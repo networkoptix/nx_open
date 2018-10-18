@@ -20,7 +20,7 @@ def test_media_stream_should_be_loaded_correctly(
     # load stream
     stream = one_running_mediaserver.api.get_media_stream(stream_type, camera.mac_addr)
     metadata_list = stream.load_archive_stream_metadata(
-        artifact_factory(['stream-media', stream_type]),
+        artifact_factory.make_artifact(['stream-media', stream_type]),
         pos=start_time, duration=sample_media_file.duration)
     for metadata in metadata_list:
         assert metadata.width == sample_media_file.width

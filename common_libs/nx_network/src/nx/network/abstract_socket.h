@@ -359,7 +359,7 @@ public:
     virtual void cancelIOSync(nx::network::aio::EventType eventType) final;
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void pleaseStopSync(bool checkForLocks = true) override;
+    virtual void pleaseStopSync() override;
 
     virtual QString idForToStringFromPtr() const; //< Used by toString(const T*).
 

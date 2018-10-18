@@ -19,7 +19,7 @@ Q_OBJECT
 QN_DECLARE_METAOBJECT_HEADER(Qn,
     ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
     StreamFpsSharingMethod TimePeriodContent SystemComponent
-    ConnectionRole ResourceStatus BitratePerGopType
+    ConnectionRole ResourceStatus
     PanicMode RebuildState BackupState PeerType StatisticsDeviceType
     StorageInitResult IOPortType IODefaultState AuditRecordType AuthResult
     RebuildAction BackupAction MediaStreamEvent StreamIndex
@@ -28,7 +28,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields
     ServerFlags IOPortTypes
-    Permissions
+    Permissions StorageStatuses
     )
 
     enum ExtrapolationMode {
@@ -40,8 +40,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     enum CameraCapability {
         NoCapabilities                      = 0x000,
         PrimaryStreamSoftMotionCapability   = 0x004,
-        RelayInputCapability                = 0x008,
-        RelayOutputCapability               = 0x010,
+        InputPortCapability                 = 0x008,
+        OutputPortCapability                = 0x010,
         ShareIpCapability                   = 0x020,
         AudioTransmitCapability             = 0x040,
         RemoteArchiveCapability             = 0x100,
@@ -53,6 +53,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         DeviceBasedSync                     = 0x4000, //< For NVR if channels are depend on each other and can play synchronously only.
         DualStreamingForLiveOnly            = 0x8000,
         customMediaPortCapability           = 0x10000, //< Camera's media streams port are editable.
+        CameraTimeCapability                = 0x20000, //< Camera sends absolute timestamps in media stream
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
@@ -297,12 +298,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
     QString toString(StatusChangeReason reason);
 
-    enum BitratePerGopType {
-        BPG_None,
-        BPG_Predefined,
-        BPG_User
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BitratePerGopType)
 
     enum IOPortType {
         PT_Unknown  = 0x0,
@@ -723,6 +718,20 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamIndex)
 
+    enum StorageStatus
+    {
+        none = 0,
+        used = 1 << 1,
+        tooSmall = 1 << 2,
+        system = 1 << 3,
+        removable = 1 << 4,
+        beingChecked = 1 << 5,
+        beingRebuilt = 1 << 6
+    };
+    Q_DECLARE_FLAGS(StorageStatuses, StorageStatus)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(StorageStatuses)
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StorageStatus)
+
     /**
      * Invalid value for a timezone UTC offset.
      */
@@ -757,7 +766,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::StorageInitResult)
     (Qn::PanicMode)
     (Qn::ResourceStatus)(Qn::StatusChangeReason)
-    (Qn::ConnectionRole)(Qn::BitratePerGopType)
+    (Qn::ConnectionRole)
     (Qn::RebuildState)(Qn::BackupState)
     (Qn::BookmarkSortField)(Qt::SortOrder)
     (Qn::RebuildAction)(Qn::BackupAction)
@@ -768,7 +777,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::IOPortTypes)(Qn::Permission)(Qn::Permissions),
+    (Qn::IOPortTypes)(Qn::Permission)(Qn::Permissions)(Qn::StorageStatus)(Qn::StorageStatuses),
     (metatype)(numeric)(lexical)
 )
 

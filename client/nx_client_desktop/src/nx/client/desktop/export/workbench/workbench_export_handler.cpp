@@ -62,6 +62,7 @@
 #include <nx/client/desktop/export/tools/export_media_validator.h>
 #include <nx/client/desktop/resources/layout_password_management.h>
 
+#include <nx/client/core/utils/grid_walker.h>
 
 #ifdef Q_OS_WIN
 #   include <launcher/nov_launcher_win.h>
@@ -86,9 +87,54 @@ QnMediaResourceWidget* extractMediaWidget(QnWorkbenchDisplay* display,
     return dynamic_cast<QnMediaResourceWidget *>(display->activeWidget());
 }
 
-static bool informersEnabled()
+QnLayoutResourcePtr layoutFromBookmarks(const QnCameraBookmarkList& bookmarks, QnResourcePool* pool)
 {
-    return ini().enableProgressInformers;
+    QnLayoutResourcePtr layout(new QnLayoutResource(pool->commonModule()));
+    layout->setName(WorkbenchExportHandler::tr("%n bookmarks", "", bookmarks.size()));
+    layout->setCellSpacing(QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Small));
+
+    // First we must count unique cameras to get the matrix size.
+    QnVirtualCameraResourceList cameras;
+    QSet<QnUuid> placedCameras;
+    for (const auto& bookmark: bookmarks)
+    {
+        if (placedCameras.contains(bookmark.cameraId))
+            continue;
+        placedCameras.insert(bookmark.cameraId);
+
+        if (const auto& camera = pool->getResourceById<QnVirtualCameraResource>(bookmark.cameraId))
+            cameras.push_back(camera);
+    }
+
+    const int camerasCount = cameras.size();
+    const int matrixSize = std::ceil(std::sqrt(camerasCount));
+    NX_ASSERT(matrixSize * matrixSize >= camerasCount);
+
+    const QRect grid(0, 0, matrixSize, matrixSize);
+    core::GridWalker gridWalker(grid);
+
+    static const QSize kCellSize(1, 1);
+
+    for (const auto& camera: cameras)
+    {
+        gridWalker.next();
+
+        QnLayoutItemData item;
+        item.flags = 0x1;
+        // Layout data item flags are declared in client module. // TODO: #GDM move to api in 4.0.
+        item.uuid = QnUuid::createUuid();
+        item.resource.id = camera->getId();
+        item.combinedGeometry = QRect(gridWalker.pos(), kCellSize);
+
+        QString forcedRotation = camera->getProperty(QnMediaResource::rotationKey());
+        if (!forcedRotation.isEmpty())
+            item.rotation = forcedRotation.toInt();
+
+        layout->addItem(item);
+    }
+
+
+    return layout;
 }
 
 bool isBinaryExportSupported()
@@ -130,18 +176,15 @@ struct WorkbenchExportHandler::Private
         q(owner),
         exportManager(new ExportManager())
     {
-        if (informersEnabled())
-        {
-            const auto& manager = q->context()->instance<WorkbenchProgressManager>();
-            NX_ASSERT(manager);
+        const auto& manager = q->context()->instance<WorkbenchProgressManager>();
+        NX_ASSERT(manager);
 
-            connect(manager, &WorkbenchProgressManager::interactionRequested, q,
-                [this](const QnUuid& exportProcessId)
-                {
-                    if (const auto dialog = runningExports.value(exportProcessId).progressDialog)
-                        dialog->show();
-                });
-        }
+        connect(manager, &WorkbenchProgressManager::interactionRequested, q,
+            [this](const QnUuid& exportProcessId)
+            {
+                if (const auto dialog = runningExports.value(exportProcessId).progressDialog)
+                    dialog->show();
+            });
     }
 
     bool isInRunningExports(const Filename& filename) const
@@ -158,9 +201,7 @@ struct WorkbenchExportHandler::Private
     {
         const auto& manager = q->context()->instance<WorkbenchProgressManager>();
         QString fullPath = fileName.completeFileName();
-        const auto exportProcessId = informersEnabled()
-            ? manager->add(tr("Exporting video"), fullPath)
-            : QnUuid::createUuid();
+        const auto exportProcessId = manager->add(tr("Exporting video"), fullPath);
 
         const auto progressDialog = new QnProgressDialog(
             fullPath,
@@ -169,18 +210,14 @@ struct WorkbenchExportHandler::Private
             100,
             q->mainWindowWidget());
 
-        if (informersEnabled())
-        {
-            auto minimizeButton = new QPushButton(tr("Minimize"), progressDialog);
-            progressDialog->addButton(minimizeButton, QDialogButtonBox::ActionRole);
-            connect(minimizeButton, &QPushButton::clicked, progressDialog, &QWidget::hide);
-        }
+        auto minimizeButton = new QPushButton(tr("Minimize"), progressDialog);
+        progressDialog->addButton(minimizeButton, QDialogButtonBox::ActionRole);
+        connect(minimizeButton, &QPushButton::clicked, progressDialog, &QWidget::hide);
 
         connect(progressDialog, &QnProgressDialog::canceled, exportManager.data(),
             [this, exportProcessId, progressDialog]
             {
-                if (informersEnabled())
-                    q->context()->instance<WorkbenchProgressManager>()->remove(exportProcessId);
+                q->context()->instance<WorkbenchProgressManager>()->remove(exportProcessId);
                 exportManager->stopExport(exportProcessId);
                 progressDialog->hide();
             });
@@ -285,6 +322,9 @@ WorkbenchExportHandler::WorkbenchExportHandler(QObject *parent):
             handleExportBookmarkAction(parameters);
         });
 
+    connect(action(ui::action::ExportBookmarksAction), &QAction::triggered, this,
+        &WorkbenchExportHandler::handleExportBookmarksAction);
+
     connect(action(ui::action::ExportStandaloneClientAction), &QAction::triggered, this,
         &WorkbenchExportHandler::at_exportStandaloneClientAction_triggered);
 
@@ -306,11 +346,8 @@ void WorkbenchExportHandler::exportProcessUpdated(const ExportProcessInfo& info)
         dialog->setValue(info.progressValue);
     }
 
-    if (informersEnabled())
-    {
-        context()->instance<WorkbenchProgressManager>()->setProgress(info.id,
-            qreal(info.progressValue - info.rangeStart) / (info.rangeEnd - info.rangeStart));
-    }
+    context()->instance<WorkbenchProgressManager>()->setProgress(info.id,
+        qreal(info.progressValue - info.rangeStart) / (info.rangeEnd - info.rangeStart));
 }
 
 void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info)
@@ -319,8 +356,7 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
         return;
 
     const auto exportProcess = d->runningExports.take(info.id);
-    if (informersEnabled())
-        context()->instance<WorkbenchProgressManager>()->remove(info.id);
+    context()->instance<WorkbenchProgressManager>()->remove(info.id);
 
     if (auto dialog = exportProcess.progressDialog)
     {
@@ -334,12 +370,15 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
             d->addResourceToPool(exportProcess.filename, resourcePool());
             QnMessageBox::success(mainWindowWidget(), tr("Export completed"));
             break;
+
         case ExportProcessStatus::failure:
             QnMessageBox::critical(mainWindowWidget(), tr("Export failed"),
                 ExportProcess::errorString(info.error));
             break;
+
         case ExportProcessStatus::cancelled:
             break;
+
         default:
             NX_ASSERT(false, "Invalid state");
     }
@@ -444,6 +483,32 @@ void WorkbenchExportHandler::handleExportBookmarkAction(const ui::action::Parame
 
     if (dialog.exec() != QDialog::Accepted)
         return;
+
+    auto context = prepareExportTool(dialog);
+    runExport(std::move(context));
+}
+
+void WorkbenchExportHandler::handleExportBookmarksAction()
+{
+    const auto parameters = menu()->currentParameters(sender());
+    auto bookmarks = parameters.argument<QnCameraBookmarkList>(Qn::CameraBookmarkListRole);
+    if (bookmarks.empty())
+        return;
+
+    QnTimePeriodList periods;
+    for (const auto& bookmark: bookmarks)
+        periods.includeTimePeriod({bookmark.startTimeMs, bookmark.durationMs});
+
+    const auto boundingPeriod = periods.boundingPeriod();
+
+    ExportSettingsDialog dialog(boundingPeriod, {}, d->fileNameValidator(), mainWindowWidget());
+    setWatermark(&dialog); //< This should go right after constructor.
+
+    static const QString reason =
+        tr("Several bookmarks can be exported as layout only.");
+    dialog.disableTab(ExportSettingsDialog::Mode::Media, reason);
+    dialog.setLayout(layoutFromBookmarks(bookmarks, resourcePool()));
+    dialog.setBookmarks(bookmarks);
 
     auto context = prepareExportTool(dialog);
     runExport(std::move(context));

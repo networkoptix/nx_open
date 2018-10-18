@@ -23,9 +23,15 @@ QnResourceStatusWatcher::QnResourceStatusWatcher(QnCommonModule* commonModule):
     connect(&m_checkStatusTimer, &QTimer::timeout, this, &QnResourceStatusWatcher::at_timer);
 }
 
-QnResourceStatusWatcher::~QnResourceStatusWatcher()
+void QnResourceStatusWatcher::stop()
 {
     m_checkStatusTimer.stop();
+    commonModule()->resourcePool()->disconnect(this);
+}
+
+QnResourceStatusWatcher::~QnResourceStatusWatcher()
+{
+    stop();
 }
 
 void QnResourceStatusWatcher::updateResourceStatus(const QnResourcePtr& resource)
@@ -122,8 +128,8 @@ void QnResourceStatusWatcher::updateResourceStatusAsync(const QnResourcePtr& res
 
     m_setStatusInProgress.insert(resource->getId());
     auto connection = commonModule()->ec2Connection();
-    auto manager = connection->getResourceManager(Qn::kSystemAccess);
-    manager->setResourceStatus(
+    auto deviceAgent = connection->getResourceManager(Qn::kSystemAccess);
+    deviceAgent->setResourceStatus(
         resource->getId(),
         resource->getStatus(),
         this,

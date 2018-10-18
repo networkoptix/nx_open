@@ -81,7 +81,6 @@ bool updateInFile(QIODevice* file,
 
 } // namespace
 
-
 QnStreamRecorder::StreamRecorderContext::StreamRecorderContext(
     const QString& fileName,
     const QnStorageResourcePtr& storage)
@@ -219,7 +218,6 @@ void QnStreamRecorder::close()
     {
         if (m_packetWrited)
             av_write_trailer(m_recordingContextVector[i].formatCtx);
-
 
         qint64 fileSize = 0;
         if (m_recordingContextVector[i].formatCtx)
@@ -1104,7 +1102,6 @@ int QnStreamRecorder::getPrebufferingUsec() const
 {
     return m_prebufferingUsec;
 }
-
 
 bool QnStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& /*media*/)
 {

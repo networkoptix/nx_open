@@ -33,7 +33,12 @@ public:
         std::optional<QString> string(const QString& name) const;
         std::optional<int> integer(const QString& name) const;
         std::optional<bool> boolean(const QString& name) const;
+        std::optional<QString> attribute(const QString& name) const;
+
+        QString stringOrEmpty(const QString& name) const;
+        int integerOrZero(const QString& name) const;
         bool booleanOrFalse(const QString& name) const;
+        QString attributeOrEmpty(const QString& name) const;
 
     private:
         const XmlRequestHelper* const m_parent;

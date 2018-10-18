@@ -64,7 +64,7 @@ public:
 
     virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event) override;
 
-    virtual bool doesEventComeFromAnalyticsDriver(nx::vms::api::EventType eventType) const override;
+    virtual bool isAnalyticsDriverEvent(nx::vms::api::EventType eventType) const override;
 
     virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) override;
 
@@ -152,7 +152,7 @@ protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
     virtual bool allowRtspVideoLayout() const override { return false; }
-    virtual void setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList) override;
+    virtual void setSupportedAnalyticsEventTypeIds(const AnalyticsEventTypeIds& eventsList) override;
 
 private:
     CameraDiagnostics::Result initDevice();
@@ -194,6 +194,7 @@ private:
 
     HanwhaPtzRangeMap fetchPtzRanges();
     QnPtzAuxilaryTraitList calculatePtzTraits() const;
+    QnPtzAuxilaryTraitList calculateCameraOnlyTraits() const;
     void calculateAutoFocusSupport(QnPtzAuxilaryTraitList* outTraitList) const;
 
     AVCodecID defaultCodecForStream(Qn::ConnectionRole role) const;
@@ -309,7 +310,7 @@ private:
         QString prefix;
     };
 
-    HanwhaPortInfo portInfoFromId(const QString& id) const;
+    boost::optional<HanwhaPortInfo> portInfoFromId(const QString& id) const;
 
     bool setOutputPortStateInternal(const QString& outputId, bool activate);
 

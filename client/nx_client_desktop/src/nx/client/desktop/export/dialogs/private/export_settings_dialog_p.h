@@ -60,6 +60,7 @@ public:
     void setWatermark(const nx::core::Watermark& watermark);
     void setLayoutReadOnly(bool value);
     void setLayoutEncryption(bool on, const QString& password);
+    void setBookmarks(const QnCameraBookmarkList& bookmarks);
 
     bool mediaSupportsUtc() const;
     Filename selectedFileName(Mode mode) const;

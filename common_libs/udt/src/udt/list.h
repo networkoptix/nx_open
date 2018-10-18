@@ -41,6 +41,7 @@ Yunhong Gu, last updated 01/22/2011
 #ifndef __UDT_LIST_H__
 #define __UDT_LIST_H__
 
+#include <mutex>
 
 #include "udt.h"
 #include "common.h"
@@ -99,7 +100,7 @@ private:
     int m_iSize;                         // size of the static array
     int m_iLastInsertPos;                // position of last insert node
 
-    pthread_mutex_t m_ListLock;          // used to synchronize list operation
+    std::mutex m_ListLock;
 
 private:
     CSndLossList(const CSndLossList&);

@@ -5,7 +5,6 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/event/event_fwd.h>
-#include <nx/api/analytics/supported_events.h>
 #include <nx/vms/event/events/events_fwd.h>
 
 #include <nx/core/resource/device_type.h>
@@ -22,6 +21,8 @@
 #include <core/resource/combined_sensors_description.h>
 #include <core/resource/media_stream_capability.h>
 #include <core/dataprovider/live_stream_params.h>
+#include <core/ptz/ptz_preset.h>
+#include "resource_data.h"
 
 class QnAbstractArchiveDelegate;
 
@@ -240,8 +241,9 @@ public:
     void setPreferredServerId(const QnUuid& value);
     QnUuid preferredServerId() const;
 
-    nx::api::AnalyticsSupportedEvents analyticsSupportedEvents() const;
-    virtual void setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList);
+    using AnalyticsEventTypeIds = QList<QString>;
+    AnalyticsEventTypeIds supportedAnalyticsEventTypeIds() const;
+    virtual void setSupportedAnalyticsEventTypeIds(const AnalyticsEventTypeIds& eventsList);
 
     //!Returns list of time periods of DTS archive, containing motion at specified \a regions with timestamp in region [\a msStartTime; \a msEndTime)
     /*!
@@ -266,8 +268,18 @@ public:
      */
     virtual bool isReadyToDetach() const {return true;}
 
-    //!Set list of IO ports
-    void setIoPortDescriptions(const QnIOPortDataList& ports);
+    /**
+     * @param ports Ports data to save into resource property.
+     * @param needMerge If true, overrides new ports dscription with saved state, because it might
+     *      be edited by client. TODO: This should be fixed by using different properties!
+     * @return true Merge has happend, false otherwise.
+     */
+    bool setIoPortDescriptions(QnIOPortDataList ports, bool needMerge);
+
+    /**
+     * @param type Filters ports by type, does not filter if Qn::PT_Unknown.
+     */
+    QnIOPortDataList ioPortDescriptions(Qn::IOPortType type = Qn::PT_Unknown) const;
 
     virtual bool setProperty(
         const QString &key,
@@ -279,9 +291,7 @@ public:
         const QVariant& value,
         PropertyOptions options = DEFAULT_OPTIONS) override;
 
-    QnIOPortDataList ioPortDescriptions(Qn::IOPortType type = Qn::PT_Unknown) const;
-
-    virtual Qn::BitratePerGopType bitratePerGopType() const;
+    virtual bool useBitratePerGop() const;
 
     // Allow getting multi video layout directly from a RTSP SDP info
     virtual bool allowRtspVideoLayout() const { return true; }
@@ -300,8 +310,13 @@ public:
     virtual int suggestBitrateKbps(const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const;
     static float rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps);
 
+    /**
+     * All events emitted by analytics driver bound to the resource can be captured within
+     * this method.
+     * @return true if event has been captured, false otherwise.
+     */
     virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event);
-    virtual bool doesEventComeFromAnalyticsDriver(nx::vms::api::EventType eventType) const;
+    virtual bool isAnalyticsDriverEvent(nx::vms::api::EventType eventType) const;
 
     virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider = nullptr) const override;
 
@@ -324,6 +339,26 @@ public:
     virtual int suggestBitrateForQualityKbps(Qn::StreamQuality q, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const;
 
     static Qn::StreamIndex toStreamIndex(Qn::ConnectionRole role);
+
+    nx::core::ptz::PresetType preferredPtzPresetType() const;
+
+    nx::core::ptz::PresetType userPreferredPtzPresetType() const;
+    void setUserPreferredPtzPresetType(nx::core::ptz::PresetType);
+
+    nx::core::ptz::PresetType defaultPreferredPtzPresetType() const;
+    void setDefaultPreferredPtzPresetType(nx::core::ptz::PresetType);
+
+    bool isUserAllowedToModifyPtzCapabilities() const;
+
+    void setIsUserAllowedToModifyPtzCapabilities(bool allowed);
+
+    Ptz::Capabilities ptzCapabilitiesAddedByUser() const;
+
+    void setPtzCapabilitiesAddedByUser(Ptz::Capabilities capabilities);
+
+    QnResourceData resourceData() const;
+
+    virtual void setCommonModule(QnCommonModule* commonModule) override;
 public slots:
     virtual void recordingEventAttached();
     virtual void recordingEventDetached();
@@ -388,7 +423,7 @@ private:
     CachedValue<bool> m_cachedCanConfigureRemoteRecording;
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
-    CachedValue<nx::api::AnalyticsSupportedEvents> m_cachedAnalyticsSupportedEvents;
+    CachedValue<AnalyticsEventTypeIds> m_cachedAnalyticsSupportedEvents;
     CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
     CachedValue<nx::core::resource::DeviceType> m_cachedDeviceType;
     CachedValue<bool> m_cachedHasVideo;

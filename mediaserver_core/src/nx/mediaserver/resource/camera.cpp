@@ -1,7 +1,5 @@
 #include "camera.h"
 
-#include <common/static_common_module.h>
-
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource_management/resource_data_pool.h>
@@ -24,7 +22,6 @@ static const std::set<QString> kSupportedCodecs = {"MJPEG", "H264", "H265"};
 namespace nx {
 namespace mediaserver {
 namespace resource {
-
 
 const float Camera::kMaxEps = 0.01f;
 
@@ -53,6 +50,7 @@ Camera::Camera(QnMediaServerModule* serverModule):
 
     connect(this, &Camera::inputPortStateChanged, updateIoCache);
     connect(this, &Camera::outputPortStateChanged, updateIoCache);
+    m_timeOffset = std::make_shared<nx::streaming::rtp::TimeOffset>();
 }
 
 Camera::~Camera()
@@ -292,7 +290,7 @@ QSize Camera::getNearestResolution(
 
     int bestIndex = -1;
     double bestMatchCoeff =
-        maxResolutionArea > kMaxEps ? (maxResolutionArea / requestSquare) : INT_MAX;
+        (maxResolutionArea > kMaxEps) ? (maxResolutionArea / requestSquare) : INT_MAX;
 
     for (int i = 0; i < resolutionList.size(); ++i)
     {
@@ -356,32 +354,30 @@ QSize Camera::closestResolution(
 
 CameraDiagnostics::Result Camera::initInternal()
 {
-    if (qnStaticCommon)
+    auto resData = resourceData();
+    int timeoutSec = resData.value<int>(Qn::kUnauthrizedTimeoutParamName);
+    auto credentials = getAuth();
+    auto status = getStatus();
+    if (timeoutSec > 0 &&
+        m_lastInitTime.isValid() &&
+        m_lastInitTime.elapsed() < timeoutSec * 1000 &&
+        status == Qn::Unauthorized &&
+        m_lastCredentials == credentials)
     {
-        auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-        int timeoutSec = resData.value<int>(Qn::kUnauthrizedTimeoutParamName);
-        auto credentials = getAuth();
-        auto status = getStatus();
-        if (timeoutSec > 0 &&
-            m_lastInitTime.isValid() &&
-            m_lastInitTime.elapsed() < timeoutSec * 1000 &&
-            status == Qn::Unauthorized &&
-            m_lastCredentials == credentials)
-        {
-            return CameraDiagnostics::NotAuthorisedResult(getUrl());
-        }
-
-        m_lastInitTime.restart();
-        m_lastCredentials = credentials;
-
-        m_mediaTraits = resData.value<nx::media::CameraTraits>(
-            Qn::kMediaTraits,
-            nx::media::CameraTraits());
+        return CameraDiagnostics::NotAuthorisedResult(getUrl());
     }
+
+    m_lastInitTime.restart();
+    m_lastCredentials = credentials;
+
+    m_mediaTraits = resData.value<nx::media::CameraTraits>(
+        Qn::kMediaTraits,
+        nx::media::CameraTraits());
 
     m_streamCapabilityAdvancedProviders.clear();
     m_defaultAdvancedParametersProvider = nullptr;
     m_advancedParametersProvidersByParameterId.clear();
+    setCameraCapability(Qn::CameraTimeCapability, true);
 
     const auto driverResult = initializeCameraDriver();
     if (driverResult.errorCode != CameraDiagnostics::ErrorCode::noError)
@@ -645,7 +641,7 @@ void Camera::fixInputPortMonitoring()
 {
     if (isInitialized() && m_inputPortListenerCount)
     {
-        if (!m_inputPortListeningInProgress && hasCameraCapabilities(Qn::RelayInputCapability))
+        if (!m_inputPortListeningInProgress && hasCameraCapabilities(Qn::InputPortCapability))
         {
             NX_DEBUG(this, "Start input port monitoring");
             startInputPortStatesMonitoring();

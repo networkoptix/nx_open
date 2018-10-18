@@ -38,7 +38,7 @@ struct UploadWorker::Private
     int chunkSize = 1024 * 1024;
     int currentChunk = 0;
     int totalChunks = 0;
-    std::mutex mutex;
+    QnMutex mutex;
 
     QFuture<QByteArray> md5Future;
     QFutureWatcher<QByteArray> md5FutureWatcher;
@@ -172,7 +172,7 @@ void UploadWorker::handleMd5Calculated()
         [this](bool success, rest::Handle handle, const QnJsonRestResult & result)
         {
             {
-                std::scoped_lock<std::mutex> lock(d->mutex);
+                QnMutexLocker lock(&d->mutex);
                 d->requests.releaseHandle(handle);
             }
             RemoteResult code = RemoteResult::ok;
@@ -197,8 +197,8 @@ void UploadWorker::handleMd5Calculated()
         d->chunkSize,
         d->md5.toHex(),
         d->upload.ttl,
-        callback);
-    // We have a racing condition around this handle
+        callback, thread());
+    // We have a race condition around this handle.
     d->requests.storeHandle(handle);
 }
 
@@ -206,7 +206,7 @@ void UploadWorker::handleFileUploadCreated(bool success, RemoteResult code, QStr
 {
     if (!success)
     {
-        switch(code)
+        switch (code)
         {
             case RemoteResult::ok:
                 // Should not be here. success should be true
@@ -261,7 +261,7 @@ void UploadWorker::handleUpload()
         [this](bool success, rest::Handle handle, const rest::ServerConnection::EmptyResponseType&)
         {
             {
-                std::scoped_lock<std::mutex> lock(d->mutex);
+                QnMutexLocker lock(&d->mutex);
                 d->requests.releaseHandle(handle);
             }
             handleChunkUploaded(success);
@@ -298,7 +298,7 @@ void UploadWorker::handleAllUploaded()
         [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             {
-                std::scoped_lock<std::mutex> lock(d->mutex);
+                QnMutexLocker lock(&d->mutex);
                 d->requests.releaseHandle(handle);
             }
             using namespace nx::vms::common::p2p::downloader;

@@ -82,7 +82,7 @@ void ConnectionManager::dispatchTransaction(
     std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer)
 {
     NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1. Dispatching transaction %2")
-        .arg(systemId).arg(transactionSerializer->transactionHeader()));
+        .arg(systemId).arg(transactionSerializer->header()));
 
     // Generating transport header.
     TransactionTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
@@ -104,7 +104,7 @@ void ConnectionManager::dispatchTransaction(
         ++connectionIt)
     {
         if (connectionIt->fullPeerName.peerId ==
-                transactionSerializer->transactionHeader().peerID.toByteArray())
+                transactionSerializer->header().peerID.toByteArray())
         {
             // Not sending transaction to peer which has generated it.
             continue;
@@ -189,7 +189,8 @@ void ConnectionManager::closeConnectionsToSystem(
     const std::string& systemId,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Closing all connections to system %1").args(systemId));
+    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        lm("Closing all connections to system %1").args(systemId));
 
     auto allConnectionsRemovedGuard =
         nx::utils::makeSharedGuard(std::move(completionHandler));

@@ -19,45 +19,6 @@ UploadManager::~UploadManager()
     m_workers.clear();
 }
 
-#ifdef TO_BE_REMOVED
-QString UploadManager::addUpload(
-    const QnMediaServerResourcePtr& server,
-    const QString& path,
-    qint64 ttl,
-    QString* errorMessage,
-    QObject* context,
-    Callback callback)
-{
-    std::unique_ptr<UploadWorker> worker = std::make_unique<UploadWorker>(server, path, ttl, this);
-
-    worker->start();
-    UploadState state = worker->state();
-    if (state.status == UploadState::Error)
-    {
-        *errorMessage = state.errorMessage;
-        return QString();
-    }
-
-    if (callback)
-        connect(worker.get(), &UploadWorker::progress, context, callback);
-
-    connect(worker.get(), &UploadWorker::progress, this,
-        [this](const UploadState& upload)
-        {
-            UploadState::Status status = upload.status;
-            if (status == UploadState::Error || status == UploadState::Done)
-            {
-                m_workers[upload.id]->deleteLater();
-                m_workers.remove(upload.id);
-            }
-        }
-    );
-
-    m_workers[state.id] = worker.release();
-    return state.id;
-}
-#endif
-
 QString UploadManager::addUpload(
         const QnMediaServerResourcePtr& server,
         UploadState& config,

@@ -636,6 +636,7 @@ ConditionWrapper syncIsForced();
 ConditionWrapper canExportLayout();
 
 ConditionWrapper canExportBookmark();
+ConditionWrapper canExportBookmarks();
 
 /** Whether wearable camera upload is enabled. */
 ConditionWrapper wearableCameraUploadEnabled();

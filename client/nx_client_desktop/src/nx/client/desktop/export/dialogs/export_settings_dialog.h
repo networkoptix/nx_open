@@ -3,6 +3,7 @@
 #include <functional>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource/camera_bookmark.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <ui/dialogs/common/button_box_dialog.h>
 #include <utils/common/connective.h>
@@ -68,6 +69,7 @@ public:
     void setLayout(const QnLayoutResourcePtr& layout);
     void setMediaParams(const QnMediaResourcePtr& mediaResource, const QnLayoutItemData& itemData,
         QnWorkbenchContext* context);
+    void setBookmarks(const QnCameraBookmarkList& bookmarks);
 private:
     SelectableTextButton* buttonForOverlayType(ExportOverlayType type);
     void setupSettingsButtons();

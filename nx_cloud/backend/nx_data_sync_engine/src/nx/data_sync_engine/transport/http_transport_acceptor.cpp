@@ -16,11 +16,13 @@ HttpTransportAcceptor::HttpTransportAcceptor(
     const QnUuid& moduleGuid,
     const ProtocolVersionRange& protocolVersionRange,
     TransactionLog* transactionLog,
-    ConnectionManager* connectionManager)
+    ConnectionManager* connectionManager,
+    const OutgoingCommandFilter& outgoingCommandFilter)
     :
     m_protocolVersionRange(protocolVersionRange),
     m_transactionLog(transactionLog),
     m_connectionManager(connectionManager),
+    m_outgoingCommandFilter(outgoingCommandFilter),
     m_localPeerData(
         moduleGuid,
         QnUuid::createUuid(),
@@ -83,6 +85,7 @@ void HttpTransportAcceptor::createConnection(
         connection->getAioThread(),
         m_connectionGuardSharedState,
         m_transactionLog,
+        m_outgoingCommandFilter,
         connectionRequestAttributes,
         systemId,
         m_localPeerData,

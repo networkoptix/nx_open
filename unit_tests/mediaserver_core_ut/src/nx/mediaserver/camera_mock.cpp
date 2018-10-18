@@ -200,7 +200,10 @@ QnSharedResourcePointer<CameraMock> CameraTest::newCamera(
     if (setup)
         setup(camera.data());
 
-    return camera->init() ? camera : QnSharedResourcePointer<CameraMock>();
+    bool result = camera->init();
+    if (!result)
+        result = camera->init();
+    return result ? camera : QnSharedResourcePointer<CameraMock>();
 }
 
 void CameraTest::SetUp()

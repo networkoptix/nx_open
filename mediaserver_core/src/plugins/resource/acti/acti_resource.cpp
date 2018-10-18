@@ -19,7 +19,6 @@
 #include <nx/utils/log/log.h>
 #include <core/resource/param.h>
 #include "acti_resource_searcher.h"
-#include <common/static_common_module.h>
 
 const QString QnActiResource::MANUFACTURE(lit("ACTI"));
 const QString QnActiResource::CAMERA_PARAMETER_GROUP_ENCODER(lit("encoder"));
@@ -429,8 +428,6 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
     setCameraCapability(Qn::customMediaPortCapability, true);
     updateDefaultAuthIfEmpty(lit("admin"), lit("123456"));
 
-    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-
     auto serverReport = makeActiRequest(
         lit("system"),
         lit("SYSTEM_INFO"),
@@ -471,7 +468,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
         m_availableEncoders.insert(lit("H264"));
     }
 
-    auto desiredTransport = resData.value<QString>(
+    auto desiredTransport = resourceData().value<QString>(
         Qn::DESIRED_TRANSPORT_PARAM_NAME,
         RtpTransport::_auto);
 
@@ -1024,14 +1021,10 @@ void QnActiResource::initializeIO( const ActiSystemInfo& systemInfo )
     auto it = systemInfo.find( "di" );
     if( it != systemInfo.end() )
         m_inputCount = it.value().toInt();
-    if( m_inputCount > 0 )
-        setCameraCapability(Qn::RelayInputCapability, true);
 
     it = systemInfo.find( "do" );
     if( it != systemInfo.end() )
         m_outputCount = it.value().toInt();
-    if( m_outputCount > 0 )
-        setCameraCapability(Qn::RelayOutputCapability, true);
 
     QnIOPortDataList ports;
     for( int i = 1; i <= m_outputCount; ++i )
@@ -1051,7 +1044,7 @@ void QnActiResource::initializeIO( const ActiSystemInfo& systemInfo )
         value.inputName = tr("Input %1").arg(i);
         ports.push_back(value);
     }
-    setIoPortDescriptions(ports);
+    setIoPortDescriptions(std::move(ports), /*needMerge*/ true);
 }
 
 /*
@@ -1447,8 +1440,7 @@ void QnActiResource::fetchAndSetAdvancedParameters()
 
 QString QnActiResource::getAdvancedParametersTemplate() const
 {
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(getVendor(), getModel());
-    auto advancedParametersTemplate = resourceData.value<QString>(ADVANCED_PARAMETERS_TEMPLATE_PARAMETER_NAME);
+    auto advancedParametersTemplate = resourceData().value<QString>(ADVANCED_PARAMETERS_TEMPLATE_PARAMETER_NAME);
     return advancedParametersTemplate.isEmpty() ?
         DEFAULT_ADVANCED_PARAMETERS_TEMPLATE : advancedParametersTemplate;
 }

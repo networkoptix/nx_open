@@ -222,6 +222,23 @@ def test_read_from_non_existent(remote_test_dir):
         _ = non_existent_file.read_bytes()
 
 
+def test_size(remote_test_dir):
+    path = remote_test_dir / 'to_measure_size.dat'
+    path.write_bytes(b'X' * 100500)
+    assert path.size() == 100500
+
+
+def test_size_of_nonexistent(remote_test_dir):
+    path = remote_test_dir / 'to_measure_size.dat'
+    pytest.raises(DoesNotExist, path.size)
+
+
+def test_size_of_a_dir(remote_test_dir):
+    path = remote_test_dir / 'to_measure_size.dat'
+    path.mkdir()
+    pytest.raises(NotAFile, path.size)
+
+
 def test_glob_on_file(existing_remote_file):
     with pytest.raises(NotADir):
         _ = list(existing_remote_file.glob('*'))

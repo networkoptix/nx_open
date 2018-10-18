@@ -6,7 +6,10 @@
 #include <nx/network/http/tunneling/client.h>
 #include <nx/network/http/tunneling/server.h>
 #include <nx/network/http/tunneling/detail/client_factory.h>
+#include <nx/network/http/tunneling/detail/connection_upgrade_tunnel_client.h>
 #include <nx/network/http/tunneling/detail/get_post_tunnel_client.h>
+#include <nx/network/http/tunneling/detail/experimental_tunnel_client.h>
+#include <nx/network/http/tunneling/detail/ssl_tunnel_client.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/thread/sync_queue.h>
 
@@ -14,9 +17,12 @@ namespace nx::network::http::tunneling::test {
 
 enum TunnelMethod
 {
-    getPost = 1,
-    connectionUpgrade = 2,
-    all = getPost | connectionUpgrade,
+    getPost = 0x01,
+    connectionUpgrade = 0x02,
+    experimental = 0x04,
+    ssl = 0x08,
+
+    all = getPost | connectionUpgrade | experimental | ssl,
 };
 
 static constexpr char kBasePath[] = "/HttpTunnelingTest";
@@ -71,6 +77,7 @@ protected:
     void whenRequestTunnel()
     {
         m_tunnelingClient = std::make_unique<Client>(m_baseUrl);
+        m_tunnelingClient->setTimeout(nx::network::kNoTimeout);
 
         m_tunnelingClient->openTunnel(
             std::bind(&HttpTunneling::saveClientTunnel, this, std::placeholders::_1));
@@ -82,7 +89,7 @@ protected:
 
         thenServerTunnelSucceded();
 
-        exchangeSomeData();
+        assertDataExchangeWorksThroughTheTunnel();
     }
 
     void thenClientTunnelSucceeded()
@@ -122,13 +129,22 @@ private:
 
     void enableTunnelMethods(int tunnelMethodMask)
     {
-        if (tunnelMethodMask & TunnelMethod::all)
+        if ((tunnelMethodMask & TunnelMethod::all) == TunnelMethod::all)
             return; //< By default, the factory is initialized with all methods.
 
         m_localFactory.clear();
 
         if (tunnelMethodMask & TunnelMethod::getPost)
             m_localFactory.registerClientType<detail::GetPostTunnelClient>();
+        
+        if (tunnelMethodMask & TunnelMethod::connectionUpgrade)
+            m_localFactory.registerClientType<detail::ConnectionUpgradeTunnelClient>();
+
+        if (tunnelMethodMask & TunnelMethod::experimental)
+            m_localFactory.registerClientType<detail::ExperimentalTunnelClient>();
+
+        if (tunnelMethodMask & TunnelMethod::ssl)
+            m_localFactory.registerClientType<detail::SslTunnelClient>();
     }
 
     void saveClientTunnel(OpenTunnelResult result)
@@ -141,7 +157,7 @@ private:
         m_serverTunnels.push(std::move(connection));
     }
 
-    void exchangeSomeData()
+    void assertDataExchangeWorksThroughTheTunnel()
     {
         ASSERT_TRUE(m_prevServerTunnelConnection->setNonBlockingMode(false));
         ASSERT_TRUE(m_prevClientTunnelResult.connection->setNonBlockingMode(false));
@@ -192,10 +208,24 @@ INSTANTIATE_TEST_CASE_P(
     HttpTunneling,
     ::testing::Values(TunnelMethod::all));
 
-
 INSTANTIATE_TEST_CASE_P(
     GetPostWithLargeMessageBody,
     HttpTunneling,
     ::testing::Values(TunnelMethod::getPost));
+
+INSTANTIATE_TEST_CASE_P(
+    ConnectionUpgrade,
+    HttpTunneling,
+    ::testing::Values(TunnelMethod::connectionUpgrade));
+
+INSTANTIATE_TEST_CASE_P(
+    Experimental,
+    HttpTunneling,
+    ::testing::Values(TunnelMethod::experimental));
+
+INSTANTIATE_TEST_CASE_P(
+    Ssl,
+    HttpTunneling,
+    ::testing::Values(TunnelMethod::ssl));
 
 } // namespace nx::network::http::tunneling::test

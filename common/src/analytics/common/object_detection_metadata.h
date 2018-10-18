@@ -30,6 +30,8 @@ QString toString(const Attribute&);
 
 //-------------------------------------------------------------------------------------------------
 
+// TODO: Rename all classes without words "Detection" and "Detected".
+
 struct DetectedObject
 {
     QString objectTypeId;

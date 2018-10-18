@@ -54,6 +54,7 @@
 #include <streaming/audio_streamer_pool.h>
 #include <media_server_process_aux.h>
 #include <nx/mediaserver/command_line_parameters.h>
+#include <nx/mediaserver/discovery/discovery_monitor.h>
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -115,6 +116,8 @@ public:
 
     bool enableMultipleInstances() const { return m_enableMultipleInstances; }
     void initStaticCommonModule();
+    void setSetupModuleCallback(std::function<void(QnMediaServerModule*)> callback);
+
 signals:
     void started();
 
@@ -168,7 +171,7 @@ private:
     void initializeUpnpPortMapper();
     nx::vms::api::ServerFlags calcServerFlags();
     void initPublicIpDiscovery();
-    void initPublicIpDiscoveryUpdate();
+    void startPublicIpDiscovery();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
     void saveStorages(
         ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages);
@@ -226,6 +229,7 @@ private:
     void updateRootPassword();
     void createResourceProcessor();
     void setRuntimeFlag(nx::vms::api::RuntimeFlag flag, bool isSet);
+    void loadResourceParamsData();
 private:
     int m_argc = 0;
     char** m_argv = nullptr;
@@ -257,23 +261,18 @@ private:
     std::unique_ptr<QTimer> m_updatePiblicIpTimer;
     std::unique_ptr<ec2::CrashReporter> m_crashReporter;
 
-    std::unique_ptr<ec2::QnDiscoveryMonitor> m_discoveryMonitor;
+    std::unique_ptr<nx::mediaserver::discovery::DiscoveryMonitor> m_discoveryMonitor;
     ec2::AbstractECConnectionPtr m_ec2Connection;
     std::unique_ptr<QnMulticast::HttpServer> m_multicastHttp;
-    std::unique_ptr<nx::mediaserver::hls::SessionPool> m_hlsSessionPool;
     std::unique_ptr<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer> m_remoteArchiveSynchronizer;
     std::unique_ptr<QnMServerResourceSearcher> m_mserverResourceSearcher;
     std::unique_ptr<QnAppserverResourceProcessor> m_serverResourceProcessor;
-    std::unique_ptr<QnMdnsListener> m_mdnsListener;
-    std::unique_ptr<nx::network::upnp::DeviceSearcher> m_upnpDeviceSearcher;
-    std::unique_ptr<QnMediaServerResourceSearchers> m_resourceSearchers;
     std::unique_ptr<TimeBasedNonceProvider> m_timeBasedNonceProvider;
     std::unique_ptr<CloudIntegrationManager> m_cloudIntegrationManager;
 
-    std::unique_ptr<QnResourceStatusWatcher> m_statusWatcher;
     std::unique_ptr<MediaServerStatusWatcher> m_mediaServerStatusWatcher;
-    std::unique_ptr<QnServerConnector> m_serverConnector;
     std::unique_ptr<QnAudioStreamerPool> m_audioStreamerPool;
     std::shared_ptr<TcpLogReceiver> m_logReceiver;
     std::unique_ptr<nx::network::upnp::PortMapper> m_upnpPortMapper;
+    std::function<void(QnMediaServerModule*)> m_setupModuleCallback;
 };

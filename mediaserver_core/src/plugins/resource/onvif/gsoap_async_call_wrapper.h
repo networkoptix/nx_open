@@ -24,18 +24,17 @@
 #include "soap_wrapper.h"
 #include <onvif/soapDeviceBindingProxy.h>
 
-
 class GSoapAsyncCallWrapperBase
 {
 public:
     /*!
         \return error code
     */
-    virtual int onGsoapSendData( const char* data, size_t size ) = 0;
+    virtual int onGsoapSendData(const char* data, size_t size) = 0;
     /*!
         \return bytes read
     */
-    virtual int onGsoapRecvData( char* data, size_t size ) = 0;
+    virtual int onGsoapRecvData(char* data, size_t maxSize) = 0;
 };
 
 //!Async wrapper for gsoap call
@@ -61,8 +60,9 @@ public:
         \param syncWrapper Ownership is passed to this class
         \param syncFunc Synchronous function to call
     */
-    GSoapAsyncCallWrapper( std::unique_ptr<SyncWrapper> syncWrapper, GSoapCallFuncType syncFunc, bool useHttpReader = false)
-    :
+    GSoapAsyncCallWrapper(std::unique_ptr<SyncWrapper> syncWrapper,
+        GSoapCallFuncType syncFunc, bool useHttpReader = false)
+        :
         m_syncWrapper(std::move(syncWrapper)),
         m_syncFunc(syncFunc),
         m_state(init),
@@ -79,15 +79,15 @@ public:
         pleaseStop();
         join();
 
-        m_syncWrapper->getProxy()->soap->socket = SOAP_INVALID_SOCKET;
-        m_syncWrapper->getProxy()->soap->master = SOAP_INVALID_SOCKET;
-        soap_destroy(m_syncWrapper->getProxy()->soap);
-        soap_end(m_syncWrapper->getProxy()->soap);
+        m_syncWrapper->soap()->socket = SOAP_INVALID_SOCKET;
+        m_syncWrapper->soap()->master = SOAP_INVALID_SOCKET;
+        soap_destroy(m_syncWrapper->soap());
+        soap_end(m_syncWrapper->soap());
         m_syncWrapper.reset();
 
-        //if we are here, it is garanteed that
-            //- completion handler is down the stack
-            //- or no completion handler is running and it will never be launched
+        // If we are here, it is guaranteed that
+        // - completion handler is down the stack
+        // - or no completion handler is running and it will never be launched.
 
         if( m_terminatedFlagPtr )
             *m_terminatedFlagPtr = true;
@@ -97,9 +97,10 @@ public:
     {
     }
 
-    /*!
-        It is garanteed that after return of this method \a resultHandler is not running and will not be called
-    */
+    /**
+     * It is guaranteed that after return of this method \a resultHandler is not running
+     * and will not be called.
+     */
     virtual void join() override
     {
         std::unique_ptr<nx::network::AbstractStreamSocket> socket;
@@ -108,28 +109,30 @@ public:
             socket = std::move(m_socket);
         }
         if( socket )
-            socket->pleaseStopSync(false);
+            socket->pleaseStopSync();
     }
 
     template<class GSoapAsyncCallWrapperType>
-    static int custom_soap_fsend( struct soap* soap, const char *s, size_t n )
+    static int custom_soap_fsend(struct soap* soap, const char* data, size_t size)
     {
         GSoapAsyncCallWrapperType* pThis = static_cast<GSoapAsyncCallWrapperType*>(soap->user);
-        return pThis->onGsoapSendData( s, n );
+        return pThis->onGsoapSendData(data, size);
     }
 
     template<class GSoapAsyncCallWrapperType>
-    static size_t custom_soap_frecv( struct soap* soap, char* data, size_t maxSize )
+    static size_t custom_soap_frecv(struct soap* soap, char* data, size_t maxSize)
     {
         GSoapAsyncCallWrapperType* pThis = static_cast<GSoapAsyncCallWrapperType*>(soap->user);
-        return pThis->onGsoapRecvData( data, maxSize );
+        return pThis->onGsoapRecvData(data, maxSize);
     }
 
     //!Start async call
     /*!
-        \param resultHandler Called on async call completion, receives GSoap result code or \a SOAP_INTERRUPTED
+        \param resultHandler Called on async call completion,
+            receives GSoap result code or \a SOAP_INTERRUPTED
         \return \a true if async call has been started successfully
-        \note Request interleaving is not supported. Issueing new request with previous still running causes undefined behavior
+        \note Request interleaving is not supported
+            Issueing new request with previous still running causes undefined behavior
     */
     template<class RequestType, class ResultHandler>
     void callAsync(RequestType&& request, ResultHandler&& resultHandler)
@@ -138,32 +141,32 @@ public:
         m_totalBytesRead = 0;
         m_httpStreamReader.flush();
         m_extCompletionHandler = std::forward<ResultHandler>(resultHandler);
-        m_resultHandler = [this](int resultCode) {
+        m_resultHandler = [this](int resultCode)
+        {
             QnMutexLocker lk( &m_mutex );
-            std::function<void(int)> extCompletionHandlerLocal = std::move( m_extCompletionHandler );
+            std::function<void(int)> extCompletionHandlerLocal = std::move(m_extCompletionHandler);
             m_socket.reset();
             lk.unlock();
-            extCompletionHandlerLocal( resultCode );
+            extCompletionHandlerLocal(resultCode);
         };
 
-        //NOTE not locking mutex because all public method calls are synchronized
-            //by caller and no request interleaving is allowed
+        // NOTE: not locking mutex because all public method calls are synchronized
+        // by caller and no request interleaving is allowed.
         m_socket = nx::network::SocketFactory::createStreamSocket(
             false,
             nx::network::NatTraversalSupport::disabled);
 
-        m_syncWrapper->getProxy()->soap->user = this;
-        m_syncWrapper->getProxy()->soap->fconnect = [](struct soap*, const char*, const char*, int) -> int { return SOAP_OK; };
-        m_syncWrapper->getProxy()->soap->fdisconnect = [](struct soap*) -> int { return SOAP_OK; };
-        m_syncWrapper->getProxy()->soap->fsend = &custom_soap_fsend<typename std::remove_reference<decltype(*this)>::type>;
-        m_syncWrapper->getProxy()->soap->frecv = &custom_soap_frecv<typename std::remove_reference<decltype(*this)>::type>;
-        m_syncWrapper->getProxy()->soap->fopen = NULL;
-        m_syncWrapper->getProxy()->soap->fdisconnect = [](struct soap*) -> int { return SOAP_OK; };
-        m_syncWrapper->getProxy()->soap->fclose = [](struct soap*) -> int { return SOAP_OK; };
-        m_syncWrapper->getProxy()->soap->fclosesocket = [](struct soap*, SOAP_SOCKET) -> int { return SOAP_OK; };
-        m_syncWrapper->getProxy()->soap->fshutdownsocket = [](struct soap*, SOAP_SOCKET, int) -> int { return SOAP_OK; };
-        m_syncWrapper->getProxy()->soap->socket = m_socket->handle();
-        m_syncWrapper->getProxy()->soap->master = m_socket->handle();
+        m_syncWrapper->soap()->user = this;
+        m_syncWrapper->soap()->fconnect = [](struct soap*, const char*, const char*, int){ return SOAP_OK; };
+        m_syncWrapper->soap()->fdisconnect = [](struct soap*){ return SOAP_OK; };
+        m_syncWrapper->soap()->fsend = &custom_soap_fsend<typename std::remove_reference<decltype(*this)>::type>;
+        m_syncWrapper->soap()->frecv = &custom_soap_frecv<typename std::remove_reference<decltype(*this)>::type>;
+        m_syncWrapper->soap()->fopen = NULL;
+        m_syncWrapper->soap()->fclose = [](struct soap*){ return SOAP_OK; };
+        m_syncWrapper->soap()->fclosesocket = [](struct soap*, SOAP_SOCKET){ return SOAP_OK; };
+        m_syncWrapper->soap()->fshutdownsocket = [](struct soap*, SOAP_SOCKET, int){ return SOAP_OK; };
+        m_syncWrapper->soap()->socket = m_socket->handle();
+        m_syncWrapper->soap()->master = m_socket->handle();
 
         //serializing request
         m_request = std::forward<RequestType>(request);
@@ -226,37 +229,37 @@ private:
         return bytesToCopy;
     }
 
-    void onConnectCompleted( SystemError::ErrorCode errorCode )
+    void onConnectCompleted(SystemError::ErrorCode errorCode)
     {
-        if( errorCode )
+        if (errorCode)
         {
             m_state = done;
-            return m_resultHandler( SOAP_FAULT );
+            return m_resultHandler(SOAP_FAULT);
         }
 
-        //serializing request
+        // serializing request
         m_state = sendingRequest;
         (m_syncWrapper.get()->*m_syncFunc)(m_request, m_response);
-        NX_ASSERT( !m_serializedRequest.isEmpty() );
-        m_syncWrapper->getProxy()->soap->socket = SOAP_INVALID_SOCKET;
-        m_syncWrapper->getProxy()->soap->master = SOAP_INVALID_SOCKET;
-        soap_destroy( m_syncWrapper->getProxy()->soap );
-        soap_end(m_syncWrapper->getProxy()->soap);
+        NX_ASSERT(!m_serializedRequest.isEmpty());
+        m_syncWrapper->soap()->socket = SOAP_INVALID_SOCKET;
+        m_syncWrapper->soap()->master = SOAP_INVALID_SOCKET;
+        soap_destroy(m_syncWrapper->soap());
+        soap_end(m_syncWrapper->soap());
 
         QnMutexLocker lk( &m_mutex );
         if( !m_socket )
             return;
-        //sending request
+        // sending request
         using namespace std::placeholders;
         m_socket->sendAsync(
             m_serializedRequest,
             std::bind(&GSoapAsyncCallWrapper::onRequestSent, this, _1, _2));
     }
 
-    void onRequestSent( SystemError::ErrorCode errorCode, size_t bytesSent )
+    void onRequestSent(SystemError::ErrorCode errorCode, size_t bytesSent)
     {
-        NX_VERBOSE( this, lm("Send size=%1: %2").args(bytesSent, SystemError::toString(errorCode)) );
-        if( errorCode )
+        NX_VERBOSE(this, lm("Send size=%1: %2").args(bytesSent, SystemError::toString(errorCode)));
+        if (errorCode)
         {
             m_state = done;
             return m_resultHandler( SOAP_FAULT );
@@ -378,8 +381,8 @@ private:
     {
         m_responseDataPos = 0;
         const int resultCode = (m_syncWrapper.get()->*m_syncFunc)(m_request, m_response);
-        m_syncWrapper->getProxy()->soap->socket = SOAP_INVALID_SOCKET;
-        m_syncWrapper->getProxy()->soap->master = SOAP_INVALID_SOCKET;
+        m_syncWrapper->soap()->socket = SOAP_INVALID_SOCKET;
+        m_syncWrapper->soap()->master = SOAP_INVALID_SOCKET;
         m_state = done;
         return resultCode;
     }

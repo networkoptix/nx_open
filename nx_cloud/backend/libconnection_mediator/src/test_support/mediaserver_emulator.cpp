@@ -29,8 +29,8 @@ class ApiModuleInformationHandler:
 {
 public:
     ApiModuleInformationHandler(
-        boost::optional<nx::String> cloudSystemId,
-        boost::optional<nx::String> serverIdForModuleInformation)
+        std::optional<nx::String> cloudSystemId,
+        std::optional<nx::String> serverIdForModuleInformation)
         :
         m_cloudSystemId(std::move(cloudSystemId)),
         m_serverIdForModuleInformation(std::move(serverIdForModuleInformation))
@@ -55,9 +55,9 @@ public:
             nx::vms::api::ModuleInformation moduleInformation;
             moduleInformation.realm = nx::network::AppInfo::realm();
             moduleInformation.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
-            moduleInformation.id = QnUuid::fromStringSafe(m_serverIdForModuleInformation.get());
+            moduleInformation.id = QnUuid::fromStringSafe(*m_serverIdForModuleInformation);
             if (m_cloudSystemId)
-                moduleInformation.cloudSystemId = m_cloudSystemId.get();
+                moduleInformation.cloudSystemId = *m_cloudSystemId;
 
             restResult.setReply(moduleInformation);
         }
@@ -71,9 +71,11 @@ public:
     }
 
 private:
-    const boost::optional<nx::String> m_cloudSystemId;
-    const boost::optional<nx::String> m_serverIdForModuleInformation;
+    const std::optional<nx::String> m_cloudSystemId;
+    const std::optional<nx::String> m_serverIdForModuleInformation;
 };
+
+//-------------------------------------------------------------------------------------------------
 
 MediaServerEmulator::MediaServerEmulator(
     const network::SocketAddress& mediatorUdpEndpoint,
@@ -92,6 +94,7 @@ MediaServerEmulator::MediaServerEmulator(
         serverName.isEmpty()
         ? QnUuid::createUuid().toSimpleString().toUtf8()
         : std::move(serverName)),
+    m_mediatorUdpEndpoint(mediatorUdpEndpoint),
     m_mediatorUdpClient(
         std::make_unique<nx::hpm::api::MediatorServerUdpConnection>(
             mediatorUdpEndpoint,
@@ -115,7 +118,8 @@ MediaServerEmulator::MediaServerEmulator(
 
     m_mediatorConnector->mockupMediatorUrl(
         nx::network::url::Builder()
-            .setScheme(network::stun::kUrlSchemeName).setEndpoint(mediatorTcpEndpoint),
+            .setScheme(network::stun::kUrlSchemeName)
+            .setEndpoint(mediatorTcpEndpoint),
         mediatorUdpEndpoint);
 
     m_mediatorConnector->setSystemCredentials(
@@ -173,7 +177,8 @@ bool MediaServerEmulator::start(bool listenToConnectRequests)
     auto client = m_mediatorConnector->systemConnection();
     client->bindToAioThread(getAioThread());
     m_mediatorAddressPublisher = std::make_unique<network::cloud::MediatorAddressPublisher>(
-        std::move(client));
+        std::move(client),
+        m_mediatorConnector.get());
 
     return true;
 }
@@ -244,13 +249,13 @@ void MediaServerEmulator::setConnectionAckResponseHandler(
 }
 
 void MediaServerEmulator::setCloudSystemIdForModuleInformation(
-    boost::optional<nx::String> cloudSystemId)
+    std::optional<nx::String> cloudSystemId)
 {
     m_cloudSystemIdForModuleInformation = cloudSystemId;
 }
 
 void MediaServerEmulator::setServerIdForModuleInformation(
-    boost::optional<nx::String> serverId)
+    std::optional<nx::String> serverId)
 {
     m_serverIdForModuleInformation = serverId;
 }
@@ -386,7 +391,6 @@ void MediaServerEmulator::onUdtConnectDone(SystemError::ErrorCode errorCode)
         return;
 
     m_stunPipeline = std::make_unique<network::stun::MessagePipeline>(
-        this,
         std::move(m_udtStreamSocket));
     m_stunPipeline->bindToAioThread(getAioThread());
     m_udtStreamSocket.reset();
@@ -442,13 +446,6 @@ void MediaServerEmulator::onMessageReceived(
     {
         return;
     }
-}
-
-void MediaServerEmulator::closeConnection(
-    SystemError::ErrorCode /*closeReason*/,
-    stun::MessagePipeline* connection)
-{
-    NX_ASSERT(connection == m_stunPipeline.get());
 }
 
 void MediaServerEmulator::stopWhileInAioThread()

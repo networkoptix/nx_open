@@ -66,7 +66,7 @@ nx::common::metadata::DetectedObject Cursor::toMetadataObject(
 {
     nx::common::metadata::DetectedObject result;
     result.objectTypeId = std::move(detectedObject.objectTypeId);
-    result.objectId = std::move(detectedObject.objectId);
+    result.objectId = std::move(detectedObject.objectAppearanceId);
     result.boundingBox = std::move(detectedObject.track.front().boundingBox);
     result.labels = std::move(detectedObject.attributes);
     return result;

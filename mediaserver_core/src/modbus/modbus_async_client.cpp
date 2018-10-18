@@ -75,7 +75,9 @@ namespace nx
             }
 
             m_modbusConnection.reset(
-                new ModbusProtocolConnection(this, std::move(connectionSocket)));
+                new ModbusProtocolConnection(std::move(connectionSocket)));
+            m_modbusConnection->setOnConnectionClosed(
+                [this](auto closeReason) { onConnectionClosed(closeReason); });
 
             m_modbusConnection->setMessageHandler(
                 [this](ModbusMessage message) { onMessage(std::move(message)); });
@@ -131,8 +133,8 @@ namespace nx
             emit done(message);
         }
 
-        void QnModbusAsyncClient::closeConnection(SystemError::ErrorCode closeReason,
-            ConnectionType* /*connection*/)
+        void QnModbusAsyncClient::onConnectionClosed(
+            SystemError::ErrorCode closeReason)
         {
             m_modbusConnection.reset();
             m_state = ModbusClientState::disconnected;

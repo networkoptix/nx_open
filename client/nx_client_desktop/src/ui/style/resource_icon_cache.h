@@ -54,6 +54,8 @@ public:
         IOModule,
         WebPage,
         WebPages,
+        AnalyticsEngine,
+        AnalyticsEngines,
 
         C2P,
 

@@ -11,7 +11,6 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <common/common_module.h>
-#include <common/static_common_module.h>
 
 #include <recording/time_period_list.h>
 #include "camera_user_attribute_pool.h"
@@ -21,7 +20,6 @@
 #include "nx/fusion/serialization/json.h"
 #include <nx/fusion/model_functions.h>
 #include "media_server_user_attributes.h"
-#include <common/static_common_module.h>
 #include <utils/common/synctime.h>
 
 #include <nx/utils/log/log.h>
@@ -69,8 +67,12 @@ QnUuid QnSecurityCamResource::makeCameraIdFromUniqueId(const QString& uniqueId)
     return guidFromArbitraryData(uniqueId);
 }
 
-//const int PRIMARY_ENCODER_INDEX = 0;
-//const int SECONDARY_ENCODER_INDEX = 1;
+void QnSecurityCamResource::setCommonModule(QnCommonModule* commonModule)
+{
+    base_type::setCommonModule(commonModule);
+    connect(commonModule->dataPool(), &QnResourceDataPool::changed, this,
+        &QnSecurityCamResource::resetCachedValues, Qt::DirectConnection);
+}
 
 QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     base_type(commonModule),
@@ -104,7 +106,7 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     m_cachedAnalyticsSupportedEvents(
         [this]()
         {
-            return QJson::deserialized<nx::api::AnalyticsSupportedEvents>(
+            return QJson::deserialized<AnalyticsEventTypeIds>(
                 getProperty(Qn::kAnalyticsDriversParamName).toUtf8());
         },
         &m_mutex),
@@ -126,8 +128,7 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     m_cachedHasVideo(
         [this]()
         {
-            const auto data = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-            return !data.value(Qn::VIDEO_DISABLED_PARAM_NAME, false);
+            return !resourceData().value(Qn::VIDEO_DISABLED_PARAM_NAME, false);
         },
         &m_mutex)
 {
@@ -479,8 +480,7 @@ bool QnSecurityCamResource::isAnalogEncoder() const
     if (deviceType() == nx::core::resource::DeviceType::encoder)
         return true;
 
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    return resourceData.value<bool>(lit("analogEncoder"));
+    return resourceData().value<bool>(lit("analogEncoder"));
 }
 
 CombinedSensorsDescription QnSecurityCamResource::combinedSensorsDescription() const
@@ -508,8 +508,7 @@ bool QnSecurityCamResource::isSharingLicenseInGroup() const
     if (!QnLicense::licenseTypeInfo(licenseType()).allowedToShareChannel)
         return false; //< Don't allow sharing for encoders e.t.c
 
-    const auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    return resourceData.value<bool>(Qn::kCanShareLicenseGroup, false);
+    return resourceData().value<bool>(Qn::kCanShareLicenseGroup, false);
 }
 
 bool QnSecurityCamResource::isNvr() const
@@ -571,9 +570,33 @@ void QnSecurityCamResource::setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod
     }
 }
 
-void QnSecurityCamResource::setIoPortDescriptions(const QnIOPortDataList& ports)
+bool QnSecurityCamResource::setIoPortDescriptions(QnIOPortDataList newPorts, bool needMerge)
 {
-    setProperty(Qn::IO_SETTINGS_PARAM_NAME, QString::fromUtf8(QJson::serialized(ports)));
+    const auto savedPorts = ioPortDescriptions();
+    bool wasDataMerged = false;
+    bool hasInputs = false;
+    bool hasOutputs = false;
+    for (auto& newPort: newPorts)
+    {
+        if (needMerge)
+        {
+            if (const auto savedPort = nx::utils::find_if(savedPorts,
+                [&](const auto& port) { return port.id == newPort.id; }))
+            {
+                newPort = *savedPort;
+                wasDataMerged = true;
+            }
+        }
+
+        const auto supportedTypes = newPort.supportedPortTypes | newPort.portType;
+        hasInputs |= supportedTypes & Qn::PT_Input;
+        hasOutputs |= supportedTypes & Qn::PT_Output;
+    }
+
+    setProperty(Qn::IO_SETTINGS_PARAM_NAME, QString::fromUtf8(QJson::serialized(newPorts)));
+    setCameraCapability(Qn::InputPortCapability, hasInputs);
+    setCameraCapability(Qn::OutputPortCapability, hasOutputs);
+    return wasDataMerged;
 }
 
 QnIOPortDataList QnSecurityCamResource::ioPortDescriptions(Qn::IOPortType type) const
@@ -914,18 +937,19 @@ QnUuid QnSecurityCamResource::preferredServerId() const
     return (*userAttributesLock)->preferredServerId;
 }
 
-nx::api::AnalyticsSupportedEvents QnSecurityCamResource::analyticsSupportedEvents() const
+QnSecurityCamResource::AnalyticsEventTypeIds
+    QnSecurityCamResource::supportedAnalyticsEventTypeIds() const
 {
     return m_cachedAnalyticsSupportedEvents.get();
 }
 
-void QnSecurityCamResource::setAnalyticsSupportedEvents(
-    const nx::api::AnalyticsSupportedEvents& eventsList)
+void QnSecurityCamResource::setSupportedAnalyticsEventTypeIds(
+    const AnalyticsEventTypeIds& eventTypeIds)
 {
-    if (eventsList.isEmpty())
+    if (eventTypeIds.isEmpty())
         setProperty(Qn::kAnalyticsDriversParamName, QVariant());
     else
-        setProperty(Qn::kAnalyticsDriversParamName, QString::fromUtf8(QJson::serialized(eventsList)));
+        setProperty(Qn::kAnalyticsDriversParamName, QString::fromUtf8(QJson::serialized(eventTypeIds)));
 }
 
 void QnSecurityCamResource::setMinDays(int value)
@@ -1290,20 +1314,17 @@ void QnSecurityCamResource::resetCachedValues()
     m_cachedCameraMediaCapabilities.reset();
     m_cachedLicenseType.reset();
     m_cachedDeviceType.reset();
+    m_cachedHasVideo.reset();
 }
 
-Qn::BitratePerGopType QnSecurityCamResource::bitratePerGopType() const
+bool QnSecurityCamResource::useBitratePerGop() const
 {
-    if (qnStaticCommon)
-    {
-        QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-        if (resourceData.value<bool>(Qn::FORCE_BITRATE_PER_GOP))
-            return Qn::BPG_Predefined;
+    auto result = getProperty(Qn::FORCE_BITRATE_PER_GOP);
+    if (!result.isEmpty())
+        return result.toInt() > 0;
 
-        if (getProperty(Qn::FORCE_BITRATE_PER_GOP).toInt() > 0)
-            return Qn::BPG_User;
-    }
-    return Qn::BPG_None;
+    return resourceData().value<bool>(Qn::FORCE_BITRATE_PER_GOP);
+    return false;
 }
 
 bool QnSecurityCamResource::isIOModule() const
@@ -1347,7 +1368,7 @@ bool QnSecurityCamResource::captureEvent(const nx::vms::event::AbstractEventPtr&
     return false;
 }
 
-bool QnSecurityCamResource::doesEventComeFromAnalyticsDriver(nx::vms::api::EventType eventType) const
+bool QnSecurityCamResource::isAnalyticsDriverEvent(nx::vms::api::EventType eventType) const
 {
     return eventType == nx::vms::api::EventType::analyticsSdkEvent;
 }
@@ -1355,6 +1376,62 @@ bool QnSecurityCamResource::doesEventComeFromAnalyticsDriver(nx::vms::api::Event
 Qn::StreamIndex QnSecurityCamResource::toStreamIndex(Qn::ConnectionRole role)
 {
     return role == Qn::CR_SecondaryLiveVideo ? Qn::StreamIndex::secondary : Qn::StreamIndex::primary;
+}
+
+nx::core::ptz::PresetType QnSecurityCamResource::preferredPtzPresetType() const
+{
+    auto userPreference = userPreferredPtzPresetType();
+    if (userPreference != nx::core::ptz::PresetType::undefined)
+        return userPreference;
+
+    return defaultPreferredPtzPresetType();
+}
+
+nx::core::ptz::PresetType QnSecurityCamResource::userPreferredPtzPresetType() const
+{
+    return QnLexical::deserialized(
+        getProperty(Qn::kUserPreferredPtzPresetType),
+        nx::core::ptz::PresetType::undefined);
+}
+
+void QnSecurityCamResource::setUserPreferredPtzPresetType(nx::core::ptz::PresetType presetType)
+{
+    setProperty(Qn::kUserPreferredPtzPresetType, QnLexical::serialized(presetType));
+}
+
+nx::core::ptz::PresetType QnSecurityCamResource::defaultPreferredPtzPresetType() const
+{
+    return QnLexical::deserialized(
+        getProperty(Qn::kDefaultPreferredPtzPresetType),
+        nx::core::ptz::PresetType::native);
+}
+
+void QnSecurityCamResource::setDefaultPreferredPtzPresetType(nx::core::ptz::PresetType presetType)
+{
+    setProperty(Qn::kDefaultPreferredPtzPresetType, QnLexical::serialized(presetType));
+}
+
+bool QnSecurityCamResource::isUserAllowedToModifyPtzCapabilities() const
+{
+    return QnLexical::deserialized(getProperty(Qn::kUserIsAllowedToOverridePtzCapabilities), false);
+}
+
+void QnSecurityCamResource::setIsUserAllowedToModifyPtzCapabilities(bool allowed)
+{
+    setProperty(
+        Qn::kUserIsAllowedToOverridePtzCapabilities,
+        QnLexical::serialized(allowed));
+}
+
+Ptz::Capabilities QnSecurityCamResource::ptzCapabilitiesAddedByUser() const
+{
+    return QnLexical::deserialized<Ptz::Capabilities>(
+        getProperty(Qn::kPtzCapabilitiesAddedByUser), Ptz::NoPtzCapabilities);
+}
+
+void QnSecurityCamResource::setPtzCapabilitiesAddedByUser(Ptz::Capabilities capabilities)
+{
+    setProperty(Qn::kPtzCapabilitiesAddedByUser, QnLexical::serialized(capabilities));
 }
 
 int QnSecurityCamResource::suggestBitrateKbps(const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const
@@ -1382,7 +1459,7 @@ int QnSecurityCamResource::suggestBitrateForQualityKbps(Qn::StreamQuality qualit
         resolution,
         fps,
         streamCapability,
-        bitratePerGopType());
+        useBitratePerGop());
 }
 
 bool QnSecurityCamResource::setCameraCredentialsSync(
@@ -1401,4 +1478,9 @@ Qn::MediaStreamEvent QnSecurityCamResource::checkForErrors() const
     if (capabilities.testFlag(Qn::IsOldFirmwareCapability))
         return Qn::MediaStreamEvent::oldFirmware;
     return Qn::MediaStreamEvent::NoEvent;
+}
+
+QnResourceData QnSecurityCamResource::resourceData() const
+{
+    return commonModule()->dataPool()->data(toSharedPointer(this));
 }

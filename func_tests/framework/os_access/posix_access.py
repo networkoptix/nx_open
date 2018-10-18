@@ -201,8 +201,7 @@ class PosixAccess(OSAccess):
                 return int(free_space_raw)
         raise RuntimeError("Cannot find mount point / in output:\n{}".format(output))
 
-    def consume_disk_space(self, should_leave_bytes):
-        to_consume_bytes = self.free_disk_space_bytes() - should_leave_bytes
+    def _hold_disk_space(self, to_consume_bytes):
         holder_path = self._disk_space_holder()
         self.shell.command(['fallocate', '-l', to_consume_bytes, holder_path]).run()
 

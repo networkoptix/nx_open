@@ -3,7 +3,7 @@ import timeit
 from abc import ABCMeta, abstractmethod, abstractproperty
 from contextlib import contextmanager
 
-from typing import ByteString
+from typing import ByteString, Optional
 
 from framework.os_access.exceptions import Timeout, exit_status_error_cls
 from framework.waiting import Wait
@@ -167,6 +167,7 @@ class Run(object):
             pos += len(stdout)
 
     def communicate(self, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
+        # type: (Optional[bytes, bytearray, memoryview], float) -> (bytes, bytes)
         if input is not None:
             # If input bytes not None but empty, send zero bytes once.
             left_to_send = memoryview(input)
@@ -209,7 +210,7 @@ class Command(object):
         yield Run()
 
     def run(self, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
-        # type: (ByteString, float) -> ByteString
+        # type: (ByteString, float) -> bytes
         """Shortcut. Just run a command and get stdout or raise an error."""
         with self.running() as run:
             stdout, stderr = run.communicate(input=input, timeout_sec=timeout_sec)

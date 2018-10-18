@@ -67,13 +67,16 @@ void QnSignDialogDisplay::finilizeSign()
 
 bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
 {
-    QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (data->dataProvider);
+    QnAbstractMediaDataPtr media = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
+    if (!media)
+        return true;
+
+    QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (media->dataProvider);
     if (reader)
         m_reader = reader;
 
     QnEmptyMediaDataPtr eofPacket = std::dynamic_pointer_cast<QnEmptyMediaData>(data);
 
-    QnAbstractMediaDataPtr media = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
     QnCompressedVideoDataPtr video = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
     QnCompressedAudioDataPtr audio = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
     if (m_prevSpeed != m_speed)

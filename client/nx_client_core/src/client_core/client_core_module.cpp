@@ -30,8 +30,6 @@ using namespace nx::client::core;
 QnClientCoreModule::QnClientCoreModule(QObject* parent):
     base_type(parent)
 {
-    Q_INIT_RESOURCE(appserver2);
-
     m_commonModule = new QnCommonModule(true, nx::core::access::Mode::cached, this);
 
     m_commonModule->store(new QnClientCoreSettings());
@@ -42,7 +40,7 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
 
     NX_ASSERT(nx::utils::TimerManager::instance());
     m_connectionFactory.reset(new ec2::RemoteConnectionFactory(
-        m_commonModule, 
+        m_commonModule,
         qnStaticCommon->localPeerType(),
         false));
 
@@ -56,6 +54,7 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
     m_resourceDataProviderFactory.reset(new QnDataProviderFactory());
 
     m_qmlEngine = new QQmlEngine(this);
+    m_qmlEngine->setOutputWarningsToStandardError(true);
 
     registerResourceDataProviders();
 }

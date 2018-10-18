@@ -6,6 +6,7 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <nx/client/desktop/resource_views/models/fake_resource_list_model.h>
+#include <utils/common/credentials.h>
 
 class QStackedWidget;
 class QnResourcePool;
@@ -95,6 +96,9 @@ private:
     QScopedPointer<FoundDevicesModel> m_model;
     AddingDevicesSet m_addingDevices;
     bool m_addressEditing;
+
+    common::utils::Credentials m_knownAddressCredentials;
+    common::utils::Credentials m_subnetScanCredentials;
 };
 
 } // namespace desktop

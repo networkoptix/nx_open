@@ -6,7 +6,6 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <streaming/rtp_stream_reader.h>
 #include <nx/utils/log/log.h>
-#include <common/static_common_module.h>
 
 const QString QnFlirEIPResource::MANUFACTURE(lit("FLIR"));
 
@@ -58,10 +57,7 @@ CameraDiagnostics::Result QnFlirEIPResource::initializeCameraDriver()
     if (!client->registerSession())
         return CameraDiagnostics::CannotEstablishConnectionResult(kDefaultEipPort);
 
-    setCameraCapabilities(
-        Qn::PrimaryStreamSoftMotionCapability |
-        Qn::RelayInputCapability |
-        Qn::RelayOutputCapability );
+    setCameraCapabilities(Qn::PrimaryStreamSoftMotionCapability);
 
     initializeIO();
 
@@ -541,7 +537,7 @@ bool QnFlirEIPResource::findAlarmInputByTypeAndId(int id, const QString& type, Q
 void QnFlirEIPResource::initializeIO()
 {
     QnMutexLocker lock(&m_ioMutex);
-    auto resData = qnStaticCommon->dataPool()->data(MANUFACTURE, getModel());
+    auto resData = resourceData();
     auto portList = resData.value<QnIOPortDataList>(Qn::IO_SETTINGS_PARAM_NAME);
     auto alarmsCount = resData.value<int>(kAlarmsCountParamName);
 
@@ -566,7 +562,7 @@ void QnFlirEIPResource::initializeIO()
     for (size_t i = 0; i < alarmsCount; i++)
         m_alarmStates.push_back(false);
 
-    setIoPortDescriptions(portList);
+    setIoPortDescriptions(std::move(portList), /*needMerge*/ true);
 }
 
 void QnFlirEIPResource::stopInputPortStatesMonitoring()

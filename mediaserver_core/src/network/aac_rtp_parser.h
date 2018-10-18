@@ -17,7 +17,7 @@ public:
     virtual ~QnAacRtpParser();
     virtual void setSdpInfo(QList<QByteArray> sdpInfo) override;
 
-    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const QnRtspStatistic& statistics, bool& gotData) override;
+    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, bool& gotData) override;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;
 private:
     int m_sizeLength; // 0 if constant size. see RFC3640
@@ -30,7 +30,6 @@ private:
     int m_streamStateIndication;
     int m_profile;
     int m_bitrate;
-    int m_frequency;
     int m_channels;
     int m_streamtype;
     QByteArray m_config;

@@ -71,6 +71,8 @@ public:
     bool isReadOnly() const;
     void setReadOnly(bool value);
 
+    void setHintColor(const QColor& color);
+
     bool isValid() const;
 
 public:

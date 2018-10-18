@@ -250,9 +250,11 @@ ActionHandler::ActionHandler(QObject *parent) :
         [this] { openLocalSettingsDialog(QnLocalSettingsDialog::NotificationsPage); },
         Qt::QueuedConnection);
 
-    // system administration
-    connect(action(action::SystemAdministrationAction), &QAction::triggered, this,
-        [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::GeneralPage); });
+    // System administration.
+    connect(action(action::SystemAdministrationAction), &QAction::triggered,
+        this, &ActionHandler::at_systemAdministrationAction_triggered);
+
+    // TODO: #vkutin #gdm Remove these actions, use FocusTabRole in action parameters instead.
     connect(action(action::PreferencesLicensesTabAction), &QAction::triggered, this,
         [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::LicensesPage); });
     connect(action(action::PreferencesSmtpTabAction), &QAction::triggered, this,
@@ -1279,10 +1281,21 @@ void ActionHandler::openBackupCamerasDialog() {
     dialog->exec();
 }
 
+void ActionHandler::at_systemAdministrationAction_triggered()
+{
+    const auto parameters = menu()->currentParameters(sender());
+    const int page = parameters.hasArgument(Qn::FocusTabRole)
+        ? parameters.argument(Qn::FocusTabRole).toInt()
+        : QnSystemAdministrationDialog::GeneralPage;
+
+    openSystemAdministrationDialog(page);
+}
+
 void ActionHandler::openSystemAdministrationDialog(int page)
 {
     QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(
         m_systemAdministrationDialog, mainWindowWidget());
+
     systemAdministrationDialog()->setCurrentPage(page);
 }
 

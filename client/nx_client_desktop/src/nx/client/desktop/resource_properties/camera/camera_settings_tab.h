@@ -13,6 +13,7 @@ enum class CameraSettingsTab
     fisheye,
     advanced,
     web,
+    analytics,
     expert,
 };
 

@@ -13,7 +13,8 @@ WebSocket::WebSocket(
     std::unique_ptr<AbstractStreamSocket> streamSocket,
     SendMode sendMode,
     ReceiveMode receiveMode,
-    Role role)
+    Role role,
+    FrameType frameType)
     :
     m_socket(std::move(streamSocket)),
     m_parser(role, this),
@@ -25,7 +26,11 @@ WebSocket::WebSocket(
     m_pingTimer(new nx::network::aio::Timer),
     m_aliveTimer(new nx::network::aio::Timer),
     m_aliveTimeout(kAliveTimeout),
-    m_lastError(SystemError::noError)
+    m_lastError(SystemError::noError),
+    m_frameType(
+        frameType == FrameType::binary || frameType == FrameType::text
+            ? frameType
+            : FrameType::binary)
 {
     m_socket->setRecvTimeout(0);
     m_socket->setSendTimeout(0);
@@ -34,6 +39,20 @@ WebSocket::WebSocket(
     m_aliveTimer->bindToAioThread(m_socket->getAioThread());
     m_readBuffer.reserve(4096);
 }
+
+WebSocket::WebSocket(
+    std::unique_ptr<AbstractStreamSocket> streamSocket,
+    FrameType frameType)
+    :
+    WebSocket(
+        std::move(streamSocket),
+        SendMode::singleMessage,
+        ReceiveMode::message,
+        Role::undefined,
+        frameType)
+{
+}
+
 
 WebSocket::~WebSocket()
 {
@@ -219,11 +238,11 @@ void WebSocket::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
             nx::Buffer writeBuffer;
             if (m_sendMode == SendMode::singleMessage)
             {
-                m_serializer.prepareMessage(buffer, FrameType::binary, &writeBuffer);
+                m_serializer.prepareMessage(buffer, m_frameType, &writeBuffer);
             }
             else
             {
-                FrameType type = !m_isFirstFrame ? FrameType::continuation : FrameType::binary;
+                FrameType type = !m_isFirstFrame ? FrameType::continuation : m_frameType;
 
                 m_serializer.prepareFrame(buffer, type, m_isLastFrame, &writeBuffer);
                 m_isFirstFrame = m_isLastFrame;

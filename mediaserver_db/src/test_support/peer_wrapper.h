@@ -4,6 +4,7 @@
 #include <string>
 
 #include <QtCore/QString>
+#include <QtCore/QVariant>
 
 #include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
@@ -15,6 +16,31 @@
 
 namespace ec2 {
 namespace test {
+
+namespace MergeAttributes {
+
+enum class AttributeName
+{
+    takeRemoteSettings,
+};
+
+struct Attribute
+{
+    AttributeName name;
+    QVariant value;
+};
+
+struct TakeRemoteSettings: Attribute
+{
+    TakeRemoteSettings(bool value_)
+    {
+        value = value_;
+    }
+};
+
+} // namespace MergeAttributes
+
+//-------------------------------------------------------------------------------------------------
 
 // TODO: #ak Get rid of this class. ec2GetTransactionLog should be in MediaServerClient.
 // Though, it requires some refactoring: moving ec2::ApiTransactionDataList out of appserver2.
@@ -35,6 +61,8 @@ public:
         ec2::ApiTransactionDataList* result);
 };
 
+//-------------------------------------------------------------------------------------------------
+
 class PeerWrapper
 {
 public:
@@ -47,6 +75,8 @@ public:
 
     bool startAndWaitUntilStarted();
 
+    void stop();
+
     bool configureAsLocalSystem();
 
     bool saveCloudSystemCredentials(
@@ -58,7 +88,9 @@ public:
 
     bool detachFromSystem();
 
-    QnRestResult::Error mergeTo(const PeerWrapper& remotePeer);
+    QnRestResult::Error mergeTo(
+        const PeerWrapper& remotePeer,
+        std::vector<MergeAttributes::Attribute> attributes = {});
 
     ec2::ErrorCode getTransactionLog(ec2::ApiTransactionDataList* result) const;
 
@@ -74,10 +106,16 @@ public:
 
     nx::utils::test::ModuleLauncher<Appserver2Process>& process();
 
-    static bool areAllPeersHaveSameTransactionLog(
+    static bool allPeersHaveSameTransactionLog(
+        std::vector<const PeerWrapper*> peers);
+
+    static bool allPeersHaveSameTransactionLog(
         const std::vector<std::unique_ptr<PeerWrapper>>& peers);
 
-    static bool arePeersInterconnected(
+    static bool peersInterconnected(
+        std::vector<const PeerWrapper*> peers);
+
+    static bool peersInterconnected(
         const std::vector<std::unique_ptr<PeerWrapper>>& peers);
 
 private:

@@ -12,7 +12,7 @@
 
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_container_api.h>
-#include <nx/sdk/metadata/plugin.h>
+#include <nx/sdk/analytics/engine.h>
 #include <nx/plugins/settings.h>
 
 /**
@@ -68,15 +68,6 @@ public:
     }
 
     /**
-     * @return Name of the plugin dynamic library, without "lib" prefix and without extension, or
-     * null string if not found.
-     */
-    QString pluginLibName(const nxpl::PluginInterface* plugin)
-    {
-        return m_libNameByNxPlugin.value(plugin);
-    }
-
-    /**
      * @param settings This settings are reported to each plugin (if supported by the plugin).
      */
     void loadPlugins(const QSettings* settings);
@@ -106,6 +97,5 @@ private:
     nxpl::PluginInterface* const m_pluginContainer;
     QList<QSharedPointer<QPluginLoader>> m_qtPlugins;
     QList<nxpl::PluginInterface*> m_nxPlugins;
-    QHash<const nxpl::PluginInterface*, QString> m_libNameByNxPlugin;
     mutable QnMutex m_mutex;
 };

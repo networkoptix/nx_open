@@ -1,3 +1,5 @@
+#include <future>
+
 #include <gtest/gtest.h>
 
 #include <nx/network/address_resolver.h>
@@ -77,7 +79,6 @@ protected:
     void givenPeerConnectedToMediator()
     {
         startMediator();
-        m_mediatorConnector->enable(true /*wait for completion*/);
 
         waitForPeerToRegisterOnMediator();
         andNewMediatorEndpointIsAvailable();
@@ -85,7 +86,16 @@ protected:
 
     void givenPeerFailedToConnectToMediator()
     {
-        m_mediatorConnector->enable(true /*wait for completion*/);
+        std::promise<nx::network::http::StatusCode::Value> fetchMediatorEndpointCompleted;
+        m_mediatorConnector->fetchUdpEndpoint(
+            [&fetchMediatorEndpointCompleted](
+                nx::network::http::StatusCode::Value statusCode, nx::network::SocketAddress)
+            {
+                fetchMediatorEndpointCompleted.set_value(statusCode);
+            });
+
+        ASSERT_FALSE(nx::network::http::StatusCode::isSuccessCode(
+            fetchMediatorEndpointCompleted.get_future().get()));
     }
 
     void whenMediatorUrlEndpointIsChanged()
@@ -127,7 +137,7 @@ protected:
 
     void andNewMediatorEndpointIsAvailable()
     {
-        while (m_mediatorConnector->udpEndpoint()->toString() !=
+        while (getMediatorUdpEndpoint().toString() !=
             m_mediator->moduleInstance()->impl()->stunUdpEndpoints().front().toString())
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -145,6 +155,20 @@ protected:
     api::MediatorConnector& mediatorConnector()
     {
         return *m_mediatorConnector;
+    }
+
+    nx::network::SocketAddress getMediatorUdpEndpoint()
+    {
+        std::promise<nx::network::SocketAddress> mediatorUdpEndpointPromise;
+        mediatorConnector().fetchUdpEndpoint(
+            [&mediatorUdpEndpointPromise](
+                auto /*resultCode*/,
+                nx::network::SocketAddress udpEndpoint)
+            {
+                mediatorUdpEndpointPromise.set_value(udpEndpoint);
+            });
+
+        return mediatorUdpEndpointPromise.get_future().get();
     }
 
 private:
@@ -187,6 +211,9 @@ private:
 
     std::unique_ptr<nx::network::http::AbstractMsgBodySource> generateCloudModuleXml()
     {
+        if (!m_mediator)
+            return nullptr;
+
         return std::make_unique<nx::network::http::BufferSource>(
             "text/xml",
             m_cloudModuleListGenerator.get(m_mediator.get()));
@@ -351,8 +378,8 @@ class MediatorHttpAndUdpEndpointsOnDifferentHostsListGenerator:
 public:
     MediatorHttpAndUdpEndpointsOnDifferentHostsListGenerator()
     {
-        m_httpHost = nx::utils::generateRandomName(7).toStdString();
-        m_stunHost = nx::utils::generateRandomName(7).toStdString();
+        m_httpHost = nx::utils::generateRandomName(7).toLower().toStdString();
+        m_stunHost = nx::utils::generateRandomName(7).toLower().toStdString();
 
         nx::network::SocketGlobals::addressResolver().dnsResolver().addEtcHost(
             m_httpHost.c_str(), { nx::network::HostAddress::localhost });
@@ -393,7 +420,6 @@ protected:
     void givenPeerConnectedToMediator()
     {
         whenStartMediator();
-        mediatorConnector().enable(true /*wait for completion*/);
 
         waitForPeerToRegisterOnMediator();
     }
@@ -404,7 +430,7 @@ protected:
 
         ASSERT_EQ(
             nx::network::url::getEndpoint(m_udpUrl),
-            *mediatorConnector().udpEndpoint());
+            getMediatorUdpEndpoint());
     }
 
 private:

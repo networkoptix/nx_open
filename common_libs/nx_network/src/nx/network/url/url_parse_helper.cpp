@@ -13,7 +13,7 @@ quint16 getDefaultPortForScheme(const QString& scheme)
         return 80;
     else if (scheme.toLower() == nx::network::http::kSecureUrlSchemeName)
         return 443;
-    else if (scheme.toLower() == nx_rtsp::kUrlSchemeName)
+    else if (scheme.toLower() == nx::network::rtsp::kUrlSchemeName)
         return 554;
 
     return 0;

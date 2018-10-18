@@ -51,16 +51,14 @@ void RemoteArchiveStreamSynchronizationTask::createArchiveReaderThreadUnsafe(
         duration_cast<microseconds>(milliseconds(timePeriod.endTimeMs())).count(),
         /*frameStep*/ 1);
 
-    #if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
-        if (m_resource->isRemoteArchiveMotionDetectionEnabled())
-        {
-            auto motionDelegate = std::make_unique<plugins::MotionDelegateWrapper>(
-                std::move(archiveDelegate));
+    if (m_resource->isRemoteArchiveMotionDetectionEnabled())
+    {
+        auto motionDelegate = std::make_unique<plugins::MotionDelegateWrapper>(
+            std::move(archiveDelegate));
 
-            motionDelegate->setMotionRegion(m_resource->getMotionRegion(0));
-            archiveDelegate = std::move(motionDelegate);
-        }
-    #endif
+        motionDelegate->setMotionRegion(m_resource->getMotionRegion(0));
+        archiveDelegate = std::move(motionDelegate);
+    }
 
     m_archiveReader = std::make_unique<QnArchiveStreamReader>(m_resource);
     m_archiveReader->setObjectName(kReaderThreadName);

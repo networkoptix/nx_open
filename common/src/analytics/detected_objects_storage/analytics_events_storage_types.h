@@ -34,7 +34,7 @@ QN_FUSION_DECLARE_FUNCTIONS(ObjectPosition, (json)(ubjson));
 
 struct DetectedObject
 {
-    QnUuid objectId;
+    QnUuid objectAppearanceId;
     QString objectTypeId;
     /** Persistent object attributes. E.g., license plate number. */
     std::vector<common::metadata::Attribute> attributes;
@@ -46,16 +46,19 @@ struct DetectedObject
 };
 
 #define DetectedObject_analytics_storage_Fields \
-    (objectId)(objectTypeId)(attributes)(firstAppearanceTimeUsec)(lastAppearanceTimeUsec)(track)
+    (objectAppearanceId)(objectTypeId)(attributes)(firstAppearanceTimeUsec)(lastAppearanceTimeUsec)(track)
 QN_FUSION_DECLARE_FUNCTIONS(DetectedObject, (json)(ubjson));
 
 //-------------------------------------------------------------------------------------------------
 
 struct Filter
 {
-    QnUuid deviceId;
+    /**
+     * If empty than any device is matched.
+     */
+    std::vector<QnUuid> deviceIds;
     std::vector<QString> objectTypeId;
-    QnUuid objectId;
+    QnUuid objectAppearanceId;
     QnTimePeriod timePeriod;
     /**
      * Coordinates are in range [0;1].
@@ -91,7 +94,7 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter);
 QString toString(const Filter& filter);
 
 #define Filter_analytics_storage_Fields \
-    (deviceId)(objectTypeId)(objectId)(timePeriod)(boundingBox)(requiredAttributes)(freeText)
+    (deviceIds)(objectTypeId)(objectAppearanceId)(timePeriod)(boundingBox)(requiredAttributes)(freeText)
 QN_FUSION_DECLARE_FUNCTIONS(Filter, (json)(ubjson));
 
 //-------------------------------------------------------------------------------------------------

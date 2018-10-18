@@ -125,25 +125,26 @@ nx::sql::DBResult SystemSharingDataObject::deleteSharing(
     const nx::sql::InnerJoinFilterFields& filterFields)
 {
     QSqlQuery removeSharingQuery(*queryContext->connection()->qtSqlConnection());
-    QString sqlQueryStr = R"sql(
+    std::string sqlQueryStr = R"sql(
         DELETE FROM system_to_account WHERE system_id=:systemId
     )sql";
 
-    QString filterStr;
+    std::string filterStr;
     if (!filterFields.empty())
     {
         filterStr = nx::sql::joinFields(filterFields, " AND ");
         sqlQueryStr += " AND " + filterStr;
     }
-    removeSharingQuery.prepare(sqlQueryStr);
+    removeSharingQuery.prepare(sqlQueryStr.c_str());
     removeSharingQuery.bindValue(
         ":systemId",
         QnSql::serialized_field(systemId));
     nx::sql::bindFields(&removeSharingQuery, filterFields);
     if (!removeSharingQuery.exec())
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Failed to remove sharing. system %1, filter \"%2\". %3")
-            .arg(systemId).arg(filterStr).arg(removeSharingQuery.lastError().text()));
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+            lm("Failed to remove sharing. system %1, filter \"%2\". %3")
+                .args(systemId, filterStr, removeSharingQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
     return nx::sql::DBResult::ok;
@@ -218,7 +219,7 @@ nx::sql::DBResult SystemSharingDataObject::fetchUserSharings(
     const nx::sql::InnerJoinFilterFields& filterFields,
     std::vector<api::SystemSharingEx>* const sharings)
 {
-    QString sqlRequestStr = R"sql(
+    std::string sqlRequestStr = R"sql(
         SELECT a.id as accountId,
                a.email as accountEmail,
                sa.system_id as systemId,
@@ -233,7 +234,7 @@ nx::sql::DBResult SystemSharingDataObject::fetchUserSharings(
         WHERE sa.account_id=a.id
     )sql";
 
-    QString filterStr;
+    std::string filterStr;
     if (!filterFields.empty())
     {
         filterStr = nx::sql::joinFields(filterFields, " AND ");
@@ -242,7 +243,7 @@ nx::sql::DBResult SystemSharingDataObject::fetchUserSharings(
 
     QSqlQuery selectSharingQuery(*queryContext->connection()->qtSqlConnection());
     selectSharingQuery.setForwardOnly(true);
-    selectSharingQuery.prepare(sqlRequestStr);
+    selectSharingQuery.prepare(sqlRequestStr.c_str());
     nx::sql::bindFields(&selectSharingQuery, filterFields);
     if (!selectSharingQuery.exec())
     {

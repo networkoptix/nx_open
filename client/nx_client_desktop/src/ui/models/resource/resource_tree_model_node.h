@@ -59,6 +59,8 @@ public:
 
     virtual ~QnResourceTreeModelNode();
 
+    void setUseExtraSearchInformation(bool value);
+
     virtual void setResource(const QnResourcePtr &resource);
     virtual void setParent(const QnResourceTreeModelNodePtr& parent);
     virtual void updateRecursive();
@@ -218,6 +220,7 @@ private:
     /* Nodes of the same resource are organized into double-linked list: */
     QnResourceTreeModelNodePtr m_prev;
     QnResourceTreeModelNodePtr m_next;
+    bool m_useExtraSearchInformation = true;
 };
 
 QDebug operator<<(QDebug dbg, QnResourceTreeModelNode* node);

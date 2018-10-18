@@ -12,6 +12,7 @@
 
 class QnCommonModule;
 struct QnJsonRestResult;
+class MediaServerClient;
 
 namespace nx {
 namespace vms {
@@ -57,6 +58,15 @@ private:
         const MergeSystemData& data,
         QnJsonRestResult* result);
 
+    nx::network::http::StatusCode::Value checkIfSystemsHaveServerWithSameId(
+        MediaServerClient* remoteMediaServerClient,
+        QnJsonRestResult* result);
+
+    nx::network::http::StatusCode::Value checkIfCloudSystemsMergeIsPossible(
+        const MergeSystemData& data,
+        MediaServerClient* remoteMediaServerClient,
+        QnJsonRestResult* result);
+
     nx::network::http::StatusCode::Value mergeSystems(
         Qn::UserAccessData accessRights,
         MergeSystemData data,
@@ -66,26 +76,27 @@ private:
         QnJsonRestResult* result,
         ::utils::MergeSystemsStatus::Value mergeStatus);
 
-    bool applyCurrentSettings(
+    nx::network::http::StatusCode::Value applyCurrentSettings(
         const nx::utils::Url& remoteUrl,
         const QString& postKey,
         bool oneServer);
 
-    bool applyRemoteSettings(
+    nx::network::http::StatusCode::Value applyRemoteSettings(
         const nx::utils::Url& remoteUrl,
         const QnUuid& systemId,
         const QString& systemName,
         const QString& getKey,
         const QString& postKey);
 
-    bool executeRemoteConfigure(
+    nx::network::http::StatusCode::Value executeRemoteConfigure(
         const ConfigureSystemData& data,
         const nx::utils::Url &remoteUrl,
         const QString& postKey);
 
     bool isResponseOK(const nx::network::http::HttpClient& client);
 
-    nx::network::http::StatusCode::Value getClientResponse(const nx::network::http::HttpClient& client);
+    nx::network::http::StatusCode::Value getClientResponse(
+        const nx::network::http::HttpClient& client);
 
     template <class ResultDataType>
     bool executeRequest(

@@ -82,7 +82,7 @@ void AddressResolver::resolveAsync(
         auto entries = info->second.getAll();
 
         // TODO: #mux This is ugly fix for VMS-5777, should be properly fixed in 3.1.
-        if (info->second.isLikelyCloudAddress && isCloudResolveEnabled())
+        if (info->second.isLikelyCloudAddress)
         {
             const bool cloudAddressEntryPresent =
                 std::count_if(
@@ -183,16 +183,6 @@ void AddressResolver::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 bool AddressResolver::isValidForConnect(const SocketAddress& endpoint) const
 {
     return (endpoint.port != 0) || isCloudHostName(endpoint.address.toString());
-}
-
-void AddressResolver::setCloudResolveEnabled(bool isEnabled)
-{
-    m_isCloudResolveEnabled = isEnabled;
-}
-
-bool AddressResolver::isCloudResolveEnabled() const
-{
-    return m_isCloudResolveEnabled;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -379,9 +369,10 @@ void AddressResolver::mediatorResolve(
     }
 
     SystemError::ErrorCode resolveResult = SystemError::notImplemented;
-    if (info->second.isLikelyCloudAddress && isCloudResolveEnabled())
+    if (info->second.isLikelyCloudAddress)
     {
-        info->second.setMediatorEntries({AddressEntry(AddressType::cloud, std::get<1>(info->first))});
+        info->second.setMediatorEntries(
+            {AddressEntry(AddressType::cloud, std::get<1>(info->first))});
         resolveResult = SystemError::noError;
     }
     else

@@ -103,7 +103,7 @@ QnLayoutResourcePtr QnLayoutResource::createFromResource(const QnResourcePtr& re
     return layout;
 }
 
-QStringList QnLayoutResource::searchFilters() const
+QStringList QnLayoutResource::searchFilters(bool /*useExtraSearchInformation*/) const
 {
     QStringList result;
     if (isFile())

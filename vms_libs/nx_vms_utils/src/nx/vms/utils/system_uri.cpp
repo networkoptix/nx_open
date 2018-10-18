@@ -264,7 +264,7 @@ public:
 
         nx::utils::Url result;
         result.setScheme(protocol == SystemUri::Protocol::Native
-            ? QString("http")
+            ? QString("https")
             : protocolToString[protocol]);
         result.setHost(hostName.first);
         result.setPort(hostName.second);

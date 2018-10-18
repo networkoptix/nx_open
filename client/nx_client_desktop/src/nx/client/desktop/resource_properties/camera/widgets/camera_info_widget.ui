@@ -78,7 +78,7 @@
         </widget>
        </item>
        <item row="1" column="1" alignment="Qt::AlignTop">
-        <widget class="QLabel" name="modelLabel">
+        <widget class="nx::client::desktop::OptionalLabel" name="modelLabel">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -94,7 +94,7 @@
         </widget>
        </item>
        <item row="1" column="0" alignment="Qt::AlignTop">
-        <widget class="QLabel" name="vendorLabel">
+        <widget class="nx::client::desktop::OptionalLabel" name="vendorLabel">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -191,7 +191,7 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QLabel" name="primaryStreamLabel">
+           <widget class="nx::client::desktop::OptionalLabel" name="primaryStreamLabel">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -338,7 +338,7 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QLabel" name="secondaryStreamLabel">
+           <widget class="nx::client::desktop::OptionalLabel" name="secondaryStreamLabel">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -405,7 +405,7 @@
         </spacer>
        </item>
        <item row="0" column="1">
-        <widget class="QLabel" name="vendorDetailLabel">
+        <widget class="nx::client::desktop::OptionalLabel" name="vendorDetailLabel">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -473,7 +473,7 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QLabel" name="modelDetailLabel">
+        <widget class="nx::client::desktop::OptionalLabel" name="modelDetailLabel">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -502,7 +502,7 @@
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QLabel" name="firmwareLabel">
+        <widget class="nx::client::desktop::OptionalLabel" name="firmwareLabel">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -518,7 +518,7 @@
         </widget>
        </item>
        <item row="8" column="1">
-        <widget class="QLabel" name="cameraIdLabel">
+        <widget class="nx::client::desktop::OptionalLabel" name="cameraIdLabel">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -560,7 +560,7 @@
         </widget>
        </item>
        <item row="6" column="1">
-        <widget class="QLabel" name="macAddressLabel">
+        <widget class="nx::client::desktop::OptionalLabel" name="macAddressLabel">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -589,7 +589,7 @@
         </widget>
        </item>
        <item row="5" column="1">
-        <widget class="QLabel" name="webPageLabel">
+        <widget class="nx::client::desktop::OptionalLabel" name="webPageLabel">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -772,6 +772,11 @@
    <class>nx::client::desktop::ClipboardButton</class>
    <extends>QPushButton</extends>
    <header location="global">nx/client/desktop/common/widgets/clipboard_button.h</header>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::OptionalLabel</class>
+   <extends>QLabel</extends>
+   <header location="global">nx/client/desktop/common/widgets/optional_label.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

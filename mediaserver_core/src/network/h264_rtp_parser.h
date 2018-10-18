@@ -13,18 +13,17 @@
 class CLH264RtpParser: public QnRtpVideoStreamParser
 {
 public:
-    CLH264RtpParser();
+    CLH264RtpParser(const QString& resourceId);
     virtual ~CLH264RtpParser();
     virtual void setSdpInfo(QList<QByteArray> lines) override;
 
-    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const QnRtspStatistic& statistics, bool& gotData) override;
+    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, bool& gotData) override;
 
 private:
     QMap <int, QByteArray> m_allNonSliceNal;
     QList<QByteArray> m_sdpSpsPps;
     SPSUnit m_sps;
     bool m_spsInitialized;
-    int m_frequency;
     int m_rtpChannel;
     int m_prevSequenceNum;
     bool m_builtinSpsFound;
@@ -38,19 +37,14 @@ private:
     //QnByteArray m_videoBuffer;
     int m_videoFrameSize;
     quint32 m_lastRtpTime;
+    QString m_resourceId;
 private:
     void serializeSpsPps(QnByteArray& dst);
     void decodeSpsInfo(const QByteArray& data);
     bool isFirstSliceNal(const quint8 nalType, const quint8* data, int dataLen) const;
-    bool isPacketStartsNewFrame(
-        const quint8* curPtr,
-        const quint8* bufferEnd) const;
+    bool isPacketStartsNewFrame(const quint8* curPtr, const quint8* bufferEnd) const;
 
-    QnCompressedVideoDataPtr createVideoData(
-        const quint8* rtpBuffer,
-        quint32 rtpTime,
-        const QnRtspStatistic& statistics);
-
+    QnCompressedVideoDataPtr createVideoData(const quint8* rtpBuffer, quint32 rtpTime);
     bool isBufferOverflow() const;
 
     bool clearInternalBuffer(); // function always returns false to convenient exit from main routine

@@ -45,14 +45,14 @@ CloudConnectionManager::~CloudConnectionManager()
     directDisconnectAll();
 }
 
-boost::optional<nx::hpm::api::SystemCredentials>
+std::optional<nx::hpm::api::SystemCredentials>
     CloudConnectionManager::getSystemCredentials() const
 {
     const auto cloudSystemId = qnGlobalSettings->cloudSystemId();
     const auto cloudAuthKey = qnGlobalSettings->cloudAuthKey();
 
     if (cloudSystemId.isEmpty() || cloudAuthKey.isEmpty())
-        return boost::none;
+        return std::nullopt;
 
     nx::hpm::api::SystemCredentials cloudCredentials;
     cloudCredentials.systemId = cloudSystemId.toUtf8();
@@ -189,7 +189,7 @@ void CloudConnectionManager::setCloudCredentials(
     else
     {
         nx::network::SocketGlobals::cloud().mediatorConnector()
-            .setSystemCredentials(boost::none);
+            .setSystemCredentials(std::nullopt);
         makeSystemLocal();
     }
 

@@ -18,6 +18,8 @@
 #include <nx/mediaserver/server_module_aware.h>
 
 class VMaxStreamFetcherPtr;
+class QnPlVmax480Resource;
+
 class QnVmax480DataConsumer
 {
 public:
@@ -88,7 +90,7 @@ private:
 private:
     static const int OPEN_ALL = 0xffff;
 
-    QnNetworkResource* m_res;
+    QWeakPointer<QnPlVmax480Resource> m_vmaxResource;
     typedef QMap<QnVmax480DataConsumer*, QnDataPacketQueue*> ConsumersMap;
 
     mutable QnMutex m_mutex;

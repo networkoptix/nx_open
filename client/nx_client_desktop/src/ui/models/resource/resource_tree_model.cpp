@@ -1,5 +1,7 @@
 #include "resource_tree_model.h"
 
+#include <ini.h>
+
 #include <QtCore/QMimeData>
 #include <QtCore/QUrl>
 #include <QtCore/QCoreApplication>
@@ -31,6 +33,8 @@
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_pc_data.h>
 #include <core/resource/videowall_matrix.h>
+#include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
 
 #include <api/global_settings.h>
 
@@ -58,6 +62,7 @@
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
+using namespace nx::vms::common;
 
 #define DEBUG_RESOURCE_TREE_MODEL
 #ifdef DEBUG_RESOURCE_TREE_MODEL
@@ -99,6 +104,7 @@ QList<ResourceTreeNodeType> rootNodeTypes()
             << ResourceTreeNodeType::layouts
             << ResourceTreeNodeType::layoutTours
             << ResourceTreeNodeType::webPages
+            << ResourceTreeNodeType::analyticsEngines
             << ResourceTreeNodeType::localResources
             << ResourceTreeNodeType::localSeparator
             << ResourceTreeNodeType::otherSystems
@@ -113,7 +119,11 @@ QList<ResourceTreeNodeType> rootNodeTypes()
 // -------------------------------------------------------------------------- //
 // QnResourceTreeModel :: contructors, destructor and helpers.
 // -------------------------------------------------------------------------- //
-QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
+QnResourceTreeModel::QnResourceTreeModel(
+    Scope scope,
+    bool useExtraSearchInformation,
+    QObject* parent)
+    :
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_scope(scope),
@@ -123,7 +133,8 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     /* Create top-level nodes. */
     for (NodeType t: rootNodeTypes())
     {
-        const auto node = QnResourceTreeModelNodeFactory::createNode(t, this, false);
+        const auto node = QnResourceTreeModelNodeFactory::createNode(
+            t, this, false, useExtraSearchInformation);
         m_rootNodes[t] = node;
         if (node)
         {
@@ -370,6 +381,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
     case NodeType::layouts:
     case NodeType::layoutTours:
     case NodeType::webPages:
+    case NodeType::analyticsEngines:
         if (m_scope == FullScope && isLoggedIn)
             return rootNode;
         return bastardNode;
@@ -462,7 +474,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     {
         if (layout->isFile())
         {
-            if (isLoggedIn)
+            if (isLoggedIn || ini().enableResourceFilteringByDefault)
                 return m_rootNodes[NodeType::localResources];
             return rootNode;
         }
@@ -483,7 +495,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     {
         if (node->resourceFlags().testFlag(Qn::local))
         {
-            if (isLoggedIn)
+            if (isLoggedIn || ini().enableResourceFilteringByDefault)
                 return m_rootNodes[NodeType::localResources];
             return rootNode;
         }
@@ -502,6 +514,9 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
 
         return parentNode;
     }
+
+    if (const auto engine = node->resource().dynamicCast<AnalyticsEngineResource>())
+        return m_rootNodes[NodeType::analyticsEngines];
 
     NX_ASSERT(false, "Should never get here.");
     return bastardNode;

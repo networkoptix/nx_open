@@ -8,6 +8,9 @@
 #include <nx/utils/std/algorithm.h>
 
 #include "get_post_tunnel_client.h"
+#include "connection_upgrade_tunnel_client.h"
+#include "experimental_tunnel_client.h"
+#include "ssl_tunnel_client.h"
 
 namespace nx::network::http::tunneling::detail {
 
@@ -15,7 +18,10 @@ ClientFactory::ClientFactory():
     base_type(std::bind(&ClientFactory::defaultFactoryFunction, this,
         std::placeholders::_1))
 {
+    registerClientType<SslTunnelClient>();
+    registerClientType<ExperimentalTunnelClient>();
     registerClientType<GetPostTunnelClient>();
+    registerClientType<ConnectionUpgradeTunnelClient>();
 }
 
 void ClientFactory::clear()
@@ -29,7 +35,7 @@ ClientFactory& ClientFactory::instance()
     return staticInstance;
 }
 
-std::unique_ptr<BasicTunnelClient> ClientFactory::defaultFactoryFunction(
+std::unique_ptr<BaseTunnelClient> ClientFactory::defaultFactoryFunction(
     const utils::Url& baseUrl)
 {
     using namespace std::placeholders;

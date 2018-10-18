@@ -23,7 +23,7 @@ QnAbstractResourcePropertyAdaptor::QnAbstractResourcePropertyAdaptor(
     m_pendingSave(0),
     m_value(defaultValue)
 {
-    connect(this, &QnAbstractResourcePropertyAdaptor::saveRequestQueued, this, &QnAbstractResourcePropertyAdaptor::processSaveRequests, Qt::QueuedConnection);
+    connect(this, &QnAbstractResourcePropertyAdaptor::saveRequestQueued, this, &QnAbstractResourcePropertyAdaptor::processSaveRequests, Qt::DirectConnection);
 }
 
 QnAbstractResourcePropertyAdaptor::~QnAbstractResourcePropertyAdaptor() {
@@ -69,7 +69,12 @@ void QnAbstractResourcePropertyAdaptor::setResourceInternal(const QnResourcePtr 
         m_resource = resource;
 
         if(m_resource)
-            connect(resource, &QnResource::propertyChanged, this, &QnAbstractResourcePropertyAdaptor::at_resource_propertyChanged);
+        {
+            connect(
+                resource, &QnResource::propertyChanged,
+                this, &QnAbstractResourcePropertyAdaptor::at_resource_propertyChanged,
+                Qt::DirectConnection);
+        }
 
         changed = loadValueLocked(newSerializedValue);
     }

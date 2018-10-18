@@ -121,7 +121,7 @@ void CloudServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
         });
 }
 
-void CloudServerSocket::pleaseStopSync(bool assertIfCalledUnderLock)
+void CloudServerSocket::pleaseStopSync()
 {
     if (isInSelfAioThread())
     {
@@ -129,7 +129,7 @@ void CloudServerSocket::pleaseStopSync(bool assertIfCalledUnderLock)
     }
     else
     {
-        AbstractStreamServerSocket::pleaseStopSync(assertIfCalledUnderLock);
+        AbstractStreamServerSocket::pleaseStopSync();
     }
 }
 
@@ -256,7 +256,9 @@ void CloudServerSocket::bindToAioThreadUnchecked(
 {
     base_type::bindToAioThread(aioThread);
 
-    NX_ASSERT(!m_tunnelPool && m_acceptors.empty());
+    NX_ASSERT(m_acceptors.empty());
+    if (m_tunnelPool)
+        m_tunnelPool->bindToAioThread(aioThread);
     m_mediatorRegistrationRetryTimer.bindToAioThread(aioThread);
     m_mediatorConnection->bindToAioThread(aioThread);
     m_aggregateAcceptor.bindToAioThread(aioThread);
@@ -510,7 +512,7 @@ void CloudServerSocket::onConnectionRequested(
             hpm::api::ConnectionMethod::toString(event.connectionMethods)));
 
     auto acceptors = TunnelAcceptorFactory::instance().create(
-        *m_mediatorConnector->udpEndpoint(),
+        m_mediatorConnector->udpEndpoint(),
         event);
     for (auto& acceptor: acceptors)
     {

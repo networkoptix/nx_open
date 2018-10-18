@@ -7,9 +7,9 @@
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
 #include <common/common_module.h>
-#include <core/resource_management/resource_changes_listener.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
+#include <core/resource_management/resource_pool.h>
 #include <text/time_strings.h>
 #include <translation/datetime_formatter.h>
 #include <ui/style/resource_icon_cache.h>
@@ -62,7 +62,6 @@ QString serverName(const QnResourcePtr& server)
 QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_hasInternetAccess(false),
     m_sameTimezone(false),
     m_sameTimezoneValid(false),
     m_currentRequest(rest::Handle())
@@ -135,13 +134,6 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
             updateColumn(Columns::OffsetColumn);
         });
 
-    auto serverChangesListener = new QnResourceChangesListener(this);
-    serverChangesListener->connectToResources<QnMediaServerResource>(
-        &QnMediaServerResource::serverFlagsChanged,
-        this, &QnTimeServerSelectionModel::updateHasInternetAccess);
-
-    updateHasInternetAccess();
-
     /* Requesting initial time. */
     resetData(qnSyncTime->currentMSecsSinceEpoch());
 }
@@ -171,7 +163,7 @@ void QnTimeServerSelectionModel::updateTimeOffset()
             for (const auto& record: data.data)
             {
                 // Store received value to use it later.
-                const auto offset = record.timeSinseEpochMs - syncTime;
+                const auto offset = record.timeSinceEpochMs - syncTime;
                 m_serverOffsetCache[record.serverId] = offset;
 
                 // Check if the server is already online.
@@ -512,11 +504,6 @@ bool QnTimeServerSelectionModel::sameTimezone() const
     return m_sameTimezone;
 }
 
-bool QnTimeServerSelectionModel::hasInternetAccess() const
-{
-    return m_hasInternetAccess;
-}
-
 bool QnTimeServerSelectionModel::calculateSameTimezone() const
 {
     qint64 commonUtcOffset = Qn::InvalidUtcOffset;
@@ -549,15 +536,4 @@ void QnTimeServerSelectionModel::resetData(qint64 currentSyncTime)
     m_items.clear();
     for (const auto& server: resourcePool()->getAllServers(Qn::AnyStatus))
         addItem(server);
-}
-
-void QnTimeServerSelectionModel::updateHasInternetAccess()
-{
-    const auto servers = resourcePool()->getResources<QnMediaServerResource>();
-    m_hasInternetAccess = boost::algorithm::any_of(servers,
-        [](const QnMediaServerResourcePtr& server)
-        {
-            return server->getStatus() == Qn::Online
-                && server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);
-        });
 }

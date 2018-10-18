@@ -40,11 +40,11 @@ public:
     void assertIfNotAllTransactionsAreFound(const TransactionPtrContainer& container)
     {
         for (const auto& transactionPtr: container)
-            assertIfCouldNotFindTransactionWithHeader(transactionPtr->transactionHeader());
+            assertIfCouldNotFindTransactionWithHeader(transactionPtr->header());
     }
 
     void assertIfCouldNotFindTransactionWithHeader(
-        const CommandHeader& transactionHeader);
+        const CommandHeader& header);
 
 private:
     OnNewTransactionHandler m_onNewTransactionHandler;

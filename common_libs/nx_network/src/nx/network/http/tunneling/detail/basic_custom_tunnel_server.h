@@ -27,8 +27,7 @@ protected:
         const RequestContext& requestContext);
 
     virtual network::http::RequestResult processOpenTunnelRequest(
-        const network::http::Request& request,
-        network::http::Response* const response,
+        const RequestContext& requestContext,
         ApplicationData... requestData) = 0;
 
     /**
@@ -177,8 +176,7 @@ void BasicCustomTunnelServer<ApplicationData...>::openTunnel(
     ApplicationData... applicationData)
 {
     auto requestResult = this->processOpenTunnelRequest(
-        requestContext->request,
-        requestContext->response,
+        *requestContext,
         std::move(applicationData)...);
 
     nx::utils::swapAndCall(completionHandler, std::move(requestResult));

@@ -63,7 +63,7 @@ public:
     virtual ~TestConnection();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void pleaseStopSync(bool checkForLocks = true) override;
+    virtual void pleaseStopSync() override;
 
     int id() const;
     void setLocalAddress(SocketAddress addr);
@@ -74,6 +74,7 @@ public:
     size_t totalBytesReceived() const;
     bool isTaskComplete() const;
 
+    void setReadBufferSize(size_t newSize);
     void setOnFinishedEventHandler(
         nx::utils::MoveOnlyFunc<void(int, TestConnection*, SystemError::ErrorCode)> handler);
 
@@ -89,6 +90,7 @@ private:
     > m_finishedEventHandler;
     nx::Buffer m_readBuffer;
     nx::Buffer m_outData;
+    size_t m_readBufferSize = kReadBufferSize;
     size_t m_totalBytesSent;
     size_t m_totalBytesReceived;
     size_t m_timeoutsInARow;
@@ -177,6 +179,8 @@ public:
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
+    void setConnectionsReadBufferSize(size_t newSize);
+    void setOnFinishedConnectionHandler(nx::utils::MoveOnlyFunc<void(TestConnection*)> handler);
     void setLocalAddress(SocketAddress addr);
     bool start(std::chrono::milliseconds rwTimeout = TestConnection::kDefaultRwTimeout);
 
@@ -189,8 +193,10 @@ private:
     const size_t m_trafficLimit;
     const TestTransmissionMode m_transmissionMode;
     mutable QnMutex m_mutex;
+    nx::utils::MoveOnlyFunc<void(TestConnection*)> m_finishedConnectionHandler;
     std::list<std::shared_ptr<TestConnection>> m_aliveConnections;
     SocketAddress m_localAddress;
+    size_t m_connectionsReadBufferSize = TestConnection::kReadBufferSize;
     size_t m_totalConnectionsAccepted;
     uint64_t m_totalBytesReceivedByClosedConnections;
     uint64_t m_totalBytesSentByClosedConnections;

@@ -5,6 +5,8 @@
 #include <fstream>
 #include <memory>
 #include <vector>
+#include <chrono>
+#include <optional>
 
 #include <QtNetwork/QAuthenticator>
 
@@ -20,7 +22,9 @@ extern "C"
 
 #include <nx/network/socket.h>
 #include <nx/network/http/http_types.h>
+#include <nx/network/rtsp/rtsp_types.h>
 #include <nx/streaming/rtp/rtcp.h>
+#include <nx/streaming/rtp/camera_time_helper.h>
 
 
 #include <utils/common/threadqueue.h>
@@ -42,31 +46,14 @@ static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 8; //< m_duration + metadata
 static const int RTSP_FFMPEG_MAX_HEADER_SIZE = RTSP_FFMPEG_GENERIC_HEADER_SIZE + RTSP_FFMPEG_METADATA_HEADER_SIZE;
 static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 
-
-// Class name is quite misleading.
-// Actually it is RTCP statistics + NTP time from Onvif extension.
-class QnRtspStatistic
-{
-public:
-    bool isEmpty() const
-    {
-        return senderReport.rtpTimestamp == 0
-            && senderReport.ntpTimestamp == 0
-            && !ntpOnvifExtensionTime.is_initialized();
-    }
-    nx::streaming::rtp::RtcpSenderReport senderReport;
-    double localTime = 0;
-    boost::optional<std::chrono::microseconds> ntpOnvifExtensionTime;
-};
-
 class QnRtspIoDevice
 {
 public:
     explicit QnRtspIoDevice(QnRtspClient* owner, bool useTCP, quint16 mediaPort = 0, quint16 rtcpPort = 0);
     virtual ~QnRtspIoDevice();
     virtual qint64 read(char * data, qint64 maxSize );
-    const QnRtspStatistic& getStatistic() { return m_statistic; }
-    void setStatistic(const QnRtspStatistic& value) { m_statistic = value; }
+    const nx::streaming::rtp::RtcpSenderReport& getSenderReport() { return m_senderReport; }
+    void setSenderReport(const nx::streaming::rtp::RtcpSenderReport& value) { m_senderReport = value; }
     nx::network::AbstractCommunicatingSocket* getMediaSocket();
     nx::network::AbstractDatagramSocket* getRtcpSocket() const { return m_rtcpSocket; }
     void shutdown();
@@ -77,12 +64,14 @@ public:
     void setRemoteEndpointRtcpPort(quint16 rtcpPort) {m_remoteEndpointRtcpPort = rtcpPort;}
     void setHostAddress(const nx::network::HostAddress& hostAddress) {m_hostAddress = hostAddress;};
     void setForceRtcpReports(bool force) {m_forceRtcpReports = force;};
+
 private:
     void processRtcpData();
+
 private:
     QnRtspClient* m_owner;
     bool m_tcpMode;
-    QnRtspStatistic m_statistic;
+    nx::streaming::rtp::RtcpSenderReport m_senderReport;
     nx::network::AbstractDatagramSocket* m_mediaSocket;
     nx::network::AbstractDatagramSocket* m_rtcpSocket;
     quint16 m_mediaPort;
@@ -280,7 +269,7 @@ public:
     QList<QByteArray> getSdpByType(TrackType trackType) const;
     int getTrackCount(TrackType trackType) const;
 
-    int getLastResponseCode() const;
+    nx::network::rtsp::StatusCodeValue getLastResponseCode() const;
 
     void setAudioEnabled(bool value);
     bool isAudioEnabled() const;
@@ -302,13 +291,8 @@ public:
     int readBinaryResponce(std::vector<QnByteArray*>& demuxedData, int& channelNumber);
 
     void sendBynaryResponse(const quint8* buffer, int size);
-
-    QnRtspStatistic parseServerRTCPReport(const quint8* srcBuffer, int srcBufferSize, bool* gotStatistics);
-
     void setUsePredefinedTracks(int numOfVideoChannel);
-
     static quint8* prepareDemuxedData(std::vector<QnByteArray*>& demuxedData, int channel, int reserve);
-
     bool setTCPReadBufferSize(int value);
 
     QString getVideoLayout() const;
@@ -377,7 +361,7 @@ private:
     qint64 m_endTime;
     float m_scale;
     std::chrono::milliseconds m_tcpTimeout;
-    int m_responseCode;
+    nx::network::rtsp::StatusCodeValue m_responseCode;
     bool m_isAudioEnabled;
     int m_numOfPredefinedChannels;
     unsigned int m_TimeOut;

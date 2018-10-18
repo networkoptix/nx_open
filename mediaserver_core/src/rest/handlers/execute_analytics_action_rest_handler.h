@@ -1,8 +1,8 @@
 #pragma once
 
 #include <rest/server/json_rest_handler.h>
-#include "nx/sdk/metadata/camera_manager.h"
-#include "nx/api/analytics/driver_manifest.h"
+#include "nx/sdk/analytics/device_agent.h"
+#include "nx/vms/api/analytics/engine_manifest.h"
 #include "api/model/analytics_actions.h"
 #include <nx/mediaserver/server_module_aware.h>
 
@@ -23,6 +23,6 @@ public:
 private:
     QString executeAction(
         AnalyticsActionResult* outActionResult,
-        nx::sdk::metadata::Plugin* plugin,
+        nx::sdk::analytics::Engine* plugin,
         const AnalyticsAction& actionData);
 };

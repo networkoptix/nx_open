@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -28,7 +29,7 @@ class PredefinedCredentialsProvider:
 public:
     void setCredentials(hpm::api::SystemCredentials cloudSystemCredentials);
 
-    virtual boost::optional<hpm::api::SystemCredentials> getSystemCredentials() const override;
+    virtual std::optional<hpm::api::SystemCredentials> getSystemCredentials() const override;
 
 private:
     hpm::api::SystemCredentials m_cloudSystemCredentials;
@@ -81,7 +82,7 @@ public:
 
     BasicTestFixture(
         int relayCount = 1,
-        boost::optional<std::chrono::seconds> disconnectedPeerTimeout = boost::none);
+        std::optional<std::chrono::seconds> disconnectedPeerTimeout = std::nullopt);
     ~BasicTestFixture();
 
     /**
@@ -151,7 +152,7 @@ private:
 
     RelayPtrList m_relays;
     int m_relayCount;
-    boost::optional<std::chrono::seconds> m_disconnectedPeerTimeout;
+    std::optional<std::chrono::seconds> m_disconnectedPeerTimeout;
 
     void initializeCloudModulesXmlWithDirectStunPort();
     void initializeCloudModulesXmlWithStunOverHttp();

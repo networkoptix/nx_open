@@ -335,7 +335,7 @@ public:
             }
             else
             {
-                perror("getgrnam");
+                perror("getgrnam failed");
                 return false;
             }
             #undef STRINGIFY
@@ -429,6 +429,9 @@ static bool setupIds()
 
 int main(int argc, const char** argv)
 {
+    fprintf(stdout, "Starting root_tool, using domain socket: %s\n",
+        nx::SystemCommands::kDomainSocket);
+
     nx::SystemCommands systemCommands;
     CommandsFactory commandsFactory;
     registerCommands(commandsFactory, &systemCommands);

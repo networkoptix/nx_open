@@ -77,8 +77,6 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_previousRtpTimestamp(-1),
     m_previousScaledRtpTimestamp(-1),
     m_framesSinceRangeCheck(0),
-    m_prevStartTime(AV_NOPTS_VALUE),
-    m_prevEndTime(AV_NOPTS_VALUE),
     m_videoChannels(1)
 {
     m_timer.start();
@@ -392,23 +390,19 @@ void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
     }
 }
 
-QByteArray QnRtspDataConsumer::getRangeHeaderIfChanged()
+void QnRtspDataConsumer::sendRangeHeaderIfChanged()
 {
-    QSharedPointer<QnArchiveStreamReader> archiveDP = m_owner->getArchiveDP();
-    if (!archiveDP)
-        return QByteArray();
-    qint64 endTime = archiveDP->endTime();
-    if (m_owner->serverModule()->recordingManager()->isCameraRecoring(archiveDP->getResource()))
-        endTime = DATETIME_NOW;
+    static const int kFramesBetweenPlayRangeCheck = 20;
+    if (++m_framesSinceRangeCheck > kFramesBetweenPlayRangeCheck)
+        return;
 
-    if (archiveDP->startTime() != m_prevStartTime || endTime != m_prevEndTime) {
-        m_prevStartTime = archiveDP->startTime();
-        m_prevEndTime = endTime;
-        return m_owner->getRangeStr();
-    }
-    else {
-        return QByteArray();
-    }
+    m_framesSinceRangeCheck = 0;
+    QByteArray range = m_owner->getRangeStr();
+    if (range == m_prevRangeHeader)
+        return;
+
+    m_prevRangeHeader = range;
+    sendMetadata(range);
 };
 
 void QnRtspDataConsumer::setNeedKeyData()
@@ -508,8 +502,8 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
             MediaQuality currentQuality = m_currentQuality[media->channelNumber];
             MediaQuality prefferredQuality = preferredLiveStreamQuality(media->channelNumber);
 
-            // Switching quality only if the current frame is a key frame.
-            if (prefferredQuality != m_currentQuality[media->channelNumber] && isKeyFrame)
+            // Switching quality only if the current frame is a key frame for video stream.
+            if (prefferredQuality != m_currentQuality[media->channelNumber] && (isKeyFrame || !isVideo))
                 m_currentQuality[media->channelNumber] = prefferredQuality;
 
             const bool isCurrentQualityLow =
@@ -663,15 +657,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
             recvRtcpReport(trackInfo->rtcpSocket);
         }
     }
-
-    static const int FRAMES_BETWEEN_PLAY_RANGE_CHECK = 20;
-    if( (++m_framesSinceRangeCheck) > FRAMES_BETWEEN_PLAY_RANGE_CHECK )
-    {
-        m_framesSinceRangeCheck = 0;
-        const QByteArray& newRange = getRangeHeaderIfChanged();
-        if (!newRange.isEmpty())
-            sendMetadata(newRange);
-    }
+    sendRangeHeaderIfChanged();
 
     if (m_packetSended++ == MAX_PACKETS_AT_SINGLE_SHOT)
         m_singleShotMode = false;

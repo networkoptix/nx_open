@@ -137,10 +137,7 @@ Authenticator::Result Authenticator::tryAllMethods(
             connect(user.data(), &QnUserResource::permissionsChanged, this, removeKey, Qt::DirectConnection);
             connect(user.data(), &QnUserResource::userRoleChanged, this, removeKey, Qt::DirectConnection);
             connect(user.data(), &QnUserResource::enabledChanged, this, removeKey, Qt::DirectConnection);
-            connect(user.data(), &QnUserResource::hashChanged, this, removeKey, Qt::DirectConnection);
-            connect(user.data(), &QnUserResource::passwordChanged, this, removeKey, Qt::DirectConnection);
-            connect(user.data(), &QnUserResource::cryptSha512HashChanged, this, removeKey, Qt::DirectConnection);
-            connect(user.data(), &QnUserResource::realmChanged, this, removeKey, Qt::DirectConnection);
+            connect(user.data(), &QnUserResource::hashesChanged, this, removeKey, Qt::DirectConnection);
             connect(user.data(), &QnUserResource::sessionExpired, this, removeKey, Qt::DirectConnection);
         }
     }
@@ -295,7 +292,7 @@ Qn::AuthResult Authenticator::tryAllMethods(
             auto authResult = tryAuthRecord(
                 clientIp,
                 authQueryParam,
-                request.requestLine.version.protocol == nx_rtsp::rtsp_1_0.protocol
+                request.requestLine.version.protocol == nx::network::rtsp::rtsp_1_0.protocol
                 ? "PLAY"    //for rtsp always using PLAY since client software does not know
                             //which request underlying player will issue first
                 : request.requestLine.method,

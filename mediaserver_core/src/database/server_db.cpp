@@ -266,13 +266,13 @@ int getBookmarksQueryLimit(const QnCameraBookmarkSearchFilter& filter)
 
 } // namespace
 
-static const qint64 CLEANUP_INTERVAL = 1000000ll * 3600;
+static const qint64 kDbCleanupIntervalUs = 1000000ll * 3600;
 
 QnServerDb::QnServerDb(QnMediaServerModule* serverModule)
     :
     nx::mediaserver::ServerModuleAware(serverModule),
-    m_lastCleanuptime(0),
-    m_auditCleanuptime(0),
+    m_lastCleanuptimeUs(0),
+    m_auditCleanuptimeUs(0),
     m_runtimeActionsTotalRecords(0),
     m_tran(m_sdb, m_mutex)
 {
@@ -284,7 +284,8 @@ bool QnServerDb::open()
     const QString fileName = closeDirPath(eventsDBFilePath)
         + QString(lit("mserver.sqlite"));
 
-    addDatabase(fileName, "QnServerDb");
+    QString connectionName = "QnServerDb" + serverModule()->commonModule()->moduleGUID().toString();
+    addDatabase(fileName, connectionName);
     if (m_sdb.open())
     {
         if (!createDatabase()) // Create tables if DB is empty.
@@ -532,15 +533,15 @@ bool QnServerDb::cleanupEvents()
     bool rez = true;
 
     // cleanup by time
-    qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
-    if (currentTime - m_lastCleanuptime > CLEANUP_INTERVAL)
+    qint64 currentTimeUs = qnSyncTime->currentUSecsSinceEpoch();
+    if (currentTimeUs - m_lastCleanuptimeUs > kDbCleanupIntervalUs)
     {
-        m_lastCleanuptime = currentTime;
+        m_lastCleanuptimeUs = currentTimeUs;
         QSqlQuery delQuery(m_sdb);
         delQuery.prepare("DELETE FROM runtime_actions where timestamp < :timestamp");
-        int utc = currentTime / 1000000ll - globalSettings()->eventLogPeriodDays() * 3600 * 24;
+        int utcMs = currentTimeUs / 1000LL - globalSettings()->eventLogPeriodDays() * 3600 * 24 * 1000LL;
 
-        delQuery.bindValue(":timestamp", utc);
+        delQuery.bindValue(":timestamp", utcMs);
         rez = execSQLQuery(&delQuery, Q_FUNC_INFO);
 
         if (rez)
@@ -712,13 +713,13 @@ bool QnServerDb::cleanupAuditLog()
 {
     bool rez = true;
 
-    qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
-    if (currentTime - m_auditCleanuptime > CLEANUP_INTERVAL)
+    qint64 currentTimeUs = qnSyncTime->currentUSecsSinceEpoch();
+    if (currentTimeUs - m_auditCleanuptimeUs > kDbCleanupIntervalUs)
     {
-        m_auditCleanuptime = currentTime;
+        m_auditCleanuptimeUs = currentTimeUs;
         QSqlQuery delQuery(m_sdb);
         delQuery.prepare("DELETE FROM audit_log where createdTimeSec < :createdTimeSec");
-        int utc = currentTime / 1000000ll - globalSettings()->auditTrailPeriodDays() * 3600 * 24;
+        int utc = currentTimeUs / 1000000ll - globalSettings()->auditTrailPeriodDays() * 3600 * 24;
         delQuery.bindValue(":createdTimeSec", utc);
         rez = execSQLQuery(&delQuery, Q_FUNC_INFO);
     }
@@ -793,7 +794,7 @@ bool QnServerDb::saveActionToDB(const vms::event::AbstractActionPtr& action)
 
     const auto actionParams = action->getParams();
 
-    insQuery.bindValue(":timestamp", timestampUsec/1000000);
+    insQuery.bindValue(":timestamp", timestampUsec/1000);
     insQuery.bindValue(":action_type", (int) action->actionType());
     insQuery.bindValue(":action_params", QnUbjson::serialized(actionParams));
     insQuery.bindValue(":runtime_params", QnUbjson::serialized(action->getRuntimeParams()));
@@ -824,11 +825,11 @@ QString QnServerDb::getRequestStr(const QnEventLogFilterData& request,
     if (!request.period.isInfinite())
     {
         requestStr += lit(" timestamp BETWEEN '%1' AND '%2'")
-            .arg(request.period.startTimeMs / 1000).arg(request.period.endTimeMs() / 1000);
+            .arg(request.period.startTimeMs).arg(request.period.endTimeMs());
     }
     else
     {
-        requestStr += lit(" timestamp >= '%1'").arg(request.period.startTimeMs / 1000);
+        requestStr += lit(" timestamp >= '%1'").arg(request.period.startTimeMs);
     }
 
     if (request.cameras.size() == 1)

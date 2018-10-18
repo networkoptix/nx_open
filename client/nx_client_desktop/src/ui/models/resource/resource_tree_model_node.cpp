@@ -142,6 +142,11 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Nod
     case NodeType::layoutTours:
         setNameInternal(tr("Showreels"));
         break;
+    case NodeType::analyticsEngines:
+    case NodeType::filteredAnalyticsEngines:
+        setNameInternal(tr("Analytics Engines"));
+        m_state = Invalid;
+        break;
     case NodeType::recorder:
         m_state = Invalid;
         break;
@@ -243,6 +248,15 @@ QnResourceTreeModelNode::~QnResourceTreeModelNode()
     NX_ASSERT(m_resource.isNull());
 }
 
+void QnResourceTreeModelNode::setUseExtraSearchInformation(bool value)
+{
+    if (m_useExtraSearchInformation == value)
+        return;
+
+    m_useExtraSearchInformation = value;
+    update();
+}
+
 void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
 {
     if (m_resource == resource)
@@ -304,7 +318,7 @@ void QnResourceTreeModelNode::update()
                 m_name = m_resource->getName();
                 m_flags = m_resource->flags();
                 m_status = m_resource->getStatus();
-                m_searchString = m_resource->toSearchString();
+                m_searchString = m_resource->toSearchString(m_useExtraSearchInformation);
                 m_displayName = QnResourceDisplayInfo(m_resource).toString(Qn::RI_NameOnly);
                 m_cameraExtraStatus = calculateCameraExtraStatus();
             }
@@ -504,6 +518,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
         case NodeType::sharedLayouts:
         case NodeType::webPages:
         case NodeType::roleUsers:
+        case NodeType::analyticsEngines:
         case NodeType::sharedResource:
         case NodeType::role:
         case NodeType::layoutTour:
@@ -1171,6 +1186,9 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
 
         case NodeType::webPages:
             return qnResIconCache->icon(QnResourceIconCache::WebPages);
+
+        case NodeType::analyticsEngines:
+            return qnResIconCache->icon(QnResourceIconCache::AnalyticsEngines);
 
         case NodeType::filteredVideowalls:
             return qnResIconCache->icon(QnResourceIconCache::VideoWall); //< Fix me: change to videowallS icon

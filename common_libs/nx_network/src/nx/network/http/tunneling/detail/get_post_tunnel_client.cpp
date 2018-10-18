@@ -11,20 +11,13 @@ GetPostTunnelClient::GetPostTunnelClient(
     const nx::utils::Url& baseTunnelUrl,
     ClientFeedbackFunction clientFeedbackFunction)
     :
-    m_baseTunnelUrl(baseTunnelUrl),
-    m_clientFeedbackFunction(std::move(clientFeedbackFunction))
+    base_type(baseTunnelUrl, std::move(clientFeedbackFunction))
 {
 }
 
-void GetPostTunnelClient::bindToAioThread(
-    aio::AbstractAioThread* aioThread)
+void GetPostTunnelClient::setTimeout(std::chrono::milliseconds timeout)
 {
-    base_type::bindToAioThread(aioThread);
-
-    if (m_httpClient)
-        m_httpClient->bindToAioThread(aioThread);
-    if (m_connection)
-        m_connection->bindToAioThread(aioThread);
+    m_timeout = timeout;
 }
 
 void GetPostTunnelClient::openTunnel(
@@ -46,28 +39,27 @@ const Response& GetPostTunnelClient::response() const
     return m_openTunnelResponse;
 }
 
-void GetPostTunnelClient::stopWhileInAioThread()
-{
-    m_httpClient.reset();
-    m_connection.reset();
-}
-
 void GetPostTunnelClient::openDownChannel()
 {
     m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
+    if (m_timeout)
+    {
+        m_httpClient->setResponseReadTimeout(*m_timeout);
+        m_httpClient->setMessageBodyReadTimeout(*m_timeout);
+    }
+
     m_httpClient->bindToAioThread(getAioThread());
     m_httpClient->setOnResponseReceived(
         std::bind(&GetPostTunnelClient::onDownChannelOpened, this));
-    // TODO: HTTP method should be configurable.
     m_httpClient->doGet(
         m_tunnelUrl,
-        std::bind(&GetPostTunnelClient::cleanupFailedTunnel, this));
+        [this]() { cleanUpFailedTunnel(); });
 }
 
 void GetPostTunnelClient::onDownChannelOpened()
 {
     if (!m_httpClient->hasRequestSucceeded())
-        return cleanupFailedTunnel();
+        return cleanUpFailedTunnel();
 
     m_connection = m_httpClient->takeSocket();
     m_openTunnelResponse = std::move(*m_httpClient->response());
@@ -124,44 +116,6 @@ void GetPostTunnelClient::handleOpenUpTunnelResult(
     }
 
     reportSuccess();
-}
-
-void GetPostTunnelClient::cleanupFailedTunnel()
-{
-    OpenTunnelResult result;
-    result.sysError = m_httpClient->lastSysErrorCode();
-    if (m_httpClient->response())
-    {
-        result.httpStatus =
-            (StatusCode::Value) m_httpClient->response()->statusLine.statusCode;
-    }
-    m_httpClient.reset();
-
-    reportFailure(std::move(result));
-}
-
-void GetPostTunnelClient::reportFailure(OpenTunnelResult result)
-{
-    if (m_clientFeedbackFunction)
-        nx::utils::swapAndCall(m_clientFeedbackFunction, false);
-
-    nx::utils::swapAndCall(m_completionHandler, std::move(result));
-}
-
-bool GetPostTunnelClient::resetConnectionAttributes()
-{
-    return m_connection->setRecvTimeout(kNoTimeout)
-        && m_connection->setSendTimeout(kNoTimeout);
-}
-
-void GetPostTunnelClient::reportSuccess()
-{
-    nx::utils::swapAndCall(
-        m_completionHandler,
-        OpenTunnelResult{
-            SystemError::noError,
-            StatusCode::ok,
-            std::exchange(m_connection, nullptr)});
 }
 
 } // namespace nx::network::http::tunneling::detail

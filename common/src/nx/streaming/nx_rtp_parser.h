@@ -1,13 +1,10 @@
-#ifndef NX_RTP_PARSER_H
-#define NX_RTP_PARSER_H
+#pragma once
 
 #include <QByteArray>
 #include <QMap>
 
 #include <nx/streaming/rtp_stream_parser.h>
 #include <nx/debugging/abstract_visual_metadata_debugger.h>
-
-class QnRtspStatistic;
 
 class QnNxRtpParser: public QnRtpVideoStreamParser
 {
@@ -18,7 +15,7 @@ public:
     virtual ~QnNxRtpParser();
 
     virtual void setSdpInfo(QList<QByteArray> sdpInfo) override;
-    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const QnRtspStatistic& statistics, bool& gotData) override;
+    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, bool& gotData) override;
 
     qint64 position() const { return m_position; }
     QnConstMediaContextPtr mediaContext() const { return m_context; }
@@ -29,7 +26,7 @@ public:
     void setAudioEnabled(bool value);
 
 private:
-    void writeDetectionMetadataToLogFile(const QnAbstractMediaDataPtr& metadata);
+    void writeAnalyticsMetadataToLogFile(const QnAbstractMediaDataPtr& metadata);
 
 private:
     const QString m_debugSourceId;
@@ -44,6 +41,4 @@ private:
     nx::debugging::VisualMetadataDebuggerPtr m_visualDebugger;
 };
 
-typedef QSharedPointer<QnNxRtpParser> QnNxRtpParserPtr;
-
-#endif // NX_RTP_PARSER_H
+using QnNxRtpParserPtr = QSharedPointer<QnNxRtpParser>;

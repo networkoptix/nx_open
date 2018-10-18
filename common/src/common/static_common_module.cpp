@@ -50,23 +50,11 @@ QnStaticCommonModule::QnStaticCommonModule(
                     connectSessionId);
             });
 
-    m_dataPool = instance<QnResourceDataPool>();
-    loadResourceData(m_dataPool, lit(":/resource_data.json"), true);
-    loadResourceData(m_dataPool, QCoreApplication::applicationDirPath() + lit("/resource_data.json"), false);
-
     store(new QnLongRunableCleanup());
     store(new nx::utils::TimerManager());
 
     instance<QnSyncTime>();
     instance<nx::network::http::ClientPool>();
-}
-
-void QnStaticCommonModule::loadResourceData(
-    QnResourceDataPool*dataPool, const QString& fileName, bool required)
-{
-    bool loaded = QFile::exists(fileName) && dataPool->load(fileName);
-    NX_ASSERT(!required || loaded, Q_FUNC_INFO, "Can't parse resource_data.json file!");
-    //< Getting an NX_ASSERT here? Something is wrong with resource data json file.
 }
 
 QnStaticCommonModule::~QnStaticCommonModule()
@@ -104,11 +92,6 @@ nx::utils::SoftwareVersion QnStaticCommonModule::engineVersion() const
 void QnStaticCommonModule::setEngineVersion(const nx::utils::SoftwareVersion& version)
 {
     m_engineVersion = version;
-}
-
-QnResourceDataPool* QnStaticCommonModule::dataPool() const
-{
-    return m_dataPool;
 }
 
 void QnStaticCommonModule::setModuleShortId(const QnUuid& id, int number)

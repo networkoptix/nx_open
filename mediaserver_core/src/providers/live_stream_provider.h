@@ -14,11 +14,12 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/dataprovider/live_stream_params.h>
-#include <nx/mediaserver/metadata/video_data_receptor.h>
+#include <nx/mediaserver/analytics/video_data_receptor.h>
 #include <core/dataconsumer/data_copier.h>
 #include <nx/mediaserver/server_module_aware.h>
 #include <nx/mediaserver/resource/resource_fwd.h>
 
+static const int META_FRAME_INTERVAL = 10;
 static const int META_DATA_DURATION_MS = 300;
 static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 1024 * 768;
 
@@ -46,7 +47,7 @@ public:
     void onPrimaryFpsChanged(int primaryFps);
     QnLiveStreamParams getLiveParams();
 
-    bool needMetadata();
+    virtual bool needMetadata();
 
     void onStreamReopen();
 
@@ -76,6 +77,7 @@ protected:
     virtual QnMetaDataV1Ptr getCameraMetadata();
     virtual Qn::ConnectionRole roleForMotionEstimation();
     virtual void onStreamResolutionChanged(int channelNumber, const QSize& picSize);
+    bool needHardwareMotion();
 protected:
     mutable QnMutex m_liveMutex;
 
@@ -100,9 +102,10 @@ private:
     void emitAnalyticsEventIfNeeded(const QnAbstractCompressedMetadataPtr& metadata);
     QnLiveStreamParams mergeWithAdvancedParams(const QnLiveStreamParams& params);
 
-    nx::mediaserver::metadata::VideoDataReceptorPtr getVideoDataReceptorForMetadataPluginsIfNeeded(
-        const QnCompressedVideoDataPtr& compressedFrame,
-        bool* outNeedUncompressedFrame);
+    nx::mediaserver::analytics::VideoDataReceptorPtr
+        getVideoDataReceptorForMetadataPluginsIfNeeded(
+            const QnCompressedVideoDataPtr& compressedFrame,
+            bool* outNeedUncompressedFrame);
 
 private:
     // NOTE: m_newLiveParams are going to update a little before the actual stream gets reopened.
@@ -120,9 +123,7 @@ private:
     Qn::ConnectionRole m_softMotionRole;
     QString m_forcedMotionStream;
 
-    #if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
-        QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
-    #endif
+    QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
 
     QSize m_videoResolutionByChannelNumber[CL_MAX_CHANNELS];
     int m_softMotionLastChannel;
@@ -133,7 +134,7 @@ private:
     int m_framesSincePrevMediaStreamCheck;
     QWeakPointer<QnAbstractVideoCamera> m_owner;
 
-    QWeakPointer<nx::mediaserver::metadata::VideoDataReceptor> m_videoDataReceptor;
+    QWeakPointer<nx::mediaserver::analytics::VideoDataReceptor> m_videoDataReceptor;
     QSharedPointer<MetadataDataReceptor> m_metadataReceptor;
     QnAbstractDataReceptorPtr m_analyticsEventsSaver;
     QSharedPointer<DataCopier> m_dataReceptorMultiplexer;

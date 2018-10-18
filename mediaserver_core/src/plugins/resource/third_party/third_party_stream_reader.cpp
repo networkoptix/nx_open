@@ -319,9 +319,14 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         //checking url type and creating corresponding data provider
 
         QUrl mediaUrl( mediaUrlStr );
-        if( nx_rtsp::isUrlSheme(mediaUrl.scheme().toLower()) )
+        if( nx::network::rtsp::isUrlSheme(mediaUrl.scheme().toLower()) )
         {
-            QnMulticodecRtpReader* rtspStreamReader = new QnMulticodecRtpReader( m_resource );
+            nx::streaming::rtp::TimeOffsetPtr timeOffset;
+            if (auto camera = m_resource.dynamicCast<nx::mediaserver::resource::Camera>())
+                timeOffset = camera->getTimeOffset();
+
+            QnMulticodecRtpReader* rtspStreamReader =
+                new QnMulticodecRtpReader(m_resource, timeOffset);
             rtspStreamReader->setUserAgent(nx::utils::AppInfo::productName());
             rtspStreamReader->setRequest( mediaUrlStr );
             rtspStreamReader->setRole(role);

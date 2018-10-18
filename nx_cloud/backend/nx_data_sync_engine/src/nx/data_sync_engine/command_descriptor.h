@@ -6,57 +6,66 @@
 
 namespace nx::data_sync_engine::command {
 
-struct TranSyncRequest
+template<typename CommandDescriptor>
+struct CommandDataHashFunctor
 {
-    using Data = vms::api::SyncRequestData;
-    static constexpr int code = ::ec2::ApiCommand::tranSyncRequest;
+    nx::Buffer operator()(const typename CommandDescriptor::Data& data)
+    {
+        return ::ec2::transactionHash(
+            static_cast<::ec2::ApiCommand::Value>(CommandDescriptor::code),
+            data).toSimpleByteArray();
+    }
+};
+
+template<typename DataType, int commandCode>
+struct BaseCommandDescriptor
+{
+    using Data = DataType;
+    static constexpr int code = commandCode;
+    using HashFunctor = 
+        CommandDataHashFunctor<BaseCommandDescriptor<DataType, commandCode>>;
+
+    static nx::Buffer hash(const Data& data)
+    {
+        return HashFunctor()(data);
+    }
+};
+
+//-------------------------------------------------------------------------------------------------
+
+struct TranSyncRequest:
+    BaseCommandDescriptor<
+        vms::api::SyncRequestData,
+        ::ec2::ApiCommand::tranSyncRequest>
+{
     static constexpr char name[] = "tranSyncRequest";
-
-    static nx::Buffer hash(const Data& data)
-    {
-        return ::ec2::transactionHash(
-            static_cast<::ec2::ApiCommand::Value>(code), data).toSimpleByteArray();
-    }
 };
 
-struct TranSyncResponse
+struct TranSyncResponse:
+    BaseCommandDescriptor<
+        vms::api::TranStateResponse,
+        ::ec2::ApiCommand::tranSyncResponse>
 {
-    using Data = vms::api::TranStateResponse;
-    static constexpr int code = ::ec2::ApiCommand::tranSyncResponse;
     static constexpr char name[] = "tranSyncResponse";
-
-    static nx::Buffer hash(const Data& data)
-    {
-        return ::ec2::transactionHash(
-            static_cast<::ec2::ApiCommand::Value>(code), data).toSimpleByteArray();
-    }
 };
 
-struct TranSyncDone
+struct TranSyncDone:
+    BaseCommandDescriptor<
+        vms::api::TranSyncDoneData,
+        ::ec2::ApiCommand::tranSyncDone>
 {
-    using Data = vms::api::TranSyncDoneData;
-    static constexpr int code = ::ec2::ApiCommand::tranSyncDone;
     static constexpr char name[] = "tranSyncDone";
-
-    static nx::Buffer hash(const Data& data)
-    {
-        return ::ec2::transactionHash(
-            static_cast<::ec2::ApiCommand::Value>(code), data).toSimpleByteArray();
-    }
 };
 
-struct UpdatePersistentSequence
+struct UpdatePersistentSequence:
+    BaseCommandDescriptor<
+        vms::api::UpdateSequenceData,
+        ::ec2::ApiCommand::updatePersistentSequence>
 {
-    using Data = vms::api::UpdateSequenceData;
-    static constexpr int code = ::ec2::ApiCommand::updatePersistentSequence;
     static constexpr char name[] = "updatePersistentSequence";
-
-    static nx::Buffer hash(const Data& data)
-    {
-        return ::ec2::transactionHash(
-            static_cast<::ec2::ApiCommand::Value>(code), data).toSimpleByteArray();
-    }
 };
+
+//-------------------------------------------------------------------------------------------------
 
 template<typename CommandDescriptor>
 Command<typename CommandDescriptor::Data> make(

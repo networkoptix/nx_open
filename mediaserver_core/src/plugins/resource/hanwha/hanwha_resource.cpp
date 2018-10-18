@@ -27,7 +27,7 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/vms/event/events/events.h>
-#include <nx/sdk/metadata/plugin.h>
+#include <nx/sdk/analytics/engine.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
 #include <nx/streaming/abstract_archive_delegate.h>
 
@@ -39,7 +39,6 @@
 
 #include <media_server/media_server_module.h>
 #include <core/resource_management/resource_data_pool.h>
-#include <common/static_common_module.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -328,7 +327,7 @@ static const QString kHanwhaVideoSourceStateOn = lit("On");
 static const int kHanwhaInvalidInputValue = 604;
 
 // Taken from Hanwha metadata plugin manifest.json.
-static const QString kHanwhaInputPortEventId = "nx.hanwha.inputPort";
+static const QString kHanwhaInputPortEventTypeId = "nx.hanwha.inputPort";
 
 static const std::map<QString, std::map<Qn::ConnectionRole, QString>> kStreamProperties = {
     {kEncodingTypeProperty,
@@ -499,7 +498,7 @@ QnCameraAdvancedParamValueMap HanwhaResource::getApiParameters(const QSet<QStrin
 
         for (const auto& submenuEntry: submenuMap)
         {
-            if (QnResource::isStopping())
+            if (commonModule()->isNeedToStop())
                 return QnCameraAdvancedParamValueMap();
 
             auto submenu = submenuEntry.first;
@@ -642,7 +641,7 @@ QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueM
     bool success = true;
     for (const auto& request: requests)
     {
-        if (QnResource::isStopping())
+        if (commonModule()->isNeedToStop())
             return QSet<QString>();
 
         const auto requestCommon = request.first;
@@ -724,7 +723,7 @@ bool HanwhaResource::captureEvent(const nx::vms::event::AbstractEventPtr& event)
         return false;
 
     const auto parameters = analyticsEvent->getRuntimeParams();
-    if (parameters.getAnalyticsEventTypeId() != kHanwhaInputPortEventId)
+    if (parameters.getAnalyticsEventTypeId() != kHanwhaInputPortEventTypeId)
         return false;
 
     emit inputPortStateChanged(
@@ -736,9 +735,9 @@ bool HanwhaResource::captureEvent(const nx::vms::event::AbstractEventPtr& event)
     return true;
 }
 
-bool HanwhaResource::doesEventComeFromAnalyticsDriver(nx::vms::api::EventType eventType) const
+bool HanwhaResource::isAnalyticsDriverEvent(nx::vms::api::EventType eventType) const
 {
-    return base_type::doesEventComeFromAnalyticsDriver(eventType)
+    return base_type::isAnalyticsDriverEvent(eventType)
         || eventType == nx::vms::api::EventType::cameraInputEvent;
 }
 
@@ -845,7 +844,7 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
     if (!result)
         return result;
 
-    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = resourceData();
     auto minFirmwareVersion = resData.value<QString>(lit("minimalFirmwareVersion"));
     if (!minFirmwareVersion.isEmpty() &&
         !getFirmware().isEmpty()
@@ -942,15 +941,6 @@ nx::media::CameraStreamCapability HanwhaResource::mediaCapabilityForRole(Qn::Con
 
 QnAbstractPtzController* HanwhaResource::createPtzControllerInternal() const
 {
-    const auto operationalCapabilities = ptzCapabilities(core::ptz::Type::operational);
-    const auto configurationalCapabilities = ptzCapabilities(core::ptz::Type::configurational);
-
-    const bool hasSomePtzCapabilities =
-        (operationalCapabilities | configurationalCapabilities) != Ptz::NoPtzCapabilities;
-
-    if (!hasSomePtzCapabilities)
-        return nullptr;
-
     auto controller = new HanwhaPtzController(toSharedPointer(this));
     controller->setPtzCapabilities(m_ptzCapabilities);
     controller->setPtzLimits(m_ptzLimits);
@@ -962,7 +952,7 @@ QnAbstractPtzController* HanwhaResource::createPtzControllerInternal() const
 
 CameraDiagnostics::Result HanwhaResource::initSystem(const HanwhaInformation& info)
 {
-    if (QnResource::isStopping())
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     m_deviceType = info.deviceType;
@@ -971,6 +961,13 @@ CameraDiagnostics::Result HanwhaResource::initSystem(const HanwhaInformation& in
     // Set device type only for NVRs and encoders due to optimization purposes.
     if (nx::core::resource::isProxyDeviceType(nxDeviceType))
         setDeviceType(nxDeviceType);
+
+    if (isAnalogEncoder())
+    {
+        // We can't reliably determine if there's PTZ caps for analogous cameras
+        // connected to Hanwha encoder, so we allow a user to enable it on the 'expert' tab
+        setIsUserAllowedToModifyPtzCapabilities(true);
+    }
 
     if (!info.firmware.isEmpty())
         setFirmware(info.firmware);
@@ -1039,7 +1036,7 @@ CameraDiagnostics::Result HanwhaResource::initBypass()
         return CameraDiagnostics::NoErrorResult();
     }
 
-    const auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    const auto resData = resourceData();
     const auto bypassOverride = resData.value<HanwhaBypassSupportType>(
         kHanwhaBypassOverrideParameterName,
         HanwhaBypassSupportType::normal);
@@ -1078,7 +1075,7 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
     if (!ini().initMedia)
         return CameraDiagnostics::NoErrorResult();
 
-    if (QnResource::isStopping())
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     if (isNvr() && !isVideoSourceActive())
@@ -1100,7 +1097,8 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
         const auto channelPrefix = kHanwhaChannelPropertyTemplate.arg(channel);
         for (const auto& entry: videoProfiles->response())
         {
-            if(!isPropertyBelongsToChannel(entry.first, channel))
+            const auto propertyChannel = extractPropertyChannel(entry.first);
+            if (propertyChannel != boost::none && *propertyChannel == channel)
                 continue;
 
             const bool isFixedProfile = entry.first.endsWith(kHanwhaIsFixedProfileProperty)
@@ -1192,7 +1190,7 @@ CameraDiagnostics::Result HanwhaResource::initIo()
     if (!ini().initIo)
         return CameraDiagnostics::NoErrorResult();
 
-    if (QnResource::isStopping())
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     QnIOPortDataList ioPorts;
@@ -1237,7 +1235,6 @@ CameraDiagnostics::Result HanwhaResource::initIo()
 
     if (maxAlarmInputs.is_initialized() && *maxAlarmInputs > 0)
     {
-        setCameraCapability(Qn::RelayInputCapability, true);
         for (auto i = 1; i <= maxAlarmInputs.get(); ++i)
         {
             QnIOPortData inputPortData;
@@ -1259,7 +1256,6 @@ CameraDiagnostics::Result HanwhaResource::initIo()
 
     if (maxAlarmOutputs.is_initialized() && *maxAlarmOutputs > 0)
     {
-        setCameraCapability(Qn::RelayOutputCapability, true);
         for (auto i = 1; i <= maxAlarmOutputs.get(); ++i)
         {
             QnIOPortData outputPortData;
@@ -1276,7 +1272,6 @@ CameraDiagnostics::Result HanwhaResource::initIo()
 
     if (maxAuxDevices.is_initialized() && *maxAuxDevices > 0)
     {
-        setCameraCapability(Qn::RelayOutputCapability, true);
         for (auto i = 1; i <= maxAuxDevices.get(); ++i)
         {
             QnIOPortData outputPortData;
@@ -1291,7 +1286,7 @@ CameraDiagnostics::Result HanwhaResource::initIo()
 
     // TODO: #dmishin get alarm outputs via bypass if possible?
 
-    setIoPortDescriptions(ioPorts);
+    setIoPortDescriptions(std::move(ioPorts), /*needMerge*/ true);
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -1305,10 +1300,10 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
     if (!ini().initPtz)
         return CameraDiagnostics::NoErrorResult();
 
-    if (QnResource::isStopping())
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
-    setProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME, QString());
+    setUserPreferredPtzPresetType(nx::core::ptz::PresetType::native);
 
     const auto mainDescriptors = isNvr()
         ? kHanwhaNvrPtzCapabilityDescriptors
@@ -1354,6 +1349,14 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
 
     NX_DEBUG(this, lm("%1: Supported PTZ capabilities: %2")
         .args(getPhysicalId(), ptzCapabilityBits(capabilities)));
+
+    if (isAnalogEncoder())
+    {
+        // Encoder PTZ capabilities are being overriden from 'Expert' tab
+        // and are empty by default.
+        m_ptzCapabilities[core::ptz::Type::operational] = Ptz::NoPtzCapabilities;
+        m_ptzCapabilities[core::ptz::Type::configurational] = Ptz::NoPtzCapabilities;
+    }
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -1470,11 +1473,21 @@ HanwhaPtzRangeMap HanwhaResource::fetchPtzRanges()
 QnPtzAuxilaryTraitList HanwhaResource::calculatePtzTraits() const
 {
     QnPtzAuxilaryTraitList ptzTraits;
+    if (deviceType() == HanwhaDeviceType::nwc) //< Camera device type.
+        ptzTraits = calculateCameraOnlyTraits();
+
+    calculateAutoFocusSupport(&ptzTraits);
+    return ptzTraits;
+}
+
+QnPtzAuxilaryTraitList HanwhaResource::calculateCameraOnlyTraits() const
+{
+    QnPtzAuxilaryTraitList ptzTraits;
     for (const auto& item: kHanwhaPtzTraitDescriptors)
     {
         const auto trait = QnPtzAuxilaryTrait(item.first);
         const auto& descriptor = item.second;
-        const auto& parameter = cgiParameters().parameter(descriptor.parameterName);
+        const auto& parameter = m_cgiParameters.parameter(descriptor.parameterName);
 
         if (parameter == boost::none)
             continue;
@@ -1489,9 +1502,9 @@ QnPtzAuxilaryTraitList HanwhaResource::calculatePtzTraits() const
         }
     }
 
-    calculateAutoFocusSupport(&ptzTraits);
     return ptzTraits;
 }
+
 void HanwhaResource::calculateAutoFocusSupport(QnPtzAuxilaryTraitList* outTraitList) const
 {
     const auto parameter = cgiParameters().parameter(lit("image/focus/control/Mode"));
@@ -1542,7 +1555,7 @@ CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
     if (!ini().initAdvancedParameters)
         return CameraDiagnostics::NoErrorResult();
 
-    if (QnResource::isStopping())
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     if (isNvr() && !isBypassSupported())
@@ -1591,7 +1604,7 @@ CameraDiagnostics::Result HanwhaResource::initTwoWayAudio()
     if (!ini().initTwoWayAudio)
         return CameraDiagnostics::NoErrorResult();
 
-    if (QnResource::isStopping())
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     const auto channel = getChannel();
@@ -1618,7 +1631,7 @@ CameraDiagnostics::Result HanwhaResource::initTwoWayAudio()
 
 CameraDiagnostics::Result HanwhaResource::initRemoteArchive()
 {
-    if (QnResource::isStopping())
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     if (!ini().enableEdge || isNvr())
@@ -2101,7 +2114,7 @@ CameraDiagnostics::Result HanwhaResource::createProfile(
         *outProfileNumber = kHanwhaInvalidProfile;
         for (auto i = 0; i < kMaxUpdateProfileTries; ++i)
         {
-            if (QnResource::isStopping())
+            if (commonModule()->isNeedToStop())
                 return CameraDiagnostics::ServerTerminatedResult();
 
             const auto profileNumber = verifyProfile(role);
@@ -2872,7 +2885,7 @@ bool HanwhaResource::addFrameRateRanges(
 
 bool HanwhaResource::addResolutionRanges(
     QnCameraAdvancedParameter* inOutParameter,
-    const HanwhaAdavancedParameterInfo & info) const
+    const HanwhaAdavancedParameterInfo& info) const
 {
     const auto codecs = m_codecInfo.codecs(getChannel());
     const auto streamPrefix =
@@ -2898,7 +2911,7 @@ bool HanwhaResource::addResolutionRanges(
         }
 
         if (!resolutionRangeString.isEmpty())
-            resolutionRangeString = resolutionRangeString.left(resolutionRangeString.size() - 1);
+            resolutionRangeString.chop(1);
 
         QnCameraAdvancedParameterDependency dependency;
         dependency.type = QnCameraAdvancedParameterDependency::DependencyType::range;
@@ -3459,12 +3472,13 @@ QString HanwhaResource::propertyByPrameterAndRole(
     return entry->second;
 }
 
-HanwhaResource::HanwhaPortInfo HanwhaResource::portInfoFromId(const QString& id) const
+boost::optional<HanwhaResource::HanwhaPortInfo> HanwhaResource::portInfoFromId(
+    const QString& id) const
 {
     HanwhaPortInfo result;
     auto split = id.split(L'.');
     if (split.size() != 2)
-        return result;
+        return boost::none;
 
     result.prefix = split[0];
     result.number = split[1];
@@ -3476,23 +3490,26 @@ HanwhaResource::HanwhaPortInfo HanwhaResource::portInfoFromId(const QString& id)
 bool HanwhaResource::setOutputPortStateInternal(const QString& outputId, bool activate)
 {
     const auto info = portInfoFromId(outputId);
+    if (info == boost::none)
+        return false;
+
     const auto state = activate ? lit("On") : lit("Off");
 
     HanwhaRequestHelper::Parameters parameters =
-        {{lit("%1.%2.State").arg(info.prefix).arg(info.number), state}};
+        {{lit("%1.%2.State").arg(info->prefix).arg(info->number), state}};
 
-    if (info.submenu == lit("alarmoutput"))
+    if (info->submenu == lit("alarmoutput"))
     {
         parameters.emplace(
             lit("%1.%2.ManualDuration")
-                .arg(info.prefix)
-                .arg(info.number),
+                .arg(info->prefix)
+                .arg(info->number),
             lit("Always"));
     }
 
     HanwhaRequestHelper helper(sharedContext());
     const auto response = helper.control(
-        lit("io/%1").arg(info.submenu),
+        lit("io/%1").arg(info->submenu),
         parameters);
 
     return response.isSuccessful();
@@ -3594,16 +3611,16 @@ QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
     return nullptr;
 }
 
-void HanwhaResource::setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList)
+void HanwhaResource::setSupportedAnalyticsEventTypeIds(const AnalyticsEventTypeIds& eventTypeIds)
 {
-    nx::api::AnalyticsSupportedEvents externalEvents;
-    for (const auto& event: eventsList)
+    AnalyticsEventTypeIds externalEvents;
+    for (const auto& eventTypeId: eventTypeIds)
     {
-        if (event != kHanwhaInputPortEventId)
-            externalEvents.push_back(event);
+        if (eventTypeId != kHanwhaInputPortEventTypeId)
+            externalEvents.push_back(eventTypeId);
     }
 
-    base_type::setAnalyticsSupportedEvents(externalEvents);
+    base_type::setSupportedAnalyticsEventTypeIds(externalEvents);
 }
 
 QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int /*detailLevel*/)
@@ -3725,7 +3742,7 @@ HanwhaProfileParameters HanwhaResource::makeProfileParameters(
     else
         result.emplace(kHanwhaProfileNumberProperty, QString::number(profileByRole(role)));
 
-    if (flags.testFlag(HanwhaProfileParameterFlag::audioSupported))
+    if (flags.testFlag(HanwhaProfileParameterFlag::audioSupported) && isAudioEnabled())
         result.emplace(kHanwhaAudioInputEnableProperty, toHanwhaString(isAudioEnabled()));
 
     if (isH26x)
@@ -3795,4 +3812,3 @@ Ptz::Capabilities HanwhaResource::ptzCapabilities(nx::core::ptz::Type ptzType) c
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-

@@ -1,8 +1,9 @@
 #pragma once
 
 #include <nx/network/aio/basic_pollable.h>
+#include <nx/utils/std/optional.h>
 
-#include "basic_tunnel_client.h"
+#include "base_tunnel_client.h"
 #include "request_paths.h"
 #include "../../http_async_client.h"
 #include "../../http_types.h"
@@ -10,34 +11,27 @@
 namespace nx::network::http::tunneling::detail {
 
 class NX_NETWORK_API GetPostTunnelClient:
-    public BasicTunnelClient
+    public BaseTunnelClient
 {
-    using base_type = BasicTunnelClient;
+    using base_type = BaseTunnelClient;
 
 public:
     GetPostTunnelClient(
         const nx::utils::Url& baseTunnelUrl,
         ClientFeedbackFunction clientFeedbackFunction);
 
-    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+    virtual void setTimeout(std::chrono::milliseconds timeout) override;
 
     virtual void openTunnel(
         OpenTunnelCompletionHandler completionHandler) override;
 
     virtual const Response& response() const override;
 
-protected:
-    virtual void stopWhileInAioThread() override;
-
 private:
-    const nx::utils::Url m_baseTunnelUrl;
-    ClientFeedbackFunction m_clientFeedbackFunction;
     nx::utils::Url m_tunnelUrl;
-    OpenTunnelCompletionHandler m_completionHandler;
-    std::unique_ptr<AsyncClient> m_httpClient;
     Response m_openTunnelResponse;
-    std::unique_ptr<network::AbstractStreamSocket> m_connection;
     nx::Buffer m_serializedOpenUpChannelRequest;
+    std::optional<std::chrono::milliseconds> m_timeout;
 
     void openDownChannel();
 
@@ -50,13 +44,6 @@ private:
     void handleOpenUpTunnelResult(
         SystemError::ErrorCode systemErrorCode,
         std::size_t /*bytesTransferred*/);
-
-    void cleanupFailedTunnel();
-    void reportFailure(OpenTunnelResult result);
-
-    bool resetConnectionAttributes();
-
-    void reportSuccess();
 };
 
 } // namespace nx::network::http::tunneling::detail

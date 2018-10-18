@@ -2,7 +2,6 @@
 
 #include "utils/db/db_helper.h"
 #include "transaction/transaction.h"
-#include "transaction/message_bus_adapter.h"
 #include "ec2_thread_pool.h"
 
 #include <nx/utils/concurrent.h>
@@ -65,18 +64,14 @@ namespace ec2 {
         impl::SimpleHandlerPtr handler)
     {
         const int reqId = generateRequestID();
+        nx::vms::api::UpdateUploadData params;
+        params.updateId = updateId;
+        params.data = data;
+        params.offset = offset;
 
-        QnTransaction<nx::vms::api::UpdateUploadData> transaction(
-            ApiCommand::uploadUpdate,
-            m_messageBus->commonModule()->moduleGUID());
-        transaction.params.updateId = updateId;
-        transaction.params.data = data;
-        transaction.params.offset = offset;
-
-        m_messageBus->sendTransaction(transaction, peers);
-        nx::utils::concurrent::run(
-            Ec2ThreadPool::instance(),
-            [handler, reqId]() { handler->done(reqId, ErrorCode::ok); });
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::uploadUpdate, params,
+            [handler, reqId](ErrorCode errorCode) { handler->done(reqId, errorCode); });
 
         return reqId;
     }
@@ -91,7 +86,6 @@ namespace ec2 {
         params.updateId = updateId;
         params.chunks = chunks;
 
-        using namespace std::placeholders;
         m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
             ApiCommand::uploadUpdateResponce, params,
             [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });

@@ -14,7 +14,7 @@ public:
     virtual ~QnSimpleAudioRtpParser();
     virtual void setSdpInfo(QList<QByteArray> sdpInfo) override;
 
-    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const QnRtspStatistic& statistics, bool& gotData) override;
+    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, bool& gotData) override;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;
     void setCodecId(AVCodecID codecId);
     void setBitsPerSample(int value);
@@ -22,7 +22,6 @@ public:
 private:
     QnConstMediaContextPtr m_context;
     QSharedPointer<QnRtspAudioLayout> m_audioLayout;
-    int m_frequency;
     int m_channels;
     int m_bits_per_coded_sample;
     AVCodecID m_codecId;

@@ -49,21 +49,21 @@ public:
     template<class CompletionFuncRefType>
     bool dispatchRequest(
         HttpServerConnection* const connection,
-        nx::network::http::Message message,
+        nx::network::http::Request request,
         nx::utils::stree::ResourceContainer authInfo,
         CompletionFuncRefType completionFunc) const
     {
-        NX_ASSERT(message.type == nx::network::http::MessageType::request);
-        nx::network::http::RequestLine& request = message.request->requestLine;
-        applyModRewrite(&request.url);
+        applyModRewrite(&request.requestLine.url);
 
-        auto handler = getHandler(request.method, request.url.path());
+        auto handler = getHandler(
+            request.requestLine.method,
+            request.requestLine.url.path());
         if (!handler)
             return false;
 
         const auto handlerPtr = handler.get();
         return handlerPtr->processRequest(
-            connection, std::move(message), std::move(authInfo),
+            connection, std::move(request), std::move(authInfo),
             [handler = std::move(handler), completionFunc = std::move(completionFunc)](
                 nx::network::http::Message message,
                 std::unique_ptr<nx::network::http::AbstractMsgBodySource> bodySource,
@@ -135,7 +135,7 @@ public:
 
         return registerRequestProcessor<Handler>(
             path.c_str(),
-            [func]() { return std::make_unique<Handler>(std::move(func)); },
+            [func = std::move(func)]() { return std::make_unique<Handler>(func); },
             method);
     }
 

@@ -5,7 +5,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/safe_direct_connection.h>
-#include <common/common_module_aware.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 /**
  * Sets host system password to admin password if appropriate.
@@ -13,13 +13,13 @@
  */
 class HostSystemPasswordSynchronizer:
     public QObject,
-    public QnCommonModuleAware,
+    public nx::mediaserver::ServerModuleAware,
     public Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
 
 public:
-    HostSystemPasswordSynchronizer(QnCommonModule* commonModule);
+    HostSystemPasswordSynchronizer(QnMediaServerModule* serverModule);
     virtual ~HostSystemPasswordSynchronizer() override;
 
     void syncLocalHostRootPasswordWithAdminIfNeeded(const QnUserResourcePtr& user);

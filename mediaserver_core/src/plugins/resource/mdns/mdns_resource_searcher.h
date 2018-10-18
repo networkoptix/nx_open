@@ -5,11 +5,13 @@
 #include <core/resource/network_resource.h>
 #include <core/resource_management/resource_searcher.h>
 
+class QnMediaServerModule;
+
 class QnMdnsResourceSearcher: virtual public QnAbstractNetworkResourceSearcher
 {
     using base_type = QnAbstractNetworkResourceSearcher;
 public:
-    QnMdnsResourceSearcher(QnCommonModule* commonModule);
+    QnMdnsResourceSearcher(QnMediaServerModule* serverModule);
     ~QnMdnsResourceSearcher();
 
     bool isProxy() const;
@@ -28,6 +30,8 @@ protected:
         const QByteArray& responseData,
         const QHostAddress& discoveryAddress,
         const QHostAddress& foundHostAddress ) = 0;
+private:
+    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 #endif // ENABLE_MDNS

@@ -273,7 +273,7 @@ bool QnConnectionDiagnosticsHelper::getInstalledVersions(
     if (!checkOnline())
         return false;
 
-    const auto result = getInstalledVersions(versions);
+    const auto result = applauncher::api::getInstalledVersions(versions);
     if (result == ResultType::ok)
         return true;
 
@@ -282,7 +282,7 @@ bool QnConnectionDiagnosticsHelper::getInstalledVersions(
     {
         QThread::msleep(100);
         qApp->processEvents();
-        if (getInstalledVersions(versions) == ResultType::ok)
+        if (applauncher::api::getInstalledVersions(versions) == ResultType::ok)
             return true;
     }
     return false;

@@ -77,24 +77,21 @@ static const char* PASSWD_CAMERA = "camera";
 bool PasswordHelper::isNotAuthenticated(const SOAP_ENV__Fault* faultInfo)
 {
 #ifdef ONVIF_DEBUG
-    qDebug() << "PasswordHelper::isNotAuthenticated: all fault info: " << SoapErrorHelper::fetchDescription(faultInfo);
+    qDebug() << "PasswordHelper::lastErrorIsNotAuthenticated: all fault info: " << SoapErrorHelper::fetchDescription(faultInfo);
 #endif
 
-    if (!faultInfo) {
+    if (!faultInfo)
         return false;
-    }
 
     QString info;
-
-    if (faultInfo->SOAP_ENV__Code && faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode) {
-        info = QString::fromLatin1(faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode->SOAP_ENV__Value).toLower();
-    } else if (faultInfo->faultstring) {
-        info = QString::fromLatin1(faultInfo->faultstring).toLower();
-    }
+    if (faultInfo->SOAP_ENV__Code && faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode)
+        info = QString::fromLatin1(faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode->SOAP_ENV__Value);
+    else if (faultInfo->faultstring)
+        info = QString::fromLatin1(faultInfo->faultstring);
 
     info = info.toLower();
 #ifdef ONVIF_DEBUG
-    qDebug() << "PasswordHelper::isNotAuthenticated: gathered string: " << info;
+    qDebug() << "PasswordHelper::lastErrorIsNotAuthenticated: gathered string: " << info;
 #endif
 
     return info.indexOf(QLatin1String("notauthorized")) != -1 ||
@@ -105,13 +102,12 @@ bool PasswordHelper::isNotAuthenticated(const SOAP_ENV__Fault* faultInfo)
         info.indexOf(QLatin1String("unauthorized")) != -1;
 }
 
-bool PasswordHelper::isConflictError(const SOAP_ENV__Fault* faultInfo)
+bool PasswordHelper::isConflict(const SOAP_ENV__Fault* faultInfo)
 {
     if (faultInfo && faultInfo->SOAP_ENV__Reason && faultInfo->SOAP_ENV__Reason->SOAP_ENV__Text)
     {
-        QString reasonValue(QLatin1String(faultInfo->SOAP_ENV__Reason->SOAP_ENV__Text));
-        reasonValue = reasonValue.toLower();
-
+        QString reasonValue(faultInfo->SOAP_ENV__Reason->SOAP_ENV__Text);
+        reasonValue = reasonValue;
         return reasonValue.indexOf(QLatin1String("conflict")) != -1;
     }
 

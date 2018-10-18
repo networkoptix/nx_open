@@ -60,20 +60,6 @@ void FoundDevicesModel::addDevices(const QnManualResourceSearchList& devices)
                 m_checked.insert(id, false);
                 m_presentedState.insert(id,
                     device.existsInPool ? alreadyAddedState : notPresentedState);
-
-                if (!device.existsInPool)
-                    continue;
-
-                const auto camera = pool->getResourceByUniqueId<QnVirtualCameraResource>(id);
-                if (!camera)
-                    continue;
-
-                const ColumnDifference difference({
-                    {brandColumn, device.vendor.trimmed() != camera->getVendor().trimmed()},
-                    {modelColumn, device.name.trimmed() != camera->getModel().trimmed()},
-                    {addressColumn, device.url.trimmed() != camera->sourceUrl(Qn::CR_LiveVideo).trimmed()}});
-
-                m_fieldsDifference.insert(id, difference);
             }
         }
     }
@@ -112,7 +98,6 @@ void FoundDevicesModel::removeDevices(QStringList ids)
         m_checked.remove(id);
         m_presentedState.remove(id);
         m_devices.erase(it);
-        m_fieldsDifference.remove(id);
         someDevicesRemoved = true;
     }
 
@@ -224,19 +209,9 @@ QPalette::ColorRole FoundDevicesModel::getColorRole(const QModelIndex& index) co
         return kUsualColor;
 
     const auto deviceId = device(index).uniqueId;
-    if (m_presentedState[deviceId] != alreadyAddedState)
-        return kHighlightedColor;
-
-    const auto diffIt = m_fieldsDifference.find(deviceId);
-    if (diffIt == m_fieldsDifference.end())
-        return kUsualColor;
-
-    const auto& difference = diffIt.value();
-    const auto diffValueIt = difference.find(column);
-    if (diffValueIt == difference.end())
-        return kUsualColor;
-
-    return diffValueIt.value() ? kHighlightedColor : kUsualColor;
+    return m_presentedState[deviceId] == alreadyAddedState
+        ? kUsualColor
+        : kHighlightedColor;
 }
 
 bool FoundDevicesModel::setData(

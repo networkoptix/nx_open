@@ -16,6 +16,24 @@
 static const QString kPresetsPropertyKey = lit("ptzPresets");
 static const QString kPtzPresetMappingPropertyName = lit("presetMapping");
 
+namespace nx {
+namespace core {
+namespace ptz {
+
+enum class PresetType
+{
+    undefined,
+    system,
+    native,
+};
+
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PresetType);
+} // namespace ptz
+} // namespace core
+} // namespace nx
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::core::ptz::PresetType, (metatype)(lexical));
+
 struct QnPtzPreset
 {
     Q_GADGET
@@ -30,7 +48,9 @@ public:
     QString id;
     QString name;
 };
+
 #define QnPtzPreset_Fields (id)(name)
+QN_FUSION_DECLARE_FUNCTIONS(QnPtzPreset, (json)(eq));
 
 Q_DECLARE_METATYPE(QnPtzPreset)
 Q_DECLARE_METATYPE(QnPtzPresetList)

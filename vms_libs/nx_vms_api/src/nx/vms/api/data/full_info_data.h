@@ -27,6 +27,8 @@ struct NX_VMS_API FullInfoData: Data
     ResourceStatusDataList resStatusList;
     WebPageDataList webPages;
     LayoutTourDataList layoutTours;
+    AnalyticsPluginDataList analyticsPlugins;
+    AnalyticsEngineDataList analyticsEngines;
 };
 #define FullInfoData_Fields \
     (resourceTypes) \
@@ -47,7 +49,9 @@ struct NX_VMS_API FullInfoData: Data
     (webPages) \
     (accessRights) \
     (userRoles) \
-    (layoutTours)
+    (layoutTours) \
+    (analyticsPlugins) \
+    (analyticsEngines)
 
 } // namespace api
 } // namespace vms

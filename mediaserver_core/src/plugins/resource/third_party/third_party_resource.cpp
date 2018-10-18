@@ -496,10 +496,12 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
         return CameraDiagnostics::UnknownErrorResult();
     }
 
+    setCameraCapability(Qn::CameraTimeCapability,
+        cameraCapabilities & nxcip::BaseCameraManager::cameraTimeCapability);
     if(cameraCapabilities & nxcip::BaseCameraManager::relayInputCapability)
-        setCameraCapability( Qn::RelayInputCapability, true );
+        setCameraCapability( Qn::InputPortCapability, true );
     if(cameraCapabilities & nxcip::BaseCameraManager::relayOutputCapability)
-        setCameraCapability( Qn::RelayOutputCapability, true );
+        setCameraCapability( Qn::OutputPortCapability, true );
     if(cameraCapabilities & nxcip::BaseCameraManager::shareIpCapability)
         setCameraCapability( Qn::ShareIpCapability, true );
     if(cameraCapabilities & nxcip::BaseCameraManager::customMediaUrlCapability)
@@ -556,11 +558,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
         setProperty( Qn::MOTION_WINDOW_CNT_PARAM_NAME, 100);
         setProperty( Qn::MOTION_MASK_WINDOW_CNT_PARAM_NAME, 100);
         setProperty( Qn::MOTION_SENS_WINDOW_CNT_PARAM_NAME, 100);
-#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
         setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid,hardwaregrid"));
-#else
-        setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("hardwaregrid"));
-#endif
     }
     else
     {
@@ -716,8 +714,8 @@ bool QnThirdPartyResource::initializeIOPorts()
     {
         NX_WARNING(this, lit("Failed to get pointer to nxcip::CameraRelayIOManager interface for third-party camera %1:%2 (url %3)").
             arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).arg(QString::fromUtf8(m_camInfo.url)));
-        setCameraCapability( Qn::RelayInputCapability, false );
-        setCameraCapability( Qn::RelayOutputCapability, false );
+        setCameraCapability( Qn::InputPortCapability, false );
+        setCameraCapability( Qn::OutputPortCapability, false );
         return false;
     }
 

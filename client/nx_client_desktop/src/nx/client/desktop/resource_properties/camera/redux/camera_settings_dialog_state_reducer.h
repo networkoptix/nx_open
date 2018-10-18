@@ -4,9 +4,7 @@
 
 #include "camera_settings_dialog_state.h"
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 class CameraSettingsDialogStateReducer
 {
@@ -52,7 +50,9 @@ public:
     static State setUseBitratePerGOP(State state, bool value);
     static State setPrimaryRecordingDisabled(State state, bool value);
     static State setSecondaryRecordingDisabled(State state, bool value);
-    static State setNativePtzPresetsDisabled(State state, bool value);
+    static State setPreferredPtzPresetType(State state, nx::core::ptz::PresetType value);
+    static State setForcedPtzPanTiltCapability(State state, bool value);
+    static State setForcedPtzZoomCapability(State state, bool value);
     static State setRtpTransportType(State state, vms::api::RtpTransportType value);
     static State setMotionStreamType(State state, vms::api::MotionStreamType value);
     static State setCustomMediaPortUsed(State state, bool value);
@@ -61,12 +61,15 @@ public:
     static State setLogicalId(State state, int value);
     static State generateLogicalId(State state);
     static State resetExpertSettings(State state);
+    static State setAnalyticsEngines(
+        State state, const QList<AnalyticsEngineInfo>& value);
+    static State setEnabledAnalyticsEngines(State state, const QSet<QnUuid>& value);
+    static std::pair<bool, State> setDeviceAgentSettingsValues(
+        State state, const QnUuid& engineId, const QVariantMap& values);
     static State setWearableMotionDetectionEnabled(State state, bool value);
     static State setWearableMotionSensitivity(State state, int value);
     static State setCredentials(
         State state, const std::optional<QString>& login, const std::optional<QString>& password);
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

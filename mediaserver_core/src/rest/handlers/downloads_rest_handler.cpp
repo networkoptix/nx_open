@@ -268,6 +268,9 @@ int Helper::handleAddUpload(const QString& fileName)
     if (errorCode != ResultCode::ok)
         return makeDownloaderError(errorCode);
 
+    QnJsonRestResult restResult;
+    restResult.setReply(errorCode);
+    QnFusionRestHandlerDetail::serialize(restResult, result, resultContentType, Qn::JsonFormat, false);
     return nx::network::http::StatusCode::ok;
 }
 
@@ -433,7 +436,7 @@ int Helper::handleValidate(const QString& url)
     {
         NX_ERROR(this, lm("[Downloader, validate] Url is empty"));
         return makeError(
-            nx::network::http::StatusCode::invalidParameter,
+            nx::network::http::StatusCode::unprocessableEntity,
             QnRestResult::Error::InvalidParameter, "Url is empty");
     }
 
@@ -442,7 +445,7 @@ int Helper::handleValidate(const QString& url)
     {
         NX_ERROR(this, lm("[Downloader, validate] No 'expected' parameter"));
         return makeError(
-            nx::network::http::StatusCode::invalidParameter,
+            nx::network::http::StatusCode::unprocessableEntity,
             QnRestResult::Error::InvalidParameter, "No 'expected' parameter");
     }
 
@@ -479,11 +482,12 @@ int Helper::makeError(
 int Helper::makeInvalidParameterError(
     const QString& parameter, const QnRestResult::Error& error)
 {
-    return makeError(nx::network::http::StatusCode::invalidParameter, error, parameter);
+    return makeError(nx::network::http::StatusCode::unprocessableEntity, error, parameter);
 }
 
 int Helper::makeFileError(const QString& fileName)
 {
+    NX_ERROR(this) << "makeFileError(" << fileName << ") - bad filename";
     return makeError(
         nx::network::http::StatusCode::badRequest,
         QnRestResult::CantProcessRequest,
@@ -495,6 +499,7 @@ int Helper::makeDownloaderError(ResultCode errorCode)
     QnJsonRestResult restResult;
     QString errorMessage = lit("DistributedFileDownloader returned error: %1").arg(
         QnLexical::serialized(errorCode));
+    NX_ERROR(this) << "makeDownloaderError(" << errorMessage << ")";
     restResult.setError(QnRestResult::CantProcessRequest, errorMessage);
     restResult.setReply(errorCode);
 
