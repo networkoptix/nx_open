@@ -1,6 +1,8 @@
 #ifndef ZIP_UTILS_H
 #define ZIP_UTILS_H
 
+#include <future>
+
 #include <QtCore/QIODevice>
 #include <QtCore/QDir>
 

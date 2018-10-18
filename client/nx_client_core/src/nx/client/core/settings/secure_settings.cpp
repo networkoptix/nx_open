@@ -2,13 +2,21 @@
 
 #include <QtCore/QCoreApplication>
 
-#include "keychain_property_storage_backend.h"
 #include <nx/utils/property_storage/qsettings_backend.h>
+#if defined(USE_QT_KEYCHAIN)
+    #include "keychain_property_storage_backend.h"
+#endif
 
 namespace nx::client::core {
 
 SecureSettings::SecureSettings():
-    nx::utils::property_storage::Storage(new KeychainBackend(QCoreApplication::applicationName()))
+    nx::utils::property_storage::Storage(
+        #if defined(USE_QT_KEYCHAIN)
+            new KeychainBackend(QCoreApplication::applicationName()))
+        #else
+            new nx::utils::property_storage::QSettingsBackend(
+                new QSettings(), "client_core_secure"))
+        #endif
 {
     load();
 }

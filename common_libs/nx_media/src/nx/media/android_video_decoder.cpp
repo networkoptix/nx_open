@@ -4,6 +4,7 @@
 #include <deque>
 
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QMutex>
 
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
