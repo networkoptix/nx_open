@@ -32,19 +32,20 @@ export class NxIntegrationsComponent implements OnInit, OnChanges {
 
     ngOnInit(): void {
         this.integrations
-            .getMockData()
+            .getIntegrations()
             .subscribe((res: any) => {
-                    this.allElements = res.integrations;
-                    this.elements = this.allElements.map(obj => ({ ...obj })); // array deep copy
+                    this.allElements = res.data;
+                    // array deep copy for filtering
+                    this.elements = this.allElements.map(obj => ({ ...obj }));
                 },
                 error => {
-                    console.error('No mock data provided');
+                    console.error('Error -> ', error);
                 });
     }
 
     markMatch(item, text) {
         const pattern = new RegExp(text, 'gm');
-        item.name =  item.name.replace(pattern, '<span class="marked">' + text + '</span>');
+        item.name = item.name.replace(pattern, '<span class="marked">' + text + '</span>');
     }
 
     searchFilterFor(text) {
@@ -81,17 +82,7 @@ export class NxIntegrationsComponent implements OnInit, OnChanges {
     }
 
     ngOnChanges(change: SimpleChanges) {
-        debugger;
-        // this.elements = this.allElements.filter(item => {
-        //
-        //     let showAll = true;
-        //     Object.keys(this.selectors).forEach(key => {
-        //         if (this.selectors[ key ] && item.type === this.selectors[ key ]) {
-        //             showAll = false;
-        //             return item;
-        //         }
-        //     });
-        // });
+
     }
 
 }

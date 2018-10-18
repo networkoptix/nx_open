@@ -2,6 +2,7 @@ import { Component, Inject, OnInit, Input, ViewEncapsulation } from '@angular/co
 import { Location }                                            from '@angular/common';
 import { NgbModal, NgbActiveModal, NgbModalRef }               from '@ng-bootstrap/ng-bootstrap';
 import { EmailValidator }                                      from '@angular/forms';
+import { NxConfigService }                                     from '../../services/nx-config';
 
 @Component({
     selector: 'nx-modal-merge-content',
@@ -14,6 +15,7 @@ export class MergeModalContent {
     @Input() language;
     @Input() closable;
 
+    config: any;
     merging: any;
     user: any;
     systems: any;
@@ -24,13 +26,14 @@ export class MergeModalContent {
     systemsSelect: any;
 
     constructor(public activeModal: NgbActiveModal,
+                private configService: NxConfigService,
                 @Inject('process') private process: any,
                 @Inject('account') private account: any,
                 @Inject('system') private systemService: any,
-                @Inject('configService') private configService: any,
                 @Inject('systemsProvider') private systemsProvider: any,
                 @Inject('cloudApiService') private cloudApi: any) {
 
+        this.config = configService.getConfig();
     }
 
     // Add system can merge where added to systems form api call
@@ -108,8 +111,8 @@ export class MergeModalContent {
             this.activeModal.close({
                 anotherSystemId: this.targetSystem.id,
                 role: this.masterId === this.system.id ?
-                    this.configService.config.systemStatuses.master :
-                    this.configService.config.systemStatuses.slave
+                    this.config.systemStatuses.master :
+                    this.config.systemStatuses.slave
             });
         });
     }

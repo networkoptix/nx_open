@@ -15,9 +15,7 @@ export class NxAccountSettingsDropdown implements OnInit {
     show: boolean;
     downloadsHistory: any;
 
-    constructor(@Inject('account') private account: any,
-                @Inject('configService') private configService: any) {
-
+    constructor(@Inject('account') private account: any) {
         this.show = false;
     }
 

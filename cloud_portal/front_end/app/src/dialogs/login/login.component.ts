@@ -10,6 +10,7 @@ import {
 import { DOCUMENT, Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { NgbModal, NgbActiveModal, NgbModalRef }                      from '@ng-bootstrap/ng-bootstrap';
 import { NxModalGenericComponent }                                    from '../generic/generic.component';
+import { NxConfigService }                                            from '../../services/nx-config';
 
 @Component({
     selector: 'ngbd-modal-content',
@@ -19,13 +20,13 @@ import { NxModalGenericComponent }                                    from '../g
 })
 export class LoginModalContent implements OnInit {
     @Input() language;
-    @Input() configService;
     @Input() login;
     @Input() cancellable;
     @Input() closable;
     @Input() location;
     @Input() keepPage;
 
+    config: any;
     auth: any;
     password: string;
     remember: boolean;
@@ -41,6 +42,7 @@ export class LoginModalContent implements OnInit {
                 @Inject('cloudApiService') private cloudApi: any,
                 @Inject('localStorageService') private localStorage: any,
                 @Inject(DOCUMENT) private document: any,
+                private configService: NxConfigService,
                 private renderer: Renderer2,
                 private genericModal: NxModalGenericComponent) {
 
@@ -48,6 +50,7 @@ export class LoginModalContent implements OnInit {
         this.password = '';
         this.remember = true;
         this.wrongPassword = false;
+        this.config = configService.getConfig();
     }
 
     resendActivation(email) {
@@ -141,15 +144,15 @@ export class LoginModalContent implements OnInit {
                 if (this.location.path() === '') {
                     // TODO: Repace this once 'register' page is moved to A5
                     // AJS and A5 routers freak out about route change *****
-                    // this.location.go(this.configService.config.redirectAuthorised);
-                    this.document.location.href = this.configService.config.redirectAuthorised;
+                    // this.location.go(this.config.redirectAuthorised);
+                    this.document.location.href = this.config.redirectAuthorised;
                 }
             } else {
                 setTimeout(() => {
                     // TODO: Repace this once 'register' page is moved to A5
                     // AJS and A5 routers freak out about route change *****
-                    // this.location.go(this.configService.config.redirectAuthorised);
-                    this.document.location.href = this.configService.config.redirectAuthorised;
+                    // this.location.go(this.config.redirectAuthorised);
+                    this.document.location.href = this.config.redirectAuthorised;
                 });
             }
         });
@@ -157,11 +160,11 @@ export class LoginModalContent implements OnInit {
 
     close(redirect?) {
         // prevent unnecessary reload
-        if (redirect && this.document.location.pathname !== this.configService.config.redirectUnauthorised) {
+        if (redirect && this.document.location.pathname !== this.config.redirectUnauthorised) {
             // TODO: Repace this once 'register' page is moved to A5
             // AJS and A5 routers freak out about route change *****
-            // this.location.go(this.configService.config.redirectUnauthorised);
-            this.document.location.href = this.configService.config.redirectUnauthorised;
+            // this.location.go(this.config.redirectUnauthorised);
+            this.document.location.href = this.config.redirectUnauthorised;
         }
 
         this.activeModal.close();
@@ -181,7 +184,6 @@ export class NxModalLoginComponent implements OnInit {
     closeResult: string;
 
     constructor(@Inject('languageService') private language: any,
-                @Inject('configService') private configService: any,
                 private modalService: NgbModal,
                 location: Location) {
 
@@ -191,7 +193,6 @@ export class NxModalLoginComponent implements OnInit {
     private dialog(keepPage?) {
         this.modalRef = this.modalService.open(LoginModalContent, {backdrop: 'static', size: 'sm', centered: true});
         this.modalRef.componentInstance.language = this.language;
-        this.modalRef.componentInstance.configService = this.configService;
         this.modalRef.componentInstance.login = this.login;
         this.modalRef.componentInstance.cancellable = !keepPage || false;
         this.modalRef.componentInstance.closable = true;

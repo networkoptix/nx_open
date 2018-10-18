@@ -47,7 +47,6 @@ export class NxPermissionsDropdown implements OnInit {
     }
 
     processAccessRoles() {
-        // const roles = this.system.accessRoles || this.configService.config.accessRoles.predefinedRoles;
         if (this.roles) {
             this.accessRoles = this.roles.filter((role) => {
                 if (!(role.isOwner || role.isAdmin && !this.system.isMine)) {

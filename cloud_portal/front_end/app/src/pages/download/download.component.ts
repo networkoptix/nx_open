@@ -7,6 +7,7 @@ import { Title }                             from '@angular/platform-browser';
 import { DOCUMENT, Location, TitleCasePipe } from '@angular/common';
 import { NgbTabChangeEvent, NgbTabset }      from '@ng-bootstrap/ng-bootstrap';
 import { DeviceDetectorService }             from 'ngx-device-detector';
+import { NxConfigService }                   from '../../services/nx-config';
 
 @Component({
     selector   : 'download-component',
@@ -23,6 +24,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
     private routeData: any;
     private canViewDownloads: boolean;
 
+    config: any;
     installers: any;
     downloads: any;
     downloadsData: any;
@@ -36,8 +38,10 @@ export class DownloadComponent implements OnInit, OnDestroy {
 
     private setupDefaults() {
 
+        this.config = this.configService.getConfig();
+
         this.canViewDownloads = false;
-        this.downloads = this.configService.config.downloads;
+        this.downloads = this.config.downloads;
 
         this.downloadsData = {
             version   : '',
@@ -57,11 +61,11 @@ export class DownloadComponent implements OnInit, OnDestroy {
 
     constructor(@Inject('languageService') private language: any,
                 @Inject('cloudApiService') private cloudApi: any,
-                @Inject('configService') private configService: any,
                 @Inject('account') private account: any,
                 @Inject('authorizationCheckService') private authorizationService: any,
                 @Inject('locationProxyService') private locationProxy: any,
                 @Inject(DOCUMENT) private document: any,
+                private configService: NxConfigService,
                 private deviceService: DeviceDetectorService,
                 private route: ActivatedRoute,
                 private router: Router,
@@ -160,17 +164,17 @@ export class DownloadComponent implements OnInit, OnDestroy {
         this.account
             .get()
             .then(result => {
-                this.canSeeHistory = (this.configService.config.publicReleases ||
+                this.canSeeHistory = (this.config.publicReleases ||
                     result.is_superuser ||
-                    result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1);
+                    result.permissions.indexOf(this.config.permissions.canViewRelease) > -1);
             });
 
-        if (!this.configService.config.publicDownloads) {
+        if (!this.config.publicDownloads) {
             this.authorizationService
                 .requireLogin()
                 .then(result => {
                     if (!result) {
-                        this.document.location.href = this.configService.config.redirectUnauthorised;
+                        this.document.location.href = this.config.redirectUnauthorised;
                         return;
                     }
 

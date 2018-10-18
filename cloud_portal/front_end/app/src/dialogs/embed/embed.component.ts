@@ -5,6 +5,7 @@ import {
 }                                                from '@angular/core';
 import { DOCUMENT, Location }                    from '@angular/common';
 import { NgbModal, NgbActiveModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NxConfigService }                       from '../../services/nx-config';
 
 @Component({
     selector   : 'nx-modal-embed-content',
@@ -17,6 +18,7 @@ export class EmbedModalContent {
     @Input() disconnect;
     @Input() closable;
 
+    config: any;
     auth: any;
     params: any;
     embedUrl: string;
@@ -26,7 +28,7 @@ export class EmbedModalContent {
     constructor(private activeModal: NgbActiveModal,
                 private renderer: Renderer2,
                 private location: Location,
-                @Inject('configService') private configService: any,
+                private configService: NxConfigService,
                 @Inject(DOCUMENT) private document: any) {
 
         this.params = {
@@ -39,6 +41,8 @@ export class EmbedModalContent {
             email   : '',
             password: ''
         };
+
+        this.config = configService.getConfig();
     }
 
     ngOnInit() {

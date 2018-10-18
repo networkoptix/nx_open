@@ -11,6 +11,7 @@ import {
 import { NgbModal, NgbActiveModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { EmailValidator }                        from '@angular/forms';
 import { NxModalGenericComponent }               from '../generic/generic.component';
+import { NxConfigService }                       from '../../services/nx-config';
 
 @Component({
     selector   : 'nx-modal-share-content',
@@ -23,6 +24,7 @@ export class ShareModalContent {
     @Input() user;
     @Input() closable;
 
+    config: any;
     title: string;
     sharing: any;
     url: string;
@@ -37,14 +39,15 @@ export class ShareModalContent {
 
     constructor(public activeModal: NgbActiveModal,
                 private renderer: Renderer2,
+                private configService: NxConfigService,
                 @Inject('account') private account: any,
                 @Inject('process') private process: any,
-                @Inject('configService') private configService: any,
                 @Inject('ngToast') private toast: any,
                 private genericModal: NxModalGenericComponent) {
 
         this.url = 'share';
         this.accessRoles = [];
+        this.config = configService.getConfig();
     }
 
     private getRoleDescription() {
@@ -86,14 +89,14 @@ export class ShareModalContent {
 
         if (!this.user) {
             this.isNewShare = true;
-            const predefinedRole = this.configService.config.accessRoles.predefinedRoles.filter(role => {
-                return role.name === this.configService.config.accessRoles.default;
+            const predefinedRole = this.config.accessRoles.predefinedRoles.filter(role => {
+                return role.name === this.config.accessRoles.default;
             })[0];
             this.user = {
                 email    : '',
                 isEnabled: true,
                 role     : {
-                    name       : this.configService.config.accessRoles.default,
+                    name       : this.config.accessRoles.default,
                     permissions: ''     // permissions will be updated within permissions component as it depends
                                         // on system's accessRoles
                 }

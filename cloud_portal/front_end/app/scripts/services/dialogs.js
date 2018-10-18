@@ -2,9 +2,8 @@
     'use strict';
     angular
         .module('cloudApp.services')
-        .factory('dialogs', ['$http', 'NgbModal', '$q', '$location', 'configService', 'NxDialogsService', 'languageService',
-        function ($http, NgbModal, $q, $location, configService, NxDialogsService, languageService) {
-            const CONFIG = configService.config;
+        .factory('dialogs', ['$http', 'NgbModal', '$q', '$location', 'NxDialogsService', 'languageService',
+        function ($http, NgbModal, $q, $location, NxDialogsService, languageService) {
             let lang = languageService.lang;
             function openDialog(settings) {
                 function isInline() {

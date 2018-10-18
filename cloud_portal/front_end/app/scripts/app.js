@@ -51,8 +51,8 @@ window.L = {};
             $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
             $httpProvider.interceptors.push('httpResponseInterceptor');
         }])
-        .config(['ngToastProvider', 'configServiceProvider', function (ngToastProvider, configServiceProvider) {
-            var CONFIG = configServiceProvider.$get().config;
+        .config(['ngToastProvider', 'nxConfigServiceProvider', function (ngToastProvider, nxConfigServiceProvider) {
+            var CONFIG = nxConfigServiceProvider.$get().getConfig();
 
             ngToastProvider.configure({
                 timeout: CONFIG.alertTimeout,
@@ -64,9 +64,9 @@ window.L = {};
             });
         }])
         .config(['$routeProvider', '$locationProvider', '$compileProvider',
-            'languageServiceProvider', 'configServiceProvider',
+            'languageServiceProvider', 'nxConfigServiceProvider',
             function ($routeProvider, $locationProvider, $compileProvider,
-                      languageServiceProvider, configServiceProvider) {
+                      languageServiceProvider, nxConfigServiceProvider) {
 
                 if (!PRODUCTION) {
                     $compileProvider.debugInfoEnabled(true);
@@ -74,7 +74,7 @@ window.L = {};
 
                 $locationProvider.html5Mode(true);
 
-                var CONFIG = configServiceProvider.$get().config;
+                var CONFIG = nxConfigServiceProvider.$get().getConfig();
 
                 var appState = {
                         viewsDir: 'static/views/', //'static/lang_' + lang + '/views/';

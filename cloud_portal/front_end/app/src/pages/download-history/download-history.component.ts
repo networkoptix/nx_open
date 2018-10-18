@@ -10,6 +10,7 @@ import { NgbTabChangeEvent, NgbTabset }      from '@ng-bootstrap/ng-bootstrap';
 
 import isArray = require('core-js/fn/array/is-array');
 import angular = require('angular');
+import { NxConfigService }                   from '../../services/nx-config';
 
 @Component({
     selector   : 'download-history',
@@ -25,6 +26,7 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
     private build: any;
     private canViewRelease: boolean;
 
+    config: any;
     user: any;
     downloads: any;
     activeBuilds: any;
@@ -39,11 +41,11 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
 
     constructor(@Inject('languageService') private language: any,
                 @Inject('cloudApiService') private cloudApi: any,
-                @Inject('configService') private configService: any,
                 @Inject('authorizationCheckService') private authorizationService: any,
                 @Inject('account') private account: any,
                 @Inject('locationProxyService') private locationProxy: any,
                 @Inject(DOCUMENT) private document: any,
+                private configService: NxConfigService,
                 private route: ActivatedRoute,
                 private router: Router,
                 private titleService: Title,
@@ -52,6 +54,7 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
         this.location = location;
         this.canViewRelease = false;
         this.noteTypes = [];
+        this.config = configService.getConfig();
     }
 
     private getAvailableDownloadTypes(data) {
@@ -108,7 +111,7 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.downloads = this.configService.config.downloads;
+        this.downloads = this.config.downloads;
 
         this.sub = this.route.params.subscribe(params => {
             // this.build = params['build'];
@@ -128,11 +131,11 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
                         return;
                     }
 
-                    if (!this.configService.config.publicReleases) {
+                    if (!this.config.publicReleases) {
                         this.account
                             .get()
                             .then(result => {
-                                this.canViewRelease = result.is_superuser || result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1;
+                                this.canViewRelease = result.is_superuser || result.permissions.indexOf(this.config.permissions.canViewRelease) > -1;
                                 if (this.canViewRelease) {
                                     this.getData();
                                 } else {

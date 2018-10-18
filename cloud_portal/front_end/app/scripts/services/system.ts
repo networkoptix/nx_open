@@ -7,11 +7,11 @@ import * as angular from 'angular';
 // Special service for operating with systems at high-level
 
     angular.module('cloudApp')
-            .factory('system', ['cloudApi', 'systemAPI', '$q', 'uuid2', '$log', 'systemsProvider', 'configService', 'languageService',
-                function (cloudApi, systemAPI, $q, uuid2, $log, systemsProvider, configService, languageService) {
+            .factory('system', ['cloudApi', 'systemAPI', '$q', 'uuid2', '$log', 'systemsProvider', 'nxConfigService', 'languageService',
+                function (cloudApi, systemAPI, $q, uuid2, $log, systemsProvider, nxConfigService, languageService) {
 
                     let systems = {};
-                    const CONFIG = configService.config;
+                    const CONFIG = nxConfigService.getConfig();
                     let L = languageService.lang;
 
                     function System(systemId, currentUserEmail) {

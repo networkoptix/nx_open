@@ -7,12 +7,12 @@
         .directive('nxHeader', NxHeader);
 
     NxHeader.$inject = [ 'NxDialogsService', 'cloudApi', 'account', '$location', '$route',
-        'systemsProvider', 'configService', '$rootScope' ];
+        'systemsProvider', 'nxConfigService', '$rootScope' ];
 
     function NxHeader(NxDialogsService, cloudApi, account, $location, $route,
-                      systemsProvider, configService, $rootScope) {
+                      systemsProvider, nxConfigService, $rootScope) {
 
-        const CONFIG = configService.config;
+        const CONFIG = nxConfigService.getConfig();
 
         return {
             restrict   : 'E',

@@ -2,6 +2,7 @@ import { Component, OnInit, Input, SimpleChanges, Inject, OnChanges } from '@ang
 import { ActivatedRoute }                                             from '@angular/router';
 import { Location }                                                   from '@angular/common';
 import { Utils }                                                      from '../../utils/helpers';
+import { NxConfigService }                                            from '../../services/nx-config';
 
 @Component({
     selector: 'nx-systems',
@@ -14,6 +15,7 @@ export class NxSystemsDropdown implements OnInit, OnChanges {
     @Input() systems: any;
     @Input() activeSystem: any;
 
+    config: any;
     systemCounter: number;
     active = {
         register: false,
@@ -25,11 +27,12 @@ export class NxSystemsDropdown implements OnInit, OnChanges {
     show: boolean;
 
     constructor(@Inject('languageService') private language: any,
-                @Inject('configService') private config: any,
+                private configService: NxConfigService,
                 private location: Location,
                 private route: ActivatedRoute) {
 
         this.show = false;
+        this.config = configService.getConfig();
     }
 
     trackByFn(index, item) {

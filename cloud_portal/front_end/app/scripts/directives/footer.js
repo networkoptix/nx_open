@@ -6,11 +6,11 @@
         .module('cloudApp.directives')
         .directive('nxFooter', NxFooter);
 
-    NxFooter.$inject = [ '$rootScope', 'configService', 'account' ];
+    NxFooter.$inject = [ '$rootScope', 'nxConfigService', 'account' ];
 
-    function NxFooter($rootScope, configService, account) {
+    function NxFooter($rootScope, nxConfigService, account) {
 
-        var CONFIG = configService.config,
+        var CONFIG = nxConfigService.getConfig(),
             user   = {};
 
         return {

@@ -6,9 +6,9 @@ const angular = require("angular");
     angular
         .module('cloudApp.services')
         .factory('cloudApi', CloudApi);
-    CloudApi.$inject = ['$http', '$q', 'configService'];
-    function CloudApi($http, $q, configService) {
-        const CONFIG = configService.config;
+    CloudApi.$inject = ['$http', '$q', 'nxConfigService'];
+    function CloudApi($http, $q, nxConfigService) {
+        const CONFIG = nxConfigService.getConfig();
         let apiBase = CONFIG.apiBase;
         let cachedResults = {};
         let cacheReceived = {};
@@ -151,6 +151,7 @@ const angular = require("angular");
                 return $http.get(apiBase + '/systems/' + systemId + '/auth');
             },
             getLanguages: cacheGet('/static/languages.json', true),
+            getIntegrations: cacheGet(apiBase + '/itegrations', true),
             changeLanguage: function (language) {
                 return $http.post(apiBase + '/utils/language/', {
                     language: language
