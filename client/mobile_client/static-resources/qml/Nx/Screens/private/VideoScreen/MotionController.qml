@@ -107,7 +107,7 @@ Item
     {
         if (drawingCustomRoi)
             d.customBottomRightRelative = d.toRelative(pos)
-        else
+        else if (!d.nearPositions(d.customInitialRelative, d.toRelative(pos)))
             handleCancelled()
     }
 
@@ -133,7 +133,7 @@ Item
     MaskedUniformGrid
     {
         // TODO: turn off motion area data gethering when not visible.
-        visible: controller.motionSearchMode
+        visible: false && controller.motionSearchMode
 
         anchors.fill: parent
 
@@ -250,7 +250,7 @@ Item
 
         function nearPositions(first, second)
         {
-            return first && second && first.minus(second).length() < 0.005 ? true : false
+            return first && second && first.minus(second).length() < 0.01 ? true : false
         }
 
         function getMotionFilter(topLeft, bottomRight)
