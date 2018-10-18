@@ -61,6 +61,7 @@ int QnMergeSystemsRestHandler::execute(
     else if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), owner->accessRights()))
     {
         systemMergeProcessor.setMergeError(&result, MergeStatus::forbidden);
+        return nx::network::http::StatusCode::forbidden;
     }
     else
     {
