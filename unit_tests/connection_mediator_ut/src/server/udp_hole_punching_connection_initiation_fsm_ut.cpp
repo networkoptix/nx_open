@@ -63,9 +63,12 @@ class UDPHolePunchingConnectionInitiationFsm:
     public ::testing::Test
 {
 public:
-    UDPHolePunchingConnectionInitiationFsm()
+    UDPHolePunchingConnectionInitiationFsm():
+        m_trafficRelayUrl("http://relay.vmsproxy.com")
     {
         using namespace std::placeholders;
+
+        m_programArguments.addArg("-trafficRelay/url", m_trafficRelayUrl.c_str());
 
         m_connectSessionId = nx::utils::generateRandomName(7);
         m_listeningPeerConnection = std::make_shared<TestServerConnection>();
@@ -104,12 +107,24 @@ public:
 protected:
     void givenStartedCloudConnectSession()
     {
-        using namespace std::placeholders;
+        m_connectingPeerConnection =
+            std::make_shared<TestConnection<nx::network::UDPSocket>>();
 
+        whenIssueConnectRequest();
+    }
+
+    void whenIssueConnectRequestOverTcp()
+    {
+        m_connectingPeerConnection =
+            std::make_shared<TestConnection<nx::network::TCPSocket>>();
+
+        whenIssueConnectRequest();
+    }
+
+    void whenIssueConnectRequest()
+    {
         if (!m_connectSessionFsm)
             initializeConnectSessionFsm();
-
-        m_connectingPeerConnection = std::make_shared<TestServerConnection>();
 
         api::ConnectRequest request;
         request.connectSessionId = m_connectSessionId;
@@ -117,7 +132,7 @@ protected:
         m_connectSessionFsm->onConnectRequest(
             m_connectingPeerConnection,
             std::move(request),
-            std::bind(&UDPHolePunchingConnectionInitiationFsm::saveConnectResponse, this, _1, _2));
+            [this](auto... args) { saveConnectResponse(std::move(args)...); });
     }
 
     void whenClientSendsResultReport()
@@ -136,7 +151,9 @@ protected:
 
         api::ConnectionAckRequest request;
         request.connectionMethods = api::ConnectionMethod::all;
-        request.udpEndpointList.push_back(nx::network::SocketAddress(nx::network::HostAddress::localhost, 12345)); //< Just any port.
+        request.udpEndpointList.push_back(
+            nx::network::SocketAddress(
+                nx::network::HostAddress::localhost, 12345)); //< Just any port.
         m_connectSessionFsm->onConnectionAckRequest(
             std::make_shared<TestServerConnection>(),
             std::move(request),
@@ -168,10 +185,20 @@ protected:
         ASSERT_EQ(api::ResultCode::ok, std::get<0>(*m_prevConnectResult));
     }
 
+    void andResponseContainsRelayInfo()
+    {
+        const auto& connectResponse = std::get<1>(*m_prevConnectResult);
+        ASSERT_TRUE(connectResponse.trafficRelayUrl);
+        ASSERT_EQ(m_trafficRelayUrl, connectResponse.trafficRelayUrl->toStdString());
+    }
+
     void thenFullPeerNameHasBeenReportedInResponse()
     {
         thenConnectResultIsReported();
-        ASSERT_EQ(m_listeningPeerFullName, std::get<1>(*m_prevConnectResult).destinationHostFullName);
+
+        ASSERT_EQ(
+            m_listeningPeerFullName,
+            std::get<1>(*m_prevConnectResult).destinationHostFullName);
     }
 
     void thenRelayInstanceInformationIsIgnored()
@@ -206,7 +233,7 @@ private:
 
     std::unique_ptr<hpm::UDPHolePunchingConnectionInitiationFsm> m_connectSessionFsm;
     std::shared_ptr<TestServerConnection> m_listeningPeerConnection;
-    std::shared_ptr<TestServerConnection> m_connectingPeerConnection;
+    std::shared_ptr<nx::network::stun::AbstractServerConnection> m_connectingPeerConnection;
     conf::Settings m_settings;
     std::unique_ptr<AbstractRelayClusterClient> m_relayClusterClient;
     QByteArray m_connectSessionId;
@@ -216,6 +243,7 @@ private:
     QString m_listeningPeerFullName;
     std::vector<const char*> m_args;
     nx::utils::test::ProgramArguments m_programArguments;
+    std::string m_trafficRelayUrl;
 
     void connectFsmFinished(api::NatTraversalResultCode /*resultCode*/)
     {
@@ -274,6 +302,15 @@ TEST_F(UDPHolePunchingConnectionInitiationFsm, find_a_relay_instance_takes_a_lon
     whenRelayClusterClientReturns();
 
     thenRelayInstanceInformationIsIgnored();
+}
+
+TEST_F(UDPHolePunchingConnectionInitiationFsm, connect_over_tcp)
+{
+    whenIssueConnectRequestOverTcp();
+    
+    thenConnectResultIsReported();
+    andConnectionResultIsSuccess();
+    andResponseContainsRelayInfo();
 }
 
 } // namespace test

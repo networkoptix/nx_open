@@ -79,6 +79,7 @@ bool MediatorFunctionalTest::waitUntilStarted()
     if (!utils::test::ModuleLauncher<MediatorProcessPublic>::waitUntilStarted())
         return false;
 
+    m_stunTcpEndpoint = moduleInstance()->impl()->stunTcpEndpoints().front();
     // Proxy is needed to be able to restart mediator while preserving same ports.
     if (m_useProxy)
     {
@@ -92,8 +93,9 @@ bool MediatorFunctionalTest::waitUntilStarted()
         m_stunTcpEndpoint = moduleInstance()->impl()->stunTcpEndpoints().front();
         m_httpEndpoint = moduleInstance()->impl()->httpEndpoints().front();
     }
+    if (!moduleInstance()->impl()->stunUdpEndpoints().empty())
+        m_stunUdpEndpoint = moduleInstance()->impl()->stunUdpEndpoints().front();
 
-    m_stunUdpEndpoint = moduleInstance()->impl()->stunUdpEndpoints().front();
 
     if (m_testFlags & MediatorTestFlags::initializeConnectivity)
     {
@@ -108,6 +110,9 @@ bool MediatorFunctionalTest::waitUntilStarted()
 
 network::SocketAddress MediatorFunctionalTest::stunUdpEndpoint() const
 {
+    if (moduleInstance()->impl()->stunUdpEndpoints().empty())
+        return network::SocketAddress();
+
     return network::SocketAddress(
         network::HostAddress::localhost,
         moduleInstance()->impl()->stunUdpEndpoints().front().port);
@@ -234,22 +239,11 @@ std::tuple<nx::network::http::StatusCode::Value, api::ListeningPeers>
 
 void MediatorFunctionalTest::beforeModuleCreation()
 {
-    for (auto it = args().begin(); it != args().end(); )
+    if (m_stunUdpEndpoint)
     {
-        if (strcmp((*it), "-stun/udpAddrToListenList") == 0)
-        {
-            free(*it);
-            it = args().erase(it);
-            free(*it);
-            it = args().erase(it); //< Value.
-        }
-        else
-        {
-            ++it;
-        }
+        removeArgByName("stun/udpAddrToListenList");
+        addArg("-stun/udpAddrToListenList", m_stunUdpEndpoint->toStdString().c_str());
     }
-
-    addArg("-stun/udpAddrToListenList", m_stunUdpEndpoint.toStdString().c_str());
 }
 
 void MediatorFunctionalTest::afterModuleDestruction()
