@@ -165,7 +165,6 @@ import * as angular from 'angular';
                 return $http.get(apiBase + '/systems/' + systemId + '/auth');
             },
             getLanguages: cacheGet('/static/languages.json', true),
-            getIntegrations: cacheGet(apiBase + '/itegrations', true),
             changeLanguage: function (language) {
                 return $http.post(apiBase + '/utils/language/', {
                     language: language
