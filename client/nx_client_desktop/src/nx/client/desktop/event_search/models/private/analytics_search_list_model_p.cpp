@@ -69,6 +69,19 @@ static const auto upperBoundPredicate =
         return left > startTime(right);
     };
 
+bool acceptedByTextFilter(const nx::common::metadata::DetectedObject& item, const QString& filter)
+{
+    if (filter.isEmpty())
+        return true;
+
+    return std::any_of(item.labels.cbegin(), item.labels.cend(),
+        [filter](const nx::common::metadata::Attribute& attribute) -> bool
+        {
+            return attribute.value.startsWith(filter, Qt::CaseInsensitive)
+                || attribute.name.startsWith(filter, Qt::CaseInsensitive);
+        });
+}
+
 } // namespace
 
 AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
@@ -504,6 +517,9 @@ void AnalyticsSearchListModel::Private::processMetadata()
                 }
 
                 if (m_filterRect.isValid() && !m_filterRect.intersects(item.boundingBox))
+                    continue;
+
+                if (!acceptedByTextFilter(item, m_filterText))
                     continue;
 
                 DetectedObject newObject;
