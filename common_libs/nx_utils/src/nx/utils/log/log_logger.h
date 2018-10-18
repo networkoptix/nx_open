@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include "abstract_logger.h"
 #include "log_settings.h"
 

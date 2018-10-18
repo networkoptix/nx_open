@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <chrono>
+#include <optional>
 
 #include <boost/optional.hpp>
 
