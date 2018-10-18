@@ -1,4 +1,5 @@
 import QtQuick 2.6
+import Nx 1.0
 import Nx.Core.Items 1.0
 import nx.client.core 1.0
 
@@ -131,6 +132,9 @@ Item
 
     MaskedUniformGrid
     {
+        // TODO: turn off motion area data gethering when not visible.
+        visible: controller.motionSearchMode
+
         anchors.fill: parent
 
         opacity: 0.5
@@ -182,6 +186,7 @@ Item
     {
         id: customRoiMarker
 
+        baseColor: d.lineColor
         topLeft: d.fromRelative(d.customTopLeftRelative)
         bottomRight: d.fromRelative(d.customBottomRightRelative)
         visible: controller.motionSearchMode && controller.customRoiExists
@@ -192,10 +197,11 @@ Item
     {
         id: defaultRoi
 
+        baseColor: d.lineColor
         topLeft: d.fromRelative(d.defaultTopLeftRelative)
         bottomRight: d.fromRelative(d.defaultBottomRightRelative)
         visible: controller.motionSearchMode && d.defaultTopLeftRelative && d.defaultBottomRightRelative
-                 ? true :false
+            ? true :false
     }
 
     Timer
@@ -215,6 +221,8 @@ Item
     QtObject
     {
         id: d
+
+        readonly property color lineColor: ColorTheme.contrast1
 
         property var customInitialRelative
         property var customTopLeftRelative

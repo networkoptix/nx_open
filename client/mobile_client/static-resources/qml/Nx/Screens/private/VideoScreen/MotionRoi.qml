@@ -1,10 +1,14 @@
 import QtQuick 2.6
+import Nx 1.0
 
 // Test control for now. Represents simple ROI
 Rectangle
 {
-    border.width: 5
-    border.color: "yellow"
+    property color baseColor: ColorTheme.contrast1
+
+    border.width: 1
+    border.color: baseColor
+
     color: singlePoint ? "red" : "transparent"
 
     readonly property bool singlePoint: topLeft.minus(bottomRight).length() < 5
