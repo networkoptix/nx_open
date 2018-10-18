@@ -15,11 +15,7 @@ endif()
 
 mark_as_advanced(Qt5MultimediaQuick_LIBRARY)
 
-file(GLOB_RECURSE QML_FILES static-resources/qml/*.qml static-resources/qml/*.js)
-
 nx_add_target(nx_client_core LIBRARY
-    OTHER_SOURCES
-        ${QML_FILES}
     PUBLIC_LIBS
         Qt5::Quick ${Qt5MultimediaQuick_LIBRARY}
         appserver2 nx_vms_utils cloud_db_client nx_media nx_network nx_utils nx_update)
