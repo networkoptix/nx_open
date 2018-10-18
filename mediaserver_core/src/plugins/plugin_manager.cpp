@@ -13,7 +13,6 @@
 #include <camera/camera_plugin.h>
 #include <nx/sdk/analytics/engine.h>
 #include <plugins/plugin_tools.h>
-#include <nx/plugins/settings.h>
 
 #include "plugins_ini.h"
 

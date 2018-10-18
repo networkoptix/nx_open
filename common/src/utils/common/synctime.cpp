@@ -38,36 +38,6 @@ std::chrono::microseconds QnSyncTime::currentTimePoint()
     return std::chrono::microseconds(currentUSecsSinceEpoch());
 }
 
-unsigned int QnSyncTime::addRef()
-{
-    return ++m_refCounter;
-}
-
-unsigned int QnSyncTime::releaseRef()
-{
-    return --m_refCounter;
-}
-
-void* QnSyncTime::queryInterface(const nxpl::NX_GUID& interfaceID)
-{
-    if (memcmp(&interfaceID, &nxpl::IID_TimeProvider, sizeof(nxpl::IID_TimeProvider)) == 0)
-    {
-        addRef();
-        return static_cast<nxpl::TimeProvider*>(this);
-    }
-    if (memcmp(&interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface)) == 0)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return NULL;
-}
-
-uint64_t QnSyncTime::millisSinceEpoch() const
-{
-    return const_cast<QnSyncTime*>(this)->currentMSecsSinceEpoch();
-}
-
 qint64 QnSyncTime::currentMSecsSinceEpoch() const
 {
     QnMutexLocker lock(&m_mutex);

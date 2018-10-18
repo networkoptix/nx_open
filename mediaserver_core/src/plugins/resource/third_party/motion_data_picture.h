@@ -47,7 +47,7 @@ public:
     virtual void* scanLine( int planeNumber, int lineNumber ) override;
     /*!
         \return Picture data. Returned buffer MUST be aligned on \a MEDIA_DATA_BUFFER_ALIGNMENT - byte boundary (this restriction helps for some optimization).
-            \a nxpt::mallocAligned and \a nxpt::freeAligned routines can be used for that purpose
+            \a nx::kit::utils::mallocAligned and \a nx::kit::utils::freeAligned routines can be used for that purpose
     */
     virtual void* data() override;
     virtual const void* data() const override;

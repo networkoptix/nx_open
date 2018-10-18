@@ -100,6 +100,7 @@ nx_add_target(mediaserver_core LIBRARY
         cloud_db_client
         nx_update
         nx_system_commands
+        nx_plugin_utils
     PRIVATE_LIBS
         Qt5::Qml
         ${private_libs}
