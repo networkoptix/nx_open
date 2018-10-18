@@ -167,6 +167,7 @@
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
 
 #include <nx/utils/app_info.h>
+#include <nx/utils/guarded_callback.h>
 
 #ifdef Q_OS_MACX
 #include <utils/mac_utils.h>
@@ -670,17 +671,16 @@ void ActionHandler::changeDefaultPasswords(
         return;
 
     using PasswordChangeResult = QPair<QnVirtualCameraResourcePtr, QnRestResult>;
-    using PassswordChangeResultList = QList<PasswordChangeResult>;
+    using PasswordChangeResultList = QList<PasswordChangeResult>;
 
-    const auto errorResultsStorage = QSharedPointer<PassswordChangeResultList>(
-        new PassswordChangeResultList());
+    const auto errorResultsStorage = QSharedPointer<PasswordChangeResultList>(
+        new PasswordChangeResultList());
 
     const auto password = dialog.password();
-    const auto guard = QPointer<ActionHandler>(this);
-    const auto completionGuard = nx::utils::makeSharedGuard(
-        [this, guard, cameras, errorResultsStorage, password, forceShowCamerasList]()
+    const auto completionGuard = nx::utils::makeSharedGuard(nx::utils::guarded(this,
+        [this, cameras, errorResultsStorage, password, forceShowCamerasList]()
         {
-            if (!guard || errorResultsStorage->isEmpty())
+            if (errorResultsStorage->isEmpty())
                 return;
 
             // Show error dialog and try one more time
@@ -721,7 +721,7 @@ void ActionHandler::changeDefaultPasswords(
                 showSingleCameraErrorMessage(explanation);
 
             changeDefaultPasswords(password, camerasWithError, forceShowCamerasList);
-        });
+        }));
 
     for (const auto camera: cameras)
     {
@@ -729,20 +729,17 @@ void ActionHandler::changeDefaultPasswords(
         auth.setPassword(password);
 
         const auto resultCallback =
-            [guard, completionGuard, camera, errorResultsStorage]
+            [completionGuard, camera, errorResultsStorage]
                 (bool success, rest::Handle /*handle*/, QnRestResult result)
             {
-                if (!guard)
-                    return;
-
                 if (!success)
                     errorResultsStorage->append(PasswordChangeResult(camera, QnRestResult()));
                 else if (result.error != QnRestResult::NoError)
                     errorResultsStorage->append(PasswordChangeResult(camera, result));
             };
 
-        serverConnection->changeCameraPassword(
-            camera->getId(), auth, resultCallback, QThread::currentThread());
+        serverConnection->changeCameraPassword(camera->getId(), auth,
+            nx::utils::guarded(this, resultCallback), QThread::currentThread());
     }
 }
 

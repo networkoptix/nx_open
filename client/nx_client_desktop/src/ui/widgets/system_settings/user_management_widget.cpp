@@ -38,6 +38,7 @@
 #include <nx/client/desktop/common/widgets/checkable_header_view.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/messages/resources_messages.h>
+#include <nx/utils/guarded_callback.h>
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
@@ -346,15 +347,12 @@ void QnUserManagementWidget::applyChanges()
     {
         if (messages::Resources::deleteResources(this, usersToDelete))
         {
-            qnResourcesChangesManager->deleteResources(usersToDelete,
-                [this, guard = QPointer<QnUserManagementWidget>(this)](bool success)
+            qnResourcesChangesManager->deleteResources(usersToDelete, nx::utils::guarded(this,
+                [this](bool success)
                 {
-                    if (guard)
-                    {
-                        setEnabled(true);
-                        emit hasChangesChanged();
-                    }
-                });
+                    setEnabled(true);
+                    emit hasChangesChanged();
+                }));
 
             setEnabled(false);
             emit hasChangesChanged();

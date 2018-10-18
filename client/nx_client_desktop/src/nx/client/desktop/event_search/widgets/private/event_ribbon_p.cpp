@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <chrono>
 
-#include <QtCore/QPointer>
 #include <QtCore/QAbstractListModel>
 #include <QtCore/QVariantAnimation>
 #include <QtGui/QWheelEvent>
@@ -27,6 +26,7 @@
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/image_providers/camera_thumbnail_provider.h>
 #include <nx/client/desktop/utils/widget_utils.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 
 #include <ini.h>
@@ -905,19 +905,16 @@ void EventRibbon::Private::highlightAppearance(EventTile* tile)
     auto curtain = new CustomPainted<QWidget>(tile);
     anchorWidgetToParent(curtain);
 
-    curtain->setCustomPaintFunction(
-        [animation, curtain, guard = QPointer<QVariantAnimation>(animation)]
-            (QPainter* painter, const QStyleOption* /*option*/, const QWidget* /*widget*/)
+    curtain->setCustomPaintFunction(nx::utils::guarded(animation, true,
+        [animation, curtain](QPainter* painter, const QStyleOption* /*option*/,
+            const QWidget* /*widget*/)
         {
-            if (!guard)
-                return true;
-
             QColor color = kHighlightCurtainColor;
             color.setAlphaF(animation->currentValue().toReal());
             painter->fillRect(curtain->rect(), color);
             curtain->update();
             return true;
-        });
+        }));
 
     connect(animation, &QObject::destroyed, curtain, &QObject::deleteLater);
     installEventHandler(curtain, QEvent::Hide, animation, &QAbstractAnimation::stop);

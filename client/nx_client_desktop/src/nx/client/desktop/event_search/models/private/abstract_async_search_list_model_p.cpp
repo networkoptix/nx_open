@@ -3,6 +3,7 @@
 #include <core/resource/camera_resource.h>
 #include <utils/common/synctime.h>
 
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 
 namespace nx::client::desktop {
@@ -19,20 +20,16 @@ AbstractAsyncSearchListModel::Private::~Private()
 
 bool AbstractAsyncSearchListModel::Private::requestFetch()
 {
-    return prefetch(
-        [this, guard = QPointer<AbstractAsyncSearchListModel>(q)](
-            const QnTimePeriod& fetchedPeriod, FetchResult result)
+    return prefetch(nx::utils::guarded(this,
+        [this](const QnTimePeriod& fetchedPeriod, FetchResult result)
         {
-            if (!guard)
-                return;
-
             q->addToFetchedTimeWindow(fetchedPeriod);
 
             if (result == FetchResult::complete || result == FetchResult::incomplete)
                 commit(fetchedPeriod);
 
             q->finishFetch(result);
-        });
+        }));
 }
 
 void AbstractAsyncSearchListModel::Private::cancelPrefetch()

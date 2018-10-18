@@ -2,7 +2,6 @@
 
 #include <algorithm>
 
-#include <QtCore/QPointer>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMenu>

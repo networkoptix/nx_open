@@ -1,18 +1,18 @@
 #include "upload_worker.h"
+#include "server_request_storage.h"
 
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QFutureWatcher>
 #include <QtConcurrent/QtConcurrentRun>
 
-#include <utils/common/guarded_callback.h>
-#include <core/resource/media_server_resource.h>
 #include <api/server_rest_connection.h>
+#include <core/resource/media_server_resource.h>
+
 #include <nx/utils/cryptographic_hash.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/vms/common/p2p/downloader/file_information.h>
 #include <nx/vms/common/p2p/downloader/result_code.h>
-
-#include "server_request_storage.h"
 
 namespace nx {
 namespace client {
@@ -168,7 +168,7 @@ void UploadWorker::handleMd5Calculated()
 
     emitProgress();
 
-    auto callback = guarded(this,
+    const auto callback = nx::utils::guarded(this,
         [this](bool success, rest::Handle handle, const QnJsonRestResult & result)
         {
             {
@@ -257,7 +257,7 @@ void UploadWorker::handleUpload()
         return;
     }
 
-    auto callback = guarded(this,
+    const auto callback = nx::utils::guarded(this,
         [this](bool success, rest::Handle handle, const rest::ServerConnection::EmptyResponseType&)
         {
             {
@@ -294,7 +294,7 @@ void UploadWorker::handleAllUploaded()
 
     emitProgress();
 
-    auto callback = guarded(this,
+    const auto callback = nx::utils::guarded(this,
         [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             {

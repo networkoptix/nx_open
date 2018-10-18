@@ -13,6 +13,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 
 #include <nx/utils/datetime.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/scope_guard.h>
@@ -156,13 +157,10 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePerio
         << QVariant::fromValue(filter.orderBy.order).toString()
         << "maximum count" << filter.limit;
 
-    return qnCameraBookmarksManager->getBookmarksAsync(q->cameras(), filter,
-        [this, guard = QPointer<QObject>(this)](
-            bool success,
-            const QnCameraBookmarkList& bookmarks,
-            int requestId)
+    const auto callback =
+        [this](bool success, const QnCameraBookmarkList& bookmarks, int requestId)
         {
-            if (!guard || !requestId || requestId != currentRequest().id)
+            if (!requestId || requestId != currentRequest().id)
                 return;
 
             QnTimePeriod actuallyFetched;
@@ -179,7 +177,10 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePerio
             }
 
             completePrefetch(actuallyFetched, success, m_prefetch.size());
-        });
+        };
+
+    return qnCameraBookmarksManager->getBookmarksAsync(q->cameras(), filter,
+        BookmarksInternalCallbackType(nx::utils::guarded(this, callback)));
 }
 
 template<typename Iter>
