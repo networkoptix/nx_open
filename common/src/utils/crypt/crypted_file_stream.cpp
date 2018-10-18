@@ -16,10 +16,10 @@ static const Key IV { //< Actually makes little sense because first 8 bytes of I
 };
 
 CryptedFileStream::CryptedFileStream(const QString& fileName, const QString& password):
+    m_mutex(QnMutex::Recursive),
     m_fileName(fileName),
     m_IV(IV),
-    m_file(fileName),
-    m_mutex(QnMutex::Recursive)
+    m_file(fileName)
 {
     m_context = EVP_CIPHER_CTX_new();
     NX_ASSERT(m_context);

@@ -16,7 +16,7 @@ namespace nx::utils {
  * Additionally provides thread-safe access.
  */
 
-class CryptedFileStream : public QIODevice
+class CryptedFileStream: public QIODevice
 {
     using Key = crypto_functions::Key;
 
@@ -24,6 +24,7 @@ public:
     CryptedFileStream(const QString& fileName, const QString& password = QString());
     virtual ~CryptedFileStream();
 
+    // Set cryptostream bounds for emplacement in another file-container.
     void setEnclosure(qint64 position, qint64 size);
 
     void setPassword(const QString& password);

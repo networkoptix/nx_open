@@ -115,7 +115,7 @@ QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::Open
     QnMutexLocker lock(&m_fileSync);
 
     if (m_lockedOpenings) //< This is used when renaming or removing layout files.
-        return false;
+        return nullptr;
 
     // Set Url if it does not exist yet.
     if (getUrl().isEmpty())
@@ -149,6 +149,7 @@ QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::Open
         NX_ASSERT(!(openMode & QIODevice::WriteOnly) || !m_password.isEmpty()); // Want to write but no password.
         if (m_password.isEmpty()) // Cannot read crypted stream without a password.
             return nullptr;
+
         stream.reset(new QnLayoutCryptoStream(*this, url, m_password));
     }
     else
