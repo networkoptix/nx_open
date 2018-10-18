@@ -22,7 +22,7 @@ bool processValueItemsRecursively(Item* item, const std::function<bool(ValueItem
         for (const auto item: group->itemsList())
         {
             if (!processValueItemsRecursively(item, f))
-                break;
+                return false;
         }
     }
 
