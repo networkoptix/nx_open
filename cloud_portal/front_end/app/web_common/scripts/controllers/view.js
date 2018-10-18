@@ -229,7 +229,6 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         function updateVideoSource(playingPosition) {
             if (!$scope.activeCamera ||
-                $scope.activeCamera.status === 'Offline' ||
                 $scope.activeCamera.status === 'Unauthorized') {
 
                 $scope.activeVideoSource = {src: ''};
