@@ -53,7 +53,13 @@ namespace nx::vms::common::p2p::downloader { class Downloader; }
 namespace nx::mediaserver::hls { class SessionPool; }
 
 namespace nx {
-namespace mediaserver { class CmdLineArguments; }
+namespace mediaserver {
+class CmdLineArguments;
+namespace analytics {
+class SdkObjectPool;
+} // namespace analytics
+} // namespace mediaserver
+
 namespace mediaserver::event {
 class ExtendedRuleProcessor;
 class EventConnector;
