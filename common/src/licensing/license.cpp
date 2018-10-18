@@ -550,6 +550,7 @@ QList<QByteArray> QnLicenseListHelper::allLicenseKeys() const
 int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType,
     QnLicenseValidator* validator) const
 {
+    return 100;
     if (licenseType == Qn::LC_Free)
         return std::numeric_limits<int>::max();
 
@@ -688,7 +689,6 @@ bool QnLicensePool::isEmpty() const
     QnMutexLocker locker(&m_mutex);
     return m_licenseDict.isEmpty();
 }
-
 
 QVector<QString> QnLicensePool::hardwareIds() const
 {
