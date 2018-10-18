@@ -68,19 +68,19 @@ private:
         Qn::UserAccessData accessRights,
         MergeSystemData data);
 
-    nx::network::http::StatusCode::Value applyCurrentSettings(
+    QnJsonRestResult applyCurrentSettings(
         const nx::utils::Url& remoteUrl,
         const QString& postKey,
         bool oneServer);
 
-    nx::network::http::StatusCode::Value applyRemoteSettings(
+    QnJsonRestResult applyRemoteSettings(
         const nx::utils::Url& remoteUrl,
         const QnUuid& systemId,
         const QString& systemName,
         const QString& getKey,
         const QString& postKey);
 
-    nx::network::http::StatusCode::Value executeRemoteConfigure(
+    QnJsonRestResult executeRemoteConfigure(
         const ConfigureSystemData& data,
         const nx::utils::Url &remoteUrl,
         const QString& postKey);
