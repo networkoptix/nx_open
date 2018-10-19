@@ -4,6 +4,9 @@ import Nx 1.0
 // Test control for now. Represents simple ROI
 Rectangle
 {
+    id: item
+
+    property bool drawing: false
     property color baseColor: ColorTheme.contrast1
 
     border.width: 1
@@ -15,19 +18,46 @@ Rectangle
     property vector2d topLeft
     property vector2d bottomRight
 
-    x: getCoordinate(topLeft.x, bottomRight.x, width)
-    y: getCoordinate(topLeft.y, bottomRight.y, height)
+    x: d.getCoordinate(topLeft.x, bottomRight.x, width)
+    y: d.getCoordinate(topLeft.y, bottomRight.y, height)
 
-    width: getLength(topLeft.x, bottomRight.x)
-    height: getLength(topLeft.y, bottomRight.y)
+    width: d.getLength(topLeft.x, bottomRight.x)
+    height: d.getLength(topLeft.y, bottomRight.y)
 
-    function getCoordinate(firstValue, secondValue, length)
+    Rectangle
     {
-        return singlePoint ? firstValue - length / 2 : Math.min(firstValue, secondValue)
+        x: -width / 2
+        y: -height / 2
+        width: radius * 2
+        height: width
+        visible: item.drawing
+        color: item.baseColor
+        radius: 1.5
     }
 
-    function getLength(firstValue, secondValue)
+    Rectangle
     {
-        return singlePoint ? 10 : Math.abs(secondValue - firstValue)
+        x: item.width - width / 2
+        y: item.height - height / 2
+        width: radius * 2
+        height: width
+        visible: item.drawing
+        color: item.baseColor
+        radius: 1.5
+    }
+
+    Object
+    {
+        id: d
+
+        function getCoordinate(firstValue, secondValue, length)
+        {
+            return singlePoint ? firstValue - length / 2 : Math.min(firstValue, secondValue)
+        }
+
+        function getLength(firstValue, secondValue)
+        {
+            return singlePoint ? 10 : Math.abs(secondValue - firstValue)
+        }
     }
 }

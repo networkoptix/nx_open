@@ -133,11 +133,11 @@ Item
     MaskedUniformGrid
     {
         // TODO: turn off motion area data gethering when not visible.
-        visible: false && controller.motionSearchMode
+        visible: controller.motionSearchMode
 
         anchors.fill: parent
 
-        opacity: 0.5
+        opacity: 1
         cellCountX: 44
         cellCountY: 32
         color: "red"
@@ -186,6 +186,7 @@ Item
     {
         id: customRoiMarker
 
+        drawing: controller.drawingCustomRoi
         baseColor: d.lineColor
         topLeft: d.fromRelative(d.customTopLeftRelative)
         bottomRight: d.fromRelative(d.customBottomRightRelative)
