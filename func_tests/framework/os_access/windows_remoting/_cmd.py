@@ -126,12 +126,6 @@ class _WinRMRun(Run):
         if is_last:
             stream['@End'] = 'true'
         self._protocol.send_message(xmltodict.unparse(rq))
-        try:
-            stdin_text = bytes(stdin_bytes).decode('ascii')
-        except UnicodeDecodeError:
-            self._logger.getChild('stdin').debug("Sent:\n%r", stdin_bytes)
-        else:
-            self._logger.getChild('stdin').debug("Sent:\n%s", stdin_text)
         return sent_bytes
 
     @property
