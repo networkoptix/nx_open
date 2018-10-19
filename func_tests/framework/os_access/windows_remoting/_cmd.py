@@ -1,4 +1,5 @@
 import base64
+import codecs
 import logging
 import xml.etree.ElementTree as ET
 from contextlib import closing
@@ -109,7 +110,8 @@ class _WinRMRun(Run):
         assert not self._is_done
         self._logger.getChild('stdin.size').debug(len(stdin_bytes))
         if len(stdin_bytes) < 8192:
-            self._logger.getChild('stdin.data').debug(bytes(stdin_bytes).decode(errors='backslashreplace'))
+            # `stdin_bytes` may be any object with buffer interface, `str` or `repr` may not work.
+            self._logger.getChild('stdin.data').debug(codecs.decode(stdin_bytes, 'utf8', 'backslashreplace'))
         # noinspection PyProtectedMember
         rq = {
             'env:Envelope': self._protocol._get_soap_header(
