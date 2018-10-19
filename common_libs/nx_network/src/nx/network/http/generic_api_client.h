@@ -51,6 +51,9 @@ protected:
         CompletionHandler completionHandler,
         InputArgs... inputArgs);
 
+    /**
+     * @return std::tuple<ResultCode, Output>
+     */
     template<typename Output, typename... InputArgs>
     auto makeSyncCall(
         const std::string& requestPath,
