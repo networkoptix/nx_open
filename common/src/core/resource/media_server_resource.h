@@ -40,8 +40,6 @@ public:
     //!Overrides \a QnResource::getName. Returns camera name from \a QnMediaServerUserAttributes
     virtual QString getName() const override;
 
-    virtual QStringList searchFilters(bool useExtraSearchInformation) const override;
-
     //!Overrides \a QnResource::setName. Writes name to \a QnMediaServerUserAttributes
     virtual void setName( const QString& name ) override;
 

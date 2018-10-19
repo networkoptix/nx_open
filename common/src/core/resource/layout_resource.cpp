@@ -103,15 +103,6 @@ QnLayoutResourcePtr QnLayoutResource::createFromResource(const QnResourcePtr& re
     return layout;
 }
 
-QStringList QnLayoutResource::searchFilters(bool /*useExtraSearchInformation*/) const
-{
-    QStringList result;
-    if (isFile())
-        result << getUrl();
-    result <<  getName();
-    return result;
-}
-
 void QnLayoutResource::setItems(const QnLayoutItemDataList& items)
 {
     QnLayoutItemDataMap map;

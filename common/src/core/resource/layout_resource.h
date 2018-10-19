@@ -44,8 +44,6 @@ public:
     /** Create a new layout with a given resource on it. */
     static QnLayoutResourcePtr createFromResource(const QnResourcePtr& resource);
 
-    virtual QStringList searchFilters(bool useExtraSearchInformation) const override;
-
     void setItems(const QnLayoutItemDataList &items);
 
     void setItems(const QnLayoutItemDataMap &items);
