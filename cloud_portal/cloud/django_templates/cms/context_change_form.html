@@ -11,42 +11,45 @@
 <form id="context_form" class="aligned" action="" enctype="multipart/form-data" method="post" novalidate>
     {% csrf_token %}
     <input type="hidden" name="context_id" value="{{ original.id }}">
-    <input type="hidden" name="product_id" value="{{ product_id }}">
+    <input type="hidden" name="product_id" value="{{ product.id }}">
     <input type="hidden" name="currentLanguage" value="{{ language_code }}">
     <input type="hidden" id="languageChanged">
     {% for field in custom_form %}
     <div class="form-row {% if field.field.disabled %} disabled-row{% endif %}">
         <div>
-            {% is_optional field.name original as optional %}
-            {% is_advanced field.name original as advanced %}
+            {% get_data_structure field.name original as data_structure %}
+            {% is_external_file field.name original as is_external %}
             {% has_value field.name product original language as record_exists %}
-            <label {% if advanced %} class="text-danger" {% endif %}
-                                     for="id_{{ field.name }}">{{ field.label }}{% if not optional %}*{% endif %}
+            <label {% if data_structure.advanced %} class="text-danger" {% endif %}
+                    for="id_{{ field.name }}">{{ field.label }}{% if not data_structure.optional %}*{% endif %}
                 <p class="help">{{ field.name }}</p>
-                {% if not optional %} <p class="help">required</p> {% endif %}
+                {% if not data_structure.optional %} <p class="help">required</p> {% endif %}
             </label>
             <div id="{{ field.name }}" style="width: 100%">
                 {% if field|is_ImageField and field.value %}
                     <div>
-                        {% if optional and record_exists %}
+                        {% if data_structure.optional and record_exists %}
                             <label><input id="delete_{{ field.name }}" type="checkbox"
                                           name="delete_{{ field.name }}" value="false"/>&nbsp;Clear Value</label>
                             <br><br>
                         {% endif %}
 
-                        <img class="preview-image context-preview {% if optional and not record_exists %} optional-image {% endif %}"
+                        <img class="preview-image context-preview {% if data_structure.optional and not record_exists %} optional-image {% endif %}"
                              src="data:image/png;base64,{{ field.value }}">
                     </div>
 
                 {% elif field|is_FileField and field.value %}
                     <div>
-                        {% if optional and record_exists %}
+                        {% if data_structure.optional and record_exists %}
                             <label><input id="delete_{{ field.name }}" type="checkbox" name="delete_{{ field.name }}"
                                           value="false"/>&nbsp;Clear Value</label>
                         {% endif %}
-
-                        <a href="{% url 'download_file' field.name %}?lang={{ language_code }}&draft" download>
-                            {% if optional and not record_exists %}
+                        <a href={% if not is_external %}
+                                    "{% url 'download_file' field.name %}?lang={{ language_code }}&draft"
+                                {% else %}
+                                    "{{ field.value }}"
+                                {% endif %} download>
+                            {% if data_structure.optional and not record_exists %}
                                 Download Example
                             {% else %}
                                 Download

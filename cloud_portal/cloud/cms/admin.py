@@ -139,7 +139,9 @@ class ContextProxyAdmin(CMSAdmin):
 
         if 'admin_language' in request.session:
             extra_context['language_code'] = request.session['admin_language']
-        extra_context['product_id'] = request.session['product_id']
+        products = Product.objects.filter(id=request.session['product_id'])
+        if products.exists():
+            extra_context['product'] = products.last()
 
         form = CustomContextForm(initial={'language': extra_context['language_code'], 'context': object_id})
         form.add_fields(Product.objects.get(id=request.session['product_id']),

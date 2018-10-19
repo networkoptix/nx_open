@@ -15,23 +15,26 @@ def is_FileField(field):
 
 
 @register.simple_tag
-def is_optional(data_structure_name, context):
+def get_data_structure(data_structure_name, context):
+    data_structure_name = data_structure_name.replace('_external_file', '')
     query = DataStructure.objects.filter(context=context, name=data_structure_name)
     if query.exists():
-        return query[0].optional
-    return False
+        return query[0]
+    return None
 
 
 @register.simple_tag
-def is_advanced(data_structure_name, context):
+def is_external_file(data_structure_name, context):
+    data_structure_name = data_structure_name.replace('_external_file', '')
     query = DataStructure.objects.filter(context=context, name=data_structure_name)
     if query.exists():
-        return query[0].advanced
+        return query[0].type == DataStructure.DATA_TYPES.external_file
     return False
 
 
 @register.simple_tag
 def has_value(data_structure_name, product, context, language):
+    data_structure_name = data_structure_name.replace('_external_file', '')
     query = DataStructure.objects.filter(context=context, name=data_structure_name)
 
     if query.exists():
@@ -42,7 +45,7 @@ def has_value(data_structure_name, product, context, language):
     if not data_structure.translatable:
         language = None
 
-    record_value = data_structure.find_actual_value(product, language)
+    record_value = data_structure.find_actual_value(product, language, draft=True)
     return record_value != "" and data_structure.default != record_value
 
 

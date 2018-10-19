@@ -5,7 +5,7 @@ from django.contrib.auth.models import Permission
 from django.db.models import Q
 
 from PIL import Image
-import base64, json, re, uuid
+import base64, json, re, uuid, hashlib
 
 from .filldata import fill_content
 from api.models import Account
@@ -57,6 +57,8 @@ def save_unrevisioned_records(product, context, language, data_structures,
             ds_language = None
 
         new_record_value = ""
+        external_file = None
+        delete_file = False
         latest_value = data_structure.find_actual_value(product, ds_language)
         # If the DataStructure is supposed to be an image convert to base64 and
         # error check
@@ -114,6 +116,31 @@ def save_unrevisioned_records(product, context, language, data_structures,
             else:
                 new_record_value = values[0]
 
+        elif data_structure.type == DataStructure.DATA_TYPES.external_file:
+            # External files are a special case that have different names than the data structure
+            external_file_name = '{}_external_file'.format(data_structure_name)
+
+            # If the user uploads a new file create a new ExternalFile record
+            if external_file_name in request_files:
+                request_file = request_files[external_file_name]
+                md5 = hashlib.md5()
+                for chunk in request_file.chunks():
+                    md5.update(chunk)
+                external_file = ExternalFile(file=request_file,
+                                             md5=md5.hexdigest(),
+                                             size=request_file.size/1048576.0)
+                external_file.save()
+
+            # Mark this file for deletion
+            elif 'delete_' + external_file_name in request_data and request_data['delete_' + external_file_name]:
+                delete_file = True
+
+            # If we change the meta information we will take the latest ExternalFile for this DataStructure
+            elif external_file_name in request_data:
+                external_file = DataRecord.objects.filter(data_structure=data_structure).latest('id').external_file
+
+            new_record_value = request_data[data_structure_name]
+
         elif data_structure_name in request_data:
             new_record_value = request_data[data_structure_name]
 
@@ -129,7 +156,7 @@ def save_unrevisioned_records(product, context, language, data_structures,
             else:
                 continue
 
-        if new_record_value == latest_value:
+        if new_record_value == latest_value and not delete_file and not external_file:
             continue
 
         if data_structure.advanced and not (user.is_superuser or user.has_perm('cms.edit_advanced')):
@@ -142,6 +169,10 @@ def save_unrevisioned_records(product, context, language, data_structures,
                             value=new_record_value,
                             created_by=user)
         record.save()
+
+        if external_file:
+            record.external_file = external_file
+            record.save()
 
     fill_content(product,
                  preview=True,
