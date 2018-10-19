@@ -97,7 +97,7 @@ def _bus_thread_running(server, queue):
         except websocket.WebSocketTimeoutException as x:
             return
         except socket.error as x:
-            logger.error('Socket error: [%s] %s', x.errrno, x.strerror)
+            logger.error('Socket error: [%s] %s', x.errno, x.strerror)
             if x.errno in [errno.ECONNRESET, errno.EPIPE]:
                 logger.info('Reopening socket.')
                 wsl[0].close()
