@@ -1,4 +1,8 @@
+from __future__ import division
+
 import datetime
+import logging
+import math
 import timeit
 
 import dateutil.parser
@@ -17,6 +21,8 @@ from framework.os_access.windows_remoting.env_vars import EnvVars
 from framework.os_access.windows_remoting.users import Users
 from framework.os_access.windows_traffic_capture import WindowsTrafficCapture
 from framework.utils import RunningTime
+
+_logger = logging.getLogger(__name__)
 
 
 class WindowsTime(Time):
@@ -146,8 +152,32 @@ class WindowsAccess(OSAccess):
             )
         return output.decode('ascii')
 
-    def make_fake_disk(self, name, size_bytes):
-        raise NotImplementedError()
+    def make_fake_disk(self, name, size_bytes, letter='V', image_dir='C:\\', partition_style='MBR'):
+        size_mb = int(math.ceil(size_bytes / 1024 / 1024))
+        image_path = self.path_cls(image_dir) / '{}.vhdx'.format(name)
+        script_template = (
+            'CREATE VDISK file={image_path} MAXIMUM={size_mb} NOERR' '\r\n'  # NOERR if exists.
+            'SELECT VDISK file={image_path}' '\r\n'  # No error if already selected.
+            'ATTACH VDISK NOERR' '\r\n'  # NOERR if attached. "Disk" of "vdisk" has been selected.
+            'CLEAN' '\r\n'  # Removes letter, wipes partition table.
+            'CONVERT {partition_style}' '\r\n'
+            'CREATE PARTITION PRIMARY' '\r\n'  # New partition and its volume have been selected.
+            'FORMAT' '\r\n'  # Filesystem is default (NTFS).
+            'ASSIGN LETTER={letter}' '\r\n'
+            'EXIT' '\r\n'
+            )
+        script = script_template.format(
+            image_path=image_path,
+            letter=letter,
+            size_mb=size_mb,
+            partition_style=partition_style)
+        _logger.debug('Diskpart script:\n%s', script)
+        # With script file, `diskpart` exits with non-zero code.
+        script_path = image_path.with_suffix('.diskpart.txt')
+        script_path.write_text(script)
+        command = self.winrm.command(['diskpart', '/s', script_path])
+        command.run(timeout_sec=10 + 0.05 * size_mb)
+        return self.path_cls('{letter}:\\'.format(letter=letter))
 
     def free_disk_space_bytes(self):
         disks = self.winrm.wmi_query('Win32_LogicalDisk', {}).enumerate()
