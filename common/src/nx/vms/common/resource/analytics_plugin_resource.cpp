@@ -32,10 +32,6 @@ PluginManifest AnalyticsPluginResource::manifest() const
 void AnalyticsPluginResource::setManifest(const PluginManifest& manifest)
 {
     setProperty(kPluginManifestProperty, QString::fromUtf8(QJson::serialized(manifest)));
-
-    // Set settings models separately since client uses those properties.
-    setEngineSettingsModel(manifest.engineSettingsModel);
-    setDeviceAgentSettingsModel(manifest.deviceAgentSettingsModel);
 }
 
 QJsonObject AnalyticsPluginResource::deviceAgentSettingsModel() const

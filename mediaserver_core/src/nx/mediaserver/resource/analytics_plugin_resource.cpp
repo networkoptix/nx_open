@@ -38,9 +38,6 @@ CameraDiagnostics::Result AnalyticsPluginResource::initInternal()
         return CameraDiagnostics::PluginErrorResult("Can't deserialize engine manifest");
 
     setManifest(*manifest);
-    setEngineSettingsModel(manifest->engineSettingsModel);
-    setDeviceAgentSettingsModel(manifest->deviceAgentSettingsModel);
-
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();
