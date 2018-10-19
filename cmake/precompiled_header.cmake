@@ -142,7 +142,7 @@ function(_add_gcc_clang_precompiled_header target input)
         if(NOT flags)
             set(flags)
         endif()
-        list(APPEND flags ${pch_flags})
+        string(APPEND flags " ${pch_flags}")
 
         get_source_file_property(depends "${source}" OBJECT_DEPENDS)
         if(NOT depends)
