@@ -157,8 +157,6 @@ auto GenericApiClient<Implementation>::makeSyncCall(
     const std::string& requestPath,
     InputArgs... inputArgs)
 {
-    using ResultCode = typename Implementation::ResultCode;
-
     if constexpr (std::is_same<Output, void>::value)
     {
         return makeSyncCallInternal<
