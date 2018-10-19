@@ -30,12 +30,6 @@
                     "maxValue": 100.0
                 },
                 {
-                    "type": "CheckBox",
-                    "name": "checkbox",
-                    "defaultValue": true,
-                    "value": true
-                },
-                {
                     "type": "ComboBox",
                     "name": "combobox",
                     "defaultValue": "value2",

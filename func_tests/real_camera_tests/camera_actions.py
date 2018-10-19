@@ -58,11 +58,15 @@ def _ffprobe_poll(expected_values, probe, stream_url, title):
     yield expect_values(expected_values, dict(video=video, audio=audio), path=title)
 
 
-def ffprobe_streams(expected_values, stream_url, title, rerun_count=1000):
+def ffprobe_streams(expected_values, stream_url, title, rerun_count=1000, audio_stage=None):
     frames = max(expected_values.get('video', {}).get('fps', [30]))
     last_failure = None
     for run_number in range(rerun_count):
-        options = ['-show_streams', '-of', 'json', '-fpsprobesize', str(frames)]
+        if audio_stage:
+            probesize = ('-probesize', '100k')
+        else:
+            probesize = ('-fpsprobesize', str(frames))
+        options = ['-show_streams', '-of', 'json', probesize[0], probesize[1]]
         probe = subprocess.Popen(
             ['ffprobe'] + options + [stream_url],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)

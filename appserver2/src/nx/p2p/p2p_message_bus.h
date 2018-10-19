@@ -443,6 +443,8 @@ protected:
     QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list
     QElapsedTimer m_lastPeerInfoTimer;
     QMap<vms::api::PersistentIdData, vms::api::RuntimeData> m_lastRuntimeInfo;
+protected:
+    void dropConnectionsThreadUnsafe();
 private:
     QMap<QnUuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections
 

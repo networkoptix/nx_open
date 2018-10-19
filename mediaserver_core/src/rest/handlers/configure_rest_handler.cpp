@@ -25,6 +25,7 @@
 #include "media_server/media_server_module.h"
 #include "media_server/serverutil.h"
 #include "media_server/settings.h"
+#include <nx/vms/utils/system_merge_processor.h>
 
 namespace
 {
@@ -76,6 +77,21 @@ int QnConfigureRestHandler::execute(
     const QnRestConnectionProcessor* owner)
 {
     nx::mediaserver::Utils utils(serverModule());
+
+    nx::vms::utils::SystemMergeProcessor systemMergeProcessor(owner->commonModule());
+    using MergeStatus = ::utils::MergeSystemsStatus::Value;
+
+    if (QnPermissionsHelper::isSafeMode(serverModule()))
+    {
+        systemMergeProcessor.setMergeError(&result, MergeStatus::safeMode);
+        return nx::network::http::StatusCode::ok;
+    }
+    if (!QnPermissionsHelper::hasOwnerPermissions(
+                 owner->resourcePool(), owner->accessRights()))
+    {
+        systemMergeProcessor.setMergeError(&result, MergeStatus::forbidden);
+        return nx::network::http::StatusCode::forbidden;
+    }
 
     if (QnPermissionsHelper::isSafeMode(serverModule()))
         return QnPermissionsHelper::safeModeError(result);

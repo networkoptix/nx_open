@@ -20,7 +20,6 @@
 
 #include <nx/mediaserver/analytics/metadata_handler.h>
 #include <nx/mediaserver/analytics/event_rule_watcher.h>
-#include <nx/plugins/settings.h>
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
@@ -215,7 +214,7 @@ Manager::EngineList Manager::availableEngines() const
         engines.append(engine);
     }
     return engines;
-    // TODO: Rewrite; the above implementation does not care about Plugin and Engine lifetimes. 
+    // TODO: Rewrite; the above implementation does not care about Plugin and Engine lifetimes.
 }
 
 /** @return Empty settings if the file does not exist, or on error. */

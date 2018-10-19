@@ -9,7 +9,7 @@
 #include <cstring>
 #include <cstdlib>
 
-#include <plugins/plugin_tools.h>
+#include <nx/kit/utils.h>
 
 
 ILPVideoPacket::ILPVideoPacket(
@@ -33,7 +33,7 @@ ILPVideoPacket::~ILPVideoPacket()
 {
     if( m_buffer )
     {
-        nxpt::freeAligned( m_buffer );
+        nx::kit::utils::freeAligned( m_buffer );
         m_buffer = NULL;
         m_bufSize = 0;
     }
@@ -140,13 +140,13 @@ void ILPVideoPacket::resizeBuffer( size_t bufSize )
         return;
     }
 
-    void* newBuffer = nxpt::mallocAligned( bufSize, nxcip::MEDIA_DATA_BUFFER_ALIGNMENT );
+    void* newBuffer = nx::kit::utils::mallocAligned( bufSize, nxcip::MEDIA_DATA_BUFFER_ALIGNMENT );
 
     if( m_bufSize > 0 )
     {
         if( newBuffer )
             memcpy( newBuffer, m_buffer, std::min<>(m_bufSize, bufSize) );
-        nxpt::freeAligned( m_buffer );
+        nx::kit::utils::freeAligned( m_buffer );
         m_buffer = NULL;
         m_bufSize = 0;
     }

@@ -5,6 +5,7 @@ import timeit
 from typing import Any, Callable, Optional, Sequence, Union
 
 from .context_logger import ContextLogger
+from .utils import description_from_func
 
 _logger = ContextLogger(__name__, 'wait')
 
@@ -80,18 +81,6 @@ class WaitTimeout(Exception):
         self.timeout_sec = timeout_sec
 
 
-def _description_from_func(func):  # type: (Any) -> str
-    try:
-        object_bound_to = func.__self__
-    except AttributeError:
-        if func.__name__ == '<lambda>':
-            raise ValueError("Cannot make description from lambda")
-        return func.__name__
-    if object_bound_to is None:
-        raise ValueError("Cannot make description from unbound method")
-    return '{func.__self__!r}.{func.__name__!s}'.format(func=func)
-
-
 def wait_for_truthy(
         get_value,  # type: Callable[[], Any]
         description=None,  # type: Optional[str]
@@ -100,7 +89,7 @@ def wait_for_truthy(
         logger=None,
         ):
     if description is None:
-        description = _description_from_func(get_value)
+        description = description_from_func(get_value)
     wait = Wait(description, timeout_sec, max_delay_sec, logger=logger)
     while True:
         result = get_value()
@@ -144,7 +133,7 @@ def wait_for_equal(
         `('reply', 'remoteAddresses', 0)` or `('reply', 'systemInformation', 'platform')`.
     """
     if actual_desc is None:
-        actual_desc = _description_from_func(get_actual)
+        actual_desc = description_from_func(get_actual)
     if expected_desc is None:
         expected_desc = repr(expected)
     if path:
@@ -168,7 +157,7 @@ def ensure_persistence(
         logger=None,
         ):
     if description is None:
-        description = _description_from_func(get_bool_value)
+        description = description_from_func(get_bool_value)
     wait = Wait(description, timeout_sec, max_delay_sec, logger=logger)
     while True:
         if not get_bool_value():
