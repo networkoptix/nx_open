@@ -29,6 +29,7 @@
 #include <nx/client/desktop/common/dialogs/web_view_dialog.h>
 #include <nx/client/desktop/utils/managed_camera_set.h>
 #include <nx/utils/datetime.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/event/analytics_helper.h>
 
@@ -383,16 +384,8 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
         << QVariant::fromValue(request.sortOrder).toString()
         << "maximum objects" << request.maxObjectsToSelect;
 
-    const auto internalCallback =
-        [callback, guard = QPointer<Private>(this)](
-            bool success, rest::Handle handle, LookupResult&& data)
-        {
-            if (guard)
-                callback(success, handle, std::move(data));
-        };
-
     return server->restConnection()->lookupDetectedObjects(
-        request, false /*isLocal*/, internalCallback, thread());
+        request, false /*isLocal*/, nx::utils::guarded(this, callback), thread());
 }
 
 void AnalyticsSearchListModel::Private::updateMetadataReceivers()
@@ -713,12 +706,11 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
         for (const auto& action: driverActions.actions)
         {
             const auto name = action.name.text(QString());
-            menu->addAction(name,
-                [this, action, object, pluginId, guard = QPointer<const Private>(this)]()
+            menu->addAction<std::function<void()>>(name, nx::utils::guarded(this,
+                [this, action, object, pluginId]()
                 {
-                    if (guard)
-                        executePluginAction(pluginId, action, object);
-                });
+                    executePluginAction(pluginId, action, object);
+                }));
         }
     }
 
@@ -736,8 +728,7 @@ void AnalyticsSearchListModel::Private::executePluginAction(
         return;
 
     const auto resultCallback =
-        [this, guard = QPointer<const Private>(this)](
-            bool success, rest::Handle /*requestId*/, QnJsonRestResult result)
+        [this](bool success, rest::Handle /*requestId*/, QnJsonRestResult result)
         {
             if (result.error != QnRestResult::NoError)
             {
@@ -762,7 +753,8 @@ void AnalyticsSearchListModel::Private::executePluginAction(
     actionData.actionId = action.id;
     actionData.objectId = object.objectId;
 
-    server->restConnection()->executeAnalyticsAction(actionData, resultCallback, thread());
+    server->restConnection()->executeAnalyticsAction(
+        actionData, nx::utils::guarded(this, resultCallback), thread());
 }
 
 AnalyticsSearchListModel::Private::PreviewParams AnalyticsSearchListModel::Private::previewParams(
