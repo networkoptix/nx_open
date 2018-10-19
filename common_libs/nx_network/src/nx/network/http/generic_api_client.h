@@ -14,7 +14,7 @@ namespace nx::network::http {
 
 /**
  * Base class for client of some API. E.g., REST API based on HTTP/json.
- * Implementation MUST define:
+ * ApiResultCodeDescriptor MUST define:
  * - ResultCode type.
  * - If ResultCode is different from nx::network::http::StatusCode, then following method MUST be 
  * defined too:
@@ -26,7 +26,8 @@ namespace nx::network::http {
  *     const Output&... output);
  * </code></pre>
  */
-template<typename Implementation>
+template<typename ApiResultCodeDescriptor>
+// requires { typename ApiResultCodeDescriptor::ResultCode; }
 class GenericApiClient:
     public network::aio::BasicPollable
 {
@@ -101,20 +102,20 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-template<typename Implementation>
-GenericApiClient<Implementation>::GenericApiClient(const utils::Url& baseApiUrl):
+template<typename ApiResultCodeDescriptor>
+GenericApiClient<ApiResultCodeDescriptor>::GenericApiClient(const utils::Url& baseApiUrl):
     m_baseApiUrl(baseApiUrl)
 {
 }
 
-template<typename Implementation>
-GenericApiClient<Implementation>::~GenericApiClient()
+template<typename ApiResultCodeDescriptor>
+GenericApiClient<ApiResultCodeDescriptor>::~GenericApiClient()
 {
     pleaseStopSync();
 }
 
-template<typename Implementation>
-void GenericApiClient<Implementation>::bindToAioThread(
+template<typename ApiResultCodeDescriptor>
+void GenericApiClient<ApiResultCodeDescriptor>::bindToAioThread(
     network::aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
@@ -124,17 +125,17 @@ void GenericApiClient<Implementation>::bindToAioThread(
         context.second.client->bindToAioThread(aioThread);
 }
 
-template<typename Implementation>
-void GenericApiClient<Implementation>::stopWhileInAioThread()
+template<typename ApiResultCodeDescriptor>
+void GenericApiClient<ApiResultCodeDescriptor>::stopWhileInAioThread()
 {
     base_type::stopWhileInAioThread();
 
     m_activeRequests.clear();
 }
 
-template<typename Implementation>
+template<typename ApiResultCodeDescriptor>
 template<typename Output, typename CompletionHandler, typename... InputArgs>
-void GenericApiClient<Implementation>::makeAsyncCall(
+void GenericApiClient<ApiResultCodeDescriptor>::makeAsyncCall(
     const std::string& requestPath,
     CompletionHandler handler,
     InputArgs... inputArgs)
@@ -151,9 +152,9 @@ void GenericApiClient<Implementation>::makeAsyncCall(
         });
 }
 
-template<typename Implementation>
+template<typename ApiResultCodeDescriptor>
 template<typename Output, typename... InputArgs>
-auto GenericApiClient<Implementation>::makeSyncCall(
+auto GenericApiClient<ApiResultCodeDescriptor>::makeSyncCall(
     const std::string& requestPath,
     InputArgs... inputArgs)
 {
@@ -161,27 +162,27 @@ auto GenericApiClient<Implementation>::makeSyncCall(
     {
         return makeSyncCallInternal<
             void,
-            std::tuple<typename Implementation::ResultCode>>(
+            std::tuple<typename ApiResultCodeDescriptor::ResultCode>>(
                 requestPath, std::move(inputArgs)...);
     }
     else
     {
         return makeSyncCallInternal<
             Output,
-            std::tuple<typename Implementation::ResultCode, Output>>(
+            std::tuple<typename ApiResultCodeDescriptor::ResultCode, Output>>(
                 requestPath, std::move(inputArgs)...);
     }
 }
 
-template<typename Implementation>
-const utils::Url& GenericApiClient<Implementation>::baseApiUrl() const
+template<typename ApiResultCodeDescriptor>
+const utils::Url& GenericApiClient<ApiResultCodeDescriptor>::baseApiUrl() const
 {
     return m_baseApiUrl;
 }
 
-template<typename Implementation>
+template<typename ApiResultCodeDescriptor>
 template<typename Output, typename... InputArgs>
-auto GenericApiClient<Implementation>::createHttpClient(
+auto GenericApiClient<ApiResultCodeDescriptor>::createHttpClient(
     const std::string& requestPath,
     InputArgs... inputArgs)
 {
@@ -204,9 +205,9 @@ auto GenericApiClient<Implementation>::createHttpClient(
     return httpClientPtr;
 }
 
-template<typename Implementation>
+template<typename ApiResultCodeDescriptor>
 template<typename CompletionHandler, typename... Output>
-void GenericApiClient<Implementation>::processResponse(
+void GenericApiClient<ApiResultCodeDescriptor>::processResponse(
     network::aio::BasicPollable* requestPtr,
     CompletionHandler handler,
     SystemError::ErrorCode error,
@@ -214,17 +215,15 @@ void GenericApiClient<Implementation>::processResponse(
     Output... output)
 {
     Context context = takeContextOfRequest(requestPtr);
-
-    const auto resultCode =
-        static_cast<const Implementation*>(this)->getResultCode(
-            error, response, output...);
-
+    
+    const auto resultCode = getResultCode(error, response, output...);
+    
     handler(resultCode, std::move(output)...);
 }
 
-template<typename Implementation>
-typename GenericApiClient<Implementation>::Context 
-    GenericApiClient<Implementation>::takeContextOfRequest(
+template<typename ApiResultCodeDescriptor>
+typename GenericApiClient<ApiResultCodeDescriptor>::Context 
+    GenericApiClient<ApiResultCodeDescriptor>::takeContextOfRequest(
         nx::network::aio::BasicPollable* httpClientPtr)
 {
     QnMutexLocker lock(&m_mutex);
@@ -236,15 +235,15 @@ typename GenericApiClient<Implementation>::Context
     return context;
 }
 
-template<typename Implementation>
+template<typename ApiResultCodeDescriptor>
 template<typename... Output>
-auto GenericApiClient<Implementation>::getResultCode(
+auto GenericApiClient<ApiResultCodeDescriptor>::getResultCode(
     [[maybe_unused]] SystemError::ErrorCode systemErrorCode,
     const network::http::Response* response,
     const Output&... output) const
 {
     if constexpr (std::is_same<
-        typename Implementation::ResultCode,
+        typename ApiResultCodeDescriptor::ResultCode,
         network::http::StatusCode::Value>::value)
     {
         return response
@@ -254,16 +253,16 @@ auto GenericApiClient<Implementation>::getResultCode(
     }
     else
     {
-        return static_cast<const Implementation*>(this)->getResultCode(
+        return ApiResultCodeDescriptor::getResultCode(
             systemErrorCode,
             response,
             output...);
     }
 }
 
-template<typename Implementation>
+template<typename ApiResultCodeDescriptor>
 template<typename Output, typename ResultTuple, typename... InputArgs>
-auto GenericApiClient<Implementation>::makeSyncCallInternal(
+auto GenericApiClient<ApiResultCodeDescriptor>::makeSyncCallInternal(
     const std::string& requestPath,
     InputArgs... inputArgs)
 {
