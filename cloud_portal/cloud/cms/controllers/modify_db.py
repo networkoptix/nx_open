@@ -28,6 +28,13 @@ def update_draft_state(review_id, target_state, user):
     review.reviewed_date = datetime.now()
     review.state = target_state
     review.save()
+
+    if review.customization.name == settings.NX:
+        if target_state == ProductCustomizationReview.REVIEW_STATES.accepted:
+            review.accepted_by_nx()
+        elif target_state == ProductCustomizationReview.REVIEW_STATES.rejected:
+            review.rejected_by_nx()
+
     return None
 
 

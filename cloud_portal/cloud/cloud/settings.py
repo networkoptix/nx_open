@@ -48,6 +48,8 @@ ALLOWED_HOSTS = ['*']
 SKINS = ['blue', 'green', 'orange']
 DEFAULT_SKIN = 'blue'
 
+NX = 'default'
+
 # Application definition
 
 INSTALLED_APPS = (
@@ -278,12 +280,14 @@ LOGGING = {
     }
 }
 
-# Static files (CSS, JavaScript, Images)
+# Static files (CSS, JavaScript, Images) and s3 config
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
 MEDIA_ROOT = BASE_DIR + '/static/integrations/'
 MEDIA_URL = '/static/integrations/'
+# #End of s3 config
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -294,15 +298,16 @@ REST_FRAMEWORK = {
        'rest_framework.permissions.AllowAny',
     )
 }
+# Used for Zapier
 HOOK_EVENTS = {
     'user.send_zap_request': None
 }
 
 # Celery settings section
 
-#Configure AWS SQS
-#Broker_url = 'sqs://{aws_access_key_id}:{aws_secret_access_key}@'
-#BROKER_TRANSPORT_OPTIONS
+# Configure AWS SQS
+# Broker_url = 'sqs://{aws_access_key_id}:{aws_secret_access_key}@'
+# BROKER_TRANSPORT_OPTIONS
 #   queue_name_prefix allows you to name the queue for sqs
 #   region allows you to specify the aws region
 

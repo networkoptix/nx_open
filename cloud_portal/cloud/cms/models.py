@@ -403,8 +403,13 @@ class ContentVersion(models.Model):
         return str(self.id)
 
     def create_reviews(self):
-        for customization in self.product.customizations.all():
-            ProductCustomizationReview(customization=customization, version=self).save()
+        state = ProductCustomizationReview.REVIEW_STATES.pending
+        if self.product.customizations.filter(name=settings.NX).exists():
+            state = ProductCustomizationReview.REVIEW_STATES.blocked
+            ProductCustomizationReview(customization=Customization.objects.get(name=settings.NX), version=self).save()
+
+        for customization in self.product.customizations.exclude(name=settings.NX):
+            ProductCustomizationReview(customization=customization, version=self, state=state).save()
 
 
     @property
@@ -429,7 +434,7 @@ class ProductCustomizationReview(models.Model):
             ("force_update", "Can forcibly update content"),
         )
 
-    REVIEW_STATES = Choices((0, "pending", "Pending"), (1, "accepted", "Accepted"), (3, "rejected", "Rejected"))
+    REVIEW_STATES = Choices((0, "pending", "Pending"), (1, "accepted", "Accepted"), (2, "rejected", "Rejected"), (3, "blocked", "Blocked"))
     customization = models.ForeignKey(Customization)
     version = models.ForeignKey(ContentVersion)
     state = models.IntegerField(choices=REVIEW_STATES, default=REVIEW_STATES.pending)
@@ -441,6 +446,18 @@ class ProductCustomizationReview(models.Model):
 
     def __str__(self):
         return self.version.product.__str__()
+
+    def accepted_by_nx(self):
+        reviews = self.version.productcustomizationreview_set.exclude(customization__name=settings.NX)
+        for review in reviews:
+            review.state = ProductCustomizationReview.REVIEW_STATES.pending
+            review.save()
+
+    def rejected_by_nx(self):
+        reviews = self.version.productcustomizationreview_set.exclude(customization__name=settings.NX)
+        for review in reviews:
+            review.state = ProductCustomizationReview.REVIEW_STATES.rejected
+            review.save()
 
 
 class ExternalFile(models.Model):
