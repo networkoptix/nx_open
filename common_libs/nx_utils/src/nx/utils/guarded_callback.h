@@ -28,7 +28,7 @@ auto guarded(QPointer<const QObject> guard, Callback&& callback)
         [guard, callback = std::forward<Callback>(callback)](auto&&... args)
         {
             if (guard)
-                callback(std::forward<std::remove_reference<decltype(args)>::type>(args)...);
+                callback(std::forward<std::remove_reference_t<decltype(args)>>(args)...);
         };
 }
 
@@ -41,7 +41,7 @@ auto guarded(
         [guard, defaultReturnValue, callback = std::forward<Callback>(callback)](auto&&... args)
         {
             return guard
-                ? callback(std::forward<std::remove_reference<decltype(args)>::type>(args)...)
+                ? callback(std::forward<std::remove_reference_t<decltype(args)>>(args)...)
                 : defaultReturnValue;
         };
 }
