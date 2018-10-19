@@ -483,6 +483,7 @@ angular.module('nxCommon').controller('ViewCtrl',
                 if (Object.keys($scope.camerasProvider.cameras).length !== 0) {
                     $scope.activeCamera = $scope.camerasProvider.getFirstAvailableCamera();
                 } else {
+                    $scope.showCameraPanel = false;
                     return;
                 }
             }
@@ -505,7 +506,7 @@ angular.module('nxCommon').controller('ViewCtrl',
                 timeManager.setOffset(serverOffset);
             }
 
-            $scope.showCameraPanel = !$scope.activeCamera;
+            $scope.showCameraPanel = Object.keys($scope.activeCamera).length;
         });
 
         $scope.$watch('player', function(){

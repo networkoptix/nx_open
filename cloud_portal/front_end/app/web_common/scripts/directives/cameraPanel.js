@@ -23,8 +23,6 @@
                 scope.storage = $localStorage;
                 scope.inputPlaceholder = L.common.searchCamPlaceholder;
 
-                scope.showCamerasMenu = !$location.search().nocameras;
-
                 scope.selectCamera = function (activeCamera) {
                     if (scope.activeCamera && (scope.activeCamera.id === activeCamera)) {
                         return;
@@ -124,6 +122,14 @@
                     }
                 }
 
+                function showMenu () {
+                    scope.showCamerasMenu = scope.showCameraPanel;
+                    if ($location.search().nocameras) {
+                        scope.showCamerasMenu = false;
+                    }
+                }
+
+                scope.$watch('showCameraPanel', showMenu);
                 scope.$watch('searchCams', searchCams);
                 scope.$watch('camerasProvider.cameras', updateCameras, true);
                 scope.$watch('camerasProvider.mediaServers', updateMediaServers, true);

@@ -42,7 +42,7 @@
 	"Password is required": "Password is required",
 	"Password:": "Password:",
 	"Permissions": "Permissions",
-	"Please make sure this system has one public user as credentials will be publicly visible.": "Please make sure this system has one public user as credentials will be publicly visible.",
+	"Please make sure this system has one public user as credentials will be\n            publicly visible.": "Please make sure this system has one public user as credentials will be\n            publicly visible.",
 	"Portal management": "Portal management",
 	"Release Notes": "Release Notes",
 	"Release notes": "Release notes",
