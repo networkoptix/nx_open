@@ -6,7 +6,7 @@ from datetime import datetime
 import six
 from netaddr import IPAddress
 from pathlib2 import PureWindowsPath
-from typing import Callable, ContextManager, Optional, Type
+from typing import Callable, ContextManager, Mapping, Optional, Type
 
 from framework.networking.interface import Networking
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
@@ -157,12 +157,20 @@ class OSAccess(object):
     def make_fake_disk(self, name, size_bytes):
         return self.path_cls()
 
+    @abstractmethod
+    def _fs_root(self):
+        return self.path_cls()
+
     def _disk_space_holder(self):  # type: () -> FileSystemPath
-        return self.path_cls.tmp() / 'space_holder.tmp'
+        return self._fs_root() / 'space_holder.tmp'
 
     @abstractmethod
-    def free_disk_space_bytes(self):  # type: () -> int
+    def _free_disk_space_bytes_on_all(self):  # type: () -> Mapping[FileSystemPath, int]
         pass
+
+    def free_disk_space_bytes(self):  # type: () -> int
+        result_on_all = self._free_disk_space_bytes_on_all()
+        return result_on_all[self._fs_root()]
 
     @abstractmethod
     def _hold_disk_space(self, to_consume_bytes):  # type: (int) -> None

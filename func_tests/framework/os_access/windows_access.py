@@ -179,10 +179,15 @@ class WindowsAccess(OSAccess):
         command.run(timeout_sec=10 + 0.05 * size_mb)
         return self.path_cls('{letter}:\\'.format(letter=letter))
 
-    def free_disk_space_bytes(self):
+    def _fs_root(self):
+        return self.path_cls('C:\\')
+
+    def _free_disk_space_bytes_on_all(self):
         disks = self.winrm.wmi_query('Win32_LogicalDisk', {}).enumerate()
-        disk_c, = (disk for disk in disks if disk['Name'] == 'C:')
-        return int(disk_c['FreeSpace'])
+        result = {}
+        for disk in disks:
+            result[self.path_cls(disk['Name']) / '\\'] = int(disk['FreeSpace'])
+        return result
 
     def _hold_disk_space(self, to_consume_bytes):
         holder_path = self._disk_space_holder()

@@ -188,18 +188,21 @@ class PosixAccess(OSAccess):
             env={'MOUNT_POINT': mount_point, 'IMAGE': image_path, 'SIZE': size_bytes})
         return mount_point
 
-    def free_disk_space_bytes(self):
+    def _fs_root(self):
+        return self.path_cls('/')
+
+    def _free_disk_space_bytes_on_all(self):
         command = self.shell.command([
             'df',
             '--output=target,avail',  # Only mount point (target) and free (available) space.
             '--block-size=1',  # By default it's 1024 and all values are in kilobytes.
             ])
         output = command.run()
+        result = {}
         for line in output.splitlines()[1:]:  # Mind header.
-            mount_point, free_space_raw = line.split()
-            if mount_point == '/':
-                return int(free_space_raw)
-        raise RuntimeError("Cannot find mount point / in output:\n{}".format(output))
+            target, avail = line.split()
+            result[self.path_cls(target)] = int(avail)
+        return result
 
     def _hold_disk_space(self, to_consume_bytes):
         holder_path = self._disk_space_holder()
