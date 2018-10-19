@@ -78,9 +78,9 @@ private:
 //-------------------------------------------------------------------------------------------------
 // QnLongRunnable.
 
-QnLongRunnable::QnLongRunnable(bool isTrackedByPool)
+QnLongRunnable::QnLongRunnable(Tracking tracking)
 {
-    if (isTrackedByPool)
+    if (tracking == Tracking::enabled)
     {
         if (QnLongRunnablePool* pool = QnLongRunnablePool::instance())
         {
@@ -92,6 +92,11 @@ QnLongRunnable::QnLongRunnable(bool isTrackedByPool)
             NX_WARNING(this, "QnLongRunnablePool instance does not exist, "
                 "lifetime of this runnable will not be tracked.");
         }
+    }
+    else
+    {
+        NX_WARNING(this, "Use nx::utils::Thread class for such usage. "
+            "In the near future, QnLongRunnable will be tracked unconditionally");
     }
 }
 

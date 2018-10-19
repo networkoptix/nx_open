@@ -16,10 +16,16 @@ class NX_UTILS_API QnLongRunnable:
     Q_OBJECT
 
 public:
-    QnLongRunnable(bool isTrackedByPool = true);
+    enum class Tracking
+    {
+        disabled,
+        enabled,
+    };
+
+    QnLongRunnable(Tracking tracking = Tracking::enabled);
     ~QnLongRunnable();
 
-protected slots:
+protected:
     virtual void at_started() override;
     virtual void at_finished() override;
 

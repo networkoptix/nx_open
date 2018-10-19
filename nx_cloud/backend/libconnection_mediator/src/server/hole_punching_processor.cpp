@@ -174,14 +174,6 @@ std::tuple<api::ResultCode, boost::optional<ListeningPeerPool::ConstDataLocker>>
         const ConnectionStrongRef& connection,
         const api::ConnectRequest& request)
 {
-    if (connection->transportProtocol() != nx::network::TransportProtocol::udp)
-    {
-        NX_DEBUG(this, lm("Failed connect request %1: only UDP hole punching is supported for now")
-            .arg(logRequest(connection, request)));
-
-        return std::make_tuple(api::ResultCode::badRequest, boost::none);
-    }
-
     auto targetPeerDataLocker = m_listeningPeerPool->
         findAndLockPeerDataByHostName(request.destinationHostName);
     if (!targetPeerDataLocker)
