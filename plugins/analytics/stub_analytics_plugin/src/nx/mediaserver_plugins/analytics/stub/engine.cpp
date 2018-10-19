@@ -186,8 +186,60 @@ static const std::string kPluginManifest = R"json(
     "id": "nx.stub",
     "name": ")json" + kPluginName + R"json(",
     "version": "1.0.0",
-    "engineSettingsModel": "",
-    "deviceAgentSettingsModel": ""
+    "engineSettingsModel": {
+        "type": "Settings",
+        "items": [
+            {
+                "type": "TextField",
+                "name": "nx.stub.engine.settings.text_0",
+                "caption": "Text Field",
+                "description": "A text field",
+                "defaultValue": "a text"
+            },
+            {
+                "type": "GroupBox",
+                "caption": "Group",
+                "items": [
+                    {
+                        "type": "SpinBox",
+                        "name": "nx.stub.engine.settings.number_0",
+                        "defaultValue": 42,
+                        "minValue": 0,
+                        "maxValue": 100
+                    },
+                    {
+                        "type": "DoubleSpinBox",
+                        "name": "nx.stub.engine.settings.double_0",
+                        "defaultValue": 3.1415,
+                        "minValue": 0.0,
+                        "maxValue": 100.0
+                    },
+                    {
+                        "type": "ComboBox",
+                        "name": "nx.stub.engine.settings.combobox_0",
+                        "defaultValue": "value2",
+                        "range": ["value1", "value2", "value3"]
+                    },
+                    {
+                        "type": "Row",
+                        "items": [
+                            {
+                                "type": "Button",
+                                "name": "nx.stub.engine.settings.button_0",
+                                "caption": "Button"
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": "nx.stub.engine.settings.checkbox_0",
+                                "defaultValue": true,
+                                "value": true
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
 })json";
 
 } // namespace

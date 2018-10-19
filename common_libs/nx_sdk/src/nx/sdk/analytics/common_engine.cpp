@@ -5,6 +5,7 @@
 #include <nx/kit/debug.h>
 
 #include <nx/sdk/utils.h>
+#include <nx/sdk/common_settings.h>
 
 #include "plugin.h"
 
@@ -81,7 +82,9 @@ void CommonEngine::setSettings(const nx::sdk::Settings* settings)
 
 nx::sdk::Settings* CommonEngine::settings() const
 {
-    return nullptr;
+    auto settingsValues = new nx::sdk::CommonSettings();
+    settingsValues->addSetting("nx.stub.engine.settings.double_0", "2.7182");
+    return settingsValues;
 }
 
 const char* CommonEngine::manifest(Error* /*error*/) const
