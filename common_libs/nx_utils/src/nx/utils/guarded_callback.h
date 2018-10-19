@@ -17,15 +17,16 @@ namespace nx::utils {
  * for example:
  *     QMenu::addAction<std::function<void()>>("Name", guarded([]() {}));
  * or
- *     QMenu::addAction(std::function<void()>("Name", guarded([]() {})));
+ *     QMenu::addAction("Name", std::function<void()>(guarded([]() {})));
  */
 
 // For callbacks without a return value.
 template<typename Callback>
-auto guarded(QPointer<const QObject> guard, Callback&& callback)
+auto guarded(const QObject* guard, Callback&& callback)
 {
     return
-        [guard, callback = std::forward<Callback>(callback)](auto&&... args)
+        [guard = QPointer<const QObject>(guard),
+            callback = std::forward<Callback>(callback)](auto&&... args)
         {
             if (guard)
                 callback(std::forward<std::remove_reference_t<decltype(args)>>(args)...);
@@ -34,11 +35,12 @@ auto guarded(QPointer<const QObject> guard, Callback&& callback)
 
 // For callbacks returning a value.
 template<typename Callback, typename ResultType>
-auto guarded(
-    QPointer<const QObject> guard, const ResultType& defaultReturnValue, Callback&& callback)
+auto guarded(const QObject* guard, const ResultType& defaultReturnValue, Callback&& callback)
 {
     return
-        [guard, defaultReturnValue, callback = std::forward<Callback>(callback)](auto&&... args)
+        [guard = QPointer<const QObject>(guard),
+            defaultReturnValue,
+            callback = std::forward<Callback>(callback)](auto&&... args)
         {
             return guard
                 ? callback(std::forward<std::remove_reference_t<decltype(args)>>(args)...)
