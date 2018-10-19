@@ -30,6 +30,7 @@ export class EmbedModalContent {
                 @Inject(DOCUMENT) private document: any) {
 
         this.params = {
+            authString: '',
             nocameras : false,
             noheader  : false,
             nocontrols: false,
@@ -59,12 +60,14 @@ export class EmbedModalContent {
         for (const paramsKey in params) {
             if (params.hasOwnProperty(paramsKey)) {
                 // filter checkboxes in form
-                if (this.params[ paramsKey ] !== undefined && !params[ paramsKey ]) {
+                if (this.params[ paramsKey ] !== undefined && (!params[ paramsKey ] || params[ paramsKey ] !== '')) {
                     uri += (uri === '') ? '?' : '&';
-                    uri += paramsKey;
+                    uri += (typeof params[ paramsKey ] === 'boolean') ? paramsKey : params[ paramsKey ];
                 }
             }
         }
+
+        uri += '&' + btoa(params.login_email + ':' + params.login_password);
 
         this.embedUrl = '<iframe ' +
                             'src = "' + url + uri + '" >' +

@@ -9,16 +9,21 @@
     </div>
 
     <div class="modal-body">
-        <p class="warning-label" translate>Please make sure this system has one public user as credentials will be
-            publicly visible.</p>
+        <p class="warning-label" translate>
+            The credentials of this user will be exposed! You must create a custom "Public User" role with access only
+            to the cameras selected for public use, and assigned only the minimum required viewing permissions. This
+            "Public User" should not have system-wide access of any kind.
+        </p>
 
-        <p translate>Specify credentials for this system:</p>
+        <p translate>Enter "Public User" credentials:</p>
 
         <div class="form-group">
             <label for="login_email" translate>Email</label>
             <input type="email" class="form-control"
                    id="login_email" name="login_email" #login_email="ngModel"
                    [(ngModel)]="auth.email"
+                   [ngModelOptions]="{ updateOn: 'blur'}"
+                   (ngModelChange)="updateAuth()"
                    pattern="{{ configService.config.emailRegex }}" maxlength="255"
                    required nxFocusMe>
         </div>
@@ -27,6 +32,8 @@
             <input type="password" class="form-control"
                    name="login_password" id="login_password" #login_password="ngModel"
                    [(ngModel)]="auth.password"
+                   [ngModelOptions]="{ updateOn: 'blur'}"
+                   (ngModelChange)="updateAuth()"
                    maxlength="255"
                    required>
         </div>
