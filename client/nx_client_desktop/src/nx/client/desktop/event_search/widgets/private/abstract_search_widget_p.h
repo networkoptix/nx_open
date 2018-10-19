@@ -67,9 +67,6 @@ public:
     void addDeviceDependentAction(
         QAction* action, const QString& mixedString, const QString& cameraString);
 
-    friend uint qHash(Period source) { return uint(source); }
-    friend uint qHash(Cameras source) { return uint(source); }
-
 private:
     void setupModels();
     void setupRibbon();
@@ -131,5 +128,15 @@ private:
 
     QList<DeviceDependentAction> m_deviceDependentActions;
 };
+
+inline uint qHash(AbstractSearchWidget::Period source)
+{
+    return uint(source);
+}
+
+inline uint qHash(AbstractSearchWidget::Cameras source)
+{
+    return uint(source);
+}
 
 } // namespace nx::client::desktop
