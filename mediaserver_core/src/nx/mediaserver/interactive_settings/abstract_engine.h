@@ -27,7 +27,7 @@ public:
     virtual ~AbstractEngine() override;
 
     virtual void load(const QByteArray& data) = 0;
-    virtual void load(const QUrl& url) = 0;
+    virtual void load(const QString& fileName);
 
     QJsonObject serialize() const;
     QVariantMap values() const;

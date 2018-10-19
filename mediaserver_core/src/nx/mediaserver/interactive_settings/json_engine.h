@@ -14,9 +14,9 @@ public:
     JsonEngine(QObject* parent = nullptr);
     virtual ~JsonEngine() override;
 
+    using AbstractEngine::load;
     void load(const QJsonObject& json);
     virtual void load(const QByteArray& data) override;
-    virtual void load(const QUrl& url) override;
 };
 
 } // namespace nx::mediaserver::interactive_settings
