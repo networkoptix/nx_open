@@ -33,11 +33,11 @@ MAKE_CORE_DUMP_TIMEOUT_SEC = 60 * 5
 
 
 class _LocalTime(Time):
-    def __init__(self):
-        self._tz = tzlocal.get_localzone()
+    def get_tz(self):
+        return tzlocal.get_localzone()
 
     def get(self):  # type: () -> RunningTime
-        now = datetime.datetime.now(tz=self._tz)
+        now = datetime.datetime.now(tz=self.get_tz())
         return RunningTime(now)
 
     def set(self, aware_datetime):  # type: (datetime) -> RunningTime
@@ -53,11 +53,14 @@ class _ReadOnlyPosixTime(Time):
         timestamp_output = self._shell.command(['date', '+%s']).run(timeout_sec=2)
         timestamp = int(timestamp_output.decode('ascii').rstrip())
         delay_sec = timeit.default_timer() - started_at
+        local_time = datetime.datetime.fromtimestamp(timestamp, tz=self.get_tz())
+        return RunningTime(local_time, datetime.timedelta(seconds=delay_sec))
+
+    def get_tz(self):
         timezone_output = self._shell.command(['cat', '/etc/timezone']).run(timeout_sec=2)
         timezone_name = timezone_output.decode('ascii').rstrip()
         timezone = pytz.timezone(timezone_name)
-        local_time = datetime.datetime.fromtimestamp(timestamp, tz=timezone)
-        return RunningTime(local_time, datetime.timedelta(seconds=delay_sec))
+        return timezone
 
     def set(self, aware_datetime):
         raise NotImplementedError("Setting time is prohibited on {!r}".format(self._shell))

@@ -35,6 +35,10 @@ class _AllPorts(object):
 @six.add_metaclass(ABCMeta)
 class Time(object):
     @abstractmethod
+    def get_tz(self):
+        pass
+
+    @abstractmethod
     def get(self):  # type: () -> RunningTime
         pass
 

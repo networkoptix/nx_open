@@ -159,13 +159,8 @@ class Mediaserver(BaseMediaserver):
 class Storage(object):
 
     def __init__(self, os_access, dir):
-        self.os_access = os_access
+        self.os_access = os_access  # type: OSAccess
         self.dir = dir
-
-    @cached_property  # TODO: Use cached_getter.
-    def timezone(self):
-        tzname = self.os_access.path_cls('/etc/timezone').read_text().strip()
-        return pytz.timezone(tzname)
 
     def save_media_sample(self, camera, start_time, sample):
         assert isinstance(camera, Camera), repr(camera)
@@ -208,7 +203,7 @@ class Storage(object):
     #   low_quality/urn_uuid_b0e78864-c021-11d3-a482-f12907312681/
     #     2017/01/27/12/1485511093576_21332.mkv
     def _construct_fpath(self, camera_mac_addr, quality_part, start_time, unixtime_utc_ms, duration):
-        local_dt = start_time.astimezone(self.timezone)  # Local to Machine.
+        local_dt = start_time.astimezone(self.os_access.time.get_tz())  # Local to Machine.
         duration_ms = int(duration.total_seconds() * 1000)
         return self.dir.joinpath(
             quality_part, camera_mac_addr,

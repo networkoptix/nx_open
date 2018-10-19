@@ -30,8 +30,7 @@ class WindowsTime(Time):
     def __init__(self, winrm):
         self.winrm = winrm
 
-    @cached_getter
-    def _get_timezone(self):
+    def get_tz(self):
         timezone_result, = self.winrm.wmi_query(u'Win32_TimeZone',
                                                 {}).enumerate()  # Mind enumeration!
         windows_timezone_name = timezone_result[u'StandardName']
@@ -53,11 +52,11 @@ class WindowsTime(Time):
         result = self.winrm.wmi_query(u'Win32_OperatingSystem', {}).get()
         delay_sec = timeit.default_timer() - started_at
         raw = result[u'LocalDateTime'][u'cim:Datetime']
-        time = dateutil.parser.parse(raw).astimezone(self._get_timezone())
+        time = dateutil.parser.parse(raw).astimezone(self.get_tz())
         return RunningTime(time, datetime.timedelta(seconds=delay_sec))
 
     def set(self, new_time):  # type: (datetime.datetime) -> RunningTime
-        localized = new_time.astimezone(self._get_timezone())
+        localized = new_time.astimezone(self.get_tz())
         started_at = timeit.default_timer()
         # TODO: Do that with Win32_OperatingSystem.SetDateTime WMI method.
         # See: https://superuser.com/q/1323610/174311
