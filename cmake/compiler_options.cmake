@@ -18,16 +18,6 @@ option(analyzeMutexLocksForDeadlock
     "Analyze mutex locks for deadlock. WARNING: this can significantly reduce performance!"
     OFF)
 
-if(MSVC)
-    # MSVC does not support compiler feature detection macros, so Qt fails to enable constexpr
-    # for some its claasses like QRect, QMargins, etc.
-    if(MSVC_VERSION GREATER 1900)
-        add_definitions(-D__cpp_constexpr=201304)
-    else()
-        add_definitions(-DQ_COMPILER_CONSTEXPR)
-    endif()
-endif()
-
 if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo")
     # TODO: Use CMake defaults in the next release version (remove the following two lines).
     string(REPLACE "-O3" "-O2" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
