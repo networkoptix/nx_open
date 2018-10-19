@@ -27,9 +27,13 @@ def make_integrations_json(integrations, contexts=[], show_pending=False):
 
         for integration in integrations:
             integration_dict = {}
-            current_version = integration.version_id() if not show_pending else 0
-            if current_version == 0 and (not show_pending or not integration.contentversion_set.filter(
-                    productcustomizationreview__state=PENDING).exists()):
+            current_version = integration.version_id()
+            if show_pending:
+                current_version = ProductCustomizationReview.objects.filter(version__product=integration,
+                                                                            state=PENDING).latest('id').version.id
+                integration_dict['pending'] = True
+
+            if current_version == 0:
                 continue
 
             for context in contexts:
@@ -51,8 +55,6 @@ def make_integrations_json(integrations, contexts=[], show_pending=False):
                 process_context_structure(cloud_portal, global_context, integration_dict, None, current_version, False, False)
 
             integration_dict['id'] = integration.id
-            if show_pending:
-                integration_dict['pending'] = current_version == 0
             integrations_json.append(integration_dict)
 
     return integrations_json
@@ -77,11 +79,14 @@ def get_integrations(request):
     if not integrations.exists():
         return api_success([])
     integration_list = []
+    drafts = Product.objects.filter(product_type__type=INTEGRATION,
+                                    contentversion__productcustomizationreview__state=PENDING)
+
     # Users with manager permissions all accepted products and pending drafts
-    if UserGroupsToCustomizationPermissions.check_permission(request.user, settings.CUSTOMIZATION, 'cms.can_view_pending'):
-        drafts = Product.objects.filter(product_type__type=INTEGRATION,
-                                        contentversion__productcustomizationreview__state=PENDING)
+    if UserGroupsToCustomizationPermissions.check_permission(request.user, settings.CUSTOMIZATION, 'cms.publish_version'):
         integration_list = make_integrations_json(drafts, show_pending=True)
+    elif drafts.filter(created_by=request.user).exists():
+        integration_list = make_integrations_json(drafts.filter(created_by=request.user), show_pending=True)
 
     integration_list.extend(make_integrations_json(integrations))
     return api_success({'data': integration_list})

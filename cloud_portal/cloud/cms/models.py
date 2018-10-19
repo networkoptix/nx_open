@@ -324,7 +324,7 @@ class DataStructure(models.Model):
         if not product:
             return self.default
         content_record = DataRecord.objects.filter(product=product, data_structure=self)
-        if draft:
+        if not draft:
             content_record = content_record.\
                 exclude(version__productcustomizationreview__state=ProductCustomizationReview.REVIEW_STATES.rejected)
 
@@ -342,7 +342,7 @@ class DataStructure(models.Model):
                 # which is not more than version_id
                 # filter only accepted content_records
                 content_record = content_record.filter(version_id__lte=version_id)
-                if draft:
+                if not draft:
                     content_record = content_record.\
                         filter(version__productcustomizationreview__state=ProductCustomizationReview.REVIEW_STATES.accepted)
                 if content_record.exists():
@@ -361,9 +361,6 @@ class UserGroupsToCustomizationPermissions(models.Model):
     class Meta:
         app_label = "api"
         db_table = "cms_usergroupstocustomizationpermissions"
-        permissions = (
-            ("can_view_pending", "Can view pending versions of integrations"),
-        )
 
     group = models.ForeignKey(Group)
     customization = models.ForeignKey(Customization)
