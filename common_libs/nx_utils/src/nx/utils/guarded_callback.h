@@ -8,6 +8,18 @@
 
 namespace nx::utils {
 
+/**
+ * These functions construct a wrapper functor around provided callback and a guard QObject.
+ * The wrapper won't call the callback if the guard is destroyed by the moment of invokation.
+ *
+ * The wrapper is a variadic generic lambda, it can be used directly where non-generic function
+ * is expected, but explicit specialization must be ensured if it's passed as a generic argument,
+ * for example:
+ *     QMenu::addAction<std::function<void()>>("Name", guarded([]() {}));
+ * or
+ *     QMenu::addAction(std::function<void()>("Name", guarded([]() {})));
+ */
+
 // For callbacks without a return value.
 template<typename Callback>
 auto guarded(QPointer<const QObject> guard, Callback&& callback)
