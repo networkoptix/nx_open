@@ -53,7 +53,7 @@ export class EmbedModalContent {
 
     createEmbedUrl(params): void {
         // Cannot use A6 router at this moment - AJS is leading the parade
-        this.embedUrl = window.location.href.replace('systems', 'embed').split('?')[ 0 ];
+        const url = window.location.href.replace('systems', 'embed').split('?')[ 0 ];
         let uri = '';
 
         for (const paramsKey in params) {
@@ -66,7 +66,10 @@ export class EmbedModalContent {
             }
         }
 
-        this.embedUrl += uri;
+        this.embedUrl = '<iframe ' +
+                            'src = "' + url + uri + '" >' +
+                            'Your browser doesn\'t support iframe.' +
+                        '</iframe>';
     }
 
     close() {
