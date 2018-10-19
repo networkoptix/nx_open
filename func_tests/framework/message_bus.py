@@ -12,6 +12,7 @@ from contextlib2 import ExitStack
 import websocket
 
 from .context_logger import ContextAdapter
+from .threaded import ThreadedCall
 from .utils import with_traceback
 
 _logger = logging.getLogger(__name__)
@@ -82,32 +83,22 @@ class _MessageBusQueue(object):
 def _bus_thread_running(server_alias, ws, queue, stop_flag):
     logger = ContextAdapter(_logger.getChild('thread'), 'message-bus %s' % server_alias)
 
-    def thread_main():
-        logger.info('Thread started')
-        while not stop_flag:
-            try:
-                data = ws.recv()
-                json_data = json.loads(data)
-                logger.debug('Received:\n%s', pprint.pformat(json_data))
-                command_name = json_data['tran']['command']
-                command_class = command_name_to_class.get(command_name, TransactionCommand)
-                command = command_class(command_name, json_data)
-                transaction = Transaction(server_alias, command)
-                logger.info('Received: %s', transaction)
-                queue.put(transaction)
-            except websocket.WebSocketTimeoutException as x:
-                pass
-        logger.info('Thread finished')
+    def process_transaction():
+        try:
+            data = ws.recv()
+            json_data = json.loads(data)
+            logger.debug('Received:\n%s', pprint.pformat(json_data))
+            command_name = json_data['tran']['command']
+            command_class = command_name_to_class.get(command_name, TransactionCommand)
+            command = command_class(command_name, json_data)
+            transaction = Transaction(server_alias, command)
+            logger.info('Received: %s', transaction)
+            queue.put(transaction)
+        except websocket.WebSocketTimeoutException as x:
+            pass
 
-    thread = threading.Thread(target=thread_main)
-    thread.start()
-    try:
+    with ThreadedCall.periodic(process_transaction, description='message-bus', logger=logger):
         yield
-    finally:
-        logger.info('Stopping:')
-        stop_flag.add(None)
-        thread.join()
-        logger.info('Stopping: done; thead is joined.')
 
 
 @contextmanager

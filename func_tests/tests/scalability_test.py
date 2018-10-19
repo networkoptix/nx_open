@@ -391,7 +391,7 @@ def transactions_generated(metrics_saver, call_generator, rate, duration):
     with ExitStack() as stack:
         _logger.debug('Starting transaction generating threads.')
         for idx in range(TRANSACTION_GENERATOR_THREAD_NUMBER):
-            stack.enter_context(ThreadedCall.periodic(issue_transaction, terminate_timeout_sec=30))
+            stack.enter_context(ThreadedCall.periodic(issue_transaction, join_timeout_sec=30))
 
         yield
 
