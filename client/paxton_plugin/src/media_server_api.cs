@@ -41,6 +41,9 @@ internal class Connection
         // Ignore invalid SSL certificates.
         ServicePointManager.ServerCertificateValidationCallback =
             (senderX, certificate, chain, sslPolicyErrors) => true;
+
+        // TLS 1.2. We must hardcode it as it is not supported directly in .NET 4.0
+        ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
     }
 
     // Makes proper uri
