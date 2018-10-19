@@ -54,6 +54,24 @@ static const int kOnvifNtpExtensionId = 0xabac;
 static const int kOnvifNtpExtensionAltId = 0xabad;
 static const int kOnvifNtpExtensionWordsNumber = 3;
 
+QString getConfiguredVideoLayout(const QnResourcePtr& resource)
+{
+    QString configuredLayout;
+    auto secResource = resource.dynamicCast<QnSecurityCamResource>();
+    if (secResource)
+    {
+        auto resData = qnStaticCommon->dataPool()->data(secResource);
+        configuredLayout = resData.value<QString>(Qn::VIDEO_LAYOUT_PARAM_NAME2);
+    }
+    if (configuredLayout.isEmpty())
+    {
+        QnResourceTypePtr resType = qnResTypePool->getResourceType(resource->getTypeId());
+        if (resType)
+            configuredLayout = resType->defaultValue(Qn::VIDEO_LAYOUT_PARAM_NAME);
+    }
+    return configuredLayout;
+}
+
 } // namespace
 
 namespace RtpTransport {
@@ -589,11 +607,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
 
     m_numberOfVideoChannels = camera && camera->allowRtspVideoLayout() ?  m_RtpSession.getTrackCount(QnRtspClient::TT_VIDEO) : 1;
     {
-        QString manualConfiguredLayout;
-        QnResourceTypePtr resType = qnResTypePool->getResourceType(m_resource->getTypeId());
-        if (resType)
-            manualConfiguredLayout = resType->defaultValue(Qn::VIDEO_LAYOUT_PARAM_NAME);
-
+        QString manualConfiguredLayout = getConfiguredVideoLayout(m_resource);
         if (m_numberOfVideoChannels > 1 && manualConfiguredLayout.isEmpty())
         {
             QnMutexLocker lock( &m_layoutMutex );
