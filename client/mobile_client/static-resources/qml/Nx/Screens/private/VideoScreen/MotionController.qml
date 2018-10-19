@@ -26,14 +26,14 @@ Item
     readonly property bool drawingCustomRoi:
     {
         var result = d.customInitialRelative
-            && d.nearPositions(d.customInitialRelative, d.customTopLeftRelative)
+            && d.nearPositions(d.customInitialRelative, d.customFirstPoint)
         return result ? true : false
     }
 
     function clearCustomRoi()
     {
-        d.customTopLeftRelative = undefined
-        d.customBottomRightRelative = undefined
+        d.customFirstPoint = undefined
+        d.customSecondPoint = undefined
         updateDefaultRoi()
     }
 
@@ -69,8 +69,8 @@ Item
 
     function handleLongPressed()
     {
-        d.customTopLeftRelative = d.customInitialRelative
-        d.customBottomRightRelative = d.customInitialRelative
+        d.customFirstPoint = d.customInitialRelative
+        d.customSecondPoint = d.customInitialRelative
         updateDefaultRoi()
     }
 
@@ -86,13 +86,6 @@ Item
 
     function handleReleased()
     {
-        if (d.customTopLeftRelative && d.customBottomRightRelative)
-        {
-            var rect = d.getRectangle(d.customTopLeftRelative, d.customBottomRightRelative)
-            d.customTopLeftRelative = Qt.vector2d(rect.left, rect.top)
-            d.customBottomRightRelative = Qt.vector2d(rect.right, rect.bottom)
-        }
-
         d.customInitialRelative = undefined
         pressAndHoldTimer.stop()
     }
@@ -106,7 +99,7 @@ Item
     function handlePositionChanged(pos)
     {
         if (drawingCustomRoi)
-            d.customBottomRightRelative = d.toRelative(pos)
+            d.customSecondPoint = d.toRelative(pos)
         else if (!d.nearPositions(d.customInitialRelative, d.toRelative(pos)))
             handleCancelled()
     }
@@ -156,21 +149,17 @@ Item
     }
 
     // Test control. Represents simple preloder for the first point
-    Rectangle
+    Circle
     {
         id: tapPreloader
 
-        readonly property vector2d center: d.fromRelative(d.customInitialRelative)
-        x: center.x - width / 2
-        y: center.y - height / 2
+        centerPoint: d.fromRelative(d.customInitialRelative)
 
-        border.width: 2
-        border.color: "red"
-        radius: width / 2
+        border.width: 1
+        border.color: d.lineColor
         color: "transparent"
         visible: d.customInitialRelative ? true : false
-        height: width
-        width: visible ? 50 : 0
+        radius: visible ? 30 : 0
         Behavior on width
         {
             NumberAnimation
@@ -181,15 +170,15 @@ Item
         }
     }
 
-    // Test roi for now.
     MotionRoi
     {
         id: customRoiMarker
 
         drawing: controller.drawingCustomRoi
-        baseColor: d.lineColor
-        topLeft: d.fromRelative(d.customTopLeftRelative)
-        bottomRight: d.fromRelative(d.customBottomRightRelative)
+        roiColor: d.lineColor
+        shadowColor: d.shadowColor
+        startPoint: d.fromRelative(d.customFirstPoint)
+        endPoint: d.fromRelative(d.customSecondPoint)
         visible: controller.motionSearchMode && controller.customRoiExists
     }
 
@@ -198,9 +187,10 @@ Item
     {
         id: defaultRoi
 
-        baseColor: d.lineColor
-        topLeft: d.fromRelative(d.defaultTopLeftRelative)
-        bottomRight: d.fromRelative(d.defaultBottomRightRelative)
+        roiColor: d.lineColor
+        shadowColor: d.shadowColor
+        startPoint: d.fromRelative(d.defaultTopLeftRelative)
+        endPoint: d.fromRelative(d.defaultBottomRightRelative)
         visible: controller.motionSearchMode && d.defaultTopLeftRelative && d.defaultBottomRightRelative
             ? true :false
     }
@@ -224,16 +214,37 @@ Item
         id: d
 
         readonly property color lineColor: ColorTheme.contrast1
+        readonly property color shadowColor: ColorTheme.transparent(ColorTheme.base1, 0.2)
 
         property var customInitialRelative
-        property var customTopLeftRelative
-        property var customBottomRightRelative
+        property var customFirstPoint
+        property var customSecondPoint
+
+        property point customTopLeftRelative:
+        {
+            if (!customFirstPoint || !customSecondPoint)
+                return Qt.point(0, 0)
+
+            return Qt.point(
+                Math.min(customFirstPoint.x, customSecondPoint.x),
+                Math.min(customFirstPoint.y, customSecondPoint.y))
+        }
+
+        property point customBottomRightRelative:
+        {
+            if (!customFirstPoint || !customSecondPoint)
+                return Qt.point(0, 0)
+
+            return Qt.point(
+                Math.max(customFirstPoint.x, customSecondPoint.x),
+                Math.max(customFirstPoint.y, customSecondPoint.y))
+        }
 
         property var defaultTopLeftRelative
         property var defaultBottomRightRelative
 
         readonly property bool hasFinishedCustomRoi:
-            !controller.drawingCustomRoi && customTopLeftRelative && customBottomRightRelative
+            !controller.drawingCustomRoi && customFirstPoint && customSecondPoint
                 ? true
                 : false
 
@@ -245,8 +256,8 @@ Item
         function fromRelative(relative)
         {
             return relative
-                ? Qt.vector2d(relative.x * controller.width, relative.y * controller.height)
-                : Qt.vector2d(0, 0)
+                ? Qt.point(relative.x * controller.width, relative.y * controller.height)
+                : Qt.point(0, 0)
         }
 
         function nearPositions(first, second)
