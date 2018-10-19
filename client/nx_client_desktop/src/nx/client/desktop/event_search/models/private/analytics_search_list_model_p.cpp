@@ -162,7 +162,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             return object.firstAppearanceTimeUsec;
 
         case Qn::PreviewTimeRole:
-            return previewParams(object).timestamp.count();
+            return QVariant::fromValue(previewParams(object).timestamp.count());
 
         case Qn::DurationRole:
             return objectDurationUs(object);
