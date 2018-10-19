@@ -1,6 +1,8 @@
 #include "export_layout_settings_widget.h"
 #include "ui_export_layout_settings_widget.h"
 
+#include <nx/client/desktop/common/widgets/password_preview_button.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -10,22 +12,30 @@ ExportLayoutSettingsWidget::ExportLayoutSettingsWidget(QWidget* parent):
     ui(new Ui::ExportLayoutSettingsWidget())
 {
     ui->setupUi(this);
-    connect(ui->readOnlyCheckBox, &QCheckBox::toggled,
-        this, &ExportLayoutSettingsWidget::dataChanged);
+
+    connect(ui->readOnlyCheckBox, &QCheckBox::clicked,
+        this, &ExportLayoutSettingsWidget::emitDataEdited);
 }
 
 ExportLayoutSettingsWidget::~ExportLayoutSettingsWidget()
 {
 }
 
-bool ExportLayoutSettingsWidget::isLayoutReadOnly() const
+void ExportLayoutSettingsWidget::emitDataEdited()
 {
-    return ui->readOnlyCheckBox->isChecked();
+    Data data;
+    data.readOnly = ui->readOnlyCheckBox->isChecked();
+    emit dataEdited(data);
 }
 
-void ExportLayoutSettingsWidget::setLayoutReadOnly(bool value)
+void ExportLayoutSettingsWidget::setData(const Data& data)
 {
-    ui->readOnlyCheckBox->setChecked(value);
+    ui->readOnlyCheckBox->setChecked(data.readOnly);
+}
+
+QLayout* ExportLayoutSettingsWidget::passwordPlaceholder()
+{
+    return ui->passwordWidget->layout();
 }
 
 } // namespace desktop

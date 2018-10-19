@@ -59,7 +59,9 @@
 #include <ini.h>
 #include <api/global_settings.h>
 
-#include "nx/client/desktop/export/tools/export_media_validator.h"
+#include <nx/client/desktop/export/tools/export_media_validator.h>
+#include <nx/client/desktop/resources/layout_password_management.h>
+
 #include <nx/client/core/utils/grid_walker.h>
 
 #ifdef Q_OS_WIN
@@ -574,6 +576,9 @@ WorkbenchExportHandler::ExportInstance WorkbenchExportHandler::prepareExportTool
                 layoutSettings.readOnly = false;
                 layoutSettings.watermark = settings.transcodingSettings.watermark;
 
+                // Extract encryption options from layout-specific settings.
+                layoutSettings.encryption = dialog.exportLayoutSettings().encryption;
+
                 // Forcing camera rotation to match a rotation, used for camera in export preview.
                 // This rotation properly matches either to:
                 //  - export from the scene, uses rotation from the layout.
@@ -713,6 +718,12 @@ void WorkbenchExportHandler::at_saveLocalLayoutAction_triggered()
     if (!layout || !layout->isFile())
         return;
 
+    if (layout->data(Qn::LayoutEncryptionRole).toBool())
+    {
+        if (!layout::confirmPassword(layout, mainWindowWidget()))
+            return; //< Reconfirm the password from user and exit if it is invalid.
+    }
+
     const bool readOnly = !accessController()->hasPermissions(layout, Qn::WritePermission);
 
     ExportLayoutSettings layoutSettings;
@@ -721,6 +732,8 @@ void WorkbenchExportHandler::at_saveLocalLayoutAction_triggered()
     layoutSettings.mode = ExportLayoutSettings::Mode::LocalSave;
     layoutSettings.period = layout->getLocalRange();
     layoutSettings.readOnly = readOnly;
+    layoutSettings.encryption = {layout->data(Qn::LayoutEncryptionRole).toBool(),
+        layout->data(Qn::LayoutPasswordRole).toString()};
 
     std::unique_ptr<nx::client::desktop::AbstractExportTool> exportTool;
     exportTool.reset(new ExportLayoutTool(layoutSettings));

@@ -57,14 +57,14 @@ void QnResourceTreeModelLayoutNodeManager::primaryNodeAdded(QnResourceTreeModelN
         [node](const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& item)
         {
             chainCall<QnResourceTreeModelLayoutNode>(node,
-                &QnResourceTreeModelLayoutNode::itemAdded, item);
+                &QnResourceTreeModelLayoutNode::addItem, item);
         });
 
     connect(layout, &QnLayoutResource::itemRemoved, node,
         [node](const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& item)
         {
             chainCall<QnResourceTreeModelLayoutNode>(node,
-                &QnResourceTreeModelLayoutNode::itemRemoved, item);
+                &QnResourceTreeModelLayoutNode::removeItem, item);
         });
 }
 

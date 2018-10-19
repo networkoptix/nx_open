@@ -471,6 +471,11 @@ enum IDType
     SaveLayoutAsAction,
 
     /**
+    * Forgets password for encrypted layout.
+    */
+    ForgetLayoutPasswordAction,
+
+    /**
      * Shares selected layout with another user.
      *
      * Parameters:

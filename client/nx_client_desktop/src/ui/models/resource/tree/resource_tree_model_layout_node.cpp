@@ -12,6 +12,7 @@
 #include <ui/models/resource/tree/resource_tree_model_layout_node_manager.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <nx/client/desktop/resources/layout_password_management.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -48,8 +49,10 @@ void QnResourceTreeModelLayoutNode::initialize()
     if (!layout)
         return;
 
-    for (const auto& item: layout->getItems())
-        itemAdded(item);
+    m_isEncrypted = nx::client::desktop::layout::isEncrypted(layout);
+
+    for (const auto& item : layout->getItems())
+        addItem(item);
 }
 
 void QnResourceTreeModelLayoutNode::deinitialize()
@@ -109,10 +112,12 @@ QIcon QnResourceTreeModelLayoutNode::calculateIcon() const
     if (!resource())
         return QIcon();
 
-    return base_type::calculateIcon();
+    return m_isEncrypted
+        ? qnResIconCache->icon(QnResourceIconCache::EncryptedLayout)
+        : qnResIconCache->icon(QnResourceIconCache::Layouts);
 }
 
-void QnResourceTreeModelLayoutNode::itemAdded(const QnLayoutItemData& item)
+void QnResourceTreeModelLayoutNode::addItem(const QnLayoutItemData& item)
 {
     NX_ASSERT(model());
     if (!model())
@@ -123,6 +128,7 @@ void QnResourceTreeModelLayoutNode::itemAdded(const QnLayoutItemData& item)
 
     QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(model(), item.uuid,
         NodeType::layoutItem));
+
     node->initialize();
     node->setParent(toSharedPointer());
 
@@ -138,7 +144,7 @@ void QnResourceTreeModelLayoutNode::itemAdded(const QnLayoutItemData& item)
     updateLoadedState();
 }
 
-void QnResourceTreeModelLayoutNode::itemRemoved(const QnLayoutItemData& item)
+void QnResourceTreeModelLayoutNode::removeItem(const QnLayoutItemData& item)
 {
     if (auto node = m_items.take(item.uuid))
     {

@@ -67,6 +67,7 @@ class Stream: public Helper
 public:
     using Helper::Helper;
 
+    Stream() {}
     Stream(const Stream&) = delete;
     Stream(Stream&&) = default;
     Stream& operator=(const Stream&) = delete;

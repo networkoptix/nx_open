@@ -6,20 +6,17 @@
 #include <QtWidgets/QBoxLayout>
 
 #include <nx/client/desktop/common/utils/accessor.h>
+#include <nx/client/desktop/common/widgets/password_preview_button.h>
 #include <ui/style/custom_style.h>
 #include <ui/widgets/word_wrapped_label.h>
 #include <utils/common/delayed.h>
+
 
 namespace nx {
 namespace client {
 namespace desktop {
 
 namespace {
-
-QLineEdit* toLineEdit(QWidget* widget)
-{
-    return qobject_cast<QLineEdit*>(widget);
-}
 
 detail::BaseInputField::AccessorPtr accessor(const QByteArray& propertyName)
 {
@@ -85,22 +82,22 @@ InputField::~InputField()
 
 QLineEdit::EchoMode InputField::echoMode() const
 {
-    return toLineEdit(input())->echoMode();
+    return lineEdit()->echoMode();
 }
 
 void InputField::setEchoMode(QLineEdit::EchoMode value)
 {
-    toLineEdit(input())->setEchoMode(value);
+    lineEdit()->setEchoMode(value);
 }
 
 QString InputField::inputMask() const
 {
-    return toLineEdit(input())->inputMask();
+    return lineEdit()->inputMask();
 }
 
 void InputField::setInputMask(const QString& inputMask)
 {
-    return toLineEdit(input())->setInputMask(inputMask);
+    lineEdit()->setInputMask(inputMask);
 }
 
 const PasswordStrengthIndicator* InputField::passwordIndicator() const
@@ -126,8 +123,7 @@ void InputField::setPasswordIndicatorEnabled(
     {
         if (!d->passwordIndicator)
         {
-            d->passwordIndicator = new PasswordStrengthIndicator(
-                toLineEdit(input()), analyzeFunction);
+            d->passwordIndicator = new PasswordStrengthIndicator(lineEdit(), analyzeFunction);
             d->passwordIndicator->setVisible(false);
         }
 
@@ -139,6 +135,22 @@ void InputField::setPasswordIndicatorEnabled(
         delete d->passwordIndicator;
         d->passwordIndicator = nullptr;
     }
+}
+
+void InputField::useForPassword()
+{
+    setEchoMode(QLineEdit::Password);
+    PasswordPreviewButton::createInline(lineEdit());
+}
+
+QLineEdit* InputField::lineEdit()
+{
+    return dynamic_cast<QLineEdit*>(input());
+}
+
+const QLineEdit* InputField::lineEdit() const
+{
+    return dynamic_cast<const QLineEdit*>(input());
 }
 
 ValidationResult InputField::calculateValidationResult() const

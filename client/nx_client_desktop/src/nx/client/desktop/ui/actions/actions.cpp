@@ -983,6 +983,11 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Screen Settings..."))
         .condition(!condition::isSafeMode());
 
+    factory(ForgetLayoutPasswordAction)
+        .flags(Tree | SingleTarget | ResourceTarget)
+        .text(ContextMenu::tr("Forget password"))
+        .condition(condition::canForgetPassword() && !condition::isLayoutTourReviewMode());
+
     factory(SaveLayoutAction)
         .flags(TitleBar | Tree | SingleTarget | ResourceTarget)
         .requiredTargetPermissions(Qn::SavePermission)
