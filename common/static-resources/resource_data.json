@@ -2863,6 +2863,13 @@
             ],
             "clearInputsTimeoutSec": 1,
             "comment": "considers input state as 0 after specified timeout"
+        },
+        {
+            "keys": [
+                "BOSCH|MIC IP starlight 7000 HD",
+                "BOSCH|MIC IP starlight 7000i"
+            ],
+            "onvifPtzDigitsAfterDecimalPoint": 2
         }
     ]
 }
