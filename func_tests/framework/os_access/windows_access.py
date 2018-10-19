@@ -16,6 +16,7 @@ from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.os_access_interface import OSAccess, Time
 from framework.os_access.smb_path import SMBPath
 from framework.os_access.windows_remoting import WinRM
+from framework.os_access.windows_remoting._cim_query import find_by_selector_set
 from framework.os_access.windows_remoting._powershell import PowershellError
 from framework.os_access.windows_remoting.env_vars import EnvVars
 from framework.os_access.windows_remoting.users import Users
@@ -183,10 +184,20 @@ class WindowsAccess(OSAccess):
         return self.path_cls('C:\\')
 
     def _free_disk_space_bytes_on_all(self):
-        disks = self.winrm.wmi_query('Win32_LogicalDisk', {}).enumerate()
+        mount_point_iter = self.winrm.wmi_query('Win32_MountPoint', {}).enumerate()
+        volume_iter = self.winrm.wmi_query('Win32_Volume', {}).enumerate()
+        volume_list = list(volume_iter)
         result = {}
-        for disk in disks:
-            result[self.path_cls(disk['Name']) / '\\'] = int(disk['FreeSpace'])
+        for mount_point in mount_point_iter:
+            # Rely on fact that single identifying selector of `Directory` is its name.
+            # TODO: Query `Win32_Directory` (`Directory` key) by its `w:SelectorSet`.
+            dir_selector_set = mount_point['Directory']['a:ReferenceParameters']['w:SelectorSet']
+            assert dir_selector_set['w:Selector'][0]['@Name'] == 'Name'
+            dir_path_raw = dir_selector_set['w:Selector'][0]['#text']
+            dir_path = self.path_cls(dir_path_raw)
+            volume_selector_set = mount_point['Volume']['a:ReferenceParameters']['w:SelectorSet']
+            volume = find_by_selector_set(volume_selector_set, volume_list)
+            result[dir_path] = int(volume['FreeSpace'])
         return result
 
     def _hold_disk_space(self, to_consume_bytes):

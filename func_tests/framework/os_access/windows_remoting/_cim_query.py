@@ -112,7 +112,7 @@ class _CimAction(object):
             response,
             dict_constructor=dict,  # Order is meaningless.
             process_namespaces=True, namespaces=self.namespaces,  # Force namespace aliases.
-            force_list=['w:Item'],
+            force_list=['w:Item', 'w:Selector'],
             postprocessor=self._substitute_namespace_in_type_attribute,
             )
         return response_dict['env:Envelope']['env:Body']
@@ -238,3 +238,15 @@ class CIMQuery(object):
                 pformat(method_output),
                 ))
         return method_output
+
+
+def find_by_selector_set(selector_set, items):
+    """Selector set is analogous to primary key in relational DB. It's the way objects are referred
+    to in WSMan. That's why only one object is returned.
+    """
+    for item in items:
+        for selector in selector_set['w:Selector']:
+            if item[selector['@Name']] != selector['#text']:
+                break
+        else:
+            return item
