@@ -77,15 +77,17 @@ class HttpClient(object):
         # noinspection PyProtectedMember
         return self._base_url._replace(scheme='rtsp', path='/' + path.lstrip('/')).url
 
-    @contextmanager
-    def websocket_opened(self, path, timeout_sec=0.5):
+    def open_websocket(self, path, timeout_sec=0.5):
         url = self._base_url._replace(scheme='ws', path=path).url
         credentials = '%s:%s' % (self.user, self.password)
         authorization = 'Basic ' + base64.b64encode(credentials.encode())
         headers = dict(Authorization=authorization)
         _logger.debug('Create websocket connection: %s', url)
-        ws = websocket.create_connection(url, header=headers, timeout=timeout_sec)
-        with closing(ws):
+        return websocket.create_connection(url, header=headers, timeout=timeout_sec)
+
+    @contextmanager
+    def websocket_opened(self, path, timeout_sec=0.5):
+        with closing(self.open_websocket(path, timeout_sec)) as ws:
             yield ws
 
     def request(self, method, path, timeout=None, **kwargs):

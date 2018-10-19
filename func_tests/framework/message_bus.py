@@ -1,9 +1,11 @@
 from collections import namedtuple
+import errno
 import json
 import pprint
 import sys
 import time
 import queue as queue_module
+import socket
 import threading
 import logging
 from contextlib import contextmanager
@@ -80,25 +82,43 @@ class _MessageBusQueue(object):
 
 
 @contextmanager
-def _bus_thread_running(server_alias, ws, queue, stop_flag):
-    logger = ContextAdapter(_logger.getChild('thread'), 'message-bus %s' % server_alias)
+def _bus_thread_running(server, queue):
+
+    def open_websocket():
+        return server.api.generic.http.open_websocket('/ec2/messageBus')
+
+    logger = ContextAdapter(_logger.getChild('thread'), 'message-bus %s' % server.api.generic.alias)
+    wsl = [open_websocket()]
 
     def process_transaction():
         try:
-            data = ws.recv()
+            data = wsl[0].recv()
             json_data = json.loads(data)
-            logger.debug('Received:\n%s', pprint.pformat(json_data))
-            command_name = json_data['tran']['command']
-            command_class = command_name_to_class.get(command_name, TransactionCommand)
-            command = command_class(command_name, json_data)
-            transaction = Transaction(server_alias, command)
-            logger.info('Received: %s', transaction)
-            queue.put(transaction)
         except websocket.WebSocketTimeoutException as x:
-            pass
+            return
+        except socket.error as x:
+            logger.error('Socket error: [%s] %s', x.errrno, x.strerror)
+            if x.errno in [errno.ECONNRESET, errno.EPIPE]:
+                logger.info('Reopening socket.')
+                wsl[0].close()
+                wsl[0] = open_websocket()
+                return
+            else:
+                raise
 
-    with ThreadedCall.periodic(process_transaction, description='message-bus', logger=logger):
-        yield
+        logger.debug('Received:\n%s', pprint.pformat(json_data))
+        command_name = json_data['tran']['command']
+        command_class = command_name_to_class.get(command_name, TransactionCommand)
+        command = command_class(command_name, json_data)
+        transaction = Transaction(server.api.generic.alias, command)
+        logger.info('Received: %s', transaction)
+        queue.put(transaction)
+
+    try:
+        with ThreadedCall.periodic(process_transaction, description='message-bus', logger=logger):
+            yield
+    finally:
+        wsl[0].close()
 
 
 @contextmanager
@@ -106,13 +126,10 @@ def message_bus_running(mediaserver_iter):
     queue = queue_module.Queue()
     # Stop flag is shared between threads for faster shutdown:
     # after first thread's yield returned all other will start exiting too.
-    stop_flag = set()
     with ExitStack() as stack:
         _logger.debug('Starting message bus threads.')
         for server in mediaserver_iter:
-            ws = stack.enter_context(server.api.generic.http.websocket_opened('/ec2/messageBus'))
-            stack.enter_context(_bus_thread_running(
-                server.api.generic.alias, ws, queue, stop_flag))
+            stack.enter_context(_bus_thread_running(server, queue))
         yield _MessageBusQueue(queue)
         _logger.debug('Stopping message bus threads:')
     _logger.debug('Stopping message bus threads: done')
