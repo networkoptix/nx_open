@@ -589,19 +589,28 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
 
     m_numberOfVideoChannels = camera && camera->allowRtspVideoLayout() ?  m_RtpSession.getTrackCount(QnRtspClient::TT_VIDEO) : 1;
     {
-        QnMutexLocker lock( &m_layoutMutex );
-        m_customVideoLayout.clear();
-        QString newVideoLayout;
-        if (m_numberOfVideoChannels > 1) {
-            m_customVideoLayout = QnCustomResourceVideoLayoutPtr(new QnCustomResourceVideoLayout(QSize(m_numberOfVideoChannels, 1)));
+        QString manualConfiguredLayout;
+        QnResourceTypePtr resType = qnResTypePool->getResourceType(m_resource->getTypeId());
+        if (resType)
+            manualConfiguredLayout = resType->defaultValue(Qn::VIDEO_LAYOUT_PARAM_NAME);
+
+        if (m_numberOfVideoChannels > 1 && manualConfiguredLayout.isEmpty())
+        {
+            QnMutexLocker lock( &m_layoutMutex );
+            m_customVideoLayout.clear();
+            QString newVideoLayout;
+            m_customVideoLayout = QnCustomResourceVideoLayoutPtr(
+                new QnCustomResourceVideoLayout(QSize(m_numberOfVideoChannels, 1)));
             for (int i = 0; i < m_numberOfVideoChannels; ++i)
                 m_customVideoLayout->setChannel(i, 0, i); // arrange multi video layout from left to right
 
             newVideoLayout = m_customVideoLayout->toString();
             QnVirtualCameraResourcePtr camRes = m_resource.dynamicCast<QnVirtualCameraResource>();
-            if (camRes && m_role == Qn::CR_LiveVideo)
-                if (camRes->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout))
-                    camRes->saveParams();
+            if (camRes && m_role == Qn::CR_LiveVideo &&
+                camRes->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout))
+            {
+                camRes->saveParams();
+            }
         }
     }
 
