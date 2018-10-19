@@ -15,8 +15,6 @@ namespace test {
 
 class CameraMock: public Camera
 {
-    Q_OBJECT
-
 public:
     CameraMock(QnMediaServerModule* serverModule);
     using Camera::initInternal;
