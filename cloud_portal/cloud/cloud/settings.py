@@ -311,7 +311,7 @@ HOOK_EVENTS = {
 BROKER_URL = os.getenv('QUEUE_BROKER_URL')
 BROKER_CONNECTION_MAX_RETRIES = 1
 if not BROKER_URL:
-    BROKER_URL = 'sqs://AKIAIQVGGMML4WNBECRA:jmXYHNKOAL9gYYaxAVClgegzShjaPF27ycvBOV1s@'
+    BROKER_URL = 'sqs://AKIAJLGVEWNXAIODNKLA:W+Xah8vz129nZBpukBkwZsz3fLtnzOLUqEMDthZp@'
 
 BROKER_TRANSPORT_OPTIONS = {
     'queue_name_prefix' : conf['queue_name'] + '-',
