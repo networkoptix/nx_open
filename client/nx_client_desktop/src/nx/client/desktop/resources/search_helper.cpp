@@ -50,9 +50,6 @@ Matches matchValues(const QString& searchString, const QnResourcePtr& resource)
                     result.emplace(parameter, value);
             };
 
-        // Check id's by full match, both with and without braces.
-        checkParameter(Parameter::id, resource->getId().toSimpleString(), true);
-        checkParameter(Parameter::id, resource->getId().toString(), true);
         if (resource->logicalId() > 0)
             checkParameter(Parameter::logicalId, QString::number(resource->logicalId()), true);
         checkParameter(Parameter::name, resource->getName());
@@ -60,6 +57,9 @@ Matches matchValues(const QString& searchString, const QnResourcePtr& resource)
 
         if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
         {
+            // Check id's by full match, both with and without braces.
+            checkParameter(Parameter::id, camera->getId().toSimpleString(), true);
+            checkParameter(Parameter::id, camera->getId().toString(), true);
             checkParameter(Parameter::mac, camera->getMAC().toString());
             checkParameter(Parameter::host, camera->getHostAddress());
             checkParameter(Parameter::model, camera->getModel());
