@@ -19,8 +19,11 @@ ShaderEffect
         lineSize / cellSize.x,
         lineSize / cellSize.y)
 
+    readonly property string shaderVersion:
+        OpenGLInfo.renderableType == OpenGLInfo.OpenGLES ? 100 : 120
+
     vertexShader: "
-        #version 120
+        #version" + shaderVersion + "
 
         uniform vec2 cellSize;
         uniform mat4 qt_Matrix;
@@ -36,7 +39,7 @@ ShaderEffect
         }"
 
     fragmentShader: "
-        #version 120
+        #version" + shaderVersion + "
 
         uniform vec4 color;
         uniform vec2 lineSizeInCellCoords;
