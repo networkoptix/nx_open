@@ -1,9 +1,9 @@
 #pragma once
 
-#include <QtCore/QUrl>
+#include <memory>
+#include <vector>
 
-#include <nx/network/http/http_async_client.h>
-#include <nx/utils/url.h>
+#include <nx/network/http/generic_api_client.h>
 
 #include "listening_peer.h"
 
@@ -11,16 +11,23 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-// TODO: #ak Refactor this class and move to an appropriate place.
-class NX_NETWORK_API Client
+class NX_NETWORK_API Client:
+    public nx::network::http::GenericApiClient<Client>
 {
+    using base_type = nx::network::http::GenericApiClient<Client>;
+
 public:
+    using ResultCode = nx::network::http::StatusCode::Value;
+
+    using ListeningPeersHandler =
+        nx::utils::MoveOnlyFunc<void(ResultCode, ListeningPeers)>;
+
     Client(const nx::utils::Url& baseMediatorApiUrl);
+    ~Client();
 
-    std::tuple<nx::network::http::StatusCode::Value, ListeningPeers> getListeningPeers() const;
+    void getListeningPeers(ListeningPeersHandler completionHandler);
 
-private:
-    const nx::utils::Url m_baseMediatorApiUrl;
+    std::tuple<ResultCode, ListeningPeers> getListeningPeers();
 };
 
 } // namespace api
