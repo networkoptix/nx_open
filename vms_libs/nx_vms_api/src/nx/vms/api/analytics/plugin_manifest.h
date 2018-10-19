@@ -19,11 +19,10 @@ public: //< Required for Qt MOC run.
     QString name;
     QString version; //< Maybe replace it with Version struct?
     QJsonObject engineSettingsModel;
-    QJsonObject deviceAgentSettingsModel;
 };
 
 #define nx_vms_api_analytics_PluginManifest_Fields \
-    (id)(name)(version)(engineSettingsModel)(deviceAgentSettingsModel)
+    (id)(name)(version)(engineSettingsModel)
 
 QN_FUSION_DECLARE_FUNCTIONS(PluginManifest, (json), NX_VMS_API)
 
