@@ -2,7 +2,6 @@ import yaml
 from django import forms
 from .models import *
 
-import jsonfield
 from dal import autocomplete
 
 
@@ -111,22 +110,12 @@ class CustomContextForm(forms.Form):
                 continue
 
             elif data_structure.type == DataStructure.DATA_TYPES.external_file:
-                external_file_field = "{}_external_file".format(data_structure.name)
-                external_label = "{} file".format(ds_label)
-                external_file_record = DataRecord.objects.filter(value=record_value).latest('id').external_file
-                external_file = external_file_record.file.url if external_file_record else ""
-                self.fields[external_file_field] = forms.FileField(label=external_label,
+                self.fields[data_structure.name] = forms.FileField(label=ds_label,
                                                                    help_text=ds_description,
-                                                                   initial=external_file,
+                                                                   initial=record_value,
                                                                    required=False,
                                                                    disabled=disabled)
 
-                ds_label = "{} meta data".format(ds_label)
-                self.fields[data_structure.name] = jsonfield.fields.JSONCharFormField(required=False,
-                                                                                      label=ds_label,
-                                                                                      help_text=ds_description,
-                                                                                      initial=record_value,
-                                                                                      disabled=disabled)
                 continue
 
             elif data_structure.type == DataStructure.DATA_TYPES.select:

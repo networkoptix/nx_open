@@ -117,12 +117,10 @@ def save_unrevisioned_records(product, context, language, data_structures,
                 new_record_value = values[0]
 
         elif data_structure.type == DataStructure.DATA_TYPES.external_file:
-            # External files are a special case that have different names than the data structure
-            external_file_name = '{}_external_file'.format(data_structure_name)
 
             # If the user uploads a new file create a new ExternalFile record
-            if external_file_name in request_files:
-                request_file = request_files[external_file_name]
+            if data_structure_name in request_files:
+                request_file = request_files[data_structure_name]
                 md5 = hashlib.md5()
                 for chunk in request_file.chunks():
                     md5.update(chunk)
@@ -130,16 +128,11 @@ def save_unrevisioned_records(product, context, language, data_structures,
                                              md5=md5.hexdigest(),
                                              size=request_file.size/1048576.0)
                 external_file.save()
+                new_record_value = external_file.file.url
 
             # Mark this file for deletion
-            elif 'delete_' + external_file_name in request_data and request_data['delete_' + external_file_name]:
+            elif 'delete_' + data_structure_name in request_data and request_data['delete_' + data_structure_name]:
                 delete_file = True
-
-            # If we change the meta information we will take the latest ExternalFile for this DataStructure
-            elif external_file_name in request_data:
-                external_file = DataRecord.objects.filter(data_structure=data_structure).latest('id').external_file
-
-            new_record_value = request_data[data_structure_name]
 
         elif data_structure_name in request_data:
             new_record_value = request_data[data_structure_name]
