@@ -187,6 +187,8 @@
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
+#include <nx/mediaserver/rest/device_analytics_settings_handler.h>
+#include <nx/mediaserver/rest/analytics_engine_settings_handler.h>
 
 #include <rtsp/rtsp_connection.h>
 
@@ -2579,6 +2581,37 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:string description Setiing description
      */
     reg("api/settingsDocumentation", new QnSettingsDocumentationHandler(&serverModule()->settings()));
+
+
+    /**%apidoc GET /ec2/analyticsEngineSettings
+     * Return settings values of the specified engine
+     * %return:object JSON object consisting of name-value settings pairs
+     *      %param:string engineId Id of analytics engine
+     *
+     * %apidoc POST /ec2/analyticsEngineSettings
+     * Applies passed settings values to correspondent analytics engine
+     * %param:string engineId Id of analytics engine
+     * %param settings JSON object consisting of name-value settings pairs
+     */
+    reg(
+        "ec2/analyticsEngineSettings",
+        new nx::mediaserver::rest::AnalyticsEngineSettingsHandler(serverModule()));
+
+    /**%apidoc GET /ec2/deviceAnalyticsSettings
+     * Return settings values of the specified device-engine pair
+     * %return:object JSON object consisting of name-value settings pairs
+     *      %param:string engineId Id of an analytics engine
+     *      %param:string deviceId Id of a device
+     *
+     * %apidoc POST /ec2/deviceAnalyticsSettings
+     * Applies passed settings values to the correspondent device-engine pair
+     * %param:string engineId Id of an analytics engine
+     * %param:string deviceId Id of a device
+     * %param settings JSON object consisting of name-value settings pairs
+     */
+    reg(
+        "ec2/deviceAnalyticsSettings",
+        new nx::mediaserver::rest::DeviceAnalyticsSettingsHandler(serverModule()));
 }
 
 template<class TcpConnectionProcessor, typename... ExtraParam>
