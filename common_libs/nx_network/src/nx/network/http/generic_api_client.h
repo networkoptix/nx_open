@@ -217,12 +217,12 @@ typename GenericApiClient<Implementation>::Context
 template<typename Implementation>
 template<typename... Output>
 auto GenericApiClient<Implementation>::getResultCode(
-    SystemError::ErrorCode systemErrorCode,
+    [[maybe_unused]] SystemError::ErrorCode systemErrorCode,
     const network::http::Response* response,
     const Output&... output) const
 {
     if constexpr (std::is_same<
-        Implementation::ResultCode,
+        typename Implementation::ResultCode,
         network::http::StatusCode::Value>::value)
     {
         return response
