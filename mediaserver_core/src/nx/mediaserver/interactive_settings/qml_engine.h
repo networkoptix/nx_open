@@ -15,7 +15,7 @@ public:
     virtual ~QmlEngine() override;
 
     virtual void load(const QByteArray& data) override;
-    virtual void load(const QUrl& url) override;
+    virtual void load(const QString& fileName) override;
 
 private:
     class Private;

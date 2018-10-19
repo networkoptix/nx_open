@@ -213,6 +213,7 @@ void QnCommonModule::setModuleGUID(const QnUuid& guid)
 
 QnCommonModule::~QnCommonModule()
 {
+    resourcePool()->threadPool()->waitForDone();
     /* Here all singletons will be destroyed, so we guarantee all socket work will stop. */
     clear();
 }

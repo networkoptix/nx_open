@@ -67,8 +67,12 @@ QnUuid QnSecurityCamResource::makeCameraIdFromUniqueId(const QString& uniqueId)
     return guidFromArbitraryData(uniqueId);
 }
 
-//const int PRIMARY_ENCODER_INDEX = 0;
-//const int SECONDARY_ENCODER_INDEX = 1;
+void QnSecurityCamResource::setCommonModule(QnCommonModule* commonModule)
+{
+    base_type::setCommonModule(commonModule);
+    connect(commonModule->dataPool(), &QnResourceDataPool::changed, this,
+        &QnSecurityCamResource::resetCachedValues, Qt::DirectConnection);
+}
 
 QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     base_type(commonModule),
@@ -1310,6 +1314,7 @@ void QnSecurityCamResource::resetCachedValues()
     m_cachedCameraMediaCapabilities.reset();
     m_cachedLicenseType.reset();
     m_cachedDeviceType.reset();
+    m_cachedHasVideo.reset();
 }
 
 bool QnSecurityCamResource::useBitratePerGop() const

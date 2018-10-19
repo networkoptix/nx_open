@@ -2,8 +2,31 @@
 
 #include <nx/fusion/model_functions.h>
 
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::analytics::EngineManifest, Capability)
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::analytics::EngineManifest, Capabilities)
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::analytics::EngineManifest, Capability,
+    (nx::vms::api::analytics::EngineManifest::Capability::noCapabilities, "noCapabilities")
+    (nx::vms::api::analytics::EngineManifest::Capability::needUncompressedVideoFrames_yuv420, "needUncompressedVideoFrames_yuv420")
+    (nx::vms::api::analytics::EngineManifest::Capability::needUncompressedVideoFrames_argb, "needUncompressedVideoFrames_argb")
+    (nx::vms::api::analytics::EngineManifest::Capability::needUncompressedVideoFrames_abgr, "needUncompressedVideoFrames_abgr")
+    (nx::vms::api::analytics::EngineManifest::Capability::needUncompressedVideoFrames_rgba, "needUncompressedVideoFrames_rgba")
+    (nx::vms::api::analytics::EngineManifest::Capability::needUncompressedVideoFrames_bgra, "needUncompressedVideoFrames_bgra")
+    (nx::vms::api::analytics::EngineManifest::Capability::needUncompressedVideoFrames_rgb, "needUncompressedVideoFrames_rgb")
+    (nx::vms::api::analytics::EngineManifest::Capability::needUncompressedVideoFrames_bgr, "needUncompressedVideoFrames_bgr")
+    (nx::vms::api::analytics::EngineManifest::Capability::cameraModelIndependent, "cameraModelIndependent")
+)
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::analytics::EngineManifest::Capability, (numeric)(debug))
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::analytics::EngineManifest, Capabilities,
+    (nx::vms::api::analytics::EngineManifest::Capability::noCapabilities, "noCapabilities")
+    (nx::vms::api::analytics::EngineManifest::Capability::needUncompressedVideoFrames_yuv420, "needUncompressedVideoFrames_yuv420")
+    (nx::vms::api::analytics::EngineManifest::Capability::needUncompressedVideoFrames_argb, "needUncompressedVideoFrames_argb")
+    (nx::vms::api::analytics::EngineManifest::Capability::needUncompressedVideoFrames_abgr, "needUncompressedVideoFrames_abgr")
+    (nx::vms::api::analytics::EngineManifest::Capability::needUncompressedVideoFrames_rgba, "needUncompressedVideoFrames_rgba")
+    (nx::vms::api::analytics::EngineManifest::Capability::needUncompressedVideoFrames_bgra, "needUncompressedVideoFrames_bgra")
+    (nx::vms::api::analytics::EngineManifest::Capability::needUncompressedVideoFrames_rgb, "needUncompressedVideoFrames_rgb")
+    (nx::vms::api::analytics::EngineManifest::Capability::needUncompressedVideoFrames_bgr, "needUncompressedVideoFrames_bgr")
+    (nx::vms::api::analytics::EngineManifest::Capability::cameraModelIndependent, "cameraModelIndependent")
+)
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::analytics::EngineManifest::Capabilities, (numeric)(debug))
 
 namespace nx::vms::api::analytics {
 

@@ -16,6 +16,7 @@
 #include <plugins/plugin_manager.h>
 #include <plugins/plugin_tools.h>
 #include <plugins/plugins_ini.h>
+#include <plugins/settings.h>
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
@@ -35,12 +36,12 @@
 
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/debugging/visual_metadata_debugger_factory.h>
-#include <nx/plugins/settings.h>
 #include <nx/utils/log/log_main.h>
 
 #include <nx/sdk/analytics/consuming_device_agent.h>
 #include <nx/sdk/analytics/pixel_format.h>
 #include <nx/sdk/analytics/plugin.h>
+#include <nx/sdk/settings.h>
 
 #include "yuv420_uncompressed_video_frame.h"
 #include "generic_uncompressed_video_frame.h"
@@ -139,28 +140,22 @@ void Manager::at_resourceAdded(const QnResourcePtr& resource)
         NX_VERBOSE(
             this,
             lm("Analytics engine %1 (%2) has been added.")
-                .args(analyticsEngine->getName(), analyticsEngine->getId()));
+               .args(analyticsEngine->getName(), analyticsEngine->getId()));
 
         at_engineAdded(analyticsEngine);
         return;
     }
 
     auto device = resource.dynamicCast<QnVirtualCameraResource>();
-    if (!device)
+    if (device)
     {
         NX_VERBOSE(
             this,
-            lm("Resource %1 (%2) is neither analytics engine nor device. Skipping.")
-                .args(resource->getName(), resource->getId()));
-        return;
-    }
-
-    NX_VERBOSE(
-        this,
-        lm("Device %1 (%2) has been added.")
+            lm("Device %1 (%2) has been added.")
             .args(resource->getName(), resource->getId()));
 
-    at_deviceAdded(device);
+        at_deviceAdded(device);
+    }
 }
 
 void Manager::at_resourceRemoved(const QnResourcePtr& resource)
@@ -572,5 +567,4 @@ void Manager::setEngineSettings(Engine* engine)
 } // namespace analytics
 } // namespace mediaserver
 } // namespace nx
-
 

@@ -16,7 +16,8 @@
 #include <nx/mediaserver/resource/analytics_plugin_resource.h>
 #include <nx/mediaserver/resource/analytics_engine_resource.h>
 
-#include <nx/plugins/settings.h>
+#include <nx/sdk/settings.h>
+#include <plugins/settings.h>
 
 class QnMediaServerModule;
 namespace nx::mediaserver::analytics {

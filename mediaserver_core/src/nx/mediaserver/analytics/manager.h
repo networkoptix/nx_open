@@ -31,8 +31,6 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/debugging/abstract_visual_metadata_debugger.h>
 
-#include <nx/plugins/settings.h>
-
 class QnMediaServerModule;
 class QnCompressedVideoData;
 

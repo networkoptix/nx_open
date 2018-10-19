@@ -9,6 +9,7 @@
 
 #include "settings.h"
 #include <plugins/resource/mdns/mdns_listener.h>
+#include <plugins/native_sdk/common_plugin_container.h>
 #include <nx/network/upnp/upnp_device_searcher.h>
 #include <nx/mediaserver/analytics/event_rule_watcher.h>
 #include <nx/mediaserver/analytics/manager.h>

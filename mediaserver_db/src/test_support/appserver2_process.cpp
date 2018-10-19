@@ -362,19 +362,18 @@ void Appserver2Process::registerHttpHandlers(
         {
             const auto data = QJson::deserialized<MergeSystemData>(request.messageBody);
             nx::vms::utils::SystemMergeProcessor systemMergeProcessor(m_commonModule.get());
-            const auto statusCode = systemMergeProcessor.merge(
+            *result = systemMergeProcessor.merge(
                 Qn::kSystemAccess,
                 QnAuthSession(),
-                data,
-                result);
-            if (nx::network::http::StatusCode::isSuccessCode(statusCode))
+                data);
+            if (result->error == QnRestResult::Error::NoError)
             {
                 m_ecConnection.load()->addRemotePeer(
                     systemMergeProcessor.remoteModuleInformation().id,
                     data.url);
             }
 
-            return statusCode;
+            return nx::network::http::StatusCode::ok;
         });
 
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/setupLocalSystem",

@@ -13,7 +13,8 @@
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 
 #include <nx/sdk/analytics/plugin.h>
-#include <nx/plugins/settings.h>
+#include <nx/sdk/settings.h>
+#include <plugins/settings.h>
 
 #include <plugins/plugin_manager.h>
 #include <common/common_module.h>

@@ -52,7 +52,7 @@ private:
         int64_t linearize(uint32_t rtpTime);
 
     private:
-        int64_t m_prevTime = 0;
+        uint32_t m_prevTime = 0;
         int64_t m_highPart = 0;
     };
 
