@@ -1828,7 +1828,9 @@ void initialize(Manager* manager, Action* root)
         .separator();
 
     factory(ToggleThumbnailsAction)
-        .flags(NoTarget);
+        .flags(NoTarget)
+        .text(ContextMenu::tr("Show Thumbnails"))
+        .toggledText(ContextMenu::tr("Hide Thumbnails"));
 
     factory(BookmarksModeAction)
         .flags(NoTarget)
