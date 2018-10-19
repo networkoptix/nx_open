@@ -13,7 +13,7 @@
 namespace nx::network::http {
 
 /**
- * Base class for client of REST API based on HTTP/json.
+ * Base class for client of some API. E.g., REST API based on HTTP/json.
  * Implementation MUST define:
  * - ResultCode type.
  * - If ResultCode is different from nx::network::http::StatusCode, then following method MUST be 
