@@ -19,9 +19,14 @@ import * as angular from 'angular';
                 this.systems = [];
 
                 this.forceUpdateSystems = function () {
-                    return cloudApi.systems().then(result => {
-                        this.systems = this.sortSystems(result.data);
-                    });
+                    return cloudApi
+                        .systems()
+                        .then(result => {
+                            this.systems = this.sortSystems(result.data);
+                            return $q.resolve();
+                        }, error => {
+                            return $q.reject(error);
+                        });
                 };
 
                 this.delayedUpdateSystems = function () {
