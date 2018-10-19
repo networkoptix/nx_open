@@ -62,6 +62,9 @@ protected:
 
     void stopInAioThread()
     {
+        if (m_stopped)
+            return;
+
         NX_VERBOSE(this, "connection: stop requested, shutting down");
         m_stopped = true;
         m_readyPromise.set_value();
