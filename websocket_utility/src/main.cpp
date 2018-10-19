@@ -492,7 +492,7 @@ static bool validateConfig()
 static bool sigHandler(DWORD fdwCtrlType)
 {
     NX_INFO(kWebsocketUtilityTag, "received SIGINT, shutting down connections..");
-    std::thread([]() { websocketConnectionsPoolInstance->stopAll(); }).detach();
+    std::thread([]() { waitablePoolInstance->stopAll(); }).detach();
     return true;
 }
 
