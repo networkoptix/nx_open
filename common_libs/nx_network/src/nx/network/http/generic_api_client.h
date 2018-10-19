@@ -76,6 +76,14 @@ private:
         const std::string& requestPath,
         InputArgs... inputArgs);
 
+    template<typename CompletionHandler, typename... Output>
+    void processResponse(
+        network::aio::BasicPollable* requestPtr,
+        CompletionHandler handler,
+        SystemError::ErrorCode error,
+        const network::http::Response* response,
+        Output... output);
+
     Context takeContextOfRequest(
         nx::network::aio::BasicPollable* httpClientPtr);
 
@@ -84,6 +92,11 @@ private:
         SystemError::ErrorCode systemErrorCode,
         const network::http::Response* response,
         const Output&... output) const;
+
+    template<typename Output, typename ResultTuple, typename... InputArgs>
+    auto makeSyncCallInternal(
+        const std::string& requestPath,
+        InputArgs... inputArgs);
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -120,30 +133,22 @@ void GenericApiClient<Implementation>::stopWhileInAioThread()
 }
 
 template<typename Implementation>
-template<typename OutputData, typename CompletionHandler, typename... InputArgs>
+template<typename Output, typename CompletionHandler, typename... InputArgs>
 void GenericApiClient<Implementation>::makeAsyncCall(
     const std::string& requestPath,
-    CompletionHandler completionHandler,
+    CompletionHandler handler,
     InputArgs... inputArgs)
 {
-    auto httpClientPtr = createHttpClient<OutputData>(
+    auto request = createHttpClient<Output>(
         requestPath,
         std::move(inputArgs)...);
 
-    httpClientPtr->execute(
-        [this, httpClientPtr, completionHandler = std::move(completionHandler)](
-            SystemError::ErrorCode systemErrorCode,
-            const network::http::Response* response,
-            OutputData output)
-    {
-        Context context = takeContextOfRequest(httpClientPtr);
-
-        const auto resultCode =
-            static_cast<const Implementation*>(this)->getResultCode(
-                systemErrorCode, response, output);
-
-        completionHandler(resultCode, std::move(output));
-    });
+    request->execute(
+        [this, request, handler = std::move(handler)](
+            auto&&... args) mutable
+        {
+            processResponse(request, std::move(handler), std::move(args)...);
+        });
 }
 
 template<typename Implementation>
@@ -154,22 +159,20 @@ auto GenericApiClient<Implementation>::makeSyncCall(
 {
     using ResultCode = typename Implementation::ResultCode;
 
-    std::promise<std::tuple<typename Implementation::ResultCode, Output>> done;
-    makeAsyncCall<Output>(
-        requestPath,
-        [this, &done](ResultCode resultCode, Output output)
-        {
-            // Doing post to make sure all network operations are completed before returning.
-            post(
-                [&done, resultCode, output = std::move(output)]()
-                {
-                    done.set_value(std::make_tuple(resultCode, std::move(output)));
-                });
-        },
-        std::move(inputArgs)...);
-
-    auto result = done.get_future().get();
-    return result;
+    if constexpr (std::is_same<Output, void>::value)
+    {
+        return makeSyncCallInternal<
+            void,
+            std::tuple<typename Implementation::ResultCode>>(
+                requestPath, std::move(inputArgs)...);
+    }
+    else
+    {
+        return makeSyncCallInternal<
+            Output,
+            std::tuple<typename Implementation::ResultCode, Output>>(
+                requestPath, std::move(inputArgs)...);
+    }
 }
 
 template<typename Implementation>
@@ -201,6 +204,24 @@ auto GenericApiClient<Implementation>::createHttpClient(
     }
 
     return httpClientPtr;
+}
+
+template<typename Implementation>
+template<typename CompletionHandler, typename... Output>
+void GenericApiClient<Implementation>::processResponse(
+    network::aio::BasicPollable* requestPtr,
+    CompletionHandler handler,
+    SystemError::ErrorCode error,
+    const network::http::Response* response,
+    Output... output)
+{
+    Context context = takeContextOfRequest(requestPtr);
+
+    const auto resultCode =
+        static_cast<const Implementation*>(this)->getResultCode(
+            error, response, output...);
+
+    handler(resultCode, std::move(output)...);
 }
 
 template<typename Implementation>
@@ -240,6 +261,32 @@ auto GenericApiClient<Implementation>::getResultCode(
             response,
             output...);
     }
+}
+
+template<typename Implementation>
+template<typename Output, typename ResultTuple, typename... InputArgs>
+auto GenericApiClient<Implementation>::makeSyncCallInternal(
+    const std::string& requestPath,
+    InputArgs... inputArgs)
+{
+    std::promise<ResultTuple> done;
+
+    makeAsyncCall<Output>(
+        requestPath,
+        [this, &done](auto&&... args)
+        {
+            auto result = std::make_tuple(std::move(args)...);
+            // Doing post to make sure all network operations are completed before returning.
+            post(
+                [&done, result = std::move(result)]()
+                {
+                    done.set_value(std::move(result));
+                });
+        },
+        std::move(inputArgs)...);
+
+    auto result = done.get_future().get();
+    return result;
 }
 
 } // namespace nx::network::http
