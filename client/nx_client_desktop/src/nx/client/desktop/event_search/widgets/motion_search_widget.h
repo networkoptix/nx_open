@@ -16,7 +16,7 @@ public:
     MotionSearchWidget(QnWorkbenchContext* context, QWidget* parent = nullptr);
     virtual ~MotionSearchWidget() override = default;
 
-    void setFilterArea(const QList<QRegion>& value);
+    void setFilterRegions(const QList<QRegion>& value); //< One region per channel.
 
 private:
     virtual QString placeholderText(bool constrained) const override;

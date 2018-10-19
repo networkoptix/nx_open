@@ -43,7 +43,7 @@ MotionSearchWidget::MotionSearchWidget(QnWorkbenchContext* context, QWidget* par
         [this](bool wholeArea)
         {
             if (wholeArea)
-                setFilterArea({});
+                setFilterRegions({});
         });
 }
 
@@ -57,12 +57,11 @@ QString MotionSearchWidget::itemCounterText(int count) const
     return tr("%n motion events", "", count);
 }
 
-void MotionSearchWidget::setFilterArea(const QList<QRegion>& value)
+void MotionSearchWidget::setFilterRegions(const QList<QRegion>& value)
 {
-    setWholeArea(std::all_of(value.cbegin(), value.cend(),
-        [](const QRegion& r) { return r.isEmpty(); }));
-
-    //motionModel(this)->setFilterArea(value); // TODO: FIXME: #vkutin Implement me!
+    auto model = motionModel(this);
+    model->setFilterRegions(value);
+    setWholeArea(model->isFilterEmpty());
 }
 
 void MotionSearchWidget::updateTimelineDisplay()

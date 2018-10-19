@@ -1,152 +1,41 @@
 #include "motion_search_list_model.h"
 #include "private/motion_search_list_model_p.h"
 
-#include <chrono>
+#include <algorithm>
 
-#include <core/resource/camera_resource.h>
-#include <ui/help/business_help.h>
-#include <ui/style/skin.h>
-#include <ui/workbench/workbench_context.h>
-
-#include <nx/client/core/utils/human_readable.h>
-#include <nx/utils/log/assert.h>
-#include <nx/vms/event/event_fwd.h>
-
-#include <nx/client/core/watchers/server_time_watcher.h>
-
-namespace nx {
-namespace client {
-namespace desktop {
-
-namespace {
-
-constexpr qreal kPreviewTimeFraction = 0.5;
-
-std::chrono::microseconds midTime(const QnTimePeriod& period, qreal fraction = kPreviewTimeFraction)
-{
-    using namespace std::chrono;
-    return period.isInfinite()
-        ? microseconds(DATETIME_NOW)
-        : microseconds(milliseconds(qint64(period.startTimeMs + period.durationMs * fraction)));
-}
-
-} // namespace
+namespace nx::client::desktop {
 
 MotionSearchListModel::MotionSearchListModel(QnWorkbenchContext* context, QObject* parent):
-    base_type(context, parent),
-    d(new Private(this))
+    base_type(context, [this]() { return new Private(this); }, parent),
+    d(qobject_cast<Private*>(base_type::d.data()))
 {
+    setLiveSupported(true);
 }
 
-MotionSearchListModel::~MotionSearchListModel()
+QList<QRegion> MotionSearchListModel::filterRegions() const
 {
+    return d->filterRegions();
 }
 
-
-QnVirtualCameraResourcePtr MotionSearchListModel::camera() const
+void MotionSearchListModel::setFilterRegions(const QList<QRegion>& value)
 {
-    return d->camera();
+    d->setFilterRegions(value);
 }
 
-void MotionSearchListModel::setCamera(const QnVirtualCameraResourcePtr& camera)
+bool MotionSearchListModel::isFilterEmpty() const
 {
-    d->setCamera(camera);
+    return std::all_of(filterRegions().cbegin(), filterRegions().cend(),
+        [](const QRegion& region) { return region.isEmpty(); });
 }
 
-int MotionSearchListModel::rowCount(const QModelIndex& parent) const
+bool MotionSearchListModel::isConstrained() const
 {
-    return parent.isValid() ? 0 : d->count();
+    return !isFilterEmpty() || base_type::isConstrained();
 }
 
-QVariant MotionSearchListModel::data(const QModelIndex& index, int role) const
+bool MotionSearchListModel::isCameraApplicable(const QnVirtualCameraResourcePtr& camera) const
 {
-    if (!isValid(index))
-        return QVariant();
-
-    using namespace std::chrono;
-    switch (role)
-    {
-        case Qt::DisplayRole:
-            return tr("Motion on camera");
-
-        case Qt::DecorationRole:
-            return qnSkin->pixmap(lit("tree/camera.png"));
-
-        case Qn::HelpTopicIdRole:
-            return QnBusiness::eventHelpId(vms::api::EventType::cameraMotionEvent);
-
-        case Qn::TimestampRole:
-            return QVariant::fromValue(microseconds(milliseconds(
-                d->period(index.row()).startTimeMs)).count());
-
-        case Qn::PreviewTimeRole:
-            return QVariant::fromValue(midTime(d->period(index.row())).count());
-
-        case Qn::ForcePrecisePreviewRole:
-            return true;
-
-        case Qn::DurationRole:
-            return QVariant::fromValue(d->period(index.row()).durationMs);
-
-        case Qn::ResourceRole:
-            return QVariant::fromValue<QnResourcePtr>(d->camera());
-
-        case Qn::ContextMenuRole:
-            return QVariant::fromValue(d->contextMenu(index.row()));
-
-        case Qn::DescriptionTextRole:
-        {
-            const auto& period = d->period(index.row());
-            const auto timeWatcher = context()->instance<core::ServerTimeWatcher>();
-            const auto start = timeWatcher->displayTime(period.startTimeMs);
-            return lit("%1: %2<br>%3: %4")
-                .arg(tr("Start"))
-                .arg(start.toString(Qt::RFC2822Date))
-                .arg(tr("Duration"))
-                .arg(core::HumanReadable::timeSpan(milliseconds(period.durationMs)));
-        }
-
-        default:
-            return base_type::data(index, role);
-    }
+    return base_type::isCameraApplicable(camera) && d->isCameraApplicable(camera);
 }
 
-// TODO: FIXME!!!
-//bool MotionSearchListModel::fetchInProgress() const
-//{
-//    return d->fetchInProgress();
-//}
-
-int MotionSearchListModel::totalCount() const
-{
-    return d->totalCount();
-}
-
-bool MotionSearchListModel::canFetch() const
-{
-    return d->canFetchMore();
-}
-
-void MotionSearchListModel::requestFetch()
-{
-    d->fetchMore();
-}
-
-void MotionSearchListModel::clearData()
-{
-    d->reset();
-}
-
-void MotionSearchListModel::truncateToRelevantTimePeriod()
-{
-    // TODO: FIXME!!!
-}
-
-void MotionSearchListModel::truncateToMaximumCount()
-{
-    // TODO: FIXME!!!
-}
-
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop
