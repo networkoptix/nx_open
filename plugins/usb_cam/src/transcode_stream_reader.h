@@ -71,7 +71,6 @@ private:
     int openVideoEncoder();
     int initializeScaledFrame(const ffmpeg::Codec* encoder);
     void setEncoderOptions(ffmpeg::Codec* encoder);
-    void maybeFlush();
     
     /**
      * Scale @param frame, modifying the preallocated @param outFrame whose size and format are

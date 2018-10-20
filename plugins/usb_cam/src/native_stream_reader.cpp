@@ -32,7 +32,6 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     *lpPacket = nullptr;
 
     ensureConsumerAdded();
-    maybeFlush();
 
     auto packet = nextPacket();
 
@@ -86,12 +85,6 @@ void NativeStreamReader::ensureConsumerAdded()
         StreamReaderPrivate::ensureConsumerAdded();
         m_camera->videoStream()->addPacketConsumer(m_avConsumer);
     }
-}
-
-void NativeStreamReader::maybeFlush()
-{
-    if (m_avConsumer->timeSpan() > kBufferTimeSpanMax)
-        m_avConsumer->flush();
 }
 
 std::shared_ptr<ffmpeg::Packet> NativeStreamReader::nextPacket()

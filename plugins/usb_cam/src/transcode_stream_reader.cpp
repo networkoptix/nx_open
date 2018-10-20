@@ -44,17 +44,10 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
     *lpPacket = nullptr;
 
-    if (m_retries >= kRetryLimit)
+    if (!ensureInitialized())
         return nxcip::NX_NO_DATA;
 
-    if (!ensureInitialized())
-    {
-        ++m_retries;
-        return nxcip::NX_OTHER_ERROR;
-    }
-
     ensureConsumerAdded();
-    maybeFlush();
 
     int outNxError = nxcip::NX_NO_ERROR;
     auto packet = nextPacket(&outNxError);
@@ -276,9 +269,11 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxErr
             return nullptr;
     }
 
+    static const std::chrono::milliseconds timeOut = std::chrono::milliseconds(1);
+
     for (;;)
     {
-        auto videoFrame = m_videoFrameConsumer->popOldest(std::chrono::milliseconds(1));
+        auto videoFrame = m_videoFrameConsumer->popOldest(timeOut);
         if (interrupted() || ioError())
             return nullptr;
         if (!shouldDrop(videoFrame.get()))
@@ -290,16 +285,20 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxErr
         // Release the reference so that internally VideoStream::m_frameCount will be decremented.
         videoFrame = nullptr;
 
-        auto peeked = m_avConsumer->peekOldest(std::chrono::milliseconds(1));
-        if (interrupted() || ioError())
-            return nullptr;
-
-        if(!peeked)
+        auto peeked = m_avConsumer->peekOldest(timeOut);
+        if (!peeked)
+        {
+            if (interrupted() || ioError())
+                return nullptr;
             continue;
+        }
 
         auto popped =  m_avConsumer->popOldest(kWaitTimeOut);
-        if (interrupted() || ioError())
-            return nullptr;
+        if(!popped)
+        {
+            if (interrupted() || ioError())
+                return nullptr;
+        }
         
         return popped;
     }
@@ -307,6 +306,9 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxErr
 
 bool TranscodeStreamReader::ensureInitialized()
 {   
+    if (m_initCode < 0)
+        return false;
+
     bool needInit = m_cameraState == csOff || m_cameraState == csModified;
     if (m_cameraState == csModified)
         uninitialize();
@@ -421,20 +423,6 @@ void TranscodeStreamReader::setEncoderOptions(ffmpeg::Codec* encoder)
     context->flags = AV_CODEC_FLAG2_LOCAL_HEADER;
     context->global_quality = context->qmin * FF_QP2LAMBDA;
     context->gop_size = m_codecParams.fps;
-}
-
-void TranscodeStreamReader::maybeFlush()
-{
-    float fps = m_camera->videoStream()->actualFps();
-    if (fps == 0) //< Should never happen.
-        fps = 30;
-
-    // Theoretically this means over a second of video.
-    if (m_videoFrameConsumer->size() >= fps)
-        m_videoFrameConsumer->flush();
-
-    if (m_avConsumer->timeSpan() > kBufferTimeSpanMax)
-        m_avConsumer->flush();
 }
 
 int TranscodeStreamReader::scale(const AVFrame * frame, AVFrame* outFrame)

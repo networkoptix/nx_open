@@ -6,6 +6,12 @@
 namespace nx {
 namespace usb_cam {
 
+namespace {
+
+static constexpr std::chrono::milliseconds kBufferMaxTimeSpan(1000);
+
+}
+
 //--------------------------------------------------------------------------------------------------
 // BufferedPacketConsumer
 
@@ -19,11 +25,22 @@ BufferedPacketConsumer::BufferedPacketConsumer(
 
 void BufferedPacketConsumer::givePacket(const std::shared_ptr<ffmpeg::Packet>& packet)
 {
+    if (m_buffer.timeSpan() > kBufferMaxTimeSpan)
+        flush();
+
+    if (packet->mediaType() == AVMEDIA_TYPE_VIDEO && m_dropUntilNextVideoKeyPacket)
+    {
+        if (!packet->keyPacket())
+            return;
+        m_dropUntilNextVideoKeyPacket = false;
+    }
+
     m_buffer.insert(packet->timestamp(), packet);
 }
 
 void BufferedPacketConsumer::flush()
 {
+    m_dropUntilNextVideoKeyPacket = true;
     m_buffer.clear();
 }
 
@@ -89,6 +106,9 @@ void BufferedVideoFrameConsumer::flush()
 
 void BufferedVideoFrameConsumer::giveFrame(const std::shared_ptr<ffmpeg::Frame>& frame)
 {
+    if (m_buffer.timeSpan() > kBufferMaxTimeSpan)
+        flush();
+
     m_buffer.insert(frame->timestamp(), frame);
 }
 
