@@ -253,10 +253,7 @@ bool VideoStream::ensureInitialized()
         std::lock_guard<std::mutex>lock(m_mutex);
         m_initCode = initialize();
         if (m_initCode < 0)
-        {
-            if (auto cam = m_camera.lock())
-                cam->setLastError(m_initCode);
-        }
+            setLastError(m_initCode);
     }
 
     return m_cameraState == csInitialized;
@@ -393,8 +390,7 @@ std::shared_ptr<ffmpeg::Packet> VideoStream::readFrame()
         if (checkIoError(result))
         {
             m_terminated = true;
-            if(auto cam = m_camera.lock())
-                cam->setLastError(result);
+            setLastError(result);
         }
         return nullptr;
     }
@@ -647,8 +643,15 @@ void VideoStream::setCodecParameters(const CodecParameters& codecParams)
 bool VideoStream::checkIoError(int ffmpegError)
 {
     // TODO: find out if this is the error code on windows
-    m_ioError = ffmpegError == AVERROR(ENODEV);
+    m_ioError = ffmpegError == AVERROR(ENODEV)
+        || ffmpegError == AVERROR(EIO);
     return m_ioError;
+}
+
+void VideoStream::setLastError(int ffmpegError)
+{
+    if (auto cam = m_camera.lock())
+        cam->setLastError(ffmpegError);
 }
 
 } // namespace usb_cam

@@ -158,6 +158,7 @@ private:
     void setCodecParameters(const CodecParameters& codecParams);
 
     bool checkIoError(int ffmpegError);
+    void setLastError(int ffmpegError);
 };
 
 } // namespace usb_cam
