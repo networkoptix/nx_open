@@ -291,6 +291,8 @@ void Manager::at_devicePropertyChanged(
         {
             NX_DEBUG(this, lm("Can't find analytics context for device %1 (%2)")
                 .args(device->getUserDefinedName(), device->getId()));
+
+            return;
         }
 
         analyticsContext->setEnabledAnalyticsEngines(

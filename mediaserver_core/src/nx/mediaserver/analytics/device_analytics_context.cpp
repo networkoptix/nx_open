@@ -62,6 +62,7 @@ void DeviceAnalyticsContext::setEnabledAnalyticsEngines(
         auto binding = std::make_shared<DeviceAnalyticsBinding>(serverModule(), m_device, engine);
         binding->setMetadataSink(m_metadataSink);
         m_bindings.emplace(engine->getId(), binding);
+        binding->startAnalytics(m_device->deviceAgentSettingsValues(engine->getId()));
     }
 
     updateSupportedFrameTypes();

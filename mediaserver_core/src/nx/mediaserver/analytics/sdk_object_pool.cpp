@@ -37,6 +37,27 @@ namespace {
 
 const nx::utils::log::Tag kLogTag{typeid(nx::mediaserver::analytics::SdkObjectPool)};
 
+template<typename T>
+void initResources(QnMediaServerModule* serverModule)
+{
+    if (!serverModule)
+    {
+        NX_ASSERT(false, "Can't access server module");
+        return;
+    }
+
+    auto resourcePool = serverModule->resourcePool();
+    if (!resourcePool)
+    {
+        NX_ASSERT(false, "Can't access resource pool");
+        return;
+    }
+
+    auto resources = resourcePool->getResources<T>();
+    for (auto& resource: resources)
+        resource->init();
+}
+
 PluginManager* getPluginManager(QnMediaServerModule* serverModule)
 {
     if (!serverModule)
@@ -180,6 +201,8 @@ bool SdkObjectPool::initPluginResources()
         analyticsManager->saveSync(pluginData);
     }
 
+    initResources<nx::mediaserver::resource::AnalyticsPluginResource>(serverModule());
+
     return true;
 }
 
@@ -230,6 +253,8 @@ bool SdkObjectPool::initEngineResources()
             }
         }
     }
+
+    initResources<nx::mediaserver::resource::AnalyticsEngineResource>(serverModule());
 
     return true;
 }
@@ -318,7 +343,7 @@ SdkObjectPool::EnginePtr SdkObjectPool::instantiateEngine(
     if (!sdkEngine)
     {
         NX_DEBUG(this, lm("Instanciating engine with Id %1").args(engineId));
-        nx::sdk::Error error;
+        nx::sdk::Error error = nx::sdk::Error::noError;
         sdkEngine = EnginePtr(sdkPlugin->createEngine(&error));
 
         if (error != nx::sdk::Error::noError || !sdkEngine)

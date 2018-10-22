@@ -75,6 +75,13 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
     if (!m_sdkDeviceAgent)
     {
         m_sdkDeviceAgent = createDeviceAgent();
+        if (!m_sdkDeviceAgent)
+        {
+            NX_ERROR(this, "Device agent creation failed, device %1 (%2)",
+                m_device->getUserDefinedName(), m_device->getId());
+            return false;
+        }
+
         auto manifest = loadDeviceAgentManifest(m_sdkDeviceAgent);
         if (!manifest)
         {

@@ -58,7 +58,7 @@ std::string DeviceAgent::manifest()
             },
             "flags": "stateDependent|regionDependent"
         }
-    ],
+    ]
 }
 )json";
 }
