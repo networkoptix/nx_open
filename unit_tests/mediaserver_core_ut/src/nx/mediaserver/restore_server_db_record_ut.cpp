@@ -8,7 +8,7 @@ namespace nx {
 namespace mediaserver {
 namespace test {
 
-TEST(restoreOwnServerInDatabase)
+TEST(RestoreServerDbRecord, restoreOwnServerInDatabase)
 {
     MediaServerLauncher launcher;
     ASSERT_TRUE(launcher.start());
