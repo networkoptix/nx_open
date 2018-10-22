@@ -5,7 +5,7 @@ import logging
 import subprocess
 from datetime import timedelta
 
-from framework.utils import Timer
+from framework.waiting import Timer
 from .checks import Success, Halt, Failure, expect_values
 
 _logger = logging.getLogger(__name__)

@@ -8,7 +8,7 @@ import pytz
 from typing import List, Dict
 
 from framework.installation.mediaserver import Mediaserver
-from framework.utils import Timer
+from framework.waiting import Timer
 from . import checks, stage, stages
 
 _logger = logging.getLogger(__name__)

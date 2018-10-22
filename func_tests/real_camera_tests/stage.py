@@ -8,7 +8,7 @@ from typing import Callable, Generator, Optional
 from framework.http_api import HttpError
 from framework.installation.mediaserver import Mediaserver
 from framework.mediaserver_api import MediaserverApiError, MediaserverApiRequestError
-from framework.utils import Timer
+from framework.waiting import Timer
 from .checks import Failure, Halt, Result, Success
 
 _logger = logging.getLogger(__name__)
