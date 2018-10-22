@@ -144,6 +144,8 @@ class SMBPath(FileSystemPath, PureWindowsPath):
     @property
     def _service_name(self):
         """Name of share"""
+        if not self.drive:
+            raise ValueError("No drive in Windows path {}".format(self))
         drive_letter = self.drive[0].upper()
         assert drive_letter in string.ascii_uppercase
         service_name = u'{}$'.format(drive_letter)  # C$, D$, ...
