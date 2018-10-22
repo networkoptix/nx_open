@@ -215,11 +215,7 @@ void VideoStream::run()
             continue;
 
         if (!ensureInitialized())
-        {
-            NX_DEBUG(this) << m_url << "Unable to initialize VideoStream: " 
-                << ffmpeg::utils::errorToString(m_initCode);
-            break;   
-        }
+            continue;
 
         auto packet = readFrame();
         if (!packet)
@@ -252,6 +248,7 @@ bool VideoStream::ensureInitialized()
     {
         std::lock_guard<std::mutex>lock(m_mutex);
         m_initCode = initialize();
+        m_terminated = checkIoError(m_initCode);
         if (m_initCode < 0)
             setLastError(m_initCode);
     }
@@ -385,13 +382,11 @@ std::shared_ptr<ffmpeg::Packet> VideoStream::readFrame()
         m_packetCount);
 
     int result = m_inputFormat->readFrame(packet->packet());
+    m_terminated = checkIoError(result);
+
     if (result < 0)
     {
-        if (checkIoError(result))
-        {
-            m_terminated = true;
-            setLastError(result);
-        }
+        setLastError(result);
         return nullptr;
     }
 
@@ -642,9 +637,9 @@ void VideoStream::setCodecParameters(const CodecParameters& codecParams)
 
 bool VideoStream::checkIoError(int ffmpegError)
 {
-    // TODO: find out if this is the error code on windows
-    m_ioError = ffmpegError == AVERROR(ENODEV)
-        || ffmpegError == AVERROR(EIO);
+    m_ioError = ffmpegError == AVERROR(ENODEV) //< Linux.
+        || ffmpegError == AVERROR(EIO) //< Windows
+        || ffmpegError == AVERROR(EBUSY); //< Device is busy during initialization.
     return m_ioError;
 }
 
