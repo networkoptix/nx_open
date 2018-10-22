@@ -81,14 +81,14 @@ class CameraStagesExecutor(object):
             while True:
                 try:
                     steps.next()
-                    self._duration = timer.duration
+                    self._duration = timer.from_start
                     yield
 
                 except StopIteration:
                     _logger.info('%s stages result %s', self.name, executors.details)
                     if not executors.is_successful and executors.stage.is_essential:
                         _logger.error('Essential stage is failed, skip other stages')
-                        self._duration = timer.duration
+                        self._duration = timer.from_start
                         return
                     break
 
@@ -155,7 +155,7 @@ class ServerStagesExecutor(object):
         else:
             current_stage.result = checker.result()
 
-        current_stage.duration = timer.duration
+        current_stage.duration = timer.from_start
         self.stages.append(current_stage)
         _logger.info(self, 'Server stage %r result %r', name, current_stage.result.details)
 

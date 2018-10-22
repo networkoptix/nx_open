@@ -156,7 +156,7 @@ class Executor(object):
             return True
 
         finally:
-            self._duration = timer.duration
+            self._duration = timer.from_start
 
         if isinstance(self._result, Success):
             return True

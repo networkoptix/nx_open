@@ -24,7 +24,7 @@ def fps_avg(fps):
 def _ffprobe_poll(expected_values, probe, stream_url, title):
     timer = Timer()
     while probe.poll() is None:
-        if timer.duration > timedelta(seconds=30):
+        if timer.from_start > timedelta(seconds=30):
             yield Halt('{!r} ffprobe has timed out'.format(title))
             return
         yield Halt('{!r} ffprobe is in progress'.format(title))

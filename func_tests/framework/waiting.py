@@ -19,7 +19,7 @@ class Timer(object):
         self._start = timeit.default_timer()
 
     @property
-    def duration(self):
+    def from_start(self):
         return datetime.timedelta(seconds=timeit.default_timer() - self._start)
 
 
