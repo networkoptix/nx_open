@@ -1457,12 +1457,27 @@ bool AsyncClient::resendRequestWithAuthorization(
     NX_ASSERT(response.statusLine.statusCode == StatusCode::unauthorized ||
         response.statusLine.statusCode == StatusCode::proxyAuthenticationRequired);
 
-    HttpHeaders::const_iterator wwwAuthenticateIter = response.headers.find(authenticateHeaderName);
+    // TODO: move to function
+    header::WWWAuthenticate wwwAuthenticateHeader;
+    HttpHeaders::const_iterator wwwAuthenticateIter;
+    for (wwwAuthenticateIter = response.headers.begin();
+         wwwAuthenticateIter != response.headers.end(); wwwAuthenticateIter++)
+    {
+        if (wwwAuthenticateIter->first != authenticateHeaderName)
+            continue;
+
+        wwwAuthenticateHeader.parse(wwwAuthenticateIter->second);
+        auto authScheme = wwwAuthenticateHeader.authScheme;
+        if (m_authType == AuthType::authBasic && authScheme == header::AuthScheme::basic)
+            break;
+        if (m_authType == AuthType::authDigest && authScheme == header::AuthScheme::digest)
+            break;
+        if (m_authType == AuthType::authBasicAndDigest)
+            break; // TODO: try to use digest here first
+    }
     if (wwwAuthenticateIter == response.headers.end())
         return false;
 
-    header::WWWAuthenticate wwwAuthenticateHeader;
-    wwwAuthenticateHeader.parse(wwwAuthenticateIter->second);
     if (wwwAuthenticateHeader.authScheme == header::AuthScheme::basic &&
         (credentials.authToken.type == AuthTokenType::password || credentials.authToken.empty()))
     {

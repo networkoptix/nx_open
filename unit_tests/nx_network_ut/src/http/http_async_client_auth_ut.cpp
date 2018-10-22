@@ -194,7 +194,8 @@ void HttpClientAsyncAuthorization2::thenClientAuthenticatedBy(AuthType auth)
     }
 }
 
-
+// TODO: Add test when server support only digest while client uses only base and etc...
+// TODO: Add test when server send both types and client can use both.
 // TODO: parametrize!
 TEST_F(HttpClientAsyncAuthorization2, basicAuth)
 {
