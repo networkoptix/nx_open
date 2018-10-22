@@ -13,6 +13,8 @@ namespace test {
 
 namespace {
 
+constexpr const int socketTimeout = 1000;
+
 const char* kTestPath = "/HttpAsyncClient_auth";
 const char* kDefaultUsername = "zorz_user";
 const char* kDefaultPassword = "zorz_pass";
@@ -36,14 +38,20 @@ const char* resonseForDefaultDigestHeader =
 
 void AuthHttpServer::processConnection(AbstractStreamSocket* connection)
 {
-    // TODO: Add while loop.
-    auto request = readRequest(connection);
-    m_receivedRequests.emplace_back(std::move(request));
-    sendResponse(connection);
+    connection->setRecvTimeout(socketTimeout);
+    connection->setSendTimeout(socketTimeout);
 
-    request = readRequest(connection);
-    m_receivedRequests.emplace_back(std::move(request));
-    sendResponse(connection);
+    int rc;
+    nx::Buffer request;
+    std::tie(rc, request) = readRequest(connection);
+    while (rc > 0)
+    {
+        m_receivedRequests.emplace_back(std::move(request));
+        sendResponse(connection);
+        std::tie(rc, request) = readRequest(connection);
+    }
+
+    ASSERT_EQ(0, rc) << "System error: " << SystemError::getLastOSErrorText().toStdString();
 }
 
 std::vector<nx::Buffer> AuthHttpServer::receivedRequests()
@@ -81,24 +89,24 @@ void AuthHttpServer::enableAuthHeaders(std::optional<AuthType> first, std::optio
 
 nx::Buffer AuthHttpServer::nextResponse()
 {
-    static NextResponse nextRepsonse = NextResponse::unauthorized;
-
     nx::Buffer unauthorizedResponse =
-        "HTTP/1.1 401 Unauthorized\r\n" +
+        "HTTP/1.1 401 Unauthorized\r\n"
+        "Content-Length: 0\r\n" +
         m_firstAuthHeader +
         m_secondAuthHeader +
         "\r\n";
 
     const nx::Buffer successResponse =
         "HTTP/1.1 200 OK\r\n"
+        "Content-Length: 0\r\n"
         "\r\n";
 
-    switch (nextRepsonse) {
+    switch (m_nextRepsonse) {
         case NextResponse::unauthorized:
-            nextRepsonse = NextResponse::success;
+            m_nextRepsonse = NextResponse::success;
             return unauthorizedResponse;
         case NextResponse::success:
-            nextRepsonse = NextResponse::unauthorized;
+            m_nextRepsonse = NextResponse::unauthorized;
             return successResponse;
         default:
             NX_ASSERT(false);
@@ -107,16 +115,15 @@ nx::Buffer AuthHttpServer::nextResponse()
     return nx::Buffer(); // To avoid compilation warning.
 }
 
-nx::Buffer AuthHttpServer::readRequest(AbstractStreamSocket* connection)
+std::pair<int, nx::Buffer> AuthHttpServer::readRequest(AbstractStreamSocket* connection)
 {
     nx::Buffer buffer;
     buffer.resize(4096);
 
     int rc = connection->recv(buffer.data(), buffer.size());
-    NX_ASSERT(rc > 0);  // Can't use ASSERT_EQ here.
-
-    buffer.resize(rc);
-    return buffer;
+    if (rc > 0)
+        buffer.resize(rc);
+    return {rc, buffer};
 }
 
 void AuthHttpServer::sendResponse(AbstractStreamSocket* connection)
@@ -169,14 +176,18 @@ void HttpClientAsyncAuthorization2::whenClientSendHttpRequestAndIsRequiredToUse(
     done.get_future().wait();
 }
 
-void HttpClientAsyncAuthorization2::thenClientAuthenticatedBy(AuthType auth)
+void HttpClientAsyncAuthorization2::thenClientAuthenticatedBy(std::optional<AuthType> exptecedAuth)
 {
-    static_cast<void>(auth);
-
     const auto requests = m_httpServer->receivedRequests();
-    ASSERT_GE(requests.size(), 2);
 
-    switch (auth) {
+    // No auth exptected.
+    if (!exptecedAuth) {
+        ASSERT_EQ(requests.size(), 1);
+        return;
+    }
+
+    ASSERT_EQ(requests.size(), 2);
+    switch (*exptecedAuth) {
     case AuthType::authBasic:
         ASSERT_THAT(requests[1].toStdString(), testing::HasSubstr(resonseForDefaultBasicHeader));
         break;
@@ -193,31 +204,35 @@ void HttpClientAsyncAuthorization2::thenClientAuthenticatedBy(AuthType auth)
     }
 }
 
+void HttpClientAsyncAuthorization2::thenClientGotResponseWithCode(int expectedHttpCode)
+{
+    ASSERT_EQ(m_httpClient->response()->statusLine.statusCode, expectedHttpCode);
+}
+
 constexpr auto basic = AuthType::authBasic;
 constexpr auto digest = AuthType::authDigest;
 constexpr auto both = AuthType::authBasicAndDigest;
 
 INSTANTIATE_TEST_CASE_P(HttpClientAsyncAuthorizationInstance, HttpClientAsyncAuthorization2,
     ::testing::Values(
-        TestParams{basic, std::nullopt, both, /* expected */ basic},
-        TestParams{digest, std::nullopt, both, /* expected */ digest},
-        TestParams{basic, std::nullopt, basic, /* expected */ basic},
-        TestParams{digest, std::nullopt, digest, /* expected */ digest},
-        TestParams{digest, basic, basic, /* expected */ basic}
+        TestParams{basic, std::nullopt, both, /* expected */ basic, 200},
+        TestParams{digest, std::nullopt, both, /* expected */ digest, 200},
+        TestParams{basic, std::nullopt, basic, /* expected */ basic, 200},
+        TestParams{digest, std::nullopt, digest, /* expected */ digest, 200},
+        TestParams{digest, basic, basic, /* expected */ basic, 200},
 //        TestParams{basic, digest, digest, /* expected */ digest}, // TODO: fix it.
 
-        // TODO: add support
-//        TestParams{digest, std::nullopt, basic, /* expected */ digest},
-//        TestParams{basic, std::nullopt, digest, /* expected */ digest}
+        TestParams{digest, std::nullopt, basic, /* expected */ std::nullopt, 401},
+        TestParams{basic, std::nullopt, digest, /* expected */ std::nullopt, 401}
     ));
 
-// TODO: Add test when server support only digest while client uses only base and etc...
 TEST_P(HttpClientAsyncAuthorization2, AuthSelection)
 {
     TestParams params = GetParam();
     givenHttpServerWithAuthorization(params.serverAuthTypeFirst, params.serverAuthTypeSecond);
     whenClientSendHttpRequestAndIsRequiredToUse(params.clientRequiredToUseAuthType);
     thenClientAuthenticatedBy(params.expectedAuthType);
+    thenClientGotResponseWithCode(params.expectedHttpCode);
 }
 
 } // namespace test

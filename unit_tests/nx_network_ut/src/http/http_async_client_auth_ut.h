@@ -28,10 +28,11 @@ private:
 
     nx::Buffer m_firstAuthHeader;
     nx::Buffer m_secondAuthHeader;
+    NextResponse m_nextRepsonse = NextResponse::unauthorized;
 
     nx::Buffer nextResponse();
     void sendResponse(AbstractStreamSocket* connection);
-    nx::Buffer readRequest(AbstractStreamSocket* connection);
+    std::pair<int, nx::Buffer> readRequest(AbstractStreamSocket* connection);
 };
 
 struct TestParams
@@ -40,7 +41,8 @@ struct TestParams
     std::optional<AuthType> serverAuthTypeSecond;
     AuthType clientRequiredToUseAuthType;
 
-    AuthType expectedAuthType;
+    std::optional<AuthType> expectedAuthType;
+    int expectedHttpCode;
 };
 
 // TODO: Rename class, try to merge with another one.
@@ -54,7 +56,8 @@ public:
     void givenHttpServerWithAuthorization(std::optional<AuthType> first,
         std::optional<AuthType> second);
     void whenClientSendHttpRequestAndIsRequiredToUse(AuthType auth);
-    void thenClientAuthenticatedBy(AuthType auth);
+    void thenClientAuthenticatedBy(std::optional<AuthType> exptecedAuth);
+    void thenClientGotResponseWithCode(int expectedHttpCode);
 
 private:
     std::unique_ptr<http::AsyncClient> m_httpClient;
