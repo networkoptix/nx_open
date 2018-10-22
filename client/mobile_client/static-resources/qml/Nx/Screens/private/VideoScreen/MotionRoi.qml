@@ -21,8 +21,8 @@ Item
     x: d.topLeftPoint.x
     y: d.topLeftPoint.y
 
-    width: d.bottomRightPoint.x - d.topLeftPoint.x
-    height: d.bottomRightPoint.y - d.topLeftPoint.y
+    width: d.bottomRightPoint.x - d.topLeftPoint.x + 1
+    height: d.bottomRightPoint.y - d.topLeftPoint.y + 1
 
     ShadedCircle
     {
@@ -62,23 +62,24 @@ Item
             border.width: 1
             border.color: item.roiColor
 
-            ShadedCircle
-            {
-                visible: item.drawing
-                centerPoint: d.startMarkerPoint
-                shadowColor: item.shadowColor
-                circleColor: item.roiColor
-                radius: 3.5
-            }
+        }
 
-            ShadedCircle
-            {
-                visible: item.drawing
-                centerPoint: d.endMarkerPoint
-                shadowColor: item.shadowColor
-                circleColor: item.roiColor
-                radius: 3.5
-            }
+        ShadedCircle
+        {
+            visible: item.drawing
+            centerPoint: d.startMarkerPoint
+            shadowColor: item.shadowColor
+            circleColor: item.roiColor
+            radius: 3.5
+        }
+
+        ShadedCircle
+        {
+            visible: item.drawing
+            centerPoint: d.endMarkerPoint
+            shadowColor: item.shadowColor
+            circleColor: item.roiColor
+            radius: 3.5
         }
     }
 
@@ -87,9 +88,10 @@ Item
         id: d
 
         readonly property real subpixelOffset: 0.5
-        readonly property real markerRight: item.width - shadowRadius * 2 - subpixelOffset
-        readonly property real markerBottom: item.height - shadowRadius * 2 - subpixelOffset
-        property int shadowRadius: signlePoint ? 0 : 20
+        readonly property real markerOffset: shadowRadius + subpixelOffset
+        readonly property real markerRight: item.width - shadowRadius - subpixelOffset
+        readonly property real markerBottom: item.height - shadowRadius - subpixelOffset
+        property int shadowRadius: /*signlePoint ? 0 :*/ 20
         property point topLeftPoint: Qt.point(
             Math.min(item.startPoint.x, item.endPoint.x) - shadowRadius,
             Math.min(item.startPoint.y, item.endPoint.y) - shadowRadius)
@@ -98,12 +100,12 @@ Item
             Math.max(item.startPoint.y, item.endPoint.y) + shadowRadius)
 
         property point startMarkerPoint: Qt.point(
-            startPoint.x < endPoint.x ? subpixelOffset : markerRight,
-            startPoint.y < endPoint.y ? subpixelOffset : markerBottom)
+            item.startPoint.x < item.endPoint.x ? markerOffset : markerRight,
+            item.startPoint.y < item.endPoint.y ? markerOffset : markerBottom)
 
         property point endMarkerPoint: Qt.point(
-            startPoint.x > endPoint.x ? subpixelOffset : markerRight,
-            startPoint.y > endPoint.y ? subpixelOffset : markerBottom)
+            item.startPoint.x > item.endPoint.x ? markerOffset : markerRight,
+            item.startPoint.y > item.endPoint.y ? markerOffset : markerBottom)
     }
 }
 

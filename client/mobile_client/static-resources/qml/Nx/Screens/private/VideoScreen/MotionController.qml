@@ -153,8 +153,8 @@ Item
     {
         id: tapPreloader
 
-        centerPoint: d.fromRelative(d.customInitialRelative)
-
+        readonly property point unfixedCenter: d.fromRelative(d.customInitialRelative)
+        centerPoint: Qt.point(unfixedCenter.x + 0.5, unfixedCenter.y + 0.5)
         border.width: 1
         border.color: d.lineColor
         color: "transparent"
