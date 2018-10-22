@@ -94,7 +94,7 @@
 .lang-xs[lang=zh_CN] { background-position: 0px  -462px; }
 
 /* Positions in our sprite for sm-sized images */
-.lang-sm[lang=ar] { background-position: 0px  -484px; }
+.lang-sm[lang=ar_SA] { background-position: 0px  -484px; }
 .lang-sm[lang=be] { background-position: 0px  -500px; }
 .lang-sm[lang=bg] { background-position: 0px  -516px; }
 .lang-sm[lang=cs] { background-position: 0px  -532px; }
@@ -139,7 +139,7 @@
 .lang-sm[lang=zh_CN] { background-position: 0px -1156px; }
 
 /* Positions in our sprite for lg-sized images */
-.lang-lg[lang=ar] { background-position: 0px -1188px; }
+.lang-lg[lang=ar_SA] { background-position: 0px -1188px; }
 .lang-lg[lang=be] { background-position: 0px -1210px; }
 .lang-lg[lang=bg] { background-position: 0px -1232px; }
 .lang-lg[lang=cs] { background-position: 0px -1254px; }
@@ -161,7 +161,7 @@
 .lang-lg[lang=he_IL] { background-position: 0px -1606px; }
 .lang-lg[lang=ja_JP] { background-position: 0px -1628px; }
 .lang-lg[lang=ko_KR] { background-position: 0px -1650px; }
-.lang-lg[lang=lt] { background-position: 0px -1672px; }
+.lang-lg[lang=lt_IT] { background-position: 0px -1672px; }
 .lang-lg[lang=lv] { background-position: 0px -1694px; }
 .lang-lg[lang=mk] { background-position: 0px -1716px; }
 .lang-lg[lang=ms] { background-position: 0px -1738px; }
@@ -242,7 +242,7 @@ h5>.lang-sm:after { top:   0px; }
 h5>.lang-xs       { top:   2px; }
 h5>.lang-xs:after { top:  -2px; }
 
-h6>.lang-sm,      
+h6>.lang-sm,
 h6>.lang-sm:after { top:   0px; }
 h6>.lang-xs       { top:   1px; }
 h6>.lang-xs:after { top:  -1px; }
