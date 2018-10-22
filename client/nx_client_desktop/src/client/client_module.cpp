@@ -71,7 +71,6 @@
 
 #include <platform/platform_abstraction.h>
 
-#include <plugins/plugin_manager.h>
 #include <plugins/resource/desktop_camera/desktop_resource_searcher.h>
 #include <plugins/resource/desktop_audio_only/desktop_audio_only_resource.h>
 #if defined(Q_OS_WIN)
@@ -676,8 +675,6 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("file"), QnQtFileStorageResource::instance, true);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("qtfile"), QnQtFileStorageResource::instance);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("layout"), QnLayoutFileStorageResource::instance);
-
-    commonModule->store(new PluginManager());
 
     auto resourceProcessor = commonModule->store(new QnClientResourceProcessor());
 

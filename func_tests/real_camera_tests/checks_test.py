@@ -3,13 +3,13 @@ import pytest
 from .checks import Failure, Halt, Success, expect_values
 
 
-def _exception_failure(**kwargs):
+def _exception_failure(*errors):
     try:
         raise KeyError(7)
     except KeyError:
-        failure = Failure(is_exception=True, **kwargs)
+        failure = Failure.from_current_exception()
         failure.exception = [failure.exception[-1]]  # Remove stack.
-        return failure
+        return failure.with_more_errors(*errors)
 
 
 @pytest.mark.parametrize("result, report", [
@@ -18,7 +18,7 @@ def _exception_failure(**kwargs):
     (Failure(errors=['shit happens']), {'status': 'failure', 'errors': ['shit happens']}),
     (Failure(errors=['shit happens']), {'status': 'failure', 'errors': ['shit happens']}),
     (_exception_failure(), {'status': 'failure', 'exception': ['KeyError: 7']}),
-    (_exception_failure(errors='shit'),
+    (_exception_failure('shit'),
         {'status': 'failure', 'exception': ['KeyError: 7'], 'errors': ['shit']}),
     (Halt('waiting'), {'status': 'halt', 'message': 'waiting'}),
 ])

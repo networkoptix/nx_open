@@ -15,6 +15,7 @@ public:
     AbstractVideoConsumer(
         const std::weak_ptr<VideoStream>& videoStream,
         const CodecParameters& params);
+    virtual ~AbstractVideoConsumer() = default;
 
     virtual float fps() const;
     virtual void resolution(int *width, int *height) const;

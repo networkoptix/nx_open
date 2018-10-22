@@ -8,7 +8,8 @@ namespace device {
 
 class AbstractCompressionTypeDescriptor
 {
-public:    
+public:
+    virtual ~AbstractCompressionTypeDescriptor() = default;
     virtual nxcip::CompressionType toNxCompressionType() const = 0;
 };
 

@@ -22,6 +22,7 @@ struct EventMetaData
     //! Users that can generate this event.
     std::vector<QnUuid> instigators;
     bool allUsers = false;
+    nx::vms::api::EventLevel level;
 
     EventMetaData() = default;
     EventMetaData(const EventMetaData&) = default;
@@ -30,7 +31,7 @@ struct EventMetaData
     EventMetaData& operator= (EventMetaData&&) = default;
 };
 
-#define EventMetaData_Fields (cameraRefs)(instigators)(allUsers)
+#define EventMetaData_Fields (cameraRefs)(instigators)(allUsers)(level)
 QN_FUSION_DECLARE_FUNCTIONS(EventMetaData, (ubjson)(json)(eq)(xml)(csv_record));
 
 struct EventParameters
@@ -42,7 +43,7 @@ struct EventParameters
     /** When did the event occur - in microseconds. */
     qint64 eventTimestampUsec;
 
-    /** Event source - id of a camera or a server. */
+    /** Event source - id of a camera or a server or a PIR. */
     QnUuid eventResourceId;
 
     /**

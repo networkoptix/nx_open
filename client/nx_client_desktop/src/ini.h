@@ -19,7 +19,6 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, enableUnlimitedZoom, "Enable unlimited zoom feature.");
     NX_INI_FLAG(0, showVideoQualityOverlay, "Show video quality overlay.");
 
-    NX_INI_FLAG(1, enableAnalytics, "Enable analytics engine");
     NX_INI_FLAG(0, enableOldAnalyticsController, "Enable old analytics controller (zoom-window based).");
     NX_INI_FLAG(0, demoAnalyticsDriver, "Enable demo analytics driver.");
     NX_INI_INT(0, demoAnalyticsProviderTimestampPrecisionUs, "Timestamp precision of demo analytics provider.");
@@ -34,7 +33,6 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, displayAnalyticsDelay, "Add delay label to detected object description.");
     NX_INI_FLAG(0, enableDeviceSearch, "Enable reworked device search dialog");
     NX_INI_FLAG(1, enableWearableCameras, "Enable wearable cameras.");
-    NX_INI_FLAG(0, enableResourceFiltering, "Enable reworked resource filtering");
     NX_INI_FLAG(1, enableResourceFilteringByDefault, "Enable reworked resource filtering");
     NX_INI_FLAG(0, debugThumbnailProviders, "Enable debug mode for thumbnail providers");
     NX_INI_FLAG(0, ignoreZoomWindowConstraints, "Ignore constrains for a zoom region");
@@ -51,6 +49,8 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, enableCaseExport, "Enable case export.");
     NX_INI_FLAG(1, enableSessionTimeout, "Enable admin-configurable absolute session timeout.");
     NX_INI_STRING("press", passwordPreviewActivationMode, "Password preview activation mode: \"press\", \"hover\" or \"toggle\".");
+    NX_INI_FLAG(0, enableEncryptedLayouts, "Enable creation of encrypted layouts.");
+    NX_INI_FLAG(0, enablePluginEvents, "Enable plugin events in Event Rules dialog.");
 };
 
 inline Ini& ini()

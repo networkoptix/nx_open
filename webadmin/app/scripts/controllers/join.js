@@ -101,15 +101,21 @@ angular.module('webadminApp')
                     errorToShow = L.join.licenceError;
                     dialogs.alert(errorToShow);
                     return false;
+                case 'DUPLICATE_MEDIASERVER_FOUND':
+                    errorToShow = L.join.duplicateServersError;
+                    dialogs.alert(errorToShow);
+                    return false;
             }
             return errorToShow;
         }
         function normalizeUrl(url){
-            if(url.indexOf(":")<0){
-                url = url + ":7001";
+            var hasPort = url.match(/:\d+/);
+            var hasProtocol= url.indexOf('//')>=0;
+            if(!hasPort){
+                url = url + ':' + Config.defaultPort;
             }
-            if(url.indexOf("//")<0){
-                url = "http://" + url;
+            if(!hasProtocol){
+                url = 'http://' + url;
             }
             return url;
         }

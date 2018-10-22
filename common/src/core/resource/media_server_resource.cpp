@@ -26,7 +26,7 @@
 #include <utils/common/sleep.h>
 #include <utils/common/util.h>
 
-#include <nx/api/analytics/driver_manifest.h>
+#include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/deprecated/asynchttpclient.h>
@@ -53,7 +53,7 @@ QnMediaServerResource::QnMediaServerResource(QnCommonModule* commonModule):
     m_analyticsDriversCache(
         [this]()
         {
-            return QJson::deserialized<QList<nx::api::AnalyticsDriverManifest>>(
+            return QJson::deserialized<QList<nx::vms::api::analytics::EngineManifest>>(
                 getProperty(Qn::kAnalyticsDriversParamName).toUtf8());
         },
         &m_mutex
@@ -142,11 +142,6 @@ QString QnMediaServerResource::getName() const
             return (*lk)->name;
     }
     return QnResource::getName();
-}
-
-QStringList QnMediaServerResource::searchFilters(bool useExtraSearchInformation) const
-{
-    return base_type::searchFilters(useExtraSearchInformation) << getUrl();
 }
 
 void QnMediaServerResource::setName( const QString& name )
@@ -604,13 +599,13 @@ nx::vms::api::ModuleInformationWithAddresses
     return information;
 }
 
-QList<nx::api::AnalyticsDriverManifest> QnMediaServerResource::analyticsDrivers() const
+QList<nx::vms::api::analytics::EngineManifest> QnMediaServerResource::analyticsDrivers() const
 {
     return m_analyticsDriversCache.get();
 }
 
 void QnMediaServerResource::setAnalyticsDrivers(
-    const QList<nx::api::AnalyticsDriverManifest>& drivers)
+    const QList<nx::vms::api::analytics::EngineManifest>& drivers)
 {
     QString value = QString::fromUtf8(QJson::serialized(drivers));
     setProperty(Qn::kAnalyticsDriversParamName, value);

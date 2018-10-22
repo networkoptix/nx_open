@@ -42,6 +42,7 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/common/widgets/async_image_widget.h>
 #include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/utils/app_info.h>
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
@@ -122,6 +123,7 @@ static const auto kTagIndexToAllowedNodeMapping = QList<ResourceTreeNodeType>(
         ResourceTreeNodeType::layoutTours,
         ResourceTreeNodeType::filteredVideowalls,
         ResourceTreeNodeType::webPages,
+        ResourceTreeNodeType::analyticsEngines,
         ResourceTreeNodeType::filteredUsers,
         ResourceTreeNodeType::localResources
     });
@@ -194,7 +196,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     // To keep aspect ratio specify only maximum height for server request
     m_thumbnailManager->setThumbnailSize(QSize(0, kMaxThumbnailSize.height()));
 
-    m_resourceModel = new QnResourceTreeModel(QnResourceTreeModel::FullScope, false, this);
+    m_resourceModel = new QnResourceTreeModel(QnResourceTreeModel::FullScope, this);
     ui->resourceTreeWidget->setModel(m_resourceModel);
     ui->resourceTreeWidget->setCheckboxesVisible(false);
     ui->resourceTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BypassGraphicsProxy);
@@ -809,7 +811,6 @@ QnResourceSearchProxyModel* QnResourceBrowserWidget::layoutModel(QnWorkbenchLayo
         result = new QnResourceSearchProxyModel(layout);
         result->setFilterCaseSensitivity(Qt::CaseInsensitive);
         result->setFilterKeyColumn(0);
-        result->setFilterRole(Qn::ResourceSearchStringRole);
         result->setSortCaseSensitivity(Qt::CaseInsensitive);
         result->setDynamicSortFilter(true);
         result->setSourceModel(m_resourceModel);

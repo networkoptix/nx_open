@@ -363,7 +363,7 @@ void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
         if (m_owner->isTcpMode())
             m_sendBuffer.resize(m_sendBuffer.size() + kRtpTcpHeaderSize);
         char* rtpHeaderPtr = m_sendBuffer.data() + m_sendBuffer.size();
-        m_sendBuffer.resize(m_sendBuffer.size() + RtpHeader::RTP_HEADER_SIZE);
+        m_sendBuffer.resize(m_sendBuffer.size() + nx::streaming::rtp::RtpHeader::kSize);
         nx::streaming::rtp::buildRtpHeader(rtpHeaderPtr, kMetaDataSsrc, metadata.size(), qnSyncTime->currentMSecsSinceEpoch(), RTP_METADATA_CODE, metadataTrack->sequence);
         m_sendBuffer.write(metadata);
 
@@ -631,7 +631,8 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         }
 
         bool isRtcp = false;
-        RtpHeader* packet = (RtpHeader*) (rtpHeaderPtr);
+        // TODO #lbusygin: Incorrect check.
+        nx::streaming::rtp::RtpHeader* packet = (nx::streaming::rtp::RtpHeader*) (rtpHeaderPtr);
         isRtcp = packet->payloadType >= 72 && packet->payloadType <= 76;
 
         if (m_owner->isTcpMode())

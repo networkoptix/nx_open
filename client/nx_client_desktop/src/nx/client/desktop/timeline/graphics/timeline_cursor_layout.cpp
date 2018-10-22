@@ -55,7 +55,7 @@ void TimelineCursorLayout::setTimeContent(bool isLive, milliseconds pos, bool sh
         if (showDate)
         {
             QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(pos.count());
-            line1 = datetime::toString(dateTime.date());
+            line1 = datetime::toString(dateTime.date(), datetime::Format::dd_MMMM_yyyy);
             line2 = datetime::toString(dateTime.time());
         }
         else

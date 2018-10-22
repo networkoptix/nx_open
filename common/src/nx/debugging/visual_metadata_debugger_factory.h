@@ -7,7 +7,7 @@ namespace debugging {
 
 enum class DebuggerType
 {
-    managerPool,
+    analyticsManager,
     archiveStreamReader,
     liveConnection,
     nxRtpParser,

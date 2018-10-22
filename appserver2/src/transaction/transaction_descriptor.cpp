@@ -172,6 +172,12 @@ void apiIdDataTriggerNotificationHelper(
         case ApiCommand::removeAccessRights:
             //#ak no notification needed
             break;
+        case ApiCommand::removeAnalyticsPlugin:
+        case ApiCommand::removeAnalyticsEngine:
+            return notificationParams.analyticsNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
+            break;
         default:
             NX_ASSERT(false);
     }
@@ -336,6 +342,16 @@ struct WebPageNotificationManagerHelper
     void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
     {
         notificationParams.webPageNotificationManager->triggerNotification(tran, notificationParams.source);
+    }
+};
+
+struct AnalyticsNotificationManagerHelper
+{
+    template<typename Param>
+    void operator()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
+    {
+        notificationParams.analyticsNotificationManager
+            ->triggerNotification(tran, notificationParams.source);
     }
 };
 

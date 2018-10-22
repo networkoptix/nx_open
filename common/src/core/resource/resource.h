@@ -99,9 +99,6 @@ public:
     QnResourcePool *resourcePool() const;
     virtual void setResourcePool(QnResourcePool *resourcePool);
 
-    QString toSearchString(bool useExtraSearchInformation = true) const;
-    virtual QStringList searchFilters(bool useExtraSearchInformation) const;
-
     template<class Resource>
     static QnSharedResourcePointer<Resource> toSharedPointer(const Resource *resource);
 
@@ -190,7 +187,7 @@ public:
 
     QnResourcePtr toSharedPointer() const;
 
-    void setCommonModule(QnCommonModule* commonModule);
+    virtual void setCommonModule(QnCommonModule* commonModule);
     QnCommonModule* commonModule() const;
 
     virtual QString idForToStringFromPtr() const; //< Used by toString(const T*).

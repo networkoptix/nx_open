@@ -6,8 +6,8 @@
 #include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
 
-#include <nx/api/analytics/analytics_event.h>
-#include <nx/api/analytics/driver_manifest.h>
+#include <nx/vms/api/analytics/manifest_items.h>
+#include <nx/vms/api/analytics/engine_manifest.h>
 
 namespace nx {
 namespace vms {
@@ -18,15 +18,15 @@ class AnalyticsHelper: public QObject, public QnCommonModuleAware
     using base_type = QObject;
     Q_OBJECT
 public:
-    struct EventTypeDescriptor: public nx::api::Analytics::EventType
+    struct EventTypeDescriptor: public nx::vms::api::analytics::EventType
     {
-        using base_type = nx::api::Analytics::EventType;
+        using base_type = nx::vms::api::analytics::EventType;
 
         EventTypeDescriptor() {}
         EventTypeDescriptor(const base_type& value): base_type(value) {}
 
         QString pluginId;
-        nx::api::TranslatableString pluginName;
+        nx::vms::api::analytics::TranslatableString pluginName;
     };
 
     AnalyticsHelper(QnCommonModule* commonModule, QObject* parent = nullptr);
@@ -38,7 +38,7 @@ public:
     QList<EventTypeDescriptor> systemCameraIndependentAnalyticsEvents() const;
 
     EventTypeDescriptor eventTypeDescriptor(const QString& eventTypeId) const;
-    nx::api::Analytics::Group groupDescriptor(const QString& groupId) const;
+    nx::vms::api::analytics::Group groupDescriptor(const QString& groupId) const;
 
     /** Get list of all supported analytics events for the given cameras. */
     static QList<EventTypeDescriptor> supportedAnalyticsEvents(
@@ -63,7 +63,7 @@ public:
     struct PluginActions
     {
         QString pluginId;
-        QList<nx::api::AnalyticsManifestObjectAction> actions;
+        QList<nx::vms::api::analytics::EngineManifest::ObjectAction> actions;
     };
 
     static QList<PluginActions> availableActions(

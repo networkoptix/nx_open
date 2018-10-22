@@ -67,8 +67,12 @@ QnUuid QnSecurityCamResource::makeCameraIdFromUniqueId(const QString& uniqueId)
     return guidFromArbitraryData(uniqueId);
 }
 
-//const int PRIMARY_ENCODER_INDEX = 0;
-//const int SECONDARY_ENCODER_INDEX = 1;
+void QnSecurityCamResource::setCommonModule(QnCommonModule* commonModule)
+{
+    base_type::setCommonModule(commonModule);
+    connect(commonModule->dataPool(), &QnResourceDataPool::changed, this,
+        &QnSecurityCamResource::resetCachedValues, Qt::DirectConnection);
+}
 
 QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     base_type(commonModule),
@@ -102,7 +106,7 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     m_cachedAnalyticsSupportedEvents(
         [this]()
         {
-            return QJson::deserialized<nx::api::AnalyticsSupportedEvents>(
+            return QJson::deserialized<AnalyticsEventTypeIds>(
                 getProperty(Qn::kAnalyticsDriversParamName).toUtf8());
         },
         &m_mutex),
@@ -933,18 +937,19 @@ QnUuid QnSecurityCamResource::preferredServerId() const
     return (*userAttributesLock)->preferredServerId;
 }
 
-nx::api::AnalyticsSupportedEvents QnSecurityCamResource::analyticsSupportedEvents() const
+QnSecurityCamResource::AnalyticsEventTypeIds
+    QnSecurityCamResource::supportedAnalyticsEventTypeIds() const
 {
     return m_cachedAnalyticsSupportedEvents.get();
 }
 
-void QnSecurityCamResource::setAnalyticsSupportedEvents(
-    const nx::api::AnalyticsSupportedEvents& eventsList)
+void QnSecurityCamResource::setSupportedAnalyticsEventTypeIds(
+    const AnalyticsEventTypeIds& eventTypeIds)
 {
-    if (eventsList.isEmpty())
+    if (eventTypeIds.isEmpty())
         setProperty(Qn::kAnalyticsDriversParamName, QVariant());
     else
-        setProperty(Qn::kAnalyticsDriversParamName, QString::fromUtf8(QJson::serialized(eventsList)));
+        setProperty(Qn::kAnalyticsDriversParamName, QString::fromUtf8(QJson::serialized(eventTypeIds)));
 }
 
 void QnSecurityCamResource::setMinDays(int value)
@@ -1309,6 +1314,7 @@ void QnSecurityCamResource::resetCachedValues()
     m_cachedCameraMediaCapabilities.reset();
     m_cachedLicenseType.reset();
     m_cachedDeviceType.reset();
+    m_cachedHasVideo.reset();
 }
 
 bool QnSecurityCamResource::useBitratePerGop() const

@@ -47,8 +47,8 @@
 #include <nx/mediaserver/event/event_message_bus.h>
 #include <nx/mediaserver/unused_wallpapers_watcher.h>
 #include <nx/mediaserver/license_watcher.h>
-#include <nx/mediaserver/metadata/manager_pool.h>
-#include <nx/mediaserver/metadata/event_rule_watcher.h>
+#include <nx/mediaserver/analytics/manager.h>
+#include <nx/mediaserver/analytics/event_rule_watcher.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
 #include <nx/mediaserver/resource/camera.h>
 #include <nx/mediaserver/root_fs.h>
@@ -244,8 +244,8 @@ QnMediaServerModule::QnMediaServerModule(const nx::mediaserver::CmdLineArguments
     m_eventRuleProcessor = store(new nx::mediaserver::event::ExtendedRuleProcessor(this));
     m_eventConnector = store(new nx::mediaserver::event::EventConnector(this));
 
-    m_metadataRuleWatcher = store(new nx::mediaserver::metadata::EventRuleWatcher(this));
-    m_metadataManagerPool = store(new nx::mediaserver::metadata::ManagerPool(this));
+    m_analyticsEventRuleWatcher = store(new nx::mediaserver::analytics::EventRuleWatcher(this));
+    m_analyticsManager = store(new nx::mediaserver::analytics::Manager(this));
 
     m_sharedContextPool = store(new nx::mediaserver::resource::SharedContextPool(this));
     m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher(this));
@@ -321,6 +321,7 @@ void QnMediaServerModule::stop()
     m_upnpDeviceSearcher->pleaseStop();
 
     resourceDiscoveryManager()->stop();
+    m_licenseWatcher->stop();
 }
 
 void QnMediaServerModule::stopLongRunnables()
@@ -412,14 +413,15 @@ PluginManager* QnMediaServerModule::pluginManager() const
     return m_pluginManager;
 }
 
-nx::mediaserver::metadata::ManagerPool* QnMediaServerModule::metadataManagerPool() const
+nx::mediaserver::analytics::Manager* QnMediaServerModule::analyticsManager() const
 {
-    return m_metadataManagerPool;
+    return m_analyticsManager;
 }
 
-nx::mediaserver::metadata::EventRuleWatcher* QnMediaServerModule::metadataRuleWatcher() const
+nx::mediaserver::analytics::EventRuleWatcher* QnMediaServerModule::analyticsEventRuleWatcher()
+    const
 {
-    return m_metadataRuleWatcher;
+    return m_analyticsEventRuleWatcher;
 }
 
 nx::mediaserver::resource::SharedContextPool* QnMediaServerModule::sharedContextPool() const

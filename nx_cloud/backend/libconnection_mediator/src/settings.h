@@ -87,7 +87,7 @@ struct ConnectionParameters:
 };
 
 /**
- * @note Values specified via command-line have priority over conf file (or win32 registry) values.
+ * NOTE: Values specified via command-line have priority over conf file (or win32 registry) values.
  */
 class Settings:
     public nx::utils::BasicServiceSettings

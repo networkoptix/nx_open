@@ -1,14 +1,14 @@
 import logging
 import time
-import timeit
-from datetime import timedelta
+from datetime import datetime, timedelta
 from collections import OrderedDict
 from fnmatch import fnmatch
 
+import pytz
 from typing import List, Dict
 
 from framework.installation.mediaserver import Mediaserver
-from framework.utils import datetime_utc_now
+from framework.waiting import Timer
 from . import checks, stage, stages
 
 _logger = logging.getLogger(__name__)
@@ -41,9 +41,12 @@ class CameraStagesExecutor(object):
         self._all_stage_steps = self._make_all_stage_steps(server)
         self._start_time = None
         self._duration = None
-        _logger.info(
-            'Camera %s(%s) is added with %s stage(s) and %s warning(s)',
-            self.name, self.id, len(self._stage_executors), len(self._warnings))
+        _logger.info('New %s', self)
+
+    def __repr__(self):
+        return '<{type_name} for {name}({id}) with {stages} stages, {warnings} warnings>'.format(
+            type_name=type(self).__name__, stages=len(self._stage_executors),
+            warnings=len(self._warnings), **self.__dict__)
 
     def execute(self):  # types: () -> bool
         """ :returns True if all stages are finished, False otherwise (retry is required).
@@ -71,21 +74,21 @@ class CameraStagesExecutor(object):
             ))
 
     def _make_all_stage_steps(self, server):  # types: (Mediaserver) -> Generator[None]
-        self._start_time = datetime_utc_now()
-        start_time = timeit.default_timer()
+        self._start_time = datetime.now(pytz.UTC)
+        timer = Timer()
         for executors in self._stage_executors:
             steps = executors.steps(server)
             while True:
                 try:
                     steps.next()
-                    self._duration = timedelta(seconds=timeit.default_timer() - start_time)
+                    self._duration = timer.from_start
                     yield
 
                 except StopIteration:
                     _logger.info('%s stages result %s', self.name, executors.details)
                     if not executors.is_successful and executors.stage.is_essential:
                         _logger.error('Essential stage is failed, skip other stages')
-                        self._duration = timedelta(seconds=timeit.default_timer() - start_time)
+                        self._duration = timer.from_start
                         return
                     break
 
@@ -116,7 +119,7 @@ class ServerStagesExecutor(object):
             self.name = name
             self.rules = rules
             self.result = checks.Halt('Is not executed')
-            self.start_time = datetime_utc_now()
+            self.start_time = datetime.now(pytz.UTC)
             self.duration = None
 
         @property
@@ -140,19 +143,19 @@ class ServerStagesExecutor(object):
         _logger.debug(self, 'Server stage %r', name)
         current_stage = self.Stage(name, rules)
         checker = checks.Checker()
-        start_time = timeit.default_timer()
+        timer = Timer()
         try:
             for query, expected_values in current_stage.rules.items():
                 actual_values = self.server.api.generic.get(query)
                 checker.expect_values(expected_values, actual_values, '<{}>'.format(query))
 
         except Exception:
-            current_stage.result = checks.Failure(is_exception=True)
+            current_stage.result = checks.Failure.from_current_exception()
 
         else:
             current_stage.result = checker.result()
 
-        current_stage.duration = timedelta(seconds=timeit.default_timer() - start_time)
+        current_stage.duration = timer.from_start
         self.stages.append(current_stage)
         _logger.info(self, 'Server stage %r result %r', name, current_stage.result.details)
 

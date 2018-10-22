@@ -1,0 +1,88 @@
+#include "common_plugin.h"
+
+#include <nx/kit/debug.h>
+
+#include "common_engine.h"
+
+namespace nx {
+namespace sdk {
+namespace analytics {
+
+using namespace nx::sdk;
+
+CommonPlugin::CommonPlugin(std::string libName, CreateEngine createEngine):
+    m_libName(std::move(libName)), m_createEngine(createEngine)
+{
+    NX_PRINT << "Created " << m_libName << "[" << this << "]";
+}
+
+CommonPlugin::~CommonPlugin()
+{
+    NX_PRINT << "Destroyed " << m_libName << "[" << this << "]";
+}
+
+void* CommonPlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
+{
+    if (interfaceId == IID_Plugin)
+    {
+        addRef();
+        return static_cast<Plugin*>(this);
+    }
+    if (interfaceId == nxpl::IID_Plugin3)
+    {
+        addRef();
+        return static_cast<nxpl::Plugin3*>(this);
+    }
+    if (interfaceId == nxpl::IID_Plugin2)
+    {
+        addRef();
+        return static_cast<nxpl::Plugin2*>(this);
+    }
+    if (interfaceId == nxpl::IID_Plugin)
+    {
+        addRef();
+        return static_cast<nxpl::Plugin*>(this);
+    }
+    if (interfaceId == nxpl::IID_PluginInterface)
+    {
+        addRef();
+        return static_cast<nxpl::PluginInterface*>(this);
+    }
+    return nullptr;
+}
+
+const char* CommonPlugin::name() const
+{
+    return m_libName.c_str();
+}
+
+void CommonPlugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
+{
+    // Here roSettings are passed from Server. Currently, they are not used by analytics plugins,
+    // thus, do nothing.
+}
+
+void CommonPlugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
+{
+    m_pluginContainer = pluginContainer;
+}
+
+void CommonPlugin::setLocale(const char* /*locale*/)
+{
+}
+
+Engine* CommonPlugin::createEngine(Error* outError)
+{
+    Engine* engine = m_createEngine(this);
+    if (!engine)
+    {
+        NX_PRINT << "ERROR: " << m_libName << ": createEngine() failed";
+        *outError = Error::unknownError;
+        return nullptr;
+    }
+    return engine;
+}
+
+} // namespace analytics
+} // namespace sdk
+} // namespace nx

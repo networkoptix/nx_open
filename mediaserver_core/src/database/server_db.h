@@ -99,8 +99,8 @@ private:
         qint64* outResult) const;
 
 private:
-    qint64 m_lastCleanuptime;
-    qint64 m_auditCleanuptime;
+    qint64 m_lastCleanuptimeUs;
+    qint64 m_auditCleanuptimeUs;
     int m_runtimeActionsTotalRecords;
     QnDbTransaction m_tran;
     std::function<void(size_t)> m_updateBookmarkCount;

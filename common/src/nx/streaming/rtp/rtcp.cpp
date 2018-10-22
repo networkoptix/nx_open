@@ -4,9 +4,7 @@
 #include <utils/common/synctime.h>
 #include <nx/streaming/rtp/rtp.h>
 
-namespace nx {
-namespace streaming {
-namespace rtp {
+namespace nx::streaming::rtp {
 
 static const uint32_t kSsrcConst = 0x2a55a9e8;
 static const uint32_t kCsrcConst = 0xe8a9552a;
@@ -140,6 +138,4 @@ const RtcpSenderReport& RtcpSenderReporter::getReport()
     return m_report;
 }
 
-} // namespace rtp
-} // namespace streaming
-} // namespace nx
+} // namespace nx::streaming::rtp
