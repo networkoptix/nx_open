@@ -1,5 +1,6 @@
-urn_uuid_32616133-3764-6665-6235-000df12aa37d:
+DWC-MF21M4TIR:
   discovery:
+    physicalId: urn_uuid_32616133-3764-6665-6235-000df12aa37d
     vendor: Digital Watchdog
     model: DWC-MF21M4TIR
     mac: 00-0D-F1-2A-A3-7D
