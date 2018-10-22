@@ -69,12 +69,12 @@ void DShowAudioDiscoveryManager::fillCameraAuxData(nxcip::CameraInfo* cameras, i
     }
 }
 
-bool DshowAudioDiscoveryManager::pluggedIn(const std::string& devicePath) const
+bool DShowAudioDiscoveryManager::pluggedIn(const std::string& devicePath) const
 {
-    auto devices = impl::getDevices();
-    for (const auto & deivce : devices)
+    auto devices = impl::getAudioDeviceList();
+    for (const auto & device : devices)
     {
-        if (device->data.deviceName == devicePath)
+        if (device.data.deviceName == devicePath)
             return true;
     }
     return false;
