@@ -11,24 +11,38 @@ from defaults import defaults
 def pytest_addoption(parser):
     g = parser.getgroup('real camera test')
     g.addoption(
-        '--rct-interface', default=defaults.get('rct_interface'), help='Network interface with cameras')
+        '--rct-interface',
+        default=defaults.get('rct_interface'),
+        help='Network interface with cameras')
     g.addoption(
-        '--rct-network', default=defaults.get('rct_network'), type=IPNetwork,
+        '--rct-network',
+        default=defaults.get('rct_network'),
+        type=IPNetwork,
         help='Network interface IP/mask')
     g.addoption(
-        '--rct-expected-cameras', default=defaults.get('rct_expected_cameras'), type=Path(__file__).parent.joinpath,
+        '--rct-expected-cameras',
+        default=defaults.get('rct_expected_cameras'),
+        type=Path(__file__).parent.joinpath,
         help='Stage rules for cameras')
     g.addoption(
-        '--rct-camera-cycle-delay', default=defaults.get('rct_camera_cycle_delay', '1s'), type=_time_delta,
+        '--rct-camera-cycle-delay',
+        default=defaults.get('rct_camera_cycle_delay', '1s'),
+        type=_time_delta,
         help='Delay between test cycles')
     g.addoption(
-        '--rct-server-stage-delay', default=defaults.get('rct_server_stage_delay', '1m'), type=_time_delta,
+        '--rct-server-stage-delay',
+        default=defaults.get('rct_server_stage_delay', '1m'),
+        type=_time_delta,
         help='Delay before last server stage')
     g.addoption(
-        '--rct-stage-hard-timeout', default=defaults.get('rct_stage_hard_timeout', '1h'), type=_time_delta,
+        '--rct-stage-hard-timeout',
+        default=defaults.get('rct_stage_hard_timeout', '1h'),
+        type=_time_delta,
         help='Limits stages delay')
     g.addoption(
-        '--rct-camera-filter', default=defaults.get('rct_camera_filter', '*'), type=lambda f: f.split(','),
+        '--rct-camera-filter',
+        default=defaults.get('rct_camera_filter', '*'),
+        type=lambda f: f.split(','),
         help='Comma separated list of camera names, posix wildcards are supported')
 
 
