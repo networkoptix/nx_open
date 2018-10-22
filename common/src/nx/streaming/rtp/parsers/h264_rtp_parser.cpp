@@ -456,7 +456,7 @@ bool H264Parser::processData(
                 nalUnitType |= nalRefIDC;
             }
             else
-			{
+            {
                 // if packet loss occured in the middle of FU packet, reset flag.
                 // packet loss will be reported on the last FU packet. So, do not report problem twice
                 isPacketLost = false;
@@ -478,8 +478,8 @@ bool H264Parser::processData(
 
             }
             if (m_packetPerNal == 0)
-			{
-			    // FU_A first packetf
+            {
+                // FU_A first packetf
                 --curPtr;
                 *curPtr = nalUnitType;
             }
