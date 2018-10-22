@@ -584,6 +584,11 @@ enum IDType
     VideowallSettingsAction,
 
     /**
+     * Opens analytics engine settings dialog.
+     */
+    AnalyticsEngineSettingsAction,
+
+    /**
      * Opens event log dialog with filter for current camera(s) issues
      */
     CameraIssuesAction,

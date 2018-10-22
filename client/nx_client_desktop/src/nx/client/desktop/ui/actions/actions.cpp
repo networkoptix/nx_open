@@ -1430,6 +1430,11 @@ void initialize(Manager* manager, Action* root)
             && ConditionWrapper(new AutoStartAllowedCondition())
             && !condition::isSafeMode());
 
+    factory(AnalyticsEngineSettingsAction)
+        .flags(Tree | SingleTarget | ResourceTarget)
+        .text(ContextMenu::tr("Analytics Engine Settings..."))
+        .condition(ConditionWrapper(new AnalyticsEngineCondition()));
+
     factory(ConvertCameraToEntropix)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
