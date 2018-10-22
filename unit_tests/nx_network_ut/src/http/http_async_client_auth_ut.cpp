@@ -220,7 +220,7 @@ INSTANTIATE_TEST_CASE_P(HttpClientAsyncAuthorizationInstance, HttpClientAsyncAut
         TestParams{basic, std::nullopt, basic, /* expected */ basic, 200},
         TestParams{digest, std::nullopt, digest, /* expected */ digest, 200},
         TestParams{digest, basic, basic, /* expected */ basic, 200},
-//        TestParams{basic, digest, digest, /* expected */ digest}, // TODO: fix it.
+        TestParams{basic, digest, digest, /* expected */ digest, 200},
 
         TestParams{digest, std::nullopt, basic, /* expected */ std::nullopt, 401},
         TestParams{basic, std::nullopt, digest, /* expected */ std::nullopt, 401}
