@@ -244,9 +244,8 @@ ${PASSWORD IS GOOD BADGE}             //span[contains(@class,"badge") and contai
 ${PASSWORD INCORRECT BADGE}           //span[contains(@class,"badge") and contains(text(),'${PASSWORD INCORRECT BADGE TEXT}')]
 
 #Already logged in modal
-#extra spaces here temporarily
-${LOGGED IN CONTINUE BUTTON}          //ngb-modal-window//button[text()='Continue ']
-${LOGGED IN LOG OUT BUTTON}           //ngb-modal-window//button[text()='Log Out ']
+${LOGGED IN CONTINUE BUTTON}          //ngb-modal-window//button[contains(text(),'${CONTINUE BUTTON TEXT}')]
+${LOGGED IN LOG OUT BUTTON}           //ngb-modal-window//button[contains(text(),'${LOG OUT BUTTON TEXT}')]
 
 ${CONTINUE BUTTON}                    //ngb-modal-window//button[contains(text(), 'Continue')]
 ${CONTINUE MODAL}                     //ngb-modal-window
