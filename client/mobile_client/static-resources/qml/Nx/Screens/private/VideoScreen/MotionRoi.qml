@@ -29,13 +29,13 @@ Item
         id: singlePointMarker
 
         centerPoint: d.startMarkerPoint
+        circleRadius: 4.5
         visible: singlePoint
         circleColor: "transparent"
         circleBorderColor: item.roiColor
         shadowColor: item.roiColor
 
         border.color: roiColor
-        radius: 3.5
     }
 
     Rectangle
@@ -67,19 +67,19 @@ Item
         ShadedCircle
         {
             visible: item.drawing
+            circleRadius: 2.5
             centerPoint: d.startMarkerPoint
             shadowColor: item.shadowColor
             circleColor: item.roiColor
-            radius: 3.5
         }
 
         ShadedCircle
         {
             visible: item.drawing
+            circleRadius: 2.5
             centerPoint: d.endMarkerPoint
             shadowColor: item.shadowColor
             circleColor: item.roiColor
-            radius: 3.5
         }
     }
 
