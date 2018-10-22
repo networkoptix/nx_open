@@ -6,15 +6,17 @@
 #include <QtCore/QMap>
 
 #include <nx/streaming/video_data_packet.h>
-#include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/rtp/parsers/rtp_stream_parser.h>
 #include <utils/media/nalUnits.h>
 #include <nx/streaming/rtsp_client.h>
 
-class CLH264RtpParser: public QnRtpVideoStreamParser
+namespace nx::streaming::rtp {
+
+class H264Parser: public VideoStreamParser
 {
 public:
-    CLH264RtpParser(const QString& resourceId);
-    virtual ~CLH264RtpParser();
+    H264Parser(const QString& resourceId);
+    virtual ~H264Parser();
     virtual void setSdpInfo(QList<QByteArray> lines) override;
 
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, bool& gotData) override;
@@ -52,4 +54,7 @@ private:
     int getSpsPpsSize() const;
 };
 
+} // namespace nx::streaming::rtp
+
 #endif // ENABLE_DATA_PROVIDERS
+

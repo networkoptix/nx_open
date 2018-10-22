@@ -2,35 +2,35 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include <nx/streaming/rtp_stream_parser.h>
-#include <nx/streaming/rtsp_client.h>
-#include <utils/common/synctime.h>
+#include <nx/streaming/rtp/rtp.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/audio_data_packet.h>
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/streaming/config.h>
 
-QnSimpleAudioRtpParser::QnSimpleAudioRtpParser():
-    QnRtpAudioStreamParser(),
+namespace nx::streaming::rtp {
+
+SimpleAudioParser::SimpleAudioParser():
+    AudioStreamParser(),
     m_audioLayout( new QnRtspAudioLayout() )
 {
-    QnRtpStreamParser::setFrequency(8000);
+    StreamParser::setFrequency(8000);
     m_channels = 1;
     m_codecId = AV_CODEC_ID_PCM_MULAW;
     m_sampleFormat = AV_SAMPLE_FMT_S16;
     m_bits_per_coded_sample = 16;
 }
 
-QnSimpleAudioRtpParser::~QnSimpleAudioRtpParser()
+SimpleAudioParser::~SimpleAudioParser()
 {
 }
 
-void QnSimpleAudioRtpParser::setCodecId(AVCodecID codecId)
+void SimpleAudioParser::setCodecId(AVCodecID codecId)
 {
     m_codecId = codecId;
 }
 
-void QnSimpleAudioRtpParser::setSdpInfo(QList<QByteArray> lines)
+void SimpleAudioParser::setSdpInfo(QList<QByteArray> lines)
 {
     // determine here:
     // 1. sizeLength(au size in bits)  or constantSize
@@ -41,7 +41,7 @@ void QnSimpleAudioRtpParser::setSdpInfo(QList<QByteArray> lines)
         {
             QList<QByteArray> params = lines[i].mid(lines[i].indexOf(' ')+1).split('/');
             if (params.size() > 1)
-                QnRtpStreamParser::setFrequency(params[1].trimmed().toInt());
+                StreamParser::setFrequency(params[1].trimmed().toInt());
             if (params.size() > 2)
                 m_channels = params[2].trimmed().toInt();
         }
@@ -60,28 +60,28 @@ void QnSimpleAudioRtpParser::setSdpInfo(QList<QByteArray> lines)
     m_context = QnConstMediaContextPtr(context);
     const auto av = context->getAvCodecContext();
     av->channels = m_channels;
-    av->sample_rate = QnRtpStreamParser::getFrequency();
+    av->sample_rate = StreamParser::getFrequency();
     av->sample_fmt = m_sampleFormat;
     av->time_base.num = 1;
     av->bits_per_coded_sample = m_bits_per_coded_sample;
-    av->time_base.den = QnRtpStreamParser::getFrequency();
+    av->time_base.den = StreamParser::getFrequency();
 
     QnResourceAudioLayout::AudioTrack track;
     track.codecContext = m_context;
     m_audioLayout->setAudioTrackInfo(track);
 }
 
-bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, bool& gotData)
+bool SimpleAudioParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, bool& gotData)
 {
     gotData = false;
     const quint8* rtpBuffer = rtpBufferBase + bufferOffset;
 
     RtpHeader* rtpHeader = (RtpHeader*) rtpBuffer;
-    const quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
+    const quint8* curPtr = rtpBuffer + RtpHeader::kSize;
 
     if (rtpHeader->extension)
     {
-        if (bufferSize < RtpHeader::RTP_HEADER_SIZE + 4)
+        if (bufferSize < RtpHeader::kSize + 4)
             return false;
 
         int extWords = ((int(curPtr[2]) << 8) + curPtr[3]);
@@ -106,19 +106,21 @@ bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset
     return true;
 }
 
-QnConstResourceAudioLayoutPtr QnSimpleAudioRtpParser::getAudioLayout()
+QnConstResourceAudioLayoutPtr SimpleAudioParser::getAudioLayout()
 {
     return m_audioLayout;
 }
 
-void QnSimpleAudioRtpParser::setBitsPerSample(int value)
+void SimpleAudioParser::setBitsPerSample(int value)
 {
     m_bits_per_coded_sample = value;
 }
 
-void QnSimpleAudioRtpParser::setSampleFormat(AVSampleFormat sampleFormat)
+void SimpleAudioParser::setSampleFormat(AVSampleFormat sampleFormat)
 {
     m_sampleFormat = sampleFormat;
 }
+
+} // namespace nx::streaming::rtp
 
 #endif // ENABLE_DATA_PROVIDERS

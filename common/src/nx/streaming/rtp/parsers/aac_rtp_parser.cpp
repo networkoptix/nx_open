@@ -6,16 +6,19 @@
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
 
+#include <nx/streaming/rtp/rtp.h>
 #include <nx/streaming/audio_data_packet.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/streaming/config.h>
 
-#include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/rtp/parsers/rtp_stream_parser.h>
 #include <nx/streaming/rtsp_client.h>
 
-QnAacRtpParser::QnAacRtpParser():
-    QnRtpAudioStreamParser()
+namespace nx::streaming::rtp {
+
+AacParser::AacParser():
+    AudioStreamParser()
 {
     m_sizeLength = 0;
     m_constantSize = 0;
@@ -27,7 +30,7 @@ QnAacRtpParser::QnAacRtpParser():
     m_streamStateIndication = 0;
     m_profile = 0;
     m_bitrate = 0;
-    QnRtpStreamParser::setFrequency(16000);
+    StreamParser::setFrequency(16000);
     m_channels = 0;
     m_streamtype = 0;
     m_auHeaderExists = false;
@@ -35,12 +38,12 @@ QnAacRtpParser::QnAacRtpParser():
     m_audioLayout.reset( new QnRtspAudioLayout() );
 }
 
-QnAacRtpParser::~QnAacRtpParser()
+AacParser::~AacParser()
 {
     // Do nothing.
 }
 
-void QnAacRtpParser::setSdpInfo(QList<QByteArray> lines)
+void AacParser::setSdpInfo(QList<QByteArray> lines)
 {
     // determine here:
     // 1. sizeLength(au size in bits)  or constantSize
@@ -51,7 +54,7 @@ void QnAacRtpParser::setSdpInfo(QList<QByteArray> lines)
         {
             QList<QByteArray> params = lines[i].mid(lines[i].indexOf(' ')+1).split('/');
             if (params.size() > 1)
-                QnRtpStreamParser::setFrequency(params[1].trimmed().toInt());
+                StreamParser::setFrequency(params[1].trimmed().toInt());
             if (params.size() > 2)
                 m_channels = params[2].trimmed().toInt();
         }
@@ -96,7 +99,7 @@ void QnAacRtpParser::setSdpInfo(QList<QByteArray> lines)
 
 }
 
-bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, bool& gotData)
+bool AacParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, bool& gotData)
 {
     gotData = false;
     const quint8* rtpBuffer = rtpBufferBase + bufferOffset;
@@ -108,12 +111,12 @@ bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bu
     //int streamStateValue = 0;
 
     RtpHeader* rtpHeader = (RtpHeader*) rtpBuffer;
-    const quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
+    const quint8* curPtr = rtpBuffer + RtpHeader::kSize;
     const quint8* end = rtpBuffer + bufferSize;
 
     if (rtpHeader->extension)
     {
-        if (bufferSize < RtpHeader::RTP_HEADER_SIZE + 4)
+        if (bufferSize < RtpHeader::kSize + 4)
             return false;
 
         int extWords = ((int(curPtr[2]) << 8) + curPtr[3]);
@@ -205,9 +208,11 @@ bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bu
     return true;
 }
 
-QnConstResourceAudioLayoutPtr QnAacRtpParser::getAudioLayout()
+QnConstResourceAudioLayoutPtr AacParser::getAudioLayout()
 {
     return m_audioLayout;
 }
+
+} // namespace nx::streaming::rtp
 
 #endif // ENABLE_DATA_PROVIDERS

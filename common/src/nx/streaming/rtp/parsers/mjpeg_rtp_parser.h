@@ -1,17 +1,18 @@
 #pragma once
+
 #if defined(ENABLE_DATA_PROVIDERS)
 
 #include <QtCore/QByteArray>
 
-#include <nx/streaming/rtp_stream_parser.h>
-#include <nx/streaming/rtsp_client.h>
-//#include "plugins/resource/arecontvision/tools/AVJpegHeader.h"
+#include <nx/streaming/rtp/parsers/rtp_stream_parser.h>
 
-class QnMjpegRtpParser: public QnRtpVideoStreamParser
+namespace nx::streaming::rtp {
+
+class MjpegParser: public VideoStreamParser
 {
 public:
-    QnMjpegRtpParser();
-    virtual ~QnMjpegRtpParser();
+    MjpegParser();
+    virtual ~MjpegParser();
     virtual void setSdpInfo(QList<QByteArray> lines) override;
 
     virtual bool processData(
@@ -53,5 +54,7 @@ private:
     int m_frameSize;
     std::vector<quint8> m_extendedJpegHeader;
 };
+
+} // namespace nx::streaming::rtp
 
 #endif // defined(ENABLE_DATA_PROVIDERS)

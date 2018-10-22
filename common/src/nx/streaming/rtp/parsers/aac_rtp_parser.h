@@ -1,20 +1,20 @@
-#ifndef __AAC_RTP_PARSER_H
-#define __AAC_RTP_PARSER_H
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <QtCore/QByteArray>
 #include <QtCore/QMap>
 
-#include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/rtp/parsers/rtp_stream_parser.h>
 #include <decoders/audio/aac.h>
 
+namespace nx::streaming::rtp {
 
-class QnAacRtpParser: public QnRtpAudioStreamParser
+class AacParser: public AudioStreamParser
 {
 public:
-    QnAacRtpParser();
-    virtual ~QnAacRtpParser();
+    AacParser();
+    virtual ~AacParser();
     virtual void setSdpInfo(QList<QByteArray> sdpInfo) override;
 
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, bool& gotData) override;
@@ -41,6 +41,6 @@ private:
     QSharedPointer<QnRtspAudioLayout> m_audioLayout;
 };
 
-#endif // ENABLE_DATA_PROVIDERS
+} // namespace nx::streaming::rtp
 
-#endif // __AAC_RTP_PARSER_H
+#endif // ENABLE_DATA_PROVIDERS

@@ -1,17 +1,17 @@
-#ifndef __G711_RTP_PARSER_H
-#define __G711_RTP_PARSER_H
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/rtp/parsers/rtp_stream_parser.h>
+
+namespace nx::streaming::rtp {
 
 // used for G711, G726 e.t.c simple audio codecs with one frame per packet
-
-class QnSimpleAudioRtpParser: public QnRtpAudioStreamParser
+class SimpleAudioParser: public AudioStreamParser
 {
 public:
-    QnSimpleAudioRtpParser();
-    virtual ~QnSimpleAudioRtpParser();
+    SimpleAudioParser();
+    virtual ~SimpleAudioParser();
     virtual void setSdpInfo(QList<QByteArray> sdpInfo) override;
 
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, bool& gotData) override;
@@ -28,6 +28,7 @@ private:
     AVSampleFormat m_sampleFormat;
 };
 
+} // namespace nx::streaming::rtp
+
 #endif // ENABLE_DATA_PROVIDERS
 
-#endif // __AAC_RTP_PARSER_H
