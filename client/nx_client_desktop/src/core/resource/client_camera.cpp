@@ -76,8 +76,11 @@ QnConstResourceAudioLayoutPtr QnClientCameraResource::getAudioLayout(const QnAbs
 
 QnAbstractStreamDataProvider* QnClientCameraResource::createLiveDataProvider()
 {
-    QnArchiveStreamReader *result = new QnArchiveStreamReader(toSharedPointer());
+    const auto camera = toSharedPointer(this);
+
+    QnArchiveStreamReader *result = new QnArchiveStreamReader(camera);
     auto delegate = new QnRtspClientArchiveDelegate(result);
+    delegate->setCamera(camera);
     result->setArchiveDelegate(delegate);
 
     connect(delegate, &QnRtspClientArchiveDelegate::dataDropped, this,
