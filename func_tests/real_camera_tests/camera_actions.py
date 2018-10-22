@@ -29,7 +29,7 @@ def _ffprobe_poll(expected_values, probe, stream_url, title):
             return
         yield Halt('{!r} ffprobe is in progress'.format(title))
 
-    stdout, stderr = probe.communicate()
+    stdout, stderr = probe.communicate()  # Loop above polls until process has exited.
     if stdout:
         _logger.debug('FFprobe(%s) stdout:\n%s', stream_url, stdout)
     if stderr:
