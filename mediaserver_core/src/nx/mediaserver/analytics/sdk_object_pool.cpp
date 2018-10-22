@@ -2,6 +2,7 @@
 
 #include <nx/vms/api/analytics/plugin_manifest.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
+#include <nx/vms/api/analytics/descriptors.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
 #include <nx/mediaserver/sdk_support/pointers.h>

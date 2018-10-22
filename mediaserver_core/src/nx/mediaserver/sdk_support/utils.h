@@ -20,6 +20,13 @@
 #include <plugins/settings.h>
 
 class QnMediaServerModule;
+
+namespace nx::analytics {
+
+class DescriptorListManager;
+
+} // namespace nx::analytics
+
 namespace nx::mediaserver::analytics {
 
 class SdkObjectPool;
@@ -83,6 +90,7 @@ QnSharedResourcePointer<ResourceType> find(QnMediaServerModule* serverModule, co
 }
 
 analytics::SdkObjectPool* getSdkObjectPool(QnMediaServerModule* serverModule);
+nx::analytics::DescriptorListManager* getDescriptorListManager(QnMediaServerModule* serverModule);
 
 bool deviceInfoFromResource(
     const QnVirtualCameraResourcePtr& device,

@@ -9,10 +9,27 @@
 
 #include <nx/mediaserver/analytics/sdk_object_pool.h>
 
+#include <nx/vms/api/analytics/descriptors.h>
+#include <nx/analytics/descriptor_list_manager.h>
+
 namespace nx::mediaserver::resource {
 
 namespace analytics_api = nx::vms::api::analytics;
 namespace analytics_sdk = nx::sdk::analytics;
+
+namespace {
+
+analytics_api::PluginDescriptor descriptorFromManifest(
+    const analytics_api::PluginManifest& manifest)
+{
+    analytics_api::PluginDescriptor descriptor;
+    descriptor.id = manifest.id;
+    descriptor.name = manifest.name;
+
+    return descriptor;
+}
+
+} // namespace
 
 AnalyticsPluginResource::AnalyticsPluginResource(QnMediaServerModule* serverModule):
     base_type(),
@@ -37,6 +54,14 @@ CameraDiagnostics::Result AnalyticsPluginResource::initInternal()
     if (!manifest)
         return CameraDiagnostics::PluginErrorResult("Can't deserialize engine manifest");
 
+    auto analyticsDescriptorListManager = sdk_support::getDescriptorListManager(serverModule());
+    if (!analyticsDescriptorListManager)
+    {
+        return CameraDiagnostics::InternalServerErrorResult(
+            "Can't access analytics descriptor list manager");
+    }
+
+    analyticsDescriptorListManager->addDescriptor(descriptorFromManifest(*manifest));
     setManifest(*manifest);
     saveParams();
 
