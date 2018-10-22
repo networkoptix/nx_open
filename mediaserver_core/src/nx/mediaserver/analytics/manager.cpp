@@ -388,7 +388,7 @@ void Manager::createDeviceAgentsForResourceUnsafe(const QnSecurityCamResourcePtr
             createMetadataHandler(camera, *engineManifest));
 
         if (auto consumingDeviceAgent = nxpt::ScopedRef<DeviceAgent>(
-            deviceAgent->queryInterface(IID_DeviceAgent)))
+            deviceAgent->queryInterface(IID_ConsumingDeviceAgent)))
         {
             handler->registerDataReceptor(&context);
             handler->setVisualDebugger(m_visualMetadataDebugger.get());
