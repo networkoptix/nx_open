@@ -16,7 +16,6 @@ def is_FileField(field):
 
 @register.simple_tag
 def get_data_structure(data_structure_name, context):
-    data_structure_name = data_structure_name.replace('_external_file', '')
     query = DataStructure.objects.filter(context=context, name=data_structure_name)
     if query.exists():
         return query[0]
@@ -25,7 +24,6 @@ def get_data_structure(data_structure_name, context):
 
 @register.simple_tag
 def is_external_file(data_structure_name, context):
-    data_structure_name = data_structure_name.replace('_external_file', '')
     query = DataStructure.objects.filter(context=context, name=data_structure_name)
     if query.exists():
         return query[0].type == DataStructure.DATA_TYPES.external_file
@@ -34,7 +32,6 @@ def is_external_file(data_structure_name, context):
 
 @register.simple_tag
 def has_value(data_structure_name, product, context, language):
-    data_structure_name = data_structure_name.replace('_external_file', '')
     query = DataStructure.objects.filter(context=context, name=data_structure_name)
 
     if query.exists():

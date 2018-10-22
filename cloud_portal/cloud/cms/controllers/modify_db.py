@@ -131,10 +131,14 @@ def save_unrevisioned_records(product, context, language, data_structures,
                 md5 = hashlib.md5()
                 for chunk in request_file.chunks():
                     md5.update(chunk)
-                external_file = ExternalFile(file=request_file,
-                                             md5=md5.hexdigest(),
-                                             size=request_file.size/1048576.0)
+
+                external_file = ExternalFile()
+                external_file.file = request_file
+                external_file.md5 = md5.hexdigest()
+                external_file.product = product
+                external_file.size = request_file.size/1048576.0
                 external_file.save()
+
                 new_record_value = external_file.file.url
 
             # Mark this file for deletion
