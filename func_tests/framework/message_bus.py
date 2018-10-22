@@ -100,11 +100,11 @@ def _bus_thread_running(server, queue):
             return
         except websocket.WebSocketConnectionClosedException as x:
             logger.error('WebSocket connection closed: %s', x)
-            reopen_socket = False
+            reopen_socket = True
         except socket.error as x:
             logger.error('Socket error: [%s] %s', x.errno, x.strerror)
             if x.errno in [errno.ECONNRESET, errno.EPIPE]:
-                reopen_socket = False
+                reopen_socket = True
             else:
                 raise
 
