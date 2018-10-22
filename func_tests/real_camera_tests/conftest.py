@@ -13,17 +13,19 @@ def pytest_addoption(parser):
     g.addoption(
         '--rct-interface',
         default=defaults.get('rct_interface'),
-        help='Network interface with cameras')
+        help="Network interface with cameras, e.g. eth0 or enp7s0.")
     g.addoption(
         '--rct-network',
         default=defaults.get('rct_network'),
         type=IPNetwork,
-        help='Network interface IP/mask')
+        help=(
+            "Network settings of interface of VM Mediaserver runs on, e.g. 192.168.10.20/28. "
+            "Camera and this VM interface should be in same IP network."))
     g.addoption(
         '--rct-expected-cameras',
         default=defaults.get('rct_expected_cameras'),
         type=Path(__file__).parent.joinpath,
-        help='Stage rules for cameras')
+        help="Stage rules for cameras. Find some examples in {}.".format(Path(__file__).parent))
     g.addoption(
         '--rct-camera-cycle-delay',
         default=defaults.get('rct_camera_cycle_delay', '1s'),
