@@ -91,20 +91,28 @@ def _bus_thread_running(server, queue):
     wsl = [open_websocket()]
 
     def process_transaction():
+        reopen_socket = False
+
         try:
             data = wsl[0].recv()
             json_data = json.loads(data)
         except websocket.WebSocketTimeoutException as x:
             return
+        except websocket.WebSocketConnectionClosedException as x:
+            logger.error('WebSocket connection closed: %s', x)
+            reopen_socket = False
         except socket.error as x:
             logger.error('Socket error: [%s] %s', x.errno, x.strerror)
             if x.errno in [errno.ECONNRESET, errno.EPIPE]:
-                logger.info('Reopening socket.')
-                wsl[0].close()
-                wsl[0] = open_websocket()
-                return
+                reopen_socket = False
             else:
                 raise
+
+        if reopen_socket:
+            logger.info('Reopening socket.')
+            wsl[0].close()
+            wsl[0] = open_websocket()
+            return
 
         logger.debug('Received:\n%s', pprint.pformat(json_data))
         command_name = json_data['tran']['command']
