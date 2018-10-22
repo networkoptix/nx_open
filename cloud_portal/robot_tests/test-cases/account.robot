@@ -179,6 +179,7 @@ Langauge is changeable on the account page
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='${lang}']
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Element    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='${lang}']/..
+    \  Click Button    ${ACCOUNT SAVE}
     \  Sleep    1    #to allow the system to change languages
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //h1['${account}']
     Wait Until Element Is Visible    ${ACCOUNT LANGUAGE DROPDOWN}
