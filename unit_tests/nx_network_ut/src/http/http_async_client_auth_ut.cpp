@@ -222,6 +222,11 @@ INSTANTIATE_TEST_CASE_P(HttpClientAsyncAuthorizationInstance, HttpClientAsyncAut
         TestParams{digest, basic, basic, /* expected */ basic, 200},
         TestParams{basic, digest, digest, /* expected */ digest, 200},
 
+        // Should always prefer digest to basic:
+        TestParams{basic, digest, both, /* expected */ digest, 200},
+        TestParams{digest, basic, both, /* expected */ digest, 200},
+
+        // Is not allowed to auth:
         TestParams{digest, std::nullopt, basic, /* expected */ std::nullopt, 401},
         TestParams{basic, std::nullopt, digest, /* expected */ std::nullopt, 401}
     ));

@@ -1442,43 +1442,54 @@ QString AsyncClient::endpointWithProtocol(const nx::utils::Url& url)
         .arg(url.port(nx::network::http::defaultPortForScheme(url.scheme().toLatin1())));
 }
 
+static std::optional<header::WWWAuthenticate> extractWWWAuthenticateHeader(
+    const HttpHeaders& headers, bool isProxy, AuthType authType)
+{
+    const StringType authenticateHeaderName = isProxy ? "Proxy-Authenticate" : "WWW-Authenticate";
+
+    std::optional<header::WWWAuthenticate> result;
+    for (HttpHeaders::const_iterator it = headers.begin(); it != headers.end(); it++)
+    {
+        if (it->first != authenticateHeaderName)
+            continue;
+
+        result = header::WWWAuthenticate();
+        result->parse(it->second);
+        auto authScheme = result->authScheme;
+        if (authType == AuthType::authBasic && authScheme == header::AuthScheme::basic)
+            return result;
+        if (authType == AuthType::authDigest && authScheme == header::AuthScheme::digest)
+            return result;
+
+        // Try to use digest if both are available.
+        if (authType == AuthType::authBasicAndDigest && authScheme == header::AuthScheme::digest)
+            return result;
+    }
+
+    // Lets use basic auth if digest header is not available.
+    if (authType == AuthType::authBasicAndDigest)
+        return result;
+    return {};
+}
+
+
 bool AsyncClient::resendRequestWithAuthorization(
     const nx::network::http::Response& response,
     bool isProxy)
 {
-    const StringType authenticateHeaderName =
-        isProxy ? "Proxy-Authenticate" : "WWW-Authenticate";
+    // If response contains WWW-Authenticate with Digest authentication, generating
+    // "Authorization: Digest" header and adding it to custom headers.
+    NX_ASSERT(response.statusLine.statusCode == StatusCode::unauthorized ||
+        response.statusLine.statusCode == StatusCode::proxyAuthenticationRequired);
+
     const StringType authorizationHeaderName =
         isProxy ? StringType("Proxy-Authorization") : header::Authorization::NAME;
     const auto credentials = isProxy ? m_proxyUser : m_user;
 
-    // If response contains WWW-Authenticate with Digest authentication,
-    // generating "Authorization: Digest" header and adding it to custom headers.
-    NX_ASSERT(response.statusLine.statusCode == StatusCode::unauthorized ||
-        response.statusLine.statusCode == StatusCode::proxyAuthenticationRequired);
-
-    // TODO: move to function
-    header::WWWAuthenticate wwwAuthenticateHeader;
-    HttpHeaders::const_iterator wwwAuthenticateIter;
-    for (wwwAuthenticateIter = response.headers.begin();
-         wwwAuthenticateIter != response.headers.end(); wwwAuthenticateIter++)
-    {
-        if (wwwAuthenticateIter->first != authenticateHeaderName)
-            continue;
-
-        wwwAuthenticateHeader.parse(wwwAuthenticateIter->second);
-        auto authScheme = wwwAuthenticateHeader.authScheme;
-        if (m_authType == AuthType::authBasic && authScheme == header::AuthScheme::basic)
-            break;
-        if (m_authType == AuthType::authDigest && authScheme == header::AuthScheme::digest)
-            break;
-        if (m_authType == AuthType::authBasicAndDigest)
-            break; // TODO: try to use digest here first
-    }
-    if (wwwAuthenticateIter == response.headers.end())
+    auto wwwAuthenticateHeader = extractWWWAuthenticateHeader(response.headers, isProxy, m_authType);
+    if(!wwwAuthenticateHeader)
         return false;
-
-    if (wwwAuthenticateHeader.authScheme == header::AuthScheme::basic &&
+    if (wwwAuthenticateHeader->authScheme == header::AuthScheme::basic &&
         (credentials.authToken.type == AuthTokenType::password || credentials.authToken.empty()))
     {
         header::BasicAuthorization basicAuthorization(
@@ -1495,18 +1506,18 @@ bool AsyncClient::resendRequestWithAuthorization(
             m_contentLocationUrl,
             m_request.requestLine.method,
             credentials,
-            std::move(wwwAuthenticateHeader),
+            std::move(*wwwAuthenticateHeader),
             std::move(basicAuthorization));
         AuthInfoCache::instance()->cacheAuthorization(m_authCacheItem);
     }
-    else if (wwwAuthenticateHeader.authScheme == header::AuthScheme::digest)
+    else if (wwwAuthenticateHeader->authScheme == header::AuthScheme::digest)
     {
         header::DigestAuthorization digestAuthorizationHeader;
         if (!calcDigestResponse(
                 m_request.requestLine.method,
                 credentials,
                 m_contentLocationUrl.toString(QUrl::RemoveScheme | QUrl::RemovePort | QUrl::RemoveAuthority | QUrl::FullyEncoded).toUtf8(),
-                wwwAuthenticateHeader,
+                *wwwAuthenticateHeader,
                 &digestAuthorizationHeader))
         {
             return false;
@@ -1522,7 +1533,7 @@ bool AsyncClient::resendRequestWithAuthorization(
             m_contentLocationUrl,
             m_request.requestLine.method,
             credentials,
-            std::move(wwwAuthenticateHeader),
+            std::move(*wwwAuthenticateHeader),
             std::move(digestAuthorizationHeader));
         AuthInfoCache::instance()->cacheAuthorization(m_authCacheItem);
     }
