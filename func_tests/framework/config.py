@@ -152,6 +152,8 @@ class SingleTestConfig(object):
             return value
         if t is int:
             return int(value)
+        if t is float:
+            return float(value)
         if t is bool:
             if value.lower() in ['true', 'yes', 'on']:
                 return True
