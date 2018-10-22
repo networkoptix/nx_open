@@ -6,9 +6,7 @@
 #include <utils/media/hevc_sps.h>
 #include <utils/common/synctime.h>
 
-namespace nx {
-namespace network {
-namespace rtp {
+namespace nx::streaming::rtp {
 
 namespace {
 
@@ -29,7 +27,7 @@ namespace hevc = nx::media_utils::hevc;
 
 HevcParser::HevcParser()
 {
-    QnRtpStreamParser::setFrequency(90000);
+    StreamParser::setFrequency(90000);
 }
 
 bool HevcParser::processData(
@@ -129,7 +127,7 @@ void HevcParser::parseRtpMap(const nx::Buffer& rtpMapLine)
     if (!success)
         return;
 
-    QnRtpStreamParser::setFrequency(frequency);
+    StreamParser::setFrequency(frequency);
 
     values = values[0].split(':');
     if (values.size() < 2)
@@ -238,11 +236,11 @@ bool HevcParser::processRtpHeader(
     if (outIsFatalError)
         *outIsFatalError = true;
 
-    if (payloadLength < RtpHeader::RTP_HEADER_SIZE + 1)
+    if (payloadLength < RtpHeader::kSize + 1)
         return false;
 
     auto rtpHeaderSize = calculateFullRtpHeaderSize(payload, payloadLength);
-    if (rtpHeaderSize < RtpHeader::RTP_HEADER_SIZE)
+    if (rtpHeaderSize < RtpHeader::kSize)
         return false;
 
     auto rtpHeader = (RtpHeader*)(payload);
@@ -281,21 +279,20 @@ int HevcParser::calculateFullRtpHeaderSize(
     const uint8_t* rtpHeaderStart,
     int bufferSize) const
 {
-    //Buffer size should be at least RtpHeader::RTP_HEADER_SIZE bytes long.
+    //Buffer size should be at least RtpHeader::kSize bytes long.
     auto rtpHeader = (RtpHeader*) rtpHeaderStart;
-    int headerSize = RtpHeader::RTP_HEADER_SIZE +
-        rtpHeader->CSRCCount * RtpHeader::CSRC_SIZE;
+    int headerSize = rtpHeader->payloadOffset();
 
     if (headerSize > bufferSize)
         return kInvalidHeaderSize;
 
     if (rtpHeader->extension)
     {
-        if (bufferSize < headerSize + RtpHeader::EXTENSION_HEADER_SIZE)
+        if (bufferSize < headerSize + RtpHeaderExtension::kSize)
             return kInvalidHeaderSize;
 
         auto extension = (RtpHeaderExtension*)(rtpHeaderStart + headerSize);
-        headerSize += RtpHeader::EXTENSION_HEADER_SIZE;
+        headerSize += RtpHeaderExtension::kSize;
 
         const int kWordSize = 4;
         headerSize += ntohs(extension->length) * kWordSize;
@@ -695,6 +692,4 @@ void HevcParser::addSdpParameterSetsIfNeeded(QnByteArray& buffer)
     }
 }
 
-} // namespace rtp
-} // namespace network
-} // namespace nx
+} // namespace nx::streaming::rtp

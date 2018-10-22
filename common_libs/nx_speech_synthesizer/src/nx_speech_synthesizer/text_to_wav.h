@@ -12,8 +12,6 @@
 #include <utils/common/threadqueue.h>
 #include <utils/media/audioformat.h>
 
-// TODO: #Elric this header does not belong in the source root.
-
 //!Synthesizes wav based on \a text. Uses festival engine
 /*!
     \param text Only latin1 string is supported

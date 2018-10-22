@@ -2,20 +2,12 @@
 
 #if defined(ENABLE_DATA_PROVIDERS)
 
+#include <nx/streaming/rtp/rtp.h>
 #include <nx/streaming/video_data_packet.h>
-#include <nx/streaming/rtp_stream_parser.h>
-#include <nx/streaming/rtsp_client.h>
 #include <nx/streaming/config.h>
 #include <utils/common/synctime.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/unused.h>
-
-#if 0
-static const char H264_NAL_PREFIX[4] = {0x00, 0x00, 0x00, 0x01};
-static const char H264_NAL_SHORT_PREFIX[3] = {0x00, 0x00, 0x01};
-static const int DEFAULT_SLICE_SIZE = 1024 * 1024;
-static const int DEFAULT_MJPEG_HEADER_SIZE = 1024;
-#endif // 0
 
 #if 0
 
@@ -50,6 +42,8 @@ static const int jpeg_chroma_quantizer[64] = {
 #else // 0
 
 // Tables from ffmpeg.
+
+namespace nx::streaming::rtp {
 
 static const int jpeg_luma_quantizer[64] = {
     16,  11,  12,  14,  12,  10,  16,  14,
@@ -230,7 +224,7 @@ quint8* MakeDRIHeader(quint8* p, u_short dri)
  * @param p Pointer to the return array.
  * @return Length of the generated headers.
  */
-int QnMjpegRtpParser::makeHeaders(
+int MjpegParser::makeHeaders(
     quint8* p, int type, int w, int h, const quint8* lqt, const quint8* cqt, u_short dri)
 {
     quint8* start = p;
@@ -313,7 +307,7 @@ int QnMjpegRtpParser::makeHeaders(
     return p - start;
 }
 
-void QnMjpegRtpParser::updateHeaderTables(const quint8* lumaTable, const quint8* chromaTable)
+void MjpegParser::updateHeaderTables(const quint8* lumaTable, const quint8* chromaTable)
 {
     memcpy(m_lumaTablePos, lumaTable, 64 * 1);
     memcpy(m_chromaTablePos, chromaTable, 64 * 1);
@@ -321,9 +315,9 @@ void QnMjpegRtpParser::updateHeaderTables(const quint8* lumaTable, const quint8*
 
 //-------------------------------------------------------------------------------------------------
 
-QnMjpegRtpParser::QnMjpegRtpParser()
+MjpegParser::MjpegParser()
 {
-    QnRtpStreamParser::setFrequency(90000);
+    StreamParser::setFrequency(90000);
     memset(m_lumaTable, 0, sizeof(m_lumaTable));
     memset(m_chromaTable, 0, sizeof(m_chromaTable));
     m_frameWidth = 0;
@@ -340,11 +334,11 @@ QnMjpegRtpParser::QnMjpegRtpParser()
     m_frameSize = 0;
 }
 
-QnMjpegRtpParser::~QnMjpegRtpParser()
+MjpegParser::~MjpegParser()
 {
 }
 
-void QnMjpegRtpParser::setSdpInfo(QList<QByteArray> lines)
+void MjpegParser::setSdpInfo(QList<QByteArray> lines)
 {
     for (int i = 0; i < lines.size(); ++i)
     {
@@ -378,7 +372,7 @@ void QnMjpegRtpParser::setSdpInfo(QList<QByteArray> lines)
     }
 }
 
-bool QnMjpegRtpParser::parseMjpegExtension(const quint8* data, int size)
+bool MjpegParser::parseMjpegExtension(const quint8* data, int size)
 {
     // Remove padding
     while (size > 0 && data[size - 1] == 0xff)
@@ -410,7 +404,7 @@ bool getUint16(const quint8** data, int* size, quint16* result)
     return true;
 };
 
-bool QnMjpegRtpParser::processRtpExtensions(const quint8* data, int size)
+bool MjpegParser::processRtpExtensions(const quint8* data, int size)
 {
     static const quint16 kOnvifTimeExtensionCode = 0xabac;
     static const quint16 kOnvifJpegExtensionCode = 0xffd8;
@@ -444,23 +438,23 @@ bool QnMjpegRtpParser::processRtpExtensions(const quint8* data, int size)
     return size == 0;
 }
 
-bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytesRead, bool& gotData)
+bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytesRead, bool& gotData)
 {
     gotData = false;
     const quint8* rtpBuffer = rtpBufferBase + bufferOffset;
 
     static quint8 jpeg_end[2] = {0xff, 0xd9};
 
-    if (bytesRead < RtpHeader::RTP_HEADER_SIZE + 1)
+    if (bytesRead < RtpHeader::kSize + 1)
         return false;
 
     RtpHeader* rtpHeader = (RtpHeader*)rtpBuffer;
-    const quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
-    int bytesLeft = bytesRead - RtpHeader::RTP_HEADER_SIZE;
+    const quint8* curPtr = rtpBuffer + RtpHeader::kSize;
+    int bytesLeft = bytesRead - RtpHeader::kSize;
 
     if (rtpHeader->extension)
     {
-        if (bytesRead < RtpHeader::RTP_HEADER_SIZE + 4)
+        if (bytesRead < RtpHeader::kSize + 4)
             return false;
 
         int extWords = ((int)curPtr[2] << 8) + curPtr[3];
@@ -657,5 +651,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
     }
     return true;
 }
+
+} // namespace nx::streaming::rtp
 
 #endif // defined(ENABLE_DATA_PROVIDERS)

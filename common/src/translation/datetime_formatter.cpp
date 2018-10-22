@@ -39,6 +39,7 @@ std::map<Format, QString> formatStrings =
     {Format::dd_MM, lit("dd-MM")},
     {Format::MMMM_yyyy, lit("MMMM yyyy")},
     {Format::dd_MM_yyyy, lit("dd-MM-yyyy")},
+    {Format::dd_MMMM_yyyy, lit("dd MMMM yyyy")},
     {Format::yyyy_MM_dd_hh_mm_ss, lit("yyyy-MM-dd hh:mm:ss")},
     {Format::dddd_d_MMMM_yyyy_hh_mm_ss, lit("dddd, d MMMM yyyy hh:mm:ss")},
 

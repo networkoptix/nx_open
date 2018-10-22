@@ -1,14 +1,13 @@
 #pragma once
 
-#include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/rtp/rtp.h>
+#include <nx/streaming/rtp/parsers/rtp_stream_parser.h>
 #include <nx/streaming/video_data_packet.h>
 
 #include <utils/media/hevc_common.h>
 #include <nx/network/buffer.h>
 
-namespace nx {
-namespace network {
-namespace rtp {
+namespace nx::streaming::rtp {
 
 struct HevcContext
 {
@@ -29,7 +28,7 @@ struct HevcContext
 /**
  * Implements RTP payload parsing for HEVC according to RFC 7798
  */
-class HevcParser: public QnRtpVideoStreamParser
+class HevcParser: public VideoStreamParser
 {
     // Decoding order number field type.
     enum class DonType
@@ -41,14 +40,14 @@ class HevcParser: public QnRtpVideoStreamParser
 public:
     HevcParser();
 
-    // Implementation of QnRtpStreamParser::processData
+    // Implementation of StreamParser::processData
     virtual bool processData(
         quint8* rtpBufferBase,
         int bufferOffset,
         int bytesRead,
         bool& gotData) override;
 
-    // Implementation of QnRtpStreamParser::setSDPInfo
+    // Implementation of StreamParser::setSDPInfo
     virtual void setSdpInfo(QByteArrayList lines) override;
 
 private:
@@ -143,6 +142,4 @@ private:
     const uint8_t* m_rtpBufferBase;
 };
 
-} // namespace rtp
-} // namespace network
-} // namespace nx
+} // namespace nx::streaming::rtp

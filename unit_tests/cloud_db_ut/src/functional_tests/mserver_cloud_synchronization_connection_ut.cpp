@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <nx/utils/random.h>
+
 #include "mserver_cloud_synchronization_connection_fixture.h"
 
 namespace nx {
@@ -49,18 +51,16 @@ TEST_F(Ec2MserverCloudSynchronizationConnection, multiple_connections)
     ASSERT_EQ(maxAllowedConcurrentConnections, activeConnectionCount());
 }
 
-TEST_F(Ec2MserverCloudSynchronizationConnection, checking_connection_blink_stability)
+TEST_F(Ec2MserverCloudSynchronizationConnection, cloud_db_is_stable_when_connections_blink)
 {
     constexpr int maxConcurrentConnectionsToCreate = 50;
-    constexpr auto testRunTime = std::chrono::seconds(10);
+    constexpr auto iterationCount = 2;
 
-    const auto runUntil = std::chrono::steady_clock::now() + testRunTime;
-    while (std::chrono::steady_clock::now() < runUntil)
+    for (int i = 0; i < iterationCount; ++i)
     {
         openTransactionConnections(maxConcurrentConnectionsToCreate);
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-
+        std::this_thread::sleep_for(
+            std::chrono::milliseconds(nx::utils::random::number<int>(100, 999)));
         closeAllConnections();
     }
 }

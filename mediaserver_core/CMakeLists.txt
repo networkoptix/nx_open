@@ -11,11 +11,6 @@ nx_configure_file(
     maven/filter-resources/resources/serverProperties.json
     ${CMAKE_CURRENT_BINARY_DIR}/serverProperties.json)
 
-nx_configure_file(
-   ${customization_dir}/icons/all/favicon.ico
-   ${CMAKE_CURRENT_BINARY_DIR}/resources/static/customization
-   COPYONLY)
-
 set(apidoctool_jar "${APIDOCTOOL_PATH}/apidoctool.jar")
 
 set(apidoctool_params
@@ -71,6 +66,7 @@ set(static_resources
     ${customization_dir}/license.html
     ${NX_SDK_PACKAGE}
     ${NX_STORAGE_SDK_PACKAGE}
+    ${CMAKE_SOURCE_DIR}/specific_features.txt
 )
 set_source_files_properties(${static_resources} PROPERTIES RESOURCE_ALIAS_PREFIX static/)
 

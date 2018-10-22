@@ -1,3 +1,4 @@
+import datetime
 import pprint
 import time
 import timeit
@@ -11,6 +12,15 @@ _logger = ContextLogger(__name__, 'wait')
 
 
 DEFAULT_MAX_DELAY_SEC = 5
+
+
+class Timer(object):
+    def __init__(self):
+        self._start = timeit.default_timer()
+
+    @property
+    def from_start(self):
+        return datetime.timedelta(seconds=timeit.default_timer() - self._start)
 
 
 class Wait(object):

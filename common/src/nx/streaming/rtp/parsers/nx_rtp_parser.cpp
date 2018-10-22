@@ -4,11 +4,10 @@
 
 #include <analytics/common/object_detection_metadata.h>
 
+#include <nx/streaming/rtp/rtp.h>
 #include <nx/streaming/audio_data_packet.h>
 #include <nx/streaming/video_data_packet.h>
 #include <nx/streaming/basic_media_context.h>
-#include <nx/streaming/rtp_stream_parser.h>
-#include <nx/streaming/rtsp_client.h>
 #include <nx/streaming/config.h>
 #include <nx/streaming/nx_streaming_ini.h>
 
@@ -19,8 +18,14 @@
 
 using namespace nx::debugging;
 
+namespace nx::streaming::rtp {
+
+static const int RTSP_FFMPEG_GENERIC_HEADER_SIZE = 8;
+static const int RTSP_FFMPEG_VIDEO_HEADER_SIZE = 3;
+static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 8; //< m_duration + metadataType
+
 QnNxRtpParser::QnNxRtpParser(const QString& debugSourceId):
-    QnRtpVideoStreamParser(),
+    VideoStreamParser(),
     m_debugSourceId(debugSourceId),
     m_nextDataPacketBuffer(nullptr),
     m_position(AV_NOPTS_VALUE),
@@ -79,7 +84,7 @@ void QnNxRtpParser::writeAnalyticsMetadataToLogFile(const QnAbstractMediaDataPtr
 bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dataSize, bool& gotData)
 {
     gotData = false;
-    if (dataSize < RtpHeader::RTP_HEADER_SIZE)
+    if (dataSize < RtpHeader::kSize)
     {
         NX_WARNING(this,
             lm("Invalid RTP packet size=%1. size < RTP header size. Ignored.").arg(dataSize));
@@ -94,8 +99,8 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
         return false;
     }
 
-    const quint8* payload = data + RtpHeader::RTP_HEADER_SIZE;
-    dataSize -= RtpHeader::RTP_HEADER_SIZE;
+    const quint8* payload = data + RtpHeader::kSize;
+    dataSize -= RtpHeader::kSize;
     const bool isCodecContext = ntohl(rtpHeader->ssrc) & 1; // odd numbers - codec context, even numbers - data
     if (isCodecContext)
     {
@@ -303,3 +308,5 @@ void QnNxRtpParser::setAudioEnabled(bool value)
 {
     m_isAudioEnabled = value;
 }
+
+} // namespace nx::streaming::rtp

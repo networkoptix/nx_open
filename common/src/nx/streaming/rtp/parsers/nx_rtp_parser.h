@@ -3,10 +3,12 @@
 #include <QByteArray>
 #include <QMap>
 
-#include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/rtp/parsers/rtp_stream_parser.h>
 #include <nx/debugging/abstract_visual_metadata_debugger.h>
 
-class QnNxRtpParser: public QnRtpVideoStreamParser
+namespace nx::streaming::rtp {
+
+class QnNxRtpParser: public VideoStreamParser
 {
 public:
     /** @param debugSourceId Human-readable stream source id for logging. */
@@ -42,3 +44,5 @@ private:
 };
 
 using QnNxRtpParserPtr = QSharedPointer<QnNxRtpParser>;
+
+} // namespace nx::streaming::rtp

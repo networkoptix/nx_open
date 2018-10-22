@@ -195,7 +195,7 @@ class WindowsAccess(OSAccess):
             dir_path_raw = dir_selector_set['w:Selector'][0]['#text']
             dir_path = self.path_cls(dir_path_raw)
             volume_selector_set = mount_point['Volume']['a:ReferenceParameters']['w:SelectorSet']
-            volume = find_by_selector_set(volume_selector_set, volume_list)
+            volume, = find_by_selector_set(volume_selector_set, volume_list)
             result[dir_path] = int(volume['FreeSpace'])
         return result
 

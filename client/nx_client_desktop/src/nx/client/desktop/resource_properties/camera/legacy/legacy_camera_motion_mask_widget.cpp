@@ -106,7 +106,7 @@ void LegacyCameraMotionMaskWidget::init()
 void LegacyCameraMotionMaskWidget::createWorkbenchLayout()
 {
     const auto workbenchLayout = qnWorkbenchLayoutsFactory->create(this);
-    workbenchLayout->setCellSpacing(0);
+    workbenchLayout->setCellSpacing(Qn::CellSpacing::None);
     workbenchLayout->setFlags(workbenchLayout->flags()
         | QnLayoutFlag::FixedViewport
         | QnLayoutFlag::MotionWidget);

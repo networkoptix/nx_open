@@ -5,7 +5,7 @@ import logging
 import subprocess
 from datetime import timedelta
 
-from framework.utils import Timer
+from framework.waiting import Timer
 from .checks import Success, Halt, Failure, expect_values
 
 _logger = logging.getLogger(__name__)
@@ -24,12 +24,12 @@ def fps_avg(fps):
 def _ffprobe_poll(expected_values, probe, stream_url, title):
     timer = Timer()
     while probe.poll() is None:
-        if timer.duration > timedelta(seconds=30):
+        if timer.from_start > timedelta(seconds=30):
             yield Halt('{!r} ffprobe has timed out'.format(title))
             return
         yield Halt('{!r} ffprobe is in progress'.format(title))
 
-    stdout, stderr = probe.communicate()
+    stdout, stderr = probe.communicate()  # Loop above polls until process has exited.
     if stdout:
         _logger.debug('FFprobe(%s) stdout:\n%s', stream_url, stdout)
     if stderr:

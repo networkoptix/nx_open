@@ -5,44 +5,7 @@
 #include <nx/streaming/media_data_packet.h>
 #include <core/resource/resource_media_layout.h>
 
-#pragma pack(push, 1)
-struct RtpHeader
-{
-    static const int RTP_HEADER_SIZE = 12;
-    static const int RTP_VERSION = 2;
-    static const int CSRC_SIZE = 4;
-    static const int EXTENSION_HEADER_SIZE = 4;
-#if Q_BYTE_ORDER == Q_BIG_ENDIAN
-    unsigned short   version:2;     /* packet type                */
-    unsigned short   padding:1;     /* padding flag               */
-    unsigned short   extension:1;   /* header extension flag      */
-    unsigned short   CSRCCount:4;   /* CSRC count                 */
-    unsigned short   marker:1;      /* marker bit                 */
-    unsigned short   payloadType:7; /* payload type               */
-#else
-    unsigned short   CSRCCount:4;   /* CSRC count                 */
-    unsigned short   extension:1;   /* header extension flag      */
-    unsigned short   padding:1;     /* padding flag               */
-    unsigned short   version:2;     /* packet type                */
-    unsigned short   payloadType:7; /* payload type               */
-    unsigned short   marker:1;      /* marker bit                 */
-#endif
-    quint16 sequence;               // sequence number
-    quint32 timestamp;              // timestamp
-    quint32 ssrc;                   // synchronization source
-    //quint32 csrc;                 // synchronization source
-    //quint32 csrc[1];              // optional CSRC list
-};
-#pragma pack(pop)
-
-#pragma pack(push, 1)
-struct RtpHeaderExtension
-{
-    static const int kRtpExtensionHeaderLength = 4;
-    uint16_t definedByProfile; //< Name from RFC. Actually it is extension type id.
-    uint16_t length; //< Length in 4-byte words.
-};
-#pragma pack(pop)
+namespace nx::streaming::rtp {
 
 class QnRtspAudioLayout: public QnResourceAudioLayout
 {
@@ -56,12 +19,12 @@ private:
     AudioTrack m_audioTrack;
 };
 
-class QnRtpStreamParser: public QObject
+class StreamParser: public QObject
 {
     Q_OBJECT
 
 public:
-    virtual ~QnRtpStreamParser() {};
+    virtual ~StreamParser() {};
 
     virtual void setSdpInfo(QList<QByteArray> sdpInfo) = 0;
     virtual QnAbstractMediaDataPtr nextData() = 0;
@@ -87,11 +50,11 @@ private:
     int m_frequency = 0;
 };
 
-class QnRtpVideoStreamParser: public QnRtpStreamParser
+class VideoStreamParser: public StreamParser
 {
 
 public:
-    QnRtpVideoStreamParser();
+    VideoStreamParser();
     virtual QnAbstractMediaDataPtr nextData() override;
 
 protected:
@@ -128,7 +91,7 @@ protected:
     std::vector<quint8> m_nextFrameChunksBuffer;
 };
 
-class QnRtpAudioStreamParser: public QnRtpStreamParser
+class AudioStreamParser: public StreamParser
 {
 
 public:
@@ -150,3 +113,5 @@ protected:
 protected:
     std::deque<QnAbstractMediaDataPtr> m_audioData;
 };
+
+} // namespace nx::streaming::rtp

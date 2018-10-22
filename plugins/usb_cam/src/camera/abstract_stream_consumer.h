@@ -9,6 +9,7 @@ namespace usb_cam {
 class AbstractStreamConsumer
 {
 public:
+    virtual ~AbstractStreamConsumer() = default;
     virtual void flush() = 0;
 };
 

@@ -1,5 +1,7 @@
 #include "rtp_stream_parser.h"
 
+namespace nx::streaming::rtp {
+
 namespace {
 
 static const int kDefaultChunkContainerSize = 1024;
@@ -7,22 +9,22 @@ static const int kDefaultChannelCount = 1;
 
 } // namespace
 
-QnRtpVideoStreamParser::QnRtpVideoStreamParser()
+VideoStreamParser::VideoStreamParser()
 {
     m_chunks.reserve(kDefaultChunkContainerSize);
 }
 
-int QnRtpStreamParser::logicalChannelNum() const
+int StreamParser::logicalChannelNum() const
 {
     return m_logicalChannelNum;
 }
 
-void QnRtpStreamParser::setLogicalChannelNum(int value)
+void StreamParser::setLogicalChannelNum(int value)
 {
     m_logicalChannelNum = value;
 }
 
-void QnRtpAudioStreamParser::processIntParam(
+void AudioStreamParser::processIntParam(
     const QByteArray& checkName,
     int& setValue,
     const QByteArray& param)
@@ -37,7 +39,7 @@ void QnRtpAudioStreamParser::processIntParam(
         setValue = paramValue.toInt();
 }
 
-void QnRtpAudioStreamParser::processHexParam(
+void AudioStreamParser::processHexParam(
     const QByteArray& checkName,
     QByteArray& setValue,
     const QByteArray& param)
@@ -52,7 +54,7 @@ void QnRtpAudioStreamParser::processHexParam(
         setValue = QByteArray::fromHex(paramValue);
 }
 
-void QnRtpAudioStreamParser::processStringParam(
+void AudioStreamParser::processStringParam(
     const QByteArray& checkName,
     QByteArray& setValue,
     const QByteArray& param)
@@ -67,7 +69,7 @@ void QnRtpAudioStreamParser::processStringParam(
         setValue = paramValue;
 }
 
-QnAbstractMediaDataPtr QnRtpVideoStreamParser::nextData()
+QnAbstractMediaDataPtr VideoStreamParser::nextData()
 {
     if (m_mediaData)
     {
@@ -81,7 +83,7 @@ QnAbstractMediaDataPtr QnRtpVideoStreamParser::nextData()
     }
 }
 
-void QnRtpVideoStreamParser::backupCurrentData(const quint8* currentBufferBase)
+void VideoStreamParser::backupCurrentData(const quint8* currentBufferBase)
 {
     size_t chunksLength = 0;
     for (const auto& chunk: m_chunks)
@@ -100,7 +102,7 @@ void QnRtpVideoStreamParser::backupCurrentData(const quint8* currentBufferBase)
     }
 }
 
-QnAbstractMediaDataPtr QnRtpAudioStreamParser::nextData()
+QnAbstractMediaDataPtr AudioStreamParser::nextData()
 {
     if (m_audioData.empty())
     {
@@ -128,3 +130,5 @@ void QnRtspAudioLayout::setAudioTrackInfo(const AudioTrack& info)
 {
     m_audioTrack = info;
 }
+
+} // namespace nx::streaming::rtp

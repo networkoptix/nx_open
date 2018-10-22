@@ -1565,32 +1565,28 @@ void initialize(Manager* manager, Action* root)
             .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission)
             .text(ContextMenu::tr("None"))
             .checkable()
-            .checked(qnGlobals->defaultLayoutCellSpacing()
-                == QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::None));
+            .checked(QnWorkbenchLayout::kDefaultCellSpacing == Qn::CellSpacing::None);
 
         factory(SetCurrentLayoutItemSpacingSmallAction)
             .flags(Scene | NoTarget)
             .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission)
             .text(ContextMenu::tr("Small"))
             .checkable()
-            .checked(qnGlobals->defaultLayoutCellSpacing()
-                == QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Small));
+            .checked(QnWorkbenchLayout::kDefaultCellSpacing == Qn::CellSpacing::Small);
 
         factory(SetCurrentLayoutItemSpacingMediumAction)
             .flags(Scene | NoTarget)
             .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission)
             .text(ContextMenu::tr("Medium"))
             .checkable()
-            .checked(qnGlobals->defaultLayoutCellSpacing()
-                == QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Medium));
+            .checked(QnWorkbenchLayout::kDefaultCellSpacing == Qn::CellSpacing::Medium);
 
         factory(SetCurrentLayoutItemSpacingLargeAction)
             .flags(Scene | NoTarget)
             .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission)
             .text(ContextMenu::tr("Large"))
             .checkable()
-            .checked(qnGlobals->defaultLayoutCellSpacing()
-                == QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Large));
+            .checked(QnWorkbenchLayout::kDefaultCellSpacing == Qn::CellSpacing::Large);
         factory.endGroup();
 
     } factory.endSubMenu();

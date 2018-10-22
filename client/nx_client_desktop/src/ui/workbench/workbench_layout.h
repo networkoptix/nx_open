@@ -47,6 +47,8 @@ class QnWorkbenchLayout: public QObject, public QnConnectionContextAware
     Q_PROPERTY(QnLayoutResource* resource READ resourcePtr CONSTANT)
 
 public:
+    static constexpr auto kDefaultCellSpacing = Qn::CellSpacing::Small;
+
     /**
      * Helper struct for obtaining detailed information on move operations.
      */
@@ -252,7 +254,7 @@ public:
     /**
      * @param cellAspectRatio New aspect ratio for cells of this layout.
      */
-    void setCellAspectRatio(float cellAspectRatio);
+    void setCellAspectRatio(float value);
 
     static qreal cellSpacingValue(Qn::CellSpacing spacing);
 
@@ -267,6 +269,8 @@ public:
      * relative to cell size.
      */
     void setCellSpacing(qreal spacing);
+
+    void setCellSpacing(Qn::CellSpacing value);
 
     /**
      * @return Lock state of this layout.
@@ -407,8 +411,6 @@ private:
 
     QnUuid zoomTargetUuidInternal(QnWorkbenchItem* item) const;
 
-    void initCellParameters();
-
     /** Check that item belongs to the current layout. */
     bool own(QnWorkbenchItem* item) const;
 
@@ -437,14 +439,14 @@ private:
     /** Map from resource to a set of items. */
     QHash<QnResourcePtr, QSet<QnWorkbenchItem*>> m_itemsByResource;
 
-    /** Aspect ratio of a single cell. */
-    float m_cellAspectRatio;
+    /** Aspect ratio of a single cell. Zero or negative value means 'invalid'. */
+    float m_cellAspectRatio = 0.0;
 
     /** Spacing between cells, relative to cell width. */
-    qreal m_cellSpacing;
+    qreal m_cellSpacing = cellSpacingValue(kDefaultCellSpacing);
 
     /** Lock status of the layout. */
-    bool m_locked;
+    bool m_locked = false;
 
     /** Map from item's universally unique identifier to item. */
     QHash<QnUuid, QnWorkbenchItem*> m_itemByUuid;
