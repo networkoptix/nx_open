@@ -97,6 +97,11 @@ const char* Engine::manifest(Error* error) const
     return m_manifest.constData();
 }
 
+void Engine::freeManifest(const char* manifestData)
+{
+    // Do nothing actually.
+}
+
 EngineManifest Engine::fetchSupportedEvents(const DeviceInfo& deviceInfo)
 {
     EngineManifest result;

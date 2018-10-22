@@ -28,14 +28,14 @@ inline QnMediaServerResourcePtr server(QnCommonModule* commonModule)
     if (!commonModule)
     {
         NX_ASSERT(false, "Can't access common module");
-        return nullptr;
+        return QnMediaServerResourcePtr();
     }
 
     auto resourcePool = commonModule->resourcePool();
     if (!resourcePool)
     {
         NX_ASSERT(false, "Can't access resource pool");
-        return nullptr;
+        return QnMediaServerResourcePtr();
     }
 
     return resourcePool->getResourceById<QnMediaServerResource>(commonModule->moduleGUID());

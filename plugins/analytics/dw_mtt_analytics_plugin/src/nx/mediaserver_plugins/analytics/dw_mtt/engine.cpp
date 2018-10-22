@@ -100,6 +100,11 @@ const char* Engine::manifest(Error* error) const
     return m_manifest.constData();
 }
 
+void Engine::freeManifest(const char* manifestData)
+{
+    // Do nothing actually.
+}
+
 const EventType* Engine::eventTypeById(const QString& id) const noexcept
 {
     const auto it = std::find_if(

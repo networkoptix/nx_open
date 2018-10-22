@@ -379,6 +379,12 @@ const char* Engine::manifest(Error* error) const
     return m_manifest.constData();
 }
 
+void Engine::freeManifest(const char* manifestData)
+{
+    // Do nothing actually.
+}
+
+
 } // namespace ssc
 } // namespace analytics
 } // namespace mediaserver_plugins

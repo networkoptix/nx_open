@@ -141,6 +141,11 @@ const char* Engine::manifest(Error* error) const
     return m_manifest.constData();
 }
 
+void Engine::freeManifest(const char* manifestData)
+{
+    // Do nothing actually.
+}
+
 void Engine::setSettings(const nx::sdk::Settings* settings)
 {
     // There are no DeviceAgent settings for this plugin.

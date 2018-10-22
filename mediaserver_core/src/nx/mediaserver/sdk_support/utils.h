@@ -3,6 +3,9 @@
 #include <QtCore/QVariantMap>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource_management/resource_pool.h>
+
+#include <media_server/media_server_module.h>
 
 #include <nx/utils/std/optional.h>
 #include <nx/utils/log/log_level.h>
@@ -77,14 +80,14 @@ QnSharedResourcePointer<ResourceType> find(QnMediaServerModule* serverModule, co
     if (!serverModule)
     {
         NX_ASSERT(false, "Can't access server module");
-        return nullptr;
+        return QnSharedResourcePointer<ResourceType>();
     }
 
     auto resourcePool = serverModule->resourcePool();
     if (!resourcePool)
     {
         NX_ASSERT(false, "Can't access resource pool");
-        return nullptr;
+        return QnSharedResourcePointer<ResourceType>();
     }
 
     return resourcePool->getResourceById<ResourceType>(QnUuid(id));

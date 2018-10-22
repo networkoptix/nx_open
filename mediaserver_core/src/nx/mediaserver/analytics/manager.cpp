@@ -395,7 +395,7 @@ void Manager::registerMetadataSink(
 QWeakPointer<AbstractVideoDataReceptor> Manager::registerMediaSource(const QnUuid& resourceId)
 {
     auto proxySource = QSharedPointer<ProxyVideoDataReceptor>::create();
-    auto& analyticsContext = context(resourceId);
+    auto analyticsContext = context(resourceId);
 
     if (analyticsContext)
         proxySource->setProxiedReceptor(analyticsContext);
@@ -478,7 +478,7 @@ QWeakPointer<QnAbstractDataReceptor> Manager::metadataSink(const QnUuid& deviceI
 {
     auto itr = m_metadataSinks.find(deviceId);
     if (itr == m_metadataSinks.cend())
-        return nullptr;
+        return QWeakPointer<QnAbstractDataReceptor>();
 
     return itr->second;
 }
@@ -493,7 +493,7 @@ QWeakPointer<ProxyVideoDataReceptor> Manager::mediaSource(const QnUuid& deviceId
 {
     auto itr = m_mediaSources.find(deviceId);
     if (itr == m_mediaSources.cend())
-        return nullptr;
+        return QWeakPointer<ProxyVideoDataReceptor>();
 
     return itr->second;
 }

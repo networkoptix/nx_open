@@ -53,7 +53,7 @@ AnalyticsPluginResourcePtr AnalyticsEngineResource::plugin() const
     if (!common)
     {
         NX_ASSERT(false, "Can't access common module");
-        return nullptr;
+        return AnalyticsPluginResourcePtr();
     }
 
     return common->resourcePool()->getResourceById(getParentId())

@@ -41,6 +41,8 @@ public:
 
     virtual const char* manifest(nx::sdk::Error* error) const override;
 
+    virtual void freeManifest(const char* manifestData) override;
+
     void registerCamera(int cameraLogicalId, DeviceAgent* deviceAgent);
     void unregisterCamera(int cameraLogicalId);
 

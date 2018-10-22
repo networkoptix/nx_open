@@ -115,6 +115,11 @@ const char* Engine::manifest(Error* error) const
     return m_manifest.constData();
 }
 
+void Engine::freeManifest(const char* data)
+{
+    // Do nothing actually.
+}
+
 QList<QString> Engine::parseSupportedEvents(const QByteArray& data)
 {
     QList<QString> result;

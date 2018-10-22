@@ -31,7 +31,7 @@ struct HasOtherTemplatedField
 
 struct HasSomeMethod
 {
-    int method(double& /*someArg*/) {};
+    int method(double& /*someArg*/) { return 0; };
 };
 
 DECLARE_FIELD_DETECTOR(hasStringField, stringField, QString);
