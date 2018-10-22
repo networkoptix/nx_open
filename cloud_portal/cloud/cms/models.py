@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-
+import os
 from django.db import models
 from django.conf import settings
 from jsonfield import JSONField
@@ -9,6 +9,7 @@ from util.config import get_config
 
 from django.contrib.auth.models import Group
 from django.template.defaultfilters import truncatechars
+from cloud.storage_backend import MediaStorage
 
 
 def get_cloud_portal_product(customization=settings.CUSTOMIZATION):
@@ -63,6 +64,12 @@ def cloud_portal_customization_cache(customization_name, value=None, force=False
         return data[value] if value in data else None
 
     return data
+
+
+def rename_file(instance, filename):
+    product_name = instance.product.name.lower()
+    product_name = product_name.replace(' ', '-')
+    return os.path.join(product_name, filename)
 
 
 # CMS structure (data structure). Only developers can change that
@@ -444,8 +451,9 @@ class ProductCustomizationReview(models.Model):
 
 
 class ExternalFile(models.Model):
-    file = models.FileField()
+    file = models.FileField(upload_to=rename_file, storage=MediaStorage())
     md5 = models.CharField(max_length=1024)
+    product = models.ForeignKey(Product, default=None, null=True)
     size = models.FloatField()
 
     def __str__(self):

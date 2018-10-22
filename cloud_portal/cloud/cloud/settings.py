@@ -64,6 +64,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'storages',
+
     'django_celery_results',
     'rest_framework',
     'rest_hooks',
@@ -285,6 +288,18 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = BASE_DIR + '/static/integrations/'
 MEDIA_URL = '/static/integrations/'
 
+# START s3 config
+AWS_ACCESS_KEY_ID = "AKIAIJRICE4V7AMYJX2A"
+AWS_SECRET_ACCESS_KEY = "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"
+AWS_STORAGE_BUCKET_NAME = 'cloud-portal' # os.getenv('INSTANCE_NAME')
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+AWS_LOCATION = CUSTOMIZATION + '-integrations'
+INTEGRATION_FILE_STORAGE = 'mysite.storage_backends.MediaStorage'
+# END s3
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
@@ -305,7 +320,6 @@ HOOK_EVENTS = {
 #BROKER_TRANSPORT_OPTIONS
 #   queue_name_prefix allows you to name the queue for sqs
 #   region allows you to specify the aws region
-
 
 
 BROKER_URL = os.getenv('QUEUE_BROKER_URL')
