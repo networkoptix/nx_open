@@ -133,7 +133,6 @@ private:
         QN_DECLARE_R_PROPERTY(qreal,    workbenchUnitSize,              WORKBENCH_UNIT_SIZE,                    10000.0) /**< Graphics scene has problems with handling mouse events on small scales, so the larger this number, the better. */
 
         QN_DECLARE_R_PROPERTY(float,    defaultLayoutCellAspectRatio,   DEFAULT_LAYOUT_CELL_ASPECT_RATIO,       16.0f / 9.0f)
-        QN_DECLARE_R_PROPERTY(qreal,    defaultLayoutCellSpacing,       DEFAULT_LAYOUT_CELL_SPACING,            0.05)
 
         QN_DECLARE_R_PROPERTY(QColor,   mrsColor,                       MRS_COLOR,                              QColor(200, 0, 0))
 
