@@ -77,7 +77,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
 
     if (!m_camera)
     {
-        m_camera = std::make_shared<Camera>(m_timeProvider, m_info);
+        m_camera = std::make_shared<Camera>(m_timeProvider, m_info);   
         m_camera->initialize();
     }
 
@@ -164,7 +164,7 @@ void CameraManager::getLastErrorString( char* errorString ) const
         [&errorString](int ffmpegError) -> bool
         {
             bool error = ffmpegError < 0;
-            if(error)
+            if (error)
             {
                 std::string s = ffmpeg::utils::errorToString(ffmpegError);
                 strncpy(errorString, s.c_str(), nxcip::MAX_TEXT_LEN - 1);
@@ -173,7 +173,10 @@ void CameraManager::getLastErrorString( char* errorString ) const
         };
 
     if(m_camera && errorToString(m_camera->lastError()))
+    {
+        m_camera->setLastError(0);
         return;
+    }
 
     *errorString = '\0';
 }
