@@ -85,12 +85,14 @@ protected:
 
     CyclicAllocator m_allocator;
 
-    std::atomic_bool m_consumerAdded;
-    std::atomic_bool m_interrupted;
+    std::atomic_bool m_videoConsumerAdded = false;
+    std::atomic_bool m_audioConsumerAdded = false;
+    std::atomic_bool m_interrupted = false;
 
 protected:
     std::unique_ptr<ILPMediaPacket> toNxPacket(const ffmpeg::Packet *packet);
-    virtual void removeConsumer();
+    void removeAudioConsumer();
+    virtual void removeVideoConsumer() = 0;
 };
 
 } // namespace usb_cam

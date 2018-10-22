@@ -83,7 +83,8 @@ private:
     int scale(const AVFrame * frame, AVFrame* outFrame);
     void calculateTimePerFrame();
 
-    void removeConsumer() override;
+    virtual void removeVideoConsumer() override;
+    void handleIoError();
 };
 
 } // namespace usb_cam

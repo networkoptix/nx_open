@@ -37,8 +37,6 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
     if(!packet)
     {
-        removeConsumer();
-
         if (m_interrupted)
         {
             m_interrupted = false;
@@ -46,7 +44,16 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
         }
 
         if(m_camera->videoStream()->ioError())
+        {
+            removeVideoConsumer();
             return nxcip::NX_IO_ERROR;
+        }
+
+        if(m_camera->audioStream()->ioError())
+        {
+            removeAudioConsumer();
+            return nxcip::NX_IO_ERROR;
+        }
         
         return nxcip::NX_OTHER_ERROR;
     }
@@ -54,11 +61,6 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     *lpPacket = toNxPacket(packet.get()).release();
 
     return nxcip::NX_NO_ERROR;
-}
-
-void NativeStreamReader::interrupt()
-{
-    StreamReaderPrivate::interrupt();
 }
 
 void NativeStreamReader::setFps(float fps)
@@ -80,10 +82,13 @@ void NativeStreamReader::setBitrate(int bitrate)
 
 void NativeStreamReader::ensureConsumerAdded()
 {
-    if (!m_consumerAdded)
-    {
+    if (!m_audioConsumerAdded)
         StreamReaderPrivate::ensureConsumerAdded();
+
+    if(! m_videoConsumerAdded)
+    {
         m_camera->videoStream()->addPacketConsumer(m_avConsumer);
+        m_videoConsumerAdded = true;
     }
 }
 
@@ -96,7 +101,7 @@ std::shared_ptr<ffmpeg::Packet> NativeStreamReader::nextPacket()
             // the time span keeps audio and video timestamps monotonic
             if (m_avConsumer->waitForTimeSpan(kStreamDelay, kWaitTimeOut))
                 break;
-            else if (m_interrupted || m_camera->videoStream()->ioError())
+            else if (m_interrupted || m_camera->ioError())
                     return nullptr;
         }            
     }
@@ -106,7 +111,7 @@ std::shared_ptr<ffmpeg::Packet> NativeStreamReader::nextPacket()
         auto popped = m_avConsumer->popOldest(kWaitTimeOut);
         if (!popped)
         {
-            if (m_interrupted || m_camera->videoStream()->ioError())
+            if (m_interrupted || m_camera->ioError())
                 return nullptr;
             continue;
         }
@@ -114,10 +119,10 @@ std::shared_ptr<ffmpeg::Packet> NativeStreamReader::nextPacket()
     }
 }
 
-void NativeStreamReader::removeConsumer()
+void NativeStreamReader::removeVideoConsumer()
 {
-    StreamReaderPrivate::removeConsumer();
     m_camera->videoStream()->removePacketConsumer(m_avConsumer);
+    m_videoConsumerAdded = false;
 }
 
 } // namespace usb_cam

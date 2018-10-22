@@ -36,6 +36,9 @@ private:
             const std::shared_ptr<PacketConsumerManager>& packetConsumerManager);
         ~AudioStreamPrivate();
 
+        bool pluggedIn() const;
+        bool ioError() const;
+
         void addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
         void removePacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
 
@@ -53,9 +56,9 @@ private:
 
         bool m_initialized = false;
         int m_initCode = 0;
-        int m_retries = 0;
+        bool m_ioError = false;
 
-        bool m_terminated = false;
+        bool m_terminated = true;
         mutable std::mutex m_mutex;
         std::condition_variable m_wait;
         std::thread m_runThread;
@@ -70,7 +73,7 @@ private:
 
     private:
         std::string ffmpegUrl() const;
-        void waitForConsumers();
+        bool waitForConsumers();
         int initialize();
         void uninitialize();
         bool ensureInitialized();
@@ -98,6 +101,9 @@ private:
         
         std::chrono::milliseconds timePerVideoFrame() const;
 
+        bool checkIoError(int ffmpegError);
+        void setLastError(int ffmpegError);
+        void tryStart();
         void start();
         void stop();
         void run();
@@ -110,6 +116,8 @@ public:
     std::string url() const;
     void setEnabled(bool enabled);
     bool enabled() const;
+
+    bool ioError() const;
 
     void addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
     void removePacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);

@@ -68,29 +68,26 @@ Camera::Camera(nxpl::TimeProvider* const timeProvider, const nxcip::CameraInfo& 
         setLastError(AVERROR(ENODEV));
 }
 
-std::shared_ptr<AudioStream> Camera::audioStream()
+void Camera::initialize()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    if(!m_audioStream)
-    {
-        m_audioStream = std::make_shared<AudioStream>(
+    m_audioStream = std::make_shared<AudioStream>(
             m_info.auxiliaryData,
             weak_from_this(),
             m_audioEnabled);
-    }
+
+    m_videoStream = std::make_shared<VideoStream>(
+            url(),
+            m_defaultVideoParams,
+            weak_from_this());
+}
+
+std::shared_ptr<AudioStream> Camera::audioStream()
+{
     return m_audioStream;
 }
     
 std::shared_ptr<VideoStream> Camera::videoStream()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    if (!m_videoStream)
-    {
-        m_videoStream = std::make_shared<VideoStream>(
-            url(),
-            m_defaultVideoParams,
-            weak_from_this());
-    }
     return m_videoStream;
 }
 
@@ -111,15 +108,18 @@ bool Camera::audioEnabled() const
     return m_audioEnabled;
 }
 
+bool Camera::ioError() const
+{
+    return m_videoStream->ioError() || m_audioStream->ioError();
+}
+
 void Camera::setLastError(int errorCode)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
     m_lastError = errorCode;
 }
 
 int Camera::lastError() const
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
     return m_lastError;
 }
 

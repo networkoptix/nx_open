@@ -52,15 +52,15 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     int outNxError = nxcip::NX_NO_ERROR;
     auto packet = nextPacket(&outNxError);
 
-    if(outNxError != nxcip::NX_NO_ERROR)
+    if (outNxError != nxcip::NX_NO_ERROR)
     {
-        removeConsumer();
+        handleIoError();
         return outNxError;
     }
 
-    if(!packet)
+    if (!packet)
     {
-        removeConsumer();
+        handleIoError();
         return nxcip::NX_OTHER_ERROR;
     }
 
@@ -239,7 +239,7 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxErr
     const auto ioError =
         [this, &outNxError]() -> bool
         {
-            if (m_camera->videoStream()->ioError())
+            if (m_camera->ioError())
             {
                 *outNxError = nxcip::NX_IO_ERROR;
                 return true;
@@ -325,10 +325,11 @@ bool TranscodeStreamReader::ensureInitialized()
 
 void TranscodeStreamReader::ensureConsumerAdded()
 {
-    if (!m_consumerAdded)
+    StreamReaderPrivate::ensureConsumerAdded();
+    if (!m_videoConsumerAdded)
     {
-        StreamReaderPrivate::ensureConsumerAdded();
         m_camera->videoStream()->addFrameConsumer(m_videoFrameConsumer);
+        m_videoConsumerAdded = true;
     }
 }
 
@@ -465,10 +466,18 @@ void TranscodeStreamReader::calculateTimePerFrame()
     m_timePerFrame = 1.0 / m_codecParams.fps * kMsecInSec;
 }
 
-void TranscodeStreamReader::removeConsumer()
+void TranscodeStreamReader::removeVideoConsumer()
 {
-    StreamReaderPrivate::removeConsumer();
     m_camera->videoStream()->removeFrameConsumer(m_videoFrameConsumer);
+    m_videoConsumerAdded = false;
+}
+
+void TranscodeStreamReader::handleIoError()
+{
+    if (m_camera->videoStream()->ioError())
+        removeVideoConsumer();
+    if (m_camera->audioStream()->ioError())
+        removeAudioConsumer();
 }
 
 } // namespace usb_cam
