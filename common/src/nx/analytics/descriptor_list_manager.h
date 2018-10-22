@@ -78,9 +78,8 @@ public:
 
             auto itr = descriptors.find(id);
             if (itr == descriptors.cend())
-            {
-                descriptors[descriptor.id] = descriptor;
-            }
+                descriptors[descriptor.getId()] = descriptor;
+
             else if constexpr (details::hasPluginIds<Descriptor>::value)
             {
                 auto& existingDescriptor = itr->second;

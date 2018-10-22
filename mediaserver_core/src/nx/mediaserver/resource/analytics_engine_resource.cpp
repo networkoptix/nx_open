@@ -8,7 +8,12 @@
 #include <nx/mediaserver/sdk_support/pointers.h>
 #include <nx/mediaserver/analytics/sdk_object_pool.h>
 
+#include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
+
+#include <nx/utils/meta/member_detector.h>
+
+#include <nx/analytics/descriptor_list_manager.h>
 
 namespace nx::mediaserver::resource {
 
@@ -87,6 +92,31 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
     const auto manifest = sdk_support::manifest<analytics_api::EngineManifest>(engine);
     if (!manifest)
         return CameraDiagnostics::PluginErrorResult("Can't deserialize engine manifest");
+
+    auto analyticsDescriptorListManager = sdk_support::getDescriptorListManager(serverModule());
+    if (!analyticsDescriptorListManager)
+    {
+        return CameraDiagnostics::InternalServerErrorResult(
+            "Can't access analytics descriptor list manager");
+    }
+
+    const auto parentPlugin = plugin();
+    if (!parentPlugin)
+        return CameraDiagnostics::InternalServerErrorResult("Can't access parent plugin");
+
+    const auto pluginManifest = parentPlugin->manifest();
+
+    analyticsDescriptorListManager->addDescriptors(
+        sdk_support::descriptorsFromItemList<analytics_api::GroupDescriptor>(
+            pluginManifest.id, manifest->groups));
+
+    analyticsDescriptorListManager->addDescriptors(
+        sdk_support::descriptorsFromItemList<analytics_api::EventTypeDescriptor>(
+            pluginManifest.id, manifest->eventTypes));
+
+    analyticsDescriptorListManager->addDescriptors(
+        sdk_support::descriptorsFromItemList<analytics_api::ObjectTypeDescriptor>(
+            pluginManifest.id, manifest->objectTypes));
 
     setManifest(*manifest);
     saveParams();

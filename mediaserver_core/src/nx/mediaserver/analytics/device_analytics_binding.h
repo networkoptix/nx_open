@@ -17,16 +17,21 @@
 #include <nx/mediaserver/sdk_support/pointers.h>
 #include <nx/mediaserver/resource/resource_fwd.h>
 #include <nx/mediaserver/analytics/metadata_handler.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 namespace nx::mediaserver::analytics {
 
-class DeviceAnalyticsBinding: public QnAbstractDataConsumer
+class DeviceAnalyticsBinding:
+    public QnAbstractDataConsumer,
+    public nx::mediaserver::ServerModuleAware
+
 {
     using base_type = QnAbstractDataConsumer;
     using Engine = nx::sdk::analytics::Engine;
     using DeviceAgent = nx::sdk::analytics::DeviceAgent;
 public:
     DeviceAnalyticsBinding(
+        QnMediaServerModule* serverModule,
         QnVirtualCameraResourcePtr device,
         nx::mediaserver::resource::AnalyticsEngineResourcePtr engine);
 
@@ -52,13 +57,14 @@ private:
     bool startAnalyticsUnsafe(const QVariantMap& settings);
     void stopAnalyticsUnsafe();
 
-private:
     sdk_support::SharedPtr<DeviceAgent> createDeviceAgent();
     std::shared_ptr<MetadataHandler> createMetadataHandler();
-    std::optional<nx::vms::api::analytics::DeviceAgentManifest> loadManifest(
+    std::optional<nx::vms::api::analytics::DeviceAgentManifest> loadDeviceAgentManifest(
         const sdk_support::SharedPtr<DeviceAgent>& deviceAgent);
 
-    void updateDeviceWithManifest(const nx::vms::api::analytics::DeviceAgentManifest& manifest);
+    bool updateDeviceWithManifest(const nx::vms::api::analytics::DeviceAgentManifest& manifest);
+    bool updateDescriptorsWithManifest(
+        const nx::vms::api::analytics::DeviceAgentManifest& manifest);
 
 private:
     mutable QnMutex m_mutex;

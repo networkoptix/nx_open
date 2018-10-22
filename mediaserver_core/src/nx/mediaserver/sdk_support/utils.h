@@ -6,6 +6,7 @@
 
 #include <nx/utils/std/optional.h>
 #include <nx/utils/log/log_level.h>
+#include <nx/utils/meta/member_detector.h>
 
 #include <nx/sdk/common.h>
 #include <nx/sdk/analytics/uncompressed_video_frame.h>
@@ -115,5 +116,45 @@ std::optional<nx::sdk::analytics::UncompressedVideoFrame::PixelFormat>
 
 resource::AnalyticsEngineResourceList toServerEngineList(
     const nx::vms::common::AnalyticsEngineResourceList engineList);
+
+namespace details {
+
+DECLARE_FIELD_DETECTOR(hasGroupIds, groupIds, std::set<QString>);
+DECLARE_FIELD_DETECTOR(hasPluginIds, pluginIds, std::set<QString>);
+DECLARE_FIELD_DETECTOR_SIMPLE(hasItem, item);
+
+} // namespace details
+
+template <typename Descriptor, typename Item>
+std::map<QString, Descriptor> descriptorsFromItemList(
+    const QString& pluginId,
+    const QList<Item>& itemList)
+{
+    std::map<QString, Descriptor> result;
+    for (const auto& item : itemList)
+    {
+        Descriptor descriptor;
+
+        if constexpr(details::hasItem<Descriptor>::value)
+        {
+            descriptor.item = item;
+        }
+        else
+        {
+            descriptor.id = item.id;
+            descriptor.name = item.name.value;
+        }
+
+        if constexpr (details::hasGroupIds<Descriptor>::value)
+            descriptor.groupIds.insert(item.groupId);
+
+        if constexpr (details::hasPluginIds<Descriptor>::value)
+            descriptor.pluginIds.insert(pluginId);
+
+        result[item.id] = std::move(descriptor);
+    }
+
+    return result;
+}
 
 } // namespace nx::mediaserver::sdk_support

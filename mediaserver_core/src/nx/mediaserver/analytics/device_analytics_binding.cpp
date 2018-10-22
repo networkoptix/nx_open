@@ -3,8 +3,12 @@
 #include <plugins/plugins_ini.h>
 
 #include <core/resource/camera_resource.h>
+#include <media_server/media_server_module.h>
 
 #include <nx/utils/log/log.h>
+
+#include <nx/analytics/descriptor_list_manager.h>
+#include <nx/vms/api/analytics/descriptors.h>
 
 #include <nx/sdk/common.h>
 #include <nx/sdk/analytics/engine.h>
@@ -29,10 +33,12 @@ static const int kMaxQueueSize = 100;
 } // namespace
 
 DeviceAnalyticsBinding::DeviceAnalyticsBinding(
+    QnMediaServerModule* serverModule,
     QnVirtualCameraResourcePtr device,
     resource::AnalyticsEngineResourcePtr engine)
     :
     base_type(kMaxQueueSize),
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_device(std::move(device)),
     m_engine(std::move(engine))
 {
@@ -69,13 +75,17 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
     if (!m_sdkDeviceAgent)
     {
         m_sdkDeviceAgent = createDeviceAgent();
-        auto manifest = loadManifest(m_sdkDeviceAgent);
+        auto manifest = loadDeviceAgentManifest(m_sdkDeviceAgent);
         if (!manifest)
         {
             NX_ERROR(this, lm("Cannot load device agent manifest, device %1 (%2)")
                 .args(m_device->getUserDefinedName(), m_device->getId()));
             return false;
         }
+
+        if (!updateDescriptorsWithManifest(*manifest))
+            return false;
+
         m_metadataHandler = createMetadataHandler();
         m_sdkDeviceAgent->setMetadataHandler(m_metadataHandler.get());
         updateDeviceWithManifest(*manifest);
@@ -93,7 +103,7 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
 
     if (!m_started)
     {
-        // TODO: #dmishin Pass event list.
+        // TODO: #dmishin Pass event list (or remove it from SDK API).
         auto error = m_sdkDeviceAgent->startFetchingMetadata(
             /*typeList*/ nullptr,
             /*typeListSize*/ 0);
@@ -288,7 +298,7 @@ std::shared_ptr<MetadataHandler> DeviceAnalyticsBinding::createMetadataHandler()
     return handler;
 }
 
-std::optional<DeviceAgentManifest> DeviceAnalyticsBinding::loadManifest(
+std::optional<DeviceAgentManifest> DeviceAnalyticsBinding::loadDeviceAgentManifest(
     const sdk_support::SharedPtr<DeviceAgent>& deviceAgent)
 {
     if (!deviceAgent)
@@ -339,10 +349,47 @@ std::optional<DeviceAgentManifest> DeviceAnalyticsBinding::loadManifest(
     return sdk_support::manifest<DeviceAgentManifest>(deviceAgentManifest.get());
 }
 
-void DeviceAnalyticsBinding::updateDeviceWithManifest(
+bool DeviceAnalyticsBinding::updateDeviceWithManifest(
     const nx::vms::api::analytics::DeviceAgentManifest& manifest)
 {
     m_device->setDeviceAgentManifest(m_engine->getId(), manifest);
+    return true;
+}
+
+bool DeviceAnalyticsBinding::updateDescriptorsWithManifest(
+    const nx::vms::api::analytics::DeviceAgentManifest& manifest)
+{
+    auto analyticsDescriptorListManager = sdk_support::getDescriptorListManager(serverModule());
+    if (!analyticsDescriptorListManager)
+    {
+        NX_ERROR(this, "Can't access analytics descriptor list manager, device %1 (%2)",
+            m_device->getUserDefinedGroupName(), m_device->getId());
+        return false;
+    }
+
+    const auto parentPlugin = m_engine->plugin();
+    if (!parentPlugin)
+    {
+        NX_ERROR(this, "Can't access parent analytics plugin, device %1 (%2)",
+            m_device->getUserDefinedName(), m_device->getId());
+        return false;
+    }
+
+    const auto pluginManifest = parentPlugin->manifest();
+
+    analyticsDescriptorListManager->addDescriptors(
+        sdk_support::descriptorsFromItemList<EventTypeDescriptor>(
+            pluginManifest.id, manifest.eventTypes));
+
+    analyticsDescriptorListManager->addDescriptors(
+        sdk_support::descriptorsFromItemList<ObjectTypeDescriptor>(
+            pluginManifest.id, manifest.objectTypes));
+
+    analyticsDescriptorListManager->addDescriptors(
+        sdk_support::descriptorsFromItemList<GroupDescriptor>(
+            pluginManifest.id, manifest.groups));
+
+    return true;
 }
 
 void DeviceAnalyticsBinding::putData(const QnAbstractDataPacketPtr& data)

@@ -59,7 +59,7 @@ void DeviceAnalyticsContext::setEnabledAnalyticsEngines(
         if (isEngineAlreadyBound(engine))
             continue;
 
-        auto binding = std::make_shared<DeviceAnalyticsBinding>(m_device, engine);
+        auto binding = std::make_shared<DeviceAnalyticsBinding>(serverModule(), m_device, engine);
         binding->setMetadataSink(m_metadataSink);
         m_bindings.emplace(engine->getId(), binding);
     }
@@ -69,7 +69,7 @@ void DeviceAnalyticsContext::setEnabledAnalyticsEngines(
 
 void DeviceAnalyticsContext::addEngine(const resource::AnalyticsEngineResourcePtr& engine)
 {
-    auto binding = std::make_shared<DeviceAnalyticsBinding>(m_device, engine);
+    auto binding = std::make_shared<DeviceAnalyticsBinding>(serverModule(), m_device, engine);
     binding->setMetadataSink(m_metadataSink);
     m_bindings.emplace(engine->getId(), binding);
     updateSupportedFrameTypes();

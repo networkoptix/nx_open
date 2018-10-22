@@ -34,4 +34,14 @@ struct NAME<\
                 SIGNATURE>>>\
 >: std::true_type {};
 
+#define DECLARE_FIELD_DETECTOR_SIMPLE(NAME, FIELD_NAME)\
+template<typename T, typename = void>\
+struct NAME: std::false_type {};\
+\
+template <typename T>\
+struct NAME<\
+    T,\
+    std::void_t<decltype(T::FIELD_NAME)>\
+>: std::true_type {};
+
 } // namespace nx::utils
