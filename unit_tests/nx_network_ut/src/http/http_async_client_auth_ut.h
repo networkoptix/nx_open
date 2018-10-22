@@ -34,9 +34,18 @@ private:
     nx::Buffer readRequest(AbstractStreamSocket* connection);
 };
 
+struct TestParams
+{
+    std::optional<AuthType> serverAuthTypeFirst;
+    std::optional<AuthType> serverAuthTypeSecond;
+    AuthType clientRequiredToUseAuthType;
+
+    AuthType expectedAuthType;
+};
 
 // TODO: Rename class, try to merge with another one.
-class HttpClientAsyncAuthorization2: public ::testing::Test
+class HttpClientAsyncAuthorization2:
+    public ::testing::TestWithParam<TestParams>
 {
 public:
     HttpClientAsyncAuthorization2();

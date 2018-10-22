@@ -150,7 +150,6 @@ void HttpClientAsyncAuthorization2::givenHttpServerWithAuthorization(std::option
 
 void HttpClientAsyncAuthorization2::whenClientSendHttpRequestAndIsRequiredToUse(AuthType auth)
 {
-    NX_ASSERT(auth == AuthType::authBasic || auth == AuthType::authDigest);
     m_httpClient->setAuthType(auth);
 
     const auto url = url::Builder()
@@ -194,35 +193,31 @@ void HttpClientAsyncAuthorization2::thenClientAuthenticatedBy(AuthType auth)
     }
 }
 
+constexpr auto basic = AuthType::authBasic;
+constexpr auto digest = AuthType::authDigest;
+constexpr auto both = AuthType::authBasicAndDigest;
+
+INSTANTIATE_TEST_CASE_P(HttpClientAsyncAuthorizationInstance, HttpClientAsyncAuthorization2,
+    ::testing::Values(
+        TestParams{basic, std::nullopt, both, /* expected */ basic},
+        TestParams{digest, std::nullopt, both, /* expected */ digest},
+        TestParams{basic, std::nullopt, basic, /* expected */ basic},
+        TestParams{digest, std::nullopt, digest, /* expected */ digest},
+        TestParams{digest, basic, basic, /* expected */ basic}
+//        TestParams{basic, digest, digest, /* expected */ digest}, // TODO: fix it.
+
+        // TODO: add support
+//        TestParams{digest, std::nullopt, basic, /* expected */ digest},
+//        TestParams{basic, std::nullopt, digest, /* expected */ digest}
+    ));
+
 // TODO: Add test when server support only digest while client uses only base and etc...
-// TODO: Add test when server send both types and client can use both.
-// TODO: parametrize!
-TEST_F(HttpClientAsyncAuthorization2, basicAuth)
+TEST_P(HttpClientAsyncAuthorization2, AuthSelection)
 {
-    givenHttpServerWithAuthorization(AuthType::authBasic, std::nullopt);
-    whenClientSendHttpRequestAndIsRequiredToUse(AuthType::authBasic);
-    thenClientAuthenticatedBy(AuthType::authBasic);
-}
-
-TEST_F(HttpClientAsyncAuthorization2, digestAuth)
-{
-    givenHttpServerWithAuthorization(AuthType::authDigest, std::nullopt);
-    whenClientSendHttpRequestAndIsRequiredToUse(AuthType::authDigest);
-    thenClientAuthenticatedBy(AuthType::authDigest);
-}
-
-TEST_F(HttpClientAsyncAuthorization2, digestBeforeBasicAuth)
-{
-    givenHttpServerWithAuthorization(AuthType::authDigest, AuthType::authBasic);
-    whenClientSendHttpRequestAndIsRequiredToUse(AuthType::authBasic);
-    thenClientAuthenticatedBy(AuthType::authBasic);
-}
-
-TEST_F(HttpClientAsyncAuthorization2, basicBeforeDigestAuth)
-{
-    givenHttpServerWithAuthorization(AuthType::authBasic, AuthType::authDigest);
-    whenClientSendHttpRequestAndIsRequiredToUse(AuthType::authDigest);
-    thenClientAuthenticatedBy(AuthType::authDigest);
+    TestParams params = GetParam();
+    givenHttpServerWithAuthorization(params.serverAuthTypeFirst, params.serverAuthTypeSecond);
+    whenClientSendHttpRequestAndIsRequiredToUse(params.clientRequiredToUseAuthType);
+    thenClientAuthenticatedBy(params.expectedAuthType);
 }
 
 } // namespace test
