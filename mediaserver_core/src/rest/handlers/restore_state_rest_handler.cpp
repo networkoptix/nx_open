@@ -55,6 +55,7 @@ void QnRestoreStateRestHandler::afterExecute(
     if (QJson::deserialize(body, &reply) && reply.error == QnJsonRestResult::NoError)
     {
         serverModule()->mutableSettings()->removeDbOnStartup.set(true);
+        NX_INFO(this, "Server restart is scheduled");
         restartServer(0);
     }
 }

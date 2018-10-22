@@ -21,20 +21,6 @@ struct ExportLayoutSettings
         Export          //< Add new exported layout.
     };
 
-    ExportLayoutSettings() = default;
-    ExportLayoutSettings(QnLayoutResourcePtr layout,
-        QnTimePeriod period,
-        Filename fileName,
-        Mode mode,
-        bool readOnly)
-        :
-        layout(layout),
-        period(period),
-        fileName(fileName),
-        mode(mode),
-        readOnly(readOnly)
-    {}
-
     QnLayoutResourcePtr layout; //< Layout that should be exported.
     QnTimePeriod period;        //< Time period to export.
     Filename fileName;           //< Target filename.
@@ -42,6 +28,12 @@ struct ExportLayoutSettings
     bool readOnly = false;      //< Make exported layout read-only.
     nx::core::Watermark watermark;
     QnCameraBookmarkList bookmarks; //< Export only selected bookmarks.
+
+    struct Encryption
+    {
+        bool on = false;
+        QString password;
+    } encryption;
 };
 
 } // namespace desktop

@@ -90,7 +90,7 @@ int QnConfigureRestHandler::execute(
                  owner->resourcePool(), owner->accessRights()))
     {
         systemMergeProcessor.setMergeError(&result, MergeStatus::forbidden);
-        return nx::network::http::StatusCode::ok;
+        return nx::network::http::StatusCode::forbidden;
     }
 
     if (QnPermissionsHelper::isSafeMode(serverModule()))

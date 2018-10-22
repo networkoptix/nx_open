@@ -14,6 +14,7 @@
 
         defaultLogin: 'admin',
         defaultPassword: 'admin',
+        defaultPort: 7001,
         newServerFlag: 'SF_NewSystem',
         publicIpFlag: 'SF_HasPublicIP',
         iflistFlag: 'SF_IfListCtrl',

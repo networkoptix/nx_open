@@ -752,9 +752,17 @@ bool PlayerPrivate::createArchiveReader()
 
     QnAbstractArchiveDelegate* archiveDelegate;
     if (isLocalFile)
+    {
         archiveDelegate = new QnAviArchiveDelegate();
+    }
     else
-        archiveDelegate = new QnRtspClientArchiveDelegate(archiveReader.get());
+    {
+        const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+        NX_ASSERT(camera);
+        auto rtspArchiveDelegate = new QnRtspClientArchiveDelegate(archiveReader.get());
+        rtspArchiveDelegate->setCamera(camera);
+        archiveDelegate = rtspArchiveDelegate;
+    }
 
     archiveReader->setArchiveDelegate(archiveDelegate);
 

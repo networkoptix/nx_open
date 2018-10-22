@@ -28,26 +28,10 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="valueLineEdit"/>
-      </item>
-      <item>
-       <widget class="QnWordWrappedLabel" name="errorLabel" native="true"/>
+       <widget class="nx::client::desktop::InputField" name="valueLineEdit"/>
       </item>
      </layout>
     </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>1</height>
-      </size>
-     </property>
-    </spacer>
    </item>
    <item>
     <widget class="Line" name="line">
@@ -70,9 +54,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnWordWrappedLabel</class>
+   <class>nx::client::desktop::InputField</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/word_wrapped_label.h</header>
+   <header location="global">nx/client/desktop/common/widgets/input_field.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

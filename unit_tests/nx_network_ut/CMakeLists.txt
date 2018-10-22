@@ -1,9 +1,4 @@
 nx_add_test(nx_network_ut
-    NO_MOC
-    NO_RC_FILE
     WERROR
     PUBLIC_LIBS
-        GTest
-        GMock
-        nx_network
-)
+        nx_network)

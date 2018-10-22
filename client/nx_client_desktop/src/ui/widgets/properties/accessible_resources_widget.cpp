@@ -439,7 +439,6 @@ void QnAccessibleResourcesWidget::initSortFilterModel()
     m_sortFilterModel->setSourceModel(m_resourcesModel);
     m_sortFilterModel->sort(QnResourceListModel::NameColumn);
     m_sortFilterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    m_sortFilterModel->setFilterRole(Qn::ResourceSearchStringRole);
     m_sortFilterModel->setFilterKeyColumn(QnResourceListModel::NameColumn);
     m_sortFilterModel->setDynamicSortFilter(true);
 

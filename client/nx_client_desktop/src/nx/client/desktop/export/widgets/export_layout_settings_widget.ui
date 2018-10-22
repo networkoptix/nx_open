@@ -31,7 +31,7 @@
      <property name="flat">
       <bool>true</bool>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -43,6 +43,11 @@
         <property name="text">
          <string>Make read-only</string>
         </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="passwordWidget" native="true">
+        <layout class="QVBoxLayout" name="verticalLayout_3"/>
        </widget>
       </item>
       <item>

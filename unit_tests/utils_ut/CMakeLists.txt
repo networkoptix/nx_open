@@ -1,10 +1,6 @@
 nx_add_test(utils_ut
     WERROR
-    NO_MOC
-    NO_RC_FILE
     PUBLIC_LIBS
         nx_utils
         nx_fusion
-        Qt5::Network
-        GTest
-        GMock)
+        Qt5::Network)

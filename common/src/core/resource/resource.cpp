@@ -271,16 +271,6 @@ void QnResource::removeFlags(Qn::ResourceFlags flags)
     emit flagsChanged(toSharedPointer(this));
 }
 
-QString QnResource::toSearchString(bool useExtraSearchInformation) const
-{
-    return searchFilters(useExtraSearchInformation).join(L' ');
-}
-
-QStringList QnResource::searchFilters(bool /*useExtraSearchInformation*/) const
-{
-    return QStringList() << getId().toSimpleString() << getName();
-}
-
 QnResourcePtr QnResource::getParentResource() const
 {
     if (const auto resourcePool = this->resourcePool())

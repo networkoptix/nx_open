@@ -555,6 +555,7 @@ void TimelineWorkbenchPanel::setThumbnailsVisible(bool visible)
 
     /* Fix y coord. */
     setOpened(true, false);
+    action(action::ToggleThumbnailsAction)->setChecked(visible);
 }
 
 void TimelineWorkbenchPanel::updateGeometry()
