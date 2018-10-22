@@ -16,7 +16,7 @@ def pytest_addoption(parser):
         '--rct-network', default=defaults.get('rct_network'), type=IPNetwork,
         help='Network interface IP/mask')
     g.addoption(
-        '--rct-expected-cameras', default=defaults.get('rct_expected_cameras'), type=Path(__file__).with_name,
+        '--rct-expected-cameras', default=defaults.get('rct_expected_cameras'), type=Path(__file__).parent.joinpath,
         help='Stage rules for cameras')
     g.addoption(
         '--rct-camera-cycle-delay', default=defaults.get('rct_camera_cycle_delay', '1s'), type=_time_delta,
