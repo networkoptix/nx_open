@@ -1,6 +1,7 @@
 {
     "YOU HAVE NO SYSTEMS TEXT": "Es ist kein System mit %PRODUCT_NAME% verbunden",
     "LOG OUT BUTTON TEXT": "Abmelden",
+    "CONTINUE BUTTON TEXT": "Fortfahren",
     "ACCOUNT SETTINGS BUTTON TEXT": "Accounteinstellungen",
     "RELEASE HISTORY BUTTON TEXT": "Andere Releases, Patches und Beta-Versionen",
     "RESET EMAIL SENT MESSAGE TEXT": "Anweisungen für die Passwortzurücksetzung wurden an die Email %email% verschickt",
@@ -44,7 +45,7 @@
     "LIVE VIEWER TEXT": "Live-Betrachter",
     "CUSTOM TEXT": "Benutzerdefiniert",
     "YOUR SYSTEM TEXT": "Ihr System",
-    "YOUR PERMISSIONS TEXT": "Your permissions:",
+    "YOUR PERMISSIONS TEXT": "Ihre Berechtigungen:",
     "ABOUT": "Über",
     "KNOWN LIMITATIONS": "Bekannte Einschränkungen",
     "SUPPORT": "Support",

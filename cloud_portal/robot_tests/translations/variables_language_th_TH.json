@@ -1,6 +1,7 @@
 {
     "YOU HAVE NO SYSTEMS TEXT": "คุณไม่มีระบบเชื่อมต่อกับ %PRODUCT_NAME%",
     "LOG OUT BUTTON TEXT": "ออกจากระบบ",
+    "CONTINUE BUTTON TEXT": "Continue",
     "ACCOUNT SETTINGS BUTTON TEXT": "การตั้งค่าบัญชี",
     "RELEASE HISTORY BUTTON TEXT": "Other releases, patches and beta versions",
     "RESET EMAIL SENT MESSAGE TEXT": "คำแนะนำในการรีเซ็ตรหัสผ่านจะถูกส่งไปที่ Email %email%",

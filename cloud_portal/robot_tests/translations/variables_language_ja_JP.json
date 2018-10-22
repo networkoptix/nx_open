@@ -1,6 +1,7 @@
 {
     "YOU HAVE NO SYSTEMS TEXT": "%PRODUCT_NAME% に接続されたシステムがありません",
     "LOG OUT BUTTON TEXT": "ログアウト",
+    "CONTINUE BUTTON TEXT": "Continue",
     "ACCOUNT SETTINGS BUTTON TEXT": "アカウント設定",
     "RELEASE HISTORY BUTTON TEXT": "その他のリリース、パッチ、ベータ版",
     "RESET EMAIL SENT MESSAGE TEXT": "%email% にパスワードリセット手順を送信します",

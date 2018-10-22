@@ -1,6 +1,7 @@
 {
     "YOU HAVE NO SYSTEMS TEXT": "%PRODUCT_NAME% nem kapcsolódik egy rendszeréhez sem",
     "LOG OUT BUTTON TEXT": "Kijelentkezés",
+    "CONTINUE BUTTON TEXT": "Continue",
     "ACCOUNT SETTINGS BUTTON TEXT": "Fiókbeállítások",
     "RELEASE HISTORY BUTTON TEXT": "Egyéb kiadások, javítások és béta verziók",
     "RESET EMAIL SENT MESSAGE TEXT": "Jelszó visszaállítási teendők megadását e-mailen megküldtük %email%",

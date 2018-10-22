@@ -1,6 +1,7 @@
 {
     "YOU HAVE NO SYSTEMS TEXT": "%PRODUCT_NAME% ile bağlı hiçbir Sisteminiz yok",
     "LOG OUT BUTTON TEXT": "Oturumu Kapat",
+    "CONTINUE BUTTON TEXT": "Continue",
     "ACCOUNT SETTINGS BUTTON TEXT": "Hesap Ayarları",
     "RELEASE HISTORY BUTTON TEXT": "Other releases, patches and beta versions",
     "RESET EMAIL SENT MESSAGE TEXT": "Şifre sıfırlama talimatları E-posta adresine gönderilir %email%",
