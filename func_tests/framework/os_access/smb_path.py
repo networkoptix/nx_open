@@ -26,8 +26,18 @@ _STATUS_FILE_IS_A_DIRECTORY = 0xC00000BA
 _STATUS_SHARING_VIOLATION = 0xC0000043
 _STATUS_DELETE_PENDING = 0xC0000056
 _STATUS_DIRECTORY_NOT_EMPTY = 0xC0000101
+_STATUS_REQUEST_NOT_ACCEPTED = 0xC00000D0
 
 _logger = logging.getLogger(__name__)
+
+
+class RequestNotAccepted(Exception):
+    message = (
+        "No more connections can be made to this remote computer at this time"
+        " because the computer has already accepted the maximum number of connections.")
+
+    def __init__(self):
+        super(RequestNotAccepted, self).__init__(self.message)
 
 
 def _reraising_on_operation_failure(status_to_error_cls):
@@ -85,6 +95,8 @@ class SMBConnectionPool(object):
         return '<SMBConnection {!s}:{:d}>'.format(self._direct_smb_address, self._direct_smb_port)
 
     @cached_getter
+    @_reraising_on_operation_failure({_STATUS_REQUEST_NOT_ACCEPTED: RequestNotAccepted})
+    @_retrying_on_status(_STATUS_REQUEST_NOT_ACCEPTED)
     def connection(self):
         # TODO: Use connection pooling with keep-alive: connections can be closed from server side.
         # See: http://pysmb.readthedocs.io/en/latest/api/smb_SMBConnection.html (Caveats section)
