@@ -18,7 +18,7 @@ Item
     property real expandedSize: 63
     property real expandedCircleRadius: expandedSize / 2
     property real expandedThickness: 3
-    property real centerCircleRadius: 1.5
+    property real centerCircleRadius: 2.5
 
 
     x: centerPoint.x - width / 2
@@ -33,9 +33,9 @@ Item
         id: leftDash
 
         anchors.verticalCenter: parent.verticalCenter
-        anchors.left: parent.left
+        x: d.thickness
         color: item.mainColor
-        width: item.dashSize
+        width: item.dashSize - d.thickness
         height: d.thickness
     }
 
@@ -44,9 +44,9 @@ Item
         id: rightDash
 
         anchors.verticalCenter: parent.verticalCenter
-        anchors.right: parent.right
+        x: parent.width - width - d.thickness
         color: item.mainColor
-        width: item.dashSize
+        width: item.dashSize - d.thickness
         height: d.thickness
     }
 
@@ -55,10 +55,10 @@ Item
         id: topDash
 
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: parent.top
+        y: d.thickness
         color: item.mainColor
         width: d.thickness
-        height: item.dashSize
+        height: item.dashSize - d.thickness
     }
 
     Rectangle
@@ -66,10 +66,10 @@ Item
         id: bottomDash
 
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
+        y: parent.height - height - d.thickness
         color: item.mainColor
         width: d.thickness
-        height: item.dashSize
+        height: item.dashSize - d.thickness
     }
 
     Circle
@@ -77,7 +77,7 @@ Item
         id: circle
 
         anchors.centerIn: parent
-        circleColor: item.mainColor
+        borderColor: item.mainColor
         radius: d.circleRadius
         border.width: d.thickness
     }
@@ -88,6 +88,7 @@ Item
 
         anchors.centerIn: parent
         circleColor: item.mainColor
+        radius: item.centerCircleRadius
     }
 
     states:
@@ -140,7 +141,7 @@ Item
     {
         id: d
 
-        readonly property int animationDuration: 240
+        readonly property int animationDuration: 800
         property real size: item.normalSize
         property real thickness: item.normalThickness
         property real circleRadius: item.normalCircleRadius

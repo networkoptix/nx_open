@@ -4,12 +4,12 @@ Rectangle
 {
     id: item
     property point centerPoint: Qt.point(0, 0)
-    property color circleColor: "white"
-    property alias innerColor: item.color
+    property color borderColor: circleColor
+    property alias circleColor: item.color
 
     color: "transparent"
-    border.width: radius
-    border.color: circleColor
+    border.width: 0
+    border.color: borderColor
 
     x: centerPoint.x - width / 2
     y: centerPoint.y - height / 2

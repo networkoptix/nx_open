@@ -76,7 +76,7 @@ Item
             return // We don't allow to start long tap after fast clicks (double click, for example).
 
         pressFilterTimer.restart()
-        selectionPreloader.centerPoint = Qt.point(pos.x + 0.5, pos.y + 0.5)
+        d.preloaderRelativePoint = d.toRelative(Qt.point(pos.x + 0.5, pos.y + 0.5))
         d.customInitialRelative = d.toRelative(pos)
         pressAndHoldTimer.restart()
     }
@@ -151,7 +151,7 @@ Item
 
         mainColor: d.lineColor
         shadowColor: d.shadowColor
-        centerPoint: d.fromRelative(d.customInitialRelative)
+        centerPoint: d.fromRelative(d.preloaderRelativePoint)
 
         state:
         {
@@ -216,6 +216,7 @@ Item
         property var customInitialRelative
         property var customFirstPoint
         property var customSecondPoint
+        property point preloaderRelativePoint
 
         property point customTopLeftRelative:
         {
@@ -242,7 +243,7 @@ Item
 
         function toRelative(absolute)
         {
-            return Qt.vector2d(absolute.x / controller.width, absolute.y / controller.height)
+            return Qt.point(absolute.x / controller.width, absolute.y / controller.height)
         }
 
         function fromRelative(relative)
@@ -254,7 +255,12 @@ Item
 
         function nearPositions(first, second)
         {
-            return first && second && first.minus(second).length() < 0.01 ? true : false
+            if (!first || !second)
+                return false
+
+            var firstVector = Qt.vector2d(first.x, first.y)
+            var secondVector = Qt.vector2d(second.x, second.y)
+            return firstVector.minus(secondVector).length() < 0.01
         }
 
         function getMotionFilter(topLeft, bottomRight)
