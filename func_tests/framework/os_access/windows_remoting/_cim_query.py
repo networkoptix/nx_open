@@ -241,12 +241,13 @@ class CIMQuery(object):
 
 
 def find_by_selector_set(selector_set, items):
-    """Selector set is analogous to primary key in relational DB. It's the way objects are referred
-    to in WSMan. That's why only one object is returned.
+    """Selector is field-value pair to find value. Selector set is used as foreign key when objects
+    are referred in WSMan response. Sometimes fields in its selector set are undocumented but it's
+    OK to used them: PowerShell does this way.
     """
     for item in items:
         for selector in selector_set['w:Selector']:
             if item[selector['@Name']] != selector['#text']:
-                break
+                break  # One of selectors is not met. Skip item. Break from loop over criteria.
         else:
-            return item
+            yield item  # All selectors are fulfilled.
