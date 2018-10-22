@@ -118,7 +118,8 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             }
 
             const unsigned char* data = (unsigned char*)(datagram.data());
-            const auto smac = nx::utils::MacAddress::fromRawData(data + 6);
+            constexpr int kMacAddressOffset = 6;
+            const auto smac = nx::utils::MacAddress::fromRawData(data + kMacAddressOffset);
 
             bool haveToContinue = false;
             for (const QnResourcePtr& res: result)
