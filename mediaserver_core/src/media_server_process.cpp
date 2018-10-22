@@ -260,7 +260,7 @@
 #include <recorder/archive_integrity_watcher.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/mediaserver/analytics/manager.h>
-#include <nx/mediaserver/analytics/sdk_object_pool.h>
+#include <nx/mediaserver/analytics/sdk_object_factory.h>
 #include <nx/utils/platform/current_process.h>
 #include <rest/handlers/change_camera_password_rest_handler.h>
 #include <nx/mediaserver/fs/media_paths/media_paths.h>

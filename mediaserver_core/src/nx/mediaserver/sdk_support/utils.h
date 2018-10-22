@@ -33,7 +33,7 @@ class DescriptorListManager;
 
 namespace nx::mediaserver::analytics {
 
-class SdkObjectPool;
+class SdkObjectFactory;
 
 } // namespace nx::mediaserver::analytics
 
@@ -93,7 +93,7 @@ QnSharedResourcePointer<ResourceType> find(QnMediaServerModule* serverModule, co
     return resourcePool->getResourceById<ResourceType>(QnUuid(id));
 }
 
-analytics::SdkObjectPool* getSdkObjectPool(QnMediaServerModule* serverModule);
+analytics::SdkObjectFactory* getSdkObjectPool(QnMediaServerModule* serverModule);
 nx::analytics::DescriptorListManager* getDescriptorListManager(QnMediaServerModule* serverModule);
 
 bool deviceInfoFromResource(

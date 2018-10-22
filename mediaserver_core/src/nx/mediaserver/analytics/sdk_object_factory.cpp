@@ -31,11 +31,11 @@ using namespace nx::vms::common;
 namespace analytics_sdk = nx::sdk::analytics;
 namespace analytics_api = nx::vms::api::analytics;
 
-class SdkObjectPool;
+class SdkObjectFactory;
 
 namespace {
 
-const nx::utils::log::Tag kLogTag{typeid(nx::mediaserver::analytics::SdkObjectPool)};
+const nx::utils::log::Tag kLogTag{typeid(nx::mediaserver::analytics::SdkObjectFactory)};
 
 template<typename T>
 void initResources(QnMediaServerModule* serverModule)
@@ -116,12 +116,12 @@ QnUuid engineId(const QnUuid& pluginId, int engineIndex)
 
 } // namespace
 
-SdkObjectPool::SdkObjectPool(QnMediaServerModule* serverModule):
+SdkObjectFactory::SdkObjectFactory(QnMediaServerModule* serverModule):
     base_type(serverModule)
 {
 }
 
-bool SdkObjectPool::init()
+bool SdkObjectFactory::init()
 {
     if (!initPluginResources())
         return false;
@@ -132,7 +132,7 @@ bool SdkObjectPool::init()
     return true;
 }
 
-bool SdkObjectPool::initPluginResources()
+bool SdkObjectFactory::initPluginResources()
 {
     auto pluginManager = getPluginManager(serverModule());
     if (!pluginManager)
@@ -206,7 +206,7 @@ bool SdkObjectPool::initPluginResources()
     return true;
 }
 
-bool SdkObjectPool::initEngineResources()
+bool SdkObjectFactory::initEngineResources()
 {
     auto analyticsManager = getAnalyticsManager(serverModule());
     if (!analyticsManager)
@@ -259,7 +259,7 @@ bool SdkObjectPool::initEngineResources()
     return true;
 }
 
-nx::vms::api::AnalyticsEngineData SdkObjectPool::createEngineData(
+nx::vms::api::AnalyticsEngineData SdkObjectFactory::createEngineData(
     const QnUuid& pluginId,
     int engineIndex) const
 {
@@ -275,19 +275,19 @@ nx::vms::api::AnalyticsEngineData SdkObjectPool::createEngineData(
     return engineData;
 }
 
-SdkObjectPool::PluginPtr SdkObjectPool::plugin(const QnUuid & id) const
+SdkObjectFactory::PluginPtr SdkObjectFactory::plugin(const QnUuid & id) const
 {
     QnMutexLocker lock(&m_mutex);
     return pluginUnsafe(id);
 }
 
-SdkObjectPool::PluginPtr SdkObjectPool::pluginUnsafe(const QnUuid& id) const
+SdkObjectFactory::PluginPtr SdkObjectFactory::pluginUnsafe(const QnUuid& id) const
 {
     auto itr = m_plugins.find(id);
     return itr == m_plugins.cend() ? nullptr : itr->second;
 }
 
-SdkObjectPool::EnginePtr SdkObjectPool::engine(const QnUuid& id) const
+SdkObjectFactory::EnginePtr SdkObjectFactory::engine(const QnUuid& id) const
 {
     QnMutexLocker lock(&m_mutex);
     auto descriptor = engineDescriptorUnsafe(id);
@@ -297,7 +297,7 @@ SdkObjectPool::EnginePtr SdkObjectPool::engine(const QnUuid& id) const
     return descriptor->engine;
 }
 
-std::shared_ptr<SdkObjectPool::EngineDescriptor> SdkObjectPool::engineDescriptorUnsafe(
+std::shared_ptr<SdkObjectFactory::EngineDescriptor> SdkObjectFactory::engineDescriptorUnsafe(
     const QnUuid& id) const
 {
     auto itr = m_engines.find(id);
@@ -307,7 +307,7 @@ std::shared_ptr<SdkObjectPool::EngineDescriptor> SdkObjectPool::engineDescriptor
     return itr->second;
 }
 
-SdkObjectPool::EnginePtr SdkObjectPool::instantiateEngine(
+SdkObjectFactory::EnginePtr SdkObjectFactory::instantiateEngine(
     const QnUuid& engineId,
     const QJsonObject& settings)
 {

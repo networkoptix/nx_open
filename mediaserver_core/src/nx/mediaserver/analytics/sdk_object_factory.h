@@ -17,7 +17,7 @@ class Engine;
 
 namespace nx::mediaserver::analytics {
 
-class SdkObjectPool:
+class SdkObjectFactory:
     public Connective<QObject>,
     public nx::mediaserver::ServerModuleAware
 {
@@ -41,7 +41,7 @@ class SdkObjectPool:
     };
 
 public:
-    SdkObjectPool(QnMediaServerModule* serverModule);
+    SdkObjectFactory(QnMediaServerModule* serverModule);
     bool init();
 
     PluginPtr plugin(const QnUuid& id) const;

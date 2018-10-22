@@ -6,7 +6,7 @@
 
 #include <nx/mediaserver/sdk_support/utils.h>
 #include <nx/mediaserver/sdk_support/pointers.h>
-#include <nx/mediaserver/analytics/sdk_object_pool.h>
+#include <nx/mediaserver/analytics/sdk_object_factory.h>
 
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
