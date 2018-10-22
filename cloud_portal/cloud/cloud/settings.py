@@ -174,7 +174,11 @@ PRIMARY_PRODUCT = "cloud_portal"
 if LOCAL_ENVIRONMENT:
     conf["cloud_db"]["url"] = 'https://cloud-dev2.hdw.mx/cdb'
 
-    BROKER_URL = 'sqs://AKIAJLGVEWNXAIODNKLA:W+Xah8vz129nZBpukBkwZsz3fLtnzOLUqEMDthZp@'
+    # BROKER_URL = 'sqs://...'
+    # This setting is removed because every developer needs personal AWS credentials
+    # Ask Ivan V to provide you with config and credentials files for AWS and save them to ~/.aws/ directory
+    # Or go through file history in source control to find the last time it was here (changeset 49115a0427b3 or 4923e6b2575d)
+
     CACHES["global"] = {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
         'LOCATION': 'portal_cache',
