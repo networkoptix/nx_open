@@ -23,15 +23,12 @@ import * as angular from 'angular';
                         .systems()
                         .then(result => {
                             this.systems = this.sortSystems(result.data);
-                            return $q.resolve();
-                        }, error => {
-                            return $q.reject(error);
                         });
                 };
 
                 this.delayedUpdateSystems = function () {
                     this.pollingSystemsUpdate = $poll(() => {
-                        this.forceUpdateSystems();
+                        return this.forceUpdateSystems();
                     }, CONFIG.updateInterval);
                 };
 

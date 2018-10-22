@@ -86,7 +86,7 @@ window.L = {};
                     };
 
                 $.ajax({
-                    url: 'api/utils/settings',
+                    url: CONFIG.apiBase + '/utils/settings',
                     async: false,
                     dataType: 'json'
                 }).done(function(response){
@@ -98,7 +98,7 @@ window.L = {};
 
                 $.ajax({
                     // url: 'static/views/language.json',
-                    url: 'api/utils/language',
+                    url: CONFIG.apiBase + '/utils/language',
                     async: false,
                     dataType: 'json'
                 })
