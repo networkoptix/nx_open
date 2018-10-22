@@ -23,12 +23,8 @@ Item
     property Item viewport: null
 
     readonly property bool customRoiExists: d.hasFinishedCustomRoi || drawingCustomRoi
-    readonly property bool drawingCustomRoi:
-    {
-        var result = d.customInitialRelative
-            && d.nearPositions(d.customInitialRelative, d.customFirstPoint)
-        return result ? true : false
-    }
+    readonly property bool drawingCustomRoi: d.toBool(
+        d.customInitialRelative && d.nearPositions(d.customInitialRelative, d.customFirstPoint))
 
     function clearCustomRoi()
     {
@@ -80,6 +76,7 @@ Item
             return // We don't allow to start long tap after fast clicks (double click, for example).
 
         pressFilterTimer.restart()
+        selectionPreloader.centerPoint = Qt.point(pos.x + 0.5, pos.y + 0.5)
         d.customInitialRelative = d.toRelative(pos)
         pressAndHoldTimer.restart()
     }
@@ -148,25 +145,23 @@ Item
         }
     }
 
-    // Test control. Represents simple preloder for the first point
-    Circle
+    RoiSelectionPreloader
     {
-        id: tapPreloader
+        id: selectionPreloader
 
-        readonly property point unfixedCenter: d.fromRelative(d.customInitialRelative)
-        centerPoint: Qt.point(unfixedCenter.x + 0.5, unfixedCenter.y + 0.5)
-        border.width: 1
-        border.color: d.lineColor
-        color: "transparent"
-        visible: d.customInitialRelative ? true : false
-        radius: visible ? 30 : 0
-        Behavior on width
+        mainColor: d.lineColor
+        shadowColor: d.shadowColor
+        centerPoint: d.fromRelative(d.customInitialRelative)
+
+        state:
         {
-            NumberAnimation
-            {
-                duration: pressAndHoldTimer.interval
-                easing.type: Easing.InOutQuad
-            }
+            if (d.customInitialRelative)
+                return "expanded"
+
+            if (d.hasFinishedCustomRoi && customRoiMarker.singlePoint)
+                return "normal"
+
+            return "hidden"
         }
     }
 
@@ -182,7 +177,7 @@ Item
         visible: controller.motionSearchMode && controller.customRoiExists
     }
 
-    // TODO: remove me, this is just for tests
+    // TODO: remove me, this is just for A. Pats
     MotionRoi
     {
         id: defaultRoi
@@ -191,8 +186,8 @@ Item
         shadowColor: d.shadowColor
         startPoint: d.fromRelative(d.defaultTopLeftRelative)
         endPoint: d.fromRelative(d.defaultBottomRightRelative)
-        visible: controller.motionSearchMode && d.defaultTopLeftRelative && d.defaultBottomRightRelative
-            ? true :false
+        visible: d.toBool(
+            controller.motionSearchMode && d.defaultTopLeftRelative && d.defaultBottomRightRelative)
     }
 
     Timer
@@ -215,6 +210,8 @@ Item
 
         readonly property color lineColor: ColorTheme.contrast1
         readonly property color shadowColor: ColorTheme.transparent(ColorTheme.base1, 0.2)
+        readonly property bool hasFinishedCustomRoi: toBool(
+            !controller.drawingCustomRoi && customFirstPoint && customSecondPoint)
 
         property var customInitialRelative
         property var customFirstPoint
@@ -242,11 +239,6 @@ Item
 
         property var defaultTopLeftRelative
         property var defaultBottomRightRelative
-
-        readonly property bool hasFinishedCustomRoi:
-            !controller.drawingCustomRoi && customFirstPoint && customSecondPoint
-                ? true
-                : false
 
         function toRelative(absolute)
         {
@@ -301,6 +293,11 @@ Item
             return left < right && top < bottom
                 ? Qt.rect(left, top, right - left, bottom - top)
                 : undefined
+        }
+
+        function toBool(value)
+        {
+            return !!value
         }
     }
 }

@@ -4,3 +4,4 @@ UniformGrid 1.0 UniformGrid.qml
 MaskedUniformGrid 1.0 MaskedUniformGrid.qml
 Circle 1.0 Circle.qml
 ShadedCircle 1.0 ShadedCircle.qml
+RoiSelectionPreloader 1.0 RoiSelectionPreloader.qml

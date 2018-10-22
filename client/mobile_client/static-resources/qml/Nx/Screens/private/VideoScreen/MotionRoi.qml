@@ -24,26 +24,11 @@ Item
     width: d.bottomRightPoint.x - d.topLeftPoint.x + 1
     height: d.bottomRightPoint.y - d.topLeftPoint.y + 1
 
-    ShadedCircle
-    {
-        id: singlePointMarker
-
-        centerPoint: d.startMarkerPoint
-        circleRadius: 4.5
-        visible: singlePoint
-        circleColor: "transparent"
-        circleBorderColor: item.roiColor
-        shadowColor: item.roiColor
-
-        border.color: roiColor
-    }
-
     Rectangle
     {
         id: roiMarker
 
-        visible: !singlePointMarker.visible
-
+        visible: item.drawing || !item.singlePoint
         anchors.fill: parent
         border.width: d.shadowRadius * 2 + boundingLines.border.width
         border.color: item.shadowColor
@@ -87,11 +72,12 @@ Item
     {
         id: d
 
+        readonly property int shadowRadius: 1
         readonly property real subpixelOffset: 0.5
         readonly property real markerOffset: shadowRadius + subpixelOffset
         readonly property real markerRight: item.width - shadowRadius - subpixelOffset
         readonly property real markerBottom: item.height - shadowRadius - subpixelOffset
-        property int shadowRadius: /*signlePoint ? 0 :*/ 20
+
         property point topLeftPoint: Qt.point(
             Math.min(item.startPoint.x, item.endPoint.x) - shadowRadius,
             Math.min(item.startPoint.y, item.endPoint.y) - shadowRadius)
