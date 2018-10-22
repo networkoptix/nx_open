@@ -148,7 +148,7 @@ void GenericApiClient<ApiResultCodeDescriptor>::makeAsyncCall(
         [this, request, handler = std::move(handler)](
             auto&&... args) mutable
         {
-            processResponse(request, std::move(handler), std::move(args)...);
+            this->processResponse(request, std::move(handler), std::move(args)...);
         });
 }
 
