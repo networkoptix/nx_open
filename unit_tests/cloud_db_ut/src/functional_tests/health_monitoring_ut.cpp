@@ -9,7 +9,7 @@ namespace nx {
 namespace cdb {
 namespace test {
 
-TEST_F(FtHealthMonitoring, system_status_is_correct)
+TEST_F(HealthMonitoring, system_status_is_correct)
 {
     for (int i = 0; i < 2; ++i)
     {
@@ -25,7 +25,7 @@ TEST_F(FtHealthMonitoring, system_status_is_correct)
     }
 }
 
-TEST_F(FtHealthMonitoring, history_is_persistent)
+TEST_F(HealthMonitoring, history_is_persistent)
 {
     establishConnectionFromMediaserverToCloud();
     closeConnectionFromMediaserverToCloud();
@@ -37,7 +37,7 @@ TEST_F(FtHealthMonitoring, history_is_persistent)
     assertHistoryIsCorrect();
 }
 
-TEST_F(FtHealthMonitoring, history_is_not_reported_for_unknown_id)
+TEST_F(HealthMonitoring, history_is_not_reported_for_unknown_id)
 {
     api::SystemHealthHistory history;
     ASSERT_NE(
@@ -47,20 +47,20 @@ TEST_F(FtHealthMonitoring, history_is_not_reported_for_unknown_id)
             QnUuid::createUuid().toStdString(), &history));
 }
 
-TEST_F(FtHealthMonitoring, history_is_available_to_system_owner_only)
+TEST_F(HealthMonitoring, history_is_available_to_system_owner_only)
 {
     givenSystemWithSomeHistory();
     whenSystemIsSharedWithSomeone();
     thenSomeoneDoesNotHaveAccessToTheHistory();
 }
 
-TEST_F(FtHealthMonitoring, history_is_not_available_to_system_credentials)
+TEST_F(HealthMonitoring, history_is_not_available_to_system_credentials)
 {
     givenSystemWithSomeHistory();
     thenSystemCredentialsCannotBeUsedToAccessHistory();
 }
 
-TEST_F(FtHealthMonitoring, no_excess_system_online_records)
+TEST_F(HealthMonitoring, no_excess_system_online_records)
 {
     establishConnectionFromMediaserverToCloud();
     assertHistoryHasASingleOnlineRecord();
