@@ -13,7 +13,7 @@ QSize getFrameSize(const QnConstCompressedVideoDataPtr& frame)
     if (frame->width > 0 && frame->height > 0)
         return QSize(frame->width, frame->height);
 
-    switch (frame->context->getCodecId())
+    switch (frame->compressionType)
     {
         case AV_CODEC_ID_H265:
         {
