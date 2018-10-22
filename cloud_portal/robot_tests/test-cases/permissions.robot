@@ -50,7 +50,7 @@ Check Special Hint
     Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${type}']
     Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${type}']/..
     ${type}    Convert To Uppercase    ${type}
-    Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT ${type}}
+    Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${type}
 
 Restart
     Register Keyword To Run On Failure    NONE

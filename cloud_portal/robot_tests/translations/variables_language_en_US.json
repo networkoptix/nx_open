@@ -44,7 +44,9 @@
 
     "EDIT USER BUTTON TEXT"                :    "Edit",
     "DELETE USER BUTTON TEXT"              :    "Delete",
-    "DELETE USER CANCEL BUTTON TEXT"       :    "Cancel",
+    "CANCEL BUTTON TEXT"                   :    "Cancel",
+    "RENAME SYSTEM SAVE TEXT"              :    "Save",
+    "SHARE BUTTON TEXT"                    :    "Share",
 
     "OWNER TEXT"                           :    "Owner",
     "ADMIN TEXT"                           :    "Administrator",

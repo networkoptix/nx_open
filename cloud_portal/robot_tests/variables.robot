@@ -128,9 +128,9 @@ ${SYSTEM NAME}                        //h1[@ng-if="gettingSystem.success"]
 ${FIRST USER OWNER}                   //table[@ng-if='system.users.length']/tbody/tr/td[3]/span[contains(text(),"${OWNER TEXT}")]
 ${DISCONNECT FROM NX}                 //button[@ng-click='disconnect()']
 ${RENAME SYSTEM}                      //button[@ng-click='rename()']
-${RENAME CANCEL}                      //form[@name='renameForm']//button[text()='Cancel']
+${RENAME CANCEL}                      //form[@name='renameForm']//button[text()='${CANCEL BUTTON TEXT}']
 ${RENAME X BUTTON}                    //form[@name='renameForm']//button[@class='close']
-${RENAME SAVE}                        //form[@name='renameForm']//button[text()='Save']
+${RENAME SAVE}                        //form[@name='renameForm']//button[text()='${RENAME SYSTEM SAVE TEXT}']
 
 ${RENAME INPUT}                       //form[@name='renameForm']//input[@id='systemName']
 ${RENAME INPUT WITH ERROR}            //form[@name='renameForm']//input[@id='systemName' and contains(@class,'ng-invalid')]
@@ -147,7 +147,7 @@ ${OPEN IN NX BUTTON}                  //div[@process-loading='gettingSystem']//b
 ${OPEN IN NX BUTTON DISABLED}         //div[@process-loading='gettingSystem']//button[@ng-click='checkForm()' and @ng-disabled='buttonDisabled']
 ${DELETE USER MODAL}                  //div[@uib-modal-transclude]
 ${DELETE USER BUTTON}                 //button[contains(text(), '${DELETE USER BUTTON TEXT}')]
-${DELETE USER CANCEL BUTTON}          //ngb-modal-window//button[contains(text(), "${DELETE USER CANCEL BUTTON TEXT}")]
+${DELETE USER CANCEL BUTTON}          //ngb-modal-window//button[contains(text(), "${CANCEL BUTTON TEXT}")]
 ${SYSTEM NAME OFFLINE}                //span[@ng-if='!system.isOnline']
 ${USERS LIST}                         //div[@process-loading='gettingSystemUsers']
 
@@ -156,7 +156,7 @@ ${AVAILABLE SYSTEMS LIST}             //a[@href='/systems']
 
 #Disconnect from cloud portal
 ${DISCONNECT FORM}                    //form[@name='disconnectForm']
-${DISCONNECT FORM CANCEL}             //form[@name='disconnectForm']//button[text()='Cancel']
+${DISCONNECT FORM CANCEL}             //form[@name='disconnectForm']//button[text()='${CANCEL BUTTON TEXT}']
 ${DISCONNECT FORM HEADER}             //h1["${DISCONNECT FORM HEADER TEXT}"]
 
 #Disconnect from my account
@@ -173,8 +173,8 @@ ${ALREADY ACTIVATED}                  //h1[@ng-if='!activate.success && !loading
 ${SHARE MODAL}                        //form[@name='shareForm']
 ${SHARE EMAIL}                        //form[@name='shareForm']//input[@id='email']
 ${SHARE PERMISSIONS DROPDOWN}         //form[@name='shareForm']//nx-permissions-select//button[@id='permissionsSelect']
-${SHARE BUTTON MODAL}                 //form[@name='shareForm']//button[text()='Share']
-${SHARE CANCEL}                       //form[@name='shareForm']//button[text()='Cancel']
+${SHARE BUTTON MODAL}                 //form[@name='shareForm']//button[text()='${SHARE BUTTON TEXT}']
+${SHARE CANCEL}                       //form[@name='shareForm']//button[text()='${CANCEL BUTTON TEXT}']
 ${SHARE CLOSE}                        //form[@name='shareForm']//button[@data-dismiss='modal']
 ${SHARE PERMISSIONS HINT}             //form[@name='shareForm']//span[contains(@class,'help-block')]
 
