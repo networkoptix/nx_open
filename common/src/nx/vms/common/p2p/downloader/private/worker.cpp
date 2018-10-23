@@ -110,7 +110,6 @@ Worker::Worker(
     AbstractPeerManager* peerManager,
     QObject* parent)
     :
-    QnLongRunnable(parent),
     m_storage(storage),
     m_peerManager(peerManager),
     m_fileName(fileName),

@@ -31,58 +31,40 @@
      <property name="flat">
       <bool>true</bool>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
+     <layout class="QGridLayout" name="gridLayout">
       <property name="leftMargin">
        <number>0</number>
       </property>
       <property name="rightMargin">
        <number>0</number>
       </property>
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <property name="spacing">
-         <number>2</number>
+      <property name="horizontalSpacing">
+       <number>0</number>
+      </property>
+      <item row="1" column="0">
+       <spacer name="filterHintSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-        <item>
-         <widget class="QCheckBox" name="filtersCheckBox">
-          <property name="text">
-           <string>Apply Filters</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="filtersLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Rotation, Dewarping, Image Enhancement etc.</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
-      <item>
+      <item row="4" column="0" colspan="3">
        <widget class="Line" name="line">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QLabel" name="warningLabel">
-        <property name="text">
-         <string>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
+      <item row="6" column="0">
        <spacer name="verticalSpacer">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
@@ -94,6 +76,41 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item row="0" column="0" colspan="3">
+       <widget class="QCheckBox" name="filtersCheckBox">
+        <property name="text">
+         <string>Apply Filters</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0" colspan="3">
+       <widget class="QLabel" name="warningLabel">
+        <property name="text">
+         <string>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" rowspan="2" colspan="2">
+       <widget class="QLabel" name="filtersLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Rotation, Dewarping, Image Enhancement etc.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="3">
+       <widget class="QWidget" name="passwordWidget" native="true">
+        <layout class="QVBoxLayout" name="verticalLayout_2"/>
+       </widget>
       </item>
      </layout>
     </widget>

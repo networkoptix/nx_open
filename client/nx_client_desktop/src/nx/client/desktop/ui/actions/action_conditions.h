@@ -653,6 +653,8 @@ ConditionWrapper canCancelWearableCameraUpload();
 
 ConditionWrapper currentLayoutIsVideowallScreen();
 
+ConditionWrapper canForgetPassword();
+
 } // namespace condition
 
 } // namespace action

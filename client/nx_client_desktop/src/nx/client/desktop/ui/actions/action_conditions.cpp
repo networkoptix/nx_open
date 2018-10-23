@@ -64,6 +64,8 @@
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <nx/client/desktop/resource_views/data/node_type.h>
+#include <nx/client/desktop/resources/layout_password_management.h>
+
 
 using boost::algorithm::any_of;
 using boost::algorithm::all_of;
@@ -1934,6 +1936,17 @@ ConditionWrapper currentLayoutIsVideowallScreen()
         {
             const auto layout = context->workbench()->currentLayout();
             return layout && !layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>().isNull();
+        });
+}
+
+ConditionWrapper canForgetPassword()
+{
+    using namespace nx::client::desktop;
+    return new CustomBoolCondition(
+        [](const Parameters& parameters, QnWorkbenchContext* context)
+        {
+            const auto layout = parameters.resource().dynamicCast<QnLayoutResource>();
+            return layout && layout::isEncrypted(layout) && !layout::requiresPassword(layout);
         });
 }
 

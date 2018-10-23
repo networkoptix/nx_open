@@ -236,11 +236,13 @@ def threadsafe_generator(generator_fn):
     return safe_generator_fn
 
 
-class Timer:
-
-    def __init__(self):
-        self._start = timeit.default_timer()
-
-    @property
-    def duration(self):
-        return timedelta(seconds=timeit.default_timer() - self._start)
+def description_from_func(func):  # type: (Any) -> str
+    try:
+        object_bound_to = func.__self__
+    except AttributeError:
+        if func.__name__ == '<lambda>':
+            raise ValueError("Cannot make description from lambda")
+        return func.__name__
+    if object_bound_to is None:
+        raise ValueError("Cannot make description from unbound method")
+    return '{func.__self__!r}.{func.__name__!s}'.format(func=func)

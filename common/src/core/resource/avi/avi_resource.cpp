@@ -204,3 +204,55 @@ QnAspectRatio QnAviResource::customAspectRatio() const
         ? QnAspectRatio::closestStandardRatio(m_aviMetadata->overridenAr)
         : base_type::customAspectRatio();
 }
+
+bool QnAviResource::isEncrypted() const
+{
+    const auto fileStorage = m_storage.dynamicCast<QnLayoutFileStorageResource>();
+    return fileStorage && fileStorage->isEncrypted();
+}
+
+bool QnAviResource::requiresPassword() const
+{
+    const auto fileStorage = m_storage.dynamicCast<QnLayoutFileStorageResource>();
+    return fileStorage && fileStorage->requiresPassword();
+}
+
+bool QnAviResource::usePasswordToRead(const QString& password)
+{
+    auto fileStorage = m_storage.dynamicCast<QnLayoutFileStorageResource>();
+
+    if (!fileStorage || !fileStorage->requiresPassword())
+        return false;
+
+    const bool success = fileStorage->usePasswordToRead(password);
+    if (success)
+        emit storageAccessChanged();
+    return success;
+}
+
+void QnAviResource::setPasswordToWrite(const QString& password)
+{
+    auto fileStorage = m_storage.dynamicCast<QnLayoutFileStorageResource>();
+    if (fileStorage)
+        fileStorage->setPasswordToWrite(password);
+}
+
+void QnAviResource::forgetPassword()
+{
+    const bool hadValidPassword = isEncrypted() && !requiresPassword();
+    auto fileStorage = m_storage.dynamicCast<QnLayoutFileStorageResource>();
+    if (fileStorage)
+        fileStorage->forgetPassword();
+
+    if (hadValidPassword)
+        emit storageAccessChanged();
+}
+
+QString QnAviResource::password()
+{
+    auto fileStorage = m_storage.dynamicCast<QnLayoutFileStorageResource>();
+    if (fileStorage)
+        return fileStorage->password();
+
+    return {};
+}

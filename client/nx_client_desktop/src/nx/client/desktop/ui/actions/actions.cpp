@@ -983,6 +983,11 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Screen Settings..."))
         .condition(!condition::isSafeMode());
 
+    factory(ForgetLayoutPasswordAction)
+        .flags(Tree | SingleTarget | ResourceTarget)
+        .text(ContextMenu::tr("Forget password"))
+        .condition(condition::canForgetPassword() && !condition::isLayoutTourReviewMode());
+
     factory(SaveLayoutAction)
         .flags(TitleBar | Tree | SingleTarget | ResourceTarget)
         .requiredTargetPermissions(Qn::SavePermission)
@@ -1565,32 +1570,28 @@ void initialize(Manager* manager, Action* root)
             .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission)
             .text(ContextMenu::tr("None"))
             .checkable()
-            .checked(qnGlobals->defaultLayoutCellSpacing()
-                == QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::None));
+            .checked(QnWorkbenchLayout::kDefaultCellSpacing == Qn::CellSpacing::None);
 
         factory(SetCurrentLayoutItemSpacingSmallAction)
             .flags(Scene | NoTarget)
             .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission)
             .text(ContextMenu::tr("Small"))
             .checkable()
-            .checked(qnGlobals->defaultLayoutCellSpacing()
-                == QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Small));
+            .checked(QnWorkbenchLayout::kDefaultCellSpacing == Qn::CellSpacing::Small);
 
         factory(SetCurrentLayoutItemSpacingMediumAction)
             .flags(Scene | NoTarget)
             .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission)
             .text(ContextMenu::tr("Medium"))
             .checkable()
-            .checked(qnGlobals->defaultLayoutCellSpacing()
-                == QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Medium));
+            .checked(QnWorkbenchLayout::kDefaultCellSpacing == Qn::CellSpacing::Medium);
 
         factory(SetCurrentLayoutItemSpacingLargeAction)
             .flags(Scene | NoTarget)
             .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission)
             .text(ContextMenu::tr("Large"))
             .checkable()
-            .checked(qnGlobals->defaultLayoutCellSpacing()
-                == QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Large));
+            .checked(QnWorkbenchLayout::kDefaultCellSpacing == Qn::CellSpacing::Large);
         factory.endGroup();
 
     } factory.endSubMenu();
@@ -1828,7 +1829,9 @@ void initialize(Manager* manager, Action* root)
         .separator();
 
     factory(ToggleThumbnailsAction)
-        .flags(NoTarget);
+        .flags(NoTarget)
+        .text(ContextMenu::tr("Show Thumbnails"))
+        .toggledText(ContextMenu::tr("Hide Thumbnails"));
 
     factory(BookmarksModeAction)
         .flags(NoTarget)

@@ -107,7 +107,7 @@ class TemporaryAccountPasswordManager:
 {
 public:
     TemporaryAccountPasswordManager(
-        const nx::utils::stree::ResourceNameSet& attrNameset,
+        const nx::utils::stree::ResourceNameSet& attributeNameset,
         nx::sql::AsyncSqlQueryExecutor* const dbManager) noexcept(false);
     virtual ~TemporaryAccountPasswordManager();
 
@@ -182,7 +182,7 @@ private:
     constexpr static const int kIndexByLogin = 1;
     constexpr static const int kIndexByAccountEmail = 2;
 
-    const nx::utils::stree::ResourceNameSet& m_attrNameset;
+    const nx::utils::stree::ResourceNameSet& m_attributeNameset;
     nx::sql::AsyncSqlQueryExecutor* const m_dbManager;
     nx::utils::Counter m_startedAsyncCallsCounter;
     TemporaryCredentialsDictionary m_temporaryCredentials;

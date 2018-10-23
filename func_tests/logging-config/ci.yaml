@@ -9,3 +9,4 @@ loggers:
   SMB.SMBConnection: {level: INFO}
   paramiko.transport: {level: INFO}
   parse: {level: INFO}
+  framework.data_differ: {level: INFO}

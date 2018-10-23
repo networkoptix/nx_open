@@ -5,7 +5,7 @@ import logging
 import subprocess
 from datetime import timedelta
 
-from framework.utils import Timer
+from framework.waiting import Timer
 from .checks import Success, Halt, Failure, expect_values
 
 _logger = logging.getLogger(__name__)
@@ -24,12 +24,12 @@ def fps_avg(fps):
 def _ffprobe_poll(expected_values, probe, stream_url, title):
     timer = Timer()
     while probe.poll() is None:
-        if timer.duration > timedelta(seconds=30):
+        if timer.from_start > timedelta(seconds=30):
             yield Halt('{!r} ffprobe has timed out'.format(title))
             return
         yield Halt('{!r} ffprobe is in progress'.format(title))
 
-    stdout, stderr = probe.communicate()
+    stdout, stderr = probe.communicate()  # Loop above polls until process has exited.
     if stdout:
         _logger.debug('FFprobe(%s) stdout:\n%s', stream_url, stdout)
     if stderr:
@@ -59,17 +59,22 @@ def _ffprobe_poll(expected_values, probe, stream_url, title):
 
 
 def ffprobe_streams(expected_values, stream_url, title, rerun_count=1000, audio_stage=None):
-    frames = max(expected_values.get('video', {}).get('fps', [30]))
     last_failure = None
     for run_number in range(rerun_count):
+        options = ['-show_streams', '-of', 'json']
         if audio_stage:
-            probesize = ('-probesize', '100k')
+            options += ['-probesize', '100k']
         else:
-            probesize = ('-fpsprobesize', str(frames))
-        options = ['-show_streams', '-of', 'json', probesize[0], probesize[1]]
-        probe = subprocess.Popen(
-            ['ffprobe'] + options + [stream_url],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            frames = max(expected_values.get('video', {}).get('fps', [30]))
+            # Increasing the amount of frames used to count fps if default amount is insufficient
+            if run_number >= 2:
+                multiplier = 1.3 ** (run_number - 1)
+                frames = min(frames * multiplier, frames * 5)
+            options += ['-fpsprobesize', str(int(frames))]
+
+        command = ['ffprobe'] + options + [stream_url]
+        probe = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        _logger.debug('Run async: %s', ' '.join(command))
         try:
             for result in _ffprobe_poll(expected_values, probe, stream_url, title):
                 if isinstance(result, Success):

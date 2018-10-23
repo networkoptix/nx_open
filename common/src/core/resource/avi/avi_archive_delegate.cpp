@@ -405,6 +405,13 @@ bool QnAviArchiveDelegate::open(
                 QnStoragePluginFactory::instance()->createStorage(
                     resource->commonModule(),
                     url));
+
+            // Stepa: Dirty hack, but I don't know how to do it another way in current architecture.
+            auto fileStorage = m_storage.dynamicCast<QnLayoutFileStorageResource>();
+            auto aviResource = m_resource.dynamicCast<QnAviResource>();
+            if (fileStorage && aviResource)
+                fileStorage->usePasswordToRead(aviResource->password());
+
             if(!m_storage)
                 return false;
         }

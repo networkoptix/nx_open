@@ -164,15 +164,17 @@ void Instrument::removeItemCondition(InstrumentItemCondition *itemCondition) {
     m_itemConditions.removeAll(itemCondition);
 }
 
-bool Instrument::satisfiesItemConditions(QGraphicsItem *item) const {
-    if(!item) {
-        qnNullWarning(item);
+bool Instrument::satisfiesItemConditions(QGraphicsItem* item) const
+{
+    NX_ASSERT(item);
+    if (!item)
         return false;
-    }
 
-    foreach(InstrumentItemCondition *condition, m_itemConditions)
-        if(!condition->operator()(item, const_cast<Instrument *>(this)))
+    for (auto condition: m_itemConditions)
+    {
+        if (!condition->operator()(item, const_cast<Instrument *>(this)))
             return false;
+    }
 
     return true;
 }

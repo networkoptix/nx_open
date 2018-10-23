@@ -167,8 +167,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     connect(action(action::PinNotificationsAction), &QAction::toggled, this,
         [this](bool checked)
         {
-            if (checked)
-                setOpened(true);
+            setOpened(checked);
             emit geometryChanged();
         });
 
@@ -190,8 +189,8 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     m_hidingProcessor->addTargetItem(item);
     m_hidingProcessor->addTargetItem(m_showButton);
     m_hidingProcessor->addTargetItem(m_eventPanelContainer);
-    m_hidingProcessor->setHoverLeaveDelay(NxUi::kClosePanelTimeoutMs);
-    m_hidingProcessor->setFocusLeaveDelay(NxUi::kClosePanelTimeoutMs);
+    m_hidingProcessor->setHoverLeaveDelay(NxUi::kCloseSidePanelTimeoutMs);
+    m_hidingProcessor->setFocusLeaveDelay(NxUi::kCloseSidePanelTimeoutMs);
     connect(m_hidingProcessor, &HoverFocusProcessor::hoverLeft, this,
         [this]
         {
@@ -332,9 +331,9 @@ void NotificationsWorkbenchPanel::stopAnimations()
     item->setX(xAnimator->targetValue().toDouble());
 }
 
-void NotificationsWorkbenchPanel::setShowButtonUsed(bool used)
+void NotificationsWorkbenchPanel::enableShowButton(bool enabled)
 {
-    m_showButton->setAcceptedMouseButtons(used ? Qt::LeftButton : Qt::NoButton);
+    m_showButton->setAcceptedMouseButtons(enabled ? Qt::LeftButton : Qt::NoButton);
 }
 
 void NotificationsWorkbenchPanel::setShowButtonIcon()
@@ -365,11 +364,11 @@ void NotificationsWorkbenchPanel::at_showingProcessor_hoverEntered()
         setOpened(true, true);
 
         /* So that the click that may follow won't hide it. */
-        setShowButtonUsed(false);
+        enableShowButton(false);
         QTimer::singleShot(NxUi::kButtonInactivityTimeoutMs, this,
             [this]
             {
-                setShowButtonUsed(true);
+                enableShowButton(true);
             });
     }
 

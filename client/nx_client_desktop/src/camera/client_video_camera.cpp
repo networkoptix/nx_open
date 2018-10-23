@@ -3,6 +3,7 @@
 #include <client_core/client_core_module.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/datetime.h>
 
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/streaming/rtsp_client_archive_delegate.h>

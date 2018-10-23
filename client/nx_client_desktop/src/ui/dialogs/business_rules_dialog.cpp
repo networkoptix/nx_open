@@ -37,6 +37,7 @@
 
 #include <nx_ec/dummy_handler.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/resources/search_helper.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -136,7 +137,7 @@ namespace {
             auto resourcePassText =
                 [this](const QnResourcePtr& resource)
                 {
-                    return resource->toSearchString(true).contains(m_filterText, Qt::CaseInsensitive);
+                    return resources::search_helper::matches(m_filterText, resource);
                 };
 
             auto passText =

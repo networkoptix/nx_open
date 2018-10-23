@@ -6,7 +6,7 @@
 
 #include <providers/spush_media_stream_provider.h>
 #include <core/resource/resource_media_layout.h>
-#include <nx/streaming/nx_rtp_parser.h>
+#include <nx/streaming/rtp/parsers/nx_rtp_parser.h>
 #include <network/multicodec_rtp_reader.h>
 #include <nx/network/deprecated/simple_http_client.h>
 
@@ -49,7 +49,7 @@ private:
 
     QSharedPointer<nx::network::AbstractStreamSocket> m_socket;
     quint8 m_recvBuffer[65536];
-    QnNxRtpParser m_parsers[MEDIA_STREAM_COUNT];
+    nx::streaming::rtp::QnNxRtpParser m_parsers[MEDIA_STREAM_COUNT];
     QElapsedTimer m_keepaliveTimer;
     QnResourceCustomAudioLayoutPtr m_audioLayout;
     mutable QnMutex m_audioLayoutMutex;

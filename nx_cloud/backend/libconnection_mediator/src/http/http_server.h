@@ -5,9 +5,11 @@
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/http/server/multi_endpoint_acceptor.h>
+#include <nx/network/http/server/abstract_fusion_request_handler.h>
 #include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
 
 #include "discovery/discovery_http_server.h"
+#include "server/hole_punching_processor.h"
 
 namespace nx {
 namespace hpm {
@@ -25,7 +27,8 @@ public:
     Server(
         const conf::Settings& settings,
         const PeerRegistrator& peerRegistrator,
-        nx::cloud::discovery::RegisteredPeerPool* registeredPeerPool);
+        nx::cloud::discovery::RegisteredPeerPool* registeredPeerPool,
+        HolePunchingProcessor* holePunchingProcessor);
 
     void listen();
     void stopAcceptingNewRequests();
@@ -43,6 +46,7 @@ private:
     nx::network::http::server::MultiEndpointAcceptor m_multiAddressHttpServer;
     std::unique_ptr<nx::cloud::discovery::HttpServer> m_discoveryHttpServer;
     nx::cloud::discovery::RegisteredPeerPool* m_registeredPeerPool = nullptr;
+    HolePunchingProcessor* m_holePunchingProcessor = nullptr;
 
     void loadSslCertificate();
 
@@ -51,11 +55,38 @@ private:
         const PeerRegistrator& peerRegistrator,
         nx::cloud::discovery::RegisteredPeerPool* registeredPeerPool);
 
+    void registerApiHandlers(const PeerRegistrator& peerRegistrator);
+
     template<typename Handler, typename Arg>
     void registerApiHandler(
         const char* path,
         const nx::network::http::StringType& method,
         Arg arg);
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class InitiateConnectionRequestHandler:
+    public nx::network::http::AbstractFusionRequestHandler<
+        api::ConnectRequest, api::ConnectResponse>
+{
+public:
+    InitiateConnectionRequestHandler(
+        HolePunchingProcessor* holePunchingProcessor);
+
+protected:
+    virtual void processRequest(
+        nx::network::http::HttpServerConnection* const connection,
+        const nx::network::http::Request& request,
+        nx::utils::stree::ResourceContainer authInfo,
+        api::ConnectRequest inputData) override;
+
+private:
+    HolePunchingProcessor* m_holePunchingProcessor = nullptr;
+
+    void reportResult(
+        api::ResultCode resultCode,
+        api::ConnectResponse response);
 };
 
 } // namespace http

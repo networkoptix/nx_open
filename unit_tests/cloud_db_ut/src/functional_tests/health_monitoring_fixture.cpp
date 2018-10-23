@@ -7,19 +7,19 @@ namespace nx {
 namespace cdb {
 namespace test {
 
-FtHealthMonitoring::FtHealthMonitoring()
+HealthMonitoring::HealthMonitoring()
 {
     m_anotherUser = addActivatedAccount2();
 }
 
-void FtHealthMonitoring::givenSystemWithSomeHistory()
+void HealthMonitoring::givenSystemWithSomeHistory()
 {
     establishConnectionFromMediaserverToCloud();
     closeConnectionFromMediaserverToCloud();
     assertHistoryIsCorrect();
 }
 
-void FtHealthMonitoring::establishConnectionFromMediaserverToCloud()
+void HealthMonitoring::establishConnectionFromMediaserverToCloud()
 {
     openTransactionConnections(1);
     waitForConnectionsToMoveToACertainState(
@@ -31,7 +31,7 @@ void FtHealthMonitoring::establishConnectionFromMediaserverToCloud()
     saveHistoryItem(api::SystemHealth::online);
 }
 
-void FtHealthMonitoring::establishConnectionFromMediaserverToCloudReusingPeerId()
+void HealthMonitoring::establishConnectionFromMediaserverToCloudReusingPeerId()
 {
     QnUuid peerId;
     connectionHelper().getAccessToConnectionByIndex(
@@ -56,19 +56,19 @@ void FtHealthMonitoring::establishConnectionFromMediaserverToCloudReusingPeerId(
         std::chrono::hours(1));
 }
 
-void FtHealthMonitoring::closeConnectionFromMediaserverToCloud()
+void HealthMonitoring::closeConnectionFromMediaserverToCloud()
 {
     closeAllConnections();
     saveHistoryItem(api::SystemHealth::offline);
     waitForSystemToBecome(api::SystemHealth::offline);
 }
 
-void FtHealthMonitoring::whenCdbIsRestarted()
+void HealthMonitoring::whenCdbIsRestarted()
 {
     ASSERT_TRUE(restart());
 }
 
-void FtHealthMonitoring::whenSystemIsSharedWithSomeone()
+void HealthMonitoring::whenSystemIsSharedWithSomeone()
 {
     const std::vector<api::SystemAccessRole> accessRolesToTest = {
         api::SystemAccessRole::custom,
@@ -88,7 +88,7 @@ void FtHealthMonitoring::whenSystemIsSharedWithSomeone()
         accessRole);
 }
 
-void FtHealthMonitoring::thenSomeoneDoesNotHaveAccessToTheHistory()
+void HealthMonitoring::thenSomeoneDoesNotHaveAccessToTheHistory()
 {
     api::SystemHealthHistory history;
     ASSERT_EQ(
@@ -98,7 +98,7 @@ void FtHealthMonitoring::thenSomeoneDoesNotHaveAccessToTheHistory()
             system().id, &history));
 }
 
-void FtHealthMonitoring::thenSystemCredentialsCannotBeUsedToAccessHistory()
+void HealthMonitoring::thenSystemCredentialsCannotBeUsedToAccessHistory()
 {
     api::SystemHealthHistory history;
     ASSERT_EQ(
@@ -108,17 +108,17 @@ void FtHealthMonitoring::thenSystemCredentialsCannotBeUsedToAccessHistory()
             system().id, &history));
 }
 
-void FtHealthMonitoring::assertSystemOnline()
+void HealthMonitoring::assertSystemOnline()
 {
     assertSystemStatusIs(api::SystemHealth::online);
 }
 
-void FtHealthMonitoring::assertSystemOffline()
+void HealthMonitoring::assertSystemOffline()
 {
     assertSystemStatusIs(api::SystemHealth::offline);
 }
 
-void FtHealthMonitoring::assertHistoryIsCorrect()
+void HealthMonitoring::assertHistoryIsCorrect()
 {
     api::SystemHealthHistory history;
     ASSERT_EQ(
@@ -134,7 +134,7 @@ void FtHealthMonitoring::assertHistoryIsCorrect()
     }
 }
 
-void FtHealthMonitoring::assertHistoryHasASingleOnlineRecord()
+void HealthMonitoring::assertHistoryHasASingleOnlineRecord()
 {
     api::SystemHealthHistory history;
     ASSERT_EQ(
@@ -145,7 +145,7 @@ void FtHealthMonitoring::assertHistoryHasASingleOnlineRecord()
     ASSERT_EQ(1U, history.events.size());
 }
 
-void FtHealthMonitoring::waitForSystemToBecome(api::SystemHealth status)
+void HealthMonitoring::waitForSystemToBecome(api::SystemHealth status)
 {
     for (;;)
     {
@@ -161,7 +161,7 @@ void FtHealthMonitoring::waitForSystemToBecome(api::SystemHealth status)
     }
 }
 
-void FtHealthMonitoring::assertSystemStatusIs(api::SystemHealth status)
+void HealthMonitoring::assertSystemStatusIs(api::SystemHealth status)
 {
     api::SystemDataEx systemData;
     ASSERT_EQ(
@@ -172,7 +172,7 @@ void FtHealthMonitoring::assertSystemStatusIs(api::SystemHealth status)
     ASSERT_EQ(status, systemData.stateOfHealth);
 }
 
-void FtHealthMonitoring::saveHistoryItem(api::SystemHealth status)
+void HealthMonitoring::saveHistoryItem(api::SystemHealth status)
 {
     api::SystemHealthHistoryItem item;
     item.state = status;

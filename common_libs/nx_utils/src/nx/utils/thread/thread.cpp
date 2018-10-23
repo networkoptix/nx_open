@@ -26,10 +26,7 @@ Thread::Thread()
 
 Thread::~Thread()
 {
-    if (isRunning())
-    {
-        NX_ASSERT(false, "Runnable instance was destroyed without a call to stop().");
-    }
+    NX_ASSERT(!isRunning(), "Thread is destroyed without a call to stop().");
 }
 
 bool Thread::needToStop() const
@@ -79,18 +76,6 @@ void Thread::initSystemThreadId()
 uintptr_t Thread::currentThreadSystemId()
 {
     return ::currentThreadSystemId();
-}
-
-void Thread::smartSleep(int ms)
-{
-    int n = ms / 100;
-
-    for (int i = 0; i < n; ++i)
-        if (!needToStop())
-            msleep(100);
-
-    if (!needToStop())
-        msleep(ms % 100);
 }
 
 void Thread::start(Priority priority)

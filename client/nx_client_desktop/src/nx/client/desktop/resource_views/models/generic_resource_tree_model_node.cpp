@@ -20,12 +20,10 @@ namespace desktop {
 GenericResourceTreeModelNode::GenericResourceTreeModelNode(
     QnResourceTreeModel* model,
     const IsAcceptableResourceCheckFunction& checkFunction,
-    NodeType nodeType,
-    bool useExtraSearchInformation)
+    NodeType nodeType)
     :
     base_type(model, nodeType),
-    m_isAcceptableCheck(checkFunction),
-    m_useExtraSearchInformation(useExtraSearchInformation)
+    m_isAcceptableCheck(checkFunction)
 {
     connect(resourceAccessProvider(), &QnResourceAccessProvider::accessChanged, this,
         &GenericResourceTreeModelNode::handleAccessChanged);
@@ -113,7 +111,6 @@ QnResourceTreeModelNodePtr GenericResourceTreeModelNode::tryEnsureResourceNode(
 
     QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(model(), resource,
         NodeType::sharedResource));
-    node->setUseExtraSearchInformation(m_useExtraSearchInformation);
     node->initialize();
 
     auto parent = toSharedPointer();

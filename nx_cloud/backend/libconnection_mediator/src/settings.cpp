@@ -302,9 +302,10 @@ void Settings::loadSettings()
             settings().value(kStunUdpEndpointsToListen).toString(),
             &m_stun.udpAddrToListenList);
     }
-
-    if (m_stun.udpAddrToListenList.empty())
+    else
+    {
         m_stun.udpAddrToListenList = m_stun.addrToListenList;
+    }
 
     m_stun.keepAliveOptions = network::KeepAliveOptions::fromString(
         settings().value(kStunKeepAliveOptions, kDefaultStunKeepAliveOptions).toString());

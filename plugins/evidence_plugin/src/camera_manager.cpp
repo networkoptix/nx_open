@@ -17,8 +17,10 @@
 #include "sync_http_client.h"
 
 
+namespace{
 static const int DEFAULT_HI_STREAM_FRAMERATE = 25;
 static const int DEFAULT_LO_STREAM_FRAMERATE = 25;
+}
 
 namespace nxcip
 {
@@ -81,7 +83,7 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
     m_credentials.setUser( QString::fromUtf8(m_info.defaultLogin) );
     m_credentials.setPassword( QString::fromUtf8(m_info.defaultPassword) );
     m_encoders.resize( 2 ); //TODO all cameras support dual streaming???
-    
+
     m_cameraCapabilities |= nxcip::BaseCameraManager::sharePixelsCapability;
 }
 
