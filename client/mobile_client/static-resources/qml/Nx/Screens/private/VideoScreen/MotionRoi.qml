@@ -14,8 +14,7 @@ Item
     property color roiColor
     property color shadowColor
     property int lineWidth: 1
-    readonly property bool singlePoint:
-        Qt.vector2d(startPoint.x - endPoint.x, startPoint.y - endPoint.y).length() < 5
+    property bool singlePoint: true
 
     x: d.topLeftPoint.x
     y: d.topLeftPoint.y

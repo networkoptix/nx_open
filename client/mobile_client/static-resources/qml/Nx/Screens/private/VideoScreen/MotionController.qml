@@ -54,6 +54,7 @@ Item
         {
             d.customSecondPoint = relativePos
             d.selectionRoi.endPoint = Qt.binding(function() { return d.fromRelative(relativePos)})
+            d.selectionRoi.singlePoint = d.nearPositions(d.customFirstPoint, d.customSecondPoint)
         }
         else if (!d.nearPositions(d.customInitialPoint, relativePos))
         {
@@ -86,6 +87,7 @@ Item
 
         d.selectionRoi.startPoint = Qt.binding(function() { return d.fromRelative(relativePos)})
         d.selectionRoi.endPoint = Qt.binding(function() { return d.fromRelative(relativePos)})
+        d.selectionRoi.singlePoint = true
         d.selectionRoi.start()
     }
 
@@ -222,7 +224,7 @@ Item
 
             var firstVector = Qt.vector2d(first.x, first.y)
             var secondVector = Qt.vector2d(second.x, second.y)
-            return firstVector.minus(secondVector).length() < 0.01
+            return firstVector.minus(secondVector).length() < 0.03
         }
 
         function getMotionFilter(first, second)
