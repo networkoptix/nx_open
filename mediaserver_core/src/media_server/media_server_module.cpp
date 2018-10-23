@@ -284,7 +284,7 @@ QnMediaServerModule::QnMediaServerModule(const nx::mediaserver::CmdLineArguments
     m_resourceSearchers.reset(new QnMediaServerResourceSearchers(this));
     m_serverConnector = store(new QnServerConnector(commonModule()));
     m_statusWatcher = store(new QnResourceStatusWatcher(commonModule()));
-    m_sdkObjectPool = store(new nx::mediaserver::analytics::SdkObjectFactory(this));
+    m_sdkObjectFactory = store(new nx::mediaserver::analytics::SdkObjectFactory(this));
 
     m_hlsSessionPool = store(new nx::mediaserver::hls::SessionPool());
 
@@ -427,9 +427,9 @@ nx::mediaserver::analytics::EventRuleWatcher* QnMediaServerModule::analyticsEven
     return m_analyticsEventRuleWatcher;
 }
 
-nx::mediaserver::analytics::SdkObjectFactory* QnMediaServerModule::sdkObjectPool() const
+nx::mediaserver::analytics::SdkObjectFactory* QnMediaServerModule::sdkObjectFactory() const
 {
-    return m_sdkObjectPool;
+    return m_sdkObjectFactory;
 }
 
 nx::mediaserver::resource::SharedContextPool* QnMediaServerModule::sharedContextPool() const

@@ -93,7 +93,7 @@ QnSharedResourcePointer<ResourceType> find(QnMediaServerModule* serverModule, co
     return resourcePool->getResourceById<ResourceType>(QnUuid(id));
 }
 
-analytics::SdkObjectFactory* getSdkObjectPool(QnMediaServerModule* serverModule);
+analytics::SdkObjectFactory* getSdkObjectFactory(QnMediaServerModule* serverModule);
 nx::analytics::DescriptorListManager* getDescriptorListManager(QnMediaServerModule* serverModule);
 
 bool deviceInfoFromResource(

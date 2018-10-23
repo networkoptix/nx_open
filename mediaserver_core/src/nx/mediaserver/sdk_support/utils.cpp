@@ -45,7 +45,7 @@ static QString manifestFileDir()
 } // namespace
 
 
-analytics::SdkObjectFactory* getSdkObjectPool(QnMediaServerModule* serverModule)
+analytics::SdkObjectFactory* getSdkObjectFactory(QnMediaServerModule* serverModule)
 {
     if (!serverModule)
     {
@@ -53,14 +53,14 @@ analytics::SdkObjectFactory* getSdkObjectPool(QnMediaServerModule* serverModule)
         return nullptr;
     }
 
-    auto sdkObjectPool = serverModule->sdkObjectPool();
-    if (!sdkObjectPool)
+    auto sdkObjectFactory = serverModule->sdkObjectFactory();
+    if (!sdkObjectFactory)
     {
         NX_ASSERT(false, "Can't access SDK object pool");
         return nullptr;
     }
 
-    return sdkObjectPool;
+    return sdkObjectFactory;
 }
 
 nx::analytics::DescriptorListManager* getDescriptorListManager(QnMediaServerModule* serverModule)

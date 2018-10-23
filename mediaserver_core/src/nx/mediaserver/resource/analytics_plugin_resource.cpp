@@ -37,20 +37,25 @@ AnalyticsPluginResource::AnalyticsPluginResource(QnMediaServerModule* serverModu
 {
 }
 
+void AnalyticsPluginResource::setSdkPlugin(sdk_support::SharedPtr<analytics_sdk::Plugin> plugin)
+{
+    m_sdkPlugin = std::move(plugin);
+}
+
+sdk_support::SharedPtr<nx::sdk::analytics::Plugin> AnalyticsPluginResource::sdkPlugin() const
+{
+    return m_sdkPlugin;
+}
+
 CameraDiagnostics::Result AnalyticsPluginResource::initInternal()
 {
     NX_DEBUG(this, lm("Initializing analytics plugin resource %1 (%2)")
         .args(getName(), getId()));
 
-    auto sdkObjectPool = sdk_support::getSdkObjectPool(serverModule());
-    if (!sdkObjectPool)
-        return CameraDiagnostics::InternalServerErrorResult("Can't access SDK object pool");
+    if (!m_sdkPlugin)
+        return CameraDiagnostics::InternalServerErrorResult("SDK plugin object is not set");
 
-    auto sdkPlugin = sdkObjectPool->plugin(getId());
-    if (!sdkPlugin)
-        return CameraDiagnostics::PluginErrorResult("Can't find plugin");
-
-    const auto manifest = sdk_support::manifest<analytics_api::PluginManifest>(sdkPlugin);
+    const auto manifest = sdk_support::manifest<analytics_api::PluginManifest>(m_sdkPlugin);
     if (!manifest)
         return CameraDiagnostics::PluginErrorResult("Can't deserialize engine manifest");
 

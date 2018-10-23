@@ -1,4 +1,4 @@
-#include "sdk_object_pool.h"
+#include "sdk_object_factory.h"
 
 #include <nx/vms/api/analytics/plugin_manifest.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
@@ -35,28 +35,10 @@ class SdkObjectFactory;
 
 namespace {
 
+using PluginPtr = sdk_support::SharedPtr<nx::sdk::analytics::Plugin>;
+using EnginePtr = sdk_support::SharedPtr<nx::sdk::analytics::Engine>;
+
 const nx::utils::log::Tag kLogTag{typeid(nx::mediaserver::analytics::SdkObjectFactory)};
-
-template<typename T>
-void initResources(QnMediaServerModule* serverModule)
-{
-    if (!serverModule)
-    {
-        NX_ASSERT(false, "Can't access server module");
-        return;
-    }
-
-    auto resourcePool = serverModule->resourcePool();
-    if (!resourcePool)
-    {
-        NX_ASSERT(false, "Can't access resource pool");
-        return;
-    }
-
-    auto resources = resourcePool->getResources<T>();
-    for (auto& resource: resources)
-        resource->init();
-}
 
 PluginManager* getPluginManager(QnMediaServerModule* serverModule)
 {
@@ -142,9 +124,8 @@ bool SdkObjectFactory::initPluginResources()
     if (!analyticsManager)
         return false;
 
-    ec2::ErrorCode error;
     nx::vms::api::AnalyticsPluginDataList databaseAnalyticsPlugins;
-    error = analyticsManager->getAnalyticsPluginsSync(&databaseAnalyticsPlugins);
+    auto error = analyticsManager->getAnalyticsPluginsSync(&databaseAnalyticsPlugins);
     if (error != ec2::ErrorCode::ok)
         return false;
 
@@ -152,56 +133,82 @@ bool SdkObjectFactory::initPluginResources()
     for (auto& analyticsPluginData: databaseAnalyticsPlugins)
         pluginDataById.emplace(analyticsPluginData.id, std::move(analyticsPluginData));
 
-    auto analyticsPlugins = pluginManager->findNxPlugins<analytics_sdk::Plugin>(
+    auto realAnalyticsPlugins = pluginManager->findNxPlugins<analytics_sdk::Plugin>(
         nx::sdk::analytics::IID_Plugin);
 
-    for (const auto analyticsPlugin: analyticsPlugins)
+    std::map<QnUuid, PluginPtr> sdkPluginsById;
+    for (const auto realAnalyticsPlugin: realAnalyticsPlugins)
     {
-        auto analyticsPluginPtr = sdk_support::SharedPtr<analytics_sdk::Plugin>(analyticsPlugin);
-        const auto manifest = sdk_support::manifest<analytics_api::PluginManifest>(
-            analyticsPlugin);
+        auto realAnalyticsPluginPtr =
+            sdk_support::SharedPtr<analytics_sdk::Plugin>(realAnalyticsPlugin);
 
-        if (!manifest)
+        const auto pluginManifest = sdk_support::manifest<analytics_api::PluginManifest>(
+            realAnalyticsPlugin);
+
+        if (!pluginManifest)
         {
             NX_ERROR(
                 this,
                 "Can't fetch manifest from analytics plugin %1",
-                analyticsPlugin->name());
+                realAnalyticsPlugin->name());
             continue;
         }
 
-        const auto id = QnUuid::fromArbitraryData(manifest->id);
-
-        {
-            QnMutexLocker lock(&m_mutex);
-            m_plugins.emplace(id, analyticsPluginPtr);
-        }
-
-        if (!manifest)
-        {
-            NX_ERROR(this, "Got broken manifest");
-            continue;
-        }
+        const auto id = QnUuid::fromArbitraryData(pluginManifest->id);
+        sdkPluginsById.emplace(id, realAnalyticsPluginPtr);
 
         NX_DEBUG(
             this,
-            lm("Analytics creating plugin resource. Id: %1; Name: %2").args(id, manifest->name));
+            "Analytics creating plugin resource. Id: %1; Name: %2",
+            id, pluginManifest->name);
 
         auto& data = pluginDataById[id];
         data.id = id;
         data.typeId = nx::vms::api::AnalyticsPluginData::kResourceTypeId;
         data.parentId = QnUuid();
-        data.name = manifest->name;
+        data.name = pluginManifest->name;
         data.url = QString();
+    }
+
+    auto resPool = resourcePool();
+    if (!resPool)
+    {
+        NX_ERROR(this, "Can't access resource pool");
+        return false;
     }
 
     for (const auto& entry: pluginDataById)
     {
         const auto& pluginData = entry.second;
         analyticsManager->saveSync(pluginData);
-    }
+        auto pluginResource = resPool->getResourceById<resource::AnalyticsPluginResource>(
+            pluginData.id);
 
-    initResources<nx::mediaserver::resource::AnalyticsPluginResource>(serverModule());
+        if (!pluginResource)
+        {
+            NX_WARNING(this, "Unable to find plugin resource in resource pool, %1 (%2)",
+                pluginData.name, pluginData.id);
+            continue;
+        }
+
+        auto sdkPluginItr = sdkPluginsById.find(pluginData.id);
+        if (sdkPluginItr == sdkPluginsById.cend())
+        {
+            NX_WARNING(this, "Unable to find SDK plugin object %1 (%2)",
+                pluginData.name, pluginData.id);
+            continue;
+        }
+
+        pluginResource->setSdkPlugin(sdkPluginItr->second);
+        auto result = pluginResource->init();
+        if (!result)
+        {
+            NX_WARNING(this, "Error while initializing plugin resource, %1, %2 (%3)",
+                result, pluginResource->getName(), pluginResource->getId());
+
+            continue;
+        }
+    }
 
     return true;
 }
@@ -212,8 +219,8 @@ bool SdkObjectFactory::initEngineResources()
     if (!analyticsManager)
         return false;
 
-    nx::vms::api::AnalyticsEngineDataList engines;
-    const auto errorCode = analyticsManager->getAnalyticsEnginesSync(&engines);
+    nx::vms::api::AnalyticsEngineDataList databaseAnalyticsEngines;
+    const auto errorCode = analyticsManager->getAnalyticsEnginesSync(&databaseAnalyticsEngines);
 
     if (errorCode != ec2::ErrorCode::ok)
     {
@@ -223,38 +230,96 @@ bool SdkObjectFactory::initEngineResources()
         return false;
     }
 
-    std::map<QnUuid, std::vector<nx::vms::api::AnalyticsEngineData>> enginesByPlugin;
-    for (const auto& engine: engines)
-        enginesByPlugin[engine.parentId].push_back(std::move(engine));
-
-    for (const auto& entry: m_plugins)
+    std::map<QnUuid, std::vector<nx::vms::api::AnalyticsEngineData>> engineDataByPlugin;
+    for (const auto& databaseAnalyticsEngine : databaseAnalyticsEngines)
     {
-        const auto& pluginId = entry.first;
-        auto& pluginEngineList = enginesByPlugin[pluginId];
+        engineDataByPlugin[databaseAnalyticsEngine.parentId]
+            .push_back(std::move(databaseAnalyticsEngine));
+    }
+
+    auto pluginResources = resourcePool()->getResources<resource::AnalyticsPluginResource>();
+    for (const auto& plugin: pluginResources)
+    {
+        const auto& pluginId = plugin->getId();
+        auto& pluginEngineList = engineDataByPlugin[pluginId];
 
         // TODO: Create default engine only if plugin has correspondent capability.
         if (pluginEngineList.empty())
             pluginEngineList.push_back(createEngineData(pluginId, /*engineIndex*/ 0));
     }
 
-    for (const auto& entry: enginesByPlugin)
+    std::map<QnUuid, EnginePtr> sdkEnginesById;
+    for (const auto& entry: engineDataByPlugin)
     {
         const auto& pluginId = entry.first;
         const auto& engineList = entry.second;
-        for (const auto& engine: engineList)
+        for (const auto& engine : engineList)
         {
             analyticsManager->saveSync(engine);
+            auto engineResource = resourcePool()
+                ->getResourceById<resource::AnalyticsEngineResource>(engine.id);
 
+            if (!engineResource)
             {
-                QnMutexLocker lock(&m_mutex);
-                m_engines.emplace(
-                    engine.id,
-                    std::make_shared<EngineDescriptor>(EnginePtr(), pluginUnsafe(pluginId)));
+                NX_WARNING(
+                    this,
+                    "Unable to find analytics engine resource in resource pool %1 (%2)",
+                    engine.name, engine.id);
+
+                continue;
+            }
+
+            auto parentPlugin = engineResource->plugin()
+                .dynamicCast<resource::AnalyticsPluginResource>();
+
+            if (!parentPlugin)
+            {
+                NX_WARNING(
+                    this,
+                    "Unable to find parent analytics plugin for engine %1 (%2)",
+                    engineResource->getName(), engineResource->getId());
+
+                continue;
+            }
+
+            auto sdkPlugin = parentPlugin->sdkPlugin();
+            if (!sdkPlugin)
+            {
+                NX_WARNING(
+                    this,
+                    "Plugin resource %1 (%2) has no correspondent SDK object",
+                    parentPlugin->getName(), parentPlugin->getId());
+            }
+
+            nx::sdk::Error error = nx::sdk::Error::noError;
+            EnginePtr sdkEngine(sdkPlugin->createEngine(&error));
+
+            if (!sdkEngine)
+            {
+                NX_WARNING(this, "Unable to create SDK engine %1 (%2)",
+                    engineResource->getName(), engineResource->getId());
+                continue;
+            }
+
+            if (error != nx::sdk::Error::noError)
+            {
+                NX_WARNING(this, "Error '%1' occured while creating SDK engine %2 (%3)",
+                    error, engineResource->getName(), engineResource->getId());
+
+                continue;
+            }
+
+            engineResource->setSdkEngine(sdkEngine);
+            const auto result = engineResource->init();
+            if (!result)
+            {
+                NX_WARNING(this, "Error while initializing engine resource, %1, %2 (%3)",
+                    result, engineResource->getName(), engineResource->getId());
+
+                continue;
             }
         }
     }
-
-    initResources<nx::mediaserver::resource::AnalyticsEngineResource>(serverModule());
 
     return true;
 }
@@ -273,101 +338,6 @@ nx::vms::api::AnalyticsEngineData SdkObjectFactory::createEngineData(
     engineData.typeId = nx::vms::api::AnalyticsEngineData::kResourceTypeId;
 
     return engineData;
-}
-
-SdkObjectFactory::PluginPtr SdkObjectFactory::plugin(const QnUuid & id) const
-{
-    QnMutexLocker lock(&m_mutex);
-    return pluginUnsafe(id);
-}
-
-SdkObjectFactory::PluginPtr SdkObjectFactory::pluginUnsafe(const QnUuid& id) const
-{
-    auto itr = m_plugins.find(id);
-    return itr == m_plugins.cend() ? nullptr : itr->second;
-}
-
-SdkObjectFactory::EnginePtr SdkObjectFactory::engine(const QnUuid& id) const
-{
-    QnMutexLocker lock(&m_mutex);
-    auto descriptor = engineDescriptorUnsafe(id);
-    if (!descriptor)
-        return EnginePtr();
-
-    return descriptor->engine;
-}
-
-std::shared_ptr<SdkObjectFactory::EngineDescriptor> SdkObjectFactory::engineDescriptorUnsafe(
-    const QnUuid& id) const
-{
-    auto itr = m_engines.find(id);
-    if (itr == m_engines.cend())
-        return nullptr;
-
-    return itr->second;
-}
-
-SdkObjectFactory::EnginePtr SdkObjectFactory::instantiateEngine(
-    const QnUuid& engineId,
-    const QJsonObject& settings)
-{
-    std::shared_ptr<EngineDescriptor> descriptor;
-    PluginPtr sdkPlugin = nullptr;
-    EnginePtr sdkEngine = nullptr;
-
-    {
-        QnMutexLocker lock(&m_mutex);
-        descriptor = engineDescriptorUnsafe(engineId);
-        if (!descriptor)
-        {
-            NX_ERROR(this, lm("An engine with the engine Id %1 is not registered").args(engineId));
-            return EnginePtr();
-        }
-
-        if (!descriptor->plugin)
-        {
-            NX_ERROR(this, lm("Can't determine a plugin the engine %1 belongs to").args(engineId));
-            return EnginePtr();
-        }
-
-        if (descriptor->engine)
-        {
-            NX_WARNING(this, lm("An engine with Id %1 already exists").args(engineId));
-            return descriptor->engine;
-        }
-
-        sdkEngine = descriptor->engine;
-        sdkPlugin = descriptor->plugin;
-    }
-
-    if (!sdkEngine)
-    {
-        NX_DEBUG(this, lm("Instanciating engine with Id %1").args(engineId));
-        nx::sdk::Error error = nx::sdk::Error::noError;
-        sdkEngine = EnginePtr(sdkPlugin->createEngine(&error));
-
-        if (error != nx::sdk::Error::noError || !sdkEngine)
-        {
-            NX_ERROR(this, lm("An error occured while creating the engine %1: %2")
-                .args(engineId, error));
-
-            return EnginePtr();
-        }
-    }
-
-    interactive_settings::JsonEngine jsonEngine;
-    jsonEngine.load(settings);
-    const auto values = jsonEngine.values();
-
-    auto sdkSettings = sdk_support::toSdkSettings(values);
-    sdkEngine->setSettings(sdkSettings.get());
-
-    {
-        QnMutexLocker lock(&m_mutex);
-        descriptor->engine = sdkEngine;
-    }
-
-    return sdkEngine;
 }
 
 } // namespace nx::mediaserver::analytics

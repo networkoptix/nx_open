@@ -4221,7 +4221,7 @@ void MediaServerProcess::run()
 
     m_serverMessageProcessor->startReceivingLocalNotifications(m_ec2Connection);
 
-    serverModule->sdkObjectPool()->init();
+    serverModule->sdkObjectFactory()->init();
     serverModule->analyticsManager()->init();
 
     at_runtimeInfoChanged(commonModule()->runtimeInfoManager()->localInfo());

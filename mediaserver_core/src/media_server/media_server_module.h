@@ -137,7 +137,7 @@ public:
     PluginManager* pluginManager() const;
     nx::mediaserver::analytics::Manager* analyticsManager() const;
     nx::mediaserver::analytics::EventRuleWatcher* analyticsEventRuleWatcher() const;
-    nx::mediaserver::analytics::SdkObjectFactory* sdkObjectPool() const;
+    nx::mediaserver::analytics::SdkObjectFactory* sdkObjectFactory() const;
 
     nx::mediaserver::resource::SharedContextPool* sharedContextPool() const;
     AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher() const;
@@ -236,6 +236,6 @@ private:
     std::unique_ptr<QnMdnsListener> m_mdnsListener;
     std::unique_ptr<nx::network::upnp::DeviceSearcher> m_upnpDeviceSearcher;
     std::unique_ptr<QnMediaServerResourceSearchers> m_resourceSearchers;
-    nx::mediaserver::analytics::SdkObjectFactory* m_sdkObjectPool;
+    nx::mediaserver::analytics::SdkObjectFactory* m_sdkObjectFactory;
     nx::mediaserver::hls::SessionPool* m_hlsSessionPool = nullptr;
 };
