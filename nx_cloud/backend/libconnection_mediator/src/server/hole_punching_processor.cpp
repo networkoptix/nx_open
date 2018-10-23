@@ -68,7 +68,6 @@ void HolePunchingProcessor::stop()
 void HolePunchingProcessor::connect(
     const ConnectionStrongRef& connection,
     api::ConnectRequest request,
-    network::stun::Message /*requestMessage*/,
     std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler)
 {
     api::ResultCode validationResult = api::ResultCode::ok;
@@ -117,7 +116,6 @@ void HolePunchingProcessor::connect(
 void HolePunchingProcessor::onConnectionAckRequest(
     const ConnectionStrongRef& connection,
     api::ConnectionAckRequest request,
-    network::stun::Message /*requestMessage*/,
     std::function<void(api::ResultCode)> completionHandler)
 {
     QnMutexLocker lk(&m_mutex);
@@ -142,7 +140,6 @@ void HolePunchingProcessor::onConnectionAckRequest(
 void HolePunchingProcessor::connectionResult(
     const ConnectionStrongRef& connection,
     api::ConnectionResultRequest request,
-    network::stun::Message /*requestMessage*/,
     std::function<void(api::ResultCode)> completionHandler)
 {
     QnMutexLocker lk(&m_mutex);

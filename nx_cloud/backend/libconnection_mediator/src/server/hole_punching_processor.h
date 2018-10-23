@@ -41,19 +41,16 @@ public:
     void connect(
         const ConnectionStrongRef& connection,
         api::ConnectRequest request,
-        network::stun::Message requestMessage,
         std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler);
 
     void onConnectionAckRequest(
         const ConnectionStrongRef& connection,
         api::ConnectionAckRequest request,
-        network::stun::Message requestMessage,
         std::function<void(api::ResultCode)> completionHandler);
 
     void connectionResult(
         const ConnectionStrongRef& connection,
         api::ConnectionResultRequest request,
-        network::stun::Message requestMessage,
         std::function<void(api::ResultCode)> completionHandler);
 
 private:

@@ -47,34 +47,31 @@ public:
 
     void listen(
         const ConnectionStrongRef& connection,
-        api::ListenRequest requestData,
         network::stun::Message requestMessage,
+        api::ListenRequest requestData,
         std::function<void(api::ResultCode, api::ListenResponse)> completionHandler);
 
     void checkOwnState(
         const ConnectionStrongRef& connection,
-        api::GetConnectionStateRequest requestData,
         network::stun::Message requestMessage,
+        api::GetConnectionStateRequest requestData,
         std::function<void(api::ResultCode, api::GetConnectionStateResponse)> completionHandler);
 
     void resolveDomain(
         const ConnectionStrongRef& connection,
         api::ResolveDomainRequest requestData,
-        network::stun::Message requestMessage,
         std::function<void(
             api::ResultCode, api::ResolveDomainResponse)> completionHandler);
 
     void resolvePeer(
         const ConnectionStrongRef& connection,
         api::ResolvePeerRequest requestData,
-        network::stun::Message requestMessage,
         std::function<void(
             api::ResultCode, api::ResolvePeerResponse)> completionHandler);
 
     void clientBind(
         const ConnectionStrongRef& connection,
         api::ClientBindRequest requestData,
-        network::stun::Message requestMessage,
         std::function<void(api::ResultCode, api::ClientBindResponse)> completionHandler);
 
     int boundClientCount() const;

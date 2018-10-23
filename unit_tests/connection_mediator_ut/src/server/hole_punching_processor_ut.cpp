@@ -455,7 +455,6 @@ protected:
         m_holePunchingProcessor.connect(
             m_originatingPeerConnection,
             m_connectRequest,
-            nx::network::stun::Message(),
             std::bind(&HolePunchingProcessor::sendConnectResponse, this, _1, _2));
     }
 
@@ -469,7 +468,6 @@ protected:
         m_holePunchingProcessor.connect(
             m_originatingPeerConnection,
             m_connectRequest,
-            nx::network::stun::Message(),
             std::bind(&HolePunchingProcessor::sendConnectResponse, this, _1, _2));
     }
 
