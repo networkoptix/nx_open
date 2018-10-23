@@ -50,7 +50,11 @@ Check Special Hint
     Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${type}']
     Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${type}']/..
     ${type}    Convert To Uppercase    ${type}
-    Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${type}
+    Run Keyword If    "${type}"=="${ADMIN TEXT}"          Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT ADMINISTRATOR}
+    ...    ELSE IF    "${type}"=="${ADV VIEWER TEXT}"     Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT ADVANCED VIEWER}
+    ...    ELSE IF    "${type}"=="${VIEWER TEXT}"         Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT VIEWER}
+    ...    ELSE IF    "${type}"=="${LIVE VIEWER TEXT}"    Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT LIVE VIEWER}
+    ...    ELSE IF    "${type}"=="${CUSTOM TEXT}"         Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT CUSTOM}
 
 Restart
     Register Keyword To Run On Failure    NONE
