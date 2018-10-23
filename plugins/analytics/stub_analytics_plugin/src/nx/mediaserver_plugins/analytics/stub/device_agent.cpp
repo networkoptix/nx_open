@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <chrono>
+#include <ctime>
 #include <math.h>
 
 #include <plugins/plugin_tools.h>
@@ -23,8 +24,11 @@ using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
 DeviceAgent::DeviceAgent(Engine* engine):
-    CommonVideoFrameProcessingDeviceAgent(engine, NX_DEBUG_ENABLE_OUTPUT)
+    CommonVideoFrameProcessingDeviceAgent(engine, NX_DEBUG_ENABLE_OUTPUT),
+    m_objectId{{0xB5,0x29,0x4F,0x25,0x4F,0xE6,0x46,0x47,0xB8,0xD1,0xA0,0x72,0x9F,0x70,0xF2,0xD1}}
 {
+    // TODO: #vkutin #mshevchenko Replace with true UUID generation when possible.
+    *reinterpret_cast<void**>(m_objectId.bytes + sizeof(m_objectId) - sizeof(void*)) = this;
 }
 
 /**
@@ -224,17 +228,20 @@ MetadataPacket* DeviceAgent::cookSomeObjects()
     commonObject->setAuxilaryData(R"json({ "auxilaryData": "someJson2" })json");
     commonObject->setTypeId(kCarObjectType);
 
-    // To be binary modified to be unique for each object.
-    nxpl::NX_GUID objectId =
-        {{0xB5,0x29,0x4F,0x25,0x4F,0xE6,0x46,0x47,0xB8,0xD1,0xA0,0x72,0x9F,0x70,0xF2,0xD1}};
-
     double dt = m_objectCounter / 32.0;
     ++m_objectCounter;
     double intPart;
     dt = modf(dt, &intPart) * 0.75;
-    *reinterpret_cast<int*>(objectId.bytes) = static_cast<int>(intPart);
-    commonObject->setId(objectId);
+    const int sequentialNumber = static_cast<int>(intPart);
 
+    if (m_currentObjectIndex != sequentialNumber)
+    {
+        // TODO: #vkutin #mshevchenko Replace with true UUID generation when possible.
+        std::time(reinterpret_cast<time_t*>(m_objectId.bytes)); //< Make ID pseudo-unique.
+        m_currentObjectIndex = sequentialNumber;
+    }
+
+    commonObject->setId(m_objectId);
     commonObject->setBoundingBox(Rect((float) dt, (float) dt, 0.25F, 0.25F));
 
     if (dt < 0.5)

@@ -3,12 +3,14 @@
 
 #include <core/resource/camera_resource.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+#include <nx/utils/log/log.h>
 
-AbstractAsyncSearchListModel::AbstractAsyncSearchListModel(CreatePrivate dCreator, QObject* parent):
-    base_type(parent),
+namespace nx::client::desktop {
+
+AbstractAsyncSearchListModel::AbstractAsyncSearchListModel(
+    QnWorkbenchContext* context, CreatePrivate dCreator, QObject* parent)
+    :
+    base_type(context, parent),
     d(dCreator())
 {
 }
@@ -17,29 +19,43 @@ AbstractAsyncSearchListModel::~AbstractAsyncSearchListModel()
 {
 }
 
-AbstractAsyncSearchListModel::Private* AbstractAsyncSearchListModel::d_func()
+bool AbstractAsyncSearchListModel::cancelFetch()
 {
-    return d.data();
+    if (!fetchInProgress())
+        return false;
+
+    d->cancelPrefetch();
+    return true;
 }
 
-QnVirtualCameraResourcePtr AbstractAsyncSearchListModel::camera() const
+void AbstractAsyncSearchListModel::clearData()
 {
-    return d->camera();
+    d->clearData();
 }
 
-void AbstractAsyncSearchListModel::setCamera(const QnVirtualCameraResourcePtr& camera)
+bool AbstractAsyncSearchListModel::canFetch() const
 {
-    d->setCamera(camera);
+    return d->canFetch();
 }
 
-void AbstractAsyncSearchListModel::relevantTimePeriodChanged(const QnTimePeriod& previousValue)
+void AbstractAsyncSearchListModel::requestFetch()
 {
-    d->relevantTimePeriodChanged(previousValue);
+    d->requestFetch();
 }
 
-void AbstractAsyncSearchListModel::clear()
+bool AbstractAsyncSearchListModel::fetchInProgress() const
 {
-    d->clear();
+    return d->fetchInProgress();
+}
+
+void AbstractAsyncSearchListModel::truncateToMaximumCount()
+{
+    d->truncateToMaximumCount();
+}
+
+void AbstractAsyncSearchListModel::truncateToRelevantTimePeriod()
+{
+    d->truncateToRelevantTimePeriod();
 }
 
 int AbstractAsyncSearchListModel::rowCount(const QModelIndex& parent) const
@@ -56,7 +72,7 @@ QVariant AbstractAsyncSearchListModel::data(const QModelIndex& index, int role) 
     {
         using namespace std::chrono;
         return data(index, Qn::TimestampRole).value<qint64>()
-            >= microseconds(milliseconds(d->fetchedTimePeriod().startTimeMs)).count();
+            >= microseconds(milliseconds(fetchedTimeWindow().startTimeMs)).count();
     }
 
     bool handled = false;
@@ -65,45 +81,4 @@ QVariant AbstractAsyncSearchListModel::data(const QModelIndex& index, int role) 
     return handled ? result : base_type::data(index, role);
 }
 
-bool AbstractAsyncSearchListModel::canFetchMore(const QModelIndex& /*parent*/) const
-{
-    return d->canFetchMore();
-}
-
-void AbstractAsyncSearchListModel::fetchMore(const QModelIndex& /*parent*/)
-{
-    prefetchAsync(
-        [this, guard = QPointer<AbstractAsyncSearchListModel>(this)](qint64 earliestTimeMs)
-        {
-            if (!guard)
-                return;
-
-            const bool cancelled = earliestTimeMs < 0;
-
-            beginFinishFetch();
-            auto finishFetch = nx::utils::makeScopeGuard(
-                [this, cancelled]() { endFinishFetch(cancelled); });
-
-            if (!cancelled)
-                commitPrefetch(earliestTimeMs);
-        });
-}
-
-bool AbstractAsyncSearchListModel::prefetchAsync(PrefetchCompletionHandler completionHandler)
-{
-    return d->prefetch(completionHandler);
-}
-
-void AbstractAsyncSearchListModel::commitPrefetch(qint64 earliestTimeToCommitMs)
-{
-    d->commit(earliestTimeToCommitMs);
-}
-
-bool AbstractAsyncSearchListModel::fetchInProgress() const
-{
-    return d->fetchInProgress();
-}
-
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>UnifiedSearchWidget</class>
- <widget class="QWidget" name="UnifiedSearchWidget">
+ <class>AbstractSearchWidget</class>
+ <widget class="QWidget" name="AbstractSearchWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -52,7 +52,7 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
+        <layout class="QVBoxLayout" name="filtersLayout">
          <property name="spacing">
           <number>2</number>
          </property>
@@ -69,7 +69,13 @@
           <number>8</number>
          </property>
          <item alignment="Qt::AlignLeft">
-          <widget class="nx::client::desktop::SelectableTextButton" name="timeButton">
+          <widget class="nx::client::desktop::SelectableTextButton" name="timeSelectionButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
             <string notr="true">&lt;time filter&gt;</string>
            </property>
@@ -79,7 +85,13 @@
           </widget>
          </item>
          <item alignment="Qt::AlignLeft">
-          <widget class="nx::client::desktop::SelectableTextButton" name="cameraButton">
+          <widget class="nx::client::desktop::SelectableTextButton" name="cameraSelectionButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
             <string notr="true">&lt;camera filter&gt;</string>
            </property>
@@ -88,31 +100,51 @@
            </property>
           </widget>
          </item>
-         <item alignment="Qt::AlignLeft">
-          <widget class="nx::client::desktop::SelectableTextButton" name="areaButton">
-           <property name="text">
-            <string notr="true">&lt;area filter&gt;</string>
+         <item>
+          <widget class="QWidget" name="areaSelectionHolder" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
-           <property name="flat">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item alignment="Qt::AlignLeft">
-          <widget class="nx::client::desktop::SelectableTextButton" name="typeButton">
-           <property name="text">
-            <string notr="true">&lt;type filter&gt;</string>
-           </property>
-           <property name="flat">
-            <bool>true</bool>
-           </property>
+           <layout class="QVBoxLayout" name="verticalLayout">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="nx::client::desktop::SelectableTextButton" name="areaSelectionButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string notr="true">&lt;area filter&gt;</string>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </item>
         </layout>
        </widget>
       </item>
       <item>
-       <widget class="Line" name="filterLine">
+       <widget class="Line" name="separatorLine">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -138,7 +170,7 @@
    </item>
    <item>
     <widget class="QWidget" name="ribbonContainer" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout">
+     <layout class="QVBoxLayout" name="ribbonAreaLayout">
       <property name="spacing">
        <number>0</number>
       </property>
@@ -168,7 +200,7 @@
           <height>32</height>
          </size>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout">
+        <layout class="QHBoxLayout" name="counterLineLayout">
          <property name="spacing">
           <number>8</number>
          </property>
@@ -185,7 +217,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="counterLabel">
+          <widget class="QLabel" name="itemCounterLabel">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -204,23 +236,50 @@
           </widget>
          </item>
          <item>
-          <widget class="nx::client::desktop::ToolButton" name="showInfoButton">
-           <property name="text">
-            <string notr="true"/>
+          <widget class="QWidget" name="toolbar" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
-           <property name="checkable">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="nx::client::desktop::ToolButton" name="showPreviewsButton">
-           <property name="text">
-            <string notr="true"/>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
-           </property>
+           <layout class="QHBoxLayout" name="toolbarLayout">
+            <property name="spacing">
+             <number>8</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="nx::client::desktop::ToolButton" name="toggleFootersButton">
+              <property name="text">
+               <string notr="true"/>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="nx::client::desktop::ToolButton" name="togglePreviewsButton">
+              <property name="text">
+               <string notr="true"/>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </item>
         </layout>
@@ -249,7 +308,7 @@
            <height>100</height>
           </size>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_4">
+         <layout class="QVBoxLayout" name="placeholderLayout">
           <property name="spacing">
            <number>16</number>
           </property>

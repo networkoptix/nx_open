@@ -50,7 +50,7 @@ void QnEventLogFilterData::loadFromParams(QnResourcePool* resourcePool,
         params.value(kEventTypeParam),
         eventType);
 
-    eventSubtype = QnLexical::deserialized<QnUuid>(params.value(kEventSubtypeParam));
+    eventSubtype = params.value(kEventSubtypeParam);
 
     actionType = QnLexical::deserialized<nx::vms::api::ActionType>(
         params.value(kActionTypeParam),
@@ -74,8 +74,8 @@ QnRequestParamList QnEventLogFilterData::toParams() const
     if (eventType != nx::vms::api::EventType::undefinedEvent)
         result.insert(kEventTypeParam, QnLexical::serialized(eventType));
 
-    if (!eventSubtype.isNull())
-        result.insert(kEventSubtypeParam, QnLexical::serialized(eventSubtype));
+    if (!eventSubtype.isEmpty())
+        result.insert(kEventSubtypeParam, eventSubtype);
 
     if (actionType != nx::vms::api::ActionType::undefinedAction)
         result.insert(kActionTypeParam, QnLexical::serialized(actionType));

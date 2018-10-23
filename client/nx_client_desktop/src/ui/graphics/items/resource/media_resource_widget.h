@@ -164,14 +164,15 @@ public:
     bool isAnalyticsEnabled() const;
     void setAnalyticsEnabled(bool analyticsEnabled);
 
-    void setAnalyticsSearchModeEnabled(bool enabled);
-    QRectF analyticsSearchRect() const;
-    void setAnalyticsSearchRect(const QRectF& value);
+    void setAnalyticsSelectionEnabled(bool enabled);
+    QRectF analyticsSelection() const;
+    void setAnalyticsSelection(const QRectF& value);
 
     nx::client::core::AbstractAnalyticsMetadataProviderPtr analyticsMetadataProvider() const;
 
 signals:
     void motionSelectionChanged();
+    void analyticsSelectionChanged();
     void displayChanged();
     void fisheyeChanged();
     void dewarpingParamsChanged();
@@ -181,7 +182,6 @@ signals:
     void zoomWindowCreationModeEnabled(bool enabled);
     void zoomWindowRectangleVisibleChanged();
     void licenseStatusChanged();
-    void analyticsSearchAreaSelected(const QRectF& relativeRect);
     void ptzControllerChanged();
 
 protected:

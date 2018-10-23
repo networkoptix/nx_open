@@ -1,52 +1,74 @@
 #include "busy_indicator_model_p.h"
 
-namespace nx {
-namespace client {
-namespace desktop {
+#include <nx/utils/log/log.h>
+
+namespace nx::client::desktop {
+
+namespace {
+
+QString debugId(BusyIndicatorModel* model)
+{
+    const auto name = model->objectName();
+    if (name.isEmpty())
+        return {};
+
+    return QString("[%1]").arg(name);
+}
+
+} // namespace
 
 bool BusyIndicatorModel::active() const
 {
     return m_active;
 }
 
-bool BusyIndicatorModel::setActive(bool value)
+void BusyIndicatorModel::setActive(bool value)
 {
     if (m_active == value)
-        return false;
+        return;
+
+    NX_VERBOSE(this) << "Setting active to" << value << debugId(this);
 
     m_active = value;
+    if (!m_visible)
+        return;
 
-    static const QVector<int> kBusyIndicatorVisibleRole = {Qn::BusyIndicatorVisibleRole};
+    static const QVector<int> kBusyIndicatorVisibleRole({Qn::BusyIndicatorVisibleRole});
     emit dataChanged(index(0), index(0), kBusyIndicatorVisibleRole);
+}
 
-    return true;
+bool BusyIndicatorModel::visible() const
+{
+    return m_visible;
+}
+
+void BusyIndicatorModel::setVisible(bool value)
+{
+    if (m_visible == value)
+        return;
+
+    NX_VERBOSE(this) << "Setting visible to" << value <<  debugId(this);
+
+    ScopedReset reset(this);
+    m_visible = value;
 }
 
 int BusyIndicatorModel::rowCount(const QModelIndex& parent) const
 {
-    return parent.isValid() ? 0 : 1;
+    return (m_visible && !parent.isValid()) ? 1 : 0;
 }
 
 QVariant BusyIndicatorModel::data(const QModelIndex& index, int role) const
 {
-    return isValid(index) && role == Qn::BusyIndicatorVisibleRole
+    return role == Qn::BusyIndicatorVisibleRole && isValid(index)
         ? QVariant::fromValue(m_active)
         : QVariant();
 }
 
-bool BusyIndicatorModel::setData(const QModelIndex& index, const QVariant& value, int role)
-{
-    return isValid(index) && role == Qn::BusyIndicatorVisibleRole && value.canConvert<bool>()
-        ? setActive(value.toBool())
-        : false;
-}
-
 bool BusyIndicatorModel::isValid(const QModelIndex& index) const
 {
-    return index.model() == this && !index.parent().isValid()
-        && index.column() == 0 && index.row() == 0;
+    return m_visible && index.column() == 0 && index.row() == 0
+        && index.model() == this && !index.parent().isValid();
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop
