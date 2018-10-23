@@ -45,19 +45,19 @@ struct TestParams
     int expectedHttpCode;
 };
 
-// TODO: Rename class, try to merge with another one.
-class HttpClientAsyncAuthorization2:
+class HttpClientAsyncAuthorization:
     public ::testing::TestWithParam<TestParams>
 {
 public:
-    HttpClientAsyncAuthorization2();
-    virtual ~HttpClientAsyncAuthorization2() override;
+    HttpClientAsyncAuthorization();
+    virtual ~HttpClientAsyncAuthorization() override;
 
     void givenHttpServerWithAuthorization(
         std::vector<AuthHttpServer::AuthHeader> authData);
-    void whenClientSendHttpRequestAndIsRequiredToUse(AuthType auth);
+    void whenClientSendHttpRequestAndIsRequiredToUse(AuthType auth, const char* username = nullptr);
     void thenClientAuthenticatedBy(const char* exptectedHeaderResponse);
     void thenClientGotResponseWithCode(int expectedHttpCode);
+    void thenLastRequestAuthorizedOnServerAsUser(const std::string& username);
 
 private:
     std::unique_ptr<http::AsyncClient> m_httpClient;

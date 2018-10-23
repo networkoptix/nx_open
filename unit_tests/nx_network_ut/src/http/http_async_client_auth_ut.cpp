@@ -19,6 +19,7 @@ const char* kTestPath = "/HttpAsyncClient_auth";
 const char* kDefaultUsername = "zorz_user";
 const char* kDefaultPassword = "zorz_pass";
 
+// TODO: rename
 const char* defaultBasicHeader = "WWW-Authenticate: Basic realm=\"ZORZ\"\r\n";
 const char* defaultDigestHeader =
     "WWW-Authenticate: Digest algorithm=\"MD5\", nonce=\"cUySLvm\", realm=\"VMS\"\r\n";
@@ -120,17 +121,17 @@ void AuthHttpServer::sendResponse(AbstractStreamSocket* connection)
 
 
 //-------------------------------------------------------------------------------------------------
-HttpClientAsyncAuthorization2::HttpClientAsyncAuthorization2():
+HttpClientAsyncAuthorization::HttpClientAsyncAuthorization():
     m_httpClient(std::make_unique<http::AsyncClient>())
 {
 }
 
-HttpClientAsyncAuthorization2::~HttpClientAsyncAuthorization2()
+HttpClientAsyncAuthorization::~HttpClientAsyncAuthorization()
 {
     m_httpClient->pleaseStopSync();
 }
 
-void HttpClientAsyncAuthorization2::givenHttpServerWithAuthorization(std::vector<AuthHttpServer::AuthHeader> authData)
+void HttpClientAsyncAuthorization::givenHttpServerWithAuthorization(std::vector<AuthHttpServer::AuthHeader> authData)
 {
     m_httpServer = std::make_unique<AuthHttpServer>();
     ASSERT_TRUE(m_httpServer->bindAndListen(SocketAddress::anyPrivateAddress));
@@ -141,15 +142,18 @@ void HttpClientAsyncAuthorization2::givenHttpServerWithAuthorization(std::vector
 }
 
 
-void HttpClientAsyncAuthorization2::whenClientSendHttpRequestAndIsRequiredToUse(AuthType auth)
+void HttpClientAsyncAuthorization::whenClientSendHttpRequestAndIsRequiredToUse(AuthType auth,
+    const char *username)
 {
     m_httpClient->setAuthType(auth);
+    if (username == nullptr)
+        username = kDefaultUsername;
 
     const auto url = url::Builder()
         .setScheme(http::kUrlSchemeName)
         .setEndpoint(m_httpServer->endpoint())
         .setPath(kTestPath)
-        .setUserName(kDefaultUsername)
+        .setUserName(username)
         .setPassword(kDefaultPassword)
         .toUrl();
 
@@ -162,7 +166,7 @@ void HttpClientAsyncAuthorization2::whenClientSendHttpRequestAndIsRequiredToUse(
     done.get_future().wait();
 }
 
-void HttpClientAsyncAuthorization2::thenClientAuthenticatedBy(const char* exptectedHeaderResponse)
+void HttpClientAsyncAuthorization::thenClientAuthenticatedBy(const char* exptectedHeaderResponse)
 {
     const auto requests = m_httpServer->receivedRequests();
 
@@ -176,9 +180,18 @@ void HttpClientAsyncAuthorization2::thenClientAuthenticatedBy(const char* exptec
     ASSERT_THAT(requests[1].toStdString(), testing::HasSubstr(exptectedHeaderResponse));
 }
 
-void HttpClientAsyncAuthorization2::thenClientGotResponseWithCode(int expectedHttpCode)
+void HttpClientAsyncAuthorization::thenClientGotResponseWithCode(int expectedHttpCode)
 {
     ASSERT_EQ(m_httpClient->response()->statusLine.statusCode, expectedHttpCode);
+}
+
+void HttpClientAsyncAuthorization::thenLastRequestAuthorizedOnServerAsUser(
+    const std::string &username)
+{
+    std::ostringstream usernameSubstring;
+    usernameSubstring << "username=\"" << username << "\"";
+    ASSERT_THAT(m_httpServer->receivedRequests().back().toStdString(),
+        testing::HasSubstr(usernameSubstring.str()));
 }
 
 const AuthHttpServer::AuthHeader basic = {AuthType::authBasic, defaultBasicHeader};
@@ -186,7 +199,7 @@ const AuthHttpServer::AuthHeader digest = {AuthType::authDigest, defaultDigestHe
 const auto basicResponse = responseForDefaultBasicHeader;
 const auto digestResponse = responseForDefaultDigestHeader;
 
-INSTANTIATE_TEST_CASE_P(HttpClientAsyncAuthorizationInstance, HttpClientAsyncAuthorization2,
+INSTANTIATE_TEST_CASE_P(HttpClientAsyncAuthorizationInstance, HttpClientAsyncAuthorization,
     ::testing::Values(
         TestParams{{basic}, AuthType::authBasicAndDigest, /* expected */ basicResponse, 200},
         TestParams{{digest}, AuthType::authBasicAndDigest, /* expected */ digestResponse, 200},
@@ -204,7 +217,7 @@ INSTANTIATE_TEST_CASE_P(HttpClientAsyncAuthorizationInstance, HttpClientAsyncAut
         TestParams{{basic}, AuthType::authDigest, /* expected */ nullptr, 401}
     ));
 
-TEST_P(HttpClientAsyncAuthorization2, AuthSelection)
+TEST_P(HttpClientAsyncAuthorization, AuthSelection)
 {
     TestParams params = GetParam();
     givenHttpServerWithAuthorization(std::move(params.serverAuthHeaders));
@@ -213,12 +226,25 @@ TEST_P(HttpClientAsyncAuthorization2, AuthSelection)
     thenClientAuthenticatedBy(params.expectedAuthResponse);
 }
 
-TEST_F(HttpClientAsyncAuthorization2, lowercaseAlgorithm)
+TEST_F(HttpClientAsyncAuthorization, lowercaseAlgorithm)
 {
     givenHttpServerWithAuthorization({{AuthType::authDigest, lowercaseMd5DigestHeader}});
     whenClientSendHttpRequestAndIsRequiredToUse(AuthType::authDigest);
     thenClientGotResponseWithCode(200);
     thenClientAuthenticatedBy(responseForLowercaseMd5DigestHeader);
+}
+
+TEST_F(HttpClientAsyncAuthorization, cached_authorization_of_a_different_user_is_not_used)
+{
+    givenHttpServerWithAuthorization({{AuthType::authDigest, defaultDigestHeader}});
+
+    whenClientSendHttpRequestAndIsRequiredToUse(AuthType::authDigest, "Vasya");
+    thenClientGotResponseWithCode(200);
+    thenLastRequestAuthorizedOnServerAsUser("Vasya");
+
+    whenClientSendHttpRequestAndIsRequiredToUse(AuthType::authDigest, "Petya");
+    thenClientGotResponseWithCode(200);
+    thenLastRequestAuthorizedOnServerAsUser("Petya");
 }
 
 } // namespace test
