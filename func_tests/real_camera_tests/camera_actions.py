@@ -24,7 +24,7 @@ def fps_avg(fps):
 def _expect_poll_output(title, expected_values, process, parse_output):
     timer = Timer()
     while process.poll() is None:
-        if timer.duration > timedelta(seconds=30):
+        if timer.from_start > timedelta(seconds=30):
             yield Halt('{!r} -- has timed out'.format(title))
             return
         yield Halt('{!r} -- is in progress'.format(title))
