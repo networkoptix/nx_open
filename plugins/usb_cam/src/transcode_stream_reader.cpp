@@ -472,13 +472,5 @@ void TranscodeStreamReader::removeVideoConsumer()
     m_videoConsumerAdded = false;
 }
 
-void TranscodeStreamReader::handleIoError()
-{
-    if (m_camera->videoStream()->ioError())
-        removeVideoConsumer();
-    if (m_camera->audioStream()->ioError())
-        removeAudioConsumer();
-}
-
 } // namespace usb_cam
 } // namespace nx
