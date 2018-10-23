@@ -52,12 +52,12 @@ public:
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
     void onConnectRequest(
-        const ConnectionStrongRef& connection,
+        const RequestSourceDescriptor& requestSourceDescriptor,
         api::ConnectRequest request,
         ConnectCompletionHandler completionHandler);
 
     void onConnectionAckRequest(
-        const ConnectionStrongRef& connection,
+        const RequestSourceDescriptor& requestSourceDescriptor,
         api::ConnectionAckRequest request,
         std::function<void(api::ResultCode)> completionHandler);
 
@@ -104,17 +104,17 @@ private:
     virtual void stopWhileInAioThread() override;
 
     void processConnectRequest(
-        const ConnectionStrongRef& originatingPeerConnection,
+        const RequestSourceDescriptor& requestSourceDescriptor,
         api::ConnectRequest request,
         ConnectCompletionHandler connectResponseSender);
 
     void processUdpConnectRequest(
-        const ConnectionStrongRef& originatingPeerConnection,
+        const RequestSourceDescriptor& requestSourceDescriptor,
         api::ConnectRequest request,
         ConnectCompletionHandler connectResponseSender);
 
     void processTcpConnectRequest(
-        const ConnectionStrongRef& originatingPeerConnection,
+        const RequestSourceDescriptor& requestSourceDescriptor,
         api::ConnectRequest request,
         ConnectCompletionHandler connectResponseSender);
 
@@ -124,21 +124,21 @@ private:
         ConnectCompletionHandler connectResponseSender);
 
     void updateSessionStatistics(
-        const ConnectionStrongRef& originatingPeerConnection,
+        const RequestSourceDescriptor& requestSourceDescriptor,
         const api::ConnectRequest& connectRequest);
 
     bool notifyListeningPeerAboutConnectRequest(
-        const ConnectionStrongRef& originatingPeerConnection,
+        const RequestSourceDescriptor& requestSourceDescriptor,
         const api::ConnectRequest& connectRequest);
 
     nx::network::stun::Message prepareConnectionRequestedIndication(
-        const ConnectionStrongRef& originatingPeerConnection,
+        const RequestSourceDescriptor& requestSourceDescriptor,
         const api::ConnectRequest& connectRequest);
 
     void noConnectionAckOnTime();
 
     void processConnectionAckRequest(
-        const ConnectionStrongRef& connection,
+        const RequestSourceDescriptor& requestSourceDescriptor,
         api::ConnectionAckRequest request,
         std::function<void(api::ResultCode)> completionHandler);
 

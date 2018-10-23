@@ -39,17 +39,17 @@ public:
     void stop();
 
     void connect(
-        const ConnectionStrongRef& connection,
+        const RequestSourceDescriptor& requestSourceDescriptor,
         api::ConnectRequest request,
         std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler);
 
     void onConnectionAckRequest(
-        const ConnectionStrongRef& connection,
+        const RequestSourceDescriptor& requestSourceDescriptor,
         api::ConnectionAckRequest request,
         std::function<void(api::ResultCode)> completionHandler);
 
     void connectionResult(
-        const ConnectionStrongRef& connection,
+        const RequestSourceDescriptor& requestSourceDescriptor,
         api::ConnectionResultRequest request,
         std::function<void(api::ResultCode)> completionHandler);
 
@@ -69,7 +69,7 @@ private:
 
     std::tuple<api::ResultCode, boost::optional<ListeningPeerPool::ConstDataLocker>>
         validateConnectRequest(
-            const ConnectionStrongRef& connection,
+            const RequestSourceDescriptor& requestSourceDescriptor,
             const api::ConnectRequest& request);
 
     void connectSessionFinished(

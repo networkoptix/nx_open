@@ -453,7 +453,9 @@ protected:
         m_connectRequest.cloudConnectVersion = m_clientCloudConnectVersion;
 
         m_holePunchingProcessor.connect(
-            m_originatingPeerConnection,
+            RequestSourceDescriptor{
+                m_originatingPeerConnection->transportProtocol(),
+                m_originatingPeerConnection->getSourceAddress()},
             m_connectRequest,
             std::bind(&HolePunchingProcessor::sendConnectResponse, this, _1, _2));
     }
@@ -466,7 +468,9 @@ protected:
         m_prevConnectResponse = m_responses.pop();
 
         m_holePunchingProcessor.connect(
-            m_originatingPeerConnection,
+            RequestSourceDescriptor{
+                m_originatingPeerConnection->transportProtocol(),
+                m_originatingPeerConnection->getSourceAddress()},
             m_connectRequest,
             std::bind(&HolePunchingProcessor::sendConnectResponse, this, _1, _2));
     }

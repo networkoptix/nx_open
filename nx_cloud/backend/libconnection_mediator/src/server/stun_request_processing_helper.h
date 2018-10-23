@@ -68,6 +68,14 @@ void serialize(
 {
 }
 
+struct RequestSourceDescriptor
+{
+    network::TransportProtocol transportProtocol;
+    nx::network::SocketAddress sourceAddress;
+
+    RequestSourceDescriptor() = delete;
+};
+
 namespace detail {
 
 template<
@@ -217,6 +225,37 @@ auto createRequestProcessor(
                     auto... args)
                 {
                     (processor->*func)(connection, std::move(args)...);
+                },
+                connection,
+                std::move(message));
+        };
+}
+
+
+template<typename Processor, typename InputData, typename... OutputData>
+auto createRequestProcessor(
+    void (Processor::*func)(
+        const RequestSourceDescriptor&,
+        InputData,
+        std::function<void(api::ResultCode, OutputData...)>),
+    Processor* processor)
+{
+    return
+        [processor, func](
+            const ConnectionStrongRef& connection,
+            network::stun::Message message)
+        {
+            processRequest<InputData, OutputData...>(
+                [processor, func](
+                    const ConnectionStrongRef& connection,
+                    network::stun::Message,
+                    auto... args)
+                {
+                    (processor->*func)(
+                        RequestSourceDescriptor{
+                            connection->transportProtocol(),
+                            connection->getSourceAddress()},
+                        std::move(args)...);
                 },
                 connection,
                 std::move(message));
