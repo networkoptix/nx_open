@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <limits>
+#include <list>
 #include <map>
 #include <optional>
 #include <set>
@@ -419,6 +420,7 @@ QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QVarLengthArray, (class T, int
 QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QMap, (class Key, class T), (Key, T), collection);
 QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QHash, (class Key, class T), (Key, T), collection);
 QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(std::vector, (class T, class Allocator), (T, Allocator), collection);
+QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(std::list, (class T, class Allocator), (T, Allocator), collection);
 QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(std::set, (class Key, class Predicate, class Allocator), (Key, Predicate, Allocator), collection);
 QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(std::map, (class Key, class T, class Predicate, class Allocator), (Key, T, Predicate, Allocator), collection);
 
