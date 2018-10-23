@@ -236,16 +236,6 @@ def threadsafe_generator(generator_fn):
     return safe_generator_fn
 
 
-class Timer:
-
-    def __init__(self):
-        self._start = timeit.default_timer()
-
-    @property
-    def duration(self):
-        return timedelta(seconds=timeit.default_timer() - self._start)
-
-
 def description_from_func(func):  # type: (Any) -> str
     try:
         object_bound_to = func.__self__

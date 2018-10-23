@@ -5,7 +5,7 @@ import logging
 import subprocess
 from datetime import timedelta
 
-from framework.utils import Timer
+from framework.waiting import Timer
 from .checks import Success, Halt, Failure, expect_values
 
 _logger = logging.getLogger(__name__)
@@ -107,7 +107,7 @@ def ffprobe_expect_stream(expected_values, stream_url, title):
         if fps:
             for result in _expect_command_output(
                     title, {'fps': fps}, _ffprobe_extract_fps,
-                    ['timeout', '10'] + command + ['-show_frames', '-select_streams', 'v']):
+                    ['timeout', '10s'] + command + ['-show_frames', '-select_streams', 'v']):
                 yield result
 
     audio = expected_values.get('audio')
