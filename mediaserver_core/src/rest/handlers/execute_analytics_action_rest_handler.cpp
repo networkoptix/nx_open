@@ -7,7 +7,7 @@
 #include <media_server/media_server_module.h>
 #include <nx/mediaserver/analytics/manager.h>
 #include <nx/mediaserver_plugins/utils/uuid.h>
-#include <nx/plugins/settings.h>
+#include <plugins/settings.h>
 
 QnExecuteAnalyticsActionRestHandler::QnExecuteAnalyticsActionRestHandler(
     QnMediaServerModule* serverModule):

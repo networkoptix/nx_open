@@ -58,16 +58,15 @@ int QnMergeSystemsRestHandler::execute(
 
     nx::vms::utils::SystemMergeProcessor systemMergeProcessor(owner->commonModule());
     systemMergeProcessor.enableDbBackup(serverModule()->settings().dataDir());
-    const auto resultCode = systemMergeProcessor.merge(
+    result = systemMergeProcessor.merge(
         owner->accessRights(),
         owner->authSession(),
-        data,
-        &result);
-    if (resultCode != nx::network::http::StatusCode::ok)
+        data);
+    if (result.error)
     {
         NX_DEBUG(this, lm("Merge with %1 failed with result %2")
-            .args(data.url, nx::network::http::StatusCode::toString(resultCode)));
-        return resultCode;
+            .args(data.url, toString(result.error)));
+        return nx::network::http::StatusCode::ok;
     }
 
     updateLocalServerAuthKeyInConfig(owner->commonModule());

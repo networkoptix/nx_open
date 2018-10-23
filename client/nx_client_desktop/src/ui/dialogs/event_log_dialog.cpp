@@ -278,7 +278,7 @@ void QnEventLogDialog::updateAnalyticsEvents()
         Qt::MatchExactly | Qt::MatchRecursive);
 
     NX_ASSERT(found.size() ==  1);
-    if (!found.size() == 1)
+    if (found.size() != 1)
         return;
 
     const auto index = found[0];
@@ -477,7 +477,7 @@ void QnEventLogDialog::query(qint64 fromMsec,
         m_requests << handle;
 
         const auto timerCallback =
-            [this, handle, callback]
+            [handle, callback]
             {
                 callback(false, handle, rest::EventLogData());
             };

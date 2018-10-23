@@ -199,6 +199,26 @@
             slowPollingTimeout: 5000,
             pollingTimeout: 1000,
             retriesForMergeCredentialsToApply: 15
+        },
+
+        metrics:{
+            hide:{
+                p2pCounters: true,
+                transactions: true,
+                tcpConnections: true,
+                offlineStatus: true
+            },
+            statusOrder:{
+                Offline: 1,
+                Unauthorized: 2,
+                Recording: 8,
+                Online: 9
+            },
+            percentValues:{
+                danger: 70, // Danger level of anything - more that 70% usage
+                warning: 50 // Warning level - more that 50% usage
+            },
+            liveMetricsUpdate: 10000 // Every 10 seconds
         }
     };
 })();

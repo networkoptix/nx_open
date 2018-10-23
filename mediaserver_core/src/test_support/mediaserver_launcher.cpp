@@ -3,6 +3,8 @@
 #include <nx/network/http/http_client.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/random.h>
+#include <test_support/utils.h>
+#include <api/global_settings.h>
 
 namespace {
 
@@ -22,6 +24,7 @@ MediaServerLauncher::MediaServerLauncher(
         addSetting("noResourceDiscovery", "1");
     if (disabledFeatures.testFlag(DisabledFeature::noMonitorStatistics))
         addSetting("noMonitorStatistics", "1");
+
     m_serverGuid = QnUuid::createUuid();
     fillDefaultSettings();
 }
@@ -29,11 +32,11 @@ MediaServerLauncher::MediaServerLauncher(
 void MediaServerLauncher::fillDefaultSettings()
 {
     m_settings = {
-	{"serverGuid", m_serverGuid.toString()},
-	{"varDir", *m_workDirResource.getDirName()},
-	{"dataDir", *m_workDirResource.getDirName()},
-	{"systemName", QnUuid::createUuid().toString()},
-	{"port", QString::number(m_serverEndpoint.port)}
+    {"serverGuid", m_serverGuid.toString()},
+    {"varDir", *m_workDirResource.getDirName()},
+    {"dataDir", *m_workDirResource.getDirName()},
+    {"systemName", QnUuid::createUuid().toString()},
+    {"port", QString::number(m_serverEndpoint.port)}
     };
 }
 
@@ -104,6 +107,13 @@ void MediaServerLauncher::run()
 bool MediaServerLauncher::start()
 {
     prepareToStart();
+    m_mediaServerProcess->setSetupModuleCallback(
+        [](QnMediaServerModule* server)
+        {
+            const auto enableDiscovery = nx::ut::cfg::configInstance().enableDiscovery;
+            server->globalSettings()->setAutoDiscoveryEnabled(enableDiscovery);
+            server->globalSettings()->setAutoDiscoveryResponseEnabled(enableDiscovery);
+        });
 
     nx::utils::promise<bool> processStartedPromise;
     auto future = processStartedPromise.get_future();

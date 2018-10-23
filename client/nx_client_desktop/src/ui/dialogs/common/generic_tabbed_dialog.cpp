@@ -5,7 +5,9 @@
 #include <QtWidgets/QPushButton>
 
 #include <boost/algorithm/cxx11/any_of.hpp>
+#include <boost/algorithm/cxx11/all_of.hpp>
 
+#include <nx/utils/log/assert.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 
 #include <utils/common/warnings.h>
@@ -38,7 +40,7 @@ int QnGenericTabbedDialog::currentPage() const
     return invalidPage;
 }
 
-void QnGenericTabbedDialog::setCurrentPage(int key, bool adjust)
+void QnGenericTabbedDialog::setCurrentPage(int key, bool adjust, const QUrl& url)
 {
     NX_ASSERT(m_tabWidget);
     NX_ASSERT(!m_pages.isEmpty());
@@ -59,7 +61,11 @@ void QnGenericTabbedDialog::setCurrentPage(int key, bool adjust)
 
         NX_ASSERT(page->isValid());
         if (page->isValid())
+        {
             m_tabWidget->setCurrentWidget(page->widget);
+            if (!url.isEmpty())
+                page->widget->activate(url);
+        }
         return;
     }
 

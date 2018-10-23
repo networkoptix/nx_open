@@ -1,8 +1,7 @@
 #pragma once
 
+#include <optional>
 #include <string>
-
-#include <boost/optional.hpp>
 
 #include <QtCore/QString>
 
@@ -34,10 +33,10 @@ public:
      * In this case mediator receives sees vms_gateway under local IP address, which is useless for remote peer.
      */
     void replaceOriginatingHostAddress(const QString& hostAddress);
-    boost::optional<QString> originatingHostAddressReplacement() const;
+    std::optional<QString> originatingHostAddressReplacement() const;
 
 private:
-    boost::optional<QString> m_originatingHostAddressReplacement;
+    std::optional<QString> m_originatingHostAddressReplacement;
     mutable QnMutex m_mutex;
 };
 

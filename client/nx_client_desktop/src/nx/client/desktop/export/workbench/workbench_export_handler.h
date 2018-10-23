@@ -40,6 +40,7 @@ private:
     void handleExportVideoAction(const ui::action::Parameters& parameters);
     void handleExportBookmarkAction(const ui::action::Parameters& parameters);
 
+    void handleExportBookmarksAction();
     typedef std::pair<QnUuid, std::unique_ptr<AbstractExportTool>> ExportInstance;
     // Extracts selected parameters from the dialog and prepares appropriate export tool.
     ExportInstance prepareExportTool(const ExportSettingsDialog& dialog);

@@ -31,8 +31,8 @@ DeviceAgent::DeviceAgent(
     m_auth.setPassword(deviceInfo.password);
 
     nx::vms::api::analytics::DeviceAgentManifest deviceAgentManifest;
-    for (const auto& eventType: typedManifest.outputEventTypes)
-        deviceAgentManifest.supportedEventTypes.push_back(eventType.id);
+    for (const auto& eventType: typedManifest.eventTypes)
+        deviceAgentManifest.supportedEventTypeIds.push_back(eventType.id);
     NX_PRINT << "Axis DeviceAgent created";
 }
 
@@ -104,11 +104,11 @@ void DeviceAgent::freeManifest(const char* data)
 const EventType* DeviceAgent::eventTypeById(const QString& id) const noexcept
 {
     const auto it = std::find_if(
-        m_typedManifest.outputEventTypes.cbegin(),
-        m_typedManifest.outputEventTypes.cend(),
+        m_typedManifest.eventTypes.cbegin(),
+        m_typedManifest.eventTypes.cend(),
         [&id](const EventType& eventType) { return eventType.id == id; });
 
-    if (it == m_typedManifest.outputEventTypes.cend())
+    if (it == m_typedManifest.eventTypes.cend())
         return nullptr;
     else
         return &(*it);

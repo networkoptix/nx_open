@@ -20,7 +20,6 @@
 
 #include <nx/mediaserver/analytics/metadata_handler.h>
 #include <nx/mediaserver/analytics/event_rule_watcher.h>
-#include <nx/plugins/settings.h>
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
@@ -215,7 +214,7 @@ Manager::EngineList Manager::availableEngines() const
         engines.append(engine);
     }
     return engines;
-    // TODO: Rewrite; the above implementation does not care about Plugin and Engine lifetimes. 
+    // TODO: Rewrite; the above implementation does not care about Plugin and Engine lifetimes.
 }
 
 /** @return Empty settings if the file does not exist, or on error. */
@@ -677,8 +676,8 @@ nx::vms::api::analytics::EngineManifest Manager::mergeEngineManifestToServer(
     }
     else
     {
-        it->outputEventTypes = it->outputEventTypes.toSet().
-            unite(manifest.outputEventTypes.toSet()).toList();
+        it->eventTypes = it->eventTypes.toSet().
+            unite(manifest.eventTypes.toSet()).toList();
         result = &*it;
     }
 
@@ -741,7 +740,7 @@ Manager::loadDeviceAgentManifest(
     auto deviceManifest = deserializeManifest<nx::vms::api::analytics::DeviceAgentManifest>(
         deviceAgentManifest.get());
 
-    if (deviceManifest && !deviceManifest->supportedEventTypes.empty())
+    if (deviceManifest && !deviceManifest->supportedEventTypeIds.empty())
         return std::make_pair(deviceManifest, boost::none);
 
     // If manifest occurred to be not AnalyticsDeviceManifest, we try to treat it as
@@ -749,13 +748,13 @@ Manager::loadDeviceAgentManifest(
     auto driverManifest = deserializeManifest<nx::vms::api::analytics::EngineManifest>(
         deviceAgentManifest.get());
 
-    if (driverManifest && driverManifest->outputEventTypes.size())
+    if (driverManifest && driverManifest->eventTypes.size())
     {
         deviceManifest = nx::vms::api::analytics::DeviceAgentManifest();
         std::transform(
-            driverManifest->outputEventTypes.cbegin(),
-            driverManifest->outputEventTypes.cend(),
-            std::back_inserter(deviceManifest->supportedEventTypes),
+            driverManifest->eventTypes.cbegin(),
+            driverManifest->eventTypes.cend(),
+            std::back_inserter(deviceManifest->supportedEventTypeIds),
             [](const nx::vms::api::analytics::EventType& eventType) { return eventType.id; });
         return std::make_pair(deviceManifest, driverManifest);
     }
@@ -773,7 +772,7 @@ void Manager::addManifestToCamera(
     const nx::vms::api::analytics::DeviceAgentManifest& manifest,
     const QnSecurityCamResourcePtr& camera)
 {
-    camera->setSupportedAnalyticsEventTypeIds(manifest.supportedEventTypes);
+    camera->setSupportedAnalyticsEventTypeIds(manifest.supportedEventTypeIds);
     camera->saveParams();
 }
 

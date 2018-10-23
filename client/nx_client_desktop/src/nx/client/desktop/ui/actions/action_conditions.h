@@ -552,6 +552,13 @@ public:
     virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
 };
 
+class AnalyticsEngineCondition: public Condition
+{
+public:
+    virtual ActionVisibility check(
+        const QnResourceList& resources, QnWorkbenchContext* context) override;
+};
+
 class MergeToCurrentSystemCondition: public Condition
 {
 public:
@@ -636,6 +643,7 @@ ConditionWrapper syncIsForced();
 ConditionWrapper canExportLayout();
 
 ConditionWrapper canExportBookmark();
+ConditionWrapper canExportBookmarks();
 
 /** Whether wearable camera upload is enabled. */
 ConditionWrapper wearableCameraUploadEnabled();

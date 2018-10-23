@@ -1,8 +1,8 @@
 #pragma once
 
 #include <chrono>
-#include <list>
 #include <map>
+#include <vector>
 
 #include <nx/network/cloud/cloud_connect_options.h>
 #include <nx/network/cloud/data/connection_parameters.h>
@@ -39,17 +39,23 @@ struct CloudDb
 
 struct Stun
 {
-    std::list<network::SocketAddress> addrToListenList;
-    std::list<network::SocketAddress> udpAddrToListenList;
+    std::vector<network::SocketAddress> addrToListenList;
+    std::vector<network::SocketAddress> udpAddrToListenList;
     std::optional<network::KeepAliveOptions> keepAliveOptions;
     std::optional<std::chrono::milliseconds> connectionInactivityTimeout;
 };
 
 struct Http
 {
-    std::list<network::SocketAddress> addrToListenList;
+    std::vector<network::SocketAddress> addrToListenList;
     std::optional<network::KeepAliveOptions> keepAliveOptions;
     std::optional<std::chrono::milliseconds> connectionInactivityTimeout;
+};
+
+struct Https
+{
+    std::vector<network::SocketAddress> endpoints;
+    std::string certificatePath;
 };
 
 struct Statistics
@@ -98,6 +104,7 @@ public:
     const CloudDb& cloudDB() const;
     const Stun& stun() const;
     const Http& http() const;
+    const Https& https() const;
     const ConnectionParameters& connectionParameters() const;
     const nx::sql::ConnectionOptions& dbConnectionOptions() const;
     const Statistics& statistics() const;
@@ -111,6 +118,7 @@ private:
     CloudDb m_cloudDB;
     Stun m_stun;
     Http m_http;
+    Https m_https;
     ConnectionParameters m_connectionParameters;
     nx::sql::ConnectionOptions m_dbConnectionOptions;
     Statistics m_statistics;
@@ -121,12 +129,15 @@ private:
     virtual void loadSettings() override;
 
     void initializeWithDefaultValues();
+
     void readEndpointList(
         const QString& str,
-        std::list<network::SocketAddress>* const addrToListenList);
+        std::vector<network::SocketAddress>* const addrToListenList);
+
     void loadConnectionParameters();
     void loadTrafficRelay();
     void loadListeningPeer();
+    void loadHttps();
 };
 
 } // namespace conf

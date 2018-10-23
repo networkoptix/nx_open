@@ -3,9 +3,9 @@
 
 #include <functional>
 
-#include <plugins/plugin_tools.h>
 #include <utils/memory/system_allocator.h>
 #include <nx/utils/log/assert.h>
+#include <nx/kit/utils.h>
 
 #include "warnings.h"
 
@@ -64,7 +64,7 @@ QnByteArray::~QnByteArray()
 {
     if( m_ownBuffer )
     {
-        nxpt::freeAligned( m_data, std::bind( &QnAbstractAllocator::release, m_allocator, _1 ) );
+        nx::kit::utils::freeAligned( m_data, std::bind( &QnAbstractAllocator::release, m_allocator, _1 ) );
 #ifdef CALC_QnByteArray_ALLOCATION
         QnByteArray_bytesAllocated.fetchAndAddOrdered( -(int)(m_capacity + QN_BYTE_ARRAY_PADDING) );
 #endif
@@ -198,14 +198,14 @@ QnByteArray& QnByteArray::operator=( const QnByteArray& right )
 #ifdef CALC_QnByteArray_ALLOCATION
         QnByteArray_bytesAllocated.fetchAndAddOrdered( -(int)(m_capacity + QN_BYTE_ARRAY_PADDING) );
 #endif
-        nxpt::freeAligned( m_data, std::bind( &QnAbstractAllocator::release, m_allocator, _1 ) );
+        nx::kit::utils::freeAligned( m_data, std::bind( &QnAbstractAllocator::release, m_allocator, _1 ) );
     }
 
     m_allocator = right.m_allocator;
     m_alignment = right.m_alignment;
     m_capacity = right.m_size;
     m_size = right.m_size;
-    m_data = (char*)nxpt::mallocAligned(
+    m_data = (char*)nx::kit::utils::mallocAligned(
         m_capacity + QN_BYTE_ARRAY_PADDING,
         m_alignment,
         std::bind( &QnAbstractAllocator::alloc, m_allocator, _1 ) );
@@ -227,7 +227,7 @@ QnByteArray& QnByteArray::operator=( QnByteArray&& right )
 
     if( m_ownBuffer )
     {
-        nxpt::freeAligned( m_data, std::bind( &QnAbstractAllocator::release, m_allocator, _1 ) );
+        nx::kit::utils::freeAligned( m_data, std::bind( &QnAbstractAllocator::release, m_allocator, _1 ) );
 #ifdef CALC_QnByteArray_ALLOCATION
         QnByteArray_bytesAllocated.fetchAndAddOrdered( -(int)(m_capacity + QN_BYTE_ARRAY_PADDING) );
 #endif
@@ -265,7 +265,7 @@ bool QnByteArray::reallocate(unsigned int capacity)
     if (capacity < m_capacity)
         return true;
 
-    char* data = (char*)nxpt::mallocAligned(
+    char* data = (char*)nx::kit::utils::mallocAligned(
         capacity + QN_BYTE_ARRAY_PADDING,
         m_alignment,
         std::bind( &QnAbstractAllocator::alloc, m_allocator, _1 ) );
@@ -278,7 +278,7 @@ bool QnByteArray::reallocate(unsigned int capacity)
     memcpy(data, m_data, m_size);
     if( m_ownBuffer )
     {
-        nxpt::freeAligned( m_data, std::bind( &QnAbstractAllocator::release, m_allocator, _1 ) );
+        nx::kit::utils::freeAligned( m_data, std::bind( &QnAbstractAllocator::release, m_allocator, _1 ) );
 #ifdef CALC_QnByteArray_ALLOCATION
         QnByteArray_bytesAllocated.fetchAndAddOrdered( -(int)(m_capacity + QN_BYTE_ARRAY_PADDING) );
 #endif

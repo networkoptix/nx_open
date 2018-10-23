@@ -28,8 +28,9 @@ private:
     void onSomeBytesReadAsync(nx::network::AbstractStreamSocket* sock,
         SystemError::ErrorCode errorCode, size_t bytesRead);
     void onDataSent(SystemError::ErrorCode errorCode, size_t bytesSent);
-    void addData(QnIOStateDataList&& value);
-    void addData(QnIOStateData&& value);
+    void addData(const QnIOStateDataList& value);
+    void addData(const QnIOStateData& value);
+    void addDataIfNeed(const QnIOStateData& value);
 private:
     Q_DECLARE_PRIVATE(QnIOMonitorConnectionProcessor);
 

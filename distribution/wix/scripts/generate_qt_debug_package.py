@@ -15,6 +15,7 @@ qt_libraries = [
     'Xml',
     'XmlPatterns',
     'Concurrent',
+    'Svg',
     'Sql',
     'Widgets',
     'OpenGL',

@@ -48,22 +48,12 @@ void TimeHelper::reset()
     m_cameraClockToLocalDiff->timeDiff = DATETIME_INVALID;
 }
 
-qint64 TimeHelper::lastPrimaryFrameUs( )
-{
-    QnMutexLocker lock(&m_cameraClockToLocalDiff->mutex);
-    return m_cameraClockToLocalDiff->lastPrimaryFrameUs;
-}
-
-qint64 TimeHelper::cameraTimeToLocalTime(
-    qint64 cameraTimeUs, qint64 currentTimeUs, bool primaryStream) const
+qint64 TimeHelper::cameraTimeToLocalTime(qint64 cameraTimeUs, qint64 currentTimeUs) const
 {
     QnMutexLocker lock(&m_cameraClockToLocalDiff->mutex);
     if (m_cameraClockToLocalDiff->timeDiff == DATETIME_INVALID)
         m_cameraClockToLocalDiff->timeDiff = currentTimeUs - cameraTimeUs;
-    qint64 result = cameraTimeUs + m_cameraClockToLocalDiff->timeDiff;
-    if (primaryStream)
-        m_cameraClockToLocalDiff->lastPrimaryFrameUs = result;
-    return result;
+    return cameraTimeUs + m_cameraClockToLocalDiff->timeDiff;
 }
 
 bool TimeHelper::isLocalTimeChanged()
@@ -99,7 +89,7 @@ qint64 TimeHelper::getCurrentTimeUs(const qint64 cameraTimeUs)
 qint64 TimeHelper::getTimeUsInternal(const qint64 cameraTimeUs, bool recursionAllowed)
 {
     const qint64 currentUs = m_getTime().count();
-    qint64 resultUs = cameraTimeToLocalTime(cameraTimeUs, currentUs, true);
+    qint64 resultUs = cameraTimeToLocalTime(cameraTimeUs, currentUs);
     const std::chrono::microseconds jitterUs(qAbs(resultUs - currentUs));
     const bool gotInvalidTime = jitterUs > kTimeResyncThreshold;
     const bool localTimeChanged = isLocalTimeChanged();

@@ -31,15 +31,21 @@ DeviceAgent::DeviceAgent(Engine* engine):
     *reinterpret_cast<void**>(m_objectId.bytes + sizeof(m_objectId) - sizeof(void*)) = this;
 }
 
+/**
+ * DeviceAgent manifest may declare eventTypes and objectTypes similarly to how an Engine declares
+ * them - semantically the set from the Engine manifest is joined with the set from the DeviceAgent
+ * manifest. Also this manifest may declare supportedEventTypeIds and supportedObjectTypeIds lists
+ * which are treated as white-list filters for the respective set.
+ */
 std::string DeviceAgent::manifest()
 {
-    return 1+R"json(
+    return /*suppress newline*/1 + R"json(
 {
     "supportedEventTypeIds": [
         ")json" + kLineCrossingEventType + R"json(",
         ")json" + kObjectInTheAreaEventType + R"json("
     ],
-    "supportedObjectTypes": [
+    "supportedObjectTypeIds": [
         ")json" + kCarObjectType + R"json("
     ],
     "eventTypes": [

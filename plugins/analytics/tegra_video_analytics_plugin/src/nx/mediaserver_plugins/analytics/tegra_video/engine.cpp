@@ -29,7 +29,7 @@ nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
 
 std::string Engine::manifest() const
 {
-    return 1+R"json(
+    return /*suppress newline*/1 + R"json(
 {
     "pluginId": "nx.tegraVideo",
     "pluginName": {
@@ -38,7 +38,7 @@ std::string Engine::manifest() const
             "ru_RU": "TegraVideo analytics engine Plugin (stub for Russian text)"
         }
     },
-    "outputEventTypes": [
+    "eventTypes": [
         {
             "id": "nx.tegraVideo.humanEnteredTheArea",
             "name": {
@@ -58,7 +58,7 @@ std::string Engine::manifest() const
             }
         }
     ],
-    "outputObjectTypes": [
+    "objectTypes": [
         {
             "id": "nx.tegraVideo.car",
             "name": {

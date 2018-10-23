@@ -153,10 +153,17 @@ void QnMergeSystemsDialog::at_urlComboBox_activated(int index) {
     ui->passwordEdit->setFocus();
 }
 
-void QnMergeSystemsDialog::at_urlComboBox_editingFinished() {
-    nx::utils::Url url = nx::utils::Url::fromUserInput(ui->urlComboBox->currentText());
+void QnMergeSystemsDialog::at_urlComboBox_editingFinished()
+{
+    const QString http = nx::network::http::urlSheme(/*isSecure*/ false);
+    const QString https = nx::network::http::urlSheme(/*isSecure*/ true);
+
+    const QString userInput = ui->urlComboBox->currentText();
+    nx::utils::Url url = nx::utils::Url::fromUserInput(userInput);
     if (url.port() == -1)
         url.setPort(DEFAULT_APPSERVER_PORT);
+    if (!userInput.startsWith(http + "://") && url.scheme() == http)
+        url.setScheme(https);
     ui->urlComboBox->setCurrentText(url.toString());
 }
 

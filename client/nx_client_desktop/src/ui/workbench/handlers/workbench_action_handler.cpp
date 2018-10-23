@@ -265,6 +265,19 @@ ActionHandler::ActionHandler(QObject *parent) :
         [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::UpdatesPage); });
     connect(action(action::UserManagementAction), &QAction::triggered, this,
         [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::UserManagement); });
+    connect(action(action::AnalyticsEngineSettingsAction), &QAction::triggered, this,
+        [this]
+        {
+            QUrl url;
+
+            if (const QnUuid& engineId = menu()->currentParameters(sender()).resource()->getId();
+                !engineId.isNull())
+            {
+                url.setQuery("engineId=" + engineId.toString());
+            }
+
+            openSystemAdministrationDialog(QnSystemAdministrationDialog::Analytics, url);
+        });
 
     connect(action(action::BusinessEventsAction), SIGNAL(triggered()), this, SLOT(at_businessEventsAction_triggered()));
     connect(action(action::OpenBusinessRulesAction), SIGNAL(triggered()), this, SLOT(at_openBusinessRulesAction_triggered()));
@@ -1274,12 +1287,12 @@ void ActionHandler::at_systemAdministrationAction_triggered()
     openSystemAdministrationDialog(page);
 }
 
-void ActionHandler::openSystemAdministrationDialog(int page)
+void ActionHandler::openSystemAdministrationDialog(int page, const QUrl& url)
 {
     QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(
         m_systemAdministrationDialog, mainWindowWidget());
 
-    systemAdministrationDialog()->setCurrentPage(page);
+    systemAdministrationDialog()->setCurrentPage(page, false, url);
 }
 
 void ActionHandler::openLocalSettingsDialog(int page)

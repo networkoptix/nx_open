@@ -55,6 +55,7 @@
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
 #include <nx/utils/log/log.h>
+#include <core/resource_management/resource_data_pool.h>
 
 using namespace nx;
 using namespace nx::vms::api;
@@ -526,6 +527,9 @@ void QnCommonMessageProcessor::on_resourceParamChanged(
         resource->setProperty(param.name, param.value, QnResource::NO_MARK_DIRTY);
     else
         propertyDictionary()->setValue(param.resourceId, param.name, param.value, false);
+
+    if (param.name == Qn::kResourceDataParamName)
+        NX_ASSERT(commonModule()->dataPool()->loadData(param.value.toUtf8()));
 }
 
 void QnCommonMessageProcessor::on_resourceParamRemoved(
@@ -888,6 +892,7 @@ void QnCommonMessageProcessor::resetStatusList(const ResourceStatusDataList& par
 
 void QnCommonMessageProcessor::onGotInitialNotification(const FullInfoData& fullData)
 {
+    commonModule()->dataPool()->clear();
     resourceAccessManager()->beginUpdate();
     resourceAccessProvider()->beginUpdate();
 

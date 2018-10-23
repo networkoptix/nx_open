@@ -48,7 +48,7 @@ QString Hanwha::EngineManifest::eventTypeIdByName(const QString& eventName) cons
     if (!result.isNull())
         return result;
 
-    for (const auto& eventTypeDescriptor: outputEventTypes)
+    for (const auto& eventTypeDescriptor: eventTypes)
     {
         if (doesMatch(eventName, eventTypeDescriptor.internalName))
         {
@@ -68,7 +68,7 @@ const Hanwha::EventType& Hanwha::EngineManifest::eventTypeDescriptorById(
     auto it = m_eventTypeDescriptorById.find(id);
     if (it != m_eventTypeDescriptorById.end())
         return it.value();
-    for (const auto& eventTypeDescriptor: outputEventTypes)
+    for (const auto& eventTypeDescriptor: eventTypes)
     {
         if (eventTypeDescriptor.id == id)
         {

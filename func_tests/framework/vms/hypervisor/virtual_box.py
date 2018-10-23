@@ -404,23 +404,29 @@ class VirtualBox(Hypervisor):
                 stdout = self.host_os_access.run_command(
                     ['tar', 'xvf', vm_image_path, '-C', vm_image_path.parent],
                     timeout_sec=timeout_sec)
-            # www.gnu.org/software/tar/manual/html_section/tar_19.html
-            # Possible exit codes of GNU tar are summarized in the following table:
+            # We need to process `tar` fatal errors only:
+            #
+            # GNU `tar` possible exit codes:
             #
             # 0 `Successful termination'.
-            # 1 `Some files differ'. If tar was invoked with `--compare' (`--diff', `-d')
-            #   command line option, this means that some files in the archive differ from
-            #   their disk counterparts (see section Comparing Archive Members with the File System).
-            #   If tar was given `--create', `--append' or `--update' option, this exit code means
-            #   that some files were changed while being archived and so the resulting archive
-            #   does not contain the exact copy of the file set.
+            # 1 `Some files differ'.
             # 2 `Fatal error'. This means that some fatal, unrecoverable error occurred.
+            #
+            # http://www.gnu.org/software/tar/manual/html_section/tar_19.html
             except exit_status_error_cls(2) as x:
                 stderr_decoded = x.stderr.decode('ascii')
                 raise VirtualBoxError(
                     "Unpack image OVA archive '%s' error: %s" % (
                         vm_image_path, stderr_decoded))
 
+            # The above files (several disk images and a textual description file
+            # in an XML dialect with an .ovf extension) can be packed together
+            # into a single archive file, typically with an .ova extension.
+            # (Such archive files use a variant of the TAR archive format and can
+            # therefore be unpacked outside of VirtualBox with any utility that
+            # can unpack standard TAR files).
+            #
+            # http://www.virtualbox.org/manual/ch01.html#ova
             for line in stdout.strip().splitlines():
                 if line.endswith('.ovf'):
                     return vm_image_path.parent / line

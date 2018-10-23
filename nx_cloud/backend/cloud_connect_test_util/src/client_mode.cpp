@@ -121,7 +121,6 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
         return 1;
     }
 
-    nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
     nx::network::SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId(
         "cc-tu-connect", QnUuid::createUuid());
 
@@ -266,7 +265,6 @@ int runInHttpClientMode(const nx::utils::ArgumentParser& args)
     args.read("o", &messageBodyFilePath);
     args.read("output-document", &messageBodyFilePath);
 
-    nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
     nx::network::SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId(
         "cc-tu-http", QnUuid::createUuid());
 
@@ -306,6 +304,7 @@ int runInHttpClientMode(const nx::utils::ArgumentParser& args)
         const auto contentType =
             nx::network::http::getHeaderValue(client.response()->headers, "Content-Type");
         if (contentType == "application/json" ||
+            contentType == "text/plain" ||
             contentType == "text/xml")
         {
             outputStream = &std::cout;

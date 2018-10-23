@@ -122,7 +122,7 @@ SystemHealthState::Private::Private(SystemHealthState* q) :
         q, updateCamerasWithDefaultPassword);
 
     connect(q->context(), &QnWorkbenchContext::userChanged, q, updateCamerasWithDefaultPassword);
-    updateCamerasWithDefaultPassword;
+    updateCamerasWithDefaultPassword();
 
     // EmailIsEmpty.
 

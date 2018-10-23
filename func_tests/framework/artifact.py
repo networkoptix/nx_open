@@ -56,9 +56,6 @@ class ArtifactFactory(object):
         self._artifact_set = artifact_set
         self._artifact = artifact
 
-    def __call__(self, *args, **kw):
-        return self.make_artifact(*args, **kw)
-
     def make_artifact(self, path_part_list=None, name=None, full_name=None, is_error=None, artifact_type=None):
         assert path_part_list is None or is_list_inst(path_part_list, str), repr(path_part_list)
         assert artifact_type is None or isinstance(artifact_type, ArtifactType), repr(artifact_type)

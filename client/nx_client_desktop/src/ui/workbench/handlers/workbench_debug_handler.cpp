@@ -17,6 +17,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
+#include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 
 #include <nx/vms/api/analytics/engine_manifest.h>
@@ -32,6 +33,7 @@
 #include <nx/client/desktop/ui/dialogs/debug/animations_control_dialog.h>
 #include <nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.h>
 #include <nx/client/desktop/custom_settings/dialogs/custom_settings_test_dialog.h>
+#include <nx/client/desktop/interactive_settings/dialogs/interactive_settings_test_dialog.h>
 #include <nx/client/desktop/debug_utils/widgets/palette_widget.h>
 
 #include <finders/test_systems_finder.h>
@@ -139,6 +141,13 @@ public:
         addButton(lit("Custom Settings Test"), [this]
             { (new CustomSettingsTestDialog(this))->show(); });
 
+        addButton(lit("Interactive Settings Test"),
+            [this]
+            {
+                const auto dialog = new InteractiveSettingsTestDialog(this);
+                dialog->show();
+            });
+
         addButton(lit("Web View"), [this]
             {
                 auto dialog(new QnWebViewDialog(this));
@@ -224,24 +233,103 @@ public:
                 close();
             });
 
-        addButton("Generate PIRs",
+        addButton("Generate Analytics Plugins and Engines",
             [this]()
             {
-                QnResourcePtr pir1(new nx::vms::common::AnalyticsEngineResource(commonModule()));
-                pir1->setId(QUuid("{F31E58E7-ABC5-4813-BA83-FDE0375A98CD}"));
-                pir1->setName("Plugin1");
+                const QString kEngineSettingsModel = R"json(
+                {
+                    "items":
+                    [
+                        {
+                            "type": "GroupBox",
+                            "caption": "General",
+                            "items": [
+                                {
+                                    "type": "TextField",
+                                    "name": "description",
+                                    "caption": "Description"
+                                },
+                                {
+                                    "type": "ComboBox",
+                                    "name": "networkType",
+                                    "caption": "Neural Network Type",
+                                    "defaultValue": "Type 1",
+                                    "range": ["Type 1", "Type 2", "Type 3"]
+                                }
+                            ]
+                        }
+                    ]
+                })json";
 
-                QnResourcePtr pir2(new nx::vms::common::AnalyticsEngineResource(commonModule()));
-                pir2->setId(QUuid("{F31E58E7-ABC5-4813-BA83-FDE0375A98CE}"));
-                pir2->setName("Plugin2");
+                const QString kDeviceAgentSettingsModel = R"json(
+                {
+                    "items":
+                    [
+                        {
+                            "type": "GroupBox",
+                            "caption": "Detection",
+                            "items": [
+                                {
+                                    "type": "CheckBox",
+                                    "name": "detectFaces",
+                                    "caption": "Detect Faces",
+                                    "defaultValue": true
+                                },
+                                {
+                                    "type": "CheckBox",
+                                    "name": "detectPeople",
+                                    "caption": "Detect People",
+                                    "defaultValue": true
+                                },
+                                {
+                                    "type": "CheckBox",
+                                    "name": "detectCars",
+                                    "caption": "Detect Cars",
+                                    "defaultValue": true
+                                }
+                            ]
+                        }
+                    ]
+                })json";
 
-                QnResourcePtr pir3(new nx::vms::common::AnalyticsEngineResource(commonModule()));
-                pir3->setId(QUuid("{F31E58E7-ABC5-4813-BA83-FDE0375A98CF}"));
-                pir3->setName("Plugin3");
+                using namespace nx::vms::common;
 
-                resourcePool()->addResource(pir1);
-                resourcePool()->addResource(pir2);
-                resourcePool()->addResource(pir3);
+                QnResourcePtr plugin1(new AnalyticsPluginResource(commonModule()));
+                plugin1->setId(QnUuid("{c302e227-3631-4ce4-9acc-ed481661ce4d}"));
+                plugin1->setName("Plugin1");
+                plugin1->setProperty(AnalyticsPluginResource::kEngineSettingsModelProperty,
+                    kEngineSettingsModel);
+                plugin1->setProperty(AnalyticsPluginResource::kDeviceAgentSettingsModelProperty,
+                    kDeviceAgentSettingsModel);
+
+                QnResourcePtr plugin2(new AnalyticsPluginResource(commonModule()));
+                plugin2->setId(QnUuid("{fce51681-bc44-4d0c-966b-12f8cf39d2f9}"));
+                plugin2->setName("Plugin2");
+                plugin2->setProperty(AnalyticsPluginResource::kEngineSettingsModelProperty,
+                    kEngineSettingsModel);
+                plugin2->setProperty(AnalyticsPluginResource::kDeviceAgentSettingsModelProperty,
+                    kDeviceAgentSettingsModel);
+
+                QnResourcePtr engine1(new AnalyticsEngineResource(commonModule()));
+                engine1->setId(QUuid("{f31e58e7-abc5-4813-ba83-fde0375a98cd}"));
+                engine1->setParentId(plugin1->getId());
+                engine1->setName("Engine1");
+
+                QnResourcePtr engine2(new AnalyticsEngineResource(commonModule()));
+                engine2->setParentId(plugin1->getId());
+                engine2->setId(QUuid("{f31e58e7-abc5-4813-ba83-fde0375a98ce}"));
+                engine2->setName("Engine2");
+
+                QnResourcePtr engine3(new AnalyticsEngineResource(commonModule()));
+                engine3->setParentId(plugin2->getId());
+                engine3->setId(QUuid("{f31e58e7-abc5-4813-ba83-fde0375a98cf}"));
+                engine3->setName("Engine3");
+
+                resourcePool()->addResource(plugin1);
+                resourcePool()->addResource(plugin2);
+                resourcePool()->addResource(engine1);
+                resourcePool()->addResource(engine2);
+                resourcePool()->addResource(engine3);
             });
 
         addButton(lit("Generate analytics manifests"),
@@ -265,7 +353,7 @@ public:
                         eventType.id = "";
                         eventType.name.value = lit("Event %1").arg(j);
                         eventType.name.localization[lit("ru_RU")] = lit("Russian %1").arg(j);
-                        manifest.outputEventTypes.push_back(eventType);
+                        manifest.eventTypes.push_back(eventType);
                     }
 
                     auto server = servers[serverIndex];
@@ -293,8 +381,8 @@ public:
                         else
                         {
                             QnSecurityCamResource::AnalyticsEventTypeIds eventTypeIds;
-                            std::transform(randomDriver.outputEventTypes.cbegin(),
-                                randomDriver.outputEventTypes.cend(),
+                            std::transform(randomDriver.eventTypes.cbegin(),
+                                randomDriver.eventTypes.cend(),
                                 std::back_inserter(eventTypeIds),
                                 [](const nx::vms::api::analytics::EventType& eventType)
                                 {

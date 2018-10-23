@@ -178,9 +178,9 @@ bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bu
     for (int i = 0; curPtr < end; ++i)
     {
         int unitSize = m_constantSize;
-
-        if (!m_constantSize) {
-            if (auSize.size() < i+1)
+        if (!m_constantSize)
+        {
+            if (auSize.size() <= i)
                 return false;
             unitSize = auSize[i];
         }
@@ -191,18 +191,15 @@ bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bu
         if (auIndex.size() > i)
             rtpTimeOffset = auIndex[i];
 
-        QnWritableCompressedAudioDataPtr audioData = QnWritableCompressedAudioDataPtr(new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, unitSize));
+        QnWritableCompressedAudioDataPtr audioData(
+            new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, unitSize));
         audioData->compressionType = AV_CODEC_ID_AAC;
         audioData->context = m_context;
-        audioData->timestamp = rtpTime+rtpTimeOffset;
-
-        //quint8 adtsHeaderBuff[AAC_HEADER_LEN];
-        //m_aacHelper.buildADTSHeader(adtsHeaderBuff, unitSize);
-        //audioData->data.write((const char*) adtsHeaderBuff, AAC_HEADER_LEN);
+        audioData->timestamp = rtpTime + rtpTimeOffset;
         audioData->m_data.write((const char*)curPtr, unitSize);
-        m_audioData.push_back(audioData);
         gotData = true;
         curPtr += unitSize;
+        m_audioData.push_back(audioData);
     }
 
     return true;

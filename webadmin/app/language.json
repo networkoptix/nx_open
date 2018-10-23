@@ -156,6 +156,7 @@
         "cloudBothError": "Cannot merge systems. Both systems are connected to cloud. You need to disconnect one first.",
         "cloudHostConflict": "Cannot merge systems, because servers are built with different cloud hosts",
         "licenceError": "Warning! You are about to merge Systems with Starter licenses. Only one Starter license is allowed per System, so the second license will be deactivated. Merge anyway?",
+        "duplicateServersError": "Cannot merge systems, because they have at least 1 server with the same ID. Please remove this server and try again.",
         "connectionFailed": "Connection failed: ",
         "unknownError": "Unknown error",
         "mergeFailed": "Merge failed: ",

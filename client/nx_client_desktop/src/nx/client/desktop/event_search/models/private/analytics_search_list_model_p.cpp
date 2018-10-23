@@ -227,7 +227,10 @@ void AnalyticsSearchListModel::Private::clearData()
 void AnalyticsSearchListModel::Private::truncateToMaximumCount()
 {
     const auto itemCleanup =
-        [this](const DetectedObject& object) { m_objectIdToTimestamp.remove(object.objectId); };
+        [this](const DetectedObject& object)
+        {
+            m_objectIdToTimestamp.remove(object.objectAppearanceId);
+        };
 
     this->truncateDataToMaximumCount(m_data, &startTime, itemCleanup);
 }
@@ -235,7 +238,10 @@ void AnalyticsSearchListModel::Private::truncateToMaximumCount()
 void AnalyticsSearchListModel::Private::truncateToRelevantTimePeriod()
 {
     const auto itemCleanup =
-        [this](const DetectedObject& object) { m_objectIdToTimestamp.remove(object.objectId); };
+        [this](const DetectedObject& object)
+        {
+            m_objectIdToTimestamp.remove(object.objectAppearanceId);
+        };
 
     this->truncateDataToTimePeriod(
         m_data, upperBoundPredicate, q->relevantTimePeriod(), itemCleanup);
@@ -528,7 +534,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
                     continue;
 
                 DetectedObject newObject;
-                newObject.objectId = item.objectId;
+                newObject.objectAppearanceId = item.objectId;
                 newObject.objectTypeId = item.objectTypeId;
                 newObject.attributes = std::move(item.labels);
                 newObject.track.push_back(pos);
@@ -610,7 +616,7 @@ void AnalyticsSearchListModel::Private::advanceObject(DetectedObject& object,
     }
 
     object.lastAppearanceTimeUsec = position.timestampUsec;
-    m_dataChangedObjectIds.insert(object.objectId);
+    m_dataChangedObjectIds.insert(object.objectAppearanceId);
 
     if (emitDataChanged)
         m_emitDataChanged->requestOperation();
@@ -627,7 +633,7 @@ int AnalyticsSearchListModel::Private::indexOf(const QnUuid& objectId) const
         std::upper_bound(m_data.cbegin(), m_data.cend(), *timestampIter, upperBoundPredicate));
 
     const auto iter = std::find_if(range.first, range.second,
-        [&objectId](const DetectedObject& item) { return item.objectId == objectId; });
+        [&objectId](const DetectedObject& item) { return item.objectAppearanceId == objectId; });
 
     return iter != range.second ? int(std::distance(m_data.cbegin(), iter)) : -1;
 }
@@ -751,7 +757,7 @@ void AnalyticsSearchListModel::Private::executePluginAction(
     AnalyticsAction actionData;
     actionData.pluginId = pluginId;
     actionData.actionId = action.id;
-    actionData.objectId = object.objectId;
+    actionData.objectId = object.objectAppearanceId;
 
     server->restConnection()->executeAnalyticsAction(
         actionData, nx::utils::guarded(this, resultCallback), thread());

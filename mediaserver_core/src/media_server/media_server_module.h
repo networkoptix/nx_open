@@ -9,6 +9,7 @@
 
 #include "settings.h"
 #include <plugins/resource/mdns/mdns_listener.h>
+#include <plugins/native_sdk/common_plugin_container.h>
 #include <nx/network/upnp/upnp_device_searcher.h>
 #include <nx/mediaserver/analytics/event_rule_watcher.h>
 #include <nx/mediaserver/analytics/manager.h>
@@ -50,6 +51,7 @@ class QnServerConnector;
 class QnResourceStatusWatcher;
 
 namespace nx::vms::common::p2p::downloader { class Downloader; }
+namespace nx::mediaserver::hls { class SessionPool; }
 
 namespace nx {
 namespace mediaserver { class CmdLineArguments; }
@@ -172,6 +174,7 @@ public:
     QnResourceStatusWatcher* statusWatcher() const;
     QnMdnsListener* mdnsListener() const;
     nx::network::upnp::DeviceSearcher* upnpDeviceSearcher() const;
+    nx::mediaserver::hls::SessionPool* hlsSessionPool() const;
 private:
     void registerResourceDataProviders();
     QDir downloadsDirectory() const;
@@ -225,4 +228,5 @@ private:
     std::unique_ptr<QnMdnsListener> m_mdnsListener;
     std::unique_ptr<nx::network::upnp::DeviceSearcher> m_upnpDeviceSearcher;
     std::unique_ptr<QnMediaServerResourceSearchers> m_resourceSearchers;
+    nx::mediaserver::hls::SessionPool* m_hlsSessionPool = nullptr;
 };

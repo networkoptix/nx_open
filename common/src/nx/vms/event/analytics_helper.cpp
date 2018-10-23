@@ -108,7 +108,7 @@ AnalyticsHelper::EventTypeDescriptor AnalyticsHelper::eventTypeDescriptor(
     {
         for (const auto& manifest: server->analyticsDrivers())
         {
-            for (const auto& eventType: manifest.outputEventTypes)
+            for (const auto& eventType: manifest.eventTypes)
             {
                 if (eventType.id == eventTypeId)
                 {
@@ -157,7 +157,7 @@ QList<AnalyticsHelper::EventTypeDescriptor> AnalyticsHelper::systemSupportedAnal
     {
         for (const auto& manifest: server->analyticsDrivers())
         {
-            for (const auto& eventType: manifest.outputEventTypes)
+            for (const auto& eventType: manifest.eventTypes)
                 storage.addUnique(manifest, eventType);
         }
     }
@@ -187,7 +187,7 @@ QList<AnalyticsHelper::EventTypeDescriptor> AnalyticsHelper::supportedAnalyticsE
 
         for (const auto& manifest: server->analyticsDrivers())
         {
-            for (const auto& eventType: manifest.outputEventTypes)
+            for (const auto& eventType: manifest.eventTypes)
             {
                 if (!supportedEventTypeIds.contains(eventType.id))
                     continue;
@@ -212,7 +212,7 @@ QList<AnalyticsHelper::EventTypeDescriptor> AnalyticsHelper::cameraIndependentAn
             if (manifest.capabilities.testFlag(
                 nx::vms::api::analytics::EngineManifest::Capability::cameraModelIndependent))
             {
-                for (const auto& eventType: manifest.outputEventTypes)
+                for (const auto& eventType: manifest.eventTypes)
                     storage.addUnique(manifest, eventType);
             }
         }
@@ -239,7 +239,7 @@ QString AnalyticsHelper::eventTypeName(const QnVirtualCameraResourcePtr& camera,
     const QString& locale)
 {
     return getTypeName(
-        camera, eventTypeId, locale, &nx::vms::api::analytics::EngineManifest::outputEventTypes);
+        camera, eventTypeId, locale, &nx::vms::api::analytics::EngineManifest::eventTypes);
 }
 
 QString AnalyticsHelper::objectTypeName(const QnVirtualCameraResourcePtr& camera,
@@ -247,7 +247,7 @@ QString AnalyticsHelper::objectTypeName(const QnVirtualCameraResourcePtr& camera
     const QString& locale)
 {
     return getTypeName(
-        camera, objectTypeId, locale, &nx::vms::api::analytics::EngineManifest::outputObjectTypes);
+        camera, objectTypeId, locale, &nx::vms::api::analytics::EngineManifest::objectTypes);
 }
 
 QList<AnalyticsHelper::PluginActions> AnalyticsHelper::availableActions(

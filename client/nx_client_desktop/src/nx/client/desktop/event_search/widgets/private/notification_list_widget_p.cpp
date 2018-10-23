@@ -107,7 +107,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     placeholderText->setProperty(style::Properties::kDontPolishFontProperty, true);
     placeholderText->setFont(font);
     placeholderText->setForegroundRole(QPalette::Mid);
-    placeholderText->setText(tr("No new notifications."));
+    placeholderText->setText(tr("No new notifications"));
     placeholderText->setAlignment(Qt::AlignCenter);
     placeholderText->setWordWrap(true);
     verticalLayout->addWidget(placeholderText);

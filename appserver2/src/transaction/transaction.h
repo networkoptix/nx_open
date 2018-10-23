@@ -622,7 +622,7 @@ APPLY(501, saveUser, nx::vms::api::UserData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        UserNotificationManagerHelper(), \
-                       ModifyResourceAccess(false), /* save permission checker */ \
+                       SaveUserAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \

@@ -43,6 +43,10 @@ bool storeUrlForRole(Qn::ConnectionRole role)
 
 } //anonymous namespace
 
+QString QnVirtualCameraResource::kEnabledAnalyticsEnginesProperty("enabledAnalyticsEngines");
+QString QnVirtualCameraResource::kDeviceAgentsSettingsValuesProperty(
+    "deviceAgentsSettingsValuesProperty");
+
 QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
     base_type(commonModule),
     m_issueCounter(0),
@@ -487,4 +491,49 @@ QnAdvancedStreamParams QnVirtualCameraResource::advancedLiveStreamParams() const
 {
     NX_ASSERT(false, lm("This method should not be called on client side."));
     return QnAdvancedStreamParams();
+}
+
+QSet<QnUuid> QnVirtualCameraResource::enabledAnalyticsEngines() const
+{
+    return QJson::deserialized<QSet<QnUuid>>(
+        getProperty(kEnabledAnalyticsEnginesProperty).toUtf8());
+}
+
+void QnVirtualCameraResource::setEnabledAnalyticsEngines(const QSet<QnUuid>& engines)
+{
+    setProperty(kEnabledAnalyticsEnginesProperty, QString::fromUtf8(QJson::serialized(engines)));
+}
+
+QHash<QnUuid, QVariantMap> QnVirtualCameraResource::deviceAgentSettingsValues() const
+{
+    const auto values = QJson::deserialized<QHash<QnUuid, QJsonObject>>(
+        getProperty(kDeviceAgentsSettingsValuesProperty).toUtf8());
+
+    QHash<QnUuid, QVariantMap> result;
+    for (auto it = values.begin(); it != values.end(); ++it)
+        result.insert(it.key(), it.value().toVariantMap());
+    return result;
+}
+
+void QnVirtualCameraResource::setDeviceAgentSettingsValues(
+    const QHash<QnUuid, QVariantMap>& settingsValues)
+{
+    QHash<QnUuid, QJsonObject> result;
+    for (auto it = settingsValues.begin(); it != settingsValues.end(); ++it)
+        result.insert(it.key(), QJsonObject::fromVariantMap(it.value()));
+
+    setProperty(kDeviceAgentsSettingsValuesProperty, QString::fromUtf8(QJson::serialized(result)));
+}
+
+QVariantMap QnVirtualCameraResource::deviceAgentSettingsValues(const QnUuid& engineId) const
+{
+    return deviceAgentSettingsValues()[engineId];
+}
+
+void QnVirtualCameraResource::setDeviceAgentSettingsValues(
+    const QnUuid& engineId, const QVariantMap& settingsValues)
+{
+    auto settingsValuesByEngineId = deviceAgentSettingsValues();
+    settingsValuesByEngineId[engineId] = settingsValues;
+    setDeviceAgentSettingsValues(settingsValuesByEngineId);
 }

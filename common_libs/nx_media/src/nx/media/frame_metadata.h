@@ -32,7 +32,7 @@ struct FrameMetadata
     QnAbstractMediaData::MediaFlags flags; /**< Various flags passed from compressed video data. */
     DisplayHint displayHint; /**< Display frame immediately with no delay. */
     int frameNum; /**< Frame number in range [0..INT_MAX]. */
-    double sar; /**< square(pixel) aspect ratio. */
+    double sar; /**< Sample(pixel) aspect ratio. */
     int videoChannel; /**< For multi-sensor cameras. */
     int sequence; /**< Number of playback request. */
     QnAbstractMediaData::DataType dataType;

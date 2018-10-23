@@ -108,25 +108,7 @@ const char* Engine::manifest(Error* error) const
     if (!m_manifest.empty())
         return m_manifest.c_str();
 
-    static const std::string kManifestPrefix = R"json(
-        {
-            "pluginId": "nx.deepstream",
-            "pluginName": {
-                "value": "DeepStream Driver",
-                "localization": {
-                    "ru_RU": "DeepStream driver (translated to Russian)"
-                }
-            },
-            "outputObjectTypes": [
-        )json";
-
-    static const std::string kManifestPostfix = R"json(
-            ],
-            "capabilities": ""
-        })json";
-
-    m_manifest = kManifestPrefix;
-
+    std::string objectTypesManifest;
     if (ini().pipelineType == kOpenAlprPipeline)
     {
         ObjectClassDescription licensePlateDescription(
@@ -134,19 +116,34 @@ const char* Engine::manifest(Error* error) const
             "",
             kLicensePlateGuid);
 
-        m_manifest += buildManifestObectTypeString(licensePlateDescription);
+        objectTypesManifest += buildManifestObectTypeString(licensePlateDescription);
     }
     else
     {
         for (auto i = 0; i < m_objectClassDescritions.size(); ++i)
         {
-            m_manifest += buildManifestObectTypeString(m_objectClassDescritions[i]);
+            objectTypesManifest += buildManifestObectTypeString(m_objectClassDescritions[i]);
             if (i < m_objectClassDescritions.size() - 1)
-                m_manifest += ',';
+                objectTypesManifest += ",\n";
         }
     }
 
-    m_manifest += kManifestPostfix;
+    m_manifest = /*suppress newline*/1 + R"json(
+{
+    "pluginId": "nx.deepstream",
+    "pluginName": {
+        "value": "DeepStream Driver",
+        "localization": {
+            "ru_RU": "DeepStream driver (translated to Russian)"
+        }
+    },
+    "objectTypes": [
+)json" + objectTypesManifest + R"json(
+    ],
+    "capabilities": ""
+}
+)json";
+
     return m_manifest.c_str();
 }
 
@@ -256,23 +253,17 @@ std::vector<std::string> Engine::loadClassGuids(const std::string& guidsFilePath
     return result;
 }
 
+/** Use indentation of 8 spaces, and no trailing whitespace. */
 std::string Engine::buildManifestObectTypeString(const ObjectClassDescription& description) const
 {
-    static const std::string kObjectTypeStringPrefix = (R"json({
-        "id": ")json");
-    static const std::string kObjectTypeStringMiddle = (R"json(",
-        "name": {
-            "value": ")json");
-    static const std::string kObjectTypeStringPostfix = (R"json(",
-            "localization": {}
-        }
-    })json");
-
-    return kObjectTypeStringPrefix
-        + description.typeId
-        + kObjectTypeStringMiddle
-        + description.name
-        + kObjectTypeStringPostfix;
+    return /*suppress newline*/1 + R"json(
+        {
+            "id": ")json" + description.typeId + R"json(",
+            "name": {
+                "value": ")json" + description.name + R"json(",
+                "localization": {}
+            }
+        })json";
 }
 
 } // namespace deepstream

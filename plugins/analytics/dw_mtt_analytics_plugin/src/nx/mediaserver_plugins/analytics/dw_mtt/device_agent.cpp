@@ -85,10 +85,10 @@ DeviceAgent::DeviceAgent(
     m_auth.setPassword(deviceInfo.password);
 
     nx::vms::api::analytics::DeviceAgentManifest typedCameraManifest;
-    for (const auto& eventType : typedManifest.outputEventTypes)
+    for (const auto& eventType: typedManifest.eventTypes)
     {
         if(!eventType.unsupported)
-            typedCameraManifest.supportedEventTypes.push_back(eventType.id);
+            typedCameraManifest.supportedEventTypeIds.push_back(eventType.id);
     }
     m_cameraManifest = QJson::serialized(typedCameraManifest);
 
@@ -346,7 +346,7 @@ QSet<QByteArray> DeviceAgent::internalNamesToCatch() const
 {
     QSet<QByteArray> names;
     std::set<int> groups;
-    for (const auto& eventToCatch : m_eventsToCatch)
+    for (const auto& eventToCatch: m_eventsToCatch)
     {
         if (!groups.count(eventToCatch.type.group))
         {

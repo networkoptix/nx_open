@@ -33,7 +33,7 @@ MetadataHandler::MetadataHandler(QnMediaServerModule* serverModule):
 
 nx::vms::api::analytics::EventType MetadataHandler::eventTypeDescriptor(const QString& eventTypeId) const
 {
-    for (const auto& descriptor: m_manifest.outputEventTypes)
+    for (const auto& descriptor: m_manifest.eventTypes)
     {
         if (descriptor.id == eventTypeId)
             return descriptor;

@@ -42,8 +42,6 @@ void ErrorProcessor::processNoError(QnAbstractMediaStreamDataProvider* streamRea
     if (!camera)
         return;
     camera->setLastMediaIssue(CameraDiagnostics::NoErrorResult());
-    if (camera->getStatus() == Qn::Unauthorized || camera->getStatus() == Qn::Offline)
-        camera->setStatus(Qn::Online);
 }
 
 /**

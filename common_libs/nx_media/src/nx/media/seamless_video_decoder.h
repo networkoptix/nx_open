@@ -65,6 +65,9 @@ public:
     void pleaseStop();
 
 private:
+    void pushFrame(QVideoFramePtr frame, int decodedFrameNum, double sar);
+
+private:
     QScopedPointer<SeamlessVideoDecoderPrivate> d_ptr;
     Q_DECLARE_PRIVATE(SeamlessVideoDecoder);
 };

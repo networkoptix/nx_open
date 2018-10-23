@@ -21,6 +21,7 @@
 #include <nx/client/desktop/ui/common/color_theme.h>
 #include <nx/utils/app_info.h>
 #include <utils/math/color_transformations.h>
+#include <utils/common/event_processors.h>
 
 namespace {
 
@@ -236,6 +237,32 @@ SearchEdit::SearchEdit(QWidget* parent):
     setupMenuButton();
     updateTagButton();
     updatePalette();
+
+    installEventHandler(this, {QEvent::KeyPress, QEvent::ShortcutOverride}, this,
+        [this](QObject* /*object*/, QEvent* event)
+        {
+            const auto keyEvent = static_cast<QKeyEvent*>(event);
+            switch (keyEvent->key())
+            {
+                case Qt::Key_Enter:
+                case Qt::Key_Return:
+                {
+                    if (event->type() == QEvent::ShortcutOverride)
+                    {
+                        if (keyEvent->modifiers().testFlag(Qt::ControlModifier))
+                            emit ctrlEnterPressed();
+                    }
+                    else if (!keyEvent->modifiers())
+                    {
+                        emit enterPressed();
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+        });
+
 }
 
 SearchEdit::~SearchEdit()
@@ -487,18 +514,6 @@ void SearchEdit::focusOutEvent(QFocusEvent* event)
 void SearchEdit::keyPressEvent(QKeyEvent* event)
 {
     d->lineEdit->event(event);
-    if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
-    {
-        const auto ctrlModifier = nx::utils::AppInfo::isMacOsX()
-            ? Qt::MetaModifier
-            : Qt::ControlModifier;
-        if (event->modifiers().testFlag(ctrlModifier))
-            emit ctrlEnterPressed();
-        else
-            emit enterPressed();
-
-        event->accept();
-    }
 }
 
 void SearchEdit::inputMethodEvent(QInputMethodEvent* event)

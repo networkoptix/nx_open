@@ -4,8 +4,6 @@
 
 #include <api/global_settings.h>
 
-#include <common/static_common_module.h>
-
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/address_resolver.h>
@@ -46,8 +44,6 @@
 #include <nx/p2p/p2p_server_message_bus.h>
 #include <transaction/server_transaction_message_bus.h>
 #include <nx/vms/time_sync/server_time_sync_manager.h>
-
-// TODO: #vkutin #gdm #fixme Check and fix API documentation after API refactoring!
 
 using namespace nx::vms::api;
 
@@ -199,7 +195,18 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regGet<std::nullptr_t, ResourceTypeDataList>(p, ApiCommand::getResourceTypes);
 
-    // AbstractResourceManager::setResourceStatus
+    /**%apidoc[proprietary] POST /ec2/setResourceStatus
+     * Change a resource status.
+     * <p>
+     * Parameters should be passed as a JSON object in POST message body with
+     * content type "application/json". Example of such object can be seen in
+     * the result of the corresponding GET function.
+     * </p>
+     * %permissions Administrator, or a custom user with "Edit camera settings" permission,
+     *     or a user who owns the resource in case the resource is a layout.
+     * %param id Unique id of the resource.
+     * %param status new resource status.
+     */
     regUpdate<ResourceStatusData>(p, ApiCommand::setResourceStatus);
 
     /**%apidoc GET /ec2/getResourceParams
@@ -1029,7 +1036,32 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
 
     regGet<ApiTranLogFilter, ApiTransactionDataList>(p, ApiCommand::getTransactionLog);
 
-    // AbstractEventRulesManager::save
+    /**%apidoc POST /ec2/saveEventRule
+     * Create or update event rule in event/actions rule list. Parameters should be passed
+	 * as a JSON object in POST message body with content type "application/json".
+	 * Example of such object can be seen in the result of the corresponding GET function.
+     * %param eventType Event type to match the rule. Example of possible values can be seen in
+	 *     the result of the corresponding GET function.
+     * %param[opt] eventResourceIds List of resources to match. Any resource if the list is empty.
+     * %param[opt] eventCondition Additional text filter for event rule. Used for some event types.
+     * %param[opt] EventState Event state to match the rule.
+     *     %value inactive Prolonged event has finished.
+     *     %value active Prolonged event has started.
+     *     %value undefined Any state.
+     * %param actionType Action to execute if the rule matches. Example of possible values can be
+	 *     seen in the result of the corresponding GET function.
+     * %param[opt] actionResourceIds Resource list associated with the action. The action is executed
+     *     for each resource in the list.
+     * %param[opt] actionParams Additional parameters used in the action. It depends on the action type.
+     * %param[opt] aggregationPeriod Aggregation period in seconds. The action is not going to trigger
+     *     more often than the aggregation period.
+     * %param disabled Enable or disable the rule.
+     * %param[opt] comment Human-readable text. Not used on the server side.
+     * %param[opt] schedule Hex representation of the binary data. Each bit defines whether
+     *     the action should or should not be executed at some hour of week. Hour numbers
+	 *     start with 0. There are 24 * 7 = 168 bits.
+     * %param[opt] system Whether the rule can't be deleted by user. System rules can't be deleted.
+    */
     regUpdate<EventRuleData>(p, ApiCommand::saveEventRule);
 
     // AbstractEventRulesManager::deleteRule
@@ -1094,9 +1126,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %permissions Administrator.
      * %param[opt] id User unique id. Can be omitted when creating a new object. If such object
      *     exists, omitted fields will not be changed.
-     * %param[opt] parentId Should be empty.
+     * %param[proprietary] parentId Should be empty.
      * %param name User name.
-     * %param[opt] url Should be empty.
+     * %param[proprietary] url Should be empty.
      * %param[proprietary] typeId Should have fixed value.
      *     %value {774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}
      * %param[proprietary] isAdmin Indended for internal use; keep the value when saving
@@ -1117,17 +1149,18 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %value GlobalCustomUserPermission Flag: this user has custom permissions
      * %param[opt] userRoleId User role unique id.
      * %param email User's email.
-     * %param[opt] digest HA1 digest hash from user password, as per RFC 2069. When modifying an
+     * %param[proprietary] digest HA1 digest hash from user password, as per RFC 2069. When modifying an
      *     existing user, supply empty string. When creating a new user, calculate the value
      *     based on UTF-8 password as follows:
      *     <code>digest = md5_hex(user_name + ":" + realm + ":" + password);</code>
-     * %param[opt] hash User's password hash. When modifying an existing user, supply empty string.
+     * %param[proprietary] hash User's password hash. When modifying an existing user, supply empty string.
      *     When creating a new user, calculate the value based on UTF-8 password as follows:
      *     <code>salt = rand_hex();
      *     hash = "md5$" + salt + "$" + md5_hex(salt + password);</code>
-     * %param[opt] cryptSha512Hash Cryptography key hash. Supply empty string
+     * %param[proprietary] cryptSha512Hash Cryptography key hash. Supply empty string
      *     when creating, keep the value when modifying.
-     * %param[opt] realm HTTP authorization realm as defined in RFC 2617, can be obtained via
+     * %param[opt] password User's password
+     * %param[proprietary] realm HTTP authorization realm as defined in RFC 2617, can be obtained via
      *     /api/gettime.
      * %param[opt] isLdap Whether the user was imported from LDAP.
      *     %value false
@@ -1141,7 +1174,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param fullName Full name of the user.
      * %// AbstractUserManager::save
      */
-    regUpdate<UserData>(p, ApiCommand::saveUser);
+    regUpdate<UserDataEx, UserData>(p, ApiCommand::saveUser);
 
     /**%apidoc:arrayParams POST /ec2/saveUsers
     * Saves the list of users. Only local and LDAP users are supported. Cloud users won't be saved.
@@ -1334,7 +1367,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc GET /ec2/getLayouts
      * Return list of user layout
      * %param[default] format
-     * %param[opt]:string id Layout unique ID or logical ID. If omitted, return data for all layouts.
+     * %param[opt]:string id Layout unique id or logical id. If omitted, return data for all
+     *     layouts.
      * %return List of layout objects in the requested format.
      * %// AbstractLayoutManager::getLayouts
      */
@@ -1401,7 +1435,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %value true
      * %param fixedWidth Fixed width of the layout in cells (integer).
      * %param fixedHeight Fixed height of the layout in cells (integer).
-     * %param logicalId Logical ID of the layout, set by user (integer).
+     * %param logicalId Logical id of the layout, set by user (integer).
      * %param backgroundImageFilename
      * %param backgroundWidth Width of the background image in cells (integer).
      * %param backgroundHeight Height of the background image in cells (integer).
@@ -1470,7 +1504,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %value true
      * %param fixedWidth Fixed width of the layout in cells (integer).
      * %param fixedHeight Fixed height of the layout in cells (integer).
-     * %param logicalId Logical ID of the layout, set by user (integer).
+     * %param logicalId Logical id of the layout, set by user (integer).
      * %param backgroundImageFilename
      * %param backgroundWidth Width of the background image in pixels (integer).
      * %param backgroundHeight Height of the background image in pixels (integer).
@@ -1918,7 +1952,7 @@ ErrorCode LocalConnectionFactory::getSettings(
     return QnDbManagerAccess(m_dbManager.get(), accessData).doQuery(nullptr, *outData);
 }
 
-template<class InputDataType>
+template<class InputDataType, class ProcessedDataType>
 void LocalConnectionFactory::regUpdate(
     QnRestProcessorPool* const restProcessorPool,
     ApiCommand::Value cmd,
@@ -1926,7 +1960,7 @@ void LocalConnectionFactory::regUpdate(
 {
     restProcessorPool->registerHandler(
         lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-        new UpdateHttpHandler<InputDataType>(m_directConnection),
+        new UpdateHttpHandler<InputDataType, ProcessedDataType>(m_directConnection),
         permission);
 }
 

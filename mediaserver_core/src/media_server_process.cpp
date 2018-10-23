@@ -206,7 +206,6 @@
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
-#include <nx/network/deprecated/simple_http_client.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
@@ -273,6 +272,8 @@
 #include <rest/handlers/sync_time_rest_handler.h>
 #include <rest/handlers/metrics_rest_handler.h>
 #include <nx/mediaserver/event/event_connector.h>
+#include <nx/network/http/http_client.h>
+#include <core/resource_management/resource_data_pool.h>
 
 #if !defined(EDGE_SERVER) && !defined(__aarch64__)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -301,6 +302,7 @@ static bool gRestartFlag = false;
 
 namespace {
 
+static const std::chrono::seconds kResourceDataReadingTimeout(5);
 const QString YES = lit("yes");
 const QString NO = lit("no");
 const QString MEDIATOR_ADDRESS_UPDATE = lit("mediatorAddressUpdate");
@@ -2429,10 +2431,12 @@ void MediaServerProcess::registerRestHandlers(
      * Get the static image from the camera.
      * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
      *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
-     * %param[opt]:string time Timestamp of the requested image (in milliseconds since epoch).
-     *     The special value "latest", which is the default value, requires to retrieve the latest
-     *     thumbnail. The special value "now" requires to retrieve the thumbnail corresponding to
-     *     the current time.
+     * %param[opt]:string time Timestamp of the requested image (in milliseconds since epoch).<br/>
+     *     The special value "now" requires to retrieve the thumbnail only from the live stream.
+     *     <br/>The special value "latest", which is the default value, requires to retrieve
+     *     thumbnail from the live stream if possible, otherwise the latest one from the archive.
+     *     <br/>Note: archive extraction can be quite slow operation depending place where it is
+     *     stored.
      * %param[opt]:integer rotate Image orientation. Can be 0, 90, 180 or 270 degrees. If the
      *     parameter is absent or equals -1, the image will be rotated as defined in the camera
      *     settings.
@@ -2828,21 +2832,28 @@ void MediaServerProcess::initPublicIpDiscovery()
         serverModule()->settings().publicIPServers().split(";", QString::SkipEmptyParts));
 
     int publicIPEnabled = serverModule()->settings().publicIPEnabled();
-    if (publicIPEnabled == 0)
-        return; // disabled
-    else if (publicIPEnabled > 1)
+    if (publicIPEnabled == 0) //< Public IP disabled.
+        return;
+
+    if (publicIPEnabled > 1) //< Public IP manually set.
     {
         auto staticIp = serverModule()->settings().staticPublicIP();
-        at_updatePublicAddress(QHostAddress(staticIp)); // manually added
+        at_updatePublicAddress(QHostAddress(staticIp));
         return;
     }
+
+    // Discover public IP.
     m_ipDiscovery->update();
-    m_ipDiscovery->waitForFinished();
+    m_ipDiscovery->waitForFinished(); //< NOTE: Slows down server startup, should be avoided here.
     at_updatePublicAddress(m_ipDiscovery->publicIP());
 }
 
-void MediaServerProcess::initPublicIpDiscoveryUpdate()
+void MediaServerProcess::startPublicIpDiscovery()
 {
+    // Should start periodic discovery only when public IP auto-discovery is enabled.
+    if (serverModule()->settings().publicIPEnabled() != 1)
+        return;
+
     m_updatePiblicIpTimer = std::make_unique<QTimer>();
     connect(m_updatePiblicIpTimer.get(), &QTimer::timeout,
         m_ipDiscovery.get(), &nx::network::PublicIPDiscovery::update);
@@ -3073,7 +3084,8 @@ void MediaServerProcess::initializeLogging()
             {
                 QnLog::HWID_LOG,
                 nx::utils::log::Tag(toString(typeid(nx::mediaserver::LicenseWatcher)))
-            }));
+            }),
+        /*writeLogHeader*/ false);
 
     logSettings.loggers.front().level.parse(cmdLineArguments().ec2TranLogLevel,
         settings.tranLogLevel(), toString(nx::utils::log::Level::none));
@@ -3210,6 +3222,12 @@ void MediaServerProcess::initStaticCommonModule()
         QnAppInfo::productNameShort(),
         QnAppInfo::customizationName());
 }
+
+void MediaServerProcess::setSetupModuleCallback(std::function<void(QnMediaServerModule*)> callback)
+{
+    m_setupModuleCallback = std::move(callback);
+}
+
 bool MediaServerProcess::setUpMediaServerResource(
     CloudIntegrationManager* cloudIntegrationManager,
     QnMediaServerModule* serverModule,
@@ -3384,8 +3402,6 @@ void MediaServerProcess::stopObjects()
         m_initStoragesAsyncPromise->get_future().wait();
     // todo: #rvasilenko some undeleted resources left in the QnMain event loop. I stopped TimerManager as temporary solution for it.
     nx::utils::TimerManager::instance()->stop();
-
-    m_hlsSessionPool.reset();
 
     // Remove all stream recorders.
     m_remoteArchiveSynchronizer.reset();
@@ -3923,6 +3939,103 @@ void MediaServerProcess::loadResourcesFromDatabase()
         moveHandlingCameras();
 }
 
+static QByteArray loadDataFromFile(const QString& fileName)
+{
+    QFile file(fileName);
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return file.readAll();
+    return QByteArray();
+}
+
+static QByteArray loadDataFromUrl(nx::utils::Url url)
+{
+    auto httpClient = std::make_unique<nx::network::http::HttpClient>();
+    httpClient->setResponseReadTimeout(kResourceDataReadingTimeout);
+    if (httpClient->doGet(url)
+        && httpClient->response()->statusLine.statusCode == nx::network::http::StatusCode::ok)
+    {
+        const auto value = httpClient->fetchEntireMessageBody();
+        if (value)
+            return *value;
+    }
+    return QByteArray();
+}
+
+void MediaServerProcess::loadResourceParamsData()
+{
+    const std::array<const char*,2> kUrlsToLoadResourceData =
+    {
+        "http://updates.networkoptix.com/resource_data.json",
+        "http://beta.networkoptix.com/beta-builds/daily/resource_data.json"
+    };
+
+    auto manager = m_ec2Connection->getResourceManager(Qn::kSystemAccess);
+
+    using namespace nx::vms::api;
+    QString source;
+    ResourceParamWithRefData param;
+    param.name = Qn::kResourceDataParamName;
+
+    QString oldValue;
+    nx::vms::api::ResourceParamWithRefDataList data;
+    manager->getKvPairsSync(QnUuid(), &data);
+    for (const auto& param: data)
+    {
+        if (param.name == Qn::kResourceDataParamName)
+        {
+            oldValue = param.value;
+            break;
+        }
+    }
+    if (oldValue.isEmpty())
+    {
+        source = ":/resource_data.json";
+        param.value = loadDataFromFile(source); //< Default value.
+    }
+
+    for (const auto& url: kUrlsToLoadResourceData)
+    {
+        const auto internetValue = loadDataFromUrl(url);
+        if (!internetValue.isEmpty())
+        {
+            if (serverModule()->commonModule()->dataPool()->validateData(internetValue))
+            {
+                param.value = internetValue;
+                source = url;
+                break;
+            }
+            else
+            {
+                NX_WARNING(this, "Skip invalid resource_data.json from %1", internetValue);
+            }
+        }
+    }
+
+    if (!param.value.isEmpty() && oldValue != param.value)
+    {
+        NX_INFO(this, "Update system wide resource_data.json from %1", source);
+
+        // Update data in the database if there is no value or get update from the HTTP request.
+        ResourceParamWithRefDataList params;
+        params.push_back(param);
+        manager->saveSync(params);
+    }
+
+    const auto externalResourceFileName =
+        QCoreApplication::applicationDirPath() + lit("/resource_data.json");
+    auto externalFile = loadDataFromFile(externalResourceFileName);
+    if (!externalFile.isEmpty())
+    {
+        // Update local data only without saving to DB if external static file is defined.
+        NX_INFO(this, "Update local resource_data.json from %1", externalResourceFileName);
+        param.value = externalFile;
+        ResourceParamWithRefDataList params;
+        params.push_back(param);
+        manager->saveSync(params);
+        m_serverMessageProcessor->resetPropertyList(params);
+    }
+}
+
 void MediaServerProcess::updateRootPassword()
 {
     // TODO: Root password for Nx1 should be updated in case of cloud owner.
@@ -4008,7 +4121,7 @@ void MediaServerProcess::run()
     if (!connectToDatabase())
         return;
 
-    m_discoveryMonitor = std::make_unique<ec2::QnDiscoveryMonitor>(
+    m_discoveryMonitor = std::make_unique<nx::mediaserver::discovery::DiscoveryMonitor>(
         m_ec2ConnectionFactory->messageBus());
 
     initializeAnalyticsEvents();
@@ -4026,8 +4139,6 @@ void MediaServerProcess::run()
 
     if (needToStop())
         return;
-
-    m_hlsSessionPool = std::make_unique<nx::mediaserver::hls::SessionPool>();
 
     if (!initTcpListener(
         m_timeBasedNonceProvider.get(),
@@ -4071,6 +4182,7 @@ void MediaServerProcess::run()
 
     initializeUpnpPortMapper();
 
+    loadResourceParamsData();
     loadResourcesFromDatabase();
 
     m_serverMessageProcessor->startReceivingLocalNotifications(m_ec2Connection);
@@ -4079,7 +4191,7 @@ void MediaServerProcess::run()
 
     at_runtimeInfoChanged(commonModule()->runtimeInfoManager()->localInfo());
 
-    initPublicIpDiscoveryUpdate();
+    startPublicIpDiscovery();
 
     saveServerInfo(m_mediaServer);
 
@@ -4112,6 +4224,8 @@ void MediaServerProcess::run()
         updateAllowCameraChangesIfNeeded();
         commonModule()->globalSettings()->synchronizeNowSync();
     #endif
+    if (m_setupModuleCallback)
+        m_setupModuleCallback(serverModule.get());
 
     commonModule()->resourceDiscoveryManager()->setReady(true);
 

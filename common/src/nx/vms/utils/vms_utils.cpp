@@ -56,7 +56,12 @@ bool configureLocalPeerAsPartOfASystem(
     const ConfigureSystemData& data)
 {
     if (commonModule->globalSettings()->localSystemId() == data.localSystemId)
+    {
+        NX_VERBOSE(typeid(VmsUtilsFunctionsTag), 
+            lm("No need to configure local peer. System id is already %1")
+                .args(data.localSystemId));
         return true;
+    }
 
     QnMediaServerResourcePtr server =
         commonModule->resourcePool()->getResourceById<QnMediaServerResource>(
@@ -72,13 +77,23 @@ bool configureLocalPeerAsPartOfASystem(
     // add foreign users
     for (const auto& user : data.foreignUsers)
     {
-        if (connection->getUserManager(Qn::kSystemAccess)->saveSync(user) != ec2::ErrorCode::ok)
+        if (const auto result = connection->getUserManager(Qn::kSystemAccess)->saveSync(user);
+            result != ec2::ErrorCode::ok)
+        {
+            NX_DEBUG(typeid(VmsUtilsFunctionsTag), lm("Failed to save user %1. %2")
+                .args(user.name, ec2::toString(result)));
             return false;
+        }
     }
 
     // add foreign resource params
-    if (connection->getResourceManager(Qn::kSystemAccess)->saveSync(data.additionParams) != ec2::ErrorCode::ok)
+    if (const auto result = connection->getResourceManager(Qn::kSystemAccess)->saveSync(data.additionParams);
+        result != ec2::ErrorCode::ok)
+    {
+        NX_DEBUG(typeid(VmsUtilsFunctionsTag), 
+            lm("Failed to save additional parameters. %1").args(ec2::toString(result)));
         return false;
+    }
 
     // apply remote settings
     const auto& settings = commonModule->globalSettings()->allSettings();

@@ -10,12 +10,11 @@
 #include <nx/streaming/config.h>
 
 #include <utils/common/connective.h>
+#include <recording/time_period_list.h>
 
 class QnlTimeSource;
 class QnMediaStreamStatistics;
-class QnResource;
 class QnAbstractArchiveStreamReader;
-class QnTimePeriod;
 
 class QnClientVideoCamera : public Connective<QObject> {
     Q_OBJECT
@@ -52,7 +51,8 @@ public:
         const QString& fileName, const QString& format,
         QnStorageResourcePtr storage,
         StreamRecorderRole role,
-        qint64 serverTimeZoneMs);
+        qint64 serverTimeZoneMs,
+        const QnTimePeriodList& playbackMask = QnTimePeriodList());
 
     void setResource(QnMediaResourcePtr resource);
     QString exportedFileName() const;

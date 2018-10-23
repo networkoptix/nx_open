@@ -40,6 +40,7 @@ public:
     MediatorProcess(int argc, char **argv);
 
     std::vector<network::SocketAddress> httpEndpoints() const;
+    std::vector<network::SocketAddress> httpsEndpoints() const;
     std::vector<network::SocketAddress> stunUdpEndpoints() const;
     std::vector<network::SocketAddress> stunTcpEndpoints() const;
     ListeningPeerPool* listeningPeerPool() const;

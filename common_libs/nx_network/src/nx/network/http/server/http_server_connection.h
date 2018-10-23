@@ -145,7 +145,7 @@ private:
     std::deque<std::unique_ptr<ResponseMessageContext>> m_responseQueue;
     std::optional<SocketAddress> m_clientEndpoint;
     std::atomic<std::int64_t> m_lastRequestSequence{0};
-    std::map<int /*sequence*/, std::unique_ptr<ResponseMessageContext>>
+    std::map<std::int64_t /*sequence*/, std::unique_ptr<ResponseMessageContext>>
         m_requestsBeingProcessed;
 
     void extractClientEndpoint(const HttpHeaders& headers);

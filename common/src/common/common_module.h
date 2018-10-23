@@ -7,7 +7,6 @@
 
 #include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
-#include <plugins/native_sdk/common_plugin_container.h>
 #include <utils/common/instance_storage.h>
 #include <utils/common/value_cache.h>
 
@@ -36,6 +35,7 @@ class QnResourceDiscoveryManager;
 class QnServerAdditionalAddressesDictionary;
 class QnAuditManager;
 class CameraDriverRestrictionList;
+class QnResourceDataPool;
 
 namespace nx { namespace vms { namespace event { class RuleManager; }}}
 namespace nx { namespace metrics { struct Storage; } }
@@ -277,6 +277,8 @@ public:
     /** instanceCounter used for unit test purpose only */
 
     CameraDriverRestrictionList* cameraDriverRestrictionList() const;
+
+    QnResourceDataPool* dataPool() const;
 signals:
     void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();
@@ -337,6 +339,7 @@ private:
     nx::vms::event::RuleManager* m_eventRuleManager = nullptr;
     QnAuditManager* m_auditManager = nullptr;
     CameraDriverRestrictionList* m_cameraDriverRestrictionList = nullptr;
+    QnResourceDataPool* m_dataPool = nullptr;
 
     // TODO: #dmishin move these factories to server module
     QnUuid m_videowallGuid;

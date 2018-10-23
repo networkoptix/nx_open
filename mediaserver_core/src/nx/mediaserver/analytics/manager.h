@@ -27,7 +27,7 @@
 #include <nx/debugging/abstract_visual_metadata_debugger.h>
 #include <nx/sdk/analytics/uncompressed_video_frame.h>
 #include <nx/mediaserver/server_module_aware.h>
-#include <nx/plugins/settings.h>
+#include <plugins/settings.h>
 
 class QnMediaServerModule;
 class QnCompressedVideoData;

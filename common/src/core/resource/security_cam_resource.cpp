@@ -11,7 +11,6 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <common/common_module.h>
-#include <common/static_common_module.h>
 
 #include <recording/time_period_list.h>
 #include "camera_user_attribute_pool.h"
@@ -21,7 +20,6 @@
 #include "nx/fusion/serialization/json.h"
 #include <nx/fusion/model_functions.h>
 #include "media_server_user_attributes.h"
-#include <common/static_common_module.h>
 #include <utils/common/synctime.h>
 
 #include <nx/utils/log/log.h>
@@ -69,8 +67,12 @@ QnUuid QnSecurityCamResource::makeCameraIdFromUniqueId(const QString& uniqueId)
     return guidFromArbitraryData(uniqueId);
 }
 
-//const int PRIMARY_ENCODER_INDEX = 0;
-//const int SECONDARY_ENCODER_INDEX = 1;
+void QnSecurityCamResource::setCommonModule(QnCommonModule* commonModule)
+{
+    base_type::setCommonModule(commonModule);
+    connect(commonModule->dataPool(), &QnResourceDataPool::changed, this,
+        &QnSecurityCamResource::resetCachedValues, Qt::DirectConnection);
+}
 
 QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     base_type(commonModule),
@@ -126,8 +128,7 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     m_cachedHasVideo(
         [this]()
         {
-            const auto data = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-            return !data.value(Qn::VIDEO_DISABLED_PARAM_NAME, false);
+            return !resourceData().value(Qn::VIDEO_DISABLED_PARAM_NAME, false);
         },
         &m_mutex)
 {
@@ -479,8 +480,7 @@ bool QnSecurityCamResource::isAnalogEncoder() const
     if (deviceType() == nx::core::resource::DeviceType::encoder)
         return true;
 
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    return resourceData.value<bool>(lit("analogEncoder"));
+    return resourceData().value<bool>(lit("analogEncoder"));
 }
 
 CombinedSensorsDescription QnSecurityCamResource::combinedSensorsDescription() const
@@ -508,8 +508,7 @@ bool QnSecurityCamResource::isSharingLicenseInGroup() const
     if (!QnLicense::licenseTypeInfo(licenseType()).allowedToShareChannel)
         return false; //< Don't allow sharing for encoders e.t.c
 
-    const auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    return resourceData.value<bool>(Qn::kCanShareLicenseGroup, false);
+    return resourceData().value<bool>(Qn::kCanShareLicenseGroup, false);
 }
 
 bool QnSecurityCamResource::isNvr() const
@@ -1315,6 +1314,7 @@ void QnSecurityCamResource::resetCachedValues()
     m_cachedCameraMediaCapabilities.reset();
     m_cachedLicenseType.reset();
     m_cachedDeviceType.reset();
+    m_cachedHasVideo.reset();
 }
 
 bool QnSecurityCamResource::useBitratePerGop() const
@@ -1323,12 +1323,7 @@ bool QnSecurityCamResource::useBitratePerGop() const
     if (!result.isEmpty())
         return result.toInt() > 0;
 
-    if (qnStaticCommon)
-    {
-        QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-        if (resourceData.value<bool>(Qn::FORCE_BITRATE_PER_GOP))
-            return true;
-    }
+    return resourceData().value<bool>(Qn::FORCE_BITRATE_PER_GOP);
     return false;
 }
 
@@ -1386,7 +1381,7 @@ Qn::StreamIndex QnSecurityCamResource::toStreamIndex(Qn::ConnectionRole role)
 nx::core::ptz::PresetType QnSecurityCamResource::preferredPtzPresetType() const
 {
     auto userPreference = userPreferredPtzPresetType();
-    if (userPreference != nx::core::ptz::PresetType::automatic)
+    if (userPreference != nx::core::ptz::PresetType::undefined)
         return userPreference;
 
     return defaultPreferredPtzPresetType();
@@ -1396,7 +1391,7 @@ nx::core::ptz::PresetType QnSecurityCamResource::userPreferredPtzPresetType() co
 {
     return QnLexical::deserialized(
         getProperty(Qn::kUserPreferredPtzPresetType),
-        nx::core::ptz::PresetType::automatic);
+        nx::core::ptz::PresetType::undefined);
 }
 
 void QnSecurityCamResource::setUserPreferredPtzPresetType(nx::core::ptz::PresetType presetType)
@@ -1408,7 +1403,7 @@ nx::core::ptz::PresetType QnSecurityCamResource::defaultPreferredPtzPresetType()
 {
     return QnLexical::deserialized(
         getProperty(Qn::kDefaultPreferredPtzPresetType),
-        nx::core::ptz::PresetType::automatic);
+        nx::core::ptz::PresetType::native);
 }
 
 void QnSecurityCamResource::setDefaultPreferredPtzPresetType(nx::core::ptz::PresetType presetType)
@@ -1483,4 +1478,9 @@ Qn::MediaStreamEvent QnSecurityCamResource::checkForErrors() const
     if (capabilities.testFlag(Qn::IsOldFirmwareCapability))
         return Qn::MediaStreamEvent::oldFirmware;
     return Qn::MediaStreamEvent::NoEvent;
+}
+
+QnResourceData QnSecurityCamResource::resourceData() const
+{
+    return commonModule()->dataPool()->data(toSharedPointer(this));
 }

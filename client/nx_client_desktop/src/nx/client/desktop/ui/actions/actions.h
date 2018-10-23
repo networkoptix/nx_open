@@ -442,11 +442,6 @@ enum IDType
     OpenVideoWallReviewAction,
 
     /**
-     * Opens given camera in analytics mode.
-     */
-    StartAnalyticsAction,
-
-    /**
      * Menu containing all layouts belonging to the current user.
      */
     OpenCurrentUserLayoutMenu,
@@ -587,6 +582,11 @@ enum IDType
      * Opens videowall settings dialog.
      */
     VideowallSettingsAction,
+
+    /**
+     * Opens analytics engine settings dialog.
+     */
+    AnalyticsEngineSettingsAction,
 
     /**
      * Opens event log dialog with filter for current camera(s) issues
@@ -966,6 +966,11 @@ enum IDType
      * Exports selected bookmark.
      */
     ExportBookmarkAction,
+
+    /**
+     * Exports several selected bookmarks into a single layout.
+     */
+    ExportBookmarksAction,
 
     /**
      * Bookmark selected range.

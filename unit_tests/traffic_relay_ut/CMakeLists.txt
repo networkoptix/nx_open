@@ -1,2 +1,9 @@
-nx_add_test(traffic_relay_ut EXECUTABLE NO_MOC
-    PUBLIC_LIBS libtraffic_relay nx_network GTest GMock)
+nx_add_test(traffic_relay_ut
+    EXECUTABLE
+    NO_MOC
+    NO_RC_FILE
+    PUBLIC_LIBS
+        libtraffic_relay
+        nx_network
+        GTest
+        GMock)

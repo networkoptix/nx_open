@@ -27,7 +27,6 @@
 #include "av_resource.h"
 #include "av_panoramic.h"
 #include "av_singesensor.h"
-#include <common/static_common_module.h>
 
 const QString QnPlAreconVisionResource::MANUFACTURE(lit("ArecontVision"));
 #define MAX_RESPONSE_LEN (4*1024)
@@ -223,9 +222,9 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initializeCameraDriver()
     if (zone_size<1)
         zone_size = 1;
 
-    if (qnStaticCommon->dataPool()->data(toSharedPointer(this)).value<bool>(lit("hasRelayInput"), true))
+    if (resourceData().value<bool>(lit("hasRelayInput"), true))
         setCameraCapability(Qn::InputPortCapability, true);
-    if (qnStaticCommon->dataPool()->data(toSharedPointer(this)).value<bool>(lit("hasRelayOutput"), true))
+    if (resourceData().value<bool>(lit("hasRelayOutput"), true))
         setCameraCapability(Qn::OutputPortCapability, true);
 
     setFirmware(firmwareVersion);
@@ -235,10 +234,7 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initializeCameraDriver()
     m_zoneSite = zone_size;
     setMotionMaskPhysical(0);
     m_dualsensor = isDualSensor();
-
-    if (!isRTSPSupported())
-        setCameraCapability(Qn::CameraTimeCapability, false);
-
+    setCameraCapability(Qn::CameraTimeCapability, isRTSPSupported());
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -650,7 +646,7 @@ void QnPlAreconVisionResource::inputPortStateRequestDone(
 
 bool QnPlAreconVisionResource::isRTSPSupported() const
 {
-    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = resourceData();
     auto arecontRtspIsAllowed = qnGlobalSettings->arecontRtspEnabled();
     auto cameraSupportsH264 = isH264();
     auto cameraSupportsRtsp = resData.value<bool>(lit("isRTSPSupported"), true);

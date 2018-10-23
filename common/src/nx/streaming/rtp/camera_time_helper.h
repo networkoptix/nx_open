@@ -1,12 +1,11 @@
 #pragma once
 
-#include <QtCore/QMutex>
-#include <QtCore/QElapsedTimer>
+#include <optional>
+#include <memory>
+#include <chrono>
+#include <string>
 
-#include <nx/streaming/rtsp_client.h>
-#include <nx/utils/elapsed_timer.h>
-#include <nx/utils/thread/mutex.h>
-#include <nx/utils/time_helper.h>
+#include <nx/streaming/rtp/rtcp.h>
 
 namespace nx::streaming::rtp {
 
@@ -16,24 +15,61 @@ enum class TimePolicy
     forceCameraTime, //< Use camera NPT time only.
 };
 
-class CameraTimeHelper: private utils::TimeHelper
+struct TimeOffset
+{
+    std::chrono::microseconds get() { return std::chrono::microseconds(*m_timeOffset); }
+    void reset(std::chrono::microseconds value) { m_timeOffset = value.count(); };
+    bool hasValue() { return m_timeOffset.has_value(); }
+
+private:
+    std::optional<std::atomic<int64_t>> m_timeOffset;
+};
+
+using TimeOffsetPtr = std::shared_ptr<TimeOffset>;
+
+class CameraTimeHelper
 {
 public:
-    CameraTimeHelper(const QString& resourceId);
-    int64_t getUsecTime(
-        int64_t rtpTime, const QnRtspStatistic& statistics, int rtpFrequency, bool primaryStream);
-    void setResyncThresholdMsec(int64_t value) { m_resyncThresholdMsec = value; }
+    using CurrentTimeGetter = std::function<std::chrono::microseconds()>;
+    CameraTimeHelper(
+        const std::string& resourceId,
+        const TimeOffsetPtr& offset);
+
+    std::chrono::microseconds getTime(
+        std::chrono::microseconds currentTime,
+        uint32_t rtpTime,
+        const RtcpSenderReport& senderReport,
+        std::optional<std::chrono::microseconds> onvifTime,
+        int rtpFrequency,
+        bool isPrimaryStream);
+
+    void setResyncThreshold(std::chrono::milliseconds value) { m_resyncThreshold = value; }
     void setTimePolicy(TimePolicy policy) { m_timePolicy = policy; }
 
 private:
-    int64_t cameraTimeToLocalTime(
-        int64_t cameraUsec, int64_t localTimeUsec, bool usePrivateOffset, bool primaryStream);
-    void resetTimeOffset(bool usePrivateOffset);
+    struct RptTimeLinearizer
+    {
+        int64_t linearize(uint32_t rtpTime);
 
+    private:
+        uint32_t m_prevTime = 0;
+        int64_t m_highPart = 0;
+    };
+
+    std::chrono::microseconds getCameraTimestamp(
+        uint32_t rtpTime,
+        const RtcpSenderReport& senderReport,
+        std::optional<std::chrono::microseconds> onvifTime,
+        int frequency);
 private:
-    int64_t m_resyncThresholdMsec = 1000;
-    int64_t m_rtpTimeOffset = 0; //< used in case when no rtcp reports
+    TimeOffsetPtr m_primaryOffset;
+    CurrentTimeGetter m_timeGetter;
+    TimeOffset m_localOffset; //< used in case when no rtcp reports
+    std::chrono::milliseconds m_resyncThreshold {1000};
+    std::chrono::milliseconds m_streamsSyncThreshold {5000};
     TimePolicy m_timePolicy = TimePolicy::bindCameraTimeToLocalTime;
+    std::string m_resourceId;
+    RptTimeLinearizer m_linearizer;
 };
 
 } // namespace nx::streaming::rtp

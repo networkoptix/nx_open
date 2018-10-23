@@ -23,6 +23,7 @@
 #include <utils/common/util.h>
 
 #include <media/filters/h264_mp4_to_annexb.h>
+#include <ini.h>
 
 QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnAbstractMediaStreamDataProvider* reader) :
     base_type(nullptr),
@@ -138,7 +139,8 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
     const QString& format,
     QnStorageResourcePtr storage,
     StreamRecorderRole role,
-    qint64 serverTimeZoneMs)
+    qint64 serverTimeZoneMs,
+    const QnTimePeriodList& playbackMask)
 {
     qint64 startTimeUs = timePeriod.startTimeMs * 1000ll;
     NX_ASSERT(timePeriod.durationMs > 0, Q_FUNC_INFO, "Invalid time period, possibly LIVE is exported");
@@ -163,11 +165,17 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
             return;
         }
         archiveReader->setCycleMode(false);
+
+        // Can we have another role in exportMediaPeriodToFile method?
         if (role == StreamRecorderRole::fileExport)
         {
             archiveReader->setQuality(MEDIA_Quality_ForceHigh, true); // for 'mkv' and 'avi' files
             // Additing filtering is required in case of.AVI export.
                 archiveReader->addMediaFilter(std::make_shared<H264Mp4ToAnnexB>());
+
+            // FIXME: #GDM Remove check when will be sure this function won't break base export.
+            if (nx::client::desktop::ini().enableCaseExport)
+                archiveReader->setPlaybackMask(playbackMask);
         }
 
         QnRtspClientArchiveDelegate* rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*> (archiveReader->getArchiveDelegate());

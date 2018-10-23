@@ -79,7 +79,7 @@ nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
         return nullptr;
 
     EngineManifest events = fetchSupportedEvents(*deviceInfo);
-    if (events.outputEventTypes.empty())
+    if (events.eventTypes.empty())
         return nullptr;
 
     return new DeviceAgent(this, *deviceInfo, events);
@@ -112,7 +112,7 @@ EngineManifest Engine::fetchSupportedEvents(const DeviceInfo& deviceInfo)
     axisCameraController.removeForbiddenEvents(forbiddenDescriptions);
 
     const auto& src = axisCameraController.suppotedEvents();
-    std::transform(src.begin(), src.end(), std::back_inserter(result.outputEventTypes),
+    std::transform(src.begin(), src.end(), std::back_inserter(result.eventTypes),
         [](const nx::axis::SupportedEventType& eventType) {return EventType(eventType); });
 
     // Being uncommented, the next code line allows to get the list of supported events in the same

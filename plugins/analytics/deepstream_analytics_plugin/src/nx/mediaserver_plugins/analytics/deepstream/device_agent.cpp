@@ -126,34 +126,35 @@ const char* DeviceAgent::manifest(Error* error)
 {
     *error = Error::noError;
 
-    static const std::string kManifestPrefix = (R"json(
-        {
-            "supportedObjectTypes": [)json");
-
-    static const std::string kManifestPostfix = "]}";
-
     if (!m_manifest.empty())
         return m_manifest.c_str();
 
-    m_manifest = kManifestPrefix;
+    std::string objectTypeIds;
     const auto& objectClassDescritions = m_engine->objectClassDescritions();
-
+    static const std::string kIndent = "        ";
     if (ini().pipelineType == kOpenAlprPipeline)
     {
-        m_manifest += "\"" + kLicensePlateGuid +"\"";
+        objectTypeIds += kIndent + "\"" + kLicensePlateGuid +"\"";
     }
     else
     {
         for (auto i = 0; i < objectClassDescritions.size(); ++i)
         {
-            m_manifest += "\"" + objectClassDescritions[i].typeId + "\"";
+            objectTypeIds += kIndent + "\"" + objectClassDescritions[i].typeId + "\"";
 
             if (i < objectClassDescritions.size() - 1)
-                m_manifest += ',';
+                objectTypeIds += ",\n";
         }
     }
 
-    m_manifest += kManifestPostfix;
+    m_manifest = /*suppress newline*/1 + R"json(
+{
+    "supportedObjectTypeIds": [
+)json" + objectTypeIds + R"json(
+    ]
+}
+)json";
+
     return m_manifest.c_str();
 }
 
