@@ -56,8 +56,7 @@ QString getConfiguredVideoLayout(const QnResourcePtr& resource)
     auto secResource = resource.dynamicCast<QnSecurityCamResource>();
     if (secResource)
     {
-        auto resData = qnStaticCommon->dataPool()->data(secResource);
-        configuredLayout = resData.value<QString>(Qn::VIDEO_LAYOUT_PARAM_NAME2);
+        configuredLayout = secResource->resourceData().value<QString>(Qn::VIDEO_LAYOUT_PARAM_NAME2);
     }
     if (configuredLayout.isEmpty())
     {
