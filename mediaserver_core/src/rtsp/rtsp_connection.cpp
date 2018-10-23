@@ -985,7 +985,8 @@ int QnRtspConnectionProcessor::composeSetup()
             }
         }
     }
-    d->response.headers.insert(nx_http::HttpHeader("Transport", transport));
+    nx_http::insertOrReplaceHeader(
+        &d->response.headers, nx_http::HttpHeader("Transport", transport));
     return CODE_OK;
 }
 
