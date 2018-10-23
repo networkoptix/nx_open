@@ -33,6 +33,9 @@
 #include <nx/vms/event/rule_manager.h>
 #include <nx/vms/event/rule.h>
 
+#include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <nx/vms/common/resource/analytics_plugin_resource.h>
+
 using namespace nx;
 
 namespace {
@@ -805,6 +808,82 @@ Handle ServerConnection::getUpdateStatus(Result<UpdateStatusAll>::type callback,
 {
     QnRequestParamList params;
     return executeGet("/ec2/updateStatus", params, callback, targetThread);
+}
+
+//--------------------------------------------------------------------------------------------------
+
+Handle ServerConnection::getEngineAnalyticsSettings(
+    const nx::vms::common::AnalyticsEngineResourcePtr& engine,
+    Result<QMap<QString, QString>>::type&& callback,
+    QThread* targetThread)
+{
+    QnRequestParamList params{{"engineId", engine->getId().toString()}};
+    return executeGet("/ec2/analyticsEngineSettings", params, callback, targetThread);
+}
+
+Handle ServerConnection::setEngineAnalyticsSettings(
+    const nx::vms::common::AnalyticsEngineResourcePtr& engine,
+    const QVariantMap& settings,
+    std::function<void(Handle, bool)>&& callback,
+    QThread* targetThread)
+{
+    auto internalCallback =
+        [callback = std::move(callback)](
+            bool success, rest::Handle handle, EmptyResponseType response)
+        {
+            callback(handle, success);
+        };
+
+    return executePost<EmptyResponseType>(
+        QString("/ec2/analyticsEngineSettings"),
+        QnRequestParamList {
+            {"engineId", engine->getId().toString()},
+            {"settings", QJson::serialized(QJsonObject::fromVariantMap(settings))}
+        },
+        nx::network::http::StringType("application/json"),
+        nx::network::http::StringType(),
+        std::move(internalCallback),
+        targetThread);
+}
+
+Handle ServerConnection::getDeviceAnalyticsSettings(
+    const QnVirtualCameraResourcePtr& device,
+    const nx::vms::common::AnalyticsEngineResourcePtr& engine,
+    Result<QMap<QString, QString>>::type&& callback,
+    QThread* targetThread)
+{
+    QnRequestParamList params {
+        {"deviceId", device->getId().toString()},
+        {"engineId", engine->getId().toString()},
+    };
+    return executeGet("/ec2/deviceAnalyticsSettings", params, callback, targetThread);
+}
+
+Handle ServerConnection::setDeviceAnalyticsSettings(
+    const QnVirtualCameraResourcePtr& device,
+    const nx::vms::common::AnalyticsEngineResourcePtr& engine,
+    const QVariantMap& settings,
+    std::function<void(Handle, bool)>&& callback,
+    QThread* targetThread)
+{
+    auto internalCallback =
+        [callback = std::move(callback)](
+            bool success, rest::Handle handle, EmptyResponseType response)
+        {
+            callback(handle, success);
+        };
+
+    return executePost<EmptyResponseType>(
+        QString("/ec2/deviceAnalyticsSettings"),
+        QnRequestParamList {
+            {"deviceId", device->getId().toString()},
+            {"engineId", engine->getId().toString()},
+            {"settings", QJson::serialized(QJsonObject::fromVariantMap(settings))}
+        },
+        nx::network::http::StringType("application/json"),
+        nx::network::http::StringType(),
+        std::move(internalCallback),
+        targetThread);
 }
 
 // --------------------------- private implementation -------------------------------------
