@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QPointer>
+#include <QtCore/QUrl>
 
 #include <ui/dialogs/common/button_box_dialog.h>
 #include <utils/common/updatable.h>
@@ -33,11 +34,13 @@ public:
     int currentPage() const;
 
     /**
-     * @brief setCurrentPage                    Select current page by key.
-     * \param adjust                            If set to true, nearest available page will be
-     *                                          selected if target page is disabled or hidden.
+     * Select current page.
+     * @param adjust If set to true, nearest available page will be selected if target page is
+     *     disabled or hidden.
+     * @param url Activate a specific resource or location inside the page denoted by the URL.
+     *     If page was adjusted URL will not be activated.
      */
-    void setCurrentPage(int page, bool adjust = false);
+    void setCurrentPage(int page, bool adjust = false, const QUrl& url = {});
 
     /**
       * @brief reject                           Overriding default reject method. Here the dialog will try to revert

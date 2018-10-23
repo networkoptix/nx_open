@@ -6,7 +6,8 @@ Text
     id: menuItem
 
     property NavigationMenu navigationMenu: null
-    readonly property bool current: navigationMenu && navigationMenu.currentItem === this
+    property var itemId: this
+    readonly property bool current: navigationMenu && navigationMenu.currentItemId === itemId
     property bool active: true
 
     leftPadding: 16
@@ -30,7 +31,7 @@ Text
         onClicked:
         {
             if (navigationMenu)
-                navigationMenu.currentItem = menuItem
+                navigationMenu.currentItemId = itemId
             menuItem.clicked()
         }
     }
