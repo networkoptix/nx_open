@@ -2,8 +2,6 @@ import QtQuick 2.6
 import QtGraphicalEffects 1.0
 import Nx.Core.Items 1.0
 
-// Test control for now. Represents simple ROI
-
 Item
 {
     id: item
@@ -25,6 +23,26 @@ Item
     width: d.bottomRightPoint.x - d.topLeftPoint.x + 1
     height: d.bottomRightPoint.y - d.topLeftPoint.y + 1
 
+    // Shows preloader
+    function start()
+    {
+        d.preloader = true
+    }
+
+    // Shows selection
+    function show()
+    {
+        d.visible = true
+        d.preloader = false
+    }
+
+    // Hides whatever it shows.
+    function hide()
+    {
+        d.preloader = false
+        d.visible = false
+    }
+
     RoiSelectionPreloader
     {
         id: singleSelectionMarker
@@ -33,11 +51,10 @@ Item
         shadowColor: item.shadowColor
         state:
         {
-            enableAnimation = !item.drawing
-            if (item.drawing)
+            if (d.preloader || item.drawing)
                 return "expanded"
 
-            return singlePoint ? "normal" : "hidden"
+            return d.visible && item.singlePoint ? "normal" : "hidden"
         }
 
         centerPoint: d.endMarkerPoint
@@ -48,7 +65,7 @@ Item
     {
         id: roiMarker
 
-        visible: item.drawing || !item.singlePoint
+        visible: (item.drawing || !item.singlePoint) && d.visible
         anchors.fill: parent
         border.width: d.shadowRadius * 2 + boundingLines.border.width
         border.color: item.shadowColor
@@ -92,6 +109,8 @@ Item
     {
         id: d
 
+        property bool visible: false
+        property bool preloader: false
         readonly property int shadowRadius: 1
         readonly property real subpixelOffset: 0.5
         readonly property real markerOffset: shadowRadius + subpixelOffset

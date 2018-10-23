@@ -20,6 +20,12 @@ Item
 
     function clearCustomRoi()
     {
+        if (d.customRoi)
+            d.customRoi.hide()
+
+        d.customRoi = null
+        d.selectionRoi = null
+
         d.customFirstPoint = undefined
         d.customSecondPoint = undefined
         updateDefaultRoi()
@@ -47,7 +53,7 @@ Item
         if (drawingRoi)
         {
             d.customSecondPoint = relativePos
-            selectionPreloader.centerPoint = d.getSubpixeled(pos)
+            d.selectionRoi.endPoint = Qt.binding(function() { return d.fromRelative(relativePos)})
         }
         else if (!d.nearPositions(d.customInitialPoint, relativePos))
         {
@@ -59,6 +65,9 @@ Item
     {
         d.customFirstPoint = d.customInitialPoint
         d.customSecondPoint = d.customInitialPoint
+        d.selectionRoi.show()
+        if (d.customRoi)
+            d.customRoi.hide()
     }
 
     function handlePressed(pos)
@@ -66,11 +75,18 @@ Item
         if (pressFilterTimer.running)
             return // We don't allow to start long tap after fast clicks (double click, for example).
 
-        selectionPreloader.centerPoint = d.getSubpixeled(pos)
-
         pressFilterTimer.restart()
-        d.customInitialPoint = d.toRelative(pos)
+        var relativePos = d.toRelative(pos)
+        d.customInitialPoint = relativePos
         pressAndHoldTimer.restart()
+
+        d.selectionRoi = d.customRoi == firstRoi
+            ? secondRoi
+            : firstRoi
+
+        d.selectionRoi.startPoint = Qt.binding(function() { return d.fromRelative(relativePos)})
+        d.selectionRoi.endPoint = Qt.binding(function() { return d.fromRelative(relativePos)})
+        d.selectionRoi.start()
     }
 
     function handleReleased()
@@ -108,45 +124,22 @@ Item
         }
     }
 
-    RoiSelectionPreloader
+    MotionRoi
     {
-        id: selectionPreloader
+        id: firstRoi
 
-        mainColor: d.lineColor
+        roiColor: d.lineColor
         shadowColor: d.shadowColor
-        animationDuration: pressAndHoldTimer.interval
-
-        state:
-        {
-            var nextExpandedState = d.toBool(d.customInitialPoint && !customRoiMarker.drawing)
-            enableAnimation = nextExpandedState
-            return nextExpandedState ? "expanded" : "hidden"
-        }
+        drawing: controller.drawingRoi && d.selectionRoi == firstRoi
     }
 
     MotionRoi
     {
-        id: customRoiMarker
+        id: secondRoi
 
-        drawing: controller.drawingRoi
         roiColor: d.lineColor
         shadowColor: d.shadowColor
-        startPoint: drawing
-            ? d.fromRelative(d.customFirstPoint)
-            : d.fromRelative(d.currentFirstPoint)
-        endPoint: drawing
-            ? d.fromRelative(d.customSecondPoint)
-            : d.fromRelative(d.currentSecondPoint)
-        visible: controller.motionSearchMode //&& controller.customRoiExists // TODO: uncomment me at the end of the development
-        animationDuration: pressAndHoldTimer.interval
-
-        lineWidth: drawing ? 1 : 5 // TODO: remove me at the end of the development
-
-        onDrawingChanged:
-        {
-            if (!drawing)
-                d.setRoiPoints(d.customFirstPoint, d.customSecondPoint)
-        }
+        drawing: controller.drawingRoi && d.selectionRoi == secondRoi
     }
 
     Timer
@@ -176,12 +169,27 @@ Item
         }
     }
 
-    onDrawingRoiChanged: controller.motionSearchMode = true
+    onDrawingRoiChanged:
+    {
+        if (drawingRoi)
+        {
+            controller.motionSearchMode = true
+        }
+        else
+        {
+            d.setRoiPoints(d.customFirstPoint, d.customSecondPoint)
+            d.customRoi = d.selectionRoi
+            d.selectionRoi = null
+        }
+    }
     onCameraRotationChanged: updateDefaultRoi()
 
     QtObject
     {
         id: d
+
+        property MotionRoi selectionRoi: null
+        property MotionRoi customRoi: null
 
         readonly property color lineColor: ColorTheme.contrast1
         readonly property color shadowColor: ColorTheme.transparent(ColorTheme.base1, 0.2)
@@ -270,12 +278,12 @@ Item
         function handleMouseReleased()
         {
             d.customInitialPoint = undefined
+            if (d.selectionRoi)
+            {
+                d.selectionRoi.hide()
+                d.selectionRoi = null
+            }
             pressAndHoldTimer.stop()
-        }
-
-        function getSubpixeled(pos)
-        {
-            return Qt.point(pos.x + 0.5, pos.y + 0.5)
         }
 
         function setRoiPoints(first, second)
