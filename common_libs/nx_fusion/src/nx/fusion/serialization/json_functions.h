@@ -1,11 +1,12 @@
 #pragma once
 
 #include <chrono>
-#include <vector>
+#include <limits>
+#include <map>
+#include <optional>
 #include <set>
 #include <string>
-#include <map>
-#include <limits>
+#include <vector>
 
 #ifndef Q_MOC_RUN
 #include <boost/preprocessor/tuple/enum.hpp>
@@ -321,6 +322,18 @@ inline bool deserialize(
 template<typename T>
 inline void serialize(
     QnJsonContext* ctx,
+    const std::optional<T>& value,
+    QJsonValue* target)
+{
+    if (!value)
+        return;
+
+    QJson::serialize<T>(ctx, *value, target);
+}
+
+template<typename T>
+inline void serialize(
+    QnJsonContext* ctx,
     const boost::optional<T>& value,
     QJsonValue* target)
 {
@@ -330,6 +343,15 @@ inline void serialize(
     QJson::serialize<T>(ctx, value.get(), target);
 }
 
+template<typename T>
+inline bool deserialize(
+    QnJsonContext* ctx,
+    const QJsonValue& value,
+    std::optional<T>* target)
+{
+    *target = T();
+    return QJson::deserialize<T>(ctx, value, &target->value());
+}
 
 template<typename T>
 inline bool deserialize(
