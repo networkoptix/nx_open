@@ -103,15 +103,6 @@ QnLayoutResourcePtr QnLayoutResource::createFromResource(const QnResourcePtr& re
     return layout;
 }
 
-QStringList QnLayoutResource::searchFilters(bool /*useExtraSearchInformation*/) const
-{
-    QStringList result;
-    if (isFile())
-        result << getUrl();
-    result <<  getName();
-    return result;
-}
-
 void QnLayoutResource::setItems(const QnLayoutItemDataList& items)
 {
     QnLayoutItemDataMap map;
@@ -533,4 +524,30 @@ QSet<QnResourcePtr> QnLayoutResource::layoutResources(QnResourcePool* resourcePo
             result << resource;
     }
     return result;
-};
+}
+
+void QnLayoutResource::usePasswordForRecordings(const QString& password)
+{
+    NX_ASSERT(isFile());
+
+    auto items = layoutResources();
+
+    for (auto item: items)
+    {
+        if (auto aviItem = item.objectCast<QnAviResource>())
+            aviItem->usePasswordToRead(password);
+    }
+}
+
+void QnLayoutResource::forgetPasswordForRecordings()
+{
+    NX_ASSERT(isFile());
+
+    auto items = layoutResources();
+
+    for(auto &item: items)
+    {
+        if (auto aviItem = item.objectCast<QnAviResource>())
+            aviItem->forgetPassword();
+    }
+}

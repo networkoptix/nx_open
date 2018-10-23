@@ -41,7 +41,7 @@ bool isValidMotionRect(const QRect& rect)
 bool isValidMotionRegion(const QRegion& region)
 {
     return region.rectCount() > 0
-        && std::all_of(region.rects().cbegin(), region.rects().cend(), isValidMotionRect);
+        && std::all_of(region.cbegin(), region.cend(), isValidMotionRect);
 };
 
 } // namespace

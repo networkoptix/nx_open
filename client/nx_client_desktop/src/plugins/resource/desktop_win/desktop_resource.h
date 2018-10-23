@@ -19,8 +19,6 @@ public:
     virtual bool isRendererSlow() const override;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/) const override;
 
-    virtual QStringList searchFilters(bool useExtraSearchInformation) const override;
-
     static QnAbstractStreamDataProvider* createDataProvider(
         const QnResourcePtr& resource,
         Qn::ConnectionRole role);

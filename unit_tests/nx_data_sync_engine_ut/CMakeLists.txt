@@ -1,10 +1,5 @@
 nx_add_test(nx_data_sync_engine_ut
-    NO_MOC
-    NO_RC_FILE
     WERROR
     PUBLIC_LIBS
-        GTest
-        GMock
         libcloud_db
-        nx_data_sync_engine
-)
+        nx_data_sync_engine)

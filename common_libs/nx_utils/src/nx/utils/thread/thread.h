@@ -30,8 +30,6 @@ public:
     virtual bool isPaused() const;
     void pauseDelay();
 
-    void smartSleep(int ms);
-
     /**
      * @return Thread id, corresponding to this object.
      * This id is remembered in Thread::initSystemThreadId.
@@ -48,7 +46,7 @@ public:
 signals:
     void paused();
 
-public slots:
+public:
     virtual void start(Priority priority = InheritPriority);
     virtual void pleaseStop() override;
     virtual void stop();
@@ -56,7 +54,7 @@ public slots:
 protected:
     void initSystemThreadId();
 
-protected slots:
+protected:
     virtual void at_started();
     virtual void at_finished();
 

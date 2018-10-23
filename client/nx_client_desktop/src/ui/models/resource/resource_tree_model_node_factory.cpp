@@ -81,15 +81,14 @@ using namespace nx::client::desktop;
 QnResourceTreeModelNodePtr QnResourceTreeModelNodeFactory::createNode(
     NodeType nodeType,
     QnResourceTreeModel* model,
-    bool initialize,
-    bool useExtraSearchInformation)
+    bool initialize)
 {
     QnResourceTreeModelNodePtr result;
     switch (nodeType)
     {
         case NodeType::filteredCameras:
             result.reset(new GenericResourceTreeModelNode(
-                model, isAcceptableForModelCamera, nodeType, useExtraSearchInformation));
+                model, isAcceptableForModelCamera, nodeType));
             break;
 
         case NodeType::filteredLayouts:

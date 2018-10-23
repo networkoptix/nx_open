@@ -53,7 +53,6 @@ DeprecatedMulticastFinder::DeprecatedMulticastFinder(
     const unsigned int pingTimeoutMillis,
     const unsigned int keepAliveMultiply)
     :
-    QnLongRunnable(parent),
     QnCommonModuleAware(parent),
     m_options(options),
     m_serverSocket(nullptr),

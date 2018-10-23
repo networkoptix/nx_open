@@ -3860,38 +3860,59 @@ void QnPlOnvifResource::onPullMessagesResponseReceived(
 
 bool QnPlOnvifResource::fetchRelayOutputs(std::vector<RelayOutputInfo>* relayOutputInfoList)
 {
+#if 0
+    /*
+        See the comment to DeviceIO::RelayOutputs in header file.
+        This code should be tested with different cameras, especially DW.
+    */
     DeviceIO::RelayOutputs relayOutputs(this);
     relayOutputs.receiveBySoap();
+#endif
 
-    if (!relayOutputs && relayOutputs.soapError() != SOAP_MUSTUNDERSTAND)
-    {
-        NX_DEBUG(this, lit("Failed to get relay input/output info. endpoint %1").arg(relayOutputs.endpoint()));
-        return false;
-    }
-    auto data = relayOutputs.get();
+    const QAuthenticator auth = getAuth();
+    DeviceSoapWrapper soapWrapper(
+        onvifTimeouts(),
+        getDeviceOnvifUrl().toStdString(),
+        auth.user(),
+        auth.password(),
+        m_timeDrift);
 
-    m_relayOutputInfo.clear();
-    if (data->RelayOutputs.size() > MAX_IO_PORTS_PER_DEVICE)
+    _onvifDevice__GetRelayOutputs request;
+    _onvifDevice__GetRelayOutputsResponse response;
+
+    int soapRes = soapWrapper.getRelayOutputs(request, response);
+    if ((soapRes != SOAP_OK) && (soapRes != SOAP_MUSTUNDERSTAND))
     {
         NX_DEBUG(this, lit("Device has too many relay outputs. endpoint %1")
-            .arg(relayOutputs.endpoint()));
+            .arg(soapWrapper.endpoint()));
         return false;
     }
 
-    for(size_t i = 0; i < data->RelayOutputs.size(); ++i)
+    m_relayOutputInfo.clear();
+    if (response.RelayOutputs.size() > MAX_IO_PORTS_PER_DEVICE)
     {
-        m_relayOutputInfo.push_back(RelayOutputInfo(
-            data->RelayOutputs[i]->token,
-            data->RelayOutputs[i]->Properties->Mode == onvifXsd__RelayMode::Bistable,
-            data->RelayOutputs[i]->Properties->DelayTime,
-            data->RelayOutputs[i]->Properties->IdleState == onvifXsd__RelayIdleState::closed));
+        NX_DEBUG(this, lit("Device has too many relay outputs. endpoint %1")
+            .arg(soapWrapper.endpoint()));
+        return false;
+    }
+
+    for (const auto& output : response.RelayOutputs)
+    {
+        if (output)
+        {
+            m_relayOutputInfo.emplace_back(
+                output->token,
+                output->Properties->Mode == onvifXsd__RelayMode::Bistable,
+                output->Properties->DelayTime,
+                output->Properties->IdleState == onvifXsd__RelayIdleState::closed);
+        }
     }
 
     if (relayOutputInfoList)
         *relayOutputInfoList = m_relayOutputInfo;
 
     NX_DEBUG(this, lit("Successfully got device (%1) output ports info. Found %2 relay output").
-        arg(relayOutputs.endpoint()).arg(m_relayOutputInfo.size()));
+        arg(soapWrapper.endpoint()).arg(m_relayOutputInfo.size()));
 
     return true;
 }

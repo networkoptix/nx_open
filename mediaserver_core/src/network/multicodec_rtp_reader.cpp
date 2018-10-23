@@ -13,15 +13,14 @@
 #include <api/global_settings.h>
 #include <api/app_server_connection.h>
 
-#include <network/h264_rtp_parser.h>
-#include <network/hevc_rtp_parser.h>
-#include <network/aac_rtp_parser.h>
-#include <network/simpleaudio_rtp_parser.h>
-#include <network/mjpeg_rtp_parser.h>
-
-#include <nx/streaming/rtp_stream_parser.h>
 #include <nx/streaming/rtp/rtp.h>
 #include <nx/streaming/rtp/onvif_header_extension.h>
+#include <nx/streaming/rtp/parsers//h264_rtp_parser.h>
+#include <nx/streaming/rtp/parsers//hevc_rtp_parser.h>
+#include <nx/streaming/rtp/parsers//aac_rtp_parser.h>
+#include <nx/streaming/rtp/parsers//simpleaudio_rtp_parser.h>
+#include <nx/streaming/rtp/parsers//mjpeg_rtp_parser.h>
+
 #include <nx/network/compat_poll.h>
 #include <nx/utils/log/log.h>
 
@@ -448,27 +447,28 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
     return QnAbstractMediaDataPtr();
 }
 
-QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
+nx::streaming::rtp::StreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
 {
-    QnRtpStreamParser* result = 0;
-
+    nx::streaming::rtp::StreamParser* result = 0;
     if (codecName.isEmpty())
         return 0;
     else if (codecName == QLatin1String("H264"))
-        result = new CLH264RtpParser(getResource()->getUniqueId());
+        result = new nx::streaming::rtp::H264Parser(getResource()->getUniqueId());
     else if (codecName == QLatin1String("H265"))
-        result = new nx::network::rtp::HevcParser();
+        result = new nx::streaming::rtp::HevcParser();
     else if (codecName == QLatin1String("JPEG"))
-        result = new QnMjpegRtpParser;
+        result = new nx::streaming::rtp::MjpegParser;
     else if (codecName == QLatin1String("MPEG4-GENERIC"))
-        result = new QnAacRtpParser;
+        result = new nx::streaming::rtp::AacParser;
     else if (codecName == QLatin1String("PCMU")) {
-        QnSimpleAudioRtpParser* audioParser = new QnSimpleAudioRtpParser;
+        nx::streaming::rtp::SimpleAudioParser* audioParser =
+            new nx::streaming::rtp::SimpleAudioParser;
         audioParser->setCodecId(AV_CODEC_ID_PCM_MULAW);
         result = audioParser;
     }
     else if (codecName == QLatin1String("PCMA")) {
-        QnSimpleAudioRtpParser* audioParser = new QnSimpleAudioRtpParser;
+        nx::streaming::rtp::SimpleAudioParser* audioParser =
+            new nx::streaming::rtp::SimpleAudioParser;
         audioParser->setCodecId(AV_CODEC_ID_PCM_ALAW);
         result = audioParser;
     }
@@ -478,21 +478,23 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
         if (bitRatePos == -1)
             return 0;
         QString bitsPerSample = codecName.mid(bitRatePos+1);
-        QnSimpleAudioRtpParser* audioParser = new QnSimpleAudioRtpParser;
+        nx::streaming::rtp::SimpleAudioParser* audioParser =
+            new nx::streaming::rtp::SimpleAudioParser;
         audioParser->setCodecId(AV_CODEC_ID_ADPCM_G726);
         audioParser->setBitsPerSample(bitsPerSample.toInt()/8);
         audioParser->setSampleFormat(AV_SAMPLE_FMT_S16);
         result = audioParser;
     }
     else if (codecName == QLatin1String("L16")) {
-        QnSimpleAudioRtpParser* audioParser = new QnSimpleAudioRtpParser;
+        nx::streaming::rtp::SimpleAudioParser* audioParser
+            = new nx::streaming::rtp::SimpleAudioParser;
         audioParser->setCodecId(AV_CODEC_ID_PCM_S16BE);
         audioParser->setSampleFormat(AV_SAMPLE_FMT_S16);
         result = audioParser;
     }
 
     if (result)
-        Qn::directConnect(result, &QnRtpStreamParser::packetLostDetected, this, &QnMulticodecRtpReader::at_packetLost);
+        Qn::directConnect(result, &nx::streaming::rtp::StreamParser::packetLostDetected, this, &QnMulticodecRtpReader::at_packetLost);
 
     return result;
 }
@@ -673,7 +675,8 @@ void QnMulticodecRtpReader::createTrackParsers()
                         m_tracks[i].ioDevice->setForceRtcpReports(forceRtcpReports);
                 }
 
-                QnRtpAudioStreamParser* audioParser = dynamic_cast<QnRtpAudioStreamParser*> (m_tracks[i].parser.get());
+                nx::streaming::rtp::AudioStreamParser* audioParser =
+                    dynamic_cast<nx::streaming::rtp::AudioStreamParser*>(m_tracks[i].parser.get());
                 if (audioParser)
                     m_audioLayout = audioParser->getAudioLayout();
 

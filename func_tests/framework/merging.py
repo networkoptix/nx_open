@@ -21,6 +21,7 @@ def merge_systems(
         remote,  # type: Mediaserver
         take_remote_settings=DEFAULT_TAKE_REMOTE_SETTINGS,
         accessible_ip_net=DEFAULT_ACCESSIBLE_IP_NET,
+        timeout_sec=30,
         ):
     remote_interfaces = remote.api.interfaces()
     try:
@@ -28,7 +29,7 @@ def merge_systems(
     except StopIteration:
         raise RuntimeError('Unable to merge systems: none of interfaces %r of %r are in network %r' % (
             remote_interfaces, remote, accessible_ip_net))
-    local.api.merge(remote.api, remote_address, remote.port, take_remote_settings=take_remote_settings)
+    local.api.merge(remote.api, remote_address, remote.port, take_remote_settings, timeout_sec)
 
 
 def setup_system(mediaservers, scheme):

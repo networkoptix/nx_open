@@ -1039,6 +1039,7 @@ void MediaServerProcess::at_databaseDumped()
                 m_mediaServer,
                 nx::mserver_aux::createServerSettingsProxy(serverModule()).get()
             ).saveToSettings(serverModule()->roSettings());
+    NX_INFO(this, "Server restart is scheduled after dump database");
     restartServer(500);
 }
 
@@ -1057,6 +1058,7 @@ void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid
                     m_mediaServer,
                     nx::mserver_aux::createServerSettingsProxy(serverModule()).get()
                 ).saveToSettings(serverModule()->roSettings());
+        NX_INFO(this, "Server restart is scheduled because sysId time is changed");
         restartServer(0);
     }
 }

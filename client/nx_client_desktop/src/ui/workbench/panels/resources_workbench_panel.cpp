@@ -123,8 +123,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     connect(action(action::PinTreeAction), &QAction::toggled, this,
         [this](bool checked)
         {
-            if (checked)
-                setOpened(true);
+            setOpened(checked);
             emit geometryChanged();
         });
 
@@ -154,11 +153,11 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     m_hidingProcessor->addTargetItem(item);
     m_hidingProcessor->addTargetItem(m_showButton);
     m_hidingProcessor->addTargetItem(m_resizerWidget);
-    m_hidingProcessor->setHoverLeaveDelay(NxUi::kClosePanelTimeoutMs);
-    m_hidingProcessor->setFocusLeaveDelay(NxUi::kClosePanelTimeoutMs);
+    m_hidingProcessor->setHoverLeaveDelay(NxUi::kCloseSidePanelTimeoutMs);
+    m_hidingProcessor->setFocusLeaveDelay(NxUi::kCloseSidePanelTimeoutMs);
     connect(menu(), &nx::client::desktop::ui::action::Manager::menuAboutToHide, m_hidingProcessor,
         &HoverFocusProcessor::forceFocusLeave);
-    connect(m_hidingProcessor, &HoverFocusProcessor::hoverAndFocusLeft, this,
+    connect(m_hidingProcessor, &HoverFocusProcessor::hoverLeft, this,
         [this]
         {
             /* Do not auto-hide tree if we have opened context menu. */

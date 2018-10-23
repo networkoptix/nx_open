@@ -48,9 +48,9 @@ struct ListeningPeerData
 /**
  * Stores information on all peers currently listening for connections on all mediator instances.
  * For peers listening locally, holds weak reference to the connection.
- * @note synchronizes listening peer list with other mediator instances
- * @note Peer entry is removed from this pool when connection has been closed
- * @note class is thread-safe
+ * NOTE: synchronizes listening peer list with other mediator instances
+ * NOTE: Peer entry is removed from this pool when connection has been closed
+ * NOTE: class is thread-safe
  */
 class ListeningPeerPool
 {
@@ -101,7 +101,7 @@ public:
 
     /**
      * Inserts new or returns existing element with key peerData.
-     * @note Another thread will block trying to lock peerData while
+     * NOTE: Another thread will block trying to lock peerData while
      *     DataLocker instance is still alive.
      */
     DataLocker insertAndLockPeerData(

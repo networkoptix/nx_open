@@ -137,6 +137,7 @@
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_welcome_screen.h>
+#include <nx/client/desktop/resources/layout_password_management.h>
 
 #include <ui/workbench/handlers/workbench_layouts_handler.h>    // TODO: #GDM dependencies
 
@@ -1201,6 +1202,18 @@ void ActionHandler::at_dropResourcesAction_triggered()
 
     QnResourceList resources = parameters.resources();
     QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
+
+    if (layouts.size() == 1)
+    {
+        auto &layout = layouts.first();
+        if (layout::requiresPassword(layout))
+        {
+            layout::askAndSetPassword(layout, mainWindowWidget());
+            if (layout::requiresPassword(layout)) //< A correct password was not entered. Do not open.
+                return;
+        }
+    }
+
     foreach(QnLayoutResourcePtr r, layouts)
         resources.removeOne(r);
 
@@ -1217,7 +1230,8 @@ void ActionHandler::at_dropResourcesAction_triggered()
         workbench()->currentLayout()->resource()->locked() &&
         !resources.empty() &&
         layouts.empty() &&
-        videowalls.empty()) {
+        videowalls.empty())
+    {
         QnGraphicsMessageBox::information(tr("Layout is locked and cannot be changed."));
         return;
     }

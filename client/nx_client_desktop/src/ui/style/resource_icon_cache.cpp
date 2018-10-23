@@ -68,6 +68,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(Layouts, loadIcon("tree/layouts.png"));
     m_cache.insert(Layout, loadIcon("tree/layout.png"));
     m_cache.insert(Layout | Locked, loadIcon("tree/layout_locked.png"));
+    m_cache.insert(EncryptedLayout, loadIcon("tree/layout_encrypted.png"));	
     m_cache.insert(SharedLayout, loadIcon("tree/layout_shared.png"));
     m_cache.insert(SharedLayout | Locked, loadIcon("tree/layout_shared_locked.png"));
     m_cache.insert(SharedLayouts, loadIcon("tree/layouts_shared.png"));
@@ -203,7 +204,9 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     }
     else if (flags.testFlag(Qn::layout))
     {
-        key = Layout;
+        key = resource.dynamicCast<QnLayoutResource>()->data(Qn::LayoutEncryptionRole).toBool()
+            ? EncryptedLayout
+            : Layout;
     }
     else if (flags.testFlag(Qn::io_module))
     {

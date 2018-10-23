@@ -1,13 +1,14 @@
 import logging
 import time
-from datetime import timedelta
+from datetime import datetime, timedelta
 from collections import OrderedDict
 from fnmatch import fnmatch
 
+import pytz
 from typing import List, Dict
 
 from framework.installation.mediaserver import Mediaserver
-from framework.utils import datetime_utc_now, Timer
+from framework.waiting import Timer
 from . import checks, stage, stages
 
 _logger = logging.getLogger(__name__)
@@ -73,21 +74,21 @@ class CameraStagesExecutor(object):
             ))
 
     def _make_all_stage_steps(self, server):  # types: (Mediaserver) -> Generator[None]
-        self._start_time = datetime_utc_now()
+        self._start_time = datetime.now(pytz.UTC)
         timer = Timer()
         for executors in self._stage_executors:
             steps = executors.steps(server)
             while True:
                 try:
                     steps.next()
-                    self._duration = timer.duration
+                    self._duration = timer.from_start
                     yield
 
                 except StopIteration:
                     _logger.info('%s stages result %s', self.name, executors.details)
                     if not executors.is_successful and executors.stage.is_essential:
                         _logger.error('Essential stage is failed, skip other stages')
-                        self._duration = timer.duration
+                        self._duration = timer.from_start
                         return
                     break
 
@@ -118,7 +119,7 @@ class ServerStagesExecutor(object):
             self.name = name
             self.rules = rules
             self.result = checks.Halt('Is not executed')
-            self.start_time = datetime_utc_now()
+            self.start_time = datetime.now(pytz.UTC)
             self.duration = None
 
         @property
@@ -154,7 +155,7 @@ class ServerStagesExecutor(object):
         else:
             current_stage.result = checker.result()
 
-        current_stage.duration = timer.duration
+        current_stage.duration = timer.from_start
         self.stages.append(current_stage)
         _logger.info(self, 'Server stage %r result %r', name, current_stage.result.details)
 

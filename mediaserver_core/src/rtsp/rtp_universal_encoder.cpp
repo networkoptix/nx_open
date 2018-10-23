@@ -2,7 +2,6 @@
 
 #include <array>
 
-#include <nx/streaming/rtp_stream_parser.h>
 #include <nx/streaming/config.h>
 #include <nx/streaming/rtp/onvif_header_extension.h>
 #include "common/common_module.h"
@@ -322,7 +321,8 @@ void QnUniversalRtpEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
 bool QnUniversalRtpEncoder::getNextPacket(QnByteArray& sendBuffer)
 {
     const QVector<int> packets = m_transcoder.getPacketsSize();
-    if (m_outputPos >= (int) m_outputBuffer.size() - RtpHeader::RTP_HEADER_SIZE || m_packetIndex >= packets.size())
+    if (m_outputPos >= (int) m_outputBuffer.size() - nx::streaming::rtp::RtpHeader::kSize ||
+        m_packetIndex >= packets.size())
         return false;
 
     auto timestamps = m_transcoder.getLastPacketTimestamp();

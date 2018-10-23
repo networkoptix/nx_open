@@ -1,9 +1,7 @@
 #include "nov_launcher_win.h"
 
 #include <client/client_app_info.h>
-
-#include "utils/common/util.h"
-#include "core/storage/file_storage/layout_storage_resource.h"
+#include <core/storage/file_storage/layout_storage_resource.h>
 
 namespace {
 
@@ -78,8 +76,8 @@ QSet<QString> calculateFileList(const QDir& sourceRoot)
 {
     static const QStringList kNameFilters{lit("*.exe"), lit("*.dll"), lit("*.conf")};
     static const QStringList kExtraDirs{
-        lit("vox"), 
-        lit("fonts"), 
+        lit("vox"),
+        lit("fonts"),
         lit("qml"),
         lit("help")};
 
@@ -107,6 +105,7 @@ QSet<QString> calculateFileList(const QDir& sourceRoot)
 
 }
 
+// Does not add layout index structures if novFileName is empty.
 QnNovLauncher::ErrorCode QnNovLauncher::createLaunchingFile(const QString& dstName, const QString& novFileName)
 {
     static const QString kLauncherFile(lit(":/launcher.exe"));
@@ -146,21 +145,15 @@ QnNovLauncher::ErrorCode QnNovLauncher::createLaunchingFile(const QString& dstNa
         return ErrorCode::WriteIndexError;
 
     qint64 novPos = dstFile.pos();
-    if (novFileName.isEmpty())
+    if (!novFileName.isEmpty())
     {
-        QnLayoutFileStorageResource::QnLayoutFileIndex idex;
-        dstFile.write((const char*)&idex, sizeof(idex)); // nov file start
-    }
-    else
-    {
+        // Append existing nov file to exe.
         if (!appendFile(dstFile, novFileName))
             return ErrorCode::WriteMediaError;
+
+        dstFile.write((const char*)&novPos, sizeof(qint64)); // nov file start
+        dstFile.write((const char*)&MAGIC, sizeof(qint64)); // magic
     }
-
-    dstFile.write((const char*)&novPos, sizeof(qint64)); // nov file start
-    dstFile.write((const char*)&MAGIC, sizeof(qint64)); // magic
-
-    dstFile.close();
 
     return ErrorCode::Ok;
 }

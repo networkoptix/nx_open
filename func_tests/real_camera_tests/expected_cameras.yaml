@@ -26,7 +26,6 @@ Axis_M3046V:
     model: AXISM3046V
 
   authorization:
-    #"'camera.status' is u'Unauthorized', expected 'Online'"
     password: auto
 
   attributes:
@@ -35,7 +34,7 @@ Axis_M3046V:
 
   recording:
     primary: {codec: 'H264', resolution: '2688x1520', fps: [[13, 17], [20, 30]]}
-    #secondary: {codec: 'H264', resolution: '640x360', fps: [5, 10]}
+    secondary: {codec: 'H264', resolution: '640x360', fps: [5, 10]}
 
   video_parameters:
     primary:
@@ -70,7 +69,7 @@ DWC-MD421D_1.1.1.8:
 
   recording:
     primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[13, 17], [8, 12]]}
-    #secondary: {'codec': 'H264', 'resolution': '640x352', 'fps': [5, 10]}
+    secondary: {'codec': 'H264', 'resolution': '640x352', 'fps': [5, 10]}
 
   video_parameters:
     primary:
@@ -111,7 +110,7 @@ DWC-MD421D_1.1.2.0:
 
   recording:
     primary: {codec: 'H264', resolution: '1920x1080', fps: [[13, 17], [8, 12]]}
-    #secondary: {codec: 'H264', resolution: '640x352', fps: [5, 10]}
+    secondary: {codec: 'H264', resolution: '640x352', fps: [5, 10]}
 
   video_parameters:
     primary:
@@ -148,7 +147,7 @@ DWC-MPA20M:
 
   recording:
     primary: {codec: 'H264', resolution: '1920x1080', fps: [[13, 17], [8, 12]]}
-    #secondary: {codec: 'H264', resolution: '640x352', fps: [5, 10]}
+    secondary: {codec: 'H264', resolution: '640x352', fps: [5, 10]}
 
   video_parameters:
     primary:
@@ -184,7 +183,7 @@ DWC-MV421TIR:
   # FIXME: There is a bug: no matter which FPS you set for recording, it's always 30.
   recording:
     primary: {codec: 'H264', resolution: '1920x1080', fps: [[13, 17], [8, 12]]}
-    #secondary: {codec: 'H264', resolution: '352x288', fps: [5, 10]}
+    secondary: {codec: 'H264', resolution: '352x288', fps: [5, 10]}
 
   video_parameters:
     primary:
@@ -224,7 +223,7 @@ DWC-MV84WiAC6:
 
   recording:
     primary: {codec: 'H264', resolution: '2560x1440', fps: [[13, 17], [8, 12]]}
-    #secondary: {codec: 'H264', resolution: '352x288', fps: [4, 8]}
+    secondary: {codec: 'H264', resolution: '352x288', fps: [4, 8]}
 
   video_parameters:
     primary: # Exact supported fps/res values are not in the spec. Adjusting may be needed
@@ -255,7 +254,7 @@ DWC-PVX16W:
 
   recording:
     primary: {codec: 'H264', resolution: '2560x1440', fps: [[25, 35]]} # TODO: Add more FPS.
-    #secondary: {codec: 'H264', resolution: '352x240', fps: [3, 8]}
+    secondary: {codec: 'H264', resolution: '352x240', fps: [3, 8]}
     # Although in all_cameras.json range is "352x240,352x288, 640x480,704x480,704x576", 352x240
     # is applied when trying to use 352x288. Bug on the server or camera?
 
@@ -294,7 +293,7 @@ Hanwha_PNM-9020V:
 
   recording:
     primary: {codec: 'H264', resolution: '4096x1800', fps: [[13, 17], [8, 12]]}
-    #secondary: {codec: 'H264', resolution: '512x224', fps: [5, 10]}
+    secondary: {codec: 'H264', resolution: '512x224', fps: [5, 10]}
 
   video_parameters:
     primary:
@@ -381,7 +380,7 @@ Hikvision_DS-2CD2132F-IWS:
 
   recording:
     primary: {codec: 'H264', resolution: '2048x1536', fps: [[13, 17], [8, 12]]}
-    #secondary: {codec: 'H264', resolution: '640x480', fps: [10, 20]}
+    secondary: {codec: 'H264', resolution: '640x480', fps: [10, 20]}
 
   video_parameters:
     primary:
@@ -417,7 +416,7 @@ Hikvision_DS-2CD2342WD-I:
 
   recording:
     primary: {codec: 'H264', resolution: '2688x1520', fps: [[15, 25], [8, 12]]}
-    #secondary: {codec: 'H264', resolution: '640x360', fps: [5, 10]}
+    secondary: {codec: 'H264', resolution: '640x360', fps: [5, 10]}
 
   video_parameters:
     primary:
@@ -444,6 +443,7 @@ Vista_VK2-1080VR:
 
   recording:
     primary: {codec: 'H264', resolution: '1920x1080', fps: [[13, 17]]} # TODO: More FPS.
+    secondary: {codec: 'H264', resolution: '640x360', fps: [5, 10]}
 
   video_parameters:
 #    primary:

@@ -49,6 +49,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, enableCaseExport, "Enable case export.");
     NX_INI_FLAG(1, enableSessionTimeout, "Enable admin-configurable absolute session timeout.");
     NX_INI_STRING("press", passwordPreviewActivationMode, "Password preview activation mode: \"press\", \"hover\" or \"toggle\".");
+    NX_INI_FLAG(0, enableEncryptedLayouts, "Enable creation of encrypted layouts.");
     NX_INI_FLAG(0, enablePluginEvents, "Enable plugin events in Event Rules dialog.");
     NX_INI_FLAG(0, automaticFilterByTimelineSelection, "Automatically switch Right Panel time"
         "selection to \"Selected on Timeline\" mode when selection exists.");

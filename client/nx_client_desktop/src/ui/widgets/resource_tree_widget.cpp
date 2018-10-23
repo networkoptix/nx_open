@@ -194,7 +194,6 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model)
         m_resourceProxyModel->setDynamicSortFilter(true);
         m_resourceProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
         m_resourceProxyModel->setFilterKeyColumn(Qn::NameColumn);
-        m_resourceProxyModel->setFilterRole(Qn::ResourceSearchStringRole);
         m_resourceProxyModel->setSortRole(Qt::DisplayRole);
         m_resourceProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
         m_resourceProxyModel->sort(Qn::NameColumn);

@@ -199,7 +199,8 @@ void QnWorkbench::setCurrentLayoutIndex(int index) {
     setCurrentLayout(m_layouts[qBound(0, index, m_layouts.size())]);
 }
 
-void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
+void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout)
+{
     if(layout == NULL)
         layout = m_dummyLayout;
 

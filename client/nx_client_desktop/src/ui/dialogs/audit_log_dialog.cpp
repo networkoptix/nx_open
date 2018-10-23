@@ -321,23 +321,14 @@ QnAuditRecordRefList QnAuditLogDialog::applyFilter()
             disabledTypes |= (Qn::AuditRecordTypes) checkBox->property(checkBoxFilterProperty).toInt();
     }
 
-    auto filter = [&keywords, &disabledTypes, this] (const QnAuditRecord& record)
-    {
-        if (disabledTypes & record.eventType)
-            return false;
-
-        bool matched = true;
-        QString wholeText = m_camerasModel->makeSearchPattern(&record);
-        for (const auto& keyword: keywords)
+    auto filter =
+        [&keywords, &disabledTypes, this](const QnAuditRecord& record)
         {
-            if (!wholeText.contains(keyword, Qt::CaseInsensitive))
-            {
-                matched = false;
-                break;
-            }
-        }
-        return matched;
-    };
+            if (disabledTypes & record.eventType)
+                return false;
+
+            return m_camerasModel->matches(&record, keywords);
+        };
     for (QnAuditRecord& record: m_allData)
     {
         if (filter(record))

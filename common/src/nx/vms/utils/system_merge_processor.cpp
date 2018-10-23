@@ -364,16 +364,16 @@ QnJsonRestResult SystemMergeProcessor::mergeSystems(
     {
         NX_DEBUG(this, "Applying remote peer settings");
 
-        if (auto statusCode = applyRemoteSettings(
+        result = applyRemoteSettings(
                 data.url,
                 m_remoteModuleInformation.localSystemId,
                 m_remoteModuleInformation.systemName,
                 data.getKey,
-                data.postKey); !nx::network::http::StatusCode::isSuccessCode(statusCode))
+                data.postKey);
+        if (result.error)
         {
             NX_DEBUG(this, lit("takeRemoteSettings %1. Failed to apply remote settings")
                 .arg(data.takeRemoteSettings));
-            setMergeError(&result, MergeStatus::configurationFailed);
             return result;
         }
     }
@@ -381,14 +381,11 @@ QnJsonRestResult SystemMergeProcessor::mergeSystems(
     {
         NX_DEBUG(this, "Applying local settings to a remote peer");
 
-        if (auto statusCode = applyCurrentSettings(
-                data.url,
-                data.postKey,
-                data.mergeOneServer); !nx::network::http::StatusCode::isSuccessCode(statusCode))
+        result = applyCurrentSettings(data.url, data.postKey, data.mergeOneServer);
+        if (result.error)
         {
             NX_DEBUG(this, lit("takeRemoteSettings %1. Failed to apply current settings")
                 .arg(data.takeRemoteSettings));
-            setMergeError(&result, MergeStatus::configurationFailed);
             return result;
         }
     }
@@ -422,7 +419,7 @@ void SystemMergeProcessor::setMergeError(
         ::utils::MergeSystemsStatus::toString(mergeStatus));
 }
 
-nx::network::http::StatusCode::Value SystemMergeProcessor::applyCurrentSettings(
+QnJsonRestResult SystemMergeProcessor::applyCurrentSettings(
     const nx::utils::Url& remoteUrl,
     const QString& postKey,
     bool oneServer)
@@ -430,7 +427,11 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::applyCurrentSettings(
     auto server = m_commonModule->resourcePool()->getResourceById<QnMediaServerResource>(
         m_commonModule->moduleGUID());
     if (!server)
-        return nx::network::http::StatusCode::internalServerError;
+    {
+        QnJsonRestResult result;
+        setMergeError(&result, MergeStatus::configurationFailed);
+        return result;
+    }
     Q_ASSERT(!server->getAuthKey().isEmpty());
 
     ConfigureSystemData data;
@@ -475,11 +476,13 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::applyCurrentSettings(
     return executeRemoteConfigure(data, remoteUrl, postKey);
 }
 
-nx::network::http::StatusCode::Value SystemMergeProcessor::executeRemoteConfigure(
+QnJsonRestResult SystemMergeProcessor::executeRemoteConfigure(
     const ConfigureSystemData& data,
     const nx::utils::Url& remoteUrl,
     const QString& postKey)
 {
+    QnJsonRestResult jsonResult;
+
     QByteArray serializedData = QJson::serialized(data);
 
     nx::network::http::HttpClient client;
@@ -499,31 +502,31 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::executeRemoteConfigur
             : nx::network::http::StatusCode::internalServerError;
         NX_WARNING(this, lit("executeRemoteConfigure api/configure failed. HTTP code %1.")
             .arg(result));
-        return result;
+        setMergeError(&jsonResult, MergeStatus::configurationFailed);
+        return jsonResult;
     }
 
     nx::network::http::BufferType response;
     while (!client.eof())
         response.append(client.fetchMessageBodyBuffer());
 
-    QnJsonRestResult jsonResult;
     if (!QJson::deserialize(response, &jsonResult))
     {
         NX_WARNING(this, lit("executeRemoteConfigure api/configure failed."
             "Invalid json response received."));
-        return nx::network::http::StatusCode::internalServerError;
+        setMergeError(&jsonResult, MergeStatus::configurationFailed);
+        return jsonResult;
     }
     if (jsonResult.error != QnRestResult::NoError)
     {
-        NX_WARNING(this, lit("executeRemoteConfigure api/configure failed. Json error %1.")
-            .arg(jsonResult.error));
-        return nx::network::http::StatusCode::internalServerError;
+        NX_WARNING(this, lit("executeRemoteConfigure api/configure failed. Json error %1 (%2)")
+            .arg(jsonResult.error).arg(toString(jsonResult.errorString)));
     }
 
-    return nx::network::http::StatusCode::ok;
+    return jsonResult;
 }
 
-nx::network::http::StatusCode::Value SystemMergeProcessor::applyRemoteSettings(
+QnJsonRestResult SystemMergeProcessor::applyRemoteSettings(
     const nx::utils::Url& remoteUrl,
     const QnUuid& systemId,
     const QString& systemName,
@@ -531,24 +534,37 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::applyRemoteSettings(
     const QString& postKey)
 {
     /* Read admin user from the remote server */
+    QnJsonRestResult result;
 
     nx::vms::api::UserDataList users;
     if (!executeRequest(remoteUrl, getKey, users, lit("/ec2/getUsers")))
-        return nx::network::http::StatusCode::internalServerError;
+    {
+        setMergeError(&result, MergeStatus::configurationFailed);
+        return result;
+    }
 
     QnJsonRestResult pingRestResult;
     if (!executeRequest(remoteUrl, getKey, pingRestResult, lit("/api/ping")))
-        return nx::network::http::StatusCode::internalServerError;
+    {
+        setMergeError(&result, MergeStatus::configurationFailed);
+        return result;
+    }
 
     QnPingReply pingReply;
     if (!QJson::deserialize(pingRestResult.reply, &pingReply))
-        return nx::network::http::StatusCode::internalServerError;
+    {
+        setMergeError(&result, MergeStatus::configurationFailed);
+        return result;
+    }
 
     if (m_dbBackupEnabled)
     {
         QnJsonRestResult backupDBRestResult;
         if (!executeRequest(remoteUrl, getKey, backupDBRestResult, lit("/api/backupDatabase")))
-            return nx::network::http::StatusCode::internalServerError;
+        {
+            setMergeError(&result, MergeStatus::configurationFailed);
+            return result;
+        }
     }
 
     // 1. Updating settings in remote database to ensure they have priority while merging.
@@ -561,13 +577,12 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::applyRemoteSettings(
         data.tranLogTime = ec2Connection->getTransactionLogTime();
         data.rewriteLocalSettings = true;
 
-        if (auto statusCode = executeRemoteConfigure(
-                data,
-                remoteUrl,
-                postKey); !nx::network::http::StatusCode::isSuccessCode(statusCode))
-        {
-            return statusCode;
-        }
+        result = executeRemoteConfigure(
+            data,
+            remoteUrl,
+            postKey);
+        if (result.error)
+            return result;
     }
 
     // 2. Updating local data.
@@ -592,7 +607,8 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::applyRemoteSettings(
     if (!nx::vms::utils::configureLocalPeerAsPartOfASystem(m_commonModule, data))
     {
         NX_DEBUG(this, lit("applyRemoteSettings. Failed to change system name"));
-        return nx::network::http::StatusCode::internalServerError;
+        setMergeError(&result, MergeStatus::configurationFailed);
+        return result;
     }
 
     // Put current server info to a foreign system to allow authorization via server key.
@@ -601,7 +617,10 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::applyRemoteSettings(
             m_commonModule->resourcePool()->getResourceById<QnMediaServerResource>(
                 m_commonModule->moduleGUID());
         if (!mServer)
-            return nx::network::http::StatusCode::internalServerError;
+        {
+            setMergeError(&result, MergeStatus::configurationFailed);
+            return result;
+        }
         api::MediaServerData currentServer;
         ec2::fromResourceToApi(mServer, currentServer);
 
@@ -620,7 +639,8 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::applyRemoteSettings(
         if (!client.doPost(requestUrl, "application/json", serializedData) ||
             !isResponseOK(client))
         {
-            return nx::network::http::StatusCode::internalServerError;
+            setMergeError(&result, MergeStatus::configurationFailed);
+            return result;
         }
     }
 
@@ -631,10 +651,11 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::applyRemoteSettings(
     {
         NX_DEBUG(this, lit("applyRemoteSettings. Failed to save new system name: %1")
             .arg(ec2::toString(errorCode)));
-        return nx::network::http::StatusCode::internalServerError;
+        setMergeError(&result, MergeStatus::configurationFailed);
+        return result;
     }
 
-    return nx::network::http::StatusCode::ok;
+    return result;
 }
 
 bool SystemMergeProcessor::isResponseOK(const nx::network::http::HttpClient& client)

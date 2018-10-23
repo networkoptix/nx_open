@@ -100,9 +100,9 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_syncButton->setIcon(qnSkin->icon("slider/buttons/sync.png"));
     m_syncButton->setPreferredSize(52, 24);
 
-    m_bookmarksModeButton = newActionButton(action::BookmarksModeAction);
-    m_bookmarksModeButton->setIcon(qnSkin->icon("slider/buttons/thumbnails.png"));
-    m_bookmarksModeButton->setPreferredSize(52, 24);
+    m_thumbnailsButton = newActionButton(action::ToggleThumbnailsAction);
+    m_thumbnailsButton->setIcon(qnSkin->icon("slider/buttons/thumbnails.png"));
+    m_thumbnailsButton->setPreferredSize(52, 24);
 
     m_calendarButton = newActionButton(action::ToggleCalendarAction);
     m_calendarButton->setIcon(qnSkin->icon("slider/buttons/calendar.png"));
@@ -198,7 +198,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     QGraphicsLinearLayout* rightLayoutBottom = new QGraphicsLinearLayout(Qt::Horizontal);
     rightLayoutBottom->setContentsMargins(0, 0, 0, 0);
     rightLayoutBottom->setSpacing(2);
-    rightLayoutBottom->addItem(m_bookmarksModeButton);
+    rightLayoutBottom->addItem(m_thumbnailsButton);
     rightLayoutBottom->addItem(m_calendarButton);
 
     QGraphicsLinearLayout* rightLayout = new QGraphicsLinearLayout(Qt::Vertical);
@@ -305,6 +305,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     addAction(action(action::JumpToLiveAction));
     addAction(action(action::ToggleMuteAction));
     addAction(action(action::ToggleSyncAction));
+    addAction(action(action::ToggleThumbnailsAction));
     addAction(action(action::ToggleCalendarAction));
 
     /* Set help topics. */
@@ -320,7 +321,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     setHelpTopic(m_jumpForwardButton,   Qn::MainWindow_Navigation_Help);
     setHelpTopic(m_syncButton,          Qn::MainWindow_Sync_Help);
     setHelpTopic(m_calendarButton,      Qn::MainWindow_Calendar_Help);
-    setHelpTopic(m_bookmarksModeButton, Qn::Bookmarks_Usage_Help);
+    setHelpTopic(m_thumbnailsButton,    Qn::MainWindow_Thumbnails_Help);
 
     /* Run handlers */
     updateMuteButtonChecked();
