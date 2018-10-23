@@ -99,7 +99,7 @@ Test Register Invalid
     [Arguments]    ${first}    ${last}    ${email}    ${pass}    ${checked}
     Reload Page
     Elements Should Not Be Visible    ${EMAIL INVALID}    ${EMAIL ALREADY REGISTERED}    ${EMAIL IS REQUIRED}    ${REGISTER EMAIL INPUT}/parent::div/parent::div[contains(@class,"has-error")]
-    ...                               ${PASSWORD BADGE}    ${PASSWORD IS REQUIRED}    ${PASSWORD TOO SHORT}    ${PASSWORD SPECIAL CHARS}    ${PASSWORD TOO COMMON}    ${PASSWORD IS WEAK}    ${REGISTER PASSWORD INPUT}/../input[contains(@class,'ng-invalid')]
+    ...                               ${PASSWORD BADGE}    ${PASSWORD IS REQUIRED}    ${PASSWORD TOO SHORT}    ${PASSWORD SPECIAL CHARS}    ${PASSWORD TOO COMMON}    ${PASSWORD IS WEAK}    ${REGISTER PASSWORD INPUT}/../input[contains(@class,'ng-invalid ')]
     ...                               ${FIRST NAME IS REQUIRED}    ${REGISTER FIRST NAME INPUT}/parent::div/parent::div[contains(@class,"has-error")]    ${LAST NAME IS REQUIRED}    ${REGISTER LAST NAME INPUT}/parent::div/parent::div[contains(@class,"has-error")]    ${TERMS AND CONDITIONS ERROR}
     # These two lines are because Hebrew has double quotes in its text.
     # This makes for issues with strings in xpaths.  These lines convert to single quotes if the language is Hebrew
