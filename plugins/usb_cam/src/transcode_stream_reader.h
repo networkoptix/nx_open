@@ -84,7 +84,6 @@ private:
     void calculateTimePerFrame();
 
     virtual void removeVideoConsumer() override;
-    void handleIoError();
 };
 
 } // namespace usb_cam

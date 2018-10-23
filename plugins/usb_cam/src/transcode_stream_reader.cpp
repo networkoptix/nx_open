@@ -54,13 +54,13 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
     if (outNxError != nxcip::NX_NO_ERROR)
     {
-        handleIoError();
+        removeConsumer();
         return outNxError;
     }
 
     if (!packet)
     {
-        handleIoError();
+        removeConsumer();
         return nxcip::NX_OTHER_ERROR;
     }
 

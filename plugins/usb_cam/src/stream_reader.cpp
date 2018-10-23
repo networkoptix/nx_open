@@ -172,5 +172,11 @@ void StreamReaderPrivate::removeAudioConsumer()
     m_audioConsumerAdded = false;
 }
 
+void StreamReaderPrivate::removeConsumer()
+{
+    removeVideoConsumer();
+    removeAudioConsumer();
+}
+
 } // namespace usb_cam
 } // namespace nx

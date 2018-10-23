@@ -505,7 +505,6 @@ void AudioStream::AudioStreamPrivate::run()
 
         std::lock_guard<std::mutex> lock(m_mutex);
         m_packetConsumerManager->givePacket(packet);
-        m_ioError = false;
     }
     uninitialize();
 }

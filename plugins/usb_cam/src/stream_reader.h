@@ -72,10 +72,8 @@ public:
     virtual void ensureConsumerAdded();
 
 protected:
-    static constexpr int kRetryLimit = 10;
     static constexpr int kMsecInSec = 1000;
-    static constexpr std::chrono::milliseconds kStreamDelay = std::chrono::milliseconds(300);
-    static constexpr std::chrono::milliseconds kBufferTimeSpanMax = std::chrono::milliseconds(1000);
+    static constexpr std::chrono::milliseconds kStreamDelay = std::chrono::milliseconds(200);
     static constexpr std::chrono::milliseconds kWaitTimeOut = std::chrono::milliseconds(1000);
 
     int m_encoderIndex;
@@ -93,6 +91,7 @@ protected:
     std::unique_ptr<ILPMediaPacket> toNxPacket(const ffmpeg::Packet *packet);
     void removeAudioConsumer();
     virtual void removeVideoConsumer() = 0;
+    void removeConsumer();
 };
 
 } // namespace usb_cam
