@@ -130,7 +130,9 @@ protected:
         request.connectSessionId = m_connectSessionId;
         request.connectionMethods = api::ConnectionMethod::all;
         m_connectSessionFsm->onConnectRequest(
-            m_connectingPeerConnection,
+            RequestSourceDescriptor{
+                m_connectingPeerConnection->transportProtocol(),
+                m_connectingPeerConnection->getSourceAddress()},
             std::move(request),
             [this](auto... args) { saveConnectResponse(std::move(args)...); });
     }
@@ -155,7 +157,9 @@ protected:
             nx::network::SocketAddress(
                 nx::network::HostAddress::localhost, 12345)); //< Just any port.
         m_connectSessionFsm->onConnectionAckRequest(
-            std::make_shared<TestServerConnection>(),
+            RequestSourceDescriptor{
+                network::TransportProtocol::tcp,
+                network::SocketAddress()},
             std::move(request),
             [](api::ResultCode) {});
     }
