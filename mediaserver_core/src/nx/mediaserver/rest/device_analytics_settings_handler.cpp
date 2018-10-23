@@ -40,7 +40,7 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::executeGet(const JsonRestReques
 
     const auto settings = analyticsManager->getSettings(deviceId, engineId);
     JsonRestResponse result(http::StatusCode::ok);
-    result.json.setReply(QJsonObject::fromVariantMap(settings));
+    result.json.setReply(variantMapToStringMap(settings));
 
     return result;
 }
@@ -87,7 +87,7 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::executePost(
 
     const auto updatedSettings = analyticsManager->getSettings(deviceId, engineId);
     JsonRestResponse result(http::StatusCode::ok);
-    result.json.setReply(QJsonObject::fromVariantMap(updatedSettings));
+    result.json.setReply(variantMapToStringMap(updatedSettings));
 
     return result;
 }

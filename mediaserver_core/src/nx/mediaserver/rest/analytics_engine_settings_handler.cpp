@@ -10,6 +10,7 @@
 #include <nx/mediaserver/resource/analytics_engine_resource.h>
 
 #include <nx/mediaserver/sdk_support/utils.h>
+#include <nx/mediaserver/rest/utils.h>
 
 namespace nx::mediaserver::rest {
 
@@ -42,7 +43,7 @@ JsonRestResponse AnalyticsEngineSettingsHandler::executeGet(const JsonRestReques
     }
 
     JsonRestResponse response(http::StatusCode::ok);
-    response.json.setReply(QJsonObject::fromVariantMap(engine->settingsValues()));
+    response.json.setReply(variantMapToStringMap(engine->settingsValues()));
     return response;
 }
 
@@ -89,7 +90,7 @@ JsonRestResponse AnalyticsEngineSettingsHandler::executePost(
     engine->saveParams();
 
     JsonRestResponse response(http::StatusCode::ok);
-    response.json.setReply(QJsonObject::fromVariantMap(engine->settingsValues()));
+    response.json.setReply(variantMapToStringMap(engine->settingsValues()));
 
     return response;
 }
