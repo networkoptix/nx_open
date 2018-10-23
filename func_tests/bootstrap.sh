@@ -16,12 +16,8 @@ type pytest && exit 4  # `pytest` MUST NOT be installed globally.
 
 # See: https://wiki.debian.org/VirtualBox#Debian_9_.22Stretch.22
 CODENAME=$(lsb_release --codename --short)
-REPOSITORY="deb http://download.virtualbox.org/virtualbox/debian $CODENAME contrib"
-echo $REPOSITORY | sudo dd status=none of=/etc/apt/sources.list.d/virtualbox.list
-wget https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
-wget https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add -
 sudo apt-get update
-sudo apt-get install --yes python-virtualenv python3-venv python2.7-dev python3-dev virtualbox-5.2 rsync ffmpeg smbclient
+sudo apt-get install --yes python-virtualenv python3-venv python2.7-dev python3-dev virtualbox rsync ffmpeg smbclient
 
 rm -fr "${VENV_DIR}"
 python2.7 -m virtualenv "${VENV_DIR}"
