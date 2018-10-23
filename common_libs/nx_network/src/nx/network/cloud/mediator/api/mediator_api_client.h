@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 
+#include <nx/network/cloud/data/connect_data.h>
 #include <nx/network/http/generic_api_client.h>
 
 #include "listening_peer.h"
@@ -19,15 +20,17 @@ class NX_NETWORK_API Client:
 public:
     using ResultCode = nx::network::http::StatusCode::Value;
 
-    using ListeningPeersHandler =
-        nx::utils::MoveOnlyFunc<void(ResultCode, ListeningPeers)>;
-
     Client(const nx::utils::Url& baseMediatorApiUrl);
     ~Client();
 
-    void getListeningPeers(ListeningPeersHandler completionHandler);
+    void getListeningPeers(
+        nx::utils::MoveOnlyFunc<void(ResultCode, ListeningPeers)> completionHandler);
 
     std::tuple<ResultCode, ListeningPeers> getListeningPeers();
+
+    void initiateConnection(
+        const ConnectRequest& request,
+        nx::utils::MoveOnlyFunc<void(ResultCode, ConnectResponse)> completionHandler);
 };
 
 } // namespace api

@@ -15,7 +15,8 @@ View::View(
     m_httpServer(
         settings,
         controller->listeningPeerRegistrator(),
-        &controller->discoveredPeerPool()),
+        &controller->discoveredPeerPool(),
+        &controller->cloudConnectProcessor()),
     m_stunServer(settings, &m_httpServer)
 {
     registerStunApiHandlers(controller);

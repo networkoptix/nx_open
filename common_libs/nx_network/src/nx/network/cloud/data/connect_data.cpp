@@ -1,5 +1,6 @@
 #include "connect_data.h"
 
+#include <nx/fusion/model_functions.h>
 #include <nx/network/stun/extension/stun_extension_types.h>
 
 namespace nx {
@@ -77,6 +78,11 @@ bool ConnectResponse::parseAttributes(const nx::network::stun::Message& message)
         readAttributeValue<attrs::UdtHpEndpointList>(message, &udpEndpointList) &&
         params.parseAttributes(message);
 }
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (ConnectRequest)(ConnectResponse),
+    (json),
+    _Fields)
 
 } // namespace api
 } // namespace hpm

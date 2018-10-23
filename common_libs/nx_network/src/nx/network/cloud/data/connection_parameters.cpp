@@ -1,5 +1,7 @@
 #include "connection_parameters.h"
 
+#include <nx/fusion/model_functions.h>
+
 namespace nx {
 namespace hpm {
 namespace api {
@@ -151,6 +153,11 @@ bool ConnectionParameters::parseAttributes(const nx::network::stun::Message& mes
 
     return true;
 }
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (ConnectionParameters),
+    (json),
+    _Fields)
 
 } // namespace api
 } // namespace hpm
