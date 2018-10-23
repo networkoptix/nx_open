@@ -69,32 +69,32 @@ void UDPHolePunchingConnectionInitiationFsm::bindToAioThread(
 }
 
 void UDPHolePunchingConnectionInitiationFsm::onConnectRequest(
-    const ConnectionStrongRef& originatingPeerConnection,
+    const RequestSourceDescriptor& requestSourceDescriptor,
     api::ConnectRequest request,
     ConnectCompletionHandler connectResponseSender)
 {
     dispatch(
-        [this, originatingPeerConnection,
+        [this, requestSourceDescriptor,
             request = std::move(request), connectResponseSender]()
         {
             processConnectRequest(
-                originatingPeerConnection,
+                requestSourceDescriptor,
                 std::move(request),
                 std::move(connectResponseSender));
         });
 }
 
 void UDPHolePunchingConnectionInitiationFsm::onConnectionAckRequest(
-    const ConnectionStrongRef& connection,
+    const RequestSourceDescriptor& requestSourceDescriptor,
     api::ConnectionAckRequest request,
     std::function<void(api::ResultCode)> completionHandler)
 {
     dispatch(
-        [this, connection, request = std::move(request),
+        [this, requestSourceDescriptor, request = std::move(request),
             completionHandler = std::move(completionHandler)]() mutable
         {
             processConnectionAckRequest(
-                connection,
+                requestSourceDescriptor,
                 std::move(request),
                 std::move(completionHandler));
         });
@@ -125,22 +125,22 @@ void UDPHolePunchingConnectionInitiationFsm::stopWhileInAioThread()
 }
 
 void UDPHolePunchingConnectionInitiationFsm::processConnectRequest(
-    const ConnectionStrongRef& originatingPeerConnection,
+    const RequestSourceDescriptor& requestSourceDescriptor,
     api::ConnectRequest request,
     ConnectCompletionHandler connectResponseSender)
 {
-    switch (originatingPeerConnection->transportProtocol())
+    switch (requestSourceDescriptor.transportProtocol)
     {
         case network::TransportProtocol::udp:
             processUdpConnectRequest(
-                originatingPeerConnection,
+                requestSourceDescriptor,
                 std::move(request),
                 std::move(connectResponseSender));
             break;
 
         default:
             processTcpConnectRequest(
-                originatingPeerConnection,
+                requestSourceDescriptor,
                 std::move(request),
                 std::move(connectResponseSender));
             break;
@@ -148,21 +148,21 @@ void UDPHolePunchingConnectionInitiationFsm::processConnectRequest(
 }
 
 void UDPHolePunchingConnectionInitiationFsm::processUdpConnectRequest(
-    const ConnectionStrongRef& originatingPeerConnection,
+    const RequestSourceDescriptor& requestSourceDescriptor,
     api::ConnectRequest request,
     ConnectCompletionHandler connectResponseSender)
 {
     if (connectResponseHasAlreadyBeenSent())
         return repeatConnectResponse(std::move(connectResponseSender));
 
-    updateSessionStatistics(originatingPeerConnection, request);
+    updateSessionStatistics(requestSourceDescriptor, request);
 
     NX_ASSERT(connectResponseSender);
     m_connectResponseSender = std::move(connectResponseSender);
 
     m_originatingPeerCloudConnectVersion = request.cloudConnectVersion;
 
-    if (!notifyListeningPeerAboutConnectRequest(originatingPeerConnection, request))
+    if (!notifyListeningPeerAboutConnectRequest(requestSourceDescriptor, request))
         return;
 
     m_timer.start(
@@ -172,11 +172,11 @@ void UDPHolePunchingConnectionInitiationFsm::processUdpConnectRequest(
 }
 
 void UDPHolePunchingConnectionInitiationFsm::processTcpConnectRequest(
-    const ConnectionStrongRef& originatingPeerConnection,
+    const RequestSourceDescriptor& requestSourceDescriptor,
     api::ConnectRequest request,
     ConnectCompletionHandler connectResponseSender)
 {
-    updateSessionStatistics(originatingPeerConnection, request);
+    updateSessionStatistics(requestSourceDescriptor, request);
 
     findRelayInstance(
         [this, connectResponseSender = std::move(connectResponseSender)](
@@ -215,17 +215,17 @@ void UDPHolePunchingConnectionInitiationFsm::repeatConnectResponse(
 }
 
 void UDPHolePunchingConnectionInitiationFsm::updateSessionStatistics(
-    const ConnectionStrongRef& originatingPeerConnection,
+    const RequestSourceDescriptor& requestSourceDescriptor,
     const api::ConnectRequest& connectRequest)
 {
     m_sessionStatisticsInfo.originatingHostEndpoint =
-        originatingPeerConnection->getSourceAddress().toString().toUtf8();
+        requestSourceDescriptor.sourceAddress.toString().toUtf8();
     m_sessionStatisticsInfo.originatingHostName = connectRequest.originatingPeerId;
     m_sessionStatisticsInfo.destinationHostName = connectRequest.destinationHostName;
 }
 
 bool UDPHolePunchingConnectionInitiationFsm::notifyListeningPeerAboutConnectRequest(
-    const ConnectionStrongRef& originatingPeerConnection,
+    const RequestSourceDescriptor& requestSourceDescriptor,
     const api::ConnectRequest& connectRequest)
 {
     auto serverConnectionStrongRef = m_serverConnectionWeakRef.lock();
@@ -238,16 +238,17 @@ bool UDPHolePunchingConnectionInitiationFsm::notifyListeningPeerAboutConnectRequ
         return false;
     }
     auto indication = prepareConnectionRequestedIndication(
-        originatingPeerConnection,
+        requestSourceDescriptor,
         connectRequest);
     serverConnectionStrongRef->sendMessage(std::move(indication));  //< TODO #ak: Check sendMessage result.
 
     return true;
 }
 
-nx::network::stun::Message UDPHolePunchingConnectionInitiationFsm::prepareConnectionRequestedIndication(
-    const ConnectionStrongRef& originatingPeerConnection,
-    const api::ConnectRequest& connectRequest)
+nx::network::stun::Message
+    UDPHolePunchingConnectionInitiationFsm::prepareConnectionRequestedIndication(
+        const RequestSourceDescriptor& requestSourceDescriptor,
+        const api::ConnectRequest& connectRequest)
 {
     api::ConnectionRequestedEvent connectionRequestedEvent;
     connectionRequestedEvent.connectSessionId = std::move(connectRequest.connectSessionId);
@@ -257,9 +258,9 @@ nx::network::stun::Message UDPHolePunchingConnectionInitiationFsm::prepareConnec
         connectRequest.udpEndpointList.end(),
         std::back_inserter(connectionRequestedEvent.udpEndpointList));
 
-    if (originatingPeerConnection->transportProtocol() == nx::network::TransportProtocol::udp)
+    if (requestSourceDescriptor.transportProtocol == nx::network::TransportProtocol::udp)
     {
-        const auto originatingPeerSourceAddress = originatingPeerConnection->getSourceAddress();
+        const auto originatingPeerSourceAddress = requestSourceDescriptor.sourceAddress;
         //setting ports if needed
         for (auto& endpoint: connectionRequestedEvent.udpEndpointList)
         {
@@ -323,22 +324,22 @@ void UDPHolePunchingConnectionInitiationFsm::noConnectionAckOnTime()
 }
 
 void UDPHolePunchingConnectionInitiationFsm::processConnectionAckRequest(
-    const ConnectionStrongRef& connection,
+    const RequestSourceDescriptor& requestSourceDescriptor,
     api::ConnectionAckRequest request,
     std::function<void(api::ResultCode)> completionHandler)
 {
     m_sessionStatisticsInfo.destinationHostEndpoint =
-        connection->getSourceAddress().toString().toUtf8();
+        requestSourceDescriptor.sourceAddress.toString().toUtf8();
 
-    if (connection->transportProtocol() == nx::network::TransportProtocol::udp)
-        request.udpEndpointList.push_front(connection->getSourceAddress());
+    if (requestSourceDescriptor.transportProtocol == nx::network::TransportProtocol::udp)
+        request.udpEndpointList.push_front(requestSourceDescriptor.sourceAddress);
 
     m_timer.pleaseStopSync();
 
     if (m_state > State::waitingServerPeerUDPAddress)
     {
         NX_DEBUG(this, lm("Connection %1. Received connectionAck while in %2 state. Ignoring...")
-            .arg(m_connectionID).arg(toString(m_state)));
+            .args(m_connectionID, toString(m_state)));
         completionHandler(api::ResultCode::ok);
         return;
     }

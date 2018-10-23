@@ -2,6 +2,7 @@
 
 #include <chrono>
 
+#include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/retry_timer.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 
@@ -62,6 +63,13 @@ public:
     virtual void serializeAttributes(nx::network::stun::Message* const message) override;
     virtual bool parseAttributes(const nx::network::stun::Message& message) override;
 };
+
+#define ConnectionParameters_Fields \
+    (rendezvousConnectTimeout)(udpTunnelKeepAliveInterval)(udpTunnelKeepAliveRetries) \
+    (tunnelInactivityTimeout)/*(tcpReverseRetryPolicy)(tcpReverseHttpTimeouts)*/ \
+    (udpHolePunchingStartDelay)(trafficRelayingStartDelay)(directTcpConnectStartDelay)
+
+QN_FUSION_DECLARE_FUNCTIONS(ConnectionParameters, (json), NX_NETWORK_API)
 
 } // namespace api
 } // namespace hpm
