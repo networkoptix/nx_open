@@ -824,23 +824,23 @@ Handle ServerConnection::getEngineAnalyticsSettings(
 Handle ServerConnection::setEngineAnalyticsSettings(
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
     const QVariantMap& settings,
-    std::function<void(Handle, bool)>&& callback,
+    std::function<void(Handle, bool, const QMap<QString, QString>&)>&& callback,
     QThread* targetThread)
 {
     auto internalCallback =
         [callback = std::move(callback)](
-            bool success, rest::Handle handle, EmptyResponseType response)
+            bool success, rest::Handle handle, const QMap<QString, QString>& response)
         {
-            callback(handle, success);
+            callback(handle, success, response);
         };
 
-    return executePost<EmptyResponseType>(
+    return executePost<QMap<QString, QString>>(
         QString("/ec2/analyticsEngineSettings"),
         QnRequestParamList {
             {"engineId", engine->getId().toString()},
             {"settings", QJson::serialized(QJsonObject::fromVariantMap(settings))}
         },
-        nx::network::http::StringType("application/json"),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
         nx::network::http::StringType(),
         std::move(internalCallback),
         targetThread);
@@ -863,24 +863,24 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
     const QVariantMap& settings,
-    std::function<void(Handle, bool)>&& callback,
+    std::function<void(Handle, bool, const QMap<QString, QString>&)>&& callback,
     QThread* targetThread)
 {
     auto internalCallback =
         [callback = std::move(callback)](
-            bool success, rest::Handle handle, EmptyResponseType response)
+            bool success, rest::Handle handle, const QMap<QString, QString>& response)
         {
-            callback(handle, success);
+            callback(handle, success, response);
         };
 
-    return executePost<EmptyResponseType>(
+    return executePost<QMap<QString, QString>>(
         QString("/ec2/deviceAnalyticsSettings"),
         QnRequestParamList {
             {"deviceId", device->getId().toString()},
             {"engineId", engine->getId().toString()},
             {"settings", QJson::serialized(QJsonObject::fromVariantMap(settings))}
         },
-        nx::network::http::StringType("application/json"),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
         nx::network::http::StringType(),
         std::move(internalCallback),
         targetThread);
