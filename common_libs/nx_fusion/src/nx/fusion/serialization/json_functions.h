@@ -350,7 +350,7 @@ inline bool deserialize(
     std::optional<T>* target)
 {
     *target = T();
-    return QJson::deserialize<T>(ctx, value, &target->value());
+    return QJson::deserialize<T>(ctx, value, &**target);
 }
 
 template<typename T>
