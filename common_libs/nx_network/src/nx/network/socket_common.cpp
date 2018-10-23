@@ -2,6 +2,8 @@
 
 #include <cstring>
 
+#include <nx/fusion/model_functions.h>
+
 #include "socket_global.h"
 
 bool operator==(const in_addr& left, const in_addr& right)
@@ -382,6 +384,20 @@ void swap(HostAddress& one, HostAddress& two)
     one.swap(two);
 }
 
+void serialize(
+    class QnJsonContext*,
+    const nx::network::HostAddress& value,
+    QJsonValue* target)
+{
+    *target = value.toString();
+}
+
+bool deserialize(QnJsonContext*, const QJsonValue& source, HostAddress* value)
+{
+    *value = HostAddress(source.toString());
+    return true;
+}
+
 //-------------------------------------------------------------------------------------------------
 // SocketAddress
 
@@ -498,6 +514,8 @@ QString SocketAddress::trimIpV6(const QString& ip)
 
     return ip;
 }
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SocketAddress, (json), (address)(port))
 
 //-------------------------------------------------------------------------------------------------
 
