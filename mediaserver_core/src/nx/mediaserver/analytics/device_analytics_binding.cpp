@@ -21,6 +21,7 @@
 #include <nx/mediaserver/sdk_support/traits.h>
 #include <nx/mediaserver/resource/analytics_engine_resource.h>
 #include <nx/mediaserver/resource/analytics_plugin_resource.h>
+#include <nx/mediaserver/interactive_settings/json_engine.h>
 
 
 namespace nx::mediaserver::analytics {
@@ -147,6 +148,13 @@ QVariantMap DeviceAnalyticsBinding::getSettings() const
         return QVariantMap();
     }
 
+    const auto engineManifest = m_engine->manifest();
+    interactive_settings::JsonEngine jsonEngine;
+    jsonEngine.load(engineManifest.deviceAgentSettingsModel);
+
+    const auto settingsFromProperty = m_device->deviceAgentSettingsValues(m_engine->getId());
+    jsonEngine.applyValues(settingsFromProperty);
+
     sdk_support::UniquePtr<nx::sdk::Settings> settings(deviceAgent->settings());
     if (!settings)
     {
@@ -164,7 +172,8 @@ QVariantMap DeviceAnalyticsBinding::getSettings() const
     for (auto i = 0; i < count; ++i)
         result.insert(settings->key(i), settings->value(i));
 
-    return result;
+    jsonEngine.applyValues(result);
+    return jsonEngine.values();
 }
 
 void DeviceAnalyticsBinding::setSettings(const QVariantMap& settings)

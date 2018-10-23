@@ -1,5 +1,6 @@
 #include "device_analytics_settings_handler.h"
 #include "parameter_names.h"
+#include "utils.h"
 
 #include <core/resource/camera_resource.h>
 
@@ -15,10 +16,6 @@ namespace nx::mediaserver::rest {
 
 using namespace nx::network;
 
-namespace {
-
-} // namespace
-
 DeviceAnalyticsSettingsHandler::DeviceAnalyticsSettingsHandler(QnMediaServerModule* serverModule):
     nx::mediaserver::ServerModuleAware(serverModule)
 {
@@ -27,42 +24,60 @@ DeviceAnalyticsSettingsHandler::DeviceAnalyticsSettingsHandler(QnMediaServerModu
 
 JsonRestResponse DeviceAnalyticsSettingsHandler::executeGet(const JsonRestRequest& request)
 {
+    if (!request.params.contains(kDeviceIdParameter))
+    {
+        NX_WARNING(this, "Missing parameter %1", kDeviceIdParameter);
+        return makeResponse(QnRestResult::Error::MissingParameter, QStringList{kDeviceIdParameter});
+    }
+
+    if (!request.params.contains(kAnalyticsEngineIdParameter))
+    {
+        NX_WARNING(this, "Missing parameter %1", kAnalyticsEngineIdParameter);
+        return makeResponse(QnRestResult::Error::MissingParameter, QStringList{kDeviceIdParameter});
+    }
+
     const auto deviceId = request.params[kDeviceIdParameter];
-    auto device = nx::camera_id_helper::findCameraByFlexibleId(
+    const auto device = nx::camera_id_helper::findCameraByFlexibleId(
         serverModule()->resourcePool(),
         deviceId);
 
     if (!device)
     {
-        NX_WARNING(this, "Can't find device by id %1", deviceId);
-        // TODO: #dmishin consider not found.
-        return JsonRestResponse(http::StatusCode::badRequest);
+        const auto message = lm("Unable to find device by id %1").args(deviceId);
+        NX_WARNING(this, message);
+        return makeResponse(QnRestResult::Error::CantProcessRequest, message);
     }
 
     if (device->flags().testFlag(Qn::foreigner))
     {
-        NX_WARNING(this, "Device belongs to the server %1, got request on the server %2",
-            device->getParentId(), moduleGUID());
+        const auto message =
+            lm("Wrong server. Device belongs to the server %1, current server: %2")
+                .args(device->getParentId(), moduleGUID());
 
-        return JsonRestResponse(http::StatusCode::badRequest);
+        NX_WARNING(this, message);
+        return makeResponse(QnRestResult::Error::CantProcessRequest, message);
     }
 
     const auto engineId = request.params[kAnalyticsEngineIdParameter];
-    auto engine = sdk_support::find<resource::AnalyticsEngineResource>(serverModule(), engineId);
+    const auto engine = sdk_support::find<resource::AnalyticsEngineResource>(
+        serverModule(), engineId);
+
     if (!engine)
     {
-        NX_WARNING(this, "Can't find device by id %1", engineId);
-        return JsonRestResponse(http::StatusCode::badRequest);
+        const auto message = lm("Unable to find analytics engine by id %1").args(engineId);
+        NX_WARNING(this, message);
+        return makeResponse(QnRestResult::Error::CantProcessRequest, message);
     }
 
-    auto analyticsManager = serverModule()->analyticsManager();
+    const auto analyticsManager = serverModule()->analyticsManager();
     if (!analyticsManager)
     {
-        NX_ERROR(this, "Can't access analytics manager");
-        return JsonRestResponse(http::StatusCode::internalServerError);
+        const QString message("Unable to access analytics manager");
+        NX_ERROR(this, message);
+        return makeResponse(QnRestResult::InternalServerError, message);
     }
 
-    auto settings = analyticsManager->getSettings(deviceId, engineId);
+    const auto settings = analyticsManager->getSettings(deviceId, engineId);
     JsonRestResponse result(http::StatusCode::ok);
     result.json.setReply(QJsonObject::fromVariantMap(settings));
 

@@ -57,6 +57,8 @@ QString QnRestResult::ErrorDescriptor::text() const
             return lit("Forbidden");
         case BadRequest:
             return lit("Bad request");
+        case InternalServerError:
+            return lit("Internal server error");
         default:
             return lit("Unknown error code '%1'. Arguments: %2")
                 .arg(static_cast<int>(m_errorCode)).arg(m_arguments.join(lit(", ")));

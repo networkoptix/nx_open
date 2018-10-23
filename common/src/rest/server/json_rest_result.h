@@ -24,6 +24,7 @@ public:
         CantProcessRequest = 3,
         Forbidden = 4,
         BadRequest = 5,
+        InternalServerError = 6,
     };
 
     /** Presents error as corresponding text with some arguments.
