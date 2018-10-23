@@ -33,17 +33,14 @@ Item
         shadowColor: item.shadowColor
         state:
         {
+            enableAnimation = !item.drawing
             if (item.drawing)
-            {
-                enableAnimation = false
                 return "expanded"
-            }
 
-            enableAnimation = true;
             return singlePoint ? "normal" : "hidden"
         }
 
-        centerPoint: d.startMarkerPoint
+        centerPoint: d.endMarkerPoint
         visible: opacity > 0
     }
 

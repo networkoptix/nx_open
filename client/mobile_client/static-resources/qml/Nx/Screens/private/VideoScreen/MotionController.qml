@@ -7,24 +7,16 @@ Item
 {
     id: controller
 
-    property alias motionProvider: mediaPlayerMotionProvider
-    property bool motionSearchMode: false
-    property string motionFilter:
-    {
-        if (!motionSearchMode)
-            return ""
-
-        return d.hasFinishedCustomRoi
-            ? d.getMotionFilter(d.customTopLeftRelative, d.customBottomRightRelative)
-            : d.getMotionFilter(d.defaultTopLeftRelative, d.defaultBottomRightRelative)
-    }
-
     property int cameraRotation: 0
     property Item viewport: null
 
-    readonly property bool customRoiExists: d.hasFinishedCustomRoi || drawingCustomRoi
-    readonly property bool drawingCustomRoi: d.toBool(
-        d.customInitialRelative && d.nearPositions(d.customInitialRelative, d.customFirstPoint))
+    property bool motionSearchMode: false
+    property alias motionProvider: mediaPlayerMotionProvider
+    property string motionFilter
+
+    readonly property bool customRoiExists: d.hasFinishedCustomRoi || drawingRoi
+    readonly property bool drawingRoi: d.toBool(
+        d.customInitialPoint && d.nearPositions(d.customInitialPoint, d.customFirstPoint))
 
     function clearCustomRoi()
     {
@@ -35,15 +27,8 @@ Item
 
     function updateDefaultRoi()
     {
-        if (!viewport)
+        if (!controller.motionSearchMode || d.hasFinishedCustomRoi)
             return
-
-        if (controller.customRoiExists)
-        {
-            d.defaultTopLeftRelative = undefined
-            d.defaultBottomRightRelative = undefined
-            return
-        }
 
         var first = viewport.mapToItem(controller, 0, 0)
         var second = viewport.mapToItem(controller, viewport.width, viewport.height)
@@ -51,23 +36,29 @@ Item
         var cameraRect = Qt.rect(0, 0, width, height);
 
         var rect = d.intersection(viewportRect, cameraRect)
-        if (rect)
+        d.setRoiPoints(
+            rect ? d.toRelative(Qt.vector2d(rect.left, rect.top)): undefined,
+            rect ? d.toRelative(Qt.vector2d(rect.right, rect.bottom)) : undefined)
+    }
+
+    function handlePositionChanged(pos)
+    {
+        var relativePos = d.toRelative(pos)
+        if (drawingRoi)
         {
-            d.defaultTopLeftRelative = d.toRelative(Qt.vector2d(rect.left, rect.top))
-            d.defaultBottomRightRelative = d.toRelative(Qt.vector2d(rect.right, rect.bottom))
+            d.customSecondPoint = relativePos
+            selectionPreloader.centerPoint = d.getSubpixeled(pos)
         }
-        else
+        else if (!d.nearPositions(d.customInitialPoint, relativePos))
         {
-            d.defaultTopLeftRelative = undefined
-            d.defaultBottomRightRelative = undefined
+            handleCancelled()
         }
     }
 
     function handleLongPressed()
     {
-        d.customFirstPoint = d.customInitialRelative
-        d.customSecondPoint = d.customInitialRelative
-        updateDefaultRoi()
+        d.customFirstPoint = d.customInitialPoint
+        d.customSecondPoint = d.customInitialPoint
     }
 
     function handlePressed(pos)
@@ -75,50 +66,22 @@ Item
         if (pressFilterTimer.running)
             return // We don't allow to start long tap after fast clicks (double click, for example).
 
+        selectionPreloader.centerPoint = d.getSubpixeled(pos)
+
         pressFilterTimer.restart()
-        d.preloaderRelativePoint = d.toRelative(Qt.point(pos.x + 0.5, pos.y + 0.5))
-        d.customInitialRelative = d.toRelative(pos)
+        d.customInitialPoint = d.toRelative(pos)
         pressAndHoldTimer.restart()
     }
 
     function handleReleased()
     {
-        d.customInitialRelative = undefined
-        pressAndHoldTimer.stop()
+        d.handleMouseReleased()
     }
 
     function handleCancelled()
     {
-        pressAndHoldTimer.stop()
-        d.customInitialRelative = undefined
+        d.handleMouseReleased()
     }
-
-    function handlePositionChanged(pos)
-    {
-        if (drawingCustomRoi)
-            d.customSecondPoint = d.toRelative(pos)
-        else if (!d.nearPositions(d.customInitialRelative, d.toRelative(pos)))
-            handleCancelled()
-    }
-
-    onCustomRoiExistsChanged:
-    {
-        if (customRoiExists)
-            motionSearchMode = true
-    }
-
-    onMotionSearchModeChanged:
-    {
-        if (!motionSearchMode)
-            clearCustomRoi()
-    }
-
-    onCameraRotationChanged:
-    {
-        updateDefaultRoi()
-    }
-
-    Component.onCompleted: updateDefaultRoi()
 
     MaskedUniformGrid
     {
@@ -151,49 +114,39 @@ Item
 
         mainColor: d.lineColor
         shadowColor: d.shadowColor
-        centerPoint: d.fromRelative(d.preloaderRelativePoint)
         animationDuration: pressAndHoldTimer.interval
 
         state:
         {
-            if (d.customInitialRelative && !customRoiMarker.running)
-            {
-                enableAnimation = true;
-                return "expanded"
-            }
-
-            enableAnimation = false
-            return "hidden"
+            var nextExpandedState = d.toBool(d.customInitialPoint && !customRoiMarker.drawing)
+            enableAnimation = nextExpandedState
+            return nextExpandedState ? "expanded" : "hidden"
         }
-
-        visible: !customRoiMarker.drawing
     }
 
     MotionRoi
     {
         id: customRoiMarker
 
-        drawing: controller.drawingCustomRoi
+        drawing: controller.drawingRoi
         roiColor: d.lineColor
         shadowColor: d.shadowColor
-        startPoint: d.fromRelative(d.customFirstPoint)
-        endPoint: d.fromRelative(d.customSecondPoint)
-        visible: controller.motionSearchMode && controller.customRoiExists
+        startPoint: drawing
+            ? d.fromRelative(d.customFirstPoint)
+            : d.fromRelative(d.currentFirstPoint)
+        endPoint: drawing
+            ? d.fromRelative(d.customSecondPoint)
+            : d.fromRelative(d.currentSecondPoint)
+        visible: controller.motionSearchMode //&& controller.customRoiExists // TODO: uncomment me at the end of the development
         animationDuration: pressAndHoldTimer.interval
-    }
 
-    // TODO: remove me, this is just for A. Pats
-    MotionRoi
-    {
-        id: defaultRoi
+        lineWidth: drawing ? 1 : 5 // TODO: remove me at the end of the development
 
-        roiColor: d.lineColor
-        shadowColor: d.shadowColor
-        startPoint: d.fromRelative(d.defaultTopLeftRelative)
-        endPoint: d.fromRelative(d.defaultBottomRightRelative)
-        lineWidth: 5
-        visible: d.toBool(
-            controller.motionSearchMode && d.defaultTopLeftRelative && d.defaultBottomRightRelative)
+        onDrawingChanged:
+        {
+            if (!drawing)
+                d.setRoiPoints(d.customFirstPoint, d.customSecondPoint)
+        }
     }
 
     Timer
@@ -210,6 +163,22 @@ Item
         interval: pressAndHoldTimer.interval
     }
 
+    onMotionSearchModeChanged:
+    {
+        if (!motionSearchMode)
+        {
+            clearCustomRoi()
+            controller.motionFilter = ""
+        }
+        else if (!d.customInitialPoint)
+        {
+            updateDefaultRoi()
+        }
+    }
+
+    onDrawingRoiChanged: controller.motionSearchMode = true
+    onCameraRotationChanged: updateDefaultRoi()
+
     QtObject
     {
         id: d
@@ -217,35 +186,14 @@ Item
         readonly property color lineColor: ColorTheme.contrast1
         readonly property color shadowColor: ColorTheme.transparent(ColorTheme.base1, 0.2)
         readonly property bool hasFinishedCustomRoi: toBool(
-            !controller.drawingCustomRoi && customFirstPoint && customSecondPoint)
+            !controller.drawingRoi && customFirstPoint && customSecondPoint)
 
-        property var customInitialRelative
+        property var customInitialPoint
         property var customFirstPoint
         property var customSecondPoint
-        property point preloaderRelativePoint
 
-        property point customTopLeftRelative:
-        {
-            if (!customFirstPoint || !customSecondPoint)
-                return Qt.point(0, 0)
-
-            return Qt.point(
-                Math.min(customFirstPoint.x, customSecondPoint.x),
-                Math.min(customFirstPoint.y, customSecondPoint.y))
-        }
-
-        property point customBottomRightRelative:
-        {
-            if (!customFirstPoint || !customSecondPoint)
-                return Qt.point(0, 0)
-
-            return Qt.point(
-                Math.max(customFirstPoint.x, customSecondPoint.x),
-                Math.max(customFirstPoint.y, customSecondPoint.y))
-        }
-
-        property var defaultTopLeftRelative
-        property var defaultBottomRightRelative
+        property var currentFirstPoint
+        property var currentSecondPoint
 
         function toRelative(absolute)
         {
@@ -269,10 +217,17 @@ Item
             return firstVector.minus(secondVector).length() < 0.01
         }
 
-        function getMotionFilter(topLeft, bottomRight)
+        function getMotionFilter(first, second)
         {
-            if (!topLeft || !bottomRight)
+            if (!first|| !second)
                 return "";
+
+            var topLeft = Qt.point(
+                Math.min(first.x, second.x),
+                Math.min(first.y, second.y))
+            var bottomRight = Qt.point(
+                Math.max(first.x, second.x),
+                Math.max(first.y, second.y))
 
             var horizontalRange = 43
             var verticalRange = 31
@@ -310,6 +265,24 @@ Item
         function toBool(value)
         {
             return !!value
+        }
+
+        function handleMouseReleased()
+        {
+            d.customInitialPoint = undefined
+            pressAndHoldTimer.stop()
+        }
+
+        function getSubpixeled(pos)
+        {
+            return Qt.point(pos.x + 0.5, pos.y + 0.5)
+        }
+
+        function setRoiPoints(first, second)
+        {
+            currentFirstPoint = first
+            currentSecondPoint = second
+            controller.motionFilter = getMotionFilter(first, second)
         }
     }
 }
