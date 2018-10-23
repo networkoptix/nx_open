@@ -91,7 +91,7 @@ protected:
     {
         api::ConnectRequest connectRequest;
         connectRequest.destinationHostName =
-            hostName.empty() ? m_system.id : hostName.c_str();
+            hostName.empty() ? m_system.id : QByteArray(hostName.c_str());
         connectRequest.originatingPeerId = nx::utils::generateRandomName(7);
         connectRequest.connectSessionId = nx::utils::generateRandomName(7);
         connectRequest.connectionMethods = api::ConnectionMethod::proxy;
