@@ -429,7 +429,8 @@ def run_transactions(metrics_saver, load_averge_collector, config, env):
     generated_transactions = transactions_generated(
         metrics_saver, transaction_gen, transaction_rate, config.TRANSACTIONS_STAGE_DURATION)
     watched_server_list = pick_some_items(env.all_server_list, config.MESSAGE_BUS_SERVER_COUNT)
-    bus_context = message_bus_running(watched_server_list)
+    socket_reopened_counter = itertools.count()
+    bus_context = message_bus_running(watched_server_list, socket_reopened_counter)
     average_collector = load_averge_collector(env.os_access_set, 'transactions')
     with generated_transactions, bus_context as bus, average_collector:
         delay_list = []
@@ -447,6 +448,7 @@ def run_transactions(metrics_saver, load_averge_collector, config, env):
             delay = datetime_local_now() - stamp_dt
             _logger.debug('Transaction propagation delay: %s', delay)
             delay_list.append(delay)
+    metrics_saver.save('websocket_reopened_count', next(socket_reopened_counter))
     if delay_list:
         average_delay = sum(delay_list, timedelta()) / len(delay_list)
         max_delay = max(delay_list)
