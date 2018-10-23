@@ -61,6 +61,7 @@ public:
     network::SocketAddress stunUdpEndpoint() const;
     network::SocketAddress stunTcpEndpoint() const;
     network::SocketAddress httpEndpoint() const;
+    nx::utils::Url httpUrl() const;
 
     std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection> clientConnection();
     std::unique_ptr<nx::hpm::api::MediatorServerTcpConnection> systemConnection();

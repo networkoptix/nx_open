@@ -45,20 +45,20 @@ SystemError::ErrorCode mediatorResultToSysErrorCode(api::ResultCode resultCode)
 
 CrossNatConnector::CrossNatConnector(
     const AddressEntry& targetPeerAddress,
-    std::optional<SocketAddress> mediatorUdpEndpoint)
+    std::optional<hpm::api::MediatorAddress> mediatorAddress)
     :
     m_targetPeerAddress(targetPeerAddress),
     m_connectSessionId(QnUuid::createUuid().toByteArray().toStdString()),
-    m_mediatorUdpEndpoint(mediatorUdpEndpoint),
+    m_mediatorAddress(std::move(mediatorAddress)),
     m_originatingHostAddressReplacement(
         SocketGlobals::cloud().settings().originatingHostAddressReplacement()),
     m_done(false),
-    m_mediatorUdpEndpointFetcher(
-        &nx::hpm::api::AbstractMediatorConnector::fetchUdpEndpoint)
+    m_mediatorAddressFetcher(
+        &nx::hpm::api::AbstractMediatorConnector::fetchAddress)
 {
     m_timer = std::make_unique<aio::Timer>();
     m_timer->bindToAioThread(getAioThread());
-    m_mediatorUdpEndpointFetcher.bindToAioThread(getAioThread());
+    m_mediatorAddressFetcher.bindToAioThread(getAioThread());
 }
 
 void CrossNatConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
@@ -70,7 +70,7 @@ void CrossNatConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
     m_timer->bindToAioThread(aioThread);
     if (m_cloudConnectorExecutor)
         m_cloudConnectorExecutor->bindToAioThread(aioThread);
-    m_mediatorUdpEndpointFetcher.bindToAioThread(aioThread);
+    m_mediatorAddressFetcher.bindToAioThread(aioThread);
 }
 
 void CrossNatConnector::connect(
@@ -130,7 +130,7 @@ void CrossNatConnector::stopWhileInAioThread()
     m_connection.reset();
     m_timer.reset();
     m_cloudConnectorExecutor.reset();
-    m_mediatorUdpEndpointFetcher.pleaseStopSync();
+    m_mediatorAddressFetcher.pleaseStopSync();
 }
 
 void CrossNatConnector::messageReceived(
@@ -153,17 +153,17 @@ utils::ResultCounter<nx::hpm::api::ResultCode>
 
 void CrossNatConnector::fetchMediatorUdpEndpoint()
 {
-    if (m_mediatorUdpEndpoint)
+    if (m_mediatorAddress)
         return issueConnectRequestToMediator();
 
-    m_mediatorUdpEndpointFetcher.invoke(
+    m_mediatorAddressFetcher.invoke(
         [this](auto... args) { onFetchMediatorUdpEndpointCompletion(std::move(args)...); },
         &nx::network::SocketGlobals::instance().cloud().mediatorConnector());
 }
 
 void CrossNatConnector::onFetchMediatorUdpEndpointCompletion(
     http::StatusCode::Value resultCode,
-    SocketAddress mediatorUdpEndpoint)
+    hpm::api::MediatorAddress mediatorAddress)
 {
     if (!http::StatusCode::isSuccessCode(resultCode))
     {
@@ -171,7 +171,7 @@ void CrossNatConnector::onFetchMediatorUdpEndpointCompletion(
         return;
     }
 
-    m_mediatorUdpEndpoint = mediatorUdpEndpoint;
+    m_mediatorAddress = std::move(mediatorAddress);
     issueConnectRequestToMediator();
 }
 
@@ -181,7 +181,7 @@ void CrossNatConnector::issueConnectRequestToMediator()
     {
         m_mediatorUdpClient =
             std::make_unique<api::MediatorClientUdpConnection>(
-                *m_mediatorUdpEndpoint);
+                m_mediatorAddress->stunUdpEndpoint);
         m_mediatorUdpClient->bindToAioThread(getAioThread());
     }
 
@@ -236,7 +236,7 @@ void CrossNatConnector::onConnectResponse(
     if (m_done)
         return;
 
-    m_mediatorUdpEndpoint = stunTransportHeader.locationEndpoint;
+    m_mediatorAddress->stunUdpEndpoint = stunTransportHeader.locationEndpoint;
 
     m_timer->cancelSync();
 
@@ -353,7 +353,7 @@ void CrossNatConnector::holePunchingDone(
             stun::extension::methods::connectionResult));
     m_connectResultReport.serialize(&connectResultReportMessage);
     m_connectResultReportSender->sendMessage(
-        *m_mediatorUdpEndpoint,
+        m_mediatorAddress->stunUdpEndpoint,
         std::move(connectResultReportMessage),
         std::bind(&CrossNatConnector::connectSessionReportSent, this, _1));
 }

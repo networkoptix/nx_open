@@ -87,9 +87,10 @@ protected:
     void givenPeerFailedToConnectToMediator()
     {
         std::promise<nx::network::http::StatusCode::Value> fetchMediatorEndpointCompleted;
-        m_mediatorConnector->fetchUdpEndpoint(
+        m_mediatorConnector->fetchAddress(
             [&fetchMediatorEndpointCompleted](
-                nx::network::http::StatusCode::Value statusCode, nx::network::SocketAddress)
+                nx::network::http::StatusCode::Value statusCode,
+                hpm::api::MediatorAddress)
             {
                 fetchMediatorEndpointCompleted.set_value(statusCode);
             });
@@ -137,7 +138,7 @@ protected:
 
     void andNewMediatorEndpointIsAvailable()
     {
-        while (getMediatorUdpEndpoint().toString() !=
+        while (getMediatorAddress().stunUdpEndpoint.toString() !=
             m_mediator->moduleInstance()->impl()->stunUdpEndpoints().front().toString())
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -157,18 +158,18 @@ protected:
         return *m_mediatorConnector;
     }
 
-    nx::network::SocketAddress getMediatorUdpEndpoint()
+    hpm::api::MediatorAddress getMediatorAddress()
     {
-        std::promise<nx::network::SocketAddress> mediatorUdpEndpointPromise;
-        mediatorConnector().fetchUdpEndpoint(
-            [&mediatorUdpEndpointPromise](
+        std::promise<hpm::api::MediatorAddress> mediatorAddressPromise;
+        mediatorConnector().fetchAddress(
+            [&mediatorAddressPromise](
                 auto /*resultCode*/,
-                nx::network::SocketAddress udpEndpoint)
+                hpm::api::MediatorAddress mediatorAddress)
             {
-                mediatorUdpEndpointPromise.set_value(udpEndpoint);
+                mediatorAddressPromise.set_value(mediatorAddress);
             });
 
-        return mediatorUdpEndpointPromise.get_future().get();
+        return mediatorAddressPromise.get_future().get();
     }
 
 private:
@@ -430,7 +431,7 @@ protected:
 
         ASSERT_EQ(
             nx::network::url::getEndpoint(m_udpUrl),
-            getMediatorUdpEndpoint());
+            getMediatorAddress().stunUdpEndpoint);
     }
 
 private:

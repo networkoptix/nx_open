@@ -64,9 +64,10 @@ protected:
         EXPECT_TRUE(m_server->listen());
 
         m_address = m_server->address();
-        network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
-            network::url::Builder().setScheme(network::stun::kUrlSchemeName).setEndpoint(m_address),
-            SocketAddress());
+        network::SocketGlobals::cloud().mediatorConnector().mockupMediatorAddress({
+            network::url::Builder().setScheme(network::stun::kUrlSchemeName)
+                .setEndpoint(m_address).toUrl(),
+            SocketAddress()});
     }
 
     CloudDataProviderMock cloud;

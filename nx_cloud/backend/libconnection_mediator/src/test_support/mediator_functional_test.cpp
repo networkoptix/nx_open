@@ -99,10 +99,11 @@ bool MediatorFunctionalTest::waitUntilStarted()
 
     if (m_testFlags & MediatorTestFlags::initializeConnectivity)
     {
-        network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
+        network::SocketGlobals::cloud().mediatorConnector().mockupMediatorAddress({
             nx::network::url::Builder()
-                .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(stunTcpEndpoint()),
-            stunUdpEndpoint());
+                .setScheme(nx::network::stun::kUrlSchemeName)
+                .setEndpoint(stunTcpEndpoint()),
+            stunUdpEndpoint()});
     }
 
     return true;
@@ -126,6 +127,14 @@ network::SocketAddress MediatorFunctionalTest::stunTcpEndpoint() const
 network::SocketAddress MediatorFunctionalTest::httpEndpoint() const
 {
     return m_httpEndpoint;
+}
+
+nx::utils::Url MediatorFunctionalTest::httpUrl() const
+{
+    return nx::network::url::Builder()
+        .setScheme(network::http::kUrlSchemeName)
+        .setEndpoint(m_httpEndpoint)
+        .setPath(hpm::api::kMediatorApiPrefix).toUrl();
 }
 
 std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection>

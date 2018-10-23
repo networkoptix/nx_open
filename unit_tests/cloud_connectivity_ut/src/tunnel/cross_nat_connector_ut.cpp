@@ -42,7 +42,7 @@ protected:
         auto connectResult = doSimpleConnectTest(
             std::chrono::milliseconds::zero(),
             nx::hpm::MediaServerEmulator::ActionToTake::proceedWithConnection,
-            mediator().stunUdpEndpoint());
+            hpm::api::MediatorAddress{mediator().httpUrl(), mediator().stunUdpEndpoint()});
         m_tunnelConnection = std::move(connectResult.connection);
     }
 
@@ -102,7 +102,9 @@ TEST_F(CrossNatConnector, timeout)
     const auto connectResult = doSimpleConnectTest(
         connectTimeout,
         nx::hpm::MediaServerEmulator::ActionToTake::ignoreIndication,
-        nx::network::SocketAddress(nx::network::HostAddress::localhost, 10345));
+        hpm::api::MediatorAddress{
+            nx::utils::Url(),
+            nx::network::SocketAddress(nx::network::HostAddress::localhost, 10345)});
 
     ASSERT_EQ(SystemError::timedOut, connectResult.errorCode);
     ASSERT_EQ(nullptr, connectResult.connection);
@@ -132,6 +134,11 @@ TEST_F(CrossNatConnector, provides_not_started_connections)
 
     givenEstablishedTunnelConnection();
     assertConnectionHasNotBeenStarted();
+}
+
+TEST_F(CrossNatConnector, sends_connect_request_through_tcp)
+{
+    // TODO
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -211,7 +218,9 @@ protected:
         m_connectResult = doSimpleConnectTest(
             std::chrono::seconds(3),
             nx::hpm::MediaServerEmulator::ActionToTake::proceedWithConnection,
-            m_redirector.server->address());
+            hpm::api::MediatorAddress{
+                nx::utils::Url(),
+                m_redirector.server->address()});
     }
 
     void thenRealConnectShouldGoThroughFunctioningMediator()

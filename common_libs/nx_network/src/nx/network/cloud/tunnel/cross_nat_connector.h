@@ -37,7 +37,7 @@ public:
      */
     CrossNatConnector(
         const AddressEntry& targetPeerAddress,
-        std::optional<SocketAddress> mediatorUdpEndpoint = std::nullopt);
+        std::optional<hpm::api::MediatorAddress> mediatorAddress = std::nullopt);
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
@@ -64,12 +64,12 @@ protected:
 
 private:
     using MediatorUdpEndpointFetcher = aio::AsyncOperationWrapper<
-        decltype(&nx::hpm::api::AbstractMediatorConnector::fetchUdpEndpoint)>;
+        decltype(&nx::hpm::api::AbstractMediatorConnector::fetchAddress)>;
 
     const AddressEntry m_targetPeerAddress;
     const std::string m_connectSessionId;
     ConnectCompletionHandler m_completionHandler;
-    std::optional<SocketAddress> m_mediatorUdpEndpoint;
+    std::optional<hpm::api::MediatorAddress> m_mediatorAddress;
     std::unique_ptr<nx::hpm::api::MediatorClientUdpConnection> m_mediatorUdpClient;
     std::optional<QString> m_originatingHostAddressReplacement;
     SocketAddress m_localAddress;
@@ -82,7 +82,7 @@ private:
     QString m_remotePeerFullName;
     std::unique_ptr<aio::Timer> m_timer;
     std::unique_ptr<ConnectorExecutor> m_cloudConnectorExecutor;
-    MediatorUdpEndpointFetcher m_mediatorUdpEndpointFetcher;
+    MediatorUdpEndpointFetcher m_mediatorAddressFetcher;
 
     static utils::ResultCounter<nx::hpm::api::ResultCode> s_mediatorResponseCounter;
 
@@ -90,7 +90,7 @@ private:
 
     void onFetchMediatorUdpEndpointCompletion(
         http::StatusCode::Value resultCode,
-        SocketAddress mediatorUdpEndpoint);
+        hpm::api::MediatorAddress mediatorAddress);
 
     void issueConnectRequestToMediator();
 

@@ -238,7 +238,9 @@ protected:
     void startMultipleCloudConnections()
     {
         m_executor = makeAsyncExecutor<Operation>(
-            mediator().stunUdpEndpoint(),
+            hpm::api::MediatorAddress{
+                mediator().httpUrl(),
+                mediator().stunUdpEndpoint()},
             serverSocketCloudAddress());
 
         m_executor->setMaxConcurrentOperations(27);
@@ -260,7 +262,7 @@ private:
     {
     public:
         Operation(
-            const nx::network::SocketAddress& mediatorUdpEndpoint,
+            const hpm::api::MediatorAddress& mediatorAddress,
             const std::string& host)
         {
             AddressEntry addressEntry;
@@ -269,7 +271,7 @@ private:
 
             m_crossNatConnector = std::make_unique<CrossNatConnector>(
                 addressEntry,
-                mediatorUdpEndpoint);
+                mediatorAddress);
         }
 
         void start(nx::utils::MoveOnlyFunc<void()> handler)
