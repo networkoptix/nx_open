@@ -195,8 +195,18 @@ void DeviceAnalyticsBinding::setSettings(const QVariantMap& settings)
         return;
     }
 
-    auto sdkSettings = sdk_support::toSdkSettings(settings);
+    const auto engineManifest = m_engine->manifest();
+    interactive_settings::JsonEngine jsonEngine;
+    jsonEngine.load(engineManifest.deviceAgentSettingsModel);
+
+    const auto settingsFromProperty = m_device->deviceAgentSettingsValues(m_engine->getId());
+    jsonEngine.applyValues(settingsFromProperty);
+    jsonEngine.applyValues(settings);
+
+    const auto settingsValues = jsonEngine.values();
+    auto sdkSettings = sdk_support::toSdkSettings(settingsValues);
     deviceAgent->setSettings(sdkSettings.get());
+    m_device->setDeviceAgentSettingsValues(m_engine->getId(), settingsValues);
 }
 
 void DeviceAnalyticsBinding::setMetadataSink(QnAbstractDataReceptorPtr metadataSink)

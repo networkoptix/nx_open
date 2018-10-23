@@ -19,55 +19,16 @@ using namespace nx::network;
 DeviceAnalyticsSettingsHandler::DeviceAnalyticsSettingsHandler(QnMediaServerModule* serverModule):
     nx::mediaserver::ServerModuleAware(serverModule)
 {
-    // TODO: #dmishin implement
 }
 
 JsonRestResponse DeviceAnalyticsSettingsHandler::executeGet(const JsonRestRequest& request)
 {
-    if (!request.params.contains(kDeviceIdParameter))
-    {
-        NX_WARNING(this, "Missing parameter %1", kDeviceIdParameter);
-        return makeResponse(QnRestResult::Error::MissingParameter, QStringList{kDeviceIdParameter});
-    }
-
-    if (!request.params.contains(kAnalyticsEngineIdParameter))
-    {
-        NX_WARNING(this, "Missing parameter %1", kAnalyticsEngineIdParameter);
-        return makeResponse(QnRestResult::Error::MissingParameter, QStringList{kDeviceIdParameter});
-    }
+    const auto error = checkCommonInputParameters(request.params);
+    if (error)
+        return *error;
 
     const auto deviceId = request.params[kDeviceIdParameter];
-    const auto device = nx::camera_id_helper::findCameraByFlexibleId(
-        serverModule()->resourcePool(),
-        deviceId);
-
-    if (!device)
-    {
-        const auto message = lm("Unable to find device by id %1").args(deviceId);
-        NX_WARNING(this, message);
-        return makeResponse(QnRestResult::Error::CantProcessRequest, message);
-    }
-
-    if (device->flags().testFlag(Qn::foreigner))
-    {
-        const auto message =
-            lm("Wrong server. Device belongs to the server %1, current server: %2")
-                .args(device->getParentId(), moduleGUID());
-
-        NX_WARNING(this, message);
-        return makeResponse(QnRestResult::Error::CantProcessRequest, message);
-    }
-
     const auto engineId = request.params[kAnalyticsEngineIdParameter];
-    const auto engine = sdk_support::find<resource::AnalyticsEngineResource>(
-        serverModule(), engineId);
-
-    if (!engine)
-    {
-        const auto message = lm("Unable to find analytics engine by id %1").args(engineId);
-        NX_WARNING(this, message);
-        return makeResponse(QnRestResult::Error::CantProcessRequest, message);
-    }
 
     const auto analyticsManager = serverModule()->analyticsManager();
     if (!analyticsManager)
@@ -88,19 +49,47 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::executePost(
     const JsonRestRequest& request,
     const QByteArray& body)
 {
-    // TODO: #dmishin implement
+    bool success = false;
+    auto requestJson = QJson::deserialized(body, QJsonObject(), &success);
+    if (!success)
+    {
+        NX_WARNING(this, "Can't deserialize request JSON");
+        return makeResponse(QnRestResult::Error::BadRequest, "Unable to deserialize reqeust");
+    }
+
+    auto parameters = requestJson.toVariantMap();
+    const auto error = checkCommonInputParameters(parameters);
+    if (error)
+        return *error;
+
+    if (!parameters.contains(kSettingsParameter))
+    {
+        NX_WARNING(this, "Missing parameter %1", kSettingsParameter);
+        return makeResponse(QnRestResult::Error::MissingParameter, QStringList{kSettingsParameter});
+    }
+
     auto analyticsManager = serverModule()->analyticsManager();
+    if (!analyticsManager)
+    {
+        const QString message("Unable to access analytics manager");
+        NX_ERROR(this, message);
+        return makeResponse(QnRestResult::InternalServerError, message);
+    }
 
-    const auto deviceId = request.params[kDeviceIdParameter];
-    const auto engineId = request.params[kAnalyticsEngineIdParameter];
-    const auto settings = request.params[kSettingsParameter];
+    const auto deviceId = parameters[kDeviceIdParameter].toString();
+    const auto engineId = parameters[kAnalyticsEngineIdParameter].toString();
+    const auto settings = parameters[kSettingsParameter];
 
-    auto document = QJsonDocument::fromBinaryData(settings.toUtf8());
-    auto settingsMap = document.object().toVariantMap();
+    analyticsManager->setSettings(
+        deviceId,
+        engineId,
+        settings.value<QVariantMap>());
 
-    analyticsManager->setSettings(deviceId, engineId, settingsMap);
+    const auto updatedSettings = analyticsManager->getSettings(deviceId, engineId);
+    JsonRestResponse result(http::StatusCode::ok);
+    result.json.setReply(QJsonObject::fromVariantMap(updatedSettings));
 
-    return JsonRestResponse(http::StatusCode::ok);
+    return result;
 }
 
 } // namespace nx::mediaserver::rest
