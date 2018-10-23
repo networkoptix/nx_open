@@ -280,7 +280,7 @@ public:
             ASSERT_FALSE(authResultStr.isEmpty());
 
             Qn::AuthResult authResult = QnLexical::deserialized<Qn::AuthResult>(authResultStr);
-            ASSERT_EQ(expectedAuthResult, authResult) << authResultStr.toStdString();
+            ASSERT_EQ(*expectedAuthResult, authResult) << authResultStr.toStdString();
 
             if (expectedStatusCode == nx::network::http::StatusCode::unauthorized)
             {
@@ -433,7 +433,7 @@ TEST_F(AuthenticationTest, noLdapConnect)
     // We have cloud user but not connected to cloud yet.
     testServerReturnCodeForWrongPassword(
         ldapUserWithFilledDigest,
-        nx::network::http::AuthType::authDigest,
+        nx::network::http::AuthType::authBasicAndDigest, //< TODO: should be set to only digest.
         nx::network::http::StatusCode::unauthorized,
         Qn::Auth_LDAPConnectError);
 }
