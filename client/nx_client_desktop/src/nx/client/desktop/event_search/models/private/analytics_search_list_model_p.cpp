@@ -314,7 +314,7 @@ bool AnalyticsSearchListModel::Private::commitInternal(const QnTimePeriod& perio
 
             end = iter;
 
-            if (timeUs == lastTimeUs && iter->objectId == last.objectId)
+            if (timeUs == lastTimeUs && iter->objectAppearanceId == last.objectAppearanceId)
                 break;
         }
     }
@@ -333,8 +333,8 @@ bool AnalyticsSearchListModel::Private::commitInternal(const QnTimePeriod& perio
     ScopedInsertRows insertRows(q, position, position + count - 1);
     for (auto iter = begin; iter != end; ++iter)
     {
-        if (!m_objectIdToTimestamp.contains(iter->objectId)) //< Just to be safe.
-            m_objectIdToTimestamp[iter->objectId] = startTime(*iter);
+        if (!m_objectIdToTimestamp.contains(iter->objectAppearanceId)) //< Just to be safe.
+            m_objectIdToTimestamp[iter->objectAppearanceId] = startTime(*iter);
     }
 
     m_data.insert(m_data.begin() + position,
