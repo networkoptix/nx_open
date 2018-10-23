@@ -125,7 +125,7 @@ protected:
                 .setEndpoint(m_mediator->moduleInstance()->impl()->httpEndpoints().front())
                 .setPath(api::kMediatorApiPrefix));
             const auto response = mediatorClient.getListeningPeers();
-            ASSERT_EQ(nx::network::http::StatusCode::ok, std::get<0>(response));
+            ASSERT_EQ(api::ResultCode::ok, std::get<0>(response));
             const auto listeningPeers = std::get<1>(response);
             if (listeningPeers.systems.find(QString::fromUtf8(m_cloudSystemCredentials.systemId)) !=
                 listeningPeers.systems.end())

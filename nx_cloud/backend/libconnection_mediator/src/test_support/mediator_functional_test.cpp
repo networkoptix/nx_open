@@ -237,7 +237,7 @@ std::vector<std::unique_ptr<MediaServerEmulator>>
     return systemServers;
 }
 
-std::tuple<nx::network::http::StatusCode::Value, api::ListeningPeers>
+std::tuple<api::ResultCode, api::ListeningPeers>
     MediatorFunctionalTest::getListeningPeers() const
 {
     api::Client mediatorClient(
