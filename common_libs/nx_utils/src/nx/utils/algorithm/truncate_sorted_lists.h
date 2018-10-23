@@ -13,7 +13,8 @@ namespace nx::utils::algorithm {
  * then truncate source lists in the way that all off-limit items are erased.
  * Merge is done using priority queue concept implemented via STL heap.
  *
- * @param sortedLists List of source sorted lists. Its type should be random access iteratable.
+ * @param sortedLists List of source sorted lists or pointers to them.
+ *   Its type should be random access iteratable.
  *   Each list should be sequentially iteratable and have value_type type,
  *   size and erase(first, last) methods.
  * @param totalLimit The maximum allowed number of items in virtual merged list.
@@ -130,7 +131,8 @@ int truncate_sorted_lists(
  * then truncate source lists in the way that all off-limit items are erased.
  * Merge is done using priority queue concept implemented via STL heap.
  *
- * @param sortedLists List of source sorted lists. Its type should be random access iteratable.
+ * @param sortedLists List of source sorted lists or pointers to them.
+ *   Its type should be random access iteratable.
  *   Each list should be sequentially iteratable and have value_type type,
  *   size and erase(first, last) methods.
  * @param sortFieldGetter A functor taking value_type of a sorted list and returning a value
@@ -162,7 +164,8 @@ int truncate_sorted_lists(
  * then truncate source lists in the way that all off-limit items are erased.
  * Merge is done using priority queue concept implemented via STL heap.
  *
- * @param sortedLists List of source sorted lists. Its type should be random access iteratable.
+ * @param sortedLists List of source sorted lists or pointers to them.
+ *   Its type should be random access iteratable.
  *   Each list should be sequentially iteratable and have value_type type,
  *   size and erase(first, last) methods.
  *   Values should be comparable with operator<
