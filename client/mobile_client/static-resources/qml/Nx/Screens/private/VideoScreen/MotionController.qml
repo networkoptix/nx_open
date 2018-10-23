@@ -191,6 +191,7 @@ Item
         shadowColor: d.shadowColor
         startPoint: d.fromRelative(d.defaultTopLeftRelative)
         endPoint: d.fromRelative(d.defaultBottomRightRelative)
+        lineWidth: 5
         visible: d.toBool(
             controller.motionSearchMode && d.defaultTopLeftRelative && d.defaultBottomRightRelative)
     }

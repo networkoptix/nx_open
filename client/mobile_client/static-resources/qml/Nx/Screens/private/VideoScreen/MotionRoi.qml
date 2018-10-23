@@ -15,6 +15,7 @@ Item
     property alias animationDuration: singleSelectionMarker.animationDuration
     property color roiColor
     property color shadowColor
+    property int lineWidth: 1
     readonly property bool singlePoint:
         Qt.vector2d(startPoint.x - endPoint.x, startPoint.y - endPoint.y).length() < 5
 
@@ -66,7 +67,7 @@ Item
             height: parent.height - d.shadowRadius * 2
             color: "transparent"
 
-            border.width: 1
+            border.width: item.lineWidth
             border.color: item.roiColor
 
         }
