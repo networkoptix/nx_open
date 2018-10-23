@@ -100,8 +100,9 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((LicenseKey), (json))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LicenseKey, (json), (licenseKey))
 
 
-int QnActivateLicenseRestHandler::executePost(const QString&, const QnRequestParams&,
-    const QByteArray& body, QnJsonRestResult& result, const QnRestConnectionProcessor* owner)
+int QnActivateLicenseRestHandler::executePost(const QString& /*path*/,
+    const QnRequestParams& /*params*/, const QByteArray& body, QnJsonRestResult& result,
+    const QnRestConnectionProcessor* owner)
 {
     LicenseKey licenseKeyStruct;
     if (!QJson::deserialize<LicenseKey>(body, &licenseKeyStruct))
@@ -115,7 +116,7 @@ int QnActivateLicenseRestHandler::executePost(const QString&, const QnRequestPar
 
 
 // WARNING: Deprecated!
-int QnActivateLicenseRestHandler::executeGet(const QString&, const QnRequestParams& params,
+int QnActivateLicenseRestHandler::executeGet(const QString& /*path*/, const QnRequestParams& params,
     QnJsonRestResult& result, const QnRestConnectionProcessor* owner)
 {
     const QString licenseKey = params.value(kKey);
@@ -129,7 +130,7 @@ int QnActivateLicenseRestHandler::executeGet(const QString&, const QnRequestPara
 }
 
 
-int QnActivateLicenseRestHandler::activateLicense(const QString licenseKey,
+int QnActivateLicenseRestHandler::activateLicense(const QString& licenseKey,
     QnJsonRestResult& result, const QnRestConnectionProcessor* owner)
 {
     vms::api::DetailedLicenseData reply;
@@ -204,7 +205,6 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(
     bool infoMode,
     QByteArray& response)
 {
-    // make check license request
     QUrl url(QN_LICENSE_URL);
     CLSimpleHTTPClient client(url.host(), url.port(80), TCP_TIMEOUT, QAuthenticator());
 
