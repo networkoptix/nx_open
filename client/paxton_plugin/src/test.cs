@@ -18,12 +18,13 @@ namespace nx
                 cameras.Add(camera);
             }
 
+            Console.ReadKey();
+
             PaxtonClient.playback(connectionInfo, new OemDvrFootageRequest(
                 DateTime.Now - TimeSpan.FromMinutes(5),
                 OemDvrPlaybackFunction.Start,
                 100,
                 cameras.ToArray()));
-            Console.ReadKey();
         }
     }
 }
