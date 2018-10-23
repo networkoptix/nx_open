@@ -152,17 +152,21 @@ Item
         mainColor: d.lineColor
         shadowColor: d.shadowColor
         centerPoint: d.fromRelative(d.preloaderRelativePoint)
+        animationDuration: pressAndHoldTimer.interval
 
         state:
         {
-            if (d.customInitialRelative)
+            if (d.customInitialRelative && !customRoiMarker.running)
+            {
+                enableAnimation = true;
                 return "expanded"
+            }
 
-            if (d.hasFinishedCustomRoi && customRoiMarker.singlePoint)
-                return "normal"
-
+            enableAnimation = false
             return "hidden"
         }
+
+        visible: !customRoiMarker.drawing
     }
 
     MotionRoi
@@ -175,6 +179,7 @@ Item
         startPoint: d.fromRelative(d.customFirstPoint)
         endPoint: d.fromRelative(d.customSecondPoint)
         visible: controller.motionSearchMode && controller.customRoiExists
+        animationDuration: pressAndHoldTimer.interval
     }
 
     // TODO: remove me, this is just for A. Pats
@@ -194,7 +199,7 @@ Item
     {
         id: pressAndHoldTimer
 
-        interval: 800
+        interval: 600
         onTriggered: controller.handleLongPressed()
     }
 

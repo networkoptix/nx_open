@@ -16,6 +16,8 @@ Item
     property real normalCircleRadius: 5.5
     property real normalThickness: 1
 
+    property bool enableAnimation: true
+    property int animationDuration: 600
     property real expandedSize: 63
     property real expandedCircleRadius: expandedSize / 2
     property real expandedThickness: 3
@@ -159,7 +161,7 @@ Item
     {
         id: d
 
-        readonly property int animationDuration: 800
+        readonly property int animationDuration: item.enableAnimation ? item.animationDuration : 0
         property real size: item.normalSize
         property real thickness: item.normalThickness
         property real circleRadius: item.normalCircleRadius

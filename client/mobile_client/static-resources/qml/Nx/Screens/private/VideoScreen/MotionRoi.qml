@@ -12,9 +12,9 @@ Item
     property point endPoint
     property bool drawing: false
 
+    property alias animationDuration: singleSelectionMarker.animationDuration
     property color roiColor
     property color shadowColor
-
     readonly property bool singlePoint:
         Qt.vector2d(startPoint.x - endPoint.x, startPoint.y - endPoint.y).length() < 5
 
@@ -23,6 +23,28 @@ Item
 
     width: d.bottomRightPoint.x - d.topLeftPoint.x + 1
     height: d.bottomRightPoint.y - d.topLeftPoint.y + 1
+
+    RoiSelectionPreloader
+    {
+        id: singleSelectionMarker
+
+        mainColor: item.roiColor
+        shadowColor: item.shadowColor
+        state:
+        {
+            if (item.drawing)
+            {
+                enableAnimation = false
+                return "expanded"
+            }
+
+            enableAnimation = true;
+            return singlePoint ? "normal" : "hidden"
+        }
+
+        centerPoint: d.startMarkerPoint
+        visible: opacity > 0
+    }
 
     Rectangle
     {
