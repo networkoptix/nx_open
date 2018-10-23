@@ -1,4 +1,5 @@
 import QtQuick 2.6
+import QtGraphicalEffects 1.0
 
 Item
 {
@@ -20,6 +21,7 @@ Item
     property real expandedThickness: 3
     property real centerCircleRadius: 2.5
 
+    layer.enabled: true
 
     x: centerPoint.x - width / 2
     y: centerPoint.y - height / 2
@@ -28,67 +30,83 @@ Item
     height: width
     visible: opacity > 0
 
-    Rectangle
+    Item
     {
-        id: leftDash
+        id: visualHolder
 
-        anchors.verticalCenter: parent.verticalCenter
-        x: d.thickness
-        color: item.mainColor
-        width: item.dashSize - d.thickness
-        height: d.thickness
+        anchors.fill: parent
+        Rectangle
+        {
+            id: leftDash
+
+            anchors.verticalCenter: parent.verticalCenter
+            x: d.thickness
+            color: item.mainColor
+            width: item.dashSize - d.thickness
+            height: d.thickness
+        }
+
+        Rectangle
+        {
+            id: rightDash
+
+            anchors.verticalCenter: parent.verticalCenter
+            x: parent.width - width - d.thickness
+            color: item.mainColor
+            width: item.dashSize - d.thickness
+            height: d.thickness
+        }
+
+        Rectangle
+        {
+            id: topDash
+
+            anchors.horizontalCenter: parent.horizontalCenter
+            y: d.thickness
+            color: item.mainColor
+            width: d.thickness
+            height: item.dashSize - d.thickness
+        }
+
+        Rectangle
+        {
+            id: bottomDash
+
+            anchors.horizontalCenter: parent.horizontalCenter
+            y: parent.height - height - d.thickness
+            color: item.mainColor
+            width: d.thickness
+            height: item.dashSize - d.thickness
+        }
+
+        Circle
+        {
+            id: circle
+
+            anchors.centerIn: parent
+            borderColor: item.mainColor
+            radius: d.circleRadius
+            border.width: d.thickness
+        }
+
+        Circle
+        {
+            id: centerCircle
+
+            anchors.centerIn: parent
+            circleColor: item.mainColor
+            radius: item.centerCircleRadius
+        }
     }
 
-    Rectangle
+    DropShadow
     {
-        id: rightDash
+        id: shadow
 
-        anchors.verticalCenter: parent.verticalCenter
-        x: parent.width - width - d.thickness
-        color: item.mainColor
-        width: item.dashSize - d.thickness
-        height: d.thickness
-    }
-
-    Rectangle
-    {
-        id: topDash
-
-        anchors.horizontalCenter: parent.horizontalCenter
-        y: d.thickness
-        color: item.mainColor
-        width: d.thickness
-        height: item.dashSize - d.thickness
-    }
-
-    Rectangle
-    {
-        id: bottomDash
-
-        anchors.horizontalCenter: parent.horizontalCenter
-        y: parent.height - height - d.thickness
-        color: item.mainColor
-        width: d.thickness
-        height: item.dashSize - d.thickness
-    }
-
-    Circle
-    {
-        id: circle
-
-        anchors.centerIn: parent
-        borderColor: item.mainColor
-        radius: d.circleRadius
-        border.width: d.thickness
-    }
-
-    Circle
-    {
-        id: centerCircle
-
-        anchors.centerIn: parent
-        circleColor: item.mainColor
-        radius: item.centerCircleRadius
+        anchors.fill: visualHolder
+        radius: 1
+        color: item.shadowColor
+        source: visualHolder
     }
 
     states:
