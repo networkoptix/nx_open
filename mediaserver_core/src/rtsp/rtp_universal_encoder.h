@@ -45,7 +45,7 @@ private:
 
 private:
     QnByteArray m_outputBuffer;
-    QByteArray m_sdp;
+    QList<QString> m_sdpAttributes;
     Config m_config;
     bool m_isCurrentPacketSecondaryStream = false;
     bool m_useSecondaryPayloadType = false;
