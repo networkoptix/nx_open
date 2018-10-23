@@ -9,14 +9,13 @@ Stop iteration => Failure, the last error is returned.
 """
 
 import logging
-import timeit
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from typing import Generator, List
 
 from framework.http_api import HttpError
 from . import stage
-from .camera_actions import configure_audio, configure_video, ffprobe_streams, fps_avg
+from .camera_actions import configure_audio, configure_video, ffprobe_expect_stream, fps_avg
 from .checks import Checker, Failure, Halt, Result, Success, expect_values, retry_expect_values
 
 # Filled by _stage decorator.
@@ -110,7 +109,7 @@ def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) ->
 
             for profile, configuration in (('primary', selected), ('secondary', secondary)):
                 if configuration:
-                    for error in ffprobe_streams(
+                    for error in ffprobe_expect_stream(
                             {'video': configuration}, run.media_url(profile),
                             '{}[{}]'.format(profile, fps_index)):
                         yield error
@@ -137,7 +136,7 @@ def video_parameters(run, stream_urls=None, **profiles):
                     run.server.api, run.id, run.data['cameraAdvancedParams'],
                     profile, **configuration)
 
-                for error in ffprobe_streams(
+                for error in ffprobe_expect_stream(
                         {'video': configuration}, run.media_url(profile),
                         '{}[{}]'.format(profile, index)):
                     yield error
@@ -172,7 +171,7 @@ def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Genera
                 else:
                     del configuration["skip_codec_change"]
 
-                for error in ffprobe_streams(
+                for error in ffprobe_expect_stream(
                         {'audio': configuration}, run.media_url(), 'primary[{}]'.format(index),
                         audio_stage=True):
                     yield error
@@ -254,9 +253,15 @@ def ptz_positions(run, *positions):  # type: (stage.Run, List[dict]) -> Generato
                 for error in execute('GetPresets', {'id=' + position['preset']: {'name': name}}):
                     yield error
 
+                if 'point' not in position:
+                    continue
+
                 for error in execute('ActivatePreset', speed=100, presetId=position['preset']):
                     yield error
             else:
+                if 'point' not in position:
+                    continue
+
                 for error in execute('AbsoluteDeviceMove', speed=100, **point):
                     yield error
 

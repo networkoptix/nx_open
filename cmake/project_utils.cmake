@@ -26,7 +26,7 @@ function(nx_add_target name type)
     set(options NO_MOC NO_RC_FILE WERROR NO_WERROR SIGNED MACOS_ARG_MAX_WORKAROUND)
     set(oneValueArgs LIBRARY_TYPE RC_FILE)
     set(multiValueArgs
-        ADDITIONAL_SOURCES ADDITIONAL_RESOURCES
+        ADDITIONAL_SOURCES ADDITIONAL_RESOURCES ADDITIONAL_MOCABLES
         SOURCE_EXCLUSIONS
         OTHER_SOURCES
         PUBLIC_LIBS PRIVATE_LIBS
@@ -161,7 +161,7 @@ function(nx_add_target name type)
     endif()
 
     if(NOT NX_NO_MOC)
-        nx_add_qt_mocables(${name} ${hpp_files}
+        nx_add_qt_mocables(${name} ${hpp_files} ${NX_ADDITIONAL_MOCABLES}
             INCLUDE_DIRS
                 ${CMAKE_CURRENT_SOURCE_DIR}/src
                 # TODO: #dklychkov Remove hardcoded nx_fusion after updating to a newer Qt which

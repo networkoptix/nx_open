@@ -7,7 +7,6 @@
 #include <QtCore/QHash>
 #include <QtCore/QMetaObject>
 #include <QtCore/QMetaProperty>
-#include <QtCore/QFile>
 
 #include <nx/utils/log/log.h>
 
@@ -73,7 +72,9 @@ JsonEngine::JsonEngine(QObject* parent):
     components::Factory::registerTypes();
 }
 
-JsonEngine::~JsonEngine() = default;
+JsonEngine::~JsonEngine()
+{
+}
 
 void JsonEngine::load(const QJsonObject& json)
 {
@@ -85,49 +86,6 @@ void JsonEngine::load(const QJsonObject& json)
 void JsonEngine::load(const QByteArray& data)
 {
     load(QJsonDocument::fromJson(data).object());
-}
-
-void JsonEngine::load(const QUrl& url)
-{
-    QString path;
-
-    if (url.isLocalFile())
-        path = url.toLocalFile();
-    else if (url.scheme() == "qrc")
-        path = ":" + url.path();
-    else if (url.scheme().isEmpty())
-        path = url.path();
-
-    if (path.isEmpty())
-    {
-        NX_ERROR(this, "Loading from remote URLs is not supported.");
-        setStatus(Status::error);
-        return;
-    }
-
-    QFile file(path);
-    if (!file.open(QFile::ReadOnly))
-    {
-        NX_ERROR(this, lm("Cannot open file %1.").arg(file.fileName()));
-        setStatus(Status::error);
-        return;
-    }
-
-    constexpr qint64 kMaxFileSize = 1024 * 1024;
-    if (file.size() > kMaxFileSize)
-    {
-        NX_ERROR(this, lm("Cannot load file %1. File is too big.").arg(file.fileName()));
-        setStatus(Status::error);
-        return;
-    }
-
-    const QByteArray data = file.readAll();
-
-    file.close();
-
-    load(data);
-
-    return;
 }
 
 } // namespace nx::mediaserver::interactive_settings

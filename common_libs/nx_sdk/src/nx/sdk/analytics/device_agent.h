@@ -34,7 +34,7 @@ public:
  * its queryInterface method.
  */
 static const nxpl::NX_GUID IID_DeviceAgent =
-    {{0x48, 0x5a, 0x23, 0x51, 0x55, 0x73, 0x4f, 0xb5, 0xa9, 0x11, 0xe4, 0xfb, 0x22, 0x87, 0x79, 0x24}};
+    {{0x48,0x5a,0x23,0x51,0x55,0x73,0x4f,0xb5,0xa9,0x11,0xe4,0xfb,0x22,0x87,0x79,0x24}};
 
 class Engine; //< Forward declaration for the parent object.
 
@@ -51,29 +51,12 @@ public:
     virtual Engine* engine() const = 0;
 
     /**
-     * Starts fetching metadata from the resource.
-     * @param typeList List of types of events and objects as an array of C-style strings; null if
-     *     the array is empty.
-     * @param typeListSize Number of items in typeList array.
-     * @return noError in case of success, other value otherwise.
+     * Called before other methods. Server provides the set of settings stored in its database for
+     * the combination of a resource instance and a engine type.
+     * @param settings Values of settings declared in the manifest. The pointer is valid only
+     *     during the call. If count is 0, the pointer is null.
      */
-    virtual Error startFetchingMetadata(
-        const char* const* typeList, int typeListSize) = 0;
-
-    /**
-     * @param handler Processes event metadata and object metadata fetched by the engine. The
-     *     engine will fetch events metadata after startFetchingMetadata() call. Errors should also
-     *     be reported via this handler. Also provides other services to the DeviceAgent, e.g.
-     *     reading settings that are stored by the Server.
-     * @return noError in case of success, other value otherwise.
-     */
-    virtual Error setMetadataHandler(MetadataHandler* handler) = 0;
-
-    /**
-     * Stops fetching metadata from the resource.
-     * @return noError in case of success, other value otherwise.
-     */
-    virtual Error stopFetchingMetadata() = 0;
+    virtual void setSettings(const nxpl::Setting* settings, int count) = 0;
 
     /**
      * Provides a 0-terminated UTF-8 string containing the JSON manifest.
@@ -88,12 +71,29 @@ public:
     virtual void freeManifest(const char* data) = 0;
 
     /**
-     * Called before other methods. Server provides the set of settings stored in its database for
-     * the combination of a resource instance and a engine type.
-     * @param settings Values of settings declared in the manifest. The pointer is valid only
-     *     during the call. If count is 0, the pointer is null.
+     * @param handler Processes event metadata and object metadata fetched by the engine. The
+     *     engine will fetch events metadata after startFetchingMetadata() call. Errors should also
+     *     be reported via this handler. Also provides other services to the DeviceAgent, e.g.
+     *     reading settings that are stored by the Server.
+     * @return noError in case of success, other value otherwise.
      */
-    virtual void setSettings(const nxpl::Setting* settings, int count) = 0;
+    virtual Error setMetadataHandler(MetadataHandler* handler) = 0;
+
+    /**
+     * Starts fetching metadata from the resource.
+     * @param typeList List of types of events and objects as an array of C-style strings; null if
+     *     the array is empty.
+     * @param typeListSize Number of items in typeList array.
+     * @return noError in case of success, other value otherwise.
+     */
+    virtual Error startFetchingMetadata(
+        const char* const* typeList, int typeListSize) = 0;
+
+    /**
+     * Stops fetching metadata from the resource.
+     * @return noError in case of success, other value otherwise.
+     */
+    virtual Error stopFetchingMetadata() = 0;
 };
 
 } // namespace analytics

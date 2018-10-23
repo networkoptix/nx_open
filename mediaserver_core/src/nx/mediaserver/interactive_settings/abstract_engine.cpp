@@ -3,6 +3,9 @@
 #include <QtCore/QPointer>
 #include <QtCore/QVector>
 #include <QtCore/QSet>
+#include <QtCore/QFile>
+
+#include <nx/utils/log/log.h>
 
 #include "components/items.h"
 
@@ -44,7 +47,34 @@ AbstractEngine::AbstractEngine(QObject* parent):
 {
 }
 
-AbstractEngine::~AbstractEngine() = default;
+AbstractEngine::~AbstractEngine()
+{
+}
+
+void AbstractEngine::load(const QString& fileName)
+{
+    QFile file(fileName);
+    if (!file.open(QFile::ReadOnly))
+    {
+        NX_ERROR(this, lm("Cannot open file %1.").arg(file.fileName()));
+        setStatus(Status::error);
+        return;
+    }
+
+    constexpr qint64 kMaxFileSize = 1024 * 1024;
+    if (file.size() > kMaxFileSize)
+    {
+        NX_ERROR(this, lm("Cannot load file %1. File is too big.").arg(file.fileName()));
+        setStatus(Status::error);
+        return;
+    }
+
+    const QByteArray data = file.readAll();
+
+    file.close();
+
+    load(data);
+}
 
 AbstractEngine::Status AbstractEngine::status() const
 {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cassert>
+#include <optional>
 #include <typeinfo>
 
 #include <boost/optional.hpp>
@@ -95,6 +96,21 @@ void serialize(QnJsonContext* ctx, const T& value, const QString& key, QJsonObje
 
     QJsonValueRef jsonValue = (*outTarget)[key];
     QJson::serialize(ctx, value, &jsonValue);
+}
+
+template<class T>
+void serialize(
+    QnJsonContext* ctx,
+    const std::optional<T>& value,
+    const QString& key,
+    QJsonObject* outTarget)
+{
+    NX_ASSERT(outTarget);
+
+    QJsonValue jsonValue;
+    QJson::serialize(ctx, value, &jsonValue);
+    if (!jsonValue.isNull())
+        (*outTarget)[key] = jsonValue;
 }
 
 template<class T>

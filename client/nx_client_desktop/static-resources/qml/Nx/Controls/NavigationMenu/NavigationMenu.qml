@@ -6,7 +6,7 @@ ScrollView
 {
     id: navigationMenu
 
-    property Item currentItem: null
+    property var currentItemId: null
 
     default property alias data: column.data
 
