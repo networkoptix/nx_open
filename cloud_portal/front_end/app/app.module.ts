@@ -5,12 +5,12 @@ import { BrowserAnimationsModule }                                        from '
 import { RouterModule, UrlHandlingStrategy, UrlTree }                     from '@angular/router';
 import { HttpClient, HttpClientModule }                                   from '@angular/common/http';
 
-import { NgbModule, NgbModal }              from '@ng-bootstrap/ng-bootstrap';
-import { OrderModule }                      from 'ngx-order-pipe';
-import { DeviceDetectorModule }             from 'ngx-device-detector';
-import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
-import { TranslateHttpLoader }              from '@ngx-translate/http-loader';
-import { CookieService }                    from 'ngx-cookie-service';
+import { NgbModule, NgbModal }                                from '@ng-bootstrap/ng-bootstrap';
+import { OrderModule }                                        from 'ngx-order-pipe';
+import { DeviceDetectorModule }                               from 'ngx-device-detector';
+import { TranslateModule, TranslateService, TranslateLoader } from '@ngx-translate/core';
+import { TranslateHttpLoader }                                from '@ngx-translate/http-loader';
+import { CookieService }                                      from 'ngx-cookie-service';
 
 import {
     cloudApiServiceModule, systemModule, systemsModule, languageServiceModule,
@@ -19,11 +19,13 @@ import {
     localStorageModule, locationProxyModule
 } from './src/ajs-upgrade/ajs-upgraded-providers';
 
-import { AppComponent }     from './app.component';
-import { DropdownsModule }  from './src/dropdowns/dropdowns.module';
-import { DialogsModule }    from './src/dialogs/dialogs.module';
-import { PagesModule }      from './src/pages/pages.module';
-import { DirectivesModule } from './src/directives/directives.module';
+import { AppComponent }        from './app.component';
+import { DropdownsModule }     from './src/dropdowns/dropdowns.module';
+import { DialogsModule }       from './src/dialogs/dialogs.module';
+import { PagesModule }         from './src/pages/pages.module';
+import { DirectivesModule }    from './src/directives/directives.module';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { ServiceModule }    from './src/services/services.module';
 
 // AoT requires an exported function for factories
 export function createTranslateLoader(http: HttpClient) {
@@ -69,6 +71,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         locationProxyModule,
         DropdownsModule,
         DialogsModule,
+        ServiceModule,
         PagesModule,
         DirectivesModule,
 
@@ -88,6 +91,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         NgbModal,
         Location,
         CookieService,
+        TranslateService,
         { provide: LocationStrategy, useClass: PathLocationStrategy },
         { provide: UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy },
     ],
@@ -101,6 +105,4 @@ export class AppModule {
     ngDoBootstrap() {
     }
 }
-
-
 

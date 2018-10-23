@@ -362,5 +362,9 @@ window.L = {};
                                 templateUrl: CONFIG.viewsDir + '404.html'
                             });
                     });
-            }]);
+            }])
+        .run(['nxLanguageService', 'languageService', function (nxLanguageService, languageService) {
+            // make sure both language services are synchronized
+            nxLanguageService.translate.use(languageService.lang.language);
+        }]);
 })();
