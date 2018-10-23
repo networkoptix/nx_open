@@ -3,9 +3,9 @@
 import json
 import logging
 import subprocess
+from datetime import timedelta
 
-import timeit
-
+from framework.utils import Timer
 from .checks import Success, Halt, Failure, expect_values
 
 _logger = logging.getLogger(__name__)
@@ -21,58 +21,39 @@ def fps_avg(fps):
     return fps_average
 
 
-def _ffprobe_poll(expected_values, probe, stream_url, title):
-    start_time = timeit.default_timer()
-    while probe.poll() is None:
-        if timeit.default_timer() - start_time > 30:
-            yield Halt('{!r} ffprobe has timed out'.format(title))
+def _expect_poll_output(title, expected_values, process, parse_output):
+    timer = Timer()
+    while process.poll() is None:
+        if timer.duration > timedelta(seconds=30):
+            yield Halt('{!r} -- has timed out'.format(title))
             return
-        yield Halt('{!r} ffprobe is in progress'.format(title))
+        yield Halt('{!r} -- is in progress'.format(title))
 
-    stdout, stderr = probe.communicate()
+    stdout, stderr = process.communicate()
     if stdout:
-        _logger.debug('FFprobe(%s) stdout:\n%s', stream_url, stdout)
+        _logger.debug('Process pid=%s -- stdout:\n%s', process.pid, stdout)
     if stderr:
-        _logger.debug('FFprobe(%s) stderr:\n%s', stream_url, stderr)
-    if probe.returncode != 0:
-        yield Halt('{!r} ffprobe returned error code {}'.format(title, probe.returncode))
+        _logger.debug('Process pid=%s -- stderr:\n%s', process.pid, stderr)
+    if process.returncode != 0 and process.returncode != 124:  # 0 - success, 124 - timeout.
+        yield Halt('{!r} -- returned error code {}'.format(title, process.returncode))
         return
 
-    streams = (json.loads(stdout.decode('utf-8')) or {}).get('streams')
-    if not streams:
-        yield Halt('{!r} ffprobe returned no streams'.format(title))
-        return
-
-    video, audio = None, None
-    for stream in streams:
-        if stream.get('codec_type') == 'video':
-            fps_count, fps_base = stream['r_frame_rate'].split('/')
-            video = {
-                'resolution': '{}x{}'.format(stream['width'], stream['height']),
-                'codec': stream['codec_name'].upper(),
-                'fps': float(fps_count) / float(fps_base),
-            }
-        elif stream.get('codec_type') == 'audio':
-            audio = {'codec': stream.get('codec_name').upper()}
-
-    yield expect_values(expected_values, dict(video=video, audio=audio), path=title)
+    yield expect_values(expected_values, parse_output(stdout), path=title)
 
 
-def ffprobe_streams(expected_values, stream_url, title, rerun_count=1000):
-    frames = max(expected_values.get('video', {}).get('fps', [30]))
+def _expect_command_output(title, expected_values, parse_output, command, rerun_count=1000):
     last_failure = None
-    for _ in range(rerun_count):
-        options = ['-show_streams', '-of', 'json', '-fpsprobesize', str(frames)]
-        probe = subprocess.Popen(
-            ['ffprobe'] + options + [stream_url],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    for run_number in range(rerun_count):
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        _logger.debug('Run async pid=%s: %s', process.pid, ' '.join(command))
         try:
-            for result in _ffprobe_poll(expected_values, probe, stream_url, title):
+            for result in _expect_poll_output(
+                    title, expected_values, process, parse_output):
                 if isinstance(result, Success):
                     return
                 elif isinstance(result, Halt) and last_failure:
-                    # In case of halt keep last error messages.
-                    yield last_failure.append_errors('retry:', result.message)
+                    yield last_failure.with_more_errors(
+                        'retry {}:'.format(run_number), result.message)
                 elif isinstance(result, Failure):
                     last_failure = result
                     yield result
@@ -80,9 +61,61 @@ def ffprobe_streams(expected_values, stream_url, title, rerun_count=1000):
                     yield result
         finally:
             try:
-                probe.kill()
+                process.kill()
             except OSError:
                 pass
+
+
+def _ffprobe_extract_video(output):
+    streams = (json.loads(output.decode('utf-8')) or {}).get('streams')
+    if not streams:
+        return None
+    stream = streams[0]
+    fps_count, fps_base = stream['r_frame_rate'].split('/')
+    return {
+        'resolution': '{}x{}'.format(stream['width'], stream['height']),
+        'codec': stream['codec_name'].upper(),
+        'fps': float(fps_count) / float(fps_base),
+    }
+
+
+def _ffprobe_extract_fps(output):
+    frames = json.loads((output + ']}').decode('utf-8')).get('frames')
+    if not frames:
+        return None
+    return {'fps': len(frames) / float(frames[-1]['pkt_pts_time'])}
+
+
+def _ffprobe_extract_audio(output):
+    streams = (json.loads(output.decode('utf-8')) or {}).get('streams')
+    if not streams:
+        return None
+    stream = streams[0]
+    return {'codec': stream.get('codec_name').upper()}
+
+
+def ffprobe_expect_stream(expected_values, stream_url, title):
+    command = ['ffprobe', '-of', 'json', '-i', stream_url]
+    video = expected_values.get('video')
+    if video:
+        fps = video.pop('fps') if 'fps' in video else None
+        for result in _expect_command_output(
+                title, video, _ffprobe_extract_video,
+                command + ['-show_streams', '-select_streams', 'v', '-probesize', '10k']):
+            yield result
+
+        if fps:
+            for result in _expect_command_output(
+                    title, {'fps': fps}, _ffprobe_extract_fps,
+                    ['timeout', '10'] + command + ['-show_frames', '-select_streams', 'v']):
+                yield result
+
+    audio = expected_values.get('audio')
+    if audio:
+        for result in _expect_command_output(
+                title, audio, _ffprobe_extract_audio,
+                command + ['-show_streams', '-select_streams', 'a', '-probesize', '10k']):
+            yield result
 
 
 def _find_param_by_name_prefix(all_params, parent_group, *name_prefixes):
@@ -121,9 +154,14 @@ def configure_video(api, camera_id, camera_advanced_params, profile, fps=None, *
 
 
 def configure_audio(api, camera_id, camera_advanced_params, codec):
-    audio_input = _find_param_by_name_prefix(camera_advanced_params['groups'], 'root', 'audio')
-    codec_param_id = _find_param_by_name_prefix(
-        audio_input['params'], 'audio input', 'codec')['id']
+    audio_group = _find_param_by_name_prefix(
+        camera_advanced_params['groups'], 'root', 'audio')
+    try:
+        codec_param = _find_param_by_name_prefix(audio_group['params'], 'group', 'codec')
+    except KeyError:
+        sub_group = _find_param_by_name_prefix(audio_group['groups'], 'group', 'input settings')
+        codec_param = _find_param_by_name_prefix(sub_group['params'], 'sub group', 'audio encoding')
+
     new_cam_params = dict()
-    new_cam_params[codec_param_id] = codec
+    new_cam_params[codec_param['id']] = codec
     api.set_camera_advanced_param(camera_id, **new_cam_params)

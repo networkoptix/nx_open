@@ -104,6 +104,7 @@
 #include <utils/common/delayed.h>
 #include <nx/client/ptz/ptz_hotkey_resource_property_adaptor.h>
 #include <nx/client/core/utils/geometry.h>
+#include <nx/client/desktop/resources/layout_password_management.h>
 
 using namespace nx::client::desktop::ui;
 using nx::client::core::Geometry;
@@ -1465,6 +1466,18 @@ void QnWorkbenchController::at_workbench_currentLayoutChanged()
 {
     if (const auto layout = workbench()->currentLayout()->resource())
     {
+        if (nx::client::desktop::layout::requiresPassword(layout))
+        {
+            // When opening encrypted layout, ask for the password and remove layout if unsuccessful.
+            if (!nx::client::desktop::layout::askAndSetPassword(layout, mainWindowWidget()))
+            {
+                const auto workbenchLayout = workbench()->currentLayout();
+                workbench()->removeLayout(workbenchLayout);
+                delete workbenchLayout;
+                return;
+            }
+        }
+
         connect(layout, &QnLayoutResource::lockedChanged, this,
             &QnWorkbenchController::updateCurrentLayoutInstruments);
     }

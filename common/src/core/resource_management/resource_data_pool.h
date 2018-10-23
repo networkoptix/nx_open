@@ -29,12 +29,14 @@ public:
     QnResourceData data(const QnConstSecurityCamResourcePtr &camera) const;
     QnResourceData data(const QString& _vendor, const QString& model, const QString& firmware = QString()) const;
 
+    bool validateData(const QByteArray& data) const;
     bool loadFile(const QString &fileName);
     bool loadData(const QByteArray& data);
-
+    void clear();
+signals:
+    void changed();
 private:
     bool loadInternal(const QString &fileName);
-
 private:
     QHash<QString, QnResourceData> m_dataByKey;
     QHash<QString, QString> m_shortVendorByName;

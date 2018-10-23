@@ -16,6 +16,9 @@
 #include <utils/email/email.h>
 #include <utils/common/ldap.h>
 
+#include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
+
 #include <nx/fusion/serialization/json.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/log/assert.h>
@@ -1040,6 +1043,93 @@ void fromApiToResourceList(const WebPageDataList& src, QnResourceList& dst)
 }
 
 void fromApiToResourceList(const WebPageDataList& src, QnWebPageResourceList& dst)
+{
+    fromApiToResourceList(src, dst, overload_tag());
+}
+
+
+void fromApiToResource(
+    const AnalyticsPluginData& src,
+    nx::vms::common::AnalyticsPluginResourcePtr& dst)
+{
+    fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
+}
+
+void fromResourceToApi(
+    const nx::vms::common::AnalyticsPluginResourcePtr& src,
+    nx::vms::api::AnalyticsPluginData& dst)
+{
+    fromResourceToApi(src, static_cast<ResourceData&>(dst));
+}
+
+template<class List>
+void fromApiToResourceList(const AnalyticsPluginDataList& src, List& dst, const overload_tag&)
+{
+    using namespace nx::vms::common;
+    dst.reserve(dst.size() + (int) src.size());
+
+    for (const auto& srcPlugin: src)
+    {
+        nx::vms::common::AnalyticsPluginResourcePtr dstPlugin(new AnalyticsPluginResource());
+        fromApiToResource(srcPlugin, dstPlugin);
+        dst.push_back(std::move(dstPlugin));
+    }
+}
+
+void fromApiToResourceList(
+    const nx::vms::api::AnalyticsPluginDataList& src,
+    QnResourceList& dst)
+{
+    fromApiToResourceList(src, dst, overload_tag());
+}
+
+void fromApiToResourceList(
+    const nx::vms::api::AnalyticsPluginDataList& src,
+    nx::vms::common::AnalyticsPluginResourceList& dst)
+{
+    fromApiToResourceList(src, dst, overload_tag());
+}
+
+
+void fromApiToResource(
+    const AnalyticsEngineData& src,
+    nx::vms::common::AnalyticsEngineResourcePtr& dst)
+{
+    fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
+}
+
+void fromResourceToApi(
+    const nx::vms::common::AnalyticsEngineResourcePtr& src,
+    nx::vms::api::AnalyticsEngineData& dst)
+{
+    fromResourceToApi(src, static_cast<ResourceData&>(dst));
+}
+
+template<class List>
+void fromApiToResourceList(const AnalyticsEngineDataList& src, List& dst, const overload_tag&)
+{
+    using namespace nx::vms::common;
+    dst.reserve(dst.size() + (int) src.size());
+
+    for (const auto& srcEngine: src)
+    {
+        nx::vms::common::AnalyticsEngineResourcePtr dstEngine(
+            new AnalyticsEngineResource());
+        fromApiToResource(srcEngine, dstEngine);
+        dst.push_back(std::move(dstEngine));
+    }
+}
+
+void fromApiToResourceList(
+    const nx::vms::api::AnalyticsEngineDataList& src,
+    QnResourceList& dst)
+{
+    fromApiToResourceList(src, dst, overload_tag());
+}
+
+void fromApiToResourceList(
+    const nx::vms::api::AnalyticsEngineDataList& src,
+    nx::vms::common::AnalyticsEngineResourceList& dst)
 {
     fromApiToResourceList(src, dst, overload_tag());
 }

@@ -7,6 +7,7 @@ import socket
 import struct
 import threading
 import time
+import timeit
 from contextlib import closing
 from datetime import datetime, timedelta
 from multiprocessing.dummy import Pool as ThreadPool
@@ -160,15 +161,11 @@ def with_traceback(fn, exception_event=None):
     return wrapper
 
 
-def take_some(iter, count):
-    for i in range(count):
-        yield next(iter)
-
-
 def imerge(*iterators):
-    for value_tuple in itertools.izip(*iterators):
+    for value_tuple in itertools.izip_longest(*iterators):
         for value in value_tuple:
-            yield value
+            if value is not None:
+                yield value
 
 
 def single(iter):
@@ -237,3 +234,15 @@ def threadsafe_generator(generator_fn):
         return ThreadSafeIterator(generator_fn(*args, **kw))
 
     return safe_generator_fn
+
+
+def description_from_func(func):  # type: (Any) -> str
+    try:
+        object_bound_to = func.__self__
+    except AttributeError:
+        if func.__name__ == '<lambda>':
+            raise ValueError("Cannot make description from lambda")
+        return func.__name__
+    if object_bound_to is None:
+        raise ValueError("Cannot make description from unbound method")
+    return '{func.__self__!r}.{func.__name__!s}'.format(func=func)

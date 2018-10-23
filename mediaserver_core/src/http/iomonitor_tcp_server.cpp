@@ -26,6 +26,7 @@ public:
     QByteArray requestBuffer;
 
     std::deque<QByteArray> messagesToSend;
+    QMap<QString, QnIOStateData> portState;
 };
 
 QnIOMonitorConnectionProcessor::QnIOMonitorConnectionProcessor(
@@ -207,18 +208,28 @@ void QnIOMonitorConnectionProcessor::onDataSent(SystemError::ErrorCode errorCode
         sendNextMessage();
 }
 
-void QnIOMonitorConnectionProcessor::addData(QnIOStateDataList&& value)
+void QnIOMonitorConnectionProcessor::addData(const QnIOStateDataList& value)
 {
     Q_D(QnIOMonitorConnectionProcessor);
     QnMutexLocker lock(&d->dataMutex);
     for (const auto& ioState: value)
-        d->dataToSend.push_back(ioState);
+        addDataIfNeed(ioState);
 }
 
-void QnIOMonitorConnectionProcessor::addData(QnIOStateData&& value)
+void QnIOMonitorConnectionProcessor::addData(const QnIOStateData& value)
 {
     Q_D(QnIOMonitorConnectionProcessor);
     QnMutexLocker lock(&d->dataMutex);
+    addDataIfNeed(value);
+}
+
+void QnIOMonitorConnectionProcessor::addDataIfNeed(const QnIOStateData& value)
+{
+    Q_D(QnIOMonitorConnectionProcessor);
+    auto& oldValue = d->portState[value.id];
+    if (oldValue == value)
+        return;
+    oldValue = value;
     d->dataToSend.push_back(value);
 }
 

@@ -45,8 +45,6 @@
 #include <transaction/server_transaction_message_bus.h>
 #include <nx/vms/time_sync/server_time_sync_manager.h>
 
-// TODO: #vkutin #gdm #fixme Check and fix API documentation after API refactoring!
-
 using namespace nx::vms::api;
 
 namespace ec2 {
@@ -1347,10 +1345,30 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regUpdate<IdData>(p, ApiCommand::removeWebPage);
 
+    // For analytics plugins and engines we provide only getters, since such resources
+    // can't be created or removed via REST API for now.
+
+    /**%apidoc GET /ec2/getAnalyticsPlugins
+     * Return list of analytics plugins
+     * %param[default] format
+     * %return List of analytics plugins in the requested format.
+     * %// AbstractAnalyticsManager::getAnalyticsPlugins
+     */
+    regGet<QnUuid, AnalyticsPluginDataList>(p, ApiCommand::getAnalyticsPlugins);
+
+    /**%apidoc GET /ec2/getAnalyticsEngines
+     * Return list of analytics engines
+     * %param[default] format
+     * %return List of analytics engines in the requested format.
+     * %// AbstractAnalyticsManager::getAnalyticsEngines
+     */
+    regGet<QnUuid, AnalyticsEngineDataList>(p, ApiCommand::getAnalyticsEngines);
+
     /**%apidoc GET /ec2/getLayouts
      * Return list of user layout
      * %param[default] format
-     * %param[opt]:string id Layout unique ID or logical ID. If omitted, return data for all layouts.
+     * %param[opt]:string id Layout unique id or logical id. If omitted, return data for all
+     *     layouts.
      * %return List of layout objects in the requested format.
      * %// AbstractLayoutManager::getLayouts
      */
@@ -1417,7 +1435,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %value true
      * %param fixedWidth Fixed width of the layout in cells (integer).
      * %param fixedHeight Fixed height of the layout in cells (integer).
-     * %param logicalId Logical ID of the layout, set by user (integer).
+     * %param logicalId Logical id of the layout, set by user (integer).
      * %param backgroundImageFilename
      * %param backgroundWidth Width of the background image in cells (integer).
      * %param backgroundHeight Height of the background image in cells (integer).
@@ -1486,7 +1504,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %value true
      * %param fixedWidth Fixed width of the layout in cells (integer).
      * %param fixedHeight Fixed height of the layout in cells (integer).
-     * %param logicalId Logical ID of the layout, set by user (integer).
+     * %param logicalId Logical id of the layout, set by user (integer).
      * %param backgroundImageFilename
      * %param backgroundWidth Width of the background image in pixels (integer).
      * %param backgroundHeight Height of the background image in pixels (integer).

@@ -46,12 +46,12 @@ std::chrono::microseconds CameraTimeHelper::getCameraTimestamp(
 }
 
 std::chrono::microseconds CameraTimeHelper::getTime(
-        std::chrono::microseconds currentTime,
-        uint32_t rtpTime,
-        const RtcpSenderReport& senderReport,
-        std::optional<std::chrono::microseconds> onvifTime,
-        int rtpFrequency,
-        bool isPrimaryStream)
+    std::chrono::microseconds currentTime,
+    uint32_t rtpTime,
+    const RtcpSenderReport& senderReport,
+    std::optional<std::chrono::microseconds> onvifTime,
+    int rtpFrequency,
+    bool isPrimaryStream)
 {
     bool hasAbsoluteTime = senderReport.ntpTimestamp != 0 || onvifTime.has_value();
     const microseconds cameraTime = getCameraTimestamp(
@@ -59,14 +59,15 @@ std::chrono::microseconds CameraTimeHelper::getTime(
     if (m_timePolicy == TimePolicy::forceCameraTime && hasAbsoluteTime)
         return cameraTime;
 
-    bool streamsDesync = !isPrimaryStream && m_primaryOffset && m_primaryOffset->hasValue() &&
+    bool hasPrimaryOffset = m_primaryOffset && m_primaryOffset->hasValue();
+    bool isStreamUnsync = !isPrimaryStream && hasPrimaryOffset &&
         abs(m_primaryOffset->get() + cameraTime - currentTime) > m_streamsSyncThreshold;
 
     bool useLocalOffset =
         !hasAbsoluteTime || // no absolute time -> can not sync streams
-        streamsDesync || // streams desync exceeds the threshold
+        isStreamUnsync || // streams desync exceeds the threshold
         !m_primaryOffset || // primary offset not used
-        (!m_primaryOffset->hasValue() && !isPrimaryStream); // primary stream not init offset yet
+        (!hasPrimaryOffset && !isPrimaryStream); // primary stream not init offset yet
 
     TimeOffset& offset = useLocalOffset ? m_localOffset : *m_primaryOffset;
     if (!offset.hasValue())

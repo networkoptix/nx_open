@@ -27,13 +27,13 @@ extern "C"
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 #include <utils/media/av_codec_helper.h>
-#include <nx/streaming/rtp_stream_parser.h>
 #include <QtConcurrent/QtConcurrentFilter>
 #include <nx/network/http/custom_headers.h>
 
+#include <nx/streaming/rtp/rtp.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/rtsp_client.h>
-#include <nx/streaming/nx_rtp_parser.h>
+#include <nx/streaming/rtp/parsers/nx_rtp_parser.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/basic_media_context.h>
 #include <nx/fusion/serialization/lexical_enum.h>
@@ -751,7 +751,7 @@ QnConstResourceAudioLayoutPtr QnRtspClientArchiveDelegate::getAudioLayout()
     if (!m_audioLayout)
     {
         m_audioLayout.reset( new QnResourceCustomAudioLayout() );
-        for (QMap<int, QnNxRtpParserPtr>::const_iterator itr = m_parsers.begin(); itr != m_parsers.end(); ++itr)
+        for (auto itr = m_parsers.begin(); itr != m_parsers.end(); ++itr)
         {
             QnConstMediaContextPtr context = itr.value()->mediaContext();
             if (context && context->getCodecType() == AVMEDIA_TYPE_AUDIO)
@@ -767,7 +767,7 @@ QnConstResourceAudioLayoutPtr QnRtspClientArchiveDelegate::getAudioLayout()
 void QnRtspClientArchiveDelegate::processMetadata(const quint8* data, int dataSize)
 {
    // RtpHeader* rtpHeader = (RtpHeader*) data;
-    const quint8* payload = data + RtpHeader::RTP_HEADER_SIZE;
+    const quint8* payload = data + nx::streaming::rtp::RtpHeader::kSize;
     QByteArray ba((const char*)payload, data + dataSize - payload);
     if (ba.startsWith("clock="))
         m_rtspSession->parseRangeHeader(QLatin1String(ba));
@@ -797,19 +797,19 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
 
     QnAbstractMediaDataPtr result;
 
-    QMap<int, QnNxRtpParserPtr>::iterator itr = m_parsers.find(channelNum);
+    auto itr = m_parsers.find(channelNum);
     if (itr == m_parsers.end())
     {
-        auto parser = new QnNxRtpParser(
+        auto parser = new nx::streaming::rtp::QnNxRtpParser(
             lm("%1-%2").args(m_camera->getUserDefinedName(), channelNum));
         // TODO: Use nx::network::http::header::Server here
         // to get RFC2616-conformant Server header parsing function.
         auto serverVersion = extractServerVersion(m_rtspSession->serverInfo());
         if (!serverVersion.isNull() && serverVersion < nx::utils::SoftwareVersion(3, 0))
             parser->setAudioEnabled(false);
-        itr = m_parsers.insert(channelNum, QnNxRtpParserPtr(parser));
+        itr = m_parsers.insert(channelNum, nx::streaming::rtp::QnNxRtpParserPtr(parser));
     }
-    QnNxRtpParserPtr parser = itr.value();
+    nx::streaming::rtp::QnNxRtpParserPtr parser = itr.value();
     bool gotData = false;
     if (!parser->processData(data, 0, dataSize, gotData))
         return QnAbstractDataPacketPtr(); //< Report error to reopen connection.

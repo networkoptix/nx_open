@@ -25,13 +25,18 @@ namespace nx::utils {
 
 void NX_UTILS_API setOnAssertHandler(std::function<void(const log::Message&)> handler);
 void NX_UTILS_API crashProgram(const log::Message& message);
-/** Always returns false. */
+
+/**
+ * @return false.
+ */
 bool NX_UTILS_API assertFailure(bool isCritical, const log::Message& message);
 
 void NX_UTILS_API enableQtMessageAsserts();
 void NX_UTILS_API disableQtMessageAsserts();
 
-/** Always returns false. */
+/**
+ * @return false.
+ */
 template<typename Reason>
 bool assertFailure(
     bool isCritical, const char* file, int line, const char* condition, const Reason& message)

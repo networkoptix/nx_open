@@ -7,7 +7,9 @@
 
 #include <nx/utils/uuid.h>
 #include <nx/streaming/abstract_archive_delegate.h>
+#include <nx/streaming/rtp/parsers/nx_rtp_parser.h>
 #include <nx/utils/thread/mutex.h>
+
 
 #include "recording/time_period.h"
 
@@ -125,7 +127,7 @@ private:
     int m_frameCnt;
     QnCustomResourceVideoLayoutPtr m_customVideoLayout;
 
-    QMap<int, QSharedPointer<QnNxRtpParser>> m_parsers;
+    QMap<int, QSharedPointer<nx::streaming::rtp::QnNxRtpParser>> m_parsers;
 
     struct {
         QString username;

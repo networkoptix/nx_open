@@ -15,7 +15,8 @@ View::View(
     m_httpServer(
         settings,
         controller->listeningPeerRegistrator(),
-        &controller->discoveredPeerPool()),
+        &controller->discoveredPeerPool(),
+        &controller->cloudConnectProcessor()),
     m_stunServer(settings, &m_httpServer)
 {
     registerStunApiHandlers(controller);
@@ -95,58 +96,23 @@ void View::registerStunApiHandlers(
 
         dispatcher->registerRequestProcessor(
             network::stun::extension::methods::listen,
-            [peerRegistrator](const ConnectionStrongRef& connection, network::stun::Message message)
-            {
-                processRequestWithOutput(
-                    &PeerRegistrator::listen,
-                    peerRegistrator,
-                    std::move(connection),
-                    std::move(message));
-            }) &&
+            detail::createRequestProcessor(&PeerRegistrator::listen, peerRegistrator)) &&
 
         dispatcher->registerRequestProcessor(
             network::stun::extension::methods::getConnectionState,
-            [peerRegistrator](const ConnectionStrongRef& connection, network::stun::Message message)
-            {
-                processRequestWithOutput(
-                    &PeerRegistrator::checkOwnState,
-                    peerRegistrator,
-                    std::move(connection),
-                    std::move(message));
-            }) &&
+            detail::createRequestProcessor(&PeerRegistrator::checkOwnState, peerRegistrator)) &&
 
         dispatcher->registerRequestProcessor(
             network::stun::extension::methods::resolveDomain,
-            [peerRegistrator](const ConnectionStrongRef& connection, network::stun::Message message)
-            {
-                processRequestWithOutput(
-                    &PeerRegistrator::resolveDomain,
-                    peerRegistrator,
-                    std::move(connection),
-                    std::move(message));
-            }) &&
+            detail::createRequestProcessor(&PeerRegistrator::resolveDomain, peerRegistrator)) &&
 
         dispatcher->registerRequestProcessor(
             network::stun::extension::methods::resolvePeer,
-            [peerRegistrator](const ConnectionStrongRef& connection, network::stun::Message message)
-            {
-                processRequestWithOutput(
-                    &PeerRegistrator::resolvePeer,
-                    peerRegistrator,
-                    std::move(connection),
-                    std::move(message));
-            }) &&
+            detail::createRequestProcessor(&PeerRegistrator::resolvePeer, peerRegistrator)) &&
 
         dispatcher->registerRequestProcessor(
             network::stun::extension::methods::clientBind,
-            [peerRegistrator](const ConnectionStrongRef& connection, network::stun::Message message)
-            {
-                processRequestWithOutput(
-                    &PeerRegistrator::clientBind,
-                    peerRegistrator,
-                    std::move(connection),
-                    std::move(message));
-            }) ;
+            detail::createRequestProcessor(&PeerRegistrator::clientBind, peerRegistrator));
 
     NX_ASSERT(result, Q_FUNC_INFO, "Could not register one of PeerRegistrator methods");
 }
@@ -157,42 +123,21 @@ void View::registerStunApiHandlers(
 {
     dispatcher->registerRequestProcessor(
         network::stun::extension::methods::connect,
-        [holePunchingProcessor](
-            const ConnectionStrongRef& connection,
-            network::stun::Message message)
-        {
-            processRequestWithOutput(
-                &HolePunchingProcessor::connect,
-                holePunchingProcessor,
-                std::move(connection),
-                std::move(message));
-        });
+        detail::createRequestProcessor(
+            &HolePunchingProcessor::connect,
+            holePunchingProcessor));
 
     dispatcher->registerRequestProcessor(
         network::stun::extension::methods::connectionAck,
-        [holePunchingProcessor](
-            const ConnectionStrongRef& connection,
-            network::stun::Message message)
-        {
-            processRequestWithNoOutput(
-                &HolePunchingProcessor::onConnectionAckRequest,
-                holePunchingProcessor,
-                std::move(connection),
-                std::move(message));
-        });
+        detail::createRequestProcessor(
+            &HolePunchingProcessor::onConnectionAckRequest,
+            holePunchingProcessor));
 
     dispatcher->registerRequestProcessor(
         network::stun::extension::methods::connectionResult,
-        [holePunchingProcessor](
-            const ConnectionStrongRef& connection,
-            network::stun::Message message)
-        {
-            processRequestWithNoOutput(
-                &HolePunchingProcessor::connectionResult,
-                holePunchingProcessor,
-                std::move(connection),
-                std::move(message));
-        });
+        detail::createRequestProcessor(
+            &HolePunchingProcessor::connectionResult,
+            holePunchingProcessor));
 }
 
 } // namespace hpm

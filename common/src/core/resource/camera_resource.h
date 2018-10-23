@@ -31,11 +31,13 @@ class QnVirtualCameraResource : public QnSecurityCamResource
     using base_type = QnSecurityCamResource;
 
 public:
+    static QString kEnabledAnalyticsEnginesProperty;
+    static QString kDeviceAgentsSettingsValuesProperty;
+
     QnVirtualCameraResource(QnCommonModule* commonModule = nullptr);
 
     virtual QString getUniqueId() const override;
 
-    virtual QStringList searchFilters(bool useExtraSearchInformation) const override;
     void forceEnableAudio();
     void forceDisableAudio();
     bool isForcedAudioSupported() const;
@@ -72,6 +74,15 @@ public:
      * For primary stream this parameters are merged with parameters on record schedule.
      */
     virtual QnAdvancedStreamParams advancedLiveStreamParams() const;
+
+    QSet<QnUuid> enabledAnalyticsEngines() const;
+    void setEnabledAnalyticsEngines(const QSet<QnUuid>& engines);
+
+    QHash<QnUuid, QVariantMap> deviceAgentSettingsValues() const;
+    void setDeviceAgentSettingsValues(const QHash<QnUuid, QVariantMap>& settingsValues);
+
+    QVariantMap deviceAgentSettingsValues(const QnUuid& engineId) const;
+    void setDeviceAgentSettingsValues(const QnUuid& engineId, const QVariantMap& settingsValues);
 
 signals:
     void ptzCapabilitiesChanged(const QnVirtualCameraResourcePtr& camera);

@@ -22,7 +22,7 @@
 
 namespace ec2 {
 
-typedef QnSafeQueue<std::function<void()>> PostProcessList;
+typedef QnUnsafeQueue<std::function<void()>> PostProcessList;
 
 namespace detail { class ServerQueryProcessor; }
 
@@ -418,8 +418,8 @@ private:
 
         PostProcessList* transactionsPostProcessList = m_owner->postProcessList();
         // Starting transaction.
+        QnMutexLocker lock(m_owner->updateMutex());
         {
-            QnMutexLocker lock(m_owner->updateMutex());
             std::unique_ptr<detail::QnDbManager::QnDbTransactionLocker> dbTran;
             PostProcessList localPostProcessList;
 
@@ -448,13 +448,13 @@ private:
             }
 
             std::function<void()> postProcessAction;
-            while (localPostProcessList.pop(postProcessAction, 0))
+            while (localPostProcessList.pop(postProcessAction))
                 transactionsPostProcessList->push(postProcessAction);
         }
 
         // Sending transactions.
         std::function<void()> postProcessAction;
-        while (transactionsPostProcessList->pop(postProcessAction, 0))
+        while (transactionsPostProcessList->pop(postProcessAction))
             postProcessAction();
 
         // Handler is invoked asynchronously.
@@ -785,6 +785,20 @@ public:
                 return removeResourceSync(tran, ApiObject_Videowall, transactionsPostProcessList);
             case ApiCommand::removeUserRole:
                 return removeResourceSync(tran, ApiObjectUserRole, transactionsPostProcessList);
+            case ApiCommand::removeAnalyticsPlugin:
+            {
+                return removeResourceSync(
+                    tran,
+                    ApiObject_AnalyticsPlugin,
+                    transactionsPostProcessList);
+            }
+            case ApiCommand::removeAnalyticsEngine:
+            {
+                return removeResourceSync(
+                    tran,
+                    ApiObject_AnalyticsEngine,
+                    transactionsPostProcessList);
+            }
             case ApiCommand::removeResource:
             {
                 QnTransaction<nx::vms::api::IdData> updatedTran = tran;
@@ -813,6 +827,12 @@ public:
                         break;
                     case ApiObject_BusinessRule:
                         updatedTran.command = ApiCommand::removeEventRule;
+                        break;
+                    case ApiObject_AnalyticsPlugin:
+                        updatedTran.command = ApiCommand::removeAnalyticsPlugin;
+                        break;
+                    case ApiObject_AnalyticsEngine:
+                        updatedTran.command = ApiCommand::removeAnalyticsEngine;
                         break;
                     default:
                         return processUpdateSync(tran, transactionsPostProcessList, 0);

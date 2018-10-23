@@ -23,6 +23,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item_index.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
 
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/abstract_ptz_controller.h>
@@ -63,6 +64,8 @@
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <nx/client/desktop/resource_views/data/node_type.h>
+#include <nx/client/desktop/resources/layout_password_management.h>
+
 
 using boost::algorithm::any_of;
 using boost::algorithm::all_of;
@@ -1614,6 +1617,18 @@ ActionVisibility IoModuleCondition::check(const QnResourceList& resources, QnWor
     return pureIoModules ? EnabledAction : InvisibleAction;
 }
 
+ActionVisibility AnalyticsEngineCondition::check(
+    const QnResourceList& resources, QnWorkbenchContext* /*context*/)
+{
+    bool ok = boost::algorithm::all_of(resources,
+        [](const QnResourcePtr& resource)
+        {
+            return resource.dynamicCast<nx::vms::common::AnalyticsEngineResource>();
+        });
+
+    return ok ? EnabledAction : InvisibleAction;
+}
+
 ActionVisibility MergeToCurrentSystemCondition::check(const QnResourceList& resources, QnWorkbenchContext* /*context*/)
 {
     if (resources.size() != 1)
@@ -1921,6 +1936,17 @@ ConditionWrapper currentLayoutIsVideowallScreen()
         {
             const auto layout = context->workbench()->currentLayout();
             return layout && !layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>().isNull();
+        });
+}
+
+ConditionWrapper canForgetPassword()
+{
+    using namespace nx::client::desktop;
+    return new CustomBoolCondition(
+        [](const Parameters& parameters, QnWorkbenchContext* context)
+        {
+            const auto layout = parameters.resource().dynamicCast<QnLayoutResource>();
+            return layout && layout::isEncrypted(layout) && !layout::requiresPassword(layout);
         });
 }
 

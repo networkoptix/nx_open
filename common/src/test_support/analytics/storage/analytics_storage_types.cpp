@@ -64,7 +64,7 @@ Filter generateRandomFilter(const AttributeDictionary* attributeDictionary)
         []() { return QnUuid::createUuid().toString(); });
 
     if (nx::utils::random::number<bool>())
-        filter.objectId = QnUuid::createUuid();
+        filter.objectAppearanceId = QnUuid::createUuid();
 
     // TODO: timePeriod.
 

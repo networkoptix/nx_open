@@ -213,6 +213,7 @@ void QnCommonModule::setModuleGUID(const QnUuid& guid)
 
 QnCommonModule::~QnCommonModule()
 {
+    resourcePool()->threadPool()->waitForDone();
     /* Here all singletons will be destroyed, so we guarantee all socket work will stop. */
     clear();
 }
@@ -356,6 +357,7 @@ void QnCommonModule::updateModuleInformationUnsafe()
 
 void QnCommonModule::setSystemIdentityTime(qint64 value, const QnUuid& sender)
 {
+    NX_INFO(this, "System identity time has changed from %1 to %2", m_systemIdentityTime, value);
     m_systemIdentityTime = value;
     emit systemIdentityTimeChanged(value, sender);
 }

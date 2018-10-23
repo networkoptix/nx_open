@@ -689,7 +689,6 @@ bool QnLicensePool::isEmpty() const
     return m_licenseDict.isEmpty();
 }
 
-
 QVector<QString> QnLicensePool::hardwareIds() const
 {
     return commonModule()->runtimeInfoManager()->remoteInfo().data.hardwareIds;

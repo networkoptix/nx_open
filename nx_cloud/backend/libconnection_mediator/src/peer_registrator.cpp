@@ -57,16 +57,19 @@ void PeerRegistrator::bind(
     const ConnectionStrongRef& connection,
     network::stun::Message requestMessage)
 {
-    if (connection->transportProtocol() != nx::network::TransportProtocol::tcp)
+    auto serverConnection =
+        std::dynamic_pointer_cast<network::stun::ServerConnection>(connection);
+
+    if (connection->transportProtocol() != nx::network::TransportProtocol::tcp ||
+        !serverConnection)
+    {
         return sendErrorResponse(
             connection,
             requestMessage.header,
             api::ResultCode::badTransport,
             network::stun::error::badRequest,
             "Only tcp is allowed for bind request");
-
-    auto serverConnection =
-        std::dynamic_pointer_cast<network::stun::ServerConnection>(connection);
+    }
 
     MediaserverData mediaserverData;
     nx::String errorMessage;
@@ -103,8 +106,8 @@ void PeerRegistrator::bind(
 
 void PeerRegistrator::listen(
     const ConnectionStrongRef& connection,
-    api::ListenRequest requestData,
     network::stun::Message requestMessage,
+    api::ListenRequest requestData,
     std::function<void(api::ResultCode, api::ListenResponse)> completionHandler)
 {
     if (connection->transportProtocol() != nx::network::TransportProtocol::tcp)
@@ -118,15 +121,7 @@ void PeerRegistrator::listen(
     const api::ResultCode resultCode =
         getMediaserverData(*serverConnection, requestMessage, &mediaserverData, &errorMessage);
     if (resultCode != api::ResultCode::ok)
-    {
-        sendErrorResponse(
-            serverConnection,
-            requestMessage.header,
-            resultCode,
-            api::resultCodeToStunErrorCode(resultCode),
-            errorMessage);
-        return;
-    }
+        return completionHandler(resultCode, {});
 
     const MediaserverData mediaserverConnectionKey(
         requestData.systemId, requestData.serverId);
@@ -176,8 +171,8 @@ void PeerRegistrator::listen(
 
 void PeerRegistrator::checkOwnState(
     const ConnectionStrongRef& connection,
-    api::GetConnectionStateRequest /*requestData*/,
     network::stun::Message requestMessage,
+    api::GetConnectionStateRequest /*requestData*/,
     std::function<void(api::ResultCode, api::GetConnectionStateResponse)> completionHandler)
 {
     MediaserverData mediaserverData;
@@ -185,15 +180,7 @@ void PeerRegistrator::checkOwnState(
     const api::ResultCode resultCode =
         getMediaserverData(*connection, requestMessage, &mediaserverData, &errorMessage);
     if (resultCode != api::ResultCode::ok)
-    {
-        sendErrorResponse(
-            connection,
-            requestMessage.header,
-            resultCode,
-            api::resultCodeToStunErrorCode(resultCode),
-            errorMessage);
-        return;
-    }
+        return completionHandler(resultCode, {});
 
     api::GetConnectionStateResponse response;
     auto peer = m_listeningPeerPool->findAndLockPeerDataByHostName(mediaserverData.hostName());
@@ -206,7 +193,6 @@ void PeerRegistrator::checkOwnState(
 void PeerRegistrator::resolveDomain(
     const ConnectionStrongRef& connection,
     api::ResolveDomainRequest requestData,
-    network::stun::Message /*requestMessage*/,
     std::function<void(
         api::ResultCode, api::ResolveDomainResponse)> completionHandler)
 {
@@ -237,7 +223,6 @@ void PeerRegistrator::resolveDomain(
 void PeerRegistrator::resolvePeer(
     const ConnectionStrongRef& connection,
     api::ResolvePeerRequest requestData,
-    network::stun::Message /*requestMessage*/,
     std::function<void(
         api::ResultCode, api::ResolvePeerResponse)> completionHandler)
 {
@@ -273,7 +258,6 @@ void PeerRegistrator::resolvePeer(
 void PeerRegistrator::clientBind(
     const ConnectionStrongRef& connection,
     api::ClientBindRequest requestData,
-    network::stun::Message /*requestMessage*/,
     std::function<void(api::ResultCode, api::ClientBindResponse)> completionHandler)
 {
     const auto reject = [&](api::ResultCode code)

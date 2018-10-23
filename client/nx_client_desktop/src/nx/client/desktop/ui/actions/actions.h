@@ -471,6 +471,11 @@ enum IDType
     SaveLayoutAsAction,
 
     /**
+    * Forgets password for encrypted layout.
+    */
+    ForgetLayoutPasswordAction,
+
+    /**
      * Shares selected layout with another user.
      *
      * Parameters:
@@ -582,6 +587,11 @@ enum IDType
      * Opens videowall settings dialog.
      */
     VideowallSettingsAction,
+
+    /**
+     * Opens analytics engine settings dialog.
+     */
+    AnalyticsEngineSettingsAction,
 
     /**
      * Opens event log dialog with filter for current camera(s) issues

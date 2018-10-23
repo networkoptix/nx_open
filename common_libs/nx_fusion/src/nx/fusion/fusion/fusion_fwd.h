@@ -44,6 +44,7 @@ namespace QnFusion {
     BOOST_PP_CAT(QN_FUSION_DECLARE_FUNCTIONS_, FUNCTION) PARAMS
 
 
+// TODO: Fix: Actually, this macro does not support PREFIX.
 /**
  * Same as QN_FUSION_DECLARE_FUNCTIONS, but for several types.
  *

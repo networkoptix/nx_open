@@ -26,6 +26,10 @@
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/resource_factory.h>
+
+#include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
+
 #include <utils/common/synctime.h>
 #include <utils/common/app_info.h>
 
@@ -37,6 +41,7 @@
 #include <nx_ec/managers/abstract_webpage_manager.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <nx_ec/managers/abstract_server_manager.h>
+#include <nx_ec/managers/abstract_analytics_manager.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
 #include <nx/network/socket_common.h>
@@ -524,7 +529,11 @@ void QnCommonMessageProcessor::on_resourceParamChanged(
         propertyDictionary()->setValue(param.resourceId, param.name, param.value, false);
 
     if (param.name == Qn::kResourceDataParamName)
-        NX_ASSERT(commonModule()->dataPool()->loadData(param.value.toUtf8()));
+    {
+        const bool loaded = param.value.isEmpty()
+            || commonModule()->dataPool()->loadData(param.value.toUtf8());
+        NX_ASSERT(loaded, "Invalid json received");
+    }
 }
 
 void QnCommonMessageProcessor::on_resourceParamRemoved(
@@ -887,6 +896,7 @@ void QnCommonMessageProcessor::resetStatusList(const ResourceStatusDataList& par
 
 void QnCommonMessageProcessor::onGotInitialNotification(const FullInfoData& fullData)
 {
+    commonModule()->dataPool()->clear();
     resourceAccessManager()->beginUpdate();
     resourceAccessProvider()->beginUpdate();
 
@@ -960,6 +970,28 @@ void QnCommonMessageProcessor::updateResource(
     QnWebPageResourcePtr qnWebpage(new QnWebPageResource(commonModule()));
     ec2::fromApiToResource(webpage, qnWebpage);
     updateResource(qnWebpage, source);
+}
+
+void QnCommonMessageProcessor::updateResource(
+    const nx::vms::api::AnalyticsPluginData& analyticsPluginData,
+    ec2::NotificationSource source)
+{
+    using namespace nx::vms::common;
+    AnalyticsPluginResourcePtr analyticsPluginResource(
+        new AnalyticsPluginResource(commonModule()));
+    ec2::fromApiToResource(analyticsPluginData, analyticsPluginResource);
+    updateResource(analyticsPluginResource, source);
+}
+
+void QnCommonMessageProcessor::updateResource(
+    const nx::vms::api::AnalyticsEngineData& analyticsEngineData,
+    ec2::NotificationSource source)
+{
+    using namespace nx::vms::common;
+    AnalyticsEngineResourcePtr analyticsEngineResource(
+        new AnalyticsEngineResource(commonModule()));
+    ec2::fromApiToResource(analyticsEngineData, analyticsEngineResource);
+    updateResource(analyticsEngineResource, source);
 }
 
 void QnCommonMessageProcessor::updateResource(const CameraData& camera, ec2::NotificationSource source)

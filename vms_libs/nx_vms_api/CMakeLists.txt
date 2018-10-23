@@ -9,6 +9,7 @@ nx_add_target(nx_vms_api
         nx_utils nx_fusion)
 
 target_compile_definitions(nx_vms_api
+    # TODO: Rename NX_VMS_API to NX_VMS_API_API.
     PRIVATE NX_VMS_API=${API_EXPORT_MACRO}
     INTERFACE NX_VMS_API=${API_IMPORT_MACRO})
 

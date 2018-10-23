@@ -126,7 +126,9 @@ private:
     void setPermissionsInternal(const QnResourcePtr& resource, Qn::Permissions permissions);
 
     Qn::Permissions calculatePermissions(const QnResourcePtr& resource) const;
-    Qn::Permissions calculatePermissionsInternal(const QnLayoutResourcePtr& layout) const;
+    // Deal with layouts; called from calculatePermissions().
+    Qn::Permissions calculateLayoutPermissions(const QnLayoutResourcePtr& layout) const;
+
     GlobalPermissions calculateGlobalPermissions() const;
 
 private:

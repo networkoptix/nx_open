@@ -17,6 +17,7 @@
 #include <managers/misc_notification_manager.h>
 #include <managers/discovery_notification_manager.h>
 #include <managers/time_notification_manager.h>
+#include <managers/analytics_notification_manager.h>
 
 #include <transaction/transaction_descriptor.h>
 
@@ -43,7 +44,8 @@ public:
         QnStoredFileNotificationManager* storedFileManager,
         QnUpdatesNotificationManager* updatesManager,
         QnMiscNotificationManager* miscManager,
-        QnDiscoveryNotificationManager* discoveryManager);
+        QnDiscoveryNotificationManager* discoveryManager,
+        AnalyticsNotificationManager* analyticsManager);
 
     template<typename T>
     void triggerNotification(const QnTransaction<T> &tran, ec2::NotificationSource source)
@@ -65,6 +67,7 @@ public:
             m_updatesManager,
             m_miscManager,
             m_discoveryManager,
+            m_analyticsManager,
             source
         };
 
@@ -93,6 +96,7 @@ private:
     QnUpdatesNotificationManager* m_updatesManager;
     QnMiscNotificationManager* m_miscManager;
     QnDiscoveryNotificationManager* m_discoveryManager;
+    AnalyticsNotificationManager* m_analyticsManager;
 };
 
 } // namespace ec2

@@ -46,6 +46,15 @@ public:
     {
         return true;
     }
+
+    /**
+     * Activate sub-element denoted by the URL.
+     * @return True if element is found and activated.
+     */
+    virtual bool activate(const QUrl& /*url*/)
+    {
+        return true;
+    }
 };
 
 class QnAbstractPreferencesWidget: public QWidget, public QnAbstractPreferencesInterface

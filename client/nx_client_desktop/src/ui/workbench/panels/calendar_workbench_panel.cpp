@@ -145,8 +145,8 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
     connect(m_opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
         &AbstractWorkbenchPanel::hoverLeft);
 
-    hidingProcessor->setHoverLeaveDelay(kClosePanelTimeoutMs);
-    hidingProcessor->setFocusLeaveDelay(kClosePanelTimeoutMs);
+    hidingProcessor->setHoverLeaveDelay(kCloseCalendarPanelTimeoutMs);
+    hidingProcessor->setFocusLeaveDelay(kCloseCalendarPanelTimeoutMs);
     connect(hidingProcessor, &HoverFocusProcessor::hoverLeft, this,
         [this]
         {

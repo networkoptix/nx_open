@@ -24,9 +24,10 @@ public:
     LicenseWatcher(QnCommonModule* commonModule);
     virtual ~LicenseWatcher();
     void start();
-
+    void stop();
 private:
-    void startUpdate();
+    void update();
+    void validateData();
     void processResponse(QByteArray responseData);
     ServerLicenseInfo licenseData() const;
 

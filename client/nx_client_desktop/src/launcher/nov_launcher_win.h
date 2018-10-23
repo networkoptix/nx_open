@@ -12,5 +12,6 @@ public:
         WriteIndexError
     };
 
+    // Creates valid (in the sense of layout::identifyFile) nov file containing client and exe header.
     static ErrorCode createLaunchingFile(const QString& dstName, const QString& novFileName = QString());
 };
