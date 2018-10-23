@@ -15,21 +15,22 @@ class AuthHttpServer:
     public nx::network::test::SynchronousStreamSocketServer
 {
 public:
-    std::vector<nx::Buffer> receivedRequests();
-    void enableAuthHeaders(std::optional<AuthType> first, std::optional<AuthType> second);
+    struct AuthHeader {
+        AuthType type;
+        nx::Buffer header;
+    };
 
-protected:
-    virtual void processConnection(AbstractStreamSocket* connection) override;
+    void appendAuthHeader(AuthHeader value);
+    std::vector<nx::Buffer> receivedRequests();
 
 private:
     enum class NextResponse {unauthorized, success};
 
     std::vector<nx::Buffer> m_receivedRequests;
-
-    nx::Buffer m_firstAuthHeader;
-    nx::Buffer m_secondAuthHeader;
+    std::vector<AuthHeader> m_authHeaders;
     NextResponse m_nextRepsonse = NextResponse::unauthorized;
 
+    virtual void processConnection(AbstractStreamSocket* connection) override;
     nx::Buffer nextResponse();
     void sendResponse(AbstractStreamSocket* connection);
     std::pair<int, nx::Buffer> readRequest(AbstractStreamSocket* connection);
@@ -37,11 +38,10 @@ private:
 
 struct TestParams
 {
-    std::optional<AuthType> serverAuthTypeFirst;
-    std::optional<AuthType> serverAuthTypeSecond;
+    std::vector<AuthHttpServer::AuthHeader> serverAuthHeaders;
     AuthType clientRequiredToUseAuthType;
 
-    std::optional<AuthType> expectedAuthType;
+    const char* expectedAuthResponse;
     int expectedHttpCode;
 };
 
@@ -53,10 +53,10 @@ public:
     HttpClientAsyncAuthorization2();
     virtual ~HttpClientAsyncAuthorization2() override;
 
-    void givenHttpServerWithAuthorization(std::optional<AuthType> first,
-        std::optional<AuthType> second);
+    void givenHttpServerWithAuthorization(
+        std::vector<AuthHttpServer::AuthHeader> authData);
     void whenClientSendHttpRequestAndIsRequiredToUse(AuthType auth);
-    void thenClientAuthenticatedBy(std::optional<AuthType> exptecedAuth);
+    void thenClientAuthenticatedBy(const char* exptectedHeaderResponse);
     void thenClientGotResponseWithCode(int expectedHttpCode);
 
 private:
