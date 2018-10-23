@@ -24,6 +24,10 @@ sudo apt-get install --yes \
     rsync \
     ffmpeg \
     smbclient
+sudo wget -O /etc/bash_completion.d/VBoxManage https://raw.githubusercontent.com/gryf/vboxmanage-bash-completion/d4f56a0d6b24ab8585dc1a3c86dd56f4235fe106/VBoxManage
+sudo chmod +x /etc/bash_completion.d/VBoxManage
+echo "Reload Bash to enable VBoxManage completion:"
+echo ". ~/.bashrc"
 
 rm -fr "${VENV_DIR}"
 python2.7 -m virtualenv "${VENV_DIR}"
