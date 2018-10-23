@@ -84,8 +84,10 @@ Invalid Last Name                         mark        ${SPACE}    ${valid email}
 Empty Last Name                           mark        ${EMPTY}    ${valid email}            ${BASE PASSWORD}            True
     [tags]    C41556
 Invalid All                               ${SPACE}    ${SPACE}    noptixqagmail.com         ${7char password}           True
+    [tags]    C41556
 Terms Unchecked                           mark        hamill      ${valid email}            ${BASE PASSWORD}            False
-Empty All                                 ${EMPTY}    ${EMPTY}    ${EMPTY}                  ${EMPTY}                    True
+    [tags]    C41556
+Empty All                                 ${EMPTY}    ${EMPTY}    ${EMPTY}                  ${EMPTY}                    False
     [tags]    C41556
 
 *** Keywords ***
@@ -95,9 +97,12 @@ Restart
 
 Test Register Invalid
     [Arguments]    ${first}    ${last}    ${email}    ${pass}    ${checked}
+    Reload Page
+    Elements Should Not Be Visible    ${EMAIL INVALID}    ${EMAIL ALREADY REGISTERED}    ${EMAIL IS REQUIRED}    ${REGISTER EMAIL INPUT}/parent::div/parent::div[contains(@class,"has-error")]
+    ...                               ${PASSWORD BADGE}    ${PASSWORD IS REQUIRED}    ${PASSWORD TOO SHORT}    ${PASSWORD SPECIAL CHARS}    ${PASSWORD TOO COMMON}    ${PASSWORD IS WEAK}    ${REGISTER PASSWORD INPUT}/../input[contains(@class,'ng-invalid')]
+    ...                               ${FIRST NAME IS REQUIRED}    ${REGISTER FIRST NAME INPUT}/parent::div/parent::div[contains(@class,"has-error")]    ${LAST NAME IS REQUIRED}    ${REGISTER LAST NAME INPUT}/parent::div/parent::div[contains(@class,"has-error")]    ${TERMS AND CONDITIONS ERROR}
     # These two lines are because Hebrew has double quotes in its text.
     # This makes for issues with strings in xpaths.  These lines convert to single quotes if the language is Hebrew
-    Reload Page
     Run Keyword If    "${LANGUAGE}"=="he_IL"    Set Suite Variable    ${EMAIL INVALID}    //span[@ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email" and contains(text(),'${EMAIL INVALID TEXT}')]
     Run Keyword If    "${LANGUAGE}"=="he_IL"    Set Suite Variable    ${EMAIL IS REQUIRED}    //span[@ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required" and contains(text(),'${EMAIL IS REQUIRED TEXT}')]
     Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}

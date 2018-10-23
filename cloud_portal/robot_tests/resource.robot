@@ -223,6 +223,11 @@ Wait Until Elements Are Visible
     :FOR     ${element}  IN  @{elements}
     \  Wait Until Element Is Visible    ${element}
 
+Elements Should Not Be Visible
+    [arguments]    @{elements}
+    :FOR     ${element}  IN  @{elements}
+    \  Element Should Not Be Visible    ${element}
+
 #Reset resources
 Clean up email noperm
     Register Keyword To Run On Failure    None
