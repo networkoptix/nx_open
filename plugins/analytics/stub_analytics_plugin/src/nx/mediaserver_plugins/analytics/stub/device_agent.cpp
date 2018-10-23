@@ -8,6 +8,7 @@
 #include <nx/sdk/analytics/common_metadata_packet.h>
 #include <nx/sdk/analytics/common_event.h>
 #include <nx/sdk/analytics/common_object.h>
+#include <nx/sdk/common_settings.h>
 
 #define NX_PRINT_PREFIX (this->utils.printPrefix)
 #include <nx/kit/debug.h>
@@ -175,6 +176,14 @@ Error DeviceAgent::stopFetchingMetadata()
 
     NX_OUTPUT << __func__ << "() END -> noError";
     return Error::noError;
+}
+
+nx::sdk::Settings* DeviceAgent::settings() const
+{
+    auto settings = new nx::sdk::CommonSettings();
+    settings->addSetting("nx.stub.device_agent.settings.number_0", "100");
+
+    return settings;
 }
 
 //-------------------------------------------------------------------------------------------------

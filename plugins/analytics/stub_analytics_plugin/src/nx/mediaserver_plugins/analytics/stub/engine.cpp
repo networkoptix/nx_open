@@ -123,7 +123,66 @@ std::string Engine::manifest() const
                 ")json" + kCarObjectType+ R"json("
             ]
         }
-    ]
+    ],
+    "deviceAgentSettingsModel": {
+        "type": "Settings",
+        "items": [
+            {
+                "type": "TextField",
+                "name": "nx.stub.device_agent.settings.text_0",
+                "caption": "Device Agent Text Field",
+                "description": "A text field",
+                "defaultValue": "a text"
+            },
+            {
+                "type": "GroupBox",
+                "caption": "Device Agent Group",
+                "items": [
+                    {
+                        "type": "SpinBox",
+                        "caption": "Device Agent SpinBox",
+                        "name": "nx.stub.device_agent.settings.number_0",
+                        "defaultValue": 42,
+                        "minValue": 0,
+                        "maxValue": 100
+                    },
+                    {
+                        "type": "DoubleSpinBox",
+                        "caption": "Device Agent DoubleSpinBox",
+                        "name": "nx.stub.device_agent.settings.double_0",
+                        "defaultValue": 3.1415,
+                        "minValue": 0.0,
+                        "maxValue": 100.0
+                    },
+                    {
+                        "type": "ComboBox",
+                        "name": "nx.stub.device_agent.settings.combobox_0",
+                        "caption": "Device Agent ComboBox",
+                        "defaultValue": "value2",
+                        "range": ["value1", "value2", "value3"]
+                    },
+                    {
+                        "type": "Row",
+                        "items": [
+                            {
+                                "type": "Button",
+                                "caption": "Device Agent Button",
+                                "name": "nx.stub.device_agent.settings.button_0",
+                                "caption": "Button"
+                            },
+                            {
+                                "type": "CheckBox",
+                                "caption": "Device Agent CheckBox",
+                                "name": "nx.stub.device_agent.settings.checkbox_0",
+                                "defaultValue": true,
+                                "value": true
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
 }
 )json";
 }
