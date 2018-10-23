@@ -55,6 +55,8 @@ QString QnRestResult::ErrorDescriptor::text() const
             return lit("Failed to process request '%1'").arg(m_arguments.value(0));
         case Forbidden:
             return lit("Forbidden");
+        case BadRequest:
+            return lit("Bad request");
         default:
             return lit("Unknown error code '%1'. Arguments: %2")
                 .arg(static_cast<int>(m_errorCode)).arg(m_arguments.join(lit(", ")));

@@ -1,12 +1,16 @@
 #pragma once
 
 #include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <nx/vms/api/analytics/engine_manifest.h>
+#include <nx/vms/api/analytics/plugin_manifest.h>
 
 #include <nx/sdk/analytics/engine.h>
 #include <nx/mediaserver/sdk_support/pointers.h>
 
 #include <nx/mediaserver/sdk_support/pointers.h>
 #include <nx/mediaserver/server_module_aware.h>
+
+#include <nx/utils/std/optional.h>
 
 namespace nx::mediaserver::resource {
 
@@ -22,6 +26,13 @@ public:
     void setSdkEngine(sdk_support::SharedPtr<nx::sdk::analytics::Engine> sdkEngine);
 
     sdk_support::SharedPtr<nx::sdk::analytics::Engine> sdkEngine() const;
+
+    virtual QVariantMap settingsValues() const override;
+
+    virtual void setSettingsValues(const QVariantMap& values) override;
+
+private:
+    std::optional<nx::vms::api::analytics::PluginManifest> pluginManifest() const;
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;

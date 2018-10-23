@@ -21,8 +21,9 @@ public:
     api::analytics::EngineManifest manifest() const;
     void setManifest(const api::analytics::EngineManifest& manifest);
 
-    QVariantMap settingsValues() const;
-    void setSettingsValues(const QVariantMap& values);
+    // TODO: REMOVE this since settings should be operated via REST methods.
+    virtual QVariantMap settingsValues() const;
+    virtual void setSettingsValues(const QVariantMap& values);
 
     AnalyticsPluginResourcePtr plugin() const;
 

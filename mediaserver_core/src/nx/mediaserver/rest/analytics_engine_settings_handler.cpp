@@ -1,5 +1,6 @@
 #include "analytics_engine_settings_handler.h"
 #include "parameter_names.h"
+#include "utils.h"
 
 #include <api/helpers/camera_id_helper.h>
 #include <media_server/media_server_module.h>
@@ -14,16 +15,6 @@ namespace nx::mediaserver::rest {
 
 using namespace nx::network;
 
-namespace {
-
-QVariantMap jsonToSettings(const QString& jsonString)
-{
-    return QJsonDocument::fromBinaryData(jsonString.toUtf8()).object().toVariantMap();
-}
-
-} // namespace
-
-
 AnalyticsEngineSettingsHandler::AnalyticsEngineSettingsHandler(QnMediaServerModule* serverModule):
     nx::mediaserver::ServerModuleAware(serverModule)
 {
@@ -32,10 +23,23 @@ AnalyticsEngineSettingsHandler::AnalyticsEngineSettingsHandler(QnMediaServerModu
 JsonRestResponse AnalyticsEngineSettingsHandler::executeGet(const JsonRestRequest& request)
 {
     // TODO: #dmishin requireParameter?
+    if (!request.params.contains(kAnalyticsEngineIdParameter))
+    {
+        NX_WARNING(this, "Missing required parameter 'analyticsEngineId'");
+        return makeResponse(
+            QnRestResult::Error::MissingParameter,
+            QStringList{"analyticsEngineId"});
+    }
+
     const auto engineId = request.params[kAnalyticsEngineIdParameter];
     auto engine = sdk_support::find<resource::AnalyticsEngineResource>(serverModule(), engineId);
     if (!engine)
-        return JsonRestResponse(http::StatusCode::badRequest);
+    {
+        NX_WARNING(this, "Can't find engine with id %1", engineId);
+        return makeResponse(
+            QnRestResult::Error::CantProcessRequest,
+            lm("Unable to find analytics engine with id %1").args(engineId));
+    }
 
     JsonRestResponse response(http::StatusCode::ok);
     response.json.setReply(QJsonObject::fromVariantMap(engine->settingsValues()));
@@ -47,18 +51,47 @@ JsonRestResponse AnalyticsEngineSettingsHandler::executePost(
     const QByteArray& body)
 {
     // TODO: #dmishin requireParameter?
-    const auto engineId = request.params[kAnalyticsEngineIdParameter];
+    bool success = false;
+    auto requestJson = QJson::deserialized(body, QJsonObject(), &success);
+
+    if (!success)
+    {
+        NX_WARNING(this, "Can't deserialize request JSON");
+        return makeResponse(QnRestResult::Error::BadRequest, "Unable to deserialize reqeust");
+    }
+
+    auto parameters = requestJson.toVariantMap();
+    if (!parameters.contains(kAnalyticsEngineIdParameter))
+    {
+        NX_WARNING(this, "Missing required parameter 'analyticsEngineId'");
+        return makeResponse(
+            QnRestResult::Error::MissingParameter,
+            QStringList{"analyticsEngineId"});
+    }
+
+    if (!parameters.contains(kSettingsParameter))
+    {
+        NX_WARNING(this, "Missing required parameter 'settings'");
+        return makeResponse(QnRestResult::Error::MissingParameter, QStringList{"settings"});
+    }
+
+    const auto engineId = parameters[kAnalyticsEngineIdParameter].toString();
     auto engine = sdk_support::find<resource::AnalyticsEngineResource>(serverModule(), engineId);
     if (!engine)
     {
         NX_WARNING(this, "Can't find engine with id %1", engineId);
-        return JsonRestResponse(http::StatusCode::badRequest);
+        return makeResponse(QnRestResult::Error::CantProcessRequest,
+            lm("Unable to find analytics engine with id %1").args(engineId));
     }
 
-    auto settings = jsonToSettings(request.params[kSettingsParameter]);
+    auto settings = parameters[kSettingsParameter].value<QVariantMap>();
     engine->setSettingsValues(settings);
+    engine->saveParams();
 
-    return JsonRestResponse(http::StatusCode::ok);
+    JsonRestResponse response(http::StatusCode::ok);
+    response.json.setReply(QJsonObject::fromVariantMap(engine->settingsValues()));
+
+    return response;
 }
 
 } // namespace nx::mediaserver::rest
