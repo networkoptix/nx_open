@@ -121,6 +121,7 @@ QByteArray updatePayloadType(const QByteArray& line, int payloadType)
     index = line.indexOf(' ');
     if (index > 0)
         result.append(line.mid(index));
+    result.append('\n');
     return result;
 }
 
