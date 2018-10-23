@@ -2437,8 +2437,8 @@ void MediaServerProcess::registerRestHandlers(
      *     The special value "now" requires to retrieve the thumbnail only from the live stream.
      *     <br/>The special value "latest", which is the default value, requires to retrieve
      *     thumbnail from the live stream if possible, otherwise the latest one from the archive.
-     *     <br/>Note: archive extraction can be quite slow operation depending place where it is
-     *     stored.
+     *     <br/>Note: Extraction from the archive can be quite slow depending on the place where the
+     *     frame is stored.
      * %param[opt]:integer rotate Image orientation. Can be 0, 90, 180 or 270 degrees. If the
      *     parameter is absent or equals -1, the image will be rotated as defined in the camera
      *     settings.
