@@ -121,7 +121,7 @@ QByteArray updatePayloadType(const QByteArray& line, int payloadType)
     index = line.indexOf(' ');
     if (index > 0)
         result.append(line.mid(index));
-    result.append('\n');
+    result.append('\n'); //< '\r' already present in line, since line splitted only by '\n'.
     return result;
 }
 
