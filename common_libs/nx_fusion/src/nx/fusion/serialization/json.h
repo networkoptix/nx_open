@@ -120,8 +120,6 @@ void serialize(
     const QString& key,
     QJsonObject* outTarget)
 {
-    serialize<T>(ctx, value, key, outTarget);
-
     NX_ASSERT(outTarget);
 
     QJsonValue jsonValue;
