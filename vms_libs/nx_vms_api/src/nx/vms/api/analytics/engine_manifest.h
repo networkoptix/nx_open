@@ -10,12 +10,21 @@
 
 namespace nx::vms::api::analytics {
 
+/**
+ * The JSON-serializable data structure that is given by each Analytics Plugin's Engine to the
+ * Server after the Engine has been created by the Plugin.
+ */
 struct NX_VMS_API EngineManifest
 {
+    /**
+     * Declaration of an Engine ObjectAction - the user may select an analytics Object (e.g.
+     * as a context action for the object rectangle on a video frame), and choose an ObjectAction
+     * to trigger from the list of all compatible ObjectActions from all Engines.
+     */
     struct ObjectAction
     {
-        QString id;
-        TranslatableString name;
+        QString id; /**< Id of the action type, like "vendor.pluginName.actionName". */
+        TranslatableString name; /**< Name to be shown to the user; in English. */
         QList<QString> supportedObjectTypeIds;
         // TODO: Add params (settings).
     };
@@ -41,8 +50,13 @@ struct NX_VMS_API EngineManifest
 
     Capabilities capabilities;
 
+    /** Types of Events that can potentially be produced by any DeviceAgent of this Engine. */
     QList<EventType> eventTypes;
+    
+    /** Types of Objects that can potentially be produced by any DeviceAgent of this Engine. */
     QList<ObjectType> objectTypes;
+    
+    /** Groups that are used to group Object and Event types declared by this manifest. */
     QList<Group> groups;
 
     QList<ObjectAction> objectActions;

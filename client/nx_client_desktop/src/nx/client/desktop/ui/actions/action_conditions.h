@@ -552,6 +552,13 @@ public:
     virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
 };
 
+class AnalyticsEngineCondition: public Condition
+{
+public:
+    virtual ActionVisibility check(
+        const QnResourceList& resources, QnWorkbenchContext* context) override;
+};
+
 class MergeToCurrentSystemCondition: public Condition
 {
 public:

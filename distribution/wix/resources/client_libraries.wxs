@@ -28,7 +28,6 @@
             <Component><File Name="Qt5MultimediaWidgets.dll" KeyPath="yes"/></Component>
             <Component><File Name="Qt5MultimediaQuick.dll" KeyPath="yes"/></Component>
             <Component><File Name="Qt5Svg.dll" KeyPath="yes"/></Component>
-            <Component><File Name="Qt5Qml.dll" KeyPath="yes"/></Component>
             <Component><File Name="Qt5Quick.dll" KeyPath="yes"/></Component>
             <Component><File Name="Qt5QuickWidgets.dll" KeyPath="yes"/></Component>
             <Component><File Name="Qt5QuickControls2.dll" KeyPath="yes"/></Component>

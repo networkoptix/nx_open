@@ -63,16 +63,18 @@ QmlEngine::QmlEngine(QObject* parent):
     });
 }
 
-QmlEngine::~QmlEngine() = default;
+QmlEngine::~QmlEngine()
+{
+}
 
 void QmlEngine::load(const QByteArray& data)
 {
     d->component->setData(data, QUrl());
 }
 
-void QmlEngine::load(const QUrl& url)
+void QmlEngine::load(const QString& fileName)
 {
-    d->component->loadUrl(url);
+    d->component->loadUrl(fileName);
 }
 
 } // namespace nx::mediaserver::interactive_settings

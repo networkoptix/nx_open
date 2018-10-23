@@ -66,14 +66,14 @@ Item
             id: enableSwitch
             text: qsTr("Enable")
             Layout.preferredWidth: Math.max(implicitWidth, 120)
-            visible: menu.currentItem
+            visible: menu.currentItemId
 
             Binding
             {
                 target: enableSwitch
                 property: "checked"
-                value: menu.currentItem && menu.currentItem.active
-                when: menu.currentItem
+                value: enabledAnalyticsEngines.indexOf(currentEngineId) !== -1
+                when: currentEngineId !== undefined
             }
 
             onClicked:
