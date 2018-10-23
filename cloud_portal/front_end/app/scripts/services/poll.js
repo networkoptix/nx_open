@@ -25,7 +25,7 @@ angular.module('cloudApp')
                 activeInterval = $interval(function(){
                     activeFnPromise = fn(); // Call function
                     if (!activeFnPromise || typeof activeFnPromise.finally !== 'function'){
-                        console.error('POLL service (activeFnPromise) ->', activeFnPromise);
+                        console.error('Function passed to POLL service not a Promise ... got ->', activeFnPromise);
                         activeFnPromise = $q.resolve(activeFnPromise);
                     }
                     activeFnPromise.finally(function (result) {
