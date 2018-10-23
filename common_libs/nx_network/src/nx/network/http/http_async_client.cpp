@@ -1442,7 +1442,7 @@ QString AsyncClient::endpointWithProtocol(const nx::utils::Url& url)
         .arg(url.port(nx::network::http::defaultPortForScheme(url.scheme().toLatin1())));
 }
 
-static std::optional<header::WWWAuthenticate> extractWWWAuthenticateHeader(
+static std::optional<header::WWWAuthenticate> extractAuthenticateHeader(
     const HttpHeaders& headers, bool isProxy, AuthType authType)
 {
     const StringType authenticateHeaderName = isProxy ? "Proxy-Authenticate" : "WWW-Authenticate";
@@ -1486,7 +1486,7 @@ bool AsyncClient::resendRequestWithAuthorization(
         isProxy ? StringType("Proxy-Authorization") : header::Authorization::NAME;
     const auto credentials = isProxy ? m_proxyUser : m_user;
 
-    auto wwwAuthenticateHeader = extractWWWAuthenticateHeader(response.headers, isProxy, m_authType);
+    auto wwwAuthenticateHeader = extractAuthenticateHeader(response.headers, isProxy, m_authType);
     if(!wwwAuthenticateHeader)
         return false;
     if (wwwAuthenticateHeader->authScheme == header::AuthScheme::basic &&

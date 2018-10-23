@@ -19,21 +19,20 @@ const char* kTestPath = "/HttpAsyncClient_auth";
 const char* kDefaultUsername = "zorz_user";
 const char* kDefaultPassword = "zorz_pass";
 
-// TODO: rename
-const char* defaultBasicHeader = "WWW-Authenticate: Basic realm=\"ZORZ\"\r\n";
-const char* defaultDigestHeader =
+const char* kDefaultBasicHeader = "WWW-Authenticate: Basic realm=\"ZORZ\"\r\n";
+const char* kDefaultDigestHeader =
     "WWW-Authenticate: Digest algorithm=\"MD5\", nonce=\"cUySLvm\", realm=\"VMS\"\r\n";
-const char* lowercaseMd5DigestHeader =
+const char* kLowercaseMd5DigestHeader =
     "WWW-Authenticate: Digest realm=\"Http Server\", "
     "nonce=\"f3164f6a1801ecb0870af2c468a6d7af\", algorithm=md5, qop=\"auth\"\r\n";
 
-const char* responseForDefaultBasicHeader = "Basic em9yel91c2VyOnpvcnpfcGFzcw==";
-const char* responseForDefaultDigestHeader =
+const char* kResponseForDefaultBasicHeader = "Basic em9yel91c2VyOnpvcnpfcGFzcw==";
+const char* kResponseForDefaultDigestHeader =
         "Digest username=\"zorz_user\", realm=\"VMS\", nonce=\"cUySLvm\", "
         "uri=\"/HttpAsyncClient_auth\", response=\"4a5ec2fdc1d7dd43dd6fb345944583c5\", "
         "algorithm=\"MD5\"";
 
-const char* responseForLowercaseMd5DigestHeader =
+const char* kResponseForLowercaseMd5DigestHeader =
         "Digest username=\"zorz_user\", realm=\"Http Server\", "
         "nonce=\"f3164f6a1801ecb0870af2c468a6d7af\", uri=\"/HttpAsyncClient_auth\", "
         "response=\"900afe7b3e6d522346fcfaaa897b6b35\", algorithm=\"md5\", cnonce=\"0a4f113b\", "
@@ -194,10 +193,10 @@ void HttpClientAsyncAuthorization::thenLastRequestAuthorizedOnServerAsUser(
         testing::HasSubstr(usernameSubstring.str()));
 }
 
-const AuthHttpServer::AuthHeader basic = {AuthType::authBasic, defaultBasicHeader};
-const AuthHttpServer::AuthHeader digest = {AuthType::authDigest, defaultDigestHeader};
-const auto basicResponse = responseForDefaultBasicHeader;
-const auto digestResponse = responseForDefaultDigestHeader;
+const AuthHttpServer::AuthHeader basic = {AuthType::authBasic, kDefaultBasicHeader};
+const AuthHttpServer::AuthHeader digest = {AuthType::authDigest, kDefaultDigestHeader};
+const auto basicResponse = kResponseForDefaultBasicHeader;
+const auto digestResponse = kResponseForDefaultDigestHeader;
 
 INSTANTIATE_TEST_CASE_P(HttpClientAsyncAuthorizationInstance, HttpClientAsyncAuthorization,
     ::testing::Values(
@@ -228,15 +227,15 @@ TEST_P(HttpClientAsyncAuthorization, AuthSelection)
 
 TEST_F(HttpClientAsyncAuthorization, lowercaseAlgorithm)
 {
-    givenHttpServerWithAuthorization({{AuthType::authDigest, lowercaseMd5DigestHeader}});
+    givenHttpServerWithAuthorization({{AuthType::authDigest, kLowercaseMd5DigestHeader}});
     whenClientSendHttpRequestAndIsRequiredToUse(AuthType::authDigest);
     thenClientGotResponseWithCode(200);
-    thenClientAuthenticatedBy(responseForLowercaseMd5DigestHeader);
+    thenClientAuthenticatedBy(kResponseForLowercaseMd5DigestHeader);
 }
 
 TEST_F(HttpClientAsyncAuthorization, cached_authorization_of_a_different_user_is_not_used)
 {
-    givenHttpServerWithAuthorization({{AuthType::authDigest, defaultDigestHeader}});
+    givenHttpServerWithAuthorization({{AuthType::authDigest, kDefaultDigestHeader}});
 
     whenClientSendHttpRequestAndIsRequiredToUse(AuthType::authDigest, "Vasya");
     thenClientGotResponseWithCode(200);

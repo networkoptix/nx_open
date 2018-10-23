@@ -106,11 +106,9 @@ boost::optional<QCryptographicHash::Algorithm> parseAlgorithm(
     const StringType& algorithm)
 {
     // TODO: #mux Perhaps we should support some other algorithms?
-    if (algorithm == "MD5") return QCryptographicHash::Md5;
-    if (algorithm == "md5") return QCryptographicHash::Md5;
+    if (algorithm.toUpper() == "MD5") return QCryptographicHash::Md5;
 
-    if (algorithm == "SHA-256") return QCryptographicHash::Sha256;
-    if (algorithm == "sha-256") return QCryptographicHash::Sha256;
+    if (algorithm.toUpper() == "SHA-256") return QCryptographicHash::Sha256;
 
     if (algorithm.isEmpty()) return QCryptographicHash::Md5; //< default
     return boost::none;

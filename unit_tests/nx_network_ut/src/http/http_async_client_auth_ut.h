@@ -9,13 +9,13 @@ namespace network {
 namespace http {
 namespace test {
 
-
 // TODO: Use TestHttpServer?
 class AuthHttpServer:
     public nx::network::test::SynchronousStreamSocketServer
 {
 public:
-    struct AuthHeader {
+    struct AuthHeader
+    {
         AuthType type;
         nx::Buffer header;
     };
@@ -39,10 +39,10 @@ private:
 struct TestParams
 {
     std::vector<AuthHttpServer::AuthHeader> serverAuthHeaders;
-    AuthType clientRequiredToUseAuthType;
+    AuthType clientRequiredToUseAuthType = AuthType::authBasicAndDigest;
 
-    const char* expectedAuthResponse;
-    int expectedHttpCode;
+    const char* expectedAuthResponse = nullptr;
+    int expectedHttpCode = 0;
 };
 
 class HttpClientAsyncAuthorization:
@@ -63,7 +63,6 @@ private:
     std::unique_ptr<http::AsyncClient> m_httpClient;
     std::unique_ptr<AuthHttpServer> m_httpServer;
 };
-
 
 } // namespace test
 } // namespace nx
