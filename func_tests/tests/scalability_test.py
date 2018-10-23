@@ -498,7 +498,9 @@ def lws_env(config, groups):
                 PROPERTIES_PER_CAMERA=config.PROPERTIES_PER_CAMERA,
                 ) as lws:
             merge_start_time = datetime_local_now()
-            server.api.merge(lws[0].api, lws.server_bind_address, lws[0].port, take_remote_settings=True)
+            server.api.merge(lws[0].api, lws.server_bind_address, lws[0].port,
+                             take_remote_settings=True,
+                             timeout_sec=config.MERGE_TIMEOUT.total_seconds())
             yield Env(
                 all_server_list=[server] + lws.servers,
                 real_server_list=[server],
@@ -514,7 +516,9 @@ def make_real_servers_env(config, server_list, common_net):
     create_test_data(config, server_list)
     merge_start_time = datetime_local_now()
     for server in server_list[1:]:
-        merge_systems(server_list[0], server, accessible_ip_net=common_net)
+        merge_systems(server_list[0], server,
+                      accessible_ip_net=common_net,
+                      timeout_sec=config.MERGE_TIMEOUT.total_seconds())
     return Env(
         all_server_list=server_list,
         real_server_list=server_list,

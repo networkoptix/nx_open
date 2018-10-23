@@ -583,6 +583,7 @@ class MediaserverApi(object):
             remote_address,  # type: IPAddress
             remote_port,
             take_remote_settings=DEFAULT_TAKE_REMOTE_SETTINGS,
+            timeout_sec=30,
             ):
         # When many servers are merged, there is server visible from others.
         # This server is passed as remote. That's why it's higher in loggers hierarchy.
@@ -619,10 +620,10 @@ class MediaserverApi(object):
                 raise MergeUnauthorized(self, remote_api, e.error, e.error_string)
             raise ExplicitMergeError(self, remote_api, e.error, e.error_string)
         servant_api.generic.http.set_credentials(master_api.generic.http.user, master_api.generic.http.password)
-        wait_for_truthy(servant_api.credentials_work, timeout_sec=30)
-        wait_for_equal(servant_api.get_local_system_id, master_system_id, timeout_sec=30)
+        wait_for_truthy(servant_api.credentials_work, timeout_sec=timeout_sec)
+        wait_for_equal(servant_api.get_local_system_id, master_system_id, timeout_sec=timeout_sec)
         all_ids = master_ids | servant_ids
-        wait_for_equal(master_api.system_mediaserver_ids, all_ids, timeout_sec=30)
+        wait_for_equal(master_api.system_mediaserver_ids, all_ids, timeout_sec=timeout_sec)
         logger.info("Merge %s to %s (takeRemoteSettings: %s): complete.", self, remote_api, take_remote_settings)
 
     def find_camera(self, camera_mac):
