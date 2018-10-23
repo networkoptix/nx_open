@@ -49,6 +49,9 @@ int QnDetachFromCloudRestHandler::execute(
     const QnRestConnectionProcessor* owner,
     QnJsonRestResult& result)
 {
+    if (!verifyCurrentPassword(data, owner, &result))
+        return nx::network::http::StatusCode::ok;
+
     const Qn::UserAccessData& accessRights = owner->accessRights();
 
     NX_VERBOSE(this, lm("Detaching system from cloud. cloudSystemId %1")

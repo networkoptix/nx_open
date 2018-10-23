@@ -1,5 +1,8 @@
 #include "json_rest_handler.h"
 
+#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/user_resource.h>
 #include <nx/utils/string.h>
 #include <rest/server/rest_connection_processor.h>
 #include <utils/common/util.h>
@@ -121,6 +124,36 @@ int QnJsonRestHandler::executePut(
     QnJsonRestResult& result, const QnRestConnectionProcessor* owner)
 {
     return setWrongMethodError(path, &result, owner);
+}
+
+bool QnJsonRestHandler::verifyCurrentPassword(
+    const CurrentPasswordData& passwordData,
+    const QnRestConnectionProcessor* owner,
+    QnJsonRestResult* result)
+{
+    const auto user = owner->commonModule()->resourcePool()
+        ->getResourceById<QnUserResource>(owner->accessRights().userId);
+
+    if (!user)
+    {
+        const auto error = lit(
+            "User is not available, this handler is supposed to be used with authorization only");
+
+        NX_ASSERT(false, error);
+        result->setError(QnJsonRestResult::CantProcessRequest, error);
+        return false;
+    }
+
+    if (user->checkLocalUserPassword(passwordData.currentPassword))
+        return true;
+
+    if (result)
+    {
+        result->setError(QnJsonRestResult::CantProcessRequest,
+            lit("Invalid current password provided"));
+    }
+
+    return false;
 }
 
 RestResponse QnJsonRestHandler::executeGet(const RestRequest& request)
