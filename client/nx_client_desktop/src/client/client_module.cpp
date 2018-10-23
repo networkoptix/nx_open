@@ -603,9 +603,9 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
 
     if (!startupParams.enforceMediatorEndpoint.isEmpty())
     {
-        nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
+        nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorAddress({
             startupParams.enforceMediatorEndpoint,
-            startupParams.enforceMediatorEndpoint);
+            startupParams.enforceMediatorEndpoint});
     }
 
     if (!startupParams.videoWallGuid.isNull())
