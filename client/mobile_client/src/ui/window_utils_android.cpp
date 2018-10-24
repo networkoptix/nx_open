@@ -94,14 +94,13 @@ void makeShortVibration()
     if (!activity.isValid())
         return;
 
-    // This gets the string value of the VIBRATOR_SERVICE field.
     const auto serviceField = QAndroidJniObject::getStaticObjectField<jstring>(
         "android/content/Context", "VIBRATOR_SERVICE");
     if (!serviceField.isValid())
         return;
 
     const auto vibrator = activity.callObjectMethod(
-        "getSystemService", "(Ljava/lang/String;)Ljava/lang/Object;",serviceField.object<jobject>());
+        "getSystemService", "(Ljava/lang/String;)Ljava/lang/Object;", serviceField.object<jobject>());
     if (!vibrator.isValid())
         return;
 
