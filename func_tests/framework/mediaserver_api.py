@@ -514,6 +514,12 @@ class MediaserverApi(object):
         # Although api/setCameraParam method is considered POST in doc, in the code it is GET
         self.generic.get('api/setCameraParam', params)
 
+    def get_server_statistics(self, salt=None):
+        if salt:
+            self.generic.get('/api/statistics', salt)
+        else:
+            self.generic.get('/api/statistics')
+
     @classmethod
     def _parse_json_fields(cls, data):
         if isinstance(data, dict):
