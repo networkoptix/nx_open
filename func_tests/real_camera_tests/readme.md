@@ -30,8 +30,13 @@ them. Besides, you need a designated network with cameras. To run the test, use:
 ```bash
     pytest real_camera_tests/test_server.py \
         --rct-interface=$NETWORK_INTERFACE_WITH_CAMERAS \
-        --rct-network=$NETWORK_IP/$NETWORK_MASK \
-        --rct-expected-cameras=$CAMERAS_CONFIG_TO_OVERRIDE_DEFAULT
+        --rct-network=$NETWORK_IP_AND_MASK \
+        --rct-expected-cameras=$CAMERAS_CONFIG_PATH
+        
+    # For example:
+    NETWORK_INTERFACE_WITH_CAMERAS=eth1
+    NETWORK_IP_AND_MASK=192.168.0.55/24
+    CAMERAS_CONFIG_PATH=muskov_expected_cameras.yaml
 ```
 
 After a successful or failed run, test results will be generated:

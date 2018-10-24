@@ -178,9 +178,9 @@ QnMediaServerModule::QnMediaServerModule(const nx::mediaserver::CmdLineArguments
 
     if (!enforcedMediatorEndpoint.isEmpty())
     {
-        nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
+        nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorAddress({
             enforcedMediatorEndpoint,
-            enforcedMediatorEndpoint);
+            enforcedMediatorEndpoint});
     }
 
     store(new QnNewSystemServerFlagWatcher(commonModule()));

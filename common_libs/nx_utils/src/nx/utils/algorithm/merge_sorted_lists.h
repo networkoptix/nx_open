@@ -5,34 +5,48 @@
 #include <type_traits>
 #include <utility>
 
-#include <QtCore/qnamespace.h>
+#include <QtCore/Qt>
 
-namespace nx {
-namespace utils {
-namespace algorithm {
+namespace nx::utils::algorithm {
 
 /**
-* Merge sorted lists using priority queue concept implemented via STL heap.
-*
-* @param sortedLists List of source sorted lists. Its type should be random access iteratable.
-*   Each list should be sequentially iteratable and have value_type type and push_back method.
-* @param lessItem Item comparison functor taking two values of sorted list's value_type
-*   and returning a boolean. Must be consistent with source lists sort order.
-* @param totalLimit The maximum allowed number of items in the resulting list; ignored if <= 0.
-* @returns Single merged sorted list.
-*/
+ * Merge sorted lists using priority queue concept implemented via STL heap.
+ *
+ * @param sortedLists List of source sorted lists. Its type should be random access iteratable.
+ *   Each list should be sequentially iteratable and have value_type type
+ *   and size, push_back and erase(first, last) methods.
+ * @param lessItem Item comparison functor taking two values of sorted list's value_type
+ *   and returning a boolean. Must be consistent with source lists sort order.
+ * @param totalLimit The maximum allowed number of items in the resulting list; ignored if <= 0.
+ * @returns Single merged sorted list.
+ */
 template<class ListOfSortedLists, class LessPredicate>
 auto merge_sorted_lists(
-    ListOfSortedLists sortedLists,
+    ListOfSortedLists&& sortedLists,
     LessPredicate lessItem,
     int totalLimit = std::numeric_limits<int>::max())
 {
-    using SortedList = typename std::remove_reference<decltype(*sortedLists.begin())>::type;
+    using SortedList = std::remove_reference_t<decltype(*sortedLists.begin())>;
+
+    if (totalLimit <= 0)
+        totalLimit = std::numeric_limits<int>::max(); //< No limit.
+
+    const auto truncatedList =
+        [](SortedList list, int limit)
+        {
+            if ((int) list.size() <= limit)
+                return list;
+
+            auto outOfLimit = list.begin();
+            std::advance(outOfLimit, limit);
+            list.erase(outOfLimit, list.end());
+            return std::move(list);
+        };
 
     switch (sortedLists.size())
     {
         case 0: return SortedList();
-        case 1: return std::move(*sortedLists.begin());
+        case 1: return truncatedList(std::move(*sortedLists.begin()), totalLimit);
         default: break;
     }
 
@@ -55,23 +69,20 @@ auto merge_sorted_lists(
     switch (queueData.size())
     {
         case 0: return SortedList();
-        case 1: return std::move(*lastNonEmptyList);
+        case 1: return truncatedList(std::move(*lastNonEmptyList), totalLimit);
         default: break;
     }
 
     SortedList result;
     static constexpr int kMaximumReserve = 10000; // Something sensible.
 
-    if (totalLimit <= 0)
-        totalLimit = std::numeric_limits<int>::max();
-
     result.reserve(std::min(totalLimit, kMaximumReserve));
 
     const auto lessPriority =
-            [lessItem](const IteratorRange& left, const IteratorRange& right) -> bool
-            {
-                return !lessItem(*left.first, *right.first);
-            };
+        [lessItem](const IteratorRange& left, const IteratorRange& right) -> bool
+        {
+            return !lessItem(*left.first, *right.first);
+        };
 
     std::make_heap(queueData.begin(), queueData.end(), lessPriority);
 
@@ -80,7 +91,11 @@ auto merge_sorted_lists(
         std::pop_heap(queueData.begin(), queueData.end(), lessPriority);
         auto& range = queueData.back();
 
-        result.push_back(*range.first);
+        if constexpr (std::is_rvalue_reference_v<decltype(sortedLists)>)
+            result.push_back(std::move(*range.first));
+        else
+            result.push_back(*range.first);
+
         ++range.first;
 
         if (range.first == range.second)
@@ -89,20 +104,21 @@ auto merge_sorted_lists(
             std::push_heap(queueData.begin(), queueData.end(), lessPriority);
     }
 
-    return std::move(result);
+    return result;
 };
 
 /**
-* Merge sorted lists using priority queue concept implemented via STL heap.
-*
-* @param sortedLists List of source sorted lists. Its type should be random access iteratable.
-*   Each list should be sequentially iteratable and have value_type type and push_back method.
-* @param sortFieldGetter A functor taking value_type of a sorted list and returning a value
-*   of type that can be compared with operator <.
-* @param sortOrder How source sorted lists are sorted.
-* @param totalLimit The maximum allowed number of items in the resulting list; ignored if <= 0.
-* @returns Single merged sorted list.
-*/
+ * Merge sorted lists using priority queue concept implemented via STL heap.
+ *
+ * @param sortedLists List of source sorted lists. Its type should be random access iteratable.
+ *   Each list should be sequentially iteratable and have value_type type
+ *   and size, push_back and erase(first, last) methods.
+ * @param sortFieldGetter A functor taking value_type of a sorted list and returning a value
+ *   of type that can be compared with operator <.
+ * @param sortOrder How source sorted lists are sorted.
+ * @param totalLimit The maximum allowed number of items in the resulting list; ignored if <= 0.
+ * @returns Single merged sorted list.
+ */
 template<class ListOfSortedLists, class SortFieldGetter>
 auto merge_sorted_lists(
     ListOfSortedLists sortedLists,
@@ -110,7 +126,7 @@ auto merge_sorted_lists(
     Qt::SortOrder sortOrder = Qt::AscendingOrder,
     int totalLimit = std::numeric_limits<int>::max())
 {
-    using SortedList = typename std::remove_reference<decltype(*sortedLists.begin())>::type;
+    using SortedList = std::remove_reference_t<decltype(*sortedLists.begin())>;
     using Item = typename SortedList::value_type;
 
     using Less = std::function<bool(const Item&, const Item&)>;
@@ -122,28 +138,27 @@ auto merge_sorted_lists(
 };
 
 /**
-* Merge sorted lists using priority queue concept implemented via STL heap.
-*
-* @param sortedLists List of source sorted lists. Its type should be random access iteratable.
-*   Each list should be sequentially iteratable and have value_type type and push_back method.
-*   Values should be comparable with operator <.
-* @param sortOrder How source sorted lists are sorted.
-* @param totalLimit The maximum allowed number of items in the resulting list; ignored if <= 0.
-* @returns Single merged sorted list.
-*/
+ * Merge sorted lists using priority queue concept implemented via STL heap.
+ *
+ * @param sortedLists List of source sorted lists. Its type should be random access iteratable.
+ *   Each list should be sequentially iteratable and have value_type type
+ *   and size, push_back and erase(first, last) methods.
+ *   Values should be comparable with operator<
+ * @param sortOrder How source sorted lists are sorted.
+ * @param totalLimit The maximum allowed number of items in the resulting list; ignored if <= 0.
+ * @returns Single merged sorted list.
+ */
 template<class ListOfSortedLists>
 auto merge_sorted_lists(
     ListOfSortedLists sortedLists,
     Qt::SortOrder sortOrder = Qt::AscendingOrder,
     int totalLimit = std::numeric_limits<int>::max())
 {
-    using SortedList = typename std::remove_reference<decltype(*sortedLists.begin())>::type;
+    using SortedList = std::remove_reference_t<decltype(*sortedLists.begin())>;
 
     return merge_sorted_lists(std::move(sortedLists),
         [](const typename SortedList::value_type& value) { return value; },
         sortOrder, totalLimit);
 }
 
-} // namespace algorithm
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils::algorithm

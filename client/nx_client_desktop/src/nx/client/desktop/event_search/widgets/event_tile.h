@@ -96,6 +96,7 @@ public:
     void setFooterEnabled(bool value);
 
     void setResourceList(const QnResourceList& list); //< Doesn't store it, only generates text.
+    void setResourceList(const QStringList& list);
 
     enum class Mode
     {

@@ -1,29 +1,29 @@
 #include "device_addition_dialog.h"
 #include "ui_device_addition_dialog.h"
-
-#include <QtCore/QScopedValueRollback>
-
 #include "private/found_devices_model.h"
 #include "private/manual_device_searcher.h"
 #include "private/presented_state_delegate.h"
 
+#include <QtCore/QScopedValueRollback>
+
+#include <api/server_rest_connection.h>
+#include <common/common_module.h>
+#include <core/resource/client_camera.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/camera_resource.h>
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
+#include <utils/common/event_processors.h>
+#include <utils/common/delayed.h>
+
 #include <nx/client/desktop/resource_views/views/fake_resource_list_view.h>
 #include <nx/client/desktop/common/widgets/password_preview_button.h>
 #include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/client/desktop/common/utils/validators.h>
-
-#include <core/resource/client_camera.h>
-#include <core/resource/media_server_resource.h>
-#include <utils/common/event_processors.h>
-#include <utils/common/delayed.h>
-#include <api/server_rest_connection.h>
-#include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/camera_resource.h>
+#include <nx/utils/guarded_callback.h>
 
 namespace {
 
@@ -517,13 +517,13 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
 
     const auto login = m_currentSearch->login();
     const auto password = m_currentSearch->password();
-    server->restConnection()->addCamera(devices, login, password,
-        [this, addingDevices, devices, guard = QPointer<DeviceAdditionDialog>(this)]
+    server->restConnection()->addCamera(devices, login, password, nx::utils::guarded(this,
+        [this, addingDevices, devices]
             (bool success, rest::Handle /*handle*/, const QnJsonRestResult& result)
         {
-            if (guard && success)
+            if (success)
                 appendAddingDevices(addingDevices);
-        }, QThread::currentThread());
+        }), QThread::currentThread());
 }
 
 void DeviceAdditionDialog::showAdditionFailedDialog(const FakeResourceList& resources)

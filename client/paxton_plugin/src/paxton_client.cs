@@ -53,6 +53,11 @@ public static class PaxtonClient
 
     public static OemDvrStatus testConnection(OemDvrConnection connectionInfo)
 	{
+	    m_logger.InfoFormat("Testing connection to: {0}:{1} as {2}",
+	        connectionInfo.HostName,
+            connectionInfo.Port,
+	        connectionInfo.UserId);
+
         var moduleInformation = createConnection(connectionInfo).getModuleInformation();
 
         m_logger.InfoFormat("Server found: {0}, protocol version: {1}",

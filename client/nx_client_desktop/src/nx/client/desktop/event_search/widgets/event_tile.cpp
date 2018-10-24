@@ -118,6 +118,35 @@ struct EventTile::Private
 
         q->setPalette(pal);
     }
+
+    void setResourceList(const QStringList& list, int andMore)
+    {
+        if (list.empty())
+        {
+            q->ui->resourceListLabel->hide();
+            q->ui->resourceListLabel->setText({});
+        }
+        else
+        {
+            QString text = lm("<b>%1</b>").arg(list.join("<br>"));
+
+            if (andMore > 0)
+            {
+                static constexpr int kQssFontWeightMultiplier = 8;
+
+                text += lm("<p style='color: %1; font-size: %2px; font-weight: %3; margin-top: %4'>%5</p>")
+                    .args(
+                        q->palette().color(QPalette::WindowText).name(),
+                        kAndMoreFontPixelSize,
+                        kAndMoreFontWeight * kQssFontWeightMultiplier,
+                        kAndMoreTopMargin,
+                        tr("...and %n more", "", andMore));
+            }
+
+            q->ui->resourceListLabel->setText(text);
+            q->ui->resourceListLabel->show();
+        }
+    }
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -210,6 +239,11 @@ EventTile::EventTile(QWidget* parent):
     d->progressLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     d->progressLabel->setFont(progressLabelFont);
     d->progressLabel->setForegroundRole(QPalette::Highlight);
+
+    ui->nameLabel->setText({});
+    ui->descriptionLabel->setText({});
+    ui->footerLabel->setText({});
+    ui->timestampLabel->setText({});
 
     static constexpr int kProgressLabelShift = 8;
     anchorWidgetToParent(d->progressLabel, {0, 0, 0, kProgressLabelShift});
@@ -304,36 +338,17 @@ void EventTile::setDescription(const QString& value)
 
 void EventTile::setResourceList(const QnResourceList& list)
 {
-    if (list.empty())
-    {
-        ui->resourceListLabel->hide();
-        ui->resourceListLabel->setText({});
-    }
-    else
-    {
-        QStringList items;
-        for (int i = 0; i < std::min(list.size(), kMaximumResourceListSize); ++i)
-            items.push_back(list[i]->getName());
+    QStringList items;
+    for (int i = 0; i < std::min(list.size(), kMaximumResourceListSize); ++i)
+        items.push_back(list[i]->getName());
 
-        QString text = lm("<b>%1</b>").arg(items.join("<br>"));
+    d->setResourceList(items, qMax(list.size() - kMaximumResourceListSize, 0));
+}
 
-        const int numExtra = list.size() - kMaximumResourceListSize;
-        if (numExtra > 0)
-        {
-            static constexpr int kQssFontWeightMultiplier = 8;
-
-            text += lm("<p style='color: %1; font-size: %2px; font-weight: %3; margin-top: %4'>%5</p>")
-                .args(
-                    palette().color(QPalette::WindowText).name(),
-                    kAndMoreFontPixelSize,
-                    kAndMoreFontWeight * kQssFontWeightMultiplier,
-                    kAndMoreTopMargin,
-                    tr("...and %n more", "", numExtra));
-        }
-
-        ui->resourceListLabel->setText(text);
-        ui->resourceListLabel->show();
-    }
+void EventTile::setResourceList(const QStringList& list)
+{
+    QStringList items = list.mid(0, kMaximumResourceListSize);
+    d->setResourceList(items, qMax(list.size() - kMaximumResourceListSize, 0));
 }
 
 QString EventTile::footerText() const

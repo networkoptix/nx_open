@@ -7,11 +7,11 @@
 #include <ui/style/custom_style.h>
 #include <ui/widgets/word_wrapped_label.h>
 #include <utils/common/delayed.h>
-#include <utils/common/guarded_callback.h>
 
 #include <nx/client/desktop/common/utils/accessor.h>
-#include <nx/utils/scope_guard.h>
 #include <nx/client/desktop/utils/widget_utils.h>
+#include <nx/utils/guarded_callback.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace client {
@@ -184,7 +184,7 @@ bool BaseInputFieldPrivate::eventFilter(QObject* watched, QEvent* event)
         {
             // Ensure input is polished.
             const auto callback = [this](){ defaultPalette = input->palette(); };
-            executeLater(guarded(this, callback), this);
+            executeLater(nx::utils::guarded(this, callback), this);
             break;
         }
         case QEvent::FocusIn:

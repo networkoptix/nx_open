@@ -244,7 +244,7 @@ bool FcResource::tryToEnableNexusServer(nx::network::http::HttpClient& httpClien
     bool status = false;
     auto isEnabled = messageBody.trimmed().toInt(&status);
 
-    if (!status || !isEnabled == 1)
+    if (!status || isEnabled != 1)
         return false;
 
     return true;

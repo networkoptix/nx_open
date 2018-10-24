@@ -180,18 +180,16 @@ DWC-MV421TIR:
   attributes if features.advanced_lens_control:
     ptzCapabilities: 16388
 
-  # FIXME: There is a bug: no matter which FPS you set for recording, it's always 30.
   recording:
     primary: {codec: 'H264', resolution: '1920x1080', fps: [[13, 17], [8, 12]]}
     secondary: {codec: 'H264', resolution: '352x288', fps: [5, 10]}
 
   video_parameters:
     primary:
-      - {codec: 'H264', resolution: '1920x1080'}
-      #- {codec: 'MJPEG', resolution: '1280x960'}
+      - {codec: 'H264', resolution: '1280x720'}
     secondary:
-      - {codec: 'H264', resolution: '640x352', fps: [8, 12]}
-      #- {codec: 'MJPEG', resolution: '320x240', fps: [24, 36]}
+      - {codec: 'H264', resolution: '704x480', fps: [8, 12]}
+      #- {codec: 'H264', resolution: '320x240', fps: [24, 36]}
 
   # Didn't find any data on supported audio_parameters codecs. This needs checking
   # "Audio stream was not discovered by ffprobe."
@@ -254,19 +252,15 @@ DWC-PVX16W:
 
   recording:
     primary: {codec: 'H264', resolution: '2560x1440', fps: [[25, 35]]} # TODO: Add more FPS.
-    secondary: {codec: 'H264', resolution: '352x240', fps: [3, 8]}
+    secondary: {codec: 'H264', resolution: '352x240', fps: [5, 9]}
     # Although in all_cameras.json range is "352x240,352x288, 640x480,704x480,704x576", 352x240
     # is applied when trying to use 352x288. Bug on the server or camera?
 
-  # No normal specs, fps/res may require adjusting
   video_parameters:
-    #"Video stream was not discovered by ffprobe."
     primary:
-      - {codec: 'H264', resolution: '2560x1440'}
-      #- {codec: 'MJPEG', resolution: '1280x960'}
+      - {codec: 'H264', resolution: '1920x1080'}
     secondary:
-      - {codec: 'H264', resolution: '352x288', fps: [8, 12]}
-      #- {codec: 'MJPEG', resolution: '640x480', fps: [24, 36]}
+      - {codec: 'H264', resolution: '704x480', fps: [13, 17]}
 
   # Didn't find any data on supported audio_parameters codecs. This needs checking.
   #"Audio stream was not discovered by ffprobe. Seems, there's no sound on the cam."
@@ -380,7 +374,7 @@ Hikvision_DS-2CD2132F-IWS:
 
   recording:
     primary: {codec: 'H264', resolution: '2048x1536', fps: [[13, 17], [8, 12]]}
-    secondary: {codec: 'H264', resolution: '640x480', fps: [10, 20]}
+    secondary: {codec: 'H264', resolution: '640x480', fps: [5, 9]}
 
   video_parameters:
     primary:
@@ -388,7 +382,7 @@ Hikvision_DS-2CD2132F-IWS:
       - {codec: 'H264', resolution: '1920x1080'}
     secondary:
       - {codec: 'H264', resolution: '1280x720', fps: [8, 12]}
-      - {codec: 'H264', resolution: '640x480', fps: [13, 17]}
+      - {codec: 'H264', resolution: '320x240', fps: [13, 17]}
 
   # Also has G722 and MP2L2 in spec. But no advanced setting to switch to those.
   # "Audio stream was not discovered by ffprobe."
@@ -423,7 +417,7 @@ Hikvision_DS-2CD2342WD-I:
       - {codec: 'H264', resolution: '2688x1520'}
       - {codec: 'H264', resolution: '1920x1080'}
     secondary:
-      - {codec: 'H264', resolution: '640x480', fps: [8, 12]}
+      - {codec: 'H264', resolution: '640x360', fps: [8, 12]}
       - {codec: 'H264', resolution: '352x240', fps: [24, 36]}
 
 
@@ -442,15 +436,15 @@ Vista_VK2-1080VR:
     isAudioSupported: 0
 
   recording:
-    primary: {codec: 'H264', resolution: '1920x1080', fps: [[13, 17]]} # TODO: More FPS.
-    secondary: {codec: 'H264', resolution: '640x360', fps: [5, 10]}
+    primary: {codec: 'H264', resolution: '1920x1080', fps: [[13, 17], [8, 12]]} # TODO: More FPS.
+    secondary: {codec: 'MJPEG', resolution: '704x576', fps: [5, 9]}
 
   video_parameters:
     primary:
       - {codec: 'H264', resolution: '1920x1080'}
-#      - {codec: 'H264', resolution: '1280x720'} # !resolution range is empty in all_cameras.json
+      - {codec: 'H264', resolution: '1280x1024'} # !resolution range is empty in all_cameras.json
     secondary:
-      - {codec: 'H264', resolution: '480x360', fps: [8, 12]} # !resolution range is empty in all_cameras.json
+      - {codec: 'MJPEG', resolution: '640x480', fps: [8, 12]} # !resolution range is empty in all_cameras.json
 #      - {codec: 'H264', resolution: '640x360', fps: [24, 36]} # fps range 1, 100 (sic!) in all_cameras.json
     stream_urls:
       "1": "rtsp://192.168.200.16:554/1/stream1/Profile1"

@@ -2,7 +2,6 @@
 
 #include <rest/server/json_rest_handler.h>
 #include <core/resource_access/user_access_data.h>
-#include <api/model/password_data.h>
 #include <nx/mediaserver/server_module_aware.h>
 
 struct PasswordData;
@@ -37,9 +36,4 @@ private:
         const QnRequestParamList& params,
         const QByteArray& body,
         const QnRestConnectionProcessor* owner) override;
-
-    bool verifyCurrentPassword(
-        const CurrentPasswordData& passwordDat,
-        const QnRestConnectionProcessor* owner,
-        QnJsonRestResult* result = nullptr);
 };

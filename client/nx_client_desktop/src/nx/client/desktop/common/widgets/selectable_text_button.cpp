@@ -240,11 +240,6 @@ void SelectableTextButton::setDeactivationToolTip(const QString& value)
 
 QSize SelectableTextButton::sizeHint() const
 {
-    return minimumSizeHint();
-}
-
-QSize SelectableTextButton::minimumSizeHint() const
-{
     const auto textSize = QFontMetrics(font()).size(0, effectiveText());
     const auto iconSize = QnSkin::maximumSize(effectiveIcon());
 
@@ -262,6 +257,11 @@ QSize SelectableTextButton::minimumSizeHint() const
         qMax(kMinimumHeight, qMax(textSize.height(), iconSize.height()) + 2));
 }
 
+QSize SelectableTextButton::minimumSizeHint() const
+{
+    return QSize(style::Metrics::kMinimumButtonWidth, kMinimumHeight);
+}
+
 bool SelectableTextButton::event(QEvent* event)
 {
     switch (event->type())
@@ -270,6 +270,9 @@ bool SelectableTextButton::event(QEvent* event)
         case QEvent::MouseButtonRelease:
         case QEvent::Shortcut:
         case QEvent::KeyPress:
+            if (menu())
+                return base_type::event(event);
+            [[fallthrough]];
         case QEvent::Enter:
         case QEvent::Leave:
         {
@@ -384,7 +387,9 @@ void SelectableTextButton::paintEvent(QPaintEvent* /*event*/)
             NX_ASSERT(false, "Should never get here!");
     }
 
-    painter.drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, effectiveText());
+    const auto fullText = effectiveText();
+    const auto elidedText = fontMetrics().elidedText(fullText, Qt::ElideRight, rect.width());
+    painter.drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, elidedText);
 }
 
 } // namespace desktop

@@ -12,21 +12,21 @@ class PredefinedMediatorConnector:
 {
 public:
     PredefinedMediatorConnector(
-        const nx::network::SocketAddress& udpEndpoint,
+        const hpm::api::MediatorAddress& mediatorAddress,
         std::unique_ptr<hpm::api::MediatorServerTcpConnection> serverConnection);
 
     virtual std::unique_ptr<hpm::api::MediatorClientTcpConnection> clientConnection() override;
 
     virtual std::unique_ptr<hpm::api::MediatorServerTcpConnection> systemConnection() override;
 
-    virtual void fetchUdpEndpoint(nx::utils::MoveOnlyFunc<void(
+    virtual void fetchAddress(nx::utils::MoveOnlyFunc<void(
         nx::network::http::StatusCode::Value /*resultCode*/,
-        nx::network::SocketAddress /*endpoint*/)> handler) override;
+        hpm::api::MediatorAddress /*address*/)> handler) override;
 
-    virtual std::optional<nx::network::SocketAddress> udpEndpoint() const override;
+    virtual std::optional<hpm::api::MediatorAddress> address() const override;
 
 private:
-    nx::network::SocketAddress m_udpEndpoint;
+    hpm::api::MediatorAddress m_mediatorAddress;
     std::unique_ptr<hpm::api::MediatorServerTcpConnection> m_serverConnection;
 };
 

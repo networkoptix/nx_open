@@ -3,9 +3,7 @@
 #include <nx/client/desktop/event_search/models/abstract_async_search_list_model.h>
 #include <nx/vms/event/event_fwd.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 class EventSearchListModel: public AbstractAsyncSearchListModel
 {
@@ -13,19 +11,20 @@ class EventSearchListModel: public AbstractAsyncSearchListModel
     using base_type = AbstractAsyncSearchListModel;
 
 public:
-    explicit EventSearchListModel(QObject* parent = nullptr);
+    explicit EventSearchListModel(QnWorkbenchContext* context, QObject* parent = nullptr);
     virtual ~EventSearchListModel() override = default;
 
     vms::api::EventType selectedEventType() const;
     void setSelectedEventType(vms::api::EventType value);
 
+    QString selectedSubType() const;
+    void setSelectedSubType(const QString& value);
+
     virtual bool isConstrained() const override;
 
 private:
     class Private;
-    Private* const d = nullptr;
+    Private* const d;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

@@ -33,9 +33,9 @@ protected:
             m_system, boost::none, hpm::ServerTweak::noListenToConnect);
 
         ASSERT_NE(nullptr, m_server);
-        SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
+        SocketGlobals::cloud().mediatorConnector().mockupMediatorAddress({
             url::Builder().setScheme("stun").setEndpoint(m_mediator.stunTcpEndpoint()),
-            m_mediator.stunUdpEndpoint());
+            m_mediator.stunUdpEndpoint()});
     }
 
     std::unique_ptr<AbstractStreamServerSocket> cloudServerSocket(

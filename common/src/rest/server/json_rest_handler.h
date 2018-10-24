@@ -4,6 +4,7 @@
 #include "json_rest_result.h"
 
 #include <nx/fusion/serialization/lexical_functions.h>
+#include <api/model/password_data.h>
 
 /**@file
  * TODO: #MSAPI
@@ -97,6 +98,11 @@ public:
     virtual int executePut(
         const QString& path, const QnRequestParams& params, const QByteArray& body,
         QnJsonRestResult& result, const QnRestConnectionProcessor* owner);
+
+    bool verifyCurrentPassword(
+        const CurrentPasswordData& passwordDat,
+        const QnRestConnectionProcessor* owner,
+        QnJsonRestResult* result = nullptr);
 
 protected:
     // QnRestRequestHandler interface implemenation:
