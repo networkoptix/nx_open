@@ -23,5 +23,4 @@ loggers:
   framework.vms.vm_type.networking.winrm.cmd: {level: INFO}
 
 root:
-  level: DEBUG  # Default is `WARNING`.
   handlers: [stderr]

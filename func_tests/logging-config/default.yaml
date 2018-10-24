@@ -59,5 +59,4 @@ loggers:
   scalability_test.post_check: {level: INFO}
 
 root:
-  level: DEBUG  # Default is `WARNING`.
   handlers: [stderr]
