@@ -101,7 +101,8 @@ def one_mediaserver_api(one_running_mediaserver):
 
 @pytest.fixture(scope='session')
 def required_licenses():
-    return [dict(n_cameras=100)]
+    # TODO: Find out why server does not allow more than 10 cameras per license.
+    return [dict(n_cameras=10)] * 5
 
 
 @pytest.fixture
