@@ -70,8 +70,7 @@ Item
         if (d.customRoi)
             d.customRoi.hide()
 
-        var kVibrationDurationMs = 500
-        vibrate(kVibrationDurationMs)
+        makeShortVibration()
     }
 
     function handlePressed(pos)

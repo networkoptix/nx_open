@@ -30,7 +30,6 @@
 #include <nx/client/core/utils/operation_manager.h>
 #include <nx/vms/discovery/manager.h>
 #include <finders/systems_finder.h>
-#include <nx/mobile_client/helpers/vibrator.h>
 
 using namespace nx::vms::utils;
 
@@ -345,9 +344,9 @@ void QnContext::updateCustomMargins()
     emit customMarginsChanged();
 }
 
-void QnContext::vibrate(int milliseconds)
+void QnContext::makeShortVibration()
 {
-    nx::mobile_client::helpers::vibrate(milliseconds);
+    ::makeShortVibration();
 }
 
 int QnContext::leftCustomMargin() const

@@ -130,7 +130,7 @@ public:
 
     Q_INVOKABLE void updateCustomMargins();
 
-    Q_INVOKABLE void vibrate(int milliseconds);
+    Q_INVOKABLE void makeShortVibration();
 
     int leftCustomMargin() const;
     int rightCustomMargin() const;
