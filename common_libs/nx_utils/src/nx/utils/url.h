@@ -139,9 +139,6 @@ private:
     void parse(const QString& url, SetUrlFunc setUrlFunc);
 };
 
-// NOTE: This function is forced to omit password, as it is used for logging.
-QString toString(const Url& url);
-
 inline quint32 qHash(const Url& url)
 {
     return qHash(url.toString());
