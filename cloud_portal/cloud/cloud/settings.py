@@ -49,8 +49,6 @@ ALLOWED_HOSTS = ['*']
 SKINS = ['blue', 'green', 'orange']
 DEFAULT_SKIN = 'blue'
 
-NX = 'default'
-
 # Application definition
 
 INSTALLED_APPS = (
@@ -114,6 +112,7 @@ ADMIN_DASHBOARD = ('cms.models.ContentVersion',
                    'cms.models.Context',
                    'cms.models.ContextProxy',
                    'cms.models.ContextTemplate',
+                   'cms.models.Customization',
                    'cms.models.DataRecord',
                    'cms.models.DataStructure',
                    'cms.models.ExternalFile',

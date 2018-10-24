@@ -76,7 +76,7 @@ class CustomContextForm(forms.Form):
                     ds_description += "<br>This record is the same for every language."
                 ds_language = None
 
-            record_value = data_structure.find_actual_value(product, ds_language)
+            record_value = data_structure.find_actual_value(product, ds_language, draft=True)
 
             widget_type = forms.TextInput(attrs={'size': 80, 'placeholder': data_structure.default})
 
@@ -196,4 +196,23 @@ class ProductForm(forms.ModelForm):
         data = self.cleaned_data['customizations']
         if self.instance.product_type and self.instance.product_type.single_customization and len(data) > 1:
             raise ValueError('Too many customizations selected')
+        return data
+
+
+class CustomizationForm(forms.ModelForm):
+    class Meta:
+        model = Customization
+        exclude = []
+
+    def __init__(self, *args, **kwargs):
+        super(CustomizationForm, self).__init__(*args, **kwargs)
+
+        self.fields['parent'].queryset = Customization.objects.exclude(id=self.instance.id)\
+            .exclude(id__in=self.instance.get_children_ids(self.instance))
+
+    def clean_parent(self):
+        data = self.cleaned_data['parent']
+        if not Customization.objects.exclude(id__in=self.instance.get_children_ids(self.instance)).\
+                exclude(id=self.instance.id).filter(id=data.id).exists():
+            raise ValueError('Invalid customization was selected')
         return data

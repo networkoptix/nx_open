@@ -106,12 +106,23 @@ class Customization(models.Model):
     public_release_history = models.BooleanField(default=False)
     public_downloads = models.BooleanField(default=True)
 
+    parent = models.ForeignKey('Customization', default=None, null=True)
+    trust_parent = models.BooleanField(default=False)
+
     def __str__(self):
         return self.name
 
     @property
     def languages_list(self):
         return self.languages.values_list('code', flat=True)
+
+    def get_children_ids(self, customization):
+        children_list = []
+        for child_customization in customization.customization_set.all():
+            children_list.append(child_customization.id)
+            if child_customization.customization_set.exists():
+                children_list.extend(self.get_children_ids(child_customization))
+        return children_list
 
 
 class ProductType(models.Model):
@@ -417,13 +428,14 @@ class ContentVersion(models.Model):
         return str(self.id)
 
     def create_reviews(self):
-        state = ProductCustomizationReview.REVIEW_STATES.pending
-        if self.product.customizations.filter(name=settings.NX).exists():
-            state = ProductCustomizationReview.REVIEW_STATES.blocked
-            ProductCustomizationReview(customization=Customization.objects.get(name=settings.NX), version=self).save()
+        blocked = ProductCustomizationReview.REVIEW_STATES.blocked
+        pending = ProductCustomizationReview.REVIEW_STATES.pending
 
-        for customization in self.product.customizations.exclude(name=settings.NX):
-            ProductCustomizationReview(customization=customization, version=self, state=state).save()
+        for customization in self.product.customizations.all():
+            if customization.parent:
+                ProductCustomizationReview(customization=customization, version=self, state=blocked).save()
+            else:
+                ProductCustomizationReview(customization=customization, version=self, state=pending).save()
 
 
     @property
@@ -461,15 +473,31 @@ class ProductCustomizationReview(models.Model):
     def __str__(self):
         return self.version.product.__str__()
 
-    def accepted_by_nx(self):
-        reviews = self.version.productcustomizationreview_set.exclude(customization__name=settings.NX)
+    def accepted_by_parent(self):
+        children_customizatons_ids = self.customization.get_children_ids(self.customization)
+        reviews = self.version.productcustomizationreview_set.exclude(customization__name=self.customization).\
+            filter(customization__id__in=children_customizatons_ids)
+        parent_review = self.version.productcustomizationreview_set.get(customization__name=self.customization)
+
         for review in reviews:
+            review.reviewed_by = parent_review.reviewed_by
+            review.reviewed_date = parent_review.reviewed_date
             review.state = ProductCustomizationReview.REVIEW_STATES.pending
+            if review.customization.trust_parent:
+                review.state = ProductCustomizationReview.REVIEW_STATES.accepted
+                review.note = "Accepted by parent"
             review.save()
 
-    def rejected_by_nx(self):
-        reviews = self.version.productcustomizationreview_set.exclude(customization__name=settings.NX)
+    def rejected_by_parent(self):
+        children_customizatons_ids = self.customization.get_children_ids(self.customization)
+        reviews = self.version.productcustomizationreview_set.exclude(customization__name=self.customization). \
+            filter(customization__id__in=children_customizatons_ids)
+        parent_review = self.version.productcustomizationreview_set.get(customization__name=self.customization)
+
         for review in reviews:
+            review.reviewed_by = parent_review.reviewed_by
+            review.reviewed_date = parent_review.reviewed_date
+            review.notes = "Rejected by parent"
             review.state = ProductCustomizationReview.REVIEW_STATES.rejected
             review.save()
 
