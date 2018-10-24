@@ -32,6 +32,8 @@ nx::network::server::ParserState MessageParser::state() const
 void MessageParser::reset()
 {
     m_header = {};
+    m_header.transactionId.resize(Header::TRANSACTION_ID_SIZE);
+
     m_attribute = {};
     m_outputMessage = nullptr;
     m_leftMessageLength = 0;
