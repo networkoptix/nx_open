@@ -174,6 +174,8 @@ class WindowsAccess(OSAccess):
         # With script file, `diskpart` exits with non-zero code.
         script_path = image_path.with_suffix('.diskpart.txt')
         script_path.write_text(script)
+        # Error originate in VDS -- Virtual Disk Service.
+        # See: https://msdn.microsoft.com/en-us/library/dd208031.aspx.
         command = self.winrm.command(['diskpart', '/s', script_path])
         command.run(timeout_sec=10 + 0.05 * size_mb)
         return self.path_cls('{letter}:\\'.format(letter=letter))
