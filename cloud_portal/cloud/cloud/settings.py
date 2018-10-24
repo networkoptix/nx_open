@@ -30,6 +30,7 @@ if not CUSTOMIZATION:
     CUSTOMIZATION = conf['customization']
 
 assert ('trafficRelay' in conf), 'Ivan, please add traffic relay to config for this instance'
+assert ('bucket' in conf), 'Ivan, please add s3 bucket to config for this instance'
 
 TRAFFIC_RELAY_HOST = '{systemId}.' + conf['trafficRelay']['host']  # {systemId}.relay-bur.vmsproxy.hdw.mx
 TRAFFIC_RELAY_PROTOCOL = 'https://'
@@ -293,14 +294,11 @@ MEDIA_URL = '/static/integrations/'
 
 
 # START s3 config
-AWS_ACCESS_KEY_ID = "AKIAIJRICE4V7AMYJX2A"
-AWS_SECRET_ACCESS_KEY = "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"
-AWS_STORAGE_BUCKET_NAME = 'cloud-portal' # os.getenv('INSTANCE_NAME')
+AWS_STORAGE_BUCKET_NAME = conf['bucket'] if 'bucket' in conf and not LOCAL_ENVIRONMENT else 'cloud-portal'
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
-AWS_LOCATION = CUSTOMIZATION + '-integrations'
 INTEGRATION_FILE_STORAGE = 'mysite.storage_backends.MediaStorage'
 # END s3
 
@@ -329,8 +327,6 @@ HOOK_EVENTS = {
 
 BROKER_URL = os.getenv('QUEUE_BROKER_URL')
 BROKER_CONNECTION_MAX_RETRIES = 1
-if not BROKER_URL:
-    BROKER_URL = 'sqs://AKIAJLGVEWNXAIODNKLA:W+Xah8vz129nZBpukBkwZsz3fLtnzOLUqEMDthZp@'
 
 BROKER_TRANSPORT_OPTIONS = {
     'queue_name_prefix' : conf['queue_name'] + '-',

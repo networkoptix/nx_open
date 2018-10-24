@@ -132,11 +132,12 @@ def save_unrevisioned_records(product, context, language, data_structures,
                 for chunk in request_file.chunks():
                     md5.update(chunk)
 
-                external_file = ExternalFile()
+                external_file = ExternalFile(data_structure=data_structure, product=product)
+                external_file.save()
+
                 external_file.file = request_file
                 external_file.md5 = md5.hexdigest()
-                external_file.product = product
-                external_file.size = request_file.size/1048576.0
+                external_file.size = request_file.size
                 external_file.save()
 
                 new_record_value = external_file.file.url

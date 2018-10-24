@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import os
+import re
 from django.db import models
 from django.conf import settings
 from jsonfield import JSONField
@@ -66,10 +67,16 @@ def cloud_portal_customization_cache(customization_name, value=None, force=False
     return data
 
 
+def slugify(name):
+    unsafe_chars = re.compile('[^a-z0-9\s-]')
+    return unsafe_chars.sub('-', name).replace(' ', '-')
+
+
 def rename_file(instance, filename):
-    product_name = instance.product.name.lower()
-    product_name = product_name.replace(' ', '-')
-    return os.path.join(product_name, filename)
+    product_name = slugify(instance.product.name.lower())
+    structure_name = slugify(instance.data_structure.name.lower())
+    file_info = "{}-{}-{}".format(structure_name, instance.id, slugify(filename.lower()))
+    return os.path.join(product_name, file_info, filename)
 
 
 # CMS structure (data structure). Only developers can change that
@@ -468,10 +475,11 @@ class ProductCustomizationReview(models.Model):
 
 
 class ExternalFile(models.Model):
+    data_structure = models.ForeignKey(DataStructure, default=None, null=True)
     file = models.FileField(upload_to=rename_file, storage=MediaStorage())
-    md5 = models.CharField(max_length=1024)
+    md5 = models.CharField(max_length=1024, default='')
     product = models.ForeignKey(Product, default=None, null=True)
-    size = models.FloatField()
+    size = models.FloatField(default=0.0)
 
     def __str__(self):
         return self.file.name
