@@ -3,6 +3,7 @@ from pprint import pformat
 from xml.dom import minidom
 
 import xmltodict
+from pylru import lrudecorator
 from winrm.exceptions import WinRMError, WinRMTransportError
 
 _logger = logging.getLogger(__name__)
@@ -218,17 +219,35 @@ class _CIMReference(object):
         response = self.cim_class.perform_action(action_uri, body, self.selectors, timeout_sec=timeout_sec)
         method_output = response[method_name + '_OUTPUT']
         if method_output[u'ReturnValue'] != u'0':
-            error_code = int(method_output[u'ReturnValue'])
-            raise RuntimeError('Non-zero return value 0x{:X} ({}) of {!s}.{!s}({!r}) where {!r}:\n{!s}'.format(
-                error_code,
-                _win32_error_codes.get(error_code, 'unknown'),
-                self.cim_class.name,
-                method_name,
-                params,
-                self.selectors,
-                pformat(method_output),
-                ))
+            exception_cls = WmiInvokeFailed.specific_cls(int(method_output[u'ReturnValue']))
+            raise exception_cls(self, method_name, params, method_output)
         return method_output
+
+
+class WmiInvokeFailed(Exception):
+    @classmethod
+    @lrudecorator(100)
+    def specific_cls(cls, rv):
+        class WmiInvokeFailed(cls):
+            return_value = rv
+
+            def __init__(self, wmi_reference, method_name, params, method_output):
+                super(WmiInvokeFailed, self).__init__(
+                    'Non-zero return value 0x{:X} ({}) of {!s}.{!s}({!r}) where {!r}:\n{!s}'.format(
+                        self.return_value,
+                        _win32_error_codes.get(self.return_value, 'unknown'),
+                        wmi_reference.cim_class.name,
+                        method_name,
+                        params,
+                        wmi_reference.selectors,
+                        pformat(method_output),
+                        ))
+                self.wmi_reference = wmi_reference
+                self.method_name = method_name
+                self.arguments = params
+                self.output = method_output
+
+        return WmiInvokeFailed
 
 
 def find_by_selector_set(selector_set, items):

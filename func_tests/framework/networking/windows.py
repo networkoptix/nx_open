@@ -7,6 +7,7 @@ from framework.context_logger import ContextLogger, context_logger
 from framework.method_caching import cached_property
 from framework.networking.interface import Networking
 from framework.os_access.windows_remoting import WinRM
+from framework.os_access.windows_remoting._cim_query import WmiInvokeFailed
 
 _logger = ContextLogger(__name__, 'networking')
 
@@ -139,9 +140,7 @@ class WindowsNetworking(Networking):
             if configuration[u'MACAddress'] != {u'@xsi:nil': u'true'} and EUI(configuration[u'MACAddress']) == mac]
         adapter_conf = adapter_conf_class.reference({u'Index': requested_configuration[u'Index']})
         invoke_arguments = {u'IPAddress': [str(ip.ip)], u'SubnetMask': [str(ip.netmask)]}
-        invoke_result = adapter_conf.invoke_method(u'EnableStatic', invoke_arguments)
-        if invoke_result[u'ReturnValue'] != u'0':
-            raise RuntimeError('EnableStatic returned {}'.format(pformat(invoke_result)))
+        adapter_conf.invoke_method(u'EnableStatic', invoke_arguments)
 
     def list_ips(self):
         # -PolicyStore:PersistentStore filters out first NATed address
