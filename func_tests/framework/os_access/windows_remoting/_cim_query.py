@@ -118,64 +118,6 @@ class _CimAction(object):
         return response_dict['env:Envelope']['env:Body']
 
 
-class _Enumeration(object):
-    def __init__(self, protocol, wmi_class, selectors, max_elements=32000):
-        self.protocol = protocol
-        self.cim_class = wmi_class
-        self.selectors = selectors
-        self.max_elements = max_elements
-        self.enumeration_context = None
-        self.is_ended = False
-
-    def _start(self):
-        _logger.debug("Start enumerating %s where %r", self.cim_class, self.selectors)
-        assert not self.is_ended
-        action = 'http://schemas.xmlsoap.org/ws/2004/09/enumeration/Enumerate'
-        body = {
-            'n:Enumerate': {
-                'w:OptimizeEnumeration': None,
-                'w:MaxElements': str(self.max_elements),
-                # See: https://www.dmtf.org/sites/default/files/standards/documents/DSP0226_1.0.0.pdf, 8.7.
-                'w:EnumerationMode': 'EnumerateObjectAndEPR',
-                }
-            }
-        response = _CimAction(self.cim_class, action, self.selectors, body).perform(self.protocol)
-        self.enumeration_context = response['n:EnumerateResponse']['n:EnumerationContext']
-        self.is_ended = 'w:EndOfSequence' in response['n:EnumerateResponse']
-        items = response['n:EnumerateResponse']['w:Items']['w:Item']
-        return self._pick_objects(items)
-
-    def _pull(self):
-        _logger.debug("Continue enumerating %s where %r", self.cim_class, self.selectors)
-        assert self.enumeration_context is not None
-        assert not self.is_ended
-        action = 'http://schemas.xmlsoap.org/ws/2004/09/enumeration/Pull'
-        body = {
-            'n:Pull': {
-                'n:EnumerationContext': self.enumeration_context,
-                'n:MaxElements': str(self.max_elements),
-                }
-            }
-        response = _CimAction(self.cim_class, action, self.selectors, body).perform(self.protocol)
-        self.is_ended = 'n:EndOfSequence' in response['n:PullResponse']
-        self.enumeration_context = None if self.is_ended else response['n:PullResponse']['n:EnumerationContext']
-        items = response['n:PullResponse']['n:Items']['w:Item']
-        return self._pick_objects(items)
-
-    def _pick_objects(self, item_list):
-        object_list = [item[self.cim_class.name] for item in item_list]
-        for object in object_list:
-            _logger.info('\tObject: %r', object)
-        return object_list
-
-    def enumerate(self):
-        for item in self._start():
-            yield item
-        while not self.is_ended:
-            for item in self._pull():
-                yield item
-
-
 class CIMQuery(object):
     def __init__(self, protocol, cim_class, selectors):
         self.protocol = protocol
@@ -184,7 +126,55 @@ class CIMQuery(object):
 
     def enumerate(self, max_elements=32000):
         _logger.info("Enumerate %s where %r", self.cim_class, self.selectors)
-        return _Enumeration(self.protocol, self.cim_class, self.selectors, max_elements=max_elements).enumerate()
+        enumeration_context = [None]
+        enumeration_is_ended = [False]
+
+        def _start():
+            _logger.debug("Start enumerating %s where %r", self.cim_class, self.selectors)
+            assert not enumeration_is_ended[0]
+            action = 'http://schemas.xmlsoap.org/ws/2004/09/enumeration/Enumerate'
+            body = {
+                'n:Enumerate': {
+                    'w:OptimizeEnumeration': None,
+                    'w:MaxElements': str(max_elements),
+                    # See: https://www.dmtf.org/sites/default/files/standards/documents/DSP0226_1.0.0.pdf, 8.7.
+                    'w:EnumerationMode': 'EnumerateObjectAndEPR',
+                    }
+                }
+            response = _CimAction(self.cim_class, action, self.selectors, body).perform(self.protocol)
+            enumeration_context[0] = response['n:EnumerateResponse']['n:EnumerationContext']
+            enumeration_is_ended[0] = 'w:EndOfSequence' in response['n:EnumerateResponse']
+            items = response['n:EnumerateResponse']['w:Items']['w:Item']
+            return _pick_objects(items)
+
+        def _pull():
+            _logger.debug("Continue enumerating %s where %r", self.cim_class, self.selectors)
+            assert enumeration_context[0] is not None
+            assert not self.is_ended
+            action = 'http://schemas.xmlsoap.org/ws/2004/09/enumeration/Pull'
+            body = {
+                'n:Pull': {
+                    'n:EnumerationContext': enumeration_context[0],
+                    'n:MaxElements': str(max_elements),
+                    }
+                }
+            response = _CimAction(self.cim_class, action, self.selectors, body).perform(self.protocol)
+            self.is_ended = 'n:EndOfSequence' in response['n:PullResponse']
+            enumeration_context[0] = None if self.is_ended else response['n:PullResponse']['n:EnumerationContext']
+            items = response['n:PullResponse']['n:Items']['w:Item']
+            return _pick_objects(items)
+
+        def _pick_objects(item_list):
+            object_list = [item[self.cim_class.name] for item in item_list]
+            for object in object_list:
+                _logger.info('\tObject: %r', object)
+            return object_list
+
+        for item in _start():
+            yield item
+        while not enumeration_is_ended[0]:
+            for item in _pull():
+                yield item
 
     def get(self):
         _logger.info("Get %s where %r", self.cim_class, self.selectors)
