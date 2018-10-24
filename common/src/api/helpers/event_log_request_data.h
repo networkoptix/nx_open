@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QString>
+
 #include <core/resource/resource_fwd.h>
 
 #include <nx/vms/event/event_fwd.h>
@@ -13,7 +15,7 @@ struct QnEventLogFilterData
     QnTimePeriod period;
     QnVirtualCameraResourceList cameras;
     nx::vms::api::EventType eventType = nx::vms::api::EventType::undefinedEvent;
-    QnUuid eventSubtype;
+    QString eventSubtype;
     nx::vms::api::ActionType actionType = nx::vms::api::ActionType::undefinedAction;
     QnUuid ruleId;
 

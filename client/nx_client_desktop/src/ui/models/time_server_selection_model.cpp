@@ -14,13 +14,13 @@
 #include <translation/datetime_formatter.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
-#include <utils/common/guarded_callback.h>
 #include <utils/common/synctime.h>
 
 #include <nx_ec/ec_api.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
 #include <nx/client/core/utils/human_readable.h>
 #include <nx/utils/algorithm/index_of.h>
+#include <nx/utils/guarded_callback.h>
 
 namespace {
 
@@ -148,7 +148,7 @@ void QnTimeServerSelectionModel::updateTimeOffset()
         return;
     auto apiConnection = server->restConnection();
 
-    const auto callback = guarded(this,
+    const auto callback = nx::utils::guarded(this,
         [this, apiConnection]
             (bool success, rest::Handle handle, rest::MultiServerTimeData data)
         {

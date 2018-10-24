@@ -13,8 +13,8 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-EventListModel::EventListModel(QObject* parent):
-    base_type(parent),
+EventListModel::EventListModel(QnWorkbenchContext* context, QObject* parent):
+    base_type(context, parent),
     d(new Private(this))
 {
 }

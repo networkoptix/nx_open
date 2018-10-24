@@ -61,8 +61,8 @@ public:
         const auto getTimestamp =
             [](const vms::event::ActionData& data) { return data.eventParams.eventTimestampUsec; };
 
-        return std::move(utils::algorithm::merge_sorted_lists(std::move(outputData),
-            getTimestamp, request.order, request.limit));
+        return utils::algorithm::merge_sorted_lists(std::move(outputData),
+            getTimestamp, request.order, request.limit);
     }
 
 private:

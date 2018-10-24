@@ -13,9 +13,7 @@
 
 class QnResourcePool;
 
-namespace nx {
-namespace vms {
-namespace event {
+namespace nx::vms::event {
 
 // TODO: #GDM #Business fix to resourceTypeRequired: None, Camera, Server, User, etc
 bool requiresCameraResource(ActionType actionType);
@@ -40,7 +38,7 @@ struct ActionData
     };
 
     ActionData(): actionType(ActionType::undefinedAction), flags(0) {}
-    ActionData(const ActionData&);
+    ActionData(const ActionData&) = delete;
     ActionData(ActionData&&) = default;
     ActionData& operator=(const ActionData&) = delete;
     ActionData& operator=(ActionData&&) = default;
@@ -129,9 +127,7 @@ protected:
     int m_aggregationCount;
 };
 
-} // namespace event
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::event
 
 Q_DECLARE_METATYPE(nx::vms::event::AbstractActionPtr)
 Q_DECLARE_METATYPE(nx::vms::event::AbstractActionList)

@@ -1,20 +1,19 @@
 #include "wearable_preparer.h"
+#include "server_request_storage.h"
+#include "wearable_payload.h"
 
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 
-#include <utils/common/guarded_callback.h>
-#include <utils/common/synctime.h>
 #include <api/server_rest_connection.h>
+#include <core/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_archive_delegate.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <recording/time_period_list.h>
+#include <utils/common/synctime.h>
 
-#include <core/resource/avi/avi_resource.h>
-#include <core/resource/avi/avi_archive_delegate.h>
-
-#include "server_request_storage.h"
-#include "wearable_payload.h"
+#include <nx/utils/guarded_callback.h>
 
 namespace nx {
 namespace client {
@@ -123,7 +122,7 @@ void WearablePreparer::prepareUploads(const QStringList& filePaths, const QnTime
         }
     }
 
-    auto callback = guarded(this,
+    const auto callback = nx::utils::guarded(this,
         [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             d->requests.releaseHandle(handle);

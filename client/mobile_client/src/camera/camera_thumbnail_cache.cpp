@@ -1,11 +1,13 @@
 #include "camera_thumbnail_cache.h"
 
+#include <api/server_rest_connection.h>
+#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <api/server_rest_connection.h>
-#include <common/common_module.h>
+
 #include <nx/media/jpeg.h>
+#include <nx/utils/guarded_callback.h>
 
 namespace {
 
@@ -134,15 +136,12 @@ void QnCameraThumbnailCache::refreshThumbnail(const QnUuid &id)
         return;
 
     const auto handleReply =
-        [this, id, guard = QPointer<QnCameraThumbnailCache>(this)](
+        [this, id](
             bool success,
             rest::Handle /*requestId*/,
             QByteArray imageData,
             const nx::network::http::HttpHeaders& /*headers*/)
         {
-            if (!guard)
-                return;
-
             bool thumbnailLoaded = false;
             QString thumbnailId;
 
@@ -176,9 +175,11 @@ void QnCameraThumbnailCache::refreshThumbnail(const QnUuid &id)
         };
 
     m_request.camera = camera;
-    int handle = server->restConnection()->cameraThumbnailAsync(m_request, handleReply, m_decompressThread);
+    int handle = server->restConnection()->cameraThumbnailAsync(
+        m_request, nx::utils::guarded(this, handleReply), m_decompressThread);
 
-    if (handle == -1) {
+    if (handle == -1)
+    {
         thumbnailData.loading = false;
         return;
     }

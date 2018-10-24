@@ -5,8 +5,6 @@
 #include <QtCore/QPointer>
 #include <QtCore/QScopedPointer>
 
-#include <nx/utils/disconnect_helper.h>
-
 class QTabWidget;
 class QStackedWidget;
 class QnMediaResourceWidget;
@@ -18,14 +16,16 @@ namespace nx::vms::event { class StringsHelper; }
 
 namespace nx::client::desktop {
 
-class EventSearchListModel;
-class MotionSearchListModel;
-class BookmarkSearchListModel;
-class AnalyticsSearchListModel;
-
 class NotificationListWidget;
-class UnifiedSearchWidget;
 class NotificationCounterLabel;
+
+class MotionSearchWidget;
+class BookmarkSearchWidget;
+class EventSearchWidget;
+class AnalyticsSearchWidget;
+
+// ------------------------------------------------------------------------------------------------
+// EventPanel::Private
 
 class EventPanel::Private: public QObject
 {
@@ -35,57 +35,117 @@ public:
     Private(EventPanel* q);
     virtual ~Private() override;
 
-    QnVirtualCameraResourcePtr camera() const;
-    void setCamera(const QnVirtualCameraResourcePtr& camera);
+signals:
+    void currentMediaWidgetAboutToBeChanged(QPrivateSignal);
+    void currentMediaWidgetChanged(QPrivateSignal);
 
 private:
-    void currentWorkbenchWidgetChanged(Qn::ItemRole role);
-    void updateTabs();
-
-    void setupMotionSearch();
-    void setupBookmarkSearch();
-    void setupEventSearch();
-    void setupAnalyticsSearch();
-
+    void rebuildTabs();
+    bool systemHasAnalytics() const;
     void updateUnreadCounter(int count, QnNotificationLevel::Value importance);
-
-    void setupTabsSyncWithNavigator();
-
-    void connectToRowCountChanges(QAbstractItemModel* model, std::function<void()> handler);
-
     void showContextMenu(const QPoint& pos);
-
-    void at_motionSearchToggled(bool on);
-    void at_bookmarksToggled(bool on);
-
-    void at_specialModeToggled(bool on, QWidget* correspondingTab);
-
-    void at_motionSelectionChanged();
+    void handleCurrentMediaWidgetChanged();
 
 private:
-    EventPanel* const q = nullptr;
-    QTabWidget* const m_tabs = nullptr;
+    EventPanel* const q;
+    QTabWidget* const m_tabs;
 
-    NotificationListWidget* const m_notificationsTab = nullptr;
-    UnifiedSearchWidget* const m_motionTab = nullptr;
-    UnifiedSearchWidget* const m_bookmarksTab = nullptr;
-    UnifiedSearchWidget* const m_eventsTab = nullptr;
-    UnifiedSearchWidget* const m_analyticsTab = nullptr;
-    NotificationCounterLabel* const m_counterLabel = nullptr;
+    NotificationListWidget* const m_notificationsTab;
+    NotificationCounterLabel* const m_counterLabel;
+
+    MotionSearchWidget* const m_motionTab;
+    BookmarkSearchWidget* const m_bookmarksTab;
+    EventSearchWidget* const m_eventsTab;
+    AnalyticsSearchWidget* const m_analyticsTab;
 
     QPointer<QnMediaResourceWidget> m_currentMediaWidget;
-    QScopedPointer<QnDisconnectHelper> m_mediaWidgetConnections;
 
-    QnVirtualCameraResourcePtr m_camera;
+    class MotionSearchSynchronizer;
+    const QScopedPointer<MotionSearchSynchronizer> m_motionSearchSynchronizer;
 
-    EventSearchListModel* const m_eventsModel = nullptr;
-    MotionSearchListModel* const m_motionModel = nullptr;
-    BookmarkSearchListModel* const m_bookmarksModel = nullptr;
-    AnalyticsSearchListModel* const m_analyticsModel = nullptr;
+    class BookmarkSearchSynchronizer;
+    const QScopedPointer<BookmarkSearchSynchronizer> m_bookmarkSearchSynchronizer;
 
-    QScopedPointer<vms::event::StringsHelper> m_helper;
-    int m_previousTabIndex = 0;
-    int m_lastTabIndex = 0;
+    class AnalyticsSearchSynchronizer;
+    const QScopedPointer<AnalyticsSearchSynchronizer> m_analyticsSearchSynchronizer;
+};
+
+// ------------------------------------------------------------------------------------------------
+// EventPanel::Private::MotionSearchSynchronizer
+
+class EventPanel::Private::MotionSearchSynchronizer: public QObject
+{
+public:
+    MotionSearchSynchronizer(EventPanel::Private* main);
+    void reset();
+
+private:
+    void handleCurrentWidgetAboutToBeChanged();
+    void handleCurrentWidgetChanged();
+    void handleMotionSelectionChanged();
+
+    void updateState();
+    void syncWidgetWithPanel();
+    void syncPanelWithWidget();
+
+    enum class State
+    {
+        irrelevant, //< Other than Motion tab is selected.
+        unsyncedMotion, //< Motion tab and other than current camera mode are selected.
+        syncedMotion //< Motion tab and current camera mode are selected.
+    };
+
+    State calculateState() const;
+
+    void setCurrentWidgetMotionSearch(bool value);
+    QnMediaResourceWidget* widget() const;
+
+private:
+    EventPanel::Private* const m_main;
+    State m_state = State::irrelevant;
+    bool m_updating = false;
+    QWidget* m_revertTab = nullptr;
+};
+
+// ------------------------------------------------------------------------------------------------
+// EventPanel::Private::AnalyticsSearchSynchronizer
+
+class EventPanel::Private::AnalyticsSearchSynchronizer: public QObject
+{
+public:
+    AnalyticsSearchSynchronizer(EventPanel::Private* main);
+    void reset();
+
+private:
+    void handleCurrentWidgetAboutToBeChanged();
+    void handleCurrentWidgetChanged();
+    void handleAnalyticsSelectionChanged();
+
+    void syncWidgetWithPanel();
+    bool analyticsAreaSelection() const; //< Whether analytics area selection mode is required.
+    void setWidgetAnalyticsSelectionEnabled(bool value);
+
+private:
+    EventPanel::Private* const m_main;
+};
+
+// ------------------------------------------------------------------------------------------------
+// EventPanel::Private::BookmarkSearchSynchronizer
+
+class EventPanel::Private::BookmarkSearchSynchronizer: public QObject
+{
+public:
+    BookmarkSearchSynchronizer(EventPanel::Private* main);
+    void reset();
+
+private:
+    void handleCurrentTabChanged();
+    void setBookmarksTabActive(bool value);
+
+private:
+    EventPanel::Private* const m_main;
+    QWidget* m_revertTab = nullptr;
+    QWidget* m_lastTab = nullptr;
 };
 
 } // namespace nx::client::desktop

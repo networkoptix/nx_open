@@ -35,6 +35,13 @@ qint64 QnTimePeriod::endTimeMs() const
     return startTimeMs + durationMs;
 }
 
+void QnTimePeriod::setEndTimeMs(qint64 value)
+{
+    durationMs = value != DATETIME_NOW
+        ? qMax(0LL, value - startTimeMs)
+        : infiniteDuration();
+}
+
 bool QnTimePeriod::isLeftIntersection(const QnTimePeriod& other) const
 {
     return other.startTimeMs < startTimeMs
@@ -150,6 +157,16 @@ std::chrono::milliseconds QnTimePeriod::startTime() const
     return std::chrono::milliseconds(startTimeMs);
 }
 
+void QnTimePeriod::setEndTime(std::chrono::milliseconds value)
+{
+    setEndTimeMs(value.count());
+}
+
+std::chrono::milliseconds QnTimePeriod::endTime() const
+{
+    return std::chrono::milliseconds(endTimeMs());
+}
+
 void QnTimePeriod::setDuration(std::chrono::milliseconds value)
 {
     durationMs = value.count();
@@ -158,11 +175,6 @@ void QnTimePeriod::setDuration(std::chrono::milliseconds value)
 std::chrono::milliseconds QnTimePeriod::duration() const
 {
     return std::chrono::milliseconds(durationMs);
-}
-
-std::chrono::milliseconds QnTimePeriod::endTime() const
-{
-    return startTime() + duration();
 }
 
 QnTimePeriod& QnTimePeriod::operator = (const QnTimePeriod &other)
@@ -238,7 +250,7 @@ QnTimePeriod QnTimePeriod::truncatedFront(qint64 timeMs) const
 
 qint64 QnTimePeriod::bound(qint64 timeMs) const
 {
-    return qBound(startTimeMs, timeMs, endTimeMs());
+    return qBound(startTimeMs, timeMs, endTimeMs() - 1);
 }
 
 QDebug operator<<(QDebug dbg, const QnTimePeriod &period) {

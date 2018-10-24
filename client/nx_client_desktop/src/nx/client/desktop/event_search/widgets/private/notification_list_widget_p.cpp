@@ -83,8 +83,8 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     QnWorkbenchContextAware(q),
     q(q),
     m_eventRibbon(new EventRibbon(q)),
-    m_systemHealthModel(new SystemHealthListModel(this)),
-    m_notificationsModel(new NotificationListModel(this))
+    m_systemHealthModel(new SystemHealthListModel(context(), this)),
+    m_notificationsModel(new NotificationListModel(context(), this))
 {
     m_placeholder = new QWidget(q);
     m_placeholder->setMinimumSize(QSize(0, 100));

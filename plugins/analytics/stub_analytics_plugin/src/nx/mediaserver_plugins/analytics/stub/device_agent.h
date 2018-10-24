@@ -58,6 +58,8 @@ private:
     int m_frameCounter = 0;
     int m_counter = 0;
     int m_objectCounter = 0;
+    int m_currentObjectIndex = -1;
+    nxpl::NX_GUID m_objectId;
     std::string m_eventTypeId;
     int64_t m_lastVideoFrameTimestampUsec = 0;
 };

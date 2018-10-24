@@ -5,10 +5,12 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-EventSearchListModel::EventSearchListModel(QObject* parent):
-    base_type([this]() { return new Private(this); }, parent),
-    d(qobject_cast<Private*>(d_func()))
+EventSearchListModel::EventSearchListModel(QnWorkbenchContext* context, QObject* parent):
+    base_type(context, [this]() { return new Private(this); }, parent),
+    d(qobject_cast<Private*>(base_type::d.data()))
 {
+    setLiveSupported(true);
+    setLivePaused(true);
 }
 
 vms::api::EventType EventSearchListModel::selectedEventType() const
@@ -19,6 +21,16 @@ vms::api::EventType EventSearchListModel::selectedEventType() const
 void EventSearchListModel::setSelectedEventType(vms::api::EventType value)
 {
     d->setSelectedEventType(value);
+}
+
+QString EventSearchListModel::selectedSubType() const
+{
+    return d->selectedSubType();
+}
+
+void EventSearchListModel::setSelectedSubType(const QString& value)
+{
+    d->setSelectedSubType(value);
 }
 
 bool EventSearchListModel::isConstrained() const

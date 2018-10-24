@@ -2,16 +2,17 @@
 
 #include <QtQml/QtQml>
 
-#include <nx/utils/log/assert.h>
+#include <api/server_rest_connection.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <api/server_rest_connection.h>
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
+
 #include <nx/client/core/two_way_audio/two_way_audio_availability_watcher.h>
-#include <utils/common/guarded_callback.h>
+#include <nx/utils/guarded_callback.h>
+#include <nx/utils/log/assert.h>
 
 namespace nx {
 namespace client {
@@ -77,7 +78,7 @@ bool TwoWayAudioController::start()
         };
     const auto connection = server->restConnection();
     m_startHandle = connection->twoWayAudioCommand(m_sourceId, m_camera->getId(), true,
-        QnGuardedCallback<decltype(callback)>(this, callback), QThread::currentThread());
+        nx::utils::guarded(this, callback), QThread::currentThread());
 
     return true;
 }

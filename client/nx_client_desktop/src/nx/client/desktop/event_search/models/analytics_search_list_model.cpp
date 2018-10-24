@@ -1,14 +1,13 @@
 #include "analytics_search_list_model.h"
 #include "private/analytics_search_list_model_p.h"
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
-AnalyticsSearchListModel::AnalyticsSearchListModel(QObject* parent):
-    base_type([this]() { return new Private(this); }, parent),
-    d(qobject_cast<Private*>(d_func()))
+AnalyticsSearchListModel::AnalyticsSearchListModel(QnWorkbenchContext* context, QObject* parent):
+    base_type(context, [this]() { return new Private(this); }, parent),
+    d(qobject_cast<Private*>(base_type::d.data()))
 {
+    setLiveSupported(true);
 }
 
 QRectF AnalyticsSearchListModel::filterRect() const
@@ -33,14 +32,12 @@ void AnalyticsSearchListModel::setFilterText(const QString& value)
 
 bool AnalyticsSearchListModel::isConstrained() const
 {
-    return filterRect().isValid() || base_type::isConstrained();
+    return filterRect().isValid() || !filterText().isEmpty() || base_type::isConstrained();
 }
 
-bool AnalyticsSearchListModel::canFetchMore(const QModelIndex& parent) const
+bool AnalyticsSearchListModel::isCameraApplicable(const QnVirtualCameraResourcePtr& camera) const
 {
-    return rowCount() < Private::kMaximumItemCount && base_type::canFetchMore(parent);
+    return base_type::isCameraApplicable(camera) && d->isCameraApplicable(camera);
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

@@ -2,7 +2,7 @@
 
 #include <QtQml/QtQml>
 
-#include <nx/client/core/watchers/user_watcher.h>
+#include <api/server_rest_connection.h>
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>
 #include <core/resource/user_resource.h>
@@ -10,8 +10,9 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_access/resource_access_manager.h>
-#include <utils/common/guarded_callback.h>
-#include <api/server_rest_connection.h>
+
+#include <nx/client/core/watchers/user_watcher.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
 
@@ -158,7 +159,7 @@ bool SoftwareTriggersController::setTriggerState(QnUuid id, vms::event::EventSta
     const auto connection = m_commonModule->currentServer()->restConnection();
     connection->softwareTriggerCommand(
         m_resourceId, rule->eventParams().inputPortId, state,
-        QnGuardedCallback<decltype(callback)>(this, callback), QThread::currentThread());
+        nx::utils::guarded(this, callback), QThread::currentThread());
 
     return true;
 }
