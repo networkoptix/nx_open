@@ -32,7 +32,7 @@ int truncate_sorted_lists(
     using SortedList = std::remove_pointer_t<SortedListsItem>;
 
     const auto deref =
-        [](auto item)
+        [](auto item) -> SortedList&
         {
             if constexpr (std::is_pointer_v<decltype(item)>)
                 return *item;
