@@ -44,50 +44,48 @@ class CIMClass(object):
         return self.uri + '/' + method_name
 
 
-class _CimAction(object):
-    common_namespaces = {
-        # Namespaces from pywinrm's Protocol.
-        # TODO: Use aliases from WS-Management spec.
-        # See: https://www.dmtf.org/sites/default/files/standards/documents/DSP0226_1.0.0.pdf, Table A-1.
-        # Currently aliases are coupled from those from Protocol.
-        'http://www.w3.org/XML/1998/namespace': 'xml',
-        'http://www.w3.org/2003/05/soap-envelope': 'env',
-        'http://schemas.xmlsoap.org/ws/2004/09/enumeration': 'n',
-        'http://www.w3.org/2001/XMLSchema-instance': 'xsi',
-        'http://www.w3.org/2001/XMLSchema': 'xs',
-        'http://schemas.dmtf.org/wbem/wscim/1/common': 'cim',
-        'http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd': 'w',
-        'http://schemas.xmlsoap.org/ws/2004/09/transfer': 't',
-        'http://schemas.xmlsoap.org/ws/2004/08/addressing': 'a',
-        CIMClass('Win32_FolderRedirectionHealth').uri: 'folder',  # Commonly encountered in responses.
-        }
-
-    def __init__(self, cim_class, action, selectors, body):
+class CIMQuery(object):
+    def __init__(self, protocol, cim_class, selectors):
+        self.protocol = protocol
         self.cim_class = cim_class
-        self.action = action
         self.selectors = selectors
-        self.body = body
-        self.namespaces = self.common_namespaces.copy()
-        # noinspection PyTypeChecker
-        self.namespaces[self.cim_class.uri] = None  # Desired class namespace is default.
 
-    def _substitute_namespace_in_type_attribute(self, path, key, data):
-        """Process namespaces in type attr value."""
-        if key != '@' + self.namespaces['http://www.w3.org/2001/XMLSchema-instance'] + ':type':
-            return key, data
-        element_namespace_aliases = path[-1][1].get('xmlns', {})
-        if element_namespace_aliases is None:
-            return key, data
-        old_namespace_alias, bare_data = data.split(':')
-        new_namespace_alias = self.namespaces[element_namespace_aliases[old_namespace_alias]]
-        if new_namespace_alias is None:
-            return key, bare_data
-        return key, new_namespace_alias + ':' + bare_data
+    def _perform_action(self, action, body, timeout_sec=None):
+        xml_namespaces = {
+            # Namespaces from pywinrm's Protocol.
+            # TODO: Use aliases from WS-Management spec.
+            # See: https://www.dmtf.org/sites/default/files/standards/documents/DSP0226_1.0.0.pdf, Table A-1.
+            # Currently aliases are coupled from those from Protocol.
+            'http://www.w3.org/XML/1998/namespace': 'xml',
+            'http://www.w3.org/2003/05/soap-envelope': 'env',
+            'http://schemas.xmlsoap.org/ws/2004/09/enumeration': 'n',
+            'http://www.w3.org/2001/XMLSchema-instance': 'xsi',
+            'http://www.w3.org/2001/XMLSchema': 'xs',
+            'http://schemas.dmtf.org/wbem/wscim/1/common': 'cim',
+            'http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd': 'w',
+            'http://schemas.xmlsoap.org/ws/2004/09/transfer': 't',
+            'http://schemas.xmlsoap.org/ws/2004/08/addressing': 'a',
+            CIMClass('Win32_FolderRedirectionHealth').uri: 'folder',
+            # Commonly encountered in responses.
+            self.cim_class.uri: None,  # Desired class namespace is default.
+            }
 
-    def perform(self, protocol, timeout_sec=None):
+        def _substitute_namespace_in_type_attribute(path, key, data):
+            """Process namespaces in type attr value."""
+            if key != '@' + xml_namespaces['http://www.w3.org/2001/XMLSchema-instance'] + ':type':
+                return key, data
+            element_namespace_aliases = path[-1][1].get('xmlns', {})
+            if element_namespace_aliases is None:
+                return key, data
+            old_namespace_alias, bare_data = data.split(':')
+            new_namespace_alias = xml_namespaces[element_namespace_aliases[old_namespace_alias]]
+            if new_namespace_alias is None:
+                return key, bare_data
+            return key, new_namespace_alias + ':' + bare_data
+
         # noinspection PyProtectedMember
-        rq = {'env:Envelope': protocol._get_soap_header(resource_uri=self.cim_class.uri, action=self.action)}
-        rq['env:Envelope'].setdefault('env:Body', self.body)
+        rq = {'env:Envelope': self.protocol._get_soap_header(resource_uri=self.cim_class.uri, action=action)}
+        rq['env:Envelope'].setdefault('env:Body', body)
         rq['env:Envelope']['env:Header']['w:SelectorSet'] = {
             'w:Selector': [
                 {'@Name': selector_name, '#text': selector_value}
@@ -99,7 +97,7 @@ class _CimAction(object):
         try:
             request_xml = xmltodict.unparse(rq)
             _logger.debug("Request XML:\n%s", _pretty_format_xml(request_xml))
-            response = protocol.send_message(request_xml)
+            response = self.protocol.send_message(request_xml)
             _logger.debug("Response XML:\n%s", _pretty_format_xml(response))
         except WinRMTransportError as e:
             _logger.exception("XML:\n%s", e.response_text)
@@ -111,18 +109,11 @@ class _CimAction(object):
         response_dict = xmltodict.parse(
             response,
             dict_constructor=dict,  # Order is meaningless.
-            process_namespaces=True, namespaces=self.namespaces,  # Force namespace aliases.
+            process_namespaces=True, namespaces=xml_namespaces,  # Force namespace aliases.
             force_list=['w:Item', 'w:Selector'],
-            postprocessor=self._substitute_namespace_in_type_attribute,
+            postprocessor=_substitute_namespace_in_type_attribute,
             )
         return response_dict['env:Envelope']['env:Body']
-
-
-class CIMQuery(object):
-    def __init__(self, protocol, cim_class, selectors):
-        self.protocol = protocol
-        self.cim_class = cim_class
-        self.selectors = selectors
 
     def enumerate(self, max_elements=32000):
         _logger.info("Enumerate %s where %r", self.cim_class, self.selectors)
@@ -141,7 +132,7 @@ class CIMQuery(object):
                     'w:EnumerationMode': 'EnumerateObjectAndEPR',
                     }
                 }
-            response = _CimAction(self.cim_class, action, self.selectors, body).perform(self.protocol)
+            response = self._perform_action(action, body)
             enumeration_context[0] = response['n:EnumerateResponse']['n:EnumerationContext']
             enumeration_is_ended[0] = 'w:EndOfSequence' in response['n:EnumerateResponse']
             items = response['n:EnumerateResponse']['w:Items']['w:Item']
@@ -158,7 +149,7 @@ class CIMQuery(object):
                     'n:MaxElements': str(max_elements),
                     }
                 }
-            response = _CimAction(self.cim_class, action, self.selectors, body).perform(self.protocol)
+            response = self._perform_action(action, body)
             self.is_ended = 'n:EndOfSequence' in response['n:PullResponse']
             enumeration_context[0] = None if self.is_ended else response['n:PullResponse']['n:EnumerationContext']
             items = response['n:PullResponse']['n:Items']['w:Item']
@@ -179,8 +170,7 @@ class CIMQuery(object):
     def get(self):
         _logger.info("Get %s where %r", self.cim_class, self.selectors)
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Get'
-        action = _CimAction(self.cim_class, action_url, self.selectors, {})
-        outcome = action.perform(self.protocol)
+        outcome = self._perform_action(action_url, {})
         instance = outcome[self.cim_class.name]
         return instance
 
@@ -189,8 +179,7 @@ class CIMQuery(object):
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Put'
         body = {self.cim_class.name: new_properties_dict}
         body[self.cim_class.name]['@xmlns'] = self.cim_class.uri
-        action = _CimAction(self.cim_class, action_url, self.selectors, body)
-        outcome = action.perform(self.protocol)
+        outcome = self._perform_action(action_url, body)
         instance = outcome[self.cim_class.name]
         return instance
 
@@ -200,8 +189,7 @@ class CIMQuery(object):
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Create'
         body = {self.cim_class.name: properties_dict}
         body[self.cim_class.name]['@xmlns'] = self.cim_class.uri
-        action = _CimAction(self.cim_class, action_url, self.selectors, body)
-        outcome = action.perform(self.protocol)
+        outcome = self._perform_action(action_url, body)
         reference_parameters = outcome[u't:ResourceCreated'][u'a:ReferenceParameters']
         assert reference_parameters[u'w:ResourceURI'] == self.cim_class.uri
         selector_set = reference_parameters[u'w:SelectorSet']
@@ -213,8 +201,7 @@ class CIMQuery(object):
         method_input = {'p:' + param_name: param_value for param_name, param_value in params.items()}
         method_input['@xmlns:p'] = self.cim_class.uri
         body = {method_name + '_INPUT': method_input}
-        action = _CimAction(self.cim_class, action_uri, self.selectors, body)
-        response = action.perform(self.protocol, timeout_sec=timeout_sec)
+        response = self._perform_action(action_uri, body, timeout_sec=timeout_sec)
         method_output = response[method_name + '_OUTPUT']
         if method_output[u'ReturnValue'] != u'0':
             error_code = int(method_output[u'ReturnValue'])
