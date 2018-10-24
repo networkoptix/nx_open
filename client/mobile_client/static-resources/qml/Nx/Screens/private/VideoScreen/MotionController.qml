@@ -69,6 +69,9 @@ Item
         d.selectionRoi.show()
         if (d.customRoi)
             d.customRoi.hide()
+
+        var kVibrationDurationMs = 500
+        vibrate(kVibrationDurationMs)
     }
 
     function handlePressed(pos)

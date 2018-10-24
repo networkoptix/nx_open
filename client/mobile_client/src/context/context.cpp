@@ -30,6 +30,7 @@
 #include <nx/client/core/utils/operation_manager.h>
 #include <nx/vms/discovery/manager.h>
 #include <finders/systems_finder.h>
+#include <nx/mobile_client/helpers/vibrator.h>
 
 using namespace nx::vms::utils;
 
@@ -342,6 +343,11 @@ void QnContext::setLocalPrefix(const QString& prefix)
 void QnContext::updateCustomMargins()
 {
     emit customMarginsChanged();
+}
+
+void QnContext::vibrate(int milliseconds)
+{
+    nx::mobile_client::helpers::vibrate(milliseconds);
 }
 
 int QnContext::leftCustomMargin() const
