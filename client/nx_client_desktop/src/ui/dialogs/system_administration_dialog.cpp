@@ -23,14 +23,16 @@
 #include <ui/style/custom_style.h>
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 #include <nx/client/desktop/system_update/multi_server_updates_widget.h>
+#include <nx/client/desktop/system_administration/widgets/time_syncronization_widget.h>
 #include <nx/client/desktop/system_administration/widgets/analytics_settings_widget.h>
+
 #include <ini.h>
 
 using namespace nx::client::desktop;
 
-QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent)
-    : base_type(parent)
-    , ui(new Ui::QnSystemAdministrationDialog)
+QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
+    base_type(parent),
+    ui(new Ui::QnSystemAdministrationDialog)
 {
     ui->setupUi(this);
     setHelpTopic(this, Qn::Administration_Help);
@@ -73,7 +75,21 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent)
     }
     addPage(UserManagement,         new QnUserManagementWidget(this),       tr("Users"));
     addPage(RoutingManagement,      routingWidget,                          tr("Routing Management"));
-    addPage(TimeServerSelection,    new QnTimeServerSelectionWidget(this),  tr("Time Synchronization"));
+    if (nx::client::desktop::ini().redesignedTimeSynchronization)
+    {
+        addPage(
+            TimeServerSelection,
+            new nx::client::desktop::TimeSynchronizationWidget(this),
+            tr("Time Synchronization"));
+    }
+    else
+    {
+        addPage(
+            TimeServerSelection,
+            new QnTimeServerSelectionWidget(this),
+            tr("Time Synchronization"));
+    }
+
     addPage(CloudManagement,        new QnCloudManagementWidget(this),      nx::network::AppInfo::cloudName());
     addPage(Analytics,              new AnalyticsSettingsWidget(this),      tr("Analytics"));
 
