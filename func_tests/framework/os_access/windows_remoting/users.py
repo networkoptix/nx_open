@@ -23,8 +23,7 @@ class Users(object):
 
     @cached_getter
     def all_accounts(self):
-        query = self._winrm.wmi_class(u'Win32_UserAccount').enumerate({})
-        accounts = list(query.enumerate())
+        accounts = list(self._winrm.wmi_class(u'Win32_UserAccount').enumerate({}))
         return accounts
 
     def account_by_name(self, local_name):
