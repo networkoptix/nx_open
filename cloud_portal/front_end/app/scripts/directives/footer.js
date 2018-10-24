@@ -24,8 +24,8 @@
 
                 scope.viewFooter = CONFIG.showHeaderAndFooter;
     
-                if (!isActive('/embed')) {
-                    scope.viewHeader = false;
+                if (isActive('/embed')) {
+                    scope.viewFooter = false;
                 }
 
                 $rootScope.$on('nx.layout.footer', function (event, opt) {

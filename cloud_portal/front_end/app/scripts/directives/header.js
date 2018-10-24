@@ -28,7 +28,7 @@
 
                 scope.viewHeader = CONFIG.showHeaderAndFooter;
                 
-                if (!isActive('/embed')) {
+                if (isActive('/embed')) {
                     scope.viewHeader = false;
                 }
 
