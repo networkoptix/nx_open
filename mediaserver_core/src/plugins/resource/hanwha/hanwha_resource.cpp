@@ -3611,16 +3611,17 @@ QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
     return nullptr;
 }
 
-void HanwhaResource::setSupportedAnalyticsEventTypeIds(const AnalyticsEventTypeIds& eventTypeIds)
+void HanwhaResource::setSupportedAnalyticsEventTypeIds(
+    QnUuid engineId, QSet<QString> supportedEvents)
 {
-    AnalyticsEventTypeIds externalEvents;
-    for (const auto& eventTypeId: eventTypeIds)
+    QSet<QString> externalEvents;
+    for (const auto& eventTypeId: supportedEvents)
     {
         if (eventTypeId != kHanwhaInputPortEventTypeId)
-            externalEvents.push_back(eventTypeId);
+            externalEvents.insert(eventTypeId);
     }
 
-    base_type::setSupportedAnalyticsEventTypeIds(externalEvents);
+    base_type::setSupportedAnalyticsEventTypeIds(engineId, externalEvents);
 }
 
 QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int /*detailLevel*/)

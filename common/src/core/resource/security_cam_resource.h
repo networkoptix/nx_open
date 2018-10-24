@@ -241,10 +241,6 @@ public:
     void setPreferredServerId(const QnUuid& value);
     QnUuid preferredServerId() const;
 
-    using AnalyticsEventTypeIds = QList<QString>;
-    AnalyticsEventTypeIds supportedAnalyticsEventTypeIds() const;
-    virtual void setSupportedAnalyticsEventTypeIds(const AnalyticsEventTypeIds& eventsList);
-
     //!Returns list of time periods of DTS archive, containing motion at specified \a regions with timestamp in region [\a msStartTime; \a msEndTime)
     /*!
         \param detailLevel Minimal time period gap (usec) that is of interest to the caller.
@@ -423,7 +419,6 @@ private:
     CachedValue<bool> m_cachedCanConfigureRemoteRecording;
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
-    CachedValue<AnalyticsEventTypeIds> m_cachedAnalyticsSupportedEvents;
     CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
     CachedValue<nx::core::resource::DeviceType> m_cachedDeviceType;
     CachedValue<bool> m_cachedHasVideo;
