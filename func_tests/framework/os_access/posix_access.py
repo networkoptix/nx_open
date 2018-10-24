@@ -184,6 +184,7 @@ class PosixAccess(OSAccess):
     def make_fake_disk(self, name, size_bytes, mount_point='/mnt/disk'):
         self._dismount_fake_disk(mount_point=mount_point)
         image_path = self.path_cls.tmp() / (name + '.image')
+        disk_bytes = size_bytes + 26 * 1024 * 1024  # Taken by filesystem.
         self.shell.run_sh_script(
             # language=Bash
             '''
@@ -193,7 +194,7 @@ class PosixAccess(OSAccess):
                 mkdir -p "$MOUNT_POINT"
                 mount "$IMAGE" "$MOUNT_POINT"
                 ''',
-            env={'MOUNT_POINT': mount_point, 'IMAGE': image_path, 'SIZE': size_bytes})
+            env={'MOUNT_POINT': mount_point, 'IMAGE': image_path, 'SIZE': disk_bytes})
         return self.path_cls(mount_point)
 
     def _fs_root(self):
