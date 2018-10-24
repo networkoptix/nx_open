@@ -111,17 +111,18 @@ private:
 private:
     struct STUNHeader
     {
-        int messageClass;
-        int method;
-        std::size_t length;
+        int messageClass = 0;
+        int method = 0;
+        std::size_t length = 0;
         nx::Buffer transactionId;
     };
 
     struct STUNAttr
     {
-        std::uint16_t length;
+        std::uint16_t length = 0;
         nx::Buffer value;
-        std::uint16_t type;
+        std::uint16_t type = 0;
+
         void clear()
         {
             length = 0;
@@ -132,9 +133,9 @@ private:
 
     STUNHeader m_header;
     STUNAttr m_attribute;
-    Message* m_outputMessage;
-    std::size_t m_leftMessageLength;
-    int m_state;
+    Message* m_outputMessage = nullptr;
+    std::size_t m_leftMessageLength = 0;
+    int m_state = HEADER_INITIAL_AND_TYPE;
     // This is for opaque usage
     std::deque<char> m_tempBuffer;
 };

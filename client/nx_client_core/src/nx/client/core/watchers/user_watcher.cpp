@@ -1,17 +1,15 @@
 #include "user_watcher.h"
 
-#include <common/common_module.h>
-
 #include <client/client_message_processor.h>
-
+#include <common/common_module.h>
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
-#include <utils/common/guarded_callback.h>
+
+#include <nx/utils/guarded_callback.h>
 
 namespace {
 
@@ -70,7 +68,7 @@ UserWatcher::UserWatcher(QObject* parent) :
 
     const auto updateUserName =
         [this](const QnUserResourcePtr& user) { setUserName(user ? user->getName() : QString()); };
-    connect(this, &UserWatcher::userChanged, this, guarded(this, updateUserName));
+    connect(this, &UserWatcher::userChanged, this, nx::utils::guarded(this, updateUserName));
 }
 
 const QnUserResourcePtr& UserWatcher::user() const

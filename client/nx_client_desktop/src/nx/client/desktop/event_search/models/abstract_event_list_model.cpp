@@ -2,30 +2,21 @@
 
 #include <chrono>
 
-#include <QtCore/QDateTime>
-
 #include <translation/datetime_formatter.h>
-
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/synctime.h>
-#include <utils/common/delayed.h>
 
 #include <nx/utils/datetime.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
-AbstractEventListModel::AbstractEventListModel(QObject* parent):
+AbstractEventListModel::AbstractEventListModel(QnWorkbenchContext* context, QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(context)
 {
-}
-
-AbstractEventListModel::~AbstractEventListModel()
-{
+    NX_CRITICAL(context, "Workbench context must be specified.");
 }
 
 QVariant AbstractEventListModel::data(const QModelIndex& index, int role) const
@@ -72,25 +63,6 @@ bool AbstractEventListModel::setData(const QModelIndex& index, const QVariant& v
         default:
             return base_type::setData(index, value, role);
     }
-}
-
-bool AbstractEventListModel::canFetchMore(const QModelIndex& /*parent*/) const
-{
-    return false;
-}
-
-void AbstractEventListModel::fetchMore(const QModelIndex& /*parent*/)
-{
-}
-
-bool AbstractEventListModel::fetchInProgress() const
-{
-    return false;
-}
-
-bool AbstractEventListModel::isConstrained() const
-{
-    return m_relevantTimePeriod != QnTimePeriod::anytime();
 }
 
 bool AbstractEventListModel::isValid(const QModelIndex& index) const
@@ -145,36 +117,4 @@ bool AbstractEventListModel::activateLink(const QModelIndex& index, const QStrin
     return defaultAction(index);
 }
 
-const QnTimePeriod& AbstractEventListModel::relevantTimePeriod() const
-{
-    return m_relevantTimePeriod;
-}
-
-void AbstractEventListModel::setRelevantTimePeriod(const QnTimePeriod& value)
-{
-    if (value == m_relevantTimePeriod)
-        return;
-
-    const auto previousValue = m_relevantTimePeriod;
-    m_relevantTimePeriod = value;
-
-    relevantTimePeriodChanged(previousValue);
-}
-
-void AbstractEventListModel::relevantTimePeriodChanged(const QnTimePeriod& /*previousValue*/)
-{
-}
-
-void AbstractEventListModel::beginFinishFetch()
-{
-    emit fetchAboutToBeFinished(QPrivateSignal());
-}
-
-void AbstractEventListModel::endFinishFetch(bool cancelled)
-{
-    emit fetchFinished(cancelled, QPrivateSignal());
-}
-
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

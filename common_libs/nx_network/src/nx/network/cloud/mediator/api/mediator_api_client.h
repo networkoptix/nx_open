@@ -7,6 +7,7 @@
 #include <nx/network/http/generic_api_client.h>
 
 #include "listening_peer.h"
+#include "../../data/result_code.h"
 
 namespace nx {
 namespace hpm {
@@ -18,7 +19,7 @@ class NX_NETWORK_API Client:
     using base_type = nx::network::http::GenericApiClient<Client>;
 
 public:
-    using ResultCode = nx::network::http::StatusCode::Value;
+    using ResultCode = api::ResultCode;
 
     Client(const nx::utils::Url& baseMediatorApiUrl);
     ~Client();
@@ -31,6 +32,28 @@ public:
     void initiateConnection(
         const ConnectRequest& request,
         nx::utils::MoveOnlyFunc<void(ResultCode, ConnectResponse)> completionHandler);
+
+    template <typename... Output>
+    static ResultCode getResultCode(
+        SystemError::ErrorCode systemErrorCode,
+        const network::http::Response* response,
+        const Output&...)
+    {
+        if (systemErrorCode != SystemError::noError)
+            return systemErrorCodeToResultCode(systemErrorCode);
+
+        if (!response)
+            return api::ResultCode::networkError;
+
+        return getResultCodeFromResponse(*response);
+    }
+
+private:
+    static ResultCode systemErrorCodeToResultCode(
+        SystemError::ErrorCode systemErrorCode);
+
+    static ResultCode getResultCodeFromResponse(
+        const network::http::Response& response);
 };
 
 } // namespace api

@@ -139,6 +139,7 @@ class ServerStagesExecutor(object):
         if delay:
             _logger.debug(self, 'Server stage %r delay %s', name, delay)
             time.sleep(delay.seconds)
+            _logger.debug('####### Server performance stats:\n %s', self.server.api.get_server_statistics())
 
         _logger.debug(self, 'Server stage %r', name)
         current_stage = self.Stage(name, rules)
@@ -254,6 +255,7 @@ class Stand(object):
                 return
 
             _logger.debug('Wait for cycle delay %s, %s cameras left', cycle_delay, cameras_left)
+            _logger.debug('Server performance stats:\n %s', self.server.api.get_server_statistics())
             time.sleep(cycle_delay.total_seconds())
 
     def _stage_rules(self, rules):  # (dict) -> dict

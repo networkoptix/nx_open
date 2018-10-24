@@ -13,7 +13,7 @@ namespace gateway {
 namespace test {
 
 
-const constexpr int kTimeoutMsec = 5000;
+const constexpr std::chrono::milliseconds kTimeoutMsec(5000);
 const QByteArray successResponse = "HTTP/1.1 200 OK\r\n";
 
 class VmsGatewayConnectTest:
@@ -35,7 +35,7 @@ public:
         const QByteArray &connectResponse = successResponse)
     {
         socket = std::make_unique<network::TCPSocket>();
-        socket->setRecvTimeout(kTimeoutMsec);
+        socket->setRecvTimeout(kTimeoutMsec.count());
 
         // Connect to proxy.
         ASSERT_TRUE(socket->connect(endpoint(), std::chrono::milliseconds(kTimeoutMsec)))
@@ -152,7 +152,7 @@ TEST_F(VmsGatewayConnectTest, WrongAddressConnect)
 {
     // Set timeouts less then kTimeoutMsec to avoid unwanted test failures.
     ASSERT_TRUE(startAndWaitUntilStarted(/*allowIpTarget*/ true, /*proxyTargetPort*/ false,
-        /*connectSupport*/ true, /*sendTimeout*/ 1, /*recvTimeout*/ 1));
+        /*connectSupport*/ true, std::chrono::seconds(1), std::chrono::seconds(1)));
     std::unique_ptr<network::TCPSocket> clientSocket;
     connectProxySocket("127.0.0.1:1", clientSocket, "HTTP/1.1 503 Service Unavailable\r\n");
     server.pleaseStopSync();

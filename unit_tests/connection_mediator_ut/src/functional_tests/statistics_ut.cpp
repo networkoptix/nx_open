@@ -45,19 +45,18 @@ protected:
 
     void whenRequestListeningPeerList()
     {
-        nx::network::http::StatusCode::Value statusCode =
-            nx::network::http::StatusCode::ok;
-        std::tie(statusCode, m_prevListeningPeersResponse) = getListeningPeers();
-        ASSERT_EQ(nx::network::http::StatusCode::ok, statusCode);
+        api::ResultCode resultCode = api::ResultCode::ok;
+        std::tie(resultCode, m_prevListeningPeersResponse) = getListeningPeers();
+        ASSERT_EQ(api::ResultCode::ok, resultCode);
     }
 
     void whenRequestServerStatistics()
     {
-        const auto statisticsUrl =
-            nx::network::url::Builder()
+        const auto statisticsUrl = nx::network::url::Builder()
             .setScheme(nx::network::http::kUrlSchemeName)
             .setEndpoint(moduleInstance()->impl()->httpEndpoints().front())
-            .appendPath(api::kMediatorApiPrefix).appendPath(api::kStatisticsMetricsPath).toUrl();
+            .appendPath(api::kMediatorApiPrefix)
+            .appendPath(api::kStatisticsMetricsPath).toUrl();
 
         nx::network::http::HttpClient httpClient;
         ASSERT_TRUE(httpClient.doGet(statisticsUrl));

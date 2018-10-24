@@ -18,15 +18,15 @@
 #include <network/cloud_system_data.h>
 #include <utils/common/app_info.h>
 #include <utils/common/delayed.h>
-#include <utils/common/guarded_callback.h>
 #include <utils/common/id.h>
 
+#include <nx/client/core/settings/secure_settings.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/string.h>
 #include <nx/vms/api/data/cloud_system_data.h>
-#include <nx/client/core/settings/secure_settings.h>
 
 using namespace nx::cdb;
 
@@ -470,7 +470,7 @@ void QnCloudStatusWatcher::resendActivationEmail(const QString& email)
 
     const api::AccountEmail account{email.toStdString()};
     const auto accountManager = d->resendActivationConnection->accountManager();
-    accountManager->reactivateAccount(account, guarded(this, callback));
+    accountManager->reactivateAccount(account, nx::utils::guarded(this, callback));
 }
 
 QnCloudSystemList QnCloudStatusWatcher::cloudSystems() const

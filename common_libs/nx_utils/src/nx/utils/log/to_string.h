@@ -3,6 +3,7 @@
 #include <memory>
 #include <chrono>
 #include <optional>
+#include <type_traits>
 
 #include <boost/optional.hpp>
 
@@ -19,7 +20,14 @@
 template<typename T>
 QString toStringSfinae(const T& value, decltype(&T::toString))
 {
-    return value.toString();
+    if constexpr (std::is_same<decltype(value.toString()), std::string>::value)
+    {
+        return value.toString().c_str();
+    }
+    else
+    {
+        return value.toString();
+    }
 }
 
 template<typename T>

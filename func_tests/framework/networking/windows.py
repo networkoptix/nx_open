@@ -7,6 +7,7 @@ from framework.context_logger import ContextLogger, context_logger
 from framework.method_caching import cached_property
 from framework.networking.interface import Networking
 from framework.os_access.windows_remoting import WinRM
+from framework.os_access.windows_remoting.wmi import WmiInvokeFailed
 
 _logger = ContextLogger(__name__, 'networking')
 
@@ -63,14 +64,14 @@ class WindowsNetworking(Networking):
         return self._names
 
     def firewall_rule_exists(self):
-        query = self._winrm.wmi_query(u'MSFT_NetFirewallRule', {}, namespace='Root/StandardCimv2')
-        all_rules = list(query.enumerate())
+        query = self._winrm.wmi_class(u'MSFT_NetFirewallRule', namespace='Root/StandardCimv2')
+        all_rules = list(query.enumerate({}))
         rules = [rule for rule in all_rules if rule[u'InstanceID'] == self._firewall_rule_name]
         return bool(rules)
 
     def create_firewall_rule(self):
         # No problem if there are multiple identical rules.
-        query = self._winrm.wmi_query(u'MSFT_NetFirewallRule', {}, namespace='Root/StandardCimv2')
+        query = self._winrm.wmi_class(u'MSFT_NetFirewallRule', namespace='Root/StandardCimv2')
         properties_dict = {
             # See on numeric constants: https://msdn.microsoft.com/en-us/library/jj676843(v=vs.85).aspx
             u'InstanceID': self._firewall_rule_name,
@@ -104,17 +105,18 @@ class WindowsNetworking(Networking):
                 ''',
             {'Name': self._firewall_rule_name})
 
-    def _network_profile_wmi_query(self, informal_profile_name):
-        query = self._winrm.wmi_query(
+    def _wmi_network_profile(self, informal_profile_name):
+        wmi_firewall_profile_class = self._winrm.wmi_class(
             u'MSFT_NetFirewallProfile',
-            {u'InstanceID': u'MSFT|FW|FirewallProfile|{}'.format(informal_profile_name)},
             namespace='Root/StandardCimv2')
-        return query
+        wmi_firewall_profile = wmi_firewall_profile_class.reference({
+            u'InstanceID': u'MSFT|FW|FirewallProfile|{}'.format(informal_profile_name)})
+        return wmi_firewall_profile
 
     def _allow_outbound_by_default(self, allow):
         value = 0 if allow else 1  # "0 -> enable, 1 or any positive -> disable.
         for profile_name in {'Private', 'Domain', 'Public'}:
-            query = self._network_profile_wmi_query(profile_name)
+            query = self._wmi_network_profile(profile_name)
             query.put({u'DefaultOutboundAction': value})
 
     def disable_internet(self):
@@ -125,22 +127,20 @@ class WindowsNetworking(Networking):
 
     def internet_is_enabled(self):
         profile_name = 'Private'  # Check only this: all interfaces assigned with the private profile.
-        query = self._network_profile_wmi_query(profile_name)
+        query = self._wmi_network_profile(profile_name)
         profile = query.get()
         return int(profile[u'DefaultOutboundAction']) == 0
 
     def setup_network(self, mac, ip):
         # type: (EUI, IPNetwork) -> None
-        all_configurations = self._winrm.wmi_query(u'Win32_NetworkAdapterConfiguration', {}).enumerate()
+        adapter_conf_class = self._winrm.wmi_class(u'Win32_NetworkAdapterConfiguration')
+        all_configurations = adapter_conf_class.enumerate({})
         requested_configuration, = [
             configuration for configuration in all_configurations
             if configuration[u'MACAddress'] != {u'@xsi:nil': u'true'} and EUI(configuration[u'MACAddress']) == mac]
-        invoke_selectors = {u'Index': requested_configuration[u'Index']}
-        invoke_query = self._winrm.wmi_query(u'Win32_NetworkAdapterConfiguration', invoke_selectors)
+        adapter_conf = adapter_conf_class.reference({u'Index': requested_configuration[u'Index']})
         invoke_arguments = {u'IPAddress': [str(ip.ip)], u'SubnetMask': [str(ip.netmask)]}
-        invoke_result = invoke_query.invoke_method(u'EnableStatic', invoke_arguments)
-        if invoke_result[u'ReturnValue'] != u'0':
-            raise RuntimeError('EnableStatic returned {}'.format(pformat(invoke_result)))
+        adapter_conf.invoke_method(u'EnableStatic', invoke_arguments)
 
     def list_ips(self):
         # -PolicyStore:PersistentStore filters out first NATed address
@@ -209,8 +209,7 @@ class WindowsNetworking(Networking):
             {})
 
     def can_reach(self, ip, timeout_sec=4):
-        query = self._winrm.wmi_query(u'Win32_PingStatus', {u'Address': str(ip)})
-        status = query.get()
+        status = self._winrm.wmi_class(u'Win32_PingStatus').reference({u'Address': str(ip)}).get()
         return status[u'StatusCode'] == u'0'
 
     def reset(self):

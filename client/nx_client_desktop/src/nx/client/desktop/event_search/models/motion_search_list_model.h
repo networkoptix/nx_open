@@ -1,52 +1,34 @@
 #pragma once
 
-#include <QtCore/QScopedPointer>
-#include <QtCore/QAbstractListModel>
+#include <QtCore/QList>
+#include <QtGui/QRegion>
 
-#include <core/resource/resource_fwd.h>
-#include <recording/time_period_list.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/client/desktop/event_search/models/abstract_async_search_list_model.h>
 
-#include <nx/client/desktop/event_search/models/abstract_event_list_model.h>
+namespace nx::client::desktop {
 
-class QnTimePeriod;
-
-namespace nx {
-namespace client {
-namespace desktop {
-
-class MotionSearchListModel: public AbstractEventListModel
+class MotionSearchListModel: public AbstractAsyncSearchListModel
 {
     Q_OBJECT
-    using base_type = AbstractEventListModel;
+    using base_type = AbstractAsyncSearchListModel;
 
 public:
-    explicit MotionSearchListModel(QObject* parent = nullptr);
-    virtual ~MotionSearchListModel() override;
+    explicit MotionSearchListModel(QnWorkbenchContext* context, QObject* parent = nullptr);
+    virtual ~MotionSearchListModel() override = default;
 
-    QnVirtualCameraResourcePtr camera() const;
-    void setCamera(const QnVirtualCameraResourcePtr& camera);
+    QList<QRegion> filterRegions() const; //< One region per channel.
+    void setFilterRegions(const QList<QRegion>& value);
 
-    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-    virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+    bool isFilterEmpty() const;
 
-    virtual bool canFetchMore(const QModelIndex& parent = QModelIndex()) const override;
-    virtual void fetchMore(const QModelIndex& parent = QModelIndex()) override;
-    virtual bool fetchInProgress() const override;
-
-    int totalCount() const;
-
-signals:
-    void totalCountChanged(int value);
+    virtual bool isConstrained() const override;
 
 protected:
-    virtual void relevantTimePeriodChanged(const QnTimePeriod& previousValue) override;
+    virtual bool isCameraApplicable(const QnVirtualCameraResourcePtr& camera) const override;
 
 private:
     class Private;
-    QScopedPointer<Private> d;
+    Private* const d;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

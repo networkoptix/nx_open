@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <chrono>
 
-#include <QtCore/QPointer>
 #include <QtCore/QAbstractListModel>
 #include <QtCore/QVariantAnimation>
 #include <QtGui/QWheelEvent>
@@ -27,6 +26,7 @@
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/image_providers/camera_thumbnail_provider.h>
 #include <nx/client/desktop/utils/widget_utils.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 
 #include <ini.h>
@@ -220,6 +220,8 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     const auto busyIndicatorVisibility = index.data(Qn::BusyIndicatorVisibleRole);
     if (busyIndicatorVisibility.isValid())
     {
+        constexpr int kIndicatorHeight = 24;
+        tile->setFixedHeight(kIndicatorHeight);
         tile->setBusyIndicatorVisible(busyIndicatorVisibility.toBool());
         return;
     }
@@ -255,7 +257,15 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     tile->setCloseable(index.data(Qn::RemovableRole).toBool());
     tile->setAutoCloseTimeMs(index.data(Qn::TimeoutRole).toInt());
     tile->setAction(index.data(Qn::CommandActionRole).value<CommandActionPtr>());
-    tile->setResourceList(index.data(Qn::ResourceListRole).value<QnResourceList>());
+
+    const auto resourceList = index.data(Qn::ResourceListRole);
+    if (resourceList.isValid())
+    {
+        if (resourceList.canConvert<QnResourceList>())
+            tile->setResourceList(resourceList.value<QnResourceList>());
+        else if (resourceList.canConvert<QStringList>())
+            tile->setResourceList(resourceList.value<QStringList>());
+    }
 
     setHelpTopic(tile, index.data(Qn::HelpTopicIdRole).toInt());
 
@@ -346,6 +356,8 @@ void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRel
 
     if (!menu)
         return;
+
+    menu->setWindowFlags(menu->windowFlags() | Qt::BypassGraphicsProxyWidget);
 
     const auto globalPos = QnHiDpiWorkarounds::safeMapToGlobal(tile, posRelativeToTile);
     menu->exec(globalPos);
@@ -444,7 +456,12 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
 
     m_scrollBar->setMaximum(m_scrollBar->maximum() + delta);
 
-    if (position < m_scrollBar->value())
+    const int kThreshold = 100;
+    const int kLiveThreshold = 10;
+
+    const bool live = m_live && index == 0 && m_scrollBar->value() < kLiveThreshold;
+
+    if (!live && position < m_scrollBar->value() + kThreshold)
     {
         m_scrollBar->setValue(m_scrollBar->value() + delta);
         updateMode = UpdateMode::instant;
@@ -557,6 +574,7 @@ void EventRibbon::Private::clear()
     m_positions.clear();
     m_visible.clear();
     m_totalHeight = 0;
+    m_live = true;
 
     clearShiftAnimations();
     setScrollBarRelevant(false);
@@ -693,6 +711,16 @@ void EventRibbon::Private::setScrollBarPolicy(Qt::ScrollBarPolicy value)
 
     m_scrollBarPolicy = value;
     updateScrollBarVisibility();
+}
+
+bool EventRibbon::Private::live() const
+{
+    return m_live;
+}
+
+void EventRibbon::Private::setLive(bool value)
+{
+    m_live = value;
 }
 
 void EventRibbon::Private::updateScrollRange()
@@ -877,19 +905,16 @@ void EventRibbon::Private::highlightAppearance(EventTile* tile)
     auto curtain = new CustomPainted<QWidget>(tile);
     anchorWidgetToParent(curtain);
 
-    curtain->setCustomPaintFunction(
-        [animation, curtain, guard = QPointer<QVariantAnimation>(animation)]
-            (QPainter* painter, const QStyleOption* /*option*/, const QWidget* /*widget*/)
+    curtain->setCustomPaintFunction(nx::utils::guarded(animation, true,
+        [animation, curtain](QPainter* painter, const QStyleOption* /*option*/,
+            const QWidget* /*widget*/)
         {
-            if (!guard)
-                return true;
-
             QColor color = kHighlightCurtainColor;
             color.setAlphaF(animation->currentValue().toReal());
             painter->fillRect(curtain->rect(), color);
             curtain->update();
             return true;
-        });
+        }));
 
     connect(animation, &QObject::destroyed, curtain, &QObject::deleteLater);
     installEventHandler(curtain, QEvent::Hide, animation, &QAbstractAnimation::stop);

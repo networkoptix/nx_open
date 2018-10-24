@@ -62,8 +62,9 @@ bool VmsGatewayFunctionalTest::startAndWaitUntilStarted()
     return startAndWaitUntilStarted(true, true, false);
 }
 
-bool VmsGatewayFunctionalTest::startAndWaitUntilStarted(
-    bool allowIpTarget, bool proxyTargetPort, bool connectSupport, int sendTimeout, int recvTimeout)
+bool VmsGatewayFunctionalTest::startAndWaitUntilStarted(bool allowIpTarget, bool proxyTargetPort,
+    bool connectSupport, std::optional<std::chrono::seconds> sendTimeout,
+    std::optional<std::chrono::seconds> recvTimeout)
 {
     if (!m_testHttpServer->bindAndListen())
         return false;
@@ -87,16 +88,14 @@ bool VmsGatewayFunctionalTest::startAndWaitUntilStarted(
         addArg("true");
     }
 
-    if (recvTimeout != -1) {
-        NX_ASSERT(recvTimeout > 0);
+    if (recvTimeout) {
         addArg("-tcp/recvTimeout");
-        addArg(std::to_string(recvTimeout).c_str());
+        addArg(std::to_string(recvTimeout->count()).c_str());
     }
 
-    if (sendTimeout != -1) {
-        NX_ASSERT(sendTimeout > 0);
+    if (sendTimeout) {
         addArg("-tcp/sendTimeout");
-        addArg(std::to_string(sendTimeout).c_str());
+        addArg(std::to_string(sendTimeout->count()).c_str());
     }
 
     if (!utils::test::ModuleLauncher<VmsGatewayProcessPublic>::startAndWaitUntilStarted())

@@ -61,6 +61,7 @@ public:
     network::SocketAddress stunUdpEndpoint() const;
     network::SocketAddress stunTcpEndpoint() const;
     network::SocketAddress httpEndpoint() const;
+    nx::utils::Url httpUrl() const;
 
     std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection> clientConnection();
     std::unique_ptr<nx::hpm::api::MediatorServerTcpConnection> systemConnection();
@@ -82,7 +83,7 @@ public:
         const AbstractCloudDataProvider::System& system,
         size_t count, ServerTweak::Value tweak = ServerTweak::defaultBehavior);
 
-    std::tuple<nx::network::http::StatusCode::Value, api::ListeningPeers>
+    std::tuple<api::ResultCode, api::ListeningPeers>
         getListeningPeers() const;
 
 protected:

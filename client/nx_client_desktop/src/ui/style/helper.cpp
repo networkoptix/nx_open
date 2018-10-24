@@ -8,6 +8,7 @@ namespace style
     const int Metrics::kMenuItemHPadding = 12;
     const int Metrics::kMenuItemVPadding = 5;
     const int Metrics::kMenuItemTextLeftPadding = 28;
+    const int Metrics::kSubmenuArrowPadding = 4;
     const int Metrics::kArrowSize = 8;
     const int Metrics::kCrossSize = 8;
     const int Metrics::kSpinButtonWidth = 16;
@@ -86,7 +87,7 @@ namespace style
     const char* Properties::kTabBarIndent = "_qn_tabBarIndent";
     const char* Properties::kItemViewRadioButtons = "_qn_itemViewRadioButtons";
     const char* Properties::kPushButtonMargin = "_qn_pushButtonMargin";
-    const char* Properties::kMenuNoMouseReplayRect = "_qn_menuNoMouseReplayRect";
+    const char* Properties::kMenuNoMouseReplayArea = "_qn_menuNoMouseReplayArea";
     const char* Properties::kComboBoxPopupWidth = "_qn_comboBoxPopupWidth";
     const char* Properties::kGroupBoxContentTopMargin = "_qn_groupBoxContentTopMargin";
 
