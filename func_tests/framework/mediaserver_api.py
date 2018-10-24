@@ -516,7 +516,7 @@ class MediaserverApi(object):
 
     def get_server_statistics(self, salt=None):
         if salt:
-            self.generic.get('/api/statistics', salt)
+            self.generic.get('/api/statistics', 'salt=' + str(salt))
         else:
             self.generic.get('/api/statistics')
 
