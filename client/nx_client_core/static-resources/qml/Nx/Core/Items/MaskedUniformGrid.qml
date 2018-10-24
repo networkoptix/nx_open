@@ -13,6 +13,7 @@ UniformGrid
 
     fragmentShader: "
         #version " + shaderVersion + "
+        precision highp float;
 
         uniform vec4 color;
         uniform vec2 cellCounts;

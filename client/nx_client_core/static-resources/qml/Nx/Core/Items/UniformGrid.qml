@@ -24,6 +24,7 @@ ShaderEffect
 
     vertexShader: "
         #version " + shaderVersion + "
+        precision highp float;
 
         uniform vec2 cellSize;
         uniform mat4 qt_Matrix;
@@ -40,6 +41,7 @@ ShaderEffect
 
     fragmentShader: "
         #version " + shaderVersion + "
+        precision highp float;
 
         uniform vec4 color;
         uniform vec2 lineSizeInCellCoords;
