@@ -12,10 +12,7 @@ namespace stun {
 
 using namespace attrs;
 
-MessageParser::MessageParser():
-    m_outputMessage(NULL),
-    m_leftMessageLength(0),
-    m_state(HEADER_INITIAL_AND_TYPE)
+MessageParser::MessageParser()
 {
     m_header.transactionId.resize(Header::TRANSACTION_ID_SIZE);
 }
@@ -34,6 +31,10 @@ nx::network::server::ParserState MessageParser::state() const
 
 void MessageParser::reset()
 {
+    m_header = {};
+    m_attribute = {};
+    m_outputMessage = nullptr;
+    m_leftMessageLength = 0;
     m_state = HEADER_INITIAL_AND_TYPE;
 }
 
