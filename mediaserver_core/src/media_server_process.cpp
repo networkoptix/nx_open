@@ -2779,9 +2779,10 @@ nx::vms::api::ServerFlags MediaServerProcess::calcServerFlags()
 {
     nx::vms::api::ServerFlags serverFlags = nx::vms::api::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
 
-#ifdef EDGE_SERVER
-    serverFlags |= vms::api::SF_Edge;
-#endif
+    #if defined(EDGE_SERVER)
+        serverFlags |= nx::vms::api::SF_Edge;
+    #endif
+    
     if (QnAppInfo::isBpi())
     {
         serverFlags |= nx::vms::api::SF_IfListCtrl | nx::vms::api::SF_timeCtrl;
