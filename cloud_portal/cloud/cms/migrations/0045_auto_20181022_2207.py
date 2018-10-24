@@ -17,6 +17,11 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='externalfile',
+            name='data_structure',
+            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to='cms.DataStructure'),
+        ),
+        migrations.AddField(
+            model_name='externalfile',
             name='product',
             field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to='cms.Product'),
         ),

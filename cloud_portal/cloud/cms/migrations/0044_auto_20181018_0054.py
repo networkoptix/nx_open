@@ -18,8 +18,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('file', models.FileField(upload_to=b'')),
-                ('md5', models.CharField(max_length=1024)),
-                ('size', models.FloatField()),
+                ('md5', models.CharField(max_length=1024, default='')),
+                ('size', models.FloatField(default=0.0)),
             ],
         ),
         migrations.AlterField(
