@@ -40,9 +40,6 @@ class CIMClass(object):
             return 'CimClass({!r}, namespace={!r})'.format(self.name, self.original_namespace)
         return 'CimClass({!r}, namespace={!r}, root_uri={!r})'.format(self.name, self.original_namespace, self.root_uri)
 
-    def method_uri(self, method_name):
-        return self.uri + '/' + method_name
-
 
 class CIMQuery(object):
     def __init__(self, protocol, cim_class, selectors):
@@ -197,7 +194,7 @@ class CIMQuery(object):
 
     def invoke_method(self, method_name, params, timeout_sec=None):
         _logger.info("Invoke %s.%s(%r) where %r", self.cim_class, method_name, params, self.selectors)
-        action_uri = self.cim_class.method_uri(method_name)
+        action_uri = self.cim_class.uri + '/' + method_name
         method_input = {'p:' + param_name: param_value for param_name, param_value in params.items()}
         method_input['@xmlns:p'] = self.cim_class.uri
         body = {method_name + '_INPUT': method_input}
