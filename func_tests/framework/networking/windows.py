@@ -7,7 +7,7 @@ from framework.context_logger import ContextLogger, context_logger
 from framework.method_caching import cached_property
 from framework.networking.interface import Networking
 from framework.os_access.windows_remoting import WinRM
-from framework.os_access.windows_remoting._cim_query import WmiInvokeFailed
+from framework.os_access.windows_remoting.wmi import WmiInvokeFailed
 
 _logger = ContextLogger(__name__, 'networking')
 

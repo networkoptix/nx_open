@@ -17,7 +17,7 @@ loggers:
   paramiko.transport: {level: INFO}
   parse: {level: INFO}
   framework.context_logger: {level: INFO}
-  framework.os_access.windows_remoting._cim_query: {level: INFO}
+  framework.os_access.windows_remoting.wmi: {level: INFO}
   framework.vms.hypervisor.virtual_box.manage: {level: INFO}
   framework.vms.vm_type.networking.ssh._StraightforwardSSHRun: {level: INFO}
   framework.vms.vm_type.networking.winrm.cmd: {level: INFO}

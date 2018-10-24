@@ -9,8 +9,7 @@ from requests import RequestException
 from framework.context_logger import ContextLogger
 from framework.method_caching import cached_getter
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
-from framework.os_access.windows_remoting._cim_query import CIMClass
-from ._cim_query import _CIMReference
+from framework.os_access.windows_remoting import wmi
 from ._cmd import Shell
 from ._powershell import run_powershell_script
 from .registry import _WindowsRegistryKey
@@ -72,9 +71,9 @@ class WinRM(object):
     def wmi_class(
             self,
             class_name,
-            namespace=CIMClass.default_namespace,
-            root_uri=CIMClass.default_root_uri):
-        return CIMClass(self._protocol, class_name, namespace=namespace, root_uri=root_uri)
+            namespace=wmi.Class.default_namespace,
+            root_uri=wmi.Class.default_root_uri):
+        return wmi.Class(self._protocol, class_name, namespace=namespace, root_uri=root_uri)
 
     def is_working(self):
         try:

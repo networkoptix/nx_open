@@ -23,9 +23,9 @@ _win32_error_codes = {
     0x80071392: 'ERROR_OBJECT_ALREADY_EXISTS',
     }
 
-class CIMClass(object):
+class Class(object):
     """WMI class on specific machine. Create or enumerate objects with this class. To work with
-    one specific object, use _CIMReference class. Use CIMClass.reference method to get reference to
+    one specific object, use _Reference class. Use Class.reference method to get reference to
     object of this class."""
 
     default_namespace = 'root/cimv2'
@@ -42,9 +42,9 @@ class CIMClass(object):
     def __repr__(self):
         if self.root_uri == self.default_root_uri:
             if self.normalized_namespace == self.default_namespace:
-                return 'CimClass({!r})'.format(self.name)
-            return 'CimClass({!r}, namespace={!r})'.format(self.name, self.original_namespace)
-        return 'CimClass({!r}, namespace={!r}, root_uri={!r})'.format(self.name, self.original_namespace, self.root_uri)
+                return 'Class({!r})'.format(self.name)
+            return 'Class({!r}, namespace={!r})'.format(self.name, self.original_namespace)
+        return 'Class({!r}, namespace={!r}, root_uri={!r})'.format(self.name, self.original_namespace, self.root_uri)
 
     def perform_action(self, action, body, selectors, timeout_sec=None):
         xml_namespaces = {
@@ -61,7 +61,7 @@ class CIMClass(object):
             'http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd': 'w',
             'http://schemas.xmlsoap.org/ws/2004/09/transfer': 't',
             'http://schemas.xmlsoap.org/ws/2004/08/addressing': 'a',
-            CIMClass(self.protocol, 'Win32_FolderRedirectionHealth').uri: 'folder',
+            Class(self.protocol, 'Win32_FolderRedirectionHealth').uri: 'folder',
             # Commonly encountered in responses.
             self.uri: None,  # Desired class namespace is default.
             }
@@ -176,7 +176,7 @@ class CIMClass(object):
 
     def reference(self, selectors):
         """Refer to objects of this class via this method."""
-        return _CIMReference(self, selectors)
+        return _Reference(self, selectors)
 
     def static(self):
         """Use to call "static" methods. E.g. for StdRegProv class."""
@@ -187,36 +187,36 @@ class CIMClass(object):
         return self.static().get()
 
 
-class _CIMReference(object):
+class _Reference(object):
     """Reference to single object. Get single object and invoke methods here."""
 
-    def __init__(self, cim_class, selectors):
-        self.cim_class = cim_class
+    def __init__(self, wmi_class, selectors):
+        self.wmi_class = wmi_class
         self.selectors = selectors
 
     def get(self):
-        _logger.info("Get %s where %r", self.cim_class, self.selectors)
+        _logger.info("Get %s where %r", self.wmi_class, self.selectors)
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Get'
-        outcome = self.cim_class.perform_action(action_url, {}, self.selectors)
-        instance = outcome[self.cim_class.name]
+        outcome = self.wmi_class.perform_action(action_url, {}, self.selectors)
+        instance = outcome[self.wmi_class.name]
         return instance
 
     def put(self, new_properties_dict):
-        _logger.info("Put %s where %r: %r", self.cim_class, self.selectors, new_properties_dict)
+        _logger.info("Put %s where %r: %r", self.wmi_class, self.selectors, new_properties_dict)
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Put'
-        body = {self.cim_class.name: new_properties_dict}
-        body[self.cim_class.name]['@xmlns'] = self.cim_class.uri
-        outcome = self.cim_class.perform_action(action_url, body, self.selectors)
-        instance = outcome[self.cim_class.name]
+        body = {self.wmi_class.name: new_properties_dict}
+        body[self.wmi_class.name]['@xmlns'] = self.wmi_class.uri
+        outcome = self.wmi_class.perform_action(action_url, body, self.selectors)
+        instance = outcome[self.wmi_class.name]
         return instance
 
     def invoke_method(self, method_name, params, timeout_sec=None):
-        _logger.info("Invoke %s.%s(%r) where %r", self.cim_class, method_name, params, self.selectors)
-        action_uri = self.cim_class.uri + '/' + method_name
+        _logger.info("Invoke %s.%s(%r) where %r", self.wmi_class, method_name, params, self.selectors)
+        action_uri = self.wmi_class.uri + '/' + method_name
         method_input = {'p:' + param_name: param_value for param_name, param_value in params.items()}
-        method_input['@xmlns:p'] = self.cim_class.uri
+        method_input['@xmlns:p'] = self.wmi_class.uri
         body = {method_name + '_INPUT': method_input}
-        response = self.cim_class.perform_action(action_uri, body, self.selectors, timeout_sec=timeout_sec)
+        response = self.wmi_class.perform_action(action_uri, body, self.selectors, timeout_sec=timeout_sec)
         method_output = response[method_name + '_OUTPUT']
         if method_output[u'ReturnValue'] != u'0':
             exception_cls = WmiInvokeFailed.specific_cls(int(method_output[u'ReturnValue']))
@@ -236,7 +236,7 @@ class WmiInvokeFailed(Exception):
                     'Non-zero return value 0x{:X} ({}) of {!s}.{!s}({!r}) where {!r}:\n{!s}'.format(
                         self.return_value,
                         _win32_error_codes.get(self.return_value, 'unknown'),
-                        wmi_reference.cim_class.name,
+                        wmi_reference.wmi_class.name,
                         method_name,
                         params,
                         wmi_reference.selectors,
