@@ -1448,13 +1448,17 @@ static std::optional<header::WWWAuthenticate> extractAuthenticateHeader(
     const StringType authenticateHeaderName = isProxy ? "Proxy-Authenticate" : "WWW-Authenticate";
 
     std::optional<header::WWWAuthenticate> result;
-    for (HttpHeaders::const_iterator it = headers.begin(); it != headers.end(); it++)
+    const auto [authHeaderBegin, authHeaderEnd] = headers.equal_range(authenticateHeaderName);
+    for (HttpHeaders::const_iterator it = authHeaderBegin; it != authHeaderEnd; it++)
     {
-        if (it->first != authenticateHeaderName)
-            continue;
-
         result = header::WWWAuthenticate();
-        result->parse(it->second);
+        if (!result->parse(it->second))
+        {
+            NX_INFO(typeid(AsyncClient), "Error while parsing %1 header: '%2'. Skipping it.",
+                authenticateHeaderName, it->second);
+            continue;
+        }
+
         auto authScheme = result->authScheme;
         if (authType == AuthType::authBasic && authScheme == header::AuthScheme::basic)
             return result;
@@ -1469,7 +1473,7 @@ static std::optional<header::WWWAuthenticate> extractAuthenticateHeader(
     // Lets use basic auth if digest header is not available.
     if (authType == AuthType::authBasicAndDigest)
         return result;
-    return {};
+    return std::nullopt;
 }
 
 

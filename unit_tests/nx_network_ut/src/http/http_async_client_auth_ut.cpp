@@ -6,10 +6,7 @@
 
 #include "http_async_client_auth_ut.h"
 
-namespace nx {
-namespace network {
-namespace http {
-namespace test {
+namespace nx::network::http::test {
 
 namespace {
 
@@ -45,9 +42,7 @@ void AuthHttpServer::processConnection(AbstractStreamSocket* connection)
     connection->setRecvTimeout(socketTimeout);
     connection->setSendTimeout(socketTimeout);
 
-    int rc;
-    nx::Buffer request;
-    std::tie(rc, request) = readRequest(connection);
+    auto [rc, request] = readRequest(connection);
     while (rc > 0)
     {
         m_receivedRequests.push_back(std::move(request));
@@ -73,7 +68,8 @@ void AuthHttpServer::appendAuthHeader(AuthHeader value)
 nx::Buffer AuthHttpServer::nextResponse()
 {
     nx::Buffer response;
-    switch (m_nextRepsonse) {
+    switch (m_nextRepsonse)
+    {
         case NextResponse::unauthorized:
             m_nextRepsonse = NextResponse::success;
 
@@ -246,7 +242,4 @@ TEST_F(HttpClientAsyncAuthorization, cached_authorization_of_a_different_user_is
     thenLastRequestAuthorizedOnServerAsUser("Petya");
 }
 
-} // namespace test
-} // namespace nx
-} // namespace network
-} // namespace http
+} // namespace nx::network::http::test

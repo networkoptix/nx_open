@@ -4,10 +4,7 @@
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/synchronous_tcp_server.h>
 
-namespace nx {
-namespace network {
-namespace http {
-namespace test {
+namespace nx::network::http::test {
 
 // TODO: Use TestHttpServer?
 class AuthHttpServer:
@@ -64,7 +61,4 @@ private:
     std::unique_ptr<AuthHttpServer> m_httpServer;
 };
 
-} // namespace test
-} // namespace nx
-} // namespace network
-} // namespace http
+} // namespace nx::network::http::test
