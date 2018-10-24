@@ -565,13 +565,6 @@ bool equal(const nx::utils::Url& lhs, const nx::utils::Url& rhs, ComparisonFlags
         && (!flags.testFlag(ComparisonFlag::Query) || lhs.query() == rhs.query());
 }
 
-}
-
-QString toString(const Url &url)
-{
-    return url.toString(QUrl::RemovePassword);
-}
-
-// namespace url
+} // namespace url
 } // namespace utils
 } // namespace nx
