@@ -192,8 +192,8 @@ static std::string systemTempDir()
 static void createDir(const std::string& dir)
 {
     // NOTE: mkdir works in both Windows and Linux.
-    if (system(("mkdir \"" + dir + "\"").c_str()) != 0)
-        fatalError("Unable to create dir: [%s]", dir.c_str());
+//    if (system(("mkdir \"" + dir + "\"").c_str()) != 0)
+//        fatalError("Unable to create dir: [%s]", dir.c_str());
 }
 
 static std::string randAsString()

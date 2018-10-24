@@ -76,6 +76,12 @@ QString nx::vms::api::SystemInformation::currentSystemRuntime()
 
 #elif !defined(Q_OS_LINUX) && !defined(Q_OS_WIN)
 
+QString nx::vms::api::SystemInformation::runtimeOsVersion()
+{
+    // #TODO #dkargin implement
+    return QString();
+}
+
 QString nx::vms::api::SystemInformation::currentSystemRuntime()
 {
     return QLatin1String("Unknown");
