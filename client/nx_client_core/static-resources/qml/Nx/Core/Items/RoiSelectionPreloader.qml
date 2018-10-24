@@ -37,6 +37,8 @@ Item
         id: visualHolder
 
         anchors.fill: parent
+        visible: false
+
         Rectangle
         {
             id: leftDash

@@ -53,7 +53,7 @@ Item
         if (drawingRoi)
         {
             d.customSecondPoint = relativePos
-            d.selectionRoi.endPoint = Qt.binding(function() { return d.fromRelative(relativePos)})
+            d.selectionRoi.endPoint = Qt.binding(function() { return d.fromRelative(relativePos) })
             d.selectionRoi.singlePoint = d.nearPositions(d.customFirstPoint, d.customSecondPoint)
         }
         else if (!d.nearPositions(d.customInitialPoint, relativePos))
@@ -87,8 +87,8 @@ Item
             ? secondRoi
             : firstRoi
 
-        d.selectionRoi.startPoint = Qt.binding(function() { return d.fromRelative(relativePos)})
-        d.selectionRoi.endPoint = Qt.binding(function() { return d.fromRelative(relativePos)})
+        d.selectionRoi.startPoint = Qt.binding(function() { return d.fromRelative(relativePos) })
+        d.selectionRoi.endPoint = Qt.binding(function() { return d.fromRelative(relativePos) })
         d.selectionRoi.singlePoint = true
         d.selectionRoi.start()
     }
