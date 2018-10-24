@@ -157,11 +157,11 @@ void CrossNatConnector::fetchMediatorUdpEndpoint()
         return issueConnectRequestToMediator();
 
     m_mediatorAddressFetcher.invoke(
-        [this](auto... args) { onFetchMediatorUdpEndpointCompletion(std::move(args)...); },
+        [this](auto&&... args) { onFetchMediatorAddressCompletion(std::move(args)...); },
         &nx::network::SocketGlobals::instance().cloud().mediatorConnector());
 }
 
-void CrossNatConnector::onFetchMediatorUdpEndpointCompletion(
+void CrossNatConnector::onFetchMediatorAddressCompletion(
     http::StatusCode::Value resultCode,
     hpm::api::MediatorAddress mediatorAddress)
 {
@@ -177,6 +177,8 @@ void CrossNatConnector::onFetchMediatorUdpEndpointCompletion(
 
 void CrossNatConnector::issueConnectRequestToMediator()
 {
+    NX_ASSERT(isInSelfAioThread());
+
     if (!m_mediatorUdpClient)
     {
         m_mediatorUdpClient =
@@ -190,7 +192,7 @@ void CrossNatConnector::issueConnectRequestToMediator()
     {
         const auto errorCode = SystemError::getLastOSErrorCode();
         NX_WARNING(this, lm("cross-nat %1. Failed to bind to mediator udp client to local port. %2")
-            .arg(m_connectSessionId).arg(SystemError::getLastOSErrorText()));
+            .args(m_connectSessionId, SystemError::getLastOSErrorText()));
         post(
             [this, errorCode]() mutable
             {
@@ -202,7 +204,7 @@ void CrossNatConnector::issueConnectRequestToMediator()
 
     m_localAddress = m_mediatorUdpClient->socket()->getLocalAddress();
 
-    NX_VERBOSE(this, lm("cross-nat %1. connecting to %2 with timeout %3, from local port %4")
+    NX_VERBOSE(this, lm("cross-nat %1. Connecting to %2 with timeout %3, from local port %4")
         .args(m_connectSessionId, m_targetPeerAddress.host.toString(),
             m_connectTimeout, m_mediatorUdpClient->socket()->getLocalAddress().port));
 
@@ -216,10 +218,9 @@ void CrossNatConnector::issueConnectRequestToMediator()
     m_connectResultReport.resultCode =
         api::NatTraversalResultCode::noResponseFromMediator;
 
-    using namespace std::placeholders;
     m_mediatorUdpClient->connect(
         prepareConnectRequest(),
-        std::bind(&CrossNatConnector::onConnectResponse, this, _1, _2, _3));
+        [this](auto&&... args) { onConnectResponse(std::move(args)...); });
 }
 
 void CrossNatConnector::onConnectResponse(
@@ -231,7 +232,7 @@ void CrossNatConnector::onConnectResponse(
 
     s_mediatorResponseCounter.addResult(resultCode);
     NX_VERBOSE(this, lm("cross-nat %1. Received %2 response from mediator")
-        .arg(m_connectSessionId).arg(QnLexical::serialized(resultCode)));
+        .args(m_connectSessionId, QnLexical::serialized(resultCode)));
 
     if (m_done)
         return;
@@ -287,8 +288,8 @@ void CrossNatConnector::onConnectorFinished(
     std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
 {
     NX_VERBOSE(this, lm("cross-nat %1. Connector has finished with result: %2, %3")
-        .arg(m_connectSessionId).arg(QnLexical::serialized(resultCode))
-        .arg(SystemError::toString(sysErrorCode)));
+        .args(m_connectSessionId, QnLexical::serialized(resultCode),
+            SystemError::toString(sysErrorCode)));
 
     m_cloudConnectorExecutor.reset();
 
@@ -300,6 +301,7 @@ void CrossNatConnector::onConnectorFinished(
         tunnelWatcher->bindToAioThread(getAioThread());
         m_connection = std::move(tunnelWatcher);
     }
+
     holePunchingDone(resultCode, sysErrorCode);
 }
 
@@ -327,8 +329,8 @@ void CrossNatConnector::holePunchingDone(
     using namespace std::placeholders;
 
     NX_VERBOSE(this, lm("cross-nat %1. result: %2, system result code: %3")
-        .arg(m_connectSessionId).arg(QnLexical::serialized(resultCode))
-        .arg(SystemError::toString(sysErrorCode)));
+        .args(m_connectSessionId, QnLexical::serialized(resultCode),
+            SystemError::toString(sysErrorCode)));
 
     // We are in aio thread.
     m_timer->cancelSync();
@@ -364,7 +366,7 @@ void CrossNatConnector::connectSessionReportSent(
     if (errorCode != SystemError::noError)
     {
         NX_DEBUG(this, lm("cross-nat %1. Failed to send report to mediator. %2")
-            .arg(m_connectSessionId).arg(SystemError::toString(errorCode)));
+            .args(m_connectSessionId, SystemError::toString(errorCode)));
     }
 
     // Ignoring send report result code.
@@ -376,9 +378,10 @@ void CrossNatConnector::connectSessionReportSent(
             ? hpm::api::toSystemErrorCode(m_connectResultReport.resultCode)
             : m_connectResultReport.sysErrorCode;
     }
-    NX_VERBOSE(this, lm("cross-nat %1. report send result code: %2. Invoking handler with result: %3")
-        .arg(m_connectSessionId).arg(SystemError::toString(errorCode))
-        .arg(SystemError::toString(sysErrorCodeToReport)));
+    NX_VERBOSE(this, lm("cross-nat %1. report send result code: %2. "
+        "Invoking handler with result: %3")
+        .args(m_connectSessionId, SystemError::toString(errorCode),
+            SystemError::toString(sysErrorCodeToReport)));
 
     if (m_connection)
     {

@@ -88,7 +88,7 @@ private:
 
     void fetchMediatorUdpEndpoint();
 
-    void onFetchMediatorUdpEndpointCompletion(
+    void onFetchMediatorAddressCompletion(
         http::StatusCode::Value resultCode,
         hpm::api::MediatorAddress mediatorAddress);
 
