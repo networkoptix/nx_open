@@ -10,7 +10,7 @@ from framework.context_logger import ContextLogger
 from framework.method_caching import cached_getter
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.windows_remoting._cim_query import CIMClass
-from ._cim_query import CIMQuery
+from ._cim_query import _CIMReference
 from ._cmd import Shell
 from ._powershell import run_powershell_script
 from .registry import _WindowsRegistryKey
@@ -69,13 +69,12 @@ class WinRM(object):
     def run_powershell_script(self, script, variables):
         return run_powershell_script(self._shell(), script, variables, logger=_logger.getChild('cmd'))
 
-    def wmi_query(
+    def wmi_class(
             self,
-            class_name, selectors,
-            namespace=CIMClass.default_namespace, root_uri=CIMClass.default_root_uri):
-        cim_class = CIMClass(class_name, namespace=namespace, root_uri=root_uri)
-        cim_query = CIMQuery(self._protocol, cim_class, selectors)
-        return cim_query
+            class_name,
+            namespace=CIMClass.default_namespace,
+            root_uri=CIMClass.default_root_uri):
+        return CIMClass(self._protocol, class_name, namespace=namespace, root_uri=root_uri)
 
     def is_working(self):
         try:

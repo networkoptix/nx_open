@@ -31,8 +31,7 @@ class WindowsTime(Time):
         self.winrm = winrm
 
     def get_tz(self):
-        timezone_result, = self.winrm.wmi_query(u'Win32_TimeZone',
-                                                {}).enumerate()  # Mind enumeration!
+        timezone_result, = self.winrm.wmi_class(u'Win32_TimeZone').enumerate({})  # Mind enumeration!
         windows_timezone_name = timezone_result[u'StandardName']
         # tzlocal.windows_tz.windows_tz contains popular timezones, including Pacific and Moscow time.
         # In case of problems, look for another timezone name mapping.
@@ -49,7 +48,7 @@ class WindowsTime(Time):
 
     def get(self):
         started_at = timeit.default_timer()
-        result = self.winrm.wmi_query(u'Win32_OperatingSystem', {}).get()
+        result = self.winrm.wmi_class(u'Win32_OperatingSystem').singleton()
         delay_sec = timeit.default_timer() - started_at
         raw = result[u'LocalDateTime'][u'cim:Datetime']
         time = dateutil.parser.parse(raw).astimezone(self.get_tz())
@@ -183,8 +182,8 @@ class WindowsAccess(OSAccess):
         return self.path_cls('C:\\')
 
     def _free_disk_space_bytes_on_all(self):
-        mount_point_iter = self.winrm.wmi_query('Win32_MountPoint', {}).enumerate()
-        volume_iter = self.winrm.wmi_query('Win32_Volume', {}).enumerate()
+        mount_point_iter = self.winrm.wmi_class('Win32_MountPoint').enumerate({})
+        volume_iter = self.winrm.wmi_class('Win32_Volume').enumerate({})
         volume_list = list(volume_iter)
         result = {}
         for mount_point in mount_point_iter:
