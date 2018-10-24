@@ -302,6 +302,7 @@ static bool gRestartFlag = false;
 
 namespace {
 
+static const std::chrono::hours kCheckDbBackupTimeout{1};
 static const std::chrono::seconds kResourceDataReadingTimeout(5);
 const QString YES = lit("yes");
 const QString NO = lit("no");
@@ -3708,6 +3709,14 @@ void MediaServerProcess::connectSignals()
                 nx::network::UdtStatistics::global.internetBytesTransfered -= current;
             }
         });
+    m_createDbBackupTimer = std::make_unique<QTimer>();
+    connect(m_createDbBackupTimer.get(), &QTimer::timeout,
+        [this]()
+        {
+            auto utils = nx::mediaserver::Utils(serverModule());
+            if (utils.timeToMakeDbBackup())
+                utils.backupDatabase();
+        });
 
     connect(
         m_universalTcpListener.get(),
@@ -3854,6 +3863,7 @@ void MediaServerProcess::startObjects()
     at_timer();
     m_generalTaskTimer->start(QnVirtualCameraResource::issuesTimeoutMs());
     m_udtInternetTrafficTimer->start(UDT_INTERNET_TRAFIC_TIMER);
+    m_createDbBackupTimer->start(kCheckDbBackupTimeout);
 
     const bool isDiscoveryDisabled = serverModule()->settings().noResourceDiscovery();
 

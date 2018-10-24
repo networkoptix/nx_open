@@ -17,11 +17,15 @@ namespace utils {
 * @return Unique filename according to pattern "<prefix>_<build>_<index>.backup" by
 * incrementing index
 */
-    QString makeNextUniqueName(const QString& prefix, int build);
+QString makeNextUniqueName(const QString& prefix, int build);
 
-bool backupDatabase(
-    const QString& outputDir,
+bool backupDatabase(const QString& backupDir,
     std::shared_ptr<ec2::AbstractECConnection> connection);
+
+QList<QString> allBackupFilePathsSorted(const QString& backupDir);
+
+void deleteOldBackupFilesIfNeeded(const QString& backupDir, const QString& filePathToSkip,
+    qint64 freeSpace);
 
 bool configureLocalPeerAsPartOfASystem(
     QnCommonModule* commonModule,

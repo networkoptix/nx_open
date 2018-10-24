@@ -107,7 +107,8 @@ bool Utils::updateUserCredentials(
 bool Utils::backupDatabase()
 {
     auto connection = ec2Connection();
-    return nx::vms::utils::backupDatabase(serverModule()->settings().dataDir(), std::move(connection));
+    return nx::vms::utils::backupDatabase(serverModule()->settings().backupsDir(),
+        std::move(connection));
 }
 
 void Utils::dropConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus)

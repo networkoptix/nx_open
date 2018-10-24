@@ -16,6 +16,8 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/password_analyzer.h>
+#include <utils/common/synctime.h>
+#include <nx/system_commands.h>
 
 namespace nx {
 namespace vms {
@@ -28,27 +30,54 @@ QString makeNextUniqueName(const QString& prefix, int build)
     QString fileName;
     for (int index = 0; ; ++index)
     {
-        auto fileName = lm("%1_%2_%3.backup").args(prefix, build, index);
+        auto fileName = lm("%1_%2_%3_%4.backup").args(prefix, build, index,
+            qnSyncTime->currentMSecsSinceEpoch());
         if (!QFile::exists(fileName))
             return fileName;
     }
     return fileName; //< We never reach this line.
 }
 
-bool backupDatabase(
-    const QString& outputDir,
+bool backupDatabase(const QString& backupDir,
     std::shared_ptr<ec2::AbstractECConnection> connection)
 {
     const nx::utils::SoftwareVersion productVersion(nx::utils::AppInfo::applicationVersion());
-    QString fileName = makeNextUniqueName(outputDir + lit("/ecs"), productVersion.build());
+    QString fileName = makeNextUniqueName(backupDir + lit("/ecs"), productVersion.build());
 
     const ec2::ErrorCode errorCode = connection->dumpDatabaseToFileSync(fileName);
     if (errorCode != ec2::ErrorCode::ok)
     {
-        NX_ERROR(typeid(VmsUtilsFunctionsTag), lit("Failed to dump EC database: %1").arg(ec2::toString(errorCode)));
+        NX_ERROR(typeid(VmsUtilsFunctionsTag),
+            lit("Failed to dump EC database: %1").arg(ec2::toString(errorCode)));
         return false;
     }
+    deleteOldBackupFilesIfNeeded(backupDir, fileName,
+        nx::SystemCommands().freeSpace(backupDir.toStdString()));
     return true;
+}
+
+QList<QString> allBackupFilePathsSorted(const QString& backupDir)
+{
+    return QList<QString>();
+}
+
+void deleteOldBackupFilesIfNeeded(const QString& backupDir, const QString& filePathToSkip,
+    qint64 freeSpace)
+{
+    const qint64 kMaxFreeSpace = 10 * 1024 * 1024;
+    const int kMaxBackupFilesCount = freeSpace > kMaxFreeSpace ? 6 : 1;
+    int deletedFilesCount = 0;
+    const auto allBackupFiles = allBackupFilePathsSorted(backupDir);
+    for (const auto& backupFilePath: allBackupFiles)
+    {
+        if (allBackupFiles.size() - deletedFilesCount <= kMaxBackupFilesCount)
+            break;
+        if (backupFilePath != filePathToSkip)
+        {
+            nx::SystemCommands().removePath(backupFilePath.toStdString());
+            deletedFilesCount++;
+        }
+    }
 }
 
 bool configureLocalPeerAsPartOfASystem(
@@ -57,7 +86,7 @@ bool configureLocalPeerAsPartOfASystem(
 {
     if (commonModule->globalSettings()->localSystemId() == data.localSystemId)
     {
-        NX_VERBOSE(typeid(VmsUtilsFunctionsTag), 
+        NX_VERBOSE(typeid(VmsUtilsFunctionsTag),
             lm("No need to configure local peer. System id is already %1")
                 .args(data.localSystemId));
         return true;
@@ -90,7 +119,7 @@ bool configureLocalPeerAsPartOfASystem(
     if (const auto result = connection->getResourceManager(Qn::kSystemAccess)->saveSync(data.additionParams);
         result != ec2::ErrorCode::ok)
     {
-        NX_DEBUG(typeid(VmsUtilsFunctionsTag), 
+        NX_DEBUG(typeid(VmsUtilsFunctionsTag),
             lm("Failed to save additional parameters. %1").args(ec2::toString(result)));
         return false;
     }
