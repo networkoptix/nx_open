@@ -3,10 +3,12 @@
 namespace nx::data_sync_engine::transport {
 
 HttpTunnelTransportConnection::HttpTunnelTransportConnection(
-    const std::string& connectionId,
+    const ProtocolVersionRange& protocolVersionRange,
+    const ConnectionRequestAttributes& connectionRequestAttributes,
     std::unique_ptr<network::AbstractStreamSocket> tunnelConnection)
     :
-    m_connectionId(connectionId),
+    m_protocolVersionRange(protocolVersionRange),
+    m_connectionRequestAttributes(connectionRequestAttributes),
     m_remoteEndpoint(tunnelConnection->getForeignAddress()),
     m_messagePipeline(std::move(tunnelConnection))
 {
@@ -41,19 +43,28 @@ void HttpTunnelTransportConnection::setOnGotTransaction(
 
 QnUuid HttpTunnelTransportConnection::connectionGuid() const
 {
-    return QnUuid::fromStringSafe(m_connectionId);
+    return QnUuid::fromStringSafe(m_connectionRequestAttributes.connectionId);
 }
 
 void HttpTunnelTransportConnection::sendTransaction(
-    TransactionTransportHeader /*transportHeader*/,
-    const std::shared_ptr<const TransactionSerializer>& /*transactionSerializer*/)
+    TransactionTransportHeader transportHeader,
+    const std::shared_ptr<const TransactionSerializer>& transactionSerializer)
 {
-    // TODO
+    auto serializedTransaction = transactionSerializer->serialize(
+        m_connectionRequestAttributes.remotePeer.dataFormat,
+        std::move(transportHeader),
+        highestProtocolVersionCompatibleWithRemotePeer());
+
+    dispatch(
+        [this, serializedTransaction = std::move(serializedTransaction)]()
+        {
+            m_messagePipeline.sendMessage({std::move(serializedTransaction)});
+        });
 }
 
 void HttpTunnelTransportConnection::closeConnection()
 {
-    // Sending local state.
+    // TODO
 }
 
 void HttpTunnelTransportConnection::stopWhileInAioThread()
@@ -65,6 +76,13 @@ void HttpTunnelTransportConnection::processMessage(
     nx::network::server::FixedSizeMessage /*message*/)
 {
     // TODO
+}
+
+int HttpTunnelTransportConnection::highestProtocolVersionCompatibleWithRemotePeer() const
+{
+    return m_connectionRequestAttributes.remotePeerProtocolVersion >= m_protocolVersionRange.begin()
+        ? m_protocolVersionRange.currentVersion()
+        : m_connectionRequestAttributes.remotePeerProtocolVersion;
 }
 
 } // namespace nx::data_sync_engine::transport

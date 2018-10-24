@@ -6,6 +6,7 @@
 #include <nx/network/connection_server/fixed_size_message_pipeline.h>
 
 #include "../abstract_transaction_transport.h"
+#include "../compatible_ec2_protocol_version.h"
 
 namespace nx::data_sync_engine::transport {
 
@@ -16,7 +17,8 @@ class HttpTunnelTransportConnection:
 
 public:
     HttpTunnelTransportConnection(
-        const std::string& connectionId,
+        const ProtocolVersionRange& protocolVersionRange,
+        const ConnectionRequestAttributes& connectionRequestAttributes,
         std::unique_ptr<network::AbstractStreamSocket> tunnelConnection);
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
@@ -39,13 +41,16 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    const std::string m_connectionId;
+    const ProtocolVersionRange m_protocolVersionRange;
+    const ConnectionRequestAttributes m_connectionRequestAttributes;
     const network::SocketAddress m_remoteEndpoint;
     nx::network::server::FixedSizeMessagePipeline m_messagePipeline;
     ConnectionClosedEventHandler m_connectionClosedEventHandler;
     GotTransactionEventHandler m_gotTransactionEventHandler;
 
     void processMessage(nx::network::server::FixedSizeMessage message);
+
+    int highestProtocolVersionCompatibleWithRemotePeer() const;
 };
 
 } // namespace nx::data_sync_engine::transport

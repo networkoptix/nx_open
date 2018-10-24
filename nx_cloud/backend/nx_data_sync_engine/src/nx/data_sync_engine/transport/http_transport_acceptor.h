@@ -75,10 +75,6 @@ private:
     std::atomic<std::uint64_t> m_lastConnectionSequence{0};
     std::map<std::int64_t /*connectionSequence*/, TransportConnectionContext> m_connections;
 
-    bool fetchDataFromConnectRequest(
-        const nx::network::http::Request& request,
-        ConnectionRequestAttributes* connectionRequestAttributes);
-
     nx::network::http::RequestResult prepareOkResponseToCreateTransactionConnection(
         const ConnectionRequestAttributes& connectionRequestAttributes,
         nx::network::http::Response* const response);

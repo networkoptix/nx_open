@@ -17,7 +17,7 @@ TransactionTransport::TransactionTransport(
     const ProtocolVersionRange& protocolVersionRange,
     nx::network::aio::AbstractAioThread* aioThread,
     std::shared_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState,
-    const ConnectionRequestAttributes& connectionRequestAttributes,
+    const transport::ConnectionRequestAttributes& connectionRequestAttributes,
     const std::string& systemId,
     const vms::api::PeerData& localPeer,
     const network::SocketAddress& remotePeerEndpoint,

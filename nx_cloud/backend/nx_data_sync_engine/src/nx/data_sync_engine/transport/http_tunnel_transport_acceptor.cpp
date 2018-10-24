@@ -47,7 +47,16 @@ void HttpTunnelTransportAcceptor::authorize(
     detail::ConnectRequestContext connectRequestContext;
     connectRequestContext.userAgent = network::http::getHeaderValue(
         httpRequestContext->request.headers, "User-Agent").toStdString();
-    // TODO
+
+    if (!fetchDataFromConnectRequest(
+            httpRequestContext->request,
+            &connectRequestContext.attributes))
+    {
+        return completionHandler(
+            network::http::StatusCode::badRequest,
+            std::move(connectRequestContext));
+    }
+    // TODO Reading systemId.
 
     completionHandler(
         network::http::StatusCode::ok,
@@ -61,7 +70,8 @@ void HttpTunnelTransportAcceptor::saveCreatedTunnel(
     const auto remotePeerEndpoint = connection->getForeignAddress();
 
     auto commandPipeline = std::make_unique<HttpTunnelTransportConnection>(
-        requestContext.attributes.connectionId,
+        m_protocolVersionRange,
+        requestContext.attributes,
         std::move(connection));
 
     auto newTransport = std::make_unique<GenericTransport>(

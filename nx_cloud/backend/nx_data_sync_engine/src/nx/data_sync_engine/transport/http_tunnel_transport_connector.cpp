@@ -32,6 +32,8 @@ void HttpTunnelTransportConnector::connect(Handler completionHandler)
 {
     m_completionHandler = std::move(completionHandler);
 
+    // TODO: #ak Adding auxiliary headers.
+
     m_client->openTunnel(
         [this](auto... args) { processOpenTunnelResult(std::move(args)...); });
 }

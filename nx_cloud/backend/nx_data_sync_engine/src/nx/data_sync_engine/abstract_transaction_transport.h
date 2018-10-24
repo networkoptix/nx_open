@@ -9,6 +9,7 @@
 
 #include "serialization/serializable_transaction.h"
 #include "transaction_transport_header.h"
+#include "transport/connect_request_attributes.h"
 
 namespace nx {
 namespace data_sync_engine {
@@ -23,14 +24,6 @@ using GotTransactionEventHandler = nx::utils::MoveOnlyFunc<void(
     Qn::SerializationFormat,
     const QByteArray&,
     TransactionTransportHeader)>;
-
-struct ConnectionRequestAttributes
-{
-    std::string connectionId;
-    vms::api::PeerData remotePeer;
-    std::string contentEncoding;
-    int remotePeerProtocolVersion = 0;
-};
 
 //-------------------------------------------------------------------------------------------------
 
