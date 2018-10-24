@@ -14,11 +14,13 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/avi/avi_resource.h>
 #include <core/resource/layout_resource.h>
 
 #include <nx/streaming/abstract_archive_resource.h>
 
 #include <utils/common/checked_cast.h>
+#include <nx/client/desktop/resources/layout_password_management.h>
 
 QnWorkbenchPermissionsNotifier::QnWorkbenchPermissionsNotifier(QObject* parent) :
     QObject(parent)
@@ -164,6 +166,12 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
 
     if (QnAbstractArchiveResourcePtr archive = resource.dynamicCast<QnAbstractArchiveResource>())
     {
+        if(auto videoFile = resource.dynamicCast<QnAviResource>())
+        {
+            if (videoFile->requiresPassword())
+                return Qn::NoPermissions;
+        }
+
         return Qn::ReadPermission
             | Qn::ViewContentPermission
             | Qn::ViewLivePermission
@@ -174,7 +182,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
     }
 
     if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
-        return calculatePermissionsInternal(layout);
+        return calculateLayoutPermissions(layout);
 
     if (qnRuntime->isVideoWallMode())
         return Qn::VideoWallMediaPermissions;
@@ -207,68 +215,52 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
     return resourceAccessManager()->permissions(m_user, resource);
 }
 
-Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(
+Qn::Permissions QnWorkbenchAccessController::calculateLayoutPermissions(
     const QnLayoutResourcePtr& layout) const
 {
+    using namespace nx::client::desktop;
     NX_ASSERT(layout);
 
     // TODO: #GDM Code duplication with QnResourceAccessManager::calculatePermissionsInternal
-    auto checkReadOnly =
-        [this](Qn::Permissions permissions)
-        {
-            if (!commonModule()->isReadOnly())
-                return permissions;
-
-            return permissions &~ (Qn::RemovePermission
-                | Qn::SavePermission
-                | Qn::WriteNamePermission
-                | Qn::EditLayoutSettingsPermission);
-        };
-
-    auto checkLoggedIn =
-        [this](Qn::Permissions permissions)
-        {
-            if (m_user)
-                return permissions;
-
-            return permissions &~ (Qn::RemovePermission
-                | Qn::SavePermission
-                | Qn::WriteNamePermission
-                | Qn::EditLayoutSettingsPermission);
-        };
-
-    auto checkLocked =
-        [this, layout](Qn::Permissions permissions)
-        {
-            // Removable layouts must be checked via main pipeline
-            NX_ASSERT(!permissions.testFlag(Qn::RemovePermission));
-            if (!layout->locked())
-                return permissions;
-
-            if (layout->isFile()) //< Local files can be renamed even if locked.
-                return permissions &~ Qn::AddRemoveItemsPermission;
-
-            return permissions &~ (Qn::AddRemoveItemsPermission | Qn::WriteNamePermission);
-        };
+    const auto readOnly = commonModule()->isReadOnly()
+        ? ~(Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission)
+        : Qn::AllPermissions;
 
     // Some layouts are created with predefined permissions which are never changed.
-    QVariant permissions = layout->data().value(Qn::LayoutPermissionsRole);
-    if (permissions.isValid() && permissions.canConvert<int>())
-        return checkReadOnly(static_cast<Qn::Permissions>(permissions.toInt()) | Qn::ReadPermission);
+    QVariant presetPermissions = layout->data().value(Qn::LayoutPermissionsRole);
+    if (presetPermissions.isValid() && presetPermissions.canConvert<int>())
+        return (static_cast<Qn::Permissions>(presetPermissions.toInt()) & readOnly) | Qn::ReadPermission;
 
+    // Deal with normal (non explicitly-authorized) files separately.
     if (layout->isFile())
     {
-        return checkLocked(Qn::ReadWriteSavePermission
+        if(layout::requiresPassword(layout))
+            return Qn::WriteNamePermission | Qn::ReadPermission;
+
+        auto permissions = Qn::ReadWriteSavePermission
             | Qn::AddRemoveItemsPermission
             | Qn::EditLayoutSettingsPermission
-            | Qn::WriteNamePermission);
+            | Qn::WriteNamePermission;
+
+        if (layout->locked() || layout::isEncrypted(layout))
+            permissions &= ~Qn::AddRemoveItemsPermission;
+
+        return permissions;
     }
+
+    const auto loggedIn = !m_user
+        ? ~(Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission)
+        : Qn::AllPermissions;
+
+    const auto locked = layout->locked()
+        ? ~(Qn::AddRemoveItemsPermission | Qn::WriteNamePermission)
+        : Qn::AllPermissions;
 
     /* User can do everything with local layouts except removing from server. */
     if (layout->hasFlags(Qn::local))
     {
-        return checkLocked(checkLoggedIn(checkReadOnly(
-            static_cast<Qn::Permissions>(Qn::FullLayoutPermissions &~ Qn::RemovePermission))));
+        return locked & loggedIn & readOnly
+            & (static_cast<Qn::Permissions>(Qn::FullLayoutPermissions &~ Qn::RemovePermission));
     }
 
     if (qnRuntime->isVideoWallMode())
@@ -342,6 +334,26 @@ void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResource
     connect(resource, &QnResource::flagsChanged, this,
         &QnWorkbenchAccessController::updatePermissions);
 
+    // Capture password setting or dropping for layout.
+    if(auto layout = resource.dynamicCast<QnLayoutResource>())
+    {
+        connect(layout, &QnLayoutResource::dataChanged, this,
+            [this, layout](int role)
+            {
+                if (role == Qn::LayoutPasswordRole)
+                    updatePermissions(layout);
+            });
+    }
+
+    // Capture password setting or dropping for exported video.
+    if(auto videoFile = resource.dynamicCast<QnAviResource>())
+    {
+        connect(videoFile, &QnAviResource::storageAccessChanged, this,
+            [this, videoFile]() { updatePermissions(videoFile); });
+    }
+
+    connect(resource, &QnResource::flagsChanged, this,
+        &QnWorkbenchAccessController::updatePermissions);
 
     if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
     {

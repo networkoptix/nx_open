@@ -2,6 +2,7 @@
 
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
+#include <QtWidgets/QLayout>
 
 namespace Ui { class ExportLayoutSettingsWidget; }
 
@@ -21,14 +22,22 @@ public:
     ExportLayoutSettingsWidget(QWidget* parent = nullptr);
     virtual ~ExportLayoutSettingsWidget();
 
-    bool isLayoutReadOnly() const;
-    void setLayoutReadOnly(bool value);
+    struct Data
+    {
+        bool readOnly = false;
+    };
+
+    void setData(const Data& data);
+
+    QLayout* passwordPlaceholder();
 
 signals:
-    void dataChanged(bool isLayoutReadOnly);
+    void dataEdited(Data& data); //< No signal on setData()!
 
 private:
     QScopedPointer<Ui::ExportLayoutSettingsWidget> ui;
+
+    void emitDataEdited();
 };
 
 } // namespace desktop

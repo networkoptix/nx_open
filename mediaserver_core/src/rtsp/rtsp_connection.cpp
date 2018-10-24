@@ -15,7 +15,6 @@ extern "C"
 #include <libavcodec/avcodec.h>
 };
 
-#include <nx/streaming/rtp_stream_parser.h>
 #include <nx/streaming/abstract_data_consumer.h>
 #include <utils/media/ffmpeg_helper.h>
 #include <nx/utils/scope_guard.h>

@@ -100,11 +100,11 @@ class VMType(object):
     @contextmanager
     def vm_allocated(self, alias):
         """Allocate VM (for self-tests) bypassing any interaction with guest OS."""
-        template_vm = self._obtain_template()
         with self.registry.taken(alias) as (vm_index, vm_name):
             try:
                 hardware = self.hypervisor.find_vm(vm_name)
             except VMNotFound:
+                template_vm = self._obtain_template()
                 hardware = template_vm.clone(vm_name)
                 hardware.setup_mac_addresses(partial(self._make_mac, vm_index=vm_index))
                 ports_base_for_vm = self._ports_base + self._ports_per_vm * vm_index

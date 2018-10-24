@@ -70,6 +70,16 @@ void EventRibbon::setScrollBarPolicy(Qt::ScrollBarPolicy value)
     d->setScrollBarPolicy(value);
 }
 
+bool EventRibbon::live() const
+{
+    return d->live();
+}
+
+void EventRibbon::setLive(bool value)
+{
+    d->setLive(value);
+}
+
 void EventRibbon::setViewportMargins(int top, int bottom)
 {
     d->setViewportMargins(top, bottom);

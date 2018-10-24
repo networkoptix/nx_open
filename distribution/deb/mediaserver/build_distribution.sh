@@ -116,6 +116,7 @@ copyQtLibs()
         Network
         Sql
         WebSockets
+        Qml
     )
     local QT_LIBS
     for QT_LIB in "${QT_LIBS[@]}"

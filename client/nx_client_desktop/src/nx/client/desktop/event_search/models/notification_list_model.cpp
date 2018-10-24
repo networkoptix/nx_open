@@ -20,8 +20,8 @@ QString getStatisticsAlias(const QString& postfix)
 
 } // namespace
 
-NotificationListModel::NotificationListModel(QObject* parent):
-    base_type(parent),
+NotificationListModel::NotificationListModel(QnWorkbenchContext* context, QObject* parent):
+    base_type(context, parent),
     d(new Private(this))
 {
 }

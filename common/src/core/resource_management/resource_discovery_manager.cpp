@@ -85,7 +85,6 @@ void QnResourceDiscoveryManagerTimeoutDelegate::onTimeout()
 
 QnResourceDiscoveryManager::QnResourceDiscoveryManager(QObject* parent)
 :
-    base_type(parent),
     QnCommonModuleAware(parent),
     m_ready(false),
     m_state(InitialSearch),

@@ -23,7 +23,10 @@
 #include <ui/style/custom_style.h>
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 #include <nx/client/desktop/system_update/multi_server_updates_widget.h>
+#include <nx/client/desktop/system_administration/widgets/analytics_settings_widget.h>
 #include <ini.h>
+
+using namespace nx::client::desktop;
 
 QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent)
     : base_type(parent)
@@ -72,6 +75,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent)
     addPage(RoutingManagement,      routingWidget,                          tr("Routing Management"));
     addPage(TimeServerSelection,    new QnTimeServerSelectionWidget(this),  tr("Time Synchronization"));
     addPage(CloudManagement,        new QnCloudManagementWidget(this),      nx::network::AppInfo::cloudName());
+    addPage(Analytics,              new AnalyticsSettingsWidget(this),      tr("Analytics"));
 
     loadDataToUi();
     autoResizePagesToContents(ui->tabWidget,  { QSizePolicy::Preferred, QSizePolicy::Preferred }, false);

@@ -86,6 +86,8 @@ namespace Qn
         LayoutBookmarksModeRole,                    /**< Role for layout's bookmarks mode state. */
         LayoutActiveItemRole,                       /**< Role for layout active item. Value of type QnUuid. */
         LayoutWatermarkRole,                        /**< Role for layout watermark (when loaded from file). */
+        LayoutEncryptionRole,                       /**< Role for encrypted layout. 'true' if encrypted. */
+        LayoutPasswordRole,                         /**< Role for encrypted layout. QString containing a password. */
 
         /* Item-based. */
         ItemUuidRole,                               /**< Role for item's UUID. Value of type QnUuid. */
@@ -240,7 +242,7 @@ namespace Qn
         BusyIndicatorVisibleRole,                   /**< Role for toggling busy indicator (bool). */
         ProgressValueRole,                          /**< Role for specifying progress value [0..1] (float). */
         AnimatedRole,                               /**< Role for specifying whether item animation is allowed (bool). */
-        DurationRole,                               /**< Role for duration in milliseconds (qint64). */
+        DurationRole,                               /**< Role for duration in microseconds (qint64). */
         NotificationLevelRole,                      /**< Role for notification level (QnNotificationLevel::Value). */
         ContextMenuRole,                            /**< Role for context menu (QSharedPointer<QMenu>). */
         ForcePrecisePreviewRole,                    /**< Role for forcing precise preview frame (bool). */

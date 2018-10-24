@@ -74,9 +74,8 @@ private:
     void query(qint64 fromMsec,
         qint64 toMsec,
         nx::vms::api::EventType eventType,
-        const QnUuid& eventSubtype,
+        const QString& eventSubtype,
         nx::vms::api::ActionType actionType);
-
 
 private:
     QScopedPointer<Ui::EventLogDialog> ui;

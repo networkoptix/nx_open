@@ -11,6 +11,7 @@ namespace style
         static const int kMenuItemHPadding;
         static const int kMenuItemVPadding;
         static const int kMenuItemTextLeftPadding;
+        static const int kSubmenuArrowPadding;
         static const int kArrowSize;
         static const int kCrossSize;
         static const int kSpinButtonWidth;
@@ -82,8 +83,8 @@ namespace style
         static const char* kTabBarIndent;           /**< Name of a property to hold an extra indent of a tab bar. */
         static const char* kItemViewRadioButtons;   /**< Name of a property to change item view checkboxes to radio buttons (bool). */
         static const char* kPushButtonMargin;       /**< Name of a property to hold custom push button margin (int). Buttons with custom margin are left-aligned. */
-        static const char* kMenuNoMouseReplayRect;  /**< Name of a property to hold rectangle in global logical coordinates (QRect).
-                                                            If menu is closed by click in this rectangle it won't replay mouse event. */
+        static const char* kMenuNoMouseReplayArea;  /**< Name of a property to hold either rectangle in global coordinates (QRect) or a widget (QPointer<QWidget>).
+                                                            If menu is closed by click in this area it won't replay mouse event. */
         static const char* kComboBoxPopupWidth;     /**< Name of a property to hold width of combo box popup. */
         static const char* kGroupBoxContentTopMargin; /**< Name of a property to hold group box top content margins without header (int). */
     };

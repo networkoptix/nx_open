@@ -121,7 +121,6 @@ QList<ResourceTreeNodeType> rootNodeTypes()
 // -------------------------------------------------------------------------- //
 QnResourceTreeModel::QnResourceTreeModel(
     Scope scope,
-    bool useExtraSearchInformation,
     QObject* parent)
     :
     base_type(parent),
@@ -134,7 +133,7 @@ QnResourceTreeModel::QnResourceTreeModel(
     for (NodeType t: rootNodeTypes())
     {
         const auto node = QnResourceTreeModelNodeFactory::createNode(
-            t, this, false, useExtraSearchInformation);
+            t, this, false);
         m_rootNodes[t] = node;
         if (node)
         {
@@ -694,7 +693,6 @@ QHash<int,QByteArray> QnResourceTreeModel::roleNames() const
     roles.insert(Qn::ResourceRole,              "resource");
     roles.insert(Qn::ResourceFlagsRole,         "flags");
     roles.insert(Qn::ItemUuidRole,              "uuid");
-    roles.insert(Qn::ResourceSearchStringRole,  "searchString");
     roles.insert(Qn::ResourceStatusRole,        "status");
     roles.insert(Qn::NodeTypeRole,              "nodeType");
     return roles;

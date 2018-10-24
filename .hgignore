@@ -36,10 +36,15 @@ cloud_portal/cloud/static
 cloud_portal/front_end/app/images/{favicon.ico,logo.png,logo_small.png,promo/cloud.png}
 cloud_portal/front_end/app/styles/custom
 cloud_portal/robot_tests/{geckodriver.log,venv}
+cloud_portal/front_end/.sass-cache
+cloud_portal/front_end/dist
 
 nx_cloud/backend/cloud_tests/monitoring/env
 nx_cloud/backend/cloud_tests/monitoring/dist
 nx_cloud/backend/cloud_tests/monitoring/monitoring_simple.egg-info
 
 webadmin/static
+webadmin/.sass-cache
+webadmin/.tmp
+webadmin/translation/language_pack
 CMakeLists.txt.user

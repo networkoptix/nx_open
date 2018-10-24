@@ -361,6 +361,7 @@ void QnCommonModule::updateModuleInformationUnsafe()
 
 void QnCommonModule::setSystemIdentityTime(qint64 value, const QnUuid& sender)
 {
+    NX_INFO(this, "System identity time has changed from %1 to %2", m_systemIdentityTime, value);
     m_systemIdentityTime = value;
     emit systemIdentityTimeChanged(value, sender);
 }

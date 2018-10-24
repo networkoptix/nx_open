@@ -1,4 +1,5 @@
 #include <nx/utils/log/log.h>
+
 #include "file_system.h"
 
 #if defined(Q_OS_UNIX)

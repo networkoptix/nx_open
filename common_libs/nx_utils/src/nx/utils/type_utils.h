@@ -129,5 +129,11 @@ struct tuple_first_element<DefaultType, std::tuple<>>
     typedef DefaultType type;
 };
 
+template<typename T>
+struct identity
+{
+    using type = T;
+};
+
 } // namespace utils
 } // namespace nx

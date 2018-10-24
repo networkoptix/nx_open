@@ -259,7 +259,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(
                 .arg(error);
             return error;
         }
-        if (m_resampler.pushFrame(m_frameDecodeTo))
+        if (!m_resampler.pushFrame(m_frameDecodeTo))
         {
             m_lastErrMessage = tr("Could not allocate sample buffers");
             return AVERROR(EINVAL);

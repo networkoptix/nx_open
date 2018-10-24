@@ -20,17 +20,24 @@ namespace http {
 Server::Server(
     const conf::Settings& settings,
     const PeerRegistrator& peerRegistrator,
-    nx::cloud::discovery::RegisteredPeerPool* registeredPeerPool)
+    nx::cloud::discovery::RegisteredPeerPool* registeredPeerPool,
+    HolePunchingProcessor* holePunchingProcessor)
     :
     m_settings(settings),
-    m_multiAddressHttpServer(nullptr, &m_httpMessageDispatcher)
+    m_multiAddressHttpServer(nullptr, &m_httpMessageDispatcher),
+    m_holePunchingProcessor(holePunchingProcessor)
 {
     NX_ASSERT(!m_settings.http().addrToListenList.empty());
 
     loadSslCertificate();
 
-    if (!launchHttpServerIfNeeded(m_settings, peerRegistrator, registeredPeerPool))
+    if (!launchHttpServerIfNeeded(
+            m_settings,
+            peerRegistrator,
+            registeredPeerPool))
+    {
         throw std::runtime_error("Failed to initialize http server");
+    }
 }
 
 void Server::listen()
@@ -106,10 +113,7 @@ bool Server::launchHttpServerIfNeeded(
 {
     NX_INFO(this, "Bringing up HTTP server");
 
-    // Registering HTTP handlers.
-    m_httpMessageDispatcher.registerRequestProcessor<http::GetListeningPeerListHandler>(
-        network::url::joinPath(api::kMediatorApiPrefix, GetListeningPeerListHandler::kHandlerPath).c_str(),
-        [&]() { return std::make_unique<http::GetListeningPeerListHandler>(peerRegistrator); });
+    registerApiHandlers(peerRegistrator);
 
     if (!m_multiAddressHttpServer.bind(
             settings.http().addrToListenList,
@@ -137,6 +141,27 @@ bool Server::launchHttpServerIfNeeded(
     return true;
 }
 
+void Server::registerApiHandlers(const PeerRegistrator& peerRegistrator)
+{
+    m_httpMessageDispatcher.registerRequestProcessor<http::GetListeningPeerListHandler>(
+        network::url::joinPath(
+            api::kMediatorApiPrefix,
+            GetListeningPeerListHandler::kHandlerPath).c_str(),
+        [&peerRegistrator]()
+        {
+            return std::make_unique<http::GetListeningPeerListHandler>(peerRegistrator);
+        });
+
+    m_httpMessageDispatcher.registerRequestProcessor<InitiateConnectionRequestHandler>(
+        network::url::joinPath(api::kMediatorApiPrefix, api::kServerSessionsPath).c_str(),
+        [this]()
+        {
+            return std::make_unique<InitiateConnectionRequestHandler>(
+                m_holePunchingProcessor);
+        },
+        network::http::Method::post);
+}
+
 template<typename Handler, typename Arg>
 void Server::registerApiHandler(
     const char* path,
@@ -150,6 +175,48 @@ void Server::registerApiHandler(
             return std::make_unique<Handler>(arg);
         },
         method);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+InitiateConnectionRequestHandler::InitiateConnectionRequestHandler(
+    HolePunchingProcessor* holePunchingProcessor)
+    :
+    m_holePunchingProcessor(holePunchingProcessor)
+{
+}
+
+void InitiateConnectionRequestHandler::processRequest(
+    nx::network::http::HttpServerConnection* const connection,
+    const nx::network::http::Request& /*request*/,
+    nx::utils::stree::ResourceContainer /*authInfo*/,
+    api::ConnectRequest inputData)
+{
+    m_holePunchingProcessor->connect(
+        RequestSourceDescriptor{
+            network::TransportProtocol::tcp,
+            connection->socket()->getForeignAddress()},
+        inputData,
+        [this](auto&&... args) { reportResult(std::move(args)...); });
+}
+
+void InitiateConnectionRequestHandler::reportResult(
+    api::ResultCode resultCode,
+    api::ConnectResponse response)
+{
+    network::http::FusionRequestResult result;
+    if (resultCode != api::ResultCode::ok)
+    {
+        result.errorClass = network::http::FusionRequestErrorClass::logicError;
+        result.errorDetail = static_cast<int>(resultCode);
+        result.errorText = api::toString(resultCode);
+        result.setHttpStatusCode(
+            resultCode == api::ResultCode::notFound
+            ? network::http::StatusCode::notFound
+            : network::http::StatusCode::badRequest);
+    }
+
+    this->requestCompleted(std::move(result), std::move(response));
 }
 
 } // namespace http

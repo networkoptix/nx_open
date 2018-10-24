@@ -137,6 +137,7 @@
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_welcome_screen.h>
+#include <nx/client/desktop/resources/layout_password_management.h>
 
 #include <ui/workbench/handlers/workbench_layouts_handler.h>    // TODO: #GDM dependencies
 
@@ -167,6 +168,7 @@
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
 
 #include <nx/utils/app_info.h>
+#include <nx/utils/guarded_callback.h>
 
 #ifdef Q_OS_MACX
 #include <utils/mac_utils.h>
@@ -264,6 +266,19 @@ ActionHandler::ActionHandler(QObject *parent) :
         [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::UpdatesPage); });
     connect(action(action::UserManagementAction), &QAction::triggered, this,
         [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::UserManagement); });
+    connect(action(action::AnalyticsEngineSettingsAction), &QAction::triggered, this,
+        [this]
+        {
+            QUrl url;
+
+            if (const QnUuid& engineId = menu()->currentParameters(sender()).resource()->getId();
+                !engineId.isNull())
+            {
+                url.setQuery("engineId=" + engineId.toString());
+            }
+
+            openSystemAdministrationDialog(QnSystemAdministrationDialog::Analytics, url);
+        });
 
     connect(action(action::BusinessEventsAction), SIGNAL(triggered()), this, SLOT(at_businessEventsAction_triggered()));
     connect(action(action::OpenBusinessRulesAction), SIGNAL(triggered()), this, SLOT(at_openBusinessRulesAction_triggered()));
@@ -670,17 +685,16 @@ void ActionHandler::changeDefaultPasswords(
         return;
 
     using PasswordChangeResult = QPair<QnVirtualCameraResourcePtr, QnRestResult>;
-    using PassswordChangeResultList = QList<PasswordChangeResult>;
+    using PasswordChangeResultList = QList<PasswordChangeResult>;
 
-    const auto errorResultsStorage = QSharedPointer<PassswordChangeResultList>(
-        new PassswordChangeResultList());
+    const auto errorResultsStorage = QSharedPointer<PasswordChangeResultList>(
+        new PasswordChangeResultList());
 
     const auto password = dialog.password();
-    const auto guard = QPointer<ActionHandler>(this);
-    const auto completionGuard = nx::utils::makeSharedGuard(
-        [this, guard, cameras, errorResultsStorage, password, forceShowCamerasList]()
+    const auto completionGuard = nx::utils::makeSharedGuard(nx::utils::guarded(this,
+        [this, cameras, errorResultsStorage, password, forceShowCamerasList]()
         {
-            if (!guard || errorResultsStorage->isEmpty())
+            if (errorResultsStorage->isEmpty())
                 return;
 
             // Show error dialog and try one more time
@@ -721,7 +735,7 @@ void ActionHandler::changeDefaultPasswords(
                 showSingleCameraErrorMessage(explanation);
 
             changeDefaultPasswords(password, camerasWithError, forceShowCamerasList);
-        });
+        }));
 
     for (const auto camera: cameras)
     {
@@ -729,20 +743,17 @@ void ActionHandler::changeDefaultPasswords(
         auth.setPassword(password);
 
         const auto resultCallback =
-            [guard, completionGuard, camera, errorResultsStorage]
+            [completionGuard, camera, errorResultsStorage]
                 (bool success, rest::Handle /*handle*/, QnRestResult result)
             {
-                if (!guard)
-                    return;
-
                 if (!success)
                     errorResultsStorage->append(PasswordChangeResult(camera, QnRestResult()));
                 else if (result.error != QnRestResult::NoError)
                     errorResultsStorage->append(PasswordChangeResult(camera, result));
             };
 
-        serverConnection->changeCameraPassword(
-            camera->getId(), auth, resultCallback, QThread::currentThread());
+        serverConnection->changeCameraPassword(camera->getId(), auth,
+            nx::utils::guarded(this, resultCallback), QThread::currentThread());
     }
 }
 
@@ -1191,6 +1202,18 @@ void ActionHandler::at_dropResourcesAction_triggered()
 
     QnResourceList resources = parameters.resources();
     QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
+
+    if (layouts.size() == 1)
+    {
+        auto &layout = layouts.first();
+        if (layout::requiresPassword(layout))
+        {
+            layout::askAndSetPassword(layout, mainWindowWidget());
+            if (layout::requiresPassword(layout)) //< A correct password was not entered. Do not open.
+                return;
+        }
+    }
+
     foreach(QnLayoutResourcePtr r, layouts)
         resources.removeOne(r);
 
@@ -1207,7 +1230,8 @@ void ActionHandler::at_dropResourcesAction_triggered()
         workbench()->currentLayout()->resource()->locked() &&
         !resources.empty() &&
         layouts.empty() &&
-        videowalls.empty()) {
+        videowalls.empty())
+    {
         QnGraphicsMessageBox::information(tr("Layout is locked and cannot be changed."));
         return;
     }
@@ -1277,12 +1301,12 @@ void ActionHandler::at_systemAdministrationAction_triggered()
     openSystemAdministrationDialog(page);
 }
 
-void ActionHandler::openSystemAdministrationDialog(int page)
+void ActionHandler::openSystemAdministrationDialog(int page, const QUrl& url)
 {
     QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(
         m_systemAdministrationDialog, mainWindowWidget());
 
-    systemAdministrationDialog()->setCurrentPage(page);
+    systemAdministrationDialog()->setCurrentPage(page, false, url);
 }
 
 void ActionHandler::openLocalSettingsDialog(int page)

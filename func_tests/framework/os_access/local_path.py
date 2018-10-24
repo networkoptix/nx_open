@@ -42,7 +42,6 @@ _reraising_existing_file_errors = _reraising({
 _reraising_existing_dir_errors = _reraising({
     ENOENT: exceptions.DoesNotExist,
     EEXIST: exceptions.AlreadyExists,
-    EISDIR: exceptions.DirIsAFile,
     })
 
 
@@ -104,9 +103,6 @@ class LocalPath(PosixPath, FileSystemPath):
         if not stat.S_ISREG(path_stat.st_mode):
             raise exceptions.NotAFile("{!r}.stat() returns {!r}".format(self, path_stat))
         return path_stat.st_size
-
-    def copy_to(self, destination):
-        destination.copy_from(self)
 
     def take_from(self, local_source_path):
         destination = self / local_source_path.name

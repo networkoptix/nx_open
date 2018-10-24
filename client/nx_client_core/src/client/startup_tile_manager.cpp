@@ -3,10 +3,11 @@
 #include <functional>
 
 #include <QtCore/QTimer>
-#include <QtCore/QPointer>
 
-#include <finders/systems_finder.h>
 #include <client_core/client_core_settings.h>
+#include <finders/systems_finder.h>
+
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 
 QnStartupTileManager::QnStartupTileManager():
@@ -28,12 +29,8 @@ QnStartupTileManager::QnStartupTileManager():
     if (qnClientCoreSettings->skipStartupTilesManagement())
         return;
 
-    QTimer::singleShot(qnClientCoreSettings->startupDiscoveryPeriodMs(),
-        [this, guard = QPointer<QObject>(this)]()
-        {
-            if (guard)
-                handleFirstSystems();
-        });
+    QTimer::singleShot(qnClientCoreSettings->startupDiscoveryPeriodMs(), nx::utils::guarded(this,
+        [this]() { handleFirstSystems(); }));
 
     const auto checkForCancelAndUninitialize =
         [this]()

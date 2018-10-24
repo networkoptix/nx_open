@@ -21,24 +21,15 @@ namespace {
  */
 struct FrameBasicInfo
 {
-    FrameBasicInfo()
-    :
-        codec(AV_CODEC_ID_NONE)
-    {
-    }
-
+    FrameBasicInfo() = default;
     FrameBasicInfo(const QnConstCompressedVideoDataPtr& frame)
-    :
-        codec(AV_CODEC_ID_NONE)
     {
         codec = frame->compressionType;
-        size = QSize(frame->width, frame->height);
-        if (size.isEmpty())
-            size = AbstractVideoDecoder::mediaSizeFromRawData(frame);
+        size = getFrameSize(frame);
     }
 
     QSize size;
-    AVCodecID codec;
+    AVCodecID codec = AV_CODEC_ID_NONE;
 };
 
 static QMutex mutex;

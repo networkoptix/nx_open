@@ -248,15 +248,6 @@ QnResourceTreeModelNode::~QnResourceTreeModelNode()
     NX_ASSERT(m_resource.isNull());
 }
 
-void QnResourceTreeModelNode::setUseExtraSearchInformation(bool value)
-{
-    if (m_useExtraSearchInformation == value)
-        return;
-
-    m_useExtraSearchInformation = value;
-    update();
-}
-
 void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
 {
     if (m_resource == resource)
@@ -310,7 +301,6 @@ void QnResourceTreeModelNode::update()
                 setNameInternal(QString());
                 m_flags = 0;
                 m_status = Qn::Online;
-                m_searchString = QString();
                 m_cameraExtraStatus = {};
             }
             else
@@ -318,7 +308,6 @@ void QnResourceTreeModelNode::update()
                 m_name = m_resource->getName();
                 m_flags = m_resource->flags();
                 m_status = m_resource->getStatus();
-                m_searchString = m_resource->toSearchString(m_useExtraSearchInformation);
                 m_displayName = QnResourceDisplayInfo(m_resource).toString(Qn::RI_NameOnly);
                 m_cameraExtraStatus = calculateCameraExtraStatus();
             }
@@ -838,11 +827,6 @@ QVariant QnResourceTreeModelNode::data(int role, int column) const
             }
             break;
 
-        case Qn::ResourceSearchStringRole:
-            return !m_searchString.isEmpty()
-                ? m_searchString
-                : m_displayName;
-
         case Qn::ResourceStatusRole:
             return QVariant::fromValue<int>(m_status);
 
@@ -1200,7 +1184,7 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
             return qnResIconCache->icon(QnResourceIconCache::Cameras);
 
         case NodeType::filteredLayouts:
-        case NodeType::layouts:
+        case NodeType::layouts: //< Overridden in QnResourceTreeModelLayoutNode.
             return qnResIconCache->icon(QnResourceIconCache::Layouts);
 
         case NodeType::layoutTour:

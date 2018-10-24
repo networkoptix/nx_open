@@ -88,10 +88,6 @@ private:
 
     void updateStreamResolution(int channelNumber, const QSize& newResolution);
 
-    void extractMediaStreamParams(
-        const QnCompressedVideoDataPtr& videoData,
-        QSize* const newResolution);
-
     void saveMediaStreamParamsIfNeeded(const QnCompressedVideoDataPtr& videoData);
 
     void saveBitrateIfNeeded(

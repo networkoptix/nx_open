@@ -23,6 +23,7 @@ public:
         TimeServerSelection,
         UserManagement,
         CloudManagement,
+        Analytics,
 
         PageCount
     };

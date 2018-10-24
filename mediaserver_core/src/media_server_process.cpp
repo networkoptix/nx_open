@@ -1042,6 +1042,7 @@ void MediaServerProcess::at_databaseDumped()
                 m_mediaServer,
                 nx::mserver_aux::createServerSettingsProxy(serverModule()).get()
             ).saveToSettings(serverModule()->roSettings());
+    NX_INFO(this, "Server restart is scheduled after dump database");
     restartServer(500);
 }
 
@@ -1060,6 +1061,7 @@ void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid
                     m_mediaServer,
                     nx::mserver_aux::createServerSettingsProxy(serverModule()).get()
                 ).saveToSettings(serverModule()->roSettings());
+        NX_INFO(this, "Server restart is scheduled because sysId time is changed");
         restartServer(0);
     }
 }
@@ -2475,7 +2477,7 @@ void MediaServerProcess::registerRestHandlers(
 
     reg("ec2/statistics", new QnMultiserverStatisticsRestHandler("ec2/statistics"));
 
-    /**%apidoc GET /api/analyticsLookupDetectedObjects
+    /**%apidoc GET /ec2/analyticsLookupDetectedObjects
      * Search analytics DB for objects that match filter specified.
      * %param[opt] deviceId Id of camera.
      * %param[opt] objectTypeId Analytics object type id.
@@ -3374,7 +3376,7 @@ void MediaServerProcess::stopObjects()
         [this](QObject* src, QObject* dst)
         {
             if (src && dst)
-                disconnect(src, nullptr, dst, nullptr);
+                src->disconnect(dst);
         };
 
     NX_INFO(this, "QnMain event loop has returned. Destroying objects...");

@@ -16,37 +16,30 @@
 #include "workbench_item.h"
 
 namespace {
-    const char *layoutSynchronizerPropertyName = "_qn_layoutSynchronizer";
-}
 
-typedef QHash<QnLayoutResource *, QnWorkbenchLayoutSynchronizer *> LayoutResourceSynchronizerHash;
+const char* layoutSynchronizerPropertyName = "_qn_layoutSynchronizer";
+
+} // namespace
+
+using LayoutResourceSynchronizerHash = QHash<QnLayoutResource*, QnWorkbenchLayoutSynchronizer*>;
 Q_GLOBAL_STATIC(LayoutResourceSynchronizerHash, qn_synchronizerByLayoutResource)
 
 QnWorkbenchLayoutSynchronizer::QnWorkbenchLayoutSynchronizer(QnWorkbenchLayout *layout, const QnLayoutResourcePtr &resource, QObject *parent):
     base_type(parent),
-    m_running(false),
     m_layout(layout),
-    m_resource(resource),
-    m_update(false),
-    m_submit(false),
-    m_autoDeleting(false),
-    m_submitPending(false)
+    m_resource(resource)
 {
-    if(layout == NULL) {
-        qnNullWarning(layout);
+    NX_ASSERT(layout, "Invalid layout");
+    if (!layout)
         return;
-    } else if(!layout->property(layoutSynchronizerPropertyName).isNull()) {
-        qnWarning("Given layout '%1' already has an associated layout synchronizer.", layout->name());
-        return;
-    }
 
-    if(resource.isNull()) {
-        qnNullWarning(resource);
+    NX_ASSERT(resource, "Invalid layout resource");
+    if (!resource)
         return;
-    } else if(!resource->property(layoutSynchronizerPropertyName).isNull()) {
-        qnWarning("Given resource '%1' already has an associated layout synchronizer.", resource->getName());
+
+    NX_ASSERT(!instance(layout), "Layout already has a synchronizer");
+    if (instance(layout))
         return;
-    }
 
     m_running = true;
     initialize();

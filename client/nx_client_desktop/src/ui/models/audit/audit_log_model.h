@@ -77,7 +77,7 @@ public:
     void setCheckState(Qt::CheckState state);
     Qt::CheckState checkState() const;
 
-    QString makeSearchPattern(const QnAuditRecord* record) const;
+    bool matches(const QnAuditRecord* record, const QStringList& keywords) const;
 
     void setHeaderHeight(int value);
 
@@ -110,7 +110,7 @@ private:
     bool skipDate(const QnAuditRecord *record, int row) const;
     static QString getResourcesString(const std::vector<QnUuid>& resources);
     static QnVirtualCameraResourceList getCameras(const std::vector<QnUuid>& resources);
-    QString searchData(const Column& column, const QnAuditRecord* data) const;
+    bool matches(const Column& column, const QnAuditRecord* data, const QString& keyword) const;
     QString descriptionTooltip(const QnAuditRecord *record) const;
     bool isDetailDataSupported(const QnAuditRecord *record) const;
 

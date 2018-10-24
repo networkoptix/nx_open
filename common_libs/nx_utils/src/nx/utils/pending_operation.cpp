@@ -12,15 +12,10 @@ PendingOperation::PendingOperation(QObject* parent):
     connect(m_timer, &QTimer::timeout, this,
         [this]()
         {
-            if (!m_requested)
-            {
+            if (m_requested)
+                fire();
+            else
                 m_timer->stop();
-                return;
-            }
-
-            m_requested = false;
-            if (m_callback)
-                m_callback();
         });
 }
 
@@ -29,6 +24,13 @@ PendingOperation::PendingOperation(const Callback& callback, int intervalMs, QOb
 {
     setCallback(callback);
     m_timer->setInterval(intervalMs);
+}
+
+PendingOperation::PendingOperation(
+    const Callback& callback, std::chrono::milliseconds interval, QObject* parent)
+    :
+    PendingOperation(callback, interval.count(), parent)
+{
 }
 
 void PendingOperation::requestOperation()
@@ -57,6 +59,15 @@ void PendingOperation::requestOperation()
     m_timer->start();
 }
 
+void PendingOperation::fire()
+{
+    m_requested = false;
+    m_timer->stop();
+
+    if (m_callback)
+        m_callback();
+}
+
 PendingOperation::Flags PendingOperation::flags() const
 {
     return m_flags;
@@ -75,6 +86,16 @@ int PendingOperation::intervalMs() const
 void PendingOperation::setIntervalMs(int value)
 {
     m_timer->setInterval(value);
+}
+
+std::chrono::milliseconds PendingOperation::interval() const
+{
+    return std::chrono::milliseconds(intervalMs());
+}
+
+void PendingOperation::setInterval(std::chrono::milliseconds value)
+{
+    setIntervalMs(value.count());
 }
 
 void PendingOperation::setCallback(const Callback& callback)

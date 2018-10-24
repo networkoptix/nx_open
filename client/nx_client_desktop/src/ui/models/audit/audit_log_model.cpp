@@ -21,6 +21,7 @@
 #include <core/resource/resource_display_info.h>
 
 #include <client/client_settings.h>
+#include <nx/client/desktop/resources/search_helper.h>
 
 #include <text/time_strings.h>
 
@@ -35,6 +36,7 @@
 #include <utils/math/math.h>
 
 using namespace nx;
+using namespace nx::client::desktop;
 
 const QByteArray QnAuditLogModel::ChildCntParamName("childCnt");
 const QByteArray QnAuditLogModel::CheckedParamName("checked");
@@ -502,39 +504,45 @@ QString QnAuditLogModel::htmlData(const Column& column, const QnAuditRecord* dat
         return textData(column, data);
 }
 
-QString QnAuditLogModel::makeSearchPattern(const QnAuditRecord* record) const {
-    // TODO: #vkutin Do we really want TimestampColumn, EndTimestampColumn, DurationColumn here?
-    Column columnsToFilter[] =
+bool QnAuditLogModel::matches(const QnAuditRecord* record, const QStringList& keywords) const
+{
+    static constexpr std::array<Column, 4> kColumnsToFilter =
+        {
+            UserNameColumn,
+            UserHostColumn,
+            EventTypeColumn,
+            DescriptionColumn
+        };
+
+    // Every keyword must be present at least in one of the columns.
+    for (const auto& keyword: keywords)
     {
-        TimestampColumn,
-        EndTimestampColumn,
-        DurationColumn,
-        UserNameColumn,
-        UserHostColumn,
-        EventTypeColumn,
-        DescriptionColumn
-    };
-    QString result;
-    for (const auto& column : columnsToFilter)
-        result += searchData(column, record);
-    return result;
+        if (!std::any_of(kColumnsToFilter.cbegin(), kColumnsToFilter.cend(),
+            [&] (auto column) { return matches(column, record, keyword); }))
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
-QString QnAuditLogModel::searchData(const Column& column, const QnAuditRecord* data) const
+bool QnAuditLogModel::matches(
+    const Column& column,
+    const QnAuditRecord* data,
+    const QString& keyword) const
 {
-    if (column == DescriptionColumn && (data->isPlaybackType() || data->eventType == Qn::AR_CameraUpdate || data->eventType == Qn::AR_CameraInsert))
+    if (column == DescriptionColumn
+        && (data->isPlaybackType()
+            || data->eventType == Qn::AR_CameraUpdate || data->eventType == Qn::AR_CameraInsert))
     {
-        QString result;
-        for (const auto& res : resourcePool()->getResourcesByIds(data->resources))
+        for (const auto& resource: resourcePool()->getResourcesByIds(data->resources))
         {
-            result += res->toSearchString(true);
-            result += lit(" ");
+            if (resources::search_helper::matches(keyword, resource))
+                return true;
         }
-
-        return result;
     }
 
-    return textData(column, data);
+    return textData(column, data).contains(keyword, Qt::CaseInsensitive);
 }
 
 QString QnAuditLogModel::textData(const Column& column, const QnAuditRecord* data) const

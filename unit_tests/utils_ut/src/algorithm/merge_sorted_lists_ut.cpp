@@ -75,7 +75,15 @@ protected:
     Vector singleTestVector()
     {
         QScopedValueRollback<bool> rollback(m_detectCopy, false);
-        return createVector({10, 20, 30});
+        return createVector({10, 20, 30, 40, 50});
+    }
+
+    Vector singleTestVectorTruncated(int limit)
+    {
+        QScopedValueRollback<bool> rollback(m_detectCopy, false);
+        auto result = singleTestVector();
+        result.resize(std::min(result.size(), size_t(limit)));
+        return result;
     }
 
 protected:
@@ -109,6 +117,24 @@ TEST_F(MergeSortedLists, LimitResults)
     ASSERT_EQ(result, expected);
 }
 
+TEST_F(MergeSortedLists, NonDestructiveMultiple)
+{
+    m_detectCopy = false;
+    auto source = testLists();
+    const auto sourceCopy = source;
+    nx::utils::algorithm::merge_sorted_lists(source);
+    ASSERT_EQ(source, sourceCopy);
+}
+
+TEST_F(MergeSortedLists, NonDestructiveSingle)
+{
+    m_detectCopy = false;
+    std::vector<Vector> source({singleTestVector()});
+    const auto sourceCopy = source;
+    nx::utils::algorithm::merge_sorted_lists(source);
+    ASSERT_EQ(source, sourceCopy);
+}
+
 TEST_F(MergeSortedLists, NoLists)
 {
     const auto result = nx::utils::algorithm::merge_sorted_lists(std::vector<Vector>());
@@ -131,6 +157,17 @@ TEST_F(MergeSortedLists, OneList)
     ASSERT_EQ(result, singleTestVector());
 }
 
+TEST_F(MergeSortedLists, OneListTruncated)
+{
+    m_detectCopy = false;
+    std::vector<Vector> lists({singleTestVector()});
+    m_detectCopy = true;
+    static constexpr int kLimit = 3;
+    const auto result = nx::utils::algorithm::merge_sorted_lists(
+        std::move(lists), Qt::AscendingOrder, kLimit);
+    ASSERT_EQ(result, singleTestVectorTruncated(kLimit));
+}
+
 TEST_F(MergeSortedLists, OneEmptyList)
 {
     std::vector<Vector> lists({createVector({})});
@@ -145,6 +182,17 @@ TEST_F(MergeSortedLists, OneNonEmptyList)
     m_detectCopy = true;
     const auto result = nx::utils::algorithm::merge_sorted_lists(std::move(lists));
     ASSERT_EQ(result, singleTestVector());
+}
+
+TEST_F(MergeSortedLists, OneNonEmptyListTruncated)
+{
+    m_detectCopy = false;
+    std::vector<Vector> lists({createVector({}), createVector({}), singleTestVector()});
+    m_detectCopy = true;
+    static constexpr int kLimit = 3;
+    const auto result = nx::utils::algorithm::merge_sorted_lists(
+        std::move(lists), Qt::AscendingOrder, kLimit);
+    ASSERT_EQ(result, singleTestVectorTruncated(kLimit));
 }
 
 } // namespace test

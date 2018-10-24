@@ -30,6 +30,7 @@
 #include <nx/mediaserver/analytics/manager.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/mediaserver/resource/camera.h>
+#include <utils/media/utils.h>
 
 using nx::mediaserver::analytics::AbstractVideoDataReceptorPtr;
 
@@ -439,8 +440,7 @@ void QnLiveStreamProvider::onGotVideoFrame(
                 || m_resolutionCheckTimer.elapsed() > PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS);
         if (updateResolutionFromPrimaryStream)
         {
-            QSize newResolution;
-            extractMediaStreamParams(compressedFrame, &newResolution);
+            QSize newResolution = nx::media::getFrameSize(compressedFrame);
             if (newResolution.isValid())
             {
                 updateStreamResolution(compressedFrame->channelNumber, newResolution);
@@ -587,7 +587,7 @@ void QnLiveStreamProvider::updateStreamResolution(int channelNumber, const QSize
     NX_VERBOSE(this) << lm("Updating stream resolution");
 
     m_videoResolutionByChannelNumber[channelNumber] = newResolution;
-    onStreamResolutionChanged( channelNumber, newResolution );
+    onStreamResolutionChanged(channelNumber, newResolution);
 
     if( getRole() == Qn::CR_SecondaryLiveVideo)
         return;
@@ -617,52 +617,6 @@ void QnLiveStreamProvider::updateSoftwareMotionStreamNum()
     m_softMotionRole = Qn::CR_Default;    //it will be auto-detected on the next frame
 }
 
-void QnLiveStreamProvider::extractMediaStreamParams(
-    const QnCompressedVideoDataPtr& videoData,
-    QSize* const newResolution)
-{
-    switch( videoData->compressionType )
-    {
-        case AV_CODEC_ID_H265:
-            if (videoData->width > 0 && videoData->height > 0)
-            {
-                *newResolution = QSize(videoData->width, videoData->height);
-            }
-            else
-            {
-                nx::media_utils::hevc::Sps sps;
-                if (sps.decodeFromVideoFrame(videoData))
-                    *newResolution = QSize(sps.picWidthInLumaSamples, sps.picHeightInLumaSamples);
-            }
-            break;
-        case AV_CODEC_ID_H264:
-            nx::media_utils::h264::extractSpsPps(
-                videoData,
-                (videoData->width > 0 && videoData->height > 0)
-                    ? nullptr   //taking resolution from sps only if video frame does not already contain it
-                    : newResolution);
-
-        case AV_CODEC_ID_MPEG2VIDEO:
-            if( videoData->width > 0 && videoData->height > 0 )
-                *newResolution = QSize( videoData->width, videoData->height );
-            //TODO #ak it is very possible that videoData->width and videoData->height do not change when stream resolution changes and there is no SPS also
-            break;
-
-        case AV_CODEC_ID_MJPEG:
-        {
-            nx_jpg::ImageInfo imgInfo;
-            if( !nx_jpg::readJpegImageInfo( (const quint8*)videoData->data(), videoData->dataSize(), &imgInfo ) )
-                return;
-            *newResolution = QSize( imgInfo.width, imgInfo.height );
-            break;
-        }
-        default:
-            if( videoData->width > 0 && videoData->height > 0 )
-                *newResolution = QSize( videoData->width, videoData->height );
-            break;
-    }
-}
-
 void QnLiveStreamProvider::saveMediaStreamParamsIfNeeded(const QnCompressedVideoDataPtr& videoData)
 {
     ++m_framesSincePrevMediaStreamCheck;
@@ -671,9 +625,7 @@ void QnLiveStreamProvider::saveMediaStreamParamsIfNeeded(const QnCompressedVideo
         return;
     m_framesSincePrevMediaStreamCheck = 0;
 
-    QSize streamResolution;
-    extractMediaStreamParams(videoData, &streamResolution);
-
+    QSize streamResolution = nx::media::getFrameSize(videoData);
     CameraMediaStreamInfo mediaStreamInfo(
         encoderIndex(),
         QSize(streamResolution.width(), streamResolution.height()),
