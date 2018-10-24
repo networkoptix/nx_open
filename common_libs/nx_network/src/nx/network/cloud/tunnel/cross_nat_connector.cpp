@@ -65,8 +65,8 @@ void CrossNatConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     AbstractCrossNatConnector::bindToAioThread(aioThread);
 
-    if (m_mediatorUdpClient)
-        m_mediatorUdpClient->bindToAioThread(aioThread);
+    if (m_connectionMediationInitiator)
+        m_connectionMediationInitiator->bindToAioThread(aioThread);
     m_timer->bindToAioThread(aioThread);
     if (m_cloudConnectorExecutor)
         m_cloudConnectorExecutor->bindToAioThread(aioThread);
@@ -125,7 +125,7 @@ utils::ResultCounter<nx::hpm::api::ResultCode>& CrossNatConnector::mediatorRespo
 
 void CrossNatConnector::stopWhileInAioThread()
 {
-    m_mediatorUdpClient.reset();
+    m_connectionMediationInitiator.reset();
     m_connectResultReportSender.reset();
     m_connection.reset();
     m_timer.reset();
@@ -179,19 +179,11 @@ void CrossNatConnector::issueConnectRequestToMediator()
 {
     NX_ASSERT(isInSelfAioThread());
 
-    if (!m_mediatorUdpClient)
-    {
-        m_mediatorUdpClient =
-            std::make_unique<api::MediatorClientUdpConnection>(
-                m_mediatorAddress->stunUdpEndpoint);
-        m_mediatorUdpClient->bindToAioThread(getAioThread());
-    }
-
-    if (!m_mediatorUdpClient->socket()->setReuseAddrFlag(true) ||
-        !m_mediatorUdpClient->socket()->bind(SocketAddress::anyAddress))
+    auto mediatorUdpClient = prepareForUdpHolePunching();
+    if (!mediatorUdpClient)
     {
         const auto errorCode = SystemError::getLastOSErrorCode();
-        NX_WARNING(this, lm("cross-nat %1. Failed to bind to mediator udp client to local port. %2")
+        NX_WARNING(this, lm("cross-nat %1. Failed to prepare mediator udp client. %2")
             .args(m_connectSessionId, SystemError::getLastOSErrorText()));
         post(
             [this, errorCode]() mutable
@@ -202,29 +194,49 @@ void CrossNatConnector::issueConnectRequestToMediator()
         return;
     }
 
-    m_localAddress = m_mediatorUdpClient->socket()->getLocalAddress();
+    m_localAddress = mediatorUdpClient->socket()->getLocalAddress();
 
     NX_VERBOSE(this, lm("cross-nat %1. Connecting to %2 with timeout %3, from local port %4")
         .args(m_connectSessionId, m_targetPeerAddress.host.toString(),
-            m_connectTimeout, m_mediatorUdpClient->socket()->getLocalAddress().port));
+            m_connectTimeout, m_localAddress.port));
 
     if (m_connectTimeout)
-    {
-        m_timer->start(
-            *m_connectTimeout,
-            std::bind(&CrossNatConnector::onTimeout, this));
-    }
+        m_timer->start(*m_connectTimeout, [this]() { onTimeout(); });
 
     m_connectResultReport.resultCode =
         api::NatTraversalResultCode::noResponseFromMediator;
 
-    m_mediatorUdpClient->connect(
-        prepareConnectRequest(),
+    if (!m_connectionMediationInitiator)
+    {
+        m_connectionMediationInitiator =
+            std::make_unique<ConnectionMediationInitiator>(
+                *m_mediatorAddress,
+                std::move(mediatorUdpClient));
+    }
+
+    m_connectionMediationInitiator->go(
+        prepareConnectRequest(m_localAddress),
         [this](auto&&... args) { onConnectResponse(std::move(args)...); });
 }
 
+std::unique_ptr<hpm::api::MediatorClientUdpConnection> 
+    CrossNatConnector::prepareForUdpHolePunching()
+{
+    auto mediatorUdpClient =
+        std::make_unique<api::MediatorClientUdpConnection>(
+            m_mediatorAddress->stunUdpEndpoint);
+    mediatorUdpClient->bindToAioThread(getAioThread());
+
+    if (!mediatorUdpClient->socket()->setReuseAddrFlag(true) ||
+        !mediatorUdpClient->socket()->bind(SocketAddress::anyAddress))
+    {
+        return nullptr;
+    }
+
+    return mediatorUdpClient;
+}
+
 void CrossNatConnector::onConnectResponse(
-    stun::TransportHeader stunTransportHeader,
     api::ResultCode resultCode,
     api::ConnectResponse response)
 {
@@ -237,12 +249,13 @@ void CrossNatConnector::onConnectResponse(
     if (m_done)
         return;
 
-    m_mediatorAddress->stunUdpEndpoint = stunTransportHeader.locationEndpoint;
+    m_mediatorAddress->stunUdpEndpoint =
+        m_connectionMediationInitiator->mediatorLocation().stunUdpEndpoint;
 
     m_timer->cancelSync();
 
-    auto mediatorClientSocket = m_mediatorUdpClient->takeSocket();
-    m_mediatorUdpClient.reset();
+    auto mediatorClientSocket = m_connectionMediationInitiator->takeUdpSocket();
+    m_connectionMediationInitiator.reset();
 
     if (resultCode != api::ResultCode::ok)
     {
@@ -313,7 +326,7 @@ void CrossNatConnector::onTimeout()
     m_done = true;
 
     // Removing connectors.
-    m_mediatorUdpClient.reset();
+    m_connectionMediationInitiator.reset();
     m_cloudConnectorExecutor.reset();
 
     // Reporting failure.
@@ -401,13 +414,15 @@ void CrossNatConnector::connectSessionReportSent(
     completionHandler(sysErrorCodeToReport, std::move(tunnelConnection));
 }
 
-hpm::api::ConnectRequest CrossNatConnector::prepareConnectRequest() const
+hpm::api::ConnectRequest CrossNatConnector::prepareConnectRequest(
+    const SocketAddress& udpHolePunchingLocalEndpoint) const
 {
     api::ConnectRequest connectRequest;
 
     connectRequest.originatingPeerId = SocketGlobals::cloud().outgoingTunnelPool().ownPeerId();
     connectRequest.connectSessionId = m_connectSessionId.c_str();
-    connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
+    connectRequest.connectionMethods = 
+        api::ConnectionMethod::udpHolePunching | api::ConnectionMethod::proxy;
     connectRequest.destinationHostName = m_targetPeerAddress.host.toString().toUtf8();
     if (m_originatingHostAddressReplacement)
     {
@@ -422,7 +437,7 @@ hpm::api::ConnectRequest CrossNatConnector::prepareConnectRequest() const
     for (const auto& addr: localInterfaceList)
     {
         connectRequest.udpEndpointList.push_back(
-            SocketAddress(addr.address.toString(), m_localAddress.port));
+            SocketAddress(addr.address.toString(), udpHolePunchingLocalEndpoint.port));
     }
 
     return connectRequest;

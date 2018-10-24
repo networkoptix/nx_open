@@ -22,6 +22,7 @@
 #include "abstract_outgoing_tunnel_connection.h"
 #include "abstract_tunnel_connector.h"
 #include "cloud_tunnel_connector_executor.h"
+#include "connection_mediaton_initiator.h"
 
 namespace nx {
 namespace network {
@@ -70,7 +71,7 @@ private:
     const std::string m_connectSessionId;
     ConnectCompletionHandler m_completionHandler;
     std::optional<hpm::api::MediatorAddress> m_mediatorAddress;
-    std::unique_ptr<nx::hpm::api::MediatorClientUdpConnection> m_mediatorUdpClient;
+    std::unique_ptr<ConnectionMediationInitiator> m_connectionMediationInitiator;
     std::optional<QString> m_originatingHostAddressReplacement;
     SocketAddress m_localAddress;
     std::optional<std::chrono::milliseconds> m_connectTimeout;
@@ -94,8 +95,9 @@ private:
 
     void issueConnectRequestToMediator();
 
+    std::unique_ptr<hpm::api::MediatorClientUdpConnection> prepareForUdpHolePunching();
+
     void onConnectResponse(
-        stun::TransportHeader stunTransportHeader,
         nx::hpm::api::ResultCode resultCode,
         nx::hpm::api::ConnectResponse response);
 
@@ -118,7 +120,8 @@ private:
 
     void connectSessionReportSent(SystemError::ErrorCode errorCode);
 
-    hpm::api::ConnectRequest prepareConnectRequest() const;
+    hpm::api::ConnectRequest prepareConnectRequest(
+        const SocketAddress& udpHolePunchingLocalEndpoint) const;
 };
 
 } // namespace cloud
