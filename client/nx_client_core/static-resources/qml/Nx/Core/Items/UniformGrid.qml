@@ -22,9 +22,12 @@ ShaderEffect
     readonly property string shaderVersion:
         OpenGLInfo.renderableType == OpenGLInfo.OpenGLES ? 100 : 120
 
+    readonly property string precisionString:
+        OpenGLInfo.renderableType == OpenGLInfo.OpenGLES ? "precision highp float;" : ""
+
     vertexShader: "
         #version " + shaderVersion + "
-        precision highp float;
+        " + precisionString + "
 
         uniform vec2 cellSize;
         uniform mat4 qt_Matrix;
@@ -41,7 +44,7 @@ ShaderEffect
 
     fragmentShader: "
         #version " + shaderVersion + "
-        precision highp float;
+        " + precisionString + "
 
         uniform vec4 color;
         uniform vec2 lineSizeInCellCoords;
