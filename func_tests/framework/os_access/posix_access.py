@@ -175,13 +175,18 @@ class PosixAccess(OSAccess):
             timeout_sec=timeout_sec)
         return output.decode('ascii')
 
-    def make_fake_disk(self, name, size_bytes):
-        mount_point = self.path_cls('/mnt') / name
-        image_path = mount_point.with_suffix('.image')
+    def _dismount_fake_disk(self, mount_point='/mnt/disk'):
+        try:
+            self.shell.run_command(['umount', mount_point])
+        except exceptions.exit_status_error_cls(1):
+            pass
+
+    def make_fake_disk(self, name, size_bytes, mount_point='/mnt/disk'):
+        self._dismount_fake_disk(mount_point=mount_point)
+        image_path = self.path_cls.tmp() / (name + '.image')
         self.shell.run_sh_script(
             # language=Bash
             '''
-                ! mountpoint "$MOUNT_POINT" || umount "$MOUNT_POINT"
                 rm -fv "$IMAGE"
                 fallocate --length $SIZE "$IMAGE"
                 mke2fs -F "$IMAGE"  # Make default filesystem for OS.
@@ -189,7 +194,7 @@ class PosixAccess(OSAccess):
                 mount "$IMAGE" "$MOUNT_POINT"
                 ''',
             env={'MOUNT_POINT': mount_point, 'IMAGE': image_path, 'SIZE': size_bytes})
-        return mount_point
+        return self.path_cls(mount_point)
 
     def _fs_root(self):
         return self.path_cls('/')

@@ -151,16 +151,32 @@ class WindowsAccess(OSAccess):
             )
         return output.decode('ascii')
 
+    def _dismount_fake_disk(self, letter='V'):
+        try:
+            self.winrm.command(['MountVol', letter + ':', '/D']).run(timeout_sec=5)
+        except exceptions.exit_status_error_cls(1):
+            pass
+
     def make_fake_disk(self, name, size_bytes, letter='V', image_dir='C:\\', partition_style='MBR'):
-        size_mb = int(math.ceil(size_bytes / 1024 / 1024))
+        """Make virtual disk and mount it.
+        When Windows 7 is not supported, move to Windows Storage Management Provider.
+        See: https://docs.microsoft.com/en-us/previous-versions/windows/desktop/stormgmt/windows-storage-management-api-portal
+        """
+        self._dismount_fake_disk(letter=letter)
+        free_space_mb = int(math.ceil(size_bytes / 1024 / 1024))
+        volume_mb = free_space_mb + 15  # 15 MB is for System Volume Information.
+        partition_mb = volume_mb + 1  # 1 MB for filesystem.
+        disk_mb = partition_mb + 2  # 1 MB is for MBR/GPT headers.
         image_path = self.path_cls(image_dir) / '{}.vhdx'.format(name)
         script_template = (
-            'CREATE VDISK file={image_path} MAXIMUM={size_mb} NOERR' '\r\n'  # NOERR if exists.
+            'CREATE VDISK file={image_path} MAXIMUM={disk_mb} NOERR' '\r\n'  # NOERR if exists.
             'SELECT VDISK file={image_path}' '\r\n'  # No error if already selected.
-            'ATTACH VDISK NOERR' '\r\n'  # NOERR if attached. "Disk" of "vdisk" has been selected.
+            'DETACH VDISK NOERR' '\r\n'  # NOERR if attached.
+            'EXPAND VDISK maximum={disk_mb} NOERR' '\r\n'  # NOERR if requested size is less.
+            'ATTACH VDISK' '\r\n'  # NOERR if attached. "Disk" of "vdisk" has been selected.
             'CLEAN' '\r\n'  # Removes letter, wipes partition table.
             'CONVERT {partition_style}' '\r\n'
-            'CREATE PARTITION PRIMARY' '\r\n'  # New partition and its volume have been selected.
+            'CREATE PARTITION PRIMARY size={partition_mb}' '\r\n'  # New partition and its volume have been selected.
             'FORMAT' '\r\n'  # Filesystem is default (NTFS).
             'ASSIGN LETTER={letter}' '\r\n'
             'EXIT' '\r\n'
@@ -168,7 +184,8 @@ class WindowsAccess(OSAccess):
         script = script_template.format(
             image_path=image_path,
             letter=letter,
-            size_mb=size_mb,
+            partition_mb=partition_mb,
+            disk_mb=disk_mb,
             partition_style=partition_style)
         _logger.debug('Diskpart script:\n%s', script)
         # With script file, `diskpart` exits with non-zero code.
@@ -177,7 +194,7 @@ class WindowsAccess(OSAccess):
         # Error originate in VDS -- Virtual Disk Service.
         # See: https://msdn.microsoft.com/en-us/library/dd208031.aspx.
         command = self.winrm.command(['diskpart', '/s', script_path])
-        command.run(timeout_sec=10 + 0.05 * size_mb)
+        command.run(timeout_sec=10 + 0.05 * free_space_mb)
         return self.path_cls('{letter}:\\'.format(letter=letter))
 
     def _fs_root(self):

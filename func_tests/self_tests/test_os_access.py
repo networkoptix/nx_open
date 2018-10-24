@@ -57,14 +57,12 @@ def test_disk_space_limit_twice(os_access):
     assert os_access.free_disk_space_bytes() == pytest.approx(before, rel=0.01)
 
 
-@pytest.xfail("Bug in make_fake_disk.")
 def test_fake_disk(os_access):
     size = 500 * 1000 * 1000
     mount_point = os_access.make_fake_disk('test', size)
     assert os_access._free_disk_space_bytes_on_all()[mount_point] == pytest.approx(size, rel=0.15)
 
 
-@pytest.xfail("Bug in make_fake_disk.")
 def test_fake_disk_twice_same_name(os_access):
     size_1 = 500 * 1000 * 1000
     mount_point_1 = os_access.make_fake_disk('test', size_1)
@@ -75,7 +73,6 @@ def test_fake_disk_twice_same_name(os_access):
     assert mount_point_2 == mount_point_1
 
 
-@pytest.xfail("Bug in make_fake_disk.")
 def test_fake_disk_twice_different_names(os_access):
     size_1 = 500 * 1000 * 1000
     mount_point_1 = os_access.make_fake_disk('test', size_1)
