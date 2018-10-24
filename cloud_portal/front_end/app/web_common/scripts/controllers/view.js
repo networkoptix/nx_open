@@ -228,6 +228,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         };
 
         function updateVideoSource(playingPosition) {
+            
             if (!$scope.activeCamera ||
                 $scope.activeCamera.status === 'Unauthorized') {
 
@@ -525,6 +526,11 @@ angular.module('nxCommon').controller('ViewCtrl',
         });
 
         timeManager.init(Config.webclient.useServerTime);
+    
+        function isActive(val) {
+            var currentPath = $location.path();
+            return currentPath.indexOf(val) >= 0;
+        }
 
         systemAPI.checkPermissions(Config.globalViewArchivePermission).then(function(result){
             $scope.canViewArchive = result;
@@ -533,7 +539,9 @@ angular.module('nxCommon').controller('ViewCtrl',
             // instead of requesting gettime once - we request it for all servers to know each timezone
             return $scope.camerasProvider.getServerTimes();
         }).then(function(){
-            $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);
+            if (!isActive('embed') && $scope.activeCamera.id !== $scope.storage.cameraId) {
+                $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);
+            }
             $scope.ready = true;
             $timeout(updateHeights);
             $scope.camerasProvider.startPoll();

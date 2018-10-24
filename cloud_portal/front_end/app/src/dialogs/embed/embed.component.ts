@@ -67,7 +67,7 @@ export class EmbedModalContent {
             }
         }
 
-        uri += '&' + btoa(params.login_email + ':' + params.login_password);
+        uri += '&auth=' + btoa(params.login_email + ':' + params.login_password);
 
         this.embedUrl = '<iframe ' +
                             'src = "' + url + uri + '" >' +

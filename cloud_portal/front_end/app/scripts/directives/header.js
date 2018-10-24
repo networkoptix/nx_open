@@ -13,6 +13,11 @@
                       systemsProvider, configService, $rootScope) {
 
         const CONFIG = configService.config;
+    
+        function isActive(val) {
+            var currentPath = $location.path();
+            return currentPath.indexOf(val) >= 0;
+        }
 
         return {
             restrict   : 'E',
@@ -22,6 +27,10 @@
                 scope.inline = typeof($location.search().inline) !== 'undefined';
 
                 scope.viewHeader = CONFIG.showHeaderAndFooter;
+                
+                if (!isActive('/embed')) {
+                    scope.viewHeader = false;
+                }
 
                 $rootScope.$on('nx.layout.header', function (event, opt) {
                     // An event to control visibility of the header
@@ -41,20 +50,6 @@
                 };
 
                 scope.systemsProvider = systemsProvider;
-                scope.$watch('systemsProvider.systems', function () {
-                    scope.systems = scope.systemsProvider.systems;
-                    scope.singleSystem = (scope.systems.length === 1);
-                    scope.systemCounter = scope.systems.length;
-
-                    updateActiveSystem();
-                });
-
-
-                function isActive(val) {
-                    var currentPath = $location.path();
-                    return currentPath.indexOf(val) >= 0;
-                }
-
                 scope.active = {};
                 // scope.activeSystem = {};
 
@@ -101,7 +96,14 @@
                     updateActiveSystem();
                     updateActive();
                 });
-
+    
+                scope.$watch('systemsProvider.systems', function () {
+                    scope.systems = scope.systemsProvider.systems;
+                    scope.singleSystem = (scope.systems.length === 1);
+                    scope.systemCounter = scope.systems.length;
+        
+                    updateActiveSystem();
+                });
             }
         };
     }
