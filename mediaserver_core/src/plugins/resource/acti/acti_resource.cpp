@@ -31,7 +31,7 @@ const QString QnActiResource::ADVANCED_PARAMETERS_TEMPLATE_PARAMETER_NAME(lit("a
 
 namespace {
 
-const int TCP_TIMEOUT = 8000; //< TODO: Check if there is some common value (in config, etc).
+const std::chrono::milliseconds kTcpTimeout(8000);
 const int DEFAULT_RTSP_PORT = 7070;
 int actiEventPort = 0;
 int DEFAULT_AVAIL_BITRATE_KBPS[] = { 28, 56, 128, 256, 384, 500, 750, 1000, 1200, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000 };
@@ -199,7 +199,8 @@ CLHttpStatus QnActiResource::makeActiRequest(
     client.setAuthType(nx::network::http::AuthType::authDigest);
     client.setUserName(auth.user());
     client.setUserPassword(auth.password());
-    // TODO: add timeouts to requests
+    client.setSendTimeout(kTcpTimeout);
+    client.setResponseReadTimeout(kTcpTimeout);
 
     const nx::utils::Url requestUrl = nx::network::url::Builder()
         .setScheme(nx::network::http::kUrlSchemeName)
@@ -212,14 +213,14 @@ CLHttpStatus QnActiResource::makeActiRequest(
     NX_VERBOSE(logTag, "makeActiRequest: request '%1'.", requestUrl);
     const bool result = client.doGet(requestUrl);
     if (!result)  //< It seems that HttpClient will log error by itself.
-        return CL_HTTP_BAD_REQUEST;  // TODO: Try to find better return-value.
+        return CL_HTTP_BAD_REQUEST;
 
     auto messageBodyOptional = client.fetchEntireMessageBody();
     if (!messageBodyOptional.has_value())
     {
         NX_INFO(logTag, "makeActiRequest: Error getting response body.");
         msgBody->clear();
-        return CL_HTTP_BAD_REQUEST; // TODO: Try to find better return-value.
+        return CL_HTTP_BAD_REQUEST;
     }
     *msgBody = std::move(*messageBodyOptional);
 
@@ -240,7 +241,7 @@ CLHttpStatus QnActiResource::makeActiRequest(
 
     if (!keepAllData)
         *msgBody = unquoteStr(msgBody->mid(msgBody->indexOf('=')+1).trimmed());
-    return CLHttpStatus(statusCode); // TODO: try to change to nx::network::http::StatusCode
+    return CLHttpStatus(statusCode);
 }
 
 static bool resolutionGreaterThan(const QSize &s1, const QSize &s2)
@@ -773,7 +774,6 @@ void QnActiResource::startInputPortStatesMonitoring()
             eventStr += lit("&");
         eventStr += lit("EVENT_DI%1='0,0'").arg(i+1);
     }
-    // TODO: check it
     // Determining address of local interface used to connect to camera.
     QString localInterfaceAddress;
     QByteArray responseMsgBody = makeActiRequest(QLatin1String("encoder"), eventStr,

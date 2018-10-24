@@ -5,8 +5,6 @@
 namespace {
 
 const std::chrono::seconds kDefaultCacheExpirationTime(300); //< 5 minutes
-const QString kActiUserParameterName = lit("USER");
-const QString kActiPasswordParamterName = lit("PWD");
 const QString kActiSystemInfoParameterName = lit("SYSTEM_INFO");
 
 const std::chrono::milliseconds kActiSystemInfoRequestSendTimeout(4000);
@@ -128,17 +126,14 @@ void QnActiSystemInfoChecker::tryToGetSystemInfoWithGivenAuthUnsafe(const QAuthe
     initHttpClientIfNeededUnsafe();
 
     nx::utils::Url requestUrl = m_baseUrl;
-    requestUrl.setPath(lit("/cgi-bin/system"));
-
-    QUrlQuery query;
-    query.addQueryItem(kActiUserParameterName, auth.user());
-    query.addQueryItem(kActiPasswordParamterName, auth.password());
-    query.addQueryItem(kActiSystemInfoParameterName, QString());
-
-    requestUrl.setQuery(query);
+    requestUrl.setPath(lit("/cgi-bin/cmd/system"));
+    requestUrl.setUserName(auth.user());
+    requestUrl.setPassword(auth.password());
+    requestUrl.setQuery(kActiSystemInfoParameterName);
 
     m_currentAuth = auth;
 
+    NX_VERBOSE(this, "tryToGetSystemInfoWithGivenAuthUnsafe: request '%1'", requestUrl);
     m_httpClient->doGet(requestUrl);
 }
 
@@ -162,38 +157,28 @@ QAuthenticator QnActiSystemInfoChecker::getNextAuthToCheckUnsafe()
 void QnActiSystemInfoChecker::handleSystemInfoResponse(nx::network::http::AsyncHttpClientPtr httpClient)
 {
     if (httpClient->state() != nx::network::http::AsyncClient::State::sDone)
-    {
-        handleFail();
-        return;
-    }
+        return handleFail();
 
     auto response = httpClient->response();
     if (!response || response->statusLine.statusCode != nx::network::http::StatusCode::ok)
-    {
-        handleFail();
-        return;
-    }
+        return handleFail();
 
     auto&& systemInfo = QnActiResource::parseSystemInfo(httpClient->fetchMessageBodyBuffer());
-    if(systemInfo.isEmpty())
-    {
-        handleFail();
-        return;
-    }
+    if (systemInfo.isEmpty())
+        return handleFail();
 
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_cycleIsInProgress = false;
-        m_failed = false;
-        m_lastSuccessfulAuth = m_currentAuth;
-        m_systemInfo = systemInfo;
-        m_cacheExpirationTimer.restart();
-    }
+    QnMutexLocker lock(&m_mutex);
+    m_cycleIsInProgress = false;
+    m_failed = false;
+    m_lastSuccessfulAuth = m_currentAuth;
+    m_systemInfo = systemInfo;
+    m_cacheExpirationTimer.restart();
 }
 
 void QnActiSystemInfoChecker::handleFail()
 {
     QnMutexLocker lock(&m_mutex);
+    NX_DEBUG(this, "%1 request failed.", kActiSystemInfoParameterName);
     if (isLastCheckInCycleUnsafe())
     {
         m_cycleIsInProgress = false;
