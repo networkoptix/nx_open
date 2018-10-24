@@ -40,7 +40,7 @@ def _expect_poll_output(title, expected_values, process, parse_output):
         return
 
     try:
-        actual_values = parse_output(stdout.decode('utf-8').trimmed())
+        actual_values = parse_output(stdout.decode('utf-8').strip())
     except Exception as error:
         _logger.debug('Process pid=%s -- parsing error: %s', process.pid, traceback.format_exc())
         yield Halt('{!r} -- parsing error: {!s}'.format(title, error))
