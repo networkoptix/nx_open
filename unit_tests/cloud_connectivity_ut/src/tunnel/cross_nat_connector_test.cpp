@@ -112,6 +112,7 @@ void TunnelConnector::cancellationTest()
     while (std::chrono::steady_clock::now() - t1 < totalTestTime)
     {
         CrossNatConnector connector(
+            &SocketGlobals::cloud(),
             nx::network::SocketAddress((server->serverId() + "." + system.id).constData()));
 
         connector.connect(
@@ -147,6 +148,7 @@ void TunnelConnector::doSimpleConnectTest(
 
     nx::utils::promise<ConnectResult> connectedPromise;
     CrossNatConnector connector(
+        &SocketGlobals::cloud(),
         nx::network::SocketAddress((server->serverId() + "." + system.id).constData()),
         mediatorAddress);
     auto connectorGuard = nx::utils::makeScopeGuard(

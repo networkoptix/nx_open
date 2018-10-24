@@ -143,6 +143,7 @@ TEST_F(UdpTunnelConnector, connecting_peer_in_the_same_lan_as_mediator)
 
     nx::utils::promise<ConnectResult> connectedPromise;
     CrossNatConnector connector(
+        &SocketGlobals::cloud(),
         nx::network::SocketAddress((server1->serverId() + "." + system1.id).constData()));
     connector.replaceOriginatingHostAddress("192.168.0.1");
 
@@ -160,12 +161,13 @@ TEST_F(UdpTunnelConnector, connecting_peer_in_the_same_lan_as_mediator)
         connectionRequestedFuture.wait_for(std::chrono::seconds(7)));
 
     const auto connectionRequestedEvent = connectionRequestedFuture.get();
+    const auto localUdpHolePunchingEndpoint =
+        SocketAddress(HostAddress("192.168.0.1"), connector.localUdpHolePunchingEndpoint().port);
     ASSERT_TRUE(
         std::find(
             connectionRequestedEvent.udpEndpointList.begin(),
             connectionRequestedEvent.udpEndpointList.end(),
-            nx::network::SocketAddress(nx::network::HostAddress("192.168.0.1"), connector.localAddress().port)) !=
-        connectionRequestedEvent.udpEndpointList.end());
+            localUdpHolePunchingEndpoint) != connectionRequestedEvent.udpEndpointList.end());
 
     connector.pleaseStopSync();
 }
