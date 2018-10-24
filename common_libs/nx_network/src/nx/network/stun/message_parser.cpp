@@ -35,7 +35,6 @@ void MessageParser::reset()
     m_header.transactionId.resize(Header::TRANSACTION_ID_SIZE);
 
     m_attribute = {};
-    m_outputMessage = nullptr;
     m_leftMessageLength = 0;
     m_state = HEADER_INITIAL_AND_TYPE;
 }
