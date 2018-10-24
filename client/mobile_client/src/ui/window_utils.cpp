@@ -54,7 +54,6 @@ QWindow *getMainWindow()
         qWarning() << "short vibration ";
     }
 
-
 #endif // !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
 
 #if !defined(Q_OS_ANDROID)
