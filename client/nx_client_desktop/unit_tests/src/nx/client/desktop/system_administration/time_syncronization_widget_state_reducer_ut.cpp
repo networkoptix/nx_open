@@ -24,7 +24,6 @@ TEST_F(TimeSynchronizationWidgetReducerTest, synchronizedWithInternet)
 {
     const auto s = Reducer::initialize(State(),
         /*isTimeSynchronizationEnabled*/ true,
-        /*syncWithInternet*/ true,
         /*primaryTimeServer*/ QnUuid(),
         /*servers*/ {server()});
 

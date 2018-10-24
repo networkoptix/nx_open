@@ -5,15 +5,17 @@ namespace nx::client::desktop {
 TimeSynchronizationWidgetReducer::State TimeSynchronizationWidgetReducer::initialize(
     State state,
     bool isTimeSynchronizationEnabled,
-    bool syncWithInternet,
     const QnUuid& primaryTimeServer,
     const QList<State::ServerInfo>& servers)
 {
     state.enabled = isTimeSynchronizationEnabled;
-    state.syncTimeWithInternet = syncWithInternet;
     state.primaryServer = primaryTimeServer;
-    state.hasChanges = false;
+    state.servers = servers;
 
+    // Actualize primary time server against servers list.
+    state.primaryServer = state.actualPrimaryServer();
+    state.lastPrimaryServer = state.primaryServer;
+    state.hasChanges = false;
 
     return state;
 }
@@ -32,11 +34,30 @@ TimeSynchronizationWidgetReducer::State TimeSynchronizationWidgetReducer::setSyn
     State state,
     bool value)
 {
-    if (value != state.syncTimeWithInternet)
+    if (value == state.syncTimeWithInternet())
+        return state;
+
+    if (value)
     {
-        state.syncTimeWithInternet = value;
-        state.hasChanges = true;
+        state.enabled = true;
+        state.primaryServer = QnUuid();
     }
+    else if (state.servers.size() == 1)
+    {
+        state.enabled = true;
+        state.primaryServer = state.servers.first().id;
+    }
+    else if (!state.lastPrimaryServer.isNull())
+    {
+        state.enabled = true;
+        state.primaryServer = state.lastPrimaryServer;
+    }
+    else
+    {
+        state.enabled = false;
+        state.primaryServer = QnUuid();
+    }
+    state.hasChanges = true;
     return state;
 }
 

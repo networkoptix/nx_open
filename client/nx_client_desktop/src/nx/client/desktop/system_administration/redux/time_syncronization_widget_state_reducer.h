@@ -12,7 +12,6 @@ public:
     static State initialize(
         State state,
         bool isTimeSynchronizationEnabled,
-        bool syncWithInternet,
         const QnUuid& primaryTimeServer,
         const QList<State::ServerInfo>& servers);
 

@@ -50,7 +50,6 @@ const TimeSynchronizationWidgetState& TimeSynchronizationWidgetStore::state() co
 
 void TimeSynchronizationWidgetStore::initialize(
     bool isTimeSynchronizationEnabled,
-    bool syncWithInternet,
     const QnUuid& primaryTimeServer,
     const QList<State::ServerInfo>& servers)
 {
@@ -60,7 +59,6 @@ void TimeSynchronizationWidgetStore::initialize(
             return Reducer::initialize(
                 std::move(state),
                 isTimeSynchronizationEnabled,
-                syncWithInternet,
                 primaryTimeServer,
                 servers);
         });

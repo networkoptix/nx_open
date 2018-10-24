@@ -21,7 +21,6 @@ public:
 
     void initialize(
         bool isTimeSynchronizationEnabled,
-        bool syncWithInternet,
         const QnUuid& primaryTimeServer,
         const QList<State::ServerInfo>& servers);
 

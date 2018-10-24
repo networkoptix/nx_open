@@ -23,8 +23,10 @@ struct TimeSynchronizationWidgetState
     bool readOnly = false;
 
     bool enabled = true;
-    bool syncTimeWithInternet = true;
     QnUuid primaryServer;
+
+    // Previous selected time server.
+    QnUuid lastPrimaryServer;
 
     std::chrono::milliseconds vmsTime = std::chrono::milliseconds(0);
     Status status = Status::synchronizedWithInternet;
@@ -43,9 +45,14 @@ struct TimeSynchronizationWidgetState
     };
     QList<ServerInfo> servers;
 
+    bool syncTimeWithInternet() const
+    {
+        return enabled && primaryServer.isNull();
+    }
+
     QnUuid actualPrimaryServer() const
     {
-        if (!enabled || syncTimeWithInternet || primaryServer.isNull())
+        if (!enabled)
             return QnUuid();
 
         if (std::any_of(servers.cbegin(), servers.cend(),

@@ -124,7 +124,6 @@ void TimeSynchronizationWidget::loadDataToUi()
 
     m_store->initialize(
         qnGlobalSettings->isTimeSynchronizationEnabled(),
-        qnGlobalSettings->isSynchronizingTimeWithInternet(),
         qnGlobalSettings->primaryTimeServer(),
         servers);
 }
@@ -137,7 +136,6 @@ void TimeSynchronizationWidget::applyChanges()
     const auto& state = m_store->state();
 
     qnGlobalSettings->setTimeSynchronizationEnabled(state.enabled);
-    qnGlobalSettings->setSynchronizingTimeWithInternet(state.syncTimeWithInternet);
     qnGlobalSettings->setPrimaryTimeServer(state.actualPrimaryServer());
     qnGlobalSettings->synchronizeNow();
 }
@@ -192,7 +190,7 @@ void TimeSynchronizationWidget::loadState(const TimeSynchronizationWidgetState& 
             ? ui->placeholderPage
             : ui->serversTablePage);
 
-    ui->syncWithInternetCheckBox->setChecked(state.syncTimeWithInternet);
+    ui->syncWithInternetCheckBox->setChecked(state.syncTimeWithInternet());
     setReadOnly(ui->syncWithInternetCheckBox, state.readOnly);
 
 
