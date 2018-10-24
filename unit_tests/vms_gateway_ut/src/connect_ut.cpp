@@ -13,7 +13,7 @@ namespace gateway {
 namespace test {
 
 
-const constexpr int kTimeoutMsec = 5000;
+const constexpr std::chrono::milliseconds kTimeoutMsec(5000);
 const QByteArray successResponse = "HTTP/1.1 200 OK\r\n";
 
 class VmsGatewayConnectTest:
@@ -35,7 +35,7 @@ public:
         const QByteArray &connectResponse = successResponse)
     {
         socket = std::make_unique<network::TCPSocket>();
-        socket->setRecvTimeout(kTimeoutMsec);
+        socket->setRecvTimeout(kTimeoutMsec.count());
 
         // Connect to proxy.
         ASSERT_TRUE(socket->connect(endpoint(), std::chrono::milliseconds(kTimeoutMsec)))
