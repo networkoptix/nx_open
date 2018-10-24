@@ -22,13 +22,13 @@ import * as angular from 'angular';
                     return cloudApi
                         .systems()
                         .then(result => {
-                            return this.systems = this.sortSystems(result.data);
+                            this.systems = this.sortSystems(result.data);
                         });
                 };
 
                 this.delayedUpdateSystems = function () {
                     this.pollingSystemsUpdate = $poll(() => {
-                        this.forceUpdateSystems();
+                        return this.forceUpdateSystems();
                     }, CONFIG.updateInterval);
                 };
 
