@@ -138,7 +138,7 @@ class CIMQuery(object):
         def _pull():
             _logger.debug("Continue enumerating %s where %r", self.cim_class, self.selectors)
             assert enumeration_context[0] is not None
-            assert not self.is_ended
+            assert not enumeration_is_ended[0]
             action = 'http://schemas.xmlsoap.org/ws/2004/09/enumeration/Pull'
             body = {
                 'n:Pull': {
@@ -147,8 +147,8 @@ class CIMQuery(object):
                     }
                 }
             response = self._perform_action(action, body)
-            self.is_ended = 'n:EndOfSequence' in response['n:PullResponse']
-            enumeration_context[0] = None if self.is_ended else response['n:PullResponse']['n:EnumerationContext']
+            enumeration_is_ended[0] = 'n:EndOfSequence' in response['n:PullResponse']
+            enumeration_context[0] = None if enumeration_is_ended[0] else response['n:PullResponse']['n:EnumerationContext']
             items = response['n:PullResponse']['n:Items']['w:Item']
             return _pick_objects(items)
 
