@@ -6,7 +6,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
-#include <nx/vms/event/analytics_helper.h>
 
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/analytics/descriptor_list_manager.h>

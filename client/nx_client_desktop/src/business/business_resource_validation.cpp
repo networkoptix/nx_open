@@ -21,7 +21,6 @@
 #include <core/resource_access/resource_access_manager.h>
 
 #include <nx/vms/api/analytics/engine_manifest.h>
-#include <nx/vms/event/analytics_helper.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/analytics/descriptor_list_manager.h>
 

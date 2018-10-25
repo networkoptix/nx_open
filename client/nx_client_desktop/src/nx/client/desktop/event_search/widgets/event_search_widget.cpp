@@ -17,7 +17,6 @@
 #include <nx/client/desktop/event_search/models/event_search_list_model.h>
 #include <nx/utils/string.h>
 #include <nx/vms/event/event_fwd.h>
-#include <nx/vms/event/analytics_helper.h>
 #include <nx/vms/event/strings_helper.h>
 
 #include <nx/analytics/descriptor_list_manager.h>

@@ -31,7 +31,6 @@
 #include <nx/utils/datetime.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/pending_operation.h>
-#include <nx/vms/event/analytics_helper.h>
 
 #include <common/common_module.h>
 #include <nx/analytics/descriptor_list_manager.h>

@@ -6,7 +6,6 @@
 #include <core/resource/media_server_resource.h>
 
 #include <nx/vms/api/analytics/manifest_items.h>
-#include <nx/vms/event/analytics_helper.h>
 
 #include <nx/analytics/descriptor_list_manager.h>
 #include <nx/vms/api/analytics/descriptors.h>

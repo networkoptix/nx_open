@@ -22,7 +22,6 @@
 
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
-#include <nx/vms/event/analytics_helper.h>
 
 #include <client/client_globals.h>
 #include <client/client_settings.h>

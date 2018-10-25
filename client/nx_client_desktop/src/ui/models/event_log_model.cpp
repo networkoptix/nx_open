@@ -9,7 +9,6 @@
 
 #include <nx/vms/event/events/reasoned_event.h>
 #include <nx/vms/event/strings_helper.h>
-#include <nx/vms/event/analytics_helper.h>
 
 #include <common/common_module.h>
 #include <translation/datetime_formatter.h>
