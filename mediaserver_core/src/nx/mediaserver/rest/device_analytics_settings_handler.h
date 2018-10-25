@@ -3,10 +3,17 @@
 #include <type_traits>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/camera_resource.h>
 #include <rest/server/json_rest_handler.h>
+#include <api/helpers/camera_id_helper.h>
+#include <media_server/media_server_module.h>
 
 #include <nx/mediaserver/resource/resource_fwd.h>
 #include <nx/mediaserver/server_module_aware.h>
+#include <nx/mediaserver/sdk_support/utils.h>
+#include <nx/mediaserver/rest/parameter_names.h>
+#include <nx/mediaserver/rest/utils.h>
 
 #include <nx/utils/std/optional.h>
 #include <nx/utils/log/log.h>
@@ -43,10 +50,7 @@ private:
         }
 
         constexpr bool isQVariant =
-            std::is_same_v<
-                std::remove_cv_t<
-                std::remove_reference_t<T::mapped_type>>,
-            QVariant>;
+            std::is_same_v<typename T::mapped_type, QVariant>;
 
         QString deviceId;
         QString engineId;

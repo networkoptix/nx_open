@@ -51,9 +51,10 @@ inline QnMediaServerResourcePtr server(
 
 // TODO: #dmishin make generic getter for supported ids
 template<typename T>
-std::set<QString> descriptorIds(const QnVirtualCameraResourcePtr& device)
+std::set<QString> descriptorIds(const QnVirtualCameraResourcePtr& /*device*/)
 {
-    static_assert(false);
+    static_assert(sizeof(T) < 0, "Method is allowed only for event and object type descriptors");
+    return std::set<QString>();
 }
 
 template<>
@@ -86,7 +87,7 @@ public:
     {
         // TODO: #dmishin need to be moved to server side
         QnMutexLocker lock(&m_mutex);
-        return descriptorsUnsafe<Descriptor>(moduleGUID());
+        return descriptorsUnsafe<Descriptor>(commonModule()->moduleGUID());
     }
 
     template<typename Descriptor>

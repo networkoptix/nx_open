@@ -1,14 +1,5 @@
 #include "device_analytics_settings_handler.h"
-#include "parameter_names.h"
-#include "utils.h"
 
-#include <core/resource/camera_resource.h>
-
-#include <api/helpers/camera_id_helper.h>
-#include <media_server/media_server_module.h>
-#include <core/resource_management/resource_pool.h>
-
-#include <nx/mediaserver/sdk_support/utils.h>
 #include <nx/mediaserver/analytics/manager.h>
 #include <nx/mediaserver/interactive_settings/json_engine.h>
 
