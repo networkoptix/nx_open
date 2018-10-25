@@ -473,33 +473,28 @@ class ProductCustomizationReview(models.Model):
     def __str__(self):
         return self.version.product.__str__()
 
-    def accepted_by_parent(self):
-        children_customizatons_ids = self.customization.get_children_ids(self.customization)
-        reviews = self.version.productcustomizationreview_set.exclude(customization__name=self.customization).\
-            filter(customization__id__in=children_customizatons_ids)
-        parent_review = self.version.productcustomizationreview_set.get(customization__name=self.customization)
+    def update_children_reviews(self):
+        reviews = self.version.productcustomizationreview_set.\
+            filter(customization__in=self.customization.customization_set.all())
 
         for review in reviews:
-            review.reviewed_by = parent_review.reviewed_by
-            review.reviewed_date = parent_review.reviewed_date
-            review.state = ProductCustomizationReview.REVIEW_STATES.pending
-            if review.customization.trust_parent:
-                review.state = ProductCustomizationReview.REVIEW_STATES.accepted
-                review.note = "Accepted by parent"
-            review.save()
+            review.reviewed_by = self.reviewed_by
+            review.reviewed_date = self.reviewed_date
+            review.state = self.state
 
-    def rejected_by_parent(self):
-        children_customizatons_ids = self.customization.get_children_ids(self.customization)
-        reviews = self.version.productcustomizationreview_set.exclude(customization__name=self.customization). \
-            filter(customization__id__in=children_customizatons_ids)
-        parent_review = self.version.productcustomizationreview_set.get(customization__name=self.customization)
+            if review.state == ProductCustomizationReview.REVIEW_STATES.accepted:
+                if review.customization.trust_parent:
+                    review.notes = "Accepted by parent"
+                else:
+                    review.state = ProductCustomizationReview.REVIEW_STATES.pending
+                    review.reviewed_by = None
+                    review.reviewed_date = None
+            else:
+                review.notes = "Rejected by parent"
 
-        for review in reviews:
-            review.reviewed_by = parent_review.reviewed_by
-            review.reviewed_date = parent_review.reviewed_date
-            review.notes = "Rejected by parent"
-            review.state = ProductCustomizationReview.REVIEW_STATES.rejected
             review.save()
+            if review.state == ProductCustomizationReview.REVIEW_STATES.rejected or review.customization.trust_parent:
+                review.update_children_reviews()
 
 
 class ExternalFile(models.Model):

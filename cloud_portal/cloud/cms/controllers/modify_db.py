@@ -29,10 +29,7 @@ def update_draft_state(review_id, target_state, user):
     review.state = target_state
     review.save()
 
-    if target_state == ProductCustomizationReview.REVIEW_STATES.accepted:
-        review.accepted_by_parent()
-    elif target_state == ProductCustomizationReview.REVIEW_STATES.rejected:
-        review.rejected_by_parent()
+    review.update_children_reviews()
 
     return None
 
