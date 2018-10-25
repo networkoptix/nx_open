@@ -3,9 +3,10 @@
 import json
 import logging
 import subprocess
+import traceback
 from datetime import timedelta
 
-from framework.utils import Timer
+from framework.waiting import Timer
 from .checks import Success, Halt, Failure, expect_values
 
 _logger = logging.getLogger(__name__)
@@ -24,7 +25,7 @@ def fps_avg(fps):
 def _expect_poll_output(title, expected_values, process, parse_output):
     timer = Timer()
     while process.poll() is None:
-        if timer.duration > timedelta(seconds=30):
+        if timer.from_start > timedelta(seconds=30):
             yield Halt('{!r} -- has timed out'.format(title))
             return
         yield Halt('{!r} -- is in progress'.format(title))
@@ -35,10 +36,16 @@ def _expect_poll_output(title, expected_values, process, parse_output):
     if stderr:
         _logger.debug('Process pid=%s -- stderr:\n%s', process.pid, stderr)
     if process.returncode != 0 and process.returncode != 124:  # 0 - success, 124 - timeout.
-        yield Halt('{!r} -- returned error code {}'.format(title, process.returncode))
+        yield Halt('{!r} -- returned error code: {}'.format(title, process.returncode))
         return
 
-    yield expect_values(expected_values, parse_output(stdout), path=title)
+    try:
+        actual_values = parse_output(stdout.decode('utf-8').strip())
+    except Exception as error:
+        _logger.debug('Process pid=%s -- parsing error: %s', process.pid, traceback.format_exc())
+        yield Halt('{!r} -- parsing error: {!s}'.format(title, error))
+    else:
+        yield expect_values(expected_values, actual_values, path=title)
 
 
 def _expect_command_output(title, expected_values, parse_output, command, rerun_count=1000):
@@ -67,34 +74,26 @@ def _expect_command_output(title, expected_values, parse_output, command, rerun_
 
 
 def _ffprobe_extract_video(output):
-    streams = (json.loads(output.decode('utf-8')) or {}).get('streams')
-    if not streams:
-        return None
-    stream = streams[0]
-    fps_count, fps_base = stream['r_frame_rate'].split('/')
-    return {
-        'resolution': '{}x{}'.format(stream['width'], stream['height']),
-        'codec': stream['codec_name'].upper(),
-        'fps': float(fps_count) / float(fps_base),
-    }
+    stream = json.loads(output)['streams'][0]
+    return dict(resolution='{width}x{height}'.format(**stream), codec=stream['codec_name'].upper())
 
 
 def _ffprobe_extract_fps(output):
-    frames = json.loads((output + ']}').decode('utf-8')).get('frames')
-    if not frames:
-        return None
-    return {'fps': len(frames) / float(frames[-1]['pkt_pts_time'])}
+    if output.count('[') > output.count(']'):
+        output += ']'
+    if output.count('{') > output.count('}'):
+        output += '}'
+    frames = json.loads(output)['frames']
+    return dict(fps=len(frames) / float(frames[-1]['pkt_pts_time']))
 
 
 def _ffprobe_extract_audio(output):
-    streams = (json.loads(output.decode('utf-8')) or {}).get('streams')
-    if not streams:
-        return None
-    stream = streams[0]
-    return {'codec': stream.get('codec_name').upper()}
+    streams = json.loads(output)['streams'][0]
+    return dict(codec=streams['codec_name'].upper())
 
 
-def ffprobe_expect_stream(expected_values, stream_url, title):
+def ffprobe_expect_stream(expected_values, stream_url, stream_title):
+    title = '{}.ffprobe'.format(stream_title)
     command = ['ffprobe', '-of', 'json', '-i', stream_url]
     video = expected_values.get('video')
     if video:
@@ -107,7 +106,7 @@ def ffprobe_expect_stream(expected_values, stream_url, title):
         if fps:
             for result in _expect_command_output(
                     title, {'fps': fps}, _ffprobe_extract_fps,
-                    ['timeout', '10'] + command + ['-show_frames', '-select_streams', 'v']):
+                    ['timeout', '10s'] + command + ['-show_frames', '-select_streams', 'v']):
                 yield result
 
     audio = expected_values.get('audio')

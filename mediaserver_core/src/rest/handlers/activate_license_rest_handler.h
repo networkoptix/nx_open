@@ -15,14 +15,15 @@ public:
         const QByteArray& body, QnJsonRestResult& result,
         const QnRestConnectionProcessor* owner) override;
 
-    // WARNING: Deprecated! Was left for a backward compatibility, should be removed in a future.
+    // WARNING: Deprecated! Was left for a backward compatibility, should be removed in the future.
     virtual int executeGet(const QString& path, const QnRequestParams& params,
         QnJsonRestResult& result, const QnRestConnectionProcessor* owner) override;
 
 private:
-    int activateLicense(const QString licenseKey, QnJsonRestResult &result,
+    int activateLicense(const QString& licenseKey, QnJsonRestResult &result,
         const QnRestConnectionProcessor* owner);
 
+    // Send request to the license server.
     CLHttpStatus makeRequest(QnCommonModule* commonModule, const QString& licenseKey, bool infoMode,
         QByteArray& response);
 };

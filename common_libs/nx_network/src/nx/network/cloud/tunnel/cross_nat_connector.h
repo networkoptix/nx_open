@@ -22,10 +22,13 @@
 #include "abstract_outgoing_tunnel_connection.h"
 #include "abstract_tunnel_connector.h"
 #include "cloud_tunnel_connector_executor.h"
+#include "connection_mediaton_initiator.h"
 
 namespace nx {
 namespace network {
 namespace cloud {
+
+class CloudConnectController;
 
 class NX_NETWORK_API CrossNatConnector:
     public AbstractCrossNatConnector,
@@ -36,8 +39,9 @@ public:
      * @param mediatorAddress Overrides mediator address. Introduced for testing purposes only.
      */
     CrossNatConnector(
+        CloudConnectController* cloudConnectController,
         const AddressEntry& targetPeerAddress,
-        std::optional<SocketAddress> mediatorUdpEndpoint = std::nullopt);
+        std::optional<hpm::api::MediatorAddress> mediatorAddress = std::nullopt);
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
@@ -47,7 +51,7 @@ public:
 
     virtual QString getRemotePeerName() const override;
 
-    SocketAddress localAddress() const;
+    SocketAddress localUdpHolePunchingEndpoint() const;
 
     void replaceOriginatingHostAddress(const QString& address);
 
@@ -64,13 +68,14 @@ protected:
 
 private:
     using MediatorUdpEndpointFetcher = aio::AsyncOperationWrapper<
-        decltype(&nx::hpm::api::AbstractMediatorConnector::fetchUdpEndpoint)>;
+        decltype(&nx::hpm::api::AbstractMediatorConnector::fetchAddress)>;
 
+    CloudConnectController* const m_cloudConnectController;
     const AddressEntry m_targetPeerAddress;
     const std::string m_connectSessionId;
     ConnectCompletionHandler m_completionHandler;
-    std::optional<SocketAddress> m_mediatorUdpEndpoint;
-    std::unique_ptr<nx::hpm::api::MediatorClientUdpConnection> m_mediatorUdpClient;
+    std::optional<hpm::api::MediatorAddress> m_mediatorAddress;
+    std::unique_ptr<ConnectionMediationInitiator> m_connectionMediationInitiator;
     std::optional<QString> m_originatingHostAddressReplacement;
     SocketAddress m_localAddress;
     std::optional<std::chrono::milliseconds> m_connectTimeout;
@@ -82,20 +87,21 @@ private:
     QString m_remotePeerFullName;
     std::unique_ptr<aio::Timer> m_timer;
     std::unique_ptr<ConnectorExecutor> m_cloudConnectorExecutor;
-    MediatorUdpEndpointFetcher m_mediatorUdpEndpointFetcher;
+    MediatorUdpEndpointFetcher m_mediatorAddressFetcher;
 
     static utils::ResultCounter<nx::hpm::api::ResultCode> s_mediatorResponseCounter;
 
     void fetchMediatorUdpEndpoint();
 
-    void onFetchMediatorUdpEndpointCompletion(
+    void onFetchMediatorAddressCompletion(
         http::StatusCode::Value resultCode,
-        SocketAddress mediatorUdpEndpoint);
+        hpm::api::MediatorAddress mediatorAddress);
 
     void issueConnectRequestToMediator();
 
+    std::unique_ptr<hpm::api::MediatorClientUdpConnection> prepareForUdpHolePunching();
+
     void onConnectResponse(
-        stun::TransportHeader stunTransportHeader,
         nx::hpm::api::ResultCode resultCode,
         nx::hpm::api::ConnectResponse response);
 
@@ -118,7 +124,8 @@ private:
 
     void connectSessionReportSent(SystemError::ErrorCode errorCode);
 
-    hpm::api::ConnectRequest prepareConnectRequest() const;
+    hpm::api::ConnectRequest prepareConnectRequest(
+        const SocketAddress& udpHolePunchingLocalEndpoint) const;
 };
 
 } // namespace cloud

@@ -52,10 +52,10 @@ public:
                 m_server->serverId(),
                 m_system.authKey));
 
-        SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
+        SocketGlobals::cloud().mediatorConnector().mockupMediatorAddress({
             nx::network::url::Builder().setScheme("stun")
                 .setEndpoint(mediator().stunTcpEndpoint()),
-            mediator().stunUdpEndpoint());
+            mediator().stunUdpEndpoint()});
     }
 
     const hpm::MediatorFunctionalTest& mediator() const

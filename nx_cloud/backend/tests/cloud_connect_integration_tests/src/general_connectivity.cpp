@@ -4,6 +4,7 @@
 
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/cloud/tunnel/cross_nat_connector.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/thread/sync_queue.h>
 
 #include "basic_test_fixture.h"
@@ -238,7 +239,9 @@ protected:
     void startMultipleCloudConnections()
     {
         m_executor = makeAsyncExecutor<Operation>(
-            mediator().stunUdpEndpoint(),
+            hpm::api::MediatorAddress{
+                mediator().httpUrl(),
+                mediator().stunUdpEndpoint()},
             serverSocketCloudAddress());
 
         m_executor->setMaxConcurrentOperations(27);
@@ -260,7 +263,7 @@ private:
     {
     public:
         Operation(
-            const nx::network::SocketAddress& mediatorUdpEndpoint,
+            const hpm::api::MediatorAddress& mediatorAddress,
             const std::string& host)
         {
             AddressEntry addressEntry;
@@ -268,8 +271,9 @@ private:
             addressEntry.host = host.c_str();
 
             m_crossNatConnector = std::make_unique<CrossNatConnector>(
+                &nx::network::SocketGlobals::cloud(),
                 addressEntry,
-                mediatorUdpEndpoint);
+                mediatorAddress);
         }
 
         void start(nx::utils::MoveOnlyFunc<void()> handler)

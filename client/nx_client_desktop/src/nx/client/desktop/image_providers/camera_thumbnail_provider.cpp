@@ -11,8 +11,8 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/custom_headers.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
-#include <utils/common/guarded_callback.h>
 
 namespace nx {
 namespace client {
@@ -106,7 +106,7 @@ void CameraThumbnailProvider::doLoadAsync()
     QPointer<CameraThumbnailProvider> guard(this);
     NX_VERBOSE(this) << "CameraThumbnailProvider::doLoadAsync(" << m_request.camera->getName() << ") - sending request to the server";
 
-    auto callback = guarded(this,
+    const auto callback = nx::utils::guarded(this,
         [this](
             bool success,
             rest::Handle /*requestId*/,

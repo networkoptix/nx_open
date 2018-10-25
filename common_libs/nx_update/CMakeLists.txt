@@ -1,9 +1,5 @@
-set(library_type)
-if(WINDOWS)
-    set(library_type LIBRARY_TYPE SHARED)
-endif()
-
-nx_add_target(nx_update LIBRARY ${library_type} WERROR
+nx_add_target(nx_update LIBRARY
+    WERROR
     PUBLIC_LIBS
         nx_utils nx_fusion nx_network nx_vms_api common
 )

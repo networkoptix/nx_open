@@ -2437,8 +2437,8 @@ void MediaServerProcess::registerRestHandlers(
      *     The special value "now" requires to retrieve the thumbnail only from the live stream.
      *     <br/>The special value "latest", which is the default value, requires to retrieve
      *     thumbnail from the live stream if possible, otherwise the latest one from the archive.
-     *     <br/>Note: archive extraction can be quite slow operation depending place where it is
-     *     stored.
+     *     <br/>Note: Extraction from the archive can be quite slow depending on the place where the
+     *     frame is stored.
      * %param[opt]:integer rotate Image orientation. Can be 0, 90, 180 or 270 degrees. If the
      *     parameter is absent or equals -1, the image will be rotated as defined in the camera
      *     settings.
@@ -2474,7 +2474,7 @@ void MediaServerProcess::registerRestHandlers(
 
     reg("ec2/statistics", new QnMultiserverStatisticsRestHandler("ec2/statistics"));
 
-    /**%apidoc GET /api/analyticsLookupDetectedObjects
+    /**%apidoc GET /ec2/analyticsLookupDetectedObjects
      * Search analytics DB for objects that match filter specified.
      * %param[opt] deviceId Id of camera.
      * %param[opt] objectTypeId Analytics object type id.
@@ -2779,9 +2779,10 @@ nx::vms::api::ServerFlags MediaServerProcess::calcServerFlags()
 {
     nx::vms::api::ServerFlags serverFlags = nx::vms::api::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
 
-#ifdef EDGE_SERVER
-    serverFlags |= vms::api::SF_Edge;
-#endif
+    #if defined(EDGE_SERVER)
+        serverFlags |= nx::vms::api::SF_Edge;
+    #endif
+    
     if (QnAppInfo::isBpi())
     {
         serverFlags |= nx::vms::api::SF_IfListCtrl | nx::vms::api::SF_timeCtrl;
@@ -3342,7 +3343,7 @@ void MediaServerProcess::stopObjects()
         [this](QObject* src, QObject* dst)
         {
             if (src && dst)
-                disconnect(src, nullptr, dst, nullptr);
+                src->disconnect(dst);
         };
 
     NX_INFO(this, "QnMain event loop has returned. Destroying objects...");

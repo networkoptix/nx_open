@@ -173,7 +173,7 @@ def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Genera
 
                 for error in ffprobe_expect_stream(
                         {'audio': configuration}, run.media_url(), 'primary[{}]'.format(index),
-                        audio_stage=True):
+                        ):
                     yield error
 
     yield Success()

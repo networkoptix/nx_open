@@ -48,3 +48,5 @@ webadmin/.sass-cache
 webadmin/.tmp
 webadmin/translation/language_pack
 CMakeLists.txt.user
+
+venv/*

@@ -36,7 +36,7 @@ protected:
     ConnectResult doSimpleConnectTest(
         std::chrono::milliseconds connectTimeout,
         nx::hpm::MediaServerEmulator::ActionToTake actionOnConnectAckResponse,
-        std::optional<nx::network::SocketAddress> mediatorStunUdpEndpoint = std::nullopt,
+        std::optional<hpm::api::MediatorAddress> mediatorAddress = std::nullopt,
         std::function<void(nx::hpm::MediaServerEmulator*)> serverConfig = nullptr);
 
     ConnectResult doSimpleConnectTest(
@@ -44,7 +44,7 @@ protected:
         nx::hpm::MediaServerEmulator::ActionToTake actionOnConnectAckResponse,
         const nx::hpm::AbstractCloudDataProvider::System& system,
         const std::unique_ptr<nx::hpm::MediaServerEmulator>& server,
-        std::optional<nx::network::SocketAddress> mediatorStunUdpEndpoint = std::nullopt);
+        std::optional<hpm::api::MediatorAddress> mediatorAddress = std::nullopt);
 
     void generalTest();
     void cancellationTest();
@@ -54,7 +54,7 @@ protected:
         nx::hpm::MediaServerEmulator::ActionToTake actionOnConnectAckResponse,
         const nx::hpm::AbstractCloudDataProvider::System& system,
         const std::unique_ptr<nx::hpm::MediaServerEmulator>& server,
-        std::optional<nx::network::SocketAddress> mediatorStunUdpEndpoint,
+        std::optional<hpm::api::MediatorAddress> mediatorAddress,
         ConnectResult* const connectResult);
 
 private:

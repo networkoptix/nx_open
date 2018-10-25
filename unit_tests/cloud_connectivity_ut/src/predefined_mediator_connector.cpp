@@ -6,10 +6,10 @@ namespace cloud {
 namespace test {
 
 PredefinedMediatorConnector::PredefinedMediatorConnector(
-    const nx::network::SocketAddress& udpEndpoint,
+    const hpm::api::MediatorAddress& mediatorAddress,
     std::unique_ptr<hpm::api::MediatorServerTcpConnection> serverConnection)
     :
-    m_udpEndpoint(udpEndpoint),
+    m_mediatorAddress(mediatorAddress),
     m_serverConnection(std::move(serverConnection))
 {
 }
@@ -26,21 +26,21 @@ std::unique_ptr<hpm::api::MediatorServerTcpConnection>
     return std::move(m_serverConnection);
 }
 
-void PredefinedMediatorConnector::fetchUdpEndpoint(
+void PredefinedMediatorConnector::fetchAddress(
     nx::utils::MoveOnlyFunc<void(
         http::StatusCode::Value /*resultCode*/,
-        SocketAddress /*endpoint*/)> handler)
+        hpm::api::MediatorAddress /*address*/)> handler)
 {
     post(
         [this, handler = std::move(handler)]() 
         {
-            handler(http::StatusCode::ok, m_udpEndpoint);
+            handler(http::StatusCode::ok, m_mediatorAddress);
         });
 }
 
-std::optional<nx::network::SocketAddress> PredefinedMediatorConnector::udpEndpoint() const
+std::optional<hpm::api::MediatorAddress> PredefinedMediatorConnector::address() const
 {
-    return m_udpEndpoint;
+    return m_mediatorAddress;
 }
 
 } // namespace test

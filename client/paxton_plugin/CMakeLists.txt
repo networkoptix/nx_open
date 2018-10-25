@@ -40,7 +40,7 @@ set(paxtonDriverIntermediateName "${paxtonLibraryName}.OemDvrMiniDriver.mini")
 set(ENV{PYTHONPATH} ${rdep_dir})
 set(depenencies_cmake_file ${CMAKE_BINARY_DIR}/dependencies.cmake)
 execute_process(
-    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/sync_dependencies.py
+    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/../../sync_dependencies.py
         --packages-dir=${PACKAGES_DIR}
         --cmake-include-file=${depenencies_cmake_file}
         --customization=${customization}

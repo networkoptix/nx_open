@@ -26,6 +26,7 @@
 #include <boost/optional.hpp>
 #endif
 
+#include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/std/optional.h>
 #include <nx/utils/system_error.h>
 
@@ -76,6 +77,8 @@ NX_NETWORK_API bool socketCannotRecoverFromError(SystemError::ErrorCode sysError
 
 using IpV6WithScope = std::pair<boost::optional<in6_addr>, boost::optional<uint32_t>>;
 
+//-------------------------------------------------------------------------------------------------
+
 /**
  * Represents ipv4 address. Supports conversion to QString and to uint32.
  * NOTE: Not using QHostAddress because QHostAddress can trigger dns name
@@ -118,6 +121,8 @@ public:
 
     bool isLocalHost() const;
     bool isLocalNetwork() const;
+    bool isIpv4LinkLocalNetwork() const;
+
     bool isIpAddress() const;
     bool isPureIpV6() const;
 
@@ -156,6 +161,10 @@ private:
 };
 
 NX_NETWORK_API void swap(HostAddress& one, HostAddress& two);
+
+QN_FUSION_DECLARE_FUNCTIONS(HostAddress, (json), NX_NETWORK_API)
+
+//-------------------------------------------------------------------------------------------------
 
 /**
  * Represents host and port (e.g. 127.0.0.1:1234).
@@ -200,6 +209,10 @@ inline uint qHash(const SocketAddress &address)
 {
     return qHash(address.address.toString(), address.port);
 }
+
+QN_FUSION_DECLARE_FUNCTIONS(SocketAddress, (json), NX_NETWORK_API)
+
+//-------------------------------------------------------------------------------------------------
 
 struct NX_NETWORK_API KeepAliveOptions
 {

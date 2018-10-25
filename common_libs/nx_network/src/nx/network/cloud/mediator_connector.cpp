@@ -70,24 +70,22 @@ void MediatorConnector::mockupCloudModulesXmlUrl(
     m_mediatorEndpointProvider->mockupCloudModulesXmlUrl(cloudModulesXmlUrl);
 }
 
-void MediatorConnector::mockupMediatorUrl(
-    const nx::utils::Url& mediatorUrl,
-    const network::SocketAddress stunUdpEndpoint)
+void MediatorConnector::mockupMediatorAddress(
+    const MediatorAddress& mediatorAddress)
 {
     {
         QnMutexLocker lock(&m_mutex);
-        if (const auto currentMediatorUrl = m_mediatorEndpointProvider->mediatorUrl();
-            currentMediatorUrl && mediatorUrl == *currentMediatorUrl)
+        if (const auto currentMediatorAddress = m_mediatorEndpointProvider->mediatorAddress();
+            currentMediatorAddress && mediatorAddress == *currentMediatorAddress)
         {
             return;
         }
 
-        NX_DEBUG(this, lm("Mediator address is mocked up: %1").arg(mediatorUrl));
+        NX_DEBUG(this, lm("Mediator address is mocked up: %1")
+            .arg(mediatorAddress));
 
-        m_mockedUpMediatorUrl = mediatorUrl;
-        m_mediatorEndpointProvider->mockupMediatorUrl(
-            mediatorUrl,
-            stunUdpEndpoint);
+        m_mockedUpMediatorAddress = mediatorAddress;
+        m_mediatorEndpointProvider->mockupMediatorAddress(mediatorAddress);
     }   
 
     establishTcpConnectionToMediatorAsync();
@@ -115,32 +113,32 @@ std::optional<SystemCredentials> MediatorConnector::getSystemCredentials() const
     return m_credentials;
 }
 
-void MediatorConnector::fetchUdpEndpoint(
+void MediatorConnector::fetchAddress(
     nx::utils::MoveOnlyFunc<void(
         nx::network::http::StatusCode::Value /*resultCode*/,
-        nx::network::SocketAddress /*endpoint*/)> handler)
+        MediatorAddress /*address*/)> handler)
 {
     post(
         [this, handler = std::move(handler)]() mutable
         {
-            if (const auto endpoint = m_mediatorEndpointProvider->udpEndpoint())
-                return handler(network::http::StatusCode::ok, *endpoint);
+            if (const auto address = m_mediatorEndpointProvider->mediatorAddress())
+                return handler(network::http::StatusCode::ok, *address);
 
             m_mediatorEndpointProvider->fetchMediatorEndpoints(
                 [this, handler = std::move(handler)](
                     nx::network::http::StatusCode::Value resultCode)
                 {
                     if (nx::network::http::StatusCode::isSuccessCode(resultCode))
-                        handler(resultCode, *m_mediatorEndpointProvider->udpEndpoint());
+                        handler(resultCode, *m_mediatorEndpointProvider->mediatorAddress());
                     else
-                        handler(resultCode, nx::network::SocketAddress());
+                        handler(resultCode, MediatorAddress());
                 });
         });
 }
 
-std::optional<nx::network::SocketAddress> MediatorConnector::udpEndpoint() const
+std::optional<MediatorAddress> MediatorConnector::address() const
 {
-    return m_mediatorEndpointProvider->udpEndpoint();
+    return m_mediatorEndpointProvider->mediatorAddress();
 }
 
 void MediatorConnector::setStunClientSettings(
@@ -177,10 +175,10 @@ void MediatorConnector::connectToMediatorAsync()
 
 void MediatorConnector::establishTcpConnectionToMediatorAsync()
 {
-    NX_ASSERT(m_mediatorEndpointProvider->mediatorUrl());
+    NX_ASSERT(m_mediatorEndpointProvider->mediatorAddress());
 
     auto createStunTunnelUrl =
-        nx::network::url::Builder(*m_mediatorEndpointProvider->mediatorUrl())
+        nx::network::url::Builder(m_mediatorEndpointProvider->mediatorAddress()->tcpUrl)
             .appendPath(api::kStunOverHttpTunnelPath).toUrl();
 
     m_stunClient->connect(
@@ -208,10 +206,10 @@ void MediatorConnector::reconnectToMediator()
     m_fetchEndpointRetryTimer->scheduleNextTry(
         [this]()
         {
-            if (m_mockedUpMediatorUrl)
+            if (m_mockedUpMediatorAddress)
             {
                 NX_DEBUG(this, lm("Using mocked up mediator URL %1")
-                    .args(*m_mockedUpMediatorUrl));
+                    .args(*m_mockedUpMediatorAddress));
                 establishTcpConnectionToMediatorAsync();
             }
             else
@@ -279,7 +277,7 @@ void DelayedConnectStunClient::onFetchEndpointCompletion(
     m_urlKnown = true;
 
     const auto createStunTunnelUrl =
-        nx::network::url::Builder(*m_endpointProvider->mediatorUrl())
+        nx::network::url::Builder(m_endpointProvider->mediatorAddress()->tcpUrl)
             .appendPath(api::kStunOverHttpTunnelPath).toUrl();
 
     base_type::connect(createStunTunnelUrl, [](auto... /*args*/) {});
@@ -329,14 +327,12 @@ void MediatorEndpointProvider::mockupCloudModulesXmlUrl(
     m_cloudModulesXmlUrl = cloudModulesXmlUrl;
 }
 
-void MediatorEndpointProvider::mockupMediatorUrl(
-    const nx::utils::Url& mediatorUrl,
-    const network::SocketAddress stunUdpEndpoint)
+void MediatorEndpointProvider::mockupMediatorAddress(
+    const MediatorAddress& mediatorAddress)
 {
     QnMutexLocker lock(&m_mutex);
 
-    m_mediatorUrl = mediatorUrl;
-    m_mediatorUdpEndpoint = stunUdpEndpoint;
+    m_mediatorAddress = mediatorAddress;
 }
 
 void MediatorEndpointProvider::fetchMediatorEndpoints(
@@ -365,8 +361,9 @@ void MediatorEndpointProvider::fetchMediatorEndpoints(
                     .args(tcpUrl, udpUrl));
 
                 QnMutexLocker lock(&m_mutex);
-                m_mediatorUdpEndpoint = nx::network::url::getEndpoint(udpUrl);
-                m_mediatorUrl = tcpUrl;
+                m_mediatorAddress = MediatorAddress{
+                    tcpUrl,
+                    nx::network::url::getEndpoint(udpUrl)};
             }
             else
             {
@@ -380,16 +377,10 @@ void MediatorEndpointProvider::fetchMediatorEndpoints(
         });
 }
 
-std::optional<nx::utils::Url> MediatorEndpointProvider::mediatorUrl() const
+std::optional<MediatorAddress> MediatorEndpointProvider::mediatorAddress() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_mediatorUrl;
-}
-
-std::optional<network::SocketAddress> MediatorEndpointProvider::udpEndpoint() const
-{
-    QnMutexLocker lock(&m_mutex);
-    return m_mediatorUdpEndpoint;
+    return m_mediatorAddress;
 }
 
 void MediatorEndpointProvider::stopWhileInAioThread()
