@@ -2,7 +2,7 @@
 
 #include <QtCore/QMap>
 
-#include <core/resource/resource.h>
+#include <core/resource/resource_fwd.h>
 #include <nx/sdk/analytics/device_agent.h>
 #include <nx/vms/event/event_fwd.h>
 #include <plugins/plugin_tools.h>
@@ -15,31 +15,31 @@
 #include <nx/debugging/abstract_visual_metadata_debugger.h>
 #include <nx/mediaserver/server_module_aware.h>
 
+#include <nx/vms/api/analytics/descriptors.h>
+
 class QnAbstractDataReceptor;
 
-namespace nx {
-namespace mediaserver {
-namespace analytics {
+namespace nx::mediaserver::analytics {
 
 class MetadataHandler:
     public QObject,
     public nx::sdk::analytics::MetadataHandler,
     public ServerModuleAware
 {
-    Q_OBJECT
-
+    Q_OBJECT;
+    using DescriptorMap = std::map<QString, nx::vms::api::analytics::EventTypeDescriptor>;
 public:
     MetadataHandler(QnMediaServerModule* serverModule);
+
     virtual void handleMetadata(
         nx::sdk::Error error,
         nx::sdk::analytics::MetadataPacket* metadata) override;
 
-    void setResource(const QnSecurityCamResourcePtr& resource);
-
-    void setManifest(const nx::vms::api::analytics::EngineManifest& manifest);
-
-    void registerDataReceptor(QnAbstractDataReceptor* dataReceptor);
-    void removeDataReceptor(QnAbstractDataReceptor* dataReceptor);
+    void setResource(QnVirtualCameraResourcePtr resource);
+    void setPluginId(QString pluginId);
+    void setEventTypeDescriptors(DescriptorMap descriptors);
+    void setMetadataSink(QnAbstractDataReceptor* metadataSink);
+    void removeMetadataSink(QnAbstractDataReceptor* metadataSink);
 
     void setVisualDebugger(nx::debugging::AbstractVisualMetadataDebugger* visualDebugger);
 
@@ -50,7 +50,7 @@ private:
     nx::vms::api::EventState lastEventState(const QString& eventTypeId) const;
 
     void setLastEventState(const QString& eventTypeId, nx::vms::api::EventState eventState);
-    
+
     nx::vms::api::analytics::EventType eventTypeDescriptor(const QString& eventTypeId) const;
 
     void handleEventsPacket(
@@ -64,13 +64,12 @@ private:
         qint64 timestampUsec);
 
 private:
-    QnSecurityCamResourcePtr m_resource;
-    nx::vms::api::analytics::EngineManifest m_manifest;
+    QnVirtualCameraResourcePtr m_resource;
+    QString m_pluginId;
+    std::map<QString, nx::vms::api::analytics::EventTypeDescriptor> m_eventTypeDescriptors;
     QMap<QString, nx::vms::api::EventState> m_eventStateMap;
-    QnAbstractDataReceptor* m_dataReceptor = nullptr;
+    QnAbstractDataReceptor* m_metadataSink = nullptr;
     nx::debugging::AbstractVisualMetadataDebugger* m_visualDebugger = nullptr;
 };
 
-} // namespace analytics
-} // namespace mediaserver
-} // namespace nx
+} // namespace nx::mediaserver::analytics

@@ -22,7 +22,6 @@
 
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
-#include <nx/vms/event/analytics_helper.h>
 
 #include <client/client_globals.h>
 #include <client/client_settings.h>
@@ -53,10 +52,15 @@
 
 #include <nx/utils/log/log.h>
 
+#include <nx/analytics/descriptor_list_manager.h>
+#include <nx/vms/api/analytics/descriptors.h>
+
 using namespace nx;
 using namespace nx::vms::event;
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
+
+namespace analytics_api = nx::vms::api::analytics;
 
 namespace {
 
@@ -237,32 +241,60 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
 {
     NX_ASSERT(rootItem);
 
-    auto allEventTypes = m_filterCameraList.empty()
-        ? AnalyticsHelper(commonModule()).systemSupportedAnalyticsEvents()
-        : AnalyticsHelper::supportedAnalyticsEvents(cameras(m_filterCameraList));
+    const auto descriptorListManager = commonModule()->analyticsDescriptorListManager();
+
+    const auto allEventTypes = m_filterCameraList.empty()
+        ? descriptorListManager->allDescriptorsInTheSystem<analytics_api::EventTypeDescriptor>()
+        : descriptorListManager->deviceDescriptors<analytics_api::EventTypeDescriptor>(
+            cameras(m_filterCameraList));
 
     if (allEventTypes.empty())
         return;
 
-    auto eventName =
-        [hasDifferentDrivers = AnalyticsHelper::hasDifferentDrivers(allEventTypes),
-            locale = qnRuntime->locale()]
-        (const AnalyticsHelper::EventTypeDescriptor& eventType)
+    const auto pluginIds = descriptorListManager->pluginIds(allEventTypes);
+
+    auto eventNames =
+        [
+            hasDifferentDrivers = pluginIds.size() > 1,
+            descriptorListManager
+        ]
+        (const analytics_api::EventTypeDescriptor& descriptor)
         {
             if (!hasDifferentDrivers)
-                return eventType.name.text(locale);
+                return QStringList(descriptor.item.name.value);
 
-            return lit("%1 - %2")
-                .arg(eventType.pluginName.text(locale))
-                .arg(eventType.name.text(locale));
+            QStringList names;
+            for (const auto& path: descriptor.paths)
+            {
+                auto pluginDescriptor = descriptorListManager
+                    ->descriptor<analytics_api::PluginDescriptor>(path.pluginId);
+
+                if (!pluginDescriptor)
+                    continue;
+
+                names.push_back(
+                    lit("%1 - %2")
+                        .arg(pluginDescriptor->name)
+                        .arg(descriptor.item.name.value));
+            }
+
+            return names;
         };
 
-    for (const auto& eventType: allEventTypes)
+    for (const auto& entry: allEventTypes)
     {
-        auto item = new QStandardItem(eventName(eventType));
-        item->setData(EventType::analyticsSdkEvent, EventTypeRole);
-        item->setData(qVariantFromValue(eventType.id), EventSubtypeRole);
-        rootItem->appendRow(item);
+        const auto& descriptor = entry.second;
+        const auto names = eventNames(descriptor);
+
+        for (const auto& name : names)
+        {
+            auto item = new QStandardItem(name);
+            item->setData(EventType::analyticsSdkEvent, EventTypeRole);
+            // TODO: #dmishin Pass plugin id somehow.
+            item->setData(qVariantFromValue(descriptor.getId()), EventSubtypeRole);
+            rootItem->appendRow(item);
+        }
+
     }
 
     rootItem->sortChildren(0);

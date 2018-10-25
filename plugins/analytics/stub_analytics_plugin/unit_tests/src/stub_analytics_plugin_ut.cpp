@@ -7,6 +7,8 @@
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_tools.h>
 
+#include <nx/sdk/common_settings.h>
+
 #include <nx/sdk/analytics/engine.h>
 #include <nx/sdk/analytics/consuming_device_agent.h>
 #include <nx/sdk/analytics/uncompressed_video_frame.h>
@@ -70,26 +72,22 @@ static void testDeviceAgentManifest(nx::sdk::analytics::DeviceAgent* deviceAgent
 
 static void testEngineSettings(nx::sdk::analytics::Engine* plugin)
 {
-    const nxpl::Setting settings[] = {
-        {"setting1", "value1"},
-        {"setting2", "value2"},
-    };
+    const auto settings = new nx::sdk::CommonSettings();
+    settings->addSetting("setting1", "value1");
+    settings->addSetting("setting2", "value2");
 
-    plugin->setSettings(nullptr, 0); //< Test assigning empty settings.
-    plugin->setSettings(settings, 1); //< Test assigning a single setting.
-    plugin->setSettings(settings, sizeof(settings) / sizeof(settings[0]));
+    plugin->setSettings(nullptr); //< Test assigning empty settings.
+    plugin->setSettings(settings); //< Test assigning a single setting.
 }
 
 static void testDeviceAgentSettings(nx::sdk::analytics::DeviceAgent* deviceAgent)
 {
-    const nxpl::Setting settings[] = {
-        {"setting1", "value1"},
-        {"setting2", "value2"},
-    };
+    const auto settings = new nx::sdk::CommonSettings();
+    settings->addSetting("setting1", "value1");
+    settings->addSetting("setting2", "value2");
 
-    deviceAgent->setSettings(nullptr, 0); //< Test assigning empty settings.
-    deviceAgent->setSettings(settings, 1); //< Test assigning a single setting.
-    deviceAgent->setSettings(settings, sizeof(settings) / sizeof(settings[0]));
+    deviceAgent->setSettings(nullptr); //< Test assigning empty settings.
+    deviceAgent->setSettings(settings); //< Test assigning a single setting.
 }
 
 class Action: public nx::sdk::analytics::Action
@@ -109,12 +107,13 @@ public:
     virtual nxpl::NX_GUID deviceId() override { return m_deviceId; }
     virtual int64_t timestampUs() override { return m_timestampUs; }
 
-    virtual const nxpl::Setting* params() override
+    virtual const nx::sdk::Settings* params() override
     {
-        return paramCount() == 0 ? nullptr : &m_params.front();
+        m_params->addRef();
+        return m_params.get();
     }
 
-    virtual int paramCount() override { return (int) m_params.size(); }
+    virtual int paramCount() override { return (int) m_params->count(); }
 
     virtual void handleResult(const char* actionUrl, const char* messageToUser) override
     {
@@ -153,10 +152,9 @@ public:
 
     void setParams(const std::vector<std::pair<std::string, std::string>>& params)
     {
-        m_paramsData = params;
-        m_params.clear();
-        for (const auto& param: m_paramsData)
-            m_params.push_back({param.first.c_str(), param.second.c_str()});
+        m_params->clear();
+        for (const auto& param: params)
+            m_params->addSetting(param.first, param.second);
     }
 
 public:
@@ -169,8 +167,7 @@ public:
     bool m_expectedNonNullMessageToUser = false;
 
 private:
-    std::vector<std::pair<std::string, std::string>> m_paramsData; //< Owns strings for m_params.
-    std::vector<nxpl::Setting> m_params; //< Points to strings from m_paramsData.
+    nxpt::ScopedRef<nx::sdk::CommonSettings> m_params;
 };
 
 static void testExecuteActionNonExisting(nx::sdk::analytics::Engine* plugin)

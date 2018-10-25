@@ -29,9 +29,9 @@ public:
 private:
     /** Used by the above NX_KIT_ASSERT (via NX_PRINT). */
     struct
-    { 
+    {
         const std::string printPrefix = "CommonVideoFrameProcessingDeviceAgent(): ";
-    } utils; 
+    } utils;
 };
 
 CommonVideoFrameProcessingDeviceAgent::CommonVideoFrameProcessingDeviceAgent(
@@ -189,13 +189,17 @@ void CommonVideoFrameProcessingDeviceAgent::freeManifest(const char* data)
     delete[] data;
 }
 
-void CommonVideoFrameProcessingDeviceAgent::setSettings(
-    const nxpl::Setting* settings, int count)
+void CommonVideoFrameProcessingDeviceAgent::setSettings(const nx::sdk::Settings* settings)
 {
-    if (!utils.fillAndOutputSettingsMap(&m_settings, settings, count, "Received settings"))
+    if (!utils.fillAndOutputSettingsMap(&m_settings, settings, "Received settings"))
         return; //< The error is already logged.
 
     settingsChanged();
+}
+
+nx::sdk::Settings* CommonVideoFrameProcessingDeviceAgent::settings() const
+{
+    return nullptr;
 }
 
 //-------------------------------------------------------------------------------------------------

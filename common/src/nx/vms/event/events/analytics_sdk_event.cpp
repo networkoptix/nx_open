@@ -3,9 +3,14 @@
 #include <nx/utils/uuid.h>
 #include <core/resource/resource.h>
 
+#include <nx/analytics/descriptor_list_manager.h>
+#include <nx/vms/api/analytics/descriptors.h>
+
 namespace nx {
 namespace vms {
 namespace event {
+
+namespace analytics_api = nx::vms::api::analytics;
 
 AnalyticsSdkEvent::AnalyticsSdkEvent(
     const QnResourcePtr& resource,
@@ -57,11 +62,17 @@ bool AnalyticsSdkEvent::checkEventParams(const EventParameters& params) const
 {
     if (!getResource() || m_pluginId != params.getAnalyticsPluginId())
         return false;
-    const auto descriptor = nx::vms::event::AnalyticsHelper(getResource()->commonModule())
-        .eventTypeDescriptor(m_eventTypeId);
+
+    auto descriptorListManager = getResource()->commonModule()->analyticsDescriptorListManager();
+    const auto descriptor = descriptorListManager
+        ->descriptor<analytics_api::EventTypeDescriptor>(m_eventTypeId);
+
+    if (!descriptor)
+        return false;
 
     const bool isEventTypeMatched = m_eventTypeId == params.getAnalyticsEventTypeId()
-        || descriptor.groupId == params.getAnalyticsEventTypeId();
+        || descriptor->hasGroup(params.getAnalyticsEventTypeId());
+
     return isEventTypeMatched
         && checkForKeywords(m_caption, params.caption)
         && checkForKeywords(m_description, params.description);

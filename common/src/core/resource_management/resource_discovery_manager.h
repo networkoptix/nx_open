@@ -157,6 +157,12 @@ protected:
     virtual bool processDiscoveredResources(QnResourceList& resources, SearchType searchType);
     bool canTakeForeignCamera(const QnSecurityCamResourcePtr& camera, int awaitingToMoveCameraCnt);
 
+    virtual nx::vms::common::AnalyticsPluginResourcePtr
+        createAnalyticsPluginResource(const QnResourceParams& params);
+
+    virtual nx::vms::common::AnalyticsEngineResourcePtr
+        createAnalyticsEngineResource(const QnResourceParams& params);
+
     friend class QnResourceDiscoveryManagerTimeoutDelegate;
 
 private:

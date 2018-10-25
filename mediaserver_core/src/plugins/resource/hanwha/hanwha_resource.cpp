@@ -1998,7 +1998,7 @@ CameraDiagnostics::Result HanwhaResource::fetchProfiles(
 {
     NX_ASSERT(outProfiles);
     if (!outProfiles)
-        return CameraDiagnostics::CameraPluginErrorResult("Output profiles isn't profvided");
+        return CameraDiagnostics::PluginErrorResult("Output profiles isn't profvided");
 
     HanwhaRequestHelper helper(sharedContext(), useBypass ? bypassChannel() : boost::none);
     const auto response = helper.view(lit("media/videoprofile"));
@@ -2051,7 +2051,7 @@ CameraDiagnostics::Result HanwhaResource::createProfile(
     NX_ASSERT(outProfileNumber);
     if (!outProfileNumber)
     {
-        return CameraDiagnostics::CameraPluginErrorResult(
+        return CameraDiagnostics::PluginErrorResult(
             lit("Create profile: output profile number is null"));
     }
 
@@ -3611,16 +3611,17 @@ QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
     return nullptr;
 }
 
-void HanwhaResource::setSupportedAnalyticsEventTypeIds(const AnalyticsEventTypeIds& eventTypeIds)
+void HanwhaResource::setSupportedAnalyticsEventTypeIds(
+    QnUuid engineId, QSet<QString> supportedEvents)
 {
-    AnalyticsEventTypeIds externalEvents;
-    for (const auto& eventTypeId: eventTypeIds)
+    QSet<QString> externalEvents;
+    for (const auto& eventTypeId: supportedEvents)
     {
         if (eventTypeId != kHanwhaInputPortEventTypeId)
-            externalEvents.push_back(eventTypeId);
+            externalEvents.insert(eventTypeId);
     }
 
-    base_type::setSupportedAnalyticsEventTypeIds(externalEvents);
+    base_type::setSupportedAnalyticsEventTypeIds(engineId, externalEvents);
 }
 
 QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int /*detailLevel*/)

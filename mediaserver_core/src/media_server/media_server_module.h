@@ -54,7 +54,13 @@ namespace nx::vms::common::p2p::downloader { class Downloader; }
 namespace nx::mediaserver::hls { class SessionPool; }
 
 namespace nx {
-namespace mediaserver { class CmdLineArguments; }
+namespace mediaserver {
+class CmdLineArguments;
+namespace analytics {
+class SdkObjectFactory;
+} // namespace analytics
+} // namespace mediaserver
+
 namespace mediaserver::event {
 class ExtendedRuleProcessor;
 class EventConnector;
@@ -131,6 +137,8 @@ public:
     PluginManager* pluginManager() const;
     nx::mediaserver::analytics::Manager* analyticsManager() const;
     nx::mediaserver::analytics::EventRuleWatcher* analyticsEventRuleWatcher() const;
+    nx::mediaserver::analytics::SdkObjectFactory* sdkObjectFactory() const;
+
     nx::mediaserver::resource::SharedContextPool* sharedContextPool() const;
     AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher() const;
     nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage() const;
@@ -228,5 +236,6 @@ private:
     std::unique_ptr<QnMdnsListener> m_mdnsListener;
     std::unique_ptr<nx::network::upnp::DeviceSearcher> m_upnpDeviceSearcher;
     std::unique_ptr<QnMediaServerResourceSearchers> m_resourceSearchers;
+    nx::mediaserver::analytics::SdkObjectFactory* m_sdkObjectFactory;
     nx::mediaserver::hls::SessionPool* m_hlsSessionPool = nullptr;
 };

@@ -38,7 +38,7 @@ public:
      * If the Engine manifest defines params for this action type, contains the array of their
      * values after they are filled by the user via Client form. Otherwise, null.
      */
-    virtual const nxpl::Setting* params() = 0;
+    virtual const nx::sdk::Settings* params() = 0;
 
     /** Number of items in params() array. */
     virtual int paramCount() = 0;

@@ -526,6 +526,16 @@ void DeviceAgent::freeManifest(const char* /*data*/)
     // Do nothing. Manifest string is stored in member-variable.
 }
 
+void DeviceAgent::setSettings(const nx::sdk::Settings* settings)
+{
+    // There are no DeviceAgent settings for this plugin.
+}
+
+nx::sdk::Settings* DeviceAgent::settings() const
+{
+    return nullptr;
+}
+
 } // namespace vca
 } // namespace analytics
 } // namespace mediaserver_plugins

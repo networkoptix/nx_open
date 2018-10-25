@@ -24,6 +24,8 @@ public:
 
     virtual nx::sdk::Error stopFetchingMetadata() override;
 
+    virtual nx::sdk::Settings* settings() const override;
+
 protected:
     virtual std::string manifest() override;
 

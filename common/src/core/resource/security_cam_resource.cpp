@@ -103,13 +103,6 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     m_cachedCanConfigureRemoteRecording(
         [this]() { return getProperty(Qn::kCanConfigureRemoteRecording).toInt() > 0; },
         &m_mutex),
-    m_cachedAnalyticsSupportedEvents(
-        [this]()
-        {
-            return QJson::deserialized<AnalyticsEventTypeIds>(
-                getProperty(Qn::kAnalyticsDriversParamName).toUtf8());
-        },
-        &m_mutex),
     m_cachedCameraMediaCapabilities(
         [this]()
         {
@@ -937,21 +930,6 @@ QnUuid QnSecurityCamResource::preferredServerId() const
     return (*userAttributesLock)->preferredServerId;
 }
 
-QnSecurityCamResource::AnalyticsEventTypeIds
-    QnSecurityCamResource::supportedAnalyticsEventTypeIds() const
-{
-    return m_cachedAnalyticsSupportedEvents.get();
-}
-
-void QnSecurityCamResource::setSupportedAnalyticsEventTypeIds(
-    const AnalyticsEventTypeIds& eventTypeIds)
-{
-    if (eventTypeIds.isEmpty())
-        setProperty(Qn::kAnalyticsDriversParamName, QVariant());
-    else
-        setProperty(Qn::kAnalyticsDriversParamName, QString::fromUtf8(QJson::serialized(eventTypeIds)));
-}
-
 void QnSecurityCamResource::setMinDays(int value)
 {
     NX_ASSERT(!getId().isNull());
@@ -1310,7 +1288,6 @@ void QnSecurityCamResource::resetCachedValues()
     m_motionType.reset();
     m_cachedIsIOModule.reset();
     m_cachedCanConfigureRemoteRecording.reset();
-    m_cachedAnalyticsSupportedEvents.reset();
     m_cachedCameraMediaCapabilities.reset();
     m_cachedLicenseType.reset();
     m_cachedDeviceType.reset();

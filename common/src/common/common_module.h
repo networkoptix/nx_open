@@ -39,6 +39,7 @@ class QnResourceDataPool;
 
 namespace nx { namespace vms { namespace event { class RuleManager; }}}
 namespace nx { namespace metrics { struct Storage; } }
+namespace nx { namespace analytics { class DescriptorListManager;  }}
 
 namespace ec2 { class AbstractECConnection; }
 namespace nx { namespace vms { namespace discovery { class Manager; }}}
@@ -279,6 +280,8 @@ public:
     CameraDriverRestrictionList* cameraDriverRestrictionList() const;
 
     QnResourceDataPool* dataPool() const;
+
+    nx::analytics::DescriptorListManager* analyticsDescriptorListManager() const;
 signals:
     void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();
@@ -340,8 +343,8 @@ private:
     QnAuditManager* m_auditManager = nullptr;
     CameraDriverRestrictionList* m_cameraDriverRestrictionList = nullptr;
     QnResourceDataPool* m_dataPool = nullptr;
+    nx::analytics::DescriptorListManager* m_analyticsDescriptorListManager = nullptr;
 
-    // TODO: #dmishin move these factories to server module
     QnUuid m_videowallGuid;
     bool m_standaloneMode = false;
     std::atomic<bool> m_needToStop{false};

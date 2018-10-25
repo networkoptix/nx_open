@@ -5,6 +5,7 @@
 #include <nx/kit/debug.h>
 
 #include <nx/sdk/utils.h>
+#include <nx/sdk/common_settings.h>
 
 #include "plugin.h"
 
@@ -28,9 +29,9 @@ public:
 private:
     /** Used by the above NX_KIT_ASSERT (via NX_PRINT). */
     struct
-    { 
+    {
         const std::string printPrefix = "CommonEngine(): ";
-    } utils; 
+    } utils;
 };
 
 CommonEngine::CommonEngine(
@@ -71,18 +72,31 @@ void* CommonEngine::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void CommonEngine::setSettings(const nxpl::Setting* settings, int count)
+void CommonEngine::setSettings(const nx::sdk::Settings* settings)
 {
-    if (!utils.fillAndOutputSettingsMap(&m_settings, settings, count, "Received settings"))
+    if (!utils.fillAndOutputSettingsMap(&m_settings, settings, "Received settings"))
         return; //< The error is already logged.
 
     settingsChanged();
 }
 
+nx::sdk::Settings* CommonEngine::settings() const
+{
+    auto settingsValues = new nx::sdk::CommonSettings();
+    settingsValues->addSetting("nx.stub.engine.settings.double_0", "2.7182");
+    return settingsValues;
+}
+
 const char* CommonEngine::manifest(Error* /*error*/) const
 {
-    m_manifest = manifest();
+    if (m_manifest.empty())
+        m_manifest = manifest();
     return m_manifest.c_str();
+}
+
+void CommonEngine::freeManifest(const char* data)
+{
+    m_manifest.clear();
 }
 
 void CommonEngine::executeAction(Action* action, Error* outError)
@@ -104,7 +118,7 @@ void CommonEngine::executeAction(Action* action, Error* outError)
     NX_OUTPUT << "    timestampUs: " << action->timestampUs();
 
     if (!utils.fillAndOutputSettingsMap(
-        &params, action->params(), action->paramCount(), "params", /*outputIndent*/ 4))
+        &params, action->params(), "params", /*outputIndent*/ 4))
     {
         // The error is already logged.
         *outError = Error::unknownError;

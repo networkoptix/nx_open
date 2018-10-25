@@ -38,13 +38,17 @@ public:
     virtual Plugin* plugin() const = 0;
 
     /**
-     * Called after creation of this Engine before calling manifest(), and each time the user
-     * changes the settings. The Server provides the set of settings stored in its database for
+     * Called before other methods. Server provides the set of settings stored in its database for
      * this Engine instance.
      * @param settings Values of settings declared in the manifest. The pointer is valid only
      *     during the call. If count is 0, the pointer is null.
      */
-    virtual void setSettings(const nxpl::Setting* settings, int count) = 0;
+    virtual void setSettings(const Settings* settings) = 0;
+
+    /**
+     * @return Engine settings that are stored on the plugin side.
+     */
+    virtual Settings* settings() const = 0;
 
     /**
      * Provides a JSON manifest for this Engine instance. See the example of such manifest in
@@ -59,8 +63,14 @@ public:
     virtual const char* manifest(Error* outError) const = 0;
 
     /**
+     * Tells Engine that the memory previously returned by manifest() pointed to
+     * by data is no longer needed and may be disposed.
+     */
+    virtual void freeManifest(const char* data) = 0;
+
+    /**
      * Creates, or returns already existing, DeviceAgent for the given device. There must be only
-     * one instance of the DeviceAgent created by the particular instance of Engine per device at 
+     * one instance of the DeviceAgent created by the particular instance of Engine per device at
      * any given time. It means that if we pass DeviceInfo objects with the same UID multiple
      * times to the same Engine, then the pointer to exactly the same object must be returned.
      * Also, multiple devices must not share the same DeviceAgent.

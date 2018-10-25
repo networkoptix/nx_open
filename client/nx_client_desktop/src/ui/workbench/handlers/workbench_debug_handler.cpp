@@ -233,6 +233,11 @@ public:
                 close();
             });
 
+        /**
+         * ATTENTION: I made analytics related code below able to compile, but it doesn't work
+         * properly. If you still need it after the change of analytics data
+         * storage layout in the database - please fix it yourself.
+         */
         addButton("Generate Analytics Plugins and Engines",
             [this]()
             {
@@ -376,19 +381,15 @@ public:
                         const auto randomDriver = nx::utils::random::choice(drivers);
                         if (randomDriver.pluginId.isEmpty()) //< dummy driver
                         {
-                            camera->setSupportedAnalyticsEventTypeIds({});
+                            camera->setSupportedAnalyticsEventTypeIds(QnUuid(), {});
                         }
                         else
                         {
-                            QnSecurityCamResource::AnalyticsEventTypeIds eventTypeIds;
-                            std::transform(randomDriver.eventTypes.cbegin(),
-                                randomDriver.eventTypes.cend(),
-                                std::back_inserter(eventTypeIds),
-                                [](const nx::vms::api::analytics::EventType& eventType)
-                                {
-                                    return eventType.id;
-                                });
-                            camera->setSupportedAnalyticsEventTypeIds(eventTypeIds);
+                            QSet<QString> eventTypeIds;
+                            for (const auto& eventType: randomDriver.eventTypes)
+                                eventTypeIds.insert(eventType.id);
+
+                            camera->setSupportedAnalyticsEventTypeIds(QnUuid(), eventTypeIds);
                         }
 
                         camera->saveParamsAsync();
@@ -401,7 +402,7 @@ public:
             {
                 for (auto camera: resourcePool()->getAllCameras({}))
                 {
-                    camera->setSupportedAnalyticsEventTypeIds({});
+                    camera->setSupportedAnalyticsEventTypeIds(QnUuid(), {});
                     camera->saveParamsAsync();
                 }
 

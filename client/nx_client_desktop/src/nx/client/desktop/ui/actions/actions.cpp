@@ -1748,7 +1748,7 @@ void initialize(Manager* manager, Action* root)
         .text(lit("Get PTZ Position")); //< DevMode, so untranslatable
 
     factory(DebugControlPanelAction)
-        .flags(GlobalHotkey | DevMode)
+        .flags(Main | GlobalHotkey)
         .shortcut(lit("Ctrl+Alt+Shift+D"))
         .text(lit("Debug Control Panel")); //< DevMode, so untranslatable
 

@@ -77,7 +77,9 @@ public:
 
     virtual void freeManifest(const char* data) override;
 
-    virtual void setSettings(const nxpl::Setting* settings, int count) override;
+    virtual void setSettings(const nx::sdk::Settings* settings) override;
+
+    virtual nx::sdk::Settings* settings() const override;
 
     QDomDocument createDomFromRequest(const QByteArray& request);
 

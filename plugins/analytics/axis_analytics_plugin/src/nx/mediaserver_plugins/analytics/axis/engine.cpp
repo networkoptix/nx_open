@@ -64,8 +64,14 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void Engine::setSettings(const nxpl::Setting* settings, int count)
+void Engine::setSettings(const nx::sdk::Settings* settings)
 {
+    // There are no DeviceAgent settings for this plugin.
+}
+
+nx::sdk::Settings* Engine::settings() const
+{
+    return nullptr;
 }
 
 nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
@@ -89,6 +95,11 @@ const char* Engine::manifest(Error* error) const
 {
     *error = Error::noError;
     return m_manifest.constData();
+}
+
+void Engine::freeManifest(const char* manifestData)
+{
+    // Do nothing actually.
 }
 
 EngineManifest Engine::fetchSupportedEvents(const DeviceInfo& deviceInfo)
@@ -133,12 +144,27 @@ void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
 } // namespace mediaserver_plugins
 } // namespace nx
 
+namespace {
+
+static const std::string kPluginName = "Axis driver";
+static const std::string kPluginManifest = R"json(
+{
+    "id": "nx.axis",
+    "name": ")json" + kPluginName + R"json(",
+    "version": "1.0.0",
+    "engineSettingsModel": "",
+    "deviceAgentSettingsModel": ""
+})json";
+
+} // namespace
+
 extern "C" {
 
 NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
-
 {
-    return new nx::sdk::analytics::CommonPlugin("axis_analytics_plugin",
+    return new nx::sdk::analytics::CommonPlugin(
+        kPluginName,
+        kPluginManifest,
         [](nx::sdk::analytics::Plugin* plugin)
         {
             return new nx::mediaserver_plugins::analytics::axis::Engine(

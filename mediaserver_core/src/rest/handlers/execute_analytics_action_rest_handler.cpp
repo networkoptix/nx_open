@@ -6,8 +6,16 @@
 #include <core/resource/media_server_resource.h>
 #include <media_server/media_server_module.h>
 #include <nx/mediaserver/analytics/manager.h>
+#include <nx/mediaserver/resource/analytics_engine_resource.h>
+#include <nx/mediaserver/resource/analytics_plugin_resource.h>
+#include <nx/mediaserver/sdk_support/utils.h>
+#include <nx/mediaserver/sdk_support/pointers.h>
 #include <nx/mediaserver_plugins/utils/uuid.h>
+#include <nx/mediaserver/sdk_support/utils.h>
+#include <nx/sdk/settings.h>
+
 #include <plugins/settings.h>
+#include <plugins/plugin_tools.h>
 
 QnExecuteAnalyticsActionRestHandler::QnExecuteAnalyticsActionRestHandler(
     QnMediaServerModule* serverModule):
@@ -22,6 +30,7 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
+    using namespace nx::mediaserver;
     bool success = false;
     const auto actionData =
         QJson::deserialized<AnalyticsAction>(body, AnalyticsAction(), &success);
@@ -46,19 +55,22 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
         return nx::network::http::StatusCode::ok;
     }
 
-    auto analyticsManager = serverModule()->analyticsManager();
-    for (auto& engine: analyticsManager->availableEngines())
+    const auto engines = resourcePool()->getResources<resource::AnalyticsEngineResource>();
+    for (auto& engine: engines)
     {
-        nxpt::ScopedRef<nx::sdk::analytics::Engine> engineGuard(engine, /*increaseRef*/ false);
-
-        const auto manifest = analyticsManager->loadEngineManifest(engine);
+        auto sdkEngine = engine->sdkEngine();
+        auto manifest = sdk_support::manifest<nx::vms::api::analytics::EngineManifest>(sdkEngine);
         if (!manifest)
-            continue; //< The error is already logged.
+        {
+            NX_WARNING(this, lm("Can't obtain engine manifest, engine %1 (%2)")
+                .args(engine->getName(), engine->getId()));
+            continue;
+        }
 
-        if (manifest.get().pluginId == actionData.pluginId)
+        if (manifest->pluginId == actionData.pluginId)
         {
             AnalyticsActionResult actionResult;
-            QString errorMessage = executeAction(&actionResult, engine, actionData);
+            QString errorMessage = executeAction(&actionResult, sdkEngine.get(), actionData);
 
             if (!errorMessage.isEmpty())
             {
@@ -98,10 +110,11 @@ public:
     }
 
     Action(const AnalyticsAction& actionData, AnalyticsActionResult* actionResult):
-        m_params(actionData.params), m_actionResult(actionResult)
+        m_params(
+            nx::mediaserver::sdk_support::toSdkSettings(actionData.params)),
+        m_actionResult(actionResult)
     {
         NX_ASSERT(m_actionResult);
-        NX_ASSERT(m_params.isValid());
 
         m_actionId = actionData.actionId.toStdString();
         m_objectId = nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(actionData.objectId);
@@ -117,9 +130,9 @@ public:
 
     virtual int64_t timestampUs() override { return m_timestampUs; }
 
-    virtual const nxpl::Setting* params() override { return m_params.array(); }
+    virtual const nx::sdk::Settings* params() override { return m_params.get(); }
 
-    virtual int paramCount() override { return m_params.size(); }
+    virtual int paramCount() override { return m_params->count(); }
 
     virtual void handleResult(const char* actionUrl, const char* messageToUser) override
     {
@@ -133,7 +146,7 @@ private:
     nxpl::NX_GUID m_deviceId;
     int64_t m_timestampUs;
 
-    const nx::plugins::SettingsHolder m_params;
+    const nx::mediaserver::sdk_support::UniquePtr<nx::sdk::Settings> m_params;
 
     AnalyticsActionResult* m_actionResult = nullptr;
 };

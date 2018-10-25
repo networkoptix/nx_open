@@ -31,7 +31,9 @@
 #include <nx/utils/datetime.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/pending_operation.h>
-#include <nx/vms/event/analytics_helper.h>
+
+#include <common/common_module.h>
+#include <nx/analytics/descriptor_list_manager.h>
 
 namespace nx::client::desktop {
 
@@ -143,10 +145,29 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
     {
         case Qt::DisplayRole:
         {
-            const auto name = vms::event::AnalyticsHelper::objectTypeName(
-                camera(object), object.objectTypeId, kDefaultLocale);
+            const auto objectCamera = camera(object);
+            if (!objectCamera)
+            {
+                handled = false;
+                return QVariant();
+            }
 
-            return name.isEmpty() ? tr("Unknown object") : name;
+            const auto descriptorListManager = objectCamera
+                ->commonModule()
+                ->analyticsDescriptorListManager();
+
+            auto objectTypeDescriptor = descriptorListManager
+                ->descriptor<nx::vms::api::analytics::ObjectTypeDescriptor>(object.objectTypeId);
+
+            if (!objectTypeDescriptor)
+            {
+                handled = false;
+                return QVariant();
+            }
+
+            return objectTypeDescriptor->item.name.value.isEmpty()
+                ? tr("Unknown object")
+                : objectTypeDescriptor->item.name.value;
         }
 
         case Qt::DecorationRole:
@@ -697,25 +718,48 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
     auto servers = q->cameraHistoryPool()->getCameraFootageData(camera, true);
     servers.push_back(camera->getParentServer());
 
-    const auto allActions = vms::event::AnalyticsHelper::availableActions(
-        servers, object.objectTypeId);
-    if (allActions.isEmpty())
+    const auto descriptorListManager = camera
+        ->commonModule()
+        ->analyticsDescriptorListManager();
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    const auto allActions = descriptorListManager
+        ->descriptors<nx::vms::api::analytics::ActionTypeDescriptor>(servers);
+
+    if (allActions.empty())
+        return QSharedPointer<QMenu>();
+
+    QMap<QString, QList<nx::vms::api::analytics::ActionTypeDescriptor>> actionsByPlugin;
+    for (auto itr = allActions.cbegin(); itr != allActions.cend(); ++itr)
+    {
+        const auto& actionId = itr->first;
+        const auto& descriptor = itr->second;
+
+        if (!descriptor.item.supportedObjectTypeIds.contains(object.objectTypeId))
+            continue;
+
+        for (const auto& path: descriptor.paths)
+            actionsByPlugin[path.pluginId].push_back(descriptor);
+    }
+
+    if (actionsByPlugin.isEmpty())
         return QSharedPointer<QMenu>();
 
     QSharedPointer<QMenu> menu(new QMenu());
-    for (const auto& driverActions: allActions)
+    for (auto itr = actionsByPlugin.cbegin(); itr != actionsByPlugin.cend(); ++itr)
+        //const auto& driverActions: allActions)
     {
+        const auto& pluginId = itr.key();
+        const auto& descriptors = *itr;
         if (!menu->isEmpty())
             menu->addSeparator();
 
-        const auto& pluginId = driverActions.pluginId;
-        for (const auto& action: driverActions.actions)
+        for (const auto& actionDescriptor: descriptors)
         {
-            const auto name = action.name.text(QString());
+            const auto name = actionDescriptor.item.name.value;
             menu->addAction<std::function<void()>>(name, nx::utils::guarded(this,
-                [this, action, object, pluginId]()
+                [this, actionDescriptor, object, pluginId]()
                 {
-                    executePluginAction(pluginId, action, object);
+                    executePluginAction(pluginId, actionDescriptor, object);
                 }));
         }
     }
@@ -725,9 +769,11 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
 
 void AnalyticsSearchListModel::Private::executePluginAction(
     const QString& pluginId,
-    const nx::vms::api::analytics::EngineManifest::ObjectAction& action,
+    const nx::vms::api::analytics::ActionTypeDescriptor& actionDescriptor,
     const analytics::storage::DetectedObject& object) const
 {
+
+    const auto& actionType = actionDescriptor.item;
     const auto server = q->commonModule()->currentServer();
     NX_ASSERT(server && server->restConnection());
     if (!server || !server->restConnection())
@@ -756,7 +802,7 @@ void AnalyticsSearchListModel::Private::executePluginAction(
 
     AnalyticsAction actionData;
     actionData.pluginId = pluginId;
-    actionData.actionId = action.id;
+    actionData.actionId = actionType.id;
     actionData.objectId = object.objectAppearanceId;
 
     server->restConnection()->executeAnalyticsAction(

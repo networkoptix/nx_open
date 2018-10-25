@@ -53,7 +53,9 @@ public:
         return m_typedManifest;
     }
 
-    virtual void setSettings(const nxpl::Setting* settings, int count) override;
+    virtual void setSettings(const nx::sdk::Settings* settings) override;
+
+    virtual nx::sdk::Settings* settings() const override;
 
     /** @return Null if not found. */
     const EventType* eventTypeById(const QString& id) const noexcept;
@@ -65,12 +67,12 @@ private:
     QUrl m_url;
     QAuthenticator m_auth;
     Monitor* m_monitor = nullptr;
-    
+
     /**
      * Place to store manifests we gave to the caller to provide 1) sufficient lifetime and
      * 2) memory releasing in destructor.
      */
-    QList<QByteArray> m_givenManifests; 
+    QList<QByteArray> m_givenManifests;
 
     nx::sdk::analytics::MetadataHandler* m_metadataHandler = nullptr;
 };

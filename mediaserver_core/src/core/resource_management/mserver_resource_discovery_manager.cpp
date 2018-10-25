@@ -30,6 +30,9 @@
 #include <core/resource/general_attribute_pool.h>
 #include <core/resource/camera_user_attribute_pool.h>
 
+#include <nx/mediaserver/resource/analytics_plugin_resource.h>
+#include <nx/mediaserver/resource/analytics_engine_resource.h>
+
 namespace {
 
 static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 2;
@@ -39,7 +42,8 @@ static const int kMinServerStartupTimeToTakeForeignCamerasMs = 1000 * 60;
 } // namespace
 
 QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(QnMediaServerModule* serverModule):
-    QnResourceDiscoveryManager(serverModule->commonModule())
+    QnResourceDiscoveryManager(serverModule->commonModule()),
+    m_serverModule(serverModule)
 {
     connect(
         this, &QnMServerResourceDiscoveryManager::cameraDisconnected,
@@ -339,6 +343,24 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         printInLogNetResources(resources);
     }
     return true;
+}
+
+nx::vms::common::AnalyticsPluginResourcePtr
+    QnMServerResourceDiscoveryManager::createAnalyticsPluginResource(
+        const QnResourceParams& /*parameters*/)
+{
+    namespace mserver = nx::mediaserver::resource;
+    return mserver::AnalyticsPluginResourcePtr(
+        new mserver::AnalyticsPluginResource(m_serverModule));
+}
+
+nx::vms::common::AnalyticsEngineResourcePtr
+    QnMServerResourceDiscoveryManager::createAnalyticsEngineResource(
+        const QnResourceParams& /*parameters*/)
+{
+    namespace mserver = nx::mediaserver::resource;
+    return mserver::AnalyticsEngineResourcePtr(
+        new mserver::AnalyticsEngineResource(m_serverModule));
 }
 
 bool QnMServerResourceDiscoveryManager::hasIpConflict(const QSet<QnNetworkResourcePtr>& cameras)

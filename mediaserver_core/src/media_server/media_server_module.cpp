@@ -54,6 +54,8 @@
 #include <nx/mediaserver/root_fs.h>
 #include <nx/mediaserver/server_update_manager.h>
 
+#include <nx/mediaserver/analytics/sdk_object_factory.h>
+
 #include <media_server/serverutil.h>
 #include <nx/core/access/access_types.h>
 #include <core/resource_management/resource_pool.h>
@@ -282,6 +284,7 @@ QnMediaServerModule::QnMediaServerModule(const nx::mediaserver::CmdLineArguments
     m_resourceSearchers.reset(new QnMediaServerResourceSearchers(this));
     m_serverConnector = store(new QnServerConnector(commonModule()));
     m_statusWatcher = store(new QnResourceStatusWatcher(commonModule()));
+    m_sdkObjectFactory = store(new nx::mediaserver::analytics::SdkObjectFactory(this));
 
     m_hlsSessionPool = store(new nx::mediaserver::hls::SessionPool());
 
@@ -424,6 +427,11 @@ nx::mediaserver::analytics::EventRuleWatcher* QnMediaServerModule::analyticsEven
     return m_analyticsEventRuleWatcher;
 }
 
+nx::mediaserver::analytics::SdkObjectFactory* QnMediaServerModule::sdkObjectFactory() const
+{
+    return m_sdkObjectFactory;
+}
+
 nx::mediaserver::resource::SharedContextPool* QnMediaServerModule::sharedContextPool() const
 {
     return m_sharedContextPool;
@@ -490,12 +498,12 @@ QnStorageManager* QnMediaServerModule::backupStorageManager() const
     return m_context->backupStorageManager.get();
 }
 
-event::EventConnector* QnMediaServerModule::eventConnector() const
+nx::mediaserver::event::EventConnector* QnMediaServerModule::eventConnector() const
 {
     return m_eventConnector;
 }
 
-event::ExtendedRuleProcessor* QnMediaServerModule::eventRuleProcessor() const
+nx::mediaserver::event::ExtendedRuleProcessor* QnMediaServerModule::eventRuleProcessor() const
 {
     return m_eventRuleProcessor;
 }

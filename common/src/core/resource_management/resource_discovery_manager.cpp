@@ -34,6 +34,9 @@
 #include <nx/vms/api/data/media_server_data.h>
 #include <api/runtime_info_manager.h>
 
+#include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
+
 #ifdef __arm__
     static const int kThreadCount = 8;
 #else
@@ -163,6 +166,14 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(const QnUuid &resourceT
     {
         result = QnResourcePtr(QnStoragePluginFactory::instance()->createStorage(commonModule(), params.url));
         NX_ASSERT(result); //storage can not be null
+    }
+    else if (resourceTypeId == nx::vms::api::AnalyticsPluginData::kResourceTypeId)
+    {
+        result = createAnalyticsPluginResource(params);
+    }
+    else if (resourceTypeId == nx::vms::api::AnalyticsEngineData::kResourceTypeId)
+    {
+        result = createAnalyticsEngineResource(params);
     }
     else
     {
@@ -390,6 +401,22 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
         return false;
 
     return mServer->currentStatusTime() > m_serverOfflineTimeout;
+}
+
+nx::vms::common::AnalyticsPluginResourcePtr
+    QnResourceDiscoveryManager::createAnalyticsPluginResource(
+        const QnResourceParams& /*parameters*/)
+{
+    using namespace nx::vms::common;
+    return AnalyticsPluginResourcePtr(new AnalyticsPluginResource());
+}
+
+nx::vms::common::AnalyticsEngineResourcePtr
+    QnResourceDiscoveryManager::createAnalyticsEngineResource(
+        const QnResourceParams& /*parameters*/)
+{
+    using namespace nx::vms::common;
+    return AnalyticsEngineResourcePtr(new AnalyticsEngineResource());
 }
 
 void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList& resources)

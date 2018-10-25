@@ -36,12 +36,12 @@ public:
      * @return Null if the frame is not available.
      */
     nx::sdk::analytics::DataPacket* getDataPacket(
-        boost::optional<nx::sdk::analytics::UncompressedVideoFrame::PixelFormat> pixelFormat);
+        std::optional<nx::sdk::analytics::UncompressedVideoFrame::PixelFormat> pixelFormat);
 
 private:
     nx::utils::MoveOnlyFunc<QnConstCompressedVideoDataPtr()> m_getCompressedFrame;
     nx::utils::MoveOnlyFunc<CLConstVideoDecoderOutputPtr()> m_getUncompressedFrame;
-    
+
     std::map<nx::sdk::analytics::UncompressedVideoFrame::PixelFormat,
         nxpt::ScopedRef<nx::sdk::analytics::UncompressedVideoFrame>> m_uncompressedFrames;
 

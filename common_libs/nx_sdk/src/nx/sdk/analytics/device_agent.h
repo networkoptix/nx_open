@@ -3,6 +3,7 @@
 #include <plugins/plugin_api.h>
 
 #include <nx/sdk/common.h>
+#include <nx/sdk/settings.h>
 #include <nx/sdk/analytics/metadata_packet.h>
 
 namespace nx {
@@ -56,7 +57,12 @@ public:
      * @param settings Values of settings declared in the manifest. The pointer is valid only
      *     during the call. If count is 0, the pointer is null.
      */
-    virtual void setSettings(const nxpl::Setting* settings, int count) = 0;
+    virtual void setSettings(const Settings* settings) = 0;
+
+    /**
+     * @return Device agent settings that are stored on the plugin side.
+     */
+    virtual Settings* settings() const = 0;
 
     /**
      * Provides a 0-terminated UTF-8 string containing the JSON manifest.

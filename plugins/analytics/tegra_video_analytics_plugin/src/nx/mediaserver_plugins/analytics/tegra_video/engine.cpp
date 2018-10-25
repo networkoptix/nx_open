@@ -87,11 +87,27 @@ std::string Engine::manifest() const
 } // namespace mediaserver_plugins
 } // namespace nx
 
+namespace {
+
+static const std::string kPluginName = "TegraVideo analytics plugin";
+static const std::string kPluginManifest = R"json(
+{
+    "id": "nx.tegra_video",
+    "name": ")json" + kPluginName + R"json(",
+    "version": "1.0.0",
+    "engineSettingsModel": "",
+    "deviceAgentSettingsModel": ""
+})json";
+
+} // namespace
+
 extern "C" {
 
 NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
-    return new nx::sdk::analytics::CommonPlugin("tegra_video_analytics_plugin",
+    return new nx::sdk::analytics::CommonPlugin(
+        kPluginName,
+        kPluginManifest,
         [](nx::sdk::analytics::Plugin* plugin)
         {
             return new nx::mediaserver_plugins::analytics::tegra_video::Engine(plugin);

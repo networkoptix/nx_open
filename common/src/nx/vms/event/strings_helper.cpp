@@ -19,12 +19,15 @@
 #include <utils/common/id.h>
 
 #include <nx/vms/api/analytics/engine_manifest.h>
+#include <nx/vms/api/analytics/descriptors.h>
 
 #include <nx/vms/event/aggregation_info.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/events/events.h>
 
 #include <nx/utils/log/assert.h>
+
+#include <nx/analytics/descriptor_list_manager.h>
 
 namespace {
 
@@ -40,32 +43,14 @@ static nx::vms::api::analytics::EventType analyticsEventType(
     if (pluginId.isNull())
         return {};
 
-    auto server = camera->getParentServer();
-    NX_ASSERT(server);
-    if (!server)
+    const auto descriptorListManager = camera->commonModule()->analyticsDescriptorListManager();
+    auto descriptor = descriptorListManager
+        ->descriptor<nx::vms::api::analytics::EventTypeDescriptor>(eventTypeId);
+
+    if (!descriptor)
         return {};
 
-    const auto drivers = server->analyticsDrivers();
-    const auto driver = std::find_if(drivers.cbegin(), drivers.cend(),
-        [pluginId](const nx::vms::api::analytics::EngineManifest& manifest)
-        {
-            return manifest.pluginId == pluginId;
-        });
-
-    NX_ASSERT(driver != drivers.cend());
-    if (driver == drivers.cend())
-        return {};
-
-    const auto types = driver->eventTypes;
-    const auto eventType = std::find_if(types.cbegin(), types.cend(),
-        [eventTypeId](const nx::vms::api::analytics::EventType eventType)
-        {
-            return eventType.id == eventTypeId;
-        });
-
-    return eventType == types.cend()
-        ? nx::vms::api::analytics::EventType()
-        : *eventType;
+    return descriptor->item;
 }
 
 } // namespace
