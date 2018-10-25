@@ -69,7 +69,7 @@ void AudioStream::AudioStreamPrivate::addPacketConsumer(
     const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_packetConsumerManager->addConsumer(consumer, false);
+    m_packetConsumerManager->addConsumer(consumer);
 
     tryStart();
 

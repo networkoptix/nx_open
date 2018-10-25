@@ -63,7 +63,7 @@ void NativeStreamReader::setFps(float fps)
 void NativeStreamReader::setResolution(const nxcip::Resolution& resolution)
 {
     StreamReaderPrivate::setResolution(resolution);
-    m_avConsumer->setResolution(resolution.width, resolution.height);
+    m_avConsumer->setResolution(resolution);
 }
 
 void NativeStreamReader::setBitrate(int bitrate)

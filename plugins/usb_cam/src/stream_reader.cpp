@@ -129,7 +129,7 @@ void StreamReaderPrivate::setFps(float fps)
 
 void StreamReaderPrivate::setResolution(const nxcip::Resolution& resolution)
 {
-    m_codecParams.setResolution(resolution.width, resolution.height);
+    m_codecParams.resolution = resolution;
 }
 
 void StreamReaderPrivate::setBitrate(int bitrate)

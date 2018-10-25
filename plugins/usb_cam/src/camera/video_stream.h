@@ -147,14 +147,14 @@ private:
     std::shared_ptr<ffmpeg::Frame> maybeDecode(const ffmpeg::Packet * packet);
     int decode(const ffmpeg::Packet * packet, ffmpeg::Frame * frame);
 
-    float largestFps() const;
-    void largestResolution(int * outWidth, int * outHeight) const;
-    int largestBitrate() const;
+    float findLargestFps() const;
+    nxcip::Resolution findLargestResolution() const;
+    int findLargestBitrate() const;
     void updateFpsUnlocked();
     void updateResolutionUnlocked();
     void updateBitrateUnlocked();
     void updateUnlocked();
-    CodecParameters closestHardwareConfiguration(const CodecParameters& params) const;
+    CodecParameters findClosestHardwareConfiguration(const CodecParameters& params) const;
     void setCodecParameters(const CodecParameters& codecParams);
 
     bool checkIoError(int ffmpegError);
