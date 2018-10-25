@@ -58,7 +58,29 @@ bool backupDatabase(const QString& backupDir,
 
 QList<DbBackupFileData> allBackupFilesData(const QString& backupDir)
 {
-    return QList<DbBackupFileData>();
+    QDir dir(backupDir);
+    NX_ASSERT(dir.exists());
+
+    QList<DbBackupFileData> result;
+    for (const auto& fileInfo: dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files))
+    {
+        if (fileInfo.completeSuffix() != ".backup")
+            continue;
+
+        auto nameSplits = fileInfo.baseName().split('_');
+        if (nameSplits.size() != 4)
+            continue;
+
+        DbBackupFileData backupFileData;
+        backupFileData.fullPath = fileInfo.absoluteFilePath();
+        backupFileData.build = nameSplits[1].toInt();
+        backupFileData.index = nameSplits[2].toInt();
+        backupFileData.timestamp = nameSplits[3].toLongLong();
+
+        result.push_back(backupFileData);
+    }
+
+    return result;
 }
 
 void deleteOldBackupFilesIfNeeded(const QString& backupDir, const QString& filePathToSkip,
