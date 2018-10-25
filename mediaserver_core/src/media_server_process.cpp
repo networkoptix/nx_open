@@ -3351,6 +3351,7 @@ void MediaServerProcess::stopObjects()
 
     m_generalTaskTimer.reset();
     m_udtInternetTrafficTimer.reset();
+    m_createDbBackupTimer.reset();
 
     safeDisconnect(commonModule()->globalSettings(), this);
     safeDisconnect(m_universalTcpListener->authenticator(), this);
@@ -3709,6 +3710,7 @@ void MediaServerProcess::connectSignals()
                 nx::network::UdtStatistics::global.internetBytesTransfered -= current;
             }
         });
+
     m_createDbBackupTimer = std::make_unique<QTimer>();
     connect(m_createDbBackupTimer.get(), &QTimer::timeout,
         [this]()
@@ -4129,6 +4131,10 @@ void MediaServerProcess::run()
 
     if (!serverModule->serverDb()->open())
         return;
+
+    auto utils = nx::mediaserver::Utils(serverModule.get());
+    if (utils.timeToMakeDbBackup())
+        utils.backupDatabase();
 
     if (!connectToDatabase())
         return;

@@ -53,6 +53,7 @@
 #include "server/server_globals.h"
 #include <media_server/media_server_module.h>
 #include <utils/crypt/symmetrical.h>
+#include <utils/common/synctime.h>
 #include <api/model/password_data.h>
 
 namespace
@@ -107,8 +108,49 @@ bool Utils::updateUserCredentials(
 bool Utils::backupDatabase()
 {
     auto connection = ec2Connection();
-    return nx::vms::utils::backupDatabase(serverModule()->settings().backupsDir(),
+    return nx::vms::utils::backupDatabase(serverModule()->settings().backupDir(),
         std::move(connection));
+}
+
+bool Utils::timeToMakeDbBackup() const
+{
+    const auto dataDir = serverModule()->settings().dataDir();
+    const auto backupDir = serverModule()->settings().backupDir();
+    if (!QFile::exists(closeDirPath(dataDir) + QString::fromLatin1("ecs.sqlite")))
+        return false; //< Nothing to make a copy of.
+
+    const auto currentVersion =
+        nx::utils::SoftwareVersion(nx::utils::AppInfo::applicationVersion());
+
+    auto allBackupFilesData = vms::utils::allBackupFilesData(backupDir);
+    QList<nx::vms::utils::DbBackupFileData> thisVersionBackupFilesData;
+
+    std::copy_if(allBackupFilesData.cbegin(), allBackupFilesData.cend(),
+        std::back_inserter(thisVersionBackupFilesData),
+        [&currentVersion](const nx::vms::utils::DbBackupFileData& backupFileData)
+        {
+            return backupFileData.build == currentVersion.build();
+        });
+
+    if (thisVersionBackupFilesData.isEmpty())
+        return true; //< Backups for the current server version haven't been found, let's make one.
+
+    NX_ASSERT(!thisVersionBackupFilesData.isEmpty());
+    std::sort(thisVersionBackupFilesData.begin(), thisVersionBackupFilesData.end(),
+        [](const nx::vms::utils::DbBackupFileData& lhs,
+            const nx::vms::utils::DbBackupFileData& rhs)
+        {
+            return lhs.timestamp > rhs.timestamp;
+        });
+
+    const auto timeFromPreviousBackupShiftedByBackupPeriod =
+        thisVersionBackupFilesData.front().timestamp
+        + serverModule()->settings().dbBackupPeriodMS().count();
+
+    if (timeFromPreviousBackupShiftedByBackupPeriod < qnSyncTime->currentMSecsSinceEpoch())
+        return true;
+
+    return false;
 }
 
 void Utils::dropConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus)

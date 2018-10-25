@@ -56,14 +56,9 @@ bool backupDatabase(const QString& backupDir,
     return true;
 }
 
-bool timeToMakeDbBackup()
+QList<DbBackupFileData> allBackupFilesData(const QString& backupDir)
 {
-    return false;
-}
-
-QList<QString> allBackupFilePathsSorted(const QString& backupDir)
-{
-    return QList<QString>();
+    return QList<DbBackupFileData>();
 }
 
 void deleteOldBackupFilesIfNeeded(const QString& backupDir, const QString& filePathToSkip,
@@ -72,14 +67,14 @@ void deleteOldBackupFilesIfNeeded(const QString& backupDir, const QString& fileP
     const qint64 kMaxFreeSpace = 10 * 1024 * 1024;
     const int kMaxBackupFilesCount = freeSpace > kMaxFreeSpace ? 6 : 1;
     int deletedFilesCount = 0;
-    const auto allBackupFiles = allBackupFilePathsSorted(backupDir);
-    for (const auto& backupFilePath: allBackupFiles)
+    const auto allBackupFiles = allBackupFilesData(backupDir);
+    for (const auto& backupFileData: allBackupFiles)
     {
         if (allBackupFiles.size() - deletedFilesCount <= kMaxBackupFilesCount)
             break;
-        if (backupFilePath != filePathToSkip)
+        if (backupFileData.fullPath != filePathToSkip)
         {
-            nx::SystemCommands().removePath(backupFilePath.toStdString());
+            nx::SystemCommands().removePath(backupFileData.fullPath.toStdString());
             deletedFilesCount++;
         }
     }

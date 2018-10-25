@@ -4,6 +4,7 @@
 
 #include <nx_ec/ec_api.h>
 #include <utils/common/optional.h>
+#include <boost/optional.hpp>
 
 class QnCommonModule;
 struct ConfigureSystemData;
@@ -12,6 +13,14 @@ struct PasswordData;
 namespace nx {
 namespace vms {
 namespace utils {
+
+struct DbBackupFileData
+{
+    QString fullPath;
+    int build = -1;
+    int index = -1;
+    qint64 timestamp = -1;
+};
 
 /**
 * @return Unique filename according to pattern "<prefix>_<build>_<index>.backup" by
@@ -22,8 +31,7 @@ QString makeNextUniqueName(const QString& prefix, int build);
 bool backupDatabase(const QString& backupDir,
     std::shared_ptr<ec2::AbstractECConnection> connection);
 
-QList<QString> allBackupFilePathsSorted(const QString& backupDir);
-bool timeToMakeDbBackup();
+QList<DbBackupFileData> allBackupFilesData(const QString& backupDir);
 
 void deleteOldBackupFilesIfNeeded(const QString& backupDir, const QString& filePathToSkip,
     qint64 freeSpace);

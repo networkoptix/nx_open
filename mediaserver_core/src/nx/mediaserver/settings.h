@@ -282,17 +282,17 @@ public:
             return obtainDataDirectory();
         }
     };
-    Option<QString> backupsDir{this, "backupsDir",
+    Option<QString> backupDir{this, "backupDir",
         "",
-        "/var/backups (on linux). "
-        "C:\\Users\\{username}\\AppData\\Local\\Network Optix\\Network Optix Media Server\\backups "
+        "/var/backup (on linux). "
+        "C:\\Users\\{username}\\AppData\\Local\\Network Optix\\Network Optix Media Server\\backup "
         "on MSWin",
         [this](const QString& value)
         {
             if (!value.isEmpty())
                 return value;
 
-            return closeDirPath(obtainDataDirectory()) + "backups";
+            return closeDirPath(obtainDataDirectory()) + "backup";
         }
     };
     Option<std::chrono::milliseconds> dbBackupPeriodMS{this, "dbBackupPeriod",

@@ -98,6 +98,7 @@ public:
 
     void syncStoragesToSettings(const QnMediaServerResourcePtr& server);
     bool backupDatabase();
+    bool timeToMakeDbBackup() const;
 };
 
 } // namespace mediaserver
