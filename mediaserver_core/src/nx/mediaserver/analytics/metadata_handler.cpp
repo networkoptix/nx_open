@@ -16,6 +16,8 @@
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include <media_server/media_server_module.h>
 
+#include <core/resource/camera_resource.h>
+
 namespace nx {
 namespace mediaserver {
 namespace analytics {
@@ -31,12 +33,15 @@ MetadataHandler::MetadataHandler(QnMediaServerModule* serverModule):
         Qt::QueuedConnection);
 }
 
-nx::vms::api::analytics::EventType MetadataHandler::eventTypeDescriptor(const QString& eventTypeId) const
+nx::vms::api::analytics::EventType MetadataHandler::eventTypeDescriptor(
+    const QString& eventTypeId) const
 {
-    for (const auto& descriptor: m_manifest.eventTypes)
+    for (const auto& entry: m_eventTypeDescriptors)
     {
-        if (descriptor.id == eventTypeId)
-            return descriptor;
+        const auto& id = entry.first;
+        const auto& descriptor = entry.second;
+        if (id == eventTypeId)
+            return descriptor.item;
     }
     return nx::vms::api::analytics::EventType();
 }
@@ -186,7 +191,7 @@ void MetadataHandler::handleMetadataEvent(
 
     auto sdkEvent = nx::vms::event::AnalyticsSdkEventPtr::create(
         m_resource,
-        m_manifest.pluginId,
+        m_pluginId,
         eventTypeId,
         eventState,
         eventData->caption(),
@@ -203,14 +208,19 @@ void MetadataHandler::handleMetadataEvent(
     emit sdkEventTriggered(sdkEvent);
 }
 
-void MetadataHandler::setResource(const QnSecurityCamResourcePtr& resource)
+void MetadataHandler::setResource(QnVirtualCameraResourcePtr resource)
 {
-    m_resource = resource;
+    m_resource = std::move(resource);
 }
 
-void MetadataHandler::setManifest(const nx::vms::api::analytics::EngineManifest& manifest)
+void MetadataHandler::setPluginId(QString pluginId)
 {
-    m_manifest = manifest;
+    m_pluginId = std::move(pluginId);
+}
+
+void MetadataHandler::setEventTypeDescriptors(DescriptorMap descriptors)
+{
+    m_eventTypeDescriptors = std::move(descriptors);
 }
 
 void MetadataHandler::setMetadataSink(QnAbstractDataReceptor* dataReceptor)

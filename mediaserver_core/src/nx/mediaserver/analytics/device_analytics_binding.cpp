@@ -23,7 +23,6 @@
 #include <nx/mediaserver/resource/analytics_plugin_resource.h>
 #include <nx/mediaserver/interactive_settings/json_engine.h>
 
-
 namespace nx::mediaserver::analytics {
 
 using namespace nx::vms::api::analytics;
@@ -337,8 +336,17 @@ std::shared_ptr<MetadataHandler> DeviceAnalyticsBinding::createMetadataHandler()
         return nullptr;
     }
 
+    const auto descriptorListManager = serverModule()
+        ->commonModule()
+        ->analyticsDescriptorListManager();
+
+    auto eventDescriptors = descriptorListManager
+        ->deviceDescriptors<EventTypeDescriptor>(m_device);
+
     auto handler = std::make_shared<MetadataHandler>(m_engine->serverModule());
     handler->setResource(m_device);
+    handler->setPluginId(m_engine->plugin()->manifest().id);
+    handler->setEventTypeDescriptors(eventDescriptors);
     handler->setMetadataSink(m_metadataSink.get());
 
     return handler;
