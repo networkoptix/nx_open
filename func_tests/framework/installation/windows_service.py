@@ -12,7 +12,10 @@ class WindowsService(Service):
         return '<WindowsService {} at {}>'.format(self._name, self._winrm)
 
     def stop(self, timeout_sec=None):
-        self._wmi_service.invoke_method(u'StopService', {}, timeout_sec=timeout_sec)
+        try:
+            self._wmi_service.invoke_method(u'StopService', {}, timeout_sec=timeout_sec)
+        except wmi.WmiInvokeFailed.specific_cls(7):
+            pass
         service = self._wmi_service.get()
         processes = list(self._winrm.wmi_class(u'Win32_Process').enumerate({}))
         for process in processes:
