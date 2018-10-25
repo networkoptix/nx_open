@@ -37,7 +37,6 @@ TEST_F(TimeSynchronizationWidgetReducerTest, synchronizedWithSelectedServer)
 
     const auto s = Reducer::initialize(State(),
         /*isTimeSynchronizationEnabled*/ true,
-        /*syncWithInternet*/ false,
         /*primaryTimeServer*/ id,
         /*servers*/ {server(id), server()});
 
@@ -52,7 +51,6 @@ TEST_F(TimeSynchronizationWidgetReducerTest, notSynchronizedByDisabledFlag)
 
     const auto s = Reducer::initialize(State(),
         /*isTimeSynchronizationEnabled*/ false,
-        /*syncWithInternet*/ true,
         /*primaryTimeServer*/ id,
         /*servers*/ {server(id), server()});
 
@@ -64,7 +62,6 @@ TEST_F(TimeSynchronizationWidgetReducerTest, notSynchronizedByNullServer)
 {
     const auto s = Reducer::initialize(State(),
         /*isTimeSynchronizationEnabled*/ true,
-        /*syncWithInternet*/ false,
         /*primaryTimeServer*/ QnUuid(),
         /*servers*/ {server(), server()});
 
@@ -75,7 +72,6 @@ TEST_F(TimeSynchronizationWidgetReducerTest, notSynchronizedByInvalidServer)
 {
     const auto s = Reducer::initialize(State(),
         /*isTimeSynchronizationEnabled*/ true,
-        /*syncWithInternet*/ false,
         /*primaryTimeServer*/ QnUuid::createUuid(),
         /*servers*/ {server(), server()});
 
@@ -90,7 +86,6 @@ TEST_F(TimeSynchronizationWidgetReducerTest, singleServerLocalTimeCorrectId)
 
     const auto s = Reducer::initialize(State(),
         /*isTimeSynchronizationEnabled*/ true,
-        /*syncWithInternet*/ false,
         /*primaryTimeServer*/ id,
         /*servers*/ {server(id)});
 
@@ -103,7 +98,6 @@ TEST_F(TimeSynchronizationWidgetReducerTest, singleServerLocalTimeEmptyId)
 {
     const auto s = Reducer::initialize(State(),
         /*isTimeSynchronizationEnabled*/ true,
-        /*syncWithInternet*/ false,
         /*primaryTimeServer*/ QnUuid(),
         /*servers*/ {server()});
 
@@ -115,7 +109,6 @@ TEST_F(TimeSynchronizationWidgetReducerTest, singleServerLocalTimeInvalidId)
 {
     const auto s = Reducer::initialize(State(),
         /*isTimeSynchronizationEnabled*/ true,
-        /*syncWithInternet*/ false,
         /*primaryTimeServer*/ QnUuid::createUuid(),
         /*servers*/ {server()});
 
@@ -131,7 +124,6 @@ TEST_F(TimeSynchronizationWidgetReducerTest, noInternetConnection)
 
     const auto s = Reducer::initialize(State(),
         /*isTimeSynchronizationEnabled*/ true,
-        /*syncWithInternet*/ true,
         /*primaryTimeServer*/ QnUuid(),
         /*servers*/ {srv});
 
@@ -147,7 +139,6 @@ TEST_F(TimeSynchronizationWidgetReducerTest, selectedServerIsOffline)
 
     const auto s = Reducer::initialize(State(),
         /*isTimeSynchronizationEnabled*/ true,
-        /*syncWithInternet*/ false,
         /*primaryTimeServer*/ id,
         /*servers*/ {srv, server()});
 
