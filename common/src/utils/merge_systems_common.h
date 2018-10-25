@@ -24,6 +24,7 @@ enum Value
     unconfiguredSystem,
     notLocalOwner,
     differentCloudHost,
+    duplicateMediaServerFound,
 };
 
 QString toString(Value value);

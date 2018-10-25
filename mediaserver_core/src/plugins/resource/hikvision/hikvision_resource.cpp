@@ -14,7 +14,6 @@
 #include <boost/optional.hpp>
 #include <utils/camera/camera_diagnostics.h>
 #include <common/common_module.h>
-#include <common/static_common_module.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <onvif/soapMediaBindingProxy.h>
 #include <nx/utils/log/log.h>
@@ -75,9 +74,7 @@ nx::mediaserver::resource::StreamCapabilityMap HikvisionResource::getStreamCapab
             capability.minBitrateKbps = capabilities->bitrateRange.first;
             capability.maxBitrateKbps = capabilities->bitrateRange.second;
 
-            const auto maxFps = std::max_element(capabilities->fps.begin(), capabilities->fps.end());
-            if (maxFps != capabilities->fps.end())
-                capability.maxFps = *maxFps;
+            const auto maxFps = capabilities->realMaxFps();
         }
     }
 
@@ -104,8 +101,7 @@ QnAbstractStreamDataProvider* HikvisionResource::createLiveDataProvider()
 
 QnAbstractPtzController* HikvisionResource::createPtzControllerInternal() const
 {
-    const auto& resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    if (resourceData.value<bool>(lit("useOnvifPtz"), false))
+    if (resourceData().value<bool>(lit("useOnvifPtz"), false))
         return QnPlOnvifResource::createPtzControllerInternal();
 
     const auto isapi = m_integrationProtocols.find(Protocol::isapi);
@@ -118,8 +114,7 @@ QnAbstractPtzController* HikvisionResource::createPtzControllerInternal() const
 CameraDiagnostics::Result HikvisionResource::initializeMedia(
     const CapabilitiesResp& onvifCapabilities)
 {
-    auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    bool hevcIsDisabled = resourceData.value<bool>(Qn::DISABLE_HEVC_PARAMETER_NAME, false);
+    bool hevcIsDisabled = resourceData().value<bool>(Qn::DISABLE_HEVC_PARAMETER_NAME, false);
 
     if (!hevcIsDisabled && m_integrationProtocols[Protocol::isapi].enabled)
     {
@@ -143,8 +138,8 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
                 if (role == Qn::ConnectionRole::CR_LiveVideo)
                 {
                     setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, 1);
-                    if (!channelCapabilities.fps.empty())
-                        setMaxFps(channelCapabilities.fps[0] / 100);
+                    if (!channelCapabilities.fpsInDeviceUnits.empty())
+                        setMaxFps(channelCapabilities.realMaxFps());
                 }
                 if (!channelCapabilities.resolutions.empty())
                     setResolutionList(channelCapabilities, role);
@@ -178,7 +173,7 @@ void HikvisionResource::setResolutionList(
         ? secondaryVideoCapabilities() : primaryVideoCapabilities();
     capabilities.resolutions = QList<QSize>::fromVector(QVector<QSize>::fromStdVector(
         channelCapabilities.resolutions));
-    capabilities.isH264 = true;
+    capabilities.encoding = UnderstandableVideoCodec::H264;
     if (role == Qn::CR_SecondaryLiveVideo)
         setSecondaryVideoCapabilities(capabilities);
     else
@@ -290,16 +285,10 @@ boost::optional<ChannelCapabilities> HikvisionResource::channelCapabilities(
 
 bool HikvisionResource::findDefaultPtzProfileToken()
 {
-    std::unique_ptr<MediaSoapWrapper> soapWrapper(new MediaSoapWrapper(
-        onvifTimeouts(),
-        getMediaUrl().toStdString(),
-        getAuth().user(),
-        getAuth().password(),
-        getTimeDrift()));
-
+    MediaSoapWrapper soapWrapper(this);
     ProfilesReq request;
     ProfilesResp response;
-    int soapRes = soapWrapper->getProfiles(request, response);
+    int soapRes = soapWrapper.getProfiles(request, response);
     if (soapRes != SOAP_OK)
     {
         NX_WARNING(this, lm("Can't read profile list from device %1").arg(getMediaUrl()));

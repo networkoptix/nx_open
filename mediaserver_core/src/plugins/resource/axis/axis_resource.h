@@ -59,7 +59,7 @@ public:
 
     int getChannelNumAxis() const; // depracated
 
-    virtual bool setRelayOutputState(
+    virtual bool setOutputPortState(
         const QString& ouputID,
         bool activate,
         unsigned int autoResetTimeoutMS ) override;
@@ -67,7 +67,7 @@ public:
     QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids);
     QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
-    virtual QnIOStateDataList ioStates() const override;
+    virtual QnIOStateDataList ioPortStates() const override;
 
     QString resolutionToString(const QSize& resolution);
     static QString toAxisCodecString(AVCodecID codecId);
@@ -88,9 +88,8 @@ protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
     virtual void setCroppingPhysical(QRect cropping);
-    virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
-    virtual void stopInputPortMonitoringAsync() override;
-    virtual bool isInputPortMonitored() const override;
+    virtual void startInputPortStatesMonitoring() override;
+    virtual void stopInputPortStatesMonitoring() override;
 private:
     void clear();
     static QRect axisRectToGridRect(const QRect& axisRect);
@@ -120,7 +119,7 @@ private:
     //std::map<QString, unsigned int> m_inputPortNameToIndex;
     //std::map<QString, unsigned int> m_outputPortNameToIndex;
     QnIOPortDataList m_ioPorts;
-    QnIOStateDataList m_ioStates;
+    QnIOStateDataList m_ioPortStates;
     int m_rtspPort = 0;
     //!http client used to monitor input port(s) state
 
@@ -139,8 +138,6 @@ private:
     nx::network::http::AsyncHttpClientPtr m_inputPortStateReader;
     QVector<QString> m_ioPortIdList;
 
-
-    nx::network::http::AsyncHttpClientPtr m_inputPortHttpMonitor;
     nx::network::http::BufferType m_currentMonitorData;
 
     QnWaitCondition m_stopInputMonitoringWaitCondition;

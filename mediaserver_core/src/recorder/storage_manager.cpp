@@ -323,7 +323,7 @@ public:
                             .arg(scanPeriodDuration / (1000 * 60 * 60)));
                     filter.scanPeriod.durationMs = scanPeriodDuration;
                     m_owner->partialMediaScan(itr.key(), scanData.storage, filter);
-                    if (needToStop() || QnResource::isStopping())
+                    if (needToStop() || m_owner->serverModule()->commonModule()->isNeedToStop())
                         return;
                     ++currentStorageStep;
                 }
@@ -376,7 +376,7 @@ public:
                     if (fullscanProcessed)
                     {
                         // Do not reset position if server is going to restart.
-                        if (!QnResource::isStopping())
+                        if (!m_owner->serverModule()->commonModule()->isNeedToStop())
                             ArchiveScanPosition::reset(m_owner->m_role, m_owner->serverModule());
 
                         m_owner->createArchiveCameras(archiveCameras);
@@ -416,8 +416,13 @@ public:
         for (const auto& storage: storagesToTest())
         {
             auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
-            if (fileStorage && !nx::mserver_aux::isStorageUnmounted(storage, m_settings))
+            if (fileStorage && !nx::mserver_aux::isStorageUnmounted(
+                m_owner->serverModule()->platform(),
+                storage,
+                m_settings))
+            {
                 fileStorage->setMounted(true);
+            }
         }
 
         for (const auto& storage : storagesToTest())
@@ -628,7 +633,7 @@ void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog,
     QnStorageDbPtr sdb = storageDbPool()->getSDB(storage);
     QString cameraUniqueId = fileCatalog->cameraUniqueId();
     for(const DeviceFileCatalog::Chunk& chunk: newChunks) {
-        if (QnResource::isStopping())
+        if (serverModule()->commonModule()->isNeedToStop())
             break;
         if (sdb)
             sdb->addRecord(cameraUniqueId, catalog, chunk);
@@ -1142,7 +1147,10 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
     if (storage && storage->getParentId() == moduleGUID())
     {
         auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
-        if (fileStorage && nx::mserver_aux::isStorageUnmounted(fileStorage, &serverModule()->settings()))
+        if (fileStorage && nx::mserver_aux::isStorageUnmounted(
+            serverModule()->platform(),
+            fileStorage,
+            &serverModule()->settings()))
             fileStorage->setMounted(false);
 
         if (checkIfMyStorage(storage))
@@ -1542,7 +1550,7 @@ void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
         {
             for (const auto& entry: fl)
             {
-                if (QnResource::isStopping())
+                if (serverModule()->commonModule()->isNeedToStop())
                     return false;
 
                 if (entry.isDir())
@@ -2115,7 +2123,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
 
     while (toDelete > 0)
     {
-        if (QnResource::isStopping())
+        if (serverModule()->commonModule()->isNeedToStop())
         {   // Return true to mark this storage as succesfully cleaned since
             // we don't want this storage to be added in clear-again list when
             // server is going to stop.
@@ -2278,6 +2286,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
             if (available >= bigStorageThreshold)
             {
                 result << fileStorage;
+                fileStorage->setStatusFlag(fileStorage->statusFlag() & ~Qn::StorageStatus::tooSmall);
                 NX_VERBOSE(
                     this,
                     lm("[ApiStorageSpace, Writable storages] candidate: %1 size seems appropriate")
@@ -2285,6 +2294,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
             }
             else
             {
+                fileStorage->setStatusFlag(fileStorage->statusFlag() | Qn::StorageStatus::tooSmall);
                 NX_VERBOSE(
                     this,
                     lm("[ApiStorageSpace, Writable storages] candidate: %1 available size %2 is less than the treshold %3.")
@@ -2305,6 +2315,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
             totalNonSystemStoragesSpace += (*it)->getTotalSpace();
         else
         {
+            (*it)->setStatusFlag((*it)->statusFlag() & ~Qn::StorageStatus::tooSmall);
             systemStorageItVec.push_back(it);
             systemStorageSpace += (*it)->getTotalSpace();
         }
@@ -2319,6 +2330,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
                 lm("[ApiStorageSpace, Writable storages] Removing system storage %1 out of candidates")
                     .args((*it)->getUrl()));
 
+            (*it)->setStatusFlag((*it)->statusFlag() | Qn::StorageStatus::tooSmall);
             result.remove(*it);
         }
     }
@@ -2400,7 +2412,6 @@ void QnStorageManager::checkWritableStoragesExist()
 
 void QnStorageManager::startAuxTimerTasks()
 {
-
     if (m_role == QnServer::StoragePool::Normal)
     {
         static const std::chrono::seconds kCheckStoragesAvailableInterval(30);
@@ -3015,3 +3026,49 @@ QnScheduleSync* QnStorageManager::scheduleSync() const
 {
     return m_scheduleSync.get();
 }
+
+Qn::StorageStatuses QnStorageManager::storageStatus(
+    QnMediaServerModule* serverModule,
+    const QnStorageResourcePtr& storage)
+{
+    Qn::StorageStatuses result =
+        serverModule->normalStorageManager()->storageStatusInternal(storage);
+    if (result.testFlag(Qn::none))
+        result = serverModule->backupStorageManager()->storageStatusInternal(storage);
+
+    return result;
+}
+
+Qn::StorageStatuses QnStorageManager::storageStatusInternal(const QnStorageResourcePtr& storage)
+{
+    QnStorageResourceList allStorages;
+    QnStorageScanData storageScanData;
+    {
+        QnMutexLocker lock(&m_mutexStorages);
+        std::transform(m_storageRoots.cbegin(), m_storageRoots.cend(),
+            std::back_inserter(allStorages), [](const auto& storage){ return storage; });
+        storageScanData = m_archiveRebuildInfo;
+    }
+
+    Qn::StorageStatuses result = Qn::StorageStatus::none;
+    auto partitionType =
+        QnLexical::deserialized<QnPlatformMonitor::PartitionType>(storage->getStorageType());
+    if (partitionType == QnPlatformMonitor::RemovableDiskPartition)
+        result |= Qn::StorageStatus::removable;
+
+    if (storage->isSystem())
+        result |= Qn::StorageStatus::system;
+
+    if (!allStorages.contains(storage))
+        return result;
+
+    result |= Qn::StorageStatus::used;
+    if (storage->getStatus() == Qn::Offline)
+        return result | Qn::StorageStatus::beingChecked;
+
+    if (storage->hasFlags(Qn::storage_fastscan) || storageScanData.path == storage->getUrl())
+        result | Qn::StorageStatus::beingRebuilt;
+
+    return result | storage->statusFlag();
+}
+

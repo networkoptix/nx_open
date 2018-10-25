@@ -23,11 +23,6 @@ class QnResourceConsumer;
 class QnResourcePool;
 class QnCommonModule;
 
-class QnInitResPool: public QThreadPool
-{
-public:
-};
-
 class QnResource: public QObject, public QnFromThisToShared<QnResource>
 {
     Q_OBJECT
@@ -37,7 +32,6 @@ class QnResource: public QObject, public QnFromThisToShared<QnResource>
     Q_PROPERTY(QString uniqueId READ getUniqueId CONSTANT)
     Q_PROPERTY(int logicalId READ logicalId WRITE setLogicalId NOTIFY logicalIdChanged)
     Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
-    Q_PROPERTY(QString searchString READ toSearchString)
     Q_PROPERTY(QnUuid parentId READ getParentId WRITE setParentId NOTIFY parentIdChanged)
     Q_PROPERTY(Qn::ResourceFlags flags READ flags WRITE setFlags NOTIFY flagsChanged)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
@@ -105,9 +99,6 @@ public:
     QnResourcePool *resourcePool() const;
     virtual void setResourcePool(QnResourcePool *resourcePool);
 
-    QString toSearchString() const;
-    virtual QStringList searchFilters() const;
-
     template<class Resource>
     static QnSharedResourcePointer<Resource> toSharedPointer(const Resource *resource);
 
@@ -126,9 +117,6 @@ public:
     bool hasConsumer(QnResourceConsumer *consumer) const;
 
     virtual bool isInitialized() const;
-
-    static void stopAsyncTasks();
-    static void pleaseStopAsyncTasks();
 
     /* Note that these functions hide property API inherited from QObject.
      * This is intended as this API cannot be used with QnResource anyway
@@ -173,9 +161,6 @@ public:
     //!Call this with proper field names to emit corresponding *changed signals. Signal can be defined in a derived class
     void emitModificationSignals(const QSet<QByteArray>& modifiedFields);
 
-    static QnInitResPool* initAsyncPoolInstance(int threadCount);
-    static bool isStopping() { return m_appStopping; }
-
     virtual bool saveParams();
     virtual int saveParamsAsync();
 signals:
@@ -202,7 +187,7 @@ public:
 
     QnResourcePtr toSharedPointer() const;
 
-    void setCommonModule(QnCommonModule* commonModule);
+    virtual void setCommonModule(QnCommonModule* commonModule);
     QnCommonModule* commonModule() const;
 
     virtual QString idForToStringFromPtr() const; //< Used by toString(const T*).
@@ -245,8 +230,6 @@ protected:
     /** Mutex that is to be used when accessing resource fields. */
     mutable QnMutex m_mutex;
     mutable QnMutex m_initMutex;
-
-    static std::atomic<bool> m_appStopping;
 
     /** Identifier of the parent resource. Use resource pool to retrieve the actual parent resource. */
     QnUuid m_parentId;

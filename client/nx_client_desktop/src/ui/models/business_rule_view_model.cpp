@@ -27,6 +27,8 @@
 #include <nx/client/desktop/event_rules/helpers/fullscreen_action_helper.h>
 #include <nx/client/desktop/event_rules/helpers/exit_fullscreen_action_helper.h>
 
+#include <nx/vms/common/resource/analytics_engine_resource.h>
+
 #include <ui/help/help_topics.h>
 #include <ui/help/business_help.h>
 #include <ui/models/notification_sound_model.h>
@@ -39,6 +41,8 @@
 #include <nx/client/core/utils/human_readable.h>
 #include <utils/media/audio_player.h>
 #include <nx/network/http/http_types.h>
+
+#include <ini.h>
 
 using namespace nx;
 
@@ -205,7 +209,20 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
 
     QnBusinessTypesComparator lexComparator(true);
     for (const auto eventType: lexComparator.lexSortedEvents(EventSubType::user))
+    {
+        if (eventType == EventType::pluginEvent)
+        {
+            if (!ini().enablePluginEvents)
+                continue;
+
+            /** Show it only for users who have at least one plugin installed. */
+            const auto pirs =
+                resourcePool()->getResources<nx::vms::common::AnalyticsEngineResource>();
+            if (pirs.isEmpty())
+                continue;
+        }
         addEventItem(eventType);
+    }
     addSeparator(m_eventTypesModel);
     for (const auto eventType: lexComparator.lexSortedEvents(EventSubType::failure))
         addEventItem(eventType);

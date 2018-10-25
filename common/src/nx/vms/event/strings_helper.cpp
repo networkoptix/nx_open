@@ -13,11 +13,12 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource/camera_history.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/network/nettools.h> /* For resolveAddress. */
 #include <utils/common/app_info.h>
 #include <utils/common/id.h>
 
-#include <nx/api/analytics/driver_manifest.h>
+#include <nx/vms/api/analytics/engine_manifest.h>
 
 #include <nx/vms/event/aggregation_info.h>
 #include <nx/vms/event/rule.h>
@@ -27,7 +28,7 @@
 
 namespace {
 
-static nx::api::Analytics::EventType analyticsEventType(
+static nx::vms::api::analytics::EventType analyticsEventType(
     const QnVirtualCameraResourcePtr& camera,
     const QString& pluginId,
     const QString& eventTypeId)
@@ -46,7 +47,7 @@ static nx::api::Analytics::EventType analyticsEventType(
 
     const auto drivers = server->analyticsDrivers();
     const auto driver = std::find_if(drivers.cbegin(), drivers.cend(),
-        [pluginId](const nx::api::AnalyticsDriverManifest& manifest)
+        [pluginId](const nx::vms::api::analytics::EngineManifest& manifest)
         {
             return manifest.pluginId == pluginId;
         });
@@ -55,15 +56,15 @@ static nx::api::Analytics::EventType analyticsEventType(
     if (driver == drivers.cend())
         return {};
 
-    const auto types = driver->outputEventTypes;
+    const auto types = driver->eventTypes;
     const auto eventType = std::find_if(types.cbegin(), types.cend(),
-        [eventTypeId](const nx::api::Analytics::EventType eventType)
+        [eventTypeId](const nx::vms::api::analytics::EventType eventType)
         {
             return eventType.id == eventTypeId;
         });
 
     return eventType == types.cend()
-        ? nx::api::Analytics::EventType()
+        ? nx::vms::api::analytics::EventType()
         : *eventType;
 }
 
@@ -142,6 +143,7 @@ QString StringsHelper::eventName(EventType value, int count) const
         case EventType::licenseIssueEvent:    return tr("License Issue");
         case EventType::backupFinishedEvent:  return tr("Archive backup finished");
         case EventType::analyticsSdkEvent:    return tr("Analytics Event");
+        case EventType::pluginEvent:          return tr("Plugin Event");
 
         case EventType::anyServerEvent:       return tr("Any Server Issue");
         case EventType::anyEvent:             return tr("Any Event");
@@ -631,37 +633,43 @@ QString StringsHelper::urlForCamera(const QnUuid& id, qint64 timestampUsec, bool
     if (!server)
         return QString();
 
-    quint64 timeStampMs = timestampUsec / 1000;
-    QnMediaServerResourcePtr newServer = cameraHistoryPool()->getMediaServerOnTime(camera, timeStampMs);
+    auto timeStampMs = timestampUsec / 1000;
+    auto newServer = cameraHistoryPool()->getMediaServerOnTime(camera, timeStampMs);
     if (newServer)
         server = newServer;
 
-    if (const auto& connection = camera->commonModule()->ec2Connection())
-    {
-        auto appServerUrl = connection->connectionInfo().ecUrl;
-        if (appServerUrl.host().isEmpty() || nx::network::resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost)
-        {
-            appServerUrl = server->getApiUrl();
-            if (isPublic)
-            {
-                const auto publicIP = server->getProperty(Qn::PUBLIC_IP);
-                if (!publicIP.isEmpty())
-                {
-                    QStringList parts = publicIP.split(L':');
-                    appServerUrl.setHost(parts[0]);
-                    if (parts.size() > 1)
-                        appServerUrl.setPort(parts[1].toInt());
-                }
-            }
-        }
+    const auto& connection = camera->commonModule()->ec2Connection();
+    if (!connection)
+        return QString();
 
-        QString result(lit("http://%1:%2/static/index.html#/view/%3?time=%4"));
-        result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80))
-            .arg(camera->getId().toSimpleString()).arg(timeStampMs);
-        return result;
+    auto appServerUrl = connection->connectionInfo().ecUrl;
+    if (appServerUrl.host().isEmpty() ||
+        nx::network::resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost)
+    {
+        appServerUrl = server->getApiUrl();
+        if (isPublic)
+        {
+            const auto publicIP = server->getProperty(Qn::PUBLIC_IP);
+            if (publicIP.isEmpty())
+                return QString();
+
+            QStringList parts = publicIP.split(L':');
+            appServerUrl.setHost(parts[0]);
+            if (parts.size() > 1)
+                appServerUrl.setPort(parts[1].toInt());
+        }
     }
 
-    return QString();
+    utils::Url url = network::url::Builder()
+        .setScheme(network::http::urlSheme(server->isSslAllowed()))
+        .setHost(appServerUrl.host())
+        .setPort(appServerUrl.port(80))
+        .setPath("/static/index.html")
+        .setFragment("/view/" + camera->getId().toSimpleString())
+        .setQuery(QString("time=%1").arg(timeStampMs));
+
+    NX_ASSERT(url.isValid());
+    return url.toString();
 }
 
 QString StringsHelper::toggleStateToString(EventState state) const

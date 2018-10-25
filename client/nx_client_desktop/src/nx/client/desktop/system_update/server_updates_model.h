@@ -33,10 +33,14 @@ struct UpdateItem
     int progress = -1;
     QString statusMessage;
 
+    // Flag for servers, that can be updated using legacy 3.2 system
     bool onlyLegacyUpdate = false;
     bool legacyUpdateUsed = false;
     bool offline = false;
     bool skipped = false;
+    bool installed = false;
+    bool changedProtocol = false;
+    bool installing = false;
     bool storeUpdates = true;
     // Row in the table
     int row = -1;
@@ -59,19 +63,22 @@ public:
         NameColumn,
         VersionColumn,
         ProgressColumn,
-        StatusColumn,
         StorageSettingsColumn,
+        StatusMessageColumn,
         ColumnCount
     };
 
-    explicit ServerUpdatesModel(QObject* parent = 0);
+    explicit ServerUpdatesModel(QObject* parent);
 
     QnServerUpdatesColors colors() const;
     void setColors(const QnServerUpdatesColors& colors);
 
     UpdateItemPtr findItemById(QnUuid id);
     UpdateItemPtr findItemByRow(int row) const;
-public:
+
+    // Overrides status for chosen mediaservers.
+    void setManualStatus(QSet<QnUuid> targets, nx::update::Status::Code status);
+
     // Overrides for QAbstractTableModel
     int columnCount(const QModelIndex& parent) const override;
     int rowCount(const QModelIndex& parent) const override;
@@ -80,22 +87,12 @@ public:
     // Need this to allow delegate to spawn editor
     Qt::ItemFlags flags(const QModelIndex& index) const override;
 
-public:
-    nx::utils::SoftwareVersion latestVersion() const;
-    void setUpdateTarget(const nx::utils::SoftwareVersion& version,
-        const QSet<nx::vms::api::SystemInformation>& selection);
+    void setUpdateTarget(const nx::utils::SoftwareVersion& version);
 
-    // Get current set of servers
-    QSet<QnUuid> getAllServers() const;
+    nx::utils::SoftwareVersion lowestInstalledVersion();
 
-    // Get servers with specified update status
-    QSet<QnUuid> getServersInState(StatusCode status) const;
-
-    // Get servers that are offline right now
-    QSet<QnUuid> getOfflineServers() const;
-
-    // Get servers that are incompatible with new update system
-    QSet<QnUuid> getLegacyServers() const;
+    // Clears internal state back to initial state
+    void clearState();
 
     // Called by rest api handler
     void setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll);
@@ -103,12 +100,11 @@ public:
     // Set resource pool to be used as a source.
     void setResourceFeed(QnResourcePool* pool);
 
-    nx::utils::SoftwareVersion lowestInstalledVersion();
+    const QList<UpdateItemPtr>& getServerData() const;
 
 private:
     void resetResourses(QnResourcePool* pool);
     void updateVersionColumn();
-
     void updateContentsIndex();
     void addItemForServer(QnMediaServerResourcePtr server);
 
@@ -119,11 +115,11 @@ private:
 
     // Reads data from resource to UpdateItem
     void updateServerData(QnMediaServerResourcePtr server, UpdateItem& item);
+
 private:
     QList<UpdateItemPtr> m_items;
-    nx::utils::SoftwareVersion m_latestVersion;
-    QSet<nx::vms::api::SystemInformation> m_updatePlatforms;
-
+    // The version we want to update to
+    nx::utils::SoftwareVersion m_targetVersion;
     QnServerUpdatesColors m_versionColors;
 };
 

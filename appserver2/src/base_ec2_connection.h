@@ -19,6 +19,7 @@
 #include <managers/updates_manager.h>
 #include <managers/misc_manager.h>
 #include <managers/discovery_manager.h>
+#include <managers/analytics_manager.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <transaction/message_bus_adapter.h>
 
@@ -55,6 +56,9 @@ public:
     virtual AbstractUpdatesManagerPtr getUpdatesManager(const Qn::UserAccessData &userAccessData) override;
     virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserAccessData &userAccessData) override;
     virtual AbstractDiscoveryManagerPtr getDiscoveryManager(const Qn::UserAccessData &userAccessData) override;
+    virtual AbstractAnalyticsManagerPtr getAnalyticsManager(
+        const Qn::UserAccessData &userAccessData) override;
+
 
     virtual AbstractLicenseNotificationManagerPtr getLicenseNotificationManager() override;
     virtual AbstractTimeNotificationManagerPtr getTimeNotificationManager() override;
@@ -71,6 +75,8 @@ public:
     virtual AbstractUpdatesNotificationManagerPtr getUpdatesNotificationManager() override;
     virtual AbstractStoredFileNotificationManagerPtr getStoredFileNotificationManager() override;
     virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() override;
+    virtual AbstractAnalyticsNotificationManagerPtr
+        getAnalyticsNotificationManager() override;
 
     virtual QnCommonModule* commonModule() const override;
 
@@ -117,6 +123,7 @@ protected:
     QnMiscNotificationManagerPtr m_miscNotificationManager;
     QnDiscoveryNotificationManagerPtr m_discoveryNotificationManager;
     QnTimeNotificationManagerPtr m_timeNotificationManager;
+    AnalyticsNotificationManagerPtr m_analyticsNotificationManager;
     std::unique_ptr<ECConnectionNotificationManager> m_notificationManager;
     std::unique_ptr<ECConnectionAuditManager> m_auditManager;
 };
@@ -142,7 +149,8 @@ BaseEc2Connection<QueryProcessorType>::BaseEc2Connection(
     m_updatesNotificationManager(new QnUpdatesNotificationManager),
     m_miscNotificationManager(new QnMiscNotificationManager),
     m_discoveryNotificationManager(new QnDiscoveryNotificationManager(commonModule())),
-    m_timeNotificationManager(new QnTimeNotificationManager(connectionFactory->timeSyncManager()))
+    m_timeNotificationManager(new QnTimeNotificationManager(connectionFactory->timeSyncManager())),
+    m_analyticsNotificationManager(new AnalyticsNotificationManager())
 {
     m_notificationManager.reset(
         new ECConnectionNotificationManager(
@@ -161,7 +169,8 @@ BaseEc2Connection<QueryProcessorType>::BaseEc2Connection(
             m_storedFileNotificationManager.get(),
             m_updatesNotificationManager.get(),
             m_miscNotificationManager.get(),
-            m_discoveryNotificationManager.get()));
+            m_discoveryNotificationManager.get(),
+            m_analyticsNotificationManager.get()));
 
     m_auditManager.reset(new ECConnectionAuditManager(this));
 }
@@ -412,6 +421,21 @@ AbstractTimeNotificationManagerPtr
     BaseEc2Connection<QueryProcessorType>::getTimeNotificationManager()
 {
     return m_timeNotificationManager;
+}
+
+template<class QueryProcessorType>
+AbstractAnalyticsManagerPtr BaseEc2Connection<QueryProcessorType>::getAnalyticsManager(
+    const Qn::UserAccessData &userAccessData)
+{
+    return std::make_shared<AnalyticsManager<QueryProcessorType>>(
+        m_queryProcessor, userAccessData);
+}
+
+template<class QueryProcessorType>
+AbstractAnalyticsNotificationManagerPtr
+    BaseEc2Connection<QueryProcessorType>::getAnalyticsNotificationManager()
+{
+    return m_analyticsNotificationManager;
 }
 
 template<class QueryProcessorType>

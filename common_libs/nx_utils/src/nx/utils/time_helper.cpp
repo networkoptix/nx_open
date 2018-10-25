@@ -48,8 +48,7 @@ void TimeHelper::reset()
     m_cameraClockToLocalDiff->timeDiff = DATETIME_INVALID;
 }
 
-qint64 TimeHelper::cameraTimeToLocalTime(
-    qint64 cameraTimeUs, qint64 currentTimeUs) const
+qint64 TimeHelper::cameraTimeToLocalTime(qint64 cameraTimeUs, qint64 currentTimeUs) const
 {
     QnMutexLocker lock(&m_cameraClockToLocalDiff->mutex);
     if (m_cameraClockToLocalDiff->timeDiff == DATETIME_INVALID)

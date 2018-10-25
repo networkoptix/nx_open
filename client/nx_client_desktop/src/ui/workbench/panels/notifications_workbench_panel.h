@@ -63,7 +63,7 @@ public:
     virtual void stopAnimations() override;
 
 private:
-    void setShowButtonUsed(bool used);
+    void enableShowButton(bool used);
     void setShowButtonIcon();
     void updateControlsGeometry();
 

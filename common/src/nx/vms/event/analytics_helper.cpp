@@ -12,7 +12,7 @@ QString getTypeName(
     const QnVirtualCameraResourcePtr& camera,
     const QString& typeId,
     const QString& locale,
-    QList<TypeStruct> nx::api::AnalyticsDriverManifest::* list)
+    QList<TypeStruct> nx::vms::api::analytics::EngineManifest::* list)
 {
     NX_ASSERT(camera);
     if (!camera)
@@ -62,18 +62,18 @@ class AnalyticsEventTypeWithRefStorage
 public:
     AnalyticsEventTypeWithRefStorage(QList<EventTypeDescriptor>* data): data(data) {}
 
-    void addUnique(const nx::api::AnalyticsDriverManifest& manifest,
-        const nx::api::Analytics::EventType& eventType)
+    void addUnique(const nx::vms::api::analytics::EngineManifest& engineManifest,
+        const nx::vms::api::analytics::EventType& eventType)
     {
-        AnalyticsEventTypeId id{manifest.pluginId, eventType.id};
+        AnalyticsEventTypeId id{engineManifest.pluginId, eventType.id};
         if (keys.contains(id))
             return;
 
         keys.insert(id);
-        EventTypeDescriptor ref(eventType);
-        ref.pluginId = manifest.pluginId;
-        ref.pluginName = manifest.pluginName;
-        data->push_back(ref);
+        EventTypeDescriptor descriptor(eventType);
+        descriptor.pluginId = engineManifest.pluginId;
+        descriptor.pluginName = engineManifest.pluginName;
+        data->push_back(descriptor);
     }
 
 private:
@@ -108,7 +108,7 @@ AnalyticsHelper::EventTypeDescriptor AnalyticsHelper::eventTypeDescriptor(
     {
         for (const auto& manifest: server->analyticsDrivers())
         {
-            for (const auto& eventType: manifest.outputEventTypes)
+            for (const auto& eventType: manifest.eventTypes)
             {
                 if (eventType.id == eventTypeId)
                 {
@@ -121,10 +121,10 @@ AnalyticsHelper::EventTypeDescriptor AnalyticsHelper::eventTypeDescriptor(
     return AnalyticsHelper::EventTypeDescriptor();
 }
 
-nx::api::Analytics::Group AnalyticsHelper::groupDescriptor(const QString& groupId) const
+nx::vms::api::analytics::Group AnalyticsHelper::groupDescriptor(const QString& groupId) const
 {
     static QnMutex mutex;
-    static QMap<QString, nx::api::Analytics::Group> cachedData;
+    static QMap<QString, nx::vms::api::analytics::Group> cachedData;
 
     QnMutexLocker lock(&mutex);
     const auto itr = cachedData.find(groupId);
@@ -145,7 +145,7 @@ nx::api::Analytics::Group AnalyticsHelper::groupDescriptor(const QString& groupI
             }
         }
     }
-    return nx::api::Analytics::Group();
+    return nx::vms::api::analytics::Group();
 }
 
 QList<AnalyticsHelper::EventTypeDescriptor> AnalyticsHelper::systemSupportedAnalyticsEvents() const
@@ -157,7 +157,7 @@ QList<AnalyticsHelper::EventTypeDescriptor> AnalyticsHelper::systemSupportedAnal
     {
         for (const auto& manifest: server->analyticsDrivers())
         {
-            for (const auto& eventType: manifest.outputEventTypes)
+            for (const auto& eventType: manifest.eventTypes)
                 storage.addUnique(manifest, eventType);
         }
     }
@@ -183,13 +183,13 @@ QList<AnalyticsHelper::EventTypeDescriptor> AnalyticsHelper::supportedAnalyticsE
         if (!server)
             continue;
 
-        QSet<QString> allowedEvents = camera->analyticsSupportedEvents().toSet();
+        QSet<QString> supportedEventTypeIds = camera->supportedAnalyticsEventTypeIds().toSet();
 
         for (const auto& manifest: server->analyticsDrivers())
         {
-            for (const auto& eventType: manifest.outputEventTypes)
+            for (const auto& eventType: manifest.eventTypes)
             {
-                if (!allowedEvents.contains(eventType.id))
+                if (!supportedEventTypeIds.contains(eventType.id))
                     continue;
 
                 storage.addUnique(manifest, eventType);
@@ -210,9 +210,9 @@ QList<AnalyticsHelper::EventTypeDescriptor> AnalyticsHelper::cameraIndependentAn
         for (const auto& manifest: server->analyticsDrivers())
         {
             if (manifest.capabilities.testFlag(
-                nx::api::AnalyticsDriverManifestBase::Capability::cameraModelIndependent))
+                nx::vms::api::analytics::EngineManifest::Capability::cameraModelIndependent))
             {
-                for (const auto& eventType: manifest.outputEventTypes)
+                for (const auto& eventType: manifest.eventTypes)
                     storage.addUnique(manifest, eventType);
             }
         }
@@ -239,7 +239,7 @@ QString AnalyticsHelper::eventTypeName(const QnVirtualCameraResourcePtr& camera,
     const QString& locale)
 {
     return getTypeName(
-        camera, eventTypeId, locale, &nx::api::AnalyticsDriverManifest::outputEventTypes);
+        camera, eventTypeId, locale, &nx::vms::api::analytics::EngineManifest::eventTypes);
 }
 
 QString AnalyticsHelper::objectTypeName(const QnVirtualCameraResourcePtr& camera,
@@ -247,7 +247,7 @@ QString AnalyticsHelper::objectTypeName(const QnVirtualCameraResourcePtr& camera
     const QString& locale)
 {
     return getTypeName(
-        camera, objectTypeId, locale, &nx::api::AnalyticsDriverManifest::outputObjectTypes);
+        camera, objectTypeId, locale, &nx::vms::api::analytics::EngineManifest::objectTypes);
 }
 
 QList<AnalyticsHelper::PluginActions> AnalyticsHelper::availableActions(

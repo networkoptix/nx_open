@@ -235,7 +235,7 @@ public:
     virtual bool listen(int queueLen = AbstractStreamServerSocket::kDefaultBacklogSize) override;
     virtual std::unique_ptr<AbstractStreamSocket> accept() override;
     virtual void pleaseStop(nx::utils::MoveOnlyFunc< void() > handler) override;
-    virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
+    virtual void pleaseStopSync() override;
 
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
 

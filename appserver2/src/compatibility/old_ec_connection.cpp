@@ -13,168 +13,177 @@
 
 #include <nx/vms/api/data/database_dump_data.h>
 
-namespace ec2
+namespace ec2 {
+
+OldEcConnection::OldEcConnection(const QnConnectionInfo& connectionInfo):
+    m_connectionInfo(connectionInfo)
 {
-    OldEcConnection::OldEcConnection(const QnConnectionInfo& connectionInfo)
-    :
-        m_connectionInfo(connectionInfo)
-    {
-    }
+}
 
-    QnConnectionInfo OldEcConnection::connectionInfo() const
-    {
-        return m_connectionInfo;
-    }
+QnConnectionInfo OldEcConnection::connectionInfo() const
+{
+    return m_connectionInfo;
+}
 
-    void OldEcConnection::updateConnectionUrl(const nx::utils::Url & /*url*/)
-    {
-        NX_ASSERT(false, "Should never get here");
-    }
+void OldEcConnection::updateConnectionUrl(const nx::utils::Url & /*url*/)
+{
+    NX_ASSERT(false, "Should never get here");
+}
 
-    AbstractResourceManagerPtr OldEcConnection::getResourceManager(const Qn::UserAccessData &)
-    {
-        return AbstractResourceManagerPtr();
-    }
+AbstractResourceManagerPtr OldEcConnection::getResourceManager(const Qn::UserAccessData &)
+{
+    return AbstractResourceManagerPtr();
+}
 
-    AbstractMediaServerManagerPtr OldEcConnection::getMediaServerManager(const Qn::UserAccessData &)
-    {
-        return AbstractMediaServerManagerPtr();
-    }
+AbstractMediaServerManagerPtr OldEcConnection::getMediaServerManager(const Qn::UserAccessData &)
+{
+    return AbstractMediaServerManagerPtr();
+}
 
-    AbstractCameraManagerPtr OldEcConnection::getCameraManager(const Qn::UserAccessData &)
-    {
-        return AbstractCameraManagerPtr();
-    }
+AbstractCameraManagerPtr OldEcConnection::getCameraManager(const Qn::UserAccessData &)
+{
+    return AbstractCameraManagerPtr();
+}
 
-    AbstractLicenseManagerPtr OldEcConnection::getLicenseManager(const Qn::UserAccessData &)
-    {
-        return AbstractLicenseManagerPtr();
-    }
+AbstractLicenseManagerPtr OldEcConnection::getLicenseManager(const Qn::UserAccessData &)
+{
+    return AbstractLicenseManagerPtr();
+}
 
-    AbstractEventRulesManagerPtr OldEcConnection::getEventRulesManager(const Qn::UserAccessData &)
-    {
-        return {};
-    }
+AbstractEventRulesManagerPtr OldEcConnection::getEventRulesManager(const Qn::UserAccessData &)
+{
+    return {};
+}
 
-    AbstractUserManagerPtr OldEcConnection::getUserManager(const Qn::UserAccessData &)
-    {
-        return AbstractUserManagerPtr();
-    }
+AbstractUserManagerPtr OldEcConnection::getUserManager(const Qn::UserAccessData &)
+{
+    return AbstractUserManagerPtr();
+}
 
-    AbstractLayoutManagerPtr OldEcConnection::getLayoutManager(const Qn::UserAccessData &)
-    {
-        return AbstractLayoutManagerPtr();
-    }
+AbstractLayoutManagerPtr OldEcConnection::getLayoutManager(const Qn::UserAccessData &)
+{
+    return AbstractLayoutManagerPtr();
+}
 
-    AbstractLayoutTourManagerPtr OldEcConnection::getLayoutTourManager(const Qn::UserAccessData&)
-    {
-        return AbstractLayoutTourManagerPtr();
-    }
+AbstractLayoutTourManagerPtr OldEcConnection::getLayoutTourManager(const Qn::UserAccessData&)
+{
+    return AbstractLayoutTourManagerPtr();
+}
 
-    AbstractVideowallManagerPtr OldEcConnection::getVideowallManager(const Qn::UserAccessData &)
-    {
-        return AbstractVideowallManagerPtr();
-    }
+AbstractVideowallManagerPtr OldEcConnection::getVideowallManager(const Qn::UserAccessData &)
+{
+    return AbstractVideowallManagerPtr();
+}
 
-    AbstractWebPageManagerPtr OldEcConnection::getWebPageManager(const Qn::UserAccessData &)
-    {
-        return AbstractWebPageManagerPtr();
-    }
+AbstractWebPageManagerPtr OldEcConnection::getWebPageManager(const Qn::UserAccessData &)
+{
+    return AbstractWebPageManagerPtr();
+}
 
-    AbstractStoredFileManagerPtr OldEcConnection::getStoredFileManager(const Qn::UserAccessData &)
-    {
-        return AbstractStoredFileManagerPtr();
-    }
+AbstractStoredFileManagerPtr OldEcConnection::getStoredFileManager(const Qn::UserAccessData &)
+{
+    return AbstractStoredFileManagerPtr();
+}
 
-    AbstractUpdatesManagerPtr OldEcConnection::getUpdatesManager(const Qn::UserAccessData &)
-    {
-        return AbstractUpdatesManagerPtr();
-    }
+AbstractUpdatesManagerPtr OldEcConnection::getUpdatesManager(const Qn::UserAccessData &)
+{
+    return AbstractUpdatesManagerPtr();
+}
 
-    AbstractMiscManagerPtr OldEcConnection::getMiscManager(const Qn::UserAccessData &)
-    {
-        return AbstractMiscManagerPtr();
-    }
+AbstractMiscManagerPtr OldEcConnection::getMiscManager(const Qn::UserAccessData &)
+{
+    return AbstractMiscManagerPtr();
+}
 
-    AbstractDiscoveryManagerPtr OldEcConnection::getDiscoveryManager(const Qn::UserAccessData &)
-    {
-        return AbstractDiscoveryManagerPtr();
-    }
+AbstractDiscoveryManagerPtr OldEcConnection::getDiscoveryManager(const Qn::UserAccessData &)
+{
+    return AbstractDiscoveryManagerPtr();
+}
 
-        AbstractLicenseNotificationManagerPtr OldEcConnection::getLicenseNotificationManager()
-    {
-        return AbstractLicenseNotificationManagerPtr();
-    }
+AbstractAnalyticsManagerPtr OldEcConnection::getAnalyticsManager(const Qn::UserAccessData&)
+{
+    return AbstractAnalyticsManagerPtr();
+}
 
-    AbstractTimeNotificationManagerPtr OldEcConnection::getTimeNotificationManager()
-    {
-        return AbstractTimeNotificationManagerPtr();
-    }
+    AbstractLicenseNotificationManagerPtr OldEcConnection::getLicenseNotificationManager()
+{
+    return AbstractLicenseNotificationManagerPtr();
+}
 
-    AbstractResourceNotificationManagerPtr OldEcConnection::getResourceNotificationManager()
-    {
-        return AbstractResourceNotificationManagerPtr();
-    }
+AbstractTimeNotificationManagerPtr OldEcConnection::getTimeNotificationManager()
+{
+    return AbstractTimeNotificationManagerPtr();
+}
 
-    AbstractMediaServerNotificationManagerPtr OldEcConnection::getMediaServerNotificationManager()
-    {
-        return AbstractMediaServerNotificationManagerPtr();
-    }
+AbstractResourceNotificationManagerPtr OldEcConnection::getResourceNotificationManager()
+{
+    return AbstractResourceNotificationManagerPtr();
+}
 
-    AbstractCameraNotificationManagerPtr OldEcConnection::getCameraNotificationManager()
-    {
-        return AbstractCameraNotificationManagerPtr();
-    }
+AbstractMediaServerNotificationManagerPtr OldEcConnection::getMediaServerNotificationManager()
+{
+    return AbstractMediaServerNotificationManagerPtr();
+}
 
-    AbstractBusinessEventNotificationManagerPtr OldEcConnection::getBusinessEventNotificationManager()
-    {
-        return AbstractBusinessEventNotificationManagerPtr();
-    }
+AbstractCameraNotificationManagerPtr OldEcConnection::getCameraNotificationManager()
+{
+    return AbstractCameraNotificationManagerPtr();
+}
 
-    AbstractUserNotificationManagerPtr OldEcConnection::getUserNotificationManager()
-    {
-        return AbstractUserNotificationManagerPtr();
-    }
+AbstractBusinessEventNotificationManagerPtr OldEcConnection::getBusinessEventNotificationManager()
+{
+    return AbstractBusinessEventNotificationManagerPtr();
+}
 
-    AbstractLayoutNotificationManagerPtr OldEcConnection::getLayoutNotificationManager()
-    {
-        return AbstractLayoutNotificationManagerPtr();
-    }
+AbstractUserNotificationManagerPtr OldEcConnection::getUserNotificationManager()
+{
+    return AbstractUserNotificationManagerPtr();
+}
 
-    AbstractLayoutTourNotificationManagerPtr OldEcConnection::getLayoutTourNotificationManager()
-    {
-        return AbstractLayoutTourNotificationManagerPtr();
-    }
+AbstractLayoutNotificationManagerPtr OldEcConnection::getLayoutNotificationManager()
+{
+    return AbstractLayoutNotificationManagerPtr();
+}
 
-    AbstractWebPageNotificationManagerPtr OldEcConnection::getWebPageNotificationManager()
-    {
-        return AbstractWebPageNotificationManagerPtr();
-    }
+AbstractLayoutTourNotificationManagerPtr OldEcConnection::getLayoutTourNotificationManager()
+{
+    return AbstractLayoutTourNotificationManagerPtr();
+}
 
-    AbstractDiscoveryNotificationManagerPtr OldEcConnection::getDiscoveryNotificationManager()
-    {
-        return AbstractDiscoveryNotificationManagerPtr();
-    }
+AbstractWebPageNotificationManagerPtr OldEcConnection::getWebPageNotificationManager()
+{
+    return AbstractWebPageNotificationManagerPtr();
+}
 
-    AbstractMiscNotificationManagerPtr OldEcConnection::getMiscNotificationManager()
-    {
-        return AbstractMiscNotificationManagerPtr();
-    }
+AbstractDiscoveryNotificationManagerPtr OldEcConnection::getDiscoveryNotificationManager()
+{
+    return AbstractDiscoveryNotificationManagerPtr();
+}
 
-    AbstractUpdatesNotificationManagerPtr OldEcConnection::getUpdatesNotificationManager()
-    {
-        return AbstractUpdatesNotificationManagerPtr();
-    }
+AbstractMiscNotificationManagerPtr OldEcConnection::getMiscNotificationManager()
+{
+    return AbstractMiscNotificationManagerPtr();
+}
 
-    AbstractStoredFileNotificationManagerPtr OldEcConnection::getStoredFileNotificationManager()
-    {
-        return AbstractStoredFileNotificationManagerPtr();
-    }
+AbstractUpdatesNotificationManagerPtr OldEcConnection::getUpdatesNotificationManager()
+{
+    return AbstractUpdatesNotificationManagerPtr();
+}
 
-    AbstractVideowallNotificationManagerPtr OldEcConnection::getVideowallNotificationManager()
-    {
-        return AbstractVideowallNotificationManagerPtr();
-    }
+AbstractStoredFileNotificationManagerPtr OldEcConnection::getStoredFileNotificationManager()
+{
+    return AbstractStoredFileNotificationManagerPtr();
+}
+
+AbstractVideowallNotificationManagerPtr OldEcConnection::getVideowallNotificationManager()
+{
+    return AbstractVideowallNotificationManagerPtr();
+}
+
+AbstractAnalyticsNotificationManagerPtr OldEcConnection::getAnalyticsNotificationManager()
+{
+    return AbstractAnalyticsNotificationManagerPtr();
+}
 
 int OldEcConnection::dumpDatabaseAsync(impl::DumpDatabaseHandlerPtr handler)
 {

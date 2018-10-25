@@ -34,7 +34,9 @@ static const QString kVideoCodecTypeTag = lit("videoCodecType");
 static const QString kVideoResolutionWidthTag = lit("videoResolutionWidth");
 static const QString kVideoResolutionHeightTag = lit("videoResolutionHeight");
 static const QString kFixedQualityTag = lit("fixedQuality");
+static const QString kBitrateControlTypeTag = lit("videoQualityControlType");
 static const QString kFixedBitrateTag = lit("constantBitRate");
+static const QString kVariableBitrateTag = lit("vbrUpperCap");
 static const QString kMaxFrameRateTag = lit("maxFrameRate");
 
 static const QString kRtspPortNumberTag = lit("rtspPortNo");
@@ -42,12 +44,17 @@ static const QString kRtspPortNumberTag = lit("rtspPortNo");
 static const QString kPrimaryStreamNumber = lit("01");
 static const QString kSecondaryStreamNumber = lit("02");
 
+static const QString kVariableBitrateValue = lit("VBR");
+static const QString kConstantBitrateValue = lit("CBR");
+
 static const QString kCapabilitiesRequestPathTemplate =
     lit("/ISAPI/Streaming/channels/%1/capabilities");
 
 // TODO: Find out if we have to try both paths.
 static const QString kChannelStreamingPathTemplate = lit("/Streaming/Channels/%1");
-static const QString kChannelStreamingPathForNvrTemplate = lit("/ISAPI/Streaming/channels/%1");
+static const QString kIsapiChannelStreamingPathTemplate = lit("/ISAPI/Streaming/channels/%1");
+
+static const int kFpsThreshold = 200;
 
 static const std::array<QString, 6> kVideoChannelProperties = {
     kVideoCodecTypeTag,
@@ -69,9 +76,15 @@ struct ChannelCapabilities
 {
     std::set<AVCodecID> codecs;
     std::vector<QSize> resolutions;
-    std::vector<int> fps;
+
+    // Cameras usually return framerate values multiplied by 100.
+    // Some models return "normal" (not multiplied) values.
+    // This vector is sorted in descending order, so the first element is the maximum framerate.
+    std::vector<int> fpsInDeviceUnits;
     std::vector<int> quality;
     std::pair<int, int> bitrateRange;
+
+    int realMaxFps() const;
 };
 
 // Intentionally use struct here just in case we need

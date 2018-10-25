@@ -52,9 +52,9 @@ void QnUniversalTcpListener::setCloudConnectionManager(
         &cloudConnectionManager, &nx::vms::cloud_integration::CloudConnectionManager::cloudBindingStatusChanged,
         this,
         [this, &cloudConnectionManager](bool /*boundToCloud*/)
-    {
-        onCloudBindingStatusChanged(cloudConnectionManager.getSystemCredentials());
-    });
+        {
+            onCloudBindingStatusChanged(cloudConnectionManager.getSystemCredentials());
+        });
 
     onCloudBindingStatusChanged(cloudConnectionManager.getSystemCredentials());
 }
@@ -125,7 +125,7 @@ void QnUniversalTcpListener::destroyServerSocket(
 }
 
 void QnUniversalTcpListener::onCloudBindingStatusChanged(
-    boost::optional<nx::hpm::api::SystemCredentials> cloudCredentials)
+    std::optional<nx::hpm::api::SystemCredentials> cloudCredentials)
 {
     QnMutexLocker lk(&m_mutex);
 

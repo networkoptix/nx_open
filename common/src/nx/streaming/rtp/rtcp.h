@@ -3,9 +3,7 @@
 #include <cstdint>
 #include <chrono>
 
-namespace nx {
-namespace streaming {
-namespace rtp {
+namespace nx::streaming::rtp {
 
 static const uint8_t kRtcpSenderReport = 200;
 static const uint8_t kRtcpReceiverReport = 201;
@@ -43,6 +41,4 @@ private:
     std::chrono::microseconds m_lastTimestamp = std::chrono::microseconds::zero();
 };
 
-} // namespace rtp
-} // namespace streaming
-} // namespace nx
+} // namespace nx::streaming::rtp

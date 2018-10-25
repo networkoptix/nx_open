@@ -50,6 +50,9 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/webpage_resource.h>
 
+#include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
+
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/camera_bookmark.h>
 
@@ -140,7 +143,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<Qn::ResourceFlags>();
     QMetaType::registerConverter<Qn::ResourceFlags, int>();
     qRegisterMetaType<Qn::ResourceStatus>();
-    qRegisterMetaType<Qn::BitratePerGopType>();
     qRegisterMetaType<nx::vms::api::EventReason>();
     qRegisterMetaType<nx::vms::event::AnalyticsSdkEventPtr>();
 
@@ -157,6 +159,9 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnVideoWallResourceList>();
     qRegisterMetaType<QnWebPageResourcePtr>();
     qRegisterMetaType<QnWebPageResourceList>();
+
+    qRegisterMetaType<nx::vms::common::AnalyticsPluginResourcePtr>();
+    qRegisterMetaType<nx::vms::common::AnalyticsEngineResourcePtr>();
 
     qRegisterMetaType<QnResourceAccessSubject>();
 
@@ -248,6 +253,8 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<Qn::PtzCommand>();
     qRegisterMetaType<Ptz::Traits>();
     qRegisterMetaType<Ptz::Capabilities>();
+    qRegisterMetaType<Qn::ResourceStatus>();
+    qRegisterMetaType<Qn::StatusChangeReason>();
 
     qRegisterMetaType<QnOnvifConfigDataPtr>();
 

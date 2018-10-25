@@ -41,7 +41,22 @@ def test_get_set_time(os_access):
 def test_disk_space(os_access):
     before = os_access.free_disk_space_bytes()
     should_be = 1000 * 1000 * 1000
-    os_access.consume_disk_space(should_be)
-    assert os_access.free_disk_space_bytes() == pytest.approx(should_be, rel=0.001, abs=1000000)
-    os_access.cleanup_disk_space()
-    assert os_access.free_disk_space_bytes() == pytest.approx(before, rel=0.001, abs=1000000)
+    with os_access.free_disk_space_limited(should_be):
+        assert os_access.free_disk_space_bytes() == pytest.approx(should_be, rel=0.01)
+    assert os_access.free_disk_space_bytes() == pytest.approx(before, rel=0.01)
+
+
+def test_disk_space_limit_twice(os_access):
+    before = os_access.free_disk_space_bytes()
+    should_be_1 = 1000 * 1000 * 1000
+    with os_access.free_disk_space_limited(should_be_1):
+        assert os_access.free_disk_space_bytes() == pytest.approx(should_be_1, rel=0.01)
+        should_be_2 = 500 * 1000 * 1000
+        with os_access.free_disk_space_limited(should_be_2):
+            assert os_access.free_disk_space_bytes() == pytest.approx(should_be_2, rel=0.01)
+    assert os_access.free_disk_space_bytes() == pytest.approx(before, rel=0.01)
+
+
+def test_fake_disk(os_access):
+    os_access.make_fake_disk('test', 100 * 1000 * 1000)
+    os_access.make_fake_disk('test', 200 * 1000 * 1000)

@@ -56,7 +56,7 @@ Filter generateRandomFilter(const AttributeDictionary* attributeDictionary)
     Filter filter;
 
     if (nx::utils::random::number<bool>())
-        filter.deviceId = QnUuid::createUuid();
+        filter.deviceIds.push_back(QnUuid::createUuid());
 
     filter.objectTypeId.resize(nx::utils::random::number<int>(0, 5));
     std::generate(
@@ -64,7 +64,7 @@ Filter generateRandomFilter(const AttributeDictionary* attributeDictionary)
         []() { return QnUuid::createUuid().toString(); });
 
     if (nx::utils::random::number<bool>())
-        filter.objectId = QnUuid::createUuid();
+        filter.objectAppearanceId = QnUuid::createUuid();
 
     // TODO: timePeriod.
 

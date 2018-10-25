@@ -134,10 +134,11 @@ bool AsyncClientMock::rmMapping(quint16 port, Protocol protocol)
 }
 
 PortMapperMocked::PortMapperMocked(
+    DeviceSearcher* deviceSearcher,
     const HostAddress& internalIp,
     quint64 checkMappingsInterval)
     :
-    PortMapper(true, checkMappingsInterval, lit("UpnpPortMapperMocked"), QString())
+    PortMapper(deviceSearcher, true, checkMappingsInterval, lit("UpnpPortMapperMocked"), QString())
 {
     m_upnpClient.reset(new AsyncClientMock);
 

@@ -72,7 +72,6 @@ struct UdtEpollHandlerHelper
     UDTSOCKET udt_handler;
 };
 
-
 static void setLastSystemErrorCodeAppropriately()
 {
     const auto systemErrorCode =
@@ -528,7 +527,6 @@ bool UdtSocket<InterfaceToImplement>::open()
 
 template class UdtSocket<AbstractStreamSocket>;
 template class UdtSocket<AbstractStreamServerSocket>;
-
 
 //=================================================================================================
 // UdtStreamSocket implementation.
@@ -1008,12 +1006,12 @@ void UdtStreamServerSocket::pleaseStop(
         });
 }
 
-void UdtStreamServerSocket::pleaseStopSync(bool assertIfCalledUnderLock)
+void UdtStreamServerSocket::pleaseStopSync()
 {
     if (isInSelfAioThread())
         stopWhileInAioThread();
     else
-        QnStoppableAsync::pleaseStopSync(assertIfCalledUnderLock);
+        QnStoppableAsync::pleaseStopSync();
 }
 
 void UdtStreamServerSocket::cancelIoInAioThread()
@@ -1044,6 +1042,7 @@ std::unique_ptr<AbstractStreamSocket> UdtStreamServerSocket::systemAccept()
         !acceptedSocket->setRecvTimeout(0) ||
         !acceptedSocket->setNonBlockingMode(false))
     {
+        detail::setLastSystemErrorCodeAppropriately();
         return nullptr;
     }
 

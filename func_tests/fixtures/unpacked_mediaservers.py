@@ -25,7 +25,9 @@ def lightweight_mediaserver_installer(mediaserver_installers_dir):
 def unpacked_mediaserver_factory(
         request, ca, artifacts_dir, mediaserver_installer_set, lightweight_mediaserver_installer):
     for installer in mediaserver_installer_set.installers:
-        if installer.platform_variant == 'ubuntu' and installer.arch == 'x64':
+        if (installer.platform_variant == 'ubuntu'
+                and installer.arch == 'x64'
+                and installer.component == 'server'):
             mediaserver_installer = installer
             break
     else:

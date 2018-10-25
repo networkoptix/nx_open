@@ -25,6 +25,7 @@
 #include "media_server/media_server_module.h"
 #include "media_server/serverutil.h"
 #include "media_server/settings.h"
+#include <nx/vms/utils/system_merge_processor.h>
 
 namespace
 {
@@ -77,6 +78,21 @@ int QnConfigureRestHandler::execute(
 {
     nx::mediaserver::Utils utils(serverModule());
 
+    nx::vms::utils::SystemMergeProcessor systemMergeProcessor(owner->commonModule());
+    using MergeStatus = ::utils::MergeSystemsStatus::Value;
+
+    if (QnPermissionsHelper::isSafeMode(serverModule()))
+    {
+        systemMergeProcessor.setMergeError(&result, MergeStatus::safeMode);
+        return nx::network::http::StatusCode::ok;
+    }
+    if (!QnPermissionsHelper::hasOwnerPermissions(
+                 owner->resourcePool(), owner->accessRights()))
+    {
+        systemMergeProcessor.setMergeError(&result, MergeStatus::forbidden);
+        return nx::network::http::StatusCode::forbidden;
+    }
+
     if (QnPermissionsHelper::isSafeMode(serverModule()))
         return QnPermissionsHelper::safeModeError(result);
     if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), owner->accessRights()))
@@ -120,6 +136,9 @@ int QnConfigureRestHandler::execute(
     const auto oldSystemId = owner->globalSettings()->localSystemId();
     if (!data.localSystemId.isNull() && data.localSystemId != owner->globalSettings()->localSystemId())
     {
+        NX_DEBUG(this, lm("Changing local system id from %1 to %2")
+            .args(owner->globalSettings()->localSystemId(), data.localSystemId));
+
         if (!utils.backupDatabase())
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));

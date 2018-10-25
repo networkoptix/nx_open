@@ -143,7 +143,7 @@ void DetectedObjectsStreamer::createCursorAsync(
         .args(m_deviceId, startTimestamp));
 
     Filter filter;
-    filter.deviceId = m_deviceId;
+    filter.deviceIds.push_back(m_deviceId);
     filter.sortOrder = Qt::SortOrder::AscendingOrder;
     filter.timePeriod.setStartTime(startTimestamp);
     filter.timePeriod.setDuration(kMaxStreamingDuration);

@@ -97,8 +97,10 @@ private:
  * NOTE: Class methods are thread-safe.
  */
 class SessionPool:
+    public QObject,
     public nx::utils::TimerEventHandler
 {
+    Q_OBJECT
 public:
     /** Locks specified session id for ScopedSessionIDLock lifetime. */
     class ScopedSessionIDLock
@@ -140,7 +142,6 @@ public:
     /** Removes session. Deallocates Session object. */
     void remove(const QString& id);
 
-    static SessionPool* instance();
     static QString generateUniqueID();
 
 protected:

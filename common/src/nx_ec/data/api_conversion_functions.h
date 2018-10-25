@@ -149,6 +149,32 @@ void fromResourceToApi(const QnWebPageResourcePtr& src, nx::vms::api::WebPageDat
 void fromApiToResourceList(const nx::vms::api::WebPageDataList& src, QnResourceList& dst);
 void fromApiToResourceList(const nx::vms::api::WebPageDataList& src, QnWebPageResourceList& dst);
 
+void fromApiToResource(
+    const nx::vms::api::AnalyticsPluginData& src,
+    nx::vms::common::AnalyticsPluginResourcePtr& dst);
+void fromResourceToApi(
+    const nx::vms::common::AnalyticsPluginResourcePtr& src,
+    nx::vms::api::AnalyticsPluginData& dst);
+void fromApiToResourceList(
+    const nx::vms::api::AnalyticsPluginDataList& src,
+    QnResourceList& dst);
+void fromApiToResourceList(
+    const nx::vms::api::AnalyticsPluginDataList& src,
+    nx::vms::common::AnalyticsPluginResourceList& dst);
+
+void fromApiToResource(
+    const nx::vms::api::AnalyticsEngineData& src,
+    nx::vms::common::AnalyticsEngineResourcePtr& dst);
+void fromResourceToApi(
+    const nx::vms::common::AnalyticsEngineResourcePtr& src,
+    nx::vms::api::AnalyticsEngineData& dst);
+void fromApiToResourceList(
+    const nx::vms::api::AnalyticsEngineDataList& src,
+    QnResourceList& dst);
+void fromApiToResourceList(
+    const nx::vms::api::AnalyticsEngineDataList& src,
+    nx::vms::common::AnalyticsEngineResourceList& dst);
+
 void deserializeNetAddrList(
     const QString& source,
     QList<nx::network::SocketAddress>& target,

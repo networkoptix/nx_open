@@ -33,8 +33,9 @@ ProxyWorker::ProxyWorker(
             translatedRequest.requestLine.url, connectionToTheTargetPeer->getLocalAddress()));
 
     m_targetHostPipeline = std::make_unique<nx::network::http::AsyncMessagePipeline>(
-        this,
         std::move(connectionToTheTargetPeer));
+    m_targetHostPipeline->setOnConnectionClosed(
+        [this](auto closeReason) { onConnectionClosed(closeReason); });
 
     m_targetHostPipeline->setMessageHandler(
         std::bind(&ProxyWorker::onMessageFromTargetHost, this, _1));
@@ -88,15 +89,12 @@ void ProxyWorker::bindToAioThread(
     m_targetHostPipeline->bindToAioThread(aioThread);
 }
 
-void ProxyWorker::closeConnection(
-    SystemError::ErrorCode closeReason,
-    nx::network::http::AsyncMessagePipeline* connection)
+void ProxyWorker::onConnectionClosed(SystemError::ErrorCode closeReason)
 {
     NX_DEBUG(this, lm("Proxy %1. Connection to target peer %2(%3) has been closed: %4")
-        .args(m_proxyingId, m_targetHost, connection->socket()->getForeignAddress().toString(),
+        .args(m_proxyingId, m_targetHost,
+            m_targetHostPipeline->socket()->getForeignAddress().toString(),
             SystemError::toString(closeReason)));
-
-    NX_ASSERT(connection == m_targetHostPipeline.get());
 
     nx::utils::swapAndCall(
         m_completionHandler,

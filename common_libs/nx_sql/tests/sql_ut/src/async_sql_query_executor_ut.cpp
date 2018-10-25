@@ -5,12 +5,15 @@
 
 #include <nx/utils/random.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/std/algorithm.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/string.h>
 #include <nx/utils/test_support/utils.h>
 
 #include <nx/sql/async_sql_query_executor.h>
+#include <nx/sql/async_sql_query_executor.h>
+#include <nx/sql/filter.h>
 #include <nx/sql/sql_cursor.h>
 #include <nx/sql/detail/query_executor_factory.h>
 #include <nx/sql/detail/query_execution_thread.h>
@@ -657,5 +660,93 @@ TEST_F(DbAsyncSqlQueryExecutorCursor, cursor_query_cleaned_up_when_after_early_c
 }
 
 // TEST_F(DbAsyncSqlQueryExecutorCursor, many_cursors_do_not_block_queries)
+
+//-------------------------------------------------------------------------------------------------
+
+class QueryWithFilter:
+    public DbAsyncSqlQueryExecutor
+{
+    using base_type = DbAsyncSqlQueryExecutor;
+
+protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        initializeDatabase();
+
+        m_allData = givenRandomData();
+    }
+
+    void whenSelectWithFilter(const Filter& filter)
+    {
+        const auto filterStr = filter.toString();
+        std::string queryStr = "SELECT * from company";
+        if (!filterStr.empty())
+            queryStr += " WHERE " + filterStr;
+
+        m_prevSelectResult = asyncSqlQueryExecutor().executeSelectQuerySync(
+            [queryStr, &filter](nx::sql::QueryContext* queryContext)
+            {
+                SqlQuery query(queryContext->connection());
+                query.prepare(queryStr.c_str());
+                filter.bindFields(&query);
+                query.exec();
+
+                std::vector<Company> companies;
+                while (query.next())
+                {
+                    Company data;
+                    readSqlRecord(&query, &data);
+                    companies.push_back(std::move(data));
+                }
+
+                return companies;
+            });
+    }
+
+    void assertSelectedRecordCount(int count)
+    {
+        ASSERT_EQ(count, (int) m_prevSelectResult.size());
+    }
+
+    void assertRecordIsSelected(const std::string& companyName)
+    {
+        ASSERT_TRUE(nx::utils::contains_if(
+            m_prevSelectResult,
+            [&companyName](const Company& company) { return company.name == companyName; }));
+    }
+
+private:
+    std::vector<Company> m_allData;
+    std::vector<Company> m_prevSelectResult;
+};
+
+TEST_F(QueryWithFilter, field_is_any_of_value_list)
+{
+    Filter filter;
+    filter.addCondition(std::make_unique<SqlFilterFieldAnyOf>(
+        "name", ":name", "Microsoft", "Google"));
+
+    whenSelectWithFilter(filter);
+
+    assertSelectedRecordCount(2);
+    assertRecordIsSelected("Microsoft");
+    assertRecordIsSelected("Google");
+}
+
+TEST_F(QueryWithFilter, multiple_conditions)
+{
+    Filter filter;
+    filter.addCondition(std::make_unique<SqlFilterFieldEqual>(
+        "name", ":name", "Microsoft"));
+    filter.addCondition(std::make_unique<SqlFilterFieldEqual>(
+        "yearFounded", ":yearFounded", 1975));
+
+    whenSelectWithFilter(filter);
+
+    assertSelectedRecordCount(1);
+    assertRecordIsSelected("Microsoft");
+}
 
 } // namespace nx::sql::test

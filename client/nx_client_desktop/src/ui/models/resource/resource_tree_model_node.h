@@ -192,9 +192,6 @@ private:
     // Extra status for cameras and recorders.
     nx::client::desktop::CameraExtraStatus m_cameraExtraStatus;
 
-    /** Search string of this node. */
-    QString m_searchString;
-
     /** Icon of this node. */
     QIcon m_icon;
 

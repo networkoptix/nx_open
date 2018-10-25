@@ -82,13 +82,14 @@ protected:
 
         while(!m_needStop)
         {
-            int readed = discoverySock->recvFrom(buffer, sizeof(buffer), &peerEndpoint);
-            if (readed > 0)
+            int bytesRead = discoverySock->recvFrom(buffer, sizeof(buffer), &peerEndpoint);
+            if (bytesRead > 0)
             {
                 if (!m_allowedIpRanges.isEmpty() && !hasRange(peerEndpoint))
                     continue;
 
-                if (QByteArray((const char*)buffer, readed).startsWith(testCameraIni().findMessage))
+                if (QByteArray((const char*) buffer, bytesRead).startsWith(
+                    testCameraIni().findMessage))
                 {
                     // got discovery message
                     qDebug() << "Got discovery message from " << peerEndpoint.toString();

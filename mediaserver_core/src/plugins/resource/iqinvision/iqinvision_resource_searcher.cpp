@@ -9,7 +9,6 @@
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
-#include <common/static_common_module.h>
 
 #if !defined(Q_OS_WIN)
     #include <arpa/inet.h>
@@ -35,7 +34,7 @@ static const QString kDefaultResourceType(lit("IQA32N"));
 QnPlIqResourceSearcher::QnPlIqResourceSearcher(QnMediaServerModule* serverModule):
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
-    QnMdnsResourceSearcher(serverModule->commonModule()),
+    QnMdnsResourceSearcher(serverModule),
     m_serverModule(serverModule)
 {
 }
@@ -123,7 +122,7 @@ QList<QnResourcePtr> QnPlIqResourceSearcher::checkHostAddr(
         return QList<QnResourcePtr>();
 
     const auto model = modelResponse.toString().trimmed();
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), model);
+    QnResourceData resourceData = dataPool()->data(manufacture(), model);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return QList<QnResourcePtr>();
 
@@ -201,7 +200,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
             return localResults; //< Already found.
     }
 
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), name);
+    QnResourceData resourceData = dataPool()->data(manufacture(), name);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return localResults; //< Model forced by ONVIF.
 

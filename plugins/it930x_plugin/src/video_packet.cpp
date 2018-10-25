@@ -2,7 +2,7 @@
 #include <cstring>
 #include <cstdlib>
 
-#include <plugins/plugin_tools.h>
+#include <nx/kit/utils.h>
 
 #include "video_packet.h"
 
@@ -10,7 +10,7 @@ namespace
 {
     static void freeAlignedX(void * ptr)
     {
-        nxpt::freeAligned(ptr);
+        nx::kit::utils::freeAligned(ptr);
     }
 }
 
@@ -24,7 +24,7 @@ namespace ite
     {
         if (data && size)
         {
-            m_data = nxpt::mallocAligned(size + nxcip::MEDIA_PACKET_BUFFER_PADDING_SIZE, nxcip::MEDIA_DATA_BUFFER_ALIGNMENT);
+            m_data = nx::kit::utils::mallocAligned(size + nxcip::MEDIA_PACKET_BUFFER_PADDING_SIZE, nxcip::MEDIA_DATA_BUFFER_ALIGNMENT);
 
             memcpy( m_data, data, size );
             memset( (uint8_t *)m_data + size, 0, nxcip::MEDIA_PACKET_BUFFER_PADDING_SIZE );

@@ -8,6 +8,7 @@
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/deprecated/simple_http_client.h>
 #include <nx/streaming/media_data_packet.h>
+#include <nx/network/http/http_async_client.h>
 
 class QDomElement;
 class QnMediaServerModule;
@@ -48,7 +49,7 @@ public:
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
-    virtual bool setRelayOutputState(
+    virtual bool setOutputPortState(
         const QString& ouputID,
         bool activate,
         unsigned int autoResetTimeoutMS) override;
@@ -59,7 +60,6 @@ public:
     bool isH264() const;
     int getZoneSite() const;
 
-    QnMetaDataV1Ptr getCameraMetadata();
     QString generateRequestString(
         const QHash<QByteArray, QVariant>& streamParam,
         bool h264,
@@ -85,8 +85,8 @@ protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
     virtual void setMotionMaskPhysical(int channel) override;
-    virtual bool startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler) override;
-    virtual void stopInputPortMonitoringAsync() override;
+    virtual void startInputPortStatesMonitoring() override;
+    virtual void stopInputPortStatesMonitoring() override;
 
     virtual bool isRTSPSupported() const;
 
@@ -110,14 +110,12 @@ protected:
 private:
     int m_totalMdZones;
     int m_zoneSite;
-    int m_channelCount;
-    int m_prevMotionChannel;
     bool m_dualsensor;
     bool m_inputPortState;
     nx::network::http::AsyncHttpClientPtr m_relayInputClient;
+
     AvParametersProvider m_advancedParametersProvider;
 
-    bool getParamPhysical2(int channel, const QString& name, QString &val);
     void inputPortStateRequestDone(nx::network::http::AsyncHttpClientPtr client);
 };
 

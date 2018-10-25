@@ -7,6 +7,7 @@ from io import BytesIO
 from netaddr import IPAddress
 from pathlib2 import PureWindowsPath
 from smb.SMBConnection import SMBConnection
+from smb.base import SharedFile
 from smb.smb_structs import OperationFailure
 
 from framework.method_caching import cached_getter
@@ -24,8 +25,19 @@ _STATUS_NOT_A_DIRECTORY = 0xC0000103
 _STATUS_FILE_IS_A_DIRECTORY = 0xC00000BA
 _STATUS_SHARING_VIOLATION = 0xC0000043
 _STATUS_DELETE_PENDING = 0xC0000056
+_STATUS_DIRECTORY_NOT_EMPTY = 0xC0000101
+_STATUS_REQUEST_NOT_ACCEPTED = 0xC00000D0
 
 _logger = logging.getLogger(__name__)
+
+
+class RequestNotAccepted(Exception):
+    message = (
+        "No more connections can be made to this remote computer at this time"
+        " because the computer has already accepted the maximum number of connections.")
+
+    def __init__(self):
+        super(RequestNotAccepted, self).__init__(self.message)
 
 
 def _reraising_on_operation_failure(status_to_error_cls):
@@ -83,6 +95,8 @@ class SMBConnectionPool(object):
         return '<SMBConnection {!s}:{:d}>'.format(self._direct_smb_address, self._direct_smb_port)
 
     @cached_getter
+    @_reraising_on_operation_failure({_STATUS_REQUEST_NOT_ACCEPTED: RequestNotAccepted})
+    @_retrying_on_status(_STATUS_REQUEST_NOT_ACCEPTED)
     def connection(self):
         # TODO: Use connection pooling with keep-alive: connections can be closed from server side.
         # See: http://pysmb.readthedocs.io/en/latest/api/smb_SMBConnection.html (Caveats section)
@@ -142,6 +156,8 @@ class SMBPath(FileSystemPath, PureWindowsPath):
     @property
     def _service_name(self):
         """Name of share"""
+        if not self.drive:
+            raise ValueError("No drive in Windows path {}".format(self))
         drive_letter = self.drive[0].upper()
         assert drive_letter in string.ascii_uppercase
         service_name = u'{}$'.format(drive_letter)  # C$, D$, ...
@@ -168,7 +184,11 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         return True
 
     @_retrying_on_status(_STATUS_SHARING_VIOLATION)  # Let OS and processes time unlock files.
-    @_reraising_on_operation_failure({_STATUS_FILE_IS_A_DIRECTORY: exceptions.NotAFile})
+    @_reraising_on_operation_failure({
+        _STATUS_FILE_IS_A_DIRECTORY: exceptions.NotAFile,
+        _STATUS_OBJECT_NAME_NOT_FOUND: exceptions.DoesNotExist,
+        _STATUS_OBJECT_PATH_NOT_FOUND: exceptions.DoesNotExist,
+        })
     def unlink(self):
         if '*' in str(self):
             raise ValueError("{!r} contains '*', but files can be deleted only by one")
@@ -240,20 +260,13 @@ class SMBPath(FileSystemPath, PureWindowsPath):
                 else:
                     raise
 
-    def rmtree(self, ignore_errors=False):
-        try:
-            iter_entries = self.glob('*')
-        except exceptions.DoesNotExist:
-            if ignore_errors:
-                pass
-            else:
-                raise
-        except exceptions.NotADir:
-            self.unlink()
-        else:
-            for entry in iter_entries:
-                entry.rmtree()
-            self._smb_connection_pool.connection().deleteDirectory(self._service_name, self._relative_path)
+    @_reraising_on_operation_failure({
+        _STATUS_DIRECTORY_NOT_EMPTY: exceptions.NotEmpty,
+        _STATUS_OBJECT_NAME_NOT_FOUND: exceptions.DoesNotExist,
+        _STATUS_OBJECT_PATH_NOT_FOUND: exceptions.DoesNotExist,
+        })
+    def rmdir(self):
+        self._smb_connection_pool.connection().deleteDirectory(self._service_name, self._relative_path)
 
     @_reraising_on_operation_failure({
         _STATUS_FILE_IS_A_DIRECTORY: exceptions.NotAFile,
@@ -288,13 +301,13 @@ class SMBPath(FileSystemPath, PureWindowsPath):
                 ad_hoc_file_object,
                 offset=offset)
 
-    def read_text(self, encoding='ascii', errors='strict'):
-        data = self.read_bytes()
-        text = data.decode(encoding=encoding, errors=errors)
-        return text
-
-    def write_text(self, text, encoding='ascii', errors='strict'):
-        data = text.encode(encoding=encoding, errors=errors)
-        bytes_written = self.write_bytes(data)
-        assert bytes_written == len(data)
-        return len(text)
+    @_reraising_on_operation_failure({
+        _STATUS_OBJECT_NAME_NOT_FOUND: exceptions.DoesNotExist,
+        _STATUS_OBJECT_PATH_NOT_FOUND: exceptions.DoesNotExist,
+        })
+    def size(self):
+        attributes = self._smb_connection_pool.connection().getAttributes(
+            self._service_name, self._relative_path)  # type: SharedFile
+        if attributes.isDirectory:
+            raise exceptions.NotAFile("Attributes of the {}: {}".format(self, attributes))
+        return attributes.file_size

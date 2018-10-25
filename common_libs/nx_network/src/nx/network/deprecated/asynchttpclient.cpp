@@ -51,7 +51,7 @@ void AsyncHttpClient::initDelegate()
 
 AsyncHttpClient::~AsyncHttpClient()
 {
-    pleaseStopSync(false);
+    pleaseStopSync();
 }
 
 void AsyncHttpClient::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
@@ -59,9 +59,9 @@ void AsyncHttpClient::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandl
     m_delegate.pleaseStop(std::move(completionHandler));
 }
 
-void AsyncHttpClient::pleaseStopSync(bool checkForLocks)
+void AsyncHttpClient::pleaseStopSync()
 {
-    m_delegate.pleaseStopSync(checkForLocks);
+    m_delegate.pleaseStopSync();
 }
 
 nx::network::aio::AbstractAioThread* AsyncHttpClient::getAioThread() const
@@ -602,7 +602,8 @@ void downloadFileAsync(
 SystemError::ErrorCode downloadFileSync(
     const nx::utils::Url& url,
     int* const statusCode,
-    nx::network::http::BufferType* const msgBody)
+    nx::network::http::BufferType* const msgBody,
+    AsyncHttpClient::Timeouts timeouts)
 {
     bool done = false;
     SystemError::ErrorCode resultingErrorCode = SystemError::noError;
@@ -620,7 +621,8 @@ SystemError::ErrorCode downloadFileSync(
             std::unique_lock<std::mutex> lk(mtx);
             done = true;
             condVar.notify_all();
-        });
+        },
+        nx::network::http::HttpHeaders(), AuthType::authBasicAndDigest, timeouts);
 
     std::unique_lock<std::mutex> lk(mtx);
     while (!done)

@@ -16,6 +16,9 @@ namespace vms {
 namespace discovery {
 namespace test {
 
+// NOTE: Used as multicast endpoint to avoid collisions with other tests ran in parallel.
+const nx::network::SocketAddress kMulticastEndpoint("239.255.11.11:0");
+
 class DiscoveryUdpMulticastFinder: public testing::Test
 {
 public:
@@ -53,6 +56,7 @@ TEST_F(DiscoveryUdpMulticastFinder, Base)
     utils::TestSyncMultiQueue<
         nx::vms::api::ModuleInformationWithAddresses, nx::network::SocketAddress> discoveryQueue;
     moduleFinder.setSendInterval(std::chrono::milliseconds(500));
+    moduleFinder.setMulticastEndpoint(kMulticastEndpoint);
     moduleFinder.updateInterfaces();
     moduleFinder.listen(
         [this, &discoveryQueue](const nx::vms::api::ModuleInformationWithAddresses& module,
@@ -101,6 +105,7 @@ TEST_F(DiscoveryUdpMulticastFinder, UpdateInterfacesAndModuleInformation)
 {
     moduleFinder.setSendInterval(std::chrono::milliseconds(20));
     moduleFinder.setUpdateInterfacesInterval(std::chrono::milliseconds(50));
+    moduleFinder.setMulticastEndpoint(kMulticastEndpoint);
     moduleFinder.updateInterfaces();
     moduleFinder.listen(
         [this](nx::vms::api::ModuleInformationWithAddresses module,

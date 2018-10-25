@@ -1,5 +1,4 @@
 #pragma once
-#if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
 
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <motion/motion_estimation.h>
@@ -31,5 +30,3 @@ private:
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_SOFTWARE_MOTION_DETECTION)

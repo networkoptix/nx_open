@@ -75,6 +75,7 @@ QList<EventType> QnBusinessTypesComparator::lexSortedEvents(EventSubType subtype
         EventType::softwareTriggerEvent,
         EventType::analyticsSdkEvent,
         EventType::userDefinedEvent,
+        EventType::pluginEvent,
     };
 
     static const QList<EventType> failureEvents{
@@ -130,6 +131,7 @@ QList<ActionType> QnBusinessTypesComparator::getAllActions() const
 QList<ActionType> QnBusinessTypesComparator::lexSortedActions(ActionSubType subtype) const
 {
     static QSet<ActionType> clientsideActions{
+        ActionType::openLayoutAction,
         ActionType::showOnAlarmLayoutAction,
         ActionType::fullscreenCameraAction,
         ActionType::exitFullscreenAction

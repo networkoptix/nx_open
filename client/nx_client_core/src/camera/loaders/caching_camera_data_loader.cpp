@@ -37,7 +37,7 @@ QnCachingCameraDataLoader::QnCachingCameraDataLoader(const QnMediaResourcePtr &r
     init();
     initLoaders();
 
-    m_analyticsFilter.deviceId = m_resource->toResource()->getId();
+    m_analyticsFilter.deviceIds.push_back(m_resource->toResource()->getId());
 
     QTimer* loadTimer = new QTimer(this);
     loadTimer->setInterval(requestIntervalMs / 10);  // time period will be loaded no often than once in 30 seconds, but timer should check it much more often
@@ -178,13 +178,13 @@ void QnCachingCameraDataLoader::setAnalyticsFilter(const AnalyticsFilter& value)
     if (m_analyticsFilter == value)
         return;
 
-    const auto deviceId = m_analyticsFilter.deviceId;
-    NX_ASSERT(value.deviceId == deviceId);
+    const auto deviceId = m_analyticsFilter.deviceIds.empty() ? QnUuid() : m_analyticsFilter.deviceIds.front();
+    NX_ASSERT(value.deviceIds == std::vector<QnUuid>{deviceId});
 
     m_analyticsFilter = value;
 
-    if (m_analyticsFilter.deviceId != deviceId)
-        m_analyticsFilter.deviceId = deviceId; //< Just for safety.
+    if (m_analyticsFilter.deviceIds != std::vector<QnUuid>{deviceId})
+        m_analyticsFilter.deviceIds = std::vector<QnUuid>{deviceId}; //< Just for safety.
 
     if (!m_cameraChunks[Qn::AnalyticsContent].isEmpty())
     {

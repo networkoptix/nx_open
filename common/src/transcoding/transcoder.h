@@ -273,4 +273,3 @@ private:
 typedef QSharedPointer<QnTranscoder> QnTranscoderPtr;
 
 #endif // ENABLE_DATA_PROVIDERS
-

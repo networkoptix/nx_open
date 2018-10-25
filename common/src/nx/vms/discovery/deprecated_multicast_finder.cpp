@@ -53,7 +53,6 @@ DeprecatedMulticastFinder::DeprecatedMulticastFinder(
     const unsigned int pingTimeoutMillis,
     const unsigned int keepAliveMultiply)
     :
-    QnLongRunnable(parent),
     QnCommonModuleAware(parent),
     m_options(options),
     m_serverSocket(nullptr),
@@ -207,6 +206,12 @@ bool DeprecatedMulticastFinder::processDiscoveryRequest(UDPSocket *udpSocket)
         NX_DEBUG(this, lm("Received invalid request from (%1) on local address %2").args(
             remoteEndpoint, udpSocket->getLocalAddress()));
         return false;
+    }
+
+    if (m_options.responseEnabled && !m_options.responseEnabled())
+    {
+        NX_VERBOSE(this, lm("Reveal request is ignored from (%1)").arg(remoteEndpoint));
+        return true;
     }
 
     //TODO #ak RevealResponse class is excess here. Should send/receive nx::vms::api::ModuleInformation

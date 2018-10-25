@@ -2,9 +2,7 @@
 
 #include <chrono>
 
-namespace nx {
-namespace streaming {
-namespace rtp {
+namespace nx::streaming::rtp {
 
 // 1900 - 1970 time diff
 static const std::chrono::seconds kNtpEpochTimeDiff(2208988800);
@@ -35,12 +33,12 @@ struct RtpHeader
     uint16_t sequence;               // sequence number
     uint32_t timestamp;              // timestamp
     uint32_t ssrc;                   // synchronization source
-    //quint32 csrc;                 // synchronization source
-    //quint32 csrc[1];              // optional CSRC list
-};
-#pragma pack(pop)
+    //quint32 csrc;                  // synchronization source
+    //quint32 csrc[1];               // optional CSRC list
 
-#pragma pack(push, 1)
+    uint32_t payloadOffset() { return kSize + CSRCCount * kCsrcSize; };
+};
+
 struct RtpHeaderExtension
 {
     static const int kSize = 4;
@@ -78,6 +76,4 @@ inline void buildRtpHeader(
     rtp->ssrc = htonl(ssrc);
 }
 
-} // namespace rtp
-} // namespace streaming
-} // namespace nx
+} // namespace nx::streaming::rtp

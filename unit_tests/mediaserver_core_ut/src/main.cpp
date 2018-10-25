@@ -1,7 +1,6 @@
 #include <QtCore>
 
 #include <nx/network/test_support/run_test.h>
-#include <nx/utils/test_support/test_with_temporary_directory.h>
 
 #include <test_support/utils.h>
 #include <common/static_common_module.h>
@@ -13,7 +12,8 @@ std::unique_ptr<QCommandLineParser> fillConfig(const QStringList& arguments)
     auto parser = std::make_unique<QCommandLineParser>();
     parser->addOptions({ {{"t", "tmp"}, "Temporary working directory path. Default: 'tmp'", "tmp"},
                        {"ftp-storage-url", "Ftp storage url"},
-                       {"smb-storage-url", "Smb storage url"} });
+                       {"smb-storage-url", "Smb storage url"},
+                       {"enable-discovery", "Enable discovery"}});
     parser->addHelpOption();
     parser->parse(arguments);
 
@@ -27,6 +27,8 @@ std::unique_ptr<QCommandLineParser> fillConfig(const QStringList& arguments)
     if (parser->isSet("smb-storage-url"))
         nx::ut::cfg::configInstance().smbUrl = parser->value("smb-storage-url");
 
+    nx::ut::cfg::configInstance().enableDiscovery = parser->isSet("enable-discovery");
+
     return parser;
 }
 
@@ -39,8 +41,6 @@ std::unique_ptr<QCommandLineParser> fillConfig(QCoreApplication& app)
 
 int main(int argc, char** argv)
 {
-    QnStaticCommonModule staticCommonModule(nx::vms::api::PeerType::server);
-
 #ifndef ENABLE_CLOUD_TEST
     QCoreApplication app(argc, argv);
     auto parser = fillConfig(app);
@@ -50,6 +50,7 @@ int main(int argc, char** argv)
         arguments.push_back(QString::fromUtf8(argv[i]));
     auto parser = fillConfig(arguments);
 #endif
+    QnStaticCommonModule staticCommonModule(nx::vms::api::PeerType::server);
     int result = nx::network::test::runTest(
         argc, argv,
         [](const nx::utils::ArgumentParser& /*args*/)

@@ -43,7 +43,7 @@ void OutgoingTransactionSorter::addTransaction(
     std::unique_ptr<const SerializableAbstractTransaction> transaction)
 {
     QnMutexLocker lock(&m_mutex);
-    const auto sequence = transaction->transactionHeader().persistentInfo.sequence;
+    const auto sequence = transaction->header().persistentInfo.sequence;
     m_transactions[cacheTranId].transactions.push_back(std::move(transaction));
     registerTransactionSequence(
         lock,
@@ -164,7 +164,7 @@ void OutgoingTransactionSorter::dispatchTransactions(
     m_transactions.erase(it);
 
     for (const auto& transaction: tranContext.transactions)
-        m_transactionsBySequence.erase(transaction->transactionHeader().persistentInfo.sequence);
+        m_transactionsBySequence.erase(transaction->header().persistentInfo.sequence);
 
     m_vmsTransactionLogCache->commit(tranId);
 

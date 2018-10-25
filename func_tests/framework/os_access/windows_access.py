@@ -1,4 +1,8 @@
+from __future__ import division
+
 import datetime
+import logging
+import math
 import timeit
 
 import dateutil.parser
@@ -7,24 +11,26 @@ import tzlocal.windows_tz
 
 from framework.method_caching import cached_getter
 from framework.networking.windows import WindowsNetworking
+from framework.os_access import exceptions
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
-from framework.os_access.exceptions import AlreadyExists, CannotDownload, exit_status_error_cls
 from framework.os_access.os_access_interface import OSAccess, Time
 from framework.os_access.smb_path import SMBPath
 from framework.os_access.windows_remoting import WinRM
+from framework.os_access.windows_remoting._cim_query import find_by_selector_set
 from framework.os_access.windows_remoting._powershell import PowershellError
 from framework.os_access.windows_remoting.env_vars import EnvVars
 from framework.os_access.windows_remoting.users import Users
 from framework.os_access.windows_traffic_capture import WindowsTrafficCapture
 from framework.utils import RunningTime
 
+_logger = logging.getLogger(__name__)
+
 
 class WindowsTime(Time):
     def __init__(self, winrm):
         self.winrm = winrm
 
-    @cached_getter
-    def _get_timezone(self):
+    def get_tz(self):
         timezone_result, = self.winrm.wmi_query(u'Win32_TimeZone',
                                                 {}).enumerate()  # Mind enumeration!
         windows_timezone_name = timezone_result[u'StandardName']
@@ -46,11 +52,11 @@ class WindowsTime(Time):
         result = self.winrm.wmi_query(u'Win32_OperatingSystem', {}).get()
         delay_sec = timeit.default_timer() - started_at
         raw = result[u'LocalDateTime'][u'cim:Datetime']
-        time = dateutil.parser.parse(raw).astimezone(self._get_timezone())
+        time = dateutil.parser.parse(raw).astimezone(self.get_tz())
         return RunningTime(time, datetime.timedelta(seconds=delay_sec))
 
     def set(self, new_time):  # type: (datetime.datetime) -> RunningTime
-        localized = new_time.astimezone(self._get_timezone())
+        localized = new_time.astimezone(self.get_tz())
         started_at = timeit.default_timer()
         # TODO: Do that with Win32_OperatingSystem.SetDateTime WMI method.
         # See: https://superuser.com/q/1323610/174311
@@ -119,7 +125,7 @@ class WindowsAccess(OSAccess):
         expected_exit_status = 0xFFFFFFFE  # ProcDump always exit with this.
         try:
             self.winrm.run_command(['procdump', '-accepteula', pid])  # Full dumps (`-ma`) are too big for pysmb.
-        except exit_status_error_cls(expected_exit_status):
+        except exceptions.exit_status_error_cls(expected_exit_status):
             pass
         else:
             raise RuntimeError("Unexpected zero exit status, {} expected".format(expected_exit_status))
@@ -146,25 +152,67 @@ class WindowsAccess(OSAccess):
             )
         return output.decode('ascii')
 
-    def make_fake_disk(self, name, size_bytes):
-        raise NotImplementedError()
+    def make_fake_disk(self, name, size_bytes, letter='V', image_dir='C:\\', partition_style='MBR'):
+        size_mb = int(math.ceil(size_bytes / 1024 / 1024))
+        image_path = self.path_cls(image_dir) / '{}.vhdx'.format(name)
+        script_template = (
+            'CREATE VDISK file={image_path} MAXIMUM={size_mb} NOERR' '\r\n'  # NOERR if exists.
+            'SELECT VDISK file={image_path}' '\r\n'  # No error if already selected.
+            'ATTACH VDISK NOERR' '\r\n'  # NOERR if attached. "Disk" of "vdisk" has been selected.
+            'CLEAN' '\r\n'  # Removes letter, wipes partition table.
+            'CONVERT {partition_style}' '\r\n'
+            'CREATE PARTITION PRIMARY' '\r\n'  # New partition and its volume have been selected.
+            'FORMAT' '\r\n'  # Filesystem is default (NTFS).
+            'ASSIGN LETTER={letter}' '\r\n'
+            'EXIT' '\r\n'
+            )
+        script = script_template.format(
+            image_path=image_path,
+            letter=letter,
+            size_mb=size_mb,
+            partition_style=partition_style)
+        _logger.debug('Diskpart script:\n%s', script)
+        # With script file, `diskpart` exits with non-zero code.
+        script_path = image_path.with_suffix('.diskpart.txt')
+        script_path.write_text(script)
+        command = self.winrm.command(['diskpart', '/s', script_path])
+        command.run(timeout_sec=10 + 0.05 * size_mb)
+        return self.path_cls('{letter}:\\'.format(letter=letter))
 
-    def free_disk_space_bytes(self):
-        disks = self.winrm.wmi_query('Win32_LogicalDisk', {}).enumerate()
-        disk_c, = (disk for disk in disks if disk['Name'] == 'C:')
-        return int(disk_c['FreeSpace'])
+    def _fs_root(self):
+        return self.path_cls('C:\\')
 
-    def consume_disk_space(self, should_leave_bytes):
-        to_consume_bytes = self.free_disk_space_bytes() - should_leave_bytes
+    def _free_disk_space_bytes_on_all(self):
+        mount_point_iter = self.winrm.wmi_query('Win32_MountPoint', {}).enumerate()
+        volume_iter = self.winrm.wmi_query('Win32_Volume', {}).enumerate()
+        volume_list = list(volume_iter)
+        result = {}
+        for mount_point in mount_point_iter:
+            # Rely on fact that single identifying selector of `Directory` is its name.
+            # TODO: Query `Win32_Directory` (`Directory` key) by its `w:SelectorSet`.
+            dir_selector_set = mount_point['Directory']['a:ReferenceParameters']['w:SelectorSet']
+            assert dir_selector_set['w:Selector'][0]['@Name'] == 'Name'
+            dir_path_raw = dir_selector_set['w:Selector'][0]['#text']
+            dir_path = self.path_cls(dir_path_raw)
+            volume_selector_set = mount_point['Volume']['a:ReferenceParameters']['w:SelectorSet']
+            volume, = find_by_selector_set(volume_selector_set, volume_list)
+            result[dir_path] = int(volume['FreeSpace'])
+        return result
+
+    def _hold_disk_space(self, to_consume_bytes):
         holder_path = self._disk_space_holder()
+        try:
+            self._disk_space_holder().unlink()
+        except exceptions.DoesNotExist:
+            pass
         args = ['fsutil', 'file', 'createNew', holder_path, to_consume_bytes]
-        self.winrm.command(args).check_call()
+        self.winrm.command(args).run()
 
     def _download_by_http(self, source_url, destination_dir, timeout_sec):
         _, file_name = source_url.rsplit('/', 1)
         destination = destination_dir / file_name
         if destination.exists():
-            raise AlreadyExists(
+            raise exceptions.AlreadyExists(
                 "Cannot download {!s} to {!s}".format(source_url, destination_dir),
                 destination)
         variables = {'out': str(destination), 'url': source_url, 'timeoutSec': timeout_sec}
@@ -172,7 +220,7 @@ class WindowsAccess(OSAccess):
         try:
             self.winrm.run_powershell_script('Invoke-WebRequest -OutFile $out $url -TimeoutSec $timeoutSec', variables)
         except PowershellError as e:
-            raise CannotDownload(str(e))
+            raise exceptions.CannotDownload(str(e))
         return destination
 
     def _download_by_smb(self, source_hostname, source_path, destination_dir, timeout_sec):

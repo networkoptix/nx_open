@@ -19,6 +19,7 @@ from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.local_path import LocalPath
 
 pytest_plugins = [
+    'framework.elasticsearch',
     'fixtures.cloud',
     'fixtures.layouts',
     'fixtures.media',

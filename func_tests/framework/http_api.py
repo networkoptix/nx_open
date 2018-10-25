@@ -1,4 +1,5 @@
 import base64
+from contextlib import contextmanager, closing
 import hashlib
 import json
 from abc import ABCMeta, abstractmethod
@@ -8,6 +9,7 @@ import requests
 import requests.exceptions
 from requests.auth import HTTPDigestAuth
 from urllib3.util import Url
+import websocket
 
 from .context_logger import ContextLogger
 
@@ -23,7 +25,7 @@ class HttpError(Exception):
 
     def __init__(self, server_name, url, status_code, reason, json=None):
         super(HttpError, self).__init__(
-            self, '[%d] HTTP Error: %r for server %s url: %s' % (status_code, reason, server_name, url))
+            '[%d] HTTP Error: %r for server %s url: %s' % (status_code, reason, server_name, url))
         self.status_code = status_code
         self.reason = reason
         self.json = json
@@ -75,6 +77,19 @@ class HttpClient(object):
         # noinspection PyProtectedMember
         return self._base_url._replace(scheme='rtsp', path='/' + path.lstrip('/')).url
 
+    def open_websocket(self, path, timeout_sec=0.5):
+        url = self._base_url._replace(scheme='ws', path=path).url
+        credentials = '%s:%s' % (self.user, self.password)
+        authorization = 'Basic ' + base64.b64encode(credentials.encode())
+        headers = dict(Authorization=authorization)
+        _logger.debug('Create websocket connection: %s', url)
+        return websocket.create_connection(url, header=headers, timeout=timeout_sec)
+
+    @contextmanager
+    def websocket_opened(self, path, timeout_sec=0.5):
+        with closing(self.open_websocket(path, timeout_sec)) as ws:
+            yield ws
+
     def request(self, method, path, timeout=None, **kwargs):
         # noinspection PyProtectedMember
         response = requests.request(
@@ -105,11 +120,19 @@ class HttpApi(object):
         _logger.debug('GET %s, params: %s, timeout: %s sec', self.http.url(path), params_str, timeout)
         assert 'data' not in kwargs
         assert 'json' not in kwargs
-        return self.request('GET', path, params=params, timeout=timeout, **kwargs)
+        try:
+            return self.request('GET', path, params=params, timeout=timeout, **kwargs)
+        except HttpError as e:
+            _logger.debug('%s', e)
+            raise
 
     def post(self, path, data, timeout=None, **kwargs):
         data_str = json.dumps(data)
         if len(data_str) > 60:
             data_str = '\n' + json.dumps(data, indent=4)
         _logger.debug('POST %s, payload: %s, timeout: %s sec', self.http.url(path), data_str, timeout)
-        return self.request('POST', path, json=data, timeout=timeout, **kwargs)
+        try:
+            return self.request('POST', path, json=data, timeout=timeout, **kwargs)
+        except HttpError as e:
+            _logger.debug('%s', e)
+            raise

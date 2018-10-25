@@ -92,6 +92,9 @@ public:
     Vector restricted(const QnPtzLimits& limits, LimitsType restrictionType) const;
 
     static Vector rangeVector(const QnPtzLimits& limits, LimitsType limitsType);
+
+    QString toString() const;
+    Vector scaleSpeed(const QnPtzLimits& limits) const;
 };
 
 Vector operator*(const Vector& ptzVector, double scalar);
@@ -197,4 +200,10 @@ inline nx::core::ptz::Vector qBound(
         qBound<float>(limits.minRotation, position.rotation, limits.maxRotation),
         qBound<float>(limits.minFov, position.zoom, limits.maxFov));
 }
+
+nx::core::ptz::Vector linearCombine(
+    qreal a,
+    const nx::core::ptz::Vector& x,
+    qreal b,
+    const nx::core::ptz::Vector& y);
 

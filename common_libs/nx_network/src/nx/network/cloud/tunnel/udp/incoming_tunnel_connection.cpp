@@ -32,7 +32,7 @@ IncomingTunnelConnection::IncomingTunnelConnection(
 
             m_state = code;
             if (m_serverSocket)
-                m_serverSocket->pleaseStopSync(false); //< We are in AIO thread.
+                m_serverSocket->pleaseStopSync(); //< We are in AIO thread.
 
             if (m_acceptHandler)
                 nx::utils::swapAndCall(m_acceptHandler, code, nullptr);

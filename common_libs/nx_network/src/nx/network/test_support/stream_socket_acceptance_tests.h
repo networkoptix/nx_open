@@ -182,7 +182,7 @@ protected:
         typename SocketTypeSet::ClientSocket* connectionPtr,
         SystemError::ErrorCode errorCode)
     {
-        ASSERT_TRUE(errorCode == SystemError::noError);
+        ASSERT_EQ(SystemError::noError, errorCode);
 
         QnMutexLocker lk(&m_mutex);
 
@@ -509,6 +509,7 @@ protected:
     void whenServerReadsBytesWithFlags(int bytesExpected, int recvFlags)
     {
         std::basic_string<uint8_t> readBuf(bytesExpected, 'x');
+
         ASSERT_EQ(
             bytesExpected,
             std::get<1>(m_prevAcceptResult)->recv(
@@ -819,6 +820,8 @@ protected:
     void thenServerSocketReceivesAllDataBeforeEof()
     {
         thenConnectionHasBeenAccepted();
+
+        ASSERT_TRUE(lastAcceptedSocket()->setNonBlockingMode(false));
 
         assertAcceptedConnectionReceived(m_sentData);
         assertAcceptedConnectionReceivedEof();

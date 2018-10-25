@@ -98,8 +98,16 @@ MessageBus::~MessageBus()
 void MessageBus::dropConnections()
 {
     QnMutexLocker lock(&m_mutex);
-    m_connections.clear();
-    m_outgoingConnections.clear();
+    dropConnectionsThreadUnsafe();
+}
+
+void MessageBus::dropConnectionsThreadUnsafe()
+{
+    QnMutexLocker lock(&m_mutex);
+    for (const auto& connection: m_connections)
+        connection->setState(Connection::State::Error);
+    for (const auto& connection: m_outgoingConnections)
+        connection->setState(Connection::State::Error);
     m_remoteUrls.clear();
     if (m_peers)
     {
@@ -145,6 +153,7 @@ void MessageBus::start()
     addOfflinePeersFromDb();
     m_lastRuntimeInfo[localPeer()] = commonModule()->runtimeInfoManager()->localInfo().data;
     base_type::start();
+    m_started = true;
 }
 
 void MessageBus::stop()
@@ -156,6 +165,7 @@ void MessageBus::stop()
 
     dropConnections();
     base_type::stop();
+    m_started = false;
 }
 
 void MessageBus::addOutgoingConnectionToPeer(const QnUuid& peer, const utils::Url &_url)
@@ -262,7 +272,8 @@ void MessageBus::createOutgoingConnections(
                 localPeerEx(),
                 remoteConnection.url,
                 std::make_unique<ConnectionContext>(),
-                std::move(connectionLockGuard)));
+                std::move(connectionLockGuard),
+                [this](const auto& remotePeer) { return validateRemotePeerData(remotePeer); }));
             m_outgoingConnections.insert(remoteConnection.peerId, connection);
             ++m_connectionTries;
             connectSignals(connection);
@@ -1216,6 +1227,11 @@ QMap<PersistentIdData, RuntimeData> MessageBus::runtimeInfo() const
 void MessageBus::sendInitialDataToCloud(const P2pConnectionPtr& connection)
 {
     NX_ASSERT(0, "Not implemented");
+}
+
+bool MessageBus::validateRemotePeerData(const vms::api::PeerDataEx& /*remotePeer*/)
+{
+    return true;
 }
 
 } // namespace p2p

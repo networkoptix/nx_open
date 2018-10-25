@@ -11,8 +11,8 @@ struct QnPtzLimits
     qreal maxPan = 360;
     qreal minTilt = -90;
     qreal maxTilt = 90;
-    qreal minFov = 0;
-    qreal maxFov = 360;
+    qreal minFov = 0; //< TODO: Rename to minZoom.
+    qreal maxFov = 360; //< TODO: Rename to maxZoom.
     qreal minRotation = 0;
     qreal maxRotation = 360;
     qreal minFocus = 0;

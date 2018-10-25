@@ -9,7 +9,6 @@
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
-#include <common/static_common_module.h>
 
 unsigned char request[] = {0xfd, 0xfd, 0x06, 0x00, 0xa1, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00};
 QByteArray barequest(reinterpret_cast<char *>(request), sizeof(request));
@@ -42,7 +41,7 @@ QnResourcePtr QnPlDlinkResourceSearcher::createResource(const QnUuid &resourceTy
 
     if (resourceType->getManufacture() != manufacture())
     {
-        //qDebug() << "Manufature " << resourceType->getManufacture() << " != " << manufacture();
+        //qDebug() << "Manufacture " << resourceType->getManufacture() << " != " << manufacture();
         return result;
     }
 
@@ -64,7 +63,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 #ifdef Q_OS_WIN
     if (!recvSocket->bind(nx::network::SocketAddress( nx::network::HostAddress::anyHost, 0 )))
 #else
-	if (!recvSocket->bind(nx::network::BROADCAST_ADDRESS, 0))
+    if (!recvSocket->bind(nx::network::BROADCAST_ADDRESS, 0))
 #endif
         return QnResourceList();
 
@@ -80,7 +79,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
         if (!sock->bind(iface.address.toString(), recvSocket->getLocalAddress().port))
             continue;
 
-        // sending broadcast
+        // Sending broadcast.
 
         for (int r = 0; r < CL_BROAD_CAST_RETRY; ++r)
         {
@@ -107,7 +106,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 
             int iqpos = datagram.indexOf("DCS-");
 
-            if (iqpos<0)
+            if (iqpos < 0)
                 continue;
 
             iqpos+=name.length();
@@ -119,24 +118,23 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             }
 
             const unsigned char* data = (unsigned char*)(datagram.data());
-            const auto smac = nx::utils::MacAddress::fromRawData(data);
-
+            constexpr int kMacAddressOffset = 6;
+            const auto smac = nx::utils::MacAddress::fromRawData(data + kMacAddressOffset);
 
             bool haveToContinue = false;
-            for(const QnResourcePtr& res: result)
+            for (const QnResourcePtr& res: result)
             {
                 QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
 
                 if (net_res->getMAC() == smac)
                 {
                     haveToContinue = true;
-                    break; // already found;
+                    break; //< already found;
                 }
             }
 
             if (haveToContinue)
                 break;
-
 
             QnPlDlinkResourcePtr resource (new QnPlDlinkResource(serverModule()));
 
@@ -144,7 +142,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             if (rt.isNull())
                 continue;
 
-            QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), name);
+            QnResourceData resourceData = dataPool()->data(manufacture(), name);
             if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
                 continue; // model forced by ONVIF
 
@@ -168,7 +166,6 @@ QString QnPlDlinkResourceSearcher::manufacture() const
     return QnPlDlinkResource::MANUFACTURE;
 }
 
-
 QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool isSearchAction)
 {
     if( !url.scheme().isEmpty() && isSearchAction )
@@ -181,7 +178,6 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const nx::utils::U
 
     int timeout = 2000;
 
-
     if (port < 0)
         port = 80;
 
@@ -192,7 +188,6 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const nx::utils::U
         return QList<QnResourcePtr>();
 
     QStringList lines = response.split(QLatin1String("\r\n"), QString::SkipEmptyParts);
-
 
     QString name;
     QString mac;
@@ -214,12 +209,11 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const nx::utils::U
     if (mac.isEmpty() || name.isEmpty())
         return QList<QnResourcePtr>();
 
-
     QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
     if (rt.isNull())
         return QList<QnResourcePtr>();
 
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), name);
+    QnResourceData resourceData = dataPool()->data(manufacture(), name);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return QList<QnResourcePtr>(); // model forced by ONVIF
 

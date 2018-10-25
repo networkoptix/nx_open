@@ -28,7 +28,7 @@ void PredefinedCredentialsProvider::setCredentials(
     m_cloudSystemCredentials = std::move(cloudSystemCredentials);
 }
 
-boost::optional<hpm::api::SystemCredentials>
+std::optional<hpm::api::SystemCredentials>
     PredefinedCredentialsProvider::getSystemCredentials() const
 {
     return m_cloudSystemCredentials;
@@ -69,7 +69,7 @@ cf::future<std::string> MemoryRemoteRelayPeerPool::findRelayByDomain(
 
 BasicTestFixture::BasicTestFixture(
     int relayCount,
-    boost::optional<std::chrono::seconds> disconnectedPeerTimeout)
+    std::optional<std::chrono::seconds> disconnectedPeerTimeout)
     :
     m_staticMsgBody("Hello, hren!"),
     m_mediator(
@@ -79,6 +79,9 @@ BasicTestFixture::BasicTestFixture(
     m_relayCount(relayCount),
     m_disconnectedPeerTimeout(disconnectedPeerTimeout)
 {
+    m_mediator.setUseProxy(true);
+    m_mediator.addArg("-stun/addrToListenList", "127.0.0.1:0");
+    m_mediator.addArg("-http/addrToListenList", "127.0.0.1:0");
 }
 
 void BasicTestFixture::setUpPublicIpFactoryFunc()
@@ -158,8 +161,6 @@ void BasicTestFixture::SetUp()
 
     m_mediator.addArg("-trafficRelay/url");
     m_mediator.addArg(relayUrl().toString().toStdString().c_str());
-    m_mediator.addArg("-stun/addrToListenList", "127.0.0.1:0");
-    m_mediator.addArg("-http/addrToListenList", "127.0.0.1:0");
 
     ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
     ASSERT_TRUE(m_cloudModulesXmlProvider.bindAndListen());
@@ -181,7 +182,6 @@ void BasicTestFixture::SetUp()
             nx::network::url::Builder().setScheme("http")
                 .setEndpoint(m_cloudModulesXmlProvider.serverAddress())
                 .setPath(kCloudModulesXmlPath));
-        SocketGlobals::cloud().mediatorConnector().enable(true);
     }
 }
 

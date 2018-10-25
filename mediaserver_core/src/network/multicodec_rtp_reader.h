@@ -17,7 +17,8 @@
 #include <nx/streaming/rtsp_client.h>
 
 #include <nx/vms/event/event_fwd.h>
-#include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/rtp/parsers/rtp_stream_parser.h>
+#include <nx/streaming/rtp/camera_time_helper.h>
 
 namespace RtpTransport {
 
@@ -32,10 +33,7 @@ Value fromString(const QString& str);
 
 } // namespace RtpTransport
 
-class QnRtpStreamParser;
-class QnRtpAudioStreamParser;
-class QnRtpVideoStreamParser;
-class QnResourceAudioLayout;
+namespace nx::streaming::rtp  { class StreamParser; }
 
 class QnMulticodecRtpReader:
     public QObject,
@@ -51,6 +49,7 @@ public:
 
     QnMulticodecRtpReader(
         const QnResourcePtr& resource,
+        const nx::streaming::rtp::TimeOffsetPtr& timeOffset,
         std::unique_ptr<nx::network::AbstractStreamSocket> tcpSock = std::unique_ptr<nx::network::AbstractStreamSocket>());
     virtual ~QnMulticodecRtpReader();
 
@@ -68,7 +67,7 @@ public:
     virtual CameraDiagnostics::Result lastOpenStreamResult() const override;
 
     /** Implementation of QnAbstractMediaStreamProvider::getLastResponseCode. */
-    int getLastResponseCode() const;
+    nx::network::rtsp::StatusCodeValue getLastResponseCode() const;
 
     /** Implementation of QnAbstractMediaStreamProvider::getAudioLayout. */
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() const override;
@@ -122,13 +121,13 @@ private:
         TrackInfo(): ioDevice(0), parser(0) {}
         ~TrackInfo() { }
         QnRtspIoDevice* ioDevice; //< External reference; do not delete.
-        std::shared_ptr<QnRtpStreamParser> parser;
+        std::shared_ptr<nx::streaming::rtp::StreamParser> parser;
+        std::optional<std::chrono::microseconds> onvifExtensionTimestamp;
         int rtcpChannelNumber = 0;
     };
 
     void updateTimePolicy();
-
-    QnRtpStreamParser* createParser(const QString& codecName);
+    nx::streaming::rtp::StreamParser* createParser(const QString& codecName);
     bool gotKeyData(const QnAbstractMediaDataPtr& mediaData);
     void clearKeyData(int channelNum);
     QnAbstractMediaDataPtr getNextDataUDP();
@@ -141,7 +140,7 @@ private:
 
     void calcStreamUrl();
 
-    QnRtspStatistic rtspStatistics(
+    void updateOnvifTime(
         int rtpBufferOffset,
         int rtpPacketSize,
         int track,
@@ -160,7 +159,7 @@ private:
 
     std::vector<QnByteArray*> m_demuxedData;
     int m_numberOfVideoChannels;
-    nx::streaming::rtp::TimeHelper m_timeHelper;
+    nx::streaming::rtp::CameraTimeHelper m_timeHelper;
     bool m_pleaseStop;
     QElapsedTimer m_rtcpReportTimer;
     bool m_gotSomeFrame;
@@ -181,7 +180,6 @@ private:
     std::atomic<qint64> m_positionUsec{AV_NOPTS_VALUE};
     OnSocketReadTimeoutCallback m_onSocketReadTimeoutCallback;
     std::chrono::milliseconds m_callbackTimeout{0};
-    nx::streaming::rtp::TimePolicy m_defaultTimePolicy {nx::streaming::rtp::TimePolicy::bindCameraTimeToLocalTime};
     CameraDiagnostics::Result m_openStreamResult;
 };
 

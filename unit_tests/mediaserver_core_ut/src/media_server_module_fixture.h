@@ -24,5 +24,5 @@ protected:
 
 private:
     std::unique_ptr<QnMediaServerModule> m_serverModule;
-    QnPlatformAbstraction m_platformMonitor;
+    QnPlatformAbstraction m_platform;
 };

@@ -1,3 +1,4 @@
+#include <nx/utils/log/log.h>
 #include "proxy_ptz_controller.h"
 
 QnProxyPtzController::QnProxyPtzController(const QnPtzControllerPtr& controller):
@@ -102,9 +103,15 @@ bool QnProxyPtzController::getPosition(
     nx::core::ptz::Vector* position,
     const nx::core::ptz::Options& options) const
 {
-    return m_controller
-        ? m_controller->getPosition(space, position, options)
-        : false;
+    if (m_controller)
+    {
+        return m_controller->getPosition(space, position, options);
+    }
+    else
+    {
+        NX_WARNING(this, lm("Getting current position: m_controller is nullptr."));
+        return false;
+    }
 }
 
 bool QnProxyPtzController::getLimits(

@@ -1,16 +1,40 @@
 #include "camera_settings_dialog_store.h"
 
+#include <type_traits>
+
 #include <QtCore/QScopedValueRollback>
 
 #include "camera_settings_dialog_state.h"
 #include "camera_settings_dialog_state_reducer.h"
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 using State = CameraSettingsDialogState;
 using Reducer = CameraSettingsDialogStateReducer;
+
+namespace {
+
+template<typename T>
+QVariantList toVariantList(const T& collection)
+{
+    QVariantList result;
+    for (const auto& item: collection)
+        result.append(QVariant::fromValue(item));
+    return result;
+}
+
+template<typename L>
+L fromVariantList(const QVariantList& list)
+{
+    using T = std::decay_t<decltype(*L().begin())>;
+
+    L result;
+    for (const auto& item: list)
+        result.push_back(item.value<T>());
+    return result;
+}
+
+} // namespace
 
 struct CameraSettingsDialogStore::Private
 {
@@ -32,6 +56,21 @@ struct CameraSettingsDialogStore::Private
         QScopedValueRollback<bool> guard(actionInProgress, true);
         state = reduce(std::move(state));
         emit q->stateChanged(state);
+    }
+
+    void executeAction(std::function<std::pair<bool, State>(State&&)> reduce)
+    {
+        // Chained actions are forbidden.
+        if (actionInProgress)
+            return;
+
+        QScopedValueRollback<bool> guard(actionInProgress, true);
+
+        bool changed = false;
+        std::tie(changed, state) = reduce(std::move(state));
+
+        if (changed)
+            emit q->stateChanged(state);
     }
 };
 
@@ -290,10 +329,22 @@ void CameraSettingsDialogStore::setSecondaryRecordingDisabled(bool value)
         [&](State state) { return Reducer::setSecondaryRecordingDisabled(std::move(state), value); });
 }
 
-void CameraSettingsDialogStore::setNativePtzPresetsDisabled(bool value)
+void CameraSettingsDialogStore::setPreferredPtzPresetType(nx::core::ptz::PresetType value)
 {
     d->executeAction(
-        [&](State state) { return Reducer::setNativePtzPresetsDisabled(std::move(state), value); });
+        [&](State state) { return Reducer::setPreferredPtzPresetType(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setForcedPtzPanTiltCapability(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setForcedPtzPanTiltCapability(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setForcedPtzZoomCapability(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setForcedPtzZoomCapability(std::move(state), value); });
 }
 
 void CameraSettingsDialogStore::setRtpTransportType(vms::api::RtpTransportType value)
@@ -344,6 +395,57 @@ void CameraSettingsDialogStore::resetExpertSettings()
         [&](State state) { return Reducer::resetExpertSettings(std::move(state)); });
 }
 
+QVariantList CameraSettingsDialogStore::analyticsEngines() const
+{
+    QVariantList result;
+    for (const auto& plugin: d->state.analytics.engines)
+    {
+        result.append(QVariantMap{
+            {"id", QVariant::fromValue(plugin.id)},
+            {"name", plugin.name},
+            {"settingsModel", plugin.settingsModel}
+        });
+    }
+    return result;
+}
+
+void CameraSettingsDialogStore::setAnalyticsEngines(const QList<AnalyticsEngineInfo>& value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setAnalyticsEngines(std::move(state), value); });
+}
+
+QVariantList CameraSettingsDialogStore::enabledAnalyticsEngines() const
+{
+    return toVariantList(d->state.analytics.enabledEngines.get());
+}
+
+void CameraSettingsDialogStore::setEnabledAnalyticsEngines(const QSet<QnUuid>& value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setEnabledAnalyticsEngines(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setEnabledAnalyticsEngines(const QVariantList& value)
+{
+    setEnabledAnalyticsEngines(fromVariantList<QList<QnUuid>>(value).toSet());
+}
+
+QVariantMap CameraSettingsDialogStore::deviceAgentSettingsValues(const QnUuid& engineId) const
+{
+    return d->state.analytics.settingsValuesByEngineId.value(engineId).get();
+}
+
+void CameraSettingsDialogStore::setDeviceAgentSettingsValues(
+    const QnUuid& engineId, const QVariantMap& values)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            return Reducer::setDeviceAgentSettingsValues(std::move(state), engineId, values);
+        });
+}
+
 void CameraSettingsDialogStore::setWearableMotionDetectionEnabled(bool value)
 {
     d->executeAction(
@@ -369,6 +471,4 @@ void CameraSettingsDialogStore::setCredentials(
         [&](State state) { return Reducer::setCredentials(std::move(state), login, password); });
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

@@ -39,7 +39,8 @@ public:
         UsersScope
     };
 
-    explicit QnResourceTreeModel(Scope scope = FullScope, QObject* parent = NULL);
+    explicit QnResourceTreeModel(Scope scope, QObject* parent);
+
     virtual ~QnResourceTreeModel();
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;

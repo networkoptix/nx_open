@@ -1,4 +1,5 @@
 #include <memory>
+#include <optional>
 
 #include <gtest/gtest.h>
 
@@ -8,6 +9,7 @@
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/network/http/empty_message_body_source.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/system_socket.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
@@ -287,6 +289,130 @@ TEST_F(HttpServerConnectionClientEndpoint, forwarded_header_with_port)
 {
     whenIssueRequestWithForwardedHeaderWithPort();
     thenHttpClientEndpointIsCorrect();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+static constexpr char kPipeliningTestPath[] = "/HttpServerConnectionRequestPipelining";
+
+class HttpServerConnectionRequestPipelining:
+    public HttpServerConnection
+{
+     using base_type = HttpServerConnection;
+
+public:
+    ~HttpServerConnectionRequestPipelining()
+    {
+        if (m_clientConnection)
+            m_clientConnection->pleaseStopSync();
+
+        m_timer.pleaseStopSync();
+    }
+
+protected:
+    void givenServerThatReordersResponses()
+    {
+        httpServer().registerRequestProcessorFunc(
+            kPipeliningTestPath,
+            [this](auto... args) { replyWhileReorderingResponses(std::move(args)...); });
+    }
+
+    void whenSendMultipleRequests()
+    {
+        const auto requestUrl = prepareRequestUrl(kPipeliningTestPath);
+        if (!m_clientConnection)
+        {
+            auto connection = std::make_unique<TCPSocket>(AF_INET);
+            ASSERT_TRUE(connection->connect(url::getEndpoint(requestUrl), kNoTimeout))
+                << SystemError::getLastOSErrorText().toStdString();
+
+            m_clientConnection = std::make_unique<http::AsyncMessagePipeline>(
+                std::move(connection));
+            m_clientConnection->setMessageHandler(
+                [this](auto... args) { saveMessage(std::move(args)...); });
+            m_clientConnection->startReadingConnection();
+        }
+
+        m_expectedResponseCount = 2;
+        for (int i = 0; i < m_expectedResponseCount; ++i)
+        {
+            http::Message message(http::MessageType::request);
+            message.request->requestLine.method = http::Method::get;
+            message.request->requestLine.version = http::http_1_1;
+            message.request->requestLine.url = requestUrl.path();
+            message.request->headers.emplace("Sequence", std::to_string(i).c_str());
+
+            m_clientConnection->sendMessage(std::move(message));
+        }
+    }
+
+    void thenResponsesAreReceivedInRequestOrder()
+    {
+        std::optional<int> prevSequence;
+        for (int i = 0; i < m_expectedResponseCount; ++i)
+        {
+            auto response = m_responseQueue.pop();
+            ASSERT_NE(nullptr, response);
+
+            const auto sequence = response->headers.find("Sequence")->second.toInt();
+            if (prevSequence)
+            {
+                ASSERT_EQ(*prevSequence + 1, sequence);
+            }
+
+            prevSequence = sequence;
+        }
+    }
+
+private:
+    nx::utils::SyncQueue<std::unique_ptr<Response>> m_responseQueue;
+    int m_expectedResponseCount = 0;
+    std::unique_ptr<http::AsyncMessagePipeline> m_clientConnection;
+    std::vector<nx::network::http::RequestProcessedHandler> m_postponedRequestCompletionHandlers;
+    aio::Timer m_timer;
+
+    void replyWhileReorderingResponses(
+        RequestContext requestContext,
+        nx::network::http::RequestProcessedHandler completionHandler)
+    {
+        const auto requestSequence = requestContext.request.headers.find("Sequence")->second;
+        requestContext.response->headers.emplace(
+            "Sequence",
+            requestSequence);
+
+        if (m_postponedRequestCompletionHandlers.empty())
+        {
+            m_postponedRequestCompletionHandlers.push_back(
+                std::move(completionHandler));
+        }
+        else
+        {
+            completionHandler(StatusCode::ok);
+
+            m_timer.start(
+                std::chrono::milliseconds(10),
+                [this]() { sendPostponedResponse(); });
+        }
+    }
+
+    void sendPostponedResponse()
+    {
+        for (auto& handler: m_postponedRequestCompletionHandlers)
+            handler(StatusCode::ok);
+    }
+
+    void saveMessage(http::Message message)
+    {
+        if (message.type == http::MessageType::response)
+            m_responseQueue.push(std::make_unique<Response>(*message.response));
+    }
+};
+
+TEST_F(HttpServerConnectionRequestPipelining, response_order_matches_request_order)
+{
+    givenServerThatReordersResponses();
+    whenSendMultipleRequests();
+    thenResponsesAreReceivedInRequestOrder();
 }
 
 } // namespace test

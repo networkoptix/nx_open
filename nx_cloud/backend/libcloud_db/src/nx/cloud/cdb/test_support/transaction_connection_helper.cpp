@@ -207,7 +207,13 @@ TransactionConnectionHelper::ConnectionContext
         [transactionConnection = connectionContext.connection.get(), this](
             test::TransactionTransport::State state)
         {
-            onTransactionConnectionStateChanged(transactionConnection, state);
+            // TransactionTransportBase deliveres this event with internal mutex locked.
+            // So, making sure that processing is done without mutex locking.
+            transactionConnection->post(
+                [this, transactionConnection, state]()
+                {
+                    onTransactionConnectionStateChanged(transactionConnection, state);
+                });
         },
         Qt::DirectConnection);
 
@@ -283,6 +289,7 @@ void TransactionConnectionHelper::onTransactionConnectionStateChanged(
             break;
     }
 
+    QnMutexLocker lk(&m_mutex);
     m_condition.wakeAll();
 }
 

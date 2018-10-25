@@ -22,8 +22,6 @@
 
 namespace {
 
-static QString urlPath;
-
 static QString toString(const QnSecurityCamResourceList& cameras)
 {
     QString result;
@@ -37,6 +35,8 @@ static QString toString(const QnSecurityCamResourceList& cameras)
 }
 
 } // namespace
+
+const QString QnMultiserverChunksRestHandler::kUrlPath("ec2/recordedTimePeriods");
 
 void QnMultiserverChunksRestHandler::loadRemoteDataAsync(
     MultiServerPeriodDataList& outputData,
@@ -75,7 +75,7 @@ void QnMultiserverChunksRestHandler::loadRemoteDataAsync(
         };
 
     nx::utils::Url apiUrl(server->getApiUrl());
-    apiUrl.setPath(lit("/%1/").arg(urlPath));
+    apiUrl.setPath(lit("/%1/").arg(kUrlPath));
 
     QnChunksRequestData modifiedRequest = ctx->request();
     modifiedRequest.format = Qn::CompressedPeriodsFormat;
@@ -109,12 +109,11 @@ static std::atomic<int> staticRequestNum;
 //-------------------------------------------------------------------------------------------------
 
 QnMultiserverChunksRestHandler::QnMultiserverChunksRestHandler(
-    QnMediaServerModule* serverModule, const QString& path)
+    QnMediaServerModule* serverModule)
     :
     QnFusionRestHandler(),
     nx::mediaserver::ServerModuleAware(serverModule)
 {
-    urlPath = path;
 }
 
 MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(

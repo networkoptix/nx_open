@@ -20,20 +20,18 @@ UploadManager::~UploadManager()
 }
 
 QString UploadManager::addUpload(
-    const QnMediaServerResourcePtr& server,
-    const QString& path,
-    qint64 ttl,
-    QString* errorMessage,
-    QObject* context,
-    Callback callback)
+        const QnMediaServerResourcePtr& server,
+        UploadState& config,
+        QObject* context,
+        Callback callback)
 {
-    std::unique_ptr<UploadWorker> worker = std::make_unique<UploadWorker>(server, path, ttl, this);
+    std::unique_ptr<UploadWorker> worker = std::make_unique<UploadWorker>(server, config, this);
 
     worker->start();
     UploadState state = worker->state();
     if (state.status == UploadState::Error)
     {
-        *errorMessage = state.errorMessage;
+        config.errorMessage = state.errorMessage;
         return QString();
     }
 

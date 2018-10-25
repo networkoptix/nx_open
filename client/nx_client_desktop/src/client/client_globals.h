@@ -86,6 +86,8 @@ namespace Qn
         LayoutBookmarksModeRole,                    /**< Role for layout's bookmarks mode state. */
         LayoutActiveItemRole,                       /**< Role for layout active item. Value of type QnUuid. */
         LayoutWatermarkRole,                        /**< Role for layout watermark (when loaded from file). */
+        LayoutEncryptionRole,                       /**< Role for encrypted layout. 'true' if encrypted. */
+        LayoutPasswordRole,                         /**< Role for encrypted layout. QString containing a password. */
 
         /* Item-based. */
         ItemUuidRole,                               /**< Role for item's UUID. Value of type QnUuid. */
@@ -161,8 +163,6 @@ namespace Qn
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and action::ConnectAction. */
         AutoLoginRole,                              /**< Role for flag that shows if client should connect with last credentials
                                                          (or to the last system) automatically next time */
-
-        LayoutTemplateRole,                         /**< Role for layout template. Used in StartAnalyticsAction. */
 
         StoreSessionRole,                          /**< Role for flag that shows if session on successful connection should be stored.
                                                          Used in action::ConnectAction. */

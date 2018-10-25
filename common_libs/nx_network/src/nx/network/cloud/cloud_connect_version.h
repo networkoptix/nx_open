@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nx/fusion/model_functions_fwd.h>
+
 namespace nx {
 namespace hpm {
 namespace api {
@@ -27,6 +29,12 @@ constexpr const CloudConnectVersion kDefaultCloudConnectVersion =
 constexpr const CloudConnectVersion kCurrentCloudConnectVersion =
     CloudConnectVersion::clientSupportsConnectSessionWithoutUdpEndpoints;
 
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(CloudConnectVersion)
+
 } // namespace api
 } // namespace hpm
 } // namespace nx
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (nx::hpm::api::CloudConnectVersion),
+    (lexical))

@@ -2,11 +2,13 @@
 
 #include <vector>
 
+#include <boost/algorithm/string.hpp>
+
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
-#include "nx/utils/std/future.h"
-#include "nx/utils/std/thread.h"
+#include <nx/utils/std/future.h>
+#include <nx/utils/std/thread.h>
 #include <nx/utils/uuid.h>
 
 namespace nx {
@@ -93,12 +95,12 @@ public:
     {
         {
             std::lock_guard<std::mutex> lock(m_mutex);
-            if (!m_moduleInstance)
-                return;
-            m_moduleInstance->pleaseStop();
+            if (m_moduleInstance)
+                m_moduleInstance->pleaseStop();
         }
 
-        m_moduleProcessThread.join();
+        if (m_moduleProcessThread.joinable())
+            m_moduleProcessThread.join();
         m_moduleInstance.reset();
     }
 
@@ -109,16 +111,65 @@ public:
         return startAndWaitUntilStarted();
     }
 
+    /**
+     * Adds short argument without value (e.g., "-f") or 
+     * a long argument with value (e.g., --output-file=tmp.txt)
+     */
     void addArg(const char* arg)
     {
         auto b = std::back_inserter(m_args);
         *b = strdup(arg);
+
+        m_argTypes.push_back(ArgumentType::name);
     }
 
-    void addArg(const char* arg, const char* value)
+    /**
+     * Adds short argument with value. E.g., addArg("-o", "tmp.txt").
+     */
+    void addArg(const char* name, const char* value)
     {
-        addArg(arg);
-        addArg(value);
+        m_args.push_back(strdup(name));
+        m_argTypes.push_back(ArgumentType::name);
+
+        m_args.push_back(strdup(value));
+        m_argTypes.push_back(ArgumentType::value);
+    }
+
+    /**
+     * Given name like "out" removes arguments "-out tmp.txt" and "--out=tmp.txt".
+     */
+    void removeArgByName(const char* name)
+    {
+        const std::string shortName = std::string("-") + name;
+        const std::string longName = std::string("--") + name + "=";
+
+        for (int i = 0; i < argCount(); ++i)
+        {
+            if (m_argTypes[i] == ArgumentType::value)
+                continue;
+
+            if (m_args[i] == shortName)
+            {
+                removeArgAt(i);
+                if (i < argCount() && m_argTypes[i] == ArgumentType::value)
+                    removeArgAt(i);
+            }
+            else if (boost::starts_with(m_args[i], longName))
+            {
+                removeArgAt(i);
+            }
+        }
+    }
+
+    void removeArgAt(std::size_t pos)
+    {
+        m_args.erase(m_args.begin() + pos);
+        m_argTypes.erase(m_argTypes.begin() + pos);
+    }
+
+    int argCount() const
+    {
+        return static_cast<int>(m_args.size());
     }
 
     void clearArgs()
@@ -126,6 +177,8 @@ public:
         for (auto ptr: m_args)
             free(ptr);
         m_args.clear();
+
+        m_argTypes.clear();
     }
 
     std::vector<char*>& args()
@@ -149,13 +202,25 @@ protected:
     virtual void afterModuleDestruction() {}
 
 private:
+    enum class ArgumentType
+    {
+        /**
+         * Can be short argument name (e.g., "-o") or 
+         * long argument with value (e.g, --output-file=out.txt).
+         */
+        name,
+        /** Value that follow name. E.g., out.txt. */
+        value,
+    };
+
     std::vector<char*> m_args;
+    std::vector<ArgumentType> m_argTypes;
     std::unique_ptr<ModuleProcessType> m_moduleInstance;
     nx::utils::thread m_moduleProcessThread;
     std::unique_ptr<nx::utils::promise<bool /*result*/>> m_moduleStartedPromise;
     mutable std::mutex m_mutex;
 };
 
-}   // namespace test
-}   // namespace utils
-}   // namespace nx
+} // namespace test
+} // namespace utils
+} // namespace nx

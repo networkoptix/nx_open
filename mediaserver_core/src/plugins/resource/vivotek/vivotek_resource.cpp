@@ -9,7 +9,6 @@
 #include <QtCore/QUrlQuery>
 
 #include <common/common_module.h>
-#include <common/static_common_module.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <utils/media/av_codec_helper.h>
 
@@ -52,8 +51,7 @@ CameraDiagnostics::Result VivotekResource::initializeMedia(const CapabilitiesRes
     if (!result)
         return result;
 
-    auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    bool hevcIsDisabled = resourceData.value<bool>(Qn::DISABLE_HEVC_PARAMETER_NAME, false);
+    bool hevcIsDisabled = resourceData().value<bool>(Qn::DISABLE_HEVC_PARAMETER_NAME, false);
 
     if (hevcIsDisabled)
         return result;
@@ -88,21 +86,19 @@ CameraDiagnostics::Result VivotekResource::initializeMedia(const CapabilitiesRes
 }
 
 CameraDiagnostics::Result VivotekResource::customStreamConfiguration(
-    Qn::ConnectionRole role,
-    const QnLiveStreamParams& params)
+    Qn::ConnectionRole role)
 {
     bool success = true;
-    const bool isHevcCodec = params.codec.compare(kHevcCodecString, Qt::CaseInsensitive) == 0;
-    if (isHevcCodec && streamSupportsHevc(role))
+    if (streamSupportsHevc(role))
         success = setHevcForStream(role);
 
     if (!success)
     {
         return CameraDiagnostics::RequestFailedResult(
             lit("Set HEVC for stream %1")
-                .arg(role == Qn::ConnectionRole::CR_LiveVideo
-                    ? lit("primary")
-                    : lit("secondary")),
+            .arg(role == Qn::ConnectionRole::CR_LiveVideo
+                ? lit("primary")
+                : lit("secondary")),
             lit("Request failed."));
     }
 

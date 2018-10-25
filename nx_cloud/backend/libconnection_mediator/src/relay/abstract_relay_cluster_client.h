@@ -24,6 +24,7 @@ public:
     virtual void selectRelayInstanceForListeningPeer(
         const std::string& peerId,
         RelayInstanceSearchCompletionHandler completionHandler) = 0;
+
     virtual void findRelayInstancePeerIsListeningOn(
         const std::string& peerId,
         RelayInstanceSearchCompletionHandler completionHandler) = 0;

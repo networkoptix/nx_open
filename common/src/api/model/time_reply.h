@@ -27,11 +27,11 @@ struct SyncTimeData
 
 struct ApiDateTimeData
 {
-    qint64 timeSinseEpochMs = 0;
+    qint64 timeSinceEpochMs = 0;
     QString timeZoneId;
     qint64 timeZoneOffsetMs = 0;
 };
-#define ApiDateTimeData_Fields (timeSinseEpochMs)(timeZoneId)(timeZoneOffsetMs)
+#define ApiDateTimeData_Fields (timeSinceEpochMs)(timeZoneId)(timeZoneOffsetMs)
 
 struct ApiServerDateTimeData: public ApiDateTimeData
 {

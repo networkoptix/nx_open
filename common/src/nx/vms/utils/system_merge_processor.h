@@ -12,6 +12,7 @@
 
 class QnCommonModule;
 struct QnJsonRestResult;
+class MediaServerClient;
 
 namespace nx {
 namespace vms {
@@ -27,17 +28,17 @@ public:
      */
     void enableDbBackup(const QString& dataDirectory);
 
-    nx::network::http::StatusCode::Value merge(
+    QnJsonRestResult merge(
         Qn::UserAccessData accessRights,
         const QnAuthSession& authSession,
-        MergeSystemData data,
-        QnJsonRestResult* result);
+        MergeSystemData data);
 
     /**
      * Valid only after successful SystemMergeProcessor::merge call.
      */
     const nx::vms::api::ModuleInformationWithAddresses& remoteModuleInformation() const;
 
+    void setMergeError(QnJsonRestResult* result, ::utils::MergeSystemsStatus::Value mergeStatus);
 private:
     QnCommonModule* m_commonModule;
     QString m_dataDirectory;
@@ -53,39 +54,41 @@ private:
 
     void saveBackupOfSomeLocalData();
 
-    nx::network::http::StatusCode::Value checkWhetherMergeIsPossible(
+    QnJsonRestResult checkWhetherMergeIsPossible(
+        const MergeSystemData& data);
+
+    QnJsonRestResult checkIfSystemsHaveServerWithSameId(
+        MediaServerClient* remoteMediaServerClient);
+
+    QnJsonRestResult checkIfCloudSystemsMergeIsPossible(
         const MergeSystemData& data,
-        QnJsonRestResult* result);
+        MediaServerClient* remoteMediaServerClient);
 
-    nx::network::http::StatusCode::Value mergeSystems(
+    QnJsonRestResult mergeSystems(
         Qn::UserAccessData accessRights,
-        MergeSystemData data,
-        QnJsonRestResult* result);
+        MergeSystemData data);
 
-    void setMergeError(
-        QnJsonRestResult* result,
-        ::utils::MergeSystemsStatus::Value mergeStatus);
-
-    bool applyCurrentSettings(
+    QnJsonRestResult applyCurrentSettings(
         const nx::utils::Url& remoteUrl,
         const QString& postKey,
         bool oneServer);
 
-    bool applyRemoteSettings(
+    QnJsonRestResult applyRemoteSettings(
         const nx::utils::Url& remoteUrl,
         const QnUuid& systemId,
         const QString& systemName,
         const QString& getKey,
         const QString& postKey);
 
-    bool executeRemoteConfigure(
+    QnJsonRestResult executeRemoteConfigure(
         const ConfigureSystemData& data,
         const nx::utils::Url &remoteUrl,
         const QString& postKey);
 
     bool isResponseOK(const nx::network::http::HttpClient& client);
 
-    nx::network::http::StatusCode::Value getClientResponse(const nx::network::http::HttpClient& client);
+    nx::network::http::StatusCode::Value getClientResponse(
+        const nx::network::http::HttpClient& client);
 
     template <class ResultDataType>
     bool executeRequest(

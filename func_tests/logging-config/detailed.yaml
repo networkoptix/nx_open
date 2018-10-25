@@ -4,7 +4,7 @@ version: 1
 disable_existing_loggers: false
 formatters:
   default:
-    format: '%(asctime)-15s %(name)s %(levelname)s %(message)s'
+    format: '%(asctime)-15s %(name)s %(levelname)s %(threadName)-11s %(message)s'
 handlers:
   stderr:
     class: logging.StreamHandler

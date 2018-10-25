@@ -61,19 +61,11 @@ public:
             });
 
         connector.activate();
-
-        auto& dnsResolver = network::SocketGlobals::addressResolver().dnsResolver();
-        dnsResolver.addEtcHost(kLocalDnsHost.toString(), {nx::network::HostAddress::localhost});
-        dnsResolver.addEtcHost(kLocalCloudHost.toString(), {nx::network::HostAddress::localhost});
     }
 
     ~DiscoveryModuleConnector()
     {
         connector.pleaseStopSync();
-
-        auto& dnsResolver = network::SocketGlobals::addressResolver().dnsResolver();
-        dnsResolver.removeEtcHost(kLocalDnsHost.toString());
-        dnsResolver.removeEtcHost(kLocalCloudHost.toString());
     }
 
     void expectConnect(const QnUuid& id, const nx::network::SocketAddress& endpoint)
@@ -173,6 +165,27 @@ private:
     std::map<QnUuid, nx::network::SocketAddress> m_knownServers;
 };
 
+struct DnsAlias
+{
+    const nx::network::SocketAddress original;
+    const nx::network::SocketAddress alias;
+
+    DnsAlias(nx::network::SocketAddress original_, nx::network::HostAddress alias_):
+        original(original_),
+        alias(alias_, original_.port)
+    {
+        nx::network::SocketGlobals::addressResolver().addFixedAddress(alias.address, original);
+    }
+
+    ~DnsAlias()
+    {
+        nx::network::SocketGlobals::addressResolver().removeFixedAddress(alias.address, original);
+    }
+
+    DnsAlias(const DnsAlias&) = delete;
+    DnsAlias& operator=(const DnsAlias&) = delete;
+};
+
 TEST_F(DiscoveryModuleConnector, AddEndpoints)
 {
     const auto id1 = QnUuid::createUuid();
@@ -257,26 +270,23 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
     connector.newEndpoints({newLocalEndpoint}, id);
     expectConnect(id, newLocalEndpoint); //< New local is prioritized.
 
-    const auto dnsRealEndpoint = addMediaserver(id);
-    const auto cloudRealEndpoint = addMediaserver(id);
-    const nx::network::SocketAddress dnsEndpoint(kLocalDnsHost, dnsRealEndpoint.port);
-    const nx::network::SocketAddress cloudEndpoint(kLocalCloudHost, cloudRealEndpoint.port);
+    const DnsAlias dnsEndpoint(addMediaserver(id), "local-doman-name.com");
+    const DnsAlias cloudEndpoint(addMediaserver(id), QnUuid::createUuid().toSimpleString());
 
-    connector.newEndpoints({dnsEndpoint, cloudEndpoint}, id);
-    expectConnect(id, dnsEndpoint);  //< DNS is the most prioritized.
+    connector.newEndpoints({dnsEndpoint.alias, cloudEndpoint.alias}, id);
+    expectConnect(id, dnsEndpoint.alias);  //< DNS is the most prioritized.
 
     removeMediaserver(newLocalEndpoint);
     removeMediaserver(networkEndpoint);
-    removeMediaserver(dnsRealEndpoint);
-    expectConnect(id, cloudEndpoint);  //< Cloud endpoint is the last possible option.
+    removeMediaserver(dnsEndpoint.original);
+    expectConnect(id, cloudEndpoint.alias);  //< Cloud endpoint is the last possible option.
 
-    const auto newDnsRealEndpoint = addMediaserver(id);
-    const nx::network::SocketAddress newDnsEndpoint(kLocalDnsHost, newDnsRealEndpoint.port);
-    connector.newEndpoints({newDnsEndpoint}, id);
-    expectConnect(id, newDnsEndpoint);
+    const DnsAlias newDnsEndpoint(addMediaserver(id), "local-doman-name.com");
+    connector.newEndpoints({newDnsEndpoint.alias}, id);
+    expectConnect(id, newDnsEndpoint.alias);
 
-    removeMediaserver(cloudRealEndpoint);
-    removeMediaserver(newDnsRealEndpoint);
+    removeMediaserver(cloudEndpoint.original);
+    removeMediaserver(newDnsEndpoint.original);
     expectDisconnect(id); //< Finally no endpoints avaliable.
 }
 

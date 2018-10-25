@@ -14,7 +14,7 @@ namespace nx {
 namespace network {
 namespace stun {
 
-using MessagePipeline = nx::network::server::BaseStreamProtocolConnectionEmbeddable<
+using MessagePipeline = nx::network::server::StreamProtocolConnection<
     Message,
     MessageParser,
     MessageSerializer>;
@@ -23,8 +23,7 @@ using MessagePipeline = nx::network::server::BaseStreamProtocolConnectionEmbedda
  * Connects to STUN server, sends requests, receives responses and indications.
  */
 class NX_NETWORK_API AsyncClient:
-    public AbstractAsyncClient,
-    public nx::network::server::StreamConnectionHolder<MessagePipeline>
+    public AbstractAsyncClient
 {
 public:
     using BaseConnectionType = MessagePipeline;
@@ -74,8 +73,9 @@ private:
         connected,
     };
 
-    virtual void closeConnection(
-        SystemError::ErrorCode errorCode, BaseConnectionType* connection) override;
+    void closeConnection(
+        SystemError::ErrorCode errorCode,
+        BaseConnectionType* connection);
 
     void openConnectionImpl(QnMutexLockerBase* lock);
     void closeConnectionImpl(QnMutexLockerBase* lock, SystemError::ErrorCode code);
@@ -99,8 +99,8 @@ private:
     mutable QnMutex m_mutex;
     boost::optional<SocketAddress> m_endpoint;
     boost::optional<SocketAddress> m_resolvedEndpoint;
-    bool m_useSsl;
-    State m_state;
+    bool m_useSsl = false;
+    State m_state = State::disconnected;
 
     std::unique_ptr<nx::network::RetryTimer> m_reconnectTimer;
     std::unique_ptr<BaseConnectionType> m_baseConnection;

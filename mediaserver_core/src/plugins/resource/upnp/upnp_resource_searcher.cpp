@@ -10,7 +10,7 @@
 #include <nx/network/socket.h>
 
 #include <utils/common/app_info.h>
-
+#include "media_server/media_server_module.h"
 
 static const QHostAddress groupAddress(QLatin1String("239.255.255.250"));
 
@@ -81,14 +81,12 @@ public:
     nx::network::upnp::DeviceInfo deviceInfo() const { return m_deviceInfo; }
 };
 
-
-
-
 // ====================================================================
-QnUpnpResourceSearcher::QnUpnpResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule),
-    m_receiveSocket(0)
+QnUpnpResourceSearcher::QnUpnpResourceSearcher(QnMediaServerModule* serverModule):
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    m_receiveSocket(0),
+    m_serverModule(serverModule)
 {
     m_cacheLivetime.restart();
 
@@ -149,7 +147,7 @@ nx::network::AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const nx
 QByteArray QnUpnpResourceSearcher::getDeviceDescription(const QByteArray& uuidStr, const QUrl& url)
 {
     if (discoveryMode() == DiscoveryMode::fullyEnabled
-        && m_cacheLivetime.elapsed() > nx::network::upnp::DeviceSearcher::instance()->cacheTimeout())
+        && m_cacheLivetime.elapsed() > m_serverModule->upnpDeviceSearcher()->cacheTimeout())
     {
         m_cacheLivetime.restart();
         m_deviceXmlCache.clear();
@@ -306,12 +304,12 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
 ////////////////////////////////////////////////////////////
 
 QnUpnpResourceSearcherAsync::QnUpnpResourceSearcherAsync(
-    QnCommonModule* commonModule,
+    QnMediaServerModule* serverModule,
     const QString& deviceType)
     :
-    QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule),
-    SearchAutoHandler(deviceType)
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    SearchAutoHandler(serverModule->upnpDeviceSearcher(), deviceType)
 {
 }
 

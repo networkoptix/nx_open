@@ -68,14 +68,15 @@ protected:
         ASSERT_FALSE(mergeRequestData.mergeOneServer);
         ASSERT_TRUE(mergeRequestData.takeRemoteSettings);
         ASSERT_FALSE(mergeRequestData.ignoreIncompatible);
+        // Keys used in merge are used for multiple requests. So, leaving url empty.
         assertAuthKeyIsValid(
             mergeRequestData.getKey.toUtf8(),
             nx::network::http::Method::get,
-            "/api/mergeSystems");
+            "");
         assertAuthKeyIsValid(
             mergeRequestData.postKey.toUtf8(),
             nx::network::http::Method::post,
-            "/api/mergeSystems");
+            "");
         QUrl remoteSystemUrl(mergeRequestData.url);
         ASSERT_EQ(nx::network::http::kSecureUrlSchemeName, remoteSystemUrl.scheme());
         ASSERT_EQ(m_idOfSystemToMergeTo, remoteSystemUrl.host().toStdString());

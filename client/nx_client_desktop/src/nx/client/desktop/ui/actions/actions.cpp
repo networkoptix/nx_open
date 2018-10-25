@@ -9,7 +9,6 @@
 #include <nx/client/desktop/ui/actions/menu_factory.h>
 #include <nx/client/desktop/ui/actions/action_conditions.h>
 #include <nx/client/desktop/ui/actions/action_factories.h>
-#include <nx/client/desktop/analytics/analytics_action_factory.h>
 #include <nx/client/desktop/radass/radass_action_factory.h>
 #include <nx/client/desktop/ui/actions/action_text_factories.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
@@ -370,12 +369,6 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Open Layout...")) //< To be displayed on button tooltip
         .childFactory(new OpenCurrentUserLayoutFactory(manager))
         .icon(qnSkin->icon("titlebar/dropdown.png"));
-
-    factory(StartAnalyticsAction)
-        .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
-        .text(ContextMenu::tr("Start Analytics..."))
-        .childFactory(new AnalyticsActionFactory(manager))
-        .condition(AnalyticsActionFactory::condition());
 
     factory()
         .flags(TitleBar)
@@ -810,6 +803,11 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Export Bookmark..."))
         .condition(condition::canExportBookmark());
 
+    factory(ExportBookmarksAction)
+        .flags(NoTarget | MultiTarget | ResourceTarget)
+        .text(ContextMenu::tr("Export Bookmarks..."))
+        .condition(condition::canExportBookmarks());
+
     factory()
         .flags(Slider)
         .separator();
@@ -984,6 +982,11 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(nx::vms::api::GlobalPermission::controlVideowall)
         .text(ContextMenu::tr("Screen Settings..."))
         .condition(!condition::isSafeMode());
+
+    factory(ForgetLayoutPasswordAction)
+        .flags(Tree | SingleTarget | ResourceTarget)
+        .text(ContextMenu::tr("Forget password"))
+        .condition(condition::canForgetPassword() && !condition::isLayoutTourReviewMode());
 
     factory(SaveLayoutAction)
         .flags(TitleBar | Tree | SingleTarget | ResourceTarget)
@@ -1432,6 +1435,11 @@ void initialize(Manager* manager, Action* root)
             && ConditionWrapper(new AutoStartAllowedCondition())
             && !condition::isSafeMode());
 
+    factory(AnalyticsEngineSettingsAction)
+        .flags(Tree | SingleTarget | ResourceTarget)
+        .text(ContextMenu::tr("Analytics Engine Settings..."))
+        .condition(ConditionWrapper(new AnalyticsEngineCondition()));
+
     factory(ConvertCameraToEntropix)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
@@ -1562,32 +1570,28 @@ void initialize(Manager* manager, Action* root)
             .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission)
             .text(ContextMenu::tr("None"))
             .checkable()
-            .checked(qnGlobals->defaultLayoutCellSpacing()
-                == QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::None));
+            .checked(QnWorkbenchLayout::kDefaultCellSpacing == Qn::CellSpacing::None);
 
         factory(SetCurrentLayoutItemSpacingSmallAction)
             .flags(Scene | NoTarget)
             .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission)
             .text(ContextMenu::tr("Small"))
             .checkable()
-            .checked(qnGlobals->defaultLayoutCellSpacing()
-                == QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Small));
+            .checked(QnWorkbenchLayout::kDefaultCellSpacing == Qn::CellSpacing::Small);
 
         factory(SetCurrentLayoutItemSpacingMediumAction)
             .flags(Scene | NoTarget)
             .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission)
             .text(ContextMenu::tr("Medium"))
             .checkable()
-            .checked(qnGlobals->defaultLayoutCellSpacing()
-                == QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Medium));
+            .checked(QnWorkbenchLayout::kDefaultCellSpacing == Qn::CellSpacing::Medium);
 
         factory(SetCurrentLayoutItemSpacingLargeAction)
             .flags(Scene | NoTarget)
             .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission)
             .text(ContextMenu::tr("Large"))
             .checkable()
-            .checked(qnGlobals->defaultLayoutCellSpacing()
-                == QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Large));
+            .checked(QnWorkbenchLayout::kDefaultCellSpacing == Qn::CellSpacing::Large);
         factory.endGroup();
 
     } factory.endSubMenu();
@@ -1825,7 +1829,9 @@ void initialize(Manager* manager, Action* root)
         .separator();
 
     factory(ToggleThumbnailsAction)
-        .flags(NoTarget);
+        .flags(NoTarget)
+        .text(ContextMenu::tr("Show Thumbnails"))
+        .toggledText(ContextMenu::tr("Hide Thumbnails"));
 
     factory(BookmarksModeAction)
         .flags(NoTarget)

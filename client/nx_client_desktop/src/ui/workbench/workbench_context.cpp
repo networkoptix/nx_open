@@ -5,6 +5,8 @@
 
 #include <common/common_module.h>
 
+#include <client/client_app_info.h>
+#include <client/client_module.h>
 #include <client/client_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client/client_runtime_settings.h>
@@ -43,9 +45,8 @@
 #include <watchers/cloud_status_watcher.h>
 
 #include <nx/utils/log/log.h>
-#include <client/client_module.h>
 #include <nx/client/core/watchers/user_watcher.h>
-#include <client/client_app_info.h>
+#include <nx/client/desktop/system_health/system_health_state.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -110,6 +111,8 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
         statisticsManager, &QnStatisticsManager::resetStatistics);
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived,
         statisticsManager, &QnStatisticsManager::sendStatistics);
+
+    instance<nx::client::desktop::SystemHealthState>();
 
     initWorkarounds();
 }
@@ -246,6 +249,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
             bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
 
             auto systemUrl = nx::utils::Url::fromUserInput(systemId);
+            systemUrl.setScheme("https");
             NX_DEBUG(this, lit("Custom URI: Connecting to system %1").arg(systemUrl.toString()));
 
             systemUrl.setUserName(auth.user);
@@ -270,10 +274,13 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
     return false;
 }
 
-bool QnWorkbenchContext::showEulaMessage() const
+bool QnWorkbenchContext::showEulaMessage(QString eulaPath) const
 {
+    if (eulaPath.isEmpty())
+        eulaPath = ":/license.html";
+
     const bool acceptedEula =
-        [this]() -> bool
+        [this, eulaPath]() -> bool
         {
             const QString eulaHtmlStyle = QString::fromLatin1(R"(
             <style media="screen" type="text/css">
@@ -287,8 +294,12 @@ bool QnWorkbenchContext::showEulaMessage() const
             }
             </style>)").arg(qApp->palette().color(QPalette::WindowText).name());
 
-            QFile eula(lit(":/license.html"));
-            eula.open(QIODevice::ReadOnly);
+            QFile eula(eulaPath);
+            if (!eula.open(QIODevice::ReadOnly))
+            {
+                NX_ERROR(this) << "Failed to open eula file" << eulaPath;
+                return true;
+            }
             QString eulaText = QString::fromUtf8(eula.readAll());
 
             // Regexp to dig out a title from html with EULA.

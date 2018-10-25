@@ -10,7 +10,7 @@ namespace mediaserver {
 ServerUpdateInstaller::ServerUpdateInstaller(QnMediaServerModule* serverModule):
     CommonUpdateInstaller(serverModule->commonModule()),
     ServerModuleAware(serverModule)
-{ 
+{
 }
 
 QString ServerUpdateInstaller::dataDirectoryPath() const

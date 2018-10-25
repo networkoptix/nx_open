@@ -74,7 +74,7 @@ public:
             return;
         }
 
-        UbjsonSerializedTransaction<typename CommandDescriptor::Data> serializableTransaction(
+        UbjsonSerializedTransaction<CommandDescriptor> serializableTransaction(
             std::move(transaction),
             std::move(dataSource->serializedTransaction),
             transportHeader.transactionFormatVersion);
@@ -101,7 +101,7 @@ public:
             return;
         }
 
-        SerializableTransaction<typename CommandDescriptor::Data> serializableTransaction(
+        SerializableTransaction<CommandDescriptor> serializableTransaction(
             std::move(transaction));
 
         this->processTransaction(
@@ -115,7 +115,7 @@ protected:
 
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
-        SerializableTransaction<typename CommandDescriptor::Data> transaction,
+        SerializableTransaction<CommandDescriptor> transaction,
         TransactionProcessedHandler handler) = 0;
 
 private:
@@ -186,7 +186,7 @@ private:
 
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
-        SerializableTransaction<typename CommandDescriptor::Data> transaction,
+        SerializableTransaction<CommandDescriptor> transaction,
         TransactionProcessedHandler handler) override
     {
         const auto systemId = transportHeader.systemId;
@@ -229,7 +229,7 @@ private:
     struct TransactionContext
     {
         TransactionTransportHeader transportHeader;
-        SerializableTransaction<typename CommandDescriptor::Data> transaction;
+        SerializableTransaction<CommandDescriptor> transaction;
     };
 
     TransactionLog* const m_transactionLog;
@@ -238,7 +238,7 @@ private:
 
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
-        SerializableTransaction<typename CommandDescriptor::Data> transaction,
+        SerializableTransaction<CommandDescriptor> transaction,
         TransactionProcessedHandler handler) override
     {
         using namespace std::placeholders;

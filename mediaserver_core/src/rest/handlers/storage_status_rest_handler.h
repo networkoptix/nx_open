@@ -4,7 +4,7 @@
 #include <nx/mediaserver/server_module_aware.h>
 #include <core/resource/resource_fwd.h>
 
-class QnStorageStatusRestHandler: 
+class QnStorageStatusRestHandler:
     public QnJsonRestHandler,
     public nx::mediaserver::ServerModuleAware
 {
@@ -13,9 +13,9 @@ public:
     QnStorageStatusRestHandler(QnMediaServerModule* serverModule);
 
     virtual int executeGet(
-        const QString &path, 
-        const QnRequestParams &params, 
-        QnJsonRestResult &result, 
+        const QString &path,
+        const QnRequestParams &params,
+        QnJsonRestResult &result,
         const QnRestConnectionProcessor*) override;
 private:
     QnStorageResourcePtr getOrCreateStorage(const QString& storageUrl) const;

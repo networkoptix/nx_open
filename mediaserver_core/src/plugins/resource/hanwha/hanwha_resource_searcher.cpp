@@ -3,7 +3,6 @@
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <common/common_module.h>
-#include <common/static_common_module.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/fusion/serialization/lexical.h>
@@ -39,7 +38,7 @@ namespace plugins {
 HanwhaResourceSearcher::HanwhaResourceSearcher(QnMediaServerModule* serverModule):
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
-    nx::network::upnp::SearchAutoHandler(kUpnpBasicDeviceType),
+    nx::network::upnp::SearchAutoHandler(serverModule->upnpDeviceSearcher(), kUpnpBasicDeviceType),
     mediaserver::ServerModuleAware(serverModule),
     m_sunapiProbePackets(createProbePackets())
 {
@@ -69,7 +68,6 @@ std::vector<std::vector<quint8>> HanwhaResourceSearcher::createProbePackets()
 
     return result;
 }
-
 
 QnResourcePtr HanwhaResourceSearcher::createResource(
     const QnUuid &resourceTypeId,
@@ -233,8 +231,11 @@ void HanwhaResourceSearcher::sendSunApiProbe()
     updateSocketList();
     for (const auto& socket: m_sunApiSocketList)
     {
-        for(const auto& packet: m_sunapiProbePackets)
-            socket->sendTo(packet.data(), packet.size(), nx::network::BROADCAST_ADDRESS, kSunApiProbeDstPort);
+        for (const auto& packet : m_sunapiProbePackets)
+        {
+            socket->sendTo(packet.data(), (int)packet.size(),
+                nx::network::BROADCAST_ADDRESS, kSunApiProbeDstPort);
+        }
     }
 }
 
@@ -379,8 +380,7 @@ void HanwhaResourceSearcher::createResource(
     if (rt.isNull())
         return;
 
-    QnResourceData resourceData = qnStaticCommon
-        ->dataPool()
+    QnResourceData resourceData = commonModule()->dataPool()
         ->data(devInfo.manufacturer, devInfo.modelName);
 
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))

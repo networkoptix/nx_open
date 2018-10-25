@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/utils/uuid.h>
-#include <platform/monitoring/platform_monitor.h>
+#include <platform/platform_abstraction.h>
 
 namespace nx {
 namespace mediaserver {
@@ -26,7 +26,10 @@ struct FilterConfig
     QnUuid serverUuid;
     bool isWindows = false;
 
-    static FilterConfig createDefault(bool includeNonHdd, const nx::mediaserver::Settings* settings);
+    static FilterConfig createDefault(
+        QnPlatformAbstraction* platform,
+        bool includeNonHdd,
+        const nx::mediaserver::Settings* settings);
 };
 
 } // namespace media_paths

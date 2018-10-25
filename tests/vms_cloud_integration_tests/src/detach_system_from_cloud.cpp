@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <nx/utils/test_support/test_with_temporary_directory.h>
 #include <test_support/merge_test_fixture.h>
 
 #include "cloud_system_fixture.h"
@@ -7,11 +8,20 @@
 namespace test {
 
 class DetachSystem:
-    public ::testing::Test
+    public ::testing::Test,
+    public nx::utils::test::TestWithTemporaryDirectory
 {
     using base_type = ::testing::Test;
 
 public:
+    DetachSystem():
+        nx::utils::test::TestWithTemporaryDirectory(
+            "vms_cloud_intergration.DetachSystem",
+            QString()),
+        m_cloudSystemFixture(testDataDir().toStdString())
+    {
+    }
+
     static void SetUpTestCase()
     {
         s_staticCommonModule =

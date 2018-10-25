@@ -1,5 +1,6 @@
 #include "connect_handler.h"
 
+#include <nx/network/aio/async_channel_bridge.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/address_resolver.h>
@@ -12,10 +13,10 @@ namespace nx {
 namespace cloud {
 namespace gateway {
 
-static const int kDefaultBufferSize = 16 * 1024;
-
-ConnectHandler::ConnectHandler(const conf::Settings& settings):
-    m_settings(settings)
+ConnectHandler::ConnectHandler(const conf::Settings& settings,
+    TunnelCreatedHandler tunnelCreatedHandler):
+    m_settings(settings),
+    m_tunnelCreatedHandler(std::move(tunnelCreatedHandler))
 {
 }
 
@@ -29,16 +30,19 @@ void ConnectHandler::processRequest(
     static_cast<void>(authInfo);
     static_cast<void>(response);
 
-    network::SocketAddress targetAddress(request.requestLine.url.path());
+    // NOTE: this validation should be done somewhere in more general place
+    if (!request.requestLine.url.isValid())
+        return completionHandler(network::http::StatusCode::badRequest);
+    network::SocketAddress targetAddress(request.requestLine.url.host(),
+        static_cast<quint16>(request.requestLine.url.port()));
     if (!network::SocketGlobals::addressResolver()
             .isCloudHostName(targetAddress.address.toString()))
     {
-        // No cloud address means direct IP
+        // No cloud address means direct IP.
         if (!m_settings.cloudConnect().allowIpTarget)
             return completionHandler(nx::network::http::StatusCode::forbidden);
-
         if (targetAddress.port == 0)
-            targetAddress.port = m_settings.http().proxyTargetPort;
+            targetAddress.port = static_cast<quint16>(m_settings.http().proxyTargetPort);
     }
 
     m_targetSocket = nx::network::SocketFactory::createStreamSocket();
@@ -47,95 +51,48 @@ void ConnectHandler::processRequest(
         !m_targetSocket->setRecvTimeout(m_settings.tcp().recvTimeout) ||
         !m_targetSocket->setSendTimeout(m_settings.tcp().sendTimeout))
     {
-        NX_INFO(this, lm("Failed to set socket options. %1")
-            .arg(SystemError::getLastOSErrorText()));
-
+        NX_INFO(this, "Failed to set socket options. %1", SystemError::getLastOSErrorText());
         return completionHandler(nx::network::http::StatusCode::internalServerError);
     }
 
     m_request = std::move(request);
     m_connection = connection;
-    m_completionHandler = std::move(completionHandler);
-    connect(targetAddress);
+    connect(targetAddress, std::move(completionHandler));
 }
 
-void ConnectHandler::closeConnection(
-    SystemError::ErrorCode /*closeReason*/,
-    nx::network::http::deprecated::AsyncMessagePipeline* /*connection*/)
+void ConnectHandler::connect(const network::SocketAddress& address,
+    network::http::RequestProcessedHandler completionHandler)
 {
-    m_connectionSocket.reset();
-    m_targetSocket.reset();
-}
-
-void ConnectHandler::connect(const network::SocketAddress& address)
-{
-    NX_DEBUG(this, lm("Connecting to '%1', socket[%2] -> socket[%3]").arg(address)
-        .arg(m_connectionSocket).arg(m_targetSocket));
+    NX_DEBUG(this, "Connecting to '%1', socket[%2] -> socket[%3].",
+        address, m_connection->socket().get(), m_targetSocket.get());
 
     m_targetSocket->connectAsync(
         address,
-        [this](SystemError::ErrorCode result)
+        [this, completionHandler = std::move(completionHandler)](SystemError::ErrorCode error)
         {
-            NX_VERBOSE(this, lm("Connect result: %1")
-                .arg(SystemError::toString(result)));
-
-            if (result != SystemError::noError)
-                return socketError(m_targetSocket.get(), result);
-
-            // TODO: #mux Find a way to steal socket after sending an automatic response
-            m_request.requestLine.version.serialize(&m_connectionBuffer);
-            m_connectionBuffer.append(Buffer(" 200 Connection estabilished\r\n\r\n"));
-
-            // TODO: #mux Currently there is a problem as m_connection may have some data
-            //  in it's buffer (client does not has to wait for CONNECT response before
-            //  sending data through)
-            m_connectionSocket = m_connection->takeSocket();
-            m_connectionSocket->cancelIOSync(network::aio::etNone);
-            m_connectionSocket->sendAsync(
-                m_connectionBuffer,
-                [this](SystemError::ErrorCode result, size_t)
-                {
-                    if (result != SystemError::noError)
-                        return socketError(m_connectionSocket.get(), result);
-
-                    m_connectionBuffer.reserve(kDefaultBufferSize);
-                    m_connectionBuffer.resize(0);
-                    stream(m_connectionSocket.get(), m_targetSocket.get(), &m_connectionBuffer);
-
-                    m_targetBuffer.reserve(kDefaultBufferSize);
-                    m_targetBuffer.resize(0);
-                    stream(m_targetSocket.get(), m_connectionSocket.get(), &m_targetBuffer);
-                });
-        });
-}
-
-void ConnectHandler::socketError(Socket* socket, SystemError::ErrorCode error)
-{
-    NX_DEBUG(this, lm("Socket %1 returned error %2")
-        .arg(socket).arg(SystemError::toString(error)));
-
-    const auto handler = std::move(m_completionHandler);
-    handler(nx::network::http::StatusCode::serviceUnavailable);
-}
-
-void ConnectHandler::stream(Socket* source, Socket* target, Buffer* buffer)
-{
-    source->readSomeAsync(
-        buffer,
-        [=](SystemError::ErrorCode result, size_t)
-        {
-            if (result != SystemError::noError)
-                return socketError(source, result);
-
-            target->sendAsync(
-                *buffer,
-                [=](SystemError::ErrorCode result, size_t)
+            if (error != SystemError::noError)
             {
-                if (result != SystemError::noError)
-                    return socketError(target, result);
+                NX_INFO(this, "Socket %1 connecting error: %2.",
+                    m_targetSocket.get(), SystemError::toString(error));
+                return completionHandler(nx::network::http::StatusCode::serviceUnavailable);
+            }
+            NX_VERBOSE(this, "Successfully connected to %1", m_targetSocket->getForeignAddress());
 
-                stream(source, target, buffer);
-            });
+            // TODO: check when is called onResponseSendHandler, is it possible to skip some data
+            //      between sending response and start of tunnel
+            network::http::RequestResult result(network::http::StatusCode::ok);
+            result.connectionEvents.onResponseHasBeenSent =
+                [targetSocket = std::move(m_targetSocket),
+                    tunnelCreatedHandler = std::move(m_tunnelCreatedHandler)](
+                    network::http::HttpServerConnection *connection) mutable
+                {
+                    auto clientSocket = connection->takeSocket();
+                    clientSocket->cancelIOSync(network::aio::etNone);
+
+                    tunnelCreatedHandler(network::aio::makeAsyncChannelBridge(
+                        std::move(clientSocket), std::move(targetSocket)));
+                };
+            return completionHandler(std::move(result));
         });
 }
 

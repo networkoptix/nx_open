@@ -53,7 +53,7 @@ public:
     virtual ~AsyncHttpClient();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
-    virtual void pleaseStopSync(bool checkForLocks = true) override;
+    virtual void pleaseStopSync() override;
 
     virtual nx::network::aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
@@ -352,7 +352,7 @@ public:
         if (m_obj.use_count() == 1)
         {
             // pleaseStopSync should have already been called explicitly.
-            m_obj->pleaseStopSync(false);
+            m_obj->pleaseStopSync();
         }
         m_obj.reset();
     }
@@ -420,7 +420,8 @@ void NX_NETWORK_API downloadFileAsync(
 SystemError::ErrorCode NX_NETWORK_API downloadFileSync(
     const nx::utils::Url& url,
     int* const statusCode,
-    nx::network::http::BufferType* const msgBody);
+    nx::network::http::BufferType* const msgBody,
+    AsyncHttpClient::Timeouts timeouts = AsyncHttpClient::Timeouts());
 
 using DownloadCompletionHandlerEx = std::function<void(SystemError::ErrorCode, int /*statusCode*/,
     nx::network::http::StringType /*content type*/, nx::network::http::BufferType /*message body*/,

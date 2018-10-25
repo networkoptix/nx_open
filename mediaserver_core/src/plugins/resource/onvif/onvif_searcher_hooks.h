@@ -8,15 +8,19 @@ namespace plugins {
 namespace onvif {
 namespace searcher_hooks {
 
-void commonHooks(EndpointAdditionalInfo* outInfo);
+void commonHooks(QnResourceDataPool* dataPool, EndpointAdditionalInfo* outInfo);
 
-void hikvisionManufacturerReplacement(EndpointAdditionalInfo* outInfo);
+void hikvisionManufacturerReplacement(
+    QnResourceDataPool* dataPool, EndpointAdditionalInfo* outInfo);
 
-void manufacturerReplacementByModel(EndpointAdditionalInfo* outInfo);
+void manufacturerReplacementByModel(
+    QnResourceDataPool* dataPool, EndpointAdditionalInfo* outInfo);
 
-void pelcoModelNormalization(EndpointAdditionalInfo* outInfo);
+void pelcoModelNormalization(
+    QnResourceDataPool* dataPool, EndpointAdditionalInfo* outInfo);
 
-void additionalManufacturerNormalization(EndpointAdditionalInfo* outInfo);
+void additionalManufacturerNormalization(
+    QnResourceDataPool* dataPool, EndpointAdditionalInfo* outInfo);
 
 } // namespace searcher_hooks
 } // namespace onvif

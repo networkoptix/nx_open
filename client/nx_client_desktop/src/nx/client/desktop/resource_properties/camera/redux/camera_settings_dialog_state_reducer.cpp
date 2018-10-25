@@ -130,7 +130,7 @@ float calculateBitrateForQualityMbps(const State& state, Qn::StreamQuality quali
             state.recording.defaultStreamResolution,
             state.recording.brush.fps,
             state.recording.mediaStreamCapability,
-            state.recording.bitratePerGopType));
+            state.recording.useBitratePerGop));
 }
 
 Qn::StreamQuality calculateQualityForBitrateMbps(const State& state, float bitrateMbps)
@@ -173,7 +173,7 @@ State fillBitrateFromFixedQuality(State state)
 
 QString settingsUrlPath(const Camera& camera)
 {
-    const auto resourceData = qnStaticCommon->dataPool()->data(camera);
+    const auto resourceData = camera->commonModule()->dataPool()->data(camera);
     if (!resourceData.value<bool>(lit("showUrl"), false))
         return QString();
 
@@ -348,9 +348,8 @@ bool isDefaultExpertSettings(const State& state)
     if (state.settingsOptimizationEnabled)
     {
         if ((state.devicesDescription.isArecontCamera == State::CombinedValue::None
-                && state.expert.cameraControlDisabled.valueOr(true))
-            || (state.devicesDescription.hasPredefinedBitratePerGOP == State::CombinedValue::None
-                && state.expert.useBitratePerGOP.valueOr(true))
+            && state.expert.cameraControlDisabled.valueOr(true))
+            || state.expert.useBitratePerGOP.valueOr(true)
             || state.expert.dualStreamingDisabled.valueOr(true))
         {
             return false;
@@ -364,8 +363,14 @@ bool isDefaultExpertSettings(const State& state)
         return false;
     }
 
-    if (state.devicesDescription.canDisableNativePtzPresets != State::CombinedValue::None
-        && state.expert.nativePtzPresetsDisabled.valueOr(true))
+    if (state.canSwitchPtzPresetTypes() && (!state.expert.preferredPtzPresetType.hasValue()
+        || state.expert.preferredPtzPresetType() != nx::core::ptz::PresetType::undefined))
+    {
+        return false;
+    }
+
+    if (state.canForcePtzCapabilities() && (state.expert.forcedPtzPanTiltCapability.valueOr(true)
+        || state.expert.forcedPtzZoomCapability.valueOr(true)))
     {
         return false;
     }
@@ -382,7 +387,7 @@ bool isDefaultExpertSettings(const State& state)
         return false;
     }
 
-    if (state.expert.trustCameraTime())
+    if (state.expert.trustCameraTime.valueOr(true))
         return false;
 
     return state.expert.rtpTransportType.hasValue()
@@ -475,6 +480,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.recordingHint = {};
     state.recordingAlert = {};
     state.motionAlert = {};
+    state.analytics.enabledEngines = {};
+    state.analytics.settingsValuesByEngineId = {};
 
     state.deviceType = firstCamera
         ? QnDeviceDependentStrings::calculateDeviceType(firstCamera->resourcePool(), cameras)
@@ -504,20 +511,11 @@ State CameraSettingsDialogStateReducer::loadCameras(
             return cameraType && cameraType->getManufacture() == lit("ArecontVision");
         });
 
-    state.devicesDescription.hasPredefinedBitratePerGOP = combinedValue(cameras,
-        [](const Camera& camera)
-        {
-            return camera->bitratePerGopType() == Qn::BPG_Predefined;
-        });
+    state.devicesDescription.canSwitchPtzPresetTypes = combinedValue(cameras,
+        [](const Camera& camera) { return camera->canSwitchPtzPresetTypes(); });
 
-    state.devicesDescription.hasPtzPresets = combinedValue(cameras,
-        [](const Camera& camera)
-        {
-            return camera->hasAnyOfPtzCapabilities(Ptz::PresetsPtzCapability);
-        });
-
-    state.devicesDescription.canDisableNativePtzPresets = combinedValue(cameras,
-        [](const Camera& camera) { return camera->canDisableNativePtzPresets(); });
+    state.devicesDescription.canForcePtzCapabilities = combinedValue(cameras,
+        [](const Camera& camera) { return camera->isUserAllowedToModifyPtzCapabilities(); });
 
     state.devicesDescription.supportsMotionStreamOverride = combinedValue(cameras,
         [](const Camera& camera)
@@ -537,10 +535,12 @@ State CameraSettingsDialogStateReducer::loadCameras(
         singleProperties.name.setBase(firstCamera->getName());
         singleProperties.id = firstCamera->getId().toSimpleString();
         singleProperties.firmware = firstCamera->getFirmware();
-        singleProperties.macAddress = firstCamera->getMAC().toString();
         singleProperties.model = firstCamera->getModel();
         singleProperties.vendor = firstCamera->getVendor();
         singleProperties.hasVideo = firstCamera->hasVideo();
+
+        const auto macAddress = firstCamera->getMAC();
+        singleProperties.macAddress = macAddress.isNull() ? QString() : macAddress.toString();
 
         if (firstCamera->getDefaultMotionType() == Qn::MotionType::MT_HardwareGrid)
         {
@@ -556,7 +556,6 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
         state = loadNetworkInfo(std::move(state), firstCamera);
 
-        state.recording.bitratePerGopType = firstCamera->bitratePerGopType();
         state.recording.defaultStreamResolution = firstCamera->streamInfo().getResolution();
         state.recording.mediaStreamCapability = firstCamera->cameraMediaCapability().
             streamCapabilities.value(Qn::StreamIndex::primary);
@@ -589,7 +588,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
                 QnLexical::deserialized<vms::api::IoModuleVisualStyle>(
                     firstCamera->getProperty(Qn::IO_OVERLAY_STYLE_PARAM_NAME), {}));
 
-            state.singleIoModuleSettings.ioPortsData.setBase(firstCamera->getIOPorts());
+            state.singleIoModuleSettings.ioPortsData.setBase(firstCamera->ioPortDescriptions());
         }
 
         state.singleCameraSettings.logicalId.setBase(firstCamera->logicalId());
@@ -600,6 +599,11 @@ State CameraSettingsDialogStateReducer::loadCameras(
             &state.singleCameraProperties.maxFpsWithoutMotion,
             nullptr,
             false);
+
+        state.analytics.enabledEngines.setBase(firstCamera->enabledAnalyticsEngines());
+        const auto& values = firstCamera->deviceAgentSettingsValues();
+        for (auto it = values.begin(); it != values.end(); ++it)
+            state.analytics.settingsValuesByEngineId[it.key()].setBase(it.value());
     }
 
     state.recording.enabled = {};
@@ -657,9 +661,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
     fetchFromCameras<bool>(state.expert.cameraControlDisabled, cameras,
         [](const Camera& camera) { return camera->isCameraControlDisabled(); });
 
-    fetchFromCameras<bool, Qn::BitratePerGopType>(state.expert.useBitratePerGOP, cameras,
-        [](const Camera& camera) { return camera->bitratePerGopType(); },
-        [](Qn::BitratePerGopType bpg) { return bpg != Qn::BPG_None; });
+    fetchFromCameras<bool>(state.expert.useBitratePerGOP, cameras,
+        [](const Camera& camera) { return camera->useBitratePerGop(); });
 
     fetchFromCameras<bool>(state.expert.primaryRecordingDisabled, cameras,
         [](const Camera& camera)
@@ -701,13 +704,30 @@ State CameraSettingsDialogStateReducer::loadCameras(
             return motionStreamType(camera) != vms::api::MotionStreamType::automatic;
         });
 
-    if (state.devicesDescription.canDisableNativePtzPresets != State::CombinedValue::None)
+    if (state.canSwitchPtzPresetTypes())
     {
-        fetchFromCameras<bool>(state.expert.nativePtzPresetsDisabled, cameras,
+        fetchFromCameras<nx::core::ptz::PresetType>(state.expert.preferredPtzPresetType,
+            cameras.filtered([](const Camera& camera) { return camera->canSwitchPtzPresetTypes(); }),
+            [](const Camera& camera) { return camera->userPreferredPtzPresetType(); });
+    }
+
+    if (state.canForcePtzCapabilities())
+    {
+        const auto editableCameras = cameras.filtered(
+            [](const Camera& camera) { return camera->isUserAllowedToModifyPtzCapabilities(); });
+
+        fetchFromCameras<bool>(state.expert.forcedPtzPanTiltCapability, editableCameras,
             [](const Camera& camera)
             {
-                return camera->canDisableNativePtzPresets()
-                    & !camera->getProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME).isEmpty();
+                return camera->ptzCapabilitiesAddedByUser().testFlag(
+                    Ptz::ContinuousPanTiltCapabilities);
+            });
+
+        fetchFromCameras<bool>(state.expert.forcedPtzPanTiltCapability, editableCameras,
+            [](const Camera& camera)
+            {
+                return camera->ptzCapabilitiesAddedByUser().testFlag(
+                    Ptz::ContinuousZoomCapability);
             });
     }
 
@@ -1109,10 +1129,7 @@ State CameraSettingsDialogStateReducer::setDualStreamingDisabled(State state, bo
 
 State CameraSettingsDialogStateReducer::setUseBitratePerGOP(State state, bool value)
 {
-    const bool hasPredefinedBitratePerGOP =
-        state.devicesDescription.hasPredefinedBitratePerGOP != State::CombinedValue::None;
-
-    if (hasPredefinedBitratePerGOP || !state.settingsOptimizationEnabled)
+    if (!state.settingsOptimizationEnabled)
         return state;
 
     state.expert.useBitratePerGOP.setUser(value);
@@ -1140,12 +1157,35 @@ State CameraSettingsDialogStateReducer::setSecondaryRecordingDisabled(State stat
     return state;
 }
 
-State CameraSettingsDialogStateReducer::setNativePtzPresetsDisabled(State state, bool value)
+State CameraSettingsDialogStateReducer::setPreferredPtzPresetType(
+    State state, nx::core::ptz::PresetType value)
 {
-    if (state.devicesDescription.canDisableNativePtzPresets == State::CombinedValue::None)
+    if (!state.canSwitchPtzPresetTypes())
         return state;
 
-    state.expert.nativePtzPresetsDisabled.setUser(value);
+    state.expert.preferredPtzPresetType.setUser(value);
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setForcedPtzPanTiltCapability(State state, bool value)
+{
+    if (!state.canForcePtzCapabilities())
+        return state;
+
+    state.expert.forcedPtzPanTiltCapability.setUser(value);
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setForcedPtzZoomCapability(State state, bool value)
+{
+    if (state.devicesDescription.canForcePtzCapabilities != State::CombinedValue::All)
+        return state;
+
+    state.expert.forcedPtzZoomCapability.setUser(value);
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
     state.hasChanges = true;
     return state;
@@ -1262,13 +1302,51 @@ State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
     state = setUseBitratePerGOP(std::move(state), false);
     state = setPrimaryRecordingDisabled(std::move(state), false);
     state = setSecondaryRecordingDisabled(std::move(state), false);
-    state = setNativePtzPresetsDisabled(std::move(state), false);
+    state = setPreferredPtzPresetType(std::move(state), nx::core::ptz::PresetType::undefined);
+    state = setForcedPtzPanTiltCapability(std::move(state), false);
+    state = setForcedPtzZoomCapability(std::move(state), false);
     state = setRtpTransportType(std::move(state), vms::api::RtpTransportType::automatic);
     state = setMotionStreamType(std::move(state), vms::api::MotionStreamType::automatic);
     state = setLogicalId(std::move(state), {});
 
     state.isDefaultExpertSettings = true;
     return state;
+}
+
+State CameraSettingsDialogStateReducer::setAnalyticsEngines(
+    State state, const QList<AnalyticsEngineInfo>& value)
+{
+    state.analytics.engines = value;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setEnabledAnalyticsEngines(
+    State state, const QSet<QnUuid>& value)
+{
+    state.analytics.enabledEngines.setUser(value);
+    state.hasChanges = true;
+    return state;
+}
+
+std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsValues(
+    State state, const QnUuid& engineId, const QVariantMap& values)
+{
+    if (!std::any_of(
+        state.analytics.engines.begin(),
+        state.analytics.engines.end(),
+        [engineId](const auto& engine) { return engine.id == engineId; }))
+    {
+        return std::make_pair(false, std::move(state));
+    }
+
+    auto& storedValues = state.analytics.settingsValuesByEngineId[engineId];
+    if (storedValues.get() == values)
+        return std::make_pair(false, std::move(state));
+
+    storedValues.setUser(values);
+    state.hasChanges = true;
+
+    return std::make_pair(true, std::move(state));
 }
 
 State CameraSettingsDialogStateReducer::setWearableMotionDetectionEnabled(State state, bool value)

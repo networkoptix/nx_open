@@ -7,7 +7,6 @@
 #include <nx/utils/uuid.h>
 #include <nx/utils/thread/mutex.h>
 
-
 namespace nx {
 namespace client {
 namespace desktop {
@@ -37,6 +36,8 @@ public:
 
     qreal progress(const QnUuid& activityId) const;
     void setProgress(const QnUuid& activityId, qreal value);
+
+    static constexpr qreal kIndefiniteProgressValue = -1;
 
     bool isCancellable(const QnUuid& activityId) const;
     void setCancellable(const QnUuid& activityId, bool value);

@@ -167,7 +167,7 @@ bool CommonUpdateManager::canDownloadFile(
             *outUpdateStatus = update::Status(
                 peerId,
                 update::Status::Code::downloading,
-                "Update file is downloading",
+                QString("Downloading file %1").arg(fileInformation.name),
                 (double) fileInformation.downloadedChunks.count(true) /
                     fileInformation.downloadedChunks.size());
             return false;
@@ -175,7 +175,7 @@ bool CommonUpdateManager::canDownloadFile(
             *outUpdateStatus = update::Status(
                 peerId,
                 update::Status::Code::downloading,
-                "Update file is being uploaded");
+                QString("Uploading file %1").arg(fileInformation.name));
             return false;
         case FileInformation::Status::downloaded:
             return installerState(outUpdateStatus, peerId);

@@ -38,7 +38,7 @@ void CloudConnectSettings::replaceOriginatingHostAddress(const QString& hostAddr
     m_originatingHostAddressReplacement = hostAddress;
 }
 
-boost::optional<QString> CloudConnectSettings::originatingHostAddressReplacement() const
+std::optional<QString> CloudConnectSettings::originatingHostAddressReplacement() const
 {
     QnMutexLocker lk(&m_mutex);
     return m_originatingHostAddressReplacement;

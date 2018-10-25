@@ -6,7 +6,6 @@
 #include <utils/common/util.h>
 
 #include <common/common_module.h>
-#include <common/static_common_module.h>
 #include <api/global_settings.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -30,9 +29,6 @@ RemoteArchiveSynchronizer::RemoteArchiveSynchronizer(QnMediaServerModule* server
     m_tasks(std::make_unique<RemoteArchiveSynchronizer::TaskMap>()),
     m_workerPool(std::make_unique<RemoteArchiveWorkerPool>())
 {
-    if (!serverModule->globalSettings()->isEdgeRecordingEnabled())
-        return;
-
     NX_DEBUG(this, lit("Creating remote archive synchronizer."));
 
     const auto threadCount = maxSynchronizationThreads();
@@ -126,11 +122,13 @@ void RemoteArchiveSynchronizer::at_resourceStateChanged(const QnResourcePtr& res
         return;
 
     const auto status = camera->getStatus();
+    const bool isEdgeRecordingEnabled = serverModule()->globalSettings()->isEdgeRecordingEnabled();
     const auto canArchiveBeSynchronized =
         (status == Qn::Online || status == Qn::Recording)
         && camera->hasCameraCapabilities(Qn::RemoteArchiveCapability)
         && camera->isLicenseUsed()
-        && !camera->hasFlags(Qn::foreigner);
+        && !camera->hasFlags(Qn::foreigner)
+        && isEdgeRecordingEnabled;
 
     if (!canArchiveBeSynchronized)
     {
@@ -139,13 +137,15 @@ void RemoteArchiveSynchronizer::at_resourceStateChanged(const QnResourcePtr& res
             "Resource belongs to this server %2"
             "Resource status: %3, "
             "Resource has remote archive capability: %4, "
-            "License is used for resource: %5")
+            "License is used for resource: %5, "
+            "Edge recording enabled: %6")
                 .args(
                     camera->getUserDefinedName(),
                     !camera->hasFlags(Qn::foreigner),
                     status,
                     camera->hasCameraCapabilities(Qn::RemoteArchiveCapability),
-                    camera->isLicenseUsed()));
+                    camera->isLicenseUsed(),
+                    isEdgeRecordingEnabled));
     }
 
     const auto id = camera->getId();

@@ -458,7 +458,7 @@ vms::api::PeerDataEx deserializePeerData(
         {
             nx::vms::api::PeerDataEx result;
             result.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
-            result.protoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION;
+            result.protoVersion = nx_ec::EC2_PROTO_VERSION;
             return result;
         };
 
