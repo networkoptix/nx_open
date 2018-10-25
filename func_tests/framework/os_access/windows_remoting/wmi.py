@@ -30,6 +30,11 @@ class Wmi(object):
     def __init__(self, protocol):
         self.protocol = protocol
 
+    def __eq__(self, other):
+        if not isinstance(other, Wmi):
+            return NotImplemented
+        return other.protocol is self.protocol
+
     def act(self, class_uri, action, body, selectors, timeout_sec=None):
         xml_namespaces = {
             # Namespaces from pywinrm's Protocol.
@@ -115,6 +120,11 @@ class _Class(object):
     def __repr__(self):
         return '_Class({!r}, {!r})'.format(self.wmi, self.uri)
 
+    def __eq__(self, other):
+        if not isinstance(other, _Class):
+            return NotImplemented
+        return other.wmi == self.wmi and other.uri == self.uri
+
     def create(self, properties_dict):
         _logger.info("Create %r: %r", self, properties_dict)
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Create'
@@ -173,8 +183,8 @@ class _Class(object):
             # `EnumerationMode` must be `EnumerateObjectAndEPR` to have both data and selectors.
             for item in item_list:
                 data = item[self.name]
-                selectors = _SelectorSet.from_raw(item['a:EndpointReference']['a:ReferenceParameters']['w:SelectorSet'])
-                ref = _Reference(self, selectors)
+                ref = _Reference.from_raw(self.wmi, item['a:EndpointReference'])
+                assert ref.wmi_class == self
                 obj = _Object(ref, data)
                 _logger.info('\tObject: %r', obj)
                 yield obj
@@ -205,6 +215,11 @@ class _SelectorSet(object):
 
     def __repr__(self):
         return '_SelectorSet.from_dict({!r})'.format(self.as_dict)
+
+    def __eq__(self, other):
+        if not isinstance(other, _SelectorSet):
+            return NotImplemented
+        return other.as_dict == self.as_dict
 
     @classmethod
     def from_dict(cls, as_dict):
@@ -254,6 +269,24 @@ class _Reference(object):
     def __repr__(self):
         return '_Reference({!r}, {!r})'.format(self.wmi_class, self.selectors)
 
+    def __eq__(self, other):
+        if not isinstance(other, _Reference):
+            return NotImplemented
+        return other.wmi_class == self.wmi_class and other.selectors == self.selectors
+
+    def __getitem__(self, item):
+        return self.selectors.as_dict[item]
+
+    @classmethod
+    def from_raw(cls, wmi, raw):
+        wmi_class = _Class(wmi, raw['a:ReferenceParameters']['w:ResourceURI'])
+        # `SelectorSet` isn't always present, e.g. with `Win32_OperatingSystem`.
+        if 'w:SelectorSet' in raw['a:ReferenceParameters']:
+            selector_set = _SelectorSet.from_raw(raw['a:ReferenceParameters']['w:SelectorSet'])
+        else:
+            selector_set = _SelectorSet.empty()
+        return cls(wmi_class, selector_set)
+
     def get(self):
         _logger.info("Get %s where %r", self.wmi_class, self.selectors)
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Get'
@@ -275,6 +308,7 @@ class _Reference(object):
         action_uri = self.wmi_class.uri + '/' + method_name
         method_input = {'p:' + param_name: param_value for param_name, param_value in params.items()}
         method_input['@xmlns:p'] = self.wmi_class.uri
+        method_input['@xmlns:cim'] = 'http://schemas.dmtf.org/wbem/wscim/1/common'  # For `cim:Datetime`.
         body = {method_name + '_INPUT': method_input}
         response = self.wmi_class.wmi.act(self.wmi_class.uri, action_uri, body, self.selectors, timeout_sec=timeout_sec)
         method_output = response[method_name + '_OUTPUT']
@@ -286,20 +320,28 @@ class _Reference(object):
 
 class _Object(object):
     def __init__(self, ref, data):  # type: (_Reference, Mapping[str, Union[str, Mapping]]) -> ...
-        self._ref = ref
-        self._data = _nil_to_none(data)
+        self.ref = ref
+        self._data = {}
+        for key, value in _nil_to_none(data).items():
+            if key == '@xmlns' or key == '@xsi:type':
+                continue
+            if isinstance(value, (dict, OrderedDict)):
+                if 'a:ReferenceParameters' in value:
+                    self._data[key] = _Reference.from_raw(ref.wmi_class.wmi, value)
+                    continue
+            self._data[key] = value
 
     def __repr__(self):
-        return '_Object({!r}, {!r})'.format(self._ref, self._data)
+        return '_Object({!r}, {!r})'.format(self.ref, self._data)
 
     def __getitem__(self, item):
         return self._data[item]
 
     def put(self, new_properties_dict):  # type: (Mapping[str, str]) -> _Object
-        return self._ref.put(new_properties_dict)
+        return self.ref.put(new_properties_dict)
 
     def invoke_method(self, method_name, params, timeout_sec=None):
-        return self._ref.invoke_method(method_name, params, timeout_sec=timeout_sec)
+        return self.ref.invoke_method(method_name, params, timeout_sec=timeout_sec)
 
 
 class WmiInvokeFailed(Exception):
