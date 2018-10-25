@@ -10,6 +10,7 @@ from typing import List, Dict
 from framework.installation.mediaserver import Mediaserver
 from framework.waiting import Timer
 from . import checks, stage, stages
+from framework.mediaserver_api import MediaserverApiRequestError
 
 _logger = logging.getLogger(__name__)
 
@@ -244,6 +245,7 @@ class Stand(object):
 
     def _run_camera_stages(self, cycle_delay):  # types: (timedelta) -> None
         _logger.info('Run all stages')
+        self._log_statistics()
         while True:
             cameras_left = 0
             for camera in self.camera_stages:
@@ -255,15 +257,19 @@ class Stand(object):
                 return
 
             _logger.debug('Wait for cycle delay %s, %s cameras left', cycle_delay, cameras_left)
-            stats = self.server.api.get_server_statistics()['statistics'][:3]
-            stat_out = {}
-            for stat in stats:
-                if stat["description"] == 'sda':
-                    stat_out.update({'DISK': stat['value']})
-                else:
-                    stat_out.update({stat["description"] : stat['value']})
-            _logger.debug('Server performance statistics:\n %s', stat_out)
             time.sleep(cycle_delay.total_seconds())
+            self._log_statistics()
+
+    def _log_statistics(self):
+        message = 'Server performance statistics'
+        try:
+            stats = self.server.api.get_server_statistics()['statistics'][:3]
+        except MediaserverApiRequestError as error:
+            _logger.debug(message + ': {!s}'.format(error))
+        else:
+            out = {s['description']: s['value'] for s in stats}
+            out['HDD'] = out.get('sda')
+            _logger.debug(message + ': CPU {CPU}, RAM {RAM}, HDD {HDD}'.format(**out))
 
     def _stage_rules(self, rules):  # (dict) -> dict
         for name, rule in rules.items():
