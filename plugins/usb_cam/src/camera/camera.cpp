@@ -197,12 +197,11 @@ CodecParameters Camera::getDefaultVideoParameters()
             ffmpegCodecID,
             it->fps,
             maxBitrate,
-            it->width,
-            it->height);
+            nxcip::Resolution(it->width, it->height));
     }
     
     // Should never reach here if m_compressionTypeDescriptor is valid
-    return CodecParameters(AV_CODEC_ID_NONE, 30, 5000000, 640, 640*9/16);
+    return CodecParameters();
 }
 
 } // namespace usb_cam

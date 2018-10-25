@@ -90,10 +90,11 @@ void TranscodeStreamReader::setFps(float fps)
 
 void TranscodeStreamReader::setResolution(const nxcip::Resolution& resolution)
 {
-    if (m_codecParams.width != resolution.width || m_codecParams.height != resolution.height)
+    if (m_codecParams.resolution.width != resolution.width 
+        || m_codecParams.resolution.height != resolution.height)
     {
         StreamReaderPrivate::setResolution(resolution);
-        m_videoFrameConsumer->setResolution(resolution.width, resolution.height);
+        m_videoFrameConsumer->setResolution(resolution);
         m_cameraState = csModified;
     }
 }
@@ -169,11 +170,11 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::transcodeVideo(
 
     m_timestamps.addTimestamp(frame->packetPts(), frame->timestamp());
 
-    uint64_t nxTimestamp = 0;
-    if (!m_timestamps.getNxTimestamp(packet->pts(), &nxTimestamp, true /*eraseEntry*/))
-        nxTimestamp = m_camera->millisSinceEpoch();
+    auto nxTimestamp = m_timestamps.takeNxTimestamp(packet->pts());
+    if (!nxTimestamp.has_value())
+        nxTimestamp.emplace(m_camera->millisSinceEpoch());
 
-    packet->setTimestamp(nxTimestamp);
+    packet->setTimestamp(nxTimestamp.value());
     return packet;
 }
 
@@ -401,7 +402,7 @@ int TranscodeStreamReader::initializeScaledFrame(const ffmpeg::Codec* encoder)
         ffmpeg::utils::unDeprecatePixelFormat(encoder->codec()->pix_fmts[0]);
 
     int result = 
-        scaledFrame->getBuffer(encoderFormat, m_codecParams.width, m_codecParams.height, 32);
+        scaledFrame->getBuffer(encoderFormat, m_codecParams.resolution.width, m_codecParams.resolution.height, 32);
     
     if (result < 0)
         return result;
@@ -413,7 +414,7 @@ int TranscodeStreamReader::initializeScaledFrame(const ffmpeg::Codec* encoder)
 void TranscodeStreamReader::setEncoderOptions(ffmpeg::Codec* encoder)
 {
     encoder->setFps(m_codecParams.fps);
-    encoder->setResolution(m_codecParams.width, m_codecParams.height);
+    encoder->setResolution(m_codecParams.resolution.width, m_codecParams.resolution.height);
     encoder->setBitrate(m_codecParams.bitrate);
     encoder->setPixelFormat(ffmpeg::utils::suggestPixelFormat(encoder->codec()));
     
@@ -437,8 +438,8 @@ int TranscodeStreamReader::scale(const AVFrame * frame, AVFrame* outFrame)
         frame->width,
         frame->height,
         ffmpeg::utils::unDeprecatePixelFormat(pixelFormat),
-        m_codecParams.width,
-        m_codecParams.height,
+        m_codecParams.resolution.width,
+        m_codecParams.resolution.height,
         ffmpeg::utils::unDeprecatePixelFormat(m_encoder->codec()->pix_fmts[0]),
         SWS_FAST_BILINEAR,
         nullptr,

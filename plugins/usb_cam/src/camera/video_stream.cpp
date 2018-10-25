@@ -84,7 +84,11 @@ AVPixelFormat VideoStream::decoderPixelFormat() const
 void VideoStream::addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_packetConsumerManager.addConsumer(consumer, true/*waitForKeyPacket*/);
+
+    static constexpr PacketConsumerManager::ConsumerState skipUntilNextKeyPacket = 
+        PacketConsumerManager::ConsumerState::skipUntilNextKeyPacket;
+
+    m_packetConsumerManager.addConsumer(consumer, skipUntilNextKeyPacket);
     updateUnlocked();
     tryStart();
     m_wait.notify_all();
@@ -319,8 +323,10 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
     if (m_codecParams.fps > 0)
         inputFormat->setFps(m_codecParams.fps);
 
-    if (m_codecParams.width * m_codecParams.height > 0)
-        inputFormat->setResolution(m_codecParams.width, m_codecParams.height);
+    if (m_codecParams.resolution.width * m_codecParams.resolution.height > 0)
+        inputFormat->setResolution(
+            m_codecParams.resolution.width,
+            m_codecParams.resolution.height);
 
     // Note: setting the bitrate only works for raspberry pi mmal camera
     if (m_codecParams.bitrate > 0)
@@ -425,11 +431,11 @@ std::shared_ptr<ffmpeg::Frame> VideoStream::maybeDecode(const ffmpeg::Packet * p
 
     m_timestamps.addTimestamp(packet->pts(), packet->timestamp());
 
-    uint64_t nxTimestamp = 0;
-    if (!m_timestamps.getNxTimestamp(frame->packetPts(), &nxTimestamp, true /*eraseEntry*/))
-        nxTimestamp = m_timeProvider->millisSinceEpoch();
+    auto nxTimestamp = m_timestamps.takeNxTimestamp(frame->packetPts());
+    if (!nxTimestamp.has_value())
+        nxTimestamp.emplace(m_timeProvider->millisSinceEpoch());
 
-    frame->setTimestamp(nxTimestamp);
+    frame->setTimestamp(nxTimestamp.value());
 
     return frame;
 }
@@ -442,58 +448,46 @@ int VideoStream::decode(const ffmpeg::Packet * packet, ffmpeg::Frame * frame)
     return result;
 }
 
-float VideoStream::largestFps() const
+float VideoStream::findLargestFps() const
 {
     if(consumersEmpty())
         return 0;
 
-    float packetFps = 0;
-    m_packetConsumerManager.largestFps(&packetFps);
-
-    float frameFps = 0;
-    m_frameConsumerManager.largestFps(&frameFps);
+    float packetFps = m_packetConsumerManager.findLargestFps();
+    float frameFps = m_frameConsumerManager.findLargestFps();
 
     return frameFps > packetFps ? frameFps : packetFps;
 }
 
-void VideoStream::largestResolution(int * outWidth, int * outHeight) const
+nxcip::Resolution VideoStream::findLargestResolution() const
 {
-    *outWidth = 0;
-    *outHeight = 0;
-
     if(consumersEmpty())
-        return;
+        return {};
 
-    int packetConsumerWidth = 0;
-    int packetConsumerHeight = 0;
-    m_packetConsumerManager.largestResolution(&packetConsumerWidth, &packetConsumerHeight);
+    nxcip::Resolution largest;
+    auto packetResolution = m_packetConsumerManager.findLargestResolution();
+    auto frameResolution = m_frameConsumerManager.findLargestResolution();
 
-    int frameConsumerWidth = 0;
-    int frameConsumerHeight = 0;
-    m_frameConsumerManager.largestResolution(&frameConsumerWidth, &frameConsumerHeight);
-
-    if(frameConsumerWidth * frameConsumerHeight > packetConsumerWidth * packetConsumerHeight)
+    if(frameResolution.width * frameResolution.height > 
+        packetResolution.width * packetResolution.height)
     {
-        *outWidth = frameConsumerWidth;
-        *outHeight = frameConsumerHeight;
+        largest = frameResolution;
     }
     else
     {
-        *outWidth = packetConsumerWidth;
-        *outHeight = packetConsumerHeight;
+        largest = packetResolution;
     }
+
+    return largest;
 }
 
-int VideoStream::largestBitrate() const
+int VideoStream::findLargestBitrate() const
 {
     if (consumersEmpty())
         return 0;
 
-    int packetBitrate = 0;
-    m_packetConsumerManager.largestBitrate(&packetBitrate);
-
-    int frameBitrate = 0;
-    m_frameConsumerManager.largestBitrate(&frameBitrate);
+    int packetBitrate = m_packetConsumerManager.findLargestBitrate();
+    int frameBitrate = m_frameConsumerManager.findLargestBitrate();
 
     return frameBitrate > packetBitrate ? frameBitrate : packetBitrate;
 }
@@ -504,10 +498,10 @@ void VideoStream::updateFpsUnlocked()
         return;
 
     CodecParameters newParams = m_codecParams;
-    newParams.fps = largestFps();
+    newParams.fps = findLargestFps();
 
-    CodecParameters codecParams = closestHardwareConfiguration(newParams);
-    setCodecParameters(codecParams);
+    CodecParameters finalParams = findClosestHardwareConfiguration(newParams);
+    setCodecParameters(finalParams);
 }
 
 void VideoStream::updateResolutionUnlocked()
@@ -515,14 +509,11 @@ void VideoStream::updateResolutionUnlocked()
     if (consumersEmpty())
         return;
 
-    int width = 0;
-    int height = 0;
     CodecParameters newParams = m_codecParams;
-    largestResolution(&width, &height);
-    newParams.setResolution(width, height);
+    newParams.resolution = findLargestResolution();
 
-    CodecParameters codecParams = closestHardwareConfiguration(newParams);
-    setCodecParameters(codecParams);
+    auto finalParams = findClosestHardwareConfiguration(newParams);
+    setCodecParameters(finalParams);
 }
 
 void VideoStream::updateBitrateUnlocked()
@@ -530,7 +521,7 @@ void VideoStream::updateBitrateUnlocked()
     if (consumersEmpty())
         return;
 
-    int bitrate = largestBitrate();
+    int bitrate = findLargestBitrate();
 
     if (m_codecParams.bitrate != bitrate)
     {
@@ -545,24 +536,18 @@ void VideoStream::updateUnlocked()
         return;
 
     // Could call updateFpsUnlocked() and updateResolutionUnlcoked() here, but this way
-    // closestHardwareConfiguration(), which queries hardware, only gets called once
+    // findClosestHardwareConfiguration(), which queries hardware, only gets called once
     CodecParameters newParams = m_codecParams;
-    newParams.fps = largestFps();
 
-    int width = 0;
-    int height = 0;
-    largestResolution(&width, &height);
-    newParams.setResolution(width, height);
-
+    newParams.fps = findLargestFps();
+    newParams.resolution =  findLargestResolution();
     updateBitrateUnlocked();
 
-    CodecParameters codecParams = closestHardwareConfiguration(newParams);
-    setCodecParameters(codecParams);
-
-    NX_DEBUG(this) << m_url + ":" << "Selected Params:" << m_codecParams.toString();
+    CodecParameters finalParams = findClosestHardwareConfiguration(newParams);
+    setCodecParameters(finalParams);
 }
 
-CodecParameters VideoStream::closestHardwareConfiguration(const CodecParameters& params) const
+CodecParameters VideoStream::findClosestHardwareConfiguration(const CodecParameters& params) const
 {
     std::vector<device::ResolutionData>resolutionList;
 
@@ -573,34 +558,33 @@ CodecParameters VideoStream::closestHardwareConfiguration(const CodecParameters&
     // Try to find an exact match first
     for (const auto & resolution : resolutionList)
     {
-        if (resolution.width == params.width 
-            && resolution.height == params.height 
+        if (resolution.width == params.resolution.width
+            && resolution.height == params.resolution.height 
             && resolution.fps == params.fps)
         {
             return CodecParameters(
                 m_codecParams.codecId, 
                 params.fps,
                 m_codecParams.bitrate,
-                params.width,
-                params.height);
+                params.resolution);
         }
     }
 
     // Then a match with similar aspect ratio whose resolution and fps are higher than requested
-    float aspectRatio = (float) params.width / params.height;
+    float aspectRatio = (float) params.resolution.width / params.resolution.height;
     for (const auto & resolution : resolutionList)
     {
         if (aspectRatio == resolution.aspectRatio())
         {
-            if (resolution.width * resolution.height >= params.width * params.height 
-                && resolution.fps >= params.fps)
+            bool actualResolutionGreater = resolution.width * resolution.height >= 
+                params.resolution.width * params.resolution.height;
+            if (actualResolutionGreater && resolution.fps >= params.fps)
             {
                 return CodecParameters(
                     m_codecParams.codecId,
                     resolution.fps,
                     m_codecParams.bitrate,
-                    resolution.width,
-                    resolution.height);
+                    nxcip::Resolution(resolution.width, resolution.width));
             }
         }
     }
@@ -608,15 +592,15 @@ CodecParameters VideoStream::closestHardwareConfiguration(const CodecParameters&
     // Any resolution or fps higher than requested
     for (const auto & resolution : resolutionList)
     {
-        if (resolution.width * resolution.height >= params.width * params.height 
-            && resolution.fps >= params.fps)
+        bool actualResolutionGreater = resolution.width * resolution.height >=
+            params.resolution.width * params.resolution.height;
+        if (actualResolutionGreater && resolution.fps >= params.fps)
         {
             return CodecParameters(
                 m_codecParams.codecId,
                 resolution.fps,
                 m_codecParams.bitrate,
-                resolution.width,
-                resolution.height);
+                nxcip::Resolution(resolution.width, resolution.width));
         }
     }
 
@@ -625,8 +609,10 @@ CodecParameters VideoStream::closestHardwareConfiguration(const CodecParameters&
 
 void VideoStream::setCodecParameters(const CodecParameters& codecParams)
 {
-    if (m_codecParams.fps != codecParams.fps
-        || m_codecParams.width * m_codecParams.height != codecParams.width * codecParams.height)
+    bool newResolutionNotEqual = m_codecParams.resolution.width * m_codecParams.resolution.height 
+        != codecParams.resolution.width * codecParams.resolution.height;
+
+    if (m_codecParams.fps != codecParams.fps || newResolutionNotEqual)
     {
         AVCodecID codecId = m_codecParams.codecId;
         m_codecParams = codecParams;
