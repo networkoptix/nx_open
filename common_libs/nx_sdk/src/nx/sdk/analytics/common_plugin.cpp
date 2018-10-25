@@ -34,11 +34,6 @@ void* CommonPlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
         addRef();
         return static_cast<Plugin*>(this);
     }
-    if (interfaceId == nxpl::IID_Plugin3)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin3*>(this);
-    }
     if (interfaceId == nxpl::IID_Plugin2)
     {
         addRef();
@@ -71,10 +66,6 @@ void CommonPlugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
 void CommonPlugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
 {
     m_pluginContainer = pluginContainer;
-}
-
-void CommonPlugin::setLocale(const char* /*locale*/)
-{
 }
 
 const char* CommonPlugin::manifest(nx::sdk::Error* outError) const

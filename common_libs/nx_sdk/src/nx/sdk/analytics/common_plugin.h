@@ -51,7 +51,6 @@ public:
 
     virtual void setSettings(const nxpl::Setting* settings, int count) override;
     virtual void setPluginContainer(nxpl::PluginInterface* pluginContainer) override;
-    virtual void setLocale(const char* locale) override;
 
     virtual const char* manifest(nx::sdk::Error* outError) const override;
 

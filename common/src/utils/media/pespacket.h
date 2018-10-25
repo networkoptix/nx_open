@@ -20,9 +20,9 @@ static qint64 get_pts(const quint8 *p)
     return pts;
 }
 
-static void set_pts_int(quint8 *p, qint64 pts, int preffix)
+static void set_pts_int(quint8 *p, qint64 pts, int prefix)
 {
-    p[0] = preffix + (quint8) (((pts >> 30) &0x07)<<1) + 1;
+    p[0] = prefix + (quint8) (((pts >> 30) &0x07)<<1) + 1;
     quint16 val = (quint16) (((pts>>15)&0x7fff)<<1) + 1;
     p[1] = val >> 8;
     p[2] = val & 0xff;

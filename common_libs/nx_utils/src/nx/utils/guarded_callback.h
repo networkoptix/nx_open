@@ -29,7 +29,7 @@ auto guarded(const QObject* guard, Callback&& callback)
             callback = std::forward<Callback>(callback)](auto&&... args)
         {
             if (guard)
-                callback(std::forward<std::remove_reference_t<decltype(args)>>(args)...);
+                callback(std::forward<decltype(args)>(args)...);
         };
 }
 
@@ -43,7 +43,7 @@ auto guarded(const QObject* guard, const ResultType& defaultReturnValue, Callbac
             callback = std::forward<Callback>(callback)](auto&&... args)
         {
             return guard
-                ? callback(std::forward<std::remove_reference_t<decltype(args)>>(args)...)
+                ? callback(std::forward<decltype(args)>(args)...)
                 : defaultReturnValue;
         };
 }

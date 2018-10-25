@@ -17,12 +17,12 @@ public:
     /**
      * @return Null terminated UTF8 string containing the caption of the event.
      */
-    virtual NX_LOCALE_DEPENDENT const char* caption() const = 0;
+    virtual const char* caption() const = 0;
 
     /**
      * @return Null terminated UTF8 string containing the description of the event.
      */
-    virtual NX_LOCALE_DEPENDENT const char* description() const = 0;
+    virtual const char* description() const = 0;
 
     /**
      * @brief auxilaryData user side data in json format. Null terminated UTF-8 string.

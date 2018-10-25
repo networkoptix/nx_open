@@ -23,7 +23,7 @@ static const nxpl::NX_GUID IID_Plugin =
  * in its start via calls to Plugin* createNxAnalyticsPlugin() which should be exported as extern
  * "C" by the plugin library, and is destroyed (via releaseRef()) on Mediaserver shutdown.
  */
-class Plugin: public nxpl::Plugin3
+class Plugin: public nxpl::Plugin2
 {
 public:
 
