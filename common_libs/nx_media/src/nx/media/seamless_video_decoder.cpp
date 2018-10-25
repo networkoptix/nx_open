@@ -31,9 +31,7 @@ struct FrameBasicInfo
         codec(AV_CODEC_ID_NONE)
     {
         codec = frame->compressionType;
-        size = QSize(frame->width, frame->height);
-        if (size.isEmpty())
-            size = nx::media::AbstractVideoDecoder::mediaSizeFromRawData(frame);
+        size = getFrameSize(frame);
     }
 
     QSize size;
