@@ -12,7 +12,7 @@ static const int kOpenPanelTimeoutMs = 150;
 static const int kCloseCalendarPanelTimeoutMs = 2000;
 
 /** Wait this time to make unpinned side (resource or notification) panel auto-hide. */
-static const int kCloseSidePanelTimeoutMs = 100;
+static const int kCloseSidePanelTimeoutMs = 1500;
 
 /** Time span to avoid graphics button double click where we don't need it. */
 static const int kButtonInactivityTimeoutMs = 300;
