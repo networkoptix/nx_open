@@ -134,5 +134,11 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     if (!isMobile && protoVersion != QnAppInfo::ec2ProtoVersion())
         return Qn::IncompatibleProtocolConnectionResult;
 
+    // For debug purposes only
+    /*
+    auto appVersion = nx::vms::api::SoftwareVersion(QnAppInfo::applicationVersion());
+    if (appVersion < version)
+        return Qn::IncompatibleProtocolConnectionResult;*/
+
     return Qn::SuccessConnectionResult;
 }

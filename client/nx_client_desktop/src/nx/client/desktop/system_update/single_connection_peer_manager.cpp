@@ -1,117 +1,43 @@
-#include <nx/utils/log/assert.h>
-#include <nx/network/http/async_http_client_reply.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/media_server_resource.h>
 #include <api/server_rest_connection.h>
-#include <rest/server/json_rest_result.h>
 #include <common/common_module.h>
-#include "peer_selection/abstract_peer_selector.h"
-#include "../validate_result.h"
-#include "../downloader.h"
-#include "resource_pool_peer_manager.h"
+#include <client_core/client_core_module.h>
+#include <nx/vms/common/p2p/downloader/validate_result.h>
+#include <nx_ec/ec_api.h>
+#include "single_connection_peer_manager.h"
 
-namespace nx {
-namespace vms {
-namespace common {
-namespace p2p {
-namespace downloader {
 
-namespace {
+namespace nx::vms::common::p2p::downloader {
 
-static const int kDownloadRequestTimeoutMs = 10 * 60 * 1000;
-
-class OtherPeerInfosProvider
-{
-public:
-    explicit OtherPeerInfosProvider(QnCommonModule* commonModule)
-    {
-        const auto selfId = commonModule->moduleGUID();
-        const auto servers = commonModule->resourcePool()->getAllServers(Qn::Online);
-        for (const auto& server: servers)
-            addInfo(server, selfId);
-    }
-
-    QList<QnUuid> ids() const
-    {
-        QList<QnUuid> result;
-        for (const auto& peerInfo: m_peerInfos)
-            result.append(peerInfo.id);
-        return result;
-    }
-
-    PeerInformationList peerInfos() const
-    {
-        return m_peerInfos;
-    }
-
-private:
-    PeerInformationList m_peerInfos;
-
-    void addInfo(const QnMediaServerResourcePtr& server, const QnUuid& selfId)
-    {
-        if (server->getId() == selfId)
-            return;
-        m_peerInfos.append(PeerInformation(server->getSystemInfo(), server->getId()));
-    }
-};
-
-} // namespace
-
-nx::network::http::AsyncHttpClientPtr createHttpClient()
-{
-    auto httpClient = nx::network::http::AsyncHttpClient::create();
-    httpClient->setResponseReadTimeoutMs(kDownloadRequestTimeoutMs);
-    httpClient->setSendTimeoutMs(kDownloadRequestTimeoutMs);
-    httpClient->setMessageBodyReadTimeoutMs(5);
-
-    return httpClient;
-}
-
-ResourcePoolPeerManager::ResourcePoolPeerManager(
+SingleConnectionPeerManager::SingleConnectionPeerManager(
     QnCommonModule* commonModule,
-    AbstractPeerSelectorPtr peerSelector,
-    bool isClient)
+    AbstractPeerSelectorPtr&& peerSelector)
     :
     QnCommonModuleAware(commonModule),
-    m_peerSelector(std::move(peerSelector)),
-    m_isClient(isClient)
+    m_peerSelector(std::move(peerSelector))
 {
 }
 
-QnUuid ResourcePoolPeerManager::selfId() const
+QnUuid SingleConnectionPeerManager::selfId() const
 {
     return commonModule()->moduleGUID();
 }
 
-QString ResourcePoolPeerManager::peerString(const QnUuid& peerId) const
+QString SingleConnectionPeerManager::peerString(const QnUuid& peerId) const
 {
-    QString result;
-
-    const auto& server = resourcePool()->getResourceById<QnMediaServerResource>(peerId);
-    if (server)
-    {
-        result = lit("%1 (%2 %3)").arg(
-            server->getName(),
-            server->getPrimaryAddress().toString(),
-            server->getId().toString());
-    }
-    else
-    {
-        result = lit("Unknown server %1").arg(peerId.toString());
-    }
+    QString result = peerId.toString();
 
     if (peerId == selfId())
-        result += lit(" (self)");
+        result += "(self)";
 
     return result;
 }
 
-QList<QnUuid> ResourcePoolPeerManager::getAllPeers() const
+QList<QnUuid> SingleConnectionPeerManager::getAllPeers() const
 {
-    return OtherPeerInfosProvider(commonModule()).ids();
+    return {selfId(), getServerId()};
 }
 
-int ResourcePoolPeerManager::distanceTo(const QnUuid& peerId) const
+int SingleConnectionPeerManager::distanceTo(const QnUuid& peerId) const
 {
     const auto& connection = commonModule()->ec2Connection();
     if (!connection)
@@ -122,20 +48,22 @@ int ResourcePoolPeerManager::distanceTo(const QnUuid& peerId) const
     return distance;
 }
 
-bool ResourcePoolPeerManager::hasInternetConnection(const QnUuid& peerId) const
+bool SingleConnectionPeerManager::hasInternetConnection(const QnUuid& peerId) const
 {
-    // Note: peerId can be a client id..
-    if (m_isClient)
+    // TODO: Is it really so true?
+    if (peerId == selfId())
+    {
+        // TODO: Ask client if it has internet.
         return true;
-    const auto& server = getServer(peerId);
-    NX_ASSERT(server);
-    if (!server)
-        return false;
-
-    return server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);
+    }
+    else
+    {
+        // TODO: Ask server if it has internet.
+    }
+    return true;
 }
 
-bool ResourcePoolPeerManager::hasAccessToTheUrl(const QString& url) const
+bool SingleConnectionPeerManager::hasAccessToTheUrl(const QString& url) const
 {
     if (url.isEmpty())
         return false;
@@ -143,7 +71,7 @@ bool ResourcePoolPeerManager::hasAccessToTheUrl(const QString& url) const
     return Downloader::validate(url, /* onlyConnectionCheck */ true, /* expectedSize */ 0);
 }
 
-rest::Handle ResourcePoolPeerManager::requestFileInfo(
+rest::Handle SingleConnectionPeerManager::requestFileInfo(
     const QnUuid& peerId, const QString& fileName, FileInfoCallback callback)
 {
     const auto& connection = getConnection(peerId);
@@ -163,7 +91,7 @@ rest::Handle ResourcePoolPeerManager::requestFileInfo(
     return connection->fileDownloadStatus(fileName, handleReply, thread());
 }
 
-rest::Handle ResourcePoolPeerManager::requestChecksums(
+rest::Handle SingleConnectionPeerManager::requestChecksums(
     const QnUuid& peerId,
     const QString& fileName,
     AbstractPeerManager::ChecksumsCallback callback)
@@ -185,7 +113,7 @@ rest::Handle ResourcePoolPeerManager::requestChecksums(
     return connection->fileChunkChecksums(fileName, handleReply, thread());
 }
 
-rest::Handle ResourcePoolPeerManager::downloadChunk(
+rest::Handle SingleConnectionPeerManager::downloadChunk(
     const QnUuid& peerId,
     const QString& fileName,
     int chunkIndex,
@@ -209,7 +137,7 @@ rest::Handle ResourcePoolPeerManager::downloadChunk(
         thread());
 }
 
-rest::Handle ResourcePoolPeerManager::validateFileInformation(
+rest::Handle SingleConnectionPeerManager::validateFileInformation(
     const QnUuid& peerId,
     const FileInformation& fileInformation,
     AbstractPeerManager::ValidateCallback callback)
@@ -230,14 +158,14 @@ rest::Handle ResourcePoolPeerManager::validateFileInformation(
         }
 
         auto handleReply =
-            [this, callback, fileInformation, peerId](
+            [callback, fileInformation, peerId](
                 bool success,
                 rest::Handle handle,
                 const QnJsonRestResult& result)
             {
                 if (!success)
                 {
-                    NX_WARNING(this, lm("[Downloader, validate] File %1. Rest connection to %2 response error")
+                    NX_WARNING(typeid(AbstractPeerManager), lm("[Downloader, validate] File %1. Rest connection to %2 response error")
                         .args(fileInformation.name, peerId));
                     return callback(success, handle);
                 }
@@ -245,12 +173,12 @@ rest::Handle ResourcePoolPeerManager::validateFileInformation(
                 const auto validateResult = result.deserialized<ValidateResult>();
                 if (!validateResult.success)
                 {
-                    NX_WARNING(this, lm("[Downloader, validate] File %1. peer %2 responded that validation had failed")
+                    NX_WARNING(typeid(AbstractPeerManager), lm("[Downloader, validate] File %1. peer %2 responded that validation had failed")
                         .args(fileInformation.name, peerId));
                     return callback(false, handle);
                 }
 
-                NX_VERBOSE(this, lm("[Downloader, validate] File %1. peer %2 validation successful")
+                NX_VERBOSE(typeid(AbstractPeerManager), lm("[Downloader, validate] File %1. peer %2 validation successful")
                     .args(fileInformation.name, peerId));
 
                 callback(success, handle);
@@ -283,7 +211,7 @@ rest::Handle ResourcePoolPeerManager::validateFileInformation(
     return handle;
 }
 
-rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
+rest::Handle SingleConnectionPeerManager::downloadChunkFromInternet(
     const QnUuid& peerId,
     const QString& fileName,
     const nx::utils::Url& url,
@@ -346,7 +274,7 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
     return handle;
 }
 
-void ResourcePoolPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle handle)
+void SingleConnectionPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle handle)
 {
     if (peerId == selfId())
     {
@@ -361,46 +289,31 @@ void ResourcePoolPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle h
     connection->cancelRequest(handle);
 }
 
-QnMediaServerResourcePtr ResourcePoolPeerManager::getServer(const QnUuid& peerId) const
+void SingleConnectionPeerManager::setConnection(rest::QnConnectionPtr connection)
 {
-    return resourcePool()->getResourceById<QnMediaServerResource>(peerId);
+    m_directConnection = connection;
 }
 
-rest::QnConnectionPtr ResourcePoolPeerManager::getConnection(const QnUuid& peerId) const
+rest::QnConnectionPtr SingleConnectionPeerManager::getConnection(const QnUuid& peerId) const
 {
     NX_ASSERT(peerId != selfId());
     if (peerId == selfId())
         return rest::QnConnectionPtr();
-
-    const auto& server = getServer(peerId);
-    if (!server)
-        return rest::QnConnectionPtr();
-
-    return server->restConnection();
+    NX_ASSERT(m_directConnection);
+    return m_directConnection;
 }
 
-QList<QnUuid> ResourcePoolPeerManager::peers() const
+QnUuid SingleConnectionPeerManager::getServerId() const
 {
-    const auto allOtherPeerInfos = OtherPeerInfosProvider(commonModule()).peerInfos();
-    return m_peerSelector->peers(allOtherPeerInfos);
+    if (m_directConnection)
+        return m_directConnection->getServerId();
+    return QnUuid();
 }
 
-ResourcePoolPeerManagerFactory::ResourcePoolPeerManagerFactory(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+
+QList<QnUuid> SingleConnectionPeerManager::peers() const
 {
+    return {getServerId()};
 }
 
-std::shared_ptr<AbstractPeerManager> ResourcePoolPeerManagerFactory::createPeerManager(
-    FileInformation::PeerSelectionPolicy peerPolicy,
-    const QList<QnUuid>& additionalPeers)
-{
-    auto&& peerSelector = createPeerSelector(peerPolicy, additionalPeers, commonModule());
-    auto rawPtr = new ResourcePoolPeerManager(commonModule(), std::move(peerSelector));
-    return std::shared_ptr<AbstractPeerManager>(rawPtr);
-}
-
-} // namespace downloader
-} // namespace p2p
-} // namespace common
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::common::p2p::downloader

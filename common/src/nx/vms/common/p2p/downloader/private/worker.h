@@ -48,7 +48,7 @@ public:
     Worker(
         const QString& fileName,
         Storage* storage,
-        AbstractPeerManager* peerManager,
+        std::shared_ptr<AbstractPeerManager> peerManager,
         QObject* parent = nullptr);
     virtual ~Worker();
 
@@ -127,7 +127,7 @@ protected:
 
     void setPrintSelfPeerInLogs();
     static qint64 defaultStepDelay();
-    AbstractPeerManager* peerManager() const;
+    std::shared_ptr<AbstractPeerManager> peerManager() const;
 
 private:
     struct RequestContext
@@ -148,7 +148,8 @@ private:
     mutable QnMutex m_mutex;
     QnWaitCondition m_waitCondition;
     Storage* m_storage = nullptr;
-    AbstractPeerManager* m_peerManager = nullptr;
+
+    std::shared_ptr<AbstractPeerManager> m_peerManager;
     const QString m_fileName;
 
     nx::utils::log::Tag m_logTag;

@@ -56,6 +56,11 @@ public:
     qint64 touchTime = 0;
     qint64 ttl = 0;
     QList<QnUuid> additionalPeers;
+
+    // Calculates a progress for download, [0..100].
+    float calculateDownloadProgress() const;
+    // Calculates total number of bytes downloaded.
+    int calculateDownloadedBytes() const;
 };
 
 #define FileInformation_Fields \

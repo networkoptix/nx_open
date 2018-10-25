@@ -665,7 +665,7 @@ void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr&
     if (!button)
         return;
 
-    const bool buttonEnabled = rule && rule->isScheduleMatchTime(qnSyncTime->currentDateTime())
+    const bool buttonEnabled = (rule && rule->isScheduleMatchTime(qnSyncTime->currentDateTime()))
         || !button->isLive();
 
     if (button->isEnabled() == buttonEnabled)
@@ -2849,7 +2849,7 @@ void QnMediaResourceWidget::createTriggerIfRelevant(
     configureTriggerButton(button, info, clientSideHandler);
 
     connect(button, &SoftwareTriggerButton::isLiveChanged, this,
-        [this, button, rule]()
+        [this, rule]()
         {
             updateTriggerAvailability(rule);
         });

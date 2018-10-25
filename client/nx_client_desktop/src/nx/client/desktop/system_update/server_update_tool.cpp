@@ -183,7 +183,7 @@ std::future<UpdateContents> ServerUpdateTool::checkUpdateFromFile(QString file)
     m_extractor = std::make_shared<QnZipExtractor>(file, m_outputDir.path());
     m_offlineUpdateCheckResult = std::promise<UpdateContents>();
     m_extractor->start();
-    connect(m_extractor.get(), &QnZipExtractor::finished, this, &ServerUpdateTool::at_extractFilesFinished);
+    connect(m_extractor.get(), &QnZipExtractor::finished, this, &ServerUpdateTool::atExtractFilesFinished);
 
     return m_offlineUpdateCheckResult.get_future();;
 }
@@ -221,7 +221,7 @@ void ServerUpdateTool::readUpdateManifest(QString path, UpdateContents& result)
 }
 
 // NOTE: We are probably not in the UI thread.
-void ServerUpdateTool::at_extractFilesFinished(int code)
+void ServerUpdateTool::atExtractFilesFinished(int code)
 {
     // TODO: Add some thread safety here
     NX_ASSERT(m_offlineUpdaterState == OfflineUpdateState::unpack);
@@ -285,12 +285,12 @@ void ServerUpdateTool::setResourceFeed(QnResourcePool* pool)
     }
 
     m_onAddedResource = connect(pool, &QnResourcePool::resourceAdded,
-        this, &ServerUpdateTool::at_resourceAdded);
+        this, &ServerUpdateTool::atResourceAdded);
     m_onRemovedResource = connect(pool, &QnResourcePool::resourceRemoved,
-        this, &ServerUpdateTool::at_resourceRemoved);
+        this, &ServerUpdateTool::atResourceRemoved);
     // TODO: Should replace it by connecting to each resource
     m_onUpdatedResource = connect(pool, &QnResourcePool::resourceChanged,
-        this, &ServerUpdateTool::at_resourceChanged);
+        this, &ServerUpdateTool::atResourceChanged);
 }
 
 QnMediaServerResourceList ServerUpdateTool::getServersForUpload()
@@ -317,7 +317,7 @@ ServerUpdateTool::OfflineUpdateState ServerUpdateTool::getUploaderState() const
     return m_offlineUpdaterState;
 }
 
-void ServerUpdateTool::at_uploadWorkerState(QnUuid serverId, const UploadState& state)
+void ServerUpdateTool::atUploadWorkerState(QnUuid serverId, const UploadState& state)
 {
     if (!m_uploadStateById.count(state.id))
     {
@@ -391,7 +391,7 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents)
             auto callback = [tool=QPointer<ServerUpdateTool>(this), serverId](const UploadState& state)
             {
                 if (tool)
-                    tool->at_uploadWorkerState(serverId, state);
+                    tool->atUploadWorkerState(serverId, state);
             };
 
             UploadState config;
@@ -587,21 +587,21 @@ ServerUpdateTool::ProgressInfo ServerUpdateTool::calculateUploadProgress()
     return result;
 }
 
-void ServerUpdateTool::at_resourceAdded(const QnResourcePtr& resource)
+void ServerUpdateTool::atResourceAdded(const QnResourcePtr& resource)
 {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         m_activeServers[server->getId()] = server;
     // TODO: We should check new server for uploading operations
 }
 
-void ServerUpdateTool::at_resourceRemoved(const QnResourcePtr& resource)
+void ServerUpdateTool::atResourceRemoved(const QnResourcePtr& resource)
 {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         m_activeServers.erase(server->getId());
     // TODO: We should remove this server from uploading operations
 }
 
-void ServerUpdateTool::at_resourceChanged(const QnResourcePtr& resource)
+void ServerUpdateTool::atResourceChanged(const QnResourcePtr& resource)
 {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server)
@@ -754,7 +754,7 @@ void ServerUpdateTool::requestInstallAction(QSet<QnUuid> targets)
             connection->updateActionInstall({});
 }
 
-void ServerUpdateTool::at_updateStatusResponse(bool success, rest::Handle handle,
+void ServerUpdateTool::atUpdateStatusResponse(bool success, rest::Handle handle,
     const std::vector<nx::update::Status>& response)
 {
     m_checkingRemoteUpdateStatus = false;
@@ -796,7 +796,7 @@ void ServerUpdateTool::requestRemoteUpdateState()
         auto callback = [tool=QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle, const UpdateStatusAll& response)
             {
                 if (tool)
-                    tool->at_updateStatusResponse(success, handle, response);
+                    tool->atUpdateStatusResponse(success, handle, response);
             };
 
         m_timeStartedInstall = Clock::now();
