@@ -284,7 +284,7 @@ public:
     };
     Option<QString> backupDir{this, "backupDir",
         "",
-        "/var/backup (on linux). "
+        "/opt/{CustomizationName}/mediaserver/var/backup (on linux). "
         "C:\\Users\\{username}\\AppData\\Local\\Network Optix\\Network Optix Media Server\\backup "
         "on MSWin",
         [this](const QString& value)

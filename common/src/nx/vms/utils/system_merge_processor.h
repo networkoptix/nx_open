@@ -41,7 +41,7 @@ public:
     void setMergeError(QnJsonRestResult* result, ::utils::MergeSystemsStatus::Value mergeStatus);
 private:
     QnCommonModule* m_commonModule;
-    QString m_backupsDirectory;
+    QString m_backupDirectory;
     QnAuthSession m_authSession;
     nx::vms::api::ModuleInformation m_localModuleInformation;
     nx::vms::api::ModuleInformationWithAddresses m_remoteModuleInformation;
