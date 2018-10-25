@@ -23,7 +23,7 @@ void Peer::connectTo(const Peer& other)
         .setScheme(network::http::kUrlSchemeName)
         .setEndpoint(other.process().moduleInstance()->httpEndpoints().front());
 
-    m_process.moduleInstance()->connectToNode("" /*systemId*/, url);
+    m_process.moduleInstance()->connectToNode(/*systemId*/ "", url);
 }
 
 void Peer::addRandomData()
