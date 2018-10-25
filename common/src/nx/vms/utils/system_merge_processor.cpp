@@ -46,10 +46,10 @@ SystemMergeProcessor::SystemMergeProcessor(QnCommonModule* commonModule):
 {
 }
 
-void SystemMergeProcessor::enableDbBackup(const QString& backupsDirectory)
+void SystemMergeProcessor::enableDbBackup(const QString& backupDirectory)
 {
     m_dbBackupEnabled = true;
-    m_backupDirectory = backupsDirectory;
+    m_backupDirectory = backupDirectory;
 }
 
 QnJsonRestResult SystemMergeProcessor::merge(

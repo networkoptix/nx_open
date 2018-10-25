@@ -26,7 +26,7 @@ public:
     /**
      * Disabled by default.
      */
-    void enableDbBackup(const QString& backupsDirectory);
+    void enableDbBackup(const QString& backupDirectory);
 
     QnJsonRestResult merge(
         Qn::UserAccessData accessRights,
