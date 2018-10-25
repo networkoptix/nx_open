@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <optional>
 
 namespace nx {
 namespace usb_cam {
@@ -13,18 +14,16 @@ public:
         m_timestamps.insert(std::pair<int64_t, uint64_t>(ffmpegPts, nxTimestamp));
     }
 
-    bool getNxTimestamp(int64_t ffmpegPts, uint64_t * outNxTimestamp, bool eraseEntry = true)
+    std::optional<uint64_t> takeNxTimestamp(int64_t ffmpegPts)
     {
-        *outNxTimestamp = 0;
+        std::optional<uint64_t> nxTimeStamp;
         auto it = m_timestamps.find(ffmpegPts);
-        bool found = it != m_timestamps.end();
-        if (found)
+        if (it != m_timestamps.end())
         {
-            *outNxTimestamp = it->second;
-            if (eraseEntry)
-                m_timestamps.erase(it);
+            nxTimeStamp.emplace(it->second);
+            m_timestamps.erase(it);
         }
-        return found;
+        return nxTimeStamp;
     }
 
     size_t size() const

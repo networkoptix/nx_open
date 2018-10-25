@@ -59,7 +59,7 @@ def determine_package_versions(
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial-1"
-        v["ffmpeg"] = "3.1.9"
+        v["ffmpeg"] = "3.1.9-2"
 
     if platform == "macosx":
         v["ffmpeg"] = "3.1.9"
@@ -85,7 +85,7 @@ def determine_package_versions(
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "jessie" 
-        v["ffmpeg"] = "3.1.1"
+        v["ffmpeg"] = "3.1.1-1"
 
     if box == "edge1":
         v["sysroot"] = "jessie"

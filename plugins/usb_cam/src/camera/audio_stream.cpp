@@ -10,13 +10,13 @@ extern "C" {
 #include "camera.h"
 #include "default_audio_encoder.h"
 #include "ffmpeg/utils.h"
+#include "discovery/audio_discovery_manager.h"
 
 namespace nx {
 namespace usb_cam {
 
 namespace {
 
-static constexpr int kRetryLimit = 10;
 static constexpr int kMsecInSec = 1000;
 
 const char * ffmpegDeviceType()
@@ -45,21 +45,34 @@ AudioStream::AudioStreamPrivate::AudioStreamPrivate(
     m_packetConsumerManager(packetConsumerManager),
     m_packetCount(std::make_shared<std::atomic_int>())
 {
-    start();
+    if (!m_packetConsumerManager->empty())
+        tryStart();
 }
 
 AudioStream::AudioStreamPrivate::~AudioStreamPrivate()
 {
     stop();
-    uninitialize();
     m_timeProvider->releaseRef();
+}
+
+bool AudioStream::AudioStreamPrivate::pluggedIn() const
+{
+    return device::AudioDiscoveryManager().pluggedIn(m_url);
+}
+
+bool AudioStream::AudioStreamPrivate::ioError() const
+{
+    return m_ioError;
 }
 
 void AudioStream::AudioStreamPrivate::addPacketConsumer(
     const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_packetConsumerManager->addConsumer(consumer, false);
+    m_packetConsumerManager->addConsumer(consumer);
+
+    tryStart();
+
     m_wait.notify_all();
 }
 
@@ -91,7 +104,7 @@ std::string AudioStream::AudioStreamPrivate::ffmpegUrl() const
 #endif
 }
 
-void AudioStream::AudioStreamPrivate::waitForConsumers()
+bool AudioStream::AudioStreamPrivate::waitForConsumers()
 {
     std::unique_lock<std::mutex> lock(m_mutex);
     if (m_packetConsumerManager->empty())
@@ -102,7 +115,10 @@ void AudioStream::AudioStreamPrivate::waitForConsumers()
             {
                 return m_terminated || !m_packetConsumerManager->empty(); 
             });
+
+        return !m_terminated;
     }
+    return true;
 }
 
 int AudioStream::AudioStreamPrivate::initialize()
@@ -158,11 +174,9 @@ bool AudioStream::AudioStreamPrivate::ensureInitialized()
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_initCode = initialize();
+        m_terminated = checkIoError(m_initCode);
         if (m_initCode < 0)
-        {
-            if (auto cam = m_camera.lock())
-                cam->setLastError(m_initCode);
-        }
+            setLastError(m_initCode);
     }
     return m_initialized;
 }
@@ -299,8 +313,8 @@ int AudioStream::AudioStreamPrivate::resample(const ffmpeg::Frame * frame, ffmpe
         m_initCode = initalizeResampleContext(frame);
         if(m_initCode < 0)
         {
-            if(auto cam = m_camera.lock())
-                cam->setLastError(m_initCode);
+            m_terminated = true;
+            setLastError(m_initCode);
             return m_initCode;
         }
     }
@@ -353,10 +367,7 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int 
 
             *outFfmpegError = resample(m_decodedFrame.get(), m_resampledFrame.get());
             if(*outFfmpegError < 0)
-            {
-                ++m_retries;
                 return nullptr;
-            }
 
             m_resampledFrame->frame()->pts = m_decodedFrame->pts();
             m_resampledFrame->frame()->pkt_pts = m_decodedFrame->packetPts();
@@ -419,8 +430,42 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::mergePackets(
     return newPacket;
 }
 
+std::chrono::milliseconds AudioStream::AudioStreamPrivate::timePerVideoFrame() const
+{
+    if(auto cam = m_camera.lock())
+        return cam->videoStream()->actualTimePerFrame();
+    return std::chrono::milliseconds(0); //< Should never happen
+}
+
+bool AudioStream::AudioStreamPrivate::checkIoError(int ffmpegError)
+{
+    m_ioError = ffmpegError == AVERROR(EIO) //< Windows and Linux.
+        || ffmpegError == AVERROR(ENODEV) //< Catch all.
+        || ffmpegError == AVERROR(EBUSY); //< Device is busy during initialization.
+    return m_ioError;
+}
+
+void AudioStream::AudioStreamPrivate::setLastError(int ffmpegError)
+{
+    if (auto cam = m_camera.lock())
+        cam->setLastError(ffmpegError);
+}
+
+void AudioStream::AudioStreamPrivate::tryStart()
+{
+    if (m_terminated)
+    {
+        bool plugged = pluggedIn();
+        if(plugged)
+            start();
+    }
+}
+
 void AudioStream::AudioStreamPrivate::start()
 {
+    if(m_runThread.joinable())
+        m_runThread.join();
+
     m_terminated = false;
     m_runThread = std::thread(&AudioStream::AudioStreamPrivate::run, this);
 }
@@ -437,38 +482,22 @@ void AudioStream::AudioStreamPrivate::run()
 {
     while (!m_terminated)
     {
-        if (m_retries >= kRetryLimit)
-        {
-            NX_DEBUG(this) << "Exceeded the retry limit of " << kRetryLimit
-                << "with error: " << ffmpeg::utils::errorToString(m_initCode);
-            return;
-        }
-
-        waitForConsumers();
-        if(m_terminated)
-             return;
+        if (!waitForConsumers())
+            continue;
 
         if (!ensureInitialized())
-        {
-            ++m_retries;
             continue;
-        }
 
         int result = 0;
         auto packet = nextPacket(&result);
+        m_terminated = checkIoError(result);
+
         if (result < 0)
         {
-            // EIO is returned when the device is unplugged for audio
-            m_terminated = result == AVERROR(EIO);
-            if(m_terminated)
-            {
-                if(auto cam = m_camera.lock())
-                    cam->setLastError(result);
-            }
+            setLastError(result);
             continue;
         }
 
-        
         // If the encoder is AAC, some packets are buffered and copied before delivering.
         // In that case, this packet is nullptr.
         if(!packet)
@@ -477,14 +506,8 @@ void AudioStream::AudioStreamPrivate::run()
         std::lock_guard<std::mutex> lock(m_mutex);
         m_packetConsumerManager->givePacket(packet);
     }
+    uninitialize();
 }
-
-std::chrono::milliseconds AudioStream::AudioStreamPrivate::timePerVideoFrame() const
-{
-    if(auto cam = m_camera.lock())
-        return cam->videoStream()->actualTimePerFrame();
-    return std::chrono::milliseconds(0);} //< Should never happen
-
 
 //--------------------------------------------------------------------------------------------------
 // AudioStream
@@ -525,6 +548,11 @@ void AudioStream::setEnabled(bool enabled)
 bool AudioStream::enabled() const
 {
     return m_streamReader != nullptr;
+}
+
+bool AudioStream::ioError() const
+{
+    return m_streamReader ? m_streamReader->ioError() : false;
 }
 
 void AudioStream::addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer)

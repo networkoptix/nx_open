@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include <camera/camera_plugin.h>
+
 #include "codec_parameters.h"
 
 namespace nx {
@@ -18,11 +20,11 @@ public:
     virtual ~AbstractVideoConsumer() = default;
 
     virtual float fps() const;
-    virtual void resolution(int *width, int *height) const;
+    virtual nxcip::Resolution resolution() const;
     virtual int bitrate() const;
 
     virtual void setFps(float fps);
-    virtual void setResolution(int width, int height);
+    virtual void setResolution(const nxcip::Resolution& resolution);
     virtual void setBitrate(int bitrate);
 
 protected:

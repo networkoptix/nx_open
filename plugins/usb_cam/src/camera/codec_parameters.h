@@ -1,10 +1,11 @@
 #pragma once
 
+#include <string>
+
 extern "C" {
 #include <libavcodec/avcodec.h>
 }
-
-#include <string>
+#include <camera/camera_plugin.h>
 
 #include "ffmpeg/utils.h"
 
@@ -13,46 +14,25 @@ namespace usb_cam {
 
 struct CodecParameters
 {
-    AVCodecID codecId;
-    float fps;
-    int bitrate;
-    int width;
-    int height;
+    AVCodecID codecId = AV_CODEC_ID_NONE;
+    float fps = 0;
+    int bitrate = 0;
+    nxcip::Resolution resolution;
 
-    CodecParameters():
-        codecId(AV_CODEC_ID_NONE),
-        fps(0),
-        bitrate(0),
-        width(0),
-        height(0)
-    {
-    }
+    CodecParameters() = default;
 
-    CodecParameters(AVCodecID codecId, float fps, int bitrate, int width, int height):
+    CodecParameters(AVCodecID codecId, float fps, int bitrate, const nxcip::Resolution& resolution):
         codecId(codecId),
         fps(fps),
         bitrate(bitrate),
-        width(width),
-        height(height)
+        resolution(resolution)
     {
-    }
-
-    void setResolution(int width, int height)
-    {
-        this->width = width;
-        this->height = height;
-    }
-
-    void resolution(int * width, int * height) const
-    {
-        *width = this->width;
-        *height = this->height;
     }
 
     std::string toString() const
     {
         return std::string("codec: ") + ffmpeg::utils::codecIdToName(codecId) + 
-            ", res:" + std::to_string(width) + "x" + std::to_string(height) + 
+            ", res:" + std::to_string(resolution.width) + "x" + std::to_string(resolution.height) + 
             ", fps: " + std::to_string(fps) + 
             ", bitrate: " +  std::to_string(bitrate);
     }

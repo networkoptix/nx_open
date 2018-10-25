@@ -19,7 +19,8 @@ def create_mediaserver_debug_file(binaries_dir, output_filename):
         'plugins/vca_analytics_plugin.pdb',
         'plugins_optional/image_library_plugin.pdb',
         'plugins_optional/stub_analytics_plugin.pdb',
-        'plugins/mjpg_link.pdb']
+        'plugins/mjpg_link.pdb',
+        'plugins/usb_cam.pdb']
     zip_files(pdb_filenames, binaries_dir, output_filename, mandatory=False)
 
 
