@@ -5,41 +5,57 @@
 .card {
     &--header {
         background-color : $light2;
-        padding          : 1rem;
+        padding          : rem(12px) 1rem;
         border-bottom    : 1px solid $light3;
-
+        height           : rem(80px);
+        
         &-info {
-            float : right;
-
+            float      : right;
+            text-align : right;
+            
             > div {
                 color       : $light10;
                 font-size   : $font-size-sm;
                 line-height : rem(14px);
             }
+            
+            .release_date {
+                margin-top : .25rem;
+            }
+            
+            .platforms {
+                margin-top : .25rem;
+                
+                img {
+                    height      : 1rem;
+                    width       : 1rem;
+                    margin-left : .25rem;
+                }
+            }
         }
     }
-
+    
     &--body {
-        padding : .5rem 1rem 2rem;
+        padding : .5rem 1rem 1rem;
         height  : 200px;
-
+        
         &-by {
             color     : $light16;
             font-size : $font-size-ssm;
         }
-
+        
         &-descr {
-            margin-top : .75rem;
+            margin-top : .5rem;
         }
     }
-
+    
     &--footer {
         position : absolute;
         bottom   : 0;
         padding  : .5rem 1rem 1rem;
-
+        
         > h3 {
-            font-family: "robotomedium", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-family : "robotomedium", "Helvetica Neue", Helvetica, Arial, sans-serif;
         }
     }
 }

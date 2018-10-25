@@ -13,6 +13,10 @@
                       systemsProvider, nxConfigService, $rootScope) {
 
         const CONFIG = nxConfigService.getConfig();
+    
+        function isActive(val) {
+            return $location.path().indexOf(val) >= 0;
+        }
 
         return {
             restrict   : 'E',
