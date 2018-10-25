@@ -466,6 +466,10 @@ angular.module('nxCommon').controller('ViewCtrl',
         var timeFromUrl = $routeParams.time || null;
 
         function resetSystemActiveCamera() {
+            if ($scope.isEmbeded) {
+                // don't reset storage
+                return;
+            }
             // remove active camera record for this system (multiple media servers)
             for (var serverId in $scope.camerasProvider.cameras) {
                 if ($scope.camerasProvider.cameras.hasOwnProperty(serverId)) {
@@ -488,14 +492,17 @@ angular.module('nxCommon').controller('ViewCtrl',
                     return;
                 }
             }
-
+            
             resetSystemActiveCamera();
 
             $scope.player = null;
             $scope.crashCount = 0;
-            $scope.storage.cameraId  = $scope.activeCamera.id;
-            $scope.storage.serverStates[$scope.activeCamera.server.id] = true; // media server status - expanded
-
+            
+            if (!$scope.isEmbeded) {
+                $scope.storage.cameraId = $scope.activeCamera.id;
+                $scope.storage.serverStates[$scope.activeCamera.server.id] = true; // media server status - expanded
+            }
+            
             systemAPI.setCameraPath($scope.activeCamera.id);
             timeFromUrl = timeFromUrl || null;
             $scope.updateCamera(timeFromUrl);

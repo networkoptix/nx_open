@@ -28,10 +28,6 @@
 
                 scope.viewHeader = CONFIG.showHeaderAndFooter;
                 
-                if (isActive('/embed')) {
-                    scope.viewHeader = false;
-                }
-
                 $rootScope.$on('nx.layout.header', function (event, opt) {
                     // An event to control visibility of the header
                     // ... i.e. when in view camera in embed
