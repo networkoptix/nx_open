@@ -4,7 +4,7 @@ from framework.os_access.windows_remoting import WinRM, wmi
 
 class WindowsService(Service):
     def __init__(self, winrm, name):  # type: (WinRM, str) -> ...
-        self._wmi_service = winrm.wmi_class(u'Win32_Service').reference({u'Name': name})
+        self._wmi_service = winrm.wmi.cls(u'Win32_Service').reference({u'Name': name})
         self._winrm = winrm
         self._name = name
 
@@ -17,7 +17,7 @@ class WindowsService(Service):
         except wmi.WmiInvokeFailed.specific_cls(7):
             pass
         service = self._wmi_service.get()
-        processes = list(self._winrm.wmi_class(u'Win32_Process').enumerate({}))
+        processes = list(self._winrm.wmi.cls(u'Win32_Process').enumerate({}))
         for process in processes:
             if process['CommandLine'] == service['PathName']:
                 process.invoke_method(u'Terminate', {})

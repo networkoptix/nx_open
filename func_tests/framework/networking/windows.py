@@ -64,14 +64,14 @@ class WindowsNetworking(Networking):
         return self._names
 
     def firewall_rule_exists(self):
-        query = self._winrm.wmi_class(u'MSFT_NetFirewallRule', namespace='Root/StandardCimv2')
+        query = self._winrm.wmi.cls(u'MSFT_NetFirewallRule', namespace='Root/StandardCimv2')
         all_rules = list(query.enumerate({}))
         rules = [rule for rule in all_rules if rule[u'InstanceID'] == self._firewall_rule_name]
         return bool(rules)
 
     def create_firewall_rule(self):
         # No problem if there are multiple identical rules.
-        query = self._winrm.wmi_class(u'MSFT_NetFirewallRule', namespace='Root/StandardCimv2')
+        query = self._winrm.wmi.cls(u'MSFT_NetFirewallRule', namespace='Root/StandardCimv2')
         properties_dict = {
             # See on numeric constants: https://msdn.microsoft.com/en-us/library/jj676843(v=vs.85).aspx
             u'InstanceID': self._firewall_rule_name,
@@ -106,7 +106,7 @@ class WindowsNetworking(Networking):
             {'Name': self._firewall_rule_name})
 
     def _wmi_network_profile(self, informal_profile_name):
-        wmi_firewall_profile_class = self._winrm.wmi_class(
+        wmi_firewall_profile_class = self._winrm.wmi.cls(
             u'MSFT_NetFirewallProfile',
             namespace='Root/StandardCimv2')
         wmi_firewall_profile = wmi_firewall_profile_class.reference({
@@ -133,7 +133,7 @@ class WindowsNetworking(Networking):
 
     def setup_network(self, mac, ip):
         # type: (EUI, IPNetwork) -> None
-        adapter_conf_class = self._winrm.wmi_class(u'Win32_NetworkAdapterConfiguration')
+        adapter_conf_class = self._winrm.wmi.cls(u'Win32_NetworkAdapterConfiguration')
         all_configurations = adapter_conf_class.enumerate({})
         adapter_conf, = [
             configuration for configuration in all_configurations
@@ -208,7 +208,7 @@ class WindowsNetworking(Networking):
             {})
 
     def can_reach(self, ip, timeout_sec=4):
-        status = self._winrm.wmi_class(u'Win32_PingStatus').reference({u'Address': str(ip)}).get()
+        status = self._winrm.wmi.cls(u'Win32_PingStatus').reference({u'Address': str(ip)}).get()
         return status[u'StatusCode'] == u'0'
 
     def reset(self):

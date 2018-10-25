@@ -170,7 +170,7 @@ class _WindowsRegistryKey(object):
 
 class WindowsRegistry(object):
     def __init__(self, winrm):
-        self._wmi_registry_provider = winrm.wmi_class(u'StdRegProv').static()
+        self._wmi_registry_provider = winrm.wmi.cls(u'StdRegProv').static()
 
     def key(self, path):
         hive_str, key = path.split('\\', 1)

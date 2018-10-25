@@ -43,6 +43,7 @@ class WinRM(object):
             operation_timeout_sec=120, read_timeout_sec=240)
         self._username = username
         self._repr = 'WinRM({!r}, {!r}, {!r}, {!r})'.format(address, port, username, password)
+        self.wmi = wmi.Wmi(self._protocol)
 
     def __repr__(self):
         return self._repr
@@ -67,13 +68,6 @@ class WinRM(object):
 
     def run_powershell_script(self, script, variables):
         return run_powershell_script(self._shell(), script, variables, logger=_logger.getChild('cmd'))
-
-    def wmi_class(
-            self,
-            class_name,
-            namespace=wmi.Class.default_namespace,
-            root_uri=wmi.Class.default_root_uri):
-        return wmi.Class(self._protocol, class_name, namespace=namespace, root_uri=root_uri)
 
     def is_working(self):
         try:

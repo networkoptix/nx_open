@@ -5,7 +5,7 @@ from xml.dom import minidom
 
 import xmltodict
 from pylru import lrudecorator
-from typing import Mapping, Union, Sequence
+from typing import Mapping, Union
 from winrm.exceptions import WinRMError, WinRMTransportError
 
 _logger = logging.getLogger(__name__)
@@ -25,30 +25,12 @@ _win32_error_codes = {
     0x80071392: 'ERROR_OBJECT_ALREADY_EXISTS',
     }
 
-class Class(object):
-    """WMI class on specific machine. Create or enumerate objects with this class. To work with
-    one specific object, use _Reference class. Use Class.reference method to get reference to
-    object of this class."""
 
-    default_namespace = 'root/cimv2'
-    default_root_uri = 'http://schemas.microsoft.com/wbem/wsman/1/wmi'
-
-    def __init__(self, protocol, name, namespace=default_namespace, root_uri=default_root_uri):
+class Wmi(object):
+    def __init__(self, protocol):
         self.protocol = protocol
-        self.name = name
-        self.original_namespace = namespace
-        self.normalized_namespace = namespace.replace('\\', '/').lower()
-        self.root_uri = root_uri
-        self.uri = root_uri + '/' + self.normalized_namespace + '/' + name
 
-    def __repr__(self):
-        if self.root_uri == self.default_root_uri:
-            if self.normalized_namespace == self.default_namespace:
-                return 'Class({!r})'.format(self.name)
-            return 'Class({!r}, namespace={!r})'.format(self.name, self.original_namespace)
-        return 'Class({!r}, namespace={!r}, root_uri={!r})'.format(self.name, self.original_namespace, self.root_uri)
-
-    def perform_action(self, action, body, selectors, timeout_sec=None):
+    def act(self, class_uri, action, body, selectors, timeout_sec=None):
         xml_namespaces = {
             # Namespaces from pywinrm's Protocol.
             # TODO: Use aliases from WS-Management spec.
@@ -63,9 +45,9 @@ class Class(object):
             'http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd': 'w',
             'http://schemas.xmlsoap.org/ws/2004/09/transfer': 't',
             'http://schemas.xmlsoap.org/ws/2004/08/addressing': 'a',
-            Class(self.protocol, 'Win32_FolderRedirectionHealth').uri: 'folder',
+            self.cls('Win32_FolderRedirectionHealth').uri: 'folder',
             # Commonly encountered in responses.
-            self.uri: None,  # Desired class namespace is default.
+            class_uri: None,  # Desired class namespace is default.
             }
 
         def _substitute_namespace_in_type_attribute(path, key, data):
@@ -82,7 +64,8 @@ class Class(object):
             return key, new_namespace_alias + ':' + bare_data
 
         # noinspection PyProtectedMember
-        rq = {'env:Envelope': self.protocol._get_soap_header(resource_uri=self.uri, action=action)}
+        rq = {
+            'env:Envelope': self.protocol._get_soap_header(resource_uri=class_uri, action=action)}
         rq['env:Envelope'].setdefault('env:Body', body)
         rq['env:Envelope']['env:Header']['w:SelectorSet'] = selectors.raw
         if timeout_sec is not None:
@@ -108,12 +91,36 @@ class Class(object):
             )
         return response_dict['env:Envelope']['env:Body']
 
+    def cls(
+            self,
+            name,
+            namespace='root/cimv2',
+            root_uri='http://schemas.microsoft.com/wbem/wsman/1/wmi'):
+        # TODO: Check URIs case-insensitively.
+        normalized_namespace = namespace.replace('\\', '/').lower()
+        uri = root_uri + '/' + normalized_namespace + '/' + name
+        return _Class(self, uri)
+
+
+class _Class(object):
+    """WMI class on specific machine. Create or enumerate objects with this class. To work with
+    one specific object, use _Reference class. Use _Class.reference method to get reference to
+    object of this class."""
+
+    def __init__(self, wmi, uri):
+        self.wmi = wmi
+        self.uri = uri
+        self.name = uri.rsplit('/', 1)[-1]
+
+    def __repr__(self):
+        return '_Class({!r}, {!r})'.format(self.wmi, self.uri)
+
     def create(self, properties_dict):
         _logger.info("Create %r: %r", self, properties_dict)
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Create'
         body = {self.name: _none_to_nil(properties_dict)}
         body[self.name]['@xmlns'] = self.uri
-        outcome = self.perform_action(action_url, body, _SelectorSet.empty())
+        outcome = self.wmi.act(self.uri, action_url, body, _SelectorSet.empty())
         reference_parameters = outcome[u't:ResourceCreated'][u'a:ReferenceParameters']
         assert reference_parameters[u'w:ResourceURI'] == self.uri
         selector_set = reference_parameters[u'w:SelectorSet']
@@ -139,7 +146,7 @@ class Class(object):
                     'w:EnumerationMode': 'EnumerateObjectAndEPR',
                     }
                 }
-            response = self.perform_action(action, body, selectors)
+            response = self.wmi.act(self.uri, action, body, selectors)
             enumeration_context[0] = response['n:EnumerateResponse']['n:EnumerationContext']
             enumeration_is_ended[0] = 'w:EndOfSequence' in response['n:EnumerateResponse']
             items = response['n:EnumerateResponse']['w:Items']['w:Item']
@@ -156,7 +163,7 @@ class Class(object):
                     'n:MaxElements': str(max_elements),
                     }
                 }
-            response = self.perform_action(action, body, selectors)
+            response = self.wmi.act(self.uri, action, body, selectors)
             enumeration_is_ended[0] = 'n:EndOfSequence' in response['n:PullResponse']
             enumeration_context[0] = None if enumeration_is_ended[0] else response['n:PullResponse']['n:EnumerationContext']
             items = response['n:PullResponse']['n:Items']['w:Item']
@@ -250,7 +257,7 @@ class _Reference(object):
     def get(self):
         _logger.info("Get %s where %r", self.wmi_class, self.selectors)
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Get'
-        outcome = self.wmi_class.perform_action(action_url, {}, self.selectors)
+        outcome = self.wmi_class.wmi.act(self.wmi_class.uri, action_url, {}, self.selectors)
         instance = outcome[self.wmi_class.name]
         return _Object(self, instance)
 
@@ -259,7 +266,7 @@ class _Reference(object):
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Put'
         body = {self.wmi_class.name: _none_to_nil(new_properties_dict)}
         body[self.wmi_class.name]['@xmlns'] = self.wmi_class.uri
-        outcome = self.wmi_class.perform_action(action_url, body, self.selectors)
+        outcome = self.wmi_class.wmi(self.wmi_class.uri, action_url, body, self.selectors)
         instance = outcome[self.wmi_class.name]
         return _Object(self, instance)
 
@@ -269,7 +276,7 @@ class _Reference(object):
         method_input = {'p:' + param_name: param_value for param_name, param_value in params.items()}
         method_input['@xmlns:p'] = self.wmi_class.uri
         body = {method_name + '_INPUT': method_input}
-        response = self.wmi_class.perform_action(action_uri, body, self.selectors, timeout_sec=timeout_sec)
+        response = self.wmi_class.wmi.act(self.wmi_class.uri, action_uri, body, self.selectors, timeout_sec=timeout_sec)
         method_output = response[method_name + '_OUTPUT']
         if method_output[u'ReturnValue'] != u'0':
             exception_cls = WmiInvokeFailed.specific_cls(int(method_output[u'ReturnValue']))
