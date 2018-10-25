@@ -215,7 +215,7 @@ angular.module('cloudApp')
                 dialogs.confirm(L.system.confirmUnshare,
                     L.system.confirmUnshareTitle,
                     L.system.confirmUnshareAction,
-                    'btn-danger', 'Cancel')
+                    'btn-danger', L.dialogs.cancelButton)
                     .then(function (result) {
                         if (result) {
                             // Run a process of sharing
