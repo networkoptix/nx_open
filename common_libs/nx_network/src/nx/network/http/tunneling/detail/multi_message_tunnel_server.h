@@ -34,13 +34,13 @@ MultiMessageTunnelServer<ApplicationData...>::MultiMessageTunnelServer(
 template<typename ...ApplicationData>
 MultiMessageTunnelServer<ApplicationData...>::~MultiMessageTunnelServer()
 {
-    closeAllTunnels();
+    this->closeAllTunnels();
 }
 
 template<typename ...ApplicationData>
 void MultiMessageTunnelServer<ApplicationData...>::registerRequestHandlers(
-    const std::string& /*basePath*/,
-    server::rest::MessageDispatcher* /*messageDispatcher*/)
+    const std::string& basePath,
+    server::rest::MessageDispatcher* messageDispatcher)
 {
     messageDispatcher->registerRequestProcessorFunc(
         nx::network::http::Method::get,
