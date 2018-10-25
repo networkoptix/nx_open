@@ -14,8 +14,15 @@ function(nx_add_server_plugin target)
     if(PLUGIN_OPTIONAL)
         set_output_directories(RUNTIME "bin/plugins_optional" LIBRARY "bin/plugins_optional")
     endif()
+
     nx_add_target(${target} LIBRARY ${PLUGIN_UNPARSED_ARGUMENTS})
+
     add_dependencies(server_plugins ${target})
+
+    target_compile_definitions(${target}
+        PRIVATE NX_PLUGIN_API=${API_EXPORT_MACRO}
+        INTERFACE NX_PLUGIN_API=${API_IMPORT_MACRO}
+    )
 endfunction()
 
 add_subdirectory(genericrtspplugin)

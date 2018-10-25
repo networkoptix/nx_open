@@ -46,7 +46,6 @@ public:
 
     virtual void setSettings(const nxpl::Setting* settings, int count) override;
     virtual void setPluginContainer(nxpl::PluginInterface* pluginContainer) override;
-    virtual void setLocale(const char* locale) override;
 
     virtual Engine* createEngine(Error* outError);
 

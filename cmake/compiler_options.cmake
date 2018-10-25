@@ -56,7 +56,7 @@ if(WINDOWS)
     set(API_EXPORT_MACRO "__declspec(dllexport)")
 else()
     set(API_IMPORT_MACRO "")
-    set(API_EXPORT_MACRO "")
+    set(API_EXPORT_MACRO "") #< TODO: Consider using "__attribute__((visibility(\"default\")))".
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

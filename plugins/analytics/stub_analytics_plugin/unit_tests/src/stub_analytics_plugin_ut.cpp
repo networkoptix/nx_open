@@ -242,7 +242,7 @@ public:
     virtual unsigned int addRef() { return ++m_refCounter; }
     virtual unsigned int releaseRef() { ASSERT_TRUE(m_refCounter > 1); return --m_refCounter; }
 
-    virtual int64_t timestampUsec() const override { return 42; }
+    virtual int64_t timestampUsec() const override { return /*dummy*/ 42; }
 
 private:
     int m_refCounter = 1;
@@ -253,7 +253,7 @@ TEST(stub_analytics_plugin, test)
     nx::sdk::Error error = nx::sdk::Error::noError;
 
     nxpl::PluginInterface* const pluginObject = createNxAnalyticsPlugin();
-    ASSERT_TRUE(pluginObject->queryInterface(nxpl::IID_Plugin3) != nullptr);
+    ASSERT_TRUE(pluginObject->queryInterface(nxpl::IID_Plugin2) != nullptr);
     pluginObject->releaseRef();
 
     const auto plugin = static_cast<nx::sdk::analytics::Plugin*>(
