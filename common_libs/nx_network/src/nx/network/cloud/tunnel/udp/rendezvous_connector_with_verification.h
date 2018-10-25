@@ -14,8 +14,7 @@ namespace udp {
  * Extends RendezvousConnector functionality by adding connection id verification.
  */
 class RendezvousConnectorWithVerification:
-    public RendezvousConnector,
-    public nx::network::server::StreamConnectionHolder<stun::MessagePipeline>
+    public RendezvousConnector
 {
 public:
     RendezvousConnectorWithVerification(
@@ -48,9 +47,7 @@ private:
     std::unique_ptr<stun::MessagePipeline> m_requestPipeline;
     std::unique_ptr<nx::network::UdtStreamSocket> m_udtConnection;
 
-    virtual void closeConnection(
-        SystemError::ErrorCode closeReason,
-        stun::MessagePipeline* connection) override;
+    void onConnectionClosed(SystemError::ErrorCode closeReason);
 
     void onConnectCompleted(SystemError::ErrorCode errorCode);
     void onMessageReceived(nx::network::stun::Message message);

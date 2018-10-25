@@ -109,6 +109,9 @@ enum EventType
     /** Analytics SDK. */
     analyticsSdkEvent = 13,
 
+    /** Plugin events. */
+    pluginEvent = 14,
+
     /** System health message. */
     systemHealthEvent = 500,
 
@@ -239,9 +242,24 @@ enum ActionType
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ActionType)
 
+enum EventLevel
+{
+    UndefinedEventLevel = 0,
+    InfoEventLevel = 1 << 0,
+    WarningEventLevel = 1 << 1,
+    ErrorEventLevel = 1 << 2,
+};
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventLevel)
+
+Q_DECLARE_FLAGS(EventLevels, EventLevel)
+Q_DECLARE_OPERATORS_FOR_FLAGS(EventLevels)
+
 } // namespace api
 } // namespace vms
 } // namespace nx
 
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::EventType, (metatype)(lexical)(debug), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::ActionType, (metatype)(lexical)(debug), NX_VMS_API)
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::EventLevel, (metatype)(numeric)(lexical)(debug), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::EventLevels, (metatype)(numeric)(lexical)(debug), NX_VMS_API)

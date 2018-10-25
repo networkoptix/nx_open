@@ -30,17 +30,15 @@ public:
      * not start right away.
      *
      * @param server                    Mediaserver to upload to.
-     * @param path                      Path to the file.
-     * @param ttl                       TTL for the file, in milliseconds. File will be deleted
-     *                                  from the server when TTL passes. -1 means infinite.
-     * @param[out] errorMessage         Error message, if any.
+     * @param config                    Contains upload description
      * @returns                         Upload id, or null in case of an error.
+     * It will write additional information to config structure.
+     * UploadManager keeps a local copy of 'UploadState config' structure.
      */
+
     QString addUpload(
         const QnMediaServerResourcePtr& server,
-        const QString& path,
-        qint64 ttl,
-        QString* errorMessage,
+        UploadState& config,
         QObject* context,
         Callback callback);
 

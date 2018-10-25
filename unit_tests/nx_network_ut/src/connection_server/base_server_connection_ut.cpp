@@ -33,7 +33,9 @@ public:
         StreamConnectionHolder<TestConnection>* connectionManager,
         std::unique_ptr<AbstractStreamSocket> streamSocket)
         :
-        base_type(connectionManager, std::move(streamSocket))
+        base_type(
+            [connectionManager](auto... args) { connectionManager->closeConnection(args...); },
+            std::move(streamSocket))
     {
     }
 

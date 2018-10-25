@@ -48,6 +48,7 @@
 #include <audit/audit_manager.h>
 #include <api/http_client_pool.h>
 #include <core/resource_management/camera_driver_restriction_list.h>
+#include <core/resource_management/resource_data_pool.h>
 
 using namespace nx;
 
@@ -135,8 +136,8 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_cloudMode = false;
 
     m_cameraDriverRestrictionList = new CameraDriverRestrictionList(this);
-    m_httpClientPool = new nx::network::http::ClientPool(this);
-    m_sessionManager = new QnSessionManager(this);
+    m_httpClientPool.reset(new nx::network::http::ClientPool(this));
+    m_sessionManager.reset(new QnSessionManager(this));
     m_licensePool = new QnLicensePool(this);
     m_cameraUserAttributesPool = new QnCameraUserAttributePool(this);
     m_mediaServerUserAttributesPool = new QnMediaServerUserAttributesPool(this);
@@ -197,6 +198,8 @@ QnCommonModule::QnCommonModule(bool clientMode,
         : nx::vms::api::ModuleInformation::nxMediaServerId();
     m_moduleInformation.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
     m_moduleInformation.realm = nx::network::AppInfo::realm();
+
+    m_dataPool = instance<QnResourceDataPool>();
 }
 
 void QnCommonModule::setModuleGUID(const QnUuid& guid)
@@ -210,6 +213,7 @@ void QnCommonModule::setModuleGUID(const QnUuid& guid)
 
 QnCommonModule::~QnCommonModule()
 {
+    resourcePool()->threadPool()->waitForDone();
     /* Here all singletons will be destroyed, so we guarantee all socket work will stop. */
     clear();
 }
@@ -353,6 +357,7 @@ void QnCommonModule::updateModuleInformationUnsafe()
 
 void QnCommonModule::setSystemIdentityTime(qint64 value, const QnUuid& sender)
 {
+    NX_INFO(this, "System identity time has changed from %1 to %2", m_systemIdentityTime, value);
     m_systemIdentityTime = value;
     emit systemIdentityTimeChanged(value, sender);
 }
@@ -521,10 +526,15 @@ QnAuditManager* QnCommonModule::auditManager() const
 
 nx::network::http::ClientPool* QnCommonModule::httpClientPool() const
 {
-    return m_httpClientPool;
+    return m_httpClientPool.data();
 }
 
 CameraDriverRestrictionList* QnCommonModule::cameraDriverRestrictionList() const
 {
     return m_cameraDriverRestrictionList;
+}
+
+QnResourceDataPool* QnCommonModule::dataPool() const
+{
+    return m_dataPool;
 }

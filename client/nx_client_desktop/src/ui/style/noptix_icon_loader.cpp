@@ -1,11 +1,15 @@
 #include "noptix_icon_loader.h"
 
 #include <QtCore/QFileInfo>
+#include <QtGui/QPainter>
+#include <QtGui/QPixmap>
+#include <QtSvg/QSvgRenderer>
 
 #include "skin.h"
 #include "icon_pixmap_accessor.h"
 
 #include <nx/utils/log/assert.h>
+#include <nx/client/desktop/ui/common/color_theme.h>
 
 namespace {
 
@@ -19,61 +23,136 @@ void decompose(const QString& path, QString* prefix, QString* suffix)
 }
 
 static const QnIcon::SuffixesList kDefaultSuffixes({
-    {QnIcon::Active,   lit("hovered")},
-    {QnIcon::Disabled, lit("disabled")},
-    {QnIcon::Selected, lit("selected")},
-    {QnIcon::Pressed,  lit("pressed")},
-    {QnIcon::Error,    lit("error")}
+    {QnIcon::Active,   "hovered"},
+    {QnIcon::Disabled, "disabled"},
+    {QnIcon::Selected, "selected"},
+    {QnIcon::Pressed,  "pressed"},
+    {QnIcon::Error,    "error"}
 });
 
-} //namespace
+static constexpr QSize kBaseIconSize(20, 20);
 
-// -------------------------------------------------------------------------- //
-// QnIconBuilder
-// -------------------------------------------------------------------------- //
-class QnIconBuilder
+class IconBuilder
 {
 public:
-    void addPixmap(const QPixmap& pixmap, QIcon::Mode mode)
+    IconBuilder(bool isHiDpi):
+        m_isHiDpi(isHiDpi)
     {
-        addPixmap(pixmap, mode, QnIcon::On);
-        addPixmap(pixmap, mode, QnIcon::Off);
     }
 
-    void addPixmap(const QPixmap& pixmap, QIcon::State state)
+    void addSvg(const QByteArray& data, QIcon::Mode mode, QIcon::State state)
     {
-        addPixmap(pixmap, QnIcon::Normal, state);
-        addPixmap(pixmap, QnIcon::Disabled, state);
-        addPixmap(pixmap, QnIcon::Active, state);
-        addPixmap(pixmap, QnIcon::Selected, state);
-        addPixmap(pixmap, QnIcon::Pressed, state);
+        QSvgRenderer renderer;
+        if (!renderer.load(data))
+        {
+            NX_ASSERT(false, "Error while loading svg");
+            return;
+        }
+
+        const QSize size = m_isHiDpi ? kBaseIconSize * 2 : kBaseIconSize;
+
+        QPixmap pixmap(size);
+        pixmap.fill(Qt::transparent);
+        QPainter p(&pixmap);
+        renderer.render(&p);
+        add(pixmap, mode, state);
     }
 
-    void addPixmap(const QPixmap& pixmap, QIcon::Mode mode, QIcon::State state)
+    void add(const QPixmap& pixmap, QIcon::State state)
     {
-        m_pixmaps[{mode, state}] = pixmap;
+        add(pixmap, QnIcon::Normal, state);
+        add(pixmap, QnIcon::Disabled, state);
+        add(pixmap, QnIcon::Active, state);
+        add(pixmap, QnIcon::Selected, state);
+        add(pixmap, QnIcon::Pressed, state);
     }
 
-    QPixmap pixmap(QIcon::Mode mode, QIcon::State state) const
+    void add(const QPixmap& pixmap, QIcon::Mode mode, QIcon::State state)
     {
-        return m_pixmaps[{mode, state}];
+        m_pixmaps[{mode, state, pixmap.size().width()}] = pixmap;
     }
 
     QIcon createIcon() const
     {
-        QIcon icon(m_pixmaps.value({QIcon::Normal, QIcon::Off}));
-
-        for (auto pos = m_pixmaps.begin(), end = m_pixmaps.end(); pos != end; pos++)
-            icon.addPixmap(pos.value(), pos.key().first, pos.key().second);
-
+        QIcon icon;
+        for (const auto& [key, image]: m_pixmaps)
+        {
+            auto [mode, state, _] = key;
+            icon.addPixmap(image, mode, state);
+        }
         return icon;
     }
 
 private:
-    using container_type = QHash<QPair<QIcon::Mode, QIcon::State>, QPixmap>;
+    const bool m_isHiDpi;
+    // Storing as map to be able overwrite default values. Allowing to handle different sizes.
+    using pixmap_key = std::tuple<QIcon::Mode, QIcon::State, int>;
+    using container_type = std::map<pixmap_key, QPixmap>;
     container_type m_pixmaps;
 };
 
+
+QPixmap getImageFromSkin(QnSkin* skin, const QString& path)
+{
+    if (skin->hasFile(path))
+        return skin->pixmap(path, false);
+    return QPixmap();
+}
+
+void loadCustomIcons(
+    QnSkin* skin,
+    IconBuilder* builder,
+    const QPixmap& baseImage,
+    const QString& name,
+    const QString& checkedName,
+    const QnIcon::SuffixesList* suffixes)
+{
+    QString prefix, extension, path;
+    decompose(name, &prefix, &extension);
+
+    for (auto suffix: *suffixes)
+    {
+        if (suffix.second.isEmpty())
+        {
+            builder->add(baseImage, suffix.first, QnIcon::Off);
+        }
+        else
+        {
+            path = prefix + lit("_") + suffix.second + extension;
+            auto image = getImageFromSkin(skin, path);
+            if (!image.isNull())
+                builder->add(image, suffix.first, QnIcon::Off);
+        }
+    }
+
+    decompose(checkedName.isEmpty()
+        ? prefix + lit("_checked") + extension
+        : checkedName,
+        &prefix, &extension);
+
+    path = prefix + extension;
+    const auto baseCheckedImage = getImageFromSkin(skin, path);
+    if (!baseCheckedImage.isNull())
+        builder->add(baseCheckedImage, QnIcon::On);
+
+    for (auto suffix: *suffixes)
+    {
+        if (suffix.second.isEmpty())
+        {
+            if (!baseCheckedImage.isNull())
+                builder->add(baseCheckedImage, suffix.first, QnIcon::On);
+        }
+        else
+        {
+            path = prefix + lit("_") + suffix.second + extension;
+            auto image = getImageFromSkin(skin, path);
+            if (!image.isNull())
+                builder->add(image, suffix.first, QnIcon::On);
+        }
+    }
+}
+
+} //namespace
 
 // -------------------------------------------------------------------------- //
 // QnNoptixIconLoader
@@ -144,63 +223,75 @@ void QnNoptixIconLoader::loadIconInternal(
     const QString& checkedName,
     const QnIcon::SuffixesList* suffixes)
 {
-    QnSkin* skin = qnSkin;
+    const auto icon = name.endsWith(".svg")
+        ? loadSvgIconInternal(qnSkin, name, checkedName, suffixes)
+        : loadPixmapIconInternal(qnSkin,  name, checkedName, suffixes);
 
-    QString prefix, extension, path;
-
-    decompose(name, &prefix, &extension);
-
-    // TODO: #ynikitenkov Add multiple pixmaps mode (for 2x-3x..nx hidpi modes)
-
-    /* Create normal icon. */
-    QnIconBuilder builder;
-    QPixmap basePixmap = skin->pixmap(name, false);
-    builder.addPixmap(basePixmap, QnIcon::Normal, QnIcon::Off);
-
-    for (auto suffix: *suffixes)
-    {
-        if (suffix.second.isEmpty())
-        {
-            builder.addPixmap(basePixmap, suffix.first, QnIcon::Off);
-        }
-        else
-        {
-            path = prefix + lit("_") + suffix.second + extension;
-            if (skin->hasFile(path))
-                builder.addPixmap(skin->pixmap(path, false), suffix.first, QnIcon::Off);
-        }
-    }
-
-    decompose(checkedName.isEmpty()
-        ? prefix + lit("_checked") + extension
-        : checkedName,
-        &prefix, &extension);
-
-    path = prefix + extension;
-    QPixmap baseCheckedPixmap;
-
-    if (skin->hasFile(path))
-    {
-        baseCheckedPixmap = skin->pixmap(path, false);
-        builder.addPixmap(baseCheckedPixmap, QnIcon::On);
-    }
-
-    for (auto suffix: *suffixes)
-    {
-        if (suffix.second.isEmpty())
-        {
-            if (!baseCheckedPixmap.isNull())
-                builder.addPixmap(baseCheckedPixmap, suffix.first, QnIcon::On);
-        }
-        else
-        {
-            path = prefix + lit("_") + suffix.second + extension;
-            if (skin->hasFile(path))
-                builder.addPixmap(skin->pixmap(path, false), suffix.first, QnIcon::On);
-        }
-    }
-
-    QIcon icon = builder.createIcon();
     m_iconByKey.insert(key, icon);
     m_cacheKeys.insert(icon.cacheKey());
+}
+
+QIcon QnNoptixIconLoader::loadPixmapIconInternal(
+    QnSkin* skin,
+    const QString& name,
+    const QString& checkedName,
+    const QnIcon::SuffixesList* suffixes)
+{
+    /* Create normal icon. */
+    IconBuilder builder(skin->isHiDpi());
+    const auto basePixmap = skin->pixmap(name, false);
+    builder.add(basePixmap, QnIcon::Normal, QnIcon::Off);
+    loadCustomIcons(skin, &builder, basePixmap, name, checkedName, suffixes);
+
+    return builder.createIcon();
+}
+
+QIcon QnNoptixIconLoader::loadSvgIconInternal(
+    QnSkin* skin,
+    const QString& name,
+    const QString& checkedName,
+    const QnIcon::SuffixesList* suffixes)
+{
+    const auto basePath = skin->path(name);
+    QFile source(basePath);
+    if (!source.open(QIODevice::ReadOnly))
+    {
+        NX_ASSERT(false, "Cannot load svg icon");
+        return QIcon();
+    }
+
+    const QByteArray baseData = source.readAll();
+
+    IconBuilder builder(skin->isHiDpi());
+    builder.addSvg(baseData, QnIcon::Normal, QnIcon::Off);
+
+    auto color =
+        [theme = nx::client::desktop::colorTheme()](const QString& name)
+        {
+            return theme->color(name).name().toUtf8();
+        };
+    const QByteArray primaryColor = "#A5B7C0"; //< Value of light10 in default customization.
+    const QByteArray secondaryColor = "#E1E7EA"; //< Value of light4 in default customization.
+
+    auto colorized =
+        [&](const QString& primary, const QString& secondary)
+        {
+            QByteArray result = baseData;
+            // Order is fixed because one of the changed colors is light4 - which leads to confuse.
+            result.replace(secondaryColor, color(secondary));
+            result.replace(secondaryColor.toLower(), color(secondary));
+            result.replace(primaryColor, color(primary));
+            result.replace(primaryColor.toLower(), color(primary));
+            return result;
+        };
+
+    builder.addSvg(colorized("dark14", "dark17"), QnIcon::Disabled, QnIcon::Off);
+    builder.addSvg(colorized("light4", "light1"), QnIcon::Selected, QnIcon::Off);
+    builder.addSvg(colorized("brand_core", "brand_l2"), QnIcon::Active, QnIcon::Off);
+    builder.addSvg(colorized("red_l2", "red_l3"), QnIcon::Error, QnIcon::Off);
+
+    // This can be enabled if we will need to override some icons
+    //loadCustomIcons(skin, &builder, basePath, name, checkedName, suffixes);
+
+    return builder.createIcon();
 }

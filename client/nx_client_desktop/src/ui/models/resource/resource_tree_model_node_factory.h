@@ -14,11 +14,14 @@ class QnResourceTreeModelNodeFactory
 public:
     static QnResourceTreeModelNodePtr createNode(
         NodeType nodeType,
-        QnResourceTreeModel* model, bool initialize = true);
+        QnResourceTreeModel* model,
+        bool initialize = true);
 
     static QnResourceTreeModelNodePtr createNode(
-        NodeType nodeType, const QnUuid& id,
-        QnResourceTreeModel* model, bool initialize = true);
+        NodeType nodeType,
+        const QnUuid& id,
+        QnResourceTreeModel* model, 
+        bool initialize = true);
 
     static QnResourceTreeModelNodePtr createLocalSystemNode(const QString& systemName,
         QnResourceTreeModel* model);

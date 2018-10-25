@@ -19,11 +19,7 @@
 #include <nx/vms/api/data/resource_data.h>
 #include <nx/metrics/metrics_storage.h>
 
-std::atomic<bool> QnResource::m_appStopping(false);
 QnMutex QnResource::m_initAsyncMutex;
-
-// TODO: #rvasilenko move it to QnResourcePool
-Q_GLOBAL_STATIC(QnInitResPool, initResPool)
 
 static const qint64 MIN_INIT_INTERVAL = 1000000ll * 30;
 
@@ -275,16 +271,6 @@ void QnResource::removeFlags(Qn::ResourceFlags flags)
     emit flagsChanged(toSharedPointer(this));
 }
 
-QString QnResource::toSearchString() const
-{
-    return searchFilters().join(L' ');
-}
-
-QStringList QnResource::searchFilters() const
-{
-    return QStringList() << getId().toSimpleString() << getName();
-}
-
 QnResourcePtr QnResource::getParentResource() const
 {
     if (const auto resourcePool = this->resourcePool())
@@ -338,9 +324,7 @@ void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatu
     if (oldStatus != Qn::NotDefined && newStatus == Qn::Offline)
         commonModule()->metrics()->offlineStatus()++;
 
-#ifdef QN_RESOURCE_DEBUG
-    qDebug() << "Change status. oldValue=" << oldStatus << " new value=" << newStatus << " id=" << m_id << " name=" << getName();
-#endif
+    NX_VERBOSE(this, "Change status. oldValue=%1,  new value=%2, name=%3, id=%4", oldStatus, newStatus, getName(), m_id);
 
     if (newStatus == Qn::Offline || newStatus == Qn::Unauthorized)
     {
@@ -379,6 +363,8 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     Qn::ResourceStatus oldStatus = commonModule()->statusDictionary()->value(id);
     if (oldStatus == newStatus)
         return;
+
+    NX_DEBUG(this, "Status changed to %1: %2", newStatus, reason);
     commonModule()->statusDictionary()->setValue(id, newStatus);
     doStatusChanged(oldStatus, newStatus, reason);
 }
@@ -631,20 +617,15 @@ void QnResource::emitModificationSignals(const QSet<QByteArray>& modifiedFields)
         emitDynamicSignal((signalName + QByteArray("(QnResourcePtr)")).data(), _a);
 }
 
-QnInitResPool* QnResource::initAsyncPoolInstance(int threadCount)
-{
-    initResPool()->setMaxThreadCount(threadCount);
-    return initResPool();
-}
 // -----------------------------------------------------------------------------
 
 bool QnResource::init()
 {
-    if (m_appStopping)
-        return false;
-
     {
         QnMutexLocker lock(&m_initMutex);
+        if (commonModule() && commonModule()->isNeedToStop())
+            return false;
+
         if (m_initialized)
             return true; /* Nothing to do. */
         if (m_initInProgress)
@@ -689,27 +670,16 @@ private:
     QnResourcePtr m_resource;
 };
 
-void QnResource::stopAsyncTasks()
-{
-    pleaseStopAsyncTasks();
-    initResPool()->waitForDone();
-}
-
-void QnResource::pleaseStopAsyncTasks()
-{
-    QnMutexLocker lock(&m_initAsyncMutex);
-    m_appStopping = true;
-}
-
 void QnResource::reinitAsync()
 {
-    if (m_appStopping || hasFlags(Qn::foreigner))
+    if (commonModule()->isNeedToStop() || hasFlags(Qn::foreigner))
         return;
 
     setStatus(Qn::Offline);
     QnMutexLocker lock(&m_initAsyncMutex);
     m_lastInitTime = getUsecTimer();
-    initResPool()->start(new InitAsyncTask(toSharedPointer(this)));
+    if (const auto pool = resourcePool())
+        pool->threadPool()->start(new InitAsyncTask(toSharedPointer(this)));
 }
 
 void QnResource::initAsync(bool optional)
@@ -721,16 +691,20 @@ void QnResource::initAsync(bool optional)
     if (t - m_lastInitTime < MIN_INIT_INTERVAL)
         return;
 
-    if (m_appStopping)
+    if (commonModule()->isNeedToStop())
         return;
 
     if (hasFlags(Qn::foreigner))
         return; // removed to other server
 
+    auto resourcePool = this->resourcePool();
+    if (!resourcePool)
+        return;
+
     InitAsyncTask *task = new InitAsyncTask(toSharedPointer(this));
     if (optional)
     {
-        if (initResPool()->tryStart(task))
+        if (resourcePool->threadPool()->tryStart(task))
             m_lastInitTime = t;
         else
             delete task;
@@ -738,7 +712,7 @@ void QnResource::initAsync(bool optional)
     else
     {
         m_lastInitTime = t;
-        initResPool()->start(task);
+        resourcePool->threadPool()->start(task);
     }
 }
 

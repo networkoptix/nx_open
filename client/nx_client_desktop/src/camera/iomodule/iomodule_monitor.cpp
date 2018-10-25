@@ -147,7 +147,7 @@ void QnIOModuleMonitor::at_MonitorConnectionClosed( nx::network::http::AsyncHttp
         QnMutexLocker lk(&m_mutex);
         if (httpClient != m_httpClient)
             return;
-
+        m_multipartContentParser->flush();
         m_httpClient.reset();
     }
 

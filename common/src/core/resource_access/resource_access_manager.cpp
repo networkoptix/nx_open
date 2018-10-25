@@ -18,6 +18,8 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/webpage_resource.h>
+#include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
 
 #include <nx/streaming/abstract_archive_resource.h>
 
@@ -36,6 +38,7 @@
 #include <utils/common/scoped_timer.h>
 
 using namespace nx::core::access;
+using namespace nx::vms::common;
 
 QnResourceAccessManager::QnResourceAccessManager(Mode mode, QObject* parent /*= nullptr*/) :
     base_type(parent),
@@ -458,6 +461,12 @@ Qn::Permissions QnResourceAccessManager::calculatePermissions(
 
     if (QnAbstractArchiveResourcePtr archive = target.dynamicCast<QnAbstractArchiveResource>())
         return Qn::ReadPermission | Qn::ExportPermission;
+
+    if (const auto plugin = target.dynamicCast<AnalyticsPluginResource>())
+        return Qn::ReadPermission;
+
+    if (const auto engine = target.dynamicCast<AnalyticsEngineResource>())
+        return Qn::ReadPermission;
 
     NX_ASSERT(false, "invalid resource type");
     return Qn::NoPermissions;

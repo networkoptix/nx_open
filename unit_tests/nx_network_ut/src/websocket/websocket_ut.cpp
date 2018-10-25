@@ -511,9 +511,9 @@ protected:
     void stopSockets()
     {
         if (clientWebSocket)
-            clientWebSocket->pleaseStopSync(false);
+            clientWebSocket->pleaseStopSync();
         if (serverWebSocket)
-            serverWebSocket->pleaseStopSync(false);
+            serverWebSocket->pleaseStopSync();
     }
 
     void resetClientSocket()

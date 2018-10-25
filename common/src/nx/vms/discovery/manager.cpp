@@ -257,6 +257,15 @@ void Manager::initializeMulticastFinders(bool clientMode)
     else
         options.listenAndRespond = true;
 
+    options.responseEnabled =
+        [common = commonModule()]()
+        {
+            if (const auto settings = common->globalSettings())
+                return !settings->isInitialized() || settings->isAutoDiscoveryResponseEnabled();
+
+            return false;
+        };
+
     m_legacyMulticastFinder = new DeprecatedMulticastFinder(this, options);
     connect(m_legacyMulticastFinder, &DeprecatedMulticastFinder::responseReceived,
         [this](const nx::vms::api::ModuleInformation& module,

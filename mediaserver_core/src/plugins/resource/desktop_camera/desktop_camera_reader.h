@@ -1,5 +1,4 @@
-#ifndef DESKTOP_CAMERA_STREAM_REDER_H__
-#define DESKTOP_CAMERA_STREAM_REDER_H__
+#pragma once
 
 #ifdef ENABLE_DESKTOP_CAMERA
 
@@ -7,9 +6,11 @@
 
 #include <providers/spush_media_stream_provider.h>
 #include <core/resource/resource_media_layout.h>
-#include <nx/streaming/nx_rtp_parser.h>
+#include <nx/streaming/rtp/parsers/nx_rtp_parser.h>
 #include <network/multicodec_rtp_reader.h>
 #include <nx/network/deprecated/simple_http_client.h>
+
+class QnDesktopCameraResourceSearcher;
 
 class QnDesktopCameraStreamReader: public CLServerPushStreamReader
 {
@@ -42,17 +43,16 @@ protected:
 private:
     int processTextResponse();
     QnAbstractMediaDataPtr createEmptyPacket();
+    QnDesktopCameraResourceSearcher* searcher() const;
 private:
     static const int MEDIA_STREAM_COUNT = 2;
 
     QSharedPointer<nx::network::AbstractStreamSocket> m_socket;
     quint8 m_recvBuffer[65536];
-    QnNxRtpParser m_parsers[MEDIA_STREAM_COUNT];
+    nx::streaming::rtp::QnNxRtpParser m_parsers[MEDIA_STREAM_COUNT];
     QElapsedTimer m_keepaliveTimer;
     QnResourceCustomAudioLayoutPtr m_audioLayout;
     mutable QnMutex m_audioLayoutMutex;
 };
 
 #endif  //ENABLE_DESKTOP_CAMERA
-
-#endif // DESKTOP_CAMERA_STREAM_REDER_H__

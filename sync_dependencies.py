@@ -84,7 +84,8 @@ def determine_package_versions(
     if box == "rpi":
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
-        v["sysroot"] = "jessie"
+        v["sysroot"] = "jessie" 
+        v["ffmpeg"] = "3.1.1"
 
     if box == "edge1":
         v["sysroot"] = "jessie"
@@ -162,6 +163,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         sync("vmaxproxy-2.1")
         sync("windows/wix-3.11", path_variable="wix_directory")
         sync("windows/signtool", path_variable="signtool_directory")
+        sync("windows/ilmerge", path_variable="ilmerge_directory")
 
     if platform in ("windows", "linux"):
         sync("%s/pandoc" % platform, path_variable="pandoc_directory")
@@ -191,7 +193,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         sync("any/nx_sdk-1.7.1")
         sync("any/nx_storage_sdk-1.7.1")
         sync("sigar")
-        sync("any/apidoctool-2.0", path_variable="APIDOCTOOL_PATH")
+        sync("any/apidoctool-2.1", path_variable="APIDOCTOOL_PATH")
         if not sync("any/server-external", optional=True):
             sync("any/server-external-" + release_version)
 

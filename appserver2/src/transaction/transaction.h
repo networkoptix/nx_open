@@ -622,7 +622,7 @@ APPLY(501, saveUser, nx::vms::api::UserData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        UserNotificationManagerHelper(), \
-                       ModifyResourceAccess(false), /* save permission checker */ \
+                       SaveUserAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -1361,6 +1361,72 @@ APPLY(10201, getSystemMergeHistory, nx::vms::api::SystemMergeHistoryRecordList, 
                        FilterListByAccess<AdminOnlyAccess>(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
+APPLY(10300, getAnalyticsPlugins, nx::vms::api::AnalyticsPluginDataList, \
+                        false, \
+                        false, \
+                        InvalidGetHashHelper(), \
+                        InvalidTriggerNotificationHelper(), \
+                        InvalidAccess(), /* save permission checker */ \
+                        InvalidAccess(), /* read permission checker */ \
+                        FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
+                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
+                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                        RegularTransactionType()) /* regular transaction type */ \
+APPLY(10301, saveAnalyticsPlugin, nx::vms::api::AnalyticsPluginData, \
+                        true, \
+                        false, \
+                        CreateHashByIdHelper(), \
+                        AnalyticsNotificationManagerHelper(), \
+                        ModifyResourceAccess(false), /* save permission checker */ \
+                        ReadResourceAccess(), /* read permission checker */ \
+                        InvalidFilterFunc(), /* Filter save func */ \
+                        InvalidFilterFunc(), /* Filter read func */ \
+                        ReadResourceAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                        RegularTransactionType()) /* regular transaction type */ \
+APPLY(10302, removeAnalyticsPlugin, nx::vms::api::IdData, \
+                        true, \
+                        false, \
+                        CreateHashByIdHelper(), \
+                        &apiIdDataTriggerNotificationHelper, \
+                        ModifyResourceAccess(true), /* save permission checker */ \
+                        ReadResourceAccess(), /* read permission checker */ \
+                        InvalidFilterFunc(), /* Filter save func */ \
+                        InvalidFilterFunc(), /* Filter read func */ \
+                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                        RegularTransactionType()) /* regular transaction type */ \
+APPLY(10400, getAnalyticsEngines, nx::vms::api::AnalyticsEngineDataList, \
+                        false, \
+                        false, \
+                        InvalidGetHashHelper(), \
+                        InvalidTriggerNotificationHelper(), \
+                        InvalidAccess(), /* save permission checker */ \
+                        InvalidAccess(), /* read permission checker */ \
+                        FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
+                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
+                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                        RegularTransactionType()) /* regular transaction type */ \
+APPLY(10401, saveAnalyticsEngine, nx::vms::api::AnalyticsEngineData, \
+                        true, \
+                        false, \
+                        CreateHashByIdHelper(), \
+                        AnalyticsNotificationManagerHelper(), \
+                        ModifyResourceAccess(false), /* save permission checker */ \
+                        ReadResourceAccess(), /* read permission checker */ \
+                        InvalidFilterFunc(), /* Filter save func */ \
+                        InvalidFilterFunc(), /* Filter read func */ \
+                        ReadResourceAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                        RegularTransactionType()) /* regular transaction type */ \
+APPLY(10402, removeAnalyticsEngine, nx::vms::api::IdData, \
+                        true, \
+                        false, \
+                        CreateHashByIdHelper(), \
+                        &apiIdDataTriggerNotificationHelper, \
+                        ModifyResourceAccess(true), /* save permission checker */ \
+                        ReadResourceAccess(), /* read permission checker */ \
+                        InvalidFilterFunc(), /* Filter save func */ \
+                        InvalidFilterFunc(), /* Filter read func */ \
+                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                        RegularTransactionType()) /* regular transaction type */ \
 
 #define TRANSACTION_ENUM_APPLY(value, name, ...) name = value,
 

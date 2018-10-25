@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include <nx/utils/thread/long_runnable.h>
+#include <nx/utils/thread/thread.h>
 
 #include "abstract_pollset.h"
 #include "aio_event_handler.h"
@@ -41,7 +41,7 @@ public:
  */
 class NX_NETWORK_API AIOThread:
     public AbstractAioThread,
-    public QnLongRunnable
+    public nx::utils::Thread
 {
 public:
     /**

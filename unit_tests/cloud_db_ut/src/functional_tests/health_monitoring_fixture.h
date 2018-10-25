@@ -8,11 +8,11 @@ namespace nx {
 namespace cdb {
 namespace test {
 
-class FtHealthMonitoring:
+class HealthMonitoring:
     public Ec2MserverCloudSynchronizationConnection
 {
 public:
-    FtHealthMonitoring();
+    HealthMonitoring();
 
 protected:
     void givenSystemWithSomeHistory();

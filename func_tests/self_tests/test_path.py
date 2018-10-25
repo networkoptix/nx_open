@@ -5,7 +5,7 @@ from string import whitespace
 
 import pytest
 
-from framework.os_access.exceptions import BadParent, DoesNotExist, NotADir, NotAFile
+from framework.os_access.exceptions import BadParent, DoesNotExist, NotADir, NotAFile, BadPath
 from framework.os_access.local_path import LocalPath
 from framework.os_access.local_shell import local_shell
 from framework.os_access.path import copy_file
@@ -25,6 +25,18 @@ def ssh_path_cls():
 
 
 @pytest.fixture(scope='session')
+def linux_vm(vm_types):
+    with vm_types['linux'].vm_ready('paths-test') as linux_vm:
+        yield linux_vm
+
+
+@pytest.fixture()
+def sftp_path_cls(linux_vm):
+    path_cls = linux_vm.os_access.shell.sftp_path_cls()
+    return path_cls
+
+
+@pytest.fixture(scope='session')
 def windows_vm(vm_types):
     with vm_types['windows'].vm_ready('paths-test') as windows_vm:
         yield windows_vm
@@ -35,7 +47,7 @@ def smb_path_cls(windows_vm):
     return windows_vm.os_access.path_cls
 
 
-@pytest.fixture(params=['local_path_cls', 'ssh_path_cls', 'smb_path_cls'])
+@pytest.fixture(params=['local_path_cls', 'ssh_path_cls', 'smb_path_cls', 'sftp_path_cls'])
 def path_cls(request):
     return request.getfixturevalue(request.param)
 
@@ -143,6 +155,7 @@ def test_write_read_bytes(remote_test_dir, data):
 def test_write_read_tricky_bytes_with_offsets(remote_test_dir, data):
     name, written = data
     file_path = remote_test_dir / '{}.dat'.format(name)
+    file_path.write_bytes(b'aaaaaaaaaa')
     file_path.write_bytes(written, offset=10)
     assert file_path.read_bytes(offset=10, max_length=100) == written[:100]
 
@@ -150,8 +163,8 @@ def test_write_read_tricky_bytes_with_offsets(remote_test_dir, data):
 def test_write_read_bytes_with_tricky_offsets(remote_test_dir):
     file_path = remote_test_dir / 'abc.dat'
     file_path.write_bytes(b'aaaaa')
-    file_path.write_bytes(b'ccccc', offset=10)
     file_path.write_bytes(b'bbbbb', offset=5)
+    file_path.write_bytes(b'ccccc', offset=10)
     assert file_path.read_bytes(offset=12, max_length=5) == b'ccc'
     assert file_path.read_bytes(offset=8, max_length=5) == b'bbccc'
     assert file_path.read_bytes(offset=3, max_length=5) == b'aabbb'
@@ -201,12 +214,12 @@ def test_mkdir_when_parent_is_a_file(path_with_file_in_parents):
 
 
 def test_read_from_dir(existing_remote_dir):
-    with pytest.raises(NotAFile):
+    with pytest.raises(BadPath):
         _ = existing_remote_dir.read_bytes()
 
 
 def test_unlink_dir(existing_remote_dir):
-    with pytest.raises(NotAFile):
+    with pytest.raises(BadPath):
         existing_remote_dir.unlink()
 
 
@@ -222,14 +235,31 @@ def test_read_from_non_existent(remote_test_dir):
         _ = non_existent_file.read_bytes()
 
 
+def test_size(remote_test_dir):
+    path = remote_test_dir / 'to_measure_size.dat'
+    path.write_bytes(b'X' * 100500)
+    assert path.size() == 100500
+
+
+def test_size_of_nonexistent(remote_test_dir):
+    path = remote_test_dir / 'to_measure_size.dat'
+    pytest.raises(DoesNotExist, path.size)
+
+
+def test_size_of_a_dir(remote_test_dir):
+    path = remote_test_dir / 'to_measure_size.dat'
+    path.mkdir()
+    pytest.raises(NotAFile, path.size)
+
+
 def test_glob_on_file(existing_remote_file):
-    with pytest.raises(NotADir):
+    with pytest.raises(BadPath):
         _ = list(existing_remote_file.glob('*'))
 
 
 def test_glob_on_non_existent(existing_remote_dir):
     non_existent_path = existing_remote_dir / 'non_existent'
-    with pytest.raises(DoesNotExist):
+    with pytest.raises(BadPath):
         _ = list(non_existent_path.glob('*'))
 
 

@@ -26,16 +26,19 @@ public:
         m_committedData = m_initialData;
     }
 
-    ~TransactionLogCache()
-    {
-    }
-
 protected:
     TranId beginTran()
     {
         const auto tranId = m_cache.beginTran();
         m_rawData[tranId] = m_committedData;
         return tranId;
+    }
+
+    void givenCacheWithNonZeroTimestampSequence()
+    {
+        const auto tranId = cache().beginTran();
+        cache().updateTimestampSequence(tranId, 10);
+        cache().commit(tranId);
     }
 
     void beginMultipleTransactions()
@@ -127,6 +130,26 @@ protected:
         assertEqual(m_committedData, m_cache);
     }
 
+    VmsTransactionLogCache& cache()
+    {
+        return m_cache;
+    }
+
+    CommandHeader prepareTransaction(TranId tranId)
+    {
+        auto transactionHeader = CommandHeader(QnUuid(m_peerId));
+        transactionHeader.peerID = QnUuid(m_peerId);
+        transactionHeader.command = ::ec2::ApiCommand::saveCamera;
+        transactionHeader.transactionType = ::ec2::TransactionType::Cloud;
+        transactionHeader.persistentInfo.sequence =
+            m_cache.generateTransactionSequence(
+                vms::api::PersistentIdData(QnUuid(m_peerId), m_dbId));
+        transactionHeader.persistentInfo.dbID = m_dbId;
+        transactionHeader.persistentInfo.timestamp =
+            m_cache.generateTransactionTimestamp(tranId);
+        return transactionHeader;
+    }
+
 private:
     struct CacheState
     {
@@ -153,21 +176,6 @@ private:
         CacheState result;
         result.timestampSequence = m_cache.committedTimestampSequence();
         return result;
-    }
-
-    CommandHeader prepareTransaction(TranId tranId)
-    {
-        auto transactionHeader = CommandHeader(QnUuid(m_peerId));
-        transactionHeader.peerID = QnUuid(m_peerId);
-        transactionHeader.command = ::ec2::ApiCommand::saveCamera;
-        transactionHeader.transactionType = ::ec2::TransactionType::Cloud;
-        transactionHeader.persistentInfo.sequence =
-            m_cache.generateTransactionSequence(
-                vms::api::PersistentIdData(QnUuid(m_peerId), m_dbId));
-        transactionHeader.persistentInfo.dbID = m_dbId;
-        transactionHeader.persistentInfo.timestamp =
-            m_cache.generateTransactionTimestamp(tranId);
-        return transactionHeader;
     }
 
     void generateTransaction(TranId tranId)
@@ -239,6 +247,25 @@ TEST_F(TransactionLogCache, timestamp_sequence_is_updated_by_external_transactio
 {
     saveTransactionWithGreaterTimestampSequence();
     assertGreaterSequenceIsApplied();
+}
+
+TEST_F(TransactionLogCache, timestamp_is_not_decreasing)
+{
+    givenCacheWithNonZeroTimestampSequence();
+
+    const auto tranId = beginTran();
+
+    const auto timestampBefore = cache().generateTransactionTimestamp(tranId);
+
+    // Saving external transaction with a lower sequence but greater ticks.
+    auto transaction = prepareTransaction(tranId);
+    transaction.persistentInfo.timestamp = timestampBefore;
+    --transaction.persistentInfo.timestamp.sequence;
+    ++transaction.persistentInfo.timestamp.ticks;
+    cache().insertOrReplaceTransaction(tranId, transaction, "tran-hash");
+
+    const auto timestampAfter = cache().generateTransactionTimestamp(tranId);
+    ASSERT_GT(timestampAfter, timestampBefore);
 }
 
 } // namespace test

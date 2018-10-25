@@ -157,20 +157,16 @@ find_package(Qt5
         XmlPatterns
         Sql
         Concurrent
-        Multimedia)
+        Multimedia
+        Qml
+)
 
 if(withDesktopClient OR withMobileClient OR withNxTool)
-    find_package(Qt5
-        COMPONENTS
-            Qml
-            Quick)
+    find_package(Qt5 COMPONENTS Quick)
 endif()
 
 if(withDesktopClient OR withNxTool)
-    find_package(Qt5
-        COMPONENTS
-            Widgets
-    )
+    find_package(Qt5 COMPONENTS Widgets)
 endif()
 
 set(QML_IMPORT_PATH
@@ -210,11 +206,10 @@ if(withMediaServer)
     add_subdirectory(mediaserver)
     add_subdirectory(plugins)
     add_subdirectory(storage_plugins)
-    add_subdirectory(nx_system_commands)
 
     if(withDistributions)
-        # TODO: Combine all SDKs (nx_storage_sdk, nx_sdk, nx_metadata_sdk) into one like this.
-        add_subdirectory(nx_metadata_sdk)
+        # TODO: Combine all SDKs (nx_storage_sdk, nx_sdk, nx_analytics_sdk) into one like this.
+        add_subdirectory(nx_analytics_sdk)
     endif()
 
     if(withMediaDbUtil)

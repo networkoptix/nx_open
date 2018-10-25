@@ -137,6 +137,7 @@
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_welcome_screen.h>
+#include <nx/client/desktop/resources/layout_password_management.h>
 
 #include <ui/workbench/handlers/workbench_layouts_handler.h>    // TODO: #GDM dependencies
 
@@ -249,9 +250,11 @@ ActionHandler::ActionHandler(QObject *parent) :
         [this] { openLocalSettingsDialog(QnLocalSettingsDialog::NotificationsPage); },
         Qt::QueuedConnection);
 
-    // system administration
-    connect(action(action::SystemAdministrationAction), &QAction::triggered, this,
-        [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::GeneralPage); });
+    // System administration.
+    connect(action(action::SystemAdministrationAction), &QAction::triggered,
+        this, &ActionHandler::at_systemAdministrationAction_triggered);
+
+    // TODO: #vkutin #gdm Remove these actions, use FocusTabRole in action parameters instead.
     connect(action(action::PreferencesLicensesTabAction), &QAction::triggered, this,
         [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::LicensesPage); });
     connect(action(action::PreferencesSmtpTabAction), &QAction::triggered, this,
@@ -262,6 +265,19 @@ ActionHandler::ActionHandler(QObject *parent) :
         [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::UpdatesPage); });
     connect(action(action::UserManagementAction), &QAction::triggered, this,
         [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::UserManagement); });
+    connect(action(action::AnalyticsEngineSettingsAction), &QAction::triggered, this,
+        [this]
+        {
+            QUrl url;
+
+            if (const QnUuid& engineId = menu()->currentParameters(sender()).resource()->getId();
+                !engineId.isNull())
+            {
+                url.setQuery("engineId=" + engineId.toString());
+            }
+
+            openSystemAdministrationDialog(QnSystemAdministrationDialog::Analytics, url);
+        });
 
     connect(action(action::BusinessEventsAction), SIGNAL(triggered()), this, SLOT(at_businessEventsAction_triggered()));
     connect(action(action::OpenBusinessRulesAction), SIGNAL(triggered()), this, SLOT(at_openBusinessRulesAction_triggered()));
@@ -1189,6 +1205,18 @@ void ActionHandler::at_dropResourcesAction_triggered()
 
     QnResourceList resources = parameters.resources();
     QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
+
+    if (layouts.size() == 1)
+    {
+        auto &layout = layouts.first();
+        if (layout::requiresPassword(layout))
+        {
+            layout::askAndSetPassword(layout, mainWindowWidget());
+            if (layout::requiresPassword(layout)) //< A correct password was not entered. Do not open.
+                return;
+        }
+    }
+
     foreach(QnLayoutResourcePtr r, layouts)
         resources.removeOne(r);
 
@@ -1205,7 +1233,8 @@ void ActionHandler::at_dropResourcesAction_triggered()
         workbench()->currentLayout()->resource()->locked() &&
         !resources.empty() &&
         layouts.empty() &&
-        videowalls.empty()) {
+        videowalls.empty())
+    {
         QnGraphicsMessageBox::information(tr("Layout is locked and cannot be changed."));
         return;
     }
@@ -1265,11 +1294,22 @@ void ActionHandler::openBackupCamerasDialog() {
     dialog->exec();
 }
 
-void ActionHandler::openSystemAdministrationDialog(int page)
+void ActionHandler::at_systemAdministrationAction_triggered()
+{
+    const auto parameters = menu()->currentParameters(sender());
+    const int page = parameters.hasArgument(Qn::FocusTabRole)
+        ? parameters.argument(Qn::FocusTabRole).toInt()
+        : QnSystemAdministrationDialog::GeneralPage;
+
+    openSystemAdministrationDialog(page);
+}
+
+void ActionHandler::openSystemAdministrationDialog(int page, const QUrl& url)
 {
     QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(
         m_systemAdministrationDialog, mainWindowWidget());
-    systemAdministrationDialog()->setCurrentPage(page);
+
+    systemAdministrationDialog()->setCurrentPage(page, false, url);
 }
 
 void ActionHandler::openLocalSettingsDialog(int page)

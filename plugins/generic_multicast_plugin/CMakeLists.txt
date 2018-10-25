@@ -7,4 +7,5 @@ nx_add_server_plugin(generic_multicast_plugin NO_MOC
         common
         nx_network
         nx_utils
+        nx_sdk
 )

@@ -11,10 +11,10 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/watchers/default_password_cameras_watcher.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
 #include <utils/common/html.h>
 #include <utils/license_usage_helper.h>
+#include <client_core/client_core_module.h>
 
 #include "camera_settings_tab.h"
 #include "redux/camera_settings_dialog_state.h"
@@ -23,6 +23,7 @@
 #include "utils/license_usage_provider.h"
 #include "watchers/camera_settings_license_watcher.h"
 #include "watchers/camera_settings_readonly_watcher.h"
+#include "watchers/camera_settings_analytics_engines_watcher.h"
 #include "watchers/camera_settings_wearable_state_watcher.h"
 #include "watchers/camera_settings_global_settings_watcher.h"
 #include "watchers/camera_settings_global_permissions_watcher.h"
@@ -31,10 +32,12 @@
 #include "widgets/camera_motion_settings_widget.h"
 #include "widgets/camera_fisheye_settings_widget.h"
 #include "widgets/camera_expert_settings_widget.h"
+#include "widgets/camera_analytics_settings_widget.h"
 #include "widgets/camera_web_page_widget.h"
 #include "widgets/io_module_settings_widget.h"
 
 #include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
+#include <nx/client/desktop/system_health/default_password_cameras_watcher.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 
 namespace nx::client::desktop {
@@ -45,6 +48,7 @@ struct CameraSettingsDialog::Private
     QPointer<CameraSettingsDialogStore> store;
     QPointer<CameraSettingsLicenseWatcher> licenseWatcher;
     QPointer<CameraSettingsReadOnlyWatcher> readOnlyWatcher;
+    QPointer<CameraSettingsAnalyticsEnginesWatcher> analyticsEnginesWatcher;
     QPointer<CameraSettingsWearableStateWatcher> wearableStateWatcher;
     QnVirtualCameraResourceList cameras;
     QPointer<QnCamLicenseUsageHelper> licenseUsageHelper;
@@ -144,7 +148,7 @@ struct CameraSettingsDialog::Private
     void handleCamerasWithDefaultPasswordChanged()
     {
         const auto defaultPasswordWatcher = q->context()->instance<DefaultPasswordCamerasWatcher>();
-        const auto troublesomeCameras = defaultPasswordWatcher->camerasWithDefaultPassword().toSet()
+        const auto troublesomeCameras = defaultPasswordWatcher->camerasWithDefaultPassword()
             .intersect(cameras.toSet());
 
         if (!troublesomeCameras.empty())
@@ -170,6 +174,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
 
     d->licenseWatcher = new CameraSettingsLicenseWatcher(d->store, this);
     d->readOnlyWatcher = new CameraSettingsReadOnlyWatcher(d->store, this);
+    d->analyticsEnginesWatcher = new CameraSettingsAnalyticsEnginesWatcher(d->store, this);
     d->wearableStateWatcher = new CameraSettingsWearableStateWatcher(d->store, this);
 
     d->licenseUsageHelper = new QnCamLicenseUsageHelper(commonModule(), this);
@@ -225,6 +230,12 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         tr("Web Page"));
 
     addPage(
+        int(CameraSettingsTab::analytics),
+        new CameraAnalyticsSettingsWidget(
+            d->store, qnClientCoreModule->mainQmlEngine(), ui->tabWidget),
+        tr("Analytics"));
+
+    addPage(
         int(CameraSettingsTab::expert),
         new CameraExpertSettingsWidget(d->store, ui->tabWidget),
         tr("Expert"));
@@ -270,7 +281,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         [this]() { d->handleAction(ui::action::ChangeDefaultCameraPasswordAction); });
 
     const auto defaultPasswordWatcher = context()->instance<DefaultPasswordCamerasWatcher>();
-    connect(defaultPasswordWatcher, &DefaultPasswordCamerasWatcher::cameraListChanged, this,
+    connect(defaultPasswordWatcher, &DefaultPasswordCamerasWatcher::cameraSetChanged, this,
         [this]() { d->handleCamerasWithDefaultPasswordChanged(); });
 
     // Make sure we will not handle stateChanged, triggered when creating watchers.
@@ -427,6 +438,8 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
 
     setPageVisible(int(CameraSettingsTab::web), state.isSingleCamera()
         && !state.singleCameraProperties.settingsUrlPath.isEmpty());
+
+    setPageVisible(int(CameraSettingsTab::analytics), state.isSingleCamera());
 
     setPageVisible(int(CameraSettingsTab::expert), !hasWearableCameras
         && state.devicesDescription.isIoModule == CombinedValue::None);

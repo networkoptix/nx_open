@@ -38,6 +38,7 @@ static const qint64 MSEC_PER_SEC = 1000;
 static const qint64 USEC_PER_MSEC = 1000;
 static unsigned int MEDIA_CACHE_SIZE_MILLIS = 10 * MSEC_PER_SEC;
 static const int CAMERA_PULLING_STOP_TIMEOUT = 1000 * 3;
+static const int kMaxGopSize = 260;
 
 // ------------------------------ QnVideoCameraGopKeeper --------------------------------
 
@@ -94,7 +95,7 @@ private:
 
 QnVideoCameraGopKeeper::QnVideoCameraGopKeeper(QnVideoCamera* camera, const QnResourcePtr& resource, QnServer::ChunksCatalog catalog):
     QnResourceConsumer(resource),
-    QnAbstractDataConsumer(100),
+    QnAbstractDataConsumer(kMaxGopSize),
     m_lastKeyFrameChannel(0),
     m_gotIFramesMask(0),
     m_allChannelsMask(0),
@@ -497,11 +498,13 @@ void QnVideoCamera::beforeStop()
 
     if (m_primaryReader) {
         m_primaryReader->removeDataProcessor(m_primaryGopKeeper);
+        m_primaryReader->removeDataProcessor(m_liveCache[MEDIA_Quality_High].get());
         m_primaryReader->pleaseStop();
     }
 
     if (m_secondaryReader) {
         m_secondaryReader->removeDataProcessor(m_secondaryGopKeeper);
+        m_secondaryReader->removeDataProcessor(m_liveCache[MEDIA_Quality_Low].get());
         m_secondaryReader->pleaseStop();
     }
 }

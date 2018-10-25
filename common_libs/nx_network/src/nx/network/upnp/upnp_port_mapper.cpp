@@ -19,12 +19,13 @@ namespace network {
 namespace upnp {
 
 PortMapper::PortMapper(
+    nx::network::upnp::DeviceSearcher* deviceSearcher,
     bool isEnabled,
     quint64 checkMappingsInterval,
     const QString& description,
     const QString& device)
     :
-    SearchAutoHandler(device),
+    SearchAutoHandler(deviceSearcher, device),
     m_isEnabled(isEnabled),
     m_upnpClient(new AsyncClient()),
     m_description(description),

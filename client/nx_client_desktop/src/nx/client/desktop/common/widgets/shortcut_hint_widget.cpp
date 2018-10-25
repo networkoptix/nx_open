@@ -2,6 +2,7 @@
 
 #include <QtGui/QFont>
 
+#include <nx/utils/app_info.h>
 #include <nx/client/desktop/ui/common/color_theme.h>
 
 namespace {
@@ -18,9 +19,17 @@ QString makeLeftFloat(const QString& text)
 
 QString keyToString(int key)
 {
-    return key == Qt::Key_Enter
-        ? lit("Enter")
-        : QKeySequence(key).toString(QKeySequence::NativeText);
+    switch (key)
+    {
+        case Qt::Key_Enter:
+            return lit("Enter");
+        case Qt::Key_Control:
+            return nx::utils::AppInfo::isMacOsX()
+                ? QKeySequence(key).toString(QKeySequence::NativeText)
+                : lit("Ctrl");
+        default:
+            return QKeySequence(key).toString(QKeySequence::NativeText);
+    }
 }
 
 QString getHintItemText(const nx::client::desktop::ShortcutHintWidget::Description& description)
@@ -47,7 +56,7 @@ QString getHintItemText(const nx::client::desktop::ShortcutHintWidget::Descripti
     static const auto kMDash = makeLeftFloat(lit("&nbsp;&mdash;"));
     const auto keys = keyItemTexts.join(kPlusSeparator);
     const auto hint = makeLeftFloat(description.second);
-    return lit("<table width=100% border = 0><tr><td>%1 %3 %2</td></tr></table>")
+    return lit("<table width=100% border = 0 border-radius = 3><tr><td>%1 %3 %2</td></tr></table>")
         .arg(keys, hint, kMDash);
 }
 
@@ -64,6 +73,7 @@ ShortcutHintWidget::ShortcutHintWidget(QWidget* parent):
     auto currentFont = font();
     currentFont.setPixelSize(12);
     setFont(currentFont);
+    setAlignment(Qt::AlignTop);
 }
 
 void ShortcutHintWidget::setDescriptions(const DescriptionList& descriptions)

@@ -7,6 +7,7 @@
 #include <QtWidgets/QLineEdit>
 
 #include <ui/dialogs/common/session_aware_dialog.h>
+#include <nx/client/desktop/common/widgets/input_field.h>
 
 namespace Ui {
 class InputDialog;
@@ -31,6 +32,8 @@ public:
     QString value() const;
     void setValue(const QString& value);
 
+    void setValidator(nx::client::desktop::TextValidateFunction validator);
+
     QString placeholderText() const;
     void setPlaceholderText(const QString& placeholderText);
 
@@ -40,6 +43,8 @@ public:
     QDialogButtonBox::StandardButtons buttons() const;
     void setButtons(QDialogButtonBox::StandardButtons buttons);
 
+    void useForPassword();
+
     static QString getText(QWidget* parent,
         const QString& title, const QString& label,
         QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
@@ -48,7 +53,7 @@ public:
         const QString& initialText = QString());
 
 private:
-    void validateInput();
+    virtual void accept() override;
 
 private:
     QScopedPointer<Ui::InputDialog> ui;

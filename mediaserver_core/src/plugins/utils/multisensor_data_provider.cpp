@@ -8,7 +8,6 @@
 #include <utils/common/sleep.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_data_pool.h>
-#include <common/static_common_module.h>
 
 namespace
 {
@@ -44,7 +43,6 @@ QnAbstractMediaDataPtr MultisensorDataProvider::getNextData()
         return getMetadata();
 
     auto data = m_dataSource.retrieveData();
-
     return data;
 }
 
@@ -70,12 +68,10 @@ CameraDiagnostics::Result MultisensorDataProvider::openStreamInternal(
 
     auto videoChannelMapping = getVideoChannelMapping();
 
-    auto resData = qnStaticCommon->dataPool()->data(
-        m_resource.dynamicCast<QnSecurityCamResource>());
+    auto resData = m_resource.dynamicCast<QnSecurityCamResource>()->resourceData();
 
-    bool doNotConfigureCamera = resData.value<bool>(
-        Qn::DO_NOT_CONFIGURE_CAMERA_PARAM_NAME, false);
-
+    const bool configureEachSensor = resData.value<bool>(Qn::kConfigureAllStitchedSensors, false);
+    bool configureSensor = true;
     for (const auto& resourceChannelMapping: videoChannelMapping)
     {
         auto resource = initSubChannelResource(
@@ -85,15 +81,15 @@ CameraDiagnostics::Result MultisensorDataProvider::openStreamInternal(
         resource->setOnvifRequestsSendTimeout(kDefaultSendTimeout);
 
         auto reader = new QnOnvifStreamReader(resource);
-        reader->setMustNotConfigureResource(doNotConfigureCamera);
+        reader->setMustNotConfigureResource(!configureSensor);
 
         QnAbstractStreamDataProviderPtr source(reader);
-        if (!doNotConfigureCamera && getRole() != Qn::CR_SecondaryLiveVideo)
+        if (getRole() == Qn::CR_LiveVideo)
             reader->setPrimaryStreamParams(params);
 
         reader->setRole(getRole());
 
-        doNotConfigureCamera = true;
+        configureSensor = configureEachSensor;
         m_dataSource.addDataSource(source);
 
         for (const auto& channelMapping: resourceChannelMapping.channelMap)
@@ -162,7 +158,7 @@ QList<QnResourceChannelMapping> MultisensorDataProvider::getVideoChannelMapping(
 {
     auto secRes = m_resource.dynamicCast<QnSecurityCamResource>();
 
-    auto resData = qnStaticCommon->dataPool()->data(
+    auto resData = m_resource->commonModule()->dataPool()->data(
         secRes->getVendor(),
         secRes->getModel());
 

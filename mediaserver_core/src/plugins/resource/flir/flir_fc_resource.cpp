@@ -6,6 +6,9 @@
 #include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
 #include <streaming/rtp_stream_reader.h>
+#include <media_server/media_server_module.h>
+#include <media_server/media_server_resource_searchers.h>
+#include "flir_resource_searcher.h"
 
 namespace {
 
@@ -30,7 +33,7 @@ FcResource::FcResource(QnMediaServerModule* serverModule)
 
 FcResource::~FcResource()
 {
-    stopInputPortMonitoringAsync();
+    stopInputPortStatesMonitoring();
 
     if (m_ioManager)
     {
@@ -102,36 +105,26 @@ CameraDiagnostics::Result FcResource::initializeCameraDriver()
     if (!m_ioManager)
     {
         m_ioManager = new nexus::WebSocketIoManager(this, port);
-        m_ioManager->moveToThread(IoExecutor::instance()->getThread());
+        auto flirSearcher = serverModule()->resourceSearchers()->searcher<QnFlirResourceSearcher>();
+        m_ioManager->moveToThread(flirSearcher->ioExecutor()->getThread());
     }
 
-    Qn::CameraCapabilities caps = Qn::NoCapabilities;
-    QnIOPortDataList allPorts = getInputPortList();
-    QnIOPortDataList outputPorts = getRelayOutputList();
-
-    if (!allPorts.empty())
-        caps |= Qn::RelayInputCapability;
-
-    if (!outputPorts.empty())
-        caps |= Qn::RelayOutputCapability;
-
+    QnIOPortDataList allPorts = m_ioManager->getInputPortList();
+    QnIOPortDataList outputPorts = m_ioManager->getOutputPortList();
     allPorts.insert(allPorts.begin(), outputPorts.begin(), outputPorts.end());
 
-    setIOPorts(allPorts);
-    setCameraCapabilities(caps);
-
+    setIoPortDescriptions(std::move(allPorts), /*needMerge*/ true);
     saveParams();
-
     return CameraDiagnostics::NoErrorResult();
 }
 
-bool FcResource::startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler)
+void FcResource::startInputPortStatesMonitoring()
 {
     if (!m_ioManager)
-        return false;
+        return;
 
     if (m_ioManager->isMonitoringInProgress())
-        return false;
+        return;
 
     m_ioManager->setInputPortStateChangeCallback(
         [this](QString portId, nx_io_managment::IOPortState portState)
@@ -140,7 +133,7 @@ bool FcResource::startInputPortMonitoringAsync(std::function<void(bool)>&& compl
             m_callbackIsInProgress = true;
 
             lock.unlock();
-            emit cameraInput(
+            emit inputPortStateChanged(
                 toSharedPointer(this),
                 portId,
                 nx_io_managment::isActiveIOPortState(portState),
@@ -171,10 +164,9 @@ bool FcResource::startInputPortMonitoringAsync(std::function<void(bool)>&& compl
         });
 
     m_ioManager->startIOMonitoring();
-    return true;
 }
 
-void FcResource::stopInputPortMonitoringAsync()
+void FcResource::stopInputPortStatesMonitoring()
 {
     if (!m_ioManager)
         return;
@@ -183,22 +175,6 @@ void FcResource::stopInputPortMonitoringAsync()
         return;
 
     m_ioManager->stopIOMonitoring();
-}
-
-QnIOPortDataList FcResource::getRelayOutputList() const
-{
-    if (m_ioManager)
-        return m_ioManager->getOutputPortList();
-
-    return QnIOPortDataList();
-}
-
-QnIOPortDataList FcResource::getInputPortList() const
-{
-    if (m_ioManager)
-        return m_ioManager->getInputPortList();
-
-    return QnIOPortDataList();
 }
 
 QnAbstractStreamDataProvider* FcResource::createLiveDataProvider()
@@ -274,7 +250,7 @@ bool FcResource::tryToEnableNexusServer(nx::network::http::HttpClient& httpClien
     return true;
 }
 
-bool FcResource::setRelayOutputState(
+bool FcResource::setOutputPortState(
     const QString& outputId,
     bool isActive,
     unsigned int autoResetTimeoutMs)

@@ -1,12 +1,16 @@
-#ifndef __STORAGE_RESOURCE_H__
-#define __STORAGE_RESOURCE_H__
+#pragma once
 
 #include "abstract_storage_resource.h"
+
 #include <atomic>
+
+#include <utils/crypt/encryptable.h>
 
 class QnAbstractMediaStreamDataProvider;
 
-class QnStorageResource: public QnAbstractStorageResource
+class QnStorageResource:
+    public QnAbstractStorageResource,
+    public nx::utils::Encryptable
 {
     using base_type = QnAbstractStorageResource;
 
@@ -37,6 +41,9 @@ public:
 
     void setUsedForWriting(bool isUsedForWriting);
     bool isUsedForWriting() const;
+
+    void setStatusFlag(Qn::StorageStatuses status);
+    Qn::StorageStatuses statusFlag() const;
 
     virtual QString getPath() const;
     static QString urlToPath(const QString &url);
@@ -93,9 +100,8 @@ private:
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
     mutable QnMutex m_bitrateMtx;
     bool m_isBackup;
+    Qn::StorageStatuses m_status = Qn::StorageStatus::none;
 };
 
 Q_DECLARE_METATYPE(QnStorageResourcePtr);
 Q_DECLARE_METATYPE(QnStorageResourceList);
-
-#endif // __ABSTRACT_STORAGE_RESOURCE_H__

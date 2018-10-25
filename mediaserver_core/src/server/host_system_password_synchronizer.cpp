@@ -16,12 +16,13 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <utils/common/app_info.h>
+#include <media_server/media_server_module.h>
 
 #include "platform/platform_abstraction.h"
 #include "platform/monitoring/platform_monitor.h"
 
-HostSystemPasswordSynchronizer::HostSystemPasswordSynchronizer(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+HostSystemPasswordSynchronizer::HostSystemPasswordSynchronizer(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
     Qn::directConnect(
         resourcePool(), &QnResourcePool::resourceAdded,
@@ -45,7 +46,7 @@ void HostSystemPasswordSynchronizer::syncLocalHostRootPasswordWithAdminIfNeeded(
     {
         //#5785 changing root password on nx1 only if DB is located on HDD
         QList<QnPlatformMonitor::PartitionSpace> partitions =
-            qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
+            serverModule()->platform()->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
                 QnPlatformMonitor::LocalDiskPartition);
 
         for (int i = 0; i < partitions.size(); ++i)
@@ -102,7 +103,7 @@ void HostSystemPasswordSynchronizer::setAdmin(QnUserResourcePtr admin)
 {
     syncLocalHostRootPasswordWithAdminIfNeeded(admin);
     Qn::directConnect(
-        admin.data(), &QnUserResource::cryptSha512HashChanged,
+        admin.data(), &QnUserResource::hashesChanged,
         this, &HostSystemPasswordSynchronizer::at_adminHashChanged);
 }
 

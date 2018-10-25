@@ -5,6 +5,7 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QObject>
 #include <QtCore/QQueue>
+#include <QtCore/QUrl>
 
 #include <QtWidgets/QDialogButtonBox>
 
@@ -192,6 +193,8 @@ protected slots:
 
     void at_openNewScene_triggered();
 
+    void at_systemAdministrationAction_triggered();
+
 private:
     void showSingleCameraErrorMessage(const QString& explanation = QString());
     void showMultipleCamerasErrorMessage(
@@ -208,7 +211,7 @@ private:
 
     void openFailoverPriorityDialog();
     void openBackupCamerasDialog();
-    void openSystemAdministrationDialog(int page);
+    void openSystemAdministrationDialog(int page, const QUrl& url = {});
     void openLocalSettingsDialog(int page);
 
     QnAdjustVideoDialog* adjustVideoDialog();

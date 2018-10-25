@@ -92,7 +92,7 @@ void QnRtspFfmpegEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
         if (!currentContext)
             currentContext = getGeneratedContext(m_media->compressionType);
         NX_ASSERT(currentContext);
-        //int rtpHeaderSize = 4 + RtpHeader::RTP_HEADER_SIZE;
+        //int rtpHeaderSize = 4 + RtpHeader::kSize;
         if (!m_contextSent || !m_contextSent->isSimilarTo(currentContext))
         {
             m_contextSent = currentContext;

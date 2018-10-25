@@ -178,12 +178,8 @@ SessionPool::SessionContext::SessionContext(
 {
 }
 
-static SessionPool* SessionPool_instance = nullptr;
-
 SessionPool::SessionPool()
 {
-    NX_ASSERT(SessionPool_instance == nullptr);
-    SessionPool_instance = this;
 }
 
 SessionPool::~SessionPool()
@@ -203,8 +199,6 @@ SessionPool::~SessionPool()
         delete sessionCtx.session;
         nx::utils::TimerManager::instance()->joinAndDeleteTimer(sessionCtx.removeTaskID);
     }
-
-    SessionPool_instance = nullptr;
 }
 
 bool SessionPool::add(Session* session, unsigned int keepAliveTimeoutMS)
@@ -232,11 +226,6 @@ void SessionPool::remove(const QString& id)
 {
     QnMutexLocker lk(&m_mutex);
     removeNonSafe(id);
-}
-
-SessionPool* SessionPool::instance()
-{
-    return SessionPool_instance;
 }
 
 static QAtomicInt nextSessionID = 1;

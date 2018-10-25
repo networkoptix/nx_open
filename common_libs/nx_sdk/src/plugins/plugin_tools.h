@@ -36,10 +36,10 @@ class ScopedRef
 {
 public:
     /** Intended to be applied to queryInterface(). */
-    ScopedRef(void* ptr): ScopedRef(static_cast<T*>(ptr), /*increaseRef*/ false) {}
+    explicit ScopedRef(void* ptr): ScopedRef(static_cast<T*>(ptr), /*increaseRef*/ false) {}
 
     /** Calls ptr->addRef() if ptr is not null and increaseRef is true. */
-    ScopedRef(T* ptr = nullptr, bool increaseRef = true):
+    explicit ScopedRef(T* ptr = nullptr, bool increaseRef = true):
         m_ptr(ptr)
     {
         if (m_ptr && increaseRef)
@@ -57,12 +57,19 @@ public:
         return *this;
     }
 
+    ScopedRef(const ScopedRef<T>&) = delete;
+
+    ScopedRef<T>& operator=(const ScopedRef<T>&) = delete;
+
     ~ScopedRef() { reset(); }
 
     operator bool() const { return m_ptr != nullptr; }
 
     /** @return Protected pointer, without releasing it. */
     T* get() { return m_ptr; }
+
+    /** @return Protected pointer, without releasing it. */
+    const T* get() const { return m_ptr; }
 
     T* operator->() { return m_ptr; }
     const T* operator->() const { return m_ptr; }
@@ -99,77 +106,7 @@ private:
         if(m_ptr)
             m_ptr->addRef();
     }
-
-    ScopedRef(const ScopedRef&);
-
-    ScopedRef& operator=(const ScopedRef&);
 };
-
-/** Alignes val up to alignment boundary. */
-inline size_t alignUp(size_t val, size_t alignment)
-{
-    const size_t remainder = val % alignment;
-    if (remainder == 0)
-        return val;
-    return val + (alignment - remainder);
-}
-
-/**
- * Allocate size bytes of data, aligned to alignment boundary.
- *
- * NOTE: Allocated memory must be freed with a call to freeAligned().
- *
- * NOTE: This function is as safe as ::malloc().
- *
- * @param mallocFunc Function with the signature void*(size_t), which is called to allocate memory.
- */
-template<class MallocFunc>
-void* mallocAligned(size_t size, size_t alignment, MallocFunc mallocFunc)
-{
-    if (alignment == 0)
-        return 0;
-    void* ptr = mallocFunc(size + alignment + sizeof(alignment));
-    if (!ptr) //< allocation error
-        return ptr;
-
-    void* aligned_ptr = (char*) ptr + sizeof(alignment); //< Leaving place to save unalignment.
-    const size_t unalignment = alignment - (((size_t) aligned_ptr) % alignment);
-    memcpy((char*) ptr+unalignment, &unalignment, sizeof(unalignment));
-    return (char*) aligned_ptr + unalignment;
-}
-
-/** Calls mallocAligned() passing ::malloc as mallocFunc. */
-inline void* mallocAligned(size_t size, size_t alignment)
-{
-    return mallocAligned<>(size, alignment, ::malloc);
-}
-
-/**
- * Free ptr allocated with a call to mallocAligned().
- *
- * NOTE: This function is as safe as ::free().
- *
- * @param freeFunc Function with the signature void(void*), which is called to free the memory.
- */
-template<class FreeFunc>
-void freeAligned(void* ptr, FreeFunc freeFunc)
-{
-    if (!ptr)
-        return freeFunc(ptr);
-
-    ptr = (char*) ptr - sizeof(size_t);
-    size_t unalignment = 0;
-    memcpy(&unalignment, ptr, sizeof(unalignment));
-    ptr = (char*) ptr - unalignment;
-
-    freeFunc(ptr);
-}
-
-/** Calls freeAligned() passing ::free as freeFunc. */
-inline void freeAligned(void* ptr)
-{
-    return freeAligned<>(ptr, ::free);
-}
 
 namespace atomic {
 
@@ -259,6 +196,13 @@ public:
         return newRefCounter;
     }
 
+	unsigned int refCount() const
+	{
+		if (m_refCountingDelegate)
+			return m_refCountingDelegate->refCount();
+		return m_refCount;
+	}
+
 private:
     atomic::AtomicLong m_refCount;
     nxpl::PluginInterface* m_objToWatch;
@@ -275,12 +219,27 @@ public:
     virtual unsigned int addRef() override { return m_refManager.addRef(); }
     virtual unsigned int releaseRef() override { return m_refManager.releaseRef(); }
 
+	unsigned int refCount() const { return m_refManager.refCount(); }
+
 protected:
     CommonRefManager m_refManager;
 
     CommonRefCounter(): m_refManager(static_cast<T*>(this)) {}
     CommonRefCounter(CommonRefManager* refManager): m_refManager(refManager) {}
 };
+
+/**
+ * Intended for debug.
+ * @return Reference counter, or 0 if object is null.
+ */
+template<typename Interface>
+unsigned int refCount(Interface* object)
+{
+	if (const auto commonRefCounter = dynamic_cast<CommonRefCounter<Interface>*>(object))
+		return commonRefCounter->refCount();
+
+	return 0;
+}
 
 enum NxGuidFormatOption
 {

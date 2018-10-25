@@ -9,7 +9,7 @@ from typing import Mapping, Sequence
 
 from framework.os_access.command import Command, CommandOutcome, DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.exceptions import AlreadyAcquired, exit_status_error_cls
-from framework.os_access.path import FileSystemPath, copy_file_using_read_and_write
+from framework.os_access.path import FileSystemPath
 
 STREAM_BUFFER_SIZE = 16 * 1024
 _PROHIBITED_ENV_NAMES = {'PATH', 'HOME', 'USER', 'SHELL', 'PWD', 'TERM'}
@@ -187,15 +187,20 @@ class Shell(object):
     def run_command(self, args, input=None, cwd=None, logger=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC, env=None):
         """Shortcut. Deprecated."""
         return self.command(
-            args, cwd=cwd, env=env, logger=logger).check_output(input=input, timeout_sec=timeout_sec)
+            args, cwd=cwd, env=env, logger=logger).run(input=input, timeout_sec=timeout_sec)
 
     def run_sh_script(self, script, input=None, cwd=None, logger=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC, env=None):
         """Shortcut. Deprecated."""
         return self.sh_script(
-            script, cwd=cwd, env=env, logger=logger).check_output(input=input, timeout_sec=timeout_sec)
+            script, cwd=cwd, env=env, logger=logger).run(input=input, timeout_sec=timeout_sec)
 
-    def copy_posix_file_to(self, posix_source, destination):
-        copy_file_using_read_and_write(posix_source, destination)
+    def current_user_name(self):
+        user_name = self.command(['whoami']).run().rstrip('\n')
+        return user_name
 
-    def copy_file_from_posix(self, source, posix_destination):
-        copy_file_using_read_and_write(source, posix_destination)
+    def home_dir(self, user_name):
+        output = self.run_command(['getent', 'passwd', user_name])
+        if not output:
+            raise RuntimeError("Can't determine home directory for {!r}".format(user_name))
+        user_home_dir = output.split(':')[5]
+        return user_home_dir

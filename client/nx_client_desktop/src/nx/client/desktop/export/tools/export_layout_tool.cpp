@@ -158,11 +158,8 @@ bool ExportLayoutTool::prepareStorage()
     const auto isExeFile = utils::AppInfo::isWindows()
         && FileExtensionUtils::isExecutable(d->settings.fileName.extension);
 
-    if (isExeFile || d->actualFilename == m_layout->getUrl())
-    {
-        // can not override opened layout. save to tmp file, then rename
-        d->actualFilename += lit(".tmp");
-    }
+    // Save to tmp file, then rename.
+    d->actualFilename += lit(".tmp");
 
 #ifdef Q_OS_WIN
     if (isExeFile)
@@ -177,8 +174,12 @@ bool ExportLayoutTool::prepareStorage()
         QFile::remove(d->actualFilename);
     }
 
-    d->storage = QnStorageResourcePtr(new QnLayoutFileStorageResource(d->settings.layout->commonModule()));
-    d->storage->setUrl(d->actualFilename);
+    auto fileStorage = new QnLayoutFileStorageResource(d->settings.layout->commonModule(),
+        d->actualFilename);
+
+    if (d->settings.encryption.on)
+        fileStorage->setPasswordToWrite(d->settings.encryption.password);
+    d->storage = QnStorageResourcePtr(fileStorage);
     return true;
 }
 
@@ -305,17 +306,35 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items)
     }
 
     /* Chunks. */
-    for (const QnMediaResourcePtr &resource : d->resources)
+    for (const auto& resource: d->resources)
     {
+        QByteArray data;
+        if (d->settings.bookmarks.empty())
+        {
+            auto loader = qnClientModule->cameraDataManager()->loader(resource);
+            if (!loader)
+                continue;
+
+            auto periods = loader->periods(Qn::RecordingContent).intersected(d->settings.period);
+            periods.encode(data);
+        }
+        else
+        {
+            // We may not have loaded chunks when using Bookmarks export for camera, which was not
+            // opened yet. This is no important as bookmarks are automatically deleted when archive
+            // is not available for the given period.
+            QnTimePeriodList periods;
+            for (const auto& bookmark: d->settings.bookmarks)
+            {
+                if (bookmark.cameraId == resource->toResourcePtr()->getId())
+                    periods.includeTimePeriod({bookmark.startTimeMs, bookmark.durationMs});
+            }
+            NX_ASSERT(std::is_sorted(periods.cbegin(), periods.cend()));
+            periods.encode(data);
+        }
+
         QString uniqId = resource->toResource()->getUniqueId();
         uniqId = uniqId.mid(uniqId.lastIndexOf(L'?') + 1);
-        auto loader = qnClientModule->cameraDataManager()->loader(resource);
-        if (!loader)
-            continue;
-        QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(d->settings.period);
-        QByteArray data;
-        periods.encode(data);
-
         if (!writeData(lit("chunk_%1.bin").arg(QFileInfo(uniqId).completeBaseName()), data))
             return false;
     }
@@ -494,12 +513,20 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
 
     qint64 serverTimeZone = client::core::ServerTimeWatcher::utcOffset(resource, Qn::InvalidUtcOffset);
 
+    QnTimePeriodList playbackMask;
+    for (const auto& bookmark: d->settings.bookmarks)
+    {
+        if (bookmark.cameraId == resource->toResourcePtr()->getId())
+            playbackMask.includeTimePeriod({bookmark.startTimeMs, bookmark.durationMs});
+    }
+
     m_currentCamera->exportMediaPeriodToFile(d->settings.period,
         uniqId,
         lit("mkv"),
         d->storage,
         role,
-        serverTimeZone);
+        serverTimeZone,
+        playbackMask);
 
     return true;
 }

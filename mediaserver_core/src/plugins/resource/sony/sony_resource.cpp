@@ -9,7 +9,6 @@
 #include "onvif/soapMediaBindingProxy.h"
 #include "utils/common/synctime.h"
 
-
 int QnPlSonyResource::MAX_RESOLUTION_DECREASES_NUM = 3;
 static const int INPUT_MONITOR_TIMEOUT_SEC = 5;
 
@@ -42,14 +41,7 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
     if (confToken.empty())
         return CameraDiagnostics::RequestFailedResult(QLatin1String("getPrimaryVideoEncoderId"), QString());
 
-    QAuthenticator auth = getAuth();
-    QString login = auth.user();
-    QString password = auth.password();
-    std::string endpoint = getMediaUrl().toStdString();
-
-    MediaSoapWrapper soapWrapperGet(
-        onvifTimeouts(),
-        endpoint.c_str(), login, password, getTimeDrift());
+    MediaSoapWrapper soapWrapperGet(this);
     VideoConfigReq confRequest;
     confRequest.ConfigurationToken = confToken;
     VideoConfigResp confResponse;
@@ -57,17 +49,29 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
     int soapRes = soapWrapperGet.getVideoEncoderConfiguration(confRequest, confResponse);
     if (soapRes != SOAP_OK || !confResponse.Configuration || !confResponse.Configuration->Resolution) {
         qWarning() << "QnPlSonyResource::updateResourceCapabilities: can't get video encoder (or received data is null) (token="
-            << confToken.c_str() << ") from camera (URL: " << soapWrapperGet.getEndpointUrl() << ", UniqueId: " << getUniqueId()
-            << "). GSoap error code: " << soapRes << ". " << soapWrapperGet.getLastError();
-        return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfiguration"), soapWrapperGet.getLastError());
+            << confToken.c_str() << ") from camera (URL: " << soapWrapperGet.endpoint() << ", UniqueId: " << getUniqueId()
+            << "). GSoap error code: " << soapRes << ". " << soapWrapperGet.getLastErrorDescription();
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfiguration"), soapWrapperGet.getLastErrorDescription());
     }
 
-    MediaSoapWrapper soapWrapper(
-        onvifTimeouts(),
-        endpoint.c_str(), login, password, getTimeDrift());
+    MediaSoapWrapper soapWrapper(this);
     SetVideoConfigReq request;
     request.Configuration = confResponse.Configuration;
-    request.Configuration->Encoding = capabilities.isH264 ? onvifXsd__VideoEncoding__H264 : onvifXsd__VideoEncoding__JPEG;
+    switch (capabilities.encoding)
+    {
+        case UnderstandableVideoCodec::JPEG:
+            request.Configuration->Encoding = onvifXsd__VideoEncoding::JPEG;
+            break;
+        case UnderstandableVideoCodec::H264:
+            request.Configuration->Encoding = onvifXsd__VideoEncoding::H264;
+            break;
+        default:
+            // ONVIF Media1 interface doesn't support other codecs
+            // (except MPEG4, but VMS doesn't support it), so we use JPEG in this case,
+            // because it is usually supported by all devices
+            request.Configuration->Encoding = onvifXsd__VideoEncoding::JPEG;
+    }
+
     request.ForcePersistence = false;
     SetVideoConfigResp response;
 
@@ -85,17 +89,19 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
         while (soapRes != SOAP_OK && --retryCount >= 0)
         {
             soapRes = soapWrapper.setVideoEncoderConfiguration(request, response);
-            if (soapRes != SOAP_OK) {
-                if (soapWrapper.isConflictError()) {
+            if (soapRes != SOAP_OK)
+            {
+                if (soapWrapper.lastErrorIsConflict())
+                {
                     continue;
                 }
 
                 qWarning() << "QnPlSonyResource::updateResourceCapabilities: can't set video encoder options (token="
-                    << confToken.c_str() << ") from camera (URL: " << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
-                    << "). GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
+                    << confToken.c_str() << ") from camera (URL: " << soapWrapper.endpoint() << ", UniqueId: " << getUniqueId()
+                    << "). GSoap error code: " << soapRes << ". " << soapWrapper.getLastErrorDescription();
                 return CameraDiagnostics::RequestFailedResult(
                     lit("setVideoEncoderConfiguration(%1x%2)").arg(it->width()).arg(it->height()),
-                    soapWrapper.getLastError() );
+                    soapWrapper.getLastErrorDescription() );
             }
         }
 
@@ -108,7 +114,7 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
     }
 
     if (soapRes != SOAP_OK)
-        return CameraDiagnostics::RequestFailedResult( lit("setVideoEncoderConfiguration"), soapWrapper.getLastError() );
+        return CameraDiagnostics::RequestFailedResult( lit("setVideoEncoderConfiguration"), soapWrapper.getLastErrorDescription() );
 
     if (triesNumLeft == MAX_RESOLUTION_DECREASES_NUM) {
         return CameraDiagnostics::NoErrorResult();
@@ -124,7 +130,7 @@ CameraDiagnostics::Result QnPlSonyResource::customInitialization(
     CameraDiagnostics::Result result = CameraDiagnostics::NoErrorResult();
 
     //if no input, exiting
-    if( !hasCameraCapabilities(Qn::RelayInputCapability) )
+    if( !hasCameraCapabilities(Qn::InputPortCapability) )
         return result;
 
     QAuthenticator auth = getAuth();
@@ -145,16 +151,9 @@ CameraDiagnostics::Result QnPlSonyResource::customInitialization(
     return CameraDiagnostics::NoErrorResult();
 }
 
-bool QnPlSonyResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
+void QnPlSonyResource::startInputPortStatesMonitoring()
 {
     QnMutexLocker lk( &m_inputPortMutex );
-
-    if( hasFlags(Qn::foreigner) ||      //we do not own camera
-        !hasCameraCapabilities(Qn::RelayInputCapability) )
-    {
-        return false;
-    }
-
     if( m_inputMonitorHttpClient )
     {
         m_inputMonitorHttpClient->pleaseStopSync();
@@ -188,10 +187,9 @@ bool QnPlSonyResource::startInputPortMonitoringAsync( std::function<void(bool)>&
     m_inputMonitorHttpClient->setUserName( auth.user() );
     m_inputMonitorHttpClient->setUserPassword( auth.password() );
     m_inputMonitorHttpClient->doGet( requestUrl );
-    return true;
 }
 
-void QnPlSonyResource::stopInputPortMonitoringAsync()
+void QnPlSonyResource::stopInputPortStatesMonitoring()
 {
     nx::network::http::AsyncHttpClientPtr inputMonitorHttpClient;
     {
@@ -203,17 +201,11 @@ void QnPlSonyResource::stopInputPortMonitoringAsync()
         inputMonitorHttpClient->pleaseStopSync();
 }
 
-bool QnPlSonyResource::isInputPortMonitored() const
-{
-    QnMutexLocker lk( &m_inputPortMutex );
-    return m_inputMonitorHttpClient.get() != NULL;
-}
-
 void QnPlSonyResource::onMonitorResponseReceived( AsyncHttpClientPtr httpClient )
 {
     QnMutexLocker lk( &m_inputPortMutex );
 
-    if( m_inputMonitorHttpClient != httpClient )    //this can happen just after stopInputPortMonitoringAsync() call
+    if( m_inputMonitorHttpClient != httpClient )    //this can happen just after stopInputPortStatesMonitoring() call
         return;
 
     if( (m_inputMonitorHttpClient->response()->statusLine.statusCode / 100) * 100 != StatusCode::ok )
@@ -269,7 +261,7 @@ void QnPlSonyResource::onMonitorMessageBodyAvailable( AsyncHttpClientPtr httpCli
             continue;
         prevPortState = currentPortState;
 
-        emit cameraInput(
+        emit inputPortStateChanged(
             toSharedPointer(),
             QString::number(inputPortIndex),
             currentPortState,

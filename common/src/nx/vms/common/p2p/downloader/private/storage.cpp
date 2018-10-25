@@ -436,6 +436,10 @@ ResultCode Storage::deleteFileInternal(const QString& fileName, bool deleteData)
             if (!dir.rmdir(name))
                 break;
         }
+        else
+        {
+            break;
+        }
     }
 
     m_fileInformationByName.erase(it);

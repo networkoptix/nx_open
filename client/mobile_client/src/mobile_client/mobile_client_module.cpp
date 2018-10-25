@@ -100,9 +100,6 @@ QnMobileClientModule::QnMobileClientModule(
     commonModule->setModuleGUID(QnUuid::createUuid());
     nx::network::SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId("mc", commonModule->moduleGUID());
 
-    // TODO: #mu ON/OFF switch in settings?
-    nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
-
     // TODO: #mshevchenko Remove when client_core_module is created.
     commonModule->store(translationManager);
 

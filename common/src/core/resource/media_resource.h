@@ -73,7 +73,7 @@ public:
     void setOperationalPtzCapabilities(Ptz::Capabilities capabilites);
 
 
-    bool canDisableNativePtzPresets() const;
+    bool canSwitchPtzPresetTypes() const;
 
     /** Name of the resource property key intended for the CustomAspectRatio value storage. */
     static QString customAspectRatioKey();
@@ -97,11 +97,9 @@ protected:
     QnCameraUserAttributePool* userAttributesPool() const;
 protected:
     mutable QnCustomResourceVideoLayoutPtr m_customVideoLayout;
-    //QnMediaDewarpingParams m_dewarpingParams;
-
+    mutable QnMutex m_layoutMutex;
 private:
     mutable QString m_cachedLayout;
-    mutable QnMutex m_layoutMutex;
 };
 
 #endif // QN_MEDIA_RESOURCE_H

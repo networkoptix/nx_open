@@ -32,13 +32,20 @@ struct Information
     QString version;
     QString cloudHost;
     QString eulaLink;
+    // This is EULA text for offline update package.
+    // We need to be able to show this data without internet.
+    QString eulaContents;
     int eulaVersion = 0;
     QString releaseNotesUrl;
+    // This is release notes for offline update package.
+    // We need to be able to show this data without internet.
+    QString releaseNotesContents;
     QList<Package> packages;
 
     bool isValid() const { return !version.isNull(); }
 };
-#define Information_Fields (version)(cloudHost)(eulaLink)(eulaVersion)(releaseNotesUrl)(packages)
+
+#define Information_Fields (version)(cloudHost)(eulaLink)(eulaContents)(eulaVersion)(releaseNotesUrl)(releaseNotesContents)(packages)
 QN_FUSION_DECLARE_FUNCTIONS(Information, (xml)(csv_record)(ubjson)(json))
 
 enum class InformationError
@@ -50,7 +57,9 @@ enum class InformationError
     brokenPackageError,
     missingPackageError,
     incompatibleCloudHostError,
-    notFoundError
+    incompatibleVersion,
+    notFoundError,
+    noNewVersion,
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(InformationError, (lexical))

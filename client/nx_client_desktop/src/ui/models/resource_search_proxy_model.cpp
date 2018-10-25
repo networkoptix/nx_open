@@ -11,6 +11,7 @@
 #include <ui/models/resource/resource_tree_model.h>
 
 #include <nx/client/desktop/resource_views/data/node_type.h>
+#include <nx/client/desktop/resources/search_helper.h>
 
 using namespace nx::client::desktop;
 
@@ -26,15 +27,34 @@ QnResourceSearchQuery QnResourceSearchProxyModel::query() const
     return m_query;
 }
 
-void QnResourceSearchProxyModel::setQuery(const QnResourceSearchQuery& query)
+QModelIndex QnResourceSearchProxyModel::setQuery(const QnResourceSearchQuery& query)
 {
     if (m_query == query)
-        return;
+        return m_currentRootNode;
 
     m_query = query;
 
     setFilterWildcard(L'*' + query.text + L'*');
     invalidateFilterLater();
+
+    m_currentRootNode =
+        [this]()
+        {
+            if (m_query.allowedNode == QnResourceSearchQuery::kAllowAllNodeTypes)
+                return QModelIndex();
+
+            const int count = rowCount();
+            if (!count)
+                return QModelIndex();
+
+            if (count == 1)
+                return index(0, 0);
+
+            NX_ASSERT(false, "There should not be more than one root node.");
+            return QModelIndex();
+        }();
+
+    return m_currentRootNode;
 }
 
 QnResourceSearchProxyModel::DefaultBehavior QnResourceSearchProxyModel::defaultBehavor() const
@@ -71,7 +91,9 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
     int sourceRow,
     const QModelIndex& sourceParent) const
 {
-    const bool searchMode = !m_query.text.isEmpty();
+    const bool searchMode = !m_query.text.isEmpty()
+        || m_query.allowedNode != QnResourceSearchQuery::kAllowAllNodeTypes;
+
     if (!searchMode && m_defaultBehavior != DefaultBehavior::showAll)
         return false;
 
@@ -96,6 +118,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
         case NodeType::userResources:
         case NodeType::layouts:
         case NodeType::users:
+        case NodeType::otherSystems:
             if (searchMode)
                 return false;
             break;
@@ -123,6 +146,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
             NodeType::layoutTours,
             NodeType::filteredVideowalls,
             NodeType::webPages,
+            NodeType::analyticsEngines,
             NodeType::filteredUsers,
             NodeType::localResources});
 
@@ -172,11 +196,14 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
             if (filterAcceptsRow(i, index))
                 return true;
         }
-        return false;
     }
 
+    const auto resource = QnResourceSearchProxyModel::resource(index);
+    if (!resource)
+        return false;
+
     // Simply filter by text first.
-    if (!base_type::filterAcceptsRow(sourceRow, root))
+    if (!resources::search_helper::matches(m_query.text, resource))
         return false;
 
     // Check if no further filtering is required.
@@ -184,8 +211,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
         return true;
 
     // Show only resources with given flags.
-    const auto resource = QnResourceSearchProxyModel::resource(index);
-    return resource && resource->hasFlags(m_query.flags);
+    return resource->hasFlags(m_query.flags);
 }
 
 

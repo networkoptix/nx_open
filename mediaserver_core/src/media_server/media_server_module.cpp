@@ -47,8 +47,8 @@
 #include <nx/mediaserver/event/event_message_bus.h>
 #include <nx/mediaserver/unused_wallpapers_watcher.h>
 #include <nx/mediaserver/license_watcher.h>
-#include <nx/mediaserver/metadata/manager_pool.h>
-#include <nx/mediaserver/metadata/event_rule_watcher.h>
+#include <nx/mediaserver/analytics/manager.h>
+#include <nx/mediaserver/analytics/event_rule_watcher.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
 #include <nx/mediaserver/resource/camera.h>
 #include <nx/mediaserver/root_fs.h>
@@ -81,6 +81,11 @@
 #include <recorder/schedule_sync.h>
 #include "media_server_process.h"
 #include <camera/camera_error_processor.h>
+#include "media_server_resource_searchers.h"
+#include <plugins/resource/upnp/global_settings_to_device_searcher_settings_adapter.h>
+#include <core/resource_management/mserver_resource_discovery_manager.h>
+#include "server_connector.h"
+#include "resource_status_watcher.h"
 
 using namespace nx;
 using namespace nx::mediaserver;
@@ -145,7 +150,7 @@ QnMediaServerModule::QnMediaServerModule(const nx::mediaserver::CmdLineArguments
     const auto rwSettingsPath = arguments->rwConfigFilePath;
 
     Q_INIT_RESOURCE(mediaserver_core);
-    Q_INIT_RESOURCE(appserver2);
+    Q_INIT_RESOURCE(mediaserver_db);
     nx::mediaserver::MetaTypes::initialize();
 
     m_settings = store(new MSSettings(roSettingsPath, rwSettingsPath));
@@ -177,7 +182,6 @@ QnMediaServerModule::QnMediaServerModule(const nx::mediaserver::CmdLineArguments
             enforcedMediatorEndpoint,
             enforcedMediatorEndpoint);
     }
-    nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
 
     store(new QnNewSystemServerFlagWatcher(commonModule()));
     m_unusedWallpapersWatcher = store(new nx::mediaserver::UnusedWallpapersWatcher(commonModule()));
@@ -240,8 +244,8 @@ QnMediaServerModule::QnMediaServerModule(const nx::mediaserver::CmdLineArguments
     m_eventRuleProcessor = store(new nx::mediaserver::event::ExtendedRuleProcessor(this));
     m_eventConnector = store(new nx::mediaserver::event::EventConnector(this));
 
-    m_metadataRuleWatcher = store(new nx::mediaserver::metadata::EventRuleWatcher(this));
-    m_metadataManagerPool = store(new nx::mediaserver::metadata::ManagerPool(this));
+    m_analyticsEventRuleWatcher = store(new nx::mediaserver::analytics::EventRuleWatcher(this));
+    m_analyticsManager = store(new nx::mediaserver::analytics::Manager(this));
 
     m_sharedContextPool = store(new nx::mediaserver::resource::SharedContextPool(this));
     m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher(this));
@@ -250,14 +254,10 @@ QnMediaServerModule::QnMediaServerModule(const nx::mediaserver::CmdLineArguments
     auto dataDir = settings().dataDir();
     m_motionHelper = store(new QnMotionHelper(settings().dataDir(), this));
 
-
-
     m_resourceCommandProcessor.reset(new QnResourceCommandProcessor());
 
     store(new nx::mediaserver_core::recorder::WearableArchiveSynchronizer(this));
-
     store(new QnWearableLockManager(this));
-
     store(new QnWearableUploadManager(this));
 
     m_serverDb = store(new QnServerDb(this));
@@ -268,8 +268,22 @@ QnMediaServerModule::QnMediaServerModule(const nx::mediaserver::CmdLineArguments
 
     m_recordingManager = store(new QnRecordingManager(this, nullptr)); //< Mutex manager disabled
 
-    m_hostSystemPasswordSynchronizer = store(new HostSystemPasswordSynchronizer(commonModule()));
-    m_cameraErrorProcessor = store(new nx::mediaserver::camera::ErrorProcessor(this));
+    m_hostSystemPasswordSynchronizer = store(new HostSystemPasswordSynchronizer(this));
+    m_cameraErrorProcessor = store(new nx::mediaserver::camera::ErrorProcessor());
+
+    commonModule()->setResourceDiscoveryManager(
+        new QnMServerResourceDiscoveryManager(this));
+
+    m_mdnsListener.reset(new QnMdnsListener());
+    auto settingsToDeviceSearcherSettingsAdaptor =
+        std::make_unique<GlobalSettingsToDeviceSearcherSettingsAdapter>(commonModule()->resourceDiscoveryManager());
+    m_upnpDeviceSearcher = std::make_unique<nx::network::upnp::DeviceSearcher>(
+        std::move(settingsToDeviceSearcherSettingsAdaptor));
+    m_resourceSearchers.reset(new QnMediaServerResourceSearchers(this));
+    m_serverConnector = store(new QnServerConnector(commonModule()));
+    m_statusWatcher = store(new QnResourceStatusWatcher(commonModule()));
+
+    m_hlsSessionPool = store(new nx::mediaserver::hls::SessionPool());
 
     // Translations must be installed from the main application thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
@@ -301,6 +315,13 @@ void QnMediaServerModule::stop()
     stopLongRunnables();
     m_recordingManager->stop();
     m_videoCameraPool->stop();
+    m_serverConnector->stop();
+    m_statusWatcher->stop();
+
+    m_upnpDeviceSearcher->pleaseStop();
+
+    resourceDiscoveryManager()->stop();
+    m_licenseWatcher->stop();
 }
 
 void QnMediaServerModule::stopLongRunnables()
@@ -392,14 +413,15 @@ PluginManager* QnMediaServerModule::pluginManager() const
     return m_pluginManager;
 }
 
-nx::mediaserver::metadata::ManagerPool* QnMediaServerModule::metadataManagerPool() const
+nx::mediaserver::analytics::Manager* QnMediaServerModule::analyticsManager() const
 {
-    return m_metadataManagerPool;
+    return m_analyticsManager;
 }
 
-nx::mediaserver::metadata::EventRuleWatcher* QnMediaServerModule::metadataRuleWatcher() const
+nx::mediaserver::analytics::EventRuleWatcher* QnMediaServerModule::analyticsEventRuleWatcher()
+    const
 {
-    return m_metadataRuleWatcher;
+    return m_analyticsEventRuleWatcher;
 }
 
 nx::mediaserver::resource::SharedContextPool* QnMediaServerModule::sharedContextPool() const
@@ -561,4 +583,44 @@ QnResourceDiscoveryManager* QnMediaServerModule::resourceDiscoveryManager() cons
 nx::mediaserver::camera::ErrorProcessor* QnMediaServerModule::cameraErrorProcessor() const
 {
     return m_cameraErrorProcessor;
+}
+
+QnMediaServerResourceSearchers* QnMediaServerModule::resourceSearchers() const
+{
+    return m_resourceSearchers.get();
+}
+
+QnPlatformAbstraction* QnMediaServerModule::platform() const
+{
+    return m_platform;
+}
+
+void QnMediaServerModule::setPlatform(QnPlatformAbstraction* platform)
+{
+    m_platform = platform;
+}
+
+QnServerConnector* QnMediaServerModule::serverConnector() const
+{
+    return m_serverConnector;
+}
+
+QnResourceStatusWatcher* QnMediaServerModule::statusWatcher() const
+{
+    return m_statusWatcher;
+}
+
+QnMdnsListener* QnMediaServerModule::mdnsListener() const
+{
+    return m_mdnsListener.get();
+}
+
+nx::network::upnp::DeviceSearcher* QnMediaServerModule::upnpDeviceSearcher() const
+{
+    return m_upnpDeviceSearcher.get();
+}
+
+nx::mediaserver::hls::SessionPool* QnMediaServerModule::hlsSessionPool() const
+{
+    return m_hlsSessionPool;
 }

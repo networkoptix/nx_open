@@ -12,6 +12,7 @@
 #include <nx/utils/software_version.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/system_information.h>
+#include <nx/vms/api/analytics/engine_manifest.h>
 
 namespace nx {
 namespace network {
@@ -22,8 +23,6 @@ class AsyncHttpClientPtr;
 } // namespace nx
 } // namespace network
 } // namespace http
-
-namespace nx { namespace api { struct AnalyticsDriverManifest; } }
 
 class QnMediaServerResource:
     public QnResource,
@@ -40,8 +39,6 @@ public:
 
     //!Overrides \a QnResource::getName. Returns camera name from \a QnMediaServerUserAttributes
     virtual QString getName() const override;
-
-    virtual QStringList searchFilters() const override;
 
     //!Overrides \a QnResource::setName. Writes name to \a QnMediaServerUserAttributes
     virtual void setName( const QString& name ) override;
@@ -113,8 +110,8 @@ public:
 
     nx::vms::api::ModuleInformationWithAddresses getModuleInformationWithAddresses() const;
 
-    QList<nx::api::AnalyticsDriverManifest> analyticsDrivers() const;
-    void setAnalyticsDrivers(const QList<nx::api::AnalyticsDriverManifest>& drivers);
+    QList<nx::vms::api::analytics::EngineManifest> analyticsDrivers() const;
+    void setAnalyticsDrivers(const QList<nx::vms::api::analytics::EngineManifest>& drivers);
 
     QString getAuthKey() const;
     void setAuthKey(const QString& value);
@@ -177,7 +174,7 @@ private:
     QString m_authKey;
 
     CachedValue<Qn::PanicMode> m_panicModeCache;
-    CachedValue<QList<nx::api::AnalyticsDriverManifest>> m_analyticsDriversCache;
+    CachedValue<QList<nx::vms::api::analytics::EngineManifest>> m_analyticsDriversCache;
 
     mutable QnResourcePtr m_firstCamera;
 

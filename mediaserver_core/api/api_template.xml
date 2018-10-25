@@ -270,9 +270,10 @@
                 <function>
                     <name>transactionBus</name>
                     <description>Allows third-party systems to get an access to the Nx Media Server transaction bus.
-                        Third-part peer should undergo usual (the same as when accessing Server API or System API) authentication process before using WebSocket connection. Transaction format is JSON.
+                        A third-party peer should undergo usual (the same as when accessing Server API or System API) authentication process before using WebSocket connection.
+                        Transactions are transferred in JSON format by default.
                         <br/>
-                    Example: wc://10.0.2.1/ec2/transactionBus
+                        Example: ws://10.0.2.1/ec2/transactionBus
                     </description>
                     <method></method>
                     <params/>

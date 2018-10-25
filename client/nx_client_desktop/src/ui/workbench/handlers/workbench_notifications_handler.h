@@ -12,7 +12,6 @@
 
 #include <utils/common/connective.h>
 
-class QnWorkbenchUserEmailWatcher;
 class QnBusinessEventsFilterResourcePropertyAdaptor;
 
 class QnWorkbenchNotificationsHandler:
@@ -47,20 +46,10 @@ public slots:
 
 private slots:
     void at_context_userChanged();
-    void at_userEmailValidityChanged(const QnUserResourcePtr &user, bool isValid);
-
     void at_eventManager_actionReceived(const nx::vms::event::AbstractActionPtr& action);
-
-    void at_settings_valueChanged(int id);
-    void at_emailSettingsChanged();
 
 private:
     void addNotification(const nx::vms::event::AbstractActionPtr& businessAction);
-
-    /**
-     * Check that system health message can be displayed to admins only.
-     */
-    bool adminOnlyMessage(QnSystemHealth::MessageType message);
 
     void setSystemHealthEventVisible(QnSystemHealth::MessageType message, bool visible);
     void setSystemHealthEventVisible(QnSystemHealth::MessageType message,
@@ -69,15 +58,11 @@ private:
     void setSystemHealthEventVisibleInternal(QnSystemHealth::MessageType message,
         const QVariant& params, bool visible);
 
-    void checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message);
-
     void handleAcknowledgeEventAction();
 
     void handleFullscreenCameraAction(const nx::vms::event::AbstractActionPtr& action);
     void handleExitFullscreenAction(const nx::vms::event::AbstractActionPtr& action);
 
 private:
-    QnWorkbenchUserEmailWatcher* m_userEmailWatcher;
     QnBusinessEventsFilterResourcePropertyAdaptor* m_adaptor;
-    QSet<QnSystemHealth::MessageType> m_popupSystemHealthFilter;
 };

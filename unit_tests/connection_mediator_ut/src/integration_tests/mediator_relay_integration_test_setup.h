@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 
 #include <relay/relay_cluster_client_factory.h>
 #include <test_support/mediaserver_emulator.h>
@@ -26,7 +27,7 @@ protected:
     void givenListeningServer();
     void issueConnectRequest();
     void assertTrafficRelayUrlHasBeenReported();
-    boost::optional<nx::String> reportedTrafficRelayUrl();
+    std::optional<nx::String> reportedTrafficRelayUrl();
 
 private:
     const QUrl m_relayUrl;
@@ -40,7 +41,7 @@ private:
     std::unique_ptr<MediaServerEmulator> m_mediaServerEmulator;
     RelayClusterClientFactory::Function m_factoryFuncBak;
 
-    virtual boost::optional<api::SystemCredentials> getSystemCredentials() const override;
+    virtual std::optional<api::SystemCredentials> getSystemCredentials() const override;
 
     std::unique_ptr<AbstractRelayClusterClient> createRelayClusterClient(
         const conf::Settings& /*settings*/);

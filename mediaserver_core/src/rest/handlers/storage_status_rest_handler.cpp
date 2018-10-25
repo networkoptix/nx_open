@@ -20,12 +20,15 @@
 
 namespace {
 
-QnStorageStatusReply createReply(const QnStorageResourcePtr& storage)
+QnStorageStatusReply createReply(
+    QnMediaServerModule* serverModule,
+    const QnStorageResourcePtr& storage)
 {
     QnStorageStatusReply reply;
     reply.status = storage->initOrUpdate();
     reply.storage.url  = storage->getUrl();
     reply.storage = QnStorageSpaceData(storage, false);
+    reply.storage.storageStatus = QnStorageManager::storageStatus(serverModule, storage);
 
     QnFileStorageResourcePtr fileStorage = storage.dynamicCast<QnFileStorageResource>();
     if (fileStorage)
@@ -81,12 +84,12 @@ int QnStorageStatusRestHandler::executeGet(
     QString storageUrl;
 
     if(!requireParameter(params, lit("path"), result, &storageUrl))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     auto storage = getOrCreateStorage(storageUrl);
     if (!storage)
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
-    result.setReply(createReply(storage));
+    result.setReply(createReply(serverModule(), storage));
     return nx::network::http::StatusCode::ok;
 }

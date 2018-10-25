@@ -2,12 +2,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-if(MSVC)
-    # Visual Studio 2017 currently (15.5.x) ignores "set(CMAKE_CXX_STANDARD 17)".
-    # So we need to set c++17 support explicitly.
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
-endif(MSVC)
-
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 if(developerBuild)
@@ -30,8 +24,6 @@ add_definitions(
     -DENABLE_SSL
     -DENABLE_SENDMAIL
     -DENABLE_DATA_PROVIDERS
-    -DENABLE_SOFTWARE_MOTION_DETECTION
-
     -DBOOST_BIND_NO_PLACEHOLDERS
 )
 
@@ -45,7 +37,6 @@ endif()
 if(ANDROID OR IOS)
     remove_definitions(
         -DENABLE_SENDMAIL
-        -DENABLE_SOFTWARE_MOTION_DETECTION
     )
 endif()
 
@@ -142,7 +133,6 @@ if(UNIX)
 
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         add_compile_options(
-            -Wno-error=dangling-else
             -Wno-error=maybe-uninitialized
             -Wno-psabi
         )

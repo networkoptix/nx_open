@@ -26,30 +26,26 @@ CameraDiagnostics::Result QnFlexWatchResource::initializeCameraDriver()
 
 CameraDiagnostics::Result QnFlexWatchResource::fetchUpdateVideoEncoder()
 {
-    QAuthenticator auth = getAuth();
-    MediaSoapWrapper soapWrapper(
-        onvifTimeouts(),
-        getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), getTimeDrift());
-
+    MediaSoapWrapper soapWrapper(this);
     VideoConfigsReq request;
     VideoConfigsResp response;
 
     int soapRes = soapWrapper.getVideoEncoderConfigurations(request, response);
     if (soapRes != SOAP_OK) {
         qCritical() << "QnOnvifStreamReader::fetchUpdateVideoEncoder: can't get video encoders from camera ("
-            << ") Gsoap error: " << soapRes << ". Description: " << soapWrapper.getLastError()
-            << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << getUniqueId();
+            << ") Gsoap error: " << soapRes << ". Description: " << soapWrapper.getLastErrorDescription()
+            << ". URL: " << soapWrapper.endpoint() << ", uniqueId: " << getUniqueId();
         return CameraDiagnostics::UnknownErrorResult();
     }
 
     bool needReboot = false;
     for (uint i = 0; i < response.Configurations.size(); ++i)
     {
-        if (response.Configurations[i]->Encoding != onvifXsd__VideoEncoding__H264)
+        if (response.Configurations[i]->Encoding != onvifXsd__VideoEncoding::H264)
         {
             needReboot = true;
 
-            response.Configurations[i]->Encoding = onvifXsd__VideoEncoding__H264;
+            response.Configurations[i]->Encoding = onvifXsd__VideoEncoding::H264;
             VideoEncoder* encoder = response.Configurations[i];
             if (encoder->H264 == 0)
                 encoder->H264 = m_tmpH264Conf;

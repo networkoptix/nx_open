@@ -1,17 +1,20 @@
 import logging
 from abc import ABCMeta, abstractmethod
+from contextlib import contextmanager
 from datetime import datetime
 
 import six
 from netaddr import IPAddress
 from pathlib2 import PureWindowsPath
-from typing import Callable, ContextManager, Optional, Type
+from typing import Callable, ContextManager, Mapping, Optional, Type
 
 from framework.networking.interface import Networking
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
+from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.local_path import LocalPath
 from framework.os_access.path import FileSystemPath
 from framework.os_access.traffic_capture import TrafficCapture
+from framework.threaded import ThreadedCall
 from framework.utils import RunningTime
 
 _DEFAULT_DOWNLOAD_TIMEOUT_SEC = 30 * 60
@@ -31,6 +34,10 @@ class _AllPorts(object):
 
 @six.add_metaclass(ABCMeta)
 class Time(object):
+    @abstractmethod
+    def get_tz(self):
+        pass
+
     @abstractmethod
     def get(self):  # type: () -> RunningTime
         pass
@@ -154,19 +161,67 @@ class OSAccess(object):
     def make_fake_disk(self, name, size_bytes):
         return self.path_cls()
 
+    @abstractmethod
+    def _fs_root(self):
+        return self.path_cls()
+
     def _disk_space_holder(self):  # type: () -> FileSystemPath
-        return self.path_cls.tmp() / 'space_holder.tmp'
+        return self._fs_root() / 'space_holder.tmp'
 
     @abstractmethod
-    def free_disk_space_bytes(self):  # type: () -> int
+    def _free_disk_space_bytes_on_all(self):  # type: () -> Mapping[FileSystemPath, int]
         pass
 
+    def free_disk_space_bytes(self):  # type: () -> int
+        result_on_all = self._free_disk_space_bytes_on_all()
+        return result_on_all[self._fs_root()]
+
     @abstractmethod
-    def consume_disk_space(self, should_leave_bytes):  # type: (int) -> None
+    def _hold_disk_space(self, to_consume_bytes):  # type: (int) -> None
         pass
 
     def cleanup_disk_space(self):
-        self._disk_space_holder().unlink()
+        try:
+            self._disk_space_holder().unlink()
+        except DoesNotExist:
+            pass
+
+    def _limit_free_disk_space(self, should_leave_bytes):  # type: (int) -> ...
+        delta_bytes = self.free_disk_space_bytes() - should_leave_bytes
+        if delta_bytes > 0:
+            try:
+                current_size = self._disk_space_holder().size()
+            except DoesNotExist:
+                current_size = 0
+            total_bytes = delta_bytes + current_size
+            self._hold_disk_space(total_bytes)
+
+    @contextmanager
+    def free_disk_space_limited(self, should_leave_bytes, interval_sec=1):
+        # type: (int, float) -> ContextManager[...]
+        """Try to maintain limited free disk space while in this context.
+
+        One-time allocation (reservation) of disk space is not enough. OS or other software
+        (Mediaserver) may free disk space by deletion of temporary files or archiving other files,
+        especially as reaction on low free disk space, limiting of which is the point of this
+        function. That's why disk space is reallocated one time per second in case some space is
+        freed by OS or software. Hence the thread.
+
+        Disk space is never given back while in this context as it makes the main point of
+        free space limiting useless. Disk space is limited to make impossible for tested software
+        create large file but, if disk space were given back, it would be possible to write file
+        chunk by chunk.
+        """
+        self._limit_free_disk_space(should_leave_bytes)
+
+        def target():
+            self._limit_free_disk_space(should_leave_bytes)
+
+        try:
+            with ThreadedCall.periodic(target, interval_sec, interval_sec + 1):
+                yield
+        finally:
+            self.cleanup_disk_space()
 
     def download(self, source_url, destination_dir, timeout_sec=_DEFAULT_DOWNLOAD_TIMEOUT_SEC):
         _logger.info("Download %s to %r.", source_url, destination_dir)

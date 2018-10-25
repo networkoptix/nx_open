@@ -15,7 +15,7 @@ QnActiStreamReader::QnActiStreamReader(
     const QnActiResourcePtr& res)
     :
     CLServerPushStreamReader(res),
-    m_multiCodec(res),
+    m_multiCodec(res, res->getTimeOffset()),
     m_actiRes(res)
 {
 }

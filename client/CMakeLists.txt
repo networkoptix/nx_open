@@ -6,6 +6,7 @@ if(withDesktopClient)
     find_package(Qt5
         COMPONENTS
             OpenGL
+            Svg
             QuickWidgets
             WebKit
             WebKitWidgets)
@@ -32,8 +33,4 @@ endif()
 
 if(withScreenChecker)
     add_subdirectory(screen_checker)
-endif()
-
-if(withPaxtonPlugin)
-    add_subdirectory(paxton_plugin)
 endif()

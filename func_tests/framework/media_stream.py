@@ -68,7 +68,7 @@ class Rtsp(object):
         self.password = password
 
     def load_archive_stream_metadata(self, artifact_factory, pos=None, duration=None):
-        temp_file_path = artifact_factory(name='media-avi', artifact_type=AVI_ARTIFACT_TYPE).produce_file_path()
+        temp_file_path = artifact_factory.make_artifact(name='media-avi', artifact_type=AVI_ARTIFACT_TYPE).produce_file_path()
         _logger.info('RTSP request: %r', self.url)
         from_cap = cv2.VideoCapture(self.url)
         assert from_cap.isOpened(), 'Failed to open RTSP url: %r' % self.url
@@ -154,7 +154,7 @@ class Webm(object):
         self.password = password
 
     def load_archive_stream_metadata(self, artifact_factory, pos=None, duration=None):
-        temp_file_path = artifact_factory(name='media-webm', artifact_type=WEBM_ARTIFACT_TYPE).produce_file_path()
+        temp_file_path = artifact_factory.make_artifact(name='media-webm', artifact_type=WEBM_ARTIFACT_TYPE).produce_file_path()
         params = dict(pos=0)
         metadata = load_stream_metadata_from_http(
             'webm', self.url, self.user, self.password, params, temp_file_path)
@@ -171,7 +171,7 @@ class DirectHls(object):
     def load_archive_stream_metadata(self, artifact_factory, pos, duration):
         assert isinstance(pos, datetime), repr(pos)
         assert isinstance(duration, timedelta), repr(duration)
-        temp_file_path = artifact_factory(name='media-mkv', artifact_type=MKV_ARTIFACT_TYPE).produce_file_path()
+        temp_file_path = artifact_factory.make_artifact(name='media-mkv', artifact_type=MKV_ARTIFACT_TYPE).produce_file_path()
         pos_ms = int(datetime_utc_to_timestamp(pos) * 1000)
         duration_sec = int(duration.total_seconds() + 1)  # round to next value
         params = dict(pos=pos_ms, duration=duration_sec)
@@ -232,7 +232,7 @@ class M3uHlsMediaMetainfoLoader(object):
 
     def _process_media_response(self, response):
         self.file_counter += 1
-        artifact_factory = self.artifact_factory(
+        artifact_factory = self.artifact_factory.make_artifact(
             [str(self.file_counter)], name='media-%d-mpeg' % self.file_counter, artifact_type=MPEG_ARTIFCT_TYPE)
         temp_file_path = artifact_factory.produce_file_path()
         metadata = load_stream_metadata_from_http_response('hls', response, temp_file_path)

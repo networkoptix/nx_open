@@ -129,12 +129,15 @@ bool setMainLogger(std::unique_ptr<AbstractLogger> logger)
     return true;
 }
 
-bool addLogger(std::unique_ptr<AbstractLogger> logger)
+bool addLogger(
+    std::unique_ptr<AbstractLogger> logger,
+    bool writeLogHeader)
 {
     if (s_isConfigurationLocked)
         return false;
 
-    logger->writeLogHeader();
+    if (writeLogHeader)
+        logger->writeLogHeader();
 
     loggerCollection()->add(std::move(logger));
     return true;

@@ -9,6 +9,7 @@
 #include <core/resource/layout_item_data.h>
 
 #include <utils/common/threadsafe_item_storage.h>
+#include <utils/crypt/encryptable.h>
 #include <common/common_globals.h>
 
 /**
@@ -19,7 +20,9 @@
  * 2) Shared layouts. They can be accessible to several users. ParentId is null.
  * 3) Service layouts. These can have server id or videowall id as parentId.
 */
-class QnLayoutResource: public QnResource,
+class QnLayoutResource:
+    public QnResource,
+    public nx::utils::Encryptable,
     private QnThreadsafeItemStorageNotifier<QnLayoutItemData>
 {
     Q_OBJECT
@@ -40,8 +43,6 @@ public:
 
     /** Create a new layout with a given resource on it. */
     static QnLayoutResourcePtr createFromResource(const QnResourcePtr& resource);
-
-    virtual QStringList searchFilters() const override;
 
     void setItems(const QnLayoutItemDataList &items);
 
@@ -135,6 +136,17 @@ public:
 
     /** Get all resources placed on the layout. WARNING: method is SLOW! */
     static QSet<QnResourcePtr> layoutResources(QnResourcePool* resourcePool, const QnLayoutItemDataMap& items);
+
+    /**
+     * Propagate password to child AviResource storages.
+     * No checking because data roles are inaccessible here.
+     */
+    void usePasswordForRecordings(const QString& password);
+    /**
+     * Makes layout children to forget its password.
+     * Layout password is kept because it in data roles that are inaccessible here
+     */
+    void forgetPasswordForRecordings();
 
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);

@@ -84,7 +84,7 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     if (role == Qn::ConnectionRole::CR_Archive)
         m_rtpReader.setTimePolicy(nx::streaming::rtp::TimePolicy::forceCameraTime);
     else
-        m_rtpReader.setTimePolicy(nx::streaming::rtp::TimePolicy::ignoreCameraTimeIfBigJitter);
+        m_rtpReader.setTimePolicy(nx::streaming::rtp::TimePolicy::bindCameraTimeToLocalTime);
 
     if (!m_rateControlEnabled)
         m_rtpReader.addRequestHeader(lit("PLAY"), nx::network::http::HttpHeader("Rate-Control", "no"));
@@ -118,7 +118,7 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(const QnLiveStreamPa
     const auto profileNumber = m_hanwhaResource->profileByRole(role);
     if (!isCorrectProfile(profileNumber))
     {
-        return CameraDiagnostics::CameraPluginErrorResult(
+        return CameraDiagnostics::CameraInvalidParams(
             lit("Update profile: invalid profile number is given"));
     }
 

@@ -2,7 +2,8 @@
 
 #include <fstream>
 #include <memory>
-#include <list>
+#include <map>
+#include <string>
 
 #include <QtCore/QString>
 
@@ -29,6 +30,7 @@ public:
 
     MediaServerLauncher(
         const QString& tmpDir = QString(),
+        int port = 0,
         DisabledFeatures disabledFeatures = DisabledFeature::all);
     ~MediaServerLauncher();
 
@@ -38,7 +40,7 @@ public:
     QnMediaServerModule* serverModule() const;
     nx::mediaserver::Authenticator* authenticator() const;
 
-    void addSetting(const QString& name, const QVariant& value);
+    void addSetting(const std::string& name, const QVariant& value);
 
     /**
      * Run media server at the current thread
@@ -70,6 +72,7 @@ signals:
     void started();
 private:
     void prepareToStart();
+    void fillDefaultSettings();
 
     std::ofstream m_configFile;
     nx::ut::utils::WorkDirResource m_workDirResource;
@@ -78,6 +81,6 @@ private:
     //nx::utils::thread m_mediaServerProcessThread;
     std::unique_ptr<MediaServerProcess> m_mediaServerProcess;
     bool m_firstStartup;
-    std::list<std::pair<QString, QString>> m_customSettings;
+    std::map<std::string, QString> m_settings;
     QnUuid m_serverGuid;
 };

@@ -3,7 +3,7 @@
 #include <rest/server/fusion_rest_handler.h>
 
 namespace nx::mediaserver { class Settings; }
-class UpdateInformationRequestData;
+struct UpdateInformationRequestData;
 
 class QnUpdateInformationRestHandler: public QnFusionRestHandler
 {

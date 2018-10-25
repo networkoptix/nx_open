@@ -27,7 +27,6 @@
 #include "av_resource.h"
 #include "av_panoramic.h"
 #include "av_singesensor.h"
-#include <common/static_common_module.h>
 
 const QString QnPlAreconVisionResource::MANUFACTURE(lit("ArecontVision"));
 #define MAX_RESPONSE_LEN (4*1024)
@@ -36,8 +35,6 @@ QnPlAreconVisionResource::QnPlAreconVisionResource(QnMediaServerModule* serverMo
     nx::mediaserver::resource::Camera(serverModule),
     m_totalMdZones(64),
     m_zoneSite(8),
-    m_channelCount(0),
-    m_prevMotionChannel(0),
     m_dualsensor(false),
     m_inputPortState(false),
     m_advancedParametersProvider{this}
@@ -225,10 +222,10 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initializeCameraDriver()
     if (zone_size<1)
         zone_size = 1;
 
-    if (qnStaticCommon->dataPool()->data(toSharedPointer(this)).value<bool>(lit("hasRelayInput"), true))
-        setCameraCapability(Qn::RelayInputCapability, true);
-    if (qnStaticCommon->dataPool()->data(toSharedPointer(this)).value<bool>(lit("hasRelayOutput"), true))
-        setCameraCapability(Qn::RelayOutputCapability, true);
+    if (resourceData().value<bool>(lit("hasRelayInput"), true))
+        setCameraCapability(Qn::InputPortCapability, true);
+    if (resourceData().value<bool>(lit("hasRelayOutput"), true))
+        setCameraCapability(Qn::OutputPortCapability, true);
 
     setFirmware(firmwareVersion);
     saveParams();
@@ -236,10 +233,8 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initializeCameraDriver()
     setApiParameter(lit("mdzonesize"), QString::number(zone_size));
     m_zoneSite = zone_size;
     setMotionMaskPhysical(0);
-
-    m_channelCount = getVideoLayout(0)->channelCount();
     m_dualsensor = isDualSensor();
-
+    setCameraCapability(Qn::CameraTimeCapability, isRTSPSupported());
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -267,7 +262,7 @@ void QnPlAreconVisionResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
 }
 
-bool QnPlAreconVisionResource::setRelayOutputState(
+bool QnPlAreconVisionResource::setOutputPortState(
     const QString& /*ouputID*/,
     bool activate,
     unsigned int autoResetTimeoutMS)
@@ -328,66 +323,6 @@ int QnPlAreconVisionResource::totalMdZones() const
 bool QnPlAreconVisionResource::isH264() const
 {
     return getProperty(lit("Codec")) == lit("H.264");
-}
-
-QnMetaDataV1Ptr QnPlAreconVisionResource::getCameraMetadata()
-{
-    QnMetaDataV1Ptr motion(new QnMetaDataV1());
-    QString mdresult;
-    if (m_channelCount == 1)
-    {
-        if (!getApiParameter(QLatin1String("mdresult"), mdresult))
-            return QnMetaDataV1Ptr(0);
-    }
-    else
-    {
-        if (!getParamPhysical2(m_prevMotionChannel+1, QLatin1String("mdresult"), mdresult))
-            return QnMetaDataV1Ptr(0);
-        motion->channelNumber = m_prevMotionChannel;
-        ++m_prevMotionChannel;
-        if (m_prevMotionChannel == m_channelCount)
-            m_prevMotionChannel = 0;
-    }
-
-    if (mdresult == lit("no motion"))
-        return motion; // no motion detected
-
-    int zones = totalMdZones() == 1024 ? 32 : 8;
-
-    QStringList md = mdresult.split(L' ', QString::SkipEmptyParts);
-    if (md.size() < zones*zones)
-        return QnMetaDataV1Ptr(0);
-
-    int pixelZoneSize = getZoneSite() * 32;
-    if (pixelZoneSize == 0)
-        return QnMetaDataV1Ptr(0);
-
-    QVariant maxSensorWidth = getProperty(lit("MaxSensorWidth"));
-    QVariant maxSensorHight = getProperty(lit("MaxSensorHeight"));
-
-    QRect imageRect(0, 0, maxSensorWidth.toInt(), maxSensorHight.toInt());
-    QRect zeroZoneRect(0, 0, pixelZoneSize, pixelZoneSize);
-
-    for (int x = 0; x < zones; ++x)
-    {
-        for (int y = 0; y < zones; ++y)
-        {
-            int index = y*zones + x;
-            QString m = md.at(index);
-
-            if (m == lit("00") || m == lit("0"))
-                continue;
-
-            QRect currZoneRect = zeroZoneRect.translated(x*pixelZoneSize, y*pixelZoneSize);
-
-            motion->mapMotion(imageRect, currZoneRect);
-
-        }
-    }
-
-    //motion->m_duration = META_DATA_DURATION_MS * 1000 ;
-    motion->m_duration = 1000 * 1000 * 1000; // 1000 sec
-    return motion;
 }
 
 QString QnPlAreconVisionResource::generateRequestString(
@@ -645,8 +580,7 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
     }
 }
 
-bool QnPlAreconVisionResource::startInputPortMonitoringAsync(
-    std::function<void(bool)>&& completionHandler)
+void QnPlAreconVisionResource::startInputPortStatesMonitoring()
 {
     nx::utils::Url url;
     url.setScheme(lit("http"));
@@ -662,20 +596,13 @@ bool QnPlAreconVisionResource::startInputPortMonitoringAsync(
 
     m_relayInputClient = nx::network::http::AsyncHttpClient::create();
     connect(m_relayInputClient.get(), &nx::network::http::AsyncHttpClient::done,
-            this,
-            [this, completionHandler](nx::network::http::AsyncHttpClientPtr client) {
-                if (completionHandler)
-                    completionHandler(
-                        client->response() &&
-                        client->response()->statusLine.statusCode == nx::network::http::StatusCode::ok);
-                inputPortStateRequestDone(std::move(client));
-            },
+            this, [this](auto client) { inputPortStateRequestDone(std::move(client)); },
             Qt::DirectConnection);
+
     m_relayInputClient->doGet(url);
-    return true;
 }
 
-void QnPlAreconVisionResource::stopInputPortMonitoringAsync()
+void QnPlAreconVisionResource::stopInputPortStatesMonitoring()
 {
     m_relayInputClient.reset();
 }
@@ -701,7 +628,7 @@ void QnPlAreconVisionResource::inputPortStateRequestDone(
     if (m_inputPortState != portEnabled)
     {
         m_inputPortState = portEnabled;
-        emit cameraInput(
+        emit inputPortStateChanged(
             toSharedPointer(),
             lit("1"),
             m_inputPortState,
@@ -719,7 +646,7 @@ void QnPlAreconVisionResource::inputPortStateRequestDone(
 
 bool QnPlAreconVisionResource::isRTSPSupported() const
 {
-    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = resourceData();
     auto arecontRtspIsAllowed = qnGlobalSettings->arecontRtspEnabled();
     auto cameraSupportsH264 = isH264();
     auto cameraSupportsRtsp = resData.value<bool>(lit("isRTSPSupported"), true);
@@ -766,33 +693,6 @@ std::vector<QnPlAreconVisionResource::AdvancedParametersProvider*>
     QnPlAreconVisionResource::advancedParametersProviders()
 {
     return {&m_advancedParametersProvider};
-}
-
-bool QnPlAreconVisionResource::getParamPhysical2(int channel, const QString& name, QString &val)
-{
-    m_mutex.lock();
-    m_mutex.unlock();
-    QUrl devUrl(getUrl());
-
-    CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
-    QString request = QLatin1String("get") + QString::number(channel) + QLatin1String("?") + name;
-
-    CLHttpStatus status = connection.doGET(request);
-    if (status == CL_HTTP_AUTH_REQUIRED)
-        setStatus(Qn::Unauthorized);
-
-    if (status != CL_HTTP_SUCCESS)
-        return false;
-
-    QByteArray response;
-    connection.readAll(response);
-    int index = response.indexOf('=');
-    if (index==-1)
-        return false;
-
-    val = QLatin1String(response.mid(index+1));
-
-    return true;
 }
 
 #endif

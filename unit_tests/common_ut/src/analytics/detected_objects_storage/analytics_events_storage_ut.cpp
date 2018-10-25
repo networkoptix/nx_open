@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/random.h>
+#include <nx/utils/std/algorithm.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
@@ -170,7 +171,7 @@ protected:
             for (const auto& object: packet->objects)
             {
                 DetectedObject detectedObject;
-                detectedObject.objectId = object.objectId;
+                detectedObject.objectAppearanceId = object.objectId;
                 detectedObject.objectTypeId = object.objectTypeId;
                 detectedObject.attributes = object.labels;
                 detectedObject.track.push_back(ObjectPosition());
@@ -189,7 +190,7 @@ protected:
             result.begin(), result.end(),
             [](const DetectedObject& left, const DetectedObject& right)
             {
-                return left.objectId < right.objectId;
+                return left.objectAppearanceId < right.objectAppearanceId;
             });
 
         for (auto it = result.begin(); it != result.end();)
@@ -198,7 +199,7 @@ protected:
             if (nextIter == result.end())
                 break;
 
-            if (it->objectId == nextIter->objectId)
+            if (it->objectAppearanceId == nextIter->objectAppearanceId)
             {
                 // Merging.
                 it->firstAppearanceTimeUsec =
@@ -334,7 +335,7 @@ protected:
                     : leftValue > rightValue;
             });
 
-        // Sorting objects in packets by objectId.
+        // Sorting objects in packets by objectAppearanceId.
         for (auto& packet: packets)
         {
             std::sort(
@@ -500,7 +501,7 @@ private:
     bool satisfiesFilter(
         const Filter& filter, const DetectedObject& detectedObject)
     {
-        if (!filter.objectId.isNull() && detectedObject.objectId != filter.objectId)
+        if (!filter.objectAppearanceId.isNull() && detectedObject.objectAppearanceId != filter.objectAppearanceId)
             return false;
 
         if (!filter.objectTypeId.empty() &&
@@ -537,11 +538,11 @@ private:
         const Filter& filter,
         const common::metadata::DetectionMetadataPacket& data)
     {
-        if (!filter.objectId.isNull())
+        if (!filter.objectAppearanceId.isNull())
         {
             bool hasRequiredObject = false;
             for (const auto& object: data.objects)
-                hasRequiredObject |= object.objectId == filter.objectId;
+                hasRequiredObject |= object.objectId == filter.objectAppearanceId;
             if (!hasRequiredObject)
                 return false;
         }
@@ -583,7 +584,7 @@ private:
     template<typename T>
     bool satisfiesCommonConditions(const Filter& filter, const T& data)
     {
-        if (!filter.deviceId.isNull() && data.deviceId != filter.deviceId)
+        if (!filter.deviceIds.empty() && !nx::utils::contains(filter.deviceIds, data.deviceId))
             return false;
 
         if (!filter.timePeriod.isNull() &&
@@ -658,7 +659,8 @@ protected:
     void addRandomKnownDeviceIdToFilter()
     {
         ASSERT_FALSE(allowedDeviceIds().empty());
-        m_filter.deviceId = nx::utils::random::choice(allowedDeviceIds());
+        m_filter.deviceIds.push_back(
+            nx::utils::random::choice(allowedDeviceIds()));
     }
 
     void addRandomNonEmptyTimePeriodToFilter()
@@ -687,7 +689,7 @@ protected:
     {
         const auto& randomPacket = nx::utils::random::choice(analyticsDataPackets());
         const auto& randomObject = nx::utils::random::choice(randomPacket->objects);
-        m_filter.objectId = randomObject.objectId;
+        m_filter.objectAppearanceId = randomObject.objectId;
     }
 
     void addRandomObjectTypeIdToFilter()
@@ -751,11 +753,22 @@ protected:
             addRandomTextFoundInDataToFilter();
     }
 
+    void givenRandomFilterWithMultipleDeviceIds()
+    {
+        givenRandomFilter();
+
+        m_filter.deviceIds.clear();
+        for (const auto& deviceId: allowedDeviceIds())
+            m_filter.deviceIds.push_back(deviceId);
+
+        m_filter.objectAppearanceId = QnUuid();
+    }
+    
     void givenObjectWithLongTrack()
     {
         using namespace std::chrono;
 
-        m_specificObjectId = QnUuid::createUuid();
+        m_specificObjectAppearanceId = QnUuid::createUuid();
         auto analyticsDataPackets = generateEventsByCriteria();
 
         qint64 objectTrackStartTime = std::numeric_limits<qint64>::max();
@@ -769,8 +782,8 @@ protected:
 
             for (auto& object: packet->objects)
             {
-                object.objectId = m_specificObjectId;
-                object.objectTypeId = m_specificObjectId.toString();
+                object.objectId = m_specificObjectAppearanceId;
+                object.objectTypeId = m_specificObjectAppearanceId.toString();
             }
         }
 
@@ -836,7 +849,7 @@ protected:
 
     void whenLookupWithMaxTrackLengthLimit()
     {
-        m_filter.objectId = m_specificObjectId;
+        m_filter.objectAppearanceId = m_specificObjectAppearanceId;
         addMaxTrackLengthLimitToFilter();
         //m_filter.maxTrackSize = 1;
 
@@ -857,7 +870,7 @@ protected:
 
     void whenLookupByRandomNonEmptyTimePeriodCoveringPartOfTrack()
     {
-        m_filter.objectId = m_specificObjectId;
+        m_filter.objectAppearanceId = m_specificObjectAppearanceId;
         m_filter.timePeriod.setStartTime(
             m_specificObjectTimePeriod.startTime() + m_specificObjectTimePeriod.duration() / 3);
         m_filter.timePeriod.setDuration(m_specificObjectTimePeriod.duration() / 3);
@@ -878,7 +891,7 @@ protected:
 
 private:
     Filter m_filter;
-    QnUuid m_specificObjectId;
+    QnUuid m_specificObjectAppearanceId;
     QnTimePeriod m_specificObjectTimePeriod;
 
     void generateVariousEvents()
@@ -998,6 +1011,13 @@ TEST_F(AnalyticsEventsStorageLookup, lookup_stress_test)
 
     whenLookupObjects();
 
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsEventsStorageLookup, quering_data_from_multiple_cameras)
+{
+    givenRandomFilterWithMultipleDeviceIds();
+    whenLookupObjects();
     thenResultMatchesExpectations();
 }
 

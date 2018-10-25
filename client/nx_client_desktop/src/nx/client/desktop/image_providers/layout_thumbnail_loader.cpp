@@ -462,7 +462,7 @@ void LayoutThumbnailLoader::setFontColor(const QColor& value)
     setPaletteColor(d->noDataWidget.data(), QPalette::WindowText, value);
 }
 
-void LayoutThumbnailLoader::setResourcePool(const QPointer<QnResourcePool>& pool)
+void LayoutThumbnailLoader::setResourcePool(QnResourcePool* pool)
 {
     m_resourcePool = pool;
 }

@@ -50,6 +50,9 @@ PeerWrapper::PeerWrapper(const QString& dataDir):
 {
     m_ownerCredentials.username = "admin";
     m_ownerCredentials.authToken = nx::network::http::PasswordAuthToken("admin");
+
+    const auto moduleGuid = QnUuid::createUuid().toSimpleString().toStdString();
+    m_process.addArg("-moduleGuid", moduleGuid.c_str());
 }
 
 void PeerWrapper::addSetting(const std::string& name, const std::string& value)
@@ -62,6 +65,11 @@ bool PeerWrapper::startAndWaitUntilStarted()
     const QString dbFileArg = lm("--dbFile=%1/db.dir").args(m_dataDir);
     m_process.addArg(dbFileArg.toStdString().c_str());
     return m_process.startAndWaitUntilStarted();
+}
+
+void PeerWrapper::stop()
+{
+    m_process.stop();
 }
 
 bool PeerWrapper::configureAsLocalSystem()
@@ -123,12 +131,20 @@ bool PeerWrapper::detachFromSystem()
     return mserverClient->detachFromSystem(data).error == QnRestResult::Error::NoError;
 }
 
-QnRestResult::Error PeerWrapper::mergeTo(const PeerWrapper& remotePeer)
+QnRestResult::Error PeerWrapper::mergeTo(
+    const PeerWrapper& remotePeer,
+    std::vector<MergeAttributes::Attribute> attributes)
 {
     MergeSystemData mergeSystemData;
     mergeSystemData.takeRemoteSettings = true;
     mergeSystemData.mergeOneServer = false;
     mergeSystemData.ignoreIncompatible = false;
+
+    for (const auto& attribute: attributes)
+    {
+        if (attribute.name == MergeAttributes::AttributeName::takeRemoteSettings)
+            mergeSystemData.takeRemoteSettings = attribute.value.toBool();
+    }
 
     AuthKey authKey;
     authKey.username = m_ownerCredentials.username.toUtf8();
@@ -193,8 +209,8 @@ nx::utils::test::ModuleLauncher<Appserver2Process>& PeerWrapper::process()
     return m_process;
 }
 
-bool PeerWrapper::areAllPeersHaveSameTransactionLog(
-    const std::vector<std::unique_ptr<PeerWrapper>>& peers)
+bool PeerWrapper::allPeersHaveSameTransactionLog(
+    std::vector<const PeerWrapper*> peers)
 {
     std::vector<::ec2::ApiTransactionDataList> transactionLogs;
     for (const auto& server: peers)
@@ -230,8 +246,20 @@ bool PeerWrapper::areAllPeersHaveSameTransactionLog(
     return allLogsAreEqual;
 }
 
-bool PeerWrapper::arePeersInterconnected(
+bool PeerWrapper::allPeersHaveSameTransactionLog(
     const std::vector<std::unique_ptr<PeerWrapper>>& peers)
+{
+    std::vector<const PeerWrapper*> peerPtrs;
+    std::transform(
+        peers.begin(), peers.end(),
+        std::back_inserter(peerPtrs),
+        [](const std::unique_ptr<PeerWrapper>& peer) { return peer.get(); });
+
+    return allPeersHaveSameTransactionLog(peerPtrs);
+}
+
+bool PeerWrapper::peersInterconnected(
+    std::vector<const PeerWrapper*> peers)
 {
     // For now just checking that each peer is connected to every other.
 
@@ -258,6 +286,18 @@ bool PeerWrapper::arePeersInterconnected(
     }
 
     return true;
+}
+
+bool PeerWrapper::peersInterconnected(
+    const std::vector<std::unique_ptr<PeerWrapper>>& peers)
+{
+    std::vector<const PeerWrapper*> peerPtrs;
+    std::transform(
+        peers.begin(), peers.end(),
+        std::back_inserter(peerPtrs),
+        [](const std::unique_ptr<PeerWrapper>& peer) { return peer.get(); });
+
+    return peersInterconnected(peerPtrs);
 }
 
 std::unique_ptr<MediaServerClientEx> PeerWrapper::prepareMediaServerClient() const

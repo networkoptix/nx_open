@@ -22,7 +22,7 @@ bool ObjectPosition::operator==(const ObjectPosition& right) const
 
 bool DetectedObject::operator==(const DetectedObject& right) const
 {
-    return objectId == right.objectId
+    return objectAppearanceId == right.objectAppearanceId
         && objectTypeId == right.objectTypeId
         //&& attributes == right.attributes
         && firstAppearanceTimeUsec == right.firstAppearanceTimeUsec
@@ -40,7 +40,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 bool Filter::operator==(const Filter& right) const
 {
     return objectTypeId == right.objectTypeId
-        && objectId == right.objectId
+        && objectAppearanceId == right.objectAppearanceId
         && timePeriod == right.timePeriod
         && equalWithPrecision(boundingBox, right.boundingBox, 6)
         && requiredAttributes == right.requiredAttributes
@@ -55,14 +55,14 @@ bool Filter::operator!=(const Filter& right) const
 
 void serializeToParams(const Filter& filter, QnRequestParamList* params)
 {
-    if (!filter.deviceId.isNull())
-        params->insert(lit("deviceId"), filter.deviceId.toSimpleString());
+    for (const auto deviceId: filter.deviceIds)
+        params->insert(lit("deviceId"), deviceId.toSimpleString());
 
     for (const auto& objectTypeId: filter.objectTypeId)
         params->insert(lit("objectTypeId"), objectTypeId);
 
-    if (!filter.objectId.isNull())
-        params->insert(lit("objectId"), filter.objectId.toSimpleString());
+    if (!filter.objectAppearanceId.isNull())
+        params->insert(lit("objectAppearanceId"), filter.objectAppearanceId.toSimpleString());
 
     params->insert(lit("startTime"), QnLexical::serialized(filter.timePeriod.startTimeMs));
     params->insert(lit("endTime"), QnLexical::serialized(filter.timePeriod.endTimeMs()));
@@ -95,14 +95,14 @@ void serializeToParams(const Filter& filter, QnRequestParamList* params)
 
 bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
 {
-    if (params.contains(lit("deviceId")))
-        filter->deviceId = QnUuid::fromStringSafe(params.value(lit("deviceId")));
+    for (const auto& deviceIdStr: params.allValues(lit("deviceId")))
+        filter->deviceIds.push_back(QnUuid::fromStringSafe(deviceIdStr));
 
     for (const auto& objectTypeId: params.allValues(lit("objectTypeId")))
         filter->objectTypeId.push_back(objectTypeId);
 
-    if (params.contains(lit("objectId")))
-        filter->objectId = QnUuid::fromStringSafe(params.value(lit("objectId")));
+    if (params.contains(lit("objectAppearanceId")))
+        filter->objectAppearanceId = QnUuid::fromStringSafe(params.value(lit("objectAppearanceId")));
 
     filter->timePeriod = QnTimePeriod::fromInterval(
         QnLexical::deserialized<qint64>(params.value(lit("startTime"))),
@@ -135,6 +135,9 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
     if (params.contains(lit("limit")))
         filter->maxObjectsToSelect = params.value(lit("limit")).toInt();
 
+    if (params.contains(lit("maxObjectsToSelect")))
+        filter->maxObjectsToSelect = params.value(lit("maxObjectsToSelect")).toInt();
+
     if (params.contains(lit("maxTrackSize")))
         filter->maxTrackSize = params.value(lit("maxTrackSize")).toInt();
 
@@ -143,12 +146,12 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
 
 ::std::ostream& operator<<(::std::ostream& os, const Filter& filter)
 {
-    if (!filter.deviceId.isNull())
-        os << "deviceId " << filter.deviceId.toSimpleString().toStdString() << "; ";
+    for (const auto& deviceId: filter.deviceIds)
+        os << "deviceId " << deviceId.toSimpleString().toStdString() << "; ";
     if (!filter.objectTypeId.empty())
         os << "objectTypeId " << lm("%1").container(filter.objectTypeId).toStdString() << "; ";
-    if (!filter.objectId.isNull())
-        os << "objectId " << filter.objectId.toSimpleString().toStdString() << "; ";
+    if (!filter.objectAppearanceId.isNull())
+        os << "objectAppearanceId " << filter.objectAppearanceId.toSimpleString().toStdString() << "; ";
     os << "timePeriod [" << filter.timePeriod.startTimeMs << ", " <<
         filter.timePeriod.durationMs << "]; ";
     if (!filter.boundingBox.isNull())
@@ -161,6 +164,11 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
     }
     if (!filter.freeText.isEmpty())
         os << "freeText \"" << filter.freeText.toStdString() << "\"; ";
+
+    os << "maxObjectsToSelect " << filter.maxObjectsToSelect << "; ";
+    os << "maxTrackSize " << filter.maxTrackSize << "; ";
+    os << "sortOrder " << 
+        (filter.sortOrder == Qt::SortOrder::DescendingOrder ? "DESC" : "ASC");
 
     return os;
 }

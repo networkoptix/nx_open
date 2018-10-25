@@ -8,9 +8,12 @@
 #include <common/common_module.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
+#include <common/common_module.h>
+#include <media_server/media_server_module.h>
 
-
-QnStatisticsRestHandler::QnStatisticsRestHandler(): QnJsonRestHandler()
+QnStatisticsRestHandler::QnStatisticsRestHandler(QnMediaServerModule* serverModule):
+    QnJsonRestHandler(),
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
 }
 
@@ -33,7 +36,7 @@ int QnStatisticsRestHandler::executeGet(
     }
 
     QnStatisticsReply reply;
-    auto monitor = qnPlatform->monitor();
+    auto monitor = serverModule()->platform()->monitor();
     reply.updatePeriod = monitor->updatePeriodMs();
     reply.uptimeMs = monitor->upTimeMs();
 

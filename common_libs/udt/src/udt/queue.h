@@ -142,7 +142,7 @@ private:
 
 struct CSNode
 {
-    CUDT* m_pUDT;        // Pointer to the instance of CUDT socket
+    std::weak_ptr<CUDT> m_pUDT;        // Pointer to the instance of CUDT socket
     uint64_t m_llTimeStamp;      // Time Stamp
 
     int m_iHeapLoc;        // location on the heap, -1 means not on the heap
@@ -166,7 +166,7 @@ public:
     // Returned value:
     //    None.
 
-    void insert(int64_t ts, CUDT* u);
+    void insert(int64_t ts, std::shared_ptr<CUDT> u);
 
     // Functionality:
     //    Update the timestamp of the UDT instance on the list.
@@ -176,7 +176,7 @@ public:
     // Returned value:
     //    None.
 
-    void update(CUDT* u, bool reschedule = true);
+    void update(std::shared_ptr<CUDT> u, bool reschedule = true);
 
     // Functionality:
     //    Retrieve the next packet and peer address from the first entry, and reschedule it in the queue.
@@ -207,7 +207,7 @@ public:
     uint64_t getNextProcTime();
 
 private:
-    void insert_(int64_t ts, CUDT* u);
+    void insert_(int64_t ts, std::shared_ptr<CUDT> u);
     void remove_(CUDT* u);
 
 private:
@@ -229,7 +229,7 @@ private:
 
 struct CRNode
 {
-    CUDT* m_pUDT;                // Pointer to the instance of CUDT socket
+    std::weak_ptr<CUDT> m_pUDT;                // Pointer to the instance of CUDT socket
     uint64_t m_llTimeStamp;      // Time Stamp
 
     CRNode* m_pPrev;             // previous link
@@ -253,7 +253,7 @@ public:
     // Returned value:
     //    None.
 
-    void insert(CUDT* u);
+    void insert(std::shared_ptr<CUDT> u);
 
     // Functionality:
     //    Remove the UDT instance from the list.
@@ -262,7 +262,7 @@ public:
     // Returned value:
     //    None.
 
-    void remove(CUDT* u);
+    void remove(std::shared_ptr<CUDT> u);
 
     // Functionality:
     //    Move the UDT instance to the end of the list, if it already exists; otherwise, do nothing.
@@ -271,7 +271,7 @@ public:
     // Returned value:
     //    None.
 
-    void update(CUDT* u);
+    void update(std::shared_ptr<CUDT> u);
 
 public:
     CRNode* m_pUList;        // the head node
@@ -308,7 +308,7 @@ public:
     // Returned value:
     //    Pointer to a UDT instance, or NULL if not found.
 
-    CUDT* lookup(int32_t id);
+    std::shared_ptr<CUDT> lookup(int32_t id);
 
     // Functionality:
     //    Insert an entry to the hash table.
@@ -318,7 +318,7 @@ public:
     // Returned value:
     //    None.
 
-    void insert(int32_t id, CUDT* u);
+    void insert(int32_t id, std::shared_ptr<CUDT> u);
 
     // Functionality:
     //    Remove an entry from the hash table.
@@ -333,7 +333,7 @@ private:
     struct CBucket
     {
         int32_t m_iID;        // Socket ID
-        CUDT* m_pUDT;        // Socket instance
+        std::shared_ptr<CUDT> m_pUDT;        // Socket instance
 
         CBucket* m_pNext;        // next bucket
     } **m_pBucket;        // list of buckets (the hash table)
@@ -352,9 +352,9 @@ public:
     ~CRendezvousQueue();
 
 public:
-    void insertToRQ(const UDTSOCKET& id, CUDT* u, int ipv, const sockaddr* addr, uint64_t ttl);
+    void insertToRQ(const UDTSOCKET& id, std::shared_ptr<CUDT> u, int ipv, const sockaddr* addr, uint64_t ttl);
     void removeFromRQ(const UDTSOCKET& id);
-    CUDT* retrieveFromRQ(const sockaddr* addr, UDTSOCKET& id);
+    std::shared_ptr<CUDT> retrieveFromRQ(const sockaddr* addr, UDTSOCKET& id);
 
     void updateConnStatus();
 
@@ -362,21 +362,18 @@ private:
     struct CRL
     {
         UDTSOCKET m_iID;            // UDT socket ID (self)
-        CUDT* m_pUDT;            // UDT instance
+        std::shared_ptr<CUDT> m_pUDT;            // UDT instance
         int m_iIPversion;                 // IP version
         sockaddr* m_pPeerAddr;        // UDT sonnection peer address
         uint64_t m_ullTTL;            // the time that this request expires
     };
     std::list<CRL> m_lRendezvousID;      // The sockets currently in rendezvous mode
 
-    pthread_mutex_t m_RIDVectorLock;
+    std::mutex m_RIDVectorLock;
 };
 
 class CSndQueue
 {
-    friend class CUDT;
-    friend class CUDTUnited;
-
 public:
     CSndQueue();
     ~CSndQueue();
@@ -403,6 +400,12 @@ public:
 
     int sendto(const sockaddr* addr, CPacket& packet);
 
+    // List of UDT instances for data sending.
+    CSndUList* sndUList() { return m_pSndUList; }
+
+    // The UDP channel for data sending.
+    CChannel* channel() { return m_pChannel; }
+
 private:
     void worker();
 
@@ -425,9 +428,6 @@ private:
 
 class CRcvQueue
 {
-    friend class CUDT;
-    friend class CUDTUnited;
-
 public:
     CRcvQueue();
     ~CRcvQueue();
@@ -460,6 +460,19 @@ public:
 
     int recvfrom(int32_t id, CPacket& packet);
 
+    // TODO: #ak Remove following calls. CUDT should be passed in constructor and live longer.
+    int setListener(std::shared_ptr<ServerSideConnectionAcceptor> listener);
+    void removeListener(std::shared_ptr<ServerSideConnectionAcceptor> listener);
+
+    void registerConnector(const UDTSOCKET& id, std::shared_ptr<CUDT> u, int ipv, const sockaddr* addr, uint64_t ttl);
+    void removeConnector(const UDTSOCKET& id);
+
+    void setNewEntry(std::shared_ptr<CUDT> u);
+    std::shared_ptr<CUDT> getNewEntry();
+
+    // The received packet queue.
+    CUnitQueue* unitQueue() { return &m_UnitQueue; }
+
 private:
     void worker();
 
@@ -478,16 +491,7 @@ private:
     volatile bool m_bClosing;            // closing the workder
 
 private:
-    // TODO: #ak Remove following calls. CUDT should be passed in constructor and live longer.
-    int setListener(std::shared_ptr<ServerSideConnectionAcceptor> listener);
-    void removeListener(std::shared_ptr<ServerSideConnectionAcceptor> listener);
-
-    void registerConnector(const UDTSOCKET& id, CUDT* u, int ipv, const sockaddr* addr, uint64_t ttl);
-    void removeConnector(const UDTSOCKET& id);
-
-    void setNewEntry(CUDT* u);
     bool ifNewEntry();
-    CUDT* getNewEntry();
 
     void storePkt(int32_t id, CPacket* pkt);
 
@@ -496,7 +500,7 @@ private:
     std::shared_ptr<ServerSideConnectionAcceptor> m_listener;    // pointer to the (unique, if any) listening UDT entity
     CRendezvousQueue* m_pRendezvousQueue;                // The list of sockets in rendezvous mode
 
-    std::vector<CUDT*> m_vNewEntry;                      // newly added entries, to be inserted
+    std::vector<std::shared_ptr<CUDT>> m_vNewEntry;                      // newly added entries, to be inserted
     std::mutex m_IDLock;
 
     std::map<int32_t, std::queue<CPacket*> > m_mBuffer;  // temporary buffer for rendezvous connection request

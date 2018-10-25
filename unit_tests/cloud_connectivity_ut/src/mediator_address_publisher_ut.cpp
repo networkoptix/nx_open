@@ -114,7 +114,7 @@ public:
         m_cloudCredentials.key = QnUuid::createUuid().toSimpleByteArray();
     }
 
-    virtual boost::optional<hpm::api::SystemCredentials> getSystemCredentials() const override
+    virtual std::optional<hpm::api::SystemCredentials> getSystemCredentials() const override
     {
         return m_cloudCredentials;
     }
@@ -148,7 +148,8 @@ protected:
         m_publisher = std::make_unique<cloud::MediatorAddressPublisher>(
             std::make_unique<hpm::api::MediatorServerTcpConnection>(
                 m_stunClient,
-                &m_cloudCredentialsProvider));
+                &m_cloudCredentialsProvider),
+            &m_cloudCredentialsProvider);
     }
 
     void whenIssuedBindRequest()

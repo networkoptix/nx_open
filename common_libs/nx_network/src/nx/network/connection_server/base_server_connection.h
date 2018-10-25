@@ -73,15 +73,19 @@ template<
     using self_type = BaseServerConnection<CustomConnectionType>;
 
 public:
+    using OnConnectionClosedHandler = nx::utils::MoveOnlyFunc<void(
+        SystemError::ErrorCode /*closeReason*/,
+        CustomConnectionType* /*connection*/)>;
+
     /**
      * @param connectionManager When connection is finished,
      * connectionManager->closeConnection(closeReason, this) is called.
      */
     BaseServerConnection(
-        StreamConnectionHolder<CustomConnectionType>* connectionManager,
+        OnConnectionClosedHandler onConnectionClosedHandler,
         std::unique_ptr<AbstractStreamSocket> streamSocket)
         :
-        m_connectionManager(connectionManager),
+        m_onConnectionClosedHandler(std::move(onConnectionClosedHandler)),
         m_streamSocket(std::move(streamSocket)),
         m_bytesToSend(0),
         m_isSendingData(false)
@@ -168,9 +172,13 @@ public:
 
     void closeConnection(SystemError::ErrorCode closeReasonCode)
     {
-        m_connectionManager->closeConnection(
-            closeReasonCode,
-            static_cast<CustomConnectionType*>(this));
+        if (m_onConnectionClosedHandler)
+        {
+            nx::utils::swapAndCall(
+                m_onConnectionClosedHandler,
+                closeReasonCode,
+                static_cast<CustomConnectionType*>(this));
+        }
     }
 
     /**
@@ -236,13 +244,8 @@ protected:
         return m_streamSocket->getForeignAddress();
     }
 
-    StreamConnectionHolder<CustomConnectionType>* connectionManager()
-    {
-        return m_connectionManager;
-    }
-
 private:
-    StreamConnectionHolder<CustomConnectionType>* m_connectionManager;
+    OnConnectionClosedHandler m_onConnectionClosedHandler;
     std::unique_ptr<AbstractStreamSocket> m_streamSocket;
     nx::Buffer m_readBuffer;
     size_t m_bytesToSend;
@@ -307,9 +310,7 @@ private:
                 break;
 
             default:
-                m_connectionManager->closeConnection(
-                    errorCode,
-                    static_cast<CustomConnectionType*>(this));
+                closeConnection(errorCode);
                 break;
         }
 
@@ -347,25 +348,29 @@ private:
 class BaseServerConnectionHandler
 {
 public:
+    virtual ~BaseServerConnectionHandler() = default;
+
     virtual void bytesReceived(nx::Buffer& buffer) = 0;
     virtual void readyToSendData() = 0;
-
-    virtual ~BaseServerConnectionHandler() {}
 };
 
-class BaseServerConnectionWrapper :
+class BaseServerConnectionWrapper:
     public BaseServerConnection<BaseServerConnectionWrapper>
 {
     friend struct BaseServerConnectionAccess;
+
 public:
     BaseServerConnectionWrapper(
-        StreamConnectionHolder<BaseServerConnectionWrapper>* connectionManager,
+        OnConnectionClosedHandler onConnectionClosedHandler,
         std::unique_ptr<AbstractStreamSocket> streamSocket,
         BaseServerConnectionHandler* handler)
         :
-        BaseServerConnection<BaseServerConnectionWrapper>(connectionManager, std::move(streamSocket)),
+        BaseServerConnection<BaseServerConnectionWrapper>(
+            std::move(onConnectionClosedHandler),
+            std::move(streamSocket)),
         m_handler(handler)
-    {}
+    {
+    }
 
 private:
     void bytesReceived(nx::Buffer& buf)

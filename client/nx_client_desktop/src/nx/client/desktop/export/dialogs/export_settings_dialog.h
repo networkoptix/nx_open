@@ -3,6 +3,7 @@
 #include <functional>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource/camera_bookmark.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <ui/dialogs/common/button_box_dialog.h>
 #include <utils/common/connective.h>
@@ -22,6 +23,7 @@ namespace client {
 namespace desktop {
 
 class SelectableTextButton;
+class ExportPasswordWidget;
 struct ExportMediaSettings;
 struct ExportLayoutSettings;
 
@@ -67,10 +69,11 @@ public:
     void setLayout(const QnLayoutResourcePtr& layout);
     void setMediaParams(const QnMediaResourcePtr& mediaResource, const QnLayoutItemData& itemData,
         QnWorkbenchContext* context);
+    void setBookmarks(const QnCameraBookmarkList& bookmarks);
 private:
     SelectableTextButton* buttonForOverlayType(ExportOverlayType type);
     void setupSettingsButtons();
-    void updateSettingsWidgets();
+    void initSettingsWidgets();
     void updateMode();
     void updateTabWidgetSize();
     void updateAlerts(Mode mode, const QStringList& weakAlerts, const QStringList& severeAlerts);
@@ -86,6 +89,7 @@ private:
     QScopedPointer<Private> d;
     QScopedPointer<Ui::ExportSettingsDialog> ui;
     FileNameValidator isFileNameValid;
+    ExportPasswordWidget* m_passwordWidget;
 };
 
 } // namespace desktop

@@ -1,7 +1,5 @@
 #pragma once
 
-#if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
-
 #include <nx/streaming/archive_delegate_wrapper.h>
 #include <motion/motion_estimation.h>
 
@@ -31,5 +29,3 @@ private:
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // ENABLE_SOFTWARE_MOTION

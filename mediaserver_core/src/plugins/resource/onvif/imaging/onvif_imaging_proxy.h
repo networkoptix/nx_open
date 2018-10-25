@@ -32,9 +32,9 @@ private:
     bool makeSetRequest();
 
     QString getImagingUrl() const;
-    QString getLogin() const;
-    QString getPassword() const;
-    int getTimeDrift() const;
+    QString login() const;
+    QString password() const;
+    int timeDrift() const;
 
 private:
     ImagingSoapWrapper* m_rangesSoapWrapper;

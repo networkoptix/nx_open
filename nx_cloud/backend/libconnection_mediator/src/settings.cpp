@@ -71,6 +71,11 @@ const std::chrono::minutes kDefaultHttpInactivityTimeout(1);
 
 const QString kModuleName = lit("connection_mediator");
 
+//HTTPS
+const QLatin1String kHttpsEndpointsToListen("https/listenOn");
+
+const QLatin1String kHttpsCertificatePath("https/certificatePath");
+
 //Statistics
 const QLatin1String kStatisticsEnabled("stats/enabled");
 const QLatin1String kDefaultStatisticsEnabled("true");
@@ -195,6 +200,11 @@ const Http& Settings::http() const
     return m_http;
 }
 
+const Https& Settings::https() const
+{
+    return m_https;
+}
+
 const ConnectionParameters& Settings::connectionParameters() const
 {
     return m_connectionParameters;
@@ -292,9 +302,10 @@ void Settings::loadSettings()
             settings().value(kStunUdpEndpointsToListen).toString(),
             &m_stun.udpAddrToListenList);
     }
-
-    if (m_stun.udpAddrToListenList.empty())
+    else
+    {
         m_stun.udpAddrToListenList = m_stun.addrToListenList;
+    }
 
     m_stun.keepAliveOptions = network::KeepAliveOptions::fromString(
         settings().value(kStunKeepAliveOptions, kDefaultStunKeepAliveOptions).toString());
@@ -311,6 +322,8 @@ void Settings::loadSettings()
 
     m_http.connectionInactivityTimeout = nx::utils::parseOptionalTimerDuration(
         settings().value(kHttpConnectionInactivityTimeout).toString(), kDefaultHttpInactivityTimeout);
+
+    loadHttps();
 
     m_dbConnectionOptions.dbName = m_general.dataDir + "/" + m_dbConnectionOptions.dbName;
     m_dbConnectionOptions.loadFromSettings(settings());
@@ -437,14 +450,24 @@ void Settings::loadListeningPeer()
 
 void Settings::readEndpointList(
     const QString& str,
-    std::list<network::SocketAddress>* const addrToListenList)
+    std::vector<network::SocketAddress>* const addrToListenList)
 {
-    const QStringList& httpAddrToListenStrList = str.split(',');
+    const QStringList& httpAddrToListenStrList = str.split(',', QString::SkipEmptyParts);
     std::transform(
         httpAddrToListenStrList.begin(),
         httpAddrToListenStrList.end(),
         std::back_inserter(*addrToListenList),
         [](const QString& str) { return network::SocketAddress(str); });
+}
+
+void Settings::loadHttps()
+{
+    readEndpointList(
+        settings().value(kHttpsEndpointsToListen).toString(),
+        &m_https.endpoints);
+
+    m_https.certificatePath =
+        settings().value(kHttpsCertificatePath).toString().toStdString();
 }
 
 } // namespace conf

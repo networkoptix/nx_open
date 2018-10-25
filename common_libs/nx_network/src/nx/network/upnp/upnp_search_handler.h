@@ -11,6 +11,8 @@ namespace nx {
 namespace network {
 namespace upnp {
 
+class DeviceSearcher;
+
 /**
  * Receives discovered devices info.
  */
@@ -39,8 +41,11 @@ class NX_NETWORK_API SearchAutoHandler:
     public SearchHandler
 {
 public:
-    SearchAutoHandler(const QString& devType = QString());
+    SearchAutoHandler(
+        nx::network::upnp::DeviceSearcher* deviceSearcher, const QString& devType = QString());
     virtual ~SearchAutoHandler() override;
+private:
+    nx::network::upnp::DeviceSearcher* m_deviceSearcher = nullptr;
 };
 
 } // namespace nx

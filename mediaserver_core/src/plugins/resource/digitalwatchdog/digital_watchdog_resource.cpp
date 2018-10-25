@@ -10,7 +10,6 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 #include <plugins/resource/onvif/onvif_stream_reader.h>
-#include <common/static_common_module.h>
 #include <plugins/utils/xml_request_helper.h>
 #include <nx/utils/log/log.h>
 #include <camera/camera_pool.h>
@@ -192,8 +191,7 @@ bool QnDigitalWatchdogResource::isCproChipset() const
 
 bool QnDigitalWatchdogResource::useOnvifAdvancedParameterProviders() const
 {
-    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    return isCproChipset() || resData.value<bool>(lit("forceOnvifAdvancedParameters"));
+    return isCproChipset() || resourceData().value<bool>(lit("forceOnvifAdvancedParameters"));
 }
 
 std::unique_ptr<CLSimpleHTTPClient> QnDigitalWatchdogResource::httpClient() const
@@ -204,7 +202,7 @@ std::unique_ptr<CLSimpleHTTPClient> QnDigitalWatchdogResource::httpClient() cons
 
 bool QnDigitalWatchdogResource::isDualStreamingEnabled(bool& unauth)
 {
-    if (m_appStopping)
+    if (commonModule()->isNeedToStop())
         return false;
 
     auto http = httpClient();
@@ -243,7 +241,7 @@ CameraDiagnostics::Result QnDigitalWatchdogResource::initializeCameraDriver()
     bool unauth = false;
     if (!isDualStreamingEnabled(unauth) && unauth==false)
     {
-        if (m_appStopping)
+        if (commonModule()->isNeedToStop())
             return CameraDiagnostics::UnknownErrorResult();
 
         // The camera most likely is going to reset after enabling dual streaming
@@ -271,8 +269,7 @@ void QnDigitalWatchdogResource::enableOnvifSecondStream()
 
 bool QnDigitalWatchdogResource::disableB2FramesForActiDW()
 {
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    bool isRebrendedActiCamera = resourceData.value<bool>(lit("isRebrendedActiCamera"), false);
+    bool isRebrendedActiCamera = resourceData().value<bool>(lit("isRebrendedActiCamera"), false);
     if (!isRebrendedActiCamera)
         return true;
 
@@ -288,8 +285,7 @@ bool QnDigitalWatchdogResource::disableB2FramesForActiDW()
 
 QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal() const
 {
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    bool useHttpPtz = resourceData.value<bool>(lit("dw-http-ptz"), false);
+    bool useHttpPtz = resourceData().value<bool>(lit("dw-http-ptz"), false);
     QScopedPointer<QnAbstractPtzController> result;
     if (useHttpPtz)
     {
@@ -309,14 +305,13 @@ QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal(
 bool QnDigitalWatchdogResource::loadAdvancedParametersTemplate(
     QnCameraAdvancedParams& params) const
 {
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     if (useOnvifAdvancedParameterProviders())
     {
         // DW CPro chipset (or something else that has incompatible cgi interface).
         if (!base_type::loadAdvancedParametersTemplate(params))
             return false;
     }
-    else if (resourceData.value<bool>(lit("dw-pravis-chipset")))
+    else if (resourceData().value<bool>(lit("dw-pravis-chipset")))
     {
         if (!loadXmlParametersInternal(params, lit(":/camera_advanced_params/dw-pravis.xml")))
             return false;
@@ -334,16 +329,15 @@ static const QString kCproPrimaryVideoCodec = lit("cproPrimaryVideoCodec");
 static const QString kCproSecondaryVideoCodec = lit("cproSecondaryVideoCodec");
 static const QStringList kCproParameters{kCproPrimaryVideoCodec, kCproSecondaryVideoCodec};
 
-void QnDigitalWatchdogResource::initAdvancedParametersProviders(QnCameraAdvancedParams &params)
+void QnDigitalWatchdogResource::initAdvancedParametersProvidersUnderLock(QnCameraAdvancedParams &params)
 {
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     if (useOnvifAdvancedParameterProviders())
     {
-        base_type::initAdvancedParametersProviders(params);
+        base_type::initAdvancedParametersProvidersUnderLock(params);
         return;
     }
 
-    if (resourceData.value<bool>(lit("dw-pravis-chipset")))
+    if (resourceData().value<bool>(lit("dw-pravis-chipset")))
         m_cameraProxy.reset(new QnPravisCameraProxy(getHostAddress(), 80, getNetworkTimeout(), getAuth()));
     else
         m_cameraProxy.reset(new QnWin4NetCameraProxy(getHostAddress(), 80, getNetworkTimeout(), getAuth()));
@@ -390,8 +384,8 @@ QString QnDigitalWatchdogResource::fetchCameraModel()
     if (soapRes != SOAP_OK)
     {
         qWarning() << "QnDigitalWatchdogResource::fetchCameraModel: GetDeviceInformation SOAP to endpoint "
-            << soapWrapper.getEndpointUrl() << " failed. Camera name will remain 'Unknown'. GSoap error code: " << soapRes
-            << ". " << soapWrapper.getLastError() << ". Only base (base for DW) advanced settings will be available for this camera.";
+            << soapWrapper.endpoint() << " failed. Camera name will remain 'Unknown'. GSoap error code: " << soapRes
+            << ". " << soapWrapper.getLastErrorDescription() << ". Only base (base for DW) advanced settings will be available for this camera.";
 
         return QString();
     }
@@ -469,6 +463,10 @@ nx::mediaserver::resource::StreamCapabilityMap
 {
     using namespace nx::mediaserver::resource;
     auto onvifResult = base_type::getStreamCapabilityMapFromDrives(streamIndex);
+    return onvifResult;
+
+    // We use onvif to detect and tune codecs
+#if 0
     const auto codecs = m_cproApiClient->getSupportedVideoCodecs(streamIndex);
     if (!codecs)
         return onvifResult;
@@ -484,6 +482,7 @@ nx::mediaserver::resource::StreamCapabilityMap
         }
     }
     return result;
+#endif
 }
 
 CameraDiagnostics::Result QnDigitalWatchdogResource::sendVideoEncoderToCameraEx(
@@ -492,11 +491,15 @@ CameraDiagnostics::Result QnDigitalWatchdogResource::sendVideoEncoderToCameraEx(
     const QnLiveStreamParams& streamParams)
 {
     auto result = base_type::sendVideoEncoderToCameraEx(encoder, streamIndex, streamParams);
+    return result;
+
+#if 0
     if (!result)
         return result;
     if (!m_cproApiClient->setVideoCodec(streamIndex, streamParams.codec))
         NX_WARNING(this, lm("Failed to configure codec %1 for resource %2").args(streamParams.codec, getUrl()));
     return CameraDiagnostics::NoErrorResult();
+#endif
 }
 
 #endif //ENABLE_ONVIF

@@ -40,7 +40,7 @@ static void loadRemoteDataAsync(
             if (success)
             {
                 remoteData.serverId = server->getId();
-                remoteData.timeSinseEpochMs = timeData.utcTime;
+                remoteData.timeSinceEpochMs = timeData.utcTime;
                 remoteData.timeZoneOffsetMs = timeData.timeZoneOffset;
                 remoteData.timeZoneId = timeData.timezoneId;
             }

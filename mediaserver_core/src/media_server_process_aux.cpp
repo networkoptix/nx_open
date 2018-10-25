@@ -66,12 +66,18 @@ QnStorageResourceList UnmountedLocalStoragesFilter::getUnmountedStorages(
     return result;
 }
 
-bool isStorageUnmounted(const QnStorageResourcePtr& storage, const nx::mediaserver::Settings* settings)
+bool isStorageUnmounted(
+    QnPlatformAbstraction* platform,
+    const QnStorageResourcePtr& storage,
+    const nx::mediaserver::Settings* settings)
 {
-    return getUnmountedStorages(QnStorageResourceList() << storage, settings).contains(storage);
+    return getUnmountedStorages(
+        platform,
+        QnStorageResourceList() << storage, settings).contains(storage);
 }
 
 QnStorageResourceList getUnmountedStorages(
+    QnPlatformAbstraction* platform,
     const QnStorageResourceList& allServerStorages,
     const nx::mediaserver::Settings* settings)
 {
@@ -79,7 +85,7 @@ QnStorageResourceList getUnmountedStorages(
 
     using namespace nx::mediaserver::fs::media_paths;
 
-    auto mediaPathList = get(FilterConfig::createDefault(/*includeNonHdd*/ true, settings));
+    auto mediaPathList = get(FilterConfig::createDefault(platform, /*includeNonHdd*/ true, settings));
     NX_VERBOSE(
         nx::utils::log::Tag(typeid(UnmountedLocalStoragesFilter)),
         lm("Record folders: %1").container(mediaPathList));

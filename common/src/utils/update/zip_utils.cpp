@@ -6,8 +6,8 @@
 #include <quazip/quazipfile.h>
 
 namespace {
-    const int readBufferSize = 1024 * 16;
-    const int maxSymlinkLength = readBufferSize;
+    const int kReadBufferSizeBytes = 1024 * 16;
+    const int maxSymlinkLength = kReadBufferSizeBytes;
 
     bool isSymlink(const QuaZipFileInfo64 &info)
     {
@@ -35,48 +35,24 @@ QnZipExtractor::~QnZipExtractor()
     stop();
 }
 
-/*
-QnZipExtractor::Error QnZipExtractor::extract(const QString &fileName, const QDir &targetDir)
-{
-    if (isRunning())
-        return Error::Busy;
-
-    m_lastError = Ok;
-    m_dir = targetDir;
-    m_zip.reset(new QuaZip(fileName));
-    return Ok;
-}
-
-QnZipExtractor::Error QnZipExtractor::extract(QIODevice *ioDevice, const QDir &targetDir)
-{
-    if (isRunning())
-        return Error::Busy;
-
-    m_lastError = Ok;
-    m_dir = targetDir;
-    m_zip.reset(new QuaZip(ioDevice));
-    return Ok;
-}
-*/
-
 QString QnZipExtractor::errorToString(QnZipExtractor::Error error)
 {
     switch (error)
     {
         case Error::BrokenZip:
-            return "Zip file is brocken.";
+            return tr("Zip file is corrupted.");
         case Error::WrongDir:
-            return "Could not find target dir.";
+            return tr("Could not find target dir.");
         case Error::CantOpenFile:
-            return "Could not open file for writing.";
+            return tr("Could not open file for writing.");
         case Error::NoFreeSpace:
-            return "There is no free space on the disk.";
+            return tr("There is no free space on the disk.");
         case Error::OtherError:
-            return "Unknown error.";
+            return tr("Unknown error.");
         case Error::Stopped:
-            return "Extraction was canceled.";
+            return tr("Extraction was cancelled.");
         case Error::Busy:
-            return "Extractor is busy.";
+            return tr("Extractor is busy.");
         default:
             return QString();
     }
@@ -96,7 +72,6 @@ void QnZipExtractor::run()
 {
     Error error = extractZip();
     m_lastError = error;
-    m_result.set_value(m_lastError);
     emit finished(error);
 }
 
@@ -147,10 +122,10 @@ QnZipExtractor::Error QnZipExtractor::extractZip()
             if (!file.open(QuaZipFile::ReadOnly))
                 return BrokenZip;
 
-            QByteArray buf(readBufferSize, 0);
+            QByteArray buf(kReadBufferSizeBytes, 0);
             while (file.bytesAvailable() && !m_needStop)
             {
-                qint64 read = file.read(buf.data(), readBufferSize);
+                qint64 read = file.read(buf.data(), kReadBufferSizeBytes);
                 if (read != destFile.write(buf.data(), read))
                 {
                     file.close();
@@ -181,11 +156,6 @@ QnZipExtractor::Error QnZipExtractor::extractZip()
     m_zip->close();
 
     return m_zip->getZipError() == UNZ_OK ? Ok : BrokenZip;
-}
-
-std::shared_future<int> QnZipExtractor::getFuture()
-{
-    return m_result.get_future();
 }
 
 QStringList QnZipExtractor::fileList()

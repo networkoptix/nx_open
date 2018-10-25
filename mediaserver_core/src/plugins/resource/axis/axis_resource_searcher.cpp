@@ -11,7 +11,6 @@
 #include <common/common_module.h>
 #include <plugins/resource/mdns/mdns_packet.h>
 #include <utils/common/credentials.h>
-#include <common/static_common_module.h>
 
 extern QString getValueFromString(const QString& line);
 
@@ -26,7 +25,7 @@ namespace
 QnPlAxisResourceSearcher::QnPlAxisResourceSearcher(QnMediaServerModule* serverModule):
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
-    QnMdnsResourceSearcher(serverModule->commonModule()),
+    QnMdnsResourceSearcher(serverModule),
     m_serverModule(serverModule)
 {
 }
@@ -118,7 +117,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const nx::utils::Ur
     if (typeId.isNull())
         return QList<QnResourcePtr>();
 
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), name);
+    QnResourceData resourceData = dataPool()->data(manufacture(), name);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return QList<QnResourcePtr>(); // model forced by ONVIF
 
@@ -221,7 +220,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
         }
     }
 
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), name);
+    QnResourceData resourceData = dataPool()->data(manufacture(), name);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return local_results; // model forced by ONVIF
 
@@ -299,7 +298,7 @@ QAuthenticator QnPlAxisResourceSearcher::determineResourceCredentials(
     if (discoveryMode() != DiscoveryMode::fullyEnabled)
         return QAuthenticator();
 
-    auto resData = qnStaticCommon->dataPool()->data(resource->getVendor(), resource->getModel());
+    auto resData = dataPool()->data(resource->getVendor(), resource->getModel());
     auto possibleCredentials = resData.value<QList<nx::common::utils::Credentials>>(
         Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
 
@@ -360,8 +359,8 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
                 return;
 
             resource->setTypeId(rt);
-            resource->setName(firstResource->getName());
-            resource->setModel(firstResource->getName());
+            resource->setName(firstResource->getModel());
+            resource->setModel(firstResource->getModel());
             resource->setMAC(firstResource->getMAC());
             resource->setDefaultGroupName(physicalId);
             resource->setGroupId(physicalId);

@@ -42,6 +42,7 @@ private:
     void at_removeLayoutItemAction_triggered();
     void at_removeLayoutItemFromSceneAction_triggered();
     void at_openLayoutAction_triggered(const vms::event::AbstractActionPtr& businessAction);
+    void at_forgetLayoutPasswordAction_triggered();
 
 private:
     bool closeAllLayouts(bool force = false);

@@ -53,7 +53,10 @@ void CellWidget::setState(FoundDevicesModel::PresentedState value)
         return;
     }
 
-    const auto movie = qnSkin->newMovie("legacy/loading.gif", button);
+    const auto movie = qnSkin->isHiDpi()
+        ? qnSkin->newMovie("legacy/loading@2x.gif", button)
+        : qnSkin->newMovie("legacy/loading.gif", button);
+
     connect(movie, &QMovie::frameChanged, button,
         [button, movie](int /*frameNumber*/)
         {

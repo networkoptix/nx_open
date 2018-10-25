@@ -110,6 +110,7 @@ DECLARE_STRUCT(SyncRequestData)
 DECLARE_STRUCT_AND_LIST(UserData)
 DECLARE_STRUCT_AND_LIST(UserRoleData)
 DECLARE_STRUCT_AND_LIST(PredefinedRoleData)
+DECLARE_STRUCT(UserDataEx)
 
 DECLARE_STRUCT(PeerSyncTimeData)
 
@@ -134,6 +135,9 @@ DECLARE_STRUCT_EX(FullInfoData, (ubjson)(json)(xml)(csv_record))
 
 DECLARE_STRUCT_EX(ModuleInformation, (eq)(ubjson)(json)(xml)(csv_record))
 DECLARE_STRUCT_EX(ModuleInformationWithAddresses, (eq)(ubjson)(json)(xml)(csv_record))
+
+DECLARE_STRUCT_AND_LIST(AnalyticsPluginData)
+DECLARE_STRUCT_AND_LIST(AnalyticsEngineData)
 
 #undef DECLARE_STRUCT
 #undef DECLARE_STRUCT_EX

@@ -60,7 +60,7 @@ QnThirdPartyResource::~QnThirdPartyResource()
         m_cameraManager3 = nullptr;
     }
 
-    stopInputPortMonitoringAsync();
+    stopInputPortStatesMonitoring();
 }
 
 QnAbstractPtzController* QnThirdPartyResource::createPtzControllerInternal() const
@@ -202,46 +202,7 @@ void QnThirdPartyResource::setMotionMaskPhysical(int /*channel*/)
     //TODO/IMPL
 }
 
-//!Implementation of QnSecurityCamResource::getRelayOutputList
-QnIOPortDataList QnThirdPartyResource::getRelayOutputList() const
-{
-    QnIOPortDataList result;
-
-    QStringList ids;
-    if( !m_relayIOManager.get() )
-        return result;
-
-    m_relayIOManager->getRelayOutputList( &ids );
-
-    for (const auto& data: ids) {
-        QnIOPortData value;
-        value.portType = Qn::PT_Output;
-        value.id = data;
-        value.outputName = tr("Otput %1").arg(data);
-        result.push_back(value);
-    }
-    return result;
-}
-
-QnIOPortDataList QnThirdPartyResource::getInputPortList() const
-{
-    QnIOPortDataList result;
-    if( !m_relayIOManager.get() )
-        return result;
-
-    QStringList ids;
-    m_relayIOManager->getInputPortList( &ids );
-    for (const auto& data: ids) {
-        QnIOPortData value;
-        value.portType = Qn::PT_Input;
-        value.id = data;
-        value.inputName = tr("Input %1").arg(data);
-        result.push_back(value);
-    }
-    return result;
-}
-
-bool QnThirdPartyResource::setRelayOutputState(
+bool QnThirdPartyResource::setOutputPortState(
     const QString& outputID,
     bool activate,
     unsigned int autoResetTimeoutMS )
@@ -398,7 +359,7 @@ void QnThirdPartyResource::inputPortStateChanged(
     int newState,
     unsigned long int /*timestamp*/ )
 {
-    emit cameraInput(
+    emit nx::mediaserver::resource::Camera::inputPortStateChanged(
         toSharedPointer(),
         QString::fromUtf8(inputPortID),
         newState != 0,
@@ -535,10 +496,12 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
         return CameraDiagnostics::UnknownErrorResult();
     }
 
+    setCameraCapability(Qn::CameraTimeCapability,
+        cameraCapabilities & nxcip::BaseCameraManager::cameraTimeCapability);
     if(cameraCapabilities & nxcip::BaseCameraManager::relayInputCapability)
-        setCameraCapability( Qn::RelayInputCapability, true );
+        setCameraCapability( Qn::InputPortCapability, true );
     if(cameraCapabilities & nxcip::BaseCameraManager::relayOutputCapability)
-        setCameraCapability( Qn::RelayOutputCapability, true );
+        setCameraCapability( Qn::OutputPortCapability, true );
     if(cameraCapabilities & nxcip::BaseCameraManager::shareIpCapability)
         setCameraCapability( Qn::ShareIpCapability, true );
     if(cameraCapabilities & nxcip::BaseCameraManager::customMediaUrlCapability)
@@ -595,11 +558,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
         setProperty( Qn::MOTION_WINDOW_CNT_PARAM_NAME, 100);
         setProperty( Qn::MOTION_MASK_WINDOW_CNT_PARAM_NAME, 100);
         setProperty( Qn::MOTION_SENS_WINDOW_CNT_PARAM_NAME, 100);
-#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
         setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid,hardwaregrid"));
-#else
-        setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("hardwaregrid"));
-#endif
     }
     else
     {
@@ -729,27 +688,22 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
     return CameraDiagnostics::NoErrorResult();
 }
 
-bool QnThirdPartyResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
+void QnThirdPartyResource::startInputPortStatesMonitoring()
 {
-    if( !m_relayIOManager.get() )
-        return false;
-    m_relayIOManager->registerEventHandler( this );
-    return m_relayIOManager->startInputPortMonitoring() == nxcip::NX_NO_ERROR;
-}
-
-void QnThirdPartyResource::stopInputPortMonitoringAsync()
-{
-    if( m_relayIOManager.get() )
+    if (m_relayIOManager.get())
     {
-        m_relayIOManager->stopInputPortMonitoring();
-        m_relayIOManager->unregisterEventHandler( this );
+        m_relayIOManager->registerEventHandler(this);
+        m_relayIOManager->startInputPortMonitoring();
     }
 }
 
-bool QnThirdPartyResource::isInputPortMonitored() const
+void QnThirdPartyResource::stopInputPortStatesMonitoring()
 {
-    //TODO/IMPL
-    return false;
+    if (m_relayIOManager.get())
+    {
+        m_relayIOManager->stopInputPortMonitoring();
+        m_relayIOManager->unregisterEventHandler(this);
+    }
 }
 
 bool QnThirdPartyResource::initializeIOPorts()
@@ -760,8 +714,8 @@ bool QnThirdPartyResource::initializeIOPorts()
     {
         NX_WARNING(this, lit("Failed to get pointer to nxcip::CameraRelayIOManager interface for third-party camera %1:%2 (url %3)").
             arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).arg(QString::fromUtf8(m_camInfo.url)));
-        setCameraCapability( Qn::RelayInputCapability, false );
-        setCameraCapability( Qn::RelayOutputCapability, false );
+        setCameraCapability( Qn::InputPortCapability, false );
+        setCameraCapability( Qn::OutputPortCapability, false );
         return false;
     }
 

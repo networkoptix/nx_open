@@ -19,7 +19,7 @@ QnISDStreamReader::QnISDStreamReader(
     const QnPlIsdResourcePtr& res)
     :
     CLServerPushStreamReader(res),
-    m_rtpStreamParser(res),
+    m_rtpStreamParser(res, res->getTimeOffset()),
     m_isdCam(res)
 {
 }

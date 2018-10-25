@@ -200,14 +200,6 @@ void QnNetworkResource::setMediaPort(int value)
     setProperty(mediaPortKey(), value > 0 ? QString::number(value) : QString());
 }
 
-QStringList QnNetworkResource::searchFilters() const
-{
-    return base_type::searchFilters()
-        << getMAC().toString()
-        << getHostAddress()
-        << lit("live");
-}
-
 void QnNetworkResource::addNetworkStatus(NetworkStatus status)
 {
     QnMutexLocker mutexLocker( &m_mutex );

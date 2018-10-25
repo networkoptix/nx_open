@@ -31,10 +31,10 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     _Fields)
 
 TemporaryAccountPasswordManager::TemporaryAccountPasswordManager(
-    const nx::utils::stree::ResourceNameSet& attrNameset,
+    const nx::utils::stree::ResourceNameSet& attributeNameset,
     nx::sql::AsyncSqlQueryExecutor* const dbManager) noexcept(false)
 :
-    m_attrNameset(attrNameset),
+    m_attributeNameset(attributeNameset),
     m_dbManager(dbManager)
 {
     if (fillCache() != nx::sql::DBResult::ok)
@@ -183,7 +183,7 @@ nx::sql::DBResult TemporaryAccountPasswordManager::fetchTemporaryCredentials(
     QnSql::bind(tempPasswordData, &fetchTempPasswordQuery);
     fetchTempPasswordQuery.bindValue(
         ":accessRights",
-        QnSql::serialized_field(tempPasswordData.accessRights.toString(m_attrNameset)));
+        QnSql::serialized_field(tempPasswordData.accessRights.toString(m_attributeNameset)));
     if (!fetchTempPasswordQuery.exec())
     {
         NX_DEBUG(this, lm("Error fetching temporary password for account %1. %2")
@@ -226,7 +226,7 @@ nx::sql::DBResult TemporaryAccountPasswordManager::updateCredentialsAttributes(
     QnSql::bind(tempPasswordData, &updateTempPasswordQuery);
     updateTempPasswordQuery.bindValue(
         ":accessRights",
-        QnSql::serialized_field(tempPasswordData.accessRights.toString(m_attrNameset)));
+        QnSql::serialized_field(tempPasswordData.accessRights.toString(m_attributeNameset)));
 
     const auto passwordHa1 = nx::network::http::calcHa1(
         credentials.login.c_str(),
@@ -375,7 +375,7 @@ nx::sql::DBResult TemporaryAccountPasswordManager::fetchTemporaryPasswords(
         parsePasswordString(tmpPassword.passwordHa1, &tmpPassword.passwordHa1, &password);
 
         tmpPassword.accessRights.parse(
-            m_attrNameset,
+            m_attributeNameset,
             tmpPassword.accessRightsStr);
         std::string login = tmpPassword.login;
         m_temporaryCredentials.insert(std::move(tmpPassword));
@@ -401,7 +401,7 @@ nx::sql::DBResult TemporaryAccountPasswordManager::insertTempPassword(
     QnSql::bind(tempPasswordData, &insertTempPasswordQuery);
     insertTempPasswordQuery.bindValue(
         ":accessRights",
-        QnSql::serialized_field(tempPasswordData.accessRights.toString(m_attrNameset)));
+        QnSql::serialized_field(tempPasswordData.accessRights.toString(m_attributeNameset)));
 
     auto passwordString = preparePasswordString(
         tempPasswordData.passwordHa1,

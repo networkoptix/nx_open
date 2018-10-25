@@ -32,3 +32,7 @@ target_include_directories(nx_client_core
     PUBLIC
         ${Qt5Quick_PRIVATE_INCLUDE_DIRS}
         ${Qt5Multimedia_PRIVATE_INCLUDE_DIRS})
+
+if(withTests)
+    add_subdirectory(unit_tests)
+endif()

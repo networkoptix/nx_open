@@ -63,7 +63,7 @@
 
 static int registerQtResources()
 {
-    Q_INIT_RESOURCE(appserver2);
+    Q_INIT_RESOURCE(mediaserver_db);
     return 0;
 }
 
@@ -362,19 +362,18 @@ void Appserver2Process::registerHttpHandlers(
         {
             const auto data = QJson::deserialized<MergeSystemData>(request.messageBody);
             nx::vms::utils::SystemMergeProcessor systemMergeProcessor(m_commonModule.get());
-            const auto statusCode = systemMergeProcessor.merge(
+            *result = systemMergeProcessor.merge(
                 Qn::kSystemAccess,
                 QnAuthSession(),
-                data,
-                result);
-            if (nx::network::http::StatusCode::isSuccessCode(statusCode))
+                data);
+            if (result->error == QnRestResult::Error::NoError)
             {
                 m_ecConnection.load()->addRemotePeer(
                     systemMergeProcessor.remoteModuleInformation().id,
                     data.url);
             }
 
-            return statusCode;
+            return nx::network::http::StatusCode::ok;
         });
 
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/setupLocalSystem",
@@ -548,6 +547,7 @@ bool Appserver2Process::createInitialData(const QString& systemName)
     settings->setSystemName(systemName);
     settings->setLocalSystemId(guidFromArbitraryData(systemName));
     settings->setAutoDiscoveryEnabled(false);
+    settings->setAutoDiscoveryResponseEnabled(false);
 
     //read server list
     nx::vms::api::MediaServerDataList mediaServerList;
@@ -581,9 +581,8 @@ void Appserver2Process::connectTo(const Appserver2Process* dstServer)
     const auto addr = dstServer->endpoint();
     auto peerId = dstServer->commonModule()->moduleGUID();
 
-    nx::utils::Url url = lit("http://%1:%2/ec2/messageBus").arg(addr.address.toString()).arg(addr.port);
-    ecConnection()->messageBus()->
-        addOutgoingConnectionToPeer(peerId, url);
+    nx::utils::Url url = lit("http://%1:%2/").arg(addr.address.toString()).arg(addr.port);
+    ecConnection()->messageBus()-> addOutgoingConnectionToPeer(peerId, url);
 }
 
 // ----------------------------- Appserver2Launcher ----------------------------------------------

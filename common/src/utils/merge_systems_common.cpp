@@ -28,7 +28,8 @@ const QHash<Value, QString> kErrorToStringHash{
     { bothSystemBoundToCloud, lit("BOTH_SYSTEM_BOUND_TO_CLOUD") },
     { differentCloudHost, lit("DIFFERENT_CLOUD_HOST") },
     { unconfiguredSystem, lit("UNCONFIGURED_SYSTEM") },
-    { unknownError, lit("UNKNOWN_ERROR") }};
+    { unknownError, lit("UNKNOWN_ERROR") },
+    { duplicateMediaServerFound, lit("DUPLICATE_MEDIASERVER_FOUND") }};
 
 class ErrorStrings
 {
@@ -97,6 +98,9 @@ public:
             case differentCloudHost:
                 return tr("These Systems are built with different %1 URL. Merge is not allowed.",
                     "%1 is the cloud name (like Nx Cloud)")
+                    .arg(nx::network::AppInfo::cloudName());
+            case duplicateMediaServerFound:
+                return tr("These Systems have server with same ID. Please remove it before merge.")
                     .arg(nx::network::AppInfo::cloudName());
             case unconfiguredSystem:
                 return tr("System name is not configured yet.");

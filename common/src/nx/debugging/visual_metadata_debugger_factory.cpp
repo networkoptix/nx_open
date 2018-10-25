@@ -21,12 +21,12 @@ VisualMetadataDebuggerPtr VisualMetadataDebuggerFactory::makeDebugger(
 
     switch (debuggerType)
     {
-        case DebuggerType::managerPool:
+        case DebuggerType::analyticsManager:
         {
-            isEnabled = visualDebuggerIni().enableManagerPoolDebuggerInstance;
-            path = QString::fromUtf8(visualDebuggerIni().managerPoolDebugOutputDirectory);
-            frameCacheSize = visualDebuggerIni().managerPoolDebuggerFrameCacheSize;
-            metadataCacheSize = visualDebuggerIni().managerPoolDebuggerMetadataCacheSize;
+            isEnabled = visualDebuggerIni().enableAnalyticsManagerDebuggerInstance;
+            path = QString::fromUtf8(visualDebuggerIni().analyticsManagerDebugOutputDirectory);
+            frameCacheSize = visualDebuggerIni().analyticsManagerDebuggerFrameCacheSize;
+            metadataCacheSize = visualDebuggerIni().analyticsManagerDebuggerMetadataCacheSize;
             return makeDebuggerInternal(isEnabled, path, frameCacheSize, metadataCacheSize);
         }
         case DebuggerType::archiveStreamReader:

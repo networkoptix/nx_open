@@ -70,7 +70,7 @@ QVariant MotionSearchListModel::data(const QModelIndex& index, int role) const
             return tr("Motion on camera");
 
         case Qt::DecorationRole:
-            return qnSkin->pixmap(lit("tree/camera.png"));
+            return qnSkin->pixmap(lit("tree/camera.svg"));
 
         case Qn::HelpTopicIdRole:
             return QnBusiness::eventHelpId(vms::api::EventType::cameraMotionEvent);

@@ -47,6 +47,11 @@ private:
     void receiveModuleInformation();
     void sendModuleInformation(Senders::iterator senderIterator);
 
+    void createReceiver();
+    void removeObsoleteSenders();
+    void addNewSenders();
+    void updateInterfacesInAioThread();
+
 private:
     nx::network::SocketAddress m_multicastEndpoint;
     std::chrono::milliseconds m_updateInterfacesInterval;

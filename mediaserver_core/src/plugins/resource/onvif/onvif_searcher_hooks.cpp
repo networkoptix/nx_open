@@ -4,7 +4,6 @@
 #include <core/resource/param.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <common/common_module.h>
-#include <common/static_common_module.h>
 
 namespace nx {
 namespace plugins {
@@ -18,7 +17,9 @@ static const QString kAdditionalManufacturerNormalization
 
 } // namespace
 
-void commonHooks(EndpointAdditionalInfo* outInfo)
+void commonHooks(
+    QnResourceDataPool* /*dataPool*/,
+    EndpointAdditionalInfo* outInfo)
 {
     QString lowerName = outInfo->name.toLower();
     auto& name = outInfo->name;
@@ -109,7 +110,9 @@ void commonHooks(EndpointAdditionalInfo* outInfo)
     }
 }
 
-void hikvisionManufacturerReplacement(EndpointAdditionalInfo* outInfo)
+void hikvisionManufacturerReplacement(
+    QnResourceDataPool* /*dataPool*/,
+    EndpointAdditionalInfo* outInfo)
 {
     const auto kHikvisionManufacturer = lit("Hikvision");
     auto currentManufacturer = outInfo->manufacturer.toLower();
@@ -130,12 +133,12 @@ void hikvisionManufacturerReplacement(EndpointAdditionalInfo* outInfo)
     }
 }
 
-void manufacturerReplacementByModel(EndpointAdditionalInfo* outInfo)
+void manufacturerReplacementByModel(QnResourceDataPool* dataPool, EndpointAdditionalInfo* outInfo)
 {
     auto& currentManufacturer = outInfo->manufacturer;
     const auto& model = outInfo->name;
 
-    auto resourceData = qnStaticCommon->dataPool()->data(currentManufacturer, model);
+    auto resourceData = dataPool->data(currentManufacturer, model);
     auto manufacturerReplacement = resourceData.value(Qn::ONVIF_MANUFACTURER_REPLACEMENT, QString());
 
     if (manufacturerReplacement.isEmpty())
@@ -144,7 +147,9 @@ void manufacturerReplacementByModel(EndpointAdditionalInfo* outInfo)
     currentManufacturer = manufacturerReplacement;
 }
 
-void pelcoModelNormalization(EndpointAdditionalInfo* outInfo)
+void pelcoModelNormalization(
+    QnResourceDataPool* /*dataPool*/,
+    EndpointAdditionalInfo* outInfo)
 {
     const auto& manufacturer = outInfo->manufacturer;
     auto& model = outInfo->name;
@@ -162,7 +167,9 @@ void pelcoModelNormalization(EndpointAdditionalInfo* outInfo)
     model = split[0];
 }
 
-void additionalManufacturerNormalization(EndpointAdditionalInfo* outInfo)
+void additionalManufacturerNormalization(
+    QnResourceDataPool* dataPool,
+    EndpointAdditionalInfo* outInfo)
 {
     if (outInfo->additionalManufacturers.empty())
         return;
@@ -170,7 +177,7 @@ void additionalManufacturerNormalization(EndpointAdditionalInfo* outInfo)
     const auto model = outInfo->manufacturer;
     for (const auto& manufacturer: outInfo->additionalManufacturers)
     {
-        auto resourceData = qnStaticCommon->dataPool()->data(manufacturer, model);
+        auto resourceData = dataPool->data(manufacturer, model);
         if (resourceData.value(kAdditionalManufacturerNormalization, false))
         {
             outInfo->manufacturer = manufacturer;

@@ -179,7 +179,7 @@ void ConnectionBase::onHttpClientDone()
             using namespace std::placeholders;
             fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey);
             m_httpClient->doGet(
-                m_remotePeerUrl,
+                m_httpClient->url(),
                 std::bind(&ConnectionBase::onHttpClientDone, this));
         }
         else
@@ -267,7 +267,11 @@ void ConnectionBase::onHttpClientDone()
     socket->setNonBlockingMode(true);
 
     using namespace nx::network;
-    m_webSocket.reset(new websocket::WebSocket(std::move(socket)));
+    m_webSocket.reset(new websocket::WebSocket(
+        std::move(socket),
+        remotePeer.dataFormat == Qn::JsonFormat
+            ? websocket::FrameType::text
+            : websocket::FrameType::binary));
     m_httpClient.reset();
     m_webSocket->setAliveTimeout(m_keepAliveTimeout);
     m_webSocket->start();

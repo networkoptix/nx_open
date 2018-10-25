@@ -19,7 +19,6 @@
 #include <nx/utils/log/log.h>
 #include <core/resource/param.h>
 #include "acti_resource_searcher.h"
-#include <common/static_common_module.h>
 
 const QString QnActiResource::MANUFACTURE(lit("ACTI"));
 const QString QnActiResource::CAMERA_PARAMETER_GROUP_ENCODER(lit("encoder"));
@@ -265,7 +264,7 @@ void QnActiResource::cameraMessageReceived( const QString& path, const QnRequest
             inputNumber = tokens[1];
     }
 
-    emit cameraInput(
+    emit inputPortStateChanged(
         toSharedPointer(),
         inputNumber,
         isActivated,
@@ -429,8 +428,6 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
     setCameraCapability(Qn::customMediaPortCapability, true);
     updateDefaultAuthIfEmpty(lit("admin"), lit("123456"));
 
-    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-
     auto serverReport = makeActiRequest(
         lit("system"),
         lit("SYSTEM_INFO"),
@@ -471,7 +468,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
         m_availableEncoders.insert(lit("H264"));
     }
 
-    auto desiredTransport = resData.value<QString>(
+    auto desiredTransport = resourceData().value<QString>(
         Qn::DESIRED_TRANSPORT_PARAM_NAME,
         RtpTransport::_auto);
 
@@ -712,16 +709,10 @@ bool QnActiResource::SetupAudioInput()
     }
 }
 
-bool QnActiResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
+void QnActiResource::startInputPortStatesMonitoring()
 {
-    if( hasFlags(Qn::foreigner) ||      //we do not own camera
-        !hasCameraCapabilities(Qn::RelayInputCapability) )
-    {
-        return false;
-    }
-
     if( actiEventPort == 0 )
-        return false;   //no http listener is present
+        return;   //no http listener is present
 
     //considering, that we have excusive access to the camera, so rewriting existing event setup
 
@@ -746,7 +737,7 @@ bool QnActiResource::startInputPortMonitoringAsync( std::function<void(bool)>&& 
     QString localInterfaceAddress;  //determining address of local interface, used to connect to camera
     QByteArray responseMsgBody = makeActiRequest(QLatin1String("encoder"), eventStr, responseStatusCode, false, &localInterfaceAddress);
     if( responseStatusCode != CL_HTTP_SUCCESS )
-        return false;
+        return;
 
     static const int EVENT_HTTP_SERVER_NUMBER = 1;
     static const int MAX_CONNECTION_TIME_SEC = 7;
@@ -767,7 +758,7 @@ bool QnActiResource::startInputPortMonitoringAsync( std::function<void(bool)>&& 
         lit("HTTP_SERVER=%1,1,%2,%3,guest,guest,%4").arg(EVENT_HTTP_SERVER_NUMBER).arg(localInterfaceAddress).arg(actiEventPort).arg(MAX_CONNECTION_TIME_SEC),
         responseStatusCode );
     if( responseStatusCode != CL_HTTP_SUCCESS )
-        return false;
+        return;
 
     //registering URL commands (one command per input port)
         //GET /cgi-bin/cmd/encoder?EVENT_RSPCMD1=1,[api/camera_event/98/di/activated],[api/camera_event/98/di/deactivated]&EVENT_RSPCMD2=1,[],[]&EVENT_RSPCMD3=1,[],[]
@@ -790,7 +781,7 @@ bool QnActiResource::startInputPortMonitoringAsync( std::function<void(bool)>&& 
         setupURLCommandRequestStr,
         responseStatusCode );
     if( responseStatusCode != CL_HTTP_SUCCESS )
-        return false;
+        return;
 
         //registering events (one event per input port)
             //GET /cgi-bin/cmd/encoder?EVENT_CONFIG HTTP/1.1\r\n
@@ -814,14 +805,12 @@ bool QnActiResource::startInputPortMonitoringAsync( std::function<void(bool)>&& 
         registerEventRequestStr,
         responseStatusCode );
     if( responseStatusCode != CL_HTTP_SUCCESS )
-        return false;
+        return;
 
     m_inputMonitored = true;
-
-    return true;
 }
 
-void QnActiResource::stopInputPortMonitoringAsync()
+void QnActiResource::stopInputPortStatesMonitoring()
 {
     if( actiEventPort == 0 )
         return;   //no http listener is present
@@ -849,11 +838,6 @@ void QnActiResource::stopInputPortMonitoringAsync()
         },
         Qt::DirectConnection );
     httpClient->doGet( url );
-}
-
-bool QnActiResource::isInputPortMonitored() const
-{
-    return m_inputMonitored;
 }
 
 QString QnActiResource::getRtspUrl(int actiChannelNum) const
@@ -976,36 +960,10 @@ QnAbstractPtzController *QnActiResource::createPtzControllerInternal() const
     return new QnActiPtzController(toSharedPointer(this));
 }
 
-QnIOPortDataList QnActiResource::getRelayOutputList() const
-{
-    QnIOPortDataList outputIDStrList;
-    for( int i = 1; i <= m_outputCount; ++i ) {
-        QnIOPortData value;
-        value.portType = Qn::PT_Output;
-        value.id = QString::number(i);
-        value.outputName = tr("Output %1").arg(i);
-        outputIDStrList.push_back(value);
-    }
-    return outputIDStrList;
-}
-
-QnIOPortDataList QnActiResource::getInputPortList() const
-{
-    QnIOPortDataList inputIDStrList;
-    for( int i = 1; i <= m_inputCount; ++i ) {
-        QnIOPortData value;
-        value.portType = Qn::PT_Input;
-        value.id = QString::number(i);
-        value.inputName = tr("Input %1").arg(i);
-        inputIDStrList.push_back(value);
-    }
-    return inputIDStrList;
-}
-
 static const int MIN_DIO_PORT_NUMBER = 1;
 static const int MAX_DIO_PORT_NUMBER = 2;
 
-bool QnActiResource::setRelayOutputState(
+bool QnActiResource::setOutputPortState(
     const QString& ouputID,
     bool activate,
     unsigned int autoResetTimeoutMS )
@@ -1063,19 +1021,30 @@ void QnActiResource::initializeIO( const ActiSystemInfo& systemInfo )
     auto it = systemInfo.find( "di" );
     if( it != systemInfo.end() )
         m_inputCount = it.value().toInt();
-    if( m_inputCount > 0 )
-        setCameraCapability(Qn::RelayInputCapability, true);
 
     it = systemInfo.find( "do" );
     if( it != systemInfo.end() )
         m_outputCount = it.value().toInt();
-    if( m_outputCount > 0 )
-        setCameraCapability(Qn::RelayOutputCapability, true);
 
-    auto ports = getInputPortList();
-    for (auto item: getRelayOutputList())
-        ports.push_back(item);
-    setIOPorts(ports);
+    QnIOPortDataList ports;
+    for( int i = 1; i <= m_outputCount; ++i )
+    {
+        QnIOPortData value;
+        value.portType = Qn::PT_Output;
+        value.id = QString::number(i);
+        value.outputName = tr("Output %1").arg(i);
+        ports.push_back(value);
+    }
+
+    for( int i = 1; i <= m_inputCount; ++i )
+    {
+        QnIOPortData value;
+        value.portType = Qn::PT_Input;
+        value.id = QString::number(i);
+        value.inputName = tr("Input %1").arg(i);
+        ports.push_back(value);
+    }
+    setIoPortDescriptions(std::move(ports), /*needMerge*/ true);
 }
 
 /*
@@ -1471,8 +1440,7 @@ void QnActiResource::fetchAndSetAdvancedParameters()
 
 QString QnActiResource::getAdvancedParametersTemplate() const
 {
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(getVendor(), getModel());
-    auto advancedParametersTemplate = resourceData.value<QString>(ADVANCED_PARAMETERS_TEMPLATE_PARAMETER_NAME);
+    auto advancedParametersTemplate = resourceData().value<QString>(ADVANCED_PARAMETERS_TEMPLATE_PARAMETER_NAME);
     return advancedParametersTemplate.isEmpty() ?
         DEFAULT_ADVANCED_PARAMETERS_TEMPLATE : advancedParametersTemplate;
 }

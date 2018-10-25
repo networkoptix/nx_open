@@ -20,7 +20,7 @@ def test_artifacts_dir(artifacts_dir):
 
 
 def test_artifact_factory_save_as_json(artifact_factory):
-    artifact = artifact_factory(['one', 'two', 'three'], name='test-artifact')
+    artifact = artifact_factory.make_artifact(['one', 'two', 'three'], name='test-artifact')
     value = dict(key='value')
     file_path = artifact.save_as_json(value)
     with file_path.open() as f:

@@ -8,6 +8,11 @@
 #include <utils/common/instance_storage.h>
 
 #include "settings.h"
+#include <plugins/resource/mdns/mdns_listener.h>
+#include <plugins/native_sdk/common_plugin_container.h>
+#include <nx/network/upnp/upnp_device_searcher.h>
+#include <nx/mediaserver/analytics/event_rule_watcher.h>
+#include <nx/mediaserver/analytics/manager.h>
 
 class QnCommonModule;
 class StreamingChunkCache;
@@ -40,8 +45,13 @@ class QnFileDeletor;
 class QnResourceAccessManager;
 class QnResourceDiscoveryManager;
 class QnAuditManager;
+class QnMediaServerResourceSearchers;
+class QnPlatformAbstraction;
+class QnServerConnector;
+class QnResourceStatusWatcher;
 
 namespace nx::vms::common::p2p::downloader { class Downloader; }
+namespace nx::mediaserver::hls { class SessionPool; }
 
 namespace nx {
 namespace mediaserver { class CmdLineArguments; }
@@ -69,13 +79,6 @@ class RootFileSystem;
 class Settings;
 class ServerTimeSyncManager;
 class ServerUpdateManager;
-
-namespace metadata {
-
-class ManagerPool;
-class EventRuleWatcher;
-
-} // namespace metadata
 
 namespace resource {
 
@@ -126,8 +129,8 @@ public:
     nx::mediaserver::LicenseWatcher* licenseWatcher() const;
     nx::mediaserver::event::EventMessageBus* eventMessageBus() const;
     PluginManager* pluginManager() const;
-    nx::mediaserver::metadata::ManagerPool* metadataManagerPool() const;
-    nx::mediaserver::metadata::EventRuleWatcher* metadataRuleWatcher() const;
+    nx::mediaserver::analytics::Manager* analyticsManager() const;
+    nx::mediaserver::analytics::EventRuleWatcher* analyticsEventRuleWatcher() const;
     nx::mediaserver::resource::SharedContextPool* sharedContextPool() const;
     AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher() const;
     nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage() const;
@@ -164,7 +167,14 @@ public:
     QnAuditManager* auditManager() const;
     QnResourceDiscoveryManager* resourceDiscoveryManager() const;
     nx::mediaserver::camera::ErrorProcessor* cameraErrorProcessor() const;
-
+    QnMediaServerResourceSearchers* resourceSearchers() const;
+    QnPlatformAbstraction* platform() const;
+    void setPlatform(QnPlatformAbstraction* platform);
+    QnServerConnector* serverConnector () const;
+    QnResourceStatusWatcher* statusWatcher() const;
+    QnMdnsListener* mdnsListener() const;
+    nx::network::upnp::DeviceSearcher* upnpDeviceSearcher() const;
+    nx::mediaserver::hls::SessionPool* hlsSessionPool() const;
 private:
     void registerResourceDataProviders();
     QDir downloadsDirectory() const;
@@ -187,11 +197,11 @@ private:
     nx::mediaserver::UnusedWallpapersWatcher* m_unusedWallpapersWatcher = nullptr;
     nx::mediaserver::LicenseWatcher* m_licenseWatcher = nullptr;
     nx::mediaserver::event::EventMessageBus* m_eventMessageBus = nullptr;
-    nx::mediaserver::metadata::ManagerPool* m_metadataManagerPool = nullptr;
+    nx::mediaserver::analytics::Manager* m_analyticsManager = nullptr;
 
     nx::mediaserver::event::ExtendedRuleProcessor* m_eventRuleProcessor = nullptr;
     nx::mediaserver::event::EventConnector* m_eventConnector = nullptr;
-    nx::mediaserver::metadata::EventRuleWatcher* m_metadataRuleWatcher = nullptr;
+    nx::mediaserver::analytics::EventRuleWatcher* m_analyticsEventRuleWatcher = nullptr;
     nx::mediaserver::resource::SharedContextPool* m_sharedContextPool = nullptr;
     AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher;
     mutable boost::optional<std::chrono::milliseconds> m_lastRunningTimeBeforeRestart;
@@ -210,5 +220,13 @@ private:
     HostSystemPasswordSynchronizer* m_hostSystemPasswordSynchronizer = nullptr;
     QnPtzControllerPool* m_ptzControllerPool = nullptr;
     QnFileDeletor* m_fileDeletor = nullptr;
-    nx::mediaserver::camera::ErrorProcessor* m_cameraErrorProcessor;
+    nx::mediaserver::camera::ErrorProcessor* m_cameraErrorProcessor = nullptr;
+    QnServerConnector* m_serverConnector = nullptr;
+    QnResourceStatusWatcher* m_statusWatcher = nullptr;
+
+    QnPlatformAbstraction* m_platform = nullptr;
+    std::unique_ptr<QnMdnsListener> m_mdnsListener;
+    std::unique_ptr<nx::network::upnp::DeviceSearcher> m_upnpDeviceSearcher;
+    std::unique_ptr<QnMediaServerResourceSearchers> m_resourceSearchers;
+    nx::mediaserver::hls::SessionPool* m_hlsSessionPool = nullptr;
 };

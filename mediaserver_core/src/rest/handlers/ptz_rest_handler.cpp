@@ -211,7 +211,7 @@ int QnPtzRestHandler::executePost(
         !requireParameter(params, lit("sequenceId"), result, &sequenceId, true) ||
         !requireParameter(params, lit("sequenceNumber"), result, &sequenceNumber, true))
     {
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
     }
 
     QString hash = QString(lit("%1-%2"))
@@ -228,7 +228,7 @@ int QnPtzRestHandler::executePost(
         else
             errStr = lit("Requested camera %1 not found.").arg(notFoundCameraId);
         result.setError(QnJsonRestResult::InvalidParameter, errStr);
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
     }
     const QString cameraId = camera->getId().toString();
 
@@ -236,7 +236,7 @@ int QnPtzRestHandler::executePost(
     {
         result.setError(QnJsonRestResult::InvalidParameter,
             lit("Camera resource '%1' is not ready yet.").arg(cameraId));
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
     }
 
     QnPtzControllerPtr controller = serverModule()->ptzControllerPool()->controller(camera);
@@ -244,7 +244,7 @@ int QnPtzRestHandler::executePost(
     {
         result.setError(QnJsonRestResult::InvalidParameter,
             lit("PTZ is not supported by camera '%1'.").arg(cameraId));
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
     }
 
     if (!checkSequence(sequenceId, sequenceNumber))
@@ -316,7 +316,7 @@ int QnPtzRestHandler::executePost(
         case Qn::GetDataPtzCommand:
             return executeGetData(controller, params, result);
         default:
-            return nx::network::http::StatusCode::invalidParameter;
+            return nx::network::http::StatusCode::unprocessableEntity;
     }
 }
 
@@ -352,7 +352,7 @@ int QnPtzRestHandler::executeContinuousMove(
     if (!success)
     {
         NX_VERBOSE(this, lit("Finish execute ContinuousMove because of invalid params."));
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
     }
 
     copyParameter(params, lit("rotationSpeed"), result, &speedVector.rotation);
@@ -379,7 +379,7 @@ int QnPtzRestHandler::executeContinuousFocus(
     if (!requireParameter(params, lit("speed"), result, &speed)
         || !requireParameter(params, lit("type"), result, &options.type, /*optional*/ true))
     {
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
     }
 
     if (!controller->continuousFocus(speed, options))
@@ -404,7 +404,7 @@ int QnPtzRestHandler::executeAbsoluteMove(const QnPtzControllerPtr &controller, 
         && requireParameter(params, lit("type"), result, &options.type, true);
 
     if (!success)
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     success = controller->absoluteMove(
         command == Qn::AbsoluteDeviceMovePtzCommand
@@ -434,7 +434,7 @@ int QnPtzRestHandler::executeViewportMove(const QnPtzControllerPtr &controller, 
         !requireParameter(params, lit("type"), result, &options.type, true)
         )
     {
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
     }
 
     QRectF viewport(QPointF(viewportLeft, viewportTop), QPointF(viewportRight, viewportBottom));
@@ -494,7 +494,7 @@ int QnPtzRestHandler::executeGetPosition(const QnPtzControllerPtr &controller, c
     if (!requireParameter(params, lit("command"), result, &command)
         || !requireParameter(params, lit("type"), result, &options.type, true))
     {
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
     }
 
     nx::core::ptz::Vector position;
@@ -519,7 +519,7 @@ int QnPtzRestHandler::executeCreatePreset(const QnPtzControllerPtr &controller, 
     if (!requireParameter(params, lit("presetId"), result, &presetId)
         || !requireParameter(params, lit("presetName"), result, &presetName))
     {
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
     }
 
     QnPtzPreset preset(presetId, presetName);
@@ -536,7 +536,7 @@ int QnPtzRestHandler::executeUpdatePreset(const QnPtzControllerPtr &controller, 
     if (!requireParameter(params, lit("presetId"), result, &presetId)
         || !requireParameter(params, lit("presetName"), result, &presetName))
     {
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
     }
 
     QnPtzPreset preset(presetId, presetName);
@@ -551,7 +551,7 @@ int QnPtzRestHandler::executeRemovePreset(const QnPtzControllerPtr &controller, 
     QString presetId;
 
     if (!requireParameter(params, lit("presetId"), result, &presetId))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     if (!controller->removePreset(presetId))
         return nx::network::http::StatusCode::internalServerError;
@@ -567,7 +567,7 @@ int QnPtzRestHandler::executeActivatePreset(const QnPtzControllerPtr &controller
     if (!requireParameter(params, lit("presetId"), result, &presetId)
         || !requireParameter(params, lit("speed"), result, &speed))
     {
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
     }
 
     if (!controller->activatePreset(presetId, speed))
@@ -599,7 +599,7 @@ int QnPtzRestHandler::executeCreateTour(
     QnPtzTour tour;
 
     if (!QJson::deserialize(body, &tour))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     // TODO: #Elric use result.
 
@@ -617,7 +617,7 @@ int QnPtzRestHandler::executeRemoveTour(
     QString tourId;
 
     if (!requireParameter(params, lit("tourId"), result, &tourId))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     if (!controller->removeTour(tourId))
         return nx::network::http::StatusCode::internalServerError;
@@ -633,7 +633,7 @@ int QnPtzRestHandler::executeActivateTour(
     QString tourId;
 
     if (!requireParameter(params, lit("tourId"), result, &tourId))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     if (!controller->activateTour(tourId))
         return nx::network::http::StatusCode::internalServerError;
@@ -680,7 +680,7 @@ int QnPtzRestHandler::executeUpdateHomeObject(
     if (!requireParameter(params, lit("objectType"), result, &objectType)
         || !requireParameter(params, lit("objectId"), result, &objectId))
     {
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
     }
 
     if (!controller->updateHomeObject(QnPtzObject(objectType, objectId)))
@@ -736,7 +736,7 @@ int QnPtzRestHandler::executeRunAuxilaryCommand(
         !requireParameter(params, lit("data"), result, &data)
         )
     {
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
     }
 
     if (!controller->runAuxilaryCommand(trait, data, options))
@@ -756,7 +756,7 @@ int QnPtzRestHandler::executeGetData(
     requireParameter(params, lit("type"), result, &options.type, /*optional*/ true);
 
     if (!requireParameter(params, lit("query"), result, &query))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     QnPtzData data;
     if (!controller->getData(query, &data, options))

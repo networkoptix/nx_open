@@ -27,12 +27,13 @@
 #include <mediaserver_ini.h>
 #include <analytics/detected_objects_storage/analytics_events_receptor.h>
 #include <media_server/media_server_module.h>
-#include <nx/mediaserver/metadata/manager_pool.h>
+#include <nx/mediaserver/analytics/manager.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/mediaserver/resource/camera.h>
+#include <utils/media/utils.h>
 
-using nx::mediaserver::metadata::VideoDataReceptor;
-using nx::mediaserver::metadata::VideoDataReceptorPtr;
+using nx::mediaserver::analytics::VideoDataReceptor;
+using nx::mediaserver::analytics::VideoDataReceptorPtr;
 
 static const int CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES = 1000;
 static const int PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS = 10 * 1000;
@@ -80,9 +81,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::mediaserver::resource::Came
         m_motionMaskBinData[i] =
             (simd128i*) qMallocAligned(Qn::kMotionGridWidth * Qn::kMotionGridHeight/8, 32);
         memset(m_motionMaskBinData[i], 0, Qn::kMotionGridWidth * Qn::kMotionGridHeight/8);
-#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
         m_motionEstimation[i].setChannelNum(i);
-#endif
     }
 
     m_role = Qn::CR_LiveVideo;
@@ -116,8 +115,8 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::mediaserver::resource::Came
                     return m_cameraRes->getStatus() == Qn::Recording;
                 }));
         m_dataReceptorMultiplexer->add(m_analyticsEventsSaver);
-        auto pool = serverModule()->metadataManagerPool();
-        pool->registerDataReceptor(getResource(), m_dataReceptorMultiplexer.toWeakRef());
+        serverModule()->analyticsManager()->registerDataReceptor(
+            getResource(), m_dataReceptorMultiplexer.toWeakRef());
     }
 }
 
@@ -149,8 +148,8 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 
     if (role == roleForAnalytics && serverModule())
     {
-        auto pool = serverModule()->metadataManagerPool();
-        m_videoDataReceptor = pool->createVideoDataReceptor(m_cameraRes->getId());
+        m_videoDataReceptor = serverModule()->analyticsManager()->createVideoDataReceptor(
+            m_cameraRes->getId());
     }
 }
 
@@ -264,7 +263,6 @@ void QnLiveStreamProvider::onStreamResolutionChanged( int /*channelNumber*/, con
 
 void QnLiveStreamProvider::updateSoftwareMotion()
 {
-#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     if (m_cameraRes->getMotionType() == Qn::MotionType::MT_SoftwareGrid && getRole() == roleForMotionEstimation())
     {
         for (int i = 0; i < m_videoChannels; ++i)
@@ -273,7 +271,7 @@ void QnLiveStreamProvider::updateSoftwareMotion()
             m_motionEstimation[i].setMotionMask(region);
         }
     }
-#endif
+
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         QnMetaDataV1::createMask(m_cameraRes->getMotionMask(i), (char*)m_motionMaskBinData[i]);
 }
@@ -326,19 +324,22 @@ bool QnLiveStreamProvider::isMaxFps() const
     return m_liveParams.fps >= m_cameraRes->getMaxFps() - 0.1;
 }
 
+bool QnLiveStreamProvider::needHardwareMotion()
+{
+    return getRole() == Qn::CR_LiveVideo
+        && (m_cameraRes->getMotionType() == Qn::MotionType::MT_HardwareGrid
+            || m_cameraRes->getMotionType() == Qn::MotionType::MT_MotionWindow);
+}
+
 bool QnLiveStreamProvider::needMetadata()
 {
     // I assume this function is called once per video frame
     if (!m_metadataReceptor->metadataQueue.isEmpty())
         return true;
 
-    bool needHardwareMotion = getRole() == Qn::CR_LiveVideo
-        && (m_cameraRes->getMotionType() == Qn::MotionType::MT_HardwareGrid
-            || m_cameraRes->getMotionType() == Qn::MotionType::MT_MotionWindow);
 
     if (m_cameraRes->getMotionType() == Qn::MotionType::MT_SoftwareGrid)
     {
-#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
         if (needAnalyzeMotion(getRole()))
         {
             for (int i = 0; i < m_videoChannels; ++i)
@@ -351,12 +352,11 @@ bool QnLiveStreamProvider::needMetadata()
                 }
             }
         }
-#endif
         return false;
     }
-    else if (needHardwareMotion)
+    else if (needHardwareMotion())
     {
-        bool result = m_framesSinceLastMetaData > 10
+        bool result = m_framesSinceLastMetaData > META_FRAME_INTERVAL
             || (m_framesSinceLastMetaData > 0
                 && m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS);
 
@@ -413,14 +413,15 @@ void QnLiveStreamProvider::onGotVideoFrame(
     const QnLiveStreamParams& currentLiveParams,
     bool isCameraControlRequired)
 {
+    if (!NX_ASSERT(compressedFrame))
+        return;
+
     m_totalVideoFrames++;
     m_framesSinceLastMetaData++;
 
     saveMediaStreamParamsIfNeeded(compressedFrame);
     if (m_totalVideoFrames && (m_totalVideoFrames % SAVE_BITRATE_FRAME) == 0)
         saveBitrateIfNeeded(compressedFrame, currentLiveParams, isCameraControlRequired);
-
-#if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
 
     NX_VERBOSE(this) << lm("Proceeding with motion detection and/or feeding metadata plugins");
 
@@ -440,8 +441,7 @@ void QnLiveStreamProvider::onGotVideoFrame(
                 || m_resolutionCheckTimer.elapsed() > PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS);
         if (updateResolutionFromPrimaryStream)
         {
-            QSize newResolution;
-            extractMediaStreamParams(compressedFrame, &newResolution);
+            QSize newResolution = nx::media::getFrameSize(compressedFrame);
             if (newResolution.isValid())
             {
                 updateStreamResolution(compressedFrame->channelNumber, newResolution);
@@ -461,8 +461,8 @@ void QnLiveStreamProvider::onGotVideoFrame(
     {
         NX_VERBOSE(this) << lm("Analyzing motion; needUncompressedFrame: %1")
             .arg(needUncompressedFrame);
-        if (motionEstimation.analyzeFrame(compressedFrame),
-            needUncompressedFrame ? &uncompressedFrame : nullptr)
+        if (motionEstimation.analyzeFrame(compressedFrame,
+            needUncompressedFrame ? &uncompressedFrame : nullptr))
         {
             updateStreamResolution(channel, motionEstimation.videoResolution());
         }
@@ -480,11 +480,11 @@ void QnLiveStreamProvider::onGotVideoFrame(
 
     if (videoDataReceptor)
     {
-        NX_VERBOSE(this) << "Pushing to receptor, timestamp:" << compressedFrame->timestamp;
+        NX_VERBOSE(this, "Pushing frame (%2) to receptor, timestamp: %1",
+            compressedFrame->timestamp,
+            uncompressedFrame ? "compressed and uncompressed" : "compressed");
         videoDataReceptor->putFrame(compressedFrame, uncompressedFrame);
     }
-
-#endif // ENABLE_SOFTWARE_MOTION_DETECTION
 }
 
 void QnLiveStreamProvider::onGotAudioFrame(const QnCompressedAudioDataPtr& audioData)
@@ -525,11 +525,9 @@ QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetadata()
         return metadata;
     }
 
-#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     if (m_cameraRes->getMotionType() == Qn::MotionType::MT_SoftwareGrid)
         return m_motionEstimation[m_softMotionLastChannel].getMotion();
     else
-#endif
         return getCameraMetadata();
 }
 
@@ -590,7 +588,7 @@ void QnLiveStreamProvider::updateStreamResolution(int channelNumber, const QSize
     NX_VERBOSE(this) << lm("Updating stream resolution");
 
     m_videoResolutionByChannelNumber[channelNumber] = newResolution;
-    onStreamResolutionChanged( channelNumber, newResolution );
+    onStreamResolutionChanged(channelNumber, newResolution);
 
     if( getRole() == Qn::CR_SecondaryLiveVideo)
         return;
@@ -620,52 +618,6 @@ void QnLiveStreamProvider::updateSoftwareMotionStreamNum()
     m_softMotionRole = Qn::CR_Default;    //it will be auto-detected on the next frame
 }
 
-void QnLiveStreamProvider::extractMediaStreamParams(
-    const QnCompressedVideoDataPtr& videoData,
-    QSize* const newResolution)
-{
-    switch( videoData->compressionType )
-    {
-        case AV_CODEC_ID_H265:
-            if (videoData->width > 0 && videoData->height > 0)
-            {
-                *newResolution = QSize(videoData->width, videoData->height);
-            }
-            else
-            {
-                nx::media_utils::hevc::Sps sps;
-                if (sps.decodeFromVideoFrame(videoData))
-                    *newResolution = QSize(sps.picWidthInLumaSamples, sps.picHeightInLumaSamples);
-            }
-            break;
-        case AV_CODEC_ID_H264:
-            nx::media_utils::h264::extractSpsPps(
-                videoData,
-                (videoData->width > 0 && videoData->height > 0)
-                    ? nullptr   //taking resolution from sps only if video frame does not already contain it
-                    : newResolution);
-
-        case AV_CODEC_ID_MPEG2VIDEO:
-            if( videoData->width > 0 && videoData->height > 0 )
-                *newResolution = QSize( videoData->width, videoData->height );
-            //TODO #ak it is very possible that videoData->width and videoData->height do not change when stream resolution changes and there is no SPS also
-            break;
-
-        case AV_CODEC_ID_MJPEG:
-        {
-            nx_jpg::ImageInfo imgInfo;
-            if( !nx_jpg::readJpegImageInfo( (const quint8*)videoData->data(), videoData->dataSize(), &imgInfo ) )
-                return;
-            *newResolution = QSize( imgInfo.width, imgInfo.height );
-            break;
-        }
-        default:
-            if( videoData->width > 0 && videoData->height > 0 )
-                *newResolution = QSize( videoData->width, videoData->height );
-            break;
-    }
-}
-
 void QnLiveStreamProvider::saveMediaStreamParamsIfNeeded(const QnCompressedVideoDataPtr& videoData)
 {
     ++m_framesSincePrevMediaStreamCheck;
@@ -674,9 +626,7 @@ void QnLiveStreamProvider::saveMediaStreamParamsIfNeeded(const QnCompressedVideo
         return;
     m_framesSincePrevMediaStreamCheck = 0;
 
-    QSize streamResolution;
-    extractMediaStreamParams(videoData, &streamResolution);
-
+    QSize streamResolution = nx::media::getFrameSize(videoData);
     CameraMediaStreamInfo mediaStreamInfo(
         encoderIndex(),
         QSize(streamResolution.width(), streamResolution.height()),
@@ -700,7 +650,7 @@ void QnLiveStreamProvider::saveBitrateIfNeeded(
         liveParams, getRole())) / 1024;
     info.actualBitrate = getBitrateMbps() / getNumberOfChannels();
 
-    info.bitratePerGop = m_cameraRes->bitratePerGopType();
+    info.bitratePerGop = m_cameraRes->useBitratePerGop();
     info.bitrateFactor = 1; // TODO: #mux Pass actual value when avaliable [2.6]
     info.numberOfChannels = getNumberOfChannels();
 

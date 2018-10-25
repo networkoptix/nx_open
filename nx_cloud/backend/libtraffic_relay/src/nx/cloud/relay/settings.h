@@ -22,7 +22,7 @@ struct Server
 
 struct Http
 {
-    std::list<network::SocketAddress> endpoints;
+    std::vector<network::SocketAddress> endpoints;
     /**
      * Backlog value to pass to tcpServerSocket->listen call.
      */
@@ -35,7 +35,7 @@ struct Http
 
 struct Https
 {
-    std::list<network::SocketAddress> endpoints;
+    std::vector<network::SocketAddress> endpoints;
     std::string certificatePath;
     std::optional<std::chrono::milliseconds> sslHandshakeTimeout;
 };
@@ -101,7 +101,7 @@ private:
     void loadEndpointList(
         const char* settingName,
         const char* defaultValue,
-        std::list<network::SocketAddress>* endpoints);
+        std::vector<network::SocketAddress>* endpoints);
 
     void loadHttps();
     void loadProxy();

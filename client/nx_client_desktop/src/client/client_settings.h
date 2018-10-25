@@ -161,6 +161,9 @@ public:
 
         ALL_LAYOUTS_SELECTION_DIALOG_MODE, //< Tree mode in MultipleLayoutSelectionDialog.
 
+        // Upload state for ServerUpdateTool.
+        SYSTEM_UPDATER_STATE,
+
         VARIABLE_COUNT
     };
 
@@ -250,8 +253,8 @@ private:
         QN_DECLARE_RW_PROPERTY(QnUuid,                      pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())
         QN_DECLARE_RW_PROPERTY(QString,                     logLevel,               setLogLevel,                LOG_LEVEL,                  QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(QString,                     ec2TranLogLevel,        setEc2TranLogLevel,         EC2_TRAN_LOG_LEVEL,         QLatin1String("none"))
-        QN_DECLARE_RW_PROPERTY(int,                         initialLiveBufferMSecs, setInitialLiveBufferMSecs,  INITIAL_LIVE_BUFFER_MSECS,  300)
-        QN_DECLARE_RW_PROPERTY(int,                         maximumLiveBufferMSecs, setMaximumLiveBufferMSecs,  MAXIMUM_LIVE_BUFFER_MSECS,  600)
+        QN_DECLARE_RW_PROPERTY(int,                         initialLiveBufferMSecs, setInitialLiveBufferMSecs,  INITIAL_LIVE_BUFFER_MSECS,  50)
+        QN_DECLARE_RW_PROPERTY(int,                         maximumLiveBufferMSecs, setMaximumLiveBufferMSecs,  MAXIMUM_LIVE_BUFFER_MSECS,  500)
         QN_DECLARE_RW_PROPERTY(QString,                     detectedObjectDisplaySettings, setDetectedObjectDisplaySettings, DETECTED_OBJECT_DISPLAY_SETTINGS, QString())
 
         // Was used earlier. Kept to migrate old settings.
@@ -259,6 +262,7 @@ private:
         QN_DECLARE_RW_PROPERTY(int,                         acceptedEulaVersion,    setAcceptedEulaVersion,     ACCEPTED_EULA_VERSION,      0)
 
         QN_DECLARE_RW_PROPERTY(bool, allLayoutsSelectionDialogMode, setAllLayoutsSelectionDialogMode, ALL_LAYOUTS_SELECTION_DIALOG_MODE, 0)
+        QN_DECLARE_RW_PROPERTY(QString, systemUpdaterState, setSystemUpdaterState, SYSTEM_UPDATER_STATE, 0)
     QN_END_PROPERTY_STORAGE()
 
     void migrateKnownServerConnections();

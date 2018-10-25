@@ -43,6 +43,8 @@ public:
     void setClearingTagIndex(int index);
     int clearingTagIndex() const;
 
+    bool focused() const;
+
 public:
     QSize sizeHint() const override;
     QVariant inputMethodQuery(Qt::InputMethodQuery property) const override;
@@ -54,6 +56,8 @@ signals:
 
     void enterPressed();
     void ctrlEnterPressed();
+    void focusedChanged();
+    void filteringChanged();
 
 protected:
     void resizeEvent(QResizeEvent* event) override;
@@ -61,6 +65,9 @@ protected:
     void focusOutEvent(QFocusEvent* event) override;
     void keyPressEvent(QKeyEvent* event) override;
     void inputMethodEvent(QInputMethodEvent* event) override;
+    void enterEvent(QEvent* event) override;
+    void leaveEvent(QEvent* event) override;
+
     bool event(QEvent* event) override;
 
 private:
@@ -70,19 +77,16 @@ private:
     void setSelectedTagIndex(int value);
     void handleTagButtonStateChanged();
     void updateTagButton();
+    void setHovered(bool value);
+    void setButtonHovered(bool value);
+    void updateMenuButtonIcon();
+
+    void setFocused(bool value);
+    void updateFocused();
 
 private:
-    QStringList m_tags;
-
-    QWidget* const m_lineEditHolder;
-    QLineEdit* const m_lineEdit = nullptr;
-    QPushButton* const m_menuButton = nullptr;
-    QMenu* const m_menu = nullptr;
-    SelectableTextButton* const m_tagButton = nullptr;
-
-    bool m_hightlighted = false;
-    int m_selectedTagIndex = -1;
-    int m_clearingTagIndex = -1;
+    struct Private;
+    const QScopedPointer<Private> d;
 };
 
 } // namespace desktop

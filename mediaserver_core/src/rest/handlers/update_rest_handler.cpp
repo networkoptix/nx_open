@@ -5,7 +5,6 @@
 
 #include <api/model/upload_update_reply.h>
 #include <common/common_module.h>
-#include <common/static_common_module.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
@@ -18,6 +17,7 @@
 
 #include <nx/utils/file_system.h>
 #include <nx/utils/log/log.h>
+#include <common/static_common_module.h>
 
 QnUpdateRestHandler::QnUpdateRestHandler(QnServerUpdateTool* updateTool):
     m_updateTool(updateTool)

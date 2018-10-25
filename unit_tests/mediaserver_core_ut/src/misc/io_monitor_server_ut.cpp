@@ -18,6 +18,7 @@
 namespace {
     static const std::chrono::seconds kMaxTestTime(500);
     static const QString kTestCamPhysicalId("testCam15");
+    static const int kSteps = 1000;
 }
 
 namespace nx {
@@ -41,7 +42,11 @@ protected:
         bool ok = false;
         QnIOStateDataList receivedDataList = QJson::deserialized<QnIOStateDataList>(data, QnIOStateDataList(), &ok);
         if (!ok)
+        {
+            QnMutexLocker lock(&m_mutex);
+            NX_WARNING(this, "QnIOStateDataList deserialization error at step %1", kSteps - m_data.size());
             return false;
+        }
 
         for (const auto& receivedData: receivedDataList)
         {
@@ -52,9 +57,13 @@ protected:
             {
                 expectData = m_data.front();
                 m_data.erase(m_data.begin());
+                NX_DEBUG(this, "Got data %1, expect data %2", receivedData.timestamp, expectData.timestamp);
             }
             if (expectData != receivedData)
+            {
+                NX_WARNING(this, "QnIOStateDataList is not match to expected data at step %1", kSteps - m_data.size());
                 return false;
+            }
         }
 
         return true;
@@ -73,7 +82,7 @@ static QnIOStateDataList genTestData()
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> stateGen(0, 1);
 
-    for (int i = 0; i < 1000; ++i)
+    for (int i = 0; i < kSteps; ++i)
     {
         QnIOStateData data(
             lit("A%1").arg(i), //< port
@@ -151,12 +160,15 @@ TEST(IoServerMonitorTest, main)
 
     QObject::connect(
         httpClient.get(), &nx::network::http::AsyncHttpClient::done,
-        [&allDataProcessed](nx::network::http::AsyncHttpClientPtr /*httpClient*/)
+        [contentParser, &allDataProcessed](nx::network::http::AsyncHttpClientPtr /*httpClient*/)
         {
+            contentParser->flush();
             allDataProcessed.set_value();
         });
 
-    auto camera = launcher.commonModule()->resourcePool()->getResourceByUniqueId<QnSecurityCamResource>(kTestCamPhysicalId);
+    auto camera = launcher.commonModule()->resourcePool()
+        ->getResourceByUniqueId<nx::mediaserver::resource::Camera>(kTestCamPhysicalId);
+
     ASSERT_TRUE(camera);
     launcher.commonModule()->statusDictionary()->setValue(camera->getId(), Qn::Online);
     httpClient->doGet(url);
@@ -167,7 +179,7 @@ TEST(IoServerMonitorTest, main)
 
     for (const auto& data: testData)
     {
-        emit camera->cameraInput(
+        emit camera->inputPortStateChanged(
             camera->toSharedPointer(),
             data.id,
             data.isActive,
@@ -178,6 +190,14 @@ TEST(IoServerMonitorTest, main)
         std::future_status::ready,
         allDataProcessed.get_future().wait_for(kMaxTestTime));
 
+    const nx::network::http::AsyncClient::State state = httpClient->state();
+    if (state == nx::network::http::AsyncClient::State::sFailed)
+    {
+        NX_WARNING(this, "Http request failed %1", httpClient->lastSysErrorCode());
+        return;
+    }
+    ASSERT_TRUE(httpClient->response());
+    ASSERT_EQ(nx::network::http::StatusCode::ok, httpClient->response()->statusLine.statusCode);
 
     ASSERT_TRUE(ioParser->isEof());
 }

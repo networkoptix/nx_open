@@ -18,6 +18,7 @@ public:
     QnResourceStatusWatcher(QnCommonModule* commonModule);
     virtual ~QnResourceStatusWatcher();
     void updateResourceStatus(const QnResourcePtr& resource);
+    void stop();
 signals:
     void statusChanged(const QnResourcePtr& resource);
 private slots:

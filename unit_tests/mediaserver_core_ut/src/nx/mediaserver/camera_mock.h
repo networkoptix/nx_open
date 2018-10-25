@@ -15,11 +15,9 @@ namespace test {
 
 class CameraMock: public Camera
 {
-    Q_OBJECT
 public:
     CameraMock(QnMediaServerModule* serverModule);
-
-    CameraDiagnostics::Result initialize();
+    using Camera::initInternal;
 
     template<template<typename> class ApiProvider>
     void makeApiAdvancedParametersProvider(const std::vector<QString>& parameters);
@@ -76,7 +74,8 @@ private:
 class CameraTest: public testing::Test
 {
 public:
-    QnSharedResourcePointer<CameraMock> newCamera(std::function<void(CameraMock*)> setup) const;
+    QnSharedResourcePointer<CameraMock> newCamera(
+        std::function<void(CameraMock*)> setup = nullptr) const;
 
 protected:
     virtual void SetUp() override;

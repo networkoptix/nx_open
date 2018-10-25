@@ -18,7 +18,27 @@ from framework.waiting import wait_for_truthy
 _logger = logging.getLogger(__name__)
 
 _DEFAULT_QUICK_RUN_TIMEOUT_SEC = 10
-_INTERNAL_NIC_INDICES = [2, 3, 4, 5, 6, 7, 8]
+
+## This NIC is used for
+# - remote OS setup,
+# - working with remote filesystem,
+# - installing Mediaserver.
+#
+# Ports are forwarded to this NIC.
+_MANAGEMENT_NIC_INDEX = 1
+
+## This NIC is used for connections initiated from within VM, e.g. when tests runner is serving
+# data by HTTP and Mediaserver is downloading it. Such traffic goes through other NIC to make it
+# possible to limit it by means of VirtualBox.
+_HOST_CONNECTION_NIC_INDEX = 2
+
+## Others are used to combine VMs into internal networks. These are unplugged before every test.
+_INTERNAL_NIC_INDICES = [3, 4, 5, 6, 7, 8]
+
+## All NIC indices. Currently used only to setup MAC addresses of the newly cloned VM.
+# Theoretically, some NICs may not be used at all but their indices should be listed here to get
+# non-random MAC address.
+_ALL_NIC_INDICES = [_MANAGEMENT_NIC_INDEX, _HOST_CONNECTION_NIC_INDEX] + _INTERNAL_NIC_INDICES
 
 
 class VirtualBoxError(Exception):
@@ -179,20 +199,30 @@ class _VirtualBoxVm(VmHardware):
         self._virtual_box.manage(['export', self.name, '-o', vm_image_path, '--options', 'nomacs'])
 
     def clone(self, clone_vm_name):  # type: (str) -> VmHardware
-        self._virtual_box.manage([
-            'clonevm', self.name,
-            '--snapshot', 'template',
-            '--name', clone_vm_name,
-            '--options', 'link',
-            '--register',
-            ])
-        nat_subnet = self._virtual_box.__class__._nat_subnet
-        self._virtual_box.manage(['modifyvm', self.name, '--natnet1', nat_subnet])
+        """Clone VM and, if needed, create template from current state. VirtualBox can create
+        linked clone only from template.
+        """
+        snapshot_name = 'template'
+
+        def _try():
+            self._virtual_box.manage([
+                'clonevm', self.name,
+                '--snapshot', snapshot_name,
+                '--name', clone_vm_name,
+                '--options', 'link',
+                '--register',
+                ])
+        try:
+            _try()
+        except virtual_box_error_cls('VBOX_E_OBJECT_NOT_FOUND'):
+            self._virtual_box.manage(['snapshot', self.name, 'take', snapshot_name])
+            _try()
+
         return self.__class__(self._virtual_box, clone_vm_name)
 
     def setup_mac_addresses(self, make_mac):
         modify_command = ['modifyvm', self.name]
-        for nic_index in [1] + _INTERNAL_NIC_INDICES:
+        for nic_index in _ALL_NIC_INDICES:
             raw_mac = make_mac(nic_index=nic_index)
             mac = EUI(raw_mac, dialect=mac_bare)
             modify_command.append('--macaddress{}={}'.format(nic_index, mac))
@@ -272,6 +302,36 @@ class _VirtualBoxVm(VmHardware):
         for nic_index in self.macs.keys():
             self._manage_nic(nic_index, 'nic', 'null')
 
+    def limit_bandwidth(self, speed_limit_kbit):
+        """See: https://www.virtualbox.org/manual/ch06.html#network_bandwidth_limit:
+
+        > The limits for each group can be changed while the VM is running, with changes being
+        picked up immediately. The example below changes the limit for the group created in the
+        example above to 100 Kbit/s:
+        ```{.sh}
+        VBoxManage bandwidthctl "VM name" set network1 --limit 100k
+        ```
+
+        In `./configure-vm.sh`, each NIC gets its own bandwidth group, `network1`, `network2`...
+        """
+        for nic_index in [_HOST_CONNECTION_NIC_INDEX] + _INTERNAL_NIC_INDICES:
+            self._virtual_box.manage([
+                'bandwidthctl', self.name,
+                'set', 'network{}'.format(nic_index),
+                '--limit', '{}k'.format(speed_limit_kbit)])
+
+    def reset_bandwidth(self):
+        """See: https://www.virtualbox.org/manual/ch06.html#network_bandwidth_limit:
+
+        > It is also possible to disable shaping for all adapters assigned to a bandwidth group
+        while VM is running, by specifying the zero limit for the group. For example, for the
+        bandwidth group named "Limit" use:
+        ```{.sh}
+        VBoxManage bandwidthctl "VM name" set Limit --limit 0
+        ```
+        """
+        self.limit_bandwidth(0)
+
     def _manage_nic(self, nic_index, command, *arguments):
         if self._is_running:
             prefix = ['controlvm', self.name, command + str(nic_index)]
@@ -318,7 +378,12 @@ class VirtualBox(Hypervisor):
     ## Network for management. Host, as it's seen from VMs, is the part of this network and its
     # address, as seen from VMs, is in this network. Host has a special address in NAT network, it
     # is `(net & mask) + 2`. See: https://www.virtualbox.org/manual/ch09.html#idm8375.
-    _nat_subnet = IPNetwork('192.168.254.0/24')
+    #
+    # Network address is set in `./configure-vm.sh`.
+    #
+    # For connections that are initiated from VM,
+    # other NIC is used to make it possible to control traffic by the means of VirtualBox.
+    _nat_subnet = IPNetwork('192.168.253.0/24')
 
     def __init__(self, host_os_access, runner_address):
         """Create VirtualBox hypervisor.
@@ -332,9 +397,47 @@ class VirtualBox(Hypervisor):
             runner_address = self.__class__._nat_subnet.ip + 2
         super(VirtualBox, self).__init__(host_os_access, runner_address)
 
+    def _get_file_path_for_import_vm(self, vm_image_path, timeout_sec):
+        if vm_image_path.suffix == '.ova':
+            try:
+                # TODO: unpack command to run under Windows or, at least, check OS before un-tar
+                stdout = self.host_os_access.run_command(
+                    ['tar', 'xvf', vm_image_path, '-C', vm_image_path.parent],
+                    timeout_sec=timeout_sec)
+            # We need to process `tar` fatal errors only:
+            #
+            # GNU `tar` possible exit codes:
+            #
+            # 0 `Successful termination'.
+            # 1 `Some files differ'.
+            # 2 `Fatal error'. This means that some fatal, unrecoverable error occurred.
+            #
+            # http://www.gnu.org/software/tar/manual/html_section/tar_19.html
+            except exit_status_error_cls(2) as x:
+                stderr_decoded = x.stderr.decode('ascii')
+                raise VirtualBoxError(
+                    "Unpack image OVA archive '%s' error: %s" % (
+                        vm_image_path, stderr_decoded))
+
+            # The above files (several disk images and a textual description file
+            # in an XML dialect with an .ovf extension) can be packed together
+            # into a single archive file, typically with an .ova extension.
+            # (Such archive files use a variant of the TAR archive format and can
+            # therefore be unpacked outside of VirtualBox with any utility that
+            # can unpack standard TAR files).
+            #
+            # http://www.virtualbox.org/manual/ch01.html#ova
+            for line in stdout.strip().splitlines():
+                if line.endswith('.ovf'):
+                    return vm_image_path.parent / line
+            raise VirtualBoxError(
+                "Image OVA archive '%s' doesn't contain OVF file" % vm_image_path)
+
+        return vm_image_path
+
     def import_vm(self, vm_image_path, vm_name):
-        self.manage(['import', vm_image_path, '--vsys', 0, '--vmname', vm_name], timeout_sec=600)
-        self.manage(['snapshot', vm_name, 'take', 'template'])
+        vm_import_file_path = self._get_file_path_for_import_vm(vm_image_path, timeout_sec=600)
+        self.manage(['import', vm_import_file_path, '--vsys', 0, '--vmname', vm_name], timeout_sec=600)
         # Group is assigned only when imported: cloned VMs are created nearby.
         group = '/' + vm_name.rsplit('-', 1)[0]
         try:
@@ -392,7 +495,9 @@ class VirtualBox(Hypervisor):
                 raise VirtualBoxError(message)
             code = mo.group(1)
             if code == 'VBOX_E_OBJECT_NOT_FOUND':
-                raise VMNotFound("Cannot find VM:\n{}".format(message))
+                mo = re.match(prefix + r"Could not find a registered machine named '(.+)'", first_line)
+                if mo:
+                    raise VMNotFound("Cannot find VM: {!r}\n{}".format(mo.group(1), message))
             if code == 'VBOX_E_FILE_ERROR' and 'already exists' in message:
                 raise VMAlreadyExists(message)
             raise virtual_box_error_cls(code)(message)

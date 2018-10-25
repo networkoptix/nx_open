@@ -284,7 +284,7 @@ public:
         --(*m_dummyChannelCount);
     }
 
-    virtual void pleaseStopSync(bool /*x*/ = false) override
+    virtual void pleaseStopSync() override
     {
         ++(*m_pleaseStopCallCount);
     }

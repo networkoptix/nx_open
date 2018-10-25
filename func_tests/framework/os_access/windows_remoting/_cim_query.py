@@ -19,7 +19,7 @@ def _pretty_format_xml(text):
 # https://docs.microsoft.com/en-us/windows/desktop/debug/system-error-codes
 # https://docs.microsoft.com/en-us/windows/desktop/adsi/win32-error-codes
 _win32_error_codes = {
-    0x80071392L: 'ERROR_OBJECT_ALREADY_EXISTS',
+    0x80071392: 'ERROR_OBJECT_ALREADY_EXISTS',
     }
 
 class CIMClass(object):
@@ -71,14 +71,6 @@ class _CimAction(object):
         # noinspection PyTypeChecker
         self.namespaces[self.cim_class.uri] = None  # Desired class namespace is default.
 
-    def _parent_is_wsman_items_element(self, parent_path, _key, _value):
-        try:
-            parent = parent_path[-1]
-        except IndexError:
-            return False
-        parent_tag, _parent_attributes = parent
-        return parent_tag == self.namespaces['http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd'] + ':Items'
-
     def _substitute_namespace_in_type_attribute(self, path, key, data):
         """Process namespaces in type attr value."""
         if key != '@' + self.namespaces['http://www.w3.org/2001/XMLSchema-instance'] + ':type':
@@ -120,7 +112,7 @@ class _CimAction(object):
             response,
             dict_constructor=dict,  # Order is meaningless.
             process_namespaces=True, namespaces=self.namespaces,  # Force namespace aliases.
-            force_list=self._parent_is_wsman_items_element,
+            force_list=['w:Item', 'w:Selector'],
             postprocessor=self._substitute_namespace_in_type_attribute,
             )
         return response_dict['env:Envelope']['env:Body']
@@ -246,3 +238,16 @@ class CIMQuery(object):
                 pformat(method_output),
                 ))
         return method_output
+
+
+def find_by_selector_set(selector_set, items):
+    """Selector is field-value pair to find value. Selector set is used as foreign key when objects
+    are referred in WSMan response. Sometimes fields in its selector set are undocumented but it's
+    OK to used them: PowerShell does this way.
+    """
+    for item in items:
+        for selector in selector_set['w:Selector']:
+            if item[selector['@Name']] != selector['#text']:
+                break  # One of selectors is not met. Skip item. Break from loop over criteria.
+        else:
+            yield item  # All selectors are fulfilled.

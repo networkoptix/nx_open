@@ -10,6 +10,7 @@
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/network/http/http_types.h>
 #include <nx/fusion/model_functions.h>
+#include <api/model/password_data.h>
 
 #include <rest/server/request_handler.h>
 #include <transaction/transaction.h>
@@ -44,6 +45,24 @@ inline void fixRequestDataIfNeeded<nx::vms::api::UserData>(nx::vms::api::UserDat
     }
 }
 
+template<>
+inline void fixRequestDataIfNeeded<nx::vms::api::UserDataEx>(
+    nx::vms::api::UserDataEx* const userDataEx)
+{
+    if (!userDataEx->password.isEmpty())
+    {
+        const auto hashes = PasswordData::calculateHashes(userDataEx->name, userDataEx->password,
+            userDataEx->isLdap);
+
+        userDataEx->realm = hashes.realm;
+        userDataEx->hash = hashes.passwordHash;
+        userDataEx->digest = hashes.passwordDigest;
+        userDataEx->cryptSha512Hash = hashes.cryptSha512Hash;
+    }
+
+    fixRequestDataIfNeeded<nx::vms::api::UserData>(userDataEx);
+}
+
 } // namespace update_http_handler_detail
 
 /**
@@ -51,12 +70,13 @@ inline void fixRequestDataIfNeeded<nx::vms::api::UserData>(nx::vms::api::UserDat
  */
 template<
     class RequestData,
+    class ProcessedRequestData = RequestData,
     class Connection = BaseEc2Connection<ServerQueryProcessorAccess> //< Overridable for tests.
 >
 class UpdateHttpHandler: public QnRestRequestHandler
 {
 public:
-    typedef std::function<void(const RequestData)> CustomActionFunc;
+    typedef std::function<void(const ProcessedRequestData)> CustomActionFunc;
     typedef std::shared_ptr<Connection> ConnectionPtr;
 
     explicit UpdateHttpHandler(
@@ -100,7 +120,7 @@ public:
         if (!success)
             return httpStatusCode;
 
-        switch (processUpdateAsync(command, requestData, owner))
+        switch (processUpdateAsync(command, ProcessedRequestData(requestData), owner))
         {
             case ErrorCode::ok:
                 return nx::network::http::StatusCode::ok;
@@ -145,7 +165,7 @@ private:
                 *requestData = QnUbjson::deserialized<RequestData>(
                     body, RequestData(), outSuccess);
                 if (!*outSuccess) //< Ubjson deserialization error.
-                    return nx::network::http::StatusCode::invalidParameter;
+                    return nx::network::http::StatusCode::badRequest;
                 break;
             }
 
@@ -327,7 +347,7 @@ private:
 
         *outSuccess = false;
 
-        RequestData existingData;
+        ProcessedRequestData existingData;
         bool found = false;
         switch (processQueryAsync(id, &existingData, &found, owner))
         {
@@ -380,16 +400,16 @@ private:
      * Sfinae: Used only when RequestData provides id for merging but is not IdData (because
      * merging for API parameters of exact type IdData has no sence).
      */
-    template<typename T = RequestData>
+    template<typename T>
     ErrorCode processQueryAsync(
         const QnUuid& uuid,
-        RequestData* outData,
+        T* outData,
         bool* outFound,
         const QnRestConnectionProcessor* owner,
         decltype(&T::getIdForMerging) /*enable_if_member_exists*/ = nullptr,
         typename std::enable_if<!std::is_same<nx::vms::api::IdData, T>::value>::type* = nullptr)
     {
-        typedef std::vector<RequestData> RequestDataList;
+        typedef std::vector<T> RequestDataList;
 
         ErrorCode errorCode = ErrorCode::ok;
         bool finished = false;
@@ -426,9 +446,10 @@ private:
         return errorCode;
     }
 
+    template<typename T>
     ErrorCode processUpdateAsync(
         ApiCommand::Value command,
-        const RequestData& requestData,
+        const T& requestData,
         const QnRestConnectionProcessor* owner)
     {
         ErrorCode errorCode = ErrorCode::ok;

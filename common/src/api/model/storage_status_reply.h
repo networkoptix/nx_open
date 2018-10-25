@@ -22,11 +22,13 @@ struct QnStorageSpaceData {
     bool isBackup;
     bool isOnline;
     QString storageType;
+    Qn::StorageStatuses storageStatus;
 
     QnStorageSpaceData();
     explicit QnStorageSpaceData(const QnStorageResourcePtr &storage, bool fastCreate);
 };
-#define QnStorageSpaceData_Fields (url)(storageId)(totalSpace)(freeSpace)(reservedSpace)(isExternal)(isWritable)(isUsedForWriting)(storageType)(isBackup)(isOnline)
+#define QnStorageSpaceData_Fields (url)(storageId)(totalSpace)(freeSpace)(reservedSpace) \
+    (isExternal)(isWritable)(isUsedForWriting)(storageType)(isBackup)(isOnline)(storageStatus)
 
 struct QnStorageStatusReply {
     bool pluginExists;

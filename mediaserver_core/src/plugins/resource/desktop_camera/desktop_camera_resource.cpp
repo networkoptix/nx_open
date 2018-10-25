@@ -6,6 +6,8 @@
 #include <plugins/resource/desktop_camera/desktop_camera_resource_searcher.h>
 
 #include <media_server/serverutil.h>
+#include <media_server/media_server_module.h>
+#include <media_server/media_server_resource_searchers.h>
 
 const QString QnDesktopCameraResource::MANUFACTURE("VIRTUAL_CAMERA");
 
@@ -31,7 +33,7 @@ QnDesktopCameraResource::~QnDesktopCameraResource()
 {
 }
 
-bool QnDesktopCameraResource::setRelayOutputState(const QString& /*outputID*/, bool /*activate*/,
+bool QnDesktopCameraResource::setOutputPortState(const QString& /*outputID*/, bool /*activate*/,
     unsigned int /*autoResetTimeoutMS*/)
 {
     return false;
@@ -57,11 +59,14 @@ bool QnDesktopCameraResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr&
 
 bool QnDesktopCameraResource::isReadyToDetach() const
 {
-    if (!QnDesktopCameraResourceSearcher::instance())
+    auto desktopCameraSearcher =
+        serverModule()->resourceSearchers()->searcher<QnDesktopCameraResourceSearcher>();
+
+    if (!desktopCameraSearcher)
         return true;
 
     auto camera = this->toSharedPointer().dynamicCast<QnDesktopCameraResource>();
-    return !QnDesktopCameraResourceSearcher::instance()->isCameraConnected(camera);  // check if we have already lost connection
+    return !desktopCameraSearcher->isCameraConnected(camera);  // check if we have already lost connection
 }
 
 nx::mediaserver::resource::StreamCapabilityMap

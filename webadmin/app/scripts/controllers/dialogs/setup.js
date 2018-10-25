@@ -258,7 +258,8 @@ angular.module('webadminApp')
                 'UNCONFIGURED_SYSTEM':'fail',
                 'DEPENDENT_SYSTEM_BOUND_TO_CLOUD':'fail',
                 'BOTH_SYSTEM_BOUND_TO_CLOUD':'fail',
-                'DIFFERENT_CLOUD_HOST':'fail'
+                'DIFFERENT_CLOUD_HOST': 'fail',
+                'DUPLICATE_MEDIASERVER_FOUND':'fail'
             };
             return errorClasses[error] || 'fail';
         }
@@ -285,6 +286,8 @@ angular.module('webadminApp')
                 'DIFFERENT_CLOUD_HOST':L.join.cloudHostConflict,
 
                 'currentPassword': L.join.incorrectCurrentPassword,
+
+                'DUPLICATE_MEDIASERVER_FOUND': L.join.duplicateServersError,
 
                 // Cloud errors:
                 'notAuthorized': L.join.incorrectRemotePassword,
