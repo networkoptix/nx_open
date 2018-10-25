@@ -104,9 +104,7 @@ StreamReaderPrivate::StreamReaderPrivate(
     m_encoderIndex(encoderIndex),
     m_codecParams(codecParams),
     m_camera(camera),
-    m_avConsumer(new BufferedPacketConsumer(m_camera->videoStream(), m_codecParams)),
-    m_consumerAdded(false),
-    m_interrupted(false)
+    m_avConsumer(new BufferedPacketConsumer(m_camera->videoStream(), m_codecParams))
 {
 }
 
@@ -141,10 +139,10 @@ void StreamReaderPrivate::setBitrate(int bitrate)
 
 void StreamReaderPrivate::ensureConsumerAdded()
 {
-    if (!m_consumerAdded)
+    if (!m_audioConsumerAdded)
     {
         m_camera->audioStream()->addPacketConsumer(m_avConsumer);
-        m_consumerAdded = true;
+        m_audioConsumerAdded = true;
     }
 }
 
@@ -168,10 +166,16 @@ std::unique_ptr<ILPMediaPacket> StreamReaderPrivate::toNxPacket(const ffmpeg::Pa
     return nxPacket;
 }
 
-void StreamReaderPrivate::removeConsumer()
+void StreamReaderPrivate::removeAudioConsumer()
 {
     m_camera->audioStream()->removePacketConsumer(m_avConsumer);
-    m_consumerAdded = false;
+    m_audioConsumerAdded = false;
+}
+
+void StreamReaderPrivate::removeConsumer()
+{
+    removeVideoConsumer();
+    removeAudioConsumer();
 }
 
 } // namespace usb_cam

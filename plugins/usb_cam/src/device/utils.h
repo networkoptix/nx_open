@@ -6,6 +6,7 @@
 #include "camera/camera_plugin.h"
 
 #include "device_data.h"
+#include "abstract_compression_type_descriptor.h"
 
 namespace nx {
 namespace usb_cam {
