@@ -17,12 +17,16 @@ def _pretty_format_xml(text):
     return pretty_text
 
 
-# Some error codes of interest to us
-# https://docs.microsoft.com/en-us/windows/desktop/WmiSdk/wmi-error-constants
-# https://docs.microsoft.com/en-us/windows/desktop/debug/system-error-codes
-# https://docs.microsoft.com/en-us/windows/desktop/adsi/win32-error-codes
+# Explanation: https://docs.microsoft.com/en-us/windows/desktop/WmiSdk/wmi-error-constants.
+# More: https://docs.microsoft.com/en-us/windows/desktop/adsi/win32-error-codes.
 _win32_error_codes = {
+    # Errors originating in the core operating system.
+    # Remove 0x8007, lookup for last 4 hex digits.
+    # See: https://docs.microsoft.com/en-us/windows/desktop/debug/system-error-codes.
     0x80071392: 'ERROR_OBJECT_ALREADY_EXISTS',
+    # WBEM Errors.
+    # See: https://docs.microsoft.com/en-us/windows/desktop/WmiSdk/wmi-error-constants.
+    0x80041008: 'WBEM_E_INVALID_PARAMETER',
     }
 
 
