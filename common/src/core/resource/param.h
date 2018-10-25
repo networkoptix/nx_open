@@ -65,6 +65,7 @@ namespace Qn
     static const QString kMediaTraits = lit("mediaTraits");
     static const QString kDeviceType = lit("deviceType");
     static const QString kConfigureAllStitchedSensors("configureAllStitchedSensors");
+    static const QString kDisableMultiThreadDecoding("disableMultiThreadDecoding");
 
     static const QString ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME = lit("advancedParameterOverloads");
 

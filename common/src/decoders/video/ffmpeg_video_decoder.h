@@ -64,8 +64,9 @@ public:
     */
     virtual unsigned int getDecoderCaps() const override;
     virtual void setSpeed( float newValue ) override;
-    void forceMtDecoding(bool value);
+
 private:
+    void forceMtDecoding(bool value);
     static AVCodec* findCodec(AVCodecID codecId);
 
     void openDecoder(const QnConstCompressedVideoDataPtr& data);

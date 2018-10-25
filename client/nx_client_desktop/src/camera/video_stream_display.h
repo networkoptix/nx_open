@@ -5,6 +5,8 @@ extern "C"
     #include <libswscale/swscale.h>
 }
 
+#include <set>
+
 #include <QtCore/QQueue>
 
 #include "decoders/video/abstract_video_decoder.h"
@@ -32,7 +34,7 @@ public:
     // TODO: #Elric #enum
     enum FrameDisplayStatus {Status_Displayed, Status_Skipped, Status_Buffered};
 
-    QnVideoStreamDisplay(bool can_downscale, int channelNumber);
+    QnVideoStreamDisplay(const QnMediaResourcePtr& resource, bool can_downscale, int channelNumber);
     ~QnVideoStreamDisplay();
 
     //!Implementation of QnStoppable::pleaseStop()
@@ -76,6 +78,7 @@ private:
     QnVideoStreamDisplay::FrameDisplayStatus flushFrame(int channel, QnFrameScaler::DownscaleFactor force_factor);
     //!Blocks until all frames passed to \a display have been rendered
     void flushFramesToRenderer();
+    std::set<AVCodecID> getDisabledMtCodecs();
     void overrideTimestampOfNextFrameToRender(qint64 value);
     //!Returns timestamp of frame that will be rendered next. It can be already displayed frame (if no new frames available)
     qint64 getTimestampOfNextFrameToRender() const;
@@ -98,6 +101,7 @@ private:
     QSet<QnAbstractRenderer*> m_newList;
     QSet<QnAbstractRenderer*> m_renderList;
     bool m_renderListModified;
+    QnMediaResourcePtr m_resource;
 
     /**
       * to reduce image size for weak video cards
