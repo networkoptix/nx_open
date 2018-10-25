@@ -13,32 +13,32 @@ class RestPathMatcher:
     public ::testing::Test
 {
 protected:
-    void assertPathRegistered(const nx::network::http::StringType& restPath, int val)
+    void assertPathRegistered(const std::string& restPath, int val)
     {
         ASSERT_TRUE(m_dictionary.add(restPath, val));
     }
 
-    void assertPathNotRegistered(const nx::network::http::StringType& restPath, int val)
+    void assertPathNotRegistered(const std::string& restPath, int val)
     {
         ASSERT_FALSE(m_dictionary.add(restPath, val));
     }
 
     void assertPathMatches(
-        const nx::network::http::StringType& path,
+        const std::string& path,
         int expectedValue,
-        std::vector<nx::network::http::StringType> expectedParams)
+        std::vector<std::string> expectedParams)
     {
-        std::vector<nx::network::http::StringType> params;
-        const auto& result = m_dictionary.match(path, &params);
+        std::vector<std::string> params;
+        const auto result = m_dictionary.match(path, &params);
 
         ASSERT_TRUE(static_cast<bool>(result));
         ASSERT_EQ(expectedValue, *result);
         ASSERT_EQ(expectedParams, params);
     }
 
-    void assertPathNotMatched(const nx::network::http::StringType& path)
+    void assertPathNotMatched(const std::string& path)
     {
-        std::vector<nx::network::http::StringType> params;
+        std::vector<std::string> params;
         ASSERT_FALSE(m_dictionary.match(path, &params));
     }
 

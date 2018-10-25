@@ -48,7 +48,7 @@ void ListeningPeerConnectionTunnelingServer::authorize(
     }
 
     relay::api::BeginListeningRequest beginListeningRequest{
-        requestContext->requestPathParams[0].toStdString()};
+        requestContext->requestPathParams[0]};
 
     m_listeningPeerManager->beginListening(
         std::move(beginListeningRequest),

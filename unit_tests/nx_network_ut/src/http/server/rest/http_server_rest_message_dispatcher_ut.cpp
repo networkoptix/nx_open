@@ -28,7 +28,7 @@ protected:
     }
 
     void thenParametersHaveBeenPassedToTheHandler(
-        const std::vector<nx::network::http::StringType>& expectedParams)
+        const RequestPathParams& expectedParams)
     {
         ASSERT_EQ(expectedParams, issuedRequest().requestPathParams);
     }

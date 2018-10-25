@@ -111,7 +111,8 @@ public:
             return true;
         }
 
-        return pathMatchContext.pathToFactory.add(path.toUtf8(), std::move(factoryFunc));
+        return pathMatchContext.pathToFactory.add(
+            path.toStdString(), std::move(factoryFunc));
     }
 
     template<typename RequestHandlerType>
@@ -190,9 +191,9 @@ private:
         const PathMatchContext& pathMatchContext,
         const QString& path) const
     {
-        std::vector<StringType> pathParams;
+        std::vector<std::string> pathParams;
         boost::optional<const FactoryFunc&> factory =
-            pathMatchContext.pathToFactory.match(path.toUtf8(), &pathParams);
+            pathMatchContext.pathToFactory.match(path.toStdString(), &pathParams);
         if (factory)
         {
             auto handler = (*factory)();

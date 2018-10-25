@@ -39,7 +39,7 @@ void ClientConnectionTunnelingServer::authorize(
 
     controller::ConnectToPeerRequestEx inputData;
     inputData.clientEndpoint = requestContext->connection->socket()->getForeignAddress();
-    inputData.sessionId = requestContext->requestPathParams[0].toStdString();
+    inputData.sessionId = requestContext->requestPathParams[0];
 
     m_connectSessionManager->connectToPeer(
         inputData,

@@ -108,7 +108,7 @@ network::http::RequestResult
 
     RequestResult requestResult(StatusCode::ok);
 
-    const std::string tunnelId = requestContext.requestPathParams.back().toStdString();
+    const std::string tunnelId = requestContext.requestPathParams.back();
 
     requestResult.dataSource =
         prepareCreateDownTunnelResponse(requestContext.response);
@@ -121,7 +121,9 @@ network::http::RequestResult
                 std::make_tuple(this, connection, tunnelId),
                 std::move(requestData));
 
-            std::apply(&SeparateUpDownConnectionsTunnelServer::saveDownChannel, std::move(allArgs));
+            std::apply(
+                &SeparateUpDownConnectionsTunnelServer::saveDownChannel,
+                std::move(allArgs));
         };
 
     return requestResult;
@@ -181,7 +183,7 @@ void SeparateUpDownConnectionsTunnelServer<ApplicationData...>::processOpenTunne
     if (!validateOpenUpChannelRequest(requestContext))
         return completionHandler(StatusCode::badRequest);
 
-    const auto tunnelId = requestContext.requestPathParams[0].toStdString();
+    const auto tunnelId = requestContext.requestPathParams.front();
 
     network::http::RequestResult requestResult(
         nx::network::http::StatusCode::ok);
