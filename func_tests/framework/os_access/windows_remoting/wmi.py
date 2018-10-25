@@ -1,8 +1,11 @@
+import datetime
 import logging
 from collections import OrderedDict
 from pprint import pformat
 from xml.dom import minidom
 
+import dateutil
+import pytz
 import xmltodict
 from pylru import lrudecorator
 from typing import Mapping, Union
@@ -132,7 +135,7 @@ class _Class(object):
     def create(self, properties_dict):
         _logger.info("Create %r: %r", self, properties_dict)
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Create'
-        body = {self.name: _none_to_nil(properties_dict)}
+        body = {self.name: _prepare_data(properties_dict)}
         body[self.name]['@xmlns'] = self.uri
         outcome = self.wmi.act(self.uri, action_url, body, _SelectorSet.empty())
         reference_parameters = outcome[u't:ResourceCreated'][u'a:ReferenceParameters']
@@ -247,19 +250,27 @@ class _SelectorSet(object):
         return cls.from_dict({})
 
 
-def _none_to_nil(data):
+def _prepare_data(data):
     if data is None:
         return {'@xsi:nil': 'true'}
+    if data == '':
+        return None
+    if isinstance(data, datetime.datetime):
+        return {'cim:Datetime': data.astimezone(pytz.UTC).strftime('%Y-%m-%dT%H:%M:%S.%fZ')}
     if isinstance(data, (dict, OrderedDict)):
-        return {key: _none_to_nil(data[key]) for key in data}
+        return {key: _prepare_data(data[key]) for key in data}
     return data
 
 
-def _nil_to_none(data):
+def _parse_data(data):
+    if data is None:
+        return ''
     if data == {'@xsi:nil': 'true'}:
         return None
     if isinstance(data, (dict, OrderedDict)):
-        return {key: _nil_to_none(data[key]) for key in data}
+        if 'cim:Datetime' in data:
+            return dateutil.parser.parse(data['cim:Datetime'])
+        return {key: _parse_data(data[key]) for key in data}
     return data
 
 
@@ -301,7 +312,7 @@ class _Reference(object):
     def put(self, new_properties_dict):
         _logger.info("Put %s where %r: %r", self.wmi_class, self.selectors, new_properties_dict)
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Put'
-        body = {self.wmi_class.name: _none_to_nil(new_properties_dict)}
+        body = {self.wmi_class.name: _prepare_data(new_properties_dict)}
         body[self.wmi_class.name]['@xmlns'] = self.wmi_class.uri
         outcome = self.wmi_class.wmi(self.wmi_class.uri, action_url, body, self.selectors)
         instance = outcome[self.wmi_class.name]
@@ -310,12 +321,13 @@ class _Reference(object):
     def invoke_method(self, method_name, params, timeout_sec=None):
         _logger.info("Invoke %s.%s(%r) where %r", self.wmi_class, method_name, params, self.selectors)
         action_uri = self.wmi_class.uri + '/' + method_name
-        method_input = {'p:' + param_name: param_value for param_name, param_value in params.items()}
+        method_input = {'p:' + param_name: param_value for param_name, param_value in _prepare_data(params).items()}
         method_input['@xmlns:p'] = self.wmi_class.uri
-        method_input['@xmlns:cim'] = 'http://schemas.dmtf.org/wbem/wscim/1/common'  # For `cim:Datetime`.
+        method_input['@xmlns:cim'] = 'http://schemas.dmtf.org/wbem/wscim/1/common'  # For `cWMIim:Datetime`.
+        method_input['@xmlns:xsi'] = 'http://www.w3.org/2001/XMLSchema-instance'  # For `@xsi:nil`.
         body = {method_name + '_INPUT': method_input}
         response = self.wmi_class.wmi.act(self.wmi_class.uri, action_uri, body, self.selectors, timeout_sec=timeout_sec)
-        method_output = response[method_name + '_OUTPUT']
+        method_output = _parse_data(response[method_name + '_OUTPUT'])
         if method_output[u'ReturnValue'] != u'0':
             exception_cls = WmiInvokeFailed.specific_cls(int(method_output[u'ReturnValue']))
             raise exception_cls(self, method_name, params, method_output)
@@ -326,7 +338,7 @@ class _Object(object):
     def __init__(self, ref, data):  # type: (_Reference, Mapping[str, Union[str, Mapping]]) -> ...
         self.ref = ref
         self._data = {}
-        for key, value in _nil_to_none(data).items():
+        for key, value in _parse_data(data).items():
             if key == '@xmlns' or key == '@xsi:type':
                 continue
             if isinstance(value, (dict, OrderedDict)):

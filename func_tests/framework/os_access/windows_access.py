@@ -50,19 +50,13 @@ class WindowsTime(Time):
         started_at = timeit.default_timer()
         result = self.winrm.wmi.cls(u'Win32_OperatingSystem').singleton()
         delay_sec = timeit.default_timer() - started_at
-        raw = result[u'LocalDateTime'][u'cim:Datetime']
-        time = dateutil.parser.parse(raw).astimezone(self.get_tz())
+        time = result[u'LocalDateTime'].astimezone(self.get_tz())
         return RunningTime(time, datetime.timedelta(seconds=delay_sec))
 
     def set(self, new_time):  # type: (datetime.datetime) -> RunningTime
         localized = new_time.astimezone(self.get_tz())
         started_at = timeit.default_timer()
-        # TODO: Do that with Win32_OperatingSystem.SetDateTime WMI method.
-        # See: https://superuser.com/q/1323610/174311
-        self.winrm.run_powershell_script(
-            # language=PowerShell
-            '''Set-Date $dateTime''',
-            variables={'dateTime': new_time.astimezone(pytz.utc).isoformat()})
+        self.winrm.wmi.cls('Win32_OperatingSystem').static().invoke_method('SetDateTime', {'LocalDateTime': new_time})
         delay_sec = timeit.default_timer() - started_at
         return RunningTime(localized, datetime.timedelta(seconds=delay_sec))
 
@@ -207,13 +201,8 @@ class WindowsAccess(OSAccess):
         result = {}
         for mount_point in mount_point_iter:
             # Rely on fact that single identifying selector of `Directory` is its name.
-            # TODO: Query `Win32_Directory` (`Directory` key) by its `w:SelectorSet`.
-            dir_selector_set = mount_point['Directory']['a:ReferenceParameters']['w:SelectorSet']
-            assert dir_selector_set['w:Selector'][0]['@Name'] == 'Name'
-            dir_path_raw = dir_selector_set['w:Selector'][0]['#text']
-            dir_path = self.path_cls(dir_path_raw)
-            volume_selector_set = mount_point['Volume']['a:ReferenceParameters']['w:SelectorSet']
-            volume, = find_by_selector_set(volume_selector_set, volume_list)
+            dir_path = self.path_cls(mount_point['Directory']['Name'])
+            volume, = (v for v in volume_list if v.ref == mount_point['Volume'])
             result[dir_path] = int(volume['FreeSpace'])
         return result
 
