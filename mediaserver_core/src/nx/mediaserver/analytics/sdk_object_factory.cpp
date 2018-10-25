@@ -260,7 +260,7 @@ bool SdkObjectFactory::initEngineResources()
 
         // TODO: Create default engine only if plugin has correspondent capability.
         if (pluginEngineList.empty())
-            pluginEngineList.push_back(createEngineData(pluginId, /*engineIndex*/ 0));
+            pluginEngineList.push_back(createEngineData(plugin, /*engineIndex*/ 0));
     }
 
     std::map<QnUuid, EnginePtr> sdkEnginesById;
@@ -340,16 +340,20 @@ bool SdkObjectFactory::initEngineResources()
 }
 
 nx::vms::api::AnalyticsEngineData SdkObjectFactory::createEngineData(
-    const QnUuid& pluginId,
+    const resource::AnalyticsPluginResourcePtr& plugin,
     int engineIndex) const
 {
     using namespace nx::vms::api;
+
+    const auto pluginId = plugin->getId();
+    const auto pluginName = plugin->getName();
+
     AnalyticsEngineData engineData;
     engineData.id = engineId(pluginId, engineIndex);
     engineData.parentId = pluginId;
 
     // TODO: Plugin name should be used here.
-    engineData.name = "Engine " + QString::number(engineIndex);
+    engineData.name = pluginName + " - Engine " + QString::number(engineIndex);
     engineData.typeId = nx::vms::api::AnalyticsEngineData::kResourceTypeId;
 
     return engineData;

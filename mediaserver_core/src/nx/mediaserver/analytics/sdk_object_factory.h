@@ -2,6 +2,7 @@
 
 #include <utils/common/connective.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/mediaserver/resource/resource_fwd.h>
 
 #include <nx/vms/api/data/analytics_data.h>
 
@@ -35,7 +36,7 @@ private:
     bool initEngineResources();
 
     nx::vms::api::AnalyticsEngineData createEngineData(
-        const QnUuid& pluginId,
+        const resource::AnalyticsPluginResourcePtr& plugin,
         const int engineIndex) const;
 };
 
