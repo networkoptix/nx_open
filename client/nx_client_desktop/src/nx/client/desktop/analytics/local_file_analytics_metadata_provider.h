@@ -3,9 +3,7 @@
 #include <nx/client/core/media/abstract_analytics_metadata_provider.h>
 #include <nx/client/core/media/analytics_metadata_provider_factory.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 class LocalFileAnalyticsMetadataProvider: public core::AbstractAnalyticsMetadataProvider
 {
@@ -13,14 +11,14 @@ public:
     LocalFileAnalyticsMetadataProvider(const QnResourcePtr& resource);
 
     virtual common::metadata::DetectionMetadataPacketPtr metadata(
-        qint64 timestamp,
+        std::chrono::microseconds timestamp,
         int channel) const override;
 
     virtual QList<common::metadata::DetectionMetadataPacketPtr> metadataRange(
-        qint64 startTimestamp,
-        qint64 endTimestamp,
+        std::chrono::microseconds startTimestamp,
+        std::chrono::microseconds endTimestamp,
         int channel,
-        int maximumCount = -1) const override;
+        int maximumCount) const override;
 
 private:
     std::vector<nx::common::metadata::DetectionMetadataPacket> m_metadata;
@@ -35,6 +33,4 @@ public:
         const QnResourcePtr& resource) const override;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

@@ -1579,7 +1579,7 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
     if (options().testFlag(InvisibleWidgetOption))
         return;
 
-    const auto timestamp = m_renderer->lastDisplayedTimestampUsec(channel);
+    const auto timestamp = m_renderer->lastDisplayedTimestamp(channel);
 
     if (options().testFlag(DisplayMotion))
     {

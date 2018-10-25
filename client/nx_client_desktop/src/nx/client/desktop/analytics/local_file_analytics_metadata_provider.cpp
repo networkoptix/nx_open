@@ -8,9 +8,10 @@
 
 #include <ini.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
+
+using namespace std::chrono;
+using namespace common::metadata;
 
 namespace {
 
@@ -18,14 +19,6 @@ QString metadataFileName(QString fileName)
 {
     return fileName.replace(QFileInfo(fileName).suffix(), lit("metadata"));
 }
-
-bool metadataContainsTime(
-    const nx::common::metadata::DetectionMetadataPacket& metadata,
-    qint64 timestamp)
-{
-    return metadata.timestampUsec >= timestamp
-        && timestamp < metadata.timestampUsec + metadata.durationUsec;
-};
 
 } // namespace
 
@@ -36,50 +29,47 @@ LocalFileAnalyticsMetadataProvider::LocalFileAnalyticsMetadataProvider(
     if (metadataFile.open(QIODevice::ReadOnly))
     {
         m_metadata =
-            QJson::deserialized<std::vector<nx::common::metadata::DetectionMetadataPacket>>(
-                metadataFile.readAll());
+            QJson::deserialized<std::vector<DetectionMetadataPacket>>(metadataFile.readAll());
     }
 }
 
-common::metadata::DetectionMetadataPacketPtr LocalFileAnalyticsMetadataProvider::metadata(
-    qint64 timestamp, int channel) const
+DetectionMetadataPacketPtr LocalFileAnalyticsMetadataProvider::metadata(
+    microseconds timestamp, int channel) const
 {
-    const auto& metadataList = metadataRange(timestamp, timestamp + 1, channel);
+    const auto& metadataList = metadataRange(timestamp, timestamp + 1us, channel, 1);
     if (metadataList.isEmpty())
         return {};
 
     return metadataList.first();
 }
 
-QList<common::metadata::DetectionMetadataPacketPtr>
-    LocalFileAnalyticsMetadataProvider::metadataRange(
-        qint64 startTimestamp, qint64 endTimestamp, int channel, int maximumCount) const
+QList<DetectionMetadataPacketPtr> LocalFileAnalyticsMetadataProvider::metadataRange(
+    microseconds startTimestamp,
+    microseconds endTimestamp,
+    int channel,
+    int maximumCount) const
 {
     if (channel != 0)
         return {};
 
-    auto startIt = std::lower_bound(
-        std::next(m_metadata.cbegin()),
-        m_metadata.cend(),
+    QList<DetectionMetadataPacketPtr> result;
+
+    auto it = std::lower_bound(m_metadata.cbegin(), m_metadata.cend(),
         std::chrono::microseconds(startTimestamp));
 
-    if (startIt == m_metadata.cend() || startTimestamp < startIt->timestampUsec)
+    if (it->timestampUsec > startTimestamp.count() && it != m_metadata.cbegin())
     {
-        --startIt;
-        if (!metadataContainsTime(*startIt, startTimestamp))
-            ++startIt;
+        --it;
+        if (it->durationUsec > 0 && it->timestampUsec + it->durationUsec < startTimestamp.count())
+            ++it;
     }
 
-    QList<common::metadata::DetectionMetadataPacketPtr> result;
-
-    auto itemsLeft = maximumCount;
-    auto it = startIt;
-    while (itemsLeft != 0 && it != m_metadata.end() && it->timestampUsec < endTimestamp)
+    while (maximumCount > 0 && it != m_metadata.end() && it->timestampUsec < endTimestamp.count())
     {
-        result.append(std::make_shared<common::metadata::DetectionMetadataPacket>(*it));
+        result.append(std::make_shared<DetectionMetadataPacket>(*it));
 
         ++it;
-        --itemsLeft;
+        --maximumCount;
     }
 
     return result;
@@ -108,6 +98,4 @@ core::AbstractAnalyticsMetadataProviderPtr
         new LocalFileAnalyticsMetadataProvider(resource));
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

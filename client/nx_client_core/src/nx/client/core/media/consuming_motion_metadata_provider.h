@@ -19,7 +19,8 @@ public:
     ConsumingMotionMetadataProvider();
     virtual ~ConsumingMotionMetadataProvider() override;
 
-    virtual MetaDataV1Ptr metadata(const qint64 timestamp, int channel) const override;
+    virtual MetaDataV1Ptr metadata(
+        const std::chrono::microseconds timestamp, int channel) const override;
 
     virtual QSharedPointer<media::AbstractMetadataConsumer> metadataConsumer() const override;
 

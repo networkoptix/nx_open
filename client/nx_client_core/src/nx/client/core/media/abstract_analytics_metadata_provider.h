@@ -1,11 +1,12 @@
 #pragma once
 
+#include <chrono>
+#include <limits>
+
 #include <analytics/common/object_detection_metadata.h>
 #include "analytics_fwd.h"
 
-namespace nx {
-namespace client {
-namespace core {
+namespace nx::client::core {
 
 class AbstractAnalyticsMetadataProvider
 {
@@ -14,16 +15,14 @@ public:
     virtual ~AbstractAnalyticsMetadataProvider();
 
     virtual common::metadata::DetectionMetadataPacketPtr metadata(
-        qint64 timestamp,
+        std::chrono::microseconds timestamp,
         int channel) const = 0;
 
     virtual QList<common::metadata::DetectionMetadataPacketPtr> metadataRange(
-        qint64 startTimestamp,
-        qint64 endTimestamp,
+        std::chrono::microseconds startTimestamp,
+        std::chrono::microseconds endTimestamp,
         int channel,
-        int maximumCount = -1) const = 0;
+        int maximumCount = std::numeric_limits<int>::max()) const = 0;
 };
 
-} // namespace core
-} // namespace client
-} // namespace nx
+} // namespace nx::client::core

@@ -184,6 +184,11 @@ qint64 QnResourceWidgetRenderer::lastDisplayedTimestampUsec(int channel) const
     return ctx.renderer ? ctx.renderer->lastDisplayedTime() : -1;
 }
 
+std::chrono::microseconds QnResourceWidgetRenderer::lastDisplayedTimestamp(int channel) const
+{
+    return std::chrono::microseconds(lastDisplayedTimestampUsec(channel));
+}
+
 void QnResourceWidgetRenderer::setBlurFactor(qreal value)
 {
     m_blurFactor = value;

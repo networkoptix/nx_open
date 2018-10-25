@@ -3,9 +3,7 @@
 #include <nx/client/core/media/analytics_metadata_provider_factory.h>
 #include <nx/utils/singleton.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 class AnalyticsMetadataProviderFactory:
     public core::AnalyticsMetadataProviderFactory,
@@ -15,6 +13,4 @@ public:
     void registerMetadataProviders();
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

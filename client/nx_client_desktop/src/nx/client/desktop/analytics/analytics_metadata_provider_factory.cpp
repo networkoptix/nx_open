@@ -4,23 +4,19 @@
 #include "local_file_analytics_metadata_provider.h"
 #include "demo_analytics_metadata_provider.h"
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 void AnalyticsMetadataProviderFactory::registerMetadataProviders()
 {
     registerMetadataFactory(
-        lit("consuming"),
+        "consuming",
         new core::ConsumingAnalyticsMetadataProviderFactory());
     registerMetadataFactory(
-        lit("local"),
+        "local",
         new LocalFileAnalyticsMetadataProviderFactory());
     registerMetadataFactory(
-        lit("demo"),
+        "demo",
         new DemoAnalyticsMetadataProviderFactory());
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

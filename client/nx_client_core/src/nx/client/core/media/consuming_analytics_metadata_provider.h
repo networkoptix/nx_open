@@ -5,9 +5,7 @@
 #include "analytics_metadata_provider_factory.h"
 #include "abstract_metadata_consumer_owner.h"
 
-namespace nx {
-namespace client {
-namespace core {
+namespace nx::client::core {
 
 class ConsumingAnalyticsMetadataProvider:
     public AbstractAnalyticsMetadataProvider,
@@ -17,25 +15,27 @@ class ConsumingAnalyticsMetadataProvider:
 
 public:
     ConsumingAnalyticsMetadataProvider();
+    virtual ~ConsumingAnalyticsMetadataProvider() override;
 
     virtual common::metadata::DetectionMetadataPacketPtr metadata(
-        qint64 timestamp,
+        std::chrono::microseconds timestamp,
         int channel) const override;
 
     virtual QList<common::metadata::DetectionMetadataPacketPtr> metadataRange(
-        qint64 startTimestamp,
-        qint64 endTimestamp,
+        std::chrono::microseconds startTimestamp,
+        std::chrono::microseconds endTimestamp,
         int channel,
-        int maximumCount = -1) const override;
+        int maximumCount) const override;
 
     virtual QSharedPointer<media::AbstractMetadataConsumer> metadataConsumer() const override;
 
 private:
     class Private;
-    QScopedPointer<Private> const d;
+    const QScopedPointer<Private> d;
 };
 
-class ConsumingAnalyticsMetadataProviderFactory: public AbstractAnalyticsMetadataProviderFactory
+class ConsumingAnalyticsMetadataProviderFactory:
+    public AbstractAnalyticsMetadataProviderFactory
 {
 public:
     virtual bool supportsAnalytics(const QnResourcePtr& resource) const override;
@@ -43,6 +43,4 @@ public:
         const QnResourcePtr& resource) const override;
 };
 
-} // namespace core
-} // namespace client
-} // namespace nx
+} // namespace nx::client::core

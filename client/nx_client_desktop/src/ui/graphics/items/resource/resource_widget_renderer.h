@@ -3,6 +3,7 @@
 //#define TEST_FISHEYE_CALIBRATOR
 
 #include <vector>
+#include <chrono>
 
 #include <QtCore/QObject>
 #include <nx/utils/thread/mutex.h>
@@ -79,6 +80,7 @@ public:
     bool isHardwareDecoderUsed(int channel) const;
 
     qint64 lastDisplayedTimestampUsec(int channel) const;
+    std::chrono::microseconds lastDisplayedTimestamp(int channel) const;
 
     QSize sourceSize() const;
 
