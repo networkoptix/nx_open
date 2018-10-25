@@ -56,6 +56,11 @@ bool backupDatabase(const QString& backupDir,
     return true;
 }
 
+bool timeToMakeDbBackup()
+{
+    return false;
+}
+
 QList<QString> allBackupFilePathsSorted(const QString& backupDir)
 {
     return QList<QString>();

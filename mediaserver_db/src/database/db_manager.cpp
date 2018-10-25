@@ -4523,8 +4523,7 @@ ErrorCode QnDbManager::doQuery(const std::nullptr_t& /*dummy*/, DatabaseDumpData
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQuery(
-    const StoredFilePath& dumpFilePath,
+ErrorCode QnDbManager::doQuery(const StoredFilePath& dumpFilePath,
     DatabaseDumpToFileData& databaseDumpToFileData)
 {
     QnWriteLocker lock(&m_mutex);

@@ -23,6 +23,7 @@ bool backupDatabase(const QString& backupDir,
     std::shared_ptr<ec2::AbstractECConnection> connection);
 
 QList<QString> allBackupFilePathsSorted(const QString& backupDir);
+bool timeToMakeDbBackup();
 
 void deleteOldBackupFilesIfNeeded(const QString& backupDir, const QString& filePathToSkip,
     qint64 freeSpace);
