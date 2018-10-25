@@ -145,6 +145,49 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const nx::utils::Ur
     return result;
 }
 
+/**
+ * In local networks Axis cameras have two ipv4 addresses for the same network interface:
+ * private network address 192.168.x.y (https://tools.ietf.org/html/rfc1918)
+ * and link-local address 169.254.w.z. (https://tools.ietf.org/html/rfc3927)
+ * The same camera is periodically discovered with each of these addresses
+ * (several minutes with one, then several minutes with the other).
+ *
+ * If incoming address is non link-local ipv4 we return it.
+ * If incoming address is link-local ipv4 address we
+ *
+ * We need to ignore temporary link-local addresses. To do this we use some heuristic.
+ *
+ * Here we treat a special situation: if camera is discovered with link-local address
+ * we wait for kConfidenceInterval time. If discovered ip is still link-local address we set
+ * this ip to camera otherwise we set the previous (private network) address stored for the mac.
+ */
+nx::network::SocketAddress QnPlAxisResourceSearcher::obtainFixedHostAddress(
+    nx::utils::MacAddress discoveredMac, nx::network::SocketAddress discoveredAddress)
+{
+    static const auto kConfidenceInterval = std::chrono::minutes(20);
+    static const in_addr kLinkLocalIpv4Network = *nx::network::HostAddress("169.254.0.0").ipV4();
+
+    auto& lastNonLinkLocalTimeMarkedAddress = m_foundNonLinkLocalAddresses[discoveredMac];
+
+    const boost::optional<in_addr> discoveredIpv4 = discoveredAddress.address.ipV4();
+    const bool isLinkLocalIpv4Address = discoveredIpv4 &&
+        discoveredIpv4->S_un.S_un_w.s_w1 == kLinkLocalIpv4Network.S_un.S_un_w.s_w1;
+
+    if (!isLinkLocalIpv4Address)
+        lastNonLinkLocalTimeMarkedAddress = TimeMarkedAddress(discoveredAddress);
+
+    // We use discoveredAddress if
+    // 1. discovered address is non link-local OR
+    // 2. non link-local address have never been discovered OR
+    // 3. non link-local address was discovered long ago last time.
+    // Otherwise we use lastNonLinkLocalTimeMarkedAddress.
+    const bool useDiscoveredAddress = !isLinkLocalIpv4Address //< 1
+        || !lastNonLinkLocalTimeMarkedAddress.elapsedTimer.isValid() //< 2
+        || lastNonLinkLocalTimeMarkedAddress.elapsedTimer.hasExpired(kConfidenceInterval); //< 3
+
+    return useDiscoveredAddress ? discoveredAddress : lastNonLinkLocalTimeMarkedAddress.address;
+}
+
 QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     QnResourceList& result,
     const QByteArray& responseData,
@@ -233,7 +276,8 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     resource->setTypeId(rt);
     resource->setName(name);
     resource->setModel(name);
-    resource->setMAC(nx::utils::MacAddress(smac));
+    auto mac = nx::utils::MacAddress(smac);
+    resource->setMAC(mac);
 
     quint16 port = nx::network::http::DEFAULT_HTTP_PORT;
     QnMdnsPacket packet;
@@ -254,8 +298,12 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
 
     QUrl url;
     url.setScheme(lit("http"));
-    url.setHost(foundHostAddress.toString());
-    url.setPort(port);
+
+    auto fixedIpPort = obtainFixedHostAddress(
+        mac, nx::network::SocketAddress(foundHostAddress.toString(), port));
+
+    url.setHost(fixedIpPort.address.toString());
+    url.setPort(fixedIpPort.port);
 
     resource->setUrl(url.toString());
 

@@ -53,8 +53,8 @@ public:
         responseReceiveBuffer.resize(connectResponse.size());
 
         // Check that CONNECT was successfull.
-        ASSERT_EQ(socket->recv(responseReceiveBuffer.data(), responseReceiveBuffer.size(), 0),
-            responseReceiveBuffer.size())
+        ASSERT_EQ(socket->recv(responseReceiveBuffer.data(), responseReceiveBuffer.size(),
+            MSG_WAITALL), responseReceiveBuffer.size())
                 << "CONNECT response failure: " << SystemError::getLastOSErrorText().toStdString();
 
         // We want to check only the first response line.
@@ -100,7 +100,7 @@ TEST_F(VmsGatewayConnectTest, ConnectionClose)
 
     server.pleaseStopSync();
     QByteArray receiveBuffer(1, 0);  //< It should be >0 to differentiate EOF and zero bytes read.
-    ASSERT_EQ(clientSocket->recv(receiveBuffer.data(), receiveBuffer.size(), 0), 0);
+    ASSERT_EQ(clientSocket->recv(receiveBuffer.data(), receiveBuffer.size(), MSG_WAITALL), 0);
 }
 
 TEST_F(VmsGatewayConnectTest, IpSpecified)
@@ -116,7 +116,7 @@ TEST_F(VmsGatewayConnectTest, IpSpecified)
 
     QByteArray receiveBuffer;
     receiveBuffer.resize(writeData.size());
-    ASSERT_EQ(clientSocket->recv(receiveBuffer.data(), receiveBuffer.size(), 0),
+    ASSERT_EQ(clientSocket->recv(receiveBuffer.data(), receiveBuffer.size(), MSG_WAITALL),
         receiveBuffer.size());
 
     server.pleaseStopSync();
@@ -141,9 +141,9 @@ TEST_F(VmsGatewayConnectTest, ConcurrentConnections)
 
     QByteArray receiveBuffer;
     receiveBuffer.resize(writeData.size());
-    ASSERT_EQ(clientSocketFirst->recv(receiveBuffer.data(), receiveBuffer.size(), 0),
+    ASSERT_EQ(clientSocketFirst->recv(receiveBuffer.data(), receiveBuffer.size(), MSG_WAITALL),
         receiveBuffer.size());
-    ASSERT_EQ(clientSocketSecond->recv(receiveBuffer.data(), receiveBuffer.size(), 0),
+    ASSERT_EQ(clientSocketSecond->recv(receiveBuffer.data(), receiveBuffer.size(), MSG_WAITALL),
         receiveBuffer.size());
     server.pleaseStopSync();
 }
