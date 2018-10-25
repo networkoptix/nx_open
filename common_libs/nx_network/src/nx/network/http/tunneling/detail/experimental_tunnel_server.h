@@ -20,18 +20,21 @@
 namespace nx::network::http::tunneling::detail {
 
 template<typename ...ApplicationData>
-class ExperimentalTunnelServer:
+class SeparateUpDownConnectionsTunnelServer:
     public BasicCustomTunnelServer<ApplicationData...>
 {
     using base_type = BasicCustomTunnelServer<ApplicationData...>;
 
 public:
-    ExperimentalTunnelServer(typename base_type::NewTunnelHandler newTunnelHandler);
-    virtual ~ExperimentalTunnelServer();
+    SeparateUpDownConnectionsTunnelServer(typename base_type::NewTunnelHandler newTunnelHandler);
+    virtual ~SeparateUpDownConnectionsTunnelServer();
 
-    void registerRequestHandlers(
-        const std::string& basePath,
-        server::rest::MessageDispatcher* messageDispatcher);
+protected:
+    void processOpenTunnelUpChannelRequest(
+        RequestContext requestContext,
+        nx::network::http::RequestProcessedHandler completionHandler);
+
+    void closeAllTunnels();
 
 private:
     struct TunnelContext
@@ -55,8 +58,6 @@ private:
         const RequestContext& requestContext,
         ApplicationData... requestData) override;
 
-    void closeAllTunnels();
-
     std::unique_ptr<AbstractMsgBodySource> prepareCreateDownTunnelResponse(
         network::http::Response* response);
 
@@ -64,10 +65,6 @@ private:
         network::http::HttpServerConnection* connection,
         const std::string& tunnelId,
         ApplicationData... requestData);
-
-    void processOpenTunnelUpChannelRequest(
-        RequestContext requestContext,
-        nx::network::http::RequestProcessedHandler completionHandler);
 
     void saveUpChannel(
         network::http::HttpServerConnection* connection,
@@ -82,7 +79,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 template<typename ...ApplicationData>
-ExperimentalTunnelServer<ApplicationData...>::ExperimentalTunnelServer(
+SeparateUpDownConnectionsTunnelServer<ApplicationData...>::SeparateUpDownConnectionsTunnelServer(
     typename base_type::NewTunnelHandler newTunnelHandler)
     :
     base_type(std::move(newTunnelHandler))
@@ -90,33 +87,14 @@ ExperimentalTunnelServer<ApplicationData...>::ExperimentalTunnelServer(
 }
 
 template<typename ...ApplicationData>
-ExperimentalTunnelServer<ApplicationData...>::~ExperimentalTunnelServer()
+SeparateUpDownConnectionsTunnelServer<ApplicationData...>::~SeparateUpDownConnectionsTunnelServer()
 {
     closeAllTunnels();
 }
 
 template<typename ...ApplicationData>
-void ExperimentalTunnelServer<ApplicationData...>::registerRequestHandlers(
-    const std::string& basePath,
-    server::rest::MessageDispatcher* messageDispatcher)
-{
-    using namespace std::placeholders;
-
-    // Tunnel initiation is done by opening tunnel down channel.
-    messageDispatcher->registerRequestProcessorFunc(
-        nx::network::http::Method::get,
-        url::joinPath(basePath, kExperimentalTunnelDownPath),
-        std::bind(&ExperimentalTunnelServer::processTunnelInitiationRequest, this, _1, _2));
-
-    messageDispatcher->registerRequestProcessorFunc(
-        nx::network::http::Method::post,
-        url::joinPath(basePath, kExperimentalTunnelUpPath),
-        std::bind(&ExperimentalTunnelServer::processOpenTunnelUpChannelRequest, this, _1, _2));
-}
-
-template<typename ...ApplicationData>
 network::http::RequestResult
-    ExperimentalTunnelServer<ApplicationData...>::processOpenTunnelRequest(
+    SeparateUpDownConnectionsTunnelServer<ApplicationData...>::processOpenTunnelRequest(
         const RequestContext& requestContext,
         ApplicationData... requestData)
 {
@@ -143,14 +121,14 @@ network::http::RequestResult
                 std::make_tuple(this, connection, tunnelId),
                 std::move(requestData));
 
-            std::apply(&ExperimentalTunnelServer::saveDownChannel, std::move(allArgs));
+            std::apply(&SeparateUpDownConnectionsTunnelServer::saveDownChannel, std::move(allArgs));
         };
 
     return requestResult;
 }
 
 template<typename ...ApplicationData>
-void ExperimentalTunnelServer<ApplicationData...>::closeAllTunnels()
+void SeparateUpDownConnectionsTunnelServer<ApplicationData...>::closeAllTunnels()
 {
     Tunnels tunnelsInProgress;
     {
@@ -167,7 +145,7 @@ void ExperimentalTunnelServer<ApplicationData...>::closeAllTunnels()
 
 template<typename ...ApplicationData>
 std::unique_ptr<AbstractMsgBodySource>
-    ExperimentalTunnelServer<ApplicationData...>::prepareCreateDownTunnelResponse(
+    SeparateUpDownConnectionsTunnelServer<ApplicationData...>::prepareCreateDownTunnelResponse(
         network::http::Response* response)
 {
     response->headers.emplace("Cache-Control", "no-store");
@@ -178,7 +156,7 @@ std::unique_ptr<AbstractMsgBodySource>
 }
 
 template<typename ...ApplicationData>
-void ExperimentalTunnelServer<ApplicationData...>::saveDownChannel(
+void SeparateUpDownConnectionsTunnelServer<ApplicationData...>::saveDownChannel(
     network::http::HttpServerConnection* connection,
     const std::string& tunnelId,
     ApplicationData... requestData)
@@ -196,7 +174,7 @@ void ExperimentalTunnelServer<ApplicationData...>::saveDownChannel(
 }
 
 template<typename ...ApplicationData>
-void ExperimentalTunnelServer<ApplicationData...>::processOpenTunnelUpChannelRequest(
+void SeparateUpDownConnectionsTunnelServer<ApplicationData...>::processOpenTunnelUpChannelRequest(
     RequestContext requestContext,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
@@ -218,7 +196,7 @@ void ExperimentalTunnelServer<ApplicationData...>::processOpenTunnelUpChannelReq
 }
 
 template<typename ...ApplicationData>
-void ExperimentalTunnelServer<ApplicationData...>::saveUpChannel(
+void SeparateUpDownConnectionsTunnelServer<ApplicationData...>::saveUpChannel(
     network::http::HttpServerConnection* connection,
     const std::string& tunnelId)
 {
@@ -234,7 +212,7 @@ void ExperimentalTunnelServer<ApplicationData...>::saveUpChannel(
 }
 
 template<typename ...ApplicationData>
-void ExperimentalTunnelServer<ApplicationData...>::reportTunnelIfReady(
+void SeparateUpDownConnectionsTunnelServer<ApplicationData...>::reportTunnelIfReady(
     const std::string& tunnelId)
 {
     std::unique_ptr<AbstractStreamSocket> tunnelConnection;
@@ -259,14 +237,14 @@ void ExperimentalTunnelServer<ApplicationData...>::reportTunnelIfReady(
         std::exchange(tunnelContext.downChannel, nullptr));
 
     std::apply(
-        &ExperimentalTunnelServer::reportTunnel,
+        &SeparateUpDownConnectionsTunnelServer::reportTunnel,
         std::tuple_cat(
             std::make_tuple(this, std::move(tunnelConnection)),
             std::move(tunnelContext.requestData)));
 }
 
 template<typename ...ApplicationData>
-bool ExperimentalTunnelServer<ApplicationData...>::validateOpenUpChannelRequest(
+bool SeparateUpDownConnectionsTunnelServer<ApplicationData...>::validateOpenUpChannelRequest(
     const RequestContext& requestContext)
 {
     if (requestContext.request.requestLine.method != network::http::Method::post ||
@@ -277,6 +255,55 @@ bool ExperimentalTunnelServer<ApplicationData...>::validateOpenUpChannelRequest(
     // TODO
 
     return true;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+template<typename ...ApplicationData>
+class ExperimentalTunnelServer:
+    public SeparateUpDownConnectionsTunnelServer<ApplicationData...>
+{
+    using base_type = SeparateUpDownConnectionsTunnelServer<ApplicationData...>;
+
+public:
+    ExperimentalTunnelServer(
+        typename base_type::NewTunnelHandler newTunnelHandler);
+    virtual ~ExperimentalTunnelServer();
+
+    void registerRequestHandlers(
+        const std::string& basePath,
+        server::rest::MessageDispatcher* messageDispatcher);
+};
+
+template<typename ...ApplicationData>
+ExperimentalTunnelServer<ApplicationData...>::ExperimentalTunnelServer(
+    typename base_type::NewTunnelHandler newTunnelHandler)
+    :
+    base_type(std::move(newTunnelHandler))
+{
+}
+
+template<typename ...ApplicationData>
+ExperimentalTunnelServer<ApplicationData...>::~ExperimentalTunnelServer()
+{
+    this->closeAllTunnels();
+}
+
+template<typename ...ApplicationData>
+void ExperimentalTunnelServer<ApplicationData...>::registerRequestHandlers(
+    const std::string& basePath,
+    server::rest::MessageDispatcher* messageDispatcher)
+{
+    // Tunnel initiation is done by opening tunnel down channel.
+    messageDispatcher->registerRequestProcessorFunc(
+        nx::network::http::Method::get,
+        url::joinPath(basePath, kExperimentalTunnelDownPath),
+        [this](auto&&... args) { this->processTunnelInitiationRequest(std::move(args)...); });
+
+    messageDispatcher->registerRequestProcessorFunc(
+        nx::network::http::Method::post,
+        url::joinPath(basePath, kExperimentalTunnelUpPath),
+        [this](auto&&... args) { this->processOpenTunnelUpChannelRequest(std::move(args)...); });
 }
 
 } // namespace nx::network::http::tunneling::detail
