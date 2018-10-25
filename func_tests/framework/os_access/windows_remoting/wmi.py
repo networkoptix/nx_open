@@ -85,6 +85,8 @@ class Class(object):
         rq['env:Envelope']['env:Header']['w:SelectorSet'] = {
             'w:Selector': [
                 {'@Name': selector_name, '#text': selector_value}
+                if selector_value is not None else
+                {'@Name': selector_name}
                 for selector_name, selector_value in selectors.items()
                 ]
             }
@@ -169,7 +171,7 @@ class Class(object):
             for item in item_list:
                 data = item[self.name]
                 selectors = {
-                    s['@Name']: s['#text']
+                    s['@Name']: s.get('#text')
                     for s
                     in item['a:EndpointReference']['a:ReferenceParameters']['w:SelectorSet']['w:Selector']}
                 obj = _Object(self, selectors, data)
