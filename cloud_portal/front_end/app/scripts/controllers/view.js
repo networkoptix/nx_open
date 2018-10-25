@@ -4,14 +4,29 @@
 
     angular
         .module('cloudApp')
-        .controller('ViewPageCtrl', [ '$rootScope', '$scope', 'account', 'system', '$routeParams', 'systemAPI', 'dialogs',
+        .controller('ViewPageCtrl', [ '$rootScope', '$scope', '$window', 'account', 'system', '$routeParams', 'systemAPI', 'dialogs',
             '$location', '$q', '$poll', 'authorizationCheckService', 'camerasProvider',
 
-            function ($rootScope, $scope, account, system, $routeParams, systemAPI, dialogs,
+            function ($rootScope, $scope, $window, account, system, $routeParams, systemAPI, dialogs,
                       $location, $q, $poll, authorizationCheckService, camerasProvider) {
 
                 $scope.systemReady = false;
                 $scope.hasCameras = false;
+
+                $rootScope.$emit('nx.layout.footer', {
+                    state: true, // hide it
+                    loc  : 'ViewPageCtrl - offline'
+                });
+    
+                // AJS $location picks parent.location and not hiding header
+                $scope.isInIframe = ($window.location != $window.parent.location) ? true : false;
+                
+                if ($scope.isInIframe) {
+                    $rootScope.$emit('nx.layout.header', {
+                        state: true, // hide it
+                        loc: 'ViewPageCtrl - inIframe'
+                    });
+                }
 
                 authorizationCheckService
                     .requireLogin()
@@ -22,21 +37,27 @@
 
                         $q.all([ systemInfoRequest, systemAuthRequest ]).then(function () {
                             $scope.system = $scope.currentSystem.mediaserver;
-                            delayedUpdateSystemInfo();
 
                             $scope.hasCameras = false;
 
                             if ($scope.currentSystem.isOnline) {
-                                $scope.system.getCameras().then(function (cameras) {
-                                    $scope.hasCameras = (cameras.data.length > 0);
-                                    $scope.systemReady = true;
-                                });
+                                $scope.camerasProvider = camerasProvider.getProvider($scope.system);
+                                $scope.camerasProvider
+                                    .requestResources()
+                                    .then(function () {
+                                        $scope.system.getCameras().then(function (cameras) {
+                                            $scope.camerasProvider.getCameras(cameras.data);
+                                            $scope.systemReady = true;
+                                            $scope.hasCameras = (Object.keys($scope.camerasProvider.cameras).length);
+
+                                            if ($scope.hasCameras) {
+                                                delayedUpdateSystemInfo();
+                                            }
+                                        });
+                                    });
                             } else {
                                 $scope.systemReady = true;
                             }
-
-                            // Set footer visibility according to system status
-                            $rootScope.$emit('nx.layout.footer', {state: $scope.currentSystem.isOnline, loc: 'ViewPageCtrl - late'});
 
                         }, function () {
                             dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}",

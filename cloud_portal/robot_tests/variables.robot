@@ -44,7 +44,7 @@ ${LOG IN NAV BAR}                     //nav//a[contains(@ng-click, 'login()')]
 ${YOU HAVE NO SYSTEMS}                //span[contains(text(),"${YOU HAVE NO SYSTEMS TEXT}")]
 
 #Header
-${ACCOUNT DROPDOWN}                   //header//nx-account-settings-select//button[@id='accountSettingsSelect']
+${ACCOUNT DROPDOWN}                   //header//nx-account-settings-select//button[@id='accountSettingsSelect' and @data-toggle="dropdown"]
 ${LOG OUT BUTTON}                     //li[contains(@class, 'collapse-first')]//a[contains(text(), "${LOG OUT BUTTON TEXT}")]
 ${LOGO LINK}                          //header//a[@href='/']
 ${ACCOUNT SETTINGS BUTTON}            //li//a[@href = '/account/']
@@ -128,9 +128,9 @@ ${SYSTEM NAME}                        //h1[@ng-if="gettingSystem.success"]
 ${FIRST USER OWNER}                   //table[@ng-if='system.users.length']/tbody/tr/td[3]/span[contains(text(),"${OWNER TEXT}")]
 ${DISCONNECT FROM NX}                 //button[@ng-click='disconnect()']
 ${RENAME SYSTEM}                      //button[@ng-click='rename()']
-${RENAME CANCEL}                      //form[@name='renameForm']//button[text()='Cancel']
+${RENAME CANCEL}                      //form[@name='renameForm']//button[text()='${CANCEL BUTTON TEXT}']
 ${RENAME X BUTTON}                    //form[@name='renameForm']//button[@class='close']
-${RENAME SAVE}                        //form[@name='renameForm']//button[text()='Save']
+${RENAME SAVE}                        //form[@name='renameForm']//button[text()='${SAVE BUTTON TEXT}']
 
 ${RENAME INPUT}                       //form[@name='renameForm']//input[@id='systemName']
 ${RENAME INPUT WITH ERROR}            //form[@name='renameForm']//input[@id='systemName' and contains(@class,'ng-invalid')]
@@ -147,7 +147,7 @@ ${OPEN IN NX BUTTON}                  //div[@process-loading='gettingSystem']//b
 ${OPEN IN NX BUTTON DISABLED}         //div[@process-loading='gettingSystem']//button[@ng-click='checkForm()' and @ng-disabled='buttonDisabled']
 ${DELETE USER MODAL}                  //div[@uib-modal-transclude]
 ${DELETE USER BUTTON}                 //button[contains(text(), '${DELETE USER BUTTON TEXT}')]
-${DELETE USER CANCEL BUTTON}          //ngb-modal-window//button[contains(text(), "${DELETE USER CANCEL BUTTON TEXT}")]
+${DELETE USER CANCEL BUTTON}          //ngb-modal-window//button[contains(text(), "${CANCEL BUTTON TEXT}")]
 ${SYSTEM NAME OFFLINE}                //span[@ng-if='!system.isOnline']
 ${USERS LIST}                         //div[@process-loading='gettingSystemUsers']
 
@@ -156,7 +156,7 @@ ${AVAILABLE SYSTEMS LIST}             //a[@href='/systems']
 
 #Disconnect from cloud portal
 ${DISCONNECT FORM}                    //form[@name='disconnectForm']
-${DISCONNECT FORM CANCEL}             //form[@name='disconnectForm']//button[text()='Cancel']
+${DISCONNECT FORM CANCEL}             //form[@name='disconnectForm']//button[text()='${CANCEL BUTTON TEXT}']
 ${DISCONNECT FORM HEADER}             //h1["${DISCONNECT FORM HEADER TEXT}"]
 
 #Disconnect from my account
@@ -173,14 +173,14 @@ ${ALREADY ACTIVATED}                  //h1[@ng-if='!activate.success && !loading
 ${SHARE MODAL}                        //form[@name='shareForm']
 ${SHARE EMAIL}                        //form[@name='shareForm']//input[@id='email']
 ${SHARE PERMISSIONS DROPDOWN}         //form[@name='shareForm']//nx-permissions-select//button[@id='permissionsSelect']
-${SHARE BUTTON MODAL}                 //form[@name='shareForm']//button[text()='Share']
-${SHARE CANCEL}                       //form[@name='shareForm']//button[text()='Cancel']
+${SHARE BUTTON MODAL}                 //form[@name='shareForm']//button[text()='${SHARE BUTTON TEXT}']
+${SHARE CANCEL}                       //form[@name='shareForm']//button[text()='${CANCEL BUTTON TEXT}']
 ${SHARE CLOSE}                        //form[@name='shareForm']//button[@data-dismiss='modal']
 ${SHARE PERMISSIONS HINT}             //form[@name='shareForm']//span[contains(@class,'help-block')]
 
 ${EDIT PERMISSIONS EMAIL}             //form[@name='shareForm']//input[@ng-model='user.email']
 ${EDIT PERMISSIONS DROPDOWN}          //form[@name='shareForm']//button[@id='permissionsSelect']
-${EDIT PERMISSIONS SAVE}              //form[@name='shareForm']//button[text()='Save']
+${EDIT PERMISSIONS SAVE}              //form[@name='shareForm']//button[text()='${SAVE BUTTON TEXT}']
 ${EDIT PERMISSIONS CANCEL}            //form[@name='shareForm']//button[@ng-click='close()']
 ${EDIT PERMISSIONS CLOSE}             //div[@uib-modal-transclude]//div[@ng-if='settings.title']//button[@ng-click='close()']
 ${EDIT PERMISSIONS ADMINISTRATOR}     //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='Administrator']
@@ -244,9 +244,8 @@ ${PASSWORD IS GOOD BADGE}             //span[contains(@class,"badge") and contai
 ${PASSWORD INCORRECT BADGE}           //span[contains(@class,"badge") and contains(text(),'${PASSWORD INCORRECT BADGE TEXT}')]
 
 #Already logged in modal
-#extra spaces here temporarily
-${LOGGED IN CONTINUE BUTTON}          //ngb-modal-window//button[text()='Continue ']
-${LOGGED IN LOG OUT BUTTON}           //ngb-modal-window//button[text()='Log Out ']
+${LOGGED IN CONTINUE BUTTON}          //ngb-modal-window//button[contains(text(),'${CONTINUE BUTTON TEXT}')]
+${LOGGED IN LOG OUT BUTTON}           //ngb-modal-window//button[contains(text(),'${LOG OUT BUTTON TEXT}')]
 
 ${CONTINUE BUTTON}                    //ngb-modal-window//button[contains(text(), 'Continue')]
 ${CONTINUE MODAL}                     //ngb-modal-window

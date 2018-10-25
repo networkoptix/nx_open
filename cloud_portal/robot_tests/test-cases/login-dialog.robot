@@ -73,7 +73,7 @@ allows log in with 'Remember Me checkmark' switched off
 
 contains 'I forgot password' link that leads to Restore Password page with pre-filled email from log In form
     Log In    ${email}    'aderhgadehf'
-    Wait Until Element Is Visible    ${FORGOT PASSWORD}
+    Wait Until Elements Are Visible    ${REMEMBER ME CHECKBOX VISIBLE}   ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}    ${FORGOT PASSWORD}
     Click Link    ${FORGOT PASSWORD}
     Wait Until Element Is Visible    ${RESTORE PASSWORD EMAIL INPUT}
     Textfield Should Contain    ${RESTORE PASSWORD EMAIL INPUT}    ${email}

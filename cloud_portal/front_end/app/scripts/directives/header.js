@@ -41,19 +41,6 @@
                 };
 
                 scope.systemsProvider = systemsProvider;
-                scope.$watch('systemsProvider.systems', function () {
-                    scope.systems = scope.systemsProvider.systems;
-                    scope.singleSystem = (scope.systems.length === 1);
-                    scope.systemCounter = scope.systems.length;
-
-                    updateActiveSystem();
-                });
-
-
-                function isActive(val) {
-                    return $location.path().indexOf(val) >= 0;
-                }
-
                 scope.active = {};
                 // scope.activeSystem = {};
 
@@ -104,7 +91,14 @@
                     updateActiveSystem();
                     updateActive();
                 });
-
+    
+                scope.$watch('systemsProvider.systems', function () {
+                    scope.systems = scope.systemsProvider.systems;
+                    scope.singleSystem = (scope.systems.length === 1);
+                    scope.systemCounter = scope.systems.length;
+        
+                    updateActiveSystem();
+                });
             }
         };
     }

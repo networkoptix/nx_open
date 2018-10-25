@@ -130,11 +130,9 @@
             justify-content : space-between;
             align-items     : center;
 
-            a {
-                width       : fit-content;
-                height      : 2rem;
-                padding     : 0 8px;
-                line-height : 2rem;
+            &--info {
+                padding-right : 1rem;
+                word-break    : break-all;
             }
         }
 
