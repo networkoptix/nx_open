@@ -173,7 +173,7 @@ QByteArray QnActiResource::unquoteStr(const QByteArray& v)
 QByteArray QnActiResource::makeActiRequest(
     const QString& group,
     const QString& command,
-    CLHttpStatus& status,
+    nx::network::http::StatusCode::Value& status,
     bool keepAllData,
     QString* const localAddress) const
 {
@@ -184,7 +184,7 @@ QByteArray QnActiResource::makeActiRequest(
 }
 
 // NOTE: Not all groups (aka CGI programs) maybe supported by current implementation of request.
-CLHttpStatus QnActiResource::makeActiRequest(
+nx::network::http::StatusCode::Value QnActiResource::makeActiRequest(
     const QUrl& url,
     const QAuthenticator& auth,
     const QString& group,
@@ -213,18 +213,18 @@ CLHttpStatus QnActiResource::makeActiRequest(
     NX_VERBOSE(logTag, "makeActiRequest: request '%1'.", requestUrl);
     const bool result = client.doGet(requestUrl);
     if (!result)  //< It seems that HttpClient will log error by itself.
-        return CL_HTTP_BAD_REQUEST;
+        return nx::network::http::StatusCode::internalServerError;
 
     auto messageBodyOptional = client.fetchEntireMessageBody();
     if (!messageBodyOptional.has_value())
     {
         NX_INFO(logTag, "makeActiRequest: Error getting response body.");
         msgBody->clear();
-        return CL_HTTP_BAD_REQUEST;
+        return nx::network::http::StatusCode::internalServerError;
     }
     *msgBody = std::move(*messageBodyOptional);
 
-    const auto statusCode = client.response()->statusLine.statusCode;
+    const auto statusCode(client.response()->statusLine.statusCode);
     if (nx::network::http::StatusCode::isSuccessCode(statusCode))
     {
         if (localAddress)
@@ -232,16 +232,16 @@ CLHttpStatus QnActiResource::makeActiRequest(
 
         // API of camera returns 200 HTTP code on errors, so trying to parse payload here.
         if (msgBody->startsWith("ERROR: bad account."))
-            return CL_HTTP_AUTH_REQUIRED;
+            return nx::network::http::StatusCode::unauthorized;
         if (msgBody->startsWith("ERROR: missing USER/PWD."))
-            return CL_HTTP_AUTH_REQUIRED;
+            return nx::network::http::StatusCode::unauthorized;
         if (msgBody->startsWith("ERROR:"))  //< NOTE: should be handled somehow?
             NX_WARNING(logTag, "makeActiRequest: Unhandled error in response: '%1'.", *msgBody);
     }
 
     if (!keepAllData)
         *msgBody = unquoteStr(msgBody->mid(msgBody->indexOf('=')+1).trimmed());
-    return CLHttpStatus(statusCode);
+    return static_cast<nx::network::http::StatusCode::Value>(statusCode);
 }
 
 static bool resolutionGreaterThan(const QSize &s1, const QSize &s2)
@@ -402,7 +402,7 @@ CameraDiagnostics::Result QnActiResource::maxFpsForSecondaryResolution(
     const QSize& secondaryResolution,
     int* outFps)
 {
-    CLHttpStatus status;
+    nx::network::http::StatusCode::Value status;
     auto result = makeActiRequest(
         lit("encoder"),
         lit("FPS_CAP_QUERY_ALL=DUAL,%1,%2,%3,%4")
@@ -411,8 +411,8 @@ CameraDiagnostics::Result QnActiResource::maxFpsForSecondaryResolution(
         .arg(secondaryCodec)
         .arg(formatResolutionStr(secondaryResolution)),
         status);
-    ;
-    if (status != CL_HTTP_SUCCESS)
+
+    if (!nx::network::http::StatusCode::isSuccessCode(status))
     {
         return CameraDiagnostics::RequestFailedResult(
             lit("FPS_CAP_QUERY_ALL"),
@@ -463,7 +463,7 @@ nx::mediaserver::resource::StreamCapabilityMap QnActiResource::getStreamCapabili
 
 CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
 {
-    CLHttpStatus status;
+    nx::network::http::StatusCode::Value status;
 
     setCameraCapability(Qn::customMediaPortCapability, true);
     updateDefaultAuthIfEmpty(lit("admin"), lit("123456"));
@@ -474,10 +474,10 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
         status,
         true);
 
-    if (status == CL_HTTP_AUTH_REQUIRED)
+    if (nx::network::http::StatusCode::unauthorized == status)
         setStatus(Qn::Unauthorized);
 
-    if (status != CL_HTTP_SUCCESS)
+    if (!nx::network::http::StatusCode::isSuccessCode(status))
     {
         return CameraDiagnostics::RequestFailedResult(
             lit("/cgi-bin/system?SYSTEM_INFO"),
@@ -553,7 +553,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
     {
         makeActiRequest(lit("encoder"), lit("VIDEO_STREAM=FISHEYE_VIEW"), status);
 
-        if (status != CL_HTTP_SUCCESS)
+        if (!nx::network::http::StatusCode::isSuccessCode(status))
         {
             auto message =
                 lit("Unable to set up fisheye view streaming mode for camera %1, %2")
@@ -572,7 +572,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
     {
         makeActiRequest(lit("encoder"), lit("VIDEO_STREAM=DUAL"), status);
 
-        if (status != CL_HTTP_SUCCESS)
+        if (!nx::network::http::StatusCode::isSuccessCode(status))
         {
             auto message =
                 lit("Unable to set up dual streaming mode for camera %1, %2")
@@ -594,10 +594,10 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
 
     // Save this check for backward compatibility
     // since SYSTEM_INFO request potentially can work without auth
-    if (status == CL_HTTP_AUTH_REQUIRED)
+    if (!nx::network::http::StatusCode::unauthorized == status)
         setStatus(Qn::Unauthorized);
 
-    if (status != CL_HTTP_SUCCESS)
+    if (!nx::network::http::StatusCode::isSuccessCode(status))
     {
         return CameraDiagnostics::RequestFailedResult(
             lit("/cgi-bin/encoder?VIDEO_RESOLUTION_CAP"),
@@ -619,7 +619,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
             lit("CHANNEL=2&VIDEO_RESOLUTION_CAP"),
             status);
 
-        if (status != CL_HTTP_SUCCESS)
+        if (!nx::network::http::StatusCode::isSuccessCode(status))
         {
             return CameraDiagnostics::RequestFailedResult(
                 lit("CHANNEL=2&VIDEO_RESOLUTION_CAP"),
@@ -639,7 +639,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
         lit("RTP_B2=1"),
         status);
 
-    if (status != CL_HTTP_SUCCESS)
+    if (!nx::network::http::StatusCode::isSuccessCode(status))
     {
         return CameraDiagnostics::RequestFailedResult(
             lit("/cgi-bin/system?RTP_B2=1"),
@@ -648,7 +648,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
 
     QByteArray fpsString = makeActiRequest(lit("system"), lit("VIDEO_FPS_CAP"), status);
 
-    if (status != CL_HTTP_SUCCESS)
+    if (!nx::network::http::StatusCode::isSuccessCode(status))
     {
         return CameraDiagnostics::RequestFailedResult(
             lit("/cgi-bin/system?VIDEO_FPS_CAPS"),
@@ -671,7 +671,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
     }
     auto rtspPortString = makeActiRequest(lit("system"), lit("V2_PORT_RTSP"), status);
 
-    if (status != CL_HTTP_SUCCESS)
+    if (!nx::network::http::StatusCode::isSuccessCode(status))
     {
         return CameraDiagnostics::RequestFailedResult(
             lit("/cgi-bin/system?V2_PORT_RTSP"),
@@ -738,9 +738,9 @@ bool QnActiResource::SetupAudioInput()
     QnMutexLocker lock(&m_audioCfgMutex);
     if (value == m_audioInputOn)
         return true;
-    CLHttpStatus status;
+    nx::network::http::StatusCode::Value status;
     makeActiRequest(QLatin1String("system"), lit("V2_AUDIO_ENABLED=%1").arg(value ? lit("1") : lit("0")), status);
-    if (status == CL_HTTP_SUCCESS) {
+    if (nx::network::http::StatusCode::isSuccessCode(status)) {
         m_audioInputOn = value;
         return true;
     }
@@ -757,7 +757,7 @@ void QnActiResource::startInputPortStatesMonitoring()
     //considering, that we have excusive access to the camera, so rewriting existing event setup
 
     //monitoring all input ports
-    CLHttpStatus responseStatusCode = CL_HTTP_SUCCESS;
+    nx::network::http::StatusCode::Value responseStatusCode = nx::network::http::StatusCode::ok;
 
         //setting Digital Input Active Level
             //GET /cgi-bin/cmd/encoder?EVENT_DI1&EVENT_DI2&EVENT_RSPDO1&EVENT_RSPDO2 HTTP/1.1\r\n
@@ -778,7 +778,7 @@ void QnActiResource::startInputPortStatesMonitoring()
     QString localInterfaceAddress;
     QByteArray responseMsgBody = makeActiRequest(QLatin1String("encoder"), eventStr,
         responseStatusCode, false, &localInterfaceAddress);
-    if (responseStatusCode != CL_HTTP_SUCCESS)
+    if (!nx::network::http::StatusCode::isSuccessCode(responseStatusCode))
         return;
 
     static const int EVENT_HTTP_SERVER_NUMBER = 1;
@@ -800,7 +800,7 @@ void QnActiResource::startInputPortStatesMonitoring()
         lit("HTTP_SERVER=%1,1,%2,%3,guest,guest,%4").arg(EVENT_HTTP_SERVER_NUMBER)
             .arg(localInterfaceAddress).arg(actiEventPort).arg(MAX_CONNECTION_TIME_SEC),
         responseStatusCode);
-    if (responseStatusCode != CL_HTTP_SUCCESS)
+    if (!nx::network::http::StatusCode::isSuccessCode(responseStatusCode))
         return;
 
     //registering URL commands (one command per input port)
@@ -823,7 +823,7 @@ void QnActiResource::startInputPortStatesMonitoring()
         QLatin1String("encoder"),
         setupURLCommandRequestStr,
         responseStatusCode );
-    if( responseStatusCode != CL_HTTP_SUCCESS )
+    if (!nx::network::http::StatusCode::isSuccessCode(responseStatusCode))
         return;
 
         //registering events (one event per input port)
@@ -847,7 +847,7 @@ void QnActiResource::startInputPortStatesMonitoring()
         QLatin1String("encoder"),
         registerEventRequestStr,
         responseStatusCode );
-    if( responseStatusCode != CL_HTTP_SUCCESS )
+    if (!nx::network::http::StatusCode::isSuccessCode(responseStatusCode))
         return;
 
     m_inputMonitored = true;
@@ -868,10 +868,11 @@ void QnActiResource::stopInputPortStatesMonitoring()
     }
     m_inputMonitored = false;
 
-    CLHttpStatus status;
+    nx::network::http::StatusCode::Value status;
     makeActiRequest("encoder", registerEventRequestStr, status);
-    if (status != CL_HTTP_SUCCESS)
-        NX_INFO(this, "stopInputPortStatesMonitoring: Unable to stop, HTTP error '%1'.", status);
+    if (!nx::network::http::StatusCode::isSuccessCode(status))
+        NX_INFO(this, "stopInputPortStatesMonitoring: Unable to stop, HTTP error '%1'.",
+            nx::network::http::StatusCode::toString(status));
 }
 
 QString QnActiResource::getRtspUrl(int actiChannelNum) const
@@ -1035,15 +1036,13 @@ void QnActiResource::onTimer( const quint64& timerID )
         1 << (4 + triggerOutputTask.outputID - 1) | //signalling output port id we refer to
         (triggerOutputTask.active ? (1 << (triggerOutputTask.outputID-1)) : 0);        //signalling new port state
 
-    CLHttpStatus status = CL_HTTP_SUCCESS;
-    QByteArray dioResponse = makeActiRequest(
-        QLatin1String("encoder"),
-        lit("DIO_OUTPUT=0x%1").arg(dioOutputMask, 2, 16, QLatin1Char('0')),
-        status );
-    if( status != CL_HTTP_SUCCESS )
+    nx::network::http::StatusCode::Value status = nx::network::http::StatusCode::ok;
+    QByteArray dioResponse = makeActiRequest(QLatin1String("encoder"),
+        lit("DIO_OUTPUT=0x%1").arg(dioOutputMask, 2, 16, QLatin1Char('0')), status);
+    if (!nx::network::http::StatusCode::isSuccessCode(status))
         return;
 
-    if( triggerOutputTask.autoResetTimeoutMS > 0 )
+    if (triggerOutputTask.autoResetTimeoutMS > 0)
         m_triggerOutputTasks.insert( std::make_pair(
             nx::utils::TimerManager::instance()->addTimer(
                 this, std::chrono::milliseconds(triggerOutputTask.autoResetTimeoutMS)),
@@ -1117,27 +1116,27 @@ QMap<QString, QnCameraAdvancedParameter> QnActiResource::getParamsMap(const QSet
  */
 QMap<QString, QString> QnActiResource::resolveQueries(QMap<QString, CameraAdvancedParamQueryInfo>& queries) const
 {
-    CLHttpStatus status;
+    nx::network::http::StatusCode::Value status;
     QMap<QString, QString> setQueries;
     QMap<QString, QString> queriesToResolve;
 
-    for(const auto& agregate: queries.keys())
+    for (const auto& agregate: queries.keys())
         if(queries[agregate].cmd.indexOf('%') != -1)
             queriesToResolve[queries[agregate].group] += agregate + lit("&");
 
     QMap<QString, QString> respParams;
-    for(const auto& group: queriesToResolve.keys())
+    for (const auto& group: queriesToResolve.keys())
     {
         auto response = makeActiRequest(group, queriesToResolve[group], status, true);
         parseCameraParametersResponse(response, respParams);
     }
 
-    for(const auto& agregateName : respParams.keys())
+    for (const auto& agregateName : respParams.keys())
         queries[agregateName].cmd = fillMissingParams(
             queries[agregateName].cmd,
             respParams[agregateName]);
 
-    for(const auto& agregate: queries.keys())
+    for (const auto& agregate: queries.keys())
         setQueries[queries[agregate].group] += agregate + lit("=") + queries[agregate].cmd + lit("&");
 
     return setQueries;
@@ -1276,13 +1275,13 @@ QMap<QString, QString> QnActiResource::buildMaintenanceQueries(
 QMap<QString, QString> QnActiResource::executeParamsQueries(const QMap<QString, QString>& queries,
     bool& isSuccessful) const
 {
-    CLHttpStatus status;
+    nx::network::http::StatusCode::Value status;
     QMap<QString, QString> result;
     isSuccessful = true;
-    for(const auto& q: queries.keys())
+    for (const auto& q: queries.keys())
     {
         auto response = makeActiRequest(q, queries[q], status, true);
-        if(status != CL_HTTP_SUCCESS)
+        if (!nx::network::http::StatusCode::isSuccessCode(status))
             isSuccessful = false;
         parseCameraParametersResponse(response, result);
     }

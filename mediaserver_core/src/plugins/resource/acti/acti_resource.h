@@ -77,11 +77,11 @@ public:
     QByteArray makeActiRequest(
         const QString& group,
         const QString& command,
-        CLHttpStatus& status,
+        nx::network::http::StatusCode::Value& status,
         bool keepAllData = false,
         QString* const localAddress = nullptr) const;
 
-    static CLHttpStatus makeActiRequest(
+    static nx::network::http::StatusCode::Value makeActiRequest(
         const QUrl& url,
         const QAuthenticator& auth,
         const QString& group,
