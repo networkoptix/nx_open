@@ -24,7 +24,8 @@ import { DropdownsModule }   from './src/dropdowns/dropdowns.module';
 import { DialogsModule }     from './src/dialogs/dialogs.module';
 import { PagesModule }       from './src/pages/pages.module';
 import { DirectivesModule }  from './src/directives/directives.module';
-import { NxConfigService }  from './src/services/nx-config';
+import { NxConfigService }   from './src/services/nx-config';
+import { ServiceModule }     from './src/services/services.module';
 
 
 
@@ -80,6 +81,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         DialogsModule,
         PagesModule,
         DirectivesModule,
+        ServiceModule,
 
         TranslateModule.forRoot({
             loader: {

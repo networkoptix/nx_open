@@ -50,7 +50,11 @@ Check Special Hint
     Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${type}']
     Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${type}']/..
     ${type}    Convert To Uppercase    ${type}
-    Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT ${type}}
+    Run Keyword If    "${type}"=="${ADMIN TEXT}"          Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT ADMINISTRATOR}
+    ...    ELSE IF    "${type}"=="${ADV VIEWER TEXT}"     Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT ADVANCED VIEWER}
+    ...    ELSE IF    "${type}"=="${VIEWER TEXT}"         Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT VIEWER}
+    ...    ELSE IF    "${type}"=="${LIVE VIEWER TEXT}"    Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT LIVE VIEWER}
+    ...    ELSE IF    "${type}"=="${CUSTOM TEXT}"         Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT CUSTOM}
 
 Restart
     Register Keyword To Run On Failure    NONE
@@ -169,7 +173,7 @@ admin cannot delete or edit other admins
     Register    mark    harmill    ${random email}    ${password}
     Activate    ${random email}
     Log in to Auto Tests System    ${email}
-    Share To    ${random email}    Administrator
+    Share To    ${random email}    ${ADMIN TEXT}
     Log Out
     Validate Log Out
     Log in to Auto Tests System    ${random email}
@@ -191,8 +195,8 @@ admin cannot invite another admin
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Sleep    2
     Click Button    ${SHARE PERMISSIONS DROPDOWN}
-    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='Viewer']
-    Element Should Not Be Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='Administrator']
+    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${VIEWER TEXT}']
+    Element Should Not Be Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${ADMIN TEXT']
     Click Button    ${SHARE PERMISSIONS DROPDOWN}
     Click Button    ${SHARE CANCEL}
 

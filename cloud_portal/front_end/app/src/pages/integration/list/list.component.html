@@ -6,13 +6,21 @@
                     <div class="float-left"><img [src]="plugin.information.logo" style="width: 100px;"></div>
                     <div class="card--header-info">
                         <div >v. {{ plugin.information.version }}</div>
-                        <div [innerHtml]="plugin.date"></div>
+                        <div class="release_date" [innerHtml]="plugin.date || 'missing date'"></div>
+                        <div class="platforms">
+                            <img  src="/static/icons/integration_tile_os_arm.svg">
+                            <img src="/static/icons/integration_tile_os_linux.svg">
+                            <img src="/static/icons/integration_tile_os_windows.svg">
+                        </div>
+                        <!--<div *ngFor="let platform of plugin.information.platforms">-->
+                            <!--{{platform}}-->
+                        <!--</div>-->
                     </div>
                 </div>
                 <div class="card--body">
                     <div><h3 [innerHtml]="plugin.information.name"></h3></div>
                     <div class="card--body-by" *ngIf="plugin.provider">By <a target="_blank" [href]="plugin.providerUrl" [innerHtml]="plugin.provider"></a></div>
-                    <div class="card--body-descr" [innerHtml]="plugin.overview.description"></div>
+                    <div class="card--body-descr" [innerHtml]="plugin.overview.description || 'missing description'"></div>
                 </div>
                 <div class="card--footer">
                     <h3 class="float-left mr-1" *ngIf="plugin.isRecommended">

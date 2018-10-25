@@ -31,7 +31,7 @@ The logo takes you to the home page when not logged in
     Click Link    ${LOGO LINK}
     Location Should Be    ${url}/
 
-The logo takes you to the home page when not logged in
+The logo takes you to the systems page when not logged in
     [tags]    C41540
     Open Browser and go to URL    ${url}/register
     Log In    ${EMAIL OWNER}    ${BASE PASSWORD}

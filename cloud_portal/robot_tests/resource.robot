@@ -19,6 +19,7 @@ Open Browser and go to URL
     run keyword if    "${docker}"=="false"    Regular Open Browser    ${url}
     ...          ELSE    Docker Open Browser    ${url}
     Set Selenium Speed    0
+    Set Selenium Timeout    10
     Check Language
     Go To    ${url}
 
@@ -55,6 +56,7 @@ Set Language
     Wait Until Element Is Visible    ${LANGUAGE TO SELECT}
     Click Element    ${LANGUAGE TO SELECT}
     Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    5
+    Sleep    1    #to wait for language to fully change before continuing.  This caused issues with login.
 
 Log In
     [arguments]    ${email}    ${password}    ${button}=${LOG IN NAV BAR}
@@ -67,8 +69,10 @@ Log In
     Click Button    ${LOG IN BUTTON}
 
 Validate Log In
-    Wait Until Page Contains Element    ${AUTHORIZED BODY}    10
+    Wait Until Page Contains Element    ${AUTHORIZED BODY}
+    Wait Until Elements Are Visible    ${ACCOUNT DROPDOWN}
     Check Language
+    Sleep    1    #this is a test to see if it eliminates a problem with the login dialog popping up on logout
 
 Log Out
     Wait Until Page Does Not Contain Element    ${BACKDROP}
@@ -131,6 +135,25 @@ Activate
     Wait Until Element Is Visible    ${ACTIVATION SUCCESS}
     Element Should Be Visible    ${ACTIVATION SUCCESS}
     Location Should Be    ${url}/activate/success
+
+Restore password
+    [arguments]    ${email}
+    Open Browser and go to URL    ${url}/restore_password
+    Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
+    Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
+    Click Button    ${RESET PASSWORD BUTTON}
+    ${link}    Get Email Link    ${email}    restore_password
+    Go To    ${link}
+    Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
+    Sleep    2
+    Input Text    ${RESET PASSWORD INPUT}    ${BASE PASSWORD}
+
+    Click Button    ${SAVE PASSWORD}
+    Wait Until Elements Are Visible    ${RESET SUCCESS MESSAGE}    ${RESET SUCCESS LOG IN LINK}
+    Click Link    ${RESET SUCCESS LOG IN LINK}
+    Log In    ${email}    ${BASE PASSWORD}    None
+    Validate Log In
+    Close Browser
 
 Share To
     [arguments]    ${random email}    ${permissions}
@@ -201,6 +224,11 @@ Wait Until Elements Are Visible
     [arguments]    @{elements}
     :FOR     ${element}  IN  @{elements}
     \  Wait Until Element Is Visible    ${element}
+
+Elements Should Not Be Visible
+    [arguments]    @{elements}
+    :FOR     ${element}  IN  @{elements}
+    \  Element Should Not Be Visible    ${element}
 
 #Reset resources
 Clean up email noperm
@@ -275,17 +303,6 @@ Reset user owner first/last name
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Close Browser
-
-Reset user password to base
-    [arguments]    ${email}    ${current password}
-    Open Browser and go to URL    ${url}/account/password
-    Log In    ${email}    ${current password}    None
-    Validate Log In
-    Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
-    Input Text    ${CURRENT PASSWORD INPUT}    ${current password}
-    Input Text    ${NEW PASSWORD INPUT}    ${BASE PASSWORD}
-    Click Button    ${CHANGE PASSWORD BUTTON}
-    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
 
 Add notowner
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}

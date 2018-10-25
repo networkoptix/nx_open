@@ -91,6 +91,7 @@ Cancel should cancel disconnection and disconnect should remove it when not owne
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
     Input Text    ${SHARE EMAIL}    ${EMAIL NOT OWNER}
+    Wait Until Element Contains    ${SHARE PERMISSIONS DROPDOWN}    Viewer
     Click Button    ${SHARE BUTTON MODAL}
     Check For Alert    ${NEW PERMISSIONS SAVED}
 

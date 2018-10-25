@@ -1,6 +1,7 @@
 from django.contrib import admin
 from api.forms import *
 from api.models import *
+from api.controllers import cloud_api
 # Register your models here.
 from cloud import settings
 from cms.admin import CMSAdmin
@@ -58,8 +59,17 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
             qs = qs.filter(customization=settings.CUSTOMIZATION)
         return qs
 
-    def has_add_permission(self, request):  # No adding users in admin
-        return False
+    def get_readonly_fields(self, request, obj=None):
+        if not obj:  # When creating a new account make email writeable for superuser
+            return self.readonly_fields[1:]
+        if request.user.is_superuser:
+            return self.readonly_fields
+        return list(set(list(self.readonly_fields) +
+                        [field.name for field in obj._meta.fields] +
+                        [field.name for field in obj._meta.many_to_many]))
+
+    def has_add_permission(self, request):  # Only superuser can add users
+        return request.user.is_superuser
 
     def has_delete_permission(self, request, obj=None):  # No deleting users at all
         return False

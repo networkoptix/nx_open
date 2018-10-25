@@ -1,21 +1,26 @@
 (function () {
-    "use strict";
+    'use strict';
 
     angular
         .module('nxCommon')
         .directive('cameraPanel', CameraPanel);
 
-    CameraPanel.$inject = [ '$localStorage', '$timeout', '$location' ];
+    CameraPanel.$inject = [ '$localStorage', '$timeout', '$location', '$routeParams'];
 
-    function CameraPanel($localStorage, $timeout, $location) {
-
+    function CameraPanel($localStorage, $timeout, $location, $routeParams) {
+    
+        function isActive(val) {
+            var currentPath = $location.path();
+            return currentPath.indexOf(val) >= 0;
+        }
+        
         return {
             restrict   : 'E',
             scope      : {
-                "activeCamera"   : "=",
-                "camerasProvider": "=",
-                "showCameraPanel": "=",
-                "searchCams"     : "="
+                'activeCamera'   : '=',
+                'camerasProvider': '=',
+                'showCameraPanel': '=',
+                'searchCams'     : '='
             },
             templateUrl: Config.viewsDirCommon + 'components/cameraPanel.html',
             link       : function (scope/*, element, attrs*/) {
@@ -23,15 +28,13 @@
                 scope.storage = $localStorage;
                 scope.inputPlaceholder = L.common.searchCamPlaceholder;
 
-                scope.showCamerasMenu = !$location.search().nocameras;
-
                 scope.selectCamera = function (activeCamera) {
                     if (scope.activeCamera && (scope.activeCamera.id === activeCamera)) {
                         return;
                     }
                     scope.activeCamera = activeCamera;
                 };
-
+                
                 function updateCameras () {
                     scope.cameras = scope.camerasProvider.cameras;
 
@@ -41,7 +44,9 @@
                         if (scope.cameras.hasOwnProperty(serverId)) {
 
                             for (var idx = 0; idx < scope.cameras[serverId].length; idx++) {
-                                if (scope.cameras[serverId][idx].id === scope.storage.activeCameras[serverId]) {
+                                if (isActive('/embed') && scope.cameras[serverId][idx].id === '{' + $routeParams.cameraId + '}' ||
+                                    !isActive('/embed') && scope.cameras[serverId][idx].id === scope.storage.activeCameras[serverId]) {
+                                    
                                     scope.selectCamera(scope.cameras[serverId][idx]);
                                     selected = true;
                                     break;
@@ -124,6 +129,14 @@
                     }
                 }
 
+                function showMenu () {
+                    scope.showCamerasMenu = scope.showCameraPanel;
+                    if ($location.search().nocameras) {
+                        scope.showCamerasMenu = false;
+                    }
+                }
+
+                scope.$watch('showCameraPanel', showMenu);
                 scope.$watch('searchCams', searchCams);
                 scope.$watch('camerasProvider.cameras', updateCameras, true);
                 scope.$watch('camerasProvider.mediaServers', updateMediaServers, true);

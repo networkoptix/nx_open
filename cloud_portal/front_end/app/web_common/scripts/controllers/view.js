@@ -228,8 +228,8 @@ angular.module('nxCommon').controller('ViewCtrl',
         };
 
         function updateVideoSource(playingPosition) {
+            
             if (!$scope.activeCamera ||
-                $scope.activeCamera.status === 'Offline' ||
                 $scope.activeCamera.status === 'Unauthorized') {
 
                 $scope.activeVideoSource = {src: ''};
@@ -466,6 +466,10 @@ angular.module('nxCommon').controller('ViewCtrl',
         var timeFromUrl = $routeParams.time || null;
 
         function resetSystemActiveCamera() {
+            if ($scope.isEmbeded) {
+                // don't reset storage
+                return;
+            }
             // remove active camera record for this system (multiple media servers)
             for (var serverId in $scope.camerasProvider.cameras) {
                 if ($scope.camerasProvider.cameras.hasOwnProperty(serverId)) {
@@ -484,17 +488,21 @@ angular.module('nxCommon').controller('ViewCtrl',
                 if (Object.keys($scope.camerasProvider.cameras).length !== 0) {
                     $scope.activeCamera = $scope.camerasProvider.getFirstAvailableCamera();
                 } else {
+                    $scope.showCameraPanel = false;
                     return;
                 }
             }
-
+            
             resetSystemActiveCamera();
 
             $scope.player = null;
             $scope.crashCount = 0;
-            $scope.storage.cameraId  = $scope.activeCamera.id;
-            $scope.storage.serverStates[$scope.activeCamera.server.id] = true; // media server status - expanded
-
+            
+            if (!$scope.isEmbeded) {
+                $scope.storage.cameraId = $scope.activeCamera.id;
+                $scope.storage.serverStates[$scope.activeCamera.server.id] = true; // media server status - expanded
+            }
+            
             systemAPI.setCameraPath($scope.activeCamera.id);
             timeFromUrl = timeFromUrl || null;
             $scope.updateCamera(timeFromUrl);
@@ -506,7 +514,7 @@ angular.module('nxCommon').controller('ViewCtrl',
                 timeManager.setOffset(serverOffset);
             }
 
-            $scope.showCameraPanel = !$scope.activeCamera;
+            $scope.showCameraPanel = Object.keys($scope.activeCamera).length;
         });
 
         $scope.$watch('player', function(){
@@ -525,6 +533,11 @@ angular.module('nxCommon').controller('ViewCtrl',
         });
 
         timeManager.init(Config.webclient.useServerTime);
+    
+        function isActive(val) {
+            var currentPath = $location.path();
+            return currentPath.indexOf(val) >= 0;
+        }
 
         systemAPI.checkPermissions(Config.globalViewArchivePermission).then(function(result){
             $scope.canViewArchive = result;
@@ -533,7 +546,9 @@ angular.module('nxCommon').controller('ViewCtrl',
             // instead of requesting gettime once - we request it for all servers to know each timezone
             return $scope.camerasProvider.getServerTimes();
         }).then(function(){
-            $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);
+            if (!isActive('embed') && $scope.activeCamera.id !== $scope.storage.cameraId) {
+                $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);
+            }
             $scope.ready = true;
             $timeout(updateHeights);
             $scope.camerasProvider.startPoll();

@@ -32,6 +32,7 @@ export class EmbedModalContent {
                 @Inject(DOCUMENT) private document: any) {
 
         this.params = {
+            authString: '',
             nocameras : false,
             noheader  : false,
             nocontrols: false,
@@ -57,20 +58,25 @@ export class EmbedModalContent {
 
     createEmbedUrl(params): void {
         // Cannot use A6 router at this moment - AJS is leading the parade
-        this.embedUrl = window.location.href.replace('systems', 'embed').split('?')[ 0 ];
+        const url = window.location.href.replace('systems', 'embed').split('?')[ 0 ];
         let uri = '';
 
         for (const paramsKey in params) {
             if (params.hasOwnProperty(paramsKey)) {
                 // filter checkboxes in form
-                if (this.params[ paramsKey ] !== undefined && !params[ paramsKey ]) {
+                if (this.params[ paramsKey ] !== undefined && (!params[ paramsKey ] || params[ paramsKey ] !== '')) {
                     uri += (uri === '') ? '?' : '&';
-                    uri += paramsKey;
+                    uri += (typeof params[ paramsKey ] === 'boolean') ? paramsKey : params[ paramsKey ];
                 }
             }
         }
 
-        this.embedUrl += uri;
+        uri += '&auth=' + btoa(params.login_email + ':' + params.login_password);
+
+        this.embedUrl = '<iframe ' +
+                            'src = "' + url + uri + '" >' +
+                            'Your browser doesn\'t support iframe.' +
+                        '</iframe>';
     }
 
     close() {
