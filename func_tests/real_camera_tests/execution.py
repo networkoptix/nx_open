@@ -256,13 +256,10 @@ class Stand(object):
 
             _logger.debug('Wait for cycle delay %s, %s cameras left', cycle_delay, cameras_left)
             stats = self.server.api.get_server_statistics()['statistics'][:3]
-            stat_out = {}
-            for stat in stats:
-                if stat["description"] == 'sda':
-                    stat_out.update({'DISK': stat['value']})
-                else:
-                    stat_out.update({stat["description"] : stat['value']})
-            _logger.debug('Server performance statistics:\n %s', stat_out)
+            stat_out = {s['description']: s['value'] for s in stats}
+            stat_out['HDD'] = stat_out.get('sda')
+            _logger.debug('Server performance statistics: CPU {CPU}, RAM {RAM}, HDD {HDD}'.format(
+                **stat_out))
             time.sleep(cycle_delay.total_seconds())
 
     def _stage_rules(self, rules):  # (dict) -> dict
