@@ -161,18 +161,18 @@ common::metadata::DetectionMetadataPacketPtr DemoAnalyticsMetadataProvider::meta
 QList<common::metadata::DetectionMetadataPacketPtr> DemoAnalyticsMetadataProvider::metadataRange(
     qint64 startTimestamp, qint64 endTimestamp, int channel, int maximumCount) const
 {
-    const auto precision = ini().demoAnalyticsProviderTimestampPrecisionUs;
-    if (precision > 0)
-    {
-        startTimestamp = startTimestamp - startTimestamp % precision;
-        endTimestamp -= endTimestamp % precision;
-    }
+    constexpr int kMinPrecision = 100000;
+
+    const auto precision =
+        std::max(ini().demoAnalyticsProviderTimestampPrecisionUs, kMinPrecision);
+    startTimestamp = startTimestamp - startTimestamp % precision;
 
     QList<common::metadata::DetectionMetadataPacketPtr> result;
-    if (maximumCount > 0)
+    for (int i = 0; i < maximumCount && startTimestamp <= endTimestamp; ++i)
+    {
         result.append(metadata(startTimestamp, channel));
-    if (maximumCount > 1)
-        result.append(metadata(endTimestamp, channel));
+        startTimestamp += precision;
+    }
     return result;
 }
 
