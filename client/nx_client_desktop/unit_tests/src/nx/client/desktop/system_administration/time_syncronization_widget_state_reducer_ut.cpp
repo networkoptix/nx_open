@@ -11,7 +11,7 @@ public:
     using State = TimeSynchronizationWidgetState;
     using Reducer = TimeSynchronizationWidgetReducer;
 
-    State::ServerInfo server(const QnUuid& id = QnUuid())
+    static State::ServerInfo server(const QnUuid& id = QnUuid())
     {
         State::ServerInfo server;
         server.id = id.isNull() ? QnUuid::createUuid() : id;

@@ -1,6 +1,6 @@
 #include "time_syncronization_widget_store.h"
 
-#include <QtCore/QScopedValueRollback>
+#include <nx/client/desktop/common/redux/private_redux_store.h>
 
 #include "time_syncronization_widget_state.h"
 #include "time_syncronization_widget_state_reducer.h"
@@ -10,27 +10,10 @@ namespace nx::client::desktop {
 using State = TimeSynchronizationWidgetState;
 using Reducer = TimeSynchronizationWidgetReducer;
 
-struct TimeSynchronizationWidgetStore::Private
+struct TimeSynchronizationWidgetStore::Private:
+    PrivateReduxStore<TimeSynchronizationWidgetStore, State>
 {
-    TimeSynchronizationWidgetStore* const q;
-    bool actionInProgress = false;
-    State state;
-
-    explicit Private(TimeSynchronizationWidgetStore* owner):
-        q(owner)
-    {
-    }
-
-    void executeAction(std::function<State(State&&)> reduce)
-    {
-        // Chained actions are forbidden.
-        if (actionInProgress)
-            return;
-
-        QScopedValueRollback<bool> guard(actionInProgress, true);
-        state = reduce(std::move(state));
-        emit q->stateChanged(state);
-    }
+    using PrivateReduxStore::PrivateReduxStore;
 };
 
 TimeSynchronizationWidgetStore::TimeSynchronizationWidgetStore(QObject* parent):

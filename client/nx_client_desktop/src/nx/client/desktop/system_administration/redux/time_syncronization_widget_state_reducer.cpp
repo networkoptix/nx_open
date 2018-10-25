@@ -2,7 +2,10 @@
 
 namespace nx::client::desktop {
 
-TimeSynchronizationWidgetReducer::State TimeSynchronizationWidgetReducer::initialize(
+using State = TimeSynchronizationWidgetReducer::State;
+using Result = TimeSynchronizationWidgetReducer::Result;
+
+State TimeSynchronizationWidgetReducer::initialize(
     State state,
     bool isTimeSynchronizationEnabled,
     const QnUuid& primaryTimeServer,
@@ -20,22 +23,25 @@ TimeSynchronizationWidgetReducer::State TimeSynchronizationWidgetReducer::initia
     return state;
 }
 
-TimeSynchronizationWidgetReducer::State TimeSynchronizationWidgetReducer::setReadOnly(
+Result TimeSynchronizationWidgetReducer::setReadOnly(
     State state,
     bool value)
 {
+    if (state.readOnly == value)
+        return {false, std::move(state)};
+
     state.readOnly = value;
     if (value)
         state.hasChanges = false;
-    return state;
+    return {true, std::move(state)};
 }
 
-TimeSynchronizationWidgetReducer::State TimeSynchronizationWidgetReducer::setSyncTimeWithInternet(
+Result TimeSynchronizationWidgetReducer::setSyncTimeWithInternet(
     State state,
     bool value)
 {
     if (value == state.syncTimeWithInternet())
-        return state;
+        return {false, std::move(state)};
 
     if (value)
     {
@@ -58,7 +64,7 @@ TimeSynchronizationWidgetReducer::State TimeSynchronizationWidgetReducer::setSyn
         state.primaryServer = QnUuid();
     }
     state.hasChanges = true;
-    return state;
+    return {true, std::move(state)};
 }
 
 } // namespace nx::client::desktop

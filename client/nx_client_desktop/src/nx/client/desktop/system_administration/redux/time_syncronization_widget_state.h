@@ -3,11 +3,13 @@
 #include <algorithm>
 #include <chrono>
 
+#include <nx/client/desktop/common/redux/abstract_redux_state.h>
+
 #include <nx/utils/uuid.h>
 
 namespace nx::client::desktop {
 
-struct TimeSynchronizationWidgetState
+struct TimeSynchronizationWidgetState: AbstractReduxState
 {
     enum class Status
     {
@@ -65,4 +67,4 @@ struct TimeSynchronizationWidgetState
     }
 };
 
-} // namespace nx::client::desktop;
+} // namespace nx::client::desktop

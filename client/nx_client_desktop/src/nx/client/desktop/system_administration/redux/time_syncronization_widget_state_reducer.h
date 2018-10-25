@@ -8,6 +8,7 @@ class TimeSynchronizationWidgetReducer
 {
 public:
     using State = TimeSynchronizationWidgetState;
+    using Result = std::pair<bool, State>;
 
     static State initialize(
         State state,
@@ -15,8 +16,8 @@ public:
         const QnUuid& primaryTimeServer,
         const QList<State::ServerInfo>& servers);
 
-    static State setReadOnly(State state, bool value);
-    static State setSyncTimeWithInternet(State state, bool value);
+    static Result setReadOnly(State state, bool value);
+    static Result setSyncTimeWithInternet(State state, bool value);
 };
 
 } // namespace nx::client::desktop

@@ -1336,17 +1336,17 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsV
         state.analytics.engines.end(),
         [engineId](const auto& engine) { return engine.id == engineId; }))
     {
-        return std::make_pair(false, std::move(state));
+        return {false, std::move(state)};
     }
 
     auto& storedValues = state.analytics.settingsValuesByEngineId[engineId];
     if (storedValues.get() == values)
-        return std::make_pair(false, std::move(state));
+        return {false, std::move(state)};
 
     storedValues.setUser(values);
     state.hasChanges = true;
 
-    return std::make_pair(true, std::move(state));
+    return {true, std::move(state)};
 }
 
 State CameraSettingsDialogStateReducer::setWearableMotionDetectionEnabled(State state, bool value)

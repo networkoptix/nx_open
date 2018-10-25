@@ -4,19 +4,12 @@
 
 #include <QtGui/QImage>
 
-namespace nx {
-namespace client {
-namespace desktop {
+#include <nx/client/desktop/common/redux/abstract_redux_state.h>
 
-struct LayoutSettingsDialogState
+namespace nx::client::desktop {
+
+struct LayoutSettingsDialogState: AbstractReduxState
 {
-    LayoutSettingsDialogState() = default;
-    LayoutSettingsDialogState(const LayoutSettingsDialogState& other) = delete;
-    LayoutSettingsDialogState(LayoutSettingsDialogState&& other) = default;
-    LayoutSettingsDialogState& operator=(const LayoutSettingsDialogState&) = delete;
-    LayoutSettingsDialogState& operator=(LayoutSettingsDialogState&&) = default;
-    ~LayoutSettingsDialogState() = default;
-
     bool locked = false;
     bool isLocalFile = false;
     float cellAspectRatio = 0.0;
@@ -142,6 +135,4 @@ struct LayoutSettingsDialogState
     Background background;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop
