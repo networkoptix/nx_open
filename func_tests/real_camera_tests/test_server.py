@@ -35,7 +35,7 @@ def test_cameras(rct_options, one_vm, one_licensed_mediaserver, artifacts_dir):
         stand.run_all_stages(rct_options.camera_cycle_delay, rct_options.server_stage_delay)
     finally:
         save_result('module_information', stand.server_information)
-        save_result('test_results', stand.report)
+        #save_result('test_results', stand.report)
         for _ in range(10):
             try:
                 save_result('all_cameras', stand.all_cameras(verbose=True))
