@@ -18,8 +18,8 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <utils/media/h264_utils.h>
+#include <utils/media/utils.h>
 #include <nx/utils/log/log.h>
-
 #include <QAndroidJniObject>
 #include <QAndroidJniEnvironment>
 
@@ -511,9 +511,7 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
         if (!frame)
             return 0;
 
-        d->frameSize = QSize(frame->width, frame->height);
-        if (!isValidFrameSize(d->frameSize))
-            d->frameSize = nx::media::AbstractVideoDecoder::mediaSizeFromRawData(frame);
+        d->frameSize = getFrameSize(frame);
         if (d->frameSize.isEmpty())
             return 0; //< Wait for I frame to be able to extract data from the binary stream.
 
