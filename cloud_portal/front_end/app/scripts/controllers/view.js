@@ -4,10 +4,10 @@
 
     angular
         .module('cloudApp')
-        .controller('ViewPageCtrl', [ '$rootScope', '$scope', 'account', 'system', '$routeParams', 'systemAPI', 'dialogs',
+        .controller('ViewPageCtrl', [ '$rootScope', '$scope', '$window', 'account', 'system', '$routeParams', 'systemAPI', 'dialogs',
             '$location', '$q', '$poll', 'authorizationCheckService', 'camerasProvider',
 
-            function ($rootScope, $scope, account, system, $routeParams, systemAPI, dialogs,
+            function ($rootScope, $scope, $window, account, system, $routeParams, systemAPI, dialogs,
                       $location, $q, $poll, authorizationCheckService, camerasProvider) {
 
                 $scope.systemReady = false;
@@ -17,6 +17,16 @@
                     state: true, // hide it
                     loc  : 'ViewPageCtrl - offline'
                 });
+    
+                // AJS $location picks parent.location and not hiding header
+                $scope.isInIframe = ($window.location != $window.parent.location) ? true : false;
+                
+                if ($scope.isInIframe) {
+                    $rootScope.$emit('nx.layout.header', {
+                        state: true, // hide it
+                        loc: 'ViewPageCtrl - inIframe'
+                    });
+                }
 
                 authorizationCheckService
                     .requireLogin()
