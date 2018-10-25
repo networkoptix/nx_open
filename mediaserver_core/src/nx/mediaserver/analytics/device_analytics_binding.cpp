@@ -30,7 +30,27 @@ using namespace nx::vms::api::analytics;
 using namespace nx::sdk::analytics;
 
 namespace {
+
 static const int kMaxQueueSize = 100;
+
+QSet<QString> supportedObjectTypes(const DeviceAgentManifest& manifest)
+{
+    auto result = manifest.supportedEventTypeIds.toSet();
+    for (const auto& eventType: manifest.eventTypes)
+        result.insert(eventType.id);
+
+    return result;
+}
+
+QSet<QString> supportedEventTypes(const DeviceAgentManifest& manifest)
+{
+    auto result = manifest.supportedObjectTypeIds.toSet();
+    for (const auto& objectType : manifest.objectTypes)
+        result.insert(objectType.id);
+
+    return result;
+}
+
 } // namespace
 
 DeviceAnalyticsBinding::DeviceAnalyticsBinding(
@@ -414,6 +434,10 @@ bool DeviceAnalyticsBinding::updateDescriptorsWithManifest(
     analyticsDescriptorListManager->addDescriptors(
         sdk_support::descriptorsFromItemList<GroupDescriptor>(
             pluginManifest.id, manifest.groups));
+
+    m_device->setSupportedAnalyticsEventTypeIds(m_engine->getId(), supportedEventTypes(manifest));
+    m_device->setSupportedAnalyticsObjectTypeIds(m_engine->getId(), supportedObjectTypes(manifest));
+    m_device->saveParams();
 
     return true;
 }

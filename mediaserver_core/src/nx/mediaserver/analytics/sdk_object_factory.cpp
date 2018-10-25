@@ -13,6 +13,9 @@
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 
+#include <nx/vms/api/analytics/descriptors.h>
+#include <nx/analytics/descriptor_list_manager.h>
+
 #include <nx/sdk/analytics/plugin.h>
 #include <nx/sdk/settings.h>
 #include <plugins/settings.h>
@@ -105,12 +108,24 @@ SdkObjectFactory::SdkObjectFactory(QnMediaServerModule* serverModule):
 
 bool SdkObjectFactory::init()
 {
+    clearActionDescriptorList();
+
     if (!initPluginResources())
         return false;
 
     if (!initEngineResources())
         return false;
 
+    return true;
+}
+
+bool SdkObjectFactory::clearActionDescriptorList()
+{
+    auto descriptorListManager = serverModule()
+        ->commonModule()
+        ->analyticsDescriptorListManager();
+
+    descriptorListManager->clearDescriptors<nx::vms::api::analytics::ActionTypeDescriptor>();
     return true;
 }
 

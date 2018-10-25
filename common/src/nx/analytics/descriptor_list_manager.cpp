@@ -4,6 +4,34 @@
 
 namespace nx::analytics {
 
+namespace details {
+
+template<>
+std::set<QString> descriptorIds<nx::vms::api::analytics::EventTypeDescriptor>(
+    const QnVirtualCameraResourcePtr& device)
+{
+    std::set<QString> result;
+    auto supportedEventTypes = device->supportedAnalyticsEventTypeIds();
+    for (const auto& eventTypeIdSet: supportedEventTypes)
+        result.insert(eventTypeIdSet.cbegin(), eventTypeIdSet.cend());
+
+    return result;
+}
+
+template<>
+std::set<QString> descriptorIds<nx::vms::api::analytics::ObjectTypeDescriptor>(
+    const QnVirtualCameraResourcePtr& device)
+{
+    std::set<QString> result;
+    auto supportedObjectTypes = device->supportedAnalyticsObjectTypeIds();
+    for (const auto& objectTypeIdSet: supportedObjectTypes)
+        result.insert(objectTypeIdSet.cbegin(), objectTypeIdSet.cend());
+
+    return result;
+}
+
+} // namespace details
+
 namespace analytics_api = nx::vms::api::analytics;
 
 DescriptorListManager::DescriptorListManager(QnCommonModule* commonModule):
@@ -13,6 +41,7 @@ DescriptorListManager::DescriptorListManager(QnCommonModule* commonModule):
     registerType<analytics_api::GroupDescriptor>("analyticsGroupDescriptorList");
     registerType<analytics_api::EventTypeDescriptor>("analyticsEventTypeDescriptorList");
     registerType<analytics_api::ObjectTypeDescriptor>("analyticsObjectTypeDescriptorList");
+    registerType<analytics_api::ActionTypeDescriptor>("analyticsActionTypeDescriptor");
 }
 
 QString DescriptorListManager::propertyName(const std::type_info& typeInfo) const

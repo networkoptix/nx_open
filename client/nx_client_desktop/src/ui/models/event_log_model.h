@@ -95,5 +95,4 @@ private:
     QBrush m_linkBrush;
     QScopedPointer<DataIndex> m_index;
     std::unique_ptr<nx::vms::event::StringsHelper> m_stringsHelper;
-    std::unique_ptr<nx::vms::event::AnalyticsHelper> m_analyticsHelper;
 };

@@ -38,6 +38,7 @@ DECLARE_FIELD_DETECTOR(hasStringField, stringField, QString);
 DECLARE_FIELD_DETECTOR(hasStructField, structField, HasStringField);
 DECLARE_METHOD_DETECTOR(hasSomeMethod, method, int(double&));
 DECLARE_FIELD_DETECTOR(hasTemplatedField, templatedField, std::set<QString>);
+DECLARE_FIELD_DETECTOR_SIMPLE(hasStringFieldSimple, stringField);
 
 } // namespace
 
@@ -67,4 +68,11 @@ TEST(MemberDetector, detect)
     ASSERT_FALSE(hasTemplatedField<HasSomeMethod>::value);
     ASSERT_TRUE(hasTemplatedField<HasTemplatedField>::value);
     ASSERT_FALSE(hasTemplatedField<HasOtherTemplatedField>::value);
+
+    ASSERT_TRUE(hasStringFieldSimple<HasStringField>::value);
+    ASSERT_FALSE(hasStringFieldSimple<HasOtherStringField>::value);
+    ASSERT_FALSE(hasStringFieldSimple<HasStructField>::value);
+    ASSERT_FALSE(hasStringFieldSimple<HasSomeMethod>::value);
+    ASSERT_FALSE(hasStringFieldSimple<HasTemplatedField>::value);
+    ASSERT_FALSE(hasStringFieldSimple<HasOtherTemplatedField>::value);
 }

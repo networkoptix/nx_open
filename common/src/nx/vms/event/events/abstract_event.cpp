@@ -8,9 +8,14 @@
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/event/analytics_helper.h>
 
+#include <nx/vms/api/analytics/descriptors.h>
+#include <nx/analytics/descriptor_list_manager.h>
+
 namespace nx {
 namespace vms {
 namespace event {
+
+namespace analytics_api = nx::vms::api::analytics;
 
 bool hasChild(EventType eventType)
 {
@@ -137,9 +142,16 @@ bool hasToggleState(
     {
         if (runtimeParams.getAnalyticsEventTypeId().isNull())
             return true;
-        AnalyticsHelper helper(commonModule);
-        auto descriptor = helper.eventTypeDescriptor(runtimeParams.getAnalyticsEventTypeId());
-        return descriptor.flags.testFlag(nx::vms::api::analytics::stateDependent);
+
+        auto descriptorListManager = commonModule->analyticsDescriptorListManager();
+        const auto descriptor = descriptorListManager
+            ->descriptor<analytics_api::EventTypeDescriptor>(
+                runtimeParams.getAnalyticsEventTypeId());
+
+        if (!descriptor)
+            return false;
+
+        return descriptor->item.flags.testFlag(nx::vms::api::analytics::stateDependent);
     }
     default:
         return false;

@@ -41,7 +41,7 @@ struct NAME: std::false_type {};\
 template <typename T>\
 struct NAME<\
     T,\
-    std::void_t<decltype(T::FIELD_NAME)>\
+    std::void_t<decltype(&T::FIELD_NAME)>\
 >: std::true_type {};
 
 } // namespace nx::utils

@@ -132,6 +132,10 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
         sdk_support::descriptorsFromItemList<analytics_api::ObjectTypeDescriptor>(
             pluginManifest.id, manifest->objectTypes));
 
+    analyticsDescriptorListManager->addDescriptors(
+        sdk_support::descriptorsFromItemList<analytics_api::ActionTypeDescriptor>(
+            pluginManifest.id, manifest->objectActions));
+
     setManifest(*manifest);
     saveParams();
     return CameraDiagnostics::NoErrorResult();

@@ -15,6 +15,7 @@
 #include <nx/sdk/analytics/uncompressed_video_frame.h>
 
 #include <nx/vms/api/analytics/engine_manifest.h>
+#include <nx/vms/api/analytics/descriptors.h>
 
 #include <nx/mediaserver/resource/resource_fwd.h>
 #include <nx/mediaserver/resource/analytics_plugin_resource.h>
@@ -122,8 +123,8 @@ resource::AnalyticsEngineResourceList toServerEngineList(
 
 namespace details {
 
-DECLARE_FIELD_DETECTOR(hasGroupIds, groupIds, std::set<QString>);
-DECLARE_FIELD_DETECTOR(hasPluginIds, pluginIds, std::set<QString>);
+DECLARE_FIELD_DETECTOR(hasGroupId, groupId, std::set<QString>);
+DECLARE_FIELD_DETECTOR(hasPaths, paths, std::set<nx::vms::api::analytics::HierarchyPath>);
 DECLARE_FIELD_DETECTOR_SIMPLE(hasItem, item);
 
 } // namespace details
@@ -134,10 +135,9 @@ std::map<QString, Descriptor> descriptorsFromItemList(
     const QList<Item>& itemList)
 {
     std::map<QString, Descriptor> result;
-    for (const auto& item : itemList)
+    for (const auto& item: itemList)
     {
         Descriptor descriptor;
-
         if constexpr(details::hasItem<Descriptor>::value)
         {
             descriptor.item = item;
@@ -148,11 +148,16 @@ std::map<QString, Descriptor> descriptorsFromItemList(
             descriptor.name = item.name.value;
         }
 
-        if constexpr (details::hasGroupIds<Descriptor>::value)
-            descriptor.groupIds.insert(item.groupId);
+        if constexpr (details::hasPaths<Descriptor>::value)
+        {
+            nx::vms::api::analytics::HierarchyPath path;
+            path.pluginId = pluginId;
 
-        if constexpr (details::hasPluginIds<Descriptor>::value)
-            descriptor.pluginIds.insert(pluginId);
+            if constexpr (details::hasGroupId<Item>::value)
+                path.groupId = item.groupId;
+
+            descriptor.paths.insert(path);
+        }
 
         result[item.id] = std::move(descriptor);
     }

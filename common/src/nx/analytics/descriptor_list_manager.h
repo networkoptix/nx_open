@@ -12,8 +12,13 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/meta/member_detector.h>
+#include <nx/utils/meta/type_traits.h>
+#include <nx/utils/std/optional.h>
 
 #include <nx/fusion/model_functions.h>
+
+#include <nx/vms/api/analytics/descriptors.h>
+#include <core/resource/camera_resource.h>
 
 namespace nx::analytics {
 
@@ -21,9 +26,11 @@ namespace details {
 
 using PluginIds = std::set<QString>;
 
-DECLARE_FIELD_DETECTOR(hasPluginIds, pluginIds, QString);
+DECLARE_FIELD_DETECTOR(hasPaths, paths, std::set<nx::vms::api::analytics::HierarchyPath>);
 
-inline QnMediaServerResourcePtr server(QnCommonModule* commonModule)
+inline QnMediaServerResourcePtr server(
+    QnCommonModule* commonModule,
+    const QnUuid& serverId = QnUuid())
 {
     if (!commonModule)
     {
@@ -38,8 +45,24 @@ inline QnMediaServerResourcePtr server(QnCommonModule* commonModule)
         return QnMediaServerResourcePtr();
     }
 
-    return resourcePool->getResourceById<QnMediaServerResource>(commonModule->moduleGUID());
+    return resourcePool->getResourceById<QnMediaServerResource>(
+        serverId.isNull() ? commonModule->moduleGUID() : serverId);
 }
+
+// TODO: #dmishin make generic getter for supported ids
+template<typename T>
+std::set<QString> descriptorIds(const QnVirtualCameraResourcePtr& device)
+{
+    static_assert(false);
+}
+
+template<>
+std::set<QString> descriptorIds<nx::vms::api::analytics::EventTypeDescriptor>(
+    const QnVirtualCameraResourcePtr& device);
+
+template<>
+std::set<QString> descriptorIds<nx::vms::api::analytics::ObjectTypeDescriptor>(
+    const QnVirtualCameraResourcePtr& device);
 
 } // namespace details
 
@@ -59,17 +82,72 @@ public:
     }
 
     template<typename Descriptor>
-    Container<Descriptor> descriptors() const
+    Container<Descriptor> currentServerDescriptors() const
+    {
+        // TODO: #dmishin need to be moved to server side
+        QnMutexLocker lock(&m_mutex);
+        return descriptorsUnsafe<Descriptor>(moduleGUID());
+    }
+
+    template<typename Descriptor>
+    Container<Descriptor> descriptors(const QnMediaServerResourceList& servers)
     {
         QnMutexLocker lock(&m_mutex);
-        return descriptorsUnsafe<Descriptor>();
+        Container<Descriptor> result;
+        for (const auto& server: servers)
+        {
+            auto serverDescriptors = descriptorsUnsafe<Descriptor>(server->getId());
+            result.insert(serverDescriptors.cbegin(), serverDescriptors.cend());
+        }
+
+        return result;
+    }
+
+    template<typename Descriptor>
+    Container<Descriptor> allDescriptorsInTheSystem() const
+    {
+        QnMutexLocker lock(&m_mutex);
+        return allDescriptorsInTheSystemUnsafe<Descriptor>();
+    }
+
+    template<typename Descriptor>
+    Container<Descriptor> deviceDescriptors(const QnVirtualCameraResourcePtr& device) const
+    {
+        QnMutexLocker lock(&m_mutex);
+        return deviceDescriptorsUnsafe<Descriptor>(device);
+    }
+
+    template<typename Descriptor>
+    Container<Descriptor> deviceDescriptors(const QnVirtualCameraResourceList& devices) const
+    {
+        QnMutexLocker lock(&m_mutex);
+        Container<Descriptor> result;
+        for (const auto& device: devices)
+        {
+            const auto deviceDescriptors = deviceDescriptorsUnsafe<Descriptor>(device);
+            result.insert(deviceDescriptors.cbegin(), deviceDescriptors.cend());
+        }
+
+        return result;
+    }
+
+    template<typename Descriptor>
+    std::optional<Descriptor> descriptor(const QString& id) const
+    {
+        QnMutexLocker lock(&m_mutex);
+        const auto descriptors = allDescriptorsInTheSystemUnsafe<Descriptor>();
+        auto itr = descriptors.find(id);
+        if (itr == descriptors.cend())
+            return std::nullopt;
+
+        return itr->second;
     }
 
     template<typename Descriptor>
     void addDescriptors(const Container<Descriptor>& descriptorsToAdd)
     {
         QnMutexLocker lock(&m_mutex);
-        auto descriptors = descriptorsUnsafe<Descriptor>();
+        auto descriptors = descriptorsUnsafe<Descriptor>(/*serverId*/ QnUuid());
 
         for (const auto& entry: descriptorsToAdd)
         {
@@ -78,16 +156,17 @@ public:
 
             auto itr = descriptors.find(id);
             if (itr == descriptors.cend())
+            {
                 descriptors[descriptor.getId()] = descriptor;
-
-            else if constexpr (details::hasPluginIds<Descriptor>::value)
+            }
+            else if constexpr (details::hasPaths<Descriptor>::value)
             {
                 auto& existingDescriptor = itr->second;
-                existingDescriptor.pluginsIds.insert(
-                    descriptor.pluginIds.cbegin(),
-                    descriptor.pluginIds.cend());
+                existingDescriptor.paths.insert(
+                    descriptor.paths.cbegin(),
+                    descriptor.paths.cend());
 
-                existingDescriptor.name = descriptor.name;
+                existingDescriptor.item = descriptor.item;
             }
             else
             {
@@ -115,14 +194,90 @@ public:
         addDescriptors(descriptors);
     }
 
+    template <typename Descriptor>
+    void clearDescriptors()
+    {
+        QnMutexLocker lock(&m_mutex);
+        auto currentServerPtr = details::server(commonModule());
+        if (!currentServerPtr)
+        {
+            NX_ASSERT(false, "Can't find current server resource");
+            return;
+        }
+
+        currentServerPtr->setProperty(propertyName(typeid(Descriptor)), QString());
+    }
+
+    template<typename Descriptor>
+    static std::set<QString> pluginIds(const Container<Descriptor>& descriptors)
+    {
+        std::set<QString> result;
+        for (const auto& entry: descriptors)
+        {
+            const auto& descriptor = entry.second;
+            for (const auto& path: descriptor.paths)
+                result.insert(path.pluginId);
+        }
+
+        return result;
+    }
+
+    template<typename Descriptor>
+    static std::set<QString> groupIds(const Container<Descriptor>& descriptors)
+    {
+        std::set<QString> result;
+        for (const auto& entry : descriptors)
+        {
+            const auto& descriptor = entry.second;
+            for (const auto& path: descriptor.paths)
+            {
+                if (!path.groupId.isEmpty())
+                    result.insert(path.groupId);
+            }
+        }
+
+        return result;
+    }
+
 private:
     template<typename Descriptor>
-    Container<Descriptor> descriptorsUnsafe() const
+    Container<Descriptor> descriptorsUnsafe(const QnUuid& serverId) const
     {
-        auto currentServerPtr = details::server(commonModule());
-        auto descriptorsString = currentServerPtr->getProperty(propertyName(typeid(Descriptor)));
+        const auto server = details::server(commonModule(), serverId);
+        const auto descriptorsString = server->getProperty(propertyName(typeid(Descriptor)));
 
         return QJson::deserialized(descriptorsString.toUtf8(), Container<Descriptor>());
+    }
+
+    template<typename Descriptor>
+    Container<Descriptor> allDescriptorsInTheSystemUnsafe() const
+    {
+        Container<Descriptor> result;
+        const auto servers = resourcePool()->getAllServers(Qn::AnyStatus);
+        for (const auto& server: servers)
+        {
+            const auto serverDescriptors = descriptorsUnsafe<Descriptor>(server->getId());
+            result.insert(serverDescriptors.cbegin(), serverDescriptors.cend());
+        }
+
+        return result;
+    }
+
+    template<typename Descriptor>
+    Container<Descriptor> deviceDescriptorsUnsafe(const QnVirtualCameraResourcePtr& device) const
+    {
+        Container<Descriptor> result;
+        const auto descriptors = allDescriptorsInTheSystemUnsafe<Descriptor>();
+
+        const auto ids = details::descriptorIds<Descriptor>(device);
+        for (const auto& id: ids)
+        {
+            const auto descriptorItr = descriptors.find(id);
+            if (descriptorItr != descriptors.cend())
+                result.insert(*descriptorItr);
+        }
+
+        return result;
     }
 
 private:

@@ -30,6 +30,7 @@ public:
     bool init();
 
 private:
+    bool clearActionDescriptorList();
     bool initPluginResources();
     bool initEngineResources();
 
