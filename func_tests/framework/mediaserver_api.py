@@ -516,9 +516,9 @@ class MediaserverApi(object):
 
     def get_server_statistics(self, salt=None):
         if salt:
-            self.generic.get('/api/statistics', 'salt=' + str(salt))
+            return self.generic.get('/api/statistics', 'salt=' + str(salt))
         else:
-            self.generic.get('/api/statistics')
+            return self.generic.get('/api/statistics')
 
     @classmethod
     def _parse_json_fields(cls, data):
