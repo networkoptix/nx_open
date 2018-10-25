@@ -56,7 +56,7 @@ private:
 
     // Maps MACs to IPs, that are non ipv4 link-local.
     // Empty IP means, that MAC never corresponded to the address, that was not link-local ipv4.
-    std::map<nx::utils::MacAddress, TimeMarkedAddress> m_foundNonLinkLocalAddresses;
+    std::map<nx::utils::MacAddress, TimeMarkedAddress> m_foundNonIpv4LinkLocalAddresses;
 };
 
 #endif // #ifdef ENABLE_AXIS

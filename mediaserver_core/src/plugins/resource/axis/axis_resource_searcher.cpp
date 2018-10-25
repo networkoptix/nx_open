@@ -165,27 +165,23 @@ nx::network::SocketAddress QnPlAxisResourceSearcher::obtainFixedHostAddress(
     nx::utils::MacAddress discoveredMac, nx::network::SocketAddress discoveredAddress)
 {
     static const auto kConfidenceInterval = std::chrono::minutes(20);
-    static const in_addr kLinkLocalIpv4Network = *nx::network::HostAddress("169.254.0.0").ipV4();
 
-    auto& lastNonLinkLocalTimeMarkedAddress = m_foundNonLinkLocalAddresses[discoveredMac];
+    const bool isIpv4LinkLocalAddress = discoveredAddress.address.isIpv4LinkLocalNetwork();
 
-    const boost::optional<in_addr> discoveredIpv4 = discoveredAddress.address.ipV4();
-    const bool isLinkLocalIpv4Address = discoveredIpv4 &&
-        discoveredIpv4->S_un.S_un_w.s_w1 == kLinkLocalIpv4Network.S_un.S_un_w.s_w1;
-
-    if (!isLinkLocalIpv4Address)
-        lastNonLinkLocalTimeMarkedAddress = TimeMarkedAddress(discoveredAddress);
+    auto& lastNonIpv4LinkLocalTimeMarkedAddress = m_foundNonIpv4LinkLocalAddresses[discoveredMac];
+    if (!isIpv4LinkLocalAddress)
+        lastNonIpv4LinkLocalTimeMarkedAddress = TimeMarkedAddress(discoveredAddress);
 
     // We use discoveredAddress if
     // 1. discovered address is non link-local OR
     // 2. non link-local address have never been discovered OR
     // 3. non link-local address was discovered long ago last time.
     // Otherwise we use lastNonLinkLocalTimeMarkedAddress.
-    const bool useDiscoveredAddress = !isLinkLocalIpv4Address //< 1
-        || !lastNonLinkLocalTimeMarkedAddress.elapsedTimer.isValid() //< 2
-        || lastNonLinkLocalTimeMarkedAddress.elapsedTimer.hasExpired(kConfidenceInterval); //< 3
+    const bool useDiscoveredAddress = !isIpv4LinkLocalAddress //< 1
+        || !lastNonIpv4LinkLocalTimeMarkedAddress.elapsedTimer.isValid() //< 2
+        || lastNonIpv4LinkLocalTimeMarkedAddress.elapsedTimer.hasExpired(kConfidenceInterval); //< 3
 
-    return useDiscoveredAddress ? discoveredAddress : lastNonLinkLocalTimeMarkedAddress.address;
+    return useDiscoveredAddress ? discoveredAddress : lastNonIpv4LinkLocalTimeMarkedAddress.address;
 }
 
 QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
