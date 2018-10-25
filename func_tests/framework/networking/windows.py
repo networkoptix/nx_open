@@ -135,10 +135,9 @@ class WindowsNetworking(Networking):
         # type: (EUI, IPNetwork) -> None
         adapter_conf_class = self._winrm.wmi_class(u'Win32_NetworkAdapterConfiguration')
         all_configurations = adapter_conf_class.enumerate({})
-        requested_configuration, = [
+        adapter_conf, = [
             configuration for configuration in all_configurations
-            if configuration[u'MACAddress'] != {u'@xsi:nil': u'true'} and EUI(configuration[u'MACAddress']) == mac]
-        adapter_conf = adapter_conf_class.reference({u'Index': requested_configuration[u'Index']})
+            if configuration[u'MACAddress'] is not None and EUI(configuration[u'MACAddress']) == mac]
         invoke_arguments = {u'IPAddress': [str(ip.ip)], u'SubnetMask': [str(ip.netmask)]}
         adapter_conf.invoke_method(u'EnableStatic', invoke_arguments)
 

@@ -1,9 +1,11 @@
 import logging
+from collections import OrderedDict
 from pprint import pformat
 from xml.dom import minidom
 
 import xmltodict
 from pylru import lrudecorator
+from typing import Mapping, Union, Sequence
 from winrm.exceptions import WinRMError, WinRMTransportError
 
 _logger = logging.getLogger(__name__)
@@ -82,14 +84,7 @@ class Class(object):
         # noinspection PyProtectedMember
         rq = {'env:Envelope': self.protocol._get_soap_header(resource_uri=self.uri, action=action)}
         rq['env:Envelope'].setdefault('env:Body', body)
-        rq['env:Envelope']['env:Header']['w:SelectorSet'] = {
-            'w:Selector': [
-                {'@Name': selector_name, '#text': selector_value}
-                if selector_value is not None else
-                {'@Name': selector_name}
-                for selector_name, selector_value in selectors.items()
-                ]
-            }
+        rq['env:Envelope']['env:Header']['w:SelectorSet'] = selectors.raw
         if timeout_sec is not None:
             rq['env:Envelope']['w:OperationTimeout'] = 'PT{}S'.format(timeout_sec)
         try:
@@ -116,16 +111,17 @@ class Class(object):
     def create(self, properties_dict):
         _logger.info("Create %r: %r", self, properties_dict)
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Create'
-        body = {self.name: properties_dict}
+        body = {self.name: _none_to_nil(properties_dict)}
         body[self.name]['@xmlns'] = self.uri
-        outcome = self.perform_action(action_url, body, {})
+        outcome = self.perform_action(action_url, body, _SelectorSet.empty())
         reference_parameters = outcome[u't:ResourceCreated'][u'a:ReferenceParameters']
         assert reference_parameters[u'w:ResourceURI'] == self.uri
         selector_set = reference_parameters[u'w:SelectorSet']
         return selector_set
 
-    def enumerate(self, selectors, max_elements=32000):
-        _logger.info("Enumerate %s where %r", self, selectors)
+    def enumerate(self, selectors_dict, max_elements=32000):
+        _logger.info("Enumerate %s where %r", self, selectors_dict)
+        selectors = _SelectorSet.from_dict(selectors_dict)
         enumeration_context = [None]
         enumeration_is_ended = [False]
 
@@ -170,11 +166,9 @@ class Class(object):
             # `EnumerationMode` must be `EnumerateObjectAndEPR` to have both data and selectors.
             for item in item_list:
                 data = item[self.name]
-                selectors = {
-                    s['@Name']: s.get('#text')
-                    for s
-                    in item['a:EndpointReference']['a:ReferenceParameters']['w:SelectorSet']['w:Selector']}
-                obj = _Object(self, selectors, data)
+                selectors = _SelectorSet.from_raw(item['a:EndpointReference']['a:ReferenceParameters']['w:SelectorSet'])
+                ref = _Reference(self, selectors)
+                obj = _Object(ref, data)
                 _logger.info('\tObject: %r', obj)
                 yield obj
 
@@ -186,7 +180,7 @@ class Class(object):
 
     def reference(self, selectors):
         """Refer to objects of this class via this method."""
-        return _Reference(self, selectors)
+        return _Reference(self, _SelectorSet.from_dict(selectors))
 
     def static(self):
         """Use to call "static" methods. E.g. for StdRegProv class."""
@@ -197,6 +191,52 @@ class Class(object):
         return self.static().get()
 
 
+class _SelectorSet(object):
+    def __init__(self, raw, as_dict):
+        self.raw = raw
+        self.as_dict = as_dict
+
+    def __repr__(self):
+        return '_SelectorSet.from_dict({!r})'.format(self.as_dict)
+
+    @classmethod
+    def from_dict(cls, as_dict):
+        raw = {
+            'w:Selector': [
+                {'@Name': selector_name, '#text': selector_value}
+                if selector_value is not None else
+                {'@Name': selector_name}
+                for selector_name, selector_value in as_dict.items()
+                ]
+            }
+        return cls(raw, as_dict)
+
+    @classmethod
+    def from_raw(cls, raw):
+        as_dict = {s['@Name']: s.get('#text') for s in raw['w:Selector']}
+        return cls(raw, as_dict)
+
+    @classmethod
+    def empty(cls):
+        return cls.from_dict({})
+
+
+def _none_to_nil(data):
+    if data is None:
+        return {'@xsi:nil': 'true'}
+    if isinstance(data, (dict, OrderedDict)):
+        return {key: _none_to_nil(data[key]) for key in data}
+    return data
+
+
+def _nil_to_none(data):
+    if data == {'@xsi:nil': 'true'}:
+        return None
+    if isinstance(data, (dict, OrderedDict)):
+        return {key: _nil_to_none(data[key]) for key in data}
+    return data
+
+
 class _Reference(object):
     """Reference to single object. Get single object and invoke methods here."""
 
@@ -204,21 +244,24 @@ class _Reference(object):
         self.wmi_class = wmi_class
         self.selectors = selectors
 
+    def __repr__(self):
+        return '_Reference({!r}, {!r})'.format(self.wmi_class, self.selectors)
+
     def get(self):
         _logger.info("Get %s where %r", self.wmi_class, self.selectors)
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Get'
         outcome = self.wmi_class.perform_action(action_url, {}, self.selectors)
         instance = outcome[self.wmi_class.name]
-        return instance
+        return _Object(self, instance)
 
     def put(self, new_properties_dict):
         _logger.info("Put %s where %r: %r", self.wmi_class, self.selectors, new_properties_dict)
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Put'
-        body = {self.wmi_class.name: new_properties_dict}
+        body = {self.wmi_class.name: _none_to_nil(new_properties_dict)}
         body[self.wmi_class.name]['@xmlns'] = self.wmi_class.uri
         outcome = self.wmi_class.perform_action(action_url, body, self.selectors)
         instance = outcome[self.wmi_class.name]
-        return instance
+        return _Object(self, instance)
 
     def invoke_method(self, method_name, params, timeout_sec=None):
         _logger.info("Invoke %s.%s(%r) where %r", self.wmi_class, method_name, params, self.selectors)
@@ -234,16 +277,22 @@ class _Reference(object):
         return method_output
 
 
-class _Object(_Reference):
-    def __init__(self, wmi_class, selectors, data):
-        super(_Object, self).__init__(wmi_class, selectors)
-        self._data = data
+class _Object(object):
+    def __init__(self, ref, data):  # type: (_Reference, Mapping[str, Union[str, Mapping]]) -> ...
+        self._ref = ref
+        self._data = _nil_to_none(data)
 
     def __repr__(self):
-        return '_Object({!r}, {!r}, {!r})'.format(self.wmi_class, self.selectors, self._data)
+        return '_Object({!r}, {!r})'.format(self._ref, self._data)
 
     def __getitem__(self, item):
         return self._data[item]
+
+    def put(self, new_properties_dict):  # type: (Mapping[str, str]) -> _Object
+        return self._ref.put(new_properties_dict)
+
+    def invoke_method(self, method_name, params, timeout_sec=None):
+        return self._ref.invoke_method(method_name, params, timeout_sec=timeout_sec)
 
 
 class WmiInvokeFailed(Exception):

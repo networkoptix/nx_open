@@ -20,7 +20,7 @@ class WindowsService(Service):
         processes = list(self._winrm.wmi_class(u'Win32_Process').enumerate({}))
         for process in processes:
             if process['CommandLine'] == service['PathName']:
-                self._winrm.wmi_class(u'Win32_Process').reference({u'Handle': process['Handle']}).invoke_method(u'Terminate', {})
+                process.invoke_method(u'Terminate', {})
 
     def start(self, timeout_sec=None):
         self._wmi_service.invoke_method(u'StartService', {}, timeout_sec=timeout_sec)
