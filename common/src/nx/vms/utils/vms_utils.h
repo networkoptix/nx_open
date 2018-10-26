@@ -29,7 +29,8 @@ struct DbBackupFileData
 QString makeNextUniqueName(const QString& prefix, int build);
 
 bool backupDatabase(const QString& backupDir,
-    std::shared_ptr<ec2::AbstractECConnection> connection);
+    std::shared_ptr<ec2::AbstractECConnection> connection,
+    const boost::optional<QString>& dbFilePath = boost::none);
 
 QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir);
 

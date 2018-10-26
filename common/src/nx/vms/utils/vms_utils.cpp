@@ -39,21 +39,43 @@ QString makeNextUniqueName(const QString& prefix, int build)
 }
 
 bool backupDatabase(const QString& backupDir,
-    std::shared_ptr<ec2::AbstractECConnection> connection)
+    std::shared_ptr<ec2::AbstractECConnection> connection,
+    const boost::optional<QString>& dbFilePath)
 {
     const nx::utils::SoftwareVersion productVersion(nx::utils::AppInfo::applicationVersion());
     QString fileName = makeNextUniqueName(backupDir + lit("/ecs"), productVersion.build());
 
-    const ec2::ErrorCode errorCode = connection->dumpDatabaseToFileSync(fileName);
-    if (errorCode != ec2::ErrorCode::ok)
+    QDir dir(backupDir);
+    if (!dir.exists() && !dir.mkdir(backupDir))
     {
-        NX_ERROR(typeid(VmsUtilsFunctionsTag),
-            lit("Failed to dump EC database: %1").arg(ec2::toString(errorCode)));
+        NX_WARNING(typeid(VmsUtilsFunctionsTag), "Failed to create DB backup directory");
         return false;
+    }
+
+    if (!dbFilePath)
+    {
+        const ec2::ErrorCode errorCode = connection->dumpDatabaseToFileSync(fileName);
+        if (errorCode != ec2::ErrorCode::ok)
+        {
+            NX_ERROR(typeid(VmsUtilsFunctionsTag),
+                lit("Failed to dump EC database: %1").arg(ec2::toString(errorCode)));
+            return false;
+        }
+    }
+    else
+    {
+        if (!QFile::copy(*dbFilePath, fileName))
+        {
+            NX_WARNING(typeid(VmsUtilsFunctionsTag), "Failed to create DB backup directory");
+            return false;
+        }
     }
 
     deleteOldBackupFilesIfNeeded(backupDir,
         nx::SystemCommands().freeSpace(backupDir.toStdString()));
+
+    NX_WARNING(typeid(VmsUtilsFunctionsTag),
+        lm("Successfully created DB backup %1").args(fileName));
 
     return true;
 }
@@ -61,9 +83,11 @@ bool backupDatabase(const QString& backupDir,
 QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir)
 {
     QDir dir(backupDir);
-    NX_ASSERT(dir.exists());
-
     QList<DbBackupFileData> result;
+
+    if (!dir.exists())
+        return result;
+
     for (const auto& fileInfo: dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files))
     {
         if (fileInfo.completeSuffix() != "backup")

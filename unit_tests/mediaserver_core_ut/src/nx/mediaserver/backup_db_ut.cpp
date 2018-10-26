@@ -107,6 +107,23 @@ protected:
         ASSERT_EQ(foundFiles[0].timestamp, m_backupFilesDataFound[0].timestamp);
     }
 
+    void whenServerStopped()
+    {
+        m_server->stop();
+    }
+
+    void thenBackupFilesShouldBeCreated(int backupFilesCount)
+    {
+        m_backupFilesDataFound = nx::vms::utils::allBackupFilesDataSorted(
+            m_server->serverModule()->settings().backupDir());
+
+        ASSERT_EQ(backupFilesCount, m_backupFilesDataFound.size());
+    }
+
+    void thenNoNewBackupFilesShouldBeCreated()
+    {
+    }
+
 private:
     LauncherPtr m_server;
     QList<nx::vms::utils::DbBackupFileData> m_backupFilesDataFound;
@@ -161,5 +178,26 @@ TEST_F(BackupDb, NoBackupCreatedOnFirstTimeLaunch)
     whenServerLaunched();
     thenNoBackupFilesShouldBeCreated();
 }
+
+TEST_F(BackupDb, CreatedWhenNoBackupsForCurrentVersion)
+{
+    whenServerLaunched();
+    whenServerStopped();
+    whenServerLaunched();
+    thenBackupFilesShouldBeCreated(/*backupFilesCount*/ 1);
+}
+
+TEST_F(BackupDb, NotCreatedWhenThereAreBackupsForCurrentVersion)
+{
+    whenServerLaunched();
+    whenServerStopped();
+    whenServerLaunched();
+    thenBackupFilesShouldBeCreated(/*backupFilesCount*/ 1);
+
+    whenServerStopped();
+    whenServerLaunched();
+    thenNoNewBackupFilesShouldBeCreated();
+}
+
 
 } // namespace nx::mediaserver::test

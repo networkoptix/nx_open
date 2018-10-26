@@ -4134,7 +4134,10 @@ void MediaServerProcess::run()
 
     auto utils = nx::mediaserver::Utils(serverModule.get());
     if (utils.timeToMakeDbBackup())
-        utils.backupDatabase();
+    {
+        utils.backupDatabase(ec2::detail::QnDbManager::ecsDbFileName(
+            serverModule->settings().dataDir()));
+    }
 
     if (!connectToDatabase())
         return;

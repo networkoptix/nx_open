@@ -55,6 +55,7 @@
 #include <utils/crypt/symmetrical.h>
 #include <utils/common/synctime.h>
 #include <api/model/password_data.h>
+#include <database/db_manager.h>
 
 namespace
 {
@@ -105,18 +106,18 @@ bool Utils::updateUserCredentials(
     return true;
 }
 
-bool Utils::backupDatabase()
+bool Utils::backupDatabase(const boost::optional<QString>& dbFilePath)
 {
     auto connection = ec2Connection();
     return nx::vms::utils::backupDatabase(serverModule()->settings().backupDir(),
-        std::move(connection));
+        std::move(connection), dbFilePath);
 }
 
 bool Utils::timeToMakeDbBackup() const
 {
     const auto dataDir = serverModule()->settings().dataDir();
     const auto backupDir = serverModule()->settings().backupDir();
-    if (!QFile::exists(closeDirPath(dataDir) + QString::fromLatin1("ecs.sqlite")))
+    if (!QFile::exists(ec2::detail::QnDbManager::ecsDbFileName(dataDir)))
         return false; //< Nothing to make a copy of.
 
     const auto currentVersion =
