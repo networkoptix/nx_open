@@ -1046,7 +1046,13 @@ CameraDiagnostics::Result HanwhaResource::initSystem(const HanwhaInformation& in
         }
     }
 
-    if (isAnalogEncoder() || isProxiedAnalogEncoder())
+    const auto hasRs485 = attributes().attribute<bool>("IO/RS485");
+    const auto hasRs422 = attributes().attribute<bool>("IO/RS422");
+
+    m_hasSerialPort = (hasRs485 != boost::none && *hasRs485)
+        || (hasRs422 != boost::none && *hasRs422);
+
+    if (isAnalogEncoder() || isProxiedAnalogEncoder() || hasSerialPort())
     {
         // We can't reliably determine if there's PTZ caps for analogous cameras
         // connected to Hanwha encoder, so we allow a user to enable it on the 'expert' tab
@@ -3591,6 +3597,11 @@ HanwhaDeviceType HanwhaResource::deviceType() const
 HanwhaDeviceType HanwhaResource::bypassDeviceType() const
 {
     return m_bypassDeviceType;
+}
+
+bool HanwhaResource::hasSerialPort() const
+{
+    return m_hasSerialPort;
 }
 
 QString HanwhaResource::nxProfileName(
