@@ -23,7 +23,7 @@ void CreateClientSessionHandler::prepareRequestData(
     const nx::network::http::Request& /*httpRequest*/,
     api::CreateClientSessionRequest* request)
 {
-    request->targetPeerName = requestPathParams()[0];
+    request->targetPeerName = requestPathParams().getByName(api::kServerIdName);
 }
 
 void CreateClientSessionHandler::beforeReportingResponse(
@@ -60,7 +60,7 @@ controller::ConnectToPeerRequestEx ConnectToListeningPeerWithHttpUpgradeHandler:
 {
     controller::ConnectToPeerRequestEx inputData;
     inputData.clientEndpoint = connection->socket()->getForeignAddress();
-    inputData.sessionId = requestPathParams()[0];
+    inputData.sessionId = requestPathParams().getByName(api::kSessionIdName);
     return inputData;
 }
 

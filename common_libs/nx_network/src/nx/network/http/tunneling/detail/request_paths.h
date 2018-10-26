@@ -14,4 +14,7 @@ static constexpr char kExperimentalTunnelDownPath[] = "/experimental/{tunnelId}/
 static constexpr char kMultiMessageTunnelDownPath[] = "/multi_message/{tunnelId}/down";
 static constexpr char kMultiMessageTunnelUpPath[] = "/multi_message/{tunnelId}/up/{sequence}";
 
+static constexpr char kTunnelIdName[] = "tunnelId";
+static constexpr char kTunnelMessageSequenceName[] = "sequence";
+
 } // namespace nx::network::http::tunneling::detail

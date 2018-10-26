@@ -35,8 +35,6 @@ struct NX_NETWORK_API RequestResult
 
 using RequestProcessedHandler = nx::utils::MoveOnlyFunc<void(RequestResult)>;
 
-using RequestPathParams = std::vector<std::string>;
-
 struct RequestContext
 {
     nx::network::http::HttpServerConnection* connection = nullptr;

@@ -31,6 +31,8 @@ public:
     {
         MatchContext matchContext;
         matchContext.regex = convertToRegex(pathTemplate);
+        if (!fetchParamNames(pathTemplate, &matchContext.paramNames))
+            return false;
         matchContext.mapped = std::move(mapped);
 
         return m_restPathToMatchContext.emplace(
@@ -40,19 +42,20 @@ public:
 
     boost::optional<const Mapped&> match(
         const std::string& path,
-        std::vector<std::string>* pathParams) const
+        RequestPathParams* pathParams) const
     {
         for (const auto& matchContext: m_restPathToMatchContext)
         {
             std::smatch matchResult;
             if (std::regex_search(path, matchResult, matchContext.second.regex))
             {
-                std::vector<std::string> params;
+                RequestPathParams params;
                 for (size_t i = 1; i < matchResult.size(); ++i)
                 {
                     if (matchResult[i].length() == 0)
                         return boost::none;
-                    params.push_back(matchResult[i]);
+                    params.nameToValue.emplace(
+                        matchContext.second.paramNames[i-1], matchResult[i]);
                 }
                 *pathParams = std::move(params);
                 return boost::optional<const Mapped&>(matchContext.second.mapped);
@@ -66,6 +69,10 @@ private:
     struct MatchContext
     {
         std::regex regex;
+        /**
+         * NOTE: Order preserves the order in the request.
+         */
+        std::vector<std::string> paramNames;
         Mapped mapped;
     };
 
@@ -74,7 +81,8 @@ private:
 
     std::regex convertToRegex(const std::string& pathTemplate)
     {
-        const std::regex replaceRestParams("{[0-9a-zA-Z]*}", std::regex_constants::basic);
+        const std::regex replaceRestParams(
+            "{[0-9a-zA-Z]*}", std::regex_constants::basic);
         const std::string replacement("\\([^/]*\\)");
 
         std::string restPathMatchRegex;
@@ -88,6 +96,28 @@ private:
         return std::regex(
             std::move(restPathMatchRegex),
             std::regex::icase | std::regex_constants::basic);
+    }
+
+    bool fetchParamNames(std::string pathTemplate, std::vector<std::string>* names)
+    {
+        std::set<std::string> uniqueNames;
+
+        const std::regex findRestParamsRegex(
+            "{\\([0-9a-zA-Z]*\\)}", std::regex_constants::basic);
+
+        std::smatch matchResult;
+        while (std::regex_search(pathTemplate, matchResult, findRestParamsRegex))
+        {
+            for (size_t i = 1; i < matchResult.size(); ++i)
+            {
+                names->push_back(matchResult[i].str());
+                if (!uniqueNames.emplace(matchResult[i].str()).second)
+                    return false;
+            }
+            pathTemplate = matchResult.suffix();
+        }
+
+        return true;
     }
 };
 

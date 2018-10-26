@@ -191,7 +191,7 @@ private:
         const PathMatchContext& pathMatchContext,
         const QString& path) const
     {
-        std::vector<std::string> pathParams;
+        RequestPathParams pathParams;
         boost::optional<const FactoryFunc&> factory =
             pathMatchContext.pathToFactory.match(path.toStdString(), &pathParams);
         if (factory)

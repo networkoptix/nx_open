@@ -20,7 +20,7 @@ public:
 
     boost::optional<const Mapped&> match(
         const std::string& path,
-        std::vector<std::string>* /*pathParams*/) const
+        RequestPathParams* /*pathParams*/) const
     {
         auto it = m_pathToMapped.find(path);
         if (it == m_pathToMapped.end())

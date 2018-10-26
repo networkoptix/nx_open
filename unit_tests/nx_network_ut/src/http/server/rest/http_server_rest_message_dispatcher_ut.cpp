@@ -40,14 +40,16 @@ TEST_F(
 {
     givenRegisteredHandler("/account/{accountId}/system/{systemName}");
     whenSentRequest("/account/akolesnikov/system/la_office_test");
-    thenParametersHaveBeenPassedToTheHandler({"akolesnikov", "la_office_test"});
+    thenParametersHaveBeenPassedToTheHandler(
+        {{{"accountId", "akolesnikov"}, {"systemName", "la_office_test"}}});
 }
 
 TEST_F(HttpServerRestMessageDispatcher, find_handler_by_url_with_query)
 {
     givenRegisteredHandler("/account/{accountId}/systems");
     whenSentRequest("/account/akolesnikov/systems?status=online");
-    thenParametersHaveBeenPassedToTheHandler({ "akolesnikov" });
+    thenParametersHaveBeenPassedToTheHandler(
+        {{{"accountId", "akolesnikov"}}});
 }
 
 } // namespace test

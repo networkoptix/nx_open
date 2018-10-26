@@ -69,7 +69,8 @@ public:
         if (requestPathParams().empty())
             return completionHandler(nx::network::http::StatusCode::badRequest);
 
-        auto peerInfo = m_registeredPeerPool->getPeerInfo(requestPathParams()[0]);
+        auto peerInfo = m_registeredPeerPool->getPeerInfo(
+            requestPathParams().getByName(http::kModuleIdParam));
         if (!peerInfo)
             return completionHandler(nx::network::http::StatusCode::notFound);
 
@@ -121,10 +122,11 @@ void HttpServer::onKeepAliveConnectionAccepted(
     std::unique_ptr<nx::network::WebSocket> connection,
     network::http::RequestPathParams restParams)
 {
-    if (restParams.empty())
+    const auto moduleId = restParams.getByName(http::kModuleIdParam);
+    if (moduleId.empty())
         return;
 
-    m_registeredPeerPool->addPeerConnection(restParams[0], std::move(connection));
+    m_registeredPeerPool->addPeerConnection(moduleId, std::move(connection));
 }
 
 } // namespace discovery
