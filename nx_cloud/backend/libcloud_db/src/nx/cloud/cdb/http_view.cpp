@@ -227,7 +227,7 @@ void HttpView::registerApiHandlers(
         {
             m_controller->systemMergeManager().startMergingSystems(
                 authzInfo,
-                restPathParams[0],
+                restPathParams.getByName(kSystemIdParam),
                 std::move(inputData.systemId),
                 std::move(completionHandler));
         });
