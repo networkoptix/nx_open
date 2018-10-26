@@ -443,7 +443,7 @@ class ProductCustomizationReview(models.Model):
             ("force_update", "Can forcibly update content"),
         )
 
-    REVIEW_STATES = Choices((0, "pending", "Pending"), (1, "accepted", "Accepted"), (3, "rejected", "Rejected"))
+    REVIEW_STATES = Choices((0, "pending", "Pending"), (1, "accepted", "Accepted"), (2, "rejected", "Rejected"))
     customization = models.ForeignKey(Customization)
     version = models.ForeignKey(ContentVersion)
     state = models.IntegerField(choices=REVIEW_STATES, default=REVIEW_STATES.pending)

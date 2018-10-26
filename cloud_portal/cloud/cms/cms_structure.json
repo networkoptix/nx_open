@@ -395,6 +395,13 @@
             "optional": true
           },
           {
+            "name": "tileDescription",
+            "label": "Description",
+            "value": "",
+            "description": "A short description for the integration tile.",
+            "type": "long_text"
+          },
+          {
             "name": "testedVersions",
             "label": "Tested software (VMS) versions",
             "value": "",
@@ -506,7 +513,7 @@
             "label": "File",
             "value": "",
             "description": "",
-            "type": "file",
+            "type": "external_file",
             "public": false
           }
         ]
