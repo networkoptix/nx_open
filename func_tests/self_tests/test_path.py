@@ -223,6 +223,10 @@ def test_unlink_dir(existing_remote_dir):
         existing_remote_dir.unlink()
 
 
+def test_unlink_non_existent(existing_remote_dir):
+    pytest.raises(DoesNotExist, existing_remote_dir.joinpath('non-existent').unlink)
+
+
 def test_write_to_existing_file(existing_remote_file):
     data = os.urandom(1000)
     bytes_written = existing_remote_file.write_bytes(data)

@@ -73,6 +73,7 @@ class SftpPath(BasePosixPath):
             return True
 
     @_reraise_by_errno({
+        errno.ENOENT: exceptions.DoesNotExist(),
         None: exceptions.BadPath("Probably a dir."),
         })
     def unlink(self):
