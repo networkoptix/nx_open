@@ -917,7 +917,7 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeSetup()
             }
         }
     }
-    d->response.headers.insert(nx::network::http::HttpHeader("Transport", transport));
+    d->response.headers.insertOrReplaceHeader(nx::network::http::HttpHeader("Transport", transport));
     return nx::network::http::StatusCode::ok;
 }
 

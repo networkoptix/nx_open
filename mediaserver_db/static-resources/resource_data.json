@@ -2891,6 +2891,14 @@
                 "BOSCH|MIC IP starlight 7000i"
             ],
             "onvifPtzDigitsAfterDecimalPoint": 2
+        },
+        {
+            "keys": [
+                "HIKVISION|DS-2CD6A64F-IHS/NFC"
+            ],
+            "disableMultiThreadDecoding": [
+                "hevc"
+            ]
         }
     ]
 }
