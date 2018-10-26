@@ -395,7 +395,7 @@
             "optional": true
           },
           {
-            "name": "tileDescription",
+            "name": "shortDescription",
             "label": "Description",
             "value": "",
             "description": "A short description for the integration tile.",
