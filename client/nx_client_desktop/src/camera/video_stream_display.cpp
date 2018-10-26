@@ -401,9 +401,8 @@ std::set<AVCodecID> QnVideoStreamDisplay::getDisabledMtCodecs()
     auto secResource = m_resource.dynamicCast<QnSecurityCamResource>();
     if (secResource)
     {
-        auto resData = qnStaticCommon->dataPool()->data(secResource);
         QList<QString> codecList =
-            resData.value<QList<QString>>(Qn::kDisableMultiThreadDecoding);
+            secResource->resourceData().value<QList<QString>>(Qn::kDisableMultiThreadDecoding);
         for(auto& codecName: codecList)
         {
             const AVCodecDescriptor* codecDescr =
