@@ -128,7 +128,6 @@ def sync_dependencies(syncher):
         sync("vcredist-2015", path_variable="vcredist_directory")
         sync("vmaxproxy-2.1")
         sync("windows/wix-3.11", path_variable="wix_directory")
-        sync("windows/signtool", path_variable="signtool_directory")
         sync("windows/ilmerge", path_variable="ilmerge_directory")
 
     if platform in ("windows", "linux"):
