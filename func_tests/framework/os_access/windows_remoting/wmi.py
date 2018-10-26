@@ -33,6 +33,23 @@ _win32_error_codes = {
     }
 
 
+def _format_timeout(timeout_sec):
+    """Operation timeout is in ISO 8601 duration format. Note that only two digits of each term are
+    supported: PT120S is invalid and interpreted by WMI as 1 minute 20 seconds. See:
+    https://en.wikipedia.org/wiki/ISO_8601#Durations.
+    >>> _format_timeout(0.5)
+    'PT00H00M00.500S'
+    >>> _format_timeout(120)
+    'PT00H02M00.000S'
+    >>> _format_timeout(3723.001)
+    'PT01H02M03.001S'
+    """
+    return 'PT{:02.0f}H{:02.0f}M{:06.3f}S'.format(
+        timeout_sec // 3600,
+        timeout_sec // 60 % 60,
+        timeout_sec % 60)
+
+
 class Wmi(object):
     def __init__(self, protocol):
         self.protocol = protocol
@@ -80,7 +97,8 @@ class Wmi(object):
             'env:Envelope': self.protocol._get_soap_header(resource_uri=class_uri, action=action)}
         rq['env:Envelope'].setdefault('env:Body', body)
         rq['env:Envelope']['env:Header']['w:SelectorSet'] = selectors.raw
-            rq['env:Envelope']['env:Header']['w:OperationTimeout'] = 'PT{}S'.format(timeout_sec)
+        timeout_sec = timeout_sec or 120  # It used to be 120 seconds and must be specified.
+        rq['env:Envelope']['env:Header']['w:OperationTimeout'] = _format_timeout(timeout_sec)
         try:
             request_xml = xmltodict.unparse(rq)
             _logger.debug("Request XML:\n%s", _pretty_format_xml(request_xml))
