@@ -29,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->exportStreamButton, &QPushButton::pressed, this, &MainWindow::exportStream);
 
     connect(ui->filenameLabel, &QPushButton::clicked, this, &MainWindow::openFile);
+    connect(ui->streamTable, &QTableWidget::itemDoubleClicked, this, &MainWindow::exportStream);
 }
 
 MainWindow::~MainWindow()
