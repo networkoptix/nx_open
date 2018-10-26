@@ -295,7 +295,7 @@ public:
             return closeDirPath(obtainDataDirectory()) + "backup";
         }
     };
-    Option<std::chrono::milliseconds> dbBackupPeriodMS{this, "dbBackupPeriod",
+    Option<std::chrono::milliseconds> dbBackupPeriodMS{this, "dbBackupPeriodMS",
         kDbBackupPeriodHrs,
         "Backup EC database period. If server version is updated, this setting is neglected and "
         "backup is created after the updated server starts.",

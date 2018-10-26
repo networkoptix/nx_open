@@ -8,6 +8,7 @@
 #include <api/model/getnonce_reply.h>
 #include <nx/vms/api/data/module_information.h>
 #include <rest/server/json_rest_result.h>
+#include <nx/system_commands.h>
 
 #include <api/test_api_requests.h>
 #include <test_support/utils.h>
@@ -29,7 +30,8 @@ protected:
     {
         m_server = std::make_unique<MediaServerLauncher>(/* tmpDir */ "");
         m_server->addSetting(QnServer::kNoInitStoragesOnStartup, "1");
-        m_baseDir = closeDirPath(m_server->dataDir());
+        m_baseDir = m_server->serverModule()->settings().dataDir();
+        m_backupDir = m_server->serverModule()->settings().backupDir();
     }
 
     void whenServerLaunched()
@@ -114,14 +116,48 @@ protected:
 
     void thenBackupFilesShouldBeCreated(int backupFilesCount)
     {
-        m_backupFilesDataFound = nx::vms::utils::allBackupFilesDataSorted(
-            m_server->serverModule()->settings().backupDir());
+        m_backupFilesDataFound = nx::vms::utils::allBackupFilesDataSorted(m_backupDir);
 
         ASSERT_EQ(backupFilesCount, m_backupFilesDataFound.size());
     }
 
     void thenNoNewBackupFilesShouldBeCreated()
     {
+        const auto backupFilesData = nx::vms::utils::allBackupFilesDataSorted(m_backupDir);
+        ASSERT_EQ(m_backupFilesDataFound[0].timestamp, backupFilesData[0].timestamp);
+    }
+
+    void givenBackupRotationPeriod(std::chrono::milliseconds period)
+    {
+        m_server->serverModule()->mutableSettings()->dbBackupPeriodMS.set(period);
+    }
+
+    void thenSeveralRotationsShouldBeObserved()
+    {
+        waitForAllBackupFilesToBeCreated();
+
+        QList<nx::vms::utils::DbBackupFileData> oldBackupFilesData;
+
+        while (true)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            const auto backupFilesData = nx::vms::utils::allBackupFilesDataSorted(m_backupDir);
+
+            if (backupFilesData.isEmpty())
+                continue;
+
+            if (oldBackupFilesData.isEmpty())
+            {
+                oldBackupFilesData = backupFilesData;
+                continue;
+            }
+            else
+            {
+
+            }
+
+            oldBackupFilesData = backupFilesData;
+        }
     }
 
 private:
@@ -130,6 +166,7 @@ private:
     QList<QString> m_backupFilesCreated;
     QList<QString> m_nonBackupFilesCreated;
     QString m_baseDir;
+    QString m_backupDir;
     qint64 m_freeSpace = -1;
 
     static QString notQuiteBackupFileName()
@@ -144,6 +181,17 @@ private:
         };
 
         return nx::utils::random::choice(fileNames);
+    }
+
+    void waitForAllBackupFilesToBeCreated()
+    {
+        const int kMaxBackupFilesCount =
+            nx::SystemCommands().freeSpace(m_backupDir.toStdString()) > 10 * 1024LL * 1024LL * 1024LL
+            ? 6
+            : 1;
+
+        while (m_backupFilesDataFound.size() != kMaxBackupFilesCount)
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 };
 
@@ -199,5 +247,11 @@ TEST_F(BackupDb, NotCreatedWhenThereAreBackupsForCurrentVersion)
     thenNoNewBackupFilesShouldBeCreated();
 }
 
+TEST_F(BackupDb, FilesRotated)
+{
+    givenBackupRotationPeriod(std::chrono::milliseconds(1000));
+    whenServerLaunched();
+    thenSeveralRotationsShouldBeObserved();
+}
 
 } // namespace nx::mediaserver::test
