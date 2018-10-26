@@ -290,11 +290,9 @@ MEDIA_ROOT = BASE_DIR + '/static/integrations/'
 MEDIA_URL = '/static/integrations/'
 
 # START s3 config
-AWS_STORAGE_BUCKET_NAME = conf['bucket'] if 'bucket' in conf and not LOCAL_ENVIRONMENT else 'cloud-portal'
+AWS_STORAGE_BUCKET_NAME = 'cloud-portal' if LOCAL_ENVIRONMENT else conf['bucket']
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
-AWS_S3_OBJECT_PARAMETERS = {
-    'CacheControl': 'max-age=86400',
-}
+# mysite is a default name for the admin site
 INTEGRATION_FILE_STORAGE = 'mysite.storage_backends.MediaStorage'
 # END s3
 
