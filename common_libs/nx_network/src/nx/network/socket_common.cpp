@@ -230,6 +230,16 @@ bool HostAddress::isLocalNetwork() const
     return false; // not even IP address
 }
 
+bool HostAddress::isIpv4LinkLocalNetwork() const
+{
+    if (const auto& ip = ipV4())
+    {
+        const auto addr = ntohl(ip->s_addr);
+        return (addr & 0xFFFF0000) == 0xA9FE0000; // 169.254.0.0
+    }
+    return false;
+}
+
 bool HostAddress::isIpAddress() const
 {
     if (m_ipV4 || m_ipV6)

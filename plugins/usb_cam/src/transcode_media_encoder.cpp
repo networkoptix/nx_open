@@ -8,8 +8,8 @@ namespace usb_cam {
 
 namespace {
 
-int constexpr kTargetFps = 5;
-int constexpr kTargetWidth = 640;
+int constexpr kDefaultSecondaryFps = 5;
+int constexpr kDefaultSecondaryWidth = 640;
 int constexpr kDefaultBitrate = 5000000;
 
 }
@@ -46,8 +46,7 @@ int TranscodeMediaEncoder::getResolutionList(nxcip::ResolutionInfo* infoList, in
         ? (int)list.size()
         : nxcip::MAX_RESOLUTION_LIST_SIZE - 1;
 
-    infoList[index].resolution.width = secondary.width;
-    infoList[index].resolution.height = secondary.height;
+    infoList[index].resolution = secondary.resolution;
     infoList[index].maxFps = secondary.fps;
 
     *infoListCount = index + 1;
@@ -89,7 +88,7 @@ CodecParameters TranscodeMediaEncoder::calculateSecondaryCodecParams(
 {
     NX_ASSERT(resolutionList.size() > 0);
     if (resolutionList.empty())
-        return CodecParameters(AV_CODEC_ID_NONE, 30, kDefaultBitrate, kTargetWidth, kTargetWidth*9/16);
+        return {};
 
     const auto& resolution = resolutionList[resolutionList.size() - 1];
     float aspectRatio = (float) resolution.width / resolution.height;
@@ -99,10 +98,9 @@ CodecParameters TranscodeMediaEncoder::calculateSecondaryCodecParams(
 
     return CodecParameters(
         codecId,
-        kTargetFps,
+        kDefaultSecondaryFps,
         kDefaultBitrate,
-        kTargetWidth,
-        kTargetWidth / aspectRatio);
+        {kDefaultSecondaryWidth, (int)(kDefaultSecondaryWidth / aspectRatio)});
 }
 
 } // namespace nx

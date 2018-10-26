@@ -135,6 +135,8 @@ class Class(object):
                 'n:Enumerate': {
                     'w:OptimizeEnumeration': None,
                     'w:MaxElements': str(max_elements),
+                    # Set mode as `EnumerateObjectAndEPR` to get selector set for reference and
+                    # be able to invoke methods on returned object.
                     # See: https://www.dmtf.org/sites/default/files/standards/documents/DSP0226_1.0.0.pdf, 8.7.
                     'w:EnumerationMode': 'EnumerateObjectAndEPR',
                     }
@@ -163,10 +165,16 @@ class Class(object):
             return _pick_objects(items)
 
         def _pick_objects(item_list):
-            object_list = [item[self.name] for item in item_list]
-            for object in object_list:
-                _logger.info('\tObject: %r', object)
-            return object_list
+            # `EnumerationMode` must be `EnumerateObjectAndEPR` to have both data and selectors.
+            for item in item_list:
+                data = item[self.name]
+                selectors = {
+                    s['@Name']: s['#text']
+                    for s
+                    in item['a:EndpointReference']['a:ReferenceParameters']['w:SelectorSet']['w:Selector']}
+                obj = _Object(self, selectors, data)
+                _logger.info('\tObject: %r', obj)
+                yield obj
 
         for item in _start():
             yield item
@@ -222,6 +230,18 @@ class _Reference(object):
             exception_cls = WmiInvokeFailed.specific_cls(int(method_output[u'ReturnValue']))
             raise exception_cls(self, method_name, params, method_output)
         return method_output
+
+
+class _Object(_Reference):
+    def __init__(self, wmi_class, selectors, data):
+        super(_Object, self).__init__(wmi_class, selectors)
+        self._data = data
+
+    def __repr__(self):
+        return '_Object({!r}, {!r}, {!r})'.format(self.wmi_class, self.selectors, self._data)
+
+    def __getitem__(self, item):
+        return self._data[item]
 
 
 class WmiInvokeFailed(Exception):

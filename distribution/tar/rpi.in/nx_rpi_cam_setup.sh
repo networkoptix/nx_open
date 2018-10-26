@@ -3,6 +3,7 @@ set -u #< Prohibit undefined variables.
 
 NX_RPI_CONFIG_FILE="/boot/config.txt"
 NX_RPI_REBOOT=0
+NX_RPI_CAM_PRESENT=0
 
 checkRunningUnderRoot()
 {
@@ -20,7 +21,7 @@ touchConfigurationFile()
     fi
 }
 
-enableCamera()
+enableRpiCameraInterface()
 {
     local line=`grep "start_x" $NX_RPI_CONFIG_FILE`
     if [ ! -z "$line" ]
@@ -58,6 +59,15 @@ setGPUMemory()
     fi
 }
 
+detectRpiCameraPresence()
+{
+    local mmal=`v4l2-ctl --list-devices | grep mmal`
+    if [ ! -z "$mmal" ]
+    then
+        NX_RPI_CAM_PRESENT=1
+    fi
+}
+
 installV4L2()
 {
     local modulePath="/etc/modules-load.d/bcm2835-v4l2.conf"
@@ -73,7 +83,7 @@ installV4L2()
 
     if ! lsmod | grep -q bcm2835_v4l2 # lsmod reports driver with an underscore
     then
-        modprobe bcm2835_v4l2 # manually load the driver this time
+        modprobe bcm2835_v4l2 || true # manually load the driver this time, ignore failure
     fi
 }
 
@@ -100,18 +110,22 @@ configureV4L2()
     fi
 
     sed -i "s/\"e0\"/\"exit 0\"/g" $file # replace "e0" with "exit 0" from earlier
-
-    eval $repeat_command
-    eval $i_frame_command  
+    
+    if [ "$NX_RPI_CAM_PRESENT" = "1" ]
+    then
+        eval $repeat_command || true
+        eval $i_frame_command || true
+    fi
 }
 
 main()
 {
     checkRunningUnderRoot
     touchConfigurationFile
-    enableCamera
+    enableRpiCameraInterface
     setGPUMemory
     installV4L2
+    detectRpiCameraPresence
     configureV4L2
     
     if [ "$NX_RPI_REBOOT" = "1" ]

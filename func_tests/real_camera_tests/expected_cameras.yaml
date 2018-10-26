@@ -48,9 +48,7 @@ Axis_M3046V:
       "2": "rtsp://192.168.200.10:554/axis-media/media.amp?streamprofile=hdwitnessSecondary"
 
 
-# Needs a reboot every time. Camera is VERY BUGGY!
 DWC-MD421D_1.1.1.8:
-
   discovery:
     physicalId: 00-1C-A6-01-21-97
     vendor: Digital Watchdog
@@ -123,10 +121,6 @@ DWC-MD421D_1.1.2.0:
       '1': "rtsp://192.168.200.14:554/h264"
       '2': "rtsp://192.168.200.14:8554/h264"
 
-  # FFmpeg is unable to discover any streams when audio is enabled.
-  audio_parameters:
-    - {'skip_codec_change': True, codec: 'MP2'}
-
   io_events:
     ins: [{id: '1'}]
     outs: [{id: 't_RelayOut-0'}]
@@ -189,7 +183,6 @@ DWC-MV421TIR:
       - {codec: 'H264', resolution: '1280x720'}
     secondary:
       - {codec: 'H264', resolution: '704x480', fps: [8, 12]}
-      #- {codec: 'H264', resolution: '320x240', fps: [24, 36]}
 
   # Didn't find any data on supported audio_parameters codecs. This needs checking
   # "Audio stream was not discovered by ffprobe."
@@ -225,10 +218,10 @@ DWC-MV84WiAC6:
 
   video_parameters:
     primary: # Exact supported fps/res values are not in the spec. Adjusting may be needed
-      - {codec: 'H264', resolution: '2560x1440'}
+      - {codec: 'H264', resolution: '1280x960'}
       #- {codec: 'MJPEG', resolution: '1280x960'}
     secondary:
-      - {codec: 'H264', resolution: '352x288', fps: [8, 12]}
+      - {codec: 'H264', resolution: '640x480', fps: [8, 12]}
       #- {codec: 'MJPEG', resolution: '640x480', fps: [24, 36]}
 
 
@@ -251,7 +244,7 @@ DWC-PVX16W:
     ptzCapabilities: 16388
 
   recording:
-    primary: {codec: 'H264', resolution: '2560x1440', fps: [[25, 35]]} # TODO: Add more FPS.
+    primary: {codec: 'H264', resolution: '2560x1440', fps: [[12, 18], [5, 10]]}
     secondary: {codec: 'H264', resolution: '352x240', fps: [5, 9]}
     # Although in all_cameras.json range is "352x240,352x288, 640x480,704x480,704x576", 352x240
     # is applied when trying to use 352x288. Bug on the server or camera?

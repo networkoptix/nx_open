@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include <camera/camera_plugin_types.h>
+
 namespace nx {
 namespace usb_cam {
 namespace device {
