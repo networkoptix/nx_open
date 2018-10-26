@@ -25,6 +25,7 @@ export class NxSystemsDropdown implements OnInit, OnChanges {
     routeSystemId: string;
     params: any;
     show: boolean;
+    moresystems: any;
 
     constructor(@Inject('languageService') private language: any,
                 private configService: NxConfigService,
@@ -33,6 +34,7 @@ export class NxSystemsDropdown implements OnInit, OnChanges {
 
         this.show = false;
         this.config = configService.getConfig();
+        this.moresystems = [];
     }
 
     trackByFn(index, item) {

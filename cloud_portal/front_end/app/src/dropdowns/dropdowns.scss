@@ -12,25 +12,25 @@ header {
     .dropdown {
         @media (max-width : $collapse-second-width) {
             position : inherit !important;
-
+            
             .dropdown-menu {
                 right : 0 !important;
             }
         }
-
+        
         .dropdown-toggle {
             height : 47px;
             border : none;
-
+            
             @media (max-width : $collapse-first-width) {
                 padding : 5px 27px 5px 5px;
             }
-
+            
             @media (max-width : $collapse-second-width) {
                 padding : 5px 8px !important;
             }
         }
-
+        
         .dropdown-menu {
             border-top                 : 1px solid $light6;
             border-radius              : 0;
@@ -43,28 +43,28 @@ header {
 .dropdown {
     &.short {
         width : 70px;
-
+        
         .multi-column {
             &.columns-2 {
                 width : 300px !important;
             }
         }
     }
-
+    
     .dropdown-toggle {
         display          : flex;
         padding          : 5px 32px 5px 10px;
         background-color : $light4;
         width            : 100%;
         max-width        : 100%;
-
+        
         &:hover {
             .arrow {
                 &::after {
                     border-top-color : $light3;
                     transition       : border-top-color 0.2s ease-in-out;
                 }
-
+                
                 &.up::after {
                     border-bottom-color : $light3;
                     border-top-color    : transparent;
@@ -72,11 +72,11 @@ header {
                 }
             }
         }
-
+        
         &::after {
             display : none !important;
         }
-
+        
         .arrow {
             position         : relative;
             bottom           : auto;
@@ -85,19 +85,19 @@ header {
             margin-top       : 6px;
             border-top-color : $dark_core;
             border-width     : 6px;
-
+            
             &:after {
                 bottom           : 2px;
                 border-top-color : $light2;
             }
-
+            
             &.up {
                 top                 : auto;
                 left                : auto;
                 border-top-width    : 0;
                 border-bottom-color : $dark_core;
                 margin-top          : 0;
-
+                
                 &:after {
                     bottom              : 2px;
                     border-bottom-color : $light2;
@@ -105,27 +105,27 @@ header {
                 }
             }
         }
-
+        
         .glyphicon {
             margin : 0 14px 0 4px;
         }
-
+        
         .ellipsis {
             // set text max-width so dropdown button will match spec width
             @media (max-width : $collapse-first-width) {
                 max-width : 150px;
             }
-
+            
             @include media-breakpoint-down(xl) {
                 max-width : 172px;
             }
-
+            
             @include media-breakpoint-up(xl) {
                 max-width : 236px;
             }
         }
     }
-
+    
     .dropdown-menu {
         margin-top       : 0;
         background-color : $light4;
@@ -135,75 +135,86 @@ header {
         border-radius    : 2px;
         width            : 100%;
         padding          : 4px 0;
-
+        
+        &--list {
+            max-height : 312px;
+            overflow   : auto;
+            padding    : 0;
+        }
+    
+        &--footer {
+            padding    : 0;
+        }
+        
         .multi-column-dropdown {
             list-style : none;
             margin     : 0;
             padding    : 0;
         }
-
+        
         .dropdown-item {
             display     : flex;
             align-items : center;
             padding     : 0.25rem rem(12px) 0.25rem;
             height      : 26px;
+            line-height : 26px;
             font-family : $font-family-medium;
-
+            
             @media (max-width : $collapse-second-width) {
                 height : 32px;
             }
-
+            
             &:hover {
                 background-color : $light5;
                 color            : $dark9 !important;
             }
-
+            
             &:active {
                 background-color : $light6 !important;
                 //color            : $light1 !important;
             }
-
+            
             &.selected {
                 background-color : $light16 !important;
                 color            : $light1 !important;
-
+                
                 &:hover {
                     color : $light1 !important;
                 }
             }
-
+            
             &:focus {
                 background-color : $light4;
             }
-
+            
         }
     }
-
+    
     .dropdown-toggle-transparent {
         background-color : transparent;
         box-shadow       : none;
         border-radius    : 0;
-
+        
         &:focus {
             background-color : transparent !important;
         }
-
+        
         &:hover {
             background-color : $light2 !important;
             box-shadow       : none !important;
         }
-
+        
         &:active {
             background-color : $light3 !important;
             box-shadow       : none !important;
         }
     }
-
+    
     &.show {
         .dropdown-toggle {
             background-color : $light5;
         }
-
+        
         .dropdown-toggle-transparent {
             background-color : transparentize($light5, 0.75) !important;
         }
