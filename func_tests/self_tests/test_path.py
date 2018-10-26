@@ -10,6 +10,7 @@ from framework.os_access.local_path import LocalPath
 from framework.os_access.local_shell import local_shell
 from framework.os_access.path import copy_file
 from framework.os_access.posix_shell_path import PosixShellPath
+from framework.os_access.sftp_path import SftpPath
 
 _logger = logging.getLogger(__name__)
 
@@ -32,7 +33,7 @@ def linux_vm(vm_types):
 
 @pytest.fixture()
 def sftp_path_cls(linux_vm):
-    path_cls = linux_vm.os_access.shell.sftp_path_cls()
+    path_cls = SftpPath.specific_cls(linux_vm.os_access.shell)
     return path_cls
 
 
