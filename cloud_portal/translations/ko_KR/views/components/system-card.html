@@ -9,8 +9,7 @@
             <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">다른 시스템과 병합</button>
         </p>
         <hr />
-        <button class="btn btn-default" ng-click="disconnect()">Disconnect from
-            <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
+        <button class="btn btn-default" ng-click="disconnect()">{{PRODUCT_NAME}} 에서 연결 해제</button>
     </div>
 </div>
 <div class="card card-condensed" ng-if="!system.isMine">
