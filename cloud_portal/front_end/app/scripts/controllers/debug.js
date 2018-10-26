@@ -2,11 +2,11 @@
 
 angular.module('cloudApp')
     .controller('DebugCtrl', ['$scope', 'cloudApi', 'account', 'process', '$q', '$timeout',
-                'dialogs', 'urlProtocol', '$base64', 'systemsProvider', '$http', 'systemAPI',
+                'dialogs', 'urlProtocol', '$base64', 'systemsProvider', 'authorizationCheckService', '$http', 'systemAPI',
         function ($scope, cloudApi, account, process, $q, $timeout,
-                  dialogs, urlProtocol, $base64, systemsProvider, $http, systemAPI) {
+                  dialogs, urlProtocol, $base64, systemsProvider, authorizationCheckService, $http, systemAPI) {
 
-        account.requireLogin();
+            authorizationCheckService.requireLogin();
 
         $scope.user_email = 'ebalashov@networkoptix.com';
         $scope.type = 'activate_account';
@@ -37,6 +37,7 @@ angular.module('cloudApp')
                 errorPrefix:'Fail!'
             })
         };
+
         var notifyCounter = 0;
         $scope.notify = function(){
             var states = ['warning','info','success','danger'];
@@ -44,6 +45,7 @@ angular.module('cloudApp')
             var hold = Math.random() > 0.9;
             dialogs.notify((notifyCounter++) + ':' + type + ': ' + hold, type, hold);
         };
+
         $scope.testNotification = function(){
             $scope.result = null;
             var message = $scope.message;
@@ -57,7 +59,7 @@ angular.module('cloudApp')
                 then(function(a){
                         $scope.notificationError = false;
                         $scope.result = $scope.formatJSON(a.data);
-                        console.log(a);
+                        console.warn(a);
                     },
                     function(a){
                         $scope.notificationError = true;
@@ -65,8 +67,7 @@ angular.module('cloudApp')
                         console.error(a);
                     }
                 );
-        }
-
+        };
 
         $scope.linkSettings = {
             native: true,
@@ -77,9 +78,11 @@ angular.module('cloudApp')
             action: null,
             actionParameters: null, // Object with parameters
             auth: null // true for request, null for skipping, string for specific value
-        }
+        };
+
         $scope.actionParameters = '{\n	"example": true\n}';
         $scope.actionParametersError = false;
+
         function clearEmptyStrings(obj){
             var ret = $.extend({},obj);
             for( var key in obj){
@@ -89,23 +92,25 @@ angular.module('cloudApp')
             }
             return ret;
         }
+
         $scope.generateLink = function(){
             $scope.linkSettings.actionParameters = null;
             try{
                 $scope.actionParametersError = false;
-                if($scope.actionParameters  && $scope.actionParameters != ''){
+                if($scope.actionParameters  && $scope.actionParameters !== ''){
                     $scope.linkSettings.actionParameters = JSON.parse($scope.actionParameters);
                 }
             }catch (a){
                 $scope.actionParametersError = true
             }
             return urlProtocol.generateLink(clearEmptyStrings($scope.linkSettings));
-        }
+        };
+
         $scope.openLink = function(){
             $scope.linkSettings.actionParameters = null;
             try{
                 $scope.actionParametersError = false;
-                if($scope.actionParameters  && $scope.actionParameters != ''){
+                if($scope.actionParameters  && $scope.actionParameters !== ''){
                     $scope.linkSettings.actionParameters = JSON.parse($scope.actionParameters);
                 }
             }catch (a){
@@ -120,7 +125,7 @@ angular.module('cloudApp')
                     alert('ok - procotol is working');
                 });
             });
-        }
+        };
 
         $scope.getTempKey = function(){
             account.authKey().then(function(authKey){
@@ -129,9 +134,7 @@ angular.module('cloudApp')
                 console.error('couldn\'t retrieve temporary auth_key from cloud_portal',no_account);
                 $scope.linkSettings.auth = 'couldn\'t retrieve temporary auth_key from cloud_portal';
             });
-        }
-
-
+        };
 
         $scope.systemsProvider = systemsProvider;
         $scope.$watch('systemsProvider.systems', function(){
@@ -140,12 +143,14 @@ angular.module('cloudApp')
                 $scope.debugProxySettings.systemId = $scope.systems[0].id;
             }
         });
+
         $scope.systemsProvider.forceUpdateSystems();
 
         $scope.mergeSettings={
             masterSystemId:null,
             slaveSystemId:null
-        }
+        };
+
         $scope.mergeSystems = function(){
             $scope.mergeSettings.result = 'working';
             cloudApi.merge($scope.mergeSettings.masterSystemId,$scope.mergeSettings.slaveSystemId).then(function(success){
@@ -153,8 +158,7 @@ angular.module('cloudApp')
             },function(error){
                 $scope.mergeSettings.result = JSON.stringify(error, null, 2);
             });
-        }
-
+        };
 
         $scope.debugProxySettings={
             method:'POST',
@@ -170,6 +174,7 @@ angular.module('cloudApp')
                 $scope.debugProxySettings.authGet = data.data.authGet;
             });
         });
+
         $scope.debugProxyUrl = function(){
             var auth = ($scope.debugProxySettings.method === 'GET') ? $scope.debugProxySettings.authGet: $scope.debugProxySettings.authPost;
             return '{protocol}//{systemId}.{proxyUrl}/{apiCall}?auth={auth}'.
@@ -179,6 +184,7 @@ angular.module('cloudApp')
                     replace('{apiCall}', $scope.debugProxySettings.apiCall).
                     replace('{auth}', auth);
         };
+
         $scope.debugProxy = function(){
             var data = null;
             if($scope.debugProxySettings.data){

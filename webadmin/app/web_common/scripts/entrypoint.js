@@ -27,6 +27,7 @@ require('./directives/timeline.js');
 require('./directives/videowindow.js');
 require('./directives/volumeControl.js');
 require('./directives/webclient.js');
+require('./directives/collapsible.js');
 
 //Filters
 require('./filters/escape.js');

@@ -14,7 +14,6 @@
 #include "abstract_transaction_transport.h"
 #include "serialization/transaction_serializer.h"
 #include "transaction_processor.h"
-#include "transaction_log_reader.h"
 #include "transaction_transport_header.h"
 
 namespace ec2 {
@@ -27,19 +26,11 @@ namespace data_sync_engine {
 
 class TransactionLog;
 
-struct ConnectionRequestAttributes
-{
-    std::string connectionId;
-    vms::api::PeerData remotePeer;
-    std::string contentEncoding;
-    int remotePeerProtocolVersion = 0;
-};
-
 class TransactionTransport:
     public QObject,
-    public AbstractTransactionTransport
+    public AbstractCommandPipeline
 {
-    using base_type = AbstractTransactionTransport;
+    using base_type = AbstractCommandPipeline;
 
 public:
     /**
@@ -49,9 +40,7 @@ public:
         const ProtocolVersionRange& protocolVersionRange,
         nx::network::aio::AbstractAioThread* aioThread,
         std::shared_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState,
-        TransactionLog* const transactionLog,
-        const OutgoingCommandFilter& outgoingCommandFilter,
-        const ConnectionRequestAttributes& connectionRequestAttributes,
+        const transport::ConnectionRequestAttributes& connectionRequestAttributes,
         const std::string& systemId,
         const vms::api::PeerData& localPeer,
         const network::SocketAddress& remotePeerEndpoint,
@@ -61,14 +50,14 @@ public:
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
     virtual void stopWhileInAioThread() override;
 
-    virtual network::SocketAddress remoteSocketAddr() const override;
+    virtual network::SocketAddress remotePeerEndpoint() const override;
     virtual void setOnConnectionClosed(ConnectionClosedEventHandler handler) override;
     virtual void setOnGotTransaction(GotTransactionEventHandler handler) override;
     virtual QnUuid connectionGuid() const override;
-    virtual const TransactionTransportHeader& commonTransportHeaderOfRemoteTransaction() const override;
     virtual void sendTransaction(
         TransactionTransportHeader transportHeader,
-        const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer) override;
+        const std::shared_ptr<const TransactionSerializer>& transactionSerializer) override;
+    virtual void closeConnection() override;
 
     void receivedTransaction(
         const nx::network::http::HttpHeaders& headers,
@@ -76,44 +65,16 @@ public:
 
     void setOutgoingConnection(std::unique_ptr<network::AbstractCommunicatingSocket> socket);
 
-    void startOutgoingChannel();
-
-    void processSpecialTransaction(
-        const TransactionTransportHeader& transportHeader,
-        Command<vms::api::SyncRequestData> data,
-        TransactionProcessedHandler handler);
-
-    void processSpecialTransaction(
-        const TransactionTransportHeader& transportHeader,
-        Command<vms::api::TranStateResponse> data,
-        TransactionProcessedHandler handler);
-
-    void processSpecialTransaction(
-        const TransactionTransportHeader& transportHeader,
-        Command<vms::api::TranSyncDoneData> data,
-        TransactionProcessedHandler handler);
-
 private:
     const ProtocolVersionRange m_protocolVersionRange;
     std::shared_ptr<::ec2::ConnectionGuardSharedState> m_connectionGuardSharedState;
     std::unique_ptr<::ec2::QnTransactionTransportBase> m_baseTransactionTransport;
     ConnectionClosedEventHandler m_connectionClosedEventHandler;
     GotTransactionEventHandler m_gotTransactionEventHandler;
-    std::unique_ptr<TransactionLogReader> m_transactionLogReader;
     const std::string m_systemId;
     const std::string m_connectionId;
     const network::SocketAddress m_connectionOriginatorEndpoint;
-    TransactionTransportHeader m_commonTransportHeaderOfRemoteTransaction;
-    /**
-     * Transaction state, we need to synchronize remote side to, before we can mark it write sync.
-     */
-    vms::api::TranState m_tranStateToSynchronizeTo;
-    /**
-     * Transaction state of remote peer. Transactions before this state have been sent to the peer.
-     */
-    vms::api::TranState m_remotePeerTranState;
-    bool m_haveToSendSyncDone;
-    bool m_closed;
+    bool m_closed = false;
     std::unique_ptr<network::aio::Timer> m_inactivityTimer;
 
     int highestProtocolVersionCompatibleWithRemotePeer() const;
@@ -133,20 +94,8 @@ private:
     void forwardStateChangedEvent(
         ::ec2::QnTransactionTransportBase::State newState);
 
-    void onTransactionsReadFromLog(
-        ResultCode resultCode,
-        std::vector<dao::TransactionLogRecord> serializedTransaction,
-        vms::api::TranState readedUpTo);
-
-    void enableOutputChannel();
-
     void restartInactivityTimer();
     void onInactivityTimeout();
-
-    template<typename CommandDescriptor>
-    void sendTransaction(
-        Command<typename CommandDescriptor::Data> transaction,
-        TransactionTransportHeader transportHeader);
 };
 
 } // namespace data_sync_engine

@@ -55,6 +55,11 @@ class ContextAdmin(CMSAdmin):
     list_filter = ('product',)
     search_fields = ('name', 'description', 'url', 'product__name')
 
+    def changelist_view(self, request, extra_context=None):
+        if not request.user.is_superuser:
+            self.list_display_links = (None,)
+        return super(ContextAdmin, self).changelist_view(request, extra_context)
+
     def context_actions(self, obj):
         return format_html('<a class="btn btn-sm" href="{}">edit content</a>',
                            reverse('page_editor', args=[obj.id]))
@@ -126,6 +131,11 @@ class ContentVersionAdmin(CMSAdmin):
     list_filter = ('product', 'customization')
     search_fields = ('accepted_by__email', 'created_by__email')
     readonly_fields = ('created_by', 'accepted_by',)
+
+    def changelist_view(self, request, extra_context=None):
+        if not request.user.is_superuser:
+            self.list_display_links = (None,)
+        return super(ContentVersionAdmin, self).changelist_view(request, extra_context)
 
     def content_version_actions(self, obj):
         return format_html('<a class="btn btn-sm" href="{}">review</a>',

@@ -76,7 +76,6 @@
         "emailSupportEmail": "サポート Eメール",
         "enableEdgeRecording": "エッジ記録を有効",
         "eventLogPeriodDays": "イベントログの期間（日）",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "必要に応じてinitでカメラプロファイルを削除",
         "ldapAdminDn": "LDAP管理DN",
         "ldapSearchBase": "LDAP検索ベース",
         "ldapSearchFilter": "LDAP検索フィルター",
@@ -110,10 +109,21 @@
         "systemName": "システム名",
         "takeCameraOwnershipWithoutLock": "ロックなしでカメラ所有権を取る",
         "timeSynchronizationEnabled": "時間同期有効",
+        "primaryTimeServer": "プライマリ時刻同期サーバ",
+        "osTimeChangeCheckPeriodMs": "OSの時刻変更チェック期間",
+        "syncTimeExchangePeriod": "同期時間周期",
+        "maxWearableArchiveSynchronizationThreads": "ウェアラブルカメラアーカイブの最大同期スレッド",
         "updateNotificationsEnabled": "更新の通知有効",
         "upnpPortMappingEnabled": "UPNPポートマッピング有効",
         "useTextEmailFormat": "テキスト形式のメールを送信する",
-        "useWindowsEmailLineFeed": "EメールにWindowsラインフィードを使用する"
+        "useWindowsEmailLineFeed": "EメールにWindowsラインフィードを使用する",
+        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha：チャンクメッセージ本文のタイムアウト",
+        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha：チャンク応答タイムアウト",
+        "showHanwhaAlternativePtzControlsOnTile": "Hanwha：タイルに代替のPTZコントロールを表示する",
+        "trafficEncryptionForced": "Force traffic encryption",
+        "videoTrafficEncryptionForced": "Force video traffic encryption",
+        "updateStatus": "ステータス更新",
+        "watermarkSettings": "透かし設定"
     },
     "info": {
         "tabs": {
@@ -145,7 +155,8 @@
         "incompatibleCloudState": "クラウド接続"
     },
     "login": {
-        "incorrectPassword": "ログインまたはパスワードが正しくありません"
+        "incorrectPassword": "ログインまたはパスワードが正しくありません",
+        "authLockout": "試行回数が多すぎます。暫くしてからもう一度お試しください"
     },
     "navigaion": {
         "cannotGetUser": "サーバー エラー: 現在のユーザー データを取得できません"

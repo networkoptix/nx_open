@@ -1,9 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import PermissionsMixin
-from account_backend import AccountManager
 from django.utils.deprecation import CallableFalse, CallableTrue
 from django.utils.html import format_html
 
+from api.account_backend import AccountManager
 from cms.models import UserGroupsToCustomizationPermissions
 from cloud.settings import CUSTOMIZATION
 
@@ -58,6 +58,14 @@ class Account(PermissionsMixin):
                                                                           group__in=self.groups.all())
         for perm_group in perm_groups:
             permissions.extend([permission.codename for permission in perm_group.group.permissions.all()])
+        return permissions
+
+    @property
+    def permissions(self):
+        user_groups = self.groups.all()
+        permissions = []
+        for group in user_groups:
+            permissions.extend([permission.codename for permission in group.permissions.all()])
         return permissions
 
     def short_email(self):

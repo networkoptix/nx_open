@@ -208,6 +208,7 @@ def get_settings(request):
 
     settings_object = {
         'trafficRelayHost':settings.TRAFFIC_RELAY_HOST,
-        'publicDownloads':customization.public_downloads
+        'publicDownloads':customization.public_downloads,
+        'publicReleases':customization.public_release_history
     }
     return Response(settings_object)

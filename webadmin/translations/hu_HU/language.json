@@ -76,7 +76,6 @@
         "emailSupportEmail": "Ügyfélszolgálati e-mail",
         "enableEdgeRecording": "Edge rögzítés engedélyezése",
         "eventLogPeriodDays": "Eseménynapló időszak (nap)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "Törölje a kameraprofilokat, ha szükséges",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "LDAP kereső bázis",
         "ldapSearchFilter": "LDAP kereső szűrő",
@@ -110,10 +109,21 @@
         "systemName": "Rendszer neve",
         "takeCameraOwnershipWithoutLock": "Kamera tulajdonjogok átvétele lezárás nélkül",
         "timeSynchronizationEnabled": "Időszinkronizálás engedélyezve",
+        "primaryTimeServer": "Elsődleges időszinkronizáló szerver",
+        "osTimeChangeCheckPeriodMs": "OS időváltozási ellenőrzési időszak",
+        "syncTimeExchangePeriod": "Szinkronizációs időtartam",
+        "maxWearableArchiveSynchronizationThreads": "Max hordozható kamera archív szinkronszálak",
         "updateNotificationsEnabled": "Frissítések értesítései engedélyezve",
         "upnpPortMappingEnabled": "Az UPNP port hozzárendelés engedélyezve",
         "useTextEmailFormat": "Egyszerű szöveges e-mailek küldése",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails"
+        "useWindowsEmailLineFeed": "Használja a Windows feed-et e-mailben",
+        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk üzenet test időtúllépés",
+        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk válasz időtúllépés",
+        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Alternatív PTZ vezérlők megjelenítése",
+        "trafficEncryptionForced": "Kényszerített forgalom titkosítás",
+        "videoTrafficEncryptionForced": "Kényszerített videó forgalom titkosítás",
+        "updateStatus": "Állapotfrissítés",
+        "watermarkSettings": "Vízjel beállítások"
     },
     "info": {
         "tabs": {
@@ -145,7 +155,8 @@
         "incompatibleCloudState": "felhő csatlakoztatva"
     },
     "login": {
-        "incorrectPassword": "Felhasználónév vagy a jelszó hibás"
+        "incorrectPassword": "Felhasználónév vagy a jelszó hibás",
+        "authLockout": "Túl sok próbálkozás. Próbálja újra később."
     },
     "navigaion": {
         "cannotGetUser": "Szerver hiba: nem olvashatók az aktuális felhasználó adatok"

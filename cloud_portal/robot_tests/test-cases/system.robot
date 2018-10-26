@@ -8,6 +8,7 @@ Suite Teardown    Close All Browsers
 Force Tags        system
 
 *** Variables ***
+${email}       ${EMAIL OWNER}
 ${password}    ${BASE PASSWORD}
 ${url}         ${ENV}
 
@@ -46,7 +47,7 @@ Restart
 systems dropdown should allow you to go back to the systems page
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${SYSTEMS DROPDOWN}
-    Click Link    ${SYSTEMS DROPDOWN}
+    Click Button    ${SYSTEMS DROPDOWN}
     Wait Until Element Is Visible    ${ALL SYSTEMS}
     Click Link    ${ALL SYSTEMS}
     Location Should Be    ${url}/systems
@@ -80,6 +81,8 @@ Cancel should cancel disconnection and disconnect should remove it when not owne
     Click Button    ${DISCONNECT FROM MY ACCOUNT}
     Wait Until Elements Are Visible    ${DISCONNECT MODAL WARNING}    ${DISCONNECT MODAL DISCONNECT BUTTON}
     Click Button    ${DISCONNECT MODAL DISCONNECT BUTTON}
+    ${SYSYEM DELETED FROM ACCOUNT}    Replace String    ${SYSYEM DELETED FROM ACCOUNT}    {{message.system_name}}    ${AUTO TESTS}
+    Check For Alert    ${SYSYEM DELETED FROM ACCOUNT}
     Wait Until Element Is Visible    ${YOU HAVE NO SYSTEMS}
     Log Out
     Log In    ${EMAIL OWNER}    ${password}
@@ -141,7 +144,8 @@ contains user emails and names
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${ADMIN FIRST NAME} ${ADMIN LAST NAME}')]
 
-rename button opens dialog; cancel closes without rename; save renames system
+rename button opens dialog and clicking cancel closes rename dialog without rename
+    [tags]    C41880
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${RENAME SYSTEM}
     Click Button    ${RENAME SYSTEM}
@@ -149,6 +153,36 @@ rename button opens dialog; cancel closes without rename; save renames system
     Click Button    ${RENAME CANCEL}
     Wait Until Page Does Not Contain Element    //div[@uib-modal-backdrop="modal-backdrop"]
     Verify In System    Auto Tests
+
+clicking 'X' closes rename dialog without rename
+    [tags]    C41880
+    Log in to Auto Tests System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    ${RENAME SYSTEM}
+    Click Button    ${RENAME SYSTEM}
+    Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME X BUTTON}
+    Wait Until Textfield Contains    ${RENAME INPUT}    ${AUTO TESTS}
+    Click Button    ${RENAME X BUTTON}
+    Wait Until Page Does Not Contain Element    ${BACKDROP}
+    Verify In System    Auto Tests
+
+clicking save with no input in rename dialoge throws error
+    [tags]    C41880
+    Log in to Auto Tests System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    ${RENAME SYSTEM}
+    Wait Until Elements Are Visible    ${RENAME SYSTEM}    ${OPEN IN NX BUTTON}    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}
+    Click Button    ${RENAME SYSTEM}
+    Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME INPUT}
+    sleep    2
+    Input Text    ${RENAME INPUT}    ${SPACE}
+    Press Key    ${RENAME INPUT}    ${BACKSPACE}
+    Click Button    ${RENAME SAVE}
+    Wait Until Elements Are Visible    ${RENAME INPUT WITH ERROR}    ${SYSTEM NAME IS REQUIRED}
+    Click Button    ${RENAME CANCEL}
+
+clicking save in rename dialog renames system
+    [tags]    C41880
+    Log in to Auto Tests System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    ${RENAME SYSTEM}
     Wait Until Elements Are Visible    ${RENAME SYSTEM}    ${OPEN IN NX BUTTON}    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}
     Click Button    ${RENAME SYSTEM}
     Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME INPUT}
@@ -191,54 +225,45 @@ should open System page by link not authorized user, and show alert if logs in a
 should display same user data as user provided during registration (stress to cyrillic)
     [tags]    email
 #create user
-    ${email}    Get Random Email    ${BASE EMAIL}
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
-    Register    ${CYRILLIC TEXT}    ${CYRILLIC TEXT}    ${email}    ${password}
-    Activate    ${email}
+    Register    ${CYRILLIC TEXT}    ${CYRILLIC TEXT}    ${random email}    ${password}
+    Activate    ${random email}
 #share system with new user
     Log in to Auto Tests System    ${EMAIL OWNER}
-    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
-    Click Button    ${SHARE BUTTON SYSTEMS}
-    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE PERMISSIONS DROPDOWN}
-    Input Text    ${SHARE EMAIL}    ${email}
-    Select From List By Label    ${SHARE PERMISSIONS DROPDOWN}    ${ADMIN TEXT}
-    Wait Until Element Is Visible    ${SHARE BUTTON MODAL}
-    Click Button    ${SHARE BUTTON MODAL}
+    Share To    ${random email}    ${ADMIN TEXT}
     Check For Alert    ${NEW PERMISSIONS SAVED}
     Log Out
 
 #verify user was added with appropriate name
-    Log In    ${email}    ${password}
+    Log In    ${random email}    ${password}
     Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC TEXT} ${CYRILLIC TEXT}')]
 
 #remove new user from system
     Log Out
     Log in to Auto Tests System    ${EMAIL OWNER}
-    Remove User Permissions    ${email}
+    Remove User Permissions    ${random email}
 
 should display same user data as showed in user account (stress to cyrillic)
-    [tags]    email
+    [tags]    email    C41573    C41842
 #create user
-    ${email}    Get Random Email    ${BASE EMAIL}
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
-    Register    mark    hamill    ${email}    ${password}
-    Activate    ${email}
+    Register    mark    hamill    ${random email}    ${password}
+    Activate    ${random email}
 #share system with new user
     Log in to Auto Tests System    ${EMAIL OWNER}
-    Click Button    ${SHARE BUTTON SYSTEMS}
-    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE PERMISSIONS DROPDOWN}
-    Input Text    ${SHARE EMAIL}    ${email}
-    Select From List By Label    ${SHARE PERMISSIONS DROPDOWN}    ${ADMIN TEXT}
-    Wait Until Element Is Visible    ${SHARE BUTTON MODAL}
-    Click Button    ${SHARE BUTTON MODAL}
+    Share To    ${random email}    ${VIEWER TEXT}
     Check For Alert    ${NEW PERMISSIONS SAVED}
     Log Out
 
     Go To    ${url}/account
-    Log In    ${email}    ${password}    None
+    Log In    ${random email}    ${password}    None
     Validate Log In
     Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    mark
     Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    hamill
+    # sometimes the text field refills itself if I don't wait a second
+    sleep    1
     Clear Element Text    ${ACCOUNT FIRST NAME}
     Input Text    ${ACCOUNT FIRST NAME}    ${CYRILLIC TEXT}
     Clear Element Text    ${ACCOUNT LAST NAME}
@@ -247,13 +272,16 @@ should display same user data as showed in user account (stress to cyrillic)
     Wait Until Element Is Visible    ${ACCOUNT SAVE}
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
-    Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
+    Log Out
+    Validate Log Out
+
+    Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC TEXT} ${CYRILLIC TEXT}')]
 
     #remove new user from system
     Log Out
     Log in to Auto Tests System    ${EMAIL OWNER}
-    Remove User Permissions    ${email}
+    Remove User Permissions    ${random email}
 
 should show "your system" for owner and "owner's name" for non-owners
     Log in to Auto Tests System    ${EMAIL OWNER}

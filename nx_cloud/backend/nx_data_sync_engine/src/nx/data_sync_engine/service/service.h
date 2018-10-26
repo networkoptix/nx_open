@@ -31,7 +31,9 @@ public:
 
     std::vector<network::SocketAddress> httpEndpoints() const;
 
-    void connectToNode(const nx::utils::Url& url);
+    void connectToNode(
+        const std::string& systemId,
+        const nx::utils::Url& url);
 
 protected:
     virtual std::unique_ptr<utils::AbstractServiceSettings> createSettings() override;

@@ -1,14 +1,16 @@
-$header-height: 56px;
+@import '_theme_variables';
+
+$header-height: 48px;
 $logo-height: 32px;
-$line-height: 24px;
-$vertical-spacing: (($header-height - $line-height) / 2);
+$line-height: 44px;
+$vertical-spacing: 15px;
 $horizontal-spacing: 16px;
 $active-border-width: 3px;
 $max-dropdown-width: 320px;
 $max-header-item-width: 212px;
 
-$collapse-first-width: 920px;
-$collapse-second-width: 700px;
+$collapse-first-width  : 920px;
+$collapse-second-width : 768px;
 
 $collapse-first-width-max: $collapse-first-width - 1px;
 $collapse-second-width-max: $collapse-second-width - 1px;
@@ -16,16 +18,30 @@ $collapse-second-width-max: $collapse-second-width - 1px;
 $header-collapsing-width-1: 1px;
 
 .navbar{
-
+    height: $header-height;
     border-top:none;
     border-left:none;
     border-right:none;
     border-radius:0;
+    border-bottom: 1px solid $light4;
     box-shadow: 0 6px 10px $light3;
+    padding-right : 0.5rem !important;
+
+    &.navbar-default {
+        background-color: #fff;
+        padding: 0;
+    }
+
+    .navbar-nav {
+        flex-direction: row;
+        align-items: center;
+        line-height: $line-height;
+    }
 
     .navbar-brand{
-        font-size: $font-size-h3;
+        font-size: $h3-font-size;
         margin: 0 $horizontal-spacing !important;
+        padding: 0;
 
         &>img{
             height:$logo-height;
@@ -39,36 +55,51 @@ $header-collapsing-width-1: 1px;
         margin-right:$horizontal-spacing !important;
     }
 
-    .nav>li{
+    .nav > li{
         margin:0;
         padding:0;
-
-        font-size: $font-size-large;
+        font-size: $font-size-lg;
+        display: flex;
+        align-items: center;
 
         &.vertical-bar{
-            border-right: 1px solid $common-border-color;
-            margin: $vertical-spacing 0 !important;
-            height: $line-height;
+            border-right: 1px solid $light4;
+            height: 25px;
 
         }
-        &>a{
-            margin:0;
-            padding:$vertical-spacing $horizontal-spacing;
-            line-height: $line-height;
 
-            &>span.ellipsis{
-                white-space: nowrap;
-                display:inline-block;
-                vertical-align:bottom;
-                line-height: $line-height;
-                max-width: $max-header-item-width;
+        & > span {
+            // display: inline-block;
+            margin-left: 10px;
+        }
+
+        & > a {
+            color          : $dark9;
+            margin         : 0;
+            padding        : 0 $horizontal-spacing;
+            line-height    : 47px;
+            font-size      : rem(14px);
+            font-family    : $font-family-medium;
+            display        : flex;
+            flex-direction : row;
+            align-items    : center;
+            position       : relative;
+
+            & > span.ellipsis {
+                white-space    : nowrap;
+                display        : inline-block;
+                vertical-align : bottom;
+                line-height    : $line-height;
+                max-width      : $max-header-item-width;
             }
 
-            &:hover{
-                background-color: $light2;
+            &:hover {
+                background-color : $light2;
+                text-decoration  : none;
             }
         }
-        &.no-hover>a:hover{
+
+        &.no-hover > a:hover{
             cursor:default;
             background-color: transparent !important;
         }
@@ -91,7 +122,7 @@ $header-collapsing-width-1: 1px;
 
                 @include box-shadow(0 2px 4px transparentize($dark15,0.8));
 
-                &:before {
+                &::before {
                     content:"";
                     position:absolute;
                     left: $horizontal-spacing;
@@ -102,20 +133,27 @@ $header-collapsing-width-1: 1px;
             }
         }
 
-        &.active{
-            background-color: white !important;
-            &>a{
-                margin:0 $horizontal-spacing;
-                padding-left:0;
-                padding-right:0;
+        &.active {
+            background-color : white !important;
+            & > a {
+                color         : $brand_core;
 
-                border-bottom: $active-border-width solid $brand_core;
-                padding-bottom: $vertical-spacing - $active-border-width + 1px;
-                &:hover{
-                    background-color: transparent !important;
+                &:hover {
+                    background-color : transparent !important;
+                }
+
+                &::after {
+                    content          : "";
+                    position         : absolute;
+                    bottom           : 0;
+                    height           : $active-border-width;
+                    background-color : $brand_core;
+                    left             : 1rem;
+                    right            : 1rem;
                 }
             }
         }
+
         &>a>span{
             &.glyphicon{
                 margin-left: -2px;
@@ -129,66 +167,6 @@ $header-collapsing-width-1: 1px;
             }
         }
     }
-
-    .dropdown-menu {
-        background-clip: border-box;
-        min-width: 100%;
-        padding: $vertical-spacing/2 0;
-        border-radius: 0;
-
-        margin-top: 2px !important;
-        border: 1px solid $navbar-default-bg;
-
-        &:before {
-            content: " ";
-            position: absolute;
-            z-index: -1;
-            top: 0px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            border: 1px solid $navbar-default-border;
-            border-top: none;
-
-            @include box-shadow(0 2px 4px transparentize($dark15,0.8));
-        }
-
-        & > li > a{
-            line-height: 32px !important;
-            padding: 0 $horizontal-spacing !important;
-            font-size: $font-size-base;
-
-            text-overflow: ellipsis;
-            overflow: hidden;
-            max-width: $max-dropdown-width;
-            margin: 0 -1px;
-
-            &:hover{
-                background-color: $light2 !important;
-            }
-
-            .system-owner{
-                color:$light10;
-            }
-        }
-
-        & > li.active > a{
-            margin-left: -1px;
-            border-left: $active-border-width solid $brand_core !important;
-            padding-left: $horizontal-spacing - $active-border-width !important;
-            &:hover{
-                background-color: transparent !important;
-                margin-right: 0px;
-                border: none;
-            }
-        }
-
-        .nav-divider{
-            margin: $vertical-spacing/2 $horizontal-spacing;
-        }
-    }
-
-
 
     /* This is to prevent top menu from collapsing */
     & > div > .navbar-nav > li {
@@ -219,9 +197,10 @@ $header-collapsing-width-1: 1px;
     }
     /* / End of This is to prevent top menu from collapsing*/
 
-    @media (min-width: $grid-float-breakpoint) {
-        .hidden-expanded{
-            display:none;
+    @media (max-width: $collapse-first-width-max) {
+        .dropdown-menu-left {
+            right: 0;
+            left: auto;
         }
     }
 
@@ -231,17 +210,6 @@ $header-collapsing-width-1: 1px;
         .icon-caret,
         .ellipsis{
             display:none !important;
-        }
-
-        .glyphicon{
-            margin-right:0 !important;
-        }
-    }
-
-    @media (max-width: $collapse-first-width-max) {
-        .dropdown-menu-left{
-            right: 0;
-            left: auto;
         }
     }
 
@@ -268,6 +236,7 @@ $header-collapsing-width-1: 1px;
 
         }
     }
+
     .collapse-second{
         @media (min-width: $collapse-second-width) {
             .hidden-expanded{
@@ -283,10 +252,6 @@ $header-collapsing-width-1: 1px;
             .icon-caret,
             .ellipsis{
                 display:none !important;
-            }
-
-            .glyphicon{
-                margin-right:0 !important;
             }
         }
     }

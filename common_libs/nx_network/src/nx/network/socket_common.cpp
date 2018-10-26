@@ -430,7 +430,12 @@ SocketAddress::SocketAddress(const QString& str)
     const bool isIpV6 = str.count(':') > 1;
     const int bracketPos = str.indexOf(']');
 
-    // IpV6 addresses without brackets are forbidden here.
+    if (isIpV6 && bracketPos == -1)
+    {
+        address = HostAddress(str);
+        return;
+    }
+
     NX_ASSERT(!isIpV6 || bracketPos > 0);
     const int sepPos = str.lastIndexOf(':');
 

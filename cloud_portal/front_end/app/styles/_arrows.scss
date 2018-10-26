@@ -1,0 +1,56 @@
+$arrow-outer-width: 8px;
+$arrow-width: 8px;
+$arrow-outer-color: $light6;
+$arrow-outer-width: 8px;
+$arrow-color: $light4;
+
+.arrow,
+.arrow:after {
+    position: absolute;
+    display: block;
+    width: 0 !important;
+    height: 0 !important;
+    border-color: transparent;
+    border-style: solid;
+}
+
+.arrow {
+    margin-left: 0 !important;
+    border-width: $arrow-outer-width;
+
+    &:after {
+        border-width: $arrow-width;
+        content: "";
+    }
+
+    &.down {
+        border-bottom-width: 0;
+        border-top-color: #999999;
+        // IE8 fallback
+        border-top-color: $arrow-outer-color;
+        bottom: -$arrow-outer-width;
+
+        &:after {
+            bottom: 1px;
+            margin-left: -$arrow-width;
+            border-bottom-width: 0;
+            border-top-color: #ffffff;
+        }
+    }
+
+    &.up {
+        border-top-width: 0;
+        border-bottom-color: #999999;
+        // IE8 fallback
+        border-bottom-color: $arrow-outer-color;
+        top: -$arrow-outer-width;
+        left: 20px;
+
+        &:after {
+            top: 1px;
+            margin-left: -$arrow-width;
+            border-top-width: 1px;
+            border-bottom-color: $arrow-color;
+        }
+    }
+}

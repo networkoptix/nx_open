@@ -15,7 +15,7 @@ namespace handler {
 using TunnelCreatedHandler =
     nx::utils::MoveOnlyFunc<void(
         std::unique_ptr<AbstractStreamSocket>,
-        std::vector<StringType> /*REST request parameters values*/)>;
+        RequestPathParams /*REST request parameters values*/)>;
 
 /**
  * Upgrades HTTP connection to the protocol specified.
@@ -46,10 +46,10 @@ public:
         if (upgradeIter == request.headers.end() ||
             upgradeIter->second != m_protocolToUpgradeTo)
         {
-            return completionHandler(nx::network::http::StatusCode::badRequest);
+            return completionHandler(StatusCode::badRequest);
         }
 
-        nx::network::http::RequestResult requestResult(nx::network::http::StatusCode::switchingProtocols);
+        RequestResult requestResult(StatusCode::switchingProtocols);
         requestResult.connectionEvents.onResponseHasBeenSent =
             [onTunnelCreated = std::move(m_onTunnelCreated), restParams = requestPathParams()](
                 HttpServerConnection* httpConnection)
