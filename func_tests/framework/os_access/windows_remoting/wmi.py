@@ -1,9 +1,14 @@
+import datetime
 import logging
+from collections import OrderedDict
 from pprint import pformat
 from xml.dom import minidom
 
+import dateutil
+import pytz
 import xmltodict
 from pylru import lrudecorator
+from typing import Mapping, Union
 from winrm.exceptions import WinRMError, WinRMTransportError
 
 _logger = logging.getLogger(__name__)
@@ -15,38 +20,46 @@ def _pretty_format_xml(text):
     return pretty_text
 
 
-# Some error codes of interest to us
-# https://docs.microsoft.com/en-us/windows/desktop/WmiSdk/wmi-error-constants
-# https://docs.microsoft.com/en-us/windows/desktop/debug/system-error-codes
-# https://docs.microsoft.com/en-us/windows/desktop/adsi/win32-error-codes
+# Explanation: https://docs.microsoft.com/en-us/windows/desktop/WmiSdk/wmi-error-constants.
+# More: https://docs.microsoft.com/en-us/windows/desktop/adsi/win32-error-codes.
 _win32_error_codes = {
+    # Errors originating in the core operating system.
+    # Remove 0x8007, lookup for last 4 hex digits.
+    # See: https://docs.microsoft.com/en-us/windows/desktop/debug/system-error-codes.
     0x80071392: 'ERROR_OBJECT_ALREADY_EXISTS',
+    # WBEM Errors.
+    # See: https://docs.microsoft.com/en-us/windows/desktop/WmiSdk/wmi-error-constants.
+    0x80041008: 'WBEM_E_INVALID_PARAMETER',
     }
 
-class Class(object):
-    """WMI class on specific machine. Create or enumerate objects with this class. To work with
-    one specific object, use _Reference class. Use Class.reference method to get reference to
-    object of this class."""
 
-    default_namespace = 'root/cimv2'
-    default_root_uri = 'http://schemas.microsoft.com/wbem/wsman/1/wmi'
+def _format_timeout(timeout_sec):
+    """Operation timeout is in ISO 8601 duration format. Note that only two digits of each term are
+    supported: PT120S is invalid and interpreted by WMI as 1 minute 20 seconds. See:
+    https://en.wikipedia.org/wiki/ISO_8601#Durations.
+    >>> _format_timeout(0.5)
+    'PT00H00M00.500S'
+    >>> _format_timeout(120)
+    'PT00H02M00.000S'
+    >>> _format_timeout(3723.001)
+    'PT01H02M03.001S'
+    """
+    return 'PT{:02.0f}H{:02.0f}M{:06.3f}S'.format(
+        timeout_sec // 3600,
+        timeout_sec // 60 % 60,
+        timeout_sec % 60)
 
-    def __init__(self, protocol, name, namespace=default_namespace, root_uri=default_root_uri):
+
+class Wmi(object):
+    def __init__(self, protocol):
         self.protocol = protocol
-        self.name = name
-        self.original_namespace = namespace
-        self.normalized_namespace = namespace.replace('\\', '/').lower()
-        self.root_uri = root_uri
-        self.uri = root_uri + '/' + self.normalized_namespace + '/' + name
 
-    def __repr__(self):
-        if self.root_uri == self.default_root_uri:
-            if self.normalized_namespace == self.default_namespace:
-                return 'Class({!r})'.format(self.name)
-            return 'Class({!r}, namespace={!r})'.format(self.name, self.original_namespace)
-        return 'Class({!r}, namespace={!r}, root_uri={!r})'.format(self.name, self.original_namespace, self.root_uri)
+    def __eq__(self, other):
+        if not isinstance(other, Wmi):
+            return NotImplemented
+        return other.protocol is self.protocol
 
-    def perform_action(self, action, body, selectors, timeout_sec=None):
+    def act(self, class_uri, action, body, selectors, timeout_sec=None):
         xml_namespaces = {
             # Namespaces from pywinrm's Protocol.
             # TODO: Use aliases from WS-Management spec.
@@ -61,9 +74,9 @@ class Class(object):
             'http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd': 'w',
             'http://schemas.xmlsoap.org/ws/2004/09/transfer': 't',
             'http://schemas.xmlsoap.org/ws/2004/08/addressing': 'a',
-            Class(self.protocol, 'Win32_FolderRedirectionHealth').uri: 'folder',
+            self.cls('Win32_FolderRedirectionHealth').uri: 'folder',
             # Commonly encountered in responses.
-            self.uri: None,  # Desired class namespace is default.
+            class_uri: None,  # Desired class namespace is default.
             }
 
         def _substitute_namespace_in_type_attribute(path, key, data):
@@ -80,16 +93,12 @@ class Class(object):
             return key, new_namespace_alias + ':' + bare_data
 
         # noinspection PyProtectedMember
-        rq = {'env:Envelope': self.protocol._get_soap_header(resource_uri=self.uri, action=action)}
+        rq = {
+            'env:Envelope': self.protocol._get_soap_header(resource_uri=class_uri, action=action)}
         rq['env:Envelope'].setdefault('env:Body', body)
-        rq['env:Envelope']['env:Header']['w:SelectorSet'] = {
-            'w:Selector': [
-                {'@Name': selector_name, '#text': selector_value}
-                for selector_name, selector_value in selectors.items()
-                ]
-            }
-        if timeout_sec is not None:
-            rq['env:Envelope']['w:OperationTimeout'] = 'PT{}S'.format(timeout_sec)
+        rq['env:Envelope']['env:Header']['w:SelectorSet'] = selectors.raw
+        timeout_sec = timeout_sec or 120  # It used to be 120 seconds and must be specified.
+        rq['env:Envelope']['env:Header']['w:OperationTimeout'] = _format_timeout(timeout_sec)
         try:
             request_xml = xmltodict.unparse(rq)
             _logger.debug("Request XML:\n%s", _pretty_format_xml(request_xml))
@@ -111,19 +120,49 @@ class Class(object):
             )
         return response_dict['env:Envelope']['env:Body']
 
+    def cls(
+            self,
+            name,
+            namespace='root/cimv2',
+            root_uri='http://schemas.microsoft.com/wbem/wsman/1/wmi'):
+        # TODO: Check URIs case-insensitively.
+        normalized_namespace = namespace.replace('\\', '/').lower()
+        uri = root_uri + '/' + normalized_namespace + '/' + name
+        return _Class(self, uri)
+
+
+class _Class(object):
+    """WMI class on specific machine. Create or enumerate objects with this class. To work with
+    one specific object, use _Reference class. Use _Class.reference method to get reference to
+    object of this class."""
+
+    def __init__(self, wmi, uri):
+        self.wmi = wmi
+        self.uri = uri
+        self.name = uri.rsplit('/', 1)[-1]
+
+    def __repr__(self):
+        return '_Class({!r}, {!r})'.format(self.wmi, self.uri)
+
+    def __eq__(self, other):
+        if not isinstance(other, _Class):
+            return NotImplemented
+        return other.wmi == self.wmi and other.uri == self.uri
+
     def create(self, properties_dict):
         _logger.info("Create %r: %r", self, properties_dict)
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Create'
-        body = {self.name: properties_dict}
+        body = {self.name: _prepare_data(properties_dict)}
         body[self.name]['@xmlns'] = self.uri
-        outcome = self.perform_action(action_url, body, {})
+        outcome = self.wmi.act(self.uri, action_url, body, _SelectorSet.empty())
         reference_parameters = outcome[u't:ResourceCreated'][u'a:ReferenceParameters']
         assert reference_parameters[u'w:ResourceURI'] == self.uri
         selector_set = reference_parameters[u'w:SelectorSet']
         return selector_set
 
-    def enumerate(self, selectors, max_elements=32000):
-        _logger.info("Enumerate %s where %r", self, selectors)
+    def enumerate(self, selectors_dict, max_elements=32000):
+        _logger.info("Enumerate %s where %r", self, selectors_dict)
+        selectors = _SelectorSet.from_dict(selectors_dict)
         enumeration_context = [None]
         enumeration_is_ended = [False]
 
@@ -141,7 +180,7 @@ class Class(object):
                     'w:EnumerationMode': 'EnumerateObjectAndEPR',
                     }
                 }
-            response = self.perform_action(action, body, selectors)
+            response = self.wmi.act(self.uri, action, body, selectors)
             enumeration_context[0] = response['n:EnumerateResponse']['n:EnumerationContext']
             enumeration_is_ended[0] = 'w:EndOfSequence' in response['n:EnumerateResponse']
             items = response['n:EnumerateResponse']['w:Items']['w:Item']
@@ -158,7 +197,7 @@ class Class(object):
                     'n:MaxElements': str(max_elements),
                     }
                 }
-            response = self.perform_action(action, body, selectors)
+            response = self.wmi.act(self.uri, action, body, selectors)
             enumeration_is_ended[0] = 'n:EndOfSequence' in response['n:PullResponse']
             enumeration_context[0] = None if enumeration_is_ended[0] else response['n:PullResponse']['n:EnumerationContext']
             items = response['n:PullResponse']['n:Items']['w:Item']
@@ -168,11 +207,9 @@ class Class(object):
             # `EnumerationMode` must be `EnumerateObjectAndEPR` to have both data and selectors.
             for item in item_list:
                 data = item[self.name]
-                selectors = {
-                    s['@Name']: s['#text']
-                    for s
-                    in item['a:EndpointReference']['a:ReferenceParameters']['w:SelectorSet']['w:Selector']}
-                obj = _Object(self, selectors, data)
+                ref = _Reference.from_raw(self.wmi, item['a:EndpointReference'])
+                assert ref.wmi_class == self
+                obj = _Object(ref, data)
                 _logger.info('\tObject: %r', obj)
                 yield obj
 
@@ -184,7 +221,7 @@ class Class(object):
 
     def reference(self, selectors):
         """Refer to objects of this class via this method."""
-        return _Reference(self, selectors)
+        return _Reference(self, _SelectorSet.from_dict(selectors))
 
     def static(self):
         """Use to call "static" methods. E.g. for StdRegProv class."""
@@ -195,6 +232,65 @@ class Class(object):
         return self.static().get()
 
 
+class _SelectorSet(object):
+    def __init__(self, raw, as_dict):
+        self.raw = raw
+        self.as_dict = as_dict
+
+    def __repr__(self):
+        return '_SelectorSet.from_dict({!r})'.format(self.as_dict)
+
+    def __eq__(self, other):
+        if not isinstance(other, _SelectorSet):
+            return NotImplemented
+        return other.as_dict == self.as_dict
+
+    @classmethod
+    def from_dict(cls, as_dict):
+        raw = {
+            'w:Selector': [
+                {'@Name': selector_name, '#text': selector_value}
+                if selector_value is not None else
+                {'@Name': selector_name}
+                for selector_name, selector_value in as_dict.items()
+                ]
+            }
+        return cls(raw, as_dict)
+
+    @classmethod
+    def from_raw(cls, raw):
+        as_dict = {s['@Name']: s.get('#text') for s in raw['w:Selector']}
+        return cls(raw, as_dict)
+
+    @classmethod
+    def empty(cls):
+        return cls.from_dict({})
+
+
+def _prepare_data(data):
+    if data is None:
+        return {'@xsi:nil': 'true'}
+    if data == '':
+        return None
+    if isinstance(data, datetime.datetime):
+        return {'cim:Datetime': data.astimezone(pytz.UTC).strftime('%Y-%m-%dT%H:%M:%S.%fZ')}
+    if isinstance(data, (dict, OrderedDict)):
+        return {key: _prepare_data(data[key]) for key in data}
+    return data
+
+
+def _parse_data(data):
+    if data is None:
+        return ''
+    if data == {'@xsi:nil': 'true'}:
+        return None
+    if isinstance(data, (dict, OrderedDict)):
+        if 'cim:Datetime' in data:
+            return dateutil.parser.parse(data['cim:Datetime'])
+        return {key: _parse_data(data[key]) for key in data}
+    return data
+
+
 class _Reference(object):
     """Reference to single object. Get single object and invoke methods here."""
 
@@ -202,46 +298,83 @@ class _Reference(object):
         self.wmi_class = wmi_class
         self.selectors = selectors
 
+    def __repr__(self):
+        return '_Reference({!r}, {!r})'.format(self.wmi_class, self.selectors)
+
+    def __eq__(self, other):
+        if not isinstance(other, _Reference):
+            return NotImplemented
+        return other.wmi_class == self.wmi_class and other.selectors == self.selectors
+
+    def __getitem__(self, item):
+        return self.selectors.as_dict[item]
+
+    @classmethod
+    def from_raw(cls, wmi, raw):
+        wmi_class = _Class(wmi, raw['a:ReferenceParameters']['w:ResourceURI'])
+        # `SelectorSet` isn't always present, e.g. with `Win32_OperatingSystem`.
+        if 'w:SelectorSet' in raw['a:ReferenceParameters']:
+            selector_set = _SelectorSet.from_raw(raw['a:ReferenceParameters']['w:SelectorSet'])
+        else:
+            selector_set = _SelectorSet.empty()
+        return cls(wmi_class, selector_set)
+
     def get(self):
         _logger.info("Get %s where %r", self.wmi_class, self.selectors)
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Get'
-        outcome = self.wmi_class.perform_action(action_url, {}, self.selectors)
+        outcome = self.wmi_class.wmi.act(self.wmi_class.uri, action_url, {}, self.selectors)
         instance = outcome[self.wmi_class.name]
-        return instance
+        return _Object(self, instance)
 
     def put(self, new_properties_dict):
         _logger.info("Put %s where %r: %r", self.wmi_class, self.selectors, new_properties_dict)
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Put'
-        body = {self.wmi_class.name: new_properties_dict}
+        body = {self.wmi_class.name: _prepare_data(new_properties_dict)}
         body[self.wmi_class.name]['@xmlns'] = self.wmi_class.uri
-        outcome = self.wmi_class.perform_action(action_url, body, self.selectors)
+        outcome = self.wmi_class.wmi(self.wmi_class.uri, action_url, body, self.selectors)
         instance = outcome[self.wmi_class.name]
-        return instance
+        return _Object(self, instance)
 
     def invoke_method(self, method_name, params, timeout_sec=None):
         _logger.info("Invoke %s.%s(%r) where %r", self.wmi_class, method_name, params, self.selectors)
         action_uri = self.wmi_class.uri + '/' + method_name
-        method_input = {'p:' + param_name: param_value for param_name, param_value in params.items()}
+        method_input = {'p:' + param_name: param_value for param_name, param_value in _prepare_data(params).items()}
         method_input['@xmlns:p'] = self.wmi_class.uri
+        method_input['@xmlns:cim'] = 'http://schemas.dmtf.org/wbem/wscim/1/common'  # For `cWMIim:Datetime`.
+        method_input['@xmlns:xsi'] = 'http://www.w3.org/2001/XMLSchema-instance'  # For `@xsi:nil`.
         body = {method_name + '_INPUT': method_input}
-        response = self.wmi_class.perform_action(action_uri, body, self.selectors, timeout_sec=timeout_sec)
-        method_output = response[method_name + '_OUTPUT']
+        response = self.wmi_class.wmi.act(self.wmi_class.uri, action_uri, body, self.selectors, timeout_sec=timeout_sec)
+        method_output = _parse_data(response[method_name + '_OUTPUT'])
         if method_output[u'ReturnValue'] != u'0':
             exception_cls = WmiInvokeFailed.specific_cls(int(method_output[u'ReturnValue']))
             raise exception_cls(self, method_name, params, method_output)
         return method_output
 
 
-class _Object(_Reference):
-    def __init__(self, wmi_class, selectors, data):
-        super(_Object, self).__init__(wmi_class, selectors)
-        self._data = data
+class _Object(object):
+    def __init__(self, ref, data):  # type: (_Reference, Mapping[str, Union[str, Mapping]]) -> ...
+        self.ref = ref
+        self._data = {}
+        for key, value in _parse_data(data).items():
+            if key == '@xmlns' or key == '@xsi:type':
+                continue
+            if isinstance(value, (dict, OrderedDict)):
+                if 'a:ReferenceParameters' in value:
+                    self._data[key] = _Reference.from_raw(ref.wmi_class.wmi, value)
+                    continue
+            self._data[key] = value
 
     def __repr__(self):
-        return '_Object({!r}, {!r}, {!r})'.format(self.wmi_class, self.selectors, self._data)
+        return '_Object({!r}, {!r})'.format(self.ref, self._data)
 
     def __getitem__(self, item):
         return self._data[item]
+
+    def put(self, new_properties_dict):  # type: (Mapping[str, str]) -> _Object
+        return self.ref.put(new_properties_dict)
+
+    def invoke_method(self, method_name, params, timeout_sec=None):
+        return self.ref.invoke_method(method_name, params, timeout_sec=timeout_sec)
 
 
 class WmiInvokeFailed(Exception):

@@ -21,6 +21,11 @@ void MediaServerClient::setUserCredentials(const nx::network::http::Credentials&
     m_userCredentials = userCredentials;
 }
 
+boost::optional<nx::network::http::Credentials> MediaServerClient::getUserCredentials() const
+{
+    return m_userCredentials;
+}
+
 void MediaServerClient::setAuthenticationKey(const QString& key)
 {
     m_authenticationKey = key;

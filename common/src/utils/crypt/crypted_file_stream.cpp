@@ -32,6 +32,13 @@ CryptedFileStream::CryptedFileStream(const QString& fileName, const QString& pas
     setPassword(password);
 }
 
+CryptedFileStream::CryptedFileStream(const QString& fileName, qint64 position, qint64 size,
+    const QString& password)
+    : CryptedFileStream(fileName, password)
+{
+    setEnclosure(position, size);
+}
+
 CryptedFileStream::~CryptedFileStream()
 {
     close();
