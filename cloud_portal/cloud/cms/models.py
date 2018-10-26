@@ -69,13 +69,13 @@ def cloud_portal_customization_cache(customization_name, value=None, force=False
 
 def slugify(name):
     unsafe_chars = re.compile('[^a-z0-9\s-]')
-    return unsafe_chars.sub('-', name).replace(' ', '-')
+    return unsafe_chars.sub('-', name).replace(' ', '-').lower()
 
 
 def rename_file(instance, filename):
-    product_name = slugify(instance.product.name.lower())
-    structure_name = slugify(instance.data_structure.name.lower())
-    file_info = "{}-{}-{}".format(structure_name, instance.id, slugify(filename.lower()))
+    product_name = slugify(instance.product.name)
+    structure_name = slugify(instance.data_structure.name)
+    file_info = "{}-{}-{}".format(structure_name, instance.id, slugify(filename))
     return os.path.join(product_name, file_info, filename)
 
 
