@@ -161,3 +161,8 @@ nx::utils::Url MediaServerLauncher::apiUrl() const
 {
     return nx::utils::Url(lit("http://") + endpoint().toString());
 }
+
+QString MediaServerLauncher::dataDir() const
+{
+    return *m_workDirResource.getDirName();
+}

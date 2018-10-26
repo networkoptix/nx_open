@@ -29,6 +29,7 @@ protected:
     {
         m_server = std::make_unique<MediaServerLauncher>(/* tmpDir */ "");
         m_server->addSetting(QnServer::kNoInitStoragesOnStartup, "1");
+        m_baseDir = closeDirPath(m_server->dataDir());
     }
 
     void whenServerLaunched()
@@ -38,7 +39,6 @@ protected:
 
     void whenSomeFilesCreated(int count, FileType fileType)
     {
-        const auto baseDir = closeDirPath(ut::cfg::configInstance().tmpDir);
         for (int i = 0; i < count; ++i)
         {
             const QString fileName = fileType == FileType::backup
@@ -48,7 +48,7 @@ protected:
                     .arg(i + 1000LL * 3600LL * 24LL * 365LL * 2010LL)
                 : notQuiteBackupFileName();
 
-            const auto filePath = QDir(baseDir).absoluteFilePath(fileName);
+            const auto filePath = QDir(m_baseDir).absoluteFilePath(fileName);
             QList<QString>* containerToSaveIn = fileType == FileType::backup
                 ? &m_backupFilesCreated
                 : &m_nonBackupFilesCreated;
@@ -64,8 +64,7 @@ protected:
 
     void whenAllBackupFilesDataCalled()
     {
-        m_backupFilesDataFound =
-            nx::vms::utils::allBackupFilesData(closeDirPath(ut::cfg::configInstance().tmpDir));
+        m_backupFilesDataFound = nx::vms::utils::allBackupFilesDataSorted(m_baseDir);
     }
 
     void thenAllBackupFilesShouldBeFound()
@@ -74,9 +73,7 @@ protected:
 
         for (const auto& backupFileData: m_backupFilesDataFound)
         {
-            auto filePathIt = std::find_if(
-                m_backupFilesCreated.begin(),
-                m_backupFilesCreated.end(),
+            auto filePathIt = std::find_if(m_backupFilesCreated.begin(), m_backupFilesCreated.end(),
                 [&backupFileData](const QString& filePath)
                 {
                     return backupFileData.fullPath == filePath;
@@ -87,9 +84,27 @@ protected:
         }
     }
 
-    void thanNoBackupFilesShouldBeCreated()
+    void thenNoBackupFilesShouldBeCreated()
     {
+        whenAllBackupFilesDataCalled();
+        ASSERT_TRUE(m_backupFilesDataFound.isEmpty());
+    }
 
+    void givenDiskFreeSpace(qint64 freeSpace)
+    {
+        m_freeSpace = freeSpace;
+    }
+
+    void whenDeleteOldFilesFunctionCalled()
+    {
+        vms::utils::deleteOldBackupFilesIfNeeded(m_baseDir, m_freeSpace);
+    }
+
+    void thenOldestFilesShouldBeDeleted(int filesLeft)
+    {
+        const auto foundFiles = nx::vms::utils::allBackupFilesDataSorted(m_baseDir);
+        ASSERT_EQ(filesLeft, foundFiles.size());
+        ASSERT_EQ(foundFiles[0].timestamp, m_backupFilesDataFound[0].timestamp);
     }
 
 private:
@@ -97,6 +112,8 @@ private:
     QList<nx::vms::utils::DbBackupFileData> m_backupFilesDataFound;
     QList<QString> m_backupFilesCreated;
     QList<QString> m_nonBackupFilesCreated;
+    QString m_baseDir;
+    qint64 m_freeSpace = -1;
 
     static QString notQuiteBackupFileName()
     {
@@ -121,10 +138,28 @@ TEST_F(BackupDb, allBackupFilesData_correctnessCheck)
     thenAllBackupFilesShouldBeFound();
 }
 
+TEST_F(BackupDb, rotation_freeSpaceMoreThan10Gb)
+{
+    givenDiskFreeSpace(11 * 1024 * 1024LL * 1024LL);
+    whenSomeFilesCreated(/*count*/ 10, FileType::backup);
+    whenAllBackupFilesDataCalled();
+    whenDeleteOldFilesFunctionCalled();
+    thenOldestFilesShouldBeDeleted(/*filesLeft*/ 6);
+}
+
+TEST_F(BackupDb, rotation_freeSpaceLessThan10Gb)
+{
+    givenDiskFreeSpace(9 * 1024 * 1024LL * 1024LL);
+    whenSomeFilesCreated(/*count*/ 10, FileType::backup);
+    whenAllBackupFilesDataCalled();
+    whenDeleteOldFilesFunctionCalled();
+    thenOldestFilesShouldBeDeleted(/*filesLeft*/ 1);
+}
+
 TEST_F(BackupDb, NoBackupCreatedOnFirstTimeLaunch)
 {
     whenServerLaunched();
-    thanNoBackupFilesShouldBeCreated();
+    thenNoBackupFilesShouldBeCreated();
 }
 
 } // namespace nx::mediaserver::test

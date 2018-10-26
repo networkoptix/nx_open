@@ -31,10 +31,10 @@ QString makeNextUniqueName(const QString& prefix, int build);
 bool backupDatabase(const QString& backupDir,
     std::shared_ptr<ec2::AbstractECConnection> connection);
 
-QList<DbBackupFileData> allBackupFilesData(const QString& backupDir);
+QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir);
 
-void deleteOldBackupFilesIfNeeded(const QString& backupDir, const QString& filePathToSkip,
-    qint64 freeSpace);
+/* Newest files come first */
+void deleteOldBackupFilesIfNeeded(const QString& backupDir, qint64 freeSpace);
 
 bool configureLocalPeerAsPartOfASystem(
     QnCommonModule* commonModule,

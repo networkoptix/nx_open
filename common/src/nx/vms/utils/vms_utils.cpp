@@ -51,12 +51,14 @@ bool backupDatabase(const QString& backupDir,
             lit("Failed to dump EC database: %1").arg(ec2::toString(errorCode)));
         return false;
     }
-    deleteOldBackupFilesIfNeeded(backupDir, fileName,
+
+    deleteOldBackupFilesIfNeeded(backupDir,
         nx::SystemCommands().freeSpace(backupDir.toStdString()));
+
     return true;
 }
 
-QList<DbBackupFileData> allBackupFilesData(const QString& backupDir)
+QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir)
 {
     QDir dir(backupDir);
     NX_ASSERT(dir.exists());
@@ -64,7 +66,7 @@ QList<DbBackupFileData> allBackupFilesData(const QString& backupDir)
     QList<DbBackupFileData> result;
     for (const auto& fileInfo: dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files))
     {
-        if (fileInfo.completeSuffix() != ".backup")
+        if (fileInfo.completeSuffix() != "backup")
             continue;
 
         auto nameSplits = fileInfo.baseName().split('_');
@@ -73,33 +75,40 @@ QList<DbBackupFileData> allBackupFilesData(const QString& backupDir)
 
         DbBackupFileData backupFileData;
         backupFileData.fullPath = fileInfo.absoluteFilePath();
-        backupFileData.build = nameSplits[1].toInt();
-        backupFileData.index = nameSplits[2].toInt();
-        backupFileData.timestamp = nameSplits[3].toLongLong();
+
+        bool ok;
+        bool conversionSuccessfull = true;
+        backupFileData.build = nameSplits[1].toInt(&ok);
+        conversionSuccessfull &= ok;
+        backupFileData.index = nameSplits[2].toInt(&ok);
+        conversionSuccessfull &= ok;
+        backupFileData.timestamp = nameSplits[3].toLongLong(&ok);
+        conversionSuccessfull &= ok;
+
+        if (!conversionSuccessfull)
+            continue;
 
         result.push_back(backupFileData);
     }
 
+    std::sort(result.begin(), result.end(),
+        [](const nx::vms::utils::DbBackupFileData& lhs,
+            const nx::vms::utils::DbBackupFileData& rhs)
+        {
+            return lhs.timestamp > rhs.timestamp;
+        });
+
+
     return result;
 }
 
-void deleteOldBackupFilesIfNeeded(const QString& backupDir, const QString& filePathToSkip,
-    qint64 freeSpace)
+void deleteOldBackupFilesIfNeeded(const QString& backupDir, qint64 freeSpace)
 {
-    const qint64 kMaxFreeSpace = 10 * 1024 * 1024;
+    const qint64 kMaxFreeSpace = 10 * 1024 * 1024LL * 1024LL; //< 10Gb
     const int kMaxBackupFilesCount = freeSpace > kMaxFreeSpace ? 6 : 1;
-    int deletedFilesCount = 0;
-    const auto allBackupFiles = allBackupFilesData(backupDir);
-    for (const auto& backupFileData: allBackupFiles)
-    {
-        if (allBackupFiles.size() - deletedFilesCount <= kMaxBackupFilesCount)
-            break;
-        if (backupFileData.fullPath != filePathToSkip)
-        {
-            nx::SystemCommands().removePath(backupFileData.fullPath.toStdString());
-            deletedFilesCount++;
-        }
-    }
+    const auto allBackupFiles = allBackupFilesDataSorted(backupDir);
+    for (int i = kMaxBackupFilesCount; i < allBackupFiles.size(); ++i)
+        nx::SystemCommands().removePath(allBackupFiles[i].fullPath.toStdString());
 }
 
 bool configureLocalPeerAsPartOfASystem(
