@@ -313,17 +313,27 @@ def path_type_to_path(request, node_dir, ssh_path_cls, path_type, name):
     return path
 
 
+@pytest.mark.parametrize(
+    ('file_size', 'chunk_size'),
+    [
+        (100 * 1000, 99 * 1000),
+        (100 * 1000, 100 * 1000),
+        (100 * 1000, 101 * 1000),
+        (0, 1),
+        ],
+    ids='file{}-chunk{}'.format)
 @pytest.mark.parametrize('destination_path_type', path_type_list)
 @pytest.mark.parametrize('source_path_type', path_type_list)
-def test_copy_file(request, node_dir, ssh_path_cls, source_path_type, destination_path_type):
+def test_copy_file(request, node_dir, ssh_path_cls, source_path_type, destination_path_type, file_size, chunk_size):
     source = path_type_to_path(request, node_dir, ssh_path_cls, source_path_type, 'source')
     destination = path_type_to_path(request, node_dir, ssh_path_cls, destination_path_type, 'destination')
 
     _logger.info('Copy: %r -> %r', source, destination)
 
-    bytes = '0123456789' * 10 * 1024  # 100K
+    fill_with = '0123456789'
+    bytes = fill_with * (file_size // len(fill_with))
     source.write_bytes(bytes)
     destination.ensure_file_is_missing()
-    copy_file(source, destination)
+    copy_file(source, destination, chunk_size_bytes=chunk_size)
     assert destination.exists()
     assert destination.read_bytes() == bytes
