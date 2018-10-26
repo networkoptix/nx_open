@@ -17,7 +17,7 @@ namespace detail {
 struct RequestContext
 {
     nx::network::http::StringType pathTemplate;
-    std::vector<nx::network::http::StringType> requestPathParams;
+    RequestPathParams requestPathParams;
 };
 
 class DummyHandler:

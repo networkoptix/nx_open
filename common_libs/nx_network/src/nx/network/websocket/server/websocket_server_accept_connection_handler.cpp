@@ -16,7 +16,7 @@ AcceptConnectionHandler::AcceptConnectionHandler(
         nx::network::websocket::kWebsocketProtocolName,
         [onConnectionCreated = std::move(onConnectionCreated)](
             std::unique_ptr<AbstractStreamSocket> connection,
-            std::vector<nx::network::http::StringType> restParams)
+            http::RequestPathParams restParams)
         {
             auto webSocket = std::make_unique<WebSocket>(
                 std::move(connection),

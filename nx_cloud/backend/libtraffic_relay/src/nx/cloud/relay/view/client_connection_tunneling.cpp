@@ -1,6 +1,7 @@
 #include "client_connection_tunneling.h"
 
 #include <nx/network/cloud/tunnel/relay/api/relay_api_data_types.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
 
 namespace nx::cloud::relay::view {
 
@@ -30,7 +31,9 @@ void ClientConnectionTunnelingServer::authorize(
 {
     using namespace std::placeholders;
 
-    if (requestContext->requestPathParams.empty())
+    const auto sessionId = 
+        requestContext->requestPathParams.getByName(api::kSessionIdName);
+    if (sessionId.empty())
     {
         return completionHandler(
             nx::network::http::StatusCode::badRequest,
@@ -39,7 +42,7 @@ void ClientConnectionTunnelingServer::authorize(
 
     controller::ConnectToPeerRequestEx inputData;
     inputData.clientEndpoint = requestContext->connection->socket()->getForeignAddress();
-    inputData.sessionId = requestContext->requestPathParams[0].toStdString();
+    inputData.sessionId = sessionId;
 
     m_connectSessionManager->connectToPeer(
         inputData,

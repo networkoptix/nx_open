@@ -15,7 +15,7 @@ angular.module('cloudApp')
                     return urlProtocol.open(scope.system && scope.system.id).catch(function(error){
                         dialogs.noClientDetected();
                         return true;
-                    });
+                    })
                 });
             }
         };

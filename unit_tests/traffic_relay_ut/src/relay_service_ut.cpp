@@ -74,7 +74,7 @@ protected:
 
     void thenRelayHasConnectedToDb()
     {
-        ASSERT_TRUE(m_cassandraConnectionInitializationEvents.pop());
+        while (!m_cassandraConnectionInitializationEvents.pop()) {}
     }
 
     void andRelayHasStarted()

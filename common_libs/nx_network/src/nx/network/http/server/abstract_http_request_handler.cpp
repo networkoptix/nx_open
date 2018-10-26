@@ -73,12 +73,12 @@ bool AbstractHttpRequestHandler::processRequest(
 }
 
 void AbstractHttpRequestHandler::setRequestPathParams(
-    std::vector<StringType> params)
+    RequestPathParams params)
 {
     m_requestPathParams = std::move(params);
 }
 
-const std::vector<StringType>& AbstractHttpRequestHandler::requestPathParams() const
+const RequestPathParams& AbstractHttpRequestHandler::requestPathParams() const
 {
     return m_requestPathParams;
 }

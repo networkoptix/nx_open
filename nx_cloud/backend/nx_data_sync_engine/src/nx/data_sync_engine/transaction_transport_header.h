@@ -13,6 +13,7 @@ class TransactionTransportHeader
 {
 public:
     std::string systemId;
+    std::string peerId;
     network::SocketAddress endpoint;
     std::string connectionId;
     CommandTransportHeader vmsTransportHeader;

@@ -26,9 +26,11 @@ std::vector<network::SocketAddress> Service::httpEndpoints() const
     return m_view->httpEndpoints();
 }
 
-void Service::connectToNode(const nx::utils::Url& /*url*/)
+void Service::connectToNode(
+    const std::string& systemId,
+    const nx::utils::Url& url)
 {
-    // TODO
+    m_controller->syncronizationEngine().connector().addNodeUrl(systemId, url);
 }
 
 std::unique_ptr<utils::AbstractServiceSettings> Service::createSettings()

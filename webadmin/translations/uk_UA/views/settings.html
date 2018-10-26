@@ -111,6 +111,26 @@
                                    target="_blank">Створити обліковий запис {{Config.cloud.productName}}</a></p>
                         </div>
                     </div>
+
+
+                    <div>
+                        <h3>Шифрування передачі</h3>
+                        <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> Забезпечити шифрування передачі
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox"
+                                           ng-disabled="!trafficSettings.trafficEncryptionForced"
+                                           ng-model="trafficSettings.videoTrafficEncryptionForced"> Забезпечити шифрування передачі відеосигналу
+                                </label>
+                            </div>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Зберегти</button>
+                        </form>
+                    </div>
                 </uib-tab>
 
                 <uib-tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">

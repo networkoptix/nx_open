@@ -1,13 +1,10 @@
 #pragma once
 
 #include <map>
+#include <regex>
+#include <string>
 
 #include <boost/optional.hpp>
-
-#include <QtCore/QRegExp>
-#include <QtCore/QString>
-
-#include <nx/utils/thread/mutex.h>
 
 #include "../../http_types.h"
 
@@ -30,10 +27,12 @@ template<typename Mapped>
 class PathMatcher
 {
 public:
-    bool add(const nx::network::http::StringType& pathTemplate, Mapped mapped)
+    bool add(const std::string& pathTemplate, Mapped mapped)
     {
         MatchContext matchContext;
-        matchContext.regex = convertToRegex(QString::fromUtf8(pathTemplate));
+        matchContext.regex = convertToRegex(pathTemplate);
+        if (!fetchParamNames(pathTemplate, &matchContext.paramNames))
+            return false;
         matchContext.mapped = std::move(mapped);
 
         return m_restPathToMatchContext.emplace(
@@ -42,20 +41,25 @@ public:
     }
 
     boost::optional<const Mapped&> match(
-        const nx::network::http::StringType& path,
-        std::vector<nx::network::http::StringType>* pathParams) const
+        const std::string& path,
+        RequestPathParams* pathParams) const
     {
-        QnMutexLocker lock(&m_mutex);
-
-        for (auto& matchContext: m_restPathToMatchContext)
+        for (const auto& matchContext: m_restPathToMatchContext)
         {
-            if (!matchContext.second.regex.exactMatch(QString::fromUtf8(path)))
-                continue;
-
-            for (int i = 1; i <= matchContext.second.regex.captureCount(); ++i)
-                pathParams->push_back(matchContext.second.regex.cap(i).toUtf8());
-
-            return boost::optional<const Mapped&>(matchContext.second.mapped);
+            std::smatch matchResult;
+            if (std::regex_search(path, matchResult, matchContext.second.regex))
+            {
+                RequestPathParams params;
+                for (size_t i = 1; i < matchResult.size(); ++i)
+                {
+                    if (matchResult[i].length() == 0)
+                        return boost::none;
+                    params.nameToValue.emplace(
+                        matchContext.second.paramNames[i-1], matchResult[i]);
+                }
+                *pathParams = std::move(params);
+                return boost::optional<const Mapped&>(matchContext.second.mapped);
+            }
         }
 
         return boost::none;
@@ -64,26 +68,56 @@ public:
 private:
     struct MatchContext
     {
-        QRegExp regex;
+        std::regex regex;
+        /**
+         * NOTE: Order preserves the order in the request.
+         */
+        std::vector<std::string> paramNames;
         Mapped mapped;
     };
 
     /** REST path template, context */
-    std::map<nx::network::http::StringType, MatchContext> m_restPathToMatchContext;
-    mutable QnMutex m_mutex;
+    std::map<std::string, MatchContext> m_restPathToMatchContext;
 
-    QRegExp convertToRegex(const QString& pathTemplate)
+    std::regex convertToRegex(const std::string& pathTemplate)
     {
-        const QRegExp replaceRestParams("\\{[0-9a-zA-Z]+\\}", Qt::CaseInsensitive);
-        const QString replacement("([^/]+)");
+        const std::regex replaceRestParams(
+            "{[0-9a-zA-Z]*}", std::regex_constants::basic);
+        const std::string replacement("\\([^/]*\\)");
 
-        QString restPathMatchRegex;
+        std::string restPathMatchRegex;
         restPathMatchRegex += "^";
-        restPathMatchRegex += pathTemplate;
+        restPathMatchRegex += std::regex_replace(
+            pathTemplate,
+            replaceRestParams,
+            replacement);
         restPathMatchRegex += "$";
-        restPathMatchRegex.replace(replaceRestParams, replacement);
 
-        return QRegExp(std::move(restPathMatchRegex), Qt::CaseInsensitive);
+        return std::regex(
+            std::move(restPathMatchRegex),
+            std::regex::icase | std::regex_constants::basic);
+    }
+
+    bool fetchParamNames(std::string pathTemplate, std::vector<std::string>* names)
+    {
+        std::set<std::string> uniqueNames;
+
+        const std::regex findRestParamsRegex(
+            "{\\([0-9a-zA-Z]*\\)}", std::regex_constants::basic);
+
+        std::smatch matchResult;
+        while (std::regex_search(pathTemplate, matchResult, findRestParamsRegex))
+        {
+            for (size_t i = 1; i < matchResult.size(); ++i)
+            {
+                names->push_back(matchResult[i].str());
+                if (!uniqueNames.emplace(matchResult[i].str()).second)
+                    return false;
+            }
+            pathTemplate = matchResult.suffix();
+        }
+
+        return true;
     }
 };
 
