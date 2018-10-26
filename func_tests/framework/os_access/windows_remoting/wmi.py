@@ -80,8 +80,7 @@ class Wmi(object):
             'env:Envelope': self.protocol._get_soap_header(resource_uri=class_uri, action=action)}
         rq['env:Envelope'].setdefault('env:Body', body)
         rq['env:Envelope']['env:Header']['w:SelectorSet'] = selectors.raw
-        if timeout_sec is not None:
-            rq['env:Envelope']['w:OperationTimeout'] = 'PT{}S'.format(timeout_sec)
+            rq['env:Envelope']['env:Header']['w:OperationTimeout'] = 'PT{}S'.format(timeout_sec)
         try:
             request_xml = xmltodict.unparse(rq)
             _logger.debug("Request XML:\n%s", _pretty_format_xml(request_xml))
