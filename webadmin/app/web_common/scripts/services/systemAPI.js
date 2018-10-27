@@ -231,6 +231,10 @@ angular.module('nxCommon')
         ServerConnection.prototype.getServerTimes = function(){
             return this._get('/ec2/getTimeOfServers');
         };
+        
+        ServerConnection.prototype.getSystemTime = function(){
+            return this._get('/api/synchronizedTime');
+        };
         /* End of Server settings */
 
         /* Working with users*/
