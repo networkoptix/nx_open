@@ -63,7 +63,7 @@ protected:
 
     void sinkItemsToDifferentDepth()
     {
-        for (int i = 0; i < m_items.size(); ++i)
+        for (int i = 0; i < (int) m_items.size(); ++i)
             sinkItem(i, random::number<int>(0, 37));
     }
 
