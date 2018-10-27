@@ -291,7 +291,9 @@ MEDIA_URL = '/static/integrations/'
 
 # START s3 config
 AWS_STORAGE_BUCKET_NAME = conf['bucket']
-AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+
+S3_DOMAIN = conf['s3_domain'] if 's3_domain' in conf else '%s.s3.amazonaws.com'
+AWS_S3_CUSTOM_DOMAIN = S3_DOMAIN % AWS_STORAGE_BUCKET_NAME
 # mysite is a default name for the admin site
 INTEGRATION_FILE_STORAGE = 'mysite.storage_backends.MediaStorage'
 # END s3
