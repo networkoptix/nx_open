@@ -88,7 +88,13 @@ public:
     /*
     * Return time periods from resource based archive (direct to storage)
     */
-    virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel);
+    virtual QnTimePeriodList getDtsTimePeriods(
+        qint64 startTimeMs,
+        qint64 endTimeMs,
+        int detailLevel,
+        bool keepSmalChunks,
+        int limit,
+        Qt::SortOrder sortOrder);
 
     //!Returns true if camera is accessible
     /*!

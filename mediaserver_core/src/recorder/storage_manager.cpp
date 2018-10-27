@@ -1296,16 +1296,31 @@ QString QnStorageManager::dateTimeStr(qint64 dateTimeMs, qint16 timeZone, const 
     return text;
 }
 
-void QnStorageManager::getTimePeriodInternal(std::vector<QnTimePeriodList> &periods, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime,
-                                             qint64 detailLevel, bool keepSmallChunks, const DeviceFileCatalogPtr &catalog)
+void QnStorageManager::getTimePeriodInternal(
+    std::vector<QnTimePeriodList>& periods,
+    const QnNetworkResourcePtr& camera,
+    qint64 startTimeMs,
+    qint64 endTimeMs,
+    qint64 detailLevel,
+    bool keepSmallChunks,
+    int limit,
+    Qt::SortOrder sortOrder,
+    const DeviceFileCatalogPtr &catalog)
 {
-    if (catalog) {
-        periods.push_back(catalog->getTimePeriods(startTime, endTime, detailLevel, keepSmallChunks, INT_MAX));
+    if (catalog)
+    {
+        periods.push_back(catalog->getTimePeriods(
+            startTimeMs,
+            endTimeMs,
+            detailLevel,
+            keepSmallChunks,
+            limit,
+            sortOrder));
         if (!periods.rbegin()->empty())
         {
             QnTimePeriod& lastPeriod = periods.rbegin()->last();
             bool isActive = !camera->hasFlags(Qn::foreigner) && (camera->getStatus() == Qn::Online || camera->getStatus() == Qn::Recording);
-            if (lastPeriod.durationMs == -1 && !isActive)
+            if (lastPeriod.durationMs == -1 && !isActive && sortOrder == Qt::SortOrder::AscendingOrder)
             {
                 lastPeriod.durationMs = 0;
                 Recorders recorders = recordingManager()->findRecorders(camera);
@@ -1356,39 +1371,53 @@ bool QnStorageManager::isArchiveTimeExistsInternal(const QString& cameraUniqueId
 
 QnTimePeriodList QnStorageManager::getRecordedPeriods(
     QnMediaServerModule* serverModule,
-    const QnSecurityCamResourceList &cameras,
-    qint64 startTime,
-    qint64 endTime,
-    qint64 detailLevel,
-    bool keepSmallChunks,
-    const QList<QnServer::ChunksCatalog> &catalogs,
-    int limit)
+    const QnChunksRequestData& request,
+    const QList<QnServer::ChunksCatalog> &catalogs)
 {
     std::vector<QnTimePeriodList> periods;
-    serverModule->normalStorageManager()->getRecordedPeriodsInternal(periods, cameras, startTime, endTime, detailLevel, keepSmallChunks, catalogs, limit);
-    serverModule->backupStorageManager()->getRecordedPeriodsInternal(periods, cameras, startTime, endTime, detailLevel, keepSmallChunks, catalogs, limit);
-    return QnTimePeriodList::mergeTimePeriods(periods, limit);
+    serverModule->normalStorageManager()->getRecordedPeriodsInternal(periods, request, catalogs);
+    serverModule->backupStorageManager()->getRecordedPeriodsInternal(periods, request, catalogs);
+    return QnTimePeriodList::mergeTimePeriods(periods, request.limit, request.sortOrder);
 }
 
 void QnStorageManager::getRecordedPeriodsInternal(
     std::vector<QnTimePeriodList>& periods,
-    const QnSecurityCamResourceList &cameras,
-    qint64 startTime, qint64 endTime, qint64 detailLevel, bool keepSmallChunks,
-    const QList<QnServer::ChunksCatalog> &catalogs,
-    int /*limit*/)
+    const QnChunksRequestData& request,
+    const QList<QnServer::ChunksCatalog> &catalogs)
 {
-    for (const QnSecurityCamResourcePtr &camera: cameras) {
+    for (const QnSecurityCamResourcePtr &camera: request.resList)
+    {
         QString cameraUniqueId = camera->getUniqueId();
-        for (int i = 0; i < QnServer::ChunksCatalogCount; ++i) {
+        for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
+        {
             QnServer::ChunksCatalog catalog = static_cast<QnServer::ChunksCatalog> (i);
             if (!catalogs.contains(catalog))
                 continue;
 
-            if (camera->isDtsBased()) {
+            if (camera->isDtsBased())
+            {
                 if (catalog == QnServer::HiQualityCatalog) // both hi- and low-quality chunks are loaded with this method
-                    periods.push_back(camera->getDtsTimePeriods(startTime, endTime, detailLevel));
-            } else {
-                getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, keepSmallChunks, getFileCatalog(cameraUniqueId, catalog));
+                {
+                    periods.push_back(camera->getDtsTimePeriods(
+                        request.startTimeMs,
+                        request.endTimeMs,
+                        request.detailLevel.count(),
+                        request.keepSmallChunks,
+                        request.limit,
+                        request.sortOrder));
+                }
+            } else
+            {
+                getTimePeriodInternal(
+                    periods,
+                    camera,
+                    request.startTimeMs,
+                    request.endTimeMs,
+                    request.detailLevel.count(),
+                    request.keepSmallChunks,
+                    request.limit,
+                    request.sortOrder,
+                    getFileCatalog(cameraUniqueId, catalog));
             }
         }
 

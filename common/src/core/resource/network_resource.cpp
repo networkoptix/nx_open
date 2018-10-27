@@ -296,7 +296,14 @@ void QnNetworkResource::checkIfOnlineAsync( std::function<void(bool)> completion
     nx::network::SocketGlobals::aioService().post(std::bind(completionHandler, false));
 }
 
-QnTimePeriodList QnNetworkResource::getDtsTimePeriods(qint64 /*startTimeMs*/, qint64 /*endTimeMs*/, int /*detailLevel*/) {
+QnTimePeriodList QnNetworkResource::getDtsTimePeriods(
+    qint64 /*startTimeMs*/,
+    qint64 /*endTimeMs*/,
+    int /*detailLevel*/,
+    bool /*keepSmalChunks*/,
+    int /*limit*/,
+    Qt::SortOrder /*sortOrder*/)
+{
     return QnTimePeriodList();
 }
 

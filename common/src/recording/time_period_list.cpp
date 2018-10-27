@@ -61,7 +61,7 @@ qint64 QnTimePeriodList::roundTimeToPeriodUSec(qint64 timeUsec, bool searchForwa
         return 0;
 }
 
-bool QnTimePeriodList::intersects(const QnTimePeriod &period) const
+bool QnTimePeriodList::intersects(const QnTimePeriod& period) const
 {
     const_iterator firstPos = findNearestPeriod(period.startTimeMs, true);
 
@@ -90,7 +90,8 @@ bool QnTimePeriodList::containPeriod(const QnTimePeriod &period) const
     return found != cend();
 }
 
-QnTimePeriodList QnTimePeriodList::intersected(const QnTimePeriod &period) const
+QnTimePeriodList QnTimePeriodList::intersected(
+    const QnTimePeriod& period, int limit, Qt::SortOrder sortOrder) const
 {
     QnTimePeriodList result;
 
@@ -100,11 +101,27 @@ QnTimePeriodList QnTimePeriodList::intersected(const QnTimePeriod &period) const
     if (lastPos != end())
         lastPos++;
 
-    for (const_iterator pos = firstPos; pos != lastPos; ++pos)
+    if (sortOrder == Qt::SortOrder::AscendingOrder)
     {
-        QnTimePeriod p = pos->intersected(period);
-        if (!p.isEmpty())
-            result.push_back(p);
+        for (const_iterator pos = firstPos; pos != lastPos; ++pos)
+        {
+            QnTimePeriod p = pos->intersected(period);
+            if (!p.isEmpty())
+                result.push_back(p);
+            if (result.size() == limit)
+                break;
+        }
+    }
+    else
+    {
+        for (const_iterator pos = lastPos-1; pos >= firstPos; --pos)
+        {
+            QnTimePeriod p = pos->intersected(period);
+            if (!p.isEmpty())
+                result.push_back(p);
+            if (result.size() == limit)
+                break;
+        }
     }
 
     return result;
@@ -613,29 +630,13 @@ void QnTimePeriodList::unionTimePeriods(QnTimePeriodList& basePeriods, const QnT
     }
 }
 
-
-QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const std::vector<QnTimePeriodList>& periodLists, int limit)
+template <typename IteratorType>
+QnTimePeriodList mergeTimePeriodsInternal(
+    const QVector<QnTimePeriodList>& nonEmptyPeriods,
+    std::vector<IteratorType>& minIndexes,
+    std::vector<IteratorType>& maxIndexes,
+    int limit)
 {
-    QVector<QnTimePeriodList> nonEmptyPeriods;
-    for (const QnTimePeriodList &periodList : periodLists)
-        if (!periodList.isEmpty())
-            nonEmptyPeriods << periodList;
-
-    if (nonEmptyPeriods.empty())
-        return QnTimePeriodList();
-
-    if (nonEmptyPeriods.size() == 1)
-    {
-        QnTimePeriodList result = nonEmptyPeriods.first();
-        if (result.size() > limit)
-            result.resize(limit);
-        return result;
-    }
-
-    std::vector< QnTimePeriodList::const_iterator > minIndices(nonEmptyPeriods.size());
-    for (int i = 0; i < nonEmptyPeriods.size(); ++i)
-        minIndices[i] = nonEmptyPeriods[i].cbegin();
-
     QnTimePeriodList result;
 
     int maxSize = std::min<int>(
@@ -650,11 +651,11 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const std::vector<QnTimePeri
         qint64 minStartTime = 0x7fffffffffffffffll;
         minIndex = -1;
         int i = 0;
-        for (const QnTimePeriodList &periodsList : nonEmptyPeriods)
+        for (const QnTimePeriodList &periodsList: nonEmptyPeriods)
         {
-            const auto startIdx = minIndices[i];
+            const auto startIdx = minIndexes[i];
 
-            if (startIdx != periodsList.cend())
+            if (startIdx != maxIndexes[i])
             {
                 const QnTimePeriod &startPeriod = *startIdx;
                 if (startPeriod.startTimeMs < minStartTime)
@@ -668,8 +669,7 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const std::vector<QnTimePeri
 
         if (minIndex >= 0)
         {
-            auto &startIdx = minIndices[minIndex];
-            //const QnTimePeriodList &periodsList = nonEmptyPeriods[minIndex];
+            auto &startIdx = minIndexes[minIndex];
             const QnTimePeriod &startPeriod = *startIdx;
 
             // add chunk to merged data
@@ -716,6 +716,59 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const std::vector<QnTimePeri
         }
     }
     return result;
+}
+
+QnTimePeriodList mergeTimePeriodsAsc(const QVector<QnTimePeriodList>& nonEmptyPeriods, int limit)
+{
+    std::vector<QnTimePeriodList::const_iterator> minIndexes(nonEmptyPeriods.size());
+    std::vector<QnTimePeriodList::const_iterator> endIndexes(nonEmptyPeriods.size());
+    for (int i = 0; i < nonEmptyPeriods.size(); ++i)
+    {
+        minIndexes[i] = nonEmptyPeriods[i].cbegin();
+        endIndexes[i] = nonEmptyPeriods[i].cend();
+    }
+    return mergeTimePeriodsInternal(nonEmptyPeriods, minIndexes, endIndexes, limit);
+}
+
+QnTimePeriodList mergeTimePeriodsDesc(const QVector<QnTimePeriodList>& nonEmptyPeriods, int limit)
+{
+    std::vector<QnTimePeriodList::const_reverse_iterator> minIndexes(nonEmptyPeriods.size());
+    std::vector<QnTimePeriodList::const_reverse_iterator> endIndexes(nonEmptyPeriods.size());
+    for (int i = 0; i < nonEmptyPeriods.size(); ++i)
+    {
+        minIndexes[i] = nonEmptyPeriods[i].crbegin();
+        endIndexes[i] = nonEmptyPeriods[i].crend();
+    }
+    auto result = mergeTimePeriodsInternal(nonEmptyPeriods, minIndexes, endIndexes, limit);
+    std::reverse(result.begin(), result.end());
+    return result;
+}
+
+QnTimePeriodList QnTimePeriodList::mergeTimePeriods(
+    const std::vector<QnTimePeriodList>& periodLists,
+    int limit,
+    Qt::SortOrder sortOrder)
+{
+    QVector<QnTimePeriodList> nonEmptyPeriods;
+    for (const QnTimePeriodList& periodList : periodLists)
+        if (!periodList.isEmpty())
+            nonEmptyPeriods << periodList;
+
+    if (nonEmptyPeriods.empty())
+        return QnTimePeriodList();
+
+    if (nonEmptyPeriods.size() == 1)
+    {
+        QnTimePeriodList result = nonEmptyPeriods.first();
+        if (result.size() > limit)
+            result.resize(limit);
+        return result;
+    }
+
+    if (sortOrder == Qt::SortOrder::AscendingOrder)
+        return mergeTimePeriodsAsc(nonEmptyPeriods, limit);
+    else
+        return mergeTimePeriodsDesc(nonEmptyPeriods, limit);
 }
 
 QnTimePeriodList QnTimePeriodList::simplified() const

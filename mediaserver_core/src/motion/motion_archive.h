@@ -70,7 +70,13 @@ public:
     QnMotionArchive(const QString& dataDir, QnNetworkResourcePtr resource, int channel);
     virtual ~QnMotionArchive();
     bool saveToArchive(QnConstMetaDataV1Ptr data);
-    QnTimePeriodList matchPeriod(const QRegion& region, qint64 startTime, qint64 endTime, int detailLevel);
+    QnTimePeriodList matchPeriod(
+        const QRegion& region,
+        qint64 startTime,
+        qint64 endTime,
+        int detailLevel,
+        int limit,
+        Qt::SortOrder sortOrder);
     QnMotionArchiveConnectionPtr createConnection();
 
     qint64 minTime() const;
@@ -91,6 +97,31 @@ private:
 
     void loadRecordedRange();
     int getSizeForTime(qint64 timeMs, bool reloadIndex);
+    void loadDataFromIndex(
+        QFile& motionFile,
+        const IndexHeader& indexHeader,
+        const QVector<IndexRecord>& index,
+        QVector<IndexRecord>::iterator startItr,
+        QVector<IndexRecord>::iterator endItr,
+        int detailLevel,
+        int limit,
+        quint8* buffer,
+        simd128i* mask,
+        int maskStart,
+        int maskEnd,
+        QnTimePeriodList& rez);
+    void loadDataFromIndexDesc(QFile& motionFile,
+        const IndexHeader& indexHeader,
+        const QVector<IndexRecord>& index,
+        QVector<IndexRecord>::iterator startItr,
+        QVector<IndexRecord>::iterator endItr,
+        int detailLevel,
+        int limit,
+        quint8* buffer,
+        simd128i* mask,
+        int maskStart,
+        int maskEnd,
+        QnTimePeriodList& rez);
 
     friend class QnMotionArchiveConnection;
 private:

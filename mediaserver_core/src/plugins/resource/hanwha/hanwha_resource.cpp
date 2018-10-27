@@ -3640,7 +3640,13 @@ void HanwhaResource::setSupportedAnalyticsEventTypeIds(const AnalyticsEventTypeI
     base_type::setSupportedAnalyticsEventTypeIds(externalEvents);
 }
 
-QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int /*detailLevel*/)
+QnTimePeriodList HanwhaResource::getDtsTimePeriods(
+    qint64 startTimeMs,
+    qint64 endTimeMs,
+    int detailLevel,
+    bool keepSmalChunks,
+    int limit,
+    Qt::SortOrder sortOrder)
 {
     if (!isNvr())
         return QnTimePeriodList();
@@ -3651,8 +3657,19 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 en
     if (numberOfOverlappedIds != 1)
         return QnTimePeriodList();
 
-    QnTimePeriod period(startTimeMs, endTimeMs - startTimeMs);
-    return timeline.cbegin()->second.intersected(period);
+
+    const auto& periods = timeline.cbegin()->second;
+    auto itr = std::lower_bound(periods.begin(), periods.end(), startTimeMs);
+    if (itr != periods.begin())
+    {
+        --itr;
+        if (itr->endTimeMs() <= startTimeMs)
+            ++itr; //< Case if previous chunk does not contain startTime.
+    }
+    auto endItr = std::lower_bound(periods.begin(), periods.end(), endTimeMs);
+
+    return QnTimePeriodList::filterTimePeriods(
+        itr, endItr, detailLevel, keepSmalChunks, limit, sortOrder);
 }
 
 QnConstResourceAudioLayoutPtr HanwhaResource::getAudioLayout(
