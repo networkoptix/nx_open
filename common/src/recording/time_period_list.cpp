@@ -90,8 +90,7 @@ bool QnTimePeriodList::containPeriod(const QnTimePeriod &period) const
     return found != cend();
 }
 
-QnTimePeriodList QnTimePeriodList::intersected(
-    const QnTimePeriod& period, int limit, Qt::SortOrder sortOrder) const
+QnTimePeriodList QnTimePeriodList::intersected(const QnTimePeriod& period) const
 {
     QnTimePeriodList result;
 
@@ -101,27 +100,11 @@ QnTimePeriodList QnTimePeriodList::intersected(
     if (lastPos != end())
         lastPos++;
 
-    if (sortOrder == Qt::SortOrder::AscendingOrder)
+    for (const_iterator pos = firstPos; pos != lastPos; ++pos)
     {
-        for (const_iterator pos = firstPos; pos != lastPos; ++pos)
-        {
-            QnTimePeriod p = pos->intersected(period);
-            if (!p.isEmpty())
-                result.push_back(p);
-            if (result.size() == limit)
-                break;
-        }
-    }
-    else
-    {
-        for (const_iterator pos = lastPos-1; pos >= firstPos; --pos)
-        {
-            QnTimePeriod p = pos->intersected(period);
-            if (!p.isEmpty())
-                result.push_back(p);
-            if (result.size() == limit)
-                break;
-        }
+        QnTimePeriod p = pos->intersected(period);
+        if (!p.isEmpty())
+            result.push_back(p);
     }
 
     return result;

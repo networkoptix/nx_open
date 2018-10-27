@@ -55,10 +55,7 @@ public:
 
     bool containPeriod(const QnTimePeriod &period) const;
 
-    QnTimePeriodList intersected(
-        const QnTimePeriod &period,
-        int limit = std::numeric_limits<int>::max(),
-        Qt::SortOrder sortOrder = Qt::SortOrder::AscendingOrder) const;
+    QnTimePeriodList intersected(const QnTimePeriod &period) const;
 
 
     template <class Iterator>
