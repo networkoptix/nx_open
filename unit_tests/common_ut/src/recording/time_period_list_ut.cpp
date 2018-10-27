@@ -633,7 +633,6 @@ TEST(QnTimePeriodsListTest, filterTimePeriodsDesc)
     auto itr = std::lower_bound(data.begin(), data.end(), 24);
     auto endItr = std::lower_bound(data.begin(), data.end(), 52);
 
-#if 0
     auto result = data.filterTimePeriods(itr, endItr, 1, true, 2, Qt::SortOrder::DescendingOrder);
     ASSERT_EQ(2, result.size());
     ASSERT_EQ(32, result[0].startTimeMs);
@@ -642,11 +641,11 @@ TEST(QnTimePeriodsListTest, filterTimePeriodsDesc)
     result = data.filterTimePeriods(itr, endItr, 1, true, 1, Qt::SortOrder::DescendingOrder);
     ASSERT_EQ(1, result.size());
     ASSERT_EQ(32, result[0].startTimeMs);
-#endif
+
     itr = data.begin();
     endItr = data.end();
 
-    auto result = data.filterTimePeriods(itr, endItr, /*detail level*/ 6, true, 100, Qt::SortOrder::DescendingOrder);
+    result = data.filterTimePeriods(itr, endItr, /*detail level*/ 6, true, 100, Qt::SortOrder::DescendingOrder);
     {
         QnTimePeriodList expectedList;
         expectedList
