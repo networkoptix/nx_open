@@ -78,7 +78,7 @@ public:
                 break;
 
             const qint64 lastEndTime = last.endTimeMs();
-            if (itr->startTimeMs - lastEndTime <= detailLevel)
+            if (itr->startTimeMs - lastEndTime < detailLevel)
             {
                 last.durationMs = itr->isInfinite() ? QnTimePeriod::infiniteDuration()
                     : qMax(last.durationMs, itr->endTimeMs() - last.startTimeMs);
