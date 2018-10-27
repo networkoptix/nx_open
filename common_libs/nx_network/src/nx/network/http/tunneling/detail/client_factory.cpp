@@ -28,6 +28,8 @@ ClientFactory::ClientFactory():
     base_type([this](auto&&... args) { return defaultFactoryFunction(std::move(args)...); }),
     m_tunnelTypeSelector(std::chrono::seconds(1) / kTunnelTypeRestoreSpeed)
 {
+    m_tunnelTypeSelector.setMaxSinkDepth(kMaxTunnelTypeSinkDepth);
+
     registerClientType<ConnectionUpgradeTunnelClient>();
     registerClientType<GetPostTunnelClient>();
     registerClientType<ExperimentalTunnelClient>();
