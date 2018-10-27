@@ -22,6 +22,7 @@ from framework.os_access.os_access_interface import OSAccess, OneWayPortMap, Rec
 from framework.os_access.path import FileSystemPath
 from framework.os_access.posix_shell import Shell
 from framework.os_access.posix_shell_path import PosixShellPath
+from framework.os_access.sftp_path import SftpPath
 from framework.os_access.ssh_shell import SSH
 from framework.os_access.ssh_traffic_capture import SSHTrafficCapture
 from framework.os_access.traffic_capture import TrafficCapture
@@ -108,7 +109,7 @@ class PosixAccess(OSAccess):
     def to_vm(cls, vm_alias, port_map, macs, ssh_user_name, ssh_private_key):
         # type: (str, ReciprocalPortMap, str, str, Container[EUI]) -> PosixAccess
         ssh = cls._make_ssh(port_map, ssh_user_name, ssh_private_key)
-        path_cls = PosixShellPath.specific_cls(ssh)
+        path_cls = SftpPath.specific_cls(ssh)
         traffic_capture = SSHTrafficCapture(ssh, path_cls.tmp() / 'traffic_capture')
         return cls(
             vm_alias,
@@ -124,7 +125,7 @@ class PosixAccess(OSAccess):
         return cls(
             alias,
             port_map,
-            ssh, _ReadOnlyPosixTime(ssh), None, ssh.lock_acquired, PosixShellPath.specific_cls(ssh),
+            ssh, _ReadOnlyPosixTime(ssh), None, ssh.lock_acquired, SftpPath.specific_cls(ssh),
             None)
 
     def is_accessible(self):

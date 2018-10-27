@@ -182,7 +182,17 @@ class BasePosixPath(FileSystemPath, PurePosixPath):
     _tmp = '/tmp/func_tests'
 
 
-def copy_file(source, destination):  # type: (FileSystemPath, FileSystemPath) -> None
+def copy_file(source, destination, chunk_size_bytes=1024 * 1024):
+    # type: (FileSystemPath, FileSystemPath, int) -> None
     _logger.info("Copy from %s to %s", source, destination)
-    destination.write_bytes(source.read_bytes())
-
+    copied_bytes = 0
+    while True:
+        chunk = source.read_bytes(copied_bytes, max_length=chunk_size_bytes)
+        if copied_bytes == 0:
+            destination.write_bytes(chunk)
+        else:
+            destination.write_bytes(chunk, offset=copied_bytes)
+        copied_bytes += len(chunk)
+        if len(chunk) < chunk_size_bytes:
+            break
+        assert len(chunk) == chunk_size_bytes

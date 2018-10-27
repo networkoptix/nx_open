@@ -4,7 +4,7 @@ from framework.os_access.windows_remoting import WinRM, wmi
 
 class WindowsService(Service):
     def __init__(self, winrm, name):  # type: (WinRM, str) -> ...
-        self._wmi_service = winrm.wmi_class(u'Win32_Service').reference({u'Name': name})
+        self._wmi_service = winrm.wmi.cls(u'Win32_Service').reference({u'Name': name})
         self._winrm = winrm
         self._name = name
 
@@ -12,12 +12,15 @@ class WindowsService(Service):
         return '<WindowsService {} at {}>'.format(self._name, self._winrm)
 
     def stop(self, timeout_sec=None):
-        self._wmi_service.invoke_method(u'StopService', {}, timeout_sec=timeout_sec)
+        try:
+            self._wmi_service.invoke_method(u'StopService', {}, timeout_sec=timeout_sec)
+        except wmi.WmiInvokeFailed.specific_cls(7):
+            pass
         service = self._wmi_service.get()
-        processes = list(self._winrm.wmi_class(u'Win32_Process').enumerate({}))
+        processes = list(self._winrm.wmi.cls(u'Win32_Process').enumerate({}))
         for process in processes:
-            if process['ExecutablePath'] == service['PathName']:
-                self._winrm.wmi_class(u'Win32_Process').reference({u'Handle': process['Handle']}).invoke_method(u'Terminate', {})
+            if process['CommandLine'] == service['PathName']:
+                process.invoke_method(u'Terminate', {})
 
     def start(self, timeout_sec=None):
         self._wmi_service.invoke_method(u'StartService', {}, timeout_sec=timeout_sec)

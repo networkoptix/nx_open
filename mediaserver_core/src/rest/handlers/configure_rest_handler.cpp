@@ -26,6 +26,7 @@
 #include "media_server/serverutil.h"
 #include "media_server/settings.h"
 #include <nx/vms/utils/system_merge_processor.h>
+#include <network/universal_tcp_listener.h>
 
 namespace
 {
@@ -115,12 +116,10 @@ int QnConfigureRestHandler::execute(
             return nx::network::http::StatusCode::ok;
         }
 
-        const auto user = owner->commonModule()->resourcePool()
-            ->getResourceById<QnUserResource>(owner->accessRights().userId);
-        if (!user->checkLocalUserPassword(data.currentPassword))
+        const auto authenticator = QnUniversalTcpListener::authenticator(owner->owner());
+        if (!authenticator->isPasswordCorrect(owner->accessRights(), data.currentPassword))
         {
-            result.setError(QnJsonRestResult::CantProcessRequest,
-                lit("currentPassword is invalid"));
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("Invalid current password"));
             return nx::network::http::StatusCode::ok;
         }
     }

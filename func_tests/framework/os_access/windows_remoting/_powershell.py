@@ -26,6 +26,10 @@ class PowershellError(Exception):
         self.message = message
 
 
+class PowerShellCommunicationError(Exception):
+    pass
+
+
 # TODO: Rename to power_shell.
 def run_powershell_script(shell, script, variables, logger=None):
     command = start_raw_powershell_script(
@@ -34,8 +38,16 @@ def run_powershell_script(shell, script, variables, logger=None):
         logger=logger,
         )
     with command.running() as run:
-        stdout, _ = run.communicate()
-    outcome, data = json.loads(stdout.decode())
+        stdout, stderr = run.communicate()
+    if not stdout:
+        raise PowerShellCommunicationError(
+            "Empty stdout; "
+            "PowerShell couldn't run (system degradation? no memory?); "
+            "stderr:\n" + stderr)
+    try:
+        outcome, data = json.loads(stdout.decode())
+    except (ValueError, UnicodeDecodeError) as e:
+        raise PowerShellCommunicationError("Cannot decode STDOUT: {}".format(e))
     if outcome == 'success':
         return data
     raise PowershellError(*data)
