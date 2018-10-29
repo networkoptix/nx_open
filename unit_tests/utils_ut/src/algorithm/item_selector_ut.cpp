@@ -67,6 +67,16 @@ protected:
             sinkItem(i, random::number<int>(0, 37));
     }
 
+    void sinkFirstItem()
+    {
+        sinkItem(0, 10);
+    }
+
+    Item frontItem()
+    {
+        return m_items.front();
+    }
+
     void assertTheFirstItemIsSelected()
     {
         ASSERT_EQ(0, m_selector.topItem());
@@ -80,6 +90,11 @@ protected:
     void assertTopItemIs(int key)
     {
         ASSERT_EQ(key, m_selector.topItem());
+    }
+
+    void assertTopItemIsNot(int key)
+    {
+        ASSERT_NE(key, m_selector.topItem());
     }
 
     void waitForTopItemToBe(int key)
@@ -143,6 +158,16 @@ TEST_F(ItemSelector, items_popup_with_different_speed)
     assertTopItemIs(heaviestItem().key);
 
     waitForTopItemToBe(lightestItem().key);
+}
+
+TEST_F(ItemSelector, sunk_item_reaches_surface_eventually)
+{
+    givenGroupOfItems();
+
+    sinkFirstItem();
+    assertTopItemIsNot(frontItem().key);
+
+    waitForTopItemToBe(frontItem().key);
 }
 
 } // namespace nx::utils::algorithm::test
