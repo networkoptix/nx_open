@@ -936,9 +936,9 @@ soap_wsa_reply(struct soap *soap, const char *id, const char *action)
       newheader->chan__ChannelInstance = (struct chan__ChannelInstanceType*)soap_malloc(soap, sizeof(struct chan__ChannelInstanceType));
       if (newheader->chan__ChannelInstance)
       {
-	soap_default_chan__ChannelInstanceType(soap, newheader->chan__ChannelInstance);
-	newheader->chan__ChannelInstance->__item = *(oldheader->SOAP_WSA(ReplyTo)->ReferenceParameters->chan__ChannelInstance);
-	newheader->chan__ChannelInstance->wsa5__IsReferenceParameter = _wsa5__IsReferenceParameter__true;
+    soap_default_chan__ChannelInstanceType(soap, newheader->chan__ChannelInstance);
+    newheader->chan__ChannelInstance->__item = *(oldheader->SOAP_WSA(ReplyTo)->ReferenceParameters->chan__ChannelInstance);
+    newheader->chan__ChannelInstance->wsa5__IsReferenceParameter = _wsa5__IsReferenceParameter__true;
       }
     }
     else
@@ -1050,7 +1050,7 @@ soap_wsa_fault_subcode_action(struct soap *soap, int flag, const char *faultsubc
     {
       oldheader->SOAP_WSA(FaultTo) = (SOAP_WSA_(,FaultTo)*)soap_malloc(soap, sizeof(SOAP_WSA_(,FaultTo)));
       if (oldheader->SOAP_WSA(FaultTo))
-	SOAP_WSA_(soap_default,EndpointReferenceType)(soap, soap->header->SOAP_WSA(FaultTo));
+    SOAP_WSA_(soap_default,EndpointReferenceType)(soap, soap->header->SOAP_WSA(FaultTo));
     }
     if (oldheader->SOAP_WSA(FaultTo))
       oldheader->SOAP_WSA(FaultTo)->Address = oldheader->SOAP_WSA(ReplyTo)->Address;
@@ -1080,20 +1080,20 @@ soap_wsa_fault_subcode_action(struct soap *soap, int flag, const char *faultsubc
       /* (re)connect to FaultTo endpoint if From != FaultTo */
       if (!oldheader->SOAP_WSA(From) || !oldheader->SOAP_WSA(From)->Address || strcmp(oldheader->SOAP_WSA(From)->Address, oldheader->SOAP_WSA(FaultTo)->Address))
       {
-	struct soap_wsa_data *data = (struct soap_wsa_data*)soap_lookup_plugin(soap, soap_wsa_id);
-	if (!data)
-	  return soap->error = SOAP_PLUGIN_ERROR;
-	soap->keep_alive = 0;
-	soap_send_empty_response(soap, SOAP_OK);  /* HTTP ACCEPTED */
-	if (soap_connect(soap, newheader->SOAP_WSA(To), newheader->SOAP_WSA(Action)))
-	  return soap->error = SOAP_STOP; /* nowhere to go */
-	soap_set_endpoint(soap, newheader->SOAP_WSA(To));
-	if (action)
-	  soap->action = (char*)action;
-	else
-	  soap->action = newheader->SOAP_WSA(Action);
-	data->fresponse = soap->fresponse;
-	soap->fresponse = soap_wsa_response;      /* response will be a POST */
+    struct soap_wsa_data *data = (struct soap_wsa_data*)soap_lookup_plugin(soap, soap_wsa_id);
+    if (!data)
+      return soap->error = SOAP_PLUGIN_ERROR;
+    soap->keep_alive = 0;
+    soap_send_empty_response(soap, SOAP_OK);  /* HTTP ACCEPTED */
+    if (soap_connect(soap, newheader->SOAP_WSA(To), newheader->SOAP_WSA(Action)))
+      return soap->error = SOAP_STOP; /* nowhere to go */
+    soap_set_endpoint(soap, newheader->SOAP_WSA(To));
+    if (action)
+      soap->action = (char*)action;
+    else
+      soap->action = newheader->SOAP_WSA(Action);
+    data->fresponse = soap->fresponse;
+    soap->fresponse = soap_wsa_response;      /* response will be a POST */
       }
     }
     else if (oldheader && oldheader->SOAP_WSA(From))

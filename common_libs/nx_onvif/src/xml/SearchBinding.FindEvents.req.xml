@@ -71,9 +71,9 @@
    <!-- _onvifSearch__FindEvents *onvifSearch__FindEvents -->
    <onvifSearch:FindEvents>
     <!-- time_t StartPoint -->
-    <onvifSearch:StartPoint>2018-10-15T11:33:35Z</onvifSearch:StartPoint>
+    <onvifSearch:StartPoint>2018-10-29T13:18:55Z</onvifSearch:StartPoint>
     <!-- time_t *EndPoint -->
-    <onvifSearch:EndPoint>2018-10-15T11:33:35Z</onvifSearch:EndPoint>
+    <onvifSearch:EndPoint>2018-10-29T13:18:55Z</onvifSearch:EndPoint>
     <!-- onvifXsd__SearchScope *Scope -->
     <onvifSearch:Scope>
      <!-- std::vector<onvifXsd__SourceReference *> IncludedSources -->

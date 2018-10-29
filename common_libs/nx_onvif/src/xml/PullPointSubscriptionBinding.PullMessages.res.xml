@@ -70,9 +70,9 @@
   <!-- __onvifEvents_pps__PullMessages(..., _onvifEvents__PullMessagesResponse &onvifEvents__PullMessagesResponse) -->
   <onvifEvents:PullMessagesResponse>
    <!-- time_t CurrentTime -->
-   <onvifEvents:CurrentTime>2018-10-15T11:33:31Z</onvifEvents:CurrentTime>
+   <onvifEvents:CurrentTime>2018-10-29T13:18:51Z</onvifEvents:CurrentTime>
    <!-- time_t TerminationTime -->
-   <onvifEvents:TerminationTime>2018-10-15T11:33:31Z</onvifEvents:TerminationTime>
+   <onvifEvents:TerminationTime>2018-10-29T13:18:51Z</onvifEvents:TerminationTime>
    <!-- std::vector<oasisWsnB2__NotificationMessageHolderType *> oasisWsnB2__NotificationMessage -->
    <!-- a repetition of 0 or more of the following -->
    <oasisWsnB2:NotificationMessage>

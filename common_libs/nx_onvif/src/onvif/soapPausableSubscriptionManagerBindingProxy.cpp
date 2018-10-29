@@ -14,59 +14,68 @@ A commercial use license is available from Genivia Inc., contact@genivia.com
 #include "soapPausableSubscriptionManagerBindingProxy.h"
 
 PausableSubscriptionManagerBindingProxy::PausableSubscriptionManagerBindingProxy()
-{	this->soap = soap_new();
-	this->soap_own = true;
-	PausableSubscriptionManagerBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    PausableSubscriptionManagerBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
 }
 
 PausableSubscriptionManagerBindingProxy::PausableSubscriptionManagerBindingProxy(const PausableSubscriptionManagerBindingProxy& rhs)
-{	this->soap = rhs.soap;
-	this->soap_own = false;
-	this->soap_endpoint = rhs.soap_endpoint;
+{
+    this->soap = rhs.soap;
+    this->soap_own = false;
+    this->soap_endpoint = rhs.soap_endpoint;
 }
 
 PausableSubscriptionManagerBindingProxy::PausableSubscriptionManagerBindingProxy(struct soap *_soap)
-{	this->soap = _soap;
-	this->soap_own = false;
-	PausableSubscriptionManagerBindingProxy_init(_soap->imode, _soap->omode);
+{
+    this->soap = _soap;
+    this->soap_own = false;
+    PausableSubscriptionManagerBindingProxy_init(_soap->imode, _soap->omode);
 }
 
 PausableSubscriptionManagerBindingProxy::PausableSubscriptionManagerBindingProxy(const char *endpoint)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	PausableSubscriptionManagerBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
-	soap_endpoint = endpoint;
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    PausableSubscriptionManagerBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+    soap_endpoint = endpoint;
 }
 
 PausableSubscriptionManagerBindingProxy::PausableSubscriptionManagerBindingProxy(soap_mode iomode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	PausableSubscriptionManagerBindingProxy_init(iomode, iomode);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    PausableSubscriptionManagerBindingProxy_init(iomode, iomode);
 }
 
 PausableSubscriptionManagerBindingProxy::PausableSubscriptionManagerBindingProxy(const char *endpoint, soap_mode iomode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	PausableSubscriptionManagerBindingProxy_init(iomode, iomode);
-	soap_endpoint = endpoint;
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    PausableSubscriptionManagerBindingProxy_init(iomode, iomode);
+    soap_endpoint = endpoint;
 }
 
 PausableSubscriptionManagerBindingProxy::PausableSubscriptionManagerBindingProxy(soap_mode imode, soap_mode omode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	PausableSubscriptionManagerBindingProxy_init(imode, omode);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    PausableSubscriptionManagerBindingProxy_init(imode, omode);
 }
 
 PausableSubscriptionManagerBindingProxy::~PausableSubscriptionManagerBindingProxy()
-{	if (this->soap_own)
-		soap_free(this->soap);
+{
+    if (this->soap_own)
+        soap_free(this->soap);
 }
 
 void PausableSubscriptionManagerBindingProxy::PausableSubscriptionManagerBindingProxy_init(soap_mode imode, soap_mode omode)
-{	soap_imode(this->soap, imode);
-	soap_omode(this->soap, omode);
-	soap_endpoint = NULL;
-	static const struct Namespace namespaces[] = {
+{
+    soap_imode(this->soap, imode);
+    soap_omode(this->soap, omode);
+    soap_endpoint = NULL;
+    static const struct Namespace namespaces[] = {
         {"SOAP-ENV", "http://www.w3.org/2003/05/soap-envelope", "http://schemas.xmlsoap.org/soap/envelope/", NULL},
         {"SOAP-ENC", "http://www.w3.org/2003/05/soap-encoding", "http://schemas.xmlsoap.org/soap/encoding/", NULL},
         {"xsi", "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL},
@@ -132,305 +141,326 @@ void PausableSubscriptionManagerBindingProxy::PausableSubscriptionManagerBinding
         {"onvifThermal", "http://www.onvif.org/ver10/thermal/wsdl", NULL, NULL},
         {NULL, NULL, NULL, NULL}
     };
-	soap_set_namespaces(this->soap, namespaces);
+    soap_set_namespaces(this->soap, namespaces);
 }
 
 PausableSubscriptionManagerBindingProxy *PausableSubscriptionManagerBindingProxy::copy()
-{	PausableSubscriptionManagerBindingProxy *dup = SOAP_NEW_UNMANAGED(PausableSubscriptionManagerBindingProxy);
-	if (dup)
-	{	soap_done(dup->soap);
-		soap_copy_context(dup->soap, this->soap);
-	}
-	return dup;
+{
+    PausableSubscriptionManagerBindingProxy *dup = SOAP_NEW_UNMANAGED(PausableSubscriptionManagerBindingProxy);
+    if (dup)
+    {
+        soap_done(dup->soap);
+        soap_copy_context(dup->soap, this->soap);
+    }
+    return dup;
 }
 
 PausableSubscriptionManagerBindingProxy& PausableSubscriptionManagerBindingProxy::operator=(const PausableSubscriptionManagerBindingProxy& rhs)
-{	if (this->soap != rhs.soap)
-	{	if (this->soap_own)
-			soap_free(this->soap);
-		this->soap = rhs.soap;
-		this->soap_own = false;
-		this->soap_endpoint = rhs.soap_endpoint;
-	}
-	return *this;
+{
+    if (this->soap != rhs.soap)
+    {
+        if (this->soap_own)
+            soap_free(this->soap);
+        this->soap = rhs.soap;
+        this->soap_own = false;
+        this->soap_endpoint = rhs.soap_endpoint;
+    }
+    return *this;
 }
 
 void PausableSubscriptionManagerBindingProxy::destroy()
-{	soap_destroy(this->soap);
-	soap_end(this->soap);
+{
+    soap_destroy(this->soap);
+    soap_end(this->soap);
 }
 
 void PausableSubscriptionManagerBindingProxy::reset()
-{	this->destroy();
-	soap_done(this->soap);
-	soap_initialize(this->soap);
-	PausableSubscriptionManagerBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+{
+    this->destroy();
+    soap_done(this->soap);
+    soap_initialize(this->soap);
+    PausableSubscriptionManagerBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
 }
 
 void PausableSubscriptionManagerBindingProxy::soap_noheader()
-{	this->soap->header = NULL;
+{
+    this->soap->header = NULL;
 }
 
-void PausableSubscriptionManagerBindingProxy::soap_header(char *wsa5__MessageID, struct wsa5__RelatesToType *wsa5__RelatesTo, struct wsa5__EndpointReferenceType *wsa5__From, struct wsa5__EndpointReferenceType *wsa5__ReplyTo, struct wsa5__EndpointReferenceType *wsa5__FaultTo, char *wsa5__To, char *wsa5__Action, struct chan__ChannelInstanceType *chan__ChannelInstance, struct wsdd__AppSequenceType *wsdd__AppSequence, struct _wsse__Security *wsse__Security, char *subscriptionID)
-{	::soap_header(this->soap);
-	this->soap->header->wsa5__MessageID = wsa5__MessageID;
-	this->soap->header->wsa5__RelatesTo = wsa5__RelatesTo;
-	this->soap->header->wsa5__From = wsa5__From;
-	this->soap->header->wsa5__ReplyTo = wsa5__ReplyTo;
-	this->soap->header->wsa5__FaultTo = wsa5__FaultTo;
-	this->soap->header->wsa5__To = wsa5__To;
-	this->soap->header->wsa5__Action = wsa5__Action;
-	this->soap->header->chan__ChannelInstance = chan__ChannelInstance;
-	this->soap->header->wsdd__AppSequence = wsdd__AppSequence;
-	this->soap->header->wsse__Security = wsse__Security;
-	this->soap->header->subscriptionID = subscriptionID;
+void PausableSubscriptionManagerBindingProxy::soap_header(char *wsa5__MessageID, struct wsa5__RelatesToType *wsa5__RelatesTo, struct wsa5__EndpointReferenceType *wsa5__From, struct wsa5__EndpointReferenceType *wsa5__ReplyTo, struct wsa5__EndpointReferenceType *wsa5__FaultTo, char *wsa5__To, char *wsa5__Action, struct chan__ChannelInstanceType *chan__ChannelInstance, struct wsdd__AppSequenceType *wsdd__AppSequence, struct _wsse__Security *wsse__Security, char *SubscriptionId)
+{
+    ::soap_header(this->soap);
+    this->soap->header->wsa5__MessageID = wsa5__MessageID;
+    this->soap->header->wsa5__RelatesTo = wsa5__RelatesTo;
+    this->soap->header->wsa5__From = wsa5__From;
+    this->soap->header->wsa5__ReplyTo = wsa5__ReplyTo;
+    this->soap->header->wsa5__FaultTo = wsa5__FaultTo;
+    this->soap->header->wsa5__To = wsa5__To;
+    this->soap->header->wsa5__Action = wsa5__Action;
+    this->soap->header->chan__ChannelInstance = chan__ChannelInstance;
+    this->soap->header->wsdd__AppSequence = wsdd__AppSequence;
+    this->soap->header->wsse__Security = wsse__Security;
+    this->soap->header->SubscriptionId = SubscriptionId;
 }
 
 ::SOAP_ENV__Header *PausableSubscriptionManagerBindingProxy::soap_header()
-{	return this->soap->header;
+{
+    return this->soap->header;
 }
 
 ::SOAP_ENV__Fault *PausableSubscriptionManagerBindingProxy::soap_fault()
-{	return this->soap->fault;
+{
+    return this->soap->fault;
 }
 
 const char *PausableSubscriptionManagerBindingProxy::soap_fault_string()
-{	return *soap_faultstring(this->soap);
+{
+    return *soap_faultstring(this->soap);
 }
 
 const char *PausableSubscriptionManagerBindingProxy::soap_fault_detail()
-{	return *soap_faultdetail(this->soap);
+{
+    return *soap_faultdetail(this->soap);
 }
 
 int PausableSubscriptionManagerBindingProxy::soap_close_socket()
-{	return soap_closesock(this->soap);
+{
+    return soap_closesock(this->soap);
 }
 
 int PausableSubscriptionManagerBindingProxy::soap_force_close_socket()
-{	return soap_force_closesock(this->soap);
+{
+    return soap_force_closesock(this->soap);
 }
 
 void PausableSubscriptionManagerBindingProxy::soap_print_fault(FILE *fd)
-{	::soap_print_fault(this->soap, fd);
+{
+    ::soap_print_fault(this->soap, fd);
 }
 
 #ifndef WITH_LEAN
 #ifndef WITH_COMPAT
 void PausableSubscriptionManagerBindingProxy::soap_stream_fault(std::ostream& os)
-{	::soap_stream_fault(this->soap, os);
+{
+    ::soap_stream_fault(this->soap, os);
 }
 #endif
 
 char *PausableSubscriptionManagerBindingProxy::soap_sprint_fault(char *buf, size_t len)
-{	return ::soap_sprint_fault(this->soap, buf, len);
+{
+    return ::soap_sprint_fault(this->soap, buf, len);
 }
 #endif
 
 int PausableSubscriptionManagerBindingProxy::Renew(const char *endpoint, const char *soap_action, _oasisWsnB2__Renew *oasisWsnB2__Renew, _oasisWsnB2__RenewResponse &oasisWsnB2__RenewResponse)
 {
-	struct __onvifEvents_psmb__Renew soap_tmp___onvifEvents_psmb__Renew;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://docs.oasis-open.org/wsn/bw-2/PausableSubscriptionManager/RenewRequest";
-	soap_tmp___onvifEvents_psmb__Renew.oasisWsnB2__Renew = oasisWsnB2__Renew;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifEvents_psmb__Renew(soap, &soap_tmp___onvifEvents_psmb__Renew);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifEvents_psmb__Renew(soap, &soap_tmp___onvifEvents_psmb__Renew, "-onvifEvents-psmb:Renew", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifEvents_psmb__Renew(soap, &soap_tmp___onvifEvents_psmb__Renew, "-onvifEvents-psmb:Renew", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_oasisWsnB2__RenewResponse*>(&oasisWsnB2__RenewResponse)) // NULL ref?
-		return soap_closesock(soap);
-	oasisWsnB2__RenewResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	oasisWsnB2__RenewResponse.soap_get(soap, "oasisWsnB2:RenewResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifEvents_psmb__Renew soap_tmp___onvifEvents_psmb__Renew;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://docs.oasis-open.org/wsn/bw-2/PausableSubscriptionManager/RenewRequest";
+    soap_tmp___onvifEvents_psmb__Renew.oasisWsnB2__Renew = oasisWsnB2__Renew;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifEvents_psmb__Renew(soap, &soap_tmp___onvifEvents_psmb__Renew);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifEvents_psmb__Renew(soap, &soap_tmp___onvifEvents_psmb__Renew, "-onvifEvents-psmb:Renew", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifEvents_psmb__Renew(soap, &soap_tmp___onvifEvents_psmb__Renew, "-onvifEvents-psmb:Renew", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_oasisWsnB2__RenewResponse*>(&oasisWsnB2__RenewResponse)) // NULL ref?
+        return soap_closesock(soap);
+    oasisWsnB2__RenewResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    oasisWsnB2__RenewResponse.soap_get(soap, "oasisWsnB2:RenewResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int PausableSubscriptionManagerBindingProxy::Unsubscribe(const char *endpoint, const char *soap_action, _oasisWsnB2__Unsubscribe *oasisWsnB2__Unsubscribe, _oasisWsnB2__UnsubscribeResponse &oasisWsnB2__UnsubscribeResponse)
 {
-	struct __onvifEvents_psmb__Unsubscribe soap_tmp___onvifEvents_psmb__Unsubscribe;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://docs.oasis-open.org/wsn/bw-2/PausableSubscriptionManager/UnsubscribeRequest";
-	soap_tmp___onvifEvents_psmb__Unsubscribe.oasisWsnB2__Unsubscribe = oasisWsnB2__Unsubscribe;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifEvents_psmb__Unsubscribe(soap, &soap_tmp___onvifEvents_psmb__Unsubscribe);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifEvents_psmb__Unsubscribe(soap, &soap_tmp___onvifEvents_psmb__Unsubscribe, "-onvifEvents-psmb:Unsubscribe", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifEvents_psmb__Unsubscribe(soap, &soap_tmp___onvifEvents_psmb__Unsubscribe, "-onvifEvents-psmb:Unsubscribe", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_oasisWsnB2__UnsubscribeResponse*>(&oasisWsnB2__UnsubscribeResponse)) // NULL ref?
-		return soap_closesock(soap);
-	oasisWsnB2__UnsubscribeResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	oasisWsnB2__UnsubscribeResponse.soap_get(soap, "oasisWsnB2:UnsubscribeResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifEvents_psmb__Unsubscribe soap_tmp___onvifEvents_psmb__Unsubscribe;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://docs.oasis-open.org/wsn/bw-2/PausableSubscriptionManager/UnsubscribeRequest";
+    soap_tmp___onvifEvents_psmb__Unsubscribe.oasisWsnB2__Unsubscribe = oasisWsnB2__Unsubscribe;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifEvents_psmb__Unsubscribe(soap, &soap_tmp___onvifEvents_psmb__Unsubscribe);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifEvents_psmb__Unsubscribe(soap, &soap_tmp___onvifEvents_psmb__Unsubscribe, "-onvifEvents-psmb:Unsubscribe", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifEvents_psmb__Unsubscribe(soap, &soap_tmp___onvifEvents_psmb__Unsubscribe, "-onvifEvents-psmb:Unsubscribe", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_oasisWsnB2__UnsubscribeResponse*>(&oasisWsnB2__UnsubscribeResponse)) // NULL ref?
+        return soap_closesock(soap);
+    oasisWsnB2__UnsubscribeResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    oasisWsnB2__UnsubscribeResponse.soap_get(soap, "oasisWsnB2:UnsubscribeResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int PausableSubscriptionManagerBindingProxy::PauseSubscription(const char *endpoint, const char *soap_action, _oasisWsnB2__PauseSubscription *oasisWsnB2__PauseSubscription, _oasisWsnB2__PauseSubscriptionResponse &oasisWsnB2__PauseSubscriptionResponse)
 {
-	struct __onvifEvents_psmb__PauseSubscription soap_tmp___onvifEvents_psmb__PauseSubscription;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://docs.oasis-open.org/wsn/bw-2/PausableSubscriptionManager/PauseSubscriptionRequest";
-	soap_tmp___onvifEvents_psmb__PauseSubscription.oasisWsnB2__PauseSubscription = oasisWsnB2__PauseSubscription;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifEvents_psmb__PauseSubscription(soap, &soap_tmp___onvifEvents_psmb__PauseSubscription);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifEvents_psmb__PauseSubscription(soap, &soap_tmp___onvifEvents_psmb__PauseSubscription, "-onvifEvents-psmb:PauseSubscription", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifEvents_psmb__PauseSubscription(soap, &soap_tmp___onvifEvents_psmb__PauseSubscription, "-onvifEvents-psmb:PauseSubscription", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_oasisWsnB2__PauseSubscriptionResponse*>(&oasisWsnB2__PauseSubscriptionResponse)) // NULL ref?
-		return soap_closesock(soap);
-	oasisWsnB2__PauseSubscriptionResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	oasisWsnB2__PauseSubscriptionResponse.soap_get(soap, "oasisWsnB2:PauseSubscriptionResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifEvents_psmb__PauseSubscription soap_tmp___onvifEvents_psmb__PauseSubscription;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://docs.oasis-open.org/wsn/bw-2/PausableSubscriptionManager/PauseSubscriptionRequest";
+    soap_tmp___onvifEvents_psmb__PauseSubscription.oasisWsnB2__PauseSubscription = oasisWsnB2__PauseSubscription;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifEvents_psmb__PauseSubscription(soap, &soap_tmp___onvifEvents_psmb__PauseSubscription);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifEvents_psmb__PauseSubscription(soap, &soap_tmp___onvifEvents_psmb__PauseSubscription, "-onvifEvents-psmb:PauseSubscription", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifEvents_psmb__PauseSubscription(soap, &soap_tmp___onvifEvents_psmb__PauseSubscription, "-onvifEvents-psmb:PauseSubscription", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_oasisWsnB2__PauseSubscriptionResponse*>(&oasisWsnB2__PauseSubscriptionResponse)) // NULL ref?
+        return soap_closesock(soap);
+    oasisWsnB2__PauseSubscriptionResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    oasisWsnB2__PauseSubscriptionResponse.soap_get(soap, "oasisWsnB2:PauseSubscriptionResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int PausableSubscriptionManagerBindingProxy::ResumeSubscription(const char *endpoint, const char *soap_action, _oasisWsnB2__ResumeSubscription *oasisWsnB2__ResumeSubscription, _oasisWsnB2__ResumeSubscriptionResponse &oasisWsnB2__ResumeSubscriptionResponse)
 {
-	struct __onvifEvents_psmb__ResumeSubscription soap_tmp___onvifEvents_psmb__ResumeSubscription;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://docs.oasis-open.org/wsn/bw-2/PausableSubscriptionManager/ResumeSubscriptionRequest";
-	soap_tmp___onvifEvents_psmb__ResumeSubscription.oasisWsnB2__ResumeSubscription = oasisWsnB2__ResumeSubscription;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifEvents_psmb__ResumeSubscription(soap, &soap_tmp___onvifEvents_psmb__ResumeSubscription);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifEvents_psmb__ResumeSubscription(soap, &soap_tmp___onvifEvents_psmb__ResumeSubscription, "-onvifEvents-psmb:ResumeSubscription", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifEvents_psmb__ResumeSubscription(soap, &soap_tmp___onvifEvents_psmb__ResumeSubscription, "-onvifEvents-psmb:ResumeSubscription", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_oasisWsnB2__ResumeSubscriptionResponse*>(&oasisWsnB2__ResumeSubscriptionResponse)) // NULL ref?
-		return soap_closesock(soap);
-	oasisWsnB2__ResumeSubscriptionResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	oasisWsnB2__ResumeSubscriptionResponse.soap_get(soap, "oasisWsnB2:ResumeSubscriptionResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifEvents_psmb__ResumeSubscription soap_tmp___onvifEvents_psmb__ResumeSubscription;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://docs.oasis-open.org/wsn/bw-2/PausableSubscriptionManager/ResumeSubscriptionRequest";
+    soap_tmp___onvifEvents_psmb__ResumeSubscription.oasisWsnB2__ResumeSubscription = oasisWsnB2__ResumeSubscription;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifEvents_psmb__ResumeSubscription(soap, &soap_tmp___onvifEvents_psmb__ResumeSubscription);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifEvents_psmb__ResumeSubscription(soap, &soap_tmp___onvifEvents_psmb__ResumeSubscription, "-onvifEvents-psmb:ResumeSubscription", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifEvents_psmb__ResumeSubscription(soap, &soap_tmp___onvifEvents_psmb__ResumeSubscription, "-onvifEvents-psmb:ResumeSubscription", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_oasisWsnB2__ResumeSubscriptionResponse*>(&oasisWsnB2__ResumeSubscriptionResponse)) // NULL ref?
+        return soap_closesock(soap);
+    oasisWsnB2__ResumeSubscriptionResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    oasisWsnB2__ResumeSubscriptionResponse.soap_get(soap, "oasisWsnB2:ResumeSubscriptionResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 /* End of client proxy code */

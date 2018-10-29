@@ -74,7 +74,7 @@
     <!-- a repetition of 0 or more of the following -->
     <onvifSearch:RecordingTokens></onvifSearch:RecordingTokens>
     <!-- time_t Time -->
-    <onvifSearch:Time>2018-10-15T11:33:35Z</onvifSearch:Time>
+    <onvifSearch:Time>2018-10-29T13:18:55Z</onvifSearch:Time>
    </onvifSearch:GetMediaAttributes>
  </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
