@@ -18,7 +18,7 @@
                     loc  : 'ViewPageCtrl - offline'
                 });
     
-                // AJS $location picks parent.location and not hiding header
+                // Check if page is displayed inside an iframe
                 $scope.isInIframe = ($window.location != $window.parent.location) ? true : false;
                 
                 if ($scope.isInIframe) {
