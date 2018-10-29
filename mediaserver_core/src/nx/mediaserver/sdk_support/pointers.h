@@ -37,9 +37,9 @@ public:
     }
 
     bool operator==(const UniquePtr& other) const { return m_ptr == other.m_ptr; }
-    bool operator==(nullptr_t) const { return m_ptr == nullptr; }
+    bool operator==(std::nullptr_t) const { return m_ptr == nullptr; }
     bool operator!=(const UniquePtr& other) const { return m_ptr != other.m_ptr; }
-    bool operator!=(const nullptr_t) const { return m_ptr != nullptr; }
+    bool operator!=(const std::nullptr_t) const { return m_ptr != nullptr; }
 
 
 private:
@@ -78,9 +78,9 @@ public:
     }
 
     bool operator==(const SharedPtr& other) const { return m_ptr == other.m_ptr; }
-    bool operator==(nullptr_t) const { return m_ptr == nullptr; }
+    bool operator==(std::nullptr_t) const { return m_ptr == nullptr; }
     bool operator!=(const SharedPtr& other) const { return m_ptr != other.m_ptr; }
-    bool operator!=(const nullptr_t) const { return m_ptr != nullptr; }
+    bool operator!=(const std::nullptr_t) const { return m_ptr != nullptr; }
 
 private:
     std::shared_ptr<RefCountable> m_ptr;

@@ -16,6 +16,8 @@ public:
     using PixelFormat = nx::sdk::analytics::UncompressedVideoFrame::PixelFormat;
     using NeededUncompressedPixelFormats = std::set<PixelFormat>;
 
+    virtual ~AbstractVideoDataReceptor() = default;
+
     virtual bool needsCompressedFrames() const = 0;
     virtual NeededUncompressedPixelFormats neededUncompressedPixelFormats() const = 0;
 
