@@ -331,6 +331,14 @@ def test_symlink_in_file_parent(existing_remote_dir):
     pytest.raises(BadParent, link.symlink_to, existing_remote_dir / 'target_non_existent')
 
 
+@pytest.mark.parametrize('path_cls', ['local_path_cls', 'ssh_path_cls', 'sftp_path_cls'], indirect=True)
+def test_rmtree_with_symlinks(existing_remote_dir):
+    path = existing_remote_dir / 'dir_with_symlink'
+    path.mkdir()
+    path.joinpath('symlink').symlink_to(existing_remote_dir / 'target_non_existent')
+    path.rmtree()
+
+
 @pytest.mark.parametrize('iterations', [2, 10], ids='{}iterations'.format)
 @pytest.mark.parametrize('depth', [2, 10], ids='depth{}'.format)
 def test_many_mkdir_rmtree(remote_test_dir, iterations, depth):

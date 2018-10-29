@@ -101,10 +101,10 @@ class SftpPath(BasePosixPath):
                 return
             raise exceptions.DoesNotExist()
         for entry in entries:
-            if stat.S_ISREG(entry.st_mode):
-                self.joinpath(entry.filename).unlink()
             if stat.S_ISDIR(entry.st_mode):
                 self.joinpath(entry.filename).rmtree(ignore_errors=False)
+            else:
+                self.joinpath(entry.filename).unlink()
         self.rmdir()
 
     @_reraise_by_errno({
