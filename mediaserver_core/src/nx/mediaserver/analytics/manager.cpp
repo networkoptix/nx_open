@@ -26,6 +26,7 @@
 #include <nx/mediaserver_plugins/utils/uuid.h>
 #include <nx/mediaserver/analytics/metadata_handler.h>
 #include <nx/mediaserver/analytics/event_rule_watcher.h>
+#include <nx/mediaserver/analytics/debug_helpers.h>
 #include <nx/mediaserver/resource/analytics_engine_resource.h>
 #include <nx/mediaserver/resource/analytics_plugin_resource.h>
 #include <nx/mediaserver/sdk_support/utils.h>
@@ -49,9 +50,7 @@
 #include "data_packet_adapter.h"
 #include "frame_converter.h"
 
-namespace nx {
-namespace mediaserver {
-namespace analytics {
+namespace nx::mediaserver::analytics {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
@@ -370,8 +369,21 @@ void Manager::updateEngineSettings(const resource::AnalyticsEngineResourcePtr& e
     NX_DEBUG(this, "Updating engine %1 (%2) with settings",
         engine->getName(), engine->getId());
 
-    auto sdkSettings = sdk_support::toSdkSettings(engine->settingsValues());
-    sdkEngine->setSettings(sdkSettings.get());
+    if (pluginsIni().analyticsEngineSettingsPath[0] != 0)
+    {
+        NX_WARNING(
+            this,
+            "Passing engine settings from file, engine %1 (%2)",
+            engine->getName(),
+            engine->getId());
+
+        debug_helpers::setEngineSettings(sdkEngine);
+    }
+    else
+    {
+        auto sdkSettings = sdk_support::toSdkSettings(engine->settingsValues());
+        sdkEngine->setSettings(sdkSettings.get());
+    }
 }
 
 void Manager::registerMetadataSink(
@@ -498,75 +510,4 @@ QWeakPointer<ProxyVideoDataReceptor> Manager::mediaSource(const QnUuid& deviceId
     return itr->second;
 }
 
-#if 0
-
-/** @return Empty settings if the file does not exist, or on error. */
-std::unique_ptr<const nx::plugins::SettingsHolder> Manager::loadSettingsFromFile(
-    const QString& fileDescription, const QString& filename)
-{
-    using nx::utils::log::Level;
-    auto log = //< Can be used to return empty settings: return log(...)
-        [&](Level level, const QString& message)
-    {
-        NX_UTILS_LOG(level, this) << lm("Metadata %1 settings: %2: [%3]")
-            .args(fileDescription, message, filename);
-        return std::make_unique<const nx::plugins::SettingsHolder>();
-    };
-
-    if (!QFileInfo::exists(filename))
-        return log(Level::info, lit("File does not exist"));
-
-    log(Level::info, lit("Loading from file"));
-
-    QFile f(filename);
-    if (!f.open(QFile::ReadOnly))
-        return log(Level::error, lit("Unable to open file"));
-
-    const QString& settingsJson = f.readAll();
-    if (settingsJson.isEmpty())
-        return log(Level::error, lit("Unable to read from file"));
-
-    auto settings = std::make_unique<const nx::plugins::SettingsHolder>(settingsJson);
-    if (!settings->isValid())
-        return log(Level::error, lit("Invalid JSON in file"));
-
-    return settings;
-}
-
-/** If path is empty, the path to ini_config .ini files is used. */
-static QString settingsFilename(
-    const char* const path, const QString& pluginLibName, const QString& extraSuffix = "")
-{
-    QString dir = QDir::cleanPath( //< Normalize to use forward slashes, as required by QFile.
-        QString::fromUtf8(path[0] ? path : nx::kit::IniConfig::iniFilesDir()));
-    if (!dir.isEmpty() && dir.at(dir.size() - 1) != '/')
-        dir.append('/');
-    return dir + pluginLibName + extraSuffix + lit(".json");
-}
-
-void Manager::setDeviceAgentSettings(
-    DeviceAgent* deviceAgent,
-    const QnVirtualCameraResourcePtr& camera)
-{
-    // TODO: Stub. Implement storing the settings in the database.
-    const auto settings = loadSettingsFromFile(lit("DeviceAgent"), settingsFilename(
-        pluginsIni().analyticsDeviceAgentSettingsPath,
-        deviceAgent->engine()->plugin()->name(),
-        lit("_device_agent_for_") + camera->getPhysicalId()));
-    deviceAgent->setSettings(settings->array(), settings->size());
-}
-
-void Manager::setEngineSettings(Engine* engine)
-{
-    // TODO: Stub. Implement storing the settings in the database.
-    const auto settings = loadSettingsFromFile(lit("Engine"), settingsFilename(
-        pluginsIni().analyticsEngineSettingsPath, engine->plugin()->name()));
-    engine->setSettings(settings->array(), settings->size());
-}
-
-#endif
-
-} // namespace analytics
-} // namespace mediaserver
-} // namespace nx
-
+} // namespace nx::mediaserver::analytics

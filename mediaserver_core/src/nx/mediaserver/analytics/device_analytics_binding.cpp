@@ -17,6 +17,7 @@
 #include <nx/sdk/analytics/consuming_device_agent.h>
 
 #include <nx/mediaserver/analytics/data_packet_adapter.h>
+#include <nx/mediaserver/analytics/debug_helpers.h>
 #include <nx/mediaserver/sdk_support/utils.h>
 #include <nx/mediaserver/sdk_support/traits.h>
 #include <nx/mediaserver/resource/analytics_engine_resource.h>
@@ -119,9 +120,31 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
     }
 
     if (!m_sdkDeviceAgent)
+    {
+        NX_ERROR(
+            this,
+            "No device agent exitsts for device %1 (%2) and engine %3 (%4)",
+            m_device->getUserDefinedName(),
+            m_device->getId(),
+            m_engine->getName(),
+            m_engine->getId());
         return false;
+    }
 
-    if (m_currentSettings != settings)
+    if (pluginsIni().analyticsDeviceAgentSettingsPath[0] != 0)
+    {
+        NX_WARNING(
+            this,
+            "Passing settings from file to device agent. "
+            "Device: %1 (%2), engine: %3 (%4)",
+            m_device->getUserDefinedName(),
+            m_device->getId(),
+            m_engine->getName(),
+            m_engine->getId());
+
+        debug_helpers::setDeviceAgentSettings(m_sdkDeviceAgent, m_device);
+    }
+    else if (m_currentSettings != settings)
     {
         const auto sdkSettings = sdk_support::toSdkSettings(settings);
         m_sdkDeviceAgent->setSettings(sdkSettings.get());

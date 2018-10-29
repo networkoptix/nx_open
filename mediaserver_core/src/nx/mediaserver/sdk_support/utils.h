@@ -105,6 +105,7 @@ std::unique_ptr<nx::plugins::SettingsHolder> toSettingsHolder(const QVariantMap&
 
 UniquePtr<nx::sdk::Settings> toSdkSettings(const QVariantMap& settings);
 UniquePtr<nx::sdk::Settings> toSdkSettings(const QMap<QString, QString>& settings);
+UniquePtr<nx::sdk::Settings> toSdkSettings(const QString& settingsJson);
 
 QVariantMap fromSdkSettings(const nx::sdk::Settings* sdkSettings);
 

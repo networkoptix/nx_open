@@ -1,10 +1,12 @@
 #include "analytics_engine_resource.h"
 
 #include <media_server/media_server_module.h>
+#include <plugins/plugins_ini.h>
 
 #include <nx/mediaserver/sdk_support/utils.h>
 #include <nx/mediaserver/sdk_support/pointers.h>
 #include <nx/mediaserver/analytics/sdk_object_factory.h>
+#include <nx/mediaserver/analytics/debug_helpers.h>
 #include <nx/mediaserver/interactive_settings/json_engine.h>
 
 #include <nx/vms/api/analytics/descriptors.h>
@@ -104,8 +106,21 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
     if (!manifest)
         return CameraDiagnostics::PluginErrorResult("Can't deserialize engine manifest");
 
-    auto sdkSettings = sdk_support::toSdkSettings(settingsValues());
-    m_sdkEngine->setSettings(sdkSettings.get());
+    if (pluginsIni().analyticsEngineSettingsPath[0])
+    {
+        NX_WARNING(
+            this,
+            "Passing engine settings from file, engine %1 (%2)",
+            getName(),
+            getId());
+
+        analytics::debug_helpers::setEngineSettings(m_sdkEngine);
+    }
+    else
+    {
+        auto sdkSettings = sdk_support::toSdkSettings(settingsValues());
+        m_sdkEngine->setSettings(sdkSettings.get());
+    }
 
     auto analyticsDescriptorListManager = sdk_support::getDescriptorListManager(serverModule());
     if (!analyticsDescriptorListManager)

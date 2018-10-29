@@ -2,12 +2,14 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
+#include <plugins/plugins_ini.h>
 
 #include <nx/mediaserver/resource/analytics_plugin_resource.h>
 #include <nx/mediaserver/resource/analytics_engine_resource.h>
 #include <nx/mediaserver/analytics/device_analytics_binding.h>
 #include <nx/mediaserver/analytics/frame_converter.h>
 #include <nx/mediaserver/analytics/data_packet_adapter.h>
+#include <nx/mediaserver/analytics/debug_helpers.h>
 #include <nx/mediaserver/sdk_support/utils.h>
 
 #include <nx/utils/log/log.h>

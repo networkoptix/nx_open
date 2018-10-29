@@ -17,9 +17,24 @@
 #include <nx/sdk/common_settings.h>
 #include <nx/mediaserver/resource/resource_fwd.h>
 
+#include <nx/fusion/model_functions.h>
+
 namespace nx::mediaserver::sdk_support {
 
 namespace {
+
+struct SettingInternal
+{
+    std::string name;
+    std::string value;
+};
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    SettingInternal,
+    (json),
+    (name)(value),
+    (optional, false)
+);
 
 nx::utils::log::Tag kLogTag(QString("SdkSupportUtils"));
 
@@ -177,6 +192,26 @@ UniquePtr<nx::sdk::Settings> toSdkSettings(const QMap<QString, QString>& setting
         sdkSettings->addSetting(itr.key().toStdString(), itr.value().toStdString());
 
     return UniquePtr<nx::sdk::Settings>(sdkSettings);
+}
+
+UniquePtr<nx::sdk::Settings> toSdkSettings(const QString& settingsJson)
+{
+    bool isValid = false;
+    const auto deserialized = QJson::deserialized<std::vector<SettingInternal>>(
+        settingsJson.toUtf8(),
+        /*defaultValue*/ {},
+        &isValid);
+
+    UniquePtr<nx::sdk::Settings> result;
+    if (!isValid)
+        result;
+
+    auto settings = new nx::sdk::CommonSettings();
+    for (const auto& setting: deserialized)
+        settings->addSetting(setting.name, setting.value);
+
+    result.reset(settings);
+    return result;
 }
 
 QVariantMap fromSdkSettings(const nx::sdk::Settings* sdkSettings)
