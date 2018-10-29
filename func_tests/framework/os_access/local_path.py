@@ -119,3 +119,13 @@ class LocalPath(PosixPath, FileSystemPath):
                 "Creating symlink {!s} pointing to {!s}".format(destination, local_source_path),
                 destination)
         return destination
+
+    @_reraising_new_file_errors
+    def symlink_to(self, target, target_is_directory=False):
+        if not isinstance(target, type(self)):
+            raise ValueError(
+                "Symlink can only point to same OS but link is {} and target is {}".format(
+                    self, target))
+        super(LocalPath, self).symlink_to(
+            str(target),
+            target_is_directory=target_is_directory)

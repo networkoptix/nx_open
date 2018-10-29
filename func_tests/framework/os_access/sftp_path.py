@@ -170,3 +170,14 @@ class SftpPath(BasePosixPath):
                 raise
             raise
         return f
+
+    @_reraise_by_errno({
+        errno.ENOENT: exceptions.BadParent(),
+        None: exceptions.AlreadyExists("Already exists"),
+        })
+    def symlink_to(self, target, target_is_directory=False):
+        if not isinstance(target, type(self)):
+            raise ValueError(
+                "Symlink can only point to same OS but link is {} and target is {}".format(
+                    self, target))
+        self._client.symlink(str(target), str(self))

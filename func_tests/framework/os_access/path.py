@@ -176,6 +176,10 @@ class FileSystemPath(PurePath):
         copy_file(local_source_path, destination)
         return destination
 
+    @abstractmethod
+    def symlink_to(self, target, target_is_directory=False):
+        pass
+
 
 class BasePosixPath(FileSystemPath, PurePosixPath):
     __metaclass__ = ABCMeta

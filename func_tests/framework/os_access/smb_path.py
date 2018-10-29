@@ -316,3 +316,6 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         if attributes.isDirectory:
             raise exceptions.NotAFile("Attributes of the {}: {}".format(self, attributes))
         return attributes.file_size
+
+    def symlink_to(self, target, target_is_directory=False):
+        raise NotImplementedError("Symlinks over SMB are not well-supported")

@@ -292,6 +292,45 @@ def test_glob_no_result(existing_remote_dir):
     assert not list(existing_remote_dir.glob('*.non_existent'))
 
 
+@pytest.mark.parametrize('path_cls', ['local_path_cls', 'ssh_path_cls', 'sftp_path_cls'], indirect=True)
+def test_symlink(existing_remote_dir):
+    target = existing_remote_dir / 'target'
+    contents = b'dummy contents'
+    target.write_bytes(contents)
+    link = existing_remote_dir / 'link'
+    link.symlink_to(target)
+    assert link.read_bytes() == contents
+
+
+@pytest.mark.parametrize('path_cls', ['local_path_cls', 'ssh_path_cls', 'sftp_path_cls'], indirect=True)
+def test_symlink_to_non_existent(existing_remote_dir):
+    target = existing_remote_dir / 'target_non_existent'
+    link = existing_remote_dir / 'link'
+    link.symlink_to(target)
+    pytest.raises(DoesNotExist, link.read_bytes)
+
+
+@pytest.mark.parametrize('path_cls', ['local_path_cls', 'ssh_path_cls', 'sftp_path_cls'], indirect=True)
+def test_symlink_at_existent_path(existing_remote_dir):
+    link = existing_remote_dir / 'link'
+    link.write_bytes(b'dummy contents')
+    pytest.raises(AlreadyExists, link.symlink_to, existing_remote_dir / 'target_non_existent')
+
+
+@pytest.mark.parametrize('path_cls', ['local_path_cls', 'ssh_path_cls', 'sftp_path_cls'], indirect=True)
+def test_symlink_in_non_existent_parent(existing_remote_dir):
+    link = existing_remote_dir / 'non_existent_dir' / 'link'
+    pytest.raises(BadParent, link.symlink_to, existing_remote_dir / 'target_non_existent')
+
+
+@pytest.mark.parametrize('path_cls', ['local_path_cls', 'ssh_path_cls', 'sftp_path_cls'], indirect=True)
+def test_symlink_in_file_parent(existing_remote_dir):
+    bad_parent = existing_remote_dir / 'file'
+    bad_parent.write_bytes(b'dummy contents')
+    link = bad_parent / 'link'
+    pytest.raises(BadParent, link.symlink_to, existing_remote_dir / 'target_non_existent')
+
+
 @pytest.mark.parametrize('iterations', [2, 10], ids='{}iterations'.format)
 @pytest.mark.parametrize('depth', [2, 10], ids='depth{}'.format)
 def test_many_mkdir_rmtree(remote_test_dir, iterations, depth):
