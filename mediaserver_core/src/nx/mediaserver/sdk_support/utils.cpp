@@ -204,7 +204,7 @@ UniquePtr<nx::sdk::Settings> toSdkSettings(const QString& settingsJson)
 
     UniquePtr<nx::sdk::Settings> result;
     if (!isValid)
-        result;
+        return result;
 
     auto settings = new nx::sdk::CommonSettings();
     for (const auto& setting: deserialized)
