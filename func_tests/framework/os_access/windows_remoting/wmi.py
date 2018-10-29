@@ -4,7 +4,7 @@ from collections import OrderedDict
 from pprint import pformat
 from xml.dom import minidom
 
-import dateutil
+import dateutil.parser
 import pytz
 import urllib3.util
 import xmltodict
