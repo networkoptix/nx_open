@@ -2890,7 +2890,8 @@
                 "BOSCH|MIC IP starlight 7000 HD",
                 "BOSCH|MIC IP starlight 7000i"
             ],
-            "onvifPtzDigitsAfterDecimalPoint": 2
+            "onvifPtzDigitsAfterDecimalPoint": 2,
+            "onvifPtzSpeedBroken": true
         },
         {
             "keys": [

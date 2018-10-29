@@ -124,6 +124,8 @@ public:
     HanwhaDeviceType deviceType() const;
     HanwhaDeviceType bypassDeviceType() const;
 
+    bool hasSerialPort() const;
+
     QString nxProfileName(
         Qn::ConnectionRole role,
         boost::optional<int> forcedProfileNameLength = boost::none) const;
@@ -361,6 +363,7 @@ private:
 
     bool m_isBypassSupported = false;
     int m_proxiedDeviceChannelCount = 1;
+    bool m_hasSerialPort = false;
 
     HanwhaAttributes m_attributes;
     HanwhaAttributes m_bypassDeviceAttributes;
