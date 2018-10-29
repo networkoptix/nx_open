@@ -93,6 +93,11 @@ static void testDeviceAgentSettings(nx::sdk::analytics::DeviceAgent* deviceAgent
 class Action: public nx::sdk::analytics::Action
 {
 public:
+    Action():
+        m_params(new nx::sdk::CommonSettings())
+    {
+    }
+
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override
     {
         ASSERT_TRUE(false);
@@ -109,11 +114,20 @@ public:
 
     virtual const nx::sdk::Settings* params() override
     {
+        if (!m_params)
+            return nullptr;
+
         m_params->addRef();
         return m_params.get();
     }
 
-    virtual int paramCount() override { return (int) m_params->count(); }
+    virtual int paramCount() override
+    {
+        if (!m_params)
+            return 0;
+
+        return (int) m_params->count();
+    }
 
     virtual void handleResult(const char* actionUrl, const char* messageToUser) override
     {
@@ -152,7 +166,7 @@ public:
 
     void setParams(const std::vector<std::pair<std::string, std::string>>& params)
     {
-        m_params->clear();
+        m_params.reset(new nx::sdk::CommonSettings());
         for (const auto& param: params)
             m_params->addSetting(param.first, param.second);
     }
