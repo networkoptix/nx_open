@@ -432,7 +432,7 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
                 }
             };
 
-        if (actionParameters.requestType.isEmpty())
+        if (requestType.isEmpty())
             requestType = nx_http::Method::get;
 
         nx_http::downloadFileAsyncEx(
@@ -462,7 +462,7 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
         if (contentType.isEmpty())
             contentType = autoDetectHttpContentType(actionParameters.text.toUtf8());
 
-        if (actionParameters.requestType.isEmpty())
+        if (requestType.isEmpty())
             requestType = nx_http::Method::post;
 
         nx_http::uploadDataAsync(url,
