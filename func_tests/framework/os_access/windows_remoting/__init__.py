@@ -9,7 +9,7 @@ import winrm
 from framework.context_logger import ContextLogger
 from framework.method_caching import cached_getter
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
-from framework.os_access.windows_remoting import _cmd, _powershell, registry, wmi
+from framework.os_access.windows_remoting import cmd, powershell, registry, wmi
 
 _logger = ContextLogger(__name__, 'winrm')
 
@@ -51,7 +51,7 @@ class WinRM(object):
     @cached_getter
     def _shell(self):
         """Lazy shell creation"""
-        shell = _cmd.Shell(self._protocol)
+        shell = cmd.Shell(self._protocol)
         shell.__enter__()
         return shell
 
@@ -64,7 +64,7 @@ class WinRM(object):
         return self.command(command).run(input, timeout_sec=timeout_sec)
 
     def run_powershell_script(self, script, variables):
-        return _powershell.run_powershell_script(self._shell(), script, variables, logger=_logger.getChild('cmd'))
+        return powershell.run_powershell_script(self._shell(), script, variables, logger=_logger.getChild('cmd'))
 
     def is_working(self):
         try:

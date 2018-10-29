@@ -16,7 +16,7 @@ from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.os_access_interface import OSAccess, Time
 from framework.os_access.smb_path import SMBPath
 from framework.os_access.windows_remoting import WinRM
-from framework.os_access.windows_remoting._powershell import PowershellError
+from framework.os_access.windows_remoting.powershell import PowershellError
 from framework.os_access.windows_remoting.env_vars import EnvVars
 from framework.os_access.windows_remoting.users import Users
 from framework.os_access.windows_remoting.wmi import find_by_selector_set
