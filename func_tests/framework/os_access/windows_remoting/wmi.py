@@ -9,9 +9,7 @@ import pytz
 import xmltodict
 from pylru import lrudecorator
 from typing import Mapping, Union
-from urllib3.util import Url, parse_url
-from winrm import Protocol
-from winrm.exceptions import WinRMError, WinRMTransportError
+from winrm import Protocol, exceptions
 
 _logger = logging.getLogger(__name__)
 
@@ -109,10 +107,10 @@ class Wmi(object):
             _logger.debug("Request XML:\n%s", _pretty_format_xml(request_xml))
             response = self.protocol.send_message(request_xml)
             _logger.debug("Response XML:\n%s", _pretty_format_xml(response))
-        except WinRMTransportError as e:
+        except exceptions.WinRMTransportError as e:
             _logger.exception("XML:\n%s", e.response_text)
             raise
-        except WinRMError as e:
+        except exceptions.WinRMError as e:
             _logger.debug("Failed: %s", e)
             raise
 
