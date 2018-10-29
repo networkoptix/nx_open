@@ -34,10 +34,10 @@ class QnCommonModule;
 
 struct SoapTimeouts
 {
-    static constexpr int kDefaultSendTimeoutSeconds = 50;
-    static constexpr int kDefaultRecvTimeoutSeconds = 50;
-    static constexpr int kDefaultConnectTimeoutSeconds = 25;
-    static constexpr int kDefaultAcceptTimeoutSeconds = 25;
+    static constexpr int kDefaultSendTimeoutSeconds = 10;
+    static constexpr int kDefaultRecvTimeoutSeconds = 10;
+    static constexpr int kDefaultConnectTimeoutSeconds = 10;
+    static constexpr int kDefaultAcceptTimeoutSeconds = 10;
 
     SoapTimeouts() = default;
     SoapTimeouts(const QString& serialized);

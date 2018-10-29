@@ -508,6 +508,9 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
     updateDefaultAuthIfEmpty(QLatin1String("root"), QLatin1String("root"));
     QAuthenticator auth = getAuth();
 
+    if (commonModule()->isNeedToStop())
+        return CameraDiagnostics::ServerTerminatedResult();
+
     //TODO #ak check firmware version. it must be >= 5.0.0 to support I/O ports
     {
         CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), auth);
@@ -517,6 +520,9 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
         if (status == CL_HTTP_SUCCESS)
             setFirmware(firmware);
     }
+
+    if (commonModule()->isNeedToStop())
+        return CameraDiagnostics::ServerTerminatedResult();
 
     if (hasVideo(0))
     {
@@ -547,6 +553,9 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
     }
 
     readMotionInfo();
+
+    if (commonModule()->isNeedToStop())
+        return CameraDiagnostics::ServerTerminatedResult();
 
     if (hasVideo(0))
     {
@@ -616,14 +625,26 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
     //root.Image.I1.TriggerData.MotionDetectionEnabled=yes
     //root.Properties.Motion.MaxNbrOfWindows=10
 
+    if (commonModule()->isNeedToStop())
+        return CameraDiagnostics::ServerTerminatedResult();
+
     CLSimpleHTTPClient httpClient(getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
     if (!initializeIOPorts( &httpClient))
         return CameraDiagnostics::CameraInvalidParams(tr("Can't initialize IO port settings"));
 
+    if (commonModule()->isNeedToStop())
+        return CameraDiagnostics::ServerTerminatedResult();
+
     if(!initializeAudio(&httpClient))
         return CameraDiagnostics::UnknownErrorResult();
 
+    if (commonModule()->isNeedToStop())
+        return CameraDiagnostics::ServerTerminatedResult();
+
     enableDuplexMode();
+
+    if (commonModule()->isNeedToStop())
+        return CameraDiagnostics::ServerTerminatedResult();
 
     /* Ptz capabilities will be initialized by PTZ controller pool. */
 
@@ -1238,6 +1259,9 @@ void QnPlAxisResource::readPortIdLIst()
 bool QnPlAxisResource::initializeIOPorts(CLSimpleHTTPClient* const http)
 {
     readPortIdLIst();
+
+    if (commonModule()->isNeedToStop())
+        return false;
 
     QnIOPortDataList cameraPorts;
     if (!readPortSettings(http, cameraPorts))
