@@ -47,14 +47,14 @@ PluginManager* getPluginManager(QnMediaServerModule* serverModule)
 {
     if (!serverModule)
     {
-        NX_ASSERT(false, "Can't access server module");
+        NX_ASSERT(false, "Can't access the server module");
         return nullptr;
     }
 
     auto pluginManager = serverModule->pluginManager();
     if (!pluginManager)
     {
-        NX_ASSERT(false, "Can't access plugin manager");
+        NX_ASSERT(false, "Can't access the plugin manager");
         return nullptr;
     }
 
@@ -65,28 +65,28 @@ ec2::AbstractAnalyticsManagerPtr getAnalyticsManager(QnMediaServerModule* server
 {
     if (!serverModule)
     {
-        NX_ASSERT(false, "Can't access server module");
+        NX_ASSERT(false, "Can't access the server module");
         return nullptr;
     }
 
     auto commonModule = serverModule->commonModule();
     if (!commonModule)
     {
-        NX_ASSERT(false, "Can't access common module");
+        NX_ASSERT(false, "Can't access the common module");
         return nullptr;
     }
 
     auto ec2Connection = commonModule->ec2Connection();
     if (!ec2Connection)
     {
-        NX_ASSERT(false, "Can't access ec2 connection");
+        NX_ASSERT(false, "Can't access the ec2 connection");
         return nullptr;
     }
 
     auto analyticsManager = ec2Connection->getAnalyticsManager(Qn::kSystemAccess);
     if (!analyticsManager)
     {
-        NX_ASSERT(false, "Can't access analytics manager");
+        NX_ASSERT(false, "Can't access the analytics manager");
         return nullptr;
     }
 
@@ -164,7 +164,7 @@ bool SdkObjectFactory::initPluginResources()
         {
             NX_ERROR(
                 this,
-                "Can't fetch manifest from analytics plugin %1",
+                "Can't fetch a manifest from the analytics plugin %1",
                 realAnalyticsPlugin->name());
             continue;
         }
@@ -174,7 +174,7 @@ bool SdkObjectFactory::initPluginResources()
 
         NX_DEBUG(
             this,
-            "Analytics creating plugin resource. Id: %1; Name: %2",
+            "Creating an analytics plugin resource. Id: %1; Name: %2",
             id, pluginManifest->name);
 
         auto& data = pluginDataById[id];
@@ -188,7 +188,7 @@ bool SdkObjectFactory::initPluginResources()
     auto resPool = resourcePool();
     if (!resPool)
     {
-        NX_ERROR(this, "Can't access resource pool");
+        NX_ERROR(this, "Can't access the resource pool");
         return false;
     }
 
@@ -201,7 +201,9 @@ bool SdkObjectFactory::initPluginResources()
 
         if (!pluginResource)
         {
-            NX_WARNING(this, "Unable to find plugin resource in resource pool, %1 (%2)",
+            NX_WARNING(this,
+                "Unable to find a plugin resource in the resource pool. "
+                "Plugin name: %1, plugin Id: %2",
                 pluginData.name, pluginData.id);
             continue;
         }
@@ -209,7 +211,7 @@ bool SdkObjectFactory::initPluginResources()
         auto sdkPluginItr = sdkPluginsById.find(pluginData.id);
         if (sdkPluginItr == sdkPluginsById.cend())
         {
-            NX_WARNING(this, "Unable to find SDK plugin object %1 (%2)",
+            NX_WARNING(this, "Unable to find a SDK plugin object. Plugin name: %1, plugin Id (%2)",
                 pluginData.name, pluginData.id);
             continue;
         }
@@ -218,7 +220,9 @@ bool SdkObjectFactory::initPluginResources()
         auto result = pluginResource->init();
         if (!result)
         {
-            NX_WARNING(this, "Error while initializing plugin resource, %1, %2 (%3)",
+            NX_WARNING(this,
+                "Error while initializing plugin resource: %1. "
+                "Plugin resource name: %2, Plugin resource Id: %3",
                 result, pluginResource->getName(), pluginResource->getId());
 
             continue;
@@ -241,7 +245,8 @@ bool SdkObjectFactory::initEngineResources()
     {
         NX_ERROR(
             this,
-            lm("Error has occured while retrieving engines from database: %1").args(errorCode));
+            lm("Error has occured while retrieving engines from the database: %1")
+                .args(errorCode));
         return false;
     }
 
@@ -278,7 +283,8 @@ bool SdkObjectFactory::initEngineResources()
             {
                 NX_WARNING(
                     this,
-                    "Unable to find analytics engine resource in resource pool %1 (%2)",
+                    "Unable to find an analytics engine resource in the resource pool. "
+                    "Engine name: %1, engine Id: (%2)",
                     engine.name, engine.id);
 
                 continue;
@@ -291,7 +297,7 @@ bool SdkObjectFactory::initEngineResources()
             {
                 NX_WARNING(
                     this,
-                    "Unable to find parent analytics plugin for engine %1 (%2)",
+                    "Unable to find a parent analytics plugin for the engine %1 (%2)",
                     engineResource->getName(), engineResource->getId());
 
                 continue;
@@ -311,14 +317,16 @@ bool SdkObjectFactory::initEngineResources()
 
             if (!sdkEngine)
             {
-                NX_WARNING(this, "Unable to create SDK engine %1 (%2)",
+                NX_WARNING(this, "Unable to create a SDK engine %1 (%2)",
                     engineResource->getName(), engineResource->getId());
                 continue;
             }
 
             if (error != nx::sdk::Error::noError)
             {
-                NX_WARNING(this, "Error '%1' occured while creating SDK engine %2 (%3)",
+                NX_WARNING(this,
+                    "Error '%1' occured while creating a SDK engine. "
+                    "Engine resource name: %2, engine resource Id: %3",
                     error, engineResource->getName(), engineResource->getId());
 
                 continue;
@@ -328,7 +336,9 @@ bool SdkObjectFactory::initEngineResources()
             const auto result = engineResource->init();
             if (!result)
             {
-                NX_WARNING(this, "Error while initializing engine resource, %1, %2 (%3)",
+                NX_WARNING(this,
+                    "Error while initializing engine resource: %1. "
+                    "Engine resource name: %2, engine resource Id: %3",
                     result, engineResource->getName(), engineResource->getId());
 
                 continue;
