@@ -35,6 +35,8 @@ public:
 
     virtual const char* manifest(nx::sdk::Error* error) const override;
 
+    virtual void freeManifest(const char* manifestData) override;
+
     virtual nx::sdk::analytics::DeviceAgent* obtainDeviceAgent(
         const nx::sdk::DeviceInfo* deviceInfo, nx::sdk::Error* outError) override;
 

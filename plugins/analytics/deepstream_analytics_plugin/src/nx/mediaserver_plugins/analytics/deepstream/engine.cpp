@@ -153,6 +153,11 @@ const char* Engine::manifest(Error* error) const
     return m_manifest.c_str();
 }
 
+void Engine::freeManifest(const char* /*manifestData*/)
+{
+    // Do nothing.
+}
+
 nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
     const DeviceInfo* deviceInfo, Error* outError)
 {
