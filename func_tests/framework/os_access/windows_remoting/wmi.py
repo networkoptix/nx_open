@@ -331,7 +331,7 @@ class _Reference(object):
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Put'
         body = {self.wmi_class.name: _prepare_data(new_properties_dict)}
         body[self.wmi_class.name]['@xmlns'] = self.wmi_class.uri
-        outcome = self.wmi_class.wmi(self.wmi_class.uri, action_url, body, self.selectors)
+        outcome = self.wmi_class.wmi.act(self.wmi_class.uri, action_url, body, self.selectors)
         instance = outcome[self.wmi_class.name]
         return _Object(self, instance)
 
