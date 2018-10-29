@@ -61,7 +61,7 @@ void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
 
 void DeviceAgent::setSettings(const nx::sdk::Settings* settings)
 {
-    NX_OUTPUT << __func__ << " Received " << m_plugin->name() << " settings:";
+    NX_OUTPUT << __func__ << " Received  settings:";
     NX_OUTPUT << "{";
 
     const auto count = settings->count();
