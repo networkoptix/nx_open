@@ -47,7 +47,12 @@ def _reraising_on_operation_failure(status_to_error_cls):
             try:
                 return func(self, *args, **kwargs)
             except OperationFailure as e:
-                last_message_status = e.smb_messages[-1].status
+                for smb_message in reversed(e.smb_messages):
+                    last_message_status = smb_message.status
+                    if last_message_status != _STATUS_SUCCESS:
+                        break
+                else:
+                    raise
                 if last_message_status in status_to_error_cls:
                     error_cls = status_to_error_cls[last_message_status]
                     raise error_cls(e)
