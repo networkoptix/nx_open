@@ -421,7 +421,7 @@ bool ExtendedRuleProcessor::executePanicAction(const vms::event::PanicActionPtr&
 bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractActionPtr& action)
 {
     const nx::vms::event::ActionParameters& actionParameters=action->getParams();
-    nx_http::StringType requestType = actionParameters.requestType;
+    nx::network::http::StringType requestType = actionParameters.requestType;
 
     nx::utils::Url url(action->getParams().url);
     if ((actionParameters.requestType == nx::network::http::Method::get) ||
