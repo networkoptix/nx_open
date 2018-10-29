@@ -107,6 +107,10 @@ class SftpPath(BasePosixPath):
                 self.joinpath(entry.filename).rmtree(ignore_errors=False)
         self.rmdir()
 
+    @_reraise_by_errno({
+        errno.ENOENT: exceptions.DoesNotExist(),
+        None: exceptions.NotEmpty(),
+        })
     def rmdir(self):
         self._client.rmdir(str(self))
 
