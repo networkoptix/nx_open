@@ -5,6 +5,18 @@ namespace nx::client::desktop {
 using State = TimeSynchronizationWidgetReducer::State;
 using Result = TimeSynchronizationWidgetReducer::Result;
 
+namespace {
+
+bool hasInternet(const State& state)
+{
+    return std::any_of(
+        state.servers.cbegin(),
+        state.servers.cend(),
+        [](const auto& info) { return info.hasInternet; });
+}
+
+} // namespace
+
 State TimeSynchronizationWidgetReducer::initialize(
     State state,
     bool isTimeSynchronizationEnabled,
@@ -52,22 +64,31 @@ Result TimeSynchronizationWidgetReducer::setSyncTimeWithInternet(
     if (value)
     {
         state.enabled = true;
+        state.lastPrimaryServer = state.primaryServer;
         state.primaryServer = QnUuid();
+        state.status = hasInternet(state)
+            ? State::Status::synchronizedWithInternet
+            : State::Status::noInternetConnection;
     }
     else if (state.servers.size() == 1)
     {
         state.enabled = true;
         state.primaryServer = state.servers.first().id;
+        state.status = State::Status::singleServerLocalTime;
     }
     else if (!state.lastPrimaryServer.isNull())
     {
         state.enabled = true;
         state.primaryServer = state.lastPrimaryServer;
+        // Actualize primary time server against servers list.
+        state.primaryServer = actualPrimaryServer(state).id;
+        state.status = actualStatus(state);
     }
     else
     {
         state.enabled = false;
         state.primaryServer = QnUuid();
+        state.status = State::Status::notSynchronized;
     }
     state.hasChanges = true;
     return {true, std::move(state)};
@@ -101,13 +122,9 @@ State::Status TimeSynchronizationWidgetReducer::actualStatus(const State& state)
 
     if (state.primaryServer.isNull())
     {
-        if (!std::any_of(state.servers.cbegin(), state.servers.cend(),
-            [](const auto& info) { return info.hasInternet; }))
-        {
-            return State::Status::noInternetConnection;
-        }
-
-        return State::Status::synchronizedWithInternet;
+        return hasInternet(state)
+            ? State::Status::synchronizedWithInternet
+            : State::Status::noInternetConnection;
     }
 
     if (state.servers.size() == 1)

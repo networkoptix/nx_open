@@ -176,5 +176,59 @@ TEST_F(TimeSynchronizationWidgetReducerTest, notSynchronizedByDisabledFlag)
     ASSERT_EQ(state.status, State::Status::notSynchronized);
 }
 
+// When there is only one server, disabling internet sync should select it as a primary server.
+TEST_F(TimeSynchronizationWidgetReducerTest, disableSyncWithInternetWithSingleServer)
+{
+    const auto id = QnUuid::createUuid();
+    auto state = Reducer::initialize(State(),
+        /*isTimeSynchronizationEnabled*/ true,
+        /*primaryTimeServer*/ QnUuid(),
+        /*servers*/ {server(id)});
+
+    bool changed = false;
+    State result;
+    std::tie(changed, result) = Reducer::setSyncTimeWithInternet(std::move(state), false);
+    ASSERT_TRUE(changed);
+    ASSERT_EQ(result.primaryServer, id);
+    ASSERT_EQ(result.status, State::Status::singleServerLocalTime);
+}
+
+// When there are some servers, disabling internet sync should disable sync completely.
+TEST_F(TimeSynchronizationWidgetReducerTest, disableSyncWithInternetWithManyServers)
+{
+    auto state = Reducer::initialize(State(),
+        /*isTimeSynchronizationEnabled*/ true,
+        /*primaryTimeServer*/ QnUuid(),
+        /*servers*/ {server(), server()});
+
+    bool changed = false;
+    State result;
+    std::tie(changed, result) = Reducer::setSyncTimeWithInternet(std::move(state), false);
+    ASSERT_TRUE(changed);
+    ASSERT_EQ(result.status, State::Status::notSynchronized);
+}
+
+// Enabling and disabling internet sync must keep the selected time server.
+TEST_F(TimeSynchronizationWidgetReducerTest, keepOldSelectedServer)
+{
+    const auto id = QnUuid::createUuid();
+    auto state = Reducer::initialize(State(),
+        /*isTimeSynchronizationEnabled*/ true,
+        /*primaryTimeServer*/ id,
+        /*servers*/ {server(id), server()});
+
+    bool changed = false;
+    State afterEnabled;
+    std::tie(changed, afterEnabled) = Reducer::setSyncTimeWithInternet(std::move(state), true);
+    ASSERT_TRUE(changed);
+    ASSERT_EQ(afterEnabled.status, State::Status::synchronizedWithInternet);
+
+    State result;
+    std::tie(changed, result) = Reducer::setSyncTimeWithInternet(std::move(afterEnabled), false);
+    ASSERT_TRUE(changed);
+    ASSERT_EQ(result.primaryServer, id);
+    ASSERT_EQ(result.status, State::Status::synchronizedWithSelectedServer);
+}
+
 } // namespace test
 } // namespace nx::client::desktop
