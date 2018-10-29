@@ -143,6 +143,22 @@ class PosixShellPath(BasePosixPath):
             if not ignore_errors:
                 raise exceptions.NotADir(self)
 
+    @_raising_on_exit_status({
+        2: exceptions.DoesNotExist,
+        3: exceptions.NotADir,
+        4: exceptions.NotEmpty,
+        })
+    def rmdir(self):
+        self._shell.run_sh_script(
+            # language=Bash
+            '''
+                test -e "$SELF" || exit 2
+                test -d "$SELF" || exit 3
+                test "$(find "$SELF" -maxdepth 0 -not -empty)" && exit 4
+                rmdir -- "$SELF"
+                ''',
+            env={'SELF': self})
+
     @_raising_on_exit_status({2: exceptions.DoesNotExist, 3: exceptions.NotAFile})
     def read_bytes(self, offset=None, max_length=None):
         return self._shell.run_sh_script(
