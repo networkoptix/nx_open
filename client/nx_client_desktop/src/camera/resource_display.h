@@ -147,5 +147,5 @@ private:
     /** Whether this display was started. */
     bool m_started;
 
-    QPointer<nx::utils::Counter> m_counter;
+    QPointer<nx::utils::CounterWithSignal> m_counter;
 };
