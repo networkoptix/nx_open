@@ -230,6 +230,16 @@ bool HostAddress::isLocalNetwork() const
     return false; // not even IP address
 }
 
+bool HostAddress::isIpv4LinkLocalNetwork() const
+{
+    if (const auto& ip = ipV4())
+    {
+        const auto addr = ntohl(ip->s_addr);
+        return (addr & 0xFFFF0000) == 0xA9FE0000; // 169.254.0.0
+    }
+    return false;
+}
+
 bool HostAddress::isIpAddress() const
 {
     if (m_ipV4 || m_ipV6)
@@ -420,7 +430,12 @@ SocketAddress::SocketAddress(const QString& str)
     const bool isIpV6 = str.count(':') > 1;
     const int bracketPos = str.indexOf(']');
 
-    // IpV6 addresses without brackets are forbidden here.
+    if (isIpV6 && bracketPos == -1)
+    {
+        address = HostAddress(str);
+        return;
+    }
+
     NX_ASSERT(!isIpV6 || bracketPos > 0);
     const int sepPos = str.lastIndexOf(':');
 

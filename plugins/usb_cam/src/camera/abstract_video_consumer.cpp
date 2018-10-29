@@ -19,9 +19,9 @@ float AbstractVideoConsumer::fps() const
     return m_params.fps;
 }
 
-void AbstractVideoConsumer::resolution(int * width, int * height) const
+nxcip::Resolution AbstractVideoConsumer::resolution() const
 {
-    m_params.resolution(width, height);
+    return m_params.resolution;
 }
 
 int AbstractVideoConsumer::bitrate() const
@@ -39,11 +39,12 @@ void AbstractVideoConsumer::setFps(float fps)
     }
 }
 
-void AbstractVideoConsumer::setResolution(int width, int height)
+void AbstractVideoConsumer::setResolution(const nxcip::Resolution& resolution)
 {
-    if(m_params.width != width || m_params.height != height)
+    if(m_params.resolution.width != resolution.width 
+        || m_params.resolution.height != resolution.height)
     {
-        m_params.setResolution(width, height);
+        m_params.resolution = resolution;
         if (auto streamReader = m_videoStream.lock())
             streamReader->updateResolution();
     }

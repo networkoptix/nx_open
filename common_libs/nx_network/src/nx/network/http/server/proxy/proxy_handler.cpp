@@ -132,7 +132,7 @@ void AbstractProxyHandler::proxyRequestToTarget(
             *m_targetConnectionInactivityTimeout);
     }
     m_requestProxyWorker->start(
-        std::bind(&AbstractProxyHandler::sendTargetServerResponse, this, _1, _2));
+        [this](auto&&... args) { sendTargetServerResponse(std::move(args)...); });
 }
 
 void AbstractProxyHandler::sendTargetServerResponse(
@@ -145,7 +145,7 @@ void AbstractProxyHandler::sendTargetServerResponse(
 
         // Removing Keep-alive connection related headers to let
         // local HTTP server to implement its own keep-alive policy.
-        response()->headers.erase("Keep-alive");
+        response()->headers.erase("Keep-Alive");
         auto connectionHeaderIter = response()->headers.find("Connection");
         if (connectionHeaderIter != response()->headers.end() &&
             connectionHeaderIter->second.toLower() == "keep-alive")

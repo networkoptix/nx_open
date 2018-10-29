@@ -4,6 +4,10 @@
 #include <algorithm>
 
 #include <client/client_settings.h>
+#include <core/resource/param.h>
+#include <common/static_common_module.h>
+#include <core/resource_management/resource_data_pool.h>
+#include <core/resource/security_cam_resource.h>
 
 #include "decoders/video/abstract_video_decoder.h"
 #include "utils/math/math.h"
@@ -21,7 +25,9 @@
 static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes
 static const double FPS_EPS = 1e-6;
 
-QnVideoStreamDisplay::QnVideoStreamDisplay(bool canDownscale, int channelNumber) :
+QnVideoStreamDisplay::QnVideoStreamDisplay(
+    const QnMediaResourcePtr& resource, bool canDownscale, int channelNumber):
+    m_resource(resource),
     m_frameQueueIndex(0),
     m_decodeMode(QnAbstractVideoDecoder::DecodeMode_Full),
     m_canDownscale(canDownscale),
@@ -389,6 +395,25 @@ void QnVideoStreamDisplay::calcSampleAR(QSharedPointer<CLVideoDecoderOutput> out
     }
 }
 
+std::set<AVCodecID> QnVideoStreamDisplay::getDisabledMtCodecs()
+{
+    std::set<AVCodecID> disabledMtCodecs;
+    auto secResource = m_resource.dynamicCast<QnSecurityCamResource>();
+    if (secResource)
+    {
+        QList<QString> codecList =
+            secResource->resourceData().value<QList<QString>>(Qn::kDisableMultiThreadDecoding);
+        for(auto& codecName: codecList)
+        {
+            const AVCodecDescriptor* codecDescr =
+                avcodec_descriptor_get_by_name(codecName.toLatin1().data());
+            if (codecDescr)
+                disabledMtCodecs.insert(codecDescr->id);
+        }
+    }
+    return disabledMtCodecs;
+}
+
 QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompressedVideoDataPtr data, bool draw, QnFrameScaler::DownscaleFactor force_factor)
 {
     updateRenderList();
@@ -445,9 +470,14 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     }
 
     if (needReinitDecoders) {
-        QnMutexLocker lock( &m_mtx );
-        foreach(QnAbstractVideoDecoder* decoder, m_decoder)
-            decoder->setMTDecoding(enableFrameQueue);
+        std::set<AVCodecID> disabledMtCodecs = getDisabledMtCodecs();
+        QnMutexLocker lock(&m_mtx);
+        auto iter = m_decoder.begin();
+        while (iter != m_decoder.end()) {
+            if (disabledMtCodecs.find(iter.key()) == disabledMtCodecs.end())
+                iter.value()->setMTDecoding(enableFrameQueue);
+            ++iter;
+        }
     }
 
     QSharedPointer<CLVideoDecoderOutput> m_tmpFrame( new CLVideoDecoderOutput() );

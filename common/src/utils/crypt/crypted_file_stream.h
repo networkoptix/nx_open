@@ -22,6 +22,8 @@ class CryptedFileStream: public QIODevice
 
 public:
     CryptedFileStream(const QString& fileName, const QString& password = QString());
+    CryptedFileStream(const QString& fileName, qint64 position, qint64 size,
+        const QString& password = QString());
     virtual ~CryptedFileStream();
 
     // Set cryptostream bounds for emplacement in another file-container.

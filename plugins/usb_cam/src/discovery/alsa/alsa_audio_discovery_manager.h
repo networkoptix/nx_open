@@ -11,9 +11,7 @@
 namespace nx {
 namespace usb_cam {
 namespace device {
-
-#include <string>
-#include <vector>
+namespace detail {
 
 class AlsaAudioDiscoveryManager: public AudioDiscoveryManagerPrivate
 {
@@ -28,11 +26,25 @@ private:
 
     struct DeviceDescriptor
     {
+        // The unique name of the interface used to open the device for capture.
         std::string path;
+
+        // The name of the sound card, used to determine if it should be ignored or deprioritized.
         std::string name;
+
+        // The index of the sound card in the system as reported by ALSA.
         int cardIndex;
+
+        // Can be Input, Output or both. Used to find input only devices.
         IOType ioType;
+        
+        // Set to true if path contains the word "default", but not "sysdefault". 
+        // Presumeably this is the systems default audio device, though ALSA has no explicit 
+        // interface to get it.
         bool isDefault;
+
+        // Set to true if the path contains "sysdefault", marking this device descriptor as the 
+        // default audio interface for this particular device.
         bool sysDefault;
 
         DeviceDescriptor():
@@ -63,12 +75,14 @@ private:
     };
 
 public:
-    void fillCameraAuxData(nxcip::CameraInfo* cameras, int cameraCount) const;
+    virtual void fillCameraAuxData(nxcip::CameraInfo* cameras, int cameraCount) const override;
+    virtual bool pluggedIn(const std::string & devicePath) const override;
 
 private:
     std::vector<DeviceDescriptor> getDevices() const;
 };
 
+} // namespace detail
 } // namespace device
 } // namespace usb_cam
 } // namespace nx

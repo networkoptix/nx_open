@@ -4,6 +4,7 @@
 
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/cloud/tunnel/cross_nat_connector.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/thread/sync_queue.h>
 
 #include "basic_test_fixture.h"
@@ -270,6 +271,7 @@ private:
             addressEntry.host = host.c_str();
 
             m_crossNatConnector = std::make_unique<CrossNatConnector>(
+                &nx::network::SocketGlobals::cloud(),
                 addressEntry,
                 mediatorAddress);
         }

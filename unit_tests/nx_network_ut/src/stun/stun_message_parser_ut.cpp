@@ -36,7 +36,10 @@ protected:
     void whenParseMultipleJunkPackets()
     {
         for (int i = 0; i < 10; ++i)
+        {
             whenParseJunkPacket();
+            m_parser.reset();
+        }
     }
 
     void whenParseJunkPacket()

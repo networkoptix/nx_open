@@ -9,6 +9,7 @@ set(customization "default" CACHE STRING "Product customization")
 set(dotNetFramework "v4.6.2" CACHE STRING "Target .NET Framework version. Allowed: v4.0, v4.6.2")
 set(CMAKE_BUILD_TYPE "Release" CACHE STRING "One of [Debug Release RelWithDebInfo MinSizeRel].")
 set(buildNumber "0" CACHE STRING "Build number")
+option(codeSigning "Enable code signing" OFF)
 
 set(signKey "${CMAKE_CURRENT_SOURCE_DIR}/src/Sign.snk")
 
@@ -40,7 +41,7 @@ set(paxtonDriverIntermediateName "${paxtonLibraryName}.OemDvrMiniDriver.mini")
 set(ENV{PYTHONPATH} ${rdep_dir})
 set(depenencies_cmake_file ${CMAKE_BINARY_DIR}/dependencies.cmake)
 execute_process(
-    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/../../sync_dependencies.py
+    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/sync_dependencies.py
         --packages-dir=${PACKAGES_DIR}
         --cmake-include-file=${depenencies_cmake_file}
         --customization=${customization}

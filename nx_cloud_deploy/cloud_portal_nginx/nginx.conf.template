@@ -22,6 +22,14 @@ http {
     # don't send the nginx version number in error pages and Server header
     server_tokens off;
 
+    # Expires map
+    map ${DOLLAR}sent_http_content_type ${DOLLAR}expires {
+        default                    off;
+        text/html                  epoch;
+        text/css                   epoch;
+        application/javascript     epoch;
+    }
+
     upstream app_server {
         # For a TCP configuration:
         server $PORTAL_HOST:5000 fail_timeout=0;
@@ -29,6 +37,8 @@ http {
 
     server {
         listen 80 default;
+
+        expires ${DOLLAR}expires;
 
         client_max_body_size 4G;
         server_name _;
@@ -39,6 +49,10 @@ http {
         root /app/app/static/$CUSTOMIZATION;
         error_page 503 /static/503.html;
         error_page 502 /static/503.html;
+
+        if (${DOLLAR}http_x_forwarded_proto != "https") {
+            return 301 https://${DOLLAR}host${DOLLAR}request_uri;
+        }
 
         location @proxy_to_app {
             proxy_set_header X-Forwarded-For ${DOLLAR}proxy_add_x_forwarded_for;
@@ -62,29 +76,11 @@ http {
             proxy_pass   http://app_server;
         }
 
-        location ~ ^/(|index.html)$ {
-            index static/index.html;
-
-            if (${DOLLAR}http_x_forwarded_proto != "https") {
-                return 301 https://${DOLLAR}host${DOLLAR}request_uri;
-            }
-
-            # checks for static file, if not found proxy to app
-            try_files ${DOLLAR}uri ${DOLLAR}uri/ @proxy_to_app;
- 
-            # Add HTTP Strict Transport Security for good measure.
-            add_header Strict-Transport-Security "max-age=31536000; includeSubDomains;";
-        }
-
-
         location / {
             index static/index.html;
 
             # checks for static file, if not found proxy to app
             try_files ${DOLLAR}uri ${DOLLAR}uri/ @proxy_to_app;
- 
-            # Add HTTP Strict Transport Security for good measure.
-            add_header Strict-Transport-Security "max-age=31536000; includeSubDomains;";
         }
 
         location /api/cloud_modules {
@@ -164,6 +160,9 @@ http {
             error_page 404 /static/index.html;
         }
 
+        # Add HTTP Strict Transport Security for good measure.
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains;";
+
         # config to don't allow the browser to render the page inside an frame or iframe
         # and avoid clickjacking http://en.wikipedia.org/wiki/Clickjacking
         # if you need to allow [i]frames, you can use SAMEORIGIN or even set an uri with ALLOW-FROM uri
@@ -191,6 +190,6 @@ http {
         # I need to change our application code so we can increase security by disabling 'unsafe-inline' 'unsafe-eval'
         # directives for css and js(if you have inline css or js, you will need to keep it too).
         # more: http://www.html5rocks.com/en/tutorials/security/content-security-policy/#inline-code-considered-harmful
-        add_header Content-Security-Policy "default-src blob: 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.hotjar.com https://*.google-analytics.com https://www.googletagmanager.com https://sjs.bizographics.com; img-src 'self' blob: data: https://*.google-analytics.com https://*.hotjar.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://themes.googleusercontent.com https://static.hotjar.com; frame-src * cox-vms://* demo-vms://* dtv-vms://* dw-vms://* ez-vms://* fly-vms://* hanwha-vms://* mvss-vms://* nvision-vms://* nx-vms://* pcms-vms://* qulu-vms://* ras-vms://* sentry-vms://* sk-vms://* https://*; connect-src 'self' https://*.hotjar.com:* wss://*.hotjar.com https://*.relay.vmsproxy.hdw.mx https://*.relay.vmsproxy.com; object-src 'none'; media-src 'self' blob:; worker-src 'self' blob:";
+        add_header Content-Security-Policy "default-src blob: 'self'; script-src 'self' blob: 'unsafe-inline' 'unsafe-eval' https://*.hotjar.com https://*.google-analytics.com https://www.googletagmanager.com https://sjs.bizographics.com; img-src 'self' blob: data: $TRAFFIC_RELAY_HOSTS_STR https://*.google-analytics.com https://*.hotjar.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://themes.googleusercontent.com https://static.hotjar.com; frame-src * cox-vms://* demo-vms://* dtv-vms://* dw-vms://* ez-vms://* fly-vms://* hanwha-vms://* mvss-vms://* nvision-vms://* nx-vms://* pcms-vms://* qulu-vms://* ras-vms://* sentry-vms://* sk-vms://* https://*; connect-src 'self' https://*.google-analytics.com https://*.hotjar.com:* wss://*.hotjar.com $TRAFFIC_RELAY_HOSTS_STR; object-src 'none'; media-src 'self' blob: $TRAFFIC_RELAY_HOSTS_STR";
     }
 }

@@ -12,7 +12,7 @@ ${password}    ${BASE PASSWORD}
 ${url}         ${ENV}
 
 *** Keywords ***
-Log in to Autotests System
+Log in to Autotests 2 System
     [arguments]    ${email}
     Go To    ${url}/systems/${AUTOTESTS OFFLINE SYSTEM ID}
     Log In    ${email}    ${password}    None
@@ -34,15 +34,21 @@ Open New Browser On Failure
     Open Browser and go to URL    ${url}
 
 *** Test Cases ***
+the page is opened and shows the user list to owner
+    [tags]    C41881
+    Log in to Autotests 2 System    ${EMAIL OWNER}
+    Location Should Be    ${url}/systems/${AUTOTESTS OFFLINE SYSTEM ID}
+    Wait Until Element Is Visible    ${USERS LIST}
+
 should confirm, if owner deletes system (You are going to disconnect your system from cloud)
-    Log in to Autotests System    ${EMAIL OWNER}
+    Log in to Autotests 2 System    ${EMAIL OWNER}
     Click Button    ${DISCONNECT FROM NX}
     Wait Until Elements Are Visible    ${DISCONNECT FORM}    ${DISCONNECT FORM HEADER}    ${DISCONNECT FORM CANCEL}
     Click Button    ${DISCONNECT FORM CANCEL}
     Wait Until Page Does Not Contain Element    ${BACKDROP}
 
 should confirm, if not owner deletes system (You will loose access to this system)
-    Log in to Autotests System    ${EMAIL OWNER}
+    Log in to Autotests 2 System    ${EMAIL OWNER}
     Validate Log In
     Wait Until Element Is Visible    ${DISCONNECT FROM NX}
     Click Button    ${DISCONNECT FROM NX}
@@ -51,21 +57,32 @@ should confirm, if not owner deletes system (You will loose access to this syste
     Wait Until Page Does Not Contain Element    ${DELETE USER MODAL}
 
 share button should be disabled
+    [tags]    C41881
     Set Window Size    1920    1080
-    Log in to Autotests System    ${EMAIL OWNER}
+    Log in to Autotests 2 System    ${EMAIL OWNER}
     Wait Until Page Does Not Contain Element    //div[contains(@uib-modal-backdrop, "modal-backdrop")]
     Wait Until Element Is Visible    ${SHARE BUTTON DISABLED}
 
 open in nx button should be disabled
-    Log in to Autotests System    ${EMAIL OWNER}
+    [tags]    C41881
+    Log in to Autotests 2 System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    ${OPEN IN NX BUTTON DISABLED}
+    Log Out
+    Validate Log Out
+    Log in to Autotests 2 System    ${EMAIL VIEWER}
     Wait Until Element Is Visible    ${OPEN IN NX BUTTON DISABLED}
 
 should show offline next to system name
-    Log in to Autotests System    ${EMAIL OWNER}
+    [tags]    C41881
+    Log in to Autotests 2 System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    ${SYSTEM NAME OFFLINE}
+    Log Out
+    Validate Log Out
+    Log in to Autotests 2 System    ${EMAIL VIEWER}
     Wait Until Element Is Visible    ${SYSTEM NAME OFFLINE}
 
 should not be able to delete/edit users
-    Log in to Autotests System    ${EMAIL OWNER}
+    Log in to Autotests 2 System    ${EMAIL OWNER}
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL VIEWER}')]
     Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL VIEWER}')]
 #This sleep is to make sure that I am not looking for the element before it loads.  That could give a false positive.
@@ -85,46 +102,72 @@ should open System page by link to not authorized user and show it, after owner 
     Verify In System    Auto Tests 2
 
 should open System page by link to user without permission and show alert (System info is unavailable: You have no access to this system)
+    [tags]    C41572
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
     Go To    ${url}/systems/${AUTOTESTS OFFLINE SYSTEM ID}
-    Wait Until Element Is Visible    ${SYSTEM NO ACCESS}
+    Wait Until Elements Are Visible    ${SYSTEM NO ACCESS}    ${AVAILABLE SYSTEMS LIST}
+    Click Link    ${AVAILABLE SYSTEMS LIST}
+    Location Should Be    ${url}/systems
 
 should open System page by link not authorized user, and show alert if logs in and has no permission
     Go To    ${url}/systems/${AUTOTESTS OFFLINE SYSTEM ID}
     Log In    ${EMAIL NOPERM}   ${password}    None
     Wait Until Element Is Visible    ${SYSTEM NO ACCESS}
 
-rename button opens dialog; cancel closes without rename; save renames system when offline
-    Log in to Autotests System    ${EMAIL OWNER}
+rename button opens dialog and clicking cancel closes rename dialog without rename
+    [tags]    C41880
+    Log in to Autotests 2 System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${RENAME SYSTEM}
     Click Button    ${RENAME SYSTEM}
     Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}
     Click Button    ${RENAME CANCEL}
+    Wait Until Page Does Not Contain Element    //div[@uib-modal-backdrop="modal-backdrop"]
+    Verify In System    Auto Tests 2
+
+clicking 'X' closes rename dialog without rename
+    [tags]    C41880
+    Log in to Autotests 2 System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    ${RENAME SYSTEM}
+    Click Button    ${RENAME SYSTEM}
+    Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME X BUTTON}
+    Wait Until Textfield Contains    ${RENAME INPUT}    ${AUTO TESTS 2}
+    Click Button    ${RENAME X BUTTON}
     Wait Until Page Does Not Contain Element    ${BACKDROP}
     Verify In System    Auto Tests 2
+
+clicking save with no input in rename dialoge throws error
+    [tags]    C41880
+    Log in to Autotests 2 System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    ${RENAME SYSTEM}
+    Wait Until Elements Are Visible    ${RENAME SYSTEM}    ${OPEN IN NX BUTTON}    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}
     Click Button    ${RENAME SYSTEM}
     Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME INPUT}
-    Clear Element Text    ${RENAME INPUT}
-    Input Text    ${RENAME INPUT}    Auto Tests Rename
+    sleep    2
+    Input Text    ${RENAME INPUT}    ${SPACE}
+    Press Key    ${RENAME INPUT}    ${BACKSPACE}
     Click Button    ${RENAME SAVE}
-    Check For Alert    ${SYSTEM NAME SAVED}
-    Verify In System    Auto Tests Rename
-    Click Button    ${RENAME SYSTEM}
-    Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME INPUT}
-    Clear Element Text    ${RENAME INPUT}
-    Input Text    ${RENAME INPUT}    Auto Tests 2
-    Click Button    ${RENAME SAVE}
-    Check For Alert    ${SYSTEM NAME SAVED}
-    Verify In System    Auto Tests 2
+    Wait Until Elements Are Visible    ${RENAME INPUT WITH ERROR}    ${SYSTEM NAME IS REQUIRED}
+    Click Button    ${RENAME CANCEL}
 
 does not show Share button to viewer, advanced viewer, live viewer
     @{emails}    Set Variable    ${EMAIL VIEWER}    ${EMAIL LIVE VIEWER}    ${EMAIL ADV VIEWER}
     :FOR    ${user}    IN    @{emails}
-    \  Log in to Autotests System    ${user}
+    \  Log in to Autotests 2 System    ${user}
     \  Register Keyword To Run On Failure    NONE
     \  Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     \  Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${RENAME SYSTEM}
     \  Register Keyword To Run On Failure    Failure Tasks
     \  Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     \  Log Out
+
+should show "your system" for owner and "owner's name" for non-owners
+    [tags]    C41881
+    Log in to AutoTests 2 System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    //h2[.='${YOUR SYSTEM TEXT}']
+    Wait Until Element Is Not Visible    //h2[.='${OWNER TEXT}']
+    Log Out
+    Validate Log Out
+    Log in to Autotests 2 System    ${EMAIL VIEWER}
+    Wait Until Elements Are Visible    //h2[.='${OWNER TEXT}']    //a[.='${EMAIL OWNER}']
+    Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']

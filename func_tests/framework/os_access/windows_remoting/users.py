@@ -8,15 +8,12 @@ class Users(object):
 
     @cached_getter
     def all_profiles(self):
-        query = self._winrm.wmi_query(u'Win32_UserProfile', {})
+        query = self._winrm.wmi.cls(u'Win32_UserProfile').enumerate({})
         profiles = list(query.enumerate())
         return profiles
 
     def profile_by_sid(self, sid):
-        selectors = {u'SID': sid}
-        query = self._winrm.wmi_query(u'Win32_UserProfile', selectors)
-        profile = query.get()
-        return profile
+        return self._winrm.wmi.cls(u'Win32_UserProfile').reference({u'SID': sid}).get()
 
     @cached_getter
     def system_profile(self):
@@ -26,8 +23,7 @@ class Users(object):
 
     @cached_getter
     def all_accounts(self):
-        query = self._winrm.wmi_query(u'Win32_UserAccount', {})
-        accounts = list(query.enumerate())
+        accounts = list(self._winrm.wmi.cls(u'Win32_UserAccount').enumerate({}))
         return accounts
 
     def account_by_name(self, local_name):

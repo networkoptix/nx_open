@@ -25,7 +25,7 @@ private:
 
     void onKeepAliveConnectionAccepted(
         std::unique_ptr<nx::network::WebSocket> connection,
-        std::vector<nx::network::http::StringType> restParams);
+        network::http::RequestPathParams restParams);
 };
 
 } // namespace discovery

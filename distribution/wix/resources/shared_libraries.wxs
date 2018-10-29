@@ -14,7 +14,6 @@
             <Component><File Name="nx_network.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="nx_kit.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="udt.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="nx_update.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="nx_sql.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="nx_vms_api.dll" KeyPath="yes" DiskId="2"/></Component>
         </ComponentGroup>

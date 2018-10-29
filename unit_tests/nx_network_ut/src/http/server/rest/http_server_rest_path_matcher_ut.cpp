@@ -13,32 +13,32 @@ class RestPathMatcher:
     public ::testing::Test
 {
 protected:
-    void assertPathRegistered(const nx::network::http::StringType& restPath, int val)
+    void assertPathRegistered(const std::string& restPath, int val)
     {
         ASSERT_TRUE(m_dictionary.add(restPath, val));
     }
 
-    void assertPathNotRegistered(const nx::network::http::StringType& restPath, int val)
+    void assertPathNotRegistered(const std::string& restPath, int val)
     {
         ASSERT_FALSE(m_dictionary.add(restPath, val));
     }
 
     void assertPathMatches(
-        const nx::network::http::StringType& path,
+        const std::string& path,
         int expectedValue,
-        std::vector<nx::network::http::StringType> expectedParams)
+        RequestPathParams expectedParams)
     {
-        std::vector<nx::network::http::StringType> params;
-        const auto& result = m_dictionary.match(path, &params);
+        RequestPathParams params;
+        const auto result = m_dictionary.match(path, &params);
 
         ASSERT_TRUE(static_cast<bool>(result));
         ASSERT_EQ(expectedValue, *result);
         ASSERT_EQ(expectedParams, params);
     }
 
-    void assertPathNotMatched(const nx::network::http::StringType& path)
+    void assertPathNotMatched(const std::string& path)
     {
-        std::vector<nx::network::http::StringType> params;
+        RequestPathParams params;
         ASSERT_FALSE(m_dictionary.match(path, &params));
     }
 
@@ -51,9 +51,9 @@ TEST_F(RestPathMatcher, find_handler)
     assertPathRegistered("/account/{accountId}/systems", 1);
     assertPathRegistered("/systems/{systemId}/users", 2);
 
-    assertPathMatches("/account/vpupkin/systems", 1, { "vpupkin" });
-    assertPathMatches("/account/vpu-pk.i_n/systems", 1, { "vpu-pk.i_n" });
-    assertPathMatches("/systems/sys1/users", 2, { "sys1" });
+    assertPathMatches("/account/vpupkin/systems", 1, {{{"accountId", "vpupkin"}}});
+    assertPathMatches("/account/vpu-pk.i_n/systems", 1, {{{"accountId", "vpu-pk.i_n"}}});
+    assertPathMatches("/systems/sys1/users", 2, {{{"systemId", "sys1"}}});
 }
 
 TEST_F(RestPathMatcher, find_handler_multiple_params)
@@ -63,13 +63,13 @@ TEST_F(RestPathMatcher, find_handler_multiple_params)
     assertPathMatches(
         "/account/akolesnikov/system/la_office_test/info",
         3,
-        { "akolesnikov", "la_office_test" });
+        {{{"accountId", "akolesnikov"}, {"systemName", "la_office_test"}}});
 }
 
 TEST_F(RestPathMatcher, find_case_insensitive)
 {
     assertPathRegistered("/account/{accountId}/systems", 1);
-    assertPathMatches("/accOUNT/vpupkIN/SYSTems", 1, { "vpupkIN" });
+    assertPathMatches("/accOUNT/vpupkIN/SYSTems", 1, {{{"accountId", "vpupkIN"}}});
 }
 
 TEST_F(RestPathMatcher, no_suitable_handler)
@@ -93,7 +93,12 @@ TEST_F(RestPathMatcher, registering_conflicting_handler)
     assertPathRegistered("/account/{accountId}/systems", 1);
     assertPathNotRegistered("/account/{accountId}/systems", 2);
 
-    assertPathMatches("/account/vpupkin/systems", 1, {"vpupkin"});
+    assertPathMatches("/account/vpupkin/systems", 1, {{{"accountId", "vpupkin"}}});
+}
+
+TEST_F(RestPathMatcher, path_with_same_name_attributes_cannot_be_registered)
+{
+    assertPathNotRegistered("/account/{accountId}/subAccount/{accountId}", 1);
 }
 
 } // namespace test

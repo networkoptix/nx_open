@@ -221,13 +221,13 @@ void HttpView::registerApiHandlers(
         EntityType::system, DataActionType::insert,
         [this](
             const AuthorizationInfo& authzInfo,
-            const std::vector<nx::network::http::StringType>& restPathParams,
+            const network::http::RequestPathParams& restPathParams,
             data::SystemId inputData,
             std::function<void(api::ResultCode)> completionHandler)
         {
             m_controller->systemMergeManager().startMergingSystems(
                 authzInfo,
-                restPathParams[0].toStdString(),
+                restPathParams.getByName(kSystemIdParam),
                 std::move(inputData.systemId),
                 std::move(completionHandler));
         });

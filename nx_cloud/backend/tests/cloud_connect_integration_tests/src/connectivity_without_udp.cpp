@@ -21,7 +21,7 @@ protected:
     }
 };
 
-TEST_F(ConnectivityWithoutUdp, DISABLED_connect_works)
+TEST_F(ConnectivityWithoutUdp, connect_works)
 {
     assertConnectionCanBeEstablished();
 }

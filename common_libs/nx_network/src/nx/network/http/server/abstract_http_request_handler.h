@@ -47,7 +47,7 @@ struct RequestContext
      * and request /object_type/id1/sub_object_type/id2 was received.
      * Then this vector would be ("id1", "id2").
      */
-    std::vector<StringType> requestPathParams;
+    RequestPathParams requestPathParams;
 };
 
 /**
@@ -70,7 +70,7 @@ public:
         nx::utils::stree::ResourceContainer&& authInfo,
         ResponseIsReadyHandler completionHandler);
 
-    void setRequestPathParams(std::vector<StringType> params);
+    void setRequestPathParams(RequestPathParams params);
     /**
      * Parameters parsed from URL path.
      * E.g., given http handler registered on path /account/%1/systems.
@@ -78,7 +78,7 @@ public:
      * Then this method will return {cartman}.
      * Works only when using RestMessageDispatcher.
      */
-    const std::vector<StringType>& requestPathParams() const;
+    const RequestPathParams& requestPathParams() const;
 
 protected:
     /**
@@ -100,7 +100,7 @@ protected:
 private:
     nx::network::http::Message m_responseMsg;
     ResponseIsReadyHandler m_completionHandler;
-    std::vector<StringType> m_requestPathParams;
+    RequestPathParams m_requestPathParams;
 };
 
 } // namespace nx

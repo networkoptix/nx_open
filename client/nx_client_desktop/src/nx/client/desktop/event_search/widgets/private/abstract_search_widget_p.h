@@ -2,6 +2,8 @@
 
 #include "../abstract_search_widget.h"
 
+#include <vector>
+
 #include <QtCore/QList>
 #include <QtCore/QHash>
 #include <QtCore/QPointer>
@@ -126,7 +128,7 @@ private:
         const QString cameraString;
     };
 
-    QList<DeviceDependentAction> m_deviceDependentActions;
+    std::vector<DeviceDependentAction> m_deviceDependentActions;
 };
 
 inline uint qHash(AbstractSearchWidget::Period source)

@@ -99,11 +99,6 @@ public:
         const QString& path, const QnRequestParams& params, const QByteArray& body,
         QnJsonRestResult& result, const QnRestConnectionProcessor* owner);
 
-    bool verifyCurrentPassword(
-        const CurrentPasswordData& passwordDat,
-        const QnRestConnectionProcessor* owner,
-        QnJsonRestResult* result = nullptr);
-
 protected:
     // QnRestRequestHandler interface implemenation:
     RestResponse executeGet(const RestRequest& request) override final;

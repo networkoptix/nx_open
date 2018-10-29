@@ -307,8 +307,7 @@ private:
             return true;
 
         nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
-        // TODO: #ak m_message should not be used after moving.
-        processMessage(std::move(m_message));
+        processMessage(std::exchange(m_message, Message()));
         if (watcher.objectDestroyed())
             return false; //< Connection has been removed by handler.
 
