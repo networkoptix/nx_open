@@ -6,10 +6,13 @@ from xml.dom import minidom
 
 import dateutil
 import pytz
+import urllib3.util
 import xmltodict
 from pylru import lrudecorator
 from typing import Mapping, Union
 from winrm import Protocol, exceptions
+
+from framework.os_access.windows_remoting.pywinrm_protocol import make_pywinrm_protocol
 
 _logger = logging.getLogger(__name__)
 
@@ -54,8 +57,17 @@ class Wmi(object):
     def __init__(self, protocol):  # type: (Protocol) -> ...
         self.protocol = protocol
 
+    @classmethod
+    def new(cls, hostname, port, username, password):
+        return cls(make_pywinrm_protocol(hostname, port, username, password))
+
     def __repr__(self):
-        return '<Wmi at {}>'.format(self.protocol.transport.endpoint)
+        transport = self.protocol.transport
+        parsed_url = urllib3.util.parse_url(transport.endpoint)
+        hostname = parsed_url.hostname
+        port = parsed_url.port
+        return 'Wmi.new({!r}, {!r}, {!r}, {!r})'.format(
+            hostname, port, transport.username, transport.password)
 
     def __eq__(self, other):
         if not isinstance(other, Wmi):
