@@ -5,7 +5,7 @@ from string import whitespace
 
 import pytest
 
-from framework.os_access.exceptions import BadParent, DoesNotExist, NotADir, NotAFile, BadPath
+from framework.os_access.exceptions import BadParent, DoesNotExist, NotADir, NotAFile, BadPath, AlreadyExists, NotEmpty
 from framework.os_access.local_path import LocalPath
 from framework.os_access.local_shell import local_shell
 from framework.os_access.path import copy_file
@@ -97,6 +97,23 @@ def existing_remote_dir(remote_test_dir):
 
 def test_home(path_cls):
     assert path_cls.home().exists()
+
+
+@pytest.mark.xfail()
+def test_mkdir_rmdir(existing_remote_dir):
+    path = existing_remote_dir / 'dir'
+    pytest.raises(DoesNotExist, path.rmdir)
+    path.mkdir()
+    pytest.raises(AlreadyExists, path.mkdir)
+    path.rmdir()
+
+
+@pytest.mark.xfail()
+def test_rmdir_on_not_empty(existing_remote_dir):
+    path = existing_remote_dir / 'dir_for_rmdir'
+    path.mkdir()
+    path.joinpath('file_to_prevent_rmdir').write_bytes(b'dummy content')
+    pytest.raises(NotEmpty, path.rmdir)
 
 
 def test_rmtree_write_exists(dirty_remote_test_dir):
