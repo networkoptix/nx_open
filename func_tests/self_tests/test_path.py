@@ -99,7 +99,6 @@ def test_home(path_cls):
     assert path_cls.home().exists()
 
 
-@pytest.mark.xfail()
 def test_mkdir_rmdir(existing_remote_dir):
     path = existing_remote_dir / 'dir'
     pytest.raises(DoesNotExist, path.rmdir)
@@ -108,7 +107,6 @@ def test_mkdir_rmdir(existing_remote_dir):
     path.rmdir()
 
 
-@pytest.mark.xfail()
 def test_rmdir_on_not_empty(existing_remote_dir):
     path = existing_remote_dir / 'dir_for_rmdir'
     path.mkdir()
