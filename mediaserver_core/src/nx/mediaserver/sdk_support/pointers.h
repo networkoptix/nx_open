@@ -14,13 +14,14 @@ template <typename RefCountable>
 class UniquePtr
 {
 public:
-    UniquePtr() = default;
     UniquePtr(RefCountable* refCountable):
         m_ptr(refCountable, [](nxpl::PluginInterface* ptr) { if (ptr) ptr->releaseRef(); })
     {
     }
+
     UniquePtr(UniquePtr&& other): m_ptr(std::move(other.m_ptr)) {}
     UniquePtr(const UniquePtr& other) = delete;
+    UniquePtr(): UniquePtr(nullptr) {}
     ~UniquePtr() = default;
 
     void reset(RefCountable* ptr = nullptr) noexcept { m_ptr.reset(ptr); }
@@ -50,13 +51,13 @@ template<typename RefCountable>
 class SharedPtr
 {
 public:
-    SharedPtr() = default;
     SharedPtr(RefCountable* refCountable):
         m_ptr(refCountable, [](RefCountable* ptr) { if (ptr) ptr->releaseRef(); })
     {
     }
     SharedPtr(SharedPtr&& other): m_ptr(std::move(other.m_ptr)) {}
-    SharedPtr(const SharedPtr& other): m_ptr(other.m_ptr) {};
+    SharedPtr(const SharedPtr& other): m_ptr(other.m_ptr) {}
+    SharedPtr(): SharedPtr(nullptr) {}
     ~SharedPtr() = default;
 
     void reset(RefCountable* ptr = nullptr) noexcept { m_ptr.reset(ptr); }
@@ -69,7 +70,7 @@ public:
     {
         m_ptr = other.m_ptr;
         return *this;
-    };
+    }
 
     SharedPtr& operator=(SharedPtr&& other) noexcept
     {
