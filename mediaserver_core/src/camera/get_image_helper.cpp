@@ -146,23 +146,18 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
         {
             video = camera->getLastVideoFrame(usePrimaryStream, preferredChannel);
             if (video)
-            {
-                NX_VERBOSE(kLogTag) << lm("%1(NOW): Got camera last frame").arg(__func__);
-            }
+                NX_VERBOSE(this, "%1(NOW): Got camera last frame", __func__);
             else
-            {
-                NX_VERBOSE(kLogTag) << lm("%1(NOW): Reject: camera last frame missing")
-                    .arg(__func__);
-            }
+                NX_VERBOSE(this, "%1(NOW): Reject: camera last frame missing", __func__);
         }
         else
         {
-            NX_VERBOSE(kLogTag) << lm("%1(NOW): Reject: camera missing").arg(__func__);
+            NX_VERBOSE(this, "%1(NOW): Reject: camera missing", __func__);
         }
     }
     else if (request.usecSinceEpoch == nx::api::ImageRequest::kLatestThumbnail)
     {
-        NX_VERBOSE(kLogTag) << lm("%1(LATEST): Get latest data").args(__func__);
+        NX_VERBOSE(this, "%1(LATEST): Get latest data", __func__);
         if (camera)
         {
             video = camera->getLastVideoFrame(usePrimaryStream, preferredChannel);
@@ -171,30 +166,31 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
                 video = camera->getLastVideoFrame(!usePrimaryStream, preferredChannel);
                 if (video)
                 {
-                    NX_VERBOSE(kLogTag) << lm(
-                        "%1(LATEST): Got camera last frame for the alternate stream")
-                        .arg(__func__);
+                    NX_VERBOSE(this, "%1(LATEST): Got camera last frame for the alternate stream",
+                        __func__);
                 }
                 else
                 {
-                    NX_VERBOSE(kLogTag) << lm(
-                        "%1(LATEST): Missing camera last frame for both streams").arg(__func__);
+                    NX_VERBOSE(this, "%1(LATEST): Missing camera last frame for both streams",
+                        __func__);
                 }
             }
             else
             {
-                NX_VERBOSE(kLogTag) << lm(
-                    "%1(LATEST): Got camera last frame for the requested stream").args(__func__);
+                NX_VERBOSE(this, "%1(LATEST): Got camera last frame for the requested stream",
+                    __func__);
             }
         }
-        if (!video)
+        // Don't look at archive on slow devices (dts based) if noArchiveOnSlowDevices is enabled.
+        if (!video && !(camera && resource->isDtsBased() && request.noArchiveOnSlowDevices))
         {
+
             openDelegateIfNeeded([&]() { return archiveDelegate->endTime() - 1000 * 100; });
             video = getNextArchiveVideoPacket(archiveDelegate, AV_NOPTS_VALUE);
             if (video)
-                NX_VERBOSE(kLogTag) << lm("%1(LATEST): Got from archive").arg(__func__);
+                NX_VERBOSE(this, "%1(LATEST): Got from archive", __func__);
             else
-                NX_VERBOSE(kLogTag) << lm("%1(LATEST): Missing from archive").arg(__func__);
+                NX_VERBOSE(this, "%1(LATEST): Missing from archive", __func__);
             isArchiveVideoPacket = true;
         }
     }
@@ -210,9 +206,9 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
                 ? request.usecSinceEpoch
                 : AV_NOPTS_VALUE);
         if (video)
-            NX_VERBOSE(kLogTag) << lm("%1(%2 us): Got from archive").args(__func__, timestampUs);
+            NX_VERBOSE(this, "%1(%2 us): Got from archive", __func__, timestampUs);
         else
-            NX_VERBOSE(kLogTag) << lm("%1(%2 us): Missing from archive").args(__func__, timestampUs);
+            NX_VERBOSE(this, "%1(%2 us): Missing from archive", __func__, timestampUs);
 
         if (!video && camera)
         {

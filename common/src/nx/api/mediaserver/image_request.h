@@ -50,6 +50,12 @@ struct ImageRequest
      */
     qint64 usecSinceEpoch = kLatestThumbnail;
 
+    /**
+     * If enabled, images requested with "Latest" option will not try to download from arhive
+     * on slow devices like NVR.
+     */
+    bool noArchiveOnSlowDevices = false;
+
     /** Forced rotation. Negative value means take default rotation from the camera settings. */
     int rotation = kDefaultRotation;
 
