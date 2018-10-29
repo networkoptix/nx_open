@@ -407,6 +407,7 @@ bool ExtendedRuleProcessor::executePanicAction(const vms::event::PanicActionPtr&
 bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractActionPtr& action)
 {
     const nx::vms::event::ActionParameters& actionParameters=action->getParams();
+    nx_http::StringType requestType;
 
     QUrl url(actionParameters.url);
     if ((actionParameters.requestType == nx_http::Method::get) ||
@@ -431,13 +432,16 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
                 }
             };
 
+        if (actionParameters.requestType.isEmpty())
+            requestType = nx_http::Method::get;
+
         nx_http::downloadFileAsyncEx(
             url,
             callback,
             nx_http::HttpHeaders(),
             actionParameters.authType,
             nx_http::AsyncHttpClient::Timeouts(),
-            actionParameters.requestType);
+            requestType);
         return true;
     }
     else
@@ -458,6 +462,9 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
         if (contentType.isEmpty())
             contentType = autoDetectHttpContentType(actionParameters.text.toUtf8());
 
+        if (actionParameters.requestType.isEmpty())
+            requestType = nx_http::Method::post;
+
         nx_http::uploadDataAsync(url,
             action->getParams().text.toUtf8(),
             contentType,
@@ -465,7 +472,7 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
             callback,
             actionParameters.authType,
             QString(), QString(), //< login/password.
-            actionParameters.requestType);
+            requestType);
         return true;
     }
 }
