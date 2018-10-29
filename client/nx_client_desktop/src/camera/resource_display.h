@@ -21,7 +21,7 @@ class QnClientVideoCamera;
 
 namespace nx {
 namespace utils {
-class Counter;
+class CounterWithSignal;
 } // namespace utils
 } // namespace nx
 

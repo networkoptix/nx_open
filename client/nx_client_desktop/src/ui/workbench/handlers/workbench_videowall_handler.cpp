@@ -587,7 +587,7 @@ void QnWorkbenchVideoWallHandler::swapLayouts(const QnVideoWallItemIndex firstIn
             /* Avoiding double swap */
             // TODO: #GDM refactor it
             bool bothSuccess = true;
-            nx::utils::Counter *counter = new nx::utils::CounterWithSignal(2);
+            auto counter = new nx::utils::CounterWithSignal(2);
             connect(counter, &nx::utils::CounterWithSignal::reachedZero, this, [callback, &bothSuccess, counter]()
             {
                 callback(bothSuccess, QnLayoutResourcePtr());
