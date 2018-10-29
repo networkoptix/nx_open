@@ -75,9 +75,9 @@
     <!-- std::string *Subject -->
     <onvifDevice:Subject></onvifDevice:Subject>
     <!-- time_t *ValidNotBefore -->
-    <onvifDevice:ValidNotBefore>2018-10-29T13:18:50Z</onvifDevice:ValidNotBefore>
+    <onvifDevice:ValidNotBefore>2018-10-29T21:59:17Z</onvifDevice:ValidNotBefore>
     <!-- time_t *ValidNotAfter -->
-    <onvifDevice:ValidNotAfter>2018-10-29T13:18:50Z</onvifDevice:ValidNotAfter>
+    <onvifDevice:ValidNotAfter>2018-10-29T21:59:17Z</onvifDevice:ValidNotAfter>
    </onvifDevice:CreateCertificate>
  </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>

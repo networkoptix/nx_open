@@ -90,9 +90,9 @@
 
     </onvifXsd:Source>
     <!-- time_t *EarliestRecording -->
-    <onvifXsd:EarliestRecording>2018-10-29T13:18:55Z</onvifXsd:EarliestRecording>
+    <onvifXsd:EarliestRecording>2018-10-29T21:59:21Z</onvifXsd:EarliestRecording>
     <!-- time_t *LatestRecording -->
-    <onvifXsd:LatestRecording>2018-10-29T13:18:55Z</onvifXsd:LatestRecording>
+    <onvifXsd:LatestRecording>2018-10-29T21:59:21Z</onvifXsd:LatestRecording>
     <!-- std::string Content -->
     <onvifXsd:Content></onvifXsd:Content>
     <!-- std::vector<onvifXsd__TrackInformation *> Track -->
@@ -105,9 +105,9 @@
      <!-- std::string Description -->
      <onvifXsd:Description></onvifXsd:Description>
      <!-- time_t DataFrom -->
-     <onvifXsd:DataFrom>2018-10-29T13:18:55Z</onvifXsd:DataFrom>
+     <onvifXsd:DataFrom>2018-10-29T21:59:21Z</onvifXsd:DataFrom>
      <!-- time_t DataTo -->
-     <onvifXsd:DataTo>2018-10-29T13:18:55Z</onvifXsd:DataTo>
+     <onvifXsd:DataTo>2018-10-29T21:59:21Z</onvifXsd:DataTo>
      <!-- std::vector<struct soap_dom_element> __any -->
      <!-- a repetition of 0 or more of the following -->
 

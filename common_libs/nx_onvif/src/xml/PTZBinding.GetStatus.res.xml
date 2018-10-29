@@ -90,7 +90,7 @@
     <!-- std::string *Error -->
     <onvifXsd:Error></onvifXsd:Error>
     <!-- time_t UtcTime -->
-    <onvifXsd:UtcTime>2018-10-29T13:18:54Z</onvifXsd:UtcTime>
+    <onvifXsd:UtcTime>2018-10-29T21:59:20Z</onvifXsd:UtcTime>
     <!-- std::vector<struct soap_dom_element> __any -->
     <!-- a repetition of 0 or more of the following -->
 

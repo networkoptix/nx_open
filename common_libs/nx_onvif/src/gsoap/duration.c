@@ -211,23 +211,23 @@ SOAP_FMAC3 LONG64 * SOAP_FMAC4 soap_in_xsd__duration(struct soap *soap, const ch
     a = (LONG64*)soap_id_forward(soap, soap->href, a, 0, SOAP_TYPE_xsd__duration, 0, sizeof(LONG64), 0, NULL, NULL);
   else if (a)
   { if (soap_s2xsd__duration(soap, soap_value(soap), a))
+      /********************************************
+      Beginning of a patch.
+      Allows to treat an empty XML element as an element with a zero time duration value.
+      This is done to support buggy devices that send incorrect XMLs
+      (that are not validated against a schema).
+      The problem is detected during VMS-10856 issue investigation.
+      ********************************************/
+      //return NULL;
       {
-          /********************************************
-          Beginning of a patch.
-          Allows to treat an empty XML element as an element with a zero time duration value.
-          This is done to support buggy devices that send incorrect XMLs
-          (that are not validated against a schema).
-          The problem is detected during VMS-10856 issue investigation.
-          ********************************************/
-          //return NULL;
           *a = 0;
           if (soap->body && soap_element_end_in(soap, tag))
               return NULL;
           return a;
-          /********************************************
-          Ending of a patch.
-          ********************************************/
       }
+      /********************************************
+      Ending of a patch.
+      ********************************************/
   }
   if (soap->body && soap_element_end_in(soap, tag))
     return NULL;

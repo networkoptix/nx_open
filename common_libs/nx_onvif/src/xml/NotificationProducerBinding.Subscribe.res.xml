@@ -98,9 +98,9 @@
     <!-- extensibility element(s) -->
    </oasisWsnB2:SubscriptionReference>
    <!-- time_t *CurrentTime -->
-   <oasisWsnB2:CurrentTime>2018-10-29T13:18:51Z</oasisWsnB2:CurrentTime>
+   <oasisWsnB2:CurrentTime>2018-10-29T21:59:18Z</oasisWsnB2:CurrentTime>
    <!-- time_t *TerminationTime -->
-   <oasisWsnB2:TerminationTime>2018-10-29T13:18:51Z</oasisWsnB2:TerminationTime>
+   <oasisWsnB2:TerminationTime>2018-10-29T21:59:18Z</oasisWsnB2:TerminationTime>
    <!-- std::vector<struct soap_dom_element> __any -->
    <!-- a repetition of 0 or more of the following -->
 
