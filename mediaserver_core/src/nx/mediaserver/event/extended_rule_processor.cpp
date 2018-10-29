@@ -407,7 +407,7 @@ bool ExtendedRuleProcessor::executePanicAction(const vms::event::PanicActionPtr&
 bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractActionPtr& action)
 {
     const nx::vms::event::ActionParameters& actionParameters=action->getParams();
-    nx_http::StringType requestType;
+    nx_http::StringType requestType = actionParameters.requestType;
 
     QUrl url(actionParameters.url);
     if ((actionParameters.requestType == nx_http::Method::get) ||
