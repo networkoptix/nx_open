@@ -11,7 +11,7 @@ if(IOS)
     set(ios_sources "src/nx/utils/log/log_ios.mm")
 endif()
 
-nx_add_target(nx_utils LIBRARY ${library_type}
+nx_add_target(nx_utils LIBRARY ${library_type} NO_MOC
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/app_info_impl.cpp"
         ${ios_sources}
@@ -20,6 +20,18 @@ nx_add_target(nx_utils LIBRARY ${library_type}
     PUBLIC_LIBS
         boost openssl Qt5::Core Qt5::Xml Qt5::Sql
         nx_kit
+)
+
+set(mocableFiles
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/counter.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/safe_direct_connection.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/uuid.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/url.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/thread/long_runnable.h)
+
+nx_add_qt_mocables(nx_utils ${mocableFiles}
+    INCLUDE_DIRS
+        "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
 
 target_compile_definitions(nx_utils

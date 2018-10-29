@@ -1,8 +1,9 @@
 #pragma once
 
-#include <deque>
+#include <map>
 #include <memory>
 
+#include <nx/utils/algorithm/item_selector.h>
 #include <nx/utils/basic_factory.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/mutex.h>
@@ -17,6 +18,15 @@ using ClientFactoryFunction =
 
 /**
  * Always instantiates client type with the highest priority.
+ * Tunnel type priorioty is lowered with each tunnel failure.
+ * Tunnel failure can be caused by some random short-term problems
+ * (e.g., TCP connection broken or cloud service restart).
+ * So, tunnel type can still be used. But, we do not know that.
+ * So, we should not switch away the "best" tunnel type forever.
+ * From time to time we should try to switch back.
+ *
+ * nx::utils::algorithm::ItemSelector is used to implement switching back.
+ * So, with each problem, we sink tunnel type and we will try it when it pops up.
  */
 class NX_NETWORK_API ClientFactory:
     public nx::utils::BasicFactory<ClientFactoryFunction>
@@ -29,16 +39,13 @@ public:
     template<typename ClientType>
     void registerClientType()
     {
-        QnMutexLocker lock(&m_mutex);
-
-        m_clientTypes.push_front(ClientTypeContext{
-            ++m_prevUsedTypeId,
+        registerClientType(
             [](const QUrl& baseUrl, ClientFeedbackFunction feedbackFunction)
             {
                 return std::make_unique<ClientType>(
                     baseUrl,
                     std::move(feedbackFunction));
-            }});
+            });
     }
 
     void clear();
@@ -51,16 +58,18 @@ private:
 
     struct ClientTypeContext
     {
-        int id = 0;
         InternalFactoryFunction factoryFunction;
     };
 
-    std::deque<ClientTypeContext> m_clientTypes;
+    std::map<int /*Tunnel type id*/, ClientTypeContext> m_clientTypes;
     QnMutex m_mutex;
     int m_prevUsedTypeId = 0;
+    nx::utils::algorithm::ItemSelector<int /*tunnel type id*/> m_tunnelTypeSelector;
 
     std::unique_ptr<BaseTunnelClient> defaultFactoryFunction(
         const QUrl& baseUrl);
+
+    void registerClientType(InternalFactoryFunction factoryFunction);
 
     void processClientFeedback(int typeId, bool success);
 };
