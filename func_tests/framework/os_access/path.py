@@ -52,7 +52,7 @@ class FileSystemPath(PurePath):
             except NotADir:
                 yield child
 
-    def mkdir(self, parents=False, exist_ok=True):
+    def mkdir(self, parents=False, exist_ok=False):
         try:
             self._mkdir_raw()
         except exceptions.AlreadyExists:

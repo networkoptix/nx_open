@@ -225,7 +225,7 @@ class SMBPath(FileSystemPath, PureWindowsPath):
             if pysmb_file.filename not in {u'.', u'..'}
             ]
 
-    def mkdir(self, parents=False, exist_ok=True):
+    def mkdir(self, parents=False, exist_ok=False):
         # No way to create all directories (parents and self) at once.
         # Usually, only few nearest parents don't exist,
         # that's why they're checked from nearest one.
