@@ -30,6 +30,8 @@ void AIOService::pleaseStopSync()
 
 bool AIOService::initialize(unsigned int aioThreadPollSize)
 {
+    aioThreadPollSize = 2;
+
     if (!aioThreadPollSize)
         aioThreadPollSize = QThread::idealThreadCount();
     initializeAioThreadPool(aioThreadPollSize);
