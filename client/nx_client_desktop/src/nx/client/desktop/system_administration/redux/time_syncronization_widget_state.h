@@ -49,21 +49,8 @@ struct TimeSynchronizationWidgetState: AbstractReduxState
 
     bool syncTimeWithInternet() const
     {
-        return enabled && primaryServer.isNull();
-    }
-
-    QnUuid actualPrimaryServer() const
-    {
-        if (!enabled)
-            return QnUuid();
-
-        if (std::any_of(servers.cbegin(), servers.cend(),
-            [this](const ServerInfo& info) { return info.id == primaryServer; }))
-        {
-            return primaryServer;
-        }
-
-        return QnUuid();
+        return status == Status::synchronizedWithInternet
+            || status == Status::noInternetConnection;
     }
 };
 

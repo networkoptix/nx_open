@@ -136,7 +136,7 @@ void TimeSynchronizationWidget::applyChanges()
     const auto& state = m_store->state();
 
     qnGlobalSettings->setTimeSynchronizationEnabled(state.enabled);
-    qnGlobalSettings->setPrimaryTimeServer(state.actualPrimaryServer());
+    qnGlobalSettings->setPrimaryTimeServer(state.primaryServer);
     qnGlobalSettings->synchronizeNow();
 }
 
@@ -180,17 +180,17 @@ void TimeSynchronizationWidget::loadState(const TimeSynchronizationWidgetState& 
     using ::setReadOnly;
 
     const auto vmsDateTime = dateTimeFromMSecs(state.vmsTime);
+    const bool isSyncWithInternet = state.syncTimeWithInternet();
 
     ui->timeLabel->setText(datetime::toString(vmsDateTime.time()));
     ui->dateLabel->setText(datetime::toString(vmsDateTime.date()));
     ui->zoneLabel->setText(vmsDateTime.timeZoneAbbreviation());
 
-    ui->detailsWidget->setCurrentWidget(
-        state.status == State::Status::synchronizedWithInternet
-            ? ui->placeholderPage
-            : ui->serversTablePage);
+    ui->detailsWidget->setCurrentWidget(state.status == State::Status::synchronizedWithInternet
+        ? ui->placeholderPage
+        : ui->serversTablePage);
 
-    ui->syncWithInternetCheckBox->setChecked(state.syncTimeWithInternet());
+    ui->syncWithInternetCheckBox->setChecked(isSyncWithInternet);
     setReadOnly(ui->syncWithInternetCheckBox, state.readOnly);
 
 

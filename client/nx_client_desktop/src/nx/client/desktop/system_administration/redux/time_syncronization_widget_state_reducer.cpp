@@ -16,9 +16,15 @@ State TimeSynchronizationWidgetReducer::initialize(
     state.servers = servers;
 
     // Actualize primary time server against servers list.
-    state.primaryServer = state.actualPrimaryServer();
+    state.primaryServer = actualPrimaryServer(state).id;
     state.lastPrimaryServer = state.primaryServer;
     state.hasChanges = false;
+
+    // If invalid server was passed, disable synchronization.
+    if (primaryTimeServer != state.primaryServer)
+        state.enabled = false;
+
+    state.status = actualStatus(state);
 
     return state;
 }
@@ -65,6 +71,55 @@ Result TimeSynchronizationWidgetReducer::setSyncTimeWithInternet(
     }
     state.hasChanges = true;
     return {true, std::move(state)};
+}
+
+State::ServerInfo TimeSynchronizationWidgetReducer::actualPrimaryServer(const State& state)
+{
+    if (!state.enabled)
+        return {};
+
+    const auto& servers = state.servers;
+    if (const auto iter = std::find_if(
+        servers.cbegin(),
+        servers.cend(),
+        [id = state.primaryServer](const auto& info) { return info.id == id; });
+        iter != servers.cend())
+    {
+        return *iter;
+    }
+
+    return {};
+}
+
+State::Status TimeSynchronizationWidgetReducer::actualStatus(const State& state)
+{
+    if (!state.enabled)
+        return State::Status::notSynchronized;
+
+    const auto primaryServer = actualPrimaryServer(state);
+    NX_ASSERT(state.primaryServer == primaryServer.id);
+
+    if (state.primaryServer.isNull())
+    {
+        if (!std::any_of(state.servers.cbegin(), state.servers.cend(),
+            [](const auto& info) { return info.hasInternet; }))
+        {
+            return State::Status::noInternetConnection;
+        }
+
+        return State::Status::synchronizedWithInternet;
+    }
+
+    if (state.servers.size() == 1)
+    {
+        NX_ASSERT(state.servers.first().id == state.primaryServer);
+        return State::Status::singleServerLocalTime;
+    }
+
+    if (!primaryServer.online)
+        return State::Status::selectedServerIsOffline;
+
+    return State::Status::synchronizedWithSelectedServer;
 }
 
 } // namespace nx::client::desktop

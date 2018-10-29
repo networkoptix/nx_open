@@ -18,6 +18,10 @@ public:
 
     static Result setReadOnly(State state, bool value);
     static Result setSyncTimeWithInternet(State state, bool value);
+
+    // Utility methods.
+    static State::ServerInfo actualPrimaryServer(const State& state);
+    static State::Status actualStatus(const State& state);
 };
 
 } // namespace nx::client::desktop
