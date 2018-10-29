@@ -9,6 +9,8 @@ import pytz
 import xmltodict
 from pylru import lrudecorator
 from typing import Mapping, Union
+from urllib3.util import Url, parse_url
+from winrm import Protocol
 from winrm.exceptions import WinRMError, WinRMTransportError
 
 _logger = logging.getLogger(__name__)
@@ -51,8 +53,11 @@ def _format_timeout(timeout_sec):
 
 
 class Wmi(object):
-    def __init__(self, protocol):
+    def __init__(self, protocol):  # type: (Protocol) -> ...
         self.protocol = protocol
+
+    def __repr__(self):
+        return '<Wmi at {}>'.format(self.protocol.transport.endpoint)
 
     def __eq__(self, other):
         if not isinstance(other, Wmi):
