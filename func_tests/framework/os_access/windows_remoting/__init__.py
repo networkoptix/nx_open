@@ -4,12 +4,12 @@ import subprocess
 
 import pathlib2 as pathlib
 import requests
-import winrm
 
 from framework.context_logger import ContextLogger
 from framework.method_caching import cached_getter
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.windows_remoting import cmd, powershell, registry, wmi
+from framework.os_access.windows_remoting.pywinrm_protocol import make_pywinrm_protocol
 
 _logger = ContextLogger(__name__, 'winrm')
 
@@ -32,12 +32,7 @@ class WinRM(object):
     """
 
     def __init__(self, address, port, username, password):
-        self._protocol = winrm.Protocol(
-            'http://{}:{}/wsman'.format(address, port),
-            username=username, password=password,
-            transport='ntlm',  # 'plaintext' is easier to debug but, for some obscure reason, is slower.
-            message_encryption='never',  # Any value except 'always' and 'auto'.
-            operation_timeout_sec=120, read_timeout_sec=240)
+        self._protocol = make_pywinrm_protocol(address, port, username, password)
         self._username = username
         self._repr = 'WinRM({!r}, {!r}, {!r}, {!r})'.format(address, port, username, password)
         self.wmi = wmi.Wmi(self._protocol)
