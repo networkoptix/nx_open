@@ -18,15 +18,8 @@ struct DbBackupFileData
 {
     QString fullPath;
     int build = -1;
-    int index = -1;
     qint64 timestamp = -1;
 };
-
-/**
-* @return Unique filename according to pattern "<prefix>_<build>_<index>.backup" by
-* incrementing index
-*/
-QString makeNextUniqueName(const QString& prefix, int build);
 
 bool backupDatabase(const QString& backupDir,
     std::shared_ptr<ec2::AbstractECConnection> connection,

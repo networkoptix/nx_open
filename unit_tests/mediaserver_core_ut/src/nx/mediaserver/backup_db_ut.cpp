@@ -30,13 +30,12 @@ protected:
     {
         m_server = std::make_unique<MediaServerLauncher>(/* tmpDir */ "");
         m_server->addSetting(QnServer::kNoInitStoragesOnStartup, "1");
-        m_baseDir = m_server->serverModule()->settings().dataDir();
-        m_backupDir = m_server->serverModule()->settings().backupDir();
     }
 
     void whenServerLaunched()
     {
         ASSERT_TRUE(m_server->start());
+        m_backupDir = m_server->serverModule()->settings().backupDir();
     }
 
     void whenSomeFilesCreated(int count, FileType fileType)
@@ -50,7 +49,7 @@ protected:
                     .arg(i + 1000LL * 3600LL * 24LL * 365LL * 2010LL)
                 : notQuiteBackupFileName();
 
-            const auto filePath = QDir(m_baseDir).absoluteFilePath(fileName);
+            const auto filePath = QDir(m_backupDir).absoluteFilePath(fileName);
             QList<QString>* containerToSaveIn = fileType == FileType::backup
                 ? &m_backupFilesCreated
                 : &m_nonBackupFilesCreated;
@@ -66,7 +65,7 @@ protected:
 
     void whenAllBackupFilesDataCalled()
     {
-        m_backupFilesDataFound = nx::vms::utils::allBackupFilesDataSorted(m_baseDir);
+        m_backupFilesDataFound = nx::vms::utils::allBackupFilesDataSorted(m_backupDir);
     }
 
     void thenAllBackupFilesShouldBeFound()
@@ -99,12 +98,12 @@ protected:
 
     void whenDeleteOldFilesFunctionCalled()
     {
-        vms::utils::deleteOldBackupFilesIfNeeded(m_baseDir, m_freeSpace);
+        vms::utils::deleteOldBackupFilesIfNeeded(m_backupDir, m_freeSpace);
     }
 
     void thenOldestFilesShouldBeDeleted(int filesLeft)
     {
-        const auto foundFiles = nx::vms::utils::allBackupFilesDataSorted(m_baseDir);
+        const auto foundFiles = nx::vms::utils::allBackupFilesDataSorted(m_backupDir);
         ASSERT_EQ(filesLeft, foundFiles.size());
         ASSERT_EQ(foundFiles[0].timestamp, m_backupFilesDataFound[0].timestamp);
     }
@@ -129,7 +128,8 @@ protected:
 
     void givenBackupRotationPeriod(std::chrono::milliseconds period)
     {
-        m_server->serverModule()->mutableSettings()->dbBackupPeriodMS.set(period);
+        m_server->addSetting("dbBackupPeriodMS", 
+            QString::fromStdString(std::to_string(period.count())));
     }
 
     void thenSeveralRotationsShouldBeObserved()
@@ -137,14 +137,13 @@ protected:
         waitForAllBackupFilesToBeCreated();
 
         QList<nx::vms::utils::DbBackupFileData> oldBackupFilesData;
+        int kMaxRotationCount = 10;
+        int rotations = 0;
 
-        while (true)
+        while (rotations < kMaxRotationCount)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
             const auto backupFilesData = nx::vms::utils::allBackupFilesDataSorted(m_backupDir);
-
-            if (backupFilesData.isEmpty())
-                continue;
 
             if (oldBackupFilesData.isEmpty())
             {
@@ -153,7 +152,9 @@ protected:
             }
             else
             {
-
+                ASSERT_TRUE(std::abs(backupFilesData.size() - oldBackupFilesData.size()) <= 1);
+                if (backupFilesData[0].timestamp != oldBackupFilesData[0].timestamp)
+                    ++rotations;
             }
 
             oldBackupFilesData = backupFilesData;
@@ -165,17 +166,14 @@ private:
     QList<nx::vms::utils::DbBackupFileData> m_backupFilesDataFound;
     QList<QString> m_backupFilesCreated;
     QList<QString> m_nonBackupFilesCreated;
-    QString m_baseDir;
     QString m_backupDir;
     qint64 m_freeSpace = -1;
 
     static QString notQuiteBackupFileName()
     {
         const QList<QString> fileNames = {
-            "ec_ab_1_100.backup",
-            "ec_1_ab_100.backup",
-            "ec_1_ab_cd.backup",
-            "ec_1_ab_100.backup",
+            "ec_ab_100.backup",
+            "ec_ab_cd.backup",
             "hello.txt",
             "looks_like_.backup"
         };
@@ -187,11 +185,18 @@ private:
     {
         const int kMaxBackupFilesCount =
             nx::SystemCommands().freeSpace(m_backupDir.toStdString()) > 10 * 1024LL * 1024LL * 1024LL
-            ? 6
-            : 1;
+            ? 6 : 1;
+
+        qDebug() << "FILE COUNT:" << kMaxBackupFilesCount << "WAIT PERIOD IS" << m_server->serverModule()->settings().dbBackupPeriodMS().count();
 
         while (m_backupFilesDataFound.size() != kMaxBackupFilesCount)
+        {
+            whenAllBackupFilesDataCalled();
+            qDebug() << "CEHCK";
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+
+        qDebug() << "ALL FILES CREATED" << kMaxBackupFilesCount;
     }
 };
 

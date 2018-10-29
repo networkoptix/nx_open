@@ -17,6 +17,7 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/password_analyzer.h>
 #include <utils/common/synctime.h>
+#include <utils/common/util.h>
 #include <nx/system_commands.h>
 
 namespace nx {
@@ -25,25 +26,13 @@ namespace utils {
 
 struct VmsUtilsFunctionsTag{};
 
-QString makeNextUniqueName(const QString& prefix, int build)
-{
-    QString fileName;
-    for (int index = 0; ; ++index)
-    {
-        auto fileName = lm("%1_%2_%3_%4.backup").args(prefix, build, index,
-            qnSyncTime->currentMSecsSinceEpoch());
-        if (!QFile::exists(fileName))
-            return fileName;
-    }
-    return fileName; //< We never reach this line.
-}
-
 bool backupDatabase(const QString& backupDir,
     std::shared_ptr<ec2::AbstractECConnection> connection,
     const boost::optional<QString>& dbFilePath)
 {
-    const nx::utils::SoftwareVersion productVersion(nx::utils::AppInfo::applicationVersion());
-    QString fileName = makeNextUniqueName(backupDir + lit("/ecs"), productVersion.build());
+    const QString fileName = lm("%1_%2_%3.backup").args(closeDirPath(backupDir) + "ecs", 
+        nx::utils::SoftwareVersion(nx::utils::AppInfo::applicationVersion()).build(), 
+        qnSyncTime->currentMSecsSinceEpoch());
 
     QDir dir(backupDir);
     if (!dir.exists() && !dir.mkdir(backupDir))
@@ -77,6 +66,8 @@ bool backupDatabase(const QString& backupDir,
     NX_WARNING(typeid(VmsUtilsFunctionsTag),
         lm("Successfully created DB backup %1").args(fileName));
 
+    qDebug() << "SUCCESS";
+
     return true;
 }
 
@@ -94,7 +85,7 @@ QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir)
             continue;
 
         auto nameSplits = fileInfo.baseName().split('_');
-        if (nameSplits.size() != 4)
+        if (nameSplits.size() != 3)
             continue;
 
         DbBackupFileData backupFileData;
@@ -104,9 +95,7 @@ QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir)
         bool conversionSuccessfull = true;
         backupFileData.build = nameSplits[1].toInt(&ok);
         conversionSuccessfull &= ok;
-        backupFileData.index = nameSplits[2].toInt(&ok);
-        conversionSuccessfull &= ok;
-        backupFileData.timestamp = nameSplits[3].toLongLong(&ok);
+        backupFileData.timestamp = nameSplits[2].toLongLong(&ok);
         conversionSuccessfull &= ok;
 
         if (!conversionSuccessfull)
