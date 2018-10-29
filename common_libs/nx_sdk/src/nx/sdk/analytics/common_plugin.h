@@ -26,14 +26,12 @@ public:
     using CreateEngine = std::function<Engine*(Plugin* plugin)>;
 
     /**
+     * @param libName Name of the plugin library. It's needed for the logging.
      * @param pluginManifest Plugin manifest to be returned from the manifest method.
      * @param createEngine Functor for engine creation.
      */
     CommonPlugin(
-        // TODO: Actually we can figure out the plugin name from the manifest,
-        // But since there is no JSON support in our helpers let's pass it as an additional
-        // parameter. Probably we need to add some JSON helpers to the SDK.
-        std::string pluginName,
+        std::string libName,
         std::string pluginManifest,
         CreateEngine createEngine);
 

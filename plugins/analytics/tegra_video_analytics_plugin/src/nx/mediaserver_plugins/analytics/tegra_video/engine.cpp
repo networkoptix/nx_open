@@ -89,11 +89,11 @@ std::string Engine::manifest() const
 
 namespace {
 
-static const std::string kPluginName = "TegraVideo analytics plugin";
+static const std::string kLibName = "tegra_video_analytics_plugin";
 static const std::string kPluginManifest = R"json(
 {
     "id": "nx.tegra_video",
-    "name": ")json" + kPluginName + R"json(",
+    "name": "TegraVideo analytics plugin",
     "version": "1.0.0",
     "engineSettingsModel": "",
     "deviceAgentSettingsModel": ""
@@ -106,7 +106,7 @@ extern "C" {
 NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
     return new nx::sdk::analytics::CommonPlugin(
-        kPluginName,
+        kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::Plugin* plugin)
         {

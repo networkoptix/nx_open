@@ -146,11 +146,11 @@ void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
 
 namespace {
 
-static const std::string kPluginName = "Axis driver";
+static const std::string kLibName = "axis_analytics_plugin";
 static const std::string kPluginManifest = R"json(
 {
     "id": "nx.axis",
-    "name": ")json" + kPluginName + R"json(",
+    "name": "Axis analytics plugin",
     "version": "1.0.0",
     "engineSettingsModel": "",
     "deviceAgentSettingsModel": ""
@@ -163,7 +163,7 @@ extern "C" {
 NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
     return new nx::sdk::analytics::CommonPlugin(
-        kPluginName,
+        kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::Plugin* plugin)
         {

@@ -392,11 +392,11 @@ void Engine::freeManifest(const char* manifestData)
 
 namespace {
 
-static const std::string kPluginName = "SSC analytics plugin";
+static const std::string kLibName = "ssc_analytics_plugin";
 static const std::string kPluginManifest = R"json(
 {
     "id": "nx.ssc",
-    "name": ")json" + kPluginName + R"json(",
+    "name": "SSC analytics plugin",
     "version": "1.0.0",
     "engineSettingsModel": "",
     "deviceAgentSettingsModel": ""
@@ -409,7 +409,7 @@ extern "C" {
 NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
     return new nx::sdk::analytics::CommonPlugin(
-        kPluginName,
+        kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::Plugin* plugin)
         {

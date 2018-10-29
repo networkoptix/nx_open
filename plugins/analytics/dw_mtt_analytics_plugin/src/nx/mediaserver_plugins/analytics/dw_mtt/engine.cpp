@@ -127,11 +127,11 @@ void Engine::executeAction(
 
 namespace {
 
-static const std::string kPluginName = "DW MTT analytics plugin";
+static const std::string kLibName = "dw_mtt_analytics_plugin";
 static const std::string kPluginManifest = R"json(
 {
     "id": "nx.dw_mtt",
-    "name": ")json" + kPluginName + R"json(",
+    "name": "DW MTT analytics plugin",
     "version": "1.0.0",
     "engineSettingsModel": "",
     "deviceAgentSettingsModel": ""
@@ -144,7 +144,7 @@ extern "C" {
 NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
     return new nx::sdk::analytics::CommonPlugin(
-        kPluginName,
+        kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::Plugin* plugin)
         {
