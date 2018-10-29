@@ -1,7 +1,7 @@
 import errno
 import os
 import stat
-from errno import EEXIST, EISDIR, ENOENT, ENOTDIR
+from errno import EEXIST, EISDIR, ENOENT, ENOTDIR, ENOTEMPTY
 from functools import wraps
 from shutil import rmtree
 
@@ -42,6 +42,7 @@ _reraising_existing_file_errors = _reraising({
 _reraising_existing_dir_errors = _reraising({
     ENOENT: exceptions.DoesNotExist,
     EEXIST: exceptions.AlreadyExists,
+    ENOTEMPTY: exceptions.NotEmpty,
     })
 
 
@@ -62,6 +63,7 @@ class LocalPath(PosixPath, FileSystemPath):
     write_text = _reraising_new_file_errors(PosixPath.write_text)
     read_text = _reraising_existing_file_errors(PosixPath.read_text)
     unlink = _reraising_existing_file_errors(PosixPath.unlink)
+    rmdir = _reraising_existing_dir_errors(PosixPath.rmdir)
 
     def __repr__(self):
         return 'LocalPath({!r})'.format(str(self))
