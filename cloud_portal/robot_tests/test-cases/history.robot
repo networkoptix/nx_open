@@ -36,15 +36,16 @@ loop expanders
     Wait Until Element Is Visible    ${RELEASE NUMBER}
     ${first number}    Get Text    ${RELEASE NUMBER}
     #create an element to reference that will always refer to elements in the first section of each tab
-    ${first section}    Set Variable If    ${FULL}==False    //div[contains(@class,"active")]//div[@ng-repeat="release in activeBuilds"]//h1/b[text()='${first number}']
+    ${first section}    Set Variable If    ${FULL}==False    //div[contains(@class,"active")]//h1[contains(text(),'${first number}')]
     #get all or just first section
-    ${expandables}    Run Keyword If    ${FULL}==True    Get WebElements    //div[contains(@class,"active")]//h4/a
-    ...    ELSE    Get WebElements    ${first section}/../..//div[@ng-repeat="platform in release.platforms"]/h5/a[@ng-click="expand[platform.name] = !expand[platform.name]"]
+    ${expandables}    Run Keyword If    ${FULL}==True    Get WebElements    //div[contains(@class,"active")]//div/a
+    ...    ELSE    Get WebElements    ${first section}/../..//div/a
+    Run Keyword Unless    ${expandables}    Fail    Expandables was empty
     #open the expanders
     : FOR    ${platform}    IN    @{expandables}
     \    Click Link    ${platform}
-    \    ${downloads}=    Run Keyword If    ${FULL}==True    Get WebElements    //div[contains(@class,"active")]//h4/following-sibling::ul/li/a
-    \    ...    ELSE    Get WebElements    ${first section}/../..//div[@ng-repeat="platform in release.platforms"]/h5/a[@ng-click="expand[platform.name] = !expand[platform.name]"]/../../ul/li/a
+    \    ${downloads}=    Run Keyword If    ${FULL}==True    Get WebElements    //div[contains(@class,"active")]//div/a/../ul/li/a
+    \    ...    ELSE    Get WebElements    ${first section}/../..//div/ul/li/a
     \    loop links    ${downloads}
 
 #check each link in each expander for validity

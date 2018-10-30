@@ -117,7 +117,7 @@ requires log In, if the user has just logged out and pressed back button in brow
     Validate Log In
     Log Out
     Go Back
-    Validate Log Out
+    Wait Until Element Is Visible    ${LOG IN MODAL}
 
 handles more than 255 symbols email and password
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
@@ -206,4 +206,4 @@ handles two tabs, updates second tab state if logout is done on first
     Select Window    @{tabs}[1]
     Location Should Be    ${url}/systems
     Reload Page
-    Validate Log Out
+    Wait Until Element Is Visible    ${LOG IN MODAL}
