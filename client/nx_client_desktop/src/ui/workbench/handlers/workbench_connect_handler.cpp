@@ -96,6 +96,8 @@
 #include <nx_ec/dummy_handler.h>
 #include <nx/client/desktop/videowall/utils.h>
 
+#include <ini.h>
+
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
@@ -198,7 +200,8 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     m_crashReporter(commonModule())
 {
     // This will work on its own.
-    const auto sessionTimeoutWatcher = new WorkbenchSessionTimeoutWatcher(this);
+    if (ini().enableSessionTimeout)
+        const auto sessionTimeoutWatcher = new WorkbenchSessionTimeoutWatcher(this);
 
     connect(this, &QnWorkbenchConnectHandler::stateChanged, this,
         &QnWorkbenchConnectHandler::handleStateChanged);
