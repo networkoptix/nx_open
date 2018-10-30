@@ -516,13 +516,6 @@ bool ServerUpdateTool::verifyUpdateManifest(UpdateContents& contents) const
         activeServers = m_activeServers;
     }
 
-    bool shouldCheckCloud = false;
-    if (auto cloudWatcher = qnClientModule->cloudStatusWatcher())
-    {
-        if (cloudWatcher->isCloudEnabled() && !contents.info.cloudHost.isEmpty())
-            shouldCheckCloud = true;
-    }
-
     // Checking if all servers have update packages.
     for(auto record: activeServers)
     {
@@ -555,14 +548,10 @@ bool ServerUpdateTool::verifyUpdateManifest(UpdateContents& contents) const
                 << "ver" << targetVersion.toString();
             contents.invalidVersion.insert(server);
         }
-
-        if (shouldCheckCloud)
-        {
-            auto moduleInformation = server->getModuleInformation();
-            if (moduleInformation.cloudHost != contents.info.cloudHost)
-                contents.cloudIsCompatible = false;
-        }
     }
+
+    contents.cloudIsCompatible = checkCloudHost(commonModule(),
+        targetVersion, contents.info.cloudHost, getAllServers());
 
     if (!contents.missingUpdate.empty() || !contents.clientPackage.isValid())
         contents.error = nx::update::InformationError::missingPackageError;
