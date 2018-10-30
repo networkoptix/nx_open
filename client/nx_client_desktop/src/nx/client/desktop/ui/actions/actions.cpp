@@ -48,12 +48,6 @@ void initialize(Manager* manager, Action* root)
         .checkable()
         .autoRepeat(false);
 
-    factory(ShowDebugOverlayAction)
-        .flags(GlobalHotkey | DevMode)
-        .text(lit("Show Debug")) //< DevMode, so untranslatable
-        .shortcut(lit("Ctrl+Alt+D"))
-        .autoRepeat(false);
-
     factory(DropResourcesAction)
         .flags(ResourceTarget | WidgetTarget | LayoutItemTarget | LayoutTarget | SingleTarget | MultiTarget)
         .mode(DesktopMode);
@@ -255,20 +249,6 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Browse Local Files"))
         .toggledText(ContextMenu::tr("Show Welcome Screen"))
         .condition(new BrowseLocalFilesCondition());
-
-    factory()
-        .flags(Main)
-        .separator();
-
-    factory(TogglePanicModeAction)
-        .flags(GlobalHotkey | DevMode)
-        .mode(DesktopMode)
-        .text(lit("Start Panic Recording")) //< DevMode, so untranslatable
-        .toggledText(lit("Stop Panic Recording")) //< DevMode, so untranslatable
-        .autoRepeat(false)
-        .shortcut(lit("Ctrl+P"))
-        .requiredGlobalPermission(GlobalPermission::admin)
-        .condition(new PanicCondition());
 
     factory()
         .flags(Main | Tree)
@@ -493,16 +473,6 @@ void initialize(Manager* manager, Action* root)
             .flags(Main)
             .separator();
     }
-
-    factory(ExportStandaloneClientAction)
-        .flags(Main | DevMode)
-        .text(lit("Export Standalone Client"))
-        .condition(condition::isTrue(nx::utils::AppInfo::isWindows()));
-
-    factory()
-        .flags(Main | DevMode)
-        .separator()
-        .condition(condition::isTrue(nx::utils::AppInfo::isWindows()));
 
     factory(EscapeHotkeyAction)
         .flags(GlobalHotkey)
@@ -1724,28 +1694,13 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Close All But This"))
         .condition(new LayoutCountCondition(2));
 
-    factory(DebugIncrementCounterAction)
-        .flags(GlobalHotkey | DevMode)
-        .shortcut(lit("Ctrl+Alt+Shift++"))
-        .text(lit("Increment Debug Counter")); //< DevMode, so untranslatable
-
-    factory(DebugDecrementCounterAction)
-        .flags(GlobalHotkey | DevMode)
-        .shortcut(lit("Ctrl+Alt+Shift+-"))
-        .text(lit("Decrement Debug Counter")); //< DevMode, so untranslatable
-
     factory(DebugCalibratePtzAction)
         .flags(Scene | SingleTarget | DevMode)
-        .text(lit("Calibrate PTZ")); //< DevMode, so untranslatable
+        .text("Calibrate PTZ"); //< DevMode, so untranslatable
 
     factory(DebugGetPtzPositionAction)
         .flags(Scene | SingleTarget | DevMode)
-        .text(lit("Get PTZ Position")); //< DevMode, so untranslatable
-
-    factory(DebugControlPanelAction)
-        .flags(GlobalHotkey | DevMode)
-        .shortcut(lit("Ctrl+Alt+Shift+D"))
-        .text(lit("Debug Control Panel")); //< DevMode, so untranslatable
+        .text("Get PTZ Position"); //< DevMode, so untranslatable
 
     factory(PlayPauseAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
@@ -1884,10 +1839,64 @@ void initialize(Manager* manager, Action* root)
     factory(PtzActivatePresetByIndexAction)
         .flags(NoTarget);
 
-    factory(OpenNewSceneAction)
-        .flags(GlobalHotkey | DevMode)
-        .shortcut(lit("Ctrl+Shift+E"))
-        .autoRepeat(false);
+    // -- Developer mode actions further. Please make note: texts are untranslatable. --
+
+    factory()
+        .flags(Main | DevMode)
+        .separator();
+
+    factory()
+        .flags(Main | DevMode)
+        .text("[Developer Mode]");
+
+    factory.beginSubMenu();
+    {
+        factory(OpenNewSceneAction)
+            .flags(GlobalHotkey | Main | DevMode)
+            .text("Open New Scene")
+            .shortcut("Ctrl+Shift+E")
+            .autoRepeat(false);
+
+        factory(ShowDebugOverlayAction)
+            .flags(GlobalHotkey | Main | DevMode)
+            .text("Show Debug Overlay")
+            .shortcut("Ctrl+Alt+D")
+            .autoRepeat(false);
+
+        factory(TogglePanicModeAction)
+            .flags(GlobalHotkey | DevMode)
+            .mode(DesktopMode)
+            .text("Start Panic Recording")
+            .toggledText("Stop Panic Recording")
+            .autoRepeat(false)
+            .shortcut("Ctrl+P")
+            .requiredGlobalPermission(GlobalPermission::admin)
+            .condition(new PanicCondition());
+
+        factory(ExportStandaloneClientAction)
+            .flags(Main | DevMode)
+            .text("Export Standalone Client")
+            .condition(condition::isTrue(nx::utils::AppInfo::isWindows()));
+
+        factory(DebugControlPanelAction)
+            .flags(GlobalHotkey | Main | DevMode)
+            .shortcut("Ctrl+Alt+Shift+D")
+            .text("Debug Control Panel");
+
+        factory(DebugIncrementCounterAction)
+            .flags(GlobalHotkey | Main | DevMode)
+            .shortcut("Ctrl+Alt+Shift++")
+            .text("Increment Debug Counter");
+
+        factory(DebugDecrementCounterAction)
+            .flags(GlobalHotkey | Main | DevMode)
+            .shortcut("Ctrl+Alt+Shift+-")
+            .text("Decrement Debug Counter");
+
+    }
+    factory.endSubMenu();
+
+    // -- Developer mode actions end. Please do not add real actions afterwards.
 }
 
 } // namespace action
