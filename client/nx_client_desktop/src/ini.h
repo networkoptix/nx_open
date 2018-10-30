@@ -32,7 +32,6 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(1, enableDetectedObjectsInterpolation, "Allow interpolation of detected objects between frames.");
     NX_INI_FLAG(0, displayAnalyticsDelay, "Add delay label to detected object description.");
     NX_INI_FLAG(0, enableDeviceSearch, "Enable reworked device search dialog");
-    NX_INI_FLAG(1, enableWearableCameras, "Enable wearable cameras.");
     NX_INI_FLAG(1, enableResourceFilteringByDefault, "Enable reworked resource filtering");
     NX_INI_FLAG(0, debugThumbnailProviders, "Enable debug mode for thumbnail providers");
     NX_INI_FLAG(0, ignoreZoomWindowConstraints, "Ignore constrains for a zoom region");

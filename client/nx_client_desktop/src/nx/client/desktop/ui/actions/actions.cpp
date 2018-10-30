@@ -349,9 +349,7 @@ void initialize(Manager* manager, Action* root)
             .text(ContextMenu::tr("Wearable Camera..."))
             .pulledText(ContextMenu::tr("New Wearable Camera..."))
             .condition(condition::isLoggedIn()
-                && !condition::isSafeMode()
-                && condition::isTrue(ini().enableWearableCameras)
-            )
+                && !condition::isSafeMode())
             .autoRepeat(false);
     }
     factory.endSubMenu();
@@ -1316,24 +1314,21 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | Tree | SingleTarget | ResourceTarget)
         .requiredGlobalPermission(GlobalPermission::editCameras)
         .text(ContextMenu::tr("Upload File..."))
-        .condition(condition::isTrue(ini().enableWearableCameras)
-            && condition::wearableCameraUploadEnabled());
+        .condition(condition::wearableCameraUploadEnabled());
 
     factory(UploadWearableCameraFolderAction)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | ResourceTarget)
         .requiredGlobalPermission(GlobalPermission::editCameras)
         .text(ContextMenu::tr("Upload Folder..."))
-        .condition(condition::isTrue(ini().enableWearableCameras)
-            && condition::wearableCameraUploadEnabled());
+        .condition(condition::wearableCameraUploadEnabled());
 
     factory(CancelWearableCameraUploadsAction)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | ResourceTarget)
         .requiredGlobalPermission(GlobalPermission::editCameras)
         .text(ContextMenu::tr("Cancel Upload..."))
-        .condition(condition::isTrue(ini().enableWearableCameras)
-            && condition::canCancelWearableCameraUpload());
+        .condition(condition::canCancelWearableCameraUpload());
 
     factory(CameraIssuesAction)
         .mode(DesktopMode)
