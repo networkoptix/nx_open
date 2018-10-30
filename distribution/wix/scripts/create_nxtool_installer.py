@@ -106,7 +106,8 @@ def build_msi(
         output_file=output_file,
         components=components,
         candle_variables=candle_variables)
-    sign(config.code_signing, output_file)
+    if config.code_signing['enabled']:
+        sign(config.code_signing, output_file)
 
 
 def build_exe(
