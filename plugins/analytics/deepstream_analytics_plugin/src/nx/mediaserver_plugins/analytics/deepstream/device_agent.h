@@ -32,13 +32,11 @@ public:
 
     virtual nx::sdk::Settings* settings() const override;
 
-    virtual nx::sdk::Error startFetchingMetadata(
-        const char* const* typeList, int typeListSize) override;
-
     virtual nx::sdk::Error setMetadataHandler(
         nx::sdk::analytics::MetadataHandler* metadataHandler) override;
 
-    virtual nx::sdk::Error stopFetchingMetadata() override;
+    virtual nx::sdk::Error setNeededMetadataTypes(
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
 
     virtual const char* manifest(
         nx::sdk::Error* error) override;
@@ -46,6 +44,12 @@ public:
     virtual void freeManifest(const char* data) override;
 
     virtual nx::sdk::Error pushDataPacket(nx::sdk::analytics::DataPacket* dataPacket) override;
+
+private:
+    nx::sdk::Error startFetchingMetadata(
+        const char* const* typeList, int typeListSize);
+   
+    void stopFetchingMetadata();
 
 private:
     Engine* const m_engine;

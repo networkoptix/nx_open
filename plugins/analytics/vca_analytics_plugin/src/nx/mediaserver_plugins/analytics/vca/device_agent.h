@@ -61,10 +61,13 @@ public:
 
     void reconnectSocket();
 
-    virtual nx::sdk::Error startFetchingMetadata(
-        const char* const* typeList, int typeListSize) override;
+    nx::sdk::Error startFetchingMetadata(
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes);
 
-    virtual nx::sdk::Error setMetadataHandler(nx::sdk::analytics::MetadataHandler* metadataHandler) override;
+    nx::sdk::Error stopFetchingMetadata();
+
+    virtual nx::sdk::Error setMetadataHandler(
+        nx::sdk::analytics::MetadataHandler* metadataHandler) override;
 
     bool isTimerNeeded() const;
 
@@ -76,7 +79,8 @@ public:
 
     void onTimer();
 
-    virtual nx::sdk::Error stopFetchingMetadata() override;
+    virtual nx::sdk::Error setNeededMetadataTypes(
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
 
     virtual const char* manifest(nx::sdk::Error* error) override;
 

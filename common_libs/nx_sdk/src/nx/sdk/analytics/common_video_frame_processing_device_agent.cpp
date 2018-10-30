@@ -163,17 +163,28 @@ Error CommonVideoFrameProcessingDeviceAgent::pushDataPacket(DataPacket* dataPack
     return Error::noError;
 }
 
+Error CommonVideoFrameProcessingDeviceAgent::setNeededMetadataTypes(
+    const IMetadataTypes* metadataTypes)
+{
+    if (metadataTypes->isNull())
+    {
+        stopFetchingMetadata();
+        return Error::noError;
+    }
+
+    return startFetchingMetadata(metadataTypes);
+}
+
 Error CommonVideoFrameProcessingDeviceAgent::startFetchingMetadata(
-    const char* const* /*typeList*/, int /*typeListSize*/)
+    const IMetadataTypes* /*metadataTypes*/)
 {
     NX_PRINT << __func__ << "() -> noError";
     return Error::noError;
 }
 
-Error CommonVideoFrameProcessingDeviceAgent::stopFetchingMetadata()
+void CommonVideoFrameProcessingDeviceAgent::stopFetchingMetadata()
 {
     NX_PRINT << __func__ << "() -> noError";
-    return Error::noError;
 }
 
 const char* CommonVideoFrameProcessingDeviceAgent::manifest(Error* /*error*/)

@@ -132,7 +132,18 @@ bool DeviceAgent::pullMetadataPackets(std::vector<MetadataPacket*>* metadataPack
     return true;
 }
 
-Error DeviceAgent::startFetchingMetadata(const char* const* /*typeList*/, int /*typeListSize*/)
+Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+{
+    if (metadataTypes->isNull())
+    {
+        stopFetchingMetadata();
+        return Error::noError;
+    }
+
+    return startFetchingMetadata(metadataTypes);
+}
+
+Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
 {
     NX_OUTPUT << __func__ << "() BEGIN";
 
@@ -163,7 +174,7 @@ Error DeviceAgent::startFetchingMetadata(const char* const* /*typeList*/, int /*
     return Error::noError;
 }
 
-Error DeviceAgent::stopFetchingMetadata()
+void DeviceAgent::stopFetchingMetadata()
 {
     NX_OUTPUT << __func__ << "() BEGIN";
     m_stopping = true;
@@ -179,7 +190,6 @@ Error DeviceAgent::stopFetchingMetadata()
     m_stopping = false;
 
     NX_OUTPUT << __func__ << "() END -> noError";
-    return Error::noError;
 }
 
 nx::sdk::Settings* DeviceAgent::settings() const

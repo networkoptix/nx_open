@@ -19,10 +19,8 @@ class DeviceAgent: public nx::sdk::analytics::CommonVideoFrameProcessingDeviceAg
 public:
     DeviceAgent(Engine* engine);
 
-    virtual nx::sdk::Error startFetchingMetadata(
-        const char* const* typeList, int typeListSize) override;
-
-    virtual nx::sdk::Error stopFetchingMetadata() override;
+    virtual nx::sdk::Error setNeededMetadataTypes(
+        const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
 
     virtual nx::sdk::Settings* settings() const override;
 
@@ -49,6 +47,11 @@ private:
     int64_t usSinceEpoch() const;
 
     bool checkFrame(const nx::sdk::analytics::UncompressedVideoFrame* videoFrame) const;
+
+    nx::sdk::Error startFetchingMetadata(
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes);
+
+    void stopFetchingMetadata();
 
 private:
     std::unique_ptr<std::thread> m_thread;

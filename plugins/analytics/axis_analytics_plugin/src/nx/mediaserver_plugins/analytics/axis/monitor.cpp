@@ -120,8 +120,9 @@ Monitor::~Monitor()
     stopMonitoring();
 }
 
-void Monitor::addRules(const nx::network::SocketAddress& localAddress,
-    const char* const* eventTypeList, int eventTypeListSize)
+void Monitor::addRules(
+    const nx::network::SocketAddress& localAddress,
+    const nx::sdk::IStringList* eventTypeIds)
 {
     removeRules();
 
@@ -131,14 +132,14 @@ void Monitor::addRules(const nx::network::SocketAddress& localAddress,
     std::string fullPath =
         std::string("http://") + localAddress.toStdString() + kWebServerPath;
 
-    for (int i = 0; i < eventTypeListSize; ++i)
+    for (int i = 0; i < eventTypeIds->count(); ++i)
     {
         const auto it = std::find_if(
             m_deviceAgent->events().eventTypes.cbegin(),
             m_deviceAgent->events().eventTypes.cend(),
-            [eventTypeList, i](const EventType& event)
+            [eventTypeIds, i](const EventType& event)
             {
-                return event.eventTypeIdExternal == eventTypeList[i];
+                return event.eventTypeIdExternal == eventTypeIds->at(i);
             });
         if (it != m_deviceAgent->events().eventTypes.cend())
         {
@@ -207,12 +208,14 @@ nx::network::HostAddress Monitor::getLocalIp(const nx::network::SocketAddress& c
     return nx::network::HostAddress();
 }
 
-nx::sdk::Error Monitor::startMonitoring(const char* const* typeList, int typeListSize)
+nx::sdk::Error Monitor::startMonitoring(
+    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
 {
     // Assume that the list contains events only, since this plugin produces no objects.
-    for (int i = 0; i < typeListSize; ++i)
+    const auto eventTypeList = metadataTypes->eventTypeIds();
+    for (int i = 0; i < eventTypeList->count(); ++i)
     {
-        const QString id = typeList[i];
+        const QString id = eventTypeList->at(i);
         const EventType* eventType = m_deviceAgent->eventTypeById(id);
         if (!eventType)
             NX_PRINT << "Unknown event type id = " << id.toStdString();
@@ -245,7 +248,7 @@ nx::sdk::Error Monitor::startMonitoring(const char* const* typeList, int typeLis
     m_aioTimer.start(kMinTimeBetweenEvents, [this](){ onTimer(); });
 
     localAddress = m_httpServer->server().address();
-    this->addRules(localAddress, typeList, typeListSize);
+    this->addRules(localAddress, eventTypeList);
     return nx::sdk::Error::noError;
 }
 

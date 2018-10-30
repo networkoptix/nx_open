@@ -15,6 +15,7 @@
 #include <nx/sdk/analytics/plugin.h>
 #include <nx/sdk/analytics/device_agent.h>
 #include <nx/sdk/analytics/consuming_device_agent.h>
+#include <nx/sdk/analytics/common_metadata_types.h>
 
 #include <nx/mediaserver/analytics/data_packet_adapter.h>
 #include <nx/mediaserver/analytics/debug_helpers.h>
@@ -154,9 +155,9 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
     if (!m_started)
     {
         // TODO: #dmishin Pass event list (or remove it from SDK API).
-        auto error = m_sdkDeviceAgent->startFetchingMetadata(
-            /*typeList*/ nullptr,
-            /*typeListSize*/ 0);
+        sdk_support::UniquePtr<nx::sdk::analytics::IMetadataTypes> metadataTypes(
+            new nx::sdk::analytics::CommonMetadataTypes());
+        auto error = m_sdkDeviceAgent->setNeededMetadataTypes(metadataTypes.get());
         m_started = error == nx::sdk::Error::noError;
     }
 
@@ -168,7 +169,10 @@ void DeviceAnalyticsBinding::stopAnalyticsUnsafe()
     m_started = false;
     if (!m_sdkDeviceAgent)
         return;
-    m_sdkDeviceAgent->stopFetchingMetadata();
+
+    sdk_support::UniquePtr<nx::sdk::analytics::IMetadataTypes> metadataTypes(
+        new nx::sdk::analytics::CommonMetadataTypes());
+    m_sdkDeviceAgent->setNeededMetadataTypes(metadataTypes.get());
 }
 
 QVariantMap DeviceAnalyticsBinding::getSettings() const

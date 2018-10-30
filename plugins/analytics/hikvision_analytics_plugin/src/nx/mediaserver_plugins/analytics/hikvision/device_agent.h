@@ -34,12 +34,11 @@ public:
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
-    virtual nx::sdk::Error startFetchingMetadata(
-        const char* const* typeList, int typeListSize) override;
+    virtual nx::sdk::Error setMetadataHandler(
+        nx::sdk::analytics::MetadataHandler* metadataHandler) override;
 
-    virtual nx::sdk::Error setMetadataHandler(nx::sdk::analytics::MetadataHandler* metadataHandler) override;
-
-    virtual nx::sdk::Error stopFetchingMetadata() override;
+    virtual nx::sdk::Error setNeededMetadataTypes(
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
 
     virtual const char* manifest(nx::sdk::Error* error) override;
 
@@ -50,6 +49,12 @@ public:
     void setEngineManifest(const Hikvision::EngineManifest& manifest);
     virtual void setSettings(const nx::sdk::Settings* settings) override;
     virtual nx::sdk::Settings* settings() const override;
+
+private:
+    nx::sdk::Error startFetchingMetadata(
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes);
+
+    void stopFetchingMetadata();
 
 private:
     Engine* const m_engine;

@@ -4,6 +4,7 @@
 
 #include <nx/sdk/common.h>
 #include <nx/sdk/settings.h>
+#include <nx/sdk/analytics/metadata_types.h>
 #include <nx/sdk/analytics/metadata_packet.h>
 
 namespace nx {
@@ -86,20 +87,12 @@ public:
     virtual Error setMetadataHandler(MetadataHandler* handler) = 0;
 
     /**
-     * Starts fetching metadata from the resource.
-     * @param typeList List of types of events and objects as an array of C-style strings; null if
-     *     the array is empty.
-     * @param typeListSize Number of items in typeList array.
-     * @return noError in case of success, other value otherwise.
+     * Sets a list of metadata types that are needed by the server.
+     * Empty list means that server doesn't need any metadata from this device agent.
+     * Before the first call to this method server doesn't expect any metadata to be provided.
+     * @param neededMetadataTypes Lists of types of events and objects.
      */
-    virtual Error startFetchingMetadata(
-        const char* const* typeList, int typeListSize) = 0;
-
-    /**
-     * Stops fetching metadata from the resource.
-     * @return noError in case of success, other value otherwise.
-     */
-    virtual Error stopFetchingMetadata() = 0;
+    virtual Error setNeededMetadataTypes(const IMetadataTypes* neededMetadataTypes) = 0;
 };
 
 } // namespace analytics

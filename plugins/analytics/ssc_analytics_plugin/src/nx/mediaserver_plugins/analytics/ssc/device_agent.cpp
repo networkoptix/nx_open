@@ -89,7 +89,7 @@ void DeviceAgent::sendEventPacket(const EventType& event) const
 }
 
 nx::sdk::Error DeviceAgent::startFetchingMetadata(
-    const char* const* /*typeList*/, int /*typeListSize*/)
+    const nx::sdk::analytics::IMetadataTypes* /*metadataTypes*/)
 {
     m_engine->registerCamera(m_cameraLogicalId, this);
     return nx::sdk::Error::noError;
@@ -115,6 +115,18 @@ sdk::Error DeviceAgent::setMetadataHandler(nx::sdk::analytics::MetadataHandler* 
 {
     m_metadataHandler = metadataHandler;
     return sdk::Error::noError;
+}
+
+sdk::Error DeviceAgent::setNeededMetadataTypes(
+    const sdk::analytics::IMetadataTypes* metadataTypes)
+{
+    if (metadataTypes->eventTypeIds()->count() == 0)
+    {
+        stopFetchingMetadata();
+        return sdk::Error::noError;
+    }
+
+    return startFetchingMetadata(metadataTypes);
 }
 
 void DeviceAgent::setSettings(const nx::sdk::Settings* settings)

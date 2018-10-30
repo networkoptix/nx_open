@@ -8,6 +8,7 @@
 #include <plugins/plugin_tools.h>
 
 #include <nx/sdk/common_settings.h>
+#include <nx/sdk/analytics/common_metadata_types.h>
 
 #include <nx/sdk/analytics/engine.h>
 #include <nx/sdk/analytics/consuming_device_agent.h>
@@ -309,13 +310,15 @@ TEST(stub_analytics_plugin, test)
     MetadataHandler metadataHandler;
     ASSERT_EQ(noError, (int) deviceAgent->setMetadataHandler(&metadataHandler));
 
-    ASSERT_EQ(noError, (int) deviceAgent->startFetchingMetadata(
-        /*typeList*/ nullptr, /*typeListSize*/ 0));
+    nxpt::ScopedRef<nx::sdk::analytics::CommonMetadataTypes> metadataTypes(
+        new nx::sdk::analytics::CommonMetadataTypes());
+
+    ASSERT_EQ(noError, (int) deviceAgent->setNeededMetadataTypes(metadataTypes.get()));
 
     CompressedVideoFrame compressedVideoFrame;
     ASSERT_EQ(noError, (int) deviceAgent->pushDataPacket(&compressedVideoFrame));
 
-    ASSERT_EQ(noError, (int) deviceAgent->stopFetchingMetadata());
+    ASSERT_EQ(noError, (int) deviceAgent->setNeededMetadataTypes(metadataTypes.get()));
 
     deviceAgent->releaseRef();
     engine->releaseRef();

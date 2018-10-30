@@ -443,7 +443,21 @@ nx::sdk::Error DeviceAgent::setMetadataHandler(
     return nx::sdk::Error::noError;
 }
 
-nx::sdk::Error DeviceAgent::startFetchingMetadata(const char* const* typeList, int typeListSize)
+
+nx::sdk::Error DeviceAgent::setNeededMetadataTypes(
+    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
+{
+    if (metadataTypes->isNull())
+    {
+        stopFetchingMetadata();
+        return nx::sdk::Error::noError;
+    }
+
+    return startFetchingMetadata(metadataTypes);
+}
+
+nx::sdk::Error DeviceAgent::startFetchingMetadata(
+    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
 {
     QString host = m_url.host();
     nx::vca::CameraController vcaCameraConrtoller(host, m_auth.user(), m_auth.password());
@@ -452,9 +466,10 @@ nx::sdk::Error DeviceAgent::startFetchingMetadata(const char* const* typeList, i
     if (error != nx::sdk::Error::noError)
         return error;
 
-    for (int i = 0; i < typeListSize; ++i)
+    const auto eventTypeIds = metadataTypes->eventTypeIds();
+    for (int i = 0; i < eventTypeIds->count(); ++i)
     {
-        QString id = typeList[i];
+        QString id(eventTypeIds->at(i));
         const EventType* eventType = m_engine->eventTypeById(id);
         if (!eventType)
             NX_PRINT << "Unknown event type. TypeId = " << id.toStdString() << ".";

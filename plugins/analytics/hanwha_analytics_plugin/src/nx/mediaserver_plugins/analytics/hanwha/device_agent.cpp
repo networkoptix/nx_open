@@ -54,6 +54,17 @@ nx::sdk::Error DeviceAgent::setMetadataHandler(MetadataHandler* metadataHandler)
     return Error::noError;
 }
 
+nx::sdk::Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+{
+    if (metadataTypes->eventTypeIds()->count() == 0)
+    {
+        stopFetchingMetadata();
+        return Error::noError;
+    }
+
+    return startFetchingMetadata(metadataTypes);
+}
+
 void DeviceAgent::setSettings(const nx::sdk::Settings* settings)
 {
     // There are no DeviceAgent settings for this plugin.
@@ -64,7 +75,8 @@ nx::sdk::Settings* DeviceAgent::settings() const
     return nullptr;
 }
 
-Error DeviceAgent::startFetchingMetadata(const char* const* /*typeList*/, int /*typeListSize*/)
+nx::sdk::Error DeviceAgent::startFetchingMetadata(
+    const nx::sdk::analytics::IMetadataTypes* /*metadataTypes*/)
 {
     const auto monitorHandler =
         [this](const EventList& events)
@@ -119,7 +131,7 @@ Error DeviceAgent::startFetchingMetadata(const char* const* /*typeList*/, int /*
     return Error::noError;
 }
 
-Error DeviceAgent::stopFetchingMetadata()
+void DeviceAgent::stopFetchingMetadata()
 {
     if (m_monitor)
         m_monitor->removeHandler(m_uniqueId);
@@ -129,8 +141,6 @@ Error DeviceAgent::stopFetchingMetadata()
         m_engine->deviceAgentStoppedToUseMonitor(m_sharedId);
 
     m_monitor = nullptr;
-
-    return Error::noError;
 }
 
 const char* DeviceAgent::manifest(Error* error)
