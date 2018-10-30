@@ -72,7 +72,7 @@ bool FixedSizeMessageParser::readMessageSize(QnByteArrayConstRef* readBuffer)
     if (m_messageSizeBuffer.size() < kMessageSizeBytes)
         return false;
 
-    memcmp(&m_lastMessageSize, m_messageSizeBuffer.constData(), kMessageSizeBytes);
+    memcpy(&m_lastMessageSize, m_messageSizeBuffer.constData(), kMessageSizeBytes);
     m_lastMessageSize = ntohl(m_lastMessageSize);
     m_message->data.reserve(m_lastMessageSize);
     return true;
