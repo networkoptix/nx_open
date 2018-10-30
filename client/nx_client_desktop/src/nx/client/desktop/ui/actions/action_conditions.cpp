@@ -1617,18 +1617,6 @@ ActionVisibility IoModuleCondition::check(const QnResourceList& resources, QnWor
     return pureIoModules ? EnabledAction : InvisibleAction;
 }
 
-ActionVisibility AnalyticsEngineCondition::check(
-    const QnResourceList& resources, QnWorkbenchContext* /*context*/)
-{
-    bool ok = boost::algorithm::all_of(resources,
-        [](const QnResourcePtr& resource)
-        {
-            return resource.dynamicCast<nx::vms::common::AnalyticsEngineResource>();
-        });
-
-    return ok ? EnabledAction : InvisibleAction;
-}
-
 ActionVisibility MergeToCurrentSystemCondition::check(const QnResourceList& resources, QnWorkbenchContext* /*context*/)
 {
     if (resources.size() != 1)
@@ -1849,6 +1837,21 @@ ConditionWrapper isEntropixCamera()
         });
 }
 
+ConditionWrapper isAnalyticsEngine()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& parameters, QnWorkbenchContext* /*context*/)
+        {
+            const auto& resouces = parameters.resources();
+
+            return std::all_of(resouces.begin(), resouces.end(),
+                [](const QnResourcePtr& resource)
+                {
+                    return resource.dynamicCast<nx::vms::common::AnalyticsEngineResource>();
+                });
+        });
+}
+
 ConditionWrapper syncIsForced()
 {
     return new CustomBoolCondition(
@@ -1947,7 +1950,7 @@ ConditionWrapper canForgetPassword()
         {
             const auto layout = parameters.resource().dynamicCast<QnLayoutResource>();
             return layout && layout::isEncrypted(layout) && !layout::requiresPassword(layout);
-        });
+    });
 }
 
 } // namespace condition

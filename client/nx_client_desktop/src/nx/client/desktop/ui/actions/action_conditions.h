@@ -552,13 +552,6 @@ public:
     virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
 };
 
-class AnalyticsEngineCondition: public Condition
-{
-public:
-    virtual ActionVisibility check(
-        const QnResourceList& resources, QnWorkbenchContext* context) override;
-};
-
 class MergeToCurrentSystemCondition: public Condition
 {
 public:
@@ -636,6 +629,9 @@ ConditionWrapper hasArgumentOfType(int key)
 
 /** Check if the resource is Entropix camera. */
 ConditionWrapper isEntropixCamera();
+
+/** Check if the resource is Analytics Engine. */
+ConditionWrapper isAnalyticsEngine();
 
 /** Playback sync is forced. */
 ConditionWrapper syncIsForced();

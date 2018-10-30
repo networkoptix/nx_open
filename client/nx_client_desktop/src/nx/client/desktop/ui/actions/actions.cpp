@@ -1438,7 +1438,7 @@ void initialize(Manager* manager, Action* root)
     factory(AnalyticsEngineSettingsAction)
         .flags(Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Analytics Engine Settings..."))
-        .condition(ConditionWrapper(new AnalyticsEngineCondition()));
+        .condition(condition::isAnalyticsEngine());
 
     factory(ConvertCameraToEntropix)
         .mode(DesktopMode)
