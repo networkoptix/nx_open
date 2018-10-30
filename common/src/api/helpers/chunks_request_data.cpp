@@ -116,6 +116,10 @@ QnRequestParamList QnChunksRequestData::toParams() const
     result.insert(kPeriodsTypeParam, QString::number(periodsType));
     result.insert(kFilterParam, filter);
     result.insert(kLimitParam, QString::number(limit));
+    if (sortOrder == Qt::SortOrder::DescendingOrder)
+        result.insert(kDescendingOrderParam, QString());
+    result.insert(kGroupByParamName, QnLexical::serialized(groupBy));
+
     if (isLocal)
         result.insert(kLocalParam, QString());
     result.insert(kFormatParam, QnLexical::serialized(format));
