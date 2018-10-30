@@ -177,7 +177,7 @@ class _ElasticsearchLoggingHandler(logging.Handler):
         queue = collections.deque()
         next_stats_report = timeit.default_timer()
         while True:
-            response = http_client.HTTPResponse(self._sock, buffering=False)
+            response = http_client.HTTPResponse(self._sock)
             # ElasticSearch usually responds with two packets: headers and content.
             # Therefore, it's very unlikely that reading blocks.
             while select.select([self._sock], [], [self._sock], 0) == ([], [], []):
