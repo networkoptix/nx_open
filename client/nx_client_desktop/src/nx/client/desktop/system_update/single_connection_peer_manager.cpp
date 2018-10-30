@@ -17,6 +17,11 @@ SingleConnectionPeerManager::SingleConnectionPeerManager(
 {
 }
 
+SingleConnectionPeerManager::~SingleConnectionPeerManager()
+{
+
+}
+
 QnUuid SingleConnectionPeerManager::selfId() const
 {
     return commonModule()->moduleGUID();
@@ -261,9 +266,12 @@ rest::Handle SingleConnectionPeerManager::downloadChunkFromInternet(
             using namespace network;
             QByteArray result;
 
-            auto okResponse = client->response() &&
-                (client->response()->statusLine.statusCode == http::StatusCode::partialContent
-                || client->response()->statusLine.statusCode == http::StatusCode::ok);
+            auto response = client->response();
+            auto statusCode = response->statusLine.statusCode;
+
+            auto okResponse = response &&
+                (statusCode == http::StatusCode::partialContent
+                || statusCode == http::StatusCode::ok);
 
             if (!client->failed() && okResponse)
                 result = client->fetchMessageBodyBuffer();
@@ -289,9 +297,9 @@ void SingleConnectionPeerManager::cancelRequest(const QnUuid& peerId, rest::Hand
     connection->cancelRequest(handle);
 }
 
-void SingleConnectionPeerManager::setConnection(rest::QnConnectionPtr connection)
+void SingleConnectionPeerManager::setServerUrl(nx::utils::Url serverUrl, QnUuid serverId)
 {
-    m_directConnection = connection;
+    m_directConnection.reset(new rest::ServerConnection(commonModule(), serverId, serverUrl));
 }
 
 rest::QnConnectionPtr SingleConnectionPeerManager::getConnection(const QnUuid& peerId) const

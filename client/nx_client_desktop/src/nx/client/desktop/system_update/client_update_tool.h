@@ -142,6 +142,7 @@ protected:
     // Callbacks
     void atDownloaderStatusChanged(const FileInformation& fileInformation);
     void atRemoteUpdateInformation(const nx::update::Information& updateInformation);
+    void atChunkDownloadFailed(const QString& fileName);
     void atExtractFilesFinished(int code);
 
 protected:
@@ -169,6 +170,7 @@ protected:
 
     std::promise<UpdateContents> m_remoteUpdateInfoRequest;
     UpdateContents m_remoteUpdateContents;
+    QnMutex m_mutex;
 };
 
 } // namespace nx::client::desktop

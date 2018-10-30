@@ -49,7 +49,8 @@ bool compatibleCloudHost(const QString& cloudHost, bool isMobile)
     if (cloudHost.isEmpty())
         return true;
 
-    return cloudHost == nx::network::SocketGlobals::cloud().cloudHost()
+    auto activeCloud = nx::network::SocketGlobals::cloud().cloudHost();
+    return cloudHost == activeCloud
         || (isMobile && nx::network::AppInfo::compatibleCloudHosts().contains(cloudHost));
 }
 

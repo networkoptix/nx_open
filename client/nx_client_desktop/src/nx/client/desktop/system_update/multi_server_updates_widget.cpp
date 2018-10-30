@@ -35,14 +35,16 @@
 #include <ui/style/custom_style.h>
 #include <ui/style/globals.h>
 #include <ui/style/nx_style.h>
-#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/models/resource/resource_list_model.h>
-#include <nx/client/desktop/ui/workbench/extensions/workbench_progress_manager.h>
 #include <update/low_free_space_warning.h>
+
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/workbench/extensions/workbench_progress_manager.h>
+#include <nx/network/app_info.h>
 
 #include <ini.h>
 #include <utils/common/html.h>
@@ -281,8 +283,6 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
 
     m_updateCheck = m_serverUpdateTool->getUpdateCheck();
 
-
-
     const auto connection = commonModule()->ec2Connection();
     if (connection)
     {
@@ -463,7 +463,9 @@ void MultiServerUpdatesWidget::at_updateCurrentState()
                     m_updateCheckError = tr("Incompatible update version");
                     break;
                 case Error::incompatibleCloudHostError:
-                    m_updateCheckError = tr("Incompatible cloud");
+                    m_updateCheckError = tr("Incompatible %1 instance. To update disconnect System from %1 first.",
+                        "%1 here will be substituted with cloud name e.g. 'Nx Cloud'.")
+                        .arg(nx::network::AppInfo::cloudName());
                     break;
                 case Error::notFoundError:
                     // No update
@@ -887,6 +889,19 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
     }
 
     for (auto id: m_serverUpdateTool->getServersInState(StatusCode::error))
+    {
+        if (m_serversActive.contains(id))
+        {
+            NX_VERBOSE(this)
+                << "processRemoteDownloading() - server "
+                << id << "failed to download update package";
+            m_serversFailed.insert(id);
+            m_serversActive.remove(id);
+        }
+    }
+
+    // Idle servers are concidered failed as well.
+    for (auto id: m_serverUpdateTool->getServersInState(StatusCode::idle))
     {
         if (m_serversActive.contains(id))
         {

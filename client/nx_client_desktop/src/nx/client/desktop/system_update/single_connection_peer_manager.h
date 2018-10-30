@@ -17,6 +17,7 @@ public:
     SingleConnectionPeerManager(
         QnCommonModule* commonModule,
         AbstractPeerSelectorPtr&& peerSelector);
+    ~SingleConnectionPeerManager();
 
     virtual QnUuid selfId() const override;
     virtual QString peerString(const QnUuid& peerId) const override;
@@ -57,7 +58,7 @@ public:
     virtual bool hasAccessToTheUrl(const QString& url) const override;
 
     // Sets internal connection
-    void setConnection(rest::QnConnectionPtr connection);
+    void setServerUrl(nx::utils::Url serverUrl, QnUuid serverId);
     QnUuid getServerId() const;
 
 protected:

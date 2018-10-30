@@ -29,11 +29,16 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
     m_peerManager.reset(new SingleConnectionPeerManager(commonModule(), std::move(peerSelector)));
     m_downloader.reset(new Downloader(m_outputDir, commonModule(), this));
     connect(m_downloader.get(), &Downloader::fileStatusChanged,
-            this, &ClientUpdateTool::atDownloaderStatusChanged);
+        this, &ClientUpdateTool::atDownloaderStatusChanged);
+
+    connect(m_downloader.get(), &Downloader::chunkDownloadFailed,
+        this, &ClientUpdateTool::atChunkDownloadFailed);
 }
 
 ClientUpdateTool::~ClientUpdateTool()
 {
+    m_downloader->disconnect(this);
+    m_serverConnection.reset();
     m_peerManager.reset();
 }
 
@@ -87,7 +92,7 @@ std::future<UpdateContents> ClientUpdateTool::requestRemoteUpdateInfo()
 void ClientUpdateTool::setServerUrl(nx::utils::Url serverUrl, QnUuid serverId)
 {
     m_serverConnection.reset(new rest::ServerConnection(commonModule(), serverId, serverUrl));
-    m_peerManager->setConnection(m_serverConnection);
+    m_peerManager->setServerUrl(serverUrl, serverId);
 }
 
 void ClientUpdateTool::atRemoteUpdateInformation(const nx::update::Information& updateInformation)
@@ -212,12 +217,18 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
     }
 }
 
+void ClientUpdateTool::atChunkDownloadFailed(const QString& fileName)
+{
+    NX_VERBOSE(this) << "atChunkDownloadFailed() failed to download chunk for" << fileName;
+    //setError(tr("Update package is corrupted: %1").arg(error));
+}
+
 void ClientUpdateTool::atExtractFilesFinished(int code)
 {
     if (code != QnZipExtractor::Ok)
     {
         QString error = QnZipExtractor::errorToString((QnZipExtractor::Error)code);
-        NX_VERBOSE(this) << "at_extractFilesFinished() err=" << error;
+        NX_VERBOSE(this) << "atExtractFilesFinished() err=" << error;
         setError(tr("Update package is corrupted: %1").arg(error));
         return;
     }
