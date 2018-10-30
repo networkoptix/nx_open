@@ -13,6 +13,8 @@
 #include <utils/update/update_utils.h>
 
 #include <client/client_settings.h>
+#include <client/client_module.h>
+#include <watchers/cloud_status_watcher.h>
 
 #include <core/resource/fake_media_server.h>
 #include <api/global_settings.h>
@@ -183,7 +185,7 @@ std::future<UpdateContents> ServerUpdateTool::checkUpdateFromFile(QString file)
     m_extractor = std::make_shared<QnZipExtractor>(file, m_outputDir.path());
     m_offlineUpdateCheckResult = std::promise<UpdateContents>();
     m_extractor->start();
-    connect(m_extractor.get(), &QnZipExtractor::finished, this, &ServerUpdateTool::at_extractFilesFinished);
+    connect(m_extractor.get(), &QnZipExtractor::finished, this, &ServerUpdateTool::atExtractFilesFinished);
 
     return m_offlineUpdateCheckResult.get_future();;
 }
@@ -221,7 +223,7 @@ void ServerUpdateTool::readUpdateManifest(QString path, UpdateContents& result)
 }
 
 // NOTE: We are probably not in the UI thread.
-void ServerUpdateTool::at_extractFilesFinished(int code)
+void ServerUpdateTool::atExtractFilesFinished(int code)
 {
     // TODO: Add some thread safety here
     NX_ASSERT(m_offlineUpdaterState == OfflineUpdateState::unpack);
@@ -285,12 +287,12 @@ void ServerUpdateTool::setResourceFeed(QnResourcePool* pool)
     }
 
     m_onAddedResource = connect(pool, &QnResourcePool::resourceAdded,
-        this, &ServerUpdateTool::at_resourceAdded);
+        this, &ServerUpdateTool::atResourceAdded);
     m_onRemovedResource = connect(pool, &QnResourcePool::resourceRemoved,
-        this, &ServerUpdateTool::at_resourceRemoved);
+        this, &ServerUpdateTool::atResourceRemoved);
     // TODO: Should replace it by connecting to each resource
     m_onUpdatedResource = connect(pool, &QnResourcePool::resourceChanged,
-        this, &ServerUpdateTool::at_resourceChanged);
+        this, &ServerUpdateTool::atResourceChanged);
 }
 
 QnMediaServerResourceList ServerUpdateTool::getServersForUpload()
@@ -317,7 +319,7 @@ ServerUpdateTool::OfflineUpdateState ServerUpdateTool::getUploaderState() const
     return m_offlineUpdaterState;
 }
 
-void ServerUpdateTool::at_uploadWorkerState(QnUuid serverId, const UploadState& state)
+void ServerUpdateTool::atUploadWorkerState(QnUuid serverId, const UploadState& state)
 {
     if (!m_uploadStateById.count(state.id))
     {
@@ -391,7 +393,7 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents)
             auto callback = [tool=QPointer<ServerUpdateTool>(this), serverId](const UploadState& state)
             {
                 if (tool)
-                    tool->at_uploadWorkerState(serverId, state);
+                    tool->atUploadWorkerState(serverId, state);
             };
 
             UploadState config;
@@ -470,6 +472,40 @@ bool ServerUpdateTool::verifyUpdateManifest(UpdateContents& contents) const
     contents.missingUpdate.clear();
     contents.filesToUpload.clear();
 
+    std::map<QnUuid, QnMediaServerResourcePtr> activeServers;
+    {
+        std::scoped_lock<std::recursive_mutex> lock(m_statusLock);
+        activeServers = m_activeServers;
+    }
+
+    if (auto cloudWatcher = qnClientModule->cloudStatusWatcher())
+    {
+        if (cloudWatcher->isCloudEnabled() && !contents.info.cloudHost.isEmpty())
+        {
+            bool cloudCompatible = true;
+            for(auto record: activeServers)
+            {
+                auto server = record.second;
+                bool isOurServer = !server->hasFlags(Qn::fake_server)
+                    || helpers::serverBelongsToCurrentSystem(server);
+                if (!isOurServer)
+                    continue;
+                auto moduleInformation = server->getModuleInformation();
+                if (moduleInformation.cloudHost != contents.info.cloudHost)
+                {
+                    cloudCompatible = false;
+                    break;
+                }
+            }
+
+            if (!cloudCompatible)
+            {
+                contents.error = nx::update::InformationError::incompatibleCloudHostError;
+                return false;
+            }
+        }
+    }
+
     // Check if some packages from manifest do not exist.
     if (contents.sourceType == UpdateSourceType::file)
     {
@@ -508,12 +544,6 @@ bool ServerUpdateTool::verifyUpdateManifest(UpdateContents& contents) const
     }
 
     contents.clientPackage = findClientPackage(contents.info);
-
-    std::map<QnUuid, QnMediaServerResourcePtr> activeServers;
-    {
-        std::scoped_lock<std::recursive_mutex> lock(m_statusLock);
-        activeServers = m_activeServers;
-    }
 
     // Checking if all servers have update packages.
     for(auto record: activeServers)
@@ -587,21 +617,21 @@ ServerUpdateTool::ProgressInfo ServerUpdateTool::calculateUploadProgress()
     return result;
 }
 
-void ServerUpdateTool::at_resourceAdded(const QnResourcePtr& resource)
+void ServerUpdateTool::atResourceAdded(const QnResourcePtr& resource)
 {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         m_activeServers[server->getId()] = server;
     // TODO: We should check new server for uploading operations
 }
 
-void ServerUpdateTool::at_resourceRemoved(const QnResourcePtr& resource)
+void ServerUpdateTool::atResourceRemoved(const QnResourcePtr& resource)
 {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         m_activeServers.erase(server->getId());
     // TODO: We should remove this server from uploading operations
 }
 
-void ServerUpdateTool::at_resourceChanged(const QnResourcePtr& resource)
+void ServerUpdateTool::atResourceChanged(const QnResourcePtr& resource)
 {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server)
@@ -754,7 +784,7 @@ void ServerUpdateTool::requestInstallAction(QSet<QnUuid> targets)
             connection->updateActionInstall({});
 }
 
-void ServerUpdateTool::at_updateStatusResponse(bool success, rest::Handle handle,
+void ServerUpdateTool::atUpdateStatusResponse(bool success, rest::Handle handle,
     const std::vector<nx::update::Status>& response)
 {
     m_checkingRemoteUpdateStatus = false;
@@ -796,7 +826,7 @@ void ServerUpdateTool::requestRemoteUpdateState()
         auto callback = [tool=QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle, const UpdateStatusAll& response)
             {
                 if (tool)
-                    tool->at_updateStatusResponse(success, handle, response);
+                    tool->atUpdateStatusResponse(success, handle, response);
             };
 
         m_timeStartedInstall = Clock::now();

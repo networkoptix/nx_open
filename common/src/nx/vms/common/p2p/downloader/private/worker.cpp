@@ -107,7 +107,7 @@ namespace downloader {
 Worker::Worker(
     const QString& fileName,
     Storage* storage,
-    AbstractPeerManager* peerManager,
+    std::shared_ptr<AbstractPeerManager> peerManager,
     QObject* parent)
     :
     m_storage(storage),
@@ -373,10 +373,9 @@ void Worker::requestFileInformationInternal()
 
     for (const auto& peer: peers)
     {
+        QString peerName = m_peerManager->peerString(peer);
         NX_VERBOSE(m_logTag,
-            lm("Requesting %1 from server %2.")
-                .arg(requestSubjectString(m_state))
-                .arg(m_peerManager->peerString(peer)));
+            lm("Requesting %1 from server %2.").args(requestSubjectString(m_state), peerName));
 
         const auto handle = m_peerManager->requestFileInfo(peer, m_fileName,
             [this, self = shared_from_this()](
@@ -1172,7 +1171,7 @@ qint64 Worker::defaultStepDelay()
     return kDefaultStepDelayMs;
 }
 
-AbstractPeerManager* Worker::peerManager() const
+std::shared_ptr<AbstractPeerManager> Worker::peerManager() const
 {
     return m_peerManager;
 }

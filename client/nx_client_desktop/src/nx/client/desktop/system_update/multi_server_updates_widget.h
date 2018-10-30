@@ -107,7 +107,6 @@ private:
     static QString toString(WidgetUpdateState state);
     static QString toString(LocalStatusCode stage);
     static QString toString(ServerUpdateTool::OfflineUpdateState state);
-    static QString toString(ClientUpdateTool::State state);
 
     void setUpdateSourceMode(UpdateSourceType mode);
 

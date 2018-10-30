@@ -37,7 +37,7 @@ public:
     TestWorker(
         const QString& fileName,
         Storage* storage,
-        AbstractPeerManager* peerManager,
+        std::shared_ptr<AbstractPeerManager> peerManager,
         QObject* parent = nullptr)
         :
         Worker(fileName, storage, peerManager, parent)
@@ -158,7 +158,7 @@ protected:
     {
         auto peer = new Peer();
         peer->id = peerId;
-        peer->peerManager = new ProxyTestPeerManager(commonPeerManager.data(), peerId, peerName);
+        peer->peerManager.reset(new ProxyTestPeerManager(commonPeerManager.data(), peerId, peerName));
         peer->storage = createStorage(peerId.toString());
         peer->worker = std::make_shared<TestWorker>(kTestFileName, peer->storage, peer->peerManager);
         return peer;
@@ -177,7 +177,7 @@ protected:
     struct Peer
     {
         QnUuid id;
-        ProxyTestPeerManager* peerManager = nullptr;
+        std::shared_ptr<ProxyTestPeerManager> peerManager;
         Storage* storage = nullptr;
         std::shared_ptr<TestWorker> worker;
 

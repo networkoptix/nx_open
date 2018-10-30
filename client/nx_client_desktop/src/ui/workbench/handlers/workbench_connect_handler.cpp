@@ -308,6 +308,8 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
 
     connect(display(), &QnWorkbenchDisplay::widgetAdded, this,
         [resourceModeAction]() { resourceModeAction->setChecked(true); });
+
+    //m_clientUpdateTool.reset(new nx::client::desktop::ClientUpdateTool(this));
 }
 
 QnWorkbenchConnectHandler::~QnWorkbenchConnectHandler()
@@ -403,7 +405,6 @@ void QnWorkbenchConnectHandler::handleConnectReply(
         default:    //error
             if (qnRuntime->isVideoWallMode())
             {
-
                 if (status == Qn::ForbiddenConnectionResult)
                 {
                     QnGraphicsMessageBox::information(
@@ -669,6 +670,9 @@ void QnWorkbenchConnectHandler::handleStateChanged(LogicalState logicalValue,
         case LogicalState::connecting:
             if (physicalValue == PhysicalState::waiting_resources)
                 showPreloader();
+            break;
+        case LogicalState::installing_updates:
+            // TODO: Check current update status
             break;
         case LogicalState::connected:
             stopReconnecting();
@@ -960,6 +964,23 @@ void QnWorkbenchConnectHandler::connectToServer(const nx::utils::Url &url)
     m_connecting.url = url;
 }
 
+void QnWorkbenchConnectHandler::connectToServerForUpdate(const nx::utils::Url &url)
+{
+    auto validState =
+        m_logicalState == LogicalState::testing
+        || m_logicalState == LogicalState::connecting
+        || m_logicalState == LogicalState::connecting_to_target
+        || m_logicalState == LogicalState::reconnecting;
+    NX_ASSERT(validState);
+    if (!validState)
+        return;
+
+    setPhysicalState(PhysicalState::pulling_updates);
+    m_connecting.handle = qnClientCoreModule->connectionFactory()->connect(
+        url, clientInfo(), this, &QnWorkbenchConnectHandler::handleConnectReply);
+    m_connecting.url = url;
+}
+
 bool QnWorkbenchConnectHandler::disconnectFromServer(DisconnectFlags flags)
 {
     const bool force = flags.testFlag(DisconnectFlag::Force);
@@ -1008,6 +1029,8 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(int handle,
     NX_ASSERT(!context()->closingDown());
     if (context()->closingDown())
         return;
+
+    // TODO: Should enter 'updating' mode
 
     auto status =  QnConnectionDiagnosticsHelper::validateConnection(
         connectionInfo, errorCode, mainWindowWidget());

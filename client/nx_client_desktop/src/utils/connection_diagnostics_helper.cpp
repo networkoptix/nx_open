@@ -95,8 +95,6 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
             .arg(connectionInfo.cloudHost));
     }
 
-
-
     switch (result)
     {
     case Qn::SuccessConnectionResult:
@@ -354,11 +352,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
 
     QList<nx::utils::SoftwareVersion> versions;
     if (!getInstalledVersions(&versions))
-    {
-        qDebug() << "QnConnectionDiagnosticsHelper::handleCompatibilityMode() - can not get any instaleld version. What happened with applauncher?";
         return handleApplauncherError(parentWidget);
-    }
-
     bool isInstalled = versions.contains(connectionInfo.version);
 
     while (true)

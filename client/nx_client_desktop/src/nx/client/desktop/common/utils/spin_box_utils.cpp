@@ -16,7 +16,7 @@ namespace spin_box_utils {
 
 namespace {
 
-static constexpr char* kDefaultValuePropertyName = "__qn_spinBoxDefaultValue";
+static constexpr const char* kDefaultValuePropertyName = "__qn_spinBoxDefaultValue";
 
 // A class used for automatic setting of spin box default value when it's in special state
 // and either up arrow is clicked with left mouse button or Up or PageUp key is pressed.

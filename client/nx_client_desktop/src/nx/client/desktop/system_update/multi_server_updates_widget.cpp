@@ -35,14 +35,16 @@
 #include <ui/style/custom_style.h>
 #include <ui/style/globals.h>
 #include <ui/style/nx_style.h>
-#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/models/resource/resource_list_model.h>
-#include <nx/client/desktop/ui/workbench/extensions/workbench_progress_manager.h>
 #include <update/low_free_space_warning.h>
+
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/workbench/extensions/workbench_progress_manager.h>
+#include <nx/network/app_info.h>
 
 #include <ini.h>
 #include <utils/common/html.h>
@@ -125,7 +127,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
 {
     ui->setupUi(this);
 
-    m_showDebugData = nx::client::desktop::ini().massSystemUpdateDebugInfo;
+    m_showDebugData = nx::client::desktop::ini().massSystemUpdateDebugInfo & 1;
 
     m_serverUpdateTool.reset(new ServerUpdateTool(this));
     m_clientUpdateTool.reset(new ClientUpdateTool(this));
@@ -281,6 +283,16 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
 
     m_updateCheck = m_serverUpdateTool->getUpdateCheck();
 
+    const auto connection = commonModule()->ec2Connection();
+    if (connection)
+    {
+        QnConnectionInfo connectionInfo = connection->connectionInfo();
+
+        QnUuid serverId = QnUuid(connectionInfo.ecsGuid);
+        nx::utils::Url serverUrl = connectionInfo.ecUrl;
+        m_clientUpdateTool->setServerUrl(serverUrl, serverId);
+        m_clientUpdateTool->requestRemoteUpdateInfo();
+    }
     // Force update when we open dialog.
     checkForInternetUpdates();
 
@@ -451,7 +463,9 @@ void MultiServerUpdatesWidget::at_updateCurrentState()
                     m_updateCheckError = tr("Incompatible update version");
                     break;
                 case Error::incompatibleCloudHostError:
-                    m_updateCheckError = tr("Incompatible cloud");
+                    m_updateCheckError = tr("Incompatible %1 instance. To update disconnect System from %1 first.",
+                        "%1 here will be substituted with cloud name e.g. 'Nx Cloud'.")
+                        .arg(nx::network::AppInfo::cloudName());
                     break;
                 case Error::notFoundError:
                     // No update
@@ -875,6 +889,19 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
     }
 
     for (auto id: m_serverUpdateTool->getServersInState(StatusCode::error))
+    {
+        if (m_serversActive.contains(id))
+        {
+            NX_VERBOSE(this)
+                << "processRemoteDownloading() - server "
+                << id << "failed to download update package";
+            m_serversFailed.insert(id);
+            m_serversActive.remove(id);
+        }
+    }
+
+    // Idle servers are concidered failed as well.
+    for (auto id: m_serverUpdateTool->getServersInState(StatusCode::idle))
     {
         if (m_serversActive.contains(id))
         {
@@ -1462,7 +1489,7 @@ void MultiServerUpdatesWidget::loadDataToUi()
         debugState += QString("Widget=%1\n").arg(toString(m_updateStateCurrent));
         debugState += QString("Widget source=%1, Update source=%2\n").arg(toString(m_updateSourceMode), toString(m_updateInfo.sourceType));
         debugState += QString("UploadTool=%1\n").arg(toString(m_serverUpdateTool->getUploaderState()));
-        debugState += QString("ClientTool=%1\n").arg(toString(m_clientUpdateTool->getState()));
+        debugState += QString("ClientTool=%1\n").arg(ClientUpdateTool::toString(m_clientUpdateTool->getState()));
         debugState += QString("validUpdate=%1\n").arg(m_haveValidUpdate);
 
         ui->debugStateLabel->setText(debugState);
@@ -1651,28 +1678,6 @@ QString MultiServerUpdatesWidget::toString(UpdateSourceType mode)
             return tr("Update from mediaservers");
     }
     return "Unknown update source mode";
-}
-
-QString MultiServerUpdatesWidget::toString(ClientUpdateTool::State state)
-{
-    switch(state)
-    {
-        case ClientUpdateTool::State::initial:
-            return "Initial";
-        case ClientUpdateTool::State::downloading:
-            return "Downloading";
-        case ClientUpdateTool::State::readyInstall:
-            return "ReadyInstall";
-        case ClientUpdateTool::State::installing:
-            return "Installing";
-        case ClientUpdateTool::State::complete:
-            return "Complete";
-        case ClientUpdateTool::State::error:
-            return "Error";
-        case ClientUpdateTool::State::applauncherError:
-            return "applauncherError";
-    }
-    return QString();
 }
 
 } // namespace nx::client::desktop
