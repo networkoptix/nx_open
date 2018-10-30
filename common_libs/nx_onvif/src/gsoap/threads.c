@@ -1,7 +1,7 @@
 /*
-	threads.c
+    threads.c
 
-	Portable threads and locks API implementation
+    Portable threads and locks API implementation
 
 gSOAP XML Web services tools
 Copyright (C) 2000-2010, Robert van Engelen, Genivia Inc., All Rights Reserved.
@@ -52,7 +52,7 @@ A commercial use license is available from Genivia, Inc., contact@genivia.com
 
 /******************************************************************************\
  *
- *	Emulation of POSIX condition variables for WIN32
+ *    Emulation of POSIX condition variables for WIN32
  *
 \******************************************************************************/
 

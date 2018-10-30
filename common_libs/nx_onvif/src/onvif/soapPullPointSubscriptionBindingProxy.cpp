@@ -14,59 +14,68 @@ A commercial use license is available from Genivia Inc., contact@genivia.com
 #include "soapPullPointSubscriptionBindingProxy.h"
 
 PullPointSubscriptionBindingProxy::PullPointSubscriptionBindingProxy()
-{	this->soap = soap_new();
-	this->soap_own = true;
-	PullPointSubscriptionBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    PullPointSubscriptionBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
 }
 
 PullPointSubscriptionBindingProxy::PullPointSubscriptionBindingProxy(const PullPointSubscriptionBindingProxy& rhs)
-{	this->soap = rhs.soap;
-	this->soap_own = false;
-	this->soap_endpoint = rhs.soap_endpoint;
+{
+    this->soap = rhs.soap;
+    this->soap_own = false;
+    this->soap_endpoint = rhs.soap_endpoint;
 }
 
 PullPointSubscriptionBindingProxy::PullPointSubscriptionBindingProxy(struct soap *_soap)
-{	this->soap = _soap;
-	this->soap_own = false;
-	PullPointSubscriptionBindingProxy_init(_soap->imode, _soap->omode);
+{
+    this->soap = _soap;
+    this->soap_own = false;
+    PullPointSubscriptionBindingProxy_init(_soap->imode, _soap->omode);
 }
 
 PullPointSubscriptionBindingProxy::PullPointSubscriptionBindingProxy(const char *endpoint)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	PullPointSubscriptionBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
-	soap_endpoint = endpoint;
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    PullPointSubscriptionBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+    soap_endpoint = endpoint;
 }
 
 PullPointSubscriptionBindingProxy::PullPointSubscriptionBindingProxy(soap_mode iomode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	PullPointSubscriptionBindingProxy_init(iomode, iomode);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    PullPointSubscriptionBindingProxy_init(iomode, iomode);
 }
 
 PullPointSubscriptionBindingProxy::PullPointSubscriptionBindingProxy(const char *endpoint, soap_mode iomode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	PullPointSubscriptionBindingProxy_init(iomode, iomode);
-	soap_endpoint = endpoint;
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    PullPointSubscriptionBindingProxy_init(iomode, iomode);
+    soap_endpoint = endpoint;
 }
 
 PullPointSubscriptionBindingProxy::PullPointSubscriptionBindingProxy(soap_mode imode, soap_mode omode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	PullPointSubscriptionBindingProxy_init(imode, omode);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    PullPointSubscriptionBindingProxy_init(imode, omode);
 }
 
 PullPointSubscriptionBindingProxy::~PullPointSubscriptionBindingProxy()
-{	if (this->soap_own)
-		soap_free(this->soap);
+{
+    if (this->soap_own)
+        soap_free(this->soap);
 }
 
 void PullPointSubscriptionBindingProxy::PullPointSubscriptionBindingProxy_init(soap_mode imode, soap_mode omode)
-{	soap_imode(this->soap, imode);
-	soap_omode(this->soap, omode);
-	soap_endpoint = NULL;
-	static const struct Namespace namespaces[] = {
+{
+    soap_imode(this->soap, imode);
+    soap_omode(this->soap, omode);
+    soap_endpoint = NULL;
+    static const struct Namespace namespaces[] = {
         {"SOAP-ENV", "http://www.w3.org/2003/05/soap-envelope", "http://schemas.xmlsoap.org/soap/envelope/", NULL},
         {"SOAP-ENC", "http://www.w3.org/2003/05/soap-encoding", "http://schemas.xmlsoap.org/soap/encoding/", NULL},
         {"xsi", "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL},
@@ -132,305 +141,326 @@ void PullPointSubscriptionBindingProxy::PullPointSubscriptionBindingProxy_init(s
         {"onvifThermal", "http://www.onvif.org/ver10/thermal/wsdl", NULL, NULL},
         {NULL, NULL, NULL, NULL}
     };
-	soap_set_namespaces(this->soap, namespaces);
+    soap_set_namespaces(this->soap, namespaces);
 }
 
 PullPointSubscriptionBindingProxy *PullPointSubscriptionBindingProxy::copy()
-{	PullPointSubscriptionBindingProxy *dup = SOAP_NEW_UNMANAGED(PullPointSubscriptionBindingProxy);
-	if (dup)
-	{	soap_done(dup->soap);
-		soap_copy_context(dup->soap, this->soap);
-	}
-	return dup;
+{
+    PullPointSubscriptionBindingProxy *dup = SOAP_NEW_UNMANAGED(PullPointSubscriptionBindingProxy);
+    if (dup)
+    {
+        soap_done(dup->soap);
+        soap_copy_context(dup->soap, this->soap);
+    }
+    return dup;
 }
 
 PullPointSubscriptionBindingProxy& PullPointSubscriptionBindingProxy::operator=(const PullPointSubscriptionBindingProxy& rhs)
-{	if (this->soap != rhs.soap)
-	{	if (this->soap_own)
-			soap_free(this->soap);
-		this->soap = rhs.soap;
-		this->soap_own = false;
-		this->soap_endpoint = rhs.soap_endpoint;
-	}
-	return *this;
+{
+    if (this->soap != rhs.soap)
+    {
+        if (this->soap_own)
+            soap_free(this->soap);
+        this->soap = rhs.soap;
+        this->soap_own = false;
+        this->soap_endpoint = rhs.soap_endpoint;
+    }
+    return *this;
 }
 
 void PullPointSubscriptionBindingProxy::destroy()
-{	soap_destroy(this->soap);
-	soap_end(this->soap);
+{
+    soap_destroy(this->soap);
+    soap_end(this->soap);
 }
 
 void PullPointSubscriptionBindingProxy::reset()
-{	this->destroy();
-	soap_done(this->soap);
-	soap_initialize(this->soap);
-	PullPointSubscriptionBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+{
+    this->destroy();
+    soap_done(this->soap);
+    soap_initialize(this->soap);
+    PullPointSubscriptionBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
 }
 
 void PullPointSubscriptionBindingProxy::soap_noheader()
-{	this->soap->header = NULL;
+{
+    this->soap->header = NULL;
 }
 
-void PullPointSubscriptionBindingProxy::soap_header(char *wsa5__MessageID, struct wsa5__RelatesToType *wsa5__RelatesTo, struct wsa5__EndpointReferenceType *wsa5__From, struct wsa5__EndpointReferenceType *wsa5__ReplyTo, struct wsa5__EndpointReferenceType *wsa5__FaultTo, char *wsa5__To, char *wsa5__Action, struct chan__ChannelInstanceType *chan__ChannelInstance, struct wsdd__AppSequenceType *wsdd__AppSequence, struct _wsse__Security *wsse__Security, char *subscriptionID)
-{	::soap_header(this->soap);
-	this->soap->header->wsa5__MessageID = wsa5__MessageID;
-	this->soap->header->wsa5__RelatesTo = wsa5__RelatesTo;
-	this->soap->header->wsa5__From = wsa5__From;
-	this->soap->header->wsa5__ReplyTo = wsa5__ReplyTo;
-	this->soap->header->wsa5__FaultTo = wsa5__FaultTo;
-	this->soap->header->wsa5__To = wsa5__To;
-	this->soap->header->wsa5__Action = wsa5__Action;
-	this->soap->header->chan__ChannelInstance = chan__ChannelInstance;
-	this->soap->header->wsdd__AppSequence = wsdd__AppSequence;
-	this->soap->header->wsse__Security = wsse__Security;
-	this->soap->header->subscriptionID = subscriptionID;
+void PullPointSubscriptionBindingProxy::soap_header(char *wsa5__MessageID, struct wsa5__RelatesToType *wsa5__RelatesTo, struct wsa5__EndpointReferenceType *wsa5__From, struct wsa5__EndpointReferenceType *wsa5__ReplyTo, struct wsa5__EndpointReferenceType *wsa5__FaultTo, char *wsa5__To, char *wsa5__Action, struct chan__ChannelInstanceType *chan__ChannelInstance, struct wsdd__AppSequenceType *wsdd__AppSequence, struct _wsse__Security *wsse__Security, char *SubscriptionId)
+{
+    ::soap_header(this->soap);
+    this->soap->header->wsa5__MessageID = wsa5__MessageID;
+    this->soap->header->wsa5__RelatesTo = wsa5__RelatesTo;
+    this->soap->header->wsa5__From = wsa5__From;
+    this->soap->header->wsa5__ReplyTo = wsa5__ReplyTo;
+    this->soap->header->wsa5__FaultTo = wsa5__FaultTo;
+    this->soap->header->wsa5__To = wsa5__To;
+    this->soap->header->wsa5__Action = wsa5__Action;
+    this->soap->header->chan__ChannelInstance = chan__ChannelInstance;
+    this->soap->header->wsdd__AppSequence = wsdd__AppSequence;
+    this->soap->header->wsse__Security = wsse__Security;
+    this->soap->header->SubscriptionId = SubscriptionId;
 }
 
 ::SOAP_ENV__Header *PullPointSubscriptionBindingProxy::soap_header()
-{	return this->soap->header;
+{
+    return this->soap->header;
 }
 
 ::SOAP_ENV__Fault *PullPointSubscriptionBindingProxy::soap_fault()
-{	return this->soap->fault;
+{
+    return this->soap->fault;
 }
 
 const char *PullPointSubscriptionBindingProxy::soap_fault_string()
-{	return *soap_faultstring(this->soap);
+{
+    return *soap_faultstring(this->soap);
 }
 
 const char *PullPointSubscriptionBindingProxy::soap_fault_detail()
-{	return *soap_faultdetail(this->soap);
+{
+    return *soap_faultdetail(this->soap);
 }
 
 int PullPointSubscriptionBindingProxy::soap_close_socket()
-{	return soap_closesock(this->soap);
+{
+    return soap_closesock(this->soap);
 }
 
 int PullPointSubscriptionBindingProxy::soap_force_close_socket()
-{	return soap_force_closesock(this->soap);
+{
+    return soap_force_closesock(this->soap);
 }
 
 void PullPointSubscriptionBindingProxy::soap_print_fault(FILE *fd)
-{	::soap_print_fault(this->soap, fd);
+{
+    ::soap_print_fault(this->soap, fd);
 }
 
 #ifndef WITH_LEAN
 #ifndef WITH_COMPAT
 void PullPointSubscriptionBindingProxy::soap_stream_fault(std::ostream& os)
-{	::soap_stream_fault(this->soap, os);
+{
+    ::soap_stream_fault(this->soap, os);
 }
 #endif
 
 char *PullPointSubscriptionBindingProxy::soap_sprint_fault(char *buf, size_t len)
-{	return ::soap_sprint_fault(this->soap, buf, len);
+{
+    return ::soap_sprint_fault(this->soap, buf, len);
 }
 #endif
 
 int PullPointSubscriptionBindingProxy::PullMessages(const char *endpoint, const char *soap_action, _onvifEvents__PullMessages *onvifEvents__PullMessages, _onvifEvents__PullMessagesResponse &onvifEvents__PullMessagesResponse)
 {
-	struct __onvifEvents_pps__PullMessages soap_tmp___onvifEvents_pps__PullMessages;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/events/wsdl/PullPointSubscription/PullMessagesRequest";
-	soap_tmp___onvifEvents_pps__PullMessages.onvifEvents__PullMessages = onvifEvents__PullMessages;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifEvents_pps__PullMessages(soap, &soap_tmp___onvifEvents_pps__PullMessages);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifEvents_pps__PullMessages(soap, &soap_tmp___onvifEvents_pps__PullMessages, "-onvifEvents-pps:PullMessages", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifEvents_pps__PullMessages(soap, &soap_tmp___onvifEvents_pps__PullMessages, "-onvifEvents-pps:PullMessages", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifEvents__PullMessagesResponse*>(&onvifEvents__PullMessagesResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifEvents__PullMessagesResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifEvents__PullMessagesResponse.soap_get(soap, "onvifEvents:PullMessagesResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifEvents_pps__PullMessages soap_tmp___onvifEvents_pps__PullMessages;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/events/wsdl/PullPointSubscription/PullMessagesRequest";
+    soap_tmp___onvifEvents_pps__PullMessages.onvifEvents__PullMessages = onvifEvents__PullMessages;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifEvents_pps__PullMessages(soap, &soap_tmp___onvifEvents_pps__PullMessages);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifEvents_pps__PullMessages(soap, &soap_tmp___onvifEvents_pps__PullMessages, "-onvifEvents-pps:PullMessages", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifEvents_pps__PullMessages(soap, &soap_tmp___onvifEvents_pps__PullMessages, "-onvifEvents-pps:PullMessages", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifEvents__PullMessagesResponse*>(&onvifEvents__PullMessagesResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifEvents__PullMessagesResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifEvents__PullMessagesResponse.soap_get(soap, "onvifEvents:PullMessagesResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int PullPointSubscriptionBindingProxy::Seek(const char *endpoint, const char *soap_action, _onvifEvents__Seek *onvifEvents__Seek, _onvifEvents__SeekResponse &onvifEvents__SeekResponse)
 {
-	struct __onvifEvents_pps__Seek soap_tmp___onvifEvents_pps__Seek;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/events/wsdl/PullPointSubscription/SeekRequest";
-	soap_tmp___onvifEvents_pps__Seek.onvifEvents__Seek = onvifEvents__Seek;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifEvents_pps__Seek(soap, &soap_tmp___onvifEvents_pps__Seek);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifEvents_pps__Seek(soap, &soap_tmp___onvifEvents_pps__Seek, "-onvifEvents-pps:Seek", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifEvents_pps__Seek(soap, &soap_tmp___onvifEvents_pps__Seek, "-onvifEvents-pps:Seek", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifEvents__SeekResponse*>(&onvifEvents__SeekResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifEvents__SeekResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifEvents__SeekResponse.soap_get(soap, "onvifEvents:SeekResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifEvents_pps__Seek soap_tmp___onvifEvents_pps__Seek;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/events/wsdl/PullPointSubscription/SeekRequest";
+    soap_tmp___onvifEvents_pps__Seek.onvifEvents__Seek = onvifEvents__Seek;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifEvents_pps__Seek(soap, &soap_tmp___onvifEvents_pps__Seek);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifEvents_pps__Seek(soap, &soap_tmp___onvifEvents_pps__Seek, "-onvifEvents-pps:Seek", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifEvents_pps__Seek(soap, &soap_tmp___onvifEvents_pps__Seek, "-onvifEvents-pps:Seek", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifEvents__SeekResponse*>(&onvifEvents__SeekResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifEvents__SeekResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifEvents__SeekResponse.soap_get(soap, "onvifEvents:SeekResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int PullPointSubscriptionBindingProxy::SetSynchronizationPoint(const char *endpoint, const char *soap_action, _onvifEvents__SetSynchronizationPoint *onvifEvents__SetSynchronizationPoint, _onvifEvents__SetSynchronizationPointResponse &onvifEvents__SetSynchronizationPointResponse)
 {
-	struct __onvifEvents_pps__SetSynchronizationPoint soap_tmp___onvifEvents_pps__SetSynchronizationPoint;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/events/wsdl/PullPointSubscription/SetSynchronizationPointRequest";
-	soap_tmp___onvifEvents_pps__SetSynchronizationPoint.onvifEvents__SetSynchronizationPoint = onvifEvents__SetSynchronizationPoint;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifEvents_pps__SetSynchronizationPoint(soap, &soap_tmp___onvifEvents_pps__SetSynchronizationPoint);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifEvents_pps__SetSynchronizationPoint(soap, &soap_tmp___onvifEvents_pps__SetSynchronizationPoint, "-onvifEvents-pps:SetSynchronizationPoint", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifEvents_pps__SetSynchronizationPoint(soap, &soap_tmp___onvifEvents_pps__SetSynchronizationPoint, "-onvifEvents-pps:SetSynchronizationPoint", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifEvents__SetSynchronizationPointResponse*>(&onvifEvents__SetSynchronizationPointResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifEvents__SetSynchronizationPointResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifEvents__SetSynchronizationPointResponse.soap_get(soap, "onvifEvents:SetSynchronizationPointResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifEvents_pps__SetSynchronizationPoint soap_tmp___onvifEvents_pps__SetSynchronizationPoint;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/events/wsdl/PullPointSubscription/SetSynchronizationPointRequest";
+    soap_tmp___onvifEvents_pps__SetSynchronizationPoint.onvifEvents__SetSynchronizationPoint = onvifEvents__SetSynchronizationPoint;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifEvents_pps__SetSynchronizationPoint(soap, &soap_tmp___onvifEvents_pps__SetSynchronizationPoint);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifEvents_pps__SetSynchronizationPoint(soap, &soap_tmp___onvifEvents_pps__SetSynchronizationPoint, "-onvifEvents-pps:SetSynchronizationPoint", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifEvents_pps__SetSynchronizationPoint(soap, &soap_tmp___onvifEvents_pps__SetSynchronizationPoint, "-onvifEvents-pps:SetSynchronizationPoint", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifEvents__SetSynchronizationPointResponse*>(&onvifEvents__SetSynchronizationPointResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifEvents__SetSynchronizationPointResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifEvents__SetSynchronizationPointResponse.soap_get(soap, "onvifEvents:SetSynchronizationPointResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int PullPointSubscriptionBindingProxy::Unsubscribe(const char *endpoint, const char *soap_action, _oasisWsnB2__Unsubscribe *oasisWsnB2__Unsubscribe, _oasisWsnB2__UnsubscribeResponse &oasisWsnB2__UnsubscribeResponse)
 {
-	struct __onvifEvents_pps__Unsubscribe soap_tmp___onvifEvents_pps__Unsubscribe;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://docs.oasis-open.org/wsn/bw-2/SubscriptionManager/UnsubscribeRequest";
-	soap_tmp___onvifEvents_pps__Unsubscribe.oasisWsnB2__Unsubscribe = oasisWsnB2__Unsubscribe;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifEvents_pps__Unsubscribe(soap, &soap_tmp___onvifEvents_pps__Unsubscribe);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifEvents_pps__Unsubscribe(soap, &soap_tmp___onvifEvents_pps__Unsubscribe, "-onvifEvents-pps:Unsubscribe", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifEvents_pps__Unsubscribe(soap, &soap_tmp___onvifEvents_pps__Unsubscribe, "-onvifEvents-pps:Unsubscribe", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_oasisWsnB2__UnsubscribeResponse*>(&oasisWsnB2__UnsubscribeResponse)) // NULL ref?
-		return soap_closesock(soap);
-	oasisWsnB2__UnsubscribeResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	oasisWsnB2__UnsubscribeResponse.soap_get(soap, "oasisWsnB2:UnsubscribeResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifEvents_pps__Unsubscribe soap_tmp___onvifEvents_pps__Unsubscribe;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://docs.oasis-open.org/wsn/bw-2/SubscriptionManager/UnsubscribeRequest";
+    soap_tmp___onvifEvents_pps__Unsubscribe.oasisWsnB2__Unsubscribe = oasisWsnB2__Unsubscribe;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifEvents_pps__Unsubscribe(soap, &soap_tmp___onvifEvents_pps__Unsubscribe);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifEvents_pps__Unsubscribe(soap, &soap_tmp___onvifEvents_pps__Unsubscribe, "-onvifEvents-pps:Unsubscribe", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifEvents_pps__Unsubscribe(soap, &soap_tmp___onvifEvents_pps__Unsubscribe, "-onvifEvents-pps:Unsubscribe", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_oasisWsnB2__UnsubscribeResponse*>(&oasisWsnB2__UnsubscribeResponse)) // NULL ref?
+        return soap_closesock(soap);
+    oasisWsnB2__UnsubscribeResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    oasisWsnB2__UnsubscribeResponse.soap_get(soap, "oasisWsnB2:UnsubscribeResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 /* End of client proxy code */

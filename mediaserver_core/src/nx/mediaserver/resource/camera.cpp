@@ -379,6 +379,9 @@ CameraDiagnostics::Result Camera::initInternal()
     m_advancedParametersProvidersByParameterId.clear();
     setCameraCapability(Qn::CameraTimeCapability, true);
 
+    if (commonModule()->isNeedToStop())
+        return CameraDiagnostics::ServerTerminatedResult();
+
     const auto driverResult = initializeCameraDriver();
     if (driverResult.errorCode != CameraDiagnostics::ErrorCode::noError)
         return driverResult;

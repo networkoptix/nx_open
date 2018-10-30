@@ -1,8 +1,8 @@
 import os
 
+import flask
 import pytest
-from flask import Flask, send_file
-from werkzeug.exceptions import NotFound
+import werkzeug.exceptions
 
 from framework.os_access.exceptions import AlreadyExists
 from framework.serving import WsgiServer
@@ -27,13 +27,13 @@ def downloads_dir(os_access):
 
 @pytest.fixture()
 def _http_url(service_ports, os_access, served_file):
-    app = Flask('One file download')
+    app = flask.Flask('One file download')
 
     @app.route('/<path:path>')
     def download(path):
         if path != served_file.name:
-            raise NotFound()
-        return send_file(str(served_file), as_attachment=True)
+            raise werkzeug.exceptions.NotFound()
+        return flask.send_file(str(served_file), as_attachment=True)
 
     wsgi_server = WsgiServer(app.wsgi_app, service_ports[5:10])
     with wsgi_server.serving():

@@ -8,8 +8,7 @@ class Users(object):
 
     @cached_getter
     def all_profiles(self):
-        query = self._winrm.wmi.cls(u'Win32_UserProfile').enumerate({})
-        profiles = list(query.enumerate())
+        profiles = list(self._winrm.wmi.cls(u'Win32_UserProfile').enumerate({}))
         return profiles
 
     def profile_by_sid(self, sid):

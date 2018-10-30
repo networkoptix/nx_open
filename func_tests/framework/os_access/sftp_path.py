@@ -101,12 +101,16 @@ class SftpPath(BasePosixPath):
                 return
             raise exceptions.DoesNotExist()
         for entry in entries:
-            if stat.S_ISREG(entry.st_mode):
-                self.joinpath(entry.filename).unlink()
             if stat.S_ISDIR(entry.st_mode):
                 self.joinpath(entry.filename).rmtree(ignore_errors=False)
+            else:
+                self.joinpath(entry.filename).unlink()
         self.rmdir()
 
+    @_reraise_by_errno({
+        errno.ENOENT: exceptions.DoesNotExist(),
+        None: exceptions.NotEmpty(),
+        })
     def rmdir(self):
         self._client.rmdir(str(self))
 
@@ -166,3 +170,14 @@ class SftpPath(BasePosixPath):
                 raise
             raise
         return f
+
+    @_reraise_by_errno({
+        errno.ENOENT: exceptions.BadParent(),
+        None: exceptions.AlreadyExists("Already exists"),
+        })
+    def symlink_to(self, target, target_is_directory=False):
+        if not isinstance(target, type(self)):
+            raise ValueError(
+                "Symlink can only point to same OS but link is {} and target is {}".format(
+                    self, target))
+        self._client.symlink(str(target), str(self))

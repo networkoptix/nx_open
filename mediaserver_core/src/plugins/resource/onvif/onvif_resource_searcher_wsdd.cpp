@@ -368,7 +368,11 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
 #endif
 
         for(const nx::network::QnInterfaceAndAddr& iface: intfList)
+        {
+            if (m_shouldStop)
+                return;
             readProbeMatches( iface, result );
+        }
 
         for(const nx::network::QnInterfaceAndAddr& iface: intfList)
         {

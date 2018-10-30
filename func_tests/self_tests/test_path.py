@@ -5,7 +5,7 @@ from string import whitespace
 
 import pytest
 
-from framework.os_access.exceptions import BadParent, DoesNotExist, NotADir, NotAFile, BadPath
+from framework.os_access import exceptions
 from framework.os_access.local_path import LocalPath
 from framework.os_access.local_shell import local_shell
 from framework.os_access.path import copy_file
@@ -99,6 +99,21 @@ def test_home(path_cls):
     assert path_cls.home().exists()
 
 
+def test_mkdir_rmdir(existing_remote_dir):
+    path = existing_remote_dir / 'dir'
+    pytest.raises(exceptions.DoesNotExist, path.rmdir)
+    path.mkdir()
+    pytest.raises(exceptions.AlreadyExists, path.mkdir)
+    path.rmdir()
+
+
+def test_rmdir_on_not_empty(existing_remote_dir):
+    path = existing_remote_dir / 'dir_for_rmdir'
+    path.mkdir()
+    path.joinpath('file_to_prevent_rmdir').write_bytes(b'dummy content')
+    pytest.raises(exceptions.NotEmpty, path.rmdir)
+
+
 def test_rmtree_write_exists(dirty_remote_test_dir):
     _cleanup_dir(dirty_remote_test_dir)
     touched_file = dirty_remote_test_dir / 'touched.empty'
@@ -114,13 +129,13 @@ def test_rmtree_mkdir_exists(dirty_remote_test_dir, depth):
     root_dir.mkdir()
     target_dir = root_dir.joinpath(*['level_{}'.format(level) for level in range(1, depth + 1)])
     assert not target_dir.exists()
-    with pytest.raises(DoesNotExist):
+    with pytest.raises(exceptions.DoesNotExist):
         target_dir.rmtree(ignore_errors=False)  # Not exists, raise.
     target_dir.rmtree(ignore_errors=True)  # No effect even if parent doesn't exist.
     if depth == 1:
         target_dir.mkdir(parents=False)
     else:
-        with pytest.raises(BadParent):
+        with pytest.raises(exceptions.BadParent):
             target_dir.mkdir(parents=False)
         target_dir.mkdir(parents=True)
     assert target_dir.exists()
@@ -192,7 +207,7 @@ def test_write_read_text(remote_test_dir, data):
 
 
 def test_write_to_dir(existing_remote_dir):
-    with pytest.raises(NotAFile):
+    with pytest.raises(exceptions.NotAFile):
         existing_remote_dir.write_bytes(os.urandom(1000))
 
 
@@ -205,27 +220,27 @@ def path_with_file_in_parents(request, existing_remote_file):
 
 
 def test_write_when_parent_is_a_file(path_with_file_in_parents):
-    with pytest.raises(BadParent):
+    with pytest.raises(exceptions.BadParent):
         path_with_file_in_parents.write_bytes(b'anything')
 
 
 def test_mkdir_when_parent_is_a_file(path_with_file_in_parents):
-    with pytest.raises(BadParent):
+    with pytest.raises(exceptions.BadParent):
         path_with_file_in_parents.mkdir()
 
 
 def test_read_from_dir(existing_remote_dir):
-    with pytest.raises(BadPath):
+    with pytest.raises(exceptions.BadPath):
         _ = existing_remote_dir.read_bytes()
 
 
 def test_unlink_dir(existing_remote_dir):
-    with pytest.raises(BadPath):
+    with pytest.raises(exceptions.BadPath):
         existing_remote_dir.unlink()
 
 
 def test_unlink_non_existent(existing_remote_dir):
-    pytest.raises(DoesNotExist, existing_remote_dir.joinpath('non-existent').unlink)
+    pytest.raises(exceptions.DoesNotExist, existing_remote_dir.joinpath('non-existent').unlink)
 
 
 def test_write_to_existing_file(existing_remote_file):
@@ -236,7 +251,7 @@ def test_write_to_existing_file(existing_remote_file):
 
 def test_read_from_non_existent(remote_test_dir):
     non_existent_file = remote_test_dir / 'non_existent'
-    with pytest.raises(DoesNotExist):
+    with pytest.raises(exceptions.DoesNotExist):
         _ = non_existent_file.read_bytes()
 
 
@@ -248,23 +263,23 @@ def test_size(remote_test_dir):
 
 def test_size_of_nonexistent(remote_test_dir):
     path = remote_test_dir / 'to_measure_size.dat'
-    pytest.raises(DoesNotExist, path.size)
+    pytest.raises(exceptions.DoesNotExist, path.size)
 
 
 def test_size_of_a_dir(remote_test_dir):
     path = remote_test_dir / 'to_measure_size.dat'
     path.mkdir()
-    pytest.raises(NotAFile, path.size)
+    pytest.raises(exceptions.NotAFile, path.size)
 
 
 def test_glob_on_file(existing_remote_file):
-    with pytest.raises(BadPath):
+    with pytest.raises(exceptions.BadPath):
         _ = list(existing_remote_file.glob('*'))
 
 
 def test_glob_on_non_existent(existing_remote_dir):
     non_existent_path = existing_remote_dir / 'non_existent'
-    with pytest.raises(BadPath):
+    with pytest.raises(exceptions.BadPath):
         _ = list(non_existent_path.glob('*'))
 
 
@@ -275,6 +290,53 @@ def test_glob_on_empty_dir(existing_remote_dir):
 def test_glob_no_result(existing_remote_dir):
     existing_remote_dir.joinpath('oi.existing').write_bytes(b'empty')
     assert not list(existing_remote_dir.glob('*.non_existent'))
+
+
+@pytest.mark.parametrize('path_cls', ['local_path_cls', 'ssh_path_cls', 'sftp_path_cls'], indirect=True)
+def test_symlink(existing_remote_dir):
+    target = existing_remote_dir / 'target'
+    contents = b'dummy contents'
+    target.write_bytes(contents)
+    link = existing_remote_dir / 'link'
+    link.symlink_to(target)
+    assert link.read_bytes() == contents
+
+
+@pytest.mark.parametrize('path_cls', ['local_path_cls', 'ssh_path_cls', 'sftp_path_cls'], indirect=True)
+def test_symlink_to_non_existent(existing_remote_dir):
+    target = existing_remote_dir / 'target_non_existent'
+    link = existing_remote_dir / 'link'
+    link.symlink_to(target)
+    pytest.raises(exceptions.DoesNotExist, link.read_bytes)
+
+
+@pytest.mark.parametrize('path_cls', ['local_path_cls', 'ssh_path_cls', 'sftp_path_cls'], indirect=True)
+def test_symlink_at_existent_path(existing_remote_dir):
+    link = existing_remote_dir / 'link'
+    link.write_bytes(b'dummy contents')
+    pytest.raises(exceptions.AlreadyExists, link.symlink_to, existing_remote_dir / 'target_non_existent')
+
+
+@pytest.mark.parametrize('path_cls', ['local_path_cls', 'ssh_path_cls', 'sftp_path_cls'], indirect=True)
+def test_symlink_in_non_existent_parent(existing_remote_dir):
+    link = existing_remote_dir / 'non_existent_dir' / 'link'
+    pytest.raises(exceptions.BadParent, link.symlink_to, existing_remote_dir / 'target_non_existent')
+
+
+@pytest.mark.parametrize('path_cls', ['local_path_cls', 'ssh_path_cls', 'sftp_path_cls'], indirect=True)
+def test_symlink_in_file_parent(existing_remote_dir):
+    bad_parent = existing_remote_dir / 'file'
+    bad_parent.write_bytes(b'dummy contents')
+    link = bad_parent / 'link'
+    pytest.raises(exceptions.BadParent, link.symlink_to, existing_remote_dir / 'target_non_existent')
+
+
+@pytest.mark.parametrize('path_cls', ['local_path_cls', 'ssh_path_cls', 'sftp_path_cls'], indirect=True)
+def test_rmtree_with_symlinks(existing_remote_dir):
+    path = existing_remote_dir / 'dir_with_symlink'
+    path.mkdir()
+    path.joinpath('symlink').symlink_to(existing_remote_dir / 'target_non_existent')
+    path.rmtree()
 
 
 @pytest.mark.parametrize('iterations', [2, 10], ids='{}iterations'.format)
