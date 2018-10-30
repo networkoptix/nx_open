@@ -53,6 +53,7 @@ public:
         bool containsTime(qint64 timeMs) const;
         qint64 getFileSize() const { return ((qint64) fileSizeHi << 32) + fileSizeLo; } // 256Tb as max file size
         void setFileSize(qint64 value) { fileSizeHi = quint16(value >> 32); fileSizeLo = quint32(value); } // 256Tb as max file size
+        bool isInfinite() const { return durationMs == -1; }
 
         QString fileName() const;
 

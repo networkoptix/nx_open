@@ -18,6 +18,7 @@ static const int kRecordsPerIteration = 1024;
 static const char version = 1;
 static const quint16 DETAILED_AGGREGATE_INTERVAL = 3; // at seconds
 
+
 //static const quint16 COARSE_AGGREGATE_INTERVAL = 3600; // at seconds
 
 bool operator < (const IndexRecord& first, const IndexRecord& other) { return first.start < other.start; }
@@ -211,12 +212,13 @@ QnTimePeriodList QnMotionArchive::matchPeriod(
     while (msStartTime < msEndTime)
     {
         qint64 minTime, maxTime;
-        dateBounds(msStartTime, minTime, maxTime);
+        auto timePointMs = descendingOrder ? msEndTime : msStartTime;
+        dateBounds(timePointMs, minTime, maxTime);
 
         QVector<IndexRecord> index;
         IndexHeader indexHeader;
-        fillFileNames(msStartTime, &motionFile, 0);
-        if (!motionFile.open(QFile::ReadOnly) || !loadIndexFile(index, indexHeader, msStartTime))
+        fillFileNames(timePointMs, &motionFile, 0);
+        if (!motionFile.open(QFile::ReadOnly) || !loadIndexFile(index, indexHeader, timePointMs))
             return rez;
 
         QVector<IndexRecord>::iterator startItr = index.begin();
@@ -245,7 +247,7 @@ QnTimePeriodList QnMotionArchive::matchPeriod(
             break;
 
         if (descendingOrder)
-            msEndTime = msStartTime;
+            msEndTime = minTime - 1;
         else
             msStartTime = maxTime + 1;
     }
@@ -442,7 +444,7 @@ bool QnMotionArchive::saveToArchiveInternal(QnConstMetaDataV1Ptr data)
 {
     QnMutexLocker lock(&m_writeMutex);
 
-    qint64 timestamp = data->timestamp/1000;
+    const qint64 timestamp = data->timestamp/1000;
     if (timestamp > m_lastDateForCurrentFile || timestamp < m_firstTime)
     {
         // go to new file
@@ -518,7 +520,7 @@ bool QnMotionArchive::saveToArchiveInternal(QnConstMetaDataV1Ptr data)
     }
 
     quint32 relTime = quint32(timestamp - m_firstTime);
-    quint32 duration = int((data->timestamp+data->m_duration)/1000 - timestamp);
+    quint32 duration = std::max(kMinimalMotionDurationMs, quint32(data->m_duration/1000));
     if (m_detailedIndexFile.write((const char*) &relTime, 4) != 4)
     {
         qWarning() << "Failed to write index file for camera" << m_resource->getUniqueId();
