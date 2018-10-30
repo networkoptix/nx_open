@@ -1,5 +1,5 @@
 #pragma once
-#include <client_core/connection_context_aware.h>
+#include <common/common_module_aware.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/vms/common/p2p/downloader/private/abstract_peer_manager.h>
 #include <nx/vms/common/p2p/downloader/private/resource_pool_peer_manager.h>
@@ -9,7 +9,6 @@ namespace nx::vms::common::p2p::downloader {
 
 /**
  * Peer manager to be used in Downloader class. It is intended for client-only usage.
- *
  */
 class SingleConnectionPeerManager: public AbstractPeerManager, public QnCommonModuleAware
 {

@@ -1,6 +1,6 @@
 #include <api/server_rest_connection.h>
 #include <common/common_module.h>
-#include <client_core/client_core_module.h>
+//#include <client_core/client_core_module.h>
 #include <nx/vms/common/p2p/downloader/validate_result.h>
 #include <nx_ec/ec_api.h>
 #include "single_connection_peer_manager.h"

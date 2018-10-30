@@ -37,7 +37,7 @@ public:
     TestWorker(
         const QString& fileName,
         Storage* storage,
-        std::shared_ptr<AbstractPeerManager> peerManager,
+        AbstractPeerManager* peerManager,
         QObject* parent = nullptr)
         :
         Worker(fileName, storage, peerManager, parent)
@@ -158,7 +158,7 @@ protected:
     {
         auto peer = new Peer();
         peer->id = peerId;
-        peer->peerManager.reset(new ProxyTestPeerManager(commonPeerManager.data(), peerId, peerName));
+        peer->peerManager = new ProxyTestPeerManager(commonPeerManager.data(), peerId, peerName);
         peer->storage = createStorage(peerId.toString());
         peer->worker = std::make_shared<TestWorker>(kTestFileName, peer->storage, peer->peerManager);
         return peer;
@@ -177,13 +177,14 @@ protected:
     struct Peer
     {
         QnUuid id;
-        std::shared_ptr<ProxyTestPeerManager> peerManager;
+        ProxyTestPeerManager* peerManager = nullptr;
         Storage* storage = nullptr;
         std::shared_ptr<TestWorker> worker;
 
         ~Peer()
         {
             worker->stop();
+            worker.reset();
             delete storage;
             // peerManager is owned and deleted by worker.
         }
@@ -194,7 +195,7 @@ protected:
         m_onRequestFileInfoCb = std::move(requestFileInfoCb);
     }
 
-    virtual void onRequestFileInfo()
+    virtual void onRequestFileInfo() override
     {
         if (m_onRequestFileInfoCb)
             m_onRequestFileInfoCb();

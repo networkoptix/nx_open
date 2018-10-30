@@ -45,10 +45,14 @@ public:
     };
     Q_ENUM(State)
 
+    /**
+     * Constructs a Worker
+     * NOTE: we need to ensure that peerManager is alive for all lifetime of a Worker.
+     */
     Worker(
         const QString& fileName,
         Storage* storage,
-        std::shared_ptr<AbstractPeerManager> peerManager,
+        AbstractPeerManager* peerManager,
         QObject* parent = nullptr);
     virtual ~Worker();
 
@@ -127,7 +131,7 @@ protected:
 
     void setPrintSelfPeerInLogs();
     static qint64 defaultStepDelay();
-    std::shared_ptr<AbstractPeerManager> peerManager() const;
+    AbstractPeerManager* peerManager() const;
 
 private:
     struct RequestContext
@@ -148,8 +152,7 @@ private:
     mutable QnMutex m_mutex;
     QnWaitCondition m_waitCondition;
     Storage* m_storage = nullptr;
-
-    std::shared_ptr<AbstractPeerManager> m_peerManager;
+    AbstractPeerManager* m_peerManager = nullptr;
     const QString m_fileName;
 
     nx::utils::log::Tag m_logTag;

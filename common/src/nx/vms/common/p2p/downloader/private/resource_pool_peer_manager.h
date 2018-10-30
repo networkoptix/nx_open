@@ -79,7 +79,7 @@ class ResourcePoolPeerManagerFactory:
 {
 public:
     ResourcePoolPeerManagerFactory(QnCommonModule* commonModule);
-    virtual std::shared_ptr<AbstractPeerManager> createPeerManager(
+    virtual AbstractPeerManager* createPeerManager(
         FileInformation::PeerSelectionPolicy peerPolicy,
         const QList<QnUuid>& additionalPeers) override;
 };

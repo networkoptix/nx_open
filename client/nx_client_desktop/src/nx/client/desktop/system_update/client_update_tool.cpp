@@ -2,8 +2,8 @@
 #include <nx/utils/log/log.h>
 #include <api/server_rest_connection.h>
 
+#include "nx/vms/common/p2p/downloader/private/single_connection_peer_manager.h"
 #include "client_update_tool.h"
-#include "single_connection_peer_manager.h"
 
 namespace nx {
 namespace client {
@@ -394,7 +394,7 @@ bool ClientUpdateTool::hasUpdate() const
 ClientUpdateTool::PeerManagerPtr ClientUpdateTool::createPeerManager(
     FileInformation::PeerSelectionPolicy /*peerPolicy*/, const QList<QnUuid>& /*additionalPeers*/)
 {
-    return m_peerManager;
+    return m_peerManager.get();
 }
 
 QString ClientUpdateTool::toString(State state)

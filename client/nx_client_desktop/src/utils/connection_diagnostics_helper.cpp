@@ -17,13 +17,13 @@
 #include <nx_ec/ec_api.h>
 
 #include <ui/dialogs/common/message_box.h>
-#include <ui/dialogs/compatibility_version_installation_dialog.h>
 #include <ui/help/help_topics.h>
 
 #include <utils/applauncher_utils.h>
 #include <utils/common/app_info.h>
-#include <nx/network/http/http_types.h>
 
+#include <nx/client/desktop/system_update/compatibility_version_installation_dialog.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>

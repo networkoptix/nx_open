@@ -10,8 +10,6 @@
 #include <utils/common/connective.h>
 #include <utils/update/zip_utils.h>
 #include <nx/vms/common/p2p/downloader/private/abstract_peer_manager.h>
-
-#include "single_connection_peer_manager.h"
 #include "update_contents.h"
 
 namespace nx::vms::common::p2p::downloader { class SingleConnectionPeerManager; }
@@ -32,7 +30,7 @@ class ClientUpdateTool:
     using base_type = Connective<QObject>;
     using Downloader = vms::common::p2p::downloader::Downloader;
     using FileInformation = vms::common::p2p::downloader::FileInformation;
-    using PeerManagerPtr = std::shared_ptr<nx::vms::common::p2p::downloader::AbstractPeerManager>;
+    using PeerManagerPtr = nx::vms::common::p2p::downloader::AbstractPeerManager*;
     using SingleConnectionPeerManager = nx::vms::common::p2p::downloader::SingleConnectionPeerManager;
 
 public:
@@ -155,7 +153,7 @@ protected:
     QDir m_outputDir;
 
     // Special peer manager to be used in the downloader.
-    std::shared_ptr<vms::common::p2p::downloader::SingleConnectionPeerManager> m_peerManager;
+    std::unique_ptr<vms::common::p2p::downloader::SingleConnectionPeerManager> m_peerManager;
     nx::update::Package m_clientPackage;
     State m_state = State::initial;
     int m_progress = 0;

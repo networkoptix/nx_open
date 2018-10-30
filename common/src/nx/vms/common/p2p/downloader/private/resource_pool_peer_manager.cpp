@@ -390,13 +390,12 @@ ResourcePoolPeerManagerFactory::ResourcePoolPeerManagerFactory(QnCommonModule* c
 {
 }
 
-std::shared_ptr<AbstractPeerManager> ResourcePoolPeerManagerFactory::createPeerManager(
+AbstractPeerManager* ResourcePoolPeerManagerFactory::createPeerManager(
     FileInformation::PeerSelectionPolicy peerPolicy,
     const QList<QnUuid>& additionalPeers)
 {
     auto&& peerSelector = createPeerSelector(peerPolicy, additionalPeers, commonModule());
-    return std::make_shared<ResourcePoolPeerManager>(commonModule(), std::move(peerSelector));
-
+    return new ResourcePoolPeerManager(commonModule(), std::move(peerSelector));
 }
 
 } // namespace downloader

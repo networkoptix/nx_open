@@ -73,7 +73,7 @@ class AbstractPeerManagerFactory
 {
 public:
     virtual ~AbstractPeerManagerFactory();
-    virtual std::shared_ptr<AbstractPeerManager> createPeerManager(
+    virtual AbstractPeerManager* createPeerManager(
         FileInformation::PeerSelectionPolicy peerPolicy,
         const QList<QnUuid>& additionalPeers) = 0;
 };

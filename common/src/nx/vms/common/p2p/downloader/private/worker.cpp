@@ -107,7 +107,7 @@ namespace downloader {
 Worker::Worker(
     const QString& fileName,
     Storage* storage,
-    std::shared_ptr<AbstractPeerManager> peerManager,
+    AbstractPeerManager* peerManager,
     QObject* parent)
     :
     m_storage(storage),
@@ -1171,7 +1171,7 @@ qint64 Worker::defaultStepDelay()
     return kDefaultStepDelayMs;
 }
 
-std::shared_ptr<AbstractPeerManager> Worker::peerManager() const
+AbstractPeerManager* Worker::peerManager() const
 {
     return m_peerManager;
 }
