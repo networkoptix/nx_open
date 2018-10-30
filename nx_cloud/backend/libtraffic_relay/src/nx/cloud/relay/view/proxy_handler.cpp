@@ -35,17 +35,11 @@ ProxyHandler::~ProxyHandler()
 }
 
 void ProxyHandler::processRequest(
-    nx::network::http::HttpServerConnection* const connection,
-    nx::utils::stree::ResourceContainer authInfo,
-    nx::network::http::Request request,
-    nx::network::http::Response* const response,
+    nx::network::http::RequestContext requestContext,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
     base_type::processRequest(
-        connection,
-        std::move(authInfo),
-        std::move(request),
-        response,
+        std::move(requestContext),
         [this, completionHandler = std::move(completionHandler)](
             network::http::RequestResult requestResult)
         {

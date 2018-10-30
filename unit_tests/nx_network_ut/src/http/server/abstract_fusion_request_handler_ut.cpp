@@ -15,10 +15,7 @@ class TestHandler:
     public nx::network::http::AbstractFusionRequestHandler<void, Serializable>
 {
 public:
-    virtual void processRequest(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        const nx::network::http::Request& /*request*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/) override
+    virtual void processRequest(http::RequestContext /*requestContext*/) override
     {
         nx::network::http::FusionRequestResult result;
         result.setHttpStatusCode(m_httpStatusCode);
