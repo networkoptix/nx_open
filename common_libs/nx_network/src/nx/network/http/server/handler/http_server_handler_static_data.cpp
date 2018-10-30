@@ -19,7 +19,7 @@ StaticData::StaticData(const StringType& mimeType, QByteArray response):
 }
 
 void StaticData::processRequest(
-    RequestContext requestContext,
+    RequestContext /*requestContext*/,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
     completionHandler(RequestResult(

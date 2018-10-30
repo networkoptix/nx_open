@@ -22,7 +22,7 @@ private:
     FunctorType m_func;
 
     virtual void processRequest(
-        nx::network::http::RequestContext requestContext) override
+        nx::network::http::RequestContext /*requestContext*/) override
     {
         auto data = m_func();
         this->requestCompleted(
