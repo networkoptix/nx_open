@@ -32,10 +32,6 @@ server_exe_file = os.path.join(installer_target_dir, server_exe_name)
 bundle_exe_name = environment.bundle_distribution_name + '.exe'
 bundle_exe_file = os.path.join(installer_target_dir, bundle_exe_name)
 
-paxton_stripped_file = os.path.join(engine_tmp_folder, 'paxton-strip.msi')
-paxton_exe_name = environment.paxton_distribution_name + '.exe'
-paxton_exe_file = os.path.join(installer_target_dir, paxton_exe_name)
-
 wix_extensions = [
     'WixFirewallExtension',
     'WixUtilExtension',
@@ -73,18 +69,9 @@ server_components = [
     'SelectionWarning',
     'Product-server-only']
 
-paxton_components = [
-    'AxClient',
-    'ClientQml',
-    'ClientFonts',
-    'ClientVox',
-    'PaxtonVcrt14',
-    'Product-paxton']
-
 client_exe_components = ['ArchCheck', 'ClientPackage', 'Product-client-exe']
 server_exe_components = ['ArchCheck', 'ServerPackage', 'Product-server-exe']
 full_exe_components = ['ArchCheck', 'ClientPackage', 'ServerPackage', 'Product-full-exe']
-paxton_exe_components = ['PaxtonPackage', 'Product-paxton-exe']
 
 
 def sign(output_file, code_signing):
@@ -197,32 +184,6 @@ def build_bundle(config):
         config)
 
 
-def build_paxton(config):
-    candle_msi_variables = {
-        'VoxSourceDir': environment.vox_source_dir,
-        'Vcrt14SrcDir': environment.vcrt14_source_dir,
-        'ClientQmlDir': environment.client_qml_source_dir,
-        'ClientHelpSourceDir': environment.client_help_source_dir,
-        'ClientFontsDir': environment.client_fonts_source_dir,
-        'ClientBgSourceDir': environment.client_background_source_dir,
-        'PaxtonVcrt14DstDir': '${customization}_${release.version}.${buildNumber}_Paxton'  # WTF
-    }
-    set_embedded_cabs(candle_msi_variables, False)
-    build_msi('paxton-msi', paxton_stripped_file, paxton_components, candle_msi_variables, config)
-
-    candle_exe_variables = {
-        'InstallerTargetDir': installer_target_dir,
-        'PaxtonMsiName': client_msi_name,
-        'PaxtonStrippedMsiFile': paxton_stripped_file
-    }
-    build_exe(
-        'paxton-exe',
-        paxton_exe_file,
-        paxton_exe_components,
-        candle_exe_variables,
-        config)
-
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', help="Config file", required=True)
@@ -235,8 +196,6 @@ def main():
     build_client(config)
     build_server(config)
     build_bundle(config)
-    if build_paxton_option:
-        build_paxton(config)
 
 
 if __name__ == '__main__':
