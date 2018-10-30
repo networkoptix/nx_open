@@ -101,7 +101,7 @@ public:
 
     /**
      * Tells applauncher to install update package.
-     * @param version - version to be sent to applauncher
+     * It will work only if tool is in state State::readyInstall.
      * @return true if success
      */
     bool installUpdate();

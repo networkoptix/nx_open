@@ -42,35 +42,6 @@ void CompatibilityVersionInstallationDialog::reject()
     QDialog::reject();
 }
 
-#ifdef TO_BE_REMOVED
-void CompatibilityVersionInstallationDialog::atUpdateStateChanged(QnUpdateResult result)
-{
-    /* Prevent final status jumping */
-    m_clientUpdateTool->disconnect(this);
-    m_ui->progressBar->setValue(100);
-
-    QDialogButtonBox::StandardButton button = QDialogButtonBox::Close;
-
-    switch (result.result)
-    {
-        case QnUpdateResult::Successful:
-            setMessage(tr("Installation completed"));
-            m_installationOk = true;
-            button = QDialogButtonBox::Ok;
-            break;
-        case QnUpdateResult::Cancelled:
-            setMessage(tr("Installation has been cancelled"));
-            break;
-        default:
-            setMessage(tr("Installation failed"));
-            break;
-    }
-
-    m_ui->buttonBox->setStandardButtons(button);
-    m_ui->buttonBox->button(button)->setFocus();
-}
-#endif
-
 int CompatibilityVersionInstallationDialog::exec()
 {
     // Will do exec there
@@ -86,7 +57,7 @@ void CompatibilityVersionInstallationDialog::atUpdateStateChanged(int state, int
     // [20-80] - Downloading
     // [80-100] - Installing
     int finalProgress = 0;
-    switch(ClientUpdateTool::State(state))
+    switch (ClientUpdateTool::State(state))
     {
         case ClientUpdateTool::State::initial:
             break;

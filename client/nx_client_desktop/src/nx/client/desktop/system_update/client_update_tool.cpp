@@ -5,16 +5,6 @@
 #include "client_update_tool.h"
 #include "single_connection_peer_manager.h"
 
-/*
- * Client update consists of the following actions:
- * 1. Download client package. It can be omitted for offline update package.
- * 2. Unpack client package.
- * 3. Verify unpacked contents.
- * 4. Install it. applauncher does it.
- *
- * Applauncher deals with stages 2-4.
- */
-
 namespace nx {
 namespace client {
 namespace desktop {
@@ -185,7 +175,7 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
         return;
 
     NX_VERBOSE(this) << "at_downloaderStatusChanged("<< fileInformation.name
-             << ") - status changed to " << fileInformation.status;
+        << ") - status changed to " << fileInformation.status;
 
     if (m_state != State::downloading)
     {
@@ -202,7 +192,6 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
             break;
         case FileInformation::Status::downloaded:
             setState(State::readyInstall);
-            //unpackUpdate(fileInformation.name);
             break;
         case FileInformation::Status::corrupted:
             setError(tr("Update package is corrupted"));
@@ -250,7 +239,7 @@ bool ClientUpdateTool::isDownloadComplete() const
 
 bool ClientUpdateTool::installUpdate()
 {
-    /* Try to run applauncher if it is not running. */
+    // Try to run applauncher if it is not running.
     if (!applauncher::api::checkOnline())
     {
         NX_VERBOSE(this) << "installUpdate can not install update - applauncher is offline" << error;
@@ -408,10 +397,9 @@ ClientUpdateTool::PeerManagerPtr ClientUpdateTool::createPeerManager(
     return m_peerManager;
 }
 
-
 QString ClientUpdateTool::toString(State state)
 {
-    switch(state)
+    switch (state)
     {
         case State::initial:
             return "Initial";

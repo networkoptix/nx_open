@@ -24,7 +24,7 @@ nx::update::Package findClientPackage(const nx::update::Information& updateInfo)
     auto arch = QnAppInfo::applicationArch();
     auto runtime = nx::vms::api::SystemInformation::currentSystemRuntime().replace(L' ', L'_');
 
-    for(auto& pkg: updateInfo.packages)
+    for (auto& pkg: updateInfo.packages)
     {
         if (pkg.component == nx::update::kComponentClient)
         {
