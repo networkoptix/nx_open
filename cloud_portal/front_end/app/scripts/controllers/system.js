@@ -18,6 +18,14 @@ angular.module('cloudApp')
                     page.title(value ? value + ' -' : '');
                     systemsProvider.forceUpdateSystems();
                 });
+                
+                $scope.$watch('system.mergeInfo', function(mergeInfo){
+                    if (mergeInfo) {
+                        setMergeStatus(mergeInfo)
+                    } else{
+                        $scope.currentlyMerging = false;
+                    }
+                })
             });
 
             function getMergeTarget(targetSystemId) {
