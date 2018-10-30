@@ -31,8 +31,6 @@ protected:
 
 protected:
     /**
-     * @param pluginName Full plugin name in English, capitalized as a header.
-     * @param libName Short plugin name: small_letters_and_underscores, as in the library filename.
      * @param enableOutput Enables NX_OUTPUT. Typically, use NX_DEBUG_ENABLE_OUTPUT as a value.
      * @param printPrefix Prefix for NX_PRINT and NX_OUTPUT. If empty, will be made from libName.
      */

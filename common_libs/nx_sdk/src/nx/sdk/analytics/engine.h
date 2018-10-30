@@ -40,6 +40,7 @@ public:
     /**
      * Called before other methods. Server provides the set of settings stored in its database for
      * this Engine instance.
+     *
      * @param settings Values of settings declared in the manifest. The pointer is valid only
      *     during the call. If count is 0, the pointer is null.
      */
@@ -56,6 +57,7 @@ public:
      * this Engine based on its current state, including setting values received via setSettings().
      * After creation of this Engine instance, this method is called after setSettings(), but can
      * be called again at any other moment to obtain the most actual manifest.
+     *
      * @param outError Status of the operation; is set to noError before this call.
      * @return Pointer to a C-style UTF-8 string string which must be valid while this Engine
      *     object exists.
@@ -69,11 +71,8 @@ public:
     virtual void freeManifest(const char* data) = 0;
 
     /**
-     * Creates, or returns already existing, DeviceAgent for the given device. There must be only
-     * one instance of the DeviceAgent created by the particular instance of Engine per device at
-     * any given time. It means that if we pass DeviceInfo objects with the same UID multiple
-     * times to the same Engine, then the pointer to exactly the same object must be returned.
-     * Also, multiple devices must not share the same DeviceAgent.
+     * Creates, or returns an already existing, a DeviceAgent instance intended to work with the
+     * given device.
      *
      * @param deviceInfo Information about the device for which a DeviceAgent should be created.
      * @param outError Status of the operation; is set to noError before this call.
@@ -84,6 +83,7 @@ public:
 
     /**
      * Action handler. Called when some action defined by this Engine is triggered by Server.
+     *
      * @param action Provides data for the action such as metadata object for which the action has
      *     been triggered, and a means for reporting back action results to Server. This object
      *     should not be used after returning from this function.

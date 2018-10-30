@@ -29,6 +29,9 @@ nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
 
 void Engine::initCapabilities()
 {
+    if (ini().deviceModelIndependent)
+        m_capabilities += "|deviceModelIndependent";
+
     const std::string pixelFormatString = ini().needUncompressedVideoFrames;
     if (!pixelFormatString.empty())
     {
