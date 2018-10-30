@@ -531,8 +531,8 @@ angular.module('nxCommon').controller('ViewCtrl',
             }
             $scope.storage.volumeLevel = $scope.volumeLevel;
         });
-
-        timeManager.init(Config.webclient.useServerTime);
+    
+        timeManager.init(Config.webclient.useServerTime, Config.webclient.useSystemTime);
     
         function isActive(val) {
             var currentPath = $location.path();

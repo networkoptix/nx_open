@@ -343,14 +343,24 @@ angular.module('nxCommon')
         };
         camerasProvider.prototype.getServerTimes = function(){
             var self = this;
-            return self.systemAPI.getServerTimes().then(function(result){
+            return self.systemAPI.getServerTimes().then(function (result) {
                 var serverOffsets = result.data.reply;
-                _.each(serverOffsets, function(server){
-                    //Typo with server api so we check for both spellings
-                    //Internal fix Link to task: https://networkoptix.atlassian.net/browse/VMS-7984
-                    var timeSinceEpochMs = server.timeSinceEpochMs || server.timeSinseEpochMs;
-                    self.serverOffsets[server.serverId] = timeManager.getOffset(timeSinceEpochMs, server.timeZoneOffsetMs);
-                });
+        
+                function setServerOffsetTime(time) {
+                    return _.each(serverOffsets, function (server) {
+                        //Typo with server api so we check for both spellings
+                        //Internal fix Link to task: https://networkoptix.atlassian.net/browse/VMS-7984
+                        var timeSinceEpochMs = time || server.timeSinceEpochMs || server.timeSinseEpochMs;
+                        self.serverOffsets[server.serverId] = timeManager.getOffset(timeSinceEpochMs, server.timeZoneOffsetMs);
+                    });
+                }
+        
+                if (Config.webclient.useSystemTime) {
+                    return self.systemAPI.getSystemTime().then(function (systemTime) {
+                        return setServerOffsetTime(systemTime);
+                    });
+                }
+                return setServerOffsetTime();
             });
         };
 
