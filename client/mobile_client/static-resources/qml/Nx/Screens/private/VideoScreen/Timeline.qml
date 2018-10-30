@@ -20,6 +20,7 @@ Item
     property alias autoPlay: timeline.autoPlay
     property alias autoReturnToBounds: timeline.autoReturnToBounds
     property alias serverTimeZoneShift: timeline.serverTimeZoneShift
+    property alias motionSearchMode: timeline.motionSearchMode
 
     readonly property bool dragging: timeline.dragging
     readonly property bool moving: timeline.moving

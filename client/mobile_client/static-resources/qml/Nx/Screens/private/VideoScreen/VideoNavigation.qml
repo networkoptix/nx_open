@@ -238,6 +238,7 @@ Item
 
             property bool resumeWhenDragFinished: false
 
+            motionSearchMode: videoNavigation.motionSearchMode
             serverTimeZoneShift: videoScreenController.resourceHelper.serverTimeOffset;
             enabled: d.hasArchive
             visible: videoNavigation.canViewArchive

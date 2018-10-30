@@ -104,15 +104,24 @@ public:
 
     QColor textColor = QColor("#727272");
     QColor chunkBarColor = QColor("#223925");
+
     QColor chunkColor = QColor("#3a911e");
+    QColor loadingChunkColor = toTransparent(chunkColor, 0.4);  //< fix me
+    QColor motionChunkColor = toTransparent(chunkColor, 0.4);   //< fix me
 
     QColor activeLiveColorLight = QColor("#358815");
     QColor activeLiveColorDark = QColor("#398f16");
     QColor inactiveLiveColorLight = toTransparent(QColor("#3d6228"), 0.4);
     QColor inactiveLiveColorDark = toTransparent(QColor("#2f4623"), 0.4);
 
+    QColor motionColor = QColor("#F02C2C");                         //< fix me
+    QColor motionLoadingColor = toTransparent(motionColor, 0.4);    //< fix me
+
     int chunkBarHeight = 48;
     int textY = -1;
+
+    bool motionSearchMode = false;
+    bool loadingMotion = false;
 
     QSGTexture* stripesDarkTexture = nullptr;
     QSGTexture* stripesLightTexture = nullptr;
@@ -504,6 +513,20 @@ void QnTimeline::setPositionImmediately(qint64 position)
     setWindow(newWindowEnd - windowSize, newWindowEnd);
 }
 
+bool QnTimeline::motionSearchMode() const
+{
+    return d->motionSearchMode;
+}
+
+void QnTimeline::setMotionSearchMode(bool value)
+{
+    if (d->motionSearchMode == value)
+        return;
+
+    d->motionSearchMode = value;
+    emit motionSearchModeChanged();
+}
+
 QDateTime QnTimeline::positionDate() const
 {
     return QDateTime::fromMSecsSinceEpoch(position() + d->serverTimeZoneShift, Qt::UTC);
@@ -756,6 +779,11 @@ void QnTimeline::setChunkProvider(QnCameraChunkProvider* chunkProvider)
 
         connect(d->chunkProvider, &QnCameraChunkProvider::timePeriodsUpdated,
             this, handleTimePeriodsUpdated);
+
+        const auto updateLoadingMotionState =
+            [this]() { d->loadingMotion = d->chunkProvider->isLoadingMotion(); };
+        connect(d->chunkProvider, &QnCameraChunkProvider::loadingMotionChanged,
+            this, updateLoadingMotionState);
 
         handleTimePeriodsUpdated();
     }
@@ -1239,8 +1267,17 @@ QSGGeometryNode* QnTimeline::updateChunksNode(QSGGeometryNode* chunksNode)
 
     QnTimelineChunkPainter chunkPainter(geometry);
     auto colors = chunkPainter.colors();
-    colors[Qn::RecordingContent] = d->chunkColor;
+
+    colors[Qn::RecordingContent] = !d->motionSearchMode
+        ? d->chunkColor
+        : (d->loadingMotion ? d->loadingChunkColor : d->motionChunkColor);
+
+    colors[Qn::MotionContent] = d->motionSearchMode && d->loadingMotion
+        ? d->motionLoadingColor
+        : d->motionColor;
+
     colors[Qn::TimePeriodContentCount] = d->hasArchive() ? d->chunkBarColor : Qt::transparent;
+
     chunkPainter.setColors(colors);
     chunkPainter.start(
         value, QRectF(0, y, liveX - 1, height() - y),

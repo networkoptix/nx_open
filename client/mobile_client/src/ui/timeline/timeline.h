@@ -53,6 +53,11 @@ class QnTimeline: public QQuickItem
     Q_PROPERTY(QnCameraChunkProvider* chunkProvider
         READ chunkProvider WRITE setChunkProvider NOTIFY chunkProviderChanged)
 
+    Q_PROPERTY(bool motionSearchMode
+        WRITE setMotionSearchMode
+        READ motionSearchMode
+        NOTIFY motionSearchModeChanged)
+
 public:
     explicit QnTimeline(QQuickItem* parent = nullptr);
     ~QnTimeline();
@@ -108,6 +113,9 @@ public:
     qint64 position() const;
     void setPosition(qint64 position);
     Q_INVOKABLE void setPositionImmediately(qint64 position);
+
+    bool motionSearchMode() const;
+    void setMotionSearchMode(bool value);
 
     QDateTime positionDate() const;
 
@@ -183,6 +191,7 @@ signals:
     void chunkProviderChanged();
 
     void moveFinished();
+    void motionSearchModeChanged();
 
 private:
     QSGNode* updateTextNode(QSGNode* textRootNode);

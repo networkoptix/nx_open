@@ -138,6 +138,7 @@ void QnCameraChunkProvider::ChunkProviderInternal::setFilter(const QString& filt
     m_filter = filter;
     emit q->motionFilterChanged();
 
+    setLoading(true);
     update();
 }
 
@@ -163,7 +164,7 @@ void QnCameraChunkProvider::ChunkProviderInternal::setLoading(bool value)
         return;
 
     m_loading = value;
-    emit q->loadingChanged();
+    q->handleLoadingChanged(m_contentType);
 }
 
 void QnCameraChunkProvider::ChunkProviderInternal::setTimePeriods(const QnTimePeriodList& periods)
@@ -227,12 +228,20 @@ QDateTime QnCameraChunkProvider::bottomBoundDate() const
 
 bool QnCameraChunkProvider::isLoading() const
 {
-    for (const auto& provider: m_providers)
-    {
-        if (provider->loading())
-            return true;
-    }
-    return false;
+    return m_providers[Qn::RecordingContent]->loading();
+}
+
+bool QnCameraChunkProvider::isLoadingMotion() const
+{
+    return m_providers[Qn::MotionContent]->loading();
+}
+
+void QnCameraChunkProvider::handleLoadingChanged(Qn::TimePeriodContent contentType)
+{
+    if (contentType == Qn::RecordingContent)
+        emit loadingChanged();
+    else
+        emit loadingMotionChanged();
 }
 
 qint64 QnCameraChunkProvider::closestChunkEndMs(qint64 position, bool forward) const
