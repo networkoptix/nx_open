@@ -79,6 +79,11 @@ QJsonObject ValueItem::serialize() const
     return result;
 }
 
+void EnumerationItem::setValue(const QVariant& value)
+{
+    base_type::setValue(m_range.contains(value) ? value : defaultValue());
+}
+
 void EnumerationItem::setRange(const QVariantList& range)
 {
     if (m_range == range)
@@ -101,6 +106,12 @@ QJsonObject EnumerationItem::serialize() const
 void IntegerNumberItem::setValue(int value)
 {
     ValueItem::setValue(qBound(m_minValue, value, m_maxValue));
+}
+
+void IntegerNumberItem::setValue(const QVariant& value)
+{
+    if (value.canConvert(QVariant::Int))
+        setValue(value.toInt());
 }
 
 void IntegerNumberItem::setMinValue(int minValue)
@@ -138,6 +149,12 @@ QJsonObject IntegerNumberItem::serialize() const
 void RealNumberItem::setValue(double value)
 {
     ValueItem::setValue(qBound(m_minValue, value, m_maxValue));
+}
+
+void RealNumberItem::setValue(const QVariant& value)
+{
+    if (value.canConvert(QVariant::Double))
+        setValue(value.toDouble());
 }
 
 void RealNumberItem::setMinValue(double minValue)

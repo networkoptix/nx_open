@@ -26,6 +26,7 @@ static const QString kTestDataPath = "qrc:///interactive_settings/";
 static const QString kLocalTestDataPath = ":/interactive_settings/";
 static const char* kSerializedProperty = "_serialized";
 static const char* kValuesProperty = "_values";
+static const char* kTestValuesProperty = "_testValues";
 
 QJsonObject loadJsonFromFile(const QString& fileName)
 {
@@ -134,6 +135,21 @@ TEST(InteractiveSettings, tryValues)
 
     ASSERT_NE(originalData, changedData);
     ASSERT_EQ(originalData, restoredData);
+}
+
+TEST(InteractiveSettings, rangeCheck)
+{
+    QmlEngine engine;
+    engine.load(kTestDataPath + "RangeCheck.qml");
+    ASSERT_EQ(engine.status(), QmlEngine::Status::loaded);
+
+    const auto testValues = engine.rootObject()->property(kTestValuesProperty).toMap();
+    engine.applyValues(testValues);
+
+    const auto values = engine.values();
+    const auto expectedValues = engine.rootObject()->property(kValuesProperty).toMap();
+
+    ASSERT_EQ(values, expectedValues);
 }
 
 } // namespace nx::mediaserver::interactive_settings::test
