@@ -12,6 +12,7 @@ namespace nx::client::desktop {
 
 struct TimeSynchronizationWidgetState;
 class TimeSynchronizationWidgetStore;
+class TimeSynchronizationServersModel;
 
 class TimeSynchronizationWidget:
     public Connective<QnAbstractPreferencesWidget>,
@@ -39,6 +40,7 @@ private:
 private:
     QScopedPointer<Ui::TimeSynchronizationWidget> ui;
     QPointer<TimeSynchronizationWidgetStore> m_store;
+    QPointer<TimeSynchronizationServersModel> m_serversModel;
 };
 
 } // namespace nx::client::desktop

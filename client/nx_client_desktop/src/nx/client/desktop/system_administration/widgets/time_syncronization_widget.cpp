@@ -18,16 +18,22 @@
 
 #include "../redux/time_syncronization_widget_store.h"
 #include "../redux/time_syncronization_widget_state.h"
+#include "../models/time_synchronization_servers_model.h"
+
+namespace nx::client::desktop {
+
+using State = TimeSynchronizationWidgetState;
+using Model = TimeSynchronizationServersModel;
 
 namespace {
 
-static const int kTimeFontSizePixels = 40;
-static const int kTimeFontWeight = QFont::Normal;
-static const int kDateFontSizePixels = 14;
-static const int kDateFontWeight = QFont::Bold;
-static const int kZoneFontSizePixels = 14;
-static const int kZoneFontWeight = QFont::Normal;
-static const int kMinimumDateTimeWidth = 84;
+static constexpr int kTimeFontSizePixels = 40;
+static constexpr int kTimeFontWeight = QFont::Normal;
+static constexpr int kDateFontSizePixels = 14;
+static constexpr int kDateFontWeight = QFont::Bold;
+static constexpr int kZoneFontSizePixels = 14;
+static constexpr int kZoneFontWeight = QFont::Normal;
+static constexpr int kMinimumDateTimeWidth = 84;
 
 QDateTime dateTimeFromMSecs(std::chrono::milliseconds value)
 {
@@ -46,36 +52,34 @@ class TimeServerDelegate: public QStyledItemDelegate
     using base_type = QStyledItemDelegate;
 
 public:
+    TimeServerDelegate(QObject* parent = nullptr): base_type(parent) {}
+
     virtual QSize sizeHint(const QStyleOptionViewItem& option,
         const QModelIndex& index) const override
     {
         QSize size = base_type::sizeHint(option, index);
-        /*
         switch (index.column())
         {
-            case QnTimeServerSelectionModel::DateColumn:
-            case QnTimeServerSelectionModel::TimeColumn:
-                size.setWidth(qMax(size.width(), kMinimumDateTimeWidth));
+            case Model::DateColumn:
+            case Model::OsTimeColumn:
+            case Model::VmsTimeColumn:
+                size.setWidth(std::max(size.width(), kMinimumDateTimeWidth));
                 break;
 
             default:
                 break;
         }
-        */
         return size;
     }
 };
 
 } // namespace
 
-namespace nx::client::desktop {
-
-using State = TimeSynchronizationWidgetState;
-
 TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
     base_type(parent),
     ui(new Ui::TimeSynchronizationWidget),
-    m_store(new TimeSynchronizationWidgetStore(this))
+    m_store(new TimeSynchronizationWidgetStore(this)),
+    m_serversModel(new Model(this))
 {
     setupUi();
 
@@ -84,6 +88,9 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
 
     connect(ui->syncWithInternetCheckBox, &QCheckBox::clicked, m_store,
         &TimeSynchronizationWidgetStore::setSyncTimeWithInternet);
+
+    //connect(m_serversModel, &Model::serverSelected, m_store,
+    //    &TimeSynchronizationWidgetStore::selectServer);
 
     const auto updateTime =
         [this]
@@ -173,27 +180,71 @@ void TimeSynchronizationWidget::setupUi()
     font.setWeight(kZoneFontWeight);
     ui->zoneLabel->setFont(font);
     ui->zoneLabel->setForegroundRole(QPalette::Light);
+
+    auto* sortModel = new QSortFilterProxyModel(this);
+    sortModel->setSourceModel(m_serversModel);
+    ui->serversTable->setModel(sortModel);
+    ui->serversTable->setProperty(style::Properties::kItemViewRadioButtons, true);
+    ui->serversTable->setItemDelegate(new TimeServerDelegate(this));
+
+    auto header = ui->serversTable->horizontalHeader();
+    header->setSectionResizeMode(QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(Model::NameColumn, QHeaderView::Stretch);
+    header->setSectionsClickable(false);
+    //ui->serversTable->setItemDelegateForColumn(Model::NameColumn, new QnResourceItemDelegate(this));
 }
 
-void TimeSynchronizationWidget::loadState(const TimeSynchronizationWidgetState& state)
+void TimeSynchronizationWidget::loadState(const State& state)
 {
     using ::setReadOnly;
 
     const auto vmsDateTime = dateTimeFromMSecs(state.vmsTime);
     const bool isSyncWithInternet = state.syncTimeWithInternet();
 
+    QString detailsText;
+    bool showWarning = false;
+    switch (state.status)
+    {
+        case State::Status::synchronizedWithInternet:
+            detailsText = tr("Synchronized with the Internet.");
+            break;
+        case State::Status::synchronizedWithSelectedServer:
+            detailsText = tr("Synchronized with the local time at the selected server.");
+            break;
+        case State::Status::notSynchronized:
+            detailsText = tr("Not synchronized. Each server uses its own local time.");
+            break;
+        case State::Status::singleServerLocalTime:
+            detailsText = tr("Equal to the server local time.");
+            break;
+        case State::Status::noInternetConnection:
+            detailsText = tr("No Internet connection. Time is not being synchronized.");
+            showWarning = true;
+            break;
+        case State::Status::selectedServerIsOffline:
+            detailsText = tr("Time Server is offline. Time is not being synchronized.");
+            showWarning = true;
+            break;
+        default:
+            break;
+    }
+    ui->statusLabel->setText(detailsText);
+    ui->statusLabel->setWarningStyle(showWarning);
+
     ui->timeLabel->setText(datetime::toString(vmsDateTime.time()));
     ui->dateLabel->setText(datetime::toString(vmsDateTime.date()));
     ui->zoneLabel->setText(vmsDateTime.timeZoneAbbreviation());
 
     ui->detailsWidget->setCurrentWidget(state.status == State::Status::synchronizedWithInternet
-        ? ui->placeholderPage
+        ? ui->synchronizedPage
         : ui->serversTablePage);
 
     ui->syncWithInternetCheckBox->setChecked(isSyncWithInternet);
     setReadOnly(ui->syncWithInternetCheckBox, state.readOnly);
 
+    m_serversModel->loadState(state);
 
+    emit hasChangesChanged();
 }
 
 } // namespace nx::client::desktop
