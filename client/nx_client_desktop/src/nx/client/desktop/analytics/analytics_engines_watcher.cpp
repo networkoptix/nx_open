@@ -77,7 +77,10 @@ void AnalyticsEnginesWatcher::Private::at_resourceRemoved(const QnResourcePtr& r
 {
     const auto id = resource->getId();
     if (engines.remove(id))
+    {
+        resource->disconnect(this);
         emit q->engineRemoved(id);
+    }
 }
 
 void AnalyticsEnginesWatcher::Private::at_engineNameChanged(const QnResourcePtr& resource)
