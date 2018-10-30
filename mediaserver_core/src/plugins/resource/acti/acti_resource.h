@@ -47,7 +47,6 @@ public:
     QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids);
     QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
-    // Sets the distance between I frames.
     virtual void setIframeDistance(int frames, int timems) override;
 
     virtual bool hasDualStreamingInternal() const override;

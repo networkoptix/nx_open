@@ -196,7 +196,7 @@ nx::network::http::StatusCode::Value QnActiResource::makeActiRequest(
     const nx::utils::log::Tag logTag = typeid(QnActiResource);
 
     nx::network::http::HttpClient client;
-    client.setAuthType(nx::network::http::AuthType::authDigest);
+    client.setAuthType(nx::network::http::AuthType::authBasicAndDigest);
     client.setUserName(auth.user());
     client.setUserPassword(auth.password());
     client.setSendTimeout(kTcpTimeout);
@@ -218,7 +218,7 @@ nx::network::http::StatusCode::Value QnActiResource::makeActiRequest(
     auto messageBodyOptional = client.fetchEntireMessageBody();
     if (!messageBodyOptional.has_value())
     {
-        NX_INFO(logTag, "makeActiRequest: Error getting response body.");
+        NX_DEBUG(logTag, "makeActiRequest: Error getting response body.");
         msgBody->clear();
         return nx::network::http::StatusCode::internalServerError;
     }
@@ -236,7 +236,7 @@ nx::network::http::StatusCode::Value QnActiResource::makeActiRequest(
         if (msgBody->startsWith("ERROR: missing USER/PWD."))
             return nx::network::http::StatusCode::unauthorized;
         if (msgBody->startsWith("ERROR:"))  //< NOTE: should be handled somehow?
-            NX_WARNING(logTag, "makeActiRequest: Unhandled error in response: '%1'.", *msgBody);
+            NX_DEBUG(logTag, "makeActiRequest: Unhandled error in response: '%1'.", *msgBody);
     }
 
     if (!keepAllData)
@@ -372,7 +372,7 @@ bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByt
             const auto minSupportedVersion = rtspAudio[i][1];
             if (version < minSupportedVersion)
             {
-                NX_INFO(this,
+                NX_DEBUG(this,
                     lm("RTSP audio is not supported for camera %1. "
                        "Camera firmware %2, platform %3, minimal firmware %4")
                     .args(getPhysicalId(), version, platform, minSupportedVersion));
@@ -382,7 +382,7 @@ bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByt
         }
     }
 
-    NX_INFO(this, lm("RTSP audio is not supported for camera %1. Camera firmware %2, platform %3")
+    NX_DEBUG(this, lm("RTSP audio is not supported for camera %1. Camera firmware %2, platform %3")
         .args(getPhysicalId(), version, platform));
     return false;
 }
@@ -871,7 +871,7 @@ void QnActiResource::stopInputPortStatesMonitoring()
     nx::network::http::StatusCode::Value status;
     makeActiRequest("encoder", registerEventRequestStr, status);
     if (!nx::network::http::StatusCode::isSuccessCode(status))
-        NX_INFO(this, "stopInputPortStatesMonitoring: Unable to stop, HTTP error '%1'.",
+        NX_DEBUG(this, "stopInputPortStatesMonitoring: Unable to stop, HTTP error '%1'.",
             nx::network::http::StatusCode::toString(status));
 }
 
@@ -1449,7 +1449,7 @@ bool QnActiResource::loadAdvancedParametersTemplateFromFile(QnCameraAdvancedPara
     bool result = QnCameraAdvacedParamsXmlParser::readXml(&paramsTemplateFile, params);
     if (!result)
     {
-        NX_WARNING(this, lit("Error while parsing xml (acti) %1").arg(templateFilename));
+        NX_DEBUG(this, lit("Error while parsing xml (acti) %1").arg(templateFilename));
     }
 
     return result;

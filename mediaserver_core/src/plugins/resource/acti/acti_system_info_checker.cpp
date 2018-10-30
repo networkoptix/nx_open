@@ -133,7 +133,7 @@ void QnActiSystemInfoChecker::tryToGetSystemInfoWithGivenAuthUnsafe(const QAuthe
 
     m_currentAuth = auth;
 
-    NX_VERBOSE(this, "tryToGetSystemInfoWithGivenAuthUnsafe: request '%1'", requestUrl);
+    NX_VERBOSE(this, "Getting system info request: '%1'", requestUrl);
     m_httpClient->doGet(requestUrl);
 }
 
