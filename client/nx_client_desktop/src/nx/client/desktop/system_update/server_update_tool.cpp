@@ -13,6 +13,8 @@
 #include <utils/update/update_utils.h>
 
 #include <client/client_settings.h>
+#include <client/client_module.h>
+#include <watchers/cloud_status_watcher.h>
 
 #include <core/resource/fake_media_server.h>
 #include <api/global_settings.h>
@@ -470,6 +472,40 @@ bool ServerUpdateTool::verifyUpdateManifest(UpdateContents& contents) const
     contents.missingUpdate.clear();
     contents.filesToUpload.clear();
 
+    std::map<QnUuid, QnMediaServerResourcePtr> activeServers;
+    {
+        std::scoped_lock<std::recursive_mutex> lock(m_statusLock);
+        activeServers = m_activeServers;
+    }
+
+    if (auto cloudWatcher = qnClientModule->cloudStatusWatcher())
+    {
+        if (cloudWatcher->isCloudEnabled() && !contents.info.cloudHost.isEmpty())
+        {
+            bool cloudCompatible = true;
+            for(auto record: activeServers)
+            {
+                auto server = record.second;
+                bool isOurServer = !server->hasFlags(Qn::fake_server)
+                    || helpers::serverBelongsToCurrentSystem(server);
+                if (!isOurServer)
+                    continue;
+                auto moduleInformation = server->getModuleInformation();
+                if (moduleInformation.cloudHost != contents.info.cloudHost)
+                {
+                    cloudCompatible = false;
+                    break;
+                }
+            }
+
+            if (!cloudCompatible)
+            {
+                contents.error = nx::update::InformationError::incompatibleCloudHostError;
+                return false;
+            }
+        }
+    }
+
     // Check if some packages from manifest do not exist.
     if (contents.sourceType == UpdateSourceType::file)
     {
@@ -508,12 +544,6 @@ bool ServerUpdateTool::verifyUpdateManifest(UpdateContents& contents) const
     }
 
     contents.clientPackage = findClientPackage(contents.info);
-
-    std::map<QnUuid, QnMediaServerResourcePtr> activeServers;
-    {
-        std::scoped_lock<std::recursive_mutex> lock(m_statusLock);
-        activeServers = m_activeServers;
-    }
 
     // Checking if all servers have update packages.
     for(auto record: activeServers)
