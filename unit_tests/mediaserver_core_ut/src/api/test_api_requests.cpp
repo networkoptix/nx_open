@@ -75,14 +75,14 @@ void doExecutePost(const MediaServerLauncher* const launcher, const QString& url
 
     const auto& actualRequest = preprocessRequestFunc ? preprocessRequestFunc(request) : request;
 
-    NX_INFO(typeid(FunctionsTag), lm("[TEST] POST %1").arg(urlStr));
-    NX_INFO(typeid(FunctionsTag), lm("[TEST] POST_REQUEST: %2").arg(actualRequest));
+    NX_INFO(typeid(FunctionsTag), lm("POST %1").arg(urlStr));
+    NX_INFO(typeid(FunctionsTag), lm("POST_REQUEST: %2").arg(actualRequest));
 
     httpClient->doPost(url, "application/json", actualRequest);
 
     const auto response = readResponseBody(httpClient.get());
-    NX_INFO(typeid(FunctionsTag), lm("[TEST] POST_RESPONSE: %1").arg(response));
-    NX_INFO(typeid(FunctionsTag), lm("[TEST] POST_STATUS: %1").arg(httpClient->response()->statusLine.statusCode));
+    NX_INFO(typeid(FunctionsTag), lm("POST_RESPONSE: %1").arg(response));
+    NX_INFO(typeid(FunctionsTag), lm("POST_STATUS: %1").arg(httpClient->response()->statusLine.statusCode));
 
     ASSERT_TRUE(httpClient->response() != nullptr);
     ASSERT_EQ(httpStatus, httpClient->response()->statusLine.statusCode);
@@ -111,14 +111,14 @@ void doExecuteGet(const nx::utils::Url& url,
 {
     auto httpClient = createHttpClient(authName, authPassword);
 
-    NX_INFO(typeid(FunctionsTag), lm("[TEST] GET %1").arg(url.path()));
+    NX_INFO(typeid(FunctionsTag), lm("GET %1").arg(url.path()));
 
     httpClient->doGet(url);
 
     NX_CRITICAL(outResponse);
     *outResponse = readResponseBody(httpClient.get());
-    NX_INFO(typeid(FunctionsTag), lm("[TEST] GET_RESPONSE: %1").arg(*outResponse));
-    NX_INFO(typeid(FunctionsTag), lm("[TEST] GET_STATUS: %1").arg(httpClient->response()->statusLine.statusCode));
+    NX_INFO(typeid(FunctionsTag), lm("GET_RESPONSE: %1").arg(*outResponse));
+    NX_INFO(typeid(FunctionsTag), lm("GET_STATUS: %1").arg(httpClient->response()->statusLine.statusCode));
 
     ASSERT_EQ(httpStatus, httpClient->response()->statusLine.statusCode);
 }

@@ -14,59 +14,68 @@ A commercial use license is available from Genivia Inc., contact@genivia.com
 #include "soapThermalBindingProxy.h"
 
 ThermalBindingProxy::ThermalBindingProxy()
-{	this->soap = soap_new();
-	this->soap_own = true;
-	ThermalBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    ThermalBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
 }
 
 ThermalBindingProxy::ThermalBindingProxy(const ThermalBindingProxy& rhs)
-{	this->soap = rhs.soap;
-	this->soap_own = false;
-	this->soap_endpoint = rhs.soap_endpoint;
+{
+    this->soap = rhs.soap;
+    this->soap_own = false;
+    this->soap_endpoint = rhs.soap_endpoint;
 }
 
 ThermalBindingProxy::ThermalBindingProxy(struct soap *_soap)
-{	this->soap = _soap;
-	this->soap_own = false;
-	ThermalBindingProxy_init(_soap->imode, _soap->omode);
+{
+    this->soap = _soap;
+    this->soap_own = false;
+    ThermalBindingProxy_init(_soap->imode, _soap->omode);
 }
 
 ThermalBindingProxy::ThermalBindingProxy(const char *endpoint)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	ThermalBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
-	soap_endpoint = endpoint;
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    ThermalBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+    soap_endpoint = endpoint;
 }
 
 ThermalBindingProxy::ThermalBindingProxy(soap_mode iomode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	ThermalBindingProxy_init(iomode, iomode);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    ThermalBindingProxy_init(iomode, iomode);
 }
 
 ThermalBindingProxy::ThermalBindingProxy(const char *endpoint, soap_mode iomode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	ThermalBindingProxy_init(iomode, iomode);
-	soap_endpoint = endpoint;
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    ThermalBindingProxy_init(iomode, iomode);
+    soap_endpoint = endpoint;
 }
 
 ThermalBindingProxy::ThermalBindingProxy(soap_mode imode, soap_mode omode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	ThermalBindingProxy_init(imode, omode);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    ThermalBindingProxy_init(imode, omode);
 }
 
 ThermalBindingProxy::~ThermalBindingProxy()
-{	if (this->soap_own)
-		soap_free(this->soap);
+{
+    if (this->soap_own)
+        soap_free(this->soap);
 }
 
 void ThermalBindingProxy::ThermalBindingProxy_init(soap_mode imode, soap_mode omode)
-{	soap_imode(this->soap, imode);
-	soap_omode(this->soap, omode);
-	soap_endpoint = NULL;
-	static const struct Namespace namespaces[] = {
+{
+    soap_imode(this->soap, imode);
+    soap_omode(this->soap, omode);
+    soap_endpoint = NULL;
+    static const struct Namespace namespaces[] = {
         {"SOAP-ENV", "http://www.w3.org/2003/05/soap-envelope", "http://schemas.xmlsoap.org/soap/envelope/", NULL},
         {"SOAP-ENC", "http://www.w3.org/2003/05/soap-encoding", "http://schemas.xmlsoap.org/soap/encoding/", NULL},
         {"xsi", "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL},
@@ -132,513 +141,538 @@ void ThermalBindingProxy::ThermalBindingProxy_init(soap_mode imode, soap_mode om
         {"onvifThermal", "http://www.onvif.org/ver10/thermal/wsdl", NULL, NULL},
         {NULL, NULL, NULL, NULL}
     };
-	soap_set_namespaces(this->soap, namespaces);
+    soap_set_namespaces(this->soap, namespaces);
 }
 
 ThermalBindingProxy *ThermalBindingProxy::copy()
-{	ThermalBindingProxy *dup = SOAP_NEW_UNMANAGED(ThermalBindingProxy);
-	if (dup)
-	{	soap_done(dup->soap);
-		soap_copy_context(dup->soap, this->soap);
-	}
-	return dup;
+{
+    ThermalBindingProxy *dup = SOAP_NEW_UNMANAGED(ThermalBindingProxy);
+    if (dup)
+    {
+        soap_done(dup->soap);
+        soap_copy_context(dup->soap, this->soap);
+    }
+    return dup;
 }
 
 ThermalBindingProxy& ThermalBindingProxy::operator=(const ThermalBindingProxy& rhs)
-{	if (this->soap != rhs.soap)
-	{	if (this->soap_own)
-			soap_free(this->soap);
-		this->soap = rhs.soap;
-		this->soap_own = false;
-		this->soap_endpoint = rhs.soap_endpoint;
-	}
-	return *this;
+{
+    if (this->soap != rhs.soap)
+    {
+        if (this->soap_own)
+            soap_free(this->soap);
+        this->soap = rhs.soap;
+        this->soap_own = false;
+        this->soap_endpoint = rhs.soap_endpoint;
+    }
+    return *this;
 }
 
 void ThermalBindingProxy::destroy()
-{	soap_destroy(this->soap);
-	soap_end(this->soap);
+{
+    soap_destroy(this->soap);
+    soap_end(this->soap);
 }
 
 void ThermalBindingProxy::reset()
-{	this->destroy();
-	soap_done(this->soap);
-	soap_initialize(this->soap);
-	ThermalBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+{
+    this->destroy();
+    soap_done(this->soap);
+    soap_initialize(this->soap);
+    ThermalBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
 }
 
 void ThermalBindingProxy::soap_noheader()
-{	this->soap->header = NULL;
+{
+    this->soap->header = NULL;
 }
 
-void ThermalBindingProxy::soap_header(char *wsa5__MessageID, struct wsa5__RelatesToType *wsa5__RelatesTo, struct wsa5__EndpointReferenceType *wsa5__From, struct wsa5__EndpointReferenceType *wsa5__ReplyTo, struct wsa5__EndpointReferenceType *wsa5__FaultTo, char *wsa5__To, char *wsa5__Action, struct chan__ChannelInstanceType *chan__ChannelInstance, struct wsdd__AppSequenceType *wsdd__AppSequence, struct _wsse__Security *wsse__Security, char *subscriptionID)
-{	::soap_header(this->soap);
-	this->soap->header->wsa5__MessageID = wsa5__MessageID;
-	this->soap->header->wsa5__RelatesTo = wsa5__RelatesTo;
-	this->soap->header->wsa5__From = wsa5__From;
-	this->soap->header->wsa5__ReplyTo = wsa5__ReplyTo;
-	this->soap->header->wsa5__FaultTo = wsa5__FaultTo;
-	this->soap->header->wsa5__To = wsa5__To;
-	this->soap->header->wsa5__Action = wsa5__Action;
-	this->soap->header->chan__ChannelInstance = chan__ChannelInstance;
-	this->soap->header->wsdd__AppSequence = wsdd__AppSequence;
-	this->soap->header->wsse__Security = wsse__Security;
-	this->soap->header->subscriptionID = subscriptionID;
+void ThermalBindingProxy::soap_header(char *wsa5__MessageID, struct wsa5__RelatesToType *wsa5__RelatesTo, struct wsa5__EndpointReferenceType *wsa5__From, struct wsa5__EndpointReferenceType *wsa5__ReplyTo, struct wsa5__EndpointReferenceType *wsa5__FaultTo, char *wsa5__To, char *wsa5__Action, struct chan__ChannelInstanceType *chan__ChannelInstance, struct wsdd__AppSequenceType *wsdd__AppSequence, struct _wsse__Security *wsse__Security, char *SubscriptionId)
+{
+    ::soap_header(this->soap);
+    this->soap->header->wsa5__MessageID = wsa5__MessageID;
+    this->soap->header->wsa5__RelatesTo = wsa5__RelatesTo;
+    this->soap->header->wsa5__From = wsa5__From;
+    this->soap->header->wsa5__ReplyTo = wsa5__ReplyTo;
+    this->soap->header->wsa5__FaultTo = wsa5__FaultTo;
+    this->soap->header->wsa5__To = wsa5__To;
+    this->soap->header->wsa5__Action = wsa5__Action;
+    this->soap->header->chan__ChannelInstance = chan__ChannelInstance;
+    this->soap->header->wsdd__AppSequence = wsdd__AppSequence;
+    this->soap->header->wsse__Security = wsse__Security;
+    this->soap->header->SubscriptionId = SubscriptionId;
 }
 
 ::SOAP_ENV__Header *ThermalBindingProxy::soap_header()
-{	return this->soap->header;
+{
+    return this->soap->header;
 }
 
 ::SOAP_ENV__Fault *ThermalBindingProxy::soap_fault()
-{	return this->soap->fault;
+{
+    return this->soap->fault;
 }
 
 const char *ThermalBindingProxy::soap_fault_string()
-{	return *soap_faultstring(this->soap);
+{
+    return *soap_faultstring(this->soap);
 }
 
 const char *ThermalBindingProxy::soap_fault_detail()
-{	return *soap_faultdetail(this->soap);
+{
+    return *soap_faultdetail(this->soap);
 }
 
 int ThermalBindingProxy::soap_close_socket()
-{	return soap_closesock(this->soap);
+{
+    return soap_closesock(this->soap);
 }
 
 int ThermalBindingProxy::soap_force_close_socket()
-{	return soap_force_closesock(this->soap);
+{
+    return soap_force_closesock(this->soap);
 }
 
 void ThermalBindingProxy::soap_print_fault(FILE *fd)
-{	::soap_print_fault(this->soap, fd);
+{
+    ::soap_print_fault(this->soap, fd);
 }
 
 #ifndef WITH_LEAN
 #ifndef WITH_COMPAT
 void ThermalBindingProxy::soap_stream_fault(std::ostream& os)
-{	::soap_stream_fault(this->soap, os);
+{
+    ::soap_stream_fault(this->soap, os);
 }
 #endif
 
 char *ThermalBindingProxy::soap_sprint_fault(char *buf, size_t len)
-{	return ::soap_sprint_fault(this->soap, buf, len);
+{
+    return ::soap_sprint_fault(this->soap, buf, len);
 }
 #endif
 
 int ThermalBindingProxy::GetServiceCapabilities(const char *endpoint, const char *soap_action, _onvifThermal__GetServiceCapabilities *onvifThermal__GetServiceCapabilities, _onvifThermal__GetServiceCapabilitiesResponse &onvifThermal__GetServiceCapabilitiesResponse)
 {
-	struct __onvifThermal__GetServiceCapabilities soap_tmp___onvifThermal__GetServiceCapabilities;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/thermal/wsdl/GetServiceCapabilities";
-	soap_tmp___onvifThermal__GetServiceCapabilities.onvifThermal__GetServiceCapabilities = onvifThermal__GetServiceCapabilities;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifThermal__GetServiceCapabilities(soap, &soap_tmp___onvifThermal__GetServiceCapabilities);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifThermal__GetServiceCapabilities(soap, &soap_tmp___onvifThermal__GetServiceCapabilities, "-onvifThermal:GetServiceCapabilities", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifThermal__GetServiceCapabilities(soap, &soap_tmp___onvifThermal__GetServiceCapabilities, "-onvifThermal:GetServiceCapabilities", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifThermal__GetServiceCapabilitiesResponse*>(&onvifThermal__GetServiceCapabilitiesResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifThermal__GetServiceCapabilitiesResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifThermal__GetServiceCapabilitiesResponse.soap_get(soap, "onvifThermal:GetServiceCapabilitiesResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifThermal__GetServiceCapabilities soap_tmp___onvifThermal__GetServiceCapabilities;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/thermal/wsdl/GetServiceCapabilities";
+    soap_tmp___onvifThermal__GetServiceCapabilities.onvifThermal__GetServiceCapabilities = onvifThermal__GetServiceCapabilities;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifThermal__GetServiceCapabilities(soap, &soap_tmp___onvifThermal__GetServiceCapabilities);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifThermal__GetServiceCapabilities(soap, &soap_tmp___onvifThermal__GetServiceCapabilities, "-onvifThermal:GetServiceCapabilities", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifThermal__GetServiceCapabilities(soap, &soap_tmp___onvifThermal__GetServiceCapabilities, "-onvifThermal:GetServiceCapabilities", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifThermal__GetServiceCapabilitiesResponse*>(&onvifThermal__GetServiceCapabilitiesResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifThermal__GetServiceCapabilitiesResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifThermal__GetServiceCapabilitiesResponse.soap_get(soap, "onvifThermal:GetServiceCapabilitiesResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int ThermalBindingProxy::GetConfigurationOptions(const char *endpoint, const char *soap_action, _onvifThermal__GetConfigurationOptions *onvifThermal__GetConfigurationOptions, _onvifThermal__GetConfigurationOptionsResponse &onvifThermal__GetConfigurationOptionsResponse)
 {
-	struct __onvifThermal__GetConfigurationOptions soap_tmp___onvifThermal__GetConfigurationOptions;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/thermal/wsdl/GetConfigurationOptions";
-	soap_tmp___onvifThermal__GetConfigurationOptions.onvifThermal__GetConfigurationOptions = onvifThermal__GetConfigurationOptions;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifThermal__GetConfigurationOptions(soap, &soap_tmp___onvifThermal__GetConfigurationOptions);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifThermal__GetConfigurationOptions(soap, &soap_tmp___onvifThermal__GetConfigurationOptions, "-onvifThermal:GetConfigurationOptions", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifThermal__GetConfigurationOptions(soap, &soap_tmp___onvifThermal__GetConfigurationOptions, "-onvifThermal:GetConfigurationOptions", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifThermal__GetConfigurationOptionsResponse*>(&onvifThermal__GetConfigurationOptionsResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifThermal__GetConfigurationOptionsResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifThermal__GetConfigurationOptionsResponse.soap_get(soap, "onvifThermal:GetConfigurationOptionsResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifThermal__GetConfigurationOptions soap_tmp___onvifThermal__GetConfigurationOptions;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/thermal/wsdl/GetConfigurationOptions";
+    soap_tmp___onvifThermal__GetConfigurationOptions.onvifThermal__GetConfigurationOptions = onvifThermal__GetConfigurationOptions;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifThermal__GetConfigurationOptions(soap, &soap_tmp___onvifThermal__GetConfigurationOptions);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifThermal__GetConfigurationOptions(soap, &soap_tmp___onvifThermal__GetConfigurationOptions, "-onvifThermal:GetConfigurationOptions", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifThermal__GetConfigurationOptions(soap, &soap_tmp___onvifThermal__GetConfigurationOptions, "-onvifThermal:GetConfigurationOptions", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifThermal__GetConfigurationOptionsResponse*>(&onvifThermal__GetConfigurationOptionsResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifThermal__GetConfigurationOptionsResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifThermal__GetConfigurationOptionsResponse.soap_get(soap, "onvifThermal:GetConfigurationOptionsResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int ThermalBindingProxy::GetConfiguration(const char *endpoint, const char *soap_action, _onvifThermal__GetConfiguration *onvifThermal__GetConfiguration, _onvifThermal__GetConfigurationResponse &onvifThermal__GetConfigurationResponse)
 {
-	struct __onvifThermal__GetConfiguration soap_tmp___onvifThermal__GetConfiguration;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/thermal/wsdl/GetConfiguration";
-	soap_tmp___onvifThermal__GetConfiguration.onvifThermal__GetConfiguration = onvifThermal__GetConfiguration;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifThermal__GetConfiguration(soap, &soap_tmp___onvifThermal__GetConfiguration);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifThermal__GetConfiguration(soap, &soap_tmp___onvifThermal__GetConfiguration, "-onvifThermal:GetConfiguration", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifThermal__GetConfiguration(soap, &soap_tmp___onvifThermal__GetConfiguration, "-onvifThermal:GetConfiguration", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifThermal__GetConfigurationResponse*>(&onvifThermal__GetConfigurationResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifThermal__GetConfigurationResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifThermal__GetConfigurationResponse.soap_get(soap, "onvifThermal:GetConfigurationResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifThermal__GetConfiguration soap_tmp___onvifThermal__GetConfiguration;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/thermal/wsdl/GetConfiguration";
+    soap_tmp___onvifThermal__GetConfiguration.onvifThermal__GetConfiguration = onvifThermal__GetConfiguration;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifThermal__GetConfiguration(soap, &soap_tmp___onvifThermal__GetConfiguration);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifThermal__GetConfiguration(soap, &soap_tmp___onvifThermal__GetConfiguration, "-onvifThermal:GetConfiguration", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifThermal__GetConfiguration(soap, &soap_tmp___onvifThermal__GetConfiguration, "-onvifThermal:GetConfiguration", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifThermal__GetConfigurationResponse*>(&onvifThermal__GetConfigurationResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifThermal__GetConfigurationResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifThermal__GetConfigurationResponse.soap_get(soap, "onvifThermal:GetConfigurationResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int ThermalBindingProxy::GetConfigurations(const char *endpoint, const char *soap_action, _onvifThermal__GetConfigurations *onvifThermal__GetConfigurations, _onvifThermal__GetConfigurationsResponse &onvifThermal__GetConfigurationsResponse)
 {
-	struct __onvifThermal__GetConfigurations soap_tmp___onvifThermal__GetConfigurations;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/thermal/wsdl/GetConfigurations";
-	soap_tmp___onvifThermal__GetConfigurations.onvifThermal__GetConfigurations = onvifThermal__GetConfigurations;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifThermal__GetConfigurations(soap, &soap_tmp___onvifThermal__GetConfigurations);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifThermal__GetConfigurations(soap, &soap_tmp___onvifThermal__GetConfigurations, "-onvifThermal:GetConfigurations", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifThermal__GetConfigurations(soap, &soap_tmp___onvifThermal__GetConfigurations, "-onvifThermal:GetConfigurations", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifThermal__GetConfigurationsResponse*>(&onvifThermal__GetConfigurationsResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifThermal__GetConfigurationsResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifThermal__GetConfigurationsResponse.soap_get(soap, "onvifThermal:GetConfigurationsResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifThermal__GetConfigurations soap_tmp___onvifThermal__GetConfigurations;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/thermal/wsdl/GetConfigurations";
+    soap_tmp___onvifThermal__GetConfigurations.onvifThermal__GetConfigurations = onvifThermal__GetConfigurations;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifThermal__GetConfigurations(soap, &soap_tmp___onvifThermal__GetConfigurations);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifThermal__GetConfigurations(soap, &soap_tmp___onvifThermal__GetConfigurations, "-onvifThermal:GetConfigurations", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifThermal__GetConfigurations(soap, &soap_tmp___onvifThermal__GetConfigurations, "-onvifThermal:GetConfigurations", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifThermal__GetConfigurationsResponse*>(&onvifThermal__GetConfigurationsResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifThermal__GetConfigurationsResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifThermal__GetConfigurationsResponse.soap_get(soap, "onvifThermal:GetConfigurationsResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int ThermalBindingProxy::SetConfiguration(const char *endpoint, const char *soap_action, _onvifThermal__SetConfiguration *onvifThermal__SetConfiguration, _onvifThermal__SetConfigurationResponse &onvifThermal__SetConfigurationResponse)
 {
-	struct __onvifThermal__SetConfiguration soap_tmp___onvifThermal__SetConfiguration;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/thermal/wsdl/SetConfiguration";
-	soap_tmp___onvifThermal__SetConfiguration.onvifThermal__SetConfiguration = onvifThermal__SetConfiguration;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifThermal__SetConfiguration(soap, &soap_tmp___onvifThermal__SetConfiguration);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifThermal__SetConfiguration(soap, &soap_tmp___onvifThermal__SetConfiguration, "-onvifThermal:SetConfiguration", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifThermal__SetConfiguration(soap, &soap_tmp___onvifThermal__SetConfiguration, "-onvifThermal:SetConfiguration", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifThermal__SetConfigurationResponse*>(&onvifThermal__SetConfigurationResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifThermal__SetConfigurationResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifThermal__SetConfigurationResponse.soap_get(soap, "onvifThermal:SetConfigurationResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifThermal__SetConfiguration soap_tmp___onvifThermal__SetConfiguration;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/thermal/wsdl/SetConfiguration";
+    soap_tmp___onvifThermal__SetConfiguration.onvifThermal__SetConfiguration = onvifThermal__SetConfiguration;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifThermal__SetConfiguration(soap, &soap_tmp___onvifThermal__SetConfiguration);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifThermal__SetConfiguration(soap, &soap_tmp___onvifThermal__SetConfiguration, "-onvifThermal:SetConfiguration", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifThermal__SetConfiguration(soap, &soap_tmp___onvifThermal__SetConfiguration, "-onvifThermal:SetConfiguration", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifThermal__SetConfigurationResponse*>(&onvifThermal__SetConfigurationResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifThermal__SetConfigurationResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifThermal__SetConfigurationResponse.soap_get(soap, "onvifThermal:SetConfigurationResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int ThermalBindingProxy::GetRadiometryConfigurationOptions(const char *endpoint, const char *soap_action, _onvifThermal__GetRadiometryConfigurationOptions *onvifThermal__GetRadiometryConfigurationOptions, _onvifThermal__GetRadiometryConfigurationOptionsResponse &onvifThermal__GetRadiometryConfigurationOptionsResponse)
 {
-	struct __onvifThermal__GetRadiometryConfigurationOptions soap_tmp___onvifThermal__GetRadiometryConfigurationOptions;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/thermal/wsdl/GetRadiometryConfigurationOptions";
-	soap_tmp___onvifThermal__GetRadiometryConfigurationOptions.onvifThermal__GetRadiometryConfigurationOptions = onvifThermal__GetRadiometryConfigurationOptions;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifThermal__GetRadiometryConfigurationOptions(soap, &soap_tmp___onvifThermal__GetRadiometryConfigurationOptions);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifThermal__GetRadiometryConfigurationOptions(soap, &soap_tmp___onvifThermal__GetRadiometryConfigurationOptions, "-onvifThermal:GetRadiometryConfigurationOptions", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifThermal__GetRadiometryConfigurationOptions(soap, &soap_tmp___onvifThermal__GetRadiometryConfigurationOptions, "-onvifThermal:GetRadiometryConfigurationOptions", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifThermal__GetRadiometryConfigurationOptionsResponse*>(&onvifThermal__GetRadiometryConfigurationOptionsResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifThermal__GetRadiometryConfigurationOptionsResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifThermal__GetRadiometryConfigurationOptionsResponse.soap_get(soap, "onvifThermal:GetRadiometryConfigurationOptionsResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifThermal__GetRadiometryConfigurationOptions soap_tmp___onvifThermal__GetRadiometryConfigurationOptions;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/thermal/wsdl/GetRadiometryConfigurationOptions";
+    soap_tmp___onvifThermal__GetRadiometryConfigurationOptions.onvifThermal__GetRadiometryConfigurationOptions = onvifThermal__GetRadiometryConfigurationOptions;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifThermal__GetRadiometryConfigurationOptions(soap, &soap_tmp___onvifThermal__GetRadiometryConfigurationOptions);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifThermal__GetRadiometryConfigurationOptions(soap, &soap_tmp___onvifThermal__GetRadiometryConfigurationOptions, "-onvifThermal:GetRadiometryConfigurationOptions", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifThermal__GetRadiometryConfigurationOptions(soap, &soap_tmp___onvifThermal__GetRadiometryConfigurationOptions, "-onvifThermal:GetRadiometryConfigurationOptions", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifThermal__GetRadiometryConfigurationOptionsResponse*>(&onvifThermal__GetRadiometryConfigurationOptionsResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifThermal__GetRadiometryConfigurationOptionsResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifThermal__GetRadiometryConfigurationOptionsResponse.soap_get(soap, "onvifThermal:GetRadiometryConfigurationOptionsResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int ThermalBindingProxy::GetRadiometryConfiguration(const char *endpoint, const char *soap_action, _onvifThermal__GetRadiometryConfiguration *onvifThermal__GetRadiometryConfiguration, _onvifThermal__GetRadiometryConfigurationResponse &onvifThermal__GetRadiometryConfigurationResponse)
 {
-	struct __onvifThermal__GetRadiometryConfiguration soap_tmp___onvifThermal__GetRadiometryConfiguration;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/thermal/wsdl/GetRadiometryConfiguration";
-	soap_tmp___onvifThermal__GetRadiometryConfiguration.onvifThermal__GetRadiometryConfiguration = onvifThermal__GetRadiometryConfiguration;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifThermal__GetRadiometryConfiguration(soap, &soap_tmp___onvifThermal__GetRadiometryConfiguration);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifThermal__GetRadiometryConfiguration(soap, &soap_tmp___onvifThermal__GetRadiometryConfiguration, "-onvifThermal:GetRadiometryConfiguration", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifThermal__GetRadiometryConfiguration(soap, &soap_tmp___onvifThermal__GetRadiometryConfiguration, "-onvifThermal:GetRadiometryConfiguration", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifThermal__GetRadiometryConfigurationResponse*>(&onvifThermal__GetRadiometryConfigurationResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifThermal__GetRadiometryConfigurationResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifThermal__GetRadiometryConfigurationResponse.soap_get(soap, "onvifThermal:GetRadiometryConfigurationResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifThermal__GetRadiometryConfiguration soap_tmp___onvifThermal__GetRadiometryConfiguration;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/thermal/wsdl/GetRadiometryConfiguration";
+    soap_tmp___onvifThermal__GetRadiometryConfiguration.onvifThermal__GetRadiometryConfiguration = onvifThermal__GetRadiometryConfiguration;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifThermal__GetRadiometryConfiguration(soap, &soap_tmp___onvifThermal__GetRadiometryConfiguration);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifThermal__GetRadiometryConfiguration(soap, &soap_tmp___onvifThermal__GetRadiometryConfiguration, "-onvifThermal:GetRadiometryConfiguration", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifThermal__GetRadiometryConfiguration(soap, &soap_tmp___onvifThermal__GetRadiometryConfiguration, "-onvifThermal:GetRadiometryConfiguration", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifThermal__GetRadiometryConfigurationResponse*>(&onvifThermal__GetRadiometryConfigurationResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifThermal__GetRadiometryConfigurationResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifThermal__GetRadiometryConfigurationResponse.soap_get(soap, "onvifThermal:GetRadiometryConfigurationResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int ThermalBindingProxy::SetRadiometryConfiguration(const char *endpoint, const char *soap_action, _onvifThermal__SetRadiometryConfiguration *onvifThermal__SetRadiometryConfiguration, _onvifThermal__SetRadiometryConfigurationResponse &onvifThermal__SetRadiometryConfigurationResponse)
 {
-	struct __onvifThermal__SetRadiometryConfiguration soap_tmp___onvifThermal__SetRadiometryConfiguration;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/thermal/wsdl/SetRadiometryConfiguration";
-	soap_tmp___onvifThermal__SetRadiometryConfiguration.onvifThermal__SetRadiometryConfiguration = onvifThermal__SetRadiometryConfiguration;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifThermal__SetRadiometryConfiguration(soap, &soap_tmp___onvifThermal__SetRadiometryConfiguration);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifThermal__SetRadiometryConfiguration(soap, &soap_tmp___onvifThermal__SetRadiometryConfiguration, "-onvifThermal:SetRadiometryConfiguration", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifThermal__SetRadiometryConfiguration(soap, &soap_tmp___onvifThermal__SetRadiometryConfiguration, "-onvifThermal:SetRadiometryConfiguration", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifThermal__SetRadiometryConfigurationResponse*>(&onvifThermal__SetRadiometryConfigurationResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifThermal__SetRadiometryConfigurationResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifThermal__SetRadiometryConfigurationResponse.soap_get(soap, "onvifThermal:SetRadiometryConfigurationResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifThermal__SetRadiometryConfiguration soap_tmp___onvifThermal__SetRadiometryConfiguration;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/thermal/wsdl/SetRadiometryConfiguration";
+    soap_tmp___onvifThermal__SetRadiometryConfiguration.onvifThermal__SetRadiometryConfiguration = onvifThermal__SetRadiometryConfiguration;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifThermal__SetRadiometryConfiguration(soap, &soap_tmp___onvifThermal__SetRadiometryConfiguration);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifThermal__SetRadiometryConfiguration(soap, &soap_tmp___onvifThermal__SetRadiometryConfiguration, "-onvifThermal:SetRadiometryConfiguration", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifThermal__SetRadiometryConfiguration(soap, &soap_tmp___onvifThermal__SetRadiometryConfiguration, "-onvifThermal:SetRadiometryConfiguration", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifThermal__SetRadiometryConfigurationResponse*>(&onvifThermal__SetRadiometryConfigurationResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifThermal__SetRadiometryConfigurationResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifThermal__SetRadiometryConfigurationResponse.soap_get(soap, "onvifThermal:SetRadiometryConfigurationResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 /* End of client proxy code */

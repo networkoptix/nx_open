@@ -84,6 +84,28 @@ struct NX_NETWORK_API ci_less
 using HttpHeaders = std::multimap<StringType, StringType, ci_less>;
 using HttpHeader = HttpHeaders::value_type;
 
+/** map<name, value>. */
+struct RequestPathParams
+{
+    std::map<std::string, std::string> nameToValue;
+
+    std::string getByName(const std::string& name) const
+    {
+        auto it = nameToValue.find(name);
+        return it != nameToValue.end() ? it->second : std::string();
+    }
+
+    bool empty() const
+    {
+        return nameToValue.empty();
+    }
+
+    bool operator==(const RequestPathParams& right) const
+    {
+        return nameToValue == right.nameToValue;
+    }
+};
+
 /**
  * This is convinient method for simplify transition from QHttp.
  * @return Value of header headerName (if found), empty string otherwise.

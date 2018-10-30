@@ -121,6 +121,8 @@ public:
 
     bool isLocalHost() const;
     bool isLocalNetwork() const;
+    bool isIpv4LinkLocalNetwork() const;
+
     bool isIpAddress() const;
     bool isPureIpV6() const;
 

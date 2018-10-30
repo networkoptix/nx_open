@@ -24,7 +24,6 @@ namespace {
 
 using namespace nx::core::layout;
 using namespace nx::utils::crypto_functions;
-using nx::utils::CryptedFileStream;
 
 QnMutex QnLayoutFileStorageResource::m_storageSync;
 QSet<QnLayoutFileStorageResource*> QnLayoutFileStorageResource::m_allStorages;
@@ -530,10 +529,8 @@ bool QnLayoutFileStorageResource::shouldCrypt(const QString& streamName)
     if (!isEncrypted())
         return false;
 
-    if (FileTypeSupport::isMovieFileExt(streamName) || FileTypeSupport::isImageFileExt(streamName))
-        return true;
-
-    return streamName.startsWith("chunk") && QFileInfo(streamName).suffix().toLower() == "bin";
+    return FileTypeSupport::isMovieFileExt(streamName)
+        || FileTypeSupport::isImageFileExt(streamName);
 }
 
 QString QnLayoutFileStorageResource::stripName(const QString& fileName)

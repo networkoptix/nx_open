@@ -1,0 +1,501 @@
+<div class="panel-body text-center" ng-if="stepIs(0)">
+    <div class="master-icon"><span class="preloader"></span></div>
+    <div class="vertical-center">
+        <h2>Nahrávání...</h2>
+    </div>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('initFailure')">
+    <div class="master-icon"><span class="icon-fail"></span></div>
+    <h2>Nelze inicializovat systém</h2>
+    <p class="master-description">
+        Ověření se nezdařilo.
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Zkusit znovu</button>
+    </p>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('brokenSystem')">
+    <div class="master-icon"><span class="icon-fail"></span></div>
+    <h2>Systém nelze nastavit</h2>
+    <p class="master-description">Systém nelze nakonfigurovat. <br>
+        <span ng-bind-html="settings.localError"></span>
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Zkusit znovu</button>
+    </p>
+</div>
+
+<div class="panel-body text-center panel-body-big" ng-if="stepIs('start')">
+    <div ng-class="{'vertical-bottom':!settings.liteClient, 'master-description': settings.liteClient}">
+        <h2>Začněte s {{Config.productName}}</h2>
+        <p>Nejprve prosím nakonfigurujte server. <br>
+            Vybrat možnost.</p>
+        <div class="spacer" ng-if="!settings.liteClient"><br><br><br></div>
+        <button class="btn btn-primary" autofocus ng-click="next()">Nastavit nový systému</button>
+
+        <div class="horisontal-line-text">
+            <span class="line"></span>
+            <span class="text">nebo</span>
+            <span class="line"></span>
+        </div>
+        <button class="btn btn-default" ng-click="skip()">Přidat k existujícímu systému</button><br>
+        <small>(pokud {{Config.productName}} byl již nastaven)</small><br>
+        <small ng-if="!settings.liteClient">&nbsp;</small>
+    </div>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('systemName')">
+    <h2>Zadat název systému</h2>
+    <p class="master-description">
+        Název pomůže identifikovat nebo nalézt systém.
+    </p>
+    <form class="master-controls" name="forms.systemNameForm" novalidate>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.systemName" name="systemName" type="text" class="form-control"
+                   placeholder="Název systému" required auto-focus>
+        </div>
+
+        <div class="form-group has-error" ng-if="forms.systemNameForm.systemName.$touched && forms.systemNameForm.systemName.$error.required">
+            <div class="help-block">
+                Název systému je povinný
+            </div>
+        </div>
+
+    </form>
+    <p class="vertical-bottom">
+        <a href="" ng-click="next('advanced', true)">Pokročilé nastavení systému</a>
+    </p>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('advanced')">
+    <h2>Pokročilé nastavení systému</h2>
+    <form class="master-controls wide text-left" name="forms.advancedSettings" novalidate>
+        <div class="form-group" ng-repeat="(setting, value) in systemSettings">
+            <div class="checkbox" ng-if="Config.settingsConfig[setting].type == 'checkbox' " >
+                <label>
+                    <input type="checkbox" id="{{setting}}"
+                           ng-model="systemSettings[setting]"> <span>{{L.settingsConfig[setting]}}</span>
+                </label>
+            </div>
+
+            <label ng-if="Config.settingsConfig[setting].type != 'checkbox' "
+                   for="{{setting}}" >{{L.settingsConfig[setting]}}</label>
+            <input ng-if="Config.settingsConfig[setting].type == 'number' " type="number"
+                   id="{{setting}}"
+                   placeholder="{{}}"
+                   ng-model="systemSettings[setting]"
+                   class="form-control input-sm"/>
+            <input ng-if="Config.settingsConfig[setting].type == 'text'" type="text"
+                   id="{{setting}}"
+                   ng-model="systemSettings[setting]"
+                   class="form-control input-sm"/>
+        </div>
+    </form>
+</div>
+
+
+<div class="panel-body text-center"  ng-if="stepIs('chooseCloudOrLocal')">
+    <h2>Zvolte typ systému</h2>
+    <div class="row radio-panels">
+        <div class="col-xs-6 radio-panel ">
+            <div class="radio-panel-body"
+                 ng-class="{'selected':!settings.chooseCloudSystem}"
+                 ng-click="settings.chooseCloudSystem = false">
+                <div class="checkbox-icon"></div>
+                <div class="master-icon"><span class="icon-localSystem"></span></div>
+                <h3>Místní</h3>
+                <p>
+                    Pracuje pouze v lokálních sítích <br>
+                    Nepožaduje připojení k Internetu
+                </p>
+            </div>
+        </div>
+        <div class="col-xs-6 radio-panel">
+            <div class="radio-panel-body"
+                 ng-class="{'selected':settings.chooseCloudSystem}"
+                 ng-click="settings.chooseCloudSystem = true">
+                <div class="checkbox-icon"></div>
+                <div class="master-icon"><span class="icon-cloud"></span></div>
+                <h3>Cloudový</h3>
+                <p>
+                    Dostupný z jakéhokoliv místa<br>
+                    Vyžaduje připojení k Internetu
+                </p>
+            </div>
+        </div>
+    </div>
+    <p class="vertical-bottom">
+        <a ng-if="!settings.liteClient" class="external" ng-href="{{portalUrl}}" title="learn more about {{Config.cloud.productName}}"
+           target="_blank" ng-click="openLink($event)">Pomozte mi rozhodnout</a>
+        <span ng-if="settings.liteClient">Další informace: {{portalUrl}}</span>
+    </p>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('cloudIntro')">
+    <div class="master-icon">
+        <span class="icon-account"></span>
+    </div>
+    <h2>{{Config.cloud.productName}} účet</h2>
+    <p class="master-description">
+        Pro použití cloudového systému {{Config.cloud.productName}}je vyžadován účet
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-primary" ng-click="createAccount()" auto-focus>Vytvořit nový účet </button>&nbsp;&nbsp;
+        <button class="btn btn-default" ng-click="next('cloudLogin', true)">Použít stávající</button>
+    </p>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('cloudAuthorizedIntro')">
+    <p>Systém bude připojen k</p>
+
+    <div class="master-icon"><span class="icon-cloud"></span></div>
+
+    <h2>{{settings.presetCloudEmail}}</h2>
+
+    <p class="vertical-bottom">
+        <a href="" ng-click="next('cloudLogin', true)">Připojit se k jinému účtu</a>
+    </p>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('cloudLogin')">
+    <div class="master-icon"><span class="icon-cloud"></span></div>
+
+    <h2>Přihlásit k <span class="product-name add-version">{{Config.cloud.productName}}</span></h2>
+
+    <form class="master-controls" name="forms.cloudForm" novalidate ng-class="{'has-error':settings.cloudError}">
+        <div class="form-group" validate-field>
+            <input ng-model="settings.cloudEmail" name="cloudEmail" class="form-control"
+                   type="email" placeholder="Email" autocomplete="new-password" required auto-focus ng-change="clearCloudError()">
+        </div>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
+                   type="password" autocomplete="new-password" required placeholder="Heslo" ng-change="clearCloudError()">
+        </div>
+
+        <div class="checkbox text-left" ng-if="settings.thickClient">
+            <labe>
+                <input ng-model="settings.savePassword" type="checkbox">
+                Zůstat trvale přihlášen
+            </labe>
+        </div>
+
+        <div class="form-group has-error"
+             ng-if="forms.cloudForm.cloudEmail.$touched && forms.cloudForm.cloudEmail.$error.email">
+            <div class="help-block">
+                Prosím zadejte platný email
+            </div>
+        </div>
+
+        <div class="form-group has-error"
+             ng-if="forms.cloudForm.cloudEmail.$touched && forms.cloudForm.cloudEmail.$error.required ||
+                    forms.cloudForm.cloudPassword.$touched && forms.cloudForm.cloudPassword.$error.required">
+            <div class="help-block">
+                Email a heslo je vyžadováno
+            </div>
+        </div>
+
+        <div class="form-group has-error" ng-if="settings.cloudError">
+            <p class="help-block">
+                {{settings.cloudError}}
+            </p>
+        </div>
+
+        <div class="form-group" ng-if="settings.liteClient">
+            <p class="help-block">
+                Chcete-li vytvořit účet, navštivte stránku {{portalUrl}}
+            </p>
+        </div>
+    </form>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('localLogin')">
+    <h2>Nastavit heslo správce</h2>
+    <form class="master-controls" name="forms.localForm" novalidate disable-autocomplete>
+        <div class="form-group" validate-field>
+            <!-- <input ng-model="settings.localLogin" name="localLogin" class="form-control"
+                   type="text" placeholder="Login" required readonly> -->
+            <div class="form-control text-left readonly" readonly>{{settings.localLogin}}</div>
+        </div>
+        <password-input ng-model="settings.localPassword"></password-input>
+        <div class="form-group" validate-field ng-class="{'has-error':forms.localForm.passwordInput.$valid &&
+                     forms.localForm.localPasswordConfirmation.$valid &&
+                     forms.localForm.localPasswordConfirmation.$touched &&
+                     settings.localPasswordConfirmation != settings.localPassword}">
+            <input ng-model="settings.localPasswordConfirmation" name="localPasswordConfirmation" class="form-control"
+                   type="password" autocomplete="new-password" placeholder="Zopakovat heslo" required>
+        </div>
+        <div class="checkbox text-left" ng-if="settings.thickClient">
+            <labe>
+                <input ng-model="settings.savePassword" type="checkbox">
+                Uložit heslo
+            </labe>
+        </div>
+
+        <div class="form-group"
+             ng-if="(!forms.localForm.localLogin.$touched || forms.localForm.localLogin.$valid) &&
++                    !forms.localForm.passwordInput.$dirty &&
++                    !forms.localForm.localPasswordConfirmation.$touched">
+            <div class="help-block">
+                Heslo musí obsahovat různé typy znaků a musí mít alespoň 8 znaků
+            </div>
+        </div>
+        <div class="form-group has-error" ng-if="!forms.localForm.passwordInput.password.$valid">
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.weak &&
+                  !forms.localForm.passwordInput.password.$error.common &&
+                  !forms.localForm.passwordInput.password.$error.pattern &&
+                  !forms.localForm.passwordInput.password.$error.minlength">{{L.passwordRequirements.weakMessage}}</div>
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.common &&
+                  !forms.localForm.passwordInput.password.$error.pattern &&
+                  !forms.localForm.passwordInput.password.$error.minlength">{{L.passwordRequirements.commonMessage}}</div>
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.minlength &&
+                  !forms.localForm.passwordInput.password.$error.pattern">{{L.passwordRequirements.minLengthMessage}}</div>
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.pattern">{{L.passwordRequirements.requiredMessage}}</div>
+        </div>
+
+        <div class="form-group has-error"
+             ng-if="forms.localForm.localLogin.$touched && forms.localForm.localLogin.$error.required ||
+                    forms.localForm.passwordInput.$dirty && forms.localForm.passwordInput.$error.required ||
+                    forms.localForm.localPasswordConfirmation.$touched && forms.localForm.localPasswordConfirmation.$error.required">
+            <div class="help-block">
+                Všechna pole jsou povinná
+            </div>
+        </div>
+
+        <div class="form-group has-error"
+             ng-if= "forms.localForm.$valid &&
+                     (settings.localPasswordConfirmation != settings.localPassword)">
+            <div class="help-block">
+                Hesla se neshodují
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="panel-body text-center" ng-hide="!stepIs('merge')">
+    <h2>Připojit server k existujícímu systému</h2>
+    <form class="master-controls wide text-left" name="forms.remoteSystemForm" novalidate disable-autocomplete>
+        <div class="form-group" validate-field>
+
+            <input type="text" ng-model="settings.remoteSystem" name="remoteSystemName"
+                   uib-typeahead="system as system.visibleName for system in discoveredUrls | filter: {isNew:false, visibleName: $viewValue} | limitTo:8"
+                   uib-typeahead-input-formatter="getSystemName($model)"
+                   uib-typeahead-focus-on-select="false"
+                   uib-typeahead-min-length="0"
+                   uib-typeahead-show-hint="true"
+                   uib-typeahead-focus-first="false"
+                   uib-typeahead-focus
+ placeholder="Stávající adresa URL systému (https: // host: port)"
+                   ng-change="clearRemoteError()"
+                   required
+ class="form-control">
+
+            <p class="help-block text-left">
+                {{settings.remoteSystem.hint}}
+            </p>
+        </div>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.remoteLogin" name="remoteLogin" class="form-control" type="text"
+                   ng-change="clearRemoteError(true)"
+                   placeholder="Přihlásit" required>
+        </div>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.remotePassword"
+                   name="remotePassword" autocomplete="new-password" class="form-control" type="password"
+                   ng-change="clearRemoteError(true)"
+                   placeholder="Heslo" required>
+        </div>
+        <div class="form-group has-error"
+             ng-if="forms.remoteSystemForm.remoteSystemName.$touched &&  forms.remoteSystemForm.remoteSystemName.$error.required||
+                    forms.remoteSystemForm.remoteLogin.$touched && forms.remoteSystemForm.remoteLogin.$error.required ||
+                    forms.remoteSystemForm.remotePassword.$touched && forms.remoteSystemForm.remotePassword.$error.required">
+            <div class="help-block">
+                Všechna pole jsou povinná
+            </div>
+        </div>
+
+        <div class="form-group has-error"  ng-if="settings.remoteError">
+            <div class="help-block">
+                {{settings.remoteError}}
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('mergeProcess')">
+    <div class="master-icon"><span class="preloader"></span></div>
+    <h2>Slučování systémů...</h2>
+    <p class="master-description">Může to trvat několik minut</p>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('retryMergeCredentials')">
+    <div class="master-icon"><span class="preloader"></span></div>
+    <h2>Slučování systémů...</h2>
+    <p class="master-description">Pokus o připojení k systému</p>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('mergeFailure')">
+    <div class="master-icon"><span class="icon-fail"></span></div>
+    <h2>Systémy nelze sloučit</h2>
+    <p class="master-description">
+        {{settings.remoteError}}
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-click="retry()">Zkusit znovu </button>
+        <button class="btn btn-default" ng-click="skip()"> Nastavit samostatný systém </button>
+    </p>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('mergeTemporaryFailure')">
+    <div class="master-icon"><span class="icon-fail"></span></div>
+    <h2>Systém byl úspěšně sloučený, ale zatím není připraven.</h2>
+    <p class="master-description">
+        {{settings.remoteError}}
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-click="retry()">Zkusit znovu</button>
+    </p>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('cloudProcess')">
+    <div class="master-icon"><span class="preloader"></span></div>
+    <h2>Připojování k {{Config.cloud.productName}}...</h2>
+    <p class="master-description">Může to trvat několik minut</p>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
+    <div class="master-icon"><span class="icon-success"></span></div>
+    <h2>Systém je připraven k použití</h2>
+    <p>Přihlásit</p>
+    <h4>{{settings.cloudEmail}}</h4>
+    <p>Sdílení a nastavení účtu</p>
+    <h4><a class="external" ng-href="{{portalSystemLink}}"  title="otevřít {{Config.cloud.productName}}"
+           ng-click="openLink($event)">{{portalShortLink}}</a></h4>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('localSuccess')">
+    <div class="master-icon"><span class="icon-success"></span></div>
+    <h2>Systém je připraven k použití</h2>
+    <p>Adresa serveru</p>
+    <h4>{{serverAddress}}</h4>
+    <p>Přihlášení administrátora</p>
+    <h4>{{settings.localLogin}}</h4>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('configureWrongNetwork')">
+    <p><b>Nejprve prosím nakonfigurujte nastavení sítě</b></p>
+    <network-settings settings="networkSettings[0]" ></network-settings>
+
+    <p class="vertical-bottom">
+        <button class="btn btn-primary" ng-click="retry()">Uložit nastavení a restartovat zařízení</button>
+    </p>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('configureNetworkForInternet')">
+    <p><b>Konfigurace sítě pro nastavení připojení k Internetu</b></p>
+    <network-settings settings="networkSettings[0]" ></network-settings>
+
+    <p class="vertical-bottom">
+        <button class="btn btn-primary" ng-click="retry()">Uložit nastavení a restartovat zařízení</button>
+    </p>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('noInternetOnServer')">
+    <h2>Připojení serveru k Internetu</h2>
+    <p class="master-description">
+        Na serveru nastavte připojení k Internetu, abyste se mohli připojit k <br> odkudkoliv pomocí {{Config.cloud.productName}}.
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-click="retry()">Zkusit znovu</button>
+        <button class="btn btn-default" ng-click="skip()"> Nastavit místní systém </button>
+    </p>
+    <p ng-if="serverInfo.flags.canSetupNetwork" class="vertical-bottom">
+        <a href="" ng-click="next('configureNetworkForInternet')">Konfigurace nastavení sítě</a>
+    </p>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('noInternetOnClient')">
+    <h2>Nelze se připojit k {{Config.cloud.productName}}</h2>
+    <p class="master-description">
+        Zkontrolujte připojení k Internetu.
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-click="retry()">Zkusit znovu</button>
+        <button class="btn btn-default" ng-click="skip()"> Nastavit místní systém </button>
+    </p>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('cloudFailure')">
+    <div class="master-icon"><span class="icon-fail"></span></div>
+    <h2>Nelze se připojit k {{Config.cloud.productName}}</h2>
+    <p class="master-description">
+        {{cloudError}}
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-click="retry()">Zkusit znovu</button>
+        <button class="btn btn-default" ng-click="skip()"> Nastavit místní systém </button>
+    </p>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('localFailure')">
+    <div class="master-icon"><span class="icon-fail"></span></div>
+    <h2>Systém nelze nastavit</h2>
+    <p class="master-description">Něco se úplně pokazilo. <br>
+        Popis chyby: {{settings.localError}}
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-click="retry()">Zkusit znovu</button>
+    </p>
+</div>
+
+
+<div class="panel-footer lite-client-instruction" ng-if="settings.liteClient && stepIs('start')">
+    <p>
+        Je možné provést nastavení z jiného počítače připojením <br>
+        k tomuto zařízení jedním z následujících způsobů:
+    </p>
+    <div class="row">
+        <div class="col-xs-6">
+            <div class="text-center"><b>Pomocí webového prohlížeče</b></div>
+            <div class="col-xs-4 text-right">Adresa</div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
+        </div>
+        <div class="col-xs-6">
+            <div class="text-center"><b>Pomocí aplikace {{Config.productName}}</b></div>
+            <div class="col-xs-6 text-right">Host</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
+            <div class="col-xs-6 text-right">Port</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
+            <div class="col-xs-6 text-right">Přihlásit</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
+            <div class="col-xs-6 text-right">Heslo</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
+        </div>
+    </div>
+</div>
+
+<div class="panel-footer" ng-hide="activeStep.noFooter">
+    <button class="btn btn-default"
+            ng-if="activeStep.cancel"
+            ng-disabled="lockNextButton"
+            ng-click="cancel()">Zrušit</button>
+    <button class="btn btn-default"
+            ng-if="activeStep.back"
+            ng-disabled="lockNextButton"
+            ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button>
+    <button class="btn btn-primary pull-right"
+            ng-if="activeStep.next"
+            ng-disabled="lockNextButton"
+            auto-focus
+ ng-click="next()">Další<span class="glyphicon glyphicon-arrow-right"></span></button>
+    <button class="btn btn-primary pull-right"
+            ng-if="activeStep.finish"
+            ng-disabled="lockNextButton"
+            auto-focus
+ ng-click="finish()">Dokončit</button>
+</div>

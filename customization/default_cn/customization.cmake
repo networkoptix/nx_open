@@ -50,11 +50,8 @@ set(freeLicenseKey "0000-0000-0000-0020")
 # Installer Customizations
 set(installerLanguage "zh_TW")
 set(installer.cultures "zh-tw")
-set(sign.password "qweasd123")
-set(sign.cer "app.p12")
 
 # Localization
 set(help.language "chinese")
 set(translations zh_TW zh_CN)
 set(defaultTranslation zh_TW)
-

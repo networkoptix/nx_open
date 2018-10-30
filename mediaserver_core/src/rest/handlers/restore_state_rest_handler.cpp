@@ -9,6 +9,7 @@
 #include <rest/helpers/permissions_helper.h>
 #include <rest/server/rest_connection_processor.h>
 #include <server/server_globals.h>
+#include <network/universal_tcp_listener.h>
 
 QnRestoreStateRestHandler::QnRestoreStateRestHandler(QnMediaServerModule* serverModule):
     nx::mediaserver::ServerModuleAware(serverModule)
@@ -33,8 +34,9 @@ int QnRestoreStateRestHandler::executePost(
     if (QnPermissionsHelper::isSafeMode(serverModule()))
         return QnPermissionsHelper::safeModeError(result);
 
-    if (!verifyCurrentPassword(passwordData, owner, &result))
-        return nx::network::http::StatusCode::ok;
+    const auto authenticator = QnUniversalTcpListener::authenticator(owner->owner());
+    if (!authenticator->isPasswordCorrect(owner->accessRights(), passwordData.currentPassword))
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Invalid current password"));
 
     return nx::network::http::StatusCode::ok;
 }

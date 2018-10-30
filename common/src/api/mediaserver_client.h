@@ -50,6 +50,7 @@ public:
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
     void setUserCredentials(const nx::network::http::Credentials& userCredentials);
+    boost::optional<nx::network::http::Credentials> getUserCredentials() const;
     /**
      * Authentication through query param.
      */

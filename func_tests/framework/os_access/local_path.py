@@ -1,7 +1,7 @@
 import errno
 import os
 import stat
-from errno import EEXIST, EISDIR, ENOENT, ENOTDIR
+from errno import EEXIST, EISDIR, ENOENT, ENOTDIR, ENOTEMPTY
 from functools import wraps
 from shutil import rmtree
 
@@ -42,6 +42,7 @@ _reraising_existing_file_errors = _reraising({
 _reraising_existing_dir_errors = _reraising({
     ENOENT: exceptions.DoesNotExist,
     EEXIST: exceptions.AlreadyExists,
+    ENOTEMPTY: exceptions.NotEmpty,
     })
 
 
@@ -62,6 +63,7 @@ class LocalPath(PosixPath, FileSystemPath):
     write_text = _reraising_new_file_errors(PosixPath.write_text)
     read_text = _reraising_existing_file_errors(PosixPath.read_text)
     unlink = _reraising_existing_file_errors(PosixPath.unlink)
+    rmdir = _reraising_existing_dir_errors(PosixPath.rmdir)
 
     def __repr__(self):
         return 'LocalPath({!r})'.format(str(self))
@@ -117,3 +119,13 @@ class LocalPath(PosixPath, FileSystemPath):
                 "Creating symlink {!s} pointing to {!s}".format(destination, local_source_path),
                 destination)
         return destination
+
+    @_reraising_new_file_errors
+    def symlink_to(self, target, target_is_directory=False):
+        if not isinstance(target, type(self)):
+            raise ValueError(
+                "Symlink can only point to same OS but link is {} and target is {}".format(
+                    self, target))
+        super(LocalPath, self).symlink_to(
+            str(target),
+            target_is_directory=target_is_directory)

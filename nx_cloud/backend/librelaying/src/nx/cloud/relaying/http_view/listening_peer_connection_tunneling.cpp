@@ -38,17 +38,16 @@ void ListeningPeerConnectionTunnelingServer::authorize(
     const nx::network::http::RequestContext* requestContext,
     CompletionHandler completionHandler)
 {
-    using namespace std::placeholders;
-
-    if (requestContext->requestPathParams.empty())
+    const auto serverId = 
+        requestContext->requestPathParams.getByName(relay::api::kServerIdName);
+    if (serverId.empty())
     {
         return completionHandler(
             nx::network::http::StatusCode::badRequest,
             std::string());
     }
 
-    relay::api::BeginListeningRequest beginListeningRequest{
-        requestContext->requestPathParams[0].toStdString()};
+    relay::api::BeginListeningRequest beginListeningRequest{serverId};
 
     m_listeningPeerManager->beginListening(
         std::move(beginListeningRequest),

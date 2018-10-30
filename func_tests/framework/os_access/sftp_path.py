@@ -10,6 +10,7 @@ from paramiko import SFTPFile
 
 from framework.os_access import exceptions
 from framework.os_access.path import BasePosixPath
+from framework.os_access.ssh_shell import SSH
 
 _logger = logging.getLogger(__name__)
 
@@ -38,21 +39,22 @@ def _reraise_by_errno(errno_to_exception):
 class SftpPath(BasePosixPath):
     __metaclass__ = ABCMeta
 
-    _client = abstractproperty()  # type: paramiko.SFTPClient
-    _home = abstractproperty()
+    @abstractproperty
+    def _client(self):  # type: () -> paramiko.SFTPClient
+        pass
 
     @classmethod
-    def specific_cls(cls, client, home):
-        # TODO: Delay `%TEMP%` and `%USERPROFILE%` expansion until accessed and use them.
+    def specific_cls(cls, ssh):  # type: (SSH) -> ...
         class SpecificSftpPath(cls):
-            _client = client
-            _home = home
+            @classmethod
+            def home(cls):
+                return cls(ssh.home_dir(ssh.current_user_name()))
+
+            @property
+            def _client(self):
+                return ssh._client().open_sftp()
 
         return SpecificSftpPath
-
-    @classmethod
-    def home(cls):
-        return cls(cls._home)
 
     @classmethod
     def tmp(cls):
@@ -73,6 +75,7 @@ class SftpPath(BasePosixPath):
             return True
 
     @_reraise_by_errno({
+        errno.ENOENT: exceptions.DoesNotExist(),
         None: exceptions.BadPath("Probably a dir."),
         })
     def unlink(self):
@@ -98,12 +101,16 @@ class SftpPath(BasePosixPath):
                 return
             raise exceptions.DoesNotExist()
         for entry in entries:
-            if stat.S_ISREG(entry.st_mode):
-                self.joinpath(entry.filename).unlink()
             if stat.S_ISDIR(entry.st_mode):
                 self.joinpath(entry.filename).rmtree(ignore_errors=False)
+            else:
+                self.joinpath(entry.filename).unlink()
         self.rmdir()
 
+    @_reraise_by_errno({
+        errno.ENOENT: exceptions.DoesNotExist(),
+        None: exceptions.NotEmpty(),
+        })
     def rmdir(self):
         self._client.rmdir(str(self))
 
@@ -163,3 +170,14 @@ class SftpPath(BasePosixPath):
                 raise
             raise
         return f
+
+    @_reraise_by_errno({
+        errno.ENOENT: exceptions.BadParent(),
+        None: exceptions.AlreadyExists("Already exists"),
+        })
+    def symlink_to(self, target, target_is_directory=False):
+        if not isinstance(target, type(self)):
+            raise ValueError(
+                "Symlink can only point to same OS but link is {} and target is {}".format(
+                    self, target))
+        self._client.symlink(str(target), str(self))

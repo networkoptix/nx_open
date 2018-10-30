@@ -2779,9 +2779,10 @@ nx::vms::api::ServerFlags MediaServerProcess::calcServerFlags()
 {
     nx::vms::api::ServerFlags serverFlags = nx::vms::api::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
 
-#ifdef EDGE_SERVER
-    serverFlags |= vms::api::SF_Edge;
-#endif
+    #if defined(EDGE_SERVER)
+        serverFlags |= nx::vms::api::SF_Edge;
+    #endif
+    
     if (QnAppInfo::isBpi())
     {
         serverFlags |= nx::vms::api::SF_IfListCtrl | nx::vms::api::SF_timeCtrl;
@@ -3338,6 +3339,8 @@ bool MediaServerProcess::setUpMediaServerResource(
 
 void MediaServerProcess::stopObjects()
 {
+    commonModule()->setNeedToStop(true);
+
     auto safeDisconnect =
         [this](QObject* src, QObject* dst)
         {
@@ -3385,7 +3388,6 @@ void MediaServerProcess::stopObjects()
         nx::utils::TimerManager::instance()->joinAndDeleteTimer(dumpSystemResourceUsageTaskID);
 
     m_ipDiscovery.reset(); // stop it before IO deinitialized
-    commonModule()->setNeedToStop(true);
     m_multicastHttp.reset();
 
     if (m_universalTcpListener)

@@ -14,11 +14,16 @@ namespace cloud {
 class NX_NETWORK_API CloudConnectSettings
 {
 public:
+    static constexpr std::chrono::milliseconds kDefaltDelayBeforeSendingConnectToMediatorOverTcp
+        = std::chrono::seconds(3);
+
     std::string forcedMediatorUrl;
     bool isUdpHpEnabled = true;
     bool isCloudProxyEnabled = true;
     bool isDirectTcpConnectEnabled = true;
     bool useHttpConnectToListenOnRelay = false;
+    std::chrono::milliseconds delayBeforeSendingConnectToMediatorOverTcp =
+        kDefaltDelayBeforeSendingConnectToMediatorOverTcp;
 
     CloudConnectSettings() = default;
     CloudConnectSettings(const CloudConnectSettings&);

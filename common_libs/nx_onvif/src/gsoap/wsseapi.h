@@ -1,9 +1,9 @@
 /*
-	wsseapi.h
+    wsseapi.h
 
-	WS-Security plugin.
+    WS-Security plugin.
 
-	See wsseapi.c for documentation and details.
+    See wsseapi.c for documentation and details.
 
 gSOAP XML Web services tools
 Copyright (C) 2000-2015, Robert van Engelen, Genivia Inc., All Rights Reserved.
@@ -58,7 +58,7 @@ A commercial use license is available from Genivia, Inc., contact@genivia.com
 # include "stdsoap2.h"
 # include SOAP_XSTRINGIFY(SOAP_H_FILE)
 #else
-# include "../onvif/soapH.h"	/* or manually replace with soapcpp2-generated *H.h file */
+# include "../onvif/soapH.h"    /* or manually replace with soapcpp2-generated *H.h file */
 #endif
 
 #include "smdevp.h"
@@ -85,23 +85,23 @@ The signature key (private) and verification key (public) are kept in the
 plugin data, together with other info.
 */
 struct soap_wsse_data {
-  const char *sigid;		/**< string with wsu:Id names to sign */
-  const char *encid;		/**< string with wsu:Id names to encrypt */
-  const char *prefixlist;	/**< string with c14n PrefixList to send, or NULL */
-  int sign_alg;			/**< The digest or signature algorithm used */
-  const void *sign_key;		/**< EVP_PKEY or key string for HMAC */
-  int sign_keylen;		/**< HMAC key length */
-  int vrfy_alg;			/**< The signature verify algorithm used */
-  const void *vrfy_key;		/**< EVP_PKEY or key string for HMAC verify */
-  int vrfy_keylen;		/**< HMAC key length */
-  int enco_alg;			/**< current encrypt algorithm used */
-  const char *enco_keyname;	/**< optional key name (id of symmetric key) */
-  const void *enco_key;		/**< EVP_PKEY or secret key */
-  int enco_keylen;		/**< secret key length */
-  int deco_alg;			/**< decrypt algorithm used */
-  const void *deco_key;		/**< EVP_PKEY or secret key */
-  int deco_keylen;		/**< secret key length */
-  struct soap_wsse_digest *digest;	/**< List of ID-hash pairs */
+  const char *sigid;        /**< string with wsu:Id names to sign */
+  const char *encid;        /**< string with wsu:Id names to encrypt */
+  const char *prefixlist;    /**< string with c14n PrefixList to send, or NULL */
+  int sign_alg;            /**< The digest or signature algorithm used */
+  const void *sign_key;        /**< EVP_PKEY or key string for HMAC */
+  int sign_keylen;        /**< HMAC key length */
+  int vrfy_alg;            /**< The signature verify algorithm used */
+  const void *vrfy_key;        /**< EVP_PKEY or key string for HMAC verify */
+  int vrfy_keylen;        /**< HMAC key length */
+  int enco_alg;            /**< current encrypt algorithm used */
+  const char *enco_keyname;    /**< optional key name (id of symmetric key) */
+  const void *enco_key;        /**< EVP_PKEY or secret key */
+  int enco_keylen;        /**< secret key length */
+  int deco_alg;            /**< decrypt algorithm used */
+  const void *deco_key;        /**< EVP_PKEY or secret key */
+  int deco_keylen;        /**< secret key length */
+  struct soap_wsse_digest *digest;    /**< List of ID-hash pairs */
   int (*fpreparesend)(struct soap*, const char*, size_t);
   int (*fpreparefinalsend)(struct soap*);
   int (*fpreparefinalrecv)(struct soap*);
@@ -121,12 +121,12 @@ to determine when the end of an element is reached by handling inner wsu:Id
 attributed elements, so that the outer wsu:Id attributed element can be hashed.
 */
 struct soap_wsse_digest {
-  struct soap_wsse_digest *next;	/**< Next in list */
-  int done;			        /**< done when digest is computed */
-  unsigned int level;			/**< XML element level */
-  struct soap_smd_data smd;		/**< smdevp engine context */
+  struct soap_wsse_digest *next;    /**< Next in list */
+  int done;                    /**< done when digest is computed */
+  unsigned int level;            /**< XML element level */
+  struct soap_smd_data smd;        /**< smdevp engine context */
   unsigned char hash[SOAP_SMD_MAX_SIZE];/**< Digest hash value */
-  char id[1];				/**< String flows down the struct */
+  char id[1];                /**< String flows down the struct */
 };
 
 extern const char *wsse_PasswordTextURI;

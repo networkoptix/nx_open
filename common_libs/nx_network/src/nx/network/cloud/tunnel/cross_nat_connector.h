@@ -28,6 +28,8 @@ namespace nx {
 namespace network {
 namespace cloud {
 
+class CloudConnectController;
+
 class NX_NETWORK_API CrossNatConnector:
     public AbstractCrossNatConnector,
     public stun::UnreliableMessagePipelineEventHandler
@@ -37,6 +39,7 @@ public:
      * @param mediatorAddress Overrides mediator address. Introduced for testing purposes only.
      */
     CrossNatConnector(
+        CloudConnectController* cloudConnectController,
         const AddressEntry& targetPeerAddress,
         std::optional<hpm::api::MediatorAddress> mediatorAddress = std::nullopt);
 
@@ -48,7 +51,7 @@ public:
 
     virtual QString getRemotePeerName() const override;
 
-    SocketAddress localAddress() const;
+    SocketAddress localUdpHolePunchingEndpoint() const;
 
     void replaceOriginatingHostAddress(const QString& address);
 
@@ -67,6 +70,7 @@ private:
     using MediatorUdpEndpointFetcher = aio::AsyncOperationWrapper<
         decltype(&nx::hpm::api::AbstractMediatorConnector::fetchAddress)>;
 
+    CloudConnectController* const m_cloudConnectController;
     const AddressEntry m_targetPeerAddress;
     const std::string m_connectSessionId;
     ConnectCompletionHandler m_completionHandler;

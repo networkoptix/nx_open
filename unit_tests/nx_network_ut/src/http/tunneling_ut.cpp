@@ -57,16 +57,11 @@ public:
 protected:
     virtual void SetUp() override
     {
-        m_httpServer = std::make_unique<TestHttpServer>();
+        startHttpServer();
 
         m_tunnelingServer.registerRequestHandlers(
             kBasePath,
             &m_httpServer->httpMessageDispatcher());
-
-        ASSERT_TRUE(m_httpServer->bindAndListen());
-        m_baseUrl = nx::network::url::Builder().setScheme(kUrlSchemeName)
-            .setEndpoint(m_httpServer->serverAddress())
-            .setPath(kBasePath);
     }
 
     void stopTunnelingServer()
@@ -74,13 +69,31 @@ protected:
         m_httpServer->server().pleaseStopSync();
     }
 
+    void setEstablishTunnelTimeout(std::chrono::milliseconds timeout)
+    {
+        m_timeout = timeout;
+    }
+
+    void givenSilentTunnellingServer()
+    {
+        stopTunnelingServer();
+        startHttpServer();
+
+        m_httpServer->registerRequestProcessorFunc(
+            http::kAnyPath,
+            [this](auto&&... args) { leaveRequestWithoutResponse(std::move(args)...); });
+    }
+
     void whenRequestTunnel()
     {
         m_tunnelingClient = std::make_unique<Client>(m_baseUrl);
-        m_tunnelingClient->setTimeout(nx::network::kNoTimeout);
+        if (m_timeout)
+            m_tunnelingClient->setTimeout(*m_timeout);
+        else
+            m_tunnelingClient->setTimeout(nx::network::kNoTimeout);
 
         m_tunnelingClient->openTunnel(
-            std::bind(&HttpTunneling::saveClientTunnel, this, std::placeholders::_1));
+            [this](auto&&... args) { saveClientTunnel(std::move(args)...); });
     }
 
     void thenTunnelIsEstablished()
@@ -115,6 +128,11 @@ protected:
         ASSERT_EQ(nullptr, m_prevClientTunnelResult.connection);
     }
 
+    void andResultCodeIs(SystemError::ErrorCode expected)
+    {
+        ASSERT_EQ(expected, m_prevClientTunnelResult.sysError);
+    }
+
 private:
     Server<> m_tunnelingServer;
     std::unique_ptr<Client> m_tunnelingClient;
@@ -126,6 +144,17 @@ private:
     OpenTunnelResult m_prevClientTunnelResult;
     nx::utils::Url m_baseUrl;
     std::unique_ptr<AbstractStreamSocket> m_prevServerTunnelConnection;
+    std::optional<std::chrono::milliseconds> m_timeout;
+
+    void startHttpServer()
+    {
+        m_httpServer = std::make_unique<TestHttpServer>();
+
+        ASSERT_TRUE(m_httpServer->bindAndListen());
+        m_baseUrl = nx::network::url::Builder().setScheme(kUrlSchemeName)
+            .setEndpoint(m_httpServer->serverAddress())
+            .setPath(kBasePath);
+    }
 
     void enableTunnelMethods(int tunnelMethodMask)
     {
@@ -183,6 +212,12 @@ private:
 
         ASSERT_EQ(0, memcmp(buf, readBuf, sizeof(readBuf)));
     }
+
+    void leaveRequestWithoutResponse(
+        http::RequestContext /*requestContext*/,
+        http::RequestProcessedHandler /*completionHandler*/)
+    {
+    }
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -199,6 +234,18 @@ TEST_P(HttpTunneling, error_is_reported)
 
     whenRequestTunnel();
     thenTunnelIsNotEstablished();
+}
+
+TEST_P(HttpTunneling, timeout_supported)
+{
+    setEstablishTunnelTimeout(std::chrono::milliseconds(1));
+
+    givenSilentTunnellingServer();
+
+    whenRequestTunnel();
+    
+    thenTunnelIsNotEstablished();
+    andResultCodeIs(SystemError::timedOut);
 }
 
 //-------------------------------------------------------------------------------------------------

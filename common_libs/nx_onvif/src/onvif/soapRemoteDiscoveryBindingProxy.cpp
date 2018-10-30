@@ -14,59 +14,68 @@ A commercial use license is available from Genivia Inc., contact@genivia.com
 #include "soapRemoteDiscoveryBindingProxy.h"
 
 RemoteDiscoveryBindingProxy::RemoteDiscoveryBindingProxy()
-{	this->soap = soap_new();
-	this->soap_own = true;
-	RemoteDiscoveryBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    RemoteDiscoveryBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
 }
 
 RemoteDiscoveryBindingProxy::RemoteDiscoveryBindingProxy(const RemoteDiscoveryBindingProxy& rhs)
-{	this->soap = rhs.soap;
-	this->soap_own = false;
-	this->soap_endpoint = rhs.soap_endpoint;
+{
+    this->soap = rhs.soap;
+    this->soap_own = false;
+    this->soap_endpoint = rhs.soap_endpoint;
 }
 
 RemoteDiscoveryBindingProxy::RemoteDiscoveryBindingProxy(struct soap *_soap)
-{	this->soap = _soap;
-	this->soap_own = false;
-	RemoteDiscoveryBindingProxy_init(_soap->imode, _soap->omode);
+{
+    this->soap = _soap;
+    this->soap_own = false;
+    RemoteDiscoveryBindingProxy_init(_soap->imode, _soap->omode);
 }
 
 RemoteDiscoveryBindingProxy::RemoteDiscoveryBindingProxy(const char *endpoint)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	RemoteDiscoveryBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
-	soap_endpoint = endpoint;
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    RemoteDiscoveryBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+    soap_endpoint = endpoint;
 }
 
 RemoteDiscoveryBindingProxy::RemoteDiscoveryBindingProxy(soap_mode iomode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	RemoteDiscoveryBindingProxy_init(iomode, iomode);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    RemoteDiscoveryBindingProxy_init(iomode, iomode);
 }
 
 RemoteDiscoveryBindingProxy::RemoteDiscoveryBindingProxy(const char *endpoint, soap_mode iomode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	RemoteDiscoveryBindingProxy_init(iomode, iomode);
-	soap_endpoint = endpoint;
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    RemoteDiscoveryBindingProxy_init(iomode, iomode);
+    soap_endpoint = endpoint;
 }
 
 RemoteDiscoveryBindingProxy::RemoteDiscoveryBindingProxy(soap_mode imode, soap_mode omode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	RemoteDiscoveryBindingProxy_init(imode, omode);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    RemoteDiscoveryBindingProxy_init(imode, omode);
 }
 
 RemoteDiscoveryBindingProxy::~RemoteDiscoveryBindingProxy()
-{	if (this->soap_own)
-		soap_free(this->soap);
+{
+    if (this->soap_own)
+        soap_free(this->soap);
 }
 
 void RemoteDiscoveryBindingProxy::RemoteDiscoveryBindingProxy_init(soap_mode imode, soap_mode omode)
-{	soap_imode(this->soap, imode);
-	soap_omode(this->soap, omode);
-	soap_endpoint = NULL;
-	static const struct Namespace namespaces[] = {
+{
+    soap_imode(this->soap, imode);
+    soap_omode(this->soap, omode);
+    soap_endpoint = NULL;
+    static const struct Namespace namespaces[] = {
         {"SOAP-ENV", "http://www.w3.org/2003/05/soap-envelope", "http://schemas.xmlsoap.org/soap/envelope/", NULL},
         {"SOAP-ENC", "http://www.w3.org/2003/05/soap-encoding", "http://schemas.xmlsoap.org/soap/encoding/", NULL},
         {"xsi", "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL},
@@ -132,201 +141,220 @@ void RemoteDiscoveryBindingProxy::RemoteDiscoveryBindingProxy_init(soap_mode imo
         {"onvifThermal", "http://www.onvif.org/ver10/thermal/wsdl", NULL, NULL},
         {NULL, NULL, NULL, NULL}
     };
-	soap_set_namespaces(this->soap, namespaces);
+    soap_set_namespaces(this->soap, namespaces);
 }
 
 RemoteDiscoveryBindingProxy *RemoteDiscoveryBindingProxy::copy()
-{	RemoteDiscoveryBindingProxy *dup = SOAP_NEW_UNMANAGED(RemoteDiscoveryBindingProxy);
-	if (dup)
-	{	soap_done(dup->soap);
-		soap_copy_context(dup->soap, this->soap);
-	}
-	return dup;
+{
+    RemoteDiscoveryBindingProxy *dup = SOAP_NEW_UNMANAGED(RemoteDiscoveryBindingProxy);
+    if (dup)
+    {
+        soap_done(dup->soap);
+        soap_copy_context(dup->soap, this->soap);
+    }
+    return dup;
 }
 
 RemoteDiscoveryBindingProxy& RemoteDiscoveryBindingProxy::operator=(const RemoteDiscoveryBindingProxy& rhs)
-{	if (this->soap != rhs.soap)
-	{	if (this->soap_own)
-			soap_free(this->soap);
-		this->soap = rhs.soap;
-		this->soap_own = false;
-		this->soap_endpoint = rhs.soap_endpoint;
-	}
-	return *this;
+{
+    if (this->soap != rhs.soap)
+    {
+        if (this->soap_own)
+            soap_free(this->soap);
+        this->soap = rhs.soap;
+        this->soap_own = false;
+        this->soap_endpoint = rhs.soap_endpoint;
+    }
+    return *this;
 }
 
 void RemoteDiscoveryBindingProxy::destroy()
-{	soap_destroy(this->soap);
-	soap_end(this->soap);
+{
+    soap_destroy(this->soap);
+    soap_end(this->soap);
 }
 
 void RemoteDiscoveryBindingProxy::reset()
-{	this->destroy();
-	soap_done(this->soap);
-	soap_initialize(this->soap);
-	RemoteDiscoveryBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+{
+    this->destroy();
+    soap_done(this->soap);
+    soap_initialize(this->soap);
+    RemoteDiscoveryBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
 }
 
 void RemoteDiscoveryBindingProxy::soap_noheader()
-{	this->soap->header = NULL;
+{
+    this->soap->header = NULL;
 }
 
-void RemoteDiscoveryBindingProxy::soap_header(char *wsa5__MessageID, struct wsa5__RelatesToType *wsa5__RelatesTo, struct wsa5__EndpointReferenceType *wsa5__From, struct wsa5__EndpointReferenceType *wsa5__ReplyTo, struct wsa5__EndpointReferenceType *wsa5__FaultTo, char *wsa5__To, char *wsa5__Action, struct chan__ChannelInstanceType *chan__ChannelInstance, struct wsdd__AppSequenceType *wsdd__AppSequence, struct _wsse__Security *wsse__Security, char *subscriptionID)
-{	::soap_header(this->soap);
-	this->soap->header->wsa5__MessageID = wsa5__MessageID;
-	this->soap->header->wsa5__RelatesTo = wsa5__RelatesTo;
-	this->soap->header->wsa5__From = wsa5__From;
-	this->soap->header->wsa5__ReplyTo = wsa5__ReplyTo;
-	this->soap->header->wsa5__FaultTo = wsa5__FaultTo;
-	this->soap->header->wsa5__To = wsa5__To;
-	this->soap->header->wsa5__Action = wsa5__Action;
-	this->soap->header->chan__ChannelInstance = chan__ChannelInstance;
-	this->soap->header->wsdd__AppSequence = wsdd__AppSequence;
-	this->soap->header->wsse__Security = wsse__Security;
-	this->soap->header->subscriptionID = subscriptionID;
+void RemoteDiscoveryBindingProxy::soap_header(char *wsa5__MessageID, struct wsa5__RelatesToType *wsa5__RelatesTo, struct wsa5__EndpointReferenceType *wsa5__From, struct wsa5__EndpointReferenceType *wsa5__ReplyTo, struct wsa5__EndpointReferenceType *wsa5__FaultTo, char *wsa5__To, char *wsa5__Action, struct chan__ChannelInstanceType *chan__ChannelInstance, struct wsdd__AppSequenceType *wsdd__AppSequence, struct _wsse__Security *wsse__Security, char *SubscriptionId)
+{
+    ::soap_header(this->soap);
+    this->soap->header->wsa5__MessageID = wsa5__MessageID;
+    this->soap->header->wsa5__RelatesTo = wsa5__RelatesTo;
+    this->soap->header->wsa5__From = wsa5__From;
+    this->soap->header->wsa5__ReplyTo = wsa5__ReplyTo;
+    this->soap->header->wsa5__FaultTo = wsa5__FaultTo;
+    this->soap->header->wsa5__To = wsa5__To;
+    this->soap->header->wsa5__Action = wsa5__Action;
+    this->soap->header->chan__ChannelInstance = chan__ChannelInstance;
+    this->soap->header->wsdd__AppSequence = wsdd__AppSequence;
+    this->soap->header->wsse__Security = wsse__Security;
+    this->soap->header->SubscriptionId = SubscriptionId;
 }
 
 ::SOAP_ENV__Header *RemoteDiscoveryBindingProxy::soap_header()
-{	return this->soap->header;
+{
+    return this->soap->header;
 }
 
 ::SOAP_ENV__Fault *RemoteDiscoveryBindingProxy::soap_fault()
-{	return this->soap->fault;
+{
+    return this->soap->fault;
 }
 
 const char *RemoteDiscoveryBindingProxy::soap_fault_string()
-{	return *soap_faultstring(this->soap);
+{
+    return *soap_faultstring(this->soap);
 }
 
 const char *RemoteDiscoveryBindingProxy::soap_fault_detail()
-{	return *soap_faultdetail(this->soap);
+{
+    return *soap_faultdetail(this->soap);
 }
 
 int RemoteDiscoveryBindingProxy::soap_close_socket()
-{	return soap_closesock(this->soap);
+{
+    return soap_closesock(this->soap);
 }
 
 int RemoteDiscoveryBindingProxy::soap_force_close_socket()
-{	return soap_force_closesock(this->soap);
+{
+    return soap_force_closesock(this->soap);
 }
 
 void RemoteDiscoveryBindingProxy::soap_print_fault(FILE *fd)
-{	::soap_print_fault(this->soap, fd);
+{
+    ::soap_print_fault(this->soap, fd);
 }
 
 #ifndef WITH_LEAN
 #ifndef WITH_COMPAT
 void RemoteDiscoveryBindingProxy::soap_stream_fault(std::ostream& os)
-{	::soap_stream_fault(this->soap, os);
+{
+    ::soap_stream_fault(this->soap, os);
 }
 #endif
 
 char *RemoteDiscoveryBindingProxy::soap_sprint_fault(char *buf, size_t len)
-{	return ::soap_sprint_fault(this->soap, buf, len);
+{
+    return ::soap_sprint_fault(this->soap, buf, len);
 }
 #endif
 
 int RemoteDiscoveryBindingProxy::Hello(const char *endpoint, const char *soap_action, const struct wsdd__HelloType& onvifNetwork__Hello, struct wsdd__ResolveType &onvifNetwork__HelloResponse)
 {
-	struct __onvifNetwork_rdb__Hello soap_tmp___onvifNetwork_rdb__Hello;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/network/wsdl/Hello";
-	soap_tmp___onvifNetwork_rdb__Hello.onvifNetwork__Hello = onvifNetwork__Hello;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifNetwork_rdb__Hello(soap, &soap_tmp___onvifNetwork_rdb__Hello);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifNetwork_rdb__Hello(soap, &soap_tmp___onvifNetwork_rdb__Hello, "-onvifNetwork-rdb:Hello", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifNetwork_rdb__Hello(soap, &soap_tmp___onvifNetwork_rdb__Hello, "-onvifNetwork-rdb:Hello", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<struct wsdd__ResolveType*>(&onvifNetwork__HelloResponse)) // NULL ref?
-		return soap_closesock(soap);
-	soap_default_wsdd__ResolveType(soap, &onvifNetwork__HelloResponse);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	soap_get_wsdd__ResolveType(soap, &onvifNetwork__HelloResponse, "onvifNetwork:HelloResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifNetwork_rdb__Hello soap_tmp___onvifNetwork_rdb__Hello;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/network/wsdl/Hello";
+    soap_tmp___onvifNetwork_rdb__Hello.onvifNetwork__Hello = onvifNetwork__Hello;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifNetwork_rdb__Hello(soap, &soap_tmp___onvifNetwork_rdb__Hello);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifNetwork_rdb__Hello(soap, &soap_tmp___onvifNetwork_rdb__Hello, "-onvifNetwork-rdb:Hello", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifNetwork_rdb__Hello(soap, &soap_tmp___onvifNetwork_rdb__Hello, "-onvifNetwork-rdb:Hello", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<struct wsdd__ResolveType*>(&onvifNetwork__HelloResponse)) // NULL ref?
+        return soap_closesock(soap);
+    soap_default_wsdd__ResolveType(soap, &onvifNetwork__HelloResponse);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    soap_get_wsdd__ResolveType(soap, &onvifNetwork__HelloResponse, "onvifNetwork:HelloResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int RemoteDiscoveryBindingProxy::Bye(const char *endpoint, const char *soap_action, const struct wsdd__ByeType& onvifNetwork__Bye, struct wsdd__ResolveType &onvifNetwork__ByeResponse)
 {
-	struct __onvifNetwork_rdb__Bye soap_tmp___onvifNetwork_rdb__Bye;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/network/wsdl/Bye";
-	soap_tmp___onvifNetwork_rdb__Bye.onvifNetwork__Bye = onvifNetwork__Bye;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifNetwork_rdb__Bye(soap, &soap_tmp___onvifNetwork_rdb__Bye);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifNetwork_rdb__Bye(soap, &soap_tmp___onvifNetwork_rdb__Bye, "-onvifNetwork-rdb:Bye", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifNetwork_rdb__Bye(soap, &soap_tmp___onvifNetwork_rdb__Bye, "-onvifNetwork-rdb:Bye", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<struct wsdd__ResolveType*>(&onvifNetwork__ByeResponse)) // NULL ref?
-		return soap_closesock(soap);
-	soap_default_wsdd__ResolveType(soap, &onvifNetwork__ByeResponse);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	soap_get_wsdd__ResolveType(soap, &onvifNetwork__ByeResponse, "onvifNetwork:ByeResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifNetwork_rdb__Bye soap_tmp___onvifNetwork_rdb__Bye;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/network/wsdl/Bye";
+    soap_tmp___onvifNetwork_rdb__Bye.onvifNetwork__Bye = onvifNetwork__Bye;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifNetwork_rdb__Bye(soap, &soap_tmp___onvifNetwork_rdb__Bye);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifNetwork_rdb__Bye(soap, &soap_tmp___onvifNetwork_rdb__Bye, "-onvifNetwork-rdb:Bye", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifNetwork_rdb__Bye(soap, &soap_tmp___onvifNetwork_rdb__Bye, "-onvifNetwork-rdb:Bye", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<struct wsdd__ResolveType*>(&onvifNetwork__ByeResponse)) // NULL ref?
+        return soap_closesock(soap);
+    soap_default_wsdd__ResolveType(soap, &onvifNetwork__ByeResponse);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    soap_get_wsdd__ResolveType(soap, &onvifNetwork__ByeResponse, "onvifNetwork:ByeResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 /* End of client proxy code */

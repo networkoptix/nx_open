@@ -24,7 +24,6 @@ def main():
         return syncher.sync(package, **kwargs)
 
     sync("windows/wix-3.11", path_variable="wix_directory")
-    sync("windows/signtool", path_variable="signtool_directory")
     sync("windows/ilmerge", path_variable="ilmerge_directory")
     sync("windows/paxton_plugin_references", path_variable="references_directory")
     sync("any/certificates-" + args.customization, path_variable="certificates_path")

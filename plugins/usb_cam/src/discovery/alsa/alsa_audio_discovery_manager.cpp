@@ -10,6 +10,7 @@
 namespace nx {
 namespace usb_cam {
 namespace device {
+namespace detail {
 
 namespace {
 
@@ -79,9 +80,9 @@ AlsaAudioDiscoveryManager::getDevices() const
 
     while(snd_card_next(&card) == 0 && card != -1)
     {
-        char * cardName;
+        char * cardName = nullptr;
         snd_card_get_name(card, &cardName);
-        char ** hints;
+        char ** hints = nullptr;
         if (snd_device_name_hint(card, "pcm", (void***)&hints) != 0)
             continue;
 
@@ -144,6 +145,18 @@ AlsaAudioDiscoveryManager::getDevices() const
     return devices;
 }
 
+bool AlsaAudioDiscoveryManager::pluggedIn(const std::string& devicePath) const
+{
+    auto devices = getDevices();
+    for (const auto & device : devices)
+    {
+        if (device.path == devicePath)
+            return true;
+    }
+    return false;
+}
+
+} // namespace detail
 } // namespace device
 } // namespace usb_cam
 } // namespace nx

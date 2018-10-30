@@ -87,8 +87,8 @@ class Type(object):
 
 
 class _WindowsRegistryValue(object):
-    def __init__(self, query, hive, key, name, type):
-        self.query = query
+    def __init__(self, wmi_registry_provider, hive, key, name, type):
+        self._wmi_registry_provider = wmi_registry_provider
         self.hive = hive  # type: Hive
         self.key = key  # type: str
         self.type = type  # type: Type
@@ -98,7 +98,7 @@ class _WindowsRegistryValue(object):
         return '<Value {}/{}/{} of type {}>'.format(self.hive, self.key, self.name, self.type.name)
 
     def get_data(self):
-        response = self.query.invoke_method(self.type.getter_name, {
+        response = self._wmi_registry_provider.invoke_method(self.type.getter_name, {
             u'hDefKey': self.hive.int_value, u'sSubKeyName': self.key, u'sValueName': self.name,
             })
         _logger.debug("%s response: %s", self.type.getter_name, pformat(response))
@@ -107,7 +107,7 @@ class _WindowsRegistryValue(object):
         return value
 
     def set_data(self, new_data):
-        response = self.query.invoke_method(self.type.setter_name, {
+        response = self._wmi_registry_provider.invoke_method(self.type.setter_name, {
             u'hDefKey': self.hive.int_value, u'sSubKeyName': self.key, u'sValueName': self.name,
             self.type.parameter_name: new_data,
             })
@@ -115,8 +115,8 @@ class _WindowsRegistryValue(object):
 
 
 class _WindowsRegistryKey(object):
-    def __init__(self, query, hive, key):
-        self.query = query
+    def __init__(self, wmi_registry_provider, hive, key):
+        self._wmi_registry_provider = wmi_registry_provider
         self.hive = hive
         self.key = key
 
@@ -124,10 +124,10 @@ class _WindowsRegistryKey(object):
         return '<Key {}\\{}>'.format(self.hive.name, self.key)
 
     def make_value(self, name, type):
-        return _WindowsRegistryValue(self.query, self.hive, self.key, name, type)
+        return _WindowsRegistryValue(self._wmi_registry_provider, self.hive, self.key, name, type)
 
     def list_values(self):
-        response = self.query.invoke_method(u'EnumValues', {
+        response = self._wmi_registry_provider.invoke_method(u'EnumValues', {
             u'hDefKey': self.hive.int_value, u'sSubKeyName': self.key})
         values = [
             self.make_value(name, Type.from_int(int(type_str)))
@@ -137,11 +137,11 @@ class _WindowsRegistryKey(object):
 
     def create(self):
         """Create, if don't exist, key and its parents"""
-        self.query.invoke_method(u'CreateKey', {
+        self._wmi_registry_provider.invoke_method(u'CreateKey', {
             u'hDefKey': self.hive.int_value, u'sSubKeyName': self.key})
 
     def delete(self):
-        self.query.invoke_method(u'DeleteKey', {
+        self._wmi_registry_provider.invoke_method(u'DeleteKey', {
             u'hDefKey': self.hive.int_value, u'sSubKeyName': self.key})
 
     def copy_values_to(self, another_key):
@@ -170,9 +170,9 @@ class _WindowsRegistryKey(object):
 
 class WindowsRegistry(object):
     def __init__(self, winrm):
-        self.query = winrm.wmi_query(u'StdRegProv', {})
+        self._wmi_registry_provider = winrm.wmi.cls(u'StdRegProv').static()
 
     def key(self, path):
         hive_str, key = path.split('\\', 1)
         hive = Hive.from_name(hive_str)
-        return _WindowsRegistryKey(self.query, hive, key)
+        return _WindowsRegistryKey(self._wmi_registry_provider, hive, key)

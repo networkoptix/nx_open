@@ -136,9 +136,22 @@ TEST_F(CrossNatConnector, provides_not_started_connections)
     assertConnectionHasNotBeenStarted();
 }
 
-TEST_F(CrossNatConnector, sends_connect_request_through_tcp)
+class CrossNatConnectorOverTcp:
+    public CrossNatConnector
 {
-    // TODO
+public:
+    CrossNatConnectorOverTcp()
+    {
+        // Disabling UDP interface on mediator.
+        mediator().removeArgByName("stun/udpAddrToListenList");
+        mediator().addArg("--stun/udpAddrToListenList=");
+    }
+};
+
+TEST_F(CrossNatConnectorOverTcp, sends_connect_request_through_tcp)
+{
+    whenEstablishConnection();
+    thenConnectionIsEstablished();
 }
 
 //-------------------------------------------------------------------------------------------------

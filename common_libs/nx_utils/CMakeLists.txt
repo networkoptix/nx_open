@@ -18,7 +18,7 @@ nx_add_target(nx_utils LIBRARY ${library_type} WERROR NO_MOC
     OTHER_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/qt5.natvis"
     PUBLIC_LIBS
-        boost openssl Qt5::Core Qt5::Xml Qt5::Sql
+        boost openssl Qt5::Core Qt5::Xml
         nx_kit
 )
 

@@ -5,9 +5,7 @@
 
 #include <nx/utils/algorithm/truncate_sorted_lists.h>
 
-namespace nx {
-namespace utils {
-namespace test {
+namespace nx::utils::test {
 
 namespace {
 
@@ -118,6 +116,17 @@ TEST_F(TruncateSortedLists, OneListNoTruncation)
     ASSERT_EQ(lists, std::vector<Vector>({source}));
 }
 
-} // namespace test
-} // namespace utils
-} // namespace nx
+TEST_F(TruncateSortedLists, SourceListOfPointers)
+{
+    auto l1 = Vector({10, 1});
+    auto l2 = Vector({20, 2});
+    auto l3 = Vector({30, 3});
+    const auto lists = {&l1, &l2, &l3};
+    int count = nx::utils::algorithm::truncate_sorted_lists(lists, 3, Qt::DescendingOrder);
+    ASSERT_EQ(count, 3);
+    ASSERT_EQ(l1, Vector({10}));
+    ASSERT_EQ(l2, Vector({20}));
+    ASSERT_EQ(l3, Vector({30}));
+}
+
+} // namespace nx::utils::test

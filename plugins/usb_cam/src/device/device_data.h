@@ -3,10 +3,6 @@
 #include <vector>
 #include <string>
 
-#include <camera/camera_plugin_types.h>
-
-#include "abstract_compression_type_descriptor.h"
-
 namespace nx {
 namespace usb_cam {
 namespace device {

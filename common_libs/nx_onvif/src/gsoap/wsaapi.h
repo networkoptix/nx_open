@@ -1,7 +1,7 @@
 /*
-	wsaapi.h
+    wsaapi.h
 
-	WS-Addressing plugin
+    WS-Addressing plugin
 
 gSOAP XML Web services tools
 Copyright (C) 2000-2008, Robert van Engelen, Genivia Inc., All Rights Reserved.
@@ -56,7 +56,7 @@ A commercial use license is available from Genivia, Inc., contact@genivia.com
 # include "stdsoap2.h"
 # include SOAP_XSTRINGIFY(SOAP_H_FILE)
 #else
-# include "../onvif/soapH.h"	/* or manually replace with soapcpp2-generated *H.h file */
+# include "../onvif/soapH.h"    /* or manually replace with soapcpp2-generated *H.h file */
 #endif
 
 #ifdef __cplusplus

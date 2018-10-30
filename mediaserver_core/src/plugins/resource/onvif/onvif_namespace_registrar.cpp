@@ -14,6 +14,7 @@ namespace onvif {
     {"SOAP-ENC", "http://www.w3.org/2003/05/soap-encoding", nullptr, nullptr},\
     {"xsi", "http://www.w3.org/2001/XMLSchema-instance", nullptr, nullptr},\
     {"xsd", "http://www.w3.org/2001/XMLSchema", nullptr, nullptr},\
+    {"wsa5", "http://www.w3.org/2005/08/addressing", nullptr, nullptr}, \
     {\
         "wsse",\
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",\
@@ -56,6 +57,14 @@ static const std::map<RequestTypeId, std::vector<Namespace>> kOverridenNamespace
         {
             COMMON_NAMESPACES,
             {"onvifMedia", "http://www.onvif.org/ver10/media/wsdl", nullptr, nullptr},
+            { nullptr, nullptr, nullptr, nullptr }
+        }
+    },
+    {
+        typeId<_onvifEvents__PullMessages>(),
+        {
+            COMMON_NAMESPACES,
+            {"onvifEvents", "http://www.onvif.org/ver10/events/wsdl", nullptr, nullptr},
             { nullptr, nullptr, nullptr, nullptr }
         }
     }

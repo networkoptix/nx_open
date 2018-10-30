@@ -1,0 +1,41 @@
+<div class="dropdown"
+     [ngClass]="{'show': show}"
+     (nxClickElsewhere)="show = false">
+
+    <button class="inset btn btn-dropdown-toggle dropdown-toggle-transparent dropdown-toggle"
+            (click)="show = !show"
+            type="button" id="accountSettingsSelect" data-toggle="dropdown">
+
+        <span class="glyphicon glyphicon-user"></span>
+        <span class="ellipsis" [innerHTML]="settings.email"></span>
+        <div class="nav-arrow">
+            <span></span>
+            <span></span>
+        </div>
+    </button>
+    <ul class="dropdown-menu" [nxArrowNav]="show"
+         [style.display]="show ? 'inline-block' : 'none'"
+         aria-labelledby="accountSettingsSelect">
+        <div class="popup arrow up"></div>
+
+        <li class="dropdown-item-container">
+            <a class="dropdown-item inset" (click)="show = false; return;"
+               [href]="'/account/'" translate>Account Settings</a>
+        </li>
+        <li class="dropdown-item-container">
+            <a class="dropdown-item inset" (click)="show = false; return;"
+               [href]="'/account/password/'" translate>Change Password</a>
+        </li>
+        <li class="dropdown-item-container">
+            <a class="dropdown-item inset" (click)="show = false; logout()"
+               href translate>Log Out</a>
+        </li>
+
+        <li class="dropdown-divider" role="separator" *ngIf="settings.is_staff"></li>
+
+        <li class="dropdown-item-container">
+            <a class="dropdown-item inset" (click)="show = false; return;" [href]="'/admin/'" target="_blank"
+               *ngIf="settings.is_staff" translate>Portal management</a>
+        </li>
+    </ul>
+</div>

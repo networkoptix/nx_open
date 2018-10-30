@@ -40,7 +40,8 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
     bindToAioThread(this->webSocket()->getAioThread());
 
     m_commonTransactionHeader.systemId = systemId;
-    m_commonTransactionHeader.endpoint = remoteSocketAddr();
+    m_commonTransactionHeader.peerId = remotePeerData.id.toSimpleByteArray().toStdString();
+    m_commonTransactionHeader.endpoint = remotePeerEndpoint();
     m_commonTransactionHeader.connectionId = connectionId.toSimpleString().toStdString();
     m_commonTransactionHeader.vmsTransportHeader.sender = remotePeerData.id;
     m_commonTransactionHeader.transactionFormatVersion = remotePeerData.protoVersion;
@@ -90,7 +91,7 @@ void WebSocketTransactionTransport::onGotMessage(
         case nx::p2p::MessageType::pushTransactionData:
         {
             TransactionTransportHeader cdbTransportHeader(m_protocolVersionRange.currentVersion());
-            cdbTransportHeader.endpoint = remoteSocketAddr();
+            cdbTransportHeader.endpoint = remotePeerEndpoint();
             cdbTransportHeader.systemId = m_transactionLogReader->systemId();
             cdbTransportHeader.connectionId = connectionGuid().toSimpleByteArray().toStdString();
             //cdbTransportHeader.vmsTransportHeader //< Empty vms transport header
@@ -117,7 +118,7 @@ void WebSocketTransactionTransport::onGotMessage(
         default:
             NX_WARNING(this, lm("P2P message type '%1' is not allowed for cloud connect! "
                 "System id %2, source endpoint %3")
-                .args(toString(messageType), m_systemId, remoteSocketAddr()));
+                .args(toString(messageType), m_systemId, remotePeerEndpoint()));
             setState(State::Error);
             break;
     }
@@ -150,7 +151,7 @@ void WebSocketTransactionTransport::onTransactionsReadFromLog(
             lm("systemId %1. Error reading transaction log (%2). "
                 "Closing connection to the peer %3")
             .args(m_transactionLogReader->systemId(),
-                toString(resultCode), remoteSocketAddr()));
+                toString(resultCode), remotePeerEndpoint()));
         setState(State::Error);   //closing connection
         return;
     }
@@ -169,23 +170,23 @@ void WebSocketTransactionTransport::onTransactionsReadFromLog(
         m_sendHandshakeDone = true; //< All data are sent.
 }
 
-network::SocketAddress WebSocketTransactionTransport::remoteSocketAddr() const
+network::SocketAddress WebSocketTransactionTransport::remotePeerEndpoint() const
 {
     return webSocket()->socket()->getForeignAddress();
 }
 
-void WebSocketTransactionTransport::setOnConnectionClosed(ConnectionClosedEventHandler handler)
+ConnectionClosedSubscription& WebSocketTransactionTransport::connectionClosedSubscription()
 {
-    m_connectionClosedEventHandler = std::move(handler);
+    return m_connectionClosedSubscription;
 }
 
 void WebSocketTransactionTransport::setState(State state)
 {
-    if (m_connectionClosedEventHandler && state == State::Error)
+    if (state == State::Error)
     {
         SystemError::ErrorCode errorCode = SystemError::noError;
         webSocket()->socket()->getLastError(&errorCode);
-        m_connectionClosedEventHandler(errorCode);
+        m_connectionClosedSubscription.notify(errorCode);
     }
     nx::p2p::ConnectionBase::setState(state);
 }
@@ -217,6 +218,10 @@ void WebSocketTransactionTransport::sendTransaction(
         remotePeer().dataFormat,
         highestProtocolVersionCompatibleWithRemotePeer());
     sendMessage(nx::p2p::MessageType::pushTransactionData, serializedTransaction);
+}
+
+void WebSocketTransactionTransport::start()
+{
 }
 
 int WebSocketTransactionTransport::highestProtocolVersionCompatibleWithRemotePeer() const

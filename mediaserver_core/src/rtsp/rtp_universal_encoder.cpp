@@ -292,16 +292,16 @@ bool QnUniversalRtpEncoder::open(
 
 QString QnUniversalRtpEncoder::getSdpMedia(bool isVideo, int trackId)
 {
+    static const QString kEndl = "\r\n";
     QString sdpMedia;
     QTextStream stream(&sdpMedia);
-    stream << "m=" << (isVideo ? "video " : "audio ") << 0 << " RTP/AVP ";
-    stream << m_payloadType;
+    stream << "m=" << (isVideo ? "video " : "audio ") << 0 << " RTP/AVP " << m_payloadType;
     if (m_useSecondaryPayloadType)
         stream << ' ' << kSecondaryStreamPayloadType;
-    stream << "\r\n";
-    stream << "a=control:trackID=" << trackId << "\r\n";
-    for(QString& attribute: m_sdpAttributes)
-        stream << attribute << "\r\n";
+    stream << kEndl;
+    stream << "a=control:trackID=" << trackId << kEndl;
+    stream << m_sdpAttributes.join(kEndl);
+    stream << kEndl;
     return sdpMedia;
 }
 

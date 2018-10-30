@@ -13,7 +13,7 @@ namespace gateway {
 namespace test {
 
 
-const constexpr int kTimeoutMsec = 5000;
+const constexpr std::chrono::milliseconds kNetworkTimeout(5000);
 const QByteArray successResponse = "HTTP/1.1 200 OK\r\n";
 
 class VmsGatewayConnectTest:
@@ -35,10 +35,10 @@ public:
         const QByteArray &connectResponse = successResponse)
     {
         socket = std::make_unique<network::TCPSocket>();
-        socket->setRecvTimeout(kTimeoutMsec);
+        socket->setRecvTimeout(kNetworkTimeout.count());
 
         // Connect to proxy.
-        ASSERT_TRUE(socket->connect(endpoint(), std::chrono::milliseconds(kTimeoutMsec)))
+        ASSERT_TRUE(socket->connect(endpoint(), std::chrono::milliseconds(kNetworkTimeout)))
             << "Connect failed: " << SystemError::getLastOSErrorText().toStdString();
 
         const QByteArray connectRequest(QString(
@@ -53,8 +53,8 @@ public:
         responseReceiveBuffer.resize(connectResponse.size());
 
         // Check that CONNECT was successfull.
-        ASSERT_EQ(socket->recv(responseReceiveBuffer.data(), responseReceiveBuffer.size(), 0),
-            responseReceiveBuffer.size())
+        ASSERT_EQ(socket->recv(responseReceiveBuffer.data(), responseReceiveBuffer.size(),
+            MSG_WAITALL), responseReceiveBuffer.size())
                 << "CONNECT response failure: " << SystemError::getLastOSErrorText().toStdString();
 
         // We want to check only the first response line.
@@ -91,7 +91,7 @@ TEST_F(VmsGatewayConnectTest, ConnectionClose)
     connectProxySocket(server.addressBeingListened(), clientSocket);
 
     clientSocket->close();
-    ASSERT_EQ(connectionFinishedFuture.wait_for(std::chrono::milliseconds(kTimeoutMsec)),
+    ASSERT_EQ(connectionFinishedFuture.wait_for(std::chrono::milliseconds(kNetworkTimeout)),
         std::future_status::ready);
     clientSocket.reset();
 
@@ -100,7 +100,7 @@ TEST_F(VmsGatewayConnectTest, ConnectionClose)
 
     server.pleaseStopSync();
     QByteArray receiveBuffer(1, 0);  //< It should be >0 to differentiate EOF and zero bytes read.
-    ASSERT_EQ(clientSocket->recv(receiveBuffer.data(), receiveBuffer.size(), 0), 0);
+    ASSERT_EQ(clientSocket->recv(receiveBuffer.data(), receiveBuffer.size(), MSG_WAITALL), 0);
 }
 
 TEST_F(VmsGatewayConnectTest, IpSpecified)
@@ -116,7 +116,7 @@ TEST_F(VmsGatewayConnectTest, IpSpecified)
 
     QByteArray receiveBuffer;
     receiveBuffer.resize(writeData.size());
-    ASSERT_EQ(clientSocket->recv(receiveBuffer.data(), receiveBuffer.size(), 0),
+    ASSERT_EQ(clientSocket->recv(receiveBuffer.data(), receiveBuffer.size(), MSG_WAITALL),
         receiveBuffer.size());
 
     server.pleaseStopSync();
@@ -141,9 +141,9 @@ TEST_F(VmsGatewayConnectTest, ConcurrentConnections)
 
     QByteArray receiveBuffer;
     receiveBuffer.resize(writeData.size());
-    ASSERT_EQ(clientSocketFirst->recv(receiveBuffer.data(), receiveBuffer.size(), 0),
+    ASSERT_EQ(clientSocketFirst->recv(receiveBuffer.data(), receiveBuffer.size(), MSG_WAITALL),
         receiveBuffer.size());
-    ASSERT_EQ(clientSocketSecond->recv(receiveBuffer.data(), receiveBuffer.size(), 0),
+    ASSERT_EQ(clientSocketSecond->recv(receiveBuffer.data(), receiveBuffer.size(), MSG_WAITALL),
         receiveBuffer.size());
     server.pleaseStopSync();
 }

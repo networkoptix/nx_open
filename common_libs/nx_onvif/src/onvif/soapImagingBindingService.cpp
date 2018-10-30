@@ -14,43 +14,50 @@ A commercial use license is available from Genivia Inc., contact@genivia.com
 #include "soapImagingBindingService.h"
 
 ImagingBindingService::ImagingBindingService()
-{	this->soap = soap_new();
-	this->soap_own = true;
-	ImagingBindingService_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    ImagingBindingService_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
 }
 
 ImagingBindingService::ImagingBindingService(const ImagingBindingService& rhs)
-{	this->soap = rhs.soap;
-	this->soap_own = false;
+{
+    this->soap = rhs.soap;
+    this->soap_own = false;
 }
 
 ImagingBindingService::ImagingBindingService(struct soap *_soap)
-{	this->soap = _soap;
-	this->soap_own = false;
-	ImagingBindingService_init(_soap->imode, _soap->omode);
+{
+    this->soap = _soap;
+    this->soap_own = false;
+    ImagingBindingService_init(_soap->imode, _soap->omode);
 }
 
 ImagingBindingService::ImagingBindingService(soap_mode iomode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	ImagingBindingService_init(iomode, iomode);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    ImagingBindingService_init(iomode, iomode);
 }
 
 ImagingBindingService::ImagingBindingService(soap_mode imode, soap_mode omode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	ImagingBindingService_init(imode, omode);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    ImagingBindingService_init(imode, omode);
 }
 
 ImagingBindingService::~ImagingBindingService()
-{	if (this->soap_own)
-		soap_free(this->soap);
+{
+    if (this->soap_own)
+        soap_free(this->soap);
 }
 
 void ImagingBindingService::ImagingBindingService_init(soap_mode imode, soap_mode omode)
-{	soap_imode(this->soap, imode);
-	soap_omode(this->soap, omode);
-	static const struct Namespace namespaces[] = {
+{
+    soap_imode(this->soap, imode);
+    soap_omode(this->soap, omode);
+    static const struct Namespace namespaces[] = {
         {"SOAP-ENV", "http://www.w3.org/2003/05/soap-envelope", "http://schemas.xmlsoap.org/soap/envelope/", NULL},
         {"SOAP-ENC", "http://www.w3.org/2003/05/soap-encoding", "http://schemas.xmlsoap.org/soap/encoding/", NULL},
         {"xsi", "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL},
@@ -116,151 +123,178 @@ void ImagingBindingService::ImagingBindingService_init(soap_mode imode, soap_mod
         {"onvifThermal", "http://www.onvif.org/ver10/thermal/wsdl", NULL, NULL},
         {NULL, NULL, NULL, NULL}
     };
-	soap_set_namespaces(this->soap, namespaces);
+    soap_set_namespaces(this->soap, namespaces);
 }
 
 void ImagingBindingService::destroy()
-{	soap_destroy(this->soap);
-	soap_end(this->soap);
+{
+    soap_destroy(this->soap);
+    soap_end(this->soap);
 }
 
 void ImagingBindingService::reset()
-{	this->destroy();
-	soap_done(this->soap);
-	soap_initialize(this->soap);
-	ImagingBindingService_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+{
+    this->destroy();
+    soap_done(this->soap);
+    soap_initialize(this->soap);
+    ImagingBindingService_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
 }
 
 #ifndef WITH_PURE_VIRTUAL
 ImagingBindingService *ImagingBindingService::copy()
-{	ImagingBindingService *dup = SOAP_NEW_UNMANAGED(ImagingBindingService);
-	if (dup)
-	{	soap_done(dup->soap);
-		soap_copy_context(dup->soap, this->soap);
-	}
-	return dup;
+{
+    ImagingBindingService *dup = SOAP_NEW_UNMANAGED(ImagingBindingService);
+    if (dup)
+    {
+        soap_done(dup->soap);
+        soap_copy_context(dup->soap, this->soap);
+    }
+    return dup;
 }
 #endif
 
 ImagingBindingService& ImagingBindingService::operator=(const ImagingBindingService& rhs)
-{	if (this->soap != rhs.soap)
-	{	if (this->soap_own)
-			soap_free(this->soap);
-		this->soap = rhs.soap;
-		this->soap_own = false;
-	}
-	return *this;
+{
+    if (this->soap != rhs.soap)
+    {
+        if (this->soap_own)
+            soap_free(this->soap);
+        this->soap = rhs.soap;
+        this->soap_own = false;
+    }
+    return *this;
 }
 
 int ImagingBindingService::soap_close_socket()
-{	return soap_closesock(this->soap);
+{
+    return soap_closesock(this->soap);
 }
 
 int ImagingBindingService::soap_force_close_socket()
-{	return soap_force_closesock(this->soap);
+{
+    return soap_force_closesock(this->soap);
 }
 
 int ImagingBindingService::soap_senderfault(const char *string, const char *detailXML)
-{	return ::soap_sender_fault(this->soap, string, detailXML);
+{
+    return ::soap_sender_fault(this->soap, string, detailXML);
 }
 
 int ImagingBindingService::soap_senderfault(const char *subcodeQName, const char *string, const char *detailXML)
-{	return ::soap_sender_fault_subcode(this->soap, subcodeQName, string, detailXML);
+{
+    return ::soap_sender_fault_subcode(this->soap, subcodeQName, string, detailXML);
 }
 
 int ImagingBindingService::soap_receiverfault(const char *string, const char *detailXML)
-{	return ::soap_receiver_fault(this->soap, string, detailXML);
+{
+    return ::soap_receiver_fault(this->soap, string, detailXML);
 }
 
 int ImagingBindingService::soap_receiverfault(const char *subcodeQName, const char *string, const char *detailXML)
-{	return ::soap_receiver_fault_subcode(this->soap, subcodeQName, string, detailXML);
+{
+    return ::soap_receiver_fault_subcode(this->soap, subcodeQName, string, detailXML);
 }
 
 void ImagingBindingService::soap_print_fault(FILE *fd)
-{	::soap_print_fault(this->soap, fd);
+{
+    ::soap_print_fault(this->soap, fd);
 }
 
 #ifndef WITH_LEAN
 #ifndef WITH_COMPAT
 void ImagingBindingService::soap_stream_fault(std::ostream& os)
-{	::soap_stream_fault(this->soap, os);
+{
+    ::soap_stream_fault(this->soap, os);
 }
 #endif
 
 char *ImagingBindingService::soap_sprint_fault(char *buf, size_t len)
-{	return ::soap_sprint_fault(this->soap, buf, len);
+{
+    return ::soap_sprint_fault(this->soap, buf, len);
 }
 #endif
 
 void ImagingBindingService::soap_noheader()
-{	this->soap->header = NULL;
+{
+    this->soap->header = NULL;
 }
 
-void ImagingBindingService::soap_header(char *wsa5__MessageID, struct wsa5__RelatesToType *wsa5__RelatesTo, struct wsa5__EndpointReferenceType *wsa5__From, struct wsa5__EndpointReferenceType *wsa5__ReplyTo, struct wsa5__EndpointReferenceType *wsa5__FaultTo, char *wsa5__To, char *wsa5__Action, struct chan__ChannelInstanceType *chan__ChannelInstance, struct wsdd__AppSequenceType *wsdd__AppSequence, struct _wsse__Security *wsse__Security, char *subscriptionID)
-{	::soap_header(this->soap);
-	this->soap->header->wsa5__MessageID = wsa5__MessageID;
-	this->soap->header->wsa5__RelatesTo = wsa5__RelatesTo;
-	this->soap->header->wsa5__From = wsa5__From;
-	this->soap->header->wsa5__ReplyTo = wsa5__ReplyTo;
-	this->soap->header->wsa5__FaultTo = wsa5__FaultTo;
-	this->soap->header->wsa5__To = wsa5__To;
-	this->soap->header->wsa5__Action = wsa5__Action;
-	this->soap->header->chan__ChannelInstance = chan__ChannelInstance;
-	this->soap->header->wsdd__AppSequence = wsdd__AppSequence;
-	this->soap->header->wsse__Security = wsse__Security;
-	this->soap->header->subscriptionID = subscriptionID;
+void ImagingBindingService::soap_header(char *wsa5__MessageID, struct wsa5__RelatesToType *wsa5__RelatesTo, struct wsa5__EndpointReferenceType *wsa5__From, struct wsa5__EndpointReferenceType *wsa5__ReplyTo, struct wsa5__EndpointReferenceType *wsa5__FaultTo, char *wsa5__To, char *wsa5__Action, struct chan__ChannelInstanceType *chan__ChannelInstance, struct wsdd__AppSequenceType *wsdd__AppSequence, struct _wsse__Security *wsse__Security, char *SubscriptionId)
+{
+    ::soap_header(this->soap);
+    this->soap->header->wsa5__MessageID = wsa5__MessageID;
+    this->soap->header->wsa5__RelatesTo = wsa5__RelatesTo;
+    this->soap->header->wsa5__From = wsa5__From;
+    this->soap->header->wsa5__ReplyTo = wsa5__ReplyTo;
+    this->soap->header->wsa5__FaultTo = wsa5__FaultTo;
+    this->soap->header->wsa5__To = wsa5__To;
+    this->soap->header->wsa5__Action = wsa5__Action;
+    this->soap->header->chan__ChannelInstance = chan__ChannelInstance;
+    this->soap->header->wsdd__AppSequence = wsdd__AppSequence;
+    this->soap->header->wsse__Security = wsse__Security;
+    this->soap->header->SubscriptionId = SubscriptionId;
 }
 
 ::SOAP_ENV__Header *ImagingBindingService::soap_header()
-{	return this->soap->header;
+{
+    return this->soap->header;
 }
 
 #ifndef WITH_NOIO
 int ImagingBindingService::run(int port)
-{	if (!soap_valid_socket(this->soap->master) && !soap_valid_socket(this->bind(NULL, port, 100)))
-		return this->soap->error;
-	for (;;)
-	{	if (!soap_valid_socket(this->accept()))
-		{	if (this->soap->errnum == 0) // timeout?
-				this->soap->error = SOAP_OK;
-			break;
-		}
-		if (this->serve())
-			break;
-		this->destroy();
-	}
-	return this->soap->error;
+{
+    if (!soap_valid_socket(this->soap->master) && !soap_valid_socket(this->bind(NULL, port, 100)))
+        return this->soap->error;
+    for (;;)
+    {
+        if (!soap_valid_socket(this->accept()))
+        {
+            if (this->soap->errnum == 0) // timeout?
+                this->soap->error = SOAP_OK;
+            break;
+        }
+        if (this->serve())
+            break;
+        this->destroy();
+    }
+    return this->soap->error;
 }
 
 #if defined(WITH_OPENSSL) || defined(WITH_GNUTLS)
 int ImagingBindingService::ssl_run(int port)
-{	if (!soap_valid_socket(this->soap->master) && !soap_valid_socket(this->bind(NULL, port, 100)))
-		return this->soap->error;
-	for (;;)
-	{	if (!soap_valid_socket(this->accept()))
-		{	if (this->soap->errnum == 0) // timeout?
-				this->soap->error = SOAP_OK;
-			break;
-		}
-		if (this->ssl_accept() || this->serve())
-			break;
-		this->destroy();
-	}
-	return this->soap->error;
+{
+    if (!soap_valid_socket(this->soap->master) && !soap_valid_socket(this->bind(NULL, port, 100)))
+        return this->soap->error;
+    for (;;)
+    {
+        if (!soap_valid_socket(this->accept()))
+        {
+            if (this->soap->errnum == 0) // timeout?
+                this->soap->error = SOAP_OK;
+            break;
+        }
+        if (this->ssl_accept() || this->serve())
+            break;
+        this->destroy();
+    }
+    return this->soap->error;
 }
 #endif
 
 SOAP_SOCKET ImagingBindingService::bind(const char *host, int port, int backlog)
-{	return soap_bind(this->soap, host, port, backlog);
+{
+    return soap_bind(this->soap, host, port, backlog);
 }
 
 SOAP_SOCKET ImagingBindingService::accept()
-{	return soap_accept(this->soap);
+{
+    return soap_accept(this->soap);
 }
 
 #if defined(WITH_OPENSSL) || defined(WITH_GNUTLS)
 int ImagingBindingService::ssl_accept()
-{	return soap_ssl_accept(this->soap);
+{
+    return soap_ssl_accept(this->soap);
 }
 #endif
 #endif
@@ -268,35 +302,36 @@ int ImagingBindingService::ssl_accept()
 int ImagingBindingService::serve()
 {
 #ifndef WITH_FASTCGI
-	this->soap->keep_alive = this->soap->max_keep_alive + 1;
+    this->soap->keep_alive = this->soap->max_keep_alive + 1;
 #endif
-	do
-	{
+    do
+    {
 #ifndef WITH_FASTCGI
-		if (this->soap->keep_alive > 0 && this->soap->max_keep_alive > 0)
-			this->soap->keep_alive--;
+        if (this->soap->keep_alive > 0 && this->soap->max_keep_alive > 0)
+            this->soap->keep_alive--;
 #endif
-		if (soap_begin_serve(this->soap))
-		{	if (this->soap->error >= SOAP_STOP)
-				continue;
-			return this->soap->error;
-		}
-		if ((dispatch() || (this->soap->fserveloop && this->soap->fserveloop(this->soap))) && this->soap->error && this->soap->error < SOAP_STOP)
-		{
+        if (soap_begin_serve(this->soap))
+        {
+            if (this->soap->error >= SOAP_STOP)
+                continue;
+            return this->soap->error;
+        }
+        if ((dispatch() || (this->soap->fserveloop && this->soap->fserveloop(this->soap))) && this->soap->error && this->soap->error < SOAP_STOP)
+        {
 #ifdef WITH_FASTCGI
-			soap_send_fault(this->soap);
+            soap_send_fault(this->soap);
 #else
-			return soap_send_fault(this->soap);
+            return soap_send_fault(this->soap);
 #endif
-		}
+        }
 #ifdef WITH_FASTCGI
-		soap_destroy(this->soap);
-		soap_end(this->soap);
-	} while (1);
+        soap_destroy(this->soap);
+        soap_end(this->soap);
+    } while (1);
 #else
-	} while (this->soap->keep_alive);
+    } while (this->soap->keep_alive);
 #endif
-	return SOAP_OK;
+    return SOAP_OK;
 }
 
 static int serve___onvifImg__GetServiceCapabilities(struct soap*, ImagingBindingService*);
@@ -312,487 +347,510 @@ static int serve___onvifImg__GetCurrentPreset(struct soap*, ImagingBindingServic
 static int serve___onvifImg__SetCurrentPreset(struct soap*, ImagingBindingService*);
 
 int ImagingBindingService::dispatch()
-{	return dispatch(this->soap);
+{
+    return dispatch(this->soap);
 }
 
 int ImagingBindingService::dispatch(struct soap* soap)
 {
-	ImagingBindingService_init(soap->imode, soap->omode);
+    ImagingBindingService_init(soap->imode, soap->omode);
 
-	soap_peek_element(soap);
-	if (!soap_match_tag(soap, soap->tag, "onvifImg:GetServiceCapabilities"))
-		return serve___onvifImg__GetServiceCapabilities(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifImg:GetImagingSettings"))
-		return serve___onvifImg__GetImagingSettings(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifImg:SetImagingSettings"))
-		return serve___onvifImg__SetImagingSettings(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifImg:GetOptions"))
-		return serve___onvifImg__GetOptions(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifImg:Move"))
-		return serve___onvifImg__Move(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifImg:Stop"))
-		return serve___onvifImg__Stop(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifImg:GetStatus"))
-		return serve___onvifImg__GetStatus(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifImg:GetMoveOptions"))
-		return serve___onvifImg__GetMoveOptions(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifImg:GetPresets"))
-		return serve___onvifImg__GetPresets(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifImg:GetCurrentPreset"))
-		return serve___onvifImg__GetCurrentPreset(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifImg:SetCurrentPreset"))
-		return serve___onvifImg__SetCurrentPreset(soap, this);
-	return soap->error = SOAP_NO_METHOD;
+    soap_peek_element(soap);
+    if (!soap_match_tag(soap, soap->tag, "onvifImg:GetServiceCapabilities"))
+        return serve___onvifImg__GetServiceCapabilities(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifImg:GetImagingSettings"))
+        return serve___onvifImg__GetImagingSettings(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifImg:SetImagingSettings"))
+        return serve___onvifImg__SetImagingSettings(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifImg:GetOptions"))
+        return serve___onvifImg__GetOptions(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifImg:Move"))
+        return serve___onvifImg__Move(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifImg:Stop"))
+        return serve___onvifImg__Stop(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifImg:GetStatus"))
+        return serve___onvifImg__GetStatus(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifImg:GetMoveOptions"))
+        return serve___onvifImg__GetMoveOptions(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifImg:GetPresets"))
+        return serve___onvifImg__GetPresets(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifImg:GetCurrentPreset"))
+        return serve___onvifImg__GetCurrentPreset(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifImg:SetCurrentPreset"))
+        return serve___onvifImg__SetCurrentPreset(soap, this);
+    return soap->error = SOAP_NO_METHOD;
 }
 
 static int serve___onvifImg__GetServiceCapabilities(struct soap *soap, ImagingBindingService *service)
-{	struct __onvifImg__GetServiceCapabilities soap_tmp___onvifImg__GetServiceCapabilities;
-	_onvifImg__GetServiceCapabilitiesResponse onvifImg__GetServiceCapabilitiesResponse;
-	onvifImg__GetServiceCapabilitiesResponse.soap_default(soap);
-	soap_default___onvifImg__GetServiceCapabilities(soap, &soap_tmp___onvifImg__GetServiceCapabilities);
-	if (!soap_get___onvifImg__GetServiceCapabilities(soap, &soap_tmp___onvifImg__GetServiceCapabilities, "-onvifImg:GetServiceCapabilities", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->GetServiceCapabilities(soap_tmp___onvifImg__GetServiceCapabilities.onvifImg__GetServiceCapabilities, onvifImg__GetServiceCapabilitiesResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifImg__GetServiceCapabilitiesResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifImg__GetServiceCapabilitiesResponse.soap_put(soap, "onvifImg:GetServiceCapabilitiesResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifImg__GetServiceCapabilitiesResponse.soap_put(soap, "onvifImg:GetServiceCapabilitiesResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifImg__GetServiceCapabilities soap_tmp___onvifImg__GetServiceCapabilities;
+    _onvifImg__GetServiceCapabilitiesResponse onvifImg__GetServiceCapabilitiesResponse;
+    onvifImg__GetServiceCapabilitiesResponse.soap_default(soap);
+    soap_default___onvifImg__GetServiceCapabilities(soap, &soap_tmp___onvifImg__GetServiceCapabilities);
+    if (!soap_get___onvifImg__GetServiceCapabilities(soap, &soap_tmp___onvifImg__GetServiceCapabilities, "-onvifImg:GetServiceCapabilities", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->GetServiceCapabilities(soap_tmp___onvifImg__GetServiceCapabilities.onvifImg__GetServiceCapabilities, onvifImg__GetServiceCapabilitiesResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifImg__GetServiceCapabilitiesResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifImg__GetServiceCapabilitiesResponse.soap_put(soap, "onvifImg:GetServiceCapabilitiesResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifImg__GetServiceCapabilitiesResponse.soap_put(soap, "onvifImg:GetServiceCapabilitiesResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifImg__GetImagingSettings(struct soap *soap, ImagingBindingService *service)
-{	struct __onvifImg__GetImagingSettings soap_tmp___onvifImg__GetImagingSettings;
-	_onvifImg__GetImagingSettingsResponse onvifImg__GetImagingSettingsResponse;
-	onvifImg__GetImagingSettingsResponse.soap_default(soap);
-	soap_default___onvifImg__GetImagingSettings(soap, &soap_tmp___onvifImg__GetImagingSettings);
-	if (!soap_get___onvifImg__GetImagingSettings(soap, &soap_tmp___onvifImg__GetImagingSettings, "-onvifImg:GetImagingSettings", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->GetImagingSettings(soap_tmp___onvifImg__GetImagingSettings.onvifImg__GetImagingSettings, onvifImg__GetImagingSettingsResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifImg__GetImagingSettingsResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifImg__GetImagingSettingsResponse.soap_put(soap, "onvifImg:GetImagingSettingsResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifImg__GetImagingSettingsResponse.soap_put(soap, "onvifImg:GetImagingSettingsResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifImg__GetImagingSettings soap_tmp___onvifImg__GetImagingSettings;
+    _onvifImg__GetImagingSettingsResponse onvifImg__GetImagingSettingsResponse;
+    onvifImg__GetImagingSettingsResponse.soap_default(soap);
+    soap_default___onvifImg__GetImagingSettings(soap, &soap_tmp___onvifImg__GetImagingSettings);
+    if (!soap_get___onvifImg__GetImagingSettings(soap, &soap_tmp___onvifImg__GetImagingSettings, "-onvifImg:GetImagingSettings", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->GetImagingSettings(soap_tmp___onvifImg__GetImagingSettings.onvifImg__GetImagingSettings, onvifImg__GetImagingSettingsResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifImg__GetImagingSettingsResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifImg__GetImagingSettingsResponse.soap_put(soap, "onvifImg:GetImagingSettingsResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifImg__GetImagingSettingsResponse.soap_put(soap, "onvifImg:GetImagingSettingsResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifImg__SetImagingSettings(struct soap *soap, ImagingBindingService *service)
-{	struct __onvifImg__SetImagingSettings soap_tmp___onvifImg__SetImagingSettings;
-	_onvifImg__SetImagingSettingsResponse onvifImg__SetImagingSettingsResponse;
-	onvifImg__SetImagingSettingsResponse.soap_default(soap);
-	soap_default___onvifImg__SetImagingSettings(soap, &soap_tmp___onvifImg__SetImagingSettings);
-	if (!soap_get___onvifImg__SetImagingSettings(soap, &soap_tmp___onvifImg__SetImagingSettings, "-onvifImg:SetImagingSettings", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->SetImagingSettings(soap_tmp___onvifImg__SetImagingSettings.onvifImg__SetImagingSettings, onvifImg__SetImagingSettingsResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifImg__SetImagingSettingsResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifImg__SetImagingSettingsResponse.soap_put(soap, "onvifImg:SetImagingSettingsResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifImg__SetImagingSettingsResponse.soap_put(soap, "onvifImg:SetImagingSettingsResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifImg__SetImagingSettings soap_tmp___onvifImg__SetImagingSettings;
+    _onvifImg__SetImagingSettingsResponse onvifImg__SetImagingSettingsResponse;
+    onvifImg__SetImagingSettingsResponse.soap_default(soap);
+    soap_default___onvifImg__SetImagingSettings(soap, &soap_tmp___onvifImg__SetImagingSettings);
+    if (!soap_get___onvifImg__SetImagingSettings(soap, &soap_tmp___onvifImg__SetImagingSettings, "-onvifImg:SetImagingSettings", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->SetImagingSettings(soap_tmp___onvifImg__SetImagingSettings.onvifImg__SetImagingSettings, onvifImg__SetImagingSettingsResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifImg__SetImagingSettingsResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifImg__SetImagingSettingsResponse.soap_put(soap, "onvifImg:SetImagingSettingsResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifImg__SetImagingSettingsResponse.soap_put(soap, "onvifImg:SetImagingSettingsResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifImg__GetOptions(struct soap *soap, ImagingBindingService *service)
-{	struct __onvifImg__GetOptions soap_tmp___onvifImg__GetOptions;
-	_onvifImg__GetOptionsResponse onvifImg__GetOptionsResponse;
-	onvifImg__GetOptionsResponse.soap_default(soap);
-	soap_default___onvifImg__GetOptions(soap, &soap_tmp___onvifImg__GetOptions);
-	if (!soap_get___onvifImg__GetOptions(soap, &soap_tmp___onvifImg__GetOptions, "-onvifImg:GetOptions", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->GetOptions(soap_tmp___onvifImg__GetOptions.onvifImg__GetOptions, onvifImg__GetOptionsResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifImg__GetOptionsResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifImg__GetOptionsResponse.soap_put(soap, "onvifImg:GetOptionsResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifImg__GetOptionsResponse.soap_put(soap, "onvifImg:GetOptionsResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifImg__GetOptions soap_tmp___onvifImg__GetOptions;
+    _onvifImg__GetOptionsResponse onvifImg__GetOptionsResponse;
+    onvifImg__GetOptionsResponse.soap_default(soap);
+    soap_default___onvifImg__GetOptions(soap, &soap_tmp___onvifImg__GetOptions);
+    if (!soap_get___onvifImg__GetOptions(soap, &soap_tmp___onvifImg__GetOptions, "-onvifImg:GetOptions", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->GetOptions(soap_tmp___onvifImg__GetOptions.onvifImg__GetOptions, onvifImg__GetOptionsResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifImg__GetOptionsResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifImg__GetOptionsResponse.soap_put(soap, "onvifImg:GetOptionsResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifImg__GetOptionsResponse.soap_put(soap, "onvifImg:GetOptionsResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifImg__Move(struct soap *soap, ImagingBindingService *service)
-{	struct __onvifImg__Move soap_tmp___onvifImg__Move;
-	_onvifImg__MoveResponse onvifImg__MoveResponse;
-	onvifImg__MoveResponse.soap_default(soap);
-	soap_default___onvifImg__Move(soap, &soap_tmp___onvifImg__Move);
-	if (!soap_get___onvifImg__Move(soap, &soap_tmp___onvifImg__Move, "-onvifImg:Move", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->Move(soap_tmp___onvifImg__Move.onvifImg__Move, onvifImg__MoveResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifImg__MoveResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifImg__MoveResponse.soap_put(soap, "onvifImg:MoveResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifImg__MoveResponse.soap_put(soap, "onvifImg:MoveResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifImg__Move soap_tmp___onvifImg__Move;
+    _onvifImg__MoveResponse onvifImg__MoveResponse;
+    onvifImg__MoveResponse.soap_default(soap);
+    soap_default___onvifImg__Move(soap, &soap_tmp___onvifImg__Move);
+    if (!soap_get___onvifImg__Move(soap, &soap_tmp___onvifImg__Move, "-onvifImg:Move", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->Move(soap_tmp___onvifImg__Move.onvifImg__Move, onvifImg__MoveResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifImg__MoveResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifImg__MoveResponse.soap_put(soap, "onvifImg:MoveResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifImg__MoveResponse.soap_put(soap, "onvifImg:MoveResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifImg__Stop(struct soap *soap, ImagingBindingService *service)
-{	struct __onvifImg__Stop soap_tmp___onvifImg__Stop;
-	_onvifImg__StopResponse onvifImg__StopResponse;
-	onvifImg__StopResponse.soap_default(soap);
-	soap_default___onvifImg__Stop(soap, &soap_tmp___onvifImg__Stop);
-	if (!soap_get___onvifImg__Stop(soap, &soap_tmp___onvifImg__Stop, "-onvifImg:Stop", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->Stop(soap_tmp___onvifImg__Stop.onvifImg__Stop, onvifImg__StopResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifImg__StopResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifImg__StopResponse.soap_put(soap, "onvifImg:StopResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifImg__StopResponse.soap_put(soap, "onvifImg:StopResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifImg__Stop soap_tmp___onvifImg__Stop;
+    _onvifImg__StopResponse onvifImg__StopResponse;
+    onvifImg__StopResponse.soap_default(soap);
+    soap_default___onvifImg__Stop(soap, &soap_tmp___onvifImg__Stop);
+    if (!soap_get___onvifImg__Stop(soap, &soap_tmp___onvifImg__Stop, "-onvifImg:Stop", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->Stop(soap_tmp___onvifImg__Stop.onvifImg__Stop, onvifImg__StopResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifImg__StopResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifImg__StopResponse.soap_put(soap, "onvifImg:StopResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifImg__StopResponse.soap_put(soap, "onvifImg:StopResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifImg__GetStatus(struct soap *soap, ImagingBindingService *service)
-{	struct __onvifImg__GetStatus soap_tmp___onvifImg__GetStatus;
-	_onvifImg__GetStatusResponse onvifImg__GetStatusResponse;
-	onvifImg__GetStatusResponse.soap_default(soap);
-	soap_default___onvifImg__GetStatus(soap, &soap_tmp___onvifImg__GetStatus);
-	if (!soap_get___onvifImg__GetStatus(soap, &soap_tmp___onvifImg__GetStatus, "-onvifImg:GetStatus", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->GetStatus(soap_tmp___onvifImg__GetStatus.onvifImg__GetStatus, onvifImg__GetStatusResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifImg__GetStatusResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifImg__GetStatusResponse.soap_put(soap, "onvifImg:GetStatusResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifImg__GetStatusResponse.soap_put(soap, "onvifImg:GetStatusResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifImg__GetStatus soap_tmp___onvifImg__GetStatus;
+    _onvifImg__GetStatusResponse onvifImg__GetStatusResponse;
+    onvifImg__GetStatusResponse.soap_default(soap);
+    soap_default___onvifImg__GetStatus(soap, &soap_tmp___onvifImg__GetStatus);
+    if (!soap_get___onvifImg__GetStatus(soap, &soap_tmp___onvifImg__GetStatus, "-onvifImg:GetStatus", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->GetStatus(soap_tmp___onvifImg__GetStatus.onvifImg__GetStatus, onvifImg__GetStatusResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifImg__GetStatusResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifImg__GetStatusResponse.soap_put(soap, "onvifImg:GetStatusResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifImg__GetStatusResponse.soap_put(soap, "onvifImg:GetStatusResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifImg__GetMoveOptions(struct soap *soap, ImagingBindingService *service)
-{	struct __onvifImg__GetMoveOptions soap_tmp___onvifImg__GetMoveOptions;
-	_onvifImg__GetMoveOptionsResponse onvifImg__GetMoveOptionsResponse;
-	onvifImg__GetMoveOptionsResponse.soap_default(soap);
-	soap_default___onvifImg__GetMoveOptions(soap, &soap_tmp___onvifImg__GetMoveOptions);
-	if (!soap_get___onvifImg__GetMoveOptions(soap, &soap_tmp___onvifImg__GetMoveOptions, "-onvifImg:GetMoveOptions", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->GetMoveOptions(soap_tmp___onvifImg__GetMoveOptions.onvifImg__GetMoveOptions, onvifImg__GetMoveOptionsResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifImg__GetMoveOptionsResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifImg__GetMoveOptionsResponse.soap_put(soap, "onvifImg:GetMoveOptionsResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifImg__GetMoveOptionsResponse.soap_put(soap, "onvifImg:GetMoveOptionsResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifImg__GetMoveOptions soap_tmp___onvifImg__GetMoveOptions;
+    _onvifImg__GetMoveOptionsResponse onvifImg__GetMoveOptionsResponse;
+    onvifImg__GetMoveOptionsResponse.soap_default(soap);
+    soap_default___onvifImg__GetMoveOptions(soap, &soap_tmp___onvifImg__GetMoveOptions);
+    if (!soap_get___onvifImg__GetMoveOptions(soap, &soap_tmp___onvifImg__GetMoveOptions, "-onvifImg:GetMoveOptions", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->GetMoveOptions(soap_tmp___onvifImg__GetMoveOptions.onvifImg__GetMoveOptions, onvifImg__GetMoveOptionsResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifImg__GetMoveOptionsResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifImg__GetMoveOptionsResponse.soap_put(soap, "onvifImg:GetMoveOptionsResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifImg__GetMoveOptionsResponse.soap_put(soap, "onvifImg:GetMoveOptionsResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifImg__GetPresets(struct soap *soap, ImagingBindingService *service)
-{	struct __onvifImg__GetPresets soap_tmp___onvifImg__GetPresets;
-	_onvifImg__GetPresetsResponse onvifImg__GetPresetsResponse;
-	onvifImg__GetPresetsResponse.soap_default(soap);
-	soap_default___onvifImg__GetPresets(soap, &soap_tmp___onvifImg__GetPresets);
-	if (!soap_get___onvifImg__GetPresets(soap, &soap_tmp___onvifImg__GetPresets, "-onvifImg:GetPresets", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->GetPresets(soap_tmp___onvifImg__GetPresets.onvifImg__GetPresets, onvifImg__GetPresetsResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifImg__GetPresetsResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifImg__GetPresetsResponse.soap_put(soap, "onvifImg:GetPresetsResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifImg__GetPresetsResponse.soap_put(soap, "onvifImg:GetPresetsResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifImg__GetPresets soap_tmp___onvifImg__GetPresets;
+    _onvifImg__GetPresetsResponse onvifImg__GetPresetsResponse;
+    onvifImg__GetPresetsResponse.soap_default(soap);
+    soap_default___onvifImg__GetPresets(soap, &soap_tmp___onvifImg__GetPresets);
+    if (!soap_get___onvifImg__GetPresets(soap, &soap_tmp___onvifImg__GetPresets, "-onvifImg:GetPresets", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->GetPresets(soap_tmp___onvifImg__GetPresets.onvifImg__GetPresets, onvifImg__GetPresetsResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifImg__GetPresetsResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifImg__GetPresetsResponse.soap_put(soap, "onvifImg:GetPresetsResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifImg__GetPresetsResponse.soap_put(soap, "onvifImg:GetPresetsResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifImg__GetCurrentPreset(struct soap *soap, ImagingBindingService *service)
-{	struct __onvifImg__GetCurrentPreset soap_tmp___onvifImg__GetCurrentPreset;
-	_onvifImg__GetCurrentPresetResponse onvifImg__GetCurrentPresetResponse;
-	onvifImg__GetCurrentPresetResponse.soap_default(soap);
-	soap_default___onvifImg__GetCurrentPreset(soap, &soap_tmp___onvifImg__GetCurrentPreset);
-	if (!soap_get___onvifImg__GetCurrentPreset(soap, &soap_tmp___onvifImg__GetCurrentPreset, "-onvifImg:GetCurrentPreset", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->GetCurrentPreset(soap_tmp___onvifImg__GetCurrentPreset.onvifImg__GetCurrentPreset, onvifImg__GetCurrentPresetResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifImg__GetCurrentPresetResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifImg__GetCurrentPresetResponse.soap_put(soap, "onvifImg:GetCurrentPresetResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifImg__GetCurrentPresetResponse.soap_put(soap, "onvifImg:GetCurrentPresetResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifImg__GetCurrentPreset soap_tmp___onvifImg__GetCurrentPreset;
+    _onvifImg__GetCurrentPresetResponse onvifImg__GetCurrentPresetResponse;
+    onvifImg__GetCurrentPresetResponse.soap_default(soap);
+    soap_default___onvifImg__GetCurrentPreset(soap, &soap_tmp___onvifImg__GetCurrentPreset);
+    if (!soap_get___onvifImg__GetCurrentPreset(soap, &soap_tmp___onvifImg__GetCurrentPreset, "-onvifImg:GetCurrentPreset", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->GetCurrentPreset(soap_tmp___onvifImg__GetCurrentPreset.onvifImg__GetCurrentPreset, onvifImg__GetCurrentPresetResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifImg__GetCurrentPresetResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifImg__GetCurrentPresetResponse.soap_put(soap, "onvifImg:GetCurrentPresetResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifImg__GetCurrentPresetResponse.soap_put(soap, "onvifImg:GetCurrentPresetResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifImg__SetCurrentPreset(struct soap *soap, ImagingBindingService *service)
-{	struct __onvifImg__SetCurrentPreset soap_tmp___onvifImg__SetCurrentPreset;
-	_onvifImg__SetCurrentPresetResponse onvifImg__SetCurrentPresetResponse;
-	onvifImg__SetCurrentPresetResponse.soap_default(soap);
-	soap_default___onvifImg__SetCurrentPreset(soap, &soap_tmp___onvifImg__SetCurrentPreset);
-	if (!soap_get___onvifImg__SetCurrentPreset(soap, &soap_tmp___onvifImg__SetCurrentPreset, "-onvifImg:SetCurrentPreset", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->SetCurrentPreset(soap_tmp___onvifImg__SetCurrentPreset.onvifImg__SetCurrentPreset, onvifImg__SetCurrentPresetResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifImg__SetCurrentPresetResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifImg__SetCurrentPresetResponse.soap_put(soap, "onvifImg:SetCurrentPresetResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifImg__SetCurrentPresetResponse.soap_put(soap, "onvifImg:SetCurrentPresetResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifImg__SetCurrentPreset soap_tmp___onvifImg__SetCurrentPreset;
+    _onvifImg__SetCurrentPresetResponse onvifImg__SetCurrentPresetResponse;
+    onvifImg__SetCurrentPresetResponse.soap_default(soap);
+    soap_default___onvifImg__SetCurrentPreset(soap, &soap_tmp___onvifImg__SetCurrentPreset);
+    if (!soap_get___onvifImg__SetCurrentPreset(soap, &soap_tmp___onvifImg__SetCurrentPreset, "-onvifImg:SetCurrentPreset", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->SetCurrentPreset(soap_tmp___onvifImg__SetCurrentPreset.onvifImg__SetCurrentPreset, onvifImg__SetCurrentPresetResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifImg__SetCurrentPresetResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifImg__SetCurrentPresetResponse.soap_put(soap, "onvifImg:SetCurrentPresetResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifImg__SetCurrentPresetResponse.soap_put(soap, "onvifImg:SetCurrentPresetResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 /* End of server object code */

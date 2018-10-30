@@ -237,7 +237,7 @@ void QnCamDisplay::addVideoRenderer(int channelCount, QnAbstractRenderer* vw, bo
     {
         if (!m_display[i])
         {
-            m_display[i] = new QnVideoStreamDisplay(canDownscale, i);
+            m_display[i] = new QnVideoStreamDisplay(m_resource, canDownscale, i);
             m_channelsCount++;
             if (m_forceMtDecoding)
                 m_display[i]->setMTDecoding(true);

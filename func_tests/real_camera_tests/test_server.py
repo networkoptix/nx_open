@@ -4,6 +4,7 @@ import logging
 import pytest
 import oyaml as yaml
 
+from framework.mediaserver_api import MediaserverApiRequestError
 from . import execution
 
 _logger = logging.getLogger(__name__)
@@ -34,7 +35,13 @@ def test_cameras(rct_options, one_vm, one_licensed_mediaserver, artifacts_dir):
         stand.run_all_stages(rct_options.camera_cycle_delay, rct_options.server_stage_delay)
     finally:
         save_result('module_information', stand.server_information)
-        save_result('all_cameras', stand.all_cameras(verbose=True))
         save_result('test_results', stand.report)
+        for _ in range(10):
+            try:
+                save_result('all_cameras', stand.all_cameras(verbose=True))
+            except MediaserverApiRequestError:
+                pass
+            else:
+                break
 
     assert stand.is_successful

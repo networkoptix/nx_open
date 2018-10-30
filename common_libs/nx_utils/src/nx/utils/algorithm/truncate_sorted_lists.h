@@ -22,9 +22,9 @@ namespace nx::utils::algorithm {
  *   and returning a boolean. Must be consistent with source lists sort order.
  * @returns Total number of items in truncated lists.
  */
-template<class ListOfSortedLists, class LessPredicate>
+template<typename ListOfSortedLists, typename LessPredicate>
 int truncate_sorted_lists(
-    ListOfSortedLists& sortedLists,
+    ListOfSortedLists&& sortedLists,
     int totalLimit,
     LessPredicate lessItem)
 {
@@ -32,9 +32,9 @@ int truncate_sorted_lists(
     using SortedList = std::remove_pointer_t<SortedListsItem>;
 
     const auto deref =
-        [](auto item)
+        [](auto&& item) -> auto&
         {
-            if constexpr (std::is_pointer_v<decltype(item)>)
+            if constexpr (std::is_pointer_v<std::remove_reference_t<decltype(item)>>)
                 return *item;
             else
                 return item;
@@ -78,7 +78,7 @@ int truncate_sorted_lists(
 
     for (auto& sortedListsItem: sortedLists)
     {
-        auto list = deref(sortedListsItem);
+        auto& list = deref(sortedListsItem);
         if (list.empty())
             continue;
 
@@ -141,14 +141,14 @@ int truncate_sorted_lists(
  * @param sortOrder How source sorted lists are sorted.
  * @returns Total number of items in truncated lists.
  */
-template<class ListOfSortedLists, class SortFieldGetter>
+template<typename ListOfSortedLists, typename SortFieldGetter>
 int truncate_sorted_lists(
-    ListOfSortedLists& sortedLists,
+    ListOfSortedLists&& sortedLists,
     SortFieldGetter sortFieldGetter,
     int totalLimit,
     Qt::SortOrder sortOrder = Qt::AscendingOrder)
 {
-    using SortedList = typename std::remove_reference<decltype(*sortedLists.begin())>::type;
+    using SortedList = std::remove_pointer_t<std::remove_reference_t<decltype(*sortedLists.begin())>>;
     using Item = typename SortedList::value_type;
 
     using Less = std::function<bool(const Item&, const Item&)>;
@@ -156,7 +156,7 @@ int truncate_sorted_lists(
         ? Less([key = sortFieldGetter](const Item& l, const Item& r) { return key(l) < key(r); })
         : Less([key = sortFieldGetter](const Item& l, const Item& r) { return key(l) > key(r); });
 
-    return truncate_sorted_lists(sortedLists, totalLimit, less);
+    return truncate_sorted_lists(std::forward<ListOfSortedLists>(sortedLists), totalLimit, less);
 };
 
 /**
@@ -173,15 +173,15 @@ int truncate_sorted_lists(
  * @param sortOrder How source sorted lists are sorted.
  * @returns Total number of items in truncated lists.
  */
-template<class ListOfSortedLists>
+template<typename ListOfSortedLists>
 int truncate_sorted_lists(
-    ListOfSortedLists& sortedLists,
+    ListOfSortedLists&& sortedLists,
     int totalLimit,
     Qt::SortOrder sortOrder = Qt::AscendingOrder)
 {
-    using SortedList = typename std::remove_reference<decltype(*sortedLists.begin())>::type;
+    using SortedList = std::remove_pointer_t<std::remove_reference_t<decltype(*sortedLists.begin())>>;
 
-    return truncate_sorted_lists(sortedLists,
+    return truncate_sorted_lists(std::forward<ListOfSortedLists>(sortedLists),
         [](const typename SortedList::value_type& value) { return value; },
         totalLimit, sortOrder);
 }

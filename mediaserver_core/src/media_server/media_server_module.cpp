@@ -311,16 +311,17 @@ void QnMediaServerModule::stopStorages()
 
 void QnMediaServerModule::stop()
 {
+    m_upnpDeviceSearcher->pleaseStop();
+    resourceDiscoveryManager()->pleaseStop();
+
     stopStorages();
     stopLongRunnables();
     m_recordingManager->stop();
     m_videoCameraPool->stop();
     m_serverConnector->stop();
     m_statusWatcher->stop();
-
-    m_upnpDeviceSearcher->pleaseStop();
-
     resourceDiscoveryManager()->stop();
+
     m_licenseWatcher->stop();
 }
 

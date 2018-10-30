@@ -1,10 +1,11 @@
 #include "connector_factory.h"
 
+#include <nx/network/socket_global.h>
+
 #include "cross_nat_connector.h"
-#include "nx/network/socket_global.h"
-#include "udp/connector.h"
-#include "tcp/direct_endpoint_connector.h"
 #include "relay/relay_connector.h"
+#include "tcp/direct_endpoint_connector.h"
+#include "udp/connector.h"
 
 namespace nx {
 namespace network {
@@ -96,7 +97,9 @@ CrossNatConnectorFactory& CrossNatConnectorFactory::instance()
 std::unique_ptr<AbstractCrossNatConnector> CrossNatConnectorFactory::defaultFactoryFunction(
     const AddressEntry& address)
 {
-    return std::make_unique<CrossNatConnector>(address);
+    return std::make_unique<CrossNatConnector>(
+        &SocketGlobals::cloud(),
+        address);
 }
 
 } // namespace cloud
