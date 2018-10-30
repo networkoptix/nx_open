@@ -646,7 +646,7 @@ void QnVirtualCameraResource::setSupportedAnalyticsItemTypeIds(
     supportedItemMap.insert(std::move(engineId), std::move(supportedItems));
 
     serialized = QString::fromUtf8(QJson::serialized(supportedItemMap));
-    setProperty(kSupportedAnalyticsEventsProperty, serialized);
+    setProperty(propertyName, serialized);
 }
 
 QMap<QnUuid, QSet<QString>> QnVirtualCameraResource::supportedAnalyticsItemTypeIds(
