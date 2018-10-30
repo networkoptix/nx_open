@@ -10,6 +10,7 @@
 #include <nx/mediaserver/analytics/frame_converter.h>
 #include <nx/mediaserver/analytics/data_packet_adapter.h>
 #include <nx/mediaserver/analytics/debug_helpers.h>
+#include <nx/mediaserver/analytics/event_rule_watcher.h>
 #include <nx/mediaserver/sdk_support/utils.h>
 
 #include <nx/utils/log/log.h>
@@ -26,6 +27,7 @@ DeviceAnalyticsContext::DeviceAnalyticsContext(
     m_device(device)
 {
     subscribeToDeviceChanges();
+    subscribeToRulesChanges();
 }
 
 bool DeviceAnalyticsContext::isEngineAlreadyBound(
@@ -231,6 +233,18 @@ void DeviceAnalyticsContext::at_devicePropertyChanged(
     }
 }
 
+void DeviceAnalyticsContext::at_rulesUpdated(const QSet<QnUuid>& affectedResources)
+{
+    if (!affectedResources.contains(m_device->getId()))
+        return;
+
+    for (auto& entry: m_bindings)
+    {
+        auto& binding = entry.second;
+        binding->updateNeededMetadataTypes();
+    }
+}
+
 void DeviceAnalyticsContext::subscribeToDeviceChanges()
 {
     connect(
@@ -248,6 +262,14 @@ void DeviceAnalyticsContext::subscribeToDeviceChanges()
     connect(
         m_device, &QnResource::propertyChanged,
         this, &DeviceAnalyticsContext::at_devicePropertyChanged);
+}
+
+void DeviceAnalyticsContext::subscribeToRulesChanges()
+{
+    auto ruleWatcher = serverModule()->analyticsEventRuleWatcher();
+    connect(
+        ruleWatcher, &EventRuleWatcher::rulesUpdated,
+        this, &DeviceAnalyticsContext::at_rulesUpdated);
 }
 
 bool DeviceAnalyticsContext::isDeviceAlive() const

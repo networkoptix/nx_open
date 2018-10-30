@@ -40,6 +40,7 @@ public:
     bool startAnalytics(const QVariantMap& settings);
     void stopAnalytics();
     bool restartAnalytics(const QVariantMap& settings);
+    bool updateNeededMetadataTypes();
 
     QVariantMap getSettings() const;
     void setSettings(const QVariantMap& settings);

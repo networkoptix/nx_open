@@ -46,9 +46,11 @@ public:
 private:
     void at_deviceUpdated(const QnResourcePtr& device);
     void at_devicePropertyChanged(const QnResourcePtr& device, const QString& propertyName);
+    void at_rulesUpdated(const QSet<QnUuid>& affectedResources);
 
 private:
     void subscribeToDeviceChanges();
+    void subscribeToRulesChanges();
 
     bool isDeviceAlive() const;
     void updateSupportedFrameTypes();

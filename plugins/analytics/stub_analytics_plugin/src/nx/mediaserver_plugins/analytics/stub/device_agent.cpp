@@ -167,7 +167,8 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/
     if (ini().generateEvents)
     {
         NX_PRINT << "Starting event generation thread";
-        m_thread.reset(new std::thread(metadataDigger));
+        if (!m_thread)
+            m_thread.reset(new std::thread(metadataDigger));
     }
 
     NX_OUTPUT << __func__ << "() END -> noError";

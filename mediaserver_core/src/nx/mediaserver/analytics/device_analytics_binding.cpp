@@ -19,6 +19,7 @@
 
 #include <nx/mediaserver/analytics/data_packet_adapter.h>
 #include <nx/mediaserver/analytics/debug_helpers.h>
+#include <nx/mediaserver/analytics/event_rule_watcher.h>
 #include <nx/mediaserver/sdk_support/utils.h>
 #include <nx/mediaserver/sdk_support/traits.h>
 #include <nx/mediaserver/resource/analytics_engine_resource.h>
@@ -36,6 +37,15 @@ static const int kMaxQueueSize = 100;
 
 QSet<QString> supportedObjectTypes(const DeviceAgentManifest& manifest)
 {
+    auto result = manifest.supportedObjectTypeIds.toSet();
+    for (const auto& objectType : manifest.objectTypes)
+        result.insert(objectType.id);
+
+    return result;
+}
+
+QSet<QString> supportedEventTypes(const DeviceAgentManifest& manifest)
+{
     auto result = manifest.supportedEventTypeIds.toSet();
     for (const auto& eventType: manifest.eventTypes)
         result.insert(eventType.id);
@@ -43,11 +53,37 @@ QSet<QString> supportedObjectTypes(const DeviceAgentManifest& manifest)
     return result;
 }
 
-QSet<QString> supportedEventTypes(const DeviceAgentManifest& manifest)
+sdk_support::UniquePtr<CommonMetadataTypes> neededMetadataTypes(
+    QnMediaServerModule* serverModule,
+    const QnVirtualCameraResourcePtr& device,
+    const sdk_support::SharedPtr<DeviceAgent>& deviceAgent)
 {
-    auto result = manifest.supportedObjectTypeIds.toSet();
-    for (const auto& objectType : manifest.objectTypes)
-        result.insert(objectType.id);
+    const auto deviceAgentManifest = sdk_support::manifest<DeviceAgentManifest>(deviceAgent);
+    if (!deviceAgentManifest)
+    {
+        NX_ASSERT(false, "Got invlaid device agent manifest");
+        return sdk_support::UniquePtr<CommonMetadataTypes>();
+    }
+
+    const auto eventTypes = supportedEventTypes(*deviceAgentManifest);
+    const auto objectTypes = supportedObjectTypes(*deviceAgentManifest);
+
+    const auto ruleWatcher = serverModule->analyticsEventRuleWatcher();
+    if (!ruleWatcher)
+    {
+        NX_ASSERT(false, "Can't access analytics rule watcher");
+        return sdk_support::UniquePtr<CommonMetadataTypes>();
+    }
+
+    auto neededEventTypes = ruleWatcher->watchedEventsForResource(device->getId());
+    neededEventTypes.intersect(eventTypes);
+
+    sdk_support::UniquePtr<CommonMetadataTypes> result(new CommonMetadataTypes());
+    for (const auto& eventTypeId: neededEventTypes)
+        result->addEventType(eventTypeId.toStdString());
+
+    for (const auto& objectTypeId: objectTypes)
+        result->addObjectType(objectTypeId.toStdString());
 
     return result;
 }
@@ -90,6 +126,25 @@ bool DeviceAnalyticsBinding::restartAnalytics(const QVariantMap& settings)
     stopAnalyticsUnsafe();
     m_sdkDeviceAgent.reset();
     return startAnalyticsUnsafe(settings);
+}
+
+bool DeviceAnalyticsBinding::updateNeededMetadataTypes()
+{
+    QnMutexLocker lock(&m_mutex);
+    if (!m_sdkDeviceAgent)
+    {
+        NX_DEBUG(
+            this,
+            "There is no SDK device agent for device %1 (%2), and engine %3 (%4)",
+            m_device->getUserDefinedName(), m_device->getId(),
+            m_engine->getName(), m_engine->getId());
+
+        return true;
+    }
+
+    const auto metadataTypes = neededMetadataTypes(serverModule(), m_device, m_sdkDeviceAgent);
+    const auto error = m_sdkDeviceAgent->setNeededMetadataTypes(metadataTypes.get());
+    return error == nx::sdk::Error::noError;
 }
 
 bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
@@ -154,10 +209,11 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
 
     if (!m_started)
     {
-        // TODO: #dmishin Pass event list (or remove it from SDK API).
-        sdk_support::UniquePtr<nx::sdk::analytics::IMetadataTypes> metadataTypes(
-            new nx::sdk::analytics::CommonMetadataTypes());
-        auto error = m_sdkDeviceAgent->setNeededMetadataTypes(metadataTypes.get());
+        const auto metadataTypes = neededMetadataTypes(
+            serverModule(),
+            m_device,
+            m_sdkDeviceAgent);
+        const auto error = m_sdkDeviceAgent->setNeededMetadataTypes(metadataTypes.get());
         m_started = error == nx::sdk::Error::noError;
     }
 
@@ -471,7 +527,10 @@ bool DeviceAnalyticsBinding::updateDescriptorsWithManifest(
             pluginManifest.id, manifest.groups));
 
     m_device->setSupportedAnalyticsEventTypeIds(m_engine->getId(), supportedEventTypes(manifest));
-    m_device->setSupportedAnalyticsObjectTypeIds(m_engine->getId(), supportedObjectTypes(manifest));
+    m_device->setSupportedAnalyticsObjectTypeIds(
+        m_engine->getId(),
+        supportedObjectTypes(manifest));
+
     m_device->saveParams();
 
     return true;
