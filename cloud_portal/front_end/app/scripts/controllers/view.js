@@ -12,6 +12,16 @@
 
                 $scope.systemReady = false;
                 $scope.hasCameras = false;
+    
+                function delayedUpdateSystemInfo() {
+                    var pollingSystemUpdate = $poll(function () {
+                        return $scope.currentSystem.update();
+                    }, Config.updateInterval);
+        
+                    $scope.$on('$destroy', function (event) {
+                        $poll.cancel(pollingSystemUpdate);
+                    });
+                }
 
                 $rootScope.$emit('nx.layout.footer', {
                     state: true, // hide it
@@ -19,7 +29,7 @@
                 });
     
                 // Check if page is displayed inside an iframe
-                $scope.isInIframe = ($window.location != $window.parent.location) ? true : false;
+                $scope.isInIframe = ($window.location !== $window.parent.location);
                 
                 if ($scope.isInIframe) {
                     $rootScope.$emit('nx.layout.header', {
@@ -66,17 +76,9 @@
                         });
                     });
 
-                function delayedUpdateSystemInfo() {
-                    var pollingSystemUpdate = $poll(function () {
-                        return $scope.currentSystem.update();
-                    }, Config.updateInterval);
+                
 
-                    $scope.$on('$destroy', function (event) {
-                        $poll.cancel(pollingSystemUpdate);
-                    });
-                }
-
-                var cancelSubscription = $scope.$on("unauthorized_" + $routeParams.systemId, function (event, data) {
+                var cancelSubscription = $scope.$on('unauthorized_' + $routeParams.systemId, function (event, data) {
                     dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}",
                         $scope.currentSystem.info.name || L.errorCodes.thisSystem), 'warning');
                     $location.path("/systems");
