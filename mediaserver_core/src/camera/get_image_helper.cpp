@@ -182,7 +182,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
             }
         }
         // Don't look at archive on slow devices (dts based) if noArchiveOnSlowDevices is enabled.
-        if (!video && !(camera && resource->isDtsBased() && request.noArchiveOnSlowDevices))
+        if (!video && !(resource->isDtsBased() && request.ignoreExternalArchive))
         {
 
             openDelegateIfNeeded([&]() { return archiveDelegate->endTime() - 1000 * 100; });
