@@ -15,8 +15,6 @@ namespace nx::vms::common {
 
 using namespace nx::vms::api::analytics;
 
-QString AnalyticsPluginResource::kDeviceAgentSettingsModelProperty("deviceAgentSettingsModel");
-QString AnalyticsPluginResource::kEngineSettingsModelProperty("engineSettingsModel");
 QString AnalyticsPluginResource::kPluginManifestProperty("pluginManifest");
 
 AnalyticsPluginResource::AnalyticsPluginResource(QnCommonModule* commonModule):
@@ -32,27 +30,6 @@ PluginManifest AnalyticsPluginResource::manifest() const
 void AnalyticsPluginResource::setManifest(const PluginManifest& manifest)
 {
     setProperty(kPluginManifestProperty, QString::fromUtf8(QJson::serialized(manifest)));
-}
-
-QJsonObject AnalyticsPluginResource::deviceAgentSettingsModel() const
-{
-    return QJsonDocument::fromJson(
-        getProperty(kDeviceAgentSettingsModelProperty).toUtf8()).object();
-}
-
-void AnalyticsPluginResource::setDeviceAgentSettingsModel(QJsonObject model)
-{
-    setProperty(kDeviceAgentSettingsModelProperty, model);
-}
-
-QJsonObject AnalyticsPluginResource::engineSettingsModel() const
-{
-    return QJsonDocument::fromJson(getProperty(kEngineSettingsModelProperty).toUtf8()).object();
-}
-
-void AnalyticsPluginResource::setEngineSettingsModel(QJsonObject model)
-{
-    setProperty(kEngineSettingsModelProperty, model);
 }
 
 AnalyticsEngineResourceList AnalyticsPluginResource::engines() const

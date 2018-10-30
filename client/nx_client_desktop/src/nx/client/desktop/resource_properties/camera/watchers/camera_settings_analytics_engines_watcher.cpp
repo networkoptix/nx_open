@@ -4,7 +4,6 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
-#include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 
 #include "../redux/camera_settings_dialog_state.h"
@@ -19,39 +18,23 @@ namespace {
 
 AnalyticsEngineInfo engineInfoFromResource(const AnalyticsEngineResourcePtr& engine)
 {
-    const auto plugin = engine->getParentResource().dynamicCast<AnalyticsPluginResource>();
-    if (!plugin)
-        return {};
-
     return AnalyticsEngineInfo {
         engine->getId(),
         engine->getName(),
-        plugin->deviceAgentSettingsModel()
+        engine->manifest().deviceAgentSettingsModel
     };
-}
-
-AnalyticsEngineInfo engineInfoFromResource(const QnResourcePtr& resource)
-{
-    if (const auto engine = resource.dynamicCast<AnalyticsEngineResource>())
-        return engineInfoFromResource(engine);
-    return {};
 }
 
 } // namespace
 
 class CameraSettingsAnalyticsEnginesWatcher::Private: public QObject
 {
-    CameraSettingsAnalyticsEnginesWatcher* q = nullptr;
-
 public:
-    Private(CameraSettingsAnalyticsEnginesWatcher* q);
-
     void updateStore();
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_resourceRemoved(const QnResourcePtr& resource);
     void at_engineNameChanged(const QnResourcePtr& resource);
     void at_enginePropertyChanged(const QnResourcePtr& resource, const QString& key);
-    void at_pluginPropertyChanged(const QnResourcePtr& resource, const QString& key);
 
 public:
     CameraSettingsDialogStore* store = nullptr;
@@ -59,11 +42,6 @@ public:
     QSet<QnUuid> enabledEngines;
     QHash<QnUuid, QVariantMap> settingsValuesByEngineId;
 };
-
-CameraSettingsAnalyticsEnginesWatcher::Private::Private(CameraSettingsAnalyticsEnginesWatcher* q):
-    q(q)
-{
-}
 
 void CameraSettingsAnalyticsEnginesWatcher::Private::updateStore()
 {
@@ -79,7 +57,7 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::at_resourceAdded(
 {
     if (const auto& engine = resource.dynamicCast<AnalyticsEngineResource>())
     {
-        const auto info = engineInfoFromResource(resource);
+        const auto info = engineInfoFromResource(engine);
         if (info.id.isNull())
             return;
 
@@ -91,11 +69,6 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::at_resourceAdded(
             this, &Private::at_enginePropertyChanged);
 
         updateStore();
-    }
-    else if (const auto& plugin = resource.dynamicCast<AnalyticsPluginResource>())
-    {
-        connect(plugin.data(), &QnResource::propertyChanged,
-            this, &Private::at_pluginPropertyChanged);
     }
 }
 
@@ -121,31 +94,19 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::at_engineNameChanged(
 void CameraSettingsAnalyticsEnginesWatcher::Private::at_enginePropertyChanged(
     const QnResourcePtr& resource, const QString& key)
 {
+    const auto engine = resource.staticCast<AnalyticsEngineResource>();
+
     if (key == AnalyticsEngineResource::kSettingsValuesProperty)
     {
-        const auto engine = resource.staticCast<AnalyticsEngineResource>();
         store->setDeviceAgentSettingsValues(engine->getId(), engine->settingsValues());
     }
-}
-
-void CameraSettingsAnalyticsEnginesWatcher::Private::at_pluginPropertyChanged(
-    const QnResourcePtr& resource, const QString& key)
-{
-    if (key == AnalyticsPluginResource::kDeviceAgentSettingsModelProperty)
+    else if (key == AnalyticsEngineResource::kEngineManifestProperty)
     {
-        const auto plugin = resource.staticCast<AnalyticsPluginResource>();
-        const QJsonObject settingsModel = plugin->deviceAgentSettingsModel();
-
-        for (const auto& engine: q->resourcePool()->getResourcesByParentId(resource->getId()))
+        if (const auto it = engines.find(resource->getId()); it != engines.end())
         {
-            const auto it = engines.find(engine->getId());
-            if (it == engines.end())
-                continue;
-
-            it->settingsModel = settingsModel;
+            it->settingsModel = engine->manifest().deviceAgentSettingsModel;
+            updateStore();
         }
-
-        updateStore();
     }
 }
 
@@ -154,7 +115,7 @@ CameraSettingsAnalyticsEnginesWatcher::CameraSettingsAnalyticsEnginesWatcher(
     :
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    d(new Private(this))
+    d(new Private())
 {
     d->store = store;
 

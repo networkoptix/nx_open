@@ -21,7 +21,7 @@ AnalyticsEnginesWatcher::AnalyticsEngineInfo engineInfoFromResource(
     return AnalyticsEnginesWatcher::AnalyticsEngineInfo {
         engine->getId(),
         engine->getName(),
-        plugin->engineSettingsModel()
+        plugin->manifest().engineSettingsModel
     };
 }
 
@@ -93,10 +93,10 @@ void AnalyticsEnginesWatcher::Private::at_engineNameChanged(const QnResourcePtr&
 void AnalyticsEnginesWatcher::Private::at_pluginPropertyChanged(
     const QnResourcePtr& resource, const QString& key)
 {
-    if (key == AnalyticsPluginResource::kEngineSettingsModelProperty)
+    if (key == AnalyticsPluginResource::kPluginManifestProperty)
     {
         const auto plugin = resource.staticCast<AnalyticsPluginResource>();
-        const QJsonObject settingsModel = plugin->engineSettingsModel();
+        const QJsonObject& settingsModel = plugin->manifest().engineSettingsModel;
 
         for (const auto& engine: resourcePool()->getResourcesByParentId(resource->getId()))
         {
