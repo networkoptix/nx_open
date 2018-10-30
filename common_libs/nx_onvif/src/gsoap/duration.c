@@ -1,9 +1,9 @@
 /*
-	duration.c
+    duration.c
 
-	See duration.h for documentation.
+    See duration.h for documentation.
 
-	Compile this file and link it with your code.
+    Compile this file and link it with your code.
 
 gSOAP XML Web services tools
 Copyright (C) 2000-2015, Robert van Engelen, Genivia Inc., All Rights Reserved.
@@ -55,7 +55,7 @@ A commercial use license is available from Genivia, Inc., contact@genivia.com
 # include "stdsoap2.h"
 # include SOAP_XSTRINGIFY(SOAP_H_FILE)
 #else
-# include "soapH.h"	/* or manually replace with soapcpp2-generated *H.h file */
+# include "soapH.h"    /* or manually replace with soapcpp2-generated *H.h file */
 #endif
 
 SOAP_FMAC3 void SOAP_FMAC4 soap_default_xsd__duration(struct soap *soap, LONG64 *a)
@@ -123,27 +123,27 @@ SOAP_FMAC3 int SOAP_FMAC4 soap_s2xsd__duration(struct soap *soap, const char *s,
       LONG64 n;
       if (*s == 'T' || *s == 't')
       { s++;
-	break;
+    break;
       }
       n = soap_strtol(s, &r, 10);
       if (!r)
-	return soap->error = SOAP_TYPE;
+    return soap->error = SOAP_TYPE;
       s = r;
       switch (*s)
       { case 'Y':
         case 'y':
-	  Y = n;
-	  break;
-	case 'M':
-	case 'm':
-	  M = n;
-	  break;
-	case 'D':
-	case 'd':
-	  D = n;
-	  break;
-	default:
-	  return soap->error = SOAP_TYPE;
+      Y = n;
+      break;
+    case 'M':
+    case 'm':
+      M = n;
+      break;
+    case 'D':
+    case 'd':
+      D = n;
+      break;
+    default:
+      return soap->error = SOAP_TYPE;
       }
       s++;
     }
@@ -153,19 +153,19 @@ SOAP_FMAC3 int SOAP_FMAC4 soap_s2xsd__duration(struct soap *soap, const char *s,
       LONG64 n;
       n = soap_strtol(s, &r, 10);
       if (!r)
-	return soap->error = SOAP_TYPE;
+    return soap->error = SOAP_TYPE;
       s = r;
       switch (*s)
       { case 'H':
         case 'h':
-	  H = n;
-	  break;
-	case 'M':
-	case 'm':
-	  N = n;
-	  break;
-	case '.':
-	  S = n;
+      H = n;
+      break;
+    case 'M':
+    case 'm':
+      N = n;
+      break;
+    case '.':
+      S = n;
 #if defined(WITH_C_LOCALE) && defined(HAVE_STRTOD_L)
 # ifdef WIN32
           f = (float)_strtod_l(s, NULL, SOAP_LOCALE(soap));
@@ -179,14 +179,14 @@ SOAP_FMAC3 int SOAP_FMAC4 soap_s2xsd__duration(struct soap *soap, const char *s,
 #elif defined(HAVE_STRTOF)
           f = strtof((char*)s, NULL);
 #endif
-	  s = NULL;
-	  continue;
-	case 'S':
-	case 's':
-	  S = n;
-	  break;
-	default:
-	  return soap->error = SOAP_TYPE;
+      s = NULL;
+      continue;
+    case 'S':
+    case 's':
+      S = n;
+      break;
+    default:
+      return soap->error = SOAP_TYPE;
       }
       s++;
     }
@@ -211,23 +211,23 @@ SOAP_FMAC3 LONG64 * SOAP_FMAC4 soap_in_xsd__duration(struct soap *soap, const ch
     a = (LONG64*)soap_id_forward(soap, soap->href, a, 0, SOAP_TYPE_xsd__duration, 0, sizeof(LONG64), 0, NULL, NULL);
   else if (a)
   { if (soap_s2xsd__duration(soap, soap_value(soap), a))
+      /********************************************
+      Beginning of a patch.
+      Allows to treat an empty XML element as an element with a zero time duration value.
+      This is done to support buggy devices that send incorrect XMLs
+      (that are not validated against a schema).
+      The problem is detected during VMS-10856 issue investigation.
+      ********************************************/
+      //return NULL;
       {
-          /********************************************
-          Beginnig of a patch.
-          Allows to treat an empty XML element as an element with a zero time duration value.
-          This is done to support buggy devices that send incorrect XMLs
-          (that are not validated against a schema).
-          The problem is detected during VMS-10856 issue investigation.
-          ********************************************/
-          //return NULL;
           *a = 0;
           if (soap->body && soap_element_end_in(soap, tag))
               return NULL;
           return a;
-          /********************************************
-          Ending of a patch.
-          ********************************************/
       }
+      /********************************************
+      Ending of a patch.
+      ********************************************/
   }
   if (soap->body && soap_element_end_in(soap, tag))
     return NULL;

@@ -1,5 +1,5 @@
 from framework.installation.service import Service, ServiceStatus
-from framework.os_access.windows_remoting import WinRM, wmi
+from framework.os_access.windows_remoting import WinRM
 
 
 class WindowsService(Service):
@@ -12,15 +12,7 @@ class WindowsService(Service):
         return '<WindowsService {} at {}>'.format(self._name, self._winrm)
 
     def stop(self, timeout_sec=None):
-        try:
-            self._wmi_service.invoke_method(u'StopService', {}, timeout_sec=timeout_sec)
-        except wmi.WmiInvokeFailed.specific_cls(7):
-            pass
-        service = self._wmi_service.get()
-        processes = list(self._winrm.wmi.cls(u'Win32_Process').enumerate({}))
-        for process in processes:
-            if process['CommandLine'] == service['PathName']:
-                process.invoke_method(u'Terminate', {})
+        self._wmi_service.invoke_method(u'StopService', {}, timeout_sec=timeout_sec)
 
     def start(self, timeout_sec=None):
         self._wmi_service.invoke_method(u'StartService', {}, timeout_sec=timeout_sec)

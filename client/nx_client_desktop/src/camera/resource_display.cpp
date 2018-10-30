@@ -42,17 +42,17 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
 
             connect(this, &QObject::destroyed, m_camera, &QnClientVideoCamera::beforeStopDisplay);
 
-            m_counter = new nx::utils::Counter(1);
-            connect(m_camera->getCamDisplay(), &QnCamDisplay::finished, m_counter, &nx::utils::Counter::decrement);
+            m_counter = new nx::utils::CounterWithSignal(1);
+            connect(m_camera->getCamDisplay(), &QnCamDisplay::finished, m_counter, &nx::utils::CounterWithSignal::decrement);
             if (m_mediaProvider->hasThread())
             {
                 connect(m_camera->getStreamreader(), &QnAbstractMediaStreamDataProvider::finished,
-                    m_counter, &nx::utils::Counter::decrement);
+                    m_counter, &nx::utils::CounterWithSignal::decrement);
                 m_counter->increment();
             }
 
-            connect(m_counter, &nx::utils::Counter::reachedZero, m_counter, &QObject::deleteLater);
-            connect(m_counter, &nx::utils::Counter::reachedZero, m_camera, &QObject::deleteLater);
+            connect(m_counter, &nx::utils::CounterWithSignal::reachedZero, m_counter, &QObject::deleteLater);
+            connect(m_counter, &nx::utils::CounterWithSignal::reachedZero, m_camera, &QObject::deleteLater);
         }
         else
         {

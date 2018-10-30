@@ -3339,6 +3339,8 @@ bool MediaServerProcess::setUpMediaServerResource(
 
 void MediaServerProcess::stopObjects()
 {
+    commonModule()->setNeedToStop(true);
+
     auto safeDisconnect =
         [this](QObject* src, QObject* dst)
         {
@@ -3385,7 +3387,6 @@ void MediaServerProcess::stopObjects()
         nx::utils::TimerManager::instance()->joinAndDeleteTimer(dumpSystemResourceUsageTaskID);
 
     m_ipDiscovery.reset(); // stop it before IO deinitialized
-    commonModule()->setNeedToStop(true);
     m_multicastHttp.reset();
 
     if (m_universalTcpListener)

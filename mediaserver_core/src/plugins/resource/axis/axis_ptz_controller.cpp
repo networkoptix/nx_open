@@ -295,6 +295,9 @@ bool QnAxisPtzController::queryInternal(const QString& request, QByteArray* body
 
     for (int i = 0; i < 2; ++i)
     {
+        if (m_resource->commonModule()->isNeedToStop())
+            return false;
+
         if (!cookie.isEmpty())
             http->addHeader("Cookie", cookie);
         CLHttpStatus status = http->doGET(lit("axis-cgi/%1").arg(request).toLatin1());
