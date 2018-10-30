@@ -427,6 +427,8 @@ void MultiServerUpdatesWidget::at_updateCurrentState()
         NX_VERBOSE(this) << "at_updateCurrentState got update info:"
             << checkResponse.info.version
             << "from" << checkResponse.source;
+
+        m_serverUpdateTool->verifyUpdateManifest(checkResponse);
         m_updateLocalStateChanged = true;
         m_updateInfo = checkResponse;
         m_haveValidUpdate = false;
@@ -555,7 +557,7 @@ void MultiServerUpdatesWidget::pickSpecificBuild()
 
     m_targetVersion = nx::utils::SoftwareVersion(version.major(), version.minor(), version.bugfix(), buildNumber);
     m_targetChangeset = dialog.changeset();
-    m_updateCheck = m_serverUpdateTool->checkSpecificChangeset(dialog.changeset(), dialog.password());
+    m_updateCheck = m_serverUpdateTool->checkSpecificChangeset(dialog.changeset());
     loadDataToUi();
 }
 

@@ -44,6 +44,7 @@ struct UpdateContents
     nx::update::Package clientPackage;
     nx::update::Information info;
     nx::update::InformationError error = nx::update::InformationError::noError;
+    bool cloudIsCompatible = true;
 
     // Check if we can apply this update.
     bool isValid() const;

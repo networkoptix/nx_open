@@ -144,29 +144,27 @@ std::future<UpdateContents> ServerUpdateTool::checkLatestUpdate()
 {
     QString updateUrl = qnSettings->updateFeedUrl();
     return std::async(std::launch::async,
-        [this, updateUrl]()
+        [updateUrl]()
         {
             UpdateContents result;
             result.info = nx::update::updateInformation(updateUrl, nx::update::kLatestVersion, &result.error);
             result.sourceType = UpdateSourceType::internet;
             result.source = lit("%1 for build=%2").arg(updateUrl, nx::update::kLatestVersion);
-            verifyUpdateManifest(result);
             return result;
         });
 }
 
-std::future<UpdateContents> ServerUpdateTool::checkSpecificChangeset(QString build, QString password)
+std::future<UpdateContents> ServerUpdateTool::checkSpecificChangeset(QString build)
 {
     QString updateUrl = qnSettings->updateFeedUrl();
 
     return std::async(std::launch::async,
-        [this, updateUrl, build]()
+        [updateUrl, build]()
         {
             UpdateContents result;
             result.info = nx::update::updateInformation(updateUrl, build, &result.error);
             result.sourceType = UpdateSourceType::internetSpecific;
             result.source = lit("%1 for build=%2").arg(updateUrl, build);
-            verifyUpdateManifest(result);
             return result;
         });
 }
@@ -234,14 +232,14 @@ void ServerUpdateTool::atExtractFilesFinished(int code)
 
     if (code != QnZipExtractor::Ok)
     {
-        NX_VERBOSE(this) << "at_extractFilesFinished() err=" << QnZipExtractor::errorToString((QnZipExtractor::Error)code);
+        NX_VERBOSE(this) << "atExtractFilesFinished() err=" << QnZipExtractor::errorToString((QnZipExtractor::Error)code);
         changeUploadState(OfflineUpdateState::initial);
         contents.error = nx::update::InformationError::missingPackageError;
         m_offlineUpdateCheckResult.set_value(contents);
         return;
     }
 
-    NX_VERBOSE(this) << "at_extractFilesFinished() status = Ready";
+    NX_VERBOSE(this) << "atExtractFilesFinished() status = Ready";
 
     // Find a subfolter containing update manifest
     QDir packageDir = findFolderForFile(m_outputDir, kPackageIndexFile);
@@ -254,6 +252,7 @@ void ServerUpdateTool::atExtractFilesFinished(int code)
     {
         m_uploadDestination = QString("updates/%1/").arg(contents.info.version);
 
+        // TODO: Move this verification to multi_server_updates_widget.cpp
         if (verifyUpdateManifest(contents) && !contents.filesToUpload.empty())
         {
             contents.error = nx::update::InformationError::noError;
@@ -472,40 +471,6 @@ bool ServerUpdateTool::verifyUpdateManifest(UpdateContents& contents) const
     contents.missingUpdate.clear();
     contents.filesToUpload.clear();
 
-    std::map<QnUuid, QnMediaServerResourcePtr> activeServers;
-    {
-        std::scoped_lock<std::recursive_mutex> lock(m_statusLock);
-        activeServers = m_activeServers;
-    }
-
-    if (auto cloudWatcher = qnClientModule->cloudStatusWatcher())
-    {
-        if (cloudWatcher->isCloudEnabled() && !contents.info.cloudHost.isEmpty())
-        {
-            bool cloudCompatible = true;
-            for(auto record: activeServers)
-            {
-                auto server = record.second;
-                bool isOurServer = !server->hasFlags(Qn::fake_server)
-                    || helpers::serverBelongsToCurrentSystem(server);
-                if (!isOurServer)
-                    continue;
-                auto moduleInformation = server->getModuleInformation();
-                if (moduleInformation.cloudHost != contents.info.cloudHost)
-                {
-                    cloudCompatible = false;
-                    break;
-                }
-            }
-
-            if (!cloudCompatible)
-            {
-                contents.error = nx::update::InformationError::incompatibleCloudHostError;
-                return false;
-            }
-        }
-    }
-
     // Check if some packages from manifest do not exist.
     if (contents.sourceType == UpdateSourceType::file)
     {
@@ -545,6 +510,19 @@ bool ServerUpdateTool::verifyUpdateManifest(UpdateContents& contents) const
 
     contents.clientPackage = findClientPackage(contents.info);
 
+    std::map<QnUuid, QnMediaServerResourcePtr> activeServers;
+    {
+        std::scoped_lock<std::recursive_mutex> lock(m_statusLock);
+        activeServers = m_activeServers;
+    }
+
+    bool shouldCheckCloud = false;
+    if (auto cloudWatcher = qnClientModule->cloudStatusWatcher())
+    {
+        if (cloudWatcher->isCloudEnabled() && !contents.info.cloudHost.isEmpty())
+            shouldCheckCloud = true;
+    }
+
     // Checking if all servers have update packages.
     for(auto record: activeServers)
     {
@@ -577,6 +555,13 @@ bool ServerUpdateTool::verifyUpdateManifest(UpdateContents& contents) const
                 << "ver" << targetVersion.toString();
             contents.invalidVersion.insert(server);
         }
+
+        if (shouldCheckCloud)
+        {
+            auto moduleInformation = server->getModuleInformation();
+            if (moduleInformation.cloudHost != contents.info.cloudHost)
+                contents.cloudIsCompatible = false;
+        }
     }
 
     if (!contents.missingUpdate.empty() || !contents.clientPackage.isValid())
@@ -588,6 +573,9 @@ bool ServerUpdateTool::verifyUpdateManifest(UpdateContents& contents) const
     // Update package has no packages at all.
     if (contents.info.packages.empty())
         contents.error = nx::update::InformationError::missingPackageError;
+
+    if (!contents.cloudIsCompatible)
+        contents.error = nx::update::InformationError::incompatibleCloudHostError;
 
     return contents.isValid();
 }

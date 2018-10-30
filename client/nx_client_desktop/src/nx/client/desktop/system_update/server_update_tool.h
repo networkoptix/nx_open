@@ -113,7 +113,7 @@ public:
     };
 
     std::future<UpdateContents> checkLatestUpdate();
-    std::future<UpdateContents> checkSpecificChangeset(QString build, QString password);
+    std::future<UpdateContents> checkSpecificChangeset(QString build);
     std::future<UpdateContents> checkUpdateFromFile(QString file);
 
     // It is used to obtain future to update check that was started

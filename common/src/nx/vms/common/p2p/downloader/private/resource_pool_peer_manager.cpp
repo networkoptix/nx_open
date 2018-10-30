@@ -395,8 +395,8 @@ std::shared_ptr<AbstractPeerManager> ResourcePoolPeerManagerFactory::createPeerM
     const QList<QnUuid>& additionalPeers)
 {
     auto&& peerSelector = createPeerSelector(peerPolicy, additionalPeers, commonModule());
-    auto rawPtr = new ResourcePoolPeerManager(commonModule(), std::move(peerSelector));
-    return std::shared_ptr<AbstractPeerManager>(rawPtr);
+    return std::make_shared<ResourcePoolPeerManager>(commonModule(), std::move(peerSelector));
+
 }
 
 } // namespace downloader
