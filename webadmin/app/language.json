@@ -49,7 +49,7 @@
         "confirmDisconnectFromSystem":"Detach server from current system",
         "confirmDisconnectFromSystemAction": "Detach",
         "disconnectedFromSystemSuccess": "Server was detached from the system successfully",
-        "disconnectedFromSystemError": "Cannot disconnected the server",
+        "disconnectedFromSystemError": "Cannot disconnect the server",
 
         "connectedSuccess": "System was connected successfully",
         "createLocalOwnerTitle":"Create local administrator",
