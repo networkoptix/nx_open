@@ -3716,10 +3716,7 @@ void MediaServerProcess::connectSignals()
         {
             auto utils = nx::mediaserver::Utils(serverModule());
             if (utils.timeToMakeDbBackup())
-            {
-                qDebug() << "TIME TO MAKE";
                 utils.backupDatabase();
-            }
         });
 
     connect(

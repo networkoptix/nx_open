@@ -15,7 +15,8 @@
 
 namespace nx::test {
 
-class BackupDb: public ::testing::Test
+
+class BackupDbUt: public ::testing::Test
 {
 protected:
     enum class FileType
@@ -24,18 +25,9 @@ protected:
         nonBackup
     };
 
-    using LauncherPtr = std::unique_ptr<MediaServerLauncher>;
-
     virtual void SetUp() override
     {
-        m_server = std::make_unique<MediaServerLauncher>(/* tmpDir */ "");
-        m_server->addSetting(QnServer::kNoInitStoragesOnStartup, "1");
-    }
-
-    void whenServerLaunched()
-    {
-        ASSERT_TRUE(m_server->start());
-        m_backupDir = m_server->serverModule()->settings().backupDir();
+        m_testDir = *m_dirResource.getDirName();
     }
 
     void whenSomeFilesCreated(int count, FileType fileType)
@@ -43,13 +35,12 @@ protected:
         for (int i = 0; i < count; ++i)
         {
             const QString fileName = fileType == FileType::backup
-                ? QString::fromLatin1("ec_%1_%2_%3.backup")
+                ? QString::fromLatin1("ec_%1_%3.backup")
                     .arg(i * 1000)
-                    .arg(i)
                     .arg(i + 1000LL * 3600LL * 24LL * 365LL * 2010LL)
                 : notQuiteBackupFileName();
 
-            const auto filePath = QDir(m_backupDir).absoluteFilePath(fileName);
+            const auto filePath = QDir(m_testDir).absoluteFilePath(fileName);
             QList<QString>* containerToSaveIn = fileType == FileType::backup
                 ? &m_backupFilesCreated
                 : &m_nonBackupFilesCreated;
@@ -65,7 +56,7 @@ protected:
 
     void whenAllBackupFilesDataCalled()
     {
-        m_backupFilesDataFound = nx::vms::utils::allBackupFilesDataSorted(m_backupDir);
+        m_backupFilesDataFound = nx::vms::utils::allBackupFilesDataSorted(m_testDir);
     }
 
     void thenAllBackupFilesShouldBeFound()
@@ -83,12 +74,9 @@ protected:
             ASSERT_NE(filePathIt, m_backupFilesCreated.cend());
             m_backupFilesCreated.erase(filePathIt);
         }
-    }
 
-    void thenNoBackupFilesShouldBeCreated()
-    {
-        whenAllBackupFilesDataCalled();
-        ASSERT_TRUE(m_backupFilesDataFound.isEmpty());
+        ASSERT_TRUE(std::is_sorted(m_backupFilesDataFound.cbegin(), m_backupFilesDataFound.cend(),
+            [](const auto& lhs, const auto& rhs) { return rhs.timestamp < lhs.timestamp; }));
     }
 
     void givenDiskFreeSpace(qint64 freeSpace)
@@ -98,14 +86,53 @@ protected:
 
     void whenDeleteOldFilesFunctionCalled()
     {
-        vms::utils::deleteOldBackupFilesIfNeeded(m_backupDir, m_freeSpace);
+        vms::utils::deleteOldBackupFilesIfNeeded(m_testDir, m_freeSpace);
     }
 
     void thenOldestFilesShouldBeDeleted(int filesLeft)
     {
-        const auto foundFiles = nx::vms::utils::allBackupFilesDataSorted(m_backupDir);
+        const auto foundFiles = nx::vms::utils::allBackupFilesDataSorted(m_testDir);
         ASSERT_EQ(filesLeft, foundFiles.size());
         ASSERT_EQ(foundFiles[0].timestamp, m_backupFilesDataFound[0].timestamp);
+    }
+
+private:
+    QList<nx::vms::utils::DbBackupFileData> m_backupFilesDataFound;
+    QList<QString> m_backupFilesCreated;
+    QList<QString> m_nonBackupFilesCreated;
+    nx::ut::utils::WorkDirResource m_dirResource;
+    QString m_testDir;
+    qint64 m_freeSpace = -1;
+
+    static QString notQuiteBackupFileName()
+    {
+        const QList<QString> fileNames = {
+            "ec_ab_100.backup",
+            "ec_ab_cd.backup",
+            "hello.txt",
+            "looks_like_.backup"
+        };
+
+        return nx::utils::random::choice(fileNames);
+    }
+ };
+
+class BackupDbIt: public ::testing::Test
+{
+protected:
+    using LauncherPtr = std::unique_ptr<MediaServerLauncher>;
+
+    virtual void SetUp() override
+    {
+        m_server = std::make_unique<MediaServerLauncher>(/* tmpDir */ "");
+        m_server->addSetting(QnServer::kNoInitStoragesOnStartup, "1");
+    }
+
+    void whenServerLaunched()
+    {
+        ASSERT_TRUE(m_server->start());
+        m_backupDir = m_server->serverModule()->settings().backupDir();
+        m_dataDir = m_server->serverModule()->settings().dataDir();
     }
 
     void whenServerStopped()
@@ -116,7 +143,6 @@ protected:
     void thenBackupFilesShouldBeCreated(int backupFilesCount)
     {
         m_backupFilesDataFound = nx::vms::utils::allBackupFilesDataSorted(m_backupDir);
-
         ASSERT_EQ(backupFilesCount, m_backupFilesDataFound.size());
     }
 
@@ -124,6 +150,12 @@ protected:
     {
         const auto backupFilesData = nx::vms::utils::allBackupFilesDataSorted(m_backupDir);
         ASSERT_EQ(m_backupFilesDataFound[0].timestamp, backupFilesData[0].timestamp);
+    }
+
+    void thenNoBackupFilesShouldBeCreated()
+    {
+        const auto backupFilesData = nx::vms::utils::allBackupFilesDataSorted(m_backupDir);
+        ASSERT_TRUE(backupFilesData.isEmpty());
     }
 
     void givenBackupRotationPeriod(std::chrono::milliseconds period)
@@ -165,42 +197,23 @@ private:
     LauncherPtr m_server;
     QList<nx::vms::utils::DbBackupFileData> m_backupFilesDataFound;
     QList<QString> m_backupFilesCreated;
-    QList<QString> m_nonBackupFilesCreated;
     QString m_backupDir;
-    qint64 m_freeSpace = -1;
-
-    static QString notQuiteBackupFileName()
-    {
-        const QList<QString> fileNames = {
-            "ec_ab_100.backup",
-            "ec_ab_cd.backup",
-            "hello.txt",
-            "looks_like_.backup"
-        };
-
-        return nx::utils::random::choice(fileNames);
-    }
+    QString m_dataDir;
 
     void waitForAllBackupFilesToBeCreated()
     {
-        const int kMaxBackupFilesCount =
-            nx::SystemCommands().freeSpace(m_backupDir.toStdString()) > 10 * 1024LL * 1024LL * 1024LL
-            ? 6 : 1;
-
-        qDebug() << "FILE COUNT:" << kMaxBackupFilesCount << "WAIT PERIOD IS" << m_server->serverModule()->settings().dbBackupPeriodMS().count();
+        const auto diskFreeSpace = nx::SystemCommands().freeSpace(m_dataDir.toStdString());
+        const int kMaxBackupFilesCount = diskFreeSpace > 10 * 1024LL * 1024LL * 1024LL ? 6 : 1;
 
         while (m_backupFilesDataFound.size() != kMaxBackupFilesCount)
         {
-            whenAllBackupFilesDataCalled();
-            qDebug() << "CEHCK";
+            m_backupFilesDataFound = nx::vms::utils::allBackupFilesDataSorted(m_backupDir);
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-
-        qDebug() << "ALL FILES CREATED" << kMaxBackupFilesCount;
     }
 };
 
-TEST_F(BackupDb, allBackupFilesData_correctnessCheck)
+TEST_F(BackupDbUt, allBackupFilesData_correctnessCheck)
 {
     whenSomeFilesCreated(/*count*/ 10, FileType::backup);
     whenSomeFilesCreated(/*count*/ 15, FileType::nonBackup);
@@ -208,7 +221,7 @@ TEST_F(BackupDb, allBackupFilesData_correctnessCheck)
     thenAllBackupFilesShouldBeFound();
 }
 
-TEST_F(BackupDb, rotation_freeSpaceMoreThan10Gb)
+TEST_F(BackupDbUt, rotation_freeSpaceMoreThan10Gb)
 {
     givenDiskFreeSpace(11 * 1024 * 1024LL * 1024LL);
     whenSomeFilesCreated(/*count*/ 10, FileType::backup);
@@ -217,7 +230,7 @@ TEST_F(BackupDb, rotation_freeSpaceMoreThan10Gb)
     thenOldestFilesShouldBeDeleted(/*filesLeft*/ 6);
 }
 
-TEST_F(BackupDb, rotation_freeSpaceLessThan10Gb)
+TEST_F(BackupDbUt, rotation_freeSpaceLessThan10Gb)
 {
     givenDiskFreeSpace(9 * 1024 * 1024LL * 1024LL);
     whenSomeFilesCreated(/*count*/ 10, FileType::backup);
@@ -226,13 +239,13 @@ TEST_F(BackupDb, rotation_freeSpaceLessThan10Gb)
     thenOldestFilesShouldBeDeleted(/*filesLeft*/ 1);
 }
 
-TEST_F(BackupDb, NoBackupCreatedOnFirstTimeLaunch)
+TEST_F(BackupDbIt, NoBackupCreatedOnFirstTimeLaunch)
 {
     whenServerLaunched();
     thenNoBackupFilesShouldBeCreated();
 }
 
-TEST_F(BackupDb, CreatedWhenNoBackupsForCurrentVersion)
+TEST_F(BackupDbIt, CreatedWhenNoBackupsForCurrentVersion)
 {
     whenServerLaunched();
     whenServerStopped();
@@ -240,7 +253,7 @@ TEST_F(BackupDb, CreatedWhenNoBackupsForCurrentVersion)
     thenBackupFilesShouldBeCreated(/*backupFilesCount*/ 1);
 }
 
-TEST_F(BackupDb, NotCreatedWhenThereAreBackupsForCurrentVersion)
+TEST_F(BackupDbIt, NotCreatedWhenThereAreBackupsForCurrentVersion)
 {
     whenServerLaunched();
     whenServerStopped();
@@ -252,7 +265,7 @@ TEST_F(BackupDb, NotCreatedWhenThereAreBackupsForCurrentVersion)
     thenNoNewBackupFilesShouldBeCreated();
 }
 
-TEST_F(BackupDb, FilesRotated)
+TEST_F(BackupDbIt, FilesRotated)
 {
     givenBackupRotationPeriod(std::chrono::milliseconds(1000));
     whenServerLaunched();

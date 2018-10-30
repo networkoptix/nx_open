@@ -66,8 +66,6 @@ bool backupDatabase(const QString& backupDir,
     NX_WARNING(typeid(VmsUtilsFunctionsTag),
         lm("Successfully created DB backup %1").args(fileName));
 
-    qDebug() << "SUCCESS";
-
     return true;
 }
 
