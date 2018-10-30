@@ -106,7 +106,7 @@ def wait_until_servers_are_online(server_list):
 
 def create_cameras(camera_pool, counter, count):
     for i in range(count):
-        camera_num = counter.next()
+        camera_num = next(counter)
         camera_mac = generator.generate_mac(camera_num)
         camera_name = 'Camera_%d' % camera_num
         camera = camera_pool.add_camera(camera_name, camera_mac)

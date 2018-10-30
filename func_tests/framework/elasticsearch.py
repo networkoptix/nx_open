@@ -166,7 +166,7 @@ class _ElasticsearchLoggingHandler(logging.Handler):
         self._index = index
 
         self._response_processor = self._process_responses_stream()
-        self._response_processor.next()  # Run until first `yield`.
+        next(self._response_processor)  # Run until first `yield`.
 
     def _log_stats(self):
         _logger.debug(
