@@ -43,10 +43,7 @@ public:
     static const QString PATH;
 
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request /*request*/,
-        nx::network::http::Response* const /*response*/,
+        http::RequestContext /*requestContext*/,
         nx::network::http::RequestProcessedHandler completionHandler)
     {
         m_timer.start(
@@ -96,19 +93,16 @@ public:
     static const nx::String PATH;
 
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request request,
-        nx::network::http::Response* const response,
-        nx::network::http::RequestProcessedHandler completionHandler)
+        http::RequestContext requestContext,
+        http::RequestProcessedHandler completionHandler)
     {
-        response->headers.emplace(
+        requestContext.response->headers.emplace(
             "Seq",
-            nx::network::http::getHeaderValue(request.headers, "Seq"));
-        completionHandler(
-            nx::network::http::RequestResult(
-                nx::network::http::StatusCode::ok,
-                std::make_unique<nx::network::http::BufferSource>("text/plain", "bla-bla-bla")));
+            http::getHeaderValue(requestContext.request.headers, "Seq"));
+
+        completionHandler(http::RequestResult(
+            http::StatusCode::ok,
+            std::make_unique<http::BufferSource>("text/plain", "bla-bla-bla")));
     }
 };
 

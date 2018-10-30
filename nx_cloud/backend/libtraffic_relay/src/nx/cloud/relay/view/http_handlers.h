@@ -33,8 +33,7 @@ public:
 
 protected:
     virtual void prepareRequestData(
-        nx::network::http::HttpServerConnection* const connection,
-        const nx::network::http::Request& httpRequest,
+        const nx::network::http::RequestContext& requestContext,
         api::CreateClientSessionRequest* request) override;
 
     virtual void beforeReportingResponse(
@@ -65,8 +64,7 @@ public:
 
 protected:
     virtual controller::ConnectToPeerRequestEx prepareRequestData(
-        nx::network::http::HttpServerConnection* const connection,
-        const nx::network::http::Request& httpRequest) override;
+        const nx::network::http::RequestContext& requestContext) override;
 };
 
 } // namespace view

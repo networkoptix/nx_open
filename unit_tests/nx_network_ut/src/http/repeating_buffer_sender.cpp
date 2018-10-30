@@ -14,10 +14,7 @@ RepeatingBufferSender::RepeatingBufferSender(
 }
 
 void RepeatingBufferSender::processRequest(
-    nx::network::http::HttpServerConnection* const /*connection*/,
-    nx::utils::stree::ResourceContainer /*authInfo*/,
-    nx::network::http::Request /*request*/,
-    nx::network::http::Response* const /*response*/,
+    nx::network::http::RequestContext /*requestContext*/,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
     completionHandler(

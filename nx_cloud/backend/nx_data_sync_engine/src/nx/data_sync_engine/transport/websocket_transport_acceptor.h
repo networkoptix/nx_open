@@ -29,10 +29,8 @@ public:
         const OutgoingCommandFilter& outgoingCommandFilter);
 
     void createConnection(
-        nx::network::http::HttpServerConnection* connection,
+        nx::network::http::RequestContext requestContext,
         const std::string& systemId,
-        nx::network::http::Request request,
-        nx::network::http::Response* response,
         nx::network::http::RequestProcessedHandler completionHandler);
 
 private:

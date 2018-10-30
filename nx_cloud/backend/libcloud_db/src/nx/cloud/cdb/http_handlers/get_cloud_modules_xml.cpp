@@ -18,21 +18,20 @@ GetCloudModulesXml::GetCloudModulesXml(
 }
 
 void GetCloudModulesXml::processRequest(
-    nx::network::http::HttpServerConnection* const /*connection*/,
-    nx::utils::stree::ResourceContainer /*authInfo*/,
-    nx::network::http::Request request,
-    nx::network::http::Response* const /*response*/,
+    nx::network::http::RequestContext requestContext,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
-    const auto host = nx::network::http::getHeaderValue(request.headers, "Host");
+    using namespace nx::network;
+
+    const auto host = http::getHeaderValue(requestContext.request.headers, "Host");
     // TODO: #ak in case if host is empty should use public IP address.
 
     // Note: Host header has format host[:port].
-    auto msgBody = std::make_unique<nx::network::http::BufferSource>(
+    auto msgBody = std::make_unique<http::BufferSource>(
         "text/xml",
         m_generateModulesXmlFunc(network::SocketAddress(host).address.toString().toUtf8()));
 
-    completionHandler(nx::network::http::RequestResult(nx::network::http::StatusCode::ok, std::move(msgBody)));
+    completionHandler(http::RequestResult(http::StatusCode::ok, std::move(msgBody)));
 }
 
 } // namespace http_handler

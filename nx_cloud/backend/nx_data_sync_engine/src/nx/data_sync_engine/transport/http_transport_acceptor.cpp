@@ -35,31 +35,31 @@ HttpTransportAcceptor::HttpTransportAcceptor(
 }
 
 void HttpTransportAcceptor::createConnection(
-    nx::network::http::HttpServerConnection* const connection,
+    nx::network::http::RequestContext requestContext,
     const std::string& systemId,
-    nx::network::http::Request request,
-    nx::network::http::Response* const response,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
     // GET /ec2/events/ConnectingStage2?guid=%7B8b939668-837d-4658-9d7a-e2cc6c12a38b%7D&
     //  runtime-guid=%7B0eac9718-4e37-4459-8799-c3023d4f7cb5%7D&system-identity-time=0&isClient
     // TODO: #ak
 
+    auto httpConnection = requestContext.connection;
+
     if (systemId.empty())
     {
         NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
             lm("Ignoring createTransactionConnection request without systemId from %1")
-            .args(connection->socket()->getForeignAddress()));
+            .args(httpConnection->socket()->getForeignAddress()));
         return completionHandler(nx::network::http::StatusCode::badRequest);
     }
 
     ConnectionRequestAttributes connectionRequestAttributes;
-    if (!fetchDataFromConnectRequest(request, &connectionRequestAttributes))
+    if (!fetchDataFromConnectRequest(requestContext.request, &connectionRequestAttributes))
     {
         NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
             lm("Error parsing createTransactionConnection request from (%1.%2; %3)")
             .args(connectionRequestAttributes.remotePeer.id, systemId,
-                connection->socket()->getForeignAddress()));
+                httpConnection->socket()->getForeignAddress()));
         return completionHandler(nx::network::http::StatusCode::badRequest);
     }
 
@@ -69,7 +69,7 @@ void HttpTransportAcceptor::createConnection(
         NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
             lm("Incompatible connection request from (%1.%2; %3). Requested protocol version %4")
             .args(connectionRequestAttributes.remotePeer.id, systemId,
-                connection->socket()->getForeignAddress(),
+                httpConnection->socket()->getForeignAddress(),
                 connectionRequestAttributes.remotePeerProtocolVersion));
         return completionHandler(nx::network::http::StatusCode::badRequest);
     }
@@ -77,7 +77,7 @@ void HttpTransportAcceptor::createConnection(
     NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
         lm("Received createTransactionConnection request from (%1.%2; %3). connectionId %4")
         .args(connectionRequestAttributes.remotePeer.id, systemId,
-            connection->socket()->getForeignAddress(),
+            httpConnection->socket()->getForeignAddress(),
             connectionRequestAttributes.connectionId));
 
     TransportConnectionContext transportConnectionContext;
@@ -85,13 +85,13 @@ void HttpTransportAcceptor::createConnection(
     
     auto commandPipeline = std::make_unique<TransactionTransport>(
         m_protocolVersionRange,
-        connection->getAioThread(),
+        httpConnection->getAioThread(),
         m_connectionGuardSharedState,
         connectionRequestAttributes,
         systemId,
         m_localPeerData,
-        connection->socket()->getForeignAddress(),
-        request);
+        httpConnection->socket()->getForeignAddress(),
+        requestContext.request);
     transportConnectionContext.commandPipeline = commandPipeline.get();
 
     auto newTransport = std::make_unique<GenericTransport>(
@@ -116,14 +116,14 @@ void HttpTransportAcceptor::createConnection(
         std::move(newTransport),
         connectionRequestAttributes.connectionId,
         {systemId, connectionRequestAttributes.remotePeer.id.toByteArray().toStdString()},
-        network::http::getHeaderValue(request.headers, "User-Agent").toStdString()};
+        network::http::getHeaderValue(requestContext.request.headers, "User-Agent").toStdString()};
 
     if (!m_connectionManager->addNewConnection(std::move(context)))
     {
         NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
             lm("Failed to add new transaction connection from (%1.%2; %3). connectionId %4")
             .args(connectionRequestAttributes.remotePeer.id, systemId,
-                connection->socket()->getForeignAddress(),
+                httpConnection->socket()->getForeignAddress(),
                 connectionRequestAttributes.connectionId));
         return completionHandler(nx::network::http::StatusCode::forbidden);
     }
@@ -131,7 +131,7 @@ void HttpTransportAcceptor::createConnection(
     auto requestResult =
         prepareOkResponseToCreateTransactionConnection(
             connectionRequestAttributes,
-            response);
+            requestContext.response);
 
     requestResult.connectionEvents.onResponseHasBeenSent =
         std::bind(&HttpTransportAcceptor::startOutgoingChannel, this,
@@ -149,12 +149,13 @@ void HttpTransportAcceptor::createConnection(
 }
 
 void HttpTransportAcceptor::pushTransaction(
-    nx::network::http::HttpServerConnection* const connection,
+    nx::network::http::RequestContext requestContext,
     const std::string& /*systemId*/,
-    nx::network::http::Request request,
-    nx::network::http::Response* const /*response*/,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
+    const auto& request = requestContext.request;
+    auto connection = requestContext.connection;
+
     auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
     if (connectionIdIter == request.headers.end())
     {

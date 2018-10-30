@@ -17,25 +17,22 @@ AbstractProxyHandler::TargetHost::TargetHost(network::SocketAddress target):
 //-------------------------------------------------------------------------------------------------
 
 void AbstractProxyHandler::processRequest(
-    nx::network::http::HttpServerConnection* const connection,
-    nx::utils::stree::ResourceContainer /*authInfo*/,
-    nx::network::http::Request request,
-    nx::network::http::Response* const /*response*/,
-    nx::network::http::RequestProcessedHandler completionHandler)
+    RequestContext requestContext,
+    RequestProcessedHandler completionHandler)
 {
     using namespace std::placeholders;
 
-    m_request = std::move(request);
+    m_request = std::move(requestContext.request);
     m_requestCompletionHandler = std::move(completionHandler);
-    m_requestSourceEndpoint = connection->socket()->getForeignAddress();
-    m_httpConnectionAioThread = connection->getAioThread();
+    m_requestSourceEndpoint = requestContext.connection->socket()->getForeignAddress();
+    m_httpConnectionAioThread = requestContext.connection->getAioThread();
 
-    m_isIncomingConnectionEncrypted = connection->isSsl();
+    m_isIncomingConnectionEncrypted = requestContext.connection->isSsl();
 
     detectProxyTarget(
-        *connection,
+        *requestContext.connection,
         &m_request,
-        std::bind(&AbstractProxyHandler::startProxying, this, _1, _2));
+        [this](auto&&... args) { startProxying(std::move(args)...); });
 }
 
 void AbstractProxyHandler::setTargetHostConnectionInactivityTimeout(

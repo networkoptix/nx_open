@@ -74,17 +74,15 @@ public:
     }
 
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request /*request*/,
-        nx::network::http::Response* const /*response*/,
-        nx::network::http::RequestProcessedHandler completionHandler)
+        http::RequestContext requestContext,
+        http::RequestProcessedHandler completionHandler)
     {
-        EXPECT_EQ(m_expectSsl, connection->isSsl());
-        completionHandler(nx::network::http::RequestResult(
-            nx::network::http::StatusCode::ok,
-            std::make_unique<nx::network::http::BufferSource>(
-                nx::network::http::BufferType("text/plain"), nx::network::http::BufferType("ok"))));
+        EXPECT_EQ(m_expectSsl, requestContext.connection->isSsl());
+
+        completionHandler(http::RequestResult(
+            http::StatusCode::ok,
+            std::make_unique<http::BufferSource>(
+                http::BufferType("text/plain"), http::BufferType("ok"))));
     }
 
 private:
@@ -701,19 +699,16 @@ public:
     }
 
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request /*request*/,
-        nx::network::http::Response* const /*response*/,
+        http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler)
     {
         if (m_requestNumber > 0)
-            connection->takeSocket(); //< Closing connection by destroying socket.
+            requestContext.connection->takeSocket(); //< Closing connection by destroying socket.
 
         completionHandler(
-            nx::network::http::RequestResult(
-                nx::network::http::StatusCode::ok,
-                std::make_unique< nx::network::http::BufferSource >(m_mimeType, m_response)));
+            http::RequestResult(
+                http::StatusCode::ok,
+                std::make_unique<http::BufferSource >(m_mimeType, m_response)));
     }
 
 private:

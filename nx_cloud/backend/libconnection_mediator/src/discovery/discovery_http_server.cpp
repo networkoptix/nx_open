@@ -25,10 +25,7 @@ public:
     }
 
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request /*request*/,
-        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestContext /*requestContext*/,
         nx::network::http::RequestProcessedHandler completionHandler) override
     {
         // TODO Filter by peer type.
@@ -60,17 +57,14 @@ public:
     }
 
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request /*request*/,
-        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler) override
     {
-        if (requestPathParams().empty())
+        if (requestContext.requestPathParams.empty())
             return completionHandler(nx::network::http::StatusCode::badRequest);
 
         auto peerInfo = m_registeredPeerPool->getPeerInfo(
-            requestPathParams().getByName(http::kModuleIdParam));
+            requestContext.requestPathParams.getByName(http::kModuleIdParam));
         if (!peerInfo)
             return completionHandler(nx::network::http::StatusCode::notFound);
 
