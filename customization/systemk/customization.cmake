@@ -62,8 +62,6 @@ set(freeLicenseKey "0000-0000-0000-0026")
 # Installer Customizations
 set(installerLanguage "ja_JP")
 set(installer.cultures "ja-jp")
-set(sign.password "qweasd123")
-set(sign.cer "app.p12")
 
 # Localization
 set(translations ja_JP)

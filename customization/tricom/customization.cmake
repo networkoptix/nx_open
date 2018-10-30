@@ -59,7 +59,3 @@ set(mac.protocol_handler_bundle.identifier "com.tricom.protocol_handler")
 set(freeLicenseIsTrial "true")
 set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0022")
-
-# Installer Customizations
-set(sign.password "qweasd123")
-set(sign.cer "app.p12")

@@ -49,7 +49,3 @@ set(mac.protocol_handler_bundle.identifier "com.ioezio.protocol_handler")
 set(freeLicenseIsTrial "true")
 set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0024")
-
-# Installer Customizations
-set(sign.password "ioezio")
-set(sign.cer "app.p12")
