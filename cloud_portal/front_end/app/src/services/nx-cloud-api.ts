@@ -13,6 +13,6 @@ export class NxCloudApiService {
     }
 
     getIntegrations(): Observable<any> {
-        return this.http.get(this.config.getConfig().apiBase + '/integrations/');
+        return this.http.get(this.config.getConfig().apiBase + '/integrations');
     }
 }
