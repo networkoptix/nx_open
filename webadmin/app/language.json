@@ -161,7 +161,7 @@
         "duplicateServersError": "Cannot merge systems, because they have at least 1 server with the same ID. Please remove this server and try again.",
         "connectionFailed": "Connection failed: ",
         "unknownError": "Unknown error",
-        "mergeFailed": "Merge failed: ",
+        "mergeFailed": "Merge failed",
         "mergeSucceed": "Merge succeed.",
         "newSystemDisplayName": "New system",
         "incompatibleProtocol":"incompatible version",
