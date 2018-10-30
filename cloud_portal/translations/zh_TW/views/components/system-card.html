@@ -3,13 +3,13 @@
     <div class="card-body">
         <h2 class="mb-3">您的系統</h2>
         <p>
-            <button class="btn btn-default" ng-click="rename()">重命名系統</button>
+            <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">重命名系統</button>
         </p>
         <p>
-            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">與其他系統合併</button>
+            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">與其他系統合併</button>
         </p>
         <hr />
-        <button class="btn btn-default" ng-click="disconnect()">脫離 
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">脫離 
             <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
     </div>
 </div>
