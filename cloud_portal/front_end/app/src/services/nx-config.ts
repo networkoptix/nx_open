@@ -211,6 +211,7 @@ export class NxConfigService {
             },
             webclient                     : {
                 useServerTime            : true,
+                useSystemTime            : true,
                 disableVolume            : true,
                 reloadInterval           : 5 * 1000,
                 leftPanelPreviewHeight   : 128,
