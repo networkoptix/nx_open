@@ -41,7 +41,6 @@ class QnWorkbenchSynchronizer;
 class QnWorkbenchLayoutSnapshotManager;
 class ActionHandler;
 class QnBusinessRulesDialog;
-class QnCameraAdditionDialog;
 class QnPopupCollectionWidget;
 class QnWorkbenchNotificationsHandler;
 class QnAdjustVideoDialog;
@@ -107,8 +106,6 @@ protected:
 
     QnCameraListDialog *cameraListDialog() const;
 
-    QnCameraAdditionDialog *cameraAdditionDialog() const;
-
     QnSystemAdministrationDialog *systemAdministrationDialog() const;
 
 protected slots:
@@ -148,7 +145,6 @@ protected slots:
     void at_cameraIssuesAction_triggered();
     void at_cameraBusinessRulesAction_triggered();
     void at_cameraDiagnosticsAction_triggered();
-    void at_serverAddCameraManuallyAction_triggered();
     void at_serverLogsAction_triggered();
     void at_serverIssuesAction_triggered();
     void at_pingAction_triggered();
@@ -242,7 +238,6 @@ private:
     QPointer<QnSearchBookmarksDialog> m_searchBookmarksDialog;
     QPointer<QnAuditLogDialog> m_auditLogDialog;
     QPointer<QnCameraListDialog> m_cameraListDialog;
-    QPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
     QPointer<QnAdjustVideoDialog> m_adjustVideoDialog;
     QPointer<QnSystemAdministrationDialog> m_systemAdministrationDialog;
 

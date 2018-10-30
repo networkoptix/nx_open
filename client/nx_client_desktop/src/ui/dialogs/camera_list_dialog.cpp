@@ -70,7 +70,7 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
         {
             const auto parameters = action::Parameters(commonModule()->currentServer())
                 .withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(this));
-            menu()->trigger(action::ServerAddCameraManuallyAction, parameters);
+            menu()->trigger(action::AddDeviceManuallyAction, parameters);
         });
 
 

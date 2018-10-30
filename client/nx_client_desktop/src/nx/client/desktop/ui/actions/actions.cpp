@@ -639,8 +639,7 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(GlobalPermission::admin)
         .condition(condition::isLoggedIn()
             && !condition::isSafeMode()
-            && !condition::tourIsRunning()
-            && condition::isTrue(nx::client::desktop::ini().enableDeviceSearch));
+            && !condition::tourIsRunning());
 
     factory(MergeSystems)
         .flags(Main | Tree)
@@ -1420,17 +1419,6 @@ void initialize(Manager* manager, Action* root)
                 !condition::isLayoutTourReviewMode()
                 && !condition::isPreviewSearchMode()));
 
-    factory(ServerAddCameraManuallyAction)
-        .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
-        .text(ContextMenu::tr("Add Device..."))   //intentionally hardcode devices here
-        .requiredGlobalPermission(GlobalPermission::admin)
-        .condition(condition::hasFlags(Qn::remote_server, MatchMode::ExactlyOne)
-            && ConditionWrapper(new EdgeServerCondition(false))
-            && !ConditionWrapper(new FakeServerCondition(true))
-            && !condition::isSafeMode()
-            && !condition::tourIsRunning()
-            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
-
     factory(AddDeviceManuallyAction)
         .flags(Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Add Device..."))   //intentionally hardcode devices here
@@ -1440,8 +1428,7 @@ void initialize(Manager* manager, Action* root)
             && !ConditionWrapper(new FakeServerCondition(true))
             && !condition::isSafeMode()
             && !condition::tourIsRunning()
-            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode())
-            && condition::isTrue(nx::client::desktop::ini().enableDeviceSearch));
+            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
 
     factory(CameraListByServerAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
