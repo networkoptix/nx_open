@@ -278,7 +278,7 @@ def test_glob_on_file(existing_remote_file):
         _ = list(existing_remote_file.glob('*'))
 
 
-@pytest.skip()
+@pytest.mark.skip()
 def test_glob_recursive(existing_remote_dir):
     layout = [
         ('1',),
