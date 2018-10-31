@@ -31,19 +31,17 @@ def _expect_poll_output(title, expected_values, process, parse_output):
         yield Halt('{!r} -- is in progress'.format(title))
 
     stdout, stderr = process.communicate()
-    if stdout:
-        _logger.debug('Process pid=%s -- stdout:\n%s', process.pid, stdout)
-    if stderr:
-        _logger.debug('Process pid=%s -- stderr:\n%s', process.pid, stderr)
+    _logger.debug('Process pid=%s -- stdout:\n%s', process.pid, stdout)
+    _logger.debug('Process pid=%s -- stderr:\n%s', process.pid, stderr)
     if process.returncode != 0 and process.returncode != 124:  # 0 - success, 124 - timeout.
-        yield Halt('{!r} -- returned error code: {}'.format(title, process.returncode))
+        yield Failure('{!r} -- returned error code: {}'.format(title, process.returncode))
         return
 
     try:
-        actual_values = parse_output(stdout.decode('utf-8').strip())
+        actual_values = parse_output(stdout.decode('utf-8').strip()) if stdout else None
     except Exception as error:
         _logger.debug('Process pid=%s -- parsing error: %s', process.pid, traceback.format_exc())
-        yield Halt('{!r} -- parsing error: {!s}'.format(title, error))
+        yield Failure('{!r} -- parsing error: {!s}'.format(title, error))
     else:
         yield expect_values(expected_values, actual_values, path=title)
 
@@ -54,16 +52,15 @@ def _expect_command_output(title, expected_values, parse_output, command, rerun_
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         _logger.debug('Run async pid=%s: %s', process.pid, ' '.join(command))
         try:
-            for result in _expect_poll_output(
-                    title, expected_values, process, parse_output):
+            retry = '-- retry {}'.format(run_number)
+            for result in _expect_poll_output(title, expected_values, process, parse_output):
                 if isinstance(result, Success):
                     return
                 elif isinstance(result, Halt) and last_failure:
-                    yield last_failure.with_more_errors(
-                        'retry {}:'.format(run_number), result.message)
+                    yield last_failure.with_more_errors([retry, result.message])
                 elif isinstance(result, Failure):
                     last_failure = result
-                    yield result
+                    yield result.with_more_errors([retry], prefix=True)
                 else:
                     yield result
         finally:
@@ -92,27 +89,26 @@ def _ffprobe_extract_audio(output):
     return dict(codec=streams['codec_name'].upper())
 
 
-def ffprobe_expect_stream(expected_values, stream_url, stream_title):
-    title = '{}.ffprobe'.format(stream_title)
+def ffprobe_expect_stream(expected_values, stream_url, title):
     command = ['ffprobe', '-of', 'json', '-i', stream_url]
     video = expected_values.get('video')
     if video:
         fps = video.pop('fps') if 'fps' in video else None
         for result in _expect_command_output(
-                title, video, _ffprobe_extract_video,
+                title + '.ffprobe_v', video, _ffprobe_extract_video,
                 command + ['-show_streams', '-select_streams', 'v', '-probesize', '10k']):
             yield result
 
         if fps:
             for result in _expect_command_output(
-                    title, {'fps': fps}, _ffprobe_extract_fps,
+                    title + '.ffprobe_f', {'fps': fps}, _ffprobe_extract_fps,
                     ['timeout', '10s'] + command + ['-show_frames', '-select_streams', 'v']):
                 yield result
 
     audio = expected_values.get('audio')
     if audio:
         for result in _expect_command_output(
-                title, audio, _ffprobe_extract_audio,
+                title + '.ffprobe_a', audio, _ffprobe_extract_audio,
                 command + ['-show_streams', '-select_streams', 'a', '-probesize', '10k']):
             yield result
 

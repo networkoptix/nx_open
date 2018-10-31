@@ -117,7 +117,7 @@ def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) ->
     yield Success()
 
 
-@_stage(timeout=timedelta(minutes=7))
+@_stage(timeout=timedelta(minutes=15))
 def video_parameters(run, stream_urls=None, **profiles):
         # type: (stage.Run, dict, dict) -> Generator[Result]
     """For each stream and its configuration: enables recording; applies the configuration and

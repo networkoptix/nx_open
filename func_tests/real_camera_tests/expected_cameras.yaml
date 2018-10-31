@@ -206,12 +206,13 @@ Hanwha_PNM-9020V:
 
   video_parameters:
     primary:
-    - {codec: 'H264', resolution: '4096x1800'}
-    - {codec: 'H265', resolution: '3584x1576'}
-    # - {codec: 'MJPEG', resolution: '3072x1352'} # 'video.resolution' is '1024x1352', expected '3072x1352'
+      - {codec: 'H264', resolution: '4096x1800'}
+      - {codec: 'MJPEG', resolution: '512x224'}
+      - {codec: 'H265', resolution: '3584x1576'}
     secondary:
-    - {codec: 'H264', resolution: '512x224', fps: [24, 36]}
-    - {codec: 'H265', resolution: '1024x452', fps: [8, 12]}
+      - {codec: 'H264', resolution: '512x224', fps: [24, 36]}
+      - {codec: 'MJPEG', resolution: '720x576', fps: [13, 17]}
+      - {codec: 'H265', resolution: '1024x452', fps: [8, 12]}
     stream_urls:
       "1": "rtsp://192.168.200.12:554/profile4/media.smp"
       "2": "rtsp://192.168.200.12:554/profile5/media.smp"
@@ -244,13 +245,13 @@ Hanwha_XNP-6120H:
 
   video_parameters:
     primary:
-    - {codec: 'H264', resolution: '1920x1080'}
-    - {codec: 'H265', resolution: '1280x1024'}
-    - {codec: 'MJPEG', resolution: '1280x960'}
+      - {codec: 'H264', resolution: '1920x1080'}
+      - {codec: 'H265', resolution: '1280x1024'}
+      - {codec: 'MJPEG', resolution: '1280x960'}
     secondary:
-    - {codec: 'H264', resolution: '640x360', fps: [8, 12]}
-    - {codec: 'H265', resolution: '320x240', fps: [13, 17]}
-    - {codec: 'MJPEG', resolution: '640x480', fps: [24, 36]}
+      - {codec: 'H264', resolution: '640x360', fps: [24, 36]}
+      - {codec: 'H265', resolution: '320x240', fps: [13, 17]}
+      - {codec: 'MJPEG', resolution: '640x480', fps: [8, 12]}
     stream_urls:
       "1": "rtsp://192.168.200.8:554/profile7/media.smp"
       "2": "rtsp://192.168.200.8:554/profile9/media.smp"
@@ -292,8 +293,8 @@ Hikvision_DS-2CD2132F-IWS:
       - {codec: 'H264', resolution: '2048x1536'}
       - {codec: 'H264', resolution: '1920x1080'}
     secondary:
-      - {codec: 'H264', resolution: '1280x720', fps: [8, 12]}
       - {codec: 'H264', resolution: '320x240', fps: [13, 17]}
+      - {codec: 'H264', resolution: '704x480', fps: [8, 12]}
 
   io_events:
     ins: [{id: '1', connected: 'AlarmOut_0'}]
@@ -323,8 +324,8 @@ Hikvision_DS-2CD2342WD-I:
       - {codec: 'H264', resolution: '2688x1520'}
       - {codec: 'H264', resolution: '1920x1080'}
     secondary:
+      - {codec: 'H264', resolution: '352x240', fps: [13, 17]}
       - {codec: 'H264', resolution: '640x360', fps: [8, 12]}
-      - {codec: 'H264', resolution: '352x240', fps: [24, 36]}
 
 
 Vista_VK2-1080VR:
@@ -342,16 +343,14 @@ Vista_VK2-1080VR:
     isAudioSupported: 0
 
   recording:
-    primary: {codec: 'H264', resolution: '1920x1080', fps: [[13, 17], [8, 12]]} # TODO: More FPS.
-    secondary: {codec: 'MJPEG', resolution: '704x576', fps: [5, 9]}
+    primary: {codec: 'H264', resolution: '1920x1080', fps: [[13, 17], [8, 12]]}
+    # secondary: supports only MJPEG, which causes ffmpeg error:
+    # 'mjpeg_decode_dc: bad vlc: 0:0 (0x1acb2e8)', vlc is unable to play as well.
 
   video_parameters:
     primary:
       - {codec: 'H264', resolution: '1920x1080'}
-      - {codec: 'H264', resolution: '1280x1024'} # !resolution range is empty in all_cameras.json
-    secondary:
-      - {codec: 'MJPEG', resolution: '640x480', fps: [8, 12]} # !resolution range is empty in all_cameras.json
-#      - {codec: 'H264', resolution: '640x360', fps: [24, 36]} # fps range 1, 100 (sic!) in all_cameras.json
+      - {codec: 'H264', resolution: '1280x1024'}
     stream_urls:
       "1": "rtsp://192.168.200.16:554/1/stream1/Profile1"
       "2": "rtsp://192.168.200.16:554/1/stream*/Profile*"
