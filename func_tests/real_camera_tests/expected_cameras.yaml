@@ -41,8 +41,8 @@ Axis_M3046V:
       - {codec: 'MJPEG', resolution: '1280x960'}
       - {codec: 'H264', resolution: '2688x1520'}
     secondary:
-      - {codec: 'MJPEG', resolution: '1280x720', fps: [24, 36]}
-      - {codec: 'H264', resolution: '640x480', fps: [24, 36]}  # TODO: Different FPS.
+      - {codec: 'MJPEG', resolution: '1280x720', fps: [25, 35]}
+      - {codec: 'H264', resolution: '640x360', fps: [13, 17]}  # TODO: Different FPS.
     stream_urls:
       "1": "rtsp://192.168.200.10:554/axis-media/media.amp?streamprofile=hdwitnessPrimary"
       "2": "rtsp://192.168.200.10:554/axis-media/media.amp?streamprofile=hdwitnessSecondary"
@@ -211,8 +211,8 @@ Hanwha_PNM-9020V:
       - {codec: 'H265', resolution: '3584x1576'}
     secondary:
       - {codec: 'H264', resolution: '512x224', fps: [24, 36]}
-      - {codec: 'MJPEG', resolution: '720x576', fps: [13, 17]}
-      - {codec: 'H265', resolution: '1024x452', fps: [8, 12]}
+      - {codec: 'MJPEG', resolution: '720x576', fps: [8, 12]}
+      - {codec: 'H265', resolution: '1024x452', fps: [13, 17]}
     stream_urls:
       "1": "rtsp://192.168.200.12:554/profile4/media.smp"
       "2": "rtsp://192.168.200.12:554/profile5/media.smp"
