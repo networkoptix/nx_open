@@ -29,6 +29,7 @@ public:
 
     Builder(Action* action);
 
+    Builder shortcut(const QString& keySequence);
     Builder shortcut(const QKeySequence& keySequence, Platform platform, bool replaceExisting);
     Builder shortcut(const QKeySequence& keySequence);
     Builder shortcutContext(Qt::ShortcutContext context);

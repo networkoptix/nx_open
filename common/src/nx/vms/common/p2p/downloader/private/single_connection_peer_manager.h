@@ -1,28 +1,22 @@
 #pragma once
-
-#include "abstract_peer_manager.h"
-
-#include <core/resource/resource_fwd.h>
-#include <api/server_rest_connection_fwd.h>
 #include <common/common_module_aware.h>
+#include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/vms/common/p2p/downloader/private/abstract_peer_manager.h>
+#include <nx/vms/common/p2p/downloader/private/resource_pool_peer_manager.h>
 #include <nx/vms/common/p2p/downloader/private/peer_selection/abstract_peer_selector.h>
-#include <nx/network/deprecated/asynchttpclient.h>
 
-class QnResourcePool;
+namespace nx::vms::common::p2p::downloader {
 
-namespace nx {
-namespace vms {
-namespace common {
-namespace p2p {
-namespace downloader {
-
-class ResourcePoolPeerManager: public AbstractPeerManager, public QnCommonModuleAware
+/**
+ * Peer manager to be used in Downloader class. It is intended for client-only usage.
+ */
+class SingleConnectionPeerManager: public AbstractPeerManager, public QnCommonModuleAware
 {
 public:
-    ResourcePoolPeerManager(
+    SingleConnectionPeerManager(
         QnCommonModule* commonModule,
-        AbstractPeerSelectorPtr peerSelector, bool isClient = false);
+        AbstractPeerSelectorPtr&& peerSelector);
+    ~SingleConnectionPeerManager();
 
     virtual QnUuid selfId() const override;
     virtual QString peerString(const QnUuid& peerId) const override;
@@ -62,32 +56,19 @@ public:
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
     virtual bool hasAccessToTheUrl(const QString& url) const override;
 
+    // Sets internal connection
+    void setServerUrl(nx::utils::Url serverUrl, QnUuid serverId);
+    QnUuid getServerId() const;
+
 protected:
-    virtual QnMediaServerResourcePtr getServer(const QnUuid& peerId) const;
     virtual rest::QnConnectionPtr getConnection(const QnUuid& peerId) const;
 
     rest::Handle m_currentSelfRequestHandle = 0;
     QHash<rest::Handle, nx::network::http::AsyncHttpClientPtr> m_httpClientByHandle;
     AbstractPeerSelectorPtr m_peerSelector;
 
-    bool m_isClient = false;
+    rest::QnConnectionPtr m_directConnection;
+    nx::utils::Url m_directUrl;
 };
 
-class ResourcePoolPeerManagerFactory:
-    public AbstractPeerManagerFactory,
-    public QnCommonModuleAware
-{
-public:
-    ResourcePoolPeerManagerFactory(QnCommonModule* commonModule);
-    virtual AbstractPeerManager* createPeerManager(
-        FileInformation::PeerSelectionPolicy peerPolicy,
-        const QList<QnUuid>& additionalPeers) override;
-};
-
-nx::network::http::AsyncHttpClientPtr createHttpClient();
-
-} // namespace downloader
-} // namespace p2p
-} // namespace common
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::common::p2p::downloader

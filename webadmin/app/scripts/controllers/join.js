@@ -103,8 +103,7 @@ angular.module('webadminApp')
                     return false;
                 case 'DUPLICATE_MEDIASERVER_FOUND':
                     errorToShow = L.join.duplicateServersError;
-                    dialogs.alert(errorToShow);
-                    return false;
+                    break;
             }
             return errorToShow;
         }
@@ -175,12 +174,12 @@ angular.module('webadminApp')
             //mediaserver.checkCurrentPassword($scope.settings.currentPassword).then(function() {
                 mediaserver.mergeSystems(remoteUrl, $scope.settings.login, $scope.settings.password || Config.defaultPassword,
                     $scope.settings.keepMySystem, $scope.settings.currentPassword).then(function (r) {
-                        if (r.data.error !== '0') {
+                        if (r.data.error !== '0' && r.data.error !== 0) {
                             var errorToShow = errorHandler(r.data.errorString);
                             if (errorToShow) {
-                                dialogs.alert(L.join.mergeFailed + errorToShow);
-                                return;
+                                dialogs.alert(L.join.mergeFailed + ': ' + errorToShow);
                             }
+                            return;
                         }
                         dialogs.alert(L.join.mergeSucceed).finally(function () {
                             window.location.reload();

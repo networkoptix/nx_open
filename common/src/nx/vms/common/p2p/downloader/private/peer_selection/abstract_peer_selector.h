@@ -3,13 +3,11 @@
 #include <memory>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/system_information.h>
+#include <nx/vms/common/p2p/downloader/file_information.h>
 
-namespace nx {
-namespace vms {
-namespace common {
-namespace p2p {
-namespace downloader {
-namespace peer_selection {
+class QnCommonModule;
+
+namespace nx::vms::common::p2p::downloader {
 
 struct PeerInformation
 {
@@ -34,9 +32,9 @@ public:
 
 using AbstractPeerSelectorPtr = std::unique_ptr<AbstractPeerSelector>;
 
-} // namespace peer_selection
-} // namespace downloader
-} // namespace p2p
-} // namespace common
-} // namespace vms
-} // namespace nx
+AbstractPeerSelectorPtr createPeerSelector(
+    FileInformation::PeerSelectionPolicy peerPolicy,
+    const QList<QnUuid>& additionalPeers,
+    QnCommonModule* commonModule);
+
+} // namespace nx::vms::common::p2p::downloader

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "compatibility_version_installation_dialog.h"
-
 #include <memory>
 
 #include <QtWidgets/QDialog>
@@ -11,6 +9,7 @@
 #include <ui/dialogs/common/button_box_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 
+#include "nx/client/desktop/system_update/compatibility_version_installation_dialog.h"
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/api/data/module_information.h>
 

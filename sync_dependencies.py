@@ -84,7 +84,7 @@ def determine_package_versions(
     if box == "rpi":
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
-        v["sysroot"] = "jessie" 
+        v["sysroot"] = "jessie"
         v["ffmpeg"] = "3.1.1-1"
 
     if box == "edge1":
@@ -162,7 +162,6 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         sync("vcredist-2015", path_variable="vcredist_directory")
         sync("vmaxproxy-2.1")
         sync("windows/wix-3.11", path_variable="wix_directory")
-        sync("windows/signtool", path_variable="signtool_directory")
         sync("windows/ilmerge", path_variable="ilmerge_directory")
 
     if platform in ("windows", "linux"):

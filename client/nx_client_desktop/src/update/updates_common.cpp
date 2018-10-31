@@ -110,6 +110,8 @@ QString QnUpdateResult::errorMessage() const
         case QnUpdateResult::InstallationFailed:
         case QnUpdateResult::RestInstallationFailed:
             return tr("Could not install updates on one or more servers.");
+        case QnUpdateResult::CancelledSilently:
+            return tr("Update has been cancelled silently.");
     }
 
     return QString();

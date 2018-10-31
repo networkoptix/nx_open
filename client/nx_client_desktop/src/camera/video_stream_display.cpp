@@ -1,6 +1,11 @@
 
 #include "video_stream_display.h"
 
+extern "C"
+{
+    #include <libavutil/imgutils.h>
+}
+
 #include <algorithm>
 
 #include <client/client_settings.h>
@@ -276,7 +281,7 @@ void QnVideoStreamDisplay::checkQueueOverflow(QnAbstractVideoDecoder* dec)
             index = maxStart + maxInterval/2;
         }
         NX_ASSERT( m_reverseQueue[index]->data[0] || m_reverseQueue[index]->picData );
-        m_reverseSizeInBytes -= avpicture_get_size((AVPixelFormat) m_reverseQueue[index]->format, m_reverseQueue[index]->width, m_reverseQueue[index]->height);
+        m_reverseSizeInBytes -= av_image_get_buffer_size((AVPixelFormat) m_reverseQueue[index]->format, m_reverseQueue[index]->width, m_reverseQueue[index]->height, 1);
         m_reverseQueue[index]->reallocate(0,0,0);
     }
 }
@@ -582,7 +587,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
                 tmpOutFrame->flags |= QnAbstractMediaData::MediaFlags_LowQuality; // flag unknown. set same flags as input data
             //tmpOutFrame->pkt_dts = AV_NOPTS_VALUE;
             m_reverseQueue.enqueue(tmpOutFrame);
-            m_reverseSizeInBytes += avpicture_get_size((AVPixelFormat)tmpOutFrame->format, tmpOutFrame->width, tmpOutFrame->height);
+            m_reverseSizeInBytes += av_image_get_buffer_size((AVPixelFormat)tmpOutFrame->format, tmpOutFrame->width, tmpOutFrame->height, 1);
             checkQueueOverflow(dec);
         }
         m_flushedBeforeReverseStart = true;
@@ -604,7 +609,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         if (!m_reverseQueue.isEmpty() && (m_reverseQueue.front()->flags & AV_REVERSE_REORDERED)) {
             outFrame = m_reverseQueue.dequeue();
             if (outFrame->data[0])
-                m_reverseSizeInBytes -= avpicture_get_size((AVPixelFormat)outFrame->format, outFrame->width, outFrame->height);
+                m_reverseSizeInBytes -= av_image_get_buffer_size((AVPixelFormat)outFrame->format, outFrame->width, outFrame->height, 1);
 
             calcSampleAR(outFrame, dec);
 
@@ -701,14 +706,14 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         if (outFrame->flags & AV_REVERSE_BLOCK_START)
             reorderPrevFrames();
         m_reverseQueue.enqueue(outFrame);
-        m_reverseSizeInBytes += avpicture_get_size((AVPixelFormat)outFrame->format, outFrame->width, outFrame->height);
+        m_reverseSizeInBytes += av_image_get_buffer_size((AVPixelFormat)outFrame->format, outFrame->width, outFrame->height, 1);
         checkQueueOverflow(dec);
         m_frameQueue[m_frameQueueIndex] = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
         if (!(m_reverseQueue.front()->flags & AV_REVERSE_REORDERED))
             return Status_Buffered; // frame does not ready. need more frames. does not perform wait
         outFrame = m_reverseQueue.dequeue();
         if (outFrame->data[0])
-            m_reverseSizeInBytes -= avpicture_get_size((AVPixelFormat)outFrame->format, outFrame->width, outFrame->height);
+            m_reverseSizeInBytes -= av_image_get_buffer_size((AVPixelFormat)outFrame->format, outFrame->width, outFrame->height, 1);
     }
 
     calcSampleAR(outFrame, dec);

@@ -7,6 +7,11 @@
 
 #include "proxy_video_decoder_utils.h"
 
+extern "C"
+{
+    #include <libavutil/imgutils.h>
+}
+
 namespace nx {
 namespace media {
 
@@ -32,7 +37,7 @@ int Impl::decode(
 
     const int alignedWidth = qPower2Ceil(
         (unsigned int) frameSize().width(), (unsigned int) kMediaAlignment);
-    const int numBytes = avpicture_get_size(AV_PIX_FMT_BGRA, alignedWidth, frameSize().height());
+    const int numBytes = av_image_get_buffer_size(AV_PIX_FMT_BGRA, alignedWidth, frameSize().height(), 1);
     const int argbLineSize = alignedWidth * 4;
 
     if (compressedVideoData)
