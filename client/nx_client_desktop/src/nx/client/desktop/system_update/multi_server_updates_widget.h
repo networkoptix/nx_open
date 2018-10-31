@@ -67,12 +67,11 @@ public:
 
 protected:
     // This one is called by timer periodically.
-    void at_updateCurrentState();
-
-    void at_clientDownloadFinished();
-    void at_modelDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
-    void at_startUpdateAction();
-    bool at_cancelCurrentAction();
+    void atUpdateCurrentState();
+    void atСlientDownloadFinished();
+    void atModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
+    void atStartUpdateAction();
+    bool atCancelCurrentAction();
 
     void hideStatusColumns(bool value);
     void clearUpdateInfo();
@@ -170,8 +169,6 @@ private:
 
     UpdateContents m_updateInfo;
     QString m_updateCheckError;
-    // We get this version either from internet, or zip package.
-    nx::utils::SoftwareVersion m_availableVersion;
     nx::utils::SoftwareVersion m_targetVersion;
 
     WidgetUpdateState m_updateStateCurrent = WidgetUpdateState::initial;
