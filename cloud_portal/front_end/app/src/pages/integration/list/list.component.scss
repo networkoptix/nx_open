@@ -3,6 +3,10 @@
 @import '../../../../styles/theme_variables';
 
 .card {
+    
+    text-decoration: none;
+    color : inherit;
+    
     &--header {
         background-color : $additional_light1;
         padding          : rem(12px) 1rem;

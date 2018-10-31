@@ -1,14 +1,16 @@
 <div class="">
     <div class="row p-0 m-0">
         <div *ngFor="let plugin of list" class="list col-12 col-md-6 col-lg-4 col-xl-3 p-2">
-            <div class="card hoverable m-0">
+
+            <a class="card hoverable m-0"
+                [routerLink]="['/integration/details', plugin.id]">
+
                 <div class="card--header clearfix">
                     <div class="card--header-logo">
                         <img [src]="plugin.information.logo || defaultLogo">
                     </div>
                     <div class="card--header-info">
                         <div class="version">v. {{ plugin.information.version }}</div>
-                        <div class="release_date" [innerHtml]="plugin.date || 'missing date'"></div>
                         <div class="platforms">
                             <img *ngIf="isSupported(plugin, 'arm')" src="/static/icons/integration_tile_os_arm.svg">
                             <img *ngIf="isSupported(plugin, 'linux')" src="/static/icons/integration_tile_os_linux.svg">
@@ -22,18 +24,19 @@
                 <div class="card--body">
                     <div class="card--body-name"><h3 [innerHtml]="plugin.information.name"></h3></div>
                     <div class="card--body-by" *ngIf="plugin.provider">By <a target="_blank" [href]="plugin.providerUrl" [innerHtml]="plugin.provider"></a></div>
-                    <div class="card--body-descr" [innerHtml]="plugin.information.shortDescription || 'missing description'"></div>
+                    <nx-ml-ellipsis class="card--body-descr">{{plugin.information.shortDescription}}</nx-ml-ellipsis>
                 </div>
                 <div class="card--footer">
-                    <h3 class="float-left m-0 mt-1 mr-1" >
-                        <span class="tag-primary" translate>Recommended</span>
-                    </h3>
+                    <!--<h3 class="float-left m-0 mt-1 mr-1" >-->
+                        <!--<span class="tag-primary" translate>Recommended</span>-->
+                    <!--</h3>-->
 
                     <h3 class="float-left m-0 mt-1 mr-1" *ngFor="let type of plugin.information.type">
                         <span class="tag" [innerHtml]="type"></span>
                     </h3>
                 </div>
-            </div>
+            </a>
+
         </div>
     </div>
 </div>
