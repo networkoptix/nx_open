@@ -82,7 +82,7 @@ private:
     std::regex convertToRegex(const std::string& pathTemplate)
     {
         const std::regex replaceRestParams(
-            "{[0-9a-zA-Z]*}", std::regex_constants::basic);
+            "{[0-9a-zA-Z_-]*}", std::regex_constants::basic);
         const std::string replacement("\\([^/]*\\)");
 
         std::string restPathMatchRegex;
@@ -103,7 +103,7 @@ private:
         std::set<std::string> uniqueNames;
 
         const std::regex findRestParamsRegex(
-            "{\\([0-9a-zA-Z]*\\)}", std::regex_constants::basic);
+            "{\\([0-9a-zA-Z_-]*\\)}", std::regex_constants::basic);
 
         std::smatch matchResult;
         while (std::regex_search(pathTemplate, matchResult, findRestParamsRegex))

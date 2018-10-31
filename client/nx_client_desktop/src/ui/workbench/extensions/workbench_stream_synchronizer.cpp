@@ -61,10 +61,10 @@ QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QObject *parent):
     connect(workbench(),                &QnWorkbench::currentLayoutChanged,             this,       &QnWorkbenchStreamSynchronizer::at_workbench_currentLayoutChanged);
 
     /* Prepare counter. */
-    m_counter = new nx::utils::Counter(1, this);
-    connect(this,                       &QObject::destroyed,                            m_counter,  &nx::utils::Counter::decrement);
-    connect(m_counter,                  &nx::utils::Counter::reachedZero,                        m_syncPlay, &QnArchiveSyncPlayWrapper::deleteLater);
-    connect(m_counter,                  &nx::utils::Counter::reachedZero,                        m_counter,  &nx::utils::Counter::deleteLater);
+    m_counter = new nx::utils::CounterWithSignal(1, this);
+    connect(this,                       &QObject::destroyed,                            m_counter,  &nx::utils::CounterWithSignal::decrement);
+    connect(m_counter,                  &nx::utils::CounterWithSignal::reachedZero,                        m_syncPlay, &QnArchiveSyncPlayWrapper::deleteLater);
+    connect(m_counter,                  &nx::utils::CounterWithSignal::reachedZero,                        m_counter,  &nx::utils::CounterWithSignal::deleteLater);
 
     /* Prepare render watcher instance. */
     connect(m_watcher,                  &QnWorkbenchRenderWatcher::displayChanged,      this,       &QnWorkbenchStreamSynchronizer::at_renderWatcher_displayChanged);

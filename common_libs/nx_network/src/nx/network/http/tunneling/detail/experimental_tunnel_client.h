@@ -3,6 +3,7 @@
 #include <string>
 
 #include <nx/network/aio/basic_pollable.h>
+#include <nx/network/aio/timer.h>
 #include <nx/utils/std/optional.h>
 
 #include "base_tunnel_client.h"
@@ -39,6 +40,7 @@ private:
     nx::utils::Url m_tunnelUrl;
     Response m_openTunnelResponse;
     std::optional<std::chrono::milliseconds> m_timeout;
+    aio::Timer m_timer;
     std::unique_ptr<AsyncClient> m_downChannelHttpClient;
     std::unique_ptr<AsyncClient> m_upChannelHttpClient;
 
@@ -60,6 +62,7 @@ private:
         std::function<void()> requestHandler);
 
     void handleTunnelFailure(AsyncClient* failedHttpClient);
+    void handleTunnelFailure(SystemError::ErrorCode systemErrorCode);
 
     void prepareOpenUpChannelRequest();
 

@@ -2,12 +2,7 @@
 
 #include <nx/network/http/server/rest/http_server_rest_path_matcher.h>
 
-namespace nx {
-namespace network {
-namespace http {
-namespace server {
-namespace rest {
-namespace test {
+namespace nx::network::http::server::rest::test {
 
 class RestPathMatcher:
     public ::testing::Test
@@ -101,9 +96,17 @@ TEST_F(RestPathMatcher, path_with_same_name_attributes_cannot_be_registered)
     assertPathNotRegistered("/account/{accountId}/subAccount/{accountId}", 1);
 }
 
-} // namespace test
-} // namespace rest
-} // namespace server
-} // namespace nx
-} // namespace network
-} // namespace http
+TEST_F(RestPathMatcher, characters_supported_in_parameter_name)
+{
+    const std::string kParamName = 
+        "abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ-0123456789";
+
+    assertPathRegistered("/account/{" + kParamName + "}/systems", 1);
+
+    assertPathMatches(
+        "/account/vpupkin/systems",
+        1,
+        {{{kParamName, "vpupkin"}}});
+}
+
+} // nx::network::http::server::rest::test

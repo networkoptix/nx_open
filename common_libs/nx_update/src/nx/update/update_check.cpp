@@ -286,13 +286,33 @@ bool findPackage(
     bool isClient,
     const QString& cloudHost,
     bool boundToCloud,
-    nx::update::Package* outPackage)
+    nx::update::Package* outPackage,
+    QString* outMessage)
 {
+    auto setErrorMessage = 
+        [outMessage](const QString& message)
+        {
+            if (outMessage)
+                *outMessage = message;
+        };
+
     if (updateInformation.cloudHost != cloudHost && boundToCloud)
+    {
+        setErrorMessage(QString::fromLatin1(
+            "Peer cloud host (%1) doesn't match update cloud host (%2)")
+                .arg(cloudHost)
+                .arg(updateInformation.cloudHost));
         return false;
+    }
 
     if (updateInformation.version <= utils::AppInfo::applicationVersion())
+    {
+        setErrorMessage(QString::fromLatin1(
+            "Update application version (%1) less or equal peer application version (%2)")
+                .arg(updateInformation.version)
+                .arg(utils::AppInfo::applicationVersion()));
         return false;
+    }
 
     for (const auto& package : updateInformation.packages)
     {
@@ -312,6 +332,14 @@ bool findPackage(
         }
     }
 
+    setErrorMessage(QString::fromLatin1(
+        "Failed to find a suitable update package for arch %1, platform %2, " \
+        "modification (variant) %3, version %4")
+            .arg(systemInformation.arch)
+            .arg(systemInformation.platform)
+            .arg(systemInformation.modification)
+            .arg(systemInformation.version));
+
     return false;
 }
 
@@ -321,14 +349,19 @@ bool findPackage(
     bool isClient,
     const QString& cloudHost,
     bool boundToCloud,
-    nx::update::Package* outPackage)
+    nx::update::Package* outPackage,
+    QString* outMessage)
 {
     update::Information updateInformation;
     if (!QJson::deserialize(serializedUpdateInformation, &updateInformation))
+    {
+        if (outMessage)
+            *outMessage = QString::fromLatin1("Failed to deserialize update information JSON");
         return false;
+    }
 
     return findPackage(systemInformation, updateInformation, isClient, cloudHost, boundToCloud,
-        outPackage);
+        outPackage, outMessage);
 }
 
 } // namespace update

@@ -18,14 +18,13 @@ Redirect::Redirect(const nx::utils::Url& actualLocation):
 }
 
 void Redirect::processRequest(
-    nx::network::http::HttpServerConnection* const /*connection*/,
-    nx::utils::stree::ResourceContainer /*authInfo*/,
-    nx::network::http::Request /*request*/,
-    nx::network::http::Response* const response,
-    nx::network::http::RequestProcessedHandler completionHandler)
+    RequestContext requestContext,
+    RequestProcessedHandler completionHandler)
 {
-    response->headers.emplace("Location", m_actualLocation.toString().toUtf8());
-    completionHandler(nx::network::http::StatusCode::movedPermanently);
+    requestContext.response->headers.emplace(
+        "Location",
+        m_actualLocation.toString().toUtf8());
+    completionHandler(StatusCode::movedPermanently);
 }
 
 } // namespace handler

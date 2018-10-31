@@ -14,59 +14,68 @@ A commercial use license is available from Genivia Inc., contact@genivia.com
 #include "soapReplayBindingProxy.h"
 
 ReplayBindingProxy::ReplayBindingProxy()
-{	this->soap = soap_new();
-	this->soap_own = true;
-	ReplayBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    ReplayBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
 }
 
 ReplayBindingProxy::ReplayBindingProxy(const ReplayBindingProxy& rhs)
-{	this->soap = rhs.soap;
-	this->soap_own = false;
-	this->soap_endpoint = rhs.soap_endpoint;
+{
+    this->soap = rhs.soap;
+    this->soap_own = false;
+    this->soap_endpoint = rhs.soap_endpoint;
 }
 
 ReplayBindingProxy::ReplayBindingProxy(struct soap *_soap)
-{	this->soap = _soap;
-	this->soap_own = false;
-	ReplayBindingProxy_init(_soap->imode, _soap->omode);
+{
+    this->soap = _soap;
+    this->soap_own = false;
+    ReplayBindingProxy_init(_soap->imode, _soap->omode);
 }
 
 ReplayBindingProxy::ReplayBindingProxy(const char *endpoint)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	ReplayBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
-	soap_endpoint = endpoint;
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    ReplayBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+    soap_endpoint = endpoint;
 }
 
 ReplayBindingProxy::ReplayBindingProxy(soap_mode iomode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	ReplayBindingProxy_init(iomode, iomode);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    ReplayBindingProxy_init(iomode, iomode);
 }
 
 ReplayBindingProxy::ReplayBindingProxy(const char *endpoint, soap_mode iomode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	ReplayBindingProxy_init(iomode, iomode);
-	soap_endpoint = endpoint;
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    ReplayBindingProxy_init(iomode, iomode);
+    soap_endpoint = endpoint;
 }
 
 ReplayBindingProxy::ReplayBindingProxy(soap_mode imode, soap_mode omode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	ReplayBindingProxy_init(imode, omode);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    ReplayBindingProxy_init(imode, omode);
 }
 
 ReplayBindingProxy::~ReplayBindingProxy()
-{	if (this->soap_own)
-		soap_free(this->soap);
+{
+    if (this->soap_own)
+        soap_free(this->soap);
 }
 
 void ReplayBindingProxy::ReplayBindingProxy_init(soap_mode imode, soap_mode omode)
-{	soap_imode(this->soap, imode);
-	soap_omode(this->soap, omode);
-	soap_endpoint = NULL;
-	static const struct Namespace namespaces[] = {
+{
+    soap_imode(this->soap, imode);
+    soap_omode(this->soap, omode);
+    soap_endpoint = NULL;
+    static const struct Namespace namespaces[] = {
         {"SOAP-ENV", "http://www.w3.org/2003/05/soap-envelope", "http://schemas.xmlsoap.org/soap/envelope/", NULL},
         {"SOAP-ENC", "http://www.w3.org/2003/05/soap-encoding", "http://schemas.xmlsoap.org/soap/encoding/", NULL},
         {"xsi", "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL},
@@ -132,305 +141,326 @@ void ReplayBindingProxy::ReplayBindingProxy_init(soap_mode imode, soap_mode omod
         {"onvifThermal", "http://www.onvif.org/ver10/thermal/wsdl", NULL, NULL},
         {NULL, NULL, NULL, NULL}
     };
-	soap_set_namespaces(this->soap, namespaces);
+    soap_set_namespaces(this->soap, namespaces);
 }
 
 ReplayBindingProxy *ReplayBindingProxy::copy()
-{	ReplayBindingProxy *dup = SOAP_NEW_UNMANAGED(ReplayBindingProxy);
-	if (dup)
-	{	soap_done(dup->soap);
-		soap_copy_context(dup->soap, this->soap);
-	}
-	return dup;
+{
+    ReplayBindingProxy *dup = SOAP_NEW_UNMANAGED(ReplayBindingProxy);
+    if (dup)
+    {
+        soap_done(dup->soap);
+        soap_copy_context(dup->soap, this->soap);
+    }
+    return dup;
 }
 
 ReplayBindingProxy& ReplayBindingProxy::operator=(const ReplayBindingProxy& rhs)
-{	if (this->soap != rhs.soap)
-	{	if (this->soap_own)
-			soap_free(this->soap);
-		this->soap = rhs.soap;
-		this->soap_own = false;
-		this->soap_endpoint = rhs.soap_endpoint;
-	}
-	return *this;
+{
+    if (this->soap != rhs.soap)
+    {
+        if (this->soap_own)
+            soap_free(this->soap);
+        this->soap = rhs.soap;
+        this->soap_own = false;
+        this->soap_endpoint = rhs.soap_endpoint;
+    }
+    return *this;
 }
 
 void ReplayBindingProxy::destroy()
-{	soap_destroy(this->soap);
-	soap_end(this->soap);
+{
+    soap_destroy(this->soap);
+    soap_end(this->soap);
 }
 
 void ReplayBindingProxy::reset()
-{	this->destroy();
-	soap_done(this->soap);
-	soap_initialize(this->soap);
-	ReplayBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+{
+    this->destroy();
+    soap_done(this->soap);
+    soap_initialize(this->soap);
+    ReplayBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
 }
 
 void ReplayBindingProxy::soap_noheader()
-{	this->soap->header = NULL;
+{
+    this->soap->header = NULL;
 }
 
-void ReplayBindingProxy::soap_header(char *wsa5__MessageID, struct wsa5__RelatesToType *wsa5__RelatesTo, struct wsa5__EndpointReferenceType *wsa5__From, struct wsa5__EndpointReferenceType *wsa5__ReplyTo, struct wsa5__EndpointReferenceType *wsa5__FaultTo, char *wsa5__To, char *wsa5__Action, struct chan__ChannelInstanceType *chan__ChannelInstance, struct wsdd__AppSequenceType *wsdd__AppSequence, struct _wsse__Security *wsse__Security, char *subscriptionID)
-{	::soap_header(this->soap);
-	this->soap->header->wsa5__MessageID = wsa5__MessageID;
-	this->soap->header->wsa5__RelatesTo = wsa5__RelatesTo;
-	this->soap->header->wsa5__From = wsa5__From;
-	this->soap->header->wsa5__ReplyTo = wsa5__ReplyTo;
-	this->soap->header->wsa5__FaultTo = wsa5__FaultTo;
-	this->soap->header->wsa5__To = wsa5__To;
-	this->soap->header->wsa5__Action = wsa5__Action;
-	this->soap->header->chan__ChannelInstance = chan__ChannelInstance;
-	this->soap->header->wsdd__AppSequence = wsdd__AppSequence;
-	this->soap->header->wsse__Security = wsse__Security;
-	this->soap->header->subscriptionID = subscriptionID;
+void ReplayBindingProxy::soap_header(char *wsa5__MessageID, struct wsa5__RelatesToType *wsa5__RelatesTo, struct wsa5__EndpointReferenceType *wsa5__From, struct wsa5__EndpointReferenceType *wsa5__ReplyTo, struct wsa5__EndpointReferenceType *wsa5__FaultTo, char *wsa5__To, char *wsa5__Action, struct chan__ChannelInstanceType *chan__ChannelInstance, struct wsdd__AppSequenceType *wsdd__AppSequence, struct _wsse__Security *wsse__Security, char *SubscriptionId)
+{
+    ::soap_header(this->soap);
+    this->soap->header->wsa5__MessageID = wsa5__MessageID;
+    this->soap->header->wsa5__RelatesTo = wsa5__RelatesTo;
+    this->soap->header->wsa5__From = wsa5__From;
+    this->soap->header->wsa5__ReplyTo = wsa5__ReplyTo;
+    this->soap->header->wsa5__FaultTo = wsa5__FaultTo;
+    this->soap->header->wsa5__To = wsa5__To;
+    this->soap->header->wsa5__Action = wsa5__Action;
+    this->soap->header->chan__ChannelInstance = chan__ChannelInstance;
+    this->soap->header->wsdd__AppSequence = wsdd__AppSequence;
+    this->soap->header->wsse__Security = wsse__Security;
+    this->soap->header->SubscriptionId = SubscriptionId;
 }
 
 ::SOAP_ENV__Header *ReplayBindingProxy::soap_header()
-{	return this->soap->header;
+{
+    return this->soap->header;
 }
 
 ::SOAP_ENV__Fault *ReplayBindingProxy::soap_fault()
-{	return this->soap->fault;
+{
+    return this->soap->fault;
 }
 
 const char *ReplayBindingProxy::soap_fault_string()
-{	return *soap_faultstring(this->soap);
+{
+    return *soap_faultstring(this->soap);
 }
 
 const char *ReplayBindingProxy::soap_fault_detail()
-{	return *soap_faultdetail(this->soap);
+{
+    return *soap_faultdetail(this->soap);
 }
 
 int ReplayBindingProxy::soap_close_socket()
-{	return soap_closesock(this->soap);
+{
+    return soap_closesock(this->soap);
 }
 
 int ReplayBindingProxy::soap_force_close_socket()
-{	return soap_force_closesock(this->soap);
+{
+    return soap_force_closesock(this->soap);
 }
 
 void ReplayBindingProxy::soap_print_fault(FILE *fd)
-{	::soap_print_fault(this->soap, fd);
+{
+    ::soap_print_fault(this->soap, fd);
 }
 
 #ifndef WITH_LEAN
 #ifndef WITH_COMPAT
 void ReplayBindingProxy::soap_stream_fault(std::ostream& os)
-{	::soap_stream_fault(this->soap, os);
+{
+    ::soap_stream_fault(this->soap, os);
 }
 #endif
 
 char *ReplayBindingProxy::soap_sprint_fault(char *buf, size_t len)
-{	return ::soap_sprint_fault(this->soap, buf, len);
+{
+    return ::soap_sprint_fault(this->soap, buf, len);
 }
 #endif
 
 int ReplayBindingProxy::GetServiceCapabilities(const char *endpoint, const char *soap_action, _onvifReplay__GetServiceCapabilities *onvifReplay__GetServiceCapabilities, _onvifReplay__GetServiceCapabilitiesResponse &onvifReplay__GetServiceCapabilitiesResponse)
 {
-	struct __onvifReplay__GetServiceCapabilities soap_tmp___onvifReplay__GetServiceCapabilities;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/replay/wsdl/GetServiceCapabilities";
-	soap_tmp___onvifReplay__GetServiceCapabilities.onvifReplay__GetServiceCapabilities = onvifReplay__GetServiceCapabilities;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifReplay__GetServiceCapabilities(soap, &soap_tmp___onvifReplay__GetServiceCapabilities);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifReplay__GetServiceCapabilities(soap, &soap_tmp___onvifReplay__GetServiceCapabilities, "-onvifReplay:GetServiceCapabilities", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifReplay__GetServiceCapabilities(soap, &soap_tmp___onvifReplay__GetServiceCapabilities, "-onvifReplay:GetServiceCapabilities", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifReplay__GetServiceCapabilitiesResponse*>(&onvifReplay__GetServiceCapabilitiesResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifReplay__GetServiceCapabilitiesResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifReplay__GetServiceCapabilitiesResponse.soap_get(soap, "onvifReplay:GetServiceCapabilitiesResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifReplay__GetServiceCapabilities soap_tmp___onvifReplay__GetServiceCapabilities;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/replay/wsdl/GetServiceCapabilities";
+    soap_tmp___onvifReplay__GetServiceCapabilities.onvifReplay__GetServiceCapabilities = onvifReplay__GetServiceCapabilities;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifReplay__GetServiceCapabilities(soap, &soap_tmp___onvifReplay__GetServiceCapabilities);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifReplay__GetServiceCapabilities(soap, &soap_tmp___onvifReplay__GetServiceCapabilities, "-onvifReplay:GetServiceCapabilities", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifReplay__GetServiceCapabilities(soap, &soap_tmp___onvifReplay__GetServiceCapabilities, "-onvifReplay:GetServiceCapabilities", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifReplay__GetServiceCapabilitiesResponse*>(&onvifReplay__GetServiceCapabilitiesResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifReplay__GetServiceCapabilitiesResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifReplay__GetServiceCapabilitiesResponse.soap_get(soap, "onvifReplay:GetServiceCapabilitiesResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int ReplayBindingProxy::GetReplayUri(const char *endpoint, const char *soap_action, _onvifReplay__GetReplayUri *onvifReplay__GetReplayUri, _onvifReplay__GetReplayUriResponse &onvifReplay__GetReplayUriResponse)
 {
-	struct __onvifReplay__GetReplayUri soap_tmp___onvifReplay__GetReplayUri;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/replay/wsdl/GetReplayUri";
-	soap_tmp___onvifReplay__GetReplayUri.onvifReplay__GetReplayUri = onvifReplay__GetReplayUri;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifReplay__GetReplayUri(soap, &soap_tmp___onvifReplay__GetReplayUri);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifReplay__GetReplayUri(soap, &soap_tmp___onvifReplay__GetReplayUri, "-onvifReplay:GetReplayUri", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifReplay__GetReplayUri(soap, &soap_tmp___onvifReplay__GetReplayUri, "-onvifReplay:GetReplayUri", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifReplay__GetReplayUriResponse*>(&onvifReplay__GetReplayUriResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifReplay__GetReplayUriResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifReplay__GetReplayUriResponse.soap_get(soap, "onvifReplay:GetReplayUriResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifReplay__GetReplayUri soap_tmp___onvifReplay__GetReplayUri;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/replay/wsdl/GetReplayUri";
+    soap_tmp___onvifReplay__GetReplayUri.onvifReplay__GetReplayUri = onvifReplay__GetReplayUri;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifReplay__GetReplayUri(soap, &soap_tmp___onvifReplay__GetReplayUri);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifReplay__GetReplayUri(soap, &soap_tmp___onvifReplay__GetReplayUri, "-onvifReplay:GetReplayUri", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifReplay__GetReplayUri(soap, &soap_tmp___onvifReplay__GetReplayUri, "-onvifReplay:GetReplayUri", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifReplay__GetReplayUriResponse*>(&onvifReplay__GetReplayUriResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifReplay__GetReplayUriResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifReplay__GetReplayUriResponse.soap_get(soap, "onvifReplay:GetReplayUriResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int ReplayBindingProxy::GetReplayConfiguration(const char *endpoint, const char *soap_action, _onvifReplay__GetReplayConfiguration *onvifReplay__GetReplayConfiguration, _onvifReplay__GetReplayConfigurationResponse &onvifReplay__GetReplayConfigurationResponse)
 {
-	struct __onvifReplay__GetReplayConfiguration soap_tmp___onvifReplay__GetReplayConfiguration;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/replay/wsdl/GetReplayConfiguration";
-	soap_tmp___onvifReplay__GetReplayConfiguration.onvifReplay__GetReplayConfiguration = onvifReplay__GetReplayConfiguration;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifReplay__GetReplayConfiguration(soap, &soap_tmp___onvifReplay__GetReplayConfiguration);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifReplay__GetReplayConfiguration(soap, &soap_tmp___onvifReplay__GetReplayConfiguration, "-onvifReplay:GetReplayConfiguration", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifReplay__GetReplayConfiguration(soap, &soap_tmp___onvifReplay__GetReplayConfiguration, "-onvifReplay:GetReplayConfiguration", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifReplay__GetReplayConfigurationResponse*>(&onvifReplay__GetReplayConfigurationResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifReplay__GetReplayConfigurationResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifReplay__GetReplayConfigurationResponse.soap_get(soap, "onvifReplay:GetReplayConfigurationResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifReplay__GetReplayConfiguration soap_tmp___onvifReplay__GetReplayConfiguration;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/replay/wsdl/GetReplayConfiguration";
+    soap_tmp___onvifReplay__GetReplayConfiguration.onvifReplay__GetReplayConfiguration = onvifReplay__GetReplayConfiguration;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifReplay__GetReplayConfiguration(soap, &soap_tmp___onvifReplay__GetReplayConfiguration);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifReplay__GetReplayConfiguration(soap, &soap_tmp___onvifReplay__GetReplayConfiguration, "-onvifReplay:GetReplayConfiguration", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifReplay__GetReplayConfiguration(soap, &soap_tmp___onvifReplay__GetReplayConfiguration, "-onvifReplay:GetReplayConfiguration", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifReplay__GetReplayConfigurationResponse*>(&onvifReplay__GetReplayConfigurationResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifReplay__GetReplayConfigurationResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifReplay__GetReplayConfigurationResponse.soap_get(soap, "onvifReplay:GetReplayConfigurationResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int ReplayBindingProxy::SetReplayConfiguration(const char *endpoint, const char *soap_action, _onvifReplay__SetReplayConfiguration *onvifReplay__SetReplayConfiguration, _onvifReplay__SetReplayConfigurationResponse &onvifReplay__SetReplayConfigurationResponse)
 {
-	struct __onvifReplay__SetReplayConfiguration soap_tmp___onvifReplay__SetReplayConfiguration;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/replay/wsdl/SetReplayConfiguration";
-	soap_tmp___onvifReplay__SetReplayConfiguration.onvifReplay__SetReplayConfiguration = onvifReplay__SetReplayConfiguration;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifReplay__SetReplayConfiguration(soap, &soap_tmp___onvifReplay__SetReplayConfiguration);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifReplay__SetReplayConfiguration(soap, &soap_tmp___onvifReplay__SetReplayConfiguration, "-onvifReplay:SetReplayConfiguration", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifReplay__SetReplayConfiguration(soap, &soap_tmp___onvifReplay__SetReplayConfiguration, "-onvifReplay:SetReplayConfiguration", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifReplay__SetReplayConfigurationResponse*>(&onvifReplay__SetReplayConfigurationResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifReplay__SetReplayConfigurationResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifReplay__SetReplayConfigurationResponse.soap_get(soap, "onvifReplay:SetReplayConfigurationResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifReplay__SetReplayConfiguration soap_tmp___onvifReplay__SetReplayConfiguration;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/replay/wsdl/SetReplayConfiguration";
+    soap_tmp___onvifReplay__SetReplayConfiguration.onvifReplay__SetReplayConfiguration = onvifReplay__SetReplayConfiguration;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifReplay__SetReplayConfiguration(soap, &soap_tmp___onvifReplay__SetReplayConfiguration);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifReplay__SetReplayConfiguration(soap, &soap_tmp___onvifReplay__SetReplayConfiguration, "-onvifReplay:SetReplayConfiguration", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifReplay__SetReplayConfiguration(soap, &soap_tmp___onvifReplay__SetReplayConfiguration, "-onvifReplay:SetReplayConfiguration", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifReplay__SetReplayConfigurationResponse*>(&onvifReplay__SetReplayConfigurationResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifReplay__SetReplayConfigurationResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifReplay__SetReplayConfigurationResponse.soap_get(soap, "onvifReplay:SetReplayConfigurationResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 /* End of client proxy code */

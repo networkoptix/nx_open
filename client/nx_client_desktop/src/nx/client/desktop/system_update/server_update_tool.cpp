@@ -13,6 +13,8 @@
 #include <utils/update/update_utils.h>
 
 #include <client/client_settings.h>
+#include <client/client_module.h>
+#include <watchers/cloud_status_watcher.h>
 
 #include <core/resource/fake_media_server.h>
 #include <api/global_settings.h>
@@ -142,29 +144,27 @@ std::future<UpdateContents> ServerUpdateTool::checkLatestUpdate()
 {
     QString updateUrl = qnSettings->updateFeedUrl();
     return std::async(std::launch::async,
-        [this, updateUrl]()
+        [updateUrl]()
         {
             UpdateContents result;
             result.info = nx::update::updateInformation(updateUrl, nx::update::kLatestVersion, &result.error);
             result.sourceType = UpdateSourceType::internet;
             result.source = lit("%1 for build=%2").arg(updateUrl, nx::update::kLatestVersion);
-            verifyUpdateManifest(result);
             return result;
         });
 }
 
-std::future<UpdateContents> ServerUpdateTool::checkSpecificChangeset(QString build, QString password)
+std::future<UpdateContents> ServerUpdateTool::checkSpecificChangeset(QString build)
 {
     QString updateUrl = qnSettings->updateFeedUrl();
 
     return std::async(std::launch::async,
-        [this, updateUrl, build]()
+        [updateUrl, build]()
         {
             UpdateContents result;
             result.info = nx::update::updateInformation(updateUrl, build, &result.error);
             result.sourceType = UpdateSourceType::internetSpecific;
             result.source = lit("%1 for build=%2").arg(updateUrl, build);
-            verifyUpdateManifest(result);
             return result;
         });
 }
@@ -183,7 +183,7 @@ std::future<UpdateContents> ServerUpdateTool::checkUpdateFromFile(QString file)
     m_extractor = std::make_shared<QnZipExtractor>(file, m_outputDir.path());
     m_offlineUpdateCheckResult = std::promise<UpdateContents>();
     m_extractor->start();
-    connect(m_extractor.get(), &QnZipExtractor::finished, this, &ServerUpdateTool::at_extractFilesFinished);
+    connect(m_extractor.get(), &QnZipExtractor::finished, this, &ServerUpdateTool::atExtractFilesFinished);
 
     return m_offlineUpdateCheckResult.get_future();;
 }
@@ -221,7 +221,7 @@ void ServerUpdateTool::readUpdateManifest(QString path, UpdateContents& result)
 }
 
 // NOTE: We are probably not in the UI thread.
-void ServerUpdateTool::at_extractFilesFinished(int code)
+void ServerUpdateTool::atExtractFilesFinished(int code)
 {
     // TODO: Add some thread safety here
     NX_ASSERT(m_offlineUpdaterState == OfflineUpdateState::unpack);
@@ -232,14 +232,14 @@ void ServerUpdateTool::at_extractFilesFinished(int code)
 
     if (code != QnZipExtractor::Ok)
     {
-        NX_VERBOSE(this) << "at_extractFilesFinished() err=" << QnZipExtractor::errorToString((QnZipExtractor::Error)code);
+        NX_VERBOSE(this) << "atExtractFilesFinished() err=" << QnZipExtractor::errorToString((QnZipExtractor::Error)code);
         changeUploadState(OfflineUpdateState::initial);
         contents.error = nx::update::InformationError::missingPackageError;
         m_offlineUpdateCheckResult.set_value(contents);
         return;
     }
 
-    NX_VERBOSE(this) << "at_extractFilesFinished() status = Ready";
+    NX_VERBOSE(this) << "atExtractFilesFinished() status = Ready";
 
     // Find a subfolter containing update manifest
     QDir packageDir = findFolderForFile(m_outputDir, kPackageIndexFile);
@@ -252,6 +252,7 @@ void ServerUpdateTool::at_extractFilesFinished(int code)
     {
         m_uploadDestination = QString("updates/%1/").arg(contents.info.version);
 
+        // TODO: Move this verification to multi_server_updates_widget.cpp
         if (verifyUpdateManifest(contents) && !contents.filesToUpload.empty())
         {
             contents.error = nx::update::InformationError::noError;
@@ -285,12 +286,12 @@ void ServerUpdateTool::setResourceFeed(QnResourcePool* pool)
     }
 
     m_onAddedResource = connect(pool, &QnResourcePool::resourceAdded,
-        this, &ServerUpdateTool::at_resourceAdded);
+        this, &ServerUpdateTool::atResourceAdded);
     m_onRemovedResource = connect(pool, &QnResourcePool::resourceRemoved,
-        this, &ServerUpdateTool::at_resourceRemoved);
+        this, &ServerUpdateTool::atResourceRemoved);
     // TODO: Should replace it by connecting to each resource
     m_onUpdatedResource = connect(pool, &QnResourcePool::resourceChanged,
-        this, &ServerUpdateTool::at_resourceChanged);
+        this, &ServerUpdateTool::atResourceChanged);
 }
 
 QnMediaServerResourceList ServerUpdateTool::getServersForUpload()
@@ -317,7 +318,7 @@ ServerUpdateTool::OfflineUpdateState ServerUpdateTool::getUploaderState() const
     return m_offlineUpdaterState;
 }
 
-void ServerUpdateTool::at_uploadWorkerState(QnUuid serverId, const UploadState& state)
+void ServerUpdateTool::atUploadWorkerState(QnUuid serverId, const UploadState& state)
 {
     if (!m_uploadStateById.count(state.id))
     {
@@ -391,7 +392,7 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents)
             auto callback = [tool=QPointer<ServerUpdateTool>(this), serverId](const UploadState& state)
             {
                 if (tool)
-                    tool->at_uploadWorkerState(serverId, state);
+                    tool->atUploadWorkerState(serverId, state);
             };
 
             UploadState config;
@@ -549,6 +550,9 @@ bool ServerUpdateTool::verifyUpdateManifest(UpdateContents& contents) const
         }
     }
 
+    contents.cloudIsCompatible = checkCloudHost(commonModule(),
+        targetVersion, contents.info.cloudHost, getAllServers());
+
     if (!contents.missingUpdate.empty() || !contents.clientPackage.isValid())
         contents.error = nx::update::InformationError::missingPackageError;
 
@@ -558,6 +562,9 @@ bool ServerUpdateTool::verifyUpdateManifest(UpdateContents& contents) const
     // Update package has no packages at all.
     if (contents.info.packages.empty())
         contents.error = nx::update::InformationError::missingPackageError;
+
+    if (!contents.cloudIsCompatible)
+        contents.error = nx::update::InformationError::incompatibleCloudHostError;
 
     return contents.isValid();
 }
@@ -587,21 +594,21 @@ ServerUpdateTool::ProgressInfo ServerUpdateTool::calculateUploadProgress()
     return result;
 }
 
-void ServerUpdateTool::at_resourceAdded(const QnResourcePtr& resource)
+void ServerUpdateTool::atResourceAdded(const QnResourcePtr& resource)
 {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         m_activeServers[server->getId()] = server;
     // TODO: We should check new server for uploading operations
 }
 
-void ServerUpdateTool::at_resourceRemoved(const QnResourcePtr& resource)
+void ServerUpdateTool::atResourceRemoved(const QnResourcePtr& resource)
 {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         m_activeServers.erase(server->getId());
     // TODO: We should remove this server from uploading operations
 }
 
-void ServerUpdateTool::at_resourceChanged(const QnResourcePtr& resource)
+void ServerUpdateTool::atResourceChanged(const QnResourcePtr& resource)
 {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server)
@@ -754,7 +761,7 @@ void ServerUpdateTool::requestInstallAction(QSet<QnUuid> targets)
             connection->updateActionInstall({});
 }
 
-void ServerUpdateTool::at_updateStatusResponse(bool success, rest::Handle handle,
+void ServerUpdateTool::atUpdateStatusResponse(bool success, rest::Handle handle,
     const std::vector<nx::update::Status>& response)
 {
     m_checkingRemoteUpdateStatus = false;
@@ -796,7 +803,7 @@ void ServerUpdateTool::requestRemoteUpdateState()
         auto callback = [tool=QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle, const UpdateStatusAll& response)
             {
                 if (tool)
-                    tool->at_updateStatusResponse(success, handle, response);
+                    tool->atUpdateStatusResponse(success, handle, response);
             };
 
         m_timeStartedInstall = Clock::now();

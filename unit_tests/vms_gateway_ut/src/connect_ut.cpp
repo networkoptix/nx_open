@@ -13,7 +13,7 @@ namespace gateway {
 namespace test {
 
 
-const constexpr std::chrono::milliseconds kTimeoutMsec(5000);
+const constexpr std::chrono::milliseconds kNetworkTimeout(5000);
 const QByteArray successResponse = "HTTP/1.1 200 OK\r\n";
 
 class VmsGatewayConnectTest:
@@ -35,10 +35,10 @@ public:
         const QByteArray &connectResponse = successResponse)
     {
         socket = std::make_unique<network::TCPSocket>();
-        socket->setRecvTimeout(kTimeoutMsec.count());
+        socket->setRecvTimeout(kNetworkTimeout.count());
 
         // Connect to proxy.
-        ASSERT_TRUE(socket->connect(endpoint(), std::chrono::milliseconds(kTimeoutMsec)))
+        ASSERT_TRUE(socket->connect(endpoint(), std::chrono::milliseconds(kNetworkTimeout)))
             << "Connect failed: " << SystemError::getLastOSErrorText().toStdString();
 
         const QByteArray connectRequest(QString(
@@ -91,7 +91,7 @@ TEST_F(VmsGatewayConnectTest, ConnectionClose)
     connectProxySocket(server.addressBeingListened(), clientSocket);
 
     clientSocket->close();
-    ASSERT_EQ(connectionFinishedFuture.wait_for(std::chrono::milliseconds(kTimeoutMsec)),
+    ASSERT_EQ(connectionFinishedFuture.wait_for(std::chrono::milliseconds(kNetworkTimeout)),
         std::future_status::ready);
     clientSocket.reset();
 

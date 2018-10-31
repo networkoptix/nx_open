@@ -91,7 +91,6 @@
 #include <ui/dialogs/about_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
 #include <ui/dialogs/local_settings_dialog.h>
-#include <ui/dialogs/camera_addition_dialog.h>
 #include <ui/dialogs/common/input_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/business_rules_dialog.h>
@@ -318,7 +317,6 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::CameraIssuesAction), SIGNAL(triggered()), this, SLOT(at_cameraIssuesAction_triggered()));
     connect(action(action::CameraBusinessRulesAction), SIGNAL(triggered()), this, SLOT(at_cameraBusinessRulesAction_triggered()));
     connect(action(action::CameraDiagnosticsAction), SIGNAL(triggered()), this, SLOT(at_cameraDiagnosticsAction_triggered()));
-    connect(action(action::ServerAddCameraManuallyAction), SIGNAL(triggered()), this, SLOT(at_serverAddCameraManuallyAction_triggered()));
     connect(action(action::PingAction), SIGNAL(triggered()), this, SLOT(at_pingAction_triggered()));
     connect(action(action::ServerLogsAction), SIGNAL(triggered()), this, SLOT(at_serverLogsAction_triggered()));
     connect(action(action::ServerIssuesAction), SIGNAL(triggered()), this, SLOT(at_serverIssuesAction_triggered()));
@@ -572,10 +570,6 @@ QnEventLogDialog *ActionHandler::businessEventsLogDialog() const {
 
 QnCameraListDialog *ActionHandler::cameraListDialog() const {
     return m_cameraListDialog.data();
-}
-
-QnCameraAdditionDialog *ActionHandler::cameraAdditionDialog() const {
-    return m_cameraAdditionDialog.data();
 }
 
 QnSystemAdministrationDialog *ActionHandler::systemAdministrationDialog() const {
@@ -1817,33 +1811,6 @@ void ActionHandler::at_cameraDiagnosticsAction_triggered() {
     dialog->exec();
 }
 
-void ActionHandler::at_serverAddCameraManuallyAction_triggered()
-{
-    const auto params = menu()->currentParameters(sender());
-    const auto server = params.resource().dynamicCast<QnMediaServerResource>();
-    if (!server)
-        return;
-
-    QnNonModalDialogConstructor<QnCameraAdditionDialog> dialogConstructor(m_cameraAdditionDialog, mainWindowWidget());
-
-    QnCameraAdditionDialog* dialog = cameraAdditionDialog();
-
-    if (dialog->server() != server) {
-        if (dialog->state() == QnCameraAdditionDialog::Searching
-            || dialog->state() == QnCameraAdditionDialog::Adding) {
-
-            const auto result = QnMessageBox::question(mainWindowWidget(),
-                tr("Cancel device adding?"), QString(),
-                QDialogButtonBox::Yes | QDialogButtonBox::No,
-                QDialogButtonBox::No);
-
-            if (result != QDialogButtonBox::Yes)
-                return;
-        }
-        dialog->setServer(server);
-    }
-}
-
 void ActionHandler::at_serverLogsAction_triggered()
 {
     QnMediaServerResourcePtr server = menu()->currentParameters(sender()).resource().dynamicCast<QnMediaServerResource>();
@@ -2587,9 +2554,6 @@ void ActionHandler::deleteDialogs() {
 
     if (businessEventsLogDialog())
         delete businessEventsLogDialog();
-
-    if (cameraAdditionDialog())
-        delete cameraAdditionDialog();
 
     if (adjustVideoDialog())
         delete adjustVideoDialog();

@@ -52,7 +52,7 @@ class FileSystemPath(PurePath):
             except NotADir:
                 yield child
 
-    def mkdir(self, parents=False, exist_ok=True):
+    def mkdir(self, parents=False, exist_ok=False):
         try:
             self._mkdir_raw()
         except exceptions.AlreadyExists:
@@ -175,6 +175,10 @@ class FileSystemPath(PurePath):
                 destination)
         copy_file(local_source_path, destination)
         return destination
+
+    @abstractmethod
+    def symlink_to(self, target, target_is_directory=False):
+        pass
 
 
 class BasePosixPath(FileSystemPath, PurePosixPath):

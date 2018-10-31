@@ -4,12 +4,15 @@ from collections import OrderedDict
 from pprint import pformat
 from xml.dom import minidom
 
-import dateutil
+import dateutil.parser
 import pytz
+import urllib3.util
 import xmltodict
 from pylru import lrudecorator
 from typing import Mapping, Union
-from winrm.exceptions import WinRMError, WinRMTransportError
+from winrm import Protocol, exceptions
+
+from framework.os_access.windows_remoting.pywinrm_protocol import make_pywinrm_protocol
 
 _logger = logging.getLogger(__name__)
 
@@ -51,8 +54,20 @@ def _format_timeout(timeout_sec):
 
 
 class Wmi(object):
-    def __init__(self, protocol):
+    def __init__(self, protocol):  # type: (Protocol) -> ...
         self.protocol = protocol
+
+    @classmethod
+    def new(cls, hostname, port, username, password):
+        return cls(make_pywinrm_protocol(hostname, port, username, password))
+
+    def __repr__(self):
+        transport = self.protocol.transport
+        parsed_url = urllib3.util.parse_url(transport.endpoint)
+        hostname = parsed_url.hostname
+        port = parsed_url.port
+        return 'Wmi.new({!r}, {!r}, {!r}, {!r})'.format(
+            hostname, port, transport.username, transport.password)
 
     def __eq__(self, other):
         if not isinstance(other, Wmi):
@@ -104,10 +119,10 @@ class Wmi(object):
             _logger.debug("Request XML:\n%s", _pretty_format_xml(request_xml))
             response = self.protocol.send_message(request_xml)
             _logger.debug("Response XML:\n%s", _pretty_format_xml(response))
-        except WinRMTransportError as e:
+        except exceptions.WinRMTransportError as e:
             _logger.exception("XML:\n%s", e.response_text)
             raise
-        except WinRMError as e:
+        except exceptions.WinRMError as e:
             _logger.debug("Failed: %s", e)
             raise
 
@@ -331,7 +346,7 @@ class _Reference(object):
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Put'
         body = {self.wmi_class.name: _prepare_data(new_properties_dict)}
         body[self.wmi_class.name]['@xmlns'] = self.wmi_class.uri
-        outcome = self.wmi_class.wmi(self.wmi_class.uri, action_url, body, self.selectors)
+        outcome = self.wmi_class.wmi.act(self.wmi_class.uri, action_url, body, self.selectors)
         instance = outcome[self.wmi_class.name]
         return _Object(self, instance)
 

@@ -27,7 +27,7 @@ void NX_UTILS_API setOnAssertHandler(std::function<void(const log::Message&)> ha
 void NX_UTILS_API crashProgram(const log::Message& message);
 
 /**
- * @return false.
+ * @return Always false.
  */
 bool NX_UTILS_API assertFailure(bool isCritical, const log::Message& message);
 
@@ -35,7 +35,7 @@ void NX_UTILS_API enableQtMessageAsserts();
 void NX_UTILS_API disableQtMessageAsserts();
 
 /**
- * @return false.
+ * @return Always false.
  */
 template<typename Reason>
 bool assertFailure(

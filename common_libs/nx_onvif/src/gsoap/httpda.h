@@ -1,8 +1,8 @@
 /*
-	httpda.h
+    httpda.h
 
-	gSOAP HTTP Digest Authentication plugin.
-	Supports both Basic and Digest authentication.
+    gSOAP HTTP Digest Authentication plugin.
+    Supports both Basic and Digest authentication.
 
 gSOAP XML Web services tools
 Copyright (C) 2000-2016, Robert van Engelen, Genivia Inc., All Rights Reserved.
@@ -101,15 +101,15 @@ struct http_da_data
   int (*fpreparefinalrecv)(struct soap*);
   struct soap_smd_data smd_data; /**< SMD engine state */
   int  option;          /**< plugin server-side digest algorithm option (0 to 5) */
-  char digest[32];	/**< entity body digest */
-  char *nonce;		/**< client/server-side copy of server's nonce value */
-  char *opaque;		/**< client/server-side copy of server's opaque value */
-  char *qop;		/**< client/server-side copy of server's qop value(s) */
-  char *alg;		/**< client-side: server's algorithm value */
-  unsigned long nc;	/**< client-side: generated nonce count */
-  char *ncount;		/**< server-side: client's nonce count */
-  char *cnonce;		/**< server-side: client's nonce */
-  char response[32];	/**< server-side: client's response digest key */
+  char digest[32];    /**< entity body digest */
+  char *nonce;        /**< client/server-side copy of server's nonce value */
+  char *opaque;        /**< client/server-side copy of server's opaque value */
+  char *qop;        /**< client/server-side copy of server's qop value(s) */
+  char *alg;        /**< client-side: server's algorithm value */
+  unsigned long nc;    /**< client-side: generated nonce count */
+  char *ncount;        /**< server-side: client's nonce count */
+  char *cnonce;        /**< server-side: client's nonce */
+  char response[32];    /**< server-side: client's response digest key */
 };
 
 /**

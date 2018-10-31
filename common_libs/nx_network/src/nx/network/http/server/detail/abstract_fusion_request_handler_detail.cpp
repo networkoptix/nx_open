@@ -96,12 +96,14 @@ bool BaseFusionRequestHandler::getDataFormat(
     return true;
 }
 
-bool BaseFusionRequestHandler::isFormatSupported(Qn::SerializationFormat dataFormat) const
+bool BaseFusionRequestHandler::isFormatSupported(
+    Qn::SerializationFormat dataFormat) const
 {
     return dataFormat == Qn::JsonFormat || dataFormat == Qn::UrlQueryFormat;
 }
 
-void BaseFusionRequestHandler::setConnectionEvents(nx::network::http::ConnectionEvents connectionEvents)
+void BaseFusionRequestHandler::setConnectionEvents(
+    nx::network::http::ConnectionEvents connectionEvents)
 {
     m_connectionEvents = std::move(connectionEvents);
 }

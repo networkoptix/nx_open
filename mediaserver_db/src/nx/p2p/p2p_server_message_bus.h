@@ -30,6 +30,7 @@ public:
         const Qn::UserAccessData& userAccessData,
         std::function<void()> onConnectionClosedCallback);
     virtual bool validateRemotePeerData(const vms::api::PeerDataEx& remotePeer) override;
+    virtual void start() override;
 protected:
     virtual void doPeriodicTasks() override;
     virtual void stop() override;
@@ -105,7 +106,8 @@ private:
     ec2::detail::QnDbManager* m_db;
     QElapsedTimer m_dbCommitTimer;
     QElapsedTimer m_wantToSubscribeTimer;
-    bool m_restartPending{false};
+    std::atomic_flag m_restartPending{false};
+    qint64 m_systemIdentityTime = 0;
 };
 
 } // namespace p2p

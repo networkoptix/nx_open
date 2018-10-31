@@ -35,28 +35,27 @@ public:
     }
 
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request request,
-        nx::network::http::Response* const response,
+        nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler )
     {
+        using namespace nx::network;
+
         if (m_securityExpectation)
         {
-            EXPECT_EQ(m_securityExpectation.get(), connection->isSsl());
+            EXPECT_EQ(m_securityExpectation.get(), requestContext.connection->isSsl());
         }
 
-        QUrlQuery requestQuery(request.requestLine.url.query());
+        QUrlQuery requestQuery(requestContext.request.requestLine.url.query());
 
-        if (request.requestLine.url.path() == testPath &&
+        if (requestContext.request.requestLine.url.path() == testPath &&
             requestQuery.hasQueryItem(testQuery))
         {
-            std::unique_ptr<nx::network::http::AbstractMsgBodySource> bodySource;
+            std::unique_ptr<http::AbstractMsgBodySource> bodySource;
             if (requestQuery.hasQueryItem("chunked"))
             {
-                response->headers.emplace("Transfer-Encoding", "chunked");
-                bodySource = std::make_unique<nx::network::http::BufferSource>(testMsgContentType,
-                    nx::network::http::QnChunkedTransferEncoder::serializeSingleChunk(testMsgBody)+"0\r\n\r\n");
+                requestContext.response->headers.emplace("Transfer-Encoding", "chunked");
+                bodySource = std::make_unique<http::BufferSource>(testMsgContentType,
+                    http::QnChunkedTransferEncoder::serializeSingleChunk(testMsgBody)+"0\r\n\r\n");
             }
             else if (requestQuery.hasQueryItem("undefinedContentLength"))
             {
@@ -64,15 +63,15 @@ public:
             }
             else
             {
-                bodySource = std::make_unique<nx::network::http::BufferSource>(testMsgContentType, testMsgBody);
+                bodySource = std::make_unique<http::BufferSource>(testMsgContentType, testMsgBody);
             }
 
-            completionHandler(nx::network::http::RequestResult(
-                nx::network::http::StatusCode::ok, std::move(bodySource)));
+            completionHandler(http::RequestResult(
+                http::StatusCode::ok, std::move(bodySource)));
         }
         else
         {
-            completionHandler(nx::network::http::StatusCode::badRequest);
+            completionHandler(http::StatusCode::badRequest);
         }
     }
 

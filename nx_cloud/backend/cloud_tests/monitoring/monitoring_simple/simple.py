@@ -90,7 +90,18 @@ def testmethod(delay=0, host=None, continue_if_fails=False, metric=None, tries=1
                         if n_try == tries:
                             raise
 
-                        log.error('Test {}: failed. Retrying..'.format(f.__name__))
+                        log.error('Test {}: failed. Assertion failed. Retrying...'.format(f.__name__))
+
+                        io = StringIO()
+                        traceback.print_exc(file=io)
+                        log.error(io.getvalue())
+
+                        time.sleep(RETRY_TIMEOUT)
+                    except Exception as e:
+                        if n_try == tries:
+                            raise
+
+                        log.error('Test {}: failed. Exception {} occured. Retrying...'.format(f.__name__, type(e).__name__))
 
                         io = StringIO()
                         traceback.print_exc(file=io)
@@ -104,7 +115,7 @@ def testmethod(delay=0, host=None, continue_if_fails=False, metric=None, tries=1
                     self.collected_metrics[(metric, host, datetime.utcnow())] = 0
 
                 return 0
-            except Exception:
+            except:
                 log.error('Test {}: failure'.format(f.__name__))
 
                 io = StringIO()

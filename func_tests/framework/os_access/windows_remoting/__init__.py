@@ -1,18 +1,15 @@
 from __future__ import print_function
 
-from subprocess import list2cmdline
+import subprocess
 
-import winrm
-from pathlib2 import PurePath
-from requests import RequestException
+import pathlib2 as pathlib
+import requests
 
 from framework.context_logger import ContextLogger
 from framework.method_caching import cached_getter
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
-from framework.os_access.windows_remoting import wmi
-from ._cmd import Shell
-from ._powershell import run_powershell_script
-from .registry import _WindowsRegistryKey
+from framework.os_access.windows_remoting import cmd, powershell, registry, wmi
+from framework.os_access.windows_remoting.pywinrm_protocol import make_pywinrm_protocol
 
 _logger = ContextLogger(__name__, 'winrm')
 
@@ -22,7 +19,7 @@ def command_args_to_str_list(command):
     for arg in command:
         if isinstance(arg, str):
             command_str_list.append(arg)
-        if isinstance(arg, (int, PurePath)):
+        if isinstance(arg, (int, pathlib.PurePath)):
             command_str_list.append(str(arg))
     return command_str_list
 
@@ -35,12 +32,7 @@ class WinRM(object):
     """
 
     def __init__(self, address, port, username, password):
-        self._protocol = winrm.Protocol(
-            'http://{}:{}/wsman'.format(address, port),
-            username=username, password=password,
-            transport='ntlm',  # 'plaintext' is easier to debug but, for some obscure reason, is slower.
-            message_encryption='never',  # Any value except 'always' and 'auto'.
-            operation_timeout_sec=120, read_timeout_sec=240)
+        self._protocol = make_pywinrm_protocol(address, port, username, password)
         self._username = username
         self._repr = 'WinRM({!r}, {!r}, {!r}, {!r})'.format(address, port, username, password)
         self.wmi = wmi.Wmi(self._protocol)
@@ -54,24 +46,24 @@ class WinRM(object):
     @cached_getter
     def _shell(self):
         """Lazy shell creation"""
-        shell = Shell(self._protocol)
+        shell = cmd.Shell(self._protocol)
         shell.__enter__()
         return shell
 
     def command(self, args):
         command_str_list = command_args_to_str_list(args)
-        _logger.info("Command: %s", list2cmdline(command_str_list))
+        _logger.info("Command: %s", subprocess.list2cmdline(command_str_list))
         return self._shell().start(command_str_list, logger=_logger.getChild('cmd'))
 
     def run_command(self, command, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
         return self.command(command).run(input, timeout_sec=timeout_sec)
 
     def run_powershell_script(self, script, variables):
-        return run_powershell_script(self._shell(), script, variables, logger=_logger.getChild('cmd'))
+        return powershell.run_powershell_script(self._shell(), script, variables, logger=_logger.getChild('cmd'))
 
     def is_working(self):
         try:
             self.run_command(['whoami'])
-        except RequestException:
+        except requests.RequestException:
             return False
         return True
