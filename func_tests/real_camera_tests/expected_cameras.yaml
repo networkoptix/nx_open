@@ -80,10 +80,6 @@ DWC-MD421D_1.1.1.8:
       '1': "rtsp://192.168.200.13:554/h264"
       '2': "rtsp://192.168.200.13:8554/h264"
 
-  # Not sure if it has audio_parameters, but isAudioSupported == 1.
-  audio_parameters if False:
-    - {'skip_codec_change': True, 'codec': 'MP2'}
-
   io_events:
     ins: [{id: '1'}]
     outs: [{id: 't_RelayOut-0'}]
@@ -146,7 +142,6 @@ DWC-MPA20M:
   video_parameters:
     primary:
       - {codec: 'H264', resolution: '1920x1080'}
-      #- {codec: 'H264', resolution: '960x720'} # Causes FFmpeg to return None.
       - {codec: 'H264', resolution: '1280x720'}
     secondary:
       - {codec: 'H264', resolution: '640x352', fps: [8, 12]}
@@ -184,81 +179,8 @@ DWC-MV421TIR:
     secondary:
       - {codec: 'H264', resolution: '704x480', fps: [8, 12]}
 
-  # Didn't find any data on supported audio_parameters codecs. This needs checking
-  # "Audio stream was not discovered by ffprobe."
   audio_parameters:
     - {'skip_codec_change': True, codec: 'MP2'}
-
-  io_events:
-    ins: [{id: '1'}]
-    outs: [{id: 'relay01'}]
-
-
-DWC-MV84WiAC6:
-  discovery:
-    physicalId: urn_uuid_32313534-3532-6666-3338-000df1215452
-    vendor: Digital Watchdog
-    model: DWC-MV84WiAC6
-    mac: 00-0D-F1-21-54-52
-
-  authorization:
-    password: auto
-
-  attributes:
-    firmware: A4.1.2
-    isAudioSupported: 0
-    ptzCapabilities: 4  # Zoom.
-
-  attributes if features.advanced_lens_control:
-    ptzCapabilities: 16388
-
-  recording:
-    primary: {codec: 'H264', resolution: '2560x1440', fps: [[13, 17], [8, 12]]}
-    secondary: {codec: 'H264', resolution: '352x288', fps: [4, 8]}
-
-  video_parameters:
-    primary: # Exact supported fps/res values are not in the spec. Adjusting may be needed
-      - {codec: 'H264', resolution: '1280x960'}
-      #- {codec: 'MJPEG', resolution: '1280x960'}
-    secondary:
-      - {codec: 'H264', resolution: '640x480', fps: [8, 12]}
-      #- {codec: 'MJPEG', resolution: '640x480', fps: [24, 36]}
-
-
-DWC-PVX16W:
-  discovery:
-    physicalId: urn_uuid_32313563-6163-6665-6436-000df1215cac
-    vendor: Digital Watchdog
-    model: DWC-PVX16W
-    mac: 00-0D-F1-21-5C-AC
-
-  authorization:
-    password: auto
-
-  attributes:
-    firmware: S2.1.3_2018.03.09
-    isAudioSupported: 1
-    ptzCapabilities: 4  # Zoom.
-
-  attributes if features.advanced_lens_control:
-    ptzCapabilities: 16388
-
-  recording:
-    primary: {codec: 'H264', resolution: '2560x1440', fps: [[12, 18], [5, 10]]}
-    secondary: {codec: 'H264', resolution: '352x240', fps: [5, 9]}
-    # Although in all_cameras.json range is "352x240,352x288, 640x480,704x480,704x576", 352x240
-    # is applied when trying to use 352x288. Bug on the server or camera?
-
-  video_parameters:
-    primary:
-      - {codec: 'H264', resolution: '1920x1080'}
-    secondary:
-      - {codec: 'H264', resolution: '704x480', fps: [13, 17]}
-
-  # Didn't find any data on supported audio_parameters codecs. This needs checking.
-  #"Audio stream was not discovered by ffprobe. Seems, there's no sound on the cam."
-  audio_parameters if False:
-    - {'skip_codec_change': True, codec: 'G711'}
 
   io_events:
     ins: [{id: '1'}]
@@ -293,10 +215,6 @@ Hanwha_PNM-9020V:
     stream_urls:
       "1": "rtsp://192.168.200.12:554/profile4/media.smp"
       "2": "rtsp://192.168.200.12:554/profile5/media.smp"
-
-  audio_parameters if False:
-    - {codec: 'AAC'}  # The camera has audio_parameters input, but ffprobe does not
-    - {codec: 'G711'} # detect any sound. Need to connect a mic???
 
   io_events:
     ins: [{id: 'AlarmInput.1', name: 'Alarm Input #1'}]
@@ -376,11 +294,6 @@ Hikvision_DS-2CD2132F-IWS:
     secondary:
       - {codec: 'H264', resolution: '1280x720', fps: [8, 12]}
       - {codec: 'H264', resolution: '320x240', fps: [13, 17]}
-
-  # Also has G722 and MP2L2 in spec. But no advanced setting to switch to those.
-  # "Audio stream was not discovered by ffprobe."
-  audio_parameters if False:
-    - {'skip_codec_change': True, codec: 'G711'}
 
   io_events:
     ins: [{id: '1', connected: 'AlarmOut_0'}]
