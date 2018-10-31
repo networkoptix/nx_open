@@ -184,14 +184,15 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(
                     request.roundMethod);
             }
             if (videoSequence && videoSequence->size() > 0)
-                return decodeFrameSequence(videoSequence, timeUSec);
+                return decodeFrameSequence(resource, videoSequence, timeUSec);
         }
     }
 
     if (!video)
         return CLVideoDecoderOutputPtr();
 
-    QnFfmpegVideoDecoder decoder(video->compressionType, video, false);
+    QnFfmpegVideoDecoder decoder(
+        DecoderConfig::fromResource(resource), video->compressionType, video, false);
     bool gotFrame = false;
 
     if (!isArchiveVideoPacket)
@@ -418,6 +419,7 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImageWithCertainQualit
 }
 
 CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameSequence(
+    const QnResourcePtr& resource,
     std::unique_ptr<QnConstDataPacketQueue>& sequence,
     quint64 timeUSec)
 {
@@ -432,7 +434,9 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameSequence(
         return CLVideoDecoderOutputPtr();
 
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
-    QnFfmpegVideoDecoder decoder(firstFrame->compressionType, firstFrame, false);
+    QnFfmpegVideoDecoder decoder(
+        DecoderConfig::fromResource(resource),
+        firstFrame->compressionType, firstFrame, false);
 
     for (int i = 0; i < randomAccess.size(); ++i)
     {

@@ -32,6 +32,7 @@ public:
         \param hwDecoder Decoder. Can be specified later with \a setHWDecoder call. VideoDecoderSwitcher object takes ownership of \a hwDecoder
     */
     VideoDecoderSwitcher(
+        const DecoderConfig& config,
         QnAbstractVideoDecoder* hwDecoder,
         const QnCompressedVideoDataPtr& sequenceHeader,
         const QnAbstractVideoDecoderPlugin& decoderFactory );
@@ -82,6 +83,7 @@ public:
     void switchToSoftwareDecoding();
 
 private:
+    const DecoderConfig m_config;
     std::unique_ptr<QnAbstractVideoDecoder> m_decoder;
     //!Used to initialize new decoder object in case of decoder switching
     QnCompressedVideoDataPtr m_mediaSequenceHeader;

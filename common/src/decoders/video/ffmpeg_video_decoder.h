@@ -29,7 +29,11 @@ public:
     /*!
         \param swDecoderCount Atomically incremented in constructor and atomically decremented in destructor
     */
-    QnFfmpegVideoDecoder(AVCodecID codec, const QnConstCompressedVideoDataPtr& data, bool mtDecoding, QAtomicInt* const swDecoderCount = NULL);
+    QnFfmpegVideoDecoder(
+        const DecoderConfig& config,
+        AVCodecID codec, const QnConstCompressedVideoDataPtr& data,
+        bool mtDecoding,
+        QAtomicInt* const swDecoderCount = NULL);
     ~QnFfmpegVideoDecoder();
     bool decode( const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
 
@@ -66,7 +70,14 @@ public:
     virtual void setSpeed( float newValue ) override;
 
 private:
-    void forceMtDecoding(bool value);
+    enum class ForceMtDecodingType
+    {
+        none,
+        forcedOn,
+        forcedOff
+    };
+
+    void setForceMtDecoding(ForceMtDecodingType value);
     static AVCodec* findCodec(AVCodecID codecId);
 
     void openDecoder(const QnConstCompressedVideoDataPtr& data);
@@ -74,6 +85,7 @@ private:
     int findMotionInfo(qint64 pkt_dts);
     void reallocateDeinterlacedFrame();
     void processNewResolutionIfChanged(const QnConstCompressedVideoDataPtr& data, int width, int height);
+    static bool needToUseMtDecoding(bool userDefinedMtDecoding, ForceMtDecodingType forcedValue);
 private:
     AVCodecContext *m_passedContext;
 
@@ -116,7 +128,7 @@ private:
     MotionMap m_motionMap;
     QAtomicInt* const m_swDecoderCount;
     mutable double m_prevSampleAspectRatio;
-    bool m_forcedMtDecoding;
+    ForceMtDecodingType m_forcedMtDecoding;
     qint64 m_prevTimestamp;
     bool m_spsFound;
 };

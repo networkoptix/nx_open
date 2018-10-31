@@ -30,6 +30,7 @@ public:
     Otherwise, it will ignore any loaded decoder plugin
     */
     static QnAbstractVideoDecoder* createDecoder(
+        const DecoderConfig& config,
         const QnCompressedVideoDataPtr& data,
         bool mtDecoding,
         const QGLContext* glContext = NULL,

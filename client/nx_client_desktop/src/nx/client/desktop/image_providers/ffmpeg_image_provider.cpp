@@ -88,7 +88,8 @@ void FfmpegImageProvider::doLoadAsync()
         QnAbstractMediaData::MediaFlags_DecodeTwice | QnAbstractMediaData::MediaFlags_StillImage;
 
     QSharedPointer<CLVideoDecoderOutput> outFrame(new CLVideoDecoderOutput());
-    QnFfmpegVideoDecoder decoder(frame->compressionType, frame, false);
+    QnFfmpegVideoDecoder decoder(
+        DecoderConfig::fromResource(d->resource), frame->compressionType, frame, false);
     if (!decoder.decode(frame, &outFrame))
         return;
 

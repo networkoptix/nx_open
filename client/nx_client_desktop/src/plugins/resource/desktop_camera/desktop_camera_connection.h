@@ -63,6 +63,7 @@ public:
     void sendUnlock();
     void sendLock();
     bool isConnected() const;
+    QnResourcePtr getResource() const;
 private:
     void disconnectInternal();
 private:

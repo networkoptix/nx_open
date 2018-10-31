@@ -72,7 +72,11 @@ struct FffmpegLog
 };
 
 
-QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(AVCodecID codec_id, const QnConstCompressedVideoDataPtr& data, bool mtDecoding, QAtomicInt* const swDecoderCount):
+QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(
+    const DecoderConfig& config,
+    AVCodecID codec_id,
+    const QnConstCompressedVideoDataPtr& data,
+    bool mtDecoding, QAtomicInt* const swDecoderCount):
     m_passedContext(0),
     m_context(0),
     //m_width(0),
@@ -91,11 +95,21 @@ QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(AVCodecID codec_id, const QnConstComp
     m_forceSliceDecoding(-1),
     m_swDecoderCount(swDecoderCount),
     m_prevSampleAspectRatio( 1.0 ),
-    m_forcedMtDecoding(false),
+    m_forcedMtDecoding(ForceMtDecodingType::none),
     m_prevTimestamp(AV_NOPTS_VALUE),
     m_spsFound(false)
 {
-    m_mtDecoding = mtDecoding;
+    for (auto& codecName: config.disabledCodecsForMtDecoding)
+    {
+        const AVCodecDescriptor* codecDescr =
+            avcodec_descriptor_get_by_name(codecName.toLatin1().data());
+        if (codecDescr && codecDescr->id == m_codecId)
+        {
+            m_forcedMtDecoding = ForceMtDecodingType::forcedOff;
+            break;
+        }
+    }
+    setMTDecoding(mtDecoding);
 
     if (data->context)
     {
@@ -157,15 +171,23 @@ void QnFfmpegVideoDecoder::closeDecoder()
     m_motionMap.clear();
 }
 
+bool QnFfmpegVideoDecoder::needToUseMtDecoding(bool userDefinedMtDecoding, ForceMtDecodingType forcedValue)
+{
+    if (forcedValue == ForceMtDecodingType::forcedOn)
+        return true;
+    else if (forcedValue == ForceMtDecodingType::forcedOff)
+        return false;
+    else
+        return userDefinedMtDecoding;
+}
+
 void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVideoDataPtr& data)
 {
-    if (m_context->thread_count <= 1) {
+    if (needToUseMtDecoding(m_mtDecoding, m_forcedMtDecoding))
         m_context->thread_count = qMin(MAX_DECODE_THREAD, QThread::idealThreadCount() + 1);
-        if (m_forcedMtDecoding)
-            m_context->thread_count = qMin(m_context->thread_count, 3);
-    }
-    if (!m_mtDecoding && !m_forcedMtDecoding)
-        m_context->thread_count = 1;
+    else
+        m_context->thread_count = 1; //< Turn off multi thread decoding.
+
 
     if (m_forceSliceDecoding == -1 && data && data->data() && m_context->codec_id == AV_CODEC_ID_H264)
     {
@@ -361,12 +383,12 @@ void QnFfmpegVideoDecoder::processNewResolutionIfChanged(const QnConstCompressed
     }
 }
 
-void QnFfmpegVideoDecoder::forceMtDecoding(bool value)
+void QnFfmpegVideoDecoder::setForceMtDecoding(ForceMtDecodingType value)
 {
     if (value != m_forcedMtDecoding)
     {
-        bool oldMtDecoding = m_mtDecoding || m_forcedMtDecoding;
-        bool newMtDecoding = m_mtDecoding || value;
+        bool oldMtDecoding = needToUseMtDecoding(m_mtDecoding, m_forcedMtDecoding);
+        bool newMtDecoding = needToUseMtDecoding(m_mtDecoding, value);
         m_forcedMtDecoding = value;
         m_needRecreate = oldMtDecoding != newMtDecoding;
     }
@@ -530,13 +552,16 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
 
         if (got_picture)
         {
-            if (m_context->width <= 3500)
-                forceMtDecoding(false);
-            else
+            if (m_forcedMtDecoding != ForceMtDecodingType::forcedOff)
             {
-                qint64 frameDistance = data->timestamp - m_prevTimestamp;
-                if (frameDistance > 0 && frameDistance < 50000)
-                    forceMtDecoding(true); // high fps and high resolution
+                if (m_context->width <= 3500)
+                    setForceMtDecoding(ForceMtDecodingType::none);
+                else
+                {
+                    qint64 frameDistance = data->timestamp - m_prevTimestamp;
+                    if (frameDistance > 0 && frameDistance < 50000)
+                        setForceMtDecoding(ForceMtDecodingType::forcedOn); // high fps and high resolution
+                }
             }
             m_prevTimestamp = data->timestamp;
         }

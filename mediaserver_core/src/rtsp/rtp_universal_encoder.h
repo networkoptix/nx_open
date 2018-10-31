@@ -43,7 +43,7 @@ private:
     QnByteArray m_outputBuffer;
     int m_outputPos;
     int packetIndex;
-    QnFfmpegTranscoder m_transcoder;
+    std::unique_ptr<QnFfmpegTranscoder> m_transcoder;
     AVCodecID m_codec;
     bool m_isVideo;
     //quint32 m_firstTime;

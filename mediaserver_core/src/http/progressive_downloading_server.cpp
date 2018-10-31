@@ -336,7 +336,7 @@ private:
 class QnProgressiveDownloadingConsumerPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
-    QnFfmpegTranscoder transcoder;
+    std::unique_ptr<QnFfmpegTranscoder> transcoder;
     QByteArray streamingFormat;
     AVCodecID videoCodec;
     QSharedPointer<QnArchiveStreamReader> archiveDP;
@@ -570,6 +570,9 @@ void QnProgressiveDownloadingConsumer::run()
             return;
         }
 
+        d->transcoder =
+            std::make_unique<QnFfmpegTranscoder>(DecoderConfig::fromResource(resource));
+
         QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>();
         if (mediaRes)
         {
@@ -583,9 +586,8 @@ void QnProgressiveDownloadingConsumer::run()
             qreal customAR = mediaRes->customAspectRatio();
             extraParams.rotation = rotation;
             extraParams.forcedAspectRatio = customAR;
-
-            d->transcoder.setTranscodingSettings(extraParams);
-            d->transcoder.setStartTimeOffset(100 * 1000); // droid client has issue if enumerate timings from 0
+            d->transcoder->setTranscodingSettings(extraParams);
+            d->transcoder->setStartTimeOffset(100 * 1000); // droid client has issue if enumerate timings from 0
         }
 
         boost::optional<CameraMediaStreams> mediaStreams;
@@ -616,7 +618,7 @@ void QnProgressiveDownloadingConsumer::run()
             }
         }
 
-        if (d->transcoder.setVideoCodec(
+        if (d->transcoder->setVideoCodec(
                 d->videoCodec,
                 transcodeMethod,
                 quality,
@@ -624,7 +626,7 @@ void QnProgressiveDownloadingConsumer::run()
                 -1) != 0 )
         {
             QByteArray msg;
-            msg = QByteArray("Transcoding error. Can not setup video codec:") + d->transcoder.getLastErrorMessage().toLatin1();
+            msg = QByteArray("Transcoding error. Can not setup video codec:") + d->transcoder->getLastErrorMessage().toLatin1();
             qWarning() << msg;
             d->response.messageBody = msg;
             sendResponse(CODE_INTERNAL_ERROR, "plain/text");
@@ -647,7 +649,7 @@ void QnProgressiveDownloadingConsumer::run()
 
         const bool rtOptimization = decodedUrlQuery.hasQueryItem(RT_OPTIMIZATION_PARAM_NAME);
         if (rtOptimization && qnServerModule->roSettings()->value(StreamingParams::FFMPEG_REALTIME_OPTIMIZATION, true).toBool())
-            d->transcoder.setUseRealTimeOptimization(true);
+            d->transcoder->setUseRealTimeOptimization(true);
 
 
         QByteArray position = decodedUrlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME ).toLatin1();
@@ -796,16 +798,16 @@ void QnProgressiveDownloadingConsumer::run()
             return;
         }
 
-        if (d->transcoder.setContainer(d->streamingFormat) != 0)
+        if (d->transcoder->setContainer(d->streamingFormat) != 0)
         {
             QByteArray msg;
-            msg = QByteArray("Transcoding error. Can not setup output format:") + d->transcoder.getLastErrorMessage().toLatin1();
+            msg = QByteArray("Transcoding error. Can not setup output format:") + d->transcoder->getLastErrorMessage().toLatin1();
             sendJsonResponse(msg);
             return;
         }
 
-        if (camRes && camRes->isAudioEnabled() && d->transcoder.isCodecSupported(AV_CODEC_ID_VORBIS))
-            d->transcoder.setAudioCodec(AV_CODEC_ID_VORBIS, QnTranscoder::TM_FfmpegTranscode);
+        if (camRes && camRes->isAudioEnabled() && d->transcoder->isCodecSupported(AV_CODEC_ID_VORBIS))
+            d->transcoder->setAudioCodec(AV_CODEC_ID_VORBIS, QnTranscoder::TM_FfmpegTranscode);
 
         dataProvider->addDataProcessor(&dataConsumer);
         d->chunkedMode = true;
@@ -866,5 +868,5 @@ int QnProgressiveDownloadingConsumer::getVideoStreamResolution() const
 QnFfmpegTranscoder* QnProgressiveDownloadingConsumer::getTranscoder()
 {
     Q_D(QnProgressiveDownloadingConsumer);
-    return &d->transcoder;
+    return d->transcoder.get();
 }

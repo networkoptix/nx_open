@@ -78,7 +78,6 @@ private:
     QnVideoStreamDisplay::FrameDisplayStatus flushFrame(int channel, QnFrameScaler::DownscaleFactor force_factor);
     //!Blocks until all frames passed to \a display have been rendered
     void flushFramesToRenderer();
-    std::set<AVCodecID> getDisabledMtCodecs();
     void overrideTimestampOfNextFrameToRender(qint64 value);
     //!Returns timestamp of frame that will be rendered next. It can be already displayed frame (if no new frames available)
     qint64 getTimestampOfNextFrameToRender() const;

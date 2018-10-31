@@ -22,6 +22,7 @@ QnVideoDecoderFactory::CLCodecManufacture QnVideoDecoderFactory::m_codecManufact
 PluginManager* QnVideoDecoderFactory::m_pluginManager = nullptr;
 
 QnAbstractVideoDecoder* QnVideoDecoderFactory::createDecoder(
+    const DecoderConfig& config,
     const QnCompressedVideoDataPtr& data,
     bool mtDecoding,
     const QGLContext* glContext,
@@ -30,7 +31,7 @@ QnAbstractVideoDecoder* QnVideoDecoderFactory::createDecoder(
     //TODO/IMPL this is a quick solution. Need something more beautiful (static counter is not beautiful at all...)
     static QAtomicInt swDecoderCount = 0;
 
-    // h264 
+    // h264
     switch (m_codecManufacture)
     {
 #ifdef Q_OS_WIN
@@ -71,7 +72,7 @@ QnAbstractVideoDecoder* QnVideoDecoderFactory::createDecoder(
         case FFMPEG:
         default:
         {
-            return new QnFfmpegVideoDecoder(data->compressionType, data, mtDecoding, &swDecoderCount);
+            return new QnFfmpegVideoDecoder(config, data->compressionType, data, mtDecoding, &swDecoderCount);
         }
     }
 

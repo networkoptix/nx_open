@@ -14,7 +14,8 @@ namespace {
     static const int kMaxPacketLen = 1024 * 32;
 }
 
-QnRtspFfmpegEncoder::QnRtspFfmpegEncoder():
+QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(const DecoderConfig& config):
+    m_config(config),
     m_gotLivePacket(false),
     m_curDataBuffer(0),
     m_liveMarker(0),
@@ -27,7 +28,7 @@ QnRtspFfmpegEncoder::QnRtspFfmpegEncoder():
 
 void QnRtspFfmpegEncoder::setDstResolution(const QSize& dstVideSize, AVCodecID dstCodec)
 {
-    m_videoTranscoder.reset(new QnFfmpegVideoTranscoder(dstCodec));
+    m_videoTranscoder.reset(new QnFfmpegVideoTranscoder(m_config, dstCodec));
     m_videoTranscoder->setResolution(dstVideSize);
 }
 

@@ -45,6 +45,7 @@ private:
         const nx::api::CameraImageRequest& request);
 
     static CLVideoDecoderOutputPtr decodeFrameSequence(
+        const QnResourcePtr& resource,
         std::unique_ptr<QnConstDataPacketQueue>& sequence,
         quint64 timeUSec);
 };

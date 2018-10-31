@@ -4,6 +4,7 @@
 #include "common/common_module.h"
 
 #include <core/resource/param.h>
+#include <nx/streaming/abstract_stream_data_provider.h>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -74,9 +75,14 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(
     //m_isFirstPacket(true),
     m_isOpened(false)
 {
-    if( m_transcoder.setContainer("rtp") != 0 )
+    DecoderConfig decoderConfig;
+    if (media && media->dataProvider)
+        decoderConfig = DecoderConfig::fromResource(media->dataProvider->getResource());
+    m_transcoder = std::make_unique<QnFfmpegTranscoder>(decoderConfig);
+
+    if( m_transcoder->setContainer("rtp") != 0 )
         return; //m_isOpened = false
-    m_transcoder.setPacketizedMode(true);
+    m_transcoder->setPacketizedMode(true);
     m_codec = transcodeToCodec != AV_CODEC_ID_NONE ? transcodeToCodec : media->compressionType;
     QnTranscoder::TranscodeMethod method;
     m_isVideo = media->dataType == QnAbstractMediaData::VIDEO;
@@ -86,11 +92,11 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(
         method = media->compressionType == transcodeToCodec ? QnTranscoder::TM_DirectStreamCopy : QnTranscoder::TM_FfmpegTranscode;
 
     if (media->dataType == QnAbstractMediaData::VIDEO) {
-        m_transcoder.setTranscodingSettings(extraTranscodeParams);
-        m_transcoder.setVideoCodec(m_codec, method, Qn::QualityNormal, videoSize);
+        m_transcoder->setTranscodingSettings(extraTranscodeParams);
+        m_transcoder->setVideoCodec(m_codec, method, Qn::QualityNormal, videoSize);
     }
     else {
-        m_transcoder.setAudioCodec(m_codec, method);
+        m_transcoder->setAudioCodec(m_codec, method);
     }
 
     if (commonModule->isTranscodeDisabled() && method != QnTranscoder::TM_DirectStreamCopy)
@@ -100,11 +106,11 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(
     }
     else if (m_isVideo)
     {
-        m_isOpened = m_transcoder.open(std::dynamic_pointer_cast<const QnCompressedVideoData>(media), QnConstCompressedAudioDataPtr()) == 0;
+        m_isOpened = m_transcoder->open(std::dynamic_pointer_cast<const QnCompressedVideoData>(media), QnConstCompressedAudioDataPtr()) == 0;
     }
     else
     {
-        m_isOpened = m_transcoder.open(QnConstCompressedVideoDataPtr(), std::dynamic_pointer_cast<const QnCompressedAudioData>(media)) == 0;
+        m_isOpened = m_transcoder->open(QnConstCompressedVideoDataPtr(), std::dynamic_pointer_cast<const QnCompressedAudioData>(media)) == 0;
     }
 }
 
@@ -128,8 +134,8 @@ QByteArray updatePayloadType(const QByteArray& line, int payloadType)
 QByteArray QnUniversalRtpEncoder::getAdditionSDP(const std::map<QString, QString>& streamParams)
 {
     AVCodecContext* codec =
-        m_isVideo ? m_transcoder.getVideoCodecContext() : m_transcoder.getAudioCodecContext();
-    AVFormatContext* fmt = m_transcoder.getFormatContext();
+        m_isVideo ? m_transcoder->getVideoCodecContext() : m_transcoder->getAudioCodecContext();
+    AVFormatContext* fmt = m_transcoder->getFormatContext();
     int payloadType = getPayloadtype();
     static const int kMaxSdpSize = 1024*16;
     char buffer[kMaxSdpSize];
@@ -171,12 +177,12 @@ void QnUniversalRtpEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
     m_outputBuffer.clear();
     m_outputPos = 0;
     packetIndex = 0;
-    m_transcoder.transcodePacket(media, &m_outputBuffer);
+    m_transcoder->transcodePacket(media, &m_outputBuffer);
 }
 
 bool QnUniversalRtpEncoder::getNextPacket(QnByteArray& sendBuffer)
 {
-    const QVector<int> packets = m_transcoder.getPacketsSize();
+    const QVector<int> packets = m_transcoder->getPacketsSize();
     if (m_outputPos >= (int) m_outputBuffer.size() - RtpHeader::RTP_HEADER_SIZE || packetIndex >= packets.size())
         return false;
 
@@ -220,12 +226,12 @@ quint32 QnUniversalRtpEncoder::getFrequency()
         if (AVRtpPayloadTypes[i].codec_id == m_codec && AVRtpPayloadTypes[i].clock_rate != -1)
             return AVRtpPayloadTypes[i].clock_rate;
     }
-    if (m_transcoder.getFormatContext())
+    if (m_transcoder->getFormatContext())
     {
-        //AVCodecContext* codecCtx =  m_transcoder.getFormatContext()->streams[0]->codec;
+        //AVCodecContext* codecCtx =  m_transcoder->getFormatContext()->streams[0]->codec;
         //if (codecCtx)
         //    return codecCtx->time_base.den / codecCtx->time_base.num;
-        AVStream* stream = m_transcoder.getFormatContext()->streams[0];
+        AVStream* stream = m_transcoder->getFormatContext()->streams[0];
         return stream->time_base.den / stream->time_base.num;
     }
 
@@ -261,5 +267,5 @@ bool QnUniversalRtpEncoder::isOpened() const
 
 void QnUniversalRtpEncoder::setUseRealTimeOptimization(bool value)
 {
-    m_transcoder.setUseRealTimeOptimization(value);
+    m_transcoder->setUseRealTimeOptimization(value);
 }

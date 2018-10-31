@@ -15,7 +15,7 @@
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/streaming/config.h>
 #include <nx/network/buffered_stream_socket.h>
-
+#include <core/resource_management/resource_pool.h>
 
 static const int CONNECT_TIMEOUT = 1000 * 5;
 static const int KEEP_ALIVE_TIMEOUT = 1000 * 120;
@@ -29,9 +29,11 @@ public:
         m_owner(owner),
         m_needVideoData(false)
     {
+        auto config = DecoderConfig::fromResource(owner->getResource()->toSharedPointer());
         for (int i = 0; i < 2; ++i) {
-            m_serializers[i].setAdditionFlags(0);
-            m_serializers[i].setLiveMarker(true);
+            m_serializers[i] = std::make_unique<QnRtspFfmpegEncoder>(config);
+            m_serializers[i]->setAdditionFlags(0);
+            m_serializers[i]->setLiveMarker(true);
         }
     }
 
@@ -61,9 +63,9 @@ protected:
         int streamIndex = media->channelNumber;
         NX_ASSERT(streamIndex <= 1);
 
-        m_serializers[streamIndex].setDataPacket(media);
+        m_serializers[streamIndex]->setDataPacket(media);
         m_owner->sendLock();
-        while(!m_needStop && m_owner->isConnected() && m_serializers[streamIndex].getNextPacket(sendBuffer))
+        while(!m_needStop && m_owner->isConnected() && m_serializers[streamIndex]->getNextPacket(sendBuffer))
         {
             NX_ASSERT(sendBuffer.size() < 65536 - 4);
             quint8 header[4];
@@ -74,11 +76,11 @@ protected:
             m_owner->sendData((const char*) &header, 4);
 
             static AVRational r = {1, 1000000};
-            AVRational time_base = {1, (int) m_serializers[streamIndex].getFrequency() };
+            AVRational time_base = {1, (int) m_serializers[streamIndex]->getFrequency() };
             qint64 packetTime = av_rescale_q(packet->timestamp, r, time_base);
 
-            QnRtspEncoder::buildRTPHeader(sendBuffer.data(), m_serializers[streamIndex].getSSRC(), m_serializers[streamIndex].getRtpMarker(),
-                           packetTime, m_serializers[streamIndex].getPayloadtype(), m_sequence++);
+            QnRtspEncoder::buildRTPHeader(sendBuffer.data(), m_serializers[streamIndex]->getSSRC(), m_serializers[streamIndex]->getRtpMarker(),
+                           packetTime, m_serializers[streamIndex]->getPayloadtype(), m_sequence++);
             m_owner->sendData(sendBuffer);
             sendBuffer.clear();
         }
@@ -93,7 +95,7 @@ protected:
 
 private:
     quint32 m_sequence;
-    QnRtspFfmpegEncoder m_serializers[2]; // video + audio
+    std::unique_ptr<QnRtspFfmpegEncoder> m_serializers[2]; // video + audio
     QnDesktopCameraConnectionProcessor* m_owner;
     bool m_needVideoData;
 };
@@ -133,6 +135,11 @@ QnDesktopCameraConnectionProcessor::~QnDesktopCameraConnectionProcessor()
     d->socket.clear(); // we have not ownership for socket in this class
 }
 
+QnResourcePtr QnDesktopCameraConnectionProcessor::getResource() const
+{
+    Q_D(const QnDesktopCameraConnectionProcessor);
+    return commonModule()->resourcePool()->getResourceById(d->desktop->getDesktopResourceUuid());
+}
 void QnDesktopCameraConnectionProcessor::processRequest()
 {
     Q_D(QnDesktopCameraConnectionProcessor);

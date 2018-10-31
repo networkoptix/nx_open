@@ -11,6 +11,7 @@
 #include <utils/media/sse_helper.h>
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
+#include <nx/streaming/abstract_stream_data_provider.h>
 
 // TODO: #Elric move to config?
 // see https://code.google.com/p/arxlib/source/browse/include/arx/Utility.h
@@ -1024,7 +1025,11 @@ bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
     if (m_decoder == 0 || m_decoder->getContext()->codec_id != videoData->compressionType)
     {
         delete m_decoder;
-        m_decoder = new QnFfmpegVideoDecoder(videoData->compressionType, videoData, false);
+        DecoderConfig config;
+        if (videoData && videoData->dataProvider)
+            config = DecoderConfig::fromResource(videoData->dataProvider->getResource());
+        m_decoder = new QnFfmpegVideoDecoder(
+            config, videoData->compressionType, videoData, false);
         m_decoder->getContext()->flags |= CODEC_FLAG_GRAY;
     }
 

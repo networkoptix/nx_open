@@ -851,7 +851,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                     // transcode video
                     if (m_dstVideoCodec == AV_CODEC_ID_NONE)
                         m_dstVideoCodec = AV_CODEC_ID_MPEG4; // default value
-                    m_videoTranscoder = new QnFfmpegVideoTranscoder(m_dstVideoCodec);
+                    m_videoTranscoder = new QnFfmpegVideoTranscoder(
+                        DecoderConfig::fromResource(m_resource), m_dstVideoCodec);
                     m_videoTranscoder->setMTMode(true);
 
                     m_videoTranscoder->open(videoData);
@@ -863,7 +864,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
 
                     QnFfmpegHelper::copyAvCodecContex(videoStream->codec, m_videoTranscoder->getCodecContext());
                 }
-                else if (mediaData->context && mediaData->context->getWidth() > 0 
+                else if (mediaData->context && mediaData->context->getWidth() > 0
                          && !forceDefaultContext(mediaData))
                 {
                     QnFfmpegHelper::mediaContextToAvCodecContext(videoCodecCtx, mediaData->context);
@@ -872,7 +873,9 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 {
                     // determine real width and height
                     QSharedPointer<CLVideoDecoderOutput> outFrame(new CLVideoDecoderOutput());
-                    QnFfmpegVideoDecoder decoder(mediaData->compressionType, videoData, false);
+                    QnFfmpegVideoDecoder decoder(
+                        DecoderConfig::fromResource(m_resource),
+                        mediaData->compressionType, videoData, false);
                     decoder.decode(videoData, &outFrame);
                     if (m_role == StreamRecorderRole::fileExport)
                     {

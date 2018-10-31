@@ -13,10 +13,12 @@
 
 
 VideoDecoderSwitcher::VideoDecoderSwitcher(
+    const DecoderConfig& config,
     QnAbstractVideoDecoder* hwDecoder,
     const QnCompressedVideoDataPtr& sequenceHeader,
     const QnAbstractVideoDecoderPlugin& decoderFactory )
 :
+    m_config(config),
     m_decoder( hwDecoder ),
     m_mediaSequenceHeader( sequenceHeader ),
     m_decoderFactory( decoderFactory ),
@@ -47,7 +49,8 @@ bool VideoDecoderSwitcher::decode( const QnConstCompressedVideoDataPtr& data, QS
         //performing following condition check before and after m_decoder->decode call
         if( m_switchToSWDecoding && data && (data->flags & AV_PKT_FLAG_KEY) )
         {
-            m_decoder.reset( new QnFfmpegVideoDecoder( data->compressionType, data, true, NULL ) ); //TODO/IMPL 3rd and 4th params
+            m_decoder.reset( new QnFfmpegVideoDecoder(
+                m_config, data->compressionType, data, true, NULL ) ); //TODO/IMPL 3rd and 4th params
             m_switchToSWDecoding = false;
         }
 

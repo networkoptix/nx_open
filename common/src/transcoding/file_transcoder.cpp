@@ -20,6 +20,7 @@
 
 FileTranscoder::FileTranscoder()
 :
+    m_transcoder(DecoderConfig()),
     m_resultCode( 0 ),
     m_state( sInit ),
     m_transcodeDurationLimit( 0 ),

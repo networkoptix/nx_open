@@ -11,7 +11,10 @@ extern "C"
 }
 
 #include <nx/utils/log/log.h>
-
+#include <common/static_common_module.h>
+#include <core/resource_management/resource_data_pool.h>
+#include <core/resource/param.h>
+#include <core/resource/security_cam_resource.h>
 
 void QnAbstractVideoDecoder::setTryHardwareAcceleration( bool tryHardwareAcceleration )
 {
@@ -27,9 +30,27 @@ QnAbstractVideoDecoder::QnAbstractVideoDecoder()
 {
 }
 
-bool QnAbstractVideoDecoder::isHardwareAccelerationEnabled() const 
+bool QnAbstractVideoDecoder::isHardwareAccelerationEnabled() const
 {
     return m_hardwareAccelerationEnabled;
+}
+
+
+DecoderConfig DecoderConfig::fromMediaResource(QnMediaResourcePtr resource)
+{
+    return fromResource(resource->toResource()->toSharedPointer());
+}
+
+DecoderConfig DecoderConfig::fromResource(QnResourcePtr resource)
+{
+    DecoderConfig config;
+    if (auto cameraResource = resource.dynamicCast<QnSecurityCamResource>())
+    {
+        auto resData = qnStaticCommon->dataPool()->data(cameraResource);
+        config.disabledCodecsForMtDecoding =
+            resData.value<QList<QString>>(Qn::kDisableMultiThreadDecoding);
+    }
+    return config;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

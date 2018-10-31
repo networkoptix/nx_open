@@ -6,7 +6,6 @@
 #include <client/client_settings.h>
 #include <core/resource/param.h>
 #include <common/static_common_module.h>
-#include <core/resource_management/resource_data_pool.h>
 #include <core/resource/security_cam_resource.h>
 
 #include "decoders/video/abstract_video_decoder.h"
@@ -396,26 +395,6 @@ void QnVideoStreamDisplay::calcSampleAR(QSharedPointer<CLVideoDecoderOutput> out
     }
 }
 
-std::set<AVCodecID> QnVideoStreamDisplay::getDisabledMtCodecs()
-{
-    std::set<AVCodecID> disabledMtCodecs;
-    auto secResource = m_resource.dynamicCast<QnSecurityCamResource>();
-    if (secResource)
-    {
-        auto resData = qnStaticCommon->dataPool()->data(secResource);
-        QList<QString> codecList =
-            resData.value<QList<QString>>(Qn::kDisableMultiThreadDecoding);
-        for(auto& codecName: codecList)
-        {
-            const AVCodecDescriptor* codecDescr =
-                avcodec_descriptor_get_by_name(codecName.toLatin1().data());
-            if (codecDescr)
-                disabledMtCodecs.insert(codecDescr->id);
-        }
-    }
-    return disabledMtCodecs;
-}
-
 QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompressedVideoDataPtr data, bool draw, QnFrameScaler::DownscaleFactor force_factor)
 {
     updateRenderList();
@@ -472,12 +451,10 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     }
 
     if (needReinitDecoders) {
-        std::set<AVCodecID> disabledMtCodecs = getDisabledMtCodecs();
         QnMutexLocker lock(&m_mtx);
         auto iter = m_decoder.begin();
         while (iter != m_decoder.end()) {
-            if (disabledMtCodecs.find(iter.key()) == disabledMtCodecs.end())
-                iter.value()->setMTDecoding(enableFrameQueue);
+            iter.value()->setMTDecoding(enableFrameQueue);
             ++iter;
         }
     }
@@ -497,7 +474,9 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         // todo: all renders MUST have same GL context!!!
         const QnAbstractRenderer* renderer = m_renderList.isEmpty() ? 0 : *m_renderList.constBegin();
         const QnResourceWidgetRenderer* widgetRenderer = dynamic_cast<const QnResourceWidgetRenderer*>(renderer);
+
         dec = QnVideoDecoderFactory::createDecoder(
+                DecoderConfig::fromMediaResource(m_resource),
                 data,
                 enableFrameQueue,
                 widgetRenderer ? widgetRenderer->glContext() : NULL);
@@ -525,7 +504,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     dec->setOutPictureSize(getMaxScreenSize());
 
     QnFrameScaler::DownscaleFactor scaleFactor = QnFrameScaler::factor_unknown;
-    if (dec->getWidth() > 0) 
+    if (dec->getWidth() > 0)
     {
         scaleFactor = determineScaleFactor(m_renderList, data->channelNumber, dec->getWidth(), dec->getHeight(), force_factor);
     }
@@ -568,10 +547,10 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
             if (scaleFactor == QnFrameScaler::factor_unknown && dec->getWidth() > 0)
             {
                 scaleFactor = determineScaleFactor(
-                    m_renderList, 
-                    data->channelNumber, 
-                    dec->getWidth(), 
-                    dec->getHeight(), 
+                    m_renderList,
+                    data->channelNumber,
+                    dec->getWidth(),
+                    dec->getHeight(),
                     force_factor);
             }
 

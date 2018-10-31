@@ -14,7 +14,7 @@ static const QString RTP_FFMPEG_GENERIC_STR(lit("FFMPEG"));
 class QnRtspFfmpegEncoder: public QnRtspEncoder
 {
 public:
-    QnRtspFfmpegEncoder();
+    QnRtspFfmpegEncoder(const DecoderConfig& config);
 
     virtual QByteArray getAdditionSDP( const std::map<QString, QString>& streamParams ) override;
 
@@ -37,6 +37,7 @@ public:
 
     virtual bool isRtpHeaderExists() const override { return false; }
 private:
+    DecoderConfig m_config;
     bool m_gotLivePacket;
     QnConstMediaContextPtr m_contextSent;
     QMap<AVCodecID, QnConstMediaContextPtr> m_generatedContexts;
