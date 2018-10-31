@@ -1,12 +1,12 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 
 /* Usage
- * <div nx-ml-ellipsis config='{"height" : "75", "lineHeight" : "25", "lines" : "3" }' >
+ * <nx-ml-ellipsis config='{"height" : "75", "lineHeight" : "25", "lines" : "3" }' >
  *     Only two things are infinite, the universe and human stupidity,
  *     and I'm not sure about the former.
  *
  *     -- A. Einstein
- * </div>
+ * </nx-ml-ellipsis>
 */
 
 @Component({
@@ -24,8 +24,7 @@ export class NxMultiLineEllipsisComponent implements OnInit {
         this.ellipsis = {};
         this.ellipsis.viewMore = false;
         this.ellipsis.viewHeight = '75px';
-        this.ellipsis.viewLineHeight = '19px';
-        this.ellipsis.viewLineHeightNegative = -19;
+        this.ellipsis.viewLineHeight = 19;
         this.ellipsis.viewLines = 4;
     }
 
@@ -48,5 +47,10 @@ export class NxMultiLineEllipsisComponent implements OnInit {
             this.ellipsis.viewLineHeight = this.ellipsis.multiLineEllipsis.lineHeight;
             this.ellipsis.viewHeight = Math.ceil(this.ellipsis.viewLineHeight * this.ellipsis.viewLines);
         }
+    }
+
+    viewMoreDescr() {
+        this.ellipsis.viewMore = true;
+        this.ellipsis.viewHeight = 'auto';
     }
 }

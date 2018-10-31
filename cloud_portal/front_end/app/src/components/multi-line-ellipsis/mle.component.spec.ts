@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NxContentBlockComponent } from './content-block.component';
+import { NxMultiLineEllipsisComponent } from './mle.component';
 
-describe('NxContentBlockComponent', () => {
-    let component: NxContentBlockComponent;
-    let fixture: ComponentFixture<NxContentBlockComponent>;
+describe('NxMultiLineEllipsisComponent', () => {
+    let component: NxMultiLineEllipsisComponent;
+    let fixture: ComponentFixture<NxMultiLineEllipsisComponent>;
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-                declarations: [ NxContentBlockComponent ]
+                declarations: [NxMultiLineEllipsisComponent ]
             })
             .compileComponents();
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(NxContentBlockComponent);
+        fixture = TestBed.createComponent(NxMultiLineEllipsisComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
@@ -22,4 +22,5 @@ describe('NxContentBlockComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
+
 });

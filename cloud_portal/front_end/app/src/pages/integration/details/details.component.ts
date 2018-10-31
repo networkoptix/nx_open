@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
-import { ActivatedRoute }                      from '@angular/router';
-import { IntegrationService }                  from '../integration.service';
+import { ActivatedRoute } from '@angular/router';
+import { IntegrationService } from '../integration.service';
 
 @Component({
     selector: 'integration-detail-component',
@@ -11,10 +11,8 @@ import { IntegrationService }                  from '../integration.service';
 export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
 
     plugin: any;
-    defaultLogo: string;
 
     private setupDefaults() {
-        this.defaultLogo = '/static/icons/integration_tile_preview_plugin.svg';
     }
 
     constructor(private _route: ActivatedRoute,

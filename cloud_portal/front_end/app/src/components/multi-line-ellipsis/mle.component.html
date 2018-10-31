@@ -1,7 +1,6 @@
 <div class="ellipsis"
-     [style.height1]="auto"
      [style.height]="ellipsis.viewHeight"
-     [style.line-height]="ellipsis.viewLineHeight">
+     [style.line-height]="ellipsis.viewLineHeight + 'px'">
 
     <div class="ellipsis-before" [style.height]="ellipsis.viewHeight"></div>
     <div class="ellipsis-body">
@@ -9,7 +8,7 @@
     </div>
 
     <div class="ellipsis-after"
-         [style.top]="ellipsis.viewLineHeightNegative + 'px'"
+         [style.top]="-ellipsis.viewLineHeight + 'px'"
          (click)="ellipsis.viewMoreDescr()"
          *ngIf="!ellipsis.viewMore"> ... &nbsp;&nbsp;&nbsp;&nbsp;
     </div>
