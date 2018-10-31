@@ -29,7 +29,7 @@ export class IntegrationService implements OnDestroy {
             return this.plugins.find(plugin => plugin.id === Number(id));
         }
 
-        return {};
+        return undefined;
     }
 
     ngOnDestroy() {

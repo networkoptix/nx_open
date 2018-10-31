@@ -1,7 +1,12 @@
-<div class="">
+<nx-pre-loader type="page" *ngIf="!plugin"></nx-pre-loader>
+
+<div class="" *ngIf="plugin">
 
     <div class="row m-0 pt-3 pl-4">
-        <button class="btn btn-default" routerLink="/integrations">All integrations</button>
+        <button class="btn btn-default btn-back" routerLink="/integrations">
+            <span class="back-arrow"></span>
+            <span>All integrations</span>
+        </button>
     </div>
 
     <div class="row m-0 p-3">
@@ -24,8 +29,8 @@
                 </nx-content-block>
             </div>
 
-            <div class="col-12 col-xxl-6 pb-3">
-                <nx-content-block>
+            <div class="col-12 col-xxl-6 pb-3" *ngIf="plugin.instructions.downloadLinks">
+                <nx-content-block >
                     <header translate>
                         Download links
                     </header>
@@ -36,7 +41,7 @@
                 </nx-content-block>
             </div>
 
-            <div class="col-12 col-xxl-6 pb-3">
+            <div class="col-12 col-xxl-6 pb-3" *ngIf="plugin.support.supportInformation">
                 <nx-content-block>
                     <header translate>
                         Support
@@ -48,7 +53,7 @@
                 </nx-content-block>
             </div>
 
-            <div class="col-12 col-xxl-6 pb-3">
+            <div class="col-12 col-xxl-6 pb-3" *ngIf="plugin.additionalInformation.additionalInformation || plugin.additionalInformation.usefulLinks">
                 <nx-content-block>
                     <header translate>
                         Additional information
