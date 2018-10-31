@@ -63,11 +63,15 @@ bool AbstractHttpRequestHandler::processRequest(
             sendResponse(std::move(requestResult));
         };
 
-    processRequest(
+    RequestContext requestContext{
         connection,
         std::move(authInfo),
         std::move(std::move(request)),
         m_responseMsg.response,
+        std::exchange(m_requestPathParams, {})};
+
+    processRequest(
+        std::move(requestContext),
         std::move(httpRequestProcessedHandler));
     return true;
 }
@@ -76,11 +80,6 @@ void AbstractHttpRequestHandler::setRequestPathParams(
     RequestPathParams params)
 {
     m_requestPathParams = std::move(params);
-}
-
-const RequestPathParams& AbstractHttpRequestHandler::requestPathParams() const
-{
-    return m_requestPathParams;
 }
 
 void AbstractHttpRequestHandler::sendResponse(RequestResult requestResult)

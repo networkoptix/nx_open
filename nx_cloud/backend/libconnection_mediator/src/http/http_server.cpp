@@ -187,15 +187,13 @@ InitiateConnectionRequestHandler::InitiateConnectionRequestHandler(
 }
 
 void InitiateConnectionRequestHandler::processRequest(
-    nx::network::http::HttpServerConnection* const connection,
-    const nx::network::http::Request& /*request*/,
-    nx::utils::stree::ResourceContainer /*authInfo*/,
+    nx::network::http::RequestContext requestContext,
     api::ConnectRequest inputData)
 {
     m_holePunchingProcessor->connect(
         RequestSourceDescriptor{
             network::TransportProtocol::tcp,
-            connection->socket()->getForeignAddress()},
+            requestContext.connection->socket()->getForeignAddress()},
         inputData,
         [this](auto&&... args) { reportResult(std::move(args)...); });
 }

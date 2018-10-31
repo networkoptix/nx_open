@@ -19,11 +19,11 @@ CreateClientSessionHandler::CreateClientSessionHandler(
 }
 
 void CreateClientSessionHandler::prepareRequestData(
-    nx::network::http::HttpServerConnection* const /*connection*/,
-    const nx::network::http::Request& /*httpRequest*/,
+    const nx::network::http::RequestContext& requestContext,
     api::CreateClientSessionRequest* request)
 {
-    request->targetPeerName = requestPathParams().getByName(api::kServerIdName);
+    request->targetPeerName = 
+        requestContext.requestPathParams.getByName(api::kServerIdName);
 }
 
 void CreateClientSessionHandler::beforeReportingResponse(
@@ -54,13 +54,13 @@ ConnectToListeningPeerWithHttpUpgradeHandler::ConnectToListeningPeerWithHttpUpgr
         nx::network::http::StatusCode::switchingProtocols);
 }
 
-controller::ConnectToPeerRequestEx ConnectToListeningPeerWithHttpUpgradeHandler::prepareRequestData(
-    nx::network::http::HttpServerConnection* const connection,
-    const nx::network::http::Request& /*httpRequest*/)
+controller::ConnectToPeerRequestEx 
+    ConnectToListeningPeerWithHttpUpgradeHandler::prepareRequestData(
+        const nx::network::http::RequestContext& requestContext)
 {
     controller::ConnectToPeerRequestEx inputData;
-    inputData.clientEndpoint = connection->socket()->getForeignAddress();
-    inputData.sessionId = requestPathParams().getByName(api::kSessionIdName);
+    inputData.clientEndpoint = requestContext.connection->socket()->getForeignAddress();
+    inputData.sessionId = requestContext.requestPathParams.getByName(api::kSessionIdName);
     return inputData;
 }
 

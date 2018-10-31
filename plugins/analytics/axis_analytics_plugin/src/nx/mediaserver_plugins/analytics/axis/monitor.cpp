@@ -71,12 +71,11 @@ bool ElapsedTimerThreadSafe::hasExpired(std::chrono::milliseconds ms) const
 #endif
 
 void axisHandler::processRequest(
-    nx::network::http::HttpServerConnection* const connection,
-    nx::utils::stree::ResourceContainer authInfo,
-    nx::network::http::Request request,
-    nx::network::http::Response* const response,
+    nx::network::http::RequestContext requestContext,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
+    const auto& request = requestContext.request;
+
     NX_PRINT << "Received from Axis: " << request.requestLine.toString().data();
 
     const QString kMessage = "?Message=";

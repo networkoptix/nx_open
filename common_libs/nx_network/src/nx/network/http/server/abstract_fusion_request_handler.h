@@ -35,9 +35,7 @@ public:
      * NOTE: If Output is void, then requestCompleted(FusionRequestResult).
      */
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        const nx::network::http::Request& request,
-        nx::utils::stree::ResourceContainer authInfo,
+        nx::network::http::RequestContext requestContext,
         Input inputData) = 0;
 
     /**
@@ -61,33 +59,24 @@ public:
      * Here actual HTTP request implementation resides.
      * On request processing completion requestCompleted(FusionRequestResult) MUST be invoked.
      */
-    virtual void processRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        const nx::network::http::Request& request,
-        nx::utils::stree::ResourceContainer authInfo ) = 0;
+    virtual void processRequest(http::RequestContext requestContext) = 0;
 
 protected:
     virtual void processRawHttpRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer authInfo,
-        nx::network::http::Request request,
-        nx::network::http::Response* const /*response*/,
-        nx::network::http::RequestProcessedHandler completionHandler) override
+        http::RequestContext requestContext,
+        http::RequestProcessedHandler completionHandler) override
     {
         this->m_completionHandler = std::move(completionHandler);
-        this->m_requestMethod = request.requestLine.method;
+        this->m_requestMethod = requestContext.request.requestLine.method;
 
         FusionRequestResult errorDescription;
-        if (!this->getDataFormat(request, nullptr, &errorDescription))
+        if (!this->getDataFormat(requestContext.request, nullptr, &errorDescription))
         {
             this->requestCompleted(std::move(errorDescription));
             return;
         }
 
-        processRequest(
-            connection,
-            request,
-            std::move(authInfo));
+        processRequest(std::move(requestContext));
     }
 };
 
@@ -105,9 +94,7 @@ public:
     }
 
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        const nx::network::http::Request& /*request*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/)
+        http::RequestContext /*requestContext*/)
     {
         auto data = m_func();
         this->requestCompleted(FusionRequestResult(), std::move(data));

@@ -42,17 +42,13 @@ public:
      * Mediaserver calls this method to open 2-way transaction exchange channel.
      */
     void createConnection(
-        nx::network::http::HttpServerConnection* const connection,
+        nx::network::http::RequestContext requestContext,
         const std::string& systemId,
-        nx::network::http::Request request,
-        nx::network::http::Response* const response,
         nx::network::http::RequestProcessedHandler completionHandler);
 
     void pushTransaction(
-        nx::network::http::HttpServerConnection* const connection,
+        nx::network::http::RequestContext requestContext,
         const std::string& systemId,
-        nx::network::http::Request request,
-        nx::network::http::Response* const response,
         nx::network::http::RequestProcessedHandler completionHandler);
 
 private:

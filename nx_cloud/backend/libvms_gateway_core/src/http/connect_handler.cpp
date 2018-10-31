@@ -21,14 +21,11 @@ ConnectHandler::ConnectHandler(const conf::Settings& settings,
 }
 
 void ConnectHandler::processRequest(
-    nx::network::http::HttpServerConnection* const connection,
-    nx::utils::stree::ResourceContainer authInfo,
-    nx::network::http::Request request,
-    nx::network::http::Response* const response,
+    nx::network::http::RequestContext requestContext,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
-    static_cast<void>(authInfo);
-    static_cast<void>(response);
+    const auto& request = requestContext.request;
+    auto connection = requestContext.connection;
 
     // NOTE: this validation should be done somewhere in more general place
     if (!request.requestLine.url.isValid())
@@ -60,7 +57,8 @@ void ConnectHandler::processRequest(
     connect(targetAddress, std::move(completionHandler));
 }
 
-void ConnectHandler::connect(const network::SocketAddress& address,
+void ConnectHandler::connect(
+    const network::SocketAddress& address,
     network::http::RequestProcessedHandler completionHandler)
 {
     NX_DEBUG(this, "Connecting to '%1', socket[%2] -> socket[%3].",
