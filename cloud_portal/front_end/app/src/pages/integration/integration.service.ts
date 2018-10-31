@@ -32,10 +32,6 @@ export class IntegrationService implements OnDestroy {
         return {};
     }
 
-    getMockData(): Observable<any> {
-        return this.http.get('src/pages/integration/integrations.json');
-    }
-
     ngOnDestroy() {
         this.pluginsSubject.unsubscribe();
     }
