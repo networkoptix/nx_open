@@ -973,7 +973,8 @@
                 "Hikvision|DS-6708*", "HIKVISION|DS-6708*",
                 "HIKVISION|DS-2CD4A26FWD-*", "hikvision|DS-2CD4A26FWD-*",
                 "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*",
-                "ONVIF|NC328-VBZ"
+                "ONVIF|NC328-VBZ",
+                "Hikvision|DS-2DF8223*"
             ],
             "parseOnvifNotificationsWithHttpReader": true
         },
@@ -2859,7 +2860,8 @@
         },
         {
             "keys": [
-                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*"
+                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*",
+                "Hikvision|DS-2DF8223*"
             ],
             "clearInputsTimeoutSec": 1,
             "comment": "considers input state as 0 after specified timeout"
