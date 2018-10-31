@@ -53,7 +53,9 @@ loop links
     [arguments]    ${downloads}
     : FOR    ${download}    IN    @{downloads}
     \    ${link}    Get Element Attribute    ${download}    href
-    \    Check File Exists    ${link}
+    \    ${matches}    Get Regexp Matches    ${link}    updates.networkoptix.com
+    \    Run Keyword If    ${matches}    Check File Exists    ${link}
+    ...    ELSE    Fail    URL did not begin with updates.networkoptix.com
 
 *** Test Cases ***
 History link is not in the downloads page for user without access
