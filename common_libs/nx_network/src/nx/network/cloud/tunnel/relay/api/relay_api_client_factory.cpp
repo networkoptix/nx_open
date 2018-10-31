@@ -7,16 +7,18 @@
 #include "relay_api_client_over_http_connect.h"
 #include "relay_api_client_over_http_get_post_tunnel.h"
 #include "relay_api_client_over_http_upgrade.h"
+#include "relay_api_client_over_http_tunnel.h"
 
 namespace nx::cloud::relay::api {
 
 ClientFactory::ClientFactory():
-    base_type(std::bind(&ClientFactory::defaultFactoryFunction, this,
-        std::placeholders::_1))
+    base_type([this](auto&&... args) { return defaultFactoryFunction(std::move(args)...); })
 {
-    registerClientType<ClientOverHttpConnect>();
-    registerClientType<ClientOverHttpGetPostTunnel>();
-    registerClientType<ClientOverHttpUpgrade>();
+    //registerClientType<ClientOverHttpConnect>();
+    //registerClientType<ClientOverHttpGetPostTunnel>();
+    //registerClientType<ClientOverHttpUpgrade>();
+
+    registerClientType<ClientOverHttpTunnel>();
 }
 
 ClientFactory& ClientFactory::instance()

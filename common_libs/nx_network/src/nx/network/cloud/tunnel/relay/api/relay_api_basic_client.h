@@ -36,7 +36,11 @@ protected:
 
     virtual void stopWhileInAioThread() override;
 
-    ResultCode toResultCode(
+    static ResultCode toUpgradeResultCode(
+        SystemError::ErrorCode sysErrorCode,
+        const nx_http::Response* httpResponse);
+
+    static ResultCode toResultCode(
         SystemError::ErrorCode sysErrorCode,
         const nx_http::Response* httpResponse);
 
@@ -92,10 +96,6 @@ private:
     void executeRequest(
         HttpClient httpClient,
         CompletionHandler completionHandler);
-
-    ResultCode toUpgradeResultCode(
-        SystemError::ErrorCode sysErrorCode,
-        const nx_http::Response* httpResponse);
 
     std::string prepareActualRelayUrl(
         const std::string& contentLocationUrl,
