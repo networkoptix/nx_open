@@ -21,6 +21,7 @@ Item
     property alias autoReturnToBounds: timeline.autoReturnToBounds
     property alias serverTimeZoneShift: timeline.serverTimeZoneShift
     property alias motionSearchMode: timeline.motionSearchMode
+    property alias changingMotionRoi: timeline.changingMotionRoi
 
     readonly property bool dragging: timeline.dragging
     readonly property bool moving: timeline.moving

@@ -23,6 +23,7 @@ Item
 
     property alias motionSearchMode: motionSearchModeButton.checked
     property alias motionFilter: cameraChunkProvider.motionFilter
+    property alias changingMotionRoi: timeline.changingMotionRoi
 
     signal ptzButtonClicked()
     signal switchToNextCamera()

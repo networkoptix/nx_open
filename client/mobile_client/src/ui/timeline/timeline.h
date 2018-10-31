@@ -77,6 +77,11 @@ class QnTimeline: public QQuickItem
         READ motionSearchMode
         NOTIFY motionSearchModeChanged)
 
+    Q_PROPERTY(bool changingMotionRoi
+        READ changingMotionRoi
+        WRITE setChangingMotionRoi
+        NOTIFY changingMotionRoiChanged)
+
 public:
     explicit QnTimeline(QQuickItem* parent = nullptr);
     ~QnTimeline();
@@ -147,6 +152,9 @@ public:
 
     bool motionSearchMode() const;
     void setMotionSearchMode(bool value);
+
+    bool changingMotionRoi() const;
+    void setChangingMotionRoi(bool value);
 
     QDateTime positionDate() const;
 
@@ -227,6 +235,7 @@ signals:
 
     void moveFinished();
     void motionSearchModeChanged();
+    void changingMotionRoiChanged();
 
 private:
     QSGNode* updateTextNode(QSGNode* textRootNode);

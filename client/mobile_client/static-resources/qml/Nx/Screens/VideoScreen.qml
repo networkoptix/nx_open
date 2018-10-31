@@ -166,16 +166,12 @@ PageBase
                 text: qsTr("Area")
                 icon.source: lp("/images/close.png")
 
-                property Item motionController: video.sourceComponent == scalableVideoComponent
-                    ? video.item.motionSearchController
-                    : null
-
-                visible: motionController && motionController.customRoiExists
+                visible: video.motionController && video.motionController.customRoiExists
 
                 onClicked:
                 {
-                    if (motionController)
-                        motionController.clearCustomRoi()
+                    if (video.motionController)
+                        video.motionController.clearCustomRoi()
                 }
             },
 
@@ -255,6 +251,10 @@ PageBase
     Loader
     {
         id: video
+
+        property Item motionController: sourceComponent == scalableVideoComponent
+            ? item.motionSearchController
+            : null
 
         y: toolBar.visible ? -header.height : 0
         x: -mainWindow.leftPadding
@@ -521,6 +521,8 @@ PageBase
         {
             id: videoNavigation
 
+            changingMotionRoi: video.motionController
+                && (video.motionController.drawingRoi || video.item.moving)
             canViewArchive: videoScreenController.accessRightsHelper.canViewArchive
             animatePlaybackControls: d.animatePlaybackControls
             videoScreenController: d.controller

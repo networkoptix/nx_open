@@ -1,5 +1,6 @@
 import QtQuick 2.6
 import nx.client.core 1.0
+import Nx 1.0
 
 Item
 {
@@ -41,6 +42,7 @@ Item
     signal clicked()
     signal doubleClicked(int mouseX, int mouseY)
     signal movementEnded()
+    property bool moving: false
 
     property var doubleTapStartCheckFuncion
 
@@ -508,6 +510,36 @@ Item
                 flick.resizeContent(flick.contentWidth * scale, flick.contentHeight * scale, Qt.point(cx, cy))
                 flick.animateToBounds()
             }
+        }
+    }
+
+    Object
+    {
+        id: d
+
+        readonly property bool movingInternal:
+            flick.flicking
+            || flick.animating
+            || flick.dragging
+            || pinchArea.pinch.active
+            || boundsAnimation.running
+
+        Timer
+        {
+            id: movingFilterTimer
+
+            property bool value: false
+            interval: 100
+            onTriggered: rootItem.moving = value
+        }
+
+        onMovingInternalChanged:
+        {
+            if (movingFilterTimer.value == movingInternal && movingFilterTimer.running)
+                return
+
+            movingFilterTimer.value = movingInternal
+            movingFilterTimer.restart()
         }
     }
 }

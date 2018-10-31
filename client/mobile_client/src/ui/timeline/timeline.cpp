@@ -123,7 +123,9 @@ public:
     int textY = -1;
 
     bool motionSearchMode = false;
+    bool changingMotionRoi = false;
     bool loadingMotion = false;
+    bool loadingState = false;
 
     QSGTexture* stripesDarkTexture = nullptr;
     QSGTexture* stripesLightTexture = nullptr;
@@ -303,6 +305,20 @@ public:
     qint64 stickPoint() const
     {
         return windowStart;
+    }
+
+    void setLoadingState(bool value)
+    {
+        if (loadingState == value)
+            return;
+
+        loadingState = value;
+        updateStripesTextures();
+        parent->update();
+    }
+    void updateLoadingState()
+    {
+        setLoadingState(motionSearchMode && (loadingMotion || changingMotionRoi));
     }
 
     int maxSiblingLevel(int zoomLevel) const
@@ -528,8 +544,25 @@ void QnTimeline::setMotionSearchMode(bool value)
     d->motionSearchMode = value;
     emit motionSearchModeChanged();
 
-    update();
+    d->updateLoadingState();
 }
+
+bool QnTimeline::changingMotionRoi() const
+{
+    return d->changingMotionRoi;
+}
+
+void QnTimeline::setChangingMotionRoi(bool value)
+{
+    if (d->changingMotionRoi == value)
+        return;
+
+    d->changingMotionRoi = value;
+    emit changingMotionRoiChanged();
+
+    d->updateLoadingState();
+}
+
 
 QDateTime QnTimeline::positionDate() const
 {
@@ -784,16 +817,14 @@ void QnTimeline::setChunkProvider(QnCameraChunkProvider* chunkProvider)
         connect(d->chunkProvider, &QnCameraChunkProvider::timePeriodsUpdated,
             this, handleTimePeriodsUpdated);
 
-        const auto updateLoadingMotionState =
-            [this]()
+        const auto handleLoadingMotionChanged =
+            [this, chunkProvider]()
             {
-                d->loadingMotion = d->chunkProvider->isLoadingMotion();
-                d->updateStripesTextures();
-                update();
+                d->loadingMotion = chunkProvider->isLoadingMotion();
+                d->updateLoadingState();
             };
-
         connect(d->chunkProvider, &QnCameraChunkProvider::loadingMotionChanged,
-            this, updateLoadingMotionState);
+            this, handleLoadingMotionChanged);
 
         handleTimePeriodsUpdated();
     }
@@ -1356,9 +1387,9 @@ QSGGeometryNode* QnTimeline::updateChunksNode(QSGGeometryNode* chunksNode)
 
     colors[Qn::RecordingContent] = !d->motionSearchMode
         ? d->chunkColor
-        : (d->loadingMotion ? d->loadingChunkColor : d->motionModeChunkColor);
+        : (d->loadingState ? d->loadingChunkColor : d->motionModeChunkColor);
 
-    colors[Qn::MotionContent] = d->motionSearchMode && d->loadingMotion
+    colors[Qn::MotionContent] = d->loadingState
         ? d->motionLoadingColor
         : d->motionColor;
 
@@ -1493,15 +1524,13 @@ void QnTimelinePrivate::updateStripesTextures()
     if (!window)
         return;
 
-    static constexpr int kTintAmount = 106;
     const auto stripesDark = makeStripesImage(
         chunkBarHeight, inactiveLiveColorLight, inactiveLiveColorDark);
 
-    const bool showMotionLoading = motionSearchMode && loadingMotion;
-    const auto activeLightColor = showMotionLoading
+    const auto activeLightColor = loadingState
         ? motionLoadingLiveColorLight
         : activeLiveColorLight;
-    const auto activeDarkColor = showMotionLoading
+    const auto activeDarkColor = loadingState
         ? motionLoadingLiveColorDark
         : activeLiveColorDark;
     const auto stripesLight = makeStripesImage(chunkBarHeight, activeLightColor, activeDarkColor);
