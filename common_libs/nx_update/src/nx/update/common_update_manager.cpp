@@ -1,7 +1,6 @@
 #include "common_update_manager.h"
 #include <api/global_settings.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/update/update_check.h>
 #include <common/common_module.h>
 #include <utils/common/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
@@ -244,7 +243,9 @@ bool CommonUpdateManager::installerState(update::Status* outUpdateStatus, const 
     return true;
 }
 
-bool CommonUpdateManager::findPackage(update::Package* outPackage, QString* outMessage) const
+update::FindPackageResult CommonUpdateManager::findPackage(
+    update::Package* outPackage,
+    QString* outMessage) const
 {
     return update::findPackage(
         QnAppInfo::currentSystemInformation(),
@@ -260,22 +261,32 @@ bool CommonUpdateManager::statusAppropriateForDownload(nx::update::Package* outP
     update::Status* outStatus)
 {
     QString message;
-    if (!findPackage(outPackage, &message))
+    switch (findPackage(outPackage, &message))
     {
-        *outStatus = update::Status(
-            commonModule()->moduleGUID(), 
-            update::Status::Code::idle, 
-            message.isEmpty() ? "Failed to find a suitable update package" : message);
-        return false;
+        case update::FindPackageResult::ok:
+            return canDownloadFile(outPackage->file, outStatus);
+        case update::FindPackageResult::otherError:
+            *outStatus = update::Status(
+                commonModule()->moduleGUID(),
+                update::Status::Code::error,
+                message.isEmpty() ? "Failed to find a suitable update package" : message);
+            return false;
+        case update::FindPackageResult::noInfo:
+            *outStatus = update::Status(
+                commonModule()->moduleGUID(),
+                update::Status::Code::idle,
+                message.isEmpty() ? "No update information found" : message);
+            return false;
     }
 
-    return canDownloadFile(outPackage->file, outStatus);
+    NX_ASSERT(false, "Shouldn't be here");
+    return false;
 }
 
 void CommonUpdateManager::onDownloaderFailed(const QString& fileName)
 {
     nx::update::Package package;
-    if (!findPackage(&package) || package.file != fileName)
+    if (findPackage(&package) != update::FindPackageResult::ok || package.file != fileName)
         return;
 
     m_downloaderFailed = true;
@@ -285,7 +296,7 @@ void CommonUpdateManager::onDownloaderFailed(const QString& fileName)
 void CommonUpdateManager::onDownloaderFinished(const QString& fileName)
 {
     nx::update::Package package;
-    if (!findPackage(&package) || package.file != fileName)
+    if (findPackage(&package) != update::FindPackageResult::ok || package.file != fileName)
         return;
 
     installer()->prepareAsync(downloader()->filePath(fileName));
