@@ -197,7 +197,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             if (resource)
                 return QVariant::fromValue(QnResourceList({resource}));
 
-            return QVariant::fromValue(QStringList({ QString("<%1>").arg(tr("deleted camera")) }));
+            return QVariant::fromValue(QStringList({QString("<%1>").arg(tr("deleted camera"))}));
         }
 
         case Qn::ResourceRole:
