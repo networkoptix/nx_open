@@ -30,7 +30,6 @@ public:
         const Qn::UserAccessData& userAccessData,
         std::function<void()> onConnectionClosedCallback);
     virtual bool validateRemotePeerData(const vms::api::PeerDataEx& remotePeer) override;
-    virtual void start() override;
 protected:
     virtual void doPeriodicTasks() override;
     virtual void stop() override;

@@ -4,6 +4,7 @@
 #include "ec_connection_notification_manager.h"
 
 #include <transaction/transaction_message_bus_priv.h>
+#include <utils/common/delayed.h>
 
 namespace {
 
@@ -189,11 +190,6 @@ void ServerMessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
 void ServerMessageBus::doPeriodicTasks()
 {
     QnMutexLocker lock(&m_mutex);
-    if (commonModule()->systemIdentityTime() > m_systemIdentityTime)
-    {
-        dropConnectionsThreadUnsafe();
-        return; //< Restart is pending.
-    }
 
     m_miscData.update();
 
@@ -786,15 +782,9 @@ bool ServerMessageBus::handlePushImpersistentBroadcastTransaction(
         GotTransactionFuction());
 }
 
-void ServerMessageBus::start()
-{
-    m_systemIdentityTime = commonModule()->systemIdentityTime();
-    base_type::start();
-}
-
 bool ServerMessageBus::validateRemotePeerData(const vms::api::PeerDataEx& remotePeer)
 {
-    if (remotePeer.identityTime > m_systemIdentityTime)
+    if (remotePeer.identityTime > commonModule()->systemIdentityTime())
     {
         if (m_restartPending.test_and_set())
             return false; //< Restart pending already queued.
@@ -804,7 +794,14 @@ bool ServerMessageBus::validateRemotePeerData(const vms::api::PeerDataEx& remote
             "current peer. Restarting and resync database with remote peer")
             .arg(remotePeer.id.toString()));
 
-        commonModule()->setSystemIdentityTime(remotePeer.identityTime, remotePeer.id);
+        executeDelayed(
+            [this, remotePeer]()
+            {
+                stop();
+                commonModule()->setSystemIdentityTime(remotePeer.identityTime, remotePeer.id);
+            },
+            0, m_thread);
+
         return false;
     }
     return true;
