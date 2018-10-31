@@ -95,16 +95,6 @@ QnActiResource::~QnActiResource()
 
 void QnActiResource::checkIfOnlineAsync(std::function<void(bool)> completionHandler)
 {
-    QAuthenticator auth = getAuth();
-    nx::utils::Url apiUrl = nx::network::url::Builder()
-        .setScheme(nx::network::http::kUrlSchemeName)
-        .setHost(getHostAddress())
-        .setPort(QUrl(getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT))
-        .setUserName(auth.user())
-        .setPassword(auth.password())
-        .setPath(kApiRequestPath).appendPath("system")
-        .setQuery("SYSTEM_INFO");
-
     QString resourceMac = getMAC().toString();
     auto requestCompletionFunc = [resourceMac, completionHandler]
         (SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody,
@@ -122,7 +112,9 @@ void QnActiResource::checkIfOnlineAsync(std::function<void(bool)> completionHand
         completionHandler(mac == resourceMac);
     };
 
-    NX_VERBOSE(this, "checkIfOnlineAsync: request '%1'.", apiUrl.toString(QUrl::RemoveUserInfo));
+    const nx::utils::Url apiUrl =
+        createRequestUrl(getAuth(), CAMERA_PARAMETER_GROUP_SYSTEM, "SYSTEM_INFO");
+    NX_VERBOSE(this, "Check if online request '%1'.", apiUrl.toString(QUrl::RemoveUserInfo));
     nx::network::http::downloadFileAsync(
         apiUrl, requestCompletionFunc, {}, nx::network::http::AuthType::authDigest);
 }
@@ -170,6 +162,20 @@ QByteArray QnActiResource::unquoteStr(const QByteArray& v)
     return value.mid(pos1, value.length()-pos1-pos2);
 }
 
+nx::utils::Url QnActiResource::createRequestUrl(const QAuthenticator& auth, const QString& group,
+    const QString& command) const
+{
+    return nx::network::url::Builder()
+        .setScheme(nx::network::http::kUrlSchemeName)
+        .setHost(getHostAddress())
+        .setPort(QUrl(getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT))
+        .setUserName(auth.user())
+        .setPassword(auth.password())
+        .setPath(kApiRequestPath)
+        .appendPath(group)
+        .setQuery(command);
+}
+
 QByteArray QnActiResource::makeActiRequest(
     const QString& group,
     const QString& command,
@@ -178,17 +184,14 @@ QByteArray QnActiResource::makeActiRequest(
     QString* const localAddress) const
 {
     QByteArray result;
-    auto auth = getAuth();
-    status = makeActiRequest(getUrl(), auth, group, command, keepAllData, &result, localAddress);
+    const auto url = createRequestUrl(getAuth(), group, command);
+    status = makeActiRequestByUrl(url, keepAllData, &result, localAddress);
     return result;
 }
 
 // NOTE: Not all groups (aka CGI programs) maybe supported by current implementation of request.
-nx::network::http::StatusCode::Value QnActiResource::makeActiRequest(
-    const QUrl& url,
-    const QAuthenticator& auth,
-    const QString& group,
-    const QString& command,
+nx::network::http::StatusCode::Value QnActiResource::makeActiRequestByUrl(
+    const nx::utils::Url& url,
     bool keepAllData,
     QByteArray* const msgBody,
     QString* const localAddress)
@@ -197,21 +200,11 @@ nx::network::http::StatusCode::Value QnActiResource::makeActiRequest(
 
     nx::network::http::HttpClient client;
     client.setAuthType(nx::network::http::AuthType::authBasicAndDigest);
-    client.setUserName(auth.user());
-    client.setUserPassword(auth.password());
     client.setSendTimeout(kTcpTimeout);
     client.setResponseReadTimeout(kTcpTimeout);
 
-    const nx::utils::Url requestUrl = nx::network::url::Builder()
-        .setScheme(nx::network::http::kUrlSchemeName)
-        .setHost(url.host())
-        .setPort(nx::network::http::DEFAULT_HTTP_PORT)
-        .setPath(kApiRequestPath)
-        .appendPath(group)
-        .setQuery(command);
-
-    NX_VERBOSE(logTag, "makeActiRequest: request '%1'.", requestUrl);
-    const bool result = client.doGet(requestUrl);
+    NX_VERBOSE(logTag, "makeActiRequest: request '%1'.", url);
+    const bool result = client.doGet(url);
     if (!result)  //< It seems that HttpClient will log error by itself.
         return nx::network::http::StatusCode::internalServerError;
 

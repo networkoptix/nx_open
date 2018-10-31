@@ -80,11 +80,8 @@ public:
         bool keepAllData = false,
         QString* const localAddress = nullptr) const;
 
-    static nx::network::http::StatusCode::Value makeActiRequest(
-        const QUrl& url,
-        const QAuthenticator& auth,
-        const QString& group,
-        const QString& command,
+    static nx::network::http::StatusCode::Value makeActiRequestByUrl(
+        const nx::utils::Url& url,
         bool keepAllData,
         QByteArray* const msgBody,
         QString* const localAddress = nullptr);
@@ -118,6 +115,9 @@ private:
         QString group;
         QString cmd;
     };
+
+    nx::utils::Url createRequestUrl(const QAuthenticator& auth, const QString& group,
+        const QString& command) const;
 
     QSize extractResolution(const QByteArray& resolutionStr) const;
     QList<QSize> parseResolutionStr(const QByteArray& resolutions);
