@@ -9,7 +9,7 @@
 #include <nx/utils/software_version.h>
 
 class QnMediaServerUpdateTool;
-class QnConnectionInfo;
+struct QnConnectionInfo;
 
 namespace Ui {
 class QnCompatibilityVersionInstallationDialog;
