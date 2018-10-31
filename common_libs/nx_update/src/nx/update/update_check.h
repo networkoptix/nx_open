@@ -24,7 +24,8 @@ bool findPackage(
     bool isClient,
     const QString& cloudHost,
     bool boundToCloud,
-    nx::update::Package* outPackage);
+    nx::update::Package* outPackage,
+    QString* outMessage);
 
 bool findPackage(
     const vms::api::SystemInformation& systemInformation,
@@ -32,7 +33,8 @@ bool findPackage(
     bool isClient,
     const QString& cloudHost,
     bool boundToCloud,
-    nx::update::Package* outPackage);
+    nx::update::Package* outPackage,
+    QString* outMessage);
 
 } // namespace update
 } // namespace nx

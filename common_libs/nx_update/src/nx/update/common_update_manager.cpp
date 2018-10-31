@@ -12,12 +12,6 @@
 
 namespace nx {
 
-namespace {
-
-const static QString kNotFoundMessage = "No update information found";
-
-} // namespace
-
 CommonUpdateManager::CommonUpdateManager(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
 {
@@ -250,7 +244,7 @@ bool CommonUpdateManager::installerState(update::Status* outUpdateStatus, const 
     return true;
 }
 
-bool CommonUpdateManager::findPackage(update::Package* outPackage) const
+bool CommonUpdateManager::findPackage(update::Package* outPackage, QString* outMessage) const
 {
     return update::findPackage(
         QnAppInfo::currentSystemInformation(),
@@ -258,17 +252,20 @@ bool CommonUpdateManager::findPackage(update::Package* outPackage) const
         runtimeInfoManager()->localInfo().data.peer.isClient(),
         nx::network::SocketGlobals::cloud().cloudHost(),
         !globalSettings()->cloudSystemId().isEmpty(),
-        outPackage);
+        outPackage,
+        outMessage);
 }
 
-bool CommonUpdateManager::statusAppropriateForDownload(
-    nx::update::Package* outPackage,
+bool CommonUpdateManager::statusAppropriateForDownload(nx::update::Package* outPackage,
     update::Status* outStatus)
 {
-    const auto peerId = commonModule()->moduleGUID();
-    if (!findPackage(outPackage))
+    QString message;
+    if (!findPackage(outPackage, &message))
     {
-        *outStatus = update::Status(peerId, update::Status::Code::idle, kNotFoundMessage);
+        *outStatus = update::Status(
+            commonModule()->moduleGUID(), 
+            update::Status::Code::idle, 
+            message.isEmpty() ? "Failed to find a suitable update package" : message);
         return false;
     }
 
