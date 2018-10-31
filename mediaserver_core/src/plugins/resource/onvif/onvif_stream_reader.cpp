@@ -302,6 +302,11 @@ void QnOnvifStreamReader::printProfile(const Profile& profile, bool isPrimary) c
             << (isPrimary? "primary": "secondary") << " profile:";
         qDebug() << "Name: " << profile.Name.c_str();
         qDebug() << "Token: " << profile.token.c_str();
+        if (!profile.VideoEncoderConfiguration)
+        {
+            qDebug() << "profile.VideoEncoderConfiguration is nullptr";
+            return;
+        }
         qDebug() << "Encoder Name: " << profile.VideoEncoderConfiguration->Name.c_str();
         qDebug() << "Encoder Token: " << profile.VideoEncoderConfiguration->token.c_str();
         qDebug() << "Quality: " << profile.VideoEncoderConfiguration->Quality;
@@ -310,8 +315,16 @@ void QnOnvifStreamReader::printProfile(const Profile& profile, bool isPrimary) c
             qDebug() << "Resolution: " << profile.VideoEncoderConfiguration->Resolution->Width
                 << "x" << profile.VideoEncoderConfiguration->Resolution->Height;
         }
-        qDebug() << "FPS: " << profile.VideoEncoderConfiguration->RateControl->FrameRateLimit;
-    #else
+        else
+        {
+            qDebug() << "profile.VideoEncoderConfiguration->Resolution is nullptr";
+        }
+
+        if (profile.VideoEncoderConfiguration->RateControl)
+            qDebug() << "FPS: " << profile.VideoEncoderConfiguration->RateControl->FrameRateLimit;
+        else
+            qDebug() << "profile.VideoEncoderConfiguration->RateControl is nullptr";
+#else
         Q_UNUSED(profile)
         Q_UNUSED(isPrimary)
     #endif
