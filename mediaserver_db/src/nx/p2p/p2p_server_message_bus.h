@@ -106,7 +106,6 @@ private:
     QElapsedTimer m_dbCommitTimer;
     QElapsedTimer m_wantToSubscribeTimer;
     std::atomic_flag m_restartPending{false};
-    qint64 m_systemIdentityTime = 0;
 };
 
 } // namespace p2p
