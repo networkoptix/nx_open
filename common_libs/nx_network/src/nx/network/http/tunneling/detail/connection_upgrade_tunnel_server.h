@@ -23,9 +23,9 @@ public:
     ConnectionUpgradeTunnelServer(typename base_type::NewTunnelHandler newTunnelHandler);
     virtual ~ConnectionUpgradeTunnelServer();
 
-    void registerRequestHandlers(
+    virtual void registerRequestHandlers(
         const std::string& basePath,
-        server::rest::MessageDispatcher* messageDispatcher);
+        server::rest::MessageDispatcher* messageDispatcher) override;
 
     void setProtocolName(const std::string& protocolName);
     std::string protocolName() const;

@@ -29,9 +29,9 @@ public:
     GetPostTunnelServer(typename base_type::NewTunnelHandler newTunnelHandler);
     virtual ~GetPostTunnelServer();
 
-    void registerRequestHandlers(
+    virtual void registerRequestHandlers(
         const std::string& basePath,
-        server::rest::MessageDispatcher* messageDispatcher);
+        server::rest::MessageDispatcher* messageDispatcher) override;
 
 private:
     struct TunnelContext
