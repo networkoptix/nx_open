@@ -81,11 +81,12 @@ Going to the history page anonymous asks for login and closing takes you back to
     Click Button    ${LOG IN CLOSE BUTTON}
     Location Should Be    ${url}/
 
-Going to the history page anonymous asks for login and login shows downloads page
+Going to the history page anonymous asks for login and login shows history page
     Go To    ${url}/downloads/history
     Log In    ${email}   ${password}    button=None
     Validate Log In
-    Location Should Be    ${url}/downloads/history
+    Wait Until Element Is Visible    ${RELEASES TAB}
+    Location Should Be    ${url}/downloads/releases
 
 Going to the history page anonymous and logging in with someone who doesn't have access takes you to 404
     Go To    ${url}/downloads/history
