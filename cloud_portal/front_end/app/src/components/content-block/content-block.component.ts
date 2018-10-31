@@ -1,7 +1,7 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 
 /* Usage
-<nx-content-block type?=['gray' | empty]>
+<nx-content-block type?=['gray' | empty] hoverable?>
     <header>
         TITLE
     </header>
@@ -31,6 +31,7 @@ import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 })
 export class NxContentBlockComponent implements OnInit {
     @Input('type') class: string;
+    @Input('hoverable') hoverable: any;
 
     haveHeader: boolean;
 
@@ -42,5 +43,6 @@ export class NxContentBlockComponent implements OnInit {
 
     ngOnInit() {
         this.haveHeader = (this.headerWrapper.nativeElement.childNodes[ 0 ].childNodes.length > 0);
+        this.hoverable = (this.hoverable !== undefined);
     }
 }

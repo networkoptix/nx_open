@@ -355,6 +355,9 @@ window.L = {};
                             .when('/integrations', {
                                 template: ''
                             })
+                            .when('/integration/details/:plugin', {
+                                template: ''
+                            })
                             .when('/content', {
                                 template: ''
                             })

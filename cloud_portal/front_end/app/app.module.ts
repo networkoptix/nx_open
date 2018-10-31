@@ -43,6 +43,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
             url.toString().startsWith('/users') ||
             url.toString().startsWith('/content') ||
             url.toString().startsWith('/right') ||
+            url.toString().startsWith('/integration/details') ||
             url.toString().startsWith('/integrations');
         // return false;
         // url.toString().startsWith('/download') ||

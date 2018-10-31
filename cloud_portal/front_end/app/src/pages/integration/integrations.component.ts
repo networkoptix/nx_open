@@ -32,15 +32,17 @@ export class NxIntegrationsComponent implements OnInit, OnChanges {
 
     ngOnInit(): void {
         this.integrations
-            .getIntegrations()
-            .subscribe((res: any) => {
-                    this.allElements = res.data;
+            .pluginsSubject
+            .subscribe((result: any) => {
+                if (result.length) {
+                    this.allElements = result;
                     // array deep copy for filtering
                     this.elements = this.allElements.map(obj => ({ ...obj }));
-                },
-                error => {
-                    console.error('Error -> ', error);
-                });
+                }
+            },
+            error => {
+                console.error('Error -> ', error);
+            });
     }
 
     markMatch(item, text) {
