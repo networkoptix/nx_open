@@ -311,7 +311,8 @@ class DataStructure(models.Model):
                          (4, 'file', 'File'),
                          (5, 'guid', 'GUID'),
                          (6, 'select', 'Select'),
-                         (7, 'external_file', 'External File'))
+                         (7, 'external_file', 'External File'),
+                         (8, 'external_image', 'External Image'))
 
     type = models.IntegerField(choices=DATA_TYPES, default=DATA_TYPES.text)
     default = models.TextField(default='', blank=True)
@@ -365,7 +366,10 @@ class DataStructure(models.Model):
                     content_value = content_record.latest('version_id').value
 
         # if no value or optional and type file - use default value from structure
-        if not content_value and (not self.optional or self.optional and self.type in [DataStructure.DATA_TYPES.file, DataStructure.DATA_TYPES.image]):
+        if not content_value and (not self.optional or self.optional and self.type in [DataStructure.DATA_TYPES.file,
+                                                                                       DataStructure.DATA_TYPES.image,
+                                                                                       DataStructure.DATA_TYPES.external_file,
+                                                                                       DataStructure.DATA_TYPES.external_image]):
             content_value = self.default
 
         return content_value

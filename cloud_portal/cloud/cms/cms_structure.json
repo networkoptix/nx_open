@@ -391,7 +391,7 @@
             "label": "Logo",
             "value": "",
             "description": "Logo for integration",
-            "type": "image",
+            "type": "external_image",
             "optional": true
           },
           {
@@ -509,8 +509,56 @@
             "type": "html"
           },
           {
-            "name": "file",
-            "label": "File",
+            "name": "arm-file",
+            "label": "Download for ARM",
+            "value": "",
+            "description": "",
+            "type": "external_file",
+            "public": false
+          },
+          {
+            "name": "linux-x86-file",
+            "label": "Download for Linux - x86",
+            "value": "",
+            "description": "",
+            "type": "external_file",
+            "public": false
+          },
+          {
+            "name": "linux-x86-file",
+            "label": "Download for Linux - x64",
+            "value": "",
+            "description": "",
+            "type": "external_file",
+            "public": false
+          },
+          {
+            "name": "macos-file",
+            "label": "Download for MacOs",
+            "value": "",
+            "description": "",
+            "type": "external_file",
+            "public": false
+          },
+          {
+            "name": "rpi-file",
+            "label": "Download for RPI",
+            "value": "",
+            "description": "",
+            "type": "external_file",
+            "public": false
+          },
+          {
+            "name": "windows-x86-file",
+            "label": "Download for Windows - x86",
+            "value": "",
+            "description": "",
+            "type": "external_file",
+            "public": false
+          },
+          {
+            "name": "windows-x64-file",
+            "label": "Download for Windows x64",
             "value": "",
             "description": "",
             "type": "external_file",
@@ -527,14 +575,14 @@
             "label": "Screenshot 1",
             "value": "",
             "description": "",
-            "type": "image"
+            "type": "external_image"
           },
           {
             "name": "screenshot2",
             "label": "Screenshot 2",
             "value": "",
             "description": "",
-            "type": "image",
+            "type": "external_image",
             "optional": true
           },
           {
@@ -542,7 +590,7 @@
             "label": "Screenshot 3",
             "value": "",
             "description": "",
-            "type": "image",
+            "type": "external_image",
             "optional": true
           }
         ]

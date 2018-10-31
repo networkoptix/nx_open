@@ -72,8 +72,7 @@ def save_unrevisioned_records(product, context, language, data_structures,
             This will create a new record making images/files behave like the other data structure types
             Places to touch are here and cms/forms.py
         """
-        if data_structure.type == DataStructure.DATA_TYPES.image\
-                or data_structure.type == DataStructure.DATA_TYPES.file:
+        if data_structure.type in[DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file]:
             # If a file has been uploaded try to save it
             if data_structure_name in request_files:
                 if request_files[data_structure_name]:
@@ -116,11 +115,17 @@ def save_unrevisioned_records(product, context, language, data_structures,
             else:
                 new_record_value = values[0]
 
-        elif data_structure.type == DataStructure.DATA_TYPES.external_file:
+        elif data_structure.type in [DataStructure.DATA_TYPES.external_file, DataStructure.DATA_TYPES.external_image]:
 
             # If the user uploads a new file create a new ExternalFile record
             if data_structure_name in request_files:
                 request_file = request_files[data_structure_name]
+
+                file_errors = check_meta_settings(data_structure, request_file)
+                if file_errors:
+                    upload_errors.extend(file_errors)
+                    continue
+
                 md5 = hashlib.md5()
                 for chunk in request_file.chunks():
                     md5.update(chunk)
@@ -134,6 +139,12 @@ def save_unrevisioned_records(product, context, language, data_structures,
                 external_file.save()
 
                 new_record_value = external_file.file.url
+            # No file was uploaded and there is a record means the user didn't change anything so skip
+            elif not data_structure.optional and latest_value:
+                continue
+            # No file was uploaded and the user didn't delete an optional data structure so skip
+            elif data_structure.optional and 'delete_' + data_structure_name not in request_data:
+                continue
 
             # Mark this file for deletion
             elif 'delete_' + data_structure_name in request_data and request_data['delete_' + data_structure_name]:
@@ -274,6 +285,7 @@ def get_records_for_version(version):
     return contexts
 
 
+# File upload helpers
 def is_not_valid_file_type(file_type, meta_types):
     for meta_type in meta_types.split(','):
         if meta_type.strip() in file_type:
@@ -281,60 +293,10 @@ def is_not_valid_file_type(file_type, meta_types):
     return True
 
 
-def upload_file(data_structure, file):
-    file_errors = []
-    file_size = file.size / 1048576.0
-    if file_size >= settings.CMS_MAX_FILE_SIZE:
-        file_errors.append((data_structure.name, 'Its size was {}MB but must be less than {} MB'
-                            .format(file_size, settings.CMS_MAX_FILE_SIZE)))
-        return None, file_errors
-
-    try:
-        formats = []
-        if 'format' in data_structure.meta_settings:
-            formats = data_structure.meta_settings['format']
-        encoded_file, file_dimensions = encode_file(file, data_structure.type, formats)
-    except (IOError, TypeError):
-        file_errors.append((data_structure.name, "Image is damaged please upload an valid version"))
-        return None, file_errors
-
-    if not encoded_file:
-        error_msg = "Invalid file type. Uploaded file is {}. It should be {}." \
-            .format(file.content_type,
-                    data_structure.meta_settings['format'].replace(',', ' or '))
-        file_errors.append((data_structure.name, error_msg))
-        return None, file_errors
-
-    # Gets the meta_settings form the DataStructure to check if the sizes are valid
-    # if the length is zero then there is no meta settings
-    if encoded_file and len(data_structure.meta_settings):
-        if data_structure.type == DataStructure.DATA_TYPES.image:
-            file_errors = check_image_dimensions(data_structure.name, data_structure.meta_settings, file_dimensions)
-
-        if 'size' in data_structure.meta_settings \
-                and file_size > float(data_structure.meta_settings['size']):
-            file_errors.append((data_structure.name, 'File size is {} MB it should be less than {} MB'
-                                .format(file_size, data_structure.meta_settings['size'])))
-    if file_errors:
-        return None, file_errors
-
-    return encoded_file, []
-
-
-def encode_file(file, data_structure_type, valid_formats):
-    encoded_string = base64.b64encode(file.read())
-    file_type = file.content_type
-    file_dimensions = None
-
-    if valid_formats and is_not_valid_file_type(file_type.lower(), valid_formats):
-        return None, None
-
-    if data_structure_type == DataStructure.DATA_TYPES.image:
-        new_image = Image.open(file)
-        width, height = new_image.size
-        file_dimensions = {'width': width, 'height': height}
-
-    return encoded_string, file_dimensions
+def get_image_dimensions(image_file):
+    new_image = Image.open(image_file)
+    width, height = new_image.size
+    return {'width': width, 'height': height}
 
 
 def check_image_dimensions(data_structure_name,
@@ -374,3 +336,38 @@ def check_image_dimensions(data_structure_name,
         size_error_msgs.append((data_structure_name, error_msg))
 
     return size_error_msgs
+
+
+def check_meta_settings(data_structure, new_file):
+    meta_settings = data_structure.meta_settings
+    print meta_settings, new_file.content_type
+    if 'format' in meta_settings and is_not_valid_file_type(new_file.content_type, meta_settings['format']):
+        error_msg = "Invalid file type. Uploaded file is {}. It should be {}." \
+            .format(new_file.content_type,
+                    data_structure.meta_settings['format'].replace(',', ' or '))
+        return [(data_structure.name, error_msg)]
+
+    if data_structure.type in [DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.external_image]:
+
+        try:
+            image_dimensions = get_image_dimensions(new_file)
+        except (IOError, TypeError):
+            return [(data_structure.name, "Image is damaged please upload an valid version")]
+
+        return check_image_dimensions(data_structure.name, meta_settings, image_dimensions)
+
+    return []
+
+
+# End of file upload helpers
+def upload_file(data_structure, new_file):
+    file_size = new_file.size / 1048576.0
+    if file_size >= settings.CMS_MAX_FILE_SIZE:
+        return None, [(data_structure.name, 'Its size was {}MB but must be less than {} MB'. \
+                       format(file_size, settings.CMS_MAX_FILE_SIZE))]
+
+    file_errors = check_meta_settings(data_structure, new_file)
+    if file_errors:
+        return None, file_errors
+
+    return base64.b64encode(new_file.read()), []
