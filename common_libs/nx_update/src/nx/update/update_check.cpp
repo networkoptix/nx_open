@@ -314,7 +314,8 @@ FindPackageResult findPackage(
     if (nx::utils::SoftwareVersion(updateInformation.version) <= qnStaticCommon->engineVersion())
     {
         setErrorMessage(QString::fromLatin1(
-            "Update application version (%1) less or equal peer application version (%2)")
+            "The update application version (%1) is less or equal to the peer application " \
+            "version (%2)")
                 .arg(updateInformation.version)
                 .arg(qnStaticCommon->engineVersion().toString()),
             outMessage);
