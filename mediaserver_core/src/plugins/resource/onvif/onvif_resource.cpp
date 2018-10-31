@@ -2990,7 +2990,7 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
         if (configuration && QString::fromStdString(configuration->token) == encoderId)
             vEncoder = configuration;
     }
-    if (!vEncoder || !vEncoder->RateControl)
+    if (!vEncoder || !vEncoder->RateControl || !vEncoder->Resolution)
         return;
     if (m_primaryStreamCapabilities.resolutions.isEmpty())
         return;

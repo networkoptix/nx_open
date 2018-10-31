@@ -305,8 +305,11 @@ void QnOnvifStreamReader::printProfile(const Profile& profile, bool isPrimary) c
         qDebug() << "Encoder Name: " << profile.VideoEncoderConfiguration->Name.c_str();
         qDebug() << "Encoder Token: " << profile.VideoEncoderConfiguration->token.c_str();
         qDebug() << "Quality: " << profile.VideoEncoderConfiguration->Quality;
-        qDebug() << "Resolution: " << profile.VideoEncoderConfiguration->Resolution->Width << "x"
-            << profile.VideoEncoderConfiguration->Resolution->Height;
+        if(profile.VideoEncoderConfiguration->Resolution)
+        {
+            qDebug() << "Resolution: " << profile.VideoEncoderConfiguration->Resolution->Width
+                << "x" << profile.VideoEncoderConfiguration->Resolution->Height;
+        }
         qDebug() << "FPS: " << profile.VideoEncoderConfiguration->RateControl->FrameRateLimit;
     #else
         Q_UNUSED(profile)
