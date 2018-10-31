@@ -332,6 +332,14 @@ bool findPackage(
         }
     }
 
+    setErrorMessage(QString::fromLatin1(
+        "Failed to find a suitable update package for arch %1, platform %2, " \
+        "modification (variant) %3, version %4")
+            .arg(systemInformation.arch)
+            .arg(systemInformation.platform)
+            .arg(systemInformation.modification)
+            .arg(systemInformation.version));
+
     return false;
 }
 
@@ -348,7 +356,7 @@ bool findPackage(
     if (!QJson::deserialize(serializedUpdateInformation, &updateInformation))
     {
         if (outMessage)
-            *outMessage = QString::fromLatin1("Failed to deserialized update information JSON");
+            *outMessage = QString::fromLatin1("Failed to deserialize update information JSON");
         return false;
     }
 
