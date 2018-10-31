@@ -316,7 +316,7 @@ FindPackageResult findPackage(
         setErrorMessage(QString::fromLatin1(
             "Update application version (%1) less or equal peer application version (%2)")
                 .arg(updateInformation.version)
-                .arg(qnStaticCommon->engineVersion()),
+                .arg(qnStaticCommon->engineVersion().toString()),
             outMessage);
         return FindPackageResult::otherError;
     }
