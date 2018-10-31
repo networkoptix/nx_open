@@ -358,7 +358,7 @@ window.L = {};
                             .when('/integration/details/:plugin', {
                                 template: ''
                             })
-                            .when('/content', {
+                            .when('/new-content', {
                                 template: ''
                             })
                             .when('/right', {
