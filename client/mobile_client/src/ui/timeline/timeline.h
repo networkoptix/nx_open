@@ -33,7 +33,26 @@ class QnTimeline: public QQuickItem
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
     Q_PROPERTY(QColor chunkBarColor
         READ chunkBarColor WRITE setChunkBarColor NOTIFY chunkBarColorChanged)
+
     Q_PROPERTY(QColor chunkColor READ chunkColor WRITE setChunkColor NOTIFY chunkColorChanged)
+    Q_PROPERTY(QColor loadingChunkColor
+        READ loadingChunkColor
+        WRITE setLoadingChunkColor
+        NOTIFY loadingChunkColorChanged)
+    Q_PROPERTY(QColor motionModeChunkColor
+        READ motionModeChunkColor
+        WRITE setMotionModeChunkColor
+        NOTIFY motionModeChunkColorChanged)
+
+    Q_PROPERTY(QColor motionColor
+        READ motionColor
+        WRITE setMotionColor
+        NOTIFY motionColorChanged)
+    Q_PROPERTY(QColor motionLoadingColor
+        READ motionLoadingColor
+        WRITE setMotionLoadingColor
+        NOTIFY motionLoadingColorChanged)
+
     Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
 
     Q_PROPERTY(QColor activeLiveColorLight READ activeLiveColorLight
@@ -73,6 +92,18 @@ public:
 
     QColor chunkColor() const;
     void setChunkColor(const QColor& color);
+
+    QColor loadingChunkColor() const;
+    void setLoadingChunkColor(const QColor& color);
+
+    QColor motionModeChunkColor() const;
+    void setMotionModeChunkColor(const QColor& color);
+
+    QColor motionColor() const;
+    void setMotionColor(const QColor& color);
+
+    QColor motionLoadingColor() const;
+    void setMotionLoadingColor(const QColor& color);
 
     QColor chunkBarColor() const;
     void setChunkBarColor(const QColor& color);
@@ -177,6 +208,10 @@ signals:
 
     void textColorChanged();
     void chunkColorChanged();
+    void loadingChunkColorChanged();
+    void motionModeChunkColorChanged();
+    void motionColorChanged();
+    void motionLoadingColorChanged();
     void chunkBarColorChanged();
     void fontChanged();
 
