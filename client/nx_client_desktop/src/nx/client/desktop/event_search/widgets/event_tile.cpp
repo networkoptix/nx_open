@@ -13,6 +13,7 @@
 #include <ui/style/skin.h>
 #include <ui/widgets/common/elided_label.h>
 #include <utils/common/delayed.h>
+#include <utils/common/html.h>
 
 #include <nx/client/desktop/common/utils/widget_anchor.h>
 #include <nx/client/desktop/common/widgets/close_button.h>
@@ -128,8 +129,7 @@ struct EventTile::Private
         }
         else
         {
-            QString text = lm("<b>%1</b>").arg(list.join("<br>"));
-
+            QString text = list.join("<br>");
             if (andMore > 0)
             {
                 static constexpr int kQssFontWeightMultiplier = 8;
@@ -340,7 +340,11 @@ void EventTile::setResourceList(const QnResourceList& list)
 {
     QStringList items;
     for (int i = 0; i < std::min(list.size(), kMaximumResourceListSize); ++i)
-        items.push_back(list[i]->getName());
+    {
+        NX_ASSERT(list[i]);
+        if (list[i])
+            items.push_back(QString("<b>%1</b>").arg(list[i]->getName()));
+    }
 
     d->setResourceList(items, qMax(list.size() - kMaximumResourceListSize, 0));
 }
@@ -348,6 +352,9 @@ void EventTile::setResourceList(const QnResourceList& list)
 void EventTile::setResourceList(const QStringList& list)
 {
     QStringList items = list.mid(0, kMaximumResourceListSize);
+    for (auto& item: items)
+        item = ensureHtml(item);
+
     d->setResourceList(items, qMax(list.size() - kMaximumResourceListSize, 0));
 }
 

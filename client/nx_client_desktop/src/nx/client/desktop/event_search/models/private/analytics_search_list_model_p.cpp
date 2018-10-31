@@ -192,7 +192,13 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             return Qn::Empty_Help;
 
         case Qn::ResourceListRole:
-            return QVariant::fromValue(QnResourceList({camera(object)}));
+        {
+            const auto resource = camera(object);
+            if (resource)
+                return QVariant::fromValue(QnResourceList({resource}));
+
+            return QVariant::fromValue(QStringList({ QString("<%1>").arg(tr("deleted camera")) }));
+        }
 
         case Qn::ResourceRole:
             return QVariant::fromValue<QnResourcePtr>(camera(object));

@@ -139,7 +139,7 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
             const auto resource = q->resourcePool()->getResourceById(eventParams.eventResourceId);
             return resource
                 ? QVariant::fromValue(QnResourceList({resource}))
-                : QVariant();
+                : QVariant(); //< TODO: #vkutin Replace with <deleted camera> or <deleted server>?
         }
 
         case Qn::ResourceRole: //< Resource for thumbnail preview only.
