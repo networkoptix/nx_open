@@ -22,7 +22,7 @@ class DeviceAgent: public nxpt::CommonRefCounter<nx::sdk::analytics::ConsumingDe
 public:
     DeviceAgent(Engine* engine, const std::string& id);
 
-    virtual ~DeviceAgent();
+    virtual ~DeviceAgent() override;
 
     virtual Engine* engine() const override { return m_engine; }
 
@@ -47,7 +47,7 @@ public:
 
 private:
     nx::sdk::Error startFetchingMetadata(
-        const char* const* typeList, int typeListSize);
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes);
    
     void stopFetchingMetadata();
 

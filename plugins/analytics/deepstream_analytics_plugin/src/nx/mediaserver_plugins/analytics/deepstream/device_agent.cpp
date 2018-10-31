@@ -134,10 +134,9 @@ nx::sdk::Error DeviceAgent::startFetchingMetadata(
     return Error::noError;
 }
 
-nx::sdk::Error DeviceAgent::stopFetchingMetadata()
+void DeviceAgent::stopFetchingMetadata()
 {
     NX_OUTPUT << __func__ << " Stopping to fetch metadata. Doing nothing, actually...";
-    return Error::noError;
 }
 
 const char* DeviceAgent::manifest(Error* error)
