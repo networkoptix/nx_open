@@ -46,6 +46,10 @@ public:
         TunnelCreatedHandler tunnelCreatedHandler,
         TunnelAuthorizer<ApplicationData...>* tunnelAuthorizer);
 
+    /**
+     * @return Reference to the created tunnel server.
+     * Can be used for tuning specific for a particular tunnel type.
+     */
     template<template<typename...> class SpecificTunnelServer>
     SpecificTunnelServer<ApplicationData...>& addTunnelServer();
 
