@@ -1,6 +1,7 @@
 # coding=utf-8
 import logging
 import os
+import pprint
 from string import whitespace
 
 import pytest
@@ -275,6 +276,77 @@ def test_size_of_a_dir(remote_test_dir):
 def test_glob_on_file(existing_remote_file):
     with pytest.raises(exceptions.BadPath):
         _ = list(existing_remote_file.glob('*'))
+
+
+@pytest.skip()
+def test_glob_recursive(existing_remote_dir):
+    layout = [
+        ('1',),
+        ('1', '11',),
+        ('1', '11', '111.txt',),
+        ('1', '11', '112.dat',),
+        ('1', '11', '113',),
+        ('1', '11', '113', '1131',),
+        ('1', '12',),
+        ('1', '13.txt',),
+        ('2',),
+        ('3.txt',),
+        ]
+    for simplified in layout:
+        path = existing_remote_dir.joinpath(*simplified)
+        if path.suffix == '.txt':
+            path.write_text(u'dummy text :)')
+        elif path.suffix == '.dat':
+            path.write_bytes(b'dummy bytes \x8D')
+        else:
+            path.mkdir()
+
+    def _glob(pattern):
+        _logger.debug('Glob: %s', pattern)
+        raw = list(existing_remote_dir.glob(pattern))
+        _logger.debug('Raw:\n%s', pprint.pformat(raw))
+        simplified = list(sorted(path.relative_to(existing_remote_dir).parts for path in raw))
+        _logger.debug('Simplified:\n%s', pprint.pformat(simplified))
+        return simplified
+
+    assert _glob('**') == [
+        (),
+        ('1',),
+        ('1', '11',),
+        ('1', '11', '113',),
+        ('1', '11', '113', '1131',),
+        ('1', '12',),
+        ('2',),
+        ]
+    assert _glob('**/*') == [
+        ('1',),
+        ('1', '11',),
+        ('1', '11', '111.txt',),
+        ('1', '11', '112.dat',),
+        ('1', '11', '113',),
+        ('1', '11', '113', '1131',),
+        ('1', '12',),
+        ('1', '13.txt',),
+        ('2',),
+        ('3.txt',),
+        ]
+    assert _glob('**/*.txt') == [
+        ('1', '11', '111.txt',),
+        ('1', '13.txt',),
+        ('3.txt',),
+        ]
+    assert _glob('**/*.dat') == [
+        ('1', '11', '112.dat',),
+        ]
+    assert _glob('**/**/**/**/**/*1*/**/**/**/**/**/*') == [
+        ('1', '11',),
+        ('1', '11', '111.txt',),
+        ('1', '11', '112.dat',),
+        ('1', '11', '113',),
+        ('1', '11', '113', '1131',),
+        ('1', '12',),
+        ('1', '13.txt',),
+        ]
 
 
 def test_glob_on_non_existent(existing_remote_dir):
