@@ -42,6 +42,7 @@
 #include <ui/common/indents.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/widgets/calendar_widget.h>
+#include <ui/workaround/hidpi_workarounds.h>
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/property_backup.h>
@@ -426,6 +427,40 @@ namespace
         return CommonScrollBar;
     }
 
+    QRect getNoReplayRect(const QMenu* menu)
+    {
+        const auto noReplayArea = menu->property(Properties::kMenuNoMouseReplayArea);
+        if (!noReplayArea.isValid())
+            return {};
+
+        if (noReplayArea.canConvert<QRect>())
+            return noReplayArea.value<QRect>();
+
+        if (noReplayArea.canConvert<QPointer<QWidget>>())
+        {
+            const auto widget = noReplayArea.value<QPointer<QWidget>>();
+            return widget
+                ? QRect(QnHiDpiWorkarounds::safeMapToGlobal(widget, QPoint()), widget->size())
+                : QRect();
+        }
+
+        return QRect();
+    }
+
+    // A menu has dropdown style either if it has kMenuAsDropdown bool property set
+    // or it has a parent menu that has that property set.
+    bool menuHasDropdownStyle(const QMenu* menu)
+    {
+        if (!menu)
+            return false;
+
+        const QVariant menuAsDropdown = menu->property(Properties::kMenuAsDropdown);
+        if (menuAsDropdown.canConvert<bool>() && menuAsDropdown.toBool())
+            return true;
+
+        return menuHasDropdownStyle(qobject_cast<const QMenu*>(menu->parentWidget()));
+    }
+
     /*
      * Class to gain access to protected property QAbstractScrollArea::viewportMargins:
      */
@@ -557,9 +592,30 @@ QnNxStyle::QnNxStyle() :
     //QTBUG: Qt is supposed to handle this, but currently it seems broken.
     if (kForceMenuMouseReplay)
     {
-        installEventHandler(qApp, QEvent::MouseButtonPress, this,
+        installEventHandler(qApp, {QEvent::MouseButtonPress, QEvent::ActionAdded}, this,
             [this](QObject* watched, QEvent* event)
             {
+                if (event->type() == QEvent::ActionAdded)
+                {
+                    // Hook into QPushButton::setMenu.
+                    if (auto button = qobject_cast<QPushButton*>(watched))
+                    {
+                        if (button->menu())
+                        {
+                            button->menu()->setProperty(Properties::kMenuNoMouseReplayArea,
+                                QVariant::fromValue(QPointer<QWidget>(button)));
+                        }
+                    }
+
+                    return;
+                }
+
+                if (event->type() != QEvent::MouseButtonPress)
+                {
+                    NX_ASSERT(false, "Should never get here");
+                    return;
+                }
+
                 if (!event->spontaneous())
                     return;
 
@@ -575,7 +631,9 @@ QnNxStyle::QnNxStyle() :
 
                 /* If menu was invoked by a click on some area we most probably want to
                  * prevent re-invoking menu if it was closed by click in the same area: */
-                QRect noReplayRect = activeMenu->property(Properties::kMenuNoMouseReplayRect).value<QRect>();
+                QRect noReplayRect = getNoReplayRect(activeMenu);
+                qDebug() << "NO REPLAY RECT:" << noReplayRect;
+
                 if (noReplayRect.isValid() && noReplayRect.contains(globalPos))
                     return;
 
@@ -584,6 +642,8 @@ QnNxStyle::QnNxStyle() :
                     return;
 
                 auto localPos = window->mapFromGlobal(globalPos);
+
+                activeMenu->setAttribute(Qt::WA_NoMouseReplay);
 
                 qApp->postEvent(window, new QMouseEvent(QEvent::MouseButtonPress,
                     localPos, globalPos, mouseEvent->button(),
@@ -2162,7 +2222,7 @@ void QnNxStyle::drawControl(
         {
             if (auto menuItem = qstyleoption_cast<const QStyleOptionMenuItem*>(option))
             {
-                bool asDropdown = widget && widget->property(Properties::kMenuAsDropdown).toBool();
+                const bool asDropdown = menuHasDropdownStyle(qobject_cast<const QMenu*>(widget));
                 if (menuItem->menuItemType == QStyleOptionMenuItem::Separator)
                 {
                     QnScopedPainterPenRollback penRollback(painter, menuItem->palette.color(QPalette::Midlight));
@@ -2235,7 +2295,6 @@ void QnNxStyle::drawControl(
 
                 if (menuItem->menuItemType == QStyleOptionMenuItem::SubMenu)
                 {
-                    NX_ASSERT(!asDropdown, Q_FUNC_INFO, "Not supported");
                     drawArrow(Right,
                               painter,
                               QRect(menuItem->rect.right() - Metrics::kMenuItemVPadding - Metrics::kArrowSize, menuItem->rect.top(),
@@ -3327,14 +3386,21 @@ QSize QnNxStyle::sizeFromContents(
 
         case CT_MenuItem:
         {
-            if (widget && widget->property(Properties::kMenuAsDropdown).toBool())
+            int submenuExtra = 0;
+            if (auto menuItem = qstyleoption_cast<const QStyleOptionMenuItem*>(option))
             {
-                return QSize(
-                    qMax(size.width() + 2 * Metrics::kStandardPadding, Metrics::kMinimumButtonWidth),
+                if (menuItem->menuItemType == QStyleOptionMenuItem::SubMenu)
+                    submenuExtra = Metrics::kSubmenuArrowPadding + Metrics::kArrowSize;
+            }
+
+            if (menuHasDropdownStyle(qobject_cast<const QMenu*>(widget)))
+            {
+                const int width = size.width() + 2 * Metrics::kStandardPadding + submenuExtra;
+                return QSize(qMax(width, Metrics::kMinimumButtonWidth),
                     size.height() + 2 * Metrics::kMenuItemVPadding);
             }
 
-            return QSize(size.width() + 24 + 2 * Metrics::kMenuItemHPadding,
+            return QSize(size.width() + 24 + 2 * Metrics::kMenuItemHPadding + submenuExtra,
                 size.height() + 2 * Metrics::kMenuItemVPadding);
         }
 

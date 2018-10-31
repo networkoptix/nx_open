@@ -180,7 +180,14 @@ protected:
     void whenInvokedDetachFromCloudRestMethod()
     {
         auto mediaServerClient = prepareMediaServerClient();
+
+        const auto credentials = mediaServerClient->getUserCredentials();
+        ASSERT_TRUE((bool) credentials);
+        ASSERT_EQ(nx::network::http::AuthTokenType::password, credentials->authToken.type);
+
         DetachFromCloudData params;
+        params.currentPassword = credentials->authToken.value;
+
         QnJsonRestResult resultCode = mediaServerClient->detachFromCloud(std::move(params));
         ASSERT_EQ(QnJsonRestResult::NoError, resultCode.error);
     }

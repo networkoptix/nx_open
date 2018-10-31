@@ -242,7 +242,7 @@ namespace Qn
         BusyIndicatorVisibleRole,                   /**< Role for toggling busy indicator (bool). */
         ProgressValueRole,                          /**< Role for specifying progress value [0..1] (float). */
         AnimatedRole,                               /**< Role for specifying whether item animation is allowed (bool). */
-        DurationRole,                               /**< Role for duration in milliseconds (qint64). */
+        DurationRole,                               /**< Role for duration in microseconds (qint64). */
         NotificationLevelRole,                      /**< Role for notification level (QnNotificationLevel::Value). */
         ContextMenuRole,                            /**< Role for context menu (QSharedPointer<QMenu>). */
         ForcePrecisePreviewRole,                    /**< Role for forcing precise preview frame (bool). */

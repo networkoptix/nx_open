@@ -2,12 +2,12 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from api.controllers import cloud_api, cloud_gateway
 
-from api.helpers.exceptions import handle_exceptions, api_success, require_params
+from api.helpers.exceptions import handle_exceptions, api_success, require_params, \
+    APINotAuthorisedException, APIRequestException, ErrorCodes
 
 from cloud import settings
 import hashlib
 import base64
-
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticated, ))
@@ -107,12 +107,16 @@ def disconnect(request):
     require_params(request, ('system_id', 'password'))
 
     if request.user.is_authenticated():
-        cloud_api.System.unbind(request.user.email, request.data['password'], request.data['system_id'])
-        return api_success()
+        try:
+            cloud_api.System.unbind(request.user.email, request.data['password'], request.data['system_id'])
+        except APINotAuthorisedException:
+            raise APIRequestException('User action was not allowed.', ErrorCodes.wrong_password,
+                                      error_data={'password': ['Not recognized.']})
+    else:
+        require_params(request, ('email', 'password'))
+        email = request.data['email'].lower()
+        cloud_api.System.unbind(email, request.data['password'], request.data['system_id'])
 
-    require_params(request, ('email', 'password'))
-    email = request.data['email'].lower()
-    cloud_api.System.unbind(email, request.data['password'], request.data['system_id'])
     return api_success()
 
 

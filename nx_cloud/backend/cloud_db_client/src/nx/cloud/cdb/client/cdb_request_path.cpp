@@ -44,5 +44,7 @@ const char* const kAnotherDeprecatedCloudModuleXmlPath = "/api/cloud_modules.xml
 
 const char* const kDiscoveryCloudModuleXmlPath = "/discovery/v1/cloud_modules.xml";
 
+const char* const kSystemIdParam = "systemId";
+
 } // namespace cdb
 } // namespace nx

@@ -24,8 +24,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOCAL_ENVIRONMENT = 'runserver' in sys.argv
 conf = get_config()
 
-sys.stderr.write ("Loaded config: \n" + json.dumps(conf, indent=4, sort_keys=True) + "\n")
-
 
 CUSTOMIZATION = os.getenv('CUSTOMIZATION')
 if not CUSTOMIZATION:
@@ -152,9 +150,9 @@ DATABASES = {
         'OPTIONS': {
             'sql_mode': 'TRADITIONAL',
             'charset': 'utf8mb4',
-            'init_command': 'SET '
-                'character_set_connection=utf8,'
-                'collation_connection=utf8_bin'
+            'init_command': 'SET \
+                character_set_server=utf8mb4,\
+                collation_server = utf8mb4_unicode_ci'
         }
     }
 }

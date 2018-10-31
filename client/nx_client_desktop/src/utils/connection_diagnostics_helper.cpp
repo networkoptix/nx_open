@@ -13,16 +13,17 @@
 #include <client/client_app_info.h>
 #include <client/client_startup_parameters.h>
 
+#include <ini.h>
 #include <nx_ec/ec_api.h>
 
 #include <ui/dialogs/common/message_box.h>
-#include <ui/dialogs/compatibility_version_installation_dialog.h>
 #include <ui/help/help_topics.h>
 
 #include <utils/applauncher_utils.h>
 #include <utils/common/app_info.h>
-#include <nx/network/http/http_types.h>
 
+#include <nx/client/desktop/system_update/compatibility_version_installation_dialog.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
@@ -94,8 +95,6 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
             .arg(connectionInfo.cloudHost));
     }
 
-
-
     switch (result)
     {
     case Qn::SuccessConnectionResult:
@@ -135,7 +134,6 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
     default:
         return QString();
     }
-
 }
 
 Qn::ConnectionResult QnConnectionDiagnosticsHelper::validateConnection(
@@ -145,9 +143,14 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::validateConnection(
 {
     const auto result = QnConnectionValidator::validateConnection(connectionInfo, errorCode);
     if (result == Qn::SuccessConnectionResult)
+    {
+        // Forcing compatibility mode for debug purposes.
+        int level = nx::client::desktop::ini().massSystemUpdateDebugInfo;
+        if (level & 2)
+            return handleCompatibilityMode(connectionInfo, parentWidget);
         return result;
+    }
 
-    const auto helpTopicId = helpTopic(result);
     if (result == Qn::IncompatibleProtocolConnectionResult
         || result == Qn::IncompatibleCloudHostConnectionResult)
     {
@@ -345,6 +348,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
     QWidget* parentWidget)
 {
     using namespace Qn;
+    using Dialog = CompatibilityVersionInstallationDialog;
 
     QList<nx::utils::SoftwareVersion> versions;
     if (!getInstalledVersions(&versions))
@@ -365,13 +369,16 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
                 tr("Download Client version %1?").arg(versionString), extras,
                 QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, parentWidget);
 
-            dialog.addButton(tr("Download"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
+            dialog.addButton(tr("Download && Install"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
             if (dialog.exec() != QDialogButtonBox::Cancel)
             {
-                QScopedPointer<CompatibilityVersionInstallationDialog> installationDialog(
-                    new CompatibilityVersionInstallationDialog(connectionInfo.version, parentWidget));
+
+                QScopedPointer<Dialog> installationDialog(new Dialog(connectionInfo, parentWidget));
+
+                // TODO: Should pass URI to the server or we need to establish partial connection
                 //starting installation
-                installationDialog->exec();
+                installationDialog->installUpdate();
+
                 if (installationDialog->installationSucceeded())
                 {
                     isInstalled = true;
@@ -427,7 +434,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
                 if (dialog.exec() != QDialogButtonBox::Cancel)
                 {
                     //starting installation
-                    QScopedPointer<CompatibilityVersionInstallationDialog> installationDialog(new CompatibilityVersionInstallationDialog(connectionInfo.version, parentWidget));
+                    QScopedPointer<Dialog> installationDialog(new Dialog(connectionInfo, parentWidget));
                     installationDialog->exec();
                     if (installationDialog->installationSucceeded())
                         continue;   //offering to start newly-installed compatibility version

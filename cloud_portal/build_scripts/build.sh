@@ -6,11 +6,11 @@ set -e
 # or from cloud_portal "./build_scripts/build.sh"
 #or like this from outside the repository "../nx_vms/cloud_portal/build_scripts/build.sh"
 
-VMS_REPOSITORY="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-[[ "$VMS_REPOSITORY" =~ (.*)\/cloud_portal.* ]]; VMS_REPOSITORY=${BASH_REMATCH[1]}
+VMS_REPOSITORY="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../.."
+[[ "$VMS_REPOSITORY" =~ (.*)\/cloud_portal.* ]]; REPO=${BASH_REMATCH[1]}
 
 #If we are not using the repository we should update necessary files
-if [[ ! $PWD =~ $VMS_REPOSITORY ]]
+if [[ ! $PWD =~ $REPO ]]
 then
     echo "Updating Cloud Portal sources"
     if [ -e "cloud_portal" ]
@@ -41,9 +41,6 @@ then
 
     mkdir -p webadmin
     pushd webadmin
-        [ -d 'app/web_common' ] && rm -rf app/web_common
-        mkdir -p app/web_common && cp -pr $VMS_REPOSITORY/webadmin/app/web_common/* "$_"
-
         [ -d 'app/styles' ] && rm -rf app/styles
         mkdir -p app/styles && cp -pr $VMS_REPOSITORY/webadmin/app/styles/* "$_"
 

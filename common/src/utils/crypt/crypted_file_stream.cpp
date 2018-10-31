@@ -32,6 +32,13 @@ CryptedFileStream::CryptedFileStream(const QString& fileName, const QString& pas
     setPassword(password);
 }
 
+CryptedFileStream::CryptedFileStream(const QString& fileName, qint64 position, qint64 size,
+    const QString& password)
+    : CryptedFileStream(fileName, password)
+{
+    setEnclosure(position, size);
+}
+
 CryptedFileStream::~CryptedFileStream()
 {
     close();
@@ -66,34 +73,29 @@ bool CryptedFileStream::open(QIODevice::OpenMode openMode)
     if (openMode == WriteOnly || (openMode & Append))
         fileOpenMode = ReadWrite;
 
-    try
+    // Ask Misha S. and Sergey I. about why not to use exceptions here - I just don't know.
+    auto exceptionAvoider = [this](const QString& str) { setErrorString(str); return false; };
+
+    if (!m_file.open(fileOpenMode))
+        return exceptionAvoider(m_file.errorString());
+
+    m_openMode = openMode;
+
+    m_enclosure.size = m_enclosure.originalSize;
+
+    // Check for probably truncated file or damaged stream.
+    if (m_enclosure.size != 0 && (m_enclosure.size - kHeaderSize) % kCryptoBlockSize != 0)
+        return exceptionAvoider(tr("Wrong crypted stream size."));
+
+    if (m_enclosure.isNull() && openMode != WriteOnly) //< Adjust to file size except if WriteOnly.
+        m_enclosure.size = m_file.size();
+
+    if (openMode == WriteOnly)
+        createHeader();
+    else
     {
-        if (!m_file.open(fileOpenMode))
-            throw std::runtime_error(m_file.errorString().toUtf8());
-
-        m_openMode = openMode;
-
-        m_enclosure.size = m_enclosure.originalSize;
-
-        // Check for probably truncated file or damaged stream.
-        if (m_enclosure.size != 0 && (m_enclosure.size - kHeaderSize) % kCryptoBlockSize != 0)
-            throw std::runtime_error(tr("Wrong crypted stream size.").toUtf8());
-
-        if (m_enclosure.isNull() && openMode != WriteOnly) //< Adjust to file size except if WriteOnly.
-            m_enclosure.size = m_file.size();
-
-        if (openMode == WriteOnly)
-            createHeader();
-        else
-        {
-            if (!readHeader())
-                throw std::runtime_error(tr("Damaged crypted stream header.").toUtf8());
-        }
-    }
-    catch (const std::exception& e)
-    {
-        setErrorString(e.what());
-        return false;
+        if (!readHeader())
+            return exceptionAvoider(tr("Damaged crypted stream header."));
     }
 
     m_openMode = openMode;

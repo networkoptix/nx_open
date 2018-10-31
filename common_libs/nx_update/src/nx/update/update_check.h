@@ -13,7 +13,7 @@ const static QString kLatestVersion = "latest";
 const static QString kComponentClient = "client";
 const static QString kComponentServer = "server";
 
-Information NX_UPDATE_API updateInformation(
+Information updateInformation(
     const QString& url,
     const QString& publicationKey = kLatestVersion,
     InformationError* error = nullptr);

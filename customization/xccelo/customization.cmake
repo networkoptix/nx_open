@@ -51,9 +51,5 @@ set(freeLicenseIsTrial "true")
 set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0030")
 
-# Installer Customizations
-set(sign.password "qweasd123")
-set(sign.cer "app.p12")
-
 # Localization
 set(defaultTranslation de_DE)

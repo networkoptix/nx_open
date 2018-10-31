@@ -129,17 +129,17 @@ def video_parameters(run, stream_urls=None, **profiles):
         {'resolution': 'XXXxYYY', 'codec': codec, 'fps': [min_fps, max_fps]}.
     """
     # Enable recording to keep video stream open during entire stage.
-    with run.server.api.camera_recording(run.uuid):
-        for profile, configurations in profiles.items():
-            for index, configuration in enumerate(configurations):
-                configure_video(
-                    run.server.api, run.id, run.data['cameraAdvancedParams'],
-                    profile, **configuration)
+    # with run.server.api.camera_recording(run.uuid):
+    for profile, configurations in profiles.items():
+        for index, configuration in enumerate(configurations):
+            configure_video(
+                run.server.api, run.id, run.data['cameraAdvancedParams'],
+                profile, **configuration)
 
-                for error in ffprobe_expect_stream(
-                        {'video': configuration}, run.media_url(profile),
-                        '{}[{}]'.format(profile, index)):
-                    yield error
+            for error in ffprobe_expect_stream(
+                    {'video': configuration}, run.media_url(profile),
+                    '{}[{}]'.format(profile, index)):
+                yield error
 
     if stream_urls:
         for error in retry_expect_values({'streamUrls': stream_urls}, lambda: run.data, syntax='*'):
@@ -156,25 +156,25 @@ def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Genera
         {'codec': codec, 'skip_codec_change': true_if_this_value_is_a_default}
     """
     # Enable recording to keep video stream open during the entire stage.
-    with run.server.api.camera_recording(run.uuid):
-        with run.server.api.camera_audio_enabled(run.uuid):
-            for index, configuration in enumerate(configurations):
-                if not configuration.get('skip_codec_change'):
-                    if 'set_codec' in configuration.keys():
-                        configure_audio(
-                            run.server.api, run.id, run.data['cameraAdvancedParams'],
-                            configuration.pop('set_codec'))
-                    else:
-                        configure_audio(
-                            run.server.api, run.id, run.data['cameraAdvancedParams'],
-                            **configuration)
+    # with run.server.api.camera_recording(run.uuid):
+    with run.server.api.camera_audio_enabled(run.uuid):
+        for index, configuration in enumerate(configurations):
+            if not configuration.get('skip_codec_change'):
+                if 'set_codec' in configuration.keys():
+                    configure_audio(
+                        run.server.api, run.id, run.data['cameraAdvancedParams'],
+                        configuration.pop('set_codec'))
                 else:
-                    del configuration["skip_codec_change"]
+                    configure_audio(
+                        run.server.api, run.id, run.data['cameraAdvancedParams'],
+                        **configuration)
+            else:
+                del configuration["skip_codec_change"]
 
-                for error in ffprobe_expect_stream(
-                        {'audio': configuration}, run.media_url(), 'primary[{}]'.format(index),
-                        audio_stage=True):
-                    yield error
+            for error in ffprobe_expect_stream(
+                    {'audio': configuration}, run.media_url(), 'primary[{}]'.format(index),
+                    ):
+                yield error
 
     yield Success()
 

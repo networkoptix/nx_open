@@ -1,0 +1,13 @@
+// Nx collapsible element
+.nx-collapsible {
+    display: block;
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+
+    &.show {
+        opacity: 1;
+        display: block;
+        height: auto;
+    }
+}

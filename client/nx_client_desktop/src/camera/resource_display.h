@@ -21,7 +21,7 @@ class QnClientVideoCamera;
 
 namespace nx {
 namespace utils {
-class Counter;
+class CounterWithSignal;
 } // namespace utils
 } // namespace nx
 
@@ -147,5 +147,5 @@ private:
     /** Whether this display was started. */
     bool m_started;
 
-    QPointer<nx::utils::Counter> m_counter;
+    QPointer<nx::utils::CounterWithSignal> m_counter;
 };

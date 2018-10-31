@@ -146,6 +146,43 @@ Authenticator::Result Authenticator::tryAllMethods(
     return result;
 }
 
+bool Authenticator::isPasswordCorrect(const Qn::UserAccessData& access, const QString& password)
+{
+    const auto user = commonModule()->resourcePool()
+        ->getResourceById<QnUserResource>(access.userId);
+    if (!user)
+        return false;
+
+    // TODO: Refactor and use direct checks instead of full HTTP authorization.
+    namespace http = nx::network::http;
+
+    const nx::Buffer requestLine("GET / HTTP/1.1");
+    http::RequestLine request;
+    request.parse(requestLine);
+
+    http::Response response;
+    addAuthHeader(response);
+
+    http::header::WWWAuthenticate unauthorized;
+    if (!unauthorized.parse(http::getHeaderValue(response.headers, unauthorized.NAME)))
+    {
+        return false;
+    }
+
+    http::header::DigestAuthorization digestAuthorization;
+    digestAuthorization.digest->userid = user->getName().toUtf8();
+    if (!http::calcDigestResponse(
+        request.method, {user->getName(), {password.toUtf8(), http::AuthTokenType::password}},
+        request.url.toString().toUtf8(), unauthorized, &digestAuthorization))
+    {
+        return false;
+    }
+
+    const auto result = tryHttpDigest(
+        request, digestAuthorization, response, /*isProxy*/ false, nullptr);
+    return result == Qn::Auth_OK;
+}
+
 static const auto kCookieRuntimeGuid = Qn::EC2_RUNTIME_GUID_HEADER_NAME.toLower();
 
 Authenticator::Result Authenticator::tryCookie(const nx::network::http::Request& request)

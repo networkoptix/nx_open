@@ -1,4 +1,4 @@
-Üdvözöljük!
+Hello {{message.userFullName}},
 
   E-mail címe visszaigazolásához és fiókja aktiválásához kattintson az alábbi linkre.
 

@@ -3,13 +3,26 @@
 
 #ifdef ENABLE_AXIS
 
+#include <map>
+
 #include "core/resource_management/resource_searcher.h"
 #include "../mdns/mdns_resource_searcher.h"
-
 
 class QnPlAxisResourceSearcher : public QnMdnsResourceSearcher
 {
     using base_type = QnMdnsResourceSearcher;
+    struct TimeMarkedAddress
+    {
+        nx::network::SocketAddress address;
+        nx::utils::ElapsedTimer elapsedTimer;
+
+        TimeMarkedAddress() = default;
+        TimeMarkedAddress(const nx::network::SocketAddress& address): address(address)
+        {
+            elapsedTimer.restart();
+        }
+    };
+
 public:
     QnPlAxisResourceSearcher(QnMediaServerModule* serverModule);
 
@@ -28,6 +41,9 @@ protected:
         const QHostAddress& foundHostAddress ) override;
 
 private:
+    nx::network::SocketAddress obtainFixedHostAddress(
+        nx::utils::MacAddress discoveredMac, nx::network::SocketAddress discoveredAddress);
+
     void setChannelToResource(const QnPlAxisResourcePtr& resource, int value);
     bool testCredentials(const QUrl& url, const QAuthenticator& auth) const;
 
@@ -37,6 +53,10 @@ private:
     void addMultichannelResources(QList<T>& result);
 private:
     QnMediaServerModule* m_serverModule = nullptr;
+
+    // Maps MACs to IPs, that are non ipv4 link-local.
+    // Empty IP means, that MAC never corresponded to the address, that was not link-local ipv4.
+    std::map<nx::utils::MacAddress, TimeMarkedAddress> m_foundNonIpv4LinkLocalAddresses;
 };
 
 #endif // #ifdef ENABLE_AXIS

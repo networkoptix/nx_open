@@ -1,41 +1,36 @@
 #include "connect_to_cloud_dialog.h"
 #include "ui_connect_to_cloud_dialog.h"
 
+#include <QtCore/QPointer>
 #include <QtWidgets/QGraphicsOpacityEffect>
 
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
-
+#include <cloud/cloud_connection.h>
+#include <cloud/cloud_result_info.h>
+#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/param.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
-
-#include <cloud/cloud_connection.h>
-#include <cloud/cloud_result_info.h>
-
-#include <common/common_module.h>
-
 #include <helpers/cloud_url_helper.h>
-#include <utils/common/delayed.h>
-
-#include <utils/common/html.h>
-
-#include <nx/client/core/settings/secure_settings.h>
-#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/dialogs/cloud/cloud_result_messages.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
+#include <utils/common/app_info.h>
+#include <utils/common/delayed.h>
+#include <utils/common/html.h>
+#include <watchers/cloud_status_watcher.h>
+
+#include <nx/client/core/settings/secure_settings.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <nx/client/desktop/common/widgets/busy_indicator_button.h>
 #include <nx/client/desktop/common/widgets/input_field.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/network/app_info.h>
-
-#include <watchers/cloud_status_watcher.h>
-
-#include <utils/common/app_info.h>
+#include <nx/utils/guarded_callback.h>
 
 using namespace nx::cdb;
 using namespace nx::client::desktop;
@@ -265,18 +260,15 @@ void QnConnectToCloudDialogPrivate::bindSystem()
     sysRegistrationData.name = qnGlobalSettings->systemName().toStdString();
     sysRegistrationData.customization = QnAppInfo::customizationName().toStdString();
 
-    const auto guard = QPointer<QObject>(this);
     const auto completionHandler =
-        [this, serverConnection, guard](api::ResultCode result, api::SystemData systemData)
+        [this, serverConnection](api::ResultCode result, api::SystemData systemData)
         {
-            if (!guard)
-                return;
-
             Q_Q(QnConnectToCloudDialog);
             emit q->bindFinished(result, systemData, serverConnection);
         };
 
-    cloudConnection->systemManager()->bindSystem(sysRegistrationData, completionHandler);
+    cloudConnection->systemManager()->bindSystem(sysRegistrationData,
+        nx::utils::guarded(this, completionHandler));
 }
 
 void QnConnectToCloudDialogPrivate::showSuccess(const QString& /*cloudLogin*/)

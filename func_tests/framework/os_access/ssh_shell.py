@@ -13,7 +13,6 @@ from framework.method_caching import cached_getter
 from framework.os_access import posix_shell
 from framework.os_access.command import Command, Run
 from framework.os_access.path import FileSystemPath
-from framework.os_access.sftp_path import SftpPath
 
 _logger = context_logger.ContextLogger('ssh')
 
@@ -220,13 +219,6 @@ class SSH(posix_shell.Shell):
         except paramiko.ssh_exception.SSHException as e:
             raise SSHNotConnected("Cannot connect to {}: {} (is service started? using VirtualBox?)".format(self, e))
         return client
-
-    @cached_getter
-    def sftp_path_cls(self):
-        home = self.home_dir(self.current_user_name())
-        sftp_client = self._client().open_sftp()
-        specific_cls = SftpPath.specific_cls(sftp_client, home)
-        return specific_cls
 
     def close(self):
         self._client().close()

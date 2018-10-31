@@ -7,6 +7,7 @@ In server requests - we always use server time
 */
 window.timeManager = {
     useServerTime: true,
+    useSystemTime: true,
     timeLatency: 0,
     timeZoneOffset: 0
 };
@@ -21,13 +22,13 @@ timeManager.localToServer = function(date){
 };
 
 timeManager.displayToServer = function(date){
-    if(this.useServerTime){
+    if(this.useServerTime || this.useSystemTime){
         return date + this.timeZoneOffset; // Translate server time to localtime
     }
     return this.localToServer(date);  // Save server time
 };
 timeManager.serverToDisplay = function(date){
-    if(this.useServerTime){
+    if(this.useServerTime || this.useSystemTime){
         return date - this.timeZoneOffset;  // Save server time
     }
     return this.serverToLocal(date); // Translate server time to localtime
@@ -35,13 +36,13 @@ timeManager.serverToDisplay = function(date){
 
 
 timeManager.localToDisplay = function(date){
-    if(this.useServerTime){
+    if(this.useServerTime || this.useSystemTime){
         return this.serverToDisplay(this.localToServer(date));
     }
     return date;
 };
 timeManager.displayToLocal = function(date){
-    if(this.useServerTime){
+    if(this.useServerTime || this.useSystemTime){
         return this.serverToLocal(this.displayToServer(date));
     }
     return date;
@@ -95,9 +96,10 @@ timeManager.setOffset = function(offset){
     this.serverTimeZoneOffset = offset.serverTimeZoneOffset;
     this.timeZoneOffset = this.clientTimeZoneOffset - this.serverTimeZoneOffset;
 };
-timeManager.init = function(useServerTime){
+timeManager.init = function(useServerTime, useSystemTime){
     // Init time manager - get client's timezone
     this.useServerTime = useServerTime;
+    this.useSystemTime = useSystemTime;
     var clientDate = new Date();
     this.clientTimeZoneOffset = -clientDate.getTimezoneOffset() * 60000;
     // For some reason local timezone offset has wrong sign, so we sum them instead of subtractions

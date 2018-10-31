@@ -4,6 +4,7 @@
 #include "json_rest_result.h"
 
 #include <nx/fusion/serialization/lexical_functions.h>
+#include <api/model/password_data.h>
 
 /**@file
  * TODO: #MSAPI

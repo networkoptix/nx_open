@@ -71,7 +71,6 @@ private:
     int openVideoEncoder();
     int initializeScaledFrame(const ffmpeg::Codec* encoder);
     void setEncoderOptions(ffmpeg::Codec* encoder);
-    void maybeFlush();
     
     /**
      * Scale @param frame, modifying the preallocated @param outFrame whose size and format are
@@ -84,7 +83,7 @@ private:
     int scale(const AVFrame * frame, AVFrame* outFrame);
     void calculateTimePerFrame();
 
-    void removeConsumer() override;
+    virtual void removeVideoConsumer() override;
 };
 
 } // namespace usb_cam

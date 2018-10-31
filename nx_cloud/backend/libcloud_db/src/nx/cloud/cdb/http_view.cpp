@@ -221,13 +221,13 @@ void HttpView::registerApiHandlers(
         EntityType::system, DataActionType::insert,
         [this](
             const AuthorizationInfo& authzInfo,
-            const std::vector<nx::network::http::StringType>& restPathParams,
+            const network::http::RequestPathParams& restPathParams,
             data::SystemId inputData,
             std::function<void(api::ResultCode)> completionHandler)
         {
             m_controller->systemMergeManager().startMergingSystems(
                 authzInfo,
-                restPathParams[0].toStdString(),
+                restPathParams.getByName(kSystemIdParam),
                 std::move(inputData.systemId),
                 std::move(completionHandler));
         });
@@ -339,24 +339,27 @@ void HttpView::registerHttpHandler(
     EntityType entityType,
     DataActionType dataActionType)
 {
-    typedef typename nx::utils::tuple_first_element<void, std::tuple<OutputData...>>::type
-        ActualOutputDataType;
-    typedef FiniteMsgBodyHttpHandler<
+    using ActualOutputDataType = 
+        typename nx::utils::tuple_first_element<void, std::tuple<OutputData...>>::type;
+
+    using HttpHandlerType = FiniteMsgBodyHttpHandler<
         void,
-        typename std::remove_const<typename std::remove_reference<ActualOutputDataType>::type>::type
-    > HttpHandlerType;
+        typename std::remove_const<
+            typename std::remove_reference<ActualOutputDataType>::type>::type>;
 
     m_httpMessageDispatcher.registerRequestProcessor<HttpHandlerType>(
         handlerPath,
         [this, managerFunc, manager, entityType, dataActionType]()
             -> std::unique_ptr<HttpHandlerType>
         {
-            using namespace std::placeholders;
             return std::make_unique<HttpHandlerType>(
                 entityType,
                 dataActionType,
                 m_controller->securityManager(),
-                std::bind(managerFunc, manager, _1, _2));
+                [managerFunc, manager](auto&&... args)
+                {
+                    (manager->*managerFunc)(std::move(args)...);
+                });
         });
 }
 
@@ -388,13 +391,13 @@ public:
 
 protected:
     virtual void processRequest(
-        const AuthorizationInfo& authzInfo,
+        nx::network::http::RequestContext requestContext,
         Input inputData,
         std::function<void(api::ResultCode)> completionHandler) override
     {
         m_func(
-            authzInfo,
-            this->requestPathParams(),
+            AuthorizationInfo(std::exchange(requestContext.authInfo, {})),
+            std::exchange(requestContext.requestPathParams, {}),
             std::move(inputData),
             std::move(completionHandler));
     }

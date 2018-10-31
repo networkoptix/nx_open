@@ -7,6 +7,12 @@
 namespace nx {
 namespace usb_cam {
 
+namespace {
+
+static constexpr int kDefaultAacBitrate = 128000;
+
+} //namespace 
+
 std::unique_ptr<ffmpeg::Codec> getDefaultAudioEncoder(int * outFfmpegError)
 {
     auto encoder = std::make_unique<ffmpeg::Codec>();
@@ -32,10 +38,7 @@ std::unique_ptr<ffmpeg::Codec> getDefaultAudioEncoder(int * outFfmpegError)
     context->channel_layout = ffmpeg::utils::suggestChannelLayout(codec);
     context->channels = av_get_channel_layout_nb_channels(context->channel_layout);
 
-    int recommendedStereoBitrate = context->codec_id == AV_CODEC_ID_AAC 
-        ? 128000  // aac
-        : 192000; // mp3 or other
-
+    int recommendedStereoBitrate = kDefaultAacBitrate;
     
     // Formula found at: https://trac.ffmpeg.org/wiki/Encode/HighQualityAudio
     context->bit_rate = recommendedStereoBitrate * context->channels / 2;

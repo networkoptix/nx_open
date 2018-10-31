@@ -17,8 +17,8 @@ static const auto kDisplayTimeout = std::chrono::milliseconds(12500);
 
 } // namespace
 
-SystemHealthListModel::SystemHealthListModel(QObject* parent):
-    base_type(parent),
+SystemHealthListModel::SystemHealthListModel(QnWorkbenchContext* context, QObject* parent):
+    base_type(context, parent),
     d(new Private(this))
 {
 }

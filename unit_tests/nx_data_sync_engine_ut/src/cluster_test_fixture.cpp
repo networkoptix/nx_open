@@ -19,10 +19,11 @@ const nx::utils::test::ModuleLauncher<CustomerDbNode>& Peer::process() const
 
 void Peer::connectTo(const Peer& other)
 {
-    m_process.moduleInstance()->connectToNode(
-        network::url::Builder()
-            .setScheme(network::http::kUrlSchemeName)
-            .setEndpoint(other.process().moduleInstance()->httpEndpoints().front()));
+    const auto url = network::url::Builder()
+        .setScheme(network::http::kUrlSchemeName)
+        .setEndpoint(other.process().moduleInstance()->httpEndpoints().front());
+
+    m_process.moduleInstance()->connectToNode(/*systemId*/ "", url);
 }
 
 void Peer::addRandomData()

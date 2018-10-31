@@ -22,6 +22,27 @@ namespace network::cloud { class ConnectionMediatorUrlFetcher; }
 namespace hpm {
 namespace api {
 
+struct MediatorAddress
+{
+    /**
+     * Can be either stun://, http:// or https://
+     */
+    nx::utils::Url tcpUrl;
+    network::SocketAddress stunUdpEndpoint;
+
+    std::string toString() const
+    {
+        return lm("tcp URL: %1, stun udp endpoint: %2")
+            .args(tcpUrl, stunUdpEndpoint).toStdString();
+    }
+
+    bool operator==(const MediatorAddress& right) const
+    {
+        return tcpUrl == right.tcpUrl
+            && stunUdpEndpoint == right.stunUdpEndpoint;
+    }
+};
+
 class DelayedConnectStunClient;
 class MediatorEndpointProvider;
 
@@ -43,14 +64,14 @@ public:
     /**
      * @param endpoint Defined only if resultCode is SystemError::noError.
      */
-    virtual void fetchUdpEndpoint(nx::utils::MoveOnlyFunc<void(
+    virtual void fetchAddress(nx::utils::MoveOnlyFunc<void(
         nx::network::http::StatusCode::Value /*resultCode*/,
-        nx::network::SocketAddress /*endpoint*/)> handler) = 0;
+        MediatorAddress /*address*/)> handler) = 0;
 
     /**
      * Provides endpoint without blocking.
      */
-    virtual std::optional<nx::network::SocketAddress> udpEndpoint() const = 0;
+    virtual std::optional<MediatorAddress> address() const = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -83,21 +104,20 @@ public:
      * Injects mediator url.
      * As a result, no mediator url resolution will happen.
      */
-    void mockupMediatorUrl(
-        const utils::Url& mediatorUrl,
-        const network::SocketAddress stunUdpEndpoint);
+    void mockupMediatorAddress(const MediatorAddress& mediatorAddress);
 
     void setSystemCredentials(std::optional<SystemCredentials> value);
 
     virtual std::optional<SystemCredentials> getSystemCredentials() const override;
 
-    virtual void fetchUdpEndpoint(nx::utils::MoveOnlyFunc<void(
+    virtual void fetchAddress(nx::utils::MoveOnlyFunc<void(
         nx::network::http::StatusCode::Value /*resultCode*/,
-        nx::network::SocketAddress /*endpoint*/)> handler) override;
+        MediatorAddress /*address*/)> handler) override;
 
-    virtual std::optional<nx::network::SocketAddress> udpEndpoint() const override;
+    virtual std::optional<MediatorAddress> address() const override;
 
-    static void setStunClientSettings(network::stun::AbstractAsyncClient::Settings stunClientSettings);
+    static void setStunClientSettings(
+        network::stun::AbstractAsyncClient::Settings stunClientSettings);
 
 private:
     mutable QnMutex m_mutex;
@@ -105,7 +125,7 @@ private:
 
     std::unique_ptr<MediatorEndpointProvider> m_mediatorEndpointProvider;
     std::shared_ptr<DelayedConnectStunClient> m_stunClient;
-    std::optional<nx::utils::Url> m_mockedUpMediatorUrl;
+    std::optional<MediatorAddress> m_mockedUpMediatorAddress;
     std::unique_ptr<nx::network::RetryTimer> m_fetchEndpointRetryTimer;
 
     virtual void stopWhileInAioThread() override;
@@ -183,16 +203,12 @@ public:
 
     void mockupCloudModulesXmlUrl(const nx::utils::Url& cloudModulesXmlUrl);
 
-    void mockupMediatorUrl(
-        const nx::utils::Url& mediatorUrl,
-        const network::SocketAddress stunUdpEndpoint);
+    void mockupMediatorAddress(const MediatorAddress& mediatorAddress);
 
     void fetchMediatorEndpoints(
         FetchMediatorEndpointsCompletionHandler handler);
 
-    std::optional<nx::utils::Url> mediatorUrl() const;
-    
-    std::optional<network::SocketAddress> udpEndpoint() const;
+    std::optional<MediatorAddress> mediatorAddress() const;
 
 protected:
     virtual void stopWhileInAioThread() override;
@@ -203,8 +219,7 @@ private:
     std::vector<FetchMediatorEndpointsCompletionHandler> m_fetchMediatorEndpointsHandlers;
     std::unique_ptr<nx::network::cloud::ConnectionMediatorUrlFetcher> m_mediatorUrlFetcher;
     std::optional<nx::utils::Url> m_cloudModulesXmlUrl;
-    std::optional<nx::utils::Url> m_mediatorUrl;
-    std::optional<network::SocketAddress> m_mediatorUdpEndpoint;
+    std::optional<MediatorAddress> m_mediatorAddress;
 
     void initializeUrlFetcher();
 };

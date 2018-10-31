@@ -15,7 +15,7 @@ namespace handler {
 using TunnelCreatedHandler =
     nx::utils::MoveOnlyFunc<void(
         std::unique_ptr<AbstractStreamSocket>,
-        std::vector<StringType> /*REST request parameters values*/)>;
+        RequestPathParams /*REST request parameters values*/)>;
 
 /**
  * Upgrades HTTP connection to the protocol specified.
@@ -34,25 +34,23 @@ public:
     }
 
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request request,
-        nx::network::http::Response* const /*response*/,
+        RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler) override
     {
-        using namespace std::placeholders;
+        const auto& request = requestContext.request;
 
         auto upgradeIter = request.headers.find("Upgrade");
         if (upgradeIter == request.headers.end() ||
             upgradeIter->second != m_protocolToUpgradeTo)
         {
-            return completionHandler(nx::network::http::StatusCode::badRequest);
+            return completionHandler(StatusCode::badRequest);
         }
 
-        nx::network::http::RequestResult requestResult(nx::network::http::StatusCode::switchingProtocols);
+        RequestResult requestResult(StatusCode::switchingProtocols);
         requestResult.connectionEvents.onResponseHasBeenSent =
-            [onTunnelCreated = std::move(m_onTunnelCreated), restParams = requestPathParams()](
-                HttpServerConnection* httpConnection)
+            [onTunnelCreated = std::move(m_onTunnelCreated),
+                restParams = std::exchange(requestContext.requestPathParams, {})](
+                    HttpServerConnection* httpConnection)
             {
                 onTunnelCreated(
                     httpConnection->takeSocket(),

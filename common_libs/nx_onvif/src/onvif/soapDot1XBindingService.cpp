@@ -14,43 +14,50 @@ A commercial use license is available from Genivia Inc., contact@genivia.com
 #include "soapDot1XBindingService.h"
 
 Dot1XBindingService::Dot1XBindingService()
-{	this->soap = soap_new();
-	this->soap_own = true;
-	Dot1XBindingService_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    Dot1XBindingService_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
 }
 
 Dot1XBindingService::Dot1XBindingService(const Dot1XBindingService& rhs)
-{	this->soap = rhs.soap;
-	this->soap_own = false;
+{
+    this->soap = rhs.soap;
+    this->soap_own = false;
 }
 
 Dot1XBindingService::Dot1XBindingService(struct soap *_soap)
-{	this->soap = _soap;
-	this->soap_own = false;
-	Dot1XBindingService_init(_soap->imode, _soap->omode);
+{
+    this->soap = _soap;
+    this->soap_own = false;
+    Dot1XBindingService_init(_soap->imode, _soap->omode);
 }
 
 Dot1XBindingService::Dot1XBindingService(soap_mode iomode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	Dot1XBindingService_init(iomode, iomode);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    Dot1XBindingService_init(iomode, iomode);
 }
 
 Dot1XBindingService::Dot1XBindingService(soap_mode imode, soap_mode omode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	Dot1XBindingService_init(imode, omode);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    Dot1XBindingService_init(imode, omode);
 }
 
 Dot1XBindingService::~Dot1XBindingService()
-{	if (this->soap_own)
-		soap_free(this->soap);
+{
+    if (this->soap_own)
+        soap_free(this->soap);
 }
 
 void Dot1XBindingService::Dot1XBindingService_init(soap_mode imode, soap_mode omode)
-{	soap_imode(this->soap, imode);
-	soap_omode(this->soap, omode);
-	static const struct Namespace namespaces[] = {
+{
+    soap_imode(this->soap, imode);
+    soap_omode(this->soap, omode);
+    static const struct Namespace namespaces[] = {
         {"SOAP-ENV", "http://www.w3.org/2003/05/soap-envelope", "http://schemas.xmlsoap.org/soap/envelope/", NULL},
         {"SOAP-ENC", "http://www.w3.org/2003/05/soap-encoding", "http://schemas.xmlsoap.org/soap/encoding/", NULL},
         {"xsi", "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL},
@@ -116,151 +123,178 @@ void Dot1XBindingService::Dot1XBindingService_init(soap_mode imode, soap_mode om
         {"onvifThermal", "http://www.onvif.org/ver10/thermal/wsdl", NULL, NULL},
         {NULL, NULL, NULL, NULL}
     };
-	soap_set_namespaces(this->soap, namespaces);
+    soap_set_namespaces(this->soap, namespaces);
 }
 
 void Dot1XBindingService::destroy()
-{	soap_destroy(this->soap);
-	soap_end(this->soap);
+{
+    soap_destroy(this->soap);
+    soap_end(this->soap);
 }
 
 void Dot1XBindingService::reset()
-{	this->destroy();
-	soap_done(this->soap);
-	soap_initialize(this->soap);
-	Dot1XBindingService_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+{
+    this->destroy();
+    soap_done(this->soap);
+    soap_initialize(this->soap);
+    Dot1XBindingService_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
 }
 
 #ifndef WITH_PURE_VIRTUAL
 Dot1XBindingService *Dot1XBindingService::copy()
-{	Dot1XBindingService *dup = SOAP_NEW_UNMANAGED(Dot1XBindingService);
-	if (dup)
-	{	soap_done(dup->soap);
-		soap_copy_context(dup->soap, this->soap);
-	}
-	return dup;
+{
+    Dot1XBindingService *dup = SOAP_NEW_UNMANAGED(Dot1XBindingService);
+    if (dup)
+    {
+        soap_done(dup->soap);
+        soap_copy_context(dup->soap, this->soap);
+    }
+    return dup;
 }
 #endif
 
 Dot1XBindingService& Dot1XBindingService::operator=(const Dot1XBindingService& rhs)
-{	if (this->soap != rhs.soap)
-	{	if (this->soap_own)
-			soap_free(this->soap);
-		this->soap = rhs.soap;
-		this->soap_own = false;
-	}
-	return *this;
+{
+    if (this->soap != rhs.soap)
+    {
+        if (this->soap_own)
+            soap_free(this->soap);
+        this->soap = rhs.soap;
+        this->soap_own = false;
+    }
+    return *this;
 }
 
 int Dot1XBindingService::soap_close_socket()
-{	return soap_closesock(this->soap);
+{
+    return soap_closesock(this->soap);
 }
 
 int Dot1XBindingService::soap_force_close_socket()
-{	return soap_force_closesock(this->soap);
+{
+    return soap_force_closesock(this->soap);
 }
 
 int Dot1XBindingService::soap_senderfault(const char *string, const char *detailXML)
-{	return ::soap_sender_fault(this->soap, string, detailXML);
+{
+    return ::soap_sender_fault(this->soap, string, detailXML);
 }
 
 int Dot1XBindingService::soap_senderfault(const char *subcodeQName, const char *string, const char *detailXML)
-{	return ::soap_sender_fault_subcode(this->soap, subcodeQName, string, detailXML);
+{
+    return ::soap_sender_fault_subcode(this->soap, subcodeQName, string, detailXML);
 }
 
 int Dot1XBindingService::soap_receiverfault(const char *string, const char *detailXML)
-{	return ::soap_receiver_fault(this->soap, string, detailXML);
+{
+    return ::soap_receiver_fault(this->soap, string, detailXML);
 }
 
 int Dot1XBindingService::soap_receiverfault(const char *subcodeQName, const char *string, const char *detailXML)
-{	return ::soap_receiver_fault_subcode(this->soap, subcodeQName, string, detailXML);
+{
+    return ::soap_receiver_fault_subcode(this->soap, subcodeQName, string, detailXML);
 }
 
 void Dot1XBindingService::soap_print_fault(FILE *fd)
-{	::soap_print_fault(this->soap, fd);
+{
+    ::soap_print_fault(this->soap, fd);
 }
 
 #ifndef WITH_LEAN
 #ifndef WITH_COMPAT
 void Dot1XBindingService::soap_stream_fault(std::ostream& os)
-{	::soap_stream_fault(this->soap, os);
+{
+    ::soap_stream_fault(this->soap, os);
 }
 #endif
 
 char *Dot1XBindingService::soap_sprint_fault(char *buf, size_t len)
-{	return ::soap_sprint_fault(this->soap, buf, len);
+{
+    return ::soap_sprint_fault(this->soap, buf, len);
 }
 #endif
 
 void Dot1XBindingService::soap_noheader()
-{	this->soap->header = NULL;
+{
+    this->soap->header = NULL;
 }
 
-void Dot1XBindingService::soap_header(char *wsa5__MessageID, struct wsa5__RelatesToType *wsa5__RelatesTo, struct wsa5__EndpointReferenceType *wsa5__From, struct wsa5__EndpointReferenceType *wsa5__ReplyTo, struct wsa5__EndpointReferenceType *wsa5__FaultTo, char *wsa5__To, char *wsa5__Action, struct chan__ChannelInstanceType *chan__ChannelInstance, struct wsdd__AppSequenceType *wsdd__AppSequence, struct _wsse__Security *wsse__Security, char *subscriptionID)
-{	::soap_header(this->soap);
-	this->soap->header->wsa5__MessageID = wsa5__MessageID;
-	this->soap->header->wsa5__RelatesTo = wsa5__RelatesTo;
-	this->soap->header->wsa5__From = wsa5__From;
-	this->soap->header->wsa5__ReplyTo = wsa5__ReplyTo;
-	this->soap->header->wsa5__FaultTo = wsa5__FaultTo;
-	this->soap->header->wsa5__To = wsa5__To;
-	this->soap->header->wsa5__Action = wsa5__Action;
-	this->soap->header->chan__ChannelInstance = chan__ChannelInstance;
-	this->soap->header->wsdd__AppSequence = wsdd__AppSequence;
-	this->soap->header->wsse__Security = wsse__Security;
-	this->soap->header->subscriptionID = subscriptionID;
+void Dot1XBindingService::soap_header(char *wsa5__MessageID, struct wsa5__RelatesToType *wsa5__RelatesTo, struct wsa5__EndpointReferenceType *wsa5__From, struct wsa5__EndpointReferenceType *wsa5__ReplyTo, struct wsa5__EndpointReferenceType *wsa5__FaultTo, char *wsa5__To, char *wsa5__Action, struct chan__ChannelInstanceType *chan__ChannelInstance, struct wsdd__AppSequenceType *wsdd__AppSequence, struct _wsse__Security *wsse__Security, char *SubscriptionId)
+{
+    ::soap_header(this->soap);
+    this->soap->header->wsa5__MessageID = wsa5__MessageID;
+    this->soap->header->wsa5__RelatesTo = wsa5__RelatesTo;
+    this->soap->header->wsa5__From = wsa5__From;
+    this->soap->header->wsa5__ReplyTo = wsa5__ReplyTo;
+    this->soap->header->wsa5__FaultTo = wsa5__FaultTo;
+    this->soap->header->wsa5__To = wsa5__To;
+    this->soap->header->wsa5__Action = wsa5__Action;
+    this->soap->header->chan__ChannelInstance = chan__ChannelInstance;
+    this->soap->header->wsdd__AppSequence = wsdd__AppSequence;
+    this->soap->header->wsse__Security = wsse__Security;
+    this->soap->header->SubscriptionId = SubscriptionId;
 }
 
 ::SOAP_ENV__Header *Dot1XBindingService::soap_header()
-{	return this->soap->header;
+{
+    return this->soap->header;
 }
 
 #ifndef WITH_NOIO
 int Dot1XBindingService::run(int port)
-{	if (!soap_valid_socket(this->soap->master) && !soap_valid_socket(this->bind(NULL, port, 100)))
-		return this->soap->error;
-	for (;;)
-	{	if (!soap_valid_socket(this->accept()))
-		{	if (this->soap->errnum == 0) // timeout?
-				this->soap->error = SOAP_OK;
-			break;
-		}
-		if (this->serve())
-			break;
-		this->destroy();
-	}
-	return this->soap->error;
+{
+    if (!soap_valid_socket(this->soap->master) && !soap_valid_socket(this->bind(NULL, port, 100)))
+        return this->soap->error;
+    for (;;)
+    {
+        if (!soap_valid_socket(this->accept()))
+        {
+            if (this->soap->errnum == 0) // timeout?
+                this->soap->error = SOAP_OK;
+            break;
+        }
+        if (this->serve())
+            break;
+        this->destroy();
+    }
+    return this->soap->error;
 }
 
 #if defined(WITH_OPENSSL) || defined(WITH_GNUTLS)
 int Dot1XBindingService::ssl_run(int port)
-{	if (!soap_valid_socket(this->soap->master) && !soap_valid_socket(this->bind(NULL, port, 100)))
-		return this->soap->error;
-	for (;;)
-	{	if (!soap_valid_socket(this->accept()))
-		{	if (this->soap->errnum == 0) // timeout?
-				this->soap->error = SOAP_OK;
-			break;
-		}
-		if (this->ssl_accept() || this->serve())
-			break;
-		this->destroy();
-	}
-	return this->soap->error;
+{
+    if (!soap_valid_socket(this->soap->master) && !soap_valid_socket(this->bind(NULL, port, 100)))
+        return this->soap->error;
+    for (;;)
+    {
+        if (!soap_valid_socket(this->accept()))
+        {
+            if (this->soap->errnum == 0) // timeout?
+                this->soap->error = SOAP_OK;
+            break;
+        }
+        if (this->ssl_accept() || this->serve())
+            break;
+        this->destroy();
+    }
+    return this->soap->error;
 }
 #endif
 
 SOAP_SOCKET Dot1XBindingService::bind(const char *host, int port, int backlog)
-{	return soap_bind(this->soap, host, port, backlog);
+{
+    return soap_bind(this->soap, host, port, backlog);
 }
 
 SOAP_SOCKET Dot1XBindingService::accept()
-{	return soap_accept(this->soap);
+{
+    return soap_accept(this->soap);
 }
 
 #if defined(WITH_OPENSSL) || defined(WITH_GNUTLS)
 int Dot1XBindingService::ssl_accept()
-{	return soap_ssl_accept(this->soap);
+{
+    return soap_ssl_accept(this->soap);
 }
 #endif
 #endif
@@ -268,35 +302,36 @@ int Dot1XBindingService::ssl_accept()
 int Dot1XBindingService::serve()
 {
 #ifndef WITH_FASTCGI
-	this->soap->keep_alive = this->soap->max_keep_alive + 1;
+    this->soap->keep_alive = this->soap->max_keep_alive + 1;
 #endif
-	do
-	{
+    do
+    {
 #ifndef WITH_FASTCGI
-		if (this->soap->keep_alive > 0 && this->soap->max_keep_alive > 0)
-			this->soap->keep_alive--;
+        if (this->soap->keep_alive > 0 && this->soap->max_keep_alive > 0)
+            this->soap->keep_alive--;
 #endif
-		if (soap_begin_serve(this->soap))
-		{	if (this->soap->error >= SOAP_STOP)
-				continue;
-			return this->soap->error;
-		}
-		if ((dispatch() || (this->soap->fserveloop && this->soap->fserveloop(this->soap))) && this->soap->error && this->soap->error < SOAP_STOP)
-		{
+        if (soap_begin_serve(this->soap))
+        {
+            if (this->soap->error >= SOAP_STOP)
+                continue;
+            return this->soap->error;
+        }
+        if ((dispatch() || (this->soap->fserveloop && this->soap->fserveloop(this->soap))) && this->soap->error && this->soap->error < SOAP_STOP)
+        {
 #ifdef WITH_FASTCGI
-			soap_send_fault(this->soap);
+            soap_send_fault(this->soap);
 #else
-			return soap_send_fault(this->soap);
+            return soap_send_fault(this->soap);
 #endif
-		}
+        }
 #ifdef WITH_FASTCGI
-		soap_destroy(this->soap);
-		soap_end(this->soap);
-	} while (1);
+        soap_destroy(this->soap);
+        soap_end(this->soap);
+    } while (1);
 #else
-	} while (this->soap->keep_alive);
+    } while (this->soap->keep_alive);
 #endif
-	return SOAP_OK;
+    return SOAP_OK;
 }
 
 static int serve___onvifAdvancedSecurity_db__AddDot1XConfiguration(struct soap*, Dot1XBindingService*);
@@ -308,315 +343,330 @@ static int serve___onvifAdvancedSecurity_db__GetNetworkInterfaceDot1XConfigurati
 static int serve___onvifAdvancedSecurity_db__DeleteNetworkInterfaceDot1XConfiguration(struct soap*, Dot1XBindingService*);
 
 int Dot1XBindingService::dispatch()
-{	return dispatch(this->soap);
+{
+    return dispatch(this->soap);
 }
 
 int Dot1XBindingService::dispatch(struct soap* soap)
 {
-	Dot1XBindingService_init(soap->imode, soap->omode);
+    Dot1XBindingService_init(soap->imode, soap->omode);
 
-	soap_peek_element(soap);
-	if (!soap_match_tag(soap, soap->tag, "onvifAdvancedSecurity:AddDot1XConfiguration"))
-		return serve___onvifAdvancedSecurity_db__AddDot1XConfiguration(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAdvancedSecurity:GetAllDot1XConfigurations"))
-		return serve___onvifAdvancedSecurity_db__GetAllDot1XConfigurations(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAdvancedSecurity:GetDot1XConfiguration"))
-		return serve___onvifAdvancedSecurity_db__GetDot1XConfiguration(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAdvancedSecurity:DeleteDot1XConfiguration"))
-		return serve___onvifAdvancedSecurity_db__DeleteDot1XConfiguration(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAdvancedSecurity:SetNetworkInterfaceDot1XConfiguration"))
-		return serve___onvifAdvancedSecurity_db__SetNetworkInterfaceDot1XConfiguration(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAdvancedSecurity:GetNetworkInterfaceDot1XConfiguration"))
-		return serve___onvifAdvancedSecurity_db__GetNetworkInterfaceDot1XConfiguration(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAdvancedSecurity:DeleteNetworkInterfaceDot1XConfiguration"))
-		return serve___onvifAdvancedSecurity_db__DeleteNetworkInterfaceDot1XConfiguration(soap, this);
-	return soap->error = SOAP_NO_METHOD;
+    soap_peek_element(soap);
+    if (!soap_match_tag(soap, soap->tag, "onvifAdvancedSecurity:AddDot1XConfiguration"))
+        return serve___onvifAdvancedSecurity_db__AddDot1XConfiguration(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAdvancedSecurity:GetAllDot1XConfigurations"))
+        return serve___onvifAdvancedSecurity_db__GetAllDot1XConfigurations(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAdvancedSecurity:GetDot1XConfiguration"))
+        return serve___onvifAdvancedSecurity_db__GetDot1XConfiguration(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAdvancedSecurity:DeleteDot1XConfiguration"))
+        return serve___onvifAdvancedSecurity_db__DeleteDot1XConfiguration(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAdvancedSecurity:SetNetworkInterfaceDot1XConfiguration"))
+        return serve___onvifAdvancedSecurity_db__SetNetworkInterfaceDot1XConfiguration(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAdvancedSecurity:GetNetworkInterfaceDot1XConfiguration"))
+        return serve___onvifAdvancedSecurity_db__GetNetworkInterfaceDot1XConfiguration(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAdvancedSecurity:DeleteNetworkInterfaceDot1XConfiguration"))
+        return serve___onvifAdvancedSecurity_db__DeleteNetworkInterfaceDot1XConfiguration(soap, this);
+    return soap->error = SOAP_NO_METHOD;
 }
 
 static int serve___onvifAdvancedSecurity_db__AddDot1XConfiguration(struct soap *soap, Dot1XBindingService *service)
-{	struct __onvifAdvancedSecurity_db__AddDot1XConfiguration soap_tmp___onvifAdvancedSecurity_db__AddDot1XConfiguration;
-	_onvifAdvancedSecurity__AddDot1XConfigurationResponse onvifAdvancedSecurity__AddDot1XConfigurationResponse;
-	onvifAdvancedSecurity__AddDot1XConfigurationResponse.soap_default(soap);
-	soap_default___onvifAdvancedSecurity_db__AddDot1XConfiguration(soap, &soap_tmp___onvifAdvancedSecurity_db__AddDot1XConfiguration);
-	if (!soap_get___onvifAdvancedSecurity_db__AddDot1XConfiguration(soap, &soap_tmp___onvifAdvancedSecurity_db__AddDot1XConfiguration, "-onvifAdvancedSecurity-db:AddDot1XConfiguration", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->AddDot1XConfiguration(soap_tmp___onvifAdvancedSecurity_db__AddDot1XConfiguration.onvifAdvancedSecurity__AddDot1XConfiguration, onvifAdvancedSecurity__AddDot1XConfigurationResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAdvancedSecurity__AddDot1XConfigurationResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAdvancedSecurity__AddDot1XConfigurationResponse.soap_put(soap, "onvifAdvancedSecurity:AddDot1XConfigurationResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAdvancedSecurity__AddDot1XConfigurationResponse.soap_put(soap, "onvifAdvancedSecurity:AddDot1XConfigurationResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAdvancedSecurity_db__AddDot1XConfiguration soap_tmp___onvifAdvancedSecurity_db__AddDot1XConfiguration;
+    _onvifAdvancedSecurity__AddDot1XConfigurationResponse onvifAdvancedSecurity__AddDot1XConfigurationResponse;
+    onvifAdvancedSecurity__AddDot1XConfigurationResponse.soap_default(soap);
+    soap_default___onvifAdvancedSecurity_db__AddDot1XConfiguration(soap, &soap_tmp___onvifAdvancedSecurity_db__AddDot1XConfiguration);
+    if (!soap_get___onvifAdvancedSecurity_db__AddDot1XConfiguration(soap, &soap_tmp___onvifAdvancedSecurity_db__AddDot1XConfiguration, "-onvifAdvancedSecurity-db:AddDot1XConfiguration", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->AddDot1XConfiguration(soap_tmp___onvifAdvancedSecurity_db__AddDot1XConfiguration.onvifAdvancedSecurity__AddDot1XConfiguration, onvifAdvancedSecurity__AddDot1XConfigurationResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAdvancedSecurity__AddDot1XConfigurationResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAdvancedSecurity__AddDot1XConfigurationResponse.soap_put(soap, "onvifAdvancedSecurity:AddDot1XConfigurationResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAdvancedSecurity__AddDot1XConfigurationResponse.soap_put(soap, "onvifAdvancedSecurity:AddDot1XConfigurationResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAdvancedSecurity_db__GetAllDot1XConfigurations(struct soap *soap, Dot1XBindingService *service)
-{	struct __onvifAdvancedSecurity_db__GetAllDot1XConfigurations soap_tmp___onvifAdvancedSecurity_db__GetAllDot1XConfigurations;
-	_onvifAdvancedSecurity__GetAllDot1XConfigurationsResponse onvifAdvancedSecurity__GetAllDot1XConfigurationsResponse;
-	onvifAdvancedSecurity__GetAllDot1XConfigurationsResponse.soap_default(soap);
-	soap_default___onvifAdvancedSecurity_db__GetAllDot1XConfigurations(soap, &soap_tmp___onvifAdvancedSecurity_db__GetAllDot1XConfigurations);
-	if (!soap_get___onvifAdvancedSecurity_db__GetAllDot1XConfigurations(soap, &soap_tmp___onvifAdvancedSecurity_db__GetAllDot1XConfigurations, "-onvifAdvancedSecurity-db:GetAllDot1XConfigurations", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->GetAllDot1XConfigurations(soap_tmp___onvifAdvancedSecurity_db__GetAllDot1XConfigurations.onvifAdvancedSecurity__GetAllDot1XConfigurations, onvifAdvancedSecurity__GetAllDot1XConfigurationsResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAdvancedSecurity__GetAllDot1XConfigurationsResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAdvancedSecurity__GetAllDot1XConfigurationsResponse.soap_put(soap, "onvifAdvancedSecurity:GetAllDot1XConfigurationsResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAdvancedSecurity__GetAllDot1XConfigurationsResponse.soap_put(soap, "onvifAdvancedSecurity:GetAllDot1XConfigurationsResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAdvancedSecurity_db__GetAllDot1XConfigurations soap_tmp___onvifAdvancedSecurity_db__GetAllDot1XConfigurations;
+    _onvifAdvancedSecurity__GetAllDot1XConfigurationsResponse onvifAdvancedSecurity__GetAllDot1XConfigurationsResponse;
+    onvifAdvancedSecurity__GetAllDot1XConfigurationsResponse.soap_default(soap);
+    soap_default___onvifAdvancedSecurity_db__GetAllDot1XConfigurations(soap, &soap_tmp___onvifAdvancedSecurity_db__GetAllDot1XConfigurations);
+    if (!soap_get___onvifAdvancedSecurity_db__GetAllDot1XConfigurations(soap, &soap_tmp___onvifAdvancedSecurity_db__GetAllDot1XConfigurations, "-onvifAdvancedSecurity-db:GetAllDot1XConfigurations", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->GetAllDot1XConfigurations(soap_tmp___onvifAdvancedSecurity_db__GetAllDot1XConfigurations.onvifAdvancedSecurity__GetAllDot1XConfigurations, onvifAdvancedSecurity__GetAllDot1XConfigurationsResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAdvancedSecurity__GetAllDot1XConfigurationsResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAdvancedSecurity__GetAllDot1XConfigurationsResponse.soap_put(soap, "onvifAdvancedSecurity:GetAllDot1XConfigurationsResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAdvancedSecurity__GetAllDot1XConfigurationsResponse.soap_put(soap, "onvifAdvancedSecurity:GetAllDot1XConfigurationsResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAdvancedSecurity_db__GetDot1XConfiguration(struct soap *soap, Dot1XBindingService *service)
-{	struct __onvifAdvancedSecurity_db__GetDot1XConfiguration soap_tmp___onvifAdvancedSecurity_db__GetDot1XConfiguration;
-	_onvifAdvancedSecurity__GetDot1XConfigurationResponse onvifAdvancedSecurity__GetDot1XConfigurationResponse;
-	onvifAdvancedSecurity__GetDot1XConfigurationResponse.soap_default(soap);
-	soap_default___onvifAdvancedSecurity_db__GetDot1XConfiguration(soap, &soap_tmp___onvifAdvancedSecurity_db__GetDot1XConfiguration);
-	if (!soap_get___onvifAdvancedSecurity_db__GetDot1XConfiguration(soap, &soap_tmp___onvifAdvancedSecurity_db__GetDot1XConfiguration, "-onvifAdvancedSecurity-db:GetDot1XConfiguration", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->GetDot1XConfiguration(soap_tmp___onvifAdvancedSecurity_db__GetDot1XConfiguration.onvifAdvancedSecurity__GetDot1XConfiguration, onvifAdvancedSecurity__GetDot1XConfigurationResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAdvancedSecurity__GetDot1XConfigurationResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAdvancedSecurity__GetDot1XConfigurationResponse.soap_put(soap, "onvifAdvancedSecurity:GetDot1XConfigurationResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAdvancedSecurity__GetDot1XConfigurationResponse.soap_put(soap, "onvifAdvancedSecurity:GetDot1XConfigurationResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAdvancedSecurity_db__GetDot1XConfiguration soap_tmp___onvifAdvancedSecurity_db__GetDot1XConfiguration;
+    _onvifAdvancedSecurity__GetDot1XConfigurationResponse onvifAdvancedSecurity__GetDot1XConfigurationResponse;
+    onvifAdvancedSecurity__GetDot1XConfigurationResponse.soap_default(soap);
+    soap_default___onvifAdvancedSecurity_db__GetDot1XConfiguration(soap, &soap_tmp___onvifAdvancedSecurity_db__GetDot1XConfiguration);
+    if (!soap_get___onvifAdvancedSecurity_db__GetDot1XConfiguration(soap, &soap_tmp___onvifAdvancedSecurity_db__GetDot1XConfiguration, "-onvifAdvancedSecurity-db:GetDot1XConfiguration", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->GetDot1XConfiguration(soap_tmp___onvifAdvancedSecurity_db__GetDot1XConfiguration.onvifAdvancedSecurity__GetDot1XConfiguration, onvifAdvancedSecurity__GetDot1XConfigurationResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAdvancedSecurity__GetDot1XConfigurationResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAdvancedSecurity__GetDot1XConfigurationResponse.soap_put(soap, "onvifAdvancedSecurity:GetDot1XConfigurationResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAdvancedSecurity__GetDot1XConfigurationResponse.soap_put(soap, "onvifAdvancedSecurity:GetDot1XConfigurationResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAdvancedSecurity_db__DeleteDot1XConfiguration(struct soap *soap, Dot1XBindingService *service)
-{	struct __onvifAdvancedSecurity_db__DeleteDot1XConfiguration soap_tmp___onvifAdvancedSecurity_db__DeleteDot1XConfiguration;
-	_onvifAdvancedSecurity__DeleteDot1XConfigurationResponse onvifAdvancedSecurity__DeleteDot1XConfigurationResponse;
-	onvifAdvancedSecurity__DeleteDot1XConfigurationResponse.soap_default(soap);
-	soap_default___onvifAdvancedSecurity_db__DeleteDot1XConfiguration(soap, &soap_tmp___onvifAdvancedSecurity_db__DeleteDot1XConfiguration);
-	if (!soap_get___onvifAdvancedSecurity_db__DeleteDot1XConfiguration(soap, &soap_tmp___onvifAdvancedSecurity_db__DeleteDot1XConfiguration, "-onvifAdvancedSecurity-db:DeleteDot1XConfiguration", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->DeleteDot1XConfiguration(soap_tmp___onvifAdvancedSecurity_db__DeleteDot1XConfiguration.onvifAdvancedSecurity__DeleteDot1XConfiguration, onvifAdvancedSecurity__DeleteDot1XConfigurationResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAdvancedSecurity__DeleteDot1XConfigurationResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAdvancedSecurity__DeleteDot1XConfigurationResponse.soap_put(soap, "onvifAdvancedSecurity:DeleteDot1XConfigurationResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAdvancedSecurity__DeleteDot1XConfigurationResponse.soap_put(soap, "onvifAdvancedSecurity:DeleteDot1XConfigurationResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAdvancedSecurity_db__DeleteDot1XConfiguration soap_tmp___onvifAdvancedSecurity_db__DeleteDot1XConfiguration;
+    _onvifAdvancedSecurity__DeleteDot1XConfigurationResponse onvifAdvancedSecurity__DeleteDot1XConfigurationResponse;
+    onvifAdvancedSecurity__DeleteDot1XConfigurationResponse.soap_default(soap);
+    soap_default___onvifAdvancedSecurity_db__DeleteDot1XConfiguration(soap, &soap_tmp___onvifAdvancedSecurity_db__DeleteDot1XConfiguration);
+    if (!soap_get___onvifAdvancedSecurity_db__DeleteDot1XConfiguration(soap, &soap_tmp___onvifAdvancedSecurity_db__DeleteDot1XConfiguration, "-onvifAdvancedSecurity-db:DeleteDot1XConfiguration", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->DeleteDot1XConfiguration(soap_tmp___onvifAdvancedSecurity_db__DeleteDot1XConfiguration.onvifAdvancedSecurity__DeleteDot1XConfiguration, onvifAdvancedSecurity__DeleteDot1XConfigurationResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAdvancedSecurity__DeleteDot1XConfigurationResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAdvancedSecurity__DeleteDot1XConfigurationResponse.soap_put(soap, "onvifAdvancedSecurity:DeleteDot1XConfigurationResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAdvancedSecurity__DeleteDot1XConfigurationResponse.soap_put(soap, "onvifAdvancedSecurity:DeleteDot1XConfigurationResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAdvancedSecurity_db__SetNetworkInterfaceDot1XConfiguration(struct soap *soap, Dot1XBindingService *service)
-{	struct __onvifAdvancedSecurity_db__SetNetworkInterfaceDot1XConfiguration soap_tmp___onvifAdvancedSecurity_db__SetNetworkInterfaceDot1XConfiguration;
-	_onvifAdvancedSecurity__SetNetworkInterfaceDot1XConfigurationResponse onvifAdvancedSecurity__SetNetworkInterfaceDot1XConfigurationResponse;
-	onvifAdvancedSecurity__SetNetworkInterfaceDot1XConfigurationResponse.soap_default(soap);
-	soap_default___onvifAdvancedSecurity_db__SetNetworkInterfaceDot1XConfiguration(soap, &soap_tmp___onvifAdvancedSecurity_db__SetNetworkInterfaceDot1XConfiguration);
-	if (!soap_get___onvifAdvancedSecurity_db__SetNetworkInterfaceDot1XConfiguration(soap, &soap_tmp___onvifAdvancedSecurity_db__SetNetworkInterfaceDot1XConfiguration, "-onvifAdvancedSecurity-db:SetNetworkInterfaceDot1XConfiguration", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->SetNetworkInterfaceDot1XConfiguration(soap_tmp___onvifAdvancedSecurity_db__SetNetworkInterfaceDot1XConfiguration.onvifAdvancedSecurity__SetNetworkInterfaceDot1XConfiguration, onvifAdvancedSecurity__SetNetworkInterfaceDot1XConfigurationResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAdvancedSecurity__SetNetworkInterfaceDot1XConfigurationResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAdvancedSecurity__SetNetworkInterfaceDot1XConfigurationResponse.soap_put(soap, "onvifAdvancedSecurity:SetNetworkInterfaceDot1XConfigurationResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAdvancedSecurity__SetNetworkInterfaceDot1XConfigurationResponse.soap_put(soap, "onvifAdvancedSecurity:SetNetworkInterfaceDot1XConfigurationResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAdvancedSecurity_db__SetNetworkInterfaceDot1XConfiguration soap_tmp___onvifAdvancedSecurity_db__SetNetworkInterfaceDot1XConfiguration;
+    _onvifAdvancedSecurity__SetNetworkInterfaceDot1XConfigurationResponse onvifAdvancedSecurity__SetNetworkInterfaceDot1XConfigurationResponse;
+    onvifAdvancedSecurity__SetNetworkInterfaceDot1XConfigurationResponse.soap_default(soap);
+    soap_default___onvifAdvancedSecurity_db__SetNetworkInterfaceDot1XConfiguration(soap, &soap_tmp___onvifAdvancedSecurity_db__SetNetworkInterfaceDot1XConfiguration);
+    if (!soap_get___onvifAdvancedSecurity_db__SetNetworkInterfaceDot1XConfiguration(soap, &soap_tmp___onvifAdvancedSecurity_db__SetNetworkInterfaceDot1XConfiguration, "-onvifAdvancedSecurity-db:SetNetworkInterfaceDot1XConfiguration", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->SetNetworkInterfaceDot1XConfiguration(soap_tmp___onvifAdvancedSecurity_db__SetNetworkInterfaceDot1XConfiguration.onvifAdvancedSecurity__SetNetworkInterfaceDot1XConfiguration, onvifAdvancedSecurity__SetNetworkInterfaceDot1XConfigurationResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAdvancedSecurity__SetNetworkInterfaceDot1XConfigurationResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAdvancedSecurity__SetNetworkInterfaceDot1XConfigurationResponse.soap_put(soap, "onvifAdvancedSecurity:SetNetworkInterfaceDot1XConfigurationResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAdvancedSecurity__SetNetworkInterfaceDot1XConfigurationResponse.soap_put(soap, "onvifAdvancedSecurity:SetNetworkInterfaceDot1XConfigurationResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAdvancedSecurity_db__GetNetworkInterfaceDot1XConfiguration(struct soap *soap, Dot1XBindingService *service)
-{	struct __onvifAdvancedSecurity_db__GetNetworkInterfaceDot1XConfiguration soap_tmp___onvifAdvancedSecurity_db__GetNetworkInterfaceDot1XConfiguration;
-	_onvifAdvancedSecurity__GetNetworkInterfaceDot1XConfigurationResponse onvifAdvancedSecurity__GetNetworkInterfaceDot1XConfigurationResponse;
-	onvifAdvancedSecurity__GetNetworkInterfaceDot1XConfigurationResponse.soap_default(soap);
-	soap_default___onvifAdvancedSecurity_db__GetNetworkInterfaceDot1XConfiguration(soap, &soap_tmp___onvifAdvancedSecurity_db__GetNetworkInterfaceDot1XConfiguration);
-	if (!soap_get___onvifAdvancedSecurity_db__GetNetworkInterfaceDot1XConfiguration(soap, &soap_tmp___onvifAdvancedSecurity_db__GetNetworkInterfaceDot1XConfiguration, "-onvifAdvancedSecurity-db:GetNetworkInterfaceDot1XConfiguration", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->GetNetworkInterfaceDot1XConfiguration(soap_tmp___onvifAdvancedSecurity_db__GetNetworkInterfaceDot1XConfiguration.onvifAdvancedSecurity__GetNetworkInterfaceDot1XConfiguration, onvifAdvancedSecurity__GetNetworkInterfaceDot1XConfigurationResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAdvancedSecurity__GetNetworkInterfaceDot1XConfigurationResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAdvancedSecurity__GetNetworkInterfaceDot1XConfigurationResponse.soap_put(soap, "onvifAdvancedSecurity:GetNetworkInterfaceDot1XConfigurationResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAdvancedSecurity__GetNetworkInterfaceDot1XConfigurationResponse.soap_put(soap, "onvifAdvancedSecurity:GetNetworkInterfaceDot1XConfigurationResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAdvancedSecurity_db__GetNetworkInterfaceDot1XConfiguration soap_tmp___onvifAdvancedSecurity_db__GetNetworkInterfaceDot1XConfiguration;
+    _onvifAdvancedSecurity__GetNetworkInterfaceDot1XConfigurationResponse onvifAdvancedSecurity__GetNetworkInterfaceDot1XConfigurationResponse;
+    onvifAdvancedSecurity__GetNetworkInterfaceDot1XConfigurationResponse.soap_default(soap);
+    soap_default___onvifAdvancedSecurity_db__GetNetworkInterfaceDot1XConfiguration(soap, &soap_tmp___onvifAdvancedSecurity_db__GetNetworkInterfaceDot1XConfiguration);
+    if (!soap_get___onvifAdvancedSecurity_db__GetNetworkInterfaceDot1XConfiguration(soap, &soap_tmp___onvifAdvancedSecurity_db__GetNetworkInterfaceDot1XConfiguration, "-onvifAdvancedSecurity-db:GetNetworkInterfaceDot1XConfiguration", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->GetNetworkInterfaceDot1XConfiguration(soap_tmp___onvifAdvancedSecurity_db__GetNetworkInterfaceDot1XConfiguration.onvifAdvancedSecurity__GetNetworkInterfaceDot1XConfiguration, onvifAdvancedSecurity__GetNetworkInterfaceDot1XConfigurationResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAdvancedSecurity__GetNetworkInterfaceDot1XConfigurationResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAdvancedSecurity__GetNetworkInterfaceDot1XConfigurationResponse.soap_put(soap, "onvifAdvancedSecurity:GetNetworkInterfaceDot1XConfigurationResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAdvancedSecurity__GetNetworkInterfaceDot1XConfigurationResponse.soap_put(soap, "onvifAdvancedSecurity:GetNetworkInterfaceDot1XConfigurationResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAdvancedSecurity_db__DeleteNetworkInterfaceDot1XConfiguration(struct soap *soap, Dot1XBindingService *service)
-{	struct __onvifAdvancedSecurity_db__DeleteNetworkInterfaceDot1XConfiguration soap_tmp___onvifAdvancedSecurity_db__DeleteNetworkInterfaceDot1XConfiguration;
-	_onvifAdvancedSecurity__DeleteNetworkInterfaceDot1XConfigurationResponse onvifAdvancedSecurity__DeleteNetworkInterfaceDot1XConfigurationResponse;
-	onvifAdvancedSecurity__DeleteNetworkInterfaceDot1XConfigurationResponse.soap_default(soap);
-	soap_default___onvifAdvancedSecurity_db__DeleteNetworkInterfaceDot1XConfiguration(soap, &soap_tmp___onvifAdvancedSecurity_db__DeleteNetworkInterfaceDot1XConfiguration);
-	if (!soap_get___onvifAdvancedSecurity_db__DeleteNetworkInterfaceDot1XConfiguration(soap, &soap_tmp___onvifAdvancedSecurity_db__DeleteNetworkInterfaceDot1XConfiguration, "-onvifAdvancedSecurity-db:DeleteNetworkInterfaceDot1XConfiguration", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->DeleteNetworkInterfaceDot1XConfiguration(soap_tmp___onvifAdvancedSecurity_db__DeleteNetworkInterfaceDot1XConfiguration.onvifAdvancedSecurity__DeleteNetworkInterfaceDot1XConfiguration, onvifAdvancedSecurity__DeleteNetworkInterfaceDot1XConfigurationResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAdvancedSecurity__DeleteNetworkInterfaceDot1XConfigurationResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAdvancedSecurity__DeleteNetworkInterfaceDot1XConfigurationResponse.soap_put(soap, "onvifAdvancedSecurity:DeleteNetworkInterfaceDot1XConfigurationResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAdvancedSecurity__DeleteNetworkInterfaceDot1XConfigurationResponse.soap_put(soap, "onvifAdvancedSecurity:DeleteNetworkInterfaceDot1XConfigurationResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAdvancedSecurity_db__DeleteNetworkInterfaceDot1XConfiguration soap_tmp___onvifAdvancedSecurity_db__DeleteNetworkInterfaceDot1XConfiguration;
+    _onvifAdvancedSecurity__DeleteNetworkInterfaceDot1XConfigurationResponse onvifAdvancedSecurity__DeleteNetworkInterfaceDot1XConfigurationResponse;
+    onvifAdvancedSecurity__DeleteNetworkInterfaceDot1XConfigurationResponse.soap_default(soap);
+    soap_default___onvifAdvancedSecurity_db__DeleteNetworkInterfaceDot1XConfiguration(soap, &soap_tmp___onvifAdvancedSecurity_db__DeleteNetworkInterfaceDot1XConfiguration);
+    if (!soap_get___onvifAdvancedSecurity_db__DeleteNetworkInterfaceDot1XConfiguration(soap, &soap_tmp___onvifAdvancedSecurity_db__DeleteNetworkInterfaceDot1XConfiguration, "-onvifAdvancedSecurity-db:DeleteNetworkInterfaceDot1XConfiguration", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->DeleteNetworkInterfaceDot1XConfiguration(soap_tmp___onvifAdvancedSecurity_db__DeleteNetworkInterfaceDot1XConfiguration.onvifAdvancedSecurity__DeleteNetworkInterfaceDot1XConfiguration, onvifAdvancedSecurity__DeleteNetworkInterfaceDot1XConfigurationResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAdvancedSecurity__DeleteNetworkInterfaceDot1XConfigurationResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAdvancedSecurity__DeleteNetworkInterfaceDot1XConfigurationResponse.soap_put(soap, "onvifAdvancedSecurity:DeleteNetworkInterfaceDot1XConfigurationResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAdvancedSecurity__DeleteNetworkInterfaceDot1XConfigurationResponse.soap_put(soap, "onvifAdvancedSecurity:DeleteNetworkInterfaceDot1XConfigurationResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 /* End of server object code */

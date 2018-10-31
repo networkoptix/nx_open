@@ -31,8 +31,6 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(1, redesignedCameraSettingsDialog, "Enable redesigned camera settings dialog.");
     NX_INI_FLAG(1, enableDetectedObjectsInterpolation, "Allow interpolation of detected objects between frames.");
     NX_INI_FLAG(0, displayAnalyticsDelay, "Add delay label to detected object description.");
-    NX_INI_FLAG(0, enableDeviceSearch, "Enable reworked device search dialog");
-    NX_INI_FLAG(1, enableWearableCameras, "Enable wearable cameras.");
     NX_INI_FLAG(1, enableResourceFilteringByDefault, "Enable reworked resource filtering");
     NX_INI_FLAG(0, debugThumbnailProviders, "Enable debug mode for thumbnail providers");
     NX_INI_FLAG(0, ignoreZoomWindowConstraints, "Ignore constrains for a zoom region");
@@ -47,10 +45,12 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, enableTimelineScreenshotCursor, "Show screenshot cursor when hovering above timeline.");
     NX_INI_FLAG(0, enableWatermark, "Enable watermarks preview and setup.");
     NX_INI_FLAG(0, enableCaseExport, "Enable case export.");
-    NX_INI_FLAG(1, enableSessionTimeout, "Enable admin-configurable absolute session timeout.");
+    NX_INI_FLAG(0, enableSessionTimeout, "Enable admin-configurable absolute session timeout.");
     NX_INI_STRING("press", passwordPreviewActivationMode, "Password preview activation mode: \"press\", \"hover\" or \"toggle\".");
     NX_INI_FLAG(0, enableEncryptedLayouts, "Enable creation of encrypted layouts.");
     NX_INI_FLAG(0, enablePluginEvents, "Enable plugin events in Event Rules dialog.");
+    NX_INI_FLAG(0, automaticFilterByTimelineSelection, "Automatically switch Right Panel time"
+        "selection to \"Selected on Timeline\" mode when selection exists.");
 };
 
 inline Ini& ini()

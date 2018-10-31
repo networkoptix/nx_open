@@ -1,0 +1,8 @@
+<span ng-if="camera.status!='Recording' && camera.scheduleEnabled" class="danger"
+	  ng-class="type == 'video' ? 'video-status offline-recording' : 'camera-status offline-recording'"></span>
+<span ng-if="camera.status=='Recording' " class="danger"
+	  ng-class="type == 'video' ? 'video-status online-recording' : 'camera-status online-recording'"></span>
+<span ng-if="camera.status!='Recording' && !camera.scheduleEnabled && camera.status != 'Offline'"
+	  ng-class="type == 'video' ? 'video-status not-recording' : 'camera-status not-recording'"></span>
+<span ng-if="camera.status == Offline && type == 'camera'"
+	  class="camera-status offline"></span>

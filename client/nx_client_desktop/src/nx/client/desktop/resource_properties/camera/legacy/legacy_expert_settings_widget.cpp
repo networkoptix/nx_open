@@ -456,7 +456,6 @@ void LegacyExpertSettingsWidget::updateFromResources(const QnVirtualCameraResour
     ui->leftWidget->setEnabled(canSetupVideoStream);
     ui->groupBoxArchive->setEnabled(canSetupVideoStream);
     ui->groupBoxRTP->setEnabled(canSetupVideoStream);
-    ui->groupBoxPtzControl->setEnabled(canSetupVideoStream);
     ui->restoreDefaultsButton->setEnabled(canSetupVideoStream);
 
     m_currentCameraId = cameras.front()->getId();

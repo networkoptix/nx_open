@@ -512,7 +512,9 @@ void CloudServerSocket::onConnectionRequested(
             hpm::api::ConnectionMethod::toString(event.connectionMethods)));
 
     auto acceptors = TunnelAcceptorFactory::instance().create(
-        m_mediatorConnector->udpEndpoint(),
+        m_mediatorConnector->address()
+            ? std::make_optional(m_mediatorConnector->address()->stunUdpEndpoint)
+            : std::nullopt,
         event);
     for (auto& acceptor: acceptors)
     {

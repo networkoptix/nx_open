@@ -87,7 +87,10 @@ class ServerConnection:
     Q_OBJECT
 
 public:
-    ServerConnection(QnCommonModule* commonModule, const QnUuid& serverId);
+    ServerConnection(
+        QnCommonModule* commonModule,
+        const QnUuid& serverId,
+        nx::utils::Url directUrl = nx::utils::Url());
     virtual ~ServerConnection();
 
     struct EmptyResponseType {};
@@ -408,6 +411,10 @@ public:
         Result<UpdateStatusAll>::type callback,
         QThread* targetThread = nullptr);
 
+    Handle getModuleInformation(
+        Result<QList<nx::vms::api::ModuleInformation>>::type callback,
+        QThread* targetThread = nullptr);
+
     /**
      * Cancel running request by known requestID. If request is canceled, callback isn't called.
      * If target thread has been used then callback may be called after 'cancelRequest' in case of data already received and queued to a target thread.
@@ -417,6 +424,9 @@ public:
      * in your destructor. Better bulletproof your callbacks with `QnGuardedCallback`.
      */
     void cancelRequest(const Handle& requestId);
+
+    // Get ID of the server we are connected to.
+    QnUuid getServerId() const;
 
 private slots:
     void onHttpClientDone(int requestId, nx::network::http::AsyncHttpClientPtr httpClient);
@@ -443,6 +453,12 @@ private:
         const nx::network::http::StringType& contentType = nx::network::http::StringType(),
         const nx::network::http::StringType& messageBody = nx::network::http::StringType());
 
+    nx::network::http::ClientPool::Request prepareDirectRequest(
+        nx::network::http::Method::ValueType method,
+        const QUrl& url,
+        const nx::network::http::StringType& contentType = nx::network::http::StringType(),
+        const nx::network::http::StringType& messageBody = nx::network::http::StringType());
+
     using HttpCompletionFunc = std::function<void (
         Handle handle,
         SystemError::ErrorCode errorCode,
@@ -462,6 +478,7 @@ private:
     QnUuid m_serverId;
     QMap<Handle, HttpCompletionFunc> m_runningRequests;
     mutable QnMutex m_mutex;
+    nx::utils::Url m_directUrl;
 
     /**
      * Generic requests, for the types, that should not be exposed to common library.

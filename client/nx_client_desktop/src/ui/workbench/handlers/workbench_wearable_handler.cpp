@@ -2,19 +2,14 @@
 
 #include <QtWidgets/QAction>
 
-#include <nx/utils/string.h>
-#include <utils/common/guarded_callback.h>
-#include <common/common_module.h>
-#include <camera/camera_data_manager.h>
-#include <camera/loaders/caching_camera_data_loader.h>
-
 #include <api/server_rest_connection.h>
 #include <api/model/wearable_camera_reply.h>
-
+#include <camera/camera_data_manager.h>
+#include <camera/loaders/caching_camera_data_loader.h>
+#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
-
 #include <ui/dialogs/new_wearable_camera_dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench_context.h>
@@ -29,6 +24,8 @@
 #include <nx/client/desktop/utils/wearable_manager.h>
 #include <nx/client/desktop/utils/wearable_state.h>
 #include <nx/client/desktop/utils/wearable_payload.h>
+#include <nx/utils/guarded_callback.h>
+#include <nx/utils/string.h>
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
@@ -148,7 +145,7 @@ void QnWorkbenchWearableHandler::at_newWearableCameraAction_triggered()
     QString name = dialog->name();
     QnMediaServerResourcePtr server = dialog->server();
 
-    auto callback = guarded(this,
+    const auto callback = nx::utils::guarded(this,
         [this, server](bool success, rest::Handle, const QnJsonRestResult& reply)
         {
             if (!success)

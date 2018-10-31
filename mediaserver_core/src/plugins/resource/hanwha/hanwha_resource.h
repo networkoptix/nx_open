@@ -120,7 +120,11 @@ public:
     void updateToChannel(int value);
 
     bool isNvr() const;
+    bool isProxiedAnalogEncoder() const;
     HanwhaDeviceType deviceType() const;
+    HanwhaDeviceType bypassDeviceType() const;
+
+    bool hasSerialPort() const;
 
     QString nxProfileName(
         Qn::ConnectionRole role,
@@ -359,6 +363,7 @@ private:
 
     bool m_isBypassSupported = false;
     int m_proxiedDeviceChannelCount = 1;
+    bool m_hasSerialPort = false;
 
     HanwhaAttributes m_attributes;
     HanwhaAttributes m_bypassDeviceAttributes;
@@ -367,6 +372,7 @@ private:
     HanwhaCgiParameters m_bypassDeviceCgiParameters;
 
     HanwhaDeviceType m_deviceType = HanwhaDeviceType::unknown;
+    HanwhaDeviceType m_bypassDeviceType = HanwhaDeviceType::unknown;
     bool m_isChannelConnectedViaSunapi = false;
 
     nx::media::CameraMediaCapability m_capabilities;

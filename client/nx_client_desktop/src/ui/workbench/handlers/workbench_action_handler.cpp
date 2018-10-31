@@ -91,7 +91,6 @@
 #include <ui/dialogs/about_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
 #include <ui/dialogs/local_settings_dialog.h>
-#include <ui/dialogs/camera_addition_dialog.h>
 #include <ui/dialogs/common/input_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/business_rules_dialog.h>
@@ -168,6 +167,7 @@
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
 
 #include <nx/utils/app_info.h>
+#include <nx/utils/guarded_callback.h>
 
 #ifdef Q_OS_MACX
 #include <utils/mac_utils.h>
@@ -317,7 +317,6 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::CameraIssuesAction), SIGNAL(triggered()), this, SLOT(at_cameraIssuesAction_triggered()));
     connect(action(action::CameraBusinessRulesAction), SIGNAL(triggered()), this, SLOT(at_cameraBusinessRulesAction_triggered()));
     connect(action(action::CameraDiagnosticsAction), SIGNAL(triggered()), this, SLOT(at_cameraDiagnosticsAction_triggered()));
-    connect(action(action::ServerAddCameraManuallyAction), SIGNAL(triggered()), this, SLOT(at_serverAddCameraManuallyAction_triggered()));
     connect(action(action::PingAction), SIGNAL(triggered()), this, SLOT(at_pingAction_triggered()));
     connect(action(action::ServerLogsAction), SIGNAL(triggered()), this, SLOT(at_serverLogsAction_triggered()));
     connect(action(action::ServerIssuesAction), SIGNAL(triggered()), this, SLOT(at_serverIssuesAction_triggered()));
@@ -573,10 +572,6 @@ QnCameraListDialog *ActionHandler::cameraListDialog() const {
     return m_cameraListDialog.data();
 }
 
-QnCameraAdditionDialog *ActionHandler::cameraAdditionDialog() const {
-    return m_cameraAdditionDialog.data();
-}
-
 QnSystemAdministrationDialog *ActionHandler::systemAdministrationDialog() const {
     return m_systemAdministrationDialog.data();
 }
@@ -684,17 +679,16 @@ void ActionHandler::changeDefaultPasswords(
         return;
 
     using PasswordChangeResult = QPair<QnVirtualCameraResourcePtr, QnRestResult>;
-    using PassswordChangeResultList = QList<PasswordChangeResult>;
+    using PasswordChangeResultList = QList<PasswordChangeResult>;
 
-    const auto errorResultsStorage = QSharedPointer<PassswordChangeResultList>(
-        new PassswordChangeResultList());
+    const auto errorResultsStorage = QSharedPointer<PasswordChangeResultList>(
+        new PasswordChangeResultList());
 
     const auto password = dialog.password();
-    const auto guard = QPointer<ActionHandler>(this);
-    const auto completionGuard = nx::utils::makeSharedGuard(
-        [this, guard, cameras, errorResultsStorage, password, forceShowCamerasList]()
+    const auto completionGuard = nx::utils::makeSharedGuard(nx::utils::guarded(this,
+        [this, cameras, errorResultsStorage, password, forceShowCamerasList]()
         {
-            if (!guard || errorResultsStorage->isEmpty())
+            if (errorResultsStorage->isEmpty())
                 return;
 
             // Show error dialog and try one more time
@@ -735,7 +729,7 @@ void ActionHandler::changeDefaultPasswords(
                 showSingleCameraErrorMessage(explanation);
 
             changeDefaultPasswords(password, camerasWithError, forceShowCamerasList);
-        });
+        }));
 
     for (const auto camera: cameras)
     {
@@ -743,20 +737,17 @@ void ActionHandler::changeDefaultPasswords(
         auth.setPassword(password);
 
         const auto resultCallback =
-            [guard, completionGuard, camera, errorResultsStorage]
+            [completionGuard, camera, errorResultsStorage]
                 (bool success, rest::Handle /*handle*/, QnRestResult result)
             {
-                if (!guard)
-                    return;
-
                 if (!success)
                     errorResultsStorage->append(PasswordChangeResult(camera, QnRestResult()));
                 else if (result.error != QnRestResult::NoError)
                     errorResultsStorage->append(PasswordChangeResult(camera, result));
             };
 
-        serverConnection->changeCameraPassword(
-            camera->getId(), auth, resultCallback, QThread::currentThread());
+        serverConnection->changeCameraPassword(camera->getId(), auth,
+            nx::utils::guarded(this, resultCallback), QThread::currentThread());
     }
 }
 
@@ -1820,33 +1811,6 @@ void ActionHandler::at_cameraDiagnosticsAction_triggered() {
     dialog->exec();
 }
 
-void ActionHandler::at_serverAddCameraManuallyAction_triggered()
-{
-    const auto params = menu()->currentParameters(sender());
-    const auto server = params.resource().dynamicCast<QnMediaServerResource>();
-    if (!server)
-        return;
-
-    QnNonModalDialogConstructor<QnCameraAdditionDialog> dialogConstructor(m_cameraAdditionDialog, mainWindowWidget());
-
-    QnCameraAdditionDialog* dialog = cameraAdditionDialog();
-
-    if (dialog->server() != server) {
-        if (dialog->state() == QnCameraAdditionDialog::Searching
-            || dialog->state() == QnCameraAdditionDialog::Adding) {
-
-            const auto result = QnMessageBox::question(mainWindowWidget(),
-                tr("Cancel device adding?"), QString(),
-                QDialogButtonBox::Yes | QDialogButtonBox::No,
-                QDialogButtonBox::No);
-
-            if (result != QDialogButtonBox::Yes)
-                return;
-        }
-        dialog->setServer(server);
-    }
-}
-
 void ActionHandler::at_serverLogsAction_triggered()
 {
     QnMediaServerResourcePtr server = menu()->currentParameters(sender()).resource().dynamicCast<QnMediaServerResource>();
@@ -2590,9 +2554,6 @@ void ActionHandler::deleteDialogs() {
 
     if (businessEventsLogDialog())
         delete businessEventsLogDialog();
-
-    if (cameraAdditionDialog())
-        delete cameraAdditionDialog();
 
     if (adjustVideoDialog())
         delete adjustVideoDialog();

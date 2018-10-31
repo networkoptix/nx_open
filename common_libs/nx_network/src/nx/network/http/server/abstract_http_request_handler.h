@@ -17,19 +17,19 @@ namespace http {
 
 struct NX_NETWORK_API RequestResult
 {
-    nx::network::http::StatusCode::Value statusCode;
-    std::unique_ptr<nx::network::http::AbstractMsgBodySource> dataSource;
+    http::StatusCode::Value statusCode;
+    std::unique_ptr<http::AbstractMsgBodySource> dataSource;
     ConnectionEvents connectionEvents;
 
     RequestResult(StatusCode::Value statusCode);
 
     RequestResult(
-        nx::network::http::StatusCode::Value statusCode,
-        std::unique_ptr<nx::network::http::AbstractMsgBodySource> dataSource);
+        http::StatusCode::Value statusCode,
+        std::unique_ptr<http::AbstractMsgBodySource> dataSource);
 
     RequestResult(
-        nx::network::http::StatusCode::Value statusCode,
-        std::unique_ptr<nx::network::http::AbstractMsgBodySource> dataSource,
+        http::StatusCode::Value statusCode,
+        std::unique_ptr<http::AbstractMsgBodySource> dataSource,
         ConnectionEvents connectionEvents);
 };
 
@@ -37,17 +37,17 @@ using RequestProcessedHandler = nx::utils::MoveOnlyFunc<void(RequestResult)>;
 
 struct RequestContext
 {
-    nx::network::http::HttpServerConnection* connection = nullptr;
+    http::HttpServerConnection* connection = nullptr;
     nx::utils::stree::ResourceContainer authInfo;
-    nx::network::http::Request request;
-    nx::network::http::Response* response = nullptr;
+    http::Request request;
+    http::Response* response = nullptr;
     /**
      * Parameters, taken from request path. 
-     * E.g., if handler was registered with path /object_type/{id}/sub_object_type/{id},
+     * E.g., if handler was registered with path /object_type/{objectId}/sub_object_type/{subObjectId},
      * and request /object_type/id1/sub_object_type/id2 was received.
-     * Then this vector would be ("id1", "id2").
+     * Then this would be (("objectId", "id1"), ("subObjectId", "id2")).
      */
-    std::vector<StringType> requestPathParams;
+    RequestPathParams requestPathParams;
 };
 
 /**
@@ -65,20 +65,12 @@ public:
      * @param completionHandler Functor to be invoked to send response.
      */
     bool processRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        nx::network::http::Request request,
+        http::HttpServerConnection* const connection,
+        http::Request request,
         nx::utils::stree::ResourceContainer&& authInfo,
         ResponseIsReadyHandler completionHandler);
 
-    void setRequestPathParams(std::vector<StringType> params);
-    /**
-     * Parameters parsed from URL path.
-     * E.g., given http handler registered on path /account/%1/systems.
-     * When receiving request with path /account/cartman/systems.
-     * Then this method will return {cartman}.
-     * Works only when using RestMessageDispatcher.
-     */
-    const std::vector<StringType>& requestPathParams() const;
+    void setRequestPathParams(RequestPathParams params);
 
 protected:
     /**
@@ -87,20 +79,17 @@ protected:
      * WARNING: This object can be removed in completionHandler
      */
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer authInfo,
-        nx::network::http::Request request,
-        nx::network::http::Response* const response,
-        nx::network::http::RequestProcessedHandler completionHandler) = 0;
+        http::RequestContext requestContext,
+        http::RequestProcessedHandler completionHandler) = 0;
 
     virtual void sendResponse(RequestResult requestResult);
 
-    nx::network::http::Response* response();
+    http::Response* response();
 
 private:
-    nx::network::http::Message m_responseMsg;
+    http::Message m_responseMsg;
     ResponseIsReadyHandler m_completionHandler;
-    std::vector<StringType> m_requestPathParams;
+    RequestPathParams m_requestPathParams;
 };
 
 } // namespace nx

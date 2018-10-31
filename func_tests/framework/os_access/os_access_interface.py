@@ -158,6 +158,10 @@ class OSAccess(object):
         pass
 
     @abstractmethod
+    def _dismount_fake_disk(self):
+        pass
+
+    @abstractmethod
     def make_fake_disk(self, name, size_bytes):
         return self.path_cls()
 

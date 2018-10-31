@@ -1,0 +1,10 @@
+@import '../../styles/custom/custom_palette';
+@import '../../styles/theme_palette';
+@import '../../styles/theme_variables';
+
+label {
+    font-family   : $font-family-medium;
+    font-weight   : 500;
+    line-height   : 16px;
+    margin-bottom : 8px;
+}

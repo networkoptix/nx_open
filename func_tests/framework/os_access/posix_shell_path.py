@@ -143,6 +143,22 @@ class PosixShellPath(BasePosixPath):
             if not ignore_errors:
                 raise exceptions.NotADir(self)
 
+    @_raising_on_exit_status({
+        2: exceptions.DoesNotExist,
+        3: exceptions.NotADir,
+        4: exceptions.NotEmpty,
+        })
+    def rmdir(self):
+        self._shell.run_sh_script(
+            # language=Bash
+            '''
+                test -e "$SELF" || exit 2
+                test -d "$SELF" || exit 3
+                test "$(find "$SELF" -maxdepth 0 -not -empty)" && exit 4
+                rmdir -- "$SELF"
+                ''',
+            env={'SELF': self})
+
     @_raising_on_exit_status({2: exceptions.DoesNotExist, 3: exceptions.NotAFile})
     def read_bytes(self, offset=None, max_length=None):
         return self._shell.run_sh_script(
@@ -196,3 +212,23 @@ class PosixShellPath(BasePosixPath):
         if file_type != u'regular file':
             raise exceptions.NotAFile("{} reports {}".format(command, output))
         return size
+
+    @_raising_on_exit_status({
+        2: exceptions.BadParent,
+        3: exceptions.BadParent,
+        4: exceptions.AlreadyExists,
+        })
+    def symlink_to(self, target, target_is_directory=False):
+        self._shell.run_sh_script(
+            # language=Bash
+            '''
+                parent="$(dirname "$SELF")"
+                test -e "$parent" || exit 2
+                test -d "$parent" || exit 3
+                test -e "$SELF" && exit 4
+                ln -s "$TARGET" "$SELF"
+                ''',
+            env={'SELF': self, 'TARGET': target},
+            timeout_sec=10,
+            )
+

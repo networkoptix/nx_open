@@ -15,7 +15,6 @@ public:
     virtual ~NativeStreamReader();
 
     virtual int getNextData(nxcip::MediaDataPacket** packet) override;
-    virtual void interrupt() override;
 
     virtual void setFps(float fps) override;
     virtual void setResolution(const nxcip::Resolution& resolution) override;
@@ -23,9 +22,8 @@ public:
 
 private:
     void ensureConsumerAdded() override;
-    void maybeFlush();
     std::shared_ptr<ffmpeg::Packet> nextPacket();
-    virtual void removeConsumer() override;
+    virtual void removeVideoConsumer() override;
 };
 
 } // namespace usb_cam

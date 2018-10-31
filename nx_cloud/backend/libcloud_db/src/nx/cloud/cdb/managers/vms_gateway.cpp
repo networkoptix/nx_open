@@ -147,8 +147,9 @@ void VmsGateway::reportRequestResult(
     }
     else
     {
-        NX_DEBUG(this, lm("Merge request to %1 failed with result code %2")
-            .args(targetSystemId, QnLexical::serialized(result.error)));
+        NX_DEBUG(this, lm("Merge request to %1 failed with result %2 (%3, %4)")
+            .args(targetSystemId, QnLexical::serialized(result.error),
+                result.errorString, result.reply.toString()));
     }
 
     completionHandler(prepareVmsResult(clientPtr, result));
