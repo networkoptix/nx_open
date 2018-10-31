@@ -63,7 +63,7 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
 
         // re-order tabs
         if (this.noteTypes.length) {
-            this.noteTypes.sort((a, b) => b > a);
+            this.noteTypes = this.noteTypes.reverse();
         }
     }
 
