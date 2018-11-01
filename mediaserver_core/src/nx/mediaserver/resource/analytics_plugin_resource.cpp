@@ -47,6 +47,17 @@ sdk_support::SharedPtr<nx::sdk::analytics::Plugin> AnalyticsPluginResource::sdkP
     return m_sdkPlugin;
 }
 
+std::unique_ptr<sdk_support::AbstractManifestLogger> AnalyticsPluginResource::makeLogger() const
+{
+    const QString messageTemplate(
+        "Error occurred while fetching Engine manifest for engine: {:engine}: {:error}");
+
+    return std::make_unique<sdk_support::ManifestLogger>(
+        nx::utils::log::Tag(typeid(this)),
+        messageTemplate,
+        toSharedPointer(this));
+}
+
 CameraDiagnostics::Result AnalyticsPluginResource::initInternal()
 {
     NX_DEBUG(this, lm("Initializing analytics plugin resource %1 (%2)")
@@ -55,7 +66,10 @@ CameraDiagnostics::Result AnalyticsPluginResource::initInternal()
     if (!m_sdkPlugin)
         return CameraDiagnostics::InternalServerErrorResult("SDK plugin object is not set");
 
-    const auto manifest = sdk_support::manifest<analytics_api::PluginManifest>(m_sdkPlugin);
+    const auto manifest = sdk_support::manifest<analytics_api::PluginManifest>(
+        m_sdkPlugin,
+        makeLogger());
+
     if (!manifest)
         return CameraDiagnostics::PluginErrorResult("Can't deserialize engine manifest");
 

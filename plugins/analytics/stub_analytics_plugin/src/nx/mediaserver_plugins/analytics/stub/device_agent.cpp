@@ -38,7 +38,7 @@ DeviceAgent::DeviceAgent(Engine* engine):
  * manifest. Also this manifest may declare supportedEventTypeIds and supportedObjectTypeIds lists
  * which are treated as white-list filters for the respective set.
  */
-std::string DeviceAgent::manifest()
+std::string DeviceAgent::manifest() const
 {
     return /*suppress newline*/1 + R"json(
 {
@@ -286,7 +286,7 @@ MetadataPacket* DeviceAgent::cookSomeObjects()
     auto objectPacket = new CommonObjectsMetadataPacket();
 
     objectPacket->setTimestampUsec(m_lastVideoFrameTimestampUsec);
-    objectPacket->setDurationUsec(1000000LL * 10);
+    objectPacket->setDurationUsec(0);
     objectPacket->addItem(commonObject);
     return objectPacket;
 }

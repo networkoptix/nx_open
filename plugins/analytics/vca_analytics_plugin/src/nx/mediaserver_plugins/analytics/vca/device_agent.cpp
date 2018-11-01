@@ -9,6 +9,7 @@
 
 #include <nx/fusion/serialization/json.h>
 
+#include <nx/sdk/common/string.h>
 #include <nx/sdk/analytics/common_event.h>
 #include <nx/sdk/analytics/common_metadata_packet.h>
 
@@ -519,7 +520,7 @@ nx::sdk::Error DeviceAgent::stopFetchingMetadata()
     return nx::sdk::Error::noError;
 }
 
-const char* DeviceAgent::manifest(nx::sdk::Error* error)
+const nx::sdk::IString* DeviceAgent::manifest(nx::sdk::Error* error) const
 {
     // If camera has no enabled events at the moment, return empty manifest.
     QString host = m_url.host();
@@ -531,14 +532,9 @@ const char* DeviceAgent::manifest(nx::sdk::Error* error)
     for (const auto& rule: vcaCameraConrtoller.suppotedRules())
     {
         if (rule.second.ruleEnabled) //< At least one enabled rule.
-            return m_cameraManifest;
+            return new nx::sdk::common::String(m_cameraManifest);
     }
-    return "";
-}
-
-void DeviceAgent::freeManifest(const char* /*data*/)
-{
-    // Do nothing. Manifest string is stored in member-variable.
+    return new nx::sdk::common::String();
 }
 
 void DeviceAgent::setSettings(const nx::sdk::Settings* settings)

@@ -158,7 +158,8 @@ bool SdkObjectFactory::initPluginResources()
             sdk_support::SharedPtr<analytics_sdk::Plugin>(realAnalyticsPlugin);
 
         const auto pluginManifest = sdk_support::manifest<analytics_api::PluginManifest>(
-            realAnalyticsPlugin);
+            realAnalyticsPlugin,
+            makeLogger(resource::AnalyticsPluginResourcePtr()));
 
         if (!pluginManifest)
         {
@@ -367,6 +368,18 @@ nx::vms::api::AnalyticsEngineData SdkObjectFactory::createEngineData(
     engineData.typeId = nx::vms::api::AnalyticsEngineData::kResourceTypeId;
 
     return engineData;
+}
+
+std::unique_ptr<sdk_support::AbstractManifestLogger> SdkObjectFactory::makeLogger(
+    resource::AnalyticsPluginResourcePtr pluginResource) const
+{
+    const QString messageTemplate(
+        "Error occurred while fetching Plugin manifest: {:error}");
+
+    return std::make_unique<sdk_support::ManifestLogger>(
+        nx::utils::log::Tag(typeid(this)),
+        messageTemplate,
+        std::move(pluginResource));
 }
 
 } // namespace nx::mediaserver::analytics

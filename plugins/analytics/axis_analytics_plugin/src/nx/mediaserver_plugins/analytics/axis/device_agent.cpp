@@ -9,6 +9,8 @@
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/fusion/serialization/json.h>
 
+#include <nx/sdk/common/string.h>
+
 #define NX_PRINT_PREFIX "[axis::DeviceAgent] "
 #include <nx/kit/debug.h>
 
@@ -99,7 +101,7 @@ void DeviceAgent::stopFetchingMetadata()
     m_monitor = nullptr;
 }
 
-const char* DeviceAgent::manifest(nx::sdk::Error* error)
+const nx::sdk::IString* DeviceAgent::manifest(nx::sdk::Error* error) const
 {
     if (m_manifest.isEmpty())
     {
@@ -108,13 +110,7 @@ const char* DeviceAgent::manifest(nx::sdk::Error* error)
     }
     *error = nx::sdk::Error::noError;
     m_givenManifests.push_back(m_manifest);
-    return m_manifest.constData();
-}
-
-void DeviceAgent::freeManifest(const char* data)
-{
-    // Do nothing. Memory allocated for Manifests is stored in m_givenManifests list and will be
-    // released in DeviceAgent's destructor.
+    return new nx::sdk::common::String(m_manifest);
 }
 
 const EventType* DeviceAgent::eventTypeById(const QString& id) const noexcept

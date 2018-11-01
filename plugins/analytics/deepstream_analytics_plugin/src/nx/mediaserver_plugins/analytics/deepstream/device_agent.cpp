@@ -2,6 +2,8 @@
 
 #include <plugins/plugin_tools.h>
 
+#include <nx/sdk/common/string.h>
+
 #include <nx/sdk/analytics/compressed_video_packet.h>
 #include <nx/sdk/analytics/common_metadata_packet.h>
 
@@ -139,12 +141,12 @@ void DeviceAgent::stopFetchingMetadata()
     NX_OUTPUT << __func__ << " Stopping to fetch metadata. Doing nothing, actually...";
 }
 
-const char* DeviceAgent::manifest(Error* error)
+const nx::sdk::IString* DeviceAgent::manifest(Error* error) const
 {
     *error = Error::noError;
 
     if (!m_manifest.empty())
-        return m_manifest.c_str();
+        return new nx::sdk::common::String(m_manifest);
 
     std::string objectTypeIds;
     const auto& objectClassDescritions = m_engine->objectClassDescritions();
@@ -155,7 +157,7 @@ const char* DeviceAgent::manifest(Error* error)
     }
     else
     {
-        for (auto i = 0; i < objectClassDescritions.size(); ++i)
+        for (std::size_t i = 0; i < objectClassDescritions.size(); ++i)
         {
             objectTypeIds += kIndent + "\"" + objectClassDescritions[i].typeId + "\"";
 
@@ -172,12 +174,7 @@ const char* DeviceAgent::manifest(Error* error)
 }
 )json";
 
-    return m_manifest.c_str();
-}
-
-void DeviceAgent::freeManifest(const char* data)
-{
-    NX_OUTPUT << __func__ << " Freeing manifest, doing nothing actually...";
+    return new nx::sdk::common::String(m_manifest);
 }
 
 DeviceAgent::~DeviceAgent()

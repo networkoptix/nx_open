@@ -46,7 +46,7 @@ protected:
         bool enableOutput,
         const std::string& printPrefix = "");
 
-    virtual std::string manifest() = 0;
+    virtual std::string manifest() const = 0;
 
     /**
      * Override to accept next compressed video frame for processing. Should not block the caller
@@ -139,8 +139,7 @@ public:
     virtual Error setMetadataHandler(MetadataHandler* handler) override;
     virtual Error pushDataPacket(DataPacket* dataPacket) override;
     virtual Error setNeededMetadataTypes(const IMetadataTypes* metadataTypes) override;
-    virtual const char* manifest(Error* error) override;
-    virtual void freeManifest(const char* data) override;
+    virtual const IString* manifest(Error* error) const override;
     virtual void setSettings(const nx::sdk::Settings* settings) override;
     virtual nx::sdk::Settings* settings() const override;
 

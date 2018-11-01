@@ -13,6 +13,8 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/scope_guard.h>
 
+#include <nx/sdk/common/string.h>
+
 #include "device_agent.h"
 #include "common.h"
 #include "attributes_parser.h"
@@ -135,15 +137,10 @@ nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
     return deviceAgent;
 }
 
-const char* Engine::manifest(Error* error) const
+const IString* Engine::manifest(Error* error) const
 {
     *error = Error::noError;
-    return m_manifest.constData();
-}
-
-void Engine::freeManifest(const char* manifestData)
-{
-    // Do nothing actually.
+    return new common::String(m_manifest);
 }
 
 void Engine::setSettings(const nx::sdk::Settings* settings)

@@ -10,6 +10,8 @@
 #include <nx/utils/log/log_main.h>
 #include <nx/fusion/model_functions.h>
 
+#include <nx/sdk/common/string.h>
+
 namespace nx {
 namespace mediaserver_plugins {
 namespace analytics {
@@ -44,7 +46,7 @@ void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void DeviceAgent::setSettings(const nx::sdk::Settings* settings)
+void DeviceAgent::setSettings(const nx::sdk::Settings* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
@@ -140,7 +142,7 @@ void DeviceAgent::stopFetchingMetadata()
     m_monitor = nullptr;
 }
 
-const char* DeviceAgent::manifest(Error* error)
+const IString* DeviceAgent::manifest(Error* error) const
 {
     if (m_deviceAgentManifest.isEmpty())
     {
@@ -149,11 +151,7 @@ const char* DeviceAgent::manifest(Error* error)
     }
 
     *error = Error::noError;
-    return m_deviceAgentManifest.constData();
-}
-
-void DeviceAgent::freeManifest(const char* data)
-{
+    return new common::String(m_deviceAgentManifest);
 }
 
 void DeviceAgent::setDeviceInfo(const nx::sdk::DeviceInfo& deviceInfo)

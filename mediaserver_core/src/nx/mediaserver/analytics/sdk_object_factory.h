@@ -8,6 +8,7 @@
 
 #include <nx/mediaserver/server_module_aware.h>
 #include <nx/mediaserver/sdk_support/pointers.h>
+#include <nx/mediaserver/sdk_support/loggers.h>
 
 namespace nx::sdk::analytics {
 
@@ -38,6 +39,9 @@ private:
     nx::vms::api::AnalyticsEngineData createEngineData(
         const resource::AnalyticsPluginResourcePtr& plugin,
         const int engineIndex) const;
+
+    std::unique_ptr<sdk_support::AbstractManifestLogger> makeLogger(
+        resource::AnalyticsPluginResourcePtr pluginResource) const;
 };
 
 } // namespace nx::mediaserver::analytics

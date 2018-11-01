@@ -11,6 +11,8 @@
 
 #include <nx/fusion/model_functions.h>
 
+#include <nx/sdk/common/string.h>
+
 #include <nx/mediaserver_plugins/utils/uuid.h>
 
 #include <nx/kit/ini_config.h>
@@ -373,17 +375,11 @@ nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
         return nullptr;
 }
 
-const char* Engine::manifest(Error* error) const
+const IString* Engine::manifest(Error* error) const
 {
     *error = Error::noError;
-    return m_manifest.constData();
+    return new common::String(m_manifest);
 }
-
-void Engine::freeManifest(const char* manifestData)
-{
-    // Do nothing actually.
-}
-
 
 } // namespace ssc
 } // namespace analytics

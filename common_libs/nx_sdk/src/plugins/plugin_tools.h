@@ -16,6 +16,7 @@
 #include <sstream>
 #include <iomanip>
 #include <limits>
+#include <type_traits>
 
 #include "plugin_api.h"
 
@@ -42,8 +43,9 @@ public:
     explicit ScopedRef(T* ptr = nullptr, bool increaseRef = true):
         m_ptr(ptr)
     {
+        // TODO: #dmishin get rid of this const mess when releaseRef becomes const
         if (m_ptr && increaseRef)
-            m_ptr->addRef();
+            const_cast<std::remove_const_t<T>*>(m_ptr)->addRef();
     }
 
     ScopedRef(ScopedRef<T>&& right)
@@ -90,7 +92,8 @@ public:
     {
         if (m_ptr)
         {
-            m_ptr->releaseRef();
+            // TODO: #dmishin get rid of this const mess when releaseRef becomes const
+            const_cast<std::remove_const_t<T>*>(m_ptr)->releaseRef();
             m_ptr = nullptr;
         }
 
@@ -104,7 +107,10 @@ private:
     {
         m_ptr = ptr;
         if(m_ptr)
-            m_ptr->addRef();
+        {
+            // TODO: #dmishin get rid of this const mess when releaseRef becomes const
+            const_cast<std::remove_const_t<T>*>(m_ptr)->addRef();
+        }
     }
 };
 

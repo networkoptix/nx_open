@@ -14,6 +14,8 @@
 #include <nx/mediaserver_plugins/utils/uuid.h>
 #include <nx/kit/debug.h>
 
+#include <nx/sdk/common/string.h>
+
 #include "device_agent.h"
 
 namespace nx {
@@ -91,15 +93,10 @@ nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
     return new DeviceAgent(this, *deviceInfo, events);
 }
 
-const char* Engine::manifest(Error* error) const
+const IString* Engine::manifest(Error* error) const
 {
     *error = Error::noError;
-    return m_manifest.constData();
-}
-
-void Engine::freeManifest(const char* manifestData)
-{
-    // Do nothing actually.
+    return new common::String(m_manifest);
 }
 
 EngineManifest Engine::fetchSupportedEvents(const DeviceInfo& deviceInfo)

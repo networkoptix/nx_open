@@ -53,41 +53,6 @@ QSet<QString> supportedEventTypes(const DeviceAgentManifest& manifest)
     return result;
 }
 
-sdk_support::UniquePtr<CommonMetadataTypes> neededMetadataTypes(
-    QnMediaServerModule* serverModule,
-    const QnVirtualCameraResourcePtr& device,
-    const sdk_support::SharedPtr<DeviceAgent>& deviceAgent)
-{
-    const auto deviceAgentManifest = sdk_support::manifest<DeviceAgentManifest>(deviceAgent);
-    if (!deviceAgentManifest)
-    {
-        NX_ASSERT(false, "Got invlaid device agent manifest");
-        return sdk_support::UniquePtr<CommonMetadataTypes>();
-    }
-
-    const auto eventTypes = supportedEventTypes(*deviceAgentManifest);
-    const auto objectTypes = supportedObjectTypes(*deviceAgentManifest);
-
-    const auto ruleWatcher = serverModule->analyticsEventRuleWatcher();
-    if (!ruleWatcher)
-    {
-        NX_ASSERT(false, "Can't access analytics rule watcher");
-        return sdk_support::UniquePtr<CommonMetadataTypes>();
-    }
-
-    auto neededEventTypes = ruleWatcher->watchedEventsForResource(device->getId());
-    neededEventTypes.intersect(eventTypes);
-
-    sdk_support::UniquePtr<CommonMetadataTypes> result(new CommonMetadataTypes());
-    for (const auto& eventTypeId: neededEventTypes)
-        result->addEventType(eventTypeId.toStdString());
-
-    for (const auto& objectTypeId: objectTypes)
-        result->addObjectType(objectTypeId.toStdString());
-
-    return result;
-}
-
 } // namespace
 
 DeviceAnalyticsBinding::DeviceAnalyticsBinding(
@@ -142,7 +107,7 @@ bool DeviceAnalyticsBinding::updateNeededMetadataTypes()
         return true;
     }
 
-    const auto metadataTypes = neededMetadataTypes(serverModule(), m_device, m_sdkDeviceAgent);
+    const auto metadataTypes = neededMetadataTypes();
     const auto error = m_sdkDeviceAgent->setNeededMetadataTypes(metadataTypes.get());
     return error == nx::sdk::Error::noError;
 }
@@ -209,10 +174,7 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
 
     if (!m_started)
     {
-        const auto metadataTypes = neededMetadataTypes(
-            serverModule(),
-            m_device,
-            m_sdkDeviceAgent);
+        const auto metadataTypes = neededMetadataTypes();
         const auto error = m_sdkDeviceAgent->setNeededMetadataTypes(metadataTypes.get());
         m_started = error == nx::sdk::Error::noError;
     }
@@ -340,7 +302,7 @@ std::optional<EngineManifest> DeviceAnalyticsBinding::engineManifest() const
         return std::nullopt;
     }
 
-    return sdk_support::manifest<EngineManifest>(sdkEngine);
+    return sdk_support::manifest<EngineManifest>(sdkEngine, makeLogger("Engine"));
 }
 
 sdk_support::SharedPtr<DeviceAnalyticsBinding::DeviceAgent>
@@ -450,20 +412,8 @@ std::optional<DeviceAgentManifest> DeviceAnalyticsBinding::loadDeviceAgentManife
         return std::nullopt;
     }
 
-    nx::sdk::Error error = nx::sdk::Error::noError;
-    auto deleter = [deviceAgent](const char* ptr) { deviceAgent->freeManifest(ptr); };
-    std::unique_ptr<const char, decltype(deleter)> deviceAgentManifest{
-        deviceAgent->manifest(&error), deleter};
-
-    if (error != nx::sdk::Error::noError)
-    {
-        NX_ERROR(
-            this,
-            lm("Can not fetch manifest for device %1 (%2), plugin returned error.")
-                .args(m_device->getUserDefinedName(), m_device->getId()));
-
-        return std::nullopt;
-    }
+    const auto deviceAgentManifest = sdk_support::manifest<DeviceAgentManifest>(
+        deviceAgent, makeLogger("DeviceAgent"));
 
     if (!deviceAgentManifest)
     {
@@ -473,17 +423,7 @@ std::optional<DeviceAgentManifest> DeviceAnalyticsBinding::loadDeviceAgentManife
         return std::nullopt;
     }
 
-    if (pluginsIni().analyticsManifestOutputPath[0])
-    {
-        sdk_support::saveManifestToFile(
-            nx::utils::log::Tag(typeid(this)),
-            deviceAgentManifest.get(),
-            "DeviceAgent",
-            m_engine->getName(),
-            lit("_device_agent"));
-    }
-
-    return sdk_support::manifest<DeviceAgentManifest>(deviceAgentManifest.get());
+    return deviceAgentManifest;
 }
 
 bool DeviceAnalyticsBinding::updateDeviceWithManifest(
@@ -534,6 +474,54 @@ bool DeviceAnalyticsBinding::updateDescriptorsWithManifest(
     m_device->saveParams();
 
     return true;
+}
+
+sdk_support::UniquePtr<CommonMetadataTypes> DeviceAnalyticsBinding::neededMetadataTypes() const
+{
+    const auto deviceAgentManifest = sdk_support::manifest<DeviceAgentManifest>(
+        m_sdkDeviceAgent, makeLogger("DeviceAgent"));
+
+    if (!deviceAgentManifest)
+    {
+        NX_ASSERT(false, "Got invlaid device agent manifest");
+        return sdk_support::UniquePtr<CommonMetadataTypes>();
+    }
+
+    const auto eventTypes = supportedEventTypes(*deviceAgentManifest);
+    const auto objectTypes = supportedObjectTypes(*deviceAgentManifest);
+
+    const auto ruleWatcher = serverModule()->analyticsEventRuleWatcher();
+    if (!ruleWatcher)
+    {
+        NX_ASSERT(false, "Can't access analytics rule watcher");
+        return sdk_support::UniquePtr<CommonMetadataTypes>();
+    }
+
+    auto neededEventTypes = ruleWatcher->watchedEventsForResource(m_device->getId());
+    neededEventTypes.intersect(eventTypes);
+
+    sdk_support::UniquePtr<CommonMetadataTypes> result(new CommonMetadataTypes());
+    for (const auto& eventTypeId: neededEventTypes)
+        result->addEventType(eventTypeId.toStdString());
+
+    for (const auto& objectTypeId: objectTypes)
+        result->addObjectType(objectTypeId.toStdString());
+
+    return result;
+}
+
+std::unique_ptr<sdk_support::AbstractManifestLogger> DeviceAnalyticsBinding::makeLogger(
+    const QString& manifestType) const
+{
+    const auto messageTemplate = QString(
+        "Error occurred while fetching %1 manifest for device {:device} "
+        "and engine {:engine}: {:error}").arg(manifestType);
+
+    return std::make_unique<sdk_support::ManifestLogger>(
+        nx::utils::log::Tag(typeid(this)),
+        messageTemplate,
+        m_device,
+        m_engine);
 }
 
 void DeviceAnalyticsBinding::putData(const QnAbstractDataPacketPtr& data)

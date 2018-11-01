@@ -4,6 +4,7 @@
 
 #include <nx/sdk/common.h>
 #include <nx/sdk/settings.h>
+#include <nx/sdk/i_string.h>
 #include <nx/sdk/analytics/metadata_types.h>
 #include <nx/sdk/analytics/metadata_packet.h>
 
@@ -61,21 +62,15 @@ public:
     virtual void setSettings(const Settings* settings) = 0;
 
     /**
-     * @return Device agent settings that are stored on the plugin side.
+     * @return DeviceAgent settings that are stored on the plugin side.
      */
     virtual Settings* settings() const = 0;
 
     /**
-     * Provides a 0-terminated UTF-8 string containing the JSON manifest.
-     * @return Pointer to a C-style string which MUST be valid until freeManifest() is invoked.
+     * Provides DeviceAgent manifest in JSON format.
+     * @return JSON string in UTF-8.
      */
-    virtual const char* manifest(Error* error) = 0;
-
-    /**
-     * Tells DeviceAgent that the memory previously returned by manifest() pointed to
-     * by data is no longer needed and may be disposed.
-     */
-    virtual void freeManifest(const char* data) = 0;
+    virtual const IString* manifest(Error* error) const = 0;
 
     /**
      * @param handler Processes event metadata and object metadata fetched by the engine. The

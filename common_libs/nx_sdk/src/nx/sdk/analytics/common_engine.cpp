@@ -6,6 +6,7 @@
 
 #include <nx/sdk/utils.h>
 #include <nx/sdk/common_settings.h>
+#include <nx/sdk/common/string.h>
 
 #include "plugin.h"
 
@@ -87,16 +88,9 @@ nx::sdk::Settings* CommonEngine::settings() const
     return settingsValues;
 }
 
-const char* CommonEngine::manifest(Error* /*error*/) const
+const IString* CommonEngine::manifest(Error* /*error*/) const
 {
-    if (m_manifest.empty())
-        m_manifest = manifest();
-    return m_manifest.c_str();
-}
-
-void CommonEngine::freeManifest(const char* data)
-{
-    m_manifest.clear();
+    return new common::String(manifest());
 }
 
 void CommonEngine::executeAction(Action* action, Error* outError)

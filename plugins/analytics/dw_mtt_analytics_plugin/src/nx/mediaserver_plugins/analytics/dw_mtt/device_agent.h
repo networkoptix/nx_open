@@ -71,9 +71,7 @@ public:
     virtual nx::sdk::Error setNeededMetadataTypes(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
 
-    virtual const char* manifest(nx::sdk::Error* error) override;
-
-    virtual void freeManifest(const char* data) override;
+    virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
 
     virtual void setSettings(const nx::sdk::Settings* settings) override;
 

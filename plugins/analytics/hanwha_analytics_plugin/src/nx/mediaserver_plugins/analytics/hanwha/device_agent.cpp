@@ -7,6 +7,8 @@
 #define NX_PRINT_PREFIX "[hanwha::DeviceAgent] "
 #include <nx/kit/debug.h>
 
+#include <nx/sdk/common/string.h>
+
 #include <nx/sdk/analytics/common_event.h>
 #include <nx/sdk/analytics/common_metadata_packet.h>
 #include <nx/utils/log/log.h>
@@ -143,7 +145,7 @@ void DeviceAgent::stopFetchingMetadata()
     m_monitor = nullptr;
 }
 
-const char* DeviceAgent::manifest(Error* error)
+const IString* DeviceAgent::manifest(Error* error) const
 {
     if (m_deviceAgentManifest.isEmpty())
     {
@@ -152,11 +154,7 @@ const char* DeviceAgent::manifest(Error* error)
     }
 
     *error = Error::noError;
-    return m_deviceAgentManifest.constData();
-}
-
-void DeviceAgent::freeManifest(const char* data)
-{
+    return new common::String(m_deviceAgentManifest);
 }
 
 void DeviceAgent::setDeviceInfo(const nx::sdk::DeviceInfo& deviceInfo)

@@ -32,9 +32,7 @@ public:
         const nx::sdk::DeviceInfo* deviceInfo,
         nx::sdk::Error* outError) override;
 
-    virtual const char* manifest(nx::sdk::Error* error) const override;
-
-    virtual void freeManifest(const char* manifestData) override;
+    virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
 
     const EventType* eventTypeById(const QString& id) const noexcept;
 

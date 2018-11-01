@@ -41,34 +41,41 @@ static const int noError = (int) nx::sdk::Error::noError;
 static void testEngineManifest(nx::sdk::analytics::Engine* engine)
 {
     nx::sdk::Error error = nx::sdk::Error::noError;
-    const char* manifest = engine->manifest(&error);
-    ASSERT_TRUE(manifest != nullptr);
-    ASSERT_EQ((int) nx::sdk::Error::noError, (int) error);
-    ASSERT_TRUE(manifest[0] != '\0');
-    NX_PRINT << "Engine manifest:\n" << manifest;
+    nxpt::ScopedRef<const nx::sdk::IString> manifest(
+        engine->manifest(&error), false);
 
-    const std::string trimmedEngineManifest = trimString(manifest);
+    ASSERT_TRUE(manifest);
+    const char* manifestStr = manifest->str();
+
+    ASSERT_TRUE(manifestStr != nullptr);
+    ASSERT_EQ((int) nx::sdk::Error::noError, (int) error);
+    ASSERT_TRUE(manifestStr[0] != '\0');
+    NX_PRINT << "Engine manifest:\n" << manifestStr;
+
+    const std::string trimmedEngineManifest = trimString(manifestStr);
     ASSERT_EQ('{', trimmedEngineManifest.front());
     ASSERT_EQ('}', trimmedEngineManifest.back());
 
     // This test assumes that the plugin consumes compressed frames - verify it in the manifest.
-    ASSERT_EQ(std::string::npos, std::string(manifest).find("needUncompressedVideoFrames"));
+    ASSERT_EQ(std::string::npos, std::string(manifestStr).find("needUncompressedVideoFrames"));
 }
 
 static void testDeviceAgentManifest(nx::sdk::analytics::DeviceAgent* deviceAgent)
 {
     nx::sdk::Error error = nx::sdk::Error::noError;
-    const char* manifest = deviceAgent->manifest(&error);
-    ASSERT_TRUE(manifest != nullptr);
+    nxpt::ScopedRef<const nx::sdk::IString> manifest(
+        deviceAgent->manifest(&error), false);
+
+    ASSERT_TRUE(manifest);
+    const char* manifestStr = manifest->str();
+    ASSERT_TRUE(manifestStr != nullptr);
     ASSERT_EQ(noError, (int) error);
-    ASSERT_TRUE(manifest[0] != '\0');
+    ASSERT_TRUE(manifestStr[0] != '\0');
     NX_PRINT << "DeviceAgent manifest:\n" << manifest;
 
-    const std::string trimmedDeviceAgentManifest = trimString(manifest);
+    const std::string trimmedDeviceAgentManifest = trimString(manifestStr);
     ASSERT_EQ('{', trimmedDeviceAgentManifest.front());
     ASSERT_EQ('}', trimmedDeviceAgentManifest.back());
-
-    deviceAgent->freeManifest(manifest);
 }
 
 static void testEngineSettings(nx::sdk::analytics::Engine* plugin)

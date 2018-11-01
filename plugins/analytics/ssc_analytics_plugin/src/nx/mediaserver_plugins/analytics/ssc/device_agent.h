@@ -33,9 +33,7 @@ public:
 
     void sendEventPacket(const EventType& event) const;
 
-    virtual const char* manifest(nx::sdk::Error* error) override;
-
-    virtual void freeManifest(const char* data) override;
+    virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
 
     virtual sdk::Error setMetadataHandler(
         nx::sdk::analytics::MetadataHandler* metadataHandler) override;

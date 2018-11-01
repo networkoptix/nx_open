@@ -16,6 +16,7 @@ extern "C" {
 #define NX_PRINT_PREFIX "deepstream::Engine::"
 #include <nx/kit/debug.h>
 #include <nx/gstreamer/gstreamer_common.h>
+#include <nx/sdk/common/string.h>
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -107,12 +108,12 @@ nx::sdk::Settings* Engine::settings() const
     return nullptr;
 }
 
-const char* Engine::manifest(Error* error) const
+const nx::sdk::IString* Engine::manifest(Error* error) const
 {
     *error = Error::noError;
 
     if (!m_manifest.empty())
-        return m_manifest.c_str();
+        return new common::String(m_manifest);
 
     std::string objectTypesManifest;
     if (ini().pipelineType == kOpenAlprPipeline)
@@ -150,12 +151,7 @@ const char* Engine::manifest(Error* error) const
 }
 )json";
 
-    return m_manifest.c_str();
-}
-
-void Engine::freeManifest(const char* /*manifestData*/)
-{
-    // Do nothing.
+    return new common::String(m_manifest);
 }
 
 nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(

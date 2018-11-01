@@ -6,6 +6,7 @@
 #include <nx/sdk/analytics/plugin.h>
 
 #include <nx/mediaserver/sdk_support/pointers.h>
+#include <nx/mediaserver/sdk_support/loggers.h>
 
 namespace nx::mediaserver::resource {
 
@@ -21,6 +22,9 @@ public:
     void setSdkPlugin(sdk_support::SharedPtr<nx::sdk::analytics::Plugin> plugin);
 
     sdk_support::SharedPtr<nx::sdk::analytics::Plugin> sdkPlugin() const;
+
+private:
+    std::unique_ptr<sdk_support::AbstractManifestLogger> makeLogger() const;
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;

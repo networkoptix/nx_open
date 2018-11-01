@@ -5,9 +5,9 @@
 #include <nx/vms/api/analytics/plugin_manifest.h>
 
 #include <nx/sdk/analytics/engine.h>
-#include <nx/mediaserver/sdk_support/pointers.h>
 
 #include <nx/mediaserver/sdk_support/pointers.h>
+#include <nx/mediaserver/sdk_support/loggers.h>
 #include <nx/mediaserver/server_module_aware.h>
 
 #include <nx/utils/std/optional.h>
@@ -34,6 +34,7 @@ public:
 
 private:
     std::optional<nx::vms::api::analytics::PluginManifest> pluginManifest() const;
+    std::unique_ptr<sdk_support::AbstractManifestLogger> makeLogger() const;
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;

@@ -4,6 +4,7 @@
 
 #include <plugins/plugin_api.h>
 #include <nx/sdk/common.h>
+#include <nx/sdk/i_string.h>
 
 #include "engine.h"
 
@@ -28,17 +29,11 @@ class Plugin: public nxpl::Plugin2
 public:
 
     /**
-     * Provides null terminated UTF-8 string containing a JSON manifest.
+     * Provides plugin manifest in JSON format.
      * @param outError Status of the operation; is set to noError before this call.
-     * @return Pointer to a C-style string which must be valid while this Plugin object exists.
+     * @return JSON string in UTF-8.
      */
-    virtual const char* manifest(nx::sdk::Error* outError) const = 0;
-
-    /**
-    * Tells Plugin that the memory previously returned by manifest() pointed to
-    * by data is no longer needed and may be disposed.
-    */
-    virtual void freeManifest(const char* data) = 0;
+    virtual const IString* manifest(nx::sdk::Error* outError) const = 0;
 
     /**
      * Creates a new instance of analytics::Engine.

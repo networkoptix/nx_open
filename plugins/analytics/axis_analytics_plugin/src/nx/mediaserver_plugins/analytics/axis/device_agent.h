@@ -42,9 +42,7 @@ public:
     virtual nx::sdk::Error setNeededMetadataTypes(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
 
-    virtual const char* manifest(nx::sdk::Error* error) override;
-
-    virtual void freeManifest(const char* data) override;
+    virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
 
     const EngineManifest& events() const noexcept
     {
@@ -76,7 +74,7 @@ private:
      * Place to store manifests we gave to the caller to provide 1) sufficient lifetime and
      * 2) memory releasing in destructor.
      */
-    QList<QByteArray> m_givenManifests;
+    mutable QList<QByteArray> m_givenManifests;
 
     nx::sdk::analytics::MetadataHandler* m_metadataHandler = nullptr;
 };

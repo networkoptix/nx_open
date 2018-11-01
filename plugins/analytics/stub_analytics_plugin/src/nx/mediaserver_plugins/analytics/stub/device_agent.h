@@ -25,7 +25,7 @@ public:
     virtual nx::sdk::Settings* settings() const override;
 
 protected:
-    virtual std::string manifest() override;
+    virtual std::string manifest() const override;
 
     virtual void settingsChanged() override;
 
@@ -48,10 +48,11 @@ private:
 
     bool checkFrame(const nx::sdk::analytics::UncompressedVideoFrame* videoFrame) const;
 
-    nx::sdk::Error startFetchingMetadata(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes);
+    // TODO: #dmishin Get rid of these methods. 
+    virtual nx::sdk::Error startFetchingMetadata(
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
 
-    void stopFetchingMetadata();
+    virtual void stopFetchingMetadata() override;
 
 private:
     std::unique_ptr<std::thread> m_thread;

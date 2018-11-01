@@ -229,20 +229,18 @@ QVariantMap fromSdkSettings(const nx::sdk::Settings* sdkSettings)
 
 void saveManifestToFile(
     const nx::utils::log::Tag& logTag,
-    const char* const manifest,
-    const QString& fileDescription,
-    const QString& pluginLibName,
-    const QString& filenameExtraSuffix)
+    const QString& manifest,
+    const QString& baseFileName)
 {
     const QString dir = manifestFileDir();
-    const QString filename = dir + pluginLibName + filenameExtraSuffix + lit("_manifest.json");
+    const QString filename = dir + baseFileName + lit("_manifest.json");
 
     using nx::utils::log::Level;
     auto log = //< Can be used to return after logging: return log(...).
         [&](Level level, const QString& message)
         {
-            NX_UTILS_LOG(level, logTag) << lm("Metadata %1 manifest: %2: [%3]")
-                .args(fileDescription, message, filename);
+            NX_UTILS_LOG(level, logTag) << lm("Analytics manifest: %1: [%2]")
+                .args(message, filename);
         };
 
     log(Level::info, lit("Saving to file"));
@@ -254,8 +252,7 @@ void saveManifestToFile(
     if (!f.open(QFile::WriteOnly))
         return log(Level::error, lit("Unable to (re)create file"));
 
-    const qint64 len = (qint64)strlen(manifest);
-    if (f.write(manifest, len) != len)
+    if (f.write(manifest.toUtf8()) < 0)
         return log(Level::error, lit("Unable to write to file"));
 }
 

@@ -4,6 +4,8 @@
 
 #include "common_engine.h"
 
+#include <nx/sdk/common/string.h>
+
 namespace nx {
 namespace sdk {
 namespace analytics {
@@ -68,16 +70,12 @@ void CommonPlugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
     m_pluginContainer = pluginContainer;
 }
 
-const char* CommonPlugin::manifest(nx::sdk::Error* outError) const
+const IString* CommonPlugin::manifest(nx::sdk::Error* outError) const
 {
     if (outError)
         *outError = nx::sdk::Error::noError;
-    return m_manifest.c_str();
-}
 
-void CommonPlugin::freeManifest(const char* data)
-{
-    // Do nothing.
+    return new common::String(m_manifest);
 }
 
 Engine* CommonPlugin::createEngine(Error* outError)

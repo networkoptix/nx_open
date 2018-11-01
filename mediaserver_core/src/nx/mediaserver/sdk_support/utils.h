@@ -21,6 +21,8 @@
 #include <nx/mediaserver/resource/analytics_plugin_resource.h>
 #include <nx/mediaserver/resource/analytics_engine_resource.h>
 
+#include <nx/mediaserver/sdk_support/loggers.h>
+
 #include <nx/sdk/settings.h>
 #include <plugins/settings.h>
 
@@ -40,33 +42,58 @@ class SdkObjectFactory;
 
 namespace nx::mediaserver::sdk_support {
 
-template<typename ManifestType>
-std::optional<ManifestType> manifest(const char* const manifestString)
-{
-    bool success = false;
-    auto deserializedManifest = QJson::deserialized(manifestString, ManifestType(), &success);
-    if (!success)
-        return std::nullopt;
+namespace details {
 
-    return deserializedManifest;
-}
+DECLARE_FIELD_DETECTOR(hasGroupId, groupId, std::set<QString>);
+DECLARE_FIELD_DETECTOR(hasPaths, paths, std::set<nx::vms::api::analytics::HierarchyPath>);
+DECLARE_FIELD_DETECTOR_SIMPLE(hasItem, item);
+
+} // namespace details
 
 template<typename ManifestType, typename SdkObjectPtr>
-std::optional<ManifestType> manifest(const SdkObjectPtr& sdkObject)
+std::optional<ManifestType> manifest(
+    const SdkObjectPtr& sdkObject,
+    std::unique_ptr<AbstractManifestLogger> logger = nullptr)
 {
     nx::sdk::Error error = nx::sdk::Error::noError;
+    sdk_support::UniquePtr<const nx::sdk::IString> manifestStr(sdkObject->manifest(&error));
 
-    // TODO: #dmishin RAII wrapper for manifest. Or change manifest interface
-    // from char* to PluginInterface.
-    auto deleter = [&sdkObject](const char* manifestMem) { sdkObject->freeManifest(manifestMem); };
-    std::unique_ptr<const char, decltype(deleter)> manifestStr(
-        sdkObject->manifest(&error),
-        deleter);
+    auto log =
+        [&logger](
+            const QString& manifestString,
+            nx::sdk::Error error,
+            const QString& customError = QString())
+        {
+            if (logger)
+                logger->log(manifestString, error, customError);
+        };
 
     if (error != nx::sdk::Error::noError)
+    {
+        log(QString(), error);
         return std::nullopt;
+    }
 
-    return manifest<ManifestType>(manifestStr.get());
+    if (!manifestStr)
+    {
+        log(QString(), nx::sdk::Error::unknownError, "No manifest string");
+        return std::nullopt;
+    }
+
+    const auto rawString = manifestStr->str();
+    if (!NX_ASSERT(rawString))
+        return std::nullopt;
+   
+    bool success = false;
+    auto deserializedManifest = QJson::deserialized(rawString, ManifestType(), &success);
+    if (!success)
+    {
+        log(rawString, nx::sdk::Error::unknownError, "Can't deserialize manifest");
+        return std::nullopt;
+    }
+
+    log(rawString, nx::sdk::Error::noError);
+    return deserializedManifest;
 }
 
 template<typename Interface, typename SdkObject>
@@ -111,10 +138,8 @@ QVariantMap fromSdkSettings(const nx::sdk::Settings* sdkSettings);
 
 void saveManifestToFile(
     const nx::utils::log::Tag& logTag,
-    const char* const manifest,
-    const QString& fileDescription,
-    const QString& pluginLibName,
-    const QString& filenameExtraSuffix);
+    const QString& manifest,
+    const QString& baseFileName);
 
 std::optional<nx::sdk::analytics::UncompressedVideoFrame::PixelFormat>
     pixelFormatFromEngineManifest(
@@ -123,14 +148,6 @@ std::optional<nx::sdk::analytics::UncompressedVideoFrame::PixelFormat>
 
 resource::AnalyticsEngineResourceList toServerEngineList(
     const nx::vms::common::AnalyticsEngineResourceList engineList);
-
-namespace details {
-
-DECLARE_FIELD_DETECTOR(hasGroupId, groupId, std::set<QString>);
-DECLARE_FIELD_DETECTOR(hasPaths, paths, std::set<nx::vms::api::analytics::HierarchyPath>);
-DECLARE_FIELD_DETECTOR_SIMPLE(hasItem, item);
-
-} // namespace details
 
 template <typename Descriptor, typename Item>
 std::map<QString, Descriptor> descriptorsFromItemList(

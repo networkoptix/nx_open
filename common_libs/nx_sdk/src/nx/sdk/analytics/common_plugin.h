@@ -50,9 +50,7 @@ public:
     virtual void setSettings(const nxpl::Setting* settings, int count) override;
     virtual void setPluginContainer(nxpl::PluginInterface* pluginContainer) override;
 
-    virtual const char* manifest(nx::sdk::Error* outError) const override;
-
-    virtual void freeManifest(const char* data) override;
+    virtual const IString* manifest(nx::sdk::Error* outError) const override;
 
     virtual Engine* createEngine(Error* outError) override;
 

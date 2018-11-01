@@ -11,6 +11,7 @@
 
 #include <nx/sdk/analytics/engine.h>
 #include <nx/sdk/analytics/device_agent.h>
+#include <nx/sdk/analytics/common_metadata_types.h>
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 
@@ -18,6 +19,8 @@
 #include <nx/mediaserver/resource/resource_fwd.h>
 #include <nx/mediaserver/analytics/metadata_handler.h>
 #include <nx/mediaserver/server_module_aware.h>
+
+#include <nx/mediaserver/sdk_support/loggers.h>
 
 namespace nx::mediaserver::analytics {
 
@@ -66,6 +69,10 @@ private:
     bool updateDeviceWithManifest(const nx::vms::api::analytics::DeviceAgentManifest& manifest);
     bool updateDescriptorsWithManifest(
         const nx::vms::api::analytics::DeviceAgentManifest& manifest);
+
+    sdk_support::UniquePtr<nx::sdk::analytics::CommonMetadataTypes> neededMetadataTypes() const;
+    std::unique_ptr<sdk_support::AbstractManifestLogger> makeLogger(
+        const QString& manifestTypes) const;
 
 private:
     mutable QnMutex m_mutex;

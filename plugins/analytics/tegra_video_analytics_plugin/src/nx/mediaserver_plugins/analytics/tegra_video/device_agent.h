@@ -25,7 +25,7 @@ public:
     virtual ~DeviceAgent() override;
 
 protected:
-    virtual std::string manifest() override;
+    virtual std::string manifest() const override;
 
     virtual bool pushCompressedVideoFrame(
         const nx::sdk::analytics::CompressedVideoPacket* videoFrame) override;

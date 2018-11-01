@@ -2,6 +2,7 @@
 
 #include <plugins/plugin_api.h>
 #include <nx/sdk/common.h>
+#include <nx/sdk/i_string.h>
 
 #include "device_agent.h"
 #include "action.h"
@@ -59,16 +60,9 @@ public:
      * be called again at any other moment to obtain the most actual manifest.
      *
      * @param outError Status of the operation; is set to noError before this call.
-     * @return Pointer to a C-style UTF-8 string string which must be valid while this Engine
-     *     object exists.
+     * @return JSON string in UTF-8.
      */
-    virtual const char* manifest(Error* outError) const = 0;
-
-    /**
-     * Tells Engine that the memory previously returned by manifest() pointed to
-     * by data is no longer needed and may be disposed.
-     */
-    virtual void freeManifest(const char* data) = 0;
+    virtual const IString* manifest(Error* outError) const = 0;
 
     /**
      * Creates, or returns an already existing, a DeviceAgent instance intended to work with the

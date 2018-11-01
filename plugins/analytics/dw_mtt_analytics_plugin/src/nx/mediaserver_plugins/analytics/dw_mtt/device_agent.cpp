@@ -15,6 +15,8 @@
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 
+#include <nx/sdk/common/string.h>
+
 #include <nx/sdk/analytics/common_event.h>
 #include <nx/sdk/analytics/common_event_metadata_packet.h>
 
@@ -487,14 +489,9 @@ void DeviceAgent::stopFetchingMetadata()
     promise.get_future().wait();
 }
 
-const char* DeviceAgent::manifest(nx::sdk::Error* error)
+const nx::sdk::IString* DeviceAgent::manifest(nx::sdk::Error* error) const
 {
-    return m_cameraManifest;
-}
-
-void DeviceAgent::freeManifest(const char* /*data*/)
-{
-    // Do nothing. Manifest string is stored in member-variable.
+    return new nx::sdk::common::String(m_cameraManifest);
 }
 
 void DeviceAgent::setSettings(const nx::sdk::Settings* settings)

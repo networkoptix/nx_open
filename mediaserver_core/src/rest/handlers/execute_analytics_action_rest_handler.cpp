@@ -17,6 +17,8 @@
 #include <plugins/settings.h>
 #include <plugins/plugin_tools.h>
 
+using namespace nx::mediaserver;
+
 QnExecuteAnalyticsActionRestHandler::QnExecuteAnalyticsActionRestHandler(
     QnMediaServerModule* serverModule):
     nx::mediaserver::ServerModuleAware(serverModule)
@@ -28,7 +30,7 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
     const QnRequestParams& /*params*/,
     const QByteArray& body,
     QnJsonRestResult& result,
-    const QnRestConnectionProcessor* owner)
+    const QnRestConnectionProcessor* /*owner*/)
 {
     using namespace nx::mediaserver;
     bool success = false;
@@ -57,7 +59,7 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
 
     for (auto& engineResource: resourcePool()->getResources<resource::AnalyticsEngineResource>())
     {
-        if (engineResource->plugin()->manifest().id == actionData.pluginId)
+         if (engineResource->plugin()->manifest().id == actionData.pluginId)
         {
             AnalyticsActionResult actionResult;
             QString errorMessage = executeAction(
@@ -83,8 +85,6 @@ namespace {
 class Action: public nxpt::CommonRefCounter<nx::sdk::analytics::Action>
 {
 public:
-    virtual ~Action() {}
-
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override
     {
         if (interfaceId == nx::sdk::analytics::IID_Action)
@@ -176,3 +176,17 @@ QString QnExecuteAnalyticsActionRestHandler::executeAction(
 
     return errorMessage(error);
 }
+
+std::unique_ptr<sdk_support::AbstractManifestLogger>
+    QnExecuteAnalyticsActionRestHandler::makeLogger(
+        resource::AnalyticsEngineResourcePtr engineResource) const
+{
+    const QString messageTemplate(
+        "Error occurred while fetching Engine manifest for engine: {:engine}: {:error}");
+
+    return std::make_unique<sdk_support::ManifestLogger>(
+        nx::utils::log::Tag(typeid(this)),
+        messageTemplate,
+        std::move(engineResource));
+}
+

@@ -8,6 +8,8 @@
 
 #include <nx/mediaserver_plugins/utils/uuid.h>
 
+#include <nx/sdk/common/string.h>
+
 #include "device_agent.h"
 #include "log.h"
 
@@ -82,15 +84,10 @@ nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
         return nullptr;
 }
 
-const char* Engine::manifest(Error* error) const
+const nx::sdk::IString* Engine::manifest(Error* error) const
 {
     *error = Error::noError;
-    return m_manifest.constData();
-}
-
-void Engine::freeManifest(const char* manifestData)
-{
-    // Do nothing actually.
+    return new common::String(m_manifest);
 }
 
 const EventType* Engine::eventTypeById(const QString& id) const noexcept

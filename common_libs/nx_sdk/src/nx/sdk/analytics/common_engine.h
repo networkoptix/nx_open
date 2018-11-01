@@ -99,8 +99,7 @@ public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
     virtual void setSettings(const nx::sdk::Settings* settings) override;
     virtual nx::sdk::Settings* settings() const override;
-    virtual const char* manifest(Error* error) const override;
-    void freeManifest(const char* data) override;
+    virtual const IString* manifest(Error* error) const override;
 
     virtual void executeAction(Action* action, Error* outError) override;
 
@@ -110,7 +109,6 @@ private:
 private:
     Plugin* const m_plugin;
     std::map<std::string, std::string> m_settings;
-    mutable std::string m_manifest; //< Cache the manifest to guarantee a lifetime for char*.
 };
 
 } // namespace analytics

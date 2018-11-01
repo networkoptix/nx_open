@@ -15,6 +15,7 @@
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/sdk/common/string.h>
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -109,15 +110,10 @@ nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
     return deviceAgent;
 }
 
-const char* Engine::manifest(Error* error) const
+const nx::sdk::IString* Engine::manifest(Error* error) const
 {
     *error = Error::noError;
-    return m_manifest.constData();
-}
-
-void Engine::freeManifest(const char* data)
-{
-    // Do nothing actually.
+    return new common::String(m_manifest);
 }
 
 QList<QString> Engine::parseSupportedEvents(const QByteArray& data)

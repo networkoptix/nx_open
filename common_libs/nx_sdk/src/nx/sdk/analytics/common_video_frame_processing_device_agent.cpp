@@ -5,6 +5,7 @@
 #include <nx/kit/debug.h>
 
 #include <nx/sdk/utils.h>
+#include <nx/sdk/common/string.h>
 #include <nx/sdk/analytics/common_engine.h>
 #include <nx/sdk/analytics/plugin.h>
 
@@ -187,17 +188,9 @@ void CommonVideoFrameProcessingDeviceAgent::stopFetchingMetadata()
     NX_PRINT << __func__ << "() -> noError";
 }
 
-const char* CommonVideoFrameProcessingDeviceAgent::manifest(Error* /*error*/)
+const IString* CommonVideoFrameProcessingDeviceAgent::manifest(Error* /*error*/) const
 {
-    const std::string manifestStr = manifest();
-    char* manifestData = new char[manifestStr.size() + 1];
-    strncpy(manifestData, manifestStr.c_str(), manifestStr.size() + 1);
-    return manifestData;
-}
-
-void CommonVideoFrameProcessingDeviceAgent::freeManifest(const char* data)
-{
-    delete[] data;
+    return new common::String(manifest());
 }
 
 void CommonVideoFrameProcessingDeviceAgent::setSettings(const nx::sdk::Settings* settings)

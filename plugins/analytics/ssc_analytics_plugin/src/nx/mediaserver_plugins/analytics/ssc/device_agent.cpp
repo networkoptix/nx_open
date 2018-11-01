@@ -4,6 +4,8 @@
 
 #include <nx/fusion/model_functions.h>
 
+#include <nx/sdk/common/string.h>
+
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 
 #include <nx/sdk/analytics/common_event.h>
@@ -101,14 +103,10 @@ nx::sdk::Error DeviceAgent::stopFetchingMetadata()
     return nx::sdk::Error::noError;
 }
 
-const char* DeviceAgent::manifest(nx::sdk::Error* error)
+const nx::sdk::IString* DeviceAgent::manifest(nx::sdk::Error* error) const
 {
-    return m_deviceAgentManifest;
-}
-
-void DeviceAgent::freeManifest(const char* /*data*/)
-{
-    // Do nothing. Manifest string is stored in member-variable.
+    *error = nx::sdk::Error::noError;
+    return new nx::sdk::common::String(m_deviceAgentManifest);
 }
 
 sdk::Error DeviceAgent::setMetadataHandler(nx::sdk::analytics::MetadataHandler* metadataHandler)
@@ -129,7 +127,7 @@ sdk::Error DeviceAgent::setNeededMetadataTypes(
     return startFetchingMetadata(metadataTypes);
 }
 
-void DeviceAgent::setSettings(const nx::sdk::Settings* settings)
+void DeviceAgent::setSettings(const nx::sdk::Settings* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }

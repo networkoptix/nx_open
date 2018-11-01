@@ -7,16 +7,21 @@
 // TODO: #mshevchenko: Move to namespace common.
 namespace nx::mediaserver::sdk_support {
 
-using SdkObjectDeleter = std::function<void(nxpl::PluginInterface*)>;
-
-void sdkDeleter(nxpl::PluginInterface* pluginInterface);
+using SdkObjectDeleter = std::function<void(const nxpl::PluginInterface*)>;
 
 template <typename RefCountable>
 class UniquePtr
 {
 public:
     UniquePtr(RefCountable* refCountable):
-        m_ptr(refCountable, [](nxpl::PluginInterface* ptr) { if (ptr) ptr->releaseRef(); })
+        m_ptr(
+            refCountable,
+            [](const nxpl::PluginInterface* ptr)
+            {
+                // TODO: #dmishin Remove const_cast when releaseRef becomes const.
+                if (ptr)
+                    const_cast<nxpl::PluginInterface*>(ptr)->releaseRef();
+            })
     {
     }
 
@@ -29,7 +34,7 @@ public:
     RefCountable* release() noexcept { return m_ptr.release(); }
     RefCountable* get() const noexcept { return m_ptr.get();  }
     RefCountable* operator->() const noexcept { return m_ptr.get(); }
-    operator bool() const noexcept { return (bool) m_ptr; }
+    operator bool() const noexcept { return !!m_ptr; }
 
     UniquePtr& operator=(const UniquePtr& other) = delete;
     UniquePtr& operator=(UniquePtr&& other) noexcept
@@ -52,7 +57,14 @@ class SharedPtr
 {
 public:
     SharedPtr(RefCountable* refCountable):
-        m_ptr(refCountable, [](RefCountable* ptr) { if (ptr) ptr->releaseRef(); })
+        m_ptr(
+            refCountable,
+            [](const nxpl::PluginInterface* ptr)
+            {
+                // TODO: #dmishin Remove const_cast when releaseRef becomes const.
+                if (ptr)
+                    const_cast<nxpl::PluginInterface*>(ptr)->releaseRef();
+            })
     {
     }
     SharedPtr(SharedPtr&& other): m_ptr(std::move(other.m_ptr)) {}
@@ -64,7 +76,7 @@ public:
     RefCountable* release() noexcept { return m_ptr.release(); }
     RefCountable* get() const noexcept { return m_ptr.get(); }
     RefCountable* operator->() const noexcept { return m_ptr.get(); }
-    operator bool() const noexcept { return (bool)m_ptr; }
+    operator bool() const noexcept { return !!m_ptr; }
 
     SharedPtr& operator=(const SharedPtr& other) noexcept
     {
