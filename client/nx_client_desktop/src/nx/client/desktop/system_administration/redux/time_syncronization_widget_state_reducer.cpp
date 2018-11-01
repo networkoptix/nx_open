@@ -64,7 +64,9 @@ Result TimeSynchronizationWidgetReducer::setSyncTimeWithInternet(
     if (value)
     {
         state.enabled = true;
-        state.lastPrimaryServer = state.primaryServer;
+        // Overwrite last primary server only if actual
+        if (state.lastPrimaryServer.isNull() || !state.primaryServer.isNull())
+            state.lastPrimaryServer = state.primaryServer;
         state.primaryServer = QnUuid();
         state.status = hasInternet(state)
             ? State::Status::synchronizedWithInternet
@@ -90,6 +92,19 @@ Result TimeSynchronizationWidgetReducer::setSyncTimeWithInternet(
         state.primaryServer = QnUuid();
         state.status = State::Status::notSynchronized;
     }
+    state.hasChanges = true;
+    return {true, std::move(state)};
+}
+
+Result TimeSynchronizationWidgetReducer::disableSync(State state)
+{
+    if (!state.enabled)
+        return {false, std::move(state)};
+
+    state.lastPrimaryServer = state.primaryServer;
+    state.enabled = false;
+    state.primaryServer = QnUuid();
+    state.status = State::Status::notSynchronized;
     state.hasChanges = true;
     return {true, std::move(state)};
 }

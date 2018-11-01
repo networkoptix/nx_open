@@ -19,6 +19,7 @@
 #include "../redux/time_syncronization_widget_store.h"
 #include "../redux/time_syncronization_widget_state.h"
 #include "../models/time_synchronization_servers_model.h"
+#include <ui/style/skin.h>
 
 namespace nx::client::desktop {
 
@@ -27,11 +28,11 @@ using Model = TimeSynchronizationServersModel;
 
 namespace {
 
-static constexpr int kTimeFontSizePixels = 40;
+static constexpr int kTimeFontPixelSize = 40;
 static constexpr int kTimeFontWeight = QFont::Normal;
-static constexpr int kDateFontSizePixels = 14;
+static constexpr int kDateFontPixelSize = 14;
 static constexpr int kDateFontWeight = QFont::Bold;
-static constexpr int kZoneFontSizePixels = 14;
+static constexpr int kZoneFontPixelSize = 14;
 static constexpr int kZoneFontWeight = QFont::Normal;
 static constexpr int kMinimumDateTimeWidth = 84;
 
@@ -88,6 +89,9 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
 
     connect(ui->syncWithInternetCheckBox, &QCheckBox::clicked, m_store,
         &TimeSynchronizationWidgetStore::setSyncTimeWithInternet);
+
+    connect(ui->disableSyncRadioButton, &QRadioButton::clicked, m_store,
+        &TimeSynchronizationWidgetStore::disableSync);
 
     //connect(m_serversModel, &Model::serverSelected, m_store,
     //    &TimeSynchronizationWidgetStore::selectServer);
@@ -165,18 +169,20 @@ void TimeSynchronizationWidget::setupUi()
     ui->syncWithInternetCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->syncWithInternetCheckBox->setForegroundRole(QPalette::ButtonText);
 
+    ui->placeholderImageLabel->setPixmap(qnSkin->pixmap("placeholders/time_placeholder.png"));
+
     QFont font;
-    font.setPixelSize(kTimeFontSizePixels);
+    font.setPixelSize(kTimeFontPixelSize);
     font.setWeight(kTimeFontWeight);
     ui->timeLabel->setFont(font);
     ui->timeLabel->setForegroundRole(QPalette::Text);
 
-    font.setPixelSize(kDateFontSizePixels);
+    font.setPixelSize(kDateFontPixelSize);
     font.setWeight(kDateFontWeight);
     ui->dateLabel->setFont(font);
     ui->dateLabel->setForegroundRole(QPalette::Light);
 
-    font.setPixelSize(kZoneFontSizePixels);
+    font.setPixelSize(kZoneFontPixelSize);
     font.setWeight(kZoneFontWeight);
     ui->zoneLabel->setFont(font);
     ui->zoneLabel->setForegroundRole(QPalette::Light);
@@ -241,6 +247,9 @@ void TimeSynchronizationWidget::loadState(const State& state)
 
     ui->syncWithInternetCheckBox->setChecked(isSyncWithInternet);
     setReadOnly(ui->syncWithInternetCheckBox, state.readOnly);
+
+    ui->disableSyncRadioButton->setChecked(!state.enabled);
+    setReadOnly(ui->disableSyncRadioButton, state.readOnly);
 
     m_serversModel->loadState(state);
 

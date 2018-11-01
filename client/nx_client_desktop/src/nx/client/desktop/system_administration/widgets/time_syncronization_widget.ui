@@ -12,7 +12,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
-    <number>8</number>
+    <number>0</number>
    </property>
    <property name="leftMargin">
     <number>0</number>
@@ -39,7 +39,7 @@
        <number>16</number>
       </property>
       <property name="bottomMargin">
-       <number>8</number>
+       <number>16</number>
       </property>
       <item>
        <widget class="QCheckBox" name="syncWithInternetCheckBox">
@@ -59,6 +59,12 @@
    </item>
    <item>
     <widget class="Line" name="line">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>1</height>
+      </size>
+     </property>
      <property name="frameShadow">
       <enum>QFrame::Plain</enum>
      </property>
@@ -80,7 +86,7 @@
        <number>16</number>
       </property>
       <property name="bottomMargin">
-       <number>4</number>
+       <number>16</number>
       </property>
       <item>
        <widget class="QStackedWidget" name="vmsTimeWidget">
@@ -161,24 +167,6 @@
         </widget>
        </widget>
       </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QWidget" name="statusWidget" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout_7">
-      <property name="leftMargin">
-       <number>16</number>
-      </property>
-      <property name="topMargin">
-       <number>4</number>
-      </property>
-      <property name="rightMargin">
-       <number>16</number>
-      </property>
-      <property name="bottomMargin">
-       <number>8</number>
-      </property>
       <item>
        <widget class="nx::client::desktop::InfoBanner" name="statusLabel">
         <property name="text">
@@ -191,6 +179,12 @@
    </item>
    <item>
     <widget class="Line" name="line_2">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>1</height>
+      </size>
+     </property>
      <property name="frameShadow">
       <enum>QFrame::Plain</enum>
      </property>

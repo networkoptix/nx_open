@@ -230,5 +230,71 @@ TEST_F(TimeSynchronizationWidgetReducerTest, keepOldSelectedServer)
     ASSERT_EQ(result.status, State::Status::synchronizedWithSelectedServer);
 }
 
+// Disabling sync when sync with internet
+TEST_F(TimeSynchronizationWidgetReducerTest, disableSyncWhenSyncedWithInternet)
+{
+    auto state = Reducer::initialize(State(),
+        /*isTimeSynchronizationEnabled*/ true,
+        /*primaryTimeServer*/ QnUuid(),
+        /*servers*/ {server()});
+
+    bool changed = false;
+    State result;
+    std::tie(changed, result) = Reducer::disableSync(std::move(state));
+    ASSERT_TRUE(changed);
+    ASSERT_FALSE(result.enabled);
+    ASSERT_TRUE(result.primaryServer.isNull());
+    ASSERT_EQ(result.status, State::Status::notSynchronized);
+}
+
+// Disable sync must keep last primary server
+TEST_F(TimeSynchronizationWidgetReducerTest, disableSyncWhenServerSelected)
+{
+    const auto id = QnUuid::createUuid();
+    auto state = Reducer::initialize(State(),
+        /*isTimeSynchronizationEnabled*/ true,
+        /*primaryTimeServer*/ id,
+        /*servers*/ {server(id)});
+
+    bool changed = false;
+    State result;
+    std::tie(changed, result) = Reducer::disableSync(std::move(state));
+    ASSERT_TRUE(changed);
+    ASSERT_FALSE(result.enabled);
+    ASSERT_TRUE(result.primaryServer.isNull());
+    ASSERT_EQ(result.lastPrimaryServer, id);
+    ASSERT_EQ(result.status, State::Status::notSynchronized);
+}
+
+// Enabling and disabling internet sync after sync was disabled must keep selected time server.
+TEST_F(TimeSynchronizationWidgetReducerTest, keepOldSelectedServerAfterSyncWasDisabled)
+{
+    const auto id = QnUuid::createUuid();
+    auto state = Reducer::initialize(State(),
+        /*isTimeSynchronizationEnabled*/ true,
+        /*primaryTimeServer*/ id,
+        /*servers*/ {server(id), server()});
+
+    bool changed = false;
+
+    State afterDisabled;
+    std::tie(changed, afterDisabled) = Reducer::disableSync(std::move(state));
+    ASSERT_TRUE(changed);
+    ASSERT_EQ(afterDisabled.lastPrimaryServer, id);
+    ASSERT_EQ(afterDisabled.status, State::Status::notSynchronized);
+
+    State afterEnabled;
+    std::tie(changed, afterEnabled) = Reducer::setSyncTimeWithInternet(std::move(afterDisabled), true);
+    ASSERT_TRUE(changed);
+    ASSERT_EQ(afterEnabled.lastPrimaryServer, id);
+    ASSERT_EQ(afterEnabled.status, State::Status::synchronizedWithInternet);
+
+    State result;
+    std::tie(changed, result) = Reducer::setSyncTimeWithInternet(std::move(afterEnabled), false);
+    ASSERT_TRUE(changed);
+    ASSERT_EQ(result.lastPrimaryServer, id);
+    ASSERT_EQ(result.status, State::Status::synchronizedWithSelectedServer);
+}
+
 } // namespace test
 } // namespace nx::client::desktop

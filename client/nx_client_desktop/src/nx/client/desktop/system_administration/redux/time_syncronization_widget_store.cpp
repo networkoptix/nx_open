@@ -58,6 +58,12 @@ void TimeSynchronizationWidgetStore::setSyncTimeWithInternet(bool value)
         [&](State state) { return Reducer::setSyncTimeWithInternet(std::move(state), value); });
 }
 
+void TimeSynchronizationWidgetStore::disableSync()
+{
+    d->executeAction(
+        [&](State state) { return Reducer::disableSync(std::move(state)); });
+}
+
 void TimeSynchronizationWidgetStore::setVmsTime(std::chrono::milliseconds value)
 {
     d->executeAction([&](State state) { state.vmsTime = value; return state; });
