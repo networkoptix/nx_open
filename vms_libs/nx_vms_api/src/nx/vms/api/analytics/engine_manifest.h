@@ -45,10 +45,6 @@ struct NX_VMS_API EngineManifest
     };
     Q_DECLARE_FLAGS(Capabilities, Capability)
 
-    // TODO: Remove when not needed for GUI's EventTypeDescriptor.
-    QString pluginId;
-    TranslatableString pluginName;
-
     Capabilities capabilities;
 
     /** Types of Events that can potentially be produced by any DeviceAgent of this Engine. */
@@ -67,8 +63,7 @@ struct NX_VMS_API EngineManifest
     // TODO: Add Engine dynamic settings.
 };
 #define EngineManifest_Fields \
-    (pluginId)(pluginName)(capabilities) \
-    (eventTypes)(objectTypes)(objectActions)(groups)(deviceAgentSettingsModel)
+    (capabilities)(eventTypes)(objectTypes)(objectActions)(groups)(deviceAgentSettingsModel)
 QN_FUSION_DECLARE_FUNCTIONS(EngineManifest, (json), NX_VMS_API)
 Q_DECLARE_OPERATORS_FOR_FLAGS(EngineManifest::Capabilities)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EngineManifest::Capability)

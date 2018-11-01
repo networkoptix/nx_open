@@ -1,9 +1,4 @@
 {
-    "pluginId": "nx.hikvision", 
-    "pluginName": {
-        "value": "Hikvision metadata driver", 
-        "localization": {}
-    }, 
     "capabilities": "deviceModelDependent",
     "outputEventTypes": [
         {

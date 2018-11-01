@@ -358,9 +358,6 @@ public:
                 for (int i = 0; i < 5; ++i)
                 {
                     nx::vms::api::analytics::EngineManifest manifest;
-                    manifest.pluginId = lit("nx.generatedDriver.%1").arg(i);
-                    manifest.pluginName.value = lit("Plugin %1").arg(i);
-                    manifest.pluginName.localization[lit("ru_RU")] = lit("Russian %1").arg(i);
                     for (int j = 0; j < 3; ++j)
                     {
                         nx::vms::api::analytics::EventType eventType;
@@ -381,6 +378,7 @@ public:
 
                 for (auto server: servers)
                 {
+                    // TODO: #sivanov: Get rid of the term "driver".
                     auto drivers = server->analyticsDrivers();
                     // Some devices will not have an Engine.
                     drivers.push_back(nx::vms::api::analytics::EngineManifest());
@@ -388,18 +386,11 @@ public:
                     for (auto camera: resourcePool()->getAllCameras(server, true))
                     {
                         const auto randomDriver = nx::utils::random::choice(drivers);
-                        if (randomDriver.pluginId.isEmpty()) //< dummy driver
-                        {
-                            camera->setSupportedAnalyticsEventTypeIds(QnUuid(), {});
-                        }
-                        else
-                        {
-                            QSet<QString> eventTypeIds;
-                            for (const auto& eventType: randomDriver.eventTypes)
-                                eventTypeIds.insert(eventType.id);
+                        QSet<QString> eventTypeIds;
+                        for (const auto& eventType: randomDriver.eventTypes)
+                            eventTypeIds.insert(eventType.id);
 
-                            camera->setSupportedAnalyticsEventTypeIds(QnUuid(), eventTypeIds);
-                        }
+                        camera->setSupportedAnalyticsEventTypeIds(QnUuid(), eventTypeIds);
 
                         camera->saveParamsAsync();
                     }

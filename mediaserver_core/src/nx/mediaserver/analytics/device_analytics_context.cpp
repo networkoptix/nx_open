@@ -135,6 +135,42 @@ AbstractVideoDataReceptor::NeededUncompressedPixelFormats
     return m_cachedUncompressedPixelFormats;
 }
 
+static QString getEngineLogLabel(QnMediaServerModule* serverModule, QnUuid engineId)
+{
+    const auto& engineResource =
+        serverModule->resourcePool()->getResourceById<resource::AnalyticsEngineResource>(
+            engineId);
+    if (!NX_ASSERT(engineResource)
+        || !NX_ASSERT(engineResource->sdkEngine()))
+    {
+        return "unknown Analytics Engine";
+    }
+
+    if (!NX_ASSERT(engineResource->sdkEngine()->plugin())
+        || !NX_ASSERT(engineResource->sdkEngine()->plugin()->name()))
+    {
+        return lm("Analytics Engine %1 of unknown Plugin").arg(engineResource->getName());
+    }
+
+    return lm("Analytics Engine %1 of Plugin %2").args(
+        engineResource->getName(), engineResource->plugin()->manifest().id);
+}
+
+static std::optional<nx::sdk::analytics::UncompressedVideoFrame::PixelFormat> pixelFormatForEngine(
+    QnMediaServerModule* serverModule,
+    QnUuid engineId,
+    const std::shared_ptr<nx::mediaserver::analytics::DeviceAnalyticsBinding>& binding,
+    bool* outSuccess)
+{
+    *outSuccess = false;
+    const QString engineLogLabel = getEngineLogLabel(serverModule, engineId);
+    const auto engineManifest = binding->engineManifest();
+    if (!NX_ASSERT(engineManifest, lm("Engine %1").arg(engineLogLabel)))
+        return std::nullopt;
+    *outSuccess = true;
+    return sdk_support::pixelFormatFromEngineManifest(*engineManifest, engineLogLabel);
+}
+
 void DeviceAnalyticsContext::putFrame(
     const QnConstCompressedVideoDataPtr& compressedFrame,
     const CLConstVideoDecoderOutputPtr& uncompressedFrame)
@@ -156,20 +192,19 @@ void DeviceAnalyticsContext::putFrame(
 
     for (auto& entry: m_bindings)
     {
+        const QnUuid engineId = entry.first;
+
         auto& binding = entry.second;
         if (!binding->isStreamConsumer())
             continue;
 
-        const auto engineManifest = binding->engineManifest();
-        if (!engineManifest)
-        {
-            NX_ERROR(this, "Unable to fetch engine manifest for device %1 (%2)",
-                m_device->getUserDefinedName(), m_device->getId());
+        bool gotPixelFormat = false;
+        const auto pixelFormat = pixelFormatForEngine(
+            serverModule(), engineId, binding, &gotPixelFormat);
+        if (!gotPixelFormat)
             continue;
-        }
 
-        if (nx::sdk::analytics::DataPacket* const dataPacket = frameConverter.getDataPacket(
-            sdk_support::pixelFormatFromEngineManifest(*engineManifest)))
+        if (const auto& dataPacket = frameConverter.getDataPacket(pixelFormat))
         {
             if (binding->canAcceptData()
                 && NX_ASSERT(dataPacket->timestampUsec() >= 0))
@@ -179,7 +214,7 @@ void DeviceAnalyticsContext::putFrame(
             else
             {
                 NX_INFO(this, "Skipped video frame for %1 from camera %2: queue overflow.",
-                   engineManifest->pluginName.value, m_device->getId());
+                    getEngineLogLabel(serverModule(), engineId), m_device->getId());
             }
         }
         else
@@ -289,15 +324,17 @@ void DeviceAnalyticsContext::updateSupportedFrameTypes()
     bool needsCompressedFrames = false;
     for (auto& entry: m_bindings)
     {
+        const QnUuid engineId = entry.first;
+
         auto binding = entry.second;
         if (!binding->isStreamConsumer())
             continue;
 
-        auto engineManifest = binding->engineManifest();
-        if (!engineManifest)
+        bool gotPixelFormat = false;
+        const auto pixelFormat = pixelFormatForEngine(
+            serverModule(), engineId, binding, &gotPixelFormat);
+        if (!gotPixelFormat)
             continue;
-
-        const auto pixelFormat = sdk_support::pixelFormatFromEngineManifest(*engineManifest);
         if (!pixelFormat)
             needsCompressedFrames = true;
         else

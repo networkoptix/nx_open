@@ -55,22 +55,13 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
         return nx::network::http::StatusCode::ok;
     }
 
-    const auto engines = resourcePool()->getResources<resource::AnalyticsEngineResource>();
-    for (auto& engine: engines)
+    for (auto& engineResource: resourcePool()->getResources<resource::AnalyticsEngineResource>())
     {
-        auto sdkEngine = engine->sdkEngine();
-        auto manifest = sdk_support::manifest<nx::vms::api::analytics::EngineManifest>(sdkEngine);
-        if (!manifest)
-        {
-            NX_WARNING(this, lm("Can't obtain engine manifest, engine %1 (%2)")
-                .args(engine->getName(), engine->getId()));
-            continue;
-        }
-
-        if (manifest->pluginId == actionData.pluginId)
+        if (engineResource->plugin()->manifest().id == actionData.pluginId)
         {
             AnalyticsActionResult actionResult;
-            QString errorMessage = executeAction(&actionResult, sdkEngine.get(), actionData);
+            QString errorMessage = executeAction(
+                &actionResult, engineResource->sdkEngine().get(), actionData);
 
             if (!errorMessage.isEmpty())
             {

@@ -1,9 +1,4 @@
 {
-    "pluginId": "nx.ssc", 
-    "pluginName": {
-        "value": "SSC (Self Service Console) driver", 
-        "localization": {}
-    }, 
     "capabilities": "", 
     "outputEventTypes": [
         {

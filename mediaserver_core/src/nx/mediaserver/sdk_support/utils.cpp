@@ -260,7 +260,9 @@ void saveManifestToFile(
 }
 
 std::optional<nx::sdk::analytics::UncompressedVideoFrame::PixelFormat>
-    pixelFormatFromEngineManifest(const nx::vms::api::analytics::EngineManifest& manifest)
+    pixelFormatFromEngineManifest(
+        const nx::vms::api::analytics::EngineManifest& manifest,
+        const QString& engineLogLabel)
 {
     using PixelFormat = nx::sdk::analytics::UncompressedVideoFrame::PixelFormat;
     using Capability = nx::vms::api::analytics::EngineManifest::Capability;
@@ -301,7 +303,7 @@ std::optional<nx::sdk::analytics::UncompressedVideoFrame::PixelFormat>
     {
         NX_ERROR(kLogTag) << lm(
             "More than one needUncompressedVideoFrames_... capability found"
-            "in Engine manifest of analytics plugin \"%1\"").arg(manifest.pluginId);
+            "in %1").arg(engineLogLabel);
     }
     if (uncompressedFrameCapabilityCount != 1)
         return std::nullopt;

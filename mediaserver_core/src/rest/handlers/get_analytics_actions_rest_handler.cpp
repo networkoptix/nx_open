@@ -33,17 +33,19 @@ int QnGetAnalyticsActionsRestHandler::executeGet(
     const auto& manifests = owner->commonModule()->currentServer()->analyticsDrivers();
     for (const auto& manifest: manifests)
     {
-        AvailableAnalyticsActionsOfPlugin actionsOfPlugin;
-        actionsOfPlugin.pluginId = manifest.pluginId;
+        AvailableAnalyticsActionsOfPlugin actionsOfEngine;
+
+        // TODO: #dmishin: Assign the proper engineId.
+        //actionsOfEngine.pluginId = manifest.pluginId;
 
         for (const auto& action: manifest.objectActions)
         {
             if (action.supportedObjectTypeIds.contains(objectTypeId))
-                actionsOfPlugin.actionIds.append(action.id);
+                actionsOfEngine.actionIds.append(action.id);
         }
 
-        if (!actionsOfPlugin.actionIds.isEmpty())
-            actions.actions.append(actionsOfPlugin);
+        if (!actionsOfEngine.actionIds.isEmpty())
+            actions.actions.append(actionsOfEngine);
     }
 
     result.setReply(actions);

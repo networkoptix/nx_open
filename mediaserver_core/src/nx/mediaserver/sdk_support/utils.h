@@ -117,7 +117,9 @@ void saveManifestToFile(
     const QString& filenameExtraSuffix);
 
 std::optional<nx::sdk::analytics::UncompressedVideoFrame::PixelFormat>
-    pixelFormatFromEngineManifest(const nx::vms::api::analytics::EngineManifest& manifest);
+    pixelFormatFromEngineManifest(
+        const nx::vms::api::analytics::EngineManifest& manifest,
+        const QString& engineLogLabel);
 
 resource::AnalyticsEngineResourceList toServerEngineList(
     const nx::vms::common::AnalyticsEngineResourceList engineList);

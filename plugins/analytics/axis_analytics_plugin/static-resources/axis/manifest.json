@@ -1,9 +1,4 @@
 {
-    "pluginId": "nx.axis", 
-    "pluginName": {
-        "value": "Axis driver", 
-        "localization": {}
-    }, 
     "capabilities": "deviceModelDependent",
     "allowedTopics": [
         "tns1:RuleEngine", 
