@@ -12,6 +12,7 @@ import {
 })
 export class ReleaseComponent implements OnInit {
     @Input() release: any;
+    @Input() linkbase: any;
 
     constructor(@Inject('languageService') private language: any,
                 @Inject('configService') private configService: any) {
