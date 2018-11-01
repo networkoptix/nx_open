@@ -7,34 +7,36 @@
         <a class="card hoverable m-0"
            [routerLink]="['/integration/details', plugin.id]">
 
-            <div class="card--header clearfix">
-                <div class="card--header-logo">
-                    <img [src]="plugin.information.logo || defaultLogo">
-                </div>
-                <div class="card--header-info">
-                    <div class="version">v. {{ plugin.information.version }}</div>
-                    <div class="platforms">
-                        <div *ngFor="let os of config.icons.platforms;">
-                            <img [src]="os.src" *ngIf="isSupported(plugin, os.name)">
+            <nx-content-block>
+                <header>
+                    <div class="card--header-logo">
+                        <img [src]="plugin.information.logo || defaultLogo">
+                    </div>
+                    <div class="card--header-info">
+                        <div class="version">v. {{ plugin.information.version }}</div>
+                        <div class="platforms">
+                            <div *ngFor="let os of config.icons.platforms;">
+                                <img [src]="os.src" *ngIf="isSupported(plugin, os.name)">
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="card--body">
-                <div class="card--body-name"><h3 [innerHtml]="plugin.information.name"></h3></div>
-                <div class="card--body-by" *ngIf="plugin.provider">By <a target="_blank" [href]="plugin.providerUrl"
-                                                                         [innerHtml]="plugin.provider"></a></div>
-                <div class="card--body-descr">{{plugin.information.shortDescription}}</div>
-            </div>
-            <div class="card--footer">
-                <!--<h3 class="float-left m-0 mt-1 mr-1" >-->
-                <!--<span class="tag-primary" translate>Recommended</span>-->
-                <!--</h3>-->
+                </header>
 
-                <h3 class="float-left m-0 mt-1 mr-1" *ngFor="let type of plugin.information.type">
-                    <span class="tag" [innerHtml]="type"></span>
-                </h3>
-            </div>
+                <nx-content-block-section type="fixed">
+                    <div class="card--body-name"><h3 [innerHtml]="plugin.information.name"></h3></div>
+                    <div class="card--body-descr">{{plugin.information.shortDescription}}</div>
+                </nx-content-block-section>
+
+                <footer>
+                    <!--<h3 class="float-left m-0 mt-1 mr-1" >-->
+                    <!--<span class="tag-primary" translate>Recommended</span>-->
+                    <!--</h3>-->
+
+                    <h3 class="float-left m-0 mt-1 mr-1" *ngFor="let type of plugin.information.type">
+                        <span class="tag" [innerHtml]="type"></span>
+                    </h3>
+                </footer>
+            </nx-content-block>
         </a>
 
     </div>

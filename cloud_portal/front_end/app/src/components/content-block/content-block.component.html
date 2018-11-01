@@ -6,5 +6,10 @@
             <ng-content select="header"></ng-content>
         </h3>
     </div>
+
     <ng-content></ng-content>
+
+    <div class="card--footer" #footerWrapper [hidden]="!haveFooter">
+        <ng-content select="footer"></ng-content>
+    </div>
 </div>

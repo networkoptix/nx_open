@@ -3,16 +3,10 @@
 @import '../../../../styles/theme_variables';
 
 .card {
-    
     text-decoration : none;
     color           : inherit;
     
     &--header {
-        background-color : $additional_light1;
-        padding          : rem(12px) 1rem;
-        border-bottom    : 1px solid $light3;
-        height           : rem(80px);
-        
         &-logo {
             float       : left;
             display     : flex;
@@ -54,11 +48,6 @@
     }
     
     &--body {
-        padding          : 1rem;
-        height           : 200px;
-        overflow         : hidden;
-        background-color : $light1;
-        
         &-name {
             h3 {
                 margin      : 0;
@@ -75,20 +64,6 @@
             font-family : $font-family-regular;
             font-size   : $font-size-base;
             margin-top  : .5rem;
-        }
-        
-    }
-    
-    &--footer {
-        position         : absolute;
-        width            : 100%;
-        bottom           : 0;
-        padding          : .5rem 1rem 1rem;
-        background-color : $light1;
-        box-shadow       : 0px -22px 22px -6px rgb(255, 255, 255);
-        
-        > h3 {
-            font-family : $font-family-regular;
         }
     }
 }

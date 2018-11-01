@@ -1,5 +1,5 @@
 import {
-    Component, ElementRef, OnInit, ViewChild, ViewEncapsulation
+    Component, ElementRef, Input, OnInit, ViewChild, ViewEncapsulation
 } from '@angular/core';
 
 /* Usage
@@ -18,10 +18,12 @@ import {
 @Component({
     selector     : 'nx-content-block-section',
     templateUrl  : 'section.component.html',
-    styleUrls    : [ 'section.component.scss' ],
     encapsulation: ViewEncapsulation.None,
+    styleUrls    : [ 'section.component.scss' ],
 })
 export class NxContentBlockSectionComponent implements OnInit {
+
+    @Input() type;
 
     haveSubheader: boolean;
 
