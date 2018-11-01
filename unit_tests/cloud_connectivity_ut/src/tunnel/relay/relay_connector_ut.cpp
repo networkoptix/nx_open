@@ -5,6 +5,7 @@
 #include <nx/network/cloud/tunnel/relay/relay_connector.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/http/tunneling/server.h>
 #include <nx/network/http/rest/http_rest_client.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
@@ -243,7 +244,10 @@ class RelayConnectorRedirect:
     public RelayConnector
 {
 public:
-    RelayConnectorRedirect()
+    RelayConnectorRedirect():
+        m_realRelayTunnelingServer(
+            [this](auto&&... args) { saveClientTunnel(std::move(args)...); },
+            nullptr)
     {
         resetClientFactoryToDefault();
     }
@@ -293,13 +297,12 @@ private:
 
     nx::network::http::TestHttpServer m_redirectingRelay;
     nx::network::http::TestHttpServer m_realRelay;
+    nx::network::http::tunneling::Server<> m_realRelayTunnelingServer;
     nx::utils::SyncQueue<ConnectResult> m_connectResults;
     nx::utils::SyncQueue<int /*dummy*/> m_connectionsUpgradedByRealRelay;
 
     virtual void SetUp() override
     {
-        using namespace std::placeholders;
-
         const auto createClientSessionPath =
             nx::network::http::rest::substituteParameters(
                 nx::cloud::relay::api::kServerClientSessionsPath, {kServerId});
@@ -310,12 +313,12 @@ private:
                 QByteArray("\", \"sessionTimeout\": \"100\" }"),
             "application/json");
 
-        m_realRelay.registerRequestProcessorFunc(
+        m_realRelayTunnelingServer.registerRequestHandlers(
             nx::network::url::joinPath(
                 kRelayApiPrefix,
                 nx::network::http::rest::substituteParameters(
-                    nx::cloud::relay::api::kClientSessionConnectionsPath, {kRelaySessionId})).c_str(),
-            std::bind(&RelayConnectorRedirect::upgradeConnection, this, _1, _2));
+                    nx::cloud::relay::api::kClientTunnelBasePath, {kRelaySessionId})),
+            &m_realRelay.httpMessageDispatcher());
 
         ASSERT_TRUE(m_realRelay.bindAndListen());
 
@@ -336,11 +339,9 @@ private:
         m_connectResults.push({systemErrorCode, std::move(connection), stillValid});
     }
 
-    void upgradeConnection(
-        nx::network::http::RequestContext /*requestContext*/,
-        nx::network::http::RequestProcessedHandler completionHandler)
+    void saveClientTunnel(
+        std::unique_ptr<network::AbstractStreamSocket> /*connection*/)
     {
-        completionHandler(nx::network::http::StatusCode::switchingProtocols);
         m_connectionsUpgradedByRealRelay.push(0);
     }
 };
