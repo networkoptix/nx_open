@@ -77,7 +77,7 @@ bool PeerWrapper::configureAsLocalSystem()
     auto mediaServerClient = prepareMediaServerClient();
 
     // TODO: #ak Using random password requires some fixes in merge tests.
-    const auto password = "qweasd123"; //nx::utils::generateRandomName(7);
+    const auto password = "My1nsAnelYSaf3P4ssW0rd"; //nx::utils::generateRandomName(7);
 
     SetupLocalSystemData request;
     request.systemName = nx::utils::generateRandomName(7);

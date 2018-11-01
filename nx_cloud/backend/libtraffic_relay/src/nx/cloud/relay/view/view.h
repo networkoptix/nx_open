@@ -8,7 +8,6 @@
 #include <nx/network/http/server/multi_endpoint_acceptor.h>
 #include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
-#include <nx/network/http/tunneling/server.h>
 #include <nx/cloud/relaying/http_view/listening_peer_connection_tunneling.h>
 
 #include "authentication_manager.h"

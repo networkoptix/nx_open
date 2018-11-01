@@ -18,9 +18,9 @@ public:
         typename base_type::NewTunnelHandler newTunnelHandler);
     virtual ~MultiMessageTunnelServer();
 
-    void registerRequestHandlers(
+    virtual void registerRequestHandlers(
         const std::string& basePath,
-        server::rest::MessageDispatcher* messageDispatcher);
+        server::rest::MessageDispatcher* messageDispatcher) override;
 };
 
 template<typename ...ApplicationData>

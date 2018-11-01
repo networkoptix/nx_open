@@ -116,7 +116,7 @@ QnTimePeriod helpers::extendTimeWindow(qint64 startTimeMs,
         ? startTimeMs - startTimeShiftMs
         : QnTimePeriod::minTimeValue());
 
-    endTimeMs = (QnTimePeriod::maxTimeValue() - endTimeShiftMs > endTimeMs
+    endTimeMs = (QnTimePeriod::maxTimeValue() - endTimeShiftMs < endTimeMs
         ? endTimeMs + endTimeShiftMs
         : QnTimePeriod::maxTimeValue());
 

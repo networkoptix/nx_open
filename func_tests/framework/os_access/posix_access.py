@@ -9,7 +9,7 @@ import portalocker
 import pytz
 import tzlocal
 from netaddr import EUI
-from typing import Container, Optional, Callable, ContextManager, Type
+from typing import Any, Container, Optional, Callable, Type
 
 from framework.method_caching import cached_getter
 from framework.networking.interface import Networking
@@ -87,7 +87,7 @@ class PosixAccess(OSAccess):
             shell,  # type: Shell
             time,  # type: Time
             traffic_capture,  # type: Optional[TrafficCapture]
-            lock_acquired,  # type: Optional[Callable[[FileSystemPath, ...], ContextManager[None]]]
+            lock_acquired,  # type: Optional[Callable[[FileSystemPath, ...], Any]]
             path_cls,  # type: Type[FileSystemPath]
             networking,  # type: Optional[Networking]
             ):
