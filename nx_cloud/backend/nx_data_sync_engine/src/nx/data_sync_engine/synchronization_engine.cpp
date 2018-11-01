@@ -32,6 +32,9 @@ SyncronizationEngine::SyncronizationEngine(
         m_supportedProtocolRange,
         &m_incomingTransactionDispatcher,
         &m_outgoingTransactionDispatcher),
+    m_connector(
+        &m_transportManager,
+        &m_connectionManager),
     m_httpTransportAcceptor(
         peerId,
         m_supportedProtocolRange,
@@ -99,6 +102,11 @@ ConnectionManager& SyncronizationEngine::connectionManager()
 const ConnectionManager& SyncronizationEngine::connectionManager() const
 {
     return m_connectionManager;
+}
+
+Connector& SyncronizationEngine::connector()
+{
+    return m_connector;
 }
 
 const statistics::Provider& SyncronizationEngine::statisticsProvider() const

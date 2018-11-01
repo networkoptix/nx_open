@@ -39,22 +39,29 @@ def test_get_set_time(os_access):
 
 
 def test_disk_space(os_access):
+    epsilon = 10 * 1000 * 1000
     before = os_access.free_disk_space_bytes()
     should_be = 1000 * 1000 * 1000
+    if os_access.free_disk_space_bytes() < should_be:
+        pytest.skip("Too low on space, need {} MB".format(should_be / 1024 / 1024))
     with os_access.free_disk_space_limited(should_be):
-        assert os_access.free_disk_space_bytes() == pytest.approx(should_be, rel=0.01)
-    assert os_access.free_disk_space_bytes() == pytest.approx(before, rel=0.01)
+        assert os_access.free_disk_space_bytes() == pytest.approx(should_be, abs=epsilon)
+    assert os_access.free_disk_space_bytes() == pytest.approx(before, abs=epsilon)
 
 
 def test_disk_space_limit_twice(os_access):
+    epsilon = 10 * 1000 * 1000
     before = os_access.free_disk_space_bytes()
     should_be_1 = 1000 * 1000 * 1000
+    if os_access.free_disk_space_bytes() < should_be_1:
+        pytest.skip("Too low on space, need {} MB".format(should_be_1 / 1024 / 1024))
     with os_access.free_disk_space_limited(should_be_1):
-        assert os_access.free_disk_space_bytes() == pytest.approx(should_be_1, rel=0.01)
+        assert os_access.free_disk_space_bytes() == pytest.approx(should_be_1, abs=epsilon)
         should_be_2 = 500 * 1000 * 1000
+        assert should_be_2 < should_be_1, "First limitation still imposed"
         with os_access.free_disk_space_limited(should_be_2):
-            assert os_access.free_disk_space_bytes() == pytest.approx(should_be_2, rel=0.01)
-    assert os_access.free_disk_space_bytes() == pytest.approx(before, rel=0.01)
+            assert os_access.free_disk_space_bytes() == pytest.approx(should_be_2, abs=epsilon)
+    assert os_access.free_disk_space_bytes() == pytest.approx(before, abs=epsilon)
 
 
 def test_fake_disk(os_access):

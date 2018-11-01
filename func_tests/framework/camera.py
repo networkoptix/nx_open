@@ -4,7 +4,7 @@ Actual streaming is pre-recorded and played over.
 Discovery is implemented fully.
 
 `_DiscoveryUdpListener`, `_MediaListener` and `_MediaStreamer` are responsible for what is
-advertised in their names. All of them has `.filen()` method, i.e. are selectable.
+advertised in their names. All of them has `.fileno()` method, i.e. are selectable.
 """
 from __future__ import division
 
@@ -21,13 +21,17 @@ from contextlib2 import ExitStack
 from typing import List, Tuple
 
 try:
-    # overwise hachoir will replace sys.stdout/err with UnicodeStdout, incompatible with pytest terminal module:
+    # `hachoir` replaces sys.stdout/err with `UnicodeStdout`, which is incompatible with pytest
+    # terminal module. Tweak `hachoir_core.config.unicode_stdout` to work around this.
+    # noinspection PyUnresolvedReferences
     import hachoir_core.config
     hachoir_core.config.unicode_stdout = False
     import hachoir_parser
     import hachoir_metadata
 except ImportError:
+    # noinspection PyUnresolvedReferences
     import hachoir.parser as hachoir_parser
+    # noinspection PyUnresolvedReferences
     import hachoir.metadata as hachoir_metadata
 
 _logger = logging.getLogger(__name__)

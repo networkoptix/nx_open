@@ -197,13 +197,10 @@ public:
     }
 
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request /*request*/,
-        nx::network::http::Response* const /*response*/,
-        nx::network::http::RequestProcessedHandler completionHandler) override
+        http::RequestContext /*requestContext*/,
+        http::RequestProcessedHandler completionHandler) override
     {
-        nx::network::http::RequestResult requestResult(nx::network::http::StatusCode::ok);
+        http::RequestResult requestResult(http::StatusCode::ok);
         requestResult.dataSource = std::make_unique<MessageBody>();
         completionHandler(std::move(requestResult));
     }

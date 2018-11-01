@@ -21,8 +21,6 @@ from framework.utils import datetime_utc_to_timestamp
 from framework.waiting import wait_for_truthy
 from ..context_logger import context_logger
 
-DEFAULT_HTTP_SCHEMA = 'http'
-
 MEDIASERVER_STORAGE_PATH = 'var/data'
 
 MEDIASERVER_CREDENTIALS_TIMEOUT = datetime.timedelta(minutes=5)

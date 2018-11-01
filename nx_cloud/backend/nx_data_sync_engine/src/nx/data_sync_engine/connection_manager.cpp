@@ -19,6 +19,7 @@
 #include "transaction_transport.h"
 #include "transaction_transport_header.h"
 #include "websocket_transaction_transport.h"
+#include "transport/generic_transport.h"
 
 namespace nx {
 namespace data_sync_engine {
@@ -151,7 +152,7 @@ std::vector<SystemConnectionInfo> ConnectionManager::getConnections() const
     {
         result.push_back({
             it->fullPeerName.systemId,
-            it->connection->remoteSocketAddr(),
+            it->connection->remotePeerEndpoint(),
             it->userAgent});
     }
 
@@ -218,9 +219,7 @@ ConnectionManager::SystemStatusChangedSubscription&
     return m_systemStatusChangedSubscription;
 }
 
-bool ConnectionManager::addNewConnection(
-    ConnectionContext context,
-    const vms::api::PeerDataEx& remotePeerInfo)
+bool ConnectionManager::addNewConnection(ConnectionContext context)
 {
     using namespace std::placeholders;
 
@@ -236,8 +235,10 @@ bool ConnectionManager::addNewConnection(
     if (!isOneMoreConnectionFromSystemAllowed(lock, context))
         return false;
 
-    context.connection->setOnConnectionClosed(
-        std::bind(&ConnectionManager::removeConnection, this, context.connectionId));
+    nx::utils::SubscriptionId subscriptionId;
+    context.connection->connectionClosedSubscription().subscribe(
+        std::bind(&ConnectionManager::removeConnection, this, context.connectionId),
+        &subscriptionId);
     context.connection->setOnGotTransaction(
         std::bind(
             &ConnectionManager::onGotTransaction, this,
@@ -248,6 +249,8 @@ bool ConnectionManager::addNewConnection(
             .arg(context.connection->commonTransportHeaderOfRemoteTransaction()));
 
     const auto systemId = context.fullPeerName.systemId;
+    const auto protocolVersion = context.connection->
+        commonTransportHeaderOfRemoteTransaction().transactionFormatVersion;
 
     if (!m_connections.insert(std::move(context)).second)
     {
@@ -260,7 +263,7 @@ bool ConnectionManager::addNewConnection(
         lock.unlock();
         m_systemStatusChangedSubscription.notify(
             systemId,
-            { true /*online*/, remotePeerInfo.protoVersion });
+            { true /*online*/, protocolVersion });
     }
 
     return true;
@@ -446,7 +449,7 @@ void ConnectionManager::processSpecialTransaction(
 
     // TODO: #ak Get rid of dynamic_cast.
     auto transactionTransport =
-        dynamic_cast<TransactionTransport*>(connectionIter->connection.get());
+        dynamic_cast<transport::GenericTransport*>(connectionIter->connection.get());
 
     // NOTE: transactionTransport variable can safely be used within its own AIO thread.
     NX_ASSERT(transactionTransport->isInSelfAioThread());

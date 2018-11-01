@@ -219,6 +219,7 @@ copyQtLibs()
         Multimedia
         Sql
         WebSockets
+        Qml
     )
 
     # Qt libs for nx1 lite client.
@@ -230,7 +231,6 @@ copyQtLibs()
             WebEngineCore
             WebView
             MultimediaQuick_p
-            Qml
             Quick
             LabsTemplates
             DBus

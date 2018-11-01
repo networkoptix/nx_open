@@ -184,6 +184,7 @@ protected:
         ~Peer()
         {
             worker->stop();
+            worker.reset();
             delete storage;
             // peerManager is owned and deleted by worker.
         }
@@ -194,7 +195,7 @@ protected:
         m_onRequestFileInfoCb = std::move(requestFileInfoCb);
     }
 
-    virtual void onRequestFileInfo()
+    virtual void onRequestFileInfo() override
     {
         if (m_onRequestFileInfoCb)
             m_onRequestFileInfoCb();

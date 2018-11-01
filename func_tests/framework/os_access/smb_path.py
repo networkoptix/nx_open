@@ -47,7 +47,12 @@ def _reraising_on_operation_failure(status_to_error_cls):
             try:
                 return func(self, *args, **kwargs)
             except OperationFailure as e:
-                last_message_status = e.smb_messages[-1].status
+                for smb_message in reversed(e.smb_messages):
+                    last_message_status = smb_message.status
+                    if last_message_status != _STATUS_SUCCESS:
+                        break
+                else:
+                    raise
                 if last_message_status in status_to_error_cls:
                     error_cls = status_to_error_cls[last_message_status]
                     raise error_cls(e)
@@ -225,7 +230,7 @@ class SMBPath(FileSystemPath, PureWindowsPath):
             if pysmb_file.filename not in {u'.', u'..'}
             ]
 
-    def mkdir(self, parents=False, exist_ok=True):
+    def mkdir(self, parents=False, exist_ok=False):
         # No way to create all directories (parents and self) at once.
         # Usually, only few nearest parents don't exist,
         # that's why they're checked from nearest one.
@@ -311,3 +316,6 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         if attributes.isDirectory:
             raise exceptions.NotAFile("Attributes of the {}: {}".format(self, attributes))
         return attributes.file_size
+
+    def symlink_to(self, target, target_is_directory=False):
+        raise NotImplementedError("Symlinks over SMB are not well-supported")

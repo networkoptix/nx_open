@@ -33,14 +33,16 @@ WebSocketTransportAcceptor::WebSocketTransportAcceptor(
 }
 
 void WebSocketTransportAcceptor::createConnection(
-    nx::network::http::HttpServerConnection* connection,
+    nx::network::http::RequestContext requestContext,
     const std::string& systemId,
-    nx::network::http::Request request,
-    nx::network::http::Response* response,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
     using namespace std::placeholders;
     using namespace nx::network;
+
+    const auto& request = requestContext.request;
+    auto connection = requestContext.connection;
+    auto response = requestContext.response;
 
     auto remotePeerInfo = p2p::deserializePeerData(request);
 
@@ -121,9 +123,7 @@ void WebSocketTransportAcceptor::addWebSocketTransactionTransport(
         {systemId, remotePeerInfo.id.toByteArray().toStdString()},
         userAgent};
 
-    if (!m_connectionManager->addNewConnection(
-            std::move(context),
-            remotePeerInfo))
+    if (!m_connectionManager->addNewConnection(std::move(context)))
     {
         NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
             lm("Failed to add new websocket transaction connection from (%1.%2; %3). connectionId %4")

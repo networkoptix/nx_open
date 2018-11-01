@@ -8,6 +8,7 @@
 
 #include "compatible_ec2_protocol_version.h"
 #include "connection_manager.h"
+#include "connector.h"
 #include "dao/rdb/structure_updater.h"
 #include "http/sync_connection_request_handler.h"
 #include "incoming_transaction_dispatcher.h"
@@ -16,6 +17,7 @@
 #include "statistics/provider.h"
 #include "transaction_log.h"
 #include "transport/http_transport_acceptor.h"
+#include "transport/transport_manager.h"
 #include "transport/websocket_transport_acceptor.h"
 
 namespace nx {
@@ -50,6 +52,8 @@ public:
     ConnectionManager& connectionManager();
     const ConnectionManager& connectionManager() const;
 
+    Connector& connector();
+
     const statistics::Provider& statisticsProvider() const;
 
     void setOutgoingCommandFilter(
@@ -75,6 +79,8 @@ private:
     TransactionLog m_transactionLog;
     IncomingTransactionDispatcher m_incomingTransactionDispatcher;
     ConnectionManager m_connectionManager;
+    TransportManager m_transportManager;
+    Connector m_connector;
     transport::HttpTransportAcceptor m_httpTransportAcceptor;
     transport::WebSocketTransportAcceptor m_webSocketAcceptor;
     statistics::Provider m_statisticsProvider;

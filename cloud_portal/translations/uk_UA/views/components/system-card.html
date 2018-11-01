@@ -1,20 +1,20 @@
 
-<div class="panel panel-default" ng-if="system.isMine">
-    <div class="panel-body">
-        <h2>Ваша система</h2>
-        <p></p>
+<div class="card card-condensed" ng-if="system.isMine">
+    <div class="card-body">
+        <h2 class="mb-3">Ваша система</h2>
         <p>
             <button class="btn btn-default" ng-click="rename()">Перейменувати систему</button>
         </p>
         <p>
             <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Об’єднати з іншою системою</button>
         </p>
-        <hr></hr>
-        <button class="btn btn-default" ng-click="disconnect()">Відключити від <span class="product-name">%PRODUCT_NAME%</span></button>
+        <hr />
+        <button class="btn btn-default" ng-click="disconnect()">Disconnect from
+            <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
     </div>
 </div>
-<div class="panel panel-default" ng-if="!system.isMine">
-    <div class="panel-body">
+<div class="card card-condensed" ng-if="!system.isMine">
+    <div class="card-body">
         <h2>Власник</h2>
         <h3 class="user-name">{{system.info.ownerFullName}}</h3>
         <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
@@ -29,15 +29,15 @@
         <button class="btn btn-default" ng-click="delete()">Від'єднатись від мого облікового запису</button>
     </div>
 </div>
-<div class="panel panel-default" ng-if="currentlyMerging">
-    <div class="panel-body" ng-if="isMaster && system.isMine">
+<div class="card card-default" ng-if="currentlyMerging">
+    <div class="card-body" ng-if="isMaster && system.isMine">
         <div><strong>{{mergeTargetSystem.name}}</strong> об'єднатися із цією системою</div>
-        <hr></hr>
+        <hr />
         <div class="merge-info-text">Залежно від розміру бази даних це може зайняти до декількох годин</div>
     </div>
-    <div class="panel-body" ng-if="!isMaster || !system.isMine">
+    <div class="card-body" ng-if="!isMaster || !system.isMine">
         <div>Ця система об'єднується в <strong>{{mergeTargetSystem.name}}</strong></div>
-        <hr></hr>
+        <hr />
         <div class="merge-info-text">
             <p>Залежно від розміру бази даних це може зайняти до декількох годин.</p>
             <p>Поки не завершиться об’єднання, ви можете увійти до цієї системи та подивитися відео, але не зможете змінити будь-які налаштування.</p>

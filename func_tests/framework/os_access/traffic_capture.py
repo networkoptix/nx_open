@@ -5,6 +5,7 @@ from contextlib import contextmanager
 from datetime import datetime
 
 from framework.os_access.command import Command
+from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.path import FileSystemPath, copy_file
 
 _logger = logging.getLogger(__name__)
@@ -50,4 +51,7 @@ class TrafficCapture(object):
                     _logger.debug("Outcome: %s", run.outcome)
                 _logger.debug("STDOUT:\n%s", stdout)
                 _logger.debug("STDERR:\n%s", stderr)
-                copy_file(remote_capture_file, local_capture_file)
+                try:
+                    copy_file(remote_capture_file, local_capture_file)
+                except DoesNotExist:
+                    _logger.error("Capture file %r doesn't exist.", remote_capture_file)

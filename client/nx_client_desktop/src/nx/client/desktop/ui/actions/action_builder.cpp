@@ -58,6 +58,11 @@ Builder Builder::shortcut(
     return *this;
 }
 
+Builder Builder::shortcut(const QString& keySequence)
+{
+    return shortcut(QKeySequence(keySequence));
+}
+
 Builder Builder::shortcut(const QKeySequence& keySequence)
 {
     return shortcut(keySequence, AllPlatforms, false);

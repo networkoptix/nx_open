@@ -51,10 +51,7 @@ protected:
     nx::network::http::Method::ValueType m_requestMethod;
 
     virtual void processRawHttpRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer authInfo,
-        nx::network::http::Request request,
-        nx::network::http::Response* const response,
+        RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler) = 0;
 
     virtual void sendRawHttpResponse(RequestResult requestResult)
@@ -135,17 +132,11 @@ private:
     boost::optional<nx::network::http::ConnectionEvents> m_connectionEvents;
 
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer authInfo,
-        nx::network::http::Request request,
-        nx::network::http::Response* const response,
+        RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler) override
     {
         processRawHttpRequest(
-            connection,
-            std::move(authInfo),
-            std::move(request),
-            response,
+            std::move(requestContext),
             std::move(completionHandler));
     }
 
@@ -244,12 +235,11 @@ class BaseFusionRequestHandlerWithInput:
 {
 protected:
     virtual void processRawHttpRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer authInfo,
-        nx::network::http::Request request,
-        nx::network::http::Response* const /*response*/,
+        RequestContext requestContext,
         RequestProcessedHandler completionHandler) override
     {
+        const auto& request = requestContext.request;
+
         this->m_completionHandler = std::move(completionHandler);
         this->m_requestMethod = request.requestLine.method;
 
@@ -281,9 +271,7 @@ protected:
         }
 
         static_cast<Descendant*>(this)->processRequest(
-            connection,
-            request,
-            std::move(authInfo),
+            std::move(requestContext),
             std::move(inputData));
     }
 };

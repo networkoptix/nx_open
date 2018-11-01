@@ -3712,7 +3712,7 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     memToFreeOnResponseDone.push_back(header);
     memset(header, 0, sizeof(*header));
     soapWrapper->soap()->header = header;
-    soapWrapper->soap()->header->subscriptionID = buf;
+    soapWrapper->soap()->header->SubscriptionId = buf;
     //TODO #ak move away check for "Samsung"
     if (!m_onvifNotificationSubscriptionReference.isEmpty() && !getVendor().contains(lit("Samsung")))
     {

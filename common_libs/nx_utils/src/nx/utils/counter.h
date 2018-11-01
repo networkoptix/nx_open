@@ -8,11 +8,8 @@
 namespace nx {
 namespace utils {
 
-class NX_UTILS_API Counter:
-    public QObject
+class NX_UTILS_API Counter
 {
-    Q_OBJECT;
-
 public:
     class NX_UTILS_API ScopedIncrement
     {
@@ -30,7 +27,8 @@ public:
         Counter* m_counter = nullptr;
     };
 
-    Counter(int initialCount = 0, QObject* parent = NULL);
+    Counter(int initialCount = 0);
+    virtual ~Counter() = default;
 
     /**
      * Increments internal counter.
@@ -42,17 +40,40 @@ public:
      */
     void wait();
 
-signals:
-    void reachedZero();
-
-public slots:
-    void increment();
-    void decrement();
+    /**
+     * @return New counter value.
+     */
+    int increment();
+    
+    /**
+     * @return New counter value.
+     */
+    virtual int decrement();
 
 private:
     QnMutex m_mutex;
     QnWaitCondition m_counterReachedZeroCondition;
     int m_count;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class NX_UTILS_API CounterWithSignal:
+    public QObject,
+    public Counter
+{
+    Q_OBJECT
+
+    using base_type = Counter;
+
+public:
+    CounterWithSignal(int initialCount = 0, QObject* parent = NULL);
+
+public slots:
+    virtual int decrement() override;
+
+signals:
+    void reachedZero();
 };
 
 } // namespace utils

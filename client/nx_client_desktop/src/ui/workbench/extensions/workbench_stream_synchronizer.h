@@ -96,7 +96,7 @@ private:
 
     /** Counter that is used to track the number of references to syncplay
      * instance. When it reaches zero, syncplay is destroyed. */
-    nx::utils::Counter *m_counter;
+    nx::utils::CounterWithSignal* m_counter;
 
     /** Syncplay instance that performs the actual stream synchronization. */
     QnArchiveSyncPlayWrapper *m_syncPlay;
