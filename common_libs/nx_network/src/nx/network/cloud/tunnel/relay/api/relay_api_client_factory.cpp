@@ -14,10 +14,6 @@ namespace nx::cloud::relay::api {
 ClientFactory::ClientFactory():
     base_type([this](auto&&... args) { return defaultFactoryFunction(std::move(args)...); })
 {
-    //registerClientType<ClientOverHttpConnect>();
-    //registerClientType<ClientOverHttpGetPostTunnel>();
-    //registerClientType<ClientOverHttpUpgrade>();
-
     registerClientType<ClientOverHttpTunnel>();
 }
 
