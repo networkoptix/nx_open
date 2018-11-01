@@ -6,6 +6,7 @@ import Nx 1.0
 import Nx.Media 1.0
 import Nx.Controls 1.0
 import com.networkoptix.qml 1.0
+import nx.client.mobile 1.0
 
 // TODO: #ynikitenkov After 18.1 refactor this control.
 
@@ -231,6 +232,13 @@ Item
                         drag.target.y = drag.maximumY
                 }
             }
+        }
+
+        MotionPlaybackMaskWatcher
+        {
+            active: videoNavigation.motionSearchMode
+            mediaPlayer: videoScreenController.mediaPlayer
+            chunkProvider: cameraChunkProvider
         }
 
         Timeline

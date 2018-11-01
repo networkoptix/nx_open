@@ -244,6 +244,7 @@ public:
     // Hardware decoding has been used for the last presented frame.
     bool isHwAccelerated;
 
+    QnTimePeriodList periods;
     void applyVideoQuality();
 
 private:
@@ -765,6 +766,8 @@ bool PlayerPrivate::createArchiveReader()
     }
 
     archiveReader->setArchiveDelegate(archiveDelegate);
+    if (!periods.isEmpty())
+        archiveReader->setPlaybackMask(periods);
 
     configureMetadataForReader();
 
@@ -1441,6 +1444,13 @@ bool Player::removeMetadataConsumer(const AbstractMetadataConsumerPtr& metadataC
     consumers.removeAt(index);
     d->configureMetadataForReader();
     return true;
+}
+
+void Player::setPlaybackMask(const QnTimePeriodList& periods)
+{
+    Q_D(Player);
+    if (d->archiveReader)
+        d->archiveReader->setPlaybackMask(periods);
 }
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Player, VideoQuality)
