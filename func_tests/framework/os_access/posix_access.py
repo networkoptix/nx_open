@@ -21,7 +21,6 @@ from framework.os_access.local_shell import local_shell
 from framework.os_access.os_access_interface import OSAccess, OneWayPortMap, ReciprocalPortMap, Time
 from framework.os_access.path import FileSystemPath
 from framework.os_access.posix_shell import Shell
-from framework.os_access.posix_shell_path import PosixShellPath
 from framework.os_access.sftp_path import SftpPath
 from framework.os_access.ssh_shell import SSH
 from framework.os_access.ssh_traffic_capture import SSHTrafficCapture

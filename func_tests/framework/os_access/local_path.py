@@ -49,7 +49,7 @@ _reraising_existing_dir_errors = _reraising({
 class LocalPath(PosixPath, FileSystemPath):
     """Access local filesystem with unified interface (incl. exceptions)
 
-    Unlike PosixShellPath and SMBPath, there can be only one local file system,
+    Unlike SftpPath and SMBPath, there can be only one local file system,
     therefore, this class is not to be inherited from.
     """
 

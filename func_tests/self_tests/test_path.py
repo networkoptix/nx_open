@@ -8,9 +8,7 @@ import pytest
 
 from framework.os_access import exceptions
 from framework.os_access.local_path import LocalPath
-from framework.os_access.local_shell import local_shell
 from framework.os_access.path import copy_file
-from framework.os_access.posix_shell_path import PosixShellPath
 from framework.os_access.sftp_path import SftpPath
 
 _logger = logging.getLogger(__name__)
@@ -19,11 +17,6 @@ _logger = logging.getLogger(__name__)
 @pytest.fixture()
 def local_path_cls():
     return LocalPath
-
-
-@pytest.fixture()
-def ssh_path_cls():
-    return PosixShellPath.specific_cls(local_shell)
 
 
 @pytest.fixture(scope='session')
@@ -49,7 +42,7 @@ def smb_path_cls(windows_vm):
     return windows_vm.os_access.path_cls
 
 
-@pytest.fixture(params=['local_path_cls', 'ssh_path_cls', 'smb_path_cls', 'sftp_path_cls'])
+@pytest.fixture(params=['local_path_cls', 'smb_path_cls', 'sftp_path_cls'])
 def path_cls(request):
     return request.getfixturevalue(request.param)
 
@@ -364,7 +357,7 @@ def test_glob_no_result(existing_remote_dir):
     assert not list(existing_remote_dir.glob('*.non_existent'))
 
 
-@pytest.mark.parametrize('path_cls', ['local_path_cls', 'ssh_path_cls', 'sftp_path_cls'], indirect=True)
+@pytest.mark.parametrize('path_cls', ['local_path_cls', 'sftp_path_cls'], indirect=True)
 def test_symlink(existing_remote_dir):
     target = existing_remote_dir / 'target'
     contents = b'dummy contents'
@@ -374,7 +367,7 @@ def test_symlink(existing_remote_dir):
     assert link.read_bytes() == contents
 
 
-@pytest.mark.parametrize('path_cls', ['local_path_cls', 'ssh_path_cls', 'sftp_path_cls'], indirect=True)
+@pytest.mark.parametrize('path_cls', ['local_path_cls', 'sftp_path_cls'], indirect=True)
 def test_symlink_to_non_existent(existing_remote_dir):
     target = existing_remote_dir / 'target_non_existent'
     link = existing_remote_dir / 'link'
@@ -382,20 +375,20 @@ def test_symlink_to_non_existent(existing_remote_dir):
     pytest.raises(exceptions.DoesNotExist, link.read_bytes)
 
 
-@pytest.mark.parametrize('path_cls', ['local_path_cls', 'ssh_path_cls', 'sftp_path_cls'], indirect=True)
+@pytest.mark.parametrize('path_cls', ['local_path_cls', 'sftp_path_cls'], indirect=True)
 def test_symlink_at_existent_path(existing_remote_dir):
     link = existing_remote_dir / 'link'
     link.write_bytes(b'dummy contents')
     pytest.raises(exceptions.AlreadyExists, link.symlink_to, existing_remote_dir / 'target_non_existent')
 
 
-@pytest.mark.parametrize('path_cls', ['local_path_cls', 'ssh_path_cls', 'sftp_path_cls'], indirect=True)
+@pytest.mark.parametrize('path_cls', ['local_path_cls', 'sftp_path_cls'], indirect=True)
 def test_symlink_in_non_existent_parent(existing_remote_dir):
     link = existing_remote_dir / 'non_existent_dir' / 'link'
     pytest.raises(exceptions.BadParent, link.symlink_to, existing_remote_dir / 'target_non_existent')
 
 
-@pytest.mark.parametrize('path_cls', ['local_path_cls', 'ssh_path_cls', 'sftp_path_cls'], indirect=True)
+@pytest.mark.parametrize('path_cls', ['local_path_cls', 'sftp_path_cls'], indirect=True)
 def test_symlink_in_file_parent(existing_remote_dir):
     bad_parent = existing_remote_dir / 'file'
     bad_parent.write_bytes(b'dummy contents')
@@ -403,7 +396,7 @@ def test_symlink_in_file_parent(existing_remote_dir):
     pytest.raises(exceptions.BadParent, link.symlink_to, existing_remote_dir / 'target_non_existent')
 
 
-@pytest.mark.parametrize('path_cls', ['local_path_cls', 'ssh_path_cls', 'sftp_path_cls'], indirect=True)
+@pytest.mark.parametrize('path_cls', ['local_path_cls', 'sftp_path_cls'], indirect=True)
 def test_rmtree_with_symlinks(existing_remote_dir):
     path = existing_remote_dir / 'dir_with_symlink'
     path.mkdir()
@@ -423,7 +416,7 @@ def test_many_mkdir_rmtree(remote_test_dir, iterations, depth):
         top_path.rmtree()
 
 
-path_type_list = ['local', 'posix', 'ssh', 'smb']
+path_type_list = ['local', 'ssh', 'smb']
 
 def remote_file_path(request, path_type, name):
     if path_type == 'ssh':
@@ -436,11 +429,9 @@ def remote_file_path(request, path_type, name):
     base_remote_dir = tmp_dir.joinpath(__name__ + '-remote')
     return base_remote_dir.joinpath(request.node.name + '-' + name)
 
-def path_type_to_path(request, node_dir, ssh_path_cls, path_type, name):
+def path_type_to_path(request, node_dir, path_type, name):
     if path_type in 'local':
         path = node_dir.joinpath('local-file-%s' % name)
-    elif path_type == 'posix':
-        path = ssh_path_cls(str(node_dir.joinpath('posix-file-%s' % name)))
     else:
         path = remote_file_path(request, path_type, name)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -458,9 +449,9 @@ def path_type_to_path(request, node_dir, ssh_path_cls, path_type, name):
     ids='file{}-chunk{}'.format)
 @pytest.mark.parametrize('destination_path_type', path_type_list)
 @pytest.mark.parametrize('source_path_type', path_type_list)
-def test_copy_file(request, node_dir, ssh_path_cls, source_path_type, destination_path_type, file_size, chunk_size):
-    source = path_type_to_path(request, node_dir, ssh_path_cls, source_path_type, 'source')
-    destination = path_type_to_path(request, node_dir, ssh_path_cls, destination_path_type, 'destination')
+def test_copy_file(request, node_dir, source_path_type, destination_path_type, file_size, chunk_size):
+    source = path_type_to_path(request, node_dir, source_path_type, 'source')
+    destination = path_type_to_path(request, node_dir, destination_path_type, 'destination')
 
     _logger.info('Copy: %r -> %r', source, destination)
 
