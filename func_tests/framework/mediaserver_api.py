@@ -26,7 +26,7 @@ _logger = ContextLogger(__name__, 'mediaserver_api')
 
 DEFAULT_API_USER = 'admin'
 INITIAL_API_PASSWORD = 'admin'
-DEFAULT_API_PASSWORD = 'qweasd123'
+DEFAULT_API_PASSWORD = 'NzJhZjI0MTJkMDliMmRjODEzODZmMGVl'
 MAX_CONTENT_LEN_TO_LOG = 1000
 DEFAULT_TAKE_REMOTE_SETTINGS = False
 
