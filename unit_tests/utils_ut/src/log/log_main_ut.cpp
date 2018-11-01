@@ -1,5 +1,9 @@
 #include <gtest/gtest.h>
 
+#define NX_DEBUG_ENABLE_OUTPUT false //< Set to true to enable verbose output of this test.
+#include <nx/kit/debug.h>
+
+#include <nx/utils/unused.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/log/log_settings.h>
@@ -13,8 +17,8 @@ namespace utils {
 namespace log {
 namespace test {
 
-static const Tag kTestTag(lit("TestTag"));
-static const Tag kNamespaceTag(lit("nx::utils::log::test"));
+static const Tag kTestTag(QLatin1String("TestTag"));
+static const Tag kNamespaceTag(QLatin1String("nx"));
 
 class LogMainTest: public ::testing::Test
 {
@@ -138,6 +142,97 @@ TEST_F(LogMainTest, This)
         "* WARNING nx::utils::log::test::*LogMain*(0x*): Value error_count = 2",
         "* DEBUG nx::utils::log::test::*LogMain*(0x*): Value error_count = 3"});
 }
+
+//-------------------------------------------------------------------------------------------------
+// NX_SCOPE_TAG tests.
+
+#define TEST_NX_SCOPE_TAG(NAME) do \
+{ \
+    { \
+        struct ScopeTag{}; /*< Needed for NX_SCOPE_TAG macro used in NX_OUTPUT. */ \
+        NX_OUTPUT << "NX_SCOPE_TAG " << NAME << ": " \
+            << nx::kit::debug::toString(NX_SCOPE_TAG.toString()); \
+    } \
+    NX_VERBOSE(NX_SCOPE_TAG, NAME); /*< Perform the tested action. */ \
+} while (0)
+
+/** Used to test logging from a global function. */
+static /*dummyValue*/ std::string* globalFunction(int dummyInt, char dummyChar)
+{
+    nx::utils::unused(dummyInt, dummyChar);
+    TEST_NX_SCOPE_TAG("globalFunction");
+    return nullptr;
+}
+
+/** Used to test logging from a static function in a class template. */
+template<typename T, char c>
+struct StructTemplate
+{
+    static T staticFunction(T dummyT, char dummyChar = c)
+    {
+        nx::utils::unused(dummyT, dummyChar);
+        TEST_NX_SCOPE_TAG("StructTemplate::staticFunction");
+        return []()
+        {
+            TEST_NX_SCOPE_TAG("lambda in StructTemplate::staticFunction");
+            return []()
+            {
+                TEST_NX_SCOPE_TAG("inner lambda in StructTemplate::staticFunction");
+                return nullptr;
+            }();
+        }();
+    }
+};
+
+/** Used for a pointer-to-member as a template non-type argument for functionTemplate<>(). */
+struct DummyStruct
+{
+    short memberFunction(char c) { return /*dummy*/ -c; }
+};
+
+/** Used to test logging from a function template, and from a lambda. */
+template<typename T, short (DummyStruct::*p)(char)>
+T functionTemplate(T dummyT, char dummyChar = 'c')
+{
+    nx::utils::unused(dummyT, dummyChar);
+    TEST_NX_SCOPE_TAG("functionTemplate");
+    return []()
+    {
+        TEST_NX_SCOPE_TAG("lambda in functionTemplate");
+        return []()
+        {
+            TEST_NX_SCOPE_TAG("inner lambda in functionTemplate");
+            return nullptr;
+        }();
+    }();
+}
+
+TEST_F(LogMainTest, Scope)
+{
+    TEST_NX_SCOPE_TAG("method");
+    expectMessages({"* VERBOSE nx::utils::log::test::LogMainTest_Scope_Test: method"});
+
+    globalFunction(/*dummyInt*/ 42, /*dummyChar*/ 'x');
+    expectMessages({"* VERBOSE nx::utils::log::test: globalFunction"});
+
+    StructTemplate</*T*/ std::string*, /*c*/ '@'>::staticFunction(
+        /*dummyT*/ nullptr, /*dummyChar*/ 'X');
+    expectMessages({
+        "* VERBOSE nx::utils::log::test::StructTemplate<*>: StructTemplate::staticFunction",
+        "* VERBOSE nx::utils::log::test::StructTemplate<*>: lambda in StructTemplate::staticFunction",
+        "* VERBOSE nx::utils::log::test::StructTemplate<*>: inner lambda in StructTemplate::staticFunction",
+    });
+
+    functionTemplate</*T*/ std::string*, /*c*/ &DummyStruct::memberFunction>(
+        /*dummyT*/ nullptr, /*dummyChar*/ 'X');
+    expectMessages({
+        "* VERBOSE nx::utils::log::test: functionTemplate",
+        "* VERBOSE nx::utils::log::test: lambda in functionTemplate",
+        "* VERBOSE nx::utils::log::test: inner lambda in functionTemplate",
+    });
+}
+
+//-------------------------------------------------------------------------------------------------
 
 class LogMainPerformanceTest: public LogMainTest
 {

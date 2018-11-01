@@ -56,10 +56,19 @@ public:
         const QList<QRegion>& regions,
         qint64 msStartTime,
         qint64 msEndTime,
-        int detailLevel ) override;
+        int detailLevel,
+        bool keepSmalChunks,
+        int limit,
+        Qt::SortOrder sortOrder) override;
 
     //!Implementation of QnNetworkResource::getDtsTimePeriods
-    virtual QnTimePeriodList getDtsTimePeriods( qint64 startTimeMs, qint64 endTimeMs, int detailLevel ) override;
+    virtual QnTimePeriodList getDtsTimePeriods(
+        qint64 startTimeMs,
+        qint64 endTimeMs,
+        int detailLevel,
+        bool keepSmalChunks,
+        int limit,
+        Qt::SortOrder sortOrder) override;
 
     //!Implementation of nxpl::NXPluginInterface::queryInterface
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;

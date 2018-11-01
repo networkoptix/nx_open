@@ -208,7 +208,8 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
 
 void ClientUpdateTool::atChunkDownloadFailed(const QString& fileName)
 {
-    NX_VERBOSE(this) << "atChunkDownloadFailed() failed to download chunk for" << fileName;
+    // It is a breakpoint catcher.
+    //NX_VERBOSE(this) << "atChunkDownloadFailed() failed to download chunk for" << fileName;
     //setError(tr("Update package is corrupted: %1").arg(error));
 }
 

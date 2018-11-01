@@ -66,7 +66,13 @@ public:
 
     virtual bool isAnalyticsDriverEvent(nx::vms::api::EventType eventType) const override;
 
-    virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) override;
+    QnTimePeriodList HanwhaResource::getDtsTimePeriods(
+        qint64 startTimeMs,
+        qint64 endTimeMs,
+        int detailLevel,
+        bool keepSmalChunks,
+        int limit,
+        Qt::SortOrder sortOrder);
 
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(
         const QnAbstractStreamDataProvider* dataProvider) const override;

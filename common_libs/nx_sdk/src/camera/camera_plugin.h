@@ -683,12 +683,31 @@ namespace nxcip
         */
         unsigned long long periodDetailLevel;
 
+        /**
+         *  Whether keep small chunks in result. This option similar to the 'periodDetailLevel', but it applied to the chunk length
+         *  instead of inter chunks gap length. Minimal allowed chunk length is applied from 'periodDetailLevel' parameter.
+         */
+        bool keepSmallChunks;
+
+        /**
+         *  Strict output data maximum records size.
+         */
+        int limit;
+
+        /**
+         * Sort output data in descending sort order if true.
+         */
+        bool descSortOrder;
+
         ArchiveSearchOptions()
         :
             motionMask( 0 ),
             startTime( INVALID_TIMESTAMP_VALUE ),
             endTime( INVALID_TIMESTAMP_VALUE ),
-            periodDetailLevel( 0 )
+            periodDetailLevel(0),
+            keepSmallChunks(0),
+            limit(0),
+            descSortOrder(false)
         {
         }
     };

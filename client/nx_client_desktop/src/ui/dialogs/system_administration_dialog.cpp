@@ -55,7 +55,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
     if (nx::client::desktop::ini().massSystemUpdatePrototype)
     {
         auto multiUpdatesWidget = new nx::client::desktop::MultiServerUpdatesWidget(this);
-        addPage(MassUpdatesPage, multiUpdatesWidget, tr("Updates"));
+        addPage(UpdatesPage, multiUpdatesWidget, tr("Updates"));
         safeModeWatcher->addControlledWidget(multiUpdatesWidget,
             QnWorkbenchSafeModeWatcher::ControlMode::Disable);
     }

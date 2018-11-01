@@ -30,7 +30,6 @@ public:
         const Qn::UserAccessData& userAccessData,
         std::function<void()> onConnectionClosedCallback);
     virtual bool validateRemotePeerData(const vms::api::PeerDataEx& remotePeer) override;
-    virtual void start() override;
 protected:
     virtual void doPeriodicTasks() override;
     virtual void stop() override;
@@ -107,7 +106,6 @@ private:
     QElapsedTimer m_dbCommitTimer;
     QElapsedTimer m_wantToSubscribeTimer;
     std::atomic_flag m_restartPending{false};
-    qint64 m_systemIdentityTime = 0;
 };
 
 } // namespace p2p

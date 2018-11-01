@@ -55,7 +55,7 @@ class CameraStagesExecutor(object):
         """ :returns True if all stages are finished, False otherwise (retry is required).
         """
         try:
-            self._all_stage_steps.next()
+            next(self._all_stage_steps)
             return False
 
         except StopIteration:
@@ -83,7 +83,7 @@ class CameraStagesExecutor(object):
             steps = executors.steps(server)
             while True:
                 try:
-                    steps.next()
+                    next(steps)
                     self._duration = timer.from_start
                     yield
 

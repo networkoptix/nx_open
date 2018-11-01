@@ -41,7 +41,7 @@ const QString kEventLogPeriodDaysName(lit("eventLogPeriodDays"));
 const QString kNameHost(lit("smtpHost"));
 const QString kNamePort(lit("smtpPort"));
 const QString kNameUser(lit("smtpUser"));
-const QString kNamePassword(lit("smptPassword"));
+const QString kNamePassword(lit("smtpPassword"));
 const QString kNameConnectionType(lit("smtpConnectionType"));
 const QString kNameSimple(lit("smtpSimple"));
 const QString kNameTimeout(lit("smtpTimeout"));

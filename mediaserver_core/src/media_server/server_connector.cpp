@@ -85,16 +85,11 @@ void QnServerConnector::stop()
     decltype(m_urls) usedUrls;
     {
         QnMutexLocker lock(&m_mutex);
-        usedUrls = m_urls;
+        std::swap(usedUrls, m_urls);
     }
 
-    for (const auto& it: m_urls.keys())
+    for (const auto& it: usedUrls.keys())
         removeConnection(it);
-
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_urls.clear();
-    }
 }
 
 void QnServerConnector::restart()

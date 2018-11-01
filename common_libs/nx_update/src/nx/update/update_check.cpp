@@ -197,8 +197,12 @@ static InformationError fillUpdateInformation(
         auto it = customizationInfo.releases.find(version);
         if (it == customizationInfo.releases.end())
             return InformationError::noNewVersion;
-        publicationKey = it.value().build();
-        NX_INFO(typeid(Information)) << "fillUpdateInformation will use build" << publicationKey;
+        auto updateVersion = it.value();
+        publicationKey = QString::number(updateVersion.build());
+        NX_INFO(typeid(Information))
+            << "fillUpdateInformation will use version"
+            << updateVersion.toString(nx::vms::api::SoftwareVersion::FullFormat)
+            << "build" << publicationKey;
     }
 
     auto baseUpdateUrl = customizationInfo.updates_prefix + "/" + publicationKey;
@@ -280,7 +284,13 @@ Information updateInformation(const QString& /*zipFileName*/, InformationError* 
     return Information();
 }
 
-bool findPackage(
+static void setErrorMessage (const QString& message, QString* outMessage)
+{
+    if (outMessage)
+        *outMessage = message;
+};
+
+FindPackageResult findPackage(
     const vms::api::SystemInformation& systemInformation,
     const nx::update::Information& updateInformation,
     bool isClient,
@@ -289,29 +299,31 @@ bool findPackage(
     nx::update::Package* outPackage,
     QString* outMessage)
 {
-    auto setErrorMessage = 
-        [outMessage](const QString& message)
-        {
-            if (outMessage)
-                *outMessage = message;
-        };
+    if (updateInformation.isEmpty())
+    {
+        setErrorMessage("Update information is empty", outMessage);
+        return FindPackageResult::noInfo;
+    }
 
     if (updateInformation.cloudHost != cloudHost && boundToCloud)
     {
         setErrorMessage(QString::fromLatin1(
             "Peer cloud host (%1) doesn't match update cloud host (%2)")
                 .arg(cloudHost)
-                .arg(updateInformation.cloudHost));
-        return false;
+                .arg(updateInformation.cloudHost),
+            outMessage);
+        return FindPackageResult::otherError;
     }
 
-    if (updateInformation.version <= utils::AppInfo::applicationVersion())
+    if (nx::utils::SoftwareVersion(updateInformation.version) <= qnStaticCommon->engineVersion())
     {
         setErrorMessage(QString::fromLatin1(
-            "Update application version (%1) less or equal peer application version (%2)")
+            "The update application version (%1) is less or equal to the peer application " \
+            "version (%2)")
                 .arg(updateInformation.version)
-                .arg(utils::AppInfo::applicationVersion()));
-        return false;
+                .arg(qnStaticCommon->engineVersion().toString()),
+            outMessage);
+        return FindPackageResult::otherError;
     }
 
     for (const auto& package : updateInformation.packages)
@@ -328,7 +340,7 @@ bool findPackage(
             && (packageOsVariant <= selfOsVariant || selfOsVariant.isNull()))
         {
             *outPackage = package;
-            return true;
+            return FindPackageResult::ok;
         }
     }
 
@@ -338,12 +350,13 @@ bool findPackage(
             .arg(systemInformation.arch)
             .arg(systemInformation.platform)
             .arg(systemInformation.modification)
-            .arg(systemInformation.version));
+            .arg(systemInformation.version),
+        outMessage);
 
-    return false;
+    return FindPackageResult::otherError;
 }
 
-bool findPackage(
+FindPackageResult findPackage(
     const vms::api::SystemInformation& systemInformation,
     const QByteArray& serializedUpdateInformation,
     bool isClient,
@@ -352,12 +365,17 @@ bool findPackage(
     nx::update::Package* outPackage,
     QString* outMessage)
 {
+    if (serializedUpdateInformation.isEmpty())
+    {
+        setErrorMessage("Update information is empty", outMessage);
+        return FindPackageResult::noInfo;
+    }
+
     update::Information updateInformation;
     if (!QJson::deserialize(serializedUpdateInformation, &updateInformation))
     {
-        if (outMessage)
-            *outMessage = QString::fromLatin1("Failed to deserialize update information JSON");
-        return false;
+        setErrorMessage("Failed to deserialize update information JSON", outMessage);
+        return FindPackageResult::otherError;
     }
 
     return findPackage(systemInformation, updateInformation, isClient, cloudHost, boundToCloud,

@@ -498,8 +498,10 @@ angular.module('webadminApp')
 
                 $scope.trafficSettings = {
                     // This weird check is due to servers weird response to api/systemSettings request
-                    trafficEncryptionForced: systemSettings.trafficEncryptionForced === 'true',
-                    videoTrafficEncryptionForced: systemSettings.videoTrafficEncryptionForced === 'true'
+                    trafficEncryptionForced: systemSettings.trafficEncryptionForced === 'true' ||
+                                             systemSettings.trafficEncryptionForced === true,
+                    videoTrafficEncryptionForced: systemSettings.videoTrafficEncryptionForced === 'true' ||
+                                                  systemSettings.videoTrafficEncryptionForced === true
                 };
             });
         }

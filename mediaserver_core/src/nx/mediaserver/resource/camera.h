@@ -160,6 +160,18 @@ public:
 
     nx::streaming::rtp::TimeOffsetPtr getTimeOffset() { return m_timeOffset; }
 
+    /*
+     * Return time periods from resource based archive (direct to storage)
+     */
+    virtual QnTimePeriodList getDtsTimePeriods(
+        qint64 startTimeMs,
+        qint64 endTimeMs,
+        int detailLevel,
+        bool keepSmalChunks,
+        int limit,
+        Qt::SortOrder sortOrder);
+
+
 signals:
     /** Emit on camera or IO module input change. */
     void inputPortStateChanged(

@@ -54,10 +54,6 @@ public:
 
     void setResourceFeed(QnResourcePool* pool);
 
-    /** Generate url for download update file, depending on actual targets list. */
-    static QUrl generateUpdatePackageUrl(const nx::utils::SoftwareVersion &targetVersion,
-        const QString& targetChangeset, const QSet<QnUuid>& targets, QnResourcePool* resourcePool);
-
     // Check if we should sync UI and data from here.
     bool hasRemoteChanges() const;
 
@@ -115,7 +111,7 @@ public:
     std::future<UpdateContents> checkLatestUpdate();
     std::future<UpdateContents> checkSpecificChangeset(QString build);
     std::future<UpdateContents> checkUpdateFromFile(QString file);
-
+    std::future<UpdateContents> checkRemoteUpdateInfo();
     // It is used to obtain future to update check that was started
     // inside loadInternalState method
     // TODO: move all state restoration logic to widget.
@@ -248,6 +244,13 @@ private:
     TimePoint m_timeStartedInstall;
     bool m_protoProblemDetected = false;
 };
+
+/**
+ * Generates URL for upcombiner.
+ * Upcombiner is special server utility, that combines several update packages
+ * to a single zip archive.
+ */
+QUrl generateUpdatePackageUrl(const UpdateContents& contents, const QSet<QnUuid>& targets, QnResourcePool* resourcePool);
 
 } // namespace desktop
 } // namespace client
