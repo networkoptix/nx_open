@@ -1393,12 +1393,12 @@ void QnStorageManager::getRecordedPeriodsInternal(
             QnServer::ChunksCatalog catalog = static_cast<QnServer::ChunksCatalog> (i);
             if (!catalogs.contains(catalog))
                 continue;
-
-            if (camera->isDtsBased())
+            auto serverCamera = camera.dynamicCast<nx::mediaserver::resource::Camera>();
+            if (serverCamera && serverCamera->isDtsBased())
             {
                 if (catalog == QnServer::HiQualityCatalog) // both hi- and low-quality chunks are loaded with this method
                 {
-                    periods.push_back(camera->getDtsTimePeriods(
+                    periods.push_back(serverCamera->getDtsTimePeriods(
                         request.startTimeMs,
                         request.endTimeMs,
                         request.detailLevel.count(),

@@ -296,51 +296,6 @@ void QnNetworkResource::checkIfOnlineAsync( std::function<void(bool)> completion
     nx::network::SocketGlobals::aioService().post(std::bind(completionHandler, false));
 }
 
-QnTimePeriodList QnNetworkResource::getDtsTimePeriods(
-    qint64 /*startTimeMs*/,
-    qint64 /*endTimeMs*/,
-    int /*detailLevel*/,
-    bool /*keepSmalChunks*/,
-    int /*limit*/,
-    Qt::SortOrder /*sortOrder*/)
-{
-    return QnTimePeriodList();
-}
-
-/*
-void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
-{
-    // cannot make concurrent work with pointer CLDevice* ; => so extra steps needed
-
-    NX_DEBUG(this, QLatin1String("Geting device info..."));
-    QTime time;
-    time.start();
-
-    QList<QnResourcePtr> local_list;
-    for (const QnResourcePtr& res: lst.values())
-    {
-        QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
-        if (netRes && !(netRes->checkNetworkStatus(QnNetworkResource::HasConflicts)))
-            local_list << res.data();
-    }
-
-    QThreadPool* global = QThreadPool::globalInstance();
-    for (int i = 0; i < threads; ++i ) global->releaseThread();
-    QtConcurrent::blockingMap(local_list, std::mem_fun(&QnResource::getBaseInfo));
-    for (int i = 0; i < threads; ++i )global->reserveThread();
-
-    CL_LOG(cl_logDEBUG1)
-    {
-        NX_DEBUG(this, QLatin1String("Done. Time elapsed: "), time.elapsed());
-
-        for(const QnResourcePtr& res: lst)
-            NX_DEBUG(this, res->toString());
-
-    }
-
-}
-*/
-
 QnUuid QnNetworkResource::physicalIdToId(const QString& physicalId)
 {
     return nx::vms::api::CameraData::physicalIdToId(physicalId);

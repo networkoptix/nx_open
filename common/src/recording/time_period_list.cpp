@@ -616,8 +616,8 @@ void QnTimePeriodList::unionTimePeriods(QnTimePeriodList& basePeriods, const QnT
 template <typename IteratorType>
 QnTimePeriodList mergeTimePeriodsInternal(
     const QVector<QnTimePeriodList>& nonEmptyPeriods,
-    std::vector<IteratorType>& minIndexes,
-    std::vector<IteratorType>& maxIndexes,
+    std::vector<IteratorType>& minIndices,
+    std::vector<IteratorType>& maxIndices,
     int limit)
 {
     QnTimePeriodList result;
@@ -636,9 +636,9 @@ QnTimePeriodList mergeTimePeriodsInternal(
         int i = 0;
         for (const QnTimePeriodList &periodsList: nonEmptyPeriods)
         {
-            const auto startIdx = minIndexes[i];
+            const auto startIdx = minIndices[i];
 
-            if (startIdx != maxIndexes[i])
+            if (startIdx != maxIndices[i])
             {
                 const QnTimePeriod &startPeriod = *startIdx;
                 if (startPeriod.startTimeMs < minStartTime)
@@ -652,7 +652,7 @@ QnTimePeriodList mergeTimePeriodsInternal(
 
         if (minIndex >= 0)
         {
-            auto &startIdx = minIndexes[minIndex];
+            auto &startIdx = minIndices[minIndex];
             const QnTimePeriod &startPeriod = *startIdx;
 
             // add chunk to merged data
@@ -703,14 +703,14 @@ QnTimePeriodList mergeTimePeriodsInternal(
 
 QnTimePeriodList mergeTimePeriodsAsc(const QVector<QnTimePeriodList>& nonEmptyPeriods, int limit)
 {
-    std::vector<QnTimePeriodList::const_iterator> minIndexes(nonEmptyPeriods.size());
-    std::vector<QnTimePeriodList::const_iterator> endIndexes(nonEmptyPeriods.size());
+    std::vector<QnTimePeriodList::const_iterator> minIndices(nonEmptyPeriods.size());
+    std::vector<QnTimePeriodList::const_iterator> endIndices(nonEmptyPeriods.size());
     for (int i = 0; i < nonEmptyPeriods.size(); ++i)
     {
-        minIndexes[i] = nonEmptyPeriods[i].cbegin();
-        endIndexes[i] = nonEmptyPeriods[i].cend();
+        minIndices[i] = nonEmptyPeriods[i].cbegin();
+        endIndices[i] = nonEmptyPeriods[i].cend();
     }
-    return mergeTimePeriodsInternal(nonEmptyPeriods, minIndexes, endIndexes, limit);
+    return mergeTimePeriodsInternal(nonEmptyPeriods, minIndices, endIndices, limit);
 }
 
 QnTimePeriodList mergeTimePeriodsDesc(const QVector<QnTimePeriodList>& nonEmptyPeriods, int limit)
@@ -733,9 +733,11 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(
     Qt::SortOrder sortOrder)
 {
     QVector<QnTimePeriodList> nonEmptyPeriods;
-    for (const QnTimePeriodList& periodList : periodLists)
+    for (const QnTimePeriodList& periodList: periodLists)
+    {
         if (!periodList.isEmpty())
             nonEmptyPeriods << periodList;
+        }
 
     if (nonEmptyPeriods.empty())
         return QnTimePeriodList();
@@ -748,10 +750,8 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(
         return result;
     }
 
-    if (sortOrder == Qt::SortOrder::AscendingOrder)
-        return mergeTimePeriodsAsc(nonEmptyPeriods, limit);
-    else
-        return mergeTimePeriodsDesc(nonEmptyPeriods, limit);
+    return sortOrder == Qt::SortOrder::AscendingOrder ?
+        mergeTimePeriodsAsc(nonEmptyPeriods, limit) : mergeTimePeriodsDesc(nonEmptyPeriods, limit);
 }
 
 QnTimePeriodList QnTimePeriodList::simplified() const

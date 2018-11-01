@@ -63,7 +63,7 @@ public:
         Iterator itr,
         Iterator endItr,
         int detailLevel,
-        bool keepSmalChunks,
+        bool keepSmallChunks,
         int limit)
     {
         QnTimePeriodList result;
@@ -85,7 +85,7 @@ public:
             }
             else
             {
-                if (last.durationMs < detailLevel && !keepSmalChunks)
+                if (last.durationMs < detailLevel && !keepSmallChunks)
                     result.pop_back();
                 if (result.size() >= limit)
                     break;
@@ -93,7 +93,7 @@ public:
             }
         }
 
-        if (result.last().durationMs < detailLevel && !keepSmalChunks)
+        if (result.last().durationMs < detailLevel && !keepSmallChunks)
             result.pop_back();
         return result;
     }
@@ -103,7 +103,7 @@ public:
         Iterator itr,
         Iterator endItr,
         int detailLevel,
-        bool keepSmalChunks,
+        bool keepSmallChunks,
         int limit)
     {
         QnTimePeriodList result;
@@ -124,7 +124,7 @@ public:
             }
             else
             {
-                if (!last.isInfinite() && last.durationMs < detailLevel && !keepSmalChunks)
+                if (!last.isInfinite() && last.durationMs < detailLevel && !keepSmallChunks)
                     result.pop_back();
                 if (result.size() >= limit)
                     break;
@@ -132,7 +132,7 @@ public:
             }
         }
 
-        if (!result.last().isInfinite() && result.last().durationMs < detailLevel && !keepSmalChunks)
+        if (!result.last().isInfinite() && result.last().durationMs < detailLevel && !keepSmallChunks)
             result.pop_back();
         return result;
     }
@@ -146,10 +146,9 @@ public:
         int limit,
         Qt::SortOrder sortOrder)
     {
-        if (sortOrder == Qt::SortOrder::AscendingOrder)
-            return filterTimePeriodsAsc(itr, endItr, detailLevel, keepSmalChunks, limit);
-        else
-            return filterTimePeriodsDesc(itr, endItr, detailLevel, keepSmalChunks, limit);
+        return sortOrder == Qt::SortOrder::AscendingOrder
+            ? filterTimePeriodsAsc(itr, endItr, detailLevel, keepSmalChunks, limit)
+            : filterTimePeriodsDesc(itr, endItr, detailLevel, keepSmalChunks, limit);
     }
 
     /** Get list of periods, that starts in the target period. */
@@ -216,7 +215,7 @@ public:
     /** Merge some time period lists into one. */
     static QnTimePeriodList mergeTimePeriods(
         const std::vector<QnTimePeriodList>& periods,
-        int limit = INT_MAX,
+        int limit = std::numeric_limits<int>::max(),
         Qt::SortOrder sortOrder = Qt::SortOrder::AscendingOrder);
 
     /** Update tail of the period list with provided tail.

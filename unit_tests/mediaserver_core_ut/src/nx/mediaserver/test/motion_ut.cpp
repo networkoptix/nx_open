@@ -6,9 +6,8 @@
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/mediaserver/camera_mock.h>
 
-namespace nx {
-namespace mediaserver {
-namespace test {
+namespace nx::mediaserver::test
+{
 
 static const int kSteps = 1200;
 static const int kDeltaMs = 10 * 1000LL;
@@ -111,6 +110,4 @@ TEST_F(MotionArchive, findMotionDesc)
     ASSERT_EQ(deltaMs,result[0].durationMs);
 }
 
-} // test
-} // mediaserver
-} // nx
+} // nx::mediaserver::test
