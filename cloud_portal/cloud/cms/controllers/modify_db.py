@@ -11,6 +11,8 @@ from .filldata import fill_content
 from api.models import Account
 from ..models import *
 
+BYTES_TO_MEGABYTES = 1048576.0
+
 
 def update_draft_state(review_id, target_state, user):
     review = ProductCustomizationReview.objects.filter(id=review_id, reviewed_by=None)
@@ -367,9 +369,9 @@ def check_meta_settings(data_structure, new_file):
 
 # End of file upload helpers
 def upload_file(data_structure, new_file):
-    file_size = new_file.size / 1048576.0
+    file_size = new_file.size / BYTES_TO_MEGABYTES
     if file_size >= settings.CMS_MAX_FILE_SIZE:
-        return None, [(data_structure.name, 'Its size was {}MB but must be less than {} MB'. \
+        return None, [(data_structure.name, 'Its size was {0:.2f}MB but must be less than {} MB'. \
                        format(file_size, settings.CMS_MAX_FILE_SIZE))]
 
     file_errors = check_meta_settings(data_structure, new_file)
