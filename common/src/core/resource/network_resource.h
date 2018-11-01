@@ -85,11 +85,6 @@ public:
 
     virtual int getChannel() const;
 
-    /*
-    * Return time periods from resource based archive (direct to storage)
-    */
-    virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel);
-
     //!Returns true if camera is accessible
     /*!
         Default implementation just establishes connection to \a getHostAddress() : \a httpPort()

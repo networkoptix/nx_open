@@ -8,13 +8,17 @@
 
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
+#include <nx/utils/scope_guard.h>
 
 #ifdef Q_OS_MAC
 #include <smmintrin.h>
 #endif
 
+static const int kRecordsPerIteration = 1024;
 static const char version = 1;
 static const quint16 DETAILED_AGGREGATE_INTERVAL = 3; // at seconds
+
+
 //static const quint16 COARSE_AGGREGATE_INTERVAL = 3600; // at seconds
 
 bool operator < (const IndexRecord& first, const IndexRecord& other) { return first.start < other.start; }
@@ -176,91 +180,204 @@ void QnMotionArchive::fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile*
         indexFile->setFileName(fileName + QString("motion_detailed_index") + getChannelPrefix() + ".bin");
 }
 
-QnTimePeriodList QnMotionArchive::matchPeriod(const QRegion& region, qint64 msStartTime, qint64 msEndTime, int detailLevel)
+QnTimePeriodList QnMotionArchive::matchPeriod(
+    const QRegion& region,
+    qint64 msStartTime,
+    qint64 msEndTime,
+    int detailLevel,
+    int limit,
+    Qt::SortOrder sortOrder)
 {
     if (minTime() != (qint64)AV_NOPTS_VALUE)
         msStartTime = qMax(minTime(), msStartTime);
     msEndTime = qMin(msEndTime, m_maxMotionTime.load());
 
-    QnTimePeriodList rez;
-    QFile motionFile, indexFile;
     quint8* buffer = (quint8*) qMallocAligned(MOTION_DATA_RECORD_SIZE * 1024, 32);
+    auto scopedGuard = nx::utils::makeScopeGuard(
+        [buffer]()
+        {
+            qFreeAligned(buffer);
+        });
+
     simd128i mask[Qn::kMotionGridWidth * Qn::kMotionGridHeight / 128];
     int maskStart, maskEnd;
 
     NX_ASSERT(!useSSE2() || ((unsigned long)mask) % 16 == 0);
-
     QnMetaDataV1::createMask(region, (char*)mask, &maskStart, &maskEnd);
-    bool isFirstStep = true;
+
+    QnTimePeriodList rez;
+    QFile motionFile, indexFile;
+    const bool descendingOrder = sortOrder == Qt::SortOrder::DescendingOrder;
 
     while (msStartTime < msEndTime)
     {
         qint64 minTime, maxTime;
-        dateBounds(msStartTime, minTime, maxTime);
+        auto timePointMs = descendingOrder ? msEndTime : msStartTime;
+        dateBounds(timePointMs, minTime, maxTime);
 
         QVector<IndexRecord> index;
         IndexHeader indexHeader;
-        fillFileNames(msStartTime, &motionFile, 0);
-        if (!motionFile.open(QFile::ReadOnly) || !loadIndexFile(index, indexHeader, msStartTime)) {
-            msStartTime = maxTime + 1;
-            continue;
-        }
-
+        fillFileNames(timePointMs, &motionFile, 0);
+        if (!motionFile.open(QFile::ReadOnly) || !loadIndexFile(index, indexHeader, timePointMs))
+            return rez;
 
         QVector<IndexRecord>::iterator startItr = index.begin();
         QVector<IndexRecord>::iterator endItr = index.end();
 
-        if (isFirstStep) {
-            startItr = std::upper_bound(index.begin(), index.end(), msStartTime-indexHeader.startTime);
-            if (startItr > index.begin())
-                startItr--;
+        if (msStartTime > minTime)
+        {
+            startItr =
+                std::lower_bound(index.begin(), index.end(), msStartTime - indexHeader.startTime);
         }
         if (maxTime <= msEndTime)
-            endItr = std::upper_bound(startItr, index.end(), msEndTime-indexHeader.startTime);
-        int totalSteps = endItr - startItr;
+            endItr = std::upper_bound(startItr, index.end(), msEndTime - indexHeader.startTime);
 
-        motionFile.seek((startItr-index.begin()) * MOTION_DATA_RECORD_SIZE);
-
-        // math file (one month)
-        QVector<IndexRecord>::const_iterator i = startItr;
-        while (totalSteps > 0)
+        if (descendingOrder)
         {
-            int readed = motionFile.read((char*) buffer, MOTION_DATA_RECORD_SIZE * qMin(totalSteps,1024));
-            if (readed <= 0)
-                break;
-            quint8* dataEnd = buffer + readed;
-            quint8* curData = buffer;
-            while (i < endItr && curData < dataEnd)
-            {
-                if (QnMetaDataV1::matchImage((simd128i*) curData, mask, maskStart, maskEnd))
-                {
-                    qint64 fullStartTime = i->start + indexHeader.startTime;
-                    if (fullStartTime > msEndTime) {
-                        totalSteps = 0;
-                        break;
-                    }
-
-                    if (rez.empty())
-                        rez.push_back(QnTimePeriod(fullStartTime, i->duration));
-                    else {
-                        QnTimePeriod& last = *(rez.end()-1);
-                        if (fullStartTime <= last.startTimeMs + last.durationMs + detailLevel)
-                            last.durationMs = qMax(last.durationMs, i->duration + fullStartTime - last.startTimeMs);
-                        else
-                            rez.push_back(QnTimePeriod(fullStartTime, i->duration));
-                    }
-                }
-                curData += MOTION_DATA_RECORD_SIZE;
-                ++i;
-            }
-            totalSteps -= readed/MOTION_DATA_RECORD_SIZE;
+            loadDataFromIndexDesc(motionFile, indexHeader, index, startItr, endItr, detailLevel, limit,
+                buffer, mask, maskStart, maskEnd, rez);
         }
-        msStartTime = maxTime + 1;
-        isFirstStep = false;
+        else
+        {
+            loadDataFromIndex(motionFile, indexHeader, index, startItr, endItr, detailLevel, limit,
+                buffer, mask, maskStart, maskEnd, rez);
+        }
+
+        if (limit && rez.size() == limit)
+            break;
+
+        if (descendingOrder)
+            msEndTime = minTime - 1;
+        else
+            msStartTime = maxTime + 1;
     }
 
-    qFreeAligned(buffer);
     return rez;
+}
+
+void QnMotionArchive::loadDataFromIndex(
+    QFile& motionFile,
+    const IndexHeader& indexHeader,
+    const QVector<IndexRecord>& index,
+    QVector<IndexRecord>::iterator startItr,
+    QVector<IndexRecord>::iterator endItr,
+    int detailLevel,
+    int limit,
+    quint8* buffer,
+    simd128i* mask,
+    int maskStart,
+    int maskEnd,
+    QnTimePeriodList& rez)
+{
+    int totalSteps = endItr - startItr;
+
+    int recordNumberToSeek = startItr - index.begin();
+    motionFile.seek(recordNumberToSeek * MOTION_DATA_RECORD_SIZE);
+
+    // math file (one month)
+    QVector<IndexRecord>::const_iterator i = startItr;
+    while (totalSteps > 0)
+    {
+        int readed = motionFile.read((char*)buffer, MOTION_DATA_RECORD_SIZE * qMin(totalSteps, kRecordsPerIteration));
+        if (readed <= 0)
+            break;
+        quint8* dataEnd = buffer + readed;
+        quint8* curData = buffer;
+        while (i < endItr && curData < dataEnd)
+        {
+            if (QnMetaDataV1::matchImage((simd128i*)curData, mask, maskStart, maskEnd))
+            {
+                qint64 fullStartTime = i->start + indexHeader.startTime;
+
+                if (rez.empty())
+                {
+                    rez.push_back(QnTimePeriod(fullStartTime, i->duration));
+                }
+                else
+                {
+                    QnTimePeriod& last = *(rez.end() - 1);
+                    if (fullStartTime <= last.startTimeMs + last.durationMs + detailLevel)
+                    {
+                        last.durationMs = qMax(last.durationMs, i->duration + fullStartTime - last.startTimeMs);
+                    }
+                    else
+                    {
+                        if (rez.size() == limit)
+                            return;
+                        rez.push_back(QnTimePeriod(fullStartTime, i->duration));
+                    }
+                }
+            }
+            curData += MOTION_DATA_RECORD_SIZE;
+            ++i;
+        }
+        totalSteps -= readed / MOTION_DATA_RECORD_SIZE;
+    }
+}
+
+void QnMotionArchive::loadDataFromIndexDesc(
+    QFile& motionFile,
+    const IndexHeader& indexHeader,
+    const QVector<IndexRecord>& index,
+    QVector<IndexRecord>::iterator startItr,
+    QVector<IndexRecord>::iterator endItr,
+    int detailLevel,
+    int limit,
+    quint8* buffer,
+    simd128i* mask,
+    int maskStart,
+    int maskEnd,
+    QnTimePeriodList& rez)
+{
+    int totalSteps = endItr - startItr;
+
+    int recordNumberToSeek = qMax(0LL, (endItr - kRecordsPerIteration) - index.begin());
+
+    // math file (one month)
+    QVector<IndexRecord>::const_iterator i = endItr - 1;
+    while (totalSteps > 0)
+    {
+        motionFile.seek(recordNumberToSeek * MOTION_DATA_RECORD_SIZE);
+        recordNumberToSeek = std::max(0, recordNumberToSeek - kRecordsPerIteration);
+        int readed = motionFile.read(
+            (char*) buffer, MOTION_DATA_RECORD_SIZE * qMin(totalSteps, kRecordsPerIteration));
+        if (readed <= 0)
+            break;
+
+        quint8* dataEnd = buffer + readed;
+        quint8* curData = buffer;
+        while (i >= startItr && curData < dataEnd)
+        {
+            if (QnMetaDataV1::matchImage((simd128i*) curData, mask, maskStart, maskEnd))
+            {
+                qint64 fullStartTimeMs = i->start + indexHeader.startTime;
+
+                if (rez.empty())
+                {
+                    rez.push_back(QnTimePeriod(fullStartTimeMs, i->duration));
+                }
+                else
+                {
+                    QnTimePeriod& last = *(rez.end() - 1);
+                    if (fullStartTimeMs + i->duration + detailLevel > last.startTimeMs)
+                    {
+                        const auto endTimeMs = last.endTimeMs();
+                        last.startTimeMs = qMin(last.startTimeMs, fullStartTimeMs);
+                        last.durationMs = endTimeMs - last.startTimeMs;
+                    }
+                    else
+                    {
+                        if (rez.size() == limit)
+                            return;
+                        rez.push_back(QnTimePeriod(fullStartTimeMs, i->duration));
+                    }
+                }
+            }
+            curData += MOTION_DATA_RECORD_SIZE;
+            --i;
+        }
+        totalSteps -= readed / MOTION_DATA_RECORD_SIZE;
+    }
 }
 
 bool QnMotionArchive::loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, const QDateTime& time) const
@@ -327,7 +444,7 @@ bool QnMotionArchive::saveToArchiveInternal(QnConstMetaDataV1Ptr data)
 {
     QnMutexLocker lock(&m_writeMutex);
 
-    qint64 timestamp = data->timestamp/1000;
+    const qint64 timestamp = data->timestamp/1000;
     if (timestamp > m_lastDateForCurrentFile || timestamp < m_firstTime)
     {
         // go to new file
@@ -403,7 +520,7 @@ bool QnMotionArchive::saveToArchiveInternal(QnConstMetaDataV1Ptr data)
     }
 
     quint32 relTime = quint32(timestamp - m_firstTime);
-    quint32 duration = int((data->timestamp+data->m_duration)/1000 - timestamp);
+    quint32 duration = std::max(kMinimalMotionDurationMs, quint32(data->m_duration/1000));
     if (m_detailedIndexFile.write((const char*) &relTime, 4) != 4)
     {
         qWarning() << "Failed to write index file for camera" << m_resource->getUniqueId();

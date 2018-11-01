@@ -1231,7 +1231,10 @@ QnTimePeriodList QnSecurityCamResource::getDtsTimePeriodsByMotionRegion(
     const QList<QRegion>& /*regions*/,
     qint64 /*msStartTime*/,
     qint64 /*msEndTime*/,
-    int /*detailLevel*/ )
+    int /*detailLevel*/,
+    bool /*keepSmalChunks*/,
+    int /*limit*/,
+    Qt::SortOrder /*sortOrder*/)
 {
     return QnTimePeriodList();
 }

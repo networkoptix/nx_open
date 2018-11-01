@@ -9,8 +9,6 @@
 #include <core/resource/camera_bookmark.h>
 #include <nx/network/http/custom_headers.h>
 
-#include "motion/motion_helper.h"
-
 #include <rest/helpers/chunks_request_helper.h>
 
 #include <utils/fs/file.h>

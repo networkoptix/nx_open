@@ -90,17 +90,37 @@ void QnMultiserverChunksRestHandler::loadLocalData(
     MultiServerPeriodDataList& outputData,
     QnChunksRequestContext* ctx) const
 {
-    MultiServerPeriodData record;
-    record.guid = moduleGUID();
-    record.periods = QnChunksRequestHelper(serverModule()).load(ctx->request());
-
-    if (!record.periods.empty())
-    {
-        ctx->executeGuarded(
-            [&outputData, &record]()
+    auto addData =
+        [&]
+        (MultiServerPeriodData record)
+        {
+            if (!record.periods.empty())
             {
-                outputData.push_back(std::move(record));
-            });
+                ctx->executeGuarded(
+                    [&outputData, &record]() { outputData.push_back(std::move(record)); });
+            }
+        };
+
+    if (ctx->request().groupBy == QnChunksRequestData::GroupBy::cameraId)
+    {
+        for (const auto& camera: ctx->request().resList)
+        {
+            auto modifiedRequest = ctx->request();
+            modifiedRequest.resList.clear();
+            modifiedRequest.resList << camera;
+
+            MultiServerPeriodData record;
+            record.guid = camera->getId();
+            record.periods = QnChunksRequestHelper(serverModule()).load(modifiedRequest);
+            addData(record);
+        }
+    }
+    else
+    {
+        MultiServerPeriodData record;
+        record.guid = moduleGUID();
+        record.periods = QnChunksRequestHelper(serverModule()).load(ctx->request());
+        addData(record);
     }
 }
 
@@ -181,6 +201,32 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(
     return outputData;
 }
 
+MultiServerPeriodDataList mergeDataWithSameId(
+    const MultiServerPeriodDataList& periodList,
+    int limit,
+    Qt::SortOrder sortOrder)
+{
+    MultiServerPeriodDataList result;
+    for (int i = 0; i < periodList.size(); ++i)
+    {
+        const auto guid = periodList[i].guid;
+        std::vector<QnTimePeriodList> periodsToMerge;
+        periodsToMerge.push_back(periodList[i].periods);
+        for (int j = i + 1; j < periodList.size(); ++j)
+        {
+            if (periodList[j].guid == guid)
+                periodsToMerge.push_back(periodList[j].periods);
+        }
+
+        MultiServerPeriodData record;
+        record.guid = guid;
+        record.periods = QnTimePeriodList::mergeTimePeriods(periodsToMerge, limit, sortOrder);
+        result.push_back(std::move(record));
+    }
+
+    return result;
+}
+
 int QnMultiserverChunksRestHandler::executeGet(
     const QString& /*path*/,
     const QnRequestParamList& params,
@@ -210,12 +256,13 @@ int QnMultiserverChunksRestHandler::executeGet(
     NX_VERBOSE(this) << " In progress request QnMultiserverChunksRestHandler::executeGet #"
         << requestNum << ". After loading data. timeout=" << timer.elapsed();
 
-    if (request.flat)
+    if (request.groupBy == QnChunksRequestData::GroupBy::none)
     {
         std::vector<QnTimePeriodList> periodsList;
         for (const MultiServerPeriodData& value: outputData)
             periodsList.push_back(value.periods);
-        QnTimePeriodList timePeriodList = QnTimePeriodList::mergeTimePeriods(periodsList);
+        QnTimePeriodList timePeriodList = QnTimePeriodList::mergeTimePeriods(
+            periodsList, request.limit, request.sortOrder);
 
         if (request.format == Qn::CompressedPeriodsFormat)
         {
@@ -230,6 +277,9 @@ int QnMultiserverChunksRestHandler::executeGet(
     }
     else
     {
+        if (request.groupBy == QnChunksRequestData::GroupBy::cameraId)
+            outputData = mergeDataWithSameId(outputData, request.limit, request.sortOrder);
+
         if (request.format == Qn::CompressedPeriodsFormat)
         {
             result = QnCompressedTime::serialized(outputData, false);

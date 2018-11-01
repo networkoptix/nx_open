@@ -2317,7 +2317,13 @@ void MediaServerProcess::registerRestHandlers(
      * %param[opt]:option keepSmallChunks If specified, standalone chunks smaller than the detail
      *     level are not removed from the result.
      * %param[opt]:integer limit Maximum number of chunks to return.
-     * %param[opt]:option flat If specified, do not group chunk lists by server.
+     * %param[opt]:option flat If specified, do not group chunk lists by server. This parameter is deprecated.
+     *     Please use parameter groupBy instead.
+    * %param[opt]:enum groupBy group type. Default value is "serverId".
+     *     %value serverId group data by serverId. Result field 'guid' has server Guid value.
+     *     %value cameraId group data by cameraId. Result field 'guid' has camera Guid value.
+     *     %value none do not group data. Result is the flat list of data.
+     * %param[opt]:option desc Sort data in descending order if provided.
      * %return:object JSON object with an error code, error message and the list of JSON objects
      *     in "reply" field: if no "flat" parameter is specified, "reply" field is the list which
      *     contains for each server its GUID (as "guid" field) and the list of chunks (as "periods"
