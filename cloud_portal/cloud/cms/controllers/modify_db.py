@@ -348,7 +348,6 @@ def check_image_dimensions(data_structure_name,
 
 def check_meta_settings(data_structure, new_file):
     meta_settings = data_structure.meta_settings
-    print meta_settings, new_file.content_type
     if 'format' in meta_settings and is_not_valid_file_type(new_file.content_type, meta_settings['format']):
         error_msg = "Invalid file type. Uploaded file is {}. It should be {}." \
             .format(new_file.content_type,
