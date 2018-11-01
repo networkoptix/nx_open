@@ -145,16 +145,15 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
     {
         case Qt::DisplayRole:
         {
-            const auto unknownObjectTitle =
-                [this]() { return tr("Unknown object"); };
+            const auto fallbackTitle =
+                [this, typeId = object.objectTypeId]()
+                {
+                    return QString("<%1>").arg(typeId.isEmpty() ? tr("Unknown object") : typeId);
+                };
 
             const auto objectCamera = camera(object);
             if (!objectCamera)
-            {
-                return object.objectTypeId.isEmpty()
-                    ? unknownObjectTitle()
-                    : QString("<%1>").arg(object.objectTypeId);
-            }
+                return fallbackTitle();
 
             const auto descriptorListManager = objectCamera
                 ->commonModule()
@@ -164,13 +163,10 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
                 ->descriptor<nx::vms::api::analytics::ObjectTypeDescriptor>(object.objectTypeId);
 
             if (!objectTypeDescriptor)
-            {
-                handled = false;
-                return QVariant();
-            }
+                return fallbackTitle();
 
             return objectTypeDescriptor->item.name.value.isEmpty()
-                ? unknownObjectTitle()
+                ? fallbackTitle()
                 : objectTypeDescriptor->item.name.value;
         }
 

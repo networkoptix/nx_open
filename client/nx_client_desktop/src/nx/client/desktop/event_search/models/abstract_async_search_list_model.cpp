@@ -78,6 +78,12 @@ QVariant AbstractAsyncSearchListModel::data(const QModelIndex& index, int role) 
     bool handled = false;
     const auto result = d->data(index, role, handled);
 
+    if (role == Qt::DisplayRole && result.toString().isEmpty())
+    {
+        NX_ASSERT(false);
+        return QString("?"); //< Title must not be empty.
+    }
+
     return handled ? result : base_type::data(index, role);
 }
 
