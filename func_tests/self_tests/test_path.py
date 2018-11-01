@@ -42,9 +42,9 @@ def smb_path_cls(windows_vm):
     return windows_vm.os_access.path_cls
 
 
-@pytest.fixture(params=['local_path_cls', 'smb_path_cls', 'sftp_path_cls'])
+@pytest.fixture(params=['local', 'smb', 'sftp'])
 def path_cls(request):
-    return request.getfixturevalue(request.param)
+    return request.getfixturevalue(request.param + '_path_cls')
 
 
 @pytest.fixture()
@@ -357,7 +357,7 @@ def test_glob_no_result(existing_remote_dir):
     assert not list(existing_remote_dir.glob('*.non_existent'))
 
 
-@pytest.mark.parametrize('path_cls', ['local_path_cls', 'sftp_path_cls'], indirect=True)
+@pytest.mark.parametrize('path_cls', ['local', 'sftp'], indirect=True)
 def test_symlink(existing_remote_dir):
     target = existing_remote_dir / 'target'
     contents = b'dummy contents'
@@ -367,7 +367,7 @@ def test_symlink(existing_remote_dir):
     assert link.read_bytes() == contents
 
 
-@pytest.mark.parametrize('path_cls', ['local_path_cls', 'sftp_path_cls'], indirect=True)
+@pytest.mark.parametrize('path_cls', ['local', 'sftp'], indirect=True)
 def test_symlink_to_non_existent(existing_remote_dir):
     target = existing_remote_dir / 'target_non_existent'
     link = existing_remote_dir / 'link'
@@ -375,20 +375,20 @@ def test_symlink_to_non_existent(existing_remote_dir):
     pytest.raises(exceptions.DoesNotExist, link.read_bytes)
 
 
-@pytest.mark.parametrize('path_cls', ['local_path_cls', 'sftp_path_cls'], indirect=True)
+@pytest.mark.parametrize('path_cls', ['local', 'sftp'], indirect=True)
 def test_symlink_at_existent_path(existing_remote_dir):
     link = existing_remote_dir / 'link'
     link.write_bytes(b'dummy contents')
     pytest.raises(exceptions.AlreadyExists, link.symlink_to, existing_remote_dir / 'target_non_existent')
 
 
-@pytest.mark.parametrize('path_cls', ['local_path_cls', 'sftp_path_cls'], indirect=True)
+@pytest.mark.parametrize('path_cls', ['local', 'sftp'], indirect=True)
 def test_symlink_in_non_existent_parent(existing_remote_dir):
     link = existing_remote_dir / 'non_existent_dir' / 'link'
     pytest.raises(exceptions.BadParent, link.symlink_to, existing_remote_dir / 'target_non_existent')
 
 
-@pytest.mark.parametrize('path_cls', ['local_path_cls', 'sftp_path_cls'], indirect=True)
+@pytest.mark.parametrize('path_cls', ['local', 'sftp'], indirect=True)
 def test_symlink_in_file_parent(existing_remote_dir):
     bad_parent = existing_remote_dir / 'file'
     bad_parent.write_bytes(b'dummy contents')
@@ -396,7 +396,7 @@ def test_symlink_in_file_parent(existing_remote_dir):
     pytest.raises(exceptions.BadParent, link.symlink_to, existing_remote_dir / 'target_non_existent')
 
 
-@pytest.mark.parametrize('path_cls', ['local_path_cls', 'sftp_path_cls'], indirect=True)
+@pytest.mark.parametrize('path_cls', ['local', 'sftp'], indirect=True)
 def test_rmtree_with_symlinks(existing_remote_dir):
     path = existing_remote_dir / 'dir_with_symlink'
     path.mkdir()
