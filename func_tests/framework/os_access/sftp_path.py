@@ -52,7 +52,7 @@ class SftpPath(BasePosixPath):
 
             @property
             def _client(self):
-                return ssh._client().open_sftp()
+                return ssh._sftp()
 
         return SpecificSftpPath
 
