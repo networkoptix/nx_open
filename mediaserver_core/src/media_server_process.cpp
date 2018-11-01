@@ -2782,7 +2782,7 @@ nx::vms::api::ServerFlags MediaServerProcess::calcServerFlags()
     #if defined(EDGE_SERVER)
         serverFlags |= nx::vms::api::SF_Edge;
     #endif
-    
+
     if (QnAppInfo::isBpi())
     {
         serverFlags |= nx::vms::api::SF_IfListCtrl | nx::vms::api::SF_timeCtrl;
