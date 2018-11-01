@@ -12,68 +12,68 @@
     <div class="row m-0 p-3">
         <div class="row m-0 p-0 col-12 col-md-8 col-xl-7 col-xxl-10">
             <div class="col-12 col-xxl-6 pb-3">
-                <nx-content-block>
+                <nx-block>
                     <header>
                         {{plugin.information.name}}
                     </header>
 
-                    <nx-content-block-section *ngIf="plugin.information.logo">
+                    <nx-section *ngIf="plugin.information.logo">
                         <div class="card--body-logo">
                             <img [src]="plugin.information.logo">
                         </div>
-                    </nx-content-block-section>
+                    </nx-section>
 
-                    <nx-content-block-section>
+                    <nx-section>
                         {{plugin.overview.description}}
-                    </nx-content-block-section>
-                </nx-content-block>
+                    </nx-section>
+                </nx-block>
             </div>
 
             <div class="col-12 col-xxl-6 pb-3" *ngIf="plugin.instructions.downloadLinks">
-                <nx-content-block >
+                <nx-block >
                     <header translate>
                         Download links
                     </header>
 
-                    <nx-content-block-section>
+                    <nx-section>
                         <div [innerHtml]="plugin.instructions.downloadLinks"></div>
-                    </nx-content-block-section>
-                </nx-content-block>
+                    </nx-section>
+                </nx-block>
             </div>
 
             <div class="col-12 col-xxl-6 pb-3" *ngIf="plugin.support.supportInformation">
-                <nx-content-block>
+                <nx-block>
                     <header translate>
                         Support
                     </header>
 
-                    <nx-content-block-section>
+                    <nx-section>
                         <div [innerHtml]="plugin.support.supportInformation"></div>
-                    </nx-content-block-section>
-                </nx-content-block>
+                    </nx-section>
+                </nx-block>
             </div>
 
             <div class="col-12 col-xxl-6 pb-3" *ngIf="plugin.additionalInformation.additionalInformation || plugin.additionalInformation.usefulLinks">
-                <nx-content-block>
+                <nx-block>
                     <header translate>
                         Additional information
                     </header>
 
-                    <nx-content-block-section>
+                    <nx-section>
                         <div [innerHtml]="plugin.additionalInformation.additionalInformation"></div>
                         <div class="mt-3" [innerHtml]="plugin.additionalInformation.usefulLinks"></div>
-                    </nx-content-block-section>
-                </nx-content-block>
+                    </nx-section>
+                </nx-block>
             </div>
         </div>
 
         <div class="col-12 col-md-4 col-xl-3 col-xxl-2">
-            <nx-content-block type='gray'>
+            <nx-block type='gray'>
                 <header translate>
                     Download
                 </header>
 
-                <nx-content-block-section>
+                <nx-section>
                     <div class="mt-3">
                         Instructions
                         <div>
@@ -98,8 +98,8 @@
                             <a href>Link</a>
                         </div>
                     </div>
-                </nx-content-block-section>
-            </nx-content-block>
+                </nx-section>
+            </nx-block>
         </div>
     </div>
 </div>

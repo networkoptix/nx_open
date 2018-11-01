@@ -1,35 +1,35 @@
 import { Component, ElementRef, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 
 /* Usage
-<nx-content-block type?=['gray' | empty] hoverable?>
+<nx-block type?=['gray' | empty] hoverable?>
     <header>
         TITLE
     </header>
-    <nx-content-block-section>
+    <nx-section>
         BODY
-    </nx-content-block-section>
+    </nx-section>
 
     <!-- ngFor -->
-    <nx-content-block-section>
+    <nx-section>
         <header>
             Section title
         </header>
         Section body
-    </nx-content-block-section>
+    </nx-section>
 
-    <nx-content-block-section>
+    <nx-section>
         SECTION without header
-    </nx-content-block-section>
+    </nx-section>
     <!-- ngFor -->
 
     <footer>
         footer content
     </footer>
-</nx-content-block>
+</nx-block>
 */
 
 @Component({
-    selector   : 'nx-content-block',
+    selector   : 'nx-block',
     templateUrl: 'content-block.component.html',
     encapsulation: ViewEncapsulation.None,
     styleUrls  : [ 'content-block.component.scss' ],

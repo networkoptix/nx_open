@@ -4,10 +4,10 @@
 <div class="row p-0 m-0" *ngIf="list.length">
     <div *ngFor="let plugin of list" class="list col-12 col-md-6 col-lg-4 col-xl-3 p-2">
 
-        <a class="card hoverable m-0"
+        <a class="m-0"
            [routerLink]="['/integration/details', plugin.id]">
 
-            <nx-content-block>
+            <nx-block type="fixed" hoverable>
                 <header>
                     <div class="card--header-logo">
                         <img [src]="plugin.information.logo || defaultLogo">
@@ -22,10 +22,10 @@
                     </div>
                 </header>
 
-                <nx-content-block-section type="fixed">
+                <nx-section>
                     <div class="card--body-name"><h3 [innerHtml]="plugin.information.name"></h3></div>
                     <div class="card--body-descr">{{plugin.information.shortDescription}}</div>
-                </nx-content-block-section>
+                </nx-section>
 
                 <footer>
                     <!--<h3 class="float-left m-0 mt-1 mr-1" >-->
@@ -36,7 +36,7 @@
                         <span class="tag" [innerHtml]="type"></span>
                     </h3>
                 </footer>
-            </nx-content-block>
+            </nx-block>
         </a>
 
     </div>
