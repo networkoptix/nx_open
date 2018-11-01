@@ -500,6 +500,7 @@
             "value": "",
             "description": "A youtube embed link for the instruction video.",
             "type": "text",
+            "optional": true,
             "meta": {
               "regex": "^https?:\\/\\/www\\.youtube\\.com\\/embed\\/[\\w]+$"
             }
