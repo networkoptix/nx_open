@@ -29,7 +29,7 @@ def _reraise_by_errno(errno_to_exception):
             except IOError as e:
                 if e.errno not in errno_to_exception:
                     raise
-                raise errno_to_exception[e.errno]
+                raise errno_to_exception[e.errno](e.errno, e.strerror)
 
         return decorated
 
@@ -60,7 +60,7 @@ class SftpPath(BasePosixPath):
     def tmp(cls):
         return cls(cls._tmp)
 
-    @_reraise_by_errno({2: exceptions.BadPath("Path doesn't exist or is a file")})
+    @_reraise_by_errno({2: exceptions.BadPath})
     def glob(self, pattern):
         return [self / name for name in fnmatch.filter(self._client.listdir(str(self)), pattern)]
 
@@ -75,8 +75,8 @@ class SftpPath(BasePosixPath):
             return True
 
     @_reraise_by_errno({
-        errno.ENOENT: exceptions.DoesNotExist(),
-        None: exceptions.BadPath("Probably a dir."),
+        errno.ENOENT: exceptions.DoesNotExist,
+        None: exceptions.BadPath,
         })
     def unlink(self):
         self._client.remove(str(self))
@@ -85,8 +85,8 @@ class SftpPath(BasePosixPath):
         raise NotImplementedError()
 
     @_reraise_by_errno({
-        errno.ENOENT: exceptions.BadParent(),
-        None: exceptions.AlreadyExists("Already exists and may be dir or file"),
+        errno.ENOENT: exceptions.BadParent,
+        None: exceptions.AlreadyExists,
         })
     def _mkdir_raw(self):
         self._client.mkdir(str(self))
@@ -99,7 +99,7 @@ class SftpPath(BasePosixPath):
                 raise
             if ignore_errors:
                 return
-            raise exceptions.DoesNotExist()
+            raise exceptions.DoesNotExist(errno.ENOENT, e.strerror)
         for entry in entries:
             if stat.S_ISDIR(entry.st_mode):
                 self.joinpath(entry.filename).rmtree(ignore_errors=False)
@@ -108,15 +108,15 @@ class SftpPath(BasePosixPath):
         self.rmdir()
 
     @_reraise_by_errno({
-        errno.ENOENT: exceptions.DoesNotExist(),
-        None: exceptions.NotEmpty(),
+        errno.ENOENT: exceptions.DoesNotExist,
+        None: exceptions.NotEmpty,
         })
     def rmdir(self):
         self._client.rmdir(str(self))
 
     @_reraise_by_errno({
-        None: exceptions.NotAFile(),
-        errno.ENOENT: exceptions.DoesNotExist(),
+        None: exceptions.NotAFile,
+        errno.ENOENT: exceptions.DoesNotExist,
         })
     def read_bytes(self, offset=None, max_length=None):
         """Read paramiko.file.BufferedFile#read docstring and code. It does exactly what's needed:
@@ -144,7 +144,7 @@ class SftpPath(BasePosixPath):
         return len(contents)
 
     @_reraise_by_errno({
-        2: exceptions.DoesNotExist(),
+        2: exceptions.DoesNotExist,
         })
     def stat(self):
         s = self._client.stat(str(self))
@@ -158,22 +158,22 @@ class SftpPath(BasePosixPath):
         except IOError as e:
             if 'w' in mode:
                 if e.errno == errno.ENOENT:
-                    raise exceptions.BadParent()
+                    raise exceptions.BadParent(e.errno, e.strerror)
                 if e.errno is None:
-                    raise exceptions.NotAFile()
+                    raise exceptions.NotAFile(errno.EISDIR, e.strerror)
                 raise
             if 'r' in mode:
                 if e.errno == errno.ENOENT:
-                    raise exceptions.DoesNotExist()
+                    raise exceptions.DoesNotExist(e.errno, e.strerror)
                 if e.errno is None:
-                    raise exceptions.BadParent()
+                    raise exceptions.BadParent(errno.EISDIR, e.strerror)
                 raise
             raise
         return f
 
     @_reraise_by_errno({
-        errno.ENOENT: exceptions.BadParent(),
-        None: exceptions.AlreadyExists("Already exists"),
+        errno.ENOENT: exceptions.BadParent,
+        None: exceptions.AlreadyExists,
         })
     def symlink_to(self, target, target_is_directory=False):
         if not isinstance(target, type(self)):

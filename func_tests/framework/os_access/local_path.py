@@ -21,7 +21,7 @@ def _reraising(raised_errors_cls_map):
                 # Avoid try-except with KeyError to be able to reraise it.
                 if caught_error.errno in raised_errors_cls_map:
                     raised_error_cls = raised_errors_cls_map[caught_error.errno]
-                    raise raised_error_cls(caught_error)
+                    raise raised_error_cls(caught_error.errno, caught_error.strerror)
                 raise
 
         return decorated
@@ -70,9 +70,9 @@ class LocalPath(PosixPath, FileSystemPath):
 
     def glob(self, pattern):
         if not self.exists():
-            raise exceptions.DoesNotExist(self)
+            raise exceptions.DoesNotExist(errno.ENOENT, str(self))
         if not self.is_dir():
-            raise exceptions.NotADir(self)
+            raise exceptions.NotADir(errno.ENOTDIR, str(self))
         return super(LocalPath, self).glob(pattern)
 
     @_reraising_existing_dir_errors
@@ -103,7 +103,7 @@ class LocalPath(PosixPath, FileSystemPath):
     def size(self):
         path_stat = self.stat()  # type: os.stat_result
         if not stat.S_ISREG(path_stat.st_mode):
-            raise exceptions.NotAFile("{!r}.stat() returns {!r}".format(self, path_stat))
+            raise exceptions.NotAFile(errno.EISDIR, "{!r}.stat() returns {!r}".format(self, path_stat))
         return path_stat.st_size
 
     def take_from(self, local_source_path):
@@ -115,9 +115,7 @@ class LocalPath(PosixPath, FileSystemPath):
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
-            raise exceptions.AlreadyExists(
-                "Creating symlink {!s} pointing to {!s}".format(destination, local_source_path),
-                destination)
+            return destination
         return destination
 
     @_reraising_new_file_errors

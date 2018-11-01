@@ -1,3 +1,4 @@
+import errno
 import logging
 import os
 import stat
@@ -110,7 +111,7 @@ class FileSystemPath(PurePath):
     def size(self):
         path_stat = self.stat()
         if not stat.S_ISREG(path_stat.st_mode):
-            raise exceptions.NotAFile("Stat: {}".format(path_stat))
+            raise exceptions.NotAFile(errno.EISDIR, "Stat: {}".format(path_stat))
         return path_stat.st_size
 
     def ensure_empty_dir(self):
@@ -170,9 +171,7 @@ class FileSystemPath(PurePath):
             raise exceptions.CannotDownload(
                 "Local file {} doesn't exist.".format(local_source_path))
         if destination.exists():
-            raise exceptions.AlreadyExists(
-                "Cannot copy {!s} to {!s}".format(local_source_path, self),
-                destination)
+            return destination
         copy_file(local_source_path, destination)
         return destination
 

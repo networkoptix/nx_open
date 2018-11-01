@@ -221,9 +221,7 @@ class PosixAccess(OSAccess):
         _, file_name = source_url.rsplit('/', 1)
         destination = destination_dir / file_name
         if destination.exists():
-            raise exceptions.AlreadyExists(
-                "Cannot download {!s} to {!s}".format(source_url, destination_dir),
-                destination)
+            return destination
         try:
             self.shell.run_command(
                 [
@@ -241,10 +239,7 @@ class PosixAccess(OSAccess):
         url = 'smb://{!s}/{!s}'.format(source_hostname, '/'.join(source_path.parts))
         destination = destination_dir / source_path.name
         if destination.exists():
-            raise exceptions.AlreadyExists(
-                "Cannot download file {!s} from {!s} to {!s}".format(
-                    source_path, source_hostname, destination_dir),
-                destination)
+            return destination
         # TODO: Decide on authentication based on username and password from URL.
         try:
             self.shell.run_command(

@@ -85,11 +85,8 @@ class VMType(object):
                     raise EnvironmentError(
                         "Template VM {} not found, template VM image URL is not specified".format(
                             self.template_vm_name))
-                try:
-                    template_vm_image = self.hypervisor.host_os_access.download(
-                        self.template_url, self._template_dir)
-                except AlreadyExists as e:
-                    template_vm_image = e.path
+                template_vm_image = self.hypervisor.host_os_access.download(
+                    self.template_url, self._template_dir)
                 return self.hypervisor.import_vm(template_vm_image, self.template_vm_name)
             except VmNotReady:
                 if not wait.again():

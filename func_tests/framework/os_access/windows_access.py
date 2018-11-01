@@ -217,9 +217,7 @@ class WindowsAccess(OSAccess):
         _, file_name = source_url.rsplit('/', 1)
         destination = destination_dir / file_name
         if destination.exists():
-            raise exceptions.AlreadyExists(
-                "Cannot download {!s} to {!s}".format(source_url, destination_dir),
-                destination)
+            return destination
         variables = {'out': str(destination), 'url': source_url, 'timeoutSec': timeout_sec}
         # language=PowerShell
         try:

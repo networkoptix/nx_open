@@ -1,3 +1,4 @@
+import errno
 import logging
 import string
 from abc import ABCMeta, abstractproperty
@@ -27,7 +28,21 @@ _STATUS_SHARING_VIOLATION = 0xC0000043
 _STATUS_DELETE_PENDING = 0xC0000056
 _STATUS_DIRECTORY_NOT_EMPTY = 0xC0000101
 _STATUS_REQUEST_NOT_ACCEPTED = 0xC00000D0
+_STATUS_ACCESS_DENIED = 0xC0000022
 
+_status_to_errno = {
+    _STATUS_NO_SUCH_FILE: errno.ENOENT,
+    _STATUS_OBJECT_NAME_NOT_FOUND: errno.ENOENT,
+    _STATUS_OBJECT_PATH_NOT_FOUND: errno.ENOENT,
+    _STATUS_OBJECT_NAME_COLLISION: errno.EEXIST,
+    _STATUS_NOT_A_DIRECTORY: errno.ENOTDIR,
+    _STATUS_FILE_IS_A_DIRECTORY: errno.EISDIR,
+    _STATUS_ACCESS_DENIED: errno.EACCES,
+    _STATUS_SHARING_VIOLATION: errno.EACCES,
+    _STATUS_DELETE_PENDING: errno.EWOULDBLOCK,
+    _STATUS_DIRECTORY_NOT_EMPTY: errno.ENOTEMPTY,
+    _STATUS_REQUEST_NOT_ACCEPTED: errno.EPERM,
+    }
 _logger = logging.getLogger(__name__)
 
 
@@ -55,7 +70,7 @@ def _reraising_on_operation_failure(status_to_error_cls):
                     raise
                 if last_message_status in status_to_error_cls:
                     error_cls = status_to_error_cls[last_message_status]
-                    raise error_cls(e)
+                    raise error_cls(_status_to_errno[last_message_status], e.message)
                 raise
 
         return decorated
@@ -238,7 +253,7 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         if self.parent == self:
             assert self == self.__class__(self.anchor)  # I.e. disk root, e.g. C:\.
             if not exist_ok:
-                raise exceptions.AlreadyExists(repr(self))
+                raise exceptions.AlreadyExists(errno.EEXIST, repr(self))
         else:
             try:
                 _logger.debug("Create directory %s on %s", self._relative_path, self._service_name)
@@ -248,20 +263,20 @@ class SMBPath(FileSystemPath, PureWindowsPath):
                 # See: https://msdn.microsoft.com/en-us/library/cc704588.aspx
                 if last_message_status == _STATUS_OBJECT_NAME_COLLISION:
                     if not exist_ok:
-                        raise exceptions.AlreadyExists(repr(self))
+                        raise exceptions.AlreadyExists(errno.EEXIST, repr(self))
                 elif last_message_status == _STATUS_OBJECT_NAME_NOT_FOUND:
                     if parents:
                         self.parent.mkdir(parents=False, exist_ok=True)
                         self.mkdir(parents=False, exist_ok=False)
                     else:
-                        raise exceptions.BadParent("Parent {0.parent} of {0} doesn't exist.".format(self))
+                        raise exceptions.BadParent(errno.ENOENT, "Parent {0.parent} of {0} doesn't exist.".format(self))
                 elif last_message_status == _STATUS_OBJECT_PATH_NOT_FOUND:
                     if parents:
                         self.parent.parent.mkdir(parents=True, exist_ok=True)
                         self.parent.mkdir(parents=False, exist_ok=False)
                         self.mkdir(parents=False, exist_ok=False)
                     else:
-                        raise exceptions.BadParent("Grandparent {0.parent.parent} of {0} doesn't exist.".format(self))
+                        raise exceptions.BadParent(errno.ENOENT, "Grandparent {0.parent.parent} of {0} doesn't exist.".format(self))
                 else:
                     raise
 
@@ -314,7 +329,7 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         attributes = self._smb_connection_pool.connection().getAttributes(
             self._service_name, self._relative_path)  # type: SharedFile
         if attributes.isDirectory:
-            raise exceptions.NotAFile("Attributes of the {}: {}".format(self, attributes))
+            raise exceptions.NotAFile(errno.EISDIR, "Attributes of the {}: {}".format(self, attributes))
         return attributes.file_size
 
     def symlink_to(self, target, target_is_directory=False):
