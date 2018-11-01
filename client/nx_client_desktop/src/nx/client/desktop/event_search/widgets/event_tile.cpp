@@ -341,9 +341,8 @@ void EventTile::setResourceList(const QnResourceList& list)
     QStringList items;
     for (int i = 0; i < std::min(list.size(), kMaximumResourceListSize); ++i)
     {
-        NX_ASSERT(list[i]);
-        if (list[i])
-            items.push_back(QString("<b>%1</b>").arg(list[i]->getName()));
+        NX_ASSERT(list[i]); //< Null resource pointer is an abnormal situation.
+        items.push_back(list[i] ? QString("<b>%1</b>").arg(list[i]->getName()) : "?");
     }
 
     d->setResourceList(items, qMax(list.size() - kMaximumResourceListSize, 0));
