@@ -8,7 +8,6 @@ from functools import wraps
 import paramiko
 from paramiko import SFTPFile
 
-from framework.method_caching import cached_property
 from framework.os_access import exceptions
 from framework.os_access.path import BasePosixPath
 from framework.os_access.ssh_shell import SSH
@@ -51,7 +50,7 @@ class SftpPath(BasePosixPath):
             def home(cls):
                 return cls(ssh.home_dir(ssh.current_user_name()))
 
-            @cached_property
+            @property
             def _client(self):
                 return ssh._client().open_sftp()
 
