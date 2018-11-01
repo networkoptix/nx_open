@@ -11,14 +11,6 @@ namespace device {
 namespace rpi {
 
 /**
- * Get a list of devices of the form /dev/video* available on the RaspberryPi.
- * Note that it is not the same path as Desktop Linux, which uses /dev/v4l/by-id/*. 
- * Raspberry Pi does not create such a directory for its integrated camera, 
- * so instead /dev/video* is searched.
- */
-std::vector<std::string> getRpiDevicePaths();
-
-/**
  * Return the resolution list for the rpi integrated camera.
  */
 std::vector<device::ResolutionData> getMmalResolutionList();
