@@ -4,6 +4,7 @@
         "value": "VCA driver", 
         "localization": {}
     }, 
+    "capabilities": "deviceModelDependent",
     "outputEventTypes": [
         {
             "id": "nx.vca.md", 

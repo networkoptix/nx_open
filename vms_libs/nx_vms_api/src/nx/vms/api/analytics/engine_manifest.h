@@ -41,7 +41,7 @@ struct NX_VMS_API EngineManifest
         needUncompressedVideoFrames_bgra = 1 << 4,
         needUncompressedVideoFrames_rgb = 1 << 5,
         needUncompressedVideoFrames_bgr = 1 << 6,
-        deviceModelIndependent = 1 << 7,
+        deviceModelDependent = 1 << 7,
     };
     Q_DECLARE_FLAGS(Capabilities, Capability)
 

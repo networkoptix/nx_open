@@ -4,6 +4,7 @@
         "value": "Hanwha metadata driver", 
         "localization": {}
     }, 
+    "capabilities": "deviceModelDependent",
     "outputEventTypes": [
         {
             "id": "nx.hanwha.FaceDetection", 

@@ -4,6 +4,7 @@
         "value": "Hikvision metadata driver", 
         "localization": {}
     }, 
+    "capabilities": "deviceModelDependent",
     "outputEventTypes": [
         {
             "id": "nx.hikvision.loitering", 

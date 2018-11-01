@@ -4,6 +4,7 @@
         "value": "Axis driver", 
         "localization": {}
     }, 
+    "capabilities": "deviceModelDependent",
     "allowedTopics": [
         "tns1:RuleEngine", 
         "tns1:VideoSource", 
