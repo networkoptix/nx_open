@@ -83,7 +83,7 @@ public:
     {
         return appendPath(std::string(path), mode);
     }
-    Builder& appendPath(const nx::String& path, QUrl::ParsingMode mode = QUrl::DecodedMode)
+    Builder& appendPath(const QByteArray& path, QUrl::ParsingMode mode = QUrl::DecodedMode)
     {
         return appendPath(QString::fromUtf8(path), mode);
     }
