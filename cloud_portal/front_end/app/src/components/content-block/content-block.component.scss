@@ -41,6 +41,12 @@
         }
     }
     
+    nx-section:first-of-type {
+        .card--body {
+            border-top: none;
+        }
+    }
+    
     &.gray {
         background-color : $light4;
         border           : none;

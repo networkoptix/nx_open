@@ -2,10 +2,12 @@
 @import '../../../../styles/custom/custom_palette';
 @import '../../../../styles/theme_variables';
 
-.card {
+.plugin {
     text-decoration : none;
     color           : inherit;
-    
+}
+
+.card {
     &--header {
         &-logo {
             float       : left;
