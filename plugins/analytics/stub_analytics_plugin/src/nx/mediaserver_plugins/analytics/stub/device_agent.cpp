@@ -341,7 +341,23 @@ bool DeviceAgent::checkFrame(const UncompressedVideoFrame* frame) const
         }
 
         // Hex-dump some bytes from raw pixel data.
-        if (NX_DEBUG_ENABLE_OUTPUT)
+        if (frame->handle() != 0)
+        {
+            if (frame->data(0) != nullptr)
+            {
+                NX_PRINT << __func__
+                    << "() ERROR: data() is not null while handle() is not zero";
+                return false;
+            }
+            if (!frame->map())
+            {
+                NX_PRINT << __func__ << "() ERROR: map() failed";
+                return false;
+            }
+            NX_PRINT_HEX_DUMP("First byte of frame data(0)", frame->data(0), 1);
+            frame->unmap();
+        }
+        else if (NX_DEBUG_ENABLE_OUTPUT)
         {
             static const int dumpOffset = 0;
             static const int dumpSize = 12;
@@ -353,9 +369,9 @@ bool DeviceAgent::checkFrame(const UncompressedVideoFrame* frame) const
             }
             else
             {
-                NX_PRINT_HEX_DUMP(nx::kit::debug::format(
-                    "Plane %d bytes %d..%d of %d",
-                    plane, dumpOffset, dumpOffset + dumpSize - 1, frame->dataSize(plane)).c_str(),
+                NX_PRINT_HEX_DUMP(
+                    nx::kit::debug::format("Plane %d bytes %d..%d of %d",
+                        plane, dumpOffset, dumpOffset + dumpSize - 1, frame->dataSize(plane)).c_str(),
                     frame->data(plane) + dumpOffset, dumpSize);
             }
         }
