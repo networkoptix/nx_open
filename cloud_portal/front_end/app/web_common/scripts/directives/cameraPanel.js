@@ -20,7 +20,8 @@
                 'activeCamera'   : '=',
                 'camerasProvider': '=',
                 'showCameraPanel': '=',
-                'searchCams'     : '='
+                'searchCams'     : '=',
+                'isEmbeded'      : '<'
             },
             templateUrl: Config.viewsDirCommon + 'components/cameraPanel.html',
             link       : function (scope/*, element, attrs*/) {
@@ -44,8 +45,8 @@
                         if (scope.cameras.hasOwnProperty(serverId)) {
 
                             for (var idx = 0; idx < scope.cameras[serverId].length; idx++) {
-                                if (isActive('/embed') && scope.cameras[serverId][idx].id === '{' + $routeParams.cameraId + '}' ||
-                                    !isActive('/embed') && scope.cameras[serverId][idx].id === scope.storage.activeCameras[serverId]) {
+                                if (scope.isEmbeded && scope.cameras[serverId][idx].id === '{' + $routeParams.cameraId + '}' ||
+                                    !scope.isEmbeded && scope.cameras[serverId][idx].id === scope.storage.activeCameras[serverId]) {
                                     
                                     scope.selectCamera(scope.cameras[serverId][idx]);
                                     selected = true;

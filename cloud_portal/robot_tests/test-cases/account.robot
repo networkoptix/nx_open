@@ -136,6 +136,7 @@ SPACE for last name is not valid
     [tags]    C41573
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
+    Validate Log In
     Verify In Account Page
     Input Text    ${ACCOUNT FIRST NAME}    Mark
     Input Text    ${ACCOUNT LAST NAME}    ${SPACE}

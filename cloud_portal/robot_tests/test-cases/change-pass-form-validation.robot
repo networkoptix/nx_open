@@ -74,6 +74,7 @@ Test Passwords Invalid
 
 Change Password Form Validation
     [arguments]    ${old password}    ${new password}
+    Sleep    .3    #added to make sure the page is loaded fully
     Input Text    ${CURRENT PASSWORD INPUT}    ${old password}
     Input Text    ${NEW PASSWORD INPUT}    ${new password}
     Check Password Badge    ${new password}
