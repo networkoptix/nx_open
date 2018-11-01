@@ -145,11 +145,15 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
     {
         case Qt::DisplayRole:
         {
+            const auto unknownObjectTitle =
+                [this]() { return tr("Unknown object"); };
+
             const auto objectCamera = camera(object);
             if (!objectCamera)
             {
-                handled = false;
-                return QVariant();
+                return object.objectTypeId.isEmpty()
+                    ? unknownObjectTitle()
+                    : QString("<%1>").arg(object.objectTypeId);
             }
 
             const auto descriptorListManager = objectCamera
@@ -166,7 +170,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             }
 
             return objectTypeDescriptor->item.name.value.isEmpty()
-                ? tr("Unknown object")
+                ? unknownObjectTitle()
                 : objectTypeDescriptor->item.name.value;
         }
 
