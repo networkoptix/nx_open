@@ -1592,7 +1592,7 @@ bool MultiServerUpdatesWidget::hasChanges() const
 
 bool MultiServerUpdatesWidget::canApplyChanges() const
 {
-    return false;
+    return true;
 }
 
 bool MultiServerUpdatesWidget::canDiscardChanges() const
