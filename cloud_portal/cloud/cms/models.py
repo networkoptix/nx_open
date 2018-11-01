@@ -317,7 +317,7 @@ class DataStructure(models.Model):
     type = models.IntegerField(choices=DATA_TYPES, default=DATA_TYPES.text)
     default = models.TextField(default='', blank=True)
     translatable = models.BooleanField(default=True)
-    meta_settings = JSONField(default=dict(), blank=True)
+    meta_settings = JSONField(default=dict(), blank=True, help_text="For the regex field \\ needs to be escaped with another '\\'")
     advanced = models.BooleanField(default=False)
     order = models.IntegerField(default=100000)
     optional = models.BooleanField(default=False)

@@ -1,5 +1,6 @@
 import yaml
 from django import forms
+from django.core.validators import RegexValidator
 from .models import *
 
 from dal import autocomplete
@@ -131,12 +132,17 @@ class CustomContextForm(forms.Form):
                                                                          disabled=disabled)
                 continue
 
+            validator = RegexValidator('')
+            if data_structure.type == DataStructure.DATA_TYPES.text and 'regex' in data_structure.meta_settings:
+                validator = RegexValidator(data_structure.meta_settings['regex'])
+
             self.fields[data_structure.name] = forms.CharField(required=False,
                                                                label=ds_label,
                                                                help_text=ds_description,
                                                                initial=record_value,
                                                                widget=widget_type,
-                                                               disabled=disabled)
+                                                               disabled=disabled,
+                                                               validators=[validator])
 
 
 class ProductSettingsForm(forms.Form):
