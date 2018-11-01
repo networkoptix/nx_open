@@ -525,6 +525,7 @@
             "value": "",
             "description": "",
             "type": "external_file",
+            "optional": true,
             "public": false
           },
           {
@@ -533,6 +534,7 @@
             "value": "",
             "description": "",
             "type": "external_file",
+            "optional": true,
             "public": false
           },
           {
@@ -541,6 +543,7 @@
             "value": "",
             "description": "",
             "type": "external_file",
+            "optional": true,
             "public": false
           },
           {
@@ -549,6 +552,7 @@
             "value": "",
             "description": "",
             "type": "external_file",
+            "optional": true,
             "public": false
           },
           {
@@ -557,6 +561,7 @@
             "value": "",
             "description": "",
             "type": "external_file",
+            "optional": true,
             "public": false
           },
           {
@@ -565,6 +570,7 @@
             "value": "",
             "description": "",
             "type": "external_file",
+            "optional": true,
             "public": false
           },
           {
@@ -573,6 +579,7 @@
             "value": "",
             "description": "",
             "type": "external_file",
+            "optional": true,
             "public": false
           }
         ]
