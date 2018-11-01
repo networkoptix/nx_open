@@ -83,7 +83,7 @@ public:
     qint64 maxTime() const;
     int getChannel() const;
 
-    static const quint32 kMinimalMotionDurationMs = 125;
+    static constexpr quint32 kMinimalMotionDurationMs = 125;
 private:
     QString getFilePrefix(const QDate& datetime) const;
     void dateBounds(qint64 datetimeMs, qint64& minDate, qint64& maxDate) const;

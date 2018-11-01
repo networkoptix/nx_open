@@ -66,7 +66,7 @@ public:
 
     virtual bool isAnalyticsDriverEvent(nx::vms::api::EventType eventType) const override;
 
-    QnTimePeriodList HanwhaResource::getDtsTimePeriods(
+    QnTimePeriodList getDtsTimePeriods(
         qint64 startTimeMs,
         qint64 endTimeMs,
         int detailLevel,

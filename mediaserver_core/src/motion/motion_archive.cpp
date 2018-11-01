@@ -331,7 +331,7 @@ void QnMotionArchive::loadDataFromIndexDesc(
 {
     int totalSteps = endItr - startItr;
 
-    int recordNumberToSeek = qMax(0LL, (endItr - kRecordsPerIteration) - index.begin());
+    int recordNumberToSeek = qMax<int>(0LL, (endItr - kRecordsPerIteration) - index.begin());
 
     // math file (one month)
     QVector<IndexRecord>::const_iterator i = endItr - 1;
