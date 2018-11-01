@@ -118,29 +118,40 @@ class SftpPath(BasePosixPath):
         None: exceptions.NotAFile,
         errno.ENOENT: exceptions.DoesNotExist,
         })
-    def read_bytes(self, offset=None, max_length=None):
+    def read_bytes(self):
         """Read paramiko.file.BufferedFile#read docstring and code. It does exactly what's needed:
         returns either `max_length` bytes or bytes until the end of file.
         """
-        if offset is not None:
-            with self.open('rb+') as f:
-                f.seek(offset)
-                return f.read(max_length)
-        else:
-            with self.open('rb') as f:
-                return f.read(max_length)
+        with self.open('rb') as f:
+            return f.read()
 
-    def write_bytes(self, contents, offset=None):
+    @_reraise_by_errno({
+        None: exceptions.NotAFile,
+        errno.ENOENT: exceptions.DoesNotExist,
+        })
+    def yank(self, offset, max_length=None):
+        """Read paramiko.file.BufferedFile#read docstring and code. It does exactly what's needed:
+        returns either `max_length` bytes or bytes until the end of file.
+        """
+        with self.open('rb+') as f:
+            f.seek(offset)
+            return f.read(max_length)
+
+    def write_bytes(self, contents):
         """paramiko.file.BufferedFile#write writes all it's fed. File is not buffered (it's set
         when opening the file) -- no flushing is required.
         """
-        if offset is not None:
-            with self.open('rb+') as f:
-                f.seek(offset)
-                f.write(contents)
-        else:
-            with self.open('wb') as f:
-                f.write(contents)
+        with self.open('wb') as f:
+            f.write(contents)
+        return len(contents)
+
+    def patch(self, offset, contents):
+        """paramiko.file.BufferedFile#write writes all it's fed. File is not buffered (it's set
+        when opening the file) -- no flushing is required.
+        """
+        with self.open('rb+') as f:
+            f.seek(offset)
+            f.write(contents)
         return len(contents)
 
     @_reraise_by_errno({

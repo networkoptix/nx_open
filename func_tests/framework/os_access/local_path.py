@@ -60,6 +60,8 @@ class LocalPath(PosixPath, FileSystemPath):
         return temp_dir
 
     mkdir = _reraising_new_file_errors(PosixPath.mkdir)
+    write_bytes = _reraising_new_file_errors(PosixPath.write_bytes)
+    read_bytes = _reraising_existing_file_errors(PosixPath.read_bytes)
     write_text = _reraising_new_file_errors(PosixPath.write_text)
     read_text = _reraising_existing_file_errors(PosixPath.read_text)
     unlink = _reraising_existing_file_errors(PosixPath.unlink)
@@ -80,21 +82,16 @@ class LocalPath(PosixPath, FileSystemPath):
         rmtree(str(self), ignore_errors=ignore_errors)
 
     @_reraising_new_file_errors
-    def write_bytes(self, data, offset=None):
-        if offset is None:
-            return super(LocalPath, self).write_bytes(data)
-        else:
-            fd = os.open(str(self), os.O_CREAT | os.O_WRONLY)
-            try:
-                os.lseek(fd, offset, os.SEEK_SET)
-                return os.write(fd, data)
-            finally:
-                os.close(fd)
+    def patch(self, offset, data):
+        fd = os.open(str(self), os.O_CREAT | os.O_WRONLY)
+        try:
+            os.lseek(fd, offset, os.SEEK_SET)
+            return os.write(fd, data)
+        finally:
+            os.close(fd)
 
     @_reraising_existing_file_errors
-    def read_bytes(self, offset=None, max_length=None):
-        if offset is None:
-            return super(LocalPath, self).read_bytes()
+    def yank(self, offset, max_length=None):
         with self.open('rb') as f:
             f.seek(offset)
             return f.read(max_length)

@@ -293,14 +293,30 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         _STATUS_OBJECT_NAME_NOT_FOUND: exceptions.DoesNotExist,
         _STATUS_OBJECT_PATH_NOT_FOUND: exceptions.DoesNotExist,
         })
-    def read_bytes(self, offset=0, max_length=-1):
+    def read_bytes(self):
+        # TODO: Speedup. Speed is ~1.4 MB/sec. Full dumps are ~300 MB.
+        # Performance is not mentioned on pysmb page.
+        ad_hoc_file_object = BytesIO()
+        _attributes, bytes_read = self._smb_connection_pool.connection().retrieveFile(
+            self._service_name, self._relative_path,
+            ad_hoc_file_object)
+        data = ad_hoc_file_object.getvalue()
+        assert bytes_read == len(data)
+        return data
+
+    @_reraising_on_operation_failure({
+        _STATUS_FILE_IS_A_DIRECTORY: exceptions.NotAFile,
+        _STATUS_OBJECT_NAME_NOT_FOUND: exceptions.DoesNotExist,
+        _STATUS_OBJECT_PATH_NOT_FOUND: exceptions.DoesNotExist,
+        })
+    def yank(self, offset, max_length=None):
         # TODO: Speedup. Speed is ~1.4 MB/sec. Full dumps are ~300 MB.
         # Performance is not mentioned on pysmb page.
         ad_hoc_file_object = BytesIO()
         _attributes, bytes_read = self._smb_connection_pool.connection().retrieveFileFromOffset(
             self._service_name, self._relative_path,
             ad_hoc_file_object,
-            offset=offset, max_length=max_length)
+            offset=offset, max_length=max_length if max_length is not None else -1)
         data = ad_hoc_file_object.getvalue()
         assert bytes_read == len(data)
         return data
@@ -309,17 +325,22 @@ class SMBPath(FileSystemPath, PureWindowsPath):
     @_reraising_on_operation_failure({
         _STATUS_FILE_IS_A_DIRECTORY: exceptions.NotAFile,
         _STATUS_OBJECT_PATH_NOT_FOUND: exceptions.BadParent})
-    def write_bytes(self, data, offset=None):
+    def write_bytes(self, data):
         ad_hoc_file_object = BytesIO(data)
-        if offset is None:
-            return self._smb_connection_pool.connection().storeFile(
-                self._service_name, self._relative_path,
-                ad_hoc_file_object)
-        else:
-            return self._smb_connection_pool.connection().storeFileFromOffset(
-                self._service_name, self._relative_path,
-                ad_hoc_file_object,
-                offset=offset)
+        return self._smb_connection_pool.connection().storeFile(
+            self._service_name, self._relative_path,
+            ad_hoc_file_object)
+
+    @_retrying_on_status(_STATUS_DELETE_PENDING)
+    @_reraising_on_operation_failure({
+        _STATUS_FILE_IS_A_DIRECTORY: exceptions.NotAFile,
+        _STATUS_OBJECT_PATH_NOT_FOUND: exceptions.BadParent})
+    def patch(self, offset, data):
+        ad_hoc_file_object = BytesIO(data)
+        return self._smb_connection_pool.connection().storeFileFromOffset(
+            self._service_name, self._relative_path,
+            ad_hoc_file_object,
+            offset=offset)
 
     @_reraising_on_operation_failure({
         _STATUS_OBJECT_NAME_NOT_FOUND: exceptions.DoesNotExist,

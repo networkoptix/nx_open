@@ -166,18 +166,18 @@ def test_write_read_tricky_bytes_with_offsets(remote_test_dir, data):
     name, written = data
     file_path = remote_test_dir / '{}.dat'.format(name)
     file_path.write_bytes(b'aaaaaaaaaa')
-    file_path.write_bytes(written, offset=10)
-    assert file_path.read_bytes(offset=10, max_length=100) == written[:100]
+    file_path.patch(10, written)
+    assert file_path.yank(10, max_length=100) == written[:100]
 
 
 def test_write_read_bytes_with_tricky_offsets(remote_test_dir):
     file_path = remote_test_dir / 'abc.dat'
     file_path.write_bytes(b'aaaaa')
-    file_path.write_bytes(b'bbbbb', offset=5)
-    file_path.write_bytes(b'ccccc', offset=10)
-    assert file_path.read_bytes(offset=12, max_length=5) == b'ccc'
-    assert file_path.read_bytes(offset=8, max_length=5) == b'bbccc'
-    assert file_path.read_bytes(offset=3, max_length=5) == b'aabbb'
+    file_path.patch(5, b'bbbbb')
+    file_path.patch(10, b'ccccc')
+    assert file_path.yank(12, max_length=5) == b'ccc'
+    assert file_path.yank(8, max_length=5) == b'bbccc'
+    assert file_path.yank(3, max_length=5) == b'aabbb'
 
 
 @pytest.mark.parametrize(

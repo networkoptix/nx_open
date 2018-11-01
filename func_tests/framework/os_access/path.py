@@ -87,11 +87,19 @@ class FileSystemPath(PurePath):
         raise NotImplementedError("Either `rmtree` or `rmdir` must be implemented")
 
     @abstractmethod
-    def read_bytes(self, offset=0, max_length=None):
+    def read_bytes(self):
         return b''
 
     @abstractmethod
-    def write_bytes(self, contents, offset=None):
+    def yank(self, offset, max_length=None):
+        pass
+
+    @abstractmethod
+    def write_bytes(self, contents):
+        return 0
+
+    @abstractmethod
+    def patch(self, offset, contents):
         return 0
 
     def read_text(self, encoding='utf8', errors='strict'):
@@ -142,7 +150,7 @@ class FileSystemPath(PurePath):
                 return
             offset = int(offset_str)
             _logger.debug("Check offset %d in %s.", offset, self)
-            chunk = self.read_bytes(offset=offset, max_length=300)  # Length is arbitrary.
+            chunk = self.yank(offset, max_length=300)  # Length is arbitrary.
             match = regex.match(chunk)
             if match is None:
                 return
@@ -162,7 +170,8 @@ class FileSystemPath(PurePath):
             _logger.info("New value is same as old %s.", new_value)
         if len(new_value) > end - begin:
             raise ValueError("New value %r is too long, max length is %d.", new_value, end - begin)
-        self.write_bytes(new_value.ljust(end - begin, b'\0'), offset=begin)
+        patch = new_value.ljust(end - begin, b'\0')
+        self.patch(begin, patch)
         return old_value
 
     def take_from(self, local_source_path):
@@ -190,11 +199,11 @@ def copy_file(source, destination, chunk_size_bytes=1024 * 1024):
     _logger.info("Copy from %s to %s", source, destination)
     copied_bytes = 0
     while True:
-        chunk = source.read_bytes(copied_bytes, max_length=chunk_size_bytes)
+        chunk = source.yank(copied_bytes, max_length=chunk_size_bytes)
         if copied_bytes == 0:
             destination.write_bytes(chunk)
         else:
-            destination.write_bytes(chunk, offset=copied_bytes)
+            destination.patch(copied_bytes, chunk)
         copied_bytes += len(chunk)
         if len(chunk) < chunk_size_bytes:
             break
