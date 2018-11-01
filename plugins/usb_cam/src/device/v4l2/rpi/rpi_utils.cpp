@@ -15,8 +15,6 @@ namespace rpi {
 
 namespace {
 
-static const std::string kRpiV4l2DevicePath = "/dev";
-
 // Maximum bits per second, taken from v4l2-ctl --list-ctrls.
 static int constexpr kMmalMaxBitrate=10000000;
 
@@ -63,38 +61,6 @@ static const std::vector<ResolutionData> kMmalResolutionList =
 };
 
 } //namespace
-
-
-std::vector<std::string> getRpiDevicePaths()
-{
-    const auto isDeviceFile =
-        [](const char *path)
-        {
-            struct stat buffer;
-            stat(path, &buffer);
-            return S_ISCHR(buffer.st_mode);
-        };
-
-    std::vector<std::string> devicePaths;
-
-    DIR *directory = opendir(kRpiV4l2DevicePath.c_str());
-    if (!directory)
-        return devicePaths;
-
-    struct dirent *directoryEntry;
-    while ((directoryEntry = readdir(directory)) != NULL)
-    {
-        if (!strstr(directoryEntry->d_name, "video"))
-            continue;
-
-        std::string devVideo = kRpiV4l2DevicePath + "/" + directoryEntry->d_name;
-        if (isDeviceFile(devVideo.c_str()))
-            devicePaths.push_back(devVideo);
-    }
-
-    closedir(directory);
-    return devicePaths;
-}
 
 int getMmalMaxBitrate()
 {
