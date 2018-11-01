@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { NxConfigService } from '../../../services/nx-config';
 
 @Component({
     selector: 'integrations-list-component',
@@ -11,13 +12,15 @@ export class NxIntegrationsListComponent implements OnInit, OnDestroy {
     @Input() list;
 
     defaultLogo: string;
+    config: any;
 
     private setupDefaults() {
         this.defaultLogo = '/static/icons/integration_tile_preview_plugin.svg';
     }
 
-    constructor() {
+    constructor(configService: NxConfigService) {
         this.setupDefaults();
+        this.config = configService.getConfig();
     }
 
     isSupported(plugin, os) {
@@ -30,6 +33,7 @@ export class NxIntegrationsListComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+
     }
 
     ngOnDestroy() {

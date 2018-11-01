@@ -19,7 +19,7 @@ import { ComponentsModule } from '../../../components/components.module';
         RouterModule,
         NgbModule,
         TranslateModule,
-        ComponentsModule
+        ComponentsModule,
     ],
     providers: [],
     declarations: [
