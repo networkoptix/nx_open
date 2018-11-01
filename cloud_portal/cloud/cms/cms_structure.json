@@ -502,7 +502,7 @@
             "type": "text",
             "optional": true,
             "meta": {
-              "regex": "^https?:\\/\\/www\\.youtube\\.com\\/embed\\/[\\w]+$"
+              "regex": "^https?:\\/\\/(?:(?:www\\.youtube\\.com\\/(?:embed\\/|watch\\?v=)|youtu\\.be\\/)[\\w]+|vimeo\\.com\\/[\\d]+)$"
             }
           },
           {
