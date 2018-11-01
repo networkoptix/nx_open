@@ -72,18 +72,22 @@ struct UdtEpollHandlerHelper
     UDTSOCKET udt_handler;
 };
 
-static void setLastSystemErrorCodeAppropriately()
+static SystemError::ErrorCode getLastUdtErrorAsSystemErrorCode()
 {
     const auto systemErrorCode =
         detail::convertToSystemError(UDT::getlasterror().getErrorCode());
     NX_ASSERT(systemErrorCode != SystemError::noError);
-    SystemError::setLastErrorCode(
-        systemErrorCode == SystemError::noError
+    return systemErrorCode == SystemError::noError
         ? SystemError::invalidData
-        : systemErrorCode);
+        : systemErrorCode;
 }
 
-}// namespace detail
+static void setLastSystemErrorCodeAppropriately()
+{
+    SystemError::setLastErrorCode(getLastUdtErrorAsSystemErrorCode());
+}
+
+} // namespace detail
 
  //=================================================================================================
  // UdtSocket implementation.
@@ -1042,7 +1046,9 @@ std::unique_ptr<AbstractStreamSocket> UdtStreamServerSocket::systemAccept()
         !acceptedSocket->setRecvTimeout(0) ||
         !acceptedSocket->setNonBlockingMode(false))
     {
-        detail::setLastSystemErrorCodeAppropriately();
+        const auto errorCode = detail::getLastUdtErrorAsSystemErrorCode();
+        acceptedSocket.reset(); //< This can change last error code.
+        SystemError::setLastErrorCode(errorCode);
         return nullptr;
     }
 
