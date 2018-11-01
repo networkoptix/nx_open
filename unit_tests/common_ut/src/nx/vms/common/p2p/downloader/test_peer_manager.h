@@ -196,7 +196,7 @@ public:
 
     // AbstractPeerManager implementation
     virtual QnUuid selfId() const override;
-    virtual QString peerString(const QnUuid& peerId) const;
+    virtual QString peerString(const QnUuid& peerId) const override;
     virtual QList<QnUuid> getAllPeers() const override;
     virtual QList<QnUuid> peers() const override { return m_peerList; }
     virtual int distanceTo(const QnUuid&) const override;

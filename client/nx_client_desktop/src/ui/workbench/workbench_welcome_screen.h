@@ -128,7 +128,7 @@ signals:
 private:
     void connectToSystemInternal(
         const QString& systemId,
-        const QUrl& serverUrl,
+        const nx::utils::Url& serverUrl,
         const QnEncodedCredentials& credentials,
         bool storePassword,
         bool autoLogin,

@@ -33,10 +33,12 @@ def report(status, start_time=None, duration=None, **details
 class CameraStagesExecutor(object):
     """ Controls camera stages execution flow and provides report.
     """
-    def __init__(self, server, name, stage_rules, stage_hard_timeout):
+    def __init__(self, server, name, stage_rules, stage_hard_timeout, is_enabled=True):
             # type: (Mediaserver, str, dict, timedelta) -> None
         self.name = name
         self.id = stage_rules.get('discovery', {}).get('physicalId')
+        if not is_enabled:
+            stage_rules = {}
         self._stage_executors = self._make_stage_executors(stage_rules, stage_hard_timeout)
         self._warnings = ['Unknown stage ' + name for name in stage_rules]
         self._all_stage_steps = self._make_all_stage_steps(server)
@@ -53,7 +55,7 @@ class CameraStagesExecutor(object):
         """ :returns True if all stages are finished, False otherwise (retry is required).
         """
         try:
-            self._all_stage_steps.next()
+            next(self._all_stage_steps)
             return False
 
         except StopIteration:
@@ -81,7 +83,7 @@ class CameraStagesExecutor(object):
             steps = executors.steps(server)
             while True:
                 try:
-                    steps.next()
+                    next(steps)
                     self._duration = timer.from_start
                     yield
 
@@ -196,9 +198,10 @@ class Stand(object):
             config.pop(SERVER_STAGES_KEY) if SERVER_STAGES_KEY in config else {}
         ))
         self.camera_stages = [
-            CameraStagesExecutor(server, name, self._stage_rules(config_rules), stage_hard_timeout)
-            for name, config_rules in config.items()
-            if any(fnmatch(name, f) for f in camera_filters)
+            CameraStagesExecutor(
+                server, name, self._stage_rules(config_rules), stage_hard_timeout,
+                is_enabled=any(fnmatch(name, f) for f in camera_filters)
+            ) for name, config_rules in config.items()
         ]
 
     def run_all_stages(self, camera_cycle_delay, server_stage_delay):
@@ -287,6 +290,7 @@ class Stand(object):
                     self._merge_dict(rules, base_name, rule)
 
         return rules
+
 
     @classmethod
     def _merge_dict(cls, container, key, value):

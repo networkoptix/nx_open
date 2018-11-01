@@ -4,6 +4,7 @@
 #include "ec_connection_notification_manager.h"
 
 #include <transaction/transaction_message_bus_priv.h>
+#include <utils/common/delayed.h>
 
 namespace {
 
@@ -189,8 +190,6 @@ void ServerMessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
 void ServerMessageBus::doPeriodicTasks()
 {
     QnMutexLocker lock(&m_mutex);
-    if (m_restartPending)
-        return;
 
     m_miscData.update();
 
@@ -785,20 +784,24 @@ bool ServerMessageBus::handlePushImpersistentBroadcastTransaction(
 
 bool ServerMessageBus::validateRemotePeerData(const vms::api::PeerDataEx& remotePeer)
 {
-    QnMutexLocker lock(&m_mutex);
-
-    if (m_restartPending)
-        return false;
     if (remotePeer.identityTime > commonModule()->systemIdentityTime())
     {
+        if (m_restartPending.test_and_set())
+            return false; //< Restart pending already queued.
+
         // Switch to the new systemIdentityTime. It allows to push restored from backup database data.
         NX_INFO(typeid(Connection), lm("Remote peer %1 has database restore time greater then "
             "current peer. Restarting and resync database with remote peer")
             .arg(remotePeer.id.toString()));
 
-        m_restartPending = true;
-        dropConnectionsThreadUnsafe();
-        commonModule()->setSystemIdentityTime(remotePeer.identityTime, remotePeer.id);
+        executeDelayed(
+            [this, remotePeer]()
+            {
+                stop();
+                commonModule()->setSystemIdentityTime(remotePeer.identityTime, remotePeer.id);
+            },
+            0, m_thread);
+
         return false;
     }
     return true;

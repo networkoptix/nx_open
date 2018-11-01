@@ -5,11 +5,13 @@
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/manual_device_addition/dialog/device_addition_dialog.h>
+#include <nx/client/desktop/utils/parameter_helper.h>
 
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
+
 
 namespace nx {
 namespace client {
@@ -26,8 +28,10 @@ WorkbenchManualDeviceAdditionHandler::WorkbenchManualDeviceAdditionHandler(QObje
             if (!server)
                 return;
 
+            const auto parent = nx::utils::extractParentWidget(params, mainWindowWidget());
+
             QnNonModalDialogConstructor<DeviceAdditionDialog> dialogContructor(
-                m_deviceAdditionDialog, mainWindowWidget());
+                m_deviceAdditionDialog, parent);
 
             m_deviceAdditionDialog->setServer(server);
             const auto removeOnClose =

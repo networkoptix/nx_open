@@ -22,10 +22,9 @@ class ResourcePoolPeerManager: public AbstractPeerManager, public QnCommonModule
 public:
     ResourcePoolPeerManager(
         QnCommonModule* commonModule,
-        peer_selection::AbstractPeerSelectorPtr peerSelector, bool isClient = false);
+        AbstractPeerSelectorPtr peerSelector, bool isClient = false);
 
     virtual QnUuid selfId() const override;
-
     virtual QString peerString(const QnUuid& peerId) const override;
     virtual QList<QnUuid> getAllPeers() const override;
     virtual QList<QnUuid> peers() const override;
@@ -63,13 +62,13 @@ public:
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
     virtual bool hasAccessToTheUrl(const QString& url) const override;
 
-private:
-    QnMediaServerResourcePtr getServer(const QnUuid& peerId) const;
-    rest::QnConnectionPtr getConnection(const QnUuid& peerId) const;
+protected:
+    virtual QnMediaServerResourcePtr getServer(const QnUuid& peerId) const;
+    virtual rest::QnConnectionPtr getConnection(const QnUuid& peerId) const;
 
     rest::Handle m_currentSelfRequestHandle = 0;
     QHash<rest::Handle, nx::network::http::AsyncHttpClientPtr> m_httpClientByHandle;
-    peer_selection::AbstractPeerSelectorPtr m_peerSelector;
+    AbstractPeerSelectorPtr m_peerSelector;
 
     bool m_isClient = false;
 };

@@ -373,10 +373,9 @@ void Worker::requestFileInformationInternal()
 
     for (const auto& peer: peers)
     {
+        QString peerName = m_peerManager->peerString(peer);
         NX_VERBOSE(m_logTag,
-            lm("Requesting %1 from server %2.")
-                .arg(requestSubjectString(m_state))
-                .arg(m_peerManager->peerString(peer)));
+            lm("Requesting %1 from server %2.").args(requestSubjectString(m_state), peerName));
 
         const auto handle = m_peerManager->requestFileInfo(peer, m_fileName,
             [this, self = shared_from_this()](

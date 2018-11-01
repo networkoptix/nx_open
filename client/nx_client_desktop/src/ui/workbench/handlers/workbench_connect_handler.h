@@ -8,6 +8,7 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
+#include <nx/client/desktop/system_update/client_update_tool.h>
 
 class QnGraphicsMessageBox;
 class QnReconnectInfoDialog;
@@ -28,7 +29,7 @@ public:
         connecting,             /*< Trying to connect to some system. */
         reconnecting,           /*< Reconnecting to the current system. */
         connecting_to_target,   /*< Connecting to the predefined server (New Window, Link). */
-        installing_updates,     /*< Installing updates to the server. */
+        installing_updates,     /*< Installing updates to the server.*/
         connected               /*< Connected and ready to work. */
     };
 
@@ -39,6 +40,7 @@ public:
         testing,                /*< Know the server url, waiting for QnConnectionInfo. */
         waiting_peer,           /*< Connection established, waiting for peerFound. */
         waiting_resources,      /*< Peer found, waiting for resources. */
+        pulling_updates,        /*< Pulling updates from the mediaservers. We need to get only a list of mediaservers.*/
         connected               /*< Connected and ready to work. */
     };
 
@@ -49,6 +51,7 @@ public:
     PhysicalState physicalState() const;
 
     void connectToServer(const nx::utils::Url& url);
+    void connectToServerForUpdate(const nx::utils::Url& url);
 
     enum DisconnectFlag
     {

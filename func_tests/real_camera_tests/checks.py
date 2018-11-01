@@ -36,8 +36,8 @@ class Failure(Result):
         if not self.errors and not self.exception:
             raise ValueError('No error description is provided')
 
-    def with_more_errors(self, *errors):
-        return Failure(self.errors + list(errors), self.exception)
+    def with_more_errors(self, errors, prefix=False):  # types (list, bool) -> Failure
+        return Failure((errors + self.errors) if prefix else (self.errors + errors), self.exception)
 
     @staticmethod
     def from_current_exception():

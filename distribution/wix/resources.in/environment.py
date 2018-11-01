@@ -19,12 +19,6 @@ client_help_source_dir = '${ClientHelpSourceDir}'
 client_fonts_source_dir = '${ClientFontsDir}'
 client_background_source_dir = '${ClientBgSourceDir}'
 
-# Signing section
-signtool_directory = '${signtool_directory}/bin'
-certificate = '${certificates_path}/wixsetup/${sign.cer}'
-sign_password = '${sign.password}'
-sign_description = '"${company.name} ${display.product.name}"'
-
 # Distrib names
 client_distribution_name = '${client_distribution_name}'
 server_distribution_name = '${server_distribution_name}'

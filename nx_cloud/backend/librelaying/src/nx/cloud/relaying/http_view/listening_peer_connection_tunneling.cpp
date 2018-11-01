@@ -12,8 +12,7 @@ ListeningPeerConnectionTunnelingServer::ListeningPeerConnectionTunnelingServer(
     m_listeningPeerManager(listeningPeerManager),
     m_listeningPeerPool(listeningPeerPool),
     m_tunnelingServer(
-        std::bind(&ListeningPeerConnectionTunnelingServer::saveNewTunnel, this,
-            std::placeholders::_1, std::placeholders::_2),
+        [this](auto&&... args) { saveNewTunnel(std::move(args)...); },
         this)
 {
 }
@@ -22,11 +21,14 @@ void ListeningPeerConnectionTunnelingServer::registerHandlers(
     const std::string& basePath,
     network::http::server::rest::MessageDispatcher* messageDispatcher)
 {
-    m_tunnelingServer.connectionUpgradeServer().setProtocolName(
+    auto& compatibilityTunnelServer = m_tunnelingServer.addTunnelServer<
+        nx::network::http::tunneling::detail::ConnectionUpgradeTunnelServer>();
+
+    compatibilityTunnelServer.setProtocolName(
         relay::api::kRelayProtocolName);
-    m_tunnelingServer.connectionUpgradeServer().setRequestPath(
+    compatibilityTunnelServer.setRequestPath(
         relay::api::kServerIncomingConnectionsPath);
-    m_tunnelingServer.connectionUpgradeServer().setUpgradeRequestMethod(
+    compatibilityTunnelServer.setUpgradeRequestMethod(
         network::http::Method::post);
 
     m_tunnelingServer.registerRequestHandlers(

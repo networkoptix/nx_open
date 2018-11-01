@@ -7,6 +7,7 @@ extern "C" {
 #include <libavformat/avformat.h>
 #include <libavutil/pixdesc.h>
 #include <libswscale/swscale.h>
+#include <libavutil/imgutils.h>
 } // extern "C"
 
 #include <utils/media/ffmpeg_helper.h>
@@ -109,7 +110,7 @@ public:
         Q_D(AvFrameMemoryBuffer);
         *bytesPerLine = d->frame->linesize[0];
         AVPixelFormat pixFmt = (AVPixelFormat)d->frame->format;
-        *numBytes = avpicture_get_size(pixFmt, d->frame->linesize[0], d->frame->height);
+        *numBytes = av_image_get_buffer_size(pixFmt, d->frame->linesize[0], d->frame->height, 1);
         return d->frame->data[0];
     }
 
@@ -199,17 +200,19 @@ AVFrame* FfmpegVideoDecoderPrivate::convertPixelFormat(const AVFrame* srcFrame)
         return nullptr;
 
     AVFrame* dstFrame = av_frame_alloc();
-    int numBytes = avpicture_get_size(dstAvFormat, srcFrame->linesize[0], srcFrame->height);
+    int numBytes = av_image_get_buffer_size(dstAvFormat, srcFrame->linesize[0], srcFrame->height, 1);
     if (numBytes <= 0)
         return nullptr; //< can't allocate frame
     numBytes += FF_INPUT_BUFFER_PADDING_SIZE; //< extra alloc space due to ffmpeg doc
     dstFrame->buf[0] = av_buffer_alloc(numBytes);
-    avpicture_fill(
-        (AVPicture*)dstFrame,
+    av_image_fill_arrays(
+        dstFrame->data,
+        dstFrame->linesize,
         dstFrame->buf[0]->data,
         dstAvFormat,
         srcFrame->linesize[0],
-        srcFrame->height);
+        srcFrame->height,
+        1);
     dstFrame->width = srcFrame->width;
     dstFrame->height = srcFrame->height;
     dstFrame->format = dstAvFormat;

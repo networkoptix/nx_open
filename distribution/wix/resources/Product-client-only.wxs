@@ -91,16 +91,10 @@
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" />
 
 
-        <!-- Trying to kill old applauncher nicely. Notice: new applauncher may be left running during update. -->
-        <CustomAction Id="CloseAppLauncherAction_Cmd" Property="CloseAppLauncherAction"
-                      Value="&quot;[InstallDirRoot]$(var.minilauncherBinaryName)&quot; &quot;quit&quot;" Execute="immediate" />
-        <CustomAction Id="CloseAppLauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
-                      Execute="deferred" Return="ignore" Impersonate="no" />
-
         <!-- Trying to kill old applauncher forcibly. -->
-        <CustomAction Id="CloseAppLauncherAction2_Cmd" Property="CloseAppLauncherAction2"
+        <CustomAction Id="CloseAppLauncherAction_Cmd" Property="CloseAppLauncherAction"
                       Value='"[WindowsFolder]\System32\taskkill.exe" /F /IM "$(var.minilauncherBinaryName)"' Execute="immediate" />
-        <CustomAction Id="CloseAppLauncherAction2" BinaryKey="WixCA" DllEntry="CAQuietExec"
+        <CustomAction Id="CloseAppLauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
         <MajorUpgrade
@@ -123,9 +117,7 @@
             <Custom Action="CleanClientRegistryKeys" After="CleanClientRegistryKeys_Cmd">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
 
             <Custom Action="CloseAppLauncherAction_Cmd" Before="CloseAppLauncherAction">NOT $(var.VmsInstalling)</Custom>
-            <Custom Action="CloseAppLauncherAction" Before="CloseAppLauncherAction2_Cmd">NOT $(var.VmsInstalling)</Custom>
-            <Custom Action="CloseAppLauncherAction2_Cmd" Before="CloseAppLauncherAction2">NOT $(var.VmsInstalling)</Custom>
-            <Custom Action="CloseAppLauncherAction2" Before="StopServices">NOT $(var.VmsInstalling)</Custom>
+            <Custom Action="CloseAppLauncherAction" Before="StopServices">NOT $(var.VmsInstalling)</Custom>
         </InstallExecuteSequence>
 
         <Media Id="1" Cabinet="client.cab" EmbedCab="yes" />

@@ -22,7 +22,8 @@ namespace impl {
 
 namespace {
 
-static const std::string kV4L2DevicePath = "/dev/v4l/by-id";
+static const std::string kV4l2DevicePathById = "/dev/v4l/by-id";
+static const std::string kV4l2DevicePathFallBack = "/dev";
 
 // Convenience class for opening and closing devices represented by devicePath
 struct DeviceInitializer
@@ -41,7 +42,8 @@ struct DeviceInitializer
     int fileDescriptor = -1;
 };
 
-std::vector<std::string> getDevicePaths();
+std::vector<std::string> getDevicePathsById();
+std::vector<std::string> getDevicePathsFallBack();
 unsigned int toV4L2PixelFormat(nxcip::CompressionType nxCodecID);
 std::string getDeviceName(int fileDescriptor);
 float toFrameRate(const v4l2_fract& frameInterval);
@@ -69,11 +71,11 @@ std::string getDeviceName(int fileDescriptor)
         deviceCapability.card + sizeof(deviceCapability.card));
 };
 
-std::vector<std::string> getDevicePaths()
+std::vector<std::string> getDevicePathsById()
 {
     std::vector<std::string> devices;
 
-    DIR *directory = opendir(kV4L2DevicePath.c_str());
+    DIR *directory = opendir(kV4l2DevicePathById.c_str());
     if (!directory)
         return devices;
 
@@ -86,12 +88,43 @@ std::vector<std::string> getDevicePaths()
             continue;   
         }
 
-        std::string device = kV4L2DevicePath + "/" + directoryEntry->d_name;
+        std::string device = kV4l2DevicePathById + "/" + directoryEntry->d_name;
         devices.push_back(device);
     }
 
     closedir(directory);
     return devices;
+}
+
+std::vector<std::string> getDevicePathsFallBack()
+{
+    const auto isDeviceFile =
+        [](const char *path)
+        {
+            struct stat buffer;
+            stat(path, &buffer);
+            return S_ISCHR(buffer.st_mode);
+        };
+
+    std::vector<std::string> devicePaths;
+
+    DIR *directory = opendir(kV4l2DevicePathFallBack.c_str());
+    if (!directory)
+        return devicePaths;
+
+    struct dirent *directoryEntry;
+    while ((directoryEntry = readdir(directory)) != NULL)
+    {
+        if (!strstr(directoryEntry->d_name, "video"))
+            continue;
+
+        std::string devVideo = kV4l2DevicePathFallBack + "/" + directoryEntry->d_name;
+        if (isDeviceFile(devVideo.c_str()))
+            devicePaths.push_back(devVideo);
+    }
+
+    closedir(directory);
+    return devicePaths;
 }
 
 float toFrameRate(const v4l2_fract& frameInterval)
@@ -154,13 +187,14 @@ std::string getDeviceName(const char * devicePath)
 
 std::vector<DeviceData> getDeviceList()
 {
-    std::vector<std::string> devicePaths = rpi::isRpi() 
-        ? rpi::getRpiDevicePaths()
-        : getDevicePaths();
+    std::vector<std::string> devicePaths = getDevicePathsById();
+
+    if (devicePaths.empty())
+       devicePaths = getDevicePathsFallBack();
+    if (devicePaths.empty())
+        return {};
 
     std::vector<DeviceData> deviceList;
-    if (devicePaths.empty())
-        return deviceList;
 
     for (const auto& devicePath : devicePaths)
     {
