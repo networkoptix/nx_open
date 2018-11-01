@@ -1,12 +1,15 @@
 from django.contrib import admin
-from api.forms import *
-from api.models import *
-# Register your models here.
+from django.contrib.admin import helpers, SimpleListFilter
+from django.conf.urls import url
+
+from django.shortcuts import render, redirect
+from django.urls import reverse
+
 from cloud import settings
 from cms.admin import CMSAdmin
+from api.forms import *
+from api.models import *
 from django_csv_exports.admin import CSVExportAdmin
-
-from django.contrib.admin import SimpleListFilter
 
 
 class GroupFilter(SimpleListFilter):
@@ -41,6 +44,8 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
     csv_fields = ('email', 'first_name', 'last_name', 'created_date', 'last_login',
                   'subscribe', 'is_staff', 'language', 'customization')
 
+    change_list_template = "api/account_changelist.html"
+
     def save_model(self, request, obj, form, change):
         # forbid creating superusers outside specific domain
         if obj.is_superuser and not obj.email.endswith(settings.SUPERUSER_DOMAIN):
@@ -63,6 +68,33 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
 
     def has_delete_permission(self, request, obj=None):  # No deleting users at all
         return False
+
+    def get_urls(self):
+        urls = super(AccountAdmin, self).get_urls()
+        my_urls = [
+            url(r'^invite/$', self.admin_site.admin_view(self.invite), name='invite')
+        ]
+        return my_urls + urls
+
+    def invite(self, request):
+        context = {
+            'title': 'Invite User',
+            'app_label': self.model._meta.app_label,
+            'opts': self.model._meta,
+            'has_change_permission': self.has_change_permission(request)
+        }
+
+        if request.method == 'POST':
+            form = UserInviteFrom(request.POST)
+            if form.is_valid():
+                user_id = form.add_user(request, request.POST['email'])
+                return redirect(reverse('admin:api_account_change', args=[user_id]))
+        else:
+            form = UserInviteFrom()
+        context['form'] = form
+        context['adminform'] = helpers.AdminForm(form, list([(None, {'fields': form.base_fields})]),
+                                                 self.get_prepopulated_fields(request))
+        return render(request, 'api/invite_form.html', context)
 
 
 @admin.register(AccountLoginHistory)
