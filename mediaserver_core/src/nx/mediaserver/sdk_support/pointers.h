@@ -4,6 +4,7 @@
 #include <functional>
 #include <plugins/plugin_api.h>
 
+// TODO: #mshevchenko: Move to namespace common.
 namespace nx::mediaserver::sdk_support {
 
 using SdkObjectDeleter = std::function<void(nxpl::PluginInterface*)>;
@@ -41,7 +42,6 @@ public:
     bool operator==(std::nullptr_t) const { return m_ptr == nullptr; }
     bool operator!=(const UniquePtr& other) const { return m_ptr != other.m_ptr; }
     bool operator!=(const std::nullptr_t) const { return m_ptr != nullptr; }
-
 
 private:
     std::unique_ptr<RefCountable, SdkObjectDeleter> m_ptr;

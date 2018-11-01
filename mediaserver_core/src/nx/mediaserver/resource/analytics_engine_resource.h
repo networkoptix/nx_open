@@ -23,6 +23,7 @@ class AnalyticsEngineResource:
 public:
     AnalyticsEngineResource(QnMediaServerModule* serverModule);
 
+    // TODO: #dmishin: Rename sdkEngine to engine.
     void setSdkEngine(sdk_support::SharedPtr<nx::sdk::analytics::Engine> sdkEngine);
 
     sdk_support::SharedPtr<nx::sdk::analytics::Engine> sdkEngine() const;

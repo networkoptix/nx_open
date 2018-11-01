@@ -78,7 +78,7 @@ static void testEngineSettings(nx::sdk::analytics::Engine* plugin)
     settings->addSetting("setting2", "value2");
 
     plugin->setSettings(nullptr); //< Test assigning empty settings.
-    plugin->setSettings(settings); //< Test assigning a single setting.
+    plugin->setSettings(settings); //< Test assigning some settings.
 }
 
 static void testDeviceAgentSettings(nx::sdk::analytics::DeviceAgent* deviceAgent)
@@ -88,7 +88,7 @@ static void testDeviceAgentSettings(nx::sdk::analytics::DeviceAgent* deviceAgent
     settings->addSetting("setting2", "value2");
 
     deviceAgent->setSettings(nullptr); //< Test assigning empty settings.
-    deviceAgent->setSettings(settings); //< Test assigning a single setting.
+    deviceAgent->setSettings(settings); //< Test assigning some settings.
 }
 
 class Action: public nx::sdk::analytics::Action

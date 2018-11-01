@@ -70,9 +70,13 @@ private:
 private:
     mutable QnMutex m_mutex;
     QnVirtualCameraResourcePtr m_device;
-    nx::mediaserver::resource::AnalyticsEngineResourcePtr m_engine;
 
+    // TODO: #dmishin: Rename to m_engineResource.
+    nx::mediaserver::resource::AnalyticsEngineResourcePtr m_engine;
+    
+    // TODO: #dmishin: Rename to m_deviceAgent.
     sdk_support::SharedPtr<DeviceAgent> m_sdkDeviceAgent;
+
     std::shared_ptr<MetadataHandler> m_metadataHandler;
     QnAbstractDataReceptorPtr m_metadataSink;
 

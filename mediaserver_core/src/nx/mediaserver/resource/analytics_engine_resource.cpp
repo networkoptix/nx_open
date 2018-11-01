@@ -17,13 +17,10 @@
 
 namespace nx::mediaserver::resource {
 
-namespace analytics_sdk = nx::sdk::analytics;
-namespace analytics_api = nx::vms::api::analytics;
-
 namespace {
 
-using PluginPtr = sdk_support::SharedPtr<analytics_sdk::Plugin>;
-using EnginePtr = sdk_support::SharedPtr<analytics_sdk::Engine>;
+using PluginPtr = sdk_support::SharedPtr<nx::sdk::analytics::Plugin>;
+using EnginePtr = sdk_support::SharedPtr<nx::sdk::analytics::Engine>;
 
 } // namespace
 
@@ -85,7 +82,8 @@ void AnalyticsEngineResource::setSettingsValues(const QVariantMap& values)
         QString::fromUtf8(QJsonDocument(QJsonObject::fromVariantMap(values)).toJson()));
 }
 
-std::optional<analytics_api::PluginManifest> AnalyticsEngineResource::pluginManifest() const
+std::optional<nx::vms::api::analytics::PluginManifest>
+    AnalyticsEngineResource::pluginManifest() const
 {
     auto parentPlugin = plugin().dynamicCast<resource::AnalyticsPluginResource>();
     if (!parentPlugin)
@@ -102,7 +100,8 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
     if (!m_sdkEngine)
         return CameraDiagnostics::PluginErrorResult("SDK analytics engine object is not set");
 
-    const auto manifest = sdk_support::manifest<analytics_api::EngineManifest>(m_sdkEngine);
+    const auto manifest = sdk_support::manifest<nx::vms::api::analytics::EngineManifest>(
+        m_sdkEngine);
     if (!manifest)
         return CameraDiagnostics::PluginErrorResult("Can't deserialize engine manifest");
 
@@ -136,19 +135,19 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
     const auto pluginManifest = parentPlugin->manifest();
 
     analyticsDescriptorListManager->addDescriptors(
-        sdk_support::descriptorsFromItemList<analytics_api::GroupDescriptor>(
+        sdk_support::descriptorsFromItemList<nx::vms::api::analytics::GroupDescriptor>(
             pluginManifest.id, manifest->groups));
 
     analyticsDescriptorListManager->addDescriptors(
-        sdk_support::descriptorsFromItemList<analytics_api::EventTypeDescriptor>(
+        sdk_support::descriptorsFromItemList<nx::vms::api::analytics::EventTypeDescriptor>(
             pluginManifest.id, manifest->eventTypes));
 
     analyticsDescriptorListManager->addDescriptors(
-        sdk_support::descriptorsFromItemList<analytics_api::ObjectTypeDescriptor>(
+        sdk_support::descriptorsFromItemList<nx::vms::api::analytics::ObjectTypeDescriptor>(
             pluginManifest.id, manifest->objectTypes));
 
     analyticsDescriptorListManager->addDescriptors(
-        sdk_support::descriptorsFromItemList<analytics_api::ActionTypeDescriptor>(
+        sdk_support::descriptorsFromItemList<nx::vms::api::analytics::ActionTypeDescriptor>(
             pluginManifest.id, manifest->objectActions));
 
     setManifest(*manifest);
