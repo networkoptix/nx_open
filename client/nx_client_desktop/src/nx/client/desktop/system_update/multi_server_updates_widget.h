@@ -68,7 +68,7 @@ public:
 protected:
     // This one is called by timer periodically.
     void atUpdateCurrentState();
-    void atСlientDownloadFinished();
+    void atClientDownloadFinished();
     void atModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
     void atStartUpdateAction();
     bool atCancelCurrentAction();
