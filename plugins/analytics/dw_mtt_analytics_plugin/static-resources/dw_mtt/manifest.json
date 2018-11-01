@@ -12,7 +12,7 @@
         "DWC-MTT4Wi6", 
         "DWC-MTT4WiA"
     ], 
-    "outputEventTypes": [
+    "eventTypes": [
         {
             "id": "nx.dw_mtt.MOTION", 
             "name": {

@@ -1,6 +1,6 @@
 {
     "capabilities": "", 
-    "outputEventTypes": [
+    "eventTypes": [
         {
             "id": "nx.ssc.camera specify command", 
             "name": {

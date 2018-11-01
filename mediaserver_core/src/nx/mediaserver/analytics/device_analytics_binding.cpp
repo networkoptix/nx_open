@@ -295,14 +295,7 @@ std::optional<EngineManifest> DeviceAnalyticsBinding::engineManifest() const
         return std::nullopt;
     }
 
-    auto sdkEngine = m_engine->sdkEngine();
-    if (!sdkEngine)
-    {
-        NX_WARNING(this, "Can't access SDK engine object for engine %1", m_engine->getName());
-        return std::nullopt;
-    }
-
-    return sdk_support::manifest<EngineManifest>(sdkEngine, makeLogger("Engine"));
+    return m_engine->manifest();
 }
 
 sdk_support::SharedPtr<DeviceAnalyticsBinding::DeviceAgent>

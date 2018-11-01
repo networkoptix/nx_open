@@ -1,6 +1,6 @@
 {
     "capabilities": "deviceModelDependent",
-    "outputEventTypes": [
+    "eventTypes": [
         {
             "id": "nx.vca.md", 
             "name": {
