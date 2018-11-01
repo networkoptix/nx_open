@@ -416,28 +416,6 @@ def test_many_mkdir_rmtree(remote_test_dir, iterations, depth):
         top_path.rmtree()
 
 
-path_type_list = ['local', 'ssh', 'smb']
-
-def remote_file_path(request, path_type, name):
-    if path_type == 'ssh':
-        vm_fixture_name = 'linux_vm'
-    if path_type == 'smb':
-        vm_fixture_name = 'windows_vm'
-    vm = request.getfixturevalue(vm_fixture_name)
-    tmp_dir = vm.os_access.path_cls.tmp()
-    tmp_dir.mkdir(parents=True, exist_ok=True)
-    base_remote_dir = tmp_dir.joinpath(__name__ + '-remote')
-    return base_remote_dir.joinpath(request.node.name + '-' + name)
-
-def path_type_to_path(request, node_dir, path_type, name):
-    if path_type in 'local':
-        path = node_dir.joinpath('local-file-%s' % name)
-    else:
-        path = remote_file_path(request, path_type, name)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    return path
-
-
 @pytest.mark.parametrize(
     ('file_size', 'chunk_size'),
     [
@@ -447,14 +425,9 @@ def path_type_to_path(request, node_dir, path_type, name):
         (0, 1),
         ],
     ids='file{}-chunk{}'.format)
-@pytest.mark.parametrize('destination_path_type', path_type_list)
-@pytest.mark.parametrize('source_path_type', path_type_list)
-def test_copy_file(request, node_dir, source_path_type, destination_path_type, file_size, chunk_size):
-    source = path_type_to_path(request, node_dir, source_path_type, 'source')
-    destination = path_type_to_path(request, node_dir, destination_path_type, 'destination')
-
-    _logger.info('Copy: %r -> %r', source, destination)
-
+def test_copy_file(local_test_dir, existing_remote_dir, file_size, chunk_size):
+    source = local_test_dir / 'source'
+    destination = existing_remote_dir / 'destination'
     fill_with = '0123456789'
     bytes = fill_with * (file_size // len(fill_with))
     source.write_bytes(bytes)
