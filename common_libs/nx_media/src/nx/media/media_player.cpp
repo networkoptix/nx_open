@@ -1449,6 +1449,10 @@ bool Player::removeMetadataConsumer(const AbstractMetadataConsumerPtr& metadataC
 void Player::setPlaybackMask(const QnTimePeriodList& periods)
 {
     Q_D(Player);
+    if (d->periods == periods)
+        return;
+
+    d->periods = periods;
     if (d->archiveReader)
         d->archiveReader->setPlaybackMask(periods);
 }
