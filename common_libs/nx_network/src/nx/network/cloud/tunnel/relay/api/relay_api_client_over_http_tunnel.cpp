@@ -15,7 +15,7 @@ namespace nx::cloud::relay::api {
 static constexpr auto kTimeout = std::chrono::seconds(11);
 
 ClientOverHttpTunnel::ClientOverHttpTunnel(
-    const nx::utils::Url& baseUrl,
+    const QUrl& baseUrl,
     ClientFeedbackFunction feedbackFunction)
     :
     base_type(baseUrl, std::move(feedbackFunction))
@@ -67,8 +67,8 @@ void ClientOverHttpTunnel::openServerTunnel(
     NX_CRITICAL(isInSelfAioThread());
 
     const auto serverTunnelBaseUrl = network::url::Builder(url())
-        .appendPath(network::http::rest::substituteParameters(
-            kServerTunnelBasePath, {peerName})).toUrl();
+        .appendPath(nx_http::rest::substituteParameters(
+            kServerTunnelBasePath, {peerName.c_str()})).toUrl();
 
     openTunnel(
         serverTunnelBaseUrl,
@@ -82,10 +82,10 @@ void ClientOverHttpTunnel::openServerTunnel(
 }
 
 void ClientOverHttpTunnel::openTunnel(
-    const nx::utils::Url& url,
+    const QUrl& url,
     ClientOverHttpTunnel::OpenTrafficRelayTunnelHandler handler)
 {
-    auto client = std::make_unique<network::http::tunneling::Client>(url);
+    auto client = std::make_unique<nx_http::tunneling::Client>(url);
     client->setTimeout(kTimeout);
     auto clientPtr = client.get();
     m_tunnelingClients.push_back(std::move(client));
@@ -104,8 +104,8 @@ void ClientOverHttpTunnel::openTunnel(
 
 void ClientOverHttpTunnel::processServerTunnelResult(
     BeginListeningHandler completionHandler,
-    const network::http::tunneling::Client& tunnelingClient,
-    network::http::tunneling::OpenTunnelResult result)
+    const nx_http::tunneling::Client& tunnelingClient,
+    nx_http::tunneling::OpenTunnelResult result)
 {
     const auto resultCode = getResultCode(result, tunnelingClient);
     if (resultCode != api::ResultCode::ok)
@@ -124,8 +124,8 @@ void ClientOverHttpTunnel::openClientTunnel(
     OpenRelayConnectionHandler completionHandler)
 {
     const auto clientTunnelBaseUrl = network::url::Builder(url())
-        .appendPath(network::http::rest::substituteParameters(
-            kClientTunnelBasePath, {sessionId})).toUrl();
+        .appendPath(nx_http::rest::substituteParameters(
+            kClientTunnelBasePath, {sessionId.c_str()})).toUrl();
 
     openTunnel(
         clientTunnelBaseUrl,
@@ -140,8 +140,8 @@ void ClientOverHttpTunnel::openClientTunnel(
 
 void ClientOverHttpTunnel::processClientTunnelResult(
     OpenRelayConnectionHandler completionHandler,
-    const network::http::tunneling::Client& tunnelingClient,
-    network::http::tunneling::OpenTunnelResult result)
+    const nx_http::tunneling::Client& tunnelingClient,
+    nx_http::tunneling::OpenTunnelResult result)
 {
     completionHandler(
         getResultCode(result, tunnelingClient),
@@ -149,8 +149,8 @@ void ClientOverHttpTunnel::processClientTunnelResult(
 }
 
 api::ResultCode ClientOverHttpTunnel::getResultCode(
-    const network::http::tunneling::OpenTunnelResult& tunnelResult,
-    const network::http::tunneling::Client& tunnelingClient)
+    const nx_http::tunneling::OpenTunnelResult& tunnelResult,
+    const nx_http::tunneling::Client& tunnelingClient)
 {
     if (tunnelResult.connection)
         return api::ResultCode::ok;

@@ -5,7 +5,7 @@
 #include <nx/network/cloud/tunnel/relay/relay_connector.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
 #include <nx/network/http/test_http_server.h>
-#include <nx/network/http/tunneling/server.h>
+//#include <nx/network/http/tunneling/server.h>
 #include <nx/network/http/rest/http_rest_client.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
@@ -236,6 +236,9 @@ TEST_F(RelayConnector, stops_internal_timer_when_reporting_result)
 //-------------------------------------------------------------------------------------------------
 // Test cases.
 
+// TODO: #ak Re-enable in 4.0.
+#if 0
+
 static const char* const kRelaySessionId = "session1";
 static const char* const kServerId = "server1.system1";
 static const char* const kRelayRelayApiPrefix = "/RelayConnectorRedirectTest";
@@ -343,6 +346,8 @@ TEST_F(RelayConnectorRedirect, handles_redirect_properly)
     whenCreateConnectSessionThatIsRedirectedToAnotherRelayInstance();
     thenProperUrlIsSpecifiedToTunnelConnection();
 }
+
+#endif
 
 } // namespace test
 } // namespace relay

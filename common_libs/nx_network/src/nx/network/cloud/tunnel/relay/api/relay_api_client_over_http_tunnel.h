@@ -15,7 +15,7 @@ class NX_NETWORK_API ClientOverHttpTunnel:
 
 public:
     ClientOverHttpTunnel(
-        const nx::utils::Url& baseUrl,
+        const QUrl& baseUrl,
         ClientFeedbackFunction /*feedbackFunction*/);
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
@@ -33,11 +33,11 @@ protected:
 
 private:
     using TunnelingClients = 
-        std::list<std::unique_ptr<network::http::tunneling::Client>>;
+        std::list<std::unique_ptr<nx_http::tunneling::Client>>;
 
     using OpenTrafficRelayTunnelHandler = nx::utils::MoveOnlyFunc<void(
-        const network::http::tunneling::Client&,
-        network::http::tunneling::OpenTunnelResult)>;
+        const nx_http::tunneling::Client&,
+        nx_http::tunneling::OpenTunnelResult)>;
 
     TunnelingClients m_tunnelingClients;
 
@@ -46,13 +46,13 @@ private:
         BeginListeningHandler completionHandler);
 
     void openTunnel(
-        const nx::utils::Url& url,
+        const QUrl& url,
         ClientOverHttpTunnel::OpenTrafficRelayTunnelHandler handler);
 
     void processServerTunnelResult(
         BeginListeningHandler completionHandler,
-        const network::http::tunneling::Client& tunnelingClient,
-        network::http::tunneling::OpenTunnelResult result);
+        const nx_http::tunneling::Client& tunnelingClient,
+        nx_http::tunneling::OpenTunnelResult result);
 
     void openClientTunnel(
         const std::string& sessionId,
@@ -60,12 +60,12 @@ private:
 
     void processClientTunnelResult(
         OpenRelayConnectionHandler completionHandler,
-        const network::http::tunneling::Client& tunnelingClient,
-        network::http::tunneling::OpenTunnelResult result);
+        const nx_http::tunneling::Client& tunnelingClient,
+        nx_http::tunneling::OpenTunnelResult result);
 
     static api::ResultCode getResultCode(
-        const network::http::tunneling::OpenTunnelResult& tunnelResult,
-        const network::http::tunneling::Client& tunnelingClient);
+        const nx_http::tunneling::OpenTunnelResult& tunnelResult,
+        const nx_http::tunneling::Client& tunnelingClient);
 };
 
 } // namespace nx::cloud::relay::api
