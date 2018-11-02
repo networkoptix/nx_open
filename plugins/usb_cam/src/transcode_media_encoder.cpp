@@ -26,7 +26,9 @@ TranscodeMediaEncoder::TranscodeMediaEncoder(
 {
 }
 
-int TranscodeMediaEncoder::getResolutionList(nxcip::ResolutionInfo* infoList, int* infoListCount) const
+int TranscodeMediaEncoder::getResolutionList(
+    nxcip::ResolutionInfo* infoList,
+    int* infoListCount) const
 {
     if (!m_camera->videoStream()->pluggedIn())
         return nxcip::NX_IO_ERROR;

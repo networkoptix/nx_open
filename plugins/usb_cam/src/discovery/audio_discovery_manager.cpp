@@ -11,7 +11,7 @@ namespace nx {
 namespace usb_cam {
 namespace device {
     
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // AudioDiscoveryManager
 
 AudioDiscoveryManager::AudioDiscoveryManager()
@@ -38,6 +38,6 @@ bool AudioDiscoveryManager::pluggedIn(const std::string& devicePath) const
     return m_discovery->pluggedIn(devicePath);
 }
 
-} // namespace device
+} // namespace discovery
 } // namespace usb_cam
 } // namespace nx

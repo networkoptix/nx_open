@@ -31,7 +31,7 @@ const char * ffmpegDeviceType()
 } // namespace
 
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // AudioStreamPrivate
 
 AudioStream::AudioStreamPrivate::AudioStreamPrivate(
@@ -306,7 +306,9 @@ int AudioStream::AudioStreamPrivate::decodeNextFrame(ffmpeg::Frame * outFrame)
     }
 }
 
-int AudioStream::AudioStreamPrivate::resample(const ffmpeg::Frame * frame, ffmpeg::Frame * outFrame)
+int AudioStream::AudioStreamPrivate::resample(
+    const ffmpeg::Frame * frame,
+    ffmpeg::Frame * outFrame)
 {
     if(!m_resampleContext)
     {
@@ -322,7 +324,10 @@ int AudioStream::AudioStreamPrivate::resample(const ffmpeg::Frame * frame, ffmpe
     if(!m_resampleContext)
         return m_initCode;
 
-    return swr_convert_frame(m_resampleContext, outFrame->frame(), frame ? frame->frame() : nullptr);
+    return swr_convert_frame(
+        m_resampleContext,
+        outFrame->frame(),
+        frame ? frame->frame() : nullptr);
 }
 
 std::chrono::milliseconds AudioStream::AudioStreamPrivate::resampleDelay() const
@@ -509,7 +514,7 @@ void AudioStream::AudioStreamPrivate::run()
     uninitialize();
 }
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // AudioStream
 
 AudioStream::AudioStream(

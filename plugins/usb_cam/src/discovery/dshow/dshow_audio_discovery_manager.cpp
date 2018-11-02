@@ -4,7 +4,7 @@
 
 #include <map>
 
-#include "device/dshow/dshow_utils.h"
+#include "device/windows/dshow_utils.h"
 
 namespace nx {
 namespace usb_cam {
@@ -43,9 +43,9 @@ void DShowAudioDiscoveryManager::fillCameraAuxData(nxcip::CameraInfo* cameras, i
                 
                  // Duplicate audio devices in windows are prepended with an index, making them
                  // unique. Therefore, it is safe to use the device name instead of its path. In
-                 // fact, the path requires further parsing before use by ffmpeg, as ffmpeg replaces
-                 // all ':' chars wtih '_' in audio alternative names. Oddly enough, it does not do
-                 // this for video.
+                 // fact, the path requires further parsing before use by ffmpeg, as ffmpeg
+                 // replaces all ':' chars wtih '_' in audio alternative names. Oddly, it does not
+                 // do this for video.
                 strncpy(
                     camera->auxiliaryData,
                     device->data.deviceName.c_str(),

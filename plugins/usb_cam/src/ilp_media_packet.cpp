@@ -138,7 +138,9 @@ void ILPMediaPacket::resizeBuffer( size_t bufSize )
     {
         if( newBuffer )
             memcpy( newBuffer, m_buffer, std::min<>(m_bufSize, bufSize) );
-        nx::kit::utils::freeAligned( m_buffer, std::bind( &CyclicAllocator::release, m_allocator, _1 ) );
+        nx::kit::utils::freeAligned(
+            m_buffer,
+            std::bind(&CyclicAllocator::release, m_allocator, _1));
         m_buffer = NULL;
         m_bufSize = 0;
     }

@@ -14,7 +14,7 @@
 namespace nx {
 namespace usb_cam {
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // TimeStampedBuffer
 
 template<typename V>
@@ -98,8 +98,8 @@ public:
      * Wait for the difference in timestamps between the oldest and newest items in buffer 
      *    to be >= timeSpan. Terminates early if interrupt() is called, returning false.
      * 
-     * @param[in] timeSpan - The amount of items in terms of their timestamps that the buffer should
-     *    contain.
+     * @param[in] timeSpan - The amount of items in terms of their timestamps that the buffer 
+     *    should contain.
      * @param[in] timeOut - The maximum amount of time to wait for the time span condition before
      *    terminating early
      * @return - true if the wait terminated due to satisfying the timespan condition, false if
@@ -137,22 +137,22 @@ protected:
         return m_buffer.empty()
             ? std::chrono::milliseconds(0)
             : std::chrono::milliseconds(m_buffer.rbegin()->first - m_buffer.begin()->first);
-            // largest key minus smallest key
+            // Largest key minus smallest key, or oldest - newest.
     }
 
     /**
      * Wait for at most timeOut for the number of items in the buffer to be > minimumBufferSize.
-     *    Terminates early if interrupt() is called, returning false. Also returns false if the wait
-     *    times out and the buffer size is not strictly larger than minimumBufferSize.
+     *    Terminates early if interrupt() is called, returning false. Also returns false if the
+     *    wait times out and the buffer size is not strictly larger than minimumBufferSize.
      * 
      * @params[in] lock - an std::unique lock that the condition_variable should wait on.
-     * @param[in] minimumBufferSize - the minimum number of items that the buffer should contain for
-     *    the wait condition to return true. Uses a strictly greater than comparison.
+     * @param[in] minimumBufferSize - the minimum number of items that the buffer should contain 
+     *    for the wait condition to return true. Uses a strictly greater than comparison.
      * @params[in] timeOut - the maximum amount of time to wait (in milliseconds)
      *     before terminating early. If 0 is passed, waits indefinitely or until interrupt()
      *     is called.
-     * @return - true if the buffer size grows larger than minimum buffer size, false if interrupted
-     *    or time out.
+     * @return - true if the buffer size grows larger than minimum buffer size, false if 
+     *    interrupted or time out.
      */
     bool wait(
         std::unique_lock<std::mutex>& lock,
@@ -188,7 +188,7 @@ protected:
     }
 };
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // BufferedPacketConsumer
 
 class BufferedPacketConsumer:
@@ -226,7 +226,7 @@ private:
     std::atomic_bool m_dropUntilNextVideoKeyPacket = false;
 };
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // BufferedVideoFrameConsumer
 
 class BufferedVideoFrameConsumer:

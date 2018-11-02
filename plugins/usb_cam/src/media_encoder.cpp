@@ -15,6 +15,12 @@
 namespace nx {
 namespace usb_cam {
 
+namespace {
+
+static constexpr int kBytesInOneKilobyte = 1000;
+
+}
+
 MediaEncoder::MediaEncoder(nxpt::CommonRefManager* const parentRefManager,
     int encoderIndex,
     const std::shared_ptr<Camera>& camera)
@@ -28,7 +34,9 @@ MediaEncoder::MediaEncoder(nxpt::CommonRefManager* const parentRefManager,
 
 void* MediaEncoder::queryInterface(const nxpl::NX_GUID& interfaceID)
 {
-    if (memcmp(&interfaceID, &nxcip::IID_CameraMediaEncoder2,
+    if (memcmp(
+        &interfaceID,
+        &nxcip::IID_CameraMediaEncoder2,
             sizeof(nxcip::IID_CameraMediaEncoder2)) == 0)
     {
         addRef();
@@ -69,8 +77,9 @@ int MediaEncoder::getMaxBitrate(int* maxBitrate) const
     if(!m_camera->videoStream()->pluggedIn())
         return nxcip::NX_IO_ERROR;
 
-    std::string url = m_camera->url();
-    *maxBitrate = device::getMaxBitrate(url.c_str(), m_camera->compressionTypeDescriptor()) / 1000;
+    *maxBitrate = device::getMaxBitrate(
+        m_camera->url().c_str(), 
+        m_camera->compressionTypeDescriptor()) / kBytesInOneKilobyte;
     return nxcip::NX_NO_ERROR;
 }
 
@@ -191,16 +200,12 @@ void MediaEncoder::fillResolutionList(
         return maxFps;
     };
 
-    NX_DEBUG(this) << "fillResolutionList():" << m_camera->info().modelName;
-
     int j = 0;
     device::ResolutionData previous(0, 0, 0);
     for (int i = 0; i < list.size() && j < nxcip::MAX_RESOLUTION_LIST_SIZE; ++i)
     {
         if (previous.width * previous.height == list[i].width * list[i].height)
             continue;
-
-        NX_DEBUG(this) << "w:" << list[i].width << ", h:" << list[i].height;
 
         outInfoList[j].resolution = { list[i].width, list[i].height };
         outInfoList[j].maxFps = getMaxFps(list, i, list[i].width, list[i].height);

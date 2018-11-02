@@ -17,7 +17,9 @@ public:
 
     virtual ~TranscodeMediaEncoder() = default;
 
-    virtual int getResolutionList(nxcip::ResolutionInfo* infoList, int* infoListCount) const override;
+    virtual int getResolutionList(
+        nxcip::ResolutionInfo* infoList,
+        int* infoListCount) const override;
     virtual int setFps(const float& fps, float*selectedFps) override;
 
     virtual nxcip::StreamReader* getLiveStreamReader() override;

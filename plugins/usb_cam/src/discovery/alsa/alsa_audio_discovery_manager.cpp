@@ -22,7 +22,8 @@ std::vector<std::string> kMotherBoardAudioList =
 
 } // namespace
 
-void AlsaAudioDiscoveryManager::fillCameraAuxData(nxcip::CameraInfo* cameras, int cameraCount) const
+void AlsaAudioDiscoveryManager::fillCameraAuxData(
+    nxcip::CameraInfo* cameras, int cameraCount) const
 {
     std::vector<DeviceDescriptor> devices = getDevices();
     std::map<DeviceDescriptor*, bool> audioTaken;

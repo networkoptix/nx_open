@@ -119,9 +119,9 @@ bool TranscodeStreamReader::shouldDrop(const ffmpeg::Frame * frame)
     if(m_codecParams.fps >= m_camera->videoStream()->fps())
         return false;
 
-    // The Mmal decoder can reorder frames, causing time stamps to be out of order. The h263 encoder
-    // throws an error if the frame it encodes is equal to or earlier in time than the previous
-    // frame, so drop it to avoid this error.
+    // The Mmal decoder can reorder frames, causing time stamps to be out of order. 
+    // The h263 encoder throws an error if the frame it encodes is equal to or earlier in time 
+    // than the previous frame, so drop it to avoid this error.
     if (m_lastVideoPts != AV_NOPTS_VALUE && frame->pts() <= m_lastVideoPts)
         return true;
 
@@ -163,10 +163,6 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::transcodeVideo(
         *outNxError = nxcip::NX_OTHER_ERROR;
         return nullptr;
     }
-
-    // Don't allow too many dangling timestamps.
-    if(m_timestamps.size() > 30)
-        m_timestamps.clear();
 
     m_timestamps.addTimestamp(frame->packetPts(), frame->timestamp());
 
@@ -398,11 +394,13 @@ int TranscodeStreamReader::initializeScaledFrame(const ffmpeg::Codec* encoder)
     if (!scaledFrame || !scaledFrame->frame())
         return AVERROR(ENOMEM);
     
-    AVPixelFormat encoderFormat = 
-        ffmpeg::utils::unDeprecatePixelFormat(encoder->codec()->pix_fmts[0]);
+    AVPixelFormat encoderFormat = ffmpeg::utils::unDeprecatePixelFormat(
+        encoder->codec()->pix_fmts[0]);
 
-    int result = 
-        scaledFrame->getBuffer(encoderFormat, m_codecParams.resolution.width, m_codecParams.resolution.height, 32);
+    int result = scaledFrame->getBuffer(
+        encoderFormat,
+        m_codecParams.resolution.width,
+        m_codecParams.resolution.height, 32);
     
     if (result < 0)
         return result;
