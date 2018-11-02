@@ -12,6 +12,7 @@
 #include <QtNetwork/QHostInfo>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/string.h>
 
 #include "nettools.h"
 #include "ping.h"
@@ -513,19 +514,6 @@ QHostAddress resolveAddress(const QString& addrString)
     return QHostAddress();
 }
 
-// TODO: #Elric I want to kill
-int strEqualAmount(const char* str1, const char* str2)
-{
-    int rez = 0;
-    while (*str1 && *str1 == *str2)
-    {
-        rez++;
-        str1++;
-        str2++;
-    }
-    return rez;
-}
-
 bool isNewDiscoveryAddressBetter(
     const HostAddress& host,
     const QHostAddress& newAddress,
@@ -535,13 +523,13 @@ bool isNewDiscoveryAddressBetter(
     // Introduce some maxPrefix(...) function and use it here.
     // E.g., auto eq1 = maxPrefix(host, newAddress).size();
 
-    const int eq1 = strEqualAmount(
-        host.toString().toLatin1().constData(),
-        newAddress.toString().toLatin1().constData());
+    const auto eq1 = nx::utils::maxPrefix(
+        host.toString().toStdString(),
+        newAddress.toString().toStdString()).size();
 
-    const int eq2 = strEqualAmount(
-        host.toString().toLatin1().constData(),
-        oldAddress.toString().toLatin1().constData());
+    const auto eq2 = nx::utils::maxPrefix(
+        host.toString().toStdString(),
+        oldAddress.toString().toStdString()).size();
 
     return eq1 > eq2;
 }
