@@ -424,7 +424,8 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         analyticsManager,
         &ec2::AbstractAnalyticsNotificationManager::analyticsPluginAddedOrUpdated,
         this,
-        on_resourceUpdated);
+        on_resourceUpdated,
+        connectionType);
 
     connect(
         analyticsManager,
@@ -437,7 +438,8 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         analyticsManager,
         &ec2::AbstractAnalyticsNotificationManager::analyticsEngineAddedOrUpdated,
         this,
-        on_resourceUpdated);
+        on_resourceUpdated,
+        connectionType);
     connect(
         analyticsManager,
         &ec2::AbstractAnalyticsNotificationManager::analyticsEngineRemoved,
