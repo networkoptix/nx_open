@@ -59,7 +59,6 @@ public:
 
     virtual bool hasChanges() const override;
 
-    virtual bool canApplyChanges() const override;
     virtual bool canDiscardChanges() const override;
 
     bool cancelUpdatesCheck();
