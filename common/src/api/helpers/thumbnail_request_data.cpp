@@ -98,13 +98,11 @@ boost::optional<QString> QnThumbnailRequestData::getError() const
 
     const auto& size = request.size;
     if (size.height() > 0 && size.height() < nx::api::CameraImageRequest::kMinimumSize)
-        return lit("Invalid height");
-
-    if (size.width() > 0
-        && (size.width() < nx::api::CameraImageRequest::kMinimumSize || size.height() < 0))
-    {
+        return QString("Height cannot be less then %1").arg(nx::api::CameraImageRequest::kMinimumSize);
+    if (size.width() > 0 && size.width() < nx::api::CameraImageRequest::kMinimumSize)
+        return QString("Width cannot be less then %1").arg(nx::api::CameraImageRequest::kMinimumSize);
+    if (size.width() > 0 && size.height() < 0)
         return lit("Width cannot be specified without specifying height");
-    }
 
     return boost::none;
 }

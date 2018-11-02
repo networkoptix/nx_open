@@ -42,7 +42,7 @@ private:
     QSize updateDstSize(
         const QnVirtualCameraResourcePtr& camera,
         const QSize& dstSize,
-        CLVideoDecoderOutputPtr outFrame,
+        const CLVideoDecoderOutput& outFrame,
         nx::api::ImageRequest::AspectRatio aspectRatio) const;
 
     CLVideoDecoderOutputPtr getImageWithCertainQuality(
