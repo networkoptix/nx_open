@@ -617,6 +617,12 @@ TEST(QnTimePeriodsListTest, filterTimePeriodsAsc)
     result = data.filterTimePeriods(itr, endItr, /*detail level*/ 6, true, 100, Qt::SortOrder::AscendingOrder);
     ASSERT_EQ(5, result.size());
     ASSERT_EQ(QnTimePeriod::infiniteDuration(), result.last().durationMs);
+
+    result = data.filterTimePeriods(
+        itr, endItr, /*detail level*/ 6, false, 100, Qt::SortOrder::AscendingOrder);
+    ASSERT_EQ(4, result.size());
+    ASSERT_EQ(QnTimePeriod::infiniteDuration(), result.last().durationMs);
+
 }
 
 TEST(QnTimePeriodsListTest, filterTimePeriodsDesc)
@@ -676,6 +682,17 @@ TEST(QnTimePeriodsListTest, filterTimePeriodsDesc)
         expectedList
             << QnTimePeriod(100, QnTimePeriod::infiniteDuration())
             << QnTimePeriod(85, 4)
+            << QnTimePeriod(52, 20)
+            << QnTimePeriod(32, 10)
+            << QnTimePeriod(15, 11);
+        checkLists(expectedList, result);
+    }
+
+    result = data.filterTimePeriods(itr, endItr, /*detail level*/ 6, false, 100, Qt::SortOrder::DescendingOrder);
+    {
+        QnTimePeriodList expectedList;
+        expectedList
+            << QnTimePeriod(100, QnTimePeriod::infiniteDuration())
             << QnTimePeriod(52, 20)
             << QnTimePeriod(32, 10)
             << QnTimePeriod(15, 11);
