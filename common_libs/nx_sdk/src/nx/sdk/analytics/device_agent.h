@@ -56,8 +56,7 @@ public:
     /**
      * Called before other methods. Server provides the set of settings stored in its database for
      * the combination of a resource instance and a engine type.
-     * @param settings Values of settings declared in the manifest. The pointer is valid only
-     *     during the call. If count is 0, the pointer is null.
+     * @param settings Values of settings declared in the manifest.
      */
     virtual void setSettings(const Settings* settings) = 0;
 
@@ -73,19 +72,17 @@ public:
     virtual const IString* manifest(Error* error) const = 0;
 
     /**
-     * @param handler Processes event metadata and object metadata fetched by the engine. The
-     *     engine will fetch events metadata after startFetchingMetadata() call. Errors should also
-     *     be reported via this handler. Also provides other services to the DeviceAgent, e.g.
-     *     reading settings that are stored by the Server.
+     * @param handler Processes event metadata and object metadata fetched by the Engine. The
+     *     Engine should fetch events metadata after setNeededMetadataTypes() call. Errors should
+     *     also be reported via this handler.
      * @return noError in case of success, other value otherwise.
      */
     virtual Error setMetadataHandler(MetadataHandler* handler) = 0;
 
     /**
-     * Sets a list of metadata types that are needed by the server.
-     * Empty list means that server doesn't need any metadata from this device agent.
-     * Before the first call to this method server doesn't expect any metadata to be provided.
-     * @param neededMetadataTypes Lists of types of events and objects.
+     * Sets a list of metadata types that are needed by the Server. Empty list means that the
+     * Server doesn't need any metadata from this DeviceAgent.
+     * @param neededMetadataTypes Lists of type ids of events and objects.
      */
     virtual Error setNeededMetadataTypes(const IMetadataTypes* neededMetadataTypes) = 0;
 };
