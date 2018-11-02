@@ -14,12 +14,10 @@ StreamTransformingAsyncChannel::StreamTransformingAsyncChannel(
     m_converter(converter),
     m_asyncReadInProgress(false)
 {
-    using namespace std::placeholders;
-
     m_inputPipeline = utils::bstream::makeCustomInput(
-        std::bind(&StreamTransformingAsyncChannel::readRawBytes, this, _1, _2));
+        [this](auto&&... args) { return readRawBytes(std::move(args)...); });
     m_outputPipeline = utils::bstream::makeCustomOutput(
-        std::bind(&StreamTransformingAsyncChannel::writeRawBytes, this, _1, _2));
+        [this](auto&&... args) { return writeRawBytes(std::move(args)...); });
     m_converter->setInput(m_inputPipeline.get());
     m_converter->setOutput(m_outputPipeline.get());
 
@@ -42,8 +40,6 @@ void StreamTransformingAsyncChannel::readSomeAsync(
     nx::Buffer* const buffer,
     UserIoHandler handler)
 {
-    using namespace std::placeholders;
-
     post(
         [this, buffer, handler = std::move(handler)]() mutable
         {
@@ -57,8 +53,6 @@ void StreamTransformingAsyncChannel::sendAsync(
     const nx::Buffer& buffer,
     UserIoHandler handler)
 {
-    using namespace std::placeholders;
-
     post(
         [this, &buffer, handler = std::move(handler)]() mutable
         {
@@ -189,8 +183,6 @@ std::tuple<SystemError::ErrorCode, int /*bytesTransferred*/>
 
 int StreamTransformingAsyncChannel::readRawBytes(void* data, size_t count)
 {
-    using namespace std::placeholders;
-
     NX_ASSERT(isInSelfAioThread());
 
     if (!m_readRawData.empty())
