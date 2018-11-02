@@ -112,14 +112,13 @@ void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
 namespace {
 
 static const std::string kLibName = "vca_analytics_plugin";
-static const std::string kPluginManifest = R"json(
+static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 {
     "id": "nx.vca",
     "name": "VCA analytics plugin",
-    "version": "1.0.0",
-    "engineSettingsModel": "",
-    "deviceAgentSettingsModel": ""
-})json";
+    "engineSettingsModel": ""
+}
+)json";
 
 } // namespace
 

@@ -90,14 +90,13 @@ std::string Engine::manifest() const
 namespace {
 
 static const std::string kLibName = "tegra_video_analytics_plugin";
-static const std::string kPluginManifest = R"json(
+static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 {
     "id": "nx.tegra_video",
     "name": "TegraVideo analytics plugin",
-    "version": "1.0.0",
-    "engineSettingsModel": "",
-    "deviceAgentSettingsModel": ""
-})json";
+    "engineSettingsModel": ""
+}
+)json";
 
 } // namespace
 

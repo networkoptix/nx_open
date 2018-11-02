@@ -1,4 +1,4 @@
-﻿#include "engine.h"
+#include "engine.h"
 
 #include <QtCore/QString>
 #include <QtCore/QFile>
@@ -125,14 +125,13 @@ void Engine::executeAction(
 namespace {
 
 static const std::string kLibName = "dw_mtt_analytics_plugin";
-static const std::string kPluginManifest = R"json(
+static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 {
     "id": "nx.dw_mtt",
     "name": "DW MTT analytics plugin",
-    "version": "1.0.0",
-    "engineSettingsModel": "",
-    "deviceAgentSettingsModel": ""
-})json";
+    "engineSettingsModel": ""
+}
+)json";
 
 } // namespace
 

@@ -306,7 +306,6 @@ public:
                         PluginManifest manifest;
                         manifest.id = id.toString();
                         manifest.name = name;
-                        manifest.version = "1.0";
                         manifest.engineSettingsModel = kEngineSettingsModel;
 
                         AnalyticsPluginResourcePtr plugin{
