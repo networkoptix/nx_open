@@ -59,7 +59,6 @@ public:
 
     virtual bool hasChanges() const override;
 
-    virtual bool canApplyChanges() const override;
     virtual bool canDiscardChanges() const override;
 
     bool cancelUpdatesCheck();
@@ -67,12 +66,11 @@ public:
 
 protected:
     // This one is called by timer periodically.
-    void at_updateCurrentState();
-
-    void at_clientDownloadFinished();
-    void at_modelDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
-    void at_startUpdateAction();
-    bool at_cancelCurrentAction();
+    void atUpdateCurrentState();
+    void atClientDownloadFinished();
+    void atModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
+    void atStartUpdateAction();
+    bool atCancelCurrentAction();
 
     void hideStatusColumns(bool value);
     void clearUpdateInfo();
@@ -107,7 +105,6 @@ private:
     static QString toString(WidgetUpdateState state);
     static QString toString(LocalStatusCode stage);
     static QString toString(ServerUpdateTool::OfflineUpdateState state);
-    static QString toString(ClientUpdateTool::State state);
 
     void setUpdateSourceMode(UpdateSourceType mode);
 
@@ -171,8 +168,6 @@ private:
 
     UpdateContents m_updateInfo;
     QString m_updateCheckError;
-    // We get this version either from internet, or zip package.
-    nx::utils::SoftwareVersion m_availableVersion;
     nx::utils::SoftwareVersion m_targetVersion;
 
     WidgetUpdateState m_updateStateCurrent = WidgetUpdateState::initial;

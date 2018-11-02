@@ -20,7 +20,7 @@
 namespace
 {
     const int MT_REQUESTS = 10;
-    static const QString kNewTestPassword("qwe123456");
+    static const QString kNewTestPassword("My1nsAnelYSaf3P4ssW0rd");
 }
 
 class MulticastHttpTestWorker: public QObject

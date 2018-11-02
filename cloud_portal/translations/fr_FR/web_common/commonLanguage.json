@@ -21,7 +21,7 @@
     "noFormat": "Ce navigateur ne supporte pas la lecture vidéo de cette caméra.",
     "ieNoWebm": "Veuillez installer <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> pour Internet Explorer.",
     "ieWin10": "S.V.P, utilisez les navigateurs Edge Microsoft ou Google Chrome.",
-    "ubuntuNX": "Ce navigateur ne supporte pas la vidéo à partir de serveurs ARM. S.V.P, utilisez un navigateur Chromium."
+    "ubuntuNX": "Ce navigateur ne supporte pas la vidéo à partir de serveurs ARM. S.V.P. utilisez un navigateur Chromium."
   },
   "searchCamPlaceholder": "Recherche",
   "resolution": {
@@ -34,7 +34,7 @@
     "play": "lecture",
     "pause": "pause",
     "live": "go to live | show me live",
-    "view": "view + [camera name]",
+    "view": "vue + [nom de la caméra]",
     "search": "find + [text for searchbar]",
     "clear search": "effacer la recherche",
     "expand server": "expand server + [server name]",

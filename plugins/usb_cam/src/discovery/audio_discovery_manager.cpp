@@ -17,9 +17,9 @@ namespace device {
 AudioDiscoveryManager::AudioDiscoveryManager()
 {
 #ifdef _WIN32
-    m_discovery = new DShowAudioDiscoveryManager();
+    m_discovery = new detail::DShowAudioDiscoveryManager();
 #else // __linux__
-    m_discovery = new AlsaAudioDiscoveryManager();
+    m_discovery = new detail::AlsaAudioDiscoveryManager();
 #endif
 }
 
@@ -31,6 +31,11 @@ AudioDiscoveryManager::~AudioDiscoveryManager()
 void AudioDiscoveryManager::fillCameraAuxData(nxcip::CameraInfo* cameras, int cameraCount) const
 {
     m_discovery->fillCameraAuxData(cameras, cameraCount);
+}
+
+bool AudioDiscoveryManager::pluggedIn(const std::string& devicePath) const
+{
+    return m_discovery->pluggedIn(devicePath);
 }
 
 } // namespace device

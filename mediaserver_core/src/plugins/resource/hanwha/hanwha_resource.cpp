@@ -962,13 +962,6 @@ CameraDiagnostics::Result HanwhaResource::initSystem(const HanwhaInformation& in
     if (nx::core::resource::isProxyDeviceType(nxDeviceType))
         setDeviceType(nxDeviceType);
 
-    if (isAnalogEncoder())
-    {
-        // We can't reliably determine if there's PTZ caps for analogous cameras
-        // connected to Hanwha encoder, so we allow a user to enable it on the 'expert' tab
-        setIsUserAllowedToModifyPtzCapabilities(true);
-    }
-
     if (!info.firmware.isEmpty())
         setFirmware(info.firmware);
 
@@ -1022,6 +1015,19 @@ CameraDiagnostics::Result HanwhaResource::initSystem(const HanwhaInformation& in
             const auto proxiedDeviceInfo = helper.view(lit("system/deviceinfo"));
             handleProxiedDeviceInfo(proxiedDeviceInfo);
         }
+    }
+
+    const auto hasRs485 = attributes().attribute<bool>("IO/RS485");
+    const auto hasRs422 = attributes().attribute<bool>("IO/RS422");
+
+    m_hasSerialPort = (hasRs485 != boost::none && *hasRs485)
+        || (hasRs422 != boost::none && *hasRs422);
+
+    if (isAnalogEncoder() || isProxiedAnalogEncoder() || hasSerialPort())
+    {
+        // We can't reliably determine if there's PTZ caps for analogous cameras
+        // connected to Hanwha encoder, so we allow a user to enable it on the 'expert' tab
+        setIsUserAllowedToModifyPtzCapabilities(true);
     }
 
     return CameraDiagnostics::NoErrorResult();
@@ -1656,12 +1662,19 @@ CameraDiagnostics::Result HanwhaResource::initRemoteArchive()
 }
 
 CameraDiagnostics::Result HanwhaResource::handleProxiedDeviceInfo(
-    const HanwhaResponse & deviceInfoResponse)
+    const HanwhaResponse& deviceInfoResponse)
 {
     if (deviceInfoResponse.isSuccessful())
     {
-        const auto proxiedIdParameter = deviceInfoResponse.parameter<QString>(
-            lit("ConnectedMACAddress"));
+        const auto deviceInfoParameter = deviceInfoResponse.parameter<QString>("DeviceType");
+        m_bypassDeviceType = deviceInfoParameter
+            ? QnLexical::deserialized<HanwhaDeviceType>(
+                deviceInfoParameter->trimmed(),
+                HanwhaDeviceType::unknown)
+            : HanwhaDeviceType::unknown;
+
+        const auto proxiedIdParameter =
+            deviceInfoResponse.parameter<QString>("ConnectedMACAddress");
 
         if (proxiedIdParameter == boost::none)
             return CameraDiagnostics::NoErrorResult();
@@ -3544,9 +3557,24 @@ bool HanwhaResource::isNvr() const
     return m_deviceType == HanwhaDeviceType::nvr;
 }
 
+bool HanwhaResource::isProxiedAnalogEncoder() const
+{
+    return bypassDeviceType() == HanwhaDeviceType::encoder;
+}
+
 HanwhaDeviceType HanwhaResource::deviceType() const
 {
     return m_deviceType;
+}
+
+HanwhaDeviceType HanwhaResource::bypassDeviceType() const
+{
+    return m_bypassDeviceType;
+}
+
+bool HanwhaResource::hasSerialPort() const
+{
+    return m_hasSerialPort;
 }
 
 QString HanwhaResource::nxProfileName(
@@ -3624,7 +3652,13 @@ void HanwhaResource::setSupportedAnalyticsEventTypeIds(
     base_type::setSupportedAnalyticsEventTypeIds(engineId, externalEvents);
 }
 
-QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int /*detailLevel*/)
+QnTimePeriodList HanwhaResource::getDtsTimePeriods(
+    qint64 startTimeMs,
+    qint64 endTimeMs,
+    int detailLevel,
+    bool keepSmalChunks,
+    int limit,
+    Qt::SortOrder sortOrder)
 {
     if (!isNvr())
         return QnTimePeriodList();
@@ -3635,8 +3669,19 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 en
     if (numberOfOverlappedIds != 1)
         return QnTimePeriodList();
 
-    QnTimePeriod period(startTimeMs, endTimeMs - startTimeMs);
-    return timeline.cbegin()->second.intersected(period);
+
+    const auto& periods = timeline.cbegin()->second;
+    auto itr = std::lower_bound(periods.begin(), periods.end(), startTimeMs);
+    if (itr != periods.begin())
+    {
+        --itr;
+        if (itr->endTimeMs() <= startTimeMs)
+            ++itr; //< Case if previous chunk does not contain startTime.
+    }
+    auto endItr = std::lower_bound(periods.begin(), periods.end(), endTimeMs);
+
+    return QnTimePeriodList::filterTimePeriods(
+        itr, endItr, detailLevel, keepSmalChunks, limit, sortOrder);
 }
 
 QnConstResourceAudioLayoutPtr HanwhaResource::getAudioLayout(
@@ -3743,7 +3788,10 @@ HanwhaProfileParameters HanwhaResource::makeProfileParameters(
     else
         result.emplace(kHanwhaProfileNumberProperty, QString::number(profileByRole(role)));
 
-    if (flags.testFlag(HanwhaProfileParameterFlag::audioSupported) && isAudioEnabled())
+    auto audioInputEnableParameter = cgiParameters().parameter(
+        QString("media/videoprofile/add_update/") + kHanwhaAudioInputEnableProperty);
+
+    if (flags.testFlag(HanwhaProfileParameterFlag::audioSupported) && audioInputEnableParameter)
         result.emplace(kHanwhaAudioInputEnableProperty, toHanwhaString(isAudioEnabled()));
 
     if (isH26x)

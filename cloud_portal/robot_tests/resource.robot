@@ -26,7 +26,7 @@ Regular Open Browser
     [Arguments]    ${url}
     Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
     Open Browser    ${ENV}    ${BROWSER}
-#    Maximize Browser Window
+    Set Window Size    1920    1080
 
 Docker Open Browser
     [Arguments]    ${url}
@@ -44,7 +44,7 @@ Set Chrome Options
     [Return]    ${options}
 
 Check Language
-    Wait Until Page Contains Element    ${LANGUAGE DROPDOWN}/following-sibling::ul//a[@ng-click='changeLanguage(lang.language)']/span[@lang='en_US']
+#    Wait Until Page Contains Element    ${LANGUAGE DROPDOWN}/span[@lang='en_US']
     Register Keyword To Run On Failure    NONE
     ${status}    ${value}=    Run Keyword And Ignore Error    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    2
     Register Keyword To Run On Failure    Failure Tasks
@@ -60,15 +60,14 @@ Log In
     [arguments]    ${email}    ${password}    ${button}=${LOG IN NAV BAR}
     Run Keyword Unless    '''${button}''' == "None"    Wait Until Element Is Visible    ${button}
     Run Keyword Unless    '''${button}''' == "None"    Click Link    ${button}
-    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}
+    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${REMEMBER ME CHECKBOX}    ${FORGOT PASSWORD}    ${LOG IN CLOSE BUTTON}
     Input Text    ${EMAIL INPUT}    ${email}
     Input Text    ${PASSWORD INPUT}    ${password}
-
     Wait Until Element Is Visible    ${LOG IN BUTTON}
-    Click Element    ${LOG IN BUTTON}
+    Click Button    ${LOG IN BUTTON}
 
 Validate Log In
-    Wait Until Page Contains Element    ${AUTHORIZED BODY}
+    Wait Until Page Contains Element    ${AUTHORIZED BODY}    10
     Check Language
 
 Log Out
@@ -76,14 +75,14 @@ Log Out
     Wait Until Page Contains Element    ${LOG OUT BUTTON}
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
     Sleep    .05    #Ubuntu was clicking too soon
-    Click Link    ${ACCOUNT DROPDOWN}
+    Click Button    ${ACCOUNT DROPDOWN}
     Wait Until Element Is Visible    ${LOG OUT BUTTON}
     Click Link    ${LOG OUT BUTTON}
     Validate Log Out
 
 Validate Log Out
     Wait Until Element Is Not Visible    ${BACKDROP}
-    Wait Until Element Is Visible    ${ANONYMOUS BODY}
+    Wait Until Page Contains Element    ${ANONYMOUS BODY}    10
 
 Register
     [arguments]    ${first name}    ${last name}    ${email}    ${password}    ${checked}=false
@@ -133,6 +132,18 @@ Activate
     Element Should Be Visible    ${ACTIVATION SUCCESS}
     Location Should Be    ${url}/activate/success
 
+Share To
+    [arguments]    ${random email}    ${permissions}
+    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    Click Button    ${SHARE BUTTON SYSTEMS}
+    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
+    Input Text    ${SHARE EMAIL}    ${random email}
+    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
+    Click Button    ${SHARE PERMISSIONS DROPDOWN}
+    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${permissions}']
+    Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${permissions}']/..
+    Click Button    ${SHARE BUTTON MODAL}
+
 Edit User Permissions In Systems
     [arguments]    ${user email}    ${permissions}
     Wait Until Element Is Not Visible    ${SHARE MODAL}
@@ -140,10 +151,12 @@ Edit User Permissions In Systems
     Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),"${EDIT USER BUTTON TEXT}")]/..
     Click Element    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),"${EDIT USER BUTTON TEXT}")]/..
-    Wait Until Element Is Visible    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label="${permissions}"]
-    Click Element    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label="${permissions}"]
-    Wait Until Element Is Visible    ${EDIT PERMISSIONS SAVE}
-    Click Element    ${EDIT PERMISSIONS SAVE}
+    Wait Until Element Is Visible    ${EDIT PERMISSIONS DROPDOWN}
+    Click Element    ${EDIT PERMISSIONS DROPDOWN}
+    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${permissions}']
+    Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${permissions}']/..
+    Click Button    ${EDIT PERMISSIONS SAVE}
+    Wait Until Page Does Not Contain Element    ${SHARE MODAL}
     Check For Alert    ${NEW PERMISSIONS SAVED}
 
 Check User Permissions
@@ -230,7 +243,7 @@ Reset user noperm first/last name
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
-    Register Keyword To Run On Failure    NONE
+
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    nameChanged
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    nameChanged
     Register Keyword To Run On Failure    Failure Tasks
@@ -241,6 +254,8 @@ Reset user noperm first/last name
     Input Text    ${ACCOUNT LAST NAME}    ${TEST LAST NAME}
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
+    # In case Kyle forgets about this it's a test to see if it fixes a problem with not changing the name back in some cases
+    Sleep    2
     Close Browser
 
 Reset user owner first/last name
@@ -248,11 +263,11 @@ Reset user owner first/last name
     Open Browser and go to URL    ${url}/account
     Log In    ${EMAIL OWNER}    ${password}    button=None
     Validate Log In
-    Register Keyword To Run On Failure    NONE
+
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    newFirstName
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    newLastName
     Register Keyword To Run On Failure    Failure Tasks
-
+    Sleep    1
     Clear Element Text    ${ACCOUNT FIRST NAME}
     Input Text    ${ACCOUNT FIRST NAME}    ${TEST FIRST NAME}
     Clear Element Text    ${ACCOUNT LAST NAME}
@@ -263,7 +278,7 @@ Reset user owner first/last name
 
 Reset user password to base
     [arguments]    ${email}    ${current password}
-    Go To    ${url}/account/password
+    Open Browser and go to URL    ${url}/account/password
     Log In    ${email}    ${current password}    None
     Validate Log In
     Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
@@ -283,7 +298,7 @@ Add notowner
     Close Browser
 
 Make sure notowner is in the system
-    Register Keyword To Run On Failure    None/
+    Register Keyword To Run On Failure    None
     Open Browser and Go To URL    ${url}
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In

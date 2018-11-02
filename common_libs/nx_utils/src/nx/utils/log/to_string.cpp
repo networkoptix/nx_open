@@ -1,5 +1,8 @@
 #include "to_string.h"
 
+#include <nx/utils/unused.h>
+
+#include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/core/demangle.hpp>
 
@@ -137,4 +140,98 @@ QString demangleTypeName(const char* type)
 QString pointerTypeName(const void* /*value*/)
 {
     return QLatin1String("void");
+}
+
+/**
+ * Mark the substring of the function type which defines the function class/namespace scope.
+ * @param outScopeAfterEndPos Set to -1 if the scope is global (the scope string is empty).
+ */
+static void findFunctionScope(
+    const std::string& demangledType, int* outScopeStartPos, int* outScopeAfterEndPos)
+{
+    // The scope ends before the last "::" which appears before the first "(" outside "<...>"
+    // (this "(" denotes the start of the function arguments), or, for lambdas on MSVC, before the
+    // first "<" following "::" (this "<" starts the construction like "<lambda_...>"). The scope
+    // starts after the last space outside "<...>" (this space precedes the function name with its
+    // possible scope), or, if there is no such space, at the beginning of the source string.
+
+    int anglesNestingLevel = 0;
+    *outScopeAfterEndPos = -1; //< Will be updated as we parse the string.
+    *outScopeStartPos = 0; //< Will be updated as we parse the string.
+    for (int p = 0; p < (int) demangledType.size(); ++p)
+    {
+        switch (demangledType.at(p))
+        {
+        case '(':
+            if (anglesNestingLevel == 0)
+                return;
+            break;
+        case ' ':
+            if (anglesNestingLevel == 0
+                // Ignore spaces immediately followed by '(' - found on MSVC in 'operator ()'.
+                && demangledType.substr(p + 1, 1) != "(")
+            {
+                *outScopeStartPos = p + 1;
+                // Ignore all "::" which may have appeared before we found the space.
+                *outScopeAfterEndPos = -1;
+            }
+            break;
+        case ':':
+            if (anglesNestingLevel == 0 && p > 0 && demangledType.at(p - 1) == ':')
+            {
+                if (demangledType.substr(p + 1, 1) == "<") //< MSVC: "::<lambda_...>"
+                    return;
+                *outScopeAfterEndPos = p - 1; //< Store the position of "::".
+            }
+            break;
+        case '<':
+        {
+            ++anglesNestingLevel;
+            break;
+        }
+        case '>':
+            --anglesNestingLevel;
+            break;
+        }
+    }
+}
+
+/**
+ * Constructs the string which specifies the namespace/class scope of a particular function.
+ * @param scopeTagTypeInfo Type info for any struct defined in the function.
+ * @param functionMacro Value of __FUNCTION__ inside the function.
+ * @return Function name with namespaces and outer classes (if any), including template arguments
+ *     in case an outer class or the function is a template. Return type and function arguments are
+ *     not included.
+ */
+std::string scopeOfFunction(
+    const std::type_info& scopeTagTypeInfo, const char* functionMacro)
+{
+    std::string demangledType;
+    #if defined(_MSC_VER)
+        if (boost::ends_with(functionMacro, "::operator ()")) //< MSVC lambda.
+        {
+            // On MSVC, type_info::name() for types defined in a lambda does not contain the scope
+            // of the lambda, thus, we have to use __FUNCTION__ instead.
+            demangledType = functionMacro;
+        }
+        else
+        {
+            // Convert the type from the form of type_info::name() to the form of __FUNCTION__.
+            demangledType = scopeTagTypeInfo.name();
+            boost::replace_all(demangledType, "* __ptr64", "*");
+        }
+    #else
+        nx::utils::unused(functionMacro);
+        demangledType = boost::core::demangle(scopeTagTypeInfo.name());
+    #endif
+
+    int scopeAfterEndPos = -1; //< Used to trim the function name, keeping the scope.
+    int scopeStartPos = 0;
+    findFunctionScope(demangledType, &scopeStartPos, &scopeAfterEndPos);
+
+    if (scopeAfterEndPos < 0) //< There is no enclosing scope.
+        return "";
+
+    return demangledType.substr(scopeStartPos, scopeAfterEndPos - scopeStartPos);
 }

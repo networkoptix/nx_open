@@ -87,7 +87,7 @@
             smtpPort: {type: 'number'},
             smtpSimple: {type: 'checkbox'},
             smtpTimeout: {type: 'number'},
-            smptPassword: {type: 'password'},
+            smtpPassword: {type: 'password'},
             smtpUser: {type: 'text'},
             updateNotificationsEnabled: {type: 'checkbox'},
             arecontRtspEnabled: {type: 'checkbox'},
@@ -137,6 +137,7 @@
         },
         webclient: {
             useServerTime: true,
+            useSystemTime: true,
             disableVolume: true,
             reloadInterval: 5 * 1000,
             leftPanelPreviewHeight: 38, // 38px is the height for previews in the left panel

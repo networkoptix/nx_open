@@ -48,12 +48,6 @@ void initialize(Manager* manager, Action* root)
         .checkable()
         .autoRepeat(false);
 
-    factory(ShowDebugOverlayAction)
-        .flags(GlobalHotkey | DevMode)
-        .text(lit("Show Debug")) //< DevMode, so untranslatable
-        .shortcut(lit("Ctrl+Alt+D"))
-        .autoRepeat(false);
-
     factory(DropResourcesAction)
         .flags(ResourceTarget | WidgetTarget | LayoutItemTarget | LayoutTarget | SingleTarget | MultiTarget)
         .mode(DesktopMode);
@@ -257,20 +251,6 @@ void initialize(Manager* manager, Action* root)
         .condition(new BrowseLocalFilesCondition());
 
     factory()
-        .flags(Main)
-        .separator();
-
-    factory(TogglePanicModeAction)
-        .flags(GlobalHotkey | DevMode)
-        .mode(DesktopMode)
-        .text(lit("Start Panic Recording")) //< DevMode, so untranslatable
-        .toggledText(lit("Stop Panic Recording")) //< DevMode, so untranslatable
-        .autoRepeat(false)
-        .shortcut(lit("Ctrl+P"))
-        .requiredGlobalPermission(GlobalPermission::admin)
-        .condition(new PanicCondition());
-
-    factory()
         .flags(Main | Tree)
         .separator();
 
@@ -349,9 +329,7 @@ void initialize(Manager* manager, Action* root)
             .text(ContextMenu::tr("Wearable Camera..."))
             .pulledText(ContextMenu::tr("New Wearable Camera..."))
             .condition(condition::isLoggedIn()
-                && !condition::isSafeMode()
-                && condition::isTrue(ini().enableWearableCameras)
-            )
+                && !condition::isSafeMode())
             .autoRepeat(false);
     }
     factory.endSubMenu();
@@ -495,16 +473,6 @@ void initialize(Manager* manager, Action* root)
             .flags(Main)
             .separator();
     }
-
-    factory(ExportStandaloneClientAction)
-        .flags(Main | DevMode)
-        .text(lit("Export Standalone Client"))
-        .condition(condition::isTrue(nx::utils::AppInfo::isWindows()));
-
-    factory()
-        .flags(Main | DevMode)
-        .separator()
-        .condition(condition::isTrue(nx::utils::AppInfo::isWindows()));
 
     factory(EscapeHotkeyAction)
         .flags(GlobalHotkey)
@@ -671,8 +639,7 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(GlobalPermission::admin)
         .condition(condition::isLoggedIn()
             && !condition::isSafeMode()
-            && !condition::tourIsRunning()
-            && condition::isTrue(nx::client::desktop::ini().enableDeviceSearch));
+            && !condition::tourIsRunning());
 
     factory(MergeSystems)
         .flags(Main | Tree)
@@ -1316,24 +1283,21 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | Tree | SingleTarget | ResourceTarget)
         .requiredGlobalPermission(GlobalPermission::editCameras)
         .text(ContextMenu::tr("Upload File..."))
-        .condition(condition::isTrue(ini().enableWearableCameras)
-            && condition::wearableCameraUploadEnabled());
+        .condition(condition::wearableCameraUploadEnabled());
 
     factory(UploadWearableCameraFolderAction)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | ResourceTarget)
         .requiredGlobalPermission(GlobalPermission::editCameras)
         .text(ContextMenu::tr("Upload Folder..."))
-        .condition(condition::isTrue(ini().enableWearableCameras)
-            && condition::wearableCameraUploadEnabled());
+        .condition(condition::wearableCameraUploadEnabled());
 
     factory(CancelWearableCameraUploadsAction)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | ResourceTarget)
         .requiredGlobalPermission(GlobalPermission::editCameras)
         .text(ContextMenu::tr("Cancel Upload..."))
-        .condition(condition::isTrue(ini().enableWearableCameras)
-            && condition::canCancelWearableCameraUpload());
+        .condition(condition::canCancelWearableCameraUpload());
 
     factory(CameraIssuesAction)
         .mode(DesktopMode)
@@ -1455,17 +1419,6 @@ void initialize(Manager* manager, Action* root)
                 !condition::isLayoutTourReviewMode()
                 && !condition::isPreviewSearchMode()));
 
-    factory(ServerAddCameraManuallyAction)
-        .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
-        .text(ContextMenu::tr("Add Device..."))   //intentionally hardcode devices here
-        .requiredGlobalPermission(GlobalPermission::admin)
-        .condition(condition::hasFlags(Qn::remote_server, MatchMode::ExactlyOne)
-            && ConditionWrapper(new EdgeServerCondition(false))
-            && !ConditionWrapper(new FakeServerCondition(true))
-            && !condition::isSafeMode()
-            && !condition::tourIsRunning()
-            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
-
     factory(AddDeviceManuallyAction)
         .flags(Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Add Device..."))   //intentionally hardcode devices here
@@ -1475,8 +1428,7 @@ void initialize(Manager* manager, Action* root)
             && !ConditionWrapper(new FakeServerCondition(true))
             && !condition::isSafeMode()
             && !condition::tourIsRunning()
-            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode())
-            && condition::isTrue(nx::client::desktop::ini().enableDeviceSearch));
+            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
 
     factory(CameraListByServerAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
@@ -1729,28 +1681,13 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Close All But This"))
         .condition(new LayoutCountCondition(2));
 
-    factory(DebugIncrementCounterAction)
-        .flags(GlobalHotkey | DevMode)
-        .shortcut(lit("Ctrl+Alt+Shift++"))
-        .text(lit("Increment Debug Counter")); //< DevMode, so untranslatable
-
-    factory(DebugDecrementCounterAction)
-        .flags(GlobalHotkey | DevMode)
-        .shortcut(lit("Ctrl+Alt+Shift+-"))
-        .text(lit("Decrement Debug Counter")); //< DevMode, so untranslatable
-
     factory(DebugCalibratePtzAction)
         .flags(Scene | SingleTarget | DevMode)
-        .text(lit("Calibrate PTZ")); //< DevMode, so untranslatable
+        .text("Calibrate PTZ"); //< DevMode, so untranslatable
 
     factory(DebugGetPtzPositionAction)
         .flags(Scene | SingleTarget | DevMode)
-        .text(lit("Get PTZ Position")); //< DevMode, so untranslatable
-
-    factory(DebugControlPanelAction)
-        .flags(Main | GlobalHotkey)
-        .shortcut(lit("Ctrl+Alt+Shift+D"))
-        .text(lit("Debug Control Panel")); //< DevMode, so untranslatable
+        .text("Get PTZ Position"); //< DevMode, so untranslatable
 
     factory(PlayPauseAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
@@ -1889,10 +1826,64 @@ void initialize(Manager* manager, Action* root)
     factory(PtzActivatePresetByIndexAction)
         .flags(NoTarget);
 
-    factory(OpenNewSceneAction)
-        .flags(GlobalHotkey | DevMode)
-        .shortcut(lit("Ctrl+Shift+E"))
-        .autoRepeat(false);
+    // -- Developer mode actions further. Please make note: texts are untranslatable. --
+
+    factory()
+        .flags(Main | DevMode)
+        .separator();
+
+    factory()
+        .flags(Main | DevMode)
+        .text("[Developer Mode]");
+
+    factory.beginSubMenu();
+    {
+        factory(OpenNewSceneAction)
+            .flags(GlobalHotkey | Main | DevMode)
+            .text("Open New Scene")
+            .shortcut("Ctrl+Shift+E")
+            .autoRepeat(false);
+
+        factory(ShowDebugOverlayAction)
+            .flags(GlobalHotkey | Main | DevMode)
+            .text("Show Debug Overlay")
+            .shortcut("Ctrl+Alt+D")
+            .autoRepeat(false);
+
+        factory(TogglePanicModeAction)
+            .flags(GlobalHotkey | DevMode)
+            .mode(DesktopMode)
+            .text("Start Panic Recording")
+            .toggledText("Stop Panic Recording")
+            .autoRepeat(false)
+            .shortcut("Ctrl+P")
+            .requiredGlobalPermission(GlobalPermission::admin)
+            .condition(new PanicCondition());
+
+        factory(ExportStandaloneClientAction)
+            .flags(Main | DevMode)
+            .text("Export Standalone Client")
+            .condition(condition::isTrue(nx::utils::AppInfo::isWindows()));
+
+        factory(DebugControlPanelAction)
+            .flags(GlobalHotkey | Main | DevMode)
+            .shortcut("Ctrl+Alt+Shift+D")
+            .text("Debug Control Panel");
+
+        factory(DebugIncrementCounterAction)
+            .flags(GlobalHotkey | Main | DevMode)
+            .shortcut("Ctrl+Alt+Shift++")
+            .text("Increment Debug Counter");
+
+        factory(DebugDecrementCounterAction)
+            .flags(GlobalHotkey | Main | DevMode)
+            .shortcut("Ctrl+Alt+Shift+-")
+            .text("Decrement Debug Counter");
+
+    }
+    factory.endSubMenu();
+
+    // -- Developer mode actions end. Please do not add real actions afterwards.
 }
 
 } // namespace action

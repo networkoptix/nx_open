@@ -59,11 +59,13 @@ namespace rest
 
 ServerConnection::ServerConnection(
     QnCommonModule* commonModule,
-    const QnUuid& serverId)
+    const QnUuid& serverId,
+    nx::utils::Url directUrl)
     :
     QObject(),
     QnCommonModuleAware(commonModule),
-    m_serverId(serverId)
+    m_serverId(serverId),
+    m_directUrl(directUrl)
 {
     Qn::directConnect(
         httpClientPool(), &nx::network::http::ClientPool::done,
@@ -199,6 +201,15 @@ Handle ServerConnection::sendStatisticsAsync(
     auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
     trace(handle, path);
     return handle;
+}
+
+Handle ServerConnection::getModuleInformation(
+    Result<QList<nx::vms::api::ModuleInformation>>::type callback,
+    QThread* targetThread)
+{
+    QnRequestParamList params;
+    params << QnRequestParam("allModules", lit("true"));
+    return executeGet("/api/moduleInformation", params, callback, targetThread);
 }
 
 Handle ServerConnection::detachSystemFromCloud(
@@ -762,7 +773,7 @@ Handle ServerConnection::lookupDetectedObjects(
 
 Handle ServerConnection::updateActionStart(const nx::update::Information& info, QThread* targetThread)
 {
-    auto callback = [](bool success, rest::Handle handle, EmptyResponseType response)
+    auto callback = [](bool /*success*/, rest::Handle /*handle*/, EmptyResponseType /*response*/)
         {
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
@@ -778,7 +789,7 @@ Handle ServerConnection::getUpdateInfo(Result<nx::update::Information>::type&& c
 
 Handle ServerConnection::updateActionStop(std::function<void (Handle, bool)>&& callback, QThread* targetThread)
 {
-    auto internalCallback = [callback=std::move(callback)](bool success, rest::Handle handle, EmptyResponseType response)
+    auto internalCallback = [callback=std::move(callback)](bool success, rest::Handle handle, EmptyResponseType /*response*/)
         {
             callback(handle, success);
         };
@@ -794,7 +805,7 @@ Handle ServerConnection::updateActionInstall(
     QThread* targetThread)
 {
     auto internalCallback =
-        [callback=std::move(callback)](bool success, rest::Handle handle, EmptyResponseType response)
+        [callback=std::move(callback)](bool success, rest::Handle handle, EmptyResponseType /*response*/)
         {
             callback(handle, success);
         };
@@ -1199,12 +1210,36 @@ void ServerConnection::cancelRequest(const Handle& requestId)
     m_runningRequests.remove(requestId);
 }
 
+nx::network::http::ClientPool::Request ServerConnection::prepareDirectRequest(
+    nx::network::http::Method::ValueType method,
+    const QUrl& url,
+    const nx::network::http::StringType& contentType,
+    const nx::network::http::StringType& messageBody)
+{
+    nx::network::http::ClientPool::Request request;
+    request.method = method;
+    request.url = m_directUrl;
+    request.url.setPath(url.path());
+    request.url.setQuery(url.query());
+    request.contentType = contentType;
+    request.messageBody = messageBody;
+
+    return request;
+}
+
+QnUuid ServerConnection::getServerId() const
+{
+    return m_serverId;
+}
+
 nx::network::http::ClientPool::Request ServerConnection::prepareRequest(
     nx::network::http::Method::ValueType method,
     const QUrl& url,
     const nx::network::http::StringType& contentType,
     const nx::network::http::StringType& messageBody)
 {
+    if (!m_directUrl.isEmpty())
+        return prepareDirectRequest(method, url, contentType, messageBody);
     auto resPool = commonModule()->resourcePool();
     const auto server = resPool->getResourceById<QnMediaServerResource>(m_serverId);
     if (!server)

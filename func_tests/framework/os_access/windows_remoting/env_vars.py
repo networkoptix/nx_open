@@ -12,8 +12,8 @@ class EnvVars(object):
     @classmethod
     def request(cls, winrm, user_name, default_user_env_vars):
         """Return (user name -> (var name -> var value)); values may contain other vars"""
-        query = winrm.wmi_query('Win32_Environment', {})
-        var_objects = list(query.enumerate())
+        wmi_class = winrm.wmi.cls('Win32_Environment')
+        var_objects = list(wmi_class.enumerate({}))
         vars = {}
         for var_object in var_objects:
             user_name = var_object['UserName']

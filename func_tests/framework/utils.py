@@ -52,9 +52,6 @@ def log_list(name, values):
 def flatten_list(list_of_lists):
     return list(itertools.chain(*tuple(list_of_lists)))
 
-def quote(s, char='"'):
-    return '%c%s%c' % (char, s, char)
-
 
 def bool_to_str(val, false_str='false', true_str='true'):
     if val:

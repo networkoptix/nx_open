@@ -379,6 +379,9 @@ CameraDiagnostics::Result Camera::initInternal()
     m_advancedParametersProvidersByParameterId.clear();
     setCameraCapability(Qn::CameraTimeCapability, true);
 
+    if (commonModule()->isNeedToStop())
+        return CameraDiagnostics::ServerTerminatedResult();
+
     const auto driverResult = initializeCameraDriver();
     if (driverResult.errorCode != CameraDiagnostics::ErrorCode::noError)
         return driverResult;
@@ -657,6 +660,17 @@ void Camera::fixInputPortMonitoring()
             m_inputPortListeningInProgress = false;
         }
     }
+}
+
+QnTimePeriodList Camera::getDtsTimePeriods(
+    qint64 /*startTimeMs*/,
+    qint64 /*endTimeMs*/,
+    int /*detailLevel*/,
+    bool /*keepSmalChunks*/,
+    int /*limit*/,
+    Qt::SortOrder /*sortOrder*/)
+{
+    return QnTimePeriodList();
 }
 
 } // namespace resource

@@ -83,7 +83,7 @@ int MediaEncoder::setResolution(const nxcip::Resolution& resolution)
     if (!m_camera->videoStream()->pluggedIn())
         return nxcip::NX_IO_ERROR;
 
-    m_codecParams.setResolution(resolution.width, resolution.height);
+    m_codecParams.resolution = resolution;
     if (m_streamReader)
         m_streamReader->setResolution(resolution);
     return nxcip::NX_NO_ERROR;

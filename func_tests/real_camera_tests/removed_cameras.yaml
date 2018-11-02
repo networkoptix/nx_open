@@ -220,3 +220,151 @@ Dlink_DCS-3716:
       "2": "rtsp://192.168.200.15:554/live2.sdp"
 
 
+# 2 cameras below are scheduled for adding to the stand in the nearest future
+Axis_M5055:
+  discovery:
+    physicalId: AC-CC-8E-97-CF-72
+    vendor: Axis
+    model: AXISM5055
+
+  authorization:
+    login: root
+    password: Axis123
+
+  attributes:
+    firmware: 6.53.1.1
+
+  recording:
+    primary: {codec: 'H264', resolution: '1920x1080', fps: [[25, 35], [10, 20]]}
+    #secondary: {codec: 'H264', resolution: '480x270', fps: [5, 9]}
+
+  video_parameters:
+    primary:
+      - {codec: 'H264', resolution: '800x450'}
+      - {codec: 'MJPEG', resolution: '1280x720'}
+    #secondary:
+      #- {codec: 'H264', resolution: '320x180', fps: [15, 25]}
+      #- {codec: 'MJPEG', resolution: '800x450', fps: [7, 13]}
+    stream_urls:
+      "1": "rtsp://192.168.0.58:554/axis-media/media.amp?streamprofile=hdwitnessPrimary"
+      "2": "rtsp://192.168.0.58:554/axis-media/media.amp?streamprofile=hdwitnessSecondary"
+
+  audio_parameters:
+    - {codec: 'AAC'}
+
+  ptz_positions if features.advanced_lens_control:
+    - {preset: 'presetposno2:Witness1'}
+    - {preset: 'presetposno3:Witness2'}
+    - {preset: 'presetposno4:Witness3'}
+
+
+Hikvision_DS-2DE2204IW-DE3:
+  discovery:
+    physicalId: 94-E1-AC-42-59-5B
+    vendor: Hikvision
+    model: DS-2DE2204IW-DE3
+
+  authorization:
+    login: admin
+    password: Hikvision1
+
+  attributes:
+    firmware: V5.5.3 build 171214
+
+  recording:
+    primary: {codec: 'H264', resolution: '1920x1080', fps: [[22, 28], [10, 20]]}
+    secondary: {codec: 'H264', resolution: '352x288', fps: [5, 9]}
+
+  video_parameters:
+    primary:
+      - {codec: 'H265', resolution: '1280x720'}
+      - {codec: 'H264', resolution: '1280x960'}
+    secondary:
+      - {codec: 'H265', resolution: '704x576', fps: [17, 23]}
+      - {codec: 'H264', resolution: '640x480', fps: [7, 13]}
+      # Cam gives very low and unstable fps with MJPEG (server bug? - in web interface fps is fine)
+      #- {codec: 'MJPEG', resolution: '640x480', fps: [7, 13]}
+    stream_urls:
+      "1": "rtsp://192.168.0.53:554/*Streaming/channels/101"
+      "2": "rtsp://192.168.0.53:554/*Streaming/channels/102"
+
+  # There is Enable audio checkbox. But no audio settings in advanced params. FFprobe does not
+  # discover any audio stream.
+  audio_parameters if version >= '4.1':
+    - {codec: 'AAC'}
+
+  ptz_positions if features.advanced_lens_control:
+    - {point: '192-22-1', preset: 'presetposno2:Witness1'}
+    - {point: '37-25-2', preset: 'presetposno3:Witness2'}
+    - {point: '127-22-1', preset: 'presetposno4:Witness3'}
+
+
+DWC-MV84WiAC6:
+  discovery:
+    physicalId: urn_uuid_32313534-3532-6666-3338-000df1215452
+    vendor: Digital Watchdog
+    model: DWC-MV84WiAC6
+    mac: 00-0D-F1-21-54-52
+
+  authorization:
+    password: auto
+
+  attributes:
+    firmware: A4.1.2
+    isAudioSupported: 0
+    ptzCapabilities: 4  # Zoom.
+
+  attributes if features.advanced_lens_control:
+    ptzCapabilities: 16388
+
+  recording:
+    primary: {codec: 'H264', resolution: '2560x1440', fps: [[13, 17], [8, 12]]}
+    secondary: {codec: 'H264', resolution: '352x288', fps: [4, 8]}
+
+  video_parameters:
+    primary: # Exact supported fps/res values are not in the spec. Adjusting may be needed
+      - {codec: 'H264', resolution: '1280x960'}
+      #- {codec: 'MJPEG', resolution: '1280x960'}
+    secondary:
+      - {codec: 'H264', resolution: '640x480', fps: [8, 12]}
+      #- {codec: 'MJPEG', resolution: '640x480', fps: [24, 36]}
+
+
+DWC-PVX16W:
+  discovery:
+    physicalId: urn_uuid_32313563-6163-6665-6436-000df1215cac
+    vendor: Digital Watchdog
+    model: DWC-PVX16W
+    mac: 00-0D-F1-21-5C-AC
+
+  authorization:
+    password: auto
+
+  attributes:
+    firmware: S2.1.3_2018.03.09
+    isAudioSupported: 1
+    ptzCapabilities: 4  # Zoom.
+
+  attributes if features.advanced_lens_control:
+    ptzCapabilities: 16388
+
+  recording:
+    primary: {codec: 'H264', resolution: '2560x1440', fps: [[12, 18], [5, 10]]}
+    secondary: {codec: 'H264', resolution: '352x240', fps: [5, 9]}
+    # Although in all_cameras.json range is "352x240,352x288, 640x480,704x480,704x576", 352x240
+    # is applied when trying to use 352x288. Bug on the server or camera?
+
+  video_parameters:
+    primary:
+      - {codec: 'H264', resolution: '1920x1080'}
+    secondary:
+      - {codec: 'H264', resolution: '704x480', fps: [13, 17]}
+
+  # Didn't find any data on supported audio_parameters codecs. This needs checking.
+  #"Audio stream was not discovered by ffprobe. Seems, there's no sound on the cam."
+  audio_parameters if False:
+    - {'skip_codec_change': True, codec: 'G711'}
+
+  io_events:
+    ins: [{id: '1'}]
+    outs: [{id: 'relay01'}]

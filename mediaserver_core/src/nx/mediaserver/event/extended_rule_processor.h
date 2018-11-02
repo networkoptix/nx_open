@@ -43,33 +43,6 @@ private:
     bool executePlaySoundAction(const vms::event::AbstractActionPtr& action);
 
 private:
-    class SendEmailAggregationKey
-    {
-    public:
-        vms::api::EventType eventType;
-        QString recipients;
-
-        SendEmailAggregationKey():
-            eventType(vms::api::EventType::undefinedEvent)
-        {
-        }
-
-        SendEmailAggregationKey(vms::api::EventType _eventType, QString _recipients):
-            eventType(_eventType),
-            recipients(_recipients)
-        {
-        }
-
-        bool operator < (const SendEmailAggregationKey& right) const
-        {
-            if (eventType < right.eventType)
-                return true;
-            if (right.eventType < eventType)
-                return false;
-            return recipients < right.recipients;
-        }
-    };
-
     class SendEmailAggregationData
     {
     public:
@@ -82,12 +55,12 @@ private:
 
     QMap<QnUuid, qint64> m_runningBookmarkActions;
     QScopedPointer<EmailManagerImpl> m_emailManager;
-    QMap<SendEmailAggregationKey, SendEmailAggregationData> m_aggregatedEmails;
+    QMap<QnUuid, SendEmailAggregationData> m_aggregatedEmails;
     QThreadPool m_emailThreadPool;
 
 private:
     bool sendMail(const vms::event::SendMailActionPtr& action);
-    void sendAggregationEmail(const SendEmailAggregationKey& aggregationKey);
+    void sendAggregationEmail(const QnUuid& ruleId);
     bool sendMailInternal(const vms::event::SendMailActionPtr& action, int aggregatedResCount);
     void sendEmailAsync(vms::event::SendMailActionPtr action, QStringList recipients, int aggregatedResCount);
 

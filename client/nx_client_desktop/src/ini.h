@@ -31,15 +31,13 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(1, redesignedCameraSettingsDialog, "Enable redesigned camera settings dialog.");
     NX_INI_FLAG(1, enableDetectedObjectsInterpolation, "Allow interpolation of detected objects between frames.");
     NX_INI_FLAG(0, displayAnalyticsDelay, "Add delay label to detected object description.");
-    NX_INI_FLAG(0, enableDeviceSearch, "Enable reworked device search dialog");
-    NX_INI_FLAG(1, enableWearableCameras, "Enable wearable cameras.");
     NX_INI_FLAG(1, enableResourceFilteringByDefault, "Enable reworked resource filtering");
     NX_INI_FLAG(0, debugThumbnailProviders, "Enable debug mode for thumbnail providers");
     NX_INI_FLAG(0, ignoreZoomWindowConstraints, "Ignore constrains for a zoom region");
     NX_INI_FLAG(0, showDebugTimeInformationInRibbon, "Show extra timestamp information in event ribbon");
     NX_INI_FLAG(0, showPreciseItemTimestamps, "Show precise timestamps on scene items");
     NX_INI_FLAG(0, massSystemUpdatePrototype, "Enable experimental system update.");
-    NX_INI_FLAG(0, massSystemUpdateDebugInfo, "Show additional debug information for experimental update system.");
+    NX_INI_INT(0, massSystemUpdateDebugInfo, "Show additional debug information for experimental update system.");
     NX_INI_FLAG(0, allowOsScreenSaver, "Allow OS to enable screensaver when user is not active.");
     NX_INI_FLAG(0, enableWebKitDeveloperExtras, "Enable WebKit developer tools like Inspector.");
     NX_INI_FLAG(1, enableWebKitPlugins, "Enable WebKit NPAPI plugins (Flash, Java, etc.)");
@@ -47,7 +45,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, enableTimelineScreenshotCursor, "Show screenshot cursor when hovering above timeline.");
     NX_INI_FLAG(0, enableWatermark, "Enable watermarks preview and setup.");
     NX_INI_FLAG(0, enableCaseExport, "Enable case export.");
-    NX_INI_FLAG(1, enableSessionTimeout, "Enable admin-configurable absolute session timeout.");
+    NX_INI_FLAG(0, enableSessionTimeout, "Enable admin-configurable absolute session timeout.");
     NX_INI_STRING("press", passwordPreviewActivationMode, "Password preview activation mode: \"press\", \"hover\" or \"toggle\".");
     NX_INI_FLAG(0, enableEncryptedLayouts, "Enable creation of encrypted layouts.");
     NX_INI_FLAG(0, enablePluginEvents, "Enable plugin events in Event Rules dialog.");

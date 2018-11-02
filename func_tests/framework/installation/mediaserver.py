@@ -21,8 +21,6 @@ from framework.utils import datetime_utc_to_timestamp
 from framework.waiting import wait_for_truthy
 from ..context_logger import context_logger
 
-DEFAULT_HTTP_SCHEMA = 'http'
-
 MEDIASERVER_STORAGE_PATH = 'var/data'
 
 MEDIASERVER_CREDENTIALS_TIMEOUT = datetime.timedelta(minutes=5)
@@ -151,9 +149,12 @@ class Mediaserver(BaseMediaserver):
 
     @property
     def storage(self):
+        """Any non-backup storage"""
         # GET /ec2/getStorages is not always possible: server sometimes is not started.
-        storage_path = self.installation.dir / MEDIASERVER_STORAGE_PATH
-        return Storage(self.os_access, storage_path)
+        response = self.api.generic.get('ec2/getStorages')
+        for storage_data in response:
+            if not storage_data['isBackup']:
+                return Storage(self.os_access, self.os_access.path_cls(storage_data['url']))
 
 
 class Storage(object):

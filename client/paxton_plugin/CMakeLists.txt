@@ -9,6 +9,7 @@ set(customization "default" CACHE STRING "Product customization")
 set(dotNetFramework "v4.6.2" CACHE STRING "Target .NET Framework version. Allowed: v4.0, v4.6.2")
 set(CMAKE_BUILD_TYPE "Release" CACHE STRING "One of [Debug Release RelWithDebInfo MinSizeRel].")
 set(buildNumber "0" CACHE STRING "Build number")
+option(codeSigning "Enable code signing" OFF)
 
 set(signKey "${CMAKE_CURRENT_SOURCE_DIR}/src/Sign.snk")
 
@@ -16,7 +17,8 @@ list(APPEND CMAKE_MODULE_PATH
     ${PROJECT_SOURCE_DIR}/../../cmake
 )
 
-set(rdep_dir "${PROJECT_SOURCE_DIR}/../../build_utils/python" CACHE PATH "Path to rdep scripts")
+set(build_utils_dir "${PROJECT_SOURCE_DIR}/../../build_utils" CACHE PATH "Path to build utils")
+set(rdep_dir "${build_utils_dir}/python" CACHE PATH "Path to rdep scripts")
 include(find_python)
 include(rdep)
 nx_rdep_configure()

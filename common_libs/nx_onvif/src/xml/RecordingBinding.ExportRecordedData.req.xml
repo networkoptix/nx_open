@@ -71,9 +71,9 @@
    <!-- _onvifRecording__ExportRecordedData *onvifRecording__ExportRecordedData -->
    <onvifRecording:ExportRecordedData>
     <!-- time_t *StartPoint -->
-    <onvifRecording:StartPoint>2018-10-15T11:33:34Z</onvifRecording:StartPoint>
+    <onvifRecording:StartPoint>2018-10-29T21:59:21Z</onvifRecording:StartPoint>
     <!-- time_t *EndPoint -->
-    <onvifRecording:EndPoint>2018-10-15T11:33:34Z</onvifRecording:EndPoint>
+    <onvifRecording:EndPoint>2018-10-29T21:59:21Z</onvifRecording:EndPoint>
     <!-- onvifXsd__SearchScope *SearchScope -->
     <onvifRecording:SearchScope>
      <!-- std::vector<onvifXsd__SourceReference *> IncludedSources -->

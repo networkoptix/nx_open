@@ -1031,6 +1031,7 @@ void QnActiResource::initializeIO( const ActiSystemInfo& systemInfo )
     {
         QnIOPortData value;
         value.portType = Qn::PT_Output;
+        value.supportedPortTypes = Qn::PT_Output;
         value.id = QString::number(i);
         value.outputName = tr("Output %1").arg(i);
         ports.push_back(value);
@@ -1040,10 +1041,12 @@ void QnActiResource::initializeIO( const ActiSystemInfo& systemInfo )
     {
         QnIOPortData value;
         value.portType = Qn::PT_Input;
+        value.supportedPortTypes = Qn::PT_Input;
         value.id = QString::number(i);
         value.inputName = tr("Input %1").arg(i);
         ports.push_back(value);
     }
+    NX_DEBUG(this, "Initialising %1 input ports and %2 output ports.", m_inputCount, m_outputCount);
     setIoPortDescriptions(std::move(ports), /*needMerge*/ true);
 }
 

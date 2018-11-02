@@ -537,8 +537,6 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
         auto item = ::newConnectionItem(vm.title, vm.url, vm.isValid);
         m_autoFoundItem->appendRow(item);
     }
-
-
 }
 
 void QnLoginDialog::updateAcceptibility()

@@ -4,9 +4,9 @@
     "lowStream": "Niedriger Stream",
     "transcoding": "Umkodierung",
     "unknown": "Unbekannt",
-    "copyToClipboard": "In Zwischenablage kopieren",
-    "copyDefaultText": "Kopieren",
-    "copyActiveText": "In die Zwischenablage kopiert"
+    "copyToClipboard": "in zwischenablage kopieren",
+    "copyDefaultText": "kopieren",
+    "copyActiveText": "in die zwischenablage kopiert"
   },
   "systemOffline": "System offline",
   "cameraStates": {

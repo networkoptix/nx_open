@@ -2,6 +2,8 @@
 
 namespace nx::cdb {
 
+static constexpr int kLoginLockPeriodGrowthRate = 2;
+
 LoginEnumerationProtector::LoginEnumerationProtector(
     const LoginEnumerationProtectionSettings& settings)
     :
@@ -10,7 +12,7 @@ LoginEnumerationProtector::LoginEnumerationProtector(
     m_unauthenticatedLoginsPerPeriod(settings.period),
     m_delayCalculator(nx::utils::ProgressiveDelayPolicy(
         m_settings.minBlockPeriod,
-        2,
+        kLoginLockPeriodGrowthRate,
         m_settings.maxBlockPeriod))
 {
 }

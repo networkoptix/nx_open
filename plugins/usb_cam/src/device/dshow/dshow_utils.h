@@ -9,6 +9,7 @@
 #include <ATLComMem.h>
 
 #include "device/device_data.h"
+#include "device/abstract_compression_type_descriptor.h"
 
 #include "camera/camera_plugin_types.h"
 

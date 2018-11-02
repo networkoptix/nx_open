@@ -8,7 +8,6 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/string.h>
-#include <nx/utils/datetime.h>
 
 #include <api/helpers/camera_id_helper.h>
 
@@ -28,6 +27,8 @@ const QString kDeprecatedIdParam(lit("id"));
 const QString kCameraIdParam(lit("cameraId"));
 const QString kLimitParam(lit("limit"));
 const QString kFlatParam(lit("flat"));
+const QString kDescendingOrderParam(lit("desc"));
+const QString kGroupByParamName(lit("groupBy"));
 
 bool isValidMotionRect(const QRect& rect)
 {
@@ -45,19 +46,6 @@ bool isValidMotionRegion(const QRegion& region)
 };
 
 } // namespace
-
-QnChunksRequestData::QnChunksRequestData():
-    periodsType(Qn::RecordingContent),
-    startTimeMs(0),
-    endTimeMs(DATETIME_NOW),
-    detailLevel(1),
-    keepSmallChunks(false),
-    isLocal(false),
-    format(Qn::JsonFormat),
-    limit(INT_MAX),
-    flat(false)
-{
-}
 
 QnChunksRequestData QnChunksRequestData::fromParams(QnResourcePool* resourcePool,
     const QnRequestParamList& params)
@@ -86,7 +74,18 @@ QnChunksRequestData QnChunksRequestData::fromParams(QnResourcePool* resourcePool
     if (params.contains(kLimitParam))
         request.limit = qMax(0LL, params.value(kLimitParam).toLongLong());
 
-    request.flat = params.contains(kFlatParam);
+    if (params.contains(kFlatParam))
+    {
+        request.groupBy = QnChunksRequestData::GroupBy::none;
+    }
+    else
+    {
+        request.groupBy = QnLexical::deserialized<QnChunksRequestData::GroupBy>(
+            params.value(kGroupByParamName),
+            QnChunksRequestData::GroupBy::cameraId);
+    }
+    request.sortOrder = params.contains(kDescendingOrderParam)
+        ? Qt::SortOrder::DescendingOrder : Qt::SortOrder::AscendingOrder;
 
     request.filter = params.value(kFilterParam);
     request.isLocal = params.contains(kLocalParam);
@@ -117,6 +116,10 @@ QnRequestParamList QnChunksRequestData::toParams() const
     result.insert(kPeriodsTypeParam, QString::number(periodsType));
     result.insert(kFilterParam, filter);
     result.insert(kLimitParam, QString::number(limit));
+    if (sortOrder == Qt::SortOrder::DescendingOrder)
+        result.insert(kDescendingOrderParam, QString());
+    result.insert(kGroupByParamName, QnLexical::serialized(groupBy));
+
     if (isLocal)
         result.insert(kLocalParam, QString());
     result.insert(kFormatParam, QnLexical::serialized(format));
@@ -167,3 +170,8 @@ bool QnChunksRequestData::isValid() const
 
     return true;
 }
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnChunksRequestData, GroupBy,
+    (QnChunksRequestData::GroupBy::none, "none")
+    (QnChunksRequestData::GroupBy::cameraId, "cameraId")
+    (QnChunksRequestData::GroupBy::serverId, "serverId"))

@@ -18,6 +18,7 @@
 
 extern "C" {
 #include <libswscale/swscale.h>
+#include <libavutil/imgutils.h>
 #ifdef WIN32
 #define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
 #endif
@@ -672,13 +673,17 @@ QnCompressedVideoDataPtr QnSignHelper::createSignatureFrame(AVCodecContext* srcC
     frame->width = videoCodecCtx->width;
     frame->height = videoCodecCtx->height;
     frame->format = videoCodecCtx->pix_fmt;
-    avpicture_alloc((AVPicture*) frame, videoCodecCtx->pix_fmt, qPower2Ceil((quint32)videoCodecCtx->width, 32), videoCodecCtx->height);
 
+    int ret = av_image_alloc(
+        frame->data,
+        frame->linesize,
+        qPower2Ceil((quint32)videoCodecCtx->width, 32),
+        videoCodecCtx->height,
+        videoCodecCtx->pix_fmt,
+        /*align*/ 1);
+    if (ret < 0)
+        memset((AVPicture*)frame, 0, sizeof(AVPicture));
     AVCodec* videoCodec = avcodec_find_encoder(videoCodecCtx->codec_id);
-
-
-    //AVDictionary* options = 0;
-
     int videoBufSize = 1024*1024*4;
     quint8* videoBuf = new quint8[videoBufSize];
 

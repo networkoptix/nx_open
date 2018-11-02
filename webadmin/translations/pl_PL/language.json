@@ -76,7 +76,6 @@
         "emailSupportEmail": "E-mail do supportu",
         "enableEdgeRecording": "Włącz nagrywanie brzegowe",
         "eventLogPeriodDays": "Okres dziennika zdarzeń (dni)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "W razie potrzeby usuń profile kamery przy inicjalizacji",
         "ldapAdminDn": "DN admina LDAP",
         "ldapSearchBase": "Podstawa wyszukiwania LDAP",
         "ldapSearchFilter": "Filtr wyszukiwania LDAP",
@@ -110,10 +109,21 @@
         "systemName": "Nazwa systemu",
         "takeCameraOwnershipWithoutLock": "Nie blokuj kamery przy podłączaniu",
         "timeSynchronizationEnabled": "Synchronizacja czasu włączona",
+        "primaryTimeServer": "Podstawowy serwer synchronizacji czasu",
+        "osTimeChangeCheckPeriodMs": "Okres sprawdzania zmiany czasu systemu",
+        "syncTimeExchangePeriod": "Okres synchronizacji czasu",
+        "maxWearableArchiveSynchronizationThreads": "Max liczba wątków synchronizacji nagrań kamery przenośnej",
         "updateNotificationsEnabled": "Powiadomienia o aktualizacji włączone",
         "upnpPortMappingEnabled": "Przekierowywanie portów UPNP włączone",
         "useTextEmailFormat": "Wysyłaj e-maile czystym tekstem",
-        "useWindowsEmailLineFeed": "Używaj w e-mailach znaków końca linii zgodnych z Windows"
+        "useWindowsEmailLineFeed": "Używaj w e-mailach znaków końca linii zgodnych z Windows",
+        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Limit czasu fragmentacji wiadomości",
+        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: limit czasu odpowiedzi na fragment",
+        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Pokaż alternatywne sterowanie PTZ na obrazie",
+        "trafficEncryptionForced": "Wymuszaj szyfrowanie transmisji",
+        "videoTrafficEncryptionForced": "Wymuszaj szyfrowanie transmisji wideo",
+        "updateStatus": "Aktualizacja statusu",
+        "watermarkSettings": "Ustawienia znaku wodnego"
     },
     "info": {
         "tabs": {
@@ -145,7 +155,8 @@
         "incompatibleCloudState": "chmura połączona"
     },
     "login": {
-        "incorrectPassword": "Nieprawidłowy login lub hasło"
+        "incorrectPassword": "Nieprawidłowy login lub hasło",
+        "authLockout": "Zbyt wiele prób. Spróbuj ponownie za minutę."
     },
     "navigaion": {
         "cannotGetUser": "Błąd serwera: nie można pobrać danych bieżącego użytkownika"

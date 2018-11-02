@@ -197,8 +197,12 @@ static InformationError fillUpdateInformation(
         auto it = customizationInfo.releases.find(version);
         if (it == customizationInfo.releases.end())
             return InformationError::noNewVersion;
-        publicationKey = it.value().build();
-        NX_INFO(typeid(Information)) << "fillUpdateInformation will use build" << publicationKey;
+        auto updateVersion = it.value();
+        publicationKey = QString::number(updateVersion.build());
+        NX_INFO(typeid(Information))
+            << "fillUpdateInformation will use version"
+            << updateVersion.toString(nx::vms::api::SoftwareVersion::FullFormat)
+            << "build" << publicationKey;
     }
 
     auto baseUpdateUrl = customizationInfo.updates_prefix + "/" + publicationKey;
@@ -280,19 +284,47 @@ Information updateInformation(const QString& /*zipFileName*/, InformationError* 
     return Information();
 }
 
-bool findPackage(
+static void setErrorMessage (const QString& message, QString* outMessage)
+{
+    if (outMessage)
+        *outMessage = message;
+};
+
+FindPackageResult findPackage(
     const vms::api::SystemInformation& systemInformation,
     const nx::update::Information& updateInformation,
     bool isClient,
     const QString& cloudHost,
     bool boundToCloud,
-    nx::update::Package* outPackage)
+    nx::update::Package* outPackage,
+    QString* outMessage)
 {
-    if (updateInformation.cloudHost != cloudHost && boundToCloud)
-        return false;
+    if (updateInformation.isEmpty())
+    {
+        setErrorMessage("Update information is empty", outMessage);
+        return FindPackageResult::noInfo;
+    }
 
-    if (updateInformation.version <= utils::AppInfo::applicationVersion())
-        return false;
+    if (updateInformation.cloudHost != cloudHost && boundToCloud)
+    {
+        setErrorMessage(QString::fromLatin1(
+            "Peer cloud host (%1) doesn't match update cloud host (%2)")
+                .arg(cloudHost)
+                .arg(updateInformation.cloudHost),
+            outMessage);
+        return FindPackageResult::otherError;
+    }
+
+    if (nx::utils::SoftwareVersion(updateInformation.version) <= qnStaticCommon->engineVersion())
+    {
+        setErrorMessage(QString::fromLatin1(
+            "The update application version (%1) is less or equal to the peer application " \
+            "version (%2)")
+                .arg(updateInformation.version)
+                .arg(qnStaticCommon->engineVersion().toString()),
+            outMessage);
+        return FindPackageResult::otherError;
+    }
 
     for (const auto& package : updateInformation.packages)
     {
@@ -308,27 +340,46 @@ bool findPackage(
             && (packageOsVariant <= selfOsVariant || selfOsVariant.isNull()))
         {
             *outPackage = package;
-            return true;
+            return FindPackageResult::ok;
         }
     }
 
-    return false;
+    setErrorMessage(QString::fromLatin1(
+        "Failed to find a suitable update package for arch %1, platform %2, " \
+        "modification (variant) %3, version %4")
+            .arg(systemInformation.arch)
+            .arg(systemInformation.platform)
+            .arg(systemInformation.modification)
+            .arg(systemInformation.version),
+        outMessage);
+
+    return FindPackageResult::otherError;
 }
 
-bool findPackage(
+FindPackageResult findPackage(
     const vms::api::SystemInformation& systemInformation,
     const QByteArray& serializedUpdateInformation,
     bool isClient,
     const QString& cloudHost,
     bool boundToCloud,
-    nx::update::Package* outPackage)
+    nx::update::Package* outPackage,
+    QString* outMessage)
 {
+    if (serializedUpdateInformation.isEmpty())
+    {
+        setErrorMessage("Update information is empty", outMessage);
+        return FindPackageResult::noInfo;
+    }
+
     update::Information updateInformation;
     if (!QJson::deserialize(serializedUpdateInformation, &updateInformation))
-        return false;
+    {
+        setErrorMessage("Failed to deserialize update information JSON", outMessage);
+        return FindPackageResult::otherError;
+    }
 
     return findPackage(systemInformation, updateInformation, isClient, cloudHost, boundToCloud,
-        outPackage);
+        outPackage, outMessage);
 }
 
 } // namespace update

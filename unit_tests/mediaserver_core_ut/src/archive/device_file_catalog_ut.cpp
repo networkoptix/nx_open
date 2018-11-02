@@ -36,7 +36,8 @@ TEST(DeviceFileCatalog, catalogRange)
             startTimeMs, endTimeMs,
             1,  //< Detail level.
             true,  //< Keep small.
-            1000000); //< Unlimited result size.
+            1000000,
+            Qt::SortOrder::AscendingOrder); //< Unlimited result size.
     };
 
     {

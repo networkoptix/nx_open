@@ -45,6 +45,10 @@ public:
     };
     Q_ENUM(State)
 
+    /**
+     * Constructs a Worker
+     * NOTE: we need to ensure that peerManager is alive for all lifetime of a Worker.
+     */
     Worker(
         const QString& fileName,
         Storage* storage,

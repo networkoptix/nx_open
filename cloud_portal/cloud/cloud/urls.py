@@ -34,6 +34,7 @@ def redirect_login(request):
         target_url += '?%s' % request.META['QUERY_STRING']
     return redirect(target_url)
 
+
 urlpatterns = [
     url(r'^admin/login/', redirect_login),
     url(r'^admin/cms/', include('cms.urls')),

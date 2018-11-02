@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <mutex>
+#include <atomic>
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_container_api.h>
@@ -23,6 +23,8 @@ public:
         const nxcip::CameraInfo& info);
     virtual ~Camera() = default;
 
+    void initialize();
+
     std::shared_ptr<AudioStream> audioStream();
     std::shared_ptr<VideoStream> videoStream();
 
@@ -30,6 +32,8 @@ public:
 
     void setAudioEnabled(bool value);
     bool audioEnabled() const;
+
+    bool ioError() const;
 
     void setLastError(int errorCode);
     int lastError() const;
@@ -57,12 +61,11 @@ private:
     nxcip::CameraInfo m_info;
     CodecParameters m_defaultVideoParams;
 
-    mutable std::mutex m_mutex;
     std::shared_ptr<AudioStream> m_audioStream;
     std::shared_ptr<VideoStream> m_videoStream;
 
     bool m_audioEnabled;
-    int m_lastError;
+    std::atomic_int m_lastError;
 
     device::CompressionTypeDescriptorPtr m_compressionTypeDescriptor;
 

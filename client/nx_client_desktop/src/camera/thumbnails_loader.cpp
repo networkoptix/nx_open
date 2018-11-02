@@ -3,10 +3,10 @@
 #include <cassert>
 #include <limits>
 
-extern "C"
-{
-    #include <libswscale/swscale.h>
-}
+extern "C" {
+#include <libswscale/swscale.h>
+#include <libavutil/imgutils.h>
+} // extern "C"
 
 #include <QtCore/QTimer>
 #include <QtGui/QImage>
@@ -592,7 +592,7 @@ void QnThumbnailsLoader::ensureScaleContextLocked(int lineSize, const QSize &sou
         m_scaleSourceLine = lineSize;
         m_scaleTargetSize = m_targetSize;
 
-        int numBytes = avpicture_get_size(AV_PIX_FMT_RGBA, qPower2Ceil(static_cast<quint32>(m_scaleTargetSize.width()), 8), m_scaleTargetSize.height());
+        int numBytes = av_image_get_buffer_size(AV_PIX_FMT_RGBA, qPower2Ceil(static_cast<quint32>(m_scaleTargetSize.width()), 8), m_scaleTargetSize.height(), /*align*/ 1);
         m_scaleBuffer = static_cast<quint8 *>(qMallocAligned(numBytes, 32));
         m_scaleContext = sws_getContext(m_scaleSourceSize.width(), m_scaleSourceSize.height(), static_cast<AVPixelFormat>(m_scaleSourceFormat), m_scaleTargetSize.width(), m_scaleTargetSize.height(), AV_PIX_FMT_BGRA, SWS_BICUBIC, NULL, NULL, NULL);
         // TODO: #Elric sws_getContext may fail and return NULL.

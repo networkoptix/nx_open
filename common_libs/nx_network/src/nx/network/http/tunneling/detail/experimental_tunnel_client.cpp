@@ -31,6 +31,8 @@ void ExperimentalTunnelClient::bindToAioThread(
         m_downChannel->bindToAioThread(aioThread);
     if (m_upChannel)
         m_upChannel->bindToAioThread(aioThread);
+
+    m_timer.bindToAioThread(aioThread);
 }
 
 void ExperimentalTunnelClient::setTimeout(std::chrono::milliseconds timeout)
@@ -47,7 +49,13 @@ void ExperimentalTunnelClient::openTunnel(
     post(
         [this]()
         {
-            // TODO: #ak Starting timer if needed.
+            if (m_timeout && *m_timeout != kNoTimeout)
+            {
+                m_timer.start(
+                    *m_timeout,
+                    [this]() { handleTunnelFailure(SystemError::timedOut); });
+            }
+
             initiateDownChannel();
             initiateUpChannel();
         });
@@ -56,6 +64,11 @@ void ExperimentalTunnelClient::openTunnel(
 void ExperimentalTunnelClient::initiateDownChannel()
 {
     m_downChannelHttpClient = std::make_unique<AsyncClient>();
+    if (m_timeout)
+    {
+        m_downChannelHttpClient->setResponseReadTimeout(*m_timeout);
+        m_downChannelHttpClient->setMessageBodyReadTimeout(*m_timeout);
+    }
 
     initiateChannel(
         m_downChannelHttpClient.get(),
@@ -79,6 +92,12 @@ void ExperimentalTunnelClient::onDownChannelOpened()
 void ExperimentalTunnelClient::initiateUpChannel()
 {
     m_upChannelHttpClient = std::make_unique<AsyncClient>();
+    if (m_timeout)
+    {
+        m_upChannelHttpClient->setResponseReadTimeout(*m_timeout);
+        m_upChannelHttpClient->setMessageBodyReadTimeout(*m_timeout);
+    }
+
     prepareOpenUpChannelRequest();
 
     initiateChannel(
@@ -141,6 +160,8 @@ void ExperimentalTunnelClient::clear()
 
     m_downChannel.reset();
     m_upChannel.reset();
+
+    m_timer.pleaseStopSync();
 }
 
 void ExperimentalTunnelClient::handleTunnelFailure(
@@ -156,6 +177,13 @@ void ExperimentalTunnelClient::handleTunnelFailure(
     clear();
 
     cleanUpFailedTunnel(failedHttpClient.get());
+}
+
+void ExperimentalTunnelClient::handleTunnelFailure(
+    SystemError::ErrorCode systemErrorCode)
+{
+    clear();
+    cleanUpFailedTunnel(systemErrorCode);
 }
 
 void ExperimentalTunnelClient::prepareOpenUpChannelRequest()
@@ -183,6 +211,8 @@ void ExperimentalTunnelClient::reportTunnelIfReady()
     m_connection = std::make_unique<SeparateUpDownChannelDelegate>(
         std::exchange(m_downChannel, nullptr),
         std::exchange(m_upChannel, nullptr));
+
+    m_timer.pleaseStopSync();
 
     if (!resetConnectionAttributes())
     {

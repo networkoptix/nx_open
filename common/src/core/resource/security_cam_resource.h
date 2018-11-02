@@ -252,7 +252,10 @@ public:
         const QList<QRegion>& regions,
         qint64 msStartTime,
         qint64 msEndTime,
-        int detailLevel );
+        int detailLevel,
+        bool keepSmalChunks,
+        int limit,
+        Qt::SortOrder sortOrder);
 
     // in some cases I just want to update couple of field from just discovered resource
     virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;

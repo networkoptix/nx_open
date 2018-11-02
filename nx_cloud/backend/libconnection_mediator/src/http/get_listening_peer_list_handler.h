@@ -10,8 +10,7 @@ class PeerRegistrator;
 
 namespace http {
 
-class GetListeningPeerListHandler
-:
+class GetListeningPeerListHandler:
     public nx::network::http::AbstractFusionRequestHandler<void, api::ListeningPeers>
 {
 public:
@@ -20,9 +19,7 @@ public:
     GetListeningPeerListHandler(const PeerRegistrator& registrator);
 
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        const nx::network::http::Request& request,
-        nx::utils::stree::ResourceContainer authInfo) override;
+        nx::network::http::RequestContext requestContext) override;
 
 private:
     const PeerRegistrator& m_registrator;

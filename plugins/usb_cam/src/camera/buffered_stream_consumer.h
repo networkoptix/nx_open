@@ -223,6 +223,7 @@ public:
 
 private:
     TimeStampedBuffer<std::shared_ptr<ffmpeg::Packet>> m_buffer;
+    std::atomic_bool m_dropUntilNextVideoKeyPacket = false;
 };
 
 //--------------------------------------------------------------------------------------------------

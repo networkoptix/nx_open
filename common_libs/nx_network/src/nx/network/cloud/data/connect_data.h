@@ -46,7 +46,7 @@ public:
 
 #define ConnectRequest_Fields \
     (destinationHostName)(originatingPeerId)(connectSessionId)(connectionMethods) \
-    /*(udpEndpointList)*/(ignoreSourceAddress)(cloudConnectVersion)
+    (udpEndpointList)(ignoreSourceAddress)(cloudConnectVersion)
 
 QN_FUSION_DECLARE_FUNCTIONS(ConnectRequest, (json), NX_NETWORK_API)
 
@@ -77,7 +77,7 @@ public:
 };
 
 #define ConnectResponse_Fields \
-    /*(forwardedTcpEndpointList)(udpEndpointList)*/(trafficRelayUrl) \
+    (forwardedTcpEndpointList)(udpEndpointList)(trafficRelayUrl) \
     (destinationHostFullName)(params)(cloudConnectVersion)
 
 QN_FUSION_DECLARE_FUNCTIONS(ConnectResponse, (json), NX_NETWORK_API)

@@ -193,9 +193,9 @@ public:
         const ApiMockData& existingData,
         const ApiMockData& expectedData)
     {
-        NX_INFO(this, lit("[TEST] ====================================================================="));
-        NX_INFO(this, lit("[TEST] line %1: %2\n").arg(sourceCodeLineNumber).arg(sourceCodeLineString));
-        NX_DEBUG(this, lit("[TEST] JSON: %1").arg(requestJson.json.constData()));
+        NX_INFO(this, lit("====================================================================="));
+        NX_INFO(this, lit("line %1: %2\n").arg(sourceCodeLineNumber).arg(sourceCodeLineString));
+        NX_DEBUG(this, lit("JSON: %1").arg(requestJson.json.constData()));
 
         m_requestJson = requestJson;
         m_existingData = existingData;
@@ -233,9 +233,9 @@ public:
         const ApiMockDataJson& requestJson,
         const ApiMockData& existingData)
     {
-        NX_INFO(this, lit("[TEST] ====================================================================="));
-        NX_INFO(this, lit("[TEST] line %1: %2").arg(sourceCodeLineNumber).arg(sourceCodeLineString));
-        NX_DEBUG(this, lit("[TEST] JSON: %1").arg(requestJson.json.constData()));
+        NX_INFO(this, lit("====================================================================="));
+        NX_INFO(this, lit("line %1: %2").arg(sourceCodeLineNumber).arg(sourceCodeLineString));
+        NX_DEBUG(this, lit("JSON: %1").arg(requestJson.json.constData()));
 
         NX_CRITICAL(requestJson.isIncomplete, "[TEST]");
 
@@ -291,7 +291,7 @@ private:
         m_wasHandleUpdateCalled = true;
         NX_CRITICAL(command == kMockApiCommand, "[TEST]");
 
-        NX_INFO(this, lit("[TEST] Transaction: %1").arg(data.toJsonString().c_str()));
+        NX_INFO(this, lit("Transaction: %1").arg(data.toJsonString().c_str()));
 
         if (m_expectedData != data)
         {

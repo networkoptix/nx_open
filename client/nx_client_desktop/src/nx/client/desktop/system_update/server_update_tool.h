@@ -54,10 +54,6 @@ public:
 
     void setResourceFeed(QnResourcePool* pool);
 
-    /** Generate url for download update file, depending on actual targets list. */
-    static QUrl generateUpdatePackageUrl(const nx::utils::SoftwareVersion &targetVersion,
-        const QString& targetChangeset, const QSet<QnUuid>& targets, QnResourcePool* resourcePool);
-
     // Check if we should sync UI and data from here.
     bool hasRemoteChanges() const;
 
@@ -113,9 +109,9 @@ public:
     };
 
     std::future<UpdateContents> checkLatestUpdate();
-    std::future<UpdateContents> checkSpecificChangeset(QString build, QString password);
+    std::future<UpdateContents> checkSpecificChangeset(QString build);
     std::future<UpdateContents> checkUpdateFromFile(QString file);
-
+    std::future<UpdateContents> checkRemoteUpdateInfo();
     // It is used to obtain future to update check that was started
     // inside loadInternalState method
     // TODO: move all state restoration logic to widget.
@@ -176,16 +172,16 @@ public:
 
 private:
     // Handlers for resource updates.
-    void at_resourceAdded(const QnResourcePtr& resource);
-    void at_resourceRemoved(const QnResourcePtr& resource);
-    void at_resourceChanged(const QnResourcePtr& resource);
+    void atResourceAdded(const QnResourcePtr& resource);
+    void atResourceRemoved(const QnResourcePtr& resource);
+    void atResourceChanged(const QnResourcePtr& resource);
 
-    void at_updateStatusResponse(bool success, rest::Handle handle, const std::vector<nx::update::Status>& response);
-    void at_uploadWorkerState(QnUuid serverId, const nx::client::desktop::UploadState& state);
+    void atUpdateStatusResponse(bool success, rest::Handle handle, const std::vector<nx::update::Status>& response);
+    void atUploadWorkerState(QnUuid serverId, const nx::client::desktop::UploadState& state);
     // Called by QnZipExtractor when the offline update package is unpacked.
-    void at_extractFilesFinished(int code);
+    void atExtractFilesFinished(int code);
 
-    void at_pingTimerTimeout();
+    void atPingTimerTimeout();
 
     // Wrapper to get REST connection to specified server.
     // For testing purposes. We can switch there to a dummy http server.
@@ -248,6 +244,13 @@ private:
     TimePoint m_timeStartedInstall;
     bool m_protoProblemDetected = false;
 };
+
+/**
+ * Generates URL for upcombiner.
+ * Upcombiner is special server utility, that combines several update packages
+ * to a single zip archive.
+ */
+QUrl generateUpdatePackageUrl(const UpdateContents& contents, const QSet<QnUuid>& targets, QnResourcePool* resourcePool);
 
 } // namespace desktop
 } // namespace client

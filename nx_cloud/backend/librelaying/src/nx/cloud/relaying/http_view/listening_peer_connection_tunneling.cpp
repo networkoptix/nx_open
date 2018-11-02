@@ -12,8 +12,7 @@ ListeningPeerConnectionTunnelingServer::ListeningPeerConnectionTunnelingServer(
     m_listeningPeerManager(listeningPeerManager),
     m_listeningPeerPool(listeningPeerPool),
     m_tunnelingServer(
-        std::bind(&ListeningPeerConnectionTunnelingServer::saveNewTunnel, this,
-            std::placeholders::_1, std::placeholders::_2),
+        [this](auto&&... args) { saveNewTunnel(std::move(args)...); },
         this)
 {
 }
@@ -22,11 +21,14 @@ void ListeningPeerConnectionTunnelingServer::registerHandlers(
     const std::string& basePath,
     network::http::server::rest::MessageDispatcher* messageDispatcher)
 {
-    m_tunnelingServer.connectionUpgradeServer().setProtocolName(
+    auto& compatibilityTunnelServer = m_tunnelingServer.addTunnelServer<
+        nx::network::http::tunneling::detail::ConnectionUpgradeTunnelServer>();
+
+    compatibilityTunnelServer.setProtocolName(
         relay::api::kRelayProtocolName);
-    m_tunnelingServer.connectionUpgradeServer().setRequestPath(
+    compatibilityTunnelServer.setRequestPath(
         relay::api::kServerIncomingConnectionsPath);
-    m_tunnelingServer.connectionUpgradeServer().setUpgradeRequestMethod(
+    compatibilityTunnelServer.setUpgradeRequestMethod(
         network::http::Method::post);
 
     m_tunnelingServer.registerRequestHandlers(
@@ -38,17 +40,16 @@ void ListeningPeerConnectionTunnelingServer::authorize(
     const nx::network::http::RequestContext* requestContext,
     CompletionHandler completionHandler)
 {
-    using namespace std::placeholders;
-
-    if (requestContext->requestPathParams.empty())
+    const auto serverId = 
+        requestContext->requestPathParams.getByName(relay::api::kServerIdName);
+    if (serverId.empty())
     {
         return completionHandler(
             nx::network::http::StatusCode::badRequest,
             std::string());
     }
 
-    relay::api::BeginListeningRequest beginListeningRequest{
-        requestContext->requestPathParams[0].toStdString()};
+    relay::api::BeginListeningRequest beginListeningRequest{serverId};
 
     m_listeningPeerManager->beginListening(
         std::move(beginListeningRequest),

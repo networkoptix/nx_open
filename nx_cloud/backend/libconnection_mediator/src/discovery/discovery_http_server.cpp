@@ -25,10 +25,7 @@ public:
     }
 
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request /*request*/,
-        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestContext /*requestContext*/,
         nx::network::http::RequestProcessedHandler completionHandler) override
     {
         // TODO Filter by peer type.
@@ -60,16 +57,14 @@ public:
     }
 
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request /*request*/,
-        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler) override
     {
-        if (requestPathParams().empty())
+        if (requestContext.requestPathParams.empty())
             return completionHandler(nx::network::http::StatusCode::badRequest);
 
-        auto peerInfo = m_registeredPeerPool->getPeerInfo(requestPathParams()[0].toStdString());
+        auto peerInfo = m_registeredPeerPool->getPeerInfo(
+            requestContext.requestPathParams.getByName(http::kModuleIdParam));
         if (!peerInfo)
             return completionHandler(nx::network::http::StatusCode::notFound);
 
@@ -119,14 +114,13 @@ HttpServer::HttpServer(
 
 void HttpServer::onKeepAliveConnectionAccepted(
     std::unique_ptr<nx::network::WebSocket> connection,
-    std::vector<nx::network::http::StringType> restParams)
+    network::http::RequestPathParams restParams)
 {
-    if (restParams.empty())
+    const auto moduleId = restParams.getByName(http::kModuleIdParam);
+    if (moduleId.empty())
         return;
 
-    m_registeredPeerPool->addPeerConnection(
-        restParams[0].toStdString(),
-        std::move(connection));
+    m_registeredPeerPool->addPeerConnection(moduleId, std::move(connection));
 }
 
 } // namespace discovery

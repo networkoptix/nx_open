@@ -8,6 +8,7 @@
 #include "abstract_tunnel_authorizer.h"
 #include "detail/connection_upgrade_tunnel_server.h"
 #include "detail/get_post_tunnel_server.h"
+#include "detail/multi_message_tunnel_server.h"
 #include "detail/experimental_tunnel_server.h"
 #include "../http_types.h"
 #include "../server/rest/http_server_rest_message_dispatcher.h"
@@ -45,19 +46,21 @@ public:
         TunnelCreatedHandler tunnelCreatedHandler,
         TunnelAuthorizer<ApplicationData...>* tunnelAuthorizer);
 
+    /**
+     * @return Reference to the created tunnel server.
+     * Can be used for tuning specific for a particular tunnel type.
+     */
+    template<template<typename...> class SpecificTunnelServer>
+    SpecificTunnelServer<ApplicationData...>& addTunnelServer();
+
     void registerRequestHandlers(
         const std::string& basePath,
         server::rest::MessageDispatcher* messageDispatcher);
 
-    detail::GetPostTunnelServer<ApplicationData...>& getPostTunnelServer();
-    detail::ConnectionUpgradeTunnelServer<ApplicationData...>& connectionUpgradeServer();
-
 private:
     TunnelCreatedHandler m_tunnelCreatedHandler;
     TunnelAuthorizer<ApplicationData...>* m_tunnelAuthorizer = nullptr;
-    detail::GetPostTunnelServer<ApplicationData...> m_getPostTunnelServer;
-    detail::ConnectionUpgradeTunnelServer<ApplicationData...> m_connectionUpgradeServer;
-    detail::ExperimentalTunnelServer<ApplicationData...> m_experimentalServer;
+    std::vector<std::unique_ptr<detail::AbstractTunnelServer<ApplicationData...>>> m_tunnelServers;
 
     void reportNewTunnel(
         std::unique_ptr<network::AbstractStreamSocket> /*connection*/,
@@ -72,17 +75,26 @@ Server<ApplicationData...>::Server(
     TunnelAuthorizer<ApplicationData...>* tunnelAuthorizer)
     :
     m_tunnelCreatedHandler(std::move(tunnelCreatedHandler)),
-    m_tunnelAuthorizer(tunnelAuthorizer),
-    m_getPostTunnelServer([this](auto... args) { reportNewTunnel(std::move(args)...); }),
-    m_connectionUpgradeServer([this](auto... args) { reportNewTunnel(std::move(args)...); }),
-    m_experimentalServer([this](auto... args) { reportNewTunnel(std::move(args)...); })
+    m_tunnelAuthorizer(tunnelAuthorizer)
 {
+    addTunnelServer<detail::GetPostTunnelServer>();
+    addTunnelServer<detail::ConnectionUpgradeTunnelServer>();
+    addTunnelServer<detail::ExperimentalTunnelServer>();
+    addTunnelServer<detail::MultiMessageTunnelServer>();
+}
+
+template<typename ...ApplicationData>
+template<template<typename...> class SpecificTunnelServer>
+SpecificTunnelServer<ApplicationData...>& Server<ApplicationData...>::addTunnelServer()
+{
+    auto tunnelServer = std::make_unique<SpecificTunnelServer<ApplicationData...>>(
+        [this](auto... args) { reportNewTunnel(std::move(args)...); });
     if (m_tunnelAuthorizer)
-    {
-        m_getPostTunnelServer.setTunnelAuthorizer(m_tunnelAuthorizer);
-        m_connectionUpgradeServer.setTunnelAuthorizer(m_tunnelAuthorizer);
-        m_experimentalServer.setTunnelAuthorizer(m_tunnelAuthorizer);
-    }
+        tunnelServer->setTunnelAuthorizer(m_tunnelAuthorizer);
+
+    auto tunnelServerPtr = tunnelServer.get();
+    m_tunnelServers.push_back(std::move(tunnelServer));
+    return *tunnelServerPtr;
 }
 
 template<typename ...ApplicationData>
@@ -90,23 +102,8 @@ void Server<ApplicationData...>::registerRequestHandlers(
     const std::string& basePath,
     server::rest::MessageDispatcher* messageDispatcher)
 {
-    m_getPostTunnelServer.registerRequestHandlers(basePath, messageDispatcher);
-    m_connectionUpgradeServer.registerRequestHandlers(basePath, messageDispatcher);
-    m_experimentalServer.registerRequestHandlers(basePath, messageDispatcher);
-}
-
-template<typename ...ApplicationData>
-detail::GetPostTunnelServer<ApplicationData...>& 
-    Server<ApplicationData...>::getPostTunnelServer()
-{
-    return m_getPostTunnelServer;
-}
-
-template<typename ...ApplicationData>
-detail::ConnectionUpgradeTunnelServer<ApplicationData...>& 
-    Server<ApplicationData...>::connectionUpgradeServer()
-{
-    return m_connectionUpgradeServer;
+    for (auto& tunnelServer: m_tunnelServers)
+        tunnelServer->registerRequestHandlers(basePath, messageDispatcher);
 }
 
 template<typename ...ApplicationData>

@@ -9,6 +9,7 @@
 namespace nx {
 namespace usb_cam {
 namespace device {
+namespace detail {
 
 void DShowAudioDiscoveryManager::fillCameraAuxData(nxcip::CameraInfo* cameras, int cameraCount) const
 {
@@ -68,6 +69,18 @@ void DShowAudioDiscoveryManager::fillCameraAuxData(nxcip::CameraInfo* cameras, i
     }
 }
 
+bool DShowAudioDiscoveryManager::pluggedIn(const std::string& devicePath) const
+{
+    auto devices = impl::getAudioDeviceList();
+    for (const auto & device : devices)
+    {
+        if (device.data.deviceName == devicePath)
+            return true;
+    }
+    return false;
+}
+
+} // namespace detail
 } // namespace device
 } // namespace usb_cam
 } // namespace nx

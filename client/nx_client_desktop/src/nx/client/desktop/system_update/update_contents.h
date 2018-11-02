@@ -5,6 +5,9 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/update/update_information.h>
+#include <nx/vms/api/data/software_version.h>
+
+class QnCommonModule;
 
 namespace nx {
 namespace client {
@@ -44,12 +47,20 @@ struct UpdateContents
     nx::update::Package clientPackage;
     nx::update::Information info;
     nx::update::InformationError error = nx::update::InformationError::noError;
+    bool cloudIsCompatible = true;
 
+    nx::utils::SoftwareVersion getVersion() const;
     // Check if we can apply this update.
     bool isValid() const;
 };
 
 nx::update::Package findClientPackage(const nx::update::Information& updateInfo);
+
+bool checkCloudHost(
+    QnCommonModule* commonModule,
+    nx::utils::SoftwareVersion targetVersion,
+    QString cloudUrl,
+    const QSet<QnUuid>& peers);
 
 } // namespace desktop
 } // namespace client

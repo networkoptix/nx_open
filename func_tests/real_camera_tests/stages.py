@@ -9,14 +9,13 @@ Stop iteration => Failure, the last error is returned.
 """
 
 import logging
-import timeit
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from typing import Generator, List
 
 from framework.http_api import HttpError
 from . import stage
-from .camera_actions import configure_audio, configure_video, ffprobe_streams, fps_avg
+from .camera_actions import configure_audio, configure_video, ffprobe_expect_stream, fps_avg
 from .checks import Checker, Failure, Halt, Result, Success, expect_values, retry_expect_values
 
 # Filled by _stage decorator.
@@ -110,7 +109,7 @@ def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) ->
 
             for profile, configuration in (('primary', selected), ('secondary', secondary)):
                 if configuration:
-                    for error in ffprobe_streams(
+                    for error in ffprobe_expect_stream(
                             {'video': configuration}, run.media_url(profile),
                             '{}[{}]'.format(profile, fps_index)):
                         yield error
@@ -118,7 +117,7 @@ def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) ->
     yield Success()
 
 
-@_stage(timeout=timedelta(minutes=7))
+@_stage(timeout=timedelta(minutes=15))
 def video_parameters(run, stream_urls=None, **profiles):
         # type: (stage.Run, dict, dict) -> Generator[Result]
     """For each stream and its configuration: enables recording; applies the configuration and
@@ -130,17 +129,17 @@ def video_parameters(run, stream_urls=None, **profiles):
         {'resolution': 'XXXxYYY', 'codec': codec, 'fps': [min_fps, max_fps]}.
     """
     # Enable recording to keep video stream open during entire stage.
-    with run.server.api.camera_recording(run.uuid):
-        for profile, configurations in profiles.items():
-            for index, configuration in enumerate(configurations):
-                configure_video(
-                    run.server.api, run.id, run.data['cameraAdvancedParams'],
-                    profile, **configuration)
+    # with run.server.api.camera_recording(run.uuid):
+    for profile, configurations in profiles.items():
+        for index, configuration in enumerate(configurations):
+            configure_video(
+                run.server.api, run.id, run.data['cameraAdvancedParams'],
+                profile, **configuration)
 
-                for error in ffprobe_streams(
-                        {'video': configuration}, run.media_url(profile),
-                        '{}[{}]'.format(profile, index)):
-                    yield error
+            for error in ffprobe_expect_stream(
+                    {'video': configuration}, run.media_url(profile),
+                    '{}[{}]'.format(profile, index)):
+                yield error
 
     if stream_urls:
         for error in retry_expect_values({'streamUrls': stream_urls}, lambda: run.data, syntax='*'):
@@ -157,25 +156,25 @@ def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Genera
         {'codec': codec, 'skip_codec_change': true_if_this_value_is_a_default}
     """
     # Enable recording to keep video stream open during the entire stage.
-    with run.server.api.camera_recording(run.uuid):
-        with run.server.api.camera_audio_enabled(run.uuid):
-            for index, configuration in enumerate(configurations):
-                if not configuration.get('skip_codec_change'):
-                    if 'set_codec' in configuration.keys():
-                        configure_audio(
-                            run.server.api, run.id, run.data['cameraAdvancedParams'],
-                            configuration.pop('set_codec'))
-                    else:
-                        configure_audio(
-                            run.server.api, run.id, run.data['cameraAdvancedParams'],
-                            **configuration)
+    # with run.server.api.camera_recording(run.uuid):
+    with run.server.api.camera_audio_enabled(run.uuid):
+        for index, configuration in enumerate(configurations):
+            if not configuration.get('skip_codec_change'):
+                if 'set_codec' in configuration.keys():
+                    configure_audio(
+                        run.server.api, run.id, run.data['cameraAdvancedParams'],
+                        configuration.pop('set_codec'))
                 else:
-                    del configuration["skip_codec_change"]
+                    configure_audio(
+                        run.server.api, run.id, run.data['cameraAdvancedParams'],
+                        **configuration)
+            else:
+                del configuration["skip_codec_change"]
 
-                for error in ffprobe_streams(
-                        {'audio': configuration}, run.media_url(), 'primary[{}]'.format(index),
-                        audio_stage=True):
-                    yield error
+            for error in ffprobe_expect_stream(
+                    {'audio': configuration}, run.media_url(), 'primary[{}]'.format(index),
+                    ):
+                yield error
 
     yield Success()
 
@@ -254,9 +253,15 @@ def ptz_positions(run, *positions):  # type: (stage.Run, List[dict]) -> Generato
                 for error in execute('GetPresets', {'id=' + position['preset']: {'name': name}}):
                     yield error
 
+                if 'point' not in position:
+                    continue
+
                 for error in execute('ActivatePreset', speed=100, presetId=position['preset']):
                     yield error
             else:
+                if 'point' not in position:
+                    continue
+
                 for error in execute('AbsoluteDeviceMove', speed=100, **point):
                     yield error
 

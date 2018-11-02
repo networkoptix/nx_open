@@ -105,6 +105,7 @@ def _bus_thread_running(server, queue, socket_reopened_counter):
         command = command_class(command_name, data)
         transaction = Transaction(server.api.generic.alias, command)
         logger.info('Received: %s', transaction)
+        return transaction
 
     def process_transaction():
         try:

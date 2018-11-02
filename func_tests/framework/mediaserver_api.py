@@ -26,7 +26,7 @@ _logger = ContextLogger(__name__, 'mediaserver_api')
 
 DEFAULT_API_USER = 'admin'
 INITIAL_API_PASSWORD = 'admin'
-DEFAULT_API_PASSWORD = 'qweasd123'
+DEFAULT_API_PASSWORD = 'qweasd12345'
 MAX_CONTENT_LEN_TO_LOG = 1000
 DEFAULT_TAKE_REMOTE_SETTINGS = False
 
@@ -513,6 +513,12 @@ class MediaserverApi(object):
         params.update({'cameraId': camera_id})
         # Although api/setCameraParam method is considered POST in doc, in the code it is GET
         self.generic.get('api/setCameraParam', params)
+
+    def get_server_statistics(self, salt=None):
+        if salt:
+            return self.generic.get('/api/statistics', 'salt=' + str(salt))
+        else:
+            return self.generic.get('/api/statistics')
 
     @classmethod
     def _parse_json_fields(cls, data):

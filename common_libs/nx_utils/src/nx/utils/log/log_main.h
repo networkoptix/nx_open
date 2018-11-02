@@ -113,6 +113,7 @@ inline Stream makeStream(Level level, const Tag& tag)
 
 #define NX_UTILS_LOG_MESSAGE(LEVEL, TAG, ...) do \
 { \
+    struct ScopeTag{}; /*< Used by NX_SCOPE_TAG to get scope from demangled type_info::name(). */ \
     if (static_cast<nx::utils::log::Level>(LEVEL) <= nx::utils::log::maxLevel()) \
     { \
         if (auto helper = nx::utils::log::detail::Helper((LEVEL), (TAG))) \
@@ -143,14 +144,16 @@ inline Stream makeStream(Level level, const Tag& tag)
         NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, \
         NX_UTILS_LOG_STREAM, args_required)(__VA_ARGS__))
 
-/**
+/*
  * Usage:
- *     NX_<LEVEL>(TAG) << MESSAGE [<< ...]; //< Writes MESSAGE to log if LEVEL and TAG allow.
- *     NX_<LEVEL>(TAG, MESSAGE); //< The same as above, but shorter syntax;
+ *     NX_<LEVEL>(TAG, MESSAGE [, VALUES...]; //< Writes MESSAGE to log if LEVEL and TAG allow.
  *
  * Examples:
+ *     NX_INFO(this, "Expected value %1", value);
+ *     NX_DEBUG(NX_SCOPE_TAG, "Message from a non-member function.");
+ *
+ * Deprecated usage:
  *     NX_ERROR(this) << "Unexpected value" << value;
- *     NX_INFO(this, lm("Expected value %1").arg(value));
  */
 #define NX_ALWAYS(...) NX_UTILS_LOG(nx::utils::log::Level::always, __VA_ARGS__)
 #define NX_ERROR(...) NX_UTILS_LOG(nx::utils::log::Level::error, __VA_ARGS__)
@@ -158,6 +161,9 @@ inline Stream makeStream(Level level, const Tag& tag)
 #define NX_INFO(...) NX_UTILS_LOG(nx::utils::log::Level::info, __VA_ARGS__)
 #define NX_DEBUG(...) NX_UTILS_LOG(nx::utils::log::Level::debug, __VA_ARGS__)
 #define NX_VERBOSE(...) NX_UTILS_LOG(nx::utils::log::Level::verbose, __VA_ARGS__)
+
+/** Use as a logging tag in functions without "this". */
+#define NX_SCOPE_TAG nx::utils::log::Tag(scopeOfFunction(typeid(ScopeTag), __FUNCTION__))
 
 } // namespace log
 } // namespace utils

@@ -2,11 +2,29 @@
 
 #include "../abstract_tunnel_authorizer.h"
 #include "../../server/http_server_connection.h"
+#include "../../server/rest/http_server_rest_message_dispatcher.h"
 
 namespace nx::network::http::tunneling::detail {
 
-template<typename ...ApplicationData>
-class BasicCustomTunnelServer
+template<typename... ApplicationData>
+class AbstractTunnelServer
+{
+public:
+    virtual ~AbstractTunnelServer() = default;
+
+    virtual void setTunnelAuthorizer(
+        TunnelAuthorizer<ApplicationData...>* tunnelAuthorizer) = 0;
+
+    virtual void registerRequestHandlers(
+        const std::string& basePath,
+        server::rest::MessageDispatcher* messageDispatcher) = 0;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+template<typename... ApplicationData>
+class BasicCustomTunnelServer:
+    public AbstractTunnelServer<ApplicationData...>
 {
 public:
     using NewTunnelHandler = nx::utils::MoveOnlyFunc<void(
@@ -16,8 +34,8 @@ public:
     BasicCustomTunnelServer(NewTunnelHandler newTunnelHandler);
     virtual ~BasicCustomTunnelServer() = default;
 
-    void setTunnelAuthorizer(
-        TunnelAuthorizer<ApplicationData...>* tunnelAuthorizer);
+    virtual void setTunnelAuthorizer(
+        TunnelAuthorizer<ApplicationData...>* tunnelAuthorizer) override;
 
     void setRequestPath(const std::string& path);
     std::string requestPath() const;

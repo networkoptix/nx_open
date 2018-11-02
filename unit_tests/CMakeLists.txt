@@ -8,11 +8,6 @@ endif()
 add_subdirectory(nx_network_ut)
 add_subdirectory(nx_sdk_ut)
 
-if(withDesktopClient)
-    add_subdirectory(client_core_ut)
-    add_subdirectory(client_ut)
-endif()
-
 if(withMediaServer)
     add_subdirectory(mediaserver_core_ut)
 endif()

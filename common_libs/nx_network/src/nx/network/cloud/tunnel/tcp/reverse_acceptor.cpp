@@ -166,12 +166,13 @@ ReverseAcceptor::NxRcHandler::NxRcHandler(ReverseAcceptor* acceptor):
 }
 
 void ReverseAcceptor::NxRcHandler::processRequest(
-    nx::network::http::HttpServerConnection* const connection,
-    nx::utils::stree::ResourceContainer,
-    nx::network::http::Request request,
-    nx::network::http::Response* const response,
+    http::RequestContext requestContext,
     nx::network::http::RequestProcessedHandler handler)
 {
+    auto connection = requestContext.connection;
+    const auto& request = requestContext.request;
+    auto response = requestContext.response;
+
     auto connectionIt = request.headers.find(kConnection);
     if (connectionIt == request.headers.end() || connectionIt->second != kUpgrade)
         return handler(nx::network::http::StatusCode::notAcceptable);

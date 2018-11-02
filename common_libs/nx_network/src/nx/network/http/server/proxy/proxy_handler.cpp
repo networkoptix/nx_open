@@ -17,25 +17,22 @@ AbstractProxyHandler::TargetHost::TargetHost(network::SocketAddress target):
 //-------------------------------------------------------------------------------------------------
 
 void AbstractProxyHandler::processRequest(
-    nx::network::http::HttpServerConnection* const connection,
-    nx::utils::stree::ResourceContainer /*authInfo*/,
-    nx::network::http::Request request,
-    nx::network::http::Response* const /*response*/,
-    nx::network::http::RequestProcessedHandler completionHandler)
+    RequestContext requestContext,
+    RequestProcessedHandler completionHandler)
 {
     using namespace std::placeholders;
 
-    m_request = std::move(request);
+    m_request = std::move(requestContext.request);
     m_requestCompletionHandler = std::move(completionHandler);
-    m_requestSourceEndpoint = connection->socket()->getForeignAddress();
-    m_httpConnectionAioThread = connection->getAioThread();
+    m_requestSourceEndpoint = requestContext.connection->socket()->getForeignAddress();
+    m_httpConnectionAioThread = requestContext.connection->getAioThread();
 
-    m_isIncomingConnectionEncrypted = connection->isSsl();
+    m_isIncomingConnectionEncrypted = requestContext.connection->isSsl();
 
     detectProxyTarget(
-        *connection,
+        *requestContext.connection,
         &m_request,
-        std::bind(&AbstractProxyHandler::startProxying, this, _1, _2));
+        [this](auto&&... args) { startProxying(std::move(args)...); });
 }
 
 void AbstractProxyHandler::setTargetHostConnectionInactivityTimeout(
@@ -132,7 +129,7 @@ void AbstractProxyHandler::proxyRequestToTarget(
             *m_targetConnectionInactivityTimeout);
     }
     m_requestProxyWorker->start(
-        std::bind(&AbstractProxyHandler::sendTargetServerResponse, this, _1, _2));
+        [this](auto&&... args) { sendTargetServerResponse(std::move(args)...); });
 }
 
 void AbstractProxyHandler::sendTargetServerResponse(
@@ -145,7 +142,7 @@ void AbstractProxyHandler::sendTargetServerResponse(
 
         // Removing Keep-alive connection related headers to let
         // local HTTP server to implement its own keep-alive policy.
-        response()->headers.erase("Keep-alive");
+        response()->headers.erase("Keep-Alive");
         auto connectionHeaderIter = response()->headers.find("Connection");
         if (connectionHeaderIter != response()->headers.end() &&
             connectionHeaderIter->second.toLower() == "keep-alive")

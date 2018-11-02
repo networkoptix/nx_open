@@ -17,12 +17,12 @@ BeginListeningUsingConnectMethodHandler::BeginListeningUsingConnectMethodHandler
 {
 }
 
-relay::api::BeginListeningRequest BeginListeningUsingConnectMethodHandler::prepareRequestData(
-    nx::network::http::HttpServerConnection* const /*connection*/,
-    const nx::network::http::Request& httpRequest)
+relay::api::BeginListeningRequest
+    BeginListeningUsingConnectMethodHandler::prepareRequestData(
+        const nx::network::http::RequestContext& requestContext)
 {
     relay::api::BeginListeningRequest inputData;
-    inputData.peerName = httpRequest.requestLine.url.path().toStdString();
+    inputData.peerName = requestContext.request.requestLine.url.path().toStdString();
     return inputData;
 }
 

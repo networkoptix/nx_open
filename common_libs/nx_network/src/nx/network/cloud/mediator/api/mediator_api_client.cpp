@@ -45,6 +45,44 @@ void Client::initiateConnection(
         request);
 }
 
+Client::ResultCode Client::systemErrorCodeToResultCode(
+    SystemError::ErrorCode systemErrorCode)
+{
+    switch (systemErrorCode)
+    {
+        case SystemError::noError:
+            return api::ResultCode::ok;
+        case SystemError::timedOut:
+            return api::ResultCode::timedOut;
+        default:
+            return api::ResultCode::networkError;
+    }
+}
+
+Client::ResultCode Client::getResultCodeFromResponse(
+    const network::http::Response& response)
+{
+    using namespace network::http;
+
+    if (StatusCode::isSuccessCode(response.statusLine.statusCode))
+        return api::ResultCode::ok;
+
+    switch (response.statusLine.statusCode)
+    {
+        case StatusCode::unauthorized:
+            return api::ResultCode::notAuthorized;
+
+        case StatusCode::badRequest:
+            return api::ResultCode::badRequest;
+
+        case StatusCode::notFound:
+            return api::ResultCode::notFound;
+
+        default:
+            return api::ResultCode::otherLogicError;
+    }
+}
+
 } // namespace api
 } // namespace hpm
 } // namespace nx

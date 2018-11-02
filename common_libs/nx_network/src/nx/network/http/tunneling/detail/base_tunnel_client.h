@@ -54,6 +54,8 @@ protected:
 
     void cleanUpFailedTunnel();
     void cleanUpFailedTunnel(AsyncClient* httpClient);
+    void cleanUpFailedTunnel(SystemError::ErrorCode systemErrorCode);
+
     void reportFailure(OpenTunnelResult result);
 
     bool resetConnectionAttributes();

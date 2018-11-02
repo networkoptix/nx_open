@@ -1,0 +1,66 @@
+<div class="dropdown {{ direction }}"
+     [ngClass]="{'show': show, 'short': short}"
+     (nxClickElsewhere)="show = false">
+
+    <button class="btn btn-dropdown-toggle dropdown-toggle"
+            (click)="show = !show"
+            type="button" id="dropdownMenuButton" data-toggle="dropdown">
+
+        <span class="lang-sm" lang="{{activeLanguage.language}}"></span>
+        <span *ngIf="!short">{{activeLanguage.name}}</span>
+        <div class="nav-arrow" [ngClass]="{ 'up': direction == 'dropup'}">
+            <span></span>
+            <span></span>
+        </div>
+    </button>
+    <ul class="dropdown-menu" *ngIf="languages.length <= 12" [nxArrowNav]="show"
+        [style.display]="show ? 'inline-block' : 'none'"
+        aria-labelledby="dropdownMenuButton">
+
+        <li class="dropdown-item-container" *ngFor="let lang of languages">
+            <a class="dropdown-item inset"
+               href
+               (click)="show = false; change(lang.language);"
+               [ngClass]="{'active': lang.language === activeLanguage.language}">
+
+                <span class="lang-sm" lang="{{lang.language}}"></span>
+                <span>{{lang.name}}</span>
+            </a>
+        </li>
+    </ul>
+
+    <ul class="dropdown-menu multi-column columns-2" *ngIf="languages.length > 12" [nxArrowNav]="show"
+        [style.display]="show ? 'inline-block' : 'none'"
+        aria-labelledby="dropdownMenuButton">
+        <div class="row m-0">
+            <div class="col-6 p-0">
+                <ul class="multi-column-dropdown">
+                    <li class="dropdown-item-container" *ngFor="let lang of languagesCol1">
+                        <a class="dropdown-item inset"
+                           href
+                           (click)="show = false; change(lang.language);"
+                           [ngClass]="{'selected': lang.language === activeLanguage.language}">
+
+                            <span class="lang-sm" lang="{{lang.language}}"></span>
+                            <span>{{lang.name}}</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-6 p-0">
+                <ul class="multi-column-dropdown">
+                    <li class="dropdown-item-container" *ngFor="let lang of languagesCol2">
+                        <a href
+                           class="dropdown-item inset"
+                           [ngClass]="{'selected': lang.language === activeLanguage.language}"
+                           (click)="show = false; change(lang.language);">
+
+                            <span class="lang-sm" lang="{{lang.language}}"></span>
+                            <span>{{lang.name}}</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </ul>
+</div>

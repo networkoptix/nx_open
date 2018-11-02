@@ -5,7 +5,7 @@
 #include <api/server_rest_connection.h>
 #include <rest/server/json_rest_result.h>
 #include <common/common_module.h>
-#include "peer_selection/peer_selector_factory.h"
+#include "peer_selection/abstract_peer_selector.h"
 #include "../validate_result.h"
 #include "../downloader.h"
 #include "resource_pool_peer_manager.h"
@@ -19,8 +19,6 @@ namespace downloader {
 namespace {
 
 static const int kDownloadRequestTimeoutMs = 10 * 60 * 1000;
-
-using namespace peer_selection;
 
 class OtherPeerInfosProvider
 {
@@ -64,14 +62,14 @@ nx::network::http::AsyncHttpClientPtr createHttpClient()
     auto httpClient = nx::network::http::AsyncHttpClient::create();
     httpClient->setResponseReadTimeoutMs(kDownloadRequestTimeoutMs);
     httpClient->setSendTimeoutMs(kDownloadRequestTimeoutMs);
-    httpClient->setMessageBodyReadTimeoutMs(5);
+    httpClient->setMessageBodyReadTimeoutMs(kDownloadRequestTimeoutMs);
 
     return httpClient;
 }
 
 ResourcePoolPeerManager::ResourcePoolPeerManager(
     QnCommonModule* commonModule,
-    peer_selection::AbstractPeerSelectorPtr peerSelector,
+    AbstractPeerSelectorPtr peerSelector,
     bool isClient)
     :
     QnCommonModuleAware(commonModule),
@@ -153,7 +151,7 @@ rest::Handle ResourcePoolPeerManager::requestFileInfo(
         return -1;
 
     auto handleReply =
-        [this, callback](bool success, rest::Handle handle, const QnJsonRestResult& result)
+        [callback](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             if (!success)
                 return callback(success, handle, FileInformation());
@@ -175,7 +173,7 @@ rest::Handle ResourcePoolPeerManager::requestChecksums(
         return -1;
 
     auto handleReply =
-        [this, callback](bool success, rest::Handle handle, const QnJsonRestResult& result)
+        [callback](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             if (!success)
                 return callback(success, handle, QVector<QByteArray>());
@@ -277,7 +275,7 @@ rest::Handle ResourcePoolPeerManager::validateFileInformation(
 
     Downloader::validateAsync(
         fileInformation.url.toString(), /* onlyConnectionCheck */ false, fileInformation.size,
-        [this, callback, handle](bool success)
+        [callback, handle](bool success)
         {
             callback(success, handle);
         });
@@ -300,7 +298,7 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
             return -1;
 
         const auto handleReply =
-            [this, callback = std::move(callback)](
+            [callback = std::move(callback)](
                 bool success,
                 rest::Handle requestId,
                 QByteArray result,
@@ -396,9 +394,8 @@ AbstractPeerManager* ResourcePoolPeerManagerFactory::createPeerManager(
     FileInformation::PeerSelectionPolicy peerPolicy,
     const QList<QnUuid>& additionalPeers)
 {
-    return new ResourcePoolPeerManager(
-        commonModule(),
-        PeerSelectorFactory::create(peerPolicy, additionalPeers, commonModule()));
+    auto&& peerSelector = createPeerSelector(peerPolicy, additionalPeers, commonModule());
+    return new ResourcePoolPeerManager(commonModule(), std::move(peerSelector));
 }
 
 } // namespace downloader

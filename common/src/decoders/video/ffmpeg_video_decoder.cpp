@@ -4,6 +4,11 @@
 
 #include <QtCore/QThread>
 
+extern "C" {
+#include <libavutil/imgutils.h>
+} // extern "C"
+
+
 #include "utils/media/nalUnits.h"
 
 /* DXVA headers (should be included before ffmpeg headers). */
@@ -191,7 +196,7 @@ void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
     if (m_context->codec_id == AV_CODEC_ID_H264 && m_context->thread_type == FF_THREAD_SLICE)
     {
         // ignoring deblocking filter type 1 for better perfomace between H264 slices.
-        m_context->flags2 |= CODEC_FLAG2_FAST;
+        m_context->flags2 |= AV_CODEC_FLAG2_FAST;
     }
     //m_context->flags |= CODEC_FLAG_GRAY;
 }
@@ -244,8 +249,6 @@ void QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
         }
     }
     //NX_ASSERT(m_context->codec);
-
-//    avpicture_fill((AVPicture *)picture, m_buffer, AV_PIX_FMT_YUV420P, c->width, c->height);
 }
 
 void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& data)
@@ -312,13 +315,17 @@ void QnFfmpegVideoDecoder::setSpeed( float /*newValue*/ )
 void QnFfmpegVideoDecoder::reallocateDeinterlacedFrame()
 {
     int roundWidth = qPower2Ceil((unsigned) m_context->width, 32);
-    int numBytes = avpicture_get_size(m_context->pix_fmt, roundWidth, m_context->height);
+    int numBytes = av_image_get_buffer_size(m_context->pix_fmt, roundWidth, m_context->height, /*align*/ 1);
     if (numBytes > 0) {
         if (m_deinterlaceBuffer)
             av_free(m_deinterlaceBuffer);
 
         m_deinterlaceBuffer = (quint8*)av_malloc(numBytes * sizeof(quint8));
-        avpicture_fill((AVPicture *)m_deinterlacedFrame, m_deinterlaceBuffer, m_context->pix_fmt, roundWidth, m_context->height);
+        av_image_fill_arrays(
+            m_deinterlacedFrame->data,
+            m_deinterlacedFrame->linesize,
+            m_deinterlaceBuffer,
+            m_context->pix_fmt, roundWidth, m_context->height, /*align*/ 1);
         m_deinterlacedFrame->width = m_context->width;
         m_deinterlacedFrame->height = m_context->height;
     }

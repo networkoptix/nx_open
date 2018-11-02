@@ -38,10 +38,7 @@ public:
     }
 
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request /*request*/,
-        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestContext /*requestContext*/,
         nx::network::http::RequestProcessedHandler handler) override
     {
         QnJsonRestResult restResult;
@@ -116,11 +113,11 @@ MediaServerEmulator::MediaServerEmulator(
 
     bindToAioThread(getAioThread());
 
-    m_mediatorConnector->mockupMediatorUrl(
+    m_mediatorConnector->mockupMediatorAddress({
         nx::network::url::Builder()
             .setScheme(network::stun::kUrlSchemeName)
             .setEndpoint(mediatorTcpEndpoint),
-        mediatorUdpEndpoint);
+        mediatorUdpEndpoint});
 
     m_mediatorConnector->setSystemCredentials(
         api::SystemCredentials(
@@ -320,7 +317,7 @@ void MediaServerEmulator::onConnectionRequested(
     {
         m_mediatorUdpClient =
             std::make_unique<nx::hpm::api::MediatorServerUdpConnection>(
-                *m_mediatorConnector->udpEndpoint(),
+                m_mediatorConnector->address()->stunUdpEndpoint,
                 m_mediatorConnector.get());
         m_mediatorUdpClient->bindToAioThread(getAioThread());
     }

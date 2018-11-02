@@ -6,7 +6,7 @@ from datetime import datetime
 import six
 from netaddr import IPAddress
 from pathlib2 import PureWindowsPath
-from typing import Callable, ContextManager, Mapping, Optional, Type
+from typing import Any, Callable, Mapping, Optional, Type
 
 from framework.networking.interface import Networking
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
@@ -121,7 +121,7 @@ class OSAccess(object):
             networking,  # type: Optional[Networking]
             time,  # type: Time
             traffic_capture,  # type: Optional[TrafficCapture]
-            lock_acquired,  # type: Optional[Callable[[FileSystemPath, ...], ContextManager[None]]]
+            lock_acquired,  # type: Optional[Callable[[FileSystemPath, ...], Any]]
             path_cls,  # type: Type[FileSystemPath]
             ):
         self.alias = alias
@@ -155,6 +155,10 @@ class OSAccess(object):
     def parse_core_dump(self, path, **options):
         """Parse process dump with OS-specific options"""
         # TODO: Decide on placement of this method. Where should it reside given that arguments differ?
+        pass
+
+    @abstractmethod
+    def _dismount_fake_disk(self):
         pass
 
     @abstractmethod
@@ -198,7 +202,7 @@ class OSAccess(object):
 
     @contextmanager
     def free_disk_space_limited(self, should_leave_bytes, interval_sec=1):
-        # type: (int, float) -> ContextManager[...]
+        # type: (int, float) -> ...
         """Try to maintain limited free disk space while in this context.
 
         One-time allocation (reservation) of disk space is not enough. OS or other software

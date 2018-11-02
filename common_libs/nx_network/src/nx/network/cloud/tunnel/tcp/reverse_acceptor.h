@@ -61,17 +61,15 @@ private:
     void fillNxRcHeaders(nx::network::http::HttpHeaders* headers) const;
     void saveConnection(String name, nx::network::http::HttpServerConnection* connection);
 
-    class NxRcHandler: public nx::network::http::AbstractHttpRequestHandler
+    class NxRcHandler:
+        public http::AbstractHttpRequestHandler
     {
     public:
         NxRcHandler(ReverseAcceptor* acceptor);
 
-        void processRequest(
-            nx::network::http::HttpServerConnection* const connection,
-            nx::utils::stree::ResourceContainer authInfo,
-            nx::network::http::Request request,
-            nx::network::http::Response* const response,
-            nx::network::http::RequestProcessedHandler handler) override;
+        virtual void processRequest(
+            http::RequestContext requestContext,
+            http::RequestProcessedHandler handler) override;
 
     private:
         ReverseAcceptor* m_acceptor;

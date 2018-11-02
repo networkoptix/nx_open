@@ -109,13 +109,10 @@ protected:
     {
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
-        nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::ok;
-        api::ListeningPeers listeningPeers;
-
         for (;;)
         {
-            std::tie(statusCode, listeningPeers) = getListeningPeers();
-            ASSERT_EQ(nx::network::http::StatusCode::ok, statusCode);
+            auto [resultCode, listeningPeers] = getListeningPeers();
+            ASSERT_EQ(api::ResultCode::ok, resultCode);
             if (listeningPeers.systems.find(m_system.id) == listeningPeers.systems.end())
                 break;
 
@@ -131,10 +128,10 @@ protected:
 
     void thenConnectSucceeded()
     {
-        thenConnectReported(nx::network::http::StatusCode::ok);
+        thenConnectReported(api::ResultCode::ok);
     }
 
-    void thenConnectReported(nx::network::http::StatusCode::Value expected)
+    void thenConnectReported(api::ResultCode expected)
     {
         ASSERT_EQ(expected, std::get<0>(m_connectResponseQueue.pop()));
     }
@@ -206,7 +203,7 @@ private:
 
     std::unique_ptr<api::Client> m_mediatorClient;
     nx::utils::SyncQueue<
-        std::tuple<HttpStatusCode::Value, api::ConnectResponse>
+        std::tuple<api::ResultCode, api::ConnectResponse>
     > m_connectResponseQueue;
 
     virtual void SetUp() override
@@ -228,10 +225,10 @@ private:
     }
 
     void saveConnectResult(
-        HttpStatusCode::Value result, api::ConnectResponse response)
+        api::ResultCode resultCode, api::ConnectResponse response)
     {
         m_connectResponseQueue.push(
-            std::make_tuple(result, std::move(response)));
+            std::make_tuple(resultCode, std::move(response)));
     }
 };
 
@@ -285,10 +282,8 @@ TEST_F(ListeningPeer, peer_disconnect)
 
     givenListeningServer();
 
-    nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::ok;
-    api::ListeningPeers listeningPeers;
-    std::tie(statusCode, listeningPeers) = getListeningPeers();
-    ASSERT_EQ(nx::network::http::StatusCode::ok, statusCode);
+    auto [resultCode, listeningPeers] = getListeningPeers();
+    ASSERT_EQ(api::ResultCode::ok, resultCode);
     ASSERT_EQ(1U, listeningPeers.systems.size());
 
     whenCloseConnectionToMediator();
@@ -305,7 +300,7 @@ TEST_F(ListeningPeer, can_connect_with_http_request)
 TEST_F(ListeningPeer, connect_to_unknown_peer_through_http_request_results_not_found)
 {
     whenConnectToUnknownPeerThroughHttp();
-    thenConnectReported(nx::network::http::StatusCode::notFound);
+    thenConnectReported(api::ResultCode::notFound);
 }
 
 //-------------------------------------------------------------------------------------------------

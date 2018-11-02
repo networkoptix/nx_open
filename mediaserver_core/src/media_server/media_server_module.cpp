@@ -180,9 +180,9 @@ QnMediaServerModule::QnMediaServerModule(const nx::mediaserver::CmdLineArguments
 
     if (!enforcedMediatorEndpoint.isEmpty())
     {
-        nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
+        nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorAddress({
             enforcedMediatorEndpoint,
-            enforcedMediatorEndpoint);
+            enforcedMediatorEndpoint});
     }
 
     store(new QnNewSystemServerFlagWatcher(commonModule()));
@@ -314,16 +314,17 @@ void QnMediaServerModule::stopStorages()
 
 void QnMediaServerModule::stop()
 {
+    m_upnpDeviceSearcher->pleaseStop();
+    resourceDiscoveryManager()->pleaseStop();
+
     stopStorages();
     stopLongRunnables();
     m_recordingManager->stop();
     m_videoCameraPool->stop();
     m_serverConnector->stop();
     m_statusWatcher->stop();
-
-    m_upnpDeviceSearcher->pleaseStop();
-
     resourceDiscoveryManager()->stop();
+
     m_licenseWatcher->stop();
 }
 

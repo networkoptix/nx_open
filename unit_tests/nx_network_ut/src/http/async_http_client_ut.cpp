@@ -74,17 +74,15 @@ public:
     }
 
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request /*request*/,
-        nx::network::http::Response* const /*response*/,
-        nx::network::http::RequestProcessedHandler completionHandler)
+        http::RequestContext requestContext,
+        http::RequestProcessedHandler completionHandler)
     {
-        EXPECT_EQ(m_expectSsl, connection->isSsl());
-        completionHandler(nx::network::http::RequestResult(
-            nx::network::http::StatusCode::ok,
-            std::make_unique<nx::network::http::BufferSource>(
-                nx::network::http::BufferType("text/plain"), nx::network::http::BufferType("ok"))));
+        EXPECT_EQ(m_expectSsl, requestContext.connection->isSsl());
+
+        completionHandler(http::RequestResult(
+            http::StatusCode::ok,
+            std::make_unique<http::BufferSource>(
+                http::BufferType("text/plain"), http::BufferType("ok"))));
     }
 
 private:
@@ -701,19 +699,16 @@ public:
     }
 
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request /*request*/,
-        nx::network::http::Response* const /*response*/,
+        http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler)
     {
         if (m_requestNumber > 0)
-            connection->takeSocket(); //< Closing connection by destroying socket.
+            requestContext.connection->takeSocket(); //< Closing connection by destroying socket.
 
         completionHandler(
-            nx::network::http::RequestResult(
-                nx::network::http::StatusCode::ok,
-                std::make_unique< nx::network::http::BufferSource >(m_mimeType, m_response)));
+            http::RequestResult(
+                http::StatusCode::ok,
+                std::make_unique<http::BufferSource >(m_mimeType, m_response)));
     }
 
 private:
@@ -1283,108 +1278,6 @@ X-Nx-Result-Code: ok
     ASSERT_TRUE(httpClient.doGet(url));
     ASSERT_NE(nullptr, httpClient.response());
     ASSERT_EQ(nx::network::http::StatusCode::ok, httpClient.response()->statusLine.statusCode);
-}
-
-//-------------------------------------------------------------------------------------------------
-
-class HttpClientAsyncAuthorization:
-    public HttpClientAsync
-{
-    using base_type = HttpClientAsync;
-
-    static constexpr char kTestPath[] = "/HttpClientAsyncAuthorization/saveRequestUser";
-
-public:
-    HttpClientAsyncAuthorization()
-    {
-        m_client = std::make_unique<http::AsyncClient>();
-    }
-
-    ~HttpClientAsyncAuthorization()
-    {
-        m_client->pleaseStopSync();
-    }
-
-protected:
-    virtual void SetUp() override
-    {
-        using namespace std::placeholders;
-
-        base_type::SetUp();
-
-        testHttpServer().setAuthenticationEnabled(true);
-        testHttpServer().registerRequestProcessorFunc(
-            kTestPath,
-            std::bind(&HttpClientAsyncAuthorization::saveRequestUser, this, _1, _2),
-            http::Method::get);
-        ASSERT_TRUE(testHttpServer().bindAndListen());
-    }
-
-    void registerUser(const std::string& username)
-    {
-        const auto password = nx::utils::generateRandomName(7).toStdString();
-        m_usernameToPassword[username] = password;
-        testHttpServer().registerUserCredentials(username.c_str(), password.c_str());
-    }
-
-    void doRequestOnBehaveOfUser(const std::string& username)
-    {
-        const auto password = m_usernameToPassword.at(username);
-        const auto url = url::Builder()
-            .setScheme(http::kUrlSchemeName)
-            .setEndpoint(m_testHttpServer->serverAddress())
-            .setPath(kTestPath)
-            .setUserName(username.c_str())
-            .setPassword(password.c_str()).toUrl();
-
-        std::promise<void> done;
-        m_client->post(
-            [this, url, &done]()
-            {
-                m_client->doGet(
-                    url,
-                    [this, &done]() { done.set_value(); });
-            });
-        done.get_future().wait();
-    }
-
-    void assertLastRequestAuthorizedOnServerAsUser(const std::string& username)
-    {
-        ASSERT_EQ(username, m_requestUser.pop());
-    }
-
-private:
-    std::map<std::string, std::string> m_usernameToPassword;
-    nx::utils::SyncQueue<std::string> m_requestUser;
-    std::unique_ptr<http::AsyncClient> m_client;
-
-    void saveRequestUser(
-        nx::network::http::RequestContext requestContext,
-        nx::network::http::RequestProcessedHandler completionHandler)
-    {
-        auto it = requestContext.request.headers.find(http::header::Authorization::NAME);
-        if (it != requestContext.request.headers.end())
-        {
-            http::header::Authorization authorization;
-            ASSERT_TRUE(authorization.parse(it->second));
-
-            m_requestUser.push(authorization.userid().toStdString());
-        }
-
-        completionHandler(http::StatusCode::ok);
-    }
-};
-
-TEST_F(HttpClientAsyncAuthorization, cached_authorization_of_a_different_user_is_not_used)
-{
-    registerUser("Vasya");
-    registerUser("Petya");
-
-    doRequestOnBehaveOfUser("Vasya");
-    assertLastRequestAuthorizedOnServerAsUser("Vasya");
-
-    doRequestOnBehaveOfUser("Petya");
-    assertLastRequestAuthorizedOnServerAsUser("Petya");
 }
 
 } // namespace test

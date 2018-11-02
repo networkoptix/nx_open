@@ -2320,7 +2320,13 @@ void MediaServerProcess::registerRestHandlers(
      * %param[opt]:option keepSmallChunks If specified, standalone chunks smaller than the detail
      *     level are not removed from the result.
      * %param[opt]:integer limit Maximum number of chunks to return.
-     * %param[opt]:option flat If specified, do not group chunk lists by server.
+     * %param[opt]:option flat If specified, do not group chunk lists by server. This parameter is deprecated.
+     *     Please use parameter groupBy instead.
+    * %param[opt]:enum groupBy group type. Default value is "serverId".
+     *     %value serverId group data by serverId. Result field 'guid' has server Guid value.
+     *     %value cameraId group data by cameraId. Result field 'guid' has camera Guid value.
+     *     %value none do not group data. Result is the flat list of data.
+     * %param[opt]:option desc Sort data in descending order if provided.
      * %return:object JSON object with an error code, error message and the list of JSON objects
      *     in "reply" field: if no "flat" parameter is specified, "reply" field is the list which
      *     contains for each server its GUID (as "guid" field) and the list of chunks (as "periods"
@@ -2440,8 +2446,8 @@ void MediaServerProcess::registerRestHandlers(
      *     The special value "now" requires to retrieve the thumbnail only from the live stream.
      *     <br/>The special value "latest", which is the default value, requires to retrieve
      *     thumbnail from the live stream if possible, otherwise the latest one from the archive.
-     *     <br/>Note: archive extraction can be quite slow operation depending place where it is
-     *     stored.
+     *     <br/>Note: Extraction from the archive can be quite slow depending on the place where the
+     *     frame is stored.
      * %param[opt]:integer rotate Image orientation. Can be 0, 90, 180 or 270 degrees. If the
      *     parameter is absent or equals -1, the image will be rotated as defined in the camera
      *     settings.
@@ -2813,9 +2819,10 @@ nx::vms::api::ServerFlags MediaServerProcess::calcServerFlags()
 {
     nx::vms::api::ServerFlags serverFlags = nx::vms::api::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
 
-#ifdef EDGE_SERVER
-    serverFlags |= vms::api::SF_Edge;
-#endif
+    #if defined(EDGE_SERVER)
+        serverFlags |= nx::vms::api::SF_Edge;
+    #endif
+
     if (QnAppInfo::isBpi())
     {
         serverFlags |= nx::vms::api::SF_IfListCtrl | nx::vms::api::SF_timeCtrl;
@@ -3372,6 +3379,8 @@ bool MediaServerProcess::setUpMediaServerResource(
 
 void MediaServerProcess::stopObjects()
 {
+    commonModule()->setNeedToStop(true);
+
     auto safeDisconnect =
         [this](QObject* src, QObject* dst)
         {
@@ -3418,7 +3427,6 @@ void MediaServerProcess::stopObjects()
         nx::utils::TimerManager::instance()->joinAndDeleteTimer(dumpSystemResourceUsageTaskID);
 
     m_ipDiscovery.reset(); // stop it before IO deinitialized
-    commonModule()->setNeedToStop(true);
     m_multicastHttp.reset();
 
     if (m_universalTcpListener)
@@ -4001,7 +4009,7 @@ void MediaServerProcess::loadResourceParamsData()
 {
     const std::array<const char*,2> kUrlsToLoadResourceData =
     {
-        "http://updates.networkoptix.com/resource_data.json",
+        "http://resources.vmsproxy.com/resource_data.json",
         "http://beta.networkoptix.com/beta-builds/daily/resource_data.json"
     };
 

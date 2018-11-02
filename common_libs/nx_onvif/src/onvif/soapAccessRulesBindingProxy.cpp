@@ -14,59 +14,68 @@ A commercial use license is available from Genivia Inc., contact@genivia.com
 #include "soapAccessRulesBindingProxy.h"
 
 AccessRulesBindingProxy::AccessRulesBindingProxy()
-{	this->soap = soap_new();
-	this->soap_own = true;
-	AccessRulesBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    AccessRulesBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
 }
 
 AccessRulesBindingProxy::AccessRulesBindingProxy(const AccessRulesBindingProxy& rhs)
-{	this->soap = rhs.soap;
-	this->soap_own = false;
-	this->soap_endpoint = rhs.soap_endpoint;
+{
+    this->soap = rhs.soap;
+    this->soap_own = false;
+    this->soap_endpoint = rhs.soap_endpoint;
 }
 
 AccessRulesBindingProxy::AccessRulesBindingProxy(struct soap *_soap)
-{	this->soap = _soap;
-	this->soap_own = false;
-	AccessRulesBindingProxy_init(_soap->imode, _soap->omode);
+{
+    this->soap = _soap;
+    this->soap_own = false;
+    AccessRulesBindingProxy_init(_soap->imode, _soap->omode);
 }
 
 AccessRulesBindingProxy::AccessRulesBindingProxy(const char *endpoint)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	AccessRulesBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
-	soap_endpoint = endpoint;
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    AccessRulesBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+    soap_endpoint = endpoint;
 }
 
 AccessRulesBindingProxy::AccessRulesBindingProxy(soap_mode iomode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	AccessRulesBindingProxy_init(iomode, iomode);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    AccessRulesBindingProxy_init(iomode, iomode);
 }
 
 AccessRulesBindingProxy::AccessRulesBindingProxy(const char *endpoint, soap_mode iomode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	AccessRulesBindingProxy_init(iomode, iomode);
-	soap_endpoint = endpoint;
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    AccessRulesBindingProxy_init(iomode, iomode);
+    soap_endpoint = endpoint;
 }
 
 AccessRulesBindingProxy::AccessRulesBindingProxy(soap_mode imode, soap_mode omode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	AccessRulesBindingProxy_init(imode, omode);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    AccessRulesBindingProxy_init(imode, omode);
 }
 
 AccessRulesBindingProxy::~AccessRulesBindingProxy()
-{	if (this->soap_own)
-		soap_free(this->soap);
+{
+    if (this->soap_own)
+        soap_free(this->soap);
 }
 
 void AccessRulesBindingProxy::AccessRulesBindingProxy_init(soap_mode imode, soap_mode omode)
-{	soap_imode(this->soap, imode);
-	soap_omode(this->soap, omode);
-	soap_endpoint = NULL;
-	static const struct Namespace namespaces[] = {
+{
+    soap_imode(this->soap, imode);
+    soap_omode(this->soap, omode);
+    soap_endpoint = NULL;
+    static const struct Namespace namespaces[] = {
         {"SOAP-ENV", "http://www.w3.org/2003/05/soap-envelope", "http://schemas.xmlsoap.org/soap/envelope/", NULL},
         {"SOAP-ENC", "http://www.w3.org/2003/05/soap-encoding", "http://schemas.xmlsoap.org/soap/encoding/", NULL},
         {"xsi", "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL},
@@ -132,565 +141,591 @@ void AccessRulesBindingProxy::AccessRulesBindingProxy_init(soap_mode imode, soap
         {"onvifThermal", "http://www.onvif.org/ver10/thermal/wsdl", NULL, NULL},
         {NULL, NULL, NULL, NULL}
     };
-	soap_set_namespaces(this->soap, namespaces);
+    soap_set_namespaces(this->soap, namespaces);
 }
 
 AccessRulesBindingProxy *AccessRulesBindingProxy::copy()
-{	AccessRulesBindingProxy *dup = SOAP_NEW_UNMANAGED(AccessRulesBindingProxy);
-	if (dup)
-	{	soap_done(dup->soap);
-		soap_copy_context(dup->soap, this->soap);
-	}
-	return dup;
+{
+    AccessRulesBindingProxy *dup = SOAP_NEW_UNMANAGED(AccessRulesBindingProxy);
+    if (dup)
+    {
+        soap_done(dup->soap);
+        soap_copy_context(dup->soap, this->soap);
+    }
+    return dup;
 }
 
 AccessRulesBindingProxy& AccessRulesBindingProxy::operator=(const AccessRulesBindingProxy& rhs)
-{	if (this->soap != rhs.soap)
-	{	if (this->soap_own)
-			soap_free(this->soap);
-		this->soap = rhs.soap;
-		this->soap_own = false;
-		this->soap_endpoint = rhs.soap_endpoint;
-	}
-	return *this;
+{
+    if (this->soap != rhs.soap)
+    {
+        if (this->soap_own)
+            soap_free(this->soap);
+        this->soap = rhs.soap;
+        this->soap_own = false;
+        this->soap_endpoint = rhs.soap_endpoint;
+    }
+    return *this;
 }
 
 void AccessRulesBindingProxy::destroy()
-{	soap_destroy(this->soap);
-	soap_end(this->soap);
+{
+    soap_destroy(this->soap);
+    soap_end(this->soap);
 }
 
 void AccessRulesBindingProxy::reset()
-{	this->destroy();
-	soap_done(this->soap);
-	soap_initialize(this->soap);
-	AccessRulesBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+{
+    this->destroy();
+    soap_done(this->soap);
+    soap_initialize(this->soap);
+    AccessRulesBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
 }
 
 void AccessRulesBindingProxy::soap_noheader()
-{	this->soap->header = NULL;
+{
+    this->soap->header = NULL;
 }
 
-void AccessRulesBindingProxy::soap_header(char *wsa5__MessageID, struct wsa5__RelatesToType *wsa5__RelatesTo, struct wsa5__EndpointReferenceType *wsa5__From, struct wsa5__EndpointReferenceType *wsa5__ReplyTo, struct wsa5__EndpointReferenceType *wsa5__FaultTo, char *wsa5__To, char *wsa5__Action, struct chan__ChannelInstanceType *chan__ChannelInstance, struct wsdd__AppSequenceType *wsdd__AppSequence, struct _wsse__Security *wsse__Security, char *subscriptionID)
-{	::soap_header(this->soap);
-	this->soap->header->wsa5__MessageID = wsa5__MessageID;
-	this->soap->header->wsa5__RelatesTo = wsa5__RelatesTo;
-	this->soap->header->wsa5__From = wsa5__From;
-	this->soap->header->wsa5__ReplyTo = wsa5__ReplyTo;
-	this->soap->header->wsa5__FaultTo = wsa5__FaultTo;
-	this->soap->header->wsa5__To = wsa5__To;
-	this->soap->header->wsa5__Action = wsa5__Action;
-	this->soap->header->chan__ChannelInstance = chan__ChannelInstance;
-	this->soap->header->wsdd__AppSequence = wsdd__AppSequence;
-	this->soap->header->wsse__Security = wsse__Security;
-	this->soap->header->subscriptionID = subscriptionID;
+void AccessRulesBindingProxy::soap_header(char *wsa5__MessageID, struct wsa5__RelatesToType *wsa5__RelatesTo, struct wsa5__EndpointReferenceType *wsa5__From, struct wsa5__EndpointReferenceType *wsa5__ReplyTo, struct wsa5__EndpointReferenceType *wsa5__FaultTo, char *wsa5__To, char *wsa5__Action, struct chan__ChannelInstanceType *chan__ChannelInstance, struct wsdd__AppSequenceType *wsdd__AppSequence, struct _wsse__Security *wsse__Security, char *SubscriptionId)
+{
+    ::soap_header(this->soap);
+    this->soap->header->wsa5__MessageID = wsa5__MessageID;
+    this->soap->header->wsa5__RelatesTo = wsa5__RelatesTo;
+    this->soap->header->wsa5__From = wsa5__From;
+    this->soap->header->wsa5__ReplyTo = wsa5__ReplyTo;
+    this->soap->header->wsa5__FaultTo = wsa5__FaultTo;
+    this->soap->header->wsa5__To = wsa5__To;
+    this->soap->header->wsa5__Action = wsa5__Action;
+    this->soap->header->chan__ChannelInstance = chan__ChannelInstance;
+    this->soap->header->wsdd__AppSequence = wsdd__AppSequence;
+    this->soap->header->wsse__Security = wsse__Security;
+    this->soap->header->SubscriptionId = SubscriptionId;
 }
 
 ::SOAP_ENV__Header *AccessRulesBindingProxy::soap_header()
-{	return this->soap->header;
+{
+    return this->soap->header;
 }
 
 ::SOAP_ENV__Fault *AccessRulesBindingProxy::soap_fault()
-{	return this->soap->fault;
+{
+    return this->soap->fault;
 }
 
 const char *AccessRulesBindingProxy::soap_fault_string()
-{	return *soap_faultstring(this->soap);
+{
+    return *soap_faultstring(this->soap);
 }
 
 const char *AccessRulesBindingProxy::soap_fault_detail()
-{	return *soap_faultdetail(this->soap);
+{
+    return *soap_faultdetail(this->soap);
 }
 
 int AccessRulesBindingProxy::soap_close_socket()
-{	return soap_closesock(this->soap);
+{
+    return soap_closesock(this->soap);
 }
 
 int AccessRulesBindingProxy::soap_force_close_socket()
-{	return soap_force_closesock(this->soap);
+{
+    return soap_force_closesock(this->soap);
 }
 
 void AccessRulesBindingProxy::soap_print_fault(FILE *fd)
-{	::soap_print_fault(this->soap, fd);
+{
+    ::soap_print_fault(this->soap, fd);
 }
 
 #ifndef WITH_LEAN
 #ifndef WITH_COMPAT
 void AccessRulesBindingProxy::soap_stream_fault(std::ostream& os)
-{	::soap_stream_fault(this->soap, os);
+{
+    ::soap_stream_fault(this->soap, os);
 }
 #endif
 
 char *AccessRulesBindingProxy::soap_sprint_fault(char *buf, size_t len)
-{	return ::soap_sprint_fault(this->soap, buf, len);
+{
+    return ::soap_sprint_fault(this->soap, buf, len);
 }
 #endif
 
 int AccessRulesBindingProxy::GetServiceCapabilities(const char *endpoint, const char *soap_action, _onvifAccessRules__GetServiceCapabilities *onvifAccessRules__GetServiceCapabilities, _onvifAccessRules__GetServiceCapabilitiesResponse &onvifAccessRules__GetServiceCapabilitiesResponse)
 {
-	struct __onvifAccessRules__GetServiceCapabilities soap_tmp___onvifAccessRules__GetServiceCapabilities;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/accessrules/wsdl/GetServiceCapabilities";
-	soap_tmp___onvifAccessRules__GetServiceCapabilities.onvifAccessRules__GetServiceCapabilities = onvifAccessRules__GetServiceCapabilities;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifAccessRules__GetServiceCapabilities(soap, &soap_tmp___onvifAccessRules__GetServiceCapabilities);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifAccessRules__GetServiceCapabilities(soap, &soap_tmp___onvifAccessRules__GetServiceCapabilities, "-onvifAccessRules:GetServiceCapabilities", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifAccessRules__GetServiceCapabilities(soap, &soap_tmp___onvifAccessRules__GetServiceCapabilities, "-onvifAccessRules:GetServiceCapabilities", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifAccessRules__GetServiceCapabilitiesResponse*>(&onvifAccessRules__GetServiceCapabilitiesResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifAccessRules__GetServiceCapabilitiesResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifAccessRules__GetServiceCapabilitiesResponse.soap_get(soap, "onvifAccessRules:GetServiceCapabilitiesResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifAccessRules__GetServiceCapabilities soap_tmp___onvifAccessRules__GetServiceCapabilities;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/accessrules/wsdl/GetServiceCapabilities";
+    soap_tmp___onvifAccessRules__GetServiceCapabilities.onvifAccessRules__GetServiceCapabilities = onvifAccessRules__GetServiceCapabilities;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifAccessRules__GetServiceCapabilities(soap, &soap_tmp___onvifAccessRules__GetServiceCapabilities);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifAccessRules__GetServiceCapabilities(soap, &soap_tmp___onvifAccessRules__GetServiceCapabilities, "-onvifAccessRules:GetServiceCapabilities", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifAccessRules__GetServiceCapabilities(soap, &soap_tmp___onvifAccessRules__GetServiceCapabilities, "-onvifAccessRules:GetServiceCapabilities", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifAccessRules__GetServiceCapabilitiesResponse*>(&onvifAccessRules__GetServiceCapabilitiesResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifAccessRules__GetServiceCapabilitiesResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifAccessRules__GetServiceCapabilitiesResponse.soap_get(soap, "onvifAccessRules:GetServiceCapabilitiesResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int AccessRulesBindingProxy::GetAccessProfileInfo(const char *endpoint, const char *soap_action, _onvifAccessRules__GetAccessProfileInfo *onvifAccessRules__GetAccessProfileInfo, _onvifAccessRules__GetAccessProfileInfoResponse &onvifAccessRules__GetAccessProfileInfoResponse)
 {
-	struct __onvifAccessRules__GetAccessProfileInfo soap_tmp___onvifAccessRules__GetAccessProfileInfo;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/accessrules/wsdl/GetAccessProfileInfo";
-	soap_tmp___onvifAccessRules__GetAccessProfileInfo.onvifAccessRules__GetAccessProfileInfo = onvifAccessRules__GetAccessProfileInfo;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifAccessRules__GetAccessProfileInfo(soap, &soap_tmp___onvifAccessRules__GetAccessProfileInfo);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifAccessRules__GetAccessProfileInfo(soap, &soap_tmp___onvifAccessRules__GetAccessProfileInfo, "-onvifAccessRules:GetAccessProfileInfo", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifAccessRules__GetAccessProfileInfo(soap, &soap_tmp___onvifAccessRules__GetAccessProfileInfo, "-onvifAccessRules:GetAccessProfileInfo", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifAccessRules__GetAccessProfileInfoResponse*>(&onvifAccessRules__GetAccessProfileInfoResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifAccessRules__GetAccessProfileInfoResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifAccessRules__GetAccessProfileInfoResponse.soap_get(soap, "onvifAccessRules:GetAccessProfileInfoResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifAccessRules__GetAccessProfileInfo soap_tmp___onvifAccessRules__GetAccessProfileInfo;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/accessrules/wsdl/GetAccessProfileInfo";
+    soap_tmp___onvifAccessRules__GetAccessProfileInfo.onvifAccessRules__GetAccessProfileInfo = onvifAccessRules__GetAccessProfileInfo;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifAccessRules__GetAccessProfileInfo(soap, &soap_tmp___onvifAccessRules__GetAccessProfileInfo);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifAccessRules__GetAccessProfileInfo(soap, &soap_tmp___onvifAccessRules__GetAccessProfileInfo, "-onvifAccessRules:GetAccessProfileInfo", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifAccessRules__GetAccessProfileInfo(soap, &soap_tmp___onvifAccessRules__GetAccessProfileInfo, "-onvifAccessRules:GetAccessProfileInfo", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifAccessRules__GetAccessProfileInfoResponse*>(&onvifAccessRules__GetAccessProfileInfoResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifAccessRules__GetAccessProfileInfoResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifAccessRules__GetAccessProfileInfoResponse.soap_get(soap, "onvifAccessRules:GetAccessProfileInfoResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int AccessRulesBindingProxy::GetAccessProfileInfoList(const char *endpoint, const char *soap_action, _onvifAccessRules__GetAccessProfileInfoList *onvifAccessRules__GetAccessProfileInfoList, _onvifAccessRules__GetAccessProfileInfoListResponse &onvifAccessRules__GetAccessProfileInfoListResponse)
 {
-	struct __onvifAccessRules__GetAccessProfileInfoList soap_tmp___onvifAccessRules__GetAccessProfileInfoList;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/accessrules/wsdl/GetAccessProfileInfoList";
-	soap_tmp___onvifAccessRules__GetAccessProfileInfoList.onvifAccessRules__GetAccessProfileInfoList = onvifAccessRules__GetAccessProfileInfoList;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifAccessRules__GetAccessProfileInfoList(soap, &soap_tmp___onvifAccessRules__GetAccessProfileInfoList);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifAccessRules__GetAccessProfileInfoList(soap, &soap_tmp___onvifAccessRules__GetAccessProfileInfoList, "-onvifAccessRules:GetAccessProfileInfoList", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifAccessRules__GetAccessProfileInfoList(soap, &soap_tmp___onvifAccessRules__GetAccessProfileInfoList, "-onvifAccessRules:GetAccessProfileInfoList", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifAccessRules__GetAccessProfileInfoListResponse*>(&onvifAccessRules__GetAccessProfileInfoListResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifAccessRules__GetAccessProfileInfoListResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifAccessRules__GetAccessProfileInfoListResponse.soap_get(soap, "onvifAccessRules:GetAccessProfileInfoListResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifAccessRules__GetAccessProfileInfoList soap_tmp___onvifAccessRules__GetAccessProfileInfoList;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/accessrules/wsdl/GetAccessProfileInfoList";
+    soap_tmp___onvifAccessRules__GetAccessProfileInfoList.onvifAccessRules__GetAccessProfileInfoList = onvifAccessRules__GetAccessProfileInfoList;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifAccessRules__GetAccessProfileInfoList(soap, &soap_tmp___onvifAccessRules__GetAccessProfileInfoList);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifAccessRules__GetAccessProfileInfoList(soap, &soap_tmp___onvifAccessRules__GetAccessProfileInfoList, "-onvifAccessRules:GetAccessProfileInfoList", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifAccessRules__GetAccessProfileInfoList(soap, &soap_tmp___onvifAccessRules__GetAccessProfileInfoList, "-onvifAccessRules:GetAccessProfileInfoList", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifAccessRules__GetAccessProfileInfoListResponse*>(&onvifAccessRules__GetAccessProfileInfoListResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifAccessRules__GetAccessProfileInfoListResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifAccessRules__GetAccessProfileInfoListResponse.soap_get(soap, "onvifAccessRules:GetAccessProfileInfoListResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int AccessRulesBindingProxy::GetAccessProfiles(const char *endpoint, const char *soap_action, _onvifAccessRules__GetAccessProfiles *onvifAccessRules__GetAccessProfiles, _onvifAccessRules__GetAccessProfilesResponse &onvifAccessRules__GetAccessProfilesResponse)
 {
-	struct __onvifAccessRules__GetAccessProfiles soap_tmp___onvifAccessRules__GetAccessProfiles;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/accessrules/wsdl/GetAccessProfiles";
-	soap_tmp___onvifAccessRules__GetAccessProfiles.onvifAccessRules__GetAccessProfiles = onvifAccessRules__GetAccessProfiles;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifAccessRules__GetAccessProfiles(soap, &soap_tmp___onvifAccessRules__GetAccessProfiles);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifAccessRules__GetAccessProfiles(soap, &soap_tmp___onvifAccessRules__GetAccessProfiles, "-onvifAccessRules:GetAccessProfiles", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifAccessRules__GetAccessProfiles(soap, &soap_tmp___onvifAccessRules__GetAccessProfiles, "-onvifAccessRules:GetAccessProfiles", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifAccessRules__GetAccessProfilesResponse*>(&onvifAccessRules__GetAccessProfilesResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifAccessRules__GetAccessProfilesResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifAccessRules__GetAccessProfilesResponse.soap_get(soap, "onvifAccessRules:GetAccessProfilesResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifAccessRules__GetAccessProfiles soap_tmp___onvifAccessRules__GetAccessProfiles;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/accessrules/wsdl/GetAccessProfiles";
+    soap_tmp___onvifAccessRules__GetAccessProfiles.onvifAccessRules__GetAccessProfiles = onvifAccessRules__GetAccessProfiles;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifAccessRules__GetAccessProfiles(soap, &soap_tmp___onvifAccessRules__GetAccessProfiles);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifAccessRules__GetAccessProfiles(soap, &soap_tmp___onvifAccessRules__GetAccessProfiles, "-onvifAccessRules:GetAccessProfiles", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifAccessRules__GetAccessProfiles(soap, &soap_tmp___onvifAccessRules__GetAccessProfiles, "-onvifAccessRules:GetAccessProfiles", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifAccessRules__GetAccessProfilesResponse*>(&onvifAccessRules__GetAccessProfilesResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifAccessRules__GetAccessProfilesResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifAccessRules__GetAccessProfilesResponse.soap_get(soap, "onvifAccessRules:GetAccessProfilesResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int AccessRulesBindingProxy::GetAccessProfileList(const char *endpoint, const char *soap_action, _onvifAccessRules__GetAccessProfileList *onvifAccessRules__GetAccessProfileList, _onvifAccessRules__GetAccessProfileListResponse &onvifAccessRules__GetAccessProfileListResponse)
 {
-	struct __onvifAccessRules__GetAccessProfileList soap_tmp___onvifAccessRules__GetAccessProfileList;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/accessrules/wsdl/GetAccessProfileList";
-	soap_tmp___onvifAccessRules__GetAccessProfileList.onvifAccessRules__GetAccessProfileList = onvifAccessRules__GetAccessProfileList;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifAccessRules__GetAccessProfileList(soap, &soap_tmp___onvifAccessRules__GetAccessProfileList);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifAccessRules__GetAccessProfileList(soap, &soap_tmp___onvifAccessRules__GetAccessProfileList, "-onvifAccessRules:GetAccessProfileList", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifAccessRules__GetAccessProfileList(soap, &soap_tmp___onvifAccessRules__GetAccessProfileList, "-onvifAccessRules:GetAccessProfileList", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifAccessRules__GetAccessProfileListResponse*>(&onvifAccessRules__GetAccessProfileListResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifAccessRules__GetAccessProfileListResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifAccessRules__GetAccessProfileListResponse.soap_get(soap, "onvifAccessRules:GetAccessProfileListResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifAccessRules__GetAccessProfileList soap_tmp___onvifAccessRules__GetAccessProfileList;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/accessrules/wsdl/GetAccessProfileList";
+    soap_tmp___onvifAccessRules__GetAccessProfileList.onvifAccessRules__GetAccessProfileList = onvifAccessRules__GetAccessProfileList;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifAccessRules__GetAccessProfileList(soap, &soap_tmp___onvifAccessRules__GetAccessProfileList);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifAccessRules__GetAccessProfileList(soap, &soap_tmp___onvifAccessRules__GetAccessProfileList, "-onvifAccessRules:GetAccessProfileList", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifAccessRules__GetAccessProfileList(soap, &soap_tmp___onvifAccessRules__GetAccessProfileList, "-onvifAccessRules:GetAccessProfileList", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifAccessRules__GetAccessProfileListResponse*>(&onvifAccessRules__GetAccessProfileListResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifAccessRules__GetAccessProfileListResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifAccessRules__GetAccessProfileListResponse.soap_get(soap, "onvifAccessRules:GetAccessProfileListResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int AccessRulesBindingProxy::CreateAccessProfile(const char *endpoint, const char *soap_action, _onvifAccessRules__CreateAccessProfile *onvifAccessRules__CreateAccessProfile, _onvifAccessRules__CreateAccessProfileResponse &onvifAccessRules__CreateAccessProfileResponse)
 {
-	struct __onvifAccessRules__CreateAccessProfile soap_tmp___onvifAccessRules__CreateAccessProfile;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/accessrules/wsdl/CreateAccessProfile";
-	soap_tmp___onvifAccessRules__CreateAccessProfile.onvifAccessRules__CreateAccessProfile = onvifAccessRules__CreateAccessProfile;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifAccessRules__CreateAccessProfile(soap, &soap_tmp___onvifAccessRules__CreateAccessProfile);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifAccessRules__CreateAccessProfile(soap, &soap_tmp___onvifAccessRules__CreateAccessProfile, "-onvifAccessRules:CreateAccessProfile", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifAccessRules__CreateAccessProfile(soap, &soap_tmp___onvifAccessRules__CreateAccessProfile, "-onvifAccessRules:CreateAccessProfile", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifAccessRules__CreateAccessProfileResponse*>(&onvifAccessRules__CreateAccessProfileResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifAccessRules__CreateAccessProfileResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifAccessRules__CreateAccessProfileResponse.soap_get(soap, "onvifAccessRules:CreateAccessProfileResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifAccessRules__CreateAccessProfile soap_tmp___onvifAccessRules__CreateAccessProfile;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/accessrules/wsdl/CreateAccessProfile";
+    soap_tmp___onvifAccessRules__CreateAccessProfile.onvifAccessRules__CreateAccessProfile = onvifAccessRules__CreateAccessProfile;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifAccessRules__CreateAccessProfile(soap, &soap_tmp___onvifAccessRules__CreateAccessProfile);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifAccessRules__CreateAccessProfile(soap, &soap_tmp___onvifAccessRules__CreateAccessProfile, "-onvifAccessRules:CreateAccessProfile", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifAccessRules__CreateAccessProfile(soap, &soap_tmp___onvifAccessRules__CreateAccessProfile, "-onvifAccessRules:CreateAccessProfile", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifAccessRules__CreateAccessProfileResponse*>(&onvifAccessRules__CreateAccessProfileResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifAccessRules__CreateAccessProfileResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifAccessRules__CreateAccessProfileResponse.soap_get(soap, "onvifAccessRules:CreateAccessProfileResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int AccessRulesBindingProxy::ModifyAccessProfile(const char *endpoint, const char *soap_action, _onvifAccessRules__ModifyAccessProfile *onvifAccessRules__ModifyAccessProfile, _onvifAccessRules__ModifyAccessProfileResponse &onvifAccessRules__ModifyAccessProfileResponse)
 {
-	struct __onvifAccessRules__ModifyAccessProfile soap_tmp___onvifAccessRules__ModifyAccessProfile;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/accessrules/wsdl/ModifyAccessProfile";
-	soap_tmp___onvifAccessRules__ModifyAccessProfile.onvifAccessRules__ModifyAccessProfile = onvifAccessRules__ModifyAccessProfile;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifAccessRules__ModifyAccessProfile(soap, &soap_tmp___onvifAccessRules__ModifyAccessProfile);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifAccessRules__ModifyAccessProfile(soap, &soap_tmp___onvifAccessRules__ModifyAccessProfile, "-onvifAccessRules:ModifyAccessProfile", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifAccessRules__ModifyAccessProfile(soap, &soap_tmp___onvifAccessRules__ModifyAccessProfile, "-onvifAccessRules:ModifyAccessProfile", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifAccessRules__ModifyAccessProfileResponse*>(&onvifAccessRules__ModifyAccessProfileResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifAccessRules__ModifyAccessProfileResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifAccessRules__ModifyAccessProfileResponse.soap_get(soap, "onvifAccessRules:ModifyAccessProfileResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifAccessRules__ModifyAccessProfile soap_tmp___onvifAccessRules__ModifyAccessProfile;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/accessrules/wsdl/ModifyAccessProfile";
+    soap_tmp___onvifAccessRules__ModifyAccessProfile.onvifAccessRules__ModifyAccessProfile = onvifAccessRules__ModifyAccessProfile;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifAccessRules__ModifyAccessProfile(soap, &soap_tmp___onvifAccessRules__ModifyAccessProfile);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifAccessRules__ModifyAccessProfile(soap, &soap_tmp___onvifAccessRules__ModifyAccessProfile, "-onvifAccessRules:ModifyAccessProfile", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifAccessRules__ModifyAccessProfile(soap, &soap_tmp___onvifAccessRules__ModifyAccessProfile, "-onvifAccessRules:ModifyAccessProfile", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifAccessRules__ModifyAccessProfileResponse*>(&onvifAccessRules__ModifyAccessProfileResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifAccessRules__ModifyAccessProfileResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifAccessRules__ModifyAccessProfileResponse.soap_get(soap, "onvifAccessRules:ModifyAccessProfileResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int AccessRulesBindingProxy::SetAccessProfile(const char *endpoint, const char *soap_action, _onvifAccessRules__SetAccessProfile *onvifAccessRules__SetAccessProfile, _onvifAccessRules__SetAccessProfileResponse &onvifAccessRules__SetAccessProfileResponse)
 {
-	struct __onvifAccessRules__SetAccessProfile soap_tmp___onvifAccessRules__SetAccessProfile;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/accessrules/wsdl/SetAccessProfile";
-	soap_tmp___onvifAccessRules__SetAccessProfile.onvifAccessRules__SetAccessProfile = onvifAccessRules__SetAccessProfile;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifAccessRules__SetAccessProfile(soap, &soap_tmp___onvifAccessRules__SetAccessProfile);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifAccessRules__SetAccessProfile(soap, &soap_tmp___onvifAccessRules__SetAccessProfile, "-onvifAccessRules:SetAccessProfile", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifAccessRules__SetAccessProfile(soap, &soap_tmp___onvifAccessRules__SetAccessProfile, "-onvifAccessRules:SetAccessProfile", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifAccessRules__SetAccessProfileResponse*>(&onvifAccessRules__SetAccessProfileResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifAccessRules__SetAccessProfileResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifAccessRules__SetAccessProfileResponse.soap_get(soap, "onvifAccessRules:SetAccessProfileResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifAccessRules__SetAccessProfile soap_tmp___onvifAccessRules__SetAccessProfile;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/accessrules/wsdl/SetAccessProfile";
+    soap_tmp___onvifAccessRules__SetAccessProfile.onvifAccessRules__SetAccessProfile = onvifAccessRules__SetAccessProfile;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifAccessRules__SetAccessProfile(soap, &soap_tmp___onvifAccessRules__SetAccessProfile);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifAccessRules__SetAccessProfile(soap, &soap_tmp___onvifAccessRules__SetAccessProfile, "-onvifAccessRules:SetAccessProfile", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifAccessRules__SetAccessProfile(soap, &soap_tmp___onvifAccessRules__SetAccessProfile, "-onvifAccessRules:SetAccessProfile", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifAccessRules__SetAccessProfileResponse*>(&onvifAccessRules__SetAccessProfileResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifAccessRules__SetAccessProfileResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifAccessRules__SetAccessProfileResponse.soap_get(soap, "onvifAccessRules:SetAccessProfileResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int AccessRulesBindingProxy::DeleteAccessProfile(const char *endpoint, const char *soap_action, _onvifAccessRules__DeleteAccessProfile *onvifAccessRules__DeleteAccessProfile, _onvifAccessRules__DeleteAccessProfileResponse &onvifAccessRules__DeleteAccessProfileResponse)
 {
-	struct __onvifAccessRules__DeleteAccessProfile soap_tmp___onvifAccessRules__DeleteAccessProfile;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/accessrules/wsdl/DeleteAccessProfile";
-	soap_tmp___onvifAccessRules__DeleteAccessProfile.onvifAccessRules__DeleteAccessProfile = onvifAccessRules__DeleteAccessProfile;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifAccessRules__DeleteAccessProfile(soap, &soap_tmp___onvifAccessRules__DeleteAccessProfile);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifAccessRules__DeleteAccessProfile(soap, &soap_tmp___onvifAccessRules__DeleteAccessProfile, "-onvifAccessRules:DeleteAccessProfile", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifAccessRules__DeleteAccessProfile(soap, &soap_tmp___onvifAccessRules__DeleteAccessProfile, "-onvifAccessRules:DeleteAccessProfile", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifAccessRules__DeleteAccessProfileResponse*>(&onvifAccessRules__DeleteAccessProfileResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifAccessRules__DeleteAccessProfileResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifAccessRules__DeleteAccessProfileResponse.soap_get(soap, "onvifAccessRules:DeleteAccessProfileResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifAccessRules__DeleteAccessProfile soap_tmp___onvifAccessRules__DeleteAccessProfile;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/accessrules/wsdl/DeleteAccessProfile";
+    soap_tmp___onvifAccessRules__DeleteAccessProfile.onvifAccessRules__DeleteAccessProfile = onvifAccessRules__DeleteAccessProfile;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifAccessRules__DeleteAccessProfile(soap, &soap_tmp___onvifAccessRules__DeleteAccessProfile);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifAccessRules__DeleteAccessProfile(soap, &soap_tmp___onvifAccessRules__DeleteAccessProfile, "-onvifAccessRules:DeleteAccessProfile", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifAccessRules__DeleteAccessProfile(soap, &soap_tmp___onvifAccessRules__DeleteAccessProfile, "-onvifAccessRules:DeleteAccessProfile", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifAccessRules__DeleteAccessProfileResponse*>(&onvifAccessRules__DeleteAccessProfileResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifAccessRules__DeleteAccessProfileResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifAccessRules__DeleteAccessProfileResponse.soap_get(soap, "onvifAccessRules:DeleteAccessProfileResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 /* End of client proxy code */

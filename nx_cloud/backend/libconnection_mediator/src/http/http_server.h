@@ -76,9 +76,7 @@ public:
 
 protected:
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        const nx::network::http::Request& request,
-        nx::utils::stree::ResourceContainer authInfo,
+        nx::network::http::RequestContext requestContext,
         api::ConnectRequest inputData) override;
 
 private:

@@ -45,14 +45,14 @@ public:
 
 protected:
     bool authorize(
-        nx::network::http::HttpServerConnection* const connection,
-        const nx::network::http::Request& request,
-        const nx::utils::stree::AbstractResourceReader& authenticationData,
+        const nx::network::http::RequestContext& requestContext,
         const nx::utils::stree::AbstractResourceReader& dataToAuthorize,
         nx::utils::stree::ResourceContainer* const authzInfo)
     {
-        SocketResourceReader socketResources(*connection->socket());
-        HttpRequestResourceReader httpRequestResources(request);
+        const auto& authenticationData = requestContext.authInfo;
+
+        SocketResourceReader socketResources(*requestContext.connection->socket());
+        HttpRequestResourceReader httpRequestResources(requestContext.request);
 
         // Performing authorization.
         // Authorization is performed here since it can depend on input data which
@@ -80,9 +80,11 @@ protected:
                 QnLexical::serialized(resultCode),
                 static_cast<int>(resultCode),
                 QString());
+
             this->response()->headers.emplace(
                 Qn::API_RESULT_CODE_HEADER_NAME,
                 QnLexical::serialized(resultCode).toLatin1());
+
             this->requestCompleted(std::move(result));
             return false;
         }
@@ -119,27 +121,21 @@ public:
     }
 
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        const nx::network::http::Request& request,
-        nx::utils::stree::ResourceContainer authInfo,
+        nx::network::http::RequestContext requestContext,
         Input inputData) override
     {
-        if (!this->authorize(
-                connection,
-                request,
-                authInfo,
-                inputData,
-                &authInfo))
+        if (!this->authorize(requestContext, inputData, &requestContext.authInfo))
             return;
 
         processRequest(
-            AuthorizationInfo(std::move(authInfo)),
+            std::move(requestContext),
             std::move(inputData),
             [this](api::ResultCode resultCode, Output... outData)
             {
                 this->response()->headers.emplace(
                     Qn::API_RESULT_CODE_HEADER_NAME,
                     QnLexical::serialized(resultCode).toLatin1());
+
                 this->requestCompleted(
                     resultCodeToFusionRequestResult(resultCode),
                     std::move(outData)...);
@@ -148,7 +144,7 @@ public:
 
 protected:
     virtual void processRequest(
-        const AuthorizationInfo& authzInfo,
+        nx::network::http::RequestContext requestContext,
         Input inputData,
         std::function<void(api::ResultCode, Output...)> completionHandler) = 0;
 };
@@ -185,11 +181,14 @@ public:
 
 protected:
     virtual void processRequest(
-        const AuthorizationInfo& authzInfo,
+        nx::network::http::RequestContext requestContext,
         Input inputData,
         std::function<void(api::ResultCode, Output...)> completionHandler) override
     {
-        m_requestFunc(authzInfo, std::move(inputData), std::move(completionHandler));
+        m_requestFunc(
+            AuthorizationInfo(std::exchange(requestContext.authInfo, {})),
+            std::move(inputData),
+            std::move(completionHandler));
     }
 
 private:
@@ -221,25 +220,24 @@ public:
     }
 
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        const nx::network::http::Request& request,
-        nx::utils::stree::ResourceContainer authInfo) override
+        nx::network::http::RequestContext requestContext) override
     {
         if (!this->authorize(
-                connection,
-                request,
-                authInfo,
+                requestContext,
                 nx::utils::stree::ResourceContainer(),
-                &authInfo))
+                &requestContext.authInfo))
+        {
             return;
+        }
 
         processRequest(
-            AuthorizationInfo(std::move(authInfo)),
+            std::move(requestContext),
             [this](api::ResultCode resultCode, Output... outData)
             {
                 this->response()->headers.emplace(
                     Qn::API_RESULT_CODE_HEADER_NAME,
                     QnLexical::serialized(resultCode).toLatin1());
+
                 this->requestCompleted(
                     resultCodeToFusionRequestResult(resultCode),
                     std::move(outData)...);
@@ -248,7 +246,7 @@ public:
 
 protected:
     virtual void processRequest(
-        const AuthorizationInfo& authzInfo,
+        nx::network::http::RequestContext requestContext,
         std::function<void(api::ResultCode, Output...)> completionHandler) = 0;
 };
 
@@ -278,10 +276,12 @@ public:
 
 protected:
     virtual void processRequest(
-        const AuthorizationInfo& authzInfo,
+        nx::network::http::RequestContext requestContext,
         std::function<void(api::ResultCode, Output...)> completionHandler) override
     {
-        m_requestFunc(authzInfo, std::move(completionHandler));
+        m_requestFunc(
+            AuthorizationInfo(std::exchange(requestContext.authInfo, {})),
+            std::move(completionHandler));
     }
 
 private:
@@ -320,22 +320,20 @@ public:
     }
 
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        const nx::network::http::Request& request,
-        nx::utils::stree::ResourceContainer authInfo,
+        nx::network::http::RequestContext requestContext,
         InputData... inputData) override
     {
         if (!this->authorize(
-                connection,
-                request,
-                authInfo,
+                requestContext,
                 nx::utils::stree::ResourceContainer(),
-                &authInfo))
+                &requestContext.authInfo))
+        {
             return;
+        }
 
         m_requestFunc(
-            connection,
-            AuthorizationInfo(std::move(authInfo)),
+            requestContext.connection,
+            AuthorizationInfo(std::exchange(requestContext.authInfo, {})),
             std::move(inputData)...,
             [this](
                 api::ResultCode resultCode,
