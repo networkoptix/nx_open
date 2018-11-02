@@ -46,8 +46,6 @@ protected:
     uint32_t m_totalBits;
     uint32_t* m_buffer;
     uint32_t* m_initBuffer;
-    static int m_maskInitialized;
-    static uint32_t m_masks[INT_BIT + 1];
 };
 
 class BitStreamReader: public BitStream
