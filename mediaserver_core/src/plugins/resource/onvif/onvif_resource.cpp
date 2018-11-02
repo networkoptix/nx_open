@@ -3330,7 +3330,7 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
 
 void QnPlOnvifResource::checkMaxFps(onvifXsd__VideoEncoderConfiguration* configuration)
 {
-    if (!configuration->RateControl)
+    if (!configuration || !configuration->RateControl || !configuration->Resolution)
         return;
     if (m_primaryStreamCapabilities.resolutions.isEmpty())
         return;

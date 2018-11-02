@@ -57,7 +57,10 @@ namespace {
     }
 }
 
-QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(nx::metrics::Storage* metrics, AVCodecID codecId)
+QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(
+    const DecoderConfig& config,
+    nx::metrics::Storage* metrics, 
+    AVCodecID codecId)
     :
     QnVideoTranscoder(codecId),
     m_decodedVideoFrame(new CLVideoDecoderOutput()),
@@ -71,6 +74,7 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(nx::metrics::Storage* metrics, 
     m_droppedFrames(0),
     m_useRealTimeOptimization(false),
     m_outPacket(av_packet_alloc()),
+    m_config(config),
     m_metrics(metrics)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -212,7 +216,7 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
 
     QnFfmpegVideoDecoder* decoder = m_videoDecoders[video->channelNumber];
     if (!decoder)
-        decoder = m_videoDecoders[video->channelNumber] = new QnFfmpegVideoDecoder(video->compressionType, video, m_mtMode);
+        decoder = m_videoDecoders[video->channelNumber] = new QnFfmpegVideoDecoder(m_config, video->compressionType, video, m_mtMode);
 
     if (result)
         *result = QnCompressedVideoDataPtr();
