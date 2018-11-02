@@ -49,13 +49,107 @@ public:
      * \returns                         Whether the given period intersects with
      *                                  any of the periods in this time period list.
      */
-    bool intersects(const QnTimePeriod &period) const;
+    bool intersects(const QnTimePeriod& period) const;
 
     bool containTime(qint64 timeMs) const;
 
     bool containPeriod(const QnTimePeriod &period) const;
 
     QnTimePeriodList intersected(const QnTimePeriod &period) const;
+
+
+    template <class Iterator>
+    static QnTimePeriodList filterTimePeriodsAsc(
+        Iterator itr,
+        Iterator endItr,
+        int detailLevel,
+        bool keepSmallChunks,
+        int limit)
+    {
+        QnTimePeriodList result;
+        if (endItr <= itr)
+            return result;
+        result.push_back(QnTimePeriod(itr->startTimeMs, itr->durationMs));
+
+        for (++itr; itr != endItr; ++itr)
+        {
+            QnTimePeriod& last = result.last();
+            if (last.isInfinite())
+                break;
+
+            const qint64 lastEndTime = last.endTimeMs();
+            if (itr->startTimeMs - lastEndTime < detailLevel)
+            {
+                last.durationMs = itr->isInfinite() ? QnTimePeriod::infiniteDuration()
+                    : qMax(last.durationMs, itr->endTimeMs() - last.startTimeMs);
+            }
+            else
+            {
+                if (last.durationMs < detailLevel && !keepSmallChunks)
+                    result.pop_back();
+                if (result.size() >= limit)
+                    break;
+                result.push_back(QnTimePeriod(itr->startTimeMs, itr->durationMs));
+            }
+        }
+
+        if (result.last().durationMs < detailLevel && !keepSmallChunks)
+            result.pop_back();
+        return result;
+    }
+
+    template <class Iterator>
+    static QnTimePeriodList filterTimePeriodsDesc(
+        Iterator itr,
+        Iterator endItr,
+        int detailLevel,
+        bool keepSmallChunks,
+        int limit)
+    {
+        QnTimePeriodList result;
+        if (endItr <= itr)
+            return result;
+        --endItr;
+        result.push_back(QnTimePeriod(endItr->startTimeMs, endItr->durationMs));
+
+        for (--endItr; endItr >= itr; --endItr)
+        {
+            QnTimePeriod& last = result.last();
+            if (endItr->endTimeMs() > last.startTimeMs - detailLevel)
+            {
+                const qint64 lastEndTime = last.endTimeMs();
+                last.startTimeMs = qMin(last.startTimeMs, endItr->startTimeMs);
+                if (!last.isInfinite())
+                    last.durationMs = lastEndTime - last.startTimeMs;
+            }
+            else
+            {
+                if (!last.isInfinite() && last.durationMs < detailLevel && !keepSmallChunks)
+                    result.pop_back();
+                if (result.size() >= limit)
+                    break;
+                result.push_back(QnTimePeriod(endItr->startTimeMs, endItr->durationMs));
+            }
+        }
+
+        if (!result.last().isInfinite() && result.last().durationMs < detailLevel && !keepSmallChunks)
+            result.pop_back();
+        return result;
+    }
+
+    template <class Iterator>
+    static QnTimePeriodList filterTimePeriods(
+        Iterator itr,
+        Iterator endItr,
+        int detailLevel,
+        bool keepSmalChunks,
+        int limit,
+        Qt::SortOrder sortOrder)
+    {
+        return sortOrder == Qt::SortOrder::AscendingOrder
+            ? filterTimePeriodsAsc(itr, endItr, detailLevel, keepSmalChunks, limit)
+            : filterTimePeriodsDesc(itr, endItr, detailLevel, keepSmalChunks, limit);
+    }
 
     /** Get list of periods, that starts in the target period. */
     QnTimePeriodList intersectedPeriods(const QnTimePeriod &period) const;
@@ -119,7 +213,10 @@ public:
     qint64 roundTimeToPeriodUSec(qint64 timeUsec, bool searchForward) const;
 
     /** Merge some time period lists into one. */
-    static QnTimePeriodList mergeTimePeriods(const std::vector<QnTimePeriodList>& periods, int limit = INT_MAX);
+    static QnTimePeriodList mergeTimePeriods(
+        const std::vector<QnTimePeriodList>& periods,
+        int limit = std::numeric_limits<int>::max(),
+        Qt::SortOrder sortOrder = Qt::SortOrder::AscendingOrder);
 
     /** Update tail of the period list with provided tail.
      *

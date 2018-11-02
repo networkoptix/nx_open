@@ -16,7 +16,7 @@ from .context_logger import ContextLogger
 _logger = ContextLogger(__name__, 'http')
 
 
-STANDARD_PASSWORDS = ['admin', 'qweasd123']  # do not mask these passwords in log files
+STANDARD_PASSWORDS = ['admin', 'qweasd12345']  # do not mask these passwords in log files
 REST_API_TIMEOUT_SEC = 20
 
 

@@ -14,10 +14,16 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+nx::utils::SoftwareVersion UpdateContents::getVersion() const
+{
+    return nx::utils::SoftwareVersion(info.version);
+}
+
 // Check if we can apply this update.
 bool UpdateContents::isValid() const
 {
     return missingUpdate.empty()
+        && !info.version.isEmpty()
         && invalidVersion.empty()
         && clientPackage.isValid()
         && error == nx::update::InformationError::noError;

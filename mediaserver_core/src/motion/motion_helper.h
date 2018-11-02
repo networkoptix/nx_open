@@ -8,6 +8,7 @@
 #include "motion_archive.h"
 #include "core/resource/resource_fwd.h"
 #include <nx/mediaserver/server_module_aware.h>
+#include <api/helpers/chunks_request_data.h>
 
 class QnTimePeriodList;
 
@@ -21,8 +22,7 @@ public:
     // write motion data to file
     void saveToArchive(const QnConstMetaDataV1Ptr& data);
 
-    QnTimePeriodList matchImage(const QList<QRegion>& region, const QnResourceList& resList, qint64 msStartTime, qint64 msEndTime, int detailLevel);
-    QnTimePeriodList matchImage(const QList<QRegion>& region, const QnResourcePtr& res, qint64 msStartTime, qint64 msEndTime, int detailLevel);
+    QnTimePeriodList matchImage(const QnChunksRequestData& request);
     QnMotionArchiveConnectionPtr createConnection(const QnResourcePtr& res, int channel);
 
     QnMotionArchive* getArchive(const QnResourcePtr& res, int channel);
@@ -38,15 +38,6 @@ private:
 
     // create Find mask by region
     void createMask(const QRegion& region);
-
-    // match one motion image by mask
-    void matchImage(
-        const QList<QRegion>& regions,
-        const QnResourcePtr& res,
-        qint64 msStartTime,
-        qint64 msEndTime,
-        int detailLevel,
-        std::vector<QnTimePeriodList>* const timePeriods );
 
 private:
     typedef QPair<QnNetworkResourcePtr, int> MotionArchiveKey;
