@@ -23,10 +23,10 @@ def get_data_structure(data_structure_name, context):
 
 
 @register.simple_tag
-def is_external_file(data_structure_name, context):
+def is_external_file_or_image(data_structure_name, context):
     query = DataStructure.objects.filter(context=context, name=data_structure_name)
     if query.exists():
-        return query[0].type == DataStructure.DATA_TYPES.external_file
+        return query[0].type in [DataStructure.DATA_TYPES.external_file, DataStructure.DATA_TYPES.external_image]
     return False
 
 

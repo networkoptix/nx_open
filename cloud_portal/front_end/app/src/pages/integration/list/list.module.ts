@@ -16,9 +16,10 @@ import { ComponentsModule } from '../../../components/components.module';
         CommonModule,
         BrowserModule,
         UpgradeModule,
+        RouterModule,
         NgbModule,
         TranslateModule,
-        ComponentsModule
+        ComponentsModule,
     ],
     providers: [],
     declarations: [

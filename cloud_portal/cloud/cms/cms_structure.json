@@ -391,8 +391,15 @@
             "label": "Logo",
             "value": "",
             "description": "Logo for integration",
-            "type": "image",
+            "type": "external_image",
             "optional": true
+          },
+          {
+            "name": "shortDescription",
+            "label": "Description",
+            "value": "",
+            "description": "A short description for the integration tile.",
+            "type": "long_text"
           },
           {
             "name": "testedVersions",
@@ -488,6 +495,17 @@
         "translatable": false,
         "values": [
           {
+            "name": "instructionVideo",
+            "label": "Instruction Video",
+            "value": "",
+            "description": "A youtube embed link for the instruction video.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "regex": "^https?:\\/\\/(?:(?:www\\.youtube\\.com\\/(?:embed\\/|watch\\?v=)|youtu\\.be\\/)[\\w]+|vimeo\\.com\\/[\\d]+)$"
+            }
+          },
+          {
             "name": "downloadLinks",
             "label": "Download links or Instructions",
             "value": "",
@@ -502,11 +520,66 @@
             "type": "html"
           },
           {
-            "name": "file",
-            "label": "File",
+            "name": "arm-file",
+            "label": "Download for ARM",
             "value": "",
             "description": "",
-            "type": "file",
+            "type": "external_file",
+            "optional": true,
+            "public": false
+          },
+          {
+            "name": "linux-x86-file",
+            "label": "Download for Linux - x86",
+            "value": "",
+            "description": "",
+            "type": "external_file",
+            "optional": true,
+            "public": false
+          },
+          {
+            "name": "linux-x86-file",
+            "label": "Download for Linux - x64",
+            "value": "",
+            "description": "",
+            "type": "external_file",
+            "optional": true,
+            "public": false
+          },
+          {
+            "name": "macos-file",
+            "label": "Download for MacOs",
+            "value": "",
+            "description": "",
+            "type": "external_file",
+            "optional": true,
+            "public": false
+          },
+          {
+            "name": "rpi-file",
+            "label": "Download for RPI",
+            "value": "",
+            "description": "",
+            "type": "external_file",
+            "optional": true,
+            "public": false
+          },
+          {
+            "name": "windows-x86-file",
+            "label": "Download for Windows - x86",
+            "value": "",
+            "description": "",
+            "type": "external_file",
+            "optional": true,
+            "public": false
+          },
+          {
+            "name": "windows-x64-file",
+            "label": "Download for Windows x64",
+            "value": "",
+            "description": "",
+            "type": "external_file",
+            "optional": true,
             "public": false
           }
         ]
@@ -520,14 +593,14 @@
             "label": "Screenshot 1",
             "value": "",
             "description": "",
-            "type": "image"
+            "type": "external_image"
           },
           {
             "name": "screenshot2",
             "label": "Screenshot 2",
             "value": "",
             "description": "",
-            "type": "image",
+            "type": "external_image",
             "optional": true
           },
           {
@@ -535,7 +608,7 @@
             "label": "Screenshot 3",
             "value": "",
             "description": "",
-            "type": "image",
+            "type": "external_image",
             "optional": true
           }
         ]

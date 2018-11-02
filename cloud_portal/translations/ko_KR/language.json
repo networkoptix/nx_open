@@ -62,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "고급 뷰어",
-      "description": "Can view live video, browse the archive, control PTZ etc"
+      "description": "라이브 비디오를보고, 아카이브를 검색하고, PTZ 등을 제어 할 수 있습니다."
     },
     "Administrator": {
       "label": "관리자",
@@ -177,7 +177,7 @@
     "confirmUnshareAction": "삭제",
     "successDisconnected": "시스템이 성공적으로 %PRODUCT_NAME%에서 분리 되었습니다.",
     "successDeleted": "시스템 {{systemName}} 이 (가) 귀하의 계정에서 성공적으로 삭제되었습니다.",
-    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
+    "successMerge": "시스템 {{systemName}} 이 {{systemName}} 과 병합되었습니다.",
     "permissionsRemoved": "권한이 {{email}} 에서 제거 되었습니다."
   },
   "account": {
@@ -279,7 +279,7 @@
       "copyActiveText": "클립보드에 복사됨"
     },
     "systemOffline": "시스템 오프라인",
-    "systemHasNoCameras": "NO CAMERAS",
+    "systemHasNoCameras": "카메라 없음",
     "cameraStates": {
       "offline": "오프라인",
       "error": "오류",

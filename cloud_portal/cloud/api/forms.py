@@ -1,9 +1,13 @@
 from django import forms
+from django.core.validators import EmailValidator
+from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.contrib.auth.models import Group
 from dal import autocomplete
 
+from api.account_backend import AccountBackend
+from api.models import Account
 from cms.models import Customization, UserGroupsToCustomizationPermissions
 
 User = get_user_model()
@@ -65,3 +69,17 @@ class GroupAdminForm(forms.ModelForm):
         # Save many-to-many data
         self.save_m2m()
         return instance
+
+
+class UserInviteFrom(forms.Form):
+    email = forms.CharField(max_length=100, validators=[EmailValidator()])
+
+    def add_user(self, request, email):
+        if AccountBackend.is_email_in_portal(email):
+            messages.error(request, "User already has a cloud account!")
+            return Account.objects.get(email=email).id
+
+        messages.success(request, "User has been invited to cloud.")
+        user = Account(email=email)
+        user.save()
+        return user.id

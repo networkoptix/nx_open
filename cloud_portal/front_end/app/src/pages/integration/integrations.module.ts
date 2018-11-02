@@ -9,14 +9,15 @@ import { NxIntegrationsComponent } from './integrations.component';
 
 import { TranslateModule }             from '@ngx-translate/core';
 import { ComponentsModule }            from '../../components/components.module';
-import { IntegrationsListModule } from './list/list.module';
+import { IntegrationsListModule }      from './list/list.module';
+import { IntegrationDetailModule }     from './details/details.module';
+import { NxIntegrationDetailsComponent } from './details/details.component';
 // import { NxUsersDetailComponent }   from '../details/users/users.component';
 // import { NxOtherDetailsComponent }  from '../details/others/others.component';
 
 const appRoutes: Routes = [
-    {
-        path    : 'integrations', component: NxIntegrationsComponent,
-    }
+    { path    : 'integrations', component: NxIntegrationsComponent },
+    { path    : 'integration/details/:plugin', component: NxIntegrationDetailsComponent }
 ];
 
 @NgModule({
@@ -28,6 +29,7 @@ const appRoutes: Routes = [
         ComponentsModule,
         FormsModule,
         IntegrationsListModule,
+        IntegrationDetailModule,
 
         RouterModule.forChild(appRoutes)
     ],

@@ -12,7 +12,7 @@ import { ComponentsModule } from '../../components/components.module';
 
 const appRoutes: Routes = [
     {
-        path: 'content', component: NxContentComponent,
+        path: 'new-content', component: NxContentComponent,
     }
 ];
 

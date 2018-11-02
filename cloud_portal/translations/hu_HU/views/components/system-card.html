@@ -3,13 +3,13 @@
     <div class="card-body">
         <h2 class="mb-3">Az Ön rendszere</h2>
         <p>
-            <button class="btn btn-default" ng-click="rename()">Renszer átnevezése</button>
+            <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Renszer átnevezése</button>
         </p>
         <p>
-            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Egyesítés egy másik rendszerrel</button>
+            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Egyesítés egy másik rendszerrel</button>
         </p>
         <hr />
-        <button class="btn btn-default" ng-click="disconnect()">Leválasztás
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Leválasztás
             <span class="product-name">&nbsp;%PRODUCT_NAME%</span> termékről</button>
     </div>
 </div>

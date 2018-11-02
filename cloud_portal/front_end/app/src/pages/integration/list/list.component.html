@@ -1,38 +1,44 @@
-<div class="">
-    <div class="row p-0 m-0">
-        <div *ngFor="let plugin of list" class="list col-12 col-md-6 col-lg-4 col-xl-3 p-2">
-            <div class="card hoverable m-0">
-                <div class="card--header clearfix">
-                    <div class="float-left"><img [src]="plugin.information.logo" style="width: 100px;"></div>
-                    <div class="card--header-info">
-                        <div >v. {{ plugin.information.version }}</div>
-                        <div class="release_date" [innerHtml]="plugin.date || 'missing date'"></div>
-                        <div class="platforms">
-                            <img  src="/static/icons/integration_tile_os_arm.svg">
-                            <img src="/static/icons/integration_tile_os_linux.svg">
-                            <img src="/static/icons/integration_tile_os_windows.svg">
-                        </div>
-                        <!--<div *ngFor="let platform of plugin.information.platforms">-->
-                            <!--{{platform}}-->
-                        <!--</div>-->
+
+<nx-pre-loader type="page" *ngIf="!list.length"></nx-pre-loader>
+
+<div class="row p-0 m-0" *ngIf="list.length">
+    <div *ngFor="let plugin of list" class="list col-12 col-md-6 col-lg-4 col-xl-3 p-2">
+
+        <a class="plugin m-0"
+           [routerLink]="['/integration/details', plugin.id]">
+
+            <nx-block type="fixed" hoverable>
+                <header>
+                    <div class="card--header-logo">
+                        <img [src]="plugin.information.logo || defaultLogo">
                     </div>
-                </div>
-                <div class="card--body">
-                    <div><h3 [innerHtml]="plugin.information.name"></h3></div>
-                    <div class="card--body-by" *ngIf="plugin.provider">By <a target="_blank" [href]="plugin.providerUrl" [innerHtml]="plugin.provider"></a></div>
-                    <div class="card--body-descr" [innerHtml]="plugin.overview.description || 'missing description'"></div>
-                </div>
-                <div class="card--footer">
-                    <h3 class="float-left mr-1" *ngIf="plugin.isRecommended">
-                        <span class="text-capitalize badge badge-primary" translate>Recommended</span>
-                    </h3>
-                    <!--  TODO: more properties are needed (Nick?) -->
-                    <!--<h3 class="float-left" *ngFor="let type of plugin.information.type">-->
-                        <!--<span class="text-capitalize badge badge-secondary" [innerHtml]="type"></span>-->
+                    <div class="card--header-info">
+                        <div class="version">v. {{ plugin.information.version }}</div>
+                        <div class="platforms">
+                            <div *ngFor="let os of config.icons.platforms;">
+                                <img [src]="os.src" *ngIf="isSupported(plugin, os.name)">
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <nx-section>
+                    <div class="card--body-name"><h3 [innerHtml]="plugin.information.name"></h3></div>
+                    <div class="card--body-descr">{{plugin.information.shortDescription}}</div>
+                </nx-section>
+
+                <footer>
+                    <!--<h3 class="float-left m-0 mt-1 mr-1" >-->
+                    <!--<span class="tag-primary" translate>Recommended</span>-->
                     <!--</h3>-->
-                </div>
-            </div>
-        </div>
+
+                    <h3 class="float-left m-0 mt-1 mr-1" *ngFor="let type of plugin.information.type">
+                        <span class="tag" [innerHtml]="type"></span>
+                    </h3>
+                </footer>
+            </nx-block>
+        </a>
+
     </div>
 </div>
 

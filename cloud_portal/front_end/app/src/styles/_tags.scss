@@ -1,0 +1,43 @@
+@import '../../styles/custom/custom_palette';
+@import '../../styles/theme_palette';
+@import '../../styles/theme_variables';
+
+#tag {
+    height           : 20px;
+    font-family      : $font-family-regular;
+    font-size        : rem(12px);
+    padding          : 0 8px 2px;
+    border-radius    : 2px;
+    color            : $light16;
+    background-color : $light4;
+    cursor           : pointer;
+    display          : flex;
+    align-items      : center;
+}
+
+.tag {
+    @extend #tag;
+    
+    &:hover {
+        background-color : $light5;
+    }
+    
+    &:active {
+        background-color : $light6;
+    }
+}
+
+.tag-primary {
+    @extend #tag;
+    
+    background-color : $brand_core;
+    color            : $light1;
+    
+    &:hover {
+        background-color : $brand_d1;
+    }
+    
+    &:active {
+        background-color : $brand_d2;
+    }
+}

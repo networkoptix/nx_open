@@ -211,7 +211,7 @@ ${MAC OS TAB}                         //a[@id="MacOS"]
 ${RELEASES TAB}                       //span[@class='tab-heading' and text()='${RELEASES TEXT}']/..
 ${PATCHES TAB}                        //span[@class='tab-heading' and text()='${PATCHES TEXT}']/..
 ${BETAS TAB}                          //span[@class='tab-heading' and text()='${BETAS TEXT}']/..
-${RELEASE NUMBER}                     //div[contains(@class,"active")]//h1/b
+${RELEASE NUMBER}                     //div[contains(@class,"active")]//h1
 
 #About
 ${ABOUT CLOUD NAME}                        //span[contains(@class,'product-name') and text()='${PRODUCT_NAME}']

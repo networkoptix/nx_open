@@ -209,8 +209,16 @@ export class NxConfigService {
                     }
                 ]
             },
+            icons : {
+                platforms : [
+                    { name: 'arm', src: '/static/icons/integration_tile_os_arm.svg' },
+                    { name: 'linux', src: '/static/icons/integration_tile_os_linux.svg' },
+                    { name: 'windows', src: '/static/icons/integration_tile_os_windows.svg' }
+                ]
+            },
             webclient                     : {
                 useServerTime            : true,
+                useSystemTime            : true,
                 disableVolume            : true,
                 reloadInterval           : 5 * 1000,
                 leftPanelPreviewHeight   : 128,

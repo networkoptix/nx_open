@@ -2,29 +2,43 @@
 @import '../../../../styles/custom/custom_palette';
 @import '../../../../styles/theme_variables';
 
+.plugin {
+    text-decoration : none;
+    color           : inherit;
+}
+
 .card {
     &--header {
-        background-color : $light2;
-        padding          : rem(12px) 1rem;
-        border-bottom    : 1px solid $light3;
-        height           : rem(80px);
+        &-logo {
+            float       : left;
+            display     : flex;
+            align-items : center;
+            height      : 100%;
+            max-width   : 160px;
+            
+            img {
+                height : 48px;
+            }
+        }
         
         &-info {
             float      : right;
             text-align : right;
             
             > div {
-                color       : $light10;
+                color       : $light12;
                 font-size   : $font-size-sm;
-                line-height : rem(14px);
+                line-height : 1rem;
             }
             
             .release_date {
-                margin-top : .25rem;
+                margin-top : rem(2px);
             }
             
             .platforms {
-                margin-top : .25rem;
+                margin-top      : rem(6px);
+                display         : flex;
+                justify-content : flex-end;
                 
                 img {
                     height      : 1rem;
@@ -36,8 +50,12 @@
     }
     
     &--body {
-        padding : .5rem 1rem 1rem;
-        height  : 200px;
+        &-name {
+            h3 {
+                margin      : 0;
+                line-height : 24px;
+            }
+        }
         
         &-by {
             color     : $light16;
@@ -45,17 +63,9 @@
         }
         
         &-descr {
-            margin-top : .5rem;
-        }
-    }
-    
-    &--footer {
-        position : absolute;
-        bottom   : 0;
-        padding  : .5rem 1rem 1rem;
-        
-        > h3 {
-            font-family : "robotomedium", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-family : $font-family-regular;
+            font-size   : $font-size-base;
+            margin-top  : .5rem;
         }
     }
 }

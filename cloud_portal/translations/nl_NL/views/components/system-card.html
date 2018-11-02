@@ -3,13 +3,13 @@
     <div class="card-body">
         <h2 class="mb-3">Uw systeem</h2>
         <p>
-            <button class="btn btn-default" ng-click="rename()">Wijzig de naam van het systeem</button>
+            <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Wijzig de naam van het systeem</button>
         </p>
         <p>
-            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Samenvoegen met een ander systeem</button>
+            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Samenvoegen met een ander systeem</button>
         </p>
         <hr />
-        <button class="btn btn-default" ng-click="disconnect()">Onttkoppel van
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Onttkoppel van
             <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
     </div>
 </div>

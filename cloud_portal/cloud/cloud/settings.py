@@ -293,13 +293,16 @@ MEDIA_URL = '/static/integrations/'
 
 
 # START s3 config
-AWS_STORAGE_BUCKET_NAME = conf['bucket'] if 'bucket' in conf and not LOCAL_ENVIRONMENT else 'cloud-portal'
-AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
-AWS_S3_OBJECT_PARAMETERS = {
-    'CacheControl': 'max-age=86400',
-}
+AWS_STORAGE_BUCKET_NAME = conf['bucket']
+
+S3_DOMAIN = conf['s3_domain'] if 's3_domain' in conf else '%s.s3.amazonaws.com'
+AWS_S3_CUSTOM_DOMAIN = S3_DOMAIN % AWS_STORAGE_BUCKET_NAME
+# mysite is a default name for the admin site
 INTEGRATION_FILE_STORAGE = 'mysite.storage_backends.MediaStorage'
 # END s3
+
+if LOCAL_ENVIRONMENT:
+    AWS_STORAGE_BUCKET_NAME = 'cloud-portal'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

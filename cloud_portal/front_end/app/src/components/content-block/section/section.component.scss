@@ -5,35 +5,52 @@
     &--body {
         border-top : 1px solid $light3;
         padding    : 1rem;
-
+        
         &-subheader {
             height     : 2rem;
             margin-top : .5rem;
-
+            
             h3 {
-                margin: 0;
+                margin : 0;
             }
         }
-
+        
+        &-logo {
+            float       : left;
+            display     : flex;
+            align-items : center;
+            height      : 100%;
+            max-width   : 160px;
+            
+            img {
+                height : 48px;
+            }
+        }
+        
         &-spacer {
             margin-top : 1rem;
         }
-
+        
         &.section {
             padding-top : 0;
         }
+        
+        &.fixed {
+            height   : 200px;
+            overflow : hidden;
+        }
     }
-
+    
     &--separator {
         margin        : 0 -1rem !important;
         height        : 1px;
         border-bottom : 1px solid $light3;
     }
-
+    
     &.gray {
         background-color : $light4;
         border           : none;
-
+        
         .card--separator {
             border-bottom-color : $light6;
         }

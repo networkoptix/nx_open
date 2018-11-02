@@ -15,6 +15,11 @@ cloud_db:
 cloud_portal:
     url: 'https://$CLOUD_PORTAL_HOST'
 
+trafficRelay:
+    host: 'relay-bur.vmsproxy.hdw.mx'
+
+bucket: 'cloud-portal'
+
 smtp:
     host: 'email-smtp.us-east-1.amazonaws.com'
     user: 'AKIAJ6MLW7ZT7WXXXOIA'

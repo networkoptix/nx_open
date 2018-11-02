@@ -1,3 +1,4 @@
+import json
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
@@ -5,7 +6,7 @@ from cloud import settings
 from api.helpers.exceptions import api_success, handle_exceptions
 
 from cms.controllers.filldata import process_context_structure
-from cms.models import Context, Product, ProductCustomizationReview, ProductType, UserGroupsToCustomizationPermissions
+from cms.models import Context, DataStructure, Product, ProductCustomizationReview, ProductType, UserGroupsToCustomizationPermissions
 
 CLOUD_PORTAL = ProductType.PRODUCT_TYPES.cloud_portal
 INTEGRATION = ProductType.PRODUCT_TYPES.integration
@@ -50,6 +51,13 @@ def make_integrations_json(integrations, contexts=[], show_pending=False):
                     integration_dict[context_name][ds_name] = datastructure.find_actual_value(product=integration,
                                                                                               version_id=current_version,
                                                                                               draft=show_pending)
+                    # If the DataStructure type is select and the multi flag is true we need to make the value an array
+                    if datastructure.type == DataStructure.DATA_TYPES.select and\
+                            'multi' in datastructure.meta_settings and\
+                            datastructure.meta_settings['multi']:
+                        # Starts as a stringified list then turned into a list of strings
+                        # "['1', '2', '3']" -> [u'1', u'2', u'3'] -> ['1', '2', '3']
+                        integration_dict[context_name][ds_name] = map(str, json.loads(integration_dict[context_name][ds_name]))
 
             for global_context in global_contexts:
                 process_context_structure(cloud_portal, global_context, integration_dict, None, current_version, False, False)
@@ -80,7 +88,8 @@ def get_integrations(request):
         return api_success([])
     integration_list = []
     drafts = Product.objects.filter(product_type__type=INTEGRATION,
-                                    contentversion__productcustomizationreview__state=PENDING)
+                                    contentversion__productcustomizationreview__state=PENDING,
+                                    contentversion__productcustomizationreview__customization__name=settings.CUSTOMIZATION)
 
     # Users with manager permissions all accepted products and pending drafts
     if UserGroupsToCustomizationPermissions.check_permission(request.user, settings.CUSTOMIZATION, 'cms.publish_version'):

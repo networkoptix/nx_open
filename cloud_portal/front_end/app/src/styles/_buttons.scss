@@ -17,7 +17,7 @@
     text-overflow : ellipsis;
     overflow      : hidden;
     line-height   : 1rem;
-
+    
     &:hover,
     &:active,
     &.active,
@@ -25,10 +25,10 @@
     &.focus {
         box-shadow : none;
     }
-
+    
     &:disabled {
         opacity : 0.3;
-
+        
         & * {
             pointer-events : none;
         }
@@ -44,12 +44,12 @@ button, .btn {
     color            : $dark9;
     background-color : $light4;
     box-shadow       : inset 0 -1px 0 0 $light7;
-
+    
     &:hover:not([disabled]):not(.disabled) {
         background-color : $light5;
         box-shadow       : inset 0 -1px 0 0 $light8;
     }
-
+    
     &:active,
     &.active {
         background-color : $light6 !important;
@@ -62,17 +62,17 @@ button, .btn {
     background-color : $brand_core;
     border-color     : transparent;
     box-shadow       : inset 0 -1px 0 0 $brand_d2;
-
+    
     &:hover:not([disabled]):not(.disabled) {
         background-color : $brand_d1;
         box-shadow       : inset 0 -1px 0 0 $brand_d3;
     }
-
+    
     &:focus,
     &.focus {
-
+    
     }
-
+    
     &:active,
     &.active {
         background-color : $brand_d2 !important;
@@ -94,28 +94,46 @@ button, .btn {
     display          : flex;
     align-content    : center;
     justify-content  : center;
-
+    
     input {
         position : absolute;
         opacity  : 0;
     }
-
+    
     &:hover:not([disabled]):not(.disabled) {
         background-color : $light5;
     }
-
+    
     &:active,
     &.active {
         background-color : $light6 !important;
     }
-
+    
     &.selected {
-        color : $light1;
+        color            : $light1;
         background-color : $light16 !important;
     }
 }
 
 // (END) Overwrite Boostrap section ******
+
+.btn-back {
+    padding-left : 0;
+    
+    .back-arrow {
+        width               : 40px;
+        height              : 32px;
+        background-image    : url('/static/images/tutorial_arrow.png') !important;
+        background-repeat   : no-repeat;
+        background-size     : 20px 20px;
+        background-position : center;
+        transform           : scaleX(-1);
+        
+        @media only screen and (-webkit-min-device-pixel-ratio : 2), only screen and (min-device-pixel-ratio : 2) {
+            background-image : url('/static/images/tutorial_arrow@2x.png') !important;
+        }
+    }
+}
 
 .btn-dropdown-toggle {
     background-color : transparent;

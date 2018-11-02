@@ -1,25 +1,25 @@
 import {
-    Component, ElementRef, OnInit, ViewChild, ViewEncapsulation
+    Component, ElementRef, Input, OnInit, ViewChild, ViewEncapsulation
 } from '@angular/core';
 
 /* Usage
-<nx-content-block-section>
+<nx-section>
     <header>
         Section title
     </header>
     Section body
-</nx-content-block-section>
+</nx-section>
 
-<nx-content-block-section>
+<nx-section>
     SECTION without header
-</nx-content-block-section>
+</nx-section>
 */
 
 @Component({
-    selector     : 'nx-content-block-section',
+    selector     : 'nx-section',
     templateUrl  : 'section.component.html',
-    styleUrls    : [ 'section.component.scss' ],
     encapsulation: ViewEncapsulation.None,
+    styleUrls    : [ 'section.component.scss' ],
 })
 export class NxContentBlockSectionComponent implements OnInit {
 

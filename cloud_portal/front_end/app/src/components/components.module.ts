@@ -11,6 +11,7 @@ import { NxRadioComponent }               from './radio/radio.component';
 import { MenuModule }                     from './menu/menu.module';
 import { NxContentBlockComponent }        from './content-block/content-block.component';
 import { NxContentBlockSectionComponent } from './content-block/section/section.component';
+import { NxMultiLineEllipsisComponent }   from './multi-line-ellipsis/mle.component';
 
 @NgModule({
     imports        : [
@@ -26,6 +27,7 @@ import { NxContentBlockSectionComponent } from './content-block/section/section.
         NxRadioComponent,
         NxContentBlockComponent,
         NxContentBlockSectionComponent,
+        NxMultiLineEllipsisComponent,
     ],
     entryComponents: [
         NxProcessButtonComponent,
@@ -34,6 +36,7 @@ import { NxContentBlockSectionComponent } from './content-block/section/section.
         NxRadioComponent,
         NxContentBlockComponent,
         NxContentBlockSectionComponent,
+        NxMultiLineEllipsisComponent,
     ],
     providers      : [
         NxProcessButtonComponent,
@@ -42,6 +45,7 @@ import { NxContentBlockSectionComponent } from './content-block/section/section.
         NxRadioComponent,
         NxContentBlockComponent,
         NxContentBlockSectionComponent,
+        NxMultiLineEllipsisComponent,
     ],
     exports        : [
         NxProcessButtonComponent,
@@ -50,6 +54,7 @@ import { NxContentBlockSectionComponent } from './content-block/section/section.
         NxRadioComponent,
         NxContentBlockComponent,
         NxContentBlockSectionComponent,
+        NxMultiLineEllipsisComponent,
         MenuModule,
     ]
 })
