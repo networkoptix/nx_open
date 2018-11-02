@@ -7,7 +7,6 @@
 #include <utils/common/util.h>
 #include <nx/utils/log/log.h>
 #include <nx/network/ping.h>
-#include <nx/network/ip_range_checker.h>
 
 #include <api/app_server_connection.h>
 #include <nx/mediaserver/event/event_connector.h>
