@@ -242,32 +242,6 @@ QList<QHostAddress> allLocalIpV4Addresses()
     return rez;
 }
 
-QList<QNetworkAddressEntry> getAllIPv4AddressEntries()
-{
-    QList<QNetworkInterface> inter_list = QNetworkInterface::allInterfaces(); // all interfaces
-
-    QList<QNetworkAddressEntry> ipv4_enty_list;
-
-    for (int il = 0; il < inter_list.size(); ++il)
-    {
-        // for each interface get addr entries
-        const QList<QNetworkAddressEntry>& addr_enntry_list = inter_list.at(il).addressEntries();
-
-        // navigate all entries for current interface and peek up IPV4 only
-        for (int al = 0; al < addr_enntry_list.size(); ++al)
-        {
-            const QNetworkAddressEntry& adrentr = addr_enntry_list.at(al);
-            if (QAbstractSocket::IPv4Protocol == adrentr.ip().protocol() && // if it has IPV4
-                adrentr.ip()!=QHostAddress::LocalHost &&// if this is not 0.0.0.0 or 127.0.0.1
-                adrentr.netmask().toIPv4Address()!=0) // and mask !=0
-                ipv4_enty_list.push_back(addr_enntry_list.at(al));
-
-        }
-    }
-
-    return ipv4_enty_list;
-}
-
 QString getIfaceIPv4Addr(const QNetworkInterface& iface)
 {
     for (const auto& addr : iface.addressEntries())
@@ -557,12 +531,6 @@ QHostAddress getGatewayOfIf(const QString& netIf)
 utils::MacAddress getMacByIP(const QString& host, bool net)
 {
     return getMacByIP(resolveAddress(host), net);
-}
-
-bool isIpv4Address(const QString& addr)
-{
-    int ip4Addr = inet_addr(addr.toLatin1().data());
-    return ip4Addr != 0 && ip4Addr != -1;
 }
 
 QHostAddress resolveAddress(const QString& addrString)
