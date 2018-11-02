@@ -89,9 +89,6 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(AddressFilters)
  */
 QList<HostAddress> NX_NETWORK_API allLocalAddresses(AddressFilters filter);
 
-//returns list of all IPV4 QNetworkAddressEntries of current machine; this function takes time;
-QList<QNetworkAddressEntry> NX_NETWORK_API getAllIPv4AddressEntries();
-
 /**
  * Set filter for interface list
  */
@@ -102,7 +99,6 @@ void NX_NETWORK_API removeARPrecord(const QHostAddress& ip);
 utils::MacAddress NX_NETWORK_API getMacByIP(const QString& host, bool net = true);
 utils::MacAddress NX_NETWORK_API getMacByIP(const QHostAddress& ip, bool net = true);
 
-bool NX_NETWORK_API isIpv4Address(const QString& addr);
 // TODO: #ak Remove this method if favor of AddressResolver.
 QHostAddress NX_NETWORK_API resolveAddress(const QString& addr);
 

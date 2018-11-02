@@ -89,69 +89,6 @@ bool QnInterfaceAndAddr::isHostBelongToIpv4Network(const QHostAddress& address) 
         broadcastAddress().toIPv4Address());
 }
 
-QnInterfaceAndAddrList getAllIPv4Interfaces(InterfaceListPolicy policy)
-{
-    struct LocalCache
-    {
-        QnInterfaceAndAddrList value;
-        QElapsedTimer timer;
-        QnMutex guard;
-    };
-
-    static LocalCache caches[(int)InterfaceListPolicy::count];
-
-    LocalCache &cache = caches[(int)policy];
-    {
-        // speed optimization
-        QnMutexLocker lock(&cache.guard);
-        enum { kCacheTimeout = 5000 };
-        if (!cache.value.isEmpty() && (cache.timer.elapsed() < kCacheTimeout))
-            return cache.value;
-    }
-
-    QList<QnInterfaceAndAddr> result;
-    QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
-    for (const QNetworkInterface &iface: interfaces)
-    {
-        if (!(iface.flags() & QNetworkInterface::IsUp) || (iface.flags() & QNetworkInterface::IsLoopBack))
-            continue;
-
-#if defined(Q_OS_LINUX) && defined(__arm__)
-        /* skipping 1.2.3.4 address on ISD */
-        if (iface.name() == "usb0" && interfaces.size() > 1)
-            continue;
-#endif
-
-        bool addInterfaceAnyway = policy == InterfaceListPolicy::allowInterfacesWithoutAddress;
-        QList<QNetworkAddressEntry> addresses = iface.addressEntries();
-        for (const QNetworkAddressEntry& address: addresses)
-        {
-            const bool isLocalHost = (address.ip() == QHostAddress::LocalHost);
-            const bool isIpV4 = (address.ip().protocol() == QAbstractSocket::IPv4Protocol);
-
-            if (isIpV4 && !isLocalHost)
-            {
-                if (allowedInterfaces.isEmpty() || allowedInterfaces.contains(address.ip()))
-                {
-                    result.append(QnInterfaceAndAddr(iface.name(), address.ip(), address.netmask(), iface));
-                    addInterfaceAnyway = false;
-                    if (policy != InterfaceListPolicy::keepAllAddressesPerInterface)
-                        break;
-                }
-            }
-        }
-
-        if (addInterfaceAnyway)
-            result.append(QnInterfaceAndAddr(iface.name(), QHostAddress(), QHostAddress(), iface));
-    }
-
-    QnMutexLocker lock(&cache.guard);
-    cache.timer.restart();
-    cache.value = result;
-
-    return result;
-}
-
 namespace {
 
 static QString ipv6AddrStringWithIfaceNameToAddrStringWithIfaceId(
@@ -557,12 +494,6 @@ QHostAddress getGatewayOfIf(const QString& netIf)
 utils::MacAddress getMacByIP(const QString& host, bool net)
 {
     return getMacByIP(resolveAddress(host), net);
-}
-
-bool isIpv4Address(const QString& addr)
-{
-    int ip4Addr = inet_addr(addr.toLatin1().data());
-    return ip4Addr != 0 && ip4Addr != -1;
 }
 
 QHostAddress resolveAddress(const QString& addrString)
