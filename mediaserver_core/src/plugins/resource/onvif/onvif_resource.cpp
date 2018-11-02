@@ -314,6 +314,7 @@ QnPlOnvifResource::QnPlOnvifResource(QnCommonModule* commonModule):
     m_timeDrift(0),
     m_isRelayOutputInversed(false),
     m_fixWrongInputPortNumber(false),
+    m_fixWrongOutputPortToken(false),
     m_inputMonitored(false),
     m_clearInputsTimeoutUSec(0),
     m_eventMonitorType(emtNone),
@@ -714,6 +715,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(
     m_inputPortCount = 0;
     m_isRelayOutputInversed = resourceData.value(QString("relayOutputInversed"), false);
     m_fixWrongInputPortNumber = resourceData.value(QString("fixWrongInputPortNumber"), false);
+    m_fixWrongOutputPortToken = resourceData.value(QString("fixWrongOutputPortToken"), false);
     //registering onvif event handler
     std::vector<QnPlOnvifResource::RelayOutputInfo> relayOutputs;
     fetchRelayOutputs(&relayOutputs);
@@ -1165,10 +1167,15 @@ void QnPlOnvifResource::notificationReceived(
         std::find_if(
             m_relayOutputInfo.begin(),
             m_relayOutputInfo.end(),
-            [&handler](const RelayOutputInfo& outputInfo)
+            [value = handler.source.front().value.toLower(),
+                isWrongToken = m_fixWrongOutputPortToken]
+            (const RelayOutputInfo& outputInfo)
             {
-                return QString::fromStdString(outputInfo.token) == handler.source.front().value;
-            }) != m_relayOutputInfo.end();
+                QString token = QString::fromStdString(outputInfo.token).toLower();
+                if (isWrongToken && !token.isEmpty())
+                    token = token.split('-').back();
+                return  token == value;
+             }) != m_relayOutputInfo.end();
 
     const bool sourceNameHasPrefixToIgnore = (!m_portNamePrefixToIgnore.isEmpty()
          && handler.source.front().value.startsWith(m_portNamePrefixToIgnore));

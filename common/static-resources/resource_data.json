@@ -1008,23 +1008,21 @@
             "relayOutputInversed": true,
             "portNamePrefixToIgnore": "AlarmOut"
         },
-    {
+        {
             "keys": [
             	"DW|DWC-PF5M1TIR",
             	"DW|DWC-MB45DiA",
             	"DW|DWC-MV85DiA",
             	"DW|DWC-PB6M4T"
             ],
-      "fixWrongInputPortNumber": true
-    },
+            "fixWrongInputPortNumber": true
+        },
         {
             "keys": [
-                "DW|DWC-PF5M1TIR",
-                "DW|DWC-MB45DiA",
-                "DW|DWC-MV85DiA",
-                "DW|DWC-PB6M4T"
+            	"DW|DWC-MD421D",
+            	"DW|DWC-MV421D"
             ],
-            "fixWrongInputPortNumber": true
+            "fixWrongOutputPortToken": true
         },
         {
             "keys": [

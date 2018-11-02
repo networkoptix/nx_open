@@ -540,6 +540,7 @@ private:
     std::vector<RelayOutputInfo> m_relayOutputInfo;
     bool m_isRelayOutputInversed;
     bool m_fixWrongInputPortNumber;
+    bool m_fixWrongOutputPortToken;
     std::map<QString, RelayInputState> m_relayInputStates;
     std::string m_deviceIOUrl;
     QString m_onvifNotificationSubscriptionID;
