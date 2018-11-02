@@ -71,8 +71,7 @@ private:
     BasicTestFixture* m_relayTest;
 };
 
-class BasicTestFixture:
-    public ::testing::Test
+class BasicTestFixture
 {
 public:
     enum Flag
@@ -91,8 +90,12 @@ public:
     void setInitFlags(int flags);
     network::SocketAddress relayInstanceEndpoint(RelayPtrList::size_type index) const;
 
+    void addRelayStartupArgument(
+        const std::string& name,
+        const std::string& value);
+
 protected:
-    virtual void SetUp() override;
+    void SetUp();
 
     void startServer();
     void stopServer();
@@ -133,6 +136,12 @@ private:
         unregistered
     };
 
+    struct StartupArgument
+    {
+        std::string name;
+        std::string value;
+    };
+
     QnMutex m_mutex;
     const nx::network::http::BufferType m_staticMsgBody;
     nx::hpm::MediatorFunctionalTest m_mediator;
@@ -145,6 +154,7 @@ private:
     std::optional<std::string> m_remotePeerName;
     MediatorApiProtocol m_mediatorApiProtocol = MediatorApiProtocol::http;
     int m_initFlags = 0;
+    std::vector<StartupArgument> m_relayStartupArguments;
 
     nx::utils::SyncQueue<HttpRequestResult> m_httpRequestResults;
     nx::network::http::BufferType m_expectedMsgBody;

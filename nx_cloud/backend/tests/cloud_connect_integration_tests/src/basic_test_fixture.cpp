@@ -125,6 +125,13 @@ network::SocketAddress BasicTestFixture::relayInstanceEndpoint(RelayPtrList::siz
     return m_relays[index]->moduleInstance()->httpEndpoints()[0];
 }
 
+void BasicTestFixture::addRelayStartupArgument(
+    const std::string& name,
+    const std::string& value)
+{
+    m_relayStartupArguments.push_back({name, value});
+}
+
 void BasicTestFixture::startRelays()
 {
     for (int i = 0; i < m_relayCount; ++i)
@@ -140,6 +147,13 @@ void BasicTestFixture::startRelay(int index)
 
     std::string dataDirString = std::string("relay_") + std::to_string(index);
     newRelay->addArg("-dataDir", dataDirString.c_str());
+
+    for (const auto& argument: m_relayStartupArguments)
+    {
+        newRelay->removeArgByName(argument.name.c_str());
+        newRelay->addArg(
+            lm("--%1=%2").args(argument.name, argument.value).toStdString().c_str());
+    }
 
     if ((bool) m_disconnectedPeerTimeout)
     {
@@ -207,10 +221,23 @@ nx::utils::Url BasicTestFixture::relayUrl(int relayNum) const
 {
     NX_ASSERT(relayNum < (int) m_relays.size());
 
-    auto relayUrlString = lm("http://%1/")
-        .arg(m_relays[relayNum]->moduleInstance()->httpEndpoints()[0].toStdString()).toQString();
+    const auto& httpEndpoints = m_relays[relayNum]->moduleInstance()->httpEndpoints();
+    const auto& httpsEndpoints = m_relays[relayNum]->moduleInstance()->httpsEndpoints();
 
-    return nx::utils::Url(relayUrlString);
+    if (!httpEndpoints.empty())
+    {
+        return nx::utils::Url(lm("http://%1/")
+            .arg(httpEndpoints[0].toStdString()).toQString());
+    }
+    else if (!httpsEndpoints.empty())
+    {
+        return nx::utils::Url(lm("https://%1/")
+            .arg(httpsEndpoints[0].toStdString()).toQString());
+    }
+    else
+    {
+        return nx::utils::Url();
+    }
 }
 
 void BasicTestFixture::restartMediator()
