@@ -75,13 +75,14 @@ void StreamTransformingAsyncChannel::stopWhileInAioThread()
 
 void StreamTransformingAsyncChannel::tryToCompleteUserTasks()
 {
-    std::vector<std::shared_ptr<UserTask>> tasksToProcess;
-    tasksToProcess.reserve(m_userTaskQueue.size());
-    for (const auto& task: m_userTaskQueue)
-        tasksToProcess.push_back(task);
-
+    const auto tasksToProcess = m_userTaskQueue;
     // m_userTaskQueue can be changed during processing.
+    tryToCompleteUserTasks(tasksToProcess);
+}
 
+void StreamTransformingAsyncChannel::tryToCompleteUserTasks(
+    const std::deque<std::shared_ptr<UserTask>>& tasksToProcess)
+{
     for (const std::shared_ptr<UserTask>& task: tasksToProcess)
     {
         utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
@@ -297,13 +298,19 @@ void StreamTransformingAsyncChannel::onRawDataWritten(
         completedIoRange.second = m_rawWriteQueue.end();
     }
 
+    const auto userTasks = m_userTaskQueue;
+
     if (completeRawSendTasks(completedIoRange, sysErrorCode) == UserHandlerResult::thisDeleted)
         return;
 
     if (sysErrorCode == SystemError::noError)
     {
         scheduleNextRawSendTaskIfAny();
-        tryToCompleteUserTasks();
+
+        // NOTE: Not trying to complete user tasks added in send user handler 
+        // (in completeRawSendTasks) because aio thread could have been changed by user.
+        // So, we will complete user tasks in a proper aio thread on the next event.
+        tryToCompleteUserTasks(userTasks);
         return;
     }
 

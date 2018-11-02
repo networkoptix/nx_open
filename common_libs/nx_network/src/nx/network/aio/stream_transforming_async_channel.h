@@ -125,6 +125,8 @@ private:
     virtual void stopWhileInAioThread() override;
 
     void tryToCompleteUserTasks();
+    void tryToCompleteUserTasks(
+        const std::deque<std::shared_ptr<UserTask>>& userTaskQueue);
     void processTask(UserTask* task);
     void processReadTask(ReadTask* task);
     void processWriteTask(WriteTask* task);
