@@ -9,22 +9,24 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/mac_address.h>
 
-namespace nx {
-namespace network {
-
-static const int ping_timeout = 300;
+namespace nx::network {
 
 struct CLSubNetState;
 
-typedef QList<quint32> CLIPList;
+using CLIPList = QList<quint32>;
 
 struct NX_NETWORK_API QnInterfaceAndAddr
 {
-    QnInterfaceAndAddr(QString name_, QHostAddress address_, QHostAddress netMask_, const QNetworkInterface& _netIf)
-        : name(name_),
-          address(address_),
-          netMask(netMask_),
-          netIf(_netIf)
+    QnInterfaceAndAddr(
+        const QString& name,
+        const QHostAddress& address,
+        const QHostAddress& netMask,
+        const QNetworkInterface& netIf)
+        :
+        name(name),
+        address(address),
+        netMask(netMask),
+        netIf(netIf)
     {
     }
 
@@ -36,8 +38,6 @@ struct NX_NETWORK_API QnInterfaceAndAddr
     QHostAddress address;
     QHostAddress netMask;
     QNetworkInterface netIf;
-
-
 };
 
 inline bool operator ==(const QnInterfaceAndAddr& lhs, const QnInterfaceAndAddr& rhs)
@@ -59,20 +59,22 @@ enum class InterfaceListPolicy
     oneAddressPerInterface, //< Return interface and its first IP address.
     allowInterfacesWithoutAddress, //< Return interface even it doesn't have any IP addresses.
     keepAllAddressesPerInterface, //< Return several records if interface has several IP addresses.
-    count
+    count,
 };
 
-/**
- * Returns list of network interfaces.
- * @param InterfaceListPolicy: see description above.
- */
+using QnInterfaceAndAddrList = QList<QnInterfaceAndAddr>;
 
-typedef QList<QnInterfaceAndAddr> QnInterfaceAndAddrList;
-QList<QnInterfaceAndAddr> NX_NETWORK_API getAllIPv4Interfaces(
+/**
+ * @param InterfaceListPolicy: see description above.
+ * @return List of network interfaces.
+ */
+NX_NETWORK_API QList<QnInterfaceAndAddr> getAllIPv4Interfaces(
     InterfaceListPolicy policy = InterfaceListPolicy::oneAddressPerInterface);
 
-// returns list of IPv4 addresses of current machine. Skip 127.0.0.1 and addresses we can't bind to.
-QList<QHostAddress> NX_NETWORK_API allLocalIpV4Addresses();
+/**
+ * @return List of IPv4 addresses of current machine. Skips 127.0.0.1 and addresses we can't bind to.
+ */
+NX_NETWORK_API QList<QHostAddress> allLocalIpV4Addresses();
 
 /** Filter mask for allLocalAddresses()*/
 enum AddressFilter
@@ -84,41 +86,46 @@ enum AddressFilter
 };
 Q_DECLARE_FLAGS(AddressFilters, AddressFilter)
 Q_DECLARE_OPERATORS_FOR_FLAGS(AddressFilters)
-/**
- * returns list of all IP addresses of current machine. Filters result by filter param.
- */
-QList<HostAddress> NX_NETWORK_API allLocalAddresses(AddressFilters filter);
 
 /**
- * Set filter for interface list
+ * @return List of all IP addresses of current machine. Filters result by filter param.
  */
-void NX_NETWORK_API setInterfaceListFilter(const QList<QHostAddress>& ifList);
+NX_NETWORK_API QList<HostAddress> allLocalAddresses(AddressFilters filter);
 
-void NX_NETWORK_API removeARPrecord(const QHostAddress& ip);
+/**
+ * Set filter for interface list.
+ */
+NX_NETWORK_API void setInterfaceListFilter(const QList<QHostAddress>& ifList);
 
-utils::MacAddress NX_NETWORK_API getMacByIP(const QString& host, bool net = true);
-utils::MacAddress NX_NETWORK_API getMacByIP(const QHostAddress& ip, bool net = true);
+NX_NETWORK_API void removeARPrecord(const QHostAddress& ip);
+
+NX_NETWORK_API utils::MacAddress getMacByIP(const QString& host, bool net = true);
+
+NX_NETWORK_API utils::MacAddress getMacByIP(const QHostAddress& ip, bool net = true);
 
 // TODO: #ak Remove this method if favor of AddressResolver.
-QHostAddress NX_NETWORK_API resolveAddress(const QString& addr);
+NX_NETWORK_API QHostAddress resolveAddress(const QString& addr);
 
-int NX_NETWORK_API strEqualAmount(const char* str1, const char* str2);
-bool NX_NETWORK_API isNewDiscoveryAddressBetter(
+NX_NETWORK_API int strEqualAmount(const char* str1, const char* str2);
+
+NX_NETWORK_API bool isNewDiscoveryAddressBetter(
     const HostAddress& host,
     const QHostAddress& newAddress,
     const QHostAddress& oldAddress );
 
-static const int MAC_ADDR_LEN = 18;
-/*!
-    \param host If function succeeds *host contains pointer to statically-allocated buffer,
-        so it MUST NOT be freed!
-    \return 0 on success, -1 in case of error. Use errno to get error code
-*/
-int NX_NETWORK_API getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host);
-QString NX_NETWORK_API getMacFromPrimaryIF();
+static constexpr int MAC_ADDR_LEN = 18;
+/**
+ * @param host If function succeeds *host contains pointer to statically-allocated buffer,
+ * so it MUST NOT be freed!
+ * @return 0 on success, -1 in case of error. Use errno to get error code.
+ * TODO #ak Refactor: make memory safe, introduce some high-level type for MAC.
+ */
+NX_NETWORK_API int getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host);
 
-QSet<QString> NX_NETWORK_API getLocalIpV4AddressList();
-std::set<HostAddress> NX_NETWORK_API getLocalIpV4HostAddressList();
+NX_NETWORK_API QString getMacFromPrimaryIF();
 
-} // namespace network
-} // namespace nx
+NX_NETWORK_API QSet<QString> getLocalIpV4AddressList();
+
+NX_NETWORK_API std::set<HostAddress> getLocalIpV4HostAddressList();
+
+} // namespace nx::network
