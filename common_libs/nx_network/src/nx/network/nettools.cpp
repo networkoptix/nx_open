@@ -520,8 +520,7 @@ bool isNewDiscoveryAddressBetter(
     const QHostAddress& oldAddress)
 {
     // TODO: Compare binary values, not strings!
-    // Introduce some maxPrefix(...) function and use it here.
-    // E.g., auto eq1 = maxPrefix(host, newAddress).size();
+    // TODO: Rename or move this function out of here.
 
     const auto eq1 = nx::utils::maxPrefix(
         host.toString().toStdString(),
