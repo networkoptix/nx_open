@@ -100,8 +100,10 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
 
                 item->setFlags(item->flags() & ~Qt::ItemIsEnabled);
                 items.insert(pluginId, {item, {}});
-                parentItem = item;
             }
+
+            if (items.contains(pluginId))
+                parentItem = items.value(pluginId).item;
 
             auto& pluginNode = usePluginName ? items[pluginId] : defaultPluginNode;
             if (!groupId.isEmpty() && !pluginNode.groups.contains(groupId))
@@ -121,6 +123,9 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
                 pluginNode.groups.insert(groupId, item);
                 parentItem = item;
             }
+
+            if (!groupId.isEmpty() && pluginNode.groups.contains(groupId))
+                parentItem = pluginNode.groups.value(groupId);
 
             addItem(parentItem, descriptor.item.name.value, pluginId, descriptor.getId());
         }
