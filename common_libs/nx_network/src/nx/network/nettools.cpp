@@ -335,44 +335,6 @@ struct PinagableT
     }
 };
 
-QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHostAddress& endAddr, int threads)
-{
-    NX_INFO(kLogTag, "About to find all ip responded to ping....");
-    QTime time;
-    time.restart();
-
-    quint32 curr = startAddr.toIPv4Address();
-    quint32 maxaddr = endAddr.toIPv4Address();
-
-    QList<PinagableT> hostslist;
-
-    while(curr < maxaddr)
-    {
-        PinagableT t;
-        t.addr = curr;
-        hostslist.push_back(t);
-
-        ++curr;
-    }
-
-    QThreadPool* global = QThreadPool::globalInstance();
-    for (int i = 0; i < threads; ++i ) global->releaseThread();
-    QtConcurrent::blockingMap(hostslist, &PinagableT::f);
-    for (int i = 0; i < threads; ++i )global->reserveThread();
-
-    QList<QHostAddress> result;
-
-    for(const PinagableT& addr: hostslist)
-    {
-        if (addr.online)
-            result.push_back(QHostAddress(addr.addr));
-    }
-
-    NX_INFO(kLogTag, lm("Done. time elapsed = %1").arg(time.elapsed()));
-    NX_INFO(kLogTag, lm("Ping results %1").container(result));
-    return result;
-}
-
 //{ windows
 #if defined(Q_OS_WIN)
 
