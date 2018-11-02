@@ -526,7 +526,7 @@
             "description": "",
             "type": "external_file",
             "optional": true,
-            "public": false
+            "public": true
           },
           {
             "name": "linux-x86-file",
@@ -535,7 +535,7 @@
             "description": "",
             "type": "external_file",
             "optional": true,
-            "public": false
+            "public": true
           },
           {
             "name": "linux-x86-file",
@@ -544,7 +544,7 @@
             "description": "",
             "type": "external_file",
             "optional": true,
-            "public": false
+            "public": true
           },
           {
             "name": "macos-file",
@@ -553,7 +553,7 @@
             "description": "",
             "type": "external_file",
             "optional": true,
-            "public": false
+            "public": true
           },
           {
             "name": "rpi-file",
@@ -562,7 +562,7 @@
             "description": "",
             "type": "external_file",
             "optional": true,
-            "public": false
+            "public": true
           },
           {
             "name": "windows-x86-file",
@@ -571,7 +571,7 @@
             "description": "",
             "type": "external_file",
             "optional": true,
-            "public": false
+            "public": true
           },
           {
             "name": "windows-x64-file",
@@ -580,7 +580,7 @@
             "description": "",
             "type": "external_file",
             "optional": true,
-            "public": false
+            "public": true
           }
         ]
       },
