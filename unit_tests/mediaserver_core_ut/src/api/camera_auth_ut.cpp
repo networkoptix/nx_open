@@ -34,6 +34,20 @@ private:
     std::unique_ptr<MediaServerLauncher> m_server;
 };
 
+TEST_F(CameraAuthUt, amendTransaction_ParamData)
+{
+    // const auto originalTran = createTranWithTestParamData();
+    // const auto amendedTran = whenTransactionProcessed(originalTran);
+    // thenItShouldBeAmended(originalTran, amendedTran);
+}
+
+TEST_F(CameraAuthUt, amendTransaction_ParamWithRefData)
+{
+    // const auto originalTran = createTranWithTestParamWithRefData();
+    // const auto amendedTran = whenTransactionProcessed(originalTran);
+    // thenItShouldBeAmended(originalTran, amendedTran);
+}
+
 TEST_F(CameraAuth, SetGetViaNetworkResource)
 {
     // whenServerLaunched();
