@@ -272,9 +272,11 @@ bool QnActiResourceSearcher::processPacket(
         devInfoCopy.friendlyName = NX_VENDOR;
 
     auto physicalId = stringToActiPhysicalID(devInfo.serialNumber);
-    if (m_alreadyFoundMacAddresses.contains(physicalId))
-        return true;
-    m_alreadyFoundMacAddresses.insert(physicalId);
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_alreadyFoundMacAddresses.contains(physicalId))
+            return true;
+    }
 
     auto existingRes = resourcePool()->getNetResourceByPhysicalId(physicalId);
 
@@ -352,6 +354,7 @@ bool QnActiResourceSearcher::processPacket(
 
     QnMutexLocker lock(&m_mutex);
     m_foundUpnpResources += result;
+    m_alreadyFoundMacAddresses.insert(physicalId);
 
     return true;
 }
