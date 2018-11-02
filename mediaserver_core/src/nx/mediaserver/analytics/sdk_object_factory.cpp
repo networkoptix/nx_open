@@ -311,6 +311,8 @@ bool SdkObjectFactory::initEngineResources()
                     this,
                     "Plugin resource %1 (%2) has no correspondent SDK object",
                     parentPlugin->getName(), parentPlugin->getId());
+
+                continue;
             }
 
             nx::sdk::Error error = nx::sdk::Error::noError;
