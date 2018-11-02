@@ -60,11 +60,8 @@ QString settingsFilename(
     const QString& pluginLibName,
     const QString& extraSuffix)
 {
-    if (path[0] == 0)
-    {
-        NX_ASSERT(false, "Path to config directory is empty");
+    if (!NX_ASSERT(path[0] != '\0'))
         return QString();
-    }
 
     // Normalize to use forward slashes, as required by QFile.
     QString dir = QDir::cleanPath(QString::fromUtf8(path));
@@ -77,17 +74,11 @@ void setDeviceAgentSettings(
     sdk_support::SharedPtr<nx::sdk::analytics::DeviceAgent> deviceAgent,
     const QnVirtualCameraResourcePtr& device)
 {
-    if (!deviceAgent)
-    {
-        NX_ASSERT(false, "device agent is nullptr");
+    if (!NX_ASSERT(deviceAgent))
         return;
-    }
 
-    if (!device)
-    {
-        NX_ASSERT(false, "Device is nullptr");
+    if (!NX_ASSERT(device))
         return;
-    }
 
     const auto settings = loadSettingsFromFile(lit("DeviceAgent"), settingsFilename(
         pluginsIni().analyticsDeviceAgentSettingsPath,
@@ -98,11 +89,8 @@ void setDeviceAgentSettings(
 
 void setEngineSettings(sdk_support::SharedPtr<nx::sdk::analytics::Engine> engine)
 {
-    if (!engine)
-    {
-        NX_ASSERT(false, "Engine is nullptr");
+    if (!NX_ASSERT(engine))
         return;
-    }
 
     const auto settings = loadSettingsFromFile(lit("Engine"), settingsFilename(
         pluginsIni().analyticsEngineSettingsPath, engine->plugin()->name()));
