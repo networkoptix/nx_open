@@ -11,13 +11,16 @@
 #include "transaction/transaction_log.h"
 #include <transaction/binary_transaction_serializer.h>
 #include <api/app_server_connection.h>
+#include <api/model/password_data.h>
 #include <ec_connection_notification_manager.h>
+#include <core/resource/param.h>
 #include "ec_connection_audit_manager.h"
 
 #include <nx/vms/event/rule.h>
 #include "nx_ec/data/api_conversion_functions.h"
 
 #include "utils/common/threadqueue.h"
+#include <utils/crypt/symmetrical.h>
 #include <transaction/message_bus_adapter.h>
 
 namespace ec2 {
@@ -132,6 +135,80 @@ struct PostProcessTransactionFunction
         const aux::AuditData& auditData,
         const QnTransaction<T>& tran) const;
 };
+
+template<typename RequestData>
+inline void fixRequestDataIfNeeded(RequestData* const /*requestData*/)
+{
+}
+
+inline void fixRequestDataIfNeeded(nx::vms::api::UserData* const userData)
+{
+    if (userData->isCloud)
+    {
+        if (userData->name.isEmpty())
+            userData->name = userData->email;
+
+        if (userData->digest.isEmpty())
+            userData->digest = nx::vms::api::UserData::kCloudPasswordStub;
+    }
+}
+
+inline void fixRequestDataIfNeeded(nx::vms::api::UserDataEx* const userDataEx)
+{
+    if (!userDataEx->password.isEmpty())
+    {
+        const auto hashes = PasswordData::calculateHashes(userDataEx->name, userDataEx->password,
+            userDataEx->isLdap);
+
+        userDataEx->realm = hashes.realm;
+        userDataEx->hash = hashes.passwordHash;
+        userDataEx->digest = hashes.passwordDigest;
+        userDataEx->cryptSha512Hash = hashes.cryptSha512Hash;
+    }
+
+    fixRequestDataIfNeeded(static_cast<nx::vms::api::UserData* const>(userDataEx));
+}
+
+template <typename T>
+auto amendTranIfNeeded(const QnTransaction<T>& tran)
+{
+    return tran;
+}
+
+inline QnTransaction<nx::vms::api::UserData> amendTranIfNeeded(
+    const QnTransaction<nx::vms::api::UserDataEx>& originalTran)
+{
+    QnTransaction<nx::vms::api::UserData> resultTran(static_cast<const QnAbstractTransaction&>(
+        originalTran));
+    auto originalParams = originalTran.params;
+    fixRequestDataIfNeeded(&originalParams);
+    resultTran.params = nx::vms::api::UserData(originalParams);
+
+    return resultTran;
+}
+
+template<typename T>
+void amendOutputDataIfNeeded(T* data)
+{
+}
+
+inline void amendOutputDataIfNeeded(nx::vms::api::ResourceParamData* paramData)
+{
+    if (paramData->name == Qn::CAMERA_CREDENTIALS_PARAM_NAME)
+        paramData->value = nx::utils::decodeStringFromHexStringAES128CBC(paraData->value);
+}
+
+inline void amendOutputDataIfNeeded(std::vector<nx::vms::api::ResourceParamData>* paramDataList)
+{
+    for (auto& paramData: *paramDataList)
+        amendOutputDataIfNeeded(&paramData);
+}
+
+inline void amendOutputDataIfNeeded(std::vector<nx::vms::api::ResourceParamData>* paramDataList)
+{
+    for (auto& paramData: *paramDataList)
+        amendOutputDataIfNeeded(&paramData);
+}
 
 class ServerQueryProcessor
 {
@@ -362,29 +439,7 @@ public:
             {
                 OutputData output;
                 const ErrorCode errorCode = accessDataCopy.doQuery(input, output);
-                handler(errorCode, output);
-                self.m_owner->decRunningAsyncOperationsCount();
-            });
-    }
-
-    /**
-     * Asynchronously fetch data from DB.
-     * @param handler Functor(ErrorCode, OutputData).
-     * TODO #ak Let compiler guess template params.
-     */
-    template<class OutputData, class InputParamType1, class InputParamType2, class HandlerType>
-    void processQueryAsync(
-        ApiCommand::Value /*cmdCode*/, InputParamType1 input1, InputParamType2 input2,
-        HandlerType handler)
-    {
-        QnDbManagerAccess accessDataCopy(m_db);
-        m_owner->incRunningAsyncOperationsCount();
-        nx::utils::concurrent::run(Ec2ThreadPool::instance(),
-            [self = *this, accessDataCopy, input1, input2, handler]()
-            {
-                OutputData output;
-                const ErrorCode errorCode = accessDataCopy.doQuery(
-                    input1, input2, output);
+                amendOutputDataIfNeeded(&output);
                 handler(errorCode, output);
                 self.m_owner->decRunningAsyncOperationsCount();
             });
@@ -744,25 +799,31 @@ public:
         NX_ASSERT(ApiCommand::isPersistent(tran.command));
 
         detail::PersistentStorage persistentDb(m_db.db());
-        tran.transactionType = getTransactionDescriptorByTransaction(tran)->getTransactionTypeFunc(
-            m_db.db()->commonModule(),
-            tran.params,
-            &persistentDb);
+        auto amendedTran = amendTranIfNeeded(tran);
+        amendedTran.transactionType = getTransactionDescriptorByTransaction(amendedTran)
+            ->getTransactionTypeFunc(
+                m_db.db()->commonModule(),
+                amendedTran.params,
+                &persistentDb);
 
-        if (tran.transactionType == TransactionType::Unknown)
+        if (amendedTran.transactionType == TransactionType::Unknown)
             return ErrorCode::forbidden;
 
-        m_db.db()->transactionLog()->fillPersistentInfo(tran);
-        QByteArray serializedTran = m_owner->messageBus()->ubjsonTranSerializer()->serializedTransaction(tran);
+        m_db.db()->transactionLog()->fillPersistentInfo(amendedTran);
+        QByteArray serializedTran = m_owner->messageBus()->ubjsonTranSerializer()
+            ->serializedTransaction(amendedTran);
 
-        ErrorCode errorCode =
-            m_db.executeTransactionNoLock(tran, serializedTran);
+        ErrorCode errorCode = m_db.executeTransactionNoLock(amendedTran, serializedTran);
         NX_ASSERT(errorCode != ErrorCode::containsBecauseSequence
             && errorCode != ErrorCode::containsBecauseTimestamp);
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        transactionsPostProcessList->push(std::bind(PostProcessTransactionFunction(), m_owner->messageBus(), createAuditDataCopy(), tran));
+        transactionsPostProcessList->push(std::bind(
+            PostProcessTransactionFunction(),
+            m_owner->messageBus(),
+            createAuditDataCopy(),
+            amendedTran));
 
         return errorCode;
     }
