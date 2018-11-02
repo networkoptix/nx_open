@@ -51,7 +51,6 @@ const QString kNameSupportEmail(lit("emailSupportEmail"));
 const QString kNameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
 
 const QString kNameTimeSynchronizationEnabled(lit("timeSynchronizationEnabled"));
-const QString kNameSynchronizeTimeWithInternet(lit("synchronizeTimeWithInternet"));
 const QString kNamePrimaryTimeServer(lit("primaryTimeServer"));
 
 /* Max rtt for internet time synchronization request */
@@ -250,9 +249,6 @@ public:
 
     bool isTimeSynchronizationEnabled() const;
     void setTimeSynchronizationEnabled(bool value);
-
-    bool isSynchronizingTimeWithInternet() const;
-    void setSynchronizingTimeWithInternet(bool value);
 
     QnUuid primaryTimeServer() const;
     void setPrimaryTimeServer(const QnUuid& value);
