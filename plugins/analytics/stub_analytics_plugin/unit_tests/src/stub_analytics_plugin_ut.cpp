@@ -28,7 +28,7 @@ static std::string trimString(const std::string& s)
     int start = 0;
     while (start < (int) s.size() && s.at(start) <= ' ')
         ++start;
-    int end = s.size() - 1;
+    int end = (int) s.size() - 1;
     while (end >= 0 && s.at(end) <= ' ')
         --end;
     if (end < start)

@@ -29,7 +29,7 @@ void CommonSettings::clear()
 
 int CommonSettings::count() const
 {
-    return m_settings.size();
+    return (int) m_settings.size();
 }
 
 const char* CommonSettings::key(int i) const
