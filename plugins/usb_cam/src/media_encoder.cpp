@@ -60,12 +60,8 @@ unsigned int MediaEncoder::releaseRef()
 
 int MediaEncoder::getMediaUrl(char* urlBuf) const
 {
-    if (!m_camera->videoStream()->pluggedIn())
-        return nxcip::NX_IO_ERROR;
-
-    //strncpy(urlBuf, m_camera->info().url, nxcip::MAX_TEXT_LEN - 1);
-    strcpy(urlBuf, m_camera->info().url);
-    return nxcip::NX_NO_ERROR;
+    urlBuf[0] = '\0'; //< the plugin does not broadcast it's own stream, the mediaserver does it.
+    return nxcip::NX_NO_DATA;
 }
 
 int MediaEncoder::getMaxBitrate(int* maxBitrate) const
