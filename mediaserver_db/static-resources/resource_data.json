@@ -620,7 +620,8 @@
                 "Siqura|EVE FOUR",
                 "Hikvision|DS-6708*",
                 "HIKVISION|DS-6708*",
-                "Samsung Techwin|SPE-110", "Samsung|SPE-110", "Hanwha|SPE-110"
+                "Samsung Techwin|SPE-110", "Samsung|SPE-110", "Hanwha|SPE-110",
+                "Sony|SNT-EP104"
             ],
             "analogEncoder": true
         },
@@ -1020,23 +1021,21 @@
             "relayOutputInversed": true,
             "portNamePrefixToIgnore": "AlarmOut"
         },
-    {
+        {
             "keys": [
             	"DW|DWC-PF5M1TIR",
             	"DW|DWC-MB45DiA",
             	"DW|DWC-MV85DiA",
             	"DW|DWC-PB6M4T"
             ],
-      "fixWrongInputPortNumber": true
-    },
+            "fixWrongInputPortNumber": true
+        },
         {
             "keys": [
-                "DW|DWC-PF5M1TIR",
-                "DW|DWC-MB45DiA",
-                "DW|DWC-MV85DiA",
-                "DW|DWC-PB6M4T"
+            	"DW|DWC-MD421D",
+            	"DW|DWC-MV421D"
             ],
-            "fixWrongInputPortNumber": true
+            "fixWrongOutputPortToken": true
         },
         {
             "keys": [
