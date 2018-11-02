@@ -26,10 +26,8 @@ def update_draft_state(review_id, target_state, user):
         review.version.accepted_date = datetime.now()
         review.version.save()
 
-    review.reviewed_by = user
-    review.reviewed_date = datetime.now()
-    review.state = target_state
-    review.save()
+    review.update_state(user, target_state)
+
     return None
 
 

@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import os
 import re
+from datetime import datetime
 from django.db import models
 from django.conf import settings
 from jsonfield import JSONField
@@ -105,8 +106,21 @@ class Customization(models.Model):
     languages = models.ManyToManyField(Language)
     filter_horizontal = ('languages',)
 
-    public_release_history = models.BooleanField(default=False)
-    public_downloads = models.BooleanField(default=True)
+    public_release_history = models.BooleanField(default=False,
+                                                 help_text="""Any user can view the release history page.""")
+    public_downloads = models.BooleanField(default=True, help_text="""Any user can view the downloads page.""")
+
+    parent = models.ForeignKey('Customization', default=None, null=True, related_name='children_customizations',
+                               help_text="""Parent is the customization that the current customization depends on.<br>
+                               The main purpose is to control how the integration review process works.
+                               <br><br>
+                               If there is a parent:<br>
+                               - A review will be locked until the parent accepts that review.<br>
+                               - If the parent rejects a review it will automatically be rejected for this customization.<br><br>
+                               If there is no parent selected or the parent is not in the review an integration
+                               can be reviewed whenever.""")
+    trust_parent = models.BooleanField(default=False, help_text="""Automatically accepts integrations the parent
+                                                                   customization accepts.""")
 
     def __str__(self):
         return self.name
@@ -114,6 +128,14 @@ class Customization(models.Model):
     @property
     def languages_list(self):
         return self.languages.values_list('code', flat=True)
+
+    def get_children_ids(self, customization):
+        children_list = []
+        for child in customization.children_customizations.all():
+            children_list.append(child.id)
+            if child.children_customizations.exists():
+                children_list.extend(self.get_children_ids(child))
+        return children_list
 
 
 class ProductType(models.Model):
@@ -423,8 +445,14 @@ class ContentVersion(models.Model):
         return str(self.id)
 
     def create_reviews(self):
+        blocked = ProductCustomizationReview.REVIEW_STATES.blocked
+        pending = ProductCustomizationReview.REVIEW_STATES.pending
+
         for customization in self.product.customizations.all():
-            ProductCustomizationReview(customization=customization, version=self).save()
+            if customization.parent:
+                ProductCustomizationReview(customization=customization, version=self, state=blocked).save()
+            else:
+                ProductCustomizationReview(customization=customization, version=self, state=pending).save()
 
 
     @property
@@ -449,7 +477,7 @@ class ProductCustomizationReview(models.Model):
             ("force_update", "Can forcibly update content"),
         )
 
-    REVIEW_STATES = Choices((0, "pending", "Pending"), (1, "accepted", "Accepted"), (2, "rejected", "Rejected"))
+    REVIEW_STATES = Choices((0, "pending", "Pending"), (1, "accepted", "Accepted"), (2, "rejected", "Rejected"), (3, "blocked", "Blocked"))
     customization = models.ForeignKey(Customization)
     version = models.ForeignKey(ContentVersion)
     state = models.IntegerField(choices=REVIEW_STATES, default=REVIEW_STATES.pending)
@@ -461,6 +489,37 @@ class ProductCustomizationReview(models.Model):
 
     def __str__(self):
         return self.version.product.__str__()
+
+    def update_children_reviews(self):
+        reviews = self.version.productcustomizationreview_set.\
+            filter(customization__in=self.customization.children_customizations.all())
+
+        for review in reviews:
+            review.reviewed_by = self.reviewed_by
+            review.reviewed_date = self.reviewed_date
+            review.state = self.state
+
+            if review.state == ProductCustomizationReview.REVIEW_STATES.accepted:
+                if review.customization.trust_parent:
+                    review.notes = "Automatically accepted by {}".format(self.customization)
+                else:
+                    review.state = ProductCustomizationReview.REVIEW_STATES.pending
+                    # If the child customization does not trust its parent we need to set reviewed by and date to blank.
+                    review.reviewed_by = None
+                    review.reviewed_date = None
+            else:
+                review.notes = "Automatically rejected by {}".format(self.customization)
+
+            review.save()
+            if review.state == ProductCustomizationReview.REVIEW_STATES.rejected or review.customization.trust_parent:
+                review.update_children_reviews()
+
+    def update_state(self, user, state):
+        self.reviewed_by = user
+        self.reviewed_date = datetime.now()
+        self.state = state
+        self.save()
+        self.update_children_reviews()
 
 
 class ExternalFile(models.Model):

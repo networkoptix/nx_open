@@ -130,8 +130,17 @@ def page_editor(request):
     preview_link = context_editor_action(request, product, context_id, language_code)
 
     if 'SendReview' in request.POST:
-        review = ProductCustomizationReview.objects.filter(version_id=ContentVersion.objects.latest('created_date')).first()
-        redirect_url = reverse('admin:cms_productcustomizationreview_change', args=(review.id,))
+        customization_review = ProductCustomizationReview.objects.\
+            filter(version_id=ContentVersion.objects.latest('created_date'))
+
+        # If the current customization is in the list of reviews go to that one.
+        # Otherwise go to the first customization in the list of reviews.
+        if customization_review.filter(customization__name=settings.CUSTOMIZATION).exists():
+            customization_review = customization_review.get(customization__name=settings.CUSTOMIZATION)
+        else:
+            customization_review = customization_review.first()
+
+        redirect_url = reverse('admin:cms_productcustomizationreview_change', args=(customization_review.id,))
         return redirect(redirect_url)
 
     return preview_link

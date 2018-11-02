@@ -216,7 +216,8 @@ admin.site.register(Language, LanguageAdmin)
 
 
 class CustomizationAdmin(CMSAdmin):
-    list_display = ('name',)
+    list_display = ('name', 'parent', 'trust_parent')
+    form = CustomizationForm
 
 
 admin.site.register(Customization, CustomizationAdmin)
