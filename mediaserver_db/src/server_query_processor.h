@@ -169,6 +169,15 @@ inline void fixRequestDataIfNeeded(nx::vms::api::UserDataEx* const userDataEx)
     fixRequestDataIfNeeded(static_cast<nx::vms::api::UserData* const>(userDataEx));
 }
 
+inline void fixRequestDataIfNeeded(nx::vms::api::ResourceParamData* const paramData)
+{
+    if (paramData->name == Qn::CAMERA_CREDENTIALS_PARAM_NAME
+    || paramData->name == Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME)
+    {
+        paramData->value = nx::utils::encodeHexStringFromStringAES128CBC(paramData->value);
+    }
+}
+
 template <typename T>
 auto amendTranIfNeeded(const QnTransaction<T>& tran)
 {
@@ -187,6 +196,24 @@ inline QnTransaction<nx::vms::api::UserData> amendTranIfNeeded(
     return resultTran;
 }
 
+inline QnTransaction<nx::vms::api::ResourceParamData> amendTranIfNeeded(
+    const QnTransaction<nx::vms::api::ResourceParamData>& originalTran)
+{
+    auto resultTran = originalTran;
+    fixRequestDataIfNeeded(&resultTran.params);
+
+    return resultTran;
+}
+
+inline QnTransaction<nx::vms::api::ResourceParamWithRefData> amendTranIfNeeded(
+    const QnTransaction<nx::vms::api::ResourceParamWithRefData>& originalTran)
+{
+    auto resultTran = originalTran;
+    fixRequestDataIfNeeded(&resultTran.params);
+
+    return resultTran;
+}
+
 template<typename T>
 void amendOutputDataIfNeeded(T* data)
 {
@@ -194,8 +221,11 @@ void amendOutputDataIfNeeded(T* data)
 
 inline void amendOutputDataIfNeeded(nx::vms::api::ResourceParamData* paramData)
 {
-    if (paramData->name == Qn::CAMERA_CREDENTIALS_PARAM_NAME)
-        paramData->value = nx::utils::decodeStringFromHexStringAES128CBC(paraData->value);
+    if (paramData->name == Qn::CAMERA_CREDENTIALS_PARAM_NAME
+    || paramData->name == Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME)
+    {
+        paramData->value = nx::utils::decodeStringFromHexStringAES128CBC(paramData->value);
+    }
 }
 
 inline void amendOutputDataIfNeeded(std::vector<nx::vms::api::ResourceParamData>* paramDataList)
@@ -204,9 +234,10 @@ inline void amendOutputDataIfNeeded(std::vector<nx::vms::api::ResourceParamData>
         amendOutputDataIfNeeded(&paramData);
 }
 
-inline void amendOutputDataIfNeeded(std::vector<nx::vms::api::ResourceParamData>* paramDataList)
+inline void amendOutputDataIfNeeded(
+    std::vector<nx::vms::api::ResourceParamWithRefData>* paramWithRefDataList)
 {
-    for (auto& paramData: *paramDataList)
+    for (auto& paramData: *paramWithRefDataList)
         amendOutputDataIfNeeded(&paramData);
 }
 

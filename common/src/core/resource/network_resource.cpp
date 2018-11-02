@@ -15,7 +15,6 @@
 #include <nx/network/rtsp/rtsp_types.h>
 #include "resource_consumer.h"
 #include "nx/utils/thread/long_runnable.h"
-#include <utils/crypt/symmetrical.h>
 
 #include <recording/time_period_list.h>
 #include <nx/vms/api/data/camera_data.h>
@@ -103,18 +102,14 @@ void QnNetworkResource::setAuth(const QAuthenticator &auth)
 {
     setProperty(
         Qn::CAMERA_CREDENTIALS_PARAM_NAME,
-        nx::utils::encodeHexStringFromStringAES128CBC(
-            lit("%1:%2").arg(auth.user())
-                        .arg(auth.password())));
+        lit("%1:%2").arg(auth.user()) .arg(auth.password()));
 }
 
 void QnNetworkResource::setDefaultAuth(const QAuthenticator &auth)
 {
     setProperty(
         Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME,
-        nx::utils::encodeHexStringFromStringAES128CBC(
-            lit("%1:%2").arg(auth.user())
-                        .arg(auth.password())));
+        lit("%1:%2").arg(auth.user()).arg(auth.password()));
 }
 
 QAuthenticator QnNetworkResource::getResourceAuth(
@@ -152,10 +147,8 @@ QAuthenticator QnNetworkResource::getDefaultAuth() const
     return getAuthInternal(value);
 }
 
-QAuthenticator QnNetworkResource::getAuthInternal(const QString& encodedAuth)
+QAuthenticator QnNetworkResource::getAuthInternal(const QString& value)
 {
-    QString value = nx::utils::decodeStringFromHexStringAES128CBC(encodedAuth);
-
     const QStringList& credentialsList = value.split(lit(":"));
     QAuthenticator auth;
     if( credentialsList.size() >= 1 )
