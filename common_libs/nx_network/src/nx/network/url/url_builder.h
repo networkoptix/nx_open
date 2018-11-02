@@ -75,6 +75,18 @@ public:
         m_url.setPath(normalizePath(m_url.path() + path), mode);
         return *this;
     }
+    Builder& appendPath(const std::string& path, QUrl::ParsingMode mode = QUrl::DecodedMode)
+    {
+        return appendPath(QString::fromStdString(path), mode);
+    }
+    Builder& appendPath(const char* path, QUrl::ParsingMode mode = QUrl::DecodedMode)
+    {
+        return appendPath(std::string(path), mode);
+    }
+    Builder& appendPath(const QByteArray& path, QUrl::ParsingMode mode = QUrl::DecodedMode)
+    {
+        return appendPath(QString::fromUtf8(path), mode);
+    }
     Builder& setQuery(const QString& query, QUrl::ParsingMode mode = QUrl::DecodedMode)
     {
         m_url.setQuery(query, mode);
