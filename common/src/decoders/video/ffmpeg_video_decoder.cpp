@@ -4,10 +4,9 @@
 
 #include <QtCore/QThread>
 
-extern "C"
-{
-    #include <libavutil/imgutils.h>
-}
+extern "C" {
+#include <libavutil/imgutils.h>
+} // extern "C"
 
 
 #include "utils/media/nalUnits.h"
@@ -316,7 +315,7 @@ void QnFfmpegVideoDecoder::setSpeed( float /*newValue*/ )
 void QnFfmpegVideoDecoder::reallocateDeinterlacedFrame()
 {
     int roundWidth = qPower2Ceil((unsigned) m_context->width, 32);
-    int numBytes = av_image_get_buffer_size(m_context->pix_fmt, roundWidth, m_context->height, 1);
+    int numBytes = av_image_get_buffer_size(m_context->pix_fmt, roundWidth, m_context->height, /*align*/ 1);
     if (numBytes > 0) {
         if (m_deinterlaceBuffer)
             av_free(m_deinterlaceBuffer);
@@ -326,7 +325,7 @@ void QnFfmpegVideoDecoder::reallocateDeinterlacedFrame()
             m_deinterlacedFrame->data,
             m_deinterlacedFrame->linesize,
             m_deinterlaceBuffer,
-            m_context->pix_fmt, roundWidth, m_context->height, 1);
+            m_context->pix_fmt, roundWidth, m_context->height, /*align*/ 1);
         m_deinterlacedFrame->width = m_context->width;
         m_deinterlacedFrame->height = m_context->height;
     }
