@@ -63,6 +63,7 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(
     AVCodecID codecId)
     :
     QnVideoTranscoder(codecId),
+    m_config(config),
     m_decodedVideoFrame(new CLVideoDecoderOutput()),
     m_encoderCtx(0),
     m_firstEncodedPts(AV_NOPTS_VALUE),
@@ -74,7 +75,6 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(
     m_droppedFrames(0),
     m_useRealTimeOptimization(false),
     m_outPacket(av_packet_alloc()),
-    m_config(config),
     m_metrics(metrics)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
