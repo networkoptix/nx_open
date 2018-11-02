@@ -43,6 +43,7 @@ struct Information
     QList<Package> packages;
 
     bool isValid() const { return !version.isNull(); }
+    bool isEmpty() const { return packages.isEmpty(); }
 };
 
 #define Information_Fields (version)(cloudHost)(eulaLink)(eulaContents)(eulaVersion)(releaseNotesUrl)(releaseNotesContents)(packages)

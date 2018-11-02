@@ -220,6 +220,10 @@ class SSH(posix_shell.Shell):
             raise SSHNotConnected("Cannot connect to {}: {} (is service started? using VirtualBox?)".format(self, e))
         return client
 
+    @cached_getter
+    def _sftp(self):
+        return self._client().open_sftp()
+
     def close(self):
         self._client().close()
 

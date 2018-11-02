@@ -38,7 +38,13 @@ public:
 
     void setArchiveRange(qint64 startTimeUsec, qint64 endTimeUsec, bool recursive = true);
 
-    virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) override;
+    virtual QnTimePeriodList getDtsTimePeriods(
+        qint64 startTimeMs,
+        qint64 endTimeMs,
+        int detailLevel,
+        bool keepSmalChunks,
+        int limit,
+        Qt::SortOrder sortOrder) override;
     virtual QnAbstractStreamDataProvider* createArchiveDataProvider() override;
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
     QnTimePeriodList getChunks();

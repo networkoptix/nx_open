@@ -27,7 +27,6 @@
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
-#include <nx/network/ip_range_checker.h>
 #include <common/common_module.h>
 #include "core/resource/media_server_resource.h"
 #include <nx/utils/log/log.h>

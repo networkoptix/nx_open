@@ -49,6 +49,7 @@ struct UpdateContents
     nx::update::InformationError error = nx::update::InformationError::noError;
     bool cloudIsCompatible = true;
 
+    nx::utils::SoftwareVersion getVersion() const;
     // Check if we can apply this update.
     bool isValid() const;
 };

@@ -10,7 +10,8 @@ namespace cloud {
 namespace test {
 
 class CloudConnectOptionsServerSide:
-    public BasicTestFixture
+    public BasicTestFixture,
+    public ::testing::Test
 {
     using base_type = BasicTestFixture;
 
