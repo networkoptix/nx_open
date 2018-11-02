@@ -615,7 +615,8 @@
                 "Siqura|EVE FOUR",
                 "Hikvision|DS-6708*",
                 "HIKVISION|DS-6708*",
-                "Samsung Techwin|SPE-110", "Samsung|SPE-110", "Hanwha|SPE-110"
+                "Samsung Techwin|SPE-110", "Samsung|SPE-110", "Hanwha|SPE-110",
+                "Sony|SNT-EP104"
             ],
             "analogEncoder": true
         },
