@@ -228,6 +228,7 @@ bool SdkObjectFactory::initPluginResources()
 
             continue;
         }
+        pluginResource->setStatus(Qn::Online);
     }
 
     return true;
@@ -346,6 +347,7 @@ bool SdkObjectFactory::initEngineResources()
 
                 continue;
             }
+            engineResource->setStatus(Qn::Online);
         }
     }
 
