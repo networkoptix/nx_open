@@ -14,6 +14,7 @@
 #include <stdlib.h>
 
 #include "rpi/rpi_utils.h"
+#include "udev_utils.h"
 
 namespace nx {
 namespace usb_cam {
@@ -137,7 +138,9 @@ float toFrameRate(const v4l2_fract& frameInterval)
 } // namespace
 
 
-V4L2CompressionTypeDescriptor::V4L2CompressionTypeDescriptor(const struct v4l2_fmtdesc& formatEnum):
+V4L2CompressionTypeDescriptor::V4L2CompressionTypeDescriptor(
+    const struct v4l2_fmtdesc& formatEnum)
+    :
     m_descriptor(new struct v4l2_fmtdesc({0}))
 {
     memcpy(m_descriptor, &formatEnum, sizeof(formatEnum));
@@ -187,10 +190,13 @@ std::string getDeviceName(const char * devicePath)
 
 std::vector<DeviceData> getDeviceList()
 {
+    bool needsUniqueId = false;
     std::vector<std::string> devicePaths = getDevicePathsById();
-
     if (devicePaths.empty())
-       devicePaths = getDevicePathsFallBack();
+    {
+        devicePaths = getDevicePathsFallBack();
+        needsUniqueId = true;
+    }
     if (devicePaths.empty())
         return {};
 
@@ -203,7 +209,14 @@ std::vector<DeviceData> getDeviceList()
         if (fileDescriptor == -1)
             continue;
 
-        deviceList.push_back(device::DeviceData(getDeviceName(fileDescriptor), devicePath));
+        std::string uniqueId = needsUniqueId 
+            ? getDeviceUniqueId(devicePath.c_str())
+            : devicePath;
+
+        deviceList.push_back(device::DeviceData(
+            getDeviceName(fileDescriptor),
+            devicePath,
+            uniqueId));
     }
     return deviceList;
 }

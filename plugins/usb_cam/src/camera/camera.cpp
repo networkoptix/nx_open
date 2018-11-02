@@ -4,6 +4,7 @@
 
 #include <nx/utils/log/log.h>
 
+#include "camera_manager.h"
 #include "device/utils.h"
 
 namespace nx {
@@ -52,9 +53,11 @@ const std::vector<nxcip::CompressionType> Camera::kVideoCodecPriorityList =
     nxcip::AV_CODEC_ID_MJPEG
 };
 
-Camera::Camera(nxpl::TimeProvider* const timeProvider, const nxcip::CameraInfo& info):
+Camera::Camera(
+    CameraManager * cameraManager,
+    nxpl::TimeProvider* const timeProvider):
+    m_cameraManager(cameraManager),
     m_timeProvider(timeProvider),
-    m_info(info),
     m_audioEnabled(false),
     m_lastError(0)
 {
@@ -71,14 +74,14 @@ Camera::Camera(nxpl::TimeProvider* const timeProvider, const nxcip::CameraInfo& 
 void Camera::initialize()
 {
     m_audioStream = std::make_shared<AudioStream>(
-            m_info.auxiliaryData,
+            info().auxiliaryData,
             weak_from_this(),
             m_audioEnabled);
 
     m_videoStream = std::make_shared<VideoStream>(
-            url(),
-            m_defaultVideoParams,
-            weak_from_this());
+//            url(),
+            weak_from_this(),
+            m_defaultVideoParams);
 }
 
 std::shared_ptr<AudioStream> Camera::audioStream()
@@ -123,16 +126,6 @@ int Camera::lastError() const
     return m_lastError;
 }
 
-const nxcip::CameraInfo& Camera::info() const
-{
-    return m_info;
-}
-
-void Camera::updateCameraInfo(const nxcip::CameraInfo& info)
-{
-    m_info = info;
-}
-
 uint64_t Camera::millisSinceEpoch() const
 {
     return m_timeProvider->millisSinceEpoch();
@@ -151,18 +144,7 @@ const device::CompressionTypeDescriptorPtr& Camera::compressionTypeDescriptor() 
 
 std::string Camera::url() const
 {
-    // Expected to be of the form: <protocol>://<ip>:<port>/<camera-resource>, 
-    // where <camera-resource> is /dev/v4l/by-id/* on Linux or the device-instance-id on Windows.
-
-    std::string url = m_info.url;
-    // Find the second occurence of ":" in the url.
-    int colon = url.find(":", url.find(":") + 1);
-    if(colon == std::string::npos)
-        return std::string();
-
-    url = url.substr(colon);
-    
-    return url.substr(url.find("/") + 1);
+    return m_cameraManager->getFfmpegUrl();
 }
 
 CodecParameters Camera::defaultVideoParameters() const
@@ -176,6 +158,11 @@ std::vector<AVCodecID> Camera::ffmpegCodecPriorityList()
     for (const auto & nxCodecID : kVideoCodecPriorityList)
         ffmpegCodecList.push_back(ffmpeg::utils::toAVCodecId(nxCodecID));
     return ffmpegCodecList;
+}
+
+nxcip::CameraInfo Camera::info() const
+{
+    return m_cameraManager->info();
 }
 
 CodecParameters Camera::getDefaultVideoParameters()

@@ -3,9 +3,9 @@
 #include <algorithm>
 
 #ifdef _WIN32
-#include "dshow/dshow_utils.h"
+#include "windows/dshow_utils.h"
 #elif __linux__
-#include "v4l2/v4l2_utils.h"
+#include "linux/v4l2_utils.h"
 #endif
 
 namespace nx {
@@ -43,13 +43,18 @@ std::vector<ResolutionData> getResolutionList(
     return list;
 }
 
-void setBitrate(const char * devicePath, int bitrate, const device::CompressionTypeDescriptorPtr& targetCodecID)
+void setBitrate(
+    const char * devicePath,
+    int bitrate,
+    const device::CompressionTypeDescriptorPtr& targetCodecID)
 {
     if(targetCodecID)
         impl::setBitrate(devicePath, bitrate, targetCodecID);
 }
 
-int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescriptorPtr& targetCodecID)
+int getMaxBitrate(
+    const char * devicePath,
+    const device::CompressionTypeDescriptorPtr& targetCodecID)
 {
     if(!targetCodecID)
         return 0;

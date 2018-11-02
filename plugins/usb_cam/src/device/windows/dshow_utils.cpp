@@ -9,7 +9,7 @@ namespace impl {
 
 namespace {
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // DShowCompressionTypeDescriptor
 
 class DShowCompressionTypeDescriptor : public AbstractCompressionTypeDescriptor{
@@ -60,7 +60,7 @@ BITMAPINFOHEADER *  DShowCompressionTypeDescriptor::videoInfoBitMapHeader() cons
 
 } // namespace
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // public api
 
 std::string getDeviceName(const char * devicePath)
@@ -70,7 +70,7 @@ std::string getDeviceName(const char * devicePath)
     HRESULT result = findDevice(CLSID_VideoInputDeviceCategory, devicePath, &pMoniker);
     if (SUCCEEDED(result) && pMoniker)
         return getDeviceName(pMoniker);
-    return std::string();
+    return {};
 }
 
 std::vector<DeviceData> getDeviceList()
@@ -135,7 +135,10 @@ std::vector<ResolutionData> getResolutionList(
     return resolutionList;
 }
 
-void setBitrate(const char * devicePath, int bitrate, const device::CompressionTypeDescriptorPtr& targetCodec)
+void setBitrate(
+    const char * devicePath,
+    int bitrate,
+    const device::CompressionTypeDescriptorPtr& targetCodec)
 {
     DShowInitializer init;
     IMoniker * pMoniker = NULL;
@@ -222,7 +225,7 @@ int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescript
 #endif
 }
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // api helper functions
 
 // borrowed from https://msdn.microsoft.com/en-us/library/windows/desktop/dd375432(v=vs.85).aspx
@@ -338,7 +341,10 @@ HRESULT setDeviceProperty(IMoniker * pMoniker, LPCOLESTR propName, VARIANT * out
     return result;
 }
 
-HRESULT enumerateMediaTypes(IMoniker* pMoniker, IEnumMediaTypes ** outEnumMediaTypes, IPin** outPin)
+HRESULT enumerateMediaTypes(
+    IMoniker* pMoniker,
+    IEnumMediaTypes ** outEnumMediaTypes,
+    IPin** outPin)
 {
     *outEnumMediaTypes = NULL;
 
@@ -415,7 +421,9 @@ HRESULT findDevice(REFGUID category, const char * devicePath, IMoniker ** outMon
     return result;
 }
 
-HRESULT getSupportedCodecs(IMoniker *pMoniker, std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> *outCodecList)
+HRESULT getSupportedCodecs(
+    IMoniker *pMoniker,
+    std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> *outCodecList)
 {
     IEnumMediaTypes * enumMediaTypes = NULL;
     HRESULT result = enumerateMediaTypes(pMoniker, &enumMediaTypes);
@@ -507,8 +515,13 @@ HRESULT getBitrateList(IMoniker *pMoniker,
             if (viHeader->bmiHeader.biCompression == targetHeader->biCompression)
             {
                 int bitrate = (int) viHeader->dwBitRate;
-                if (std::find(bitrateList.begin(), bitrateList.end(), bitrate) == bitrateList.end())
-                    bitrateList.push_back(bitrate);
+                if (std::find(
+                        bitrateList.begin(),
+                        bitrateList.end(),
+                        bitrate) == bitrateList.end())
+                    {
+                        bitrateList.push_back(bitrate);
+                    }
             }
         }
         deleteMediaType(mediaType);
@@ -589,7 +602,7 @@ std::vector<AudioDeviceDescriptor> getAudioDeviceList()
     while (S_OK == pEnum->Next(1, &pMoniker, NULL))
     {
         std::string devicePath = getDisplayName(pMoniker);
-        DeviceData data(getDeviceName(pMoniker), devicePath);
+        DeviceData data(getDeviceName(pMoniker), devicePath, devicePath);
         devices.push_back(AudioDeviceDescriptor(data, getWaveInID(pMoniker)));
         pMoniker->Release();
     }

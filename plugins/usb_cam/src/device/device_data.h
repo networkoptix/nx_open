@@ -47,17 +47,17 @@ struct DeviceData
 {
     std::string deviceName;
     std::string devicePath;
+    std::string uniqueId;
 
-    DeviceData(const std::string& deviceName, const std::string& devicePath):
+    DeviceData(
+        const std::string& deviceName,
+        const std::string& devicePath,
+        const std::string& uniqueId)
+        :
         deviceName(deviceName),
-        devicePath(devicePath)
+        devicePath(devicePath),
+        uniqueId(uniqueId)
     {
-    }
-
-    bool operator==(const DeviceData& rhs) const
-    {
-        return deviceName == rhs.deviceName
-            && devicePath == rhs.devicePath;
     }
 };
 

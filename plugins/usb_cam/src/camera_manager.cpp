@@ -6,6 +6,7 @@
 #include <nx/utils/url.h>
 #include <nx/utils/log/assert.h>
 
+#include "discovery_manager.h"
 #include "native_media_encoder.h"
 #include "transcode_media_encoder.h"
 #include "ffmpeg/utils.h"
@@ -15,11 +16,13 @@ namespace nx {
 namespace usb_cam {
 
 CameraManager::CameraManager(
-    const nxcip::CameraInfo& info,
-    nxpl::TimeProvider *const timeProvider)
+    DiscoveryManager * discoveryManager,
+    nxpl::TimeProvider *const timeProvider,
+    const nxcip::CameraInfo& info)
 :
-    m_info( info ),
+    m_discoveryManager(discoveryManager),
     m_timeProvider(timeProvider),
+    m_info( info ),
     m_refManager( this ),
     m_pluginRef( Plugin::instance() ),
     m_capabilities(
@@ -31,18 +34,20 @@ CameraManager::CameraManager(
         m_capabilities |= nxcip::BaseCameraManager::audioCapability;
 }
 
-CameraManager::~CameraManager()
-{
-}
-
 void* CameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
 {
-    if( memcmp( &interfaceID, &nxcip::IID_BaseCameraManager2, sizeof(nxcip::IID_BaseCameraManager2) ) == 0 )
+    if (memcmp(
+        &interfaceID,
+        &nxcip::IID_BaseCameraManager2,
+        sizeof(nxcip::IID_BaseCameraManager2) ) == 0 )
     {
         addRef();
         return static_cast<nxcip::BaseCameraManager2*>(this);
     }
-    if( memcmp( &interfaceID, &nxcip::IID_BaseCameraManager, sizeof(nxcip::IID_BaseCameraManager) ) == 0 )
+    if (memcmp(
+        &interfaceID,
+        &nxcip::IID_BaseCameraManager,
+        sizeof(nxcip::IID_BaseCameraManager) ) == 0 )
     {
         addRef();
         return static_cast<nxcip::BaseCameraManager*>(this);
@@ -77,7 +82,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
 
     if (!m_camera)
     {
-        m_camera = std::make_shared<Camera>(m_timeProvider, m_info);   
+        m_camera = std::make_shared<Camera>(this, m_timeProvider);   
         m_camera->initialize();
     }
 
@@ -131,8 +136,6 @@ void CameraManager::setCredentials( const char* username, const char* password )
 {
     strncpy( m_info.defaultLogin, username, sizeof(m_info.defaultLogin)-1 );
     strncpy( m_info.defaultPassword, password, sizeof(m_info.defaultPassword)-1 );
-    if (m_camera)
-        m_camera->updateCameraInfo(m_info);
 }
 
 int CameraManager::setAudioEnabled( int audioEnabled )
@@ -204,6 +207,11 @@ const nxcip::CameraInfo& CameraManager::info() const
 nxpt::CommonRefManager* CameraManager::refManager()
 {
     return &m_refManager;
+}
+
+std::string CameraManager::getFfmpegUrl() const
+{
+    return m_discoveryManager->getFfmpegUrl(m_info.uid);
 }
 
 } // namespace nx

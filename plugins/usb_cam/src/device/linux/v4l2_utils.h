@@ -28,8 +28,8 @@ private:
 };
 
 /**
-* get the name of the device reported by the underlying hardware.
-* @params[in]
+* Get the name of the device reported by the underlying hardware.
+* @params[in] devicePath - the path to the device, like, /dev/video* on Linux.
 */
 std::string getDeviceName(const char * devicePath);
 
@@ -46,6 +46,7 @@ std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const char 
 /**
 * Get the list of supported resolutions for the device with the given path.
 * On Linux, this corresponds to the devices's /dev/video* entry.
+*
 * @param[in] getResolution - whether or not to fill each DeviceData with supported resolutions
 * @param[in] codecId - the codec whose resolution list is desired
 */
@@ -54,17 +55,24 @@ std::vector<ResolutionData> getResolutionList(
     const device::CompressionTypeDescriptorPtr& targetCodecID);
 
 /**
-* Set the bitrate for the device with the given path.
+* Set the bitrate for the device with the given path. 
 * On Linux, this corresponds to the devices's /dev/video* entry.
+*
 * @param[in] bitrate - the bitrate to set in bits per second.
 */ 
-void setBitrate(const char * devicePath, int bitrate, const device::CompressionTypeDescriptorPtr& targetCodecID);
+void setBitrate(
+    const char * devicePath,
+    int bitrate,
+    const device::CompressionTypeDescriptorPtr& targetCodecID);
 
 /**
-* Get the maximum bitrate supported by the camera
-* @param[int] devicePath - the path to the device
+* Get the maximum bitrate supported by the camera.
+*
+* @param[int] devicePath - the path to the device.
 */ 
-int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescriptorPtr& tagetCodecID);
+int getMaxBitrate(
+    const char * devicePath,
+    const device::CompressionTypeDescriptorPtr& tagetCodecID);
 
 } // namespace impl
 } // namespace device

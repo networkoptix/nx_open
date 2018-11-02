@@ -18,11 +18,15 @@ DiscoveryManager::DiscoveryManager(
     m_refManager(refManager),
     m_timeProvider(timeProvider)
 {
+    findCamerasInternal();
 }
 
 void* DiscoveryManager::queryInterface(const nxpl::NX_GUID& interfaceID)
 {
-    if (memcmp(&interfaceID, &nxcip::IID_CameraDiscoveryManager, sizeof(nxcip::IID_CameraDiscoveryManager)) == 0)
+    if (memcmp(
+        &interfaceID,
+        &nxcip::IID_CameraDiscoveryManager,
+        sizeof(nxcip::IID_CameraDiscoveryManager)) == 0)
     {
         addRef();
         return this;
@@ -52,20 +56,17 @@ void DiscoveryManager::getVendorName(char* buf) const
 
 int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr)
 {
-    std::vector<device::DeviceData> devices = device::getDeviceList();
+    std::vector<device::DeviceData> devices = findCamerasInternal();
     
     int i;
     for (i = 0; i < devices.size() && i < nxcip::CAMERA_INFO_ARRAY_SIZE; ++i)
     {
-        strncpy(cameras[i].modelName, devices[i].deviceName.c_str(), sizeof(cameras[i].modelName) - 1);
-        
-        std::string url = std::string(localInterfaceIPAddr) + "/" + devices[i].devicePath;
-        strncpy(cameras[i].url, url.c_str(), sizeof(cameras[i].url) - 1);
-
-        const QByteArray& uidHash = QCryptographicHash::hash(
-            devices[i].devicePath.c_str(),
-            QCryptographicHash::Md5).toHex();
-        strncpy(cameras[i].uid, uidHash.constData(), sizeof(cameras[i].uid) - 1);
+        strncpy(
+            cameras[i].modelName,
+            devices[i].deviceName.c_str(),
+            sizeof(cameras[i].modelName) - 1);
+        strncpy(cameras[i].url, localInterfaceIPAddr, sizeof(cameras[i].url) - 1);
+        strncpy(cameras[i].uid, devices[i].uniqueId.c_str(), sizeof(cameras[i].uid) - 1);
     }
 
     device::AudioDiscoveryManager audioDiscovery;
@@ -103,13 +104,49 @@ int DiscoveryManager::fromUpnpData(
 
 nxcip::BaseCameraManager* DiscoveryManager::createCameraManager(const nxcip::CameraInfo& info)
 {
-    return new CameraManager(info, m_timeProvider);
+    return new CameraManager(this, m_timeProvider, info);
 }
 
 int DiscoveryManager::getReservedModelList(char** /*modelList*/, int* count)
 {
     *count = 0;
     return nxcip::NX_NO_ERROR;
+}
+
+void DiscoveryManager::addFfmpegUrl(const std::string& uniqueId, const std::string& ffmpegUrl)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    auto it = m_ffmpegUrlMap.find(uniqueId);
+    if(it == m_ffmpegUrlMap.end())
+        m_ffmpegUrlMap.emplace(uniqueId, ffmpegUrl);
+    else
+        it->second = ffmpegUrl;
+}
+
+std::string DiscoveryManager::getFfmpegUrl(const std::string& uniqueId) const
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    auto it = m_ffmpegUrlMap.find(uniqueId);
+    return it != m_ffmpegUrlMap.end() ? it->second : std::string();
+}
+
+std::vector<device::DeviceData> DiscoveryManager::findCamerasInternal()
+{
+    std::vector<device::DeviceData> devices = device::getDeviceList();
+
+    for (int i = 0; i < devices.size(); ++i)
+    {
+        const QByteArray& uidHash = QCryptographicHash::hash(
+            devices[i].uniqueId.c_str(),
+            QCryptographicHash::Md5).toHex();
+
+        // Convert camera uniqueId to one guaranteed to work with the media server.
+        devices[i].uniqueId = uidHash.constData();
+
+        addFfmpegUrl(uidHash.constData(), devices[i].devicePath);
+    }
+
+    return devices;
 }
 
 } // namespace nx 

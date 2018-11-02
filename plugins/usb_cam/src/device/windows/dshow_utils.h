@@ -44,7 +44,7 @@ struct DShowInitializer{
     }
 };
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // public api
 
 std::string getDeviceName(const char * devicePath);
@@ -57,11 +57,14 @@ std::vector<ResolutionData> getResolutionList(
     const char * devicePath,
     const device::CompressionTypeDescriptorPtr& targetCodecID);
 
-void setBitrate(const char * devicePath, int bitrate, const CompressionTypeDescriptorPtr& targetCodecID);
+void setBitrate(
+    const char * devicePath,
+    int bitrate,
+    const CompressionTypeDescriptorPtr& targetCodecID);
 
 int getMaxBitrate(const char * devicePath, const CompressionTypeDescriptorPtr& targetCodecID);
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // api helper functions
 
 void freeMediaType(AM_MEDIA_TYPE& mediaType);
@@ -95,7 +98,7 @@ std::string toStdString(BSTR str);
 std::string getDeviceName(IMoniker *pMoniker);
 std::string getDevicePath(IMoniker *pMoniker);
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // audio
 
 struct AudioDeviceDescriptor
