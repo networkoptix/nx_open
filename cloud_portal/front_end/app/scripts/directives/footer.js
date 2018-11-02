@@ -1,13 +1,7 @@
 (function () {
 
     'use strict';
-
-    angular
-        .module('cloudApp.directives')
-        .directive('nxFooter', NxFooter);
-
-    NxFooter.$inject = [ '$rootScope', 'configService' ];
-
+    
     function NxFooter($rootScope, configService) {
 
         var CONFIG = configService.config;
@@ -25,6 +19,13 @@
                     scope.viewFooter = !opt.state;
                 });
             }
-        }
+        };
     }
+    
+    NxFooter.$inject = ['$rootScope', 'configService'];
+    
+    angular
+        .module('cloudApp.directives')
+        .directive('nxFooter', NxFooter);
+    
 })();

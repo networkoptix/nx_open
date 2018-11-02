@@ -1,18 +1,11 @@
 (function () {
+    
     'use strict';
 
-    angular
-        .module('nxCommon')
-        .directive('cameraPanel', CameraPanel);
-
-    CameraPanel.$inject = [ '$localStorage', '$timeout', '$location', '$routeParams'];
-
-    function CameraPanel($localStorage, $timeout, $location, $routeParams) {
+    function CameraPanel($localStorage, $timeout, $location, $routeParams, configService, languageService) {
     
-        function isActive(val) {
-            var currentPath = $location.path();
-            return currentPath.indexOf(val) >= 0;
-        }
+        const CONFIG = configService.config;
+        const LANG = languageService.lang;
         
         return {
             restrict   : 'E',
@@ -23,11 +16,11 @@
                 'searchCams'     : '=',
                 'isEmbeded'      : '<'
             },
-            templateUrl: Config.viewsDirCommon + 'components/cameraPanel.html',
+            templateUrl: CONFIG.viewsDirCommon + 'components/cameraPanel.html',
             link       : function (scope/*, element, attrs*/) {
-                scope.Config = Config;
+                scope.Config = CONFIG;
                 scope.storage = $localStorage;
-                scope.inputPlaceholder = L.common.searchCamPlaceholder;
+                scope.inputPlaceholder = LANG.common.searchCamPlaceholder;
 
                 scope.selectCamera = function (activeCamera) {
                     if (scope.activeCamera && (scope.activeCamera.id === activeCamera)) {
@@ -35,6 +28,33 @@
                     }
                     scope.activeCamera = activeCamera;
                 };
+    
+                function searchCams(searchText) {
+                    function has(str, substr) {
+                        return str && str.toLowerCase().replace(/\s/g, '').indexOf(substr.toLowerCase().replace(/\s/g, '')) >= 0;
+                    }
+        
+                    //If the text is blank allow scope.searchCams to update in dom then update cameras
+                    if (searchText === '') {
+                        return $timeout(searchCams);
+                    }
+        
+                    _.forEach(scope.mediaServers, function (server) {
+                        var cameras = scope.cameras[server.id];
+                        var camsVisible = false;
+            
+                        _.forEach(cameras, function (camera) {
+                            camera.visible = scope.searchCams === '' ||
+                                has(camera.name, scope.searchCams) ||
+                                has(camera.url, scope.searchCams);
+                            camsVisible = camsVisible || camera.visible;
+                        });
+            
+                        server.visible = scope.searchCams === '' || camsVisible /*||
+                        has(server.name, scope.searchCams) ||
+                        has(server.url, scope.searchCams)*/;
+                    });
+                }
                 
                 function updateCameras () {
                     scope.cameras = scope.camerasProvider.cameras;
@@ -88,33 +108,6 @@
                     scope.storage.serverStates[ server.id ] = server.expanded;
                 };
 
-                function searchCams(searchText) {
-                    function has(str, substr) {
-                        return str && str.toLowerCase().replace(/\s/g, '').indexOf(substr.toLowerCase().replace(/\s/g, '')) >= 0;
-                    }
-
-                    //If the text is blank allow scope.searchCams to update in dom then update cameras
-                    if (searchText === '') {
-                        return $timeout(searchCams);
-                    }
-
-                    _.forEach(scope.mediaServers, function (server) {
-                        var cameras = scope.cameras[ server.id ];
-                        var camsVisible = false;
-
-                        _.forEach(cameras, function (camera) {
-                            camera.visible = scope.searchCams === '' ||
-                                has(camera.name, scope.searchCams) ||
-                                has(camera.url, scope.searchCams);
-                            camsVisible = camsVisible || camera.visible;
-                        });
-
-                        server.visible = scope.searchCams === '' || camsVisible /*||
-                        has(server.name, scope.searchCams) ||
-                        has(server.url, scope.searchCams)*/;
-                    });
-                }
-
                 function updateMediaServers () {
                     scope.mediaServers = scope.camerasProvider.getMediaServers();
 
@@ -126,7 +119,7 @@
                             }
 
                             server.expanded = scope.storage.serverStates[server.id] !== undefined && scope.storage.serverStates[server.id];
-                        })
+                        });
                     }
                 }
 
@@ -144,4 +137,10 @@
             }
         };
     }
+    
+    CameraPanel.$inject = ['$localStorage', '$timeout', '$location', '$routeParams', 'configService', 'languageService'];
+    
+    angular
+        .module('nxCommon')
+        .directive('cameraPanel', CameraPanel);
 })();
