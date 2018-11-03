@@ -106,8 +106,6 @@ NX_NETWORK_API utils::MacAddress getMacByIP(const QHostAddress& ip, bool net = t
 // TODO: #ak Remove this method if favor of AddressResolver.
 NX_NETWORK_API QHostAddress resolveAddress(const QString& addr);
 
-NX_NETWORK_API int strEqualAmount(const char* str1, const char* str2);
-
 NX_NETWORK_API bool isNewDiscoveryAddressBetter(
     const HostAddress& host,
     const QHostAddress& newAddress,
