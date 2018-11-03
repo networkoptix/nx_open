@@ -5,7 +5,8 @@
 namespace nx {
 namespace usb_cam {
 namespace device {
-namespace impl {
+namespace video {
+namespace detail {
 
 namespace {
 
@@ -610,7 +611,8 @@ std::vector<AudioDeviceDescriptor> getAudioDeviceList()
     return devices;
 }
 
-} // namespace impl
+} // namespace detail
+} // namespace video
 } // namespace device
 } // namespace usb_cam
 } // namespace nx

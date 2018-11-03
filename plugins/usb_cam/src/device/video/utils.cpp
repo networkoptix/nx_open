@@ -11,20 +11,21 @@
 namespace nx {
 namespace usb_cam {
 namespace device {
+namespace video {
 
 std::string getDeviceName(const char * devicePath)
 {
-    return impl::getDeviceName(devicePath);
+    return detail::getDeviceName(devicePath);
 }
 
 std::vector<DeviceData> getDeviceList()
 {
-    return impl::getDeviceList();
+    return detail::getDeviceList();
 }
 
 std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const char *devicePath)
 {
-    return impl::getSupportedCodecs(devicePath);
+    return detail::getSupportedCodecs(devicePath);
 }
 
 std::vector<ResolutionData> getResolutionList(
@@ -34,7 +35,7 @@ std::vector<ResolutionData> getResolutionList(
     if (!targetCodecID)
         return {};
 
-    auto list = impl::getResolutionList(devicePath, targetCodecID);
+    auto list = detail::getResolutionList(devicePath, targetCodecID);
     std::sort(list.begin(), list.end(),
         [](const ResolutionData& a, const ResolutionData& b)
         {
@@ -49,7 +50,7 @@ void setBitrate(
     const device::CompressionTypeDescriptorPtr& targetCodecID)
 {
     if(targetCodecID)
-        impl::setBitrate(devicePath, bitrate, targetCodecID);
+        detail::setBitrate(devicePath, bitrate, targetCodecID);
 }
 
 int getMaxBitrate(
@@ -59,9 +60,10 @@ int getMaxBitrate(
     if(!targetCodecID)
         return 0;
 
-    return impl::getMaxBitrate(devicePath, targetCodecID);
+    return detail::getMaxBitrate(devicePath, targetCodecID);
 }
 
+} // namespace video
 } // namespace device
 } // namespace usb_cam
 } // namespace nx

@@ -9,8 +9,8 @@
 #include "video_stream.h"
 #include "audio_stream.h"
 
-#include "../device/abstract_compression_type_descriptor.h"
-#include "../device/device_data.h"
+#include "device/video/resolution_data.h"
+#include "device/abstract_compression_type_descriptor.h"
 
 namespace nx {
 namespace usb_cam {
@@ -29,7 +29,7 @@ public:
     std::shared_ptr<AudioStream> audioStream();
     std::shared_ptr<VideoStream> videoStream();
 
-    std::vector<device::ResolutionData> resolutionList() const;
+    std::vector<device::video::ResolutionData> resolutionList() const;
 
     void setAudioEnabled(bool value);
     bool audioEnabled() const;

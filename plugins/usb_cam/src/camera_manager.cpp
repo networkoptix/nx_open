@@ -10,7 +10,7 @@
 #include "native_media_encoder.h"
 #include "transcode_media_encoder.h"
 #include "ffmpeg/utils.h"
-#include "device/utils.h"
+#include "device/video/utils.h"
 
 namespace nx {
 namespace usb_cam {
@@ -39,7 +39,7 @@ void* CameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     if (memcmp(
         &interfaceID,
         &nxcip::IID_BaseCameraManager2,
-        sizeof(nxcip::IID_BaseCameraManager2) ) == 0 )
+        sizeof(nxcip::IID_BaseCameraManager2)) == 0)
     {
         addRef();
         return static_cast<nxcip::BaseCameraManager2*>(this);
@@ -47,12 +47,12 @@ void* CameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     if (memcmp(
         &interfaceID,
         &nxcip::IID_BaseCameraManager,
-        sizeof(nxcip::IID_BaseCameraManager) ) == 0 )
+        sizeof(nxcip::IID_BaseCameraManager)) == 0)
     {
         addRef();
         return static_cast<nxcip::BaseCameraManager*>(this);
     }
-    if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
+    if( memcmp(&interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface)) == 0)
     {
         addRef();
         return static_cast<nxpl::PluginInterface*>(this);

@@ -2,10 +2,8 @@
 
 #include <algorithm>
 
-#include <nx/utils/log/log.h>
-
 #include "camera_manager.h"
-#include "device/utils.h"
+#include "device/video/utils.h"
 
 namespace nx {
 namespace usb_cam {
@@ -61,7 +59,7 @@ Camera::Camera(
     m_audioEnabled(false),
     m_lastError(0)
 {
-    auto codecList = device::getSupportedCodecs(url().c_str());
+    auto codecList = device::video::getSupportedCodecs(url().c_str());
     m_compressionTypeDescriptor = getPriorityDescriptor(kVideoCodecPriorityList, codecList);
     
     // If m_compressionTypeDescriptor is null, there probably is no camera plugged in.
@@ -79,7 +77,6 @@ void Camera::initialize()
             m_audioEnabled);
 
     m_videoStream = std::make_shared<VideoStream>(
-//            url(),
             weak_from_this(),
             m_defaultVideoParams);
 }
@@ -94,9 +91,9 @@ std::shared_ptr<VideoStream> Camera::videoStream()
     return m_videoStream;
 }
 
-std::vector<device::ResolutionData> Camera::resolutionList() const
+std::vector<device::video::ResolutionData> Camera::resolutionList() const
 {
-    return device::getResolutionList(url().c_str(), m_compressionTypeDescriptor);
+    return device::video::getResolutionList(url().c_str(), m_compressionTypeDescriptor);
 }
 
 void Camera::setAudioEnabled(bool value)
@@ -172,14 +169,14 @@ CodecParameters Camera::getDefaultVideoParameters()
 
     auto resolutionList = this->resolutionList();
     auto it = std::max_element(resolutionList.begin(), resolutionList.end(),
-        [](const device::ResolutionData& a, const device::ResolutionData& b)
+        [](const device::video::ResolutionData& a, const device::video::ResolutionData& b)
         {
             return a.width * a.height < b.width * b.height;
         });
 
     if (it != resolutionList.end())
     {
-        int maxBitrate = device::getMaxBitrate(url().c_str(), m_compressionTypeDescriptor);
+        int maxBitrate = device::video::getMaxBitrate(url().c_str(), m_compressionTypeDescriptor);
         return CodecParameters(
             ffmpegCodecID,
             it->fps,

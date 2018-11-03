@@ -8,7 +8,7 @@
 
 #include "camera.h"
 #include "buffered_stream_consumer.h"
-#include "device/utils.h"
+#include "device/video/utils.h"
 #include "ffmpeg/utils.h"
 
 namespace nx {
@@ -142,7 +142,7 @@ bool VideoStream::ioError() const
 
 bool VideoStream::pluggedIn() const
 {
-    return !device::getDeviceName(url().c_str()).empty();
+    return !device::video::getDeviceName(url().c_str()).empty();
 }
 
 void VideoStream::updateActualFps(uint64_t now)
@@ -334,7 +334,7 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
         if(auto cam = m_camera.lock())
         {
             // ffmpeg doesn't have an option for setting the bitrate on AVFormatContext.
-            device::setBitrate(
+            device::video::setBitrate(
                 url().c_str(),
                 m_codecParams.bitrate,
                 cam->compressionTypeDescriptor());
@@ -545,7 +545,7 @@ void VideoStream::updateUnlocked()
 
 CodecParameters VideoStream::findClosestHardwareConfiguration(const CodecParameters& params) const
 {
-    std::vector<device::ResolutionData>resolutionList;
+    std::vector<device::video::ResolutionData>resolutionList;
 
     // Assumes list is in ascending resolution order
     if (auto cam = m_camera.lock())

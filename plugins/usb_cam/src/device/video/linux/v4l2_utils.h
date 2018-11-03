@@ -2,18 +2,21 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 #include <linux/videodev2.h>
 
 #include <camera/camera_plugin_types.h>
 #include "camera/camera_plugin.h"
 
 #include "device/device_data.h"
+#include "device/video/resolution_data.h"
 #include "device/abstract_compression_type_descriptor.h"
 
 namespace nx {
 namespace usb_cam {
 namespace device {
-namespace impl {
+namespace video {
+namespace detail {
 
 class V4L2CompressionTypeDescriptor : public AbstractCompressionTypeDescriptor
 {
@@ -74,7 +77,8 @@ int getMaxBitrate(
     const char * devicePath,
     const device::CompressionTypeDescriptorPtr& tagetCodecID);
 
-} // namespace impl
+} // namespace detail
+} // namespace video
 } // namespace device
 } // namespace usb_cam
 } // namespace nx

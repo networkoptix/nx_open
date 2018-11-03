@@ -16,7 +16,8 @@
 namespace nx {
 namespace usb_cam {
 namespace device {
-namespace impl {
+namespace video {
+namespace detail {
 
 /**
  * initializes dshow for the thread that calls the public util functions
@@ -122,7 +123,8 @@ LONG getWaveInID(IMoniker * pMoniker);
 std::string getDisplayName(IMoniker * pMoniker);
 std::vector<AudioDeviceDescriptor> getAudioDeviceList();
 
-} // namespace impl
+} // namespace detail
+} // namespace video
 } // namespace device
 } // namespace usb_cam
 } // namespace nx

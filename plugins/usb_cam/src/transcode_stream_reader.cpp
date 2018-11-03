@@ -1,6 +1,5 @@
 #include "transcode_stream_reader.h"
 
-#include <stdio.h>
 #include <set>
 
 extern "C" {
@@ -9,10 +8,6 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 } // extern "C"
 
-#include <nx/utils/log/log.h>
-#include "nx/utils/app_info.h"
-
-#include "device/utils.h"
 #include "ffmpeg/utils.h"
 
 namespace nx {
@@ -334,19 +329,11 @@ int TranscodeStreamReader::initialize()
 {
     int result = openVideoEncoder();
     if (result < 0)
-    {
-        NX_DEBUG(this) << m_camera->videoStream()->url() + ":" 
-            << "encoder open error:" << ffmpeg::utils::errorToString(result);
         return result;
-    }
 
     result = initializeScaledFrame(m_encoder.get());
     if (result < 0)
-    {
-        NX_DEBUG(this) << m_camera->videoStream()->url() + ":" 
-            << "scaled frame init error:" << ffmpeg::utils::errorToString(result);
         return result;
-    }
 
     m_cameraState = csInitialized;
     return 0;

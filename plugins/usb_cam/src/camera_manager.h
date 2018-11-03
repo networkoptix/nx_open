@@ -7,9 +7,9 @@
 #include <mutex>
 
 #include "plugin.h"
-#include "device/utils.h"
 #include "camera/camera.h"
 #include "camera/codec_parameters.h"
+#include "device/video/utils.h"
 #include "device/abstract_compression_type_descriptor.h"
 
 namespace nx {

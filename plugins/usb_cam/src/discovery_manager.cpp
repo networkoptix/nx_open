@@ -1,12 +1,11 @@
 #include "discovery_manager.h"
 
-#include "device/utils.h"
-#include "camera_manager.h"
-#include "plugin.h"
-
 #include <QCryptographicHash>
 
-#include "discovery/audio_discovery_manager.h"
+#include "plugin.h"
+#include "camera_manager.h"
+#include "device/video/utils.h"
+#include "device/audio/utils.h"
 
 namespace nx {
 namespace usb_cam {
@@ -69,8 +68,7 @@ int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localI
         strncpy(cameras[i].uid, devices[i].uniqueId.c_str(), sizeof(cameras[i].uid) - 1);
     }
 
-    device::AudioDiscoveryManager audioDiscovery;
-    audioDiscovery.fillCameraAuxData(cameras, i);
+    device::audio::fillCameraAuxiliaryData(cameras, i);
 
     return i;
 }
@@ -132,7 +130,7 @@ std::string DiscoveryManager::getFfmpegUrl(const std::string& uniqueId) const
 
 std::vector<device::DeviceData> DiscoveryManager::findCamerasInternal()
 {
-    std::vector<device::DeviceData> devices = device::getDeviceList();
+    std::vector<device::DeviceData> devices = device::video::getDeviceList();
 
     for (int i = 0; i < devices.size(); ++i)
     {

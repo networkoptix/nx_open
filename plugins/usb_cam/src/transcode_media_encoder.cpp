@@ -86,7 +86,7 @@ nxcip::StreamReader* TranscodeMediaEncoder::getLiveStreamReader()
 }
 
 CodecParameters TranscodeMediaEncoder::calculateSecondaryCodecParams(
-    const std::vector<device::ResolutionData>& resolutionList) const
+    const std::vector<device::video::ResolutionData>& resolutionList) const
 {
     NX_ASSERT(resolutionList.size() > 0);
     if (resolutionList.empty())

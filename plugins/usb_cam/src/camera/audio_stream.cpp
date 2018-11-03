@@ -4,13 +4,12 @@ extern "C" {
 #include <libswresample/swresample.h>
 } // extern "C"
 
-#include <nx/utils/log/log.h>
 #include <plugins/plugin_container_api.h>
 
 #include "camera.h"
 #include "default_audio_encoder.h"
 #include "ffmpeg/utils.h"
-#include "discovery/audio_discovery_manager.h"
+#include "device/audio/utils.h"
 
 namespace nx {
 namespace usb_cam {
@@ -57,7 +56,7 @@ AudioStream::AudioStreamPrivate::~AudioStreamPrivate()
 
 bool AudioStream::AudioStreamPrivate::pluggedIn() const
 {
-    return device::AudioDiscoveryManager().pluggedIn(m_url);
+    return device::audio::pluggedIn(m_url.c_str());
 }
 
 bool AudioStream::AudioStreamPrivate::ioError() const

@@ -26,7 +26,7 @@ public:
 
 private:
     CodecParameters calculateSecondaryCodecParams(
-        const std::vector<device::ResolutionData>& resolutionList) const;
+        const std::vector<device::video::ResolutionData>& resolutionList) const;
 };
 
 } // namespace nx 

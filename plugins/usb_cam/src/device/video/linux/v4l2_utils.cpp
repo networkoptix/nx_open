@@ -19,7 +19,8 @@
 namespace nx {
 namespace usb_cam {
 namespace device {
-namespace impl {
+namespace video {    
+namespace detail {
 
 namespace {
 
@@ -365,7 +366,8 @@ int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescript
     return 0;
 }
 
-} // namespace impl
+} // namespace detail
+} // namespace video
 } // namespace device
 } // namespace usb_cam
 } // namespace nx
