@@ -1611,7 +1611,7 @@ TYPED_TEST_P(
 {
     this->givenPingPongServer();
     this->givenConnectedSocket();
-    ASSERT_TRUE(connection()->setNonBlockingMode(true));
+    ASSERT_TRUE(this->connection()->setNonBlockingMode(true));
 
     this->whenClientSentPingAsync(
         [this]()
