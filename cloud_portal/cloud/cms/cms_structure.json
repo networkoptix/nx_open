@@ -518,7 +518,13 @@
             "value": "",
             "description": "",
             "type": "html"
-          },
+          }
+        ]
+      },
+      {
+        "name": "Download Files",
+        "translatable": false,
+        "values":[
           {
             "name": "arm-file",
             "label": "Download for ARM",
@@ -538,7 +544,7 @@
             "public": true
           },
           {
-            "name": "linux-x86-file",
+            "name": "linux-x64-file",
             "label": "Download for Linux - x64",
             "value": "",
             "description": "",
