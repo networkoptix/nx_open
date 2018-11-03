@@ -1,3 +1,5 @@
+#ifdef __linux__
+
 #include "udev_utils.h"
 
 #include <libudev.h>
@@ -167,3 +169,5 @@ std::string getDeviceUniqueId(const char * devicePath)
 } // namespace device
 } // namespace usb_cam
 } // namespace nx
+
+#endif //__linux__

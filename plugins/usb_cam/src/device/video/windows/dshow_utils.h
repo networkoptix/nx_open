@@ -2,16 +2,19 @@
 
 #pragma once
 
+#include <vector>
+
 #include <dshow.h>
 #include <windows.h>
 #include <comip.h>
 #include <atlmem.h>
 #include <ATLComMem.h>
 
+#include <camera/camera_plugin_types.h>
+
 #include "device/device_data.h"
 #include "device/abstract_compression_type_descriptor.h"
-
-#include "camera/camera_plugin_types.h"
+#include "device/video/resolution_data.h"
 
 namespace nx {
 namespace usb_cam {
@@ -22,11 +25,12 @@ namespace detail {
 /**
  * initializes dshow for the thread that calls the public util functions
  * https://msdn.microsoft.com/en-us/library/windows/desktop/ms695279(v=vs.85).aspx
- * note: only use this from the public api functions listed in "dshow_utils.h"
- * todo: This is a work around, we shouldn't have to init and deinit every time the util
+ * Note: only use this from the public api functions listed in "dshow_utils.h"
+ * TODO: This is a work around, we shouldn't have to init and deinit every time the util
  *      functions are called.
  */
-struct DShowInitializer{
+struct DShowInitializer
+{
     HRESULT m_result;
 
     DShowInitializer():

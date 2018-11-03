@@ -5,7 +5,7 @@
 namespace nx {
 namespace usb_cam {
 namespace device {
-namespace video{
+namespace video {
 
 struct ResolutionData
 {

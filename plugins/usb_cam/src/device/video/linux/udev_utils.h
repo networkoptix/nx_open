@@ -1,3 +1,5 @@
+#ifdef __linux__
+
 #pragma once
 
 #include <string>
@@ -15,3 +17,5 @@ std::string getDeviceUniqueId(const char * devicePath);
 } // namespace device
 } // namespace usb_cam
 } // namespace nx
+
+#endif // __linux__

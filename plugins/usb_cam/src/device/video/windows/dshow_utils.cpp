@@ -88,7 +88,8 @@ std::vector<DeviceData> getDeviceList()
     IMoniker *pMoniker = NULL;
     while (S_OK == pEnum->Next(1, &pMoniker, NULL))
     {
-        devices.push_back(DeviceData(getDeviceName(pMoniker), getDevicePath(pMoniker)));
+        std::string devicePath = getDevicePath(pMoniker);
+        devices.push_back(DeviceData(getDeviceName(pMoniker), devicePath, devicePath));
         pMoniker->Release();
     }
     pEnum->Release();
