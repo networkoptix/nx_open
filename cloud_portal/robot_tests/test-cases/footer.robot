@@ -60,7 +60,7 @@ Copyright leads to the proper site
 Change interface language
     [tags]    C41549
     :FOR    ${lang}    ${account}   IN ZIP    ${LANGUAGES LIST}    ${LANGUAGES CREATE ACCOUNT TEXT LIST}
-    \  Sleep    1
+    \  Sleep    2
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Button    ${LANGUAGE DROPDOWN}
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //nx-footer//span[@lang='${lang}']/..
