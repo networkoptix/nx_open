@@ -115,6 +115,10 @@ void VideoStream::removeFrameConsumer(const std::weak_ptr<AbstractFrameConsumer>
     std::lock_guard<std::mutex> lock(m_mutex);
     m_frameConsumerManager.removeConsumer(consumer);
     updateUnlocked();
+
+    // Raspberry Pi: reinitialize the camera to recover frame rate on the primary stream.
+    if (nx::utils::AppInfo::isRaspberryPi() && m_frameConsumerManager.empty())
+        m_cameraState = csModified;
 }
 
 void VideoStream::updateFps()

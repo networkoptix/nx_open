@@ -25,19 +25,23 @@ TranscodeStreamReader::TranscodeStreamReader(
     m_videoFrameConsumer(new BufferedVideoFrameConsumer(m_camera->videoStream(), m_codecParams))
 {
     calculateTimePerFrame();
+    std::cout << "TranscodeStreamReader" << std::endl;
 }
 
 TranscodeStreamReader::~TranscodeStreamReader()
 {
-    uninitialize();
+    std::cout << "~TranscodeStreamReader" << std::endl;
     m_videoFrameConsumer->interrupt();
-    // Avoid virtual removeConsumer()
+    // Avoid virtual removeVideoConsumer()
     m_camera->videoStream()->removeFrameConsumer(m_videoFrameConsumer);
+    uninitialize();
 }   
 
 int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
     *lpPacket = nullptr;
+
+    std::cout << "Transcode getNextData" << std::endl;
 
     if (!ensureInitialized())
         return nxcip::NX_NO_DATA;
@@ -49,6 +53,7 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
     if (outNxError != nxcip::NX_NO_ERROR)
     {
+        std::cout << "Transcode getNextData return interrupted" << std::endl;
         removeConsumer();
         return outNxError;
     }
@@ -61,15 +66,17 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
     *lpPacket = toNxPacket(packet.get()).release();
 
+    std::cout << "Transcode getNextData return no error" << std::endl;
     return nxcip::NX_NO_ERROR;
 }
 
 void TranscodeStreamReader::interrupt()
 {
-    // Note: StreamReaderPrivate::interrupt calls removeConsumer(), which is overriden here.
+    std::cout << "Transcode interrupted" << std::endl;
     StreamReaderPrivate::interrupt();
     m_videoFrameConsumer->interrupt();
     m_videoFrameConsumer->flush();
+    removeConsumer();
 }
 
 void TranscodeStreamReader::setFps(float fps)
