@@ -11,21 +11,36 @@
 #include "device/video/rpi/rpi_utils.h"
 #include "device/audio/utils.h"
 
+#include <iostream>
+
 namespace nx {
 namespace usb_cam {
 
 namespace {
 
-constexpr char * const kVendorName = "usb_cam";
+static constexpr const char * const kVendorName = "usb_cam";
+static constexpr const char * const kQtMacAddressDelimiter = ":";
+static constexpr const char * const kNxMacAddressDelimiter = "-";
 
 std::string getEthernetMacAddress()
 {
     for (const auto & iFace : QNetworkInterface::allInterfaces())
     {
         if(iFace.type() == QNetworkInterface::Ethernet)
-            return iFace.hardwareAddress().toStdString();
+        {
+            // The media server modifies the mac address delimiter from ":" to "-",
+            // so do it preemptively to avoid adding the unique id with the wrong delimiter.
+            return iFace.hardwareAddress().replace(
+                kQtMacAddressDelimiter, 
+                kNxMacAddressDelimiter).toStdString();
+        }
     }
     return {};
+}
+
+bool isRpiMmal(const std::string deviceName)
+{
+   return device::video::rpi::isRpi() && device::video::rpi::isMmalCamera(deviceName);
 }
 
 }
@@ -156,7 +171,7 @@ std::vector<device::DeviceData> DiscoveryManager::findCamerasInternal()
     {
         // Convert camera uniqueId to one guaranteed to work with the media server.
         // On Raspberry Pi for the integrated camera, use the ethernet mac address per VMS-12076.
-        if (device::video::rpi::isRpi() && device::video::rpi::isMmalCamera(devices[i].deviceName))
+        if (isRpiMmal(devices[i].deviceName))
         {
             devices[i].uniqueId = getEthernetMacAddress();
         }
