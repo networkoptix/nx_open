@@ -62,7 +62,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.activeCamera = null;
         $scope.player = null;
 
-        $scope.showCameraPanel = true;
+        $scope.showCameraPanel = !$scope.isEmbeded;
 
         $scope.activeResolution = 'Auto';
         // TODO: detect better resolution here?
@@ -439,6 +439,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.showCamerasPanel = function(){
             $scope.showSettings = false;
             $scope.showCameraPanel = true;
+            $scope.showOnTop = true; // z-index -> show panel on small screen
         };
 
         document.addEventListener('MSFullscreenChange',function(){ // IE only
@@ -494,7 +495,10 @@ angular.module('nxCommon').controller('ViewCtrl',
             }
             
             resetSystemActiveCamera();
-
+    
+            $scope.showCameraPanel = true;
+            $scope.showOnTop = false; // z-index -> hide panel on small screen
+            
             $scope.player = null;
             $scope.crashCount = 0;
             
@@ -513,8 +517,6 @@ angular.module('nxCommon').controller('ViewCtrl',
             if(serverOffset){
                 timeManager.setOffset(serverOffset);
             }
-
-            $scope.showCameraPanel = Object.keys($scope.activeCamera).length;
         });
 
         $scope.$watch('player', function(){

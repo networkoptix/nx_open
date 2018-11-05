@@ -513,9 +513,10 @@ import * as Hls from 'hls.js';
                                     return '';
                             }
                         };
-                        
-                        angular.element($window).bind('resize', updateWidth);
-                        
+    
+                        var jqWindow = $(window);
+                        jqWindow.resize(updateWidth);
+    
                         if (scope.debugMode) {
                             scope.$watch('activeFormat', srcChanged);
                         }

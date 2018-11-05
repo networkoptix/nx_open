@@ -99,7 +99,6 @@
                 };
 
                 scope.showCamera = function (camera) {
-                    scope.showCameraPanel = false;
                     scope.selectCamera(camera);
                 };
 
@@ -122,15 +121,7 @@
                         });
                     }
                 }
-
-                function showMenu () {
-                    scope.showCamerasMenu = scope.showCameraPanel;
-                    if ($location.search().nocameras) {
-                        scope.showCamerasMenu = false;
-                    }
-                }
-
-                scope.$watch('showCameraPanel', showMenu);
+                
                 scope.$watch('searchCams', searchCams);
                 scope.$watch('camerasProvider.cameras', updateCameras, true);
                 scope.$watch('camerasProvider.mediaServers', updateMediaServers, true);
