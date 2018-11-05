@@ -1,10 +1,14 @@
 #include "discovery_manager.h"
 
 #include <QCryptographicHash>
+#include <QNetworkInterface>
+
+#include <nx/utils/app_info.h>
 
 #include "plugin.h"
 #include "camera_manager.h"
 #include "device/video/utils.h"
+#include "device/video/rpi/rpi_utils.h"
 #include "device/audio/utils.h"
 
 namespace nx {
@@ -13,6 +17,16 @@ namespace usb_cam {
 namespace {
 
 constexpr char * const kVendorName = "usb_cam";
+
+std::string getEthernetMacAddress()
+{
+    for (const auto & iFace : QNetworkInterface::allInterfaces())
+    {
+        if(iFace.type() == QNetworkInterface::Ethernet)
+            return iFace.hardwareAddress().toStdString();
+    }
+    return {};
+}
 
 }
 
@@ -62,7 +76,7 @@ void DiscoveryManager::getVendorName(char* buf) const
 int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr)
 {
     std::vector<device::DeviceData> devices = findCamerasInternal();
-    
+
     int i;
     for (i = 0; i < devices.size() && i < nxcip::CAMERA_INFO_ARRAY_SIZE; ++i)
     {
@@ -140,14 +154,21 @@ std::vector<device::DeviceData> DiscoveryManager::findCamerasInternal()
 
     for (int i = 0; i < devices.size(); ++i)
     {
-        const QByteArray& uidHash = QCryptographicHash::hash(
-            devices[i].uniqueId.c_str(),
-            QCryptographicHash::Md5).toHex();
-
         // Convert camera uniqueId to one guaranteed to work with the media server.
-        devices[i].uniqueId = uidHash.constData();
+        // On Raspberry Pi for the integrated camera, use the ethernet mac address per VMS-12076.
+        if (device::video::rpi::isRpi() && device::video::rpi::isMmalCamera(devices[i].deviceName))
+        {
+            devices[i].uniqueId = getEthernetMacAddress();
+        }
+        else
+        {
+            const QByteArray& uidHash = QCryptographicHash::hash(
+                devices[i].uniqueId.c_str(),
+                QCryptographicHash::Md5).toHex();
+            devices[i].uniqueId = uidHash.constData();
+        }
 
-        addFfmpegUrl(uidHash.constData(), devices[i].devicePath);
+        addFfmpegUrl(devices[i].uniqueId, devices[i].devicePath);
     }
    
     return devices;

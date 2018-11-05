@@ -13,7 +13,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#include "rpi/rpi_utils.h"
+#include "device/video/rpi/rpi_utils.h"
 #include "udev_utils.h"
 
 namespace nx {

@@ -46,6 +46,7 @@ public:
     void addFfmpegUrl(const std::string& uniqueId, const std::string& ffmpegUrl);
     std::string getFfmpegUrl(const std::string& uniqueId) const;
     std::vector<device::DeviceData> findCamerasInternal();
+
 private:
     nxpt::CommonRefManager m_refManager;
     nxpl::TimeProvider *const m_timeProvider;

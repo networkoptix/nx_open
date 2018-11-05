@@ -1,10 +1,6 @@
-#ifdef __linux__
-
 #include "rpi_utils.h"
 
 #include <vector>
-#include <dirent.h>
-#include <sys/stat.h>
 
 #include <nx/utils/app_info.h>
 
@@ -88,5 +84,3 @@ bool isRpi()
 } // namespace device
 } // namespace usb_cam
 } // namespace nx
-
-#endif
