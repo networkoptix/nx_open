@@ -26,8 +26,7 @@ void fillCameraAuxiliaryData(nxcip::CameraInfo* cameras, int cameraCount)
         if (devices[i].isDefault())
             defaults.push_back(&devices[i]);
 
-        audioTaken.insert(
-            std::pair<video::detail::AudioDeviceDescriptor*, bool>(&devices[i], false));
+        audioTaken.emplace(&devices[i], false);
     }
 
     std::vector<nxcip::CameraInfo*> muteCameras;
@@ -44,11 +43,11 @@ void fillCameraAuxiliaryData(nxcip::CameraInfo* cameras, int cameraCount)
                 mute = false;
                 audioTaken[device] = true;
                 
-                 // Duplicate audio devices in windows are prepended with an index, making them
-                 // unique. Therefore, it is safe to use the device name instead of its path. In
-                 // fact, the path requires further parsing before use by ffmpeg, as ffmpeg
-                 // replaces all ':' chars wtih '_' in audio alternative names. Oddly, it does not
-                 // do this for video.
+                // Duplicate audio devices in windows are prepended with an index, making them
+                // unique. Therefore, it is safe to use the device name instead of its path. In
+                // fact, the path requires further parsing before use by ffmpeg, as ffmpeg
+                // replaces all ':' chars wtih '_' in audio alternative names. Oddly, it does not
+                // do this for video.
                 strncpy(
                     camera->auxiliaryData,
                     device->data.deviceName.c_str(),

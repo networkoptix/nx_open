@@ -10,6 +10,12 @@
 namespace nx {
 namespace usb_cam {
 
+namespace {
+
+constexpr char * const kVendorName = "usb_cam";
+
+}
+
 DiscoveryManager::DiscoveryManager(
     nxpt::CommonRefManager* const refManager,
     nxpl::TimeProvider *const timeProvider)
@@ -50,7 +56,7 @@ unsigned int DiscoveryManager::releaseRef()
 
 void DiscoveryManager::getVendorName(char* buf) const
 {
-    strncpy(buf, "usb_cam", nxcip::MAX_TEXT_LEN - 1);
+    strncpy(buf, kVendorName, nxcip::MAX_TEXT_LEN - 1);
 }
 
 int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr)
@@ -143,7 +149,7 @@ std::vector<device::DeviceData> DiscoveryManager::findCamerasInternal()
 
         addFfmpegUrl(uidHash.constData(), devices[i].devicePath);
     }
-
+   
     return devices;
 }
 
