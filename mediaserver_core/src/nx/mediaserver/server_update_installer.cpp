@@ -27,12 +27,18 @@ bool ServerUpdateInstaller::initializeUpdateLog(const QString& targetVersion, QS
         logDir = settings().dataDir() + lit("/log/");
 
     if (logDir.isEmpty())
+    {
+        NX_WARNING(this, lm("Failed to find a proper path for a log file for version %1 installer").arg(targetVersion));
         return false;
+    }
 
     QString fileName = QDir(logDir).absoluteFilePath("update.log");
     QFile logFile(fileName);
     if (!logFile.open(QFile::Append))
+    {
+        NX_WARNING(this, lm("Failed to create log file %1 for version %2 installer").args(fileName, targetVersion));
         return false;
+    }
 
     QByteArray preface;
     preface.append("================================================================================\n");
@@ -45,6 +51,7 @@ bool ServerUpdateInstaller::initializeUpdateLog(const QString& targetVersion, QS
     logFile.close();
 
     *logFileName = fileName;
+    NX_INFO(this, lm("initializeUpdateLog() - created log file %1 for version %2 installer").args(fileName, targetVersion));
     return true;
 }
 

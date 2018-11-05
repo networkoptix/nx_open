@@ -30,18 +30,6 @@
 
 namespace {
 
-nx::utils::SoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
-{
-    nx::utils::SoftwareVersion minimalVersion = qnStaticCommon->engineVersion();
-    const auto allServers = resourcePool->getAllServers(Qn::AnyStatus);
-    for(const QnMediaServerResourcePtr &server: allServers)
-    {
-        if (server->getVersion() < minimalVersion)
-            minimalVersion = server->getVersion();
-    }
-    return minimalVersion;
-}
-
 // Trying to find a file in root directory or in one of subdirectories.
 QDir findFolderForFile(QDir root, QString file)
 {
@@ -186,6 +174,36 @@ std::future<UpdateContents> ServerUpdateTool::checkUpdateFromFile(QString file)
     connect(m_extractor.get(), &QnZipExtractor::finished, this, &ServerUpdateTool::atExtractFilesFinished);
 
     return m_offlineUpdateCheckResult.get_future();;
+}
+
+std::future<UpdateContents> ServerUpdateTool::checkRemoteUpdateInfo()
+{
+    if (auto connection = getServerConnection(commonModule()->currentServer()))
+    {
+        auto promise = std::make_shared<std::promise<UpdateContents>>();
+        auto result = promise->get_future();
+        // Requesting remote update info.
+        connection->getUpdateInfo(
+            [promise = std::move(promise)](bool success, rest::Handle handle, const nx::update::Information& response)
+            {
+                UpdateContents contents;
+                if (success)
+                {
+                    contents.info = response;
+                }
+                contents.sourceType = UpdateSourceType::mediaservers;
+                promise->set_value(contents);
+            });
+        return result;
+    }
+    else
+    {
+        NX_WARNING(this) << "requestRemoteUpdateInfo() - have no connection to the server";
+        std::promise<UpdateContents> emptyPromise;
+        auto result = emptyPromise.get_future();
+        emptyPromise.set_value(UpdateContents());
+        return result;
+    }
 }
 
 void ServerUpdateTool::changeUploadState(OfflineUpdateState newState)
@@ -554,17 +572,29 @@ bool ServerUpdateTool::verifyUpdateManifest(UpdateContents& contents) const
         targetVersion, contents.info.cloudHost, getAllServers());
 
     if (!contents.missingUpdate.empty() || !contents.clientPackage.isValid())
+    {
+        NX_WARNING(this) << "verifyUpdateManifest(" << contents.info.version <<") - detected missing packages";
         contents.error = nx::update::InformationError::missingPackageError;
+    }
 
     if (!contents.invalidVersion.empty())
+    {
+        NX_WARNING(this) << "verifyUpdateManifest(" << contents.info.version <<") - detected incompatible version error";
         contents.error = nx::update::InformationError::incompatibleVersion;
+    }
 
     // Update package has no packages at all.
     if (contents.info.packages.empty())
+    {
+        NX_WARNING(this) << "verifyUpdateManifest(" << contents.info.version <<") - this update is completely empty";
         contents.error = nx::update::InformationError::missingPackageError;
+    }
 
     if (!contents.cloudIsCompatible)
+    {
+        NX_WARNING(this) << "verifyUpdateManifest(" << contents.info.version <<") - detected incompatible cloud";
         contents.error = nx::update::InformationError::incompatibleCloudHostError;
+    }
 
     return contents.isValid();
 }
@@ -619,67 +649,6 @@ void ServerUpdateTool::atResourceChanged(const QnResourcePtr& resource)
     //  - Stopped being part of this system: WTF?
 }
 
-/**
- * Generates URL for upcombiner.
- * Upcombiner is special server utility, that combines several update packages
- * to a single zip archive.
- */
-QUrl ServerUpdateTool::generateUpdatePackageUrl(const nx::utils::SoftwareVersion &targetVersion,
-    const QString& targetChangeset, const QSet<QnUuid>& targets, QnResourcePool* resourcePool)
-{
-    QUrlQuery query;
-
-    if (targetVersion.isNull())
-    {
-        query.addQueryItem(lit("version"), lit("latest"));
-        query.addQueryItem(lit("current"), getCurrentVersion(resourcePool).toString());
-    }
-    else
-    {
-        const auto key = targetChangeset.isEmpty()
-            ? QString::number(targetVersion.build())
-            : targetChangeset;
-
-        query.addQueryItem(lit("version"), targetVersion.toString());
-        query.addQueryItem(lit("password"), passwordForBuild(key));
-    }
-
-    QSet<nx::vms::api::SystemInformation> systemInformationList;
-    for (const auto& id: targets)
-    {
-        const auto& server = resourcePool->getResourceById<QnMediaServerResource>(id);
-        if (!server)
-            continue;
-
-        bool incompatible = (server->getStatus() == Qn::Incompatible);
-
-        if (server->getStatus() != Qn::Online && !incompatible)
-            continue;
-
-        if (!server->getSystemInfo().isValid())
-            continue;
-
-        if (!targetVersion.isNull() && server->getVersion() == targetVersion)
-            continue;
-
-        systemInformationList.insert(server->getSystemInfo());
-    }
-
-    query.addQueryItem(lit("client"), nx::vms::api::SystemInformation::currentSystemRuntime().replace(L' ', L'_'));
-    for(const auto &systemInformation: systemInformationList)
-        query.addQueryItem(lit("server"), systemInformation.toString().replace(L' ', L'_'));
-
-    query.addQueryItem(lit("customization"), QnAppInfo::customizationName());
-
-    QString path = qnSettings->updateCombineUrl();
-    if (path.isEmpty())
-        path = QnAppInfo::updateGeneratorUrl();
-    QUrl url(path);
-    url.setQuery(query);
-
-    return url;
-}
-
 bool ServerUpdateTool::hasRemoteChanges() const
 {
     bool result = false;
@@ -716,6 +685,7 @@ UpdateContents ServerUpdateTool::getRemoteUpdateContents() const
     contents.source = "mediaservers";
     contents.info = m_updateManifest;
     contents.clientPackage = findClientPackage(m_updateManifest);
+    verifyUpdateManifest(contents);
     return contents;
 }
 
@@ -878,7 +848,6 @@ QSet<QnUuid> ServerUpdateTool::getLegacyServers() const
     return result;
 }
 
-
 QSet<QnUuid> ServerUpdateTool::getServersCompleteInstall() const
 {
     QSet<QnUuid> result;
@@ -905,10 +874,79 @@ QSet<QnUuid> ServerUpdateTool::getServersWithChangedProtocol() const
     return result;
 }
 
-
 std::shared_ptr<ServerUpdatesModel> ServerUpdateTool::getModel()
 {
     return m_updatesModel;
+}
+
+nx::utils::SoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
+{
+    nx::utils::SoftwareVersion minimalVersion = qnStaticCommon->engineVersion();
+    const auto allServers = resourcePool->getAllServers(Qn::AnyStatus);
+    for(const QnMediaServerResourcePtr &server: allServers)
+    {
+        if (server->getVersion() < minimalVersion)
+            minimalVersion = server->getVersion();
+    }
+    return minimalVersion;
+}
+
+QUrl generateUpdatePackageUrl(const UpdateContents& contents, const QSet<QnUuid>& targets, QnResourcePool* resourcePool)
+{
+    bool useLatest = contents.sourceType == UpdateSourceType::internet;
+    auto changeset = contents.info.version;
+    nx::utils::SoftwareVersion targetVersion = useLatest ? nx::utils::SoftwareVersion() : contents.getVersion();
+
+    QUrlQuery query;
+
+    if (targetVersion.isNull())
+    {
+        query.addQueryItem(lit("version"), lit("latest"));
+        query.addQueryItem(lit("current"), getCurrentVersion(resourcePool).toString());
+    }
+    else
+    {
+        QString key = QString::number(targetVersion.build());
+        QString password = passwordForBuild(key);
+        qDebug() << "Generated password" << password << "for key" << key;
+        query.addQueryItem(lit("version"), targetVersion.toString());
+        query.addQueryItem(lit("password"), password);
+    }
+
+    QSet<nx::vms::api::SystemInformation> systemInformationList;
+    for (const auto& id: targets)
+    {
+        const auto& server = resourcePool->getResourceById<QnMediaServerResource>(id);
+        if (!server)
+            continue;
+
+        bool incompatible = (server->getStatus() == Qn::Incompatible);
+
+        if (server->getStatus() != Qn::Online && !incompatible)
+            continue;
+
+        if (!server->getSystemInfo().isValid())
+            continue;
+
+        if (!targetVersion.isNull() && server->getVersion() == targetVersion)
+            continue;
+
+        systemInformationList.insert(server->getSystemInfo());
+    }
+
+    query.addQueryItem(lit("client"), nx::vms::api::SystemInformation::currentSystemRuntime().replace(L' ', L'_'));
+    for(const auto &systemInformation: systemInformationList)
+        query.addQueryItem(lit("server"), systemInformation.toString().replace(L' ', L'_'));
+
+    query.addQueryItem(lit("customization"), QnAppInfo::customizationName());
+
+    QString path = qnSettings->updateCombineUrl();
+    if (path.isEmpty())
+        path = QnAppInfo::updateGeneratorUrl();
+    QUrl url(path);
+    url.setQuery(query);
+
+    return url;
 }
 
 } // namespace desktop

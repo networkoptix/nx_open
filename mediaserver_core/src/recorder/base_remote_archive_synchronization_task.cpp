@@ -152,7 +152,8 @@ bool BaseRemoteArchiveSynchronizationTask::synchronizeOverlappedTimeline(
             endTimeMs,
             duration_cast<milliseconds>(kDetalizationLevel).count(),
             /*keepSmallChunks*/ true,
-            std::numeric_limits<int>::max());
+            std::numeric_limits<int>::max(),
+            Qt::SortOrder::AscendingOrder);
 
     auto deviceTimePeriods = toTimePeriodList(m_chunks[overlappedId])
         .intersected(
@@ -452,7 +453,8 @@ milliseconds BaseRemoteArchiveSynchronizationTask::calculateDurationOfMediaToImp
             endTimeMs,
             duration_cast<milliseconds>(kDetalizationLevel).count(),
             /*keepSmallChunks*/ true,
-            std::numeric_limits<int>::max());
+            /*limit*/ std::numeric_limits<int>::max(),
+            Qt::SortOrder::AscendingOrder);
 
     mergedDeviceTimePeriods.excludeTimePeriods(serverTimePeriods);
 

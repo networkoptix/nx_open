@@ -148,35 +148,16 @@ bool CommonUpdateInstaller::install(const QnAuthSession& authInfo)
     else
         NX_WARNING(this, "Failed to create or open update log file.");
 
-    if (nx::utils::log::mainLogger()->isToBeLogged(nx::utils::log::Level::debug))
-    {
-        QString argumentsStr(
-            " APPSERVER_PASSWORD=\"\" APPSERVER_PASSWORD_CONFIRM=\"\" SERVER_PASSWORD=\"\"\
-             SERVER_PASSWORD_CONFIRM=\"\"");
-        for (const QString& arg: arguments)
-            argumentsStr += " " + arg;
-
-        NX_INFO(this, lm("Launching %1 %2").arg(m_executable).args(argumentsStr));
-    }
-
     auto authRecord = commonModule()->auditManager()->prepareRecord(authInfo, Qn::AR_UpdateInstall);
     authRecord.addParam("version", m_version.toLatin1());
     commonModule()->auditManager()->addAuditRecord(authRecord);
 
-    const SystemError::ErrorCode processStartErrorCode = nx::startProcessDetached(
-        QDir(installerWorkDir()).absoluteFilePath(m_executable),
-        arguments);
-    if (processStartErrorCode == SystemError::noError)
-    {
-        NX_INFO(this, "Update has been started.");
-    }
+    QString installerPath = QDir(installerWorkDir()).absoluteFilePath(m_executable);
+    SystemError::ErrorCode error = nx::startProcessDetached(installerPath, arguments);
+    if (error == SystemError::noError)
+        NX_INFO(this, lm("Update has been started. file=%1, args=%2").args(installerPath, arguments.join(" ")));
     else
-    {
-        NX_ERROR(
-            this,
-            lm("Failed to launch update script. %1")
-                .args(SystemError::toString(processStartErrorCode)));
-    }
+        NX_ERROR(this, lm("Failed to launch update script. %1").args(SystemError::toString(error)));
 
     QDir::setCurrent(currentDir);
 

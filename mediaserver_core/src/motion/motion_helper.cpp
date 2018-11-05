@@ -6,7 +6,7 @@
 #include <QtCore/QDir>
 #include "recorder/file_deletor.h"
 
-#include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
 #include <recording/time_period_list.h>
 
 
@@ -55,44 +55,43 @@ QnMotionArchiveConnectionPtr QnMotionHelper::createConnection(const QnResourcePt
         return QnMotionArchiveConnectionPtr();
 }
 
-QnTimePeriodList QnMotionHelper::matchImage(const QList<QRegion>& regions, const QnResourcePtr& res, qint64 msStartTime, qint64 msEndTime, int detailLevel)
+QnTimePeriodList QnMotionHelper::matchImage(const QnChunksRequestData& request)
 {
-    std::vector<QnTimePeriodList> data;
-    matchImage( regions, res, msStartTime, msEndTime, detailLevel, &data );
-    return QnTimePeriodList::mergeTimePeriods(data);
-}
+    QList<QRegion> motionRegions = QJson::deserialized<QList<QRegion>>(request.filter.toUtf8());
 
-QnTimePeriodList QnMotionHelper::matchImage(const QList<QRegion>& regions, const QnResourceList& resList, qint64 msStartTime, qint64 msEndTime, int detailLevel)
-{
-    std::vector<QnTimePeriodList> data;
-    for(const QnResourcePtr& res: resList)
-        matchImage( regions, res, msStartTime, msEndTime, detailLevel, &data );
-    //NOTE could just call prev method instead of private one, but that will result in multiple QnTimePeriodList::mergeTimePeriods calls, which could worsen performance
-    return QnTimePeriodList::mergeTimePeriods(data);
-}
-
-void QnMotionHelper::matchImage(
-    const QList<QRegion>& regions,
-    const QnResourcePtr& res,
-    qint64 msStartTime,
-    qint64 msEndTime,
-    int detailLevel,
-    std::vector<QnTimePeriodList>* const timePeriods )
-{
-    for (int i = 0; i < regions.size(); ++i)
+    std::vector<QnTimePeriodList> timePeriods;
+    for(const auto& res: request.resList)
     {
-        QnSecurityCamResource* securityCamRes = dynamic_cast<QnSecurityCamResource*>(res.data());
-        if( securityCamRes && securityCamRes->isDtsBased() )
+        if (res->isDtsBased())
         {
-            timePeriods->push_back(securityCamRes->getDtsTimePeriodsByMotionRegion( regions, msStartTime, msEndTime, detailLevel ));
+            timePeriods.push_back(res->getDtsTimePeriodsByMotionRegion(
+                motionRegions,
+                request.startTimeMs,
+                request.endTimeMs,
+                request.detailLevel.count(),
+                request.keepSmallChunks,
+                request.limit,
+                request.sortOrder));
         }
         else
         {
-            QnMotionArchive* archive = getArchive(res, i);
-            if (archive)
-                timePeriods->push_back(archive->matchPeriod(regions[i], msStartTime, msEndTime, detailLevel));
+            for (int i = 0; i < motionRegions.size(); ++i)
+            {
+                QnMotionArchive* archive = getArchive(res, i);
+                if (archive)
+                {
+                    timePeriods.push_back(archive->matchPeriod(
+                        motionRegions[i],
+                        request.startTimeMs,
+                        request.endTimeMs,
+                        request.detailLevel.count(),
+                        request.limit,
+                        request.sortOrder));
+                }
+            }
         }
     }
+    return QnTimePeriodList::mergeTimePeriods(timePeriods, request.limit, request.sortOrder);
 }
 
 QString QnMotionHelper::getBaseDir(const QString& cameraUniqueId) const

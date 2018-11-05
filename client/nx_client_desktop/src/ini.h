@@ -37,7 +37,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, showDebugTimeInformationInRibbon, "Show extra timestamp information in event ribbon");
     NX_INI_FLAG(0, showPreciseItemTimestamps, "Show precise timestamps on scene items");
     NX_INI_FLAG(0, massSystemUpdatePrototype, "Enable experimental system update.");
-    NX_INI_FLAG(0, massSystemUpdateDebugInfo, "Show additional debug information for experimental update system.");
+    NX_INI_INT(0, massSystemUpdateDebugInfo, "Show additional debug information for experimental update system.");
     NX_INI_FLAG(0, allowOsScreenSaver, "Allow OS to enable screensaver when user is not active.");
     NX_INI_FLAG(0, enableWebKitDeveloperExtras, "Enable WebKit developer tools like Inspector.");
     NX_INI_FLAG(1, enableWebKitPlugins, "Enable WebKit NPAPI plugins (Flash, Java, etc.)");

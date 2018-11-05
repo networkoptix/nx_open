@@ -42,7 +42,7 @@ Axis_M3046V:
       - {codec: 'H264', resolution: '2688x1520'}
     secondary:
       - {codec: 'MJPEG', resolution: '1280x720', fps: [25, 35]}
-      - {codec: 'H264', resolution: '640x360', fps: [13, 17]}  # TODO: Different FPS.
+      - {codec: 'H264', resolution: '640x360', fps: [13, 17]}
     stream_urls:
       "1": "rtsp://192.168.200.10:554/axis-media/media.amp?streamprofile=hdwitnessPrimary"
       "2": "rtsp://192.168.200.10:554/axis-media/media.amp?streamprofile=hdwitnessSecondary"
@@ -286,7 +286,7 @@ Hikvision_DS-2CD2132F-IWS:
 
   recording:
     primary: {codec: 'H264', resolution: '2048x1536', fps: [[13, 17], [8, 12]]}
-    secondary: {codec: 'H264', resolution: '640x480', fps: [5, 9]}
+    secondary: {codec: 'H264', resolution: '640x480', fps: [3, 11]}
 
   video_parameters:
     primary:

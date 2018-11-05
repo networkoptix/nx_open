@@ -22,7 +22,8 @@ namespace cloud {
 namespace test {
 
 class VmsGatewayMediatorIntegration:
-    public BasicTestFixture
+    public BasicTestFixture,
+    public ::testing::Test
 {
     using base_type = BasicTestFixture;
 
@@ -35,6 +36,13 @@ public:
     }
 
 protected:
+    virtual void SetUp() override
+    {
+        // NOTE: BasicTestFixture does not inherit ::testing::Test anymore.
+        // So, base_type::SetUp() is not called automatically.
+        base_type::SetUp();
+    }
+
     void givenGatewayThatFailedToConnectToMediator()
     {
         mediator().stop();
