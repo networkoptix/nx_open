@@ -52,9 +52,6 @@ Check Language
     Run Keyword If    "${status}"=="FAIL"    Set Language
 
 Set Language
-    Sleep    20
-    ${log}    Get Browser Log
-    Log    ${log}
     Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}    20
     Click Button    ${LANGUAGE DROPDOWN}
     Wait Until Element Is Visible    ${LANGUAGE TO SELECT}
