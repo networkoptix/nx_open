@@ -156,10 +156,10 @@ INSTANTIATE_TEST_CASE_P(
     Relaying,
     ::testing::Values(kNotUsingHttpConnect));
 
-//INSTANTIATE_TEST_CASE_P(
-//    SslOnly,
-//    Relaying,
-//    ::testing::Values(kRelayAcceptsSslOnly));
+INSTANTIATE_TEST_CASE_P(
+    SslOnly,
+    Relaying,
+    ::testing::Values(kRelayAcceptsSslOnly));
 
 } // namespace test
 } // namespace cloud
