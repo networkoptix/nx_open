@@ -1,14 +1,15 @@
 import errno
+import functools
+import io
 import logging
-import string
-from abc import ABCMeta, abstractproperty
-from functools import wraps
-from io import BytesIO
+import stat
+import sys
 
+import pathlib2 as pathlib
+import six
 from netaddr import IPAddress
-from pathlib2 import PureWindowsPath
+from scandir import GenericDirEntry
 from smb.SMBConnection import SMBConnection
-from smb.base import SharedFile
 from smb.smb_structs import OperationFailure
 
 from framework.method_caching import cached_getter
@@ -43,21 +44,13 @@ _status_to_errno = {
     _STATUS_DIRECTORY_NOT_EMPTY: errno.ENOTEMPTY,
     _STATUS_REQUEST_NOT_ACCEPTED: errno.EPERM,
     }
+
 _logger = logging.getLogger(__name__)
-
-
-class RequestNotAccepted(Exception):
-    message = (
-        "No more connections can be made to this remote computer at this time"
-        " because the computer has already accepted the maximum number of connections.")
-
-    def __init__(self):
-        super(RequestNotAccepted, self).__init__(self.message)
 
 
 def _reraising_on_operation_failure(status_to_error_cls):
     def decorator(func):
-        @wraps(func)
+        @functools.wraps(func)
         def decorated(self, *args, **kwargs):
             try:
                 return func(self, *args, **kwargs)
@@ -70,7 +63,8 @@ def _reraising_on_operation_failure(status_to_error_cls):
                     raise
                 if last_message_status in status_to_error_cls:
                     error_cls = status_to_error_cls[last_message_status]
-                    raise error_cls(_status_to_errno[last_message_status], e.message)
+                    error = error_cls(_status_to_errno[last_message_status], e.message)
+                    six.reraise(error_cls, error, sys.exc_info()[2])
                 raise
 
         return decorated
@@ -78,9 +72,22 @@ def _reraising_on_operation_failure(status_to_error_cls):
     return decorator
 
 
+_reraise_for_existing = _reraising_on_operation_failure({
+    _STATUS_DIRECTORY_NOT_EMPTY: exceptions.NotEmpty,
+    _STATUS_OBJECT_NAME_NOT_FOUND: exceptions.DoesNotExist,
+    _STATUS_OBJECT_PATH_NOT_FOUND: exceptions.DoesNotExist,
+    _STATUS_FILE_IS_A_DIRECTORY: exceptions.NotAFile,
+    })
+_reraise_for_new = _reraising_on_operation_failure({
+    _STATUS_FILE_IS_A_DIRECTORY: exceptions.NotAFile,
+    _STATUS_OBJECT_PATH_NOT_FOUND: exceptions.BadParent,
+    _STATUS_OBJECT_NAME_COLLISION: exceptions.AlreadyExists,
+    })
+
+
 def _retrying_on_status(*statuses):
     def decorator(func):
-        @wraps(func)
+        @functools.wraps(func)
         def decorated(*args, **kwargs):
             until = "no {} error".format(', '.join(map(hex, statuses)))
             wait = Wait(until, timeout_sec=5)
@@ -98,6 +105,15 @@ def _retrying_on_status(*statuses):
         return decorated
 
     return decorator
+
+
+class RequestNotAccepted(Exception):
+    message = (
+        "No more connections can be made to this remote computer at this time"
+        " because the computer has already accepted the maximum number of connections.")
+
+    def __init__(self):
+        super(RequestNotAccepted, self).__init__(self.message)
 
 
 class SMBConnectionPool(object):
@@ -140,218 +156,143 @@ class SMBConnectionPool(object):
         return connection
 
 
-class SMBPath(FileSystemPath, PureWindowsPath):
-    """Base class for file system access through SMB (v2) protocol
+class _SmbStat(object):
+    def __init__(self, attrs):
+        self.st_mode = stat.S_IFDIR if attrs.isDirectory else stat.S_IFREG
+        self.st_size = attrs.file_size
 
-    It's the simplest way to integrate with `pathlib` and `pathlib2`.
-    When manipulating with paths, `pathlib` doesn't call neither
-    `__new__` nor `__init__`. The only information preserved is type.
-    That's why `SMB` credentials, ports and address are in class class,
-    not to object. This class is not on a module level, therefore,
-    it will be referenced by `WindowsAccess` object and by path objects
-    and will live until those objects live.
-    """
-    __metaclass__ = ABCMeta
-    _smb_connection_pool = abstractproperty()  # type: SMBConnectionPool
+
+class _SmbAccessor(object):
+    def __init__(self, connection_pool):
+        self._smb_connection_pool = connection_pool
+
+    def _conn(self):  # type: () -> SMBConnection
+        return self._smb_connection_pool.connection()
+
+    @_reraise_for_existing
+    def stat(self, path):
+        attrs = self._conn().getAttributes(path.smb_share, path.smb_path)
+        return _SmbStat(attrs)
+
+    lstat = stat
+
+    @_reraise_for_existing
+    def scandir(self, path):
+        entries = []
+        for shared_file in self._conn().listPath(path.smb_share, path.smb_path):
+            if shared_file.filename in ('.', '..'):
+                continue
+            entry = GenericDirEntry(str(path), shared_file.filename)
+            entry._lstat = entry._stat = _SmbStat(shared_file)
+            entries.append(entry)
+        return entries
+
+    def listdir(self, path):
+        return [entry.name for entry in self.scandir(path)]
+
+    @_reraise_for_new
+    def mkdir(self, path, mode=None):
+        if mode is not None:
+            _logger.warning("`mode` is ignored but given: %r", mode)
+        self._conn().createDirectory(path.smb_share, path.smb_path)
+
+    @_reraise_for_existing
+    def rmdir(self, path):
+        self._conn().deleteDirectory(path.smb_share, path.smb_path)
+
+    @_reraise_for_existing
+    def rename(self, path, new_path):
+        assert new_path.smb_share == path.smb_share
+        return self._conn().rename(path.smb_share, path.smb_path, new_path.smb_path)
+
+    @_retrying_on_status(_STATUS_SHARING_VIOLATION)  # Let OS and processes time unlock files.
+    @_reraise_for_existing
+    def unlink(self, path):
+        return self._conn().deleteFiles(path.smb_share, path.smb_path)
+
+
+class SMBPath(FileSystemPath):
+    _accessor = None
+    _connection_pool = None  # type: SMBConnectionPool
 
     @classmethod
-    def specific_cls(cls, address, port, user_name, password):
-        # TODO: Delay `%TEMP%` and `%USERPROFILE%` expansion until accessed and use them.
-        class SpecificSMBPath(cls):
-            _smb_connection_pool = SMBConnectionPool(user_name, password, address, port)
+    def specific_cls(cls, hostname, port, username, password):
+        class ModernSmbPath(cls):
+            _connection_pool = SMBConnectionPool(username, password, hostname, port)
+            _accessor = _SmbAccessor(_connection_pool)
+            _flavour = pathlib._windows_flavour
 
             @classmethod
             def home(cls):
-                return cls('C:', 'Users', user_name)
+                return cls('C:', 'Users', username)
 
-        return SpecificSMBPath
+        return ModernSmbPath
 
-    def __repr__(self):
-        return '<SMBPath {!s} on {!r}>'.format(self, self._smb_connection_pool)
+    def _init(self, template=None):
+        super(SMBPath, self)._init(template=template)
+        if self._drv:
+            self.smb_share = self._drv[0] + '$'
+            self.smb_path = '\\'.join(self._parts[1:])
 
     @classmethod
     def tmp(cls):
         return cls('C:\\', 'Windows', 'Temp', 'FuncTests')
 
-    @property
-    def _service_name(self):
-        """Name of share"""
-        if not self.drive:
-            raise ValueError("No drive in Windows path {}".format(self))
-        drive_letter = self.drive[0].upper()
-        assert drive_letter in string.ascii_uppercase
-        service_name = u'{}$'.format(drive_letter)  # C$, D$, ...
-        return service_name
+    def open(self, mode='r', buffering=-1, encoding=None, errors=None, newline=None):
+        raise NotImplementedError(
+            "Opening of file via SMB is not supported at the moment. "
+            "While opening a file (create message) is essential part of SMB, "
+            "`pysmb` doesn't support this.")
 
-    @property
-    def _relative_path(self):
-        """Path relative to share root"""
-        rel_path = self.relative_to(self.anchor)
-        rel_path_str = str(rel_path).encode().decode()  # Portable unicode.
-        assert not rel_path_str.startswith('\\')
-        return rel_path_str
-
-    def exists(self):
-        try:
-            _ = self._smb_connection_pool.connection().getAttributes(self._service_name, self._relative_path)
-        except OperationFailure as e:
-            last_message_status = e.smb_messages[-1].status
-            if last_message_status == _STATUS_OBJECT_NAME_NOT_FOUND:
-                return False
-            if last_message_status == _STATUS_OBJECT_PATH_NOT_FOUND:
-                return False
-            raise
-        return True
-
-    @_retrying_on_status(_STATUS_SHARING_VIOLATION)  # Let OS and processes time unlock files.
-    @_reraising_on_operation_failure({
-        _STATUS_FILE_IS_A_DIRECTORY: exceptions.NotAFile,
-        _STATUS_OBJECT_NAME_NOT_FOUND: exceptions.DoesNotExist,
-        _STATUS_OBJECT_PATH_NOT_FOUND: exceptions.DoesNotExist,
-        })
-    def unlink(self):
-        if '*' in str(self):
-            raise ValueError("{!r} contains '*', but files can be deleted only by one")
-        self._smb_connection_pool.connection().deleteFiles(self._service_name, self._relative_path)
-
-    def expanduser(self):
-        """Don't do any expansion on Windows"""
-        return self
-
-    @_reraising_on_operation_failure({
-        _STATUS_NOT_A_DIRECTORY: exceptions.NotADir,
-        _STATUS_OBJECT_NAME_NOT_FOUND: exceptions.DoesNotExist,
-        _STATUS_OBJECT_PATH_NOT_FOUND: exceptions.DoesNotExist,
-        })
-    def _glob(self, pattern):
-        try:
-            return self._smb_connection_pool.connection().listPath(
-                self._service_name, self._relative_path,
-                pattern=pattern)
-        except OperationFailure as e:
-            no_files_match = all([
-                # TODO: Consider checking commands too.
-                e.smb_messages[-1].status == _STATUS_SUCCESS,
-                e.smb_messages[-2].status == _STATUS_NO_SUCH_FILE,
-                ])
-            if no_files_match:
-                return []
-            raise
-
-    def glob(self, pattern):
-        return [
-            self / pysmb_file.filename
-            for pysmb_file in self._glob(pattern)
-            if pysmb_file.filename not in {u'.', u'..'}
-            ]
-
-    def mkdir(self, parents=False, exist_ok=False):
-        # No way to create all directories (parents and self) at once.
-        # Usually, only few nearest parents don't exist,
-        # that's why they're checked from nearest one.
-        # TODO: Consider more sophisticated algorithms.
-        if self.parent == self:
-            assert self == self.__class__(self.anchor)  # I.e. disk root, e.g. C:\.
-            if not exist_ok:
-                raise exceptions.AlreadyExists(errno.EEXIST, repr(self))
-        else:
-            try:
-                _logger.debug("Create directory %s on %s", self._relative_path, self._service_name)
-                self._smb_connection_pool.connection().createDirectory(self._service_name, self._relative_path)
-            except OperationFailure as e:
-                last_message_status = e.smb_messages[-1].status
-                # See: https://msdn.microsoft.com/en-us/library/cc704588.aspx
-                if last_message_status == _STATUS_OBJECT_NAME_COLLISION:
-                    if not exist_ok:
-                        raise exceptions.AlreadyExists(errno.EEXIST, repr(self))
-                elif last_message_status == _STATUS_OBJECT_NAME_NOT_FOUND:
-                    if parents:
-                        self.parent.mkdir(parents=False, exist_ok=True)
-                        self.mkdir(parents=False, exist_ok=False)
-                    else:
-                        raise exceptions.BadParent(errno.ENOENT, "Parent {0.parent} of {0} doesn't exist.".format(self))
-                elif last_message_status == _STATUS_OBJECT_PATH_NOT_FOUND:
-                    if parents:
-                        self.parent.parent.mkdir(parents=True, exist_ok=True)
-                        self.parent.mkdir(parents=False, exist_ok=False)
-                        self.mkdir(parents=False, exist_ok=False)
-                    else:
-                        raise exceptions.BadParent(errno.ENOENT, "Grandparent {0.parent.parent} of {0} doesn't exist.".format(self))
-                else:
-                    raise
-
-    @_reraising_on_operation_failure({
-        _STATUS_DIRECTORY_NOT_EMPTY: exceptions.NotEmpty,
-        _STATUS_OBJECT_NAME_NOT_FOUND: exceptions.DoesNotExist,
-        _STATUS_OBJECT_PATH_NOT_FOUND: exceptions.DoesNotExist,
-        })
-    def rmdir(self):
-        self._smb_connection_pool.connection().deleteDirectory(self._service_name, self._relative_path)
-
-    @_reraising_on_operation_failure({
-        _STATUS_FILE_IS_A_DIRECTORY: exceptions.NotAFile,
-        _STATUS_OBJECT_NAME_NOT_FOUND: exceptions.DoesNotExist,
-        _STATUS_OBJECT_PATH_NOT_FOUND: exceptions.DoesNotExist,
-        })
+    @_reraise_for_existing
     def read_bytes(self):
         # TODO: Speedup. Speed is ~1.4 MB/sec. Full dumps are ~300 MB.
         # Performance is not mentioned on pysmb page.
-        ad_hoc_file_object = BytesIO()
-        _attributes, bytes_read = self._smb_connection_pool.connection().retrieveFile(
-            self._service_name, self._relative_path,
-            ad_hoc_file_object)
+        ad_hoc_file_object = io.BytesIO()
+        _attributes, bytes_read = self._connection_pool.connection().retrieveFile(
+            self.smb_share, self.smb_path, ad_hoc_file_object)
         data = ad_hoc_file_object.getvalue()
         assert bytes_read == len(data)
         return data
 
-    @_reraising_on_operation_failure({
-        _STATUS_FILE_IS_A_DIRECTORY: exceptions.NotAFile,
-        _STATUS_OBJECT_NAME_NOT_FOUND: exceptions.DoesNotExist,
-        _STATUS_OBJECT_PATH_NOT_FOUND: exceptions.DoesNotExist,
-        })
+    @_retrying_on_status(_STATUS_DELETE_PENDING)
+    @_reraise_for_new
+    def write_bytes(self, data):
+        ad_hoc_file_object = io.BytesIO(data)
+        return self._connection_pool.connection().storeFile(
+            self.smb_share, self.smb_path,
+            ad_hoc_file_object)
+
+    @_reraise_for_new
+    def read_text(self, encoding='utf8', errors='strict'):
+        data = self.read_bytes()
+        text = data.decode(encoding=encoding, errors=errors)
+        return text
+
+    @_retrying_on_status(_STATUS_DELETE_PENDING)
+    @_reraise_for_new
+    def write_text(self, text, encoding='utf8', errors='strict'):
+        data = text.encode(encoding=encoding, errors=errors)
+        bytes_written = self.write_bytes(data)
+        assert bytes_written == len(data)
+        return len(text)
+
+    @_reraise_for_new
     def yank(self, offset, max_length=None):
         # TODO: Speedup. Speed is ~1.4 MB/sec. Full dumps are ~300 MB.
         # Performance is not mentioned on pysmb page.
-        ad_hoc_file_object = BytesIO()
-        _attributes, bytes_read = self._smb_connection_pool.connection().retrieveFileFromOffset(
-            self._service_name, self._relative_path,
-            ad_hoc_file_object,
+        ad_hoc_file_object = io.BytesIO()
+        _attributes, bytes_read = self._connection_pool.connection().retrieveFileFromOffset(
+            self.smb_share, self.smb_path, ad_hoc_file_object,
             offset=offset, max_length=max_length if max_length is not None else -1)
         data = ad_hoc_file_object.getvalue()
         assert bytes_read == len(data)
         return data
 
     @_retrying_on_status(_STATUS_DELETE_PENDING)
-    @_reraising_on_operation_failure({
-        _STATUS_FILE_IS_A_DIRECTORY: exceptions.NotAFile,
-        _STATUS_OBJECT_PATH_NOT_FOUND: exceptions.BadParent})
-    def write_bytes(self, data):
-        ad_hoc_file_object = BytesIO(data)
-        return self._smb_connection_pool.connection().storeFile(
-            self._service_name, self._relative_path,
-            ad_hoc_file_object)
-
-    @_retrying_on_status(_STATUS_DELETE_PENDING)
-    @_reraising_on_operation_failure({
-        _STATUS_FILE_IS_A_DIRECTORY: exceptions.NotAFile,
-        _STATUS_OBJECT_PATH_NOT_FOUND: exceptions.BadParent})
+    @_reraise_for_new
     def patch(self, offset, data):
-        ad_hoc_file_object = BytesIO(data)
-        return self._smb_connection_pool.connection().storeFileFromOffset(
-            self._service_name, self._relative_path,
-            ad_hoc_file_object,
+        ad_hoc_file_object = io.BytesIO(data)
+        return self._connection_pool.connection().storeFileFromOffset(
+            self.smb_share, self.smb_path, ad_hoc_file_object,
             offset=offset)
-
-    @_reraising_on_operation_failure({
-        _STATUS_OBJECT_NAME_NOT_FOUND: exceptions.DoesNotExist,
-        _STATUS_OBJECT_PATH_NOT_FOUND: exceptions.DoesNotExist,
-        })
-    def size(self):
-        attributes = self._smb_connection_pool.connection().getAttributes(
-            self._service_name, self._relative_path)  # type: SharedFile
-        if attributes.isDirectory:
-            raise exceptions.NotAFile(errno.EISDIR, "Attributes of the {}: {}".format(self, attributes))
-        return attributes.file_size
-
-    def symlink_to(self, target, target_is_directory=False):
-        raise NotImplementedError("Symlinks over SMB are not well-supported")

@@ -2,119 +2,86 @@ import errno
 import logging
 import os
 import stat
+import sys
 from abc import ABCMeta, abstractmethod
 
-from pathlib2 import PurePath, PurePosixPath
+import pathlib2 as pathlib
+import six
 
 from framework.os_access import exceptions
-from framework.os_access.exceptions import DoesNotExist, NotADir
 
 _logger = logging.getLogger(__name__)
 
 
-class FileSystemPath(PurePath):
+class FileSystemPath(pathlib.Path):
     __metaclass__ = ABCMeta
 
-    def __init__(self, *parts):  # type: (*str) -> None
-        """Merely for type hinting"""
+    def __new__(cls, *args, **kwargs):
+        return cls._from_parts(args)
 
-    @classmethod
-    @abstractmethod
-    def home(cls):
-        return cls()
+    def _init(self, template=None):
+        if template is not None:
+            assert isinstance(template, type(self))
+            assert template._accessor is self._accessor
+        self._closed = False
 
     @classmethod
     @abstractmethod
     def tmp(cls):
         return cls()
 
-    @abstractmethod
-    def exists(self):
-        return True
+    def rmtree(self, ignore_errors=False, onerror=None):
+        """Recursively delete a directory tree.
 
-    @abstractmethod
-    def unlink(self):
-        pass
+        If ignore_errors is set, errors are ignored; otherwise, if onerror
+        is set, it is called to handle the error with arguments (func,
+        path, exc_info) where func is os.listdir, os.remove, or os.rmdir;
+        path is the argument to that function that caused it to fail; and
+        exc_info is a tuple returned by sys.exc_info().  If ignore_errors
+        is false and onerror is None, an exception is raised.
 
-    @abstractmethod
-    def expanduser(self):
-        return self.__class__()
-
-    @abstractmethod
-    def glob(self, pattern):
-        return [FileSystemPath()]
-
-    def walk(self):
-        children = self.glob('*')
-        for child in children:
-            try:
-                for descendant in child.walk():
-                    yield descendant
-            except NotADir:
-                yield child
-
-    def mkdir(self, parents=False, exist_ok=False):
-        try:
-            self._mkdir_raw()
-        except exceptions.AlreadyExists:
-            if not exist_ok:
-                raise
-        except exceptions.BadParent:
-            if not parents:
-                raise
-            self.parent.mkdir(parents=True, exist_ok=False)
-            self.mkdir(parents=False, exist_ok=False)
-
-    def _mkdir_raw(self):
-        raise NotImplementedError("Either `mkdir` or `_mkdir_raw` must be implemented")
-
-    def rmtree(self, ignore_errors=False):
-        try:
-            iter_entries = self.glob('*')
-        except exceptions.DoesNotExist:
-            if ignore_errors:
+        """
+        if ignore_errors:
+            def onerror(*_args):
                 pass
+        elif onerror is None:
+            def onerror(_failed_func, _path, exc_info):
+                six.reraise(*exc_info)
+        try:
+            if self.is_symlink():
+                # symlinks to directories are forbidden, see bug #1669
+                raise OSError("Cannot call rmtree on a symbolic link")
+        except OSError:
+            onerror(self.is_symlink, self, sys.exc_info())
+            # can't continue even if onerror hook returns
+            return
+        children = []
+        try:
+            children = list(self.iterdir())
+        except OSError:
+            onerror(self.iterdir, self, sys.exc_info())
+        for child in children:
+            if child.is_dir():
+                child.rmtree(ignore_errors=ignore_errors, onerror=onerror)
             else:
-                raise
-        except exceptions.NotADir:
-            self.unlink()
-        else:
-            for entry in iter_entries:
-                entry.rmtree()
+                try:
+                    child.unlink()
+                except OSError:
+                    onerror(self.unlink, child, sys.exc_info())
+        try:
             self.rmdir()
+        except OSError:
+            onerror(self.rmdir, self, sys.exc_info())
 
-    def rmdir(self):
-        raise NotImplementedError("Either `rmtree` or `rmdir` must be implemented")
-
-    @abstractmethod
-    def read_bytes(self):
-        return b''
-
-    @abstractmethod
     def yank(self, offset, max_length=None):
-        pass
+        with self.open('rb+') as f:
+            f.seek(offset)
+            return f.read(max_length)
 
-    @abstractmethod
-    def write_bytes(self, contents):
-        return 0
-
-    @abstractmethod
-    def patch(self, offset, contents):
-        return 0
-
-    def read_text(self, encoding='utf8', errors='strict'):
-        data = self.read_bytes()
-        text = data.decode(encoding=encoding, errors=errors)
-        return text
-
-    def write_text(self, text, encoding='utf8', errors='strict'):
-        data = text.encode(encoding=encoding, errors=errors)
-        bytes_written = self.write_bytes(data)
-        assert bytes_written == len(data)
-        return len(text)
-
-    def stat(self):
-        raise NotImplementedError("Either `size` or `stat` must be implemented.")
+    def patch(self, offset, data):
+        with self.open('rb+') as f:
+            f.seek(offset)
+            return f.write(data)
 
     def size(self):
         path_stat = self.stat()
@@ -145,7 +112,7 @@ class FileSystemPath(PurePath):
             _logger.debug("Read file with offset %s.", offset_path)
             try:
                 offset_str = offset_path.read_text()
-            except DoesNotExist:
+            except exceptions.DoesNotExist:
                 _logger.debug("Cannot find file with offset %s.", offset_path)
                 return
             offset = int(offset_str)
@@ -183,15 +150,6 @@ class FileSystemPath(PurePath):
             return destination
         copy_file(local_source_path, destination)
         return destination
-
-    @abstractmethod
-    def symlink_to(self, target, target_is_directory=False):
-        pass
-
-
-class BasePosixPath(FileSystemPath, PurePosixPath):
-    __metaclass__ = ABCMeta
-    _tmp = '/tmp/func_tests'
 
 
 def copy_file(source, destination, chunk_size_bytes=1024 * 1024):

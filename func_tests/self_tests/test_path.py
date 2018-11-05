@@ -155,8 +155,7 @@ _tricky_bytes = [
 def test_write_read_bytes(remote_test_dir, data):
     name, written = data
     file_path = remote_test_dir / '{}.dat'.format(name)
-    bytes_written = file_path.write_bytes(written)
-    assert bytes_written == len(written)
+    file_path.write_bytes(written)
     read = file_path.read_bytes()
     assert read == written
 
@@ -239,8 +238,8 @@ def test_unlink_non_existent(existing_remote_dir):
 
 def test_write_to_existing_file(existing_remote_file):
     data = os.urandom(1000)
-    bytes_written = existing_remote_file.write_bytes(data)
-    assert bytes_written == len(data)
+    existing_remote_file.write_bytes(data)
+    assert existing_remote_file.read_bytes() == data
 
 
 def test_read_from_non_existent(remote_test_dir):
@@ -267,11 +266,9 @@ def test_size_of_a_dir(remote_test_dir):
 
 
 def test_glob_on_file(existing_remote_file):
-    with pytest.raises(exceptions.BadPath):
-        _ = list(existing_remote_file.glob('*'))
+    assert not list(existing_remote_file.glob('*'))
 
 
-@pytest.mark.skip()
 def test_glob_recursive(existing_remote_dir):
     layout = [
         ('1',),
@@ -344,8 +341,7 @@ def test_glob_recursive(existing_remote_dir):
 
 def test_glob_on_non_existent(existing_remote_dir):
     non_existent_path = existing_remote_dir / 'non_existent'
-    with pytest.raises(exceptions.BadPath):
-        _ = list(non_existent_path.glob('*'))
+    assert not list(non_existent_path.glob('*'))
 
 
 def test_glob_on_empty_dir(existing_remote_dir):
