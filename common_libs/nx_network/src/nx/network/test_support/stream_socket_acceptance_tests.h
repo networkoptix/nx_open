@@ -1612,6 +1612,7 @@ TYPED_TEST_P(
     this->givenPingPongServer();
     this->givenConnectedSocket();
     ASSERT_TRUE(this->connection()->setNonBlockingMode(true));
+    this->startReadingConnectionAsync();
 
     this->whenClientSentPingAsync(
         [this]()
@@ -1624,6 +1625,7 @@ TYPED_TEST_P(
         });
 
     this->thenServerMessageIsReceived();
+    this->thenSocketCanBeUsedForAsyncIo();
 }
 
 TYPED_TEST_P(StreamSocketAcceptance, DISABLED_socket_is_usable_after_send_cancellation)

@@ -79,9 +79,9 @@ void StreamTransformingAsyncChannel::tryToCompleteUserTasks(
 {
     for (const std::shared_ptr<UserTask>& task: tasksToProcess)
     {
-        utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+        InterruptionFlag::ScopeWatcher watcher(this, &m_aioInterruptionFlag);
         processTask(task.get());
-        if (watcher.objectDestroyed())
+        if (watcher.interrupted())
             return;
 
         if (task->status == UserTaskStatus::done)
@@ -276,12 +276,12 @@ int StreamTransformingAsyncChannel::writeRawBytes(const void* data, size_t count
 }
 
 void StreamTransformingAsyncChannel::onRawDataWritten(
-    SystemError::ErrorCode sysErrorCode,
+    SystemError::ErrorCode resultCode,
     std::size_t /*bytesTransferred*/)
 {
     auto completedIoRange =
         std::make_pair(m_rawWriteQueue.begin(), std::next(m_rawWriteQueue.begin()));
-    if (sysErrorCode != SystemError::noError)
+    if (resultCode != SystemError::noError)
     {
         // Marking socket unusable since we cannot throw away bytes out of SSL stream.
         m_sendShutdown = true;
@@ -290,61 +290,70 @@ void StreamTransformingAsyncChannel::onRawDataWritten(
         completedIoRange.second = m_rawWriteQueue.end();
     }
 
-    const auto userTasks = m_userTaskQueue;
-
-    if (completeRawSendTasks(completedIoRange, sysErrorCode) == UserHandlerResult::thisDeleted)
+    if (completeRawSendTasks(takeRawSendTasks(completedIoRange), resultCode) !=
+        InterruptionFlag::StateChange::noChange)
+    {
         return;
+    }
 
-    if (sysErrorCode == SystemError::noError)
+    if (resultCode == SystemError::noError)
     {
         scheduleNextRawSendTaskIfAny();
 
         // NOTE: Not trying to complete user tasks added in send user handler 
         // (in completeRawSendTasks) because aio thread could have been changed by user.
         // So, we will complete user tasks in a proper aio thread on the next event.
-        tryToCompleteUserTasks(userTasks);
+        tryToCompleteUserTasks();
         return;
     }
 
-    if (socketCannotRecoverFromError(sysErrorCode))
-        reportFailureOfEveryUserTask(sysErrorCode);
+    if (socketCannotRecoverFromError(resultCode))
+        reportFailureOfEveryUserTask(resultCode);
     else
-        reportFailureToTasksFilteredByType(sysErrorCode, UserTaskType::write);
+        reportFailureToTasksFilteredByType(resultCode, UserTaskType::write);
 }
 
 template<typename Range>
-StreamTransformingAsyncChannel::UserHandlerResult
-    StreamTransformingAsyncChannel::completeRawSendTasks(
-        Range completedIoRange,
-        SystemError::ErrorCode sysErrorCode)
+std::deque<StreamTransformingAsyncChannel::RawSendContext> 
+    StreamTransformingAsyncChannel::takeRawSendTasks(Range range)
 {
-    for (auto it = completedIoRange.first; it != completedIoRange.second; ++it)
+    decltype(m_rawWriteQueue) rawSendTasks;
+    std::move(
+        range.first, range.second,
+        std::back_inserter(rawSendTasks));
+    m_rawWriteQueue.erase(range.first, range.second);
+
+    return rawSendTasks;
+}
+
+InterruptionFlag::StateChange StreamTransformingAsyncChannel::completeRawSendTasks(
+    std::deque<RawSendContext> completedRawSendTasks,
+    SystemError::ErrorCode sysErrorCode)
+{
+    for (auto& sendTask: completedRawSendTasks)
     {
-        if (!it->userHandler)
+        if (!sendTask.userHandler)
             continue;
 
-        utils::ObjectDestructionFlag::Watcher thisDestructionWatcher(&m_destructionFlag);
+        InterruptionFlag::ScopeWatcher interruptionWatcher(this, &m_aioInterruptionFlag);
         nx::utils::swapAndCall(
-            it->userHandler,
+            sendTask.userHandler,
             sysErrorCode,
-            sysErrorCode == SystemError::noError ? it->userByteCount : (size_t) -1);
-        if (thisDestructionWatcher.objectDestroyed())
-            return UserHandlerResult::thisDeleted;
+            sysErrorCode == SystemError::noError ? sendTask.userByteCount : (size_t) -1);
+        if (interruptionWatcher.interrupted())
+            return interruptionWatcher.stateChange();
     }
 
-    m_rawWriteQueue.erase(completedIoRange.first, completedIoRange.second);
-    return UserHandlerResult::thisLeftRunning;
+    return InterruptionFlag::StateChange::noChange;
 }
 
 void StreamTransformingAsyncChannel::scheduleNextRawSendTaskIfAny()
 {
-    using namespace std::placeholders;
-
     if (!m_rawWriteQueue.empty())
     {
         m_rawDataChannel->sendAsync(
             m_rawWriteQueue.front().data,
-            std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this, _1, _2));
+            [this](auto&&... args) { onRawDataWritten(std::move(args)...); });
     }
 }
 
@@ -376,7 +385,7 @@ void StreamTransformingAsyncChannel::reportFailureToTasksFilteredByType(
     for (auto& userTask: userTaskQueue)
     {
         auto handler = std::move(userTask->handler);
-        utils::ObjectDestructionFlag::Watcher thisDestructionWatcher(&m_destructionFlag);
+        InterruptionFlag::ScopeWatcher interruptionWatcher(this, &m_aioInterruptionFlag);
         if (sysErrorCode == SystemError::noError) //< Connection closed.
         {
             if (userTask->type == UserTaskType::read)
@@ -388,7 +397,7 @@ void StreamTransformingAsyncChannel::reportFailureToTasksFilteredByType(
         {
             handler(sysErrorCode, (std::size_t)-1);
         }
-        if (thisDestructionWatcher.objectDestroyed())
+        if (interruptionWatcher.interrupted())
             return;
     }
 }
