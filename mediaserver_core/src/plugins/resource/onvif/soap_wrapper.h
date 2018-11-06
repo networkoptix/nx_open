@@ -34,10 +34,10 @@ class QnCommonModule;
 
 struct SoapTimeouts
 {
-    static constexpr int kDefaultSendTimeoutSeconds = 50;
-    static constexpr int kDefaultRecvTimeoutSeconds = 50;
-    static constexpr int kDefaultConnectTimeoutSeconds = 25;
-    static constexpr int kDefaultAcceptTimeoutSeconds = 25;
+    static constexpr int kDefaultSendTimeoutSeconds = 10;
+    static constexpr int kDefaultRecvTimeoutSeconds = 10;
+    static constexpr int kDefaultConnectTimeoutSeconds = 10;
+    static constexpr int kDefaultAcceptTimeoutSeconds = 10;
 
     SoapTimeouts() = default;
     SoapTimeouts(const QString& serialized);
@@ -512,6 +512,15 @@ namespace DeviceIO
         _onvifDeviceIO__GetDigitalInputs,
         _onvifDeviceIO__GetDigitalInputsResponse>;
 
+    /**
+     * This request fails on DWC-MV44WiA (192.168.1.81),
+     * the response contains empty vector of outputs (with "200 OK" return code).
+     * Normally all requests are sent to the endpoint, corresponding the Web Service name,
+     * in this case - QnOnvifServiceUrls::deviceioServiceUrl. But this request works only
+     * if endpoint is QnOnvifServiceUrls::deviceServiceUrl.
+
+     * Instead of DeviceIO::GetRelayOutputs we use obsolete function Device::GetRelayOutputs.
+     */
     using RelayOutputs = RequestWrapper<
         _onvifDevice__GetRelayOutputs,
         _onvifDevice__GetRelayOutputsResponse>;

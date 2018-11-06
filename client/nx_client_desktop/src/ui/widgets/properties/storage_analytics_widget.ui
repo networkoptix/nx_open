@@ -36,7 +36,7 @@
        <item>
         <widget class="QTabWidget" name="tabWidget">
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <property name="documentMode">
           <bool>false</bool>
@@ -47,7 +47,7 @@
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <property name="topMargin">
-            <number>12</number>
+            <number>4</number>
            </property>
            <item>
             <widget class="nx::client::desktop::TableView" name="statsTable">
@@ -103,7 +103,7 @@
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0,0">
            <property name="topMargin">
-            <number>12</number>
+            <number>4</number>
            </property>
            <item>
             <widget class="nx::client::desktop::TableView" name="forecastTable">
@@ -168,7 +168,7 @@
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <item>
               <widget class="QWidget" name="forecastControlWidget" native="true">
-               <layout class="QGridLayout" name="gridLayout_2">
+               <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,0,0,0,0,0">
                 <property name="leftMargin">
                  <number>0</number>
                 </property>
@@ -181,29 +181,54 @@
                 <property name="bottomMargin">
                  <number>0</number>
                 </property>
-                <item row="0" column="0" rowspan="4">
-                 <widget class="QLabel" name="label">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_3">
                   <property name="text">
-                   <string>Additional storage:</string>
+                   <string>Base forecast on recording density for</string>
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="1" rowspan="4">
-                 <widget class="QDoubleSpinBox" name="extraSizeSpinBox">
-                  <property name="suffix">
-                   <string notr="true">&lt; TB&gt;</string>
-                  </property>
-                  <property name="maximum">
-                   <double>1000.000000000000000</double>
+                <item row="1" column="0">
+                 <widget class="QComboBox" name="averagingPeriodCombobox"/>
+                </item>
+                <item row="1" column="6">
+                 <widget class="QLabel" name="maxSizeLabel">
+                  <property name="text">
+                   <string notr="true">1000 TB</string>
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="3" rowspan="4">
+                <item row="1" column="4">
+                 <widget class="QLabel" name="label_2">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string notr="true">0</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="5">
                  <widget class="QSlider" name="extraSpaceSlider">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <property name="minimumSize">
                    <size>
-                    <width>350</width>
+                    <width>320</width>
                     <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>320</width>
+                    <height>16777215</height>
                    </size>
                   </property>
                   <property name="maximum">
@@ -226,21 +251,62 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="2" rowspan="4">
-                 <widget class="QLabel" name="label_2">
+                <item row="0" column="2">
+                 <widget class="QLabel" name="label">
                   <property name="text">
-                   <string notr="true">0</string>
+                   <string>Additional storage</string>
                   </property>
                  </widget>
                 </item>
+                <item row="1" column="1">
+                 <spacer name="horizontalSpacer_3">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Fixed</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>4</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="1" column="2">
+                 <widget class="QDoubleSpinBox" name="extraSizeSpinBox">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="suffix">
+                   <string notr="true">&lt; TB&gt;</string>
+                  </property>
+                  <property name="maximum">
+                   <double>1000.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="3">
+                 <spacer name="horizontalSpacer_4">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Fixed</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>4</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
                </layout>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="maxSizeLabel">
-               <property name="text">
-                <string notr="true">1000 TB</string>
-               </property>
               </widget>
              </item>
              <item>
@@ -248,11 +314,8 @@
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
+               <property name="sizeType">
+                <enum>QSizePolicy::Expanding</enum>
                </property>
               </spacer>
              </item>

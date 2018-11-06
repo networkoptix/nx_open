@@ -4,6 +4,11 @@
 
 #include <QtCore/QThread>
 
+extern "C" {
+#include <libavutil/imgutils.h>
+} // extern "C"
+
+
 #include "utils/media/nalUnits.h"
 
 /* DXVA headers (should be included before ffmpeg headers). */
@@ -69,7 +74,11 @@ struct FffmpegLog
     }
 };
 
-QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(AVCodecID codec_id, const QnConstCompressedVideoDataPtr& data, bool mtDecoding, QAtomicInt* const swDecoderCount):
+QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(
+    const DecoderConfig& config,
+    AVCodecID codec_id,
+    const QnConstCompressedVideoDataPtr& data,
+    bool mtDecoding, QAtomicInt* const swDecoderCount):
     m_passedContext(0),
     m_context(0),
     //m_width(0),
@@ -87,11 +96,21 @@ QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(AVCodecID codec_id, const QnConstComp
     m_checkH264ResolutionChange(false),
     m_forceSliceDecoding(-1),
     m_prevSampleAspectRatio( 1.0 ),
-    m_forcedMtDecoding(false),
+    m_forcedMtDecoding(ForceMtDecodingType::none),
     m_prevTimestamp(AV_NOPTS_VALUE),
     m_spsFound(false)
 {
-    m_mtDecoding = mtDecoding;
+    for (auto& codecName: config.disabledCodecsForMtDecoding)
+    {
+        const AVCodecDescriptor* codecDescr =
+            avcodec_descriptor_get_by_name(codecName.toLatin1().data());
+        if (codecDescr && codecDescr->id == m_codecId)
+        {
+            m_forcedMtDecoding = ForceMtDecodingType::forcedOff;
+            break;
+        }
+    }
+    setMTDecoding(mtDecoding);
 
     if (data->context)
     {
@@ -146,15 +165,23 @@ void QnFfmpegVideoDecoder::closeDecoder()
     delete m_frameTypeExtractor;
 }
 
+bool QnFfmpegVideoDecoder::needToUseMtDecoding(bool userDefinedMtDecoding, ForceMtDecodingType forcedValue)
+{
+    if (forcedValue == ForceMtDecodingType::forcedOn)
+        return true;
+    else if (forcedValue == ForceMtDecodingType::forcedOff)
+        return false;
+    else
+        return userDefinedMtDecoding;
+}
+
 void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVideoDataPtr& data)
 {
-    if (m_context->thread_count <= 1) {
+    if (needToUseMtDecoding(m_mtDecoding, m_forcedMtDecoding))
         m_context->thread_count = qMin(MAX_DECODE_THREAD, QThread::idealThreadCount() + 1);
-        if (m_forcedMtDecoding)
-            m_context->thread_count = qMin(m_context->thread_count, 3);
-    }
-    if (!m_mtDecoding && !m_forcedMtDecoding)
-        m_context->thread_count = 1;
+    else
+        m_context->thread_count = 1; //< Turn off multi thread decoding.
+
 
     if (m_forceSliceDecoding == -1 && data && data->data() && m_context->codec_id == AV_CODEC_ID_H264)
     {
@@ -191,7 +218,7 @@ void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
     if (m_context->codec_id == AV_CODEC_ID_H264 && m_context->thread_type == FF_THREAD_SLICE)
     {
         // ignoring deblocking filter type 1 for better perfomace between H264 slices.
-        m_context->flags2 |= CODEC_FLAG2_FAST;
+        m_context->flags2 |= AV_CODEC_FLAG2_FAST;
     }
     //m_context->flags |= CODEC_FLAG_GRAY;
 }
@@ -244,8 +271,6 @@ void QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
         }
     }
     //NX_ASSERT(m_context->codec);
-
-//    avpicture_fill((AVPicture *)picture, m_buffer, AV_PIX_FMT_YUV420P, c->width, c->height);
 }
 
 void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& data)
@@ -312,13 +337,17 @@ void QnFfmpegVideoDecoder::setSpeed( float /*newValue*/ )
 void QnFfmpegVideoDecoder::reallocateDeinterlacedFrame()
 {
     int roundWidth = qPower2Ceil((unsigned) m_context->width, 32);
-    int numBytes = avpicture_get_size(m_context->pix_fmt, roundWidth, m_context->height);
+    int numBytes = av_image_get_buffer_size(m_context->pix_fmt, roundWidth, m_context->height, /*align*/ 1);
     if (numBytes > 0) {
         if (m_deinterlaceBuffer)
             av_free(m_deinterlaceBuffer);
 
         m_deinterlaceBuffer = (quint8*)av_malloc(numBytes * sizeof(quint8));
-        avpicture_fill((AVPicture *)m_deinterlacedFrame, m_deinterlaceBuffer, m_context->pix_fmt, roundWidth, m_context->height);
+        av_image_fill_arrays(
+            m_deinterlacedFrame->data,
+            m_deinterlacedFrame->linesize,
+            m_deinterlaceBuffer,
+            m_context->pix_fmt, roundWidth, m_context->height, /*align*/ 1);
         m_deinterlacedFrame->width = m_context->width;
         m_deinterlacedFrame->height = m_context->height;
     }
@@ -339,12 +368,12 @@ void QnFfmpegVideoDecoder::processNewResolutionIfChanged(const QnConstCompressed
     }
 }
 
-void QnFfmpegVideoDecoder::forceMtDecoding(bool value)
+void QnFfmpegVideoDecoder::setForceMtDecoding(ForceMtDecodingType value)
 {
     if (value != m_forcedMtDecoding)
     {
-        bool oldMtDecoding = m_mtDecoding || m_forcedMtDecoding;
-        bool newMtDecoding = m_mtDecoding || value;
+        bool oldMtDecoding = needToUseMtDecoding(m_mtDecoding, m_forcedMtDecoding);
+        bool newMtDecoding = needToUseMtDecoding(m_mtDecoding, value);
         m_forcedMtDecoding = value;
         m_needRecreate = oldMtDecoding != newMtDecoding;
     }
@@ -518,13 +547,16 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
 
         if (got_picture)
         {
-            if (m_context->width <= 3500)
-                forceMtDecoding(false);
-            else
+            if (m_forcedMtDecoding != ForceMtDecodingType::forcedOff)
             {
-                qint64 frameDistance = data->timestamp - m_prevTimestamp;
-                if (frameDistance > 0 && frameDistance < 50000)
-                    forceMtDecoding(true); // high fps and high resolution
+                if (m_context->width <= 3500)
+                    setForceMtDecoding(ForceMtDecodingType::none);
+                else
+                {
+                    qint64 frameDistance = data->timestamp - m_prevTimestamp;
+                    if (frameDistance > 0 && frameDistance < 50000)
+                        setForceMtDecoding(ForceMtDecodingType::forcedOn); // high fps and high resolution
+                }
             }
             m_prevTimestamp = data->timestamp;
         }

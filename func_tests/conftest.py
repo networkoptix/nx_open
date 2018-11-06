@@ -193,6 +193,7 @@ def init_logging(request, run_dir):
         logging.info('Logging is initialized from "%s".', full_path)
 
     root_logger = logging.getLogger()
+    root_logger.setLevel(logging.DEBUG)  # default is warning
     file_formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
     for level in {logging.DEBUG, logging.INFO}:
         file_name = logging.getLevelName(level).lower() + '.log'

@@ -111,11 +111,13 @@ private:
         ConnectSessionManager::ConnectToPeerHandler completionHandler,
         api::ResultCode resultCode,
         std::unique_ptr<network::AbstractStreamSocket> listeningPeerConnection);
+
     void startRelaying(
         const std::string& connectSessionId,
         const std::string& listeningPeerName,
         std::unique_ptr<network::AbstractStreamSocket> listeningPeerConnection,
         std::unique_ptr<network::AbstractStreamSocket> clientTunnel);
+
     void startRelaying(RelaySession relaySession);
 };
 

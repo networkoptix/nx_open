@@ -19,7 +19,6 @@ from framework.utils import (
     make_threaded_async_calls,
     MultiFunction,
     SimpleNamespace,
-    take_some,
     )
 
 _logger = logging.getLogger(__name__)
@@ -267,7 +266,7 @@ def test_layout_data_synchronization(artifact_factory, env):
         for idx in range(TEST_SIZE * 3):
             # layouts have 0, 1, 2, .. MAX_LAYOUT_ITEMS-1 items count
             count = idx % MAX_LAYOUT_ITEMS
-            yield list(take_some(item_gen, count))
+            yield list(itertools.islice(item_gen, count))
 
     def layout_call_generator(user_list, layout_item_list_list):
         for idx in range(TEST_SIZE):

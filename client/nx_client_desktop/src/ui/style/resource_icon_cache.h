@@ -28,6 +28,7 @@ public:
         HealthMonitor,
 
         Layout,
+        EncryptedLayout,
         SharedLayout,
         Layouts,
         SharedLayouts,
@@ -53,6 +54,8 @@ public:
         IOModule,
         WebPage,
         WebPages,
+        AnalyticsEngine,
+        AnalyticsEngines,
 
         C2P,
 

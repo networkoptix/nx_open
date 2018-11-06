@@ -2,8 +2,11 @@
 
 #include "../analytics_search_list_model.h"
 
+#include <chrono>
 #include <deque>
 #include <limits>
+#include <memory>
+#include <vector>
 
 #include <QtCore/QSet>
 #include <QtCore/QHash>
@@ -15,20 +18,16 @@
 
 #include <nx/client/desktop/camera/camera_fwd.h>
 #include <nx/client/desktop/event_search/models/private/abstract_async_search_list_model_p.h>
-#include <nx/media/signaling_metadata_consumer.h>
+#include <nx/client/desktop/event_search/utils/live_analytics_receiver.h>
+#include <nx/vms/api/analytics/engine_manifest.h>
 
 class QnUuid;
 class QnMediaResourceWidget;
 class QMenu;
 
-namespace nx {
+namespace nx::utils { class PendingOperation; }
 
-namespace api { struct AnalyticsManifestObjectAction; }
-
-namespace utils { class PendingOperation; }
-
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 class AnalyticsSearchListModel::Private: public AbstractAsyncSearchListModel::Private
 {
@@ -39,8 +38,6 @@ public:
     explicit Private(AnalyticsSearchListModel* q);
     virtual ~Private() override;
 
-    virtual void setCamera(const QnVirtualCameraResourcePtr& camera) override;
-
     virtual int count() const override;
     virtual QVariant data(const QModelIndex& index, int role, bool& handled) const override;
 
@@ -50,79 +47,71 @@ public:
     QString filterText() const;
     void setFilterText(const QString& value);
 
-    virtual void clear() override;
+    virtual void clearData() override;
+    virtual void truncateToMaximumCount() override;
+    virtual void truncateToRelevantTimePeriod() override;
 
-    static constexpr int kMaximumItemCount = 1000;
+    bool isCameraApplicable(const QnVirtualCameraResourcePtr& camera) const;
 
 protected:
-    virtual rest::Handle requestPrefetch(qint64 fromMs, qint64 toMs) override;
-    virtual bool commitPrefetch(qint64 earliestTimeToCommitMs, bool& fetchedAll) override;
-    virtual void clipToSelectedTimePeriod() override;
+    virtual rest::Handle requestPrefetch(const QnTimePeriod& period) override;
+    virtual bool commitPrefetch(const QnTimePeriod& periodToCommit) override;
     virtual bool hasAccessRights() const override;
 
 private:
+    void updateMetadataReceivers();
     void processMetadata();
-    media::SignalingMetadataConsumer* createMetadataSource();
 
     int indexOf(const QnUuid& objectId) const;
 
-    void periodicUpdate();
-    void refreshUpdateTimer();
-    void addNewlyReceivedObjects(analytics::storage::LookupResult&& data);
-    void emitDataChangedIfNeeded();
+    template<typename Iter>
+    bool commitInternal(const QnTimePeriod& periodToCommit, Iter prefetchBegin, Iter prefetchEnd,
+        int position, bool handleOverlaps);
 
+    void emitDataChangedIfNeeded();
     void advanceObject(analytics::storage::DetectedObject& object,
         analytics::storage::ObjectPosition&& position, bool emitDataChanged = true);
 
     using GetCallback = std::function<void(bool, rest::Handle, analytics::storage::LookupResult&&)>;
-    rest::Handle getObjects(qint64 startMs, qint64 endMs, GetCallback callback,
-        int limit = std::numeric_limits<int>::max());
+    rest::Handle getObjects(const QnTimePeriod& period, GetCallback callback, int limit);
 
     QString description(const analytics::storage::DetectedObject& object) const;
     QString attributes(const analytics::storage::DetectedObject& object) const;
     QSharedPointer<QMenu> contextMenu(const analytics::storage::DetectedObject& object) const;
-    static qint64 startTimeMs(const analytics::storage::DetectedObject& object);
 
-    utils::PendingOperation* createUpdateWorkbenchFilterOperation();
+    QnVirtualCameraResourcePtr camera(const analytics::storage::DetectedObject& object) const;
 
     void executePluginAction(const QString& pluginId,
-        const api::AnalyticsManifestObjectAction& action,
+        const nx::vms::api::analytics::EngineManifest::ObjectAction& action,
         const analytics::storage::DetectedObject& object) const;
 
-    void constrainLength();
+    void setLiveReceptionActive(bool value);
 
     struct PreviewParams
     {
-        qint64 timestampUs = 0;
+        std::chrono::microseconds timestamp = std::chrono::microseconds(0);
         QRectF boundingBox;
     };
 
     static PreviewParams previewParams(const analytics::storage::DetectedObject& object);
 
 private:
-    AnalyticsSearchListModel* const q = nullptr;
+    AnalyticsSearchListModel* const q;
     QRectF m_filterRect;
     QString m_filterText;
-    const QScopedPointer<QTimer> m_updateTimer;
+
     const QScopedPointer<utils::PendingOperation> m_emitDataChanged;
-    const QScopedPointer<utils::PendingOperation> m_updateWorkbenchFilter;
-    QSet<QnUuid> m_dataChangedObjectIds; //< For which objects delayed dataChanged is queued.
-    media::AbstractMetadataConsumerPtr m_metadataSource;
-    QnResourceDisplayPtr m_display;
-    qint64 m_latestTimeMs = 0;
-    rest::Handle m_currentUpdateId = rest::Handle();
+    bool m_liveReceptionActive = false;
+
+    using MetadataReceiverList = std::vector<std::unique_ptr<LiveAnalyticsReceiver>>;
+    MetadataReceiverList m_metadataReceivers;
+    const QScopedPointer<QTimer> m_metadataProcessingTimer;
 
     analytics::storage::LookupResult m_prefetch;
     std::deque<analytics::storage::DetectedObject> m_data;
-    bool m_success = true;
 
-    QHash<QnUuid, qint64> m_objectIdToTimestampUs;
-
-    const QScopedPointer<QTimer> m_metadataProcessingTimer;
-    QVector<QnAbstractCompressedMetadataPtr> m_metadataPackets;
-    mutable QnMutex m_metadataMutex;
+    QSet<QnUuid> m_dataChangedObjectIds; //< For which objects delayed dataChanged is queued.
+    QHash<QnUuid, std::chrono::milliseconds> m_objectIdToTimestamp;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

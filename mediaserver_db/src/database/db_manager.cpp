@@ -712,6 +712,26 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
                     return false;
                 }
             }
+            if (m_resyncFlags.testFlag(ResyncAnalyticsPlugins))
+            {
+                if (!fillTransactionLogInternal<
+                    QnUuid,
+                    AnalyticsPluginData,
+                    AnalyticsPluginDataList>(ApiCommand::saveAnalyticsPlugin))
+                {
+                    return false;
+                }
+            }
+            if (m_resyncFlags.testFlag(ResyncAnalyticsEngines))
+            {
+                if (!fillTransactionLogInternal<
+                    QnUuid,
+                    AnalyticsEngineData,
+                    AnalyticsEngineDataList>(ApiCommand::saveAnalyticsEngine))
+                {
+                    return false;
+                }
+            }
 
             if (m_resyncFlags.testFlag(ResyncUserAccessRights))
             {
@@ -1113,6 +1133,22 @@ bool QnDbManager::resyncTransactionLog()
         QnUuid,
         WebPageData,
         WebPageDataList>(ApiCommand::saveWebPage))
+    {
+        return false;
+    }
+
+    if (!fillTransactionLogInternal <
+        QnUuid,
+        AnalyticsPluginData,
+        AnalyticsPluginDataList > (ApiCommand::saveAnalyticsPlugin))
+    {
+        return false;
+    }
+
+    if (!fillTransactionLogInternal <
+        QnUuid,
+        AnalyticsEngineData,
+        AnalyticsEngineDataList > (ApiCommand::saveAnalyticsEngine))
     {
         return false;
     }
@@ -1900,6 +1936,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith("/99_20180914_rename_preferred_preset_type.sql"))
         return resyncIfNeeded(ResyncCameraAttributes);
+
+    if (updateName.endsWith("/99_20181031_rename_smptPassword_parameter.sql"))
+        return resyncIfNeeded(ResyncGlobalSettings);
 
     NX_DEBUG(this, lit("SQL update %1 does not require post-actions.").arg(updateName));
     return true;
@@ -2822,6 +2861,44 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<WebPageDat
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::executeTransactionInternal(
+    const QnTransaction<nx::vms::api::AnalyticsPluginData>& tran)
+{
+    ErrorCode result = saveAnalyticsPlugin(tran.params);
+    return result;
+}
+
+ErrorCode QnDbManager::executeTransactionInternal(
+    const QnTransaction<nx::vms::api::AnalyticsEngineData>& tran)
+{
+    ErrorCode result = saveAnalyticsEngine(tran.params);
+    return result;
+}
+
+ErrorCode QnDbManager::executeTransactionInternal(
+    const QnTransaction<nx::vms::api::AnalyticsPluginDataList>& tran)
+{
+    for (const auto& analyticsPlugin: tran.params)
+    {
+        ErrorCode err = saveAnalyticsPlugin(analyticsPlugin);
+        if (err != ErrorCode::ok)
+            return err;
+    }
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::executeTransactionInternal(
+    const QnTransaction<nx::vms::api::AnalyticsEngineDataList>& tran)
+{
+    for (const auto& analyticsEngine: tran.params)
+    {
+        ErrorCode err = saveAnalyticsEngine(analyticsEngine);
+        if (err != ErrorCode::ok)
+            return err;
+    }
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<DiscoveryData> &tran)
 {
     if (tran.command == ApiCommand::addDiscoveryInformation) {
@@ -3189,6 +3266,10 @@ ApiObjectType QnDbManager::getObjectTypeNoLock(const QnUuid& objectId)
         return ApiObject_Videowall;
     else if (objectType == WebPageData::kResourceTypeName)
         return ApiObject_WebPage;
+    else if (objectType == AnalyticsPluginData::kResourceTypeName)
+        return ApiObject_AnalyticsPlugin;
+    else if (objectType == AnalyticsEngineData::kResourceTypeName)
+        return ApiObject_AnalyticsEngine;
     else
     {
         NX_ASSERT(false, "Unknown object type", Q_FUNC_INFO);
@@ -3350,6 +3431,10 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<IdData>& t
         return cleanAccessRights(tran.params.id);
     case ApiCommand::removeResourceStatus:
         return removeResourceStatus(tran.params.id);
+    case ApiCommand::removeAnalyticsPlugin:
+        return removeAnalyticsPlugin(tran.params.id);
+    case ApiCommand::removeAnalyticsEngine:
+        return removeAnalyticsEngine(tran.params.id);
     default:
         return removeObject(ApiObjectInfo(getObjectTypeNoLock(tran.params.id), tran.params.id));
     }
@@ -3398,6 +3483,12 @@ ErrorCode QnDbManager::removeObject(const ApiObjectInfo& apiObject)
         break;
     case ApiObject_WebPage:
         result = removeWebPage(apiObject.id);
+        break;
+    case ApiObject_AnalyticsPlugin:
+        result = removeAnalyticsPlugin(apiObject.id);
+        break;
+    case ApiObject_AnalyticsEngine:
+        result = removeAnalyticsEngine(apiObject.id);
         break;
     case ApiObject_NotDefined:
         result = ErrorCode::ok; // object already removed
@@ -4288,6 +4379,62 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, WebPageDataList& webPageL
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::doQueryNoLock(
+    const QnUuid& id,
+    nx::vms::api::AnalyticsPluginDataList& outAnalyticsPluginList)
+{
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    QString queryString =
+        "SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId "
+        "FROM vms_resource AS r "
+        "WHERE r.xtype_guid = %1 %2 "
+        "ORDER BY r.guid";
+
+    queryString = queryString
+        .arg(guidToSqlString(nx::vms::api::AnalyticsPluginData::kResourceTypeId))
+        .arg(id.isNull() ? QString() : QString("AND r.guid = %1").arg(guidToSqlString(id)));
+
+    query.prepare(queryString);
+
+    if (!query.exec())
+    {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::dbError;
+    }
+
+    QnSql::fetch_many(query, &outAnalyticsPluginList);
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::doQueryNoLock(
+    const QnUuid& id,
+    nx::vms::api::AnalyticsEngineDataList& outAnalyticsEngineList)
+{
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    QString queryString =
+        "SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId "
+        "FROM vms_resource AS r "
+        "WHERE r.xtype_guid = %1 %2 "
+        "ORDER BY r.guid";
+
+    queryString = queryString
+        .arg(guidToSqlString(nx::vms::api::AnalyticsEngineData::kResourceTypeId))
+        .arg(id.isNull() ? QString() : QString("AND r.guid = %1").arg(guidToSqlString(id)));
+
+    query.prepare(queryString);
+
+    if (!query.exec())
+    {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::dbError;
+    }
+
+    QnSql::fetch_many(query, &outAnalyticsEngineList);
+    return ErrorCode::ok;
+}
+
 //getEventRules
 ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, EventRuleDataList& businessRuleList)
 {
@@ -4461,6 +4608,8 @@ ErrorCode QnDbManager::readFullInfoDataComplete(FullInfoData* data)
     DB_LOAD(QnUuid(), data->resStatusList);
     DB_LOAD(nullptr, data->accessRights);
     DB_LOAD(QnUuid(), data->layoutTours);
+    DB_LOAD(QnUuid(), data->analyticsPlugins);
+    DB_LOAD(QnUuid(), data->analyticsEngines);
 
     return ErrorCode::ok;
 }
@@ -5025,6 +5174,31 @@ ErrorCode QnDbManager::insertOrReplaceWebPage(const WebPageData& data, qint32 in
 
     qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
     return ErrorCode::dbError;
+}
+
+ErrorCode QnDbManager::saveAnalyticsPlugin(const nx::vms::api::AnalyticsPluginData& params)
+{
+    qint32 dummy = 0;
+    return insertOrReplaceResource(params, &dummy);
+}
+
+ErrorCode QnDbManager::removeAnalyticsPlugin(const QnUuid& guid)
+{
+    qint32 id = getResourceInternalId(guid);
+    return deleteRecordFromResourceTable(id);
+}
+
+ErrorCode QnDbManager::saveAnalyticsEngine(
+    const nx::vms::api::AnalyticsEngineData& params)
+{
+    qint32 dummy = 0;
+    return insertOrReplaceResource(params, &dummy);
+}
+
+ErrorCode QnDbManager::removeAnalyticsEngine(const QnUuid& guid)
+{
+    qint32 id = getResourceInternalId(guid);
+    return deleteRecordFromResourceTable(id);
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<LicenseOverflowData>& tran)

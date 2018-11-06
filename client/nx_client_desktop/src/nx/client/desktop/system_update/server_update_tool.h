@@ -54,10 +54,6 @@ public:
 
     void setResourceFeed(QnResourcePool* pool);
 
-    /** Generate url for download update file, depending on actual targets list. */
-    static QUrl generateUpdatePackageUrl(const nx::utils::SoftwareVersion &targetVersion,
-        const QString& targetChangeset, const QSet<QnUuid>& targets, QnResourcePool* resourcePool);
-
     // Check if we should sync UI and data from here.
     bool hasRemoteChanges() const;
 
@@ -113,9 +109,9 @@ public:
     };
 
     std::future<UpdateContents> checkLatestUpdate();
-    std::future<UpdateContents> checkSpecificChangeset(QString build, QString password);
+    std::future<UpdateContents> checkSpecificChangeset(QString build);
     std::future<UpdateContents> checkUpdateFromFile(QString file);
-
+    std::future<UpdateContents> checkRemoteUpdateInfo();
     // It is used to obtain future to update check that was started
     // inside loadInternalState method
     // TODO: move all state restoration logic to widget.
@@ -123,7 +119,7 @@ public:
 
     // Check if update info contains all the packages necessary to update the system.
     // @param contents - current update contents.
-    bool verifyUpdateManifest(UpdateContents& contentse) const;
+    bool verifyUpdateManifest(UpdateContents& contents) const;
 
     // Start uploading local update packages to the server(s).
     bool startUpload(const UpdateContents& contents);
@@ -166,6 +162,10 @@ public:
     // Get servers that have completed installation process.
     QSet<QnUuid> getServersCompleteInstall() const;
 
+    // Get servers that have started update installation.
+    // Note: only client, that have sent an 'install' command can know about this state.
+    QSet<QnUuid> getServersInstalling() const;
+
     // Get servers, which are installing updates for too long.
     QSet<QnUuid> getServersWithStalledUpdate() const;
 
@@ -176,16 +176,16 @@ public:
 
 private:
     // Handlers for resource updates.
-    void at_resourceAdded(const QnResourcePtr& resource);
-    void at_resourceRemoved(const QnResourcePtr& resource);
-    void at_resourceChanged(const QnResourcePtr& resource);
+    void atResourceAdded(const QnResourcePtr& resource);
+    void atResourceRemoved(const QnResourcePtr& resource);
+    void atResourceChanged(const QnResourcePtr& resource);
 
-    void at_updateStatusResponse(bool success, rest::Handle handle, const std::vector<nx::update::Status>& response);
-    void at_uploadWorkerState(QnUuid serverId, const nx::client::desktop::UploadState& state);
+    void atUpdateStatusResponse(bool success, rest::Handle handle, const std::vector<nx::update::Status>& response);
+    void atUploadWorkerState(QnUuid serverId, const nx::client::desktop::UploadState& state);
     // Called by QnZipExtractor when the offline update package is unpacked.
-    void at_extractFilesFinished(int code);
+    void atExtractFilesFinished(int code);
 
-    void at_pingTimerTimeout();
+    void atPingTimerTimeout();
 
     // Wrapper to get REST connection to specified server.
     // For testing purposes. We can switch there to a dummy http server.
@@ -225,11 +225,13 @@ private:
     std::set<QString> m_completedUploads;
     std::map<QString, nx::client::desktop::UploadState> m_uploadStateById;
 
-    // Current update manifest.
+    // Current update manifest. We get it from mediaservers, or overriding it by calling
+    // requestStartUpdate(...) method.
     nx::update::Information m_updateManifest;
 
     std::future<UpdateContents> m_updateCheck;
 
+    // Path to a remote folder with update packages.
     QString m_uploadDestination;
     // Cached path to file with offline updates.
     QString m_localUpdateFile;
@@ -246,6 +248,13 @@ private:
     TimePoint m_timeStartedInstall;
     bool m_protoProblemDetected = false;
 };
+
+/**
+ * Generates URL for upcombiner.
+ * Upcombiner is special server utility, that combines several update packages
+ * to a single zip archive.
+ */
+QUrl generateUpdatePackageUrl(const UpdateContents& contents, const QSet<QnUuid>& targets, QnResourcePool* resourcePool);
 
 } // namespace desktop
 } // namespace client

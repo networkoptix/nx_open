@@ -5,7 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
-#include <nx/api/analytics/analytics_event.h>
+#include <nx/vms/api/analytics/manifest_items.h>
 #include <nx/vms/event/analytics_helper.h>
 
 namespace nx {
@@ -29,7 +29,7 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
 
     auto addItem = [this](
         QStandardItem* parent,
-        const nx::api::TranslatableString& name,
+        const nx::vms::api::analytics::TranslatableString& name,
         const QString& pluginId,
         const QString& id)
     {

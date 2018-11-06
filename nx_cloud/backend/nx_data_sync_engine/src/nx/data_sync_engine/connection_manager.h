@@ -100,9 +100,7 @@ public:
         OutgoingTransactionDispatcher* const outgoingTransactionDispatcher);
     virtual ~ConnectionManager();
 
-    bool addNewConnection(
-        ConnectionContext connectionContext,
-        const vms::api::PeerDataEx& remotePeerInfo);
+    bool addNewConnection(ConnectionContext connectionContext);
 
     /**
      * @return false If connectionId does not refer to an existing connection.

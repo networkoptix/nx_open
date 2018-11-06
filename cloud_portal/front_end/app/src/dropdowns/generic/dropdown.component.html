@@ -1,0 +1,25 @@
+<div class="dropdown"
+     [ngClass]="{'show': show}"
+     (nxClickElsewhere)="show = false">
+
+    <button class="btn btn-dropdown-toggle dropdown-toggle"
+            (click)="show = !show"
+            type="button" id="genericSelect" data-toggle="dropdown">
+
+        <span [innerHtml]="selected.name"></span>
+        <div class="nav-arrow">
+            <span></span>
+            <span></span>
+        </div>
+    </button>
+    <ul class="dropdown-menu" [nxArrowNav]="show"
+         [style.display]="show ? 'inline-block' : 'none'"
+         aria-labelledby="genericSelect">
+
+        <li class="dropdown-item-container" *ngFor="let item of items">
+            <a class="dropdown-item inset" (click)="show = false; change(item)">
+                <span>{{item.name}}</span>
+            </a>
+        </li>
+    </ul>
+</div>

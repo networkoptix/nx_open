@@ -4,7 +4,6 @@
 #include <QtCore/QElapsedTimer>
 
 #include <nx/streaming/abstract_data_consumer.h>
-#include <nx/streaming/rtp_stream_parser.h>
 #include <nx/streaming/abstract_data_packet.h>
 #include <utils/media/externaltimesource.h>
 #include <rtsp/rtsp_ffmpeg_encoder.h>
@@ -110,7 +109,6 @@ private:
     qint64 m_rtStartTime; // used for realtime streaming mode
     qint64 m_lastRtTime; // used for realtime streaming mode
     qint64 m_lastMediaTime; // same as m_lastSendTime, but show real timestamp for LIVE video (m_lastSendTime always returns DATETIME_NOW for live)
-    //char m_rtpHeader[RtpHeader::RTP_HEADER_SIZE];
     QnMutex m_mutex;
     QnMutex m_qualityChangeMutex;
     int m_waitSCeq;

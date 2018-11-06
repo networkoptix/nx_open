@@ -60,10 +60,10 @@ def test_execution(temporary_results, is_success):
 
     steps = executor.steps(FakeServer)
     for _ in temporary_results:
-        steps.next()
+        next(steps)
 
     with pytest.raises(StopIteration):
-        steps.next()
+        next(steps)
 
     assert is_success == executor.is_successful, executor.details
     assert executor.details['duration'] > timedelta()
@@ -86,7 +86,7 @@ def test_execution_timeout():
 def test_execution_exception():
     executor = Executor(_CAMERA_ID, _CAMERA_ID, make_stage(), dict(wrong='rules'))
     with pytest.raises(StopIteration):
-        executor.steps(FakeServer).next()
+        next(executor.steps(FakeServer))
 
     assert not executor.is_successful
     assert 'AssertionError' in '\n'.join(executor.details['exception'])

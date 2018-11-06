@@ -268,26 +268,29 @@ QIcon QnNoptixIconLoader::loadSvgIconInternal(
     auto color =
         [theme = nx::client::desktop::colorTheme()](const QString& name)
         {
-            return theme->color(name).name(QColor::HexRgb).toUpper().toUtf8();
+            return theme->color(name).name().toUtf8();
         };
-    const QByteArray primaryColor = color("light10");
-    const QByteArray secondaryColor = color("light4");
+    const QByteArray primaryColor = "#A5B7C0"; //< Value of light10 in default customization.
+    const QByteArray secondaryColor = "#E1E7EA"; //< Value of light4 in default customization.
 
-    auto replaced =
+    auto colorized =
         [&](const QString& primary, const QString& secondary)
         {
             QByteArray result = baseData;
             // Order is fixed because one of the changed colors is light4 - which leads to confuse.
             result.replace(secondaryColor, color(secondary));
+            result.replace(secondaryColor.toLower(), color(secondary));
             result.replace(primaryColor, color(primary));
+            result.replace(primaryColor.toLower(), color(primary));
             return result;
         };
 
-    builder.addSvg(replaced("dark14", "dark17"), QnIcon::Disabled, QnIcon::Off);
-    builder.addSvg(replaced("light4", "light1"), QnIcon::Selected, QnIcon::Off);
-    builder.addSvg(replaced("brand_core", "brand_l2"), QnIcon::Active, QnIcon::Off);
-    builder.addSvg(replaced("red_l2", "red_l3"), QnIcon::Error, QnIcon::Off);
+    builder.addSvg(colorized("dark14", "dark17"), QnIcon::Disabled, QnIcon::Off);
+    builder.addSvg(colorized("light4", "light1"), QnIcon::Selected, QnIcon::Off);
+    builder.addSvg(colorized("brand_core", "brand_l2"), QnIcon::Active, QnIcon::Off);
+    builder.addSvg(colorized("red_l2", "red_l3"), QnIcon::Error, QnIcon::Off);
 
+    // This can be enabled if we will need to override some icons
     //loadCustomIcons(skin, &builder, basePath, name, checkedName, suffixes);
 
     return builder.createIcon();

@@ -14,59 +14,68 @@ A commercial use license is available from Genivia Inc., contact@genivia.com
 #include "soapSearchBindingProxy.h"
 
 SearchBindingProxy::SearchBindingProxy()
-{	this->soap = soap_new();
-	this->soap_own = true;
-	SearchBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    SearchBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
 }
 
 SearchBindingProxy::SearchBindingProxy(const SearchBindingProxy& rhs)
-{	this->soap = rhs.soap;
-	this->soap_own = false;
-	this->soap_endpoint = rhs.soap_endpoint;
+{
+    this->soap = rhs.soap;
+    this->soap_own = false;
+    this->soap_endpoint = rhs.soap_endpoint;
 }
 
 SearchBindingProxy::SearchBindingProxy(struct soap *_soap)
-{	this->soap = _soap;
-	this->soap_own = false;
-	SearchBindingProxy_init(_soap->imode, _soap->omode);
+{
+    this->soap = _soap;
+    this->soap_own = false;
+    SearchBindingProxy_init(_soap->imode, _soap->omode);
 }
 
 SearchBindingProxy::SearchBindingProxy(const char *endpoint)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	SearchBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
-	soap_endpoint = endpoint;
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    SearchBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+    soap_endpoint = endpoint;
 }
 
 SearchBindingProxy::SearchBindingProxy(soap_mode iomode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	SearchBindingProxy_init(iomode, iomode);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    SearchBindingProxy_init(iomode, iomode);
 }
 
 SearchBindingProxy::SearchBindingProxy(const char *endpoint, soap_mode iomode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	SearchBindingProxy_init(iomode, iomode);
-	soap_endpoint = endpoint;
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    SearchBindingProxy_init(iomode, iomode);
+    soap_endpoint = endpoint;
 }
 
 SearchBindingProxy::SearchBindingProxy(soap_mode imode, soap_mode omode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	SearchBindingProxy_init(imode, omode);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    SearchBindingProxy_init(imode, omode);
 }
 
 SearchBindingProxy::~SearchBindingProxy()
-{	if (this->soap_own)
-		soap_free(this->soap);
+{
+    if (this->soap_own)
+        soap_free(this->soap);
 }
 
 void SearchBindingProxy::SearchBindingProxy_init(soap_mode imode, soap_mode omode)
-{	soap_imode(this->soap, imode);
-	soap_omode(this->soap, omode);
-	soap_endpoint = NULL;
-	static const struct Namespace namespaces[] = {
+{
+    soap_imode(this->soap, imode);
+    soap_omode(this->soap, omode);
+    soap_endpoint = NULL;
+    static const struct Namespace namespaces[] = {
         {"SOAP-ENV", "http://www.w3.org/2003/05/soap-envelope", "http://schemas.xmlsoap.org/soap/envelope/", NULL},
         {"SOAP-ENC", "http://www.w3.org/2003/05/soap-encoding", "http://schemas.xmlsoap.org/soap/encoding/", NULL},
         {"xsi", "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL},
@@ -132,825 +141,856 @@ void SearchBindingProxy::SearchBindingProxy_init(soap_mode imode, soap_mode omod
         {"onvifThermal", "http://www.onvif.org/ver10/thermal/wsdl", NULL, NULL},
         {NULL, NULL, NULL, NULL}
     };
-	soap_set_namespaces(this->soap, namespaces);
+    soap_set_namespaces(this->soap, namespaces);
 }
 
 SearchBindingProxy *SearchBindingProxy::copy()
-{	SearchBindingProxy *dup = SOAP_NEW_UNMANAGED(SearchBindingProxy);
-	if (dup)
-	{	soap_done(dup->soap);
-		soap_copy_context(dup->soap, this->soap);
-	}
-	return dup;
+{
+    SearchBindingProxy *dup = SOAP_NEW_UNMANAGED(SearchBindingProxy);
+    if (dup)
+    {
+        soap_done(dup->soap);
+        soap_copy_context(dup->soap, this->soap);
+    }
+    return dup;
 }
 
 SearchBindingProxy& SearchBindingProxy::operator=(const SearchBindingProxy& rhs)
-{	if (this->soap != rhs.soap)
-	{	if (this->soap_own)
-			soap_free(this->soap);
-		this->soap = rhs.soap;
-		this->soap_own = false;
-		this->soap_endpoint = rhs.soap_endpoint;
-	}
-	return *this;
+{
+    if (this->soap != rhs.soap)
+    {
+        if (this->soap_own)
+            soap_free(this->soap);
+        this->soap = rhs.soap;
+        this->soap_own = false;
+        this->soap_endpoint = rhs.soap_endpoint;
+    }
+    return *this;
 }
 
 void SearchBindingProxy::destroy()
-{	soap_destroy(this->soap);
-	soap_end(this->soap);
+{
+    soap_destroy(this->soap);
+    soap_end(this->soap);
 }
 
 void SearchBindingProxy::reset()
-{	this->destroy();
-	soap_done(this->soap);
-	soap_initialize(this->soap);
-	SearchBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+{
+    this->destroy();
+    soap_done(this->soap);
+    soap_initialize(this->soap);
+    SearchBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
 }
 
 void SearchBindingProxy::soap_noheader()
-{	this->soap->header = NULL;
+{
+    this->soap->header = NULL;
 }
 
-void SearchBindingProxy::soap_header(char *wsa5__MessageID, struct wsa5__RelatesToType *wsa5__RelatesTo, struct wsa5__EndpointReferenceType *wsa5__From, struct wsa5__EndpointReferenceType *wsa5__ReplyTo, struct wsa5__EndpointReferenceType *wsa5__FaultTo, char *wsa5__To, char *wsa5__Action, struct chan__ChannelInstanceType *chan__ChannelInstance, struct wsdd__AppSequenceType *wsdd__AppSequence, struct _wsse__Security *wsse__Security, char *subscriptionID)
-{	::soap_header(this->soap);
-	this->soap->header->wsa5__MessageID = wsa5__MessageID;
-	this->soap->header->wsa5__RelatesTo = wsa5__RelatesTo;
-	this->soap->header->wsa5__From = wsa5__From;
-	this->soap->header->wsa5__ReplyTo = wsa5__ReplyTo;
-	this->soap->header->wsa5__FaultTo = wsa5__FaultTo;
-	this->soap->header->wsa5__To = wsa5__To;
-	this->soap->header->wsa5__Action = wsa5__Action;
-	this->soap->header->chan__ChannelInstance = chan__ChannelInstance;
-	this->soap->header->wsdd__AppSequence = wsdd__AppSequence;
-	this->soap->header->wsse__Security = wsse__Security;
-	this->soap->header->subscriptionID = subscriptionID;
+void SearchBindingProxy::soap_header(char *wsa5__MessageID, struct wsa5__RelatesToType *wsa5__RelatesTo, struct wsa5__EndpointReferenceType *wsa5__From, struct wsa5__EndpointReferenceType *wsa5__ReplyTo, struct wsa5__EndpointReferenceType *wsa5__FaultTo, char *wsa5__To, char *wsa5__Action, struct chan__ChannelInstanceType *chan__ChannelInstance, struct wsdd__AppSequenceType *wsdd__AppSequence, struct _wsse__Security *wsse__Security, char *SubscriptionId)
+{
+    ::soap_header(this->soap);
+    this->soap->header->wsa5__MessageID = wsa5__MessageID;
+    this->soap->header->wsa5__RelatesTo = wsa5__RelatesTo;
+    this->soap->header->wsa5__From = wsa5__From;
+    this->soap->header->wsa5__ReplyTo = wsa5__ReplyTo;
+    this->soap->header->wsa5__FaultTo = wsa5__FaultTo;
+    this->soap->header->wsa5__To = wsa5__To;
+    this->soap->header->wsa5__Action = wsa5__Action;
+    this->soap->header->chan__ChannelInstance = chan__ChannelInstance;
+    this->soap->header->wsdd__AppSequence = wsdd__AppSequence;
+    this->soap->header->wsse__Security = wsse__Security;
+    this->soap->header->SubscriptionId = SubscriptionId;
 }
 
 ::SOAP_ENV__Header *SearchBindingProxy::soap_header()
-{	return this->soap->header;
+{
+    return this->soap->header;
 }
 
 ::SOAP_ENV__Fault *SearchBindingProxy::soap_fault()
-{	return this->soap->fault;
+{
+    return this->soap->fault;
 }
 
 const char *SearchBindingProxy::soap_fault_string()
-{	return *soap_faultstring(this->soap);
+{
+    return *soap_faultstring(this->soap);
 }
 
 const char *SearchBindingProxy::soap_fault_detail()
-{	return *soap_faultdetail(this->soap);
+{
+    return *soap_faultdetail(this->soap);
 }
 
 int SearchBindingProxy::soap_close_socket()
-{	return soap_closesock(this->soap);
+{
+    return soap_closesock(this->soap);
 }
 
 int SearchBindingProxy::soap_force_close_socket()
-{	return soap_force_closesock(this->soap);
+{
+    return soap_force_closesock(this->soap);
 }
 
 void SearchBindingProxy::soap_print_fault(FILE *fd)
-{	::soap_print_fault(this->soap, fd);
+{
+    ::soap_print_fault(this->soap, fd);
 }
 
 #ifndef WITH_LEAN
 #ifndef WITH_COMPAT
 void SearchBindingProxy::soap_stream_fault(std::ostream& os)
-{	::soap_stream_fault(this->soap, os);
+{
+    ::soap_stream_fault(this->soap, os);
 }
 #endif
 
 char *SearchBindingProxy::soap_sprint_fault(char *buf, size_t len)
-{	return ::soap_sprint_fault(this->soap, buf, len);
+{
+    return ::soap_sprint_fault(this->soap, buf, len);
 }
 #endif
 
 int SearchBindingProxy::GetServiceCapabilities(const char *endpoint, const char *soap_action, _onvifSearch__GetServiceCapabilities *onvifSearch__GetServiceCapabilities, _onvifSearch__GetServiceCapabilitiesResponse &onvifSearch__GetServiceCapabilitiesResponse)
 {
-	struct __onvifSearch__GetServiceCapabilities soap_tmp___onvifSearch__GetServiceCapabilities;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/search/wsdl/GetServiceCapabilities";
-	soap_tmp___onvifSearch__GetServiceCapabilities.onvifSearch__GetServiceCapabilities = onvifSearch__GetServiceCapabilities;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifSearch__GetServiceCapabilities(soap, &soap_tmp___onvifSearch__GetServiceCapabilities);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifSearch__GetServiceCapabilities(soap, &soap_tmp___onvifSearch__GetServiceCapabilities, "-onvifSearch:GetServiceCapabilities", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifSearch__GetServiceCapabilities(soap, &soap_tmp___onvifSearch__GetServiceCapabilities, "-onvifSearch:GetServiceCapabilities", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifSearch__GetServiceCapabilitiesResponse*>(&onvifSearch__GetServiceCapabilitiesResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifSearch__GetServiceCapabilitiesResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifSearch__GetServiceCapabilitiesResponse.soap_get(soap, "onvifSearch:GetServiceCapabilitiesResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifSearch__GetServiceCapabilities soap_tmp___onvifSearch__GetServiceCapabilities;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/search/wsdl/GetServiceCapabilities";
+    soap_tmp___onvifSearch__GetServiceCapabilities.onvifSearch__GetServiceCapabilities = onvifSearch__GetServiceCapabilities;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifSearch__GetServiceCapabilities(soap, &soap_tmp___onvifSearch__GetServiceCapabilities);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifSearch__GetServiceCapabilities(soap, &soap_tmp___onvifSearch__GetServiceCapabilities, "-onvifSearch:GetServiceCapabilities", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifSearch__GetServiceCapabilities(soap, &soap_tmp___onvifSearch__GetServiceCapabilities, "-onvifSearch:GetServiceCapabilities", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifSearch__GetServiceCapabilitiesResponse*>(&onvifSearch__GetServiceCapabilitiesResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifSearch__GetServiceCapabilitiesResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifSearch__GetServiceCapabilitiesResponse.soap_get(soap, "onvifSearch:GetServiceCapabilitiesResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int SearchBindingProxy::GetRecordingSummary(const char *endpoint, const char *soap_action, _onvifSearch__GetRecordingSummary *onvifSearch__GetRecordingSummary, _onvifSearch__GetRecordingSummaryResponse &onvifSearch__GetRecordingSummaryResponse)
 {
-	struct __onvifSearch__GetRecordingSummary soap_tmp___onvifSearch__GetRecordingSummary;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/search/wsdl/GetRecordingSummary";
-	soap_tmp___onvifSearch__GetRecordingSummary.onvifSearch__GetRecordingSummary = onvifSearch__GetRecordingSummary;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifSearch__GetRecordingSummary(soap, &soap_tmp___onvifSearch__GetRecordingSummary);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifSearch__GetRecordingSummary(soap, &soap_tmp___onvifSearch__GetRecordingSummary, "-onvifSearch:GetRecordingSummary", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifSearch__GetRecordingSummary(soap, &soap_tmp___onvifSearch__GetRecordingSummary, "-onvifSearch:GetRecordingSummary", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifSearch__GetRecordingSummaryResponse*>(&onvifSearch__GetRecordingSummaryResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifSearch__GetRecordingSummaryResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifSearch__GetRecordingSummaryResponse.soap_get(soap, "onvifSearch:GetRecordingSummaryResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifSearch__GetRecordingSummary soap_tmp___onvifSearch__GetRecordingSummary;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/search/wsdl/GetRecordingSummary";
+    soap_tmp___onvifSearch__GetRecordingSummary.onvifSearch__GetRecordingSummary = onvifSearch__GetRecordingSummary;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifSearch__GetRecordingSummary(soap, &soap_tmp___onvifSearch__GetRecordingSummary);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifSearch__GetRecordingSummary(soap, &soap_tmp___onvifSearch__GetRecordingSummary, "-onvifSearch:GetRecordingSummary", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifSearch__GetRecordingSummary(soap, &soap_tmp___onvifSearch__GetRecordingSummary, "-onvifSearch:GetRecordingSummary", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifSearch__GetRecordingSummaryResponse*>(&onvifSearch__GetRecordingSummaryResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifSearch__GetRecordingSummaryResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifSearch__GetRecordingSummaryResponse.soap_get(soap, "onvifSearch:GetRecordingSummaryResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int SearchBindingProxy::GetRecordingInformation(const char *endpoint, const char *soap_action, _onvifSearch__GetRecordingInformation *onvifSearch__GetRecordingInformation, _onvifSearch__GetRecordingInformationResponse &onvifSearch__GetRecordingInformationResponse)
 {
-	struct __onvifSearch__GetRecordingInformation soap_tmp___onvifSearch__GetRecordingInformation;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/search/wsdl/GetRecordingInformation";
-	soap_tmp___onvifSearch__GetRecordingInformation.onvifSearch__GetRecordingInformation = onvifSearch__GetRecordingInformation;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifSearch__GetRecordingInformation(soap, &soap_tmp___onvifSearch__GetRecordingInformation);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifSearch__GetRecordingInformation(soap, &soap_tmp___onvifSearch__GetRecordingInformation, "-onvifSearch:GetRecordingInformation", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifSearch__GetRecordingInformation(soap, &soap_tmp___onvifSearch__GetRecordingInformation, "-onvifSearch:GetRecordingInformation", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifSearch__GetRecordingInformationResponse*>(&onvifSearch__GetRecordingInformationResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifSearch__GetRecordingInformationResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifSearch__GetRecordingInformationResponse.soap_get(soap, "onvifSearch:GetRecordingInformationResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifSearch__GetRecordingInformation soap_tmp___onvifSearch__GetRecordingInformation;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/search/wsdl/GetRecordingInformation";
+    soap_tmp___onvifSearch__GetRecordingInformation.onvifSearch__GetRecordingInformation = onvifSearch__GetRecordingInformation;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifSearch__GetRecordingInformation(soap, &soap_tmp___onvifSearch__GetRecordingInformation);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifSearch__GetRecordingInformation(soap, &soap_tmp___onvifSearch__GetRecordingInformation, "-onvifSearch:GetRecordingInformation", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifSearch__GetRecordingInformation(soap, &soap_tmp___onvifSearch__GetRecordingInformation, "-onvifSearch:GetRecordingInformation", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifSearch__GetRecordingInformationResponse*>(&onvifSearch__GetRecordingInformationResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifSearch__GetRecordingInformationResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifSearch__GetRecordingInformationResponse.soap_get(soap, "onvifSearch:GetRecordingInformationResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int SearchBindingProxy::GetMediaAttributes(const char *endpoint, const char *soap_action, _onvifSearch__GetMediaAttributes *onvifSearch__GetMediaAttributes, _onvifSearch__GetMediaAttributesResponse &onvifSearch__GetMediaAttributesResponse)
 {
-	struct __onvifSearch__GetMediaAttributes soap_tmp___onvifSearch__GetMediaAttributes;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/search/wsdl/GetMediaAttributes";
-	soap_tmp___onvifSearch__GetMediaAttributes.onvifSearch__GetMediaAttributes = onvifSearch__GetMediaAttributes;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifSearch__GetMediaAttributes(soap, &soap_tmp___onvifSearch__GetMediaAttributes);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifSearch__GetMediaAttributes(soap, &soap_tmp___onvifSearch__GetMediaAttributes, "-onvifSearch:GetMediaAttributes", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifSearch__GetMediaAttributes(soap, &soap_tmp___onvifSearch__GetMediaAttributes, "-onvifSearch:GetMediaAttributes", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifSearch__GetMediaAttributesResponse*>(&onvifSearch__GetMediaAttributesResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifSearch__GetMediaAttributesResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifSearch__GetMediaAttributesResponse.soap_get(soap, "onvifSearch:GetMediaAttributesResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifSearch__GetMediaAttributes soap_tmp___onvifSearch__GetMediaAttributes;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/search/wsdl/GetMediaAttributes";
+    soap_tmp___onvifSearch__GetMediaAttributes.onvifSearch__GetMediaAttributes = onvifSearch__GetMediaAttributes;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifSearch__GetMediaAttributes(soap, &soap_tmp___onvifSearch__GetMediaAttributes);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifSearch__GetMediaAttributes(soap, &soap_tmp___onvifSearch__GetMediaAttributes, "-onvifSearch:GetMediaAttributes", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifSearch__GetMediaAttributes(soap, &soap_tmp___onvifSearch__GetMediaAttributes, "-onvifSearch:GetMediaAttributes", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifSearch__GetMediaAttributesResponse*>(&onvifSearch__GetMediaAttributesResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifSearch__GetMediaAttributesResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifSearch__GetMediaAttributesResponse.soap_get(soap, "onvifSearch:GetMediaAttributesResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int SearchBindingProxy::FindRecordings(const char *endpoint, const char *soap_action, _onvifSearch__FindRecordings *onvifSearch__FindRecordings, _onvifSearch__FindRecordingsResponse &onvifSearch__FindRecordingsResponse)
 {
-	struct __onvifSearch__FindRecordings soap_tmp___onvifSearch__FindRecordings;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/search/wsdl/FindRecordings";
-	soap_tmp___onvifSearch__FindRecordings.onvifSearch__FindRecordings = onvifSearch__FindRecordings;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifSearch__FindRecordings(soap, &soap_tmp___onvifSearch__FindRecordings);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifSearch__FindRecordings(soap, &soap_tmp___onvifSearch__FindRecordings, "-onvifSearch:FindRecordings", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifSearch__FindRecordings(soap, &soap_tmp___onvifSearch__FindRecordings, "-onvifSearch:FindRecordings", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifSearch__FindRecordingsResponse*>(&onvifSearch__FindRecordingsResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifSearch__FindRecordingsResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifSearch__FindRecordingsResponse.soap_get(soap, "onvifSearch:FindRecordingsResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifSearch__FindRecordings soap_tmp___onvifSearch__FindRecordings;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/search/wsdl/FindRecordings";
+    soap_tmp___onvifSearch__FindRecordings.onvifSearch__FindRecordings = onvifSearch__FindRecordings;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifSearch__FindRecordings(soap, &soap_tmp___onvifSearch__FindRecordings);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifSearch__FindRecordings(soap, &soap_tmp___onvifSearch__FindRecordings, "-onvifSearch:FindRecordings", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifSearch__FindRecordings(soap, &soap_tmp___onvifSearch__FindRecordings, "-onvifSearch:FindRecordings", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifSearch__FindRecordingsResponse*>(&onvifSearch__FindRecordingsResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifSearch__FindRecordingsResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifSearch__FindRecordingsResponse.soap_get(soap, "onvifSearch:FindRecordingsResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int SearchBindingProxy::GetRecordingSearchResults(const char *endpoint, const char *soap_action, _onvifSearch__GetRecordingSearchResults *onvifSearch__GetRecordingSearchResults, _onvifSearch__GetRecordingSearchResultsResponse &onvifSearch__GetRecordingSearchResultsResponse)
 {
-	struct __onvifSearch__GetRecordingSearchResults soap_tmp___onvifSearch__GetRecordingSearchResults;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/search/wsdl/GetRecordingSearchResults";
-	soap_tmp___onvifSearch__GetRecordingSearchResults.onvifSearch__GetRecordingSearchResults = onvifSearch__GetRecordingSearchResults;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifSearch__GetRecordingSearchResults(soap, &soap_tmp___onvifSearch__GetRecordingSearchResults);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifSearch__GetRecordingSearchResults(soap, &soap_tmp___onvifSearch__GetRecordingSearchResults, "-onvifSearch:GetRecordingSearchResults", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifSearch__GetRecordingSearchResults(soap, &soap_tmp___onvifSearch__GetRecordingSearchResults, "-onvifSearch:GetRecordingSearchResults", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifSearch__GetRecordingSearchResultsResponse*>(&onvifSearch__GetRecordingSearchResultsResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifSearch__GetRecordingSearchResultsResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifSearch__GetRecordingSearchResultsResponse.soap_get(soap, "onvifSearch:GetRecordingSearchResultsResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifSearch__GetRecordingSearchResults soap_tmp___onvifSearch__GetRecordingSearchResults;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/search/wsdl/GetRecordingSearchResults";
+    soap_tmp___onvifSearch__GetRecordingSearchResults.onvifSearch__GetRecordingSearchResults = onvifSearch__GetRecordingSearchResults;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifSearch__GetRecordingSearchResults(soap, &soap_tmp___onvifSearch__GetRecordingSearchResults);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifSearch__GetRecordingSearchResults(soap, &soap_tmp___onvifSearch__GetRecordingSearchResults, "-onvifSearch:GetRecordingSearchResults", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifSearch__GetRecordingSearchResults(soap, &soap_tmp___onvifSearch__GetRecordingSearchResults, "-onvifSearch:GetRecordingSearchResults", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifSearch__GetRecordingSearchResultsResponse*>(&onvifSearch__GetRecordingSearchResultsResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifSearch__GetRecordingSearchResultsResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifSearch__GetRecordingSearchResultsResponse.soap_get(soap, "onvifSearch:GetRecordingSearchResultsResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int SearchBindingProxy::FindEvents(const char *endpoint, const char *soap_action, _onvifSearch__FindEvents *onvifSearch__FindEvents, _onvifSearch__FindEventsResponse &onvifSearch__FindEventsResponse)
 {
-	struct __onvifSearch__FindEvents soap_tmp___onvifSearch__FindEvents;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/search/wsdl/FindEvents";
-	soap_tmp___onvifSearch__FindEvents.onvifSearch__FindEvents = onvifSearch__FindEvents;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifSearch__FindEvents(soap, &soap_tmp___onvifSearch__FindEvents);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifSearch__FindEvents(soap, &soap_tmp___onvifSearch__FindEvents, "-onvifSearch:FindEvents", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifSearch__FindEvents(soap, &soap_tmp___onvifSearch__FindEvents, "-onvifSearch:FindEvents", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifSearch__FindEventsResponse*>(&onvifSearch__FindEventsResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifSearch__FindEventsResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifSearch__FindEventsResponse.soap_get(soap, "onvifSearch:FindEventsResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifSearch__FindEvents soap_tmp___onvifSearch__FindEvents;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/search/wsdl/FindEvents";
+    soap_tmp___onvifSearch__FindEvents.onvifSearch__FindEvents = onvifSearch__FindEvents;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifSearch__FindEvents(soap, &soap_tmp___onvifSearch__FindEvents);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifSearch__FindEvents(soap, &soap_tmp___onvifSearch__FindEvents, "-onvifSearch:FindEvents", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifSearch__FindEvents(soap, &soap_tmp___onvifSearch__FindEvents, "-onvifSearch:FindEvents", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifSearch__FindEventsResponse*>(&onvifSearch__FindEventsResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifSearch__FindEventsResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifSearch__FindEventsResponse.soap_get(soap, "onvifSearch:FindEventsResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int SearchBindingProxy::GetEventSearchResults(const char *endpoint, const char *soap_action, _onvifSearch__GetEventSearchResults *onvifSearch__GetEventSearchResults, _onvifSearch__GetEventSearchResultsResponse &onvifSearch__GetEventSearchResultsResponse)
 {
-	struct __onvifSearch__GetEventSearchResults soap_tmp___onvifSearch__GetEventSearchResults;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/search/wsdl/GetEventSearchResults";
-	soap_tmp___onvifSearch__GetEventSearchResults.onvifSearch__GetEventSearchResults = onvifSearch__GetEventSearchResults;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifSearch__GetEventSearchResults(soap, &soap_tmp___onvifSearch__GetEventSearchResults);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifSearch__GetEventSearchResults(soap, &soap_tmp___onvifSearch__GetEventSearchResults, "-onvifSearch:GetEventSearchResults", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifSearch__GetEventSearchResults(soap, &soap_tmp___onvifSearch__GetEventSearchResults, "-onvifSearch:GetEventSearchResults", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifSearch__GetEventSearchResultsResponse*>(&onvifSearch__GetEventSearchResultsResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifSearch__GetEventSearchResultsResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifSearch__GetEventSearchResultsResponse.soap_get(soap, "onvifSearch:GetEventSearchResultsResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifSearch__GetEventSearchResults soap_tmp___onvifSearch__GetEventSearchResults;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/search/wsdl/GetEventSearchResults";
+    soap_tmp___onvifSearch__GetEventSearchResults.onvifSearch__GetEventSearchResults = onvifSearch__GetEventSearchResults;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifSearch__GetEventSearchResults(soap, &soap_tmp___onvifSearch__GetEventSearchResults);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifSearch__GetEventSearchResults(soap, &soap_tmp___onvifSearch__GetEventSearchResults, "-onvifSearch:GetEventSearchResults", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifSearch__GetEventSearchResults(soap, &soap_tmp___onvifSearch__GetEventSearchResults, "-onvifSearch:GetEventSearchResults", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifSearch__GetEventSearchResultsResponse*>(&onvifSearch__GetEventSearchResultsResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifSearch__GetEventSearchResultsResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifSearch__GetEventSearchResultsResponse.soap_get(soap, "onvifSearch:GetEventSearchResultsResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int SearchBindingProxy::FindPTZPosition(const char *endpoint, const char *soap_action, _onvifSearch__FindPTZPosition *onvifSearch__FindPTZPosition, _onvifSearch__FindPTZPositionResponse &onvifSearch__FindPTZPositionResponse)
 {
-	struct __onvifSearch__FindPTZPosition soap_tmp___onvifSearch__FindPTZPosition;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/search/wsdl/FindPTZPosition";
-	soap_tmp___onvifSearch__FindPTZPosition.onvifSearch__FindPTZPosition = onvifSearch__FindPTZPosition;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifSearch__FindPTZPosition(soap, &soap_tmp___onvifSearch__FindPTZPosition);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifSearch__FindPTZPosition(soap, &soap_tmp___onvifSearch__FindPTZPosition, "-onvifSearch:FindPTZPosition", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifSearch__FindPTZPosition(soap, &soap_tmp___onvifSearch__FindPTZPosition, "-onvifSearch:FindPTZPosition", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifSearch__FindPTZPositionResponse*>(&onvifSearch__FindPTZPositionResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifSearch__FindPTZPositionResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifSearch__FindPTZPositionResponse.soap_get(soap, "onvifSearch:FindPTZPositionResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifSearch__FindPTZPosition soap_tmp___onvifSearch__FindPTZPosition;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/search/wsdl/FindPTZPosition";
+    soap_tmp___onvifSearch__FindPTZPosition.onvifSearch__FindPTZPosition = onvifSearch__FindPTZPosition;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifSearch__FindPTZPosition(soap, &soap_tmp___onvifSearch__FindPTZPosition);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifSearch__FindPTZPosition(soap, &soap_tmp___onvifSearch__FindPTZPosition, "-onvifSearch:FindPTZPosition", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifSearch__FindPTZPosition(soap, &soap_tmp___onvifSearch__FindPTZPosition, "-onvifSearch:FindPTZPosition", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifSearch__FindPTZPositionResponse*>(&onvifSearch__FindPTZPositionResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifSearch__FindPTZPositionResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifSearch__FindPTZPositionResponse.soap_get(soap, "onvifSearch:FindPTZPositionResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int SearchBindingProxy::GetPTZPositionSearchResults(const char *endpoint, const char *soap_action, _onvifSearch__GetPTZPositionSearchResults *onvifSearch__GetPTZPositionSearchResults, _onvifSearch__GetPTZPositionSearchResultsResponse &onvifSearch__GetPTZPositionSearchResultsResponse)
 {
-	struct __onvifSearch__GetPTZPositionSearchResults soap_tmp___onvifSearch__GetPTZPositionSearchResults;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/search/wsdl/GetPTZPositionSearchResults";
-	soap_tmp___onvifSearch__GetPTZPositionSearchResults.onvifSearch__GetPTZPositionSearchResults = onvifSearch__GetPTZPositionSearchResults;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifSearch__GetPTZPositionSearchResults(soap, &soap_tmp___onvifSearch__GetPTZPositionSearchResults);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifSearch__GetPTZPositionSearchResults(soap, &soap_tmp___onvifSearch__GetPTZPositionSearchResults, "-onvifSearch:GetPTZPositionSearchResults", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifSearch__GetPTZPositionSearchResults(soap, &soap_tmp___onvifSearch__GetPTZPositionSearchResults, "-onvifSearch:GetPTZPositionSearchResults", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifSearch__GetPTZPositionSearchResultsResponse*>(&onvifSearch__GetPTZPositionSearchResultsResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifSearch__GetPTZPositionSearchResultsResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifSearch__GetPTZPositionSearchResultsResponse.soap_get(soap, "onvifSearch:GetPTZPositionSearchResultsResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifSearch__GetPTZPositionSearchResults soap_tmp___onvifSearch__GetPTZPositionSearchResults;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/search/wsdl/GetPTZPositionSearchResults";
+    soap_tmp___onvifSearch__GetPTZPositionSearchResults.onvifSearch__GetPTZPositionSearchResults = onvifSearch__GetPTZPositionSearchResults;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifSearch__GetPTZPositionSearchResults(soap, &soap_tmp___onvifSearch__GetPTZPositionSearchResults);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifSearch__GetPTZPositionSearchResults(soap, &soap_tmp___onvifSearch__GetPTZPositionSearchResults, "-onvifSearch:GetPTZPositionSearchResults", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifSearch__GetPTZPositionSearchResults(soap, &soap_tmp___onvifSearch__GetPTZPositionSearchResults, "-onvifSearch:GetPTZPositionSearchResults", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifSearch__GetPTZPositionSearchResultsResponse*>(&onvifSearch__GetPTZPositionSearchResultsResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifSearch__GetPTZPositionSearchResultsResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifSearch__GetPTZPositionSearchResultsResponse.soap_get(soap, "onvifSearch:GetPTZPositionSearchResultsResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int SearchBindingProxy::GetSearchState(const char *endpoint, const char *soap_action, _onvifSearch__GetSearchState *onvifSearch__GetSearchState, _onvifSearch__GetSearchStateResponse &onvifSearch__GetSearchStateResponse)
 {
-	struct __onvifSearch__GetSearchState soap_tmp___onvifSearch__GetSearchState;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/search/wsdl/GetSearchState";
-	soap_tmp___onvifSearch__GetSearchState.onvifSearch__GetSearchState = onvifSearch__GetSearchState;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifSearch__GetSearchState(soap, &soap_tmp___onvifSearch__GetSearchState);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifSearch__GetSearchState(soap, &soap_tmp___onvifSearch__GetSearchState, "-onvifSearch:GetSearchState", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifSearch__GetSearchState(soap, &soap_tmp___onvifSearch__GetSearchState, "-onvifSearch:GetSearchState", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifSearch__GetSearchStateResponse*>(&onvifSearch__GetSearchStateResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifSearch__GetSearchStateResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifSearch__GetSearchStateResponse.soap_get(soap, "onvifSearch:GetSearchStateResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifSearch__GetSearchState soap_tmp___onvifSearch__GetSearchState;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/search/wsdl/GetSearchState";
+    soap_tmp___onvifSearch__GetSearchState.onvifSearch__GetSearchState = onvifSearch__GetSearchState;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifSearch__GetSearchState(soap, &soap_tmp___onvifSearch__GetSearchState);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifSearch__GetSearchState(soap, &soap_tmp___onvifSearch__GetSearchState, "-onvifSearch:GetSearchState", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifSearch__GetSearchState(soap, &soap_tmp___onvifSearch__GetSearchState, "-onvifSearch:GetSearchState", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifSearch__GetSearchStateResponse*>(&onvifSearch__GetSearchStateResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifSearch__GetSearchStateResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifSearch__GetSearchStateResponse.soap_get(soap, "onvifSearch:GetSearchStateResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int SearchBindingProxy::EndSearch(const char *endpoint, const char *soap_action, _onvifSearch__EndSearch *onvifSearch__EndSearch, _onvifSearch__EndSearchResponse &onvifSearch__EndSearchResponse)
 {
-	struct __onvifSearch__EndSearch soap_tmp___onvifSearch__EndSearch;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/search/wsdl/EndSearch";
-	soap_tmp___onvifSearch__EndSearch.onvifSearch__EndSearch = onvifSearch__EndSearch;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifSearch__EndSearch(soap, &soap_tmp___onvifSearch__EndSearch);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifSearch__EndSearch(soap, &soap_tmp___onvifSearch__EndSearch, "-onvifSearch:EndSearch", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifSearch__EndSearch(soap, &soap_tmp___onvifSearch__EndSearch, "-onvifSearch:EndSearch", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifSearch__EndSearchResponse*>(&onvifSearch__EndSearchResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifSearch__EndSearchResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifSearch__EndSearchResponse.soap_get(soap, "onvifSearch:EndSearchResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifSearch__EndSearch soap_tmp___onvifSearch__EndSearch;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/search/wsdl/EndSearch";
+    soap_tmp___onvifSearch__EndSearch.onvifSearch__EndSearch = onvifSearch__EndSearch;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifSearch__EndSearch(soap, &soap_tmp___onvifSearch__EndSearch);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifSearch__EndSearch(soap, &soap_tmp___onvifSearch__EndSearch, "-onvifSearch:EndSearch", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifSearch__EndSearch(soap, &soap_tmp___onvifSearch__EndSearch, "-onvifSearch:EndSearch", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifSearch__EndSearchResponse*>(&onvifSearch__EndSearchResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifSearch__EndSearchResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifSearch__EndSearchResponse.soap_get(soap, "onvifSearch:EndSearchResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int SearchBindingProxy::FindMetadata(const char *endpoint, const char *soap_action, _onvifSearch__FindMetadata *onvifSearch__FindMetadata, _onvifSearch__FindMetadataResponse &onvifSearch__FindMetadataResponse)
 {
-	struct __onvifSearch__FindMetadata soap_tmp___onvifSearch__FindMetadata;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/search/wsdl/FindMetadata";
-	soap_tmp___onvifSearch__FindMetadata.onvifSearch__FindMetadata = onvifSearch__FindMetadata;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifSearch__FindMetadata(soap, &soap_tmp___onvifSearch__FindMetadata);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifSearch__FindMetadata(soap, &soap_tmp___onvifSearch__FindMetadata, "-onvifSearch:FindMetadata", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifSearch__FindMetadata(soap, &soap_tmp___onvifSearch__FindMetadata, "-onvifSearch:FindMetadata", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifSearch__FindMetadataResponse*>(&onvifSearch__FindMetadataResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifSearch__FindMetadataResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifSearch__FindMetadataResponse.soap_get(soap, "onvifSearch:FindMetadataResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifSearch__FindMetadata soap_tmp___onvifSearch__FindMetadata;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/search/wsdl/FindMetadata";
+    soap_tmp___onvifSearch__FindMetadata.onvifSearch__FindMetadata = onvifSearch__FindMetadata;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifSearch__FindMetadata(soap, &soap_tmp___onvifSearch__FindMetadata);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifSearch__FindMetadata(soap, &soap_tmp___onvifSearch__FindMetadata, "-onvifSearch:FindMetadata", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifSearch__FindMetadata(soap, &soap_tmp___onvifSearch__FindMetadata, "-onvifSearch:FindMetadata", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifSearch__FindMetadataResponse*>(&onvifSearch__FindMetadataResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifSearch__FindMetadataResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifSearch__FindMetadataResponse.soap_get(soap, "onvifSearch:FindMetadataResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int SearchBindingProxy::GetMetadataSearchResults(const char *endpoint, const char *soap_action, _onvifSearch__GetMetadataSearchResults *onvifSearch__GetMetadataSearchResults, _onvifSearch__GetMetadataSearchResultsResponse &onvifSearch__GetMetadataSearchResultsResponse)
 {
-	struct __onvifSearch__GetMetadataSearchResults soap_tmp___onvifSearch__GetMetadataSearchResults;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/search/wsdl/GetMetadataSearchResults";
-	soap_tmp___onvifSearch__GetMetadataSearchResults.onvifSearch__GetMetadataSearchResults = onvifSearch__GetMetadataSearchResults;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifSearch__GetMetadataSearchResults(soap, &soap_tmp___onvifSearch__GetMetadataSearchResults);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifSearch__GetMetadataSearchResults(soap, &soap_tmp___onvifSearch__GetMetadataSearchResults, "-onvifSearch:GetMetadataSearchResults", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifSearch__GetMetadataSearchResults(soap, &soap_tmp___onvifSearch__GetMetadataSearchResults, "-onvifSearch:GetMetadataSearchResults", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifSearch__GetMetadataSearchResultsResponse*>(&onvifSearch__GetMetadataSearchResultsResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifSearch__GetMetadataSearchResultsResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifSearch__GetMetadataSearchResultsResponse.soap_get(soap, "onvifSearch:GetMetadataSearchResultsResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifSearch__GetMetadataSearchResults soap_tmp___onvifSearch__GetMetadataSearchResults;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/search/wsdl/GetMetadataSearchResults";
+    soap_tmp___onvifSearch__GetMetadataSearchResults.onvifSearch__GetMetadataSearchResults = onvifSearch__GetMetadataSearchResults;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifSearch__GetMetadataSearchResults(soap, &soap_tmp___onvifSearch__GetMetadataSearchResults);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifSearch__GetMetadataSearchResults(soap, &soap_tmp___onvifSearch__GetMetadataSearchResults, "-onvifSearch:GetMetadataSearchResults", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifSearch__GetMetadataSearchResults(soap, &soap_tmp___onvifSearch__GetMetadataSearchResults, "-onvifSearch:GetMetadataSearchResults", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifSearch__GetMetadataSearchResultsResponse*>(&onvifSearch__GetMetadataSearchResultsResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifSearch__GetMetadataSearchResultsResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifSearch__GetMetadataSearchResultsResponse.soap_get(soap, "onvifSearch:GetMetadataSearchResultsResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 /* End of client proxy code */

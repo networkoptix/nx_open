@@ -85,6 +85,11 @@ Tag::Tag(QString s):
 {
 }
 
+Tag::Tag(const std::string& s):
+    m_value(QString::fromStdString(s))
+{
+}
+
 bool Tag::matches(const Tag& mask) const
 {
     // TODO: currently all tags are considered as prefixes, but it might be useful to support

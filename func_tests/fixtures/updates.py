@@ -1,8 +1,8 @@
 import hashlib
 
+import flask
 import pytest
-from flask import Flask, request, send_file
-from werkzeug.exceptions import BadRequest, SecurityError
+import werkzeug.exceptions
 
 from defaults import defaults
 from framework.cloud_host import resolve_cloud_host_from_registry
@@ -36,16 +36,16 @@ def _calculate_md5_of_file(path):
 def _make_updates_wsgi_app(updates_dir, range_header_policy='support'):
     """Make app that serves update archives. The only reason to use flask here is to have a
     control over Range header, which may be checked in future."""
-    app = Flask(__name__)
+    app = flask.Flask(__name__)
 
     @app.route('/<path:path>')
     def serve(path):
         path = updates_dir.joinpath(path)
         if updates_dir.resolve() not in path.resolve().parents:
-            raise SecurityError("Resolved path is outside of data dir.")
-        if 'Range' in request.headers and range_header_policy == 'err':
-            raise BadRequest('Range header is not supported')
-        return send_file(
+            raise werkzeug.exceptions.SecurityError("Resolved path is outside of data dir.")
+        if 'Range' in flask.request.headers and range_header_policy == 'err':
+            raise werkzeug.exceptions.BadRequest('Range header is not supported')
+        return flask.send_file(
             str(path),
             as_attachment=True, attachment_filename=path.name,
             conditional=range_header_policy == 'support')
@@ -72,7 +72,7 @@ def updates_set(updates_dir):
 @pytest.fixture()
 def update_info(updates_dir, updates_set, updates_server_url):
     return {
-        'version': str(updates_set.version),
+        'version': str(updates_set.version) + 'a',
         'cloudHost': resolve_cloud_host_from_registry('test', updates_set.customization.customization_name),
         'eulaLink': 'http://new.eula.com/eulaText',
         'eulaVersion': 1,

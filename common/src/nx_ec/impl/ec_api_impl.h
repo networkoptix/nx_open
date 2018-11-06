@@ -201,6 +201,16 @@ namespace ec2
             void onGetWebPagesDone              (int reqID, const ec2::ErrorCode, const nx::vms::api::WebPageDataList&);
             void onGetAccessRightsDone          (int reqID, const ec2::ErrorCode, const nx::vms::api::AccessRightsDataList&);
             void onGetSystemMergeHistoryDone    (int reqID, const ec2::ErrorCode, const nx::vms::api::SystemMergeHistoryRecordList&);
+
+            void onGetAnalyticsPluginsDone(
+                int reqID,
+                const ec2::ErrorCode,
+                const nx::vms::api::AnalyticsPluginDataList&);
+
+            void onGetAnalyticsEnginesDone(
+                int reqID,
+                const ec2::ErrorCode,
+                const nx::vms::api::AnalyticsEngineDataList&);
         };
 
 
@@ -296,6 +306,18 @@ namespace ec2
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER(GetDiscoveryData, ec2::ErrorCode, nx::vms::api::DiscoveryDataList)
 
+        //////////////////////////////////////////////////////////
+        ///////// Handlers for AbstractAnalyticsManager
+        //////////////////////////////////////////////////////////
+        DEFINE_TWO_ARG_HANDLER(
+            GetAnalyticsPlugins,
+            ec2::ErrorCode,
+            nx::vms::api::AnalyticsPluginDataList)
+
+        DEFINE_TWO_ARG_HANDLER(
+            GetAnalyticsEngines,
+            ec2::ErrorCode,
+            nx::vms::api::AnalyticsEngineDataList)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractECConnection

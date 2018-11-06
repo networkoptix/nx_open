@@ -7,6 +7,7 @@ import socket
 import struct
 import threading
 import time
+import timeit
 from contextlib import closing
 from datetime import datetime, timedelta
 from multiprocessing.dummy import Pool as ThreadPool
@@ -50,9 +51,6 @@ def log_list(name, values):
 
 def flatten_list(list_of_lists):
     return list(itertools.chain(*tuple(list_of_lists)))
-
-def quote(s, char='"'):
-    return '%c%s%c' % (char, s, char)
 
 
 def bool_to_str(val, false_str='false', true_str='true'):
@@ -147,26 +145,24 @@ def get_internet_time(address='time.rfc868server.com', port=37):
     return RunningTime(remote_as_datetime, request_duration)
 
 
-def with_traceback(fn):
+def with_traceback(fn, exception_event=None):
     @wraps(fn)  # critical for VMFactory.map to work
     def wrapper(*args, **kw):
         try:
             return fn(*args, **kw)
         except Exception:
             _logger.exception('Exception in %r:', fn)
+            if exception_event:
+                exception_event.set()
             raise
     return wrapper
 
 
-def take_some(iter, count):
-    for i in range(count):
-        yield next(iter)
-
-
 def imerge(*iterators):
-    for value_tuple in itertools.izip(*iterators):
+    for value_tuple in itertools.izip_longest(*iterators):
         for value in value_tuple:
-            yield value
+            if value is not None:
+                yield value
 
 
 def single(iter):
@@ -235,3 +231,15 @@ def threadsafe_generator(generator_fn):
         return ThreadSafeIterator(generator_fn(*args, **kw))
 
     return safe_generator_fn
+
+
+def description_from_func(func):  # type: (Any) -> str
+    try:
+        object_bound_to = func.__self__
+    except AttributeError:
+        if func.__name__ == '<lambda>':
+            raise ValueError("Cannot make description from lambda")
+        return func.__name__
+    if object_bound_to is None:
+        raise ValueError("Cannot make description from unbound method")
+    return '{func.__self__!r}.{func.__name__!s}'.format(func=func)

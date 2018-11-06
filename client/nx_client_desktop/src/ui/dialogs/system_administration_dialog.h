@@ -18,11 +18,11 @@ public:
         LicensesPage,
         SmtpPage,
         UpdatesPage,
-        MassUpdatesPage,
         RoutingManagement,
         TimeServerSelection,
         UserManagement,
         CloudManagement,
+        Analytics,
 
         PageCount
     };

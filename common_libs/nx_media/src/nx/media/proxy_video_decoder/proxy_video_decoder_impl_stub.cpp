@@ -2,10 +2,13 @@
 #if defined(ENABLE_PROXY_DECODER)
 
 #include <nx/kit/debug.h>
-
 #include <nx/media/aligned_mem_video_buffer.h>
 
 #include "proxy_video_decoder_utils.h"
+
+extern "C" {
+#include <libavutil/imgutils.h>
+} // extern "C"
 
 namespace nx {
 namespace media {
@@ -32,7 +35,7 @@ int Impl::decode(
 
     const int alignedWidth = qPower2Ceil(
         (unsigned int) frameSize().width(), (unsigned int) kMediaAlignment);
-    const int numBytes = avpicture_get_size(AV_PIX_FMT_BGRA, alignedWidth, frameSize().height());
+    const int numBytes = av_image_get_buffer_size(AV_PIX_FMT_BGRA, alignedWidth, frameSize().height(), /*align*/ 1);
     const int argbLineSize = alignedWidth * 4;
 
     if (compressedVideoData)

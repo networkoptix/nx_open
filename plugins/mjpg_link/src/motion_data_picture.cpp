@@ -8,7 +8,7 @@
 #include <climits>
 #include <cstring>
 
-#include <plugins/plugin_tools.h>
+#include <nx/kit/utils.h>
 
 
 MotionDataPicture::MotionDataPicture()
@@ -17,15 +17,15 @@ MotionDataPicture::MotionDataPicture()
     m_data( NULL ),
     m_width( nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT ),
     m_height( nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH ),
-    m_stride( nxpt::alignUp( m_width, CHAR_BIT ) / CHAR_BIT )
+    m_stride( nx::kit::utils::alignUp( m_width, CHAR_BIT ) / CHAR_BIT )
 {
-    m_data = static_cast<uint8_t*>(nxpt::mallocAligned( m_stride*m_height, nxcip::MEDIA_DATA_BUFFER_ALIGNMENT ));
+    m_data = static_cast<uint8_t*>(nx::kit::utils::mallocAligned( m_stride*m_height, nxcip::MEDIA_DATA_BUFFER_ALIGNMENT ));
     memset( m_data, 0, m_stride*m_height );
 }
 
 MotionDataPicture::~MotionDataPicture()
 {
-    nxpt::freeAligned( m_data );
+    nx::kit::utils::freeAligned( m_data );
     m_data = NULL;
 }
 
@@ -99,7 +99,7 @@ void* MotionDataPicture::scanLine( int /*planeNumber*/, int lineNumber )
 
 /*!
     \return MotionDataPicture data. Returned buffer MUST be aligned on \a MEDIA_DATA_BUFFER_ALIGNMENT - byte boundary (this restriction helps for some optimization).
-        \a nxpt::mallocAligned and \a nxpt::freeAligned routines can be used for that purpose
+        \a nx::kit::utils::mallocAligned and \a nx::kit::utils::freeAligned routines can be used for that purpose
 */
 const void* MotionDataPicture::data() const
 {

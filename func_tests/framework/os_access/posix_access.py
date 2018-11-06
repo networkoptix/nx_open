@@ -9,7 +9,7 @@ import portalocker
 import pytz
 import tzlocal
 from netaddr import EUI
-from typing import Container, Optional, Callable, ContextManager, Type
+from typing import Any, Container, Optional, Callable, Type
 
 from framework.method_caching import cached_getter
 from framework.networking.interface import Networking
@@ -22,6 +22,7 @@ from framework.os_access.os_access_interface import OSAccess, OneWayPortMap, Rec
 from framework.os_access.path import FileSystemPath
 from framework.os_access.posix_shell import Shell
 from framework.os_access.posix_shell_path import PosixShellPath
+from framework.os_access.sftp_path import SftpPath
 from framework.os_access.ssh_shell import SSH
 from framework.os_access.ssh_traffic_capture import SSHTrafficCapture
 from framework.os_access.traffic_capture import TrafficCapture
@@ -33,11 +34,11 @@ MAKE_CORE_DUMP_TIMEOUT_SEC = 60 * 5
 
 
 class _LocalTime(Time):
-    def __init__(self):
-        self._tz = tzlocal.get_localzone()
+    def get_tz(self):
+        return tzlocal.get_localzone()
 
     def get(self):  # type: () -> RunningTime
-        now = datetime.datetime.now(tz=self._tz)
+        now = datetime.datetime.now(tz=self.get_tz())
         return RunningTime(now)
 
     def set(self, aware_datetime):  # type: (datetime) -> RunningTime
@@ -53,11 +54,14 @@ class _ReadOnlyPosixTime(Time):
         timestamp_output = self._shell.command(['date', '+%s']).run(timeout_sec=2)
         timestamp = int(timestamp_output.decode('ascii').rstrip())
         delay_sec = timeit.default_timer() - started_at
+        local_time = datetime.datetime.fromtimestamp(timestamp, tz=self.get_tz())
+        return RunningTime(local_time, datetime.timedelta(seconds=delay_sec))
+
+    def get_tz(self):
         timezone_output = self._shell.command(['cat', '/etc/timezone']).run(timeout_sec=2)
         timezone_name = timezone_output.decode('ascii').rstrip()
         timezone = pytz.timezone(timezone_name)
-        local_time = datetime.datetime.fromtimestamp(timestamp, tz=timezone)
-        return RunningTime(local_time, datetime.timedelta(seconds=delay_sec))
+        return timezone
 
     def set(self, aware_datetime):
         raise NotImplementedError("Setting time is prohibited on {!r}".format(self._shell))
@@ -83,7 +87,7 @@ class PosixAccess(OSAccess):
             shell,  # type: Shell
             time,  # type: Time
             traffic_capture,  # type: Optional[TrafficCapture]
-            lock_acquired,  # type: Optional[Callable[[FileSystemPath, ...], ContextManager[None]]]
+            lock_acquired,  # type: Optional[Callable[[FileSystemPath, ...], Any]]
             path_cls,  # type: Type[FileSystemPath]
             networking,  # type: Optional[Networking]
             ):
@@ -105,7 +109,7 @@ class PosixAccess(OSAccess):
     def to_vm(cls, vm_alias, port_map, macs, ssh_user_name, ssh_private_key):
         # type: (str, ReciprocalPortMap, str, str, Container[EUI]) -> PosixAccess
         ssh = cls._make_ssh(port_map, ssh_user_name, ssh_private_key)
-        path_cls = PosixShellPath.specific_cls(ssh)
+        path_cls = SftpPath.specific_cls(ssh)
         traffic_capture = SSHTrafficCapture(ssh, path_cls.tmp() / 'traffic_capture')
         return cls(
             vm_alias,
@@ -121,7 +125,7 @@ class PosixAccess(OSAccess):
         return cls(
             alias,
             port_map,
-            ssh, _ReadOnlyPosixTime(ssh), None, ssh.lock_acquired, PosixShellPath.specific_cls(ssh),
+            ssh, _ReadOnlyPosixTime(ssh), None, ssh.lock_acquired, SftpPath.specific_cls(ssh),
             None)
 
     def is_accessible(self):
@@ -172,34 +176,43 @@ class PosixAccess(OSAccess):
             timeout_sec=timeout_sec)
         return output.decode('ascii')
 
-    def make_fake_disk(self, name, size_bytes):
-        mount_point = self.path_cls('/mnt') / name
-        image_path = mount_point.with_suffix('.image')
+    def _dismount_fake_disk(self, mount_point='/mnt/disk'):
+        try:
+            self.shell.run_command(['umount', mount_point])
+        except exceptions.exit_status_error_cls(1):
+            pass
+
+    def make_fake_disk(self, name, size_bytes, mount_point='/mnt/disk'):
+        self._dismount_fake_disk(mount_point=mount_point)
+        image_path = self.path_cls.tmp() / (name + '.image')
+        disk_bytes = size_bytes + 26 * 1024 * 1024  # Taken by filesystem.
         self.shell.run_sh_script(
             # language=Bash
             '''
-                ! mountpoint "$MOUNT_POINT" || umount "$MOUNT_POINT"
                 rm -fv "$IMAGE"
                 fallocate --length $SIZE "$IMAGE"
                 mke2fs -F "$IMAGE"  # Make default filesystem for OS.
                 mkdir -p "$MOUNT_POINT"
                 mount "$IMAGE" "$MOUNT_POINT"
                 ''',
-            env={'MOUNT_POINT': mount_point, 'IMAGE': image_path, 'SIZE': size_bytes})
-        return mount_point
+            env={'MOUNT_POINT': mount_point, 'IMAGE': image_path, 'SIZE': disk_bytes})
+        return self.path_cls(mount_point)
 
-    def free_disk_space_bytes(self):
+    def _fs_root(self):
+        return self.path_cls('/')
+
+    def _free_disk_space_bytes_on_all(self):
         command = self.shell.command([
             'df',
             '--output=target,avail',  # Only mount point (target) and free (available) space.
             '--block-size=1',  # By default it's 1024 and all values are in kilobytes.
             ])
         output = command.run()
+        result = {}
         for line in output.splitlines()[1:]:  # Mind header.
-            mount_point, free_space_raw = line.split()
-            if mount_point == '/':
-                return int(free_space_raw)
-        raise RuntimeError("Cannot find mount point / in output:\n{}".format(output))
+            target, avail = line.split()
+            result[self.path_cls(target)] = int(avail)
+        return result
 
     def _hold_disk_space(self, to_consume_bytes):
         holder_path = self._disk_space_holder()

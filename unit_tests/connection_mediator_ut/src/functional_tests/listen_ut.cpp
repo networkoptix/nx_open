@@ -1,6 +1,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <nx/network/cloud/mediator/api/mediator_api_client.h>
+#include <nx/network/cloud/mediator/api/mediator_api_http_paths.h>
 #include <nx/network/cloud/mediator_server_connections.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/stun/stun_types.h>
@@ -23,6 +25,8 @@ namespace nx {
 namespace hpm {
 namespace test {
 
+namespace HttpStatusCode = nx::network::http::StatusCode;
+
 class ListeningPeer:
     public MediatorFunctionalTest,
     public nx::hpm::api::AbstractCloudSystemCredentialsProvider
@@ -37,6 +41,8 @@ public:
     {
         for (auto& connection: m_serverConnections)
             connection->pleaseStopSync();
+
+        m_mediatorClient.reset();
     }
 
     virtual std::optional<nx::hpm::api::SystemCredentials> getSystemCredentials() const override
@@ -81,17 +87,32 @@ protected:
         m_serverConnections.pop_back();
     }
 
+    void whenConnectToPeerOverHttp(std::string hostName = std::string())
+    {
+        api::ConnectRequest connectRequest;
+        connectRequest.destinationHostName =
+            hostName.empty() ? m_system.id : QByteArray(hostName.c_str());
+        connectRequest.originatingPeerId = nx::utils::generateRandomName(7);
+        connectRequest.connectSessionId = nx::utils::generateRandomName(7);
+        connectRequest.connectionMethods = api::ConnectionMethod::proxy;
+        m_mediatorClient->initiateConnection(
+            connectRequest,
+            [this](auto... args) { saveConnectResult(std::move(args)...); });
+    }
+
+    void whenConnectToUnknownPeerThroughHttp()
+    {
+        whenConnectToPeerOverHttp("unknown_host");
+    }
+
     void thenSystemDisappearedFromListeningPeerList()
     {
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
-        nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::ok;
-        api::ListeningPeers listeningPeers;
-
         for (;;)
         {
-            std::tie(statusCode, listeningPeers) = getListeningPeers();
-            ASSERT_EQ(nx::network::http::StatusCode::ok, statusCode);
+            auto [resultCode, listeningPeers] = getListeningPeers();
+            ASSERT_EQ(api::ResultCode::ok, resultCode);
             if (listeningPeers.systems.find(m_system.id) == listeningPeers.systems.end())
                 break;
 
@@ -103,6 +124,16 @@ protected:
     {
         auto closedConnection = m_closeConnectionEvents.pop();
         ASSERT_EQ(closedConnection, m_serverConnections.front().get());
+    }
+
+    void thenConnectSucceeded()
+    {
+        thenConnectReported(api::ResultCode::ok);
+    }
+
+    void thenConnectReported(api::ResultCode expected)
+    {
+        ASSERT_EQ(expected, std::get<0>(m_connectResponseQueue.pop()));
     }
 
     nx::hpm::AbstractCloudDataProvider::System& system()
@@ -170,11 +201,20 @@ private:
     nx::utils::SyncQueue<std::tuple<nx::hpm::api::ResultCode, nx::hpm::api::ListenResponse>>
         m_listenResponseQueue;
 
+    std::unique_ptr<api::Client> m_mediatorClient;
+    nx::utils::SyncQueue<
+        std::tuple<api::ResultCode, api::ConnectResponse>
+    > m_connectResponseQueue;
+
     virtual void SetUp() override
     {
         ASSERT_TRUE(startAndWaitUntilStarted());
 
         m_system = addRandomSystem();
+
+        m_mediatorClient = std::make_unique<api::Client>(
+            network::url::Builder().setScheme(network::http::kUrlSchemeName)
+                .setEndpoint(httpEndpoint()).setPath(api::kMediatorApiPrefix));
     }
 
     void saveConnectionClosedEvent(
@@ -182,6 +222,13 @@ private:
         SystemError::ErrorCode /*systemErrorCode*/)
     {
         m_closeConnectionEvents.push(stunClient);
+    }
+
+    void saveConnectResult(
+        api::ResultCode resultCode, api::ConnectResponse response)
+    {
+        m_connectResponseQueue.push(
+            std::make_tuple(resultCode, std::move(response)));
     }
 };
 
@@ -235,14 +282,25 @@ TEST_F(ListeningPeer, peer_disconnect)
 
     givenListeningServer();
 
-    nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::ok;
-    api::ListeningPeers listeningPeers;
-    std::tie(statusCode, listeningPeers) = getListeningPeers();
-    ASSERT_EQ(nx::network::http::StatusCode::ok, statusCode);
+    auto [resultCode, listeningPeers] = getListeningPeers();
+    ASSERT_EQ(api::ResultCode::ok, resultCode);
     ASSERT_EQ(1U, listeningPeers.systems.size());
 
     whenCloseConnectionToMediator();
     thenSystemDisappearedFromListeningPeerList();
+}
+
+TEST_F(ListeningPeer, can_connect_with_http_request)
+{
+    givenListeningServer();
+    whenConnectToPeerOverHttp();
+    thenConnectSucceeded();
+}
+
+TEST_F(ListeningPeer, connect_to_unknown_peer_through_http_request_results_not_found)
+{
+    whenConnectToUnknownPeerThroughHttp();
+    thenConnectReported(api::ResultCode::notFound);
 }
 
 //-------------------------------------------------------------------------------------------------

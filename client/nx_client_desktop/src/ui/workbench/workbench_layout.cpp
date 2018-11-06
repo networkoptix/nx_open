@@ -58,14 +58,11 @@ static const nx::utils::log::Tag kFreeSlotTag(lit("__freeSlot"));
 QnWorkbenchLayout::QnWorkbenchLayout(const QnLayoutResourcePtr& resource, QObject* parent):
     QObject(parent)
 {
-
     // TODO: #Elric this does not belong here.
     setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(
         QnStreamSynchronizationState(true, DATETIME_NOW, 1.0)));
 
-    initCellParameters();
-
-    if (resource.isNull())
+    if (!resource)
         return;
 
     if (resource->data().contains(Qn::LayoutFlagsRole))
@@ -125,7 +122,7 @@ QnLayoutResourcePtr QnWorkbenchLayout::resource() const
     return QnLayoutResourcePtr();
 }
 
-QnLayoutResource*QnWorkbenchLayout::resourcePtr() const
+QnLayoutResource* QnWorkbenchLayout::resourcePtr() const
 {
     return resource().data();
 }
@@ -795,11 +792,10 @@ void QnWorkbenchLayout::updateBoundingRectInternal()
 
 void QnWorkbenchLayout::setCellAspectRatio(float cellAspectRatio)
 {
-    if (cellAspectRatio < 0.0 || qFuzzyIsNull(cellAspectRatio)) /* Negative means 'use default value'. */
-        cellAspectRatio = -1.0;
+    if (cellAspectRatio < 0.0 || qFuzzyIsNull(cellAspectRatio))
+        cellAspectRatio = 0.0;
 
     if (qFuzzyCompare(m_cellAspectRatio, cellAspectRatio))
-        return;
 
     m_cellAspectRatio = cellAspectRatio;
 
@@ -833,7 +829,7 @@ void QnWorkbenchLayout::setCellSpacing(qreal spacing)
 {
     if (spacing < 0.0) //< Negative means 'use default value'
     {
-        setCellSpacing(qnGlobals->defaultLayoutCellSpacing());
+        setCellSpacing(kDefaultCellSpacing);
         return;
     }
 
@@ -844,6 +840,11 @@ void QnWorkbenchLayout::setCellSpacing(qreal spacing)
 
     emit cellSpacingChanged();
     emit dataChanged(Qn::LayoutCellSpacingRole);
+}
+
+void QnWorkbenchLayout::setCellSpacing(Qn::CellSpacing value)
+{
+    setCellSpacing(cellSpacingValue(value));
 }
 
 bool QnWorkbenchLayout::locked() const
@@ -863,12 +864,6 @@ void QnWorkbenchLayout::setLocked(bool value)
 const QRect& QnWorkbenchLayout::boundingRect() const
 {
     return m_boundingRect;
-}
-
-void QnWorkbenchLayout::initCellParameters()
-{
-    m_cellAspectRatio = -1.0;
-    m_cellSpacing = qnGlobals->defaultLayoutCellSpacing();
 }
 
 bool QnWorkbenchLayout::own(QnWorkbenchItem* item) const

@@ -43,6 +43,10 @@ enum class ResourceTreeNodeType
     users,
     // Root node for filtered users.
     filteredUsers,
+    // Root node for analytics engines.
+    analyticsEngines,
+    // Root node for filtered analytics engines.
+    filteredAnalyticsEngines,
     // Root node for remote systems.
     otherSystems,
     // Root node for local resources.

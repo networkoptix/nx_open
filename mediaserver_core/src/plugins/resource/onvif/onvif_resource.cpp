@@ -386,6 +386,7 @@ QnPlOnvifResource::QnPlOnvifResource(QnMediaServerModule* serverModule):
     m_timeDrift(0),
     m_isRelayOutputInversed(false),
     m_fixWrongInputPortNumber(false),
+    m_fixWrongOutputPortToken(false),
     m_inputMonitored(false),
     m_clearInputsTimeoutUSec(0),
     m_eventMonitorType(emtNone),
@@ -393,7 +394,7 @@ QnPlOnvifResource::QnPlOnvifResource(QnMediaServerModule* serverModule):
     m_renewSubscriptionTimerID(0),
     m_maxChannels(1),
     m_streamConfCounter(0),
-    m_prevPullMessageResponseClock(0),
+    m_previousPullMessagesResponseTimeMs(0),
     m_inputPortCount(0),
     m_videoLayout(nullptr),
     m_advancedParametersProvider(this),
@@ -401,7 +402,7 @@ QnPlOnvifResource::QnPlOnvifResource(QnMediaServerModule* serverModule):
     m_onvifSendTimeout(DEFAULT_SOAP_TIMEOUT)
 {
     m_tmpH264Conf.reset(new onvifXsd__H264Configuration());
-    m_monotonicClock.start();
+    m_pullMessagesResponseElapsedTimer.start();
     m_advSettingsLastUpdated.restart();
 }
 
@@ -831,6 +832,8 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(
     m_inputPortCount = 0;
     m_isRelayOutputInversed = resourceData.value(QString("relayOutputInversed"), false);
     m_fixWrongInputPortNumber = resourceData.value(QString("fixWrongInputPortNumber"), false);
+    m_fixWrongOutputPortToken = resourceData.value(QString("fixWrongOutputPortToken"), false);
+
     //registering onvif event handler
     std::vector<QnPlOnvifResource::RelayOutputInfo> RelayOutputInfoList;
     fetchRelayOutputs(&RelayOutputInfoList);
@@ -1253,7 +1256,7 @@ void QnPlOnvifResource::parseSourceAndData(
     }
 }
 
-void QnPlOnvifResource::notificationReceived(
+void QnPlOnvifResource::handleOneNotification(
     const oasisWsnB2__NotificationMessageHolderType& notification, time_t minNotificationTime)
 {
     const auto now = qnSyncTime->currentUSecsSinceEpoch();
@@ -1309,14 +1312,24 @@ void QnPlOnvifResource::notificationReceived(
     }
 
     //parsing Message
-    QString text = notification.Message.__any.atts->text; // for example: "2018-04-30T21:18:37Z"
+    soap_dom_attribute* att = notification.Message.__any.atts;
+    QString text;
+    while (att && att->name && att->text)
+    {
+        if (QByteArray(att->name).toLower() == "utctime")
+            text = QString(att->text); // example: "2018-04-30T21:18:37Z"
+        att = att->next;
+    }
+
     QDateTime dateTime = QDateTime::fromString(text, Qt::ISODate);
     if (dateTime.timeSpec() == Qt::LocalTime)
         dateTime.setTimeZone(m_cameraTimeZone);
     if (dateTime.timeSpec() != Qt::UTC)
         dateTime = dateTime.toUTC();
 
-    if ((minNotificationTime != (time_t)-1) && (dateTime.toTime_t() < minNotificationTime))
+    const time_t notificationTime = dateTime.toTime_t();
+
+    if ((minNotificationTime != (time_t)-1) && (notificationTime < minNotificationTime))
         return; //ignoring old notifications: DW camera can deliver old cached notifications
 
     std::vector<onvifSimpleItem> source;
@@ -1363,10 +1376,15 @@ void QnPlOnvifResource::notificationReceived(
         std::find_if(
             m_relayOutputInfo.begin(),
             m_relayOutputInfo.end(),
-            [&source](const RelayOutputInfo& outputInfo)
+            [value = QString::fromStdString(source.front().value).toLower(),
+                isWrongToken = m_fixWrongOutputPortToken]
+            (const RelayOutputInfo& outputInfo)
             {
-                return outputInfo.token == source.front().value;
-            }) != m_relayOutputInfo.end();
+                QString token = QString::fromStdString(outputInfo.token).toLower();
+                if (isWrongToken && !token.isEmpty())
+                    token = token.split('-').back();
+                return  token == value;
+             }) != m_relayOutputInfo.end();
 
     const bool sourceNameHasPrefixToIgnore = (!m_portNamePrefixToIgnore.isEmpty()
          && QString::fromStdString(source.front().value).startsWith(m_portNamePrefixToIgnore));
@@ -3320,7 +3338,7 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
 
 void QnPlOnvifResource::checkMaxFps(onvifXsd__VideoEncoderConfiguration* configuration)
 {
-    if (!configuration->RateControl)
+    if (!configuration || !configuration->RateControl || !configuration->Resolution)
         return;
     if (m_primaryStreamCapabilities.resolutions.isEmpty())
         return;
@@ -3612,7 +3630,7 @@ bool QnPlOnvifResource::createPullPointSubscription()
     }
 
     m_eventMonitorType = emtPullPoint;
-    m_prevPullMessageResponseClock = m_monotonicClock.elapsed();
+    m_previousPullMessagesResponseTimeMs = m_pullMessagesResponseElapsedTimer.elapsed();
 
     updateTimer(&m_nextPullMessagesTimerID,
         std::chrono::milliseconds(PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC * MS_PER_SECOND),
@@ -3704,7 +3722,8 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     memToFreeOnResponseDone.push_back(buf);
 
     _onvifEvents__PullMessages request;
-    request.Timeout = (m_monotonicClock.elapsed() - m_prevPullMessageResponseClock) / 1000 * 1000;
+    request.Timeout = (m_pullMessagesResponseElapsedTimer.elapsed() -
+        m_previousPullMessagesResponseTimeMs) / MS_PER_SECOND * MS_PER_SECOND;
     request.MessageLimit = MAX_MESSAGES_TO_PULL;
     QByteArray onvifNotificationSubscriptionIDLatin1 = m_onvifNotificationSubscriptionID.toLatin1();
     strcpy(buf, onvifNotificationSubscriptionIDLatin1.data());
@@ -3712,7 +3731,7 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     memToFreeOnResponseDone.push_back(header);
     memset(header, 0, sizeof(*header));
     soapWrapper->soap()->header = header;
-    soapWrapper->soap()->header->subscriptionID = buf;
+    soapWrapper->soap()->header->SubscriptionId = buf;
     //TODO #ak move away check for "Samsung"
     if (!m_onvifNotificationSubscriptionReference.isEmpty() && !getVendor().contains(lit("Samsung")))
     {
@@ -3798,7 +3817,7 @@ void QnPlOnvifResource::onPullMessagesDone(
             std::bind(&QnPlOnvifResource::renewPullPointSubscriptionFallback, this, _1));
     }
 
-    onPullMessagesResponseReceived(asyncWrapper->syncWrapper(), resultCode, asyncWrapper->response());
+    handleAllNotifications(asyncWrapper->response());
 
     QnMutexLocker lk(&m_ioPortMutex);
 
@@ -3836,62 +3855,77 @@ void QnPlOnvifResource::renewPullPointSubscriptionFallback(quint64 timerId)
         scheduleRetrySubscriptionTimer();
 }
 
-void QnPlOnvifResource::onPullMessagesResponseReceived(
-    PullPointSubscriptionWrapper* /*soapWrapper*/,
-    int resultCode,
-    const _onvifEvents__PullMessagesResponse& response)
+void QnPlOnvifResource::handleAllNotifications(const _onvifEvents__PullMessagesResponse& response)
 {
-    NX_ASSERT(resultCode == SOAP_OK || resultCode == SOAP_MUSTUNDERSTAND);
+    const qint64 currentPullMessagesResponseTimeMs = m_pullMessagesResponseElapsedTimer.elapsed();
+    const time_t timeSinceLastResponseSec = roundUp<qint64>(currentPullMessagesResponseTimeMs -
+        m_previousPullMessagesResponseTimeMs, MS_PER_SECOND) / MS_PER_SECOND;
 
-    const qint64 currentRequestSendClock = m_monotonicClock.elapsed();
-
-    const time_t minNotificationTime = response.CurrentTime - roundUp<qint64>(m_monotonicClock.elapsed() - m_prevPullMessageResponseClock, MS_PER_SECOND) / MS_PER_SECOND;
-    if (response.oasisWsnB2__NotificationMessage.size() > 0)
+    // Notifications with timestamps older then minNotificationTime are ignored.
+    const time_t minNotificationTime = response.CurrentTime - timeSinceLastResponseSec;
+    for (const auto& notification : response.oasisWsnB2__NotificationMessage)
     {
-        for(size_t i = 0; i < response.oasisWsnB2__NotificationMessage.size(); ++i)
-        {
-            notificationReceived(
-                *response.oasisWsnB2__NotificationMessage[i], minNotificationTime);
-        }
+        if (notification)
+            handleOneNotification(*notification, minNotificationTime);
     }
-
-    m_prevPullMessageResponseClock = currentRequestSendClock;
+    m_previousPullMessagesResponseTimeMs = currentPullMessagesResponseTimeMs;
 }
 
 bool QnPlOnvifResource::fetchRelayOutputs(std::vector<RelayOutputInfo>* relayOutputInfoList)
 {
+#if 0
+    /*
+        See the comment to DeviceIO::RelayOutputs in header file.
+        This code should be tested with different cameras, especially DW.
+    */
     DeviceIO::RelayOutputs relayOutputs(this);
     relayOutputs.receiveBySoap();
+#endif
 
-    if (!relayOutputs && relayOutputs.soapError() != SOAP_MUSTUNDERSTAND)
-    {
-        NX_DEBUG(this, lit("Failed to get relay input/output info. endpoint %1").arg(relayOutputs.endpoint()));
-        return false;
-    }
-    auto data = relayOutputs.get();
+    const QAuthenticator auth = getAuth();
+    DeviceSoapWrapper soapWrapper(
+        onvifTimeouts(),
+        getDeviceOnvifUrl().toStdString(),
+        auth.user(),
+        auth.password(),
+        m_timeDrift);
 
-    m_relayOutputInfo.clear();
-    if (data->RelayOutputs.size() > MAX_IO_PORTS_PER_DEVICE)
+    _onvifDevice__GetRelayOutputs request;
+    _onvifDevice__GetRelayOutputsResponse response;
+
+    int soapRes = soapWrapper.getRelayOutputs(request, response);
+    if ((soapRes != SOAP_OK) && (soapRes != SOAP_MUSTUNDERSTAND))
     {
         NX_DEBUG(this, lit("Device has too many relay outputs. endpoint %1")
-            .arg(relayOutputs.endpoint()));
+            .arg(soapWrapper.endpoint()));
         return false;
     }
 
-    for(size_t i = 0; i < data->RelayOutputs.size(); ++i)
+    m_relayOutputInfo.clear();
+    if (response.RelayOutputs.size() > MAX_IO_PORTS_PER_DEVICE)
     {
-        m_relayOutputInfo.push_back(RelayOutputInfo(
-            data->RelayOutputs[i]->token,
-            data->RelayOutputs[i]->Properties->Mode == onvifXsd__RelayMode::Bistable,
-            data->RelayOutputs[i]->Properties->DelayTime,
-            data->RelayOutputs[i]->Properties->IdleState == onvifXsd__RelayIdleState::closed));
+        NX_DEBUG(this, lit("Device has too many relay outputs. endpoint %1")
+            .arg(soapWrapper.endpoint()));
+        return false;
+    }
+
+    for (const auto& output : response.RelayOutputs)
+    {
+        if (output)
+        {
+            m_relayOutputInfo.emplace_back(
+                output->token,
+                output->Properties->Mode == onvifXsd__RelayMode::Bistable,
+                output->Properties->DelayTime,
+                output->Properties->IdleState == onvifXsd__RelayIdleState::closed);
+        }
     }
 
     if (relayOutputInfoList)
         *relayOutputInfoList = m_relayOutputInfo;
 
     NX_DEBUG(this, lit("Successfully got device (%1) output ports info. Found %2 relay output").
-        arg(relayOutputs.endpoint()).arg(m_relayOutputInfo.size()));
+        arg(soapWrapper.endpoint()).arg(m_relayOutputInfo.size()));
 
     return true;
 }

@@ -7,12 +7,12 @@ namespace nx::cloud::relay::view {
 const char* OptionsRequestHandler::kPath = "";
 
 void OptionsRequestHandler::processRequest(
-    nx::network::http::HttpServerConnection* const /*connection*/,
-    nx::utils::stree::ResourceContainer /*authInfo*/,
-    nx::network::http::Request request,
-    nx::network::http::Response* const response,
+    nx::network::http::RequestContext requestContext,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
+    const auto& request = requestContext.request;
+    auto response = requestContext.response;
+
     if (auto it = request.headers.find("Origin");
         it != request.headers.end())
     {
@@ -23,7 +23,9 @@ void OptionsRequestHandler::processRequest(
 
     network::http::insertOrReplaceHeader(
         &response->headers,
-        network::http::HttpHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS"));
+        network::http::HttpHeader(
+            "Access-Control-Allow-Methods",
+            "POST, GET, PUT, DELETE, OPTIONS"));
 
     if (auto it = request.headers.find("Access-Control-Request-Headers");
         it != request.headers.end())

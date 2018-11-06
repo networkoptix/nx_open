@@ -1,4 +1,4 @@
-您好，
+Hello {{message.userFullName}},
 
   请访问下面的连结以确认您的电子邮件地址并激活帐户。
 

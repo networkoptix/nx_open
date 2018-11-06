@@ -17,7 +17,7 @@ static const int kNxPayloadType = 102;
 static const QString kNxPayloadTypeName("FFMPEG");
 static const uint32_t kNxBasicSsrc = 20000;
 
-QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(nx::metrics::Storage* metrics)
+QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(const DecoderConfig& config, nx::metrics::Storage* metrics)
     :
     m_gotLivePacket(false),
     m_curDataBuffer(0),
@@ -31,7 +31,7 @@ QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(nx::metrics::Storage* metrics)
 
 void QnRtspFfmpegEncoder::setDstResolution(const QSize& dstVideSize, AVCodecID dstCodec)
 {
-    m_videoTranscoder.reset(new QnFfmpegVideoTranscoder(m_metrics, dstCodec));
+    m_videoTranscoder.reset(new QnFfmpegVideoTranscoder(m_config, m_metrics, dstCodec));
     m_videoTranscoder->setResolution(dstVideSize);
 }
 
@@ -92,7 +92,7 @@ void QnRtspFfmpegEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
         if (!currentContext)
             currentContext = getGeneratedContext(m_media->compressionType);
         NX_ASSERT(currentContext);
-        //int rtpHeaderSize = 4 + RtpHeader::RTP_HEADER_SIZE;
+        //int rtpHeaderSize = 4 + RtpHeader::kSize;
         if (!m_contextSent || !m_contextSent->isSimilarTo(currentContext))
         {
             m_contextSent = currentContext;

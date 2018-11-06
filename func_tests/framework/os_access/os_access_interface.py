@@ -6,7 +6,7 @@ from datetime import datetime
 import six
 from netaddr import IPAddress
 from pathlib2 import PureWindowsPath
-from typing import Callable, ContextManager, Optional, Type
+from typing import Any, Callable, Mapping, Optional, Type
 
 from framework.networking.interface import Networking
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
@@ -34,6 +34,10 @@ class _AllPorts(object):
 
 @six.add_metaclass(ABCMeta)
 class Time(object):
+    @abstractmethod
+    def get_tz(self):
+        pass
+
     @abstractmethod
     def get(self):  # type: () -> RunningTime
         pass
@@ -117,7 +121,7 @@ class OSAccess(object):
             networking,  # type: Optional[Networking]
             time,  # type: Time
             traffic_capture,  # type: Optional[TrafficCapture]
-            lock_acquired,  # type: Optional[Callable[[FileSystemPath, ...], ContextManager[None]]]
+            lock_acquired,  # type: Optional[Callable[[FileSystemPath, ...], Any]]
             path_cls,  # type: Type[FileSystemPath]
             ):
         self.alias = alias
@@ -154,15 +158,27 @@ class OSAccess(object):
         pass
 
     @abstractmethod
+    def _dismount_fake_disk(self):
+        pass
+
+    @abstractmethod
     def make_fake_disk(self, name, size_bytes):
         return self.path_cls()
 
+    @abstractmethod
+    def _fs_root(self):
+        return self.path_cls()
+
     def _disk_space_holder(self):  # type: () -> FileSystemPath
-        return self.path_cls.tmp() / 'space_holder.tmp'
+        return self._fs_root() / 'space_holder.tmp'
 
     @abstractmethod
-    def free_disk_space_bytes(self):  # type: () -> int
+    def _free_disk_space_bytes_on_all(self):  # type: () -> Mapping[FileSystemPath, int]
         pass
+
+    def free_disk_space_bytes(self):  # type: () -> int
+        result_on_all = self._free_disk_space_bytes_on_all()
+        return result_on_all[self._fs_root()]
 
     @abstractmethod
     def _hold_disk_space(self, to_consume_bytes):  # type: (int) -> None
@@ -186,7 +202,7 @@ class OSAccess(object):
 
     @contextmanager
     def free_disk_space_limited(self, should_leave_bytes, interval_sec=1):
-        # type: (int, float) -> ContextManager[...]
+        # type: (int, float) -> ...
         """Try to maintain limited free disk space while in this context.
 
         One-time allocation (reservation) of disk space is not enough. OS or other software

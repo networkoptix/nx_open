@@ -199,7 +199,8 @@ void QnWorkbench::setCurrentLayoutIndex(int index) {
     setCurrentLayout(m_layouts[qBound(0, index, m_layouts.size())]);
 }
 
-void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
+void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout)
+{
     if(layout == NULL)
         layout = m_dummyLayout;
 
@@ -436,6 +437,7 @@ void QnWorkbench::submit(QnWorkbenchState& state)
 void QnWorkbench::at_layout_itemAdded(QnWorkbenchItem *item) {
     Q_UNUSED(item)
     updateSingleRoleItem();
+    emit currentLayoutItemsChanged();
 }
 
 void QnWorkbench::at_layout_itemRemoved(QnWorkbenchItem *item) {
@@ -445,6 +447,7 @@ void QnWorkbench::at_layout_itemRemoved(QnWorkbenchItem *item) {
 
     updateSingleRoleItem();
     updateActiveRoleItem();
+    emit currentLayoutItemsChanged();
 }
 
 void QnWorkbench::at_layout_aboutToBeDestroyed() {

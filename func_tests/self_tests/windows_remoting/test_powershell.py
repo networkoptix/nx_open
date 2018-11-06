@@ -5,7 +5,7 @@ from textwrap import dedent
 import pytest
 
 from framework.os_access.windows_power_shell_utils import power_shell_augment_script
-from framework.os_access.windows_remoting._powershell import (
+from framework.os_access.windows_remoting.powershell import (
     PowershellError,
     run_powershell_script,
     start_raw_powershell_script,

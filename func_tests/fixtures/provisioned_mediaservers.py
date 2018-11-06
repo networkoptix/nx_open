@@ -134,16 +134,16 @@ def mediaserver_allocation(mediaserver_installer_set, artifacts_dir, ca, elastic
             mediaserver.examine()
             mediaserver.collect_artifacts(mediaserver_artifacts_dir)
             # TODO: Get logs only once.
-            for log_file in mediaserver.installation.list_log_files():
-                log_bytes = log_file.read_bytes()
-                static_data = {
-                    'mediaserver': {
-                        'name': mediaserver.name,
-                        'api': mediaserver.api.generic.http.url(''),
-                        'file': log_file.name,
-                        },
-                    }
-                if elasticsearch is not None:
+            if elasticsearch is not None:
+                for log_file in mediaserver.installation.list_log_files():
+                    log_bytes = log_file.read_bytes()
+                    static_data = {
+                        'mediaserver': {
+                            'name': mediaserver.name,
+                            'api': mediaserver.api.generic.http.url(''),
+                            'file': log_file.name,
+                            },
+                        }
                     parsed_log = parse_mediaserver_logs(log_bytes)
                     elasticsearch.bulk_upload('ft_mediaserver', static_data, parsed_log)
 

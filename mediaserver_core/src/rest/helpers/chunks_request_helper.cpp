@@ -27,11 +27,7 @@ QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
     {
         case Qn::MotionContent:
         {
-            QList<QRegion> motionRegions =
-                QJson::deserialized<QList<QRegion>>(request.filter.toUtf8());
-            periods = serverModule()->motionHelper()->matchImage(
-                motionRegions, request.resList, request.startTimeMs, request.endTimeMs,
-                request.detailLevel.count());
+            periods = serverModule()->motionHelper()->matchImage(request);
             break;
         }
 
@@ -43,11 +39,9 @@ QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
         default:
             periods = QnStorageManager::getRecordedPeriods(
                 serverModule(),
-                request.resList, request.startTimeMs, request.endTimeMs, request.detailLevel.count(),
-                request.keepSmallChunks,
+                request,
                 QList<QnServer::ChunksCatalog>()
-                    << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog,
-                request.limit);
+                    << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog);
             break;
     }
 
@@ -71,7 +65,8 @@ QnTimePeriodList QnChunksRequestHelper::loadAnalyticsTimePeriods(
         filter = *request.analyticsStorageFilter;
     filter.timePeriod.setStartTime(milliseconds(request.startTimeMs));
     filter.timePeriod.setDuration(milliseconds(request.endTimeMs - request.startTimeMs));
-    // TODO: #ak request.limit.
+    filter.maxObjectsToSelect = request.limit;
+    filter.sortOrder = request.sortOrder;
 
     TimePeriodsLookupOptions options;
     options.detailLevel = request.detailLevel;

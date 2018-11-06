@@ -51,7 +51,6 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
 
     m_resourceSearch->setSourceModel(m_model);
     m_resourceSearch->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    m_resourceSearch->setFilterRole(Qn::ResourceSearchStringRole);
 
     updateCriterion();
 
@@ -71,7 +70,7 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
         {
             const auto parameters = action::Parameters(commonModule()->currentServer())
                 .withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(this));
-            menu()->trigger(action::ServerAddCameraManuallyAction, parameters);
+            menu()->trigger(action::AddDeviceManuallyAction, parameters);
         });
 
 

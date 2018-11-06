@@ -11,6 +11,7 @@
 #include <ui/models/resource/resource_tree_model.h>
 
 #include <nx/client/desktop/resource_views/data/node_type.h>
+#include <nx/client/desktop/resources/search_helper.h>
 
 using namespace nx::client::desktop;
 
@@ -145,6 +146,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
             NodeType::layoutTours,
             NodeType::filteredVideowalls,
             NodeType::webPages,
+            NodeType::analyticsEngines,
             NodeType::filteredUsers,
             NodeType::localResources});
 
@@ -196,8 +198,12 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
         }
     }
 
+    const auto resource = QnResourceSearchProxyModel::resource(index);
+    if (!resource)
+        return false;
+
     // Simply filter by text first.
-    if (!base_type::filterAcceptsRow(sourceRow, root))
+    if (!resources::search_helper::matches(m_query.text, resource))
         return false;
 
     // Check if no further filtering is required.
@@ -205,8 +211,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
         return true;
 
     // Show only resources with given flags.
-    const auto resource = QnResourceSearchProxyModel::resource(index);
-    return resource && resource->hasFlags(m_query.flags);
+    return resource->hasFlags(m_query.flags);
 }
 
 

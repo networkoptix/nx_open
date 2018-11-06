@@ -294,7 +294,10 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
         });
 
     PredefinedMediatorConnector mediatorConnector(
-        stunAsyncClient->remoteAddress(),
+        hpm::api::MediatorAddress{
+            url::Builder().setScheme("stun")
+                .setEndpoint(stunAsyncClient->remoteAddress()).toUrl(),
+            stunAsyncClient->remoteAddress()},
         std::make_unique<hpm::api::MediatorServerTcpConnection>(
             stunAsyncClient,
             &nx::network::SocketGlobals::cloud().mediatorConnector()));
@@ -385,7 +388,10 @@ protected:
                 });
 
         m_mediatorConnector = std::make_unique<PredefinedMediatorConnector>(
-            m_stunClient->remoteAddress(),
+            hpm::api::MediatorAddress{
+                url::Builder().setScheme("stun")
+                    .setEndpoint(m_stunClient->remoteAddress()).toUrl(),
+                m_stunClient->remoteAddress()},
             std::make_unique<hpm::api::MediatorServerTcpConnection>(
                 m_stunClient,
                 &SocketGlobals::cloud().mediatorConnector()));
@@ -610,6 +616,8 @@ public:
         nx::hpm::api::MediatorConnector::setStunClientSettings(stunClientSettings);
 
         SocketGlobalsHolder::instance()->reinitialize();
+
+        m_mediator.setUseProxy(true);
     }
 
     ~CloudServerSocket()
@@ -637,10 +645,10 @@ protected:
                 server->serverId(),
                 system.authKey));
 
-        SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
+        SocketGlobals::cloud().mediatorConnector().mockupMediatorAddress({
             nx::network::url::Builder().setScheme("stun")
                 .setEndpoint(m_mediator.stunTcpEndpoint()),
-            m_mediator.stunUdpEndpoint());
+            m_mediator.stunUdpEndpoint()});
     }
 
     void givenInitializedServerSocket()

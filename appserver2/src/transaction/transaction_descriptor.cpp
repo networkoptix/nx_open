@@ -172,6 +172,12 @@ void apiIdDataTriggerNotificationHelper(
         case ApiCommand::removeAccessRights:
             //#ak no notification needed
             break;
+        case ApiCommand::removeAnalyticsPlugin:
+        case ApiCommand::removeAnalyticsEngine:
+            return notificationParams.analyticsNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
+            break;
         default:
             NX_ASSERT(false);
     }
@@ -339,6 +345,16 @@ struct WebPageNotificationManagerHelper
     }
 };
 
+struct AnalyticsNotificationManagerHelper
+{
+    template<typename Param>
+    void operator()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
+    {
+        notificationParams.analyticsNotificationManager
+            ->triggerNotification(tran, notificationParams.source);
+    }
+};
+
 struct EmptyNotificationHelper
 {
     template<typename Param>
@@ -478,22 +494,6 @@ struct ModifyResourceAccess
             .dynamicCast<QnUserResource>();
         QnResourcePtr target = resPool->getResourceById(param.id);
 
-        if constexpr (std::is_same<Param, nx::vms::api::UserData>::value)
-        {
-            if (!target) //< new user
-            {
-                auto allUsers = resPool->getResources<QnUserResource>();
-                auto hasUserWithSameName = std::any_of(allUsers.cbegin(), allUsers.cend(),
-                    [&param](const auto& resPtr) { return resPtr->getName() == param.name; });
-                if (hasUserWithSameName)
-                {
-                    NX_DEBUG(this, lm("Won't save user '%1' because of the name duplication")
-                        .args(param.name));
-                    return false;
-                }
-            }
-        }
-
         bool result = false;
         if (isRemove)
             result = commonModule->resourceAccessManager()->hasPermission(userResource, target, Qn::RemovePermission);
@@ -512,6 +512,30 @@ struct ModifyResourceAccess
     }
 
     bool isRemove;
+};
+
+struct SaveUserAccess
+{
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData,
+        const nx::vms::api::UserData& param)
+    {
+        if (!hasSystemAccess(accessData))
+        {
+            auto allUsers = commonModule->resourcePool()->getResources<QnUserResource>();
+            auto hasUserWithSameName = std::any_of(allUsers.cbegin(), allUsers.cend(),
+                [&param](const auto& resPtr)
+                { return resPtr->getName() == param.name && resPtr->getId() != param.id; });
+
+            if (hasUserWithSameName)
+            {
+                NX_DEBUG(this, lm("Won't save user '%1' because of the name duplication")
+                    .args(param.name));
+                return false;
+            }
+        }
+
+        return ModifyResourceAccess(/*isRemove*/ false)(commonModule, accessData, param);
+    }
 };
 
 struct ModifyCameraDataAccess

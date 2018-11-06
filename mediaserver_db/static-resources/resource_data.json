@@ -620,7 +620,8 @@
                 "Siqura|EVE FOUR",
                 "Hikvision|DS-6708*",
                 "HIKVISION|DS-6708*",
-                "Samsung Techwin|SPE-110", "Samsung|SPE-110", "Hanwha|SPE-110"
+                "Samsung Techwin|SPE-110", "Samsung|SPE-110", "Hanwha|SPE-110",
+                "Sony|SNT-EP104"
             ],
             "analogEncoder": true
         },
@@ -986,7 +987,8 @@
                 "Hikvision|DS-6708*", "HIKVISION|DS-6708*",
                 "HIKVISION|DS-2CD4A26FWD-*", "hikvision|DS-2CD4A26FWD-*",
                 "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*",
-                "ONVIF|NC328-VBZ"
+                "ONVIF|NC328-VBZ",
+                "Hikvision|DS-2DF8223*"
             ],
             "parseOnvifNotificationsWithHttpReader": true
         },
@@ -1019,23 +1021,21 @@
             "relayOutputInversed": true,
             "portNamePrefixToIgnore": "AlarmOut"
         },
-    {
+        {
             "keys": [
             	"DW|DWC-PF5M1TIR",
             	"DW|DWC-MB45DiA",
             	"DW|DWC-MV85DiA",
             	"DW|DWC-PB6M4T"
             ],
-      "fixWrongInputPortNumber": true
-    },
+            "fixWrongInputPortNumber": true
+        },
         {
             "keys": [
-                "DW|DWC-PF5M1TIR",
-                "DW|DWC-MB45DiA",
-                "DW|DWC-MV85DiA",
-                "DW|DWC-PB6M4T"
+            	"DW|DWC-MD421D",
+            	"DW|DWC-MV421D"
             ],
-            "fixWrongInputPortNumber": true
+            "fixWrongOutputPortToken": true
         },
         {
             "keys": [
@@ -2880,10 +2880,27 @@
         },
         {
             "keys": [
-                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*"
+                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*",
+                "Hikvision|DS-2DF8223*"
             ],
             "clearInputsTimeoutSec": 1,
             "comment": "considers input state as 0 after specified timeout"
+        },
+        {
+            "keys": [
+                "BOSCH|MIC IP starlight 7000 HD",
+                "BOSCH|MIC IP starlight 7000i"
+            ],
+            "onvifPtzDigitsAfterDecimalPoint": 2,
+            "onvifPtzSpeedBroken": true
+        },
+        {
+            "keys": [
+                "HIKVISION|DS-2CD6A64F-IHS/NFC"
+            ],
+            "disableMultiThreadDecoding": [
+                "hevc"
+            ]
         }
     ]
 }

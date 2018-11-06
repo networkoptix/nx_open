@@ -422,6 +422,8 @@ public:
         const P2pConnectionPtr& connection,
         const vms::api::PersistentIdData& to,
         int sequence);
+
+    bool isStarted() const { return m_started; }
 protected:
     std::unique_ptr<BidirectionRoutingInfo> m_peers;
     PeerNumberInfo m_localShortPeerInfo; //< Short numbers created by current peer
@@ -441,6 +443,8 @@ protected:
     QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list
     QElapsedTimer m_lastPeerInfoTimer;
     QMap<vms::api::PersistentIdData, vms::api::RuntimeData> m_lastRuntimeInfo;
+protected:
+    void dropConnectionsThreadUnsafe();
 private:
     QMap<QnUuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections
 
@@ -463,6 +467,7 @@ private:
     int m_connectionTries = 0;
     QElapsedTimer m_outConnectionsTimer;
     std::set<vms::api::PeerData> m_lastAlivePeers;
+    std::atomic<bool> m_started{false};
 };
 
 } // namespace p2p

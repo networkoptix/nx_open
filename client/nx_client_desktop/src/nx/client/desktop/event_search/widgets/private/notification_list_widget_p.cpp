@@ -83,8 +83,8 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     QnWorkbenchContextAware(q),
     q(q),
     m_eventRibbon(new EventRibbon(q)),
-    m_systemHealthModel(new SystemHealthListModel(this)),
-    m_notificationsModel(new NotificationListModel(this))
+    m_systemHealthModel(new SystemHealthListModel(context(), this)),
+    m_notificationsModel(new NotificationListModel(context(), this))
 {
     m_placeholder = new QWidget(q);
     m_placeholder->setMinimumSize(QSize(0, 100));
@@ -107,7 +107,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     placeholderText->setProperty(style::Properties::kDontPolishFontProperty, true);
     placeholderText->setFont(font);
     placeholderText->setForegroundRole(QPalette::Mid);
-    placeholderText->setText(tr("No new notifications."));
+    placeholderText->setText(tr("No new notifications"));
     placeholderText->setAlignment(Qt::AlignCenter);
     placeholderText->setWordWrap(true);
     verticalLayout->addWidget(placeholderText);
@@ -122,8 +122,6 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     auto sortModel = new SystemHealthSortFilterModel(this);
     auto systemHealthListModel = new SubsetListModel(sortModel, 0, QModelIndex(), this);
     sortModel->setSourceModel(m_systemHealthModel);
-    sortModel->setFilterRole(Qn::ResourceSearchStringRole);
-    sortModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
 
     auto progressModel = new ProgressListModel(this);
 

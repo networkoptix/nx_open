@@ -1,7 +1,10 @@
+from __future__ import division
+
 import datetime
+import logging
+import math
 import timeit
 
-import dateutil.parser
 import pytz
 import tzlocal.windows_tz
 
@@ -12,21 +15,21 @@ from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.os_access_interface import OSAccess, Time
 from framework.os_access.smb_path import SMBPath
 from framework.os_access.windows_remoting import WinRM
-from framework.os_access.windows_remoting._powershell import PowershellError
 from framework.os_access.windows_remoting.env_vars import EnvVars
+from framework.os_access.windows_remoting.powershell import PowershellError
 from framework.os_access.windows_remoting.users import Users
 from framework.os_access.windows_traffic_capture import WindowsTrafficCapture
 from framework.utils import RunningTime
+
+_logger = logging.getLogger(__name__)
 
 
 class WindowsTime(Time):
     def __init__(self, winrm):
         self.winrm = winrm
 
-    @cached_getter
-    def _get_timezone(self):
-        timezone_result, = self.winrm.wmi_query(u'Win32_TimeZone',
-                                                {}).enumerate()  # Mind enumeration!
+    def get_tz(self):
+        timezone_result, = self.winrm.wmi.cls(u'Win32_TimeZone').enumerate({})  # Mind enumeration!
         windows_timezone_name = timezone_result[u'StandardName']
         # tzlocal.windows_tz.windows_tz contains popular timezones, including Pacific and Moscow time.
         # In case of problems, look for another timezone name mapping.
@@ -43,21 +46,15 @@ class WindowsTime(Time):
 
     def get(self):
         started_at = timeit.default_timer()
-        result = self.winrm.wmi_query(u'Win32_OperatingSystem', {}).get()
+        result = self.winrm.wmi.cls(u'Win32_OperatingSystem').singleton()
         delay_sec = timeit.default_timer() - started_at
-        raw = result[u'LocalDateTime'][u'cim:Datetime']
-        time = dateutil.parser.parse(raw).astimezone(self._get_timezone())
+        time = result[u'LocalDateTime'].astimezone(self.get_tz())
         return RunningTime(time, datetime.timedelta(seconds=delay_sec))
 
     def set(self, new_time):  # type: (datetime.datetime) -> RunningTime
-        localized = new_time.astimezone(self._get_timezone())
+        localized = new_time.astimezone(self.get_tz())
         started_at = timeit.default_timer()
-        # TODO: Do that with Win32_OperatingSystem.SetDateTime WMI method.
-        # See: https://superuser.com/q/1323610/174311
-        self.winrm.run_powershell_script(
-            # language=PowerShell
-            '''Set-Date $dateTime''',
-            variables={'dateTime': new_time.astimezone(pytz.utc).isoformat()})
+        self.winrm.wmi.cls('Win32_OperatingSystem').static().invoke_method('SetDateTime', {'LocalDateTime': new_time})
         delay_sec = timeit.default_timer() - started_at
         return RunningTime(localized, datetime.timedelta(seconds=delay_sec))
 
@@ -146,13 +143,66 @@ class WindowsAccess(OSAccess):
             )
         return output.decode('ascii')
 
-    def make_fake_disk(self, name, size_bytes):
-        raise NotImplementedError()
+    def _dismount_fake_disk(self, letter='V'):
+        try:
+            self.winrm.command(['MountVol', letter + ':', '/D']).run(timeout_sec=5)
+        except exceptions.exit_status_error_cls(1):
+            pass
 
-    def free_disk_space_bytes(self):
-        disks = self.winrm.wmi_query('Win32_LogicalDisk', {}).enumerate()
-        disk_c, = (disk for disk in disks if disk['Name'] == 'C:')
-        return int(disk_c['FreeSpace'])
+    def make_fake_disk(self, name, size_bytes, letter='V', image_dir='C:\\', partition_style='MBR'):
+        """Make virtual disk and mount it.
+        When Windows 7 is not supported, move to Windows Storage Management Provider.
+        See: https://docs.microsoft.com/en-us/previous-versions/windows/desktop/stormgmt/windows-storage-management-api-portal
+        """
+        self._dismount_fake_disk(letter=letter)
+        free_space_mb = int(math.ceil(size_bytes / 1024 / 1024))
+        volume_mb = free_space_mb + 15  # 15 MB is for System Volume Information.
+        partition_mb = volume_mb + 1  # 1 MB for filesystem.
+        disk_mb = partition_mb + 2  # 1 MB is for MBR/GPT headers.
+        image_path = self.path_cls(image_dir) / '{}.vhdx'.format(name)
+        script_template = (
+            'CREATE VDISK file={image_path} MAXIMUM={disk_mb} NOERR' '\r\n'  # NOERR if exists.
+            'SELECT VDISK file={image_path}' '\r\n'  # No error if already selected.
+            'DETACH VDISK NOERR' '\r\n'  # NOERR if attached.
+            'EXPAND VDISK maximum={disk_mb} NOERR' '\r\n'  # NOERR if requested size is less.
+            'ATTACH VDISK' '\r\n'  # NOERR if attached. "Disk" of "vdisk" has been selected.
+            'CLEAN' '\r\n'  # Removes letter, wipes partition table.
+            'CONVERT {partition_style}' '\r\n'
+            'CREATE PARTITION PRIMARY size={partition_mb}' '\r\n'  # New partition and its volume have been selected.
+            'FORMAT' '\r\n'  # Filesystem is default (NTFS).
+            'ASSIGN LETTER={letter}' '\r\n'
+            'EXIT' '\r\n'
+            )
+        script = script_template.format(
+            image_path=image_path,
+            letter=letter,
+            partition_mb=partition_mb,
+            disk_mb=disk_mb,
+            partition_style=partition_style)
+        _logger.debug('Diskpart script:\n%s', script)
+        # With script file, `diskpart` exits with non-zero code.
+        script_path = image_path.with_suffix('.diskpart.txt')
+        script_path.write_text(script)
+        # Error originate in VDS -- Virtual Disk Service.
+        # See: https://msdn.microsoft.com/en-us/library/dd208031.aspx.
+        command = self.winrm.command(['diskpart', '/s', script_path])
+        command.run(timeout_sec=10 + 0.05 * free_space_mb)
+        return self.path_cls('{letter}:\\'.format(letter=letter))
+
+    def _fs_root(self):
+        return self.path_cls('C:\\')
+
+    def _free_disk_space_bytes_on_all(self):
+        mount_point_iter = self.winrm.wmi.cls('Win32_MountPoint').enumerate({})
+        volume_iter = self.winrm.wmi.cls('Win32_Volume').enumerate({})
+        volume_list = list(volume_iter)
+        result = {}
+        for mount_point in mount_point_iter:
+            # Rely on fact that single identifying selector of `Directory` is its name.
+            dir_path = self.path_cls(mount_point['Directory']['Name'])
+            volume, = (v for v in volume_list if v.ref == mount_point['Volume'])
+            result[dir_path] = int(volume['FreeSpace'])
+        return result
 
     def _hold_disk_space(self, to_consume_bytes):
         holder_path = self._disk_space_holder()

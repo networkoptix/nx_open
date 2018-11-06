@@ -14,6 +14,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
 
 #include <ui/style/skin.h>
 #include <api/global_settings.h>
@@ -67,6 +68,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(Layouts, loadIcon("tree/layouts.png"));
     m_cache.insert(Layout, loadIcon("tree/layout.png"));
     m_cache.insert(Layout | Locked, loadIcon("tree/layout_locked.png"));
+    m_cache.insert(EncryptedLayout, loadIcon("tree/layout_encrypted.png"));	
     m_cache.insert(SharedLayout, loadIcon("tree/layout_shared.png"));
     m_cache.insert(SharedLayout | Locked, loadIcon("tree/layout_shared_locked.png"));
     m_cache.insert(SharedLayouts, loadIcon("tree/layouts_shared.png"));
@@ -111,6 +113,11 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(WebPage, loadIcon("tree/webpage.png"));
     m_cache.insert(WebPage | Offline, loadIcon("tree/webpage_offline.png"));
     m_cache.insert(C2P, loadIcon("tree/c2p.png"));
+
+    // Analytics.
+    m_cache.insert(AnalyticsEngine, loadIcon("tree/server.png"));
+    m_cache.insert(AnalyticsEngines, loadIcon("tree/servers.png"));
+    m_cache.insert(AnalyticsEngine | Offline, loadIcon("tree/server_offline.png"));
 }
 
 QnResourceIconCache::~QnResourceIconCache()
@@ -197,7 +204,9 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     }
     else if (flags.testFlag(Qn::layout))
     {
-        key = Layout;
+        key = resource.dynamicCast<QnLayoutResource>()->data(Qn::LayoutEncryptionRole).toBool()
+            ? EncryptedLayout
+            : Layout;
     }
     else if (flags.testFlag(Qn::io_module))
     {
@@ -231,6 +240,10 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     else if (flags.testFlag(Qn::videowall))
     {
         key = VideoWall;
+    }
+    else if (const auto engine = resource.dynamicCast<nx::vms::common::AnalyticsEngineResource>())
+    {
+        key = AnalyticsEngine;
     }
     else if (flags.testFlag(Qn::web_page))
     {

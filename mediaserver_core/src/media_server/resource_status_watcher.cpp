@@ -128,8 +128,8 @@ void QnResourceStatusWatcher::updateResourceStatusAsync(const QnResourcePtr& res
 
     m_setStatusInProgress.insert(resource->getId());
     auto connection = commonModule()->ec2Connection();
-    auto manager = connection->getResourceManager(Qn::kSystemAccess);
-    manager->setResourceStatus(
+    auto deviceAgent = connection->getResourceManager(Qn::kSystemAccess);
+    deviceAgent->setResourceStatus(
         resource->getId(),
         resource->getStatus(),
         this,

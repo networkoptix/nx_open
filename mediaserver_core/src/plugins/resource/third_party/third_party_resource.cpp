@@ -260,7 +260,10 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriodsByMotionRegion(
     const QList<QRegion>& regions,
     qint64 startTimeMs,
     qint64 endTimeMs,
-    int detailLevel )
+    int detailLevel,
+    bool keepSmalChunks,
+    int limit,
+    Qt::SortOrder sortOrder)
 {
     if( !m_camManager )
         return QnTimePeriodList();
@@ -298,6 +301,9 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriodsByMotionRegion(
     searchOptions.startTime = startTimeMs * USEC_IN_MS;
     searchOptions.endTime = endTimeMs * USEC_IN_MS;
     searchOptions.periodDetailLevel = detailLevel;
+    searchOptions.keepSmallChunks = keepSmalChunks;
+    searchOptions.limit = limit;
+    searchOptions.descSortOrder = (sortOrder == Qt::SortOrder::DescendingOrder);
     nxcip::TimePeriods* timePeriods = NULL;
     if( camManager2->find( &searchOptions, &timePeriods ) != nxcip::NX_NO_ERROR || !timePeriods )
         return resultTimePeriods;
@@ -316,13 +322,22 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriodsByMotionRegion(
     return resultTimePeriods;
 }
 
-QnTimePeriodList QnThirdPartyResource::getDtsTimePeriods( qint64 startTimeMs, qint64 endTimeMs, int detailLevel )
+QnTimePeriodList QnThirdPartyResource::getDtsTimePeriods(
+    qint64 startTimeMs,
+    qint64 endTimeMs,
+    int detailLevel,
+    bool keepSmalChunks,
+    int limit,
+    Qt::SortOrder sortOrder)
 {
     return getDtsTimePeriodsByMotionRegion(
         QList<QRegion>(),
         startTimeMs,
         endTimeMs,
-        detailLevel );
+        detailLevel,
+        keepSmalChunks,
+        limit,
+        sortOrder);
 }
 
 //!Implementation of nxpl::NXPluginInterface::queryInterface

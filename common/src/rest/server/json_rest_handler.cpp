@@ -1,5 +1,8 @@
 #include "json_rest_handler.h"
 
+#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/user_resource.h>
 #include <nx/utils/string.h>
 #include <rest/server/rest_connection_processor.h>
 #include <utils/common/util.h>

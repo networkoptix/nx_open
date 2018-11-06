@@ -206,7 +206,7 @@ credentials to the digest store:
         http_da_save(soap, &info, realm, "<userid>", "<passwd>");
         if (soap_call_ns__method(soap, ...)) // make a call with authentication
           ... // error
-	...
+    ...
         http_da_release(soap, &info); // deallocate authentication info if auth is no longer needed
       }
       else
@@ -735,53 +735,53 @@ http_da_post_header(struct soap *soap, const char *key, const char *val)
       http_da_calc_nonce(soap, cnonce);
 
       if (http_da_calc_HA1(soap, &data->smd_data, data->alg, userid, soap->authrealm, passwd, data->nonce, cnonce, HA1hex))
-	return soap->error;
+    return soap->error;
 
       if (soap->status != SOAP_GET && soap->status != SOAP_CONNECT && data->qop && !soap_tag_cmp(data->qop, "*auth-int*"))
       {
-	qop = "auth-int";
-	(void)soap_s2hex(soap, (unsigned char*)data->digest, entityHAhex, smd_len);
+    qop = "auth-int";
+    (void)soap_s2hex(soap, (unsigned char*)data->digest, entityHAhex, smd_len);
       }
       else if (data->qop)
       {
-	qop = "auth";
+    qop = "auth";
       }
       else
       {
-	qop = NULL;
+    qop = NULL;
       }
 
       if (soap->status == SOAP_GET)
       {
-	method = "GET";
+    method = "GET";
       }
       else if (soap->status == SOAP_CONNECT)
       {
-	method = "CONNECT";
+    method = "CONNECT";
       }
       else
       {
-	method = "POST";
+    method = "POST";
       }
 
       (SOAP_SNPRINTF(ncount, sizeof(ncount), 8), "%8.8lx", data->nc++);
 
       if (http_da_calc_response(soap, &data->smd_data, data->alg, HA1hex, data->nonce, ncount, cnonce, qop, method, soap->path, entityHAhex, response, responseHA))
-	return soap->error;
+    return soap->error;
 
       if (qop)
       {
-	(SOAP_SNPRINTF(soap->tmpbuf, sizeof(soap->tmpbuf), strlen(soap->authrealm) + strlen(userid) + strlen(data->nonce) + strlen(soap->path) + strlen(qop) + strlen(ncount) + strlen(cnonce) + strlen(response) + 83), "Digest algorithm=%s, realm=\"%s\", username=\"%s\", nonce=\"%s\", uri=\"%s\", qop=\"%s\", nc=%s, cnonce=\"%s\", response=\"%s\"", data->alg ? data->alg : "MD5", soap->authrealm, userid, data->nonce, soap->path, qop, ncount, cnonce, response);
+    (SOAP_SNPRINTF(soap->tmpbuf, sizeof(soap->tmpbuf), strlen(soap->authrealm) + strlen(userid) + strlen(data->nonce) + strlen(soap->path) + strlen(qop) + strlen(ncount) + strlen(cnonce) + strlen(response) + 83), "Digest algorithm=%s, realm=\"%s\", username=\"%s\", nonce=\"%s\", uri=\"%s\", qop=\"%s\", nc=%s, cnonce=\"%s\", response=\"%s\"", data->alg ? data->alg : "MD5", soap->authrealm, userid, data->nonce, soap->path, qop, ncount, cnonce, response);
       }
       else
       {
-	(SOAP_SNPRINTF(soap->tmpbuf, sizeof(soap->tmpbuf), strlen(soap->authrealm) + strlen(userid) + strlen(data->nonce) + strlen(soap->path) + strlen(ncount) + strlen(cnonce) + strlen(response) + 59), "Digest algorithm=%s, realm=\"%s\", username=\"%s\", nonce=\"%s\", uri=\"%s\", response=\"%s\"", data->alg ? data->alg : "MD5", soap->authrealm, userid, data->nonce, soap->path, response);
+    (SOAP_SNPRINTF(soap->tmpbuf, sizeof(soap->tmpbuf), strlen(soap->authrealm) + strlen(userid) + strlen(data->nonce) + strlen(soap->path) + strlen(ncount) + strlen(cnonce) + strlen(response) + 59), "Digest algorithm=%s, realm=\"%s\", username=\"%s\", nonce=\"%s\", uri=\"%s\", response=\"%s\"", data->alg ? data->alg : "MD5", soap->authrealm, userid, data->nonce, soap->path, response);
       }
 
       if (data->opaque)
       {
-	size_t l = strlen(soap->tmpbuf);
-	(SOAP_SNPRINTF(soap->tmpbuf + l, sizeof(soap->tmpbuf) - l, strlen(data->opaque) + 11), ", opaque=\"%s\"", data->opaque);
+    size_t l = strlen(soap->tmpbuf);
+    (SOAP_SNPRINTF(soap->tmpbuf + l, sizeof(soap->tmpbuf) - l, strlen(data->opaque) + 11), ", opaque=\"%s\"", data->opaque);
       }
 
       return data->fposthdr(soap, key, soap->tmpbuf);

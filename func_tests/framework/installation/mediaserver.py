@@ -21,8 +21,6 @@ from framework.utils import datetime_utc_to_timestamp
 from framework.waiting import wait_for_truthy
 from ..context_logger import context_logger
 
-DEFAULT_HTTP_SCHEMA = 'http'
-
 MEDIASERVER_STORAGE_PATH = 'var/data'
 
 MEDIASERVER_CREDENTIALS_TIMEOUT = datetime.timedelta(minutes=5)
@@ -93,6 +91,9 @@ class BaseMediaserver(object):
             else:
                 _logger.error("{} is stopped.".format(self))
 
+    def has_core_dumps(self):
+        return self.installation.list_core_dumps() != []
+
     def collect_artifacts(self, artifacts_dir):
         for file in self.installation.list_log_files():
             if file.exists():
@@ -148,21 +149,19 @@ class Mediaserver(BaseMediaserver):
 
     @property
     def storage(self):
+        """Any non-backup storage"""
         # GET /ec2/getStorages is not always possible: server sometimes is not started.
-        storage_path = self.installation.dir / MEDIASERVER_STORAGE_PATH
-        return Storage(self.os_access, storage_path)
+        response = self.api.generic.get('ec2/getStorages')
+        for storage_data in response:
+            if not storage_data['isBackup']:
+                return Storage(self.os_access, self.os_access.path_cls(storage_data['url']))
 
 
 class Storage(object):
 
     def __init__(self, os_access, dir):
-        self.os_access = os_access
+        self.os_access = os_access  # type: OSAccess
         self.dir = dir
-
-    @cached_property  # TODO: Use cached_getter.
-    def timezone(self):
-        tzname = self.os_access.path_cls('/etc/timezone').read_text().strip()
-        return pytz.timezone(tzname)
 
     def save_media_sample(self, camera, start_time, sample):
         assert isinstance(camera, Camera), repr(camera)
@@ -205,7 +204,7 @@ class Storage(object):
     #   low_quality/urn_uuid_b0e78864-c021-11d3-a482-f12907312681/
     #     2017/01/27/12/1485511093576_21332.mkv
     def _construct_fpath(self, camera_mac_addr, quality_part, start_time, unixtime_utc_ms, duration):
-        local_dt = start_time.astimezone(self.timezone)  # Local to Machine.
+        local_dt = start_time.astimezone(self.os_access.time.get_tz())  # Local to Machine.
         duration_ms = int(duration.total_seconds() * 1000)
         return self.dir.joinpath(
             quality_part, camera_mac_addr,

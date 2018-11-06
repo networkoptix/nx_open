@@ -71,21 +71,21 @@ copyMediaserverPlugins()
         mjpg_link
     )
     PLUGINS+=( # Metadata plugins.
-        hikvision_metadata_plugin
-        axis_metadata_plugin
-        dw_mtt_metadata_plugin
-        vca_metadata_plugin
+        hikvision_analytics_plugin
+        axis_analytics_plugin
+        dw_mtt_analytics_plugin
+        vca_analytics_plugin
     )
     if [ "$ENABLE_HANWHA" == "true" ]
     then
-        PLUGINS+=( hanwha_metadata_plugin )
+        PLUGINS+=( hanwha_analytics_plugin )
     fi
 
     distrib_copyMediaserverPlugins "plugins" "$STAGE_MODULE/bin" "${PLUGINS[@]}"
     stripIfNeeded "$STAGE_MODULE/bin/plugins"
 
     local PLUGINS_OPTIONAL=(
-        stub_metadata_plugin
+        stub_analytics_plugin
     )
 
     distrib_copyMediaserverPlugins "plugins_optional" "$STAGE_MODULE/bin" "${PLUGINS_OPTIONAL[@]}"
@@ -116,6 +116,7 @@ copyQtLibs()
         Network
         Sql
         WebSockets
+        Qml
     )
     local QT_LIBS
     for QT_LIB in "${QT_LIBS[@]}"

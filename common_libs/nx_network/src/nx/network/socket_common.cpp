@@ -2,6 +2,7 @@
 
 #include <cstring>
 
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/url.h>
 
 #include "socket_global.h"
@@ -229,6 +230,16 @@ bool HostAddress::isLocalNetwork() const
     return false; // not even IP address
 }
 
+bool HostAddress::isIpv4LinkLocalNetwork() const
+{
+    if (const auto& ip = ipV4())
+    {
+        const auto addr = ntohl(ip->s_addr);
+        return (addr & 0xFFFF0000) == 0xA9FE0000; // 169.254.0.0
+    }
+    return false;
+}
+
 bool HostAddress::isIpAddress() const
 {
     if (m_ipV4 || m_ipV6)
@@ -387,6 +398,20 @@ void swap(HostAddress& one, HostAddress& two)
     one.swap(two);
 }
 
+void serialize(
+    class QnJsonContext*,
+    const nx::network::HostAddress& value,
+    QJsonValue* target)
+{
+    *target = value.toString();
+}
+
+bool deserialize(QnJsonContext*, const QJsonValue& source, HostAddress* value)
+{
+    *value = HostAddress(source.toString());
+    return true;
+}
+
 //-------------------------------------------------------------------------------------------------
 // SocketAddress
 
@@ -405,7 +430,12 @@ SocketAddress::SocketAddress(const QString& str)
     const bool isIpV6 = str.count(':') > 1;
     const int bracketPos = str.indexOf(']');
 
-    // IpV6 addresses without brackets are forbidden here.
+    if (isIpV6 && bracketPos == -1)
+    {
+        address = HostAddress(str);
+        return;
+    }
+
     NX_ASSERT(!isIpV6 || bracketPos > 0);
     const int sepPos = str.lastIndexOf(':');
 
@@ -515,6 +545,8 @@ QString SocketAddress::trimIpV6(const QString& ip)
 
     return ip;
 }
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SocketAddress, (json), (address)(port))
 
 //-------------------------------------------------------------------------------------------------
 

@@ -26,7 +26,7 @@ _logger = ContextLogger(__name__, 'mediaserver_api')
 
 DEFAULT_API_USER = 'admin'
 INITIAL_API_PASSWORD = 'admin'
-DEFAULT_API_PASSWORD = 'qweasd123'
+DEFAULT_API_PASSWORD = 'qweasd234'
 MAX_CONTENT_LEN_TO_LOG = 1000
 DEFAULT_TAKE_REMOTE_SETTINGS = False
 
@@ -298,8 +298,13 @@ class MediaserverApi(object):
         assert self.credentials_work()
         return response['settings']
 
-    def detach_from_cloud(self, password):
-        self.generic.post('api/detachFromCloud', {'password': password})
+    def detach_from_cloud(self, password, current_password):
+        self.generic.post(
+            'api/detachFromCloud',
+            {
+                'password': password,
+                'currentPassword': current_password
+            })
         self.generic.http.set_credentials(DEFAULT_API_USER, password)
 
     def get_system_settings(self):
@@ -514,6 +519,12 @@ class MediaserverApi(object):
         # Although api/setCameraParam method is considered POST in doc, in the code it is GET
         self.generic.get('api/setCameraParam', params)
 
+    def get_server_statistics(self, salt=None):
+        if salt:
+            return self.generic.get('/api/statistics', 'salt=' + str(salt))
+        else:
+            return self.generic.get('/api/statistics')
+
     @classmethod
     def _parse_json_fields(cls, data):
         if isinstance(data, dict):
@@ -583,6 +594,7 @@ class MediaserverApi(object):
             remote_address,  # type: IPAddress
             remote_port,
             take_remote_settings=DEFAULT_TAKE_REMOTE_SETTINGS,
+            timeout_sec=30,
             ):
         # When many servers are merged, there is server visible from others.
         # This server is passed as remote. That's why it's higher in loggers hierarchy.
@@ -619,10 +631,11 @@ class MediaserverApi(object):
                 raise MergeUnauthorized(self, remote_api, e.error, e.error_string)
             raise ExplicitMergeError(self, remote_api, e.error, e.error_string)
         servant_api.generic.http.set_credentials(master_api.generic.http.user, master_api.generic.http.password)
-        wait_for_truthy(servant_api.credentials_work, timeout_sec=30)
-        wait_for_equal(servant_api.get_local_system_id, master_system_id, timeout_sec=30)
+        wait_for_truthy(servant_api.credentials_work, timeout_sec=timeout_sec)
+        wait_for_equal(servant_api.get_local_system_id, master_system_id, timeout_sec=timeout_sec)
         all_ids = master_ids | servant_ids
-        wait_for_equal(master_api.system_mediaserver_ids, all_ids, timeout_sec=30)
+        wait_for_equal(master_api.system_mediaserver_ids, all_ids, timeout_sec=timeout_sec,
+                       expected_desc="Mediaserver master get servant in it's server list")
         logger.info("Merge %s to %s (takeRemoteSettings: %s): complete.", self, remote_api, take_remote_settings)
 
     def find_camera(self, camera_mac):
@@ -645,7 +658,7 @@ class MediaserverApi(object):
         return _MediaserverCameraApi(self.generic, camera_id)
 
     @property
-    def camera_list(self):
+    def all_cameras(self):
         result = []
         for camera_info in self.generic.get('ec2/getCameras'):
             result.append(_MediaserverCameraApi(self.generic, camera_info['id']))

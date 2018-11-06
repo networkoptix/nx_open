@@ -189,6 +189,11 @@ signals:
      */
     void currentLayoutChanged();
 
+    /**
+    * This signal is emitted when an item added to or removed from current layout.
+    */
+    void currentLayoutItemsChanged();
+
     void layoutsChanged();
 
     /**

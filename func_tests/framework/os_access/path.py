@@ -1,8 +1,9 @@
 import logging
 import os
+import stat
 from abc import ABCMeta, abstractmethod
 
-from pathlib2 import PurePath
+from pathlib2 import PurePath, PurePosixPath
 
 from framework.os_access import exceptions
 from framework.os_access.exceptions import DoesNotExist, NotADir
@@ -51,13 +52,38 @@ class FileSystemPath(PurePath):
             except NotADir:
                 yield child
 
-    @abstractmethod
-    def mkdir(self, parents=False, exist_ok=True):
-        pass
+    def mkdir(self, parents=False, exist_ok=False):
+        try:
+            self._mkdir_raw()
+        except exceptions.AlreadyExists:
+            if not exist_ok:
+                raise
+        except exceptions.BadParent:
+            if not parents:
+                raise
+            self.parent.mkdir(parents=True, exist_ok=False)
+            self.mkdir(parents=False, exist_ok=False)
 
-    @abstractmethod
+    def _mkdir_raw(self):
+        raise NotImplementedError("Either `mkdir` or `_mkdir_raw` must be implemented")
+
     def rmtree(self, ignore_errors=False):
-        pass
+        try:
+            iter_entries = self.glob('*')
+        except exceptions.DoesNotExist:
+            if ignore_errors:
+                pass
+            else:
+                raise
+        except exceptions.NotADir:
+            self.unlink()
+        else:
+            for entry in iter_entries:
+                entry.rmtree()
+            self.rmdir()
+
+    def rmdir(self):
+        raise NotImplementedError("Either `rmtree` or `rmdir` must be implemented")
 
     @abstractmethod
     def read_bytes(self, offset=0, max_length=None):
@@ -67,23 +93,25 @@ class FileSystemPath(PurePath):
     def write_bytes(self, contents, offset=None):
         return 0
 
-    @abstractmethod
-    def read_text(self, encoding, errors):
-        return u''
+    def read_text(self, encoding='utf8', errors='strict'):
+        data = self.read_bytes()
+        text = data.decode(encoding=encoding, errors=errors)
+        return text
 
-    @abstractmethod
-    def write_text(self, data, encoding, errors):
-        return 0
+    def write_text(self, text, encoding='utf8', errors='strict'):
+        data = text.encode(encoding=encoding, errors=errors)
+        bytes_written = self.write_bytes(data)
+        assert bytes_written == len(data)
+        return len(text)
 
-    @abstractmethod
+    def stat(self):
+        raise NotImplementedError("Either `size` or `stat` must be implemented.")
+
     def size(self):
-        return 0
-
-    def copy_to(self, destination):
-        copy_file_using_read_and_write(self, destination)
-
-    def copy_from(self, source):
-        copy_file_using_read_and_write(source, self)
+        path_stat = self.stat()
+        if not stat.S_ISREG(path_stat.st_mode):
+            raise exceptions.NotAFile("Stat: {}".format(path_stat))
+        return path_stat.st_size
 
     def ensure_empty_dir(self):
         if self.exists():
@@ -148,10 +176,27 @@ class FileSystemPath(PurePath):
         copy_file(local_source_path, destination)
         return destination
 
+    @abstractmethod
+    def symlink_to(self, target, target_is_directory=False):
+        pass
 
-def copy_file(source, destination):  # type: (FileSystemPath, FileSystemPath) -> None
+
+class BasePosixPath(FileSystemPath, PurePosixPath):
+    __metaclass__ = ABCMeta
+    _tmp = '/tmp/func_tests'
+
+
+def copy_file(source, destination, chunk_size_bytes=1024 * 1024):
+    # type: (FileSystemPath, FileSystemPath, int) -> None
     _logger.info("Copy from %s to %s", source, destination)
-    source.copy_to(destination)
-
-def copy_file_using_read_and_write(source, destination):  # type: (FileSystemPath, FileSystemPath) -> None
-    destination.write_bytes(source.read_bytes())
+    copied_bytes = 0
+    while True:
+        chunk = source.read_bytes(copied_bytes, max_length=chunk_size_bytes)
+        if copied_bytes == 0:
+            destination.write_bytes(chunk)
+        else:
+            destination.write_bytes(chunk, offset=copied_bytes)
+        copied_bytes += len(chunk)
+        if len(chunk) < chunk_size_bytes:
+            break
+        assert len(chunk) == chunk_size_bytes

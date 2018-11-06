@@ -30,7 +30,9 @@ public:
 
     virtual bool startAndWaitUntilStarted() override;
     bool startAndWaitUntilStarted(
-        bool allowIpTarget, bool proxyTargetPort, bool connectSupport);
+        bool allowIpTarget, bool proxyTargetPort, bool connectSupport,
+        std::optional<std::chrono::seconds> sendTimeout = {},
+        std::optional<std::chrono::seconds> recvTimeout = {});
 
     network::SocketAddress endpoint() const;
     const std::unique_ptr<nx::network::http::TestHttpServer>& testHttpServer() const;

@@ -1,25 +1,26 @@
 #include "lite_client_controller.h"
 
+#include <api/runtime_info_manager.h>
+#include <api/server_rest_connection.h>
+#include <api/app_server_connection.h>
 #include <common/common_module.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/camera_resource.h>
-#include <api/runtime_info_manager.h>
-#include <api/server_rest_connection.h>
-#include <api/app_server_connection.h>
-#include <nx_ec/data/api_conversion_functions.h>
 #include <managers/videowall_manager.h>
+#include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/id.h>
+
 #include <nx/client/mobile/resource/lite_client_layout_helper.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/types/connection_types.h>
 
 namespace {
 
-    const int kStartStopTimeoutMs = 60 * 1000;
+static constexpr int kStartStopTimeoutMs = 60 * 1000;
 
 } // namespace
 
@@ -155,12 +156,10 @@ void QnLiteClientController::startLiteClient()
         return;
     }
 
-    auto handleReply =
-        [this, d, guard = QPointer<QnLiteClientController>(this)](
-            bool success, rest::Handle handle, const QnJsonRestResult& result)
+    const auto handleReply =
+        [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
-            if (!guard)
-                return;
+            Q_D(QnLiteClientController);
 
             if (d->clientStartHandle != handle)
                 return;
@@ -169,7 +168,9 @@ void QnLiteClientController::startLiteClient()
                 d->setClientStartResult(false);
         };
 
-    d->clientStartHandle = d->server->restConnection()->startLiteClient(handleReply, thread());
+    d->clientStartHandle = d->server->restConnection()->startLiteClient(
+        nx::utils::guarded(this, handleReply), thread());
+
     if (d->clientStartHandle <= 0)
         d->setClientStartResult(false);
 }

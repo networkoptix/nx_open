@@ -14,12 +14,7 @@
 
 class QnUuid;
 
-namespace nx {
-
-namespace utils { class PendingOperation; }
-
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 class BookmarkSearchListModel::Private: public AbstractAsyncSearchListModel::Private
 {
@@ -36,12 +31,13 @@ public:
     QString filterText() const;
     void setFilterText(const QString& value);
 
-    virtual void clear() override;
+    virtual void clearData() override;
+    virtual void truncateToMaximumCount() override;
+    virtual void truncateToRelevantTimePeriod() override;
 
 protected:
-    virtual rest::Handle requestPrefetch(qint64 fromMs, qint64 toMs) override;
-    virtual bool commitPrefetch(qint64 earliestTimeToCommitMs, bool& fetchedAll) override;
-    virtual void clipToSelectedTimePeriod() override;
+    virtual rest::Handle requestPrefetch(const QnTimePeriod& period) override;
+    virtual bool commitPrefetch(const QnTimePeriod& periodToCommit) override;
     virtual bool hasAccessRights() const override;
 
 private:
@@ -53,21 +49,21 @@ private:
 
     int indexOf(const QnUuid& guid) const; //< Logarithmic complexity.
 
-    utils::PendingOperation* createUpdateBookmarksWatcherOperation();
+    QnVirtualCameraResourcePtr camera(const QnCameraBookmark& bookmark) const;
+
+    template<typename Iter>
+    bool commitPrefetch(const QnTimePeriod& periodToCommit,
+        Iter prefetchBegin, Iter prefetchEnd, int position);
 
     static QPixmap pixmap();
     static QColor color();
 
 private:
-    BookmarkSearchListModel* const q = nullptr;
+    BookmarkSearchListModel* const q;
     QString m_filterText;
     QnCameraBookmarkList m_prefetch;
-    QScopedPointer<utils::PendingOperation> m_updateBookmarksWatcher;
     std::deque<QnCameraBookmark> m_data;
-    QHash<QnUuid, qint64> m_guidToTimestampMs;
-    bool m_success = true;
+    QHash<QnUuid, std::chrono::milliseconds> m_guidToTimestamp;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

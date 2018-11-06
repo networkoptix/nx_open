@@ -105,6 +105,20 @@ copyBuildLibs()
         libvpx
     )
 
+    if [ "$BOX" = "rpi" ]
+    then
+        LIBS_TO_COPY+=(
+            libasound
+            libmmal_core
+            libmmal_util
+            libmmal_vc_client
+            libvchiq_arm
+            libvcos
+            libvcsm
+            libbcm_host
+        )
+    fi
+
     if [ "$BOX" != "edge1" ]
     then
         LIBS_TO_COPY+=(
@@ -205,6 +219,7 @@ copyQtLibs()
         Multimedia
         Sql
         WebSockets
+        Qml
     )
 
     # Qt libs for nx1 lite client.
@@ -216,7 +231,6 @@ copyQtLibs()
             WebEngineCore
             WebView
             MultimediaQuick_p
-            Qml
             Quick
             LabsTemplates
             DBus
@@ -308,22 +322,23 @@ copyMediaserverPlugins()
         generic_multicast_plugin
         genericrtspplugin
         mjpg_link
+        usb_cam
     )
     PLUGINS+=( # Metadata plugins.
-        hikvision_metadata_plugin
-        axis_metadata_plugin
-        dw_mtt_metadata_plugin
-        vca_metadata_plugin
+        hikvision_analytics_plugin
+        axis_analytics_plugin
+        dw_mtt_analytics_plugin
+        vca_analytics_plugin
     )
     if [ "$ENABLE_HANWHA" == "true" ]
     then
-        PLUGINS+=( hanwha_metadata_plugin )
+        PLUGINS+=( hanwha_analytics_plugin )
     fi
 
     distrib_copyMediaserverPlugins "plugins" "$STAGE_MEDIASERVER_BIN" "${PLUGINS[@]}"
 
     local PLUGINS_OPTIONAL=(
-        stub_metadata_plugin
+        stub_analytics_plugin
     )
 
     distrib_copyMediaserverPlugins \
@@ -562,6 +577,11 @@ createUpdateZip() # file.tar.gz
     ln -s "$TAR_GZ_FILE" "$ZIP_DIR/"
     cp -r "$CURRENT_BUILD_DIR/update.json" "$ZIP_DIR/"
     cp -r "$CURRENT_BUILD_DIR/install.sh" "$ZIP_DIR/"
+
+    if [ "$BOX" = "rpi" ]
+    then
+        cp -r "$CURRENT_BUILD_DIR/nx_rpi_cam_setup.sh" "$ZIP_DIR/"
+    fi
 
     distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP" "$ZIP_DIR" zip
 }

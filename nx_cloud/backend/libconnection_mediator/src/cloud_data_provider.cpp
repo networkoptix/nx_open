@@ -145,10 +145,10 @@ void CloudDataProvider::updateSystemsAsync()
         {
             if (code != cdb::api::ResultCode::ok)
             {
-                NX_UTILS_LOG(std::chrono::steady_clock::now() - m_startTime > m_startTimeout ?
-                    utils::log::Level::error : utils::log::Level::debug, this,
-                    lm("Error: %1").arg(m_connectionFactory->toString(code)));
-
+                NX_UTILS_LOG((std::chrono::steady_clock::now() - m_startTime > m_startTimeout)
+                    ? utils::log::Level::error
+                    : utils::log::Level::debug,
+                    this, lm("Error: %1").arg(m_connectionFactory->toString(code)));
                 // TODO: shall we m_systemCache.clear() after a few failing attempts?
             }
             else

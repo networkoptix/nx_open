@@ -20,7 +20,7 @@ class QnFfmpegTranscoder: public QnTranscoder
 public:
     static const int MTU_SIZE = 1412;
 
-    QnFfmpegTranscoder(nx::metrics::Storage* metrics);
+    QnFfmpegTranscoder(const DecoderConfig& config, nx::metrics::Storage* metrics);
     ~QnFfmpegTranscoder();
 
     int setContainer(const QString& value);
@@ -56,6 +56,7 @@ private:
     void closeFfmpegContext();
 
 private:
+    DecoderConfig m_config;
     AVCodecContext* m_videoEncoderCodecCtx;
     AVCodecContext* m_audioEncoderCodecCtx;
     int m_videoBitrate;

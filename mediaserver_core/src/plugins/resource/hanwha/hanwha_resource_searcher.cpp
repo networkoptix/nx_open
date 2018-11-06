@@ -414,6 +414,9 @@ void HanwhaResourceSearcher::createResource(
 template <typename T>
 void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result, const QAuthenticator& auth)
 {
+    if (shouldStop())
+        return;
+
     const auto firstResource = result.last().template dynamicCast<HanwhaResource>();
     const auto physicalId = firstResource->getPhysicalId();
 

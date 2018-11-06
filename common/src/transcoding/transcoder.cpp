@@ -149,7 +149,9 @@ QSize findSavedResolution(const QnConstCompressedVideoDataPtr& video)
 
 bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 {
-    QnFfmpegVideoDecoder decoder(video->compressionType, video, false);
+    QnFfmpegVideoDecoder decoder(
+        DecoderConfig(),
+        video->compressionType, video, false);
     QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
     decoder.decode(video, &decodedVideoFrame);
     if (m_resolution.width() == 0 && m_resolution.height() > 0)
@@ -361,7 +363,10 @@ int QnTranscoder::setVideoCodec(
             break;
         case TM_FfmpegTranscode:
         {
-            ffmpegTranscoder = new QnFfmpegVideoTranscoder(m_metrics, codec);
+            ffmpegTranscoder = new QnFfmpegVideoTranscoder(
+                DecoderConfig::fromMediaResource(m_transcodingSettings.resource),
+                m_metrics,
+                codec);
 
             ffmpegTranscoder->setResolution(resolution);
             ffmpegTranscoder->setBitrate(bitrate);

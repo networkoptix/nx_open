@@ -48,5 +48,7 @@ extern const char* const kAnotherDeprecatedCloudModuleXmlPath;
 
 extern const char* const kDiscoveryCloudModuleXmlPath;
 
+extern const char* const kSystemIdParam;
+
 } // namespace cdb
 } // namespace nx

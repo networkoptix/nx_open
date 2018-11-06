@@ -38,6 +38,7 @@ public:
     Tag(const char* s) = delete;
     Tag(const std::type_info& info);
     explicit Tag(QString s);
+    explicit Tag(const std::string& s);
 
     template<typename T>
     Tag(const T* pointer): m_value(::toString(pointer)) {}

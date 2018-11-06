@@ -49,7 +49,8 @@ bool compatibleCloudHost(const QString& cloudHost, bool isMobile)
     if (cloudHost.isEmpty())
         return true;
 
-    return cloudHost == nx::network::SocketGlobals::cloud().cloudHost()
+    auto activeCloud = nx::network::SocketGlobals::cloud().cloudHost();
+    return cloudHost == activeCloud
         || (isMobile && nx::network::AppInfo::compatibleCloudHosts().contains(cloudHost));
 }
 
@@ -133,6 +134,12 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     // Mobile client can connect to servers with any protocol version.
     if (!isMobile && protoVersion != QnAppInfo::ec2ProtoVersion())
         return Qn::IncompatibleProtocolConnectionResult;
+
+    // For debug purposes only
+    /*
+    auto appVersion = nx::vms::api::SoftwareVersion(QnAppInfo::applicationVersion());
+    if (appVersion < version)
+        return Qn::IncompatibleProtocolConnectionResult;*/
 
     return Qn::SuccessConnectionResult;
 }

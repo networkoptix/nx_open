@@ -85,6 +85,7 @@
 #include <nx_ec/managers/abstract_webpage_manager.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <nx_ec/managers/abstract_server_manager.h>
+#include <nx_ec/managers/abstract_analytics_manager.h>
 #include <nx/network/socket.h>
 #include <nx/network/ssl/ssl_engine.h>
 #include <nx/network/udt/udt_socket.h>
@@ -256,7 +257,7 @@
 #include <rest/helper/p2p_statistics.h>
 #include <recorder/archive_integrity_watcher.h>
 #include <nx/utils/std/cpp14.h>
-#include <nx/mediaserver/metadata/manager_pool.h>
+#include <nx/mediaserver/analytics/manager.h>
 #include <nx/utils/platform/current_process.h>
 #include <rest/handlers/change_camera_password_rest_handler.h>
 #include <nx/mediaserver/fs/media_paths/media_paths.h>
@@ -1038,6 +1039,7 @@ void MediaServerProcess::at_databaseDumped()
                 m_mediaServer,
                 nx::mserver_aux::createServerSettingsProxy(serverModule()).get()
             ).saveToSettings(serverModule()->roSettings());
+    NX_INFO(this, "Server restart is scheduled after dump database");
     restartServer(500);
 }
 
@@ -1056,6 +1058,7 @@ void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid
                     m_mediaServer,
                     nx::mserver_aux::createServerSettingsProxy(serverModule()).get()
                 ).saveToSettings(serverModule()->roSettings());
+        NX_INFO(this, "Server restart is scheduled because sysId time is changed");
         restartServer(0);
     }
 }
@@ -2117,6 +2120,8 @@ void MediaServerProcess::registerRestHandlers(
      * %permissions Administrator.
      * %param[opt]:string systemName System display name. It affects all servers in the system.
      * %param[opt]:integer port Server API port. It affects the current server only.
+     * %param[opt]:string password Set new admin password.
+     * %param[opt]:string currentPassword Required if new admin password is provided.
      * %return JSON with error code, error string, and flag "restartNeeded" that shows whether the
      *     server must be restarted to apply settings. Error string contains a hint to identify the
      *     problem: "SYSTEM_NAME" or "PORT".
@@ -2129,6 +2134,7 @@ void MediaServerProcess::registerRestHandlers(
      * be called either via GET or POST method. POST data should be a json object.
      * %permissions Administrator.
      * %param[opt]:string password Set new admin password after detach.
+     * %param[opt]:string currentPassword Required if new admin password is provided.
      * %return JSON result with error code
      */
     reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(serverModule(), cloudManagerGroup), kAdmin);
@@ -2314,7 +2320,13 @@ void MediaServerProcess::registerRestHandlers(
      * %param[opt]:option keepSmallChunks If specified, standalone chunks smaller than the detail
      *     level are not removed from the result.
      * %param[opt]:integer limit Maximum number of chunks to return.
-     * %param[opt]:option flat If specified, do not group chunk lists by server.
+     * %param[opt]:option flat If specified, do not group chunk lists by server. This parameter is deprecated.
+     *     Please use parameter groupBy instead.
+    * %param[opt]:enum groupBy group type. Default value is "serverId".
+     *     %value serverId group data by serverId. Result field 'guid' has server Guid value.
+     *     %value cameraId group data by cameraId. Result field 'guid' has camera Guid value.
+     *     %value none do not group data. Result is the flat list of data.
+     * %param[opt]:option desc Sort data in descending order if provided.
      * %return:object JSON object with an error code, error message and the list of JSON objects
      *     in "reply" field: if no "flat" parameter is specified, "reply" field is the list which
      *     contains for each server its GUID (as "guid" field) and the list of chunks (as "periods"
@@ -2434,8 +2446,8 @@ void MediaServerProcess::registerRestHandlers(
      *     The special value "now" requires to retrieve the thumbnail only from the live stream.
      *     <br/>The special value "latest", which is the default value, requires to retrieve
      *     thumbnail from the live stream if possible, otherwise the latest one from the archive.
-     *     <br/>Note: archive extraction can be quite slow operation depending place where it is
-     *     stored.
+     *     <br/>Note: Extraction from the archive can be quite slow depending on the place where the
+     *     frame is stored.
      * %param[opt]:integer rotate Image orientation. Can be 0, 90, 180 or 270 degrees. If the
      *     parameter is absent or equals -1, the image will be rotated as defined in the camera
      *     settings.
@@ -2471,7 +2483,7 @@ void MediaServerProcess::registerRestHandlers(
 
     reg("ec2/statistics", new QnMultiserverStatisticsRestHandler("ec2/statistics"));
 
-    /**%apidoc GET /api/analyticsLookupDetectedObjects
+    /**%apidoc GET /ec2/analyticsLookupDetectedObjects
      * Search analytics DB for objects that match filter specified.
      * %param[opt] deviceId Id of camera.
      * %param[opt] objectTypeId Analytics object type id.
@@ -2500,21 +2512,21 @@ void MediaServerProcess::registerRestHandlers(
         commonModule(), serverModule()->analyticsEventsStorage()));
 
     /**%apidoc GET /api/getAnalyticsActions
-     * Get analytics actions from all metadata plugins on the current server which are applicable
+     * Get analytics actions from all analytics plugins on the current server which are applicable
      *     to the specified metadata object type.
      * %param objectTypeId Id of an object type to which an action should be applicable.
      * %return JSON with an error code, error message and a JSON object in "reply" field:
      *     %param actions List of JSON objects, each describing a set of actions from a particular
-     *         metadata plugin.
+     *         analytics plugin.
      *     %param actions[].actionIds List of action ids (strings).
-     *     %param actions[].pluginId Id of a metadata plugin which offers the actions.
+     *     %param actions[].pluginId Id of a analytics plugin which offers the actions.
      */
     reg("api/getAnalyticsActions", new QnGetAnalyticsActionsRestHandler());
 
     /**%apidoc POST /api/executeAnalyticsAction
-     * Execute analytics action from the particular metadata plugin on this server. The action is
+     * Execute analytics action from the particular analytics plugin on this server. The action is
      * applied to the specified metadata object.
-     * %param pluginId Id of a metadata plugin which offers the action.
+     * %param pluginId Id of an analytics plugin which offers the action.
      * %param actionId Id of an action to execute.
      * %param objectId Id of a metadata object to which the action is applied.
      * %param cameraId Id of a camera from which the action was triggered.
@@ -2776,9 +2788,10 @@ nx::vms::api::ServerFlags MediaServerProcess::calcServerFlags()
 {
     nx::vms::api::ServerFlags serverFlags = nx::vms::api::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
 
-#ifdef EDGE_SERVER
-    serverFlags |= vms::api::SF_Edge;
-#endif
+    #if defined(EDGE_SERVER)
+        serverFlags |= nx::vms::api::SF_Edge;
+    #endif
+
     if (QnAppInfo::isBpi())
     {
         serverFlags |= nx::vms::api::SF_IfListCtrl | nx::vms::api::SF_timeCtrl;
@@ -3083,7 +3096,8 @@ void MediaServerProcess::initializeLogging()
             {
                 QnLog::HWID_LOG,
                 nx::utils::log::Tag(toString(typeid(nx::mediaserver::LicenseWatcher)))
-            }));
+            }),
+        /*writeLogHeader*/ false);
 
     logSettings.loggers.front().level.parse(cmdLineArguments().ec2TranLogLevel,
         settings.tranLogLevel(), toString(nx::utils::log::Level::none));
@@ -3334,11 +3348,13 @@ bool MediaServerProcess::setUpMediaServerResource(
 
 void MediaServerProcess::stopObjects()
 {
+    commonModule()->setNeedToStop(true);
+
     auto safeDisconnect =
         [this](QObject* src, QObject* dst)
         {
             if (src && dst)
-                disconnect(src, nullptr, dst, nullptr);
+                src->disconnect(dst);
         };
 
     NX_INFO(this, "QnMain event loop has returned. Destroying objects...");
@@ -3380,7 +3396,6 @@ void MediaServerProcess::stopObjects()
         nx::utils::TimerManager::instance()->joinAndDeleteTimer(dumpSystemResourceUsageTaskID);
 
     m_ipDiscovery.reset(); // stop it before IO deinitialized
-    commonModule()->setNeedToStop(true);
     m_multicastHttp.reset();
 
     if (m_universalTcpListener)
@@ -3407,7 +3422,7 @@ void MediaServerProcess::stopObjects()
     m_mserverResourceSearcher.reset();
 
     commonModule()->resourceDiscoveryManager()->stop();
-    serverModule()->metadataManagerPool()->stop(); //< Stop processing analytics events.
+    serverModule()->analyticsManager()->stop(); //< Stop processing analytics events.
 
     serverModule()->resourcePool()->threadPool()->waitForDone();
     commonModule()->resourcePool()->clear();
@@ -3963,7 +3978,7 @@ void MediaServerProcess::loadResourceParamsData()
 {
     const std::array<const char*,2> kUrlsToLoadResourceData =
     {
-        "http://updates.networkoptix.com/resource_data.json",
+        "http://resources.vmsproxy.com/resource_data.json",
         "http://beta.networkoptix.com/beta-builds/daily/resource_data.json"
     };
 
@@ -3973,7 +3988,18 @@ void MediaServerProcess::loadResourceParamsData()
     QString source;
     ResourceParamWithRefData param;
     param.name = Qn::kResourceDataParamName;
-    auto oldValue = serverModule()->commonModule()->propertyDictionary()->value(QnUuid(), param.name);
+
+    QString oldValue;
+    nx::vms::api::ResourceParamWithRefDataList data;
+    manager->getKvPairsSync(QnUuid(), &data);
+    for (const auto& param: data)
+    {
+        if (param.name == Qn::kResourceDataParamName)
+        {
+            oldValue = param.value;
+            break;
+        }
+    }
     if (oldValue.isEmpty())
     {
         source = ":/resource_data.json";
@@ -3985,7 +4011,7 @@ void MediaServerProcess::loadResourceParamsData()
         const auto internetValue = loadDataFromUrl(url);
         if (!internetValue.isEmpty())
         {
-            if (serverModule()->commonModule()->dataPool()->loadData(internetValue))
+            if (serverModule()->commonModule()->dataPool()->validateData(internetValue))
             {
                 param.value = internetValue;
                 source = url;
@@ -4006,7 +4032,6 @@ void MediaServerProcess::loadResourceParamsData()
         ResourceParamWithRefDataList params;
         params.push_back(param);
         manager->saveSync(params);
-        m_serverMessageProcessor->resetPropertyList(params);
     }
 
     const auto externalResourceFileName =
@@ -4109,7 +4134,7 @@ void MediaServerProcess::run()
     if (!connectToDatabase())
         return;
 
-    m_discoveryMonitor = std::make_unique<ec2::QnDiscoveryMonitor>(
+    m_discoveryMonitor = std::make_unique<nx::mediaserver::discovery::DiscoveryMonitor>(
         m_ec2ConnectionFactory->messageBus());
 
     initializeAnalyticsEvents();
@@ -4170,12 +4195,12 @@ void MediaServerProcess::run()
 
     initializeUpnpPortMapper();
 
-    loadResourcesFromDatabase();
     loadResourceParamsData();
+    loadResourcesFromDatabase();
 
     m_serverMessageProcessor->startReceivingLocalNotifications(m_ec2Connection);
 
-    serverModule->metadataManagerPool()->init();
+    serverModule->analyticsManager()->init();
 
     at_runtimeInfoChanged(commonModule()->runtimeInfoManager()->localInfo());
 

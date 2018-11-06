@@ -1,5 +1,4 @@
 import logging
-import timeit
 import json
 from datetime import datetime, timedelta
 
@@ -9,7 +8,7 @@ from typing import Callable, Generator, Optional
 from framework.http_api import HttpError
 from framework.installation.mediaserver import Mediaserver
 from framework.mediaserver_api import MediaserverApiError, MediaserverApiRequestError
-from framework.utils import datetime_utc_now
+from framework.waiting import Timer
 from .checks import Failure, Halt, Result, Success
 
 _logger = logging.getLogger(__name__)
@@ -58,8 +57,8 @@ class Run(object):
 class Stage(object):
     """ Stage description object, allows to start execution process for a specific camera.
     """
-    def __init__(self, name, actions, is_essential, timeout
-                 ):  # type: (str, Callable[[Run], Result], bool, timedelta) -> None
+    def __init__(self, name, actions, is_essential, timeout):
+            # type: (str, Callable[[Run], Result], bool, timedelta) -> None
         self.name = name
         self.is_essential = is_essential
         self.timeout = timeout
@@ -82,7 +81,7 @@ class Stage(object):
 
         while True:
             run.clear_cache()
-            yield actions.next()
+            yield next(actions)
 
 
 class Executor(object):
@@ -105,10 +104,10 @@ class Executor(object):
         """
         steps = self.stage.steps(server, self.camera_name, self.camera_id, self._rules)
         self._result = Halt('Stage is not finished')
-        self._start_time = datetime_utc_now()
-        start_time = timeit.default_timer()
+        self._start_time = datetime.now(pytz.UTC)
+        timer = Timer()
         _logger.info('Stage "%s" is started for %s', self.stage.name, self.camera_name)
-        while not self._execute_next_step(steps, start_time):
+        while not self._execute_next_step(steps, timer):
             _logger.debug(
                 'Stage "%s" for %s after %s: %s',
                 self.stage.name, self.camera_name, self._duration, self._result)
@@ -139,12 +138,12 @@ class Executor(object):
 
         return dict(start_time=self._start_time, duration=self._duration, **self._result.details)
 
-    def _execute_next_step(self, stage_steps, start_time
-                           ):  # type: (Generator[Result], float) -> bool
+    def _execute_next_step(self, stage_steps, timer):
+            # type: (Generator[Result], Timer) -> bool
         """ :returns True if stage is finished, False otherwise.
         """
         try:
-            self._result = stage_steps.next()
+            self._result = next(stage_steps)
 
         except HttpError as error:
             self._result = Failure(str(error))
@@ -153,11 +152,11 @@ class Executor(object):
             return True
 
         except Exception:
-            self._result = Failure(is_exception=True)
+            self._result = Failure.from_current_exception()
             return True
 
         finally:
-            self._duration = timedelta(seconds=timeit.default_timer() - start_time)
+            self._duration = timer.from_start
 
         if isinstance(self._result, Success):
             return True

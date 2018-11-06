@@ -82,7 +82,6 @@ void QnResourceDiscoveryManagerTimeoutDelegate::onTimeout()
 
 QnResourceDiscoveryManager::QnResourceDiscoveryManager(QObject* parent)
 :
-    base_type(parent),
     QnCommonModuleAware(parent),
     m_ready(false),
     m_state(InitialSearch),
@@ -186,15 +185,20 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(const QnUuid &resourceT
 
 void QnResourceDiscoveryManager::stop()
 {
+    pleaseStop();
+    quit();
+    wait();
+}
+
+void QnResourceDiscoveryManager::pleaseStop()
+{
     if (isRunning())
     {
         QnMutexLocker lock(&m_searchersListMutex);
         for (QnAbstractResourceSearcher* searcher: m_searchersList)
             searcher->pleaseStop();
     }
-
-    quit();
-    wait();
+    base_type::pleaseStop();
 }
 
 void QnResourceDiscoveryManager::run()

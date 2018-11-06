@@ -18,6 +18,7 @@ extern "C" {
 #endif
 #include <libavutil/pixdesc.h>
 #include <libswscale/swscale.h>
+#include <libavutil/imgutils.h>
 #ifdef WIN32
 #   undef AVPixFmtDescriptor
 #endif
@@ -227,10 +228,14 @@ void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
 
     int rc = 32 >> (newFormat == AV_PIX_FMT_RGBA || newFormat == AV_PIX_FMT_ABGR || newFormat == AV_PIX_FMT_BGRA ? 2 : 0);
     int roundWidth = qPower2Ceil((unsigned) width, rc);
-    int numBytes = avpicture_get_size((AVPixelFormat) format, roundWidth, height);
+    int numBytes = av_image_get_buffer_size((AVPixelFormat) format, roundWidth, height, /*align*/ 1);
     if (numBytes > 0) {
         numBytes += FF_INPUT_BUFFER_PADDING_SIZE; // extra alloc space due to ffmpeg doc
-        avpicture_fill((AVPicture*) this, (quint8*) av_malloc(numBytes), (AVPixelFormat) format, roundWidth, height);
+        av_image_fill_arrays(
+            data,
+            linesize,
+            (quint8*) av_malloc(numBytes),
+            (AVPixelFormat) format, roundWidth, height, /*align*/ 1);
         fillRightEdge();
     }
 }
@@ -243,9 +248,14 @@ void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
     height = newHeight;
     format = newFormat;
 
-    int numBytes = avpicture_get_size((AVPixelFormat) format, lineSizeHint, height);
-    if (numBytes > 0) {
-        avpicture_fill((AVPicture*) this, (quint8*) av_malloc(numBytes), (AVPixelFormat) format, lineSizeHint, height);
+    int numBytes = av_image_get_buffer_size((AVPixelFormat) format, lineSizeHint, height, /*align*/ 1);
+    if (numBytes > 0)
+    {
+        av_image_fill_arrays(
+            data,
+            linesize,
+            (quint8*) av_malloc(numBytes),
+            (AVPixelFormat) format, lineSizeHint, height, /*align*/ 1);
         fillRightEdge();
     }
 }

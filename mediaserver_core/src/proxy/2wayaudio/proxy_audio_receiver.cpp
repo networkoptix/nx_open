@@ -6,7 +6,7 @@
 #include "network/universal_tcp_listener.h"
 #include <streaming/audio_streamer_pool.h>
 #include <rest/handlers/audio_transmission_rest_handler.h>
-#include <nx/streaming/nx_rtp_parser.h>
+#include <nx/streaming/rtp/parsers/nx_rtp_parser.h>
 #include <media_server/media_server_module.h>
 
 namespace
@@ -44,7 +44,7 @@ class QnProxyDesktopDataProvider:
 {
 private:
     quint8* m_recvBuffer;
-    QnNxRtpParser m_parser;
+    nx::streaming::rtp::QnNxRtpParser m_parser;
 
 public:
     QnProxyDesktopDataProvider(const QnUuid& cameraId):

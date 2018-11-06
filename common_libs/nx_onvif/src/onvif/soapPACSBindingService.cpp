@@ -14,43 +14,50 @@ A commercial use license is available from Genivia Inc., contact@genivia.com
 #include "soapPACSBindingService.h"
 
 PACSBindingService::PACSBindingService()
-{	this->soap = soap_new();
-	this->soap_own = true;
-	PACSBindingService_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    PACSBindingService_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
 }
 
 PACSBindingService::PACSBindingService(const PACSBindingService& rhs)
-{	this->soap = rhs.soap;
-	this->soap_own = false;
+{
+    this->soap = rhs.soap;
+    this->soap_own = false;
 }
 
 PACSBindingService::PACSBindingService(struct soap *_soap)
-{	this->soap = _soap;
-	this->soap_own = false;
-	PACSBindingService_init(_soap->imode, _soap->omode);
+{
+    this->soap = _soap;
+    this->soap_own = false;
+    PACSBindingService_init(_soap->imode, _soap->omode);
 }
 
 PACSBindingService::PACSBindingService(soap_mode iomode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	PACSBindingService_init(iomode, iomode);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    PACSBindingService_init(iomode, iomode);
 }
 
 PACSBindingService::PACSBindingService(soap_mode imode, soap_mode omode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	PACSBindingService_init(imode, omode);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    PACSBindingService_init(imode, omode);
 }
 
 PACSBindingService::~PACSBindingService()
-{	if (this->soap_own)
-		soap_free(this->soap);
+{
+    if (this->soap_own)
+        soap_free(this->soap);
 }
 
 void PACSBindingService::PACSBindingService_init(soap_mode imode, soap_mode omode)
-{	soap_imode(this->soap, imode);
-	soap_omode(this->soap, omode);
-	static const struct Namespace namespaces[] = {
+{
+    soap_imode(this->soap, imode);
+    soap_omode(this->soap, omode);
+    static const struct Namespace namespaces[] = {
         {"SOAP-ENV", "http://www.w3.org/2003/05/soap-envelope", "http://schemas.xmlsoap.org/soap/envelope/", NULL},
         {"SOAP-ENC", "http://www.w3.org/2003/05/soap-encoding", "http://schemas.xmlsoap.org/soap/encoding/", NULL},
         {"xsi", "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL},
@@ -116,151 +123,178 @@ void PACSBindingService::PACSBindingService_init(soap_mode imode, soap_mode omod
         {"onvifThermal", "http://www.onvif.org/ver10/thermal/wsdl", NULL, NULL},
         {NULL, NULL, NULL, NULL}
     };
-	soap_set_namespaces(this->soap, namespaces);
+    soap_set_namespaces(this->soap, namespaces);
 }
 
 void PACSBindingService::destroy()
-{	soap_destroy(this->soap);
-	soap_end(this->soap);
+{
+    soap_destroy(this->soap);
+    soap_end(this->soap);
 }
 
 void PACSBindingService::reset()
-{	this->destroy();
-	soap_done(this->soap);
-	soap_initialize(this->soap);
-	PACSBindingService_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+{
+    this->destroy();
+    soap_done(this->soap);
+    soap_initialize(this->soap);
+    PACSBindingService_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
 }
 
 #ifndef WITH_PURE_VIRTUAL
 PACSBindingService *PACSBindingService::copy()
-{	PACSBindingService *dup = SOAP_NEW_UNMANAGED(PACSBindingService);
-	if (dup)
-	{	soap_done(dup->soap);
-		soap_copy_context(dup->soap, this->soap);
-	}
-	return dup;
+{
+    PACSBindingService *dup = SOAP_NEW_UNMANAGED(PACSBindingService);
+    if (dup)
+    {
+        soap_done(dup->soap);
+        soap_copy_context(dup->soap, this->soap);
+    }
+    return dup;
 }
 #endif
 
 PACSBindingService& PACSBindingService::operator=(const PACSBindingService& rhs)
-{	if (this->soap != rhs.soap)
-	{	if (this->soap_own)
-			soap_free(this->soap);
-		this->soap = rhs.soap;
-		this->soap_own = false;
-	}
-	return *this;
+{
+    if (this->soap != rhs.soap)
+    {
+        if (this->soap_own)
+            soap_free(this->soap);
+        this->soap = rhs.soap;
+        this->soap_own = false;
+    }
+    return *this;
 }
 
 int PACSBindingService::soap_close_socket()
-{	return soap_closesock(this->soap);
+{
+    return soap_closesock(this->soap);
 }
 
 int PACSBindingService::soap_force_close_socket()
-{	return soap_force_closesock(this->soap);
+{
+    return soap_force_closesock(this->soap);
 }
 
 int PACSBindingService::soap_senderfault(const char *string, const char *detailXML)
-{	return ::soap_sender_fault(this->soap, string, detailXML);
+{
+    return ::soap_sender_fault(this->soap, string, detailXML);
 }
 
 int PACSBindingService::soap_senderfault(const char *subcodeQName, const char *string, const char *detailXML)
-{	return ::soap_sender_fault_subcode(this->soap, subcodeQName, string, detailXML);
+{
+    return ::soap_sender_fault_subcode(this->soap, subcodeQName, string, detailXML);
 }
 
 int PACSBindingService::soap_receiverfault(const char *string, const char *detailXML)
-{	return ::soap_receiver_fault(this->soap, string, detailXML);
+{
+    return ::soap_receiver_fault(this->soap, string, detailXML);
 }
 
 int PACSBindingService::soap_receiverfault(const char *subcodeQName, const char *string, const char *detailXML)
-{	return ::soap_receiver_fault_subcode(this->soap, subcodeQName, string, detailXML);
+{
+    return ::soap_receiver_fault_subcode(this->soap, subcodeQName, string, detailXML);
 }
 
 void PACSBindingService::soap_print_fault(FILE *fd)
-{	::soap_print_fault(this->soap, fd);
+{
+    ::soap_print_fault(this->soap, fd);
 }
 
 #ifndef WITH_LEAN
 #ifndef WITH_COMPAT
 void PACSBindingService::soap_stream_fault(std::ostream& os)
-{	::soap_stream_fault(this->soap, os);
+{
+    ::soap_stream_fault(this->soap, os);
 }
 #endif
 
 char *PACSBindingService::soap_sprint_fault(char *buf, size_t len)
-{	return ::soap_sprint_fault(this->soap, buf, len);
+{
+    return ::soap_sprint_fault(this->soap, buf, len);
 }
 #endif
 
 void PACSBindingService::soap_noheader()
-{	this->soap->header = NULL;
+{
+    this->soap->header = NULL;
 }
 
-void PACSBindingService::soap_header(char *wsa5__MessageID, struct wsa5__RelatesToType *wsa5__RelatesTo, struct wsa5__EndpointReferenceType *wsa5__From, struct wsa5__EndpointReferenceType *wsa5__ReplyTo, struct wsa5__EndpointReferenceType *wsa5__FaultTo, char *wsa5__To, char *wsa5__Action, struct chan__ChannelInstanceType *chan__ChannelInstance, struct wsdd__AppSequenceType *wsdd__AppSequence, struct _wsse__Security *wsse__Security, char *subscriptionID)
-{	::soap_header(this->soap);
-	this->soap->header->wsa5__MessageID = wsa5__MessageID;
-	this->soap->header->wsa5__RelatesTo = wsa5__RelatesTo;
-	this->soap->header->wsa5__From = wsa5__From;
-	this->soap->header->wsa5__ReplyTo = wsa5__ReplyTo;
-	this->soap->header->wsa5__FaultTo = wsa5__FaultTo;
-	this->soap->header->wsa5__To = wsa5__To;
-	this->soap->header->wsa5__Action = wsa5__Action;
-	this->soap->header->chan__ChannelInstance = chan__ChannelInstance;
-	this->soap->header->wsdd__AppSequence = wsdd__AppSequence;
-	this->soap->header->wsse__Security = wsse__Security;
-	this->soap->header->subscriptionID = subscriptionID;
+void PACSBindingService::soap_header(char *wsa5__MessageID, struct wsa5__RelatesToType *wsa5__RelatesTo, struct wsa5__EndpointReferenceType *wsa5__From, struct wsa5__EndpointReferenceType *wsa5__ReplyTo, struct wsa5__EndpointReferenceType *wsa5__FaultTo, char *wsa5__To, char *wsa5__Action, struct chan__ChannelInstanceType *chan__ChannelInstance, struct wsdd__AppSequenceType *wsdd__AppSequence, struct _wsse__Security *wsse__Security, char *SubscriptionId)
+{
+    ::soap_header(this->soap);
+    this->soap->header->wsa5__MessageID = wsa5__MessageID;
+    this->soap->header->wsa5__RelatesTo = wsa5__RelatesTo;
+    this->soap->header->wsa5__From = wsa5__From;
+    this->soap->header->wsa5__ReplyTo = wsa5__ReplyTo;
+    this->soap->header->wsa5__FaultTo = wsa5__FaultTo;
+    this->soap->header->wsa5__To = wsa5__To;
+    this->soap->header->wsa5__Action = wsa5__Action;
+    this->soap->header->chan__ChannelInstance = chan__ChannelInstance;
+    this->soap->header->wsdd__AppSequence = wsdd__AppSequence;
+    this->soap->header->wsse__Security = wsse__Security;
+    this->soap->header->SubscriptionId = SubscriptionId;
 }
 
 ::SOAP_ENV__Header *PACSBindingService::soap_header()
-{	return this->soap->header;
+{
+    return this->soap->header;
 }
 
 #ifndef WITH_NOIO
 int PACSBindingService::run(int port)
-{	if (!soap_valid_socket(this->soap->master) && !soap_valid_socket(this->bind(NULL, port, 100)))
-		return this->soap->error;
-	for (;;)
-	{	if (!soap_valid_socket(this->accept()))
-		{	if (this->soap->errnum == 0) // timeout?
-				this->soap->error = SOAP_OK;
-			break;
-		}
-		if (this->serve())
-			break;
-		this->destroy();
-	}
-	return this->soap->error;
+{
+    if (!soap_valid_socket(this->soap->master) && !soap_valid_socket(this->bind(NULL, port, 100)))
+        return this->soap->error;
+    for (;;)
+    {
+        if (!soap_valid_socket(this->accept()))
+        {
+            if (this->soap->errnum == 0) // timeout?
+                this->soap->error = SOAP_OK;
+            break;
+        }
+        if (this->serve())
+            break;
+        this->destroy();
+    }
+    return this->soap->error;
 }
 
 #if defined(WITH_OPENSSL) || defined(WITH_GNUTLS)
 int PACSBindingService::ssl_run(int port)
-{	if (!soap_valid_socket(this->soap->master) && !soap_valid_socket(this->bind(NULL, port, 100)))
-		return this->soap->error;
-	for (;;)
-	{	if (!soap_valid_socket(this->accept()))
-		{	if (this->soap->errnum == 0) // timeout?
-				this->soap->error = SOAP_OK;
-			break;
-		}
-		if (this->ssl_accept() || this->serve())
-			break;
-		this->destroy();
-	}
-	return this->soap->error;
+{
+    if (!soap_valid_socket(this->soap->master) && !soap_valid_socket(this->bind(NULL, port, 100)))
+        return this->soap->error;
+    for (;;)
+    {
+        if (!soap_valid_socket(this->accept()))
+        {
+            if (this->soap->errnum == 0) // timeout?
+                this->soap->error = SOAP_OK;
+            break;
+        }
+        if (this->ssl_accept() || this->serve())
+            break;
+        this->destroy();
+    }
+    return this->soap->error;
 }
 #endif
 
 SOAP_SOCKET PACSBindingService::bind(const char *host, int port, int backlog)
-{	return soap_bind(this->soap, host, port, backlog);
+{
+    return soap_bind(this->soap, host, port, backlog);
 }
 
 SOAP_SOCKET PACSBindingService::accept()
-{	return soap_accept(this->soap);
+{
+    return soap_accept(this->soap);
 }
 
 #if defined(WITH_OPENSSL) || defined(WITH_GNUTLS)
 int PACSBindingService::ssl_accept()
-{	return soap_ssl_accept(this->soap);
+{
+    return soap_ssl_accept(this->soap);
 }
 #endif
 #endif
@@ -268,35 +302,36 @@ int PACSBindingService::ssl_accept()
 int PACSBindingService::serve()
 {
 #ifndef WITH_FASTCGI
-	this->soap->keep_alive = this->soap->max_keep_alive + 1;
+    this->soap->keep_alive = this->soap->max_keep_alive + 1;
 #endif
-	do
-	{
+    do
+    {
 #ifndef WITH_FASTCGI
-		if (this->soap->keep_alive > 0 && this->soap->max_keep_alive > 0)
-			this->soap->keep_alive--;
+        if (this->soap->keep_alive > 0 && this->soap->max_keep_alive > 0)
+            this->soap->keep_alive--;
 #endif
-		if (soap_begin_serve(this->soap))
-		{	if (this->soap->error >= SOAP_STOP)
-				continue;
-			return this->soap->error;
-		}
-		if ((dispatch() || (this->soap->fserveloop && this->soap->fserveloop(this->soap))) && this->soap->error && this->soap->error < SOAP_STOP)
-		{
+        if (soap_begin_serve(this->soap))
+        {
+            if (this->soap->error >= SOAP_STOP)
+                continue;
+            return this->soap->error;
+        }
+        if ((dispatch() || (this->soap->fserveloop && this->soap->fserveloop(this->soap))) && this->soap->error && this->soap->error < SOAP_STOP)
+        {
 #ifdef WITH_FASTCGI
-			soap_send_fault(this->soap);
+            soap_send_fault(this->soap);
 #else
-			return soap_send_fault(this->soap);
+            return soap_send_fault(this->soap);
 #endif
-		}
+        }
 #ifdef WITH_FASTCGI
-		soap_destroy(this->soap);
-		soap_end(this->soap);
-	} while (1);
+        soap_destroy(this->soap);
+        soap_end(this->soap);
+    } while (1);
 #else
-	} while (this->soap->keep_alive);
+    } while (this->soap->keep_alive);
 #endif
-	return SOAP_OK;
+    return SOAP_OK;
 }
 
 static int serve___onvifAccessControl__GetServiceCapabilities(struct soap*, PACSBindingService*);
@@ -324,1003 +359,1050 @@ static int serve___onvifAccessControl__DisableAccessPoint(struct soap*, PACSBind
 static int serve___onvifAccessControl__ExternalAuthorization(struct soap*, PACSBindingService*);
 
 int PACSBindingService::dispatch()
-{	return dispatch(this->soap);
+{
+    return dispatch(this->soap);
 }
 
 int PACSBindingService::dispatch(struct soap* soap)
 {
-	PACSBindingService_init(soap->imode, soap->omode);
+    PACSBindingService_init(soap->imode, soap->omode);
 
-	soap_peek_element(soap);
-	if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:GetServiceCapabilities"))
-		return serve___onvifAccessControl__GetServiceCapabilities(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:GetAccessPointInfoList"))
-		return serve___onvifAccessControl__GetAccessPointInfoList(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:GetAccessPointInfo"))
-		return serve___onvifAccessControl__GetAccessPointInfo(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:GetAccessPointList"))
-		return serve___onvifAccessControl__GetAccessPointList(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:GetAccessPoints"))
-		return serve___onvifAccessControl__GetAccessPoints(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:CreateAccessPoint"))
-		return serve___onvifAccessControl__CreateAccessPoint(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:SetAccessPoint"))
-		return serve___onvifAccessControl__SetAccessPoint(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:ModifyAccessPoint"))
-		return serve___onvifAccessControl__ModifyAccessPoint(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:DeleteAccessPoint"))
-		return serve___onvifAccessControl__DeleteAccessPoint(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:SetAccessPointAuthenticationProfile"))
-		return serve___onvifAccessControl__SetAccessPointAuthenticationProfile(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:DeleteAccessPointAuthenticationProfile"))
-		return serve___onvifAccessControl__DeleteAccessPointAuthenticationProfile(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:GetAreaInfoList"))
-		return serve___onvifAccessControl__GetAreaInfoList(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:GetAreaInfo"))
-		return serve___onvifAccessControl__GetAreaInfo(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:GetAreaList"))
-		return serve___onvifAccessControl__GetAreaList(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:GetAreas"))
-		return serve___onvifAccessControl__GetAreas(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:CreateArea"))
-		return serve___onvifAccessControl__CreateArea(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:SetArea"))
-		return serve___onvifAccessControl__SetArea(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:ModifyArea"))
-		return serve___onvifAccessControl__ModifyArea(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:DeleteArea"))
-		return serve___onvifAccessControl__DeleteArea(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:GetAccessPointState"))
-		return serve___onvifAccessControl__GetAccessPointState(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:EnableAccessPoint"))
-		return serve___onvifAccessControl__EnableAccessPoint(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:DisableAccessPoint"))
-		return serve___onvifAccessControl__DisableAccessPoint(soap, this);
-	if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:ExternalAuthorization"))
-		return serve___onvifAccessControl__ExternalAuthorization(soap, this);
-	return soap->error = SOAP_NO_METHOD;
+    soap_peek_element(soap);
+    if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:GetServiceCapabilities"))
+        return serve___onvifAccessControl__GetServiceCapabilities(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:GetAccessPointInfoList"))
+        return serve___onvifAccessControl__GetAccessPointInfoList(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:GetAccessPointInfo"))
+        return serve___onvifAccessControl__GetAccessPointInfo(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:GetAccessPointList"))
+        return serve___onvifAccessControl__GetAccessPointList(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:GetAccessPoints"))
+        return serve___onvifAccessControl__GetAccessPoints(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:CreateAccessPoint"))
+        return serve___onvifAccessControl__CreateAccessPoint(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:SetAccessPoint"))
+        return serve___onvifAccessControl__SetAccessPoint(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:ModifyAccessPoint"))
+        return serve___onvifAccessControl__ModifyAccessPoint(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:DeleteAccessPoint"))
+        return serve___onvifAccessControl__DeleteAccessPoint(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:SetAccessPointAuthenticationProfile"))
+        return serve___onvifAccessControl__SetAccessPointAuthenticationProfile(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:DeleteAccessPointAuthenticationProfile"))
+        return serve___onvifAccessControl__DeleteAccessPointAuthenticationProfile(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:GetAreaInfoList"))
+        return serve___onvifAccessControl__GetAreaInfoList(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:GetAreaInfo"))
+        return serve___onvifAccessControl__GetAreaInfo(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:GetAreaList"))
+        return serve___onvifAccessControl__GetAreaList(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:GetAreas"))
+        return serve___onvifAccessControl__GetAreas(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:CreateArea"))
+        return serve___onvifAccessControl__CreateArea(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:SetArea"))
+        return serve___onvifAccessControl__SetArea(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:ModifyArea"))
+        return serve___onvifAccessControl__ModifyArea(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:DeleteArea"))
+        return serve___onvifAccessControl__DeleteArea(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:GetAccessPointState"))
+        return serve___onvifAccessControl__GetAccessPointState(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:EnableAccessPoint"))
+        return serve___onvifAccessControl__EnableAccessPoint(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:DisableAccessPoint"))
+        return serve___onvifAccessControl__DisableAccessPoint(soap, this);
+    if (!soap_match_tag(soap, soap->tag, "onvifAccessControl:ExternalAuthorization"))
+        return serve___onvifAccessControl__ExternalAuthorization(soap, this);
+    return soap->error = SOAP_NO_METHOD;
 }
 
 static int serve___onvifAccessControl__GetServiceCapabilities(struct soap *soap, PACSBindingService *service)
-{	struct __onvifAccessControl__GetServiceCapabilities soap_tmp___onvifAccessControl__GetServiceCapabilities;
-	_onvifAccessControl__GetServiceCapabilitiesResponse onvifAccessControl__GetServiceCapabilitiesResponse;
-	onvifAccessControl__GetServiceCapabilitiesResponse.soap_default(soap);
-	soap_default___onvifAccessControl__GetServiceCapabilities(soap, &soap_tmp___onvifAccessControl__GetServiceCapabilities);
-	if (!soap_get___onvifAccessControl__GetServiceCapabilities(soap, &soap_tmp___onvifAccessControl__GetServiceCapabilities, "-onvifAccessControl:GetServiceCapabilities", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->GetServiceCapabilities(soap_tmp___onvifAccessControl__GetServiceCapabilities.onvifAccessControl__GetServiceCapabilities, onvifAccessControl__GetServiceCapabilitiesResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAccessControl__GetServiceCapabilitiesResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAccessControl__GetServiceCapabilitiesResponse.soap_put(soap, "onvifAccessControl:GetServiceCapabilitiesResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAccessControl__GetServiceCapabilitiesResponse.soap_put(soap, "onvifAccessControl:GetServiceCapabilitiesResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAccessControl__GetServiceCapabilities soap_tmp___onvifAccessControl__GetServiceCapabilities;
+    _onvifAccessControl__GetServiceCapabilitiesResponse onvifAccessControl__GetServiceCapabilitiesResponse;
+    onvifAccessControl__GetServiceCapabilitiesResponse.soap_default(soap);
+    soap_default___onvifAccessControl__GetServiceCapabilities(soap, &soap_tmp___onvifAccessControl__GetServiceCapabilities);
+    if (!soap_get___onvifAccessControl__GetServiceCapabilities(soap, &soap_tmp___onvifAccessControl__GetServiceCapabilities, "-onvifAccessControl:GetServiceCapabilities", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->GetServiceCapabilities(soap_tmp___onvifAccessControl__GetServiceCapabilities.onvifAccessControl__GetServiceCapabilities, onvifAccessControl__GetServiceCapabilitiesResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAccessControl__GetServiceCapabilitiesResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAccessControl__GetServiceCapabilitiesResponse.soap_put(soap, "onvifAccessControl:GetServiceCapabilitiesResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAccessControl__GetServiceCapabilitiesResponse.soap_put(soap, "onvifAccessControl:GetServiceCapabilitiesResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAccessControl__GetAccessPointInfoList(struct soap *soap, PACSBindingService *service)
-{	struct __onvifAccessControl__GetAccessPointInfoList soap_tmp___onvifAccessControl__GetAccessPointInfoList;
-	_onvifAccessControl__GetAccessPointInfoListResponse onvifAccessControl__GetAccessPointInfoListResponse;
-	onvifAccessControl__GetAccessPointInfoListResponse.soap_default(soap);
-	soap_default___onvifAccessControl__GetAccessPointInfoList(soap, &soap_tmp___onvifAccessControl__GetAccessPointInfoList);
-	if (!soap_get___onvifAccessControl__GetAccessPointInfoList(soap, &soap_tmp___onvifAccessControl__GetAccessPointInfoList, "-onvifAccessControl:GetAccessPointInfoList", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->GetAccessPointInfoList(soap_tmp___onvifAccessControl__GetAccessPointInfoList.onvifAccessControl__GetAccessPointInfoList, onvifAccessControl__GetAccessPointInfoListResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAccessControl__GetAccessPointInfoListResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAccessControl__GetAccessPointInfoListResponse.soap_put(soap, "onvifAccessControl:GetAccessPointInfoListResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAccessControl__GetAccessPointInfoListResponse.soap_put(soap, "onvifAccessControl:GetAccessPointInfoListResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAccessControl__GetAccessPointInfoList soap_tmp___onvifAccessControl__GetAccessPointInfoList;
+    _onvifAccessControl__GetAccessPointInfoListResponse onvifAccessControl__GetAccessPointInfoListResponse;
+    onvifAccessControl__GetAccessPointInfoListResponse.soap_default(soap);
+    soap_default___onvifAccessControl__GetAccessPointInfoList(soap, &soap_tmp___onvifAccessControl__GetAccessPointInfoList);
+    if (!soap_get___onvifAccessControl__GetAccessPointInfoList(soap, &soap_tmp___onvifAccessControl__GetAccessPointInfoList, "-onvifAccessControl:GetAccessPointInfoList", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->GetAccessPointInfoList(soap_tmp___onvifAccessControl__GetAccessPointInfoList.onvifAccessControl__GetAccessPointInfoList, onvifAccessControl__GetAccessPointInfoListResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAccessControl__GetAccessPointInfoListResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAccessControl__GetAccessPointInfoListResponse.soap_put(soap, "onvifAccessControl:GetAccessPointInfoListResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAccessControl__GetAccessPointInfoListResponse.soap_put(soap, "onvifAccessControl:GetAccessPointInfoListResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAccessControl__GetAccessPointInfo(struct soap *soap, PACSBindingService *service)
-{	struct __onvifAccessControl__GetAccessPointInfo soap_tmp___onvifAccessControl__GetAccessPointInfo;
-	_onvifAccessControl__GetAccessPointInfoResponse onvifAccessControl__GetAccessPointInfoResponse;
-	onvifAccessControl__GetAccessPointInfoResponse.soap_default(soap);
-	soap_default___onvifAccessControl__GetAccessPointInfo(soap, &soap_tmp___onvifAccessControl__GetAccessPointInfo);
-	if (!soap_get___onvifAccessControl__GetAccessPointInfo(soap, &soap_tmp___onvifAccessControl__GetAccessPointInfo, "-onvifAccessControl:GetAccessPointInfo", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->GetAccessPointInfo(soap_tmp___onvifAccessControl__GetAccessPointInfo.onvifAccessControl__GetAccessPointInfo, onvifAccessControl__GetAccessPointInfoResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAccessControl__GetAccessPointInfoResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAccessControl__GetAccessPointInfoResponse.soap_put(soap, "onvifAccessControl:GetAccessPointInfoResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAccessControl__GetAccessPointInfoResponse.soap_put(soap, "onvifAccessControl:GetAccessPointInfoResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAccessControl__GetAccessPointInfo soap_tmp___onvifAccessControl__GetAccessPointInfo;
+    _onvifAccessControl__GetAccessPointInfoResponse onvifAccessControl__GetAccessPointInfoResponse;
+    onvifAccessControl__GetAccessPointInfoResponse.soap_default(soap);
+    soap_default___onvifAccessControl__GetAccessPointInfo(soap, &soap_tmp___onvifAccessControl__GetAccessPointInfo);
+    if (!soap_get___onvifAccessControl__GetAccessPointInfo(soap, &soap_tmp___onvifAccessControl__GetAccessPointInfo, "-onvifAccessControl:GetAccessPointInfo", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->GetAccessPointInfo(soap_tmp___onvifAccessControl__GetAccessPointInfo.onvifAccessControl__GetAccessPointInfo, onvifAccessControl__GetAccessPointInfoResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAccessControl__GetAccessPointInfoResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAccessControl__GetAccessPointInfoResponse.soap_put(soap, "onvifAccessControl:GetAccessPointInfoResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAccessControl__GetAccessPointInfoResponse.soap_put(soap, "onvifAccessControl:GetAccessPointInfoResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAccessControl__GetAccessPointList(struct soap *soap, PACSBindingService *service)
-{	struct __onvifAccessControl__GetAccessPointList soap_tmp___onvifAccessControl__GetAccessPointList;
-	_onvifAccessControl__GetAccessPointListResponse onvifAccessControl__GetAccessPointListResponse;
-	onvifAccessControl__GetAccessPointListResponse.soap_default(soap);
-	soap_default___onvifAccessControl__GetAccessPointList(soap, &soap_tmp___onvifAccessControl__GetAccessPointList);
-	if (!soap_get___onvifAccessControl__GetAccessPointList(soap, &soap_tmp___onvifAccessControl__GetAccessPointList, "-onvifAccessControl:GetAccessPointList", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->GetAccessPointList(soap_tmp___onvifAccessControl__GetAccessPointList.onvifAccessControl__GetAccessPointList, onvifAccessControl__GetAccessPointListResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAccessControl__GetAccessPointListResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAccessControl__GetAccessPointListResponse.soap_put(soap, "onvifAccessControl:GetAccessPointListResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAccessControl__GetAccessPointListResponse.soap_put(soap, "onvifAccessControl:GetAccessPointListResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAccessControl__GetAccessPointList soap_tmp___onvifAccessControl__GetAccessPointList;
+    _onvifAccessControl__GetAccessPointListResponse onvifAccessControl__GetAccessPointListResponse;
+    onvifAccessControl__GetAccessPointListResponse.soap_default(soap);
+    soap_default___onvifAccessControl__GetAccessPointList(soap, &soap_tmp___onvifAccessControl__GetAccessPointList);
+    if (!soap_get___onvifAccessControl__GetAccessPointList(soap, &soap_tmp___onvifAccessControl__GetAccessPointList, "-onvifAccessControl:GetAccessPointList", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->GetAccessPointList(soap_tmp___onvifAccessControl__GetAccessPointList.onvifAccessControl__GetAccessPointList, onvifAccessControl__GetAccessPointListResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAccessControl__GetAccessPointListResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAccessControl__GetAccessPointListResponse.soap_put(soap, "onvifAccessControl:GetAccessPointListResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAccessControl__GetAccessPointListResponse.soap_put(soap, "onvifAccessControl:GetAccessPointListResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAccessControl__GetAccessPoints(struct soap *soap, PACSBindingService *service)
-{	struct __onvifAccessControl__GetAccessPoints soap_tmp___onvifAccessControl__GetAccessPoints;
-	_onvifAccessControl__GetAccessPointsResponse onvifAccessControl__GetAccessPointsResponse;
-	onvifAccessControl__GetAccessPointsResponse.soap_default(soap);
-	soap_default___onvifAccessControl__GetAccessPoints(soap, &soap_tmp___onvifAccessControl__GetAccessPoints);
-	if (!soap_get___onvifAccessControl__GetAccessPoints(soap, &soap_tmp___onvifAccessControl__GetAccessPoints, "-onvifAccessControl:GetAccessPoints", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->GetAccessPoints(soap_tmp___onvifAccessControl__GetAccessPoints.onvifAccessControl__GetAccessPoints, onvifAccessControl__GetAccessPointsResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAccessControl__GetAccessPointsResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAccessControl__GetAccessPointsResponse.soap_put(soap, "onvifAccessControl:GetAccessPointsResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAccessControl__GetAccessPointsResponse.soap_put(soap, "onvifAccessControl:GetAccessPointsResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAccessControl__GetAccessPoints soap_tmp___onvifAccessControl__GetAccessPoints;
+    _onvifAccessControl__GetAccessPointsResponse onvifAccessControl__GetAccessPointsResponse;
+    onvifAccessControl__GetAccessPointsResponse.soap_default(soap);
+    soap_default___onvifAccessControl__GetAccessPoints(soap, &soap_tmp___onvifAccessControl__GetAccessPoints);
+    if (!soap_get___onvifAccessControl__GetAccessPoints(soap, &soap_tmp___onvifAccessControl__GetAccessPoints, "-onvifAccessControl:GetAccessPoints", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->GetAccessPoints(soap_tmp___onvifAccessControl__GetAccessPoints.onvifAccessControl__GetAccessPoints, onvifAccessControl__GetAccessPointsResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAccessControl__GetAccessPointsResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAccessControl__GetAccessPointsResponse.soap_put(soap, "onvifAccessControl:GetAccessPointsResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAccessControl__GetAccessPointsResponse.soap_put(soap, "onvifAccessControl:GetAccessPointsResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAccessControl__CreateAccessPoint(struct soap *soap, PACSBindingService *service)
-{	struct __onvifAccessControl__CreateAccessPoint soap_tmp___onvifAccessControl__CreateAccessPoint;
-	_onvifAccessControl__CreateAccessPointResponse onvifAccessControl__CreateAccessPointResponse;
-	onvifAccessControl__CreateAccessPointResponse.soap_default(soap);
-	soap_default___onvifAccessControl__CreateAccessPoint(soap, &soap_tmp___onvifAccessControl__CreateAccessPoint);
-	if (!soap_get___onvifAccessControl__CreateAccessPoint(soap, &soap_tmp___onvifAccessControl__CreateAccessPoint, "-onvifAccessControl:CreateAccessPoint", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->CreateAccessPoint(soap_tmp___onvifAccessControl__CreateAccessPoint.onvifAccessControl__CreateAccessPoint, onvifAccessControl__CreateAccessPointResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAccessControl__CreateAccessPointResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAccessControl__CreateAccessPointResponse.soap_put(soap, "onvifAccessControl:CreateAccessPointResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAccessControl__CreateAccessPointResponse.soap_put(soap, "onvifAccessControl:CreateAccessPointResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAccessControl__CreateAccessPoint soap_tmp___onvifAccessControl__CreateAccessPoint;
+    _onvifAccessControl__CreateAccessPointResponse onvifAccessControl__CreateAccessPointResponse;
+    onvifAccessControl__CreateAccessPointResponse.soap_default(soap);
+    soap_default___onvifAccessControl__CreateAccessPoint(soap, &soap_tmp___onvifAccessControl__CreateAccessPoint);
+    if (!soap_get___onvifAccessControl__CreateAccessPoint(soap, &soap_tmp___onvifAccessControl__CreateAccessPoint, "-onvifAccessControl:CreateAccessPoint", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->CreateAccessPoint(soap_tmp___onvifAccessControl__CreateAccessPoint.onvifAccessControl__CreateAccessPoint, onvifAccessControl__CreateAccessPointResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAccessControl__CreateAccessPointResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAccessControl__CreateAccessPointResponse.soap_put(soap, "onvifAccessControl:CreateAccessPointResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAccessControl__CreateAccessPointResponse.soap_put(soap, "onvifAccessControl:CreateAccessPointResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAccessControl__SetAccessPoint(struct soap *soap, PACSBindingService *service)
-{	struct __onvifAccessControl__SetAccessPoint soap_tmp___onvifAccessControl__SetAccessPoint;
-	_onvifAccessControl__SetAccessPointResponse onvifAccessControl__SetAccessPointResponse;
-	onvifAccessControl__SetAccessPointResponse.soap_default(soap);
-	soap_default___onvifAccessControl__SetAccessPoint(soap, &soap_tmp___onvifAccessControl__SetAccessPoint);
-	if (!soap_get___onvifAccessControl__SetAccessPoint(soap, &soap_tmp___onvifAccessControl__SetAccessPoint, "-onvifAccessControl:SetAccessPoint", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->SetAccessPoint(soap_tmp___onvifAccessControl__SetAccessPoint.onvifAccessControl__SetAccessPoint, onvifAccessControl__SetAccessPointResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAccessControl__SetAccessPointResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAccessControl__SetAccessPointResponse.soap_put(soap, "onvifAccessControl:SetAccessPointResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAccessControl__SetAccessPointResponse.soap_put(soap, "onvifAccessControl:SetAccessPointResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAccessControl__SetAccessPoint soap_tmp___onvifAccessControl__SetAccessPoint;
+    _onvifAccessControl__SetAccessPointResponse onvifAccessControl__SetAccessPointResponse;
+    onvifAccessControl__SetAccessPointResponse.soap_default(soap);
+    soap_default___onvifAccessControl__SetAccessPoint(soap, &soap_tmp___onvifAccessControl__SetAccessPoint);
+    if (!soap_get___onvifAccessControl__SetAccessPoint(soap, &soap_tmp___onvifAccessControl__SetAccessPoint, "-onvifAccessControl:SetAccessPoint", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->SetAccessPoint(soap_tmp___onvifAccessControl__SetAccessPoint.onvifAccessControl__SetAccessPoint, onvifAccessControl__SetAccessPointResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAccessControl__SetAccessPointResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAccessControl__SetAccessPointResponse.soap_put(soap, "onvifAccessControl:SetAccessPointResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAccessControl__SetAccessPointResponse.soap_put(soap, "onvifAccessControl:SetAccessPointResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAccessControl__ModifyAccessPoint(struct soap *soap, PACSBindingService *service)
-{	struct __onvifAccessControl__ModifyAccessPoint soap_tmp___onvifAccessControl__ModifyAccessPoint;
-	_onvifAccessControl__ModifyAccessPointResponse onvifAccessControl__ModifyAccessPointResponse;
-	onvifAccessControl__ModifyAccessPointResponse.soap_default(soap);
-	soap_default___onvifAccessControl__ModifyAccessPoint(soap, &soap_tmp___onvifAccessControl__ModifyAccessPoint);
-	if (!soap_get___onvifAccessControl__ModifyAccessPoint(soap, &soap_tmp___onvifAccessControl__ModifyAccessPoint, "-onvifAccessControl:ModifyAccessPoint", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->ModifyAccessPoint(soap_tmp___onvifAccessControl__ModifyAccessPoint.onvifAccessControl__ModifyAccessPoint, onvifAccessControl__ModifyAccessPointResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAccessControl__ModifyAccessPointResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAccessControl__ModifyAccessPointResponse.soap_put(soap, "onvifAccessControl:ModifyAccessPointResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAccessControl__ModifyAccessPointResponse.soap_put(soap, "onvifAccessControl:ModifyAccessPointResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAccessControl__ModifyAccessPoint soap_tmp___onvifAccessControl__ModifyAccessPoint;
+    _onvifAccessControl__ModifyAccessPointResponse onvifAccessControl__ModifyAccessPointResponse;
+    onvifAccessControl__ModifyAccessPointResponse.soap_default(soap);
+    soap_default___onvifAccessControl__ModifyAccessPoint(soap, &soap_tmp___onvifAccessControl__ModifyAccessPoint);
+    if (!soap_get___onvifAccessControl__ModifyAccessPoint(soap, &soap_tmp___onvifAccessControl__ModifyAccessPoint, "-onvifAccessControl:ModifyAccessPoint", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->ModifyAccessPoint(soap_tmp___onvifAccessControl__ModifyAccessPoint.onvifAccessControl__ModifyAccessPoint, onvifAccessControl__ModifyAccessPointResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAccessControl__ModifyAccessPointResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAccessControl__ModifyAccessPointResponse.soap_put(soap, "onvifAccessControl:ModifyAccessPointResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAccessControl__ModifyAccessPointResponse.soap_put(soap, "onvifAccessControl:ModifyAccessPointResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAccessControl__DeleteAccessPoint(struct soap *soap, PACSBindingService *service)
-{	struct __onvifAccessControl__DeleteAccessPoint soap_tmp___onvifAccessControl__DeleteAccessPoint;
-	_onvifAccessControl__DeleteAccessPointResponse onvifAccessControl__DeleteAccessPointResponse;
-	onvifAccessControl__DeleteAccessPointResponse.soap_default(soap);
-	soap_default___onvifAccessControl__DeleteAccessPoint(soap, &soap_tmp___onvifAccessControl__DeleteAccessPoint);
-	if (!soap_get___onvifAccessControl__DeleteAccessPoint(soap, &soap_tmp___onvifAccessControl__DeleteAccessPoint, "-onvifAccessControl:DeleteAccessPoint", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->DeleteAccessPoint(soap_tmp___onvifAccessControl__DeleteAccessPoint.onvifAccessControl__DeleteAccessPoint, onvifAccessControl__DeleteAccessPointResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAccessControl__DeleteAccessPointResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAccessControl__DeleteAccessPointResponse.soap_put(soap, "onvifAccessControl:DeleteAccessPointResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAccessControl__DeleteAccessPointResponse.soap_put(soap, "onvifAccessControl:DeleteAccessPointResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAccessControl__DeleteAccessPoint soap_tmp___onvifAccessControl__DeleteAccessPoint;
+    _onvifAccessControl__DeleteAccessPointResponse onvifAccessControl__DeleteAccessPointResponse;
+    onvifAccessControl__DeleteAccessPointResponse.soap_default(soap);
+    soap_default___onvifAccessControl__DeleteAccessPoint(soap, &soap_tmp___onvifAccessControl__DeleteAccessPoint);
+    if (!soap_get___onvifAccessControl__DeleteAccessPoint(soap, &soap_tmp___onvifAccessControl__DeleteAccessPoint, "-onvifAccessControl:DeleteAccessPoint", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->DeleteAccessPoint(soap_tmp___onvifAccessControl__DeleteAccessPoint.onvifAccessControl__DeleteAccessPoint, onvifAccessControl__DeleteAccessPointResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAccessControl__DeleteAccessPointResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAccessControl__DeleteAccessPointResponse.soap_put(soap, "onvifAccessControl:DeleteAccessPointResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAccessControl__DeleteAccessPointResponse.soap_put(soap, "onvifAccessControl:DeleteAccessPointResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAccessControl__SetAccessPointAuthenticationProfile(struct soap *soap, PACSBindingService *service)
-{	struct __onvifAccessControl__SetAccessPointAuthenticationProfile soap_tmp___onvifAccessControl__SetAccessPointAuthenticationProfile;
-	_onvifAccessControl__SetAccessPointAuthenticationProfileResponse onvifAccessControl__SetAccessPointAuthenticationProfileResponse;
-	onvifAccessControl__SetAccessPointAuthenticationProfileResponse.soap_default(soap);
-	soap_default___onvifAccessControl__SetAccessPointAuthenticationProfile(soap, &soap_tmp___onvifAccessControl__SetAccessPointAuthenticationProfile);
-	if (!soap_get___onvifAccessControl__SetAccessPointAuthenticationProfile(soap, &soap_tmp___onvifAccessControl__SetAccessPointAuthenticationProfile, "-onvifAccessControl:SetAccessPointAuthenticationProfile", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->SetAccessPointAuthenticationProfile(soap_tmp___onvifAccessControl__SetAccessPointAuthenticationProfile.onvifAccessControl__SetAccessPointAuthenticationProfile, onvifAccessControl__SetAccessPointAuthenticationProfileResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAccessControl__SetAccessPointAuthenticationProfileResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAccessControl__SetAccessPointAuthenticationProfileResponse.soap_put(soap, "onvifAccessControl:SetAccessPointAuthenticationProfileResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAccessControl__SetAccessPointAuthenticationProfileResponse.soap_put(soap, "onvifAccessControl:SetAccessPointAuthenticationProfileResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAccessControl__SetAccessPointAuthenticationProfile soap_tmp___onvifAccessControl__SetAccessPointAuthenticationProfile;
+    _onvifAccessControl__SetAccessPointAuthenticationProfileResponse onvifAccessControl__SetAccessPointAuthenticationProfileResponse;
+    onvifAccessControl__SetAccessPointAuthenticationProfileResponse.soap_default(soap);
+    soap_default___onvifAccessControl__SetAccessPointAuthenticationProfile(soap, &soap_tmp___onvifAccessControl__SetAccessPointAuthenticationProfile);
+    if (!soap_get___onvifAccessControl__SetAccessPointAuthenticationProfile(soap, &soap_tmp___onvifAccessControl__SetAccessPointAuthenticationProfile, "-onvifAccessControl:SetAccessPointAuthenticationProfile", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->SetAccessPointAuthenticationProfile(soap_tmp___onvifAccessControl__SetAccessPointAuthenticationProfile.onvifAccessControl__SetAccessPointAuthenticationProfile, onvifAccessControl__SetAccessPointAuthenticationProfileResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAccessControl__SetAccessPointAuthenticationProfileResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAccessControl__SetAccessPointAuthenticationProfileResponse.soap_put(soap, "onvifAccessControl:SetAccessPointAuthenticationProfileResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAccessControl__SetAccessPointAuthenticationProfileResponse.soap_put(soap, "onvifAccessControl:SetAccessPointAuthenticationProfileResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAccessControl__DeleteAccessPointAuthenticationProfile(struct soap *soap, PACSBindingService *service)
-{	struct __onvifAccessControl__DeleteAccessPointAuthenticationProfile soap_tmp___onvifAccessControl__DeleteAccessPointAuthenticationProfile;
-	_onvifAccessControl__DeleteAccessPointAuthenticationProfileResponse onvifAccessControl__DeleteAccessPointAuthenticationProfileResponse;
-	onvifAccessControl__DeleteAccessPointAuthenticationProfileResponse.soap_default(soap);
-	soap_default___onvifAccessControl__DeleteAccessPointAuthenticationProfile(soap, &soap_tmp___onvifAccessControl__DeleteAccessPointAuthenticationProfile);
-	if (!soap_get___onvifAccessControl__DeleteAccessPointAuthenticationProfile(soap, &soap_tmp___onvifAccessControl__DeleteAccessPointAuthenticationProfile, "-onvifAccessControl:DeleteAccessPointAuthenticationProfile", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->DeleteAccessPointAuthenticationProfile(soap_tmp___onvifAccessControl__DeleteAccessPointAuthenticationProfile.onvifAccessControl__DeleteAccessPointAuthenticationProfile, onvifAccessControl__DeleteAccessPointAuthenticationProfileResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAccessControl__DeleteAccessPointAuthenticationProfileResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAccessControl__DeleteAccessPointAuthenticationProfileResponse.soap_put(soap, "onvifAccessControl:DeleteAccessPointAuthenticationProfileResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAccessControl__DeleteAccessPointAuthenticationProfileResponse.soap_put(soap, "onvifAccessControl:DeleteAccessPointAuthenticationProfileResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAccessControl__DeleteAccessPointAuthenticationProfile soap_tmp___onvifAccessControl__DeleteAccessPointAuthenticationProfile;
+    _onvifAccessControl__DeleteAccessPointAuthenticationProfileResponse onvifAccessControl__DeleteAccessPointAuthenticationProfileResponse;
+    onvifAccessControl__DeleteAccessPointAuthenticationProfileResponse.soap_default(soap);
+    soap_default___onvifAccessControl__DeleteAccessPointAuthenticationProfile(soap, &soap_tmp___onvifAccessControl__DeleteAccessPointAuthenticationProfile);
+    if (!soap_get___onvifAccessControl__DeleteAccessPointAuthenticationProfile(soap, &soap_tmp___onvifAccessControl__DeleteAccessPointAuthenticationProfile, "-onvifAccessControl:DeleteAccessPointAuthenticationProfile", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->DeleteAccessPointAuthenticationProfile(soap_tmp___onvifAccessControl__DeleteAccessPointAuthenticationProfile.onvifAccessControl__DeleteAccessPointAuthenticationProfile, onvifAccessControl__DeleteAccessPointAuthenticationProfileResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAccessControl__DeleteAccessPointAuthenticationProfileResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAccessControl__DeleteAccessPointAuthenticationProfileResponse.soap_put(soap, "onvifAccessControl:DeleteAccessPointAuthenticationProfileResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAccessControl__DeleteAccessPointAuthenticationProfileResponse.soap_put(soap, "onvifAccessControl:DeleteAccessPointAuthenticationProfileResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAccessControl__GetAreaInfoList(struct soap *soap, PACSBindingService *service)
-{	struct __onvifAccessControl__GetAreaInfoList soap_tmp___onvifAccessControl__GetAreaInfoList;
-	_onvifAccessControl__GetAreaInfoListResponse onvifAccessControl__GetAreaInfoListResponse;
-	onvifAccessControl__GetAreaInfoListResponse.soap_default(soap);
-	soap_default___onvifAccessControl__GetAreaInfoList(soap, &soap_tmp___onvifAccessControl__GetAreaInfoList);
-	if (!soap_get___onvifAccessControl__GetAreaInfoList(soap, &soap_tmp___onvifAccessControl__GetAreaInfoList, "-onvifAccessControl:GetAreaInfoList", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->GetAreaInfoList(soap_tmp___onvifAccessControl__GetAreaInfoList.onvifAccessControl__GetAreaInfoList, onvifAccessControl__GetAreaInfoListResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAccessControl__GetAreaInfoListResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAccessControl__GetAreaInfoListResponse.soap_put(soap, "onvifAccessControl:GetAreaInfoListResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAccessControl__GetAreaInfoListResponse.soap_put(soap, "onvifAccessControl:GetAreaInfoListResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAccessControl__GetAreaInfoList soap_tmp___onvifAccessControl__GetAreaInfoList;
+    _onvifAccessControl__GetAreaInfoListResponse onvifAccessControl__GetAreaInfoListResponse;
+    onvifAccessControl__GetAreaInfoListResponse.soap_default(soap);
+    soap_default___onvifAccessControl__GetAreaInfoList(soap, &soap_tmp___onvifAccessControl__GetAreaInfoList);
+    if (!soap_get___onvifAccessControl__GetAreaInfoList(soap, &soap_tmp___onvifAccessControl__GetAreaInfoList, "-onvifAccessControl:GetAreaInfoList", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->GetAreaInfoList(soap_tmp___onvifAccessControl__GetAreaInfoList.onvifAccessControl__GetAreaInfoList, onvifAccessControl__GetAreaInfoListResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAccessControl__GetAreaInfoListResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAccessControl__GetAreaInfoListResponse.soap_put(soap, "onvifAccessControl:GetAreaInfoListResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAccessControl__GetAreaInfoListResponse.soap_put(soap, "onvifAccessControl:GetAreaInfoListResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAccessControl__GetAreaInfo(struct soap *soap, PACSBindingService *service)
-{	struct __onvifAccessControl__GetAreaInfo soap_tmp___onvifAccessControl__GetAreaInfo;
-	_onvifAccessControl__GetAreaInfoResponse onvifAccessControl__GetAreaInfoResponse;
-	onvifAccessControl__GetAreaInfoResponse.soap_default(soap);
-	soap_default___onvifAccessControl__GetAreaInfo(soap, &soap_tmp___onvifAccessControl__GetAreaInfo);
-	if (!soap_get___onvifAccessControl__GetAreaInfo(soap, &soap_tmp___onvifAccessControl__GetAreaInfo, "-onvifAccessControl:GetAreaInfo", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->GetAreaInfo(soap_tmp___onvifAccessControl__GetAreaInfo.onvifAccessControl__GetAreaInfo, onvifAccessControl__GetAreaInfoResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAccessControl__GetAreaInfoResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAccessControl__GetAreaInfoResponse.soap_put(soap, "onvifAccessControl:GetAreaInfoResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAccessControl__GetAreaInfoResponse.soap_put(soap, "onvifAccessControl:GetAreaInfoResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAccessControl__GetAreaInfo soap_tmp___onvifAccessControl__GetAreaInfo;
+    _onvifAccessControl__GetAreaInfoResponse onvifAccessControl__GetAreaInfoResponse;
+    onvifAccessControl__GetAreaInfoResponse.soap_default(soap);
+    soap_default___onvifAccessControl__GetAreaInfo(soap, &soap_tmp___onvifAccessControl__GetAreaInfo);
+    if (!soap_get___onvifAccessControl__GetAreaInfo(soap, &soap_tmp___onvifAccessControl__GetAreaInfo, "-onvifAccessControl:GetAreaInfo", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->GetAreaInfo(soap_tmp___onvifAccessControl__GetAreaInfo.onvifAccessControl__GetAreaInfo, onvifAccessControl__GetAreaInfoResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAccessControl__GetAreaInfoResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAccessControl__GetAreaInfoResponse.soap_put(soap, "onvifAccessControl:GetAreaInfoResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAccessControl__GetAreaInfoResponse.soap_put(soap, "onvifAccessControl:GetAreaInfoResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAccessControl__GetAreaList(struct soap *soap, PACSBindingService *service)
-{	struct __onvifAccessControl__GetAreaList soap_tmp___onvifAccessControl__GetAreaList;
-	_onvifAccessControl__GetAreaListResponse onvifAccessControl__GetAreaListResponse;
-	onvifAccessControl__GetAreaListResponse.soap_default(soap);
-	soap_default___onvifAccessControl__GetAreaList(soap, &soap_tmp___onvifAccessControl__GetAreaList);
-	if (!soap_get___onvifAccessControl__GetAreaList(soap, &soap_tmp___onvifAccessControl__GetAreaList, "-onvifAccessControl:GetAreaList", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->GetAreaList(soap_tmp___onvifAccessControl__GetAreaList.onvifAccessControl__GetAreaList, onvifAccessControl__GetAreaListResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAccessControl__GetAreaListResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAccessControl__GetAreaListResponse.soap_put(soap, "onvifAccessControl:GetAreaListResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAccessControl__GetAreaListResponse.soap_put(soap, "onvifAccessControl:GetAreaListResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAccessControl__GetAreaList soap_tmp___onvifAccessControl__GetAreaList;
+    _onvifAccessControl__GetAreaListResponse onvifAccessControl__GetAreaListResponse;
+    onvifAccessControl__GetAreaListResponse.soap_default(soap);
+    soap_default___onvifAccessControl__GetAreaList(soap, &soap_tmp___onvifAccessControl__GetAreaList);
+    if (!soap_get___onvifAccessControl__GetAreaList(soap, &soap_tmp___onvifAccessControl__GetAreaList, "-onvifAccessControl:GetAreaList", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->GetAreaList(soap_tmp___onvifAccessControl__GetAreaList.onvifAccessControl__GetAreaList, onvifAccessControl__GetAreaListResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAccessControl__GetAreaListResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAccessControl__GetAreaListResponse.soap_put(soap, "onvifAccessControl:GetAreaListResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAccessControl__GetAreaListResponse.soap_put(soap, "onvifAccessControl:GetAreaListResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAccessControl__GetAreas(struct soap *soap, PACSBindingService *service)
-{	struct __onvifAccessControl__GetAreas soap_tmp___onvifAccessControl__GetAreas;
-	_onvifAccessControl__GetAreasResponse onvifAccessControl__GetAreasResponse;
-	onvifAccessControl__GetAreasResponse.soap_default(soap);
-	soap_default___onvifAccessControl__GetAreas(soap, &soap_tmp___onvifAccessControl__GetAreas);
-	if (!soap_get___onvifAccessControl__GetAreas(soap, &soap_tmp___onvifAccessControl__GetAreas, "-onvifAccessControl:GetAreas", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->GetAreas(soap_tmp___onvifAccessControl__GetAreas.onvifAccessControl__GetAreas, onvifAccessControl__GetAreasResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAccessControl__GetAreasResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAccessControl__GetAreasResponse.soap_put(soap, "onvifAccessControl:GetAreasResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAccessControl__GetAreasResponse.soap_put(soap, "onvifAccessControl:GetAreasResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAccessControl__GetAreas soap_tmp___onvifAccessControl__GetAreas;
+    _onvifAccessControl__GetAreasResponse onvifAccessControl__GetAreasResponse;
+    onvifAccessControl__GetAreasResponse.soap_default(soap);
+    soap_default___onvifAccessControl__GetAreas(soap, &soap_tmp___onvifAccessControl__GetAreas);
+    if (!soap_get___onvifAccessControl__GetAreas(soap, &soap_tmp___onvifAccessControl__GetAreas, "-onvifAccessControl:GetAreas", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->GetAreas(soap_tmp___onvifAccessControl__GetAreas.onvifAccessControl__GetAreas, onvifAccessControl__GetAreasResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAccessControl__GetAreasResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAccessControl__GetAreasResponse.soap_put(soap, "onvifAccessControl:GetAreasResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAccessControl__GetAreasResponse.soap_put(soap, "onvifAccessControl:GetAreasResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAccessControl__CreateArea(struct soap *soap, PACSBindingService *service)
-{	struct __onvifAccessControl__CreateArea soap_tmp___onvifAccessControl__CreateArea;
-	_onvifAccessControl__CreateAreaResponse onvifAccessControl__CreateAreaResponse;
-	onvifAccessControl__CreateAreaResponse.soap_default(soap);
-	soap_default___onvifAccessControl__CreateArea(soap, &soap_tmp___onvifAccessControl__CreateArea);
-	if (!soap_get___onvifAccessControl__CreateArea(soap, &soap_tmp___onvifAccessControl__CreateArea, "-onvifAccessControl:CreateArea", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->CreateArea(soap_tmp___onvifAccessControl__CreateArea.onvifAccessControl__CreateArea, onvifAccessControl__CreateAreaResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAccessControl__CreateAreaResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAccessControl__CreateAreaResponse.soap_put(soap, "onvifAccessControl:CreateAreaResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAccessControl__CreateAreaResponse.soap_put(soap, "onvifAccessControl:CreateAreaResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAccessControl__CreateArea soap_tmp___onvifAccessControl__CreateArea;
+    _onvifAccessControl__CreateAreaResponse onvifAccessControl__CreateAreaResponse;
+    onvifAccessControl__CreateAreaResponse.soap_default(soap);
+    soap_default___onvifAccessControl__CreateArea(soap, &soap_tmp___onvifAccessControl__CreateArea);
+    if (!soap_get___onvifAccessControl__CreateArea(soap, &soap_tmp___onvifAccessControl__CreateArea, "-onvifAccessControl:CreateArea", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->CreateArea(soap_tmp___onvifAccessControl__CreateArea.onvifAccessControl__CreateArea, onvifAccessControl__CreateAreaResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAccessControl__CreateAreaResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAccessControl__CreateAreaResponse.soap_put(soap, "onvifAccessControl:CreateAreaResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAccessControl__CreateAreaResponse.soap_put(soap, "onvifAccessControl:CreateAreaResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAccessControl__SetArea(struct soap *soap, PACSBindingService *service)
-{	struct __onvifAccessControl__SetArea soap_tmp___onvifAccessControl__SetArea;
-	_onvifAccessControl__SetAreaResponse onvifAccessControl__SetAreaResponse;
-	onvifAccessControl__SetAreaResponse.soap_default(soap);
-	soap_default___onvifAccessControl__SetArea(soap, &soap_tmp___onvifAccessControl__SetArea);
-	if (!soap_get___onvifAccessControl__SetArea(soap, &soap_tmp___onvifAccessControl__SetArea, "-onvifAccessControl:SetArea", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->SetArea(soap_tmp___onvifAccessControl__SetArea.onvifAccessControl__SetArea, onvifAccessControl__SetAreaResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAccessControl__SetAreaResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAccessControl__SetAreaResponse.soap_put(soap, "onvifAccessControl:SetAreaResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAccessControl__SetAreaResponse.soap_put(soap, "onvifAccessControl:SetAreaResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAccessControl__SetArea soap_tmp___onvifAccessControl__SetArea;
+    _onvifAccessControl__SetAreaResponse onvifAccessControl__SetAreaResponse;
+    onvifAccessControl__SetAreaResponse.soap_default(soap);
+    soap_default___onvifAccessControl__SetArea(soap, &soap_tmp___onvifAccessControl__SetArea);
+    if (!soap_get___onvifAccessControl__SetArea(soap, &soap_tmp___onvifAccessControl__SetArea, "-onvifAccessControl:SetArea", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->SetArea(soap_tmp___onvifAccessControl__SetArea.onvifAccessControl__SetArea, onvifAccessControl__SetAreaResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAccessControl__SetAreaResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAccessControl__SetAreaResponse.soap_put(soap, "onvifAccessControl:SetAreaResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAccessControl__SetAreaResponse.soap_put(soap, "onvifAccessControl:SetAreaResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAccessControl__ModifyArea(struct soap *soap, PACSBindingService *service)
-{	struct __onvifAccessControl__ModifyArea soap_tmp___onvifAccessControl__ModifyArea;
-	_onvifAccessControl__ModifyAreaResponse onvifAccessControl__ModifyAreaResponse;
-	onvifAccessControl__ModifyAreaResponse.soap_default(soap);
-	soap_default___onvifAccessControl__ModifyArea(soap, &soap_tmp___onvifAccessControl__ModifyArea);
-	if (!soap_get___onvifAccessControl__ModifyArea(soap, &soap_tmp___onvifAccessControl__ModifyArea, "-onvifAccessControl:ModifyArea", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->ModifyArea(soap_tmp___onvifAccessControl__ModifyArea.onvifAccessControl__ModifyArea, onvifAccessControl__ModifyAreaResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAccessControl__ModifyAreaResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAccessControl__ModifyAreaResponse.soap_put(soap, "onvifAccessControl:ModifyAreaResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAccessControl__ModifyAreaResponse.soap_put(soap, "onvifAccessControl:ModifyAreaResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAccessControl__ModifyArea soap_tmp___onvifAccessControl__ModifyArea;
+    _onvifAccessControl__ModifyAreaResponse onvifAccessControl__ModifyAreaResponse;
+    onvifAccessControl__ModifyAreaResponse.soap_default(soap);
+    soap_default___onvifAccessControl__ModifyArea(soap, &soap_tmp___onvifAccessControl__ModifyArea);
+    if (!soap_get___onvifAccessControl__ModifyArea(soap, &soap_tmp___onvifAccessControl__ModifyArea, "-onvifAccessControl:ModifyArea", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->ModifyArea(soap_tmp___onvifAccessControl__ModifyArea.onvifAccessControl__ModifyArea, onvifAccessControl__ModifyAreaResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAccessControl__ModifyAreaResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAccessControl__ModifyAreaResponse.soap_put(soap, "onvifAccessControl:ModifyAreaResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAccessControl__ModifyAreaResponse.soap_put(soap, "onvifAccessControl:ModifyAreaResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAccessControl__DeleteArea(struct soap *soap, PACSBindingService *service)
-{	struct __onvifAccessControl__DeleteArea soap_tmp___onvifAccessControl__DeleteArea;
-	_onvifAccessControl__DeleteAreaResponse onvifAccessControl__DeleteAreaResponse;
-	onvifAccessControl__DeleteAreaResponse.soap_default(soap);
-	soap_default___onvifAccessControl__DeleteArea(soap, &soap_tmp___onvifAccessControl__DeleteArea);
-	if (!soap_get___onvifAccessControl__DeleteArea(soap, &soap_tmp___onvifAccessControl__DeleteArea, "-onvifAccessControl:DeleteArea", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->DeleteArea(soap_tmp___onvifAccessControl__DeleteArea.onvifAccessControl__DeleteArea, onvifAccessControl__DeleteAreaResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAccessControl__DeleteAreaResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAccessControl__DeleteAreaResponse.soap_put(soap, "onvifAccessControl:DeleteAreaResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAccessControl__DeleteAreaResponse.soap_put(soap, "onvifAccessControl:DeleteAreaResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAccessControl__DeleteArea soap_tmp___onvifAccessControl__DeleteArea;
+    _onvifAccessControl__DeleteAreaResponse onvifAccessControl__DeleteAreaResponse;
+    onvifAccessControl__DeleteAreaResponse.soap_default(soap);
+    soap_default___onvifAccessControl__DeleteArea(soap, &soap_tmp___onvifAccessControl__DeleteArea);
+    if (!soap_get___onvifAccessControl__DeleteArea(soap, &soap_tmp___onvifAccessControl__DeleteArea, "-onvifAccessControl:DeleteArea", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->DeleteArea(soap_tmp___onvifAccessControl__DeleteArea.onvifAccessControl__DeleteArea, onvifAccessControl__DeleteAreaResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAccessControl__DeleteAreaResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAccessControl__DeleteAreaResponse.soap_put(soap, "onvifAccessControl:DeleteAreaResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAccessControl__DeleteAreaResponse.soap_put(soap, "onvifAccessControl:DeleteAreaResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAccessControl__GetAccessPointState(struct soap *soap, PACSBindingService *service)
-{	struct __onvifAccessControl__GetAccessPointState soap_tmp___onvifAccessControl__GetAccessPointState;
-	_onvifAccessControl__GetAccessPointStateResponse onvifAccessControl__GetAccessPointStateResponse;
-	onvifAccessControl__GetAccessPointStateResponse.soap_default(soap);
-	soap_default___onvifAccessControl__GetAccessPointState(soap, &soap_tmp___onvifAccessControl__GetAccessPointState);
-	if (!soap_get___onvifAccessControl__GetAccessPointState(soap, &soap_tmp___onvifAccessControl__GetAccessPointState, "-onvifAccessControl:GetAccessPointState", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->GetAccessPointState(soap_tmp___onvifAccessControl__GetAccessPointState.onvifAccessControl__GetAccessPointState, onvifAccessControl__GetAccessPointStateResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAccessControl__GetAccessPointStateResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAccessControl__GetAccessPointStateResponse.soap_put(soap, "onvifAccessControl:GetAccessPointStateResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAccessControl__GetAccessPointStateResponse.soap_put(soap, "onvifAccessControl:GetAccessPointStateResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAccessControl__GetAccessPointState soap_tmp___onvifAccessControl__GetAccessPointState;
+    _onvifAccessControl__GetAccessPointStateResponse onvifAccessControl__GetAccessPointStateResponse;
+    onvifAccessControl__GetAccessPointStateResponse.soap_default(soap);
+    soap_default___onvifAccessControl__GetAccessPointState(soap, &soap_tmp___onvifAccessControl__GetAccessPointState);
+    if (!soap_get___onvifAccessControl__GetAccessPointState(soap, &soap_tmp___onvifAccessControl__GetAccessPointState, "-onvifAccessControl:GetAccessPointState", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->GetAccessPointState(soap_tmp___onvifAccessControl__GetAccessPointState.onvifAccessControl__GetAccessPointState, onvifAccessControl__GetAccessPointStateResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAccessControl__GetAccessPointStateResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAccessControl__GetAccessPointStateResponse.soap_put(soap, "onvifAccessControl:GetAccessPointStateResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAccessControl__GetAccessPointStateResponse.soap_put(soap, "onvifAccessControl:GetAccessPointStateResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAccessControl__EnableAccessPoint(struct soap *soap, PACSBindingService *service)
-{	struct __onvifAccessControl__EnableAccessPoint soap_tmp___onvifAccessControl__EnableAccessPoint;
-	_onvifAccessControl__EnableAccessPointResponse onvifAccessControl__EnableAccessPointResponse;
-	onvifAccessControl__EnableAccessPointResponse.soap_default(soap);
-	soap_default___onvifAccessControl__EnableAccessPoint(soap, &soap_tmp___onvifAccessControl__EnableAccessPoint);
-	if (!soap_get___onvifAccessControl__EnableAccessPoint(soap, &soap_tmp___onvifAccessControl__EnableAccessPoint, "-onvifAccessControl:EnableAccessPoint", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->EnableAccessPoint(soap_tmp___onvifAccessControl__EnableAccessPoint.onvifAccessControl__EnableAccessPoint, onvifAccessControl__EnableAccessPointResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAccessControl__EnableAccessPointResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAccessControl__EnableAccessPointResponse.soap_put(soap, "onvifAccessControl:EnableAccessPointResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAccessControl__EnableAccessPointResponse.soap_put(soap, "onvifAccessControl:EnableAccessPointResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAccessControl__EnableAccessPoint soap_tmp___onvifAccessControl__EnableAccessPoint;
+    _onvifAccessControl__EnableAccessPointResponse onvifAccessControl__EnableAccessPointResponse;
+    onvifAccessControl__EnableAccessPointResponse.soap_default(soap);
+    soap_default___onvifAccessControl__EnableAccessPoint(soap, &soap_tmp___onvifAccessControl__EnableAccessPoint);
+    if (!soap_get___onvifAccessControl__EnableAccessPoint(soap, &soap_tmp___onvifAccessControl__EnableAccessPoint, "-onvifAccessControl:EnableAccessPoint", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->EnableAccessPoint(soap_tmp___onvifAccessControl__EnableAccessPoint.onvifAccessControl__EnableAccessPoint, onvifAccessControl__EnableAccessPointResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAccessControl__EnableAccessPointResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAccessControl__EnableAccessPointResponse.soap_put(soap, "onvifAccessControl:EnableAccessPointResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAccessControl__EnableAccessPointResponse.soap_put(soap, "onvifAccessControl:EnableAccessPointResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAccessControl__DisableAccessPoint(struct soap *soap, PACSBindingService *service)
-{	struct __onvifAccessControl__DisableAccessPoint soap_tmp___onvifAccessControl__DisableAccessPoint;
-	_onvifAccessControl__DisableAccessPointResponse onvifAccessControl__DisableAccessPointResponse;
-	onvifAccessControl__DisableAccessPointResponse.soap_default(soap);
-	soap_default___onvifAccessControl__DisableAccessPoint(soap, &soap_tmp___onvifAccessControl__DisableAccessPoint);
-	if (!soap_get___onvifAccessControl__DisableAccessPoint(soap, &soap_tmp___onvifAccessControl__DisableAccessPoint, "-onvifAccessControl:DisableAccessPoint", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->DisableAccessPoint(soap_tmp___onvifAccessControl__DisableAccessPoint.onvifAccessControl__DisableAccessPoint, onvifAccessControl__DisableAccessPointResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAccessControl__DisableAccessPointResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAccessControl__DisableAccessPointResponse.soap_put(soap, "onvifAccessControl:DisableAccessPointResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAccessControl__DisableAccessPointResponse.soap_put(soap, "onvifAccessControl:DisableAccessPointResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAccessControl__DisableAccessPoint soap_tmp___onvifAccessControl__DisableAccessPoint;
+    _onvifAccessControl__DisableAccessPointResponse onvifAccessControl__DisableAccessPointResponse;
+    onvifAccessControl__DisableAccessPointResponse.soap_default(soap);
+    soap_default___onvifAccessControl__DisableAccessPoint(soap, &soap_tmp___onvifAccessControl__DisableAccessPoint);
+    if (!soap_get___onvifAccessControl__DisableAccessPoint(soap, &soap_tmp___onvifAccessControl__DisableAccessPoint, "-onvifAccessControl:DisableAccessPoint", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->DisableAccessPoint(soap_tmp___onvifAccessControl__DisableAccessPoint.onvifAccessControl__DisableAccessPoint, onvifAccessControl__DisableAccessPointResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAccessControl__DisableAccessPointResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAccessControl__DisableAccessPointResponse.soap_put(soap, "onvifAccessControl:DisableAccessPointResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAccessControl__DisableAccessPointResponse.soap_put(soap, "onvifAccessControl:DisableAccessPointResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 
 static int serve___onvifAccessControl__ExternalAuthorization(struct soap *soap, PACSBindingService *service)
-{	struct __onvifAccessControl__ExternalAuthorization soap_tmp___onvifAccessControl__ExternalAuthorization;
-	_onvifAccessControl__ExternalAuthorizationResponse onvifAccessControl__ExternalAuthorizationResponse;
-	onvifAccessControl__ExternalAuthorizationResponse.soap_default(soap);
-	soap_default___onvifAccessControl__ExternalAuthorization(soap, &soap_tmp___onvifAccessControl__ExternalAuthorization);
-	if (!soap_get___onvifAccessControl__ExternalAuthorization(soap, &soap_tmp___onvifAccessControl__ExternalAuthorization, "-onvifAccessControl:ExternalAuthorization", NULL))
-		return soap->error;
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap->error;
-	soap->error = service->ExternalAuthorization(soap_tmp___onvifAccessControl__ExternalAuthorization.onvifAccessControl__ExternalAuthorization, onvifAccessControl__ExternalAuthorizationResponse);
-	if (soap->error)
-		return soap->error;
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	onvifAccessControl__ExternalAuthorizationResponse.soap_serialize(soap);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || onvifAccessControl__ExternalAuthorizationResponse.soap_put(soap, "onvifAccessControl:ExternalAuthorizationResponse", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	};
-	if (soap_end_count(soap)
-	 || soap_response(soap, SOAP_OK)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || onvifAccessControl__ExternalAuthorizationResponse.soap_put(soap, "onvifAccessControl:ExternalAuthorizationResponse", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap->error;
-	return soap_closesock(soap);
+{
+    struct __onvifAccessControl__ExternalAuthorization soap_tmp___onvifAccessControl__ExternalAuthorization;
+    _onvifAccessControl__ExternalAuthorizationResponse onvifAccessControl__ExternalAuthorizationResponse;
+    onvifAccessControl__ExternalAuthorizationResponse.soap_default(soap);
+    soap_default___onvifAccessControl__ExternalAuthorization(soap, &soap_tmp___onvifAccessControl__ExternalAuthorization);
+    if (!soap_get___onvifAccessControl__ExternalAuthorization(soap, &soap_tmp___onvifAccessControl__ExternalAuthorization, "-onvifAccessControl:ExternalAuthorization", NULL))
+        return soap->error;
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap->error;
+    soap->error = service->ExternalAuthorization(soap_tmp___onvifAccessControl__ExternalAuthorization.onvifAccessControl__ExternalAuthorization, onvifAccessControl__ExternalAuthorizationResponse);
+    if (soap->error)
+        return soap->error;
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    onvifAccessControl__ExternalAuthorizationResponse.soap_serialize(soap);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || onvifAccessControl__ExternalAuthorizationResponse.soap_put(soap, "onvifAccessControl:ExternalAuthorizationResponse", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    };
+    if (soap_end_count(soap)
+     || soap_response(soap, SOAP_OK)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || onvifAccessControl__ExternalAuthorizationResponse.soap_put(soap, "onvifAccessControl:ExternalAuthorizationResponse", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap->error;
+    return soap_closesock(soap);
 }
 /* End of server object code */

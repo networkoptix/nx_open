@@ -1,14 +1,22 @@
-"use strict";
+(function () {
 
-angular.module("cloudApp")
-    .controller("StartPageCtrl", ["$scope", "$routeParams", "dialogs", "account", function ($scope, $routeParams, dialogs, account) {
-        account.redirectAuthorised();
-        if (window.jscd.browser === "Safari" && window.jscd.browserMajorVersion < 10) {
-            alert(L.errorCodes.oldSafariNotSupported);
-        }
-        $scope.userEmail = account.getEmail();
+    "use strict";
+
+    angular
+        .module('cloudApp')
+        .controller('StartPageCtrl', StartPage);
+
+    StartPage.$inject = [ '$scope', 'cloudApi', '$location', '$routeParams',
+        'dialogs', 'account', 'authorizationCheckService' ];
+
+    function StartPage($scope, cloudApi, $location, $routeParams,
+                       dialogs, account, authorizationCheckService) {
 
         if ($routeParams.callLogin) {
-            dialogs.login();
+            dialogs.login(false);
+        } else {
+            authorizationCheckService.redirectAuthorised();
+            $scope.userEmail = account.getEmail();
         }
-    }]);
+    }
+})();

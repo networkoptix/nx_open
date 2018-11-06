@@ -18,7 +18,7 @@ nx_add_target(nx_utils LIBRARY ${library_type} WERROR NO_MOC
     OTHER_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/qt5.natvis"
     PUBLIC_LIBS
-        boost openssl Qt5::Core Qt5::Xml Qt5::Sql
+        boost openssl Qt5::Core Qt5::Xml
         nx_kit
 )
 
@@ -27,7 +27,8 @@ set(mocableFiles
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/safe_direct_connection.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/uuid.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/url.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/thread/long_runnable.h)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/thread/long_runnable.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/thread/thread.h)
 
 nx_add_qt_mocables(nx_utils ${mocableFiles}
     INCLUDE_DIRS

@@ -104,26 +104,26 @@ protected slots:
 
 private:
     /** Whether this synchronizer is functional. */
-    bool m_running;
+    bool m_running = false;
 
     /** Associated workbench layout. */
-    QnWorkbenchLayout *m_layout;
+    QnWorkbenchLayout* m_layout;
 
     /** Associated layout resource. */
     QnLayoutResourcePtr m_resource;
 
     /** Whether changes should be propagated from resource to layout. */
-    bool m_update;
+    bool m_update = false;
 
     /** Whether changes should be propagated from layout to resource. */
-    bool m_submit;
+    bool m_submit = false;
 
     /** Whether this layout synchronizer should delete itself once
      * one of the objects it manages is destroyed. */
-    bool m_autoDeleting;
+    bool m_autoDeleting = false;
 
     /** Whether queued submit is in progress. */
-    bool m_submitPending;
+    bool m_submitPending = false;
 
     /** Queue of item UUIDs that are to be submitted in deferred mode.
      *

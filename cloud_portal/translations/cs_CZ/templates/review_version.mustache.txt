@@ -1,0 +1,10 @@
+K dispozici je nová verze pro {{ message.product }}
+
+Kliknutím na odkaz zobrazíte koncept {{ message.id }} pro {{ message.product }}
+
+Odkaz k zobrazení revize: {{ config.portal_url }}/ admin / cms / version /{{ message.id }}
+
+Na této stránce můžete
+1) Vytvořit náhled pro zobrazení nejnovějších změn.
+2) Oznámit tuto verzi, která bude aktualizovat veškerý obsah.
+3) Upravit kontexty kliknutím na tlačítko Upravit záznam. Chcete-li zobrazit tyto změny, musíte vytvořit novou verzi.

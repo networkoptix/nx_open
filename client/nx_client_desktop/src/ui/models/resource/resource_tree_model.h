@@ -39,7 +39,7 @@ public:
         UsersScope
     };
 
-    explicit QnResourceTreeModel(Scope scope, bool useExtraSearchInformation, QObject* parent);
+    explicit QnResourceTreeModel(Scope scope, QObject* parent);
 
     virtual ~QnResourceTreeModel();
 

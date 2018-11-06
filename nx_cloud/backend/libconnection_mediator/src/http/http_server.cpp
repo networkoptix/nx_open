@@ -20,17 +20,24 @@ namespace http {
 Server::Server(
     const conf::Settings& settings,
     const PeerRegistrator& peerRegistrator,
-    nx::cloud::discovery::RegisteredPeerPool* registeredPeerPool)
+    nx::cloud::discovery::RegisteredPeerPool* registeredPeerPool,
+    HolePunchingProcessor* holePunchingProcessor)
     :
     m_settings(settings),
-    m_multiAddressHttpServer(nullptr, &m_httpMessageDispatcher)
+    m_multiAddressHttpServer(nullptr, &m_httpMessageDispatcher),
+    m_holePunchingProcessor(holePunchingProcessor)
 {
     NX_ASSERT(!m_settings.http().addrToListenList.empty());
 
     loadSslCertificate();
 
-    if (!launchHttpServerIfNeeded(m_settings, peerRegistrator, registeredPeerPool))
+    if (!launchHttpServerIfNeeded(
+            m_settings,
+            peerRegistrator,
+            registeredPeerPool))
+    {
         throw std::runtime_error("Failed to initialize http server");
+    }
 }
 
 void Server::listen()
@@ -106,18 +113,17 @@ bool Server::launchHttpServerIfNeeded(
 {
     NX_INFO(this, "Bringing up HTTP server");
 
-    // Registering HTTP handlers.
-    m_httpMessageDispatcher.registerRequestProcessor<http::GetListeningPeerListHandler>(
-        network::url::joinPath(api::kMediatorApiPrefix, GetListeningPeerListHandler::kHandlerPath).c_str(),
-        [&]() { return std::make_unique<http::GetListeningPeerListHandler>(peerRegistrator); });
+    registerApiHandlers(peerRegistrator);
 
     if (!m_multiAddressHttpServer.bind(
             settings.http().addrToListenList,
             settings.https().endpoints))
     {
         const auto osErrorCode = SystemError::getLastOSErrorCode();
-        NX_ERROR(this, lm("Failed to bind HTTP server to address ... . %1")
-            .arg(SystemError::toString(osErrorCode)));
+        NX_ERROR(this, lm("Failed to bind HTTP server to address(-es) %1, %2. %3")
+            .container(settings.http().addrToListenList)
+            .container(settings.https().endpoints)
+            .args(SystemError::toString(osErrorCode)));
         return false;
     }
 
@@ -125,6 +131,7 @@ bool Server::launchHttpServerIfNeeded(
         [&settings](nx::network::http::HttpStreamSocketServer* server)
         {
             server->setConnectionKeepAliveOptions(settings.http().keepAliveOptions);
+            server->setConnectionInactivityTimeout(settings.http().connectionInactivityTimeout);
         });
 
     m_discoveryHttpServer = std::make_unique<nx::cloud::discovery::HttpServer>(
@@ -132,6 +139,27 @@ bool Server::launchHttpServerIfNeeded(
         registeredPeerPool);
 
     return true;
+}
+
+void Server::registerApiHandlers(const PeerRegistrator& peerRegistrator)
+{
+    m_httpMessageDispatcher.registerRequestProcessor<http::GetListeningPeerListHandler>(
+        network::url::joinPath(
+            api::kMediatorApiPrefix,
+            GetListeningPeerListHandler::kHandlerPath).c_str(),
+        [&peerRegistrator]()
+        {
+            return std::make_unique<http::GetListeningPeerListHandler>(peerRegistrator);
+        });
+
+    m_httpMessageDispatcher.registerRequestProcessor<InitiateConnectionRequestHandler>(
+        network::url::joinPath(api::kMediatorApiPrefix, api::kServerSessionsPath).c_str(),
+        [this]()
+        {
+            return std::make_unique<InitiateConnectionRequestHandler>(
+                m_holePunchingProcessor);
+        },
+        network::http::Method::post);
 }
 
 template<typename Handler, typename Arg>
@@ -147,6 +175,46 @@ void Server::registerApiHandler(
             return std::make_unique<Handler>(arg);
         },
         method);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+InitiateConnectionRequestHandler::InitiateConnectionRequestHandler(
+    HolePunchingProcessor* holePunchingProcessor)
+    :
+    m_holePunchingProcessor(holePunchingProcessor)
+{
+}
+
+void InitiateConnectionRequestHandler::processRequest(
+    nx::network::http::RequestContext requestContext,
+    api::ConnectRequest inputData)
+{
+    m_holePunchingProcessor->connect(
+        RequestSourceDescriptor{
+            network::TransportProtocol::tcp,
+            requestContext.connection->socket()->getForeignAddress()},
+        inputData,
+        [this](auto&&... args) { reportResult(std::move(args)...); });
+}
+
+void InitiateConnectionRequestHandler::reportResult(
+    api::ResultCode resultCode,
+    api::ConnectResponse response)
+{
+    network::http::FusionRequestResult result;
+    if (resultCode != api::ResultCode::ok)
+    {
+        result.errorClass = network::http::FusionRequestErrorClass::logicError;
+        result.errorDetail = static_cast<int>(resultCode);
+        result.errorText = api::toString(resultCode);
+        result.setHttpStatusCode(
+            resultCode == api::ResultCode::notFound
+            ? network::http::StatusCode::notFound
+            : network::http::StatusCode::badRequest);
+    }
+
+    this->requestCompleted(std::move(result), std::move(response));
 }
 
 } // namespace http

@@ -49,6 +49,13 @@ public:
             : QnTimePeriod(endTimeMs, startTimeMs - endTimeMs);
     };
 
+    static constexpr QnTimePeriod fromInterval(
+        const std::chrono::milliseconds& startTime,
+        const std::chrono::milliseconds& endTime)
+    {
+        return fromInterval(startTime.count(), endTime.count());
+    };
+
     QnTimePeriod& operator = (const QnTimePeriod &other);
 
     bool isLeftIntersection(const QnTimePeriod& other) const;
@@ -80,6 +87,7 @@ public:
     bool isEmpty() const;
 
     qint64 endTimeMs() const;
+    void setEndTimeMs(qint64 value);
 
     /**
      * \returns                         Whether this is a null time period.
@@ -150,10 +158,11 @@ public:
     void setStartTime(std::chrono::milliseconds value);
     std::chrono::milliseconds startTime() const;
 
+    void setEndTime(std::chrono::milliseconds value);
+    std::chrono::milliseconds endTime() const;
+
     void setDuration(std::chrono::milliseconds value);
     std::chrono::milliseconds duration() const;
-
-    std::chrono::milliseconds endTime() const;
 
     constexpr bool operator==(const QnTimePeriod& other) const
     {

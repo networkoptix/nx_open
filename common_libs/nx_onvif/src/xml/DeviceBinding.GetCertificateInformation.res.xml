@@ -92,9 +92,9 @@
     <!-- onvifXsd__DateTimeRange *Validity -->
     <onvifXsd:Validity>
      <!-- time_t From -->
-     <onvifXsd:From>2018-08-21T18:08:12Z</onvifXsd:From>
+     <onvifXsd:From>2018-10-29T21:59:17Z</onvifXsd:From>
      <!-- time_t Until -->
-     <onvifXsd:Until>2018-08-21T18:08:12Z</onvifXsd:Until>
+     <onvifXsd:Until>2018-10-29T21:59:17Z</onvifXsd:Until>
      <!-- std::vector<struct soap_dom_element> __any -->
      <!-- a repetition of 0 or more of the following -->
 

@@ -14,59 +14,68 @@ A commercial use license is available from Genivia Inc., contact@genivia.com
 #include "soapActionEngineBindingProxy.h"
 
 ActionEngineBindingProxy::ActionEngineBindingProxy()
-{	this->soap = soap_new();
-	this->soap_own = true;
-	ActionEngineBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    ActionEngineBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
 }
 
 ActionEngineBindingProxy::ActionEngineBindingProxy(const ActionEngineBindingProxy& rhs)
-{	this->soap = rhs.soap;
-	this->soap_own = false;
-	this->soap_endpoint = rhs.soap_endpoint;
+{
+    this->soap = rhs.soap;
+    this->soap_own = false;
+    this->soap_endpoint = rhs.soap_endpoint;
 }
 
 ActionEngineBindingProxy::ActionEngineBindingProxy(struct soap *_soap)
-{	this->soap = _soap;
-	this->soap_own = false;
-	ActionEngineBindingProxy_init(_soap->imode, _soap->omode);
+{
+    this->soap = _soap;
+    this->soap_own = false;
+    ActionEngineBindingProxy_init(_soap->imode, _soap->omode);
 }
 
 ActionEngineBindingProxy::ActionEngineBindingProxy(const char *endpoint)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	ActionEngineBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
-	soap_endpoint = endpoint;
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    ActionEngineBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+    soap_endpoint = endpoint;
 }
 
 ActionEngineBindingProxy::ActionEngineBindingProxy(soap_mode iomode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	ActionEngineBindingProxy_init(iomode, iomode);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    ActionEngineBindingProxy_init(iomode, iomode);
 }
 
 ActionEngineBindingProxy::ActionEngineBindingProxy(const char *endpoint, soap_mode iomode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	ActionEngineBindingProxy_init(iomode, iomode);
-	soap_endpoint = endpoint;
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    ActionEngineBindingProxy_init(iomode, iomode);
+    soap_endpoint = endpoint;
 }
 
 ActionEngineBindingProxy::ActionEngineBindingProxy(soap_mode imode, soap_mode omode)
-{	this->soap = soap_new();
-	this->soap_own = true;
-	ActionEngineBindingProxy_init(imode, omode);
+{
+    this->soap = soap_new();
+    this->soap_own = true;
+    ActionEngineBindingProxy_init(imode, omode);
 }
 
 ActionEngineBindingProxy::~ActionEngineBindingProxy()
-{	if (this->soap_own)
-		soap_free(this->soap);
+{
+    if (this->soap_own)
+        soap_free(this->soap);
 }
 
 void ActionEngineBindingProxy::ActionEngineBindingProxy_init(soap_mode imode, soap_mode omode)
-{	soap_imode(this->soap, imode);
-	soap_omode(this->soap, omode);
-	soap_endpoint = NULL;
-	static const struct Namespace namespaces[] = {
+{
+    soap_imode(this->soap, imode);
+    soap_omode(this->soap, omode);
+    soap_endpoint = NULL;
+    static const struct Namespace namespaces[] = {
         {"SOAP-ENV", "http://www.w3.org/2003/05/soap-envelope", "http://schemas.xmlsoap.org/soap/envelope/", NULL},
         {"SOAP-ENC", "http://www.w3.org/2003/05/soap-encoding", "http://schemas.xmlsoap.org/soap/encoding/", NULL},
         {"xsi", "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL},
@@ -132,617 +141,644 @@ void ActionEngineBindingProxy::ActionEngineBindingProxy_init(soap_mode imode, so
         {"onvifThermal", "http://www.onvif.org/ver10/thermal/wsdl", NULL, NULL},
         {NULL, NULL, NULL, NULL}
     };
-	soap_set_namespaces(this->soap, namespaces);
+    soap_set_namespaces(this->soap, namespaces);
 }
 
 ActionEngineBindingProxy *ActionEngineBindingProxy::copy()
-{	ActionEngineBindingProxy *dup = SOAP_NEW_UNMANAGED(ActionEngineBindingProxy);
-	if (dup)
-	{	soap_done(dup->soap);
-		soap_copy_context(dup->soap, this->soap);
-	}
-	return dup;
+{
+    ActionEngineBindingProxy *dup = SOAP_NEW_UNMANAGED(ActionEngineBindingProxy);
+    if (dup)
+    {
+        soap_done(dup->soap);
+        soap_copy_context(dup->soap, this->soap);
+    }
+    return dup;
 }
 
 ActionEngineBindingProxy& ActionEngineBindingProxy::operator=(const ActionEngineBindingProxy& rhs)
-{	if (this->soap != rhs.soap)
-	{	if (this->soap_own)
-			soap_free(this->soap);
-		this->soap = rhs.soap;
-		this->soap_own = false;
-		this->soap_endpoint = rhs.soap_endpoint;
-	}
-	return *this;
+{
+    if (this->soap != rhs.soap)
+    {
+        if (this->soap_own)
+            soap_free(this->soap);
+        this->soap = rhs.soap;
+        this->soap_own = false;
+        this->soap_endpoint = rhs.soap_endpoint;
+    }
+    return *this;
 }
 
 void ActionEngineBindingProxy::destroy()
-{	soap_destroy(this->soap);
-	soap_end(this->soap);
+{
+    soap_destroy(this->soap);
+    soap_end(this->soap);
 }
 
 void ActionEngineBindingProxy::reset()
-{	this->destroy();
-	soap_done(this->soap);
-	soap_initialize(this->soap);
-	ActionEngineBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+{
+    this->destroy();
+    soap_done(this->soap);
+    soap_initialize(this->soap);
+    ActionEngineBindingProxy_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
 }
 
 void ActionEngineBindingProxy::soap_noheader()
-{	this->soap->header = NULL;
+{
+    this->soap->header = NULL;
 }
 
-void ActionEngineBindingProxy::soap_header(char *wsa5__MessageID, struct wsa5__RelatesToType *wsa5__RelatesTo, struct wsa5__EndpointReferenceType *wsa5__From, struct wsa5__EndpointReferenceType *wsa5__ReplyTo, struct wsa5__EndpointReferenceType *wsa5__FaultTo, char *wsa5__To, char *wsa5__Action, struct chan__ChannelInstanceType *chan__ChannelInstance, struct wsdd__AppSequenceType *wsdd__AppSequence, struct _wsse__Security *wsse__Security, char *subscriptionID)
-{	::soap_header(this->soap);
-	this->soap->header->wsa5__MessageID = wsa5__MessageID;
-	this->soap->header->wsa5__RelatesTo = wsa5__RelatesTo;
-	this->soap->header->wsa5__From = wsa5__From;
-	this->soap->header->wsa5__ReplyTo = wsa5__ReplyTo;
-	this->soap->header->wsa5__FaultTo = wsa5__FaultTo;
-	this->soap->header->wsa5__To = wsa5__To;
-	this->soap->header->wsa5__Action = wsa5__Action;
-	this->soap->header->chan__ChannelInstance = chan__ChannelInstance;
-	this->soap->header->wsdd__AppSequence = wsdd__AppSequence;
-	this->soap->header->wsse__Security = wsse__Security;
-	this->soap->header->subscriptionID = subscriptionID;
+void ActionEngineBindingProxy::soap_header(char *wsa5__MessageID, struct wsa5__RelatesToType *wsa5__RelatesTo, struct wsa5__EndpointReferenceType *wsa5__From, struct wsa5__EndpointReferenceType *wsa5__ReplyTo, struct wsa5__EndpointReferenceType *wsa5__FaultTo, char *wsa5__To, char *wsa5__Action, struct chan__ChannelInstanceType *chan__ChannelInstance, struct wsdd__AppSequenceType *wsdd__AppSequence, struct _wsse__Security *wsse__Security, char *SubscriptionId)
+{
+    ::soap_header(this->soap);
+    this->soap->header->wsa5__MessageID = wsa5__MessageID;
+    this->soap->header->wsa5__RelatesTo = wsa5__RelatesTo;
+    this->soap->header->wsa5__From = wsa5__From;
+    this->soap->header->wsa5__ReplyTo = wsa5__ReplyTo;
+    this->soap->header->wsa5__FaultTo = wsa5__FaultTo;
+    this->soap->header->wsa5__To = wsa5__To;
+    this->soap->header->wsa5__Action = wsa5__Action;
+    this->soap->header->chan__ChannelInstance = chan__ChannelInstance;
+    this->soap->header->wsdd__AppSequence = wsdd__AppSequence;
+    this->soap->header->wsse__Security = wsse__Security;
+    this->soap->header->SubscriptionId = SubscriptionId;
 }
 
 ::SOAP_ENV__Header *ActionEngineBindingProxy::soap_header()
-{	return this->soap->header;
+{
+    return this->soap->header;
 }
 
 ::SOAP_ENV__Fault *ActionEngineBindingProxy::soap_fault()
-{	return this->soap->fault;
+{
+    return this->soap->fault;
 }
 
 const char *ActionEngineBindingProxy::soap_fault_string()
-{	return *soap_faultstring(this->soap);
+{
+    return *soap_faultstring(this->soap);
 }
 
 const char *ActionEngineBindingProxy::soap_fault_detail()
-{	return *soap_faultdetail(this->soap);
+{
+    return *soap_faultdetail(this->soap);
 }
 
 int ActionEngineBindingProxy::soap_close_socket()
-{	return soap_closesock(this->soap);
+{
+    return soap_closesock(this->soap);
 }
 
 int ActionEngineBindingProxy::soap_force_close_socket()
-{	return soap_force_closesock(this->soap);
+{
+    return soap_force_closesock(this->soap);
 }
 
 void ActionEngineBindingProxy::soap_print_fault(FILE *fd)
-{	::soap_print_fault(this->soap, fd);
+{
+    ::soap_print_fault(this->soap, fd);
 }
 
 #ifndef WITH_LEAN
 #ifndef WITH_COMPAT
 void ActionEngineBindingProxy::soap_stream_fault(std::ostream& os)
-{	::soap_stream_fault(this->soap, os);
+{
+    ::soap_stream_fault(this->soap, os);
 }
 #endif
 
 char *ActionEngineBindingProxy::soap_sprint_fault(char *buf, size_t len)
-{	return ::soap_sprint_fault(this->soap, buf, len);
+{
+    return ::soap_sprint_fault(this->soap, buf, len);
 }
 #endif
 
 int ActionEngineBindingProxy::GetSupportedActions(const char *endpoint, const char *soap_action, _onvifActionEngine__GetSupportedActions *onvifActionEngine__GetSupportedActions, _onvifActionEngine__GetSupportedActionsResponse &onvifActionEngine__GetSupportedActionsResponse)
 {
-	struct __onvifActionEngine__GetSupportedActions soap_tmp___onvifActionEngine__GetSupportedActions;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/actionengine/wsdl/GetSupportedActions";
-	soap_tmp___onvifActionEngine__GetSupportedActions.onvifActionEngine__GetSupportedActions = onvifActionEngine__GetSupportedActions;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifActionEngine__GetSupportedActions(soap, &soap_tmp___onvifActionEngine__GetSupportedActions);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifActionEngine__GetSupportedActions(soap, &soap_tmp___onvifActionEngine__GetSupportedActions, "-onvifActionEngine:GetSupportedActions", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifActionEngine__GetSupportedActions(soap, &soap_tmp___onvifActionEngine__GetSupportedActions, "-onvifActionEngine:GetSupportedActions", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifActionEngine__GetSupportedActionsResponse*>(&onvifActionEngine__GetSupportedActionsResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifActionEngine__GetSupportedActionsResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifActionEngine__GetSupportedActionsResponse.soap_get(soap, "onvifActionEngine:GetSupportedActionsResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifActionEngine__GetSupportedActions soap_tmp___onvifActionEngine__GetSupportedActions;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/actionengine/wsdl/GetSupportedActions";
+    soap_tmp___onvifActionEngine__GetSupportedActions.onvifActionEngine__GetSupportedActions = onvifActionEngine__GetSupportedActions;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifActionEngine__GetSupportedActions(soap, &soap_tmp___onvifActionEngine__GetSupportedActions);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifActionEngine__GetSupportedActions(soap, &soap_tmp___onvifActionEngine__GetSupportedActions, "-onvifActionEngine:GetSupportedActions", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifActionEngine__GetSupportedActions(soap, &soap_tmp___onvifActionEngine__GetSupportedActions, "-onvifActionEngine:GetSupportedActions", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifActionEngine__GetSupportedActionsResponse*>(&onvifActionEngine__GetSupportedActionsResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifActionEngine__GetSupportedActionsResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifActionEngine__GetSupportedActionsResponse.soap_get(soap, "onvifActionEngine:GetSupportedActionsResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int ActionEngineBindingProxy::GetActions(const char *endpoint, const char *soap_action, _onvifActionEngine__GetActions *onvifActionEngine__GetActions, _onvifActionEngine__GetActionsResponse &onvifActionEngine__GetActionsResponse)
 {
-	struct __onvifActionEngine__GetActions soap_tmp___onvifActionEngine__GetActions;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/actionengine/wsdl/GetActions";
-	soap_tmp___onvifActionEngine__GetActions.onvifActionEngine__GetActions = onvifActionEngine__GetActions;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifActionEngine__GetActions(soap, &soap_tmp___onvifActionEngine__GetActions);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifActionEngine__GetActions(soap, &soap_tmp___onvifActionEngine__GetActions, "-onvifActionEngine:GetActions", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifActionEngine__GetActions(soap, &soap_tmp___onvifActionEngine__GetActions, "-onvifActionEngine:GetActions", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifActionEngine__GetActionsResponse*>(&onvifActionEngine__GetActionsResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifActionEngine__GetActionsResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifActionEngine__GetActionsResponse.soap_get(soap, "onvifActionEngine:GetActionsResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifActionEngine__GetActions soap_tmp___onvifActionEngine__GetActions;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/actionengine/wsdl/GetActions";
+    soap_tmp___onvifActionEngine__GetActions.onvifActionEngine__GetActions = onvifActionEngine__GetActions;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifActionEngine__GetActions(soap, &soap_tmp___onvifActionEngine__GetActions);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifActionEngine__GetActions(soap, &soap_tmp___onvifActionEngine__GetActions, "-onvifActionEngine:GetActions", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifActionEngine__GetActions(soap, &soap_tmp___onvifActionEngine__GetActions, "-onvifActionEngine:GetActions", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifActionEngine__GetActionsResponse*>(&onvifActionEngine__GetActionsResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifActionEngine__GetActionsResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifActionEngine__GetActionsResponse.soap_get(soap, "onvifActionEngine:GetActionsResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int ActionEngineBindingProxy::CreateActions(const char *endpoint, const char *soap_action, _onvifActionEngine__CreateActions *onvifActionEngine__CreateActions, _onvifActionEngine__CreateActionsResponse &onvifActionEngine__CreateActionsResponse)
 {
-	struct __onvifActionEngine__CreateActions soap_tmp___onvifActionEngine__CreateActions;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/actionengine/wsdl/CreateActions";
-	soap_tmp___onvifActionEngine__CreateActions.onvifActionEngine__CreateActions = onvifActionEngine__CreateActions;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifActionEngine__CreateActions(soap, &soap_tmp___onvifActionEngine__CreateActions);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifActionEngine__CreateActions(soap, &soap_tmp___onvifActionEngine__CreateActions, "-onvifActionEngine:CreateActions", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifActionEngine__CreateActions(soap, &soap_tmp___onvifActionEngine__CreateActions, "-onvifActionEngine:CreateActions", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifActionEngine__CreateActionsResponse*>(&onvifActionEngine__CreateActionsResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifActionEngine__CreateActionsResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifActionEngine__CreateActionsResponse.soap_get(soap, "onvifActionEngine:CreateActionsResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifActionEngine__CreateActions soap_tmp___onvifActionEngine__CreateActions;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/actionengine/wsdl/CreateActions";
+    soap_tmp___onvifActionEngine__CreateActions.onvifActionEngine__CreateActions = onvifActionEngine__CreateActions;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifActionEngine__CreateActions(soap, &soap_tmp___onvifActionEngine__CreateActions);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifActionEngine__CreateActions(soap, &soap_tmp___onvifActionEngine__CreateActions, "-onvifActionEngine:CreateActions", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifActionEngine__CreateActions(soap, &soap_tmp___onvifActionEngine__CreateActions, "-onvifActionEngine:CreateActions", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifActionEngine__CreateActionsResponse*>(&onvifActionEngine__CreateActionsResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifActionEngine__CreateActionsResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifActionEngine__CreateActionsResponse.soap_get(soap, "onvifActionEngine:CreateActionsResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int ActionEngineBindingProxy::DeleteActions(const char *endpoint, const char *soap_action, _onvifActionEngine__DeleteActions *onvifActionEngine__DeleteActions, _onvifActionEngine__DeleteActionsResponse &onvifActionEngine__DeleteActionsResponse)
 {
-	struct __onvifActionEngine__DeleteActions soap_tmp___onvifActionEngine__DeleteActions;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/actionengine/wsdl/DeleteActions";
-	soap_tmp___onvifActionEngine__DeleteActions.onvifActionEngine__DeleteActions = onvifActionEngine__DeleteActions;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifActionEngine__DeleteActions(soap, &soap_tmp___onvifActionEngine__DeleteActions);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifActionEngine__DeleteActions(soap, &soap_tmp___onvifActionEngine__DeleteActions, "-onvifActionEngine:DeleteActions", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifActionEngine__DeleteActions(soap, &soap_tmp___onvifActionEngine__DeleteActions, "-onvifActionEngine:DeleteActions", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifActionEngine__DeleteActionsResponse*>(&onvifActionEngine__DeleteActionsResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifActionEngine__DeleteActionsResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifActionEngine__DeleteActionsResponse.soap_get(soap, "onvifActionEngine:DeleteActionsResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifActionEngine__DeleteActions soap_tmp___onvifActionEngine__DeleteActions;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/actionengine/wsdl/DeleteActions";
+    soap_tmp___onvifActionEngine__DeleteActions.onvifActionEngine__DeleteActions = onvifActionEngine__DeleteActions;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifActionEngine__DeleteActions(soap, &soap_tmp___onvifActionEngine__DeleteActions);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifActionEngine__DeleteActions(soap, &soap_tmp___onvifActionEngine__DeleteActions, "-onvifActionEngine:DeleteActions", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifActionEngine__DeleteActions(soap, &soap_tmp___onvifActionEngine__DeleteActions, "-onvifActionEngine:DeleteActions", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifActionEngine__DeleteActionsResponse*>(&onvifActionEngine__DeleteActionsResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifActionEngine__DeleteActionsResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifActionEngine__DeleteActionsResponse.soap_get(soap, "onvifActionEngine:DeleteActionsResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int ActionEngineBindingProxy::ModifyActions(const char *endpoint, const char *soap_action, _onvifActionEngine__ModifyActions *onvifActionEngine__ModifyActions, _onvifActionEngine__ModifyActionsResponse &onvifActionEngine__ModifyActionsResponse)
 {
-	struct __onvifActionEngine__ModifyActions soap_tmp___onvifActionEngine__ModifyActions;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/actionengine/wsdl/ModifyActions";
-	soap_tmp___onvifActionEngine__ModifyActions.onvifActionEngine__ModifyActions = onvifActionEngine__ModifyActions;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifActionEngine__ModifyActions(soap, &soap_tmp___onvifActionEngine__ModifyActions);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifActionEngine__ModifyActions(soap, &soap_tmp___onvifActionEngine__ModifyActions, "-onvifActionEngine:ModifyActions", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifActionEngine__ModifyActions(soap, &soap_tmp___onvifActionEngine__ModifyActions, "-onvifActionEngine:ModifyActions", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifActionEngine__ModifyActionsResponse*>(&onvifActionEngine__ModifyActionsResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifActionEngine__ModifyActionsResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifActionEngine__ModifyActionsResponse.soap_get(soap, "onvifActionEngine:ModifyActionsResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifActionEngine__ModifyActions soap_tmp___onvifActionEngine__ModifyActions;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/actionengine/wsdl/ModifyActions";
+    soap_tmp___onvifActionEngine__ModifyActions.onvifActionEngine__ModifyActions = onvifActionEngine__ModifyActions;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifActionEngine__ModifyActions(soap, &soap_tmp___onvifActionEngine__ModifyActions);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifActionEngine__ModifyActions(soap, &soap_tmp___onvifActionEngine__ModifyActions, "-onvifActionEngine:ModifyActions", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifActionEngine__ModifyActions(soap, &soap_tmp___onvifActionEngine__ModifyActions, "-onvifActionEngine:ModifyActions", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifActionEngine__ModifyActionsResponse*>(&onvifActionEngine__ModifyActionsResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifActionEngine__ModifyActionsResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifActionEngine__ModifyActionsResponse.soap_get(soap, "onvifActionEngine:ModifyActionsResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int ActionEngineBindingProxy::GetServiceCapabilities(const char *endpoint, const char *soap_action, _onvifActionEngine__GetServiceCapabilities *onvifActionEngine__GetServiceCapabilities, _onvifActionEngine__GetServiceCapabilitiesResponse &onvifActionEngine__GetServiceCapabilitiesResponse)
 {
-	struct __onvifActionEngine__GetServiceCapabilities soap_tmp___onvifActionEngine__GetServiceCapabilities;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/actionengine/wsdl/GetServiceCapabilities";
-	soap_tmp___onvifActionEngine__GetServiceCapabilities.onvifActionEngine__GetServiceCapabilities = onvifActionEngine__GetServiceCapabilities;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifActionEngine__GetServiceCapabilities(soap, &soap_tmp___onvifActionEngine__GetServiceCapabilities);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifActionEngine__GetServiceCapabilities(soap, &soap_tmp___onvifActionEngine__GetServiceCapabilities, "-onvifActionEngine:GetServiceCapabilities", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifActionEngine__GetServiceCapabilities(soap, &soap_tmp___onvifActionEngine__GetServiceCapabilities, "-onvifActionEngine:GetServiceCapabilities", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifActionEngine__GetServiceCapabilitiesResponse*>(&onvifActionEngine__GetServiceCapabilitiesResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifActionEngine__GetServiceCapabilitiesResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifActionEngine__GetServiceCapabilitiesResponse.soap_get(soap, "onvifActionEngine:GetServiceCapabilitiesResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifActionEngine__GetServiceCapabilities soap_tmp___onvifActionEngine__GetServiceCapabilities;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/actionengine/wsdl/GetServiceCapabilities";
+    soap_tmp___onvifActionEngine__GetServiceCapabilities.onvifActionEngine__GetServiceCapabilities = onvifActionEngine__GetServiceCapabilities;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifActionEngine__GetServiceCapabilities(soap, &soap_tmp___onvifActionEngine__GetServiceCapabilities);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifActionEngine__GetServiceCapabilities(soap, &soap_tmp___onvifActionEngine__GetServiceCapabilities, "-onvifActionEngine:GetServiceCapabilities", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifActionEngine__GetServiceCapabilities(soap, &soap_tmp___onvifActionEngine__GetServiceCapabilities, "-onvifActionEngine:GetServiceCapabilities", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifActionEngine__GetServiceCapabilitiesResponse*>(&onvifActionEngine__GetServiceCapabilitiesResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifActionEngine__GetServiceCapabilitiesResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifActionEngine__GetServiceCapabilitiesResponse.soap_get(soap, "onvifActionEngine:GetServiceCapabilitiesResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int ActionEngineBindingProxy::GetActionTriggers(const char *endpoint, const char *soap_action, _onvifActionEngine__GetActionTriggers *onvifActionEngine__GetActionTriggers, _onvifActionEngine__GetActionTriggersResponse &onvifActionEngine__GetActionTriggersResponse)
 {
-	struct __onvifActionEngine__GetActionTriggers soap_tmp___onvifActionEngine__GetActionTriggers;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/actionengine/wsdl/GetActionTriggers";
-	soap_tmp___onvifActionEngine__GetActionTriggers.onvifActionEngine__GetActionTriggers = onvifActionEngine__GetActionTriggers;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifActionEngine__GetActionTriggers(soap, &soap_tmp___onvifActionEngine__GetActionTriggers);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifActionEngine__GetActionTriggers(soap, &soap_tmp___onvifActionEngine__GetActionTriggers, "-onvifActionEngine:GetActionTriggers", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifActionEngine__GetActionTriggers(soap, &soap_tmp___onvifActionEngine__GetActionTriggers, "-onvifActionEngine:GetActionTriggers", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifActionEngine__GetActionTriggersResponse*>(&onvifActionEngine__GetActionTriggersResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifActionEngine__GetActionTriggersResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifActionEngine__GetActionTriggersResponse.soap_get(soap, "onvifActionEngine:GetActionTriggersResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifActionEngine__GetActionTriggers soap_tmp___onvifActionEngine__GetActionTriggers;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/actionengine/wsdl/GetActionTriggers";
+    soap_tmp___onvifActionEngine__GetActionTriggers.onvifActionEngine__GetActionTriggers = onvifActionEngine__GetActionTriggers;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifActionEngine__GetActionTriggers(soap, &soap_tmp___onvifActionEngine__GetActionTriggers);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifActionEngine__GetActionTriggers(soap, &soap_tmp___onvifActionEngine__GetActionTriggers, "-onvifActionEngine:GetActionTriggers", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifActionEngine__GetActionTriggers(soap, &soap_tmp___onvifActionEngine__GetActionTriggers, "-onvifActionEngine:GetActionTriggers", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifActionEngine__GetActionTriggersResponse*>(&onvifActionEngine__GetActionTriggersResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifActionEngine__GetActionTriggersResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifActionEngine__GetActionTriggersResponse.soap_get(soap, "onvifActionEngine:GetActionTriggersResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int ActionEngineBindingProxy::CreateActionTriggers(const char *endpoint, const char *soap_action, _onvifActionEngine__CreateActionTriggers *onvifActionEngine__CreateActionTriggers, _onvifActionEngine__CreateActionTriggersResponse &onvifActionEngine__CreateActionTriggersResponse)
 {
-	struct __onvifActionEngine__CreateActionTriggers soap_tmp___onvifActionEngine__CreateActionTriggers;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/actionengine/wsdl/CreateActionTriggers";
-	soap_tmp___onvifActionEngine__CreateActionTriggers.onvifActionEngine__CreateActionTriggers = onvifActionEngine__CreateActionTriggers;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifActionEngine__CreateActionTriggers(soap, &soap_tmp___onvifActionEngine__CreateActionTriggers);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifActionEngine__CreateActionTriggers(soap, &soap_tmp___onvifActionEngine__CreateActionTriggers, "-onvifActionEngine:CreateActionTriggers", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifActionEngine__CreateActionTriggers(soap, &soap_tmp___onvifActionEngine__CreateActionTriggers, "-onvifActionEngine:CreateActionTriggers", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifActionEngine__CreateActionTriggersResponse*>(&onvifActionEngine__CreateActionTriggersResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifActionEngine__CreateActionTriggersResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifActionEngine__CreateActionTriggersResponse.soap_get(soap, "onvifActionEngine:CreateActionTriggersResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifActionEngine__CreateActionTriggers soap_tmp___onvifActionEngine__CreateActionTriggers;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/actionengine/wsdl/CreateActionTriggers";
+    soap_tmp___onvifActionEngine__CreateActionTriggers.onvifActionEngine__CreateActionTriggers = onvifActionEngine__CreateActionTriggers;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifActionEngine__CreateActionTriggers(soap, &soap_tmp___onvifActionEngine__CreateActionTriggers);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifActionEngine__CreateActionTriggers(soap, &soap_tmp___onvifActionEngine__CreateActionTriggers, "-onvifActionEngine:CreateActionTriggers", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifActionEngine__CreateActionTriggers(soap, &soap_tmp___onvifActionEngine__CreateActionTriggers, "-onvifActionEngine:CreateActionTriggers", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifActionEngine__CreateActionTriggersResponse*>(&onvifActionEngine__CreateActionTriggersResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifActionEngine__CreateActionTriggersResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifActionEngine__CreateActionTriggersResponse.soap_get(soap, "onvifActionEngine:CreateActionTriggersResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int ActionEngineBindingProxy::DeleteActionTriggers(const char *endpoint, const char *soap_action, _onvifActionEngine__DeleteActionTriggers *onvifActionEngine__DeleteActionTriggers, _onvifActionEngine__DeleteActionTriggersResponse &onvifActionEngine__DeleteActionTriggersResponse)
 {
-	struct __onvifActionEngine__DeleteActionTriggers soap_tmp___onvifActionEngine__DeleteActionTriggers;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/actionengine/wsdl/DeleteActionTriggers";
-	soap_tmp___onvifActionEngine__DeleteActionTriggers.onvifActionEngine__DeleteActionTriggers = onvifActionEngine__DeleteActionTriggers;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifActionEngine__DeleteActionTriggers(soap, &soap_tmp___onvifActionEngine__DeleteActionTriggers);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifActionEngine__DeleteActionTriggers(soap, &soap_tmp___onvifActionEngine__DeleteActionTriggers, "-onvifActionEngine:DeleteActionTriggers", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifActionEngine__DeleteActionTriggers(soap, &soap_tmp___onvifActionEngine__DeleteActionTriggers, "-onvifActionEngine:DeleteActionTriggers", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifActionEngine__DeleteActionTriggersResponse*>(&onvifActionEngine__DeleteActionTriggersResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifActionEngine__DeleteActionTriggersResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifActionEngine__DeleteActionTriggersResponse.soap_get(soap, "onvifActionEngine:DeleteActionTriggersResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifActionEngine__DeleteActionTriggers soap_tmp___onvifActionEngine__DeleteActionTriggers;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/actionengine/wsdl/DeleteActionTriggers";
+    soap_tmp___onvifActionEngine__DeleteActionTriggers.onvifActionEngine__DeleteActionTriggers = onvifActionEngine__DeleteActionTriggers;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifActionEngine__DeleteActionTriggers(soap, &soap_tmp___onvifActionEngine__DeleteActionTriggers);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifActionEngine__DeleteActionTriggers(soap, &soap_tmp___onvifActionEngine__DeleteActionTriggers, "-onvifActionEngine:DeleteActionTriggers", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifActionEngine__DeleteActionTriggers(soap, &soap_tmp___onvifActionEngine__DeleteActionTriggers, "-onvifActionEngine:DeleteActionTriggers", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifActionEngine__DeleteActionTriggersResponse*>(&onvifActionEngine__DeleteActionTriggersResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifActionEngine__DeleteActionTriggersResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifActionEngine__DeleteActionTriggersResponse.soap_get(soap, "onvifActionEngine:DeleteActionTriggersResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 
 int ActionEngineBindingProxy::ModifyActionTriggers(const char *endpoint, const char *soap_action, _onvifActionEngine__ModifyActionTriggers *onvifActionEngine__ModifyActionTriggers, _onvifActionEngine__ModifyActionTriggersResponse &onvifActionEngine__ModifyActionTriggersResponse)
 {
-	struct __onvifActionEngine__ModifyActionTriggers soap_tmp___onvifActionEngine__ModifyActionTriggers;
-	if (endpoint)
-		soap_endpoint = endpoint;
-	if (soap_action == NULL)
-		soap_action = "http://www.onvif.org/ver10/actionengine/wsdl/ModifyActionTriggers";
-	soap_tmp___onvifActionEngine__ModifyActionTriggers.onvifActionEngine__ModifyActionTriggers = onvifActionEngine__ModifyActionTriggers;
-	soap_begin(soap);
-	soap->encodingStyle = NULL;
-	soap_serializeheader(soap);
-	soap_serialize___onvifActionEngine__ModifyActionTriggers(soap, &soap_tmp___onvifActionEngine__ModifyActionTriggers);
-	if (soap_begin_count(soap))
-		return soap->error;
-	if (soap->mode & SOAP_IO_LENGTH)
-	{	if (soap_envelope_begin_out(soap)
-		 || soap_putheader(soap)
-		 || soap_body_begin_out(soap)
-		 || soap_put___onvifActionEngine__ModifyActionTriggers(soap, &soap_tmp___onvifActionEngine__ModifyActionTriggers, "-onvifActionEngine:ModifyActionTriggers", "")
-		 || soap_body_end_out(soap)
-		 || soap_envelope_end_out(soap))
-			 return soap->error;
-	}
-	if (soap_end_count(soap))
-		return soap->error;
-	if (soap_connect(soap, soap_endpoint, soap_action)
-	 || soap_envelope_begin_out(soap)
-	 || soap_putheader(soap)
-	 || soap_body_begin_out(soap)
-	 || soap_put___onvifActionEngine__ModifyActionTriggers(soap, &soap_tmp___onvifActionEngine__ModifyActionTriggers, "-onvifActionEngine:ModifyActionTriggers", "")
-	 || soap_body_end_out(soap)
-	 || soap_envelope_end_out(soap)
-	 || soap_end_send(soap))
-		return soap_closesock(soap);
-	if (!static_cast<_onvifActionEngine__ModifyActionTriggersResponse*>(&onvifActionEngine__ModifyActionTriggersResponse)) // NULL ref?
-		return soap_closesock(soap);
-	onvifActionEngine__ModifyActionTriggersResponse.soap_default(soap);
-	if (soap_begin_recv(soap)
-	 || soap_envelope_begin_in(soap)
-	 || soap_recv_header(soap)
-	 || soap_body_begin_in(soap))
-		return soap_closesock(soap);
-	onvifActionEngine__ModifyActionTriggersResponse.soap_get(soap, "onvifActionEngine:ModifyActionTriggersResponse", NULL);
-	if (soap->error)
-		return soap_recv_fault(soap, 0);
-	if (soap_body_end_in(soap)
-	 || soap_envelope_end_in(soap)
-	 || soap_end_recv(soap))
-		return soap_closesock(soap);
-	return soap_closesock(soap);
+    struct __onvifActionEngine__ModifyActionTriggers soap_tmp___onvifActionEngine__ModifyActionTriggers;
+    if (endpoint)
+        soap_endpoint = endpoint;
+    if (soap_action == NULL)
+        soap_action = "http://www.onvif.org/ver10/actionengine/wsdl/ModifyActionTriggers";
+    soap_tmp___onvifActionEngine__ModifyActionTriggers.onvifActionEngine__ModifyActionTriggers = onvifActionEngine__ModifyActionTriggers;
+    soap_begin(soap);
+    soap->encodingStyle = NULL;
+    soap_serializeheader(soap);
+    soap_serialize___onvifActionEngine__ModifyActionTriggers(soap, &soap_tmp___onvifActionEngine__ModifyActionTriggers);
+    if (soap_begin_count(soap))
+        return soap->error;
+    if (soap->mode & SOAP_IO_LENGTH)
+    {
+        if (soap_envelope_begin_out(soap)
+         || soap_putheader(soap)
+         || soap_body_begin_out(soap)
+         || soap_put___onvifActionEngine__ModifyActionTriggers(soap, &soap_tmp___onvifActionEngine__ModifyActionTriggers, "-onvifActionEngine:ModifyActionTriggers", "")
+         || soap_body_end_out(soap)
+         || soap_envelope_end_out(soap))
+             return soap->error;
+    }
+    if (soap_end_count(soap))
+        return soap->error;
+    if (soap_connect(soap, soap_endpoint, soap_action)
+     || soap_envelope_begin_out(soap)
+     || soap_putheader(soap)
+     || soap_body_begin_out(soap)
+     || soap_put___onvifActionEngine__ModifyActionTriggers(soap, &soap_tmp___onvifActionEngine__ModifyActionTriggers, "-onvifActionEngine:ModifyActionTriggers", "")
+     || soap_body_end_out(soap)
+     || soap_envelope_end_out(soap)
+     || soap_end_send(soap))
+        return soap_closesock(soap);
+    if (!static_cast<_onvifActionEngine__ModifyActionTriggersResponse*>(&onvifActionEngine__ModifyActionTriggersResponse)) // NULL ref?
+        return soap_closesock(soap);
+    onvifActionEngine__ModifyActionTriggersResponse.soap_default(soap);
+    if (soap_begin_recv(soap)
+     || soap_envelope_begin_in(soap)
+     || soap_recv_header(soap)
+     || soap_body_begin_in(soap))
+        return soap_closesock(soap);
+    onvifActionEngine__ModifyActionTriggersResponse.soap_get(soap, "onvifActionEngine:ModifyActionTriggersResponse", NULL);
+    if (soap->error)
+        return soap_recv_fault(soap, 0);
+    if (soap_body_end_in(soap)
+     || soap_envelope_end_in(soap)
+     || soap_end_recv(soap))
+        return soap_closesock(soap);
+    return soap_closesock(soap);
 }
 /* End of client proxy code */

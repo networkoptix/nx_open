@@ -1,11 +1,13 @@
 #pragma once
 
 #include <chrono>
-#include <vector>
+#include <limits>
+#include <list>
+#include <map>
+#include <optional>
 #include <set>
 #include <string>
-#include <map>
-#include <limits>
+#include <vector>
 
 #ifndef Q_MOC_RUN
 #include <boost/preprocessor/tuple/enum.hpp>
@@ -321,6 +323,18 @@ inline bool deserialize(
 template<typename T>
 inline void serialize(
     QnJsonContext* ctx,
+    const std::optional<T>& value,
+    QJsonValue* target)
+{
+    if (!value)
+        return;
+
+    QJson::serialize<T>(ctx, *value, target);
+}
+
+template<typename T>
+inline void serialize(
+    QnJsonContext* ctx,
     const boost::optional<T>& value,
     QJsonValue* target)
 {
@@ -330,6 +344,15 @@ inline void serialize(
     QJson::serialize<T>(ctx, value.get(), target);
 }
 
+template<typename T>
+inline bool deserialize(
+    QnJsonContext* ctx,
+    const QJsonValue& value,
+    std::optional<T>* target)
+{
+    *target = T();
+    return QJson::deserialize<T>(ctx, value, &**target);
+}
 
 template<typename T>
 inline bool deserialize(
@@ -397,6 +420,7 @@ QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QVarLengthArray, (class T, int
 QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QMap, (class Key, class T), (Key, T), collection);
 QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QHash, (class Key, class T), (Key, T), collection);
 QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(std::vector, (class T, class Allocator), (T, Allocator), collection);
+QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(std::list, (class T, class Allocator), (T, Allocator), collection);
 QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(std::set, (class Key, class Predicate, class Allocator), (Key, Predicate, Allocator), collection);
 QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(std::map, (class Key, class T, class Predicate, class Allocator), (Key, T, Predicate, Allocator), collection);
 

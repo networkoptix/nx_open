@@ -229,8 +229,8 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
     const QString layoutUrl = fixSeparators(filename);
     NX_ASSERT(layoutUrl == filename);
 
-    QnLayoutFileStorageResource layoutStorage(qnClientCoreModule->commonModule());
-    layoutStorage.setUrl(layoutUrl);
+    // Create storage handler and read layout info.
+    QnLayoutFileStorageResource layoutStorage(qnClientCoreModule->commonModule(), layoutUrl);
     QScopedPointer<QIODevice> layoutFile(layoutStorage.open(lit("layout.pb"), QIODevice::ReadOnly));
     if (!layoutFile)
         return QnLayoutResourcePtr();
@@ -239,6 +239,14 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
     layoutFile.reset();
 
     QnLayoutResourcePtr layout(new QnLayoutResource());
+
+    // Deal with encrypted layouts.
+    const auto fileInfo = nx::core::layout::identifyFile(filename);
+    if (!fileInfo.isValid)
+        return QnLayoutResourcePtr();
+    if (fileInfo.isCrypted)
+        layout->setData(Qn::LayoutEncryptionRole, true);
+
     nx::vms::api::LayoutData apiLayout;
     if (!QJson::deserialize(layoutData, &apiLayout))
     {
@@ -348,8 +356,8 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
             path += lit(".mkv");
         item.resource.uniqueId = QnLayoutFileStorageResource::itemUniqueId(layoutUrl, path);
 
-        QnStorageResourcePtr storage(new QnLayoutFileStorageResource(qnClientCoreModule->commonModule()));
-        storage->setUrl(layoutUrl);
+        QnStorageResourcePtr storage(
+            new QnLayoutFileStorageResource(qnClientCoreModule->commonModule(), layoutUrl));
 
         QnAviResourcePtr aviResource(new QnAviResource(item.resource.uniqueId));
         aviResource->addFlags(Qn::exported_media);
@@ -455,7 +463,7 @@ QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& f
         return rez;
     }
 
-    if (FileTypeSupport::isLayoutFileExt(path))
+    if (FileTypeSupport::isValidLayoutFile(path))
         return layoutFromFile(path, resourcePool);
 
     return QnResourcePtr();

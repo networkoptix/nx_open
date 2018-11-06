@@ -21,6 +21,7 @@ enum class Format
     dd_MM,
     MMMM_yyyy,
     dd_MM_yyyy, // ~=QLocale::Date::ShortFormat
+    dd_MMMM_yyyy,
     yyyy_MM_dd_hh_mm_ss, // ~=QLocale::DateTime::ShortFormat
     dddd_d_MMMM_yyyy_hh_mm_ss, // ~=QLocale::DateTime::LongFormat
 

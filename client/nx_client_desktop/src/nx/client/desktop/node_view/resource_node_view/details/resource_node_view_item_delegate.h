@@ -5,7 +5,7 @@
 
 #include <QtCore/QScopedPointer>
 
-class QnResourceItemColors;
+struct QnResourceItemColors;
 
 namespace nx {
 namespace client {

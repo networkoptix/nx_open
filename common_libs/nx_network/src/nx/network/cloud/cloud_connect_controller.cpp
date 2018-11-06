@@ -202,9 +202,9 @@ void CloudConnectController::applySettings()
 {
     if (!m_impl->settings.forcedMediatorUrl.empty())
     {
-        mediatorConnector().mockupMediatorUrl(
-            QString::fromStdString(m_impl->settings.forcedMediatorUrl),
-            url::getEndpoint(utils::Url(m_impl->settings.forcedMediatorUrl)));
+        mediatorConnector().mockupMediatorAddress({
+            utils::Url(m_impl->settings.forcedMediatorUrl),
+            url::getEndpoint(utils::Url(m_impl->settings.forcedMediatorUrl))});
     }
 
     int enabledConnectTypes = static_cast<int>(cloud::ConnectType::all);

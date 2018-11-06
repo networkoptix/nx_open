@@ -12,14 +12,15 @@ def create_mediaserver_debug_file(binaries_dir, output_filename):
         'mediaserver.pdb',
         'plugins/generic_multicast_plugin.pdb',
         'plugins/genericrtspplugin.pdb',
-        'plugins/hanwha_metadata_plugin.pdb',
-        'plugins/dw_mtt_metadata_plugin.pdb',
-        'plugins/hikvision_metadata_plugin.pdb',
-        'plugins/axis_metadata_plugin.pdb',
-        'plugins/vca_metadata_plugin.pdb',
+        'plugins/hanwha_analytics_plugin.pdb',
+        'plugins/dw_mtt_analytics_plugin.pdb',
+        'plugins/hikvision_analytics_plugin.pdb',
+        'plugins/axis_analytics_plugin.pdb',
+        'plugins/vca_analytics_plugin.pdb',
         'plugins_optional/image_library_plugin.pdb',
-        'plugins_optional/stub_metadata_plugin.pdb',
-        'plugins/mjpg_link.pdb']
+        'plugins_optional/stub_analytics_plugin.pdb',
+        'plugins/mjpg_link.pdb',
+        'plugins/usb_cam.pdb']
     zip_files(pdb_filenames, binaries_dir, output_filename, mandatory=False)
 
 

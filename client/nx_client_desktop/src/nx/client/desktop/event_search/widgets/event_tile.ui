@@ -110,7 +110,42 @@
         <property name="verticalSpacing">
          <number>4</number>
         </property>
-        <item row="6" column="0">
+        <item row="4" column="0" colspan="2">
+         <widget class="QLabel" name="footerLabel">
+          <property name="text">
+           <string notr="true">&lt;Extra description&gt;</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+          <property name="openExternalLinks">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="nameLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string notr="true">&lt;Event Name&gt;</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+          <property name="openExternalLinks">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
          <widget class="QWidget" name="actionHolder" native="true">
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <property name="spacing">
@@ -144,19 +179,6 @@
           </layout>
          </widget>
         </item>
-        <item row="5" column="0" colspan="2">
-         <widget class="QLabel" name="footerLabel">
-          <property name="text">
-           <string notr="true">&lt;Extra description&gt;</string>
-          </property>
-          <property name="wordWrap">
-           <bool>true</bool>
-          </property>
-          <property name="openExternalLinks">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="1">
          <widget class="QLabel" name="timestampLabel">
           <property name="text">
@@ -170,19 +192,10 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="nameLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
+        <item row="1" column="0" colspan="2">
+         <widget class="QLabel" name="resourceListLabel">
           <property name="text">
-           <string notr="true">&lt;Event Name&gt;</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           <string notr="true">&lt;Resource list&gt;</string>
           </property>
           <property name="wordWrap">
            <bool>true</bool>
@@ -192,20 +205,7 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="QLabel" name="descriptionLabel">
-          <property name="text">
-           <string notr="true">&lt;Textual description of the event&gt;</string>
-          </property>
-          <property name="wordWrap">
-           <bool>true</bool>
-          </property>
-          <property name="openExternalLinks">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0" colspan="2">
+        <item row="3" column="0" colspan="2">
          <widget class="QWidget" name="narrowHolder" native="true">
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <property name="spacing">
@@ -215,7 +215,7 @@
             <number>0</number>
            </property>
            <property name="topMargin">
-            <number>0</number>
+            <number>2</number>
            </property>
            <property name="rightMargin">
             <number>0</number>
@@ -261,10 +261,10 @@
           </layout>
          </widget>
         </item>
-        <item row="3" column="0" colspan="2">
-         <widget class="QLabel" name="resourceListLabel">
+        <item row="2" column="0" colspan="2">
+         <widget class="QLabel" name="descriptionLabel">
           <property name="text">
-           <string notr="true">&lt;Resource list&gt;</string>
+           <string notr="true">&lt;Textual description of the event&gt;</string>
           </property>
           <property name="wordWrap">
            <bool>true</bool>

@@ -21,14 +21,11 @@ ConnectHandler::ConnectHandler(const conf::Settings& settings,
 }
 
 void ConnectHandler::processRequest(
-    nx::network::http::HttpServerConnection* const connection,
-    nx::utils::stree::ResourceContainer authInfo,
-    nx::network::http::Request request,
-    nx::network::http::Response* const response,
+    nx::network::http::RequestContext requestContext,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
-    static_cast<void>(authInfo);
-    static_cast<void>(response);
+    const auto& request = requestContext.request;
+    auto connection = requestContext.connection;
 
     // NOTE: this validation should be done somewhere in more general place
     if (!request.requestLine.url.isValid())
@@ -52,7 +49,6 @@ void ConnectHandler::processRequest(
         !m_targetSocket->setSendTimeout(m_settings.tcp().sendTimeout))
     {
         NX_INFO(this, "Failed to set socket options. %1", SystemError::getLastOSErrorText());
-
         return completionHandler(nx::network::http::StatusCode::internalServerError);
     }
 
@@ -61,7 +57,8 @@ void ConnectHandler::processRequest(
     connect(targetAddress, std::move(completionHandler));
 }
 
-void ConnectHandler::connect(const network::SocketAddress& address,
+void ConnectHandler::connect(
+    const network::SocketAddress& address,
     network::http::RequestProcessedHandler completionHandler)
 {
     NX_DEBUG(this, "Connecting to '%1', socket[%2] -> socket[%3].",
@@ -77,6 +74,7 @@ void ConnectHandler::connect(const network::SocketAddress& address,
                     m_targetSocket.get(), SystemError::toString(error));
                 return completionHandler(nx::network::http::StatusCode::serviceUnavailable);
             }
+            NX_VERBOSE(this, "Successfully connected to %1", m_targetSocket->getForeignAddress());
 
             // TODO: check when is called onResponseSendHandler, is it possible to skip some data
             //      between sending response and start of tunnel

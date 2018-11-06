@@ -2,7 +2,7 @@ import select
 import socket
 import time
 from abc import ABCMeta
-from contextlib import closing, contextmanager
+from contextlib import contextmanager
 from io import StringIO
 
 import paramiko
@@ -12,9 +12,7 @@ from framework import context_logger
 from framework.method_caching import cached_getter
 from framework.os_access import posix_shell
 from framework.os_access.command import Command, Run
-from framework.os_access.local_path import LocalPath
-from framework.os_access.path import FileSystemPath, copy_file_using_read_and_write
-from framework.os_access.posix_shell_path import PosixShellPath
+from framework.os_access.path import FileSystemPath
 
 _logger = context_logger.ContextLogger('ssh')
 
@@ -222,6 +220,10 @@ class SSH(posix_shell.Shell):
             raise SSHNotConnected("Cannot connect to {}: {} (is service started? using VirtualBox?)".format(self, e))
         return client
 
+    @cached_getter
+    def _sftp(self):
+        return self._client().open_sftp()
+
     def close(self):
         self._client().close()
 
@@ -233,24 +235,6 @@ class SSH(posix_shell.Shell):
             logger = _logger
         augmented_script = posix_shell.augment_script(script, cwd=cwd, env=env, set_eux=set_eux)
         return _SSHCommand(self._client(), augmented_script, logger)
-
-    def copy_posix_file_to(self, posix_source, destination):
-        assert isinstance(posix_source, PosixShellPath), repr(posix_source)
-        assert isinstance(posix_source._shell, SSH), repr(posix_source._shell)
-        if isinstance(destination, LocalPath):
-            with closing(self._client().open_sftp()) as sftp:
-                sftp.get(str(posix_source), str(destination))
-        else:
-            copy_file_using_read_and_write(posix_source, destination)
-
-    def copy_file_from_posix(self, source, posix_destination):
-        assert isinstance(posix_destination, PosixShellPath), repr(posix_destination)
-        assert isinstance(posix_destination._shell, SSH), repr(posix_destination._shell)
-        if isinstance(source, LocalPath):
-            with closing(self._client().open_sftp()) as sftp:
-                sftp.put(str(source), str(posix_destination))
-        else:
-            copy_file_using_read_and_write(source, posix_destination)
 
     def is_working(self):
         try:

@@ -19,6 +19,8 @@
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/types_fwd.h>
 
+#include "../utils/analytics_engine_info.h"
+
 namespace nx::client::desktop {
 
 struct CameraSettingsDialogState
@@ -27,7 +29,9 @@ struct CameraSettingsDialogState
     struct UserEditable
     {
         T get() const { return m_user.value_or(m_base); }
+        bool hasUser() const { return m_user.has_value(); }
         void setUser(T value) { m_user = value; }
+        T getBase() const { return m_base; }
         void setBase(T value) { m_base = value; }
         void resetUser() { m_user = {}; }
 
@@ -281,6 +285,14 @@ struct CameraSettingsDialogState
         UserEditableMultiple<Rotation> rotation;
     };
     ImageControlSettings imageControl;
+
+    struct AnalyticsSettings
+    {
+        QList<AnalyticsEngineInfo> engines;
+        UserEditable<QSet<QnUuid>> enabledEngines;
+        QHash<QnUuid, UserEditable<QVariantMap>> settingsValuesByEngineId;
+    };
+    AnalyticsSettings analytics;
 
     struct WearableCameraMotionDetection
     {

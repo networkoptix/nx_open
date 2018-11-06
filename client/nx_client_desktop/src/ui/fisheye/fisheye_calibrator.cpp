@@ -1,5 +1,9 @@
 #include "fisheye_calibrator.h"
 
+extern "C" {
+#include <libavutil/imgutils.h>
+} // extern "C"
+
 struct Distance
 {
     Distance()
@@ -407,7 +411,7 @@ QnFisheyeCalibrator::Error QnFisheyeCalibrator::analyseFrame(QImage frame)
         memcpy(inputData[0], frame.bits(), inputNumBytes);
 
         int roundWidth = qPower2Ceil((unsigned)frame.width(),32);
-        int numBytes = avpicture_get_size(AV_PIX_FMT_GRAY8, roundWidth, frame.height());
+        int numBytes = av_image_get_buffer_size(AV_PIX_FMT_GRAY8, roundWidth, frame.height(), /*align*/ 1);
 
         // ffmpeg returns -1 in case of error
         if (numBytes < 0)
@@ -421,11 +425,14 @@ QnFisheyeCalibrator::Error QnFisheyeCalibrator::analyseFrame(QImage frame)
         if (SwsContext* scaleContext = sws_getContext(frame.width(), frame.height(), AV_PIX_FMT_RGBA,
             frame.width(), frame.height(), AV_PIX_FMT_GRAY8, SWS_BICUBIC, NULL, NULL, NULL))
         {
-            AVPicture dstPict;
-            avpicture_fill(&dstPict, m_grayImageBuffer, AV_PIX_FMT_GRAY8, roundWidth, frame.height());
+            AVFrame dstPict;
+            av_image_fill_arrays(
+                dstPict.data,
+                dstPict.linesize,
+                m_grayImageBuffer,
+               AV_PIX_FMT_GRAY8, roundWidth, frame.height(), /*align*/ 1);
 
             int inputLinesize[4] = { frame.bytesPerLine() , 0, 0, 0 };
-
             QImage newFrame(m_grayImageBuffer, frame.width(), frame.height(), roundWidth, QImage::Format_Indexed8);
             sws_scale(scaleContext, inputData, inputLinesize, 0, frame.height(), dstPict.data, dstPict.linesize);
             sws_freeContext(scaleContext);

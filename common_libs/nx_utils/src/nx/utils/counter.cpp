@@ -46,8 +46,7 @@ Counter::ScopedIncrement::~ScopedIncrement()
 //-------------------------------------------------------------------------------------------------
 // Counter
 
-Counter::Counter(int initialCount, QObject* parent):
-    QObject(parent),
+Counter::Counter(int initialCount):
     m_count(initialCount)
 {
 }
@@ -64,22 +63,39 @@ void Counter::wait()
         m_counterReachedZeroCondition.wait(lk.mutex());
 }
 
-void Counter::increment()
+int Counter::increment()
 {
     QnMutexLocker locker(&m_mutex);
-    m_count++;
+    return ++m_count;
 }
 
-void Counter::decrement()
+int Counter::decrement()
 {
     QnMutexLocker locker(&m_mutex);
-    auto val = --m_count;
-    locker.unlock();
+
+    const auto val = --m_count;
     if (val == 0)
-    {
-        emit reachedZero();
         m_counterReachedZeroCondition.wakeAll();
-    }
+
+    return val;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+CounterWithSignal::CounterWithSignal(int initialCount, QObject* parent):
+    QObject(parent),
+    Counter(initialCount)
+{
+}
+
+int CounterWithSignal::decrement()
+{
+    const int value = base_type::decrement();
+
+    if (value == 0)
+        emit reachedZero();
+
+    return value;
 }
 
 } // namespace utils

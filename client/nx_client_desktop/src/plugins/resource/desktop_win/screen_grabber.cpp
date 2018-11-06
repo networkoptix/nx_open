@@ -19,8 +19,9 @@
 QnMutex QnScreenGrabber::m_guiWaitMutex;
 
 extern "C" {
-    #include <libavformat/avformat.h>
-    #include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
+#include <libavutil/imgutils.h>
 }
 
 static const int LOGO_CORNER_OFFSET = 8;
@@ -206,9 +207,13 @@ void QnScreenGrabber::allocateTmpFrame(int width, int height, AVPixelFormat form
 
     m_tmpFrame = av_frame_alloc();
     m_tmpFrame->format = format;
-    int numBytes = avpicture_get_size(format, m_tmpFrameWidth, m_tmpFrameHeight);
+    int numBytes = av_image_get_buffer_size(format, m_tmpFrameWidth, m_tmpFrameHeight, /*align*/ 1);
     m_tmpFrameBuffer = (quint8*)av_malloc(numBytes * sizeof(quint8));
-    avpicture_fill((AVPicture *)m_tmpFrame, m_tmpFrameBuffer, format, m_tmpFrameWidth, m_tmpFrameHeight);
+    av_image_fill_arrays(
+        m_tmpFrame->data,
+        m_tmpFrame->linesize,
+        m_tmpFrameBuffer,
+        format, m_tmpFrameWidth, m_tmpFrameHeight, /*align*/ 1);
 
     m_scaleContext = sws_getContext(
         width, height, format,
@@ -530,10 +535,13 @@ bool QnScreenGrabber::direct3DDataToFrame(void* opaque, AVFrame* pFrame)
 
     if (pFrame->width == 0)
     {
-        int videoBufSize = avpicture_get_size(format(), width(), height());
+        int videoBufSize = av_image_get_buffer_size(format(), width(), height(), /*align*/ 1);
         quint8* videoBuf = (quint8*) av_malloc(videoBufSize);
-
-        avpicture_fill((AVPicture *)pFrame, videoBuf, format(), width(), height());
+        av_image_fill_arrays(
+            pFrame->data,
+            pFrame->linesize,
+            videoBuf,
+            format(), width(), height(), /*align*/ 1);
         pFrame->key_frame = 1;
         //pFrame->pict_type = AV_PICTURE_TYPE_I;
         pFrame->width = m_ddm.Width;

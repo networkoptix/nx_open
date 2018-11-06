@@ -1,7 +1,6 @@
 #include "restore_state_rest_handler.h"
 
 #include <core/resource/user_resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
 #include <media_server_process.h>
@@ -9,8 +8,8 @@
 #include <nx/vms/utils/vms_utils.h>
 #include <rest/helpers/permissions_helper.h>
 #include <rest/server/rest_connection_processor.h>
-#include <rest/server/rest_connection_processor.h>
 #include <server/server_globals.h>
+#include <network/universal_tcp_listener.h>
 
 QnRestoreStateRestHandler::QnRestoreStateRestHandler(QnMediaServerModule* serverModule):
     nx::mediaserver::ServerModuleAware(serverModule)
@@ -35,8 +34,9 @@ int QnRestoreStateRestHandler::executePost(
     if (QnPermissionsHelper::isSafeMode(serverModule()))
         return QnPermissionsHelper::safeModeError(result);
 
-    if (!verifyCurrentPassword(passwordData, owner, &result))
-        return nx::network::http::StatusCode::ok;
+    const auto authenticator = QnUniversalTcpListener::authenticator(owner->owner());
+    if (!authenticator->isPasswordCorrect(owner->accessRights(), passwordData.currentPassword))
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Invalid current password"));
 
     return nx::network::http::StatusCode::ok;
 }
@@ -55,36 +55,7 @@ void QnRestoreStateRestHandler::afterExecute(
     if (QJson::deserialize(body, &reply) && reply.error == QnJsonRestResult::NoError)
     {
         serverModule()->mutableSettings()->removeDbOnStartup.set(true);
+        NX_INFO(this, "Server restart is scheduled");
         restartServer(0);
     }
-}
-
-bool QnRestoreStateRestHandler::verifyCurrentPassword(
-    const CurrentPasswordData& passwordData,
-    const QnRestConnectionProcessor* owner,
-    QnJsonRestResult* result)
-{
-    const auto user = owner->commonModule()->resourcePool()
-        ->getResourceById<QnUserResource>(owner->accessRights().userId);
-
-    if (!user)
-    {
-        const auto error = lit(
-            "User is not available, this handler is supposed to be used with authorization only");
-
-        NX_ASSERT(false, error);
-        result->setError(QnJsonRestResult::CantProcessRequest, error);
-        return false;
-    }
-
-    if (user->checkLocalUserPassword(passwordData.currentPassword))
-        return true;
-
-    if (result)
-    {
-        result->setError(QnJsonRestResult::CantProcessRequest,
-            lit("Invalid current password provided"));
-    }
-
-    return false;
 }

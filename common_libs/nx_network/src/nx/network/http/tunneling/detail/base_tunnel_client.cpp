@@ -46,6 +46,14 @@ void BaseTunnelClient::cleanUpFailedTunnel(AsyncClient* httpClient)
     reportFailure(std::move(result));
 }
 
+void BaseTunnelClient::cleanUpFailedTunnel(
+    SystemError::ErrorCode systemErrorCode)
+{
+    OpenTunnelResult result;
+    result.sysError = systemErrorCode;
+    reportFailure(std::move(result));
+}
+
 void BaseTunnelClient::reportFailure(OpenTunnelResult result)
 {
     if (m_clientFeedbackFunction)

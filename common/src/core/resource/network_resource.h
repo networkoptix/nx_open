@@ -65,8 +65,6 @@ public:
     virtual int mediaPort() const;
     void setMediaPort(int value);
 
-    virtual QStringList searchFilters(bool useExtraSearchInformation) const override;
-
     void addNetworkStatus(NetworkStatus status);
     void removeNetworkStatus(NetworkStatus status);
     bool checkNetworkStatus(NetworkStatus status) const;
@@ -86,11 +84,6 @@ public:
     virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source);
 
     virtual int getChannel() const;
-
-    /*
-    * Return time periods from resource based archive (direct to storage)
-    */
-    virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel);
 
     //!Returns true if camera is accessible
     /*!

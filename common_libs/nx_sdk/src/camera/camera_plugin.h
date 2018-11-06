@@ -621,7 +621,7 @@ namespace nxcip
         virtual void* scanLine( int planeNumber, int lineNumber ) = 0;
         /*!
             \return Picture data. Returned buffer MUST be aligned on \a MEDIA_DATA_BUFFER_ALIGNMENT - byte boundary (this restriction helps for some optimization).
-                \a nxpt::mallocAligned and \a nxpt::freeAligned routines can be used for that purpose
+                \a nx::kit::utils::mallocAligned and \a nx::kit::utils::freeAligned routines can be used for that purpose
         */
         virtual void* data() = 0;
         virtual const void* data() const = 0;
@@ -683,12 +683,31 @@ namespace nxcip
         */
         unsigned long long periodDetailLevel;
 
+        /**
+         *  Whether keep small chunks in result. This option similar to the 'periodDetailLevel', but it applied to the chunk length
+         *  instead of inter chunks gap length. Minimal allowed chunk length is applied from 'periodDetailLevel' parameter.
+         */
+        bool keepSmallChunks;
+
+        /**
+         *  Strict output data maximum records size.
+         */
+        int limit;
+
+        /**
+         * Sort output data in descending sort order if true.
+         */
+        bool descSortOrder;
+
         ArchiveSearchOptions()
         :
             motionMask( 0 ),
             startTime( INVALID_TIMESTAMP_VALUE ),
             endTime( INVALID_TIMESTAMP_VALUE ),
-            periodDetailLevel( 0 )
+            periodDetailLevel(0),
+            keepSmallChunks(0),
+            limit(0),
+            descSortOrder(false)
         {
         }
     };
@@ -1000,7 +1019,7 @@ namespace nxcip
                 - motion jpeg (\a nxcip::AV_CODEC_ID_MJPEG): Each packet is a complete jpeg picture
                 - aac (\a nxcip::AV_CODEC_ID_AAC): ADTS stream
             \return Media data. Returned buffer MUST be aligned on \a MEDIA_DATA_BUFFER_ALIGNMENT - byte boundary (this restriction helps for some optimization).
-                \a nxpt::mallocAligned and \a nxpt::freeAligned routines can be used for that purpose
+                \a nx::kit::utils::mallocAligned and \a nx::kit::utils::freeAligned routines can be used for that purpose
             \warning Actual buffer size MUST be \a MEDIA_PACKET_BUFFER_PADDING_SIZE larger than \a MediaDataPacket::dataSize() returns
                 and this padding MUST be filled with zeros. This is required by decoder, since this buffer may (and will!) be used as decoder input
         */

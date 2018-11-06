@@ -25,20 +25,21 @@
                 Directory="plugins">
             <Component><File Name="genericrtspplugin.dll" KeyPath="yes"/></Component>
             <Component><File Name="mjpg_link.dll" KeyPath="yes"/></Component>
+            <Component><File Name="usb_cam.dll" KeyPath="yes"/></Component>
             <Component><File Name="generic_multicast_plugin.dll" KeyPath="yes"/></Component>
-            <Component><File Name="dw_mtt_metadata_plugin.dll" KeyPath="yes"/></Component>
-            <Component><File Name="hikvision_metadata_plugin.dll" KeyPath="yes"/></Component>
-            <Component><File Name="axis_metadata_plugin.dll" KeyPath="yes"/></Component>
-            <Component><File Name="vca_metadata_plugin.dll" KeyPath="yes"/></Component>
+            <Component><File Name="dw_mtt_analytics_plugin.dll" KeyPath="yes"/></Component>
+            <Component><File Name="hikvision_analytics_plugin.dll" KeyPath="yes"/></Component>
+            <Component><File Name="axis_analytics_plugin.dll" KeyPath="yes"/></Component>
+            <Component><File Name="vca_analytics_plugin.dll" KeyPath="yes"/></Component>
             <?if $(var.enable_hanwha) = "true"?>
-                <Component><File Name="hanwha_metadata_plugin.dll" KeyPath="yes"/></Component>
+                <Component><File Name="hanwha_analytics_plugin.dll" KeyPath="yes"/></Component>
             <?endif?>
         </ComponentGroup>
 
         <ComponentGroup Id="server_plugins_optional"
                 Source="$(var.plugins_optional_dir)"
                 Directory="plugins_optional">
-            <Component><File Name="stub_metadata_plugin.dll" KeyPath="yes"/></Component>
+            <Component><File Name="stub_analytics_plugin.dll" KeyPath="yes"/></Component>
         </ComponentGroup>
     </Fragment>
 </Wix>

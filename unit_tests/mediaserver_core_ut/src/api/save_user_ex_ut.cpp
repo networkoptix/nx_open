@@ -27,17 +27,25 @@ protected:
     enum class UserCategory
     {
         admin,
-        regular
+        regular,
+        regular2
     };
 
     SaveUserEx()
     {
-        m_nonAdminUser.email = "test@test.com";
-        m_nonAdminUser.fullName = "testUser";
-        m_nonAdminUser.isEnabled = true;
-        m_nonAdminUser.name = "test_user_name";
-        m_nonAdminUser.password = "testUserPassword";
-        m_nonAdminUser.permissions = GlobalPermission::accessAllMedia;
+        m_regularUser.email = "test@test.com";
+        m_regularUser.fullName = "testUser";
+        m_regularUser.isEnabled = true;
+        m_regularUser.name = "test_user_name";
+        m_regularUser.password = "testUserPassword";
+        m_regularUser.permissions = GlobalPermission::accessAllMedia;
+
+        m_regularUser2.email = "test2@test.com";
+        m_regularUser2.fullName = "testUser2";
+        m_regularUser2.isEnabled = true;
+        m_regularUser2.name = "test_user_name2";
+        m_regularUser2.password = "testUserPassword2";
+        m_regularUser2.permissions = GlobalPermission::accessAllMedia;
 
         m_adminUser.email = "admin@test.com";
         m_adminUser.fullName = "testAdminUser";
@@ -66,11 +74,9 @@ protected:
         UserCategory userCategory,
         network::http::StatusCode::Value expectedCode)
     {
-        auto* userDataToSave = userCategory == UserCategory::regular
-            ? &m_nonAdminUser : &m_adminUser;
-
-        QString authName = apiAccess == ApiAccess::admin ? "admin" : m_nonAdminUser.name;
-        QString authPassword = apiAccess == ApiAccess::admin ? "admin" : m_nonAdminUser.password;
+        vms::api::UserDataEx* userDataToSave = selectData(userCategory);
+        QString authName = apiAccess == ApiAccess::admin ? "admin" : m_regularUser.name;
+        QString authPassword = apiAccess == ApiAccess::admin ? "admin" : m_regularUser.password;
 
         NX_TEST_API_POST(server.get(), "/ec2/saveUser", *userDataToSave, nullptr,
             expectedCode, authName, authPassword, &m_responseBuffer);
@@ -81,19 +87,19 @@ protected:
     void thenUserShouldAppearInTheGetUsersResponse(const LauncherPtr& server,
         UserCategory userCategory)
     {
-        vms::api::UserDataList userDataList;
-        NX_TEST_API_GET(server.get(), "/ec2/getUsers", &userDataList);
-
+        NX_TEST_API_GET(server.get(), "/ec2/getUsers", &m_userDataList);
         QString userName;
-        if (userCategory == UserCategory::regular)
-            userName = m_nonAdminUser.name;
-        else
-            userName = m_adminUser.name;
+        switch (userCategory)
+        {
+            case UserCategory::admin: userName = m_adminUser.name; break;
+            case UserCategory::regular: userName = m_regularUser.name; break;
+            case UserCategory::regular2: userName = m_regularUser2.name; break;
+        }
 
-        auto testUserIt = std::find_if(userDataList.cbegin(), userDataList.cend(),
+        auto testUserIt = std::find_if(m_userDataList.cbegin(), m_userDataList.cend(),
             [&userName](const auto& userData) { return userData.name == userName; });
 
-        ASSERT_NE(testUserIt, userDataList.cend());
+        ASSERT_NE(testUserIt, m_userDataList.cend());
     }
 
     void thenSavedUserShouldBeAuthorizedByServer(const LauncherPtr& server,
@@ -102,17 +108,38 @@ protected:
         vms::api::UserDataList userDataList;
 
         QString authName = userCategory == UserCategory::admin
-            ? m_adminUser.name : m_nonAdminUser.name;
+            ? m_adminUser.name : m_regularUser.name;
         QString authPassword = userCategory == UserCategory::admin
-            ? m_adminUser.password : m_nonAdminUser.password;
+            ? m_adminUser.password : m_regularUser.password;
 
         NX_TEST_API_GET(server.get(), "/ec2/getUsers", &userDataList,
             network::http::StatusCode::ok, authName, authPassword);
     }
 
+    void whenUserNameChanged(UserCategory toChange, UserCategory changeTo)
+    {
+        vms::api::UserDataEx* userDataToChange = selectData(toChange);
+        vms::api::UserDataEx* userDataToChangeTo = selectData(changeTo);
+
+        userDataToChange->name = userDataToChangeTo->name;
+    }
+
+    void whenIdFilled(UserCategory userCategory)
+    {
+        vms::api::UserDataEx* userDataToFillId = selectData(userCategory);
+        for (const auto& existingUser: m_userDataList)
+        {
+            if (existingUser.name == userDataToFillId->name)
+                userDataToFillId->id = existingUser.id;
+        }
+        ASSERT_FALSE(userDataToFillId->id.isNull());
+    }
+
 private:
     vms::api::UserDataEx m_adminUser;
-    vms::api::UserDataEx m_nonAdminUser;
+    vms::api::UserDataEx m_regularUser;
+    vms::api::UserDataEx m_regularUser2;
+    vms::api::UserDataList m_userDataList;
     Buffer m_responseBuffer;
 
     template<typename ResponseData>
@@ -122,6 +149,17 @@ private:
         QnJsonRestResult jsonRestResult;
         NX_TEST_API_GET(launcher, path, &jsonRestResult);
         responseData = jsonRestResult.deserialized<ResponseData>();
+    }
+
+    vms::api::UserDataEx* selectData(UserCategory category)
+    {
+        switch (category)
+        {
+            case UserCategory::admin: return &m_adminUser;
+            case UserCategory::regular: return &m_regularUser;
+            case UserCategory::regular2: return &m_regularUser2;
+        }
+        return nullptr;
     }
 };
 
@@ -161,6 +199,54 @@ TEST_F(SaveUserEx, nonAdminAccessShouldFail)
 
     whenSaveUserRequestIssued(server, ApiAccess::nonAdmin, UserCategory::admin,
         /*expectedResult*/ network::http::StatusCode::forbidden);
+}
+
+TEST_F(SaveUserEx, shouldBeImpossibleToSaveNewUserWithSameName)
+{
+    auto server = givenServer();
+    whenServerLaunched(server);
+
+    whenSaveUserRequestIssued(server, ApiAccess::admin, UserCategory::regular,
+        /*expectedResult*/ network::http::StatusCode::ok);
+    thenUserShouldAppearInTheGetUsersResponse(server, UserCategory::regular);
+
+    whenSaveUserRequestIssued(server, ApiAccess::admin, UserCategory::regular,
+        /*expectedResult*/ network::http::StatusCode::forbidden);
+}
+
+TEST_F(SaveUserEx, shouldBeImpossibleToChangeExistingUserNameIfAnotherUserHasIt)
+{
+    auto server = givenServer();
+    whenServerLaunched(server);
+
+    whenSaveUserRequestIssued(server, ApiAccess::admin, UserCategory::regular,
+        /*expectedResult*/ network::http::StatusCode::ok);
+    whenSaveUserRequestIssued(server, ApiAccess::admin, UserCategory::regular2,
+        /*expectedResult*/ network::http::StatusCode::ok);
+
+    thenUserShouldAppearInTheGetUsersResponse(server, UserCategory::regular);
+    thenUserShouldAppearInTheGetUsersResponse(server, UserCategory::regular2);
+
+    whenIdFilled(UserCategory::regular);
+    whenUserNameChanged(/*toChange*/ UserCategory::regular, /*changeTo*/ UserCategory::regular2);
+    whenSaveUserRequestIssued(server, ApiAccess::admin, UserCategory::regular,
+        network::http::StatusCode::forbidden);
+}
+
+TEST_F(SaveUserEx, shouldPossibleToSaveSameUserTwice)
+{
+    auto server = givenServer();
+    whenServerLaunched(server);
+
+    whenSaveUserRequestIssued(server, ApiAccess::admin, UserCategory::regular,
+        /*expectedResult*/ network::http::StatusCode::ok);
+    thenUserShouldAppearInTheGetUsersResponse(server, UserCategory::regular);
+
+    whenIdFilled(UserCategory::regular);
+    whenSaveUserRequestIssued(server, ApiAccess::admin, UserCategory::regular,
+        network::http::StatusCode::ok);
+
+    thenUserShouldAppearInTheGetUsersResponse(server, UserCategory::regular);
 }
 
 } // namespace nx::test

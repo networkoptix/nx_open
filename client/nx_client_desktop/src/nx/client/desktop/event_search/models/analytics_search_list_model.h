@@ -4,9 +4,7 @@
 
 #include <nx/client/desktop/event_search/models/abstract_async_search_list_model.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 class AnalyticsSearchListModel: public AbstractAsyncSearchListModel
 {
@@ -14,7 +12,7 @@ class AnalyticsSearchListModel: public AbstractAsyncSearchListModel
     using base_type = AbstractAsyncSearchListModel;
 
 public:
-    explicit AnalyticsSearchListModel(QObject* parent = nullptr);
+    explicit AnalyticsSearchListModel(QnWorkbenchContext* context, QObject* parent = nullptr);
     virtual ~AnalyticsSearchListModel() override = default;
 
     QRectF filterRect() const;
@@ -25,13 +23,12 @@ public:
 
     virtual bool isConstrained() const override;
 
-    virtual bool canFetchMore(const QModelIndex& parent) const override;
+protected:
+    virtual bool isCameraApplicable(const QnVirtualCameraResourcePtr& camera) const override;
 
 private:
     class Private;
-    Private* const d = nullptr;
+    Private* const d;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

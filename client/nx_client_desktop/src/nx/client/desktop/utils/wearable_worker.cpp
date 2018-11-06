@@ -1,21 +1,20 @@
 #include "wearable_worker.h"
+#include "server_request_storage.h"
+#include "upload_manager.h"
+#include "wearable_payload.h"
 
 #include <QtCore/QTimer>
 
-#include <utils/common/guarded_callback.h>
-#include <rest/server/json_rest_result.h>
 #include <api/model/wearable_status_reply.h>
 #include <api/server_rest_connection.h>
+#include <client/client_module.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <rest/server/json_rest_result.h>
 
-#include <client/client_module.h>
-
-#include "server_request_storage.h"
-#include "upload_manager.h"
-#include "wearable_payload.h"
+#include <nx/utils/guarded_callback.h>
 
 namespace nx {
 namespace client {
@@ -115,7 +114,7 @@ void WearableWorker::updateState()
         return;
     d->waitingForStatusReply = true;
 
-    auto callback = guarded(this,
+    const auto callback = nx::utils::guarded(this,
         [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             d->requests.releaseHandle(handle);
@@ -146,7 +145,7 @@ bool WearableWorker::addUpload(const WearablePayloadList& payloads)
         return true;
     }
 
-    auto callback = guarded(this,
+    const auto callback = nx::utils::guarded(this,
         [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             d->requests.releaseHandle(handle);
@@ -186,7 +185,7 @@ void WearableWorker::processCurrentFile()
     {
         d->state.status = WearableState::Locked;
 
-        auto callback = guarded(this,
+        const auto callback = nx::utils::guarded(this,
             [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
             {
                 d->requests.releaseHandle(handle);
@@ -406,7 +405,7 @@ void WearableWorker::handleUploadProgress(const UploadState& state)
         d->state.status = WearableState::Consuming;
         d->state.consumeProgress = 0;
 
-        auto callback = guarded(this,
+        const auto callback = nx::utils::guarded(this,
             [this](bool success, rest::Handle handle, const rest::ServerConnection::EmptyResponseType&)
             {
                 d->requests.releaseHandle(handle);
@@ -439,7 +438,7 @@ void WearableWorker::pollExtend()
     if (!isWorking())
         return;
 
-    auto callback = guarded(this,
+    const auto callback = nx::utils::guarded(this,
         [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             d->requests.releaseHandle(handle);

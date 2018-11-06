@@ -200,14 +200,6 @@ void QnNetworkResource::setMediaPort(int value)
     setProperty(mediaPortKey(), value > 0 ? QString::number(value) : QString());
 }
 
-QStringList QnNetworkResource::searchFilters(bool useExtraSearchInformation) const
-{
-    return base_type::searchFilters(useExtraSearchInformation)
-        << getMAC().toString()
-        << getHostAddress()
-        << lit("live");
-}
-
 void QnNetworkResource::addNetworkStatus(NetworkStatus status)
 {
     QnMutexLocker mutexLocker( &m_mutex );
@@ -303,44 +295,6 @@ void QnNetworkResource::checkIfOnlineAsync( std::function<void(bool)> completion
     //calling completionHandler(false) in aio_thread
     nx::network::SocketGlobals::aioService().post(std::bind(completionHandler, false));
 }
-
-QnTimePeriodList QnNetworkResource::getDtsTimePeriods(qint64 /*startTimeMs*/, qint64 /*endTimeMs*/, int /*detailLevel*/) {
-    return QnTimePeriodList();
-}
-
-/*
-void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
-{
-    // cannot make concurrent work with pointer CLDevice* ; => so extra steps needed
-
-    NX_DEBUG(this, QLatin1String("Geting device info..."));
-    QTime time;
-    time.start();
-
-    QList<QnResourcePtr> local_list;
-    for (const QnResourcePtr& res: lst.values())
-    {
-        QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
-        if (netRes && !(netRes->checkNetworkStatus(QnNetworkResource::HasConflicts)))
-            local_list << res.data();
-    }
-
-    QThreadPool* global = QThreadPool::globalInstance();
-    for (int i = 0; i < threads; ++i ) global->releaseThread();
-    QtConcurrent::blockingMap(local_list, std::mem_fun(&QnResource::getBaseInfo));
-    for (int i = 0; i < threads; ++i )global->reserveThread();
-
-    CL_LOG(cl_logDEBUG1)
-    {
-        NX_DEBUG(this, QLatin1String("Done. Time elapsed: "), time.elapsed());
-
-        for(const QnResourcePtr& res: lst)
-            NX_DEBUG(this, res->toString());
-
-    }
-
-}
-*/
 
 QnUuid QnNetworkResource::physicalIdToId(const QString& physicalId)
 {

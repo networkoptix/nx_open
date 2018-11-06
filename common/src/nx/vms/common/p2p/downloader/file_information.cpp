@@ -18,6 +18,21 @@ bool FileInformation::isValid() const
     return !name.isEmpty();
 }
 
+float FileInformation::calculateDownloadProgress() const
+{
+    int size = downloadedChunks.size();
+    if (!size)
+        return 0;
+    int done = downloadedChunks.count(true);
+    return 100.0*done / size;
+}
+
+int FileInformation::calculateDownloadedBytes() const
+{
+    int done = downloadedChunks.count(true);
+    return done * chunkSize;
+}
+
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(FileInformation, Status)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(FileInformation, PeerSelectionPolicy)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(

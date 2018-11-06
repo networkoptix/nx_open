@@ -2,7 +2,7 @@
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/network/http/http_client.h>
-#include <nx/network/url/url_builder.h>
+#include <nx/network/http/rest/http_rest_client.h>
 
 #include "mediator_api_http_paths.h"
 
@@ -11,38 +11,76 @@ namespace hpm {
 namespace api {
 
 Client::Client(const nx::utils::Url& baseMediatorApiUrl):
-    m_baseMediatorApiUrl(baseMediatorApiUrl)
+    base_type(baseMediatorApiUrl)
 {
 }
 
-std::tuple<nx::network::http::StatusCode::Value, ListeningPeers> Client::getListeningPeers() const
+Client::~Client()
 {
-    auto requestUrl = nx::network::url::Builder(m_baseMediatorApiUrl)
-        .appendPath(kStatisticsListeningPeersPath).toUrl();
+    pleaseStopSync();
+}
 
-    nx::network::http::HttpClient httpClient;
-    if (!httpClient.doGet(requestUrl))
+void Client::getListeningPeers(
+    nx::utils::MoveOnlyFunc<void(ResultCode, ListeningPeers)> completionHandler)
+{
+    base_type::template makeAsyncCall<ListeningPeers>(
+        kStatisticsListeningPeersPath,
+        std::move(completionHandler));
+}
+
+std::tuple<Client::ResultCode, ListeningPeers> Client::getListeningPeers()
+{
+    return base_type::template makeSyncCall<ListeningPeers>(
+        kStatisticsListeningPeersPath);
+}
+
+void Client::initiateConnection(
+    const ConnectRequest& request,
+    nx::utils::MoveOnlyFunc<void(ResultCode, ConnectResponse)> completionHandler)
+{
+    base_type::template makeAsyncCall<ConnectResponse>(
+        nx::network::http::rest::substituteParameters(
+            kServerSessionsPath, {request.destinationHostName.toStdString()}),
+        std::move(completionHandler),
+        request);
+}
+
+Client::ResultCode Client::systemErrorCodeToResultCode(
+    SystemError::ErrorCode systemErrorCode)
+{
+    switch (systemErrorCode)
     {
-        return std::make_tuple(
-            nx::network::http::StatusCode::serviceUnavailable,
-            ListeningPeers());
+        case SystemError::noError:
+            return api::ResultCode::ok;
+        case SystemError::timedOut:
+            return api::ResultCode::timedOut;
+        default:
+            return api::ResultCode::networkError;
     }
+}
 
-    if (httpClient.response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
+Client::ResultCode Client::getResultCodeFromResponse(
+    const network::http::Response& response)
+{
+    using namespace network::http;
+
+    if (StatusCode::isSuccessCode(response.statusLine.statusCode))
+        return api::ResultCode::ok;
+
+    switch (response.statusLine.statusCode)
     {
-        return std::make_tuple(
-            static_cast<nx::network::http::StatusCode::Value>(
-                httpClient.response()->statusLine.statusCode),
-            ListeningPeers());
+        case StatusCode::unauthorized:
+            return api::ResultCode::notAuthorized;
+
+        case StatusCode::badRequest:
+            return api::ResultCode::badRequest;
+
+        case StatusCode::notFound:
+            return api::ResultCode::notFound;
+
+        default:
+            return api::ResultCode::otherLogicError;
     }
-
-    QByteArray responseBody;
-    while (!httpClient.eof())
-        responseBody += httpClient.fetchMessageBodyBuffer();
-
-    return std::make_tuple(
-        nx::network::http::StatusCode::ok,
-        QJson::deserialized<api::ListeningPeers>(responseBody));
 }
 
 } // namespace api

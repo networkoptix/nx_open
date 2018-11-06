@@ -19,19 +19,11 @@ public:
     }
 
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer authInfo,
-        nx::network::http::Request request,
-        nx::network::http::Response* const response,
+        RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler) override
     {
         m_func(
-            RequestContext{
-                connection,
-                std::move(authInfo),
-                std::move(request),
-                response,
-                requestPathParams()},
+            std::move(requestContext),
             std::move(completionHandler));
     }
 

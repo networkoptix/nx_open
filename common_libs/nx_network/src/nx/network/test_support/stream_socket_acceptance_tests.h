@@ -509,6 +509,7 @@ protected:
     void whenServerReadsBytesWithFlags(int bytesExpected, int recvFlags)
     {
         std::basic_string<uint8_t> readBuf(bytesExpected, 'x');
+
         ASSERT_EQ(
             bytesExpected,
             std::get<1>(m_prevAcceptResult)->recv(
@@ -819,6 +820,8 @@ protected:
     void thenServerSocketReceivesAllDataBeforeEof()
     {
         thenConnectionHasBeenAccepted();
+
+        ASSERT_TRUE(lastAcceptedSocket()->setNonBlockingMode(false));
 
         assertAcceptedConnectionReceived(m_sentData);
         assertAcceptedConnectionReceivedEof();

@@ -2,7 +2,6 @@
 
 #include <array>
 
-#include <nx/streaming/rtp_stream_parser.h>
 #include <nx/streaming/config.h>
 #include <nx/streaming/rtp/onvif_header_extension.h>
 #include "common/common_module.h"
@@ -117,9 +116,9 @@ bool isCodecSupported(AVCodecID codecId)
 
 // Change payload type in SDP media attributes.
 // #: "a=rtpmap:97 mpeg4-generic/32000/2", where 97 is payload type.
-QByteArray updatePayloadType(const QByteArray& line, int payloadType)
+QString updatePayloadType(const QString& line, int payloadType)
 {
-    QByteArray result;
+    QString result;
     int index = line.indexOf(':');
     if (index < 0)
         return line;
@@ -131,7 +130,8 @@ QByteArray updatePayloadType(const QByteArray& line, int payloadType)
     return result;
 }
 
-QByteArray buildSdpFromContext(AVCodecContext* codec, AVFormatContext* fmt, int payloadType)
+QList<QString> getSdpAttributesFromContext(
+    AVCodecContext* codec, AVFormatContext* fmt, int payloadType)
 {
     static const int kMaxSdpSize = 1024*16;
     char buffer[kMaxSdpSize];
@@ -156,24 +156,23 @@ QByteArray buildSdpFromContext(AVCodecContext* codec, AVFormatContext* fmt, int 
     streams[0] = &stream;
     ctx.streams = streams;
     av_sdp_create(contexts, 1, buffer, sizeof(buffer));
-    QList<QByteArray> lines = QByteArray(buffer).split('\n');
-    QByteArray result;
+    QList<QString> lines = QString(buffer).split("\r\n");
+    QList<QString> result;
     for (const auto& line: lines)
     {
         if (line.startsWith("a=rtpmap") ||
             line.startsWith("a=fmtp") ||
             line.startsWith("a=framesize"))
         {
-            result.append(updatePayloadType(line, payloadType));
+            result.push_back(updatePayloadType(line, payloadType));
         }
     }
     avcodec_parameters_free(&stream.codecpar);
     return result;
 }
 
-QByteArray buildSdpFromMedia(QnConstAbstractMediaDataPtr media, int payloadType)
+QList<QString> getSdpAttributesFromMedia(QnConstAbstractMediaDataPtr media, int payloadType)
 {
-    QByteArray sdp;
     AVCodecContext* codec = avcodec_alloc_context3(nullptr);
     codec->codec_type = AVMEDIA_TYPE_VIDEO;
     codec->codec_id = media->compressionType;
@@ -183,12 +182,12 @@ QByteArray buildSdpFromMedia(QnConstAbstractMediaDataPtr media, int payloadType)
     // we need to build AVFormatContext due to ffmpeg bug sdp.c:424(not check oformat pointer)
     AVOutputFormat * oformat = av_guess_format("rtp", NULL, NULL);
     if (oformat == 0)
-        return sdp;
+        return QList<QString>();
     AVFormatContext* fmt;
     if (avformat_alloc_output_context2(&fmt, oformat, 0, "") != 0)
-        return sdp;
+        return QList<QString>();
 
-    sdp = buildSdpFromContext(codec, fmt, payloadType);
+    QList<QString> sdp = getSdpAttributesFromContext(codec, fmt, payloadType);
     avformat_close_input(&fmt);
     avcodec_close(codec);
     av_free(codec);
@@ -198,7 +197,7 @@ QByteArray buildSdpFromMedia(QnConstAbstractMediaDataPtr media, int payloadType)
 QnUniversalRtpEncoder::QnUniversalRtpEncoder(const Config& config, nx::metrics::Storage* metrics):
     m_outputBuffer(CL_MEDIA_ALIGNMENT, 0),
     m_config(config),
-    m_transcoder(metrics)
+    m_transcoder(config, metrics)
 {
 }
 
@@ -208,30 +207,26 @@ void QnUniversalRtpEncoder::buildSdp(
     bool transcoding,
     MediaQuality quality)
 {
-    m_sdp.clear();
+    m_sdpAttributes.clear();
     if (transcoding || !m_isVideo || !m_config.useMultipleSdpPayloadTypes)
     {
         AVCodecContext* codec = m_isVideo
             ? m_transcoder.getVideoCodecContext()
             : m_transcoder.getAudioCodecContext();
-        m_sdp = buildSdpFromContext(codec, m_transcoder.getFormatContext(), m_payloadType);
+        m_sdpAttributes =
+            getSdpAttributesFromContext(codec, m_transcoder.getFormatContext(), m_payloadType);
     }
     else
     {
+        int highPayloadType = m_payloadType;
+        int lowPayloadType = kSecondaryStreamPayloadType;
         if (quality != MEDIA_Quality_High && quality != MEDIA_Quality_ForceHigh)
-        {
-            if (mediaHigh)
-                m_sdp.append(buildSdpFromMedia(mediaHigh, m_payloadType));
-            if (mediaLow)
-                m_sdp.append(buildSdpFromMedia(mediaLow, kSecondaryStreamPayloadType));
-        }
-        else
-        {
-            if (mediaLow)
-                m_sdp.append(buildSdpFromMedia(mediaLow, m_payloadType));
-            if (mediaHigh)
-                m_sdp.append(buildSdpFromMedia(mediaHigh, kSecondaryStreamPayloadType));
-        }
+            std::swap(highPayloadType, lowPayloadType);
+
+        if (mediaHigh)
+            m_sdpAttributes.append(getSdpAttributesFromMedia(mediaHigh, highPayloadType));
+        if (mediaLow)
+            m_sdpAttributes.append(getSdpAttributesFromMedia(mediaLow, lowPayloadType));
         m_useSecondaryPayloadType = true;
     }
 }
@@ -297,15 +292,16 @@ bool QnUniversalRtpEncoder::open(
 
 QString QnUniversalRtpEncoder::getSdpMedia(bool isVideo, int trackId)
 {
+    static const QString kEndl = "\r\n";
     QString sdpMedia;
     QTextStream stream(&sdpMedia);
-    stream << "m=" << (isVideo ? "video " : "audio ") << 0 << " RTP/AVP ";
-    stream << m_payloadType;
+    stream << "m=" << (isVideo ? "video " : "audio ") << 0 << " RTP/AVP " << m_payloadType;
     if (m_useSecondaryPayloadType)
         stream << ' ' << kSecondaryStreamPayloadType;
-    stream << "\r\n";
-    stream << "a=control:trackID=" << trackId << "\r\n";
-    stream << m_sdp;
+    stream << kEndl;
+    stream << "a=control:trackID=" << trackId << kEndl;
+    stream << m_sdpAttributes.join(kEndl);
+    stream << kEndl;
     return sdpMedia;
 }
 
@@ -322,7 +318,8 @@ void QnUniversalRtpEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
 bool QnUniversalRtpEncoder::getNextPacket(QnByteArray& sendBuffer)
 {
     const QVector<int> packets = m_transcoder.getPacketsSize();
-    if (m_outputPos >= (int) m_outputBuffer.size() - RtpHeader::RTP_HEADER_SIZE || m_packetIndex >= packets.size())
+    if (m_outputPos >= (int) m_outputBuffer.size() - nx::streaming::rtp::RtpHeader::kSize ||
+        m_packetIndex >= packets.size())
         return false;
 
     auto timestamps = m_transcoder.getLastPacketTimestamp();

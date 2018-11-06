@@ -3,6 +3,7 @@
 #include <list>
 #include <optional>
 
+#include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/cloud/cloud_connect_version.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/uuid.h>
@@ -43,6 +44,14 @@ public:
     virtual bool parseAttributes(const nx::network::stun::Message& message) override;
 };
 
+#define ConnectRequest_Fields \
+    (destinationHostName)(originatingPeerId)(connectSessionId)(connectionMethods) \
+    (udpEndpointList)(ignoreSourceAddress)(cloudConnectVersion)
+
+QN_FUSION_DECLARE_FUNCTIONS(ConnectRequest, (json), NX_NETWORK_API)
+
+//-------------------------------------------------------------------------------------------------
+
 class NX_NETWORK_API ConnectResponse:
     public StunResponseData
 {
@@ -66,6 +75,12 @@ public:
     virtual void serializeAttributes(nx::network::stun::Message* const message) override;
     virtual bool parseAttributes(const nx::network::stun::Message& message) override;
 };
+
+#define ConnectResponse_Fields \
+    (forwardedTcpEndpointList)(udpEndpointList)(trafficRelayUrl) \
+    (destinationHostFullName)(params)(cloudConnectVersion)
+
+QN_FUSION_DECLARE_FUNCTIONS(ConnectResponse, (json), NX_NETWORK_API)
 
 } // namespace api
 } // namespace hpm

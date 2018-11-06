@@ -11,7 +11,9 @@ NX_UTILS_API std::shared_ptr<AbstractLogger> mainLogger();
 
 NX_UTILS_API bool setMainLogger(std::unique_ptr<AbstractLogger> logger);
 
-NX_UTILS_API bool addLogger(std::unique_ptr<AbstractLogger> logger);
+NX_UTILS_API bool addLogger(
+    std::unique_ptr<AbstractLogger> logger,
+    bool writeLogHeader = true);
 
 /** Every setMainLogger and addLogger calls will fail until unlockConfiguration is called. */
 NX_UTILS_API void lockConfiguration();
@@ -39,21 +41,23 @@ namespace detail {
 class Helper
 {
 public:
-    Helper(): m_level(Level::none), m_tag() {} //< Constructing a helper which does not log anything.
+    Helper() {} //< Constructing a helper which does not log anything.
 
-    Helper(Level level, const Tag& tag): m_level(level), m_tag(std::move(tag))
+    Helper(Level level, const Tag& tag):
+        m_level(level),
+        m_tag(std::move(tag)),
+        m_logger(getLogger(m_tag))
     {
-        m_logger = getLogger(m_tag);
         if (!m_logger->isToBeLogged(m_level, m_tag))
             m_logger.reset();
     }
 
     void log(const QString& message) { m_logger->logForced(m_level, m_tag, message); }
 
-    explicit operator bool() const { return m_logger != nullptr; }
+    explicit operator bool() const { return m_logger.get(); }
 
 protected:
-   const Level m_level;
+   const Level m_level = Level::none;
    const Tag m_tag;
    std::shared_ptr<AbstractLogger> m_logger;
 };
@@ -61,17 +65,9 @@ protected:
 class Stream: public Helper
 {
 public:
-    Stream() {} //< Pre-C++17, the default constructor is not inherited via "using".
     using Helper::Helper;
 
-    ~Stream()
-    {
-        if (!m_logger)
-            return;
-        NX_ASSERT(!m_strings.isEmpty());
-       log(m_strings.join(m_delimiter));
-    }
-
+    Stream() = default;
     Stream(const Stream&) = delete;
     Stream(Stream&&) = default;
     Stream& operator=(const Stream&) = delete;
@@ -83,9 +79,6 @@ public:
         return *this;
     }
 
-    /** Operator logic is reversed to support tricky syntax: if (stream) {} else stream << ... */
-    explicit operator bool() const { return m_logger == nullptr; }
-
     template<typename Value>
     Stream& operator<<(const Value& value)
     {
@@ -94,13 +87,22 @@ public:
         return *this;
     }
 
+    void flush()
+    {
+        if (!m_logger)
+            return;
+
+        NX_ASSERT(!m_strings.isEmpty());
+        log(m_strings.join(m_delimiter));
+        m_logger.reset();
+    }
+
 private:
     QStringList m_strings;
     QString m_delimiter = QStringLiteral(" ");
 };
 
-template<typename Tag>
-Stream makeStream(Level level, const Tag& tag)
+inline Stream makeStream(Level level, const Tag& tag)
 {
     if (level > maxLevel())
         return Stream();
@@ -111,6 +113,7 @@ Stream makeStream(Level level, const Tag& tag)
 
 #define NX_UTILS_LOG_MESSAGE(LEVEL, TAG, ...) do \
 { \
+    struct ScopeTag{}; /*< Used by NX_SCOPE_TAG to get scope from demangled type_info::name(). */ \
     if (static_cast<nx::utils::log::Level>(LEVEL) <= nx::utils::log::maxLevel()) \
     { \
         if (auto helper = nx::utils::log::detail::Helper((LEVEL), (TAG))) \
@@ -119,20 +122,20 @@ Stream makeStream(Level level, const Tag& tag)
 } while (0)
 
 #define NX_UTILS_LOG_STREAM(LEVEL, TAG) \
-    if (auto stream = nx::utils::log::detail::makeStream((LEVEL), (TAG))) {} \
-    else stream /* <<... */
+    for (auto stream = nx::utils::log::detail::makeStream((LEVEL), (TAG)); stream; stream.flush()) \
+        stream /* <<... */
 
 /**
  * Can be used to redirect NX_PRINT to log as following:
  * <pre><code>
  *     #define NX_PRINT NX_UTILS_LOG_STREAM_NO_SPACE( \
- *     nx::utils::log::Level::debug, nx::utils::log::Tag(QStringLiteral("vca_metadata_plugin"))) \
+ *     nx::utils::log::Level::debug, nx::utils::log::Tag(QStringLiteral("vca_analytics_plugin"))) \
  *     << NX_PRINT_PREFIX
  * </code></pre>
  */
 #define NX_UTILS_LOG_STREAM_NO_SPACE(LEVEL, TAG) \
-    if (auto stream = nx::utils::log::detail::makeStream((LEVEL), (TAG))) {} \
-    else stream.setDelimiter(QString()) /* <<... */
+    for (auto stream = nx::utils::log::detail::makeStream((LEVEL), (TAG)); stream; stream.flush()) \
+        stream.setDelimiter(QString()) /* <<... */
 
 #define NX_UTILS_LOG(...) \
     NX_MSVC_EXPAND(NX_GET_15TH_ARG(__VA_ARGS__, \
@@ -141,14 +144,16 @@ Stream makeStream(Level level, const Tag& tag)
         NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, \
         NX_UTILS_LOG_STREAM, args_required)(__VA_ARGS__))
 
-/**
+/*
  * Usage:
- *     NX_<LEVEL>(TAG) << MESSAGE [<< ...]; //< Writes MESSAGE to log if LEVEL and TAG allow.
- *     NX_<LEVEL>(TAG, MESSAGE); //< The same as above, but shorter syntax;
+ *     NX_<LEVEL>(TAG, MESSAGE [, VALUES...]; //< Writes MESSAGE to log if LEVEL and TAG allow.
  *
  * Examples:
+ *     NX_INFO(this, "Expected value %1", value);
+ *     NX_DEBUG(NX_SCOPE_TAG, "Message from a non-member function.");
+ *
+ * Deprecated usage:
  *     NX_ERROR(this) << "Unexpected value" << value;
- *     NX_INFO(this, lm("Expected value %1").arg(value));
  */
 #define NX_ALWAYS(...) NX_UTILS_LOG(nx::utils::log::Level::always, __VA_ARGS__)
 #define NX_ERROR(...) NX_UTILS_LOG(nx::utils::log::Level::error, __VA_ARGS__)
@@ -156,6 +161,9 @@ Stream makeStream(Level level, const Tag& tag)
 #define NX_INFO(...) NX_UTILS_LOG(nx::utils::log::Level::info, __VA_ARGS__)
 #define NX_DEBUG(...) NX_UTILS_LOG(nx::utils::log::Level::debug, __VA_ARGS__)
 #define NX_VERBOSE(...) NX_UTILS_LOG(nx::utils::log::Level::verbose, __VA_ARGS__)
+
+/** Use as a logging tag in functions without "this". */
+#define NX_SCOPE_TAG nx::utils::log::Tag(scopeOfFunction(typeid(ScopeTag), __FUNCTION__))
 
 } // namespace log
 } // namespace utils

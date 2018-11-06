@@ -33,7 +33,7 @@ QString sTemporaryDirectoryPath;
 VmsGatewayFunctionalTest::VmsGatewayFunctionalTest(int flags):
     m_httpPort(0)
 {
-    //starting clean test
+    // Starting clean test.
     if ((flags & doNotReinitialiseSocketGlobals) == 0)
         nx::network::SocketGlobalsHolder::instance()->reinitialize();
     m_testHttpServer = std::make_unique<nx::network::http::TestHttpServer>();
@@ -62,8 +62,9 @@ bool VmsGatewayFunctionalTest::startAndWaitUntilStarted()
     return startAndWaitUntilStarted(true, true, false);
 }
 
-bool VmsGatewayFunctionalTest::startAndWaitUntilStarted(
-    bool allowIpTarget, bool proxyTargetPort, bool connectSupport)
+bool VmsGatewayFunctionalTest::startAndWaitUntilStarted(bool allowIpTarget, bool proxyTargetPort,
+    bool connectSupport, std::optional<std::chrono::seconds> sendTimeout,
+    std::optional<std::chrono::seconds> recvTimeout)
 {
     if (!m_testHttpServer->bindAndListen())
         return false;
@@ -85,6 +86,16 @@ bool VmsGatewayFunctionalTest::startAndWaitUntilStarted(
     {
         addArg("-http/connectSupport");
         addArg("true");
+    }
+
+    if (recvTimeout) {
+        addArg("-tcp/recvTimeout");
+        addArg(std::to_string(recvTimeout->count()).c_str());
+    }
+
+    if (sendTimeout) {
+        addArg("-tcp/sendTimeout");
+        addArg(std::to_string(sendTimeout->count()).c_str());
     }
 
     if (!utils::test::ModuleLauncher<VmsGatewayProcessPublic>::startAndWaitUntilStarted())

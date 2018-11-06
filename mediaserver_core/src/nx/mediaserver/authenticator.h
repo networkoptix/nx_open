@@ -61,6 +61,8 @@ public:
           QString toString() const;
     };
 
+    bool isPasswordCorrect(const Qn::UserAccessData& access, const QString& password);
+
     Result tryAllMethods(
         const nx::network::HostAddress& clientIp,
         const nx::network::http::Request& request,

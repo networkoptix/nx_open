@@ -53,6 +53,7 @@ public:
         bool containsTime(qint64 timeMs) const;
         qint64 getFileSize() const { return ((qint64) fileSizeHi << 32) + fileSizeLo; } // 256Tb as max file size
         void setFileSize(qint64 value) { fileSizeHi = quint16(value >> 32); fileSizeLo = quint32(value); } // 256Tb as max file size
+        bool isInfinite() const { return durationMs == -1; }
 
         QString fileName() const;
 
@@ -289,7 +290,13 @@ public:
     // All information less than detail level is discarded
     typedef std::deque<Chunk> ChunkMap;
 
-    QnTimePeriodList getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel, bool keepSmalChunks, int limit);
+    QnTimePeriodList getTimePeriods(
+        qint64 startTimeMs,
+        qint64 endTimeMs,
+        qint64 detailLevel,
+        bool keepSmalChunks,
+        int limit,
+        Qt::SortOrder sortOrder);
     void close();
 
     QString rootFolder(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog) const;

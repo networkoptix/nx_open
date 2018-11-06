@@ -541,18 +541,7 @@ void QnMediaResourceWidget::initAreaSelectOverlay()
     addOverlayWidget(m_areaSelectOverlayWidget, detail::OverlayParams(Visible, true, true));
 
     connect(m_areaSelectOverlayWidget, &AreaSelectOverlayWidget::selectedAreaChanged,
-        this, &QnMediaResourceWidget::analyticsSearchAreaSelected);
-}
-
-QRectF QnMediaResourceWidget::analyticsSearchRect() const
-{
-    return m_areaSelectOverlayWidget ? m_areaSelectOverlayWidget->selectedArea() : QRectF();
-}
-
-void QnMediaResourceWidget::setAnalyticsSearchRect(const QRectF& value)
-{
-    if (m_areaSelectOverlayWidget)
-        m_areaSelectOverlayWidget->setSelectedArea(value);
+        this, &QnMediaResourceWidget::analyticsSelectionChanged);
 }
 
 void QnMediaResourceWidget::initAreaHighlightOverlay()
@@ -613,7 +602,7 @@ void QnMediaResourceWidget::initStatusOverlayController()
          });
 }
 
-void QnMediaResourceWidget::setAnalyticsSearchModeEnabled(bool enabled)
+void QnMediaResourceWidget::setAnalyticsSelectionEnabled(bool enabled)
 {
     if (!m_areaSelectOverlayWidget)
         return;
@@ -629,6 +618,17 @@ void QnMediaResourceWidget::setAnalyticsSearchModeEnabled(bool enabled)
     {
         m_areaSelectOverlayWidget->clearSelectedArea();
     }
+}
+
+QRectF QnMediaResourceWidget::analyticsSelection() const
+{
+    return m_areaSelectOverlayWidget ? m_areaSelectOverlayWidget->selectedArea() : QRectF();
+}
+
+void QnMediaResourceWidget::setAnalyticsSelection(const QRectF& value)
+{
+    if (m_areaSelectOverlayWidget)
+        m_areaSelectOverlayWidget->setSelectedArea(value); //< May emit analyticsSelectionChanged.
 }
 
 QString QnMediaResourceWidget::overlayCustomButtonText(
@@ -665,7 +665,7 @@ void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr&
     if (!button)
         return;
 
-    const bool buttonEnabled = rule && rule->isScheduleMatchTime(qnSyncTime->currentDateTime())
+    const bool buttonEnabled = (rule && rule->isScheduleMatchTime(qnSyncTime->currentDateTime()))
         || !button->isLive();
 
     if (button->isEnabled() == buttonEnabled)
@@ -2318,6 +2318,8 @@ void QnMediaResourceWidget::at_resource_propertyChanged(
         ensureTwoWayAudioWidget();
     else if (key == Qn::kCombinedSensorsDescriptionParamName)
         updateAspectRatio();
+    else if (key == Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME)
+        updateAspectRatio();
 }
 
 void QnMediaResourceWidget::updateAspectRatio()
@@ -2847,7 +2849,7 @@ void QnMediaResourceWidget::createTriggerIfRelevant(
     configureTriggerButton(button, info, clientSideHandler);
 
     connect(button, &SoftwareTriggerButton::isLiveChanged, this,
-        [this, button, rule]()
+        [this, rule]()
         {
             updateTriggerAvailability(rule);
         });

@@ -1,8 +1,16 @@
-SET FILE=${server_distribution_name}.exe
+SET INSTALLER=${server_distribution_name}.exe
+cd %~dp0
+
+if exist %INSTALLER% (
+    echo Starting "%INSTALLER%"
+) else (
+    echo File "%INSTALLER%" could not be found!
+    exit /b 1
+)
 
 :update
-    start /wait %FILE% /silent /norestart -l %FILE%.log
-    type %FILE%.log %FILE%_000_ServerPackage.log
+    start /wait "%INSTALLER%" /silent /norestart -l "%INSTALLER%.log"
+    type "%INSTALLER%.log" "%INSTALLER%_000_ServerPackage.log"
     exit /b
 
 if "%1" != "" (

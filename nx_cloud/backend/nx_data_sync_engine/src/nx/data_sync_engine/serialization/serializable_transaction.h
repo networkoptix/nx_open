@@ -107,5 +107,15 @@ private:
     Command<typename CommandDescriptor::Data> m_transaction;
 };
 
+//-------------------------------------------------------------------------------------------------
+
+template<typename CommandDescriptor>
+std::unique_ptr<SerializableTransaction<CommandDescriptor>> makeSerializer(
+    Command<typename CommandDescriptor::Data> command)
+{
+    using Serializer = SerializableTransaction<CommandDescriptor>;
+    return std::make_unique<Serializer>(std::move(command));
+}
+
 } // namespace data_sync_engine
 } // namespace nx

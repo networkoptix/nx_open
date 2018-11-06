@@ -11,8 +11,11 @@ class QnCommonModule;
 class QnUniversalRtpEncoder: public AbstractRtspEncoder
 {
 public:
-    struct Config
+    struct Config: DecoderConfig
     {
+        Config() = default;
+        Config(const DecoderConfig& value): DecoderConfig(value) {}
+
         bool absoluteRtcpTimestamps = false;
         bool addOnvifHeaderExtension = false;
         bool useRealTimeOptimization = false;
@@ -45,7 +48,7 @@ private:
 
 private:
     QnByteArray m_outputBuffer;
-    QByteArray m_sdp;
+    QStringList m_sdpAttributes;
     Config m_config;
     bool m_isCurrentPacketSecondaryStream = false;
     bool m_useSecondaryPayloadType = false;

@@ -86,11 +86,11 @@ EventType eventType(const QModelIndex& index)
         : EventType::undefinedEvent;
 }
 
-QnUuid eventSubtype(const QModelIndex& index)
+QString eventSubtype(const QModelIndex& index)
 {
     return index.isValid()
-        ? index.data(EventSubtypeRole).value<QnUuid>()
-        : QnUuid();
+        ? index.data(EventSubtypeRole).toString()
+        : QString();
 }
 
 const int kQueryTimeoutMs = 15000;
@@ -394,9 +394,9 @@ void QnEventLogDialog::updateData()
     const auto actionType = ::actionType(m_actionTypesModel->index(
         ui->actionComboBox->currentIndex(), 0));
 
-    const QnUuid eventSubtype = eventType == EventType::analyticsSdkEvent
+    const QString eventSubtype = eventType == EventType::analyticsSdkEvent
         ? ::eventSubtype(ui->eventComboBox->currentIndex())
-        : QnUuid();
+        : QString();
 
     query(ui->dateRangeWidget->startTimeMs(),
         ui->dateRangeWidget->endTimeMs(),
@@ -425,7 +425,7 @@ void QnEventLogDialog::updateData()
 void QnEventLogDialog::query(qint64 fromMsec,
     qint64 toMsec,
     EventType eventType,
-    const QnUuid& eventSubtype,
+    const QString& eventSubtype,
     ActionType actionType)
 {
     m_requests.clear();

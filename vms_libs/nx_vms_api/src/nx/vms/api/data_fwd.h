@@ -136,6 +136,9 @@ DECLARE_STRUCT_EX(FullInfoData, (ubjson)(json)(xml)(csv_record))
 DECLARE_STRUCT_EX(ModuleInformation, (eq)(ubjson)(json)(xml)(csv_record))
 DECLARE_STRUCT_EX(ModuleInformationWithAddresses, (eq)(ubjson)(json)(xml)(csv_record))
 
+DECLARE_STRUCT_AND_LIST(AnalyticsPluginData)
+DECLARE_STRUCT_AND_LIST(AnalyticsEngineData)
+
 #undef DECLARE_STRUCT
 #undef DECLARE_STRUCT_EX
 #undef DECLARE_STRUCT_AND_LIST

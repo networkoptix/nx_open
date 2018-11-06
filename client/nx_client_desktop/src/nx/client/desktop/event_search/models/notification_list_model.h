@@ -14,7 +14,7 @@ class NotificationListModel: public EventListModel
     using base_type = EventListModel;
 
 public:
-    explicit NotificationListModel(QObject* parent = nullptr);
+    explicit NotificationListModel(QnWorkbenchContext* context, QObject* parent = nullptr);
     virtual ~NotificationListModel() override;
 
     virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;

@@ -15,7 +15,6 @@ extern "C"
 #include <libavcodec/avcodec.h>
 };
 
-#include <nx/streaming/rtp_stream_parser.h>
 #include <nx/streaming/abstract_data_consumer.h>
 #include <utils/media/ffmpeg_helper.h>
 #include <nx/utils/scope_guard.h>
@@ -646,7 +645,8 @@ AbstractRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(
     else
         rotation = res->getProperty(QnMediaResource::rotationKey()).toInt();
 
-    QnUniversalRtpEncoder::Config config;
+    QnUniversalRtpEncoder::Config config(DecoderConfig::fromResource(res));
+
     config.absoluteRtcpTimestamps = d->serverModule->settings().absoluteRtcpTimestamps();
     config.useRealTimeOptimization = d->serverModule->settings().ffmpegRealTimeOptimization();
     QString require = nx::network::http::getHeaderValue(d->request.headers, "Require");
@@ -918,7 +918,9 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeSetup()
             }
         }
     }
-    d->response.headers.insert(nx::network::http::HttpHeader("Transport", transport));
+    nx::network::http::insertOrReplaceHeader(
+        &d->response.headers,
+        nx::network::http::HttpHeader("Transport", transport));
     return nx::network::http::StatusCode::ok;
 }
 
@@ -1135,7 +1137,7 @@ QnRtspFfmpegEncoder* QnRtspConnectionProcessor::createRtspFfmpegEncoder(bool isV
 {
     Q_D(const QnRtspConnectionProcessor);
 
-    QnRtspFfmpegEncoder* result = new QnRtspFfmpegEncoder(commonModule()->metrics());
+    QnRtspFfmpegEncoder* result = new QnRtspFfmpegEncoder(DecoderConfig::fromMediaResource(d->mediaRes), commonModule()->metrics());
     if (isVideo && !d->transcodeParams.isNull())
         result->setDstResolution(d->transcodeParams.resolution, d->transcodeParams.codecId);
     return result;
@@ -1172,7 +1174,9 @@ void QnRtspConnectionProcessor::createPredefinedTracks(QnConstResourceVideoLayou
     }
 
     RtspServerTrackInfoPtr aTrack(new RtspServerTrackInfo());
-    aTrack->setEncoder(AbstractRtspEncoderPtr(new QnRtspFfmpegEncoder(commonModule()->metrics())));
+    aTrack->setEncoder(AbstractRtspEncoderPtr(new QnRtspFfmpegEncoder(
+        DecoderConfig::fromMediaResource(d->mediaRes),
+        commonModule()->metrics())));
     aTrack->clientPort = trackNum*2;
     aTrack->clientRtcpPort = trackNum*2+1;
     d->trackInfo.insert(trackNum, aTrack);

@@ -71,7 +71,6 @@
 
 #include <platform/platform_abstraction.h>
 
-#include <plugins/plugin_manager.h>
 #include <plugins/resource/desktop_camera/desktop_resource_searcher.h>
 #include <plugins/resource/desktop_audio_only/desktop_audio_only_resource.h>
 #if defined(Q_OS_WIN)
@@ -604,9 +603,9 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
 
     if (!startupParams.enforceMediatorEndpoint.isEmpty())
     {
-        nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
+        nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorAddress({
             startupParams.enforceMediatorEndpoint,
-            startupParams.enforceMediatorEndpoint);
+            startupParams.enforceMediatorEndpoint});
     }
 
     if (!startupParams.videoWallGuid.isNull())
@@ -676,8 +675,6 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("file"), QnQtFileStorageResource::instance, true);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("qtfile"), QnQtFileStorageResource::instance);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("layout"), QnLayoutFileStorageResource::instance);
-
-    commonModule->store(new PluginManager());
 
     auto resourceProcessor = commonModule->store(new QnClientResourceProcessor());
 

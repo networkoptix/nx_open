@@ -5,33 +5,51 @@ import pytest
 from netaddr import IPNetwork
 from pathlib2 import Path
 
+from defaults import defaults
+
 
 def pytest_addoption(parser):
     g = parser.getgroup('real camera test')
     g.addoption(
-        '--rct-interface', default='enp3s0', help='Network interface with cameras')
+        '--rct-interface',
+        default=defaults.get('rct_interface'),
+        help="Network interface with cameras, e.g. eth0 or enp7s0.")
     g.addoption(
-        '--rct-network', default='192.168.200.111/24', type=IPNetwork,
-        help='Network interface IP/mask')
+        '--rct-network',
+        default=defaults.get('rct_network'),
+        type=IPNetwork,
+        help=(
+            "Network settings of interface of VM Mediaserver runs on, e.g. 192.168.10.20/28. "
+            "Camera and this VM interface should be in same IP network."))
     g.addoption(
-        '--rct-expected-cameras', default='expected_cameras.yaml', type=_local_file,
-        help='Stage rules for cameras')
+        '--rct-expected-cameras',
+        default=defaults.get('rct_expected_cameras'),
+        type=Path(__file__).parent.joinpath,
+        help="Stage rules for cameras. Find some examples in {}.".format(Path(__file__).parent))
     g.addoption(
-        '--rct-camera-cycle-delay', default='1s', type=_time_delta,
+        '--rct-camera-cycle-delay',
+        default=defaults.get('rct_camera_cycle_delay', '1s'),
+        type=_time_delta,
         help='Delay between test cycles')
     g.addoption(
-        '--rct-server-stage-delay', default='1m', type=_time_delta,
+        '--rct-server-stage-delay',
+        default=defaults.get('rct_server_stage_delay', '1m'),
+        type=_time_delta,
         help='Delay before last server stage')
     g.addoption(
-        '--rct-stage-hard-timeout', default='1h', type=_time_delta,
+        '--rct-stage-hard-timeout',
+        default=defaults.get('rct_stage_hard_timeout', '1h'),
+        type=_time_delta,
         help='Limits stages delay')
     g.addoption(
-        '--rct-camera-filter', default='*', type=lambda f: f.split(','),
+        '--rct-camera-filter',
+        default=defaults.get('rct_camera_filter', '*'),
+        type=lambda f: f.split(','),
         help='Comma separated list of camera names, posix wildcards are supported')
 
 
 RctOptions = namedtuple(
-    'Options',
+    'RctOptions',
     [
         'interface',
         'network',
@@ -49,13 +67,6 @@ def rct_options(request):
     return RctOptions(**{
         name: request.config.getoption('--rct-' + name.replace('_', '-'))
         for name in RctOptions._fields})
-
-
-def _local_file(value):
-    path = Path(value)
-    if not path.is_absolute():
-        path = Path(__file__).parent / path
-    return path
 
 
 def _time_delta(value):

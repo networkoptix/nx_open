@@ -51,22 +51,24 @@ def test_camera_switching_should_be_represented_in_history(artifact_factory, two
     one.api.take_camera(camera_id)
     _logger.info("Start recording to make camera appear in camera history.")
     with one.api.camera_recording(camera_id):
-        wait_for_equal(one.api.camera(camera_id).server, one.api.get_server_id(), timeout_sec=60)
+        # After camera is moved, synchronization shouldn't take long.
+        # History update takes a while. History synchronization does not.
+        wait_for_equal(one.api.camera(camera_id).server, one.api.get_server_id(), timeout_sec=30)
         wait_for_equal(two.api.camera(camera_id).server, one.api.get_server_id(), timeout_sec=5)
         history = [one.api.get_server_id()]
-        wait_for_equal(one.api.camera(camera_id).history, history, timeout_sec=60)
+        wait_for_equal(one.api.camera(camera_id).history, history, timeout_sec=30)
         wait_for_equal(two.api.camera(camera_id).history, history, timeout_sec=5)
         _logger.info("Switch camera to `two`.")
         two.api.take_camera(camera_id)
-        wait_for_equal(one.api.camera(camera_id).server, two.api.get_server_id())
-        wait_for_equal(two.api.camera(camera_id).server, two.api.get_server_id())
+        wait_for_equal(one.api.camera(camera_id).server, two.api.get_server_id(), timeout_sec=30)
+        wait_for_equal(two.api.camera(camera_id).server, two.api.get_server_id(), timeout_sec=5)
         history.append(two.api.get_server_id())
-        wait_for_equal(one.api.camera(camera_id).history, history, timeout_sec=60)
+        wait_for_equal(one.api.camera(camera_id).history, history, timeout_sec=30)
         wait_for_equal(two.api.camera(camera_id).history, history, timeout_sec=5)
         _logger.info("Switch camera back to `one`.")
         one.api.take_camera(camera_id)
-        wait_for_equal(one.api.camera(camera_id).server, one.api.get_server_id())
-        wait_for_equal(two.api.camera(camera_id).server, one.api.get_server_id())
+        wait_for_equal(one.api.camera(camera_id).server, one.api.get_server_id(), timeout_sec=30)
+        wait_for_equal(two.api.camera(camera_id).server, one.api.get_server_id(), timeout_sec=5)
         history.append(one.api.get_server_id())
         wait_for_equal(one.api.camera(camera_id).history, history, timeout_sec=60)
         wait_for_equal(two.api.camera(camera_id).history, history, timeout_sec=5)
@@ -75,7 +77,7 @@ def test_camera_switching_should_be_represented_in_history(artifact_factory, two
     stream_type = 'hls'
     stream = one.api.get_media_stream(stream_type, camera.mac_addr)
     metadata_list = stream.load_archive_stream_metadata(
-        artifact_factory(['stream-media', stream_type]), pos=0, duration=3000)
+        artifact_factory.make_artifact(['stream-media', stream_type]), pos=0, duration=3000)
     assert metadata_list  # Must not be empty
 
     check_media_stream_transports(one)

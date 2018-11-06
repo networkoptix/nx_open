@@ -66,9 +66,10 @@ AVIOContext* QnFfmpegTranscoder::createFfmpegIOContext()
 
 static QAtomicInt QnFfmpegTranscoder_count = 0;
 
-QnFfmpegTranscoder::QnFfmpegTranscoder(nx::metrics::Storage* metrics)
+QnFfmpegTranscoder::QnFfmpegTranscoder(const DecoderConfig& config, nx::metrics::Storage* metrics)
 :
     QnTranscoder(metrics),
+    m_config(config),
     m_videoEncoderCodecCtx(0),
     m_audioEncoderCodecCtx(0),
     m_videoBitrate(0),
@@ -174,7 +175,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
             int videoHeight = video->height;
             if (!video || video->width < 1 || video->height < 1)
             {
-                QnFfmpegVideoDecoder decoder(video->compressionType, video, false);
+                QnFfmpegVideoDecoder decoder(m_config, video->compressionType, video, false);
                 QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
                 decoder.decode(video, &decodedVideoFrame);
                 videoWidth = decoder.getWidth();

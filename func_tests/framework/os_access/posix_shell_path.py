@@ -2,10 +2,9 @@ from abc import ABCMeta, abstractproperty
 from functools import wraps
 
 import parse
-from pathlib2 import PurePosixPath
 
 from framework.os_access import exceptions
-from framework.os_access.path import FileSystemPath
+from framework.os_access.path import BasePosixPath
 from framework.os_access.posix_shell import Shell
 
 
@@ -26,7 +25,7 @@ def _raising_on_exit_status(exit_status_to_error_cls):
     return decorator
 
 
-class PosixShellPath(FileSystemPath, PurePosixPath):
+class PosixShellPath(BasePosixPath):
     """Base class for file system access through SSH
 
     It's the simplest way to integrate with `pathlib` and `pathlib2`.
@@ -51,7 +50,7 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
     def home(cls):
         # Returning `echo ~` output doesn't work since tests may me run in environment with no
         # `$HOME` env var, e.g. under `tox`, where `~` is not expanded by shell.
-        return cls('~').expanduser()
+        return cls(cls._shell.home_dir(cls._shell.current_user_name()))
 
     @classmethod
     def tmp(cls):
@@ -83,14 +82,8 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
         """Expand tilde at the beginning safely (without passing complete path to sh)"""
         if not self.parts[0].startswith('~'):
             return self
-        if self.parts[0] == '~':
-            user_name = self._shell.command(['whoami']).run().rstrip('\n')
-        else:
-            user_name = self.parts[0][1:]
-        output = self._shell.run_command(['getent', 'passwd', user_name])
-        if not output:
-            raise RuntimeError("Can't determine home directory for {!r}".format(user_name))
-        user_home_dir = output.split(':')[5]
+        user_name = self._shell.current_user_name() if self.parts[0] == '~' else self.parts[0][1:]
+        user_home_dir = self._shell.home_dir(user_name)
         return self.__class__(user_home_dir, *self.parts[1:])
 
     @_raising_on_exit_status({2: exceptions.DoesNotExist, 3: exceptions.NotADir})
@@ -107,7 +100,8 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
         paths = [self.__class__(line) for line in lines]
         return paths
 
-    @_raising_on_exit_status({2: exceptions.BadParent, 3: exceptions.AlreadyExists, 4: exceptions.BadParent})
+    @_raising_on_exit_status(
+        {2: exceptions.BadParent, 3: exceptions.AlreadyExists, 4: exceptions.BadParent})
     def mkdir(self, parents=False, exist_ok=False):
         self._shell.run_sh_script(
             # language=Bash
@@ -149,6 +143,22 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
             if not ignore_errors:
                 raise exceptions.NotADir(self)
 
+    @_raising_on_exit_status({
+        2: exceptions.DoesNotExist,
+        3: exceptions.NotADir,
+        4: exceptions.NotEmpty,
+        })
+    def rmdir(self):
+        self._shell.run_sh_script(
+            # language=Bash
+            '''
+                test -e "$SELF" || exit 2
+                test -d "$SELF" || exit 3
+                test "$(find "$SELF" -maxdepth 0 -not -empty)" && exit 4
+                rmdir -- "$SELF"
+                ''',
+            env={'SELF': self})
+
     @_raising_on_exit_status({2: exceptions.DoesNotExist, 3: exceptions.NotAFile})
     def read_bytes(self, offset=None, max_length=None):
         return self._shell.run_sh_script(
@@ -166,7 +176,8 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
             timeout_sec=600,
             )
 
-    @_raising_on_exit_status({2: exceptions.BadParent, 3: exceptions.BadParent, 4: exceptions.NotAFile})
+    @_raising_on_exit_status(
+        {2: exceptions.BadParent, 3: exceptions.BadParent, 4: exceptions.NotAFile})
     def write_bytes(self, contents, offset=None):
         output = self._shell.run_sh_script(
             # language=Bash
@@ -189,17 +200,6 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
         written = int(output) if output else len(contents)
         return written
 
-    def read_text(self, encoding='ascii', errors='strict'):
-        # ASCII encoding is single used encoding in the project.
-        return self.read_bytes().decode(encoding=encoding, errors=errors)
-
-    def write_text(self, text, encoding='ascii', errors='strict'):
-        # ASCII encoding is single used encoding in the project.
-        data = text.encode(encoding=encoding, errors=errors)
-        bytes_written = self.write_bytes(data)
-        assert bytes_written == len(data)
-        return len(text)
-
     def size(self):
         command = self._shell.command(['stat', '--printf=%s\\n%F', self])
         try:
@@ -213,8 +213,22 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
             raise exceptions.NotAFile("{} reports {}".format(command, output))
         return size
 
-    def copy_to(self, destination):
-        self._shell.copy_posix_file_to(self, destination)
+    @_raising_on_exit_status({
+        2: exceptions.BadParent,
+        3: exceptions.BadParent,
+        4: exceptions.AlreadyExists,
+        })
+    def symlink_to(self, target, target_is_directory=False):
+        self._shell.run_sh_script(
+            # language=Bash
+            '''
+                parent="$(dirname "$SELF")"
+                test -e "$parent" || exit 2
+                test -d "$parent" || exit 3
+                test -e "$SELF" && exit 4
+                ln -s "$TARGET" "$SELF"
+                ''',
+            env={'SELF': self, 'TARGET': target},
+            timeout_sec=10,
+            )
 
-    def copy_from(self, source):
-        self._shell.copy_file_from_posix(source, self)

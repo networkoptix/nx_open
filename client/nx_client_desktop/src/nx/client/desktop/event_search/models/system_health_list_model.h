@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QtCore/QScopedPointer>
+#include "abstract_event_list_model.h"
 
-#include <nx/client/desktop/event_search/models/abstract_event_list_model.h>
+#include <QtCore/QScopedPointer>
 
 namespace nx {
 namespace client {
@@ -14,7 +14,7 @@ class SystemHealthListModel: public AbstractEventListModel
     using base_type = AbstractEventListModel;
 
 public:
-    explicit SystemHealthListModel(QObject* parent = nullptr);
+    explicit SystemHealthListModel(QnWorkbenchContext* context, QObject* parent = nullptr);
     virtual ~SystemHealthListModel() override;
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
