@@ -825,34 +825,46 @@ Handle ServerConnection::getUpdateStatus(Result<UpdateStatusAll>::type callback,
 
 Handle ServerConnection::getEngineAnalyticsSettings(
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-    Result<QMap<QString, QString>>::type&& callback,
+    Result<QJsonObject>::type&& callback,
     QThread* targetThread)
 {
-    QnRequestParamList params{{"engineId", engine->getId().toString()}};
-    return executeGet("/ec2/analyticsEngineSettings", params, callback, targetThread);
+    QnRequestParamList params{{"analyticsEngineId", engine->getId().toString()}};
+
+    auto internalCallback =
+        [callback = std::move(callback)](
+            bool success,
+            Handle requestId,
+            const QByteArray& result,
+            const nx::network::http::HttpHeaders& /*headers*/)
+        {
+            callback(success, requestId,
+                 QJson::deserialized<QnJsonRestResult>(result).deserialized<QJsonObject>());
+        };
+
+    return executeGet(
+        "/ec2/analyticsEngineSettings", params, std::move(internalCallback), targetThread);
 }
 
 Handle ServerConnection::setEngineAnalyticsSettings(
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-    const QVariantMap& settings,
-    std::function<void(Handle, bool, const QMap<QString, QString>&)>&& callback,
+    const QJsonObject& settings,
+    std::function<void(bool, Handle, const QJsonObject&)>&& callback,
     QThread* targetThread)
 {
     auto internalCallback =
-        [callback = std::move(callback)](
-            bool success, rest::Handle handle, const QMap<QString, QString>& response)
+        [callback = std::move(callback)](bool success, Handle requestId, const QByteArray& result)
         {
-            callback(handle, success, response);
+            callback(success, requestId,
+                 QJson::deserialized<QnJsonRestResult>(result).deserialized<QJsonObject>());
         };
 
-    return executePost<QMap<QString, QString>>(
+    return executePost<QByteArray>(
         QString("/ec2/analyticsEngineSettings"),
-        QnRequestParamList {
-            {"engineId", engine->getId().toString()},
-            {"settings", QJson::serialized(QJsonObject::fromVariantMap(settings))}
+        QnRequestParamList{
+            {"analyticsEngineId", engine->getId().toString()}
         },
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
-        nx::network::http::StringType(),
+        QJson::serialized(settings),
         std::move(internalCallback),
         targetThread);
 }
@@ -860,39 +872,51 @@ Handle ServerConnection::setEngineAnalyticsSettings(
 Handle ServerConnection::getDeviceAnalyticsSettings(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-    Result<QMap<QString, QString>>::type&& callback,
+    Result<QJsonObject>::type&& callback,
     QThread* targetThread)
 {
     QnRequestParamList params {
         {"deviceId", device->getId().toString()},
-        {"engineId", engine->getId().toString()},
+        {"analyticsEngineId", engine->getId().toString()},
     };
-    return executeGet("/ec2/deviceAnalyticsSettings", params, callback, targetThread);
+
+    auto internalCallback =
+        [callback = std::move(callback)](
+            bool success,
+            Handle requestId,
+            const QByteArray& result,
+            const nx::network::http::HttpHeaders& /*headers*/)
+        {
+            callback(success, requestId,
+                 QJson::deserialized<QnJsonRestResult>(result).deserialized<QJsonObject>());
+        };
+
+    return executeGet(
+        "/ec2/deviceAnalyticsSettings", params, std::move(internalCallback), targetThread);
 }
 
 Handle ServerConnection::setDeviceAnalyticsSettings(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-    const QVariantMap& settings,
-    std::function<void(Handle, bool, const QMap<QString, QString>&)>&& callback,
+    const QJsonObject& settings,
+    std::function<void(bool, Handle, const QJsonObject&)>&& callback,
     QThread* targetThread)
 {
     auto internalCallback =
-        [callback = std::move(callback)](
-            bool success, rest::Handle handle, const QMap<QString, QString>& response)
+        [callback = std::move(callback)](bool success, Handle requestId, const QByteArray& result)
         {
-            callback(handle, success, response);
+            callback(success, requestId,
+                QJson::deserialized<QnJsonRestResult>(result).deserialized<QJsonObject>());
         };
 
-    return executePost<QMap<QString, QString>>(
+    return executePost<QByteArray>(
         QString("/ec2/deviceAnalyticsSettings"),
         QnRequestParamList {
             {"deviceId", device->getId().toString()},
-            {"engineId", engine->getId().toString()},
-            {"settings", QJson::serialized(QJsonObject::fromVariantMap(settings))}
+            {"analyticsEngineId", engine->getId().toString()},
         },
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
-        nx::network::http::StringType(),
+        QJson::serialized(settings),
         std::move(internalCallback),
         targetThread);
 }

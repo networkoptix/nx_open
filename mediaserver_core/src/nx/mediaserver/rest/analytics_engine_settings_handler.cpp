@@ -23,7 +23,6 @@ AnalyticsEngineSettingsHandler::AnalyticsEngineSettingsHandler(QnMediaServerModu
 
 JsonRestResponse AnalyticsEngineSettingsHandler::executeGet(const JsonRestRequest& request)
 {
-    // TODO: #dmishin requireParameter?
     if (!request.params.contains(kAnalyticsEngineIdParameter))
     {
         NX_WARNING(this, "Missing required parameter 'analyticsEngineId'");
@@ -43,7 +42,7 @@ JsonRestResponse AnalyticsEngineSettingsHandler::executeGet(const JsonRestReques
     }
 
     JsonRestResponse response(http::StatusCode::ok);
-    response.json.setReply(variantMapToStringMap(engine->settingsValues()));
+    response.json.setReply(QJsonObject::fromVariantMap(engine->settingsValues()));
     return response;
 }
 
@@ -51,18 +50,7 @@ JsonRestResponse AnalyticsEngineSettingsHandler::executePost(
     const JsonRestRequest& request,
     const QByteArray& body)
 {
-    bool success = false;
-    auto requestJson = QJson::deserialized(body, QJsonObject(), &success);
-
-    if (!success)
-    {
-        NX_WARNING(this, "Can't deserialize request JSON");
-        return makeResponse(QnRestResult::Error::BadRequest, "Unable to deserialize reqeust");
-    }
-
-    // TODO: #dmishin requireParameter?
-    auto parameters = requestJson.toVariantMap();
-    if (!parameters.contains(kAnalyticsEngineIdParameter))
+    if (!request.params.contains(kAnalyticsEngineIdParameter))
     {
         NX_WARNING(this, "Missing required parameter 'analyticsEngineId'");
         return makeResponse(
@@ -70,13 +58,16 @@ JsonRestResponse AnalyticsEngineSettingsHandler::executePost(
             QStringList{kAnalyticsEngineIdParameter});
     }
 
-    if (!parameters.contains(kSettingsParameter))
+    bool success = false;
+    const auto& settings = QJson::deserialized(body, QJsonObject(), &success);
+    if (!success)
     {
-        NX_WARNING(this, "Missing required parameter 'settings'");
-        return makeResponse(QnRestResult::Error::MissingParameter, QStringList{kSettingsParameter});
+        const QString message("Unable to deserialize request");
+        NX_WARNING(this, message);
+        return makeResponse(QnRestResult::Error::BadRequest, message);
     }
 
-    const auto engineId = parameters[kAnalyticsEngineIdParameter].toString();
+    const auto engineId = request.params[kAnalyticsEngineIdParameter];
     auto engine = sdk_support::find<resource::AnalyticsEngineResource>(serverModule(), engineId);
     if (!engine)
     {
@@ -85,12 +76,11 @@ JsonRestResponse AnalyticsEngineSettingsHandler::executePost(
             lm("Unable to find analytics engine with id %1").args(engineId));
     }
 
-    auto settings = parameters[kSettingsParameter].value<QVariantMap>();
-    engine->setSettingsValues(settings);
+    engine->setSettingsValues(settings.toVariantMap());
     engine->saveParams();
 
     JsonRestResponse response(http::StatusCode::ok);
-    response.json.setReply(variantMapToStringMap(engine->settingsValues()));
+    response.json.setReply(QJsonObject::fromVariantMap(engine->settingsValues()));
 
     return response;
 }

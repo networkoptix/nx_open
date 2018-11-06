@@ -10,6 +10,4 @@ JsonRestResponse makeResponse(QnRestResult::Error error, const QString& errorStr
 
 JsonRestResponse makeResponse(QnRestResult::Error error, const QStringList& arguments);
 
-QMap<QString, QString> variantMapToStringMap(const QVariantMap& variantMap);
-
 } // namespace nx::mediaserver::rest

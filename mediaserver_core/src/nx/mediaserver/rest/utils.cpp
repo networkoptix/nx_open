@@ -38,13 +38,4 @@ JsonRestResponse makeResponse(QnRestResult::Error error, const QStringList& argu
     return response;
 }
 
-QMap<QString, QString> variantMapToStringMap(const QVariantMap& variantMap)
-{
-    QMap<QString, QString> result;
-    for (auto itr = variantMap.cbegin(); itr != variantMap.cend(); itr++)
-        result.insert(itr.key(), itr.value().toString());
-
-    return result;
-}
-
 } // namespace nx::mediaserver::rest

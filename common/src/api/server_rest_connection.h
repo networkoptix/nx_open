@@ -417,26 +417,26 @@ public:
 
     Handle getEngineAnalyticsSettings(
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-        Result<QMap<QString, QString>>::type&& callback,
+        Result<QJsonObject>::type&& callback,
         QThread* targetThread = nullptr);
     
     Handle setEngineAnalyticsSettings(
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-        const QVariantMap& settings,
-        std::function<void (Handle, bool, const QMap<QString, QString>&)>&& callback,
+        const QJsonObject& settings,
+        std::function<void (bool, Handle, const QJsonObject&)>&& callback,
         QThread* targetThread = nullptr);
 
     Handle getDeviceAnalyticsSettings(
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-        Result<QMap<QString, QString>>::type&& callback,
+        Result<QJsonObject>::type&& callback,
         QThread* targetThread = nullptr);
 
     Handle setDeviceAnalyticsSettings(
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-        const QVariantMap& settings,
-        std::function<void(Handle, bool, const QMap<QString, QString>&)>&& callback,
+        const QJsonObject& settings,
+        std::function<void(bool, Handle, const QJsonObject&)>&& callback,
         QThread* targetThread = nullptr);
 
     /**
