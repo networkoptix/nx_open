@@ -215,30 +215,39 @@ inline QnTransaction<nx::vms::api::ResourceParamWithRefData> amendTranIfNeeded(
 }
 
 template<typename T>
-void amendOutputDataIfNeeded(T* data)
+void amendOutputDataIfNeeded(const Qn::UserAccessData&, T*)
 {
 }
 
-inline void amendOutputDataIfNeeded(nx::vms::api::ResourceParamData* paramData)
+inline void amendOutputDataIfNeeded(
+    const Qn::UserAccessData& accessData,
+    nx::vms::api::ResourceParamData* paramData)
 {
     if (paramData->name == Qn::CAMERA_CREDENTIALS_PARAM_NAME
     || paramData->name == Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME)
     {
-        paramData->value = nx::utils::decodeStringFromHexStringAES128CBC(paramData->value);
+        auto decryptedValue = nx::utils::decodeStringFromHexStringAES128CBC(paramData->value);
+        if (accessData == Qn::kSystemAccess)
+            paramData->value = decryptedValue;
+        else
+            paramData->value = decryptedValue.replace(QRegExp(":.*$"), ":******");
     }
 }
 
-inline void amendOutputDataIfNeeded(std::vector<nx::vms::api::ResourceParamData>* paramDataList)
+inline void amendOutputDataIfNeeded(
+    const Qn::UserAccessData& accessData,
+    std::vector<nx::vms::api::ResourceParamData>* paramDataList)
 {
     for (auto& paramData: *paramDataList)
-        amendOutputDataIfNeeded(&paramData);
+        amendOutputDataIfNeeded(accessData, &paramData);
 }
 
 inline void amendOutputDataIfNeeded(
+    const Qn::UserAccessData& accessData,
     std::vector<nx::vms::api::ResourceParamWithRefData>* paramWithRefDataList)
 {
     for (auto& paramData: *paramWithRefDataList)
-        amendOutputDataIfNeeded(&paramData);
+        amendOutputDataIfNeeded(accessData, &paramData);
 }
 
 class ServerQueryProcessor
@@ -470,7 +479,7 @@ public:
             {
                 OutputData output;
                 const ErrorCode errorCode = accessDataCopy.doQuery(input, output);
-                amendOutputDataIfNeeded(&output);
+                amendOutputDataIfNeeded(self.m_db.userAccessData(), &output);
                 handler(errorCode, output);
                 self.m_owner->decRunningAsyncOperationsCount();
             });
