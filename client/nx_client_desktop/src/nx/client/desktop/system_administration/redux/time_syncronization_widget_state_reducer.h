@@ -19,6 +19,7 @@ public:
     static Result setReadOnly(State state, bool value);
     static Result setSyncTimeWithInternet(State state, bool value);
     static Result disableSync(State state);
+    static Result selectServer(State state, const QnUuid& serverId);
 
     // Utility methods.
     static State::ServerInfo actualPrimaryServer(const State& state);

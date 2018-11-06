@@ -29,6 +29,12 @@ public:
         ColumnCount
     };
 
+    enum DataRole
+    {
+        IpAddressRole = Qt::UserRole,
+        ServerIdRole,
+    };
+
     explicit TimeSynchronizationServersModel(QObject* parent = nullptr);
 
     virtual int columnCount(const QModelIndex& parent) const override;

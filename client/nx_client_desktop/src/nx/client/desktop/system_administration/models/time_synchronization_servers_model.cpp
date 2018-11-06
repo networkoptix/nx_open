@@ -128,6 +128,19 @@ QVariant TimeSynchronizationServersModel::data(const QModelIndex& index, int rol
             }
             break;
 
+        case Qt::DecorationRole:
+            if (column == NameColumn)
+            {
+                return qnResIconCache->icon(QnResourceIconCache::Server);
+            }
+            break;
+
+        case IpAddressRole:
+            return server.ipAddress;
+
+        case ServerIdRole:
+            return qVariantFromValue(server.id);
+
         default:
             break;
     }

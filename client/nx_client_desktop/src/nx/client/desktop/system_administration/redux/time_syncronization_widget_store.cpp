@@ -64,6 +64,12 @@ void TimeSynchronizationWidgetStore::disableSync()
         [&](State state) { return Reducer::disableSync(std::move(state)); });
 }
 
+void TimeSynchronizationWidgetStore::selectServer(const QnUuid& serverId)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::selectServer(std::move(state), serverId); });
+}
+
 void TimeSynchronizationWidgetStore::setVmsTime(std::chrono::milliseconds value)
 {
     d->executeAction([&](State state) { state.vmsTime = value; return state; });

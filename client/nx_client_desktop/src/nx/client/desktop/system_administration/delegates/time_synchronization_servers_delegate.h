@@ -1,0 +1,31 @@
+#pragma once
+
+#include <QtCore/QObject>
+
+#include <QtWidgets/QStyledItemDelegate>
+
+#include <ui/common/text_pixmap_cache.h>
+
+namespace nx::client::desktop {
+
+class TimeSynchronizationServersDelegate: public QStyledItemDelegate
+{
+    using base_type = QStyledItemDelegate;
+
+public:
+    explicit TimeSynchronizationServersDelegate(QObject* parent = nullptr);
+
+    virtual void paint(
+        QPainter* painter,
+        const QStyleOptionViewItem& styleOption,
+        const QModelIndex& index) const override;
+
+    virtual QSize sizeHint(
+        const QStyleOptionViewItem& option,
+        const QModelIndex& index) const override;
+
+private:
+    mutable QnTextPixmapCache m_textPixmapCache;
+};
+
+} // namespace nx::client::desktop

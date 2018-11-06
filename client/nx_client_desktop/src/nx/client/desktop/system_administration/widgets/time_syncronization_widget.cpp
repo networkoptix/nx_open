@@ -2,7 +2,6 @@
 #include "ui_time_syncronization_widget.h"
 
 #include <QtCore/QTimer>
-#include <QtWidgets/QStyledItemDelegate>
 
 #include <api/global_settings.h>
 #include <common/common_module.h>
@@ -19,7 +18,9 @@
 #include "../redux/time_syncronization_widget_store.h"
 #include "../redux/time_syncronization_widget_state.h"
 #include "../models/time_synchronization_servers_model.h"
+#include "../delegates/time_synchronization_servers_delegate.h"
 #include <ui/style/skin.h>
+#include <core/resource/resource_display_info.h>
 
 namespace nx::client::desktop {
 
@@ -34,7 +35,6 @@ static constexpr int kDateFontPixelSize = 14;
 static constexpr int kDateFontWeight = QFont::Bold;
 static constexpr int kZoneFontPixelSize = 14;
 static constexpr int kZoneFontWeight = QFont::Normal;
-static constexpr int kMinimumDateTimeWidth = 84;
 
 QDateTime dateTimeFromMSecs(std::chrono::milliseconds value)
 {
@@ -48,31 +48,6 @@ QDateTime dateTimeFromMSecs(std::chrono::milliseconds value)
     return result;
 }
 
-class TimeServerDelegate: public QStyledItemDelegate
-{
-    using base_type = QStyledItemDelegate;
-
-public:
-    TimeServerDelegate(QObject* parent = nullptr): base_type(parent) {}
-
-    virtual QSize sizeHint(const QStyleOptionViewItem& option,
-        const QModelIndex& index) const override
-    {
-        QSize size = base_type::sizeHint(option, index);
-        switch (index.column())
-        {
-            case Model::DateColumn:
-            case Model::OsTimeColumn:
-            case Model::VmsTimeColumn:
-                size.setWidth(std::max(size.width(), kMinimumDateTimeWidth));
-                break;
-
-            default:
-                break;
-        }
-        return size;
-    }
-};
 
 } // namespace
 
@@ -95,6 +70,14 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
 
     //connect(m_serversModel, &Model::serverSelected, m_store,
     //    &TimeSynchronizationWidgetStore::selectServer);
+
+    connect(ui->serversTable, &TableView::clicked, this,
+        [this](const QModelIndex& index)
+        {
+            const QnUuid& serverId = index.data(Model::ServerIdRole).value<QnUuid>();
+            if (!serverId.isNull())
+                m_store->selectServer(serverId);
+        });
 
     const auto updateTime =
         [this]
@@ -126,7 +109,7 @@ void TimeSynchronizationWidget::loadDataToUi()
         State::ServerInfo serverInfo;
         serverInfo.id = server->getId();
         serverInfo.name = server->getName();
-        serverInfo.ipAddress = server->getUrl();
+        serverInfo.ipAddress = QnResourceDisplayInfo(server).host();
         serverInfo.online = server->getStatus() == Qn::Online;
         serverInfo.hasInternet = server->getServerFlags().testFlag(
             vms::api::ServerFlag::SF_HasPublicIP);
@@ -166,6 +149,9 @@ void TimeSynchronizationWidget::setupUi()
     ui->setupUi(this);
     setHelpTopic(this, Qn::Administration_TimeSynchronization_Help);
 
+    ui->vmsTimeCaptionLabel->setHint(tr("Time, common and synchronized between all servers. "
+        "Can be different with OS time on any particular server."));
+
     ui->syncWithInternetCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->syncWithInternetCheckBox->setForegroundRole(QPalette::ButtonText);
 
@@ -191,13 +177,16 @@ void TimeSynchronizationWidget::setupUi()
     sortModel->setSourceModel(m_serversModel);
     ui->serversTable->setModel(sortModel);
     ui->serversTable->setProperty(style::Properties::kItemViewRadioButtons, true);
-    ui->serversTable->setItemDelegate(new TimeServerDelegate(this));
+    ui->serversTable->setItemDelegate(new TimeSynchronizationServersDelegate(this));
 
     auto header = ui->serversTable->horizontalHeader();
     header->setSectionResizeMode(QHeaderView::ResizeToContents);
     header->setSectionResizeMode(Model::NameColumn, QHeaderView::Stretch);
     header->setSectionsClickable(false);
-    //ui->serversTable->setItemDelegateForColumn(Model::NameColumn, new QnResourceItemDelegate(this));
+    header->setDefaultAlignment(Qt::AlignLeft);
+
+    auto vheader = ui->serversTable->verticalHeader();
+    vheader->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
 void TimeSynchronizationWidget::loadState(const State& state)
@@ -212,16 +201,16 @@ void TimeSynchronizationWidget::loadState(const State& state)
     switch (state.status)
     {
         case State::Status::synchronizedWithInternet:
-            detailsText = tr("Synchronized with the Internet.");
+            detailsText = tr("Synchronized with the Internet");
             break;
         case State::Status::synchronizedWithSelectedServer:
-            detailsText = tr("Synchronized with the local time at the selected server.");
+            detailsText = tr("Synchronized with the local time at the selected server");
             break;
         case State::Status::notSynchronized:
             detailsText = tr("Not synchronized. Each server uses its own local time.");
             break;
         case State::Status::singleServerLocalTime:
-            detailsText = tr("Equal to the server local time.");
+            detailsText = tr("Equal to the server local time");
             break;
         case State::Status::noInternetConnection:
             detailsText = tr("No Internet connection. Time is not being synchronized.");

@@ -89,6 +89,13 @@
        <number>16</number>
       </property>
       <item>
+       <widget class="nx::client::desktop::LabelWithHint" name="vmsTimeCaptionLabel">
+        <property name="text">
+         <string>VMS Time</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QStackedWidget" name="vmsTimeWidget">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -288,6 +295,11 @@
    <class>nx::client::desktop::InfoBanner</class>
    <extends>QLabel</extends>
    <header location="global">nx/client/desktop/common/widgets/info_banner.h</header>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::LabelWithHint</class>
+   <extends>QLabel</extends>
+   <header location="global">nx/client/desktop/common/widgets/widget_with_hint.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

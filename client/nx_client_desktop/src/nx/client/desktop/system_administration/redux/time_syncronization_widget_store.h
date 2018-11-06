@@ -27,6 +27,8 @@ public:
     void setReadOnly(bool value);
     void setSyncTimeWithInternet(bool value);
     void disableSync();
+    void selectServer(const QnUuid& serverId);
+
     void setVmsTime(std::chrono::milliseconds value);
 
 signals:

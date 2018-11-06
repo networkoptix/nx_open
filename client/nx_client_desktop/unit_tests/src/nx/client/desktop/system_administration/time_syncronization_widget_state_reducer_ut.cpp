@@ -266,8 +266,8 @@ TEST_F(TimeSynchronizationWidgetReducerTest, disableSyncWhenServerSelected)
     ASSERT_EQ(result.status, State::Status::notSynchronized);
 }
 
-// Enabling and disabling internet sync after sync was disabled must keep selected time server.
-TEST_F(TimeSynchronizationWidgetReducerTest, keepOldSelectedServerAfterSyncWasDisabled)
+// Enabling and disabling internet sync after sync was disabled must clear selected time server.
+TEST_F(TimeSynchronizationWidgetReducerTest, clearOldSelectedServerAfterSyncWasDisabled)
 {
     const auto id = QnUuid::createUuid();
     auto state = Reducer::initialize(State(),
@@ -286,14 +286,80 @@ TEST_F(TimeSynchronizationWidgetReducerTest, keepOldSelectedServerAfterSyncWasDi
     State afterEnabled;
     std::tie(changed, afterEnabled) = Reducer::setSyncTimeWithInternet(std::move(afterDisabled), true);
     ASSERT_TRUE(changed);
-    ASSERT_EQ(afterEnabled.lastPrimaryServer, id);
+    ASSERT_TRUE(afterEnabled.lastPrimaryServer.isNull());
     ASSERT_EQ(afterEnabled.status, State::Status::synchronizedWithInternet);
 
     State result;
     std::tie(changed, result) = Reducer::setSyncTimeWithInternet(std::move(afterEnabled), false);
     ASSERT_TRUE(changed);
-    ASSERT_EQ(result.lastPrimaryServer, id);
+    ASSERT_EQ(result.status, State::Status::notSynchronized);
+}
+
+TEST_F(TimeSynchronizationWidgetReducerTest, selectServerWhenInternetSync)
+{
+    const auto id = QnUuid::createUuid();
+    auto state = Reducer::initialize(State(),
+        /*isTimeSynchronizationEnabled*/ true,
+        /*primaryTimeServer*/ QnUuid::createUuid(),
+        /*servers*/ {server(), server(id)});
+
+    bool changed = false;
+    State result;
+    std::tie(changed, result) = Reducer::selectServer(std::move(state), id);
+
+    assertIsActual(result);
+    ASSERT_EQ(result.primaryServer, id);
     ASSERT_EQ(result.status, State::Status::synchronizedWithSelectedServer);
+}
+
+TEST_F(TimeSynchronizationWidgetReducerTest, selectServerWhenWasDisabled)
+{
+    const auto id = QnUuid::createUuid();
+    auto state = Reducer::initialize(State(),
+        /*isTimeSynchronizationEnabled*/ false,
+        /*primaryTimeServer*/ QnUuid(),
+        /*servers*/ {server(), server(id)});
+
+    bool changed = false;
+    State result;
+    std::tie(changed, result) = Reducer::selectServer(std::move(state), id);
+
+    assertIsActual(result);
+    ASSERT_EQ(result.primaryServer, id);
+    ASSERT_EQ(result.status, State::Status::synchronizedWithSelectedServer);
+}
+
+// Selecting invalid server must sync the system with the Internet.
+TEST_F(TimeSynchronizationWidgetReducerTest, selectInvalidServer)
+{
+    const auto id = QnUuid::createUuid();
+    auto state = Reducer::initialize(State(),
+        /*isTimeSynchronizationEnabled*/ true,
+        /*primaryTimeServer*/ QnUuid::createUuid(),
+        /*servers*/ {server(), server()});
+
+    bool changed = false;
+    State result;
+    std::tie(changed, result) = Reducer::selectServer(std::move(state), id);
+
+    assertIsActual(result);
+    ASSERT_TRUE(result.primaryServer.isNull());
+    ASSERT_EQ(result.status, State::Status::synchronizedWithInternet);
+}
+
+TEST_F(TimeSynchronizationWidgetReducerTest, selectServerTwice)
+{
+    const auto id = QnUuid::createUuid();
+
+    auto state = Reducer::initialize(State(),
+        /*isTimeSynchronizationEnabled*/ true,
+        /*primaryTimeServer*/ id,
+        /*servers*/ {server(id), server()});
+
+    bool changed = false;
+    State result;
+    std::tie(changed, result) = Reducer::selectServer(std::move(state), id);
+    ASSERT_FALSE(changed);
 }
 
 } // namespace test
