@@ -2120,6 +2120,8 @@ void MediaServerProcess::registerRestHandlers(
      * %permissions Administrator.
      * %param[opt]:string systemName System display name. It affects all servers in the system.
      * %param[opt]:integer port Server API port. It affects the current server only.
+     * %param[opt]:string password Set new admin password.
+     * %param[opt]:string currentPassword Required if new admin password is provided.
      * %return JSON with error code, error string, and flag "restartNeeded" that shows whether the
      *     server must be restarted to apply settings. Error string contains a hint to identify the
      *     problem: "SYSTEM_NAME" or "PORT".
@@ -2132,6 +2134,7 @@ void MediaServerProcess::registerRestHandlers(
      * be called either via GET or POST method. POST data should be a json object.
      * %permissions Administrator.
      * %param[opt]:string password Set new admin password after detach.
+     * %param[opt]:string currentPassword Required if new admin password is provided.
      * %return JSON result with error code
      */
     reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(serverModule(), cloudManagerGroup), kAdmin);
