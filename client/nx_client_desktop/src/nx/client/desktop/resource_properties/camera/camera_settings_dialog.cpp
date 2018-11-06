@@ -21,6 +21,7 @@
 #include "redux/camera_settings_dialog_store.h"
 #include "utils/camera_settings_dialog_state_conversion_functions.h"
 #include "utils/license_usage_provider.h"
+#include "utils/device_agent_settings_adaptor.h"
 #include "watchers/camera_settings_license_watcher.h"
 #include "watchers/camera_settings_readonly_watcher.h"
 #include "watchers/camera_settings_analytics_engines_watcher.h"
@@ -53,6 +54,7 @@ struct CameraSettingsDialog::Private
     QnVirtualCameraResourceList cameras;
     QPointer<QnCamLicenseUsageHelper> licenseUsageHelper;
     QSharedPointer<CameraThumbnailManager> previewManager;
+    QPointer<DeviceAgentSettingsAdaptor> deviceAgentSettingsAdaptor;
 
     Private(CameraSettingsDialog* q): q(q) {}
 
@@ -70,6 +72,8 @@ struct CameraSettingsDialog::Private
             if (!licenseUsageHelper->canEnableRecording(cameras))
                 store->setRecordingEnabled(false);
         }
+
+        deviceAgentSettingsAdaptor->applySettings();
 
         store->applyChanges();
         const auto& state = store->state();
@@ -184,6 +188,8 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     d->previewManager->setThumbnailSize(QSize(0, 0));
     d->previewManager->setAutoRefresh(false);
 
+    d->deviceAgentSettingsAdaptor = new DeviceAgentSettingsAdaptor(d->store, this);
+
     new CameraSettingsGlobalSettingsWatcher(d->store, this);
     new CameraSettingsGlobalPermissionsWatcher(d->store, this);
 
@@ -229,11 +235,18 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         new CameraWebPageWidget(d->store, ui->tabWidget),
         tr("Web Page"));
 
+    const auto analyticsSettingsWidget = new CameraAnalyticsSettingsWidget(
+        d->store, qnClientCoreModule->mainQmlEngine(), ui->tabWidget);
     addPage(
         int(CameraSettingsTab::analytics),
-        new CameraAnalyticsSettingsWidget(
-            d->store, qnClientCoreModule->mainQmlEngine(), ui->tabWidget),
+        analyticsSettingsWidget,
         tr("Analytics"));
+    connect(analyticsSettingsWidget, &CameraAnalyticsSettingsWidget::currentEngineIdChanged, this,
+        [this](const QnUuid& engineId)
+        {
+            if (!engineId.isNull())
+                d->deviceAgentSettingsAdaptor->refreshSettings(engineId);
+        });
 
     addPage(
         int(CameraSettingsTab::expert),
@@ -313,7 +326,8 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
         !force
         && isVisible()
         && d->cameras != cameras
-        && d->hasChanges();
+        && (d->hasChanges()
+            || d->store->state().analytics.loading);
 
     if (askConfirmation)
     {
@@ -331,14 +345,15 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
         }
     }
 
+    const auto singleCamera = cameras.size() == 1 ? cameras.first() : QnVirtualCameraResourcePtr();
+
     d->cameras = cameras;
     d->resetChanges();
     d->licenseWatcher->setCameras(cameras);
     d->readOnlyWatcher->setCameras(cameras);
     d->wearableStateWatcher->setCameras(cameras);
-    d->previewManager->selectCamera(cameras.size() == 1
-        ? cameras.front()
-        : QnVirtualCameraResourcePtr());
+    d->previewManager->selectCamera(singleCamera);
+    d->deviceAgentSettingsAdaptor->setCamera(singleCamera);
 
     d->handleCamerasWithDefaultPasswordChanged();
     return true;

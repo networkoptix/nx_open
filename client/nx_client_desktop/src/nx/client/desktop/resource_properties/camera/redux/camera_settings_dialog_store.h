@@ -87,9 +87,13 @@ public:
     void setAnalyticsEngines(const QList<AnalyticsEngineInfo>& value);
     Q_INVOKABLE QVariantList enabledAnalyticsEngines() const;
     void setEnabledAnalyticsEngines(const QSet<QnUuid>& value);
+    Q_INVOKABLE bool analyticsSettingsLoading() const;
+    void setAnalyticsSettingsLoading(bool value);
     Q_INVOKABLE void setEnabledAnalyticsEngines(const QVariantList& value);
     Q_INVOKABLE QVariantMap deviceAgentSettingsValues(const QnUuid& engineId) const;
     Q_INVOKABLE void setDeviceAgentSettingsValues(
+        const QnUuid& engineId, const QVariantMap& values);
+    void resetDeviceAgentSettingsValues(
         const QnUuid& engineId, const QVariantMap& values);
 
     void setWearableMotionDetectionEnabled(bool value);

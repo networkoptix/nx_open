@@ -2,6 +2,8 @@
 
 #include <QtQuickWidgets/QQuickWidget>
 
+#include <nx/utils/uuid.h>
+
 namespace nx::client::desktop {
 
 struct CameraSettingsDialogState;
@@ -18,6 +20,12 @@ public:
         CameraSettingsDialogStore* store,
         QQmlEngine* engine,
         QWidget* parent = nullptr);
+
+signals:
+    void currentEngineIdChanged(const QnUuid& engineId);
+
+private slots:
+    void onCurrentEngineIdChanged();
 };
 
 } // namespace nx::client::desktop

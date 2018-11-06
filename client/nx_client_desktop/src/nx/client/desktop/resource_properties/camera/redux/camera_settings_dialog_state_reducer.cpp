@@ -601,9 +601,6 @@ State CameraSettingsDialogStateReducer::loadCameras(
             false);
 
         state.analytics.enabledEngines.setBase(firstCamera->enabledAnalyticsEngines());
-        const auto& values = firstCamera->deviceAgentSettingsValues();
-        for (auto it = values.begin(); it != values.end(); ++it)
-            state.analytics.settingsValuesByEngineId[it.key()].setBase(it.value());
     }
 
     state.recording.enabled = {};
@@ -1320,6 +1317,12 @@ State CameraSettingsDialogStateReducer::setAnalyticsEngines(
     return state;
 }
 
+State CameraSettingsDialogStateReducer::setAnalyticsSettingsLoading(State state, bool value)
+{
+    state.analytics.loading = value;
+    return state;
+}
+
 State CameraSettingsDialogStateReducer::setEnabledAnalyticsEngines(
     State state, const QSet<QnUuid>& value)
 {
@@ -1346,6 +1349,14 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsV
     storedValues.setUser(values);
     state.hasChanges = true;
 
+    return std::make_pair(true, std::move(state));
+}
+
+std::pair<bool, State> CameraSettingsDialogStateReducer::resetDeviceAgentSettingsValues(
+    State state, const QnUuid& engineId, const QVariantMap& values)
+{
+    state.analytics.settingsValuesByEngineId[engineId].setBase(values);
+    state.analytics.settingsValuesByEngineId[engineId].resetUser();
     return std::make_pair(true, std::move(state));
 }
 
