@@ -19,10 +19,11 @@
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/utils/managed_camera_set.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/algorithm/merge_sorted_lists.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/algorithm/merge_sorted_lists.h>
+#include <nx/utils/log/log_message.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/event/event_fwd.h>
 
@@ -113,9 +114,9 @@ QVariant MotionSearchListModel::Private::data(const QModelIndex& index, int role
             if (!ini().showDebugTimeInformationInRibbon)
                 return QString();
 
-            return QString("Begin: %1<br>End: %2")
-                .arg(utils::timestampToDebugString(chunk.period.startTimeMs))
-                .arg(utils::timestampToDebugString(chunk.period.endTimeMs()));
+            return lm("Begin: %1<br>End: %2").args( //< Not translatable debug string.
+                utils::timestampToDebugString(chunk.period.startTimeMs),
+                utils::timestampToDebugString(chunk.period.endTimeMs()));
         }
 
         case Qn::PreviewTimeRole:
