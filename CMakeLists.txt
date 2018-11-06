@@ -233,7 +233,7 @@ if(withTrayTool)
     add_subdirectory(traytool)
 endif()
 
-add_subdirectory(client)
+add_subdirectory(vms)
 
 if(withNxTool)
     add_subdirectory(nxtool)

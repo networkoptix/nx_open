@@ -67,16 +67,6 @@ struct QnScheduleTask
     bool isEmpty() const { return startTime == 0 && endTime == 0; }
 };
 
-namespace nx {
-namespace client {
-namespace desktop {
-
-using ScheduleTasks = QnScheduleTaskList;
-
-} // namespace desktop
-} // namespace client
-} // namespace nx
-
 Q_DECLARE_TYPEINFO(QnScheduleTask, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(QnScheduleTask)
 Q_DECLARE_METATYPE(QnScheduleTaskList)
