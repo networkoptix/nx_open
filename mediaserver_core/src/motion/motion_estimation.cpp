@@ -11,7 +11,7 @@
 #include <utils/media/sse_helper.h>
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
-
+#include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/utils/log/log.h>
 
 // TODO: #Elric move to config?
@@ -1031,7 +1031,10 @@ CLConstVideoDecoderOutputPtr QnMotionEstimation::decodeFrame(const QnCompressedV
         NX_VERBOSE(this) << lm("Recreating decoder, old codec_id: %1")
             .arg(!m_decoder ? -1 : m_decoder->getContext()->codec_id);
         delete m_decoder;
-        m_decoder = new QnFfmpegVideoDecoder(frame->compressionType, frame, /*mtDecoding*/ false);
+        DecoderConfig config;
+        if (frame && frame->dataProvider)
+            config = DecoderConfig::fromResource(frame->dataProvider->getResource());
+        m_decoder = new QnFfmpegVideoDecoder(config, frame->compressionType, frame, /*mtDecoding*/ false);
     }
 
     m_decoder->getContext()->flags &= ~CODEC_FLAG_GRAY; //< Turn off Y-only mode.
@@ -1054,7 +1057,10 @@ bool QnMotionEstimation::analyzeFrame(const QnCompressedVideoDataPtr& frame,
     if (!m_decoder || m_decoder->getContext()->codec_id != frame->compressionType)
     {
         delete m_decoder;
-        m_decoder = new QnFfmpegVideoDecoder(frame->compressionType, frame, /*mtDecoding*/ false);
+        DecoderConfig config;
+        if (frame && frame->dataProvider)
+            config = DecoderConfig::fromResource(frame->dataProvider->getResource());
+        m_decoder = new QnFfmpegVideoDecoder(config, frame->compressionType, frame, /*mtDecoding*/ false);
     }
 
     // Turn on Y-only mode if the decoded frame was not requested from this function.

@@ -266,7 +266,7 @@ int QnMultiserverChunksRestHandler::executeGet(
 
         if (request.format == Qn::CompressedPeriodsFormat)
         {
-            result = QnCompressedTime::serialized(timePeriodList, false);
+            result = QnCompressedTime::serialized(timePeriodList, request.sortOrder == Qt::SortOrder::DescendingOrder);
             contentType = Qn::serializationFormatToHttpContentType(Qn::CompressedPeriodsFormat);
         }
         else
@@ -282,7 +282,7 @@ int QnMultiserverChunksRestHandler::executeGet(
 
         if (request.format == Qn::CompressedPeriodsFormat)
         {
-            result = QnCompressedTime::serialized(outputData, false);
+            result = QnCompressedTime::serialized(outputData, request.sortOrder == Qt::SortOrder::DescendingOrder);
             contentType = Qn::serializationFormatToHttpContentType(Qn::CompressedPeriodsFormat);
         }
         else

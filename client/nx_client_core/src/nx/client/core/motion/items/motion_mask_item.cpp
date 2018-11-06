@@ -69,7 +69,9 @@ public:
             texture.reset(window->createTextureFromImage(image));
             texture->setHorizontalWrapMode(QSGTexture::ClampToEdge);
             texture->setVerticalWrapMode(QSGTexture::ClampToEdge);
-            provider->updateTexture(texture.data());
+
+            if (provider)
+                provider->updateTexture(texture.data());
 
             textureDirty = false;
         }

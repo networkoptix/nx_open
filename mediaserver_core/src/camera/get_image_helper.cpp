@@ -224,7 +224,8 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
     if (!video)
         return CLVideoDecoderOutputPtr();
 
-    QnFfmpegVideoDecoder decoder(video->compressionType, video, /*mtDecoding*/ false);
+    QnFfmpegVideoDecoder decoder(
+        DecoderConfig::fromResource(resource), video->compressionType, video, false);
     bool gotFrame = false;
 
     if (!isArchiveVideoPacket)
@@ -272,7 +273,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromCaches(
     if (videoSequence)
     {
         NX_VERBOSE(kLogTag) << logPrefix << "Got from GopKeeper";
-        return decodeFrameSequence(videoSequence, timestampUs);
+        return decodeFrameSequence(camera->resource(), videoSequence, timestampUs);
     }
 
     // Try liveCache.
@@ -295,7 +296,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromLiveCache(
     if (!gopFrames)
         return CLVideoDecoderOutputPtr();
 
-    if (auto decodedFrame = decodeFrameSequence(gopFrames, timestampUs))
+    if (auto decodedFrame = decodeFrameSequence(camera->resource(), gopFrames, timestampUs))
         return decodedFrame;
 
     NX_VERBOSE(kLogTag) << lm("%1(): WARNING: liveCache decoding failed");
@@ -587,6 +588,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
 }
 
 CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameSequence(
+    const QnResourcePtr& resource,
     std::unique_ptr<QnConstDataPacketQueue>& sequence, quint64 timestampUs) const
 {
     if (!sequence || sequence->isEmpty())
@@ -600,7 +602,9 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameSequence(
         return CLVideoDecoderOutputPtr();
 
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
-    QnFfmpegVideoDecoder decoder(firstFrame->compressionType, firstFrame, false);
+    QnFfmpegVideoDecoder decoder(
+        DecoderConfig::fromResource(resource),
+        firstFrame->compressionType, firstFrame, false);
     for (int i = 0; i < randomAccess.size(); ++i)
     {
         auto frame = std::dynamic_pointer_cast<const QnCompressedVideoData>(randomAccess.at(i));

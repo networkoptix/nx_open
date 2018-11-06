@@ -19,7 +19,7 @@
 #include <nx/utils/random.h>
 
 FileTranscoder::FileTranscoder(nx::metrics::Storage* metrics):
-    m_transcoder(metrics),
+    m_transcoder(DecoderConfig(), metrics),
     m_resultCode( 0 ),
     m_state( sInit ),
     m_transcodeDurationLimit( 0 ),

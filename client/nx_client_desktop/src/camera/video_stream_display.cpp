@@ -10,7 +10,6 @@ extern "C" {
 #include <client/client_settings.h>
 #include <core/resource/param.h>
 #include <common/static_common_module.h>
-#include <core/resource_management/resource_data_pool.h>
 #include <core/resource/security_cam_resource.h>
 
 #include "decoders/video/abstract_video_decoder.h"
@@ -399,25 +398,6 @@ void QnVideoStreamDisplay::calcSampleAR(QSharedPointer<CLVideoDecoderOutput> out
     }
 }
 
-std::set<AVCodecID> QnVideoStreamDisplay::getDisabledMtCodecs()
-{
-    std::set<AVCodecID> disabledMtCodecs;
-    auto secResource = m_resource.dynamicCast<QnSecurityCamResource>();
-    if (secResource)
-    {
-        QList<QString> codecList =
-            secResource->resourceData().value<QList<QString>>(Qn::kDisableMultiThreadDecoding);
-        for(auto& codecName: codecList)
-        {
-            const AVCodecDescriptor* codecDescr =
-                avcodec_descriptor_get_by_name(codecName.toLatin1().data());
-            if (codecDescr)
-                disabledMtCodecs.insert(codecDescr->id);
-        }
-    }
-    return disabledMtCodecs;
-}
-
 QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompressedVideoDataPtr data, bool draw, QnFrameScaler::DownscaleFactor force_factor)
 {
     updateRenderList();
@@ -474,12 +454,10 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     }
 
     if (needReinitDecoders) {
-        std::set<AVCodecID> disabledMtCodecs = getDisabledMtCodecs();
         QnMutexLocker lock(&m_mtx);
         auto iter = m_decoder.begin();
         while (iter != m_decoder.end()) {
-            if (disabledMtCodecs.find(iter.key()) == disabledMtCodecs.end())
-                iter.value()->setMTDecoding(enableFrameQueue);
+            iter.value()->setMTDecoding(enableFrameQueue);
             ++iter;
         }
     }
@@ -500,6 +478,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         static QAtomicInt swDecoderCount = 0;
 
         dec = new QnFfmpegVideoDecoder(
+            DecoderConfig::fromMediaResource(m_resource),
             data->compressionType, data, /*mtDecoding*/ enableFrameQueue, &swDecoderCount);
 
         dec->setSpeed( m_speed );
