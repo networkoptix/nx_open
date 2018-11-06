@@ -62,8 +62,8 @@ private:
 
     QnMediaServerResourcePtr m_server;
 
-    QnRecordingStatsModel* m_model;
-    QnRecordingStatsModel* m_forecastModel;
+    QnRecordingStatsModel* m_model = nullptr;
+    QnRecordingStatsModel* m_forecastModel = nullptr;
     int m_spaceRequestHandle = -1; //< Request handle for storage space information.
     struct StatsRequest
     {
@@ -74,9 +74,9 @@ private:
     bool m_updating = false;
     bool m_dirty = false;
 
-    QAction* m_selectAllAction;
-    QAction* m_exportAction;
-    QAction* m_clipboardAction;
+    QAction* m_selectAllAction = nullptr;
+    QAction* m_exportAction = nullptr;
+    QAction* m_clipboardAction = nullptr;
     Qt::MouseButton m_lastMouseButton = Qt::NoButton;
 
     // Map from averaging period to recording stats.
@@ -108,12 +108,12 @@ private:
     virtual void showEvent(QShowEvent*) override; //< Resizes columns when shown.
 
 private slots:
-    void at_receivedStats(int status, const QnRecordingStatsReply& data, int requestNum);
-    void at_receivedSpaceInfo(int status, const QnStorageSpaceReply& data, int requestNum);
-    void at_eventsGrid_customContextMenuRequested(const QPoint&);
-    void at_clipboardAction_triggered();
-    void at_exportAction_triggered();
-    void at_mouseButtonRelease(QObject*, QEvent* event);
-    void at_forecastParamsChanged();
-    void at_averagingPeriodChanged();
+    void atReceivedStats(int status, const QnRecordingStatsReply& data, int requestNum);
+    void atReceivedSpaceInfo(int status, const QnStorageSpaceReply& data, int requestNum);
+    void atEventsGrid_customContextMenuRequested(const QPoint&);
+    void atClipboardAction_triggered();
+    void atExportAction_triggered();
+    void atMouseButtonRelease(QObject*, QEvent* event);
+    void atForecastParamsChanged();
+    void atAveragingPeriodChanged();
 };

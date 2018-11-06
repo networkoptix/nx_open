@@ -119,22 +119,22 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     ui->averagingPeriodCombobox->setCurrentIndex(1); // 5 min.
 
     connect(ui->averagingPeriodCombobox, qOverload<int>(&QComboBox::currentIndexChanged),
-        this, [this](int) { at_averagingPeriodChanged(); });
+        this, [this](int) { atAveragingPeriodChanged(); });
 
     connect(m_clipboardAction, &QAction::triggered,
-        this, &QnStorageAnalyticsWidget::at_clipboardAction_triggered);
+        this, &QnStorageAnalyticsWidget::atClipboardAction_triggered);
 
     connect(m_exportAction, &QAction::triggered,
-        this, &QnStorageAnalyticsWidget::at_exportAction_triggered);
+        this, &QnStorageAnalyticsWidget::atExportAction_triggered);
 
     connect(refreshButton, &QAbstractButton::clicked,
         this, [this] { clearCache(); updateDataFromServer(); });
 
     connect(ui->extraSpaceSlider, &QSlider::valueChanged,
-        this, &QnStorageAnalyticsWidget::at_forecastParamsChanged);
+        this, &QnStorageAnalyticsWidget::atForecastParamsChanged);
 
     connect(ui->extraSizeSpinBox, QnDoubleSpinBoxValueChanged,
-        this, &QnStorageAnalyticsWidget::at_forecastParamsChanged);
+        this, &QnStorageAnalyticsWidget::atForecastParamsChanged);
 
     connect(m_selectAllAction, &QAction::triggered,
         this, [this]() { currentTable()->selectAll(); });
@@ -190,12 +190,12 @@ void QnStorageAnalyticsWidget::setupTableView(TableView* table, QAbstractItemMod
     m_clipboardAction->setShortcut(QKeySequence::Copy);
 
     installEventHandler(table->viewport(), QEvent::MouseButtonRelease,
-        this, &QnStorageAnalyticsWidget::at_mouseButtonRelease);
+        this, &QnStorageAnalyticsWidget::atMouseButtonRelease);
 
     table->addAction(m_clipboardAction);
     table->addAction(m_exportAction);
 
-    connect(table, &QTableView::customContextMenuRequested, this, &QnStorageAnalyticsWidget::at_eventsGrid_customContextMenuRequested);
+    connect(table, &QTableView::customContextMenuRequested, this, &QnStorageAnalyticsWidget::atEventsGrid_customContextMenuRequested);
 }
 
 QnMediaServerResourcePtr QnStorageAnalyticsWidget::server() const
@@ -295,7 +295,7 @@ bool QnStorageAnalyticsWidget::requestsInProgress() const
         || m_spaceRequestHandle != -1;
 }
 
-void QnStorageAnalyticsWidget::at_receivedStats(int status, const QnRecordingStatsReply& data,
+void QnStorageAnalyticsWidget::atReceivedStats(int status, const QnRecordingStatsReply& data,
     int requestNum)
 {
     StatsRequest*  request;
@@ -322,7 +322,7 @@ void QnStorageAnalyticsWidget::at_receivedStats(int status, const QnRecordingSta
     processRequestFinished();
 }
 
-void QnStorageAnalyticsWidget::at_receivedSpaceInfo(int status, const QnStorageSpaceReply& data,
+void QnStorageAnalyticsWidget::atReceivedSpaceInfo(int status, const QnStorageSpaceReply& data,
     int requestNum)
 {
     if (m_spaceRequestHandle != requestNum)
@@ -375,11 +375,11 @@ void QnStorageAnalyticsWidget::processRequestFinished()
 
     ui->statsTable->setDisabled(false);
     ui->forecastTable->setDisabled(false);
-    at_forecastParamsChanged();
+    atForecastParamsChanged();
     setCursor(Qt::ArrowCursor);
 }
 
-void QnStorageAnalyticsWidget::at_eventsGrid_customContextMenuRequested(const QPoint&)
+void QnStorageAnalyticsWidget::atEventsGrid_customContextMenuRequested(const QPoint&)
 {
     auto table = currentTable();
 
@@ -418,17 +418,17 @@ void QnStorageAnalyticsWidget::at_eventsGrid_customContextMenuRequested(const QP
     QnHiDpiWorkarounds::showMenu(menu.data(), QCursor::pos());
 }
 
-void QnStorageAnalyticsWidget::at_exportAction_triggered()
+void QnStorageAnalyticsWidget::atExportAction_triggered()
 {
     QnTableExportHelper::exportToFile(currentTable(), true, this, tr("Export selected events to file"));
 }
 
-void QnStorageAnalyticsWidget::at_clipboardAction_triggered()
+void QnStorageAnalyticsWidget::atClipboardAction_triggered()
 {
     QnTableExportHelper::copyToClipboard(currentTable());
 }
 
-void QnStorageAnalyticsWidget::at_mouseButtonRelease(QObject*, QEvent* event)
+void QnStorageAnalyticsWidget::atMouseButtonRelease(QObject*, QEvent* event)
 {
     QMouseEvent* me = dynamic_cast<QMouseEvent*> (event);
     m_lastMouseButton = me->button();
@@ -464,7 +464,7 @@ int QnStorageAnalyticsWidget::bytesToSliderPosition(qint64 value) const
     return idx * kTicksPerInterval + value / step;
 }
 
-void QnStorageAnalyticsWidget::at_forecastParamsChanged()
+void QnStorageAnalyticsWidget::atForecastParamsChanged()
 {
     if (m_updating)
         return;
@@ -493,7 +493,7 @@ void QnStorageAnalyticsWidget::at_forecastParamsChanged()
     ui->forecastTable->setEnabled(true);
 }
 
-void QnStorageAnalyticsWidget::at_averagingPeriodChanged()
+void QnStorageAnalyticsWidget::atAveragingPeriodChanged()
 {
     // Request data from server if not in cache.
     if (!m_recordingsStatData.contains(currentForecastAveragingPeriod()))
@@ -501,7 +501,7 @@ void QnStorageAnalyticsWidget::at_averagingPeriodChanged()
     else
     {
         m_forecastModel->setModelData(filterStatsReply(m_recordingsStatData[currentForecastAveragingPeriod()]));
-        at_forecastParamsChanged();
+        atForecastParamsChanged();
     }
 }
 
