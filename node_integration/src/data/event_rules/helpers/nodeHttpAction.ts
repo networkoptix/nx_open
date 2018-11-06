@@ -35,9 +35,10 @@ export class NodeHttpAction extends HttpAction {
     }
 
     /**
-     * Allows you to provide a route parameter and callback function. Then it adds the callback function
-     * to the default route handler with the route parameter as a key on the express server.
-     * @param {string} routeParam The route parameter for the default route handler on the express server.
+     * Allows you to provide a route parameter and callback function. Then it adds the callback
+     * function to the default route handler with the route parameter as a key on the express server.
+     * @param {string} routeParam The route parameter for the default route handler
+     *     on the express server.
      * @param callback The callback function that executes for the express route.
      */
     public configDefaultHandler(routeParam: string, callback: any) {

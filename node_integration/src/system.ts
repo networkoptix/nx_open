@@ -25,7 +25,8 @@ export class System extends MediaserverApi {
      * @param {{[p: string]: string}} configRules Rules from the config file.
      * @constructor
      */
-    constructor(systemUrl: string, username: string, password: string, configRules: { [key: string]: string }) {
+    constructor(systemUrl: string, username: string, password: string,
+                configRules: { [key: string]: string }) {
         super(systemUrl, username, password);
         this.ruleManager = new EventRuleManager({ configRules });
         this.cameras = this.getCameras();
