@@ -828,21 +828,18 @@ Handle ServerConnection::getEngineAnalyticsSettings(
     Result<QJsonObject>::type&& callback,
     QThread* targetThread)
 {
-    QnRequestParamList params{{"analyticsEngineId", engine->getId().toString()}};
-
-    auto internalCallback =
-        [callback = std::move(callback)](
-            bool success,
-            Handle requestId,
-            const QByteArray& result,
-            const nx::network::http::HttpHeaders& /*headers*/)
-        {
-            callback(success, requestId,
-                 QJson::deserialized<QnJsonRestResult>(result).deserialized<QJsonObject>());
-        };
-
     return executeGet(
-        "/ec2/analyticsEngineSettings", params, std::move(internalCallback), targetThread);
+        "/ec2/analyticsEngineSettings",
+        QnRequestParamList{
+            {"analyticsEngineId", engine->getId().toString()}
+        },
+        Result<QnJsonRestResult>::type(
+            [callback = std::move(callback)](
+                bool success, Handle requestId, const QnJsonRestResult& result)
+            {
+                callback(success, requestId, result.deserialized<QJsonObject>());
+            }),
+        targetThread);
 }
 
 Handle ServerConnection::setEngineAnalyticsSettings(
@@ -851,21 +848,18 @@ Handle ServerConnection::setEngineAnalyticsSettings(
     std::function<void(bool, Handle, const QJsonObject&)>&& callback,
     QThread* targetThread)
 {
-    auto internalCallback =
-        [callback = std::move(callback)](bool success, Handle requestId, const QByteArray& result)
-        {
-            callback(success, requestId,
-                 QJson::deserialized<QnJsonRestResult>(result).deserialized<QJsonObject>());
-        };
-
-    return executePost<QByteArray>(
+    return executePost<QnJsonRestResult>(
         QString("/ec2/analyticsEngineSettings"),
         QnRequestParamList{
             {"analyticsEngineId", engine->getId().toString()}
         },
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
         QJson::serialized(settings),
-        std::move(internalCallback),
+        [callback = std::move(callback)](
+            bool success, Handle requestId, const QnJsonRestResult& result)
+        {
+            callback(success, requestId, result.deserialized<QJsonObject>());
+        },
         targetThread);
 }
 
@@ -875,24 +869,19 @@ Handle ServerConnection::getDeviceAnalyticsSettings(
     Result<QJsonObject>::type&& callback,
     QThread* targetThread)
 {
-    QnRequestParamList params {
-        {"deviceId", device->getId().toString()},
-        {"analyticsEngineId", engine->getId().toString()},
-    };
-
-    auto internalCallback =
-        [callback = std::move(callback)](
-            bool success,
-            Handle requestId,
-            const QByteArray& result,
-            const nx::network::http::HttpHeaders& /*headers*/)
-        {
-            callback(success, requestId,
-                 QJson::deserialized<QnJsonRestResult>(result).deserialized<QJsonObject>());
-        };
-
     return executeGet(
-        "/ec2/deviceAnalyticsSettings", params, std::move(internalCallback), targetThread);
+        "/ec2/deviceAnalyticsSettings",
+        QnRequestParamList{
+            {"deviceId", device->getId().toString()},
+            {"analyticsEngineId", engine->getId().toString()},
+        },
+        Result<QnJsonRestResult>::type(
+            [callback = std::move(callback)](
+                bool success, Handle requestId, const QnJsonRestResult& result)
+            {
+                callback(success, requestId, result.deserialized<QJsonObject>());
+            }),
+        targetThread);
 }
 
 Handle ServerConnection::setDeviceAnalyticsSettings(
@@ -902,22 +891,19 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
     std::function<void(bool, Handle, const QJsonObject&)>&& callback,
     QThread* targetThread)
 {
-    auto internalCallback =
-        [callback = std::move(callback)](bool success, Handle requestId, const QByteArray& result)
-        {
-            callback(success, requestId,
-                QJson::deserialized<QnJsonRestResult>(result).deserialized<QJsonObject>());
-        };
-
-    return executePost<QByteArray>(
+    return executePost<QnJsonRestResult>(
         QString("/ec2/deviceAnalyticsSettings"),
-        QnRequestParamList {
+        QnRequestParamList{
             {"deviceId", device->getId().toString()},
             {"analyticsEngineId", engine->getId().toString()},
         },
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
         QJson::serialized(settings),
-        std::move(internalCallback),
+        [callback = std::move(callback)](
+            bool success, Handle requestId, const QnJsonRestResult& result)
+        {
+            callback(success, requestId, result.deserialized<QJsonObject>());
+        },
         targetThread);
 }
 
