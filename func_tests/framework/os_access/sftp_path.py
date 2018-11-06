@@ -10,6 +10,7 @@ import pathlib2 as pathlib
 import scandir
 import six
 
+from framework.method_caching import cached_property
 from framework.os_access import exceptions
 from framework.os_access.path import FileSystemPath
 from framework.os_access.ssh_shell import SSH
@@ -108,7 +109,9 @@ class SftpPath(FileSystemPath):
     @classmethod
     def specific_cls(cls, ssh):  # type: (SSH) -> ...
         class SpecificSftpPath(cls):
-            _accessor = _SftpAccessor(ssh._sftp())
+            @cached_property
+            def _accessor(self):
+                return _SftpAccessor(ssh._sftp())
 
             @classmethod
             def home(cls):
