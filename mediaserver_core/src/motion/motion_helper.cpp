@@ -57,7 +57,7 @@ QnMotionArchiveConnectionPtr QnMotionHelper::createConnection(const QnResourcePt
 
 QnTimePeriodList QnMotionHelper::matchImage(const QnChunksRequestData& request)
 {
-    const auto motionRegionList = request.filter.isEmpty()
+    const auto motionRegionList = request.filter.trimmed().isEmpty()
         ? QList<QRegion>()
         : QJson::deserialized<QList<QRegion>>(request.filter.toUtf8());
 
