@@ -42,22 +42,17 @@ ConnectionManager::ConnectionManager(
         Qn::UbjsonFormat),
     m_onNewTransactionSubscriptionId(nx::utils::kInvalidSubscriptionId)
 {
-    using namespace std::placeholders;
-
     m_transactionDispatcher->registerSpecialCommandHandler<command::TranSyncRequest>(
-        std::bind(&ConnectionManager::processSpecialTransaction<command::TranSyncRequest::Data>,
-            this, _1, _2, _3, _4));
+        [this](auto&&... args) { processSpecialTransaction(std::move(args)...); });
 
     m_transactionDispatcher->registerSpecialCommandHandler<command::TranSyncResponse>(
-        std::bind(&ConnectionManager::processSpecialTransaction<command::TranSyncResponse::Data>,
-            this, _1, _2, _3, _4));
+        [this](auto&&... args) { processSpecialTransaction(std::move(args)...); });
 
     m_transactionDispatcher->registerSpecialCommandHandler<command::TranSyncDone>(
-        std::bind(&ConnectionManager::processSpecialTransaction<command::TranSyncDone::Data>,
-            this, _1, _2, _3, _4));
+        [this](auto&&... args) { processSpecialTransaction(std::move(args)...); });
 
     m_outgoingTransactionDispatcher->onNewTransactionSubscription().subscribe(
-        std::bind(&ConnectionManager::dispatchTransaction, this, _1, _2),
+        [this](auto&&... args) { dispatchTransaction(std::move(args)...); },
         &m_onNewTransactionSubscriptionId);
 }
 
@@ -228,6 +223,7 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
     const auto systemWasOffline = getConnectionCountBySystemId(
         lock, context.fullPeerName.systemId) == 0;
 
+    // TODO: #ak "One connection only" logic MUST be configurable.
     removeExistingConnection<
         kConnectionByFullPeerNameIndex,
         decltype(context.fullPeerName)>(lock, context.fullPeerName);
@@ -237,16 +233,17 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
 
     nx::utils::SubscriptionId subscriptionId;
     context.connection->connectionClosedSubscription().subscribe(
-        std::bind(&ConnectionManager::removeConnection, this, context.connectionId),
+        [this, id = context.connectionId](auto&&... /*args*/){ removeConnection(id); },
         &subscriptionId);
     context.connection->setOnGotTransaction(
-        std::bind(
-            &ConnectionManager::onGotTransaction, this,
-            context.connection->connectionGuid().toByteArray().toStdString(), _1, _2, _3));
+        [this, id = context.connectionId](auto&&... args)
+        {
+            onGotTransaction(id, std::move(args)...);
+        });
 
     NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Adding new transaction connection %1 from %2")
-            .arg(context.connectionId)
-            .arg(context.connection->commonTransportHeaderOfRemoteTransaction()));
+        .arg(context.connectionId)
+        .arg(context.connection->commonTransportHeaderOfRemoteTransaction()));
 
     const auto systemId = context.fullPeerName.systemId;
     const auto protocolVersion = context.connection->
