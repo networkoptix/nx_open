@@ -213,8 +213,12 @@ EventPanel::Private::MotionSearchSynchronizer::MotionSearchSynchronizer(EventPan
     connect(m_main, &Private::currentMediaWidgetChanged,
         this, &MotionSearchSynchronizer::handleCurrentWidgetChanged);
 
-    connect(m_main->m_motionTab, &AbstractSearchWidget::cameraSetChanged,
-        this, &MotionSearchSynchronizer::updateState);
+    connect(m_main->m_motionTab, &AbstractSearchWidget::cameraSetChanged, this,
+        [this]()
+        {
+            handleMotionSelectionChanged();
+            updateState();
+        });
 
     connect(m_main->m_tabs, &QTabWidget::currentChanged,
         this, &MotionSearchSynchronizer::updateState);
