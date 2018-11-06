@@ -17,6 +17,8 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
 
     vms::common::p2p::downloader::AbstractPeerSelectorPtr peerSelector;
     m_peerManager.reset(new SingleConnectionPeerManager(commonModule(), std::move(peerSelector)));
+    m_peerManager->setParent(this);
+
     m_downloader.reset(new Downloader(m_outputDir, commonModule(), this));
     connect(m_downloader.get(), &Downloader::fileStatusChanged,
         this, &ClientUpdateTool::atDownloaderStatusChanged);
