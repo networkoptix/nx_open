@@ -48,7 +48,7 @@ protected:
 
 protected:
     void fillResolutionList(
-        const std::vector<device::ResolutionData>& list,
+        const std::vector<device::video::ResolutionData>& list,
         nxcip::ResolutionInfo* outInfoList,
         int* outInfoListCount) const;
 };

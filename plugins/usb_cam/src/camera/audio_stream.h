@@ -97,7 +97,9 @@ private:
          * @params[out] - outFfmpegError an error < 0 if one occured, 0 otherwise
          * @return - all previously given packets, merged into one
          */
-        std::shared_ptr<ffmpeg::Packet> mergePackets(const std::shared_ptr<ffmpeg::Packet>& packet, int * outFfmpegError);
+        std::shared_ptr<ffmpeg::Packet> mergePackets(
+            const std::shared_ptr<ffmpeg::Packet>& packet,
+            int * outFfmpegError);
         
         std::chrono::milliseconds timePerVideoFrame() const;
 

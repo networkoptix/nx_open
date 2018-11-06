@@ -1,16 +1,13 @@
-#ifdef __linux__
-
 #include "rpi_utils.h"
 
 #include <vector>
-#include <dirent.h>
-#include <sys/stat.h>
 
 #include <nx/utils/app_info.h>
 
 namespace nx {
 namespace usb_cam {
 namespace device {
+namespace video {
 namespace rpi {
 
 namespace {
@@ -67,7 +64,7 @@ int getMmalMaxBitrate()
     return kMmalMaxBitrate;
 }
 
-std::vector<device::ResolutionData> getMmalResolutionList()
+std::vector<device::video::ResolutionData> getMmalResolutionList()
 {
     return kMmalResolutionList;
 }
@@ -83,8 +80,7 @@ bool isRpi()
 }
     
 } // namespace rpi
+} // namespace video
 } // namespace device
 } // namespace usb_cam
 } // namespace nx
-
-#endif

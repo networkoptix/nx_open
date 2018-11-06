@@ -2,30 +2,35 @@
 
 #pragma once
 
+#include <vector>
+
 #include <dshow.h>
 #include <windows.h>
 #include <comip.h>
 #include <atlmem.h>
 #include <ATLComMem.h>
 
+#include <camera/camera_plugin_types.h>
+
 #include "device/device_data.h"
 #include "device/abstract_compression_type_descriptor.h"
-
-#include "camera/camera_plugin_types.h"
+#include "device/video/resolution_data.h"
 
 namespace nx {
 namespace usb_cam {
 namespace device {
-namespace impl {
+namespace video {
+namespace detail {
 
 /**
  * initializes dshow for the thread that calls the public util functions
  * https://msdn.microsoft.com/en-us/library/windows/desktop/ms695279(v=vs.85).aspx
- * note: only use this from the public api functions listed in "dshow_utils.h"
- * todo: This is a work around, we shouldn't have to init and deinit every time the util
+ * Note: only use this from the public api functions listed in "dshow_utils.h"
+ * TODO: This is a work around, we shouldn't have to init and deinit every time the util
  *      functions are called.
  */
-struct DShowInitializer{
+struct DShowInitializer
+{
     HRESULT m_result;
 
     DShowInitializer():
@@ -44,7 +49,7 @@ struct DShowInitializer{
     }
 };
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // public api
 
 std::string getDeviceName(const char * devicePath);
@@ -57,11 +62,14 @@ std::vector<ResolutionData> getResolutionList(
     const char * devicePath,
     const device::CompressionTypeDescriptorPtr& targetCodecID);
 
-void setBitrate(const char * devicePath, int bitrate, const CompressionTypeDescriptorPtr& targetCodecID);
+void setBitrate(
+    const char * devicePath,
+    int bitrate,
+    const CompressionTypeDescriptorPtr& targetCodecID);
 
 int getMaxBitrate(const char * devicePath, const CompressionTypeDescriptorPtr& targetCodecID);
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // api helper functions
 
 void freeMediaType(AM_MEDIA_TYPE& mediaType);
@@ -95,7 +103,7 @@ std::string toStdString(BSTR str);
 std::string getDeviceName(IMoniker *pMoniker);
 std::string getDevicePath(IMoniker *pMoniker);
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // audio
 
 struct AudioDeviceDescriptor
@@ -119,7 +127,8 @@ LONG getWaveInID(IMoniker * pMoniker);
 std::string getDisplayName(IMoniker * pMoniker);
 std::vector<AudioDeviceDescriptor> getAudioDeviceList();
 
-} // namespace impl
+} // namespace detail
+} // namespace video
 } // namespace device
 } // namespace usb_cam
 } // namespace nx

@@ -24,7 +24,10 @@ int Options::setEntry(const char * key, int64_t value, int flags)
     return av_dict_set_int(&m_options, key, value, flags);
 }
 
-AVDictionaryEntry* Options::getEntry(const char * key, const AVDictionaryEntry * prev, int flags) const
+AVDictionaryEntry* Options::getEntry(
+    const char * key,
+    const AVDictionaryEntry * prev,
+    int flags) const
 {
     return av_dict_get(m_options, key, prev, flags);
 }

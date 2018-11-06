@@ -1,7 +1,7 @@
 #include "stream_reader.h"
 
 #include <nx/utils/url.h>
-#include <nx/utils/log/log_main.h>
+#include <nx/utils/log/log.h>
 
 #include "ffmpeg/utils.h"
 #include "camera/buffered_stream_consumer.h"
@@ -18,7 +18,7 @@ int kUsecInMsec = 1000;
 
 }
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // StreamReader
 
 StreamReader::StreamReader(
@@ -45,12 +45,12 @@ StreamReader::StreamReader(
 
 void* StreamReader::queryInterface( const nxpl::NX_GUID& interfaceID )
 {
-    if( memcmp( &interfaceID, &nxcip::IID_StreamReader, sizeof(nxcip::IID_StreamReader) ) == 0 )
+    if( memcmp( &interfaceID, &nxcip::IID_StreamReader, sizeof(nxcip::IID_StreamReader) ) == 0)
     {
         addRef();
         return this;
     }
-    if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
+    if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0)
     {
         addRef();
         return static_cast<nxpl::PluginInterface*>(this);
@@ -93,7 +93,7 @@ void StreamReader::setBitrate(int bitrate)
     m_streamReader->setBitrate(bitrate);
 }
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // StreamReaderPrivate
 
 StreamReaderPrivate::StreamReaderPrivate(
@@ -111,7 +111,7 @@ StreamReaderPrivate::StreamReaderPrivate(
 StreamReaderPrivate::~StreamReaderPrivate()
 {
     m_avConsumer->interrupt();
-    m_camera->audioStream()->removePacketConsumer(m_avConsumer); //< Avoid virtual removeConsumer()
+    removeAudioConsumer();
 }
 
 void StreamReaderPrivate::interrupt()
