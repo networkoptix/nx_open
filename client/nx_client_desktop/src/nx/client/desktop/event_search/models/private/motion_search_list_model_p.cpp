@@ -18,7 +18,7 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/utils/managed_camera_set.h>
-#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
