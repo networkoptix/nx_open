@@ -190,7 +190,98 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.toggleSettingsMenu = function () {
             $scope.showSettings = !$scope.showSettings;
         };
-
+    
+        function updateVideoSource(playingPosition) {
+    
+            // clear preview for next camera
+            $scope.preview = '';
+            
+            if (!$scope.activeCamera ||
+                $scope.activeCamera.status === 'Unauthorized') {
+            
+                $scope.activeVideoSource = {src: ''};
+            
+                return;
+            }
+        
+            var salt = '&' + Math.random(),
+                cameraId = $scope.activeCamera.id,
+                resolution = $scope.activeResolution,
+                resolutionHls = channels[resolution] || channels.Low,
+                live = !playingPosition;
+        
+            if ($scope.playerAPI) {
+                // Pause playing
+                $scope.playerAPI.pause();
+            }
+        
+            updateAvailableResolutions();
+        
+            $scope.positionSelected = !!playingPosition;
+            if (!$scope.positionProvider) {
+                return;
+            }
+        
+            $scope.positionProvider.init(playingPosition, $scope.positionProvider.playing);
+            if (live) {
+                playingPosition = timeManager.nowToDisplay();
+            } else {
+                playingPosition = Math.round(playingPosition);
+            }
+        
+            // Fix here!
+            if (resolutionHls === channels.Low && $scope.availableResolutions.indexOf('Low') < 0) {
+                resolutionHls = channels.High;
+            }
+            $scope.resolution = resolutionHls;
+        
+            $scope.currentResolution = $scope.player === "webm" ? resolution : resolutionHls;
+            $scope.activeVideoSource = _.filter([
+                {
+                    src: systemAPI.hlsUrl(cameraId, !live && playingPosition, resolutionHls) + salt,
+                    type: mimeTypes.hls,
+                    transport: 'hls'
+                },
+                {
+                    src: systemAPI.webmUrl(cameraId, !live && playingPosition, resolution) + salt,
+                    type: mimeTypes.webm,
+                    transport: 'webm'
+                },
+                {
+                    src: systemAPI.previewUrl(cameraId, !live && playingPosition, null, window.screen.availHeight) + salt,
+                    type: mimeTypes.jpeg,
+                    transport: 'preview'
+                }
+            ], function (src) {
+                return cameraSupports(src.transport) != null;
+            });
+        
+            $scope.preview = _.find($scope.activeVideoSource, function (src) {
+                return src.type === 'image/jpeg';
+            }).src;
+        
+            if ((Config.allowBetaMode || $scope.debugMode) && jscd.browser.toLowerCase() === 'chrome') {
+                var streamInfo = {};
+                var streamType = "webm";
+            
+                if ($scope.debugMode) {
+                    streamType = $scope.player === "webm" ? "webm" : "hls";
+                }
+            
+                streamInfo.src = streamType === "webm" ? systemAPI.webmUrl(cameraId, !live && playingPosition, resolution, true)
+                    : systemAPI.hlsUrl(cameraId, !live && playingPosition, resolutionHls);
+                streamInfo.title = $scope.activeCamera.name;
+            
+                if (cameraSupports(streamType) || $scope.debugMode) {
+                    $scope.showCastButton = true;
+                    chromeCast.load(streamInfo, streamType);
+                }
+                else {
+                    $scope.showCastButton = false;
+                }
+            }
+        }
+        
         $scope.updateCamera = function (position) {
             var oldTimePosition = null;
             if($scope.positionProvider && !$scope.positionProvider.liveMode){
@@ -226,82 +317,6 @@ angular.module('nxCommon').controller('ViewCtrl',
                 }, Config.webclient.playerReadyTimeout);
             }
         };
-
-        function updateVideoSource(playingPosition) {
-            
-            if (!$scope.activeCamera ||
-                $scope.activeCamera.status === 'Unauthorized') {
-
-                $scope.activeVideoSource = {src: ''};
-                $scope.preview = '';
-
-                return;
-            }
-
-            var salt = '&' + Math.random(),
-                cameraId = $scope.activeCamera.id,
-                resolution = $scope.activeResolution,
-                resolutionHls = channels[resolution] || channels.Low,
-                live = !playingPosition;
-
-            if($scope.playerAPI) {
-                // Pause playing
-                $scope.playerAPI.pause();
-            }
-
-            updateAvailableResolutions();
-
-            $scope.positionSelected = !!playingPosition;
-            if(!$scope.positionProvider){
-                return;
-            }
-
-            $scope.positionProvider.init(playingPosition, $scope.positionProvider.playing);
-            if(live){
-                playingPosition = timeManager.nowToDisplay();
-            }else{
-                playingPosition = Math.round(playingPosition);
-            }
-
-            // Fix here!
-            if(resolutionHls === channels.Low && $scope.availableResolutions.indexOf('Low')<0){
-                resolutionHls = channels.High;
-            }
-            $scope.resolution = resolutionHls;
-
-            $scope.currentResolution = $scope.player === "webm" ? resolution : resolutionHls;
-            $scope.activeVideoSource = _.filter([
-                { src: systemAPI.hlsUrl(cameraId, !live && playingPosition, resolutionHls) + salt, type: mimeTypes.hls, transport:'hls'},
-                { src: systemAPI.webmUrl(cameraId, !live && playingPosition, resolution) + salt, type: mimeTypes.webm, transport:'webm' },
-                { src: systemAPI.previewUrl(cameraId, !live && playingPosition, null, window.screen.availHeight) + salt, type: mimeTypes.jpeg, transport:'preview'}
-            ],function(src){
-                return cameraSupports(src.transport) != null;
-            });
-
-            $scope.preview = _.find($scope.activeVideoSource,function(src){return src.type === 'image/jpeg';}).src;
-
-            if((Config.allowBetaMode || $scope.debugMode) && jscd.browser.toLowerCase() === 'chrome'){
-                var streamInfo = {};
-                var streamType = "webm";
-
-                if($scope.debugMode){
-                    streamType = $scope.player === "webm" ? "webm" : "hls";
-                }
-
-                streamInfo.src = streamType === "webm" ? systemAPI.webmUrl(cameraId, !live && playingPosition, resolution, true)
-                                                         : systemAPI.hlsUrl(cameraId, !live && playingPosition, resolutionHls);
-                streamInfo.title = $scope.activeCamera.name;
-
-                if(cameraSupports(streamType) || $scope.debugMode){
-                    $scope.showCastButton = true;
-                    chromeCast.load(streamInfo, streamType);
-                }
-                else{
-                    $scope.showCastButton = false;
-                }
-            }
-        }
-
 
         $scope.updateTime = function(currentTime, duration){
             if(currentTime === null && duration === null){
