@@ -137,7 +137,7 @@ CommonUpdateInstaller::State CommonUpdateInstaller::checkContents(const QString&
 
 bool CommonUpdateInstaller::install(const QnAuthSession& authInfo)
 {
-    QString installerDir  = installerWorkDir();
+    QString installerDir = installerWorkDir();
 
     QStringList arguments;
     QString logFileName;
@@ -159,7 +159,9 @@ bool CommonUpdateInstaller::install(const QnAuthSession& authInfo)
         NX_INFO(this, lm("Update has been started. file=\"%1\", args=%2").args(installerPath, argumentsString));
     }
     else
+    {
         NX_ERROR(this, lm("Failed to launch update script. %1").args(SystemError::toString(error)));
+    }
 
     return true;
 }
