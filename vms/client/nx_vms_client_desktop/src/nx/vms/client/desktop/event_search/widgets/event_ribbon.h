@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
@@ -39,6 +41,9 @@ public:
 
     bool live() const;
     void setLive(bool value);
+
+    std::chrono::microseconds highlightedTimestamp() const;
+    void setHighlightedTimestamp(std::chrono::microseconds value);
 
     void setViewportMargins(int top, int bottom);
 
