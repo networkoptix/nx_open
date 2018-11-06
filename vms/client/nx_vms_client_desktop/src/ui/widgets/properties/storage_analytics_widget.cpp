@@ -7,7 +7,6 @@
 #include <QtCore/QMimeData>
 #include <QtGui/QClipboard>
 #include <QtWidgets/QMenu>
-#include <QtGui/QMouseEvent>
 #include <QtGui/QShowEvent>
 
 #include <client/client_color_types.h>
@@ -28,7 +27,6 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/recording_stats_model.h>
-#include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
 #include <ui/utils/table_export_helper.h>
@@ -38,31 +36,24 @@
 #include <ui/workaround/hidpi_workarounds.h>
 
 #include <utils/common/event_processors.h>
-#include <utils/common/synctime.h>
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
 namespace {
 
+using namespace std::chrono_literals;
 using std::chrono::milliseconds;
 using std::chrono::seconds;
 using std::chrono::minutes;
 using std::chrono::hours;
 
-static constexpr int kHoursPerDay = 24;
-static constexpr int kDaysPerWeek = 7;
-static constexpr int kDaysPerMonth = 30;
-
 auto days(int count)
 {
-    return hours(count * kHoursPerDay);
+    return hours(count * 24);
 }
 
-auto weeks(int count)
-{
-    return days(count * kDaysPerWeek);
-}
+const qint64 kDefaultBitrateAveragingPeriod = milliseconds(5min).count();
 
 // TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
 const qint64 kBytesInGB = 1024ll * 1024 * 1024;
@@ -84,115 +75,22 @@ const std::array<qint64, 5> kExtraDataBase =
 
 const int kTicksPerInterval = 100;
 
-class CustomHorizontalHeader: public QHeaderView
-{
-    Q_DECLARE_TR_FUNCTIONS(CustomHorizontalHeader)
-    using base_type = QHeaderView;
-
-public:
-    CustomHorizontalHeader(QWidget* parent = nullptr) :
-        base_type(Qt::Horizontal, parent),
-        m_durationButton(new DropdownButton(this))
-    {
-        m_durationButton->setButtonTextRole(Qt::ToolTipRole);
-
-        auto addAction =
-            [this](const QString& text, const QString& buttonText, seconds duration)
-            {
-                auto menu = m_durationButton->menu();
-                auto action = menu->addAction(text);
-                action->setData(qint64(duration.count()));
-                action->setToolTip(buttonText);
-                return action;
-            };
-
-        addAction(tr("5 minutes"), tr("For the last 5 min"), minutes(5));
-        addAction(tr("Hour"),      tr("For the last hour"),  hours(1));
-        addAction(tr("Day"),       tr("For the last day"),   days(1));
-        addAction(tr("Week"),      tr("For the last week"),  weeks(1));
-        addAction(tr("Month"),     tr("For the last month"), days(kDaysPerMonth));
-        addAction(tr("All data"),  tr("For all data"),       seconds(0))->trigger(); //< default
-
-        m_durationButton->setFlat(true);
-
-        connect(this, &QHeaderView::sectionResized, this,
-            &CustomHorizontalHeader::updateButtonGeometry, Qt::DirectConnection);
-        connect(this, &QHeaderView::sectionResized, this,
-            &CustomHorizontalHeader::updateButtonGeometry, Qt::QueuedConnection);
-    }
-
-    virtual void showEvent(QShowEvent* e) override
-    {
-        QHeaderView::showEvent(e);
-        updateButtonGeometry();
-        m_durationButton->show();
-    }
-
-    seconds durationForBitrate() const
-    {
-        if (!m_durationButton)
-            return seconds(0);
-
-        const auto current = m_durationButton->currentAction();
-        if (!current)
-            return seconds(0);
-
-        return seconds(current->data().value<qint64>());
-    }
-
-    DropdownButton* durationButton() const
-    {
-        return m_durationButton;
-    }
-
-protected:
-    virtual QSize sectionSizeFromContents(int logicalIndex) const override
-    {
-        QSize size = base_type::sectionSizeFromContents(logicalIndex);
-        if (logicalIndex == QnRecordingStatsModel::BitrateColumn)
-            size.rwidth() += m_durationButton->minimumSizeHint().width();
-
-        return size;
-    }
-
-private:
-    void updateButtonGeometry()
-    {
-        QRect rect(sectionViewportPosition(QnRecordingStatsModel::BitrateColumn), 0,
-            sectionSize(QnRecordingStatsModel::BitrateColumn), height());
-
-        m_durationButton->setGeometry(QStyle::alignedRect(
-            Qt::LeftToRight, Qt::AlignRight | Qt::AlignVCenter,
-            m_durationButton->minimumSizeHint(), rect));
-    }
-
-private:
-    DropdownButton* m_durationButton;
-};
-
 } // namespace
-
 
 QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::StorageAnalyticsWidget),
-    m_server(),
     m_model(new QnRecordingStatsModel(false, this)),
     m_forecastModel(new QnRecordingStatsModel(true, this)),
-    m_requests(),
-    m_updating(false),
-    m_updateDisabled(false),
-    m_dirty(false),
     m_selectAllAction(new QAction(tr("Select All"), this)),
     m_exportAction(new QAction(tr("Export Selection to File..."), this)),
-    m_clipboardAction(new QAction(tr("Copy Selection to Clipboard"), this)),
-    m_lastMouseButton(Qt::NoButton),
-    m_allData(),
-    m_availStorages()
+    m_clipboardAction(new QAction(tr("Copy Selection to Clipboard"), this))
 {
     ui->setupUi(this);
     setWarningStyle(ui->warningLabel);
+    ui->extraSpaceSlider->setProperty(style::Properties::kSliderFeatures,
+        static_cast<int>(style::SliderFeature::FillingUp));
 
     auto refreshButton = new QPushButton(ui->tabWidget);
     refreshButton->setFlat(true);
@@ -208,6 +106,20 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     setupTableView(ui->statsTable, m_model);
     setupTableView(ui->forecastTable, m_forecastModel);
 
+    ui->averagingPeriodCombobox->addItem(tr("The last minute"),
+        QVariant::fromValue<qint64>(milliseconds(1min).count()));
+    ui->averagingPeriodCombobox->addItem(tr("The last 5 minutes"),
+        QVariant::fromValue<qint64>(milliseconds(5min).count()));
+    ui->averagingPeriodCombobox->addItem(tr("The last hour"),
+        QVariant::fromValue<qint64>(milliseconds(1h).count()));
+    ui->averagingPeriodCombobox->addItem(tr("The last 24 hours"),
+        QVariant::fromValue<qint64>(milliseconds(24h).count()));
+    ui->averagingPeriodCombobox->addItem(tr("All recorded data"), 0);
+    ui->averagingPeriodCombobox->setCurrentIndex(1); // 5 min.
+
+    connect(ui->averagingPeriodCombobox, qOverload<int>(&QComboBox::currentIndexChanged),
+        this, [this](int) { at_averagingPeriodChanged(); });
+
     connect(m_clipboardAction, &QAction::triggered,
         this, &QnStorageAnalyticsWidget::at_clipboardAction_triggered);
 
@@ -215,7 +127,7 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
         this, &QnStorageAnalyticsWidget::at_exportAction_triggered);
 
     connect(refreshButton, &QAbstractButton::clicked,
-        this, &QnStorageAnalyticsWidget::updateData);
+        this, [this] { clearCache(); updateDataFromServer(); });
 
     connect(ui->extraSpaceSlider, &QSlider::valueChanged,
         this, &QnStorageAnalyticsWidget::at_forecastParamsChanged);
@@ -230,8 +142,8 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
 
     // TODO: #GDM move to std texts
     ui->extraSizeSpinBox->setSuffix(L' ' + tr("TB", "TB - terabytes"));
-    ui->maxSizeLabel->setText(tr("%n TB", "TB - terabytes"
-        , qRound(ui->extraSizeSpinBox->maximum())));
+    ui->maxSizeLabel->setText(tr("%n TB", "TB - terabytes",
+        qRound(ui->extraSizeSpinBox->maximum())));
 }
 
 QnStorageAnalyticsWidget::~QnStorageAnalyticsWidget()
@@ -245,6 +157,11 @@ TableView* QnStorageAnalyticsWidget::currentTable() const
         : ui->forecastTable;
 }
 
+qint64 QnStorageAnalyticsWidget::currentForecastAveragingPeriod()
+{
+    return ui->averagingPeriodCombobox->currentData().toLongLong();
+}
+
 void QnStorageAnalyticsWidget::setupTableView(TableView* table, QAbstractItemModel* model)
 {
     auto sortModel = new QnSortedRecordingStatsModel(this);
@@ -255,12 +172,12 @@ void QnStorageAnalyticsWidget::setupTableView(TableView* table, QAbstractItemMod
     table->verticalHeader()->setMinimumSectionSize(kTableRowHeight);
     table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
-    CustomHorizontalHeader* header = new CustomHorizontalHeader(this);
+    QHeaderView* header = new QHeaderView(Qt::Horizontal, this);
     table->setHorizontalHeader(header);
 
     header->setSectionsClickable(true);
     header->setMinimumSectionSize(kMinimumColumnWidth);
-    header->setSectionResizeMode(QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(QHeaderView::Fixed);
     header->setSectionResizeMode(QnRecordingStatsModel::CameraNameColumn, QHeaderView::Stretch);
     header->setSortIndicatorShown(true);
 
@@ -274,23 +191,6 @@ void QnStorageAnalyticsWidget::setupTableView(TableView* table, QAbstractItemMod
     table->addAction(m_exportAction);
 
     connect(table, &QTableView::customContextMenuRequested, this, &QnStorageAnalyticsWidget::at_eventsGrid_customContextMenuRequested);
-
-    /* For now bitrates in Statistics and Forecast are linked. */
-    // TODO: #vkutin #GDM in the future maybe make independent settings and queries.
-
-    auto otherTable = table == ui->statsTable
-        ? ui->forecastTable
-        : ui->statsTable;
-
-    connect(header->durationButton(), &DropdownButton::currentChanged, this,
-        [this, otherTable](int index)
-        {
-            static_cast<CustomHorizontalHeader*>(otherTable->horizontalHeader())->
-                durationButton()->setCurrentIndex(index);
-
-            if (otherTable == ui->forecastTable)
-                updateData();
-        }, Qt::QueuedConnection);
 }
 
 QnMediaServerResourcePtr QnStorageAnalyticsWidget::server() const
@@ -304,12 +204,17 @@ void QnStorageAnalyticsWidget::setServer(const QnMediaServerResourcePtr& server)
         return;
 
     m_server = server;
+
+    clearCache();
+    m_dirty = true;
 }
 
 void QnStorageAnalyticsWidget::loadDataToUi()
 {
     ui->tabWidget->setCurrentWidget(ui->statsTab);
-    updateData();
+
+    if(isVisible() && m_dirty)
+        updateDataFromServer();
 }
 
 void QnStorageAnalyticsWidget::applyChanges()
@@ -322,22 +227,16 @@ bool QnStorageAnalyticsWidget::hasChanges() const
     return false;
 }
 
-void QnStorageAnalyticsWidget::updateData()
+void QnStorageAnalyticsWidget::updateDataFromServer()
 {
-    if (m_updateDisabled)
-    {
-        m_dirty = true;
-        return;
-    }
-
-    m_updateDisabled = true;
-
-    query(milliseconds(static_cast<CustomHorizontalHeader*>(ui->statsTable->horizontalHeader())
-        ->durationForBitrate()).count());
+    querySpaceFromServer();
+    queryStatsFromServer(kDefaultBitrateAveragingPeriod);
+    // Do second stats request if forecast is made for different averaging period.
+    if (currentForecastAveragingPeriod() != kDefaultBitrateAveragingPeriod)
+        queryStatsFromServer(currentForecastAveragingPeriod());
 
     // update UI
-
-    if (!m_requests.isEmpty())
+    if (requestsInProgress())
     {
         ui->statsTable->setDisabled(true);
         ui->forecastTable->setDisabled(true);
@@ -346,79 +245,105 @@ void QnStorageAnalyticsWidget::updateData()
     }
     else
     {
-        requestFinished(); // just clear grid
+        processRequestFinished(); // just clear grid
         ui->stackedWidget->setCurrentWidget(ui->warnPage);
     }
 
-    m_updateDisabled = false;
     m_dirty = false;
 }
 
-void QnStorageAnalyticsWidget::query(qint64 bitrateAnalizePeriodMs)
+void QnStorageAnalyticsWidget::clearCache()
 {
-    m_requests.clear();
-    m_allData.clear();
-    m_availStorages.clear();
-
-    if (!m_server)
-        return;
-
-    if (m_server->getStatus() == Qn::Online)
-    {
-        int handle = m_server->apiConnection()->getRecordingStatisticsAsync(
-            bitrateAnalizePeriodMs,
-            this, SLOT(at_gotStatiscits(int, const QnRecordingStatsReply&, int)));
-
-        m_requests.insert(handle, m_server->getId());
-        handle = m_server->apiConnection()->getStorageSpaceAsync(false, this, SLOT(at_gotStorageSpace(int, const QnStorageSpaceReply&, int)));
-        m_requests.insert(handle, m_server->getId());
-    }
+    m_availableStorages.clear();
+    m_recordingsStatData.clear();
 }
 
-void QnStorageAnalyticsWidget::at_gotStatiscits(int status, const QnRecordingStatsReply& data, int requestNum)
+void QnStorageAnalyticsWidget::querySpaceFromServer()
 {
-    if (!m_requests.contains(requestNum))
+    m_availableStorages.clear();
+
+    if (!m_server || m_server->getStatus() != Qn::Online)
         return;
 
-    QnUuid serverId = m_requests.value(requestNum);
-    m_requests.remove(requestNum);
+    // If next call fails, it will return -1 meaning "no request".
+    m_spaceRequestHandle = m_server->apiConnection()->getStorageSpaceAsync(false,
+        this, SLOT(at_receivedSpaceInfo(int, const QnStorageSpaceReply&, int)));
+}
 
-    if (status == 0 && !data.isEmpty())
+void QnStorageAnalyticsWidget::queryStatsFromServer(qint64 bitrateAveragingPeriodMs)
+{
+    m_recordingsStatData.remove(bitrateAveragingPeriodMs);
+
+    if (!m_server || m_server->getStatus() != Qn::Online)
+        return;
+
+    const auto index = bitrateAveragingPeriodMs == kDefaultBitrateAveragingPeriod ? 0 : 1;
+    // If next call fails, it will return -1 meaning "no request".
+    m_statsRequest[index].averagingPeriod = bitrateAveragingPeriodMs;
+    m_statsRequest[index].handle = m_server->apiConnection()->getRecordingStatisticsAsync(
+        bitrateAveragingPeriodMs, this, SLOT(at_receivedStats(int, const QnRecordingStatsReply&, int)));
+}
+
+bool QnStorageAnalyticsWidget::requestsInProgress() const
+{
+    return m_statsRequest[0].handle != -1 || m_statsRequest[1].handle != -1
+        || m_spaceRequestHandle != -1;
+}
+
+void QnStorageAnalyticsWidget::at_receivedStats(int status, const QnRecordingStatsReply& data,
+    int requestNum)
+{
+    StatsRequest*  request;
+    // There could be 2 simultaneous requests, select the correct one.
+    if (m_statsRequest[0].handle == requestNum)
+        request = &(m_statsRequest[0]);
+    else if (m_statsRequest[1].handle == requestNum)
+        request = &(m_statsRequest[1]);
+    else
+        return;
+
+    request->handle = -1;
+
+    if (status == 0)
     {
+        // Create map entry because we got the reply.
+        if(!m_recordingsStatData.contains(request->averagingPeriod))
+            m_recordingsStatData[request->averagingPeriod] = QnRecordingStatsReply();
+
         for (const auto& value: data)
-            m_allData << value;
+            m_recordingsStatData[request->averagingPeriod] << value;
     }
 
-    if (m_requests.isEmpty())
-        requestFinished();
+    processRequestFinished();
 }
 
-void QnStorageAnalyticsWidget::at_gotStorageSpace(int status, const QnStorageSpaceReply& data, int requestNum)
+void QnStorageAnalyticsWidget::at_receivedSpaceInfo(int status, const QnStorageSpaceReply& data,
+    int requestNum)
 {
-    if (!m_requests.contains(requestNum))
+    if (m_spaceRequestHandle != requestNum)
         return;
 
-    m_requests.remove(requestNum);
+    m_spaceRequestHandle = -1;
+
     if (status == 0)
     {
         for (const auto& storage : data.storages)
-            m_availStorages << storage;
+            m_availableStorages << storage;
     }
 
-    if (m_requests.isEmpty())
-        requestFinished();
+    processRequestFinished();
 }
 
-void QnStorageAnalyticsWidget::requestFinished()
+QnRecordingStatsReply QnStorageAnalyticsWidget::filterStatsReply(const QnRecordingStatsReply& cameraStats)
 {
-    QnRecordingStatsReply existsCameras;
+    QnRecordingStatsReply visibleCameras;
     QnRecordingStatsReply hiddenCameras;
 
-    for (const auto& camera : m_allData)
+    for (const auto& camera : cameraStats)
     {
         const auto& cam = resourcePool()->getResourceByUniqueId(camera.uniqueId);
         if (cam && cam->getParentId() == m_server->getId())
-            existsCameras << camera;
+            visibleCameras << camera;
         else
             hiddenCameras << camera; // hide all cameras which belong to another server
     }
@@ -430,20 +355,27 @@ void QnStorageAnalyticsWidget::requestFinished()
         for (const auto& hiddenRecord: hiddenCameras)
             extraRecord.recordedBytes += hiddenRecord.recordedBytes;
 
-        existsCameras << extraRecord;
+        visibleCameras << extraRecord;
     }
+    return visibleCameras;
+}
 
-    m_model->setModelData(existsCameras);
+void QnStorageAnalyticsWidget::processRequestFinished()
+{
+    if (requestsInProgress())
+        return;
+
+    m_model->setModelData(filterStatsReply(m_recordingsStatData[kDefaultBitrateAveragingPeriod]));
+    m_forecastModel->setModelData(filterStatsReply(m_recordingsStatData[currentForecastAveragingPeriod()]));
+
     ui->statsTable->setDisabled(false);
     ui->forecastTable->setDisabled(false);
     at_forecastParamsChanged();
     setCursor(Qt::ArrowCursor);
 }
 
-void QnStorageAnalyticsWidget::at_eventsGrid_customContextMenuRequested(const QPoint& point)
+void QnStorageAnalyticsWidget::at_eventsGrid_customContextMenuRequested(const QPoint&)
 {
-    Q_UNUSED(point);
-
     auto table = currentTable();
 
     QScopedPointer<QMenu> menu;
@@ -491,9 +423,8 @@ void QnStorageAnalyticsWidget::at_clipboardAction_triggered()
     QnTableExportHelper::copyToClipboard(currentTable());
 }
 
-void QnStorageAnalyticsWidget::at_mouseButtonRelease(QObject* sender, QEvent* event)
+void QnStorageAnalyticsWidget::at_mouseButtonRelease(QObject*, QEvent* event)
 {
-    Q_UNUSED(sender)
     QMouseEvent* me = dynamic_cast<QMouseEvent*> (event);
     m_lastMouseButton = me->button();
 }
@@ -515,7 +446,7 @@ qint64 QnStorageAnalyticsWidget::sliderPositionToBytes(int value) const
     return k1 + step * intervalTicks;
 }
 
-int QnStorageAnalyticsWidget::bytesToSliderPosition (qint64 value) const
+int QnStorageAnalyticsWidget::bytesToSliderPosition(qint64 value) const
 {
     int idx = 0;
     for (; idx < (qint64) kExtraDataBase.size() - 1; ++idx)
@@ -557,9 +488,21 @@ void QnStorageAnalyticsWidget::at_forecastParamsChanged()
     ui->forecastTable->setEnabled(true);
 }
 
+void QnStorageAnalyticsWidget::at_averagingPeriodChanged()
+{
+    // Request data from server if not in cache.
+    if (!m_recordingsStatData.contains(currentForecastAveragingPeriod()))
+        updateDataFromServer();
+    else
+    {
+        m_forecastModel->setModelData(filterStatsReply(m_recordingsStatData[currentForecastAveragingPeriod()]));
+        at_forecastParamsChanged();
+    }
+}
+
 QnRecordingStatsReply QnStorageAnalyticsWidget::getForecastData(qint64 extraSizeBytes)
 {
-    const QnRecordingStatsReply modelData = m_model->modelData();
+    const QnRecordingStatsReply modelData = m_forecastModel->modelData();
     ForecastData forecastData;
 
     // 1. collect camera related forecast params
@@ -576,7 +519,7 @@ QnRecordingStatsReply QnStorageAnalyticsWidget::getForecastData(qint64 extraSize
             cameraForecast.expand &= cameraStats.archiveDurationSecs > 0 && cameraStats.recordedBytes > 0;
             cameraForecast.minDays = qMax(0, camRes->minDays());
             cameraForecast.maxDays = qMax(0, camRes->maxDays());
-            cameraForecast.byterate = cameraStats.recordedBytes / qMax(1ll, cameraStats.archiveDurationSecs);
+            cameraForecast.byterate = qMax(1ll, cameraStats.averageBitrate);
 
             if (cameraForecast.expand)
                 hasExpaned = true;
@@ -595,7 +538,7 @@ QnRecordingStatsReply QnStorageAnalyticsWidget::getForecastData(qint64 extraSize
         {
             for (auto itr = cameraStats.recordedBytesPerStorage.begin(); itr != cameraStats.recordedBytesPerStorage.end(); ++itr)
             {
-                for (const auto& storageSpaceData: m_availStorages)
+                for (const auto& storageSpaceData: m_availableStorages)
                 {
                     if (storageSpaceData.storageId == itr.key() && storageSpaceData.isUsedForWriting && storageSpaceData.isWritable)
                         forecastData.totalSpace += itr.value();
@@ -608,7 +551,7 @@ QnRecordingStatsReply QnStorageAnalyticsWidget::getForecastData(qint64 extraSize
         return modelData; // no recording cameras at all. Do not forecast anything
 
     // 2.1 add free storage space
-    for (const auto& storageData: m_availStorages)
+    for (const auto& storageData: m_availableStorages)
     {
         QnResourcePtr storageRes = resourcePool()->getResourceById(storageData.storageId);
         if (!storageRes)
@@ -668,29 +611,57 @@ QnRecordingStatsReply QnStorageAnalyticsWidget::doForecast(ForecastData forecast
     return result;
 }
 
-void QnStorageAnalyticsWidget::spendData(ForecastData& forecastData, qint64 needSeconds, std::function<bool (const ForecastDataPerCamera& stats)> predicate)
+void QnStorageAnalyticsWidget::spendData(ForecastData& forecastData, qint64 needSeconds,
+    std::function<bool (const ForecastDataPerCamera& stats)> predicate)
 {
-    qint64 moreBytesRequired = 0;
+    qint64 lackingBytes = 0;
     for (ForecastDataPerCamera& cameraForecast: forecastData.cameras)
     {
         if (!predicate(cameraForecast))
             continue;
 
-        qint64 needMoreSeconds = qMax(0ll, needSeconds - cameraForecast.stats.archiveDurationSecs);
-        moreBytesRequired += needMoreSeconds * cameraForecast.byterate;
+        const qint64 lackingSeconds = qMax(0ll, needSeconds - cameraForecast.stats.archiveDurationSecs);
+        lackingBytes += lackingSeconds * cameraForecast.byterate;
     }
 
     // we have less bytes left then required
     qreal coeff = 1.0;
-    if (moreBytesRequired > forecastData.totalSpace)
-        coeff = forecastData.totalSpace / (qreal) moreBytesRequired;
+    if (lackingBytes > forecastData.totalSpace)
+        coeff = forecastData.totalSpace / (qreal) lackingBytes;
 
     // spend data
     for (ForecastDataPerCamera& cameraForecast: forecastData.cameras)
     {
         if (predicate(cameraForecast))
-            cameraForecast.stats.archiveDurationSecs += coeff * (needSeconds - cameraForecast.stats.archiveDurationSecs);
+        {
+            cameraForecast.stats.archiveDurationSecs += coeff * (needSeconds
+                - cameraForecast.stats.archiveDurationSecs);
+        }
     }
 
-    forecastData.totalSpace = qMax(0ll, forecastData.totalSpace - moreBytesRequired);
+    forecastData.totalSpace = qMax(0ll, forecastData.totalSpace - lackingBytes);
+}
+
+void QnStorageAnalyticsWidget::resizeEvent(QResizeEvent*)
+{
+    // We assume that tables have equal width when visible.
+    // However, only current (visible) table has correct width on the first show.
+    const int tableWidth = currentTable()->width();
+
+    // Setup table column widths (40%/20%/20%/20% and 40%/30%/30%).
+    // First (0) column will stretch.
+    ui->statsTable->setColumnWidth(1, (2 * tableWidth) / 10);
+    ui->statsTable->setColumnWidth(2, (2 * tableWidth) / 10);
+    ui->statsTable->setColumnWidth(3, (2 * tableWidth) / 10);
+
+    // First column will stretch.
+    ui->forecastTable->setColumnWidth(1, (3 * tableWidth) / 10);
+    ui->forecastTable->setColumnWidth(2, (3 * tableWidth) / 10);
+}
+
+void QnStorageAnalyticsWidget::showEvent(QShowEvent*)
+{
+    resizeEvent(nullptr); //< We know true widget geometry only at this point.
+    if (m_dirty) //< Update info if it was previously requested.
+        updateDataFromServer();
 }

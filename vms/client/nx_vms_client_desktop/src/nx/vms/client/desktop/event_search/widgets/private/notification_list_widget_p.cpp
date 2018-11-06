@@ -120,8 +120,6 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     auto sortModel = new SystemHealthSortFilterModel(this);
     auto systemHealthListModel = new SubsetListModel(sortModel, 0, QModelIndex(), this);
     sortModel->setSourceModel(m_systemHealthModel);
-    sortModel->setFilterRole(Qn::ResourceSearchStringRole);
-    sortModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
 
     auto progressModel = new ProgressListModel(this);
 

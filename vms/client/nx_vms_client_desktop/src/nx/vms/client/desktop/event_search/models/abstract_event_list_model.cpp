@@ -29,11 +29,6 @@ QVariant AbstractEventListModel::data(const QModelIndex& index, int role) const
         case Qn::TimestampTextRole:
             return timestampText(index.data(Qn::TimestampRole).value<qint64>());
 
-        case Qn::ResourceSearchStringRole:
-            return lit("%1 %2")
-                .arg(index.data(Qt::DisplayRole).toString())
-                .arg(index.data(Qn::DescriptionTextRole).toString());
-
         case Qt::AccessibleTextRole:
         case Qt::StatusTipRole:
         case Qt::WhatsThisRole:

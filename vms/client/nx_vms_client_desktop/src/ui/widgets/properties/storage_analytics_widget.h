@@ -34,78 +34,86 @@ public:
     virtual bool hasChanges() const override;
 
     QnMediaServerResourcePtr server() const;
-    void setServer(const QnMediaServerResourcePtr &server);
+    void setServer(const QnMediaServerResourcePtr& server);
 
 private:
-    void updateData();
+    void updateDataFromServer();
+    void clearCache();
     void setupTableView(nx::vms::client::desktop::TableView* table, QAbstractItemModel* model);
     nx::vms::client::desktop::TableView* currentTable() const;
+    qint64 currentForecastAveragingPeriod();
 
-private slots:
-    void at_gotStatiscits(int status, const QnRecordingStatsReply& data, int requestNum);
-    void at_gotStorageSpace(int status, const QnStorageSpaceReply& data, int requestNum);
-    void at_eventsGrid_customContextMenuRequested(const QPoint& screenPos);
-    void at_clipboardAction_triggered();
-    void at_exportAction_triggered();
-    void at_mouseButtonRelease(QObject* sender, QEvent* event);
-    void at_forecastParamsChanged();
-
-private:
-    void requestFinished();
     QnRecordingStatsReply getForecastData(qint64 extraSizeBytes);
 
-    /**
-     * Get data from server
-     *
-     * \param fromMsec start date. UTC msecs
-     * \param toMsec end date. UTC msecs. Can be DATETIME_NOW
-     */
-    void query(qint64 bitrateAnalizePeriodMs);
+    // Removes "foreign" and hidden cameras and aggregates their data in one pseudo-camera.
+    QnRecordingStatsReply filterStatsReply(const QnRecordingStatsReply& cameraStats);
+
+    // Starts server request.
+    void querySpaceFromServer();
+    void queryStatsFromServer(qint64 bitrateAveragingPeriodMs);
+
+    bool requestsInProgress() const;
+    void processRequestFinished();
+
     qint64 sliderPositionToBytes(int value) const;
     int bytesToSliderPosition (qint64 value) const;
 
-private:
     QScopedPointer<Ui::StorageAnalyticsWidget> ui;
 
     QnMediaServerResourcePtr m_server;
 
-    QnRecordingStatsModel *m_model;
-    QnRecordingStatsModel *m_forecastModel;
-    QMap<int, QnUuid> m_requests;
+    QnRecordingStatsModel* m_model;
+    QnRecordingStatsModel* m_forecastModel;
+    int m_spaceRequestHandle = -1; //< Request handle for storage space information.
+    struct StatsRequest
+    {
+        int handle = -1; //< Request handle for statistics.
+        qint64 averagingPeriod = 0;
+    } m_statsRequest[2]; //< One is always for "Storage" tab with avg=5min, second is for "Forecast".
 
-    bool m_updating;
-    bool m_updateDisabled;
-    bool m_dirty;
+    bool m_updating = false;
+    bool m_dirty = false;
 
-    QAction *m_selectAllAction;
-    QAction *m_exportAction;
-    QAction *m_clipboardAction;
-    Qt::MouseButton m_lastMouseButton;
-    QnRecordingStatsReply m_allData;
+    QAction* m_selectAllAction;
+    QAction* m_exportAction;
+    QAction* m_clipboardAction;
+    Qt::MouseButton m_lastMouseButton = Qt::NoButton;
 
-    QVector<QnStorageSpaceData> m_availStorages;
+    // Map from averaging period to recording stats.
+    QMap<quint64, QnRecordingStatsReply> m_recordingsStatData;
+    //QnRecordingStatsReply m_recordingsStatData;
+    QVector<QnStorageSpaceData> m_availableStorages;
 
-private:
-    // forecast related data
+    // Forecast-related data.
     struct ForecastDataPerCamera
     {
-        ForecastDataPerCamera(): expand(false), minDays(0), maxDays(0), byterate(0) {}
-
-        QnCamRecordingStatsData stats;         // forecasted statistics
-        bool expand;                           // do expand archive for that camera in the forecast
-        int minDays;                           // cached camera 'minDays' value
-        int maxDays;                           // cached camera 'maxDays' value
-        qint64 byterate;                       // how may bytes camera gives per second (bytes/second)
+        QnCamRecordingStatsData stats; //< Forecasted statistics.
+        bool expand = false; //< Expand archive for that camera in the forecast.
+        int minDays = 0; //< Cached camera 'minDays' value.
+        int maxDays = 0; //< Cached camera 'maxDays' value.
+        qint64 byterate = 0; //< How may bytes camera gives per second (bytes/second).
     };
 
     struct ForecastData
     {
-        ForecastData(): totalSpace(0) {}
-        qint64 totalSpace; // total space for all storages
-        QVector<ForecastDataPerCamera> cameras; // camera list by server
+        qint64 totalSpace = 0; //< Total space for all storages.
+        QVector<ForecastDataPerCamera> cameras; //< Camera list by server.
     };
 
-private:
     QnRecordingStatsReply doForecast(ForecastData forecastData);
-    void spendData(ForecastData& forecastData, qint64 needSeconds, std::function<bool (const ForecastDataPerCamera& stats)> predicate);
+    void spendData(ForecastData& forecastData, qint64 needSeconds,
+        std::function<bool (const ForecastDataPerCamera& stats)> predicate);
+
+    virtual void resizeEvent(QResizeEvent*) override; //< Use this to resize table columns; accepts null.
+    virtual void showEvent(QShowEvent*) override; //< Resizes columns when shown.
+
+private slots:
+    void at_receivedStats(int status, const QnRecordingStatsReply& data, int requestNum);
+    void at_receivedSpaceInfo(int status, const QnStorageSpaceReply& data, int requestNum);
+    void at_eventsGrid_customContextMenuRequested(const QPoint&);
+    void at_clipboardAction_triggered();
+    void at_exportAction_triggered();
+    void at_mouseButtonRelease(QObject*, QEvent* event);
+    void at_forecastParamsChanged();
+    void at_averagingPeriodChanged();
 };
