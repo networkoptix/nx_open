@@ -11,6 +11,7 @@
 #include <nx/fusion/serialization/compressed_time_functions.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/fusion/serialization/compressed_time.h>
+#include <nx/utils/algorithm/truncate_sorted_lists.h>
 
 #include <recorder/storage_manager.h>
 
@@ -223,6 +224,25 @@ MultiServerPeriodDataList mergeDataWithSameId(
         record.periods = QnTimePeriodList::mergeTimePeriods(periodsToMerge, limit, sortOrder);
         result.push_back(std::move(record));
     }
+
+    // Truncate period lists to total count less than or equal to limit.
+
+    QList<QnTimePeriodList*> lists;
+
+    for (auto& list: result)
+        lists.push_back(&list.periods);
+
+    nx::utils::algorithm::truncate_sorted_lists(lists,
+        [](const QnTimePeriod& period) { return period.startTimeMs; },
+        limit,
+        sortOrder);
+
+    // Remove records with empty period lists.
+
+    const auto isPeriodListEmpty =
+        [](const MultiServerPeriodData& list) { return list.periods.empty(); };
+
+    result.erase(std::remove_if(result.begin(), result.end(), isPeriodListEmpty), result.end());
 
     return result;
 }

@@ -273,24 +273,18 @@ rest::Handle MotionSearchListModel::Private::getMotion(
     if (!server || !server->apiConnection())
         return {};
 
-    // TODO: #vkutin This looks like a hack. Think what to do.
-    auto regions = m_filterRegions;
-    if (q->isFilterEmpty())
-    {
-        static constexpr QRect kWholeFrame(0, 0, Qn::kMotionGridWidth, Qn::kMotionGridHeight);
-        for (auto& region: regions)
-            region = kWholeFrame;
-    }
-
     QnChunksRequestData request;
     request.resList = q->cameras().toList();
     request.startTimeMs = period.startTimeMs;
     request.endTimeMs = period.endTimeMs(),
     request.periodsType = Qn::MotionContent;
-    request.filter = QJson::serialized(regions);
     request.groupBy = QnChunksRequestData::GroupBy::cameraId;
     request.sortOrder = order;
     request.limit = limit;
+
+    request.filter = q->cameraSet()->type() != ManagedCameraSet::Type::single || q->isFilterEmpty()
+        ? QString()
+        : QJson::serialized(m_filterRegions);
 
     NX_VERBOSE(q) << "Requesting motion periods from"
         << utils::timestampToDebugString(period.startTimeMs) << "to"
