@@ -226,10 +226,6 @@ if(withTestCamera)
     add_subdirectory(testcamera)
 endif()
 
-if(withTrayTool)
-    add_subdirectory(traytool)
-endif()
-
 add_subdirectory(vms)
 
 if(withNxTool)
