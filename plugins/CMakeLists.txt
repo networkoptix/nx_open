@@ -29,7 +29,7 @@ add_subdirectory(generic_multicast_plugin)
 add_subdirectory(analytics)
 
 if(LINUX AND NOT box STREQUAL "bpi")
-add_subdirectory(usb_cam)
+    add_subdirectory(usb_cam)
 endif()
 
 
