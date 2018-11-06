@@ -21,7 +21,12 @@ endif()
 
 file(GLOB_RECURSE QML_FILES static-resources/qml/*.qml static-resources/qml/*.js)
 
-nx_add_target(nx_client_desktop LIBRARY
+set(library_type)
+if(WINDOWS)
+    set(library_type LIBRARY_TYPE SHARED)
+endif()
+
+nx_add_target(nx_client_desktop LIBRARY ${library_type}
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/client_app_info_impl.cpp"
         ${uic_files}
@@ -46,8 +51,14 @@ nx_add_target(nx_client_desktop LIBRARY
         nx_audio
         vms_gateway_core
         nx_vms_applauncher_api
+        qtsingleapplication
+        nx_kit
     MACOS_ARG_MAX_WORKAROUND
 )
+
+target_compile_definitions(nx_client_desktop
+    PRIVATE NX_VMS_DESKTOP_CLIENT_API=${API_EXPORT_MACRO}
+    INTERFACE NX_VMS_DESKTOP_CLIENT_API=${API_IMPORT_MACRO})
 
 if(WINDOWS)
     add_dependencies(nx_client_desktop nov_file_launcher)

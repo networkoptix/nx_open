@@ -595,7 +595,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
 
     QKeyEvent *e = static_cast<QKeyEvent *>(event);
 
-    auto w = qobject_cast<MainWindow*>(mainWindowWidget());
+    auto w = mainWindow();
     NX_ASSERT(w);
     if (w && w->handleKeyPress(e->key()))
         return;

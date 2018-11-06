@@ -26,12 +26,12 @@ class Manager:
 public:
     Manager(QnWorkbenchContext* context);
     virtual ~Manager();
-    void start();
+    void start(WId winId);
 
     void notifyHardwareConfigurationChanged();
 
 private:
-    void loadDrivers();
+    void loadDrivers(WId winId);
     bool loadMappings();
     void applyMappings(std::vector<JoystickPtr>& joysticks);
     void applyMappingsAndCaptureJoysticks();

@@ -39,10 +39,10 @@ Manager::~Manager()
 {
 }
 
-void Manager::start()
+void Manager::start(WId winId)
 {
     QnMutexLocker lock(&m_mutex);
-    loadDrivers();
+    loadDrivers(winId);
 
     bool loaded = loadMappings();
     NX_ASSERT(loaded);
@@ -58,10 +58,10 @@ void Manager::notifyHardwareConfigurationChanged()
     applyMappingsAndCaptureJoysticks();
 }
 
-void Manager::loadDrivers()
+void Manager::loadDrivers(WId winId)
 {
 #if defined(Q_OS_WIN)
-    auto hwndId = reinterpret_cast<HWND>(mainWindow()->winId());
+    auto hwndId = reinterpret_cast<HWND>(winId);
     m_drivers.emplace_back(new driver::MmWinDriver(hwndId));
 
     QApplication::instance()->installNativeEventFilter(new driver::JoystickEventFilter(hwndId));

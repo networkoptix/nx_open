@@ -1,8 +1,10 @@
 nx_add_target(desktop_client EXECUTABLE SIGNED
     RC_FILE
         "desktop_client.rc"
-    PUBLIC_LIBS
-        qtsingleapplication nx_kit nx_client_desktop)
+    NO_MOC
+    NO_PCH
+    PRIVATE_LIBS
+        nx_client_desktop)
 
 if(LINUX)
     # Security requirement (see hardening-check).

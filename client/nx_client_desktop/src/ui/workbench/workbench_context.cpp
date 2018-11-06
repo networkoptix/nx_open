@@ -49,6 +49,7 @@
 #include <nx/client/desktop/system_health/system_health_state.h>
 
 using namespace nx::client::desktop::ui;
+using namespace nx::vms::client::desktop;
 
 QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessController, QObject* parent):
     QObject(parent),
@@ -378,7 +379,7 @@ QnWorkbenchContext::StartupParametersCode
     /* Process input files. */
     bool haveInputFiles = false;
     {
-        auto window = qobject_cast<nx::client::desktop::ui::MainWindow*>(mainWindow());
+        auto window = qobject_cast<MainWindow*>(mainWindow());
         NX_ASSERT(window);
 
         bool skipArg = true;

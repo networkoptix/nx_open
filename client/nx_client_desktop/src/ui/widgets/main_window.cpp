@@ -116,10 +116,7 @@
 
 using nx::client::core::Geometry;
 
-namespace nx {
-namespace client {
-namespace desktop {
-namespace ui {
+namespace nx::vms::client::desktop {
 
 namespace {
 
@@ -146,6 +143,9 @@ void enable_animations(void* qnmainwindow)
 
 }
 #endif
+
+using namespace nx::client::desktop;
+using namespace nx::client::desktop::ui;
 
 MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags) :
     base_type(parent, flags),
@@ -816,7 +816,4 @@ void MainWindow::at_fileOpenSignalizer_activated(QObject*, QEvent* event)
         handleOpenFile(fileEvent->file());
 }
 
-} // namespace ui
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::vms::client::desktop

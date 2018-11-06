@@ -175,7 +175,7 @@ QnWorkbenchNavigator* QnWorkbenchContextAware::navigator() const
     return context()->navigator();
 }
 
-MainWindow* QnWorkbenchContextAware::mainWindow() const
+nx::vms::client::desktop::MainWindow* QnWorkbenchContextAware::mainWindow() const
 {
     return context()->mainWindow();
 }

@@ -28,10 +28,7 @@ class QnWorkbenchLayout;
 class QnMainWindowTitleBarWidget;
 class QnWorkbenchWelcomeScreen;
 
-namespace nx {
-namespace client {
-namespace desktop {
-namespace ui {
+namespace nx::vms::client::desktop {
 
 class MainWindow: public QnEmulatedFrameWidget, public QnWorkbenchContextAware
 {
@@ -136,7 +133,4 @@ private:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(MainWindow::Options);
 
-} // namespace ui
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::vms::client::desktop
