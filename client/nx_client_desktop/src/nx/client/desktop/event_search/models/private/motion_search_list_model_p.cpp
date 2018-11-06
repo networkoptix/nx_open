@@ -116,7 +116,7 @@ QVariant MotionSearchListModel::Private::data(const QModelIndex& index, int role
 
             return lm("Begin: %1<br>End: %2").args( //< Not translatable debug string.
                 utils::timestampToDebugString(chunk.period.startTimeMs),
-                utils::timestampToDebugString(chunk.period.endTimeMs()));
+                utils::timestampToDebugString(chunk.period.endTimeMs())).toQString();
         }
 
         case Qn::PreviewTimeRole:
