@@ -298,8 +298,13 @@ class MediaserverApi(object):
         assert self.credentials_work()
         return response['settings']
 
-    def detach_from_cloud(self, password):
-        self.generic.post('api/detachFromCloud', {'password': password})
+    def detach_from_cloud(self, password, current_password):
+        self.generic.post(
+            'api/detachFromCloud',
+            {
+                'password': password,
+                'currentPassword': current_password
+            })
         self.generic.http.set_credentials(DEFAULT_API_USER, password)
 
     def get_system_settings(self):
