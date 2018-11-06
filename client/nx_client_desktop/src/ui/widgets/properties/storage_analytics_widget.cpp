@@ -31,6 +31,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/utils/table_export_helper.h>
 #include <nx/client/desktop/common/widgets/dropdown_button.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workaround/hidpi_workarounds.h>
@@ -144,6 +145,10 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     ui->extraSizeSpinBox->setSuffix(L' ' + tr("TB", "TB - terabytes"));
     ui->maxSizeLabel->setText(tr("%n TB", "TB - terabytes",
         qRound(ui->extraSizeSpinBox->maximum())));
+
+    const auto scrollBar = new SnappedScrollBar(this);
+    scrollBar->setUseMaximumSpace(true);
+    ui->forecastTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
 }
 
 QnStorageAnalyticsWidget::~QnStorageAnalyticsWidget()
