@@ -303,6 +303,22 @@ size_t find_last_of(
     return BufferNpos;
 }
 
+template<template<typename...> class String, typename CharType>
+// requires Random_access_iterator<typename String<Char>::iterator>
+String<CharType> maxPrefix(const String<CharType>& one, const String<CharType>& two)
+{
+    auto oneIter = one.begin();
+    auto twoIter = two.begin();
+
+    while ((oneIter != one.end()) && (twoIter != two.end()) && (*oneIter == *twoIter))
+    {
+        ++oneIter;
+        ++twoIter;
+    }
+
+    return String<CharType>(one.begin(), oneIter);
+}
+
 /**
  * Format Json string with indentation to make it human-readable.
  */
