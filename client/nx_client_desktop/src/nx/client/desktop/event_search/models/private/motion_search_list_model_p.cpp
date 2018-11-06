@@ -250,7 +250,7 @@ bool MotionSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodTo
 
 void MotionSearchListModel::Private::fetchLive()
 {
-    if (m_liveFetch.id || !q->isLive() || q->livePaused())
+    if (m_liveFetch.id || !q->isLive() || !q->isOnline() || q->livePaused())
         return;
 
     if (m_data.empty() && fetchInProgress())
