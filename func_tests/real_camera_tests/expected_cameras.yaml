@@ -6,17 +6,17 @@ SERVER_STAGES:
   before if features.mediaserver_metrics:
     api/metrics?brief:
       offlineStatus: 0
-      transactions: {"errors": 0, "local": [1, 2], "success": [20, 30]}
+      transactions: {"errors": 0, "local": [1, 5], "success": [20, 30]}
 
   after if features.mediaserver_metrics:
     api/metrics?brief:
       offlineStatus: 0
-      transactions: {"errors": 0, "local": [1, 5], "success": [500, 600]}
+      transactions: {"errors": 0, "local": [1, 10], "success": [300, 500]}
 
   delayed if features.mediaserver_metrics:
     api/metrics?brief:
       offlineStatus: 0]
-      transactions: {"errors": 0, "local": [1, 5], "success": [500, 600]}
+      transactions: {"errors": 0, "local": [1, 10], "success": [300, 500]}
 
 
 Axis_M3046V:
