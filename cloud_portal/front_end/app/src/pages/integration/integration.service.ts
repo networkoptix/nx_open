@@ -38,13 +38,16 @@ export class IntegrationService implements OnDestroy {
                 let downloadPlatforms = plugin.downloadFiles;
                 plugin.downloadFiles = [];
                 Object.keys(downloadPlatforms).forEach((platformName) => {
-                    if(!downloadPlatforms[platformName]) {
+                    if(!downloadPlatforms[platformName] || platformName.match(/additional-file-[\d]+-name/)) {
                         return;
                     }
                     let platform: Platform = { file: '', name: '', url: '' };
                     platform.name = platformName.replace('-file', '')
                             .replace('-', ' ');
                     platform.name = platform.name[0].toUpperCase() + platform.name.slice(1);
+                    if (platformName.match(/additional-file-[\d]+/)) {
+                        platform.name = downloadPlatforms[`${platformName}-name`]
+                    }
                     platform.url = downloadPlatforms[platformName];
                     platform.file = platform.url.slice(platform.url.lastIndexOf('/') + 1);
                     plugin.downloadFiles.push(platform);

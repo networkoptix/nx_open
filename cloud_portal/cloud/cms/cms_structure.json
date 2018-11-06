@@ -600,8 +600,16 @@
             "public": true
           },
           {
-            "name": "generic-file-1",
-            "label": "Generic file 1",
+            "name": "additional-file-1-name",
+            "label": "Additional File 1 Name",
+            "value": "",
+            "description": "Name for additional file 1.",
+            "type": "text",
+            "optional": true
+          },
+          {
+            "name": "additional-file-1",
+            "label": "Additional file 1",
             "value": "",
             "description": "Upload any other necessary files.",
             "type": "external_file",
@@ -609,8 +617,16 @@
             "public": true
           },
           {
-            "name": "generic-file-2",
-            "label": "Generic file 2",
+            "name": "additional-file-2-name",
+            "label": "Additional File 2 Name",
+            "value": "",
+            "description": "Name for additional file 2.",
+            "type": "text",
+            "optional": true
+          },
+          {
+            "name": "additional-file-2",
+            "label": "Additional file 2",
             "value": "",
             "description": "Upload any other necessary files.",
             "type": "external_file",
@@ -618,8 +634,16 @@
             "public": true
           },
           {
-            "name": "generic-file-3",
-            "label": "Generic file 3",
+            "name": "additional-file-3-name",
+            "label": "Additional File 3 Name",
+            "value": "",
+            "description": "Name for additional file 3.",
+            "type": "text",
+            "optional": true
+          },
+          {
+            "name": "additional-file-3",
+            "label": "Additional file 3",
             "value": "",
             "description": "Upload any other necessary files.",
             "type": "external_file",
