@@ -280,10 +280,6 @@ Hikvision_DS-2CD2132F-IWS:
     login: admin
     password: Hikvision1
 
-  attributes:
-    firmware: V5.4.5 build 170123
-    isAudioSupported: 1
-
   recording:
     primary: {codec: 'H264', resolution: '2048x1536', fps: [[13, 17], [8, 12]]}
     secondary: {codec: 'H264', resolution: '640x480', fps: [3, 11]}
