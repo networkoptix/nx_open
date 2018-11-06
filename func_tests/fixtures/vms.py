@@ -47,7 +47,7 @@ def persistent_dir(slot, host_os_access):
 
 @pytest.fixture(scope='session')
 def hypervisor(host_os_access):
-    return VirtualBox(host_os_access, IPAddress('127.0.0.1'))
+    return VirtualBox(host_os_access=host_os_access)
 
 
 @pytest.fixture(scope='session')
@@ -55,7 +55,6 @@ def vm_types(request, slot, hypervisor, persistent_dir):
     template_url_prefix = request.config.getoption('template_url_prefix')
     vm_types = {
         name: VMType.from_config(
-            hypervisor,
             name,
             conf,
             VmTemplate(
@@ -63,6 +62,7 @@ def vm_types(request, slot, hypervisor, persistent_dir):
                 conf['vm']['template_vm'].format(slot=slot),
                 template_url_prefix + conf['vm']['template_file'],
                 persistent_dir),
+            hypervisor=hypervisor,
             slot=slot,
             )
         for name, conf in vm_types_configuration().items()

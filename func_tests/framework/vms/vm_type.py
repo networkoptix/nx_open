@@ -13,6 +13,7 @@ from framework.os_access.posix_access import PosixAccess
 from framework.os_access.windows_access import WindowsAccess
 from framework.registry import Registry
 from framework.vms.hypervisor import VMNotFound, VmHardware, VmNotReady
+from framework.vms.hypervisor.default import default_hypervisor
 from framework.vms.hypervisor.hypervisor import Hypervisor
 from framework.waiting import Wait, WaitTimeout, wait_for_truthy
 
@@ -101,7 +102,7 @@ class VMType(object):
         return '<{!s}>'.format(self)
 
     @classmethod
-    def from_config(cls, hypervisor, name, conf, template, slot=0):
+    def from_config(cls, name, conf, template, hypervisor=default_hypervisor, slot=0):
         return cls(
             name,
             hypervisor,
