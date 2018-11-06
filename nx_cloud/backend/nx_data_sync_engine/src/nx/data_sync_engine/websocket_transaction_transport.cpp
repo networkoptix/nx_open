@@ -6,10 +6,9 @@
 #include "compatible_ec2_protocol_version.h"
 #include "transaction_log.h"
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine::transport {
 
-constexpr static const int kMaxTransactionsPerIteration = 17;
+static constexpr int kMaxTransactionsPerIteration = 17;
 
 WebSocketTransactionTransport::WebSocketTransactionTransport(
     const ProtocolVersionRange& protocolVersionRange,
@@ -238,5 +237,4 @@ void WebSocketTransactionTransport::fillAuthInfo(
     NX_ASSERT(0, "This method is used for outgoing connections only. Not implemented");
 }
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine::transport

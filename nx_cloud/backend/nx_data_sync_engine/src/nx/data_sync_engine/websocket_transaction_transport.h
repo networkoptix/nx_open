@@ -13,10 +13,9 @@
 
 #include "compatible_ec2_protocol_version.h"
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine { class TransactionLog; }
 
-class TransactionLog;
+namespace nx::data_sync_engine::transport {
 
 class WebSocketTransactionTransport:
     public AbstractTransactionTransport,
@@ -79,5 +78,4 @@ private:
     QnUuid m_connectionGuid;
 };
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine::transport

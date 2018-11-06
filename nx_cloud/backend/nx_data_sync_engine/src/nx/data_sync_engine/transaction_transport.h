@@ -21,10 +21,9 @@ class QnTransactionTransportBase;
 class ConnectionGuardSharedState;
 } // namespace ec2
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine { class TransactionLog; }
 
-class TransactionLog;
+namespace nx::data_sync_engine::transport {
 
 class TransactionTransport:
     public QObject,
@@ -45,6 +44,15 @@ public:
         const vms::api::PeerData& localPeer,
         const network::SocketAddress& remotePeerEndpoint,
         const nx::network::http::Request& request);
+
+    TransactionTransport(
+        const ProtocolVersionRange& protocolVersionRange,
+        std::unique_ptr<::ec2::QnTransactionTransportBase> connection,
+        nx::network::aio::AbstractAioThread* aioThread,
+        std::shared_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState,
+        const std::string& systemId,
+        const network::SocketAddress& remotePeerEndpoint);
+
     virtual ~TransactionTransport();
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
@@ -64,6 +72,10 @@ public:
         const QnByteArrayConstRef& tranData);
 
     void setOutgoingConnection(std::unique_ptr<network::AbstractCommunicatingSocket> socket);
+
+    nx::vms::api::PeerData localPeer() const;
+    nx::vms::api::PeerData remotePeer() const;
+    int remotePeerProtocolVersion() const;
 
 private:
     const ProtocolVersionRange m_protocolVersionRange;
@@ -98,5 +110,4 @@ private:
     void onInactivityTimeout();
 };
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine::transport

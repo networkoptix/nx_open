@@ -11,8 +11,7 @@
 #include "transaction_transport_header.h"
 #include "transport/connect_request_attributes.h"
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine::transport {
 
 using ConnectionClosedSubscription =
     nx::utils::Subscription<SystemError::ErrorCode>;
@@ -69,5 +68,4 @@ public:
     virtual void start() = 0;
 };
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine::transport

@@ -83,7 +83,7 @@ public:
 
     struct ConnectionContext
     {
-        std::unique_ptr<AbstractTransactionTransport> connection;
+        std::unique_ptr<transport::AbstractTransactionTransport> connection;
         std::string connectionId;
         FullPeerName fullPeerName;
         std::string userAgent;
@@ -107,7 +107,7 @@ public:
      */
     bool modifyConnectionByIdSafe(
         const std::string& connectionId,
-        std::function<void(AbstractTransactionTransport* connection)> func);
+        std::function<void(transport::AbstractTransactionTransport* connection)> func);
 
     /**
      * Dispatches transaction to corresponding peers.
