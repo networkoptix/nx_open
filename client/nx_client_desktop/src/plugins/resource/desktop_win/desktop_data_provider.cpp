@@ -17,13 +17,12 @@ static const int BASE_BITRATE = 1000 * 1000 * 10; // bitrate for best quality fo
 
 static const int MAX_VIDEO_JITTER = 2;
 
-extern "C"
-{
-    #include <libavformat/avformat.h>
-    #include <libavcodec/avcodec.h>
-    #include <libavutil/opt.h>
-    #include <libavutil/imgutils.h>
-}
+extern "C" {
+#include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
+#include <libavutil/opt.h>
+#include <libavutil/imgutils.h>
+} // extern "C"
 
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/av_codec_media_context.h>
@@ -367,12 +366,12 @@ bool QnDesktopDataProvider::init()
 
     //av_log_set_callback(FffmpegLog::av_log_default_callback_impl);
 
-    m_videoBufSize = av_image_get_buffer_size((AVPixelFormat) m_grabber->format(), m_grabber->width(), m_grabber->height(), 1);
+    m_videoBufSize = av_image_get_buffer_size((AVPixelFormat) m_grabber->format(), m_grabber->width(), m_grabber->height(), /*align*/ 1);
     m_videoBuf = (quint8*) av_malloc(m_videoBufSize);
 
     m_frame = av_frame_alloc();
     int ret = av_image_alloc(m_frame->data, m_frame->linesize,
-        m_grabber->width(), m_grabber->height(), m_grabber->format(), 1);
+        m_grabber->width(), m_grabber->height(), m_grabber->format(), /*align*/ 1);
     if (ret < 0)
         memset((AVPicture*)m_frame, 0, sizeof(AVPicture));
 

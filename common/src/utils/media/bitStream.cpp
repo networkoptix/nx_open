@@ -1,7 +1,12 @@
 #include "bitStream.h"
 
-int BitStream::m_maskInitialized = 0;
-uint32_t BitStream::m_masks[INT_BIT + 1];
+
+constexpr uint32_t kMask[] = {
+    0000000000, 0x00000001, 0x00000003, 0x00000007, 0x0000000f, 0x0000001f, 0x0000003f, 0x0000007f,
+    0x000000ff, 0x000001ff, 0x000003ff, 0x000007ff, 0x00000fff, 0x00001fff, 0x00003fff, 0x00007fff,
+    0x0000ffff, 0x0001ffff, 0x0003ffff, 0x0007ffff, 0x000fffff, 0x001fffff, 0x003fffff, 0x007fffff,
+    0x00ffffff, 0x01ffffff, 0x03ffffff, 0x07ffffff, 0x0fffffff, 0x1fffffff, 0x3fffffff, 0x7fffffff,
+    0xffffffff};
 
 void updateBits(const BitStreamReader& bitReader, int bitOffset, int bitLen, int value)
 {
@@ -69,13 +74,6 @@ void BitStream::setBuffer(const uint8_t* buffer, const uint8_t* end)
     if (buffer >= end)
         THROW_BITSTREAM_ERR;
     m_totalBits = (uint32_t)(end - buffer) * 8;
-    if (m_maskInitialized == 0)
-    {
-        for (uint32_t i= 0; i < INT_BIT; i++)
-            m_masks[i] = (1 << i) - 1;
-        m_masks[INT_BIT] = UINT_MAX;
-        m_maskInitialized = 1;
-    }
     m_initBuffer = m_buffer = (uint32_t*) buffer;
 }
 
@@ -121,13 +119,13 @@ uint32_t BitStreamReader::getBits(uint32_t num)
     if (num <= m_bitLeft)
         m_bitLeft -= num;
     else {
-        prevVal = (m_curVal &  m_masks[m_bitLeft]) << (num - m_bitLeft);
+        prevVal = (m_curVal &  kMask[m_bitLeft]) << (num - m_bitLeft);
         m_buffer++;
         m_curVal = getCurVal(m_buffer);
         m_bitLeft = INT_BIT - num + m_bitLeft;
     }
     m_totalBits -= num;
-    return (prevVal + (m_curVal >> m_bitLeft)) & m_masks[num];
+    return (prevVal + (m_curVal >> m_bitLeft)) & kMask[num];
 }
 
 uint32_t BitStreamReader::showBits(uint32_t num)
@@ -141,12 +139,12 @@ uint32_t BitStreamReader::showBits(uint32_t num)
     if (num <= bitLeft)
         bitLeft -= num;
     else {
-        prevVal = (curVal &  m_masks[bitLeft]) << (num - bitLeft);
+        prevVal = (curVal &  kMask[bitLeft]) << (num - bitLeft);
         //curVal = ntohl(m_buffer[1]);
         curVal = getCurVal(m_buffer+1);
         bitLeft = INT_BIT - num + bitLeft;
     }
-    return (prevVal + (curVal >> bitLeft)) & m_masks[num];
+    return (prevVal + (curVal >> bitLeft)) & kMask[num];
 }
 
 uint32_t BitStreamReader::getBit()
@@ -213,7 +211,7 @@ void BitStreamWriter::putBits(uint32_t num, uint32_t value)
 {
     if (m_totalBits < num)
         THROW_BITSTREAM_ERR;
-    value &= m_masks[num];
+    value &= kMask[num];
     if (m_bitsWritten + num < INT_BIT) {
         m_bitsWritten += num;
         m_curVal <<= num;
@@ -224,7 +222,7 @@ void BitStreamWriter::putBits(uint32_t num, uint32_t value)
         m_bitsWritten = m_bitsWritten + num - INT_BIT;
         m_curVal += value >> m_bitsWritten;
         *m_buffer++ = htonl(m_curVal);
-        m_curVal = value & m_masks[m_bitsWritten];
+        m_curVal = value & kMask[m_bitsWritten];
     }
     m_totalBits -= num;
 }
@@ -287,7 +285,7 @@ void BitStreamWriter::putBit(uint32_t value)
 {
     if (m_totalBits < 1)
         THROW_BITSTREAM_ERR;
-    value &= m_masks[1];
+    value &= kMask[1];
     if (m_bitsWritten + 1 < INT_BIT)
     {
         m_bitsWritten ++;
@@ -300,7 +298,7 @@ void BitStreamWriter::putBit(uint32_t value)
         m_bitsWritten = m_bitsWritten + 1 - INT_BIT;
         m_curVal += value >> m_bitsWritten;
         *m_buffer++ = htonl(m_curVal);
-        m_curVal = value & m_masks[m_bitsWritten];
+        m_curVal = value & kMask[m_bitsWritten];
     }
     m_totalBits --;
 }
@@ -316,7 +314,7 @@ void BitStreamWriter::flushBits(bool finishLastByte)
 
     m_curVal <<= INT_BIT - m_bitsWritten;
     uint32_t prevVal = ntohl(*m_buffer);
-    prevVal &= m_masks[INT_BIT - m_bitsWritten];
+    prevVal &= kMask[INT_BIT - m_bitsWritten];
     prevVal |= m_curVal;
     *m_buffer = htonl(prevVal);
 }

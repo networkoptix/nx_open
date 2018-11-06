@@ -293,12 +293,12 @@ public:
 
     //!Relay input with token \a relayToken has changed its state to \a active
     //void notificationReceived( const std::string& relayToken, bool active );
-    /*!
-        Notifications with timestamp earlier than \a minNotificationTime are ignored
-    */
-    void notificationReceived(
+
+    /** Notifications with timestamp earlier than \a minNotificationTime are ignored. */
+    void handleOneNotification(
         const oasisWsnB2__NotificationMessageHolderType& notification,
         time_t minNotificationTime = (time_t)-1 );
+
     void onRelayInputStateChange(const QString& name, const RelayInputState& state);
     QString fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort = true);
 
@@ -570,6 +570,7 @@ private:
     std::vector<RelayOutputInfo> m_relayOutputInfo;
     bool m_isRelayOutputInversed;
     bool m_fixWrongInputPortNumber;
+    bool m_fixWrongOutputPortToken;
     std::map<QString, RelayInputState> m_relayInputStates;
     QString m_onvifNotificationSubscriptionID;
     mutable QnMutex m_ioPortMutex;
@@ -586,8 +587,9 @@ private:
     int m_streamConfCounter;
     CameraDiagnostics::Result m_prevOnvifResultCode;
     QString m_onvifNotificationSubscriptionReference;
-    QElapsedTimer m_monotonicClock;
-    qint64 m_prevPullMessageResponseClock;
+
+    QElapsedTimer m_pullMessagesResponseElapsedTimer;
+    qint64 m_previousPullMessagesResponseTimeMs;
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> m_asyncPullMessagesCallWrapper;
 
     QString m_portNamePrefixToIgnore;
@@ -606,11 +608,11 @@ private:
      */
     void scheduleRenewSubscriptionTimer(unsigned int timeoutSec);
     void renewPullPointSubscriptionFallback(quint64 timerId);
-    void onPullMessagesResponseReceived(
-        PullPointSubscriptionWrapper* soapWrapper,
-        int resultCode,
-        const _onvifEvents__PullMessagesResponse& response);
-        //!Reads relay output list from resource
+
+    /** Handle all notifications listed in the response. */
+    void handleAllNotifications(const _onvifEvents__PullMessagesResponse& response);
+
+    //!Reads relay output list from resource
     bool fetchRelayOutputs(std::vector<RelayOutputInfo>* relayOutputInfoList);
     bool fetchRelayOutputInfo( const std::string& outputID, RelayOutputInfo* const relayOutputInfo );
     bool fetchRelayInputInfo( const CapabilitiesResp& capabilitiesResponse );
