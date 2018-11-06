@@ -17,6 +17,7 @@
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/log/log_main.h>
 
 namespace nx {
 namespace mediaserver {
@@ -80,6 +81,17 @@ HanwhaMetadataPlugin::HanwhaMetadataPlugin()
     QFile f(":/hanwha/manifest.json");
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
+    {
+        QFile file("plugins/hanwha/manifest.json");
+        if (file.open(QFile::ReadOnly))
+        {
+            NX_INFO(this,
+                lm("Switch to external manifest file %1").arg(QFileInfo(file).absoluteFilePath()));
+            m_manifest = file.readAll();
+        }
+    }
+
+
     m_driverManifest = QJson::deserialized<Hanwha::DriverManifest>(m_manifest);
 }
 
