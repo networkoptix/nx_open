@@ -30,7 +30,7 @@ mkdir -p $TARGET_DIR/sample/ftpstorageplugin
 cp -f readme.txt $TARGET_DIR
 
 #Copying integration headers
-cp -f ../common_libs/nx_sdk/src/plugins/plugin_api.h $TARGET_DIR/include/plugins/
+cp -f ../nxlib/nx_sdk/src/plugins/plugin_api.h $TARGET_DIR/include/plugins/
 cp -f ../mediaserver_core/src/plugins/storage/third_party/third_party_storage.h $TARGET_DIR/include/plugins/storage/third_party
 
 pluginName=ftpstorageplugin

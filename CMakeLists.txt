@@ -190,7 +190,7 @@ list(APPEND CMAKE_MSVCIDE_RUN_PATH ${QT_DIR}/bin)
 add_subdirectory(dependencies)
 
 if (withMediaServer OR withTestCamera OR withTrayTool OR withDesktopClient OR withMobileClient OR withClouds)
-    add_subdirectory(common_libs)
+    add_subdirectory(nxlib)
     add_subdirectory(nx_cloud)
 endif()
 
