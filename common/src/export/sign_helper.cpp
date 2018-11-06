@@ -680,7 +680,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSignatureFrame(AVCodecContext* srcC
         qPower2Ceil((quint32)videoCodecCtx->width, 32),
         videoCodecCtx->height,
         videoCodecCtx->pix_fmt,
-        1);
+        /*align*/ 1);
     if (ret < 0)
         memset((AVPicture*)frame, 0, sizeof(AVPicture));
     AVCodec* videoCodec = avcodec_find_encoder(videoCodecCtx->codec_id);

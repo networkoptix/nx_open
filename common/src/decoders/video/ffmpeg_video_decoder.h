@@ -30,7 +30,11 @@ public:
     /*!
         \param swDecoderCount Atomically incremented in constructor and atomically decremented in destructor
     */
-    QnFfmpegVideoDecoder(AVCodecID codec, const QnConstCompressedVideoDataPtr& data, bool mtDecoding, QAtomicInt* const swDecoderCount = NULL);
+    QnFfmpegVideoDecoder(
+        const DecoderConfig& config,
+        AVCodecID codec, const QnConstCompressedVideoDataPtr& data,
+        bool mtDecoding,
+        QAtomicInt* const swDecoderCount = NULL);
     ~QnFfmpegVideoDecoder();
     bool decode( const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
 
@@ -67,7 +71,14 @@ public:
     virtual void setSpeed( float newValue ) override;
 
 private:
-    void forceMtDecoding(bool value);
+    enum class ForceMtDecodingType
+    {
+        none,
+        forcedOn,
+        forcedOff
+    };
+
+    void setForceMtDecoding(ForceMtDecodingType value);
     static AVCodec* findCodec(AVCodecID codecId);
 
     void openDecoder(const QnConstCompressedVideoDataPtr& data);
@@ -79,6 +90,7 @@ private:
         AVFrame *picture,
         int *got_picture_ptr,
         const AVPacket *avpkt);
+    static bool needToUseMtDecoding(bool userDefinedMtDecoding, ForceMtDecodingType forcedValue);
 private:
     AVCodecContext *m_passedContext;
 
@@ -119,7 +131,7 @@ private:
     // I have used vector instead map because of 2-3 elements is typical size
     typedef QVector<QPair<qint64, FrameMetadata> > MotionMap;
     mutable double m_prevSampleAspectRatio;
-    bool m_forcedMtDecoding;
+    ForceMtDecodingType m_forcedMtDecoding;
     qint64 m_prevTimestamp;
     bool m_spsFound;
     std::deque<qint64> m_dtsQueue;

@@ -137,8 +137,7 @@ CommonUpdateInstaller::State CommonUpdateInstaller::checkContents(const QString&
 
 bool CommonUpdateInstaller::install(const QnAuthSession& authInfo)
 {
-    QString currentDir = QDir::currentPath();
-    QDir::setCurrent(installerWorkDir());
+    QString installerDir  = installerWorkDir();
 
     QStringList arguments;
     QString logFileName;
@@ -153,13 +152,14 @@ bool CommonUpdateInstaller::install(const QnAuthSession& authInfo)
     commonModule()->auditManager()->addAuditRecord(authRecord);
 
     QString installerPath = QDir(installerWorkDir()).absoluteFilePath(m_executable);
-    SystemError::ErrorCode error = nx::startProcessDetached(installerPath, arguments);
+    SystemError::ErrorCode error = nx::startProcessDetached(installerPath, arguments, installerDir);
     if (error == SystemError::noError)
-        NX_INFO(this, lm("Update has been started. file=%1, args=%2").args(installerPath, arguments.join(" ")));
+    {
+        auto argumentsString = lm("%1").arg(arguments.join("\" \""));
+        NX_INFO(this, lm("Update has been started. file=\"%1\", args=%2").args(installerPath, argumentsString));
+    }
     else
         NX_ERROR(this, lm("Failed to launch update script. %1").args(SystemError::toString(error)));
-
-    QDir::setCurrent(currentDir);
 
     return true;
 }

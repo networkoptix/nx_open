@@ -1590,11 +1590,6 @@ bool MultiServerUpdatesWidget::hasChanges() const
     return false;
 }
 
-bool MultiServerUpdatesWidget::canApplyChanges() const
-{
-    return true;
-}
-
 bool MultiServerUpdatesWidget::canDiscardChanges() const
 {
     // TODO: #GDM now this prevents other tabs from discarding their changes

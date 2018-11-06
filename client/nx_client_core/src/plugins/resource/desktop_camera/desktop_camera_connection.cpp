@@ -18,7 +18,7 @@
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/streaming/config.h>
 #include <nx/network/buffered_stream_socket.h>
-
+#include <core/resource_management/resource_pool.h>
 static const int CONNECT_TIMEOUT = 1000 * 5;
 static const int KEEP_ALIVE_TIMEOUT = 1000 * 120;
 
@@ -30,9 +30,10 @@ public:
         m_owner(owner),
         m_needVideoData(false)
     {
+        auto config = DecoderConfig::fromResource(owner->getResource()->toSharedPointer());
         for (int i = 0; i < 2; ++i)
         {
-            m_serializers[i].reset(new QnRtspFfmpegEncoder(owner->commonModule()->metrics()));
+            m_serializers[i].reset(new QnRtspFfmpegEncoder(config, owner->commonModule()->metrics()));
             m_serializers[i]->setAdditionFlags(0);
             m_serializers[i]->setLiveMarker(true);
         }
@@ -126,6 +127,11 @@ QnDesktopCameraConnectionProcessor::~QnDesktopCameraConnectionProcessor()
     disconnectInternal();
 }
 
+QnResourcePtr QnDesktopCameraConnectionProcessor::getResource() const
+{
+    Q_D(const QnDesktopCameraConnectionProcessor);
+    return commonModule()->resourcePool()->getResourceById(d->desktop->getDesktopResourceUuid());
+}
 void QnDesktopCameraConnectionProcessor::processRequest()
 {
     Q_D(QnDesktopCameraConnectionProcessor);

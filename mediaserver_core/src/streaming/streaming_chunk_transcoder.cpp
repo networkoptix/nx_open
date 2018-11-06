@@ -425,7 +425,8 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
 
     //launching transcoding:
     //creating transcoder
-    std::unique_ptr<QnTranscoder> transcoder(new QnFfmpegTranscoder(mediaResource->commonModule()->metrics()));
+    auto config = DecoderConfig::fromResource(mediaResource);
+    std::unique_ptr<QnTranscoder> transcoder(new QnFfmpegTranscoder(config, mediaResource->commonModule()->metrics()));
     if (transcoder->setContainer(transcodeParams.containerFormat()) != 0)
     {
         NX_WARNING(this, lm("Failed to create transcoder with container \"%1\" to transcode chunk (%2 - %3) of resource %4")

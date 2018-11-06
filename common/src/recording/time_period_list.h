@@ -85,7 +85,7 @@ public:
             }
             else
             {
-                if (last.durationMs < detailLevel && !keepSmallChunks)
+                if (!last.isInfinite() && last.durationMs < detailLevel && !keepSmallChunks)
                     result.pop_back();
                 if (result.size() >= limit)
                     break;
@@ -93,7 +93,7 @@ public:
             }
         }
 
-        if (result.last().durationMs < detailLevel && !keepSmallChunks)
+        if (!result.last().isInfinite() && result.last().durationMs < detailLevel && !keepSmallChunks)
             result.pop_back();
         return result;
     }

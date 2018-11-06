@@ -340,12 +340,15 @@ void QnTcpListener::run()
             auto clientSocket = d->serverSocket->accept();
             if (clientSocket)
             {
-                commonModule()->metrics()->tcpConnections().total()++;
-                clientSocket->setBeforeDestroyCallback(
-                    [metrics = commonModule()->metrics()]()
-                    {
-                        metrics->tcpConnections().total()--;
-                    });
+                if (commonModule())
+                {
+                    commonModule()->metrics()->tcpConnections().total()++;
+                    clientSocket->setBeforeDestroyCallback(
+                        [metrics = commonModule()->metrics()]()
+                        {
+                            metrics->tcpConnections().total()--;
+                        });
+                }
                 processNewConnection(std::move(clientSocket));
             }
             else
