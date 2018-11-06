@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NxExternalVideoComponent } from './external-video.component';
 
-describe('NxContentBlockComponent', () => {
+describe('NxExternalVideoComponent', () => {
     let component: NxExternalVideoComponent;
     let fixture: ComponentFixture<NxExternalVideoComponent>;
 

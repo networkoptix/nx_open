@@ -509,7 +509,7 @@
             "name": "instructionVideo",
             "label": "Instruction Video",
             "value": "",
-            "description": "A youtube or vimeo embed link for the instruction video.",
+            "description": "A youtube or vimeo link for the instruction video.",
             "type": "text",
             "optional": true,
             "meta": {
@@ -689,7 +689,7 @@
             "name": "additionalVideo",
             "label": "Additional Video",
             "value": "",
-            "description": "A youtube or vimeo embed link for a video.",
+            "description": "A youtube or vimeo link for a video.",
             "type": "text",
             "optional": true,
             "meta": {
@@ -718,6 +718,17 @@
         "name": "Support",
         "translatable": false,
         "values": [
+          {
+            "name": "supportVideo",
+            "label": "Support Video",
+            "value": "",
+            "description": "A youtube or vimeo link for a support video.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "regex": "^https?:\\/\\/(?:(?:www\\.youtube\\.com\\/(?:embed\\/|watch\\?v=)|youtu\\.be\\/)[\\w]+|vimeo\\.com\\/[\\d]+)$"
+            }
+          },
           {
             "name": "supportInformation",
             "label": "Support Information",
