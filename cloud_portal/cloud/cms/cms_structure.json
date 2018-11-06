@@ -482,6 +482,17 @@
         "translatable": false,
         "values": [
           {
+            "name": "overviewVideo",
+            "label": "Overview Video",
+            "value": "",
+            "description": "A youtube or vimeo link for the overview video.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "regex": "^https?:\\/\\/(?:(?:www\\.youtube\\.com\\/(?:embed\\/|watch\\?v=)|youtu\\.be\\/)[\\w]+|vimeo\\.com\\/[\\d]+)$"
+            }
+          },
+          {
             "name": "description",
             "label": "Full functionality overview",
             "value": "",
@@ -498,7 +509,7 @@
             "name": "instructionVideo",
             "label": "Instruction Video",
             "value": "",
-            "description": "A youtube embed link for the instruction video.",
+            "description": "A youtube or vimeo embed link for the instruction video.",
             "type": "text",
             "optional": true,
             "meta": {
@@ -650,6 +661,17 @@
         "name": "Additional Information",
         "translatable": false,
         "values": [
+          {
+            "name": "additionalVideo",
+            "label": "Additional Video",
+            "value": "",
+            "description": "A youtube or vimeo embed link for a video.",
+            "type": "text",
+            "optional": true,
+            "meta": {
+              "regex": "^https?:\\/\\/(?:(?:www\\.youtube\\.com\\/(?:embed\\/|watch\\?v=)|youtu\\.be\\/)[\\w]+|vimeo\\.com\\/[\\d]+)$"
+            }
+          },
           {
             "name": "usefulLinks",
             "label": "Useful Links",
