@@ -587,6 +587,33 @@
             "type": "external_file",
             "optional": true,
             "public": true
+          },
+          {
+            "name": "generic-file-1",
+            "label": "Generic file 1",
+            "value": "",
+            "description": "Upload any other necessary files.",
+            "type": "external_file",
+            "optional": true,
+            "public": true
+          },
+          {
+            "name": "generic-file-2",
+            "label": "Generic file 2",
+            "value": "",
+            "description": "Upload any other necessary files.",
+            "type": "external_file",
+            "optional": true,
+            "public": true
+          },
+          {
+            "name": "generic-file-3",
+            "label": "Generic file 3",
+            "value": "",
+            "description": "Upload any other necessary files.",
+            "type": "external_file",
+            "optional": true,
+            "public": true
           }
         ]
       },

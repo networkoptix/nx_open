@@ -38,6 +38,9 @@ export class IntegrationService implements OnDestroy {
                 let downloadPlatforms = plugin.downloadFiles;
                 plugin.downloadFiles = [];
                 Object.keys(downloadPlatforms).forEach((platformName) => {
+                    if(!downloadPlatforms[platformName]) {
+                        return;
+                    }
                     let platform: Platform = { file: '', name: '', url: '' };
                     platform.name = platformName.replace('-file', '')
                             .replace('-', ' ');
