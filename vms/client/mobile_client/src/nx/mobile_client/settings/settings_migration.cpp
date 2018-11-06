@@ -72,8 +72,8 @@ static void migrateFrom24To25()
 
 static void migrateFrom26To30()
 {
-    using namespace client::core;
-    using namespace client::core::helpers;
+    using namespace nx::vms::client::core;
+    using namespace nx::vms::client::core::helpers;
 
     const QVariantList sessions = qnSettings->savedSessions();
     if (sessions.isEmpty())

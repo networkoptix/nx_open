@@ -12,25 +12,15 @@ class QnCloudStatusWatcher;
 class QnMobileClientUiController;
 class QnCloudUrlHelper;
 
-namespace nx {
-namespace client {
-
-namespace core {
+namespace nx::vms::client::core {
 
 class UserWatcher;
 class TwoWayAudioController;
 class OperationManager;
 
-} // namespace core
+} // namespace nx::vms::client::core
 
-namespace mobile {
-
-class QmlSettingsAdaptor;
-
-} // namespace mobile
-
-} // namespace client
-} // namespace nx
+namespace nx::client::mobile { class QmlSettingsAdaptor; }
 
 using nx::client::mobile::QmlSettingsAdaptor;
 

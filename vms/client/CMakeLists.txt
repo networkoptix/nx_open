@@ -1,5 +1,5 @@
 if(withDesktopClient OR withMobileClient)
-    add_subdirectory(nx_client_core)
+    add_subdirectory(nx_vms_client_core)
 endif()
 
 if(withDesktopClient)
@@ -22,7 +22,7 @@ if(withDesktopClient)
         add_subdirectory(nov_file_launcher)
     endif()
 
-    add_subdirectory(nx_client_desktop)
+    add_subdirectory(nx_vms_client_desktop)
     add_subdirectory(desktop_client)
     add_subdirectory(applauncher)
 endif()

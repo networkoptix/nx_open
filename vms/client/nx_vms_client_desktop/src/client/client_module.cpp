@@ -330,7 +330,7 @@ QnNetworkProxyFactory* QnClientModule::networkProxyFactory() const
 
 void QnClientModule::initMetaInfo()
 {
-    Q_INIT_RESOURCE(nx_client_desktop);
+    Q_INIT_RESOURCE(nx_vms_client_desktop);
     QnClientMetaTypes::initialize();
 }
 

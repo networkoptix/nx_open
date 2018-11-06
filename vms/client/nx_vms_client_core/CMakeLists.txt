@@ -15,13 +15,13 @@ endif()
 
 mark_as_advanced(Qt5MultimediaQuick_LIBRARY)
 
-nx_add_target(nx_client_core LIBRARY
+nx_add_target(nx_vms_client_core LIBRARY
     PUBLIC_LIBS
         Qt5::Quick ${Qt5MultimediaQuick_LIBRARY}
         qtkeychain
         appserver2 nx_vms_utils cloud_db_client nx_media nx_network nx_utils nx_update)
 
-target_include_directories(nx_client_core
+target_include_directories(nx_vms_client_core
     PUBLIC
         ${Qt5Quick_PRIVATE_INCLUDE_DIRS}
         ${Qt5Multimedia_PRIVATE_INCLUDE_DIRS})

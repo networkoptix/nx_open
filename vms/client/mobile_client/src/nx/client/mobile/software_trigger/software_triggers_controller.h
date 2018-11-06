@@ -10,25 +10,11 @@ class QnUuid;
 class QnCommonModule;
 class QnResourceAccessManager;
 
-namespace nx {
+namespace nx::vms::event { class RuleManager; }
 
-namespace vms {
-namespace event {
+namespace nx::vms::client::core { class UserWatcher; }
 
-class RuleManager;
-
-} // namespace event
-} // namespace vms
-
-namespace client {
-
-namespace core {
-
-class UserWatcher;
-
-} // namespace core
-
-namespace mobile {
+namespace nx::client::mobile {
 
 class SoftwareTriggersController: public QObject
 {
@@ -65,7 +51,7 @@ private:
 
 private:
     QnCommonModule* const m_commonModule = nullptr;
-    core::UserWatcher* const m_userWatcher = nullptr;
+    nx::vms::client::core::UserWatcher* const m_userWatcher = nullptr;
     QnResourceAccessManager* const m_accessManager = nullptr;
     vms::event::RuleManager* const m_ruleManager = nullptr;
 
@@ -73,6 +59,4 @@ private:
     QnUuid m_activeTriggerId;
 };
 
-} // namespace mobile
-} // namespace client
-} // namespace nx
+} // namespace nx::client::mobile

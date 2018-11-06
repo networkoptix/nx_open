@@ -97,7 +97,7 @@ void SessionsMigrationHelper::Private::checkEndpoints()
 void SessionsMigrationHelper::Private::at_moduleFound(
     const vms::discovery::ModuleEndpoint& moduleData)
 {
-    using client::core::LocalConnectionData;
+    using nx::vms::client::core::LocalConnectionData;
 
     const auto systemId = helpers::getLocalSystemId(moduleData);
     auto recentConnections = qnClientCoreSettings->recentLocalConnections();
@@ -146,7 +146,7 @@ void SessionsMigrationHelper::Private::at_moduleFound(
         const auto credentialsList = authenticationData.take(fakeId);
 
         recentConnections.erase(migratedIt);
-        client::core::helpers::removeConnection(fakeId);
+        nx::vms::client::core::helpers::removeConnection(fakeId);
 
         savedSessions.erase(
             std::find_if(savedSessions.begin(), savedSessions.end(),
@@ -156,12 +156,12 @@ void SessionsMigrationHelper::Private::at_moduleFound(
                 }));
 
         for (const auto& url: connectionData.urls)
-            client::core::helpers::storeConnection(systemId, connectionData.systemName, url);
+            nx::vms::client::core::helpers::storeConnection(systemId, connectionData.systemName, url);
 
         for (const auto& credentials: credentialsList)
         {
-            if (client::core::helpers::getCredentials(systemId, credentials.user).isEmpty())
-                client::core::helpers::storeCredentials(systemId, credentials);
+            if (nx::vms::client::core::helpers::getCredentials(systemId, credentials.user).isEmpty())
+                nx::vms::client::core::helpers::storeCredentials(systemId, credentials);
         }
 
         recentConnectionsChanged = true;

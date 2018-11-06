@@ -8,8 +8,11 @@ from environment import zip_files
 
 
 def create_client_debug_file(binaries_dir, client_binary_name, output_filename):
-    pdb_filename = client_binary_name.replace('.exe', '.pdb')
-    zip_files([pdb_filename], binaries_dir, output_filename)
+    pdb_filenames = [
+        client_binary_name.replace('.exe', '.pdb'),
+        'nx_vms_client_desktop.pdb'
+    ]
+    zip_files(pdb_filenames, binaries_dir, output_filename)
 
 
 def main():

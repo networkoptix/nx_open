@@ -7,7 +7,7 @@ nx_add_target(nov_browser EXECUTABLE
     RC_FILE
         "nov_browser.rc"
     PUBLIC_LIBS
-        nx_vms_utils nx_utils nx_client_core
+        nx_vms_utils nx_utils nx_vms_client_core
     PRIVATE_LIBS
         Qt5::Core
         Qt5::Gui

@@ -171,8 +171,8 @@ endif()
 
 set(QML_IMPORT_PATH
     "${QT_DIR}/qml"
-    "${CMAKE_CURRENT_LIST_DIR}/client/nx_client_desktop/static-resources/qml"
-    "${CMAKE_CURRENT_LIST_DIR}/client/mobile_client/static-resources/qml"
+    "${CMAKE_CURRENT_LIST_DIR}/vms/client/nx_vms_client_desktop/static-resources/qml"
+    "${CMAKE_CURRENT_LIST_DIR}/vms/client/mobile_client/static-resources/qml"
     "${CMAKE_CURRENT_LIST_DIR}/nxtool/static-resources/src/qml"
     CACHE STRING "Extra QML import paths")
 

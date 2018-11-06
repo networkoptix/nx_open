@@ -1,5 +1,5 @@
 #include <windows.h>
-#include "${CMAKE_SOURCE_DIR}/client/nx_client_desktop/src/app_icons.h"
+#include "${CMAKE_SOURCE_DIR}/vms/client/nx_vms_client_desktop/src/app_icons.h"
 
 IDI_ICON_APPLICATION    ICON    DISCARDABLE     "${customization.dir}/icons/all/favicon.ico"
 IDI_ICON_VIDEOWALL      ICON    DISCARDABLE     "${customization.dir}/icons/all/videowall.ico"

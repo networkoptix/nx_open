@@ -89,8 +89,8 @@ SoftwareTriggersWatcher::SoftwareTriggersWatcher(QObject* parent):
         this, &SoftwareTriggersWatcher::updateTriggers);
 
     const auto manager = globalPermissionsManager();
-    const auto userWatcher = commonModule()->instance<core::UserWatcher>();
-    connect(userWatcher, &core::UserWatcher::userChanged,
+    const auto userWatcher = commonModule()->instance<nx::vms::client::core::UserWatcher>();
+    connect(userWatcher, &nx::vms::client::core::UserWatcher::userChanged,
         this, &SoftwareTriggersWatcher::updateTriggers);
     connect(manager, &QnGlobalPermissionsManager::globalPermissionsChanged, this,
         [this, userWatcher]

@@ -142,7 +142,7 @@ copyBuildLibs()
         LIBS_TO_COPY+=(
             # vms
             libnx_audio
-            libnx_client_core
+            libnx_vms_client_core
             libnx_media
             libnx_vms_utils
 

@@ -35,7 +35,7 @@ namespace nx {
 namespace client {
 namespace mobile {
 
-using namespace core;
+using namespace nx::vms::client::core;
 
 struct ActionButtonsModel::Button
 {

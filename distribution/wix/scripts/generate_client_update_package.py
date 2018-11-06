@@ -41,6 +41,7 @@ qt_plugins = [
     'platforms/qwindows.dll']
 
 nx_libraries = [
+    'nx_vms_client_desktop',
     'nx_vms_utils',
 	'nx_vms_applauncher_api',
     'nx_utils',

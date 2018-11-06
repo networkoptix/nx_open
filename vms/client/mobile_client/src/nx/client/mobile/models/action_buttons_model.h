@@ -6,14 +6,13 @@
 #include <utils/common/connective.h>
 #include <nx/client/mobile/software_trigger/software_triggers_watcher.h>
 
-namespace nx {
-namespace client {
+namespace nx::vms::client::core {
 
-namespace core {
 class TwoWayAudioAvailabilityWatcher;
-} // namespace core
 
-namespace mobile {
+} // namespace nx::vms::client::core
+
+namespace nx::client::mobile {
 
 class PtzAvailabilityWatcher;
 
@@ -94,12 +93,10 @@ private:
     QnUuid m_resourceId;
     ButtonList m_buttons;
     QScopedPointer<PtzAvailabilityWatcher> m_ptzAvailabilityWatcher;
-    QScopedPointer<core::TwoWayAudioAvailabilityWatcher> m_twoWayAudioAvailabilityWatcher;
+    QScopedPointer<nx::vms::client::core::TwoWayAudioAvailabilityWatcher> m_twoWayAudioAvailabilityWatcher;
     QScopedPointer<SoftwareTriggersWatcher> m_softwareTriggeresWatcher;
 };
 
-} // namespace mobile
-} // namespace client
-} // namespace nx
+} // namespace nx::client::mobile
 
 Q_DECLARE_METATYPE(nx::client::mobile::ActionButtonsModel::ButtonType)

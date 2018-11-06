@@ -40,13 +40,13 @@ TRANSLATABLE_PROJECTS = [
     TranslatableProject("common", groups=[ProjectGroups.MOBILE]),
     TranslatableProject("traytool", groups=[ProjectGroups.VMS]),
     TranslatableProject(
-        "client_base", "vms/client/nx_client_desktop", groups=[ProjectGroups.VMS]),
+        "client_base", "vms/client/nx_vms_client_desktop", groups=[ProjectGroups.VMS]),
     TranslatableProject(
-        "client_ui", "vms/client/nx_client_desktop", groups=[ProjectGroups.VMS]).ui(),
+        "client_ui", "vms/client/nx_vms_client_desktop", groups=[ProjectGroups.VMS]).ui(),
     TranslatableProject(
-        "client_core", "vms/client/nx_client_core", groups=[ProjectGroups.MOBILE, ProjectGroups.VMS]),
+        "client_core", "vms/client/nx_vms_client_core", groups=[ProjectGroups.MOBILE, ProjectGroups.VMS]),
     TranslatableProject(
-        "client_qml", "vms/client/nx_client_desktop", groups=[ProjectGroups.VMS]).qml(),
+        "client_qml", "vms/client/nx_vms_client_desktop", groups=[ProjectGroups.VMS]).qml(),
     TranslatableProject(
         "mobile_client_base", "vms/client/mobile_client", groups=[ProjectGroups.MOBILE]),
     TranslatableProject(
