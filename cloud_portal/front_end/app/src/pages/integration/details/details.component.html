@@ -11,7 +11,7 @@
 
     <div class="row m-0 p-3">
         <div class="row m-0 p-0 col-12 col-md-8 col-xl-7 col-xxl-10">
-            <div class="col-12 col-xxl-6 pb-3">
+            <div class="col-12 col-xxl-6">
                 <nx-block>
                     <header>
                         {{plugin.information.name}}
@@ -32,7 +32,7 @@
                 </nx-block>
             </div>
 
-            <div class="col-12 col-xxl-6 pb-3" *ngIf="plugin.instructions">
+            <div class="col-12 col-xxl-6" *ngIf="plugin.instructions">
                 <nx-block >
                     <header translate>
                         Instructions
@@ -48,7 +48,7 @@
                 </nx-block>
             </div>
 
-            <div class="col-12 col-xxl-6 pb-3" *ngIf="plugin.support">
+            <div class="col-12 col-xxl-6" *ngIf="plugin.support">
                 <nx-block>
                     <header translate>
                         Support
@@ -63,7 +63,7 @@
                 </nx-block>
             </div>
 
-            <div class="col-12 col-xxl-6 pb-3" *ngIf="plugin.additionalInformation">
+            <div class="col-12 col-xxl-6" *ngIf="plugin.additionalInformation">
                 <nx-block>
                     <header translate>
                         Additional information
@@ -83,7 +83,7 @@
             </div>
         </div>
 
-        <div *ngIf="plugin.downloadFiles.length > 1" class="col-12 col-md-4 col-xl-3 col-xxl-2">
+        <div *ngIf="plugin.downloadFiles && plugin.downloadFiles.length > 1" class="col-12 col-md-4 col-xl-3 col-xxl-2">
             <nx-block type='gray'>
                 <header translate>
                     Download
