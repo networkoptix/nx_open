@@ -4,6 +4,7 @@
 #include <nx/utils/software_version.h>
 #include <utils/common/process.h>
 #include <utils/common/app_info.h>
+#include <utils/common/util.h>
 #include <audit/audit_manager.h>
 #include <api/model/audit/auth_session.h>
 #include <common/common_module.h>
@@ -155,7 +156,7 @@ bool CommonUpdateInstaller::install(const QnAuthSession& authInfo)
     SystemError::ErrorCode error = nx::startProcessDetached(installerPath, arguments, installerDir);
     if (error == SystemError::noError)
     {
-        auto argumentsString = lm("%1").arg(arguments.join("\" \""));
+        auto argumentsString = lm("\"%1\"").arg(arguments.join("\" \""));
         NX_INFO(this, lm("Update has been started. file=\"%1\", args=%2").args(installerPath, argumentsString));
     }
     else
@@ -168,7 +169,7 @@ bool CommonUpdateInstaller::install(const QnAuthSession& authInfo)
 
 QString CommonUpdateInstaller::installerWorkDir() const
 {
-    return dataDirectoryPath() + QDir::separator() + ".installer";
+    return closeDirPath(dataDirectoryPath()) + "nx_installer";
 }
 
 void CommonUpdateInstaller::stopSync()
