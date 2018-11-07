@@ -72,8 +72,8 @@ copyBuildLibs()
         libappserver2
         libcloud_db_client
         libcommon
-        libmediaserver_core
-        libmediaserver_db
+        libnx_vms_server
+        libnx_vms_server_db
         libnx_email
         libnx_fusion
         libnx_kit
