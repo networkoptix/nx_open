@@ -13,7 +13,50 @@ namespace nx::test {
 class CameraAuthUt: public ::testing::Test
 {
 protected:
-private:
+    template <typename Data>
+    ec2::QnTransaction<Data> createTran(const QString& name, const QString& value)
+    {
+        if constexpr (std::is_same<Data, vms::api::ResourceParamWithRefData>::value)
+        {
+            return ec2::QnTransaction<Data>(
+                ec2::ApiCommand::setResourceParam,
+                QnUuid::createUuid(),
+                Data(QnUuid::createUuid(), name, value));
+        }
+        else
+        {
+            return ec2::QnTransaction<Data>(
+                ec2::ApiCommand::setResourceParam,
+                QnUuid::createUuid(),
+                Data(name, value));
+        }
+    }
+
+    template <typename Data>
+    ec2::QnTransaction<Data> whenTransactionProcessed(const ec2::QnTransaction<Data>& originalTran)
+    {
+        return ec2::detail::amendTranIfNeeded(originalTran);
+    }
+
+    template<typename Data>
+    void thenItShouldBeAmended(
+        const ec2::QnTransaction<Data>& originalTran,
+        const ec2::QnTransaction<Data>& processedTran)
+    {
+        qDebug() << "Original:" << originalTran.params.name << originalTran.params.value;
+        qDebug() << "Amended:" << processedTran.params.name << processedTran.params.value;
+        ASSERT_NE(originalTran.params, processedTran.params);
+    }
+
+    template<typename Data>
+    void thenItShouldNOTBeAmended(
+        const ec2::QnTransaction<Data>& originalTran,
+        const ec2::QnTransaction<Data>& processedTran)
+    {
+        ASSERT_EQ(originalTran.params, processedTran.params);
+        qDebug() << "Original:" << originalTran.params.name << originalTran.params.value;
+        qDebug() << "Amended:" << processedTran.params.name << processedTran.params.value;
+    }
 };
 
 class CameraAuth: public ::testing::Test
@@ -36,17 +79,44 @@ private:
 
 TEST_F(CameraAuthUt, amendTransaction_ParamData)
 {
-    // const auto originalTran = createTranWithTestParamData();
-    // const auto amendedTran = whenTransactionProcessed(originalTran);
-    // thenItShouldBeAmended(originalTran, amendedTran);
+    auto originalTran = createTran<vms::api::ResourceParamData>(
+        Qn::CAMERA_CREDENTIALS_PARAM_NAME,
+        "testValue");
+    auto amendedTran = whenTransactionProcessed(originalTran);
+    thenItShouldBeAmended(originalTran, amendedTran);
+
+    originalTran = createTran<vms::api::ResourceParamData>(
+        Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME,
+        "testValue");
+    amendedTran = whenTransactionProcessed(originalTran);
+    thenItShouldBeAmended(originalTran, amendedTran);
+
+    originalTran = createTran<vms::api::ResourceParamData>(
+        "some_other_name",
+        "testValue");
+    amendedTran = whenTransactionProcessed(originalTran);
+    thenItShouldNOTBeAmended(originalTran, amendedTran);
 }
 
 TEST_F(CameraAuthUt, amendTransaction_ParamWithRefData)
 {
-    // const auto originalTran = createTranWithTestParamWithRefData();
-    // const auto amendedTran = whenTransactionProcessed(originalTran);
-    // thenItShouldBeAmended(originalTran, amendedTran);
-}
+    auto originalTran = createTran<vms::api::ResourceParamWithRefData>(
+        Qn::CAMERA_CREDENTIALS_PARAM_NAME,
+        "testValue");
+    auto amendedTran = whenTransactionProcessed(originalTran);
+    thenItShouldBeAmended(originalTran, amendedTran);
+
+    originalTran = createTran<vms::api::ResourceParamWithRefData>(
+        Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME,
+        "testValue");
+    amendedTran = whenTransactionProcessed(originalTran);
+    thenItShouldBeAmended(originalTran, amendedTran);
+
+    originalTran = createTran<vms::api::ResourceParamWithRefData>(
+        "some_other_name",
+        "testValue");
+    amendedTran = whenTransactionProcessed(originalTran);
+    thenItShouldNOTBeAmended(originalTran, amendedTran);}
 
 TEST_F(CameraAuth, SetGetViaNetworkResource)
 {
