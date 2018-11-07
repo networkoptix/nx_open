@@ -36,3 +36,7 @@ target_compile_definitions(nx_network
 if(WINDOWS)
     target_link_libraries(nx_network PRIVATE Iphlpapi ws2_32)
 endif()
+
+if(withTests)
+    add_subdirectory(unit_tests)
+endif()

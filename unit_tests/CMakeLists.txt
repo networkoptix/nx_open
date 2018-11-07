@@ -1,7 +1,6 @@
 if(TARGET nx_media)
     add_subdirectory(nx_media_ut)
 endif()
-add_subdirectory(nx_network_ut)
 add_subdirectory(nx_sdk_ut)
 
 if(withClouds)
