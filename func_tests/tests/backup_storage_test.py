@@ -177,23 +177,23 @@ def add_camera(camera_pool, server, camera_id, backup_type):
 def assert_backup_equal_to_archive(
         server, backup_storage_path, camera,
         system_backup_type, backup_new_camera, camera_backup_type):
-    hi_quality_backup_path = backup_storage_path / HI_QUALITY_PATH / camera.mac_addr
-    hi_quality_server_archive_path = server.storage.dir / HI_QUALITY_PATH / camera.mac_addr
-    low_quality_backup_path = backup_storage_path / LOW_QUALITY_PATH / camera.mac_addr
-    low_quality_server_archive_path = server.storage.dir / LOW_QUALITY_PATH / camera.mac_addr
+    backup_hi = backup_storage_path / HI_QUALITY_PATH / camera.mac_addr
+    archive_hi = server.storage.dir / HI_QUALITY_PATH / camera.mac_addr
+    backup_lo = backup_storage_path / LOW_QUALITY_PATH / camera.mac_addr
+    archive_lo = server.storage.dir / LOW_QUALITY_PATH / camera.mac_addr
     if ((camera_backup_type and camera_backup_type == BACKUP_DISABLED) or
             (not camera_backup_type and not backup_new_camera)):
-        assert not hi_quality_backup_path.exists()
-        assert not low_quality_backup_path.exists()
+        assert not backup_hi.exists()
+        assert not backup_lo.exists()
     elif system_backup_type == BACKUP_HIGH:
-        assert server.os_access.tree_md5(hi_quality_backup_path) == server.os_access.tree_md5(hi_quality_server_archive_path)
-        assert not low_quality_backup_path.exists()
+        assert server.os_access.tree_md5(backup_hi) == server.os_access.tree_md5(archive_hi)
+        assert not backup_lo.exists()
     elif system_backup_type == BACKUP_LOW:
-        assert not hi_quality_backup_path.exists()
-        assert server.os_access.tree_md5(low_quality_backup_path) == server.os_access.tree_md5(low_quality_server_archive_path)
+        assert not backup_hi.exists()
+        assert server.os_access.tree_md5(backup_lo) == server.os_access.tree_md5(archive_lo)
     else:
-        assert server.os_access.tree_md5(hi_quality_backup_path) == server.os_access.tree_md5(hi_quality_server_archive_path)
-        assert server.os_access.tree_md5(low_quality_backup_path) == server.os_access.tree_md5(low_quality_server_archive_path)
+        assert server.os_access.tree_md5(backup_hi) == server.os_access.tree_md5(archive_hi)
+        assert server.os_access.tree_md5(backup_lo) == server.os_access.tree_md5(archive_lo)
 
 
 def test_backup_by_request(
