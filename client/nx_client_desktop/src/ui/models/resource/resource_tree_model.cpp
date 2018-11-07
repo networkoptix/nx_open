@@ -705,9 +705,9 @@ QStringList QnResourceTreeModel::mimeTypes() const
     return result;
 }
 
-QMimeData *QnResourceTreeModel::mimeData(const QModelIndexList& indexes) const
+QMimeData* QnResourceTreeModel::mimeData(const QModelIndexList& indexes) const
 {
-    auto mimeData = base_type::mimeData(indexes);
+    QScopedPointer<QMimeData> mimeData(base_type::mimeData(indexes));
     if (!mimeData)
         return nullptr;
 
@@ -752,7 +752,7 @@ QMimeData *QnResourceTreeModel::mimeData(const QModelIndexList& indexes) const
             resources.insert(res);
     }
 
-    MimeData data(mimeData, resourcePool());
+    MimeData data(mimeData.get(), resourcePool());
     data.setEntities(entities.toList());
     data.setResources(resources.toList());
     data.setData(pureTreeResourcesOnlyMimeType, QByteArray(pureTreeResourcesOnly ? "1" : "0"));
