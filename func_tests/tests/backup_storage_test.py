@@ -4,7 +4,6 @@ from datetime import datetime
 
 import pytest
 import pytz
-from pathlib2 import Path
 
 import framework.utils as utils
 import server_api_data_generators as generator
@@ -83,8 +82,9 @@ def second_camera_backup_type(request):
 
 @pytest.fixture()
 def backup_storage_volume(one_mediaserver):
-    storage_volume = one_mediaserver.os_access.make_fake_disk('backup', DEFAULT_VOLUME_SIZE)
-    return storage_volume
+    fake_disk = one_mediaserver.os_access.fake_disk()
+    fake_disk.mount(DEFAULT_VOLUME_SIZE)
+    return fake_disk.path
 
 
 @pytest.fixture()
@@ -142,7 +142,7 @@ def add_backup_storage(server, storage_path):
     server.api.generic.post('ec2/saveStorage', dict(**storage))
     wait_storage_ready(server, storage['id'])
     change_and_assert_server_backup_type(server, 'BackupManual')
-    return Path(storage['url'])
+    return server.os_access.path_cls(storage['url'])
 
 
 def wait_backup_finish(server, expected_backup_time):

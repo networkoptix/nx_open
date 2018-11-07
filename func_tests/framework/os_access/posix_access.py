@@ -1,6 +1,7 @@
 import datetime
 import errno
 import logging
+import shlex
 import timeit
 from abc import ABCMeta
 from contextlib import contextmanager
@@ -18,7 +19,7 @@ from framework.os_access import exceptions
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.local_path import LocalPath
 from framework.os_access.local_shell import local_shell
-from framework.os_access.os_access_interface import OSAccess, OneWayPortMap, ReciprocalPortMap, Time
+from framework.os_access.os_access_interface import BaseFakeDisk, OSAccess, OneWayPortMap, ReciprocalPortMap, Time
 from framework.os_access.path import FileSystemPath
 from framework.os_access.posix_shell import Shell
 from framework.os_access.sftp_path import SftpPath
@@ -175,27 +176,8 @@ class PosixAccess(OSAccess):
             timeout_sec=timeout_sec)
         return output.decode('ascii')
 
-    def _dismount_fake_disk(self, mount_point='/mnt/disk'):
-        try:
-            self.shell.run_command(['umount', mount_point])
-        except exceptions.exit_status_error_cls(1):
-            pass
-
-    def make_fake_disk(self, name, size_bytes, mount_point='/mnt/disk'):
-        self._dismount_fake_disk(mount_point=mount_point)
-        image_path = self.path_cls.tmp() / (name + '.image')
-        disk_bytes = size_bytes + 26 * 1024 * 1024  # Taken by filesystem.
-        self.shell.run_sh_script(
-            # language=Bash
-            '''
-                rm -fv "$IMAGE"
-                fallocate --length $SIZE "$IMAGE"
-                mke2fs -F "$IMAGE"  # Make default filesystem for OS.
-                mkdir -p "$MOUNT_POINT"
-                mount "$IMAGE" "$MOUNT_POINT"
-                ''',
-            env={'MOUNT_POINT': mount_point, 'IMAGE': image_path, 'SIZE': disk_bytes})
-        return self.path_cls(mount_point)
+    def fake_disk(self):
+        return _FakeDisk(self)
 
     def _fs_root(self):
         return self.path_cls('/')
@@ -287,6 +269,41 @@ class PosixAccess(OSAccess):
             parts = path.relative_to(tree_path).parts
             result[parts] = digest
         return result
+
+
+class _FakeDisk(BaseFakeDisk):
+    def __init__(self, posix_access):  # type: (PosixAccess) -> ...
+        super(_FakeDisk, self).__init__(posix_access.path_cls('/mnt/disk'))
+        self._image_path = self.path.with_suffix('.img')
+        self._shell = posix_access.shell
+
+    def remove(self):
+        # At least, in Ubuntu 14.04 trusty, multiple `/dev/loop*` devices may be mounted to single
+        # mount point. Files that are behind `/dev/loop*` may be deleted. To dismount such mounts,
+        # `umount -f /mnt/point` must be called unless it exists with error code 1 and says
+        # `umount2: Invalid argument` and `umount: /mnt/disk: not mounted`.
+        while True:
+            try:
+                self._shell.run_command(['umount', '-f', self.path])
+            except exceptions.exit_status_error_cls(1):
+                break
+        # File should be deleted too. Otherwise, it may contain data from previous test.
+        try:
+            self._image_path.unlink()
+        except exceptions.DoesNotExist:
+            pass
+
+    def mount(self, size_bytes):
+        disk_bytes = size_bytes + 26 * 1024 * 1024  # Taken by filesystem.
+        self._shell.run_sh_script(
+            # language=Bash
+            '''
+                fallocate --length $SIZE "$IMAGE"
+                mke2fs -F "$IMAGE"  # Make default filesystem for OS.
+                mkdir -p "$MOUNT_POINT"
+                mount "$IMAGE" "$MOUNT_POINT"
+                ''',
+            env={'MOUNT_POINT': self.path, 'IMAGE': self._image_path, 'SIZE': disk_bytes})
 
 
 @contextmanager

@@ -183,6 +183,7 @@ class VMType(object):
                 # TODO: Consider unplug and reset only before network setup.
                 vm.os_access.networking.reset()
                 vm.os_access.cleanup_disk_space()
+                vm.os_access.fake_disk().remove()
                 vm.hardware.reset_bandwidth()
                 yield vm
 
