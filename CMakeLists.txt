@@ -205,10 +205,6 @@ if(withTests)
     add_subdirectory(tests)
 endif()
 
-if(withDistributions)
-    add_subdirectory(distribution)
-endif()
-
 include(fix_qt_vars)
 
 if(beta)
