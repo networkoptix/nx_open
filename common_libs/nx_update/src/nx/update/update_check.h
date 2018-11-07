@@ -17,7 +17,8 @@ enum class FindPackageResult
 {
     ok,
     noInfo,
-    otherError
+    otherError,
+    latestUpdateInstalled
 };
 
 Information updateInformation(
