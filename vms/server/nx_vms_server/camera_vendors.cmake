@@ -69,7 +69,7 @@ endif()
 
 nx_enable_camera_vendor(wearable)
 
-# TODO: mediaserver_core uses MDNS unconditionally, so disabling this macro always leads to build
+# TODO: nx_vms_server uses MDNS unconditionally, so disabling this macro always leads to build
 # failure.
 if(NOT targetDevice MATCHES "android|ios")
     nx_enable_camera_vendor_old(third_party)

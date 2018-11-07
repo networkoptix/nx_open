@@ -76,7 +76,7 @@ set_property(SOURCE ${favicon} PROPERTY RESOURCE_ALIAS_PREFIX static/customizati
 set_property(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/webadmin_skins/${defaultSkin}
     PROPERTY RESOURCE_ALIAS_PREFIX static/skin/)
 
-nx_add_target(mediaserver_core LIBRARY
+nx_add_target(nx_vms_server LIBRARY
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/mediaserver_core_app_info_impl.cpp"
     SOURCE_EXCLUSIONS
@@ -90,7 +90,7 @@ nx_add_target(mediaserver_core LIBRARY
     PUBLIC_LIBS
         Qt5::WebSockets
         appserver2
-        mediaserver_db
+        nx_vms_server_db
         nx_onvif
         nx_email
         cloud_db_client
@@ -102,12 +102,12 @@ nx_add_target(mediaserver_core LIBRARY
         ${private_libs}
 )
 
-nx_add_vendor_macros(mediaserver_core)
+nx_add_vendor_macros(nx_vms_server)
 
 if(LINUX)
-    target_link_libraries(mediaserver_core PRIVATE ldap lber)
+    target_link_libraries(nx_vms_server PRIVATE ldap lber)
 endif()
 
 if(WINDOWS)
-    target_link_libraries(mediaserver_core PRIVATE Wldap32.dll Iphlpapi.dll Crypt32.lib)
+    target_link_libraries(nx_vms_server PRIVATE Wldap32.dll Iphlpapi.dll Crypt32.lib)
 endif()

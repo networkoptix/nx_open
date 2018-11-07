@@ -9,6 +9,6 @@ nx_add_server_plugin(hanwha_analytics_plugin
         nx_network
         nx_utils
         nx_fusion
-        mediaserver_core
+        nx_vms_server
         nx_kit
 )

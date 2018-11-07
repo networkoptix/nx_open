@@ -10,7 +10,7 @@ set(file_internal_name "${mediaserver_application_name}")
 set(file_description "${mediaserver.display.name}")
 
 nx_add_target(mediaserver EXECUTABLE SIGNED
-    PUBLIC_LIBS mediaserver_core)
+    PUBLIC_LIBS nx_vms_server)
 
 if(TARGET festival_libs)
     target_link_libraries(mediaserver PRIVATE festival_libs)

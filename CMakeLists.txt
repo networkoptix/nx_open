@@ -194,30 +194,6 @@ if (withMediaServer OR withTestCamera OR withTrayTool OR withDesktopClient OR wi
     add_subdirectory(nx_cloud)
 endif()
 
-if(withMediaServer OR withClouds)
-    add_subdirectory(mediaserver_db)
-endif()
-
-if(withMediaServer)
-    add_subdirectory(mediaserver_core)
-    add_subdirectory(mediaserver)
-    add_subdirectory(plugins)
-    add_subdirectory(storage_plugins)
-
-    if(withDistributions)
-        # TODO: Combine all SDKs (nx_storage_sdk, nx_sdk, nx_analytics_sdk) into one like this.
-        add_subdirectory(nx_analytics_sdk)
-    endif()
-
-    if(withMediaDbUtil)
-        add_subdirectory(media_db_util)
-    endif()
-
-    if(withRootTool)
-        add_subdirectory(root_tool)
-    endif()
-endif()
-
 #add_subdirectory(_axis_controller)
 #add_subdirectory(_dw_vca_controller)
 #add_subdirectory(_dw_mtt_controller)
