@@ -9,3 +9,7 @@ endif()
 if(withTestCamera)
     add_subdirectory(testcamera)
 endif()
+
+if(withNxTool)
+    add_subdirectory(nxtool)
+endif()

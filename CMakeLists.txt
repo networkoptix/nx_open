@@ -198,15 +198,7 @@ endif()
 #add_subdirectory(_dw_vca_controller)
 #add_subdirectory(_dw_mtt_controller)
 
-if(withTestCamera)
-    add_subdirectory(testcamera)
-endif()
-
 add_subdirectory(vms)
-
-if(withNxTool)
-    add_subdirectory(nxtool)
-endif()
 
 if(withTests)
     add_subdirectory(unit_tests)
