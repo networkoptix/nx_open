@@ -1773,6 +1773,8 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc POST /api/changeCameraPassword
      * Change password for already existing user on a camera.
+     * This method is allowed for cameras with 'SetUserPasswordCapability' capability only.
+     * Otherwise it returns an error in the JSON result.
      * %permissions Administrator.
      * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
      *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
