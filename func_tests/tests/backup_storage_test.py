@@ -22,10 +22,6 @@ BACKUP_HIGH = 1      # backup only high quality stream
 BACKUP_LOW = 2       # backup only low quality stream
 BACKUP_BOTH = 3      # backup both (high & low) streams
 
-# Backup and archive subpaths
-HI_QUALITY_PATH = 'hi_quality'
-LOW_QUALITY_PATH = 'low_quality'
-
 # Backup settings
 
 # Combination (via "|") of the days of week on which the backup is active on,
@@ -177,10 +173,10 @@ def add_camera(camera_pool, server, camera_id, backup_type):
 def assert_backup_equal_to_archive(
         server, backup_storage_path, camera,
         system_backup_type, backup_new_camera, camera_backup_type):
-    backup_hi = backup_storage_path / HI_QUALITY_PATH / camera.mac_addr
-    archive_hi = server.storage.dir / HI_QUALITY_PATH / camera.mac_addr
-    backup_lo = backup_storage_path / LOW_QUALITY_PATH / camera.mac_addr
-    archive_lo = server.storage.dir / LOW_QUALITY_PATH / camera.mac_addr
+    backup_hi = backup_storage_path / 'hi_quality' / camera.mac_addr
+    archive_hi = server.storage.dir / 'hi_quality' / camera.mac_addr
+    backup_lo = backup_storage_path / 'low_quality' / camera.mac_addr
+    archive_lo = server.storage.dir / 'low_quality' / camera.mac_addr
     if ((camera_backup_type and camera_backup_type == BACKUP_DISABLED) or
             (not camera_backup_type and not backup_new_camera)):
         assert not backup_hi.exists()
