@@ -5,3 +5,7 @@ add_subdirectory(server)
 if(withTrayTool)
     add_subdirectory(traytool)
 endif()
+
+if(withTestCamera)
+    add_subdirectory(testcamera)
+endif()
