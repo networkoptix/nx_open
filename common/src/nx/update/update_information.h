@@ -76,12 +76,13 @@ public:
     enum class Code
     {
         idle,
-        // Server is downloading update package.
+        // Server is downloading an update package.
         downloading,
-        // Server is verifying update package after successfull downloading.
+        // Server is verifying an update package after downloading has finished successfully.
         preparing,
-        // Update package is downloaded and verified.
+        // Update package has been downloaded and verified.
         readyToInstall,
+        latestUpdateInstalled,
         offline,
         error
     };
