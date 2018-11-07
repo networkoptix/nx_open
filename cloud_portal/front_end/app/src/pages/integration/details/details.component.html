@@ -26,6 +26,9 @@
                     <nx-section>
                         {{plugin.overview.description}}
                     </nx-section>
+                    <nx-section *ngIf="plugin.overview.overviewVideo">
+                        <nx-external-video [src]="plugin.overview.overviewVideo"></nx-external-video>
+                    </nx-section>
                 </nx-block>
             </div>
 
@@ -41,27 +44,36 @@
                 </nx-block>
             </div>
 
-            <div class="col-12 col-xxl-6 pb-3" *ngIf="plugin.support.supportInformation">
+            <div class="col-12 col-xxl-6 pb-3" *ngIf="plugin.support">
                 <nx-block>
                     <header translate>
                         Support
                     </header>
+                    <nx-section *ngIf="plugin.support.supportVideo">
+                        <nx-external-video [src]="plugin.support.supportVideo"></nx-external-video>
+                    </nx-section>
 
-                    <nx-section>
+                    <nx-section *ngIf="plugin.support.supportInformation">
                         <div [innerHtml]="plugin.support.supportInformation"></div>
                     </nx-section>
                 </nx-block>
             </div>
 
-            <div class="col-12 col-xxl-6 pb-3" *ngIf="plugin.additionalInformation.additionalInformation || plugin.additionalInformation.usefulLinks">
+            <div class="col-12 col-xxl-6 pb-3" *ngIf="plugin.additionalInformation">
                 <nx-block>
                     <header translate>
                         Additional information
                     </header>
+                    <nx-section *ngIf="plugin.additionalInformation.additionalVideo">
+                        <nx-external-video [src]="plugin.additionalInformation.additionalVideo"></nx-external-video>
+                    </nx-section>
 
-                    <nx-section>
+                    <nx-section *ngIf="plugin.additionalInformation.additionalInformation">
                         <div [innerHtml]="plugin.additionalInformation.additionalInformation"></div>
-                        <div class="mt-3" [innerHtml]="plugin.additionalInformation.usefulLinks"></div>
+                    </nx-section>
+                    <nx-section *ngIf="plugin.additionalInformation.usefulLinks">
+                        <div class="mt-3"
+                             [innerHtml]="plugin.additionalInformation.usefulLinks"></div>
                     </nx-section>
                 </nx-block>
             </div>
