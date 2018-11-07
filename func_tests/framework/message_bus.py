@@ -15,7 +15,7 @@ import websocket
 
 from .context_logger import ContextAdapter
 from .threaded import ThreadedCall
-from .utils import with_traceback
+from .utils import with_traceback, datetime_local_now
 
 _logger = logging.getLogger(__name__)
 
@@ -43,7 +43,7 @@ class SetResourceParamCommand(TransactionCommand):
             )
 
     def __str__(self):
-        return '%s: %s.%s = %r' % (self.name, self.param.name, self.param.resourceId, self.param.value)
+        return '%s: %s/%s = %r' % (self.name, self.param.name, self.param.resourceId, self.param.value)
 
 
 command_name_to_class = dict(
@@ -53,8 +53,9 @@ command_name_to_class = dict(
 
 class Transaction(object):
 
-    def __init__(self, mediaserver_alias, command):
+    def __init__(self, mediaserver_alias, received_at, command):
         self.mediaserver_alias = mediaserver_alias
+        self.received_at = received_at  # type: datetime
         self.command = command  # type: TransactionCommand
 
     def __str__(self):
@@ -95,15 +96,15 @@ def _bus_thread_running(server, queue, socket_reopened_counter):
         wsl[0].close()
         wsl[0] = open_websocket()
         if socket_reopened_counter:
-            next(socket_reopened_counter)
+            socket_reopened_counter.incr()
 
-    def parse_transaction(json_data):
+    def parse_transaction(json_data, received_at):
         data = json.loads(json_data)
         logger.debug('Received:\n%s', pprint.pformat(data))
         command_name = data['tran']['command']
         command_class = command_name_to_class.get(command_name, TransactionCommand)
         command = command_class(command_name, data)
-        transaction = Transaction(server.api.generic.alias, command)
+        transaction = Transaction(server.api.generic.alias, received_at, command)
         logger.info('Received: %s', transaction)
         return transaction
 
@@ -122,7 +123,8 @@ def _bus_thread_running(server, queue, socket_reopened_counter):
             else:
                 raise
         else:
-            queue.put(parse_transaction(json_data))
+            received_at = datetime_local_now()
+            queue.put(parse_transaction(json_data, received_at))
 
     try:
         with ThreadedCall.periodic(process_transaction, description='message-bus', logger=logger):
@@ -133,6 +135,7 @@ def _bus_thread_running(server, queue, socket_reopened_counter):
 
 @contextmanager
 def message_bus_running(mediaserver_iter, socket_reopened_counter=None):
+        # type: (Iterable[Mediaserver], ThreadSafeCounter) -> Generator[_MessageBusQueue]
     queue = queue_module.Queue()
     # Stop flag is shared between threads for faster shutdown:
     # after first thread's yield returned all other will start exiting too.
