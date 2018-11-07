@@ -2,6 +2,7 @@ import { Injectable, OnDestroy }        from '@angular/core';
 import { HttpClient }                   from '@angular/common/http';
 import { BehaviorSubject, Observable }  from 'rxjs';
 import { NxCloudApiService }            from '../../services/nx-cloud-api';
+import { NxConfigService }              from "../../services/nx-config";
 
 
 interface Platform {
@@ -19,7 +20,8 @@ export class IntegrationService implements OnDestroy {
     pluginsSubject = new BehaviorSubject([]);
 
     constructor(private http: HttpClient,
-                private api: NxCloudApiService) {
+                private api: NxCloudApiService,
+                private config: NxConfigService) {
 
         this.getIntegrations().subscribe(result => {
             this.plugins = result.data;
@@ -30,13 +32,6 @@ export class IntegrationService implements OnDestroy {
 
     private getIntegrations(): Observable<any> {
         return this.api.getIntegrations();
-    }
-
-    private formatPlatformName(platform: string){
-        // Converts 'windows-x64-file' -> 'windows x64'
-        platform = platform.replace('-file', '').replace('-', ' ');
-        // Makes the first character of the string uppercase
-        return platform[0].toUpperCase() + platform.slice(1);
     }
 
     private formatDownloads() {
@@ -55,7 +50,7 @@ export class IntegrationService implements OnDestroy {
                     if (platformName.match(/additional-file-[\d]+/)) {
                         platform.name = downloadPlatforms[`${platformName}-name`];
                     } else {
-                        platform.name = this.formatPlatformName(platformName);
+                        platform.name = this.config.config.defaultPlatformNames[platformName];
                     }
                     platform.url = downloadPlatforms[platformName];
                     platform.file = platform.url.slice(platform.url.lastIndexOf('/') + 1);

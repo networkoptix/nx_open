@@ -260,6 +260,15 @@ export class NxConfigService {
                     link: 'https://www.youtube.com/embed/',
                     regex: '^https?:\\/\\/(?:www\\.youtube\\.com\\/(?:embed\\/|watch\\?v=)|youtu\\.be\\/)([\\w]+)$'
                 }
+            },
+            defaultPlatformNames                 : {
+                'arm-file'        : 'Arm',
+                'linux-x64-file'  : 'Linux x64',
+                'linux-x86-file'  : 'Linux x86',
+                'macos-file'      : 'MacOs',
+                'rpi-file'        : 'Rpi',
+                'windows-x64-file': 'Windows x64',
+                'windows-x86-file': 'Windows x86'
             }
         };
     }
