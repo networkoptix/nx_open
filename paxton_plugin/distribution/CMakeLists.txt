@@ -1,7 +1,7 @@
 set(installerLanguage "en_US")
 set(installerMsiFile "${distribution_output_dir}/${paxton_plugin_distribution_name}.msi")
-set(themeFile "${CMAKE_CURRENT_SOURCE_DIR}/../../../distribution/wix/common/theme.xml")
-set(localizationFile "${CMAKE_CURRENT_SOURCE_DIR}/../../../distribution/wix/common/theme_${installerLanguage}.wxl")
+set(themeFile "${repositoryRootDir}/vms/distribution/wix/common/theme.xml")
+set(localizationFile "${repositoryRootDir}/vms/distribution/wix/common/theme_${installerLanguage}.wxl")
 set(paxtonPluginName "${display.product.name} Paxton Plugin")
 
 if(codeSigning)

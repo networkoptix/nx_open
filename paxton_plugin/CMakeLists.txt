@@ -12,18 +12,19 @@ set(buildNumber "0" CACHE STRING "Build number")
 option(codeSigning "Enable code signing" OFF)
 
 set(signKey "${CMAKE_CURRENT_SOURCE_DIR}/src/Sign.snk")
+set(repositoryRootDir ${PROJECT_SOURCE_DIR}/..)
 
 list(APPEND CMAKE_MODULE_PATH
-    ${PROJECT_SOURCE_DIR}/../../cmake
+    ${repositoryRootDir}/cmake
 )
 
-set(build_utils_dir "${PROJECT_SOURCE_DIR}/../../build_utils" CACHE PATH "Path to build utils")
+set(build_utils_dir "${repositoryRootDir}/build_utils" CACHE PATH "Path to build utils")
 set(rdep_dir "${build_utils_dir}/python" CACHE PATH "Path to rdep scripts")
 include(find_python)
 include(rdep)
 nx_rdep_configure()
 
-set(customization_dir "${PROJECT_SOURCE_DIR}/../../customization/${customization}")
+set(customization_dir "${repositoryRootDir}/customization/${customization}")
 
 include(CMakeDependentOption)
 include(utils)
