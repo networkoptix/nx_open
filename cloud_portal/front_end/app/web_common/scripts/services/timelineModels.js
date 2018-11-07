@@ -633,6 +633,15 @@
         var self = this;
         
         //1. Request records for interval
+
+        /*
+         Here is the logic behind this weird staff:
+         self.currentRequest remembers last request we sent, it supposed to prevent the code from making two requests
+         at the same time.
+         But due to race condition the problem might appear and another request will be sent. In this case we will
+         receive two responses instead of one. That's why we use makeRequest to remember the initial request and compare
+         with self.currentRequest in the handler.
+         */
         var makeRequest = this.mediaserver.getRecords(this.cameras[0], start, end, detailization, null, levelData.name);
         self.currentRequest = makeRequest;
         return self.currentRequest.then(function (data) {
@@ -946,6 +955,16 @@
         
         this.abort('update again');
         // Get next {{limitChunks}} chunks
+
+         /*
+         Here is the logic behind this weird staff:
+         self.currentRequest remembers last request we sent, it supposed to prevent the code from making two requests
+         at the same time.
+         But due to race condition the problem might appear and another request will be sent. In this case we will
+         receive two responses instead of one. That's why we use makeRequest to remember the initial request and compare
+         with self.currentRequest in the handler.
+         */
+         
         var makeRequest = this.mediaserver.getRecords(
             this.cameras[0],
             window.timeManager.displayToServer(requestPosition),
