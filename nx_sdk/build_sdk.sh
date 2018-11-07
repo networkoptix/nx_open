@@ -8,6 +8,7 @@ DOXYCHECK=`command -v doxygen`
 SDK_NAME=nx_sdk
 TARGET_DIR=$SDK_NAME
 VERSION=1.6.0
+SERVER_PLUGINS_DIR=../vms/server/plugins
 
 if [ -z "$DOXYCHECK" ]; then
      sudo apt-get install -y doxygen
@@ -42,11 +43,11 @@ do
 
     #Copying plugin
     mkdir -p $TARGET_DIR/sample/$pluginName/src
-    cp -f ../plugins/$pluginName/src/*.txt $TARGET_DIR/sample/$pluginName/src/
-    cp -f ../plugins/$pluginName/src/*.h $TARGET_DIR/sample/$pluginName/src/
-    cp -f ../plugins/$pluginName/src/*.cpp $TARGET_DIR/sample/$pluginName/src/
-    cp -f ../plugins/$pluginName/Doxyfile $TARGET_DIR/sample/$pluginName/Doxyfile
-    cp -f ../plugins/$pluginName/readme.txt $TARGET_DIR/sample/$pluginName/readme.txt
+    cp -f $SERVER_PLUGINS_DIR/$pluginName/src/*.txt $TARGET_DIR/sample/$pluginName/src/
+    cp -f $SERVER_PLUGINS_DIR/$pluginName/src/*.h $TARGET_DIR/sample/$pluginName/src/
+    cp -f $SERVER_PLUGINS_DIR/$pluginName/src/*.cpp $TARGET_DIR/sample/$pluginName/src/
+    cp -f $SERVER_PLUGINS_DIR/$pluginName/Doxyfile $TARGET_DIR/sample/$pluginName/Doxyfile
+    cp -f $SERVER_PLUGINS_DIR/$pluginName/readme.txt $TARGET_DIR/sample/$pluginName/readme.txt
 
     if [ $? -eq 0 ]
     then

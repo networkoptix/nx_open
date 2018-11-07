@@ -1,6 +1,7 @@
 
 set SDK_NAME=nx_sdk
 set TARGET_DIR=%SDK_NAME%
+set SERVER_PLUGINS_DIR=..\vms\server\plugins
 
 rmdir /S /Q %TARGET_DIR%
 
@@ -23,10 +24,10 @@ set PLUGIN_NAME=axiscamplugin
 
 mkdir %TARGET_DIR%\sample\%PLUGIN_NAME%\
 mkdir %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
-xcopy /Y ..\plugins\%PLUGIN_NAME%\src\*.txt %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
-xcopy /Y ..\plugins\%PLUGIN_NAME%\src\*.h %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
-xcopy /Y ..\plugins\%PLUGIN_NAME%\src\*.cpp %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
-copy /Y ..\plugins\%PLUGIN_NAME%\Doxyfile %TARGET_DIR%\sample\%PLUGIN_NAME%\Doxyfile
+xcopy /Y %SERVER_PLUGINS_DIR%\%PLUGIN_NAME%\src\*.txt %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
+xcopy /Y %SERVER_PLUGINS_DIR%\%PLUGIN_NAME%\src\*.h %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
+xcopy /Y %SERVER_PLUGINS_DIR%\%PLUGIN_NAME%\src\*.cpp %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
+copy /Y %SERVER_PLUGINS_DIR%\%PLUGIN_NAME%\Doxyfile %TARGET_DIR%\sample\%PLUGIN_NAME%\Doxyfile
 
 @rem Removing unnecessary source files
 del /Q /F %TARGET_DIR%\sample\%PLUGIN_NAME%\src\compatibility_info.cpp
@@ -46,11 +47,11 @@ set PLUGIN_NAME=image_library_plugin
 
 mkdir %TARGET_DIR%\sample\%PLUGIN_NAME%\
 mkdir %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
-xcopy /Y ..\plugins\%PLUGIN_NAME%\src\*.txt %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
-xcopy /Y ..\plugins\%PLUGIN_NAME%\src\*.h %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
-xcopy /Y ..\plugins\%PLUGIN_NAME%\src\*.cpp %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
-copy /Y ..\plugins\%PLUGIN_NAME%\Doxyfile %TARGET_DIR%\sample\%PLUGIN_NAME%\Doxyfile
-copy /Y ..\plugins\%PLUGIN_NAME%\readme.txt %TARGET_DIR%\sample\%PLUGIN_NAME%\readme.txt
+xcopy /Y %SERVER_PLUGINS_DIR%\%PLUGIN_NAME%\src\*.txt %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
+xcopy /Y %SERVER_PLUGINS_DIR%\%PLUGIN_NAME%\src\*.h %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
+xcopy /Y %SERVER_PLUGINS_DIR%\%PLUGIN_NAME%\src\*.cpp %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
+copy /Y %SERVER_PLUGINS_DIR%\%PLUGIN_NAME%\Doxyfile %TARGET_DIR%\sample\%PLUGIN_NAME%\Doxyfile
+copy /Y %SERVER_PLUGINS_DIR%\%PLUGIN_NAME%\readme.txt %TARGET_DIR%\sample\%PLUGIN_NAME%\readme.txt
 
 @rem Removing unnecessary source files
 del /Q /F %TARGET_DIR%\sample\%PLUGIN_NAME%\src\compatibility_info.cpp
@@ -68,11 +69,11 @@ set PLUGIN_NAME=rpi_cam
 
 mkdir %TARGET_DIR%\sample\%PLUGIN_NAME%\
 mkdir %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
-xcopy /Y ..\plugins\%PLUGIN_NAME%\src\*.txt %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
-xcopy /Y ..\plugins\%PLUGIN_NAME%\src\*.h %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
-xcopy /Y ..\plugins\%PLUGIN_NAME%\src\*.cpp %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
-copy /Y ..\plugins\%PLUGIN_NAME%\Doxyfile %TARGET_DIR%\sample\%PLUGIN_NAME%\Doxyfile
-copy /Y ..\plugins\%PLUGIN_NAME%\readme.txt %TARGET_DIR%\sample\%PLUGIN_NAME%\readme.txt
+xcopy /Y %SERVER_PLUGINS_DIR%\%PLUGIN_NAME%\src\*.txt %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
+xcopy /Y %SERVER_PLUGINS_DIR%\%PLUGIN_NAME%\src\*.h %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
+xcopy /Y %SERVER_PLUGINS_DIR%\%PLUGIN_NAME%\src\*.cpp %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
+copy /Y %SERVER_PLUGINS_DIR%\%PLUGIN_NAME%\Doxyfile %TARGET_DIR%\sample\%PLUGIN_NAME%\Doxyfile
+copy /Y %SERVER_PLUGINS_DIR%\%PLUGIN_NAME%\readme.txt %TARGET_DIR%\sample\%PLUGIN_NAME%\readme.txt
 
 @rem Removing unnecessary source files
 del /Q /F %TARGET_DIR%\sample\%PLUGIN_NAME%\src\compatibility_info.cpp
