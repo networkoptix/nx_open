@@ -26,7 +26,7 @@ nx_copy_bin_resources(${CMAKE_CURRENT_SOURCE_DIR}/resources ${CMAKE_CURRENT_BINA
 nx_configure_directory(${CMAKE_CURRENT_SOURCE_DIR}/resources.in ${CMAKE_CURRENT_BINARY_DIR})
 
 file(WRITE ${bin_source_dir}/launcher.version "${releaseVersion.full}")
-file(COPY "${CMAKE_SOURCE_DIR}/common/maven/bin-resources/resources/qt/etc/qt.conf"
+file(COPY "${CMAKE_SOURCE_DIR}/vms/libs/common/maven/bin-resources/resources/qt/etc/qt.conf"
     DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
 set(config_file "${CMAKE_CURRENT_BINARY_DIR}/config.yaml")

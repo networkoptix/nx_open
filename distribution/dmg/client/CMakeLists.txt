@@ -33,7 +33,7 @@ nx_configure_directory(
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${launcher.version.file} "${releaseVersion.full}")
 nx_store_known_file(${CMAKE_CURRENT_BINARY_DIR}/${launcher.version.file})
 
-nx_copy(${CMAKE_SOURCE_DIR}/common/maven/bin-resources/resources/qt/etc/qt.conf
+nx_copy(${CMAKE_SOURCE_DIR}/vms/libs/common/maven/bin-resources/resources/qt/etc/qt.conf
     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 add_custom_target(distribution_dmg_client ALL
