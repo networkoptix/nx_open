@@ -485,7 +485,7 @@
             "name": "overviewVideo",
             "label": "Overview Video",
             "value": "",
-            "description": "A youtube or vimeo link for the overview video.",
+            "description": "<br><br><br>A youtube or vimeo link for a overview video.<br>Links can be:<br>https://www.youtube.com/watch?v={video id}<br>https://www.youtube.com/embed/{video id}<br>https://youtu.be/{video id}<br>https://vimeo.com/{video id}",
             "type": "text",
             "optional": true,
             "meta": {
@@ -509,7 +509,7 @@
             "name": "instructionVideo",
             "label": "Instruction Video",
             "value": "",
-            "description": "A youtube or vimeo link for the instruction video.",
+            "description": "<br><br><br>A youtube or vimeo link for a instruction video.<br>Links can be:<br>https://www.youtube.com/watch?v={video id}<br>https://www.youtube.com/embed/{video id}<br>https://youtu.be/{video id}<br>https://vimeo.com/{video id}",
             "type": "text",
             "optional": true,
             "meta": {
@@ -689,7 +689,7 @@
             "name": "additionalVideo",
             "label": "Additional Video",
             "value": "",
-            "description": "A youtube or vimeo link for a video.",
+            "description": "<br><br><br>A youtube or vimeo link for a support video.<br>Links can be:<br>https://www.youtube.com/watch?v={video id}<br>https://www.youtube.com/embed/{video id}<br>https://youtu.be/{video id}<br>https://vimeo.com/{video id}",
             "type": "text",
             "optional": true,
             "meta": {
