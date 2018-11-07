@@ -80,11 +80,12 @@ private:
 
     // TODO: #dmishin: Rename to m_engineResource.
     nx::mediaserver::resource::AnalyticsEngineResourcePtr m_engine;
-    
+
+    std::shared_ptr<MetadataHandler> m_metadataHandler;
+
     // TODO: #dmishin: Rename to m_deviceAgent.
     sdk_support::SharedPtr<DeviceAgent> m_sdkDeviceAgent;
 
-    std::shared_ptr<MetadataHandler> m_metadataHandler;
     QnAbstractDataReceptorPtr m_metadataSink;
 
     QVariantMap m_currentSettings;
