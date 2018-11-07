@@ -32,11 +32,15 @@
                 </nx-block>
             </div>
 
-            <div class="col-12 col-xxl-6 pb-3" *ngIf="plugin.instructions.downloadLinks">
+            <div class="col-12 col-xxl-6 pb-3" *ngIf="plugin.instructions">
                 <nx-block >
                     <header translate>
-                        Download links
+                        Instructions
                     </header>
+
+                    <nx-section *ngIf="plugin.instructions.instructionVideo">
+                        <nx-external-video [src]="plugin.instructions.instructionVideo"></nx-external-video>
+                    </nx-section>
 
                     <nx-section>
                         <div [innerHtml]="plugin.instructions.downloadLinks"></div>

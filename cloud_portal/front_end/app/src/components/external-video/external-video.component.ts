@@ -15,10 +15,10 @@ export class NxExternalVideoComponent implements OnInit {
                 private config: NxConfigService) {}
 
     private FormatSrc(link){
-        for (let i in this.config.config.embedRegex) {
-            const videoRegex = link.match(this.config.config.embedRegex[i]);
+        for (let videoType in this.config.config.embedInfo) {
+            const videoRegex = link.match(this.config.config.embedInfo[videoType].regex);
             if (videoRegex && videoRegex[1]) {
-                return `${this.config.config.embedLinks[i]}${videoRegex[1]}`;
+                return `${this.config.config.embedInfo[videoType].link}${videoRegex[1]}`;
             }
         }
         return undefined;

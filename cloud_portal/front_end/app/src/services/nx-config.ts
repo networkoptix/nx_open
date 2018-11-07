@@ -251,13 +251,15 @@ export class NxConfigService {
                 chunksOnTimeline: false // timeline.js - draw debug events
             },
             responseOk                    : 'ok',
-            embedLinks                    : {
-                vimeo : 'https://player.vimeo.com/video/',
-                youtube: 'https://www.youtube.com/embed/'
-            },
-            embedRegex                    : {
-                vimeo: '^https?:\\/\\/vimeo\\.com\\/([\\d]+)$',
-                youtube: '^https?:\\/\\/(?:www\\.youtube\\.com\\/(?:embed\\/|watch\\?v=)|youtu\\.be\\/)([\\w]+)$'
+            embedInfo                     : {
+                vimeo : {
+                    link : 'https://player.vimeo.com/video/',
+                    regex : '^https?:\\/\\/vimeo\\.com\\/([\\d]+)$'
+                },
+                youtube : {
+                    link: 'https://www.youtube.com/embed/',
+                    regex: '^https?:\\/\\/(?:www\\.youtube\\.com\\/(?:embed\\/|watch\\?v=)|youtu\\.be\\/)([\\w]+)$'
+                }
             }
         };
     }

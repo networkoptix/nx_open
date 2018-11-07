@@ -719,17 +719,6 @@
         "translatable": false,
         "values": [
           {
-            "name": "supportVideo",
-            "label": "Support Video",
-            "value": "",
-            "description": "A youtube or vimeo link for a support video.",
-            "type": "text",
-            "optional": true,
-            "meta": {
-              "regex": "^https?:\\/\\/(?:(?:www\\.youtube\\.com\\/(?:embed\\/|watch\\?v=)|youtu\\.be\\/)[\\w]+|vimeo\\.com\\/[\\d]+)$"
-            }
-          },
-          {
             "name": "supportInformation",
             "label": "Support Information",
             "value": "",
