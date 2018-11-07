@@ -19,6 +19,9 @@ void manufacturerReplacementByModel(
 void pelcoModelNormalization(
     QnResourceDataPool* dataPool, EndpointAdditionalInfo* outInfo);
 
+void forcedAdditionalManufacturer(
+    QnResourceDataPool* dataPool, EndpointAdditionalInfo* outInfo);
+
 void additionalManufacturerNormalization(
     QnResourceDataPool* dataPool, EndpointAdditionalInfo* outInfo);
 
