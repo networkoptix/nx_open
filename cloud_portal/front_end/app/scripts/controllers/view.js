@@ -37,7 +37,11 @@
                         loc: 'ViewPageCtrl - inIframe'
                     });
                 }
-
+                function systemError(error){
+                    dialogs.notify(L.errorCodes.lostConnection.replace('{{systemName}}',
+                        $scope.currentSystem.name || L.errorCodes.thisSystem), 'warning');
+                    $location.path('/systems');
+                }
                 authorizationCheckService
                     .requireLogin()
                     .then(function (account) {
@@ -63,17 +67,12 @@
                                             if ($scope.hasCameras) {
                                                 delayedUpdateSystemInfo();
                                             }
-                                        });
-                                    });
+                                        }, systemError);
+                                    }, systemError);
                             } else {
                                 $scope.systemReady = true;
                             }
-
-                        }, function () {
-                            dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}",
-                                $scope.currentSystem.name || L.errorCodes.thisSystem), 'warning');
-                            $location.path("/systems");
-                        });
+                        }, systemError);
                     });
 
                 
