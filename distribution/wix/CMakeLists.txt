@@ -72,7 +72,7 @@ endif()
 
 
 if(withNxTool)
-    set(nxtool_qml_root "${CMAKE_SOURCE_DIR}/nxtool/static-resources/src/qml/")
+    set(nxtool_qml_root "${CMAKE_SOURCE_DIR}/vms/nxtool/static-resources/src/qml/")
     set(nxtool_executable "${bin_source_dir}/nxtool.exe")
 
     add_custom_target(collect_nxtool_qml_dependencies
