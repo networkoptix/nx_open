@@ -183,7 +183,7 @@ def assert_path_does_not_exist(server, path):
 
 
 def assert_paths_are_equal(server, path_1, path_2):
-    server.os_access.run_command(['diff', '--recursive', '--report-identical-files', path_1, path_2])
+    assert server.os_access.tree_md5(path_1) == server.os_access.tree_md5(path_2)
 
 
 def assert_backup_equal_to_archive(

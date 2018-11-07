@@ -256,6 +256,38 @@ class PosixAccess(OSAccess):
             raise exceptions.CannotDownload(e.stderr)
         return destination
 
+    def _files_md5(self, paths):
+        _logger.debug("Get MD5 of %d paths:\n%s", len(paths), '\n'.join(str(p) for p in paths))
+        if not paths:
+            return
+        command = self.shell.command(['md5sum', '--binary'] + paths)
+        with command.running() as run:
+            stdout, stderr = run.communicate(timeout_sec=300)
+        for line in stdout.decode().splitlines():
+            if not line:  # Last line is empty.
+                continue
+            assert line[32] == ' '
+            assert line[33] == '*'  # `*` appears if file is treated as binary.
+            yield self.path_cls(line[34:]), line[:32]
+        for line in stderr.decode().splitlines():
+            if not line or line.startswith('+'):  # Last empty line and tracing from set `-x`.
+                continue
+            if not line.endswith(': Is a directory'):
+                raise RuntimeError('Cannot calculate MD5 on {}:\n{}'.format(self, stderr))
+
+    def file_md5(self, file_path):
+        (path, digest), = self._files_md5([file_path])
+        return digest
+
+    def tree_md5(self, tree_path):
+        _logger.debug("Get MD5 of each file under: %s", tree_path)
+        paths = list(tree_path.glob('**/*'))
+        result = {}
+        for path, digest in self._files_md5(paths):
+            parts = path.relative_to(tree_path).parts
+            result[parts] = digest
+        return result
+
 
 @contextmanager
 def portalocker_lock_acquired(path, timeout_sec=10):

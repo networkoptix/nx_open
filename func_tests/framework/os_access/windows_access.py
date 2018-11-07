@@ -1,8 +1,10 @@
 from __future__ import division
 
 import datetime
+import errno
 import logging
 import math
+import re
 import timeit
 
 import pytz
@@ -237,3 +239,12 @@ class WindowsAccess(OSAccess):
             "What is to be attempted: Kerberos authentication. "
             "To debug try `Invoke-Command` from another Windows machine. "
             )
+
+    def file_md5(self, path):
+        output = self.winrm.command(['CertUtil', '-hashfile', path, 'md5']).decode()
+        match = re.search('\b[0-9a-fA-F]{32}\b', output)
+        if match is None:
+            if '0x80070002' in output:
+                raise exceptions.NotAFile(errno.EISDIR, "Trying to get MD5 of dir.")
+            raise RuntimeError('Cannot get MD5 of {}:\n{}'.format(path, output))
+        return match.group()

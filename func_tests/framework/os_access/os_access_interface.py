@@ -110,6 +110,11 @@ class ReciprocalPortMap(object):
         to_local_from_remote = OneWayPortMap.direct(local_addr_for_remote)
         cls(to_remote, to_local_from_remote)
 
+    @classmethod
+    def one_port(cls, address_from, port_from, port_to, protocol='tcp'):
+        to_remote = OneWayPortMap.forwarding({(protocol, port_to): port_from}, address_from)
+        return cls(to_remote, OneWayPortMap.empty())
+
 
 class OSAccess(object):
     __metaclass__ = ABCMeta
@@ -247,3 +252,18 @@ class OSAccess(object):
     @abstractmethod
     def _download_by_smb(self, source_hostname, source_path, destination_dir, timeout_sec):
         return self.path_cls()
+
+    @abstractmethod
+    def file_md5(self, file_path):
+        pass
+
+    def tree_md5(self, tree_path):
+        assert isinstance(tree_path, self.path_cls)
+        files_md5 = {}
+        for file_path in tree_path.glob('**/*'):
+            parts = file_path.relative_to(tree_path).parts
+            try:
+                files_md5[parts] = self.file_md5(file_path)
+            except NotAFile:
+                pass
+        return files_md5
