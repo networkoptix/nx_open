@@ -110,11 +110,6 @@ class ReciprocalPortMap(object):
         to_local_from_remote = OneWayPortMap.direct(local_addr_for_remote)
         cls(to_remote, to_local_from_remote)
 
-    @classmethod
-    def one_port(cls, address_from, port_from, port_to, protocol='tcp'):
-        to_remote = OneWayPortMap.forwarding({(protocol, port_to): port_from}, address_from)
-        return cls(to_remote, OneWayPortMap.empty())
-
 
 class BaseFakeDisk(object):
     __metaclass__ = ABCMeta
