@@ -103,7 +103,7 @@ endif()
 
 if(withDesktopClient)
     set(desktop_client_qml_root "${CMAKE_SOURCE_DIR}/vms/client/nx_vms_client_desktop/static-resources/qml/")
-    set(desktop_client_executable "${bin_source_dir}/${product.name}.exe")
+    set(desktop_client_executable "${bin_source_dir}/nx_vms_client_desktop.dll")
 
     add_custom_target(collect_qml_dependencies
         DEPENDS
