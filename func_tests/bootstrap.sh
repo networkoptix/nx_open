@@ -20,11 +20,10 @@ sudo apt-get update
 sudo apt-get install --yes \
     python-virtualenv python2.7-dev \
     python3-venv python3-dev \
-    virtualbox virtualbox-ext-pack \
+    virtualbox virtualbox-ext-pack virtualbox-qt \
     rsync \
     ffmpeg \
-    smbclient \
-    virtualbox-qt
+    smbclient
 sudo wget -O /etc/bash_completion.d/VBoxManage https://raw.githubusercontent.com/gryf/vboxmanage-bash-completion/d4f56a0d6b24ab8585dc1a3c86dd56f4235fe106/VBoxManage
 sudo chmod +x /etc/bash_completion.d/VBoxManage
 echo "Reload Bash to enable VBoxManage completion:"
