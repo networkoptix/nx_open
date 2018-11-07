@@ -14,6 +14,7 @@ from datetime import timedelta
 from typing import Generator, List
 
 from framework.http_api import HttpError
+from framework.mediaserver_api import MediaserverApiError, MediaserverApiRequestError
 from . import stage
 from .camera_actions import configure_audio, configure_video, ffprobe_expect_stream, fps_avg
 from .checks import Checker, Failure, Halt, Result, Success, expect_values, retry_expect_values
@@ -87,7 +88,7 @@ def attributes(self, **kwargs):  # type: (stage.Run, dict) -> Generator[Result]
         yield expect_values(kwargs, self.data)
 
 
-@_stage(timeout=timedelta(minutes=7))
+@_stage(timeout=timedelta(minutes=5))
 def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) -> Generator[Result]
     """For each FPS item in the primary configuration: enables recording with this FPS; checks if
     the primary and the secondary stream parameters match the configuration values.
@@ -117,7 +118,7 @@ def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) ->
     yield Success()
 
 
-@_stage(timeout=timedelta(minutes=15))
+@_stage(timeout=timedelta(minutes=10))
 def video_parameters(run, stream_urls=None, **profiles):
         # type: (stage.Run, dict, dict) -> Generator[Result]
     """For each stream and its configuration: enables recording; applies the configuration and
@@ -147,7 +148,7 @@ def video_parameters(run, stream_urls=None, **profiles):
     yield Success()
 
 
-@_stage(timeout=timedelta(minutes=1))
+@_stage(timeout=timedelta(minutes=5))
 def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Generator[Result]
     """For each configuration: enables recording with audio; applies the configuration and checks if
     the actual stream parameters on primary stream correspond to it.
@@ -242,8 +243,10 @@ def ptz_positions(run, *positions):  # type: (stage.Run, List[dict]) -> Generato
 
             def execute(command, expected=None, **kwargs):
                 return retry_expect_values(
-                    expected, lambda: run.server.api.execute_ptz(run.id, command, **kwargs),
-                    HttpError, '<{}>'.format(position['preset' if use_preset else 'point']))
+                    expected,
+                    lambda: run.server.api.execute_ptz(run.id, command, **kwargs),
+                    (HttpError, MediaserverApiError, MediaserverApiRequestError),
+                    '<{}>'.format(position['preset' if use_preset else 'point']))
 
             if use_preset:
                 if 'preset' not in position:

@@ -76,7 +76,6 @@ protected:
     void pickSpecificBuild();
 
 private:
-
     // General state for a widget.
     // It extends update state from the servers, uploader and client update.
     enum class WidgetUpdateState
@@ -132,11 +131,10 @@ private:
 
     // Advances UI FSM towards selected state.
     void setTargetState(WidgetUpdateState state, QSet<QnUuid> targets = {});
-
     void completeInstallation(bool clientUpdated);
+
 private:
     QScopedPointer<Ui::MultiServerUpdatesWidget> ui;
-
     QScopedPointer<QMenu> m_selectUpdateTypeMenu;
     QScopedPointer<QMenu> m_autoCheckMenu;
     QScopedPointer<QMenu> m_manualCheckMenu;

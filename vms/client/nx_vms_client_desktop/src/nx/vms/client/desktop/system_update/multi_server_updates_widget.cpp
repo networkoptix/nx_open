@@ -709,7 +709,7 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
     {
         NX_VERBOSE(this) << "atCancelCurrentAction() at" << toString(m_updateStateCurrent);
         // Should send 'cancel' command to all the servers?
-        auto serversToCancel = m_serverUpdateTool->getServersInState(StatusCode::installing);
+        auto serversToCancel = m_serverUpdateTool->getServersInstalling();
         m_serverUpdateTool->requestStopAction();
         m_clientUpdateTool->resetState();
         setTargetState(WidgetUpdateState::initial, {});
@@ -776,8 +776,7 @@ ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress
     else if (m_updateStateCurrent == WidgetUpdateState::installing)
     {
         ServerUpdateTool::ProgressInfo result;
-
-        auto installing = m_serverUpdateTool->getServersInState(StatusCode::installing);
+        auto installing = m_serverUpdateTool->getServersInstalling();
         auto installed = m_serverUpdateTool->getServersCompleteInstall();
         // TODO: Deal with it.
         result.installingServers = !m_serversActive.empty();
@@ -805,7 +804,7 @@ void MultiServerUpdatesWidget::processRemoteInitialState()
 {
     auto downloaded = m_serverUpdateTool->getServersInState(StatusCode::readyToInstall);
     auto downloading = m_serverUpdateTool->getServersInState(StatusCode::downloading);
-    auto installing = m_serverUpdateTool->getServersInState(StatusCode::installing);
+    auto installing = m_serverUpdateTool->getServersInstalling();
     auto installed = m_serverUpdateTool->getServersCompleteInstall();
 
     if (m_serverUpdateTool->haveActiveUpdate())
@@ -1057,6 +1056,7 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
         m_serversActive.remove(id);
     }
 
+    // No servers are installing anything right now. We should check if installation is complete.
     if (m_serversActive.empty())
     {
         bool clientInstallComplete = m_clientUpdateTool->isInstallComplete();
@@ -1652,8 +1652,6 @@ QString MultiServerUpdatesWidget::toString(LocalStatusCode status)
             return "Preparing";
         case LocalStatusCode::readyToInstall:
             return "ReadyToInstall";
-        case LocalStatusCode::installing:
-            return "Installing";
         case LocalStatusCode::error:
             return "Error";
         default:

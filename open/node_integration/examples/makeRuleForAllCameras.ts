@@ -17,7 +17,8 @@ const saveRuleToConfig = (rule: Rule | null) => {
         return;
     }
     config.rules[rule.comment] = rule.ruleId;
-    fs.writeFileSync(path.resolve(__dirname, './nodeConfig.json'), JSON.stringify(config, undefined, 4));
+    fs.writeFileSync(path.resolve(__dirname, './nodeConfig.json'),
+            JSON.stringify(config, undefined, 4));
 };
 // Makes a rule for each camera currently on the system.
 const makeExampleRules = (cameras: any) => {
@@ -27,11 +28,14 @@ const makeExampleRules = (cameras: any) => {
     for (const camera of cameras) {
         const softTrigger: SoftTrigger = new SoftTrigger(`Open - ${camera.name}`);
         const httpAction: NodeHttpAction = new NodeHttpAction(nodeServer);
-        httpAction.configCustomHandler(`${customRoute}${camera.name}`, (query: any) => {
+        httpAction.configCustomHandler(`${customRoute}${camera.name}`,
+                (query: any) => {
             logging.info(`${query.cameraName} - was just ${query.state}`);
         });
         // Makes a rule that sends an http action to the express server when a soft trigger is pushed.
-        const cameraRule = new Rule(`Open - ${camera.name}`).on(softTrigger).do(httpAction);
+        const cameraRule = new Rule(`Open - ${camera.name}`)
+                .on(softTrigger)
+                .do(httpAction);
         cameraRule.config({ cameraIds: [camera.id] });
         server.saveRuleToSystem(cameraRule).then(saveRuleToConfig);
     }
@@ -39,7 +43,8 @@ const makeExampleRules = (cameras: any) => {
 
 // Adds a new route to the express server, and gets all of the cameras in the system.
 const getCameras = () => {
-    nodeServer.addExpressHandler('/shark', (req: express.Request, res: express.Response) => {
+    nodeServer.addExpressHandler('/shark',
+            (req: express.Request, res: express.Response) => {
         logging.info(JSON.stringify(req.query));
         const key = `${req.query.state} - ${req.query.cameraName}`;
         if (key in nodeServer.httpActionCallbacks) {

@@ -194,15 +194,15 @@ Qt::ItemFlags ServerUpdatesModel::flags(const QModelIndex& index) const
     return base_type::flags(index);
 }
 
-void ServerUpdatesModel::setManualStatus(QSet<QnUuid> targets, StatusCode status)
+void ServerUpdatesModel::setServersInstalling(QSet<QnUuid> targets, bool installing)
 {
     for (const auto& uid: targets)
     {
         if (auto item = findItemById(uid))
         {
-            item->state = status;
-            if (status == StatusCode::installing)
-                item->installing = true;
+            if (item->installing == installing)
+                continue;
+            item->installing = installing;
             QModelIndex idx = index(item->row, 0);
             emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
         }
@@ -379,7 +379,6 @@ void ServerUpdatesModel::updateServerData(QnMediaServerResourcePtr server, Updat
     if (installed != item.installed)
     {
         item.installed = true;
-        item.installing = false;
         changed = true;
     }
 

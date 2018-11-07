@@ -160,6 +160,10 @@ public:
     // Get servers that have completed installation process.
     QSet<QnUuid> getServersCompleteInstall() const;
 
+    // Get servers that have started update installation.
+    // Note: only client, that have sent an 'install' command can know about this state.
+    QSet<QnUuid> getServersInstalling() const;
+
     // Get servers, which are installing updates for too long.
     QSet<QnUuid> getServersWithStalledUpdate() const;
 

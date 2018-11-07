@@ -722,7 +722,7 @@ void ServerUpdateTool::requestInstallAction(QSet<QnUuid> targets)
     m_remoteUpdateStatus = {};
 
     NX_VERBOSE(this) << "requestInstallAction() for" << targets;
-    m_updatesModel->setManualStatus(targets, nx::update::Status::Code::installing);
+    m_updatesModel->setServersInstalling(targets);
 
     for (auto it : m_activeServers)
         if (auto connection = getServerConnection(it.second))
@@ -841,6 +841,19 @@ QSet<QnUuid> ServerUpdateTool::getLegacyServers() const
         if (!item->server)
             continue;
         if (item->onlyLegacyUpdate)
+            result.insert(item->server->getId());
+    }
+    return result;
+}
+
+QSet<QnUuid> ServerUpdateTool::getServersInstalling() const
+{
+    QSet<QnUuid> result;
+    for (const auto& item : m_updatesModel->getServerData())
+    {
+        if (!item->server)
+            continue;
+        if (item->installing)
             result.insert(item->server->getId());
     }
     return result;

@@ -213,7 +213,7 @@ def test_cloud_merge_after_disconnect(two_stopped_mediaservers, cloud_account, t
 
     # Disconnect Server2 from cloud
     new_password = 'new_password'
-    two.api.detach_from_cloud(new_password)
+    two.api.detach_from_cloud(new_password, cloud_account.password)
 
     # Merge systems (takeRemoteSettings = true)
     merge_systems(two, one, take_remote_settings=True)
