@@ -155,7 +155,7 @@ bool CommonUpdateInstaller::install(const QnAuthSession& authInfo)
     SystemError::ErrorCode error = nx::startProcessDetached(installerPath, arguments, installerDir);
     if (error == SystemError::noError)
     {
-        auto argumentsString = lm("%1").arg(arguments.join("\" \""));
+        auto argumentsString = lm("\"%1\"").arg(arguments.join("\" \""));
         NX_INFO(this, lm("Update has been started. file=\"%1\", args=%2").args(installerPath, argumentsString));
     }
     else
