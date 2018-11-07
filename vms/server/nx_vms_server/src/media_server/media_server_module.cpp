@@ -149,8 +149,8 @@ QnMediaServerModule::QnMediaServerModule(const nx::mediaserver::CmdLineArguments
     const auto roSettingsPath = arguments->configFilePath;
     const auto rwSettingsPath = arguments->rwConfigFilePath;
 
-    Q_INIT_RESOURCE(mediaserver_core);
-    Q_INIT_RESOURCE(mediaserver_db);
+    Q_INIT_RESOURCE(nx_vms_server);
+    Q_INIT_RESOURCE(nx_vms_server_db);
     nx::mediaserver::MetaTypes::initialize();
 
     m_settings = store(new MSSettings(roSettingsPath, rwSettingsPath));

@@ -63,7 +63,7 @@
 
 static int registerQtResources()
 {
-    Q_INIT_RESOURCE(mediaserver_db);
+    Q_INIT_RESOURCE(nx_vms_server_db);
     return 0;
 }
 
