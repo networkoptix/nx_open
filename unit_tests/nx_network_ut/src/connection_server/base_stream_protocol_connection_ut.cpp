@@ -16,6 +16,16 @@ namespace nx::network::server::test {
 
 namespace {
 
+class DummyOutput:
+    public utils::bstream::AbstractOutput
+{
+public:
+    virtual int write(const void* /*data*/, size_t count) override
+    {
+        return (int)count;
+    }
+};
+
 class AsyncChannelToStreamSocketAdapter:
     public StreamSocketDelegate
 {
@@ -40,6 +50,13 @@ public:
         IoCompletionHandler handler) override
     {
         m_asyncChannel->readSomeAsync(buffer, std::move(handler));
+    }
+
+    virtual void sendAsync(
+        const nx::Buffer& buffer,
+        IoCompletionHandler handler) override
+    {
+        m_asyncChannel->sendAsync(buffer, std::move(handler));
     }
 
 private:
@@ -124,7 +141,7 @@ public:
     BaseStreamProtocolConnection():
         m_asyncChannel(
             &m_input,
-            nullptr,
+            &m_dummyOutput,
             aio::test::AsyncChannel::InputDepletionPolicy::retry)
     {
         m_connection = std::make_unique<TestHttpConnection>(
@@ -178,9 +195,21 @@ protected:
         sendMessages();
     }
 
+    template<typename Handler>
+    void whenSendMessage(Handler handler)
+    {
+        m_connection->sendMessage(
+            http::Message(http::MessageType::request),
+            [this, handler = std::move(handler)](
+                SystemError::ErrorCode sysErrorCode)
+            {
+                handler();
+                m_sendResults.push(sysErrorCode);
+            });
+    }
+
     void thenMessageIsReported()
     {
-        //m_receivedMessageQueue.pop();
         thenEveryMessageIsReceived();
     }
 
@@ -207,11 +236,22 @@ protected:
         }
     }
 
+    void thenMessageHasBeenSent()
+    {
+        ASSERT_EQ(SystemError::noError, m_sendResults.pop());
+    }
+
     virtual void saveMessage(nx::network::http::Message message)
     {
         auto messageToSave = std::make_unique<nx::network::http::Message>(std::move(message));
         m_prevMessageReceived = messageToSave.get();
         m_receivedMessageQueue.push(std::move(messageToSave));
+    }
+
+    void freeConnection()
+    {
+        m_asyncChannel.cancelIOSync(aio::etNone);
+        m_connection.reset();
     }
 
     TestHttpConnection& connection()
@@ -234,6 +274,8 @@ private:
     std::vector<HttpMessageTestData> m_messagesSent;
     nx::network::http::Message* m_prevMessageReceived = nullptr;
     QnMutex m_mutex;
+    nx::utils::SyncQueue<SystemError::ErrorCode> m_sendResults;
+    DummyOutput m_dummyOutput;
 
     void sendMessages()
     {
@@ -298,6 +340,14 @@ TEST_F(BaseStreamProtocolConnection, receiving_multiple_messages_over_same_conne
 {
     whenReadMultipleMessages();
     thenEveryMessageIsReceived();
+}
+
+TEST_F(BaseStreamProtocolConnection, can_be_removed_in_send_completion_handler)
+{
+    whenSendMessage([this]() { freeConnection(); });
+
+    thenMessageHasBeenSent();
+    // andProcessHasNotCrashed()
 }
 
 // TEST_F(BaseStreamProtocolConnection, message_parse_error)
