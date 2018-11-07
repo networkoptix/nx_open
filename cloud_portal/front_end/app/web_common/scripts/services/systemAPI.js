@@ -125,6 +125,7 @@ angular.module('nxCommon')
                 canceler = null;
             });
             promise.abort = function(reason){
+                this.abortReason = reason; // Save this information for the promise handler
                 if(canceler) {
                     canceler.resolve('abort request: ' + reason);
                 }

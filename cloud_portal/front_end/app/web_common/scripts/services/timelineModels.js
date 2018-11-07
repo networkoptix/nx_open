@@ -1010,7 +1010,9 @@
             
             self.setPlayingPosition(self.played);
         },function(error){
-            console.error("Was not able to get records from server", error);
+            if(!makeRequest.abortReason){ // If the request was aborted - no handling is needed
+                console.error("Was not able to get records from server", error);
+            }
         });
     };
 
