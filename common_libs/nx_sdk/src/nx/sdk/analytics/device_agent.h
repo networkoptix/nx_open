@@ -18,7 +18,7 @@ static const int NX_UNKNOWN_PARAMETER = -41;
 static const int NX_MORE_DATA = -23;
 
 /**
- * Interface for handler that processes metadata incoming from the engine.
+ * Interface for handler that processes metadata incoming from the DeviceAgent.
  */
 class MetadataHandler
 {
@@ -27,7 +27,7 @@ public:
 
     /**
      * @param error Used for reporting errors to the outer code.
-     * @param metadata Incoming from the engine.
+     * @param metadata Metadata incoming from the DeviceAgent.
      */
     virtual void handleMetadata(Error error, MetadataPacket* metadata) = 0;
 };
