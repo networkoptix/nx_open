@@ -61,3 +61,7 @@ endif()
 if(NOT WINDOWS)
     target_link_libraries(nx_utils PRIVATE z)
 endif()
+
+if(withTests)
+    add_subdirectory(unit_tests)
+endif()

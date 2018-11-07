@@ -1,4 +1,3 @@
-add_subdirectory(utils_ut)
 if(TARGET nx_media)
     add_subdirectory(nx_media_ut)
 endif()

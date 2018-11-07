@@ -1,4 +1,4 @@
-nx_add_test(utils_ut
+nx_add_test(nx_utils_ut
     WERROR
     PUBLIC_LIBS
         nx_utils
