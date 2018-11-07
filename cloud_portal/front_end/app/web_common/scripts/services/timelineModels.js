@@ -624,6 +624,7 @@
         this.level = level;
         if (this.currentRequest) {
             return this.currentRequest;
+            // that logic might be wrong, since currentRequest might be different from new request
         }
         
         var levelData = window.RulerModel.levels[level];
@@ -632,9 +633,13 @@
         var self = this;
         
         //1. Request records for interval
-        self.currentRequest = this.mediaserver.getRecords(this.cameras[0], start, end, detailization, null, levelData.name);
-        
+        var makeRequest = this.mediaserver.getRecords(this.cameras[0], start, end, detailization, null, levelData.name);
+        self.currentRequest = makeRequest;
         return self.currentRequest.then(function (data) {
+            if(makeRequest !== self.currentRequest){
+                console.error('Unexpected response in CameraRecordsProvider', data);
+                return;
+            }
             self.currentRequest = null;//Unlock requests - we definitely have chunkstree here
             var chunks = parseChunks(data.data.reply);
             
@@ -941,16 +946,23 @@
         
         this.abort('update again');
         // Get next {{limitChunks}} chunks
-        this.currentRequest = this.mediaserver.getRecords(
+        var makeRequest = this.mediaserver.getRecords(
             this.cameras[0],
             window.timeManager.displayToServer(requestPosition),
             window.timeManager.nowToServer() + 100000,
             this.requestDetailization,
             this.limitChunks
         );
+        this.currentRequest = makeRequest;
         
         this.currentRequest.then(function (data) {
+
+            if(makeRequest !== self.currentRequest){
+                console.error('Unexpected response in ShortCache', data);
+                return;
+            }
             self.updating = false;
+            self.currentRequest = null;
             
             var chunks = parseChunks(data.data.reply);
             
