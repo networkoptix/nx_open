@@ -204,7 +204,7 @@ def assert_backup_equal_to_archive(
         assert_paths_are_equal(server, low_quality_backup_path, low_quality_server_archive_path)
         assert_path_does_not_exist(server, hi_quality_backup_path)
     else:
-        assert_paths_are_equal(server, low_quality_backup_path, low_quality_server_archive_path)
+        assert_paths_are_equal(server, hi_quality_backup_path, hi_quality_server_archive_path)
         assert_paths_are_equal(server, low_quality_backup_path, low_quality_server_archive_path)
 
 
