@@ -99,12 +99,12 @@ TYPED_TEST_P(
     TransportAcceptance,
     transport_connection_is_removed_before_http_response_has_been_sent)
 {
-    setMaximumActiveConnectionCountPerSystem(1);
+    this->setMaximumActiveConnectionCountPerSystem(1);
    
     constexpr int connectionToEstablishCount = 11;
-    establishSameSystemConnectionsSimultaneosly(connectionToEstablishCount);
+    this->establishSameSystemConnectionsSimultaneosly(connectionToEstablishCount);
 
-    waitForEveryConnectToComplete();
+    this->waitForEveryConnectToComplete();
 }
 
 REGISTER_TYPED_TEST_CASE_P(TransportAcceptance,
