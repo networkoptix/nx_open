@@ -4,6 +4,7 @@ from functools import partial
 
 from contextlib2 import ExitStack
 from parse import parse
+from pathlib2 import Path
 
 from framework.context_logger import context_logger
 from framework.os_access.exceptions import AlreadyExists
@@ -12,6 +13,7 @@ from framework.os_access.path import FileSystemPath
 from framework.os_access.posix_access import PosixAccess
 from framework.os_access.windows_access import WindowsAccess
 from framework.registry import Registry
+from framework.serialize import load
 from framework.vms.hypervisor import VMNotFound, VmHardware, VmNotReady
 from framework.vms.hypervisor.default import default_hypervisor
 from framework.vms.hypervisor.hypervisor import Hypervisor
@@ -198,3 +200,23 @@ class VMType(object):
                     _logger.debug("Machine %s not found.", name)
                     continue
                 vm.destroy()
+
+
+def vm_types_from_config(downloads_dir, template_url_prefix, hypervisor=default_hypervisor, slot=0):
+    path = Path(__file__).with_name('configuration.yaml')
+    config_file_data = load(path.read_text())
+    vm_types = {
+        name: VMType.from_config(
+            name,
+            conf,
+            VmTemplate(
+                hypervisor,
+                conf['vm']['template_vm'].format(slot=slot),
+                template_url_prefix + conf['vm']['template_file'],
+                downloads_dir),
+            hypervisor=hypervisor,
+            slot=slot,
+            )
+        for name, conf in config_file_data['vm_types'].items()
+        }
+    return vm_types
