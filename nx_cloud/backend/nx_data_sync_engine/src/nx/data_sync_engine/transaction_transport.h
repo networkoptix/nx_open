@@ -48,7 +48,6 @@ public:
     TransactionTransport(
         const ProtocolVersionRange& protocolVersionRange,
         std::unique_ptr<::ec2::QnTransactionTransportBase> connection,
-        nx::network::aio::AbstractAioThread* aioThread,
         std::shared_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState,
         const std::string& systemId,
         const network::SocketAddress& remotePeerEndpoint);
@@ -88,6 +87,16 @@ private:
     const network::SocketAddress m_connectionOriginatorEndpoint;
     bool m_closed = false;
     std::unique_ptr<network::aio::Timer> m_inactivityTimer;
+
+    // TODO: #ak Remove this constructor.
+    TransactionTransport(
+        const ProtocolVersionRange& protocolVersionRange,
+        std::unique_ptr<::ec2::QnTransactionTransportBase> connection,
+        const std::string& connectionId,
+        nx::network::aio::AbstractAioThread* aioThread,
+        std::shared_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState,
+        const std::string& systemId,
+        const network::SocketAddress& remotePeerEndpoint);
 
     int highestProtocolVersionCompatibleWithRemotePeer() const;
 

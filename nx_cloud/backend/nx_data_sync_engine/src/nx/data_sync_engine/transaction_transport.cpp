@@ -39,6 +39,7 @@ TransactionTransport::TransactionTransport(
             connectionRequestAttributes.contentEncoding.c_str(),
             kTcpKeepAliveTimeout,
             kKeepAliveProbeCount),
+        connectionRequestAttributes.connectionId,
         aioThread,
         connectionGuardSharedState,
         systemId,
@@ -49,6 +50,25 @@ TransactionTransport::TransactionTransport(
 TransactionTransport::TransactionTransport(
     const ProtocolVersionRange& protocolVersionRange,
     std::unique_ptr<::ec2::QnTransactionTransportBase> connection,
+    std::shared_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState,
+    const std::string& systemId,
+    const network::SocketAddress& remotePeerEndpoint)
+    :
+    TransactionTransport(
+        protocolVersionRange,
+        std::move(connection),
+        connection->connectionGuid().toSimpleByteArray().toStdString(),
+        connection->getAioThread(),
+        connectionGuardSharedState,
+        systemId,
+        remotePeerEndpoint)
+{
+}
+
+TransactionTransport::TransactionTransport(
+    const ProtocolVersionRange& protocolVersionRange,
+    std::unique_ptr<::ec2::QnTransactionTransportBase> connection,
+    const std::string& connectionId,
     nx::network::aio::AbstractAioThread* aioThread,
     std::shared_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState,
     const std::string& systemId,
@@ -58,7 +78,7 @@ TransactionTransport::TransactionTransport(
     m_connectionGuardSharedState(connectionGuardSharedState),
     m_baseTransactionTransport(std::move(connection)),
     m_systemId(systemId),
-    m_connectionId(m_baseTransactionTransport->connectionGuid().toSimpleByteArray().toStdString()),
+    m_connectionId(connectionId),
     m_connectionOriginatorEndpoint(remotePeerEndpoint),
     m_inactivityTimer(std::make_unique<network::aio::Timer>())
 {
