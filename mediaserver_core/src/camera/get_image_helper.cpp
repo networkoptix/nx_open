@@ -69,10 +69,10 @@ QSize updateDstSize(
 {
     QSize dstSize(srcSize);
 
-#ifdef EDGE_SERVER
-    if (dstSize.height() < 1)
-        dstSize.setHeight(360); // On edge instead of full-size image we return 360p.
-#endif
+    #if defined(EDGE_SERVER)
+        if (dstSize.height() < 1)
+            dstSize.setHeight(360); //< On edge instead of full-size image we return 360p.
+    #endif
     double sar = outFrame.sample_aspect_ratio;
     double ar = sar * outFrame.width / outFrame.height;
     NX_ASSERT(ar > 0);
@@ -333,11 +333,10 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImage(const nx::api::CameraImageReq
     const auto secondaryResolution =
         request.camera->streamInfo(Qn::StreamIndex::secondary).getResolution();
     const bool usePrimaryStream =
-        request.size.width() <= 0 ||
-        request.size.height() <= 0 ||
-        request.size.width() > secondaryResolution.width() ||
-        request.size.height() > secondaryResolution.height()
-                        ;
+        request.size.width() <= 0 && request.size.height() <= 0
+        || request.size.width() > secondaryResolution.width()
+        || request.size.height() > secondaryResolution.height();
+
     if (auto frame = getImageWithCertainQuality(usePrimaryStream, request))
     {
         NX_VERBOSE(kLogTag) << lm("%1() END -> frame").arg(__func__);
