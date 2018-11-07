@@ -648,11 +648,14 @@ void QnRecordingManager::disableLicensesIfNeed()
             ec2::ErrorCode errCode =  ec2Connection()->getCameraManager(Qn::kSystemAccess)->saveUserAttributesSync(apiAttributes);
             if (errCode != ec2::ErrorCode::ok)
             {
-                qWarning() << "Can't turn off recording for camera:" << camera->getUniqueId() << "error:" << ec2::toString(errCode);
+                NX_WARNING(this, "Can't turn off recording for camera: %1. Error: %2",
+                    camera->getUniqueId(), ec2::toString(errCode));
                 camera->setLicenseUsed(true); // rollback
                 continue;
             }
             camera->saveParams();
+            NX_INFO(this, "Turn off recording for camera %1 because there is not enough licenses",
+                camera->getUniqueId());
             disabledCameras << camera->getId().toString();
             helper.invalidate();
         }
