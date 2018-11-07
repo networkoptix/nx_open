@@ -1,5 +1,3 @@
-add_subdirectory(nx_sdk_ut)
-
 if(withClouds)
     set(nx_enable_werror ON)
 
