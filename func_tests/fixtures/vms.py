@@ -1,9 +1,6 @@
-from functools import partial
-
 import pytest
 from netaddr import IPAddress
 from netaddr.ip import IPNetwork
-from parse import parse
 from pathlib2 import Path
 from pylru import lrudecorator
 
@@ -12,7 +9,7 @@ from framework.os_access.posix_access import local_access
 from framework.serialize import load
 from framework.vms.hypervisor.virtual_box import VirtualBox
 from framework.vms.networks import setup_flat_network
-from framework.vms.vm_type import VMType
+from framework.vms.vm_type import VMType, VmTemplate
 
 
 def pytest_addoption(parser):
@@ -55,37 +52,20 @@ def hypervisor(host_os_access):
 
 @pytest.fixture(scope='session')
 def vm_types(request, slot, hypervisor, persistent_dir):
+    template_url_prefix = request.config.getoption('template_url_prefix')
     vm_types = {
-        vm_type_name: VMType(
-            vm_type_name,
+        name: VMType.from_config(
             hypervisor,
-            vm_type_conf['os_family'],
-            vm_type_conf['power_on_timeout_sec'],
-            vm_type_conf['vm']['registry_path'].format(slot=slot),
-            partial(vm_type_conf['vm']['name_format'].format, slot=slot),
-            vm_type_conf['vm']['machines_per_slot'],
-            vm_type_conf['vm']['template_vm'].format(slot=slot),
-            partial(vm_type_conf['vm']['mac_address_format'].format, slot=slot),
-            {
-                'host_ports_base': (
-                    vm_type_conf['vm']['port_forwarding']['host_ports_base']
-                    + (
-                        slot
-                        * vm_type_conf['vm']['machines_per_slot']
-                        * vm_type_conf['vm']['port_forwarding']['host_ports_per_vm']
-                        )
-                    ),
-                'host_ports_per_vm': vm_type_conf['vm']['port_forwarding']['host_ports_per_vm'],
-                'vm_ports_to_host_port_offsets': {
-                    parse('{}/{:d}', key): hint
-                    for key, hint
-                    in vm_type_conf['vm']['port_forwarding']['vm_ports_to_host_port_offsets'].items()
-                    },
-                },
-            request.config.getoption('template_url_prefix') + vm_type_conf['vm']['template_file'],
-            persistent_dir,
+            name,
+            conf,
+            VmTemplate(
+                hypervisor,
+                conf['vm']['template_vm'].format(slot=slot),
+                template_url_prefix + conf['vm']['template_file'],
+                persistent_dir),
+            slot=slot,
             )
-        for vm_type_name, vm_type_conf in vm_types_configuration().items()
+        for name, conf in vm_types_configuration().items()
         }
     if request.config.getoption('--clean'):
         for vm_type in vm_types.values():
