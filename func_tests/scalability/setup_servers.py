@@ -12,6 +12,7 @@ from netaddr import IPNetwork
 import yaml
 
 from framework.ca import CA
+from framework.config import str_to_timedelta
 from framework.installation.installer import InstallerSet
 from framework.installation.lightweight_mediaserver import LWS_BINARY_NAME
 from framework.installation.unpacked_mediaserver_factory import UnpackedMediaserverFactory
@@ -45,7 +46,7 @@ class SetupConfig(namedtuple('_SetupConfig', [
             host_list=test_config['host_list'],
             use_lightweight_servers=use_lightweight_servers,
             server_count=server_count or test_config['server_count'],
-            merge_timeout=test_config['merge_timeout'],
+            merge_timeout=str_to_timedelta(test_config['merge_timeout']),
             cameras_per_server=test_config['cameras_per_server'],
             storages_per_server=test_config['storages_per_server'],
             users_per_server=test_config['users_per_server'],
@@ -186,7 +187,7 @@ def _setup_main():
         wait_for_servers_synced(
             env,
             setup_config.merge_timeout,
-            scalability_config['message_bus_timeout'],
+            str_to_timedelta(scalability_config['message_bus_timeout']),
             MESSAGE_BUS_SERVER_COUNT,
             )
         merge_duration = datetime_local_now() - env.merge_start_time
