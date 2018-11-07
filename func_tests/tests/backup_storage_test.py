@@ -7,7 +7,6 @@ import pytz
 
 import framework.utils as utils
 import server_api_data_generators as generator
-from framework.os_access.exceptions import NonZeroExitStatus
 from framework.waiting import wait_for_truthy
 
 _logger = logging.getLogger(__name__)
@@ -175,17 +174,6 @@ def add_camera(camera_pool, server, camera_id, backup_type):
     return camera
 
 
-def assert_path_does_not_exist(server, path):
-    assert_message = "'%r': unexpected existen path '%s'" % (server, path)
-    with pytest.raises(NonZeroExitStatus, message=assert_message) as x_info:
-        server.os_access.run_command(['[', '-e', path, ']'])
-    assert x_info.value.exit_status == 1, assert_message
-
-
-def assert_paths_are_equal(server, path_1, path_2):
-    assert server.os_access.tree_md5(path_1) == server.os_access.tree_md5(path_2)
-
-
 def assert_backup_equal_to_archive(
         server, backup_storage_path, camera,
         system_backup_type, backup_new_camera, camera_backup_type):
@@ -195,17 +183,17 @@ def assert_backup_equal_to_archive(
     low_quality_server_archive_path = server.storage.dir / LOW_QUALITY_PATH / camera.mac_addr
     if ((camera_backup_type and camera_backup_type == BACKUP_DISABLED) or
             (not camera_backup_type and not backup_new_camera)):
-        assert_path_does_not_exist(server, hi_quality_backup_path)
-        assert_path_does_not_exist(server, low_quality_backup_path)
+        assert not hi_quality_backup_path.exists()
+        assert not low_quality_backup_path.exists()
     elif system_backup_type == BACKUP_HIGH:
-        assert_paths_are_equal(server, hi_quality_backup_path, hi_quality_server_archive_path)
-        assert_path_does_not_exist(server, low_quality_backup_path)
+        assert server.os_access.tree_md5(hi_quality_backup_path) == server.os_access.tree_md5(hi_quality_server_archive_path)
+        assert not low_quality_backup_path.exists()
     elif system_backup_type == BACKUP_LOW:
-        assert_paths_are_equal(server, low_quality_backup_path, low_quality_server_archive_path)
-        assert_path_does_not_exist(server, hi_quality_backup_path)
+        assert not hi_quality_backup_path.exists()
+        assert server.os_access.tree_md5(low_quality_backup_path) == server.os_access.tree_md5(low_quality_server_archive_path)
     else:
-        assert_paths_are_equal(server, hi_quality_backup_path, hi_quality_server_archive_path)
-        assert_paths_are_equal(server, low_quality_backup_path, low_quality_server_archive_path)
+        assert server.os_access.tree_md5(hi_quality_backup_path) == server.os_access.tree_md5(hi_quality_server_archive_path)
+        assert server.os_access.tree_md5(low_quality_backup_path) == server.os_access.tree_md5(low_quality_server_archive_path)
 
 
 def test_backup_by_request(
