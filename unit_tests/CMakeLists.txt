@@ -1,4 +1,3 @@
-add_subdirectory(appserver2_ut)
 add_subdirectory(common_ut)
 add_subdirectory(nx_fusion_ut)
 add_subdirectory(utils_ut)
