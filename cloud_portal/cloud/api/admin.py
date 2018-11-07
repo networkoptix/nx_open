@@ -85,12 +85,12 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
         }
 
         if request.method == 'POST':
-            form = UserInviteFrom(request.POST)
+            form = UserInviteFrom(request.POST, user=request.user)
             if form.is_valid():
-                user_id = form.add_user(request, request.POST['email'])
+                user_id = form.add_user(request)
                 return redirect(reverse('admin:api_account_change', args=[user_id]))
         else:
-            form = UserInviteFrom()
+            form = UserInviteFrom(user=request.user)
         context['form'] = form
         context['adminform'] = helpers.AdminForm(form, list([(None, {'fields': form.base_fields})]),
                                                  self.get_prepopulated_fields(request))

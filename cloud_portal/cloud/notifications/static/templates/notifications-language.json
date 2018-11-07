@@ -16,5 +16,8 @@
   },
   "cloud_notification": {
     "emailSubject": "{{message.subject}}"
+  },
+  "cloud_invite": {
+    "emailSubject": "You have been invited to %PRODUCT_NAME%"
   }
 }
