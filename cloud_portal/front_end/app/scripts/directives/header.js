@@ -101,7 +101,7 @@
     }
     
     NxHeader.$inject = ['NxDialogsService', 'cloudApi', 'account', '$location', '$route',
-        'systemsProvider', 'configService', '$rootScope'];
+        'systemsProvider', 'nxConfigService', '$rootScope'];
     
     angular
         .module('cloudApp')
