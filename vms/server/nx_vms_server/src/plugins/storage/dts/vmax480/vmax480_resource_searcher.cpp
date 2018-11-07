@@ -12,7 +12,7 @@
 #include <QtCore/QUrlQuery>
 
 #include "core/resource_management/resource_pool.h"
-#include "../../vmaxproxy/src/vmax480_helper.h"
+#include "vmax480_helper.h"
 namespace {
 
 static const int VMAX_API_PORT = 9010;

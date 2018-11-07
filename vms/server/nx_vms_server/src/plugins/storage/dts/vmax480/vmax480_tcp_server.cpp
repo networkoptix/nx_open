@@ -11,7 +11,7 @@
 #include <nx/streaming/av_codec_media_context.h>
 #include "vmax480_stream_fetcher.h"
 #include <network/tcp_connection_priv.h>
-#include "../../../../vmaxproxy/src/vmax480_helper.h"
+#include "vmax480_helper.h"
 #include <nx/utils/log/log_main.h>
 
 static const int UUID_LEN = 38;

@@ -7,7 +7,7 @@
 #include "vmax480_stream_fetcher.h"
 #include "nx/utils/thread/long_runnable.h"
 #include "recording/time_period_list.h"
-#include "../../../../vmaxproxy/src/vmax480_helper.h"
+#include "vmax480_helper.h"
 
 class QnVMax480ChunkReader: public  QnLongRunnable, public QnVmax480DataConsumer
 {
