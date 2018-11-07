@@ -32,26 +32,35 @@ export class IntegrationService implements OnDestroy {
         return this.api.getIntegrations();
     }
 
+    private formatPlatformName(platform: string){
+        // Converts 'windows-x64-file' -> 'windows x64'
+        platform = platform.replace('-file', '').replace('-', ' ');
+        // Makes the first character of the string uppercase
+        return platform[0].toUpperCase() + platform.slice(1);
+    }
+
     private formatDownloads() {
         this.plugins.forEach((plugin) => {
             if (plugin.downloadFiles) {
                 let downloadPlatforms = plugin.downloadFiles;
                 plugin.downloadFiles = [];
-                Object.keys(downloadPlatforms).forEach((platformName) => {
+                for (let platformName in downloadPlatforms) {
+                    // If there is no file url or its the name for an additional field skip
                     if(!downloadPlatforms[platformName] || platformName.match(/additional-file-[\d]+-name/)) {
-                        return;
+                        continue
                     }
+
                     let platform: Platform = { file: '', name: '', url: '' };
-                    platform.name = platformName.replace('-file', '')
-                            .replace('-', ' ');
-                    platform.name = platform.name[0].toUpperCase() + platform.name.slice(1);
+                    // If the platformName is additional file we replace it with the correct name
                     if (platformName.match(/additional-file-[\d]+/)) {
-                        platform.name = downloadPlatforms[`${platformName}-name`]
+                        platform.name = downloadPlatforms[`${platformName}-name`];
+                    } else {
+                        platform.name = this.formatPlatformName(platformName);
                     }
                     platform.url = downloadPlatforms[platformName];
                     platform.file = platform.url.slice(platform.url.lastIndexOf('/') + 1);
                     plugin.downloadFiles.push(platform);
-                });
+                }
                 plugin.downloadFiles = plugin.downloadFiles.sort((a, b) => {
                     if (a.name < b.name) {
                         return -1;
