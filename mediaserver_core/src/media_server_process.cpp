@@ -1234,6 +1234,8 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIp)
     if (isStopping())
         return;
 
+    NX_DEBUG(this, "Server %1 has changed publicIp to value %2", commonModule()->moduleGUID(), publicIp);
+
     QnPeerRuntimeInfo localInfo = commonModule()->runtimeInfoManager()->localInfo();
     localInfo.data.publicIP = publicIp.toString();
     commonModule()->runtimeInfoManager()->updateLocalItem(localInfo);
