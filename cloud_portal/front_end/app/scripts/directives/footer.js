@@ -1,17 +1,10 @@
 (function () {
 
     'use strict';
-
-    angular
-        .module('cloudApp.directives')
-        .directive('nxFooter', NxFooter);
-
-    NxFooter.$inject = [ '$rootScope', 'nxConfigService', 'account' ];
-
-    function NxFooter($rootScope, nxConfigService, account) {
-
-        var CONFIG = nxConfigService.getConfig(),
-            user   = {};
+    
+    function NxFooter($rootScope, nxConfigService) {
+    
+        var CONFIG = nxConfigService.getConfig();
 
         return {
             restrict   : 'E',
@@ -26,6 +19,13 @@
                     scope.viewFooter = !opt.state;
                 });
             }
-        }
+        };
     }
+    
+    NxFooter.$inject = ['$rootScope', 'nxConfigService'];
+    
+    angular
+        .module('cloudApp.directives')
+        .directive('nxFooter', NxFooter);
+    
 })();

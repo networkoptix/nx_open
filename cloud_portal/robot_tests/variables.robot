@@ -27,7 +27,7 @@ ${TM TEXT}                            qweasdzxc123®™
 #Log In Elements
 ${LOG IN MODAL}                       //form[@name='loginForm']
 ${EMAIL INPUT}                        //form[@name='loginForm']//input[@id='login_email']
-${PASSWORD INPUT}                     //form[@name='loginForm']//input[@id='login_password']
+${PASSWORD INPUT}                     //form[@name='loginForm']//input[@id='login_password' and @name="login_password" and @type="password"]
 ${LOG IN BUTTON}                      //form[@name='loginForm']//nx-process-button//button
 
 ${REMEMBER ME CHECKBOX VISIBLE}       //form[@name='loginForm']//input[@id='remember']/following-sibling::span[@class="checkmark"]/..

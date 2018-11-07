@@ -2,13 +2,6 @@
 
     'use strict';
 
-    angular
-        .module('cloudApp')
-        .directive('nxHeader', NxHeader);
-
-    NxHeader.$inject = [ 'NxDialogsService', 'cloudApi', 'account', '$location', '$route',
-        'systemsProvider', 'nxConfigService', '$rootScope' ];
-
     function NxHeader(NxDialogsService, cloudApi, account, $location, $route,
                       systemsProvider, nxConfigService, $rootScope) {
 
@@ -77,7 +70,7 @@
                     .get()
                     .then(function (account) {
                         scope.account = account;
-                    scope.downloadsHistory = scope.account.permissions.indexOf(Config.permissions.canViewRelease) > -1;
+                    scope.downloadsHistory = scope.account.permissions.indexOf(CONFIG.permissions.canViewRelease) > -1;
 
                         $('body').removeClass('loading');
                         $('body').addClass('authorized');
@@ -106,4 +99,11 @@
             }
         };
     }
+    
+    NxHeader.$inject = ['NxDialogsService', 'cloudApi', 'account', '$location', '$route',
+        'systemsProvider', 'configService', '$rootScope'];
+    
+    angular
+        .module('cloudApp')
+        .directive('nxHeader', NxHeader);
 })();

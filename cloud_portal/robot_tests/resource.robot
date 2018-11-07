@@ -52,6 +52,7 @@ Check Language
     Run Keyword If    "${status}"=="FAIL"    Set Language
 
 Set Language
+    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}    20
     Click Button    ${LANGUAGE DROPDOWN}
     Wait Until Element Is Visible    ${LANGUAGE TO SELECT}
     Click Element    ${LANGUAGE TO SELECT}
@@ -69,7 +70,7 @@ Log In
     Click Button    ${LOG IN BUTTON}
 
 Validate Log In
-    Wait Until Page Contains Element    ${AUTHORIZED BODY}
+    Wait Until Page Contains Element    ${AUTHORIZED BODY}    20
     Wait Until Elements Are Visible    ${ACCOUNT DROPDOWN}
     Check Language
     Sleep    1    #this is a test to see if it eliminates a problem with the login dialog popping up on logout
@@ -86,7 +87,7 @@ Log Out
 
 Validate Log Out
     Wait Until Element Is Not Visible    ${BACKDROP}
-    Wait Until Page Contains Element    ${ANONYMOUS BODY}    10
+    Wait Until Page Contains Element    ${ANONYMOUS BODY}    20
 
 Register
     [arguments]    ${first name}    ${last name}    ${email}    ${password}    ${checked}=false
@@ -146,7 +147,7 @@ Restore password
     Go To    ${link}
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
     #sometimes the DB doesn't update with the new code before it's used by the test.  This is to wait for the DB update.
-    Sleep    5
+    Sleep    20
     Input Text    ${RESET PASSWORD INPUT}    ${BASE PASSWORD}
 
     Click Button    ${SAVE PASSWORD}
@@ -224,7 +225,7 @@ Failure Tasks
 Wait Until Elements Are Visible
     [arguments]    @{elements}
     :FOR     ${element}  IN  @{elements}
-    \  Wait Until Element Is Visible    ${element}
+    \  Wait Until Element Is Visible    ${element}    20
 
 Elements Should Not Be Visible
     [arguments]    @{elements}

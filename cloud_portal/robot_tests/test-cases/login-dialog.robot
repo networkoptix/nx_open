@@ -157,9 +157,10 @@ should respond to Esc key and close dialog
 should respond to Enter key and log in
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}
+    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${REMEMBER ME CHECKBOX VISIBLE}    ${FORGOT PASSWORD}    ${LOG IN CLOSE BUTTON}
     Input Text    ${EMAIL INPUT}    ${email}
     Input Text    ${PASSWORD INPUT}    ${password}
+    Wait Until Element Is Visible    ${LOG IN BUTTON}
     Press Key    ${PASSWORD INPUT}    ${ENTER}
     Validate Log In
 
