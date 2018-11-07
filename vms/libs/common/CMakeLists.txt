@@ -54,3 +54,7 @@ endif()
 if(targetDevice STREQUAL "isd")
     target_compile_definitions(common PRIVATE ISD_JAGUAR)
 endif()
+
+if(withTests)
+    add_subdirectory(unit_tests)
+endif()
