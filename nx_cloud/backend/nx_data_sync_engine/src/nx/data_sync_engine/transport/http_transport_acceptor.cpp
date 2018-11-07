@@ -80,9 +80,6 @@ void HttpTransportAcceptor::createConnection(
             httpConnection->socket()->getForeignAddress(),
             connectionRequestAttributes.connectionId));
 
-    TransportConnectionContext transportConnectionContext;
-    transportConnectionContext.connectionSequence = ++m_lastConnectionSequence;
-    
     auto commandPipeline = std::make_unique<TransactionTransport>(
         m_protocolVersionRange,
         httpConnection->getAioThread(),
@@ -92,7 +89,7 @@ void HttpTransportAcceptor::createConnection(
         m_localPeerData,
         httpConnection->socket()->getForeignAddress(),
         requestContext.request);
-    transportConnectionContext.commandPipeline = commandPipeline.get();
+    auto commandPipelinePtr = commandPipeline.get();
 
     auto newTransport = std::make_unique<GenericTransport>(
         m_protocolVersionRange,
@@ -102,15 +99,7 @@ void HttpTransportAcceptor::createConnection(
         connectionRequestAttributes,
         m_localPeerData,
         std::move(commandPipeline));
-
-    transportConnectionContext.transport = newTransport.get();
-    newTransport->connectionClosedSubscription().subscribe(
-        [this, seq = transportConnectionContext.connectionSequence](
-            auto... /*args*/)
-        {
-            forgetConnection(seq);
-        },
-        &transportConnectionContext.connectionClosedSubscriptionId);
+    auto transportPtr = newTransport.get();
 
     ConnectionManager::ConnectionContext context{
         std::move(newTransport),
@@ -134,16 +123,16 @@ void HttpTransportAcceptor::createConnection(
             requestContext.response);
 
     requestResult.connectionEvents.onResponseHasBeenSent =
-        std::bind(&HttpTransportAcceptor::startOutgoingChannel, this,
-            transportConnectionContext.connectionSequence,
-            std::placeholders::_1);
-
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_connections.emplace(
-            transportConnectionContext.connectionSequence,
-            transportConnectionContext);
-    }
+        [this, commandPipelinePtr, transportPtr,
+            connectionId = connectionRequestAttributes.connectionId](
+                nx::network::http::HttpServerConnection* httpConnection)
+        {
+            startOutgoingChannel(
+                connectionId,
+                commandPipelinePtr,
+                transportPtr,
+                httpConnection);
+        };
 
     completionHandler(std::move(requestResult));
 }
@@ -235,32 +224,22 @@ nx::network::http::RequestResult
     return requestResult;
 }
 
-void HttpTransportAcceptor::forgetConnection(
-    std::int64_t connectionSequence)
-{
-    QnMutexLocker lock(&m_mutex);
-    m_connections.erase(connectionSequence);
-}
-
 void HttpTransportAcceptor::startOutgoingChannel(
-    std::int64_t connectionSequence,
-    nx::network::http::HttpServerConnection* connection)
+    const std::string& connectionId,
+    TransactionTransport* commandPipeline,
+    GenericTransport* transportConnection,
+    nx::network::http::HttpServerConnection* httpConnection)
 {
-    QnMutexLocker lock(&m_mutex);
+    // TODO: #ak Should not rely on connectionId being globally unique.
 
-    auto connectionIter = m_connections.find(connectionSequence);
-    if (connectionIter == m_connections.end())
-        return;
-    
-    TransportConnectionContext& transportContext = connectionIter->second;
-
-    transportContext.commandPipeline->setOutgoingConnection(
-        connection->takeSocket());
-    transportContext.transport->start();
-
-    transportContext.transport->connectionClosedSubscription()
-        .removeSubscription(transportContext.connectionClosedSubscriptionId);
-    m_connections.erase(connectionIter);
+    m_connectionManager->modifyConnectionByIdSafe(
+        connectionId,
+        [commandPipeline, transportConnection, httpConnection](
+            transport::AbstractTransactionTransport*)
+        {
+            commandPipeline->setOutgoingConnection(httpConnection->takeSocket());
+            transportConnection->start();
+        });
 }
 
 void HttpTransportAcceptor::postTransactionToTransport(
