@@ -6,10 +6,6 @@ endif()
 add_subdirectory(nx_network_ut)
 add_subdirectory(nx_sdk_ut)
 
-if(withMediaServer)
-    add_subdirectory(mediaserver_core_ut)
-endif()
-
 if(withClouds)
     set(nx_enable_werror ON)
 

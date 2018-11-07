@@ -111,3 +111,7 @@ endif()
 if(WINDOWS)
     target_link_libraries(nx_vms_server PRIVATE Wldap32.dll Iphlpapi.dll Crypt32.lib)
 endif()
+
+if(withTests)
+    add_subdirectory(unit_tests)
+endif()
