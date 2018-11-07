@@ -18,7 +18,6 @@ std::ostream& operator <<(std::ostream& stream, const QSize& size) {
 
 } // namespace
 
-// TODO: correct namespaces?
 namespace nx::test {
 
 class MockCameraResource: public QnVirtualCameraResource

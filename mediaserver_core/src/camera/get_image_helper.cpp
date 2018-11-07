@@ -537,7 +537,6 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
         if (i == 0)
         {
             const QSize dstSize = updateDstSize(*camera, request.size, *frame, request.aspectRatio);
-            NX_ASSERT(dstSize.width() > 16 || dstSize.height() > 8);  // TODO: Remove mageic numbers.
             filterChain << QnAbstractImageFilterPtr(new QnScaleImageFilter(dstSize));
             filterChain << QnAbstractImageFilterPtr(new QnTiledImageFilter(layout));
             filterChain << QnAbstractImageFilterPtr(new QnRotateImageFilter(rotation));
