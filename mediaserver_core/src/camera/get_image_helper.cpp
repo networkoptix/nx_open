@@ -69,14 +69,9 @@ QSize updateDstSize(
 {
     QSize dstSize(srcSize);
 
-    #if defined(EDGE_SERVER)
-        if (dstSize.height() < 1)
-            dstSize.setHeight(360); //< On edge instead of full-size image we return 360p.
-    #endif
-    double sar = outFrame.sample_aspect_ratio;
-    double ar = sar * outFrame.width / outFrame.height;
+    const double sar = outFrame.sample_aspect_ratio;
+    const double ar = sar * outFrame.width / outFrame.height;
     NX_ASSERT(ar > 0);
-
     if (!dstSize.isEmpty())
     {
         dstSize.setHeight(qPower2Ceil((unsigned)dstSize.height(), kRoundFactor));
@@ -85,7 +80,7 @@ QSize updateDstSize(
     else if (dstSize.height() > 0)
     {
         dstSize.setHeight(qPower2Ceil((unsigned)dstSize.height(), kRoundFactor));
-        dstSize.setWidth(qPower2Ceil((unsigned)(dstSize.height()*ar), kRoundFactor));
+        dstSize.setWidth(qPower2Ceil((unsigned)(dstSize.height() * ar), kRoundFactor));
     }
     else if (dstSize.width() > 0)
     {
@@ -96,9 +91,6 @@ QSize updateDstSize(
     {
         dstSize = QSize(outFrame.width * sar, outFrame.height);
     }
-    static constexpr int kMaxSize = nx::api::CameraImageRequest::kMaximumSize;
-    dstSize.setWidth(qMin(dstSize.width(), qMax(kMaxSize, outFrame.width) * sar));
-    dstSize.setHeight(qMin(dstSize.height(), qMax(kMaxSize, outFrame.height)));
 
     // If auto was requested, then should use aspect ratio like it is used in GUI.
     if (aspectRatio == nx::api::ImageRequest::AspectRatio::auto_)
@@ -108,16 +100,20 @@ QSize updateDstSize(
             dstSize.setWidth(dstSize.height() * customAr.toFloat());
     }
 
-    // Scale image to min size, if lower than min requested.
+    // Scale image to fit inside max size square.
+    static constexpr int kMaxSize = nx::api::CameraImageRequest::kMaximumSize;
+    if (dstSize.width() > kMaxSize || dstSize.height() > kMaxSize)
+        dstSize.scale(kMaxSize, kMaxSize, Qt::KeepAspectRatio);
+
+    // Scale image to fit outside min size square.
     static constexpr int kMinSize = nx::api::CameraImageRequest::kMinimumSize;
     if (dstSize.height() < kMinSize && dstSize.height() > 0
         || dstSize.width() < kMinSize && dstSize.width() > 0)
-    {
         dstSize.scale(kMinSize, kMinSize, Qt::KeepAspectRatioByExpanding);
-        NX_VERBOSE(kLogTag, "%1(): dstSize: %2", __func__, dstSize);
-    }
 
-    return QnCodecTranscoder::roundSize(dstSize);
+    dstSize = QnCodecTranscoder::roundSize(dstSize);
+    NX_VERBOSE(kLogTag, "%1(): dstSize: %2", __func__, dstSize);
+    return dstSize;
 }
 
 CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
@@ -336,6 +332,10 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImage(const nx::api::CameraImageReq
         request.size.width() <= 0 && request.size.height() <= 0
         || request.size.width() > secondaryResolution.width()
         || request.size.height() > secondaryResolution.height();
+
+    #if defined(EDGE_SERVER)
+        usePrimaryStream = false;  //< On edge we always try to use secondary stream first.
+    #endif
 
     if (auto frame = getImageWithCertainQuality(usePrimaryStream, request))
     {

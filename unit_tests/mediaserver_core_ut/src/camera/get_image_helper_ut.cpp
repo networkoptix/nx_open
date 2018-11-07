@@ -18,7 +18,6 @@ std::ostream& operator <<(std::ostream& stream, const QSize& size) {
 
 } // namespace
 
-// TODO: check for EDGE_SERVER
 // TODO: correct namespaces?
 namespace nx::test {
 
@@ -46,9 +45,8 @@ TEST(GetImageHelper, updateDstSize_sourceRatio)
     EXPECT_EQ(QSize(outFrame.width, outFrame.height),
         updateDstSize(camera, {0, 0}, outFrame, AspectRatio::source));
 
-    // TODO: #rvasilenko how should it work...
-//    outFrame.sample_aspect_ratio = 2;
-//    EXPECT_EQ(QSize(1920, 2160), updateDstSize(camera, {1920, 1080}, outFrame, AspectRatio::source));
+    outFrame.sample_aspect_ratio = 2;
+    EXPECT_EQ(QSize(1920, 540), updateDstSize(camera, {0, 0}, outFrame, AspectRatio::source));
 }
 
 TEST(GetImageHelper, updateDstSize_autoRatio)
@@ -72,8 +70,8 @@ TEST(GetImageHelper, updateDstSize_minSize)
 
     MockCameraResource camera;
     CLVideoDecoderOutput outFrame;
-    outFrame.width = 100;
-    outFrame.height = 100;
+    outFrame.width = kMinSize / 2;
+    outFrame.height = kMinSize / 2;
     outFrame.sample_aspect_ratio = 1;
 
     // Width and height specified.
@@ -89,10 +87,36 @@ TEST(GetImageHelper, updateDstSize_minSize)
         updateDstSize(camera, {0, kMinSize / 2}, outFrame, AspectRatio::source));
 
     // Nothing specified, should use source.
-    outFrame.width = kMinSize / 2;
-    outFrame.height = kMinSize / 2;
     EXPECT_EQ(QSize(kMinSize, kMinSize),
         updateDstSize(camera, {0, 0}, outFrame, AspectRatio::source));
 }
+
+TEST(GetImageHelper, updateDstSize_maxSize)
+{
+    static constexpr int kMaxSize = nx::api::CameraImageRequest::kMaximumSize;
+
+    MockCameraResource camera;
+    CLVideoDecoderOutput outFrame;
+    outFrame.width = kMaxSize * 2;
+    outFrame.height = kMaxSize * 2;
+    outFrame.sample_aspect_ratio = 1;
+
+    // Width and height specified.
+    EXPECT_EQ(QSize(kMaxSize, kMaxSize),
+        updateDstSize(camera, {kMaxSize * 2, kMaxSize * 2}, outFrame, AspectRatio::source));
+
+    // Width and height specified (persisting aspect ratio).
+    EXPECT_EQ(QSize(kMaxSize / 2, kMaxSize),
+        updateDstSize(camera, {kMaxSize * 2, kMaxSize * 4}, outFrame, AspectRatio::source));
+
+    // Width specified.
+    EXPECT_EQ(QSize(kMaxSize, kMaxSize),
+        updateDstSize(camera, {0, kMaxSize * 2}, outFrame, AspectRatio::source));
+
+    // Nothing specified, should use source.
+    EXPECT_EQ(QSize(kMaxSize, kMaxSize),
+        updateDstSize(camera, {0, 0}, outFrame, AspectRatio::source));
+}
+
 
 } // namespace nx::test
