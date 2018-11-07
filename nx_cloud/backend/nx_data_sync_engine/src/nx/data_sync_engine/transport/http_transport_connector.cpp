@@ -24,7 +24,8 @@ HttpCommandPipelineConnector::HttpCommandPipelineConnector(
     m_nodeUrl(nx::network::url::Builder(nodeUrl)
         .appendPath(kHttpTransportPathBase)
         .setQuery(lm("guid=%1").args(nodeId)).toUrl()),
-    m_systemId(systemId)
+    m_systemId(systemId),
+    m_connectionGuardSharedState(std::make_shared<::ec2::ConnectionGuardSharedState>())
 {
     m_peerData.id = QnUuid::fromStringSafe(nodeId.c_str());
     m_peerData.instanceId = m_peerData.id;
@@ -46,7 +47,7 @@ void HttpCommandPipelineConnector::connect(Handler completionHandler)
 
     m_connection = std::make_unique<::ec2::QnTransactionTransportBase>(
         QnUuid::fromStringSafe(m_systemId),
-        &m_connectionGuardSharedState,
+        &*m_connectionGuardSharedState,
         m_peerData,
         kTcpKeepAliveTimeout,
         kKeepAliveProbeCount);
@@ -106,8 +107,8 @@ void HttpCommandPipelineConnector::processSuccessfulConnect()
     auto commandPipeline = std::make_unique<TransactionTransport>(
         m_protocolVersionRange,
         std::exchange(m_connection, nullptr),
-        getAioThread(),
-        std::make_shared<::ec2::ConnectionGuardSharedState>(),
+        //getAioThread(),
+        m_connectionGuardSharedState,
         m_systemId,
         nx::network::url::getEndpoint(m_nodeUrl));
 
@@ -192,6 +193,8 @@ void HttpTransportConnector::onPipelineConnectCompleted(
     connectionRequestAttributes.remotePeer = transport->remotePeer();
     connectionRequestAttributes.remotePeerProtocolVersion =
         transport->remotePeerProtocolVersion();
+    connectionRequestAttributes.connectionId = 
+        transport->connectionGuid().toSimpleString().toStdString();
 
     auto newTransport = std::make_unique<GenericTransport>(
         m_protocolVersionRange,

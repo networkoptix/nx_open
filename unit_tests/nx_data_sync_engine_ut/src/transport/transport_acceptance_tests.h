@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -19,6 +20,12 @@ class TransportAcceptance:
     using Connector = typename TransportTypeSet::Connector;
 
 public:
+    TransportAcceptance()
+    {
+        m_systemId = QnUuid::createUuid().toSimpleByteArray().toStdString();
+        m_nodeId = QnUuid::createUuid().toSimpleByteArray().toStdString();
+    }
+
     ~TransportAcceptance()
     {
         for (auto& connector: m_connectors)
@@ -40,25 +47,20 @@ protected:
 
     void establishSameSystemConnectionsSimultaneosly(int count)
     {
-        const auto systemId = QnUuid::createUuid().toSimpleByteArray().toStdString();
-        auto url = m_nodeCluster.peer(0).syncronizationUrl();
-        url.setPath(nx::network::http::rest::substituteParameters(
-            url.path().toStdString(),
-            {systemId}).c_str());
-
-        const auto nodeId = QnUuid::createUuid().toSimpleByteArray().toStdString();
-
         for (int i = 0; i < count; ++i)
-        {
-            auto connector = std::make_unique<Connector>(
-                ProtocolVersionRange::any,
-                url,
-                systemId,
-                nodeId);
-            m_connectors.push_back(std::move(connector));
-            m_connectors.back()->connect(
-                [this](auto&&... args) { processConnectResult(std::move(args)...); });
-        }
+            whenConnect();
+    }
+
+    void whenConnect()
+    {
+        auto connector = std::make_unique<Connector>(
+            ProtocolVersionRange::any,
+            getUrlForSystem(m_systemId),
+            m_systemId,
+            m_nodeId);
+        m_connectors.push_back(std::move(connector));
+        m_connectors.back()->connect(
+            [this](auto&&... args) { processConnectResult(std::move(args)...); });
     }
 
     void waitForEveryConnectToComplete()
@@ -72,16 +74,56 @@ protected:
         }
     }
 
+    void thenConnectSucceeded()
+    {
+        thenConnectCompleted();
+
+        ASSERT_NE(nullptr, m_prevConnectResult->connection);
+        ASSERT_TRUE(m_prevConnectResult->result.ok());
+    }
+
+    void thenConnectCompleted()
+    {
+        m_prevConnectResult = m_connectResults.pop();
+    }
+
+    void andConnectionIsKnownOnNode()
+    {
+        ASSERT_TRUE(m_nodeCluster.peer(0).process().moduleInstance()->syncronizationEngine()
+            .connectionManager().isSystemConnected(m_systemId));
+    }
+
 private:
     struct ConnectResult
     {
-        ConnectResultDescriptor connectResultDescriptor;
+        ConnectResultDescriptor result;
         std::unique_ptr<AbstractCommandPipeline> connection;
+
+        ConnectResult(ConnectResult&&) = default;
+        ConnectResult& operator=(ConnectResult&&) = default;
+
+        ~ConnectResult()
+        {
+            if (connection)
+                connection->pleaseStopSync();
+        }
     };
 
     data_sync_engine::test::ClusterTestFixture m_nodeCluster;
     std::vector<std::unique_ptr<AbstractCommandPipelineConnector>> m_connectors;
     nx::utils::SyncQueue<ConnectResult> m_connectResults;
+    std::optional<ConnectResult> m_prevConnectResult;
+    std::string m_systemId;
+    std::string m_nodeId;
+
+    nx::utils::Url getUrlForSystem(const std::string& systemId)
+    {
+        auto url = m_nodeCluster.peer(0).syncronizationUrl();
+        url.setPath(nx::network::http::rest::substituteParameters(
+            url.path().toStdString(),
+            {systemId}).c_str());
+        return url;
+    }
 
     void processConnectResult(
         ConnectResultDescriptor connectResultDescriptor,
@@ -95,19 +137,29 @@ TYPED_TEST_CASE_P(TransportAcceptance);
 
 //-------------------------------------------------------------------------------------------------
 
+TYPED_TEST_P(TransportAcceptance, connection_can_be_established)
+{
+    this->whenConnect();
+
+    this->thenConnectSucceeded();
+    this->andConnectionIsKnownOnNode();
+}
+
 TYPED_TEST_P(
     TransportAcceptance,
     transport_connection_is_removed_before_http_response_has_been_sent)
 {
+    constexpr int connectionToEstablishCount = 11;
+
     this->setMaximumActiveConnectionCountPerSystem(1);
    
-    constexpr int connectionToEstablishCount = 11;
     this->establishSameSystemConnectionsSimultaneosly(connectionToEstablishCount);
 
     this->waitForEveryConnectToComplete();
 }
 
 REGISTER_TYPED_TEST_CASE_P(TransportAcceptance,
+    connection_can_be_established,
     transport_connection_is_removed_before_http_response_has_been_sent
 );
 

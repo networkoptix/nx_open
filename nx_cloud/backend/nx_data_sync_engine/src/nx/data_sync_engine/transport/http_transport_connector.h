@@ -43,7 +43,7 @@ private:
 
     Handler m_completionHandler;
     std::unique_ptr<::ec2::QnTransactionTransportBase> m_connection;
-    ::ec2::ConnectionGuardSharedState m_connectionGuardSharedState;
+    std::shared_ptr<::ec2::ConnectionGuardSharedState> m_connectionGuardSharedState;
     QMetaObject::Connection m_stateChangedConnection;
 
     void onStateChanged(::ec2::QnTransactionTransportBase::State newState);

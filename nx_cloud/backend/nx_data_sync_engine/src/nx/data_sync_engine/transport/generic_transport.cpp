@@ -32,7 +32,7 @@ GenericTransport::GenericTransport(
     bindToAioThread(m_commandPipeline->getAioThread());
 
     m_commonTransportHeaderOfRemoteTransaction.connectionId =
-        m_commandPipeline->connectionGuid().toSimpleByteArray().toStdString();
+        connectionRequestAttributes.connectionId;
     m_commonTransportHeaderOfRemoteTransaction.systemId = systemId;
     m_commonTransportHeaderOfRemoteTransaction.peerId =
         connectionRequestAttributes.remotePeer.id.toSimpleByteArray().toStdString();
