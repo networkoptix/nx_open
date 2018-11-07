@@ -1,10 +1,10 @@
-# Default logging configuration.
+# Default logging configuration, with http requests and responses.
 
 version: 1
 disable_existing_loggers: false
 formatters:
   default:
-    format: '%(asctime)-15s %(levelname)7s %(threadName)-11s %(message)s'
+    format: '%(asctime)-15s %(levelname)7s %(message)s'
 handlers:
   stderr:
     class: logging.StreamHandler
@@ -23,7 +23,6 @@ loggers:
   framework.ca: {level: INFO}
   framework.lock: {level: WARNING}
   framework.registry: {level: INFO}
-  framework.data_differ: {level: INFO}
   framework.vms.vm_type: {level: INFO}
   framework.vms.vm_type.wait: {level: WARNING}
   framework.vms.vm_type.ssh: {level: WARNING}
@@ -32,32 +31,23 @@ loggers:
   framework.vms.vm_type.networking.winrm: {level: WARNING}
   framework.vms.hypervisor.virtual_box: {level: INFO}
   framework.vms.hypervisor.virtual_box.manage: {level: WARNING}
-  framework.os_access.windows_remoting.wmi: {level: INFO}
+  framework.os_access.windows_remoting._cim_query: {level: INFO}
   framework.os_access.traffic_capture: {level: INFO}
   framework.mediaserver_api.setup: {level: INFO}
   framework.mediaserver_api.setup.wait: {level: WARNING}
   framework.mediaserver_api.merge: {level: INFO}
-  framework.message_bus: {level: INFO}
-  framework.message_bus.thread: {level: WARNING}
-  framework.mediaserver_sync_wait.sync.mediaserver_api: {level: INFO}
-  framework.mediaserver_sync_wait.wait: {level: WARNING}
-  framework.installation.installer: {level: INFO}
   framework.installation.deb_installation: {level: INFO}
   framework.installation.mediaserver.examination: {level: INFO}
   framework.installation.mediaserver.wait: {level: INFO}
   framework.installation.mediaserver.http: {level: INFO}
-  framework.installation.mediaserver.mediaserver_api: {level: INFO}
+  framework.installation.mediaserver.mediaserver_api: {level: DEBUG}
   framework.installation.lightweight_mediaserver.wait: {level: INFO}
-  framework.installation.lightweight_mediaserver.http: {level: INFO}
-  framework.installation.lightweight_mediaserver.mediaserver_api: {level: INFO}
+  framework.installation.lightweight_mediaserver.http: {level: DEBUG}
+  framework.installation.lightweight_mediaserver.mediaserver_api: {level: DEBUG}
 
-  resource_synchronization_test.dumper.mediaserver_api: {level: INFO}
-  scalability.create_test_data: {level: INFO}
-  scalability.merge: {level: INFO}
-  scalability.transaction_generator.init: {level: INFO}
-  scalability.transaction_generator.stamp: {level: INFO}
-  scalability.dumper: {level: INFO}
-  scalability.post_check: {level: INFO}
+  scalability_test.create_test_data: {level: INFO}
+  scalability_test.merge: {level: INFO}
+  scalability_test.post_check: {level: INFO}
 
 root:
   handlers: [stderr]

@@ -20,28 +20,38 @@ const saveRuleToConfig = (rule: Rule | null) => {
         return;
     }
     config.rules[rule.comment] = rule.ruleId;
-    fs.writeFileSync(path.resolve(__dirname, './nodeConfig.json'), JSON.stringify(config, undefined, 4));
+    fs.writeFileSync(path.resolve(__dirname, './nodeConfig.json'),
+            JSON.stringify(config, undefined, 4));
 };
 
 // Makes all of the rules on the target system.
 const makeExampleRules = () => {
     const promiseRules: any[] = [];
 
-    // Makes a rule that displays a notification when a generic event with 'node.js' as the source is received.
+    /*
+     * Makes a rule that displays a notification when a generic event
+     * with 'node.js' as the source is received.
+     */
     const genericEvent: GenericEvent = new GenericEvent('Node.js');
     const showNotification: ShowPopup = new ShowPopup();
-    const catchSpecificEvent = new Rule('Generic Event Popup', false).on(genericEvent).do(showNotification);
+    const catchSpecificEvent = new Rule('Generic Event Popup', false)
+            .on(genericEvent)
+            .do(showNotification);
     // After this rule is made, test it by triggering the event manually.
-    promiseRules.push(server.saveRuleToSystem(catchSpecificEvent).then((rule: Rule | null) => {
-        server.sendEvent({ event: genericEvent });
-        saveRuleToConfig(rule);
-        return rule;
-    }));
+    promiseRules.push(server.saveRuleToSystem(catchSpecificEvent)
+            .then((rule: Rule | null) => {
+                server.sendEvent({ event: genericEvent });
+                saveRuleToConfig(rule);
+                return rule;
+            })
+    );
 
     // Makes a rule that displays a notification whenever a generic event is received.
     const genericEvent2: GenericEvent = new GenericEvent();
     genericEvent2.config({});
-    const catchAllEvents: Rule = new Rule('Catch All Events').on(genericEvent2).do(showNotification);
+    const catchAllEvents: Rule = new Rule('Catch All Events')
+            .on(genericEvent2)
+            .do(showNotification);
     promiseRules.push(server.saveRuleToSystem(catchAllEvents).then((rule: Rule | null) => {
         saveRuleToConfig(rule);
         return rule;

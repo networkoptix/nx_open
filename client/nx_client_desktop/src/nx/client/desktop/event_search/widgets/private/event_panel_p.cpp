@@ -267,7 +267,9 @@ void EventPanel::Private::MotionSearchSynchronizer::handleCurrentWidgetChanged()
 
 void EventPanel::Private::MotionSearchSynchronizer::handleMotionSelectionChanged()
 {
-    m_main->m_motionTab->setFilterRegions(widget() ? widget()->motionSelection() : QList<QRegion>());
+    m_main->m_motionTab->setFilterRegions(widget() && widget()->isMotionSearchModeEnabled()
+        ? widget()->motionSelection()
+        : QList<QRegion>());
 }
 
 void EventPanel::Private::MotionSearchSynchronizer::updateState()

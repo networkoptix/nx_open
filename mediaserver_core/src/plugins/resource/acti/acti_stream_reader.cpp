@@ -103,7 +103,7 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(
 
     if (isCameraControlRequired)
     {
-        CLHttpStatus status;
+        nx::network::http::StatusCode::Value status;
         if (desiredTransport == RtpTransport::udp)
         {
             QByteArray result = m_actiRes->makeActiRequest(
@@ -113,27 +113,27 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(
                 .arg(kStreamingMethodRtpUdp),
                 status);
 
-            if (status != CL_HTTP_SUCCESS)
+            if (!nx::network::http::StatusCode::isSuccessCode(status))
                 return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("streaming method"));
         }
 
         QByteArray result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_FPS.arg(ch).arg(params.fps), status);
-        if (status != CL_HTTP_SUCCESS)
+        if (!nx::network::http::StatusCode::isSuccessCode(status))
             return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("fps"));
 
         result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_RESOLUTION.arg(ch).arg(resolutionStr), status);
-        if (status != CL_HTTP_SUCCESS)
+        if (!nx::network::http::StatusCode::isSuccessCode(status))
             return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("resolution"));
 
         if (params.codec == "MJPEG")
             result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_QUALITY.arg(ch).arg(toJpegQuality(params)), status);
         else
             result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_BITRATE.arg(ch).arg(bitrateStr), status);
-        if (status != CL_HTTP_SUCCESS)
+        if (!nx::network::http::StatusCode::isSuccessCode(status))
             return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("bitrate"));
 
         result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_ENCODER.arg(ch).arg(encoderStr), status);
-        if (status != CL_HTTP_SUCCESS)
+        if (!nx::network::http::StatusCode::isSuccessCode(status))
             return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("encoder"));
 
         if (!m_actiRes->SetupAudioInput())

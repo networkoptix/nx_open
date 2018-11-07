@@ -57,11 +57,29 @@ QnMotionArchiveConnectionPtr QnMotionHelper::createConnection(const QnResourcePt
 
 QnTimePeriodList QnMotionHelper::matchImage(const QnChunksRequestData& request)
 {
-    QList<QRegion> motionRegions = QJson::deserialized<QList<QRegion>>(request.filter.toUtf8());
+    const auto motionRegionList = request.filter.trimmed().isEmpty()
+        ? QList<QRegion>()
+        : QJson::deserialized<QList<QRegion>>(request.filter.toUtf8());
+
+    const auto wholeFrameRegionList =
+        [](int channelCount)
+        {
+            static const QRegion kWholeFrame(
+                QRect(0, 0, Qn::kMotionGridWidth, Qn::kMotionGridHeight));
+
+            QList<QRegion> result;
+            result.reserve(channelCount);
+            std::fill_n(std::back_inserter(result), channelCount, kWholeFrame);
+            return result;
+        };
 
     std::vector<QnTimePeriodList> timePeriods;
-    for(const auto& res: request.resList)
+    for (const auto& res: request.resList)
     {
+        const auto motionRegions = motionRegionList.isEmpty()
+            ? wholeFrameRegionList(res->getVideoLayout()->channelCount())
+            : motionRegionList;
+
         if (res->isDtsBased())
         {
             timePeriods.push_back(res->getDtsTimePeriodsByMotionRegion(
