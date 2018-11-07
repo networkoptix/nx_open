@@ -23,7 +23,8 @@ sudo apt-get install --yes \
     virtualbox virtualbox-ext-pack \
     rsync \
     ffmpeg \
-    smbclient
+    smbclient \
+    virtualbox-qt
 sudo wget -O /etc/bash_completion.d/VBoxManage https://raw.githubusercontent.com/gryf/vboxmanage-bash-completion/d4f56a0d6b24ab8585dc1a3c86dd56f4235fe106/VBoxManage
 sudo chmod +x /etc/bash_completion.d/VBoxManage
 echo "Reload Bash to enable VBoxManage completion:"
