@@ -53,11 +53,12 @@ public:
 
 private:
     const ProtocolVersionRange& m_protocolVersionRange;
-    TransactionLog* m_transactionLog;
-    ConnectionManager* m_connectionManager;
+    TransactionLog* m_transactionLog = nullptr;
+    ConnectionManager* m_connectionManager = nullptr;
     const OutgoingCommandFilter& m_outgoingCommandFilter;
     const vms::api::PeerData m_localPeerData;
     std::shared_ptr<::ec2::ConnectionGuardSharedState> m_connectionGuardSharedState;
+    std::atomic<int> m_connectionSeq{0};
 
     nx::network::http::RequestResult prepareOkResponseToCreateTransactionConnection(
         const ConnectionRequestAttributes& connectionRequestAttributes,
@@ -65,8 +66,8 @@ private:
 
     void startOutgoingChannel(
         const std::string& connectionId,
+        int connectionSeq,
         TransactionTransport* commandPipeline,
-        GenericTransport* transportConnection,
         nx::network::http::HttpServerConnection* httpConnection);
 
     void postTransactionToTransport(

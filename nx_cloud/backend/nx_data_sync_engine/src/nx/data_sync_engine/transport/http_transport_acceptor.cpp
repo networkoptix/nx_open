@@ -7,11 +7,37 @@
 #include <nx/network/socket_global.h>
 #include <nx/vms/api/types/connection_types.h>
 
+#include "command_transport_delegate.h"
 #include "generic_transport.h"
 #include "../connection_manager.h"
 #include "../compatible_ec2_protocol_version.h"
 
 namespace nx::data_sync_engine::transport {
+
+class AcceptedTransportConnection:
+    public CommandTransportDelegate
+{
+    using base_type = CommandTransportDelegate;
+
+public:
+    AcceptedTransportConnection(
+        std::unique_ptr<AbstractTransactionTransport> delegatee,
+        int connectionSeq)
+        :
+        base_type(delegatee.get()),
+        m_delegatee(std::move(delegatee)),
+        m_connectionSeq(connectionSeq)
+    {
+    }
+
+    int seq() const { return m_connectionSeq; }
+
+private:
+    std::unique_ptr<AbstractTransactionTransport> m_delegatee;
+    const int m_connectionSeq = 0;
+};
+
+//-------------------------------------------------------------------------------------------------
 
 HttpTransportAcceptor::HttpTransportAcceptor(
     const QnUuid& peerId,
@@ -99,10 +125,12 @@ void HttpTransportAcceptor::createConnection(
         connectionRequestAttributes,
         m_localPeerData,
         std::move(commandPipeline));
-    auto transportPtr = newTransport.get();
 
+    const int connectionSeq = ++m_connectionSeq;
     ConnectionManager::ConnectionContext context{
-        std::move(newTransport),
+        std::make_unique<AcceptedTransportConnection>(
+            std::move(newTransport),
+            connectionSeq),
         connectionRequestAttributes.connectionId,
         {systemId, connectionRequestAttributes.remotePeer.id.toByteArray().toStdString()},
         network::http::getHeaderValue(requestContext.request.headers, "User-Agent").toStdString()};
@@ -123,14 +151,14 @@ void HttpTransportAcceptor::createConnection(
             requestContext.response);
 
     requestResult.connectionEvents.onResponseHasBeenSent =
-        [this, commandPipelinePtr, transportPtr,
+        [this, commandPipelinePtr, connectionSeq,
             connectionId = connectionRequestAttributes.connectionId](
                 nx::network::http::HttpServerConnection* httpConnection)
         {
             startOutgoingChannel(
                 connectionId,
+                connectionSeq,
                 commandPipelinePtr,
-                transportPtr,
                 httpConnection);
         };
 
@@ -226,17 +254,24 @@ nx::network::http::RequestResult
 
 void HttpTransportAcceptor::startOutgoingChannel(
     const std::string& connectionId,
+    int connectionSeq,
     TransactionTransport* commandPipeline,
-    GenericTransport* transportConnection,
     nx::network::http::HttpServerConnection* httpConnection)
 {
-    // TODO: #ak Should not rely on connectionId being globally unique.
-
     m_connectionManager->modifyConnectionByIdSafe(
         connectionId,
-        [commandPipeline, transportConnection, httpConnection](
-            transport::AbstractTransactionTransport*)
+        [connectionSeq, commandPipeline, httpConnection](
+            transport::AbstractTransactionTransport* transportConnection)
         {
+            auto acceptedTransportConnection = 
+                dynamic_cast<AcceptedTransportConnection*>(transportConnection);
+            if (!acceptedTransportConnection || 
+                acceptedTransportConnection->seq() != connectionSeq)
+            {
+                // connectionId is not globally unique.
+                return;
+            }
+
             commandPipeline->setOutgoingConnection(httpConnection->takeSocket());
             transportConnection->start();
         });
