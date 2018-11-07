@@ -80,14 +80,14 @@ Env = namedtuple('Env', 'all_server_list real_server_list lws os_access_set merg
 
 
 @with_traceback
-def make_real_servers_env(config, server_list, common_net):
+def make_real_servers_env(setup_config, server_list, common_net):
     # lightweight servers create data themselves
-    create_resources_on_servers(config, server_list)
+    create_resources_on_servers(setup_config, server_list)
     merge_start_time = datetime_local_now()
     for server in server_list[1:]:
         merge_systems(server_list[0], server,
                       accessible_ip_net=common_net,
-                      timeout_sec=config.merge_timeout.total_seconds())
+                      timeout_sec=setup_config.merge_timeout.total_seconds())
     return Env(
         all_server_list=server_list,
         real_server_list=server_list,
@@ -98,10 +98,10 @@ def make_real_servers_env(config, server_list, common_net):
 
 
 @contextmanager
-def servers_set_up(config, unpacked_mediaserver_factory, create_data_for_lws=False):
-    groups = unpacked_mediaserver_factory.from_host_config_list(config.host_list)
+def servers_set_up(setup_config, unpacked_mediaserver_factory, create_data_for_lws=False):
+    groups = unpacked_mediaserver_factory.from_host_config_list(setup_config.host_list)
     with ExitStack() as stack:
-        if config.use_lightweight_servers:
+        if setup_config.use_lightweight_servers:
             if create_data_for_lws:
                 lws_config = dict(
                     CAMERAS_PER_SERVER=0,
@@ -111,25 +111,25 @@ def servers_set_up(config, unpacked_mediaserver_factory, create_data_for_lws=Fal
                     )
             else:
                 lws_config = dict(
-                    CAMERAS_PER_SERVER=config.cameras_per_server,
-                    STORAGES_PER_SERVER=config.storages_per_server,
-                    USERS_PER_SERVER=config.users_per_server,
-                    PROPERTIES_PER_CAMERA=config.properties_per_camera,
+                    CAMERAS_PER_SERVER=setup_config.cameras_per_server,
+                    STORAGES_PER_SERVER=setup_config.storages_per_server,
+                    USERS_PER_SERVER=setup_config.users_per_server,
+                    PROPERTIES_PER_CAMERA=setup_config.properties_per_camera,
                     )
             lws = stack.enter_context(groups.allocated_lws(
-                server_count=config.server_count - 1,  # minus one standalone
-                merge_timeout_sec=config.merge_timeout.total_seconds(),
+                server_count=setup_config.server_count - 1,  # minus one standalone
+                merge_timeout_sec=setup_config.merge_timeout.total_seconds(),
                 **lws_config
                 ))
             server = stack.enter_context(
                 groups.one_allocated_server('standalone', system_settings, _unpacked_server_config))
             all_server_list = [server] + lws.servers
             if create_data_for_lws:
-                create_resources_on_servers(config, all_server_list)
+                create_resources_on_servers(setup_config, all_server_list)
             merge_start_time = datetime_local_now()
             server.api.merge(lws[0].api, lws.server_bind_address, lws[0].port,
                              take_remote_settings=True,
-                             timeout_sec=config.merge_timeout.total_seconds())
+                             timeout_sec=setup_config.merge_timeout.total_seconds())
             env = Env(
                 all_server_list=all_server_list,
                 real_server_list=[server],
@@ -139,8 +139,8 @@ def servers_set_up(config, unpacked_mediaserver_factory, create_data_for_lws=Fal
                 )
         else:
             server_list = stack.enter_context(groups.many_allocated_servers(
-                config.server_count, system_settings, _unpacked_server_config))
-            env = make_real_servers_env(config, server_list, IPNetwork('0.0.0.0/0'))
+                setup_config.server_count, system_settings, _unpacked_server_config))
+            env = make_real_servers_env(setup_config, server_list, IPNetwork('0.0.0.0/0'))
 
         yield env
 
