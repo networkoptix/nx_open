@@ -12,10 +12,7 @@
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/std/cpp14.h>
 
-namespace nx {
-namespace network {
-namespace server {
-namespace test {
+namespace nx::network::server::test {
 
 namespace {
 
@@ -130,14 +127,12 @@ public:
             nullptr,
             aio::test::AsyncChannel::InputDepletionPolicy::retry)
     {
-        using namespace std::placeholders;
-
         m_connection = std::make_unique<TestHttpConnection>(
             std::make_unique<AsyncChannelToStreamSocketAdapter>(&m_asyncChannel));
         m_connection->setMessageHandler(
-            std::bind(&BaseStreamProtocolConnection::saveMessage, this, _1));
+            [this](auto&&... args) { saveMessage(std::move(args)...); });
         m_connection->setOnSomeMessageBodyAvailable(
-            std::bind(&BaseStreamProtocolConnection::saveSomeBody, this, _1));
+            [this](auto&&... args) { saveSomeBody(std::move(args)...); });
         m_connection->startReadingConnection();
     }
 
@@ -323,13 +318,11 @@ protected:
 
     void thenMessageBodyCanBeReadFromSocket()
     {
-        using namespace std::placeholders;
-
         m_readBuffer.reserve(expectedBody().size());
 
         m_streamSocket->readSomeAsync(
             &m_readBuffer,
-            std::bind(&BaseStreamProtocolConnectionTakeSocket::onSomeBytesRead, this, _1, _2));
+            [this](auto&&... args) { onSomeBytesRead(std::move(args)...); });
 
         m_done.get_future().wait();
     }
@@ -349,8 +342,6 @@ private:
     void onSomeBytesRead(
         SystemError::ErrorCode sysErrorCode, std::size_t /*bytesRead*/)
     {
-        using namespace std::placeholders;
-
         ASSERT_EQ(SystemError::noError, sysErrorCode);
 
         if (m_readBuffer == expectedBody())
@@ -363,7 +354,7 @@ private:
 
         m_streamSocket->readSomeAsync(
             &m_readBuffer,
-            std::bind(&BaseStreamProtocolConnectionTakeSocket::onSomeBytesRead, this, _1, _2));
+            [this](auto&&... args) { onSomeBytesRead(std::move(args)...); });
     }
 };
 
@@ -374,7 +365,4 @@ TEST_F(BaseStreamProtocolConnectionTakeSocket, taking_socket_does_not_lose_data)
     thenMessageBodyCanBeReadFromSocket();
 }
 
-} // namespace test
-} // namespace server
-} // namespace network
-} // namespace nx
+} // namespace nx::network::server::test
