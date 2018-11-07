@@ -990,6 +990,8 @@
             }
             
             self.setPlayingPosition(self.played);
+        },function(error){
+            console.error("Was not able to get records from server", error);
         });
     };
 
