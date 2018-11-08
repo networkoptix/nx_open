@@ -291,6 +291,9 @@ class _FakeDisk(BaseFakeDisk):
             try:
                 self._shell.run_command(['umount', '-l', self.path])
             except exceptions.exit_status_error_cls(1) as e:
+                if e.stderr.decode().rstrip().endswith(': not found'):
+                    _logger.debug("No mount point %s, OK if never been mounted.", self.path)
+                    break
                 if not e.stderr.decode().rstrip().endswith(': not mounted'):
                     raise
                 break
