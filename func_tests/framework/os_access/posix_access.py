@@ -280,12 +280,16 @@ class _FakeDisk(BaseFakeDisk):
     def remove(self):
         """At least, in Ubuntu 14.04 trusty, multiple `/dev/loop*` devices may be mounted to single
         mount point. Files that are behind `/dev/loop*` may be deleted. To dismount such mounts,
-        `umount -f /mnt/point` must be called unless it exists with error code 1 and says
+        `umount -l /mnt/point` must be called unless it exists with error code 1 and says
         `umount: /mnt/disk: not mounted`.
+
+        Also note that lazy `umount` is used. From `man umount`: "Detach the filesystem from the
+        file hierarchy now, and clean up all references to this filesystem as soon as it is not
+        busy anymore." Image file can be deleted even if it's still used.
         """
         while True:
             try:
-                self._shell.run_command(['umount', '-f', self.path])
+                self._shell.run_command(['umount', '-l', self.path])
             except exceptions.exit_status_error_cls(1) as e:
                 if not e.stderr.decode().rstrip().endswith(': not mounted'):
                     raise
