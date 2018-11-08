@@ -122,20 +122,20 @@ def work_dir(request, metadata):
 @pytest.fixture(scope='session')
 def run_dir(work_dir, metadata):
     prefix = 'run_'
-    this = work_dir / '{}{:%Y%m%d_%H%M%S}'.format(prefix, datetime.now())
-    metadata['Run Dir'] = this
-    this.mkdir(parents=False, exist_ok=False)
+    run_dir = work_dir / '{}{:%Y%m%d_%H%M%S}'.format(prefix, datetime.now())
+    metadata['Run Dir'] = run_dir
+    run_dir.mkdir(parents=False, exist_ok=False)
     latest = work_dir / 'latest'
     try:
         latest.unlink()
     except DoesNotExist:
         pass
-    latest.symlink_to(this, target_is_directory=True)
+    latest.symlink_to(run_dir, target_is_directory=True)
     old = list(sorted(work_dir.glob('{}*'.format(prefix))))[:-5]
     pool = ThreadPool(10)  # Arbitrary, just not so much.
     future = pool.map_async(lambda dir: dir.rmtree(), old)
-    _logger.info("Run dir: %s", this)
-    yield this
+    _logger.info("Run dir: %s", run_dir)
+    yield run_dir
     future.wait(timeout=30)
     pool.terminate()
 
@@ -160,15 +160,15 @@ mimetypes.add_type('application/x-yaml', '.yml')
 
 @pytest.fixture()
 def artifacts_dir(node_dir, artifact_set):
-    dir = node_dir / 'artifacts'
-    dir.mkdir(exist_ok=True)
-    _logger.info("Artifacts dir: %s", dir)
-    yield dir
-    for entry in dir.glob('**'):
+    artifacts_dir = node_dir / 'artifacts'
+    artifacts_dir.mkdir(exist_ok=True)
+    _logger.info("Artifacts dir: %s", artifacts_dir)
+    yield artifacts_dir
+    for entry in artifacts_dir.glob('**'):
         # noinspection PyUnresolvedReferences
         mime_type = mimetypes.types_map.get(entry.suffix, 'application/octet-stream')
         type = ArtifactType(entry.suffix[1:] if entry.suffix else 'unknown_type', mime_type, ext=entry.suffix)
-        name = str(entry.relative_to(dir))
+        name = str(entry.relative_to(artifacts_dir))
         is_error = any(word in entry.name for word in {'core', 'backtrace'})
         artifact_set.add(Artifact(entry, name=name, is_error=is_error, artifact_type=type))
 
