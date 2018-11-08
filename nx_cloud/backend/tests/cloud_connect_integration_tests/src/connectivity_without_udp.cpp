@@ -3,7 +3,8 @@
 namespace nx::network::cloud::test {
 
 class ConnectivityWithoutUdp:
-    public BasicTestFixture
+    public BasicTestFixture,
+    public ::testing::Test
 {
     using base_type = BasicTestFixture;
 

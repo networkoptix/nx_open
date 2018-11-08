@@ -18,7 +18,7 @@ class AbstractPollable:
     public QnStoppableAsync
 {
 public:
-    virtual ~AbstractPollable() {}
+    virtual ~AbstractPollable() = default;
 
     virtual aio::AbstractAioThread* getAioThread() const = 0;
     /**

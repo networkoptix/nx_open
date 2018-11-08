@@ -18,6 +18,12 @@ nxpl::PluginInterface* createNXPluginInstance()
 namespace nx {
 namespace usb_cam {
 
+namespace {
+
+static constexpr const char * const kPluginName = "usb_cam";
+
+}
+
 static Plugin* webCameraPluginInstance = NULL;
 
 Plugin::Plugin():
@@ -35,7 +41,10 @@ Plugin::~Plugin()
 
 void* Plugin::queryInterface( const nxpl::NX_GUID& interfaceID )
 {
-    if( memcmp( &interfaceID, &nxcip::IID_CameraDiscoveryManager, sizeof(nxcip::IID_CameraDiscoveryManager) ) == 0 )
+    if (memcmp(
+        &interfaceID,
+        &nxcip::IID_CameraDiscoveryManager,
+        sizeof(nxcip::IID_CameraDiscoveryManager)) == 0 )
     {
         if (!m_discoveryManager)
             m_discoveryManager.reset(new DiscoveryManager(
@@ -75,7 +84,7 @@ unsigned int Plugin::releaseRef()
 
 const char* Plugin::name() const
 {
-    return "usb_cam";
+    return kPluginName;
 }
 
 void Plugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)

@@ -19,7 +19,9 @@ NativeMediaEncoder::NativeMediaEncoder(
 {
 }
 
-int NativeMediaEncoder::getResolutionList(nxcip::ResolutionInfo * infoList, int * infoListCount) const
+int NativeMediaEncoder::getResolutionList(
+    nxcip::ResolutionInfo * infoList,
+    int * infoListCount) const
 {
     if (!m_camera->videoStream()->pluggedIn())
         return nxcip::NX_IO_ERROR;

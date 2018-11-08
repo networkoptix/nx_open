@@ -12,7 +12,7 @@ static constexpr std::chrono::milliseconds kBufferMaxTimeSpan(1000);
 
 }
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // BufferedPacketConsumer
 
 BufferedPacketConsumer::BufferedPacketConsumer(
@@ -88,7 +88,7 @@ std::vector<uint64_t> BufferedPacketConsumer::timestamps() const
     return m_buffer.timestamps();
 }
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // BufferedVideoFrameConsumer
 
 BufferedVideoFrameConsumer::BufferedVideoFrameConsumer(

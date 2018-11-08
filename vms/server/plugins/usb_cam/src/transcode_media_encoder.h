@@ -17,14 +17,16 @@ public:
 
     virtual ~TranscodeMediaEncoder() = default;
 
-    virtual int getResolutionList(nxcip::ResolutionInfo* infoList, int* infoListCount) const override;
+    virtual int getResolutionList(
+        nxcip::ResolutionInfo* infoList,
+        int* infoListCount) const override;
     virtual int setFps(const float& fps, float*selectedFps) override;
 
     virtual nxcip::StreamReader* getLiveStreamReader() override;
 
 private:
     CodecParameters calculateSecondaryCodecParams(
-        const std::vector<device::ResolutionData>& resolutionList) const;
+        const std::vector<device::video::ResolutionData>& resolutionList) const;
 };
 
 } // namespace nx 

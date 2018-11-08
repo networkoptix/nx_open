@@ -11,6 +11,9 @@ class TimestampMapper
 public:
     void addTimestamp(int64_t ffmpegPts, uint64_t nxTimestamp)
     {
+        // Don't allow too many dangling timestamps.
+        if (m_timestamps.size() > kTimestampMaxSize)
+            m_timestamps.clear();
         m_timestamps.insert(std::pair<int64_t, uint64_t>(ffmpegPts, nxTimestamp));
     }
 
@@ -39,6 +42,7 @@ public:
 
 private:
     std::map<int64_t /*ffmpeg pts*/, uint64_t /*nx timestamp*/> m_timestamps;
+    static constexpr int kTimestampMaxSize = 30;
 };
 
 } // namespace usb_cam

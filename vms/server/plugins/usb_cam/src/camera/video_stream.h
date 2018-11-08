@@ -30,11 +30,13 @@ class VideoStream
 {
 public:
     VideoStream(
-        const std::string& url,
-        const CodecParameters& codecParams,
-        const std::weak_ptr<Camera>& camera);
+        const std::weak_ptr<Camera>& camera,
+        const CodecParameters& codecParams);
     virtual ~VideoStream();
 
+    /**
+     * Get the url of the video stream.
+     */
     std::string url() const;
     
     /**
@@ -43,8 +45,8 @@ public:
     float fps() const;
     
     /**
-     * The number of frames per second the video stream is actually producing, updated every second.
-     * Some camera hardware runs at a lower fps than it actually reports.
+     * The number of frames per second the video stream is actually producing, updated every
+     *    second. Some cameras run at a lower fps than it actually reports.
      */
     float actualFps() const;
 
@@ -87,9 +89,9 @@ private:
         csModified
     };
 
-    std::string m_url;
-    CodecParameters m_codecParams;
+    //std::string m_url;
     std::weak_ptr<Camera> m_camera;
+    CodecParameters m_codecParams;
     nxpl::TimeProvider * const m_timeProvider;
 
     CameraState m_cameraState = csOff;
@@ -130,7 +132,10 @@ private:
 
 private:
     void updateActualFps(uint64_t now);
-    std::string ffmpegUrl() const;
+    /**
+     * Get the url of the video stream, modified appropriately based on platform.
+     */
+    std::string ffmpegUrlPlatformDependent() const;
     bool consumersEmpty() const;
     bool waitForConsumers();
     void tryStart();

@@ -1,6 +1,5 @@
 #include "transcode_stream_reader.h"
 
-#include <stdio.h>
 #include <set>
 
 extern "C" {
@@ -9,10 +8,6 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 } // extern "C"
 
-#include <nx/utils/log/log.h>
-#include "nx/utils/app_info.h"
-
-#include "device/utils.h"
 #include "ffmpeg/utils.h"
 
 namespace nx {
@@ -34,10 +29,10 @@ TranscodeStreamReader::TranscodeStreamReader(
 
 TranscodeStreamReader::~TranscodeStreamReader()
 {
-    uninitialize();
     m_videoFrameConsumer->interrupt();
-    // Avoid virtual removeConsumer()
+    // Avoid virtual removeVideoConsumer()
     m_camera->videoStream()->removeFrameConsumer(m_videoFrameConsumer);
+    uninitialize();
 }   
 
 int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
@@ -71,10 +66,10 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
 void TranscodeStreamReader::interrupt()
 {
-    // Note: StreamReaderPrivate::interrupt calls removeConsumer(), which is overriden here.
     StreamReaderPrivate::interrupt();
     m_videoFrameConsumer->interrupt();
     m_videoFrameConsumer->flush();
+    removeConsumer();
 }
 
 void TranscodeStreamReader::setFps(float fps)
@@ -119,9 +114,9 @@ bool TranscodeStreamReader::shouldDrop(const ffmpeg::Frame * frame)
     if(m_codecParams.fps >= m_camera->videoStream()->fps())
         return false;
 
-    // The Mmal decoder can reorder frames, causing time stamps to be out of order. The h263 encoder
-    // throws an error if the frame it encodes is equal to or earlier in time than the previous
-    // frame, so drop it to avoid this error.
+    // The Mmal decoder can reorder frames, causing time stamps to be out of order. 
+    // The h263 encoder throws an error if the frame it encodes is equal to or earlier in time 
+    // than the previous frame, so drop it to avoid this error.
     if (m_lastVideoPts != AV_NOPTS_VALUE && frame->pts() <= m_lastVideoPts)
         return true;
 
@@ -163,10 +158,6 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::transcodeVideo(
         *outNxError = nxcip::NX_OTHER_ERROR;
         return nullptr;
     }
-
-    // Don't allow too many dangling timestamps.
-    if(m_timestamps.size() > 30)
-        m_timestamps.clear();
 
     m_timestamps.addTimestamp(frame->packetPts(), frame->timestamp());
 
@@ -338,19 +329,11 @@ int TranscodeStreamReader::initialize()
 {
     int result = openVideoEncoder();
     if (result < 0)
-    {
-        NX_DEBUG(this) << m_camera->videoStream()->url() + ":" 
-            << "encoder open error:" << ffmpeg::utils::errorToString(result);
         return result;
-    }
 
     result = initializeScaledFrame(m_encoder.get());
     if (result < 0)
-    {
-        NX_DEBUG(this) << m_camera->videoStream()->url() + ":" 
-            << "scaled frame init error:" << ffmpeg::utils::errorToString(result);
         return result;
-    }
 
     m_cameraState = csInitialized;
     return 0;
@@ -398,11 +381,13 @@ int TranscodeStreamReader::initializeScaledFrame(const ffmpeg::Codec* encoder)
     if (!scaledFrame || !scaledFrame->frame())
         return AVERROR(ENOMEM);
     
-    AVPixelFormat encoderFormat = 
-        ffmpeg::utils::unDeprecatePixelFormat(encoder->codec()->pix_fmts[0]);
+    AVPixelFormat encoderFormat = ffmpeg::utils::unDeprecatePixelFormat(
+        encoder->codec()->pix_fmts[0]);
 
-    int result = 
-        scaledFrame->getBuffer(encoderFormat, m_codecParams.resolution.width, m_codecParams.resolution.height, 32);
+    int result = scaledFrame->getBuffer(
+        encoderFormat,
+        m_codecParams.resolution.width,
+        m_codecParams.resolution.height, 32);
     
     if (result < 0)
         return result;
