@@ -63,7 +63,7 @@ if(withTestCamera)
         COMMENT "Preparing testcamera package..."
         DEPENDS
             testcamera
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/distribution/wix/scripts
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
         COMMAND ${PYTHON_EXECUTABLE} generate_testcamera_package.py
             "--config" ${config_file}
             "--output" ${distribution_output_dir}
@@ -80,7 +80,7 @@ if(withNxTool)
             nxtool
             wix_custom_actions
         COMMENT "Collecting NxTool QML libraries..."
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/distribution/wix/scripts
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
         COMMAND ${PYTHON_EXECUTABLE} collect_qml_dependencies.py
             "--config" ${config_file}
             "--source" ${nxtool_executable}
@@ -92,7 +92,7 @@ if(withNxTool)
         COMMENT "Generating NxTool installer..."
         DEPENDS
             collect_nxtool_qml_dependencies
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/distribution/wix/scripts
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
         COMMAND ${PYTHON_EXECUTABLE} create_nxtool_installer.py
             "--config" ${config_file}
             "--qml-dir" ${nxtool_qml_dir}
@@ -109,7 +109,7 @@ if(withDesktopClient)
         DEPENDS
             desktop_client
         COMMENT "Collecting QML libraries..."
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/distribution/wix/scripts
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
         COMMAND ${PYTHON_EXECUTABLE} collect_qml_dependencies.py
             "--config" ${config_file}
             "--source" ${desktop_client_executable}
@@ -124,7 +124,7 @@ if(withDesktopClient)
         collect_qml_dependencies
         applauncher
         minilauncher
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/distribution/wix/scripts
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
     COMMAND ${PYTHON_EXECUTABLE} generate_client_update_package.py
         "--config" ${config_file}
         "--output" ${distribution_output_dir}
@@ -134,7 +134,7 @@ if(withDesktopClient)
         COMMENT "Preparing client debug package..."
         DEPENDS
             desktop_client
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/distribution/wix/scripts
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
         COMMAND ${PYTHON_EXECUTABLE} generate_client_debug_package.py
             "--config" ${config_file}
             "--output" ${distribution_output_dir}
@@ -155,7 +155,7 @@ if(withMediaServer)
         COMMENT "Preparing mediaserver update package..."
         DEPENDS
             distribution_wix
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/distribution/wix/scripts
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
         COMMAND ${PYTHON_EXECUTABLE} generate_server_update_package.py
             "--config" ${config_file}
             "--output" ${distribution_output_dir}
@@ -173,7 +173,7 @@ if(withDesktopClient OR withMediaServer OR withTestCamera)
             nx_vms_api
             nx_kit
             udt
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/distribution/wix/scripts
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
         COMMAND ${PYTHON_EXECUTABLE} generate_libs_debug_package.py
             "--config" ${config_file}
             "--output" ${distribution_output_dir}
@@ -187,7 +187,7 @@ if(withMediaServer)
             mediaserver
             server_plugins
 
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/distribution/wix/scripts
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
         COMMAND ${PYTHON_EXECUTABLE} generate_mediaserver_debug_package.py
             "--config" ${config_file}
             "--output" ${distribution_output_dir}
@@ -202,7 +202,7 @@ if(withClouds)
             cloud_db
             connection_mediator
             vms_gateway
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/distribution/wix/scripts
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
         COMMAND ${PYTHON_EXECUTABLE} generate_cloud_debug_package.py
             "--config" ${config_file}
             "--output" ${distribution_output_dir}
@@ -212,7 +212,7 @@ endif()
 if(addQtPdb)
     add_custom_target(generate_qt_debug_package ALL
         COMMENT "Preparing Qt debug package..."
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/distribution/wix/scripts
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
         COMMAND ${PYTHON_EXECUTABLE} generate_qt_debug_package.py
             "--config" ${config_file}
             "--output" ${distribution_output_dir}
@@ -221,7 +221,7 @@ endif()
 
 add_custom_target(generate_misc_debug_package ALL
     COMMENT "Preparing misc debug package..."
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/distribution/wix/scripts
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
     COMMAND ${PYTHON_EXECUTABLE} generate_misc_debug_package.py
         "--config" ${config_file}
         "--output" ${distribution_output_dir}
