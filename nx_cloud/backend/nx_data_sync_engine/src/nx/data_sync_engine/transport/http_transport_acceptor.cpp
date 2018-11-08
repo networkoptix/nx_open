@@ -7,35 +7,13 @@
 #include <nx/network/socket_global.h>
 #include <nx/vms/api/types/connection_types.h>
 
-#include "command_transport_delegate.h"
 #include "generic_transport.h"
 #include "../connection_manager.h"
 #include "../compatible_ec2_protocol_version.h"
 
+//#define ENABLE_SEQ_VERIFICATION
+
 namespace nx::data_sync_engine::transport {
-
-class AcceptedTransportConnection:
-    public CommandTransportDelegate
-{
-    using base_type = CommandTransportDelegate;
-
-public:
-    AcceptedTransportConnection(
-        std::unique_ptr<AbstractTransactionTransport> delegatee,
-        int connectionSeq)
-        :
-        base_type(delegatee.get()),
-        m_delegatee(std::move(delegatee)),
-        m_connectionSeq(connectionSeq)
-    {
-    }
-
-    int seq() const { return m_connectionSeq; }
-
-private:
-    std::unique_ptr<AbstractTransactionTransport> m_delegatee;
-    const int m_connectionSeq = 0;
-};
 
 //-------------------------------------------------------------------------------------------------
 
@@ -128,9 +106,13 @@ void HttpTransportAcceptor::createConnection(
 
     const int connectionSeq = ++m_connectionSeq;
     ConnectionManager::ConnectionContext context{
+#ifdef ENABLE_SEQ_VERIFICATION
         std::make_unique<AcceptedTransportConnection>(
             std::move(newTransport),
             connectionSeq),
+#else
+            std::move(newTransport),
+#endif
         connectionRequestAttributes.connectionId,
         {systemId, connectionRequestAttributes.remotePeer.id.toByteArray().toStdString()},
         network::http::getHeaderValue(requestContext.request.headers, "User-Agent").toStdString()};
@@ -263,7 +245,8 @@ void HttpTransportAcceptor::startOutgoingChannel(
         [connectionSeq, commandPipeline, httpConnection](
             transport::AbstractTransactionTransport* transportConnection)
         {
-            auto acceptedTransportConnection = 
+#ifdef ENABLE_SEQ_VERIFICATION
+            auto acceptedTransportConnection =
                 dynamic_cast<AcceptedTransportConnection*>(transportConnection);
             if (!acceptedTransportConnection || 
                 acceptedTransportConnection->seq() != connectionSeq)
@@ -271,6 +254,7 @@ void HttpTransportAcceptor::startOutgoingChannel(
                 // connectionId is not globally unique.
                 return;
             }
+#endif
 
             commandPipeline->setOutgoingConnection(httpConnection->takeSocket());
             transportConnection->start();

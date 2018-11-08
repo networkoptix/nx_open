@@ -14,6 +14,7 @@
 #include <transaction/connection_guard_shared_state.h>
 
 #include "../transaction_transport.h"
+#include "command_transport_delegate.h"
 
 namespace nx::data_sync_engine {
 
@@ -25,6 +26,31 @@ class TransactionLog;
 } // namespace nx::data_sync_engine
 
 namespace nx::data_sync_engine::transport {
+
+class AcceptedTransportConnection:
+    public CommandTransportDelegate
+{
+    using base_type = CommandTransportDelegate;
+
+public:
+    AcceptedTransportConnection(
+        std::unique_ptr<AbstractTransactionTransport> delegatee,
+        int connectionSeq)
+        :
+        base_type(delegatee.get()),
+        m_delegatee(std::move(delegatee)),
+        m_connectionSeq(connectionSeq)
+    {
+    }
+
+    int seq() const { return m_connectionSeq; }
+
+    AbstractTransactionTransport* delegatee() { return m_delegatee.get(); };
+
+private:
+    std::unique_ptr<AbstractTransactionTransport> m_delegatee;
+    const int m_connectionSeq = 0;
+};
 
 class GenericTransport;
 
