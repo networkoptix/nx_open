@@ -20,13 +20,34 @@ namespace network {
 namespace cloud {
 namespace test {
 
-template <typename T>
+struct RelayingConfiguration
+{
+    const bool useHttpConnect;
+    const bool relayAcceptsSslOnly;
+
+    RelayingConfiguration() = delete;
+};
+
+static constexpr RelayingConfiguration kUsingHttpConnect{true, false};
+static constexpr RelayingConfiguration kNotUsingHttpConnect{false, false};
+static constexpr RelayingConfiguration kRelayAcceptsSslOnly{false, true};
+
 class Relaying:
-    public BasicTestFixture
+    public BasicTestFixture,
+    public ::testing::TestWithParam<RelayingConfiguration>
 {
     using base_type = BasicTestFixture;
 
 public:
+    Relaying()
+    {
+        if (GetParam().relayAcceptsSslOnly)
+        {
+            addRelayStartupArgument("http/listenOn", "");
+            addRelayStartupArgument("https/listenOn", "127.0.0.1:0");
+        }
+    }
+
     ~Relaying()
     {
         if (m_useHttpConnectToListenOnRelayBak)
@@ -85,7 +106,8 @@ private:
 
         m_useHttpConnectToListenOnRelayBak =
             SocketGlobals::cloud().settings().useHttpConnectToListenOnRelay;
-        SocketGlobals::cloud().settings().useHttpConnectToListenOnRelay = T::value;
+        SocketGlobals::cloud().settings().useHttpConnectToListenOnRelay =
+            GetParam().useHttpConnect;
 
         startServer();
     }
@@ -96,44 +118,48 @@ TYPED_TEST_CASE_P(Relaying);
 //-------------------------------------------------------------------------------------------------
 // Test cases.
 
-TYPED_TEST_P(Relaying, server_socket_registers_itself_on_relay)
+TEST_P(Relaying, server_socket_registers_itself_on_relay)
 {
     this->assertServerIsListeningOnRelay();
 }
 
-TYPED_TEST_P(Relaying, connection_can_be_established)
+TEST_P(Relaying, connection_can_be_established)
 {
     this->assertConnectionCanBeEstablished();
 }
 
-TYPED_TEST_P(Relaying, connecting_using_full_server_name)
+TEST_P(Relaying, connecting_using_full_server_name)
 {
     this->setRemotePeerName(this->cloudSystemCredentials().hostName().toStdString());
     this->assertConnectionCanBeEstablished();
 }
 
-TYPED_TEST_P(Relaying, exchanging_fixed_data)
+TEST_P(Relaying, exchanging_fixed_data)
 {
     this->startExchangingFixedData();
     this->assertDataHasBeenExchangedCorrectly();
 }
 
-TYPED_TEST_P(Relaying, multiple_connections)
+TEST_P(Relaying, multiple_connections)
 {
     this->startMoreConnectionsThatAreFoundOnRelay();
     this->assertDataHasBeenExchangedCorrectly();
 }
 
-REGISTER_TYPED_TEST_CASE_P(
+INSTANTIATE_TEST_CASE_P(
+    UsingHttpConnectRelaying,
     Relaying,
-    server_socket_registers_itself_on_relay,
-    connection_can_be_established,
-    connecting_using_full_server_name,
-    exchanging_fixed_data,
-    multiple_connections);
+    ::testing::Values(kUsingHttpConnect));
 
-INSTANTIATE_TYPED_TEST_CASE_P(UsingHttpConnectRelaying, Relaying, std::true_type);
-INSTANTIATE_TYPED_TEST_CASE_P(NotUsingHttpConnect, Relaying, std::false_type);
+INSTANTIATE_TEST_CASE_P(
+    NotUsingHttpConnect,
+    Relaying,
+    ::testing::Values(kNotUsingHttpConnect));
+
+INSTANTIATE_TEST_CASE_P(
+    SslOnly,
+    Relaying,
+    ::testing::Values(kRelayAcceptsSslOnly));
 
 } // namespace test
 } // namespace cloud

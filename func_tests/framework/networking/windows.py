@@ -77,7 +77,7 @@ class WindowsNetworking(Networking):
             u'Action': 2,  # Allow.
             }
         try:
-            selector_set = query.create(properties_dict)
+            query.create(properties_dict)
         except WinRMError as e:
             if u'already exists' not in str(e):  # TODO: Retrieve detailed error from pywinrm internals.
                 raise

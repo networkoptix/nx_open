@@ -10,7 +10,7 @@ from framework.utils import (
     )
 import server_api_data_generators as generator
 
-_logger = logging.getLogger(__name__)
+_logger = logging.getLogger('scalability')
 _create_test_data_logger = _logger.getChild('create_test_data')
 
 

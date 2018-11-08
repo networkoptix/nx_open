@@ -17,19 +17,19 @@ files:
     dest: '/TrayTool/traytool.ts'
     translation: '/traytool/translations/traytool_%locale_with_underscore%.ts'
   -
-    source: '/client/nx_client_core/translations/client_core_en_US.ts'
+    source: '/vms/client/nx_vms_client_core/translations/client_core_en_US.ts'
     dest: '/Client/client_core.ts'
-    translation: '/client/nx_client_core/translations/client_core_%locale_with_underscore%.ts'
+    translation: '/vms/client/nx_vms_client_core/translations/client_core_%locale_with_underscore%.ts'
   -
-    source: '/client/nx_client_desktop/translations/client_qml_en_US.ts'
+    source: '/vms/client/nx_vms_client_desktop/translations/client_qml_en_US.ts'
     dest: '/Client/client_qml.ts'
-    translation: '/client/nx_client_desktop/translations/client_qml_%locale_with_underscore%.ts'
+    translation: '/vms/client/nx_vms_client_desktop/translations/client_qml_%locale_with_underscore%.ts'
   -
-    source: '/client/nx_client_desktop/translations/client_base_en_US.ts'
+    source: '/vms/client/nx_vms_client_desktop/translations/client_base_en_US.ts'
     dest: '/Client/client_base.ts'
-    translation: '/client/nx_client_desktop/translations/client_base_%locale_with_underscore%.ts'
+    translation: '/vms/client/nx_vms_client_desktop/translations/client_base_%locale_with_underscore%.ts'
   -
-    source: '/client/nx_client_desktop/translations/client_ui_en_US.ts'
+    source: '/vms/client/nx_vms_client_desktop/translations/client_ui_en_US.ts'
     dest: '/Client/client_ui.ts'
-    translation: '/client/nx_client_desktop/translations/client_ui_%locale_with_underscore%.ts'
+    translation: '/vms/client/nx_vms_client_desktop/translations/client_ui_%locale_with_underscore%.ts'
 
