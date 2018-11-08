@@ -35,6 +35,9 @@ export class IntegrationService implements OnDestroy {
     }
 
     private formatDownloads() {
+        if (!this.plugins){
+            return;
+        }
         this.plugins.forEach((plugin) => {
             if (plugin.downloadFiles) {
                 let downloadPlatforms = plugin.downloadFiles;
