@@ -10,3 +10,7 @@ nx_add_target(nx_data_sync_engine LIBRARY ${library_type} NO_MOC
 target_compile_definitions(nx_data_sync_engine
     PRIVATE NX_DATA_SYNC_ENGINE_API=${API_EXPORT_MACRO}
     INTERFACE NX_DATA_SYNC_ENGINE_API=${API_IMPORT_MACRO})
+
+if(withTests)
+    add_subdirectory(unit_tests)
+endif()
