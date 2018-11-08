@@ -12,3 +12,7 @@ nx_add_target(libconnection_mediator LIBRARY NO_MOC
 )
 
 set_target_properties(libconnection_mediator PROPERTIES PREFIX "")
+
+if(withTests)
+    add_subdirectory(unit_tests)
+endif()
