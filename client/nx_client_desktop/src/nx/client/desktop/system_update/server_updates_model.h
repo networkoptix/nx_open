@@ -76,8 +76,7 @@ public:
     UpdateItemPtr findItemById(QnUuid id);
     UpdateItemPtr findItemByRow(int row) const;
 
-    // Overrides status for chosen mediaservers.
-    void setManualStatus(QSet<QnUuid> targets, nx::update::Status::Code status);
+    void setServersInstalling(QSet<QnUuid> targets, bool installing = true);
 
     // Overrides for QAbstractTableModel
     int columnCount(const QModelIndex& parent) const override;

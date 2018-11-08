@@ -171,6 +171,12 @@ def single(iter):
     return l[0]
 
 
+def first(iter):
+    l = list(iter)
+    assert len(l) >= 1, 'At least one item is expected'
+    return l[0]
+
+
 def make_threaded_async_calls(thread_number, call_gen):
     failures = []
 

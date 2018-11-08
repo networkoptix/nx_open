@@ -3,6 +3,7 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+#include <nx/utils/log/log_main.h>
 
 namespace nx {
 namespace vms {
@@ -79,6 +80,8 @@ void QnMasterServerStatusWatcher::at_updateMasterFlag()
 
 void QnMasterServerStatusWatcher::setMasterFlag(bool value)
 {
+    NX_DEBUG(this, "Set master flag to value %1 for server %2", value, m_commonModule->moduleGUID());
+
     QnPeerRuntimeInfo localInfo = m_commonModule->runtimeInfoManager()->localInfo();
     if (value)
         localInfo.data.flags |= api::RuntimeFlag::masterCloudSync;

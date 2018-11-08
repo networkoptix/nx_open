@@ -19,10 +19,11 @@
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/utils/managed_camera_set.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/algorithm/merge_sorted_lists.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/algorithm/merge_sorted_lists.h>
+#include <nx/utils/log/log_message.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/event/event_fwd.h>
 
@@ -113,9 +114,9 @@ QVariant MotionSearchListModel::Private::data(const QModelIndex& index, int role
             if (!ini().showDebugTimeInformationInRibbon)
                 return QString();
 
-            return QString("Begin: %1<br>End: %2")
-                .arg(utils::timestampToDebugString(chunk.period.startTimeMs))
-                .arg(utils::timestampToDebugString(chunk.period.endTimeMs()));
+            return lm("Begin: %1<br>End: %2").args( //< Not translatable debug string.
+                utils::timestampToDebugString(chunk.period.startTimeMs),
+                utils::timestampToDebugString(chunk.period.endTimeMs())).toQString();
         }
 
         case Qn::PreviewTimeRole:
@@ -249,7 +250,7 @@ bool MotionSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodTo
 
 void MotionSearchListModel::Private::fetchLive()
 {
-    if (m_liveFetch.id || !q->isLive() || q->livePaused())
+    if (m_liveFetch.id || !q->isLive() || !q->isOnline() || q->livePaused())
         return;
 
     if (m_data.empty() && fetchInProgress())
@@ -272,24 +273,18 @@ rest::Handle MotionSearchListModel::Private::getMotion(
     if (!server || !server->apiConnection())
         return {};
 
-    // TODO: #vkutin This looks like a hack. Think what to do.
-    auto regions = m_filterRegions;
-    if (q->isFilterEmpty())
-    {
-        static constexpr QRect kWholeFrame(0, 0, Qn::kMotionGridWidth, Qn::kMotionGridHeight);
-        for (auto& region: regions)
-            region = kWholeFrame;
-    }
-
     QnChunksRequestData request;
     request.resList = q->cameras().toList();
     request.startTimeMs = period.startTimeMs;
     request.endTimeMs = period.endTimeMs(),
     request.periodsType = Qn::MotionContent;
-    request.filter = QJson::serialized(regions);
     request.groupBy = QnChunksRequestData::GroupBy::cameraId;
     request.sortOrder = order;
     request.limit = limit;
+
+    request.filter = q->cameraSet()->type() != ManagedCameraSet::Type::single || q->isFilterEmpty()
+        ? QString()
+        : QJson::serialized(m_filterRegions);
 
     NX_VERBOSE(q) << "Requesting motion periods from"
         << utils::timestampToDebugString(period.startTimeMs) << "to"

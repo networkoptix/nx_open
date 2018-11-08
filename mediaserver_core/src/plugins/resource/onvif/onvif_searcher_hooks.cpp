@@ -15,6 +15,8 @@ namespace {
 static const QString kAdditionalManufacturerNormalization
     = lit("enableAdditionalManufacturerNormalization");
 
+static const QString kForcedAdditionalManufacturerProperty("forcedAdditionalManufacturer");
+
 } // namespace
 
 void commonHooks(
@@ -165,6 +167,18 @@ void pelcoModelNormalization(
         return;
 
     model = split[0];
+}
+
+void forcedAdditionalManufacturer(QnResourceDataPool* dataPool, EndpointAdditionalInfo* outInfo)
+{
+    for (const auto& manufacturer: outInfo->additionalManufacturers)
+    {
+        auto resourceData = dataPool->data(manufacturer, QString());
+        if (!resourceData.contains(kForcedAdditionalManufacturerProperty))
+            continue;
+
+        outInfo->manufacturer = resourceData.value<QString>(kForcedAdditionalManufacturerProperty);
+    }
 }
 
 void additionalManufacturerNormalization(

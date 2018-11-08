@@ -30,6 +30,7 @@
 #include <nx/client/desktop/utils/managed_camera_set.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/log/log_message.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/event/analytics_helper.h>
 
@@ -649,11 +650,11 @@ QString AnalyticsSearchListModel::Private::description(
     const auto durationUs = objectDurationUs(object);
 
     using namespace std::chrono;
-    return QString("Timestamp: %1 us<br>%2<br>Duration: %3 us<br>%4")
-        .arg(object.firstAppearanceTimeUsec)
-        .arg(start.toString(Qt::RFC2822Date))
-        .arg(durationUs)
-        .arg(core::HumanReadable::timeSpan(duration_cast<milliseconds>(microseconds(durationUs))));
+    return lm("Timestamp: %1 us<br>%2<br>Duration: %3 us<br>%4").args( //< Not translatable, debug.
+        object.firstAppearanceTimeUsec,
+        start.toString(Qt::RFC2822Date),
+        durationUs,
+        core::HumanReadable::timeSpan(duration_cast<milliseconds>(microseconds(durationUs))));
 }
 
 QString AnalyticsSearchListModel::Private::attributes(

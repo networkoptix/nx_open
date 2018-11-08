@@ -76,11 +76,14 @@ public:
     enum class Code
     {
         idle,
+        // Server is downloading an update package.
         downloading,
-        readyToInstall,
+        // Server is verifying an update package after downloading has finished successfully.
         preparing,
+        // Update package has been downloaded and verified.
+        readyToInstall,
+        latestUpdateInstalled,
         offline,
-        installing,
         error
     };
     Q_ENUM(Code)

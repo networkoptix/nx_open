@@ -1,11 +1,11 @@
 import errno
 import os
-import stat
+import sys
 from errno import EEXIST, EISDIR, ENOENT, ENOTDIR, ENOTEMPTY
 from functools import wraps
-from shutil import rmtree
 
-from pathlib2 import PosixPath
+import pathlib2 as pathlib
+import six
 
 from framework.os_access import exceptions
 from framework.os_access.path import FileSystemPath
@@ -14,14 +14,15 @@ from framework.os_access.path import FileSystemPath
 def _reraising(raised_errors_cls_map):
     def decorator(func):
         @wraps(func)
-        def decorated(self, *args, **kwargs):
+        def decorated(*args, **kwargs):
             try:
-                return func(self, *args, **kwargs)
+                return func(*args, **kwargs)
             except (IOError, OSError) as caught_error:
                 # Avoid try-except with KeyError to be able to reraise it.
                 if caught_error.errno in raised_errors_cls_map:
-                    raised_error_cls = raised_errors_cls_map[caught_error.errno]
-                    raise raised_error_cls(caught_error)
+                    error_cls = raised_errors_cls_map[caught_error.errno]
+                    error = error_cls(caught_error.errno, caught_error.strerror)
+                    six.reraise(error_cls, error, sys.exc_info()[2])
                 raise
 
         return decorated
@@ -38,20 +39,48 @@ _reraising_new_file_errors = _reraising({
 _reraising_existing_file_errors = _reraising({
     ENOENT: exceptions.DoesNotExist,
     EISDIR: exceptions.NotAFile,
-    })
-_reraising_existing_dir_errors = _reraising({
-    ENOENT: exceptions.DoesNotExist,
     EEXIST: exceptions.AlreadyExists,
     ENOTEMPTY: exceptions.NotEmpty,
     })
 
 
-class LocalPath(PosixPath, FileSystemPath):
+class _Accessor(object):
+    scandir = staticmethod(_reraising_existing_file_errors(pathlib._NormalAccessor.scandir))
+    listdir = staticmethod(_reraising_existing_file_errors(pathlib._NormalAccessor.listdir))
+    stat = staticmethod(_reraising_existing_file_errors(pathlib._NormalAccessor.stat))
+    lstat = staticmethod(_reraising_existing_file_errors(pathlib._NormalAccessor.lstat))
+    chmod = staticmethod(_reraising_existing_file_errors(pathlib._NormalAccessor.chmod))
+    lchmod = staticmethod(_reraising_existing_file_errors(pathlib._NormalAccessor.lchmod))
+    unlink = staticmethod(_reraising_existing_file_errors(pathlib._NormalAccessor.unlink))
+    rename = staticmethod(_reraising_existing_file_errors(pathlib._NormalAccessor.rename))
+    mkdir = staticmethod(_reraising_new_file_errors(pathlib._NormalAccessor.mkdir))
+    symlink = staticmethod(_reraising_new_file_errors(pathlib._NormalAccessor.symlink))
+    utime = staticmethod(_reraising_existing_file_errors(pathlib._NormalAccessor.utime))
+    readlink = staticmethod(_reraising_existing_file_errors(pathlib._NormalAccessor.readlink))
+    rmdir = staticmethod(_reraising_existing_file_errors(pathlib._NormalAccessor.rmdir))
+
+
+class LocalPath(FileSystemPath):
     """Access local filesystem with unified interface (incl. exceptions)
 
-    Unlike PosixShellPath and SMBPath, there can be only one local file system,
+    Unlike SftpPath and SMBPath, there can be only one local file system,
     therefore, this class is not to be inherited from.
     """
+
+    _accessor = _Accessor()
+    _flavour = pathlib._windows_flavour if os.name == 'nt' else pathlib._posix_flavour
+
+    def open(self, mode='r', buffering=-1, encoding=None, errors=None, newline=None):
+        super_open = super(LocalPath, type(self)).open
+        if 'w' in mode or '+' in mode or 'a' in mode:
+            cls_open = _reraising_new_file_errors(super_open)
+        else:
+            cls_open = _reraising_existing_file_errors(super_open)
+        return cls_open(
+            self,
+            mode=mode,
+            buffering=buffering,
+            encoding=encoding, errors=errors, newline=newline)
 
     @classmethod
     def tmp(cls):
@@ -59,52 +88,8 @@ class LocalPath(PosixPath, FileSystemPath):
         temp_dir.mkdir(parents=True, exist_ok=True)
         return temp_dir
 
-    mkdir = _reraising_new_file_errors(PosixPath.mkdir)
-    write_text = _reraising_new_file_errors(PosixPath.write_text)
-    read_text = _reraising_existing_file_errors(PosixPath.read_text)
-    unlink = _reraising_existing_file_errors(PosixPath.unlink)
-    rmdir = _reraising_existing_dir_errors(PosixPath.rmdir)
-
     def __repr__(self):
         return 'LocalPath({!r})'.format(str(self))
-
-    def glob(self, pattern):
-        if not self.exists():
-            raise exceptions.DoesNotExist(self)
-        if not self.is_dir():
-            raise exceptions.NotADir(self)
-        return super(LocalPath, self).glob(pattern)
-
-    @_reraising_existing_dir_errors
-    def rmtree(self, ignore_errors=False):
-        rmtree(str(self), ignore_errors=ignore_errors)
-
-    @_reraising_new_file_errors
-    def write_bytes(self, data, offset=None):
-        if offset is None:
-            return super(LocalPath, self).write_bytes(data)
-        else:
-            fd = os.open(str(self), os.O_CREAT | os.O_WRONLY)
-            try:
-                os.lseek(fd, offset, os.SEEK_SET)
-                return os.write(fd, data)
-            finally:
-                os.close(fd)
-
-    @_reraising_existing_file_errors
-    def read_bytes(self, offset=None, max_length=None):
-        if offset is None:
-            return super(LocalPath, self).read_bytes()
-        with self.open('rb') as f:
-            f.seek(offset)
-            return f.read(max_length)
-
-    @_reraising_existing_file_errors
-    def size(self):
-        path_stat = self.stat()  # type: os.stat_result
-        if not stat.S_ISREG(path_stat.st_mode):
-            raise exceptions.NotAFile("{!r}.stat() returns {!r}".format(self, path_stat))
-        return path_stat.st_size
 
     def take_from(self, local_source_path):
         destination = self / local_source_path.name
@@ -115,17 +100,5 @@ class LocalPath(PosixPath, FileSystemPath):
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
-            raise exceptions.AlreadyExists(
-                "Creating symlink {!s} pointing to {!s}".format(destination, local_source_path),
-                destination)
+            return destination
         return destination
-
-    @_reraising_new_file_errors
-    def symlink_to(self, target, target_is_directory=False):
-        if not isinstance(target, type(self)):
-            raise ValueError(
-                "Symlink can only point to same OS but link is {} and target is {}".format(
-                    self, target))
-        super(LocalPath, self).symlink_to(
-            str(target),
-            target_is_directory=target_is_directory)

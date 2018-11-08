@@ -46,7 +46,8 @@ export class EventRuleManager {
         if (rule.ruleId !== undefined) {
             return rule.ruleId;
         }
-        if (rule.comment in this.configIds && this.systemRuleIds.indexOf(this.configIds[rule.comment]) > -1) {
+        if (rule.comment in this.configIds &&
+                this.systemRuleIds.indexOf(this.configIds[rule.comment]) > -1) {
             return this.configIds[rule.comment];
         }
         return '';

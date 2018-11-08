@@ -1,8 +1,10 @@
 from __future__ import division
 
 import datetime
+import errno
 import logging
 import math
+import re
 import timeit
 
 import pytz
@@ -12,7 +14,7 @@ from framework.method_caching import cached_getter
 from framework.networking.windows import WindowsNetworking
 from framework.os_access import exceptions
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
-from framework.os_access.os_access_interface import OSAccess, Time
+from framework.os_access.os_access_interface import OSAccess, Time, BaseFakeDisk
 from framework.os_access.smb_path import SMBPath
 from framework.os_access.windows_remoting import WinRM
 from framework.os_access.windows_remoting.env_vars import EnvVars
@@ -143,51 +145,8 @@ class WindowsAccess(OSAccess):
             )
         return output.decode('ascii')
 
-    def _dismount_fake_disk(self, letter='V'):
-        try:
-            self.winrm.command(['MountVol', letter + ':', '/D']).run(timeout_sec=5)
-        except exceptions.exit_status_error_cls(1):
-            pass
-
-    def make_fake_disk(self, name, size_bytes, letter='V', image_dir='C:\\', partition_style='MBR'):
-        """Make virtual disk and mount it.
-        When Windows 7 is not supported, move to Windows Storage Management Provider.
-        See: https://docs.microsoft.com/en-us/previous-versions/windows/desktop/stormgmt/windows-storage-management-api-portal
-        """
-        self._dismount_fake_disk(letter=letter)
-        free_space_mb = int(math.ceil(size_bytes / 1024 / 1024))
-        volume_mb = free_space_mb + 15  # 15 MB is for System Volume Information.
-        partition_mb = volume_mb + 1  # 1 MB for filesystem.
-        disk_mb = partition_mb + 2  # 1 MB is for MBR/GPT headers.
-        image_path = self.path_cls(image_dir) / '{}.vhdx'.format(name)
-        script_template = (
-            'CREATE VDISK file={image_path} MAXIMUM={disk_mb} NOERR' '\r\n'  # NOERR if exists.
-            'SELECT VDISK file={image_path}' '\r\n'  # No error if already selected.
-            'DETACH VDISK NOERR' '\r\n'  # NOERR if attached.
-            'EXPAND VDISK maximum={disk_mb} NOERR' '\r\n'  # NOERR if requested size is less.
-            'ATTACH VDISK' '\r\n'  # NOERR if attached. "Disk" of "vdisk" has been selected.
-            'CLEAN' '\r\n'  # Removes letter, wipes partition table.
-            'CONVERT {partition_style}' '\r\n'
-            'CREATE PARTITION PRIMARY size={partition_mb}' '\r\n'  # New partition and its volume have been selected.
-            'FORMAT' '\r\n'  # Filesystem is default (NTFS).
-            'ASSIGN LETTER={letter}' '\r\n'
-            'EXIT' '\r\n'
-            )
-        script = script_template.format(
-            image_path=image_path,
-            letter=letter,
-            partition_mb=partition_mb,
-            disk_mb=disk_mb,
-            partition_style=partition_style)
-        _logger.debug('Diskpart script:\n%s', script)
-        # With script file, `diskpart` exits with non-zero code.
-        script_path = image_path.with_suffix('.diskpart.txt')
-        script_path.write_text(script)
-        # Error originate in VDS -- Virtual Disk Service.
-        # See: https://msdn.microsoft.com/en-us/library/dd208031.aspx.
-        command = self.winrm.command(['diskpart', '/s', script_path])
-        command.run(timeout_sec=10 + 0.05 * free_space_mb)
-        return self.path_cls('{letter}:\\'.format(letter=letter))
+    def fake_disk(self):
+        return _FakeDisk(self)
 
     def _fs_root(self):
         return self.path_cls('C:\\')
@@ -217,9 +176,7 @@ class WindowsAccess(OSAccess):
         _, file_name = source_url.rsplit('/', 1)
         destination = destination_dir / file_name
         if destination.exists():
-            raise exceptions.AlreadyExists(
-                "Cannot download {!s} to {!s}".format(source_url, destination_dir),
-                destination)
+            return destination
         variables = {'out': str(destination), 'url': source_url, 'timeoutSec': timeout_sec}
         # language=PowerShell
         try:
@@ -239,3 +196,66 @@ class WindowsAccess(OSAccess):
             "What is to be attempted: Kerberos authentication. "
             "To debug try `Invoke-Command` from another Windows machine. "
             )
+
+    def file_md5(self, path):
+        output = self.winrm.command(['CertUtil', '-hashfile', path, 'md5']).decode()
+        match = re.search('\b[0-9a-fA-F]{32}\b', output)
+        if match is None:
+            if '0x80070002' in output:
+                raise exceptions.NotAFile(errno.EISDIR, "Trying to get MD5 of dir.")
+            raise RuntimeError('Cannot get MD5 of {}:\n{}'.format(path, output))
+        return match.group()
+
+
+class _FakeDisk(BaseFakeDisk):
+    def __init__(self, windows_access):  # type: (WindowsAccess) -> ...
+        self._letter = 'V'
+        super(_FakeDisk, self).__init__(windows_access.path_cls('{}:\\'.format(self._letter)))
+        self._image_path = windows_access.path_cls('C:\\{}.vhdx'.format(self._letter))
+        self.winrm = windows_access.winrm
+
+    def remove(self, letter='V'):
+        try:
+            self.winrm.command(['MountVol', letter + ':', '/D']).run(timeout_sec=5)
+        except exceptions.exit_status_error_cls(1):
+            pass
+        try:
+            self._image_path.unlink()
+        except exceptions.DoesNotExist:
+            pass
+
+    def mount(self, size_bytes):
+        """Make virtual disk and mount it.
+        When Windows 7 is not supported, move to Windows Storage Management Provider.
+        See: https://docs.microsoft.com/en-us/previous-versions/windows/desktop/stormgmt/windows-storage-management-api-portal
+        """
+        free_space_mb = int(math.ceil(size_bytes / 1024 / 1024))
+        volume_mb = free_space_mb + 15  # 15 MB is for System Volume Information.
+        partition_mb = volume_mb + 1  # 1 MB for filesystem.
+        disk_mb = partition_mb + 2  # 1 MB is for MBR/GPT headers.
+        script_template = (
+            'CREATE VDISK file={image_path} MAXIMUM={disk_mb} NOERR' '\r\n'  # NOERR if exists.
+            'SELECT VDISK file={image_path}' '\r\n'  # No error if already selected.
+            'DETACH VDISK NOERR' '\r\n'  # NOERR if attached.
+            'EXPAND VDISK maximum={disk_mb} NOERR' '\r\n'  # NOERR if requested size is less.
+            'ATTACH VDISK' '\r\n'  # NOERR if attached. "Disk" of "vdisk" has been selected.
+            'CLEAN' '\r\n'  # Removes letter, wipes partition table.
+            'CONVERT MBR' '\r\n'
+            'CREATE PARTITION PRIMARY size={partition_mb}' '\r\n'  # New partition and its volume have been selected.
+            'FORMAT' '\r\n'  # Filesystem is default (NTFS).
+            'ASSIGN LETTER={letter}' '\r\n'
+            'EXIT' '\r\n'
+        )
+        script = script_template.format(
+            image_path=self._image_path,
+            letter=self._letter,
+            partition_mb=partition_mb,
+            disk_mb=disk_mb)
+        _logger.debug('Diskpart script:\n%s', script)
+        # With script file, `diskpart` exits with non-zero code.
+        script_path = self._image_path.with_suffix('.diskpart.txt')
+        script_path.write_text(script)
+        # Error originate in VDS -- Virtual Disk Service.
+        # See: https://msdn.microsoft.com/en-us/library/dd208031.aspx.
+        command = self.winrm.command(['diskpart', '/s', script_path])
+        command.run(timeout_sec=10 + 0.05 * free_space_mb)

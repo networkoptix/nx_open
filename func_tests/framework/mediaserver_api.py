@@ -26,7 +26,7 @@ _logger = ContextLogger(__name__, 'mediaserver_api')
 
 DEFAULT_API_USER = 'admin'
 INITIAL_API_PASSWORD = 'admin'
-DEFAULT_API_PASSWORD = 'qweasd12345'
+DEFAULT_API_PASSWORD = 'qweasd234'
 MAX_CONTENT_LEN_TO_LOG = 1000
 DEFAULT_TAKE_REMOTE_SETTINGS = False
 
@@ -298,8 +298,13 @@ class MediaserverApi(object):
         assert self.credentials_work()
         return response['settings']
 
-    def detach_from_cloud(self, password):
-        self.generic.post('api/detachFromCloud', {'password': password})
+    def detach_from_cloud(self, password, current_password):
+        self.generic.post(
+            'api/detachFromCloud',
+            {
+                'password': password,
+                'currentPassword': current_password
+            })
         self.generic.http.set_credentials(DEFAULT_API_USER, password)
 
     def get_system_settings(self):

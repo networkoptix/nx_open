@@ -22,7 +22,8 @@ const saveRuleToConfig = (rule: Rule | null) => {
         return;
     }
     config.rules[rule.comment] = rule.ruleId;
-    fs.writeFileSync(path.resolve(__dirname, './nodeConfig.json'), JSON.stringify(config, undefined, 4));
+    fs.writeFileSync(path.resolve(__dirname, './nodeConfig.json'),
+            JSON.stringify(config, undefined, 4));
 };
 
 /*
@@ -53,18 +54,23 @@ const makeExampleRules = () => {
         return rule;
     }));
 
-    /* Makes a rule that sends an http action to the default route on the express server
-     * when the soft trigger is pressed. In this example we are using the _config function of the NodeHttpAction class
-     * to set the route and callback functions. However, they can be passed into the constructor list this
-     * new NodeHttpAction(nodeServer, 'test', () => {logging.info('Callback works');. If you choose to set the route
-     * and callback function when the object is created you need to pass in both of them.
+    /*
+     * Makes a rule that sends an http action to the default route on the express server
+     * when the soft trigger is pressed. In this example we are using the _config function of
+     * the NodeHttpAction class to set the route and callback functions. However, they can be passed
+     * into the constructor list this
+     * new NodeHttpAction(nodeServer, 'test', () => {logging.info('Callback works');.
+     * If you choose to set the route and callback function when the object is created you need to
+     * pass in both of them.
      */
     const nodeHttpAction: NodeHttpAction = new NodeHttpAction(nodeServer);
     const softTrigger2: SoftTrigger = new SoftTrigger('Node callback');
     nodeHttpAction.configDefaultHandler('test', () => {
         logging.info('Callback works');
     });
-    const rule4 = new Rule('Soft Trigger Http Action -> node').on(softTrigger2).do(nodeHttpAction);
+    const rule4 = new Rule('Soft Trigger Http Action -> node')
+            .on(softTrigger2)
+            .do(nodeHttpAction);
     promiseRules.push(server.saveRuleToSystem(rule4).then((rule: Rule | null) => {
         saveRuleToConfig(rule);
         return rule;

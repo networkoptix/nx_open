@@ -277,6 +277,12 @@ bool CommonUpdateManager::statusAppropriateForDownload(nx::update::Package* outP
                 update::Status::Code::idle,
                 message.isEmpty() ? "No update information found" : message);
             return false;
+        case update::FindPackageResult::latestUpdateInstalled:
+            *outStatus = update::Status(
+                commonModule()->moduleGUID(),
+                update::Status::Code::latestUpdateInstalled,
+                message);
+            return false;
     }
 
     NX_ASSERT(false, "Shouldn't be here");

@@ -4,12 +4,13 @@ from collections import OrderedDict
 from pprint import pformat
 from uuid import UUID, uuid1
 
-from netaddr import EUI, IPNetwork
+from netaddr import EUI, IPAddress, IPNetwork
 from netaddr.strategy.eui48 import mac_bare
 from pylru import lrudecorator
 
 from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.os_access_interface import OneWayPortMap, ReciprocalPortMap
+from framework.os_access.posix_access import local_access
 from framework.port_check import port_is_open
 from framework.vms.hypervisor import VMAlreadyExists, VMNotFound, VmHardware, VmNotReady
 from framework.vms.hypervisor.hypervisor import Hypervisor
@@ -385,7 +386,7 @@ class VirtualBox(Hypervisor):
     # other NIC is used to make it possible to control traffic by the means of VirtualBox.
     _nat_subnet = IPNetwork('192.168.253.0/24')
 
-    def __init__(self, host_os_access, runner_address):
+    def __init__(self, host_os_access=local_access, runner_address=IPAddress('127.0.0.1')):
         """Create VirtualBox hypervisor.
         @param runner_address: Address of machine this process is running on as seen from machine
             VirtualBox is working on. If it's the same machine, and the address of the machine is

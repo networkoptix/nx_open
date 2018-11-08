@@ -11,6 +11,7 @@
 #include <nx/fusion/serialization/compressed_time_functions.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/fusion/serialization/compressed_time.h>
+#include <nx/utils/algorithm/truncate_sorted_lists.h>
 
 #include <recorder/storage_manager.h>
 
@@ -280,9 +281,32 @@ int QnMultiserverChunksRestHandler::executeGet(
         if (request.groupBy == QnChunksRequestData::GroupBy::cameraId)
             outputData = mergeDataWithSameId(outputData, request.limit, request.sortOrder);
 
+        // Truncate period lists to total count less than or equal to limit.
+
+        QList<QnTimePeriodList*> lists;
+
+        for (auto& list: outputData)
+            lists.push_back(&list.periods);
+
+        nx::utils::algorithm::truncate_sorted_lists(lists,
+            [](const QnTimePeriod& period) { return period.startTimeMs; },
+            request.limit,
+            request.sortOrder);
+
+        // Remove records with empty period lists.
+
+        const auto isPeriodListEmpty =
+            [](const MultiServerPeriodData& list) { return list.periods.empty(); };
+
+        outputData.erase(std::remove_if(outputData.begin(), outputData.end(), isPeriodListEmpty),
+            outputData.end());
+
+        // Serialize reply.
+
         if (request.format == Qn::CompressedPeriodsFormat)
         {
-            result = QnCompressedTime::serialized(outputData, request.sortOrder == Qt::SortOrder::DescendingOrder);
+            const bool signedFormat = (request.sortOrder == Qt::SortOrder::DescendingOrder);
+            result = QnCompressedTime::serialized(outputData, signedFormat);
             contentType = Qn::serializationFormatToHttpContentType(Qn::CompressedPeriodsFormat);
         }
         else
