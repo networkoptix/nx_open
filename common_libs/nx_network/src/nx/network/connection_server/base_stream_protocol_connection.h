@@ -3,18 +3,16 @@
 #include <chrono>
 #include <deque>
 #include <functional>
+#include <optional>
 
-#include <boost/optional.hpp>
-
+#include <nx/network/aio/interruption_flag.h>
 #include <nx/network/buffered_stream_socket.h>
 #include <nx/utils/qnbytearrayref.h>
 
 #include "base_protocol_message_types.h"
 #include "base_server_connection.h"
 
-namespace nx {
-namespace network {
-namespace server {
+namespace nx::network::server {
 
 /**
  * Connection of stream-orientied protocol of type request/respose.
@@ -54,11 +52,10 @@ public:
         std::unique_ptr<AbstractStreamSocket> streamSocket)
         :
         base_type(std::move(handler), std::move(streamSocket)),
-        m_serializerState(SerializerState::done),
         m_creationTimestamp(std::chrono::steady_clock::now())
     {
-        static const size_t DEFAULT_SEND_BUFFER_SIZE = 4 * 1024;
-        m_writeBuffer.reserve(DEFAULT_SEND_BUFFER_SIZE);
+        static constexpr size_t kDefaultSendBufferSize = 4 * 1024;
+        m_writeBuffer.reserve(kDefaultSendBufferSize);
 
         m_parser.setMessage(&m_message);
     }
@@ -75,6 +72,7 @@ public:
                 m_dataToParse);
             streamSocket = std::move(bufferedSocket);
         }
+
         return streamSocket;
     }
 
@@ -84,7 +82,7 @@ public:
 
         if (m_dataToParse.isEmpty())
         {
-            // Reporting eof of file to the parser.
+            // Reporting end of file to the parser.
             invokeMessageParser();
         }
         else
@@ -104,39 +102,25 @@ public:
         // Using clear will clear the reserved buffer in QByteArray.
         m_writeBuffer.resize(0);
 
-        if (m_serializerState != SerializerState::needMoreBufferSpace)
+        if (m_serializerState == SerializerState::done)
         {
             // Message is sent, triggerring completion handler.
-            NX_ASSERT(!m_sendQueue.empty());
-            // Completion handler is allowed to remove this connection, so moving handler to local variable.
-            std::function<void(SystemError::ErrorCode)> sendCompletionHandler;
-            sendCompletionHandler.swap(m_sendQueue.front().handler);
-            m_serializer.setMessage(nullptr);
-            m_sendQueue.pop_front();
-
-            if (sendCompletionHandler)
-            {
-                nx::utils::ObjectDestructionFlag::Watcher watcher(
-                    &m_connectionFreedFlag);
-                sendCompletionHandler(SystemError::noError);
-                if (watcher.objectDestroyed())
-                    return; //< Connection has been removed by handler.
-            }
-
+            if (completeCurrentSendTask() != aio::InterruptionFlag::StateChange::noChange)
+                return;
             processAnotherSendTaskIfAny();
-            return;
         }
-        size_t bytesWritten = 0;
-        m_serializerState = m_serializer.serialize(&m_writeBuffer, &bytesWritten);
-        if ((m_serializerState == SerializerState::needMoreBufferSpace) && (bytesWritten == 0))
+        else if (m_serializerState == SerializerState::needMoreBufferSpace)
         {
-            // TODO: #ak Increase buffer.
-            NX_ASSERT(false);
-        }
-        // Assuming that all bytes will be written or none.
-        base_type::sendBufAsync(m_writeBuffer);
+            serializeMessage();
 
-        // On completion readyToSendData will be called.
+            // Assuming that all bytes will be written or none.
+            base_type::sendBufAsync(m_writeBuffer);
+        }
+        else
+        {
+            NX_ASSERT(false, lm("Unknown serializer state: %1")
+                .args(static_cast<int>(m_serializerState)));
+        }
     }
 
     /**
@@ -148,14 +132,15 @@ public:
     {
         if (m_sendCompletionHandler)
         {
-            decltype(m_sendCompletionHandler) addHandler;
-            std::swap(addHandler, m_sendCompletionHandler);
+            // TODO: #ak Remove m_sendCompletionHandler after refactoring "reverse connection" logic.
+            auto auxiliaryHandler = std::exchange(m_sendCompletionHandler, nullptr);
             handler =
-                [baseHandler = std::move(handler), addHandler = std::move(addHandler)](
-                    SystemError::ErrorCode code)
+                [baseHandler = std::move(handler),
+                    auxiliaryHandler = std::move(auxiliaryHandler)](
+                        SystemError::ErrorCode code)
                 {
                     baseHandler(code);
-                    addHandler(code);
+                    auxiliaryHandler(code);
                 };
         }
 
@@ -232,8 +217,8 @@ private:
         SendTask(const SendTask&) = delete;
         SendTask& operator=(const SendTask&) = delete;
 
-        boost::optional<Message> msg;
-        boost::optional<nx::Buffer> buf;
+        std::optional<Message> msg;
+        std::optional<nx::Buffer> buf;
         std::function<void(SystemError::ErrorCode)> handler;
         bool asyncSendIssued = false;
     };
@@ -241,11 +226,11 @@ private:
     Message m_message;
     Parser m_parser;
     Serializer m_serializer;
-    SerializerState m_serializerState;
+    SerializerState m_serializerState = SerializerState::done;
     nx::Buffer m_writeBuffer;
     std::function<void(SystemError::ErrorCode)> m_sendCompletionHandler;
     std::deque<SendTask> m_sendQueue;
-    nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
+    aio::InterruptionFlag m_connectionFreedFlag;
     bool m_messageReported = false;
     QnByteArrayConstRef m_dataToParse;
     std::chrono::steady_clock::time_point m_creationTimestamp;
@@ -306,9 +291,9 @@ private:
         if (m_messageReported)
             return true;
 
-        nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
+        aio::InterruptionFlag::ScopeWatcher watcher(this, &m_connectionFreedFlag);
         processMessage(std::exchange(m_message, Message()));
-        if (watcher.objectDestroyed())
+        if (watcher.interrupted())
             return false; //< Connection has been removed by handler.
 
         m_messageReported = true;
@@ -321,9 +306,9 @@ private:
         if (msgBodyBuffer.isEmpty())
             return true;
 
-        nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
+        aio::InterruptionFlag::ScopeWatcher watcher(this, &m_connectionFreedFlag);
         processSomeMessageBody(std::move(msgBodyBuffer));
-        if (watcher.objectDestroyed())
+        if (watcher.interrupted())
             return false; //< Connection has been removed by handler.
 
         return true;
@@ -331,9 +316,9 @@ private:
 
     bool reportMessageEnd()
     {
-        nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
+        aio::InterruptionFlag::ScopeWatcher watcher(this, &m_connectionFreedFlag);
         processMessageEnd();
-        return !watcher.objectDestroyed();
+        return !watcher.interrupted();
     }
 
     void resetParserState()
@@ -365,6 +350,27 @@ private:
             });
     }
 
+    aio::InterruptionFlag::StateChange completeCurrentSendTask()
+    {
+        NX_ASSERT(!m_sendQueue.empty());
+        // NOTE: Completion handler is allowed to delete this connection object.
+        auto sendCompletionHandler =
+            std::exchange(m_sendQueue.front().handler, nullptr);
+        m_serializer.setMessage(nullptr);
+        m_sendQueue.pop_front();
+
+        if (sendCompletionHandler)
+        {
+            aio::InterruptionFlag::ScopeWatcher watcher(
+                this,
+                &m_connectionFreedFlag);
+            sendCompletionHandler(SystemError::noError);
+            return watcher.stateChange();
+        }
+
+        return aio::InterruptionFlag::StateChange::noChange;
+    }
+
     void processAnotherSendTaskIfAny()
     {
         // Sending next message in queue (if any).
@@ -375,14 +381,26 @@ private:
         task.asyncSendIssued = true;
         if (task.msg)
         {
-            sendMessageInternal(task.msg.get());
+            sendMessageInternal(*task.msg);
         }
         else if (task.buf)
         {
             NX_ASSERT(m_writeBuffer.isEmpty());
-            m_writeBuffer = std::move(task.buf.get());
+            m_writeBuffer = std::exchange(*task.buf, {});
             m_serializerState = SerializerState::done;
             base_type::sendBufAsync(m_writeBuffer);
+        }
+    }
+
+    void serializeMessage()
+    {
+        size_t bytesWritten = 0;
+        m_serializerState = m_serializer.serialize(&m_writeBuffer, &bytesWritten);
+        if ((m_serializerState == SerializerState::needMoreBufferSpace) &&
+            (bytesWritten == 0))
+        {
+            // TODO: #ak Increase buffer.
+            NX_ASSERT(false);
         }
     }
 
@@ -390,15 +408,16 @@ private:
     {
         NX_ASSERT(!m_sendQueue.empty());
 
-        std::function<void(SystemError::ErrorCode)> handler;
-        handler.swap(m_sendQueue.front().handler);
+        auto handler = std::exchange(m_sendQueue.front().handler, nullptr);
         {
-            nx::utils::ObjectDestructionFlag::Watcher watcher(
+            aio::InterruptionFlag::ScopeWatcher watcher(
+                this,
                 &m_connectionFreedFlag);
             handler(errorCode);
-            if (watcher.objectDestroyed())
+            if (watcher.interrupted())
                 return; //< Connection has been removed by handler.
         }
+
         base_type::closeConnection(errorCode);
     }
 };
@@ -505,6 +524,4 @@ private:
     }
 };
 
-} // namespace server
-} // namespace network
-} // namespace nx
+} // namespace nx::network::server

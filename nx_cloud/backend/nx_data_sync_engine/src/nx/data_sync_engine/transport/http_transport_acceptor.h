@@ -14,6 +14,7 @@
 #include <transaction/connection_guard_shared_state.h>
 
 #include "../transaction_transport.h"
+#include "command_transport_delegate.h"
 
 namespace nx::data_sync_engine {
 
@@ -52,34 +53,23 @@ public:
         nx::network::http::RequestProcessedHandler completionHandler);
 
 private:
-    struct TransportConnectionContext
-    {
-        std::int64_t connectionSequence = 0;
-        GenericTransport* transport = nullptr;
-        TransactionTransport* commandPipeline = nullptr;
-        nx::utils::SubscriptionId connectionClosedSubscriptionId =
-            nx::utils::kInvalidSubscriptionId;
-    };
-
     const ProtocolVersionRange& m_protocolVersionRange;
-    TransactionLog* m_transactionLog;
-    ConnectionManager* m_connectionManager;
+    TransactionLog* m_transactionLog = nullptr;
+    ConnectionManager* m_connectionManager = nullptr;
     const OutgoingCommandFilter& m_outgoingCommandFilter;
     const vms::api::PeerData m_localPeerData;
     std::shared_ptr<::ec2::ConnectionGuardSharedState> m_connectionGuardSharedState;
-    QnMutex m_mutex;
-    std::atomic<std::uint64_t> m_lastConnectionSequence{0};
-    std::map<std::int64_t /*connectionSequence*/, TransportConnectionContext> m_connections;
+    std::atomic<int> m_connectionSeq{0};
 
     nx::network::http::RequestResult prepareOkResponseToCreateTransactionConnection(
         const ConnectionRequestAttributes& connectionRequestAttributes,
         nx::network::http::Response* const response);
 
-    void forgetConnection(std::int64_t connectionSequence);
-
     void startOutgoingChannel(
-        std::int64_t connectionSequence,
-        nx::network::http::HttpServerConnection* connection);
+        const std::string& connectionId,
+        int connectionSeq,
+        TransactionTransport* commandPipeline,
+        nx::network::http::HttpServerConnection* httpConnection);
 
     void postTransactionToTransport(
         AbstractTransactionTransport* transportConnection,

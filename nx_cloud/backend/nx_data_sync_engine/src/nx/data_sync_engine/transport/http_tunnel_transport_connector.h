@@ -23,7 +23,6 @@ public:
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
     virtual void connect(Handler completionHandler) override;
-    virtual std::string lastErrorText() const override;
 
 protected:
     virtual void stopWhileInAioThread() override;

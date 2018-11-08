@@ -38,12 +38,6 @@ void HttpTunnelTransportConnector::connect(Handler completionHandler)
         [this](auto... args) { processOpenTunnelResult(std::move(args)...); });
 }
 
-std::string HttpTunnelTransportConnector::lastErrorText() const
-{
-    // TODO
-    return "";
-}
-
 void HttpTunnelTransportConnector::stopWhileInAioThread()
 {
     m_client.reset();
@@ -58,7 +52,10 @@ void HttpTunnelTransportConnector::processOpenTunnelResult(
         NX_DEBUG(this, lm("Error connecting to %1. %2, %3")
             .args(m_targetUrl, SystemError::toString(result.sysError),
                 nx::network::http::StatusCode::toString(result.httpStatus)));
-        return nx::utils::swapAndCall(m_completionHandler, nullptr);
+        return nx::utils::swapAndCall(
+            m_completionHandler,
+            ConnectResultDescriptor(result.sysError, result.httpStatus),
+            nullptr);
     }
 
     //auto connection = std::make_unique<HttpTunnelTransportConnection>(
@@ -66,7 +63,10 @@ void HttpTunnelTransportConnector::processOpenTunnelResult(
     //    std::move(result.connection),
     //    0); // TODO: #ak Protocol version.
 
-    nx::utils::swapAndCall(m_completionHandler, nullptr);
+    nx::utils::swapAndCall(
+        m_completionHandler,
+        ConnectResultDescriptor(SystemError::notImplemented),
+        nullptr);
 }
 
 } // namespace nx::data_sync_engine::transport

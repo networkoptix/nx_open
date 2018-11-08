@@ -35,6 +35,8 @@ public:
         const std::string& systemId,
         const nx::utils::Url& url);
 
+    SyncronizationEngine& syncronizationEngine();
+
 protected:
     virtual std::unique_ptr<utils::AbstractServiceSettings> createSettings() override;
     virtual int serviceMain(const utils::AbstractServiceSettings& settings) override;
@@ -47,7 +49,6 @@ protected:
     virtual void teardown() {}
 
     nx::sql::AsyncSqlQueryExecutor& sqlQueryExecutor();
-    SyncronizationEngine& syncronizationEngine();
 
 private:
     const std::string m_applicationId;

@@ -79,7 +79,7 @@ private:
     TransactionLog m_transactionLog;
     IncomingTransactionDispatcher m_incomingTransactionDispatcher;
     ConnectionManager m_connectionManager;
-    TransportManager m_transportManager;
+    transport::TransportManager m_transportManager;
     Connector m_connector;
     transport::HttpTransportAcceptor m_httpTransportAcceptor;
     transport::WebSocketTransportAcceptor m_webSocketAcceptor;

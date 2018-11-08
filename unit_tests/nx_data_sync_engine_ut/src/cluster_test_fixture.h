@@ -19,6 +19,8 @@ public:
     nx::utils::test::ModuleLauncher<CustomerDbNode>& process();
     const nx::utils::test::ModuleLauncher<CustomerDbNode>& process() const;
 
+    nx::utils::Url syncronizationUrl() const;
+
     void connectTo(const Peer& other);
     void addRandomData();
 
@@ -29,7 +31,6 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 class ClusterTestFixture:
-    public ::testing::Test,
     public nx::utils::test::TestWithTemporaryDirectory
 {
     using base_type = nx::utils::test::TestWithTemporaryDirectory;

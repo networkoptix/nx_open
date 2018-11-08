@@ -15,9 +15,7 @@
 
 #include "stream_socket_server.h"
 
-namespace nx {
-namespace network {
-namespace server {
+namespace nx::network::server {
 
 static constexpr size_t kReadBufferCapacity = 16 * 1024;
 
@@ -176,8 +174,7 @@ public:
 
     /**
      * Register handler to be executed when connection just about to be destroyed.
-     * NOTE: It is unspecified which thread handler will be invoked in
-     * (usually, it is aio thread corresponding to the socket).
+     * NOTE: Handler is invoked in socket's aio thread.
      */
     void registerCloseHandler(nx::utils::MoveOnlyFunc<void()> handler)
     {
@@ -275,7 +272,9 @@ private:
             [this](auto&&... args) { onBytesRead(std::move(args)...); });
     }
 
-    void onBytesSent(SystemError::ErrorCode errorCode, size_t count)
+    void onBytesSent(
+        SystemError::ErrorCode errorCode,
+        [[maybe_unused]] size_t count)
     {
         m_isSendingData = false;
         resetInactivityTimer();
@@ -283,7 +282,6 @@ private:
         if (errorCode != SystemError::noError)
             return handleSocketError(errorCode);
 
-        static_cast<void>(count);
         NX_ASSERT(count == m_bytesToSend);
 
         BaseServerConnectionAccess::readyToSendData<CustomConnectionType>(this);
@@ -330,9 +328,12 @@ private:
     }
 };
 
+//-------------------------------------------------------------------------------------------------
+
 /**
  * These two classes enable BaseServerConnection alternative usage without inheritance.
  */
+
 class BaseServerConnectionHandler
 {
 public:
@@ -372,9 +373,7 @@ private:
     }
 
 private:
-    BaseServerConnectionHandler* m_handler;
+    BaseServerConnectionHandler* m_handler = nullptr;
 };
 
-} // namespace server
-} // namespace network
-} // namespace nx
+} // namespace nx::network::server

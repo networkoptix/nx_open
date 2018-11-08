@@ -14,14 +14,15 @@
 namespace nx::data_sync_engine {
 
 class ConnectionManager;
-class TransportManager;
+
+namespace transport { class TransportManager; }
 
 class Connector:
     public nx::network::aio::BasicPollable
 {
 public:
     Connector(
-        TransportManager* transportManager,
+        transport::TransportManager* transportManager,
         ConnectionManager* connectionManager);
 
     ~Connector();
@@ -38,11 +39,11 @@ private:
     {
         std::string systemId;
         std::string connectionId;
-        std::unique_ptr<AbstractTransactionTransportConnector> connector;
+        std::unique_ptr<transport::AbstractTransactionTransportConnector> connector;
         std::unique_ptr<nx::network::aio::Timer> retryTimer;
     };
 
-    TransportManager* m_transportManager = nullptr;
+    transport::TransportManager* m_transportManager = nullptr;
     ConnectionManager* m_connectionManager = nullptr;
     std::map<nx::utils::Url, NodeContext> m_nodes;
 
@@ -50,12 +51,13 @@ private:
     
     void onConnectCompletion(
         const nx::utils::Url& url,
-        std::unique_ptr<AbstractTransactionTransport> connection);
+        transport::ConnectResultDescriptor result,
+        std::unique_ptr<transport::AbstractTransactionTransport> connection);
     
     void registerConnection(
         const nx::utils::Url& url,
         const NodeContext& nodeContext,
-        std::unique_ptr<AbstractTransactionTransport> connection);
+        std::unique_ptr<transport::AbstractTransactionTransport> connection);
 
     void onConnectionClosed(
         const nx::utils::Url& url,

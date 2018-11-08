@@ -13,10 +13,9 @@
 
 #include "compatible_ec2_protocol_version.h"
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine { class TransactionLog; }
 
-class TransactionLog;
+namespace nx::data_sync_engine::transport {
 
 class WebSocketTransactionTransport:
     public AbstractTransactionTransport,
@@ -35,7 +34,7 @@ public:
 
     virtual network::SocketAddress remotePeerEndpoint() const override;
     virtual ConnectionClosedSubscription& connectionClosedSubscription() override;
-    virtual void setOnGotTransaction(GotTransactionEventHandler handler) override;
+    virtual void setOnGotTransaction(CommandHandler handler) override;
     virtual QnUuid connectionGuid() const override;
     virtual const TransactionTransportHeader& commonTransportHeaderOfRemoteTransaction() const override;
     virtual void sendTransaction(
@@ -58,6 +57,8 @@ private:
         nx::p2p::MessageType messageType,
         const QByteArray& payload);
 
+    void reportCommandReceived(QByteArray commandBuffer);
+
     void onTransactionsReadFromLog(
         ResultCode resultCode,
         std::vector<dao::TransactionLogRecord> serializedTransactions,
@@ -69,7 +70,7 @@ private:
     const ProtocolVersionRange m_protocolVersionRange;
     TransactionTransportHeader m_commonTransactionHeader;
     ConnectionClosedSubscription m_connectionClosedSubscription;
-    GotTransactionEventHandler m_gotTransactionEventHandler;
+    CommandHandler m_gotTransactionEventHandler;
     std::unique_ptr<TransactionLogReader> m_transactionLogReader;
 
     bool m_sendHandshakeDone = false;
@@ -79,5 +80,4 @@ private:
     QnUuid m_connectionGuid;
 };
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine::transport

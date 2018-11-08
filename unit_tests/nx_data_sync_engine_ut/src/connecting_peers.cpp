@@ -5,6 +5,7 @@
 namespace nx::data_sync_engine::test {
 
 class ConnectingPeers:
+    public ::testing::Test,
     public ClusterTestFixture
 {
 protected:

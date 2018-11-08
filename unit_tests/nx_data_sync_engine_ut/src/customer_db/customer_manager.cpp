@@ -13,22 +13,22 @@ CustomerManager::CustomerManager(
 {
     using namespace std::placeholders;
 
-    m_syncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
-        <command::SaveCustomer>(
-            std::bind(&CustomerManager::processSaveCustomer, this, _1, _2, _3));
+    m_syncronizationEngine->incomingTransactionDispatcher()
+        .registerTransactionHandler<command::SaveCustomer>(
+            [this](auto&&... args) { return processSaveCustomer(std::move(args)...); });
 
-    m_syncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
-        <command::RemoveCustomer>(
-            std::bind(&CustomerManager::processRemoveCustomer, this, _1, _2, _3));
+    m_syncronizationEngine->incomingTransactionDispatcher()
+        .registerTransactionHandler<command::RemoveCustomer>(
+            [this](auto&&... args) { return processRemoveCustomer(std::move(args)...); });
 }
 
 CustomerManager::~CustomerManager()
 {
-    m_syncronizationEngine->incomingTransactionDispatcher().removeHandler
-        <command::RemoveCustomer>();
+    m_syncronizationEngine->incomingTransactionDispatcher()
+        .removeHandler<command::RemoveCustomer>();
 
-    m_syncronizationEngine->incomingTransactionDispatcher().removeHandler
-        <command::SaveCustomer>();
+    m_syncronizationEngine->incomingTransactionDispatcher()
+        .removeHandler<command::SaveCustomer>();
 }
 
 void CustomerManager::saveCustomer(
@@ -39,7 +39,10 @@ void CustomerManager::saveCustomer(
 
     m_syncronizationEngine->transactionLog().startDbTransaction(
         "",
-        std::bind(&CustomerManager::saveCustomerToDb, this, _1, customer),
+        [this, customer](auto&&... args)
+        {
+            return saveCustomerToDb(std::move(args)..., customer);
+        },
         [handler = std::move(handler)](nx::sql::DBResult dbResult)
         {
             handler(dbResult == nx::sql::DBResult::ok
@@ -56,7 +59,7 @@ void CustomerManager::removeCustomer(
 
     m_syncronizationEngine->transactionLog().startDbTransaction(
         "",
-        std::bind(&CustomerManager::removeCustomerFromDb, this, _1, id),
+        [this, id](auto&&... args) { return removeCustomerFromDb(std::move(args)..., id); },
         [handler = std::move(handler)](nx::sql::DBResult dbResult)
         {
             handler(dbResult == nx::sql::DBResult::ok
@@ -94,8 +97,9 @@ nx::sql::DBResult CustomerManager::saveCustomerToDb(
 
     m_customerDao->saveCustomer(queryContext, customer);
 
-    return m_syncronizationEngine->transactionLog().generateTransactionAndSaveToLog
-        <command::SaveCustomer>(queryContext, "", customer);
+    return m_syncronizationEngine->transactionLog()
+        .generateTransactionAndSaveToLog<command::SaveCustomer>(
+            queryContext, "", customer);
 }
 
 nx::sql::DBResult CustomerManager::removeCustomerFromDb(
@@ -104,8 +108,9 @@ nx::sql::DBResult CustomerManager::removeCustomerFromDb(
 {
     m_customerDao->removeCustomer(queryContext, customerId);
 
-    return m_syncronizationEngine->transactionLog().generateTransactionAndSaveToLog
-        <command::RemoveCustomer>(queryContext, "", Id{customerId});
+    return m_syncronizationEngine->transactionLog()
+        .generateTransactionAndSaveToLog<command::RemoveCustomer>(
+            queryContext, "", Id{customerId});
 }
 
 nx::sql::DBResult CustomerManager::processSaveCustomer(

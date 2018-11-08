@@ -23,9 +23,7 @@ SyncronizationEngine::SyncronizationEngine(
         m_supportedProtocolRange,
         dbManager,
         &m_outgoingTransactionDispatcher),
-    m_incomingTransactionDispatcher(
-        peerId,
-        &m_transactionLog),
+    m_incomingTransactionDispatcher(&m_transactionLog),
     m_connectionManager(
         peerId,
         settings,

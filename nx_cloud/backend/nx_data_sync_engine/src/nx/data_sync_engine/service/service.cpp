@@ -16,7 +16,7 @@ Service::Service(
     int argc,
     char **argv)
     :
-    base_type(argc, argv, "xxx"),
+    base_type(argc, argv, "nx::data_sync_engine service"),
     m_applicationId(applicationId)
 {
 }
@@ -31,6 +31,11 @@ void Service::connectToNode(
     const nx::utils::Url& url)
 {
     m_controller->syncronizationEngine().connector().addNodeUrl(systemId, url);
+}
+
+nx::sql::AsyncSqlQueryExecutor& Service::sqlQueryExecutor()
+{
+    return m_model->queryExecutor();
 }
 
 std::unique_ptr<utils::AbstractServiceSettings> Service::createSettings()
@@ -69,11 +74,6 @@ int Service::serviceMain(const utils::AbstractServiceSettings& abstractSettings)
     NX_ALWAYS(this, lm("Stopping..."));
 
     return result;
-}
-
-nx::sql::AsyncSqlQueryExecutor& Service::sqlQueryExecutor()
-{
-    return m_model->queryExecutor();
 }
 
 SyncronizationEngine& Service::syncronizationEngine()
