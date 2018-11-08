@@ -25,3 +25,7 @@ nx_add_qt_mocables(vms_gateway_core ${mocableNetworkFiles}
 target_compile_definitions(vms_gateway_core
     PRIVATE NX_VMS_GATEWAY_API=${API_EXPORT_MACRO}
     INTERFACE NX_VMS_GATEWAY_API=${API_IMPORT_MACRO})
+
+if(withTests)
+    add_subdirectory(unit_tests)
+endif()
