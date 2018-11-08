@@ -753,7 +753,7 @@ void ServerUpdateTool::atUpdateStatusResponse(bool success, rest::Handle handle,
     m_remoteUpdateStatus = std::move(remoteStatus);
 }
 
-rest::QnConnectionPtr ServerUpdateTool::getServerConnection(const QnMediaServerResourcePtr& server)
+rest::QnConnectionPtr ServerUpdateTool::getServerConnection(const QnMediaServerResourcePtr& server) const
 {
     return server ? server->restConnection() : rest::QnConnectionPtr();
 }
@@ -890,6 +890,48 @@ std::shared_ptr<ServerUpdatesModel> ServerUpdateTool::getModel()
     return m_updatesModel;
 }
 
+QString ServerUpdateTool::getUpdateStateUrl() const
+{
+    if (const auto connection = commonModule()->ec2Connection())
+    {
+        QnConnectionInfo connectionInfo = connection->connectionInfo();
+        nx::utils::Url url = connectionInfo.ecUrl;
+        url.setPath("/ec2/updateStatus");
+        bool hasSsl = commonModule()->moduleInformation().sslAllowed;
+        url.setScheme(nx::network::http::urlSheme(hasSsl));
+        return url.toString();
+    }
+    return "";
+}
+
+QString ServerUpdateTool::getUpdateInformationUrl() const
+{
+    if (const auto connection = commonModule()->ec2Connection())
+    {
+        QnConnectionInfo connectionInfo = connection->connectionInfo();
+        nx::utils::Url url = connectionInfo.ecUrl;
+        url.setPath("/ec2/updateInformation");
+        bool hasSsl = commonModule()->moduleInformation().sslAllowed;
+        url.setScheme(nx::network::http::urlSheme(hasSsl));
+        return url.toString();
+    }
+    return "";
+}
+
+QString ServerUpdateTool::getInstalledUpdateInfomationUrl() const
+{
+    if (const auto connection = commonModule()->ec2Connection())
+    {
+        QnConnectionInfo connectionInfo = connection->connectionInfo();
+        nx::utils::Url url = connectionInfo.ecUrl;
+        url.setPath("/ec2/installedUpdateInfomation");
+        bool hasSsl = commonModule()->moduleInformation().sslAllowed;
+        url.setScheme(nx::network::http::urlSheme(hasSsl));
+        return url.toString();
+    }
+    return "";
+}
+
 nx::utils::SoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
 {
     nx::utils::SoftwareVersion minimalVersion = qnStaticCommon->engineVersion();
@@ -945,7 +987,12 @@ QUrl generateUpdatePackageUrl(const UpdateContents& contents, const QSet<QnUuid>
         systemInformationList.insert(server->getSystemInfo());
     }
 
-    query.addQueryItem(lit("client"), nx::vms::api::SystemInformation::currentSystemRuntime().replace(L' ', L'_'));
+    //QString clientRuntime = nx::vms::api::SystemInformation::currentSystemRuntime().replace(L' ', L'_');
+    auto clientPlatformModification = QnAppInfo::applicationPlatformModification();
+    auto clientArch = QnAppInfo::applicationArch();
+    QString clientRuntime = QString("%1_%2").arg(clientArch, clientPlatformModification);
+
+    query.addQueryItem(lit("client"), clientRuntime);
     for(const auto &systemInformation: systemInformationList)
         query.addQueryItem(lit("server"), systemInformation.toString().replace(L' ', L'_'));
 

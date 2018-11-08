@@ -172,6 +172,13 @@ public:
 
     std::shared_ptr<ServerUpdatesModel> getModel();
 
+    // These are debug functions that return URL to appropriate mediaserver API calls.
+    // This URLs are clickable at MultiServerUpdateWidget. This allows testers to
+    // check current update state easily and fill in a meaningful bug report.
+    QString getUpdateStateUrl() const;
+    QString getUpdateInformationUrl() const;
+    QString getInstalledUpdateInfomationUrl() const;
+
 private:
     // Handlers for resource updates.
     void atResourceAdded(const QnResourcePtr& resource);
@@ -187,7 +194,7 @@ private:
 
     // Wrapper to get REST connection to specified server.
     // For testing purposes. We can switch there to a dummy http server.
-    rest::QnConnectionPtr getServerConnection(const QnMediaServerResourcePtr& server);
+    rest::QnConnectionPtr getServerConnection(const QnMediaServerResourcePtr& server) const;
     static void readUpdateManifest(QString path, UpdateContents& result);
     QnMediaServerResourceList getServersForUpload();
 
