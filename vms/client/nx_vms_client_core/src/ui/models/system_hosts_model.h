@@ -18,7 +18,8 @@ class QnSystemHostsModel: public QnSortFilterListModel
 public:
     enum Roles
     {
-        UrlRole = Qt::UserRole + 1
+        UrlRole = Qt::UserRole + 1,
+        UrlDisplayRole,
     };
 
     QnSystemHostsModel(QObject* parent = nullptr);

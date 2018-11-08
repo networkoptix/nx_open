@@ -160,7 +160,9 @@ QVariant QnSystemHostsModel::HostsModel::data(const QModelIndex& index, int role
                 ? lit("%1:%2").arg(data.second.host(), QString::number(data.second.port()))
                 : data.second.host());
         case UrlRole:
-            return data.second.toString();
+            return qVariantFromValue(data.second);
+        case UrlDisplayRole:
+            return data.second.toDisplayString();
         default:
             break;
     }
@@ -321,7 +323,10 @@ QnSystemHostsModel::HostsModel::getDataIt(const QnUuid& serverId)
 
 QHash<int, QByteArray> QnSystemHostsModel::HostsModel::roleNames() const
 {
-    static const auto kRoles = QHash<int, QByteArray>{{QnSystemHostsModel::UrlRole, "url"}};
+    static const auto kRoles = QHash<int, QByteArray>{
+        {UrlRole, "url-internal"},
+        {UrlDisplayRole, "url"}
+    };
     return base_type::roleNames().unite(kRoles);
 }
 
@@ -338,13 +343,14 @@ bool QnSystemHostsModel::lessThan(
     const QModelIndex& sourceLeft,
     const QModelIndex& sourceRight) const
 {
-    const auto leftUrl = nx::utils::Url::fromQUrl(sourceLeft.data(UrlRole).toUrl());
-    const auto rightUrl = nx::utils::Url::fromQUrl(sourceRight.data(UrlRole).toUrl());
+    const auto leftUrl = sourceLeft.data(UrlRole).value<nx::utils::Url>();
+    NX_ASSERT(leftUrl.isValid(), lm("Invalid url %1").arg(leftUrl.toString()));
+
+    const auto rightUrl = sourceRight.data(UrlRole).value<nx::utils::Url>();
+    NX_ASSERT(rightUrl.isValid(), lm("Invalid url %1").arg(rightUrl.toString()));
+
     if (!leftUrl.isValid() || !rightUrl.isValid())
-    {
-        NX_ASSERT(false, "Urls should be valid");
         return sourceLeft.row() < sourceRight.row();
-    }
 
     const auto recentUrls = hostsModel()->recentConnectionUrls();
     const auto getIndexOfConnection =
