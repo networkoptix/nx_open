@@ -5,9 +5,11 @@ import errno
 import logging
 import math
 import re
+import sys
 import timeit
 
 import pytz
+import six
 import tzlocal.windows_tz
 
 from framework.method_caching import cached_getter
@@ -214,6 +216,20 @@ class _FakeDisk(BaseFakeDisk):
         self._image_path = windows_access.path_cls('C:\\{}.vhdx'.format(self._letter))
         self.winrm = windows_access.winrm
 
+    def _diskpart(self, name, script, timeout_sec):
+        _logger.debug('Diskpart script:\n%s', script)
+        script_path = self._image_path.with_name('{}.{}.diskpart.txt'.format(self._letter, name))
+        script_path.write_text(script)
+        # Error originate in VDS -- Virtual Disk Service.
+        # See: https://msdn.microsoft.com/en-us/library/dd208031.aspx.
+        command = self.winrm.command(['diskpart', '/s', script_path])
+        try:
+            command.run(timeout_sec=timeout_sec)
+        except exceptions.exit_status_error_cls(0x80070057) as e:
+            message_multiline = e.stdout.decode().rstrip().rsplit('\r\n\r\n')[-1]
+            message_oneline = message_multiline.replace('\r\n', ' ')
+            six.reraise(OSError, OSError(errno.EINVAL, message_oneline), sys.exc_info()[2])
+
     def remove(self, letter='V'):
         try:
             self.winrm.command(['MountVol', letter + ':', '/D']).run(timeout_sec=5)
@@ -251,11 +267,4 @@ class _FakeDisk(BaseFakeDisk):
             letter=self._letter,
             partition_mb=partition_mb,
             disk_mb=disk_mb)
-        _logger.debug('Diskpart script:\n%s', script)
-        # With script file, `diskpart` exits with non-zero code.
-        script_path = self._image_path.with_suffix('.diskpart.txt')
-        script_path.write_text(script)
-        # Error originate in VDS -- Virtual Disk Service.
-        # See: https://msdn.microsoft.com/en-us/library/dd208031.aspx.
-        command = self.winrm.command(['diskpart', '/s', script_path])
-        command.run(timeout_sec=10 + 0.05 * free_space_mb)
+        self._diskpart('mount', script, 10 + 0.05 * free_space_mb)
