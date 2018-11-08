@@ -32,10 +32,10 @@ file(GLOB_RECURSE sdk_src_nx_sdk_new_files ${sdk_src_nx_sdk_new_origin}/*)
 file(GLOB_RECURSE sdk_src_nx_sdk_common_headers ${sdk_src_nx_sdk_common_headers_origin}/*)
 
 # Collect source files for the sample - Stub Analytics Plugin.
-set(sdk_src_sample_origin ${CMAKE_SOURCE_DIR}/plugins/analytics/stub_analytics_plugin/src)
+set(sdk_src_sample_origin ${CMAKE_SOURCE_DIR}/vms/server/plugins/analytics/stub_analytics_plugin/src)
 file(GLOB_RECURSE sdk_src_sample_files ${sdk_src_sample_origin}/*)
 set(sdk_src_sample_ut_origin
-    ${CMAKE_SOURCE_DIR}/plugins/analytics/stub_analytics_plugin/unit_tests/src)
+    ${CMAKE_SOURCE_DIR}/vms/server/plugins/analytics/stub_analytics_plugin/unit_tests/src)
 file(GLOB_RECURSE sdk_src_sample_ut_files ${sdk_src_sample_ut_origin}/*)
 
 set(create_sdk_script ${CMAKE_CURRENT_BINARY_DIR}/create_sdk.cmake)
