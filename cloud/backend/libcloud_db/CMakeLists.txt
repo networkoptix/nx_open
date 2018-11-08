@@ -10,3 +10,7 @@ nx_add_target(libcloud_db LIBRARY NO_MOC
 )
 
 set_target_properties(libcloud_db PROPERTIES PREFIX "")
+
+if(withTests)
+    add_subdirectory(unit_tests)
+endif()
