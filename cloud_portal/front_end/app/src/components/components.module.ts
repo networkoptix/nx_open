@@ -12,8 +12,8 @@ import { MenuModule }                     from './menu/menu.module';
 import { NxContentBlockComponent }        from './content-block/content-block.component';
 import { NxContentBlockSectionComponent } from './content-block/section/section.component';
 import { NxMultiLineEllipsisComponent }   from './multi-line-ellipsis/mle.component';
-import { NxExternalVideoComponent }       from "./external-video/external-video.component";
-import { NxLayoutComponent }              from './layout/layout.component';
+import { NxExternalVideoComponent }       from './external-video/external-video.component';
+import { NxLayoutComponent }              from './layout-right/layout.component';
 
 @NgModule({
     imports        : [
