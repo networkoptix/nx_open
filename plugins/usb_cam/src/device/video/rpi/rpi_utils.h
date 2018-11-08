@@ -1,19 +1,20 @@
-#ifdef __linux__
 #pragma once
 
 #include <string>
+#include <vector>
 
-#include "device/device_data.h"
+#include "device/video/resolution_data.h"
 
 namespace nx {
 namespace usb_cam {
 namespace device {
+namespace video {
 namespace rpi {
 
 /**
  * Return the resolution list for the rpi integrated camera.
  */
-std::vector<device::ResolutionData> getMmalResolutionList();
+std::vector<device::video::ResolutionData> getMmalResolutionList();
 
 /**
  * Return the maximum bitrate of the rpi integrated camera.
@@ -21,7 +22,8 @@ std::vector<device::ResolutionData> getMmalResolutionList();
 int getMmalMaxBitrate();
 
 /**
- * Returns true if the mediaserver is running on the rpi and the name of the camera contains "mmal".
+ * Returns true if the mediaserver is running on the rpi and the name of the camera
+ *    contains "mmal".
  */
 bool isMmalCamera(const std::string& deviceName);
 
@@ -31,8 +33,7 @@ bool isMmalCamera(const std::string& deviceName);
 bool isRpi();
 
 } // namespace rpi
+} // namespace video
 } // namespace device
 } // namespace usb_cam
 } // namespace nx
-
-#endif

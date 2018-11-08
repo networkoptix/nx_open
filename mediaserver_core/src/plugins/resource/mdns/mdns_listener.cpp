@@ -6,6 +6,7 @@
 #include <nx/network/system_socket.h>
 #include <nx/network/socket_factory.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/string.h>
 
 #ifndef Q_OS_WIN
 #include <netinet/in.h>
@@ -77,9 +78,9 @@ QString QnMdnsListener::getBestLocalAddress(const QString& remoteAddress)
     int bestIndex = 0;
     for (int i = 0; i < m_localAddressList.size(); ++i)
     {
-        int eq = nx::network::strEqualAmount(
-            m_localAddressList[i].toLatin1().constData(),
-            remoteAddress.toLatin1().constData());
+        const int eq = (int) nx::utils::maxPrefix(
+            m_localAddressList[i].toStdString(),
+            remoteAddress.toStdString()).size();
 
         if (eq > bestEq) {
             bestEq = eq;

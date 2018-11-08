@@ -11,7 +11,7 @@
 namespace nx {
 namespace usb_cam {
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // AbstractStreamConsumerManager
 
 class AbstractStreamConsumerManager
@@ -37,11 +37,10 @@ public:
      * Remove the givenconsumer from the consumer manager.
      *
      * @param[in] consumer - the consumer to remove.
-     * @return - the index the consumer was add before it was removed or -1 if it couldn't be found.
+     * @return - the index the consumer was add before it was removed or -1 if not found.
      */
     virtual size_t removeConsumer(const std::weak_ptr<AbstractStreamConsumer>& consumer);
     int consumerIndex(const std::weak_ptr<AbstractStreamConsumer>& consumer) const;
-    const std::vector<std::weak_ptr<AbstractStreamConsumer>>& consumers() const;
 
     int findLargestBitrate() const;
     float findLargestFps() const;
@@ -51,7 +50,7 @@ protected:
     std::vector<std::weak_ptr<AbstractStreamConsumer>> m_consumers;
 };
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // FrameConsumerManager
 
 class FrameConsumerManager: public AbstractStreamConsumerManager

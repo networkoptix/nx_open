@@ -20,7 +20,7 @@ sudo apt-get update
 sudo apt-get install --yes \
     python-virtualenv python2.7-dev \
     python3-venv python3-dev \
-    virtualbox virtualbox-ext-pack \
+    virtualbox virtualbox-ext-pack virtualbox-qt \
     rsync \
     ffmpeg \
     smbclient

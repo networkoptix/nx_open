@@ -19,8 +19,12 @@ using namespace nx::cloud::relay;
 
 class RelayToRelayRedirect;
 
-class RelayToRelayRedirect: public BasicTestFixture
+class RelayToRelayRedirect:
+    public BasicTestFixture,
+    public ::testing::Test
 {
+    using base_type = BasicTestFixture;
+
 public:
     RelayToRelayRedirect():
         BasicTestFixture(3, std::chrono::seconds(1)),
@@ -30,7 +34,7 @@ public:
 
     virtual void SetUp() override
     {
-        BasicTestFixture::SetUp();
+        base_type::SetUp();
         ConnectorFactory::setEnabledCloudConnectMask((int)ConnectType::proxy);
         startServer();
     }

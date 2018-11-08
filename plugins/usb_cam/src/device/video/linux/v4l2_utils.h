@@ -2,18 +2,21 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 #include <linux/videodev2.h>
 
 #include <camera/camera_plugin_types.h>
 #include "camera/camera_plugin.h"
 
 #include "device/device_data.h"
+#include "device/video/resolution_data.h"
 #include "device/abstract_compression_type_descriptor.h"
 
 namespace nx {
 namespace usb_cam {
 namespace device {
-namespace impl {
+namespace video {
+namespace detail {
 
 class V4L2CompressionTypeDescriptor : public AbstractCompressionTypeDescriptor
 {
@@ -28,8 +31,8 @@ private:
 };
 
 /**
-* get the name of the device reported by the underlying hardware.
-* @params[in]
+* Get the name of the device reported by the underlying hardware.
+* @params[in] devicePath - the path to the device, like, /dev/video* on Linux.
 */
 std::string getDeviceName(const char * devicePath);
 
@@ -46,6 +49,7 @@ std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const char 
 /**
 * Get the list of supported resolutions for the device with the given path.
 * On Linux, this corresponds to the devices's /dev/video* entry.
+*
 * @param[in] getResolution - whether or not to fill each DeviceData with supported resolutions
 * @param[in] codecId - the codec whose resolution list is desired
 */
@@ -54,19 +58,27 @@ std::vector<ResolutionData> getResolutionList(
     const device::CompressionTypeDescriptorPtr& targetCodecID);
 
 /**
-* Set the bitrate for the device with the given path.
+* Set the bitrate for the device with the given path. 
 * On Linux, this corresponds to the devices's /dev/video* entry.
+*
 * @param[in] bitrate - the bitrate to set in bits per second.
 */ 
-void setBitrate(const char * devicePath, int bitrate, const device::CompressionTypeDescriptorPtr& targetCodecID);
+void setBitrate(
+    const char * devicePath,
+    int bitrate,
+    const device::CompressionTypeDescriptorPtr& targetCodecID);
 
 /**
-* Get the maximum bitrate supported by the camera
-* @param[int] devicePath - the path to the device
+* Get the maximum bitrate supported by the camera.
+*
+* @param[int] devicePath - the path to the device.
 */ 
-int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescriptorPtr& tagetCodecID);
+int getMaxBitrate(
+    const char * devicePath,
+    const device::CompressionTypeDescriptorPtr& tagetCodecID);
 
-} // namespace impl
+} // namespace detail
+} // namespace video
 } // namespace device
 } // namespace usb_cam
 } // namespace nx

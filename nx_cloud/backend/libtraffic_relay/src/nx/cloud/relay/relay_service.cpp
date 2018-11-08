@@ -86,9 +86,13 @@ bool RelayService::registerThisInstanceNameInCluster(const conf::Settings& setti
             return false;
         }
 
-        externalHostName = network::SocketAddress(
-            *publicIp,
-            m_view->httpEndpoints().front().port).toStdString();
+        int port = 0;
+        if (!m_view->httpEndpoints().empty())
+            port = m_view->httpEndpoints().front().port;
+        else
+            port = m_view->httpsEndpoints().front().port;
+
+        externalHostName = network::SocketAddress(*publicIp, port).toStdString();
     }
 
     m_model->remoteRelayPeerPool().setNodeId(externalHostName);

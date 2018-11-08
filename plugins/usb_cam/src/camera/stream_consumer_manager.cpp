@@ -22,7 +22,8 @@ void AbstractStreamConsumerManager::flush()
     }
 }
 
-size_t AbstractStreamConsumerManager::addConsumer(const std::weak_ptr<AbstractStreamConsumer>& consumer)
+size_t AbstractStreamConsumerManager::addConsumer(
+    const std::weak_ptr<AbstractStreamConsumer>& consumer)
 {
     int index = consumerIndex(consumer);
     if (index >= m_consumers.size())
@@ -33,7 +34,8 @@ size_t AbstractStreamConsumerManager::addConsumer(const std::weak_ptr<AbstractSt
     return -1;
 }
 
-size_t AbstractStreamConsumerManager::removeConsumer(const std::weak_ptr<AbstractStreamConsumer>& consumer)
+size_t AbstractStreamConsumerManager::removeConsumer(
+    const std::weak_ptr<AbstractStreamConsumer>& consumer)
 {
     int index = consumerIndex(consumer);
     if (index < m_consumers.size())
@@ -46,7 +48,8 @@ size_t AbstractStreamConsumerManager::removeConsumer(const std::weak_ptr<Abstrac
     return -1;
 }
 
-int AbstractStreamConsumerManager::consumerIndex(const std::weak_ptr<AbstractStreamConsumer>& consumer) const
+int AbstractStreamConsumerManager::consumerIndex(
+    const std::weak_ptr<AbstractStreamConsumer>& consumer) const
 {
     int index = 0;
     for(const auto & c : m_consumers)
@@ -56,11 +59,6 @@ int AbstractStreamConsumerManager::consumerIndex(const std::weak_ptr<AbstractStr
         ++index;
     }
     return index;
-}
-
-const std::vector<std::weak_ptr<AbstractStreamConsumer>>& AbstractStreamConsumerManager::consumers() const
-{
-    return m_consumers;
 }
 
 int AbstractStreamConsumerManager::findLargestBitrate() const
@@ -116,7 +114,7 @@ nxcip::Resolution AbstractStreamConsumerManager::findLargestResolution() const
     return largest;
 }
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // FrameConsumerManager
 
 void FrameConsumerManager::giveFrame(const std::shared_ptr<ffmpeg::Frame>& frame)
@@ -131,7 +129,7 @@ void FrameConsumerManager::giveFrame(const std::shared_ptr<ffmpeg::Frame>& frame
     }
 }
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // AbstractPacketConsumerManager
 
 size_t PacketConsumerManager::addConsumer(const std::weak_ptr<AbstractStreamConsumer>& consumer)

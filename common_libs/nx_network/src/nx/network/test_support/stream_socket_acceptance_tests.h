@@ -455,6 +455,29 @@ protected:
         whenConnectUsingHostName();
     }
 
+    template<typename AuxiliaryConnectCompletionHandler>
+    void whenConnectToServer(AuxiliaryConnectCompletionHandler&& handler)
+    {
+        whenConnectToServerAsync(serverEndpoint(), std::move(handler));
+        thenConnectionIsEstablished();
+    }
+
+    template<typename AuxiliaryConnectCompletionHandler>
+    void whenConnectToServerAsync(
+        const SocketAddress& endpoint,
+        AuxiliaryConnectCompletionHandler&& handler)
+    {
+        m_connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
+        ASSERT_TRUE(m_connection->setNonBlockingMode(true));
+        m_connection->connectAsync(
+            endpoint,
+            [this, handler = std::move(handler)](SystemError::ErrorCode resultCode)
+            {
+                handler();
+                this->saveConnectResult(resultCode);
+            });
+    }
+
     void whenReceivedMessageFromServerAsync(
         nx::utils::MoveOnlyFunc<void()> auxiliaryHandler)
     {
@@ -468,13 +491,7 @@ protected:
 
     void whenConnectUsingHostName()
     {
-        using namespace std::placeholders;
-
-        m_connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
-        ASSERT_TRUE(m_connection->setNonBlockingMode(true));
-        m_connection->connectAsync(
-            m_mappedEndpoint,
-            std::bind(&StreamSocketAcceptance::saveConnectResult, this, _1));
+        whenConnectToServerAsync(m_mappedEndpoint, [](){});
     }
 
     void whenSendRandomDataToServer()
@@ -574,18 +591,22 @@ protected:
             : SystemError::getLastOSErrorCode());
     }
 
-    void whenClientSentPingAsync()
+    void whenClientSentPingAsync(std::function<void()> auxiliaryHandler = nullptr)
     {
-        whenClientSendsPingAsync();
+        whenClientSendsPingAsync(std::move(auxiliaryHandler));
         thenSendSucceeded();
     }
 
-    void whenClientSendsPingAsync()
+    void whenClientSendsPingAsync(std::function<void()> auxiliaryHandler = nullptr)
     {
         m_connection->sendAsync(
             m_clientMessage,
-            [this](SystemError::ErrorCode systemErrorCode, std::size_t /*bytesSent*/)
+            [this, auxiliaryHandler = std::move(auxiliaryHandler)](
+                SystemError::ErrorCode systemErrorCode,
+                std::size_t /*bytesSent*/)
             {
+                if (auxiliaryHandler)
+                    auxiliaryHandler();
                 m_sendResultQueue.push(systemErrorCode);
             });
     }
@@ -918,6 +939,14 @@ protected:
         m_synchronousServerReceivedData.waitForReceivedDataToMatch(m_sentData);
     }
 
+    void thenSocketCanBeUsedForAsyncIo()
+    {
+        this->whenClientSentPingAsync();
+
+        this->startReadingConnectionAsync();
+        this->thenServerMessageIsReceived();
+    }
+
     void thenEveryConnectionIsAccepted()
     {
         for (int i = 0; i < (int) m_clientConnections.size(); ++i)
@@ -961,8 +990,8 @@ protected:
         ASSERT_TRUE(connection()->setNonBlockingMode(true));
 
         doIoUntilFirstFailure(
-            std::bind(&StreamSocketAcceptance::whenClientSendsPingAsync, this),
-            std::bind(&StreamSocketAcceptance::startReadingConnectionAsync, this));
+            [this](auto&&... args) { whenClientSendsPingAsync(std::move(args)...); },
+            [this](auto&&... args) { startReadingConnectionAsync(std::move(args)...); });
     }
 
     template<typename SendPingFunc, typename RecvPingFunc>
@@ -1295,8 +1324,8 @@ TYPED_TEST_CASE_P(StreamSocketAcceptance);
 
 //-------------------------------------------------------------------------------------------------
 
-// Windows 8/10 doesn't support client->server send timeout.
-// It close connection automatically with error 10053 after client send timeout.
+// Windows 8/10 does not support client->server send timeout.
+// It closes connection automatically with error 10053 after client send timeout.
 TYPED_TEST_P(StreamSocketAcceptance, DISABLED_receiveDelay)
 {
     this->runStreamingTest(/*serverDelay*/ true, /*clientDelay*/ false);
@@ -1405,7 +1434,6 @@ TYPED_TEST_P(StreamSocketAcceptance, recv_timeout_is_reported)
     this->whenReadSocketInBlockingWay();
 
     this->thenClientSocketReportedTimedout();
-    //this->thenClientSocketReportedFailure();
 }
 
 TYPED_TEST_P(StreamSocketAcceptance, msg_dont_wait_flag_makes_recv_call_nonblocking)
@@ -1517,7 +1545,6 @@ TYPED_TEST_P(StreamSocketAcceptance, receive_timeout_change_is_not_ignored)
         });
 
     this->thenClientSocketReportedTimedout();
-    //this->thenClientSocketReportedFailure();
 }
 
 // TODO: #ak Modify and uncomment this test.
@@ -1557,6 +1584,48 @@ TYPED_TEST_P(StreamSocketAcceptance, socket_is_ready_for_io_after_read_cancellat
 
     this->assertConnectionCanDoSyncIo();
     this->assertConnectionCanDoAsyncIo();
+}
+
+TYPED_TEST_P(
+    StreamSocketAcceptance,
+    socket_aio_thread_can_be_changed_after_io_cancellation_during_connect_completion)
+{
+    this->givenPingPongServer();
+
+    this->whenConnectToServer(
+        [this]()
+        {
+            this->connection()->cancelIOSync(aio::etNone);
+            this->connection()->bindToAioThread(
+                SocketGlobals::aioService().getRandomAioThread());
+
+            this->startReadingConnectionAsync();
+        });
+
+    this->thenSocketCanBeUsedForAsyncIo();
+}
+
+TYPED_TEST_P(
+    StreamSocketAcceptance,
+    socket_aio_thread_can_be_changed_after_io_cancellation_during_send_completion)
+{
+    this->givenPingPongServer();
+    this->givenConnectedSocket();
+    ASSERT_TRUE(this->connection()->setNonBlockingMode(true));
+    this->startReadingConnectionAsync();
+
+    this->whenClientSentPingAsync(
+        [this]()
+        {
+            this->connection()->cancelIOSync(aio::etNone);
+            this->connection()->bindToAioThread(
+                SocketGlobals::aioService().getRandomAioThread());
+
+            this->startReadingConnectionAsync();
+        });
+
+    this->thenServerMessageIsReceived();
+    this->thenSocketCanBeUsedForAsyncIo();
 }
 
 TYPED_TEST_P(StreamSocketAcceptance, DISABLED_socket_is_usable_after_send_cancellation)
@@ -1731,6 +1800,8 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     receive_timeout_change_is_not_ignored,
     cancel_io,
     socket_is_ready_for_io_after_read_cancellation,
+    socket_aio_thread_can_be_changed_after_io_cancellation_during_connect_completion,
+    socket_aio_thread_can_be_changed_after_io_cancellation_during_send_completion,
     DISABLED_socket_is_usable_after_send_cancellation,
     /**
      * These tests are disabled because currently it is not supported on mswin.

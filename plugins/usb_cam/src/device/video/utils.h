@@ -1,19 +1,22 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
+#include <camera/camera_plugin.h>
 #include <camera/camera_plugin_types.h>
-#include "camera/camera_plugin.h"
 
-#include "device_data.h"
-#include "abstract_compression_type_descriptor.h"
+#include "resolution_data.h"
+#include "device/device_data.h"
+#include "device/abstract_compression_type_descriptor.h"
 
 namespace nx {
 namespace usb_cam {
 namespace device {
+namespace video {
 
 /**
- * Get the gui friendly name of the device
+ * Get the gui friendly name of the device.
  */
 std::string getDeviceName(const char * devicePath);
 
@@ -61,6 +64,7 @@ int getMaxBitrate(
     const char * devicePath,
     const device::CompressionTypeDescriptorPtr& targetCodecID);
 
+} // namespace video
 } // namespace device
 } // namespace usb_cam
 } // namespace nx
