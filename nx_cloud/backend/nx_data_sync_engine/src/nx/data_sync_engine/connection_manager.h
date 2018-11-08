@@ -185,8 +185,7 @@ private:
 
     void onGotTransaction(
         const std::string& connectionId,
-        Qn::SerializationFormat tranFormat,
-        QByteArray serializedTransaction,
+        std::unique_ptr<DeserializableCommandData> commandData,
         TransactionTransportHeader transportHeader);
 
     void onTransactionDone(const std::string& connectionId, ResultCode resultCode);

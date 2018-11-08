@@ -34,7 +34,7 @@ ConnectionClosedSubscription& CommandTransportDelegate::connectionClosedSubscrip
     return m_delegatee->connectionClosedSubscription();
 }
 
-void CommandTransportDelegate::setOnGotTransaction(GotTransactionEventHandler handler)
+void CommandTransportDelegate::setOnGotTransaction(CommandHandler handler)
 {
     m_delegatee->setOnGotTransaction(std::move(handler));
 }

@@ -142,7 +142,7 @@ void TransactionTransport::setOnConnectionClosed(ConnectionClosedEventHandler ha
     m_connectionClosedEventHandler = std::move(handler);
 }
 
-void TransactionTransport::setOnGotTransaction(GotTransactionEventHandler handler)
+void TransactionTransport::setOnGotTransaction(CommandDataHandler handler)
 {
     m_gotTransactionEventHandler = std::move(handler);
 }

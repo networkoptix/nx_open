@@ -89,19 +89,10 @@ void WebSocketTransactionTransport::onGotMessage(
     {
         case nx::p2p::MessageType::pushTransactionData:
         {
-            TransactionTransportHeader cdbTransportHeader(m_protocolVersionRange.currentVersion());
-            cdbTransportHeader.endpoint = remotePeerEndpoint();
-            cdbTransportHeader.systemId = m_transactionLogReader->systemId();
-            cdbTransportHeader.connectionId = connectionGuid().toSimpleByteArray().toStdString();
-            //cdbTransportHeader.vmsTransportHeader //< Empty vms transport header
-            cdbTransportHeader.transactionFormatVersion = highestProtocolVersionCompatibleWithRemotePeer();
-            m_gotTransactionEventHandler(
-                remotePeer().dataFormat,
-                std::move(payload),
-                std::move(cdbTransportHeader));
-                //cdbTransportHeader);
+            reportCommandReceived(payload);
             break;
         }
+
         case nx::p2p::MessageType::subscribeAll:
         {
             bool success = false;
@@ -114,6 +105,7 @@ void WebSocketTransactionTransport::onGotMessage(
             readTransactions();
             break;
         }
+
         default:
             NX_WARNING(this, lm("P2P message type '%1' is not allowed for cloud connect! "
                 "System id %2, source endpoint %3")
@@ -121,6 +113,34 @@ void WebSocketTransactionTransport::onGotMessage(
             setState(State::Error);
             break;
     }
+}
+
+void WebSocketTransactionTransport::reportCommandReceived(
+    QByteArray commandBuffer)
+{
+    TransactionTransportHeader cdbTransportHeader(m_protocolVersionRange.currentVersion());
+    cdbTransportHeader.endpoint = remotePeerEndpoint();
+    cdbTransportHeader.systemId = m_transactionLogReader->systemId();
+    cdbTransportHeader.connectionId = connectionGuid().toSimpleByteArray().toStdString();
+    //cdbTransportHeader.vmsTransportHeader //< Empty vms transport header
+    cdbTransportHeader.transactionFormatVersion = highestProtocolVersionCompatibleWithRemotePeer();
+
+    auto commandData = TransactionDeserializer::deserialize(
+        remotePeer().dataFormat,
+        cdbTransportHeader.peerId,
+        cdbTransportHeader.transactionFormatVersion,
+        std::move(commandBuffer));
+    if (!commandData)
+    {
+        NX_DEBUG(this, lm("Failed to deserialize command from %1")
+            .args(remotePeerEndpoint()));
+        setState(State::Error);
+        return;
+    }
+
+    m_gotTransactionEventHandler(
+        std::move(commandData),
+        std::move(cdbTransportHeader));
 }
 
 void WebSocketTransactionTransport::readTransactions()
@@ -190,7 +210,7 @@ void WebSocketTransactionTransport::setState(State state)
     nx::p2p::ConnectionBase::setState(state);
 }
 
-void WebSocketTransactionTransport::setOnGotTransaction(GotTransactionEventHandler handler)
+void WebSocketTransactionTransport::setOnGotTransaction(CommandHandler handler)
 {
     m_gotTransactionEventHandler = std::move(handler);
 }

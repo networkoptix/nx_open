@@ -20,6 +20,7 @@
 #include "transaction_transport_header.h"
 #include "websocket_transaction_transport.h"
 #include "transport/generic_transport.h"
+#include "transport/http_transport_acceptor.h"
 
 namespace nx {
 namespace data_sync_engine {
@@ -396,14 +397,12 @@ void ConnectionManager::removeConnection(const std::string& connectionId)
 
 void ConnectionManager::onGotTransaction(
     const std::string& connectionId,
-    Qn::SerializationFormat tranFormat,
-    QByteArray serializedTransaction,
+    std::unique_ptr<DeserializableCommandData> commandData,
     TransactionTransportHeader transportHeader)
 {
     m_transactionDispatcher->dispatchTransaction(
         std::move(transportHeader),
-        tranFormat,
-        std::move(serializedTransaction),
+        std::move(commandData),
         [this, locker = m_startedAsyncCallsCounter.getScopedIncrement(), connectionId](
             ResultCode resultCode)
         {

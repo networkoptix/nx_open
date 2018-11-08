@@ -1,5 +1,7 @@
 #include "generic_transport.h"
 
+#include <nx/utils/log/log.h>
+
 #include "../command_descriptor.h"
 #include "../transaction_transport.h"
 
@@ -45,6 +47,9 @@ GenericTransport::GenericTransport(
 
     m_commandPipeline->setOnConnectionClosed(
         [this](auto... args) { processConnectionClosedEvent(std::move(args)...); });
+
+    m_commandPipeline->setOnGotTransaction(
+        [this](auto&&... args) { processCommandData(std::move(args)...); });
 }
 
 GenericTransport::~GenericTransport()
@@ -75,9 +80,9 @@ ConnectionClosedSubscription& GenericTransport::connectionClosedSubscription()
 }
 
 void GenericTransport::setOnGotTransaction(
-    GotTransactionEventHandler handler)
+    CommandHandler handler)
 {
-    m_commandPipeline->setOnGotTransaction(std::move(handler));
+    m_gotCommandHandler = std::move(handler);
 }
 
 QnUuid GenericTransport::connectionGuid() const
@@ -215,6 +220,36 @@ void GenericTransport::processConnectionClosedEvent(
     SystemError::ErrorCode closeReason)
 {
     m_connectionClosedSubscription.notify(closeReason);
+}
+
+void GenericTransport::processCommandData(
+    Qn::SerializationFormat dataFormat,
+    const QByteArray& serializedCommand,
+    TransactionTransportHeader transportHeader)
+{
+    // TODO: #ak Processing specific commands.
+
+    if (!m_gotCommandHandler)
+        return;
+    
+    auto commandData = TransactionDeserializer::deserialize(
+        dataFormat,
+        transportHeader.peerId,
+        transportHeader.transactionFormatVersion,
+        std::move(serializedCommand));
+
+    if (!commandData)
+    {
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+            lm("Failed to deserialized %1 command received from (%2, %3)")
+            .args(dataFormat, transportHeader.systemId, transportHeader.endpoint.toString()));
+        m_commandPipeline->closeConnection();
+        return;
+    }
+
+    m_gotCommandHandler(
+        std::move(commandData),
+        std::move(transportHeader));
 }
 
 void GenericTransport::onTransactionsReadFromLog(

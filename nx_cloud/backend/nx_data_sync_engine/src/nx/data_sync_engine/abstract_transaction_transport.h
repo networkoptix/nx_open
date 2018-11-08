@@ -8,6 +8,7 @@
 #include <nx/utils/subscription.h>
 
 #include "serialization/serializable_transaction.h"
+#include "serialization/transaction_deserializer.h"
 #include "transaction_transport_header.h"
 #include "transport/connect_request_attributes.h"
 
@@ -19,9 +20,13 @@ using ConnectionClosedSubscription =
 using ConnectionClosedEventHandler =
     typename ConnectionClosedSubscription::NotificationCallback;
 
-using GotTransactionEventHandler = nx::utils::MoveOnlyFunc<void(
+using CommandDataHandler = nx::utils::MoveOnlyFunc<void(
     Qn::SerializationFormat,
     const QByteArray&,
+    TransactionTransportHeader)>;
+
+using CommandHandler = nx::utils::MoveOnlyFunc<void(
+    std::unique_ptr<DeserializableCommandData>,
     TransactionTransportHeader)>;
 
 //-------------------------------------------------------------------------------------------------
@@ -34,7 +39,7 @@ public:
 
     virtual void setOnConnectionClosed(ConnectionClosedEventHandler handler) = 0;
 
-    virtual void setOnGotTransaction(GotTransactionEventHandler handler) = 0;
+    virtual void setOnGotTransaction(CommandDataHandler handler) = 0;
 
     virtual QnUuid connectionGuid() const = 0;
 
@@ -55,7 +60,7 @@ public:
 
     virtual ConnectionClosedSubscription& connectionClosedSubscription() = 0;
 
-    virtual void setOnGotTransaction(GotTransactionEventHandler handler) = 0;
+    virtual void setOnGotTransaction(CommandHandler handler) = 0;
 
     virtual QnUuid connectionGuid() const = 0;
 

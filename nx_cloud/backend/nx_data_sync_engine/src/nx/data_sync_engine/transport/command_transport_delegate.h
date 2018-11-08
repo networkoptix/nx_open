@@ -18,7 +18,7 @@ public:
 
     virtual ConnectionClosedSubscription& connectionClosedSubscription() override;
 
-    virtual void setOnGotTransaction(GotTransactionEventHandler handler) override;
+    virtual void setOnGotTransaction(CommandHandler handler) override;
 
     virtual QnUuid connectionGuid() const override;
 

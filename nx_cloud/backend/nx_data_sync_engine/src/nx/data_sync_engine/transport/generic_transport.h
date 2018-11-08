@@ -43,7 +43,7 @@ public:
 
     virtual ConnectionClosedSubscription& connectionClosedSubscription() override;
 
-    virtual void setOnGotTransaction(GotTransactionEventHandler handler) override;
+    virtual void setOnGotTransaction(CommandHandler handler) override;
 
     virtual QnUuid connectionGuid() const override;
 
@@ -94,8 +94,14 @@ private:
     std::unique_ptr<TransactionLogReader> m_transactionLogReader;
     TransactionTransportHeader m_commonTransportHeaderOfRemoteTransaction;
     ConnectionClosedSubscription m_connectionClosedSubscription;
+    CommandHandler m_gotCommandHandler;
 
     void processConnectionClosedEvent(SystemError::ErrorCode closeReason);
+
+    void processCommandData(
+        Qn::SerializationFormat serializationFormat,
+        const QByteArray& serializedCommand,
+        TransactionTransportHeader transportHeader);
 
     void onTransactionsReadFromLog(
         ResultCode resultCode,

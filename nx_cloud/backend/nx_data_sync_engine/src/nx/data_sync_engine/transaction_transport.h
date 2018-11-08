@@ -59,7 +59,7 @@ public:
 
     virtual network::SocketAddress remotePeerEndpoint() const override;
     virtual void setOnConnectionClosed(ConnectionClosedEventHandler handler) override;
-    virtual void setOnGotTransaction(GotTransactionEventHandler handler) override;
+    virtual void setOnGotTransaction(CommandDataHandler handler) override;
     virtual QnUuid connectionGuid() const override;
     virtual void sendTransaction(
         TransactionTransportHeader transportHeader,
@@ -81,7 +81,7 @@ private:
     std::shared_ptr<::ec2::ConnectionGuardSharedState> m_connectionGuardSharedState;
     std::unique_ptr<::ec2::QnTransactionTransportBase> m_baseTransactionTransport;
     ConnectionClosedEventHandler m_connectionClosedEventHandler;
-    GotTransactionEventHandler m_gotTransactionEventHandler;
+    CommandDataHandler m_gotTransactionEventHandler;
     const std::string m_systemId;
     const std::string m_connectionId;
     const network::SocketAddress m_connectionOriginatorEndpoint;
