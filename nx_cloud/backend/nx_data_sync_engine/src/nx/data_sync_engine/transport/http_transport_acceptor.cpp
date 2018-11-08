@@ -236,13 +236,17 @@ nx::network::http::RequestResult
 
 void HttpTransportAcceptor::startOutgoingChannel(
     const std::string& connectionId,
-    int connectionSeq,
+    [[maybe_unused]] int connectionSeq,
     TransactionTransport* commandPipeline,
     nx::network::http::HttpServerConnection* httpConnection)
 {
     m_connectionManager->modifyConnectionByIdSafe(
         connectionId,
-        [connectionSeq, commandPipeline, httpConnection](
+        [
+#ifdef ENABLE_SEQ_VERIFICATION
+        connectionSeq,
+#endif
+         commandPipeline, httpConnection](
             transport::AbstractTransactionTransport* transportConnection)
         {
 #ifdef ENABLE_SEQ_VERIFICATION
