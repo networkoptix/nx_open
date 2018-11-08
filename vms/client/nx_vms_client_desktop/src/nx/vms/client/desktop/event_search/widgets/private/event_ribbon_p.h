@@ -2,6 +2,8 @@
 
 #include "../event_ribbon.h"
 
+#include <chrono>
+
 #include <QtCore/QModelIndex>
 #include <QtCore/QPointer>
 #include <QtCore/QScopedPointer>
@@ -11,6 +13,7 @@
 #include <QtCore/QSet>
 
 #include <ui/style/helper.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 #include <nx/utils/disconnect_helper.h>
 
@@ -19,7 +22,9 @@ class QVariantAnimation;
 
 namespace nx::vms::client::desktop {
 
-class EventRibbon::Private: public QObject
+class EventRibbon::Private:
+    public QObject,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
     using PrivateSignal = EventRibbon::QPrivateSignal;

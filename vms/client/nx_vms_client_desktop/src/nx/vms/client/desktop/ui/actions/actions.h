@@ -1054,6 +1054,7 @@ enum IDType
     ToggleMuteAction,
     JumpToLiveAction,
     ToggleSyncAction,
+    JumpToTimeAction,
 
     /* Debug actions. */
 
@@ -1126,6 +1127,11 @@ enum IDType
      * Go to the previous item on layout
      */
     GoToPreviousItemAction,
+
+    /**
+     * Go to the first item of specified resource on layout
+     */
+    GoToResourceAction,
 
     /**
      * Maximizes/Unmaximizes current item

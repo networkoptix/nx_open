@@ -484,19 +484,21 @@ bool EventTile::hasAutoClose() const
     return closeable() && d->autoCloseTimer;
 }
 
-int EventTile::autoCloseTimeMs() const
+std::chrono::milliseconds EventTile::autoCloseTime() const
 {
-    return hasAutoClose() ? d->autoCloseTimer->interval() : -1;
+    return std::chrono::milliseconds(hasAutoClose() ? d->autoCloseTimer->interval() : 0);
 }
 
-int EventTile::autoCloseRemainingMs() const
+std::chrono::milliseconds EventTile::autoCloseRemainingTime() const
 {
-    return hasAutoClose() ? d->autoCloseTimer->remainingTime() : -1;
+    return std::chrono::milliseconds(hasAutoClose() ? d->autoCloseTimer->remainingTime() : 0);
 }
 
-void EventTile::setAutoCloseTimeMs(int value)
+void EventTile::setAutoCloseTime(std::chrono::milliseconds value)
 {
-    if (value <= 0)
+    using namespace std::literals::chrono_literals;
+
+    if (value <= 0ms)
     {
         if (!d->autoCloseTimer)
             return;
@@ -518,13 +520,13 @@ void EventTile::setAutoCloseTimeMs(int value)
         if (!d->isRead)
             d->autoCloseTimer->stop();
 
-        d->autoCloseTimer->setInterval(value);
+        d->autoCloseTimer->setInterval(value.count());
     }
     else
     {
         d->autoCloseTimer = new QTimer(this);
         d->autoCloseTimer->setSingleShot(true);
-        d->autoCloseTimer->setInterval(value);
+        d->autoCloseTimer->setInterval(value.count());
 
         connect(d->autoCloseTimer, &QTimer::timeout, this, autoClose);
 

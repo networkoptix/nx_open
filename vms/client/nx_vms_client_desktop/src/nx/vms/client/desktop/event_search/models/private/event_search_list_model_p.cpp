@@ -126,7 +126,7 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
                 return QVariant();
             [[fallthrough]];
         case Qn::TimestampRole:
-            return QVariant::fromValue(eventParams.eventTimestampUsec);
+            return QVariant::fromValue(std::chrono::microseconds(eventParams.eventTimestampUsec));
 
         case Qn::ResourceListRole:
         {

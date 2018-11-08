@@ -52,11 +52,11 @@ milliseconds startTime(const DetectedObject& object)
     return duration_cast<milliseconds>(microseconds(object.firstAppearanceTimeUsec));
 }
 
-qint64 objectDurationUs(const DetectedObject& object)
+microseconds objectDuration(const DetectedObject& object)
 {
     // TODO: #vkutin Is this duration formula good enough for us?
     //   Or we need to add some "lastAppearanceDurationUsec"?
-    return object.lastAppearanceTimeUsec - object.firstAppearanceTimeUsec;
+    return microseconds(object.lastAppearanceTimeUsec - object.firstAppearanceTimeUsec);
 }
 
 static const auto lowerBoundPredicate =
@@ -160,13 +160,13 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             return attributes(object);
 
         case Qn::TimestampRole:
-            return object.firstAppearanceTimeUsec;
+            return QVariant::fromValue(std::chrono::microseconds(object.firstAppearanceTimeUsec));
 
         case Qn::PreviewTimeRole:
-            return QVariant::fromValue(previewParams(object).timestamp.count());
+            return QVariant::fromValue(previewParams(object).timestamp);
 
         case Qn::DurationRole:
-            return objectDurationUs(object);
+            return QVariant::fromValue(objectDuration(object));
 
         case Qn::HelpTopicIdRole:
             return Qn::Empty_Help;
@@ -647,14 +647,14 @@ QString AnalyticsSearchListModel::Private::description(
 
     const auto timeWatcher = q->context()->instance<nx::vms::client::core::ServerTimeWatcher>();
     const auto start = timeWatcher->displayTime(startTime(object).count());
-    const auto durationUs = objectDurationUs(object);
+    const auto duration = objectDuration(object);
 
     using namespace std::chrono;
     return lm("Timestamp: %1 us<br>%2<br>Duration: %3 us<br>%4").args( //< Not translatable, debug.
         object.firstAppearanceTimeUsec,
         start.toString(Qt::RFC2822Date),
-        durationUs,
-        core::HumanReadable::timeSpan(duration_cast<milliseconds>(microseconds(durationUs))));
+        duration.count(),
+        core::HumanReadable::timeSpan(duration_cast<milliseconds>(duration)));
 }
 
 QString AnalyticsSearchListModel::Private::attributes(

@@ -44,10 +44,10 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
             return QVariant::fromValue(event.id);
 
         case Qn::TimestampRole:
-            return QVariant::fromValue(event.timestampUs);
+            return QVariant::fromValue(event.timestamp);
 
         case Qn::PreviewTimeRole:
-            return QVariant::fromValue(event.previewTimeUs);
+            return QVariant::fromValue(event.previewTime);
 
         case Qt::ToolTipRole:
             return QVariant::fromValue(event.toolTip);
@@ -76,7 +76,7 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
             return QVariant::fromValue(event.extraAction);
 
         case Qn::TimeoutRole:
-            return event.removable ? event.lifetimeMs : -1;
+            return event.removable ? QVariant::fromValue(event.lifetime) : QVariant();
 
         default:
             return base_type::data(index, role);
@@ -124,25 +124,13 @@ bool EventListModel::removeRows(int row, int count, const QModelIndex& parent)
     return true;
 }
 
-bool EventListModel::setData(const QModelIndex& index, const QVariant& /*value*/, int role)
+bool EventListModel::defaultAction(const QModelIndex& index)
 {
-    if (!index.isValid() || index.model() != this)
-        return false;
+    const auto& event = getEvent(index.row());
+    if (event.actionId != ui::action::NoAction)
+        menu()->triggerIfPossible(event.actionId, event.actionParameters);
 
-    switch (role)
-    {
-        case Qn::DefaultNotificationRole:
-        case Qn::ActivateLinkRole:
-        {
-            const auto& event = getEvent(index.row());
-            if (event.actionId != ui::action::NoAction)
-                menu()->triggerIfPossible(event.actionId, event.actionParameters);
-            return true;
-        }
-
-        default:
-            return false;
-    }
+    return true;
 }
 
 } // namespace nx::vms::client::desktop

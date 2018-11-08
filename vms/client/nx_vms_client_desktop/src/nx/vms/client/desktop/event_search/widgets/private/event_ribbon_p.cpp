@@ -12,18 +12,19 @@
 
 #include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
-#include <utils/common/event_processors.h>
-#include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <ui/common/notification_levels.h>
-#include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/helper.h>
 #include <ui/style/nx_style_p.h>
 #include <ui/workaround/hidpi_workarounds.h>
+#include <utils/common/event_processors.h>
 
 #include <nx/api/mediaserver/image_request.h>
+#include <nx/vms/client/desktop/common/utils/custom_painted.h>
+#include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/utils/guarded_callback.h>
@@ -60,7 +61,7 @@ QSize minimumWidgetSize(QWidget* widget)
 } // namespace
 
 EventRibbon::Private::Private(EventRibbon* q):
-    QObject(),
+    QnWorkbenchContextAware(q),
     q(q),
     m_scrollBar(new QScrollBar(Qt::Vertical, q)),
     m_viewport(new QWidget(q))
@@ -201,8 +202,34 @@ EventTile* EventRibbon::Private::createTile(const QModelIndex& index)
         [this]()
         {
             const int index = indexOf(static_cast<EventTile*>(sender()));
-            if (m_model && index >= 0)
-                m_model->setData(m_model->index(index), QVariant(), Qn::DefaultNotificationRole);
+            if (!m_model || index < 0)
+                return;
+
+            const auto modelIndex = m_model->index(index);
+            if (m_model->setData(modelIndex, QVariant(), Qn::DefaultNotificationRole))
+                return;
+
+            const auto timestamp = modelIndex.data(Qn::TimestampRole);
+            if (!timestamp.isValid())
+                return;
+
+            const auto cameraList = modelIndex.data(Qn::ResourceListRole).value<QnResourceList>()
+                .filtered<QnVirtualCameraResource>();
+
+            const auto camera = cameraList.size() == 1
+                ? cameraList.back()
+                : QnVirtualCameraResourcePtr();
+
+            using namespace ui::action;
+
+            if (camera)
+            {
+                menu()->triggerIfPossible(GoToResourceAction, Parameters(camera)
+                    .withArgument(Qn::ForceRole, ini().raiseCameraFromClickedTile));
+            }
+
+            menu()->triggerIfPossible(JumpToTimeAction,
+                Parameters().withArgument(Qn::TimestampRole, timestamp));
         });
 
     connect(tile, &QWidget::customContextMenuRequested, this,
@@ -259,7 +286,7 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     tile->setFooterText(index.data(Qn::AdditionalTextRole).toString());
     tile->setToolTip(index.data(Qt::ToolTipRole).toString());
     tile->setCloseable(index.data(Qn::RemovableRole).toBool());
-    tile->setAutoCloseTimeMs(index.data(Qn::TimeoutRole).toInt());
+    tile->setAutoCloseTime(index.data(Qn::TimeoutRole).value<std::chrono::milliseconds>());
     tile->setAction(index.data(Qn::CommandActionRole).value<CommandActionPtr>());
 
     const auto resourceList = index.data(Qn::ResourceListRole);
@@ -283,7 +310,7 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     if (!camera)
         return;
 
-    const auto previewTimeUs = index.data(Qn::PreviewTimeRole).value<qint64>();
+    const auto previewTime = index.data(Qn::PreviewTimeRole).value<std::chrono::microseconds>();
     const auto previewCropRect = index.data(Qn::ItemZoomRectRole).value<QRectF>();
     const auto thumbnailWidth = previewCropRect.isEmpty()
         ? kDefaultThumbnailWidth
@@ -295,7 +322,7 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     nx::api::CameraImageRequest request;
     request.camera = camera;
     request.usecSinceEpoch =
-        previewTimeUs > 0 ? previewTimeUs : nx::api::ImageRequest::kLatestThumbnail;
+        previewTime.count() > 0 ? previewTime.count() : nx::api::ImageRequest::kLatestThumbnail;
     request.rotation = nx::api::ImageRequest::kDefaultRotation;
     request.size = QSize(thumbnailWidth, 0);
     request.imageFormat = nx::api::ImageRequest::ThumbnailFormat::jpg;
