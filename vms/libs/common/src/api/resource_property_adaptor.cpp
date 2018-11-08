@@ -61,7 +61,7 @@ void QnAbstractResourcePropertyAdaptor::setResourceInternal(const QnResourcePtr 
             return;
 
         if(m_resource) {
-            disconnect(m_resource, NULL, this, NULL);
+            directDisconnectAll();
             oldResource = m_resource;
             oldSerializedValue = m_serializedValue;
         }
@@ -70,10 +70,9 @@ void QnAbstractResourcePropertyAdaptor::setResourceInternal(const QnResourcePtr 
 
         if(m_resource)
         {
-            connect(
-                resource, &QnResource::propertyChanged,
-                this, &QnAbstractResourcePropertyAdaptor::at_resource_propertyChanged,
-                Qt::DirectConnection);
+            Qn::directConnect(
+                resource.get(), &QnResource::propertyChanged,
+                this, &QnAbstractResourcePropertyAdaptor::at_resource_propertyChanged);
         }
 
         changed = loadValueLocked(newSerializedValue);

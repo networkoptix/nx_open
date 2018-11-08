@@ -91,3 +91,9 @@ def test_fake_disk_twice_less_size(os_access):
     fake_disk.remove()
     fake_disk.mount(size_2)
     assert os_access._free_disk_space_bytes_on_all()[fake_disk.path] == pytest.approx(size_2, rel=0.05)
+
+
+def test_fake_disk_remove_twice(os_access):
+    fake_disk = os_access.fake_disk()
+    fake_disk.remove()
+    fake_disk.remove()

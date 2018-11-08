@@ -753,7 +753,7 @@ void ServerUpdateTool::atUpdateStatusResponse(bool success, rest::Handle handle,
     m_remoteUpdateStatus = std::move(remoteStatus);
 }
 
-rest::QnConnectionPtr ServerUpdateTool::getServerConnection(const QnMediaServerResourcePtr& server)
+rest::QnConnectionPtr ServerUpdateTool::getServerConnection(const QnMediaServerResourcePtr& server) const
 {
     return server ? server->restConnection() : rest::QnConnectionPtr();
 }
@@ -890,6 +890,35 @@ std::shared_ptr<ServerUpdatesModel> ServerUpdateTool::getModel()
     return m_updatesModel;
 }
 
+QString getServerUrl(QnCommonModule* commonModule, QString path)
+{
+    if (const auto connection = commonModule->ec2Connection())
+    {
+        QnConnectionInfo connectionInfo = connection->connectionInfo();
+        nx::utils::Url url = connectionInfo.ecUrl;
+        url.setPath(path);
+        bool hasSsl = commonModule->moduleInformation().sslAllowed;
+        url.setScheme(nx::network::http::urlSheme(hasSsl));
+        return url.toString(QUrl::RemoveUserInfo);
+    }
+    return "";
+}
+
+QString ServerUpdateTool::getUpdateStateUrl() const
+{
+    return getServerUrl(commonModule(), "/ec2/updateStatus");
+}
+
+QString ServerUpdateTool::getUpdateInformationUrl() const
+{
+    return getServerUrl(commonModule(), "/ec2/updateInformation");
+}
+
+QString ServerUpdateTool::getInstalledUpdateInfomationUrl() const
+{
+    return getServerUrl(commonModule(), "/ec2/installedUpdateInfomation");
+}
+
 nx::utils::SoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
 {
     nx::utils::SoftwareVersion minimalVersion = qnStaticCommon->engineVersion();
@@ -945,7 +974,12 @@ QUrl generateUpdatePackageUrl(const UpdateContents& contents, const QSet<QnUuid>
         systemInformationList.insert(server->getSystemInfo());
     }
 
-    query.addQueryItem(lit("client"), nx::vms::api::SystemInformation::currentSystemRuntime().replace(L' ', L'_'));
+    //QString clientRuntime = nx::vms::api::SystemInformation::currentSystemRuntime().replace(L' ', L'_');
+    auto clientPlatformModification = QnAppInfo::applicationPlatformModification();
+    auto clientArch = QnAppInfo::applicationArch();
+    QString clientRuntime = QString("%1_%2").arg(clientArch, clientPlatformModification);
+
+    query.addQueryItem(lit("client"), clientRuntime);
     for(const auto &systemInformation: systemInformationList)
         query.addQueryItem(lit("server"), systemInformation.toString().replace(L' ', L'_'));
 

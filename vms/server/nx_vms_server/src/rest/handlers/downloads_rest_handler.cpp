@@ -129,10 +129,22 @@ public:
         int httpStatusCode,
         const QnRestResult::Error& error,
         const QString& errorString);
+    /**
+     * Generate a response with parameter error.
+     * @param parameter - name of parater
+     * @param error - generic error code
+     * @returns - http status code
+     */
     int makeInvalidParameterError(
         const QString& parameter,
         const QnRestResult::Error& error = QnRestResult::InvalidParameter);
-    int makeFileError(const QString& fileName);
+    /**
+     * Generate a response with file error.
+     * @param fileName - path to a file with a problem
+     * @param at - code location, that got this sort of an error
+     * @returns - http status code
+     */
+    int makeFileError(const QString& fileName, const QString& at);
     int makeDownloaderError(ResultCode errorCode);
 
     bool hasDownloader() const;
@@ -289,7 +301,7 @@ int Helper::handleGetChunkChecksums(const QString& fileName)
 {
     const auto& fileInfo = downloader->fileInformation(fileName);
     if (!fileInfo.isValid())
-        return makeFileError(fileName);
+        return makeFileError(fileName, "handleGetChunkChecksums");
 
     const auto& checksums = downloader->getChunkChecksums(fileInfo.name);
 
@@ -409,7 +421,7 @@ int Helper::handleStatus(const QString& fileName)
     {
         const auto& fileInfo = downloader->fileInformation(fileName);
         if (!fileInfo.isValid())
-            return makeFileError(fileName);
+            return makeFileError(fileName, "handleStatus");
 
         QnFusionRestHandlerDetail::serializeJsonRestReply(
             fileInfo, params, result, resultContentType, QnRestResult());
@@ -485,13 +497,13 @@ int Helper::makeInvalidParameterError(
     return makeError(nx::network::http::StatusCode::unprocessableEntity, error, parameter);
 }
 
-int Helper::makeFileError(const QString& fileName)
+int Helper::makeFileError(const QString& fileName, const QString& at)
 {
-    NX_ERROR(this) << "makeFileError(" << fileName << ") - bad filename";
+    NX_ERROR(this) << at << "(" << fileName << ") - bad filename";
     return makeError(
         nx::network::http::StatusCode::badRequest,
         QnRestResult::CantProcessRequest,
-        lit("%1: file does not exist.").arg(fileName));
+        lit("%1(%2): file does not exist.").arg(at, fileName));
 }
 
 int Helper::makeDownloaderError(ResultCode errorCode)

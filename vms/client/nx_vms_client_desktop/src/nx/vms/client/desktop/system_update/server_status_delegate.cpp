@@ -98,6 +98,11 @@ public:
                     m_left->setHidden(false);
                     errorStyle = true;
                     break;
+                case StatusCode::latestUpdateInstalled:
+                    m_left->setText(tr("Installed"));
+                    m_left->setIcon(qnSkin->icon("text_buttons/ok.png"));
+                    m_left->setHidden(false);
+                    break;
                 case StatusCode::idle:
                     m_left->setHidden(true);
                     progressHidden = true;

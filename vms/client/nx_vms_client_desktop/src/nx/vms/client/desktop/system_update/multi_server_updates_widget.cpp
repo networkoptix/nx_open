@@ -1282,8 +1282,7 @@ void MultiServerUpdatesWidget::closePanelNotifications()
 void MultiServerUpdatesWidget::syncUpdateCheck()
 {
     bool isChecking = m_updateCheck.valid();
-    bool hasLatestVersion = m_updateSourceMode == UpdateSourceType::internet
-        && ((m_updateInfo.isValid() || m_updatesModel->lowestInstalledVersion() >= m_updateInfo.getVersion())
+    bool hasLatestVersion = ((m_updateInfo.isValid() || m_updatesModel->lowestInstalledVersion() >= m_updateInfo.getVersion())
         || m_updateInfo.error == nx::update::InformationError::noNewVersion);
 
     if (m_updateStateCurrent != WidgetUpdateState::ready
@@ -1523,26 +1522,30 @@ void MultiServerUpdatesWidget::loadDataToUi()
 
     if (m_showDebugData)
     {
-        QString debugState;
         QString combinePath = qnSettings->updateCombineUrl();
         if (combinePath.isEmpty())
             combinePath = QnAppInfo::updateGeneratorUrl();
 
-        debugState += QString("UpdateUrl=%1\n").arg(qnSettings->updateFeedUrl());
-        debugState += QString("UpdateFeedUrl=%1\n").arg(combinePath);
-        debugState += QString("Widget=%1\n").arg(toString(m_updateStateCurrent));
-        debugState += QString("Widget source=%1, Update source=%2\n").arg(toString(m_updateSourceMode), toString(m_updateInfo.sourceType));
-        debugState += QString("UploadTool=%1\n").arg(toString(m_serverUpdateTool->getUploaderState()));
-        debugState += QString("ClientTool=%1\n").arg(ClientUpdateTool::toString(m_clientUpdateTool->getState()));
-        debugState += QString("validUpdate=%1\n").arg(m_haveValidUpdate);
-        debugState += QString("targetVersion=%1\n").arg(m_updateInfo.info.version);
+        QStringList debugState = {
+            QString("UpdateUrl=<a href=\"%1\">%1</a>").arg(qnSettings->updateFeedUrl()),
+            QString("UpdateFeedUrl=<a href=\"%1\">%1</a>").arg(combinePath),
+            QString("Widget=%1").arg(toString(m_updateStateCurrent)),
+            QString("Widget source=%1, Update source=%2").arg(toString(m_updateSourceMode), toString(m_updateInfo.sourceType)),
+            QString("UploadTool=%1").arg(toString(m_serverUpdateTool->getUploaderState())),
+            QString("ClientTool=%1").arg(ClientUpdateTool::toString(m_clientUpdateTool->getState())),
+            QString("validUpdate=%1").arg(m_haveValidUpdate),
+            QString("targetVersion=%1").arg(m_updateInfo.info.version),
+            QString("<a href=\"%1\">/ec2/updateState</a>").arg(m_serverUpdateTool->getUpdateStateUrl()),
+            QString("<a href=\"%1\">/ec2/updateInformation</a>").arg(m_serverUpdateTool->getUpdateInformationUrl()),
+            QString("<a href=\"%1\">/ec2/installedUpdateInformation</a>").arg(m_serverUpdateTool->getInstalledUpdateInfomationUrl()),
+        };
 
         if (m_updateInfo.error != nx::update::InformationError::noError)
         {
             QString internalError = nx::update::toString(m_updateInfo.error);
-            debugState += QString("updateInfoError=%1\n").arg(internalError);
+            debugState << QString("updateInfoError=%1").arg(internalError);
         }
-        ui->debugStateLabel->setText(debugState);
+        ui->debugStateLabel->setText(debugState.join("<br>"));
     }
 
     ui->debugStateLabel->setVisible(m_showDebugData);
