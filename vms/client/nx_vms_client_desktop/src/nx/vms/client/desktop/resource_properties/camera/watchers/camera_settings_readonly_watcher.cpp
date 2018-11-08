@@ -39,6 +39,11 @@ void CameraSettingsReadOnlyWatcher::setCameras(const QnVirtualCameraResourceList
     updateReadOnly();
 }
 
+bool CameraSettingsReadOnlyWatcher::isReadOnly() const
+{
+    return m_readOnly;
+}
+
 void CameraSettingsReadOnlyWatcher::afterContextInitialized()
 {
     connect(context(), &QnWorkbenchContext::userChanged, this,

@@ -42,7 +42,9 @@ protected:
 private:
     QDialogButtonBox::StandardButton showConfirmationDialog();
 
-    void loadState(const CameraSettingsDialogState& state);
+    void updateState();
+
+    void updateButtonsAvailability();
 
 private:
     Q_DISABLE_COPY(CameraSettingsDialog)
