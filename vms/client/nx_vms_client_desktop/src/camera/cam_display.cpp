@@ -2093,12 +2093,12 @@ QnMediaResourcePtr QnCamDisplay::resource() const
 
 qint64 QnCamDisplay::initialLiveBufferMkSecs()
 {
-    return qMin(qnSettings->initialLiveBufferMSecs() * 1000ll, maximumLiveBufferMkSecs());
+    return qMin(qnSettings->initialLiveBufferMs() * 1000ll, maximumLiveBufferMkSecs());
 }
 
 qint64 QnCamDisplay::maximumLiveBufferMkSecs()
 {
-    return qnSettings->maximumLiveBufferMSecs() * 1000ll;
+    return qnSettings->maximumLiveBufferMs() * 1000ll;
 }
 
 Qn::MediaStreamEvent QnCamDisplay::lastMediaEvent() const

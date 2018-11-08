@@ -33,6 +33,7 @@
 
 #include <utils/common/delayed.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
+#include <nx/utils/app_info.h>
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
@@ -244,10 +245,13 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     layout->addWidget(newActionButton(
         action::MinimizeAction,
         kControlButtonSize));
-    layout->addWidget(newActionButton(
-        action::EffectiveMaximizeAction,
-        Qn::MainWindow_Fullscreen_Help,
-        kControlButtonSize));
+    if (!nx::utils::AppInfo::isMacOsX()) // Remove me later, workaround for 4.0 beta (VMS-11557).
+    {
+        layout->addWidget(newActionButton(
+            action::EffectiveMaximizeAction,
+            Qn::MainWindow_Fullscreen_Help,
+            kControlButtonSize));
+    }
     layout->addWidget(newActionButton(
         action::ExitAction,
         kControlButtonSize));

@@ -267,8 +267,10 @@ void QnDisconnectFromCloudDialogPrivate::unbindSystem()
     QString updatedPassword = scenario == Scenario::CloudOwnerOnly
         ? resetPasswordField->text()
         : QString();
+    const QString currentPassword = authorizePasswordField->text();
 
-    serverConnection->detachSystemFromCloud(updatedPassword, handleReply, q->thread());
+    serverConnection->detachSystemFromCloud(
+        currentPassword, updatedPassword, handleReply, q->thread());
 }
 
 void QnDisconnectFromCloudDialogPrivate::showFailure(const QString &message)

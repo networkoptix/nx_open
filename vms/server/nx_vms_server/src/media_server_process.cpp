@@ -1234,6 +1234,8 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIp)
     if (isStopping())
         return;
 
+    NX_DEBUG(this, "Server %1 has changed publicIp to value %2", commonModule()->moduleGUID(), publicIp);
+
     QnPeerRuntimeInfo localInfo = commonModule()->runtimeInfoManager()->localInfo();
     localInfo.data.publicIP = publicIp.toString();
     commonModule()->runtimeInfoManager()->updateLocalItem(localInfo);
@@ -1771,6 +1773,8 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc POST /api/changeCameraPassword
      * Change password for already existing user on a camera.
+     * This method is allowed for cameras with 'SetUserPasswordCapability' capability only.
+     * Otherwise it returns an error in the JSON result.
      * %permissions Administrator.
      * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
      *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).

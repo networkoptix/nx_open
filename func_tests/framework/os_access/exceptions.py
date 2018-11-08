@@ -43,7 +43,12 @@ class Timeout(Exception):
         self.timeout_sec = timeout_sec
 
 
-class BadPath(Exception):
+class FileSystemError(OSError):
+    def __init__(self, errno, strerror):  # type: (int, str) -> ...
+        super(FileSystemError, self).__init__(errno, strerror)
+
+
+class BadPath(FileSystemError):
     pass
 
 
@@ -51,17 +56,15 @@ class DoesNotExist(BadPath):
     pass
 
 
-class CannotDownload(DoesNotExist):
+class CannotDownload(Exception):
     pass
 
 
-class AlreadyExists(Exception):
-    def __init__(self, message, path=None):
-        super(AlreadyExists, self).__init__(message)
-        self.path = path
+class AlreadyExists(FileSystemError):
+    pass
 
 
-class BadParent(Exception):
+class BadParent(FileSystemError):
     pass
 
 
@@ -73,7 +76,7 @@ class NotAFile(BadPath):
     pass
 
 
-class NotEmpty(Exception):
+class NotEmpty(FileSystemError):
     pass
 
 
