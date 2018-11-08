@@ -28,7 +28,7 @@ add_subdirectory(generic_multicast_plugin)
 
 add_subdirectory(analytics)
 
-if (NOT box STREQUAL "bpi")
+if (NOT box STREQUAL "bpi" AND NOT box STREQUAL "bananapi")
     add_subdirectory(usb_cam)
 endif()
 
