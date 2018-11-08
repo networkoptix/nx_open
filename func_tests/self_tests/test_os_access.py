@@ -66,8 +66,9 @@ def test_disk_space_limit_twice(os_access):
 
 def test_fake_disk(os_access):
     size = 500 * 1000 * 1000
-    mount_point = os_access.fake_disk().mount(size)
-    assert os_access._free_disk_space_bytes_on_all()[mount_point] == pytest.approx(size, rel=0.05)
+    fake_disk = os_access.fake_disk()
+    fake_disk.mount(size)
+    assert os_access._free_disk_space_bytes_on_all()[fake_disk.path] == pytest.approx(size, rel=0.05)
 
 
 def test_fake_disk_twice(os_access):
