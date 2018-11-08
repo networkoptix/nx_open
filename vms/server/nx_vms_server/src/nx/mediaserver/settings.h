@@ -292,7 +292,7 @@ public:
             if (!value.isEmpty())
                 return value;
 
-            return closeDirPath(obtainDataDirectory()) + "backup";
+            return closeDirPath(dataDir()) + "backup";
         }
     };
     Option<std::chrono::milliseconds> dbBackupPeriodMS{this, "dbBackupPeriodMS",

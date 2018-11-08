@@ -1,4 +1,4 @@
-#include <QtCore/QString>
+    #include <QtCore/QString>
 #include <nx/utils/uuid.h>
 #include <QtGui/QDesktopServices>
 #include <QtCore/QDir>
@@ -137,12 +137,11 @@ bool Utils::timeToMakeDbBackup() const
         return true; //< Backups for the current server version haven't been found, let's make one.
 
     NX_ASSERT(!thisVersionBackupFilesData.isEmpty());
-    const auto timeFromPreviousBackupShiftedByBackupPeriod =
-        thisVersionBackupFilesData.front().timestamp
-        + serverModule()->settings().dbBackupPeriodMS().count();
-
-    if (timeFromPreviousBackupShiftedByBackupPeriod < qnSyncTime->currentMSecsSinceEpoch())
+    if (qnSyncTime->currentMSecsSinceEpoch() - thisVersionBackupFilesData.front().timestamp
+        > serverModule()->settings().dbBackupPeriodMS().count())
+    {
         return true;
+    }
 
     return false;
 }

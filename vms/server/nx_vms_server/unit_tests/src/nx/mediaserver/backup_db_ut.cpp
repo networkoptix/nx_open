@@ -126,6 +126,7 @@ protected:
     {
         m_server = std::make_unique<MediaServerLauncher>(/* tmpDir */ "");
         m_server->addSetting(QnServer::kNoInitStoragesOnStartup, "1");
+        m_server->addSetting("dataDir", *m_dirResource.getDirName());
     }
 
     void whenServerLaunched()
@@ -160,7 +161,7 @@ protected:
 
     void givenBackupRotationPeriod(std::chrono::milliseconds period)
     {
-        m_server->addSetting("dbBackupPeriodMS", 
+        m_server->addSetting("dbBackupPeriodMS",
             QString::fromStdString(std::to_string(period.count())));
     }
 
@@ -199,6 +200,7 @@ private:
     QList<QString> m_backupFilesCreated;
     QString m_backupDir;
     QString m_dataDir;
+    nx::ut::utils::WorkDirResource m_dirResource;
 
     void waitForAllBackupFilesToBeCreated()
     {
