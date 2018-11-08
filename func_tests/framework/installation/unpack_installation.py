@@ -68,7 +68,7 @@ class UnpackedMediaserverGroup(object):
                 'Provided package was built with another customization. '
                 'Expected: {}. But files in unpacked dir are: {}'.format(
                     self._installer.customization.linux_subdir,
-                    self._unpack_root_dir.joinpath('opt').glob('*'),
+                    list(self._unpack_root_dir.joinpath('opt').glob('*')),
                     ),
                 )
 
@@ -121,7 +121,7 @@ class CopyInstallation(CustomPosixInstallation):
         if force or self.should_reinstall(installer):
             unpack_dir = self._installation_group.get_unpacked_dist_dir(installer)
             self.dir.ensure_empty_dir()
-            self.posix_access.run_command(['cp', '-a'] + unpack_dir.glob('*') + [self.dir])
+            self.posix_access.run_command(['cp', '-a'] + list(unpack_dir.glob('*')) + [self.dir])
             self._write_control_script()
             self._write_server_conf()
             assert self.is_valid()
