@@ -39,18 +39,17 @@ class SyncWaitTimeout(WaitTimeout):
         self.mismatched_result = mismatched_result
         self.diff_list = diff_list
 
-    def log_and_dump_results(self, artifact_factory):
+    def log_and_dump_results(self, artifacts_dir):
         _logger.info('Servers %s and %s still has unmatched %r:',
                      self.first_server, self.mismatched_server, self.api_path)
         log_diff_list(_logger.info, self.diff_list)
-        self._save_json_artifact(artifact_factory, self.first_server, self.first_result)
-        self._save_json_artifact(artifact_factory, self.mismatched_server, self.mismatched_result)
+        self._save_json_artifact(artifacts_dir, self.first_server, self.first_result)
+        self._save_json_artifact(artifacts_dir, self.mismatched_server, self.mismatched_result)
 
-    def _save_json_artifact(self, artifact_factory, server, value):
-        method_name = self.api_path.replace('/', '-')
-        part_list = ['result', method_name, server.name]
-        artifact = artifact_factory.make_artifact(part_list, name='%s-%s' % (method_name, server.name))
-        file_path = artifact.save_as_json(value)
+    def _save_json_artifact(self, artifacts_dir, server, value):
+        file_name = 'result-{}-{}'.format(self.api_path.replace('/', '-'), server.name)
+        file_path = artifacts_dir / file_name
+        file_path.write_json(value)
         _logger.debug('Results from %s from server %s %s are stored to %s',
                       self.api_path, server.name, server, file_path)
 
@@ -110,7 +109,7 @@ def wait_until_no_transactions_from_servers(server_list, timeout_sec):
 
 
 def wait_for_servers_synced(
-        artifact_factory,
+        artifacts_dir,
         server_list,
         timeout_sec=DEFAULT_TIMEOUT_SEC,
         bus_timeout_sec=DEFAULT_BUS_TIMEOUT_SEC,
@@ -123,5 +122,5 @@ def wait_for_servers_synced(
         wait_for_api_path_match(
             server_list, 'ec2/getTransactionLog', transaction_log_differ, timeout_sec, api_path_getter)
     except SyncWaitTimeout as e:
-        e.log_and_dump_results(artifact_factory)
+        e.log_and_dump_results(artifacts_dir)
         raise

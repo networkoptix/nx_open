@@ -151,8 +151,7 @@ def dump_full_info(artifacts_dir, env):
     _logger.info('Making final dump for first server %s:', server)
     with context_logger(_dumper_logger, 'framework.mediaserver_api'):
         full_info = server.api.generic.get('ec2/getFullInfo')
-    with artifacts_dir.joinpath('full-info.json').open('wb') as f:
-        json.dump(full_info, f, indent=2)
+    artifacts_dir.joinpath('full-info.json').write_json(full_info)
 
 
 @context_logger(_post_check_logger, 'framework.http_api')
@@ -165,7 +164,7 @@ def perform_post_checks(env):
     _logger.info('Perform test post checks: done.')
 
 
-def test_scalability(artifact_factory, artifacts_dir, metrics_saver, load_averge_collector, config, env):
+def test_scalability(artifacts_dir, metrics_saver, load_averge_collector, config, env):
     try:
         with load_averge_collector(env.os_access_set, 'merge'):
             try:
@@ -176,7 +175,7 @@ def test_scalability(artifact_factory, artifacts_dir, metrics_saver, load_averge
                     config.MESSAGE_BUS_SERVER_COUNT,
                     )
             except SyncWaitTimeout as e:
-                e.log_and_dump_results(artifact_factory)
+                e.log_and_dump_results(artifacts_dir)
                 make_core_dumps(env)
                 raise
         metrics_saver.save('merge_duration', datetime_local_now() - env.merge_start_time)
