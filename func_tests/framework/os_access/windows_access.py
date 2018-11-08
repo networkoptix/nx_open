@@ -244,7 +244,7 @@ class _FakeDisk(BaseFakeDisk):
                 'SELECT VDISK file={image_path}' '\r\n'
                 'DETACH VDISK' '\r\n'  # When detaching, volume is unmounted automatically.
             )
-            script = script_template.format(image_path=self._image_path, letter=self._letter)
+            script = script_template.format(image_path=self._image_path)
             self._diskpart('remove', script, 5)
             _logger.debug("Delete virtual disk file: %s", self._image_path)
             self._image_path.unlink()
