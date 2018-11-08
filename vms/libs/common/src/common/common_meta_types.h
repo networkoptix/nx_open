@@ -1,12 +1,12 @@
-#ifndef QN_COMMON_META_TYPES_H
-#define QN_COMMON_META_TYPES_H
+#pragma once
+
+#include <chrono>
 
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/uuid.h>
 #include <QtCore/QMetaType>
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QAuthenticator>
-
 
 // TODO: #Elric move to model functions?
 /**
@@ -23,7 +23,6 @@ inline QDataStream &operator>>(QDataStream &stream, ENUM &value) {              
     return stream;                                                              \
 }
 
-
 /**
  * Convenience class for uniform initialization of metatypes in common module.
  */
@@ -37,4 +36,8 @@ Q_DECLARE_METATYPE(QAuthenticator);
 Q_DECLARE_METATYPE(Qt::ConnectionType);
 Q_DECLARE_METATYPE(Qt::Orientations);
 
-#endif // QN_COMMON_META_TYPES_H
+Q_DECLARE_METATYPE(std::chrono::hours);
+Q_DECLARE_METATYPE(std::chrono::minutes);
+Q_DECLARE_METATYPE(std::chrono::seconds);
+Q_DECLARE_METATYPE(std::chrono::milliseconds);
+Q_DECLARE_METATYPE(std::chrono::microseconds);
