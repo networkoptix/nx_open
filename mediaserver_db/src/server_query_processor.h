@@ -209,7 +209,7 @@ inline QnTransaction<nx::vms::api::ResourceParamWithRefData> amendTranIfNeeded(
     const QnTransaction<nx::vms::api::ResourceParamWithRefData>& originalTran)
 {
     auto resultTran = originalTran;
-    fixRequestDataIfNeeded(&resultTran.params);
+    fixRequestDataIfNeeded(static_cast<nx::vms::api::ResourceParamData* const>(&resultTran.params));
 
     return resultTran;
 }
@@ -236,6 +236,15 @@ inline void amendOutputDataIfNeeded(
 
 inline void amendOutputDataIfNeeded(
     const Qn::UserAccessData& accessData,
+    nx::vms::api::ResourceParamWithRefData* paramData)
+{
+    return amendOutputDataIfNeeded(
+        accessData,
+        static_cast<nx::vms::api::ResourceParamData*>(paramData));
+}
+
+inline void amendOutputDataIfNeeded(
+    const Qn::UserAccessData& accessData,
     std::vector<nx::vms::api::ResourceParamData>* paramDataList)
 {
     for (auto& paramData: *paramDataList)
@@ -247,7 +256,11 @@ inline void amendOutputDataIfNeeded(
     std::vector<nx::vms::api::ResourceParamWithRefData>* paramWithRefDataList)
 {
     for (auto& paramData: *paramWithRefDataList)
-        amendOutputDataIfNeeded(accessData, &paramData);
+    {
+        amendOutputDataIfNeeded(
+            accessData,
+            static_cast<nx::vms::api::ResourceParamData*>(&paramData));
+    }
 }
 
 class ServerQueryProcessor
@@ -1014,7 +1027,9 @@ void PostProcessTransactionFunction::operator()(
     const QnTransaction<T>& tran) const
 {
     messageBus->sendTransaction(tran);
-    aux::triggerNotification(auditData, tran);
+    auto amendedTran = tran;
+    amendOutputDataIfNeeded(Qn::kSystemAccess, &amendedTran.params);
+    aux::triggerNotification(auditData, amendedTran);
 }
 
 } // namespace detail
