@@ -1,7 +1,8 @@
 
 set SDK_NAME=nx_sdk
 set TARGET_DIR=%SDK_NAME%
-set SERVER_PLUGINS_DIR=..\vms\server\plugins
+set SERVER_PLUGINS_DIR=..\plugins
+set NX_SDK_DIR=..\..\..\nxlib\nx_sdk
 
 rmdir /S /Q %TARGET_DIR%
 
@@ -13,11 +14,11 @@ mkdir %TARGET_DIR%\sample\axiscamplugin\
 copy /Y readme.txt %TARGET_DIR%\
 
 @rem Copying integration headers
-copy /Y ..\nxlib\nx_sdk\src\plugins\plugin_api.h %TARGET_DIR%\include\plugins\
-copy /Y ..\nxlib\nx_sdk\src\plugins\plugin_tools.h %TARGET_DIR%\include\plugins\
-copy /Y ..\nxlib\nx_sdk\src\plugins\plugin_container_api.h %TARGET_DIR%\include\plugins\
-copy /Y ..\nxlib\nx_sdk\src\camera\camera_plugin.h %TARGET_DIR%\include\plugins\
-copy /Y ..\nxlib\nx_sdk\src\camera\camera_plugin_types.h %TARGET_DIR%\include\plugins\
+copy /Y %NX_SDK_DIR%\src\plugins\plugin_api.h %TARGET_DIR%\include\plugins\
+copy /Y %NX_SDK_DIR%\src\plugins\plugin_tools.h %TARGET_DIR%\include\plugins\
+copy /Y %NX_SDK_DIR%\src\plugins\plugin_container_api.h %TARGET_DIR%\include\plugins\
+copy /Y %NX_SDK_DIR%\src\camera\camera_plugin.h %TARGET_DIR%\include\plugins\
+copy /Y %NX_SDK_DIR%\src\camera\camera_plugin_types.h %TARGET_DIR%\include\plugins\
 
 @rem Copying AXIS plugin
 set PLUGIN_NAME=axiscamplugin

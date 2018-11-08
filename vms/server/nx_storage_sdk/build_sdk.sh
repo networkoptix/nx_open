@@ -8,6 +8,7 @@ DOXYCHECK=`command -v doxygen`
 SDK_NAME=nx_storage_sdk
 TARGET_DIR=$SDK_NAME
 VERSION=1.6.0
+NX_SDK_DIR=../../../nxlib/nx_sdk
 
 if [ -z "$DOXYCHECK" ]; then
      sudo apt-get install -y doxygen
@@ -30,7 +31,7 @@ mkdir -p $TARGET_DIR/sample/ftpstorageplugin
 cp -f readme.txt $TARGET_DIR
 
 #Copying integration headers
-cp -f ../nxlib/nx_sdk/src/plugins/plugin_api.h $TARGET_DIR/include/plugins/
+cp -f $NX_SDK_DIR/src/plugins/plugin_api.h $TARGET_DIR/include/plugins/
 cp -f ../vms/server/nx_vms_server/src/plugins/storage/third_party/third_party_storage.h $TARGET_DIR/include/plugins/storage/third_party
 
 pluginName=ftpstorageplugin

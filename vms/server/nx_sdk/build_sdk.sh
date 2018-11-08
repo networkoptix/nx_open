@@ -8,7 +8,8 @@ DOXYCHECK=`command -v doxygen`
 SDK_NAME=nx_sdk
 TARGET_DIR=$SDK_NAME
 VERSION=1.6.0
-SERVER_PLUGINS_DIR=../vms/server/plugins
+SERVER_PLUGINS_DIR=../plugins
+NX_SDK_DIR=../../../nxlib/nx_sdk
 
 if [ -z "$DOXYCHECK" ]; then
      sudo apt-get install -y doxygen
@@ -29,11 +30,11 @@ mkdir -p $TARGET_DIR/include/plugins/
 cp -f readme.txt $TARGET_DIR
 
 #Copying integration headers
-cp -f ../nxlib/nx_sdk/src/plugins/plugin_api.h $TARGET_DIR/include/plugins/
-cp -f ../nxlib/nx_sdk/src/plugins/plugin_tools.h $TARGET_DIR/include/plugins/
-cp -f ../nxlib/nx_sdk/src/plugins/plugin_container_api.h $TARGET_DIR/include/plugins/
-cp -f ../nxlib/nx_sdk/src/camera/camera_plugin.h $TARGET_DIR/include/plugins/
-cp -f ../nxlib/nx_sdk/src/camera/camera_plugin_types.h $TARGET_DIR/include/plugins/
+cp -f $NX_SDK_DIR/src/plugins/plugin_api.h $TARGET_DIR/include/plugins/
+cp -f $NX_SDK_DIR/src/plugins/plugin_tools.h $TARGET_DIR/include/plugins/
+cp -f $NX_SDK_DIR/src/plugins/plugin_container_api.h $TARGET_DIR/include/plugins/
+cp -f $NX_SDK_DIR/src/camera/camera_plugin.h $TARGET_DIR/include/plugins/
+cp -f $NX_SDK_DIR/src/camera/camera_plugin_types.h $TARGET_DIR/include/plugins/
 
 PLUGINS=(axiscamplugin image_library_plugin rpi_cam)
 
