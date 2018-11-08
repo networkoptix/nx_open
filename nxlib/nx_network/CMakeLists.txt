@@ -12,6 +12,7 @@ nx_add_target(nx_network LIBRARY ${library_type} NO_MOC
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/app_info_impl.cpp"
     PUBLIC_LIBS
+        Qt5::Concurrent
         Qt5::Network
         openssl
         nx_kit
