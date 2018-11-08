@@ -890,46 +890,33 @@ std::shared_ptr<ServerUpdatesModel> ServerUpdateTool::getModel()
     return m_updatesModel;
 }
 
-QString ServerUpdateTool::getUpdateStateUrl() const
+QString getServerUrl(QnCommonModule* commonModule, QString path)
 {
-    if (const auto connection = commonModule()->ec2Connection())
+    if (const auto connection = commonModule->ec2Connection())
     {
         QnConnectionInfo connectionInfo = connection->connectionInfo();
         nx::utils::Url url = connectionInfo.ecUrl;
-        url.setPath("/ec2/updateStatus");
-        bool hasSsl = commonModule()->moduleInformation().sslAllowed;
+        url.setPath(path);
+        bool hasSsl = commonModule->moduleInformation().sslAllowed;
         url.setScheme(nx::network::http::urlSheme(hasSsl));
-        return url.toString();
+        return url.toString(QUrl::RemoveUserInfo);
     }
     return "";
+}
+
+QString ServerUpdateTool::getUpdateStateUrl() const
+{
+    return getServerUrl(commonModule(), "/ec2/updateStatus");
 }
 
 QString ServerUpdateTool::getUpdateInformationUrl() const
 {
-    if (const auto connection = commonModule()->ec2Connection())
-    {
-        QnConnectionInfo connectionInfo = connection->connectionInfo();
-        nx::utils::Url url = connectionInfo.ecUrl;
-        url.setPath("/ec2/updateInformation");
-        bool hasSsl = commonModule()->moduleInformation().sslAllowed;
-        url.setScheme(nx::network::http::urlSheme(hasSsl));
-        return url.toString();
-    }
-    return "";
+    return getServerUrl(commonModule(), "/ec2/updateInformation");
 }
 
 QString ServerUpdateTool::getInstalledUpdateInfomationUrl() const
 {
-    if (const auto connection = commonModule()->ec2Connection())
-    {
-        QnConnectionInfo connectionInfo = connection->connectionInfo();
-        nx::utils::Url url = connectionInfo.ecUrl;
-        url.setPath("/ec2/installedUpdateInfomation");
-        bool hasSsl = commonModule()->moduleInformation().sslAllowed;
-        url.setScheme(nx::network::http::urlSheme(hasSsl));
-        return url.toString();
-    }
-    return "";
+    return getServerUrl(commonModule(), "/ec2/installedUpdateInfomation");
 }
 
 nx::utils::SoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
