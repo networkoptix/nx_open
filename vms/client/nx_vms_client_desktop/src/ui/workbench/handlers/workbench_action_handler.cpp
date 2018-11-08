@@ -162,7 +162,7 @@
 #include <utils/math/math.h>
 #include <nx/utils/std/cpp14.h>
 #include <utils/screen_manager.h>
-#include <vms_gateway_embeddable.h>
+#include <nx/cloud/vms_gateway/vms_gateway_embeddable.h>
 #include <utils/unity_launcher_workaround.h>
 #include <utils/connection_diagnostics_helper.h>
 #include <nx/vms/client/desktop/ui/workbench/layouts/layout_factory.h>

@@ -191,7 +191,7 @@ add_subdirectory(dependencies)
 
 if (withMediaServer OR withTestCamera OR withTrayTool OR withDesktopClient OR withMobileClient OR withClouds)
     add_subdirectory(nxlib)
-    add_subdirectory(nx_cloud)
+    add_subdirectory(cloud)
 endif()
 
 #add_subdirectory(_axis_controller)

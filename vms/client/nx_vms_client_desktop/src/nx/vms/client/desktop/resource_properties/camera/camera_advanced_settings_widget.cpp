@@ -24,7 +24,7 @@
 #include <ui/style/webview_style.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_advanced_settings_web_page.h>
 
-#include <vms_gateway_embeddable.h>
+#include <nx/cloud/vms_gateway/vms_gateway_embeddable.h>
 #include "camera_advanced_settings_web_page.h"
 
 namespace {
