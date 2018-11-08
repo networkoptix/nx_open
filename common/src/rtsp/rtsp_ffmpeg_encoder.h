@@ -10,7 +10,7 @@
 class QnRtspFfmpegEncoder: public AbstractRtspEncoder
 {
 public:
-    QnRtspFfmpegEncoder(nx::metrics::Storage* metrics);
+    QnRtspFfmpegEncoder(const DecoderConfig& config, nx::metrics::Storage* metrics);
 
     virtual QString getSdpMedia(bool isVideo, int trackId) override;
 
@@ -26,6 +26,7 @@ public:
     void setAdditionFlags(quint16 value);
 
 private:
+    DecoderConfig m_config;
     bool m_gotLivePacket;
     QnConstMediaContextPtr m_contextSent;
     QMap<AVCodecID, QnConstMediaContextPtr> m_generatedContexts;

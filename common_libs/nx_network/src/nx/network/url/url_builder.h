@@ -83,6 +83,10 @@ public:
     {
         return appendPath(std::string(path), mode);
     }
+    Builder& appendPath(const QByteArray& path, QUrl::ParsingMode mode = QUrl::DecodedMode)
+    {
+        return appendPath(QString::fromUtf8(path), mode);
+    }
     Builder& setQuery(const QString& query, QUrl::ParsingMode mode = QUrl::DecodedMode)
     {
         m_url.setQuery(query, mode);

@@ -17,7 +17,9 @@ public:
 
     virtual ~NativeMediaEncoder() = default;
 
-    virtual int getResolutionList(nxcip::ResolutionInfo * infoList, int * infoListCount) const override;
+    virtual int getResolutionList(
+        nxcip::ResolutionInfo * infoList,
+        int * infoListCount) const override;
 
     virtual nxcip::StreamReader* getLiveStreamReader() override;
 

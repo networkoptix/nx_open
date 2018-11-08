@@ -20,15 +20,6 @@ class QTimer;
 
 namespace nx::client::desktop {
 
-struct MotionChunksRequest
-{
-    QList<QnUuid> cameraIds;
-    QList<QRegion> filter; //< Used only in single camera mode.
-    QnTimePeriod period;
-    Qt::SortOrder order = Qt::AscendingOrder;
-    int limit = 0;
-};
-
 struct MotionChunk
 {
     QnUuid cameraId;
@@ -71,9 +62,10 @@ private:
     bool commitInternal(const QnTimePeriod& periodToCommit, Iter prefetchBegin, Iter prefetchEnd,
         int position, bool handleOverlaps);
 
-    using GetCallback = std::function<void(bool, rest::Handle, std::vector<MotionChunk>&&)>;
-    rest::Handle getMotion(
-        const QnTimePeriod& period, GetCallback callback, Qt::SortOrder order, int limit);
+    rest::Handle getMotion(const QnTimePeriod& period, Qt::SortOrder order, int limit);
+
+    Q_SLOT void processReceivedTimePeriods(
+        int status, const MultiServerPeriodDataList& timePeriods, int requestId);
 
     void fetchLive();
 

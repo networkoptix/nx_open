@@ -375,7 +375,6 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(
 {
     Q_D(QnProgressiveDownloadingConsumer);
     d->serverModule = serverModule;
-    d->transcoder.reset(new QnFfmpegTranscoder(owner->commonModule()->metrics()));
 
     d->socket->setRecvTimeout(CONNECTION_TIMEOUT);
     d->socket->setSendTimeout(CONNECTION_TIMEOUT);
@@ -586,6 +585,9 @@ void QnProgressiveDownloadingConsumer::run()
             sendMediaEventErrorResponse(mediaStreamEvent);
             return;
         }
+
+        d->transcoder = std::make_unique<QnFfmpegTranscoder>(
+            DecoderConfig::fromResource(resource), commonModule()->metrics());
 
         QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>();
         if (mediaRes)

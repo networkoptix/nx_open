@@ -4,13 +4,12 @@ extern "C" {
 #include <libswresample/swresample.h>
 } // extern "C"
 
-#include <nx/utils/log/log.h>
 #include <plugins/plugin_container_api.h>
 
 #include "camera.h"
 #include "default_audio_encoder.h"
 #include "ffmpeg/utils.h"
-#include "discovery/audio_discovery_manager.h"
+#include "device/audio/utils.h"
 
 namespace nx {
 namespace usb_cam {
@@ -31,7 +30,7 @@ const char * ffmpegDeviceType()
 } // namespace
 
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // AudioStreamPrivate
 
 AudioStream::AudioStreamPrivate::AudioStreamPrivate(
@@ -57,7 +56,7 @@ AudioStream::AudioStreamPrivate::~AudioStreamPrivate()
 
 bool AudioStream::AudioStreamPrivate::pluggedIn() const
 {
-    return device::AudioDiscoveryManager().pluggedIn(m_url);
+    return device::audio::pluggedIn(m_url.c_str());
 }
 
 bool AudioStream::AudioStreamPrivate::ioError() const
@@ -306,7 +305,9 @@ int AudioStream::AudioStreamPrivate::decodeNextFrame(ffmpeg::Frame * outFrame)
     }
 }
 
-int AudioStream::AudioStreamPrivate::resample(const ffmpeg::Frame * frame, ffmpeg::Frame * outFrame)
+int AudioStream::AudioStreamPrivate::resample(
+    const ffmpeg::Frame * frame,
+    ffmpeg::Frame * outFrame)
 {
     if(!m_resampleContext)
     {
@@ -322,7 +323,10 @@ int AudioStream::AudioStreamPrivate::resample(const ffmpeg::Frame * frame, ffmpe
     if(!m_resampleContext)
         return m_initCode;
 
-    return swr_convert_frame(m_resampleContext, outFrame->frame(), frame ? frame->frame() : nullptr);
+    return swr_convert_frame(
+        m_resampleContext,
+        outFrame->frame(),
+        frame ? frame->frame() : nullptr);
 }
 
 std::chrono::milliseconds AudioStream::AudioStreamPrivate::resampleDelay() const
@@ -509,7 +513,7 @@ void AudioStream::AudioStreamPrivate::run()
     uninitialize();
 }
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // AudioStream
 
 AudioStream::AudioStream(

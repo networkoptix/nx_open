@@ -41,19 +41,22 @@ void FoundDevicesModel::addDevices(const QnManualResourceSearchList& devices)
 
     auto newIds = extractIds(devices);
     const auto currentIds = extractIds(m_devices);
-    const auto truncatedIds = newIds.subtract(currentIds);
-    if (truncatedIds.size() != devices.size())
+    const auto addedIds = newIds.subtract(currentIds);
+    if (addedIds.size() != devices.size())
         NX_ASSERT(false, "Devices exist already");
 
+    if (addedIds.isEmpty())
+        return; //< Nothing new has found.
+
     const int first = rowCount();
-    const int last = rowCount() + truncatedIds.size() - 1;
+    const int last = rowCount() + addedIds.size() - 1;
     bool hasNewDevices = false;
     {
         const ScopedInsertRows guard(this, QModelIndex(), first, last);
         for (const auto& device: devices)
         {
             const auto& id = device.uniqueId;
-            if (truncatedIds.contains(id))
+            if (addedIds.contains(id))
             {
                 hasNewDevices = true;
                 m_devices.append(device);

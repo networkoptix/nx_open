@@ -122,7 +122,7 @@ void Packet::setTimestamp(uint64_t millis)
 
 bool Packet::keyPacket() const
 {
-    // DirectShow implementation does not set AVPacket::flags properly after a call to av_read_frame.
+    // DirectShow implementation does not set AVPacket::flags properly after calling av_read_frame.
 #ifdef _WIN32
     // in the case the packet was produced by an encoder, this will be set apporpriately
     if (m_packet->flags & AV_PKT_FLAG_KEY)
