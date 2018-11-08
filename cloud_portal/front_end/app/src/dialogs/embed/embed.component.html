@@ -23,7 +23,6 @@
                    id="login_email" name="login_email" #login_email="ngModel"
                    [(ngModel)]="auth.email"
                    [ngModelOptions]="{ updateOn: 'blur'}"
-                   (ngModelChange)="updateAuth()"
                    pattern="{{ configService.config.emailRegex }}" maxlength="255"
                    required nxFocusMe>
         </div>
@@ -33,7 +32,6 @@
                    name="login_password" id="login_password" #login_password="ngModel"
                    [(ngModel)]="auth.password"
                    [ngModelOptions]="{ updateOn: 'blur'}"
-                   (ngModelChange)="updateAuth()"
                    maxlength="255"
                    required>
         </div>

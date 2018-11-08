@@ -6,19 +6,24 @@
         .module('cloudApp')
         .controller('ViewPageCtrl', [ '$rootScope', '$scope', '$window', 'account', 'system', '$routeParams', 'systemAPI', 'dialogs',
             '$location', '$q', '$poll', 'authorizationCheckService', 'camerasProvider',
+            'configService', 'languageService',
 
             function ($rootScope, $scope, $window, account, system, $routeParams, systemAPI, dialogs,
-                      $location, $q, $poll, authorizationCheckService, camerasProvider) {
-
+                      $location, $q, $poll, authorizationCheckService, camerasProvider,
+                      configService, languageService) {
+    
+                const CONFIG = configService.config;
+                const LANG = languageService.lang;
+            
                 $scope.systemReady = false;
                 $scope.hasCameras = false;
     
                 function delayedUpdateSystemInfo() {
                     var pollingSystemUpdate = $poll(function () {
                         return $scope.currentSystem.update();
-                    }, Config.updateInterval);
+                    }, CONFIG.updateInterval);
         
-                    $scope.$on('$destroy', function (event) {
+                    $scope.$on('$destroy', function () {
                         $poll.cancel(pollingSystemUpdate);
                     });
                 }
@@ -27,7 +32,7 @@
                     state: true, // hide it
                     loc  : 'ViewPageCtrl - offline'
                 });
-    
+                
                 // Check if page is displayed inside an iframe
                 $scope.isInIframe = ($window.location !== $window.parent.location);
                 
@@ -37,9 +42,9 @@
                         loc: 'ViewPageCtrl - inIframe'
                     });
                 }
-                function systemError(error){
-                    dialogs.notify(L.errorCodes.lostConnection.replace('{{systemName}}',
-                        $scope.currentSystem.name || L.errorCodes.thisSystem), 'warning');
+                function systemError(){
+                    dialogs.notify(LANG.errorCodes.lostConnection.replace('{{systemName}}',
+                        $scope.currentSystem.name || LANG.errorCodes.thisSystem), 'warning');
                     $location.path('/systems');
                 }
                 authorizationCheckService
@@ -77,13 +82,13 @@
 
                 
 
-                var cancelSubscription = $scope.$on('unauthorized_' + $routeParams.systemId, function (event, data) {
-                    dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}",
-                        $scope.currentSystem.info.name || L.errorCodes.thisSystem), 'warning');
-                    $location.path("/systems");
+                var cancelSubscription = $scope.$on('unauthorized_' + $routeParams.systemId, function () {
+                    dialogs.notify(LANG.errorCodes.lostConnection.replace('{{systemName}}',
+                        $scope.currentSystem.info.name || LANG.errorCodes.thisSystem), 'warning');
+                    $location.path('/systems');
                 });
 
-                $scope.$on('$destroy', function (event) {
+                $scope.$on('$destroy', function () {
                     cancelSubscription();
                     // Reset visibility state
                     $rootScope.$emit('nx.layout.header', {state: false});

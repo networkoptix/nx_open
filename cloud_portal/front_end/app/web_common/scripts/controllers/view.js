@@ -48,10 +48,18 @@
                 }
                 
                 $scope.isEmbeded = ($location.path().indexOf('/embed') === 0);
-                $scope.showTimeline = !$location.search().nocontrols;
-                $scope.showCameraHeader = !$location.search().noheader;
-                $scope.showCamerasMenu = !$location.search().nocameras;
+                var nocontrols = !$location.search().nocontrols,
+                    noheader = !$location.search().noheader,
+                    nocameras = !$location.search().nocameras;
                 
+                function setCameraComponentsVisibility () {
+                    $scope.showTimeline = !$scope.isEmbeded || $scope.isEmbeded && nocontrols;
+                    $scope.showCameraHeader = !$scope.isEmbeded || $scope.isEmbeded && noheader;
+                    $scope.showCamerasMenu = !$scope.isEmbeded || $scope.isEmbeded && nocameras;
+                    $scope.showCameraPanel = $scope.showCamerasMenu;
+                }
+    
+                setCameraComponentsVisibility();
                 
                 var castAlert = false;
                 $scope.showWarning = function () {
@@ -65,8 +73,6 @@
                 $scope.activeVideoRecords = null;
                 $scope.activeCamera = null;
                 $scope.player = null;
-                
-                $scope.showCameraPanel = !$scope.isEmbeded;
                 
                 $scope.activeResolution = 'Auto';
                 // TODO: detect better resolution here?
@@ -456,8 +462,9 @@
                 
                 $scope.showCamerasPanel = function () {
                     $scope.showSettings = false;
-                    $scope.showCameraPanel = true;
                     $scope.showOnTop = true; // z-index -> show panel on small screen
+    
+                    setCameraComponentsVisibility();
                 };
                 
                 document.addEventListener('MSFullscreenChange', function () { // IE only
@@ -513,8 +520,8 @@
                     }
                     
                     resetSystemActiveCamera();
+                    setCameraComponentsVisibility();
                     
-                    $scope.showCameraPanel = true;
                     $scope.showOnTop = false; // z-index -> hide panel on small screen
                     
                     $scope.player = null;
