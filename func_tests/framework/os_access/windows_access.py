@@ -231,10 +231,12 @@ class _FakeDisk(BaseFakeDisk):
             six.reraise(OSError, OSError(errno.EINVAL, message_oneline), sys.exc_info()[2])
 
     def remove(self, letter='V'):
-        try:
-            self.winrm.command(['MountVol', letter + ':', '/D']).run(timeout_sec=5)
-        except exceptions.exit_status_error_cls(1):
-            pass
+        script_template = (
+            'SELECT VDISK file={image_path} NOERR' '\r\n'
+            'DETACH VDISK NOERR' '\r\n'  # When detaching, volume is unmounted automatically.
+        )
+        script = script_template.format(image_path=self._image_path, letter=self._letter)
+        self._diskpart('remove', script, 5)
         try:
             self._image_path.unlink()
         except exceptions.DoesNotExist:
@@ -250,17 +252,13 @@ class _FakeDisk(BaseFakeDisk):
         partition_mb = volume_mb + 1  # 1 MB for filesystem.
         disk_mb = partition_mb + 2  # 1 MB is for MBR/GPT headers.
         script_template = (
-            'CREATE VDISK file={image_path} MAXIMUM={disk_mb} NOERR' '\r\n'  # NOERR if exists.
+            'CREATE VDISK file={image_path} MAXIMUM={disk_mb}' '\r\n'  # NOERR if exists.
             'SELECT VDISK file={image_path}' '\r\n'  # No error if already selected.
-            'DETACH VDISK NOERR' '\r\n'  # NOERR if attached.
-            'EXPAND VDISK maximum={disk_mb} NOERR' '\r\n'  # NOERR if requested size is less.
-            'ATTACH VDISK' '\r\n'  # NOERR if attached. "Disk" of "vdisk" has been selected.
-            'CLEAN' '\r\n'  # Removes letter, wipes partition table.
+            'ATTACH VDISK' '\r\n'  # "Disk" of "vdisk" has been selected.
             'CONVERT MBR' '\r\n'
             'CREATE PARTITION PRIMARY size={partition_mb}' '\r\n'  # New partition and its volume have been selected.
             'FORMAT' '\r\n'  # Filesystem is default (NTFS).
             'ASSIGN LETTER={letter}' '\r\n'
-            'EXIT' '\r\n'
         )
         script = script_template.format(
             image_path=self._image_path,
@@ -268,3 +266,4 @@ class _FakeDisk(BaseFakeDisk):
             partition_mb=partition_mb,
             disk_mb=disk_mb)
         self._diskpart('mount', script, 10 + 0.05 * free_space_mb)
+
