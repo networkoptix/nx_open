@@ -12,14 +12,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='usergroupstocustomizationpermissions',
-            name='customization',
-        ),
-        migrations.RemoveField(
-            model_name='usergroupstocustomizationpermissions',
-            name='group',
-        ),
         migrations.CreateModel(
             name='ContextProxy',
             fields=[
@@ -30,8 +22,5 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'Admin Pages',
             },
             bases=('cms.context',),
-        ),
-        migrations.DeleteModel(
-            name='UserGroupsToCustomizationPermissions',
         ),
     ]

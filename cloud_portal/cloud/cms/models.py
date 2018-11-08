@@ -401,7 +401,6 @@ class DataStructure(models.Model):
 
 class UserGroupsToCustomizationPermissions(models.Model):
     class Meta:
-        app_label = "api"
         db_table = "cms_usergroupstocustomizationpermissions"
 
     group = models.ForeignKey(Group)
