@@ -12,8 +12,11 @@ namespace searcher_hooks {
 
 namespace {
 
-static const QString kAdditionalManufacturerNormalization
-    = lit("enableAdditionalManufacturerNormalization");
+static const QString kAdditionalManufacturerNormalization =
+    lit("enableAdditionalManufacturerNormalization");
+
+static const QString kSwapVendorAndModel =
+    lit("swapVendorAndModel");
 
 static const QString kForcedAdditionalManufacturerProperty("forcedAdditionalManufacturer");
 
@@ -199,6 +202,14 @@ void additionalManufacturerNormalization(
             return;
         }
     }
+}
+
+void swapVendorAndModel(
+    QnResourceDataPool* dataPool, EndpointAdditionalInfo* outInfo)
+{
+    auto resourceData = dataPool->data(outInfo->manufacturer, outInfo->name);
+    if (resourceData.value<bool>(kSwapVendorAndModel))
+        std::swap(outInfo->manufacturer, outInfo->name);
 }
 
 } // namespace searcher_hooks

@@ -25,6 +25,8 @@ void forcedAdditionalManufacturer(
 void additionalManufacturerNormalization(
     QnResourceDataPool* dataPool, EndpointAdditionalInfo* outInfo);
 
+void swapVendorAndModel(QnResourceDataPool* dataPool, EndpointAdditionalInfo* outInfo);
+
 } // namespace searcher_hooks
 } // namespace onvif
 } // namespace plugins
