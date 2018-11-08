@@ -14,8 +14,6 @@
 #include <nx/utils/string.h>
 #include <nx/utils/test_support/test_options.h>
 
-#include "common_server_socket_ut.h"
-
 namespace nx {
 namespace network {
 namespace test {
@@ -74,137 +72,12 @@ private:
     boost::optional<SocketFactory::CreateStreamServerSocketFuncType> m_createStreamServerSocketFunc;
 };
 
-namespace {
-
-void onAcceptedConnection(
-    AbstractStreamServerSocket* serverSocket,
-    SystemError::ErrorCode /*errCode*/,
-    std::unique_ptr<AbstractStreamSocket> sock)
-{
-    sock.reset();
-
-    using namespace std::placeholders;
-    serverSocket->acceptAsync(std::bind(onAcceptedConnection, serverSocket, _1, _2));
-}
-
-} // namespace
-
-TEST_F(SocketUdt, cancelConnect)
-{
-    UdtStreamServerSocket serverSocket(AF_INET);
-    ASSERT_TRUE(serverSocket.setNonBlockingMode(true));
-    ASSERT_TRUE(serverSocket.bind(SocketAddress(HostAddress::localhost, 0)));
-    serverSocket.listen();
-    using namespace std::placeholders;
-    serverSocket.acceptAsync(std::bind(onAcceptedConnection, &serverSocket, _1, _2));
-
-    for (int i = 0; i < 100; ++i)
-    {
-        UdtStreamSocket sock(AF_INET);
-        std::atomic<bool> handlerCalled(false);
-        ASSERT_TRUE(sock.setNonBlockingMode(true));
-        sock.connectAsync(
-            serverSocket.getLocalAddress(),
-            [&handlerCalled](SystemError::ErrorCode /*errorCode*/){
-                handlerCalled = true;
-            });
-        sock.pleaseStopSync();
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(nx::utils::random::number(0, 50)));
-    }
-
-    serverSocket.pleaseStopSync();
-}
-
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST_F, SocketUdt,
     [](){ return std::make_unique<UdtStreamServerSocket>(AF_INET); },
     [](){ return std::make_unique<UdtStreamSocket>(AF_INET); })
 
-static std::unique_ptr<UdtStreamSocket> createRendezvousUdtSocket(
-    std::chrono::milliseconds connectTimeout)
-{
-    auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
-    EXPECT_TRUE(socket->setRendezvous(true));
-    EXPECT_TRUE(socket->setSendTimeout(connectTimeout.count()));
-    EXPECT_TRUE(socket->setNonBlockingMode(true));
-    EXPECT_TRUE(socket->bind(SocketAddress(HostAddress::localhost, 0)));
-    return socket;
-}
-
-TEST_F(SocketUdt, rendezvousConnect)
-{
-    const std::chrono::seconds kConnectTimeout(2);
-    const size_t kBytesToSendThroughConnection(128 * 1024);
-    const int kMaxSimultaneousConnections(25);
-    const std::chrono::seconds kTestDuration(3);
-
-    //creating two sockets, performing randezvous connect
-    const auto connectorSocket = createRendezvousUdtSocket(kConnectTimeout);
-    const auto acceptorSocket = createRendezvousUdtSocket(kConnectTimeout);
-
-    auto socketStoppedGuard = nx::utils::makeScopeGuard(
-        [&connectorSocket, &acceptorSocket]
-        {
-            //cleaning up
-            connectorSocket->pleaseStopSync();
-            acceptorSocket->pleaseStopSync();
-        });
-
-    nx::utils::promise<SystemError::ErrorCode> connectorConnectedPromise;
-    connectorSocket->connectAsync(
-        acceptorSocket->getLocalAddress(),
-        [&connectorConnectedPromise](
-            SystemError::ErrorCode errorCode)
-        {
-            connectorConnectedPromise.set_value(errorCode);
-        });
-
-    nx::utils::promise<SystemError::ErrorCode> acceptorConnectedPromise;
-    acceptorSocket->connectAsync(
-        connectorSocket->getLocalAddress(),
-        [&acceptorConnectedPromise](
-            SystemError::ErrorCode errorCode)
-        {
-            acceptorConnectedPromise.set_value(errorCode);
-        });
-
-    const auto connectorResultCode = connectorConnectedPromise.get_future().get();
-    ASSERT_EQ(SystemError::noError, connectorResultCode)
-        << SystemError::toString(connectorResultCode).toStdString();
-    const auto acceptorResultCode = acceptorConnectedPromise.get_future().get();
-    ASSERT_EQ(SystemError::noError, acceptorResultCode)
-        << SystemError::toString(acceptorResultCode).toStdString();
-
-    //after successfull connect starting listener on one side and connector on the other one
-    setUdtSocketFunctions();
-
-    RandomDataTcpServer server(
-        TestTrafficLimitType::outgoing,
-        kBytesToSendThroughConnection,
-        TestTransmissionMode::spam);
-    server.setLocalAddress(acceptorSocket->getLocalAddress());
-    ASSERT_TRUE(server.start());
-
-    ConnectionsGenerator connectionsGenerator(
-        SocketAddress(HostAddress::localhost, server.addressBeingListened().port),
-        kMaxSimultaneousConnections,
-        TestTrafficLimitType::outgoing,
-        kBytesToSendThroughConnection,
-        ConnectionsGenerator::kInfiniteConnectionCount,
-        TestTransmissionMode::spam);
-    connectionsGenerator.setLocalAddress(connectorSocket->getLocalAddress());
-    connectionsGenerator.start();
-
-    std::this_thread::sleep_for(kTestDuration);
-
-    connectionsGenerator.pleaseStopSync();
-    server.pleaseStopSync();
-
-    ASSERT_GT(connectionsGenerator.totalConnectionsEstablished(), 0U);
-    ASSERT_GT(connectionsGenerator.totalBytesSent(), 0U);
-    ASSERT_GT(connectionsGenerator.totalBytesReceived(), 0U);
-}
+//-------------------------------------------------------------------------------------------------
 
 class SocketUdtRendezvous:
     public SocketUdt
@@ -328,6 +201,17 @@ protected:
         }
     }
 
+    static std::unique_ptr<UdtStreamSocket> createRendezvousUdtSocket(
+        std::chrono::milliseconds connectTimeout)
+    {
+        auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
+        EXPECT_TRUE(socket->setRendezvous(true));
+        EXPECT_TRUE(socket->setSendTimeout(connectTimeout.count()));
+        EXPECT_TRUE(socket->setNonBlockingMode(true));
+        EXPECT_TRUE(socket->bind(SocketAddress(HostAddress::localhost, 0)));
+        return socket;
+    }
+
 private:
     std::unique_ptr<UdtStreamSocket> m_serverSocket;
     std::unique_ptr<UdtStreamSocket> m_clientSocket;
@@ -343,7 +227,81 @@ const size_t SocketUdtRendezvous::kBytesToEcho(128 * 1024);
 const int SocketUdtRendezvous::kMaxSimultaneousConnections(25);
 const std::chrono::seconds SocketUdtRendezvous::kTestDuration(3);
 
-TEST_F(SocketUdtRendezvous, connectWithDelay)
+TEST_F(SocketUdtRendezvous, connect_works)
+{
+    const std::chrono::seconds kConnectTimeout(2);
+    const size_t kBytesToSendThroughConnection(128 * 1024);
+    const int kMaxSimultaneousConnections(25);
+    const std::chrono::seconds kTestDuration(3);
+
+    //creating two sockets, performing randezvous connect
+    const auto connectorSocket = createRendezvousUdtSocket(kConnectTimeout);
+    const auto acceptorSocket = createRendezvousUdtSocket(kConnectTimeout);
+
+    auto socketStoppedGuard = nx::utils::makeScopeGuard(
+        [&connectorSocket, &acceptorSocket]
+        {
+            //cleaning up
+            connectorSocket->pleaseStopSync();
+            acceptorSocket->pleaseStopSync();
+        });
+
+    nx::utils::promise<SystemError::ErrorCode> connectorConnectedPromise;
+    connectorSocket->connectAsync(
+        acceptorSocket->getLocalAddress(),
+        [&connectorConnectedPromise](
+            SystemError::ErrorCode errorCode)
+        {
+            connectorConnectedPromise.set_value(errorCode);
+        });
+
+    nx::utils::promise<SystemError::ErrorCode> acceptorConnectedPromise;
+    acceptorSocket->connectAsync(
+        connectorSocket->getLocalAddress(),
+        [&acceptorConnectedPromise](
+            SystemError::ErrorCode errorCode)
+        {
+            acceptorConnectedPromise.set_value(errorCode);
+        });
+
+    const auto connectorResultCode = connectorConnectedPromise.get_future().get();
+    ASSERT_EQ(SystemError::noError, connectorResultCode)
+        << SystemError::toString(connectorResultCode).toStdString();
+    const auto acceptorResultCode = acceptorConnectedPromise.get_future().get();
+    ASSERT_EQ(SystemError::noError, acceptorResultCode)
+        << SystemError::toString(acceptorResultCode).toStdString();
+
+    //after successfull connect starting listener on one side and connector on the other one
+    setUdtSocketFunctions();
+
+    RandomDataTcpServer server(
+        TestTrafficLimitType::outgoing,
+        kBytesToSendThroughConnection,
+        TestTransmissionMode::spam);
+    server.setLocalAddress(acceptorSocket->getLocalAddress());
+    ASSERT_TRUE(server.start());
+
+    ConnectionsGenerator connectionsGenerator(
+        SocketAddress(HostAddress::localhost, server.addressBeingListened().port),
+        kMaxSimultaneousConnections,
+        TestTrafficLimitType::outgoing,
+        kBytesToSendThroughConnection,
+        ConnectionsGenerator::kInfiniteConnectionCount,
+        TestTransmissionMode::spam);
+    connectionsGenerator.setLocalAddress(connectorSocket->getLocalAddress());
+    connectionsGenerator.start();
+
+    std::this_thread::sleep_for(kTestDuration);
+
+    connectionsGenerator.pleaseStopSync();
+    server.pleaseStopSync();
+
+    ASSERT_GT(connectionsGenerator.totalConnectionsEstablished(), 0U);
+    ASSERT_GT(connectionsGenerator.totalBytesSent(), 0U);
+    ASSERT_GT(connectionsGenerator.totalBytesReceived(), 0U);
+}
+
+TEST_F(SocketUdtRendezvous, connect_works_with_delay_between_server_and_client)
 {
     startConnectingServerSocket();
     std::this_thread::sleep_for(kConnectDelay);
@@ -356,122 +314,7 @@ TEST_F(SocketUdtRendezvous, connectWithDelay)
     waitUntilSomeActivityHasBeenPerformedByGenerator();
 }
 
-TEST_F(SocketUdt, acceptingFirstConnection)
-{
-    const int loopLength = 71;
-
-    for (int i = 0; i < loopLength; ++i)
-    {
-        UdtStreamServerSocket serverSocket(AF_INET);
-        auto serverSocketGuard = nx::utils::makeScopeGuard(
-            [&serverSocket]() { serverSocket.pleaseStopSync(); });
-
-        ASSERT_TRUE(serverSocket.bind(SocketAddress(HostAddress::localhost, 0)));
-        const auto serverAddress = serverSocket.getLocalAddress();
-        ASSERT_TRUE(serverSocket.listen());
-        ASSERT_TRUE(serverSocket.setNonBlockingMode(true));
-
-        nx::utils::promise<
-            std::pair<SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>>
-        > socketAcceptedPromise;
-        serverSocket.acceptAsync(
-            [&socketAcceptedPromise](
-                SystemError::ErrorCode errorCode,
-                std::unique_ptr<AbstractStreamSocket> socket)
-            {
-               socketAcceptedPromise.set_value(
-                   std::make_pair(errorCode, std::move(socket)));
-            });
-
-        UdtStreamSocket clientSock(AF_INET);
-        ASSERT_TRUE(clientSock.connect(serverAddress, nx::network::kNoTimeout))
-            << serverAddress.toStdString() <<", "
-            << SystemError::getLastOSErrorText().toStdString();
-
-        const auto result = socketAcceptedPromise.get_future().get();
-        ASSERT_EQ(SystemError::noError, result.first);
-    }
-}
-
-class SocketUdtNew:
-    public SocketUdt
-{
-public:
-    SocketUdtNew():
-        m_serverSocket(AF_INET)
-    {
-    }
-
-protected:
-    std::unique_ptr<UdtStreamSocket> m_clientSock;
-    UdtStreamServerSocket m_serverSocket;
-
-    void startSyncUdtSocketServer()
-    {
-        m_udtSocketServerThread =
-            nx::utils::thread(std::bind(&SocketUdtNew::udtSocketServerMain, this));
-        m_udtSocketServerStarted.get_future().wait();
-    }
-
-    void listenOnServerSocket()
-    {
-        ASSERT_TRUE(m_serverSocket.bind(SocketAddress(HostAddress::localhost, 0)));
-        m_serverAddress = m_serverSocket.getLocalAddress();
-        ASSERT_TRUE(m_serverSocket.listen());
-    }
-
-    void connectToUdtServer()
-    {
-        m_clientSock = std::make_unique<UdtStreamSocket>(AF_INET);
-        ASSERT_TRUE(m_clientSock->connect(m_serverAddress, nx::network::kNoTimeout))
-            << SystemError::getLastOSErrorText().toStdString();
-    }
-
-    void closeConnection()
-    {
-        m_clientSock.reset();
-    }
-
-    void assertAcceptedConnectionReceivedFin()
-    {
-        m_udtSocketServerThread.join();
-    }
-
-private:
-    nx::utils::thread m_udtSocketServerThread;
-    nx::utils::promise<void> m_udtSocketServerStarted;
-    SocketAddress m_serverAddress;
-
-    void udtSocketServerMain()
-    {
-        listenOnServerSocket();
-
-        m_udtSocketServerStarted.set_value();
-
-        auto acceptedSocket = m_serverSocket.accept();
-        ASSERT_NE(nullptr, acceptedSocket);
-
-        for (;;)
-        {
-            char testBuf[128];
-            const int bytesRead = acceptedSocket->recv(testBuf, sizeof(testBuf));
-            ASSERT_GE(bytesRead, 0);
-            if (bytesRead == 0)
-                break;
-        }
-    }
-};
-
-TEST_F(SocketUdtNew, connectionProperlyClosed)
-{
-    startSyncUdtSocketServer();
-    connectToUdtServer();
-
-    closeConnection();
-    assertAcceptedConnectionReceivedFin();
-}
-
-INSTANTIATE_TYPED_TEST_CASE_P(UdtStreamServerSocket, ServerSocketTest, UdtStreamServerSocket);
+//-------------------------------------------------------------------------------------------------
 
 struct UdtSocketTypeSet
 {
@@ -482,6 +325,7 @@ struct UdtSocketTypeSet
 };
 
 // Any endpoint that does not have UDT server socket on it is fine.
+// TODO: #ak Allocate UDP socket and use that socket's port.
 const SocketAddress UdtSocketTypeSet::serverEndpointForConnectShutdown =
     SocketAddress(HostAddress::localhost, 45431);
 
