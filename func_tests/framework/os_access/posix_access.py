@@ -278,10 +278,11 @@ class _FakeDisk(BaseFakeDisk):
         self._shell = posix_access.shell
 
     def remove(self):
-        # At least, in Ubuntu 14.04 trusty, multiple `/dev/loop*` devices may be mounted to single
-        # mount point. Files that are behind `/dev/loop*` may be deleted. To dismount such mounts,
-        # `umount -f /mnt/point` must be called unless it exists with error code 1 and says
-        # `umount2: Invalid argument` and `umount: /mnt/disk: not mounted`.
+        """At least, in Ubuntu 14.04 trusty, multiple `/dev/loop*` devices may be mounted to single
+        mount point. Files that are behind `/dev/loop*` may be deleted. To dismount such mounts,
+        `umount -f /mnt/point` must be called unless it exists with error code 1 and says
+        `umount: /mnt/disk: not mounted`.
+        """
         while True:
             try:
                 self._shell.run_command(['umount', '-f', self.path])
