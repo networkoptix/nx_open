@@ -91,7 +91,7 @@
 
                 <nx-section>
                     <div *ngFor="let platform of plugin.downloadFiles" class="mt-3">
-                        {{ platform.name}}
+                        <div *ngIf="platform.name">{{ platform.name}}</div>
                         <div>
                             <a href="{{ platform.url }}">{{ platform.file }}</a>
                         </div>

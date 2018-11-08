@@ -56,10 +56,18 @@ export class IntegrationService implements OnDestroy {
                     platform.file = platform.url.slice(platform.url.lastIndexOf('/') + 1);
                     plugin.downloadFiles.push(platform);
                 }
+                //sort by name and then sort by file name.
                 plugin.downloadFiles = plugin.downloadFiles.sort((a, b) => {
-                    if (a.name < b.name) {
+                    // '~~~' are used to weight downloads
+                    const weight = "~~~";
+                    if (a.name + weight < b.name + weight) {
                         return -1;
-                    } else if (a.name > b.name) {
+                    } else if (a.name + weight > b.name + weight) {
+                        return 1;
+                    }
+                    if (a.file + weight < b.file + weight) {
+                        return - 1;
+                    } else if (a.file + weight > b.file + weight) {
                         return 1;
                     }
                     return 0;
