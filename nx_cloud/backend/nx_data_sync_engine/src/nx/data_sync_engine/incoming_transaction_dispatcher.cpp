@@ -12,10 +12,8 @@ namespace nx {
 namespace data_sync_engine {
 
 IncomingTransactionDispatcher::IncomingTransactionDispatcher(
-    const QnUuid& moduleGuid,
     TransactionLog* const transactionLog)
-:
-    m_moduleGuid(moduleGuid),
+    :
     m_transactionLog(transactionLog)
 {
 }
@@ -63,7 +61,7 @@ void IncomingTransactionDispatcher::dispatchUbjsonTransaction(
     QByteArray serializedTransaction,
     TransactionProcessedHandler handler)
 {
-    CommandHeader commandHeader(m_moduleGuid);
+    CommandHeader commandHeader(QnUuid::fromStringSafe(transportHeader.peerId));
     auto dataSource =
         std::make_unique<TransactionUbjsonDataSource>(std::move(serializedTransaction));
     if (!TransactionDeserializer::deserialize(
@@ -91,7 +89,7 @@ void IncomingTransactionDispatcher::dispatchJsonTransaction(
     QByteArray serializedTransaction,
     TransactionProcessedHandler handler)
 {
-    CommandHeader commandHeader(m_moduleGuid);
+    CommandHeader commandHeader(QnUuid::fromStringSafe(transportHeader.peerId));
     QJsonObject tranObject;
     // TODO: #ak put tranObject to some cache for later use
     if (!QJson::deserialize(serializedTransaction, &tranObject))

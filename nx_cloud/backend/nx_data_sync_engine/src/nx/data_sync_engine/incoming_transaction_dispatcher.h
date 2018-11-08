@@ -28,9 +28,7 @@ public:
         const TransactionTransportHeader&,
         const CommandHeader&>;
 
-    IncomingTransactionDispatcher(
-        const QnUuid& moduleGuid,
-        TransactionLog* const transactionLog);
+    IncomingTransactionDispatcher(TransactionLog* const transactionLog);
     virtual ~IncomingTransactionDispatcher();
 
     /**
@@ -105,7 +103,6 @@ private:
     using TransactionProcessors =
         std::map<int, std::unique_ptr<TransactionProcessorContext>>;
 
-    const QnUuid m_moduleGuid;
     TransactionLog* const m_transactionLog;
     TransactionProcessors m_transactionProcessors;
     nx::network::aio::Timer m_aioTimer;
