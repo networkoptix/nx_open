@@ -194,7 +194,7 @@ if (withMediaServer OR withTestCamera OR withTrayTool OR withDesktopClient OR wi
     add_subdirectory(vms_libs)
     add_subdirectory(common)
     add_subdirectory(appserver2)
-    add_subdirectory(nx_cloud)
+    add_subdirectory(cloud)
 endif()
 
 if(withMediaServer OR withClouds)
