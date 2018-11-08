@@ -120,8 +120,9 @@ class AccountManager(db.models.Manager):
 
         Account.register(ip, email, password, first_name, last_name)
         user = models.Account.objects.get(email=email)
-        user.first_name=first_name
-        user.last_name=last_name
+        user.is_active = True
+        user.first_name = first_name
+        user.last_name = last_name
         user.save()
 
         return user
