@@ -20,7 +20,7 @@ static int constexpr kMmalMaxBitrate=10000000;
 
 // The v4l2 driver for the integrated camera doesn't report resolutions accurately,
 // so we have to hardcode it here
-static const std::vector<ResolutionData> kMmalResolutionList = 
+static const std::vector<video::ResolutionData> kMmalResolutionList =
 {
     {1920, 1080, 30},
     {1920, 1080, 25},
@@ -67,7 +67,7 @@ int getMmalMaxBitrate()
     return kMmalMaxBitrate;
 }
 
-std::vector<device::ResolutionData> getMmalResolutionList()
+std::vector<video::ResolutionData> getMmalResolutionList()
 {
     return kMmalResolutionList;
 }

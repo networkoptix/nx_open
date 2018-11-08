@@ -2,8 +2,10 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "device/device_data.h"
+#include "device/video/resolution_data.h"
 
 namespace nx {
 namespace usb_cam {
@@ -13,7 +15,7 @@ namespace rpi {
 /**
  * Return the resolution list for the rpi integrated camera.
  */
-std::vector<device::ResolutionData> getMmalResolutionList();
+std::vector<video::ResolutionData> getMmalResolutionList();
 
 /**
  * Return the maximum bitrate of the rpi integrated camera.

@@ -1,11 +1,13 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include <camera/camera_plugin_types.h>
 #include "camera/camera_plugin.h"
 
 #include "device_data.h"
+#include "video/resolution_data.h"
 #include "abstract_compression_type_descriptor.h"
 
 namespace nx {
@@ -36,7 +38,7 @@ std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const char 
 * @param[in] devicePath - the path to the device.
 * @param[in] targetCodecID - the codec whose resolution list is desired
 */
-std::vector<ResolutionData> getResolutionList(
+std::vector<video::ResolutionData> getResolutionList(
     const char * devicePath,
     const device::CompressionTypeDescriptorPtr& targetCodecID);
 

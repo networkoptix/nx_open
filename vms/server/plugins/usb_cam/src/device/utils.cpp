@@ -5,7 +5,7 @@
 #ifdef _WIN32
 #include "dshow/dshow_utils.h"
 #elif __linux__
-#include "v4l2/v4l2_utils.h"
+#include "video/linux/v4l2_utils.h"
 #endif
 
 namespace nx {
@@ -14,29 +14,29 @@ namespace device {
 
 std::string getDeviceName(const char * devicePath)
 {
-    return impl::getDeviceName(devicePath);
+    return video::detail::getDeviceName(devicePath);
 }
 
 std::vector<DeviceData> getDeviceList()
 {
-    return impl::getDeviceList();
+    return video::detail::getDeviceList();
 }
 
 std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const char *devicePath)
 {
-    return impl::getSupportedCodecs(devicePath);
+    return video::detail::getSupportedCodecs(devicePath);
 }
 
-std::vector<ResolutionData> getResolutionList(
+std::vector<video::ResolutionData> getResolutionList(
     const char * devicePath,
     const device::CompressionTypeDescriptorPtr& targetCodecID)
 {
     if (!targetCodecID)
         return {};
 
-    auto list = impl::getResolutionList(devicePath, targetCodecID);
+    auto list = video::detail::getResolutionList(devicePath, targetCodecID);
     std::sort(list.begin(), list.end(),
-        [](const ResolutionData& a, const ResolutionData& b)
+        [](const video::ResolutionData& a, const video::ResolutionData& b)
         {
             return a.width * a.height < b.width * b.height;
         });
@@ -46,7 +46,7 @@ std::vector<ResolutionData> getResolutionList(
 void setBitrate(const char * devicePath, int bitrate, const device::CompressionTypeDescriptorPtr& targetCodecID)
 {
     if(targetCodecID)
-        impl::setBitrate(devicePath, bitrate, targetCodecID);
+        video::detail::setBitrate(devicePath, bitrate, targetCodecID);
 }
 
 int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescriptorPtr& targetCodecID)
@@ -54,7 +54,7 @@ int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescript
     if(!targetCodecID)
         return 0;
 
-    return impl::getMaxBitrate(devicePath, targetCodecID);
+    return video::detail::getMaxBitrate(devicePath, targetCodecID);
 }
 
 } // namespace device
