@@ -233,8 +233,6 @@ boost::optional<int> HikvisionHevcStreamReader::rescaleQuality(
 CameraDiagnostics::Result HikvisionHevcStreamReader::fetchChannelProperties(
     ChannelProperties* outChannelProperties) const
 {
-    const auto kRequestName = lit("Fetch channel properties");
-
     boost::optional<int> rtspPort;
     auto url = hikvisionRequestUrlFromPath(kIsapiChannelStreamingPathTemplate.arg(
         buildChannelNumber(getRole(), m_hikvisionResource->getChannel())));
@@ -254,7 +252,14 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::fetchChannelProperties(
         return result;
 
     if (!rtspPort)
-        return CameraDiagnostics::RequestFailedResult("Fetch RTSP port", "No RTSP port found");
+    {
+        NX_WARNING(
+            this,
+            lm("Unable to determine RTSP port for resource %1 (%2), using the default one").args(
+                m_hikvisionResource->getUserDefinedName(),
+                m_hikvisionResource->getId()));
+        rtspPort = nx_rtsp::DEFAULT_RTSP_PORT;
+    }
 
     outChannelProperties->httpUrl = url;
     outChannelProperties->rtspPort = *rtspPort;
