@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0020_apispecialpermissions'),
+        ('api', '0019_auto_20181012_0242'),
     ]
 
     operations = [
