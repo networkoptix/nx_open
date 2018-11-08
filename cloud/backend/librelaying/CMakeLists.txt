@@ -10,3 +10,7 @@ nx_add_target(nx_relaying LIBRARY ${library_type} NO_MOC
 target_compile_definitions(nx_relaying
     PRIVATE NX_RELAYING_API=${API_EXPORT_MACRO}
     INTERFACE NX_RELAYING_API=${API_IMPORT_MACRO})
+
+if(withTests)
+    add_subdirectory(unit_tests)
+endif()
