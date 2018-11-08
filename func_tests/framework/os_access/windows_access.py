@@ -200,11 +200,12 @@ class WindowsAccess(OSAccess):
             )
 
     def file_md5(self, path):
-        output = self.winrm.command(['CertUtil', '-hashfile', path, 'md5']).decode()
-        match = re.search('\b[0-9a-fA-F]{32}\b', output)
+        try:
+            output = self.winrm.command(['CertUtil', '-hashfile', path, 'md5']).run().decode()
+        except exceptions.exit_status_error_cls(0x80070002):  # Misleading error code and message.
+            raise exceptions.NotAFile(errno.EISDIR, "Trying to get MD5 of dir.")
+        match = re.search(r'\b[0-9a-fA-F]{32}\b', output)
         if match is None:
-            if '0x80070002' in output:
-                raise exceptions.NotAFile(errno.EISDIR, "Trying to get MD5 of dir.")
             raise RuntimeError('Cannot get MD5 of {}:\n{}'.format(path, output))
         return match.group()
 
