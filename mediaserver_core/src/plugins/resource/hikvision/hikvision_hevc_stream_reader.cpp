@@ -234,32 +234,96 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::fetchChannelProperties(
     ChannelProperties* outChannelProperties) const
 {
     const auto kRequestName = lit("Fetch channel properties");
-    nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
-    for (const auto& path: {kIsapiChannelStreamingPathTemplate, kChannelStreamingPathTemplate})
+
+    boost::optional<int> rtspPort;
+    auto url = hikvisionRequestUrlFromPath(kIsapiChannelStreamingPathTemplate.arg(
+        buildChannelNumber(getRole(), m_hikvisionResource->getChannel())));
+
+    auto result = fetchRtspPortViaIsapi(&rtspPort);
+    if (result.errorCode == CameraDiagnostics::ErrorCode::notAuthorised)
+        return result;
+
+    if (!rtspPort)
     {
-        auto url = hikvisionRequestUrlFromPath(path.arg(
+        url = hikvisionRequestUrlFromPath(kChannelStreamingPathTemplate.arg(
             buildChannelNumber(getRole(), m_hikvisionResource->getChannel())));
-
-        nx::Buffer response;
-        if (!doGetRequest(url, m_hikvisionResource->getAuth(), &response, &statusCode))
-        {
-            if (statusCode == nx_http::StatusCode::Value::unauthorized)
-                return CameraDiagnostics::NotAuthorisedResult(url.toString());
-
-            if (statusCode != nx_http::StatusCode::Value::ok)
-                continue;
-        }
-
-        if (!parseChannelPropertiesResponse(response, outChannelProperties))
-            return CameraDiagnostics::CameraResponseParseErrorResult(url.toString(), kRequestName);
-
-        outChannelProperties->httpUrl = url;
-        return CameraDiagnostics::NoErrorResult();
+        result = fetchRtspPortViaOldApi(&rtspPort);
     }
-    if (statusCode != nx_http::StatusCode::Value::ok)
-        return CameraDiagnostics::RequestFailedResult(kRequestName, toString(statusCode));
 
-    return CameraDiagnostics::RequestFailedResult(kRequestName, lit("No sutable URL"));
+    if (!result)
+        return result;
+
+    if (!rtspPort)
+        return CameraDiagnostics::RequestFailedResult("Fetch RTSP port", "No RTSP port found");
+
+    outChannelProperties->httpUrl = url;
+    outChannelProperties->rtspPort = *rtspPort;
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result HikvisionHevcStreamReader::fetchRtspPortViaIsapi(
+    boost::optional<int>* outRtspPort) const
+{
+    static const QString kAdminAccessPath("/ISAPI/Security/adminAccesses");
+    const auto url = hikvisionRequestUrlFromPath(kAdminAccessPath);
+
+    nx::Buffer response;
+    const auto result = fetchResponse(url, &response);
+    if (!result)
+        return result;
+
+    AdminAccess adminAccess;
+    const bool success = parseAdminAccessResponse(response, &adminAccess);
+    if (!success)
+        return CameraDiagnostics::CameraResponseParseErrorResult(kAdminAccessPath, "Admin access");
+
+    *outRtspPort = adminAccess.rtspPort;
+    return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result HikvisionHevcStreamReader::fetchRtspPortViaOldApi(
+    boost::optional<int>* outRtspPort) const
+{
+    auto url = hikvisionRequestUrlFromPath(kChannelStreamingPathTemplate.arg(
+        buildChannelNumber(getRole(), m_hikvisionResource->getChannel())));
+
+    nx::Buffer response;
+    const auto result = fetchResponse(url, &response);
+    if (!result)
+        return result;
+
+    ChannelProperties channelProperties;
+    if (!parseChannelPropertiesResponse(response, &channelProperties))
+    {
+        return CameraDiagnostics::CameraResponseParseErrorResult(
+            url.toString(),
+            "Fetch channel properties");
+    }
+
+    *outRtspPort = channelProperties.rtspPort;
+    return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result HikvisionHevcStreamReader::fetchResponse(
+    const QUrl& url,
+    nx::Buffer* outBuffer) const
+{
+    nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
+
+    if (!doGetRequest(url, m_hikvisionResource->getAuth(), outBuffer, &statusCode))
+    {
+        if (statusCode == nx_http::StatusCode::Value::unauthorized)
+            return CameraDiagnostics::NotAuthorisedResult(url.toString());
+
+        if (statusCode != nx_http::StatusCode::Value::ok)
+        {
+            return CameraDiagnostics::RequestFailedResult(
+                url.toString(), QString::fromUtf8(*outBuffer));
+        }
+    }
+
+    return CameraDiagnostics::NoErrorResult();
 }
 
 CameraDiagnostics::Result HikvisionHevcStreamReader::configureChannel(
