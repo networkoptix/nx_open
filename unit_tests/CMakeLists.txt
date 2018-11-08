@@ -17,7 +17,6 @@ if(withClouds)
 
     add_subdirectory(nx_data_sync_engine_ut)
     add_subdirectory(vms_gateway_ut)
-    add_subdirectory(cloud_connectivity_ut)
     add_subdirectory(cloud_db_ut)
     add_subdirectory(connection_mediator_ut)
     add_subdirectory(traffic_relay_ut)
