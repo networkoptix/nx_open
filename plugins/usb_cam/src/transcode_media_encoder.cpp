@@ -1,5 +1,7 @@
 #include "transcode_media_encoder.h"
 
+#include <nx/utils/log/log.h>
+
 #include "stream_reader.h"
 #include "transcode_stream_reader.h"
 
@@ -71,6 +73,8 @@ int TranscodeMediaEncoder::setFps(const float& fps, float* selectedFps)
 
 nxcip::StreamReader* TranscodeMediaEncoder::getLiveStreamReader()
 {
+    NX_ALWAYS(this, "%1 : Secondary stream requested", m_camera->info().modelName);
+
     if (!m_streamReader)
     {        
         m_streamReader.reset(new StreamReader(

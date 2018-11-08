@@ -11,8 +11,6 @@
 #include "device/video/rpi/rpi_utils.h"
 #include "device/audio/utils.h"
 
-#include <iostream>
-
 namespace nx {
 namespace usb_cam {
 
