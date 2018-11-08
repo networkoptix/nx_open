@@ -14,10 +14,8 @@ class SyncConnectionRequestHandler:
 {
 public:
     using ManagerFuncType = void (ManagerType::*)(
-        nx::network::http::HttpServerConnection* const connection,
+        nx::network::http::RequestContext requestContext,
         const std::string& systemId,
-        nx::network::http::Request request,
-        nx::network::http::Response* const response,
         nx::network::http::RequestProcessedHandler completionHandler);
 
     SyncConnectionRequestHandler(
@@ -31,19 +29,14 @@ public:
 
 protected:
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request request,
-        nx::network::http::Response* const response,
+        nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler) override
     {
-        std::string systemId = extractUserName(request);
+        std::string systemId = extractUserName(requestContext.request);
 
         (m_manager->*m_managerFuncPtr)(
-            connection,
+            std::move(requestContext),
             systemId,
-            std::move(request),
-            response,
             std::move(completionHandler));
     }
 

@@ -1,6 +1,7 @@
 import datetime
 import errno
 import logging
+import shlex
 import timeit
 from abc import ABCMeta
 from contextlib import contextmanager
@@ -9,7 +10,7 @@ import portalocker
 import pytz
 import tzlocal
 from netaddr import EUI
-from typing import Container, Optional, Callable, ContextManager, Type
+from typing import Any, Container, Optional, Callable, Type
 
 from framework.method_caching import cached_getter
 from framework.networking.interface import Networking
@@ -18,10 +19,9 @@ from framework.os_access import exceptions
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.local_path import LocalPath
 from framework.os_access.local_shell import local_shell
-from framework.os_access.os_access_interface import OSAccess, OneWayPortMap, ReciprocalPortMap, Time
+from framework.os_access.os_access_interface import BaseFakeDisk, OSAccess, OneWayPortMap, ReciprocalPortMap, Time
 from framework.os_access.path import FileSystemPath
 from framework.os_access.posix_shell import Shell
-from framework.os_access.posix_shell_path import PosixShellPath
 from framework.os_access.sftp_path import SftpPath
 from framework.os_access.ssh_shell import SSH
 from framework.os_access.ssh_traffic_capture import SSHTrafficCapture
@@ -87,7 +87,7 @@ class PosixAccess(OSAccess):
             shell,  # type: Shell
             time,  # type: Time
             traffic_capture,  # type: Optional[TrafficCapture]
-            lock_acquired,  # type: Optional[Callable[[FileSystemPath, ...], ContextManager[None]]]
+            lock_acquired,  # type: Optional[Callable[[FileSystemPath, ...], Any]]
             path_cls,  # type: Type[FileSystemPath]
             networking,  # type: Optional[Networking]
             ):
@@ -176,27 +176,8 @@ class PosixAccess(OSAccess):
             timeout_sec=timeout_sec)
         return output.decode('ascii')
 
-    def _dismount_fake_disk(self, mount_point='/mnt/disk'):
-        try:
-            self.shell.run_command(['umount', mount_point])
-        except exceptions.exit_status_error_cls(1):
-            pass
-
-    def make_fake_disk(self, name, size_bytes, mount_point='/mnt/disk'):
-        self._dismount_fake_disk(mount_point=mount_point)
-        image_path = self.path_cls.tmp() / (name + '.image')
-        disk_bytes = size_bytes + 26 * 1024 * 1024  # Taken by filesystem.
-        self.shell.run_sh_script(
-            # language=Bash
-            '''
-                rm -fv "$IMAGE"
-                fallocate --length $SIZE "$IMAGE"
-                mke2fs -F "$IMAGE"  # Make default filesystem for OS.
-                mkdir -p "$MOUNT_POINT"
-                mount "$IMAGE" "$MOUNT_POINT"
-                ''',
-            env={'MOUNT_POINT': mount_point, 'IMAGE': image_path, 'SIZE': disk_bytes})
-        return self.path_cls(mount_point)
+    def fake_disk(self):
+        return _FakeDisk(self)
 
     def _fs_root(self):
         return self.path_cls('/')
@@ -222,9 +203,7 @@ class PosixAccess(OSAccess):
         _, file_name = source_url.rsplit('/', 1)
         destination = destination_dir / file_name
         if destination.exists():
-            raise exceptions.AlreadyExists(
-                "Cannot download {!s} to {!s}".format(source_url, destination_dir),
-                destination)
+            return destination
         try:
             self.shell.run_command(
                 [
@@ -242,10 +221,7 @@ class PosixAccess(OSAccess):
         url = 'smb://{!s}/{!s}'.format(source_hostname, '/'.join(source_path.parts))
         destination = destination_dir / source_path.name
         if destination.exists():
-            raise exceptions.AlreadyExists(
-                "Cannot download file {!s} from {!s} to {!s}".format(
-                    source_path, source_hostname, destination_dir),
-                destination)
+            return destination
         # TODO: Decide on authentication based on username and password from URL.
         try:
             self.shell.run_command(
@@ -261,6 +237,73 @@ class PosixAccess(OSAccess):
         except exceptions.NonZeroExitStatus as e:
             raise exceptions.CannotDownload(e.stderr)
         return destination
+
+    def _files_md5(self, paths):
+        _logger.debug("Get MD5 of %d paths:\n%s", len(paths), '\n'.join(str(p) for p in paths))
+        if not paths:
+            return
+        command = self.shell.command(['md5sum', '--binary'] + paths)
+        with command.running() as run:
+            stdout, stderr = run.communicate(timeout_sec=300)
+        for line in stdout.decode().splitlines():
+            if not line:  # Last line is empty.
+                continue
+            assert line[32] == ' '
+            assert line[33] == '*'  # `*` appears if file is treated as binary.
+            yield self.path_cls(line[34:]), line[:32]
+        for line in stderr.decode().splitlines():
+            if not line or line.startswith('+'):  # Last empty line and tracing from set `-x`.
+                continue
+            if not line.endswith(': Is a directory'):
+                raise RuntimeError('Cannot calculate MD5 on {}:\n{}'.format(self, stderr))
+
+    def file_md5(self, file_path):
+        (path, digest), = self._files_md5([file_path])
+        return digest
+
+    def tree_md5(self, tree_path):
+        _logger.debug("Get MD5 of each file under: %s", tree_path)
+        paths = list(tree_path.glob('**/*'))
+        result = {}
+        for path, digest in self._files_md5(paths):
+            parts = path.relative_to(tree_path).parts
+            result[parts] = digest
+        return result
+
+
+class _FakeDisk(BaseFakeDisk):
+    def __init__(self, posix_access):  # type: (PosixAccess) -> ...
+        super(_FakeDisk, self).__init__(posix_access.path_cls('/mnt/disk'))
+        self._image_path = self.path.with_suffix('.img')
+        self._shell = posix_access.shell
+
+    def remove(self):
+        # At least, in Ubuntu 14.04 trusty, multiple `/dev/loop*` devices may be mounted to single
+        # mount point. Files that are behind `/dev/loop*` may be deleted. To dismount such mounts,
+        # `umount -f /mnt/point` must be called unless it exists with error code 1 and says
+        # `umount2: Invalid argument` and `umount: /mnt/disk: not mounted`.
+        while True:
+            try:
+                self._shell.run_command(['umount', '-f', self.path])
+            except exceptions.exit_status_error_cls(1):
+                break
+        # File should be deleted too. Otherwise, it may contain data from previous test.
+        try:
+            self._image_path.unlink()
+        except exceptions.DoesNotExist:
+            pass
+
+    def mount(self, size_bytes):
+        disk_bytes = size_bytes + 26 * 1024 * 1024  # Taken by filesystem.
+        self._shell.run_sh_script(
+            # language=Bash
+            '''
+                fallocate --length $SIZE "$IMAGE"
+                mke2fs -F "$IMAGE"  # Make default filesystem for OS.
+                mkdir -p "$MOUNT_POINT"
+                mount "$IMAGE" "$MOUNT_POINT"
+                ''',
+            env={'MOUNT_POINT': self.path, 'IMAGE': self._image_path, 'SIZE': disk_bytes})
 
 
 @contextmanager

@@ -60,7 +60,6 @@ def url(request):
 @pytest.mark.skipifnotimplemented
 def test_download(os_access, url, downloads_dir):
     path = os_access.download(url, downloads_dir)
-    assert path.exists() or path.is_symlink()
-    with pytest.raises(AlreadyExists) as excinfo:
-        os_access.download(url, downloads_dir)
-    assert excinfo.value.path == path
+    assert path.exists()
+    os_access.download(url, downloads_dir)  # No problem on second try.
+    assert path.exists()

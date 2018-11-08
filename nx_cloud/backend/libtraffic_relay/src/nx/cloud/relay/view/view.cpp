@@ -121,6 +121,7 @@ void View::registerApiHandlers()
         nx::network::http::Method::post,
         &m_controller->connectSessionManager());
 
+    // TODO: #ak Remove handler after end of 3.2 support. This is a compatiblity handler.
     registerApiHandler<view::ConnectToListeningPeerWithHttpUpgradeHandler>(
         nx::network::http::Method::post,
         &m_controller->connectSessionManager());
@@ -133,6 +134,7 @@ void View::registerApiHandlers()
         api::kClientTunnelBasePath,
         &m_httpMessageDispatcher);
 
+    // TODO: #ak Remove handler after end of 3.2 support. This is a compatiblity handler.
     registerApiHandler<relaying::BeginListeningUsingConnectMethodHandler>(
         nx::network::http::Method::connect,
         &m_controller->listeningPeerManager());

@@ -9,7 +9,7 @@ def _exception_failure(*errors):
     except KeyError:
         failure = Failure.from_current_exception()
         failure.exception = [failure.exception[-1]]  # Remove stack.
-        return failure.with_more_errors(*errors)
+        return failure.with_more_errors(list(errors))
 
 
 @pytest.mark.parametrize("result, report", [

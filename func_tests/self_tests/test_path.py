@@ -1,15 +1,14 @@
 # coding=utf-8
 import logging
 import os
+import pprint
 from string import whitespace
 
 import pytest
 
 from framework.os_access import exceptions
 from framework.os_access.local_path import LocalPath
-from framework.os_access.local_shell import local_shell
 from framework.os_access.path import copy_file
-from framework.os_access.posix_shell_path import PosixShellPath
 from framework.os_access.sftp_path import SftpPath
 
 _logger = logging.getLogger(__name__)
@@ -18,11 +17,6 @@ _logger = logging.getLogger(__name__)
 @pytest.fixture()
 def local_path_cls():
     return LocalPath
-
-
-@pytest.fixture()
-def ssh_path_cls():
-    return PosixShellPath.specific_cls(local_shell)
 
 
 @pytest.fixture(scope='session')
@@ -48,9 +42,9 @@ def smb_path_cls(windows_vm):
     return windows_vm.os_access.path_cls
 
 
-@pytest.fixture(params=['local_path_cls', 'ssh_path_cls', 'smb_path_cls', 'sftp_path_cls'])
+@pytest.fixture(params=['local', 'smb', 'sftp'])
 def path_cls(request):
-    return request.getfixturevalue(request.param)
+    return request.getfixturevalue(request.param + '_path_cls')
 
 
 @pytest.fixture()
@@ -161,8 +155,7 @@ _tricky_bytes = [
 def test_write_read_bytes(remote_test_dir, data):
     name, written = data
     file_path = remote_test_dir / '{}.dat'.format(name)
-    bytes_written = file_path.write_bytes(written)
-    assert bytes_written == len(written)
+    file_path.write_bytes(written)
     read = file_path.read_bytes()
     assert read == written
 
@@ -172,18 +165,18 @@ def test_write_read_tricky_bytes_with_offsets(remote_test_dir, data):
     name, written = data
     file_path = remote_test_dir / '{}.dat'.format(name)
     file_path.write_bytes(b'aaaaaaaaaa')
-    file_path.write_bytes(written, offset=10)
-    assert file_path.read_bytes(offset=10, max_length=100) == written[:100]
+    file_path.patch(10, written)
+    assert file_path.yank(10, max_length=100) == written[:100]
 
 
 def test_write_read_bytes_with_tricky_offsets(remote_test_dir):
     file_path = remote_test_dir / 'abc.dat'
     file_path.write_bytes(b'aaaaa')
-    file_path.write_bytes(b'bbbbb', offset=5)
-    file_path.write_bytes(b'ccccc', offset=10)
-    assert file_path.read_bytes(offset=12, max_length=5) == b'ccc'
-    assert file_path.read_bytes(offset=8, max_length=5) == b'bbccc'
-    assert file_path.read_bytes(offset=3, max_length=5) == b'aabbb'
+    file_path.patch(5, b'bbbbb')
+    file_path.patch(10, b'ccccc')
+    assert file_path.yank(12, max_length=5) == b'ccc'
+    assert file_path.yank(8, max_length=5) == b'bbccc'
+    assert file_path.yank(3, max_length=5) == b'aabbb'
 
 
 @pytest.mark.parametrize(
@@ -245,8 +238,8 @@ def test_unlink_non_existent(existing_remote_dir):
 
 def test_write_to_existing_file(existing_remote_file):
     data = os.urandom(1000)
-    bytes_written = existing_remote_file.write_bytes(data)
-    assert bytes_written == len(data)
+    existing_remote_file.write_bytes(data)
+    assert existing_remote_file.read_bytes() == data
 
 
 def test_read_from_non_existent(remote_test_dir):
@@ -273,14 +266,82 @@ def test_size_of_a_dir(remote_test_dir):
 
 
 def test_glob_on_file(existing_remote_file):
-    with pytest.raises(exceptions.BadPath):
-        _ = list(existing_remote_file.glob('*'))
+    assert not list(existing_remote_file.glob('*'))
+
+
+def test_glob_recursive(existing_remote_dir):
+    layout = [
+        ('1',),
+        ('1', '11',),
+        ('1', '11', '111.txt',),
+        ('1', '11', '112.dat',),
+        ('1', '11', '113',),
+        ('1', '11', '113', '1131',),
+        ('1', '12',),
+        ('1', '13.txt',),
+        ('2',),
+        ('3.txt',),
+        ]
+    for simplified in layout:
+        path = existing_remote_dir.joinpath(*simplified)
+        if path.suffix == '.txt':
+            path.write_text(u'dummy text :)')
+        elif path.suffix == '.dat':
+            path.write_bytes(b'dummy bytes \x8D')
+        else:
+            path.mkdir()
+
+    def _glob(pattern):
+        _logger.debug('Glob: %s', pattern)
+        raw = list(existing_remote_dir.glob(pattern))
+        _logger.debug('Raw:\n%s', pprint.pformat(raw))
+        simplified = list(sorted(path.relative_to(existing_remote_dir).parts for path in raw))
+        _logger.debug('Simplified:\n%s', pprint.pformat(simplified))
+        return simplified
+
+    assert _glob('**') == [
+        (),
+        ('1',),
+        ('1', '11',),
+        ('1', '11', '113',),
+        ('1', '11', '113', '1131',),
+        ('1', '12',),
+        ('2',),
+        ]
+    assert _glob('**/*') == [
+        ('1',),
+        ('1', '11',),
+        ('1', '11', '111.txt',),
+        ('1', '11', '112.dat',),
+        ('1', '11', '113',),
+        ('1', '11', '113', '1131',),
+        ('1', '12',),
+        ('1', '13.txt',),
+        ('2',),
+        ('3.txt',),
+        ]
+    assert _glob('**/*.txt') == [
+        ('1', '11', '111.txt',),
+        ('1', '13.txt',),
+        ('3.txt',),
+        ]
+    assert _glob('**/*.dat') == [
+        ('1', '11', '112.dat',),
+        ]
+    assert _glob('**/**/**/**/**/*1*/**/**/**/**/**/*') == [
+        ('1', '11',),
+        ('1', '11', '111.txt',),
+        ('1', '11', '112.dat',),
+        ('1', '11', '113',),
+        ('1', '11', '113', '1131',),
+        ('1', '12',),
+        ('1', '13.txt',),
+        ]
 
 
 def test_glob_on_non_existent(existing_remote_dir):
     non_existent_path = existing_remote_dir / 'non_existent'
-    with pytest.raises(exceptions.BadPath):
-        _ = list(non_existent_path.glob('*'))
+    assert not list(non_existent_path.glob('*'))
 
 
 def test_glob_on_empty_dir(existing_remote_dir):
@@ -292,7 +353,7 @@ def test_glob_no_result(existing_remote_dir):
     assert not list(existing_remote_dir.glob('*.non_existent'))
 
 
-@pytest.mark.parametrize('path_cls', ['local_path_cls', 'ssh_path_cls', 'sftp_path_cls'], indirect=True)
+@pytest.mark.parametrize('path_cls', ['local', 'sftp'], indirect=True)
 def test_symlink(existing_remote_dir):
     target = existing_remote_dir / 'target'
     contents = b'dummy contents'
@@ -302,7 +363,7 @@ def test_symlink(existing_remote_dir):
     assert link.read_bytes() == contents
 
 
-@pytest.mark.parametrize('path_cls', ['local_path_cls', 'ssh_path_cls', 'sftp_path_cls'], indirect=True)
+@pytest.mark.parametrize('path_cls', ['local', 'sftp'], indirect=True)
 def test_symlink_to_non_existent(existing_remote_dir):
     target = existing_remote_dir / 'target_non_existent'
     link = existing_remote_dir / 'link'
@@ -310,20 +371,20 @@ def test_symlink_to_non_existent(existing_remote_dir):
     pytest.raises(exceptions.DoesNotExist, link.read_bytes)
 
 
-@pytest.mark.parametrize('path_cls', ['local_path_cls', 'ssh_path_cls', 'sftp_path_cls'], indirect=True)
+@pytest.mark.parametrize('path_cls', ['local', 'sftp'], indirect=True)
 def test_symlink_at_existent_path(existing_remote_dir):
     link = existing_remote_dir / 'link'
     link.write_bytes(b'dummy contents')
     pytest.raises(exceptions.AlreadyExists, link.symlink_to, existing_remote_dir / 'target_non_existent')
 
 
-@pytest.mark.parametrize('path_cls', ['local_path_cls', 'ssh_path_cls', 'sftp_path_cls'], indirect=True)
+@pytest.mark.parametrize('path_cls', ['local', 'sftp'], indirect=True)
 def test_symlink_in_non_existent_parent(existing_remote_dir):
     link = existing_remote_dir / 'non_existent_dir' / 'link'
     pytest.raises(exceptions.BadParent, link.symlink_to, existing_remote_dir / 'target_non_existent')
 
 
-@pytest.mark.parametrize('path_cls', ['local_path_cls', 'ssh_path_cls', 'sftp_path_cls'], indirect=True)
+@pytest.mark.parametrize('path_cls', ['local', 'sftp'], indirect=True)
 def test_symlink_in_file_parent(existing_remote_dir):
     bad_parent = existing_remote_dir / 'file'
     bad_parent.write_bytes(b'dummy contents')
@@ -331,7 +392,7 @@ def test_symlink_in_file_parent(existing_remote_dir):
     pytest.raises(exceptions.BadParent, link.symlink_to, existing_remote_dir / 'target_non_existent')
 
 
-@pytest.mark.parametrize('path_cls', ['local_path_cls', 'ssh_path_cls', 'sftp_path_cls'], indirect=True)
+@pytest.mark.parametrize('path_cls', ['local', 'sftp'], indirect=True)
 def test_rmtree_with_symlinks(existing_remote_dir):
     path = existing_remote_dir / 'dir_with_symlink'
     path.mkdir()
@@ -351,30 +412,6 @@ def test_many_mkdir_rmtree(remote_test_dir, iterations, depth):
         top_path.rmtree()
 
 
-path_type_list = ['local', 'posix', 'ssh', 'smb']
-
-def remote_file_path(request, path_type, name):
-    if path_type == 'ssh':
-        vm_fixture_name = 'linux_vm'
-    if path_type == 'smb':
-        vm_fixture_name = 'windows_vm'
-    vm = request.getfixturevalue(vm_fixture_name)
-    tmp_dir = vm.os_access.path_cls.tmp()
-    tmp_dir.mkdir(parents=True, exist_ok=True)
-    base_remote_dir = tmp_dir.joinpath(__name__ + '-remote')
-    return base_remote_dir.joinpath(request.node.name + '-' + name)
-
-def path_type_to_path(request, node_dir, ssh_path_cls, path_type, name):
-    if path_type in 'local':
-        path = node_dir.joinpath('local-file-%s' % name)
-    elif path_type == 'posix':
-        path = ssh_path_cls(str(node_dir.joinpath('posix-file-%s' % name)))
-    else:
-        path = remote_file_path(request, path_type, name)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    return path
-
-
 @pytest.mark.parametrize(
     ('file_size', 'chunk_size'),
     [
@@ -384,14 +421,9 @@ def path_type_to_path(request, node_dir, ssh_path_cls, path_type, name):
         (0, 1),
         ],
     ids='file{}-chunk{}'.format)
-@pytest.mark.parametrize('destination_path_type', path_type_list)
-@pytest.mark.parametrize('source_path_type', path_type_list)
-def test_copy_file(request, node_dir, ssh_path_cls, source_path_type, destination_path_type, file_size, chunk_size):
-    source = path_type_to_path(request, node_dir, ssh_path_cls, source_path_type, 'source')
-    destination = path_type_to_path(request, node_dir, ssh_path_cls, destination_path_type, 'destination')
-
-    _logger.info('Copy: %r -> %r', source, destination)
-
+def test_copy_file(local_test_dir, existing_remote_dir, file_size, chunk_size):
+    source = local_test_dir / 'source'
+    destination = existing_remote_dir / 'destination'
     fill_with = '0123456789'
     bytes = fill_with * (file_size // len(fill_with))
     source.write_bytes(bytes)

@@ -179,7 +179,7 @@ Class Hierarchies:
   implemented (even if only theoretically) for Linux and Windows. `OSAccess` family knows nothing
   about Mediaserver. `OSAccess` uses classes:
   - `FileSystemPath` — pathlib-like interface for paths: not all operations are implemented,
-    exceptions are uniform. Platform classes: `SSHPath`, `SMBPath`.
+    exceptions are uniform. Platform classes: `SftpPath`, `SMBPath`.
   - `Networking` — common place for networking-related operations.
     - `PosixShell` — POSIX-specific interface, subclasses: `LocalShell` and `SSH`.
     - `WinRM` — class with Windows-specific interface. It can execute CMD and PowerShell scripts

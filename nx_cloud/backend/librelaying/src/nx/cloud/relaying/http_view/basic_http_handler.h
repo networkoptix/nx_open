@@ -127,18 +127,15 @@ public:
     }
 
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        const nx::network::http::Request& request,
-        nx::utils::stree::ResourceContainer /*authInfo*/) override
+        network::http::RequestContext requestContext) override
     {
-        Request inputData = prepareRequestData(connection, request);
+        Request inputData = prepareRequestData(requestContext);
         this->invokeManagerFunc(inputData, this->m_managerFunc);
     }
 
 protected:
     virtual Request prepareRequestData(
-        nx::network::http::HttpServerConnection* const connection,
-        const nx::network::http::Request& httpRequest) = 0;
+        const nx::network::http::RequestContext& requestContext) = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -157,19 +154,16 @@ public:
     }
 
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        const nx::network::http::Request& request,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
+        nx::network::http::RequestContext requestContext,
         Request inputData) override
     {
-        prepareRequestData(connection, request, &inputData);
+        prepareRequestData(requestContext, &inputData);
         this->invokeManagerFunc(inputData, this->m_managerFunc);
     }
 
 protected:
     virtual void prepareRequestData(
-        nx::network::http::HttpServerConnection* const connection,
-        const nx::network::http::Request& httpRequest,
+        const nx::network::http::RequestContext& requestContext,
         Request* request) = 0;
 };
 

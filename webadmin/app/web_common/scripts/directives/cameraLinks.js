@@ -69,7 +69,7 @@ angular.module('nxCommon')
                         replace("{{streamLetter}}", stream?'lo':'hi').
                         replace("{{auth}}", !scope.linkSettings.useAuth?'':'&auth=' + (transport=='rtsp'?systemAPI.authPlay():systemAPI.authGet())).
                         replace("{{position}}", scope.liveMode || !scope.position?'':'&pos=' + Math.round(scope.position)).
-                        replace("{{previewPosition}}", scope.liveMode || !scope.position?'&time=LATEST':'&time=' + Math.round(scope.position)).
+                        replace("{{previewPosition}}", scope.liveMode || !scope.position?'&time=LATEST&ignoreExternalArchive':'&time=' + Math.round(scope.position)).
                         replace("{{webPosition}}", scope.liveMode || !scope.position?'':'time=' + Math.round(scope.position)).
                         replace("{{webRootPath}}", systemAPI.systemId? '/' : (window.location.pathname + '#')).
                         replace("{{debug}}", scope.debugMode? 'debug' : '').

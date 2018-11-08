@@ -170,10 +170,9 @@ class _Class(object):
         body = {self.name: _prepare_data(properties_dict)}
         body[self.name]['@xmlns'] = self.uri
         outcome = self.wmi.act(self.uri, action_url, body, _SelectorSet.empty())
-        reference_parameters = outcome[u't:ResourceCreated'][u'a:ReferenceParameters']
-        assert reference_parameters[u'w:ResourceURI'] == self.uri
-        selector_set = reference_parameters[u'w:SelectorSet']
-        return selector_set
+        ref = _Reference.from_raw(self.wmi, outcome[u't:ResourceCreated'])
+        assert ref.wmi_class == self
+        return ref
 
     def enumerate(self, selectors_dict, max_elements=32000):
         _logger.info("Enumerate %s where %r", self, selectors_dict)
@@ -309,7 +308,7 @@ def _parse_data(data):
 class _Reference(object):
     """Reference to single object. Get single object and invoke methods here."""
 
-    def __init__(self, wmi_class, selectors):
+    def __init__(self, wmi_class, selectors):  # type: (_Class, _SelectorSet) -> ...
         self.wmi_class = wmi_class
         self.selectors = selectors
 
