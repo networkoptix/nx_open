@@ -269,8 +269,10 @@ protected:
         if (encryptionUse == network::ssl::EncryptionUse::always)
         {
             auto sslAcceptor = std::make_unique<network::ssl::StreamServerSocket>(
-                std::make_unique<AcceptorToServerSocketAdapter<RelayConnectionAcceptor>>(std::move(acceptor)),
+                std::make_unique<AcceptorToServerSocketAdapter<RelayConnectionAcceptor>>(
+                    std::move(acceptor)),
                 network::ssl::EncryptionUse::always);
+            sslAcceptor->setNonBlockingMode(true);
 
             peerServer = std::make_unique<nx::network::http::TestHttpServer>(
                 std::move(sslAcceptor));
