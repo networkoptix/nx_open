@@ -18,9 +18,9 @@
 #include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/test_options.h>
 
-#include <libconnection_mediator/src/listening_peer_pool.h>
-#include <libconnection_mediator/src/mediator_service.h>
-#include <libconnection_mediator/src/test_support/mediator_functional_test.h>
+#include <nx/cloud/mediator/listening_peer_pool.h>
+#include <nx/cloud/mediator/mediator_service.h>
+#include <nx/cloud/mediator/test_support/mediator_functional_test.h>
 
 #include "predefined_mediator_connector.h"
 

@@ -8,7 +8,7 @@
 #include <nx/network/cloud/tunnel/udp/connector.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/random.h>
-#include <libconnection_mediator/src/test_support/mediator_functional_test.h>
+#include <nx/cloud/mediator/test_support/mediator_functional_test.h>
 
 #include "cross_nat_connector_test.h"
 

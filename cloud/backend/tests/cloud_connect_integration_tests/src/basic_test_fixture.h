@@ -16,7 +16,7 @@
 
 #include <nx/cloud/relay/model/abstract_remote_relay_peer_pool.h>
 #include <nx/cloud/relay/test_support/traffic_relay_launcher.h>
-#include <libconnection_mediator/src/test_support/mediator_functional_test.h>
+#include <nx/cloud/mediator/test_support/mediator_functional_test.h>
 
 namespace nx {
 namespace network {

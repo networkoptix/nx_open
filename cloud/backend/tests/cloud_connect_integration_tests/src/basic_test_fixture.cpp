@@ -7,8 +7,8 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 
-#include <libconnection_mediator/src/listening_peer_pool.h>
-#include <libconnection_mediator/src/mediator_service.h>
+#include <nx/cloud/mediator/listening_peer_pool.h>
+#include <nx/cloud/mediator/mediator_service.h>
 #include <nx/cloud/relay/model/remote_relay_peer_pool.h>
 #include <nx/cloud/relay/controller/relay_public_ip_discovery.h>
 #include <nx/cloud/relaying/listening_peer_pool.h>

@@ -8,8 +8,8 @@
 #include <nx/network/http/server/abstract_fusion_request_handler.h>
 #include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
 
-#include "discovery/discovery_http_server.h"
-#include "server/hole_punching_processor.h"
+#include "../discovery/discovery_http_server.h"
+#include "../server/hole_punching_processor.h"
 
 namespace nx {
 namespace hpm {

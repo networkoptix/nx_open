@@ -2,7 +2,7 @@
 
 #include <nx/network/cloud/mediator/api/mediator_api_http_paths.h>
 
-#include "peer_registrator.h"
+#include "../peer_registrator.h"
 
 namespace nx {
 namespace hpm {

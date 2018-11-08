@@ -3,7 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include <mediator_process_public.h>
+#include <nx/cloud/mediator/mediator_process_public.h>
 #include <nx/network/socket_global.h>
 
 #ifdef _WIN32

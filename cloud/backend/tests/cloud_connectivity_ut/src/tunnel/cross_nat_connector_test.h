@@ -7,7 +7,7 @@
 
 #include <nx/network/cloud/tunnel/connector_factory.h>
 #include <nx/utils/std/optional.h>
-#include <libconnection_mediator/src/test_support/mediator_functional_test.h>
+#include <nx/cloud/mediator/test_support/mediator_functional_test.h>
 
 namespace nx {
 namespace network {

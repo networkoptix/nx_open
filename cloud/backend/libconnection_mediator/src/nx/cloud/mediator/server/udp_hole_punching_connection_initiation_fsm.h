@@ -14,9 +14,9 @@
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/thread/stoppable.h>
 
-#include "listening_peer_pool.h"
-#include "relay/abstract_relay_cluster_client.h"
-#include "statistics/connection_statistics_info.h"
+#include "../relay/abstract_relay_cluster_client.h"
+#include "../statistics/connection_statistics_info.h"
+#include "../listening_peer_pool.h"
 
 namespace nx {
 namespace hpm {

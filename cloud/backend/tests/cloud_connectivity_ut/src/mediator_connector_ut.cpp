@@ -18,9 +18,9 @@
 #include <nx/utils/test_support/module_instance_launcher.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 
-#include <libconnection_mediator/src/mediator_process_public.h>
-#include <libconnection_mediator/src/mediator_service.h>
-#include <libconnection_mediator/src/test_support/local_cloud_data_provider.h>
+#include <nx/cloud/mediator/mediator_process_public.h>
+#include <nx/cloud/mediator/mediator_service.h>
+#include <nx/cloud/mediator/test_support/local_cloud_data_provider.h>
 
 namespace nx {
 namespace hpm {

@@ -9,7 +9,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 
-#include <libconnection_mediator/src/test_support/mediator_functional_test.h>
+#include <nx/cloud/mediator/test_support/mediator_functional_test.h>
 
 #include "cross_nat_connector_test.h"
 #include "tunnel_connector_stub.h"

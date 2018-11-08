@@ -7,7 +7,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/time.h>
 
-#include "settings.h"
+#include "../settings.h"
 
 namespace nx {
 namespace hpm {

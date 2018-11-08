@@ -25,9 +25,9 @@
 #include <nx/utils/sync_call.h>
 #include <nx/utils/crypt/linux_passwd_crypt.h>
 
-#include "http/get_listening_peer_list_handler.h"
 #include "local_cloud_data_provider.h"
-#include "mediator_service.h"
+#include "../http/get_listening_peer_list_handler.h"
+#include "../mediator_service.h"
 
 namespace nx {
 namespace hpm {

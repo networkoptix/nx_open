@@ -11,7 +11,7 @@
 
 #include "connection_statistics_info.h"
 #include "dao/abstract_data_object.h"
-#include "settings.h"
+#include "../settings.h"
 
 namespace nx {
 namespace hpm {

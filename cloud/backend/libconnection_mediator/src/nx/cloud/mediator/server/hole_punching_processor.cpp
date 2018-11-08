@@ -6,9 +6,9 @@
 #include <nx/utils/time.h>
 #include <nx/utils/thread/barrier_handler.h>
 
-#include "listening_peer_pool.h"
-#include "settings.h"
-#include "statistics/collector.h"
+#include "../listening_peer_pool.h"
+#include "../settings.h"
+#include "../statistics/collector.h"
 
 namespace nx {
 namespace hpm {

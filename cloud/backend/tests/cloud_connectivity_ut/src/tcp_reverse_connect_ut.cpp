@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <libconnection_mediator/src/test_support/mediator_functional_test.h>
+#include <nx/cloud/mediator/test_support/mediator_functional_test.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/cloud/tunnel/tcp/reverse_connection_pool.h>

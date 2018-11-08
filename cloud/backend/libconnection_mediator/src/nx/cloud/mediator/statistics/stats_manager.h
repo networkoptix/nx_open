@@ -4,8 +4,7 @@
 
 #include "collector.h"
 #include "dao/rdb/instance_controller.h"
-#include "settings.h"
-
+#include "../settings.h"
 #include "../listening_peer_pool.h"
 #include "../peer_registrator.h"
 
