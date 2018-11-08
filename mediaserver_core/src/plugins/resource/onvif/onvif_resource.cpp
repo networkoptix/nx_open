@@ -1445,6 +1445,17 @@ void QnPlOnvifResource::setPtzConfigurationToken(const QString &src)
 
 QString QnPlOnvifResource::getPtzProfileToken() const
 {
+    const auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    if (resourceData.contains("forcedOnvifParams"))
+    {
+        const auto channel = getChannel();
+        const auto forcedOnvifParams =
+            resourceData.value<QnOnvifConfigDataPtr>(QString("forcedOnvifParams"));
+
+        if (forcedOnvifParams->ptzProfiles.size() > channel)
+            return forcedOnvifParams->ptzProfiles.at(channel);
+    }
+
     QnMutexLocker lock(&m_mutex);
     return m_ptzProfileToken;
 }
@@ -1560,9 +1571,22 @@ bool QnPlOnvifResource::fetchRelayInputInfo(const CapabilitiesResp& capabilities
 
 bool QnPlOnvifResource::fetchPtzInfo()
 {
-
     if (getPtzUrl().isEmpty())
         return false;
+
+    const auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    if (resourceData.contains("forcedOnvifParams"))
+    {
+        const auto channel = getChannel();
+        const auto forcedOnvifParams =
+            resourceData.value<QnOnvifConfigDataPtr>(QString("forcedOnvifParams"));
+
+        if (forcedOnvifParams->ptzConfigurations.size() > channel)
+        {
+            m_ptzConfigurationToken = forcedOnvifParams->ptzConfigurations.at(channel);
+            return true;
+        }
+    }
 
     QAuthenticator auth = getAuth();
     PtzSoapWrapper ptz (getPtzUrl().toStdString(), auth.user(), auth.password(), getTimeDrift());
