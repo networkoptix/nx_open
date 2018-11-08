@@ -115,6 +115,7 @@ def work_dir(request, metadata):
     # Don't create parents to fail fast if work dir is misconfigured.
     work_dir.mkdir(exist_ok=True, parents=False)
     metadata['Work Dir'] = work_dir
+    _logger.info("Work dir: %s", work_dir)
     return work_dir
 
 
@@ -133,6 +134,7 @@ def run_dir(work_dir, metadata):
     old = list(sorted(work_dir.glob('{}*'.format(prefix))))[:-5]
     pool = ThreadPool(10)  # Arbitrary, just not so much.
     future = pool.map_async(lambda dir: dir.rmtree(), old)
+    _logger.info("Run dir: %s", this)
     yield this
     future.wait(timeout=30)
     pool.terminate()
@@ -144,6 +146,7 @@ def node_dir(request, run_dir):
     # `node`, in pytest terms, is test with instantiated parameters.
     node_dir = run_dir.joinpath(*request.node.listnames()[1:])  # First path is always same.
     node_dir.mkdir(parents=True, exist_ok=False)
+    _logger.info("Node dir: %s", node_dir)
     return node_dir
 
 
@@ -159,6 +162,7 @@ mimetypes.add_type('application/x-yaml', '.yml')
 def artifacts_dir(node_dir, artifact_set):
     dir = node_dir / 'artifacts'
     dir.mkdir(exist_ok=True)
+    _logger.info("Artifacts dir: %s", dir)
     yield dir
     for entry in dir.glob('**'):
         # noinspection PyUnresolvedReferences
