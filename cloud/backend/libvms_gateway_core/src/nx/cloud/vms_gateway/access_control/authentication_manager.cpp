@@ -22,9 +22,9 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
 
-#include "stree/cdb_ns.h"
-#include "stree/http_request_attr_reader.h"
-#include "stree/socket_attr_reader.h"
+#include "../stree/cdb_ns.h"
+#include "../stree/http_request_attr_reader.h"
+#include "../stree/socket_attr_reader.h"
 
 
 namespace nx {

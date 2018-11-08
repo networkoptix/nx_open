@@ -6,7 +6,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/utils/sync_call.h>
 
-#include <discovery/registered_peer_pool.h>
+#include <nx/cloud/mediator/discovery/registered_peer_pool.h>
 
 #include "discovery_test_setup.h"
 

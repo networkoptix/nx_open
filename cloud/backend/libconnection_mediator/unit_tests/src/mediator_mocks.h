@@ -2,7 +2,7 @@
 
 #include <gmock/gmock.h>
 
-#include <mediaserver_endpoint_tester.h>
+#include <nx/cloud/mediator/mediaserver_endpoint_tester.h>
 
 #include "custom_printers.h"
 

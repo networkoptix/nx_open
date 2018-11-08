@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 
-#include <settings.h>
+#include <nx/cloud/mediator/settings.h>
 
 namespace nx {
 namespace hpm {

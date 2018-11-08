@@ -7,7 +7,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-#include "settings.h"
+#include "../settings.h"
 
 namespace nx {
 namespace cloud {

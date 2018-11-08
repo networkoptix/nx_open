@@ -3,8 +3,8 @@
 #include <nx/network/http/server/proxy/proxy_handler.h>
 #include <nx/network/http/server/proxy/proxy_worker.h>
 
-#include "settings.h"
 #include "target_peer_connector.h"
+#include "../settings.h"
 
 namespace nx {
 namespace cloud {

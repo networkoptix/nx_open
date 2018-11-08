@@ -2,7 +2,7 @@
 
 #include <nx/utils/std/optional.h>
 
-#include <statistics/collector.h>
+#include <nx/cloud/mediator/statistics/collector.h>
 
 #include "../functional_tests/mediator_functional_test.h"
 

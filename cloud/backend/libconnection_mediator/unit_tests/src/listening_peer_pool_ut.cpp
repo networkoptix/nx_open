@@ -6,8 +6,9 @@
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 
-#include <listening_peer_pool.h>
-#include <server/test_connection.h>
+#include <nx/cloud/mediator/listening_peer_pool.h>
+
+#include "server/test_connection.h"
 
 namespace nx {
 namespace hpm {

@@ -11,8 +11,7 @@
 #include <nx/utils/thread/sync_queue.h>
 
 #include <nx/cloud/relaying/settings.h>
-
-#include <http/target_peer_connector.h>
+#include <nx/cloud/vms_gateway/http/target_peer_connector.h>
 
 namespace nx {
 namespace cloud {

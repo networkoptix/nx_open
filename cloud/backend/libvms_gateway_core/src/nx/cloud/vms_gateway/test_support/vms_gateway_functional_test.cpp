@@ -18,7 +18,7 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
 
-#include "vms_gateway_process.h"
+#include "../vms_gateway_process.h"
 
 namespace nx {
 namespace cloud {

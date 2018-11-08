@@ -4,7 +4,7 @@
 #include <nx/network/http/server/proxy/m3u_playlist_converter.h>
 #include <nx/utils/std/cpp14.h>
 
-#include <http/url_rewriter.h>
+#include <nx/cloud/vms_gateway/http/url_rewriter.h>
 
 namespace nx {
 namespace cloud {

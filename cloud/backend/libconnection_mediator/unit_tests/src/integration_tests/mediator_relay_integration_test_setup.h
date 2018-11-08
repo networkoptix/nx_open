@@ -3,8 +3,8 @@
 #include <memory>
 #include <optional>
 
-#include <relay/relay_cluster_client_factory.h>
-#include <test_support/mediaserver_emulator.h>
+#include <nx/cloud/mediator/relay/relay_cluster_client_factory.h>
+#include <nx/cloud/mediator/test_support/mediaserver_emulator.h>
 
 #include "../functional_tests/mediator_functional_test.h"
 

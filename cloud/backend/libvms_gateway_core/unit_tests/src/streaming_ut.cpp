@@ -5,7 +5,7 @@
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/url/url_builder.h>
 
-#include <vms_gateway_process.h>
+#include <nx/cloud/vms_gateway/vms_gateway_process.h>
 
 #include "random_data_source.h"
 

@@ -8,8 +8,8 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <http/http_api_path.h>
-#include <vms_gateway_process.h>
+#include <nx/cloud/vms_gateway/http/http_api_path.h>
+#include <nx/cloud/vms_gateway/vms_gateway_process.h>
 
 #include "test_setup.h"
 

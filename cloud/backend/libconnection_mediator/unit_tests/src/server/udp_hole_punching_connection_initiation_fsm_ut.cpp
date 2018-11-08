@@ -10,9 +10,9 @@
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/test_support/program_arguments.h>
 
-#include <relay/relay_cluster_client.h>
-#include <server/udp_hole_punching_connection_initiation_fsm.h>
-#include <settings.h>
+#include <nx/cloud/mediator/relay/relay_cluster_client.h>
+#include <nx/cloud/mediator/server/udp_hole_punching_connection_initiation_fsm.h>
+#include <nx/cloud/mediator/settings.h>
 
 #include "test_connection.h"
 

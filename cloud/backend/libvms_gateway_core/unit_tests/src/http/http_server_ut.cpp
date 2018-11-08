@@ -2,7 +2,7 @@
 
 #include <nx/network/system_socket.h>
 
-#include <vms_gateway_process.h>
+#include <nx/cloud/vms_gateway/vms_gateway_process.h>
 
 #include "../test_setup.h"
 

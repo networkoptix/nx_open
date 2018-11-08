@@ -9,11 +9,11 @@
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/uuid.h>
 
-#include <relay/relay_cluster_client.h>
-#include <server/hole_punching_processor.h>
-#include <settings.h>
-#include <statistics/collector.h>
-#include <test_support/mediaserver_emulator.h>
+#include <nx/cloud/mediator/relay/relay_cluster_client.h>
+#include <nx/cloud/mediator/server/hole_punching_processor.h>
+#include <nx/cloud/mediator/settings.h>
+#include <nx/cloud/mediator/statistics/collector.h>
+#include <nx/cloud/mediator/test_support/mediaserver_emulator.h>
 
 #include "functional_tests/mediator_functional_test.h"
 #include "test_connection.h"

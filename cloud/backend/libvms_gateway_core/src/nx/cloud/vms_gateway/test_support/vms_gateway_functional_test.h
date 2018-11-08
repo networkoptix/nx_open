@@ -10,7 +10,7 @@
 #include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
 
-#include "vms_gateway_process_public.h"
+#include "../vms_gateway_process_public.h"
 
 namespace nx {
 namespace cloud {

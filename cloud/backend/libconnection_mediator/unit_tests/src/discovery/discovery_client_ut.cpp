@@ -4,7 +4,7 @@
 
 #include <nx/network/http/rest/http_rest_client.h>
 
-#include <discovery/discovery_client.h>
+#include <nx/cloud/mediator/discovery/discovery_client.h>
 
 #include "discovery_test_setup.h"
 

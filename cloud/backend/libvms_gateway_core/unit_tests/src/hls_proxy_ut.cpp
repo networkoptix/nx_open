@@ -11,7 +11,7 @@
 #include <nx/network/socket_factory.h>
 #include <nx/network/ssl/ssl_stream_socket.h>
 
-#include <vms_gateway_process.h>
+#include <nx/cloud/vms_gateway/vms_gateway_process.h>
 
 namespace nx {
 namespace cloud {

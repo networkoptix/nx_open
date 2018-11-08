@@ -14,10 +14,10 @@
 #include <nx/utils/sync_call.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <listening_peer_pool.h>
-#include <mediator_service.h>
-#include <relay/relay_cluster_client_factory.h>
-#include <test_support/mediaserver_emulator.h>
+#include <nx/cloud/mediator/listening_peer_pool.h>
+#include <nx/cloud/mediator/mediator_service.h>
+#include <nx/cloud/mediator/relay/relay_cluster_client_factory.h>
+#include <nx/cloud/mediator/test_support/mediaserver_emulator.h>
 
 #include "mediator_functional_test.h"
 

@@ -10,7 +10,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/sync_call.h>
 
-#include <test_support/mediaserver_emulator.h>
+#include <nx/cloud/mediator/test_support/mediaserver_emulator.h>
 
 #include "functional_tests/mediator_functional_test.h"
 

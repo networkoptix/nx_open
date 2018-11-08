@@ -13,8 +13,8 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/cpp14.h>
 
-#include <discovery/discovery_client.h>
-#include <discovery/discovery_http_api_path.h>
+#include <nx/cloud/mediator/discovery/discovery_client.h>
+#include <nx/cloud/mediator/discovery/discovery_http_api_path.h>
 
 #include "../integration_tests/mediator_relay_integration_test_setup.h"
 

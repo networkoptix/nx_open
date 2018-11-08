@@ -1,4 +1,4 @@
-#include <libvms_gateway_main.h>
+#include <nx/cloud/vms_gateway/libvms_gateway_main.h>
 
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>

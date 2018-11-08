@@ -6,8 +6,8 @@
 #include <nx/sql/db_connection_holder.h>
 #include <nx/sql/test_support/test_with_db_helper.h>
 
-#include <statistics/dao/rdb/instance_controller.h>
-#include <statistics/dao/rdb/rdb_data_object.h>
+#include <nx/cloud/mediator/statistics/dao/rdb/instance_controller.h>
+#include <nx/cloud/mediator/statistics/dao/rdb/rdb_data_object.h>
 
 namespace nx {
 namespace hpm {

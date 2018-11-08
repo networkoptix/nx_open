@@ -1,7 +1,7 @@
 //
 // This file is generated. Go to pom.xml.
 //
-#include <libvms_gateway_core_app_info.h>
+#include <nx/cloud/vms_gateway/libvms_gateway_core_app_info.h>
 
 QString QnLibVmsGatewayAppInfo::applicationName()
 {

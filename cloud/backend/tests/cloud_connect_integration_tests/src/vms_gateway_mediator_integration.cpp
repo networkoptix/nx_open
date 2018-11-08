@@ -8,11 +8,11 @@
 #include <nx/network/stream_proxy.h>
 #include <nx/network/stream_server_socket_to_acceptor_wrapper.h>
 
-#include <libvms_gateway_core/src/test_support/vms_gateway_functional_test.h>
+#include <nx/cloud/vms_gateway/test_support/vms_gateway_functional_test.h>
 
-#include <controller.h>
-#include <mediator_service.h>
-#include <peer_registrator.h>
+#include <nx/cloud/mediator/controller.h>
+#include <nx/cloud/mediator/mediator_service.h>
+#include <nx/cloud/mediator/peer_registrator.h>
 
 #include "basic_test_fixture.h"
 

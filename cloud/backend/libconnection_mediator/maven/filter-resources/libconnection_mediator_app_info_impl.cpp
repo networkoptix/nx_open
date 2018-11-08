@@ -1,7 +1,7 @@
 //
 // This file is generated. Go to pom.xml.
 //
-#include <libconnection_mediator_app_info.h>
+#include <nx/cloud/mediator/libconnection_mediator_app_info.h>
 
 QString QnLibConnectionMediatorAppInfo::applicationName()
 {

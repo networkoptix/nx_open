@@ -3,7 +3,7 @@
 
 #include <nx/network/ssl/ssl_engine.h>
 #include <nx/network/test_support/run_test.h>
-#include <test_support/vms_gateway_functional_test.h>
+#include <nx/cloud/vms_gateway/test_support/vms_gateway_functional_test.h>
 
 int main(int argc, char** argv)
 {

@@ -11,8 +11,8 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
 
-#include <mediator_service.h>
-#include <statistics/statistics_provider.h>
+#include <nx/cloud/mediator/mediator_service.h>
+#include <nx/cloud/mediator/statistics/statistics_provider.h>
 
 #include "functional_tests/mediator_functional_test.h"
 

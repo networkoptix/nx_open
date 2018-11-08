@@ -9,11 +9,11 @@
 #include <nx/sql/async_sql_query_executor.h>
 #include <nx/sql/test_support/test_with_db_helper.h>
 
-#include <settings.h>
-#include <statistics/collector.h>
-#include <statistics/dao/abstract_data_object.h>
-#include <statistics/dao/data_object_factory.h>
-#include <statistics/dao/memory/in_memory_data_object.h>
+#include <nx/cloud/mediator/settings.h>
+#include <nx/cloud/mediator/statistics/collector.h>
+#include <nx/cloud/mediator/statistics/dao/abstract_data_object.h>
+#include <nx/cloud/mediator/statistics/dao/data_object_factory.h>
+#include <nx/cloud/mediator/statistics/dao/memory/in_memory_data_object.h>
 
 namespace nx {
 namespace hpm {

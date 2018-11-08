@@ -10,7 +10,7 @@
 #include <nx/network/websocket/websocket.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <discovery/discovery_client.h>
+#include <nx/cloud/mediator/discovery/discovery_client.h>
 
 namespace nx {
 namespace cloud {

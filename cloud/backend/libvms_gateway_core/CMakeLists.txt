@@ -15,7 +15,7 @@ nx_add_target(vms_gateway_core LIBRARY ${library_type} NO_MOC
 )
 
 set(mocableNetworkFiles
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/vms_gateway_embeddable.h)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/cloud/vms_gateway/vms_gateway_embeddable.h)
 
 nx_add_qt_mocables(vms_gateway_core ${mocableNetworkFiles}
     INCLUDE_DIRS

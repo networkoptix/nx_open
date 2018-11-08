@@ -24,10 +24,10 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
 
-#include <listening_peer_pool.h>
-#include <peer_registrator.h>
-#include <relay/relay_cluster_client.h>
-#include <view.h>
+#include <nx/cloud/mediator/listening_peer_pool.h>
+#include <nx/cloud/mediator/peer_registrator.h>
+#include <nx/cloud/mediator/relay/relay_cluster_client.h>
+#include <nx/cloud/mediator/view.h>
 
 #include "mediator_mocks.h"
 

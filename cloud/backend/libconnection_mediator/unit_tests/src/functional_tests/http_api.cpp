@@ -5,7 +5,7 @@
 #include <nx/network/ssl/ssl_engine.h>
 #include <nx/network/url/url_builder.h>
 
-#include <mediator_service.h>
+#include <nx/cloud/mediator/mediator_service.h>
 
 #include "mediator_functional_test.h"
 
