@@ -10,6 +10,7 @@ MotionSearchListModel::MotionSearchListModel(QnWorkbenchContext* context, QObjec
     d(qobject_cast<Private*>(base_type::d.data()))
 {
     setLiveSupported(true);
+    setLivePaused(true);
 }
 
 QList<QRegion> MotionSearchListModel::filterRegions() const

@@ -13,7 +13,7 @@ struct QnAuthSession;
 
 namespace nx {
 
-namespace update {struct Package; }
+namespace update { struct Package; }
 
 class CommonUpdateInstaller;
 
@@ -36,7 +36,7 @@ private:
     void onDownloaderFailed(const QString& fileName);
     void onDownloaderFinished(const QString& fileName);
     update::FindPackageResult findPackage(
-        nx::update::Package* outPackage, 
+        nx::update::Package* outPackage,
         QString* outMessage = nullptr) const;
     bool canDownloadFile(const QString& fileName, update::Status* outUpdateStatus);
     bool statusAppropriateForDownload(nx::update::Package* outPackage, update::Status* outStatus);

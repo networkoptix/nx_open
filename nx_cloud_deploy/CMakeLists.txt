@@ -54,7 +54,7 @@ function(nx_get_cloud_version versionVarName)
         message(STATUS "Build number ${buildNumber} has been provided")
     endif()
 
-    file(READ ${CMAKE_SOURCE_DIR}/nx_cloud/version.txt cloudVersion)
+    file(READ ${CMAKE_SOURCE_DIR}/cloud/version.txt cloudVersion)
     string(STRIP ${cloudVersion} cloudVersion)
 
     set(${versionVarName} "${cloudVersion}.${buildNumber}" PARENT_SCOPE)

@@ -12,12 +12,19 @@
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/std/cpp14.h>
 
-namespace nx {
-namespace network {
-namespace server {
-namespace test {
+namespace nx::network::server::test {
 
 namespace {
+
+class DummyOutput:
+    public utils::bstream::AbstractOutput
+{
+public:
+    virtual int write(const void* /*data*/, size_t count) override
+    {
+        return (int)count;
+    }
+};
 
 class AsyncChannelToStreamSocketAdapter:
     public StreamSocketDelegate
@@ -43,6 +50,13 @@ public:
         IoCompletionHandler handler) override
     {
         m_asyncChannel->readSomeAsync(buffer, std::move(handler));
+    }
+
+    virtual void sendAsync(
+        const nx::Buffer& buffer,
+        IoCompletionHandler handler) override
+    {
+        m_asyncChannel->sendAsync(buffer, std::move(handler));
     }
 
 private:
@@ -127,17 +141,15 @@ public:
     BaseStreamProtocolConnection():
         m_asyncChannel(
             &m_input,
-            nullptr,
+            &m_dummyOutput,
             aio::test::AsyncChannel::InputDepletionPolicy::retry)
     {
-        using namespace std::placeholders;
-
         m_connection = std::make_unique<TestHttpConnection>(
             std::make_unique<AsyncChannelToStreamSocketAdapter>(&m_asyncChannel));
         m_connection->setMessageHandler(
-            std::bind(&BaseStreamProtocolConnection::saveMessage, this, _1));
+            [this](auto&&... args) { saveMessage(std::move(args)...); });
         m_connection->setOnSomeMessageBodyAvailable(
-            std::bind(&BaseStreamProtocolConnection::saveSomeBody, this, _1));
+            [this](auto&&... args) { saveSomeBody(std::move(args)...); });
         m_connection->startReadingConnection();
     }
 
@@ -183,9 +195,21 @@ protected:
         sendMessages();
     }
 
+    template<typename Handler>
+    void whenSendMessage(Handler handler)
+    {
+        m_connection->sendMessage(
+            http::Message(http::MessageType::request),
+            [this, handler = std::move(handler)](
+                SystemError::ErrorCode sysErrorCode)
+            {
+                handler();
+                m_sendResults.push(sysErrorCode);
+            });
+    }
+
     void thenMessageIsReported()
     {
-        //m_receivedMessageQueue.pop();
         thenEveryMessageIsReceived();
     }
 
@@ -212,11 +236,22 @@ protected:
         }
     }
 
+    void thenMessageHasBeenSent()
+    {
+        ASSERT_EQ(SystemError::noError, m_sendResults.pop());
+    }
+
     virtual void saveMessage(nx::network::http::Message message)
     {
         auto messageToSave = std::make_unique<nx::network::http::Message>(std::move(message));
         m_prevMessageReceived = messageToSave.get();
         m_receivedMessageQueue.push(std::move(messageToSave));
+    }
+
+    void freeConnection()
+    {
+        m_asyncChannel.cancelIOSync(aio::etNone);
+        m_connection.reset();
     }
 
     TestHttpConnection& connection()
@@ -239,6 +274,8 @@ private:
     std::vector<HttpMessageTestData> m_messagesSent;
     nx::network::http::Message* m_prevMessageReceived = nullptr;
     QnMutex m_mutex;
+    nx::utils::SyncQueue<SystemError::ErrorCode> m_sendResults;
+    DummyOutput m_dummyOutput;
 
     void sendMessages()
     {
@@ -305,6 +342,14 @@ TEST_F(BaseStreamProtocolConnection, receiving_multiple_messages_over_same_conne
     thenEveryMessageIsReceived();
 }
 
+TEST_F(BaseStreamProtocolConnection, can_be_removed_in_send_completion_handler)
+{
+    whenSendMessage([this]() { freeConnection(); });
+
+    thenMessageHasBeenSent();
+    // andProcessHasNotCrashed()
+}
+
 // TEST_F(BaseStreamProtocolConnection, message_parse_error)
 
 //-------------------------------------------------------------------------------------------------
@@ -323,13 +368,11 @@ protected:
 
     void thenMessageBodyCanBeReadFromSocket()
     {
-        using namespace std::placeholders;
-
         m_readBuffer.reserve(expectedBody().size());
 
         m_streamSocket->readSomeAsync(
             &m_readBuffer,
-            std::bind(&BaseStreamProtocolConnectionTakeSocket::onSomeBytesRead, this, _1, _2));
+            [this](auto&&... args) { onSomeBytesRead(std::move(args)...); });
 
         m_done.get_future().wait();
     }
@@ -349,8 +392,6 @@ private:
     void onSomeBytesRead(
         SystemError::ErrorCode sysErrorCode, std::size_t /*bytesRead*/)
     {
-        using namespace std::placeholders;
-
         ASSERT_EQ(SystemError::noError, sysErrorCode);
 
         if (m_readBuffer == expectedBody())
@@ -363,7 +404,7 @@ private:
 
         m_streamSocket->readSomeAsync(
             &m_readBuffer,
-            std::bind(&BaseStreamProtocolConnectionTakeSocket::onSomeBytesRead, this, _1, _2));
+            [this](auto&&... args) { onSomeBytesRead(std::move(args)...); });
     }
 };
 
@@ -374,7 +415,4 @@ TEST_F(BaseStreamProtocolConnectionTakeSocket, taking_socket_does_not_lose_data)
     thenMessageBodyCanBeReadFromSocket();
 }
 
-} // namespace test
-} // namespace server
-} // namespace network
-} // namespace nx
+} // namespace nx::network::server::test

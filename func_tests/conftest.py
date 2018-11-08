@@ -160,7 +160,7 @@ def artifacts_dir(node_dir, artifact_set):
     dir = node_dir / 'artifacts'
     dir.mkdir(exist_ok=True)
     yield dir
-    for entry in dir.walk():
+    for entry in dir.glob('**'):
         # noinspection PyUnresolvedReferences
         mime_type = mimetypes.types_map.get(entry.suffix, 'application/octet-stream')
         type = ArtifactType(entry.suffix[1:] if entry.suffix else 'unknown_type', mime_type, ext=entry.suffix)

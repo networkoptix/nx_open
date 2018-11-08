@@ -115,10 +115,13 @@ export class MediaserverApi {
      * Sends an event to system. Currently only supports generic events.
      * @param {BaseEvent} event The event you want to trigger on the server.
      * @param {Date} timestamp The timestamp of when the event occurred.
-     * @param {string} state Describes if the event started or stopped. Values can be '', 'Active', 'Inactive'.
+     * @param {string} state Describes if the event started or stopped.
+     *     Values can be '', 'Active', 'Inactive'.
      * @returns {Bluebird<void>}
      */
-    public sendEvent({ event, timestamp, state }: { event: BaseEvent, timestamp?: Date, state?: string }) {
+    public sendEvent({ event, timestamp, state }: {
+        event: BaseEvent, timestamp?: Date, state?: string
+    }) {
         const queryString: { [key: string]: any } = event.formatQueryString();
         if (timestamp !== undefined) {
             queryString.timestamp = timestamp;

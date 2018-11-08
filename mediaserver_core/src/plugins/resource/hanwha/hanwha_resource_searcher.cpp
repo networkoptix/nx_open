@@ -26,6 +26,7 @@ static const QString kHanwhaDefaultPassword = lit("4321");
 
 static const int kSunApiProbeSrcPort = 7711;
 static const int kSunApiProbeDstPort = 7701;
+static std::chrono::seconds kSunapiSocketSendTimeout(5);
 
 static const int64_t kSunApiDiscoveryTimeoutMs = 10 * 60 * 1000; //< 10 minutes.
 
@@ -160,12 +161,13 @@ void HanwhaResourceSearcher::updateSocketList()
 {
     if (!m_sunapiReceiveSocket)
     {
-        m_sunapiReceiveSocket = nx::network::SocketFactory::createDatagramSocket();
-        if (!m_sunapiReceiveSocket->setReuseAddrFlag(true) ||
-            !m_sunapiReceiveSocket->bind(network::BROADCAST_ADDRESS, kSunApiProbeSrcPort))
+        auto socket = nx::network::SocketFactory::createDatagramSocket();
+        if (!socket->setReuseAddrFlag(true) ||
+            !socket->bind(network::BROADCAST_ADDRESS, kSunApiProbeSrcPort))
         {
             return;
         }
+        m_sunapiReceiveSocket = std::move(socket);
     }
 
     const auto interfaceList = nx::network::getAllIPv4Interfaces();
@@ -178,7 +180,8 @@ void HanwhaResourceSearcher::updateSocketList()
     {
         auto socket(nx::network::SocketFactory::createDatagramSocket());
         if (!socket->setReuseAddrFlag(true) ||
-            !socket->bind(iface.address.toString(), kSunApiProbeSrcPort))
+            !socket->bind(iface.address.toString(), kSunApiProbeSrcPort) ||
+            !socket->setSendTimeout(kSunapiSocketSendTimeout))
         {
             continue;
         }
@@ -249,7 +252,7 @@ void HanwhaResourceSearcher::readSunApiResponse(QnResourceList& resultResourceLi
             m_sunApiSocketList.clear();
     }
 
-    if (m_sunapiReceiveSocket->hasData())
+    if (m_sunapiReceiveSocket && m_sunapiReceiveSocket->hasData())
     {
         success = readSunApiResponseFromSocket(m_sunapiReceiveSocket.get(), &resultResourceList);
         if (!success)

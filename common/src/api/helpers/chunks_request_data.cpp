@@ -161,11 +161,11 @@ bool QnChunksRequestData::isValid() const
         return false;
     }
 
-    if (periodsType == Qn::MotionContent)
+    if (periodsType == Qn::MotionContent && !filter.trimmed().isEmpty())
     {
         const auto motionRegions = QJson::deserialized<QList<QRegion>>(filter.toUtf8());
-        return !motionRegions.empty()
-            && std::all_of(motionRegions.cbegin(), motionRegions.cend(), isValidMotionRegion);
+        if (!std::all_of(motionRegions.cbegin(), motionRegions.cend(), isValidMotionRegion))
+            return false;
     }
 
     return true;

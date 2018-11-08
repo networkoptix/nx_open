@@ -20,6 +20,8 @@ class Shell(object):
         self._shell_id = None
 
     def __enter__(self):
+        # 65001 is UTF-8.
+        # https://docs.microsoft.com/en-us/windows/desktop/intl/code-page-identifiers.
         self._shell_id = self._protocol.open_shell(codepage=65001)
         return self
 

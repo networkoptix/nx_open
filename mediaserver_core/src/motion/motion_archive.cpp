@@ -295,7 +295,7 @@ void QnMotionArchive::loadDataFromIndex(
                 }
                 else
                 {
-                    QnTimePeriod& last = *(rez.end() - 1);
+                    QnTimePeriod& last = rez.back();
                     if (fullStartTime <= last.startTimeMs + last.durationMs + detailLevel)
                     {
                         last.durationMs = qMax(last.durationMs, i->duration + fullStartTime - last.startTimeMs);
@@ -358,8 +358,8 @@ void QnMotionArchive::loadDataFromIndexDesc(
                 }
                 else
                 {
-                    QnTimePeriod& last = *(rez.end() - 1);
-                    if (fullStartTimeMs + i->duration + detailLevel > last.startTimeMs)
+                    QnTimePeriod& last = rez.back();
+                    if (fullStartTimeMs + i->duration + detailLevel >= last.startTimeMs)
                     {
                         const auto endTimeMs = last.endTimeMs();
                         last.startTimeMs = qMin(last.startTimeMs, fullStartTimeMs);

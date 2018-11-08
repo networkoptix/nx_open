@@ -44,7 +44,6 @@ def timedelta_representer(dumper, data):
 
 yaml.add_constructor(u'!timedelta', timedelta_constructor)
 yaml.add_representer(datetime.timedelta, timedelta_representer)
-yaml.add_implicit_resolver(u'!timedelta', TIMEDELTA_REGEXP)
 
 
 class TestParameter(object):

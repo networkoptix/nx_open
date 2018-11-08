@@ -373,6 +373,13 @@
         },
         {
             "keys":[
+                "Hanwha|*", "Samsung|*"
+            ],
+            "ignoreONVIF": true,
+            "forcedAdditionalManufacturer": "Hanwha"
+        },
+        {
+            "keys":[
                 "Axis|Axis F44 Dual Audio*"
             ],
             "ignoreONVIF": true
