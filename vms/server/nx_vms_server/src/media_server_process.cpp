@@ -3366,6 +3366,7 @@ void MediaServerProcess::stopObjects()
 
     m_generalTaskTimer.reset();
     m_udtInternetTrafficTimer.reset();
+    m_createDbBackupTimer.reset();
 
     safeDisconnect(commonModule()->globalSettings(), this);
     safeDisconnect(m_universalTcpListener->authenticator(), this);
@@ -3724,6 +3725,15 @@ void MediaServerProcess::connectSignals()
             }
         });
 
+    m_createDbBackupTimer = std::make_unique<QTimer>();
+    connect(m_createDbBackupTimer.get(), &QTimer::timeout,
+        [this]()
+        {
+            auto utils = nx::mediaserver::Utils(serverModule());
+            if (utils.timeToMakeDbBackup())
+                utils.backupDatabase();
+        });
+
     connect(
         m_universalTcpListener.get(),
         &QnTcpListener::portChanged,
@@ -3869,6 +3879,7 @@ void MediaServerProcess::startObjects()
     at_timer();
     m_generalTaskTimer->start(QnVirtualCameraResource::issuesTimeoutMs());
     m_udtInternetTrafficTimer->start(UDT_INTERNET_TRAFIC_TIMER);
+    m_createDbBackupTimer->start(serverModule()->settings().dbBackupPeriodMS().count());
 
     const bool isDiscoveryDisabled = serverModule()->settings().noResourceDiscovery();
 
@@ -4134,6 +4145,13 @@ void MediaServerProcess::run()
 
     if (!serverModule->serverDb()->open())
         return;
+
+    auto utils = nx::mediaserver::Utils(serverModule.get());
+    if (utils.timeToMakeDbBackup())
+    {
+        utils.backupDatabase(ec2::detail::QnDbManager::ecsDbFileName(
+            serverModule->settings().dataDir()));
+    }
 
     if (!connectToDatabase())
         return;

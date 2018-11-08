@@ -4,6 +4,7 @@
 #include <network/multicodec_rtp_reader.h>
 #include <network/system_helpers.h>
 #include <utils/common/app_info.h>
+#include <utils/common/util.h>
 
 namespace nx {
 namespace mediaserver {
@@ -281,6 +282,31 @@ public:
             return obtainDataDirectory();
         }
     };
+    Option<QString> backupDir{this, "backupDir",
+        "",
+        "/opt/{CustomizationName}/mediaserver/var/backup (on linux). "
+        "C:\\Users\\{username}\\AppData\\Local\\Network Optix\\Network Optix Media Server\\backup "
+        "on MSWin",
+        [this](const QString& value)
+        {
+            if (!value.isEmpty())
+                return value;
+
+            return closeDirPath(dataDir()) + "backup";
+        }
+    };
+    Option<std::chrono::milliseconds> dbBackupPeriodMS{this, "dbBackupPeriodMS",
+        kDbBackupPeriodHrs,
+        "Backup EC database period. If server version is updated, this setting is neglected and "
+        "backup is created after the updated server starts.",
+        [this](const std::chrono::milliseconds& value)
+        {
+            if (value.count() == 0)
+                return std::chrono::milliseconds(kDbBackupPeriodHrs);
+
+            return value;
+        }
+    };
     Option<QString> staticDataDir{this, "staticDataDir",
         "",
         "If set, license ecs_static.sqlite will be forwarded to specified directory.",
@@ -326,6 +352,7 @@ public:
 #endif // defined(__arm__)
     static constexpr unsigned int kDefaultHlsPlaylistPreFillChunks = 2;
     static constexpr std::chrono::milliseconds kDefaultHlsTargetDurationMs{5 * 1000};
+    static constexpr std::chrono::hours kDbBackupPeriodHrs{24};
     static constexpr int kDefaultHlsRemovedLiveChunksToKeep = -1;
 };
 

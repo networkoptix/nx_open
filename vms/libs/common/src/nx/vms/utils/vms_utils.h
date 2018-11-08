@@ -4,6 +4,7 @@
 
 #include <nx_ec/ec_api.h>
 #include <utils/common/optional.h>
+#include <boost/optional.hpp>
 
 class QnCommonModule;
 struct ConfigureSystemData;
@@ -13,15 +14,21 @@ namespace nx {
 namespace vms {
 namespace utils {
 
-/**
-* @return Unique filename according to pattern "<prefix>_<build>_<index>.backup" by
-* incrementing index
-*/
-    QString makeNextUniqueName(const QString& prefix, int build);
+struct DbBackupFileData
+{
+    QString fullPath;
+    int build = -1;
+    qint64 timestamp = -1;
+};
 
-bool backupDatabase(
-    const QString& outputDir,
-    std::shared_ptr<ec2::AbstractECConnection> connection);
+bool backupDatabase(const QString& backupDir,
+    std::shared_ptr<ec2::AbstractECConnection> connection,
+    const boost::optional<QString>& dbFilePath = boost::none);
+
+QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir);
+
+/* Newest files come first */
+void deleteOldBackupFilesIfNeeded(const QString& backupDir, qint64 freeSpace);
 
 bool configureLocalPeerAsPartOfASystem(
     QnCommonModule* commonModule,

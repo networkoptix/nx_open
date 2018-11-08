@@ -390,6 +390,11 @@ bool QnDbManager::setMediaServersStatus(Qn::ResourceStatus status)
     return true;
 }
 
+QString QnDbManager::ecsDbFileName(const QString& basePath)
+{
+    return closeDirPath(basePath) + QString::fromLatin1("ecs.sqlite");
+}
+
 bool QnDbManager::init(const nx::utils::Url& dbUrl)
 {
     NX_ASSERT(m_tranLog != nullptr);
@@ -399,7 +404,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
         const QString dbFilePath = dbUrl.toLocalFile();
         const QString dbFilePathStatic = QUrlQuery(dbUrl.query()).queryItemValue("staticdb_path");
 
-        QString dbFileName = closeDirPath(dbFilePath) + QString::fromLatin1("ecs.sqlite");
+        QString dbFileName = ecsDbFileName(dbFilePath);
         addDatabase(dbFileName, getDatabaseName("QnDbManager"));
 
         QString backupDbFileName = dbFileName + QString::fromLatin1(".backup");
@@ -4526,8 +4531,7 @@ ErrorCode QnDbManager::doQuery(const std::nullptr_t& /*dummy*/, DatabaseDumpData
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQuery(
-    const StoredFilePath& dumpFilePath,
+ErrorCode QnDbManager::doQuery(const StoredFilePath& dumpFilePath,
     DatabaseDumpToFileData& databaseDumpToFileData)
 {
     QnWriteLocker lock(&m_mutex);

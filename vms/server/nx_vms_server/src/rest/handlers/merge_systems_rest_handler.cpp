@@ -65,7 +65,7 @@ int QnMergeSystemsRestHandler::execute(
     }
     else
     {
-        systemMergeProcessor.enableDbBackup(serverModule()->settings().dataDir());
+        systemMergeProcessor.enableDbBackup(serverModule()->settings().backupDir());
         result = systemMergeProcessor.merge(
             owner->accessRights(),
             owner->authSession(),

@@ -46,10 +46,10 @@ SystemMergeProcessor::SystemMergeProcessor(QnCommonModule* commonModule):
 {
 }
 
-void SystemMergeProcessor::enableDbBackup(const QString& dataDirectory)
+void SystemMergeProcessor::enableDbBackup(const QString& backupDirectory)
 {
     m_dbBackupEnabled = true;
-    m_dataDirectory = dataDirectory;
+    m_backupDirectory = backupDirectory;
 }
 
 QnJsonRestResult SystemMergeProcessor::merge(
@@ -350,7 +350,7 @@ QnJsonRestResult SystemMergeProcessor::mergeSystems(
         NX_DEBUG(this, "Backing up the database");
 
         if (!nx::vms::utils::backupDatabase(
-                m_dataDirectory,
+                m_backupDirectory,
                 m_commonModule->ec2Connection()))
         {
             NX_DEBUG(this, lit("takeRemoteSettings %1. Failed to backup database")

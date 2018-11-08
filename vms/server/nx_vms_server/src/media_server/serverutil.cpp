@@ -1,4 +1,4 @@
-#include <QtCore/QString>
+    #include <QtCore/QString>
 #include <nx/utils/uuid.h>
 #include <QtGui/QDesktopServices>
 #include <QtCore/QDir>
@@ -53,7 +53,9 @@
 #include "server/server_globals.h"
 #include <media_server/media_server_module.h>
 #include <utils/crypt/symmetrical.h>
+#include <utils/common/synctime.h>
 #include <api/model/password_data.h>
+#include <database/db_manager.h>
 
 namespace
 {
@@ -104,10 +106,44 @@ bool Utils::updateUserCredentials(
     return true;
 }
 
-bool Utils::backupDatabase()
+bool Utils::backupDatabase(const boost::optional<QString>& dbFilePath)
 {
     auto connection = ec2Connection();
-    return nx::vms::utils::backupDatabase(serverModule()->settings().dataDir(), std::move(connection));
+    return nx::vms::utils::backupDatabase(serverModule()->settings().backupDir(),
+        std::move(connection), dbFilePath);
+}
+
+bool Utils::timeToMakeDbBackup() const
+{
+    const auto dataDir = serverModule()->settings().dataDir();
+    const auto backupDir = serverModule()->settings().backupDir();
+    if (!QFile::exists(ec2::detail::QnDbManager::ecsDbFileName(dataDir)))
+        return false; //< Nothing to make a copy of.
+
+    const auto currentVersion =
+        nx::utils::SoftwareVersion(nx::utils::AppInfo::applicationVersion());
+
+    auto allBackupFilesData = vms::utils::allBackupFilesDataSorted(backupDir);
+    QList<nx::vms::utils::DbBackupFileData> thisVersionBackupFilesData;
+
+    std::copy_if(allBackupFilesData.cbegin(), allBackupFilesData.cend(),
+        std::back_inserter(thisVersionBackupFilesData),
+        [&currentVersion](const nx::vms::utils::DbBackupFileData& backupFileData)
+        {
+            return backupFileData.build == currentVersion.build();
+        });
+
+    if (thisVersionBackupFilesData.isEmpty())
+        return true; //< Backups for the current server version haven't been found, let's make one.
+
+    NX_ASSERT(!thisVersionBackupFilesData.isEmpty());
+    if (qnSyncTime->currentMSecsSinceEpoch() - thisVersionBackupFilesData.front().timestamp
+        > serverModule()->settings().dbBackupPeriodMS().count())
+    {
+        return true;
+    }
+
+    return false;
 }
 
 void Utils::dropConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus)

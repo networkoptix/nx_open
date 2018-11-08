@@ -8,12 +8,8 @@ FindFreePorts
 CopyMediaServerProfile
 CopyAppServerProfile
 CopyAppServerNotificationFiles
-DeleteDatabaseFile
 DeleteRegistryKeys
 DeleteAllRegistryKeys
-BackupDatabaseFile
-RestoreDatabaseFile
-CopyDatabaseFile
 CopyHostedFiles
 PopulateRestoreVersions
 CAQuitExecAndWarn
