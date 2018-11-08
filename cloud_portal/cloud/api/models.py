@@ -12,6 +12,7 @@ class Account(PermissionsMixin):
     class Meta:
         permissions = (
             ("can_view_release", "Can view releases and patches"),
+            ('invite_users', 'Invite users'),
         )
 
     objects = AccountManager()
