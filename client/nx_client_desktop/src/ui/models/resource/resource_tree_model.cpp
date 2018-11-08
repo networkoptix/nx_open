@@ -473,7 +473,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     {
         if (layout->isFile())
         {
-            if (isLoggedIn || ini().enableResourceFilteringByDefault)
+            if (isLoggedIn)
                 return m_rootNodes[NodeType::localResources];
             return rootNode;
         }
@@ -494,7 +494,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     {
         if (node->resourceFlags().testFlag(Qn::local))
         {
-            if (isLoggedIn || ini().enableResourceFilteringByDefault)
+            if (isLoggedIn)
                 return m_rootNodes[NodeType::localResources];
             return rootNode;
         }

@@ -353,11 +353,8 @@ void forEachIndex(
 
 void QnResourceBrowserWidget::initInstantSearch()
 {
-    const bool visible = nx::client::desktop::ini().enableResourceFilteringByDefault;
     const auto filterEdit = ui->instantFilterLineEdit;
-    filterEdit->setVisible(visible);
-    if (!visible)
-        return;
+    //filterEdit->setVisible(true);
 
     ui->tabWidget->tabBar()->hide();
 
@@ -751,8 +748,7 @@ void QnResourceBrowserWidget::updateHintVisibilityByBasicState()
     const bool hasSelectedGroup = query.allowedNode != QnResourceSearchQuery::kAllowAllNodeTypes;
 
     setHintVisibleByBasicState(
-        ini().enableResourceFilteringByDefault
-        && (hasFilterText || hasSelectedGroup)
+        (hasFilterText || hasSelectedGroup)
         && ui->instantFilterLineEdit->focused());
 }
 

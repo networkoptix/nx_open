@@ -565,9 +565,6 @@ void ExportSettingsDialog::updateWidgetsState()
             button->setState(SelectableTextButton::State::unselected);
         }
     }
-
-    if (!ini().enableEncryptedLayouts) //< Remove this before release.
-        m_passwordWidget->setVisible(false);
 }
 
 void ExportSettingsDialog::setMediaParams(
@@ -674,7 +671,7 @@ void ExportSettingsDialog::accept()
         return;
 
     if (nx::core::layout::isLayoutExtension(filenamePanel->filename().completeFileName())
-        && ini().enableEncryptedLayouts && !m_passwordWidget->validate())
+        && !m_passwordWidget->validate())
     {
         return;
     }
