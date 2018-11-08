@@ -28,9 +28,7 @@ public:
         const TransactionTransportHeader&,
         const CommandHeader&>;
 
-    IncomingTransactionDispatcher(
-        const QnUuid& moduleGuid,
-        TransactionLog* const transactionLog);
+    IncomingTransactionDispatcher(TransactionLog* const transactionLog);
     virtual ~IncomingTransactionDispatcher();
 
     /**
@@ -38,8 +36,7 @@ public:
      */
     void dispatchTransaction(
         TransactionTransportHeader transportHeader,
-        Qn::SerializationFormat tranFormat,
-        QByteArray data,
+        std::unique_ptr<DeserializableCommandData> commandData,
         TransactionProcessedHandler completionHandler);
 
     /**
@@ -105,29 +102,11 @@ private:
     using TransactionProcessors =
         std::map<int, std::unique_ptr<TransactionProcessorContext>>;
 
-    const QnUuid m_moduleGuid;
     TransactionLog* const m_transactionLog;
     TransactionProcessors m_transactionProcessors;
     nx::network::aio::Timer m_aioTimer;
     mutable QnMutex m_mutex;
     WatchTransactionSubscription m_watchTransactionSubscription;
-
-    void dispatchUbjsonTransaction(
-        TransactionTransportHeader transportHeader,
-        QByteArray serializedTransaction,
-        TransactionProcessedHandler handler);
-
-    void dispatchJsonTransaction(
-        TransactionTransportHeader transportHeader,
-        QByteArray serializedTransaction,
-        TransactionProcessedHandler handler);
-
-    template<typename TransactionDataSource>
-    void dispatchTransaction(
-        TransactionTransportHeader transportHeader,
-        CommandHeader transaction,
-        TransactionDataSource dataSource,
-        TransactionProcessedHandler completionHandler);
 
     void removeHandler(int commandCode);
 };

@@ -5,6 +5,8 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/string.h>
 
+#include <nx/data_sync_engine/http/http_paths.h>
+
 namespace nx::data_sync_engine::test {
 
 nx::utils::test::ModuleLauncher<CustomerDbNode>& Peer::process()
@@ -15,6 +17,14 @@ nx::utils::test::ModuleLauncher<CustomerDbNode>& Peer::process()
 const nx::utils::test::ModuleLauncher<CustomerDbNode>& Peer::process() const
 {
     return m_process;
+}
+
+nx::utils::Url Peer::syncronizationUrl() const
+{
+    return nx::network::url::Builder()
+        .setScheme(nx::network::http::kUrlSchemeName)
+        .setEndpoint(m_process.moduleInstance()->httpEndpoints().front())
+        .setPath(kBaseSynchronizationPath);
 }
 
 void Peer::connectTo(const Peer& other)

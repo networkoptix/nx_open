@@ -2,10 +2,9 @@
 
 #include "controller.h"
 #include "settings.h"
+#include "../http/http_paths.h"
 
 namespace nx::data_sync_engine {
-
-static constexpr char kHttpPathPrefix[] = "/ec2";
 
 View::View(
     const Settings& settings,
@@ -17,7 +16,7 @@ View::View(
         &m_httpMessageDispatcher))
 {
     controller->syncronizationEngine().registerHttpApi(
-        kHttpPathPrefix,
+        kBaseSynchronizationPath,
         &m_httpMessageDispatcher);
 }
 

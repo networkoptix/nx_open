@@ -7,8 +7,7 @@
 #include "compatible_ec2_protocol_version.h"
 #include "command_descriptor.h"
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine::transport {
 
 constexpr static const std::chrono::seconds kTcpKeepAliveTimeout = std::chrono::seconds(5);
 constexpr static const int kKeepAliveProbeCount = 3;
@@ -23,33 +22,69 @@ TransactionTransport::TransactionTransport(
     const network::SocketAddress& remotePeerEndpoint,
     const nx::network::http::Request& request)
     :
+    TransactionTransport(
+        protocolVersionRange,
+        std::make_unique<::ec2::QnTransactionTransportBase>(
+            QnUuid(), //< localSystemId. Not used here
+            QnUuid::fromStringSafe(connectionRequestAttributes.connectionId),
+            ::ec2::ConnectionLockGuard(
+                localPeer.id,
+                connectionGuardSharedState.get(),
+                connectionRequestAttributes.remotePeer.id,
+                ::ec2::ConnectionLockGuard::Direction::Incoming),
+            localPeer,
+            connectionRequestAttributes.remotePeer,
+            ::ec2::ConnectionType::incoming,
+            request,
+            connectionRequestAttributes.contentEncoding.c_str(),
+            kTcpKeepAliveTimeout,
+            kKeepAliveProbeCount),
+        connectionRequestAttributes.connectionId,
+        aioThread,
+        connectionGuardSharedState,
+        systemId,
+        remotePeerEndpoint)
+{
+}
+
+TransactionTransport::TransactionTransport(
+    const ProtocolVersionRange& protocolVersionRange,
+    std::unique_ptr<::ec2::QnTransactionTransportBase> connection,
+    std::shared_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState,
+    const std::string& systemId,
+    const network::SocketAddress& remotePeerEndpoint)
+    :
+    TransactionTransport(
+        protocolVersionRange,
+        std::move(connection),
+        connection->connectionGuid().toSimpleByteArray().toStdString(),
+        connection->getAioThread(),
+        connectionGuardSharedState,
+        systemId,
+        remotePeerEndpoint)
+{
+}
+
+TransactionTransport::TransactionTransport(
+    const ProtocolVersionRange& protocolVersionRange,
+    std::unique_ptr<::ec2::QnTransactionTransportBase> connection,
+    const std::string& connectionId,
+    nx::network::aio::AbstractAioThread* aioThread,
+    std::shared_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState,
+    const std::string& systemId,
+    const network::SocketAddress& remotePeerEndpoint)
+    :
     m_protocolVersionRange(protocolVersionRange),
     m_connectionGuardSharedState(connectionGuardSharedState),
-    m_baseTransactionTransport(std::make_unique<::ec2::QnTransactionTransportBase>(
-        QnUuid(), //< localSystemId. Not used here
-        QnUuid::fromStringSafe(connectionRequestAttributes.connectionId),
-        ::ec2::ConnectionLockGuard(
-            localPeer.id,
-            connectionGuardSharedState.get(),
-            connectionRequestAttributes.remotePeer.id,
-            ::ec2::ConnectionLockGuard::Direction::Incoming),
-        localPeer,
-        connectionRequestAttributes.remotePeer,
-        ::ec2::ConnectionType::incoming,
-        request,
-        connectionRequestAttributes.contentEncoding.c_str(),
-        kTcpKeepAliveTimeout,
-        kKeepAliveProbeCount)),
+    m_baseTransactionTransport(std::move(connection)),
     m_systemId(systemId),
-    m_connectionId(connectionRequestAttributes.connectionId),
+    m_connectionId(connectionId),
     m_connectionOriginatorEndpoint(remotePeerEndpoint),
     m_inactivityTimer(std::make_unique<network::aio::Timer>())
 {
-    using namespace std::placeholders;
-
     bindToAioThread(aioThread);
     m_baseTransactionTransport->setState(::ec2::QnTransactionTransportBase::ReadyForStreaming);
-    //ignoring "state changed to Connected" signal
+    // Ignoring "state changed to Connected" signal.
 
     QObject::connect(
         m_baseTransactionTransport.get(), &::ec2::QnTransactionTransportBase::gotTransaction,
@@ -71,7 +106,7 @@ TransactionTransport::TransactionTransport(
         m_inactivityTimer->start(
             m_baseTransactionTransport->connectionKeepAliveTimeout()
                 * m_baseTransactionTransport->keepAliveProbeCount(),
-            std::bind(&TransactionTransport::onInactivityTimeout, this));
+            [this]() { onInactivityTimeout(); });
     }
 }
 
@@ -107,7 +142,7 @@ void TransactionTransport::setOnConnectionClosed(ConnectionClosedEventHandler ha
     m_connectionClosedEventHandler = std::move(handler);
 }
 
-void TransactionTransport::setOnGotTransaction(GotTransactionEventHandler handler)
+void TransactionTransport::setOnGotTransaction(CommandDataHandler handler)
 {
     m_gotTransactionEventHandler = std::move(handler);
 }
@@ -154,6 +189,21 @@ void TransactionTransport::setOutgoingConnection(
     std::unique_ptr<network::AbstractCommunicatingSocket> socket)
 {
     m_baseTransactionTransport->setOutgoingConnection(std::move(socket));
+}
+
+nx::vms::api::PeerData TransactionTransport::localPeer() const
+{
+    return m_baseTransactionTransport->localPeer();
+}
+
+nx::vms::api::PeerData TransactionTransport::remotePeer() const
+{
+    return m_baseTransactionTransport->remotePeer();
+}
+
+int TransactionTransport::remotePeerProtocolVersion() const
+{
+    return m_baseTransactionTransport->remotePeerProtocolVersion();
 }
 
 int TransactionTransport::highestProtocolVersionCompatibleWithRemotePeer() const
@@ -270,5 +320,4 @@ void TransactionTransport::onInactivityTimeout()
     m_baseTransactionTransport->setState(::ec2::QnTransactionTransportBase::Error);
 }
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine::transport

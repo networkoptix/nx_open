@@ -36,7 +36,7 @@ void HttpTunnelTransportConnection::setOnConnectionClosed(
 }
 
 void HttpTunnelTransportConnection::setOnGotTransaction(
-    GotTransactionEventHandler handler)
+    CommandDataHandler handler)
 {
     m_gotTransactionEventHandler = std::move(handler);
 }

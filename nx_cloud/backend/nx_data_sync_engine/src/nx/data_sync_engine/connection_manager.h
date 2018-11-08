@@ -12,12 +12,12 @@
 
 #include <nx/network/http/abstract_msg_body_source.h>
 #include <nx/network/http/server/abstract_http_request_handler.h>
-#include <nx/utils/move_only_func.h>
-#include <nx/utils/thread/mutex.h>
-#include <nx/vms/api/data/peer_data.h>
-
 #include <nx/utils/counter.h>
+#include <nx/utils/move_only_func.h>
 #include <nx/utils/subscription.h>
+#include <nx/utils/thread/mutex.h>
+
+#include <nx/vms/api/data/peer_data.h>
 
 #include "compatible_ec2_protocol_version.h"
 #include "serialization/transaction_serializer.h"
@@ -83,7 +83,7 @@ public:
 
     struct ConnectionContext
     {
-        std::unique_ptr<AbstractTransactionTransport> connection;
+        std::unique_ptr<transport::AbstractTransactionTransport> connection;
         std::string connectionId;
         FullPeerName fullPeerName;
         std::string userAgent;
@@ -107,7 +107,7 @@ public:
      */
     bool modifyConnectionByIdSafe(
         const std::string& connectionId,
-        std::function<void(AbstractTransactionTransport* connection)> func);
+        std::function<void(transport::AbstractTransactionTransport* connection)> func);
 
     /**
      * Dispatches transaction to corresponding peers.
@@ -185,18 +185,10 @@ private:
 
     void onGotTransaction(
         const std::string& connectionId,
-        Qn::SerializationFormat tranFormat,
-        QByteArray serializedTransaction,
+        std::unique_ptr<DeserializableCommandData> commandData,
         TransactionTransportHeader transportHeader);
 
     void onTransactionDone(const std::string& connectionId, ResultCode resultCode);
-
-    template<typename TransactionDataType>
-    void processSpecialTransaction(
-        const std::string& systemId,
-        const TransactionTransportHeader& transportHeader,
-        Command<TransactionDataType> data,
-        TransactionProcessedHandler handler);
 };
 
 } // namespace data_sync_engine

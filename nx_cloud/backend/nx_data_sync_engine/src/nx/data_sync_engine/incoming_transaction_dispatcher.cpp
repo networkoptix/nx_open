@@ -12,10 +12,8 @@ namespace nx {
 namespace data_sync_engine {
 
 IncomingTransactionDispatcher::IncomingTransactionDispatcher(
-    const QnUuid& moduleGuid,
     TransactionLog* const transactionLog)
-:
-    m_moduleGuid(moduleGuid),
+    :
     m_transactionLog(transactionLog)
 {
 }
@@ -25,120 +23,31 @@ IncomingTransactionDispatcher::~IncomingTransactionDispatcher()
     m_aioTimer.pleaseStopSync();
 }
 
-void IncomingTransactionDispatcher::dispatchTransaction(
-    TransactionTransportHeader transportHeader,
-    Qn::SerializationFormat tranFormat,
-    QByteArray serializedTransaction,
-    TransactionProcessedHandler handler)
-{
-    if (tranFormat == Qn::UbjsonFormat)
-    {
-        dispatchUbjsonTransaction(
-            std::move(transportHeader),
-            std::move(serializedTransaction),
-            std::move(handler));
-    }
-    else if (tranFormat == Qn::JsonFormat)
-    {
-        dispatchJsonTransaction(
-            std::move(transportHeader),
-            std::move(serializedTransaction),
-            std::move(handler));
-    }
-    else
-    {
-        m_aioTimer.post(
-            [handler = std::move(handler)]{ handler(ResultCode::badRequest); });
-    }
-}
-
 IncomingTransactionDispatcher::WatchTransactionSubscription&
     IncomingTransactionDispatcher::watchTransactionSubscription()
 {
     return m_watchTransactionSubscription;
 }
 
-void IncomingTransactionDispatcher::dispatchUbjsonTransaction(
-    TransactionTransportHeader transportHeader,
-    QByteArray serializedTransaction,
-    TransactionProcessedHandler handler)
-{
-    CommandHeader commandHeader(m_moduleGuid);
-    auto dataSource =
-        std::make_unique<TransactionUbjsonDataSource>(std::move(serializedTransaction));
-    if (!TransactionDeserializer::deserialize(
-            &dataSource->stream,
-            &commandHeader,
-            transportHeader.transactionFormatVersion))
-    {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Failed to deserialized ubjson transaction received from (%1, %2). size %3")
-            .arg(transportHeader.systemId).arg(transportHeader.endpoint.toString())
-            .arg(dataSource->serializedTransaction.size()));
-        m_aioTimer.post(
-            [handler = std::move(handler)]{ handler(ResultCode::badRequest); });
-        return;
-    }
-
-    return dispatchTransaction(
-        std::move(transportHeader),
-        std::move(commandHeader),
-        std::move(dataSource),
-        std::move(handler));
-}
-
-void IncomingTransactionDispatcher::dispatchJsonTransaction(
-    TransactionTransportHeader transportHeader,
-    QByteArray serializedTransaction,
-    TransactionProcessedHandler handler)
-{
-    CommandHeader commandHeader(m_moduleGuid);
-    QJsonObject tranObject;
-    // TODO: #ak put tranObject to some cache for later use
-    if (!QJson::deserialize(serializedTransaction, &tranObject))
-    {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Failed to parse json transaction received from (%1, %2). size %3")
-            .arg(transportHeader.systemId).arg(transportHeader.endpoint.toString())
-            .arg(serializedTransaction.size()));
-        m_aioTimer.post(
-            [handler = std::move(handler)]{ handler(ResultCode::badRequest); });
-        return;
-    }
-    if (!QJson::deserialize(tranObject["tran"], &commandHeader))
-    {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Failed to deserialize json transaction received from (%1, %2). size %3")
-            .arg(transportHeader.systemId).arg(transportHeader.endpoint.toString())
-            .arg(serializedTransaction.size()));
-        m_aioTimer.post(
-            [handler = std::move(handler)]{ handler(ResultCode::badRequest); });
-        return;
-    }
-
-    return dispatchTransaction(
-        std::move(transportHeader),
-        std::move(commandHeader),
-        tranObject["tran"].toObject(),
-        std::move(handler));
-}
-
-template<typename TransactionDataSource>
 void IncomingTransactionDispatcher::dispatchTransaction(
     TransactionTransportHeader transportHeader,
-    CommandHeader commandHeader,
-    TransactionDataSource dataSource,
+    std::unique_ptr<DeserializableCommandData> commandData,
     TransactionProcessedHandler completionHandler)
 {
-    m_watchTransactionSubscription.notify(transportHeader, commandHeader);
+    m_watchTransactionSubscription.notify(
+        transportHeader,
+        commandData->header());
 
     QnMutexLocker lock(&m_mutex);
 
-    auto it = m_transactionProcessors.find(commandHeader.command);
-    if (commandHeader.command == command::UpdatePersistentSequence::code)
+    auto it = m_transactionProcessors.find(commandData->header().command);
+    if (commandData->header().command == command::UpdatePersistentSequence::code)
         return; // TODO: #ak Do something.
 
     if (it == m_transactionProcessors.end() || it->second->markedForRemoval)
     {
         NX_VERBOSE(this, lm("Received unsupported transaction %1")
-            .arg(commandHeader.command));
+            .arg(commandData->header().command));
         // No handler registered for transaction type.
         m_aioTimer.post(
             [completionHandler = std::move(completionHandler)]
@@ -155,8 +64,7 @@ void IncomingTransactionDispatcher::dispatchTransaction(
     // TODO: should we always call completionHandler in the same thread?
     return it->second->processor->processTransaction(
         std::move(transportHeader),
-        std::move(commandHeader),
-        std::move(dataSource),
+        std::move(commandData),
         [it, completionHandler = std::move(completionHandler)](
             ResultCode resultCode)
         {

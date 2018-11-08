@@ -11,7 +11,7 @@ namespace nx::data_sync_engine {
 static constexpr std::chrono::seconds kRetryConnectTimeout(7);
 
 Connector::Connector(
-    TransportManager* transportManager,
+    transport::TransportManager* transportManager,
     ConnectionManager* connectionManager)
     :
     m_transportManager(transportManager),
@@ -65,7 +65,8 @@ void Connector::connectToNodeAsync(const nx::utils::Url& url)
 
 void Connector::onConnectCompletion(
     const nx::utils::Url& url,
-    std::unique_ptr<AbstractTransactionTransport> connection)
+    transport::ConnectResultDescriptor result,
+    std::unique_ptr<transport::AbstractTransactionTransport> connection)
 {
     auto nodeIter = m_nodes.find(url);
     NX_CRITICAL(nodeIter != m_nodes.end());
@@ -75,8 +76,7 @@ void Connector::onConnectCompletion(
 
     if (!connection)
     {
-        NX_DEBUG(this, lm("Error connecting to %1. %2")
-            .args(url, connector->lastErrorText()));
+        NX_DEBUG(this, lm("Error connecting to %1. %2").args(url, result));
 
         nodeContext.retryTimer->start(
             kRetryConnectTimeout,
@@ -90,7 +90,7 @@ void Connector::onConnectCompletion(
 void Connector::registerConnection(
     const nx::utils::Url& url,
     const NodeContext& nodeContext,
-    std::unique_ptr<AbstractTransactionTransport> connection)
+    std::unique_ptr<transport::AbstractTransactionTransport> connection)
 {
     NX_DEBUG(this, lm("Connection %1 to %2 established successfully")
         .args(nodeContext.connectionId, url));

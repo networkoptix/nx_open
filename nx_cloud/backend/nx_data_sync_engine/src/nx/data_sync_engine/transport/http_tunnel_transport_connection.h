@@ -27,7 +27,7 @@ public:
 
     virtual void setOnConnectionClosed(ConnectionClosedEventHandler handler) override;
 
-    virtual void setOnGotTransaction(GotTransactionEventHandler handler) override;
+    virtual void setOnGotTransaction(CommandDataHandler handler) override;
 
     virtual QnUuid connectionGuid() const override;
 
@@ -46,7 +46,7 @@ private:
     const network::SocketAddress m_remoteEndpoint;
     nx::network::server::FixedSizeMessagePipeline m_messagePipeline;
     ConnectionClosedEventHandler m_connectionClosedEventHandler;
-    GotTransactionEventHandler m_gotTransactionEventHandler;
+    CommandDataHandler m_gotTransactionEventHandler;
 
     void processMessage(nx::network::server::FixedSizeMessage message);
 

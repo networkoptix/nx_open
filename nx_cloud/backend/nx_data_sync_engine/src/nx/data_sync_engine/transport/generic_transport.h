@@ -43,7 +43,7 @@ public:
 
     virtual ConnectionClosedSubscription& connectionClosedSubscription() override;
 
-    virtual void setOnGotTransaction(GotTransactionEventHandler handler) override;
+    virtual void setOnGotTransaction(CommandHandler handler) override;
 
     virtual QnUuid connectionGuid() const override;
 
@@ -54,21 +54,6 @@ public:
         const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer) override;
 
     virtual void start() override;
-
-    void processSpecialTransaction(
-        const TransactionTransportHeader& transportHeader,
-        Command<vms::api::SyncRequestData> data,
-        TransactionProcessedHandler handler);
-
-    void processSpecialTransaction(
-        const TransactionTransportHeader& transportHeader,
-        Command<vms::api::TranStateResponse> data,
-        TransactionProcessedHandler handler);
-
-    void processSpecialTransaction(
-        const TransactionTransportHeader& transportHeader,
-        Command<vms::api::TranSyncDoneData> data,
-        TransactionProcessedHandler handler);
 
     AbstractCommandPipeline& commandPipeline();
 
@@ -94,8 +79,23 @@ private:
     std::unique_ptr<TransactionLogReader> m_transactionLogReader;
     TransactionTransportHeader m_commonTransportHeaderOfRemoteTransaction;
     ConnectionClosedSubscription m_connectionClosedSubscription;
+    CommandHandler m_gotCommandHandler;
 
     void processConnectionClosedEvent(SystemError::ErrorCode closeReason);
+
+    void processCommandData(
+        Qn::SerializationFormat serializationFormat,
+        const QByteArray& serializedCommand,
+        TransactionTransportHeader transportHeader);
+
+    bool isHandshakeCommand(int commandType) const;
+
+    void processHandshakeCommand(
+        TransactionTransportHeader transportHeader,
+        std::unique_ptr<DeserializableCommandData> commandData);
+
+    void processHandshakeCommand(
+        Command<vms::api::SyncRequestData> data);
 
     void onTransactionsReadFromLog(
         ResultCode resultCode,
