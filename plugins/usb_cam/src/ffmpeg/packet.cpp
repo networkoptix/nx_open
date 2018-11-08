@@ -1,30 +1,8 @@
 #include "packet.h"
 
-#include <iostream>
-
-extern "C" {
-#include <libavcodec/avcodec.h>
-} // extern "C"
-
-#ifdef _WIN32
-#include <iterator>
-#endif
-
 namespace nx {
 namespace usb_cam {
 namespace ffmpeg {
-
-namespace {
-
-uint8_t firstDigit(uint8_t n)
-{
-    int result = 0;
-    while (n-- % 10 != 0)
-        ++result;
-    return result;
-}
-
-}
 
 Packet::Packet(
     AVCodecID codecId,
@@ -122,61 +100,8 @@ void Packet::setTimestamp(uint64_t millis)
 
 bool Packet::keyPacket() const
 {
-    // DirectShow implementation does not set AVPacket::flags properly after calling av_read_frame.
-#ifdef _WIN32
-    // in the case the packet was produced by an encoder, this will be set apporpriately
-    if (m_packet->flags & AV_PKT_FLAG_KEY)
-        return true;
-
-    parseNalUnits();
-#endif
-    
-    // Video4Linux2 implementation sets it properly
     return m_packet->flags & AV_PKT_FLAG_KEY;
 }
-
-#ifdef _WIN32
-void Packet::parseNalUnits() const
-{
-    if (m_codecId != AV_CODEC_ID_H264)
-        return;
-
-    if (m_parseNalUnitsVisited)
-        return;
-
-    m_parseNalUnitsVisited = true;
-
-    const uint8_t* buffer = data();
-    const uint8_t* bufStart = buffer;
-    const uint8_t* end = buffer + size();
-
-    while (buffer < end)
-    {
-        if (*buffer > 1)
-            buffer += 3;
-        else if (*buffer == 0)
-            buffer++;
-        else if (buffer[-2] == 0 && buffer[-1] == 0)
-        {
-            if (buffer - 3 >= bufStart && buffer[-3] == 0)
-            {
-                if (buffer + 1 < end)
-                {
-                    uint8_t n = firstDigit(buffer[1]);
-                    if (n % 5 == 0)
-                    {
-                        m_packet->flags |= AV_PKT_FLAG_KEY;
-                        break;
-                    }
-                }
-            }
-            buffer += 3;
-        }
-        else
-            buffer += 3;
-    }
-}
-#endif
 
 } // namespace ffmpeg
 } // namespace usb_cam
