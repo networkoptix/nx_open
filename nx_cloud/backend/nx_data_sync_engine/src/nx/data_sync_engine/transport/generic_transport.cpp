@@ -150,10 +150,80 @@ void GenericTransport::start()
         makeSerializer<command::TranSyncRequest>(std::move(requestTran)));
 }
 
-void GenericTransport::processSpecialTransaction(
-    const TransactionTransportHeader& /*transportHeader*/,
-    Command<vms::api::SyncRequestData> data,
-    TransactionProcessedHandler handler)
+AbstractCommandPipeline& GenericTransport::commandPipeline()
+{
+    return *m_commandPipeline;
+}
+
+void GenericTransport::stopWhileInAioThread()
+{
+    m_commandPipeline.reset();
+    m_transactionLogReader.reset();
+}
+
+void GenericTransport::processConnectionClosedEvent(
+    SystemError::ErrorCode closeReason)
+{
+    m_connectionClosedSubscription.notify(closeReason);
+}
+
+void GenericTransport::processCommandData(
+    Qn::SerializationFormat dataFormat,
+    const QByteArray& serializedCommand,
+    TransactionTransportHeader transportHeader)
+{
+    auto commandData = TransactionDeserializer::deserialize(
+        dataFormat,
+        transportHeader.peerId,
+        transportHeader.transactionFormatVersion,
+        std::move(serializedCommand));
+
+    if (!commandData)
+    {
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+            lm("Failed to deserialized %1 command received from (%2, %3)")
+            .args(dataFormat, transportHeader.systemId, transportHeader.endpoint.toString()));
+        m_commandPipeline->closeConnection();
+        return;
+    }
+
+    if (isHandshakeCommand(commandData->header().command))
+    {
+        processHandshakeCommand(
+            std::move(transportHeader),
+            std::move(commandData));
+        return;
+    }
+
+    if (!m_gotCommandHandler)
+        return;
+
+    m_gotCommandHandler(
+        std::move(commandData),
+        std::move(transportHeader));
+}
+
+bool GenericTransport::isHandshakeCommand(int commandType) const
+{
+    return commandType == command::TranSyncRequest::code
+        || commandType == command::TranSyncResponse::code
+        || commandType == command::TranSyncDone::code;
+}
+
+void GenericTransport::processHandshakeCommand(
+    TransactionTransportHeader transportHeader,
+    std::unique_ptr<DeserializableCommandData> commandData)
+{
+    if (commandData->header().command == command::TranSyncRequest::code)
+    {
+        auto commandWrapper = commandData->deserialize<command::TranSyncRequest>(
+            transportHeader.transactionFormatVersion);
+        processHandshakeCommand(commandWrapper->take());
+    }
+}
+
+void GenericTransport::processHandshakeCommand(
+    Command<vms::api::SyncRequestData> data)
 {
     m_tranStateToSynchronizeTo = m_transactionLogReader->getCurrentState();
     m_remotePeerTranState = std::move(data.params.persistentState);
@@ -183,73 +253,6 @@ void GenericTransport::processSpecialTransaction(
     m_transactionLogReader->readTransactions(
         filter,
         [this](auto... args) { onTransactionsReadFromLog(std::move(args)...); });
-
-    handler(ResultCode::ok);
-}
-
-void GenericTransport::processSpecialTransaction(
-    const TransactionTransportHeader& /*transportHeader*/,
-    Command<vms::api::TranStateResponse> /*data*/,
-    TransactionProcessedHandler /*handler*/)
-{
-    // TODO: no need to do anything?
-    //NX_ASSERT(false);
-}
-
-void GenericTransport::processSpecialTransaction(
-    const TransactionTransportHeader& /*transportHeader*/,
-    Command<vms::api::TranSyncDoneData> /*data*/,
-    TransactionProcessedHandler /*handler*/)
-{
-    // TODO: no need to do anything?
-    //NX_ASSERT(false);
-}
-
-AbstractCommandPipeline& GenericTransport::commandPipeline()
-{
-    return *m_commandPipeline;
-}
-
-void GenericTransport::stopWhileInAioThread()
-{
-    m_commandPipeline.reset();
-    m_transactionLogReader.reset();
-}
-
-void GenericTransport::processConnectionClosedEvent(
-    SystemError::ErrorCode closeReason)
-{
-    m_connectionClosedSubscription.notify(closeReason);
-}
-
-void GenericTransport::processCommandData(
-    Qn::SerializationFormat dataFormat,
-    const QByteArray& serializedCommand,
-    TransactionTransportHeader transportHeader)
-{
-    // TODO: #ak Processing specific commands.
-
-    if (!m_gotCommandHandler)
-        return;
-    
-    auto commandData = TransactionDeserializer::deserialize(
-        dataFormat,
-        transportHeader.peerId,
-        transportHeader.transactionFormatVersion,
-        std::move(serializedCommand));
-
-    if (!commandData)
-    {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
-            lm("Failed to deserialized %1 command received from (%2, %3)")
-            .args(dataFormat, transportHeader.systemId, transportHeader.endpoint.toString()));
-        m_commandPipeline->closeConnection();
-        return;
-    }
-
-    m_gotCommandHandler(
-        std::move(commandData),
-        std::move(transportHeader));
 }
 
 void GenericTransport::onTransactionsReadFromLog(

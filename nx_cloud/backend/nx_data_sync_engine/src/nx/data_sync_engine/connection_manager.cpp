@@ -2,12 +2,8 @@
 
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/custom_headers.h>
-#include <nx/network/http/server/http_message_dispatcher.h>
-#include <nx/network/websocket/websocket_handshake.h>
-#include <nx/p2p/p2p_serialization.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
-#include <nx/vms/api/types/connection_types.h>
 
 #include <nx_ec/data/api_fwd.h>
 
@@ -18,9 +14,6 @@
 #include "p2p_sync_settings.h"
 #include "transaction_transport.h"
 #include "transaction_transport_header.h"
-#include "websocket_transaction_transport.h"
-#include "transport/generic_transport.h"
-#include "transport/http_transport_acceptor.h"
 
 namespace nx {
 namespace data_sync_engine {
@@ -43,15 +36,6 @@ ConnectionManager::ConnectionManager(
         Qn::UbjsonFormat),
     m_onNewTransactionSubscriptionId(nx::utils::kInvalidSubscriptionId)
 {
-    m_transactionDispatcher->registerSpecialCommandHandler<command::TranSyncRequest>(
-        [this](auto&&... args) { processSpecialTransaction(std::move(args)...); });
-
-    m_transactionDispatcher->registerSpecialCommandHandler<command::TranSyncResponse>(
-        [this](auto&&... args) { processSpecialTransaction(std::move(args)...); });
-
-    m_transactionDispatcher->registerSpecialCommandHandler<command::TranSyncDone>(
-        [this](auto&&... args) { processSpecialTransaction(std::move(args)...); });
-
     m_outgoingTransactionDispatcher->onNewTransactionSubscription().subscribe(
         [this](auto&&... args) { dispatchTransaction(std::move(args)...); },
         &m_onNewTransactionSubscriptionId);
@@ -423,39 +407,6 @@ void ConnectionManager::onTransactionDone(
         // Closing connection in case of failure.
         QnMutexLocker lock(&m_mutex);
         removeExistingConnection<kConnectionByIdIndex, std::string>(lock, connectionId);
-    }
-}
-
-template<typename TransactionDataType>
-void ConnectionManager::processSpecialTransaction(
-    const std::string& /*systemId*/,
-    const TransactionTransportHeader& transportHeader,
-    Command<TransactionDataType> data,
-    TransactionProcessedHandler handler)
-{
-    QnMutexLocker lk(&m_mutex);
-
-    const auto& connectionByIdIndex = m_connections.get<kConnectionByIdIndex>();
-    auto connectionIter = connectionByIdIndex.find(transportHeader.connectionId);
-    if (connectionIter == connectionByIdIndex.end())
-        return; //< This can happen since connection destruction happens with some
-                //  delay after connection has been removed from m_connections.
-
-    // TODO: #ak Get rid of dynamic_cast.
-    auto transactionTransport =
-        dynamic_cast<transport::GenericTransport*>(connectionIter->connection.get());
-
-    // NOTE: transactionTransport variable can safely be used within its own AIO thread.
-    NX_ASSERT(transactionTransport->isInSelfAioThread());
-
-    lk.unlock();
-
-    if (transactionTransport)
-    {
-        transactionTransport->processSpecialTransaction(
-            transportHeader,
-            std::move(data),
-            std::move(handler));
     }
 }
 

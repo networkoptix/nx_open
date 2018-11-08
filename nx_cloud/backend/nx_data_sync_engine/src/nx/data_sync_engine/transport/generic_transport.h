@@ -55,21 +55,6 @@ public:
 
     virtual void start() override;
 
-    void processSpecialTransaction(
-        const TransactionTransportHeader& transportHeader,
-        Command<vms::api::SyncRequestData> data,
-        TransactionProcessedHandler handler);
-
-    void processSpecialTransaction(
-        const TransactionTransportHeader& transportHeader,
-        Command<vms::api::TranStateResponse> data,
-        TransactionProcessedHandler handler);
-
-    void processSpecialTransaction(
-        const TransactionTransportHeader& transportHeader,
-        Command<vms::api::TranSyncDoneData> data,
-        TransactionProcessedHandler handler);
-
     AbstractCommandPipeline& commandPipeline();
 
 protected:
@@ -102,6 +87,15 @@ private:
         Qn::SerializationFormat serializationFormat,
         const QByteArray& serializedCommand,
         TransactionTransportHeader transportHeader);
+
+    bool isHandshakeCommand(int commandType) const;
+
+    void processHandshakeCommand(
+        TransactionTransportHeader transportHeader,
+        std::unique_ptr<DeserializableCommandData> commandData);
+
+    void processHandshakeCommand(
+        Command<vms::api::SyncRequestData> data);
 
     void onTransactionsReadFromLog(
         ResultCode resultCode,
