@@ -285,7 +285,9 @@ class _FakeDisk(BaseFakeDisk):
         while True:
             try:
                 self._shell.run_command(['umount', '-f', self.path])
-            except exceptions.exit_status_error_cls(1):
+            except exceptions.exit_status_error_cls(1) as e:
+                if not e.stderr.decode().rstrip().endswith(': not mounted'):
+                    raise
                 break
         # File should be deleted too. Otherwise, it may contain data from previous test.
         try:
