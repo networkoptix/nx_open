@@ -11,9 +11,37 @@
 #include "../connection_manager.h"
 #include "../compatible_ec2_protocol_version.h"
 
-//#define ENABLE_SEQ_VERIFICATION
-
 namespace nx::data_sync_engine::transport {
+
+class AcceptedTransportConnection:
+    public CommandTransportDelegate
+{
+    using base_type = CommandTransportDelegate;
+
+public:
+    AcceptedTransportConnection(
+        std::unique_ptr<AbstractTransactionTransport> delegatee,
+        int connectionSeq,
+        AbstractCommandPipeline* commandPipeline)
+        :
+        base_type(delegatee.get()),
+        m_delegatee(std::move(delegatee)),
+        m_connectionSeq(connectionSeq),
+        m_commandPipeline(commandPipeline)
+    {
+    }
+
+    int seq() const { return m_connectionSeq; }
+
+    AbstractTransactionTransport* delegatee() { return m_delegatee.get(); };
+
+    AbstractCommandPipeline* commandPipeline() { return m_commandPipeline; }
+
+private:
+    std::unique_ptr<AbstractTransactionTransport> m_delegatee;
+    const int m_connectionSeq = 0;
+    AbstractCommandPipeline* m_commandPipeline = nullptr;
+};
 
 //-------------------------------------------------------------------------------------------------
 
@@ -106,13 +134,10 @@ void HttpTransportAcceptor::createConnection(
 
     const int connectionSeq = ++m_connectionSeq;
     ConnectionManager::ConnectionContext context{
-#ifdef ENABLE_SEQ_VERIFICATION
         std::make_unique<AcceptedTransportConnection>(
             std::move(newTransport),
-            connectionSeq),
-#else
-            std::move(newTransport),
-#endif
+            connectionSeq,
+            commandPipelinePtr),
         connectionRequestAttributes.connectionId,
         {systemId, connectionRequestAttributes.remotePeer.id.toByteArray().toStdString()},
         network::http::getHeaderValue(requestContext.request.headers, "User-Agent").toStdString()};
@@ -243,13 +268,10 @@ void HttpTransportAcceptor::startOutgoingChannel(
     m_connectionManager->modifyConnectionByIdSafe(
         connectionId,
         [
-#ifdef ENABLE_SEQ_VERIFICATION
         connectionSeq,
-#endif
          commandPipeline, httpConnection](
             transport::AbstractTransactionTransport* transportConnection)
         {
-#ifdef ENABLE_SEQ_VERIFICATION
             auto acceptedTransportConnection =
                 dynamic_cast<AcceptedTransportConnection*>(transportConnection);
             if (!acceptedTransportConnection || 
@@ -258,7 +280,6 @@ void HttpTransportAcceptor::startOutgoingChannel(
                 // connectionId is not globally unique.
                 return;
             }
-#endif
 
             commandPipeline->setOutgoingConnection(httpConnection->takeSocket());
             transportConnection->start();
@@ -271,7 +292,7 @@ void HttpTransportAcceptor::postTransactionToTransport(
     bool* foundConnectionOfExpectedType)
 {
     auto transactionTransport =
-        dynamic_cast<GenericTransport*>(transportConnection);
+        dynamic_cast<AcceptedTransportConnection*>(transportConnection);
     if (!transactionTransport)
     {
         *foundConnectionOfExpectedType = false;
@@ -282,8 +303,8 @@ void HttpTransportAcceptor::postTransactionToTransport(
     transactionTransport->post(
         [transactionTransport, request = std::move(request)]() mutable
         {
-            static_cast<TransactionTransport&>(transactionTransport->commandPipeline())
-                .receivedTransaction(
+            static_cast<TransactionTransport*>(transactionTransport->commandPipeline())
+                ->receivedTransaction(
                     std::move(request.headers),
                     std::move(request.messageBody));
         });
