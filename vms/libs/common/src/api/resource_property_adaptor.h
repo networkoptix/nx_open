@@ -7,6 +7,7 @@
 
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/fusion/serialization/lexical_functions.h>
+#include <nx/utils/safe_direct_connection.h>
 
 #include <core/resource/resource_fwd.h>
 
@@ -96,7 +97,10 @@ public:
  *
  * This class is thread-safe.
  */
-class QnAbstractResourcePropertyAdaptor: public Connective<QObject> {
+class QnAbstractResourcePropertyAdaptor:
+    public Connective<QObject>,
+    public Qn::EnableSafeDirectConnection
+{
     Q_OBJECT
     typedef Connective<QObject> base_type;
 
