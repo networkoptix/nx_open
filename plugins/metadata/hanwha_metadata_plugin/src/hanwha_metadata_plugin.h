@@ -78,6 +78,7 @@ private:
         const nx::sdk::CameraInfo& cameraInfo);
 
     boost::optional<QList<QnUuid>> eventsFromParameters(
+        const nx::sdk::CameraInfo& cameraInfo,
         const nx::mediaserver_core::plugins::HanwhaCgiParameters& parameters,
         const nx::mediaserver_core::plugins::HanwhaResponse& eventStatuses,
         int channel);

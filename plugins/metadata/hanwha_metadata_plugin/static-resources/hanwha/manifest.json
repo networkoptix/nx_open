@@ -94,6 +94,16 @@
             "positiveState": "has been detected"
         },
         {
+            "eventTypeId": "{E068D6FF-A3AC-43AA-B2D6-1804440AF506}",
+            "eventName": {
+                "value": "Shock detection",
+                "localization": {}
+            },
+            "internalName": "ShockDetection",
+            "description": "ShockDetection %1",
+            "positiveState": "has been detected"
+        },
+        {
             "eventTypeId": "{CABB4644-F6C2-4F09-8EDF-E0FAFCC4F833}",
             "eventName": {
                 "value": "Audio detection",

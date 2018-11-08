@@ -207,10 +207,12 @@ boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::fetchSupportedEvents(
         return boost::none;
 
     return eventsFromParameters(
+        cameraInfo,
         information->cgiParameters, eventStatuses.value, cameraInfo.channel);
 }
 
 boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
+    const CameraInfo& cameraInfo,
     const nx::mediaserver_core::plugins::HanwhaCgiParameters& parameters,
     const nx::mediaserver_core::plugins::HanwhaResponse& eventStatuses,
     int channel)
@@ -227,6 +229,7 @@ boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
     QSet<QnUuid> result;
 
     auto supportedEvents = supportedEventsParameter->possibleValues();
+    NX_VERBOSE(this, lm("camera %1 report supported analytics events %2").arg(cameraInfo.url).arg(supportedEvents));
     for (const auto& eventName: supportedEvents)
     {
         bool gotValidParameter = false;
