@@ -36,6 +36,10 @@ export SASL_PATH="$LIBS_DIR/sasl2"
 
 RUN_ARGS="-e"
 
+source $INSTALL_DIR/build_info.txt
+FULL_VERSION="$version-$changeSet-$customization"
+[ ! -z "$beta" ] && FULL_VERSION+="-beta"
+
 #--------------------------------------------------------------------------------------------------
 
 # Redirect all output of this script to the log file.
@@ -88,7 +92,7 @@ process_core_dump()
     TIME=$(date +"%s")
     CORE="$CORE_ORIG.$TIME"
     if mv "$CORE_ORIG" "$CORE" 2>/dev/null; then
-        REPORT="${BIN_NAME}_$("$BIN_FILE" --version)_$TIME.gdb-bt"
+        REPORT="${BIN_NAME}_${FULL_VERSION}_$TIME.gdb-bt"
 
         echo "Generate crash report (in background) $REPORT"
         echo "t apply all bt 25" |gdb "$BIN_FILE" "$CORE" 2>/dev/null >"/tmp/$REPORT" && \
