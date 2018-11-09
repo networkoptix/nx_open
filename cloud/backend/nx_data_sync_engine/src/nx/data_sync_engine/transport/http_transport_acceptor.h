@@ -29,10 +29,10 @@ namespace nx::data_sync_engine::transport {
 
 class GenericTransport;
 
-class HttpTransportAcceptor
+class CommonHttpAcceptor
 {
 public:
-    HttpTransportAcceptor(
+    CommonHttpAcceptor(
         const QnUuid& peerId,
         const ProtocolVersionRange& protocolVersionRange,
         TransactionLog* transactionLog,
@@ -68,11 +68,11 @@ private:
     void startOutgoingChannel(
         const std::string& connectionId,
         int connectionSeq,
-        TransactionTransport* commandPipeline,
+        CommonHttpConnection* commandPipeline,
         nx::network::http::HttpServerConnection* httpConnection);
 
     void postTransactionToTransport(
-        AbstractTransactionTransport* transportConnection,
+        AbstractConnection* transportConnection,
         nx::network::http::Request request,
         bool* foundConnectionOfExpectedType);
 };

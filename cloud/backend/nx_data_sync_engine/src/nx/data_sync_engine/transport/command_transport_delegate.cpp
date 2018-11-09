@@ -3,7 +3,7 @@
 namespace nx::data_sync_engine::transport {
 
 CommandTransportDelegate::CommandTransportDelegate(
-    AbstractTransactionTransport* delegatee)
+    AbstractConnection* delegatee)
     :
     m_delegatee(delegatee)
 {

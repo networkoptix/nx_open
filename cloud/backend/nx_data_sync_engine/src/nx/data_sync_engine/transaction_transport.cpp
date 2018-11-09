@@ -12,7 +12,7 @@ namespace nx::data_sync_engine::transport {
 constexpr static const std::chrono::seconds kTcpKeepAliveTimeout = std::chrono::seconds(5);
 constexpr static const int kKeepAliveProbeCount = 3;
 
-TransactionTransport::TransactionTransport(
+CommonHttpConnection::CommonHttpConnection(
     const ProtocolVersionRange& protocolVersionRange,
     nx::network::aio::AbstractAioThread* aioThread,
     std::shared_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState,
@@ -22,7 +22,7 @@ TransactionTransport::TransactionTransport(
     const network::SocketAddress& remotePeerEndpoint,
     const nx::network::http::Request& request)
     :
-    TransactionTransport(
+    CommonHttpConnection(
         protocolVersionRange,
         std::make_unique<::ec2::QnTransactionTransportBase>(
             QnUuid(), //< localSystemId. Not used here
@@ -47,14 +47,14 @@ TransactionTransport::TransactionTransport(
 {
 }
 
-TransactionTransport::TransactionTransport(
+CommonHttpConnection::CommonHttpConnection(
     const ProtocolVersionRange& protocolVersionRange,
     std::unique_ptr<::ec2::QnTransactionTransportBase> connection,
     std::shared_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState,
     const std::string& systemId,
     const network::SocketAddress& remotePeerEndpoint)
     :
-    TransactionTransport(
+    CommonHttpConnection(
         protocolVersionRange,
         std::move(connection),
         connection->connectionGuid().toSimpleByteArray().toStdString(),
@@ -65,7 +65,7 @@ TransactionTransport::TransactionTransport(
 {
 }
 
-TransactionTransport::TransactionTransport(
+CommonHttpConnection::CommonHttpConnection(
     const ProtocolVersionRange& protocolVersionRange,
     std::unique_ptr<::ec2::QnTransactionTransportBase> connection,
     const std::string& connectionId,
@@ -88,17 +88,17 @@ TransactionTransport::TransactionTransport(
 
     QObject::connect(
         m_baseTransactionTransport.get(), &::ec2::QnTransactionTransportBase::gotTransaction,
-        this, &TransactionTransport::onGotTransaction,
+        this, &CommonHttpConnection::onGotTransaction,
         Qt::DirectConnection);
 
     QObject::connect(
         m_baseTransactionTransport.get(), &::ec2::QnTransactionTransportBase::stateChanged,
-        this, &TransactionTransport::onStateChanged,
+        this, &CommonHttpConnection::onStateChanged,
         Qt::DirectConnection);
 
     QObject::connect(
         m_baseTransactionTransport.get(), &::ec2::QnTransactionTransportBase::onSomeDataReceivedFromRemotePeer,
-        this, &TransactionTransport::restartInactivityTimer,
+        this, &CommonHttpConnection::restartInactivityTimer,
         Qt::DirectConnection);
 
     if (m_baseTransactionTransport->remotePeerSupportsKeepAlive())
@@ -110,12 +110,12 @@ TransactionTransport::TransactionTransport(
     }
 }
 
-TransactionTransport::~TransactionTransport()
+CommonHttpConnection::~CommonHttpConnection()
 {
     stopWhileInAioThread();
 }
 
-void TransactionTransport::bindToAioThread(
+void CommonHttpConnection::bindToAioThread(
     nx::network::aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
@@ -124,7 +124,7 @@ void TransactionTransport::bindToAioThread(
     m_inactivityTimer->bindToAioThread(aioThread);
 }
 
-void TransactionTransport::stopWhileInAioThread()
+void CommonHttpConnection::stopWhileInAioThread()
 {
     base_type::stopWhileInAioThread();
 
@@ -132,27 +132,27 @@ void TransactionTransport::stopWhileInAioThread()
     m_inactivityTimer.reset();
 }
 
-network::SocketAddress TransactionTransport::remotePeerEndpoint() const
+network::SocketAddress CommonHttpConnection::remotePeerEndpoint() const
 {
     return m_connectionOriginatorEndpoint;
 }
 
-void TransactionTransport::setOnConnectionClosed(ConnectionClosedEventHandler handler)
+void CommonHttpConnection::setOnConnectionClosed(ConnectionClosedEventHandler handler)
 {
     m_connectionClosedEventHandler = std::move(handler);
 }
 
-void TransactionTransport::setOnGotTransaction(CommandDataHandler handler)
+void CommonHttpConnection::setOnGotTransaction(CommandDataHandler handler)
 {
     m_gotTransactionEventHandler = std::move(handler);
 }
 
-QnUuid TransactionTransport::connectionGuid() const
+QnUuid CommonHttpConnection::connectionGuid() const
 {
     return m_baseTransactionTransport->connectionGuid();
 }
 
-void TransactionTransport::sendTransaction(
+void CommonHttpConnection::sendTransaction(
     TransactionTransportHeader transportHeader,
     const std::shared_ptr<const TransactionSerializer>& transactionSerializer)
 {
@@ -172,48 +172,48 @@ void TransactionTransport::sendTransaction(
         });
 }
 
-void TransactionTransport::closeConnection()
+void CommonHttpConnection::closeConnection()
 {
     m_baseTransactionTransport->setState(
         ::ec2::QnTransactionTransportBase::Closed);
 }
 
-void TransactionTransport::receivedTransaction(
+void CommonHttpConnection::receivedTransaction(
     const nx::network::http::HttpHeaders& headers,
     const QnByteArrayConstRef& tranData)
 {
     m_baseTransactionTransport->receivedTransaction(headers, tranData);
 }
 
-void TransactionTransport::setOutgoingConnection(
+void CommonHttpConnection::setOutgoingConnection(
     std::unique_ptr<network::AbstractCommunicatingSocket> socket)
 {
     m_baseTransactionTransport->setOutgoingConnection(std::move(socket));
 }
 
-nx::vms::api::PeerData TransactionTransport::localPeer() const
+nx::vms::api::PeerData CommonHttpConnection::localPeer() const
 {
     return m_baseTransactionTransport->localPeer();
 }
 
-nx::vms::api::PeerData TransactionTransport::remotePeer() const
+nx::vms::api::PeerData CommonHttpConnection::remotePeer() const
 {
     return m_baseTransactionTransport->remotePeer();
 }
 
-int TransactionTransport::remotePeerProtocolVersion() const
+int CommonHttpConnection::remotePeerProtocolVersion() const
 {
     return m_baseTransactionTransport->remotePeerProtocolVersion();
 }
 
-int TransactionTransport::highestProtocolVersionCompatibleWithRemotePeer() const
+int CommonHttpConnection::highestProtocolVersionCompatibleWithRemotePeer() const
 {
     return m_baseTransactionTransport->remotePeerProtocolVersion() >= m_protocolVersionRange.begin()
         ? m_protocolVersionRange.currentVersion()
         : m_baseTransactionTransport->remotePeerProtocolVersion();
 }
 
-void TransactionTransport::onGotTransaction(
+void CommonHttpConnection::onGotTransaction(
     Qn::SerializationFormat tranFormat,
     QByteArray data,
     CommandTransportHeader transportHeader)
@@ -236,7 +236,7 @@ void TransactionTransport::onGotTransaction(
         });
 }
 
-void TransactionTransport::forwardTransactionToProcessor(
+void CommonHttpConnection::forwardTransactionToProcessor(
     Qn::SerializationFormat tranFormat,
     QByteArray data,
     CommandTransportHeader transportHeader)
@@ -265,7 +265,7 @@ void TransactionTransport::forwardTransactionToProcessor(
         std::move(cdbTransportHeader));
 }
 
-void TransactionTransport::onStateChanged(
+void CommonHttpConnection::onStateChanged(
     ::ec2::QnTransactionTransportBase::State newState)
 {
     NX_CRITICAL(isInSelfAioThread());
@@ -280,7 +280,7 @@ void TransactionTransport::onStateChanged(
         });
 }
 
-void TransactionTransport::forwardStateChangedEvent(
+void CommonHttpConnection::forwardStateChangedEvent(
     ::ec2::QnTransactionTransportBase::State newState)
 {
     NX_CRITICAL(isInSelfAioThread());
@@ -301,7 +301,7 @@ void TransactionTransport::forwardStateChangedEvent(
     }
 }
 
-void TransactionTransport::restartInactivityTimer()
+void CommonHttpConnection::restartInactivityTimer()
 {
     NX_CRITICAL(isInSelfAioThread());
     NX_CRITICAL(m_inactivityTimer->isInSelfAioThread());
@@ -310,10 +310,10 @@ void TransactionTransport::restartInactivityTimer()
     m_inactivityTimer->start(
         m_baseTransactionTransport->connectionKeepAliveTimeout()
             * m_baseTransactionTransport->keepAliveProbeCount(),
-        std::bind(&TransactionTransport::onInactivityTimeout, this));
+        std::bind(&CommonHttpConnection::onInactivityTimeout, this));
 }
 
-void TransactionTransport::onInactivityTimeout()
+void CommonHttpConnection::onInactivityTimeout()
 {
     NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1, connection %2. Inactivity timeout triggered")
         .args(m_systemId, m_connectionId));

@@ -13,14 +13,14 @@
 
 namespace nx::data_sync_engine::transport {
 
-class AcceptedTransportConnection:
+class AcceptedConnection:
     public CommandTransportDelegate
 {
     using base_type = CommandTransportDelegate;
 
 public:
-    AcceptedTransportConnection(
-        std::unique_ptr<AbstractTransactionTransport> delegatee,
+    AcceptedConnection(
+        std::unique_ptr<AbstractConnection> delegatee,
         int connectionSeq,
         AbstractCommandPipeline* commandPipeline)
         :
@@ -33,19 +33,19 @@ public:
 
     int seq() const { return m_connectionSeq; }
 
-    AbstractTransactionTransport* delegatee() { return m_delegatee.get(); };
+    AbstractConnection* delegatee() { return m_delegatee.get(); };
 
     AbstractCommandPipeline* commandPipeline() { return m_commandPipeline; }
 
 private:
-    std::unique_ptr<AbstractTransactionTransport> m_delegatee;
+    std::unique_ptr<AbstractConnection> m_delegatee;
     const int m_connectionSeq = 0;
     AbstractCommandPipeline* m_commandPipeline = nullptr;
 };
 
 //-------------------------------------------------------------------------------------------------
 
-HttpTransportAcceptor::HttpTransportAcceptor(
+CommonHttpAcceptor::CommonHttpAcceptor(
     const QnUuid& peerId,
     const ProtocolVersionRange& protocolVersionRange,
     TransactionLog* transactionLog,
@@ -66,7 +66,7 @@ HttpTransportAcceptor::HttpTransportAcceptor(
 {
 }
 
-void HttpTransportAcceptor::createConnection(
+void CommonHttpAcceptor::createConnection(
     nx::network::http::RequestContext requestContext,
     const std::string& systemId,
     nx::network::http::RequestProcessedHandler completionHandler)
@@ -112,7 +112,7 @@ void HttpTransportAcceptor::createConnection(
             httpConnection->socket()->getForeignAddress(),
             connectionRequestAttributes.connectionId));
 
-    auto commandPipeline = std::make_unique<TransactionTransport>(
+    auto commandPipeline = std::make_unique<CommonHttpConnection>(
         m_protocolVersionRange,
         httpConnection->getAioThread(),
         m_connectionGuardSharedState,
@@ -134,7 +134,7 @@ void HttpTransportAcceptor::createConnection(
 
     const int connectionSeq = ++m_connectionSeq;
     ConnectionManager::ConnectionContext context{
-        std::make_unique<AcceptedTransportConnection>(
+        std::make_unique<AcceptedConnection>(
             std::move(newTransport),
             connectionSeq,
             commandPipelinePtr),
@@ -172,7 +172,7 @@ void HttpTransportAcceptor::createConnection(
     completionHandler(std::move(requestResult));
 }
 
-void HttpTransportAcceptor::pushTransaction(
+void CommonHttpAcceptor::pushTransaction(
     nx::network::http::RequestContext requestContext,
     const std::string& /*systemId*/,
     nx::network::http::RequestProcessedHandler completionHandler)
@@ -193,7 +193,7 @@ void HttpTransportAcceptor::pushTransaction(
     bool foundConnectionOfExpectedType = true;
     const auto connectionFound = m_connectionManager->modifyConnectionByIdSafe(
         connectionId,
-        std::bind(&HttpTransportAcceptor::postTransactionToTransport, this,
+        std::bind(&CommonHttpAcceptor::postTransactionToTransport, this,
             std::placeholders::_1, std::move(request), &foundConnectionOfExpectedType));
 
     if (!connectionFound)
@@ -223,7 +223,7 @@ void HttpTransportAcceptor::pushTransaction(
 }
 
 nx::network::http::RequestResult
-    HttpTransportAcceptor::prepareOkResponseToCreateTransactionConnection(
+    CommonHttpAcceptor::prepareOkResponseToCreateTransactionConnection(
         const ConnectionRequestAttributes& connectionRequestAttributes,
         nx::network::http::Response* const response)
 {
@@ -259,10 +259,10 @@ nx::network::http::RequestResult
     return requestResult;
 }
 
-void HttpTransportAcceptor::startOutgoingChannel(
+void CommonHttpAcceptor::startOutgoingChannel(
     const std::string& connectionId,
     [[maybe_unused]] int connectionSeq,
-    TransactionTransport* commandPipeline,
+    CommonHttpConnection* commandPipeline,
     nx::network::http::HttpServerConnection* httpConnection)
 {
     m_connectionManager->modifyConnectionByIdSafe(
@@ -270,10 +270,10 @@ void HttpTransportAcceptor::startOutgoingChannel(
         [
         connectionSeq,
          commandPipeline, httpConnection](
-            transport::AbstractTransactionTransport* transportConnection)
+            transport::AbstractConnection* transportConnection)
         {
             auto acceptedTransportConnection =
-                dynamic_cast<AcceptedTransportConnection*>(transportConnection);
+                dynamic_cast<AcceptedConnection*>(transportConnection);
             if (!acceptedTransportConnection || 
                 acceptedTransportConnection->seq() != connectionSeq)
             {
@@ -286,13 +286,13 @@ void HttpTransportAcceptor::startOutgoingChannel(
         });
 }
 
-void HttpTransportAcceptor::postTransactionToTransport(
-    AbstractTransactionTransport* transportConnection,
+void CommonHttpAcceptor::postTransactionToTransport(
+    AbstractConnection* transportConnection,
     nx::network::http::Request request,
     bool* foundConnectionOfExpectedType)
 {
     auto transactionTransport =
-        dynamic_cast<AcceptedTransportConnection*>(transportConnection);
+        dynamic_cast<AcceptedConnection*>(transportConnection);
     if (!transactionTransport)
     {
         *foundConnectionOfExpectedType = false;
@@ -303,7 +303,7 @@ void HttpTransportAcceptor::postTransactionToTransport(
     transactionTransport->post(
         [transactionTransport, request = std::move(request)]() mutable
         {
-            static_cast<TransactionTransport*>(transactionTransport->commandPipeline())
+            static_cast<CommonHttpConnection*>(transactionTransport->commandPipeline())
                 ->receivedTransaction(
                     std::move(request.headers),
                     std::move(request.messageBody));
