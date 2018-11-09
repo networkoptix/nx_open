@@ -60,8 +60,6 @@ using namespace nx::vms::event;
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
-namespace analytics_api = nx::vms::api::analytics;
-
 namespace {
 
 enum EventListRoles
@@ -106,7 +104,6 @@ QnVirtualCameraResourceList cameras(const QSet<QnUuid>& ids)
 }
 
 } // namespace
-
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     base_type(parent),
@@ -244,9 +241,10 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
     const auto descriptorListManager = commonModule()->analyticsDescriptorListManager();
 
     const auto allEventTypes = m_filterCameraList.empty()
-        ? descriptorListManager->allDescriptorsInTheSystem<analytics_api::EventTypeDescriptor>()
-        : descriptorListManager->deviceDescriptors<analytics_api::EventTypeDescriptor>(
-            cameras(m_filterCameraList));
+        ? descriptorListManager->allDescriptorsInTheSystem<
+            nx::vms::api::analytics::EventTypeDescriptor>()
+        : descriptorListManager->deviceDescriptors<
+            nx::vms::api::analytics::EventTypeDescriptor>(cameras(m_filterCameraList));
 
     if (allEventTypes.empty())
         return;
@@ -254,11 +252,8 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
     const auto pluginIds = descriptorListManager->pluginIds(allEventTypes);
 
     auto eventNames =
-        [
-            hasDifferentDrivers = pluginIds.size() > 1,
-            descriptorListManager
-        ]
-        (const analytics_api::EventTypeDescriptor& descriptor)
+        [hasDifferentDrivers = pluginIds.size() > 1, descriptorListManager](
+            const nx::vms::api::analytics::EventTypeDescriptor& descriptor)
         {
             if (!hasDifferentDrivers)
                 return QStringList(descriptor.item.name.value);
@@ -267,7 +262,7 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
             for (const auto& path: descriptor.paths)
             {
                 auto pluginDescriptor = descriptorListManager
-                    ->descriptor<analytics_api::PluginDescriptor>(path.pluginId);
+                    ->descriptor<nx::vms::api::analytics::PluginDescriptor>(path.pluginId);
 
                 if (!pluginDescriptor)
                     continue;
@@ -553,13 +548,15 @@ void QnEventLogDialog::requestFinished()
     auto end = ui->dateRangeWidget->endDate();
     if (start != end)
     {
-        ui->statusLabel->setText(tr("Event log for period from %1 to %2 - %n event(s) found", "", m_model->rowCount())
+        ui->statusLabel->setText(
+            tr("Event log for period from %1 to %2 - %n event(s) found", "", m_model->rowCount())
             .arg(start.toString(Qt::DefaultLocaleLongDate))
             .arg(end.toString(Qt::DefaultLocaleLongDate)));
     }
     else
     {
-        ui->statusLabel->setText(tr("Event log for %1 - %n event(s) found", "", m_model->rowCount())
+        ui->statusLabel->setText(
+            tr("Event log for %1 - %n event(s) found", "", m_model->rowCount())
             .arg(start.toString(Qt::DefaultLocaleLongDate)));
     }
 
@@ -649,7 +646,8 @@ void QnEventLogDialog::at_filterAction_triggered()
         eventType = parentEventType;
 
     QSet<QnUuid> camList;
-    const auto cameraResource = m_model->eventResource(idx.row()).dynamicCast<QnVirtualCameraResource>();
+    const auto cameraResource =
+        m_model->eventResource(idx.row()).dynamicCast<QnVirtualCameraResource>();
     if (cameraResource)
         camList << cameraResource->getId();
 
@@ -701,7 +699,8 @@ void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
 
 void QnEventLogDialog::at_exportAction_triggered()
 {
-    QnTableExportHelper::exportToFile(ui->gridEvents, true, this, tr("Export selected events to file"));
+    QnTableExportHelper::exportToFile(ui->gridEvents, true, this,
+        tr("Export selected events to file"));
 }
 
 void QnEventLogDialog::at_clipboardAction_triggered()

@@ -26,8 +26,6 @@
 
 #include <utils/email/email.h>
 
-namespace analytics_api = nx::vms::api::analytics;
-
 namespace {
 
 static const QString kForceHtml = lit("<html>%1</html>");
@@ -243,7 +241,7 @@ bool QnCameraAnalyticsPolicy::isResourceValid(const QnVirtualCameraResourcePtr& 
 {
     const auto descriptorListManager = camera->commonModule()->analyticsDescriptorListManager();
     const auto descriptors = descriptorListManager
-        ->deviceDescriptors<analytics_api::EventTypeDescriptor>(camera);
+        ->deviceDescriptors<nx::vms::api::analytics::EventTypeDescriptor>(camera);
 
     return !descriptors.empty();
 }

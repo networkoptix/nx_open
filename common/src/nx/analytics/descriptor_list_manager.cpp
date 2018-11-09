@@ -4,7 +4,7 @@
 
 namespace nx::analytics {
 
-namespace details {
+namespace details { //< TODO: Rename to "detail".
 
 template<>
 std::set<QString> descriptorIds<nx::vms::api::analytics::EventTypeDescriptor>(
@@ -32,16 +32,15 @@ std::set<QString> descriptorIds<nx::vms::api::analytics::ObjectTypeDescriptor>(
 
 } // namespace details
 
-namespace analytics_api = nx::vms::api::analytics;
-
 DescriptorListManager::DescriptorListManager(QnCommonModule* commonModule):
     base_type(commonModule)
 {
-    registerType<analytics_api::PluginDescriptor>("analyticsPluginDescriptorList");
-    registerType<analytics_api::GroupDescriptor>("analyticsGroupDescriptorList");
-    registerType<analytics_api::EventTypeDescriptor>("analyticsEventTypeDescriptorList");
-    registerType<analytics_api::ObjectTypeDescriptor>("analyticsObjectTypeDescriptorList");
-    registerType<analytics_api::ActionTypeDescriptor>("analyticsActionTypeDescriptor");
+    using namespace nx::vms::api::analytics;
+    registerType<PluginDescriptor>("analyticsPluginDescriptorList");
+    registerType<GroupDescriptor>("analyticsGroupDescriptorList");
+    registerType<EventTypeDescriptor>("analyticsEventTypeDescriptorList");
+    registerType<ObjectTypeDescriptor>("analyticsObjectTypeDescriptorList");
+    registerType<ActionTypeDescriptor>("analyticsActionTypeDescriptor");
 }
 
 QString DescriptorListManager::propertyName(const std::type_info& typeInfo) const
@@ -54,5 +53,3 @@ QString DescriptorListManager::propertyName(const std::type_info& typeInfo) cons
 }
 
 } // namespace nx::analytics
-
-
