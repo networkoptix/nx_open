@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QString>
+#include <QtCore/QDir>
 
 namespace nx {
 namespace utils {
@@ -15,7 +16,7 @@ public:
     QString testDataDir() const;
 
 private:
-    QString m_tmpDir;
+    QDir m_tmpDir;
 };
 
 } // namespace test
