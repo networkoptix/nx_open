@@ -112,7 +112,7 @@ static void updateTreeItem(QnResourceTreeWidget* tree, const QnWorkbenchItem* it
     tree->update(resource);
 }
 
-// Must correlate with QnResourceTreeWidget::filterTags() method.
+// Must correlate with QnResourceBrowserWidget::filterTags() method.
 static const auto kTagIndexToAllowedNodeMapping = QList<ResourceTreeNodeType>(
     {
         QnResourceSearchQuery::kAllowAllNodeTypes,
@@ -123,7 +123,6 @@ static const auto kTagIndexToAllowedNodeMapping = QList<ResourceTreeNodeType>(
         ResourceTreeNodeType::layoutTours,
         ResourceTreeNodeType::filteredVideowalls,
         ResourceTreeNodeType::webPages,
-        ResourceTreeNodeType::analyticsEngines,
         ResourceTreeNodeType::filteredUsers,
         ResourceTreeNodeType::localResources
     });
