@@ -1,9 +1,8 @@
 #pragma once
 
+#include <vector>
+
 #include <QtCore/QString>
-#include <QtCore/QList>
-#include <QtCore/QVector>
-#include <QtCore/QByteArray>
 
 namespace nx::streaming {
 
