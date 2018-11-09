@@ -3,6 +3,7 @@
 #include <deque>
 
 #include <nx/streaming/media_data_packet.h>
+#include <nx/streaming/sdp.h>
 #include <core/resource/resource_media_layout.h>
 
 namespace nx::streaming::rtp {
@@ -26,7 +27,7 @@ class StreamParser: public QObject
 public:
     virtual ~StreamParser() {};
 
-    virtual void setSdpInfo(const QStringList& sdpInfo) = 0;
+    virtual void setSdpInfo(const Sdp::Media& sdp) = 0;
     virtual QnAbstractMediaDataPtr nextData() = 0;
     virtual bool processData(
         quint8* rtpBufferBase,

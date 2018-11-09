@@ -338,11 +338,11 @@ MjpegParser::~MjpegParser()
 {
 }
 
-void MjpegParser::setSdpInfo(const QStringList& lines)
+void MjpegParser::setSdpInfo(const Sdp::Media& sdp)
 {
-    for (int i = 0; i < lines.size(); ++i)
+    for (int i = 0; i < sdp.sdpAttributes.size(); ++i)
     {
-        QString line = lines[i].trimmed();
+        QString line = sdp.sdpAttributes[i].trimmed();
         if (line.startsWith("a=framesize:"))
         {
             const QStringList& values = line.split(' ');

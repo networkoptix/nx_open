@@ -12,7 +12,7 @@ class SimpleAudioParser: public AudioStreamParser
 public:
     SimpleAudioParser();
     virtual ~SimpleAudioParser();
-    virtual void setSdpInfo(const QStringList& sdpInfo) override;
+    virtual void setSdpInfo(const Sdp::Media& sdp) override;
 
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, bool& gotData) override;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;

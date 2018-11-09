@@ -15,7 +15,7 @@ class AacParser: public AudioStreamParser
 public:
     AacParser();
     virtual ~AacParser();
-    virtual void setSdpInfo(const QStringList& sdpInfo) override;
+    virtual void setSdpInfo(const Sdp::Media& sdp) override;
 
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, bool& gotData) override;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;

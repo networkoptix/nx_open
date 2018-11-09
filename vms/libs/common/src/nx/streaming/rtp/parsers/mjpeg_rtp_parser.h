@@ -13,7 +13,7 @@ class MjpegParser: public VideoStreamParser
 public:
     MjpegParser();
     virtual ~MjpegParser();
-    virtual void setSdpInfo(const QStringList& lines) override;
+    virtual void setSdpInfo(const Sdp::Media& sdp) override;
 
     virtual bool processData(
         quint8* rtpBufferBase, int bufferOffset, int bytesRead, bool& gotData) override;

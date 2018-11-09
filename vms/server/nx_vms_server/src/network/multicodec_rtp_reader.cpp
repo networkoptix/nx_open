@@ -679,7 +679,7 @@ void QnMulticodecRtpReader::createTrackParsers()
             if (!trackParser.parser)
                 continue;
 
-            trackParser.parser->setSdpInfo(track.sdpMedia.sdpAttributes);
+            trackParser.parser->setSdpInfo(track.sdpMedia);
             trackParser.ioDevice = track.ioDevice.get();
             trackParser.rtcpChannelNumber = track.interleaved.second;
             if (trackParser.ioDevice)

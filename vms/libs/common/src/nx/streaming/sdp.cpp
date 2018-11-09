@@ -45,6 +45,23 @@ bool parseRtpmap(const QString& line, Sdp::Rtpmap& rtpmap)
     return true;
 }
 
+bool parseFmtp(const QString& line, Sdp::Fmtp& fmtp)
+{
+    int valueIndex = line.indexOf(' ');
+    if (valueIndex == -1)
+        return false;
+
+    QStringList fmtpHeader = line.left(valueIndex).split(':');
+    if (fmtpHeader.size() < 2)
+        return false;
+    fmtp.format = fmtpHeader[1].toUInt();
+    fmtp.params = line.mid(valueIndex + 1).split(';');
+    for (QString& param: fmtp.params)
+        param = param.trimmed();
+
+    return true;
+}
+
 Sdp::Media parseMedia(QStringList& lines)
 {
     Sdp::Media media;
@@ -74,6 +91,12 @@ Sdp::Media parseMedia(QStringList& lines)
                 if (rtpmap.codecName.isEmpty())
                     rtpmap.codecName = findCodecById(rtpmap.format);
             }
+        }
+        else if (line.startsWith("a=fmtp", Qt::CaseInsensitive))
+        {
+            Sdp::Fmtp fmtp;
+            if (parseFmtp(line, fmtp) && fmtp.format == media.format)
+                media.fmtp = fmtp;
         }
         else if (line.startsWith("a=control:", Qt::CaseInsensitive))
         {

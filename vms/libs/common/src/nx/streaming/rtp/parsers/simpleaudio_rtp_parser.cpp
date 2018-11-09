@@ -30,31 +30,15 @@ void SimpleAudioParser::setCodecId(AVCodecID codecId)
     m_codecId = codecId;
 }
 
-void SimpleAudioParser::setSdpInfo(const QStringList& lines)
+void SimpleAudioParser::setSdpInfo(const Sdp::Media& sdp)
 {
     // determine here:
     // 1. sizeLength(au size in bits)  or constantSize
 
-    for (int i = 0; i < lines.size(); ++ i)
-    {
-        if (lines[i].startsWith("a=rtpmap"))
-        {
-            QStringList params = lines[i].mid(lines[i].indexOf(' ')+1).split('/');
-            if (params.size() > 1)
-                StreamParser::setFrequency(params[1].trimmed().toInt());
-            if (params.size() > 2)
-                m_channels = params[2].trimmed().toInt();
-        }
-        else if (lines[i].startsWith("a=fmtp"))
-        {
-            QStringList params = lines[i].mid(lines[i].indexOf(' ')+1).split(';');
-            for(QString param: params)
-            {
-                param = param.trimmed();
-                //processStringParam("mode-set", m_mode, param);
-            }
-        }
-    }
+    if (sdp.rtpmap.clockRate > 0)
+        StreamParser::setFrequency(sdp.rtpmap.clockRate);
+    if (sdp.rtpmap.channels > 0)
+        m_channels = sdp.rtpmap.channels;
 
     const auto context = new QnAvCodecMediaContext(m_codecId);
     m_context = QnConstMediaContextPtr(context);

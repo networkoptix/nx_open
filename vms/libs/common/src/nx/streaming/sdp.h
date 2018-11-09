@@ -23,6 +23,12 @@ struct Sdp {
         int channels = 0;
     };
 
+    struct Fmtp
+    {
+        int format = -1;
+        QStringList params;
+    };
+
     struct Media
     {
         int format = -1;
@@ -31,6 +37,7 @@ struct Sdp {
         bool sendOnly = false;
         uint32_t ssrc = 0;
         Rtpmap rtpmap;
+        Fmtp fmtp;
         QStringList sdpAttributes;
     };
 
