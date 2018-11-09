@@ -193,8 +193,14 @@ void CommonHttpAcceptor::pushTransaction(
     bool foundConnectionOfExpectedType = true;
     const auto connectionFound = m_connectionManager->modifyConnectionByIdSafe(
         connectionId,
-        std::bind(&CommonHttpAcceptor::postTransactionToTransport, this,
-            std::placeholders::_1, std::move(request), &foundConnectionOfExpectedType));
+        [this, request = std::move(request), &foundConnectionOfExpectedType](
+            auto&&... args) mutable
+        {
+            postTransactionToTransport(
+                std::move(args)...,
+                std::move(request),
+                &foundConnectionOfExpectedType);
+        });
 
     if (!connectionFound)
     {
@@ -267,9 +273,7 @@ void CommonHttpAcceptor::startOutgoingChannel(
 {
     m_connectionManager->modifyConnectionByIdSafe(
         connectionId,
-        [
-        connectionSeq,
-         commandPipeline, httpConnection](
+        [connectionSeq, commandPipeline, httpConnection](
             transport::AbstractConnection* transportConnection)
         {
             auto acceptedTransportConnection =
