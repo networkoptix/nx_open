@@ -1,0 +1,13 @@
+<h1>Table</h1>
+<table>
+  <tr>
+    <th *ngFor="let header of headers">
+      {{header}}
+    </th>
+  </tr>
+  <tr *ngFor="let element of elements">
+    <td *ngFor="let detail of details">
+      {{element[detail]}}
+    </td>
+  </tr>
+</table>

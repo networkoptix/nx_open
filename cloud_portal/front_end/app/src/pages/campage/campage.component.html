@@ -1,0 +1,46 @@
+<div class="container">
+    <h1>CAMPAGE</h1>
+    <div class="row">
+        <div class="col-12 col-xxl-6 pb-3">
+            <nx-block type='gray'>
+                <header>
+                    Table for Cameras
+                </header>
+
+                <nx-section>
+                    <nx-cam-table
+                            [headers] = "cameraHeaders"
+                            [elements] = "testArrayE"
+                    ></nx-cam-table>
+                </nx-section>
+
+                <nx-section *ngIf="activeCamera">
+                    <h2>Where the camera panel will be</h2>
+                </nx-section>
+            </nx-block>
+        </div>
+        <!--<div ng-show="!query && isFilterEmpty()" cg-busy="camerasPromise" ng-cloak>-->
+            <div class="container">
+                <!--<ul class="list-unstyled col-md-3" ng-repeat="n in [0, 1, 2, 3]" style="padding-left: 7px;">
+                    <li class="no-left-padding"
+                        ng-repeat="vendor in vendors.slice(vendorGroup(n).start, vendorGroup(n).end)">
+                        <a href="javascript:void(0);" ng-click="setVendor(vendor)">
+                        <span style="white-space: nowrap; color: #999999; font-size: large;">
+                            {{ vendor }}
+                        </span>
+                        </a>
+                    </li>
+                </ul>-->
+                <ul class="list-unstyled col-md-3" *ngFor="let n of [0, 1, 2, 3]">
+                    <li class="no-left-padding" *ngFor="let vendor of vendors.slice(vendorGroup(n).start, vendorGroup(n).end)">
+                        <a href="javascript:void(0);" (click)="setVendor(vendor)">
+                            <span>
+                                {{ vendor }}
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        <!--</div>-->
+    </div>
+</div>
