@@ -24,8 +24,9 @@
                     </nx-section>
 
                     <nx-section>
-                        {{plugin.overview.description}}
+                        <div [innerHtml]="plugin.overview.description"></div>
                     </nx-section>
+
                     <nx-section *ngIf="plugin.overview.overviewVideo">
                         <nx-external-video [src]="plugin.overview.overviewVideo"></nx-external-video>
                     </nx-section>
@@ -58,7 +59,7 @@
                     </nx-section>
 
                     <nx-section *ngIf="plugin.support.supportInformation">
-                        <div [innerHtml]="plugin.support.supportInformation"></div>
+                        <div [innerHtml]="sanitizer.bypassSecurityTrustHtml(plugin.support.supportInformation)"></div>
                     </nx-section>
                 </nx-block>
             </div>

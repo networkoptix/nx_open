@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { IntegrationService } from '../integration.service';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
     selector: 'integration-detail-component',
@@ -15,7 +16,8 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
     private setupDefaults() {
     }
 
-    constructor(private _route: ActivatedRoute,
+    constructor(public sanitizer: DomSanitizer,
+                private _route: ActivatedRoute,
                 private integrationService: IntegrationService) {
 
         this.setupDefaults();

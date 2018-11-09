@@ -1,4 +1,8 @@
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import {
+    Component, OnInit, OnDestroy,
+    Input, SimpleChanges, OnChanges
+} from '@angular/core';
+
 import { NxConfigService } from '../../../services/nx-config';
 
 @Component({
@@ -7,7 +11,7 @@ import { NxConfigService } from '../../../services/nx-config';
     styleUrls: ['list.component.scss']
 })
 
-export class NxIntegrationsListComponent implements OnInit, OnDestroy {
+export class NxIntegrationsListComponent implements OnInit, OnDestroy, OnChanges {
 
     @Input() list;
 
@@ -23,23 +27,36 @@ export class NxIntegrationsListComponent implements OnInit, OnDestroy {
         this.config = configService.getConfig();
     }
 
-    isSupported(plugin, os) {
-        const result = plugin.information.platforms.find(platform => {
-            // 32 or 64 bit? ... it doesn't matter :)
-            return platform.toLowerCase().indexOf(os) > -1;
+    getPlatformIconsFor(plugin) {
+        const platformIcons = [];
+
+        this.config.icons.platforms.forEach(icon => {
+            const platform = plugin.information.platforms.find(platform => {
+                // 32 or 64 bit? ... it doesn't matter :)
+                return platform.toLowerCase().indexOf(icon.name) > -1;
+            });
+
+            if (platform) {
+                platformIcons.push({ name: platform, src: icon.src });
+            }
         });
 
-        return result !== undefined;
+        return platformIcons;
     }
 
     ngOnInit(): void {
-
     }
 
     ngOnDestroy() {
     }
 
-    onSubmit() {
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes.list) {
+            // inject platform icons info
+            this.list.forEach((plugin) => {
+                plugin.information.platforms.icons = this.getPlatformIconsFor(plugin);
+            });
+        }
     }
 }
 
