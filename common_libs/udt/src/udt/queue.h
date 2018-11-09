@@ -121,7 +121,7 @@ private:
         char* m_pBuffer;        // data buffer
         int m_iSize;        // size of each queue
 
-        CQEntry* m_pNext;
+        CQEntry* next;
     }
     *m_pQEntry,            // pointer to the first unit queue
         *m_pCurrQueue,        // pointer to the current available queue
@@ -144,18 +144,22 @@ private:
 
 struct CSNode
 {
-    std::weak_ptr<CUDT> m_pUDT;        // Pointer to the instance of CUDT socket
-    uint64_t m_llTimeStamp;      // Time Stamp
+    std::weak_ptr<CUDT> socket;
+    uint64_t timestamp = 0;
 
-    int m_iHeapLoc;        // location on the heap, -1 means not on the heap
+    // -1 means not on the heap.
+    int locationOnHeap = -1;
 };
 
 class CSndUList
 {
-    friend class CSndQueue;
+    //friend class CSndQueue;
 
 public:
-    CSndUList(CTimer* timer);
+    CSndUList(
+        CTimer* timer,
+        std::mutex* windowLock,
+        std::condition_variable* windowCond);
     ~CSndUList();
 
 public:
@@ -164,7 +168,7 @@ public:
     //    Update the timestamp of the UDT instance on the list.
     // Parameters:
     //    1) [in] u: pointer to the UDT instance
-    //    2) [in] resechedule: if the timestampe shoudl be rescheduled
+    //    2) [in] resechedule: if the timestamp should be rescheduled
     // Returned value:
     //    None.
 
@@ -198,6 +202,8 @@ public:
 
     uint64_t getNextProcTime();
 
+    int lastEntry() const { return m_iLastEntry; }
+
 private:
     void insert_(int64_t ts, std::shared_ptr<CUDT> u);
     void remove_(CUDT* u);
@@ -226,22 +232,19 @@ private:
 
 struct CRNode
 {
-    std::weak_ptr<CUDT> m_pUDT;                // Pointer to the instance of CUDT socket
-    uint64_t m_llTimeStamp;      // Time Stamp
+    std::weak_ptr<CUDT> socket;
+    uint64_t timestamp = 0;
 
-    CRNode* m_pPrev;             // previous link
-    CRNode* m_pNext;             // next link
+    CRNode* prev = nullptr;
+    CRNode* next = nullptr;
 
-    bool m_bOnList;              // if the node is already on the list
+    bool onList = false;    // if the node is already on the list
 };
 
 class CRcvUList
 {
 public:
-    CRcvUList();
-    ~CRcvUList();
-
-public:
+    CRcvUList() = default;
 
     // Functionality:
     //    Insert a new UDT instance to the list.
@@ -271,10 +274,10 @@ public:
     void update(std::shared_ptr<CUDT> u);
 
 public:
-    CRNode* m_pUList;        // the head node
+    CRNode* m_pUList = nullptr;        // the head node
 
 private:
-    CRNode* m_pLast;        // the last node
+    CRNode* m_pLast = nullptr;        // the last node
 
 private:
     CRcvUList(const CRcvUList&);
@@ -324,7 +327,7 @@ private:
     struct CRL
     {
         UDTSOCKET m_iID;            // UDT socket ID (self)
-        std::weak_ptr<CUDT> m_pUDT;            // UDT instance
+        std::weak_ptr<CUDT> socket;            // UDT instance
         int m_iIPversion;                 // IP version
         sockaddr* m_pPeerAddr;        // UDT sonnection peer address
         uint64_t m_ullTTL;            // the time that this request expires

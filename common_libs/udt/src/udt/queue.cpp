@@ -148,9 +148,9 @@ static SendedPacketVerifier packetVerifier;
 
 
 CUnitQueue::CUnitQueue():
-    m_pQEntry(NULL),
-    m_pCurrQueue(NULL),
-    m_pLastQueue(NULL),
+    m_pQEntry(nullptr),
+    m_pCurrQueue(nullptr),
+    m_pLastQueue(nullptr),
     m_iSize(0),
     m_iCount(0),
     m_iMSS(),
@@ -162,25 +162,25 @@ CUnitQueue::~CUnitQueue()
 {
     CQEntry* p = m_pQEntry;
 
-    while (p != NULL)
+    while (p != nullptr)
     {
         delete[] p->m_pUnit;
         delete[] p->m_pBuffer;
 
         CQEntry* q = p;
         if (p == m_pLastQueue)
-            p = NULL;
+            p = nullptr;
         else
-            p = p->m_pNext;
+            p = p->next;
         delete q;
     }
 }
 
 int CUnitQueue::init(int size, int mss, int version)
 {
-    CQEntry* tempq = NULL;
-    CUnit* tempu = NULL;
-    char* tempb = NULL;
+    CQEntry* tempq = nullptr;
+    CUnit* tempu = nullptr;
+    char* tempb = nullptr;
 
     try
     {
@@ -207,7 +207,7 @@ int CUnitQueue::init(int size, int mss, int version)
     tempq->m_iSize = size;
 
     m_pQEntry = m_pCurrQueue = m_pLastQueue = tempq;
-    m_pQEntry->m_pNext = m_pQEntry;
+    m_pQEntry->next = m_pQEntry;
 
     m_pAvailUnit = m_pCurrQueue->m_pUnit;
 
@@ -223,7 +223,7 @@ int CUnitQueue::increase()
     // adjust/correct m_iCount
     int real_count = 0;
     CQEntry* p = m_pQEntry;
-    while (p != NULL)
+    while (p != nullptr)
     {
         CUnit* u = p->m_pUnit;
         for (CUnit* end = u + p->m_iSize; u != end; ++u)
@@ -231,17 +231,17 @@ int CUnitQueue::increase()
                 ++real_count;
 
         if (p == m_pLastQueue)
-            p = NULL;
+            p = nullptr;
         else
-            p = p->m_pNext;
+            p = p->next;
     }
     m_iCount = real_count;
     if (double(m_iCount) / m_iSize < 0.9)
         return -1;
 
-    CQEntry* tempq = NULL;
-    CUnit* tempu = NULL;
-    char* tempb = NULL;
+    CQEntry* tempq = nullptr;
+    CUnit* tempu = nullptr;
+    char* tempb = nullptr;
 
     // all queues have the same size
     int size = m_pQEntry->m_iSize;
@@ -270,9 +270,9 @@ int CUnitQueue::increase()
     tempq->m_pBuffer = tempb;
     tempq->m_iSize = size;
 
-    m_pLastQueue->m_pNext = tempq;
+    m_pLastQueue->next = tempq;
     m_pLastQueue = tempq;
-    m_pLastQueue->m_pNext = m_pQEntry;
+    m_pLastQueue->next = m_pQEntry;
 
     m_iSize += size;
 
@@ -291,7 +291,7 @@ CUnit* CUnitQueue::getNextAvailUnit()
         increase();
 
     if (m_iCount >= m_iSize)
-        return NULL;
+        return nullptr;
 
     CQEntry* entrance = m_pCurrQueue;
 
@@ -307,19 +307,25 @@ CUnit* CUnitQueue::getNextAvailUnit()
             return m_pAvailUnit;
         }
 
-        m_pCurrQueue = m_pCurrQueue->m_pNext;
+        m_pCurrQueue = m_pCurrQueue->next;
         m_pAvailUnit = m_pCurrQueue->m_pUnit;
     } while (m_pCurrQueue != entrance);
 
     increase();
 
-    return NULL;
+    return nullptr;
 }
 
 
-CSndUList::CSndUList(CTimer* timer):
+CSndUList::CSndUList(
+    CTimer* timer,
+    std::mutex* windowLock,
+    std::condition_variable* windowCond)
+    :
     m_iArrayLength(4096),
     m_iLastEntry(-1),
+    m_pWindowLock(windowLock),
+    m_pWindowCond(windowCond),
     m_pTimer(timer)
 {
     m_pHeap = new CSNode*[m_iArrayLength];
@@ -336,14 +342,14 @@ void CSndUList::update(std::shared_ptr<CUDT> u, bool reschedule)
 
     CSNode* n = u->sNode();
 
-    if (n->m_iHeapLoc >= 0)
+    if (n->locationOnHeap >= 0)
     {
         if (!reschedule)
             return;
 
-        if (n->m_iHeapLoc == 0)
+        if (n->locationOnHeap == 0)
         {
-            n->m_llTimeStamp = 1;
+            n->timestamp = 1;
             m_pTimer->interrupt();
             return;
         }
@@ -364,10 +370,10 @@ int CSndUList::pop(sockaddr*& addr, CPacket& pkt)
     // no pop until the next schedulled time
     uint64_t ts;
     CTimer::rdtsc(ts);
-    if (ts < m_pHeap[0]->m_llTimeStamp)
+    if (ts < m_pHeap[0]->timestamp)
         return -1;
 
-    std::shared_ptr<CUDT> u = m_pHeap[0]->m_pUDT.lock();
+    std::shared_ptr<CUDT> u = m_pHeap[0]->socket.lock();
     remove_(u.get());
 
     if (!u->connected() || u->broken())
@@ -400,7 +406,7 @@ uint64_t CSndUList::getNextProcTime()
     if (-1 == m_iLastEntry)
         return 0;
 
-    return m_pHeap[0]->m_llTimeStamp;
+    return m_pHeap[0]->timestamp;
 }
 
 void CSndUList::insert_(int64_t ts, std::shared_ptr<CUDT> u)
@@ -408,34 +414,34 @@ void CSndUList::insert_(int64_t ts, std::shared_ptr<CUDT> u)
     CSNode* n = u->sNode();
 
     // do not insert repeated node
-    if (n->m_iHeapLoc >= 0)
+    if (n->locationOnHeap >= 0)
         return;
 
     m_iLastEntry++;
     m_pHeap[m_iLastEntry] = n;
-    n->m_llTimeStamp = ts;
+    n->timestamp = ts;
 
     int q = m_iLastEntry;
     int p = q;
     while (p != 0)
     {
         p = (q - 1) >> 1;
-        if (m_pHeap[p]->m_llTimeStamp > m_pHeap[q]->m_llTimeStamp)
+        if (m_pHeap[p]->timestamp > m_pHeap[q]->timestamp)
         {
             CSNode* t = m_pHeap[p];
             m_pHeap[p] = m_pHeap[q];
             m_pHeap[q] = t;
-            t->m_iHeapLoc = q;
+            t->locationOnHeap = q;
             q = p;
         }
         else
             break;
     }
 
-    n->m_iHeapLoc = q;
+    n->locationOnHeap = q;
 
     // an earlier event has been inserted, wake up sending worker
-    if (n->m_iHeapLoc == 0)
+    if (n->locationOnHeap == 0)
         m_pTimer->interrupt();
 
     // first entry, activate the sending queue
@@ -450,27 +456,27 @@ void CSndUList::remove_(CUDT* u)
 {
     CSNode* n = u->sNode();
 
-    if (n->m_iHeapLoc >= 0)
+    if (n->locationOnHeap >= 0)
     {
         // remove the node from heap
-        m_pHeap[n->m_iHeapLoc] = m_pHeap[m_iLastEntry];
+        m_pHeap[n->locationOnHeap] = m_pHeap[m_iLastEntry];
         m_iLastEntry--;
-        m_pHeap[n->m_iHeapLoc]->m_iHeapLoc = n->m_iHeapLoc;
+        m_pHeap[n->locationOnHeap]->locationOnHeap = n->locationOnHeap;
 
-        int q = n->m_iHeapLoc;
+        int q = n->locationOnHeap;
         int p = q * 2 + 1;
         while (p <= m_iLastEntry)
         {
-            if ((p + 1 <= m_iLastEntry) && (m_pHeap[p]->m_llTimeStamp > m_pHeap[p + 1]->m_llTimeStamp))
+            if ((p + 1 <= m_iLastEntry) && (m_pHeap[p]->timestamp > m_pHeap[p + 1]->timestamp))
                 p++;
 
-            if (m_pHeap[q]->m_llTimeStamp > m_pHeap[p]->m_llTimeStamp)
+            if (m_pHeap[q]->timestamp > m_pHeap[p]->timestamp)
             {
                 CSNode* t = m_pHeap[p];
                 m_pHeap[p] = m_pHeap[q];
-                m_pHeap[p]->m_iHeapLoc = p;
+                m_pHeap[p]->locationOnHeap = p;
                 m_pHeap[q] = t;
-                m_pHeap[q]->m_iHeapLoc = q;
+                m_pHeap[q]->locationOnHeap = q;
 
                 q = p;
                 p = q * 2 + 1;
@@ -480,7 +486,7 @@ void CSndUList::remove_(CUDT* u)
         }
 
         m_pHeap[m_iLastEntry + 1] = 0;
-        n->m_iHeapLoc = -1;
+        n->locationOnHeap = -1;
     }
 
     // the only event has been deleted, wake up immediately
@@ -490,12 +496,10 @@ void CSndUList::remove_(CUDT* u)
 
 //
 CSndQueue::CSndQueue(CChannel* c, CTimer* t):
-    m_pSndUList(std::make_unique<CSndUList>(t)),
+    m_pSndUList(std::make_unique<CSndUList>(t, &m_WindowLock, &m_WindowCond)),
     m_pChannel(c),
     m_pTimer(t)
 {
-    m_pSndUList->m_pWindowLock = &m_WindowLock;
-    m_pSndUList->m_pWindowCond = &m_WindowCond;
 }
 
 CSndQueue::~CSndQueue()
@@ -551,7 +555,7 @@ void CSndQueue::worker()
             std::unique_lock<std::mutex> lock(m_WindowLock);
             m_WindowCond.wait(
                 lock,
-                [this]() { return m_bClosing || m_pSndUList->m_iLastEntry >= 0; });
+                [this]() { return m_bClosing || m_pSndUList->lastEntry() >= 0; });
         }
     }
 }
@@ -567,36 +571,26 @@ int CSndQueue::sendto(const sockaddr* addr, CPacket& packet)
     return packet.getLength();
 }
 
-
-//
-CRcvUList::CRcvUList():
-    m_pUList(NULL),
-    m_pLast(NULL)
-{
-}
-
-CRcvUList::~CRcvUList()
-{
-}
+//-------------------------------------------------------------------------------------------------
+// CRcvUList
 
 void CRcvUList::insert(std::shared_ptr<CUDT> u)
 {
     CRNode* n = u->rNode();
-    CTimer::rdtsc(n->m_llTimeStamp);
+    CTimer::rdtsc(n->timestamp);
 
-    if (NULL == m_pUList)
+    if (!m_pUList)
     {
         // empty list, insert as the single node
-        n->m_pPrev = n->m_pNext = NULL;
+        n->prev = n->next = nullptr;
         m_pLast = m_pUList = n;
-
         return;
     }
 
     // always insert at the end for RcvUList
-    n->m_pPrev = m_pLast;
-    n->m_pNext = NULL;
-    m_pLast->m_pNext = n;
+    n->prev = m_pLast;
+    n->next = nullptr;
+    m_pLast->next = n;
     m_pLast = n;
 }
 
@@ -604,60 +598,60 @@ void CRcvUList::remove(std::shared_ptr<CUDT> u)
 {
     CRNode* n = u->rNode();
 
-    if (!n->m_bOnList)
+    if (!n->onList)
         return;
 
-    if (NULL == n->m_pPrev)
+    if (nullptr == n->prev)
     {
         // n is the first node
-        m_pUList = n->m_pNext;
-        if (NULL == m_pUList)
-            m_pLast = NULL;
+        m_pUList = n->next;
+        if (nullptr == m_pUList)
+            m_pLast = nullptr;
         else
-            m_pUList->m_pPrev = NULL;
+            m_pUList->prev = nullptr;
     }
     else
     {
-        n->m_pPrev->m_pNext = n->m_pNext;
-        if (NULL == n->m_pNext)
+        n->prev->next = n->next;
+        if (nullptr == n->next)
         {
             // n is the last node
-            m_pLast = n->m_pPrev;
+            m_pLast = n->prev;
         }
         else
-            n->m_pNext->m_pPrev = n->m_pPrev;
+            n->next->prev = n->prev;
     }
 
-    n->m_pNext = n->m_pPrev = NULL;
+    n->next = n->prev = nullptr;
 }
 
 void CRcvUList::update(std::shared_ptr<CUDT> u)
 {
     CRNode* n = u->rNode();
 
-    if (!n->m_bOnList)
+    if (!n->onList)
         return;
 
-    CTimer::rdtsc(n->m_llTimeStamp);
+    CTimer::rdtsc(n->timestamp);
 
     // if n is the last node, do not need to change
-    if (NULL == n->m_pNext)
+    if (nullptr == n->next)
         return;
 
-    if (NULL == n->m_pPrev)
+    if (nullptr == n->prev)
     {
-        m_pUList = n->m_pNext;
-        m_pUList->m_pPrev = NULL;
+        m_pUList = n->next;
+        m_pUList->prev = nullptr;
     }
     else
     {
-        n->m_pPrev->m_pNext = n->m_pNext;
-        n->m_pNext->m_pPrev = n->m_pPrev;
+        n->prev->next = n->next;
+        n->next->prev = n->prev;
     }
 
-    n->m_pPrev = m_pLast;
-    n->m_pNext = NULL;
-    m_pLast->m_pNext = n;
+    n->prev = m_pLast;
+    n->next = nullptr;
+    m_pLast->next = n;
     m_pLast = n;
 }
 
@@ -713,7 +707,7 @@ void CRendezvousQueue::insert(
 
     CRL r;
     r.m_iID = id;
-    r.m_pUDT = u;
+    r.socket = u;
     r.m_iIPversion = ipVersion;
     r.m_pPeerAddr = (AF_INET == ipVersion)
         ? (sockaddr*)new sockaddr_in 
@@ -759,7 +753,7 @@ std::shared_ptr<CUDT> CRendezvousQueue::getByAddr(
             (id == 0 || id == crl.m_iID))
         {
             id = crl.m_iID;
-            return crl.m_pUDT.lock();
+            return crl.socket.lock();
         }
     }
 
@@ -775,7 +769,7 @@ void CRendezvousQueue::updateConnStatus()
 
     for (auto i = m_lRendezvousID.begin(); i != m_lRendezvousID.end(); ++i)
     {
-        auto udtSocket = i->m_pUDT.lock();
+        auto udtSocket = i->socket.lock();
         if (!udtSocket)
             continue;
 
@@ -796,7 +790,7 @@ void CRendezvousQueue::updateConnStatus()
 
             CPacket request;
             char* reqdata = new char[udtSocket->payloadSize()];
-            request.pack(ControlPacketType::Handshake, NULL, reqdata, udtSocket->payloadSize());
+            request.pack(ControlPacketType::Handshake, nullptr, reqdata, udtSocket->payloadSize());
             // ID = 0, connection request
             request.m_iID = !udtSocket->rendezvous() ? 0 : udtSocket->connRes().m_iID;
             int hs_size = udtSocket->payloadSize();
@@ -893,7 +887,7 @@ void CRcvQueue::worker()
 
         // find next available slot for incoming packet
         CUnit* unit = m_UnitQueue.getNextAvailUnit();
-        if (NULL == unit)
+        if (nullptr == unit)
         {
             // no space, skip this packet
             CPacket temp;
@@ -975,9 +969,9 @@ void CRcvQueue::worker()
 
         CRNode* ul = m_pRcvUList->m_pUList;
         uint64_t ctime = currtime - 100000 * CTimer::getCPUFrequency();
-        while ((NULL != ul) && (ul->m_llTimeStamp < ctime))
+        while ((nullptr != ul) && (ul->timestamp < ctime))
         {
-            std::shared_ptr<CUDT> u = ul->m_pUDT.lock();
+            std::shared_ptr<CUDT> u = ul->socket.lock();
 
             if (u->connected() && !u->broken() && !u->isClosing())
             {
@@ -989,7 +983,7 @@ void CRcvQueue::worker()
                 // the socket must be removed from Hash table first, then RcvUList
                 m_socketByIdDict.remove(u->socketId());
                 m_pRcvUList->remove(u);
-                u->rNode()->m_bOnList = false;
+                u->rNode()->onList = false;
             }
 
             ul = m_pRcvUList->m_pUList;

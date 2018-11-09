@@ -585,18 +585,16 @@ void CUDT::open()
     m_llSndDuration = m_llSndDurationTotal = 0;
 
     // structures for queue
-    if (NULL == m_pSNode)
-        m_pSNode = new CSNode;
-    m_pSNode->m_pUDT = shared_from_this();
-    m_pSNode->m_llTimeStamp = 1;
-    m_pSNode->m_iHeapLoc = -1;
+    if (!m_pSNode)
+        m_pSNode = new CSNode();
+    m_pSNode->socket = shared_from_this();
+    m_pSNode->timestamp = 1;
+    m_pSNode->locationOnHeap = -1;
 
-    if (NULL == m_pRNode)
-        m_pRNode = new CRNode;
-    m_pRNode->m_pUDT = shared_from_this();
-    m_pRNode->m_llTimeStamp = 1;
-    m_pRNode->m_pPrev = m_pRNode->m_pNext = NULL;
-    m_pRNode->m_bOnList = false;
+    if (!m_pRNode)
+        m_pRNode = new CRNode();
+    m_pRNode->socket = shared_from_this();
+    m_pRNode->timestamp = 1;
 
     m_iRTT = 10 * m_iSYNInterval;
     m_iRTTVar = m_iRTT >> 1;
@@ -892,7 +890,7 @@ POST_CONNECT:
     m_bConnected = true;
 
     // register this socket for receiving data packets
-    m_pRNode->m_bOnList = true;
+    m_pRNode->onList = true;
     rcvQueue().addNewEntry(shared_from_this());
 
     // acknowledge the management module.
@@ -992,7 +990,7 @@ void CUDT::connect(const sockaddr* peer, CHandShake* hs)
     m_bConnected = true;
 
     // register this socket for receiving data packets
-    m_pRNode->m_bOnList = true;
+    m_pRNode->onList = true;
     rcvQueue().addNewEntry(shared_from_this());
 
     //send the response to the peer, see listen() for more discussions about this

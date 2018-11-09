@@ -1208,7 +1208,7 @@ void CUDTUnited::checkBrokenSockets()
 
         // timeout 1 second to destroy a socket AND it has been removed from RcvUList
         if ((CTimer::getTime() - j->second->m_TimeStamp > 1000000)
-            && ((nullptr == j->second->m_pUDT->rNode()) || !j->second->m_pUDT->rNode()->m_bOnList))
+            && ((nullptr == j->second->m_pUDT->rNode()) || !j->second->m_pUDT->rNode()->onList))
         {
             tbr.push_back(j->first);
         }
