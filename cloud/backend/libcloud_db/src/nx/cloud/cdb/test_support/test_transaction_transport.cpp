@@ -7,7 +7,7 @@ namespace test {
 constexpr static const std::chrono::seconds kTcpKeepAliveTimeout = std::chrono::seconds(5);
 constexpr static const int kKeepAliveProbeCount = 3;
 
-TransactionTransport::TransactionTransport(
+CommonHttpConnection::CommonHttpConnection(
     ::ec2::ConnectionGuardSharedState* const connectionGuardSharedState,
     nx::vms::api::PeerData localPeer,
     const std::string& systemId,
@@ -28,12 +28,12 @@ TransactionTransport::TransactionTransport(
     setLocalPeerProtocolVersion(protocolVersion);
 }
 
-int TransactionTransport::connectionId() const
+int CommonHttpConnection::connectionId() const
 {
     return m_connectionId;
 }
 
-void TransactionTransport::fillAuthInfo(
+void CommonHttpConnection::fillAuthInfo(
     const nx::network::http::AsyncHttpClientPtr& httpClient,
     bool /*authByKey*/)
 {

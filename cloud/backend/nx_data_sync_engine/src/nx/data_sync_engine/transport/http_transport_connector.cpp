@@ -104,7 +104,7 @@ void HttpCommandPipelineConnector::processSuccessfulConnect()
 
     m_connection->disconnect(m_stateChangedConnection);
 
-    auto commandPipeline = std::make_unique<TransactionTransport>(
+    auto commandPipeline = std::make_unique<CommonHttpConnection>(
         m_protocolVersionRange,
         std::exchange(m_connection, nullptr),
         //getAioThread(),
@@ -186,8 +186,8 @@ void HttpTransportConnector::onPipelineConnectCompleted(
         return;
     }
 
-    TransactionTransport* transport = 
-        static_cast<TransactionTransport*>(connection.get());
+    CommonHttpConnection* transport = 
+        static_cast<CommonHttpConnection*>(connection.get());
 
     ConnectionRequestAttributes connectionRequestAttributes;
     connectionRequestAttributes.remotePeer = transport->remotePeer();

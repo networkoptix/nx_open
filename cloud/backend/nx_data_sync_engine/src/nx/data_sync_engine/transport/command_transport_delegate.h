@@ -5,12 +5,12 @@
 namespace nx::data_sync_engine::transport {
 
 class NX_DATA_SYNC_ENGINE_API CommandTransportDelegate:
-    public AbstractTransactionTransport
+    public AbstractConnection
 {
-    using base_type = AbstractTransactionTransport;
+    using base_type = AbstractConnection;
 
 public:
-    CommandTransportDelegate(AbstractTransactionTransport* delegatee);
+    CommandTransportDelegate(AbstractConnection* delegatee);
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
@@ -34,7 +34,7 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    AbstractTransactionTransport* m_delegatee = nullptr;
+    AbstractConnection* m_delegatee = nullptr;
 };
 
 } // namespace nx::data_sync_engine::transport
