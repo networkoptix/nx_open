@@ -28,12 +28,8 @@
                 </nx-section>
 
                 <footer>
-                    <!--<h3 class="float-left m-0 mt-1 mr-1" >-->
-                    <!--<span class="tag-primary" translate>Recommended</span>-->
-                    <!--</h3>-->
-
                     <h3 class="float-left m-0 mt-1 mr-1" *ngFor="let type of plugin.information.type">
-                        <span class="tag" [innerHtml]="type"></span>
+                        <nx-tag>{{type}}</nx-tag>
                     </h3>
                 </footer>
             </nx-block>

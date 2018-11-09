@@ -1,0 +1,96 @@
+@import '../../../styles/custom/custom_palette';
+@import '../../../styles/theme_palette';
+@import '../../../styles/theme_variables';
+
+#tag {
+    height           : 20px;
+    font-family      : $font-family-regular;
+    font-size        : rem(12px);
+    padding          : 0 8px 2px;
+    border-radius    : 2px;
+    color            : $light16;
+    background-color : $light4;
+    cursor           : pointer;
+    display          : flex;
+    align-items      : center;
+}
+
+#selected-tag {
+    @extend #tag;
+    padding-right: 0px !important;
+}
+
+.close-button {
+    border-radius: 2px;
+    display         : flex;
+    justify-content : center;
+    height          : 32px;
+    width           : 32px;
+}
+
+.close-icon {
+    margin: auto !important;
+}
+
+.large {
+    height           : 32px;
+    font-size        : rem(13px);
+    padding: 0 12px;
+}
+
+.selected {
+    @extend #selected-tag;
+    background-color: $light16;
+    color: $light1;
+    
+    & > span:hover {
+        background-color: $light17;
+    }
+    
+    & > span:active {
+        background-color: $light18;
+    }
+}
+
+.selected-styled {
+    @extend #selected-tag;
+    background-color : $brand_core;
+    color            : $light1;
+    
+    & > span:hover {
+        background-color : $brand_d1;
+    }
+    
+    & > span:active {
+        background-color : $brand_d2;
+    }
+}
+
+
+
+.tag {
+    @extend #tag;
+    
+    &:hover {
+        background-color : $light5;
+    }
+    
+    &:active {
+        background-color : $light6;
+    }
+}
+
+.tag-styled {
+    @extend #tag;
+    
+    background-color : $brand_core;
+    color            : $light1;
+    
+    &:hover {
+        background-color : $brand_d1;
+    }
+    
+    &:active {
+        background-color : $brand_d2;
+    }
+}

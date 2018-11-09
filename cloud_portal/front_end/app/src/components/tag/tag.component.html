@@ -1,0 +1,12 @@
+<span [ngClass]="{
+    'large'          : selected || isLarge,
+    'selected'       : selected && !isStyled,
+    'selected-styled': selected && isStyled,
+    'tag'            : !selected && !isStyled,
+    'tag-styled'     : !selected && isStyled
+}">
+    <ng-content></ng-content>
+    <span *ngIf="selected" class="close-button">
+        <span class="glyphicon close-icon"></span>
+    </span>
+</span>
