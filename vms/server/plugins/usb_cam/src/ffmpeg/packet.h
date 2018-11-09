@@ -46,14 +46,6 @@ private:
     std::shared_ptr<std::atomic_int> m_packetCount;
     uint64_t m_timestamp = 0;
     AVPacket* m_packet = nullptr;
-
-#ifdef _WIN32
-private:
-    mutable bool m_parseNalUnitsVisited = false;
-
-private:
-    void parseNalUnits() const;
-#endif
 };
 
 } // namespace ffmpeg

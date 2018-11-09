@@ -84,10 +84,14 @@ private:
     std::unique_ptr<AbstractStreamSocket> acceptNonBlocking();
     std::unique_ptr<AbstractStreamSocket> acceptBlocking();
 
+    void acceptAsyncInternal(AcceptCompletionHandler handler);
+
     void startTimer(std::chrono::milliseconds timeout);
+
     void onAccepted(
         SystemError::ErrorCode systemErrorCode,
         std::unique_ptr<AbstractStreamSocket> connection);
+
     void stopWhileInAioThread();
 };
 
