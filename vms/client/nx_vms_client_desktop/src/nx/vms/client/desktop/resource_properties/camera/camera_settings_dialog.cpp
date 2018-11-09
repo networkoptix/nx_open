@@ -14,6 +14,7 @@
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
 #include <ui/common/read_only.h>
 #include <utils/common/html.h>
+#include <utils/common/event_processors.h>
 #include <utils/license_usage_helper.h>
 #include <client_core/client_core_module.h>
 
@@ -36,6 +37,7 @@
 #include "widgets/camera_analytics_settings_widget.h"
 #include "widgets/camera_web_page_widget.h"
 #include "widgets/io_module_settings_widget.h"
+#include "camera_advanced_settings_widget.h"
 
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
