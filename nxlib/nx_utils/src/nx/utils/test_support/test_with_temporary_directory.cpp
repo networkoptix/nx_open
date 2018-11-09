@@ -18,18 +18,19 @@ TestWithTemporaryDirectory::TestWithTemporaryDirectory(QString moduleName, QStri
                 ? QDir::homePath() : TestOptions::temporaryDirectoryPath()) +
             QString("/%1_ut.data").arg(moduleName);
     }
-    QDir(m_tmpDir).removeRecursively();
-    QDir().mkpath(m_tmpDir);
+    m_tmpDir.removeRecursively();
+    bool created = m_tmpDir.mkpath(m_tmpDir.absolutePath());
+    NX_ASSERT(created);
 }
 
 TestWithTemporaryDirectory::~TestWithTemporaryDirectory()
 {
-    QDir(m_tmpDir).removeRecursively();
+    m_tmpDir.removeRecursively();
 }
 
 QString TestWithTemporaryDirectory::testDataDir() const
 {
-    return m_tmpDir;
+    return QDir::cleanPath(m_tmpDir.absolutePath());
 }
 
 } // namespace test
