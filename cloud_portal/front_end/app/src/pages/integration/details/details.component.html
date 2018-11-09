@@ -11,7 +11,7 @@
 
     <div class="row m-0 p-3">
         <div class="row m-0 p-0 col-12 col-md-8 col-xl-7 col-xxl-10">
-            <div class="col-12 col-xxl-6">
+            <div class="col-12 col-xxl-6" *ngIf="plugin.information.hasInfo && plugin.overview.hasInfo">
                 <nx-block>
                     <header>
                         {{plugin.information.name}}
@@ -23,7 +23,7 @@
                         </div>
                     </nx-section>
 
-                    <nx-section>
+                    <nx-section *ngIf="plugin.overview.description">
                         <div [innerHtml]="plugin.overview.description"></div>
                     </nx-section>
 
@@ -33,7 +33,7 @@
                 </nx-block>
             </div>
 
-            <div class="col-12 col-xxl-6" *ngIf="plugin.instructions">
+            <div class="col-12 col-xxl-6" *ngIf="plugin.instructions.hasInfo">
                 <nx-block >
                     <header translate>
                         Instructions
@@ -49,7 +49,7 @@
                 </nx-block>
             </div>
 
-            <div class="col-12 col-xxl-6" *ngIf="plugin.support">
+            <div class="col-12 col-xxl-6" *ngIf="plugin.support.hasInfo">
                 <nx-block>
                     <header translate>
                         Support
@@ -64,7 +64,7 @@
                 </nx-block>
             </div>
 
-            <div class="col-12 col-xxl-6" *ngIf="plugin.additionalInformation">
+            <div class="col-12 col-xxl-6" *ngIf="plugin.additionalInformation.hasInfo">
                 <nx-block>
                     <header translate>
                         Additional information
@@ -84,7 +84,7 @@
             </div>
         </div>
 
-        <div *ngIf="plugin.downloadFiles && plugin.downloadFiles.length > 1" class="col-12 col-md-4 col-xl-3 col-xxl-2">
+        <div *ngIf="plugin.downloadFiles.length > 1" class="col-12 col-md-4 col-xl-3 col-xxl-2">
             <nx-block type='gray'>
                 <header translate>
                     Download
