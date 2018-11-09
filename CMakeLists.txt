@@ -201,7 +201,6 @@ endif()
 add_subdirectory(vms)
 
 if(withTests)
-    add_subdirectory(unit_tests)
     add_subdirectory(tests)
 endif()
 
