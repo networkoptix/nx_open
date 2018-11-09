@@ -183,7 +183,7 @@ private:
     void addCommandLineParametersFromConfig(MSSettings* settings);
     void saveServerInfo(const QnMediaServerResourcePtr& server);
 
-    nx::utils::log::Settings makeLogSettings();
+    nx::utils::log::Settings makeLogSettings(const nx::mediaserver::Settings& settings);
 
     void initializeLogging();
     void initializeHardwareId();

@@ -3037,16 +3037,15 @@ void MediaServerProcess::updateGuidIfNeeded()
         commonModule()->setObsoleteServerGuid(obsoleteGuid);
 }
 
-nx::utils::log::Settings MediaServerProcess::makeLogSettings()
+nx::utils::log::Settings MediaServerProcess::makeLogSettings(
+    const nx::mediaserver::Settings& settings)
 {
-    const auto& settings = serverModule()->settings();
-
     nx::utils::log::Settings s;
     s.loggers.resize(1);
     s.loggers.front().maxBackupCount = settings.logArchiveSize();
     s.loggers.front().directory = settings.logDir();
     s.loggers.front().maxFileSize = settings.maxLogFileSize();
-    s.updateDirectoryIfEmpty(serverModule()->settings().dataDir());
+    s.updateDirectoryIfEmpty(settings.dataDir());
 
     for (const auto& loggerArg: cmdLineArguments().auxLoggers)
     {
@@ -3060,12 +3059,17 @@ nx::utils::log::Settings MediaServerProcess::makeLogSettings()
 
 void MediaServerProcess::initializeLogging()
 {
-    const auto& settings = serverModule()->settings();
+    const auto roSettingsPath = cmdLineArguments().configFilePath;
+    const auto rwSettingsPath = cmdLineArguments().rwConfigFilePath;
+    auto mSettings = MSSettings(roSettingsPath, rwSettingsPath);
+    auto& settings = mSettings.settings();
+    auto roSettings = mSettings.roSettings();
+
     const auto binaryPath = QFile::decodeName(m_argv[0]);
 
     // TODO: Implement "--log-file" option like in client_startup_parameters.cpp.
 
-    auto logSettings = makeLogSettings();
+    auto logSettings = makeLogSettings(settings);
 
     logSettings.loggers.front().level.parse(cmdLineArguments().logLevel,
         settings.logLevel(), toString(nx::utils::log::kDefaultLevel));
@@ -3077,9 +3081,9 @@ void MediaServerProcess::initializeLogging()
             binaryPath));
 
     if (auto path = nx::utils::log::mainLogger()->filePath())
-        serverModule()->roSettings()->setValue("logFile", path->replace(lit(".log"), QString()));
+        roSettings->setValue("logFile", path->replace(lit(".log"), QString()));
     else
-        serverModule()->roSettings()->remove("logFile");
+        roSettings->remove("logFile");
 
     logSettings.loggers.front().level.parse(cmdLineArguments().httpLogLevel,
         settings.httpLogLevel(), toString(nx::utils::log::Level::none));
@@ -3130,7 +3134,7 @@ void MediaServerProcess::initializeHardwareId()
 {
     const auto binaryPath = QFile::decodeName(m_argv[0]);
 
-    auto logSettings = makeLogSettings();
+    auto logSettings = makeLogSettings(serverModule()->settings());
 
     logSettings.loggers.front().level.parse(cmdLineArguments().systemLogLevel,
         serverModule()->settings().systemLogLevel(), toString(nx::utils::log::Level::info));
@@ -4089,6 +4093,9 @@ void MediaServerProcess::run()
     if (QThreadPool::globalInstance()->maxThreadCount() < kMinimalGlobalThreadPoolSize)
         QThreadPool::globalInstance()->setMaxThreadCount(kMinimalGlobalThreadPoolSize);
 
+    if (m_serviceMode)
+        initializeLogging();
+
     std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(&m_cmdLineArguments));
     m_serverModule = serverModule;
 
@@ -4098,9 +4105,6 @@ void MediaServerProcess::run()
         initializeHardwareId();
 
     prepareOsResources();
-
-    if (m_serviceMode)
-        initializeLogging();
 
     updateAllowedInterfaces();
 
