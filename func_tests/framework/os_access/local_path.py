@@ -44,7 +44,7 @@ _reraising_existing_file_errors = _reraising({
     })
 
 
-class _Accessor(object):
+class _Accessor(object, pathlib._NormalAccessor):
     scandir = staticmethod(_reraising_existing_file_errors(pathlib._NormalAccessor.scandir))
     listdir = staticmethod(_reraising_existing_file_errors(pathlib._NormalAccessor.listdir))
     stat = staticmethod(_reraising_existing_file_errors(pathlib._NormalAccessor.stat))
@@ -56,7 +56,7 @@ class _Accessor(object):
     mkdir = staticmethod(_reraising_new_file_errors(pathlib._NormalAccessor.mkdir))
     symlink = staticmethod(_reraising_new_file_errors(pathlib._NormalAccessor.symlink))
     utime = staticmethod(_reraising_existing_file_errors(pathlib._NormalAccessor.utime))
-    readlink = staticmethod(_reraising_existing_file_errors(pathlib._NormalAccessor.readlink))
+    readlink = _reraising_existing_file_errors(pathlib._NormalAccessor.readlink)
     rmdir = staticmethod(_reraising_existing_file_errors(pathlib._NormalAccessor.rmdir))
 
 

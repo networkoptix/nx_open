@@ -21,9 +21,9 @@ namespace nx::data_sync_engine::transport {
  * are out of scope of this class and encapsulated by commandPipeline.
  */
 class GenericTransport:
-    public AbstractTransactionTransport
+    public AbstractConnection
 {
-    using base_type = AbstractTransactionTransport;
+    using base_type = AbstractConnection;
 
 public:
     GenericTransport(

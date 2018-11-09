@@ -86,7 +86,7 @@ bool TransactionConnectionHelper::waitForState(
         {
             // Connection has been removed.
             for (const auto& desiredState: desiredStates)
-                if (desiredState == test::TransactionTransport::Closed)
+                if (desiredState == test::CommonHttpConnection::Closed)
                     return true;
             return false;
         }
@@ -189,7 +189,7 @@ TransactionConnectionHelper::ConnectionContext
     connectionContext.connectionGuardSharedState =
         std::make_unique<::ec2::ConnectionGuardSharedState>();
     connectionContext.connection =
-        std::make_unique<test::TransactionTransport>(
+        std::make_unique<test::CommonHttpConnection>(
             connectionContext.connectionGuardSharedState.get(),
             connectionContext.peerInfo,
             login,
@@ -202,10 +202,10 @@ TransactionConnectionHelper::ConnectionContext
     if (keepAlivePolicy == KeepAlivePolicy::noKeepAlive)
         connectionContext.connection->setKeepAliveEnabled(false);
     QObject::connect(
-        connectionContext.connection.get(), &test::TransactionTransport::stateChanged,
+        connectionContext.connection.get(), &test::CommonHttpConnection::stateChanged,
         connectionContext.connection.get(),
         [transactionConnection = connectionContext.connection.get(), this](
-            test::TransactionTransport::State state)
+            test::CommonHttpConnection::State state)
         {
             // TransactionTransportBase deliveres this event with internal mutex locked.
             // So, making sure that processing is done without mutex locking.
@@ -224,7 +224,7 @@ void TransactionConnectionHelper::startConnection(
     ConnectionContext* connectionContext,
     const nx::utils::Url& appserver2BaseUrl)
 {
-    // TODO: #ak TransactionTransport should do that. But somehow it doesn't...
+    // TODO: #ak CommonHttpConnection should do that. But somehow it doesn't...
     const auto targetUrl = prepareTargetUrl(appserver2BaseUrl, connectionContext->peerInfo.id);
 
     if (m_maxDelayBeforeConnect > std::chrono::milliseconds::zero())
@@ -257,7 +257,7 @@ void TransactionConnectionHelper::onTransactionConnectionStateChanged(
     ec2::QnTransactionTransportBase::State newState)
 {
     const auto connectionId =
-        static_cast<test::TransactionTransport*>(connection)->connectionId();
+        static_cast<test::CommonHttpConnection*>(connection)->connectionId();
 
     switch (newState)
     {
@@ -333,7 +333,7 @@ TransactionConnectionHelper::ConnectionId
     TransactionConnectionHelper::getConnectionId(
         ec2::QnTransactionTransportBase* connection) const
 {
-    return static_cast<test::TransactionTransport*>(connection)->connectionId();
+    return static_cast<test::CommonHttpConnection*>(connection)->connectionId();
 }
 
 } // namespace test

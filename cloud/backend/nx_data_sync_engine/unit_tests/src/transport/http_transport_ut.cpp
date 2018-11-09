@@ -7,8 +7,8 @@ namespace nx::data_sync_engine::transport::test {
 
 struct HttpTransportTypes
 {
-    using Acceptor = HttpTransportAcceptor;
-    using CommandPipeline = TransactionTransport;
+    using Acceptor = CommonHttpAcceptor;
+    using CommandPipeline = CommonHttpConnection;
     using Connector = HttpCommandPipelineConnector;
 };
 

@@ -44,7 +44,7 @@ class SynchronizationSettings;
 class IncomingTransactionDispatcher;
 class OutgoingTransactionDispatcher;
 class TransactionLog;
-class TransactionTransport;
+class CommonHttpConnection;
 class TransactionTransportHeader;
 
 struct SystemStatusDescriptor
@@ -83,7 +83,7 @@ public:
 
     struct ConnectionContext
     {
-        std::unique_ptr<transport::AbstractTransactionTransport> connection;
+        std::unique_ptr<transport::AbstractConnection> connection;
         std::string connectionId;
         FullPeerName fullPeerName;
         std::string userAgent;
@@ -107,7 +107,7 @@ public:
      */
     bool modifyConnectionByIdSafe(
         const std::string& connectionId,
-        std::function<void(transport::AbstractTransactionTransport* connection)> func);
+        std::function<void(transport::AbstractConnection* connection)> func);
 
     /**
      * Dispatches transaction to corresponding peers.

@@ -77,7 +77,7 @@ void ConnectionManager::dispatchTransaction(
         m_connections.get<kConnectionByFullPeerNameIndex>();
 
     std::size_t connectionCount = 0;
-    std::array<transport::AbstractTransactionTransport*, 7> connectionsToSendTo;
+    std::array<transport::AbstractConnection*, 7> connectionsToSendTo;
     for (auto connectionIt = connectionBySystemIdAndPeerIdIndex
             .lower_bound(FullPeerName{systemId, std::string()});
         connectionIt != connectionBySystemIdAndPeerIdIndex.end()
@@ -251,7 +251,7 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
 
 bool ConnectionManager::modifyConnectionByIdSafe(
     const std::string& connectionId,
-    std::function<void(transport::AbstractTransactionTransport* connection)> func)
+    std::function<void(transport::AbstractConnection* connection)> func)
 {
     QnMutexLocker lk(&m_mutex);
 
@@ -328,7 +328,7 @@ void ConnectionManager::removeConnectionByIter(
     Iterator connectionIterator,
     CompletionHandler completionHandler)
 {
-    std::unique_ptr<transport::AbstractTransactionTransport> existingConnection;
+    std::unique_ptr<transport::AbstractConnection> existingConnection;
     connectionIndex.modify(
         connectionIterator,
         [&existingConnection](ConnectionContext& data)
@@ -337,7 +337,7 @@ void ConnectionManager::removeConnectionByIter(
         });
     connectionIndex.erase(connectionIterator);
 
-    transport::AbstractTransactionTransport* existingConnectionPtr = existingConnection.get();
+    transport::AbstractConnection* existingConnectionPtr = existingConnection.get();
 
     NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Removing transaction connection %1 from %2")
             .arg(existingConnectionPtr->connectionGuid())

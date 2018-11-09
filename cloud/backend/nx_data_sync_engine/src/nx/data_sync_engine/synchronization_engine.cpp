@@ -149,13 +149,13 @@ void SyncronizationEngine::registerHttpApi(
 {
     registerHttpHandler(
         nx::network::url::joinPath(pathPrefix, kEstablishEc2TransactionConnectionPath),
-        &transport::HttpTransportAcceptor::createConnection,
+        &transport::CommonHttpAcceptor::createConnection,
         &m_httpTransportAcceptor,
         dispatcher);
 
     registerHttpHandler(
         nx::network::url::joinPath(pathPrefix, kPushEc2TransactionPath),
-        &transport::HttpTransportAcceptor::pushTransaction,
+        &transport::CommonHttpAcceptor::pushTransaction,
         &m_httpTransportAcceptor,
         dispatcher);
 
