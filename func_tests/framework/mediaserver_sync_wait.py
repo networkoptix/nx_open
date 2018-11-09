@@ -1,12 +1,13 @@
 '''Wait for mediaservers to synchronize between themselves'''
 
+from functools import partial
 import logging
 
 from .context_logger import context_logger
 from .data_differ import log_diff_list, full_info_differ, transaction_log_differ
 from .installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from .message_bus import message_bus_running
-from .utils import datetime_utc_now
+from .utils import datetime_utc_now, make_threaded_async_calls
 from .waiting import WaitTimeout, Wait
 
 _logger = logging.getLogger(__name__)
@@ -78,15 +79,38 @@ def wait_for_api_path_match(
         server_0 = server_list[0]
         result_0 = api_path_getter(server_0, api_path)
 
-        for server in server_list[1:]:
-            result = api_path_getter(server, api_path)
+        other_server_list = server_list[1:]
+
+        if len(other_server_list) <= 3:
+            result_iter = ((server, api_path_getter(server, api_path))
+                           for server in other_server_list)
+        else:
+
+            def get_server_and_call_result(server):
+                return (server, api_path_getter(server, api_path))
+
+            # Make first 2 calls and checks synchronously,
+            # others asynchronously, if they are still required.
+            # This is because most of the time first several results are already different,
+            # so there is no need to call all servers for them.
+            def result_gen():
+                for server in other_server_list[:2]:
+                    yield (server, api_path_getter(server, api_path))
+                for (server, result) in make_threaded_async_calls(thread_count=64, call_gen=[
+                        partial(get_server_and_call_result, server) for server in other_server_list[2:]]):
+                    yield (server, result)
+
+            result_iter = result_gen()
+
+        for server, result in result_iter:
             diff_list = differ.diff(result_0, result)
             if diff_list:
-                break
+                break  # server and result from this scope will be used below
         else:
             _logger.info('Wait for %s: done, sync duration: %s',
                          description, datetime_utc_now() - start_time)
             return
+
         if not wait.again():
             raise SyncWaitTimeout(
                 timeout_sec,
