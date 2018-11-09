@@ -13,13 +13,13 @@
 
 namespace nx::data_sync_engine::transport {
 
-class AcceptedConnection:
+class AcceptedCommonHttpConnection:
     public CommandTransportDelegate
 {
     using base_type = CommandTransportDelegate;
 
 public:
-    AcceptedConnection(
+    AcceptedCommonHttpConnection(
         std::unique_ptr<AbstractConnection> delegatee,
         int connectionSeq,
         AbstractCommandPipeline* commandPipeline)
@@ -134,7 +134,7 @@ void CommonHttpAcceptor::createConnection(
 
     const int connectionSeq = ++m_connectionSeq;
     ConnectionManager::ConnectionContext context{
-        std::make_unique<AcceptedConnection>(
+        std::make_unique<AcceptedCommonHttpConnection>(
             std::move(newTransport),
             connectionSeq,
             commandPipelinePtr),
@@ -273,7 +273,7 @@ void CommonHttpAcceptor::startOutgoingChannel(
             transport::AbstractConnection* transportConnection)
         {
             auto acceptedTransportConnection =
-                dynamic_cast<AcceptedConnection*>(transportConnection);
+                dynamic_cast<AcceptedCommonHttpConnection*>(transportConnection);
             if (!acceptedTransportConnection || 
                 acceptedTransportConnection->seq() != connectionSeq)
             {
@@ -292,7 +292,7 @@ void CommonHttpAcceptor::postTransactionToTransport(
     bool* foundConnectionOfExpectedType)
 {
     auto transactionTransport =
-        dynamic_cast<AcceptedConnection*>(transportConnection);
+        dynamic_cast<AcceptedCommonHttpConnection*>(transportConnection);
     if (!transactionTransport)
     {
         *foundConnectionOfExpectedType = false;
