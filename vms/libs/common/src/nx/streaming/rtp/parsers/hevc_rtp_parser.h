@@ -48,7 +48,7 @@ public:
         bool& gotData) override;
 
     // Implementation of StreamParser::setSDPInfo
-    virtual void setSdpInfo(QByteArrayList lines) override;
+    virtual void setSdpInfo(const QStringList& lines) override;
 
 private:
 

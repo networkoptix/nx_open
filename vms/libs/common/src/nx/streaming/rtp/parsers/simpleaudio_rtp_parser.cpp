@@ -30,7 +30,7 @@ void SimpleAudioParser::setCodecId(AVCodecID codecId)
     m_codecId = codecId;
 }
 
-void SimpleAudioParser::setSdpInfo(QList<QByteArray> lines)
+void SimpleAudioParser::setSdpInfo(const QStringList& lines)
 {
     // determine here:
     // 1. sizeLength(au size in bits)  or constantSize
@@ -39,7 +39,7 @@ void SimpleAudioParser::setSdpInfo(QList<QByteArray> lines)
     {
         if (lines[i].startsWith("a=rtpmap"))
         {
-            QList<QByteArray> params = lines[i].mid(lines[i].indexOf(' ')+1).split('/');
+            QStringList params = lines[i].mid(lines[i].indexOf(' ')+1).split('/');
             if (params.size() > 1)
                 StreamParser::setFrequency(params[1].trimmed().toInt());
             if (params.size() > 2)
@@ -47,8 +47,8 @@ void SimpleAudioParser::setSdpInfo(QList<QByteArray> lines)
         }
         else if (lines[i].startsWith("a=fmtp"))
         {
-            QList<QByteArray> params = lines[i].mid(lines[i].indexOf(' ')+1).split(';');
-            for(QByteArray param: params)
+            QStringList params = lines[i].mid(lines[i].indexOf(' ')+1).split(';');
+            for(QString param: params)
             {
                 param = param.trimmed();
                 //processStringParam("mode-set", m_mode, param);

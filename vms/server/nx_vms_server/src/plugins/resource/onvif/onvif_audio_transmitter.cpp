@@ -42,7 +42,6 @@ void OnvifAudioTransmitter::close()
 {
     m_rtspConnection.reset();
     m_transcoder.reset();
-    m_trackInfo.reset();
     m_sequence = 0;
     m_firstPts = AV_NOPTS_VALUE;
 }
@@ -50,7 +49,9 @@ void OnvifAudioTransmitter::close()
 void OnvifAudioTransmitter::prepare()
 {
     close();
-    m_rtspConnection.reset(new QnRtspClient(m_resource->toSharedPointer()));
+    QnRtspClient::Config config;
+    config.backChannelAudioOnly = true;
+    m_rtspConnection.reset(new QnRtspClient(m_resource->toSharedPointer(), config));
     m_rtspConnection->setAuth(m_resource->getAuth(), nx::network::http::header::AuthScheme::digest);
     m_rtspConnection->setAdditionAttribute("Require", "www.onvif.org/ver20/backchannel");
     m_rtspConnection->setTransport(QnRtspClient::TRANSPORT_TCP);
@@ -64,31 +65,20 @@ void OnvifAudioTransmitter::prepare()
     }
 
     auto tracks = m_rtspConnection->getTrackInfo();
-    tracks.erase(std::remove_if(tracks.begin(), tracks.end(),
-        [this](const QSharedPointer<QnRtspClient::SDPTrackInfo>& track)
-    {
-        return !track->isBackChannel;
-    }), tracks.end());
-    if (tracks.isEmpty())
+    if (tracks.empty())
     {
         close();
         return;
     }
-    tracks.resize(1);
-    tracks[0]->trackNumber = 0;
-    tracks[0]->interleaved = QPair<int, int>(0, 1);
-
-    m_rtspConnection->setTrackInfo(tracks);
-    auto tracksToPlay = m_rtspConnection->play(DATETIME_NOW, AV_NOPTS_VALUE, 1.0);
-    if (tracksToPlay.isEmpty())
+    if (!m_rtspConnection->play(DATETIME_NOW, AV_NOPTS_VALUE, 1.0))
     {
         close();
         return;
     }
 
     m_trackInfo = tracks[0];
-    m_transcoder.reset(new QnFfmpegAudioTranscoder(toFfmpegCodec(m_trackInfo->codecName)));
-    m_transcoder->setSampleRate(m_trackInfo->timeBase);
+    m_transcoder.reset(new QnFfmpegAudioTranscoder(toFfmpegCodec(m_trackInfo.sdpMedia.rtpmap.codecName)));
+    m_transcoder->setSampleRate(m_trackInfo.sdpMedia.rtpmap.clockRate);
     if (m_bitrateKbps > 0)
         m_transcoder->setBitrate(m_bitrateKbps);
 }
@@ -139,7 +129,7 @@ bool OnvifAudioTransmitter::sendData(const QnAbstractMediaDataPtr& audioData)
     char* rtpHeaderPtr = sendBuffer.data() + kRtpTcpHeaderSize;
 
     AVRational srcTimeBase = { 1, 1000000 };
-    AVRational dstTimeBase = { 1, m_trackInfo->timeBase };
+    AVRational dstTimeBase = { 1, m_trackInfo.sdpMedia.rtpmap.clockRate};
     if (m_firstPts == AV_NOPTS_VALUE)
         m_firstPts = audioData->timestamp;
     auto timestamp = av_rescale_q(audioData->timestamp - m_firstPts, srcTimeBase, dstTimeBase);
@@ -149,11 +139,11 @@ bool OnvifAudioTransmitter::sendData(const QnAbstractMediaDataPtr& audioData)
         0, //< ssrc
         audioData->dataSize(),
         timestamp,
-        m_trackInfo->mapNumber,
+        m_trackInfo.sdpMedia.format,
         m_sequence++);
 
     sendBuffer.data()[0] = '$';
-    sendBuffer.data()[1] = m_trackInfo->interleaved.first;
+    sendBuffer.data()[1] = m_trackInfo.interleaved.first;
     quint16* lenPtr = (quint16*)(sendBuffer.data() + 2);
     *lenPtr = htons(sendBuffer.size() - kRtpTcpHeaderSize);
     memcpy(

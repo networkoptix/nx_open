@@ -1,0 +1,104 @@
+#include "sdp.h"
+
+namespace nx::streaming {
+
+static Sdp::MediaType mediaTypeFromString(const QString& value)
+{
+    QString trackTypeStr = value.toLower();
+    if (trackTypeStr == "audio")
+        return Sdp::MediaType::Audio;
+    else if (trackTypeStr == "video")
+        return Sdp::MediaType::Video;
+    else if (trackTypeStr == "metadata")
+        return Sdp::MediaType::Metadata;
+    else
+        return Sdp::MediaType::Unknown;
+}
+
+// see rfc1890 for full RTP predefined codec list
+static QString findCodecById(int num)
+{
+    switch (num)
+    {
+        case 0: return QString("PCMU");
+        case 8: return QString("PCMA");
+        case 26: return QString("JPEG");
+        default: return QString();
+    }
+}
+
+bool parseRtpmap(const QString& line, Sdp::Rtpmap& rtpmap)
+{
+    QStringList params = line.split(' ');
+    if (params.size() < 2)
+        return false; // invalid data format. skip
+    QStringList trackInfo = params[0].split(':');
+    QStringList codecInfo = params[1].split('/');
+    if (trackInfo.size() < 2 || codecInfo.size() < 2)
+        return false; // invalid data format
+
+    rtpmap.format = trackInfo[1].toUInt();
+    rtpmap.codecName = codecInfo[0];
+    rtpmap.clockRate = codecInfo[1].toInt();
+    if (codecInfo.size() >= 3)
+        rtpmap.channels = codecInfo[2].toInt();
+    return true;
+}
+
+Sdp::Media parseMedia(QStringList& lines)
+{
+    Sdp::Media media;
+    QString line = lines.front().trimmed().toLower();
+    QStringList trackParams = line.mid(2).split(' ');
+    media.mediaType = mediaTypeFromString(trackParams[0]);
+    if (trackParams.size() >= 4)
+        media.format = trackParams[3].toInt();
+
+    lines.pop_front();
+    while (!lines.empty() && !lines.front().startsWith("m=", Qt::CaseInsensitive))
+    {
+        line = lines.front().trimmed();
+        lines.pop_front();
+
+        if (line.startsWith("a=", Qt::CaseInsensitive))
+            media.sdpAttributes << line.toLower(); // save sdp for codec parser
+
+        if (line.startsWith("a=rtpmap", Qt::CaseInsensitive))
+        {
+            Sdp::Rtpmap rtpmap;
+            if (parseRtpmap(line, rtpmap) &&
+                (media.format == 0 || rtpmap.format == media.format)) // Ignore invalid rtpmap
+            {
+                media.rtpmap = rtpmap;
+                media.format = rtpmap.format;
+                if (rtpmap.codecName.isEmpty())
+                    rtpmap.codecName = findCodecById(rtpmap.format);
+            }
+        }
+        else if (line.startsWith("a=control:", Qt::CaseInsensitive))
+        {
+            media.control = line.mid(QString("a=control:").length());
+        }
+        else if (line.startsWith("a=sendonly", Qt::CaseInsensitive))
+        {
+            media.sendOnly = true;
+        }
+    }
+    return media;
+}
+
+void Sdp::parse(const QString& sdpData)
+{
+    media.clear();
+    QStringList lines = sdpData.split('\n');
+    while(!lines.isEmpty())
+    {
+        QString line = lines.front().trimmed();
+        if (line.startsWith("m=", Qt::CaseInsensitive))
+            media.push_back(parseMedia(lines));
+        else
+            lines.pop_front();
+    }
+}
+
+} // namespace nx::streaming

@@ -35,20 +35,20 @@ H264Parser::~H264Parser()
 {
 }
 
-void H264Parser::setSdpInfo(QList<QByteArray> lines)
+void H264Parser::setSdpInfo(const QStringList& lines)
 {
     for (int i = 0; i < lines.size(); ++ i)
     {
-        lines[i] = lines[i].trimmed();
-        if (lines[i].startsWith("a=rtpmap:"))
+        QString line = lines[i].trimmed();
+        if (line.startsWith("a=rtpmap:"))
         {
-            QList<QByteArray> values = lines[i].split(' ');
+            QStringList values = line.split(' ');
             if (values.size() < 2)
                 continue;
-            QByteArray codecName = values[1];
+            QString codecName = values[1];
             if (!codecName.toUpper().startsWith("H264"))
                 continue;
-            QList<QByteArray> values2 = codecName.split('/');
+            QStringList values2 = codecName.split('/');
             if (values2.size() < 2)
                 continue;
             StreamParser::setFrequency(values2[1].toUInt());
@@ -62,32 +62,31 @@ void H264Parser::setSdpInfo(QList<QByteArray> lines)
 
     for (int i = 0; i < lines.size(); ++ i)
     {
-        lines[i] = lines[i].trimmed();
-        if (lines[i].startsWith("a=fmtp:"))
+        QString line = lines[i].trimmed();
+        if (line.startsWith("a=fmtp:"))
         {
-            int valueIndex = lines[i].indexOf(' ');
+            int valueIndex = line.indexOf(' ');
             if (valueIndex == -1)
                 continue;
 
-            QList<QByteArray> fmpParam = lines[i].left(valueIndex).split(':'); //values[0].split(':');
+            QStringList fmpParam = line.left(valueIndex).split(':'); //values[0].split(':');
             if (fmpParam.size() < 2 || fmpParam[1].toUInt() != (uint)m_rtpChannel)
                 continue;
 
-            QList<QByteArray> h264Params = lines[i].mid(valueIndex+1).split(';');
+            QStringList h264Params = line.mid(valueIndex+1).split(';');
             for (int i = 0; i < h264Params.size(); ++i)
             {
-                QByteArray h264Parma = h264Params[i].trimmed();
+                QString h264Parma = h264Params[i].trimmed();
                 if (h264Parma.startsWith("sprop-parameter-sets"))
                 {
                     int pos = h264Parma.indexOf('=');
                     if (pos >= 0)
                     {
-                        QByteArray h264SpsPps = h264Parma.mid(pos+1);
-                        QList<QByteArray> nalUnits = h264SpsPps.split(',');
-                        for(QByteArray nal: nalUnits)
+                        QString h264SpsPps = h264Parma.mid(pos+1);
+                        QStringList nalUnits = h264SpsPps.split(',');
+                        for(QString nalStr: nalUnits)
                         {
-                            nal = QByteArray::fromBase64(nal);
-
+                            QByteArray nal = QByteArray::fromBase64(nal);
                             {
                                 // some cameras( Digitalwatchdog sends extra start code in SPSPSS sdp string );
                                 QByteArray startCode(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));

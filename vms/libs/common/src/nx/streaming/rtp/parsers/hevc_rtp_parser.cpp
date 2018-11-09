@@ -91,20 +91,20 @@ bool HevcParser::processData(
     return true;
 }
 
-void HevcParser::setSdpInfo(QByteArrayList lines)
+void HevcParser::setSdpInfo(const QStringList& lines)
 {
     for (const auto& line: lines)
     {
         auto trimmed = line.trimmed();
         if (trimmed.startsWith(kSdpRtpMapPrefix))
-            parseRtpMap(trimmed);
+            parseRtpMap(trimmed.toUtf8());
     }
 
     for (const auto& line: lines)
     {
         auto trimmed = line.trimmed();
         if (trimmed.startsWith(kSdpFmtpPrefix))
-            parseFmtp(trimmed);
+            parseFmtp(trimmed.toUtf8());
     }
 }
 

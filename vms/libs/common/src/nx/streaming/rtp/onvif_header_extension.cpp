@@ -1,5 +1,6 @@
 #include "onvif_header_extension.h"
 
+#include <utils/media/bitStream.h>
 #include <nx/streaming/rtp/rtp.h>
 
 namespace nx::streaming::rtp {

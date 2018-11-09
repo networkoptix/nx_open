@@ -2,6 +2,12 @@
 
 #include <chrono>
 
+#ifdef Q_OS_WIN
+#include <WinSock2.h>
+#else
+#include <arpa/inet.h>
+#endif
+
 namespace nx::streaming::rtp {
 
 // 1900 - 1970 time diff
@@ -33,8 +39,8 @@ struct RtpHeader
     uint16_t sequence;               // sequence number
     uint32_t timestamp;              // timestamp
     uint32_t ssrc;                   // synchronization source
-    //quint32 csrc;                  // synchronization source
-    //quint32 csrc[1];               // optional CSRC list
+    //uint32_t csrc;                  // synchronization source
+    //uint32_t csrc[1];               // optional CSRC list
 
     uint32_t payloadOffset() { return kSize + CSRCCount * kCsrcSize; };
 };
@@ -58,11 +64,11 @@ inline std::pair<uint32_t, uint32_t> makeFraction(uint64_t value, uint64_t denom
 
 inline void buildRtpHeader(
     char* buffer,
-    quint32 ssrc,
-    int markerBit,
-    quint32 timestamp,
-    quint8 payloadType,
-    quint16 sequence)
+    uint32_t ssrc,
+    uint8_t markerBit,
+    uint32_t timestamp,
+    uint8_t payloadType,
+    uint16_t sequence)
 {
     RtpHeader* rtp = (RtpHeader*)buffer;
     rtp->version = RtpHeader::kVersion;

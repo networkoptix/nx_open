@@ -43,7 +43,7 @@ AacParser::~AacParser()
     // Do nothing.
 }
 
-void AacParser::setSdpInfo(QList<QByteArray> lines)
+void AacParser::setSdpInfo(const QStringList& lines)
 {
     // determine here:
     // 1. sizeLength(au size in bits)  or constantSize
@@ -52,7 +52,7 @@ void AacParser::setSdpInfo(QList<QByteArray> lines)
     {
         if (lines[i].startsWith("a=rtpmap"))
         {
-            QList<QByteArray> params = lines[i].mid(lines[i].indexOf(' ')+1).split('/');
+            QStringList params = lines[i].mid(lines[i].indexOf(' ')+1).split('/');
             if (params.size() > 1)
                 StreamParser::setFrequency(params[1].trimmed().toInt());
             if (params.size() > 2)
@@ -60,8 +60,8 @@ void AacParser::setSdpInfo(QList<QByteArray> lines)
         }
         else if (lines[i].startsWith("a=fmtp"))
         {
-            QList<QByteArray> params = lines[i].mid(lines[i].indexOf(' ')+1).split(';');
-            for(QByteArray param: params)
+            QStringList params = lines[i].mid(lines[i].indexOf(' ')+1).split(';');
+            for(QString param: params)
             {
                 param = param.trimmed();
                 processIntParam("sizeLength", m_sizeLength, param);

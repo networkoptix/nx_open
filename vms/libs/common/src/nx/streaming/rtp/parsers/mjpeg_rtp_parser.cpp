@@ -338,17 +338,17 @@ MjpegParser::~MjpegParser()
 {
 }
 
-void MjpegParser::setSdpInfo(QList<QByteArray> lines)
+void MjpegParser::setSdpInfo(const QStringList& lines)
 {
     for (int i = 0; i < lines.size(); ++i)
     {
-        lines[i] = lines[i].trimmed();
-        if (lines[i].startsWith("a=framesize:"))
+        QString line = lines[i].trimmed();
+        if (line.startsWith("a=framesize:"))
         {
-            QList<QByteArray> values = lines[i].split(' ');
+            const QStringList& values = line.split(' ');
             if (values.size() > 1)
             {
-                QList<QByteArray> dimension = values[1].split('-');
+                const QStringList& dimension = values[1].split('-');
                 if (dimension.size() == 2)
                 {
                     m_frameWidth = dimension[0].trimmed().toInt();
@@ -356,12 +356,12 @@ void MjpegParser::setSdpInfo(QList<QByteArray> lines)
                 }
             }
         }
-        else if (lines[i].startsWith("a=x-dimensions:"))
+        else if (line.startsWith("a=x-dimensions:"))
         {
-            QList<QByteArray> values = lines[i].split(':');
+            const QStringList& values = line.split(':');
             if (values.size() > 1)
             {
-                QList<QByteArray> dimension = values[1].split(',');
+                const QStringList& dimension = values[1].split(',');
                 if (dimension.size() == 2)
                 {
                     m_frameWidth = dimension[0].trimmed().toInt();
