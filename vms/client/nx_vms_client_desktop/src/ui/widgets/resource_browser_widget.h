@@ -134,7 +134,9 @@ private:
     void updateSearchMode();
     void updateInstantFilter();
     void handleInstantFilterUpdated();
-    static QStringList filterTags();
+
+    using FilterTagWithNodeType = QPair<QString, nx::vms::client::desktop::ResourceTreeNodeType>;
+    QList<FilterTagWithNodeType> filterTagsWithNodeTypes() const;
 
     void setHintVisible(bool value);
 
