@@ -32,6 +32,7 @@ echo --- Starting: $EXE $ARGS
 
 if [ "@withRootTool@" = "true" ]
 then
+    su @deb.customization.company.name@ -c 'ulimit -c unlimited; ulimit -a'
     exec start-stop-daemon --start \
         --chuid @deb.customization.company.name@:@deb.customization.company.name@ \
         -d "$VMS_DIR/bin" --exec $EXE -- $ARGS
