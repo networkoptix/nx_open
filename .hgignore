@@ -116,7 +116,6 @@ cloud_portal/robot_tests/{geckodriver.log,venv}
 cloud_portal/front_end/.sass-cache
 cloud_portal/front_end/dist
 
-<<<<<<< local
 *test-tmp.cfg
 func_tests_old/ssh.*.conf
 
