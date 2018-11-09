@@ -265,8 +265,8 @@ export class NxConfigService {
                 'arm-file'        : 'Arm',
                 'linux-x64-file'  : 'Linux x64',
                 'linux-x86-file'  : 'Linux x86',
-                'macos-file'      : 'MacOs',
-                'rpi-file'        : 'Rpi',
+                'macos-file'      : 'Mac OS',
+                'rpi-file'        : 'Raspberry Pi',
                 'windows-x64-file': 'Windows x64',
                 'windows-x86-file': 'Windows x86'
             }
