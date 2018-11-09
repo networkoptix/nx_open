@@ -1,3 +1,7 @@
+#if !defined(_WIN32)
+#   include <arpa/inet.h>
+#endif
+
 #include <thread>
 
 #include <gtest/gtest.h>
