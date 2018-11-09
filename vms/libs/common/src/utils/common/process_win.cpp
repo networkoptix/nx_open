@@ -24,9 +24,14 @@ SystemError::ErrorCode startProcessDetached(
     const QString& workingDirectory,
     qint64* pid)
 {
-    return QProcess::startDetached(executablePath, arguments, workingDirectory, pid)
-        ? SystemError::noError
-        : SystemError::fileNotFound; // TODO: #ak get proper error code.
+    QProcess p;
+    p.setProgram(executablePath);
+    p.setWorkingDirectory(workingDirectory);
+    p.setArguments(arguments);
+    p.setCreateProcessArgumentsModifier(
+        [](QProcess::CreateProcessArguments *args) { args->flags |= CREATE_NEW_CONSOLE; });
+
+    return p.startDetached(pid)? SystemError::noError : SystemError::fileNotFound;
 }
 
 bool checkProcessExists(qint64 pid)
