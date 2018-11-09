@@ -4,13 +4,13 @@
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
-    "okButton": "Ok",
+    "okButton": "OK",
     "cancelButton": "Zrušit",
     "loginTitle": "Přihlásit se k %PRODUCT_NAME%",
     "loginButton": "Přihlásit se",
     "logoutAuthorisedTitle": "Již jste přihlášen",
     "logoutAuthorisedContinueButton": "Pokračovat",
-    "logoutAuthorisedLogoutButton": "Odhlásit"
+    "logoutAuthorisedLogoutButton": "Odhlásit se"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -65,7 +65,7 @@
       "description": "Can view live video, browse the archive, control PTZ etc"
     },
     "Administrator": {
-      "label": "Administrator",
+      "label": "Administrátor",
       "description": "Neomezený přístup včetně možnosti sdílení"
     },
     "Custom": {
@@ -73,7 +73,7 @@
       "description": "Pro nastavení uživatelských oprávnění použijte aplikaci %VMS_NAME% Client"
     },
     "cloudAdmin": {
-      "label": "Administrator",
+      "label": "Administrátor",
       "description": "Můžete nastavit systém a sdílet jej"
     },
     "customRole": {
@@ -163,7 +163,7 @@
     "openClient": "Otevřít v %VMS_NAME%",
     "openClientNoSystem": "Otevřít %VMS_NAME%",
     "confirmMergeAction": "Sloučit",
-    "mergeSystemTitle": "Sloučit systémy",
+    "mergeSystemTitle": "Sloučení systémů",
     "confirmRenameTitle": "Název systému",
     "confirmRenameAction": "Uložit",
     "successRename": "Název systému byl uložen",
@@ -184,7 +184,7 @@
     "accountSavedSuccess": "Váš účet byl úspěšně uložen",
     "activationLinkSent": "Aktivní odkaz byl odeslán",
     "passwordChangedSuccess": "Váš účet byl úspěšně uložen",
-    "changePassword": "Změna hesla",
+    "changePassword": "Změnit heslo",
     "newPasswordLabel": "Nové heslo",
     "saveChanges": "Uložit"
   },
@@ -256,7 +256,7 @@
   },
   "activeActions": {
     "sendConfirm": "Znovu poslat aktivační odkaz",
-    "resetPassword": "Obnovit heslo",
+    "resetPassword": "Obnovení hesla",
     "setNewPassword": "Uložit heslo",
     "setNewPasswordLabel": "Nové heslo"
   },
@@ -298,7 +298,7 @@
     "resolution": {
       "auto": "Auto",
       "high": "Vysoká",
-      "low": "Nízký"
+      "low": "Nízká"
     },
     "chromeCastWarning": "Chromecast je náročný na systémové zdroje a může způsobit problémy na vašem serveru.",
     "voiceCommands": {

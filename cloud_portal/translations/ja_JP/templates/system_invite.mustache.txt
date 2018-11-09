@@ -9,5 +9,5 @@
 {{message.system_name}}へのアクセスが許可されています
 {{/message.sharer_name}}
 
-登録してシステムを表示: {{config.portal_url}}/register/{{message.code}}
+登録してシステムを表示: {{config.portal_url}}/登録/{{message.code}}
 

@@ -6,7 +6,7 @@
   "dialogs": {
     "okButton": "Tamam",
     "cancelButton": "İptal",
-    "loginTitle": "%PRODUCT_NAME%'e giriş yapın",
+    "loginTitle": "%PRODUCT_NAME% e giriş yapın",
     "loginButton": "Giriş yap",
     "logoutAuthorisedTitle": "Zaten giriş yapılmış",
     "logoutAuthorisedContinueButton": "Devam et",
@@ -167,7 +167,7 @@
     "confirmRenameTitle": "Sistem Adı",
     "confirmRenameAction": "Kaydet",
     "successRename": "Sistem ismi kaydedildi",
-    "confirmDisconnectTitle": "%PRODUCT_NAME% çıkış yapılsın mı?",
+    "confirmDisconnectTitle": "%PRODUCT_NAME% den bağlantıyı kesmek istiyor musunuz?",
     "confirmDisconnectAction": "Bağlantıyı kes",
     "confirmUnshareFromMe": "Hesabınızın bu sistemle bağlantısını kesmek üzeresiniz. Bundan sonra bu sisteme erişim sağlayamayacaksınız. Emin misiniz?",
     "confirmUnshareFromMeTitle": "Sistemle bağlantıyı kes?",

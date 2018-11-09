@@ -116,36 +116,20 @@
 
     <h2>Logeinstellungen</h2>
     <form class="form" role="form" name="logLevels" novalidate>
-        <div class="form-group">
-            <label class="col-sm-4">Hauptloglevel</label>
+        <div ng-repeat="(name, level) in loggers" class="form-group">
+            <label class="col-sm-4">{{name}} Loglevel</label>
             <div class="col-sm-8">
-
-                <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">Keine: Log deaktiviert.</option>
-                    <option value="ALWAYS">Immer: Fehler, Warnungen und die wichtigsten Nachrichten werden protokolliert.</option>
-                    <option value="ERROR">Fehler: Nur Fehler protokollieren.</option>
-                    <option value="WARNING">Warnung: Warnungen und Fehler werden protokolliert.</option>
-                    <option value="INFO">Info: Fehler, Warnungen und alle Nachrichten werden protokolliert.</option>
-                    <option value="DEBUG">Debug: Jede Systemnachricht und Debug-Informationen protokollieren.</option>
-                    <option value="DEBUG2">Debug2: Jede Systemnachricht und erweiterte Debug-Informationen protokollieren.</option>
+                <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
+                    <option value="none">Keine: Log deaktiviert.</option>
+                    <option value="always">Immer: Fehler, Warnungen und die wichtigsten Nachrichten werden protokolliert.</option>
+                    <option value="error">Fehler: Nur Fehler protokollieren.</option>
+                    <option value="warning">Warnung: Warnungen und Fehler werden protokolliert.</option>
+                    <option value="info">Info: Fehler, Warnungen und alle Nachrichten werden protokolliert.</option>
+                    <option value="debug">Debug: Jede Systemnachricht und Debug-Informationen protokollieren.</option>
+                    <option value="debug2">Debug2: Jede Systemnachricht und erweiterte Debug-Informationen protokollieren.</option>
                 </select>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-sm-4">Transaktionsloglevel</label>
-            <div class="col-sm-8">
-                <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">Keine: Log deaktiviert.</option>
-                    <option value="ALWAYS">Immer: Fehler, Warnungen und die wichtigsten Nachrichten werden protokolliert.</option>
-                    <option value="ERROR">Fehler: Nur Fehler protokollieren.</option>
-                    <option value="WARNING">Warnung: Warnungen und Fehler werden protokolliert.</option>
-                    <option value="INFO">Info: Fehler, Warnungen und alle Nachrichten werden protokolliert.</option>
-                    <option value="DEBUG">Debug: Jede Systemnachricht und Debug-Informationen protokollieren.</option>
-                    <option value="DEBUG2">Debug2: Jede Systemnachricht und erweiterte Debug-Informationen protokollieren.</option>
-                </select>
-            </div>
-        </div>
-
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="changeLogLevels()" >Speichern</button>
         </div>

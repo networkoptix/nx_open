@@ -1,0 +1,43 @@
+<div class="container-fluid">
+    <h1>
+        Документація по серверу
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">Ці налаштування доступні:</h2>
+        </div>
+        <div class="panel-body">
+            <p>
+                Для Windows в розділі реєстру:
+               Computer\HKEY_LOCAL_MACHINE\SOFTWARE \"{{Config.productName}}"\"{{Config.productName}} Media Server"
+            </p>
+            <p>
+                Для всіх інших платформ він розміщується у файлі конфігурації:
+                /opt/{{Config.productName}}/mediaserver/etc/mediaserver.conf
+            </p>
+        </div>
+    </div>
+    <div class="panel panel-default table-responsive">
+        <div class="panel-heading">
+            <h2 class="panel-title">Налаштування сервера</h2>
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped table-condensed">
+                <thead>
+                    <rt>
+                        <th>Ім’я</th>
+                        <th>Опис</th>
+                        <th>Стандартне значення</th>
+                    </rt>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="setting in settings">
+                        <td>{{setting.name}}</td>
+                        <td>{{setting.description}}</td>
+                        <td>{{setting.defaultValue}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,12 +1,21 @@
-import { Component, Inject, OnInit, Input, ViewEncapsulation, Renderer2 } from '@angular/core';
-import { NgbModal, NgbActiveModal, NgbModalRef }                          from '@ng-bootstrap/ng-bootstrap';
-import { EmailValidator }                                                 from '@angular/forms';
-import { NxModalGenericComponent }                                        from '../generic/generic.component';
+import {
+    Component,
+    Inject,
+    OnInit,
+    Input,
+    ViewEncapsulation,
+    Renderer2,
+    SimpleChanges,
+    OnChanges
+}                                                from '@angular/core';
+import { NgbModal, NgbActiveModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { EmailValidator }                        from '@angular/forms';
+import { NxModalGenericComponent }               from '../generic/generic.component';
 
 @Component({
-    selector: 'nx-modal-share-content',
+    selector   : 'nx-modal-share-content',
     templateUrl: 'share.component.html',
-    styleUrls: []
+    styleUrls  : []
 })
 export class ShareModalContent {
     @Input() language;
@@ -35,6 +44,7 @@ export class ShareModalContent {
                 private genericModal: NxModalGenericComponent) {
 
         this.url = 'share';
+        this.accessRoles = [];
     }
 
     private getRoleDescription() {
@@ -44,38 +54,15 @@ export class ShareModalContent {
         if (this.user.role.userRoleId) {
             return this.language.accessRoles.customRole.description;
         }
-        if (this.language.accessRoles[this.user.role.name]) {
-            return this.language.accessRoles[this.user.role.name].description;
+        if (this.language.accessRoles[ this.user.role.name ]) {
+            return this.language.accessRoles[ this.user.role.name ].description;
         }
         return this.language.accessRoles.customRole.description;
     }
 
-    setPermission(role: string) {
-        this.selectedPermission = this.accessRoles.filter((accessRole) => {
-            if (accessRole.name === role) {
-                return role;
-            }
-        })[0];
-
-        this.accessDescription = this.language.accessRoles[this.selectedPermission.name].description;
-    }
-
-    processAccessRoles() {
-        const roles = this.system.accessRoles || this.configService.config.accessRoles.predefinedRoles;
-        this.accessRoles = roles.filter((role) => {
-            if (!(role.isOwner || role.isAdmin && !this.system.isMine)) {
-                role.optionLabel = this.language.accessRoles[role.name].label || role.name;
-                return role;
-            }
-
-            return false;
-        });
-
-        if (!this.user.role) {
-            this.user.role = this.system.findAccessRole(this.user);
-        }
-
-        this.options = this.accessRoles;
+    setPermission(role: any) {
+        this.selectedPermission = role;
+        this.accessDescription = this.language.accessRoles[ this.selectedPermission.name ].description;
     }
 
     formatUserName() {
@@ -89,24 +76,33 @@ export class ShareModalContent {
     doShare() {
         this.user.role = this.selectedPermission;
 
-        if (!this.user.role.permissions) {
-            this.user.role.permissions = this.accessRoles.filter((role) => {
-                if (this.user.role.name === role.name) {
-                    return role;
-                }
-            })[0].permissions;
-        }
-
         return this.system.saveUser(this.user, this.user.role);
     }
 
     ngOnInit() {
         this.title = (!this.user) ? this.language.sharing.shareTitle : this.language.sharing.editShareTitle;
         this.buttonText = this.language.sharing.shareConfirmButton;
-        this.isNewShare = !this.user;
+        this.isNewShare = false;
 
-        this.user = (this.user) ? {...this.user} : {email: '', isEnabled: true, role: {name: 'Viewer'}};
-        this.selectedPermission = this.user.role;
+        if (!this.user) {
+            this.isNewShare = true;
+            const predefinedRole = this.configService.config.accessRoles.predefinedRoles.filter(role => {
+                return role.name === this.configService.config.accessRoles.default;
+            })[0];
+            this.user = {
+                email    : '',
+                isEnabled: true,
+                role     : {
+                    name       : this.configService.config.accessRoles.default,
+                    permissions: ''     // permissions will be updated within permissions component as it depends
+                                        // on system's accessRoles
+                }
+            };
+        }
+
+        if (!this.user.role) {
+            this.user.role = this.system.findAccessRole(this.user);
+        }
 
         if (!this.isNewShare) {
             this.account
@@ -115,11 +111,11 @@ export class ShareModalContent {
                     if (account.email === this.user.email) {
                         this.activeModal.close();
                         this.toast.create({
-                            className: 'error',
-                            content: this.language.share.cantEditYourself,
+                            className       : 'error',
+                            content         : this.language.share.cantEditYourself,
                             dismissOnTimeout: true,
-                            dismissOnClick: true,
-                            dismissButton: false
+                            dismissOnClick  : true,
+                            dismissButton   : false
                         });
                     }
 
@@ -129,22 +125,19 @@ export class ShareModalContent {
             this.buttonText = this.language.sharing.editShareConfirmButton;
         }
 
-        this.processAccessRoles();
-        this.accessDescription = this.getRoleDescription();
-
         this.sharing = this.process.init(() => {
             if (this.user.role.isOwner) {
                 return this.genericModal
-                           .openConfirm(this.language.sharing.confirmOwner,
-                               this.language.sharing.shareTitle,
-                               this.language.sharing.shareConfirmButton,
-                               null,
-                               this.language.dialogs.cancelButton)
-                           .then((result) => {
-                               if (result) {
-                                   this.doShare();
-                               }
-                           });
+                    .openConfirm(this.language.sharing.confirmOwner,
+                        this.language.sharing.shareTitle,
+                        this.language.sharing.shareConfirmButton,
+                        null,
+                        this.language.dialogs.cancelButton)
+                    .then((result) => {
+                        if (result) {
+                            this.doShare();
+                        }
+                    });
             } else {
                 return this.doShare();
             }
@@ -161,10 +154,10 @@ export class ShareModalContent {
 }
 
 @Component({
-    selector: 'nx-modal-share',
-    template: '',
+    selector     : 'nx-modal-share',
+    template     : '',
     encapsulation: ViewEncapsulation.None,
-    styleUrls: []
+    styleUrls    : []
 })
 
 export class NxModalShareComponent implements OnInit {
@@ -175,7 +168,7 @@ export class NxModalShareComponent implements OnInit {
     }
 
     private dialog(system?, user?) {
-        this.modalRef = this.modalService.open(ShareModalContent, {backdrop: 'static', centered: true});
+        this.modalRef = this.modalService.open(ShareModalContent, { backdrop: 'static', centered: true });
         this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.system = system;
         this.modalRef.componentInstance.user = user;

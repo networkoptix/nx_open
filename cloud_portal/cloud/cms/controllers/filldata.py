@@ -40,8 +40,6 @@ def target_file(file_name, customization, language_code, preview):
 
 def process_context_structure(customization, context, content,
                               language, version_id, preview, force_global_files):
-    logger.info("process_context_structure: " + context.name)
-
     def replace_in(adict, key, value):
         for dict_key in adict.keys():
             itm_type = type(adict[dict_key])

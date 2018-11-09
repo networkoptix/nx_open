@@ -116,36 +116,20 @@
 
     <h2>Naplóbeállítások</h2>
     <form class="form" role="form" name="logLevels" novalidate>
-        <div class="form-group">
-            <label class="col-sm-4">Fő rendszernapló szintje</label>
+        <div ng-repeat="(name, level) in loggers" class="form-group">
+            <label class="col-sm-4">{{name}} log level</label>
             <div class="col-sm-8">
-
-                <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">Nincs: napló leállítva.</option>
-                    <option value="ALWAYS">Mindig: Napló hibák, figyelmeztetések és a legfontosabb üzenetek.</option>
-                    <option value="ERROR">Hiba: csak hibák naplózása.</option>
-                    <option value="WARNING">Figyelmeztetés: Napló figyelmeztetések és hibák.</option>
-                    <option value="INFO">Info: Napló hibák, figyelmeztetések és minden üzenet.</option>
-                    <option value="DEBUG">Hibakeresés: Minden rendszerüzenet és hibakeresési információ naplózása.</option>
-                    <option value="DEBUG2">Hibakeresés2: Minden rendszerüzenet és kiterjesztett hibakeresési információ naplózása.</option>
+                <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
+                    <option value="none">Nincs: napló leállítva.</option>
+                    <option value="always">Mindig: Napló hibák, figyelmeztetések és a legfontosabb üzenetek.</option>
+                    <option value="error">Hiba: csak hibák naplózása.</option>
+                    <option value="warning">Figyelmeztetés: Napló figyelmeztetések és hibák.</option>
+                    <option value="info">Info: Napló hibák, figyelmeztetések és minden üzenet.</option>
+                    <option value="debug">Hibakeresés: Minden rendszerüzenet és hibakeresési információ naplózása.</option>
+                    <option value="debug2">Hibakeresés2: Minden rendszerüzenet és kiterjesztett hibakeresési információ naplózása.</option>
                 </select>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-sm-4">Tranzakciós rendszernapló szintje</label>
-            <div class="col-sm-8">
-                <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">Nincs: napló leállítva.</option>
-                    <option value="ALWAYS">Mindig: Napló hibák, figyelmeztetések és a legfontosabb üzenetek.</option>
-                    <option value="ERROR">Hiba: csak hibák naplózása.</option>
-                    <option value="WARNING">Figyelmeztetés: Napló figyelmeztetések és hibák.</option>
-                    <option value="INFO">Info: Napló hibák, figyelmeztetések és minden üzenet.</option>
-                    <option value="DEBUG">Hibakeresés: Minden rendszerüzenet és hibakeresési információ naplózása.</option>
-                    <option value="DEBUG2">Hibakeresés2: Minden rendszerüzenet és kiterjesztett hibakeresési információ naplózása.</option>
-                </select>
-            </div>
-        </div>
-
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="changeLogLevels()" >Mentés</button>
         </div>
