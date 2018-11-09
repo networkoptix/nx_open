@@ -17,4 +17,6 @@ if(LINUX AND NOT ANDROID)
     target_link_libraries(udt rt pthread)
 endif()
 
-add_subdirectory(unit_tests)
+if(withTests)
+    add_subdirectory(unit_tests)
+endif()
