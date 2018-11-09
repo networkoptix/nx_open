@@ -12,6 +12,8 @@
 #include <utils/common/app_info.h>
 #include <utils/update/update_utils.h>
 
+#include <nx/utils/app_info.h>
+
 #include <client/client_settings.h>
 #include <client/client_module.h>
 #include <watchers/cloud_status_watcher.h>
@@ -974,10 +976,10 @@ QUrl generateUpdatePackageUrl(const UpdateContents& contents, const QSet<QnUuid>
         systemInformationList.insert(server->getSystemInfo());
     }
 
-    //QString clientRuntime = nx::vms::api::SystemInformation::currentSystemRuntime().replace(L' ', L'_');
     auto clientPlatformModification = QnAppInfo::applicationPlatformModification();
     auto clientArch = QnAppInfo::applicationArch();
-    QString clientRuntime = QString("%1_%2").arg(clientArch, clientPlatformModification);
+    auto clientPlatform = nx::utils::AppInfo::applicationPlatform();
+    QString clientRuntime = QString("%1_%2_%3").arg(clientPlatform, clientArch, clientPlatformModification);
 
     query.addQueryItem(lit("client"), clientRuntime);
     for(const auto &systemInformation: systemInformationList)
