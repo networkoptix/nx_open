@@ -9,13 +9,13 @@ namespace nx::vms::client::desktop {
 void AnalyticsMetadataProviderFactory::registerMetadataProviders()
 {
     registerMetadataFactory(
-        lit("consuming"),
+        "consuming",
         new core::ConsumingAnalyticsMetadataProviderFactory());
     registerMetadataFactory(
-        lit("local"),
+        "local",
         new LocalFileAnalyticsMetadataProviderFactory());
     registerMetadataFactory(
-        lit("demo"),
+        "demo",
         new DemoAnalyticsMetadataProviderFactory());
 }
 

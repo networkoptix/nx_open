@@ -233,10 +233,15 @@ public:
                 close();
             });
 
+        /**
+         * ATTENTION: I made analytics related code below able to compile, but it doesn't work
+         * properly. If you still need it after the change of analytics data
+         * storage layout in the database - please fix it yourself.
+         */
         addButton("Generate Analytics Plugins and Engines",
             [this]()
             {
-                const QString kEngineSettingsModel = R"json(
+                const QJsonObject kEngineSettingsModel = QJsonDocument::fromJson(R"json(
                 {
                     "items":
                     [
@@ -259,9 +264,9 @@ public:
                             ]
                         }
                     ]
-                })json";
+                })json").object();
 
-                const QString kDeviceAgentSettingsModel = R"json(
+                const QJsonObject kDeviceAgentSettingsModel = QJsonDocument::fromJson(R"json(
                 {
                     "items":
                     [
@@ -290,46 +295,54 @@ public:
                             ]
                         }
                     ]
-                })json";
+                })json").object();
 
                 using namespace nx::vms::common;
+                using namespace nx::vms::api::analytics;
 
-                QnResourcePtr plugin1(new AnalyticsPluginResource(commonModule()));
-                plugin1->setId(QnUuid("{c302e227-3631-4ce4-9acc-ed481661ce4d}"));
-                plugin1->setName("Plugin1");
-                plugin1->setProperty(AnalyticsPluginResource::kEngineSettingsModelProperty,
-                    kEngineSettingsModel);
-                plugin1->setProperty(AnalyticsPluginResource::kDeviceAgentSettingsModelProperty,
-                    kDeviceAgentSettingsModel);
+                auto addPlugin =
+                    [&](const QnUuid& id, const QString& name)
+                    {
+                        PluginManifest manifest;
+                        manifest.id = id.toString();
+                        manifest.name = name;
+                        manifest.engineSettingsModel = kEngineSettingsModel;
 
-                QnResourcePtr plugin2(new AnalyticsPluginResource(commonModule()));
-                plugin2->setId(QnUuid("{fce51681-bc44-4d0c-966b-12f8cf39d2f9}"));
-                plugin2->setName("Plugin2");
-                plugin2->setProperty(AnalyticsPluginResource::kEngineSettingsModelProperty,
-                    kEngineSettingsModel);
-                plugin2->setProperty(AnalyticsPluginResource::kDeviceAgentSettingsModelProperty,
-                    kDeviceAgentSettingsModel);
+                        AnalyticsPluginResourcePtr plugin{
+                            new AnalyticsPluginResource(commonModule())};
+                        plugin->setId(id);
+                        plugin->setName(name);
+                        plugin->setManifest(manifest);
 
-                QnResourcePtr engine1(new AnalyticsEngineResource(commonModule()));
-                engine1->setId(QUuid("{f31e58e7-abc5-4813-ba83-fde0375a98cd}"));
-                engine1->setParentId(plugin1->getId());
-                engine1->setName("Engine1");
+                        resourcePool()->addResource(plugin);
+                        return plugin;
+                    };
 
-                QnResourcePtr engine2(new AnalyticsEngineResource(commonModule()));
-                engine2->setParentId(plugin1->getId());
-                engine2->setId(QUuid("{f31e58e7-abc5-4813-ba83-fde0375a98ce}"));
-                engine2->setName("Engine2");
+                auto addEngine =
+                    [&](const QnUuid& id, const QString& name, const QnResourcePtr& parent)
+                    {
+                        EngineManifest manifest;
+                        manifest.deviceAgentSettingsModel = kDeviceAgentSettingsModel;
 
-                QnResourcePtr engine3(new AnalyticsEngineResource(commonModule()));
-                engine3->setParentId(plugin2->getId());
-                engine3->setId(QUuid("{f31e58e7-abc5-4813-ba83-fde0375a98cf}"));
-                engine3->setName("Engine3");
+                        AnalyticsEngineResourcePtr engine{
+                            new AnalyticsEngineResource(commonModule())};
+                        engine->setId(id);
+                        engine->setParentId(parent->getId());
+                        engine->setName(name);
+                        engine->setManifest(manifest);
 
-                resourcePool()->addResource(plugin1);
-                resourcePool()->addResource(plugin2);
-                resourcePool()->addResource(engine1);
-                resourcePool()->addResource(engine2);
-                resourcePool()->addResource(engine3);
+                        resourcePool()->addResource(engine);
+                        return engine;
+                    };
+
+                const auto plugin1 = addPlugin(
+                    QnUuid("{c302e227-3631-4ce4-9acc-ed481661ce4d}"), "Plugin 1");
+                const auto plugin2 = addPlugin(
+                    QnUuid("{fce51681-bc44-4d0c-966b-12f8cf39d2f9}"), "Plugin 2");
+
+                addEngine(QnUuid("{f31e58e7-abc5-4813-ba83-fde0375a98cd}"), "Engine 1", plugin1);
+                addEngine(QnUuid("{f31e58e7-abc5-4813-ba83-fde0375a98ce}"), "Engine 2", plugin1);
+                addEngine(QnUuid("{f31e58e7-abc5-4813-ba83-fde0375a98cf}"), "Engine 3", plugin2);
             });
 
         addButton(lit("Generate analytics manifests"),
@@ -344,9 +357,6 @@ public:
                 for (int i = 0; i < 5; ++i)
                 {
                     nx::vms::api::analytics::EngineManifest manifest;
-                    manifest.pluginId = lit("nx.generatedDriver.%1").arg(i);
-                    manifest.pluginName.value = lit("Plugin %1").arg(i);
-                    manifest.pluginName.localization[lit("ru_RU")] = lit("Russian %1").arg(i);
                     for (int j = 0; j < 3; ++j)
                     {
                         nx::vms::api::analytics::EventType eventType;
@@ -367,6 +377,7 @@ public:
 
                 for (auto server: servers)
                 {
+                    // TODO: #sivanov: Get rid of the term "driver".
                     auto drivers = server->analyticsDrivers();
                     // Some devices will not have an Engine.
                     drivers.push_back(nx::vms::api::analytics::EngineManifest());
@@ -374,22 +385,11 @@ public:
                     for (auto camera: resourcePool()->getAllCameras(server, true))
                     {
                         const auto randomDriver = nx::utils::random::choice(drivers);
-                        if (randomDriver.pluginId.isEmpty()) //< dummy driver
-                        {
-                            camera->setSupportedAnalyticsEventTypeIds({});
-                        }
-                        else
-                        {
-                            QnSecurityCamResource::AnalyticsEventTypeIds eventTypeIds;
-                            std::transform(randomDriver.eventTypes.cbegin(),
-                                randomDriver.eventTypes.cend(),
-                                std::back_inserter(eventTypeIds),
-                                [](const nx::vms::api::analytics::EventType& eventType)
-                                {
-                                    return eventType.id;
-                                });
-                            camera->setSupportedAnalyticsEventTypeIds(eventTypeIds);
-                        }
+                        QSet<QString> eventTypeIds;
+                        for (const auto& eventType: randomDriver.eventTypes)
+                            eventTypeIds.insert(eventType.id);
+
+                        camera->setSupportedAnalyticsEventTypeIds(QnUuid(), eventTypeIds);
 
                         camera->saveParamsAsync();
                     }
@@ -401,7 +401,7 @@ public:
             {
                 for (auto camera: resourcePool()->getAllCameras({}))
                 {
-                    camera->setSupportedAnalyticsEventTypeIds({});
+                    camera->setSupportedAnalyticsEventTypeIds(QnUuid(), {});
                     camera->saveParamsAsync();
                 }
 

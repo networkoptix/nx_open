@@ -15,11 +15,9 @@ namespace nx::mediaserver_plugins::utils::analytics {
  */
 struct NX_PLUGIN_UTILS_API EngineManifestBase
 {
-    QString pluginId;
-    nx::vms::api::analytics::TranslatableString pluginName;
     nx::vms::api::analytics::EngineManifest::Capabilities capabilities;
 };
-#define EngineManifestBase_Fields (pluginId)(pluginName)(capabilities)
+#define EngineManifestBase_Fields (capabilities)
 QN_FUSION_DECLARE_FUNCTIONS(EngineManifestBase, (json), NX_PLUGIN_UTILS_API)
 
 } // namespace nx::mediaserver_plugins::utils::analytics

@@ -8,6 +8,8 @@
 namespace nx {
 namespace sdk {
 
+class Settings;
+
 /**
  * Plugin utils providing convenience for using NX_PRINT/NX_OUTPUT with their settings
  * (printPrefix string and enableOutput flag) taken from the particular plugin: these settings are
@@ -37,8 +39,10 @@ struct Utils
      * @return Whether the settings are valid.
      */
     bool fillAndOutputSettingsMap(
-        std::map<std::string, std::string>* map, const nxpl::Setting* settings, int count,
-        const std::string& caption, int outputIndent = 0) const;
+        std::map<std::string, std::string>* map,
+        const nx::sdk::Settings* settings,
+        const std::string& caption,
+        int outputIndent = 0) const;
 };
 
 } // namespace sdk

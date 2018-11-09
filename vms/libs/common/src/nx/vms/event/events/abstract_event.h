@@ -4,11 +4,11 @@
 #include <QtCore/QSharedPointer>
 
 #include <common/common_globals.h>
+#include <common/common_module.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/event_parameters.h>
 #include <nx/vms/event/action_parameters.h>
-#include <nx/vms/event/analytics_helper.h>
 
 namespace nx {
 namespace vms {

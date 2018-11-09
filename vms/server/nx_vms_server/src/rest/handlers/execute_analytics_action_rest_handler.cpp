@@ -6,8 +6,18 @@
 #include <core/resource/media_server_resource.h>
 #include <media_server/media_server_module.h>
 #include <nx/mediaserver/analytics/manager.h>
+#include <nx/mediaserver/resource/analytics_engine_resource.h>
+#include <nx/mediaserver/resource/analytics_plugin_resource.h>
+#include <nx/mediaserver/sdk_support/utils.h>
+#include <nx/mediaserver/sdk_support/pointers.h>
 #include <nx/mediaserver_plugins/utils/uuid.h>
+#include <nx/mediaserver/sdk_support/utils.h>
+#include <nx/sdk/settings.h>
+
 #include <plugins/settings.h>
+#include <plugins/plugin_tools.h>
+
+using namespace nx::mediaserver;
 
 QnExecuteAnalyticsActionRestHandler::QnExecuteAnalyticsActionRestHandler(
     QnMediaServerModule* serverModule):
@@ -20,8 +30,9 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
     const QnRequestParams& /*params*/,
     const QByteArray& body,
     QnJsonRestResult& result,
-    const QnRestConnectionProcessor* owner)
+    const QnRestConnectionProcessor* /*owner*/)
 {
+    using namespace nx::mediaserver;
     bool success = false;
     const auto actionData =
         QJson::deserialized<AnalyticsAction>(body, AnalyticsAction(), &success);
@@ -46,19 +57,13 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
         return nx::network::http::StatusCode::ok;
     }
 
-    auto analyticsManager = serverModule()->analyticsManager();
-    for (auto& engine: analyticsManager->availableEngines())
+    for (auto& engineResource: resourcePool()->getResources<resource::AnalyticsEngineResource>())
     {
-        nxpt::ScopedRef<nx::sdk::analytics::Engine> engineGuard(engine, /*increaseRef*/ false);
-
-        const auto manifest = analyticsManager->loadEngineManifest(engine);
-        if (!manifest)
-            continue; //< The error is already logged.
-
-        if (manifest.get().pluginId == actionData.pluginId)
+         if (engineResource->plugin()->manifest().id == actionData.pluginId)
         {
             AnalyticsActionResult actionResult;
-            QString errorMessage = executeAction(&actionResult, engine, actionData);
+            QString errorMessage = executeAction(
+                &actionResult, engineResource->sdkEngine().get(), actionData);
 
             if (!errorMessage.isEmpty())
             {
@@ -80,8 +85,6 @@ namespace {
 class Action: public nxpt::CommonRefCounter<nx::sdk::analytics::Action>
 {
 public:
-    virtual ~Action() {}
-
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override
     {
         if (interfaceId == nx::sdk::analytics::IID_Action)
@@ -98,10 +101,11 @@ public:
     }
 
     Action(const AnalyticsAction& actionData, AnalyticsActionResult* actionResult):
-        m_params(actionData.params), m_actionResult(actionResult)
+        m_params(
+            nx::mediaserver::sdk_support::toSdkSettings(actionData.params)),
+        m_actionResult(actionResult)
     {
         NX_ASSERT(m_actionResult);
-        NX_ASSERT(m_params.isValid());
 
         m_actionId = actionData.actionId.toStdString();
         m_objectId = nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(actionData.objectId);
@@ -117,9 +121,9 @@ public:
 
     virtual int64_t timestampUs() override { return m_timestampUs; }
 
-    virtual const nxpl::Setting* params() override { return m_params.array(); }
+    virtual const nx::sdk::Settings* params() override { return m_params.get(); }
 
-    virtual int paramCount() override { return m_params.size(); }
+    virtual int paramCount() override { return m_params->count(); }
 
     virtual void handleResult(const char* actionUrl, const char* messageToUser) override
     {
@@ -133,7 +137,7 @@ private:
     nxpl::NX_GUID m_deviceId;
     int64_t m_timestampUs;
 
-    const nx::plugins::SettingsHolder m_params;
+    const nx::mediaserver::sdk_support::UniquePtr<nx::sdk::Settings> m_params;
 
     AnalyticsActionResult* m_actionResult = nullptr;
 };
@@ -172,3 +176,17 @@ QString QnExecuteAnalyticsActionRestHandler::executeAction(
 
     return errorMessage(error);
 }
+
+std::unique_ptr<sdk_support::AbstractManifestLogger>
+    QnExecuteAnalyticsActionRestHandler::makeLogger(
+        resource::AnalyticsEngineResourcePtr engineResource) const
+{
+    const QString messageTemplate(
+        "Error occurred while fetching Engine manifest for engine: {:engine}: {:error}");
+
+    return std::make_unique<sdk_support::ManifestLogger>(
+        nx::utils::log::Tag(typeid(this)),
+        messageTemplate,
+        std::move(engineResource));
+}
+

@@ -1,11 +1,6 @@
 {
-    "pluginId": "nx.ssc", 
-    "pluginName": {
-        "value": "SSC (Self Service Console) driver", 
-        "localization": {}
-    }, 
-    "capabilities": "cameraModelIndependent", 
-    "outputEventTypes": [
+    "capabilities": "", 
+    "eventTypes": [
         {
             "id": "nx.ssc.camera specify command", 
             "name": {

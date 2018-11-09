@@ -7,46 +7,49 @@
 
 namespace nx::vms::client::core {
 
+using namespace std::chrono;
+using namespace nx::common::metadata;
+
 class ConsumingAnalyticsMetadataProvider::Private
 {
 public:
-    Private();
-
-    QSharedPointer<media::CachingMetadataConsumer> metadataConsumer;
+    QSharedPointer<media::CachingMetadataConsumer> metadataConsumer{
+        new media::CachingMetadataConsumer(MetadataType::ObjectDetection)};
 };
-
-ConsumingAnalyticsMetadataProvider::Private::Private():
-    metadataConsumer(new media::CachingMetadataConsumer(MetadataType::ObjectDetection))
-{
-}
 
 ConsumingAnalyticsMetadataProvider::ConsumingAnalyticsMetadataProvider():
     d(new Private())
 {
 }
 
-nx::common::metadata::DetectionMetadataPacketPtr ConsumingAnalyticsMetadataProvider::metadata(
-    qint64 timestamp, int channel) const
+ConsumingAnalyticsMetadataProvider::~ConsumingAnalyticsMetadataProvider()
+{
+}
+
+DetectionMetadataPacketPtr ConsumingAnalyticsMetadataProvider::metadata(
+    microseconds timestamp, int channel) const
 {
     const auto compressedMetadata = std::dynamic_pointer_cast<QnCompressedMetadata>(
         d->metadataConsumer->metadata(timestamp, channel));
 
-    return nx::common::metadata::fromMetadataPacket(compressedMetadata);
+    return fromMetadataPacket(compressedMetadata);
 }
 
-QList<nx::common::metadata::DetectionMetadataPacketPtr>
-    ConsumingAnalyticsMetadataProvider::metadataRange(
-        qint64 startTimestamp, qint64 endTimestamp, int channel, int maximumCount) const
+QList<DetectionMetadataPacketPtr> ConsumingAnalyticsMetadataProvider::metadataRange(
+    microseconds startTimestamp,
+    microseconds endTimestamp,
+    int channel,
+    int maximumCount) const
 {
     const auto& metadataList = d->metadataConsumer->metadataRange(
         startTimestamp, endTimestamp, channel, maximumCount);
 
-    QList<nx::common::metadata::DetectionMetadataPacketPtr> result;
+    QList<DetectionMetadataPacketPtr> result;
     for (const auto& metadata: metadataList)
     {
         const auto compressedMetadata =
             std::dynamic_pointer_cast<QnCompressedMetadata>(metadata);
-        result.append(nx::common::metadata::fromMetadataPacket(compressedMetadata));
+        result.append(fromMetadataPacket(compressedMetadata));
     }
     return result;
 }

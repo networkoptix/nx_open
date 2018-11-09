@@ -13,6 +13,8 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/scope_guard.h>
 
+#include <nx/sdk/common/string.h>
+
 #include "device_agent.h"
 #include "common.h"
 #include "attributes_parser.h"
@@ -135,14 +137,20 @@ nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
     return deviceAgent;
 }
 
-const char* Engine::manifest(Error* error) const
+const IString* Engine::manifest(Error* error) const
 {
     *error = Error::noError;
-    return m_manifest.constData();
+    return new common::String(m_manifest);
 }
 
-void Engine::setSettings(const nxpl::Setting* settings, int count)
+void Engine::setSettings(const nx::sdk::Settings* settings)
 {
+    // There are no DeviceAgent settings for this plugin.
+}
+
+nx::sdk::Settings* Engine::settings() const
+{
+    return nullptr;
 }
 
 void Engine::executeAction(Action* action, Error* outError)
@@ -309,11 +317,26 @@ std::shared_ptr<Engine::SharedResources> Engine::sharedResources(
 } // namespace mediaserver_plugins
 } // namespace nx
 
+namespace {
+
+static const std::string kLibName = "hanwha_analytics_plugin";
+static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
+{
+    "id": "nx.hanwha",
+    "name": "Hanwha analytics plugin",
+    "engineSettingsModel": ""
+}
+)json";
+
+} // namespace
+
 extern "C" {
 
 NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
-    return new nx::sdk::analytics::CommonPlugin("hanwha_analytics_plugin",
+    return new nx::sdk::analytics::CommonPlugin(
+        kLibName,
+        kPluginManifest,
         [](nx::sdk::analytics::Plugin* plugin)
         {
             return new nx::mediaserver_plugins::analytics::hanwha::Engine(

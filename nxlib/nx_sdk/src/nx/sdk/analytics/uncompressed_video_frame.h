@@ -72,9 +72,9 @@ public:
      * non-zero, data() should be called only after map call, otherwise data() returns null.
      * @return Success.
      */
-    virtual bool map() = 0;
+    virtual bool map() const = 0;
 
-    virtual void unmap() = 0;
+    virtual void unmap() const = 0;
 };
 
 } // namespace analytics

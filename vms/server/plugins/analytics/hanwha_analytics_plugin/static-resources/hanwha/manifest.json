@@ -1,10 +1,6 @@
 {
-    "pluginId": "nx.hanwha", 
-    "pluginName": {
-        "value": "Hanwha metadata driver", 
-        "localization": {}
-    }, 
-    "outputEventTypes": [
+    "capabilities": "deviceModelDependent",
+    "eventTypes": [
         {
             "id": "nx.hanwha.FaceDetection", 
             "name": {

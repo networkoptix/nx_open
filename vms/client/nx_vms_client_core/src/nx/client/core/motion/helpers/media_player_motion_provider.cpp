@@ -86,8 +86,8 @@ QByteArray MediaPlayerMotionProvider::motionMask(int channel) const
         return kEmptyMotionMask;
 
     using namespace std::chrono;
-    const auto positionUs = microseconds(milliseconds(d->mediaPlayer->position())).count();
-    const auto metadata = d->metadataProvider.metadata(positionUs, channel);
+    const auto timestamp = microseconds(milliseconds(d->mediaPlayer->position()));
+    const auto metadata = d->metadataProvider.metadata(timestamp, channel);
     if (!metadata)
         return kEmptyMotionMask;
 

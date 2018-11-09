@@ -127,10 +127,10 @@ QString demangleTypeName(const char* type)
 
     #if defined(_MSC_VER)
         static const std::vector<std::string> kTypePrefixes = {"struct ", "class "};
-        for (const auto& preffix: kTypePrefixes)
+        for (const auto& prefix: kTypePrefixes)
         {
-            if (boost::starts_with(typeName, preffix))
-                typeName = typeName.substr(preffix.size());
+            if (boost::starts_with(typeName, prefix))
+                typeName = typeName.substr(prefix.size());
         }
     #endif
 

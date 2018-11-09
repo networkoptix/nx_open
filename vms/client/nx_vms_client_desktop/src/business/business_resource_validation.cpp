@@ -21,9 +21,12 @@
 #include <core/resource_access/resource_access_manager.h>
 
 #include <nx/vms/api/analytics/engine_manifest.h>
-#include <nx/vms/event/analytics_helper.h>
+#include <nx/vms/api/analytics/descriptors.h>
+#include <nx/analytics/descriptor_list_manager.h>
 
 #include <utils/email/email.h>
+
+namespace analytics_api = nx::vms::api::analytics;
 
 namespace {
 
@@ -238,7 +241,11 @@ QString QnCameraRecordingPolicy::getText(const QnResourceList &resources, const 
 
 bool QnCameraAnalyticsPolicy::isResourceValid(const QnVirtualCameraResourcePtr& camera)
 {
-    return !nx::vms::event::AnalyticsHelper::supportedAnalyticsEvents({camera}).isEmpty();
+    const auto descriptorListManager = camera->commonModule()->analyticsDescriptorListManager();
+    const auto descriptors = descriptorListManager
+        ->deviceDescriptors<analytics_api::EventTypeDescriptor>(camera);
+
+    return !descriptors.empty();
 }
 
 QString QnCameraAnalyticsPolicy::getText(const QnResourceList& resources, const bool detailed)

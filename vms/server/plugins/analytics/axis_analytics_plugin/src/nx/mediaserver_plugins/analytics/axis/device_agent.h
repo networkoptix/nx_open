@@ -39,24 +39,28 @@ public:
     virtual nx::sdk::Error setMetadataHandler(
         nx::sdk::analytics::MetadataHandler* metadataHandler) override;
 
-    virtual nx::sdk::Error startFetchingMetadata(
-        const char* const* typeList, int typeListSize) override;
+    virtual nx::sdk::Error setNeededMetadataTypes(
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
 
-    virtual nx::sdk::Error stopFetchingMetadata() override;
-
-    virtual const char* manifest(nx::sdk::Error* error) override;
-
-    virtual void freeManifest(const char* data) override;
+    virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
 
     const EngineManifest& events() const noexcept
     {
         return m_typedManifest;
     }
 
-    virtual void setSettings(const nxpl::Setting* settings, int count) override;
+    virtual void setSettings(const nx::sdk::Settings* settings) override;
+
+    virtual nx::sdk::Settings* settings() const override;
 
     /** @return Null if not found. */
     const EventType* eventTypeById(const QString& id) const noexcept;
+
+private:
+    nx::sdk::Error startFetchingMetadata(
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes);
+
+    void stopFetchingMetadata();
 
 private:
     Engine* const m_engine;
@@ -65,12 +69,12 @@ private:
     QUrl m_url;
     QAuthenticator m_auth;
     Monitor* m_monitor = nullptr;
-    
+
     /**
      * Place to store manifests we gave to the caller to provide 1) sufficient lifetime and
      * 2) memory releasing in destructor.
      */
-    QList<QByteArray> m_givenManifests; 
+    mutable QList<QByteArray> m_givenManifests;
 
     nx::sdk::analytics::MetadataHandler* m_metadataHandler = nullptr;
 };

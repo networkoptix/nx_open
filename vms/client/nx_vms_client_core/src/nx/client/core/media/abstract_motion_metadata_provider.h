@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <chrono>
 
 #include <QtCore/QScopedPointer>
 
@@ -16,7 +17,8 @@ public:
     AbstractMotionMetadataProvider();
     virtual ~AbstractMotionMetadataProvider();
 
-    virtual MetaDataV1Ptr metadata(const qint64 timestamp, int channel) const = 0;
+    virtual MetaDataV1Ptr metadata(
+        const std::chrono::microseconds timestamp, int channel) const = 0;
 };
 
 } // namespace nx::vms::client::core

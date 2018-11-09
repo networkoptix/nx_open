@@ -34,6 +34,9 @@
 #include <nx/vms/event/rule.h>
 #include <api/model/detach_from_cloud_data.h>
 
+#include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <nx/vms/common/resource/analytics_plugin_resource.h>
+
 using namespace nx;
 
 namespace {
@@ -821,6 +824,92 @@ Handle ServerConnection::getUpdateStatus(Result<UpdateStatusAll>::type callback,
 {
     QnRequestParamList params;
     return executeGet("/ec2/updateStatus", params, callback, targetThread);
+}
+
+//--------------------------------------------------------------------------------------------------
+
+Handle ServerConnection::getEngineAnalyticsSettings(
+    const nx::vms::common::AnalyticsEngineResourcePtr& engine,
+    Result<QJsonObject>::type&& callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        "/ec2/analyticsEngineSettings",
+        QnRequestParamList{
+            {"analyticsEngineId", engine->getId().toString()}
+        },
+        Result<QnJsonRestResult>::type(
+            [callback = std::move(callback)](
+                bool success, Handle requestId, const QnJsonRestResult& result)
+            {
+                callback(success, requestId, result.deserialized<QJsonObject>());
+            }),
+        targetThread);
+}
+
+Handle ServerConnection::setEngineAnalyticsSettings(
+    const nx::vms::common::AnalyticsEngineResourcePtr& engine,
+    const QJsonObject& settings,
+    std::function<void(bool, Handle, const QJsonObject&)>&& callback,
+    QThread* targetThread)
+{
+    return executePost<QnJsonRestResult>(
+        QString("/ec2/analyticsEngineSettings"),
+        QnRequestParamList{
+            {"analyticsEngineId", engine->getId().toString()}
+        },
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        QJson::serialized(settings),
+        [callback = std::move(callback)](
+            bool success, Handle requestId, const QnJsonRestResult& result)
+        {
+            callback(success, requestId, result.deserialized<QJsonObject>());
+        },
+        targetThread);
+}
+
+Handle ServerConnection::getDeviceAnalyticsSettings(
+    const QnVirtualCameraResourcePtr& device,
+    const nx::vms::common::AnalyticsEngineResourcePtr& engine,
+    Result<QJsonObject>::type&& callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        "/ec2/deviceAnalyticsSettings",
+        QnRequestParamList{
+            {"deviceId", device->getId().toString()},
+            {"analyticsEngineId", engine->getId().toString()},
+        },
+        Result<QnJsonRestResult>::type(
+            [callback = std::move(callback)](
+                bool success, Handle requestId, const QnJsonRestResult& result)
+            {
+                callback(success, requestId, result.deserialized<QJsonObject>());
+            }),
+        targetThread);
+}
+
+Handle ServerConnection::setDeviceAnalyticsSettings(
+    const QnVirtualCameraResourcePtr& device,
+    const nx::vms::common::AnalyticsEngineResourcePtr& engine,
+    const QJsonObject& settings,
+    std::function<void(bool, Handle, const QJsonObject&)>&& callback,
+    QThread* targetThread)
+{
+    return executePost<QnJsonRestResult>(
+        QString("/ec2/deviceAnalyticsSettings"),
+        QnRequestParamList{
+            {"deviceId", device->getId().toString()},
+            {"analyticsEngineId", engine->getId().toString()},
+        },
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        QJson::serialized(settings),
+        [callback = std::move(callback)](
+            bool success, Handle requestId, const QnJsonRestResult& result)
+        {
+            callback(success, requestId, result.deserialized<QJsonObject>());
+        },
+        targetThread);
 }
 
 // --------------------------- private implementation -------------------------------------

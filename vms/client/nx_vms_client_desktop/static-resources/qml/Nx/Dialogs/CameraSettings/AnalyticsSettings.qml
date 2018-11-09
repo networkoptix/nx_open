@@ -16,12 +16,14 @@ Item
     property var enabledAnalyticsEngines: []
 
     property var currentEngineId
+    property bool loading: false
 
     Connections
     {
         target: store
         onStateChanged:
         {
+            loading = store.analyticsSettingsLoading()
             analyticsEngines = store.analyticsEngines()
             enabledAnalyticsEngines = store.enabledAnalyticsEngines()
             settingsView.setValues(store.deviceAgentSettingsValues(currentEngineId))
@@ -60,6 +62,8 @@ Item
         anchors.margins: 16
         anchors.leftMargin: menu.width + 16
         spacing: 16
+
+        enabled: !loading
 
         SwitchButton
         {

@@ -86,7 +86,7 @@ public:
 
     QVariant value() const;
 
-    void setValue(const QVariant& value);
+    virtual void setValue(const QVariant& value);
 
     QVariant defaultValue() const
     {
@@ -115,6 +115,8 @@ class EnumerationItem: public ValueItem
 
 public:
     using ValueItem::ValueItem;
+
+    virtual void setValue(const QVariant& value) override;
 
     QVariantList range() const
     {
@@ -150,6 +152,7 @@ public:
     }
 
     void setValue(int value);
+    virtual void setValue(const QVariant& value) override;
 
     int minValue() const
     {
@@ -194,6 +197,7 @@ public:
     }
 
     void setValue(double value);
+    virtual void setValue(const QVariant& value) override;
 
     double minValue() const
     {
@@ -290,6 +294,8 @@ public:
     {
         ValueItem::setValue(value);
     }
+
+    using ValueItem::setValue;
 };
 
 class Button: public Item

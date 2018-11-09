@@ -4,21 +4,29 @@
 
 #include "common_engine.h"
 
+#include <nx/sdk/common/string.h>
+
 namespace nx {
 namespace sdk {
 namespace analytics {
 
 using namespace nx::sdk;
 
-CommonPlugin::CommonPlugin(std::string libName, CreateEngine createEngine):
-    m_libName(std::move(libName)), m_createEngine(createEngine)
+CommonPlugin::CommonPlugin(
+    std::string pluginName,
+    std::string pluginManifest,
+    CreateEngine createEngine)
+    :
+    m_name(std::move(pluginName)),
+    m_manifest(std::move(pluginManifest)),
+    m_createEngine(std::move(createEngine))
 {
-    NX_PRINT << "Created " << m_libName << "[" << this << "]";
+    NX_PRINT << "Created " << m_name << "[" << this << "]";
 }
 
 CommonPlugin::~CommonPlugin()
 {
-    NX_PRINT << "Destroyed " << m_libName << "[" << this << "]";
+    NX_PRINT << "Destroyed " << m_name << "[" << this << "]";
 }
 
 void* CommonPlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -27,11 +35,6 @@ void* CommonPlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
     {
         addRef();
         return static_cast<Plugin*>(this);
-    }
-    if (interfaceId == nxpl::IID_Plugin3)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin3*>(this);
     }
     if (interfaceId == nxpl::IID_Plugin2)
     {
@@ -53,7 +56,7 @@ void* CommonPlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
 
 const char* CommonPlugin::name() const
 {
-    return m_libName.c_str();
+    return m_name.c_str();
 }
 
 void CommonPlugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
@@ -67,8 +70,12 @@ void CommonPlugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
     m_pluginContainer = pluginContainer;
 }
 
-void CommonPlugin::setLocale(const char* /*locale*/)
+const IString* CommonPlugin::manifest(nx::sdk::Error* outError) const
 {
+    if (outError)
+        *outError = nx::sdk::Error::noError;
+
+    return new common::String(m_manifest);
 }
 
 Engine* CommonPlugin::createEngine(Error* outError)
@@ -76,7 +83,7 @@ Engine* CommonPlugin::createEngine(Error* outError)
     Engine* engine = m_createEngine(this);
     if (!engine)
     {
-        NX_PRINT << "ERROR: " << m_libName << ": createEngine() failed";
+        NX_PRINT << "ERROR: " << m_name << ": createEngine() failed";
         *outError = Error::unknownError;
         return nullptr;
     }

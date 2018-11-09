@@ -16,6 +16,7 @@ extern "C" {
 #define NX_PRINT_PREFIX "deepstream::Engine::"
 #include <nx/kit/debug.h>
 #include <nx/gstreamer/gstreamer_common.h>
+#include <nx/sdk/common/string.h>
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -87,26 +88,32 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void Engine::setSettings(const nxpl::Setting *settings, int count)
+void Engine::setSettings(const nx::sdk::Settings* settings)
 {
     NX_OUTPUT << __func__ << " Received " << m_plugin->name() << " settings:";
     NX_OUTPUT << "{";
+
+    const auto count = settings->count();
     for (int i = 0; i < count; ++i)
     {
-        NX_OUTPUT << "    " << settings[i].name
-            << ": " << settings[i].value
+        NX_OUTPUT << "    " << settings->key(i)
+            << ": " << settings->value(i)
             << ((i < count - 1) ? "," : "");
     }
     NX_OUTPUT << "}";
 }
 
+nx::sdk::Settings* Engine::settings() const
+{
+    return nullptr;
+}
 
-const char* Engine::manifest(Error* error) const
+const nx::sdk::IString* Engine::manifest(Error* error) const
 {
     *error = Error::noError;
 
     if (!m_manifest.empty())
-        return m_manifest.c_str();
+        return new common::String(m_manifest);
 
     std::string objectTypesManifest;
     if (ini().pipelineType == kOpenAlprPipeline)
@@ -144,7 +151,7 @@ const char* Engine::manifest(Error* error) const
 }
 )json";
 
-    return m_manifest.c_str();
+    return new common::String(m_manifest);
 }
 
 nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
@@ -271,11 +278,26 @@ std::string Engine::buildManifestObectTypeString(const ObjectClassDescription& d
 } // namespace mediaserver_plugins
 } // namespace nx
 
+namespace {
+
+static const std::string kLibName = "deepstream_analytics_plugin";
+static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
+{
+    "id": "nx.deepstream",
+    "name": "DeepStream analytics plugin",
+    "engineSettingsModel": ""
+}
+)json";
+
+} // namespace
+
 extern "C" {
 
 NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
-    return new nx::sdk::analytics::CommonPlugin("deepstream_analytics_plugin",
+    return new nx::sdk::analytics::CommonPlugin(
+        kLibName,
+        kPluginManifest,
         [](nx::sdk::analytics::Plugin* plugin)
         {
             return new nx::mediaserver_plugins::analytics::deepstream::Engine(

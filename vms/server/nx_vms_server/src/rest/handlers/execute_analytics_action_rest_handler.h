@@ -5,6 +5,7 @@
 #include "nx/vms/api/analytics/engine_manifest.h"
 #include "api/model/analytics_actions.h"
 #include <nx/mediaserver/server_module_aware.h>
+#include <nx/mediaserver/sdk_support/loggers.h>
 
 class QnExecuteAnalyticsActionRestHandler:
     public QnJsonRestHandler,
@@ -25,4 +26,7 @@ private:
         AnalyticsActionResult* outActionResult,
         nx::sdk::analytics::Engine* plugin,
         const AnalyticsAction& actionData);
+
+    std::unique_ptr<nx::mediaserver::sdk_support::AbstractManifestLogger> makeLogger(
+        nx::mediaserver::resource::AnalyticsEngineResourcePtr engineResource) const;
 };

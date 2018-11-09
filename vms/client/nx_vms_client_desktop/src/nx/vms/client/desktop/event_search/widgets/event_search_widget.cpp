@@ -17,11 +17,15 @@
 #include <nx/vms/client/desktop/event_search/models/event_search_list_model.h>
 #include <nx/utils/string.h>
 #include <nx/vms/event/event_fwd.h>
-#include <nx/vms/event/analytics_helper.h>
 #include <nx/vms/event/strings_helper.h>
+
+#include <nx/analytics/descriptor_list_manager.h>
+#include <nx/vms/api/analytics/descriptors.h>
+#include <common/common_module.h>
 
 namespace nx::vms::client::desktop {
 
+namespace analytics_api = nx::vms::api::analytics;
 // ------------------------------------------------------------------------------------------------
 // EventSearchWidget::Private
 
@@ -50,11 +54,11 @@ private:
     QAction* m_analyticsEventsSubmenuAction = nullptr;
     QAction* m_analyticsEventsSingleAction = nullptr;
 
-    using EventDescriptorList = QList<nx::vms::event::AnalyticsHelper::EventTypeDescriptor>;
+    using EventTypeDescriptors = std::map<QString, analytics_api::EventTypeDescriptor>;
     struct PluginInfo
     {
         QString name;
-        EventDescriptorList eventTypes;
+        EventTypeDescriptors eventTypes;
 
         bool operator<(const PluginInfo& other) const
         {
@@ -235,30 +239,38 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
     {
         using namespace nx::vms::event;
 
-        const auto allAnalyticsEvents =
-            AnalyticsHelper(q->commonModule()).systemSupportedAnalyticsEvents();
+        const auto descriptorListManager = q->commonModule()->analyticsDescriptorListManager();
+        const auto allAnalyticsEvents = descriptorListManager
+            ->allDescriptorsInTheSystem<analytics_api::EventTypeDescriptor>();
+
+        const auto allAnalyticsPlugins = descriptorListManager
+            ->allDescriptorsInTheSystem<analytics_api::PluginDescriptor>();
 
         analyticsMenu->clear();
 
         if (!allAnalyticsEvents.empty())
         {
-            QList<PluginInfo> plugins;
-            QHash<QString, int> pluginIndexById;
-
-            const auto locale = qnRuntime->locale();
-
-            for (const auto& descriptor: allAnalyticsEvents)
+            QHash<QString, PluginInfo> pluginsById;
+            for (const auto& entry: allAnalyticsPlugins)
             {
-                int index = pluginIndexById.value(descriptor.pluginId, -1);
-                if (index < 0)
-                {
-                    index = plugins.size();
-                    pluginIndexById[descriptor.pluginId] = index;
-                    plugins.push_back({descriptor.pluginName.text(locale), {}});
-                }
+                const auto& pluginId = entry.first;
+                const auto& descriptor = entry.second;
 
-                plugins[index].eventTypes.push_back(descriptor);
+                pluginsById[pluginId].name = descriptor.name;
             }
+
+            for (const auto& entry: allAnalyticsEvents)
+            {
+                const auto& eventId = entry.first;
+                const auto& descriptor = entry.second;
+
+                for (const auto& path: descriptor.paths)
+                    pluginsById[path.pluginId].eventTypes.insert(entry);
+            }
+
+            QList<PluginInfo> plugins;
+            for (const auto& pluginInfo: pluginsById)
+                plugins.push_back(pluginInfo);
 
             std::sort(plugins.begin(), plugins.end());
             const bool severalPlugins = plugins.size() > 1;
@@ -278,18 +290,19 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
                     currentMenu = analyticsMenu->addMenu(pluginName);
                 }
 
-                for (const auto eventType: plugin.eventTypes)
+                for (const auto entry: plugin.eventTypes)
                 {
-                    addMenuAction(currentMenu, eventType.name.text(locale),
-                        EventType::analyticsSdkEvent, eventType.id);
+                    const auto& eventType = entry.second;
+                    addMenuAction(currentMenu,
+                        eventType.item.name.value,
+                        EventType::analyticsSdkEvent, eventType.getId());
 
-                    if (!currentSelectionStillAvailable && currentSelection == eventType.id)
+                    if (!currentSelectionStillAvailable && currentSelection == eventType.getId())
                         currentSelectionStillAvailable = true;
                 }
             }
 
             analyticsMenu->addSeparator();
-
             addMenuAction(analyticsMenu, tr("Any analytics event"),
                 EventType::analyticsSdkEvent, {});
         }

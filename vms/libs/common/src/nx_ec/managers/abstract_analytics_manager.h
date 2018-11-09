@@ -75,7 +75,7 @@ public:
     ErrorCode getAnalyticsEnginesSync(
         nx::vms::api::AnalyticsEngineDataList* const outAnalyticsEnginesList)
     {
-        return impl::doSyncCall < impl::GetAnalyticsEnginesHandler > (
+        return impl::doSyncCall<impl::GetAnalyticsEnginesHandler>(
             [this](impl::GetAnalyticsEnginesHandlerPtr handler)
             {
                 this->getAnalyticsEngines(handler);
@@ -117,6 +117,26 @@ public:
                     target,
                     handler)));
     }
+
+    ErrorCode saveSync(const nx::vms::api::AnalyticsPluginData& plugin)
+    {
+        return impl::doSyncCall<impl::SimpleHandler>(
+            [this, plugin](impl::SimpleHandlerPtr handler)
+            {
+                this->save(plugin, handler);
+            });
+    }
+
+    ErrorCode saveSync(const nx::vms::api::AnalyticsEngineData& engine)
+    {
+        return impl::doSyncCall<impl::SimpleHandler>(
+            [this, engine](impl::SimpleHandlerPtr handler)
+            {
+                this->save(engine, handler);
+            });
+    }
+
+    // TODO: #dmishin add methods to save and remove lists of pluigns and engines.
 
     /**
      * @param handler Functor with params: (ErrorCode)

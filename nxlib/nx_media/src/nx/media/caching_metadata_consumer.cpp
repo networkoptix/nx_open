@@ -10,24 +10,11 @@
 
 #include <nx/media/ini.h>
 
-namespace nx {
-namespace media {
+namespace nx::media {
+
+using namespace std::chrono;
 
 namespace {
-
-bool metadataContainsTime(const QnAbstractCompressedMetadataPtr& metadata, const qint64 timestamp)
-{
-    const auto allowedDelay = (metadata->metadataType == MetadataType::ObjectDetection)
-        ? ini().allowedAnalyticsMetadataDelayMs * 1000
-        : 0;
-
-    const auto duration = metadata->duration() + allowedDelay;
-
-    if (duration == 0)
-        return timestamp == metadata->timestamp;
-
-    return timestamp >= metadata->timestamp && timestamp < metadata->timestamp + duration;
-}
 
 class MetadataCache
 {
@@ -65,37 +52,28 @@ public:
         if (m_metadataByTimestamp.isEmpty())
             return {};
 
-        // Check metadata at lower_bound first (will match when only when timestamps are
-        // equal). Then if it fails check the previous item (may match by duration). Since
-        // we check the previous item anyway we can exclude the first item from
-        // lower_bound. Thus explicit check for possibility to decrement the iterator
-        // can be omitted.
+        QList<QnAbstractCompressedMetadataPtr> result;
 
-        auto startIt = std::lower_bound(
-            std::next(m_metadataByTimestamp.keyBegin()),
+        auto it = std::lower_bound(
+            m_metadataByTimestamp.keyBegin(),
             m_metadataByTimestamp.keyEnd(),
             startTimestamp).base();
 
-        if (startIt == m_metadataByTimestamp.end() || startTimestamp < (*startIt)->timestamp)
+        if (it.key() > startTimestamp && it != m_metadataByTimestamp.begin())
         {
-            --startIt;
-            if (!metadataContainsTime(*startIt, startTimestamp))
-                ++startIt;
+            --it;
+            if ((*it)->duration() > 0 && it.key() + (*it)->duration() < startTimestamp)
+                ++it;
         }
 
-        QList<QnAbstractCompressedMetadataPtr> result;
-
-        auto itemsLeft = maxCount;
-        auto it = startIt;
-        while (itemsLeft != 0 && it != m_metadataByTimestamp.end()
+        while (maxCount > 0 && it != m_metadataByTimestamp.end()
             && (*it)->timestamp < endTimestamp)
         {
-            NX_ASSERT(*it, "Metadata cache should not hold null metadata pointers.");
-            if (*it)
+            if (NX_ASSERT(*it, "Metadata cache should not hold null metadata pointers."))
                 result.append(*it);
 
             ++it;
-            --itemsLeft;
+            --maxCount;
         }
 
         return result;
@@ -119,8 +97,7 @@ private:
         const auto it = m_metadataByTimestamp.find(metadata->timestamp);
         // Check the value equality is necessary because the stored value can be replaced by
         // other metadata with the same timestamp.
-        NX_ASSERT(it != m_metadataByTimestamp.end());
-        if (it != m_metadataByTimestamp.end() && *it == metadata)
+        if (NX_ASSERT(it != m_metadataByTimestamp.end()) && *it == metadata)
             m_metadataByTimestamp.erase(it);
     }
 
@@ -179,7 +156,7 @@ void CachingMetadataConsumer::setCacheSize(size_t cacheSize)
 }
 
 QnAbstractCompressedMetadataPtr CachingMetadataConsumer::metadata(
-    qint64 timestamp, int channel) const
+    microseconds timestamp, int channel) const
 {
     if (channel >= d->cachePerChannel.size())
         return QnAbstractCompressedMetadataPtr();
@@ -188,11 +165,14 @@ QnAbstractCompressedMetadataPtr CachingMetadataConsumer::metadata(
     if (!cache)
         return QnAbstractCompressedMetadataPtr();
 
-    return cache->findMetadata(timestamp);
+    return cache->findMetadata(timestamp.count());
 }
 
 QList<QnAbstractCompressedMetadataPtr> CachingMetadataConsumer::metadataRange(
-    qint64 startTimestamp, qint64 endTimestamp, int channel, int maximumCount) const
+    microseconds startTimestamp,
+    microseconds endTimestamp,
+    int channel,
+    int maximumCount) const
 {
     if (channel >= d->cachePerChannel.size())
         return QList<QnAbstractCompressedMetadataPtr>();
@@ -201,7 +181,7 @@ QList<QnAbstractCompressedMetadataPtr> CachingMetadataConsumer::metadataRange(
     if (!cache)
         return QList<QnAbstractCompressedMetadataPtr>();
 
-    return cache->findMetadataInRange(startTimestamp, endTimestamp, maximumCount);
+    return cache->findMetadataInRange(startTimestamp.count(), endTimestamp.count(), maximumCount);
 }
 
 void CachingMetadataConsumer::processMetadata(const QnAbstractCompressedMetadataPtr& metadata)
@@ -217,5 +197,4 @@ void CachingMetadataConsumer::processMetadata(const QnAbstractCompressedMetadata
     cache->insertMetadata(metadata);
 }
 
-} // namespace media
-} // namespace nx
+} // namespace nx::media

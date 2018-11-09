@@ -50,6 +50,8 @@
 #include <core/resource_management/camera_driver_restriction_list.h>
 #include <core/resource_management/resource_data_pool.h>
 
+#include <nx/analytics/descriptor_list_manager.h>
+
 using namespace nx;
 
 namespace {
@@ -200,6 +202,8 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_moduleInformation.realm = nx::network::AppInfo::realm();
 
     m_dataPool = instance<QnResourceDataPool>();
+
+    m_analyticsDescriptorListManager = new nx::analytics::DescriptorListManager(this);
 }
 
 void QnCommonModule::setModuleGUID(const QnUuid& guid)
@@ -537,4 +541,9 @@ CameraDriverRestrictionList* QnCommonModule::cameraDriverRestrictionList() const
 QnResourceDataPool* QnCommonModule::dataPool() const
 {
     return m_dataPool;
+}
+
+nx::analytics::DescriptorListManager* QnCommonModule::analyticsDescriptorListManager() const
+{
+    return m_analyticsDescriptorListManager;
 }

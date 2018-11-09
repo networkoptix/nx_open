@@ -7,6 +7,8 @@
 #define NX_PRINT_PREFIX "[hanwha::DeviceAgent] "
 #include <nx/kit/debug.h>
 
+#include <nx/sdk/common/string.h>
+
 #include <nx/sdk/analytics/common_event.h>
 #include <nx/sdk/analytics/common_metadata_packet.h>
 #include <nx/utils/log/log.h>
@@ -54,12 +56,29 @@ nx::sdk::Error DeviceAgent::setMetadataHandler(MetadataHandler* metadataHandler)
     return Error::noError;
 }
 
-void DeviceAgent::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
+nx::sdk::Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+{
+    if (metadataTypes->eventTypeIds()->count() == 0)
+    {
+        stopFetchingMetadata();
+        return Error::noError;
+    }
+
+    return startFetchingMetadata(metadataTypes);
+}
+
+void DeviceAgent::setSettings(const nx::sdk::Settings* settings)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-Error DeviceAgent::startFetchingMetadata(const char* const* /*typeList*/, int /*typeListSize*/)
+nx::sdk::Settings* DeviceAgent::settings() const
+{
+    return nullptr;
+}
+
+nx::sdk::Error DeviceAgent::startFetchingMetadata(
+    const nx::sdk::analytics::IMetadataTypes* /*metadataTypes*/)
 {
     const auto monitorHandler =
         [this](const EventList& events)
@@ -114,7 +133,7 @@ Error DeviceAgent::startFetchingMetadata(const char* const* /*typeList*/, int /*
     return Error::noError;
 }
 
-Error DeviceAgent::stopFetchingMetadata()
+void DeviceAgent::stopFetchingMetadata()
 {
     if (m_monitor)
         m_monitor->removeHandler(m_uniqueId);
@@ -124,11 +143,9 @@ Error DeviceAgent::stopFetchingMetadata()
         m_engine->deviceAgentStoppedToUseMonitor(m_sharedId);
 
     m_monitor = nullptr;
-
-    return Error::noError;
 }
 
-const char* DeviceAgent::manifest(Error* error)
+const IString* DeviceAgent::manifest(Error* error) const
 {
     if (m_deviceAgentManifest.isEmpty())
     {
@@ -137,11 +154,7 @@ const char* DeviceAgent::manifest(Error* error)
     }
 
     *error = Error::noError;
-    return m_deviceAgentManifest.constData();
-}
-
-void DeviceAgent::freeManifest(const char* data)
-{
+    return new common::String(m_deviceAgentManifest);
 }
 
 void DeviceAgent::setDeviceInfo(const nx::sdk::DeviceInfo& deviceInfo)

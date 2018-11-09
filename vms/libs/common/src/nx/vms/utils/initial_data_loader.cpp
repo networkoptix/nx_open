@@ -308,6 +308,36 @@ void loadResourcesFromEcs(
             messageProcessor->on_licenseChanged(license);
     }
 
+    {
+        // Load analytics plugins and engines.
+        nx::vms::api::AnalyticsPluginDataList pluginList;
+        auto analyticsManager = ec2Connection->getAnalyticsManager(Qn::kSystemAccess);
+
+        while ((rez = analyticsManager->getAnalyticsPluginsSync(&pluginList)) != ec2::ErrorCode::ok)
+        {
+            qDebug() << "Can't get analytics plugin resource list. Reason: " << ec2::toString(rez);
+            std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
+            if (needToStop())
+                return;
+        }
+
+        for (const auto &plugin: pluginList)
+            messageProcessor->updateResource(plugin, ec2::NotificationSource::Local);
+
+        nx::vms::api::AnalyticsEngineDataList engineList;
+        while ((rez = analyticsManager->getAnalyticsEnginesSync(&engineList)) != ec2::ErrorCode::ok)
+        {
+            qDebug() << "Can't get analytics engine resource list. Reason: " << ec2::toString(rez);
+            std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
+            if (needToStop())
+                return;
+        }
+
+        for (const auto &engine: engineList)
+            messageProcessor->updateResource(engine, ec2::NotificationSource::Local);
+
+    }
+
 }
 
 } // namespace utils

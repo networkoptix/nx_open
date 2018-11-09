@@ -9,6 +9,7 @@
 
 #include <nx/fusion/serialization/json.h>
 
+#include <nx/sdk/common/string.h>
 #include <nx/sdk/analytics/common_event.h>
 #include <nx/sdk/analytics/common_metadata_packet.h>
 
@@ -443,7 +444,21 @@ nx::sdk::Error DeviceAgent::setMetadataHandler(
     return nx::sdk::Error::noError;
 }
 
-nx::sdk::Error DeviceAgent::startFetchingMetadata(const char* const* typeList, int typeListSize)
+
+nx::sdk::Error DeviceAgent::setNeededMetadataTypes(
+    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
+{
+    if (metadataTypes->isNull())
+    {
+        stopFetchingMetadata();
+        return nx::sdk::Error::noError;
+    }
+
+    return startFetchingMetadata(metadataTypes);
+}
+
+nx::sdk::Error DeviceAgent::startFetchingMetadata(
+    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
 {
     QString host = m_url.host();
     nx::vca::CameraController vcaCameraConrtoller(host, m_auth.user(), m_auth.password());
@@ -452,9 +467,10 @@ nx::sdk::Error DeviceAgent::startFetchingMetadata(const char* const* typeList, i
     if (error != nx::sdk::Error::noError)
         return error;
 
-    for (int i = 0; i < typeListSize; ++i)
+    const auto eventTypeIds = metadataTypes->eventTypeIds();
+    for (int i = 0; i < eventTypeIds->count(); ++i)
     {
-        QString id = typeList[i];
+        QString id(eventTypeIds->at(i));
         const EventType* eventType = m_engine->eventTypeById(id);
         if (!eventType)
             NX_PRINT << "Unknown event type. TypeId = " << id.toStdString() << ".";
@@ -504,7 +520,7 @@ nx::sdk::Error DeviceAgent::stopFetchingMetadata()
     return nx::sdk::Error::noError;
 }
 
-const char* DeviceAgent::manifest(nx::sdk::Error* error)
+const nx::sdk::IString* DeviceAgent::manifest(nx::sdk::Error* error) const
 {
     // If camera has no enabled events at the moment, return empty manifest.
     QString host = m_url.host();
@@ -516,14 +532,19 @@ const char* DeviceAgent::manifest(nx::sdk::Error* error)
     for (const auto& rule: vcaCameraConrtoller.suppotedRules())
     {
         if (rule.second.ruleEnabled) //< At least one enabled rule.
-            return m_cameraManifest;
+            return new nx::sdk::common::String(m_cameraManifest);
     }
-    return "";
+    return new nx::sdk::common::String();
 }
 
-void DeviceAgent::freeManifest(const char* /*data*/)
+void DeviceAgent::setSettings(const nx::sdk::Settings* settings)
 {
-    // Do nothing. Manifest string is stored in member-variable.
+    // There are no DeviceAgent settings for this plugin.
+}
+
+nx::sdk::Settings* DeviceAgent::settings() const
+{
+    return nullptr;
 }
 
 } // namespace vca

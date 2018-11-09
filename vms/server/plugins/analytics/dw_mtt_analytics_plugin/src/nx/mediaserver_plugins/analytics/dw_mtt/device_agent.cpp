@@ -15,6 +15,8 @@
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 
+#include <nx/sdk/common/string.h>
+
 #include <nx/sdk/analytics/common_event.h>
 #include <nx/sdk/analytics/common_event_metadata_packet.h>
 
@@ -403,16 +405,37 @@ QByteArray DeviceAgent::extractRequestFromBuffer()
     return request;
 }
 
-nx::sdk::Error DeviceAgent::startFetchingMetadata(const char* const* typeList, int typeListSize)
+nx::sdk::Error DeviceAgent::setMetadataHandler(
+    nx::sdk::analytics::MetadataHandler* metadataHandler)
+{
+    m_metadataHandler = metadataHandler;
+    return nx::sdk::Error::noError;
+}
+
+nx::sdk::Error DeviceAgent::setNeededMetadataTypes(
+    const sdk::analytics::IMetadataTypes* metadataTypes)
+{
+    if (metadataTypes->eventTypeIds()->count() == 0)
+    {
+        stopFetchingMetadata();
+        return sdk::Error::noError;
+    }
+
+    return startFetchingMetadata(metadataTypes);
+}
+
+nx::sdk::Error DeviceAgent::startFetchingMetadata(
+    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
 {
     const QByteArray host = m_url.host().toLatin1();
     m_cameraController.setIp(m_url.host().toLatin1());
     m_cameraController.setCredentials(m_auth.user().toLatin1(), m_auth.password().toLatin1());
 
     // Assuming that the list contains only events, since this plugin does not produce objects.
-    for (int i = 0; i < typeListSize; ++i)
+    const auto eventTypeList = metadataTypes->eventTypeIds();
+    for (int i = 0; i < eventTypeList->count(); ++i)
     {
-        const QString id = typeList[i];
+        const QString id(eventTypeList->at(i));
         const EventType* eventType = m_engine->eventTypeById(id);
         if (!eventType)
             NX_URL_PRINT << "Unknown event type. TypeId = " << id.toStdString();
@@ -443,14 +466,7 @@ nx::sdk::Error DeviceAgent::startFetchingMetadata(const char* const* typeList, i
     return nx::sdk::Error::noError;
 }
 
-nx::sdk::Error DeviceAgent::setMetadataHandler(
-    nx::sdk::analytics::MetadataHandler* metadataHandler)
-{
-    m_metadataHandler = metadataHandler;
-    return nx::sdk::Error::noError;
-}
-
-nx::sdk::Error DeviceAgent::stopFetchingMetadata()
+void DeviceAgent::stopFetchingMetadata()
 {
     m_terminated = true;
     nx::utils::promise<void> promise;
@@ -471,21 +487,21 @@ nx::sdk::Error DeviceAgent::stopFetchingMetadata()
             promise.set_value();
         });
     promise.get_future().wait();
-    return nx::sdk::Error::noError;
 }
 
-const char* DeviceAgent::manifest(nx::sdk::Error* error)
+const nx::sdk::IString* DeviceAgent::manifest(nx::sdk::Error* error) const
 {
-    return m_cameraManifest;
+    return new nx::sdk::common::String(m_cameraManifest);
 }
 
-void DeviceAgent::freeManifest(const char* /*data*/)
+void DeviceAgent::setSettings(const nx::sdk::Settings* settings)
 {
-    // Do nothing. Manifest string is stored in member-variable.
+    // There are no DeviceAgent settings for this plugin.
 }
 
-void DeviceAgent::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
+nx::sdk::Settings* DeviceAgent::settings() const
 {
+    return nullptr;
 }
 
 } // namespace dw_mtt

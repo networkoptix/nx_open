@@ -104,9 +104,15 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
     if (params.contains(lit("objectAppearanceId")))
         filter->objectAppearanceId = QnUuid::fromStringSafe(params.value(lit("objectAppearanceId")));
 
-    filter->timePeriod = QnTimePeriod::fromInterval(
-        QnLexical::deserialized<qint64>(params.value(lit("startTime"))),
-        QnLexical::deserialized<qint64>(params.value(lit("endTime"))));
+    filter->timePeriod.setStartTime(
+        std::chrono::milliseconds(params.value("startTime").toLongLong()));
+    filter->timePeriod.setDuration(
+        std::chrono::milliseconds(QnTimePeriod::infiniteDuration()));
+    if (params.contains("endTime"))
+    {
+        filter->timePeriod.setEndTime(
+            std::chrono::milliseconds(params.value("endTime").toLongLong()));
+    }
 
     QnLexical::deserialize(params.value(lit("sortOrder")), &filter->sortOrder);
 

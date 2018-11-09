@@ -26,7 +26,8 @@ ConsumingMotionMetadataProvider::ConsumingMotionMetadataProvider():
 {
 }
 
-MetaDataV1Ptr ConsumingMotionMetadataProvider::metadata(const qint64 timestamp, int channel) const
+MetaDataV1Ptr ConsumingMotionMetadataProvider::metadata(
+    const std::chrono::microseconds timestamp, int channel) const
 {
     return std::dynamic_pointer_cast<QnMetaDataV1>(
         d->metadataConsumer->metadata(timestamp, channel));

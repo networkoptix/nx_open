@@ -10,7 +10,7 @@ enum EventTypeFlag
 {
     noFlags = 0,
     stateDependent = 1 << 0, //< Prolonged event with active and non-active states.
-    regionDependent = 1 << 1, //< Event has reference to a region.
+    regionDependent = 1 << 1, //< Event has reference to a region on a video frame.
 };
 Q_DECLARE_FLAGS(EventTypeFlags, EventTypeFlag)
 

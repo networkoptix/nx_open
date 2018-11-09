@@ -2,6 +2,8 @@
 
 #include <plugins/plugin_tools.h>
 
+#include <nx/sdk/common/string.h>
+
 #include <nx/sdk/analytics/compressed_video_packet.h>
 #include <nx/sdk/analytics/common_metadata_packet.h>
 
@@ -59,21 +61,27 @@ void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void DeviceAgent::setSettings(const nxpl::Setting *settings, int count)
+void DeviceAgent::setSettings(const nx::sdk::Settings* settings)
 {
-    NX_OUTPUT << __func__ << " Received DeviceAgent settings:";
+    NX_OUTPUT << __func__ << " Received  settings:";
     NX_OUTPUT << "{";
+
+    const auto count = settings->count();
     for (int i = 0; i < count; ++i)
     {
-        NX_OUTPUT << "    \"" << settings[i].name
-            << "\": \"" << settings[i].value << "\""
+        NX_OUTPUT << "    " << settings->key(i)
+            << ": " << settings->value(i)
             << ((i < count - 1) ? "," : "");
     }
     NX_OUTPUT << "}";
-
 }
 
-Error DeviceAgent::setMetadataHandler(MetadataHandler* metadataHandler)
+nx::sdk::Settings* DeviceAgent::settings() const
+{
+    return nullptr;
+}
+
+nx::sdk::Error DeviceAgent::setMetadataHandler(MetadataHandler* metadataHandler)
 {
     NX_OUTPUT << __func__ << " Setting metadata handler";
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -86,13 +94,6 @@ Error DeviceAgent::setMetadataHandler(MetadataHandler* metadataHandler)
         });
 
     NX_OUTPUT << __func__ << "() END -> noError";
-    return Error::noError;
-}
-
-Error DeviceAgent::startFetchingMetadata(
-    const char* const* /*typeList*/, int /*typeListSize*/)
-{
-    NX_OUTPUT << __func__ << " Starting to fetch metadata. Doing nothing, actually...";
     return Error::noError;
 }
 
@@ -116,18 +117,36 @@ nx::sdk::Error DeviceAgent::pushDataPacket(nx::sdk::analytics::DataPacket* dataP
     return Error::noError;
 }
 
-Error DeviceAgent::stopFetchingMetadata()
+nx::sdk::Error DeviceAgent::setNeededMetadataTypes(
+    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
 {
-    NX_OUTPUT << __func__ << " Stopping to fetch metadata. Doing nothing, actually...";
+    if (metadataTypes->isNull())
+    {
+        stopFetchingMetadata();
+        return nx::sdk::Error::noError;
+    }
+
+    return startFetchingMetadata(metadataTypes);
+}
+
+nx::sdk::Error DeviceAgent::startFetchingMetadata(
+    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
+{
+    NX_OUTPUT << __func__ << " Starting to fetch metadata. Doing nothing, actually...";
     return Error::noError;
 }
 
-const char* DeviceAgent::manifest(Error* error)
+void DeviceAgent::stopFetchingMetadata()
+{
+    NX_OUTPUT << __func__ << " Stopping to fetch metadata. Doing nothing, actually...";
+}
+
+const nx::sdk::IString* DeviceAgent::manifest(Error* error) const
 {
     *error = Error::noError;
 
     if (!m_manifest.empty())
-        return m_manifest.c_str();
+        return new nx::sdk::common::String(m_manifest);
 
     std::string objectTypeIds;
     const auto& objectClassDescritions = m_engine->objectClassDescritions();
@@ -138,7 +157,7 @@ const char* DeviceAgent::manifest(Error* error)
     }
     else
     {
-        for (auto i = 0; i < objectClassDescritions.size(); ++i)
+        for (std::size_t i = 0; i < objectClassDescritions.size(); ++i)
         {
             objectTypeIds += kIndent + "\"" + objectClassDescritions[i].typeId + "\"";
 
@@ -155,12 +174,7 @@ const char* DeviceAgent::manifest(Error* error)
 }
 )json";
 
-    return m_manifest.c_str();
-}
-
-void DeviceAgent::freeManifest(const char* data)
-{
-    NX_OUTPUT << __func__ << " Freeing manifest, doing nothing actually...";
+    return new nx::sdk::common::String(m_manifest);
 }
 
 DeviceAgent::~DeviceAgent()

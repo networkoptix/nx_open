@@ -1,9 +1,5 @@
 {
-    "pluginId": "nx.axis", 
-    "pluginName": {
-        "value": "Axis driver", 
-        "localization": {}
-    }, 
+    "capabilities": "deviceModelDependent",
     "allowedTopics": [
         "tns1:RuleEngine", 
         "tns1:VideoSource", 
@@ -12,7 +8,7 @@
     "forbiddenDescriptions": [
         "xinternal_data"
     ], 
-    "outputEventTypes": [
+    "eventTypes": [
         {
             "id": "nx.axis.tns1:VideoSource/tnsaxis:Tampering", 
             "name": {

@@ -426,6 +426,20 @@ void CameraSettingsDialogStore::setEnabledAnalyticsEngines(const QSet<QnUuid>& v
         [&](State state) { return Reducer::setEnabledAnalyticsEngines(std::move(state), value); });
 }
 
+bool CameraSettingsDialogStore::analyticsSettingsLoading() const
+{
+    return d->state.analytics.loading;
+}
+
+void CameraSettingsDialogStore::setAnalyticsSettingsLoading(bool value)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            return Reducer::setAnalyticsSettingsLoading(std::move(state), value);
+        });
+}
+
 void CameraSettingsDialogStore::setEnabledAnalyticsEngines(const QVariantList& value)
 {
     setEnabledAnalyticsEngines(fromVariantList<QList<QnUuid>>(value).toSet());
@@ -443,6 +457,16 @@ void CameraSettingsDialogStore::setDeviceAgentSettingsValues(
         [&](State state)
         {
             return Reducer::setDeviceAgentSettingsValues(std::move(state), engineId, values);
+        });
+}
+
+void CameraSettingsDialogStore::resetDeviceAgentSettingsValues(
+    const QnUuid& engineId, const QVariantMap& values)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            return Reducer::resetDeviceAgentSettingsValues(std::move(state), engineId, values);
         });
 }
 

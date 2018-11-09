@@ -66,12 +66,12 @@ public:
     /**
      * @brief (e.g. vehicle type: truck,  car, etc)
      */
-    virtual NX_ASCII const char* objectSubType() const = 0;
+    virtual const char* objectSubType() const = 0;
 
     /**
      * @brief attributes array of object attributes (e.g. age, color).
      */
-    virtual NX_LOCALE_DEPENDENT const Attribute* attribute(int index) const = 0;
+    virtual const Attribute* attribute(int index) const = 0;
 
     /**
      * @brief attributeCount count of attributes

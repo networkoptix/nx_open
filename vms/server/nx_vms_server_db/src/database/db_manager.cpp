@@ -1942,6 +1942,18 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith("/99_20180914_rename_preferred_preset_type.sql"))
         return resyncIfNeeded(ResyncCameraAttributes);
 
+    if (updateName.endsWith(lit("99_20181018_add_analytics_resource_types.sql")))
+    {
+        // TODO: This is really weird method (copied from WebPage)
+        // of inserting fixed resource types - get rid of it.
+        QMap<int, QnUuid> guids = getGuidList(
+            "SELECT rt.id, rt.name || '-' as guid "
+            "FROM vms_resourcetype rt "
+            "WHERE rt.name == 'AnalyticsPlugin' OR rt.name == 'AnalyticsEngine'",
+            CM_MakeHash);
+        return updateTableGuids("vms_resourcetype", "guid", guids);
+    }
+
     if (updateName.endsWith("/99_20181031_rename_smptPassword_parameter.sql"))
         return resyncIfNeeded(ResyncGlobalSettings);
 
@@ -4391,7 +4403,13 @@ ErrorCode QnDbManager::doQueryNoLock(
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
     QString queryString =
-        "SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId "
+        "SELECT "
+            "r.guid as id, "
+            "r.guid, "
+            "r.xtype_guid as typeId, "
+            "r.parent_guid as parentId, "
+            "r.name, "
+            "r.url "
         "FROM vms_resource AS r "
         "WHERE r.xtype_guid = %1 %2 "
         "ORDER BY r.guid";
@@ -4419,7 +4437,13 @@ ErrorCode QnDbManager::doQueryNoLock(
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
     QString queryString =
-        "SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId "
+        "SELECT "
+            "r.guid as id, "
+            "r.guid, "
+            "r.xtype_guid as typeId, "
+            "r.parent_guid as parentId, "
+            "r.name, "
+            "r.url "
         "FROM vms_resource AS r "
         "WHERE r.xtype_guid = %1 %2 "
         "ORDER BY r.guid";

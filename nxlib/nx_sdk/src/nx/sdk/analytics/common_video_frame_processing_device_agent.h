@@ -46,7 +46,7 @@ protected:
         bool enableOutput,
         const std::string& printPrefix = "");
 
-    virtual std::string manifest() = 0;
+    virtual std::string manifest() const = 0;
 
     /**
      * Override to accept next compressed video frame for processing. Should not block the caller
@@ -102,6 +102,18 @@ protected:
      */
     std::string getParamValue(const char* paramName);
 
+    /**
+     * Starts fetching metadata. This method is called from setNeededMetadataTypes. This method
+     * is called from setNeededMetatadatTypes if metadata types list passed to it is empty.
+     */
+    virtual nx::sdk::Error startFetchingMetadata(const IMetadataTypes* metadataTypes);
+
+    /**
+     * Stops fetching metadata. This method is called from setNeededMetatadatTypes if metadata
+     * types list passed to it is empty.
+     */
+    virtual void stopFetchingMetadata();
+
 public:
     virtual ~CommonVideoFrameProcessingDeviceAgent() override;
 
@@ -126,11 +138,10 @@ public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
     virtual Error setMetadataHandler(MetadataHandler* handler) override;
     virtual Error pushDataPacket(DataPacket* dataPacket) override;
-    virtual Error startFetchingMetadata(const char* const* typeList, int typeListSize) override;
-    virtual Error stopFetchingMetadata() override;
-    virtual const char* manifest(Error* error) override;
-    virtual void freeManifest(const char* data) override;
-    virtual void setSettings(const nxpl::Setting* settings, int count) override;
+    virtual Error setNeededMetadataTypes(const IMetadataTypes* metadataTypes) override;
+    virtual const IString* manifest(Error* error) const override;
+    virtual void setSettings(const nx::sdk::Settings* settings) override;
+    virtual nx::sdk::Settings* settings() const override;
 
 private:
     void assertEngineCasted(void* engine) const;

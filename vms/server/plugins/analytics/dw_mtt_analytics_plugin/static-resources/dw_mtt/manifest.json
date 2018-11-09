@@ -1,9 +1,5 @@
 {
-    "pluginId": "nx.dw_mtt", 
-    "pluginName": {
-        "value": "DW_MTT driver", 
-        "localization": {}
-    }, 
+    "capabilities": "deviceModelDependent",
     "supportedCameraModels": [
         "DWC-MVT4Wi28", 
         "DWC-MVT4Wi36", 
@@ -16,7 +12,7 @@
         "DWC-MTT4Wi6", 
         "DWC-MTT4WiA"
     ], 
-    "outputEventTypes": [
+    "eventTypes": [
         {
             "id": "nx.dw_mtt.MOTION", 
             "name": {
