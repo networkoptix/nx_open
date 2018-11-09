@@ -38,6 +38,7 @@ public:
     QnNetworkProxyFactory* networkProxyFactory() const;
     QnCloudStatusWatcher* cloudStatusWatcher() const;
     QnCameraDataManager* cameraDataManager() const;
+    QnClientCoreModule* clientCoreModule() const;
 
     nx::vms::client::desktop::RadassController* radassController() const;
 

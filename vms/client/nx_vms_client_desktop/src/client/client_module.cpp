@@ -708,6 +708,11 @@ QnCameraDataManager* QnClientModule::cameraDataManager() const
     return m_cameraDataManager;
 }
 
+QnClientCoreModule* QnClientModule::clientCoreModule() const
+{
+    return m_clientCoreModule.data();
+}
+
 nx::vms::client::desktop::RadassController* QnClientModule::radassController() const
 {
     return m_radassController;

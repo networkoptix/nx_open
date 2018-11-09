@@ -4,8 +4,10 @@
 #include <QtCore/QList>
 
 #include <client/client_globals.h>
-#include <client_core/connection_context_aware.h>
+
 #include <common/common_globals.h>
+#include <common/common_module_aware.h>
+
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
 #include <utils/common/connective.h>
@@ -33,14 +35,14 @@ private:
  */
 class NX_VMS_DESKTOP_CLIENT_API QnWorkbenchAccessController:
     public Connective<QObject>,
-    public QnConnectionContextAware
+    public QnCommonModuleAware
 {
     Q_OBJECT
 
     typedef Connective<QObject> base_type;
 
 public:
-    QnWorkbenchAccessController(QObject* parent = nullptr);
+    QnWorkbenchAccessController(QnCommonModule* commonModule, QObject* parent = nullptr);
     virtual ~QnWorkbenchAccessController();
 
     QnUserResourcePtr user() const;

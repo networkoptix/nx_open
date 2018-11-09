@@ -27,8 +27,12 @@ QnWorkbenchPermissionsNotifier::QnWorkbenchPermissionsNotifier(QObject* parent) 
 {
 }
 
-QnWorkbenchAccessController::QnWorkbenchAccessController(QObject* parent) :
+QnWorkbenchAccessController::QnWorkbenchAccessController(
+    QnCommonModule* commonModule,
+    QObject* parent)
+    :
     base_type(parent),
+    QnCommonModuleAware(commonModule),
     m_user()
 {
     connect(resourcePool(), &QnResourcePool::resourceAdded, this,

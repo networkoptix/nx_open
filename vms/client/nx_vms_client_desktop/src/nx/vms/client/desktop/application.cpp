@@ -51,6 +51,8 @@
 #include <client/client_startup_parameters.h>
 #include <client/self_updater.h>
 
+#include <client_core/client_core_module.h>
+
 #include <nx/media/decoder_registrar.h>
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
@@ -165,7 +167,8 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
     qApp->installEventFilter(&helpHandler);
 
     /* Create workbench context. */
-    QScopedPointer<QnWorkbenchAccessController> accessController(new QnWorkbenchAccessController());
+    QScopedPointer<QnWorkbenchAccessController> accessController(
+        new QnWorkbenchAccessController(client.clientCoreModule()->commonModule()));
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(accessController.data()));
 
     #if defined(Q_OS_LINUX)
