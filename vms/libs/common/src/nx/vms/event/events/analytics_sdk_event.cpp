@@ -10,8 +10,6 @@ namespace nx {
 namespace vms {
 namespace event {
 
-namespace analytics_api = nx::vms::api::analytics;
-
 AnalyticsSdkEvent::AnalyticsSdkEvent(
     const QnResourcePtr& resource,
     const QString& pluginId,
@@ -65,7 +63,7 @@ bool AnalyticsSdkEvent::checkEventParams(const EventParameters& params) const
 
     auto descriptorListManager = getResource()->commonModule()->analyticsDescriptorListManager();
     const auto descriptor = descriptorListManager
-        ->descriptor<analytics_api::EventTypeDescriptor>(m_eventTypeId);
+        ->descriptor<nx::vms::api::analytics::EventTypeDescriptor>(m_eventTypeId);
 
     if (!descriptor)
         return false;

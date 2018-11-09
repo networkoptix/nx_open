@@ -25,7 +25,6 @@
 
 namespace nx::vms::client::desktop {
 
-namespace analytics_api = nx::vms::api::analytics;
 // ------------------------------------------------------------------------------------------------
 // EventSearchWidget::Private
 
@@ -54,7 +53,7 @@ private:
     QAction* m_analyticsEventsSubmenuAction = nullptr;
     QAction* m_analyticsEventsSingleAction = nullptr;
 
-    using EventTypeDescriptors = std::map<QString, analytics_api::EventTypeDescriptor>;
+    using EventTypeDescriptors = std::map<QString, nx::vms::api::analytics::EventTypeDescriptor>;
     struct PluginInfo
     {
         QString name;
@@ -241,10 +240,10 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
 
         const auto descriptorListManager = q->commonModule()->analyticsDescriptorListManager();
         const auto allAnalyticsEvents = descriptorListManager
-            ->allDescriptorsInTheSystem<analytics_api::EventTypeDescriptor>();
+            ->allDescriptorsInTheSystem<nx::vms::api::analytics::EventTypeDescriptor>();
 
         const auto allAnalyticsPlugins = descriptorListManager
-            ->allDescriptorsInTheSystem<analytics_api::PluginDescriptor>();
+            ->allDescriptorsInTheSystem<nx::vms::api::analytics::PluginDescriptor>();
 
         analyticsMenu->clear();
 
