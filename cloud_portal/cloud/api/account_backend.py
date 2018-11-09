@@ -120,6 +120,11 @@ class AccountManager(db.models.Manager):
 
         Account.register(ip, email, password, first_name, last_name)
         user = models.Account.objects.get(email=email)
+        """
+        When an account is created using cloud invites it is disabled because its registration
+        is different from regular users. Once the user has registered their account it is set to
+        active in this function.
+        """
         user.is_active = True
         user.first_name = first_name
         user.last_name = last_name

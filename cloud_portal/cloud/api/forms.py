@@ -94,7 +94,7 @@ class UserInviteFrom(forms.Form):
 
         messages.success(request, "User has been invited to cloud.")
         language_code = Customization.objects.get(name=customization).default_language.code
-        user = Account(email=email, customization=customization, language=language_code, is_active=False, is_staff=True)
+        user = Account(email=email, customization=customization, language=language_code, is_active=False)
         user.save()
         # Password in the encoded email doesnt matter its just a place holder.
         encode_email = base64.b64encode("password:{}".format(email))

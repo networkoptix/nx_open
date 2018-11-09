@@ -1,6 +1,10 @@
 <h1>Hello, </h1>
 
+<p>You have been invited to %PRODUCT_NAME%</p>
+
+{{#message.message}}
 <p>{{ message.message }}</p>
+{{/message.message}}
 
 <p>To view and manage it, please create account on
     <a href="{{ config.portal_url }}">%PRODUCT_NAME%</a>

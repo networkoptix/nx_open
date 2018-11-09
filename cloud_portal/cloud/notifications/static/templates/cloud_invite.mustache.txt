@@ -1,7 +1,11 @@
 Hello,
 
- {{message.message}}
+You have been invited to %PRODUCT_NAME%.
+{{#message.message}}
 
+{{ message.message }}
+
+{{/message.message}}
 To view and manage it, please create account on %PRODUCT_NAME%
 using your current email address and follow further instructions.
 
