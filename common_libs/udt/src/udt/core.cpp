@@ -649,7 +649,7 @@ void CUDT::listen()
         m_multiplexer->m_pSndQueue.get(),
         m_sPollID);
     // if there is already another socket listening on the same port
-    if (rcvQueue().setListener(m_synPacketHandler) < 0)
+    if (!rcvQueue().setListener(m_synPacketHandler))
         throw CUDTException(5, 11, 0);
 
     m_bListening = true;
@@ -1068,8 +1068,6 @@ void CUDT::close()
 
     m_bListening = false;
 
-    if (m_multiplexer && m_synPacketHandler)
-        m_multiplexer->m_pRcvQueue->removeListener(m_synPacketHandler);
     m_synPacketHandler = nullptr;
 
     if (m_multiplexer)

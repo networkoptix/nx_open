@@ -661,82 +661,25 @@ void CRcvUList::update(std::shared_ptr<CUDT> u)
     m_pLast = n;
 }
 
-//
-CHash::CHash(int size):
-    m_pBucket(NULL),
-    m_iHashSize(size)
-{
-    m_pBucket = new CBucket*[size];
+//-------------------------------------------------------------------------------------------------
+// SocketByIdDict
 
-    for (int i = 0; i < size; ++i)
-        m_pBucket[i] = NULL;
+std::shared_ptr<CUDT> SocketByIdDict::lookup(int32_t id)
+{
+    auto it = m_idToSocket.find(id);
+    return it != m_idToSocket.end()
+        ? it->second.lock()
+        : nullptr;
 }
 
-CHash::~CHash()
+void SocketByIdDict::insert(int32_t id, const std::weak_ptr<CUDT>& u)
 {
-    for (int i = 0; i < m_iHashSize; ++i)
-    {
-        CBucket* b = m_pBucket[i];
-        while (NULL != b)
-        {
-            CBucket* n = b->m_pNext;
-            delete b;
-            b = n;
-        }
-    }
-
-    delete[] m_pBucket;
+    m_idToSocket.emplace(id, u);
 }
 
-std::shared_ptr<CUDT> CHash::lookup(int32_t id)
+void SocketByIdDict::remove(int32_t id)
 {
-    // simple hash function (% hash table size); suitable for socket descriptors
-    CBucket* b = m_pBucket[id % m_iHashSize];
-
-    while (NULL != b)
-    {
-        if (id == b->m_iID)
-            return b->m_pUDT;
-        b = b->m_pNext;
-    }
-
-    return NULL;
-}
-
-void CHash::insert(int32_t id, std::shared_ptr<CUDT> u)
-{
-    CBucket* b = m_pBucket[id % m_iHashSize];
-
-    CBucket* n = new CBucket;
-    n->m_iID = id;
-    n->m_pUDT = u;
-    n->m_pNext = b;
-
-    m_pBucket[id % m_iHashSize] = n;
-}
-
-void CHash::remove(int32_t id)
-{
-    CBucket* b = m_pBucket[id % m_iHashSize];
-    CBucket* p = NULL;
-
-    while (NULL != b)
-    {
-        if (id == b->m_iID)
-        {
-            if (NULL == p)
-                m_pBucket[id % m_iHashSize] = b->m_pNext;
-            else
-                p->m_pNext = b->m_pNext;
-
-            delete b;
-
-            return;
-        }
-
-        p = b;
-        b = b->m_pNext;
-    }
+    m_idToSocket.erase(id);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -878,7 +821,6 @@ CRcvQueue::CRcvQueue(
     CTimer* t)
     :
     m_pRcvUList(std::make_unique<CRcvUList>()),
-    m_pHash(std::make_unique<CHash>(hsize)),
     m_pChannel(c),
     m_pTimer(t),
     m_iPayloadSize(payload),
@@ -898,11 +840,10 @@ CRcvQueue::~CRcvQueue()
         m_WorkerThread.join();
 
     m_pRcvUList.reset();
-    m_pHash.reset();
     m_pRendezvousQueue.reset();
 
     // remove all queued messages
-    for (map<int32_t, std::queue<CPacket*> >::iterator i = m_mBuffer.begin(); i != m_mBuffer.end(); ++i)
+    for (auto i = m_mBuffer.begin(); i != m_mBuffer.end(); ++i)
     {
         while (!i->second.empty())
         {
@@ -946,7 +887,7 @@ void CRcvQueue::worker()
             if (ne)
             {
                 m_pRcvUList->insert(ne);
-                m_pHash->insert(ne->socketId(), ne);
+                m_socketByIdDict.insert(ne->socketId(), ne);
             }
         }
 
@@ -976,13 +917,7 @@ void CRcvQueue::worker()
             // ID 0 is for connection request, which should be passed to the listening socket or rendezvous sockets
             if (0 == id)
             {
-                decltype(m_listener) listener;
-                {
-                    std::unique_lock<std::mutex> lock(m_LSLock);
-                    listener = m_listener;
-                }
-
-                if (listener)
+                if (auto listener = m_listener.lock())
                 {
                     listener->processConnectionRequest(addr, unit->m_Packet);
                 }
@@ -1002,7 +937,7 @@ void CRcvQueue::worker()
                 packetVerifier.packetReceived(unit->m_Packet);
 #endif // DEBUG_RECORD_PACKET_HISTORY
 
-                if (auto u = m_pHash->lookup(id))
+                if (auto u = m_socketByIdDict.lookup(id))
                 {
                     if (CIPAddress::ipcmp(addr, u->peerAddr(), u->ipVersion()))
                     {
@@ -1052,7 +987,7 @@ void CRcvQueue::worker()
             else
             {
                 // the socket must be removed from Hash table first, then RcvUList
-                m_pHash->remove(u->socketId());
+                m_socketByIdDict.remove(u->socketId());
                 m_pRcvUList->remove(u);
                 u->rNode()->m_bOnList = false;
             }
@@ -1114,26 +1049,23 @@ int CRcvQueue::recvfrom(int32_t id, CPacket& packet)
     return packet.getLength();
 }
 
-int CRcvQueue::setListener(std::shared_ptr<ServerSideConnectionAcceptor> listener)
+bool CRcvQueue::setListener(std::weak_ptr<ServerSideConnectionAcceptor> listener)
 {
     std::lock_guard<std::mutex> lock(m_LSLock);
 
-    if (m_listener)
-        return -1;
+    if (m_listener.lock())
+        return false;
 
     m_listener = listener;
-    return 0;
+    return true;
 }
 
-void CRcvQueue::removeListener(std::shared_ptr<ServerSideConnectionAcceptor> listener)
-{
-    std::unique_lock<std::mutex> lock(m_LSLock);
-
-    if (m_listener == listener)
-        m_listener = nullptr;
-}
-
-void CRcvQueue::registerConnector(const UDTSOCKET& id, std::shared_ptr<CUDT> u, int ipVersion, const sockaddr* addr, uint64_t ttl)
+void CRcvQueue::registerConnector(
+    const UDTSOCKET& id,
+    std::shared_ptr<CUDT> u,
+    int ipVersion,
+    const sockaddr* addr,
+    uint64_t ttl)
 {
     m_pRendezvousQueue->insert(id, u, ipVersion, addr, ttl);
 }

@@ -140,6 +140,8 @@ private:
     CUnitQueue& operator=(const CUnitQueue&);
 };
 
+//-------------------------------------------------------------------------------------------------
+
 struct CSNode
 {
     std::weak_ptr<CUDT> m_pUDT;        // Pointer to the instance of CUDT socket
@@ -220,6 +222,8 @@ private:
     CSndUList& operator=(const CSndUList&);
 };
 
+//-------------------------------------------------------------------------------------------------
+
 struct CRNode
 {
     std::weak_ptr<CUDT> m_pUDT;                // Pointer to the instance of CUDT socket
@@ -277,60 +281,22 @@ private:
     CRcvUList& operator=(const CRcvUList&);
 };
 
-class CHash
+//-------------------------------------------------------------------------------------------------
+
+class SocketByIdDict
 {
 public:
-    /**
-     * @param size Hash table size.
-     */
-    CHash(int size);
-    ~CHash();
-
-public:
-
-    // Functionality:
-    //    Look for a UDT instance from the hash table.
-    // Parameters:
-    //    1) [in] id: socket ID
-    // Returned value:
-    //    Pointer to a UDT instance, or NULL if not found.
-
     std::shared_ptr<CUDT> lookup(int32_t id);
 
-    // Functionality:
-    //    Insert an entry to the hash table.
-    // Parameters:
-    //    1) [in] id: socket ID
-    //    2) [in] u: pointer to the UDT instance
-    // Returned value:
-    //    None.
-
-    void insert(int32_t id, std::shared_ptr<CUDT> u);
-
-    // Functionality:
-    //    Remove an entry from the hash table.
-    // Parameters:
-    //    1) [in] id: socket ID
-    // Returned value:
-    //    None.
+    void insert(int32_t id, const std::weak_ptr<CUDT>& u);
 
     void remove(int32_t id);
 
 private:
-    struct CBucket
-    {
-        int32_t m_iID;        // Socket ID
-        std::shared_ptr<CUDT> m_pUDT;        // Socket instance
-
-        CBucket* m_pNext;        // next bucket
-    } **m_pBucket;        // list of buckets (the hash table)
-
-    int m_iHashSize;        // size of hash table
-
-private:
-    CHash(const CHash&);
-    CHash& operator=(const CHash&);
+    std::map<int32_t, std::weak_ptr<CUDT>> m_idToSocket;
 };
+
+//-------------------------------------------------------------------------------------------------
 
 class CRendezvousQueue
 {
@@ -367,6 +333,8 @@ private:
 
     mutable std::mutex m_mutex;
 };
+
+//-------------------------------------------------------------------------------------------------
 
 class CSndQueue
 {
@@ -415,6 +383,8 @@ private:
     CSndQueue& operator=(const CSndQueue&);
 };
 
+//-------------------------------------------------------------------------------------------------
+
 class CRcvQueue
 {
 public:
@@ -444,11 +414,15 @@ public:
 
     int recvfrom(int32_t id, CPacket& packet);
 
-    // TODO: #ak Remove following calls. CUDT should be passed in constructor and live longer.
-    int setListener(std::shared_ptr<ServerSideConnectionAcceptor> listener);
-    void removeListener(std::shared_ptr<ServerSideConnectionAcceptor> listener);
+    bool setListener(std::weak_ptr<ServerSideConnectionAcceptor> listener);
 
-    void registerConnector(const UDTSOCKET& id, std::shared_ptr<CUDT> u, int ipv, const sockaddr* addr, uint64_t ttl);
+    void registerConnector(
+        const UDTSOCKET& id,
+        std::shared_ptr<CUDT> u,
+        int ipVersion,
+        const sockaddr* addr,
+        uint64_t ttl);
+    
     void removeConnector(const UDTSOCKET& id);
 
     void addNewEntry(const std::weak_ptr<CUDT>& u);
@@ -468,7 +442,7 @@ private:
     // List of UDT instances that will read packets from the queue.
     std::unique_ptr<CRcvUList> m_pRcvUList;
     // Hash table for UDT socket looking up
-    std::unique_ptr<CHash> m_pHash;
+    SocketByIdDict m_socketByIdDict;
     // UDP channel for receving packets
     CChannel* m_pChannel = nullptr;
     // shared timer with the snd queue
@@ -486,7 +460,7 @@ private:
 private:
     std::mutex m_LSLock;
     // pointer to the (unique, if any) listening UDT entity
-    std::shared_ptr<ServerSideConnectionAcceptor> m_listener;   
+    std::weak_ptr<ServerSideConnectionAcceptor> m_listener;   
     // The list of sockets in rendezvous mode
     std::unique_ptr<CRendezvousQueue> m_pRendezvousQueue;
 
