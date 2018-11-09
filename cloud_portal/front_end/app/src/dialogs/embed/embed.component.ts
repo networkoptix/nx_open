@@ -64,7 +64,7 @@ export class EmbedModalContent {
         for (const paramsKey in params) {
             if (params.hasOwnProperty(paramsKey)) {
                 // filter checkboxes in form
-                if (this.params[ paramsKey ] !== undefined && (!params[ paramsKey ] || params[ paramsKey ] !== '')) {
+                if (this.params[ paramsKey ] !== undefined && !params[ paramsKey ]) {
                     uri += (uri === '') ? '?' : '&';
                     uri += (typeof params[ paramsKey ] === 'boolean') ? paramsKey : params[ paramsKey ];
                 }
