@@ -22,76 +22,11 @@ func_tests/report.html
 func_tests/doc/html
 
 *.orig
+*.rej
 .vscode
 
-<<<<<<< local
-.DS_Store
-Debug
-Release
-
-.directory
-.test
-
-*/x86/*
-*/x64/*
-*/arm/*
-*/arm-edge1/*
-*/arm-rpi/*
-*/arm-bpi/*
-*/arm-bananapi/*
-*/arm-tx1/*
-*/target/*
-*/target-edge1/*
-*/target-rpi/*
-*/target-bpi/*
-*/target-bananapi/*
-*/target-tx1/*
-
-android-build
-
-build_environment/target
-build_environment/target/buildenv.timestamp
-
-libc.so
-
-build_environment/maven/filter-resources/current_config
-
-common/bin
-common/build
-common/src/common.pro
-common/src/plugins/resources/archive/filetypes.h
-common/src/Makefile
-common/src/common.vcproj
-common/src/common.pri
-common/common.mak*
-
-debsetup/mediaserver-deb/package
-debsetup/appserver-deb/package
-debsetup/repo
-
-mediaserver/bin
-mediaserver/build
-mediaserver/src/server.pro
-mediaserver/src/*.vsp
-mediaserver/src/server.vcproj
-mediaserver/mediaserver.mak*
-
-nx_kit/src
-
-vmaxproxy/bin
-vmaxproxy/build
-vmaxproxy/src/mediaproxy.vcproj
-vmaxproxy/src/mediaproxy.pro
-vmaxproxy/mediaproxy.mak*
-
-testcamera/bin
-testcamera/build
-testcamera/src/testCamera.pro
-testcamera/src/testCamera.vcproj
-testcamera/testcamera.mak*
-testcamera/build
-
-help/target
+*.qmlc
+*.jsc
 
 traytool/src/traytool.pro
 traytool/src/traytool.vcproj
@@ -140,7 +75,7 @@ cloud_portal/env
 cloud_portal/cloud/static
 cloud_portal/front_end/**/*.js.map
 cloud_portal/front_end/app/src/**/*.js
-cloud_portal/front_end/app/scripts/services/{location-proxy,language,dialogs,system,systems,process,nx-config,cloud_api,account,angular-uuid2,authorizationCheckService}.js
+cloud_portal/front_end/app/scripts/services/{language,dialogs,system,systems,process,nx-config,cloud_api,account,angular-uuid2,authorizationCheckService}.js
 cloud_portal/front_end/app/scripts/downgraded-providers.js
 cloud_portal/front_end/app/{main,polyfills,vendor,overrides.d,app.module,app.component,ajs-upgraded-providers}.js
 
@@ -178,6 +113,8 @@ cloud_portal/cloud/static
 cloud_portal/front_end/app/images/{favicon.ico,logo.png,logo_small.png,promo/cloud.png}
 cloud_portal/front_end/app/styles/custom
 cloud_portal/robot_tests/{geckodriver.log,venv}
+cloud_portal/front_end/.sass-cache
+cloud_portal/front_end/dist
 
 <<<<<<< local
 *test-tmp.cfg
@@ -237,4 +174,9 @@ tags
 nx_cloud/backend/cloud_tests/monitoring/monitoring_simple.egg-info
 doc/html
 webadmin/static
+webadmin/.sass-cache
+webadmin/.tmp
+webadmin/translation/language_pack
 CMakeLists.txt.user
+
+venv/*
