@@ -55,6 +55,7 @@ Yunhong Gu, last updated 09/28/2010
 #include "epoll.h"
 
 class CUDT;
+class Multiplexer;
 
 class CUDTSocket
 {
@@ -242,7 +243,7 @@ private:
     void updateMux(CUDTSocket* s, const CUDTSocket* ls);
 
 private:
-    std::map<int, CMultiplexer> m_mMultiplexers;        // UDP multiplexer
+    std::map<int, std::shared_ptr<Multiplexer>> m_multiplexers;
     pthread_mutex_t m_MultiplexerLock;
 
 private:
@@ -266,7 +267,7 @@ private:
     void checkBrokenSockets();
     void removeSocket(
         const UDTSOCKET u,
-        std::vector<CMultiplexer>* const multiplexersToRemove);
+        std::vector<std::shared_ptr<Multiplexer>>* const multiplexersToRemove);
 
 private:
     CEPoll m_EPoll;                                     // handling epoll data structures and events
