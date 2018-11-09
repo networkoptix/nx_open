@@ -14,8 +14,6 @@ namespace nx {
 namespace vms {
 namespace event {
 
-namespace analytics_api = nx::vms::api::analytics;
-
 bool hasChild(EventType eventType)
 {
     switch (eventType)
@@ -144,7 +142,7 @@ bool hasToggleState(
 
         auto descriptorListManager = commonModule->analyticsDescriptorListManager();
         const auto descriptor = descriptorListManager
-            ->descriptor<analytics_api::EventTypeDescriptor>(
+            ->descriptor<nx::vms::api::analytics::EventTypeDescriptor>(
                 runtimeParams.getAnalyticsEventTypeId());
 
         if (!descriptor)

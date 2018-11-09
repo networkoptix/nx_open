@@ -66,6 +66,7 @@ struct EventTile::Private
     bool isRead = false;
     bool footerEnabled = true;
     Style style = Style::standard;
+    bool highlighted = false;
 
     Private(EventTile* q):
         q(q),
@@ -102,21 +103,13 @@ struct EventTile::Private
     {
         auto pal = q->palette();
         const auto base = pal.color(QPalette::Base);
-        const auto lighter = colorTheme()->lighter(base, 1);
 
-        switch (style)
-        {
-            case Style::standard:
-                pal.setColor(QPalette::Window, base);
-                pal.setColor(QPalette::Midlight, lighter);
-                break;
+        int lighterBy = highlighted ? 2 : 0;
+        if (style == Style::informer)
+            ++lighterBy;
 
-            case Style::informer:
-                pal.setColor(QPalette::Window, lighter);
-                pal.setColor(QPalette::Midlight, colorTheme()->lighter(lighter, 1));
-                break;
-        }
-
+        pal.setColor(QPalette::Window, colorTheme()->lighter(base, lighterBy));
+        pal.setColor(QPalette::Midlight, colorTheme()->lighter(base, lighterBy + 1));
         q->setPalette(pal);
     }
 
@@ -689,6 +682,20 @@ void EventTile::setVisualStyle(Style value)
         return;
 
     d->style = value;
+    d->updatePalette();
+}
+
+bool EventTile::highlighted() const
+{
+    return d->highlighted;
+}
+
+void EventTile::setHighlighted(bool value)
+{
+    if (d->highlighted == value)
+        return;
+
+    d->highlighted = value;
     d->updatePalette();
 }
 

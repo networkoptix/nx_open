@@ -163,7 +163,8 @@ signals:
     void playingSupportedChanged();
     void speedChanged();
     void speedRangeChanged();
-    void positionChanged();
+    void positionChanged(); //< By seek but not by playback.
+    void timelinePositionChanged(); //< By seek or by playback.
     void bookmarksModeEnabledChanged();
     void syncIsForcedChanged();
     void timelineRelevancyChanged(bool isRelevant);

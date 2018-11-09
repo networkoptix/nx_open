@@ -14,8 +14,6 @@
 namespace nx::vms::client::desktop {
 namespace ui {
 
-namespace analytics_api = nx::vms::api::analytics;
-
 AnalyticsSdkEventModel::AnalyticsSdkEventModel(QObject* parent):
     QnCommonModuleAware(parent),
     QStandardItemModel(parent)
@@ -52,13 +50,13 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
     clear();
 
     const auto deviceEventTypes = descriptorListManager->deviceDescriptors<
-        analytics_api::EventTypeDescriptor>(cameras);
+        nx::vms::api::analytics::EventTypeDescriptor>(cameras);
 
     const auto plugins = descriptorListManager->allDescriptorsInTheSystem<
-        analytics_api::PluginDescriptor>();
+        nx::vms::api::analytics::PluginDescriptor>();
 
     const auto groups = descriptorListManager->allDescriptorsInTheSystem<
-        analytics_api::GroupDescriptor>();
+        nx::vms::api::analytics::GroupDescriptor>();
 
 #if 0
     cameras.empty()

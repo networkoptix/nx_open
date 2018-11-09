@@ -52,6 +52,9 @@ public:
     Qt::ScrollBarPolicy scrollBarPolicy() const;
     void setScrollBarPolicy(Qt::ScrollBarPolicy value);
 
+    std::chrono::microseconds highlightedTimestamp() const;
+    void setHighlightedTimestamp(std::chrono::microseconds value);
+
     bool live() const;
     void setLive(bool value);
 
@@ -94,6 +97,8 @@ private:
     void setScrollBarRelevant(bool value);
     void updateScrollBarVisibility();
 
+    void updateHighlightedTiles(); //< By highlighted timestamp, not appearing animation.
+
     int indexOf(EventTile* tile) const;
     int indexAtPos(const QPoint& pos) const;
 
@@ -124,6 +129,7 @@ private:
     QHash<EventTile*, int> m_positions;
     int m_totalHeight = 0;
 
+    int m_firstVisible = -1;
     QSet<EventTile*> m_visible;
     QHash<EventTile*, QnNotificationLevel::Value> m_unread;
 
@@ -143,6 +149,8 @@ private:
     bool m_footersEnabled = true;
     bool m_scrollBarRelevant = true;
     bool m_live = true;
+
+    std::chrono::microseconds m_highlightedTimestamp{0};
 
     int m_topMargin = style::Metrics::kStandardPadding;
     int m_bottomMargin = style::Metrics::kStandardPadding;

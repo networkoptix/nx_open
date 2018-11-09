@@ -14,15 +14,12 @@
 
 namespace nx::mediaserver::resource {
 
-namespace analytics_api = nx::vms::api::analytics;
-namespace analytics_sdk = nx::sdk::analytics;
-
 namespace {
 
-analytics_api::PluginDescriptor descriptorFromManifest(
-    const analytics_api::PluginManifest& manifest)
+nx::vms::api::analytics::PluginDescriptor descriptorFromManifest(
+    const nx::vms::api::analytics::PluginManifest& manifest)
 {
-    analytics_api::PluginDescriptor descriptor;
+    nx::vms::api::analytics::PluginDescriptor descriptor;
     descriptor.id = manifest.id;
     descriptor.name = manifest.name;
 
@@ -37,7 +34,8 @@ AnalyticsPluginResource::AnalyticsPluginResource(QnMediaServerModule* serverModu
 {
 }
 
-void AnalyticsPluginResource::setSdkPlugin(sdk_support::SharedPtr<analytics_sdk::Plugin> plugin)
+void AnalyticsPluginResource::setSdkPlugin(
+    sdk_support::SharedPtr<nx::sdk::analytics::Plugin> plugin)
 {
     m_sdkPlugin = std::move(plugin);
 }
@@ -66,7 +64,7 @@ CameraDiagnostics::Result AnalyticsPluginResource::initInternal()
     if (!m_sdkPlugin)
         return CameraDiagnostics::InternalServerErrorResult("SDK plugin object is not set");
 
-    const auto manifest = sdk_support::manifest<analytics_api::PluginManifest>(
+    const auto manifest = sdk_support::manifest<nx::vms::api::analytics::PluginManifest>(
         m_sdkPlugin,
         makeLogger());
 

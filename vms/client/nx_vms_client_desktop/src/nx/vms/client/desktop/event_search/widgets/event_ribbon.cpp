@@ -78,6 +78,16 @@ void EventRibbon::setLive(bool value)
     d->setLive(value);
 }
 
+std::chrono::microseconds EventRibbon::highlightedTimestamp() const
+{
+    return d->highlightedTimestamp();
+}
+
+void EventRibbon::setHighlightedTimestamp(std::chrono::microseconds value)
+{
+    d->setHighlightedTimestamp(value);
+}
+
 void EventRibbon::setViewportMargins(int top, int bottom)
 {
     d->setViewportMargins(top, bottom);

@@ -199,6 +199,13 @@ void AbstractSearchWidget::Private::setupRibbon()
         this, &Private::requestFetchIfNeeded, Qt::QueuedConnection);
 
     connect(ui->ribbon, &EventRibbon::tileHovered, q, &AbstractSearchWidget::tileHovered);
+
+    connect(navigator(), &QnWorkbenchNavigator::timelinePositionChanged, this,
+        [this]()
+        {
+            ui->ribbon->setHighlightedTimestamp(
+                std::chrono::microseconds(navigator()->positionUsec()));
+        });
 }
 
 void AbstractSearchWidget::Private::setupToolbar()

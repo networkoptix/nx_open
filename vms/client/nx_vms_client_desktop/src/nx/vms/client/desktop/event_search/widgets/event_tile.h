@@ -118,6 +118,9 @@ public:
     Style visualStyle() const;
     void setVisualStyle(Style value);
 
+    bool highlighted() const;
+    void setHighlighted(bool value);
+
 signals:
     void clicked();
 
