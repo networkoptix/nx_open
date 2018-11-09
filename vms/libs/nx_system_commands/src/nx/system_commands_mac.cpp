@@ -64,7 +64,8 @@ int SystemCommands::open(const std::string& /*path*/, int /*mode*/)
 
 bool SystemCommands::rename(const std::string& oldPath, const std::string& newPath)
 {
-    return false
+    return false;
+}
 
 int64_t SystemCommands::freeSpace(const std::string& path)
 {
