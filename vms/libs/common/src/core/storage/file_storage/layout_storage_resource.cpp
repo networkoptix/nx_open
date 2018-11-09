@@ -46,7 +46,7 @@ QnLayoutFileStorageResource::QnLayoutFileStorageResource(
 
 QnLayoutFileStorageResource::~QnLayoutFileStorageResource()
 {
-    QnMutexLocker lock( &m_storageSync );
+    QnMutexLocker lock(&m_storageSync);
     m_allStorages.remove(this);
 }
 
@@ -242,10 +242,9 @@ qint64 QnLayoutFileStorageResource::getTotalSpace() const
 
 bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QString& newName, bool dataInOldFile)
 {
-    QnMutexLocker lock( &m_storageSync );
-    for (auto itr = m_allStorages.begin(); itr != m_allStorages.end(); ++itr)
+    QnMutexLocker lock(&m_storageSync);
+    for (auto storage: m_allStorages)
     {
-        QnLayoutFileStorageResource* storage = *itr;
         QString storageUrl = storage->getPath();
         if (storageUrl == newName || storageUrl == oldName)
         {
@@ -265,19 +264,12 @@ bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QSt
         QFile::remove(oldName);
     }
 
-    for (auto itr = m_allStorages.begin(); itr != m_allStorages.end(); ++itr)
+    for (auto storage: m_allStorages)
     {
-        QnLayoutFileStorageResource* storage = *itr;
         QString storageUrl = storage->getPath();
-        if (storageUrl == newName)
+        if (storageUrl == newName || storageUrl == oldName)
         {
             storage->setUrl(newName); // update binary offsetvalue
-            storage->unlockOpenings();
-            storage->restoreOpenedFiles();
-        }
-        else if (storageUrl == oldName)
-        {
-            storage->setUrl(newName);
             storage->unlockOpenings();
             storage->restoreOpenedFiles();
         }
@@ -364,7 +356,7 @@ QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::findStream(cons
 // This function may create a new .nov file.
 QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::findOrAddStream(const QString& name)
 {
-    QnMutexLocker lock( &m_fileSync );
+    QnMutexLocker lock(&m_fileSync);
 
     QString fileName = stripName(name);
 
@@ -419,14 +411,21 @@ void QnLayoutFileStorageResource::finalizeWrittenStream(qint64 pos)
 
 void QnLayoutFileStorageResource::registerFile(QnLayoutStreamSupport* file)
 {
-    QnMutexLocker lock( &m_fileSync );
+    QnMutexLocker lock(&m_fileSync);
     m_openedFiles.insert(file);
 }
 
 void QnLayoutFileStorageResource::unregisterFile(QnLayoutStreamSupport* file)
 {
-    QnMutexLocker lock( &m_fileSync );
+    QnMutexLocker lock(&m_fileSync);
     m_openedFiles.remove(file);
+}
+
+void QnLayoutFileStorageResource::removeFileCompletely(QnLayoutStreamSupport* file)
+{
+    QnMutexLocker lock(&m_fileSync);
+    m_openedFiles.remove(file);
+    m_cachedOpenedFiles.remove(file);
 }
 
 bool QnLayoutFileStorageResource::readIndexHeader()
@@ -503,25 +502,17 @@ void QnLayoutFileStorageResource::writeFileTail(QFile& file)
 
 void QnLayoutFileStorageResource::closeOpenedFiles()
 {
-    QnMutexLocker lock( &m_fileSync );
+    QnMutexLocker lock(&m_fileSync);
     m_cachedOpenedFiles = m_openedFiles; // m_openedFiles will be cleared in storeStateAndClose().
-    for (auto file : m_cachedOpenedFiles)
-    {
-        file->lockFile();
+    for (auto file: m_cachedOpenedFiles)
         file->storeStateAndClose();
-        file->unlockFile();
-    }
 }
 
 void QnLayoutFileStorageResource::restoreOpenedFiles()
 {
     QnMutexLocker lock(&m_fileSync);
-    for (auto file : m_cachedOpenedFiles)
-    {
-        file->lockFile();
+    for (auto file: m_cachedOpenedFiles)
         file->restoreState();
-        file->unlockFile();
-    }
 }
 
 bool QnLayoutFileStorageResource::shouldCrypt(const QString& streamName)
@@ -555,6 +546,11 @@ void QnLayoutFileStorageResource::unlockOpenings()
     m_lockedOpenings = false;
 }
 
+QnMutex& QnLayoutFileStorageResource::streamMutex()
+{
+    return m_fileSync;
+}
+
 // The one who requests to remove this function will become a permanent maintainer of this class.
 void QnLayoutFileStorageResource::dumpStructure()
 {
@@ -576,9 +572,4 @@ void QnLayoutFileStorageResource::dumpStructure()
             << "adjusted:" << hex << m_index.entries[i + 1].offset - m_index.entries[i].offset -
             strlen(actualFileName.data()) - 1;
     }
-}
-
-QnMutex& QnLayoutFileStorageResource::streamMutex()
-{
-    return m_fileSync;
 }

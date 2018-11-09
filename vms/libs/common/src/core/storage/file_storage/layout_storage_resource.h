@@ -92,6 +92,8 @@ public:
     void finalizeWrittenStream(qint64 pos);
     void registerFile(QnLayoutStreamSupport* file);
     void unregisterFile(QnLayoutStreamSupport* file);
+    // This functions also removes file from rename cache.
+    void removeFileCompletely(QnLayoutStreamSupport* file);
 
     void dumpStructure();
 
@@ -127,7 +129,7 @@ private:
     static QSet<QnLayoutFileStorageResource*> m_allStorages;
 
     nx::core::layout::FileInfo m_info;
-    bool m_lockedOpenings = false; //< Used to prevent stream openings when moving file. 
+    bool m_lockedOpenings = false; //< Used to prevent stream openings when moving file.
 };
 
 typedef QSharedPointer<QnLayoutFileStorageResource> QnLayoutFileStorageResourcePtr;

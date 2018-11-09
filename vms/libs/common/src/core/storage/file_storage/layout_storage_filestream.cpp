@@ -15,20 +15,20 @@ QnLayoutPlainStream::QnLayoutPlainStream(QnLayoutFileStorageResource& storageRes
 QnLayoutPlainStream::~QnLayoutPlainStream()
 {
     close();
+    m_storageResource.removeFileCompletely(this);
 }
 
 bool QnLayoutPlainStream::seek(qint64 offset)
 {
     QnMutexLocker lock(&m_mutex);
-    int rez = m_file.seek(offset + m_fileOffset);
     QIODevice::seek(offset);
-    return rez;
+    return m_file.seek(offset + m_fileOffset);;
 }
 
 qint64 QnLayoutPlainStream::pos() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_file.pos() - m_fileOffset;
+    return QIODevice::pos();
 }
 
 qint64 QnLayoutPlainStream::size() const
@@ -87,35 +87,28 @@ void QnLayoutPlainStream::close()
     {
         QnMutexLocker lock(&m_mutex);
 
+        QIODevice::close();
         m_file.close();
+
         if (m_openMode & QIODevice::WriteOnly)
             m_storageResource.finalizeWrittenStream(m_fileOffset + m_fileSize);
 
         m_openMode = NotOpen;
-        QIODevice::close();
 
         m_storageResource.unregisterFile(this);
     }
 }
 
-void QnLayoutPlainStream::lockFile()
-{
-    m_mutex.lock();
-}
-
-void QnLayoutPlainStream::unlockFile()
-{
-    m_mutex.unlock();
-}
-
 void QnLayoutPlainStream::storeStateAndClose()
 {
+    QnMutexLocker lock(&m_mutex);
     m_storedPosition = pos();
     m_file.close();
 }
 
 void QnLayoutPlainStream::restoreState()
 {
+    QnMutexLocker lock(&m_mutex);
     open(m_openMode);
     seek(m_storedPosition);
 }
