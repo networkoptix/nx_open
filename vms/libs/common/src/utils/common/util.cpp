@@ -23,6 +23,7 @@
 #include <utils/common/app_info.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/datetime.h>
+#include <nx/system_commands.h>
 
 bool removeDir(const QString &dirName)
 {
@@ -131,55 +132,14 @@ QString closeDirPath(const QString& value)
 
 #ifdef Q_OS_WIN32
 
-bool isLocalPath(const QString& folder)
-{
-    return folder.length() >= 2 && folder[1] == L':';
-}
-
-QString getParentFolder(const QString& root)
-{
-    QString newRoot = QDir::toNativeSeparators(root);
-    if (newRoot.endsWith(QDir::separator()))
-        newRoot.chop(1);
-    return newRoot.left(newRoot.lastIndexOf(QDir::separator())+1);
-}
-
 qint64 getDiskFreeSpace(const QString& root)
 {
-    quint64 freeBytesAvailableToCaller = -1;
-    quint64 totalNumberOfBytes = -1;
-    quint64 totalNumberOfFreeBytes = -1;
-    BOOL status = GetDiskFreeSpaceEx(
-        (LPCWSTR) root.data(), // pointer to the directory name
-        (PULARGE_INTEGER) &freeBytesAvailableToCaller, // receives the number of bytes on disk available to the caller
-        (PULARGE_INTEGER) &totalNumberOfBytes, // receives the number of bytes on disk
-        (PULARGE_INTEGER) &totalNumberOfFreeBytes // receives the free bytes on disk
-    );
-    if (!status && isLocalPath(root)) {
-        QString newRoot = getParentFolder(root);
-        if (!newRoot.isEmpty())
-            return getDiskFreeSpace(newRoot); // try parent folder
-    }
-    return freeBytesAvailableToCaller;
+    return nx::SystemCommands().freeSpace(root.toStdString());
 };
 
 qint64 getDiskTotalSpace(const QString& root)
 {
-    quint64 freeBytesAvailableToCaller = -1;
-    quint64 totalNumberOfBytes = -1;
-    quint64 totalNumberOfFreeBytes = -1;
-    BOOL status = GetDiskFreeSpaceEx(
-        (LPCWSTR) root.data(), // pointer to the directory name
-        (PULARGE_INTEGER) &freeBytesAvailableToCaller, // receives the number of bytes on disk available to the caller
-        (PULARGE_INTEGER) &totalNumberOfBytes, // receives the number of bytes on disk
-        (PULARGE_INTEGER) &totalNumberOfFreeBytes // receives the free bytes on disk
-        );
-    if (!status && isLocalPath(root)) {
-        QString newRoot = getParentFolder(root);
-        if (!newRoot.isEmpty())
-            return getDiskTotalSpace(newRoot); // try parent folder
-    }
-    return totalNumberOfBytes;
+    return nx::SystemCommands().totalSpace(root.toStdString());
 };
 
 #elif defined(Q_OS_ANDROID)

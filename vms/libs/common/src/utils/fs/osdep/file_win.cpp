@@ -14,6 +14,7 @@
 #include <windows.h>
 #include <sys/stat.h>
 #include <nx/utils/log/log.h>
+#include <nx/system_commands.h>
 
 QnFile::QnFile(): m_impl(INVALID_HANDLE_VALUE), m_eof(false)
 {
@@ -195,13 +196,9 @@ bool QnFile::fileExists( const QString& fileName )
     return retCode == 0;
 }
 
-qint64 QnFile::getFileSize( const QString& fileName )
+qint64 QnFile::getFileSize(const QString& fileName)
 {
-    struct _stat64 fstat;
-    int retCode = _wstat64( (wchar_t*)fileName.utf16(), &fstat );
-    if( retCode != 0 )
-        return -1;
-    return fstat.st_size;
+    return nx::SystemCommands().fileSize(fileName.toStdString());
 }
 
 #endif

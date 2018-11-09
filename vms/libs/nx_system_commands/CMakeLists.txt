@@ -1,5 +1,5 @@
 if (WINDOWS)
-    set(nx_system_commands_private_libs common Qt5::Core)
+    set(nx_system_commands_private_libs Qt5::Core)
 endif()
 
 if (LINUX)
