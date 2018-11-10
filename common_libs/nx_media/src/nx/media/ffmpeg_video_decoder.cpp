@@ -110,7 +110,7 @@ public:
         Q_D(AvFrameMemoryBuffer);
         *bytesPerLine = d->frame->linesize[0];
         AVPixelFormat pixFmt = (AVPixelFormat)d->frame->format;
-        *numBytes = av_image_get_buffer_size(pixFmt, d->frame->linesize[0], d->frame->height, 1);
+        *numBytes = av_image_get_buffer_size(pixFmt, d->frame->linesize[0], d->frame->height, /*align*/ 1);
         return d->frame->data[0];
     }
 
@@ -200,7 +200,7 @@ AVFrame* FfmpegVideoDecoderPrivate::convertPixelFormat(const AVFrame* srcFrame)
         return nullptr;
 
     AVFrame* dstFrame = av_frame_alloc();
-    int numBytes = av_image_get_buffer_size(dstAvFormat, srcFrame->linesize[0], srcFrame->height, 1);
+    int numBytes = av_image_get_buffer_size(dstAvFormat, srcFrame->linesize[0], srcFrame->height, /*align*/ 1);
     if (numBytes <= 0)
         return nullptr; //< can't allocate frame
     numBytes += FF_INPUT_BUFFER_PADDING_SIZE; //< extra alloc space due to ffmpeg doc
@@ -212,7 +212,7 @@ AVFrame* FfmpegVideoDecoderPrivate::convertPixelFormat(const AVFrame* srcFrame)
         dstAvFormat,
         srcFrame->linesize[0],
         srcFrame->height,
-        1);
+        /*align*/ 1);
     dstFrame->width = srcFrame->width;
     dstFrame->height = srcFrame->height;
     dstFrame->format = dstAvFormat;

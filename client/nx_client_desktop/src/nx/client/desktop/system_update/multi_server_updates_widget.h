@@ -59,7 +59,6 @@ public:
 
     virtual bool hasChanges() const override;
 
-    virtual bool canApplyChanges() const override;
     virtual bool canDiscardChanges() const override;
 
     bool cancelUpdatesCheck();
@@ -67,12 +66,11 @@ public:
 
 protected:
     // This one is called by timer periodically.
-    void at_updateCurrentState();
-
-    void at_clientDownloadFinished();
-    void at_modelDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
-    void at_startUpdateAction();
-    bool at_cancelCurrentAction();
+    void atUpdateCurrentState();
+    void atClientDownloadFinished();
+    void atModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
+    void atStartUpdateAction();
+    bool atCancelCurrentAction();
 
     void hideStatusColumns(bool value);
     void clearUpdateInfo();
@@ -80,7 +78,6 @@ protected:
     void pickSpecificBuild();
 
 private:
-
     // General state for a widget.
     // It extends update state from the servers, uploader and client update.
     enum class WidgetUpdateState
@@ -136,11 +133,10 @@ private:
 
     // Advances UI FSM towards selected state.
     void setTargetState(WidgetUpdateState state, QSet<QnUuid> targets = {});
-
     void completeInstallation(bool clientUpdated);
+
 private:
     QScopedPointer<Ui::MultiServerUpdatesWidget> ui;
-
     QScopedPointer<QMenu> m_selectUpdateTypeMenu;
     QScopedPointer<QMenu> m_autoCheckMenu;
     QScopedPointer<QMenu> m_manualCheckMenu;
@@ -170,8 +166,6 @@ private:
 
     UpdateContents m_updateInfo;
     QString m_updateCheckError;
-    // We get this version either from internet, or zip package.
-    nx::utils::SoftwareVersion m_availableVersion;
     nx::utils::SoftwareVersion m_targetVersion;
 
     WidgetUpdateState m_updateStateCurrent = WidgetUpdateState::initial;

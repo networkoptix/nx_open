@@ -62,7 +62,7 @@ nx::network::http::AsyncHttpClientPtr createHttpClient()
     auto httpClient = nx::network::http::AsyncHttpClient::create();
     httpClient->setResponseReadTimeoutMs(kDownloadRequestTimeoutMs);
     httpClient->setSendTimeoutMs(kDownloadRequestTimeoutMs);
-    httpClient->setMessageBodyReadTimeoutMs(5);
+    httpClient->setMessageBodyReadTimeoutMs(kDownloadRequestTimeoutMs);
 
     return httpClient;
 }

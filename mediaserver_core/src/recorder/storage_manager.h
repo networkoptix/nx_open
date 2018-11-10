@@ -41,6 +41,7 @@
 #include "health/system_health.h"
 #include "nx/mediaserver/server_module_aware.h"
 #include <media_server/media_server_module.h>
+#include <api/helpers/chunks_request_data.h>
 
 extern "C" {
 
@@ -126,13 +127,8 @@ public:
 
     static QnTimePeriodList getRecordedPeriods(
         QnMediaServerModule* serverModule,
-        const QnSecurityCamResourceList &cameras,
-        qint64 startTime,
-        qint64 endTime,
-        qint64 detailLevel,
-        bool keepSmallChunks,
-        const QList<QnServer::ChunksCatalog> &catalogs,
-        int limit);
+        const QnChunksRequestData& request,
+        const QList<QnServer::ChunksCatalog> &catalogs);
     QnRecordingStatsReply getChunkStatistics(qint64 bitrateAnalizePeriodMs);
 
     void doMigrateCSVCatalog(QnStorageResourcePtr extraAllowedStorage = QnStorageResourcePtr());
@@ -218,17 +214,25 @@ private:
     friend class TestStorageThread;
 
     void createArchiveCameras(const nx::caminfo::ArchiveCameraDataList& archiveCameras);
-    void getRecordedPeriodsInternal(std::vector<QnTimePeriodList>& periods,
-                                    const QnSecurityCamResourceList &cameras,
-                                    qint64 startTime, qint64 endTime, qint64 detailLevel,  bool keepSmallChunks,
-                                    const QList<QnServer::ChunksCatalog> &catalogs, int limit);
+    void getRecordedPeriodsInternal(
+        std::vector<QnTimePeriodList>& periods,
+        const QnChunksRequestData& request,
+        const QList<QnServer::ChunksCatalog> &catalogs);
     bool isArchiveTimeExistsInternal(const QString& cameraUniqueId, qint64 timeMs);
     bool isArchiveTimeExistsInternal(const QString& cameraUniqueId, const QnTimePeriod period);
     //void loadFullFileCatalogInternal(QnServer::ChunksCatalog catalog, bool rebuildMode);
     QnStorageResourcePtr extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& uniqueId, QString& quality);
-    void getTimePeriodInternal(std::vector<QnTimePeriodList> &cameras, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, bool keepSmallChunks,
-                               const DeviceFileCatalogPtr &catalog);
-    bool existsStorageWithID(const QnStorageResourceList& storages, const QnUuid &id) const;
+    void getTimePeriodInternal(std::vector<QnTimePeriodList>& periods,
+        const QnNetworkResourcePtr& camera,
+        qint64 startTimeMs,
+        qint64 endTimeMs,
+        qint64 detailLevel,
+        bool keepSmallChunks,
+        int limit,
+        Qt::SortOrder sortOrder,
+        const DeviceFileCatalogPtr& catalog);
+        bool existsStorageWithID(const QnStorageResourceList& storages,
+        const QnUuid& id) const;
     QnStorageResourcePtr getStorageByUrlInternal(const QString& fileName);
 
     QString toCanonicalPath(const QString& path);

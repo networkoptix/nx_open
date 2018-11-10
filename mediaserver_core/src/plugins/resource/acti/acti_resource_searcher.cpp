@@ -192,7 +192,7 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const nx::utils::Url&
 boost::optional<QnActiResource::ActiSystemInfo> QnActiResourceSearcher::getActiSystemInfo(
     const QnActiResourcePtr& actiResource)
 {
-    CLHttpStatus status;
+    nx::network::http::StatusCode::Value status;
     auto response = actiResource->makeActiRequest(
         kActiSystemGroup,
         kActiSystemInfoCommand,
@@ -202,7 +202,7 @@ boost::optional<QnActiResource::ActiSystemInfo> QnActiResourceSearcher::getActiS
     if (shouldStop())
         return boost::none;
 
-    if (status != CL_HTTP_SUCCESS)
+    if (!nx::network::http::StatusCode::isSuccessCode(status))
     {
         bool upnpDevInfoStatus = false;
         nx::utils::Url deviceXmlUrl(actiResource->getUrl());
@@ -221,7 +221,7 @@ boost::optional<QnActiResource::ActiSystemInfo> QnActiResourceSearcher::getActiS
             status,
             true);
 
-        if(status != CL_HTTP_SUCCESS || shouldStop())
+        if(!nx::network::http::StatusCode::isSuccessCode(status) || shouldStop())
             return boost::none;
     }
 
@@ -275,9 +275,11 @@ bool QnActiResourceSearcher::processPacket(
         devInfoCopy.friendlyName = NX_VENDOR;
 
     auto physicalId = stringToActiPhysicalID(devInfo.serialNumber);
-    if (m_alreadyFoundMacAddresses.contains(physicalId))
-        return true;
-    m_alreadyFoundMacAddresses.insert(physicalId);
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_alreadyFoundMacAddresses.contains(physicalId))
+            return true;
+    }
 
     auto existingRes = serverModule()->resourcePool()->getNetResourceByPhysicalId(physicalId);
 
@@ -354,6 +356,7 @@ bool QnActiResourceSearcher::processPacket(
 
     QnMutexLocker lock(&m_mutex);
     m_foundUpnpResources += result;
+    m_alreadyFoundMacAddresses.insert(physicalId);
 
     return true;
 }

@@ -1,9 +1,8 @@
 #include "fisheye_calibrator.h"
 
-extern "C"
-{
-    #include <libavutil/imgutils.h>
-}
+extern "C" {
+#include <libavutil/imgutils.h>
+} // extern "C"
 
 struct Distance
 {
@@ -412,7 +411,7 @@ QnFisheyeCalibrator::Error QnFisheyeCalibrator::analyseFrame(QImage frame)
         memcpy(inputData[0], frame.bits(), inputNumBytes);
 
         int roundWidth = qPower2Ceil((unsigned)frame.width(),32);
-        int numBytes = av_image_get_buffer_size(AV_PIX_FMT_GRAY8, roundWidth, frame.height(), 1);
+        int numBytes = av_image_get_buffer_size(AV_PIX_FMT_GRAY8, roundWidth, frame.height(), /*align*/ 1);
 
         // ffmpeg returns -1 in case of error
         if (numBytes < 0)
@@ -431,7 +430,7 @@ QnFisheyeCalibrator::Error QnFisheyeCalibrator::analyseFrame(QImage frame)
                 dstPict.data,
                 dstPict.linesize,
                 m_grayImageBuffer,
-               AV_PIX_FMT_GRAY8, roundWidth, frame.height(), 1);
+               AV_PIX_FMT_GRAY8, roundWidth, frame.height(), /*align*/ 1);
 
             int inputLinesize[4] = { frame.bytesPerLine() , 0, 0, 0 };
             QImage newFrame(m_grayImageBuffer, frame.width(), frame.height(), roundWidth, QImage::Format_Indexed8);

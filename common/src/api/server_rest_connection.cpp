@@ -32,6 +32,7 @@
 #include <nx/vms/api/data_fwd.h>
 #include <nx/vms/event/rule_manager.h>
 #include <nx/vms/event/rule.h>
+#include <api/model/detach_from_cloud_data.h>
 
 using namespace nx;
 
@@ -210,6 +211,7 @@ Handle ServerConnection::getModuleInformation(
 }
 
 Handle ServerConnection::detachSystemFromCloud(
+    const QString& currentAdminPassword,
     const QString& resetAdminPassword,
     Result<QnRestResult>::type callback,
     QThread* targetThread)
@@ -224,11 +226,14 @@ Handle ServerConnection::detachSystemFromCloud(
         data = PasswordData::calculateHashes(admin->getName(), resetAdminPassword, false);
     }
 
+    CurrentPasswordData currentPasswordData;
+    currentPasswordData.currentPassword = currentAdminPassword;
+
     return executePost(
         lit("/api/detachFromCloud"),
         QnRequestParamList(),
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
-        QJson::serialized(std::move(data)),
+        QJson::serialized(DetachFromCloudData(data, currentPasswordData)),
         callback,
         targetThread);
 }

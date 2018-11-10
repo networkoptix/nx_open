@@ -56,6 +56,7 @@ private:
         nx::api::ImageRequest::RoundMethod roundMethod) const;
 
     CLVideoDecoderOutputPtr decodeFrameSequence(
+        const QnResourcePtr& resource,
         std::unique_ptr<QnConstDataPacketQueue>& sequence, quint64 timestampUs) const;
 
     CLVideoDecoderOutputPtr decodeFrameFromLiveCache(

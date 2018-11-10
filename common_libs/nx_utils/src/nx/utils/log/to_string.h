@@ -69,6 +69,9 @@ NX_UTILS_API QString toString(const std::type_info& value);
 NX_UTILS_API QString demangleTypeName(const char* type);
 NX_UTILS_API QString pointerTypeName(const void* value);
 
+NX_UTILS_API std::string scopeOfFunction(
+    const std::type_info& scopeTagTypeInfo, const char* functionMacro);
+
 template<typename T>
 QString pointerTypeName(const T* value)
 {

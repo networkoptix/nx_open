@@ -41,7 +41,7 @@ const QString kEventLogPeriodDaysName(lit("eventLogPeriodDays"));
 const QString kNameHost(lit("smtpHost"));
 const QString kNamePort(lit("smtpPort"));
 const QString kNameUser(lit("smtpUser"));
-const QString kNamePassword(lit("smptPassword"));
+const QString kNamePassword(lit("smtpPassword"));
 const QString kNameConnectionType(lit("smtpConnectionType"));
 const QString kNameSimple(lit("smtpSimple"));
 const QString kNameTimeout(lit("smtpTimeout"));
@@ -324,6 +324,8 @@ public:
     int maxRecorderQueueSizeBytes() const;
     int maxRecorderQueueSizePackets() const;
 
+    int maxProgressiveDownloaders() const;
+
     bool hanwhaDeleteProfilesOnInitIfNeeded() const;
     void setHanwhaDeleteProfilesOnInitIfNeeded(bool deleteProfiles);
 
@@ -490,6 +492,8 @@ private:
 
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizeBytes = nullptr;
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizePackets = nullptr;
+
+    QnResourcePropertyAdaptor<int>* m_maxProgressiveDownloaders = nullptr;
 
     QnResourcePropertyAdaptor<int>* m_maxRtpRetryCount = nullptr;
 

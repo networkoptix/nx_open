@@ -81,7 +81,7 @@ class Stage(object):
 
         while True:
             run.clear_cache()
-            yield actions.next()
+            yield next(actions)
 
 
 class Executor(object):
@@ -143,7 +143,7 @@ class Executor(object):
         """ :returns True if stage is finished, False otherwise.
         """
         try:
-            self._result = stage_steps.next()
+            self._result = next(stage_steps)
 
         except HttpError as error:
             self._result = Failure(str(error))

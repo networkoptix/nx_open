@@ -3,10 +3,13 @@
 #include <QtCore/QTimer>
 #include <QtWidgets/QMenu>
 
+#include <api/helpers/chunks_request_data.h>
+#include <api/media_server_connection.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <motion/motion_detection.h>
 #include <ui/help/business_help.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -15,11 +18,16 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/utils/managed_camera_set.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/utils/algorithm/merge_sorted_lists.h>
+#include <nx/utils/datetime.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/guarded_callback.h>
+#include <nx/utils/log/log_message.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/event/event_fwd.h>
+
+#include <ini.h>
 
 namespace nx::client::desktop {
 
@@ -79,7 +87,7 @@ QVariant MotionSearchListModel::Private::data(const QModelIndex& index, int role
             return tr("Motion");
 
         case Qt::DecorationRole:
-            return QVariant::fromValue(qnSkin->pixmap("tree/camera.png"));
+            return QVariant::fromValue(qnSkin->pixmap("tree/camera.svg"));
 
         case Qn::HelpTopicIdRole:
             return QnBusiness::eventHelpId(vms::api::EventType::cameraMotionEvent);
@@ -91,8 +99,25 @@ QVariant MotionSearchListModel::Private::data(const QModelIndex& index, int role
             return QVariant::fromValue(microseconds(chunk.period.duration()).count());
 
         case Qn::ResourceRole:
-            return QVariant::fromValue<QnResourcePtr>(
-                q->resourcePool()->getResourceById<QnVirtualCameraResource>(chunk.cameraId));
+            return QVariant::fromValue<QnResourcePtr>(camera(chunk));
+
+        case Qn::ResourceListRole:
+        {
+            const auto resource = camera(chunk);
+            return resource
+                ? QVariant::fromValue(QnResourceList({resource}))
+                : QVariant::fromValue(QStringList({QString("<%1>").arg(tr("deleted camera"))}));
+        }
+
+        case Qn::DescriptionTextRole:
+        {
+            if (!ini().showDebugTimeInformationInRibbon)
+                return QString();
+
+            return lm("Begin: %1<br>End: %2").args( //< Not translatable debug string.
+                utils::timestampToDebugString(chunk.period.startTimeMs),
+                utils::timestampToDebugString(chunk.period.endTimeMs())).toQString();
+        }
 
         case Qn::PreviewTimeRole:
             return QVariant::fromValue(midTime(chunk.period).count());
@@ -157,33 +182,11 @@ void MotionSearchListModel::Private::truncateToRelevantTimePeriod()
 
 rest::Handle MotionSearchListModel::Private::requestPrefetch(const QnTimePeriod& period)
 {
-    const auto dataReceived =
-        [this](bool success, rest::Handle requestId, std::vector<MotionChunk>&& data)
-        {
-            if (!requestId || requestId != currentRequest().id)
-                return;
-
-            QnTimePeriod actuallyFetched;
-            m_prefetch.clear();
-
-            if (success)
-            {
-                m_prefetch = std::move(data);
-                if (!m_prefetch.empty())
-                {
-                    actuallyFetched = QnTimePeriod::fromInterval(
-                        m_prefetch.back().period.startTime(), m_prefetch.front().period.startTime());
-                }
-            }
-
-            completePrefetch(actuallyFetched, success, int(m_prefetch.size()));
-        };
-
     const auto sortOrder = currentRequest().direction == FetchDirection::earlier
         ? Qt::DescendingOrder
         : Qt::AscendingOrder;
 
-    return getMotion(period, dataReceived, sortOrder, currentRequest().batchSize);
+    return getMotion(period, sortOrder, currentRequest().batchSize);
 }
 
 template<typename Iter>
@@ -247,7 +250,7 @@ bool MotionSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodTo
 
 void MotionSearchListModel::Private::fetchLive()
 {
-    if (m_liveFetch.id || !q->isLive() || q->livePaused())
+    if (m_liveFetch.id || !q->isLive() || !q->isOnline() || q->livePaused())
         return;
 
     if (m_data.empty() && fetchInProgress())
@@ -258,75 +261,125 @@ void MotionSearchListModel::Private::fetchLive()
     m_liveFetch.direction = FetchDirection::later;
     m_liveFetch.batchSize = q->fetchBatchSize();
 
-    const auto liveEventsReceived =
-        [this](bool success, rest::Handle requestId, std::vector<MotionChunk>&& data)
-        {
-            const auto scopedClear = nx::utils::makeScopeGuard([this]() { m_liveFetch = {}; });
-
-            if (!success || data.empty() || !q->isLive() || !requestId || requestId != m_liveFetch.id)
-                return;
-
-            auto periodToCommit = QnTimePeriod::fromInterval(
-                data.back().period.startTime(), data.front().period.startTime());
-
-            if (data.size() >= m_liveFetch.batchSize)
-            {
-                periodToCommit.truncateFront(periodToCommit.startTimeMs + 1);
-                q->clear(); //< Otherwise there will be a gap between live and archive events.
-            }
-
-            q->addToFetchedTimeWindow(periodToCommit);
-
-            NX_VERBOSE(q) << "Live update commit";
-            commitInternal(periodToCommit, data.begin(), data.end(), 0, true);
-
-            if (count() > q->maximumCount())
-            {
-                NX_VERBOSE(q) << "Truncating to maximum count";
-                truncateToMaximumCount();
-            }
-        };
-
     NX_VERBOSE(q) << "Live update request";
-
-    m_liveFetch.id = getMotion(m_liveFetch.period, liveEventsReceived, Qt::DescendingOrder,
-        m_liveFetch.batchSize);
+    m_liveFetch.id = getMotion(m_liveFetch.period, Qt::DescendingOrder, m_liveFetch.batchSize);
 }
 
-rest::Handle MotionSearchListModel::Private::getMotion(const QnTimePeriod& period,
-    GetCallback callback, Qt::SortOrder order, int limit)
+rest::Handle MotionSearchListModel::Private::getMotion(
+    const QnTimePeriod& period, Qt::SortOrder order, int limit)
 {
-    // TODO: #vkutin Implement new rest request.
-#if 0
     const auto server = q->commonModule()->currentServer();
-    NX_ASSERT(callback && server && server->restConnection());
-    if (!callback || !server || !server->restConnection())
+    NX_ASSERT(server && server->apiConnection());
+    if (!server || !server->apiConnection())
         return {};
 
-    MotionChunksRequest request;
-    if (q->cameraSet()->type() != ManagedCameraSet::Type::all)
-    {
-        const auto cameras = q->cameraSet()->cameras();
-        std::transform(cameras.cbegin(), cameras.cend(), std::back_inserter(request.cameraIds),
-            [](const QnVirtualCameraResourcePtr& camera) { return camera->getId(); });
-    }
-
-    request.period = period;
-    request.filter = m_filterRegions;
+    QnChunksRequestData request;
+    request.resList = q->cameras().toList();
+    request.startTimeMs = period.startTimeMs;
+    request.endTimeMs = period.endTimeMs(),
+    request.periodsType = Qn::MotionContent;
+    request.groupBy = QnChunksRequestData::GroupBy::cameraId;
+    request.sortOrder = order;
     request.limit = limit;
-    request.order = order;
-    request.detailsPosition = kPreviewTimeFraction;
+
+    request.filter = q->cameraSet()->type() != ManagedCameraSet::Type::single || q->isFilterEmpty()
+        ? QString()
+        : QJson::serialized(m_filterRegions);
 
     NX_VERBOSE(q) << "Requesting motion periods from"
         << utils::timestampToDebugString(period.startTimeMs) << "to"
         << utils::timestampToDebugString(period.endTimeMs()) << "in"
-        << QVariant::fromValue(request.order).toString()
-        << "maximum objects" << request.limit;
+        << QVariant::fromValue(request.sortOrder).toString()
+        << "maximum chunks" << request.limit;
 
-    return server->restConnection()->getMotionPeriods(
-        request, false /*isLocal*/, nx::utils::guarded(this, callback), thread());
-#endif
-    return {};
+    return server->apiConnection()->recordedTimePeriods(request, this,
+        SLOT(processReceivedTimePeriods(int, const MultiServerPeriodDataList &, int)));
+}
+
+void MotionSearchListModel::Private::processReceivedTimePeriods(
+    int status, const MultiServerPeriodDataList& timePeriods, int requestId)
+{
+    NX_ASSERT(requestId);
+    if (!requestId)
+        return;
+
+    std::vector<std::vector<MotionChunk>> chunksByCamera;
+    chunksByCamera.resize(timePeriods.size());
+
+    auto source = timePeriods.cbegin();
+    for (auto& chunks: chunksByCamera)
+    {
+        chunks.resize(source->periods.size());
+        std::transform(source->periods.cbegin(), source->periods.cend(), chunks.begin(),
+            [cameraId = source->guid](const QnTimePeriod& item) -> MotionChunk
+            {
+                return {cameraId, item};
+            });
+
+        ++source;
+    }
+
+    const bool success = status == 0;
+
+    if (requestId == currentRequest().id)
+    {
+        // Archive fetch.
+
+        const auto sortOrder = currentRequest().direction == FetchDirection::earlier
+            ? Qt::DescendingOrder
+            : Qt::AscendingOrder;
+
+        QnTimePeriod actuallyFetched;
+        m_prefetch.clear();
+
+        if (success)
+        {
+            m_prefetch = nx::utils::algorithm::merge_sorted_lists(std::move(chunksByCamera),
+                [](const MotionChunk& chunk) { return chunk.period.startTimeMs; },
+                sortOrder, currentRequest().batchSize);
+
+            if (!m_prefetch.empty())
+            {
+                actuallyFetched = QnTimePeriod::fromInterval(
+                    m_prefetch.back().period.startTime(), m_prefetch.front().period.startTime());
+            }
+        }
+
+        completePrefetch(actuallyFetched, success, int(m_prefetch.size()));
+    }
+    else if (requestId == m_liveFetch.id)
+    {
+        // Live fetch.
+
+        const auto scopedClear = nx::utils::makeScopeGuard([this]() { m_liveFetch = {}; });
+
+        if (!success || chunksByCamera.empty() || !q->isLive())
+            return;
+
+        auto data = nx::utils::algorithm::merge_sorted_lists(std::move(chunksByCamera),
+            [](const MotionChunk& chunk) { return chunk.period.startTimeMs; },
+            Qt::DescendingOrder, m_liveFetch.batchSize);
+
+        auto periodToCommit = QnTimePeriod::fromInterval(
+            data.back().period.startTime(), data.front().period.startTime());
+
+        if (data.size() >= m_liveFetch.batchSize)
+        {
+            periodToCommit.truncateFront(periodToCommit.startTimeMs + 1);
+            q->clear(); //< Otherwise there will be a gap between live and archive events.
+        }
+
+        q->addToFetchedTimeWindow(periodToCommit);
+
+        NX_VERBOSE(q) << "Live update commit";
+        commitInternal(periodToCommit, data.begin(), data.end(), 0, true);
+
+        if (count() > q->maximumCount())
+        {
+            NX_VERBOSE(q) << "Truncating to maximum count";
+            truncateToMaximumCount();
+        }
+    }
 }
 
 QSharedPointer<QMenu> MotionSearchListModel::Private::contextMenu(const MotionChunk& chunk) const

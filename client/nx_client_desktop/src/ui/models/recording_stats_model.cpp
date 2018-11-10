@@ -96,9 +96,16 @@ int QnRecordingStatsModel::rowCount(const QModelIndex &parent) const {
     return 0;
 }
 
-int QnRecordingStatsModel::columnCount(const QModelIndex &parent) const {
+int QnRecordingStatsModel::columnCount(const QModelIndex &parent) const
+{
     if (!parent.isValid())
+    {
+        if (m_isForecastRole)
+            return ColumnCount - 1; // Do not show "(Current) Bitrate" column.
+
         return ColumnCount;
+    }
+
     return 0;
 }
 
@@ -131,7 +138,7 @@ QString QnRecordingStatsModel::displayData(const QModelIndex &index) const {
 QString QnRecordingStatsModel::footerDisplayData(const QModelIndex &index) const {
     switch(index.column())
     {
-    case CameraNameColumn:
+        case CameraNameColumn:
         {
             QnVirtualCameraResourceList cameras;
             for (const QnCamRecordingStatsData &data: m_data)
@@ -151,14 +158,10 @@ QString QnRecordingStatsModel::footerDisplayData(const QModelIndex &index) const
                 ), cameras
             );
         }
-    case BytesColumn:
-        return formatBytesString(m_footer.recordedBytes);
-    case DurationColumn:
-        return formatDurationString(m_footer);
-    case BitrateColumn:
-        return formatBitrateString(m_footer.bitrateSum);
-    default:
-        return QString();
+        case BytesColumn: return formatBytesString(m_footer.recordedBytes);
+        case DurationColumn: return QString();// Removed.
+        case BitrateColumn: return formatBitrateString(m_footer.bitrateSum);
+        default: return QString();
     }
     return QString();
 }
@@ -205,31 +208,6 @@ qreal QnRecordingStatsModel::chartData(const QModelIndex& index) const
     result = qBound(0.0, result, 1.0);
     NX_ASSERT(qBetween(0.0, result, 1.00001));
     return result;
-}
-
-QVariant QnRecordingStatsModel::footerData(const QModelIndex &index, int role) const
-{
-    switch(role)
-    {
-        case Qt::DisplayRole:
-            return footerDisplayData(index);
-        case Qt::ToolTipRole:
-            return tooltipText(static_cast<Columns>(index.column()));
-        case Qt::DecorationRole:
-        {
-            if (index.column() != CameraNameColumn)
-                break;
-
-            return qnResIconCache->icon(
-                QnResourceIconCache::Cameras | QnResourceIconCache::AlwaysSelected);
-        }
-        case Qn::RecordingStatsDataRole:
-            return QVariant::fromValue<QnCamRecordingStatsData>(m_footer);
-        default:
-            break;
-    }
-
-    return QVariant();
 }
 
 QString QnRecordingStatsModel::tooltipText(Columns column) const
@@ -309,12 +287,37 @@ QVariant QnRecordingStatsModel::headerData(int section, Qt::Orientation orientat
                     tr("Camera"));
             case BytesColumn:      return tr("Space");
             case DurationColumn:   return tr("Calendar Days");
-            case BitrateColumn:    return tr("Bitrate");
+            case BitrateColumn:    return tr("Current Bitrate");
             default:               break;
         }
     }
 
     return base_type::headerData(section, orientation, role);
+}
+
+QVariant QnRecordingStatsModel::footerData(const QModelIndex &index, int role) const
+{
+    switch(role)
+    {
+        case Qt::DisplayRole:
+            return footerDisplayData(index);
+        case Qt::ToolTipRole:
+            return tooltipText(static_cast<Columns>(index.column()));
+        case Qt::DecorationRole:
+        {
+            if (index.column() != CameraNameColumn)
+                break;
+
+            return qnResIconCache->icon(
+                QnResourceIconCache::Cameras | QnResourceIconCache::AlwaysSelected);
+        }
+        case Qn::RecordingStatsDataRole:
+            return QVariant::fromValue<QnCamRecordingStatsData>(m_footer);
+        default:
+            break;
+    }
+
+    return QVariant();
 }
 
 void QnRecordingStatsModel::clear() {
@@ -343,18 +346,19 @@ QnFooterData QnRecordingStatsModel::calculateFooter(const QnRecordingStatsReply&
     QnRecordingStatsData summ;
     QnFooterData footer;
 
-    for(const QnCamRecordingStatsData& value: data) {
+    for(const QnCamRecordingStatsData& value: data)
+    {
         summ += value;
         footer.maxValues.recordedBytes = qMax(footer.maxValues.recordedBytes, value.recordedBytes);
         footer.maxValues.recordedSecs = qMax(footer.maxValues.recordedSecs, value.recordedSecs);
-        footer.maxValues.archiveDurationSecs = qMax(footer.maxValues.archiveDurationSecs, value.archiveDurationSecs);
+        // Removed footer.maxValues.archiveDurationSecs.
         footer.maxValues.averageBitrate = qMax(footer.maxValues.averageBitrate, value.averageBitrate);
         footer.bitrateSum += value.averageBitrate;
     }
 
     footer.recordedBytes = summ.recordedBytes;
     footer.recordedSecs = summ.recordedSecs;
-    footer.archiveDurationSecs = summ.archiveDurationSecs;
+    // Removed footer.archiveDurationSecs.
     footer.averageBitrate = footer.maxValues.averageBitrate;
 
     return footer;

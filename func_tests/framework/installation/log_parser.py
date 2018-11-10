@@ -38,7 +38,7 @@ def _record(prev_match, message):
 def parse_mediaserver_logs(log_bytes):
     log_text = log_bytes.decode('utf-8-sig')
     matches_iter = _split_re.finditer(log_text)
-    prev_match = matches_iter.next()
+    prev_match = next(matches_iter)
     assert prev_match.start() == 0
     for next_match in matches_iter:
         message = log_text[prev_match.end():next_match.start() - 1]

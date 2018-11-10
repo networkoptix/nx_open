@@ -3,14 +3,19 @@ from contextlib import contextmanager
 from functools import partial
 
 from contextlib2 import ExitStack
+from parse import parse
+from pathlib2 import Path
 
 from framework.context_logger import context_logger
 from framework.os_access.exceptions import AlreadyExists
 from framework.os_access.os_access_interface import OSAccess
+from framework.os_access.path import FileSystemPath
 from framework.os_access.posix_access import PosixAccess
 from framework.os_access.windows_access import WindowsAccess
 from framework.registry import Registry
+from framework.serialize import load
 from framework.vms.hypervisor import VMNotFound, VmHardware, VmNotReady
+from framework.vms.hypervisor.default import default_hypervisor
 from framework.vms.hypervisor.hypervisor import Hypervisor
 from framework.waiting import Wait, WaitTimeout, wait_for_truthy
 
@@ -32,6 +37,39 @@ class UnknownOsFamily(Exception):
     pass
 
 
+class VmTemplate(object):
+    def __init__(self, hypervisor, vm_name, url, downloads_dir):
+        # type: (Hypervisor, str, str, FileSystemPath) -> ...
+        self._hypervisor = hypervisor
+        self._vm_name = vm_name
+        self._url = url
+        self._downloads_dir = downloads_dir
+
+    def arrange_template_vm(self):
+        # VirtualBox sometimes locks VM for a short period of time
+        # when other operation is performed in parallel.
+        wait = Wait(
+            "template {} not locked".format(self._vm_name),
+            timeout_sec=30,
+            logger=_logger.getChild('wait'),
+            )
+        while True:
+            try:
+                return self._hypervisor.find_vm(self._vm_name)
+            except VMNotFound:
+                if self._url is None:
+                    raise EnvironmentError(
+                        "Template VM {} not found, template VM image URL is not specified".format(
+                            self._vm_name))
+                vm_image = self._hypervisor.host_os_access.download(self._url, self._downloads_dir)
+                return self._hypervisor.import_vm(vm_image, self._vm_name)
+            except VmNotReady:
+                if not wait.again():
+                    raise
+                wait.sleep()  # TODO: Need jitter on wait times.
+                continue
+
+
 class VMType(object):
     def __init__(
             self,
@@ -40,10 +78,8 @@ class VMType(object):
             os_family,
             power_on_timeout_sec,
             registry_path, make_name, limit,
-            template_vm,
             make_mac, network_conf,
-            template_url,
-            template_dir,
+            template,  # type: VmTemplate
             ):
         self._name = name
         self.hypervisor = hypervisor  # type: Hypervisor
@@ -53,9 +89,7 @@ class VMType(object):
             lambda index: make_name(vm_index=index),  # Registry doesn't know about VMs.
             limit,
             )
-        self.template_vm_name = template_vm
-        self.template_url = template_url
-        self._template_dir = template_dir
+        self._template = template
         self._make_mac = make_mac
         self._port_offsets = network_conf['vm_ports_to_host_port_offsets']
         self._ports_per_vm = network_conf['host_ports_per_vm']
@@ -69,33 +103,35 @@ class VMType(object):
     def __repr__(self):
         return '<{!s}>'.format(self)
 
-    def _obtain_template(self):
-        # VirtualBox sometimes locks VM for a short period of time
-        # when other operation is performed in parallel.
-        wait = Wait(
-            "template {} not locked".format(self.template_vm_name),
-            timeout_sec=30,
-            logger=_logger.getChild('wait'),
+    @classmethod
+    def from_config(cls, name, conf, template, hypervisor=default_hypervisor, slot=0):
+        return cls(
+            name,
+            hypervisor,
+            conf['os_family'],
+            conf['power_on_timeout_sec'],
+            conf['vm']['registry_path'].format(slot=slot),
+            partial(conf['vm']['name_format'].format, slot=slot),
+            conf['vm']['machines_per_slot'],
+            partial(conf['vm']['mac_address_format'].format, slot=slot),
+            {
+                'host_ports_base': (
+                        conf['vm']['port_forwarding']['host_ports_base']
+                        + (
+                                slot
+                                * conf['vm']['machines_per_slot']
+                                * conf['vm']['port_forwarding']['host_ports_per_vm']
+                        )
+                ),
+                'host_ports_per_vm': conf['vm']['port_forwarding']['host_ports_per_vm'],
+                'vm_ports_to_host_port_offsets': {
+                    parse('{}/{:d}', key): hint
+                    for key, hint
+                    in conf['vm']['port_forwarding']['vm_ports_to_host_port_offsets'].items()
+                    },
+                },
+            template,
             )
-        while True:
-            try:
-                return self.hypervisor.find_vm(self.template_vm_name)
-            except VMNotFound:
-                if self.template_url is None:
-                    raise EnvironmentError(
-                        "Template VM {} not found, template VM image URL is not specified".format(
-                            self.template_vm_name))
-                try:
-                    template_vm_image = self.hypervisor.host_os_access.download(
-                        self.template_url, self._template_dir)
-                except AlreadyExists as e:
-                    template_vm_image = e.path
-                return self.hypervisor.import_vm(template_vm_image, self.template_vm_name)
-            except VmNotReady:
-                if not wait.again():
-                    raise
-                wait.sleep()  # TODO: Need jitter on wait times.
-                continue
 
     @contextmanager
     def vm_allocated(self, alias):
@@ -104,7 +140,7 @@ class VMType(object):
             try:
                 hardware = self.hypervisor.find_vm(vm_name)
             except VMNotFound:
-                template_vm = self._obtain_template()
+                template_vm = self._template.arrange_template_vm()
                 hardware = template_vm.clone(vm_name)
                 hardware.setup_mac_addresses(partial(self._make_mac, vm_index=vm_index))
                 ports_base_for_vm = self._ports_base + self._ports_per_vm * vm_index
@@ -147,6 +183,7 @@ class VMType(object):
                 # TODO: Consider unplug and reset only before network setup.
                 vm.os_access.networking.reset()
                 vm.os_access.cleanup_disk_space()
+                vm.os_access.fake_disk().remove()
                 vm.hardware.reset_bandwidth()
                 yield vm
 
@@ -164,3 +201,23 @@ class VMType(object):
                     _logger.debug("Machine %s not found.", name)
                     continue
                 vm.destroy()
+
+
+def vm_types_from_config(downloads_dir, template_url_prefix, hypervisor=default_hypervisor, slot=0):
+    path = Path(__file__).with_name('configuration.yaml')
+    config_file_data = load(path.read_text())
+    vm_types = {
+        name: VMType.from_config(
+            name,
+            conf,
+            VmTemplate(
+                hypervisor,
+                conf['vm']['template_vm'].format(slot=slot),
+                template_url_prefix + conf['vm']['template_file'],
+                downloads_dir),
+            hypervisor=hypervisor,
+            slot=slot,
+            )
+        for name, conf in config_file_data['vm_types'].items()
+        }
+    return vm_types

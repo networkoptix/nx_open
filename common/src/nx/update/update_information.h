@@ -43,6 +43,7 @@ struct Information
     QList<Package> packages;
 
     bool isValid() const { return !version.isNull(); }
+    bool isEmpty() const { return packages.isEmpty(); }
 };
 
 #define Information_Fields (version)(cloudHost)(eulaLink)(eulaContents)(eulaVersion)(releaseNotesUrl)(releaseNotesContents)(packages)
@@ -75,11 +76,14 @@ public:
     enum class Code
     {
         idle,
+        // Server is downloading an update package.
         downloading,
-        readyToInstall,
+        // Server is verifying an update package after downloading has finished successfully.
         preparing,
+        // Update package has been downloaded and verified.
+        readyToInstall,
+        latestUpdateInstalled,
         offline,
-        installing,
         error
     };
     Q_ENUM(Code)

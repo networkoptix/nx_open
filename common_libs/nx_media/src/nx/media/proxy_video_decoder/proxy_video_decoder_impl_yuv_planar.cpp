@@ -7,10 +7,9 @@
 
 #include "proxy_video_decoder_utils.h"
 
-extern "C"
-{
-    #include <libavutil/imgutils.h>
-}
+extern "C" {
+#include <libavutil/imgutils.h>
+} // extern "C"
 
 namespace nx {
 namespace media {
@@ -35,7 +34,7 @@ int Impl::decode(
 
     const int alignedWidth = qPower2Ceil((unsigned) frameSize().width(), (unsigned) kMediaAlignment);
     const int numBytes = av_image_get_buffer_size(
-        AV_PIX_FMT_YUV420P, alignedWidth, frameSize().height(), 1);
+        AV_PIX_FMT_YUV420P, alignedWidth, frameSize().height(), /*align*/ 1);
     const int lineSize = alignedWidth;
 
     auto videoBuffer = new AlignedMemVideoBuffer(numBytes, kMediaAlignment, lineSize);

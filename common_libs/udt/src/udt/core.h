@@ -57,6 +57,8 @@ Yunhong Gu, last updated 02/28/2012
 
 enum UDTSockType { UDT_STREAM = 1, UDT_DGRAM };
 
+class Multiplexer;
+
 /**
  * Processes handshake requests.
  */
@@ -83,7 +85,7 @@ private:
     uint64_t m_StartTime = 0;
     UDTSockType m_iSockType;
     UDTSOCKET m_SocketId;
-    CSndQueue* m_pSndQueue = nullptr;
+    CSndQueue* m_sendQueue = nullptr;
     std::set<int> m_pollIds;
 };
 
@@ -182,10 +184,10 @@ public: // internal API
 
     UDTSOCKET peerId() const { return m_PeerID; }
 
-    CSndQueue* sndQueue() { return m_pSndQueue; }
-    void setSndQueue(CSndQueue* value) { m_pSndQueue = value; }
-    CRcvQueue* rcvQueue() { return m_pRcvQueue; }
-    void setRcvQueue(CRcvQueue* value) { m_pRcvQueue = value; }
+    CSndQueue& sndQueue();
+    CRcvQueue& rcvQueue();
+
+    void setMultiplexer(const std::shared_ptr<Multiplexer>& multiplexer);
     
     CSndBuffer* sndBuffer() { return m_pSndBuffer; }
     CRcvBuffer* rcvBuffer() { return m_pRcvBuffer; }
@@ -538,16 +540,15 @@ private: // Timers
     uint64_t m_ullTargetTime;            // scheduled time of next packet sending
 
 private: // for UDP multiplexer
-    CSndQueue* m_pSndQueue;            // packet sending queue
-    CRcvQueue* m_pRcvQueue;            // packet receiving queue
-    sockaddr* m_pPeerAddr;            // peer address
-    uint32_t m_piSelfIP[4];            // local UDP IP address
-    CSNode* m_pSNode;                // node information for UDT list used in snd queue
-    CRNode* m_pRNode;                            // node information for UDT list used in rcv queue
+    std::shared_ptr<Multiplexer> m_multiplexer;
+    sockaddr* m_pPeerAddr = nullptr;    // peer address
+    uint32_t m_piSelfIP[4];             // local UDP IP address
+    CSNode* m_pSNode = nullptr;         // node information for UDT list used in snd queue
+    CRNode* m_pRNode = nullptr;         // node information for UDT list used in rcv queue
     std::shared_ptr<ServerSideConnectionAcceptor> m_synPacketHandler;
 
 private: // for epoll
-    std::set<int> m_sPollID;                     // set of epoll ID to trigger
+    std::set<int> m_sPollID;            // set of epoll ID to trigger
 };
 
 #endif

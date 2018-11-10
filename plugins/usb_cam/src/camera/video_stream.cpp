@@ -2,19 +2,21 @@
 
 #include <algorithm>
 
-#include <nx/utils/log/log.h>
 #include <nx/utils/app_info.h>
 #include <plugins/plugin_container_api.h>
+#include <utils/media/frame_type_extractor.h>
 
 #include "camera.h"
 #include "buffered_stream_consumer.h"
-#include "device/utils.h"
+#include "device/video/utils.h"
 #include "ffmpeg/utils.h"
 
 namespace nx {
 namespace usb_cam {
 
 namespace {
+
+static constexpr int kMsecInSec = 1000;
 
 const char * deviceType()
 {
@@ -26,18 +28,26 @@ const char * deviceType()
 #endif
 }
 
-static constexpr int kMsecInSec = 1000;
+bool isIFrame(const ffmpeg::Packet * packet)
+{
+    if(!packet)
+        return false;
+
+    const quint8 * udata = static_cast<const quint8 *>(packet->data());
+
+    FrameTypeExtractor extractor(packet->codecId());
+
+    return extractor.getFrameType(udata, packet->size()) == FrameTypeExtractor::I_Frame;
+}
 
 } // namespace
 
 VideoStream::VideoStream(
-    const std::string& url,
-    const CodecParameters& codecParams,
-    const std::weak_ptr<Camera>& camera)
+    const std::weak_ptr<Camera>& camera,
+    const CodecParameters& codecParams)
     :
-    m_url(url),
-    m_codecParams(codecParams),
     m_camera(camera),
+    m_codecParams(codecParams),
     m_timeProvider(camera.lock()->timeProvider()),
     m_packetCount(std::make_shared<std::atomic_int>(0)),
     m_frameCount(std::make_shared<std::atomic_int>(0))
@@ -52,7 +62,9 @@ VideoStream::~VideoStream()
 
 std::string VideoStream::url() const
 {
-    return m_url;
+    if (auto cam = m_camera.lock())
+        return cam->url();
+    return {};
 }
 
 float VideoStream::fps() const
@@ -115,6 +127,10 @@ void VideoStream::removeFrameConsumer(const std::weak_ptr<AbstractFrameConsumer>
     std::lock_guard<std::mutex> lock(m_mutex);
     m_frameConsumerManager.removeConsumer(consumer);
     updateUnlocked();
+
+    // Raspberry Pi: reinitialize the camera to recover frame rate on the primary stream.
+    if (nx::utils::AppInfo::isRaspberryPi() && m_frameConsumerManager.empty())
+        m_cameraState = csModified;
 }
 
 void VideoStream::updateFps()
@@ -142,7 +158,7 @@ bool VideoStream::ioError() const
 
 bool VideoStream::pluggedIn() const
 {
-    return !device::getDeviceName(m_url.c_str()).empty();
+    return !device::video::getDeviceName(url().c_str()).empty();
 }
 
 void VideoStream::updateActualFps(uint64_t now)
@@ -159,13 +175,13 @@ void VideoStream::updateActualFps(uint64_t now)
     }
 }
 
-std::string VideoStream::ffmpegUrl() const
+std::string VideoStream::ffmpegUrlPlatformDependent() const
 {
     return
 #ifdef _WIN32
-        std::string("video=@device_pnp_") + m_url;
+        std::string("video=@device_pnp_") + url();
 #else
-        m_url;
+        url();
 #endif
 }
 
@@ -303,7 +319,7 @@ int VideoStream::initializeInputFormat()
 
     setInputFormatOptions(inputFormat);
 
-    result = inputFormat->open(ffmpegUrl().c_str());
+    result = inputFormat->open(ffmpegUrlPlatformDependent().c_str());
     checkIoError(result);
     if (result < 0)
         return result;
@@ -334,8 +350,8 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
         if(auto cam = m_camera.lock())
         {
             // ffmpeg doesn't have an option for setting the bitrate on AVFormatContext.
-            device::setBitrate(
-                m_url.c_str(),
+            device::video::setBitrate(
+                url().c_str(),
                 m_codecParams.bitrate,
                 cam->compressionTypeDescriptor());
         }
@@ -396,6 +412,12 @@ std::shared_ptr<ffmpeg::Packet> VideoStream::readFrame()
         return nullptr;
     }
 
+#ifdef _WIN32
+    // dshow input format does not set h264 key packet flag correctly, so do it manually
+    if (packet->codecId() == AV_CODEC_ID_H264 && isIFrame(packet.get()))
+        packet->packet()->flags |= AV_PKT_FLAG_KEY;
+#endif
+
     // Setting timestamp here because primary stream needs it even if there is no decoding.
     packet->setTimestamp(m_timeProvider->millisSinceEpoch());
 
@@ -424,10 +446,6 @@ std::shared_ptr<ffmpeg::Frame> VideoStream::maybeDecode(const ffmpeg::Packet * p
 
     if (frame->pts() == AV_NOPTS_VALUE)
         frame->frame()->pts = frame->packetPts();
-
-    // Don't allow too many dangling timestamps.
-    if (m_timestamps.size() > 30)
-        m_timestamps.clear();
 
     m_timestamps.addTimestamp(packet->pts(), packet->timestamp());
 
@@ -549,7 +567,7 @@ void VideoStream::updateUnlocked()
 
 CodecParameters VideoStream::findClosestHardwareConfiguration(const CodecParameters& params) const
 {
-    std::vector<device::ResolutionData>resolutionList;
+    std::vector<device::video::ResolutionData>resolutionList;
 
     // Assumes list is in ascending resolution order
     if (auto cam = m_camera.lock())
@@ -624,7 +642,7 @@ void VideoStream::setCodecParameters(const CodecParameters& codecParams)
 bool VideoStream::checkIoError(int ffmpegError)
 {
     m_ioError = ffmpegError == AVERROR(ENODEV) //< Linux.
-        || ffmpegError == AVERROR(EIO) //< Windows
+        || ffmpegError == AVERROR(EIO) //< Windows.
         || ffmpegError == AVERROR(EBUSY); //< Device is busy during initialization.
     return m_ioError;
 }

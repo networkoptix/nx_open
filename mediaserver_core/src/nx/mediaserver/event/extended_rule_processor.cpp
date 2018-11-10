@@ -129,7 +129,7 @@ static const QString tpDescription(lit("description"));
 
 static const QSize SCREENSHOT_SIZE(640, 480);
 static const unsigned int MS_PER_SEC = 1000;
-static const unsigned int emailAggregationPeriodMS = 30 * MS_PER_SEC;
+static const std::chrono::seconds kDefaultMailAggregationPeriod(30);
 
 static const int kEmailSendDelay = 0;
 
@@ -610,7 +610,7 @@ bool ExtendedRuleProcessor::sendMailInternal(const vms::event::SendMailActionPtr
 {
     NX_ASSERT(action);
 
-    QStringList recipients = action->getParams().emailAddress.split(kNewEmailDelimiter);
+    QStringList recipients = action->getParams().emailAddress.split(kNewEmailDelimiter, QString::SkipEmptyParts);
 
     if (recipients.isEmpty())
     {
@@ -765,10 +765,7 @@ bool ExtendedRuleProcessor::sendMail(const vms::event::SendMailActionPtr& action
 
     // Aggregating by recipients and event type.
 
-    SendEmailAggregationKey aggregationKey(action->getRuntimeParams().eventType,
-        action->getParams().emailAddress); //< all recipients are already computed and packed here.
-
-    SendEmailAggregationData& aggregatedData = m_aggregatedEmails[aggregationKey];
+    SendEmailAggregationData& aggregatedData = m_aggregatedEmails[action->getRuleId()];
 
     vms::event::AggregationInfo aggregationInfo = aggregatedData.action
         ? aggregatedData.action->aggregationInfo() //< adding event source (camera) to the existing aggregation info.
@@ -776,11 +773,17 @@ bool ExtendedRuleProcessor::sendMail(const vms::event::SendMailActionPtr& action
 
     if (!aggregatedData.action)
     {
+        auto ruleManager = serverModule()->commonModule()->eventRuleManager();
+        auto rule = ruleManager->rule(action->getRuleId());
+        std::chrono::seconds aggregationPeriod = kDefaultMailAggregationPeriod;
+        if (rule && rule->aggregationPeriod())
+            aggregationPeriod = std::chrono::seconds(rule->aggregationPeriod());
+
         aggregatedData.action = vms::event::SendMailActionPtr(new vms::event::SendMailAction(*action));
         using namespace std::placeholders;
         aggregatedData.periodicTaskID = nx::utils::TimerManager::instance()->addTimer(
-            std::bind(&ExtendedRuleProcessor::sendAggregationEmail, this, aggregationKey),
-            std::chrono::milliseconds(emailAggregationPeriodMS));
+            std::bind(&ExtendedRuleProcessor::sendAggregationEmail, this, action->getRuleId()),
+            aggregationPeriod);
     }
 
     ++aggregatedData.eventCount;
@@ -791,11 +794,11 @@ bool ExtendedRuleProcessor::sendMail(const vms::event::SendMailActionPtr& action
     return true;
 }
 
-void ExtendedRuleProcessor::sendAggregationEmail(const SendEmailAggregationKey& aggregationKey)
+void ExtendedRuleProcessor::sendAggregationEmail(const QnUuid& ruleId)
 {
     QnMutexLocker lk(&m_mutex);
 
-    auto aggregatedActionIter = m_aggregatedEmails.find(aggregationKey);
+    auto aggregatedActionIter = m_aggregatedEmails.find(ruleId);
     if (aggregatedActionIter == m_aggregatedEmails.end())
         return;
 

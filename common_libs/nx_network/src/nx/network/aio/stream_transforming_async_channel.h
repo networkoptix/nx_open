@@ -4,6 +4,7 @@
 #include <memory>
 #include <tuple>
 
+#include <nx/network/aio/interruption_flag.h>
 #include <nx/utils/byte_stream/pipeline.h>
 #include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/std/optional.h>
@@ -55,12 +56,6 @@ private:
     {
         inProgress,
         done,
-    };
-
-    enum class UserHandlerResult
-    {
-        thisLeftRunning,
-        thisDeleted,
     };
 
     struct UserTask
@@ -119,12 +114,14 @@ private:
     std::deque<nx::Buffer> m_readRawData;
     std::deque<RawSendContext> m_rawWriteQueue;
     bool m_asyncReadInProgress;
-    nx::utils::ObjectDestructionFlag m_destructionFlag;
+    InterruptionFlag m_aioInterruptionFlag;
     bool m_sendShutdown = false;
-
+    
     virtual void stopWhileInAioThread() override;
 
     void tryToCompleteUserTasks();
+    void tryToCompleteUserTasks(
+        const std::deque<std::shared_ptr<UserTask>>& userTaskQueue);
     void processTask(UserTask* task);
     void processReadTask(ReadTask* task);
     void processWriteTask(WriteTask* task);
@@ -138,10 +135,10 @@ private:
     int writeRawBytes(const void* data, size_t count);
 
     void onRawDataWritten(SystemError::ErrorCode, std::size_t);
-    template<typename Range>
-        UserHandlerResult completeRawSendTasks(
-            Range completedIoRange,
-            SystemError::ErrorCode sysErrorCode);
+    template<typename Range> std::deque<RawSendContext> takeRawSendTasks(Range range);
+    InterruptionFlag::StateChange completeRawSendTasks(
+        std::deque<RawSendContext> completedRawSendTasks,
+        SystemError::ErrorCode sysErrorCode);
     void scheduleNextRawSendTaskIfAny();
 
     void reportFailureOfEveryUserTask(SystemError::ErrorCode sysErrorCode);

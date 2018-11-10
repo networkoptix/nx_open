@@ -14,10 +14,16 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+nx::utils::SoftwareVersion UpdateContents::getVersion() const
+{
+    return nx::utils::SoftwareVersion(info.version);
+}
+
 // Check if we can apply this update.
 bool UpdateContents::isValid() const
 {
     return missingUpdate.empty()
+        && !info.version.isEmpty()
         && invalidVersion.empty()
         && clientPackage.isValid()
         && error == nx::update::InformationError::noError;
@@ -29,7 +35,6 @@ nx::update::Package findClientPackage(const nx::update::Information& updateInfo)
     nx::update::Package result;
     const auto modification = QnAppInfo::applicationPlatformModification();
     auto arch = QnAppInfo::applicationArch();
-    auto runtime = nx::vms::api::SystemInformation::currentSystemRuntime().replace(L' ', L'_');
 
     for (auto& pkg: updateInfo.packages)
     {

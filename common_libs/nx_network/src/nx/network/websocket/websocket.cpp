@@ -56,6 +56,7 @@ WebSocket::WebSocket(
 
 WebSocket::~WebSocket()
 {
+    pleaseStopSync();
 }
 
 void WebSocket::start()

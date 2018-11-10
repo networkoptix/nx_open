@@ -15,11 +15,9 @@
 
 #include "stream_socket_server.h"
 
-namespace nx {
-namespace network {
-namespace server {
+namespace nx::network::server {
 
-static constexpr size_t READ_BUFFER_CAPACITY = 16 * 1024;
+static constexpr size_t kReadBufferCapacity = 16 * 1024;
 
 struct BaseServerConnectionAccess
 {
@@ -67,9 +65,9 @@ struct BaseServerConnectionAccess
 template<
     class CustomConnectionType
 > class BaseServerConnection:
-    public nx::network::aio::BasicPollable
+    public aio::BasicPollable
 {
-    using base_type = nx::network::aio::BasicPollable;
+    using base_type = aio::BasicPollable;
     using self_type = BaseServerConnection<CustomConnectionType>;
 
 public:
@@ -86,13 +84,11 @@ public:
         std::unique_ptr<AbstractStreamSocket> streamSocket)
         :
         m_onConnectionClosedHandler(std::move(onConnectionClosedHandler)),
-        m_streamSocket(std::move(streamSocket)),
-        m_bytesToSend(0),
-        m_isSendingData(false)
+        m_streamSocket(std::move(streamSocket))
     {
         bindToAioThread(m_streamSocket->getAioThread());
 
-        m_readBuffer.reserve(READ_BUFFER_CAPACITY);
+        m_readBuffer.reserve(kReadBufferCapacity);
     }
 
     ~BaseServerConnection()
@@ -100,7 +96,7 @@ public:
         stopWhileInAioThread();
     }
 
-    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
     {
         base_type::bindToAioThread(aioThread);
 
@@ -113,8 +109,6 @@ public:
     void startReadingConnection(
         std::optional<std::chrono::milliseconds> inactivityTimeout = std::nullopt)
     {
-        using namespace std::placeholders;
-
         m_streamSocket->dispatch(
             [this, inactivityTimeout]()
             {
@@ -132,7 +126,7 @@ public:
                 m_readBuffer.resize(0);
                 m_streamSocket->readSomeAsync(
                     &m_readBuffer,
-                    std::bind(&self_type::onBytesRead, this, _1, _2));
+                    [this](auto&&... args) { onBytesRead(std::move(args)...); });
             });
     }
 
@@ -153,8 +147,6 @@ public:
      */
     void sendBufAsync(const nx::Buffer& buf)
     {
-        using namespace std::placeholders;
-
         m_streamSocket->dispatch(
             [this, &buf]()
             {
@@ -164,9 +156,8 @@ public:
 
                 m_streamSocket->sendAsync(
                     buf,
-                    std::bind(&self_type::onBytesSent, this, _1, _2));
+                    [this](auto&&... args) { onBytesSent(std::move(args)...); });
                 m_bytesToSend = buf.size();
-
             });
     }
 
@@ -183,8 +174,7 @@ public:
 
     /**
      * Register handler to be executed when connection just about to be destroyed.
-     * NOTE: It is unspecified which thread handler will be invoked in
-     * (usually, it is aio thread corresponding to the socket).
+     * NOTE: Handler is invoked in socket's aio thread.
      */
     void registerCloseHandler(nx::utils::MoveOnlyFunc<void()> handler)
     {
@@ -210,12 +200,10 @@ public:
      */
     virtual std::unique_ptr<AbstractStreamSocket> takeSocket()
     {
-        m_streamSocket->cancelIOSync(nx::network::aio::etNone);
+        m_streamSocket->cancelIOSync(aio::etNone);
         m_receiving = false;
 
-        decltype(m_streamSocket) socketToReturn;
-        socketToReturn.swap(m_streamSocket);
-        return socketToReturn;
+        return std::exchange(m_streamSocket, nullptr);
     }
 
     /**
@@ -248,18 +236,16 @@ private:
     OnConnectionClosedHandler m_onConnectionClosedHandler;
     std::unique_ptr<AbstractStreamSocket> m_streamSocket;
     nx::Buffer m_readBuffer;
-    size_t m_bytesToSend;
+    size_t m_bytesToSend = 0;
     std::forward_list<nx::utils::MoveOnlyFunc<void()>> m_connectionClosedHandlers;
     nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
 
     std::optional<std::chrono::milliseconds> m_inactivityTimeout;
-    bool m_isSendingData;
+    bool m_isSendingData = false;
     bool m_receiving = false;
 
     void onBytesRead(SystemError::ErrorCode errorCode, size_t bytesRead)
     {
-        using namespace std::placeholders;
-
         resetInactivityTimer();
         if (errorCode != SystemError::noError)
             return handleSocketError(errorCode);
@@ -283,10 +269,12 @@ private:
 
         m_streamSocket->readSomeAsync(
             &m_readBuffer,
-            std::bind(&self_type::onBytesRead, this, _1, _2));
+            [this](auto&&... args) { onBytesRead(std::move(args)...); });
     }
 
-    void onBytesSent(SystemError::ErrorCode errorCode, size_t count)
+    void onBytesSent(
+        SystemError::ErrorCode errorCode,
+        [[maybe_unused]] size_t count)
     {
         m_isSendingData = false;
         resetInactivityTimer();
@@ -294,7 +282,6 @@ private:
         if (errorCode != SystemError::noError)
             return handleSocketError(errorCode);
 
-        static_cast<void>(count);
         NX_ASSERT(count == m_bytesToSend);
 
         BaseServerConnectionAccess::readyToSendData<CustomConnectionType>(this);
@@ -320,8 +307,7 @@ private:
 
     void triggerConnectionClosedEvent()
     {
-        decltype(m_connectionClosedHandlers) connectionClosedHandlers;
-        connectionClosedHandlers.swap(m_connectionClosedHandlers);
+        auto connectionClosedHandlers = std::exchange(m_connectionClosedHandlers, {});
         for (auto& connectionCloseHandler: connectionClosedHandlers)
             connectionCloseHandler();
     }
@@ -338,19 +324,22 @@ private:
 
     void removeInactivityTimer()
     {
-        m_streamSocket->cancelIOSync(nx::network::aio::etTimedOut);
+        m_streamSocket->cancelIOSync(aio::etTimedOut);
     }
 };
+
+//-------------------------------------------------------------------------------------------------
 
 /**
  * These two classes enable BaseServerConnection alternative usage without inheritance.
  */
+
 class BaseServerConnectionHandler
 {
 public:
     virtual ~BaseServerConnectionHandler() = default;
 
-    virtual void bytesReceived(nx::Buffer& buffer) = 0;
+    virtual void bytesReceived(const nx::Buffer& buffer) = 0;
     virtual void readyToSendData() = 0;
 };
 
@@ -373,7 +362,7 @@ public:
     }
 
 private:
-    void bytesReceived(nx::Buffer& buf)
+    void bytesReceived(const nx::Buffer& buf)
     {
         m_handler->bytesReceived(buf);
     }
@@ -384,9 +373,7 @@ private:
     }
 
 private:
-    BaseServerConnectionHandler* m_handler;
+    BaseServerConnectionHandler* m_handler = nullptr;
 };
 
-} // namespace server
-} // namespace network
-} // namespace nx
+} // namespace nx::network::server

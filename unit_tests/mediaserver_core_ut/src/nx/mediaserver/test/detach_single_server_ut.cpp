@@ -114,7 +114,7 @@ public:
         client->setUserName("admin");
         client->setUserPassword("admin");
         DetachFromCloudData data;
-        data.password = "qweasd123";
+        data.password = "My1nsAnelYSaf3P4ssW0rd";
 
         nx::utils::Url url = mediaServerLauncher->apiUrl();
         url.setPath("/api/detachFromSystem");

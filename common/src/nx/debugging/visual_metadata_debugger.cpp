@@ -5,6 +5,7 @@
 #include <QtGui/QPainter>
 
 #include <utils/common/sleep.h>
+#include <nx/streaming/abstract_stream_data_provider.h>
 
 namespace nx {
 namespace debugging {
@@ -136,7 +137,12 @@ CLVideoDecoderOutputPtr VisualMetadataDebugger::decode(const QnConstCompressedVi
 
     if (!m_decoder || video->compressionType != m_decoder->getContext()->codec_id)
     {
+        DecoderConfig config;
+        if (video->dataProvider)
+            config = DecoderConfig::fromResource(video->dataProvider->getResource());
+
         m_decoder = std::make_unique<QnFfmpegVideoDecoder>(
+            config,
             video->compressionType,
             video,
             /*mtDecoding*/ false);

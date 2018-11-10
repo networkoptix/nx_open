@@ -989,56 +989,34 @@ void DeviceFileCatalog::close()
 {
 }
 
-QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel, bool keepSmalChunks, int limit)
+QnTimePeriodList DeviceFileCatalog::getTimePeriods(
+    qint64 startTimeMs,
+    qint64 endTimeMs,
+    qint64 detailLevel,
+    bool keepSmalChunks,
+    int limit,
+    Qt::SortOrder sortOrder)
 {
-    //qDebug() << "find period from " << QDateTime::fromMSecsSinceEpoch(startTime).toString("hh:mm:ss.zzz") << "to" << QDateTime::fromMSecsSinceEpoch(endTime).toString("hh:mm:ss.zzz");
-
     QnMutexLocker lock( &m_mutex );
     QnTimePeriodList result;
     if (m_chunks.empty())
         return result;
 
-    ChunkMap::const_iterator itr = std::lower_bound(m_chunks.begin(), m_chunks.end(), startTime);
+    ChunkMap::const_iterator itr = std::lower_bound(m_chunks.begin(), m_chunks.end(), startTimeMs);
     /* Checking if we should include a chunk, containing startTime. */
-    if (itr != m_chunks.begin()) {
+    if (itr != m_chunks.begin())
+    {
         --itr;
-
-        /* Case if previous chunk does not contain startTime. */
-        if (itr->endTimeMs() <= startTime)
-            ++itr;
+        if (itr->endTimeMs() <= startTimeMs)
+            ++itr; //< Case if previous chunk does not contain startTime.
     }
 
-    if (itr == m_chunks.end() || itr->startTimeMs >= endTime)
+    if (itr == m_chunks.end() || itr->startTimeMs >= endTimeMs)
         return result;
 
-    result.push_back(QnTimePeriod(itr->startTimeMs, itr->durationMs));
-
-    ++itr;
-    for (; itr != m_chunks.end() && itr->startTimeMs < endTime; ++itr)
-    {
-        QnTimePeriod& last = result.last();
-        qint64 lastEndTime = last.startTimeMs + last.durationMs;
-        if (lastEndTime > itr->startTimeMs) {
-            // overlapped periods
-            if (itr->durationMs == -1)
-                last.durationMs = -1;
-            else
-                last.durationMs = qMax(last.durationMs, itr->endTimeMs() - last.startTimeMs);
-        }
-        else if (qAbs(lastEndTime - itr->startTimeMs) <= detailLevel && itr->durationMs != -1)
-            last.durationMs = itr->startTimeMs - last.startTimeMs + itr->durationMs;
-        else {
-            if (last.durationMs < detailLevel && result.size() > 1 && !keepSmalChunks)
-                result.pop_back();
-            if (result.size() >= limit)
-                break;
-            result.push_back(QnTimePeriod(itr->startTimeMs, itr->durationMs));
-        }
-    }
-    //if (!result.isEmpty())
-    //    qDebug() << "lastFoundPeriod start " << QDateTime::fromMSecsSinceEpoch(result.last().startTimeMs).toString("hh:mm:ss.zzz") << "dur=" << result.last().durationMs;
-
-    return result;
+    ChunkMap::const_iterator endItr = std::lower_bound(m_chunks.begin(), m_chunks.end(), endTimeMs);
+    return QnTimePeriodList::filterTimePeriods(
+        itr, endItr, detailLevel, keepSmalChunks, limit, sortOrder);
 }
 
 bool DeviceFileCatalog::fromCSVFile(const QString& fileName)

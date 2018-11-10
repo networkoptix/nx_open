@@ -1,5 +1,7 @@
 #include "transcode_media_encoder.h"
 
+#include <nx/utils/log/log.h>
+
 #include "stream_reader.h"
 #include "transcode_stream_reader.h"
 
@@ -26,7 +28,9 @@ TranscodeMediaEncoder::TranscodeMediaEncoder(
 {
 }
 
-int TranscodeMediaEncoder::getResolutionList(nxcip::ResolutionInfo* infoList, int* infoListCount) const
+int TranscodeMediaEncoder::getResolutionList(
+    nxcip::ResolutionInfo* infoList,
+    int* infoListCount) const
 {
     if (!m_camera->videoStream()->pluggedIn())
         return nxcip::NX_IO_ERROR;
@@ -69,6 +73,8 @@ int TranscodeMediaEncoder::setFps(const float& fps, float* selectedFps)
 
 nxcip::StreamReader* TranscodeMediaEncoder::getLiveStreamReader()
 {
+    NX_ALWAYS(this, "%1 : Secondary stream requested", m_camera->info().modelName);
+
     if (!m_streamReader)
     {        
         m_streamReader.reset(new StreamReader(
@@ -84,7 +90,7 @@ nxcip::StreamReader* TranscodeMediaEncoder::getLiveStreamReader()
 }
 
 CodecParameters TranscodeMediaEncoder::calculateSecondaryCodecParams(
-    const std::vector<device::ResolutionData>& resolutionList) const
+    const std::vector<device::video::ResolutionData>& resolutionList) const
 {
     NX_ASSERT(resolutionList.size() > 0);
     if (resolutionList.empty())

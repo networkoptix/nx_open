@@ -47,6 +47,19 @@ TEST(splitQuotedString, separator_in_braces_is_ignored)
         {"n1=v1", "n2=(raz,\"raz,raz\",raz)", "n3=\"raz,[raz,raz],raz\""});
 }
 
+TEST(String, maxPrefix)
+{
+    ASSERT_EQ("a", maxPrefix(std::string("aabc"), std::string("a")));
+    ASSERT_EQ("", maxPrefix(std::string("abc"), std::string("def")));
+    ASSERT_EQ("abc", maxPrefix(std::string("abcdef"), std::string("abc")));
+    ASSERT_EQ("", maxPrefix(std::string(""), std::string("")));
+    ASSERT_EQ("abc", maxPrefix(std::string("abc"), std::string("abc")));
+
+    ASSERT_EQ(
+        std::vector<int>({1, 2, 3}),
+        maxPrefix(std::vector<int>({1, 2, 3, 4, 5}), std::vector<int>({1, 2, 3, 6, 7})));
+}
+
 } // namespace test
 } // namespace utils
 } // namespace nx
