@@ -119,8 +119,6 @@ CUDT::CUDT()
     m_pRcvTimeWindow = NULL;
 
     m_pPeerAddr = NULL;
-    m_pSNode = NULL;
-    m_pRNode = NULL;
 
     // Initilize mutex and condition variables
     initSynch();
@@ -171,8 +169,6 @@ CUDT::CUDT(const CUDT& ancestor)
     m_pRcvTimeWindow = NULL;
 
     m_pPeerAddr = NULL;
-    m_pSNode = NULL;
-    m_pRNode = NULL;
 
     // Initilize mutex and condition variables
     initSynch();

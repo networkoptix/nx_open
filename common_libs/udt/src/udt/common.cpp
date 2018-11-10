@@ -758,7 +758,6 @@ const int CUDTException::EPEERERR = 7000;
 const int CUDTException::EUNKNOWN = -1;
 
 
-//
 bool CIPAddress::ipcmp(
     const sockaddr* addr1,
     const sockaddr* addr2)

@@ -208,7 +208,7 @@ private:
 
 private:
     // The heap array
-    CSNode** m_nodeHeap = nullptr;
+    std::vector<CSNode*> m_nodeHeap;
     // physical length of the array
     int m_iArrayLength = 0;
     // position of last entry on the heap array

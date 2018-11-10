@@ -328,12 +328,11 @@ CSndUList::CSndUList(
     m_pWindowCond(windowCond),
     m_timer(timer)
 {
-    m_nodeHeap = new CSNode*[m_iArrayLength];
+    m_nodeHeap.resize(m_iArrayLength, nullptr);
 }
 
 CSndUList::~CSndUList()
 {
-    delete[] m_nodeHeap;
 }
 
 void CSndUList::update(std::shared_ptr<CUDT> u, bool reschedule)
@@ -428,14 +427,14 @@ void CSndUList::insert_(int64_t ts, std::shared_ptr<CUDT> u)
         p = (q - 1) >> 1;
         if (m_nodeHeap[p]->timestamp > m_nodeHeap[q]->timestamp)
         {
-            CSNode* t = m_nodeHeap[p];
-            m_nodeHeap[p] = m_nodeHeap[q];
-            m_nodeHeap[q] = t;
-            t->locationOnHeap = q;
+            std::swap(m_nodeHeap[p], m_nodeHeap[q]);
+            m_nodeHeap[q]->locationOnHeap = q;
             q = p;
         }
         else
+        {
             break;
+        }
     }
 
     n->locationOnHeap = q;
