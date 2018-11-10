@@ -6,7 +6,7 @@ You have been invited to %PRODUCT_NAME%.
 {{ message.message }}
 
 {{/message.message}}
-To view and manage it, please create account on %PRODUCT_NAME%
+Please create account on %PRODUCT_NAME%
 using your current email address and follow further instructions.
 
 Register your account using this link: {{ config.portal_url }}/register/{{ message.code }}
