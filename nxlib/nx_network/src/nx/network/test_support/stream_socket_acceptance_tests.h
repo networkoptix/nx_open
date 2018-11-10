@@ -948,7 +948,6 @@ protected:
     {
         this->whenClientSentPingAsync();
 
-        this->startReadingConnectionAsync();
         this->thenServerMessageIsReceived();
     }
 
