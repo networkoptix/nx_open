@@ -4,19 +4,25 @@
 
 Multiplexer::Multiplexer(
     int ipVersion,
-    int payloadSize)
+    int payloadSize,
+    int maximumSegmentSize,
+    bool reusable,
+    int id)
     :
-    m_pChannel(std::make_shared<CChannel>(ipVersion)),
-    m_pTimer(std::make_shared<CTimer>()),
-    m_pSndQueue(std::make_shared<CSndQueue>(m_pChannel.get(), m_pTimer.get())),
-    m_pRcvQueue(std::make_shared<CRcvQueue>(
+    m_udpChannel(std::make_unique<UdpChannel>(ipVersion)),
+    m_timer(std::make_unique<CTimer>()),
+    m_sendQueue(std::make_unique<CSndQueue>(m_udpChannel.get(), m_timer.get())),
+    m_recvQueue(std::make_unique<CRcvQueue>(
         32,
         payloadSize,
         ipVersion,
         1024,
-        m_pChannel.get(),
-        m_pTimer.get())),
-    m_iIPversion(ipVersion)
+        m_udpChannel.get(),
+        m_timer.get())),
+    ipVersion(ipVersion),
+    maximumSegmentSize(maximumSegmentSize),
+    reusable(reusable),
+    id(id)
 {
 }
 
@@ -27,18 +33,33 @@ Multiplexer::~Multiplexer()
 
 void Multiplexer::start()
 {
-    m_pSndQueue->start();
-    m_pRcvQueue->start();
+    m_sendQueue->start();
+    m_recvQueue->start();
 }
 
 void Multiplexer::shutdown()
 {
-    if (m_pChannel)
-        m_pChannel->shutdown();
-    if (m_pRcvQueue)
-        m_pRcvQueue->stop();
-    m_pSndQueue.reset();
-    m_pRcvQueue.reset();
-    m_pTimer.reset();
-    m_pChannel.reset();
+    if (m_udpChannel)
+        m_udpChannel->shutdown();
+    if (m_recvQueue)
+        m_recvQueue->stop();
+    m_sendQueue.reset();
+    m_recvQueue.reset();
+    m_timer.reset();
+    m_udpChannel.reset();
+}
+
+UdpChannel& Multiplexer::channel()
+{
+    return *m_udpChannel;
+}
+
+CSndQueue& Multiplexer::sendQueue()
+{
+    return *m_sendQueue;
+}
+
+CRcvQueue& Multiplexer::recvQueue()
+{
+    return *m_recvQueue;
 }

@@ -85,7 +85,7 @@ private:
     uint64_t m_StartTime = 0;
     UDTSockType m_iSockType;
     UDTSOCKET m_SocketId;
-    CSndQueue* m_pSndQueue = nullptr;
+    CSndQueue* m_sendQueue = nullptr;
     std::set<int> m_pollIds;
 };
 

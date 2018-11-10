@@ -4,7 +4,7 @@
 
 class CSndQueue;
 class CRcvQueue;
-class CChannel;
+class UdpChannel;
 class CTimer;
 
 /**
@@ -15,28 +15,33 @@ class Multiplexer
 public:
     Multiplexer(
         int ipVersion,
-        int payloadSize);
+        int payloadSize,
+        int maximumSegmentSize,
+        bool reusable,
+        int id);
     virtual ~Multiplexer();
 
     void start();
 
-    // The UDP channel for sending and receiving
-    std::shared_ptr<CChannel> m_pChannel;
-    std::shared_ptr<CTimer> m_pTimer;
-    std::shared_ptr<CSndQueue> m_pSndQueue;
-    std::shared_ptr<CRcvQueue> m_pRcvQueue;
-
-    // The UDP port number of this multiplexer
-    int m_iPort = 0;
-    int m_iIPversion = 0;
-    // Maximum Segment Size
-    int m_iMSS = 0;
-    // number of UDT instances that are associated with this multiplexer
-    int m_iRefCount = 0;
-    // if this one can be shared with others
-    bool m_bReusable = 0;
-
-    int m_iID = 0;
-
     void shutdown();
+
+    UdpChannel& channel();
+    CSndQueue& sendQueue();
+    CRcvQueue& recvQueue();
+
+    const int ipVersion;
+    const int maximumSegmentSize;
+    // if this one can be shared with others
+    const bool reusable;
+    const int id;
+
+    int udpPort = 0;
+    // number of UDT instances that are associated with this multiplexer
+    int refCount = 0;
+
+private:
+    std::unique_ptr<UdpChannel> m_udpChannel;
+    std::unique_ptr<CTimer> m_timer;
+    std::unique_ptr<CSndQueue> m_sendQueue;
+    std::unique_ptr<CRcvQueue> m_recvQueue;
 };

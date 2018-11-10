@@ -46,12 +46,12 @@ Yunhong Gu, last updated 01/27/2011
 #include "packet.h"
 
 
-class CChannel
+class UdpChannel
 {
 public:
-    CChannel();
-    CChannel(int version);
-    ~CChannel();
+    UdpChannel();
+    UdpChannel(int version);
+    ~UdpChannel();
 
     // Functionality:
     //    Open a UDP channel.

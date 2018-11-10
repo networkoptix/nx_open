@@ -72,7 +72,7 @@ public:
 
     int m_iIPversion;                         // IP version
     sockaddr* m_pSelfAddr;                    // pointer to the local address of the socket
-    sockaddr* m_pPeerAddr;                    // pointer to the peer address of the socket
+    struct sockaddr m_pPeerAddr;                    // pointer to the peer address of the socket
 
     UDTSOCKET m_SocketID;                     // socket ID
     UDTSOCKET m_ListenSocket;                 // ID of the listener socket; 0 means this is an independent socket
@@ -90,7 +90,7 @@ public:
 
     unsigned int m_uiBackLog;                 // maximum number of connections in queue
 
-    int m_iMuxID;                             // multiplexer ID
+    int m_multiplexerId;                             // multiplexer ID
 
     pthread_mutex_t m_ControlLock;            // lock this socket exclusively for control APIs: bind/listen/connect
 

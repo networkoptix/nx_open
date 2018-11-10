@@ -218,7 +218,7 @@ CUDT::~CUDT()
     //
     // This workaround is here to prevent a segfault:
     if (m_multiplexer)
-        m_multiplexer->m_pSndQueue->sndUList().remove(this);
+        m_multiplexer->sendQueue().sndUList().remove(this);
 
     // release mutex/condtion variables
     destroySynch();
@@ -240,12 +240,12 @@ CUDT::~CUDT()
 
 CSndQueue& CUDT::sndQueue()
 {
-    return *m_multiplexer->m_pSndQueue;
+    return m_multiplexer->sendQueue();
 }
 
 CRcvQueue& CUDT::rcvQueue()
 {
-    return *m_multiplexer->m_pRcvQueue;
+    return m_multiplexer->recvQueue();
 }
 
 void CUDT::setMultiplexer(const std::shared_ptr<Multiplexer>& multiplexer)
@@ -644,7 +644,7 @@ void CUDT::listen()
         m_StartTime,
         m_iSockType,
         m_SocketID,
-        m_multiplexer->m_pSndQueue.get(),
+        &m_multiplexer->sendQueue(),
         m_sPollID);
     // if there is already another socket listening on the same port
     if (!rcvQueue().setListener(m_synPacketHandler))
@@ -670,6 +670,7 @@ void CUDT::connect(const sockaddr* serv_addr)
     delete m_pPeerAddr;
     m_pPeerAddr = (AF_INET == m_iIPversion) ? (sockaddr*)new sockaddr_in : (sockaddr*)new sockaddr_in6;
     memcpy(m_pPeerAddr, serv_addr, (AF_INET == m_iIPversion) ? sizeof(sockaddr_in) : sizeof(sockaddr_in6));
+    m_pPeerAddr->sa_family = m_iIPversion;
 
     // register this socket in the rendezvous queue
     // RendezevousQueue is used to temporarily store incoming handshake, non-rendezvous connections also require this function
@@ -1069,7 +1070,7 @@ void CUDT::close()
     m_synPacketHandler = nullptr;
 
     if (m_multiplexer)
-        m_multiplexer->m_pRcvQueue->removeConnector(m_SocketID);
+        m_multiplexer->recvQueue().removeConnector(m_SocketID);
 
     std::lock_guard<std::mutex> cg(m_ConnectionLock);
 
@@ -2681,7 +2682,7 @@ ServerSideConnectionAcceptor::ServerSideConnectionAcceptor(
     m_StartTime(startTime),
     m_iSockType(sockType),
     m_SocketId(socketId),
-    m_pSndQueue(sndQueue),
+    m_sendQueue(sndQueue),
     m_pollIds(std::move(pollIds))
 {
 }
@@ -2715,7 +2716,7 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
         packet.m_iID = hs.m_iID;
         int size = packet.getLength();
         hs.serialize(packet.m_pcData, size);
-        m_pSndQueue->sendto(addr, packet);
+        m_sendQueue->sendto(addr, packet);
         return 0;
     }
     else
@@ -2743,7 +2744,7 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
             int size = CHandShake::m_iContentSize;
             hs.serialize(packet.m_pcData, size);
             packet.m_iID = id;
-            m_pSndQueue->sendto(addr, packet);
+            m_sendQueue->sendto(addr, packet);
         }
         else
         {
@@ -2758,7 +2759,7 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
                 int size = CHandShake::m_iContentSize;
                 hs.serialize(packet.m_pcData, size);
                 packet.m_iID = id;
-                m_pSndQueue->sendto(addr, packet);
+                m_sendQueue->sendto(addr, packet);
             }
             else
             {

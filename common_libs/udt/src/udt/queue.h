@@ -153,8 +153,6 @@ struct CSNode
 
 class CSndUList
 {
-    //friend class CSndQueue;
-
 public:
     CSndUList(
         CTimer* timer,
@@ -210,7 +208,7 @@ private:
 
 private:
     // The heap array
-    CSNode** m_pHeap = nullptr;
+    CSNode** m_nodeHeap = nullptr;
     // physical length of the array
     int m_iArrayLength = 0;
     // position of last entry on the heap array
@@ -221,7 +219,7 @@ private:
     std::mutex* m_pWindowLock = nullptr;
     std::condition_variable* m_pWindowCond = nullptr;
 
-    CTimer* m_pTimer = nullptr;
+    CTimer* m_timer = nullptr;
 
 private:
     CSndUList(const CSndUList&);
@@ -245,6 +243,9 @@ class CRcvUList
 {
 public:
     CRcvUList() = default;
+
+    CRcvUList(const CRcvUList&) = delete;
+    CRcvUList& operator=(const CRcvUList&) = delete;
 
     // Functionality:
     //    Insert a new UDT instance to the list.
@@ -274,14 +275,10 @@ public:
     void update(std::shared_ptr<CUDT> u);
 
 public:
-    CRNode* m_pUList = nullptr;        // the head node
+    CRNode* m_nodeListHead = nullptr;        // the head node
 
 private:
-    CRNode* m_pLast = nullptr;        // the last node
-
-private:
-    CRcvUList(const CRcvUList&);
-    CRcvUList& operator=(const CRcvUList&);
+    CRNode* m_nodeListTail = nullptr;        // the last node
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -326,14 +323,20 @@ public:
 private:
     struct CRL
     {
-        UDTSOCKET m_iID;            // UDT socket ID (self)
-        std::weak_ptr<CUDT> socket;            // UDT instance
-        int m_iIPversion;                 // IP version
-        sockaddr* m_pPeerAddr;        // UDT sonnection peer address
-        uint64_t m_ullTTL;            // the time that this request expires
-    };
-    std::list<CRL> m_lRendezvousID;      // The sockets currently in rendezvous mode
+        UDTSOCKET id = -1;
+        std::weak_ptr<CUDT> socket;
+        // UDT sonnection peer address
+        struct sockaddr peerAddr;
+        // the time that this request expires
+        uint64_t ttl = 0;
 
+        CRL()
+        {
+            memset(&peerAddr, 0, sizeof(peerAddr));
+        }
+    };
+
+    std::list<CRL> m_rendezvousSockets;      // The sockets currently in rendezvous mode
     mutable std::mutex m_mutex;
 };
 
@@ -342,7 +345,7 @@ private:
 class CSndQueue
 {
 public:
-    CSndQueue(CChannel* c, CTimer* t);
+    CSndQueue(UdpChannel* c, CTimer* t);
     ~CSndQueue();
 
     void start();
@@ -361,7 +364,7 @@ public:
     CSndUList& sndUList() { return *m_pSndUList; }
 
     // The UDP channel for data sending.
-    CChannel* channel() { return m_pChannel; }
+    UdpChannel* channel() { return m_channel; }
 
 private:
     void worker();
@@ -372,9 +375,9 @@ private:
     // List of UDT instances for data sending
     std::unique_ptr<CSndUList> m_pSndUList;
     // The UDP channel for data sending
-    CChannel* m_pChannel = nullptr;
+    UdpChannel* m_channel = nullptr;
     // Timing facility
-    CTimer* m_pTimer = nullptr;
+    CTimer* m_timer = nullptr;
 
     std::mutex m_WindowLock;
     std::condition_variable m_WindowCond;
@@ -399,7 +402,7 @@ public:
      * @param c UDP channel to be associated to the queue
      * @param t timer
      */
-    CRcvQueue(int size, int payload, int ipVersion, int hsize, CChannel* c, CTimer* t);
+    CRcvQueue(int size, int payload, int ipVersion, int hsize, UdpChannel* c, CTimer* t);
     ~CRcvQueue();
 
     void start();
@@ -447,9 +450,9 @@ private:
     // Hash table for UDT socket looking up
     SocketByIdDict m_socketByIdDict;
     // UDP channel for receving packets
-    CChannel* m_pChannel = nullptr;
+    UdpChannel* m_channel = nullptr;
     // shared timer with the snd queue
-    CTimer* m_pTimer = nullptr;
+    CTimer* m_timer = nullptr;
 
     // packet payload size
     int m_iPayloadSize = 0;
