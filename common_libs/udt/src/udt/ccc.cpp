@@ -93,7 +93,7 @@ void CCC::sendCustomMsg(CPacket& pkt) const
     if (NULL != u)
     {
         pkt.m_iID = u->peerId();
-        u->sndQueue()->sendto(u->peerAddr(), pkt);
+        u->sndQueue().sendto(u->peerAddr(), pkt);
     }
 }
 

@@ -52,7 +52,7 @@ public:
 
 //-------------------------------------------------------------------------------------------------
 
-class AbstractTransactionTransport:
+class AbstractConnection:
     public nx::network::aio::BasicPollable
 {
 public:

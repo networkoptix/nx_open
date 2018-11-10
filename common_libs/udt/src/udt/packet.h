@@ -52,7 +52,7 @@ struct iovec
 };
 #endif
 
-class CChannel;
+class UdpChannel;
 
 enum class ControlPacketType
 {
@@ -78,7 +78,7 @@ enum class PacketFlag
 
 class CPacket
 {
-    friend class CChannel;
+    friend class UdpChannel;
     friend class CSndQueue;
     friend class CRcvQueue;
 

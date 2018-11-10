@@ -52,12 +52,12 @@ private:
     void onConnectCompletion(
         const nx::utils::Url& url,
         transport::ConnectResultDescriptor result,
-        std::unique_ptr<transport::AbstractTransactionTransport> connection);
+        std::unique_ptr<transport::AbstractConnection> connection);
     
     void registerConnection(
         const nx::utils::Url& url,
         const NodeContext& nodeContext,
-        std::unique_ptr<transport::AbstractTransactionTransport> connection);
+        std::unique_ptr<transport::AbstractConnection> connection);
 
     void onConnectionClosed(
         const nx::utils::Url& url,

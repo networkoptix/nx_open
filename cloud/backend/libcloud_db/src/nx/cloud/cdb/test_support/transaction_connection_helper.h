@@ -38,7 +38,7 @@ public:
          * multiple connections to same peer be created.
          */
         std::unique_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState;
-        std::unique_ptr<test::TransactionTransport> connection;
+        std::unique_ptr<test::CommonHttpConnection> connection;
         std::unique_ptr<nx::network::aio::Timer> timer;
     };
 

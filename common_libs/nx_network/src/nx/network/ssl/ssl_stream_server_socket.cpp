@@ -58,7 +58,7 @@ StreamServerSocket::StreamServerSocket(
     base_type(delegate.get()),
     m_acceptor(
         std::move(delegate),
-        std::bind(&StreamServerSocket::createSocketWrapper, this, std::placeholders::_1)),
+        [this](auto&&... args) { return createSocketWrapper(std::move(args)...); }),
     m_encryptionUse(encryptionUse)
 {
     bindToAioThread(m_acceptor.getAioThread());
@@ -134,22 +134,16 @@ bool StreamServerSocket::listen(int backlog)
 
 void StreamServerSocket::acceptAsync(AcceptCompletionHandler handler)
 {
-    using namespace std::placeholders;
+    if (!m_nonBlockingModeEnabled)
+    {
+        return post(
+            [handler = std::move(handler)]()
+            {
+                handler(SystemError::notSupported, nullptr);
+            });
+    }
 
-    dispatch(
-        [this, handler = std::move(handler)]() mutable
-        {
-            m_userHandler = std::move(handler);
-
-            unsigned int timeout = 0;
-            getRecvTimeout(&timeout); // TODO: Handle error
-            if (timeout > 0)
-                startTimer(std::chrono::milliseconds(timeout));
-            else
-                m_timer.cancelSync();
-
-            m_acceptor.acceptAsync(std::bind(&StreamServerSocket::onAccepted, this, _1, _2));
-        });
+    acceptAsyncInternal(std::move(handler));
 }
 
 std::unique_ptr<AbstractStreamSocket> StreamServerSocket::accept()
@@ -208,7 +202,7 @@ std::unique_ptr<AbstractStreamSocket> StreamServerSocket::acceptBlocking()
         std::unique_ptr<AbstractStreamSocket>>
         > accepted;
 
-    acceptAsync(
+    acceptAsyncInternal(
         [&accepted](
             SystemError::ErrorCode systemErrorCode,
             std::unique_ptr<AbstractStreamSocket> connection)
@@ -228,6 +222,34 @@ std::unique_ptr<AbstractStreamSocket> StreamServerSocket::acceptBlocking()
         return nullptr;
 
     return connection;
+}
+
+void StreamServerSocket::acceptAsyncInternal(AcceptCompletionHandler handler)
+{
+    dispatch(
+        [this, handler = std::move(handler)]() mutable
+        {
+            unsigned int timeout = 0;
+            if (!getRecvTimeout(&timeout))
+            {
+                return post(
+                    [handler = std::move(handler),
+                        errorCode = SystemError::getLastOSErrorCode()]()
+                    {
+                        handler(errorCode, nullptr);
+                    });
+            }
+
+            m_userHandler = std::move(handler);
+
+            if (timeout > 0)
+                startTimer(std::chrono::milliseconds(timeout));
+            else
+                m_timer.cancelSync();
+
+            m_acceptor.acceptAsync(
+                [this](auto&&... args) { onAccepted(std::move(args)...); });
+        });
 }
 
 void StreamServerSocket::startTimer(std::chrono::milliseconds timeout)

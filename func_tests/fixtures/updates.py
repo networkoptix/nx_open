@@ -72,7 +72,7 @@ def updates_set(updates_dir):
 @pytest.fixture()
 def update_info(updates_dir, updates_set, updates_server_url):
     return {
-        'version': str(updates_set.version) + 'a',
+        'version': str(updates_set.version) + '1',
         'cloudHost': resolve_cloud_host_from_registry('test', updates_set.customization.customization_name),
         'eulaLink': 'http://new.eula.com/eulaText',
         'eulaVersion': 1,
