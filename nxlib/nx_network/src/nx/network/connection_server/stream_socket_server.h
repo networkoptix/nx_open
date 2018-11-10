@@ -307,6 +307,14 @@ private:
             return;
         }
 
+        if (!socket->setNonBlockingMode(true))
+        {
+            const auto errorCode = SystemError::getLastOSErrorCode();
+            NX_WARNING(this, lm("Failed to switch socket to a non blocking mode: %1")
+                .arg(SystemError::toString(errorCode)));
+            return;
+        }
+
         m_statisticsCalculator.connectionAccepted();
 
         if (m_keepAliveOptions)

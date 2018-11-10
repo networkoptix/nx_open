@@ -36,6 +36,7 @@ public:
         base_type(&m_tcpSocket),
         m_asyncChannel(asyncChannel)
     {
+        m_tcpSocket.setNonBlockingMode(true);
         m_asyncChannel->bindToAioThread(getAioThread());
     }
 

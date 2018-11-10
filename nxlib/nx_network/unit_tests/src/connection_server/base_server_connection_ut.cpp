@@ -12,7 +12,10 @@ namespace test {
 
 namespace {
 
-class TestStreamSocket:
+/**
+ * Socket non-blocking mode option is inconsistent.
+ */
+class BrokenStreamSocket:
     public nx::network::TCPSocket
 {
 public:
@@ -20,6 +23,12 @@ public:
     {
         SystemError::setLastErrorCode(SystemError::notConnected);
         return false;
+    }
+
+    virtual bool getNonBlockingMode(bool* val) const override
+    {
+        *val = true;
+        return true;
     }
 };
 
@@ -81,7 +90,7 @@ protected:
     {
         m_connection = std::make_unique<TestConnection>(
             this,
-            std::make_unique<TestStreamSocket>());
+            std::make_unique<BrokenStreamSocket>());
     }
 
     void givenStartedConnection()

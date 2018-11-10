@@ -39,6 +39,8 @@ protected:
     {
         using namespace std::placeholders;
 
+        ASSERT_TRUE(m_httpTunnelConnection->setNonBlockingMode(true));
+
         nx::network::stun::AsyncClient stunClient(std::move(m_httpTunnelConnection));
         auto stunClientGuard = nx::utils::makeScopeGuard(
             [&stunClient]() { stunClient.pleaseStopSync(); });
