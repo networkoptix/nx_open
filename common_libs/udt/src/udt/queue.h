@@ -330,10 +330,7 @@ private:
         // the time that this request expires
         uint64_t ttl = 0;
 
-        CRL()
-        {
-            memset(&peerAddr, 0, sizeof(peerAddr));
-        }
+        CRL();
     };
 
     std::list<CRL> m_rendezvousSockets;      // The sockets currently in rendezvous mode

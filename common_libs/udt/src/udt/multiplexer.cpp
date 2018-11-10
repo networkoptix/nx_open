@@ -9,6 +9,10 @@ Multiplexer::Multiplexer(
     bool reusable,
     int id)
     :
+    ipVersion(ipVersion),
+    maximumSegmentSize(maximumSegmentSize),
+    reusable(reusable),
+    id(id),
     m_udpChannel(std::make_unique<UdpChannel>(ipVersion)),
     m_timer(std::make_unique<CTimer>()),
     m_sendQueue(std::make_unique<CSndQueue>(m_udpChannel.get(), m_timer.get())),
@@ -18,11 +22,7 @@ Multiplexer::Multiplexer(
         ipVersion,
         1024,
         m_udpChannel.get(),
-        m_timer.get())),
-    ipVersion(ipVersion),
-    maximumSegmentSize(maximumSegmentSize),
-    reusable(reusable),
-    id(id)
+        m_timer.get()))
 {
 }
 

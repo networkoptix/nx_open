@@ -679,6 +679,11 @@ void SocketByIdDict::remove(int32_t id)
 //-------------------------------------------------------------------------------------------------
 // CRendezvousQueue
 
+CRendezvousQueue::CRL::CRL()
+{
+    memset(&peerAddr, 0, sizeof(peerAddr));
+}
+
 CRendezvousQueue::CRendezvousQueue()
 {
 }
