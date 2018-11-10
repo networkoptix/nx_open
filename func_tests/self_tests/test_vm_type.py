@@ -5,7 +5,7 @@ import pytest
 
 from framework.os_access.exceptions import DoesNotExist
 from framework.vms.hypervisor import VMNotFound
-from framework.vms.vm_type import VMType
+from framework.vms.vm_type import VMType, VmTemplate
 
 _logger = logging.getLogger(__name__)
 
@@ -38,7 +38,6 @@ def vm_type(slot, hypervisor, node_dir, template_url):
         registry_path,
         partial('func_tests-temp-factory_test-{slot}-{vm_index}'.format, slot=slot),
         2,
-        'dummy-{}-template'.format(slot),
         partial('0A-00-{slot:02X}-FF-{vm_index:02X}-0{nic_index:01X}'.format, slot=slot),
         {
             'host_ports_base': 49000 + 100 * slot,
@@ -47,8 +46,12 @@ def vm_type(slot, hypervisor, node_dir, template_url):
                 ('tcp', 22): 0,
                 },
             },
-        template_url,
-        node_dir,
+        VmTemplate(
+            hypervisor,
+            'dummy-{}-template'.format(slot),
+            template_url,
+            node_dir,
+            ),
         )
     for index, name, lock_path in vm_type.registry.possible_entries():
         try:

@@ -42,6 +42,7 @@
 #include <core/dataprovider/data_provider_factory.h>
 #include <nx/metrics/metrics_storage.h>
 #include <nx/utils/scope_guard.h>
+#include <api/global_settings.h>
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;
@@ -375,7 +376,6 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(
 {
     Q_D(QnProgressiveDownloadingConsumer);
     d->serverModule = serverModule;
-    d->transcoder.reset(new QnFfmpegTranscoder(owner->commonModule()->metrics()));
 
     d->socket->setRecvTimeout(CONNECTION_TIMEOUT);
     d->socket->setSendTimeout(CONNECTION_TIMEOUT);
@@ -496,12 +496,20 @@ void QnProgressiveDownloadingConsumer::run()
     Q_D(QnProgressiveDownloadingConsumer);
     initSystemThreadId();
     auto metrics = d->serverModule->commonModule()->metrics();
-    metrics->tcpConnections().progressiveDownloading()++;
+
+    std::atomic_int& donwloaderCount = metrics->tcpConnections().progressiveDownloading();
+    auto newValue = ++donwloaderCount;
     auto metricsGuard = nx::utils::makeScopeGuard(
         [metrics]()
         {
-            metrics->tcpConnections().progressiveDownloading()--;
+            --metrics->tcpConnections().progressiveDownloading();
         });
+
+    if (newValue > commonModule()->globalSettings()->maxProgressiveDownloaders())
+    {
+        sendMediaEventErrorResponse(Qn::MediaStreamEvent::TooManyOpenedConnections);
+        return;
+    }
 
     if (commonModule()->isTranscodeDisabled())
     {
@@ -586,6 +594,9 @@ void QnProgressiveDownloadingConsumer::run()
             sendMediaEventErrorResponse(mediaStreamEvent);
             return;
         }
+
+        d->transcoder = std::make_unique<QnFfmpegTranscoder>(
+            DecoderConfig::fromResource(resource), commonModule()->metrics());
 
         QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>();
         if (mediaRes)

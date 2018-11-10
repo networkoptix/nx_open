@@ -855,7 +855,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                             commonModule()->globalSettings()->defaultVideoCodec());
                     }
 
-                    m_videoTranscoder = new QnFfmpegVideoTranscoder(commonModule()->metrics(), m_dstVideoCodec);
+                    m_videoTranscoder = new QnFfmpegVideoTranscoder(
+                        DecoderConfig::fromResource(m_resource), commonModule()->metrics(), m_dstVideoCodec);
                     m_videoTranscoder->setMTMode(true);
 
                     m_videoTranscoder->open(videoData);
@@ -874,7 +875,9 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 {
                     // determine real width and height
                     QSharedPointer<CLVideoDecoderOutput> outFrame(new CLVideoDecoderOutput());
-                    QnFfmpegVideoDecoder decoder(mediaData->compressionType, videoData, false);
+                    QnFfmpegVideoDecoder decoder(
+                        DecoderConfig::fromResource(m_resource),
+                        mediaData->compressionType, videoData, false);
                     decoder.decode(videoData, &outFrame);
                     if (m_role == StreamRecorderRole::fileExport)
                     {

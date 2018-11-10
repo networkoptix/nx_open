@@ -197,8 +197,12 @@ static InformationError fillUpdateInformation(
         auto it = customizationInfo.releases.find(version);
         if (it == customizationInfo.releases.end())
             return InformationError::noNewVersion;
-        publicationKey = it.value().build();
-        NX_INFO(typeid(Information)) << "fillUpdateInformation will use build" << publicationKey;
+        auto updateVersion = it.value();
+        publicationKey = QString::number(updateVersion.build());
+        NX_INFO(typeid(Information))
+            << "fillUpdateInformation will use version"
+            << updateVersion.toString(nx::vms::api::SoftwareVersion::FullFormat)
+            << "build" << publicationKey;
     }
 
     auto baseUpdateUrl = customizationInfo.updates_prefix + "/" + publicationKey;
@@ -311,11 +315,19 @@ FindPackageResult findPackage(
         return FindPackageResult::otherError;
     }
 
-    if (nx::utils::SoftwareVersion(updateInformation.version) <= qnStaticCommon->engineVersion())
+    if (nx::utils::SoftwareVersion(updateInformation.version) == qnStaticCommon->engineVersion())
     {
         setErrorMessage(QString::fromLatin1(
-            "The update application version (%1) is less or equal to the peer application " \
-            "version (%2)")
+            "Latest update (%1) installed")
+                .arg(qnStaticCommon->engineVersion().toString()),
+            outMessage);
+        return FindPackageResult::latestUpdateInstalled;
+    }
+
+    if (nx::utils::SoftwareVersion(updateInformation.version) < qnStaticCommon->engineVersion())
+    {
+        setErrorMessage(QString::fromLatin1(
+            "The update application version (%1) is less than the peer application version (%2)")
                 .arg(updateInformation.version)
                 .arg(qnStaticCommon->engineVersion().toString()),
             outMessage);

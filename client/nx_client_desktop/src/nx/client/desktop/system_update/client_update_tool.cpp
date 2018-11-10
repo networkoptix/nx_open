@@ -17,6 +17,8 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
 
     vms::common::p2p::downloader::AbstractPeerSelectorPtr peerSelector;
     m_peerManager.reset(new SingleConnectionPeerManager(commonModule(), std::move(peerSelector)));
+    m_peerManager->setParent(this);
+
     m_downloader.reset(new Downloader(m_outputDir, commonModule(), this));
     connect(m_downloader.get(), &Downloader::fileStatusChanged,
         this, &ClientUpdateTool::atDownloaderStatusChanged);
@@ -208,7 +210,8 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
 
 void ClientUpdateTool::atChunkDownloadFailed(const QString& fileName)
 {
-    NX_VERBOSE(this) << "atChunkDownloadFailed() failed to download chunk for" << fileName;
+    // It is a breakpoint catcher.
+    //NX_VERBOSE(this) << "atChunkDownloadFailed() failed to download chunk for" << fileName;
     //setError(tr("Update package is corrupted: %1").arg(error));
 }
 

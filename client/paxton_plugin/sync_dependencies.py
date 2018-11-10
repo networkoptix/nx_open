@@ -26,7 +26,6 @@ def main():
     sync("windows/wix-3.11", path_variable="wix_directory")
     sync("windows/ilmerge", path_variable="ilmerge_directory")
     sync("windows/paxton_plugin_references", path_variable="references_directory")
-    sync("any/certificates-" + args.customization, path_variable="certificates_path")
 
     syncher.generate_cmake_include(args.cmake_include_file)
 

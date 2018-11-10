@@ -16,6 +16,15 @@ extern "C"
 
 class QGLContext;
 
+struct DecoderConfig
+{
+
+    static DecoderConfig fromResource(QnResourcePtr resource);
+    static DecoderConfig fromMediaResource(QnMediaResourcePtr resource);
+
+    QStringList disabledCodecsForMtDecoding;
+};
+
 //!Abstract interface. Every video decoder MUST implement this interface.
 /*!
     Implementation of this class does not have to be thread-safe.

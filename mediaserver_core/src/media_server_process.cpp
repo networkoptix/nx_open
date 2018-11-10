@@ -1234,6 +1234,8 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIp)
     if (isStopping())
         return;
 
+    NX_DEBUG(this, "Server %1 has changed publicIp to value %2", commonModule()->moduleGUID(), publicIp);
+
     QnPeerRuntimeInfo localInfo = commonModule()->runtimeInfoManager()->localInfo();
     localInfo.data.publicIP = publicIp.toString();
     commonModule()->runtimeInfoManager()->updateLocalItem(localInfo);
@@ -1771,6 +1773,8 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc POST /api/changeCameraPassword
      * Change password for already existing user on a camera.
+     * This method is allowed for cameras with 'SetUserPasswordCapability' capability only.
+     * Otherwise it returns an error in the JSON result.
      * %permissions Administrator.
      * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
      *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
@@ -2120,6 +2124,8 @@ void MediaServerProcess::registerRestHandlers(
      * %permissions Administrator.
      * %param[opt]:string systemName System display name. It affects all servers in the system.
      * %param[opt]:integer port Server API port. It affects the current server only.
+     * %param[opt]:string password Set new admin password.
+     * %param[opt]:string currentPassword Required if new admin password is provided.
      * %return JSON with error code, error string, and flag "restartNeeded" that shows whether the
      *     server must be restarted to apply settings. Error string contains a hint to identify the
      *     problem: "SYSTEM_NAME" or "PORT".
@@ -2132,6 +2138,7 @@ void MediaServerProcess::registerRestHandlers(
      * be called either via GET or POST method. POST data should be a json object.
      * %permissions Administrator.
      * %param[opt]:string password Set new admin password after detach.
+     * %param[opt]:string currentPassword Required if new admin password is provided.
      * %return JSON result with error code
      */
     reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(serverModule(), cloudManagerGroup), kAdmin);
@@ -2317,7 +2324,13 @@ void MediaServerProcess::registerRestHandlers(
      * %param[opt]:option keepSmallChunks If specified, standalone chunks smaller than the detail
      *     level are not removed from the result.
      * %param[opt]:integer limit Maximum number of chunks to return.
-     * %param[opt]:option flat If specified, do not group chunk lists by server.
+     * %param[opt]:option flat If specified, do not group chunk lists by server. This parameter is deprecated.
+     *     Please use parameter groupBy instead.
+    * %param[opt]:enum groupBy group type. Default value is "serverId".
+     *     %value serverId group data by serverId. Result field 'guid' has server Guid value.
+     *     %value cameraId group data by cameraId. Result field 'guid' has camera Guid value.
+     *     %value none do not group data. Result is the flat list of data.
+     * %param[opt]:option desc Sort data in descending order if provided.
      * %return:object JSON object with an error code, error message and the list of JSON objects
      *     in "reply" field: if no "flat" parameter is specified, "reply" field is the list which
      *     contains for each server its GUID (as "guid" field) and the list of chunks (as "periods"
@@ -2782,7 +2795,7 @@ nx::vms::api::ServerFlags MediaServerProcess::calcServerFlags()
     #if defined(EDGE_SERVER)
         serverFlags |= nx::vms::api::SF_Edge;
     #endif
-    
+
     if (QnAppInfo::isBpi())
     {
         serverFlags |= nx::vms::api::SF_IfListCtrl | nx::vms::api::SF_timeCtrl;
@@ -3969,7 +3982,7 @@ void MediaServerProcess::loadResourceParamsData()
 {
     const std::array<const char*,2> kUrlsToLoadResourceData =
     {
-        "http://updates.networkoptix.com/resource_data.json",
+        "http://resources.vmsproxy.com/resource_data.json",
         "http://beta.networkoptix.com/beta-builds/daily/resource_data.json"
     };
 

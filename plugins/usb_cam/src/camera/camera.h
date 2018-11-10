@@ -9,26 +9,27 @@
 #include "video_stream.h"
 #include "audio_stream.h"
 
-#include "../device/abstract_compression_type_descriptor.h"
-#include "../device/device_data.h"
+#include "device/video/resolution_data.h"
+#include "device/abstract_compression_type_descriptor.h"
 
 namespace nx {
 namespace usb_cam {
+
+class CameraManager;
 
 class Camera: public std::enable_shared_from_this<Camera>
 {
 public:
     Camera(
-        nxpl::TimeProvider * const timeProvider,
-        const nxcip::CameraInfo& info);
-    virtual ~Camera() = default;
+        CameraManager * cameraManager,
+        nxpl::TimeProvider * const timeProvider);
 
     void initialize();
 
     std::shared_ptr<AudioStream> audioStream();
     std::shared_ptr<VideoStream> videoStream();
 
-    std::vector<device::ResolutionData> resolutionList() const;
+    std::vector<device::video::ResolutionData> resolutionList() const;
 
     void setAudioEnabled(bool value);
     bool audioEnabled() const;
@@ -37,9 +38,6 @@ public:
 
     void setLastError(int errorCode);
     int lastError() const;
-
-    const nxcip::CameraInfo& info() const;
-    void updateCameraInfo(const nxcip::CameraInfo& info);
 
     uint64_t millisSinceEpoch() const;
     nxpl::TimeProvider * const timeProvider() const;
@@ -54,11 +52,13 @@ public:
 
     std::vector<AVCodecID> ffmpegCodecPriorityList();
 
+    nxcip::CameraInfo info() const;
+
 private:
     static const std::vector<nxcip::CompressionType> kVideoCodecPriorityList;
 
+    CameraManager * m_cameraManager;
     nxpl::TimeProvider * const m_timeProvider;
-    nxcip::CameraInfo m_info;
     CodecParameters m_defaultVideoParams;
 
     std::shared_ptr<AudioStream> m_audioStream;

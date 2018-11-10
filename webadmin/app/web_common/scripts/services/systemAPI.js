@@ -325,7 +325,7 @@ angular.module('nxCommon')
             if(height){
                 data.height = height;
             }
-            return this._setGetParams('/ec2/cameraThumbnail', data, this.systemId && this.authGet());
+            return this._setGetParams('/ec2/cameraThumbnail?ignoreExternalArchive', data, this.systemId && this.authGet());
         };
         ServerConnection.prototype.hlsUrl = function(cameraId, position, resolution){
             var data = {};

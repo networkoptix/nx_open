@@ -1,3 +1,6 @@
+option(enablePrecompiledHeaders "Enable precompiled headers support" ON)
+mark_as_advanced(enablePrecompiledHeaders)
+
 function(_generate_pch_parameters target parameters_file)
     set(flags
         "$<TARGET_PROPERTY:${target},COMPILE_OPTIONS>"
@@ -158,6 +161,10 @@ function(_add_gcc_clang_precompiled_header target input)
 endfunction()
 
 function(add_precompiled_header target input)
+    if(NOT enablePrecompiledHeaders)
+        return()
+    endif()
+
     if(MSVC)
         _add_msvc_precompiled_header(${target} ${input})
     elseif(XCODE)

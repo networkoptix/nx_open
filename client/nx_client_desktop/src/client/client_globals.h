@@ -58,7 +58,6 @@ namespace Qn
 
         ResourceNameRole,                           /**< Role for resource name. Value of type QString. */
         ResourceFlagsRole,                          /**< Role for resource flags. Value of type int (Qn::ResourceFlags). */
-        ResourceSearchStringRole,                   /**< Role for resource search string. Value of type QString. */
         ResourceStatusRole,                         /**< Role for resource status. Value of type int (Qn::ResourceStatus). */
         ResourceIconKeyRole,                        /**< Role for resource custom icon key. Value of type QString. */
 

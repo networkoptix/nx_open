@@ -186,28 +186,34 @@ EventTile* EventRibbon::Private::createTile(const QModelIndex& index)
     connect(tile, &EventTile::closeRequested, this,
         [this]()
         {
-            if (m_model)
-                m_model->removeRow(indexOf(static_cast<EventTile*>(sender())));
+            const int index = indexOf(static_cast<EventTile*>(sender()));
+            if (m_model && index >= 0)
+                m_model->removeRow(index);
         });
 
     connect(tile, &EventTile::linkActivated, this,
         [this](const QString& link)
         {
-            const auto tile = static_cast<EventTile*>(sender());
-            if (m_model)
-                m_model->setData(m_model->index(indexOf(tile)), link, Qn::ActivateLinkRole);
+            const int index = indexOf(static_cast<EventTile*>(sender()));
+            if (m_model && index >= 0)
+                m_model->setData(m_model->index(index), link, Qn::ActivateLinkRole);
         });
 
     connect(tile, &EventTile::clicked, this,
         [this]()
         {
-            const auto tile = static_cast<EventTile*>(sender());
-            if (m_model)
-                m_model->setData(m_model->index(indexOf(tile)), QVariant(), Qn::DefaultNotificationRole);
+            const int index = indexOf(static_cast<EventTile*>(sender()));
+            if (m_model && index >= 0)
+                m_model->setData(m_model->index(index), QVariant(), Qn::DefaultNotificationRole);
         });
 
     connect(tile, &QWidget::customContextMenuRequested, this,
-        [this](const QPoint &pos) { showContextMenu(static_cast<EventTile*>(sender()), pos); });
+        [this](const QPoint &pos)
+        {
+            const int index = indexOf(static_cast<EventTile*>(sender()));
+            if (m_model && index >= 0)
+                showContextMenu(static_cast<EventTile*>(sender()), pos);
+        });
 
     return tile;
 }

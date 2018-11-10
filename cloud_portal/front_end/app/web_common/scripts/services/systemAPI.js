@@ -303,17 +303,18 @@ angular.module('nxCommon')
         /* Formatting urls */
         ServerConnection.prototype.previewUrl = function(cameraId, time, width, height){
             var data = {
-                    cameraId:cleanId(cameraId),
-                    time: time || 'ignoreExternalArchive'
+                    cameraId:cleanId(cameraId)
                 };
-
+            if(time){
+                data.time = time;
+            }
             if(width){
                 data.width = width;
             }
             if(height){
                 data.height = height;
             }
-            return this._setGetParams('/ec2/cameraThumbnail', data, this.systemId && this.authGet());
+            return this._setGetParams('/ec2/cameraThumbnail?ignoreExternalArchive', data, this.systemId && this.authGet());
         };
         ServerConnection.prototype.hlsUrl = function(cameraId, position, resolution){
             var data = {};

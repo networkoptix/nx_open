@@ -81,7 +81,7 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
             {
                 auto resStrongRef = resToNotify.toStrongRef();
                 if( resStrongRef )
-                    resStrongRef->notificationReceived( notification );
+                    resStrongRef->handleOneNotification( notification );
             }
             lk.relock();
         }

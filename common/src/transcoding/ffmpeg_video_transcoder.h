@@ -24,7 +24,7 @@ class QnFfmpegVideoTranscoder: public QnVideoTranscoder
 {
     Q_DECLARE_TR_FUNCTIONS(QnFfmpegVideoTranscoder)
 public:
-    QnFfmpegVideoTranscoder(nx::metrics::Storage* metrics, AVCodecID codecId);
+    QnFfmpegVideoTranscoder(const DecoderConfig& config, nx::metrics::Storage* metrics, AVCodecID codecId);
     ~QnFfmpegVideoTranscoder();
 
     virtual int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result) override;
@@ -41,6 +41,7 @@ private:
     int transcodePacketImpl(const QnConstCompressedVideoDataPtr& video, QnAbstractMediaDataPtr* const result);
 
 private:
+    DecoderConfig m_config;
     QVector<QnFfmpegVideoDecoder*> m_videoDecoders;
     CLVideoDecoderOutputPtr m_decodedVideoFrame;
 

@@ -185,9 +185,10 @@ int QnWearableCameraRestHandler::executePrepare(const QnRequestParams& params,
             unionPeriod.endTimeMs(),
             kDetalizationLevelMs,
             /*keepSmallChunks*/ false,
-            std::numeric_limits<int>::max());
+            /*limit*/ std::numeric_limits<int>::max(),
+            Qt::SortOrder::AscendingOrder);
 
-    for (const QnWearablePrepareDataElement& element : data.elements)
+    for (const QnWearablePrepareDataElement& element: data.elements)
     {
         QnWearablePrepareReplyElement replyElement;
         replyElement.period = shrinkPeriod(element.period, serverTimePeriods);

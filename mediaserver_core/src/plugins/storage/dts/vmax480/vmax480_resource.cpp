@@ -247,7 +247,13 @@ void QnPlVmax480Resource::setChunks(const QnTimePeriodList& chunks)
     //m_chunksCond.wakeAll();
 }
 
-QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int /*detailLevel*/)
+QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(
+    qint64 startTimeMs,
+    qint64 endTimeMs,
+    int detailLevel,
+    bool keepSmalChunks,
+    int limit,
+    Qt::SortOrder sortOrder)
 {
     QnMutexLocker lock( &m_mutexChunks );
     if (!m_chunks.empty())
@@ -255,10 +261,17 @@ QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint
 
     QnTimePeriod period(startTimeMs, endTimeMs - startTimeMs);
 
-    //while (!m_chunksReady)
-    //    m_chunksCond.wait(&m_mutexChunks);
+    auto itr = std::lower_bound(m_chunks.begin(), m_chunks.end(), startTimeMs);
+    if (itr != m_chunks.begin())
+    {
+        --itr;
+        if (itr->endTimeMs() <= startTimeMs)
+            ++itr; //< Case if previous chunk does not contain startTime.
+    }
+    auto endItr = std::lower_bound(m_chunks.begin(), m_chunks.end(), endTimeMs);
 
-    return m_chunks.intersected(period);
+    return QnTimePeriodList::filterTimePeriods(
+        itr, endItr, detailLevel, keepSmalChunks, limit, sortOrder);
 }
 
 Qn::LicenseType QnPlVmax480Resource::calculateLicenseType() const
