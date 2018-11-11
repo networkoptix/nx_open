@@ -415,7 +415,7 @@ void removeARPrecord(const QHostAddress& /*ip*/) {}
 #if defined(Q_OS_IOS)
 utils::MacAddress getMacByIP(const QHostAddress& /*ip*/, bool /*net*/)
 {
-    return MacAddress();
+    return utils::MacAddress();
 }
 #else // defined(Q_OS_IOS)
 
