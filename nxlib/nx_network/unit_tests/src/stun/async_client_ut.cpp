@@ -108,6 +108,8 @@ protected:
         m_tcpConnectionToTheServer = std::make_unique<nx::network::TCPSocket>(AF_INET);
         ASSERT_TRUE(m_tcpConnectionToTheServer->connect(
             m_server->address(), nx::network::kNoTimeout));
+
+        ASSERT_TRUE(m_tcpConnectionToTheServer->setNonBlockingMode(true));
     }
 
     void givenStunClientWithPredefinedConnection()

@@ -29,15 +29,21 @@ def pick_some_items(seq, count):
     return [seq[len(seq) * i // count] for i in range(count)]
 
 
-def wait_for_servers_synced(env, merge_timeout, message_bus_timeout, message_bus_server_count):
+def wait_for_servers_synced(
+        match_server_list,
+        watch_server_list,
+        merge_timeout,
+        message_bus_timeout,
+        message_bus_server_count=None,
+        ):
     wait_until_no_transactions_from_servers(
-        env.real_server_list[:1], message_bus_timeout.total_seconds())
-    if len(env.real_server_list) > message_bus_server_count:
-        server_list = pick_some_items(env.real_server_list[1:], message_bus_server_count)
+        watch_server_list[:1], message_bus_timeout.total_seconds())
+    if message_bus_server_count and len(watch_server_list) > message_bus_server_count:
+        server_list = pick_some_items(watch_server_list[1:], message_bus_server_count)
         wait_until_no_transactions_from_servers(server_list, message_bus_timeout.total_seconds())
 
     def wait_for_match(api_path, differ):
-        wait_for_api_path_match(env.all_server_list, api_path, differ,
+        wait_for_api_path_match(match_server_list, api_path, differ,
                                 merge_timeout.total_seconds(), api_path_getter)
 
     wait_for_match('ec2/getFullInfo', full_info_differ)

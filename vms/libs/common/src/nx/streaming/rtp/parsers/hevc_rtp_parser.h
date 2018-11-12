@@ -48,7 +48,7 @@ public:
         bool& gotData) override;
 
     // Implementation of StreamParser::setSDPInfo
-    virtual void setSdpInfo(QByteArrayList lines) override;
+    virtual void setSdpInfo(const Sdp::Media& sdp) override;
 
 private:
 
@@ -120,8 +120,7 @@ private:
     void createVideoDataIfNeeded(bool* outGotData, uint32_t rtpTimestamp);
     QnCompressedVideoDataPtr createVideoData(const uint8_t* rtpBuffer, uint32_t rtpTime);
 
-    void parseRtpMap(const nx::Buffer& rtpMapLine);
-    void parseFmtp(const nx::Buffer& fmtpLine);
+    void parseFmtp(const QStringList& fmtp);
     bool extractPictureDimensionsFromSps(const nx::Buffer& rawSps);
     bool extractPictureDimensionsFromSps(const uint8_t* buffer, int bufferLength);
 

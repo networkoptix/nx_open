@@ -323,7 +323,11 @@ protected:
         if (!m_clientConnection)
         {
             auto connection = std::make_unique<TCPSocket>(AF_INET);
+            
             ASSERT_TRUE(connection->connect(url::getEndpoint(requestUrl), kNoTimeout))
+                << SystemError::getLastOSErrorText().toStdString();
+            
+            ASSERT_TRUE(connection->setNonBlockingMode(true))
                 << SystemError::getLastOSErrorText().toStdString();
 
             m_clientConnection = std::make_unique<http::AsyncMessagePipeline>(

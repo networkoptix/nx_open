@@ -25,9 +25,9 @@ void StreamParser::setLogicalChannelNum(int value)
 }
 
 void AudioStreamParser::processIntParam(
-    const QByteArray& checkName,
+    const QString& checkName,
     int& setValue,
-    const QByteArray& param)
+    const QString& param)
 {
     int valuePos = param.indexOf('=');
     if (valuePos == -1)
@@ -40,9 +40,9 @@ void AudioStreamParser::processIntParam(
 }
 
 void AudioStreamParser::processHexParam(
-    const QByteArray& checkName,
+    const QString& checkName,
     QByteArray& setValue,
-    const QByteArray& param)
+    const QString& param)
 {
     int valuePos = param.indexOf('=');
     if (valuePos == -1)
@@ -51,13 +51,13 @@ void AudioStreamParser::processHexParam(
     const auto paramName = param.left(valuePos);
     const auto paramValue = param.mid(valuePos+1);
     if (paramName.toLower() == checkName.toLower())
-        setValue = QByteArray::fromHex(paramValue);
+        setValue = QByteArray::fromHex(paramValue.toUtf8());
 }
 
 void AudioStreamParser::processStringParam(
-    const QByteArray& checkName,
-    QByteArray& setValue,
-    const QByteArray& param)
+    const QString& checkName,
+    QString& setValue,
+    const QString& param)
 {
     int valuePos = param.indexOf('=');
     if (valuePos == -1)

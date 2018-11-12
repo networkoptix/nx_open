@@ -25,7 +25,7 @@ namespace nx::data_sync_engine { class TransactionLog; }
 
 namespace nx::data_sync_engine::transport {
 
-class TransactionTransport:
+class CommonHttpConnection:
     public QObject,
     public AbstractCommandPipeline
 {
@@ -35,7 +35,7 @@ public:
     /**
      * Initializer for incoming connection.
      */
-    TransactionTransport(
+    CommonHttpConnection(
         const ProtocolVersionRange& protocolVersionRange,
         nx::network::aio::AbstractAioThread* aioThread,
         std::shared_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState,
@@ -45,14 +45,14 @@ public:
         const network::SocketAddress& remotePeerEndpoint,
         const nx::network::http::Request& request);
 
-    TransactionTransport(
+    CommonHttpConnection(
         const ProtocolVersionRange& protocolVersionRange,
         std::unique_ptr<::ec2::QnTransactionTransportBase> connection,
         std::shared_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState,
         const std::string& systemId,
         const network::SocketAddress& remotePeerEndpoint);
 
-    virtual ~TransactionTransport();
+    virtual ~CommonHttpConnection();
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
     virtual void stopWhileInAioThread() override;
@@ -89,7 +89,7 @@ private:
     std::unique_ptr<network::aio::Timer> m_inactivityTimer;
 
     // TODO: #ak Remove this constructor.
-    TransactionTransport(
+    CommonHttpConnection(
         const ProtocolVersionRange& protocolVersionRange,
         std::unique_ptr<::ec2::QnTransactionTransportBase> connection,
         const std::string& connectionId,

@@ -1,6 +1,7 @@
 import select
 import socket
 import time
+import errno
 from abc import ABCMeta
 from contextlib import contextmanager
 from io import StringIO
@@ -124,8 +125,15 @@ class _PseudoTerminalSSHRun(_SSHRun):
         This way of terminating process is the whole point of this class.
         """
         self._channel.send('\x03')
-        time.sleep(0.1)
-        self._channel.send('\x04')
+        while True:
+            time.sleep(0.1)
+            try:
+                self._channel.send('\x04')
+            except socket.error as e:
+                if e.errno is None:
+                    break
+                else:
+                    raise
 
 
 class _StraightforwardSSHRun(_SSHRun):

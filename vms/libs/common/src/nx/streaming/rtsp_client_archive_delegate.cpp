@@ -65,7 +65,7 @@ bool isSpecialTimeValue(qint64 value)
 QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* reader)
     :
     QnAbstractArchiveDelegate(),
-    m_rtspSession(new QnRtspClient(/*shouldGuessAuthDigest*/ true)),
+    m_rtspSession(new QnRtspClient(/*shouldGuessAuthDigest*/ true, QnRtspClient::Config())),
     m_rtpData(0),
     m_tcpMode(true),
     m_position(DATETIME_NOW),
@@ -169,7 +169,7 @@ void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr &came
         m_footageUpToDate.clear();
     });
 
-    setupRtspSession(camera, m_server, m_rtspSession.get(), m_playNowModeAllowed);
+    setupRtspSession(camera, m_server, m_rtspSession.get());
 }
 
 void QnRtspClientArchiveDelegate::setFixedServer(const QnMediaServerResourcePtr &server)
@@ -221,8 +221,8 @@ struct ArchiveTimeCheckInfo
 
 void QnRtspClientArchiveDelegate::checkGlobalTimeAsync(const QnSecurityCamResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64* result)
 {
-    QnRtspClient otherRtspSession(true);
-    QnRtspClientArchiveDelegate::setupRtspSession(camera, server,  &otherRtspSession, false);
+    QnRtspClient otherRtspSession(true, QnRtspClient::Config());
+    QnRtspClientArchiveDelegate::setupRtspSession(camera, server,  &otherRtspSession);
     if (otherRtspSession.open(QnRtspClientArchiveDelegate::getUrl(camera, server)).errorCode != CameraDiagnostics::ErrorCode::noError)
         return;
 
@@ -332,8 +332,13 @@ bool QnRtspClientArchiveDelegate::openInternal()
         }
     }
 
-    setupRtspSession(m_camera, m_server, m_rtspSession.get(), m_playNowModeAllowed);
-    setRtpData(0);
+    if (m_playNowModeAllowed) {
+        m_channelCount = 1;
+        QnConstResourceVideoLayoutPtr videoLayout = m_camera->getVideoLayout(0);
+         if (videoLayout)
+             m_channelCount = videoLayout->channelCount();
+    }
+    setupRtspSession(m_camera, m_server, m_rtspSession.get());
 
     const bool isOpened = m_rtspSession->open(getUrl(m_camera, m_server), m_lastSeekTime).errorCode == CameraDiagnostics::ErrorCode::noError;
     if (isOpened)
@@ -347,9 +352,19 @@ bool QnRtspClientArchiveDelegate::openInternal()
         if (m_isMultiserverAllowed)
             checkMinTimeFromOtherServer(m_camera);
 
-        QnRtspClient::TrackMap trackInfo =  m_rtspSession->getTrackInfo();
-        if (!trackInfo.isEmpty())
-            setRtpData(trackInfo[0]->ioDevice);
+        m_rtpData = nullptr;
+        if (m_playNowModeAllowed)
+        {
+            // temporary solution
+            m_rtspDevice = std::make_unique<QnRtspIoDevice>(m_rtspSession.get(), true);
+            m_rtpData = m_rtspDevice.get();
+        }
+        else
+        {
+            auto& trackInfo =  m_rtspSession->getTrackInfo();
+            if (!trackInfo.empty())
+                m_rtpData = trackInfo[0].ioDevice.get();
+        }
         if (!m_rtpData)
             m_rtspSession->stop();
     }
@@ -362,7 +377,7 @@ bool QnRtspClientArchiveDelegate::openInternal()
     {
         m_sessionTimeout.restart();
 
-        QList<QByteArray> audioSDP = m_rtspSession->getSdpByType(QnRtspClient::TT_AUDIO);
+        QStringList audioSDP = m_rtspSession->getSdpByType(nx::streaming::Sdp::MediaType::Audio);
         parseAudioSDP(audioSDP);
 
         QString vLayout = m_rtspSession->getVideoLayout();
@@ -378,7 +393,7 @@ bool QnRtspClientArchiveDelegate::openInternal()
     return isOpened;
 }
 
-void QnRtspClientArchiveDelegate::parseAudioSDP(const QList<QByteArray>& audioSDP)
+void QnRtspClientArchiveDelegate::parseAudioSDP(const QStringList& audioSDP)
 {
     QnMutexLocker lock(&m_mutex);
     for (int i = 0; i < audioSDP.size(); ++i)
@@ -390,7 +405,7 @@ void QnRtspClientArchiveDelegate::parseAudioSDP(const QList<QByteArray>& audioSD
             {
                 m_audioLayout.reset( new QnResourceCustomAudioLayout() );
                 QnConstMediaContextPtr context(QnBasicMediaContext::deserialize(
-                    QByteArray::fromBase64(audioSDP[i].mid(configPos + 7))));
+                    QByteArray::fromBase64(audioSDP[i].mid(configPos + 7).toUtf8())));
                 if (context && context->getCodecType() == AVMEDIA_TYPE_AUDIO)
                 {
                     m_audioLayout->addAudioTrack(QnResourceAudioLayout::AudioTrack(
@@ -399,11 +414,6 @@ void QnRtspClientArchiveDelegate::parseAudioSDP(const QList<QByteArray>& audioSD
             }
         }
     }
-}
-
-void QnRtspClientArchiveDelegate::setRtpData(QnRtspIoDevice* value)
-{
-    m_rtpData = value;
 }
 
 void QnRtspClientArchiveDelegate::beforeClose()
@@ -580,21 +590,29 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
         else {
             rtpChannelNum = m_rtpData->getMediaSocket()->getLocalAddress().port;
         }
-        const QString format = m_rtspSession->getTrackFormatByRtpChannelNum(rtpChannelNum).toLower();
+
+        QString codecName;
+        if (m_playNowModeAllowed)
+            codecName = rtpChannelNum < (m_channelCount + 1) * 2 ? "ffmpeg" : "ffmpeg-metadata";
+        else
+            codecName = m_rtspSession->getTrackCodec(rtpChannelNum).toLower();
+
         qint64 parserPosition = qint64(AV_NOPTS_VALUE);
-        if (format.isEmpty()) {
-            //qWarning() << Q_FUNC_INFO << __LINE__ << "RTP track" << rtpChannelNum << "not found";
-        }
-        else if (format == QLatin1String("ffmpeg")) {
-            result = std::dynamic_pointer_cast<QnAbstractMediaData>(processFFmpegRtpPayload(data, blockSize, rtpChannelNum/2, &parserPosition));
+        if (codecName == QLatin1String("ffmpeg"))
+        {
+            result = std::dynamic_pointer_cast<QnAbstractMediaData>(
+                processFFmpegRtpPayload(data, blockSize, rtpChannelNum/2, &parserPosition));
             if (!result && m_frameCnt == 0 && receiveTimer.elapsed() > 4000)
                 emit dataDropped(m_reader); // if client can't receive first frame too long inform that stream is slow
         }
-        else if (format == QLatin1String("ffmpeg-metadata")) {
+        else if (codecName == QLatin1String("ffmpeg-metadata"))
+        {
             processMetadata(data, blockSize);
         }
         else
-            qWarning() << Q_FUNC_INFO << __LINE__ << "Only FFMPEG payload format now implemeted. Ask developers to add '" << format << "' format";
+        {
+            NX_WARNING(this, "Unsupported codec format '%1'", codecName);
+        }
 
         if (result && m_sendedCSec != result->opaque)
             result.reset(); // ignore old archive data
@@ -971,17 +989,8 @@ void QnRtspClientArchiveDelegate::setMultiserverAllowed(bool value)
     m_isMultiserverAllowed = value;
 }
 
-void QnRtspClientArchiveDelegate::setupRtspSession(const QnSecurityCamResourcePtr &camera, const QnMediaServerResourcePtr &server, QnRtspClient* session, bool usePredefinedTracks) const {
-    if (usePredefinedTracks) {
-        int numOfVideoChannels = 1;
-        QnConstResourceVideoLayoutPtr videoLayout = camera->getVideoLayout(0);
-         if (videoLayout)
-             numOfVideoChannels = videoLayout->channelCount();
-        session->setUsePredefinedTracks(numOfVideoChannels); // omit DESCRIBE and SETUP requests
-    } else {
-        session->setUsePredefinedTracks(0);
-    }
-
+void QnRtspClientArchiveDelegate::setupRtspSession(const QnSecurityCamResourcePtr &camera, const QnMediaServerResourcePtr &server, QnRtspClient* session) const
+{
     QString user = m_auth.username;
     QString password = m_auth.password;
     QAuthenticator auth;
@@ -1010,9 +1019,7 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnSecurityCamResourcePt
 
 void QnRtspClientArchiveDelegate::setPlayNowModeAllowed(bool value)
 {
-    m_playNowModeAllowed = value;
-    if (!value)
-        m_rtspSession->setUsePredefinedTracks(0);
+    m_rtspSession->setPlayNowModeAllowed(value);
 }
 
 bool QnRtspClientArchiveDelegate::hasVideo() const

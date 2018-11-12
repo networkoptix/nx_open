@@ -16,7 +16,7 @@ public:
 
     virtual ~QnNxRtpParser();
 
-    virtual void setSdpInfo(QList<QByteArray> sdpInfo) override;
+    virtual void setSdpInfo(const Sdp::Media& /*sdp*/) override {};
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, bool& gotData) override;
 
     qint64 position() const { return m_position; }

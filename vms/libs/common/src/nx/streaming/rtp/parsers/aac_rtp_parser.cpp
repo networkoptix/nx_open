@@ -43,42 +43,31 @@ AacParser::~AacParser()
     // Do nothing.
 }
 
-void AacParser::setSdpInfo(QList<QByteArray> lines)
+void AacParser::setSdpInfo(const Sdp::Media& sdp)
 {
     // determine here:
     // 1. sizeLength(au size in bits)  or constantSize
 
-    for (int i = 0; i < lines.size(); ++ i)
+    if (sdp.rtpmap.clockRate > 0)
+        StreamParser::setFrequency(sdp.rtpmap.clockRate);
+    if (sdp.rtpmap.channels > 0)
+        m_channels = sdp.rtpmap.channels;
+
+    for(const QString& param: sdp.fmtp.params)
     {
-        if (lines[i].startsWith("a=rtpmap"))
-        {
-            QList<QByteArray> params = lines[i].mid(lines[i].indexOf(' ')+1).split('/');
-            if (params.size() > 1)
-                StreamParser::setFrequency(params[1].trimmed().toInt());
-            if (params.size() > 2)
-                m_channels = params[2].trimmed().toInt();
-        }
-        else if (lines[i].startsWith("a=fmtp"))
-        {
-            QList<QByteArray> params = lines[i].mid(lines[i].indexOf(' ')+1).split(';');
-            for(QByteArray param: params)
-            {
-                param = param.trimmed();
-                processIntParam("sizeLength", m_sizeLength, param);
-                processIntParam("indexLength", m_indexLength, param);
-                processIntParam("indexDeltaLength", m_indexDeltaLength, param);
-                processIntParam("CTSDeltaLength", m_CTSDeltaLength, param);
-                processIntParam("DTSDeltaLength", m_DTSDeltaLength, param);
-                processIntParam("randomAccessIndication", m_randomAccessIndication, param);
-                processIntParam("streamStateIndication", m_streamStateIndication, param);
-                processIntParam("profile", m_profile, param);
-                processIntParam("bitrate", m_bitrate, param);
-                processIntParam("streamtype", m_streamtype, param);
-                processHexParam("config", m_config, param);
-                processStringParam("mode", m_mode, param);
-                processIntParam("constantSize", m_constantSize, param);
-            }
-        }
+        processIntParam("sizeLength", m_sizeLength, param);
+        processIntParam("indexLength", m_indexLength, param);
+        processIntParam("indexDeltaLength", m_indexDeltaLength, param);
+        processIntParam("CTSDeltaLength", m_CTSDeltaLength, param);
+        processIntParam("DTSDeltaLength", m_DTSDeltaLength, param);
+        processIntParam("randomAccessIndication", m_randomAccessIndication, param);
+        processIntParam("streamStateIndication", m_streamStateIndication, param);
+        processIntParam("profile", m_profile, param);
+        processIntParam("bitrate", m_bitrate, param);
+        processIntParam("streamtype", m_streamtype, param);
+        processHexParam("config", m_config, param);
+        processStringParam("mode", m_mode, param);
+        processIntParam("constantSize", m_constantSize, param);
     }
     m_auHeaderExists = m_sizeLength || m_indexLength || m_indexDeltaLength || m_CTSDeltaLength || m_DTSDeltaLength || m_randomAccessIndication || m_streamStateIndication;
     m_aacHelper.readConfig(m_config);

@@ -98,7 +98,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP2 )
     QAuthenticator auth;
     auth.setUser( "root" );
     auth.setPassword( "ptth" );
-    QnRtspClient rtspClient(true);
+    QnRtspClient rtspClient(true, QnRtspClient::Config());
     rtspClient.setAuth( auth, nx::network::http::header::AuthScheme::basic );
 
     rtspClient.setTransport( "tcp" );
@@ -127,7 +127,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP3 )
     QAuthenticator auth;
     auth.setUser( "root" );
     auth.setPassword( "ptth" );
-    QnRtspClient rtspClient(true);
+    QnRtspClient rtspClient(true, QnRtspClient::Config());
     rtspClient.setAuth( auth, nx::network::http::header::AuthScheme::basic );
 
     rtspClient.setTransport( "tcp" );
@@ -236,7 +236,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP5 )
     QAuthenticator auth;
     auth.setUser( "root" );
     auth.setPassword( "ptth" );
-    QnRtspClient rtspClient(true);
+    QnRtspClient rtspClient(true, QnRtspClient::Config());
     rtspClient.setAuth( auth, nx::network::http::header::AuthScheme::basic );
 
     rtspClient.setTransport( "tcp" );
@@ -416,7 +416,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP7 )
     RtspClients.resize( SESSION_COUNT );
     for( auto& rtspClient: RtspClients )
     {
-        rtspClient.reset( new QnRtspClient(true) );
+        rtspClient.reset( new QnRtspClient(true, QnRtspClient::Config()) );
         rtspClient->setAuth( auth, nx::network::http::header::AuthScheme::basic );
         rtspClient->setTransport( "tcp" );
         ASSERT_TRUE( rtspClient->open( rtspUrl ).errorCode == 0 );
@@ -464,7 +464,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP8 )
     RtspClients.resize( SESSION_COUNT );
     for( auto& rtspClient: RtspClients )
     {
-        rtspClient.reset( new QnRtspClient(true) );
+        rtspClient.reset( new QnRtspClient(true, QnRtspClient::Config()) );
         rtspClient->setAuth( auth, nx::network::http::header::AuthScheme::basic );
         rtspClient->setTransport( "tcp" );
         ASSERT_TRUE( rtspClient->open( rtspUrl ).errorCode == 0 );

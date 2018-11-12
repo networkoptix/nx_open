@@ -87,7 +87,7 @@ private:
     UDTSOCKET m_clientSocket = -1;
 };
 
-TEST_F(Deinitialization, DISABLED_does_not_crash_the_process)
+TEST_F(Deinitialization, does_not_crash_the_process)
 {
     initializeUdt();
 

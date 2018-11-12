@@ -57,11 +57,6 @@ QnNxRtpParser::~QnNxRtpParser()
         m_analyticsMetadataLogFile.close();
 }
 
-void QnNxRtpParser::setSdpInfo(QList<QByteArray>)
-{
-
-}
-
 void QnNxRtpParser::writeAnalyticsMetadataToLogFile(const QnAbstractMediaDataPtr& metadata)
 {
     nx::common::metadata::DetectionMetadataPacketPtr data =

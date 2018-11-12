@@ -36,7 +36,7 @@ private:
     std::unique_ptr<QnRtspClient> m_rtspConnection;
     mutable QnMutex m_mutex;
     quint32 m_sequence = 0;
-    QSharedPointer<QnRtspClient::SDPTrackInfo> m_trackInfo;
+    QnRtspClient::SDPTrackInfo m_trackInfo;
     qint64 m_firstPts = AV_NOPTS_VALUE;
 };
 

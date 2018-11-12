@@ -75,7 +75,6 @@ public:
 signals:
     void dataDropped(QnArchiveStreamReader* reader);
 private:
-    void setRtpData(QnRtspIoDevice* value);
     QnAbstractDataPacketPtr processFFmpegRtpPayload(quint8* data, int dataSize, int channelNum, qint64* parserPosition);
     void processMetadata(const quint8* data, int dataSize);
     bool openInternal();
@@ -88,13 +87,14 @@ private:
     QString getUrl(const QnSecurityCamResourcePtr &camera, const QnMediaServerResourcePtr &server = QnMediaServerResourcePtr()) const;
     void checkGlobalTimeAsync(const QnSecurityCamResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64* result);
     void checkMinTimeFromOtherServer(const QnSecurityCamResourcePtr &camera);
-    void setupRtspSession(const QnSecurityCamResourcePtr &camera, const QnMediaServerResourcePtr &server, QnRtspClient* session, bool usePredefinedTracks) const;
-    void parseAudioSDP(const QList<QByteArray>& audioSDP);
+    void setupRtspSession(const QnSecurityCamResourcePtr &camera, const QnMediaServerResourcePtr &server, QnRtspClient* session) const;
+    void parseAudioSDP(const QStringList& audioSDP);
     void setCustomVideoLayout(const QnCustomResourceVideoLayoutPtr& value);
     bool isConnectionExpired() const;
 private:
     QnMutex m_mutex;
     std::unique_ptr<QnRtspClient> m_rtspSession;
+    std::unique_ptr<QnRtspIoDevice> m_rtspDevice;
     QnRtspIoDevice* m_rtpData;
     quint8* m_rtpDataBuffer;
     bool m_tcpMode;
@@ -115,6 +115,7 @@ private:
     bool m_qualityFastSwitch;
     QSize m_resolution;
     qint64 m_lastMinTimeTime;
+    int m_channelCount = 0;
 
     QnTimePeriod m_serverTimePeriod;
     std::atomic<qint64> m_globalMinArchiveTime; // min archive time between all servers

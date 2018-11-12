@@ -91,73 +91,22 @@ bool HevcParser::processData(
     return true;
 }
 
-void HevcParser::setSdpInfo(QByteArrayList lines)
+void HevcParser::setSdpInfo(const Sdp::Media& sdp)
 {
-    for (const auto& line: lines)
-    {
-        auto trimmed = line.trimmed();
-        if (trimmed.startsWith(kSdpRtpMapPrefix))
-            parseRtpMap(trimmed);
-    }
-
-    for (const auto& line: lines)
-    {
-        auto trimmed = line.trimmed();
-        if (trimmed.startsWith(kSdpFmtpPrefix))
-            parseFmtp(trimmed);
-    }
+    if (sdp.rtpmap.clockRate > 0)
+        StreamParser::setFrequency(sdp.rtpmap.clockRate);
+    m_context.rtpChannel = sdp.format;
+    parseFmtp(sdp.fmtp.params);
 }
 
-void HevcParser::parseRtpMap(const nx::Buffer& rtpMapLine)
+void HevcParser::parseFmtp(const QStringList& fmtpParams)
 {
-    auto values = rtpMapLine.split(' ');
-    if (values.size() < 2)
-        return;
-
-    auto codecName = values[1];
-    if (!codecName.toUpper().startsWith(kSdpCodecNamePrefix))
-        return;
-
-    auto values2 = codecName.split('/');
-    if (values2.size() < 2)
-        return;
-
-    bool success = false;
-    auto frequency = values2[1].toInt(&success);
-    if (!success)
-        return;
-
-    StreamParser::setFrequency(frequency);
-
-    values = values[0].split(':');
-    if (values.size() < 2)
-        return;
-
-    auto rtpChannel = values[1].toInt(&success);
-    if(!success)
-        return;
-
-    m_context.rtpChannel = rtpChannel;
-}
-
-void HevcParser::parseFmtp(const nx::Buffer& fmtpLine)
-{
-    int valueIndex = fmtpLine.indexOf(' ');
-    if (valueIndex == -1)
-        return;
-
-    auto fmtParam = fmtpLine.left(valueIndex).split(':');
-    if (fmtParam.size() < 2 || fmtParam[1].toInt() != m_context.rtpChannel)
-        return;
-
-    auto hevcParams = fmtpLine.mid(valueIndex + 1).split(';');
-    for (const auto& param : hevcParams)
+    for (const auto& param : fmtpParams)
     {
-        auto trimmedParam = param.trimmed();
-        bool isParameterSet = trimmedParam.startsWith(kSdpVpsPrefix)
-            || trimmedParam.startsWith(kSdpSpsPrefix)
-            || trimmedParam.startsWith(kSdpPpsPrefix)
-            || trimmedParam.startsWith(kSdpSeiPrefix);
+        bool isParameterSet = param.startsWith(kSdpVpsPrefix)
+            || param.startsWith(kSdpSpsPrefix)
+            || param.startsWith(kSdpPpsPrefix)
+            || param.startsWith(kSdpSeiPrefix);
 
         if (!isParameterSet)
             continue;
@@ -166,7 +115,7 @@ void HevcParser::parseFmtp(const nx::Buffer& fmtpLine)
         if (pos == -1)
             continue;
 
-        auto parameterSet = nx::Buffer::fromBase64(param.mid(pos + 1));
+        auto parameterSet = nx::Buffer::fromBase64(param.mid(pos + 1).toUtf8());
         nx::Buffer startCode(
             (char*)hevc::kNalUnitPrefix,
             sizeof(hevc::kNalUnitPrefix));
@@ -194,20 +143,20 @@ void HevcParser::parseFmtp(const nx::Buffer& fmtpLine)
         else if (parameterSet.startsWith(startCodeShort))
             parameterSet.remove(0, sizeof(hevc::kShortNalUnitPrefix));
 
-        if (trimmedParam.startsWith(kSdpVpsPrefix))
+        if (param.startsWith(kSdpVpsPrefix))
         {
             m_context.spropVps = parameterSet;
         }
-        else if (trimmedParam.startsWith(kSdpSpsPrefix))
+        else if (param.startsWith(kSdpSpsPrefix))
         {
             m_context.spropSps = parameterSet;
             extractPictureDimensionsFromSps(parameterSet);
         }
-        else if (trimmedParam.startsWith(kSdpPpsPrefix))
+        else if (param.startsWith(kSdpPpsPrefix))
         {
             m_context.spropPps = parameterSet;
         }
-        else if (trimmedParam.startsWith(kSdpSeiPrefix))
+        else if (param.startsWith(kSdpSeiPrefix))
         {
             m_context.spropSei = parameterSet;
         }

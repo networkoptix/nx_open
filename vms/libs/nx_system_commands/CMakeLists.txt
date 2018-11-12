@@ -1,6 +1,4 @@
-if (WINDOWS)
-    set(nx_system_commands_private_libs Qt5::Core)
-endif()
+set(nx_system_commands_private_libs Qt5::Core)
 
 if (LINUX)
     add_definitions(-DNX_CUSTOMIZATION_NAME=${deb.customization.company.name})

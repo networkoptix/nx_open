@@ -7,11 +7,11 @@ namespace nx {
 namespace cdb {
 namespace test {
 
-class TransactionTransport:
+class CommonHttpConnection:
     public ::ec2::QnTransactionTransportBase
 {
 public:
-    TransactionTransport(
+    CommonHttpConnection(
         ::ec2::ConnectionGuardSharedState* const connectionGuardSharedState,
         nx::vms::api::PeerData localPeer,
         const std::string& systemId,

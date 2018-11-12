@@ -65,14 +65,14 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
 
 void WebSocketTransactionTransport::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
 {
-    AbstractTransactionTransport::bindToAioThread(aioThread);
+    AbstractConnection::bindToAioThread(aioThread);
     nx::p2p::ConnectionBase::bindToAioThread(aioThread);
     m_transactionLogReader->bindToAioThread(aioThread);
 }
 
 void WebSocketTransactionTransport::stopWhileInAioThread()
 {
-    AbstractTransactionTransport::stopWhileInAioThread();
+    AbstractConnection::stopWhileInAioThread();
     nx::p2p::ConnectionBase::stopWhileInAioThread();
     m_transactionLogReader.reset();
 }

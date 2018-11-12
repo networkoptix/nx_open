@@ -75,7 +75,7 @@ def vm_env(two_clean_mediaservers, setup_config):
 @pytest.fixture
 def env(request, unpacked_mediaserver_factory, setup_config):
     if setup_config.host_list:
-        with servers_set_up(setup_config, unpacked_mediaserver_factory) as env:
+        with servers_set_up(unpacked_mediaserver_factory, setup_config) as env:
             yield env
     else:
         yield request.getfixturevalue('vm_env')
@@ -169,10 +169,11 @@ def test_scalability(artifacts_dir, metrics_saver, load_averge_collector, config
         with load_averge_collector(env.os_access_set, 'merge'):
             try:
                 wait_for_servers_synced(
-                    env,
-                    config.MERGE_TIMEOUT,
-                    config.MESSAGE_BUS_TIMEOUT,
-                    config.MESSAGE_BUS_SERVER_COUNT,
+                    match_server_list=env.all_server_list,
+                    watch_server_list=env.real_server_list,
+                    merge_timeout=config.MERGE_TIMEOUT,
+                    message_bus_timeout=config.MESSAGE_BUS_TIMEOUT,
+                    message_bus_server_count=config.MESSAGE_BUS_SERVER_COUNT,
                     )
             except SyncWaitTimeout as e:
                 e.log_and_dump_results(artifacts_dir)

@@ -10,7 +10,7 @@
 namespace nx::data_sync_engine::transport {
 
 class AbstractCommandPipeline;
-class AbstractTransactionTransport;
+class AbstractConnection;
 
 struct ConnectResultDescriptor
 {
@@ -75,7 +75,7 @@ class AbstractTransactionTransportConnector:
 public:
     using Handler = nx::utils::MoveOnlyFunc<void(
         ConnectResultDescriptor connectResultDescriptor,
-        std::unique_ptr<AbstractTransactionTransport> /*connection*/)>;
+        std::unique_ptr<AbstractConnection> /*connection*/)>;
 
     virtual ~AbstractTransactionTransportConnector() = default;
 
