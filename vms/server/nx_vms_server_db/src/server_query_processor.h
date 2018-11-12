@@ -224,13 +224,13 @@ inline void amendOutputDataIfNeeded(
     nx::vms::api::ResourceParamData* paramData)
 {
     if (paramData->name == Qn::CAMERA_CREDENTIALS_PARAM_NAME
-    || paramData->name == Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME)
+        || paramData->name == Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME)
     {
         auto decryptedValue = nx::utils::decodeStringFromHexStringAES128CBC(paramData->value);
         if (accessData == Qn::kSystemAccess)
             paramData->value = decryptedValue;
         else
-            paramData->value = decryptedValue.replace(QRegExp(":.*$"), ":******");
+            paramData->value = decryptedValue.left(decryptedValue.indexOf(':')) + ":******";
     }
 }
 
