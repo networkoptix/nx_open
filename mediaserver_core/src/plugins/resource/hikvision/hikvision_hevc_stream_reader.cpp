@@ -265,7 +265,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::fetchChannelProperties(
 
     if (!rtspPort)
     {
-        NX_WARNING(
+        NX_DEBUG(
             this,
             lm("Unable to determine RTSP port for resource %1 (%2), using the default one").args(
                 m_hikvisionResource->getUserDefinedName(),
