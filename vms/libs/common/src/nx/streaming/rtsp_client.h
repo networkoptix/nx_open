@@ -85,6 +85,7 @@ class QnRtspClient: public QObject
 public:
     struct Config
     {
+        bool shouldGuessAuthDigest = false;
         bool backChannelAudioOnly = false;
     };
     enum TransportType { TRANSPORT_UDP, TRANSPORT_TCP, TRANSPORT_AUTO };
@@ -119,9 +120,7 @@ public:
         QPair<int, int> interleaved{ -1, -1 };
         std::shared_ptr<QnRtspIoDevice> ioDevice;
     };
-    QnRtspClient(
-        bool shouldGuessAuthDigest,
-        const Config& config,
+    QnRtspClient(const Config& config,
         std::unique_ptr<nx::network::AbstractStreamSocket> tcpSock = std::unique_ptr<nx::network::AbstractStreamSocket>());
 
     ~QnRtspClient();

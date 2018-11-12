@@ -39,7 +39,7 @@ void H264Parser::setSdpInfo(const Sdp::Media& sdp)
 {
     if (sdp.rtpmap.clockRate > 0)
         StreamParser::setFrequency(sdp.rtpmap.clockRate);
-    m_rtpChannel = sdp.format;
+    m_rtpChannel = sdp.payloadType;
     for (const QString& param: sdp.fmtp.params)
     {
         if (param.startsWith("sprop-parameter-sets"))
@@ -52,22 +52,8 @@ void H264Parser::setSdpInfo(const Sdp::Media& sdp)
                 for (QString nalStr: nalUnits)
                 {
                     QByteArray nal = QByteArray::fromBase64(nalStr.toUtf8());
-                    {
-                        // some cameras( Digitalwatchdog sends extra start code in SPSPSS sdp string );
-                        QByteArray startCode(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
-                        QByteArray startCodeShort(H264_NAL_SHORT_PREFIX, sizeof(H264_NAL_SHORT_PREFIX));
-
-                        if (nal.endsWith(startCode))
-                            nal.remove(nal.size()-4,4);
-                        else if (nal.endsWith(startCodeShort))
-                            nal.remove(nal.size()-3,3);
-
-
-                        if (nal.startsWith(startCode))
-                            nal.remove(0,4);
-                        else if (nal.startsWith(startCodeShort))
-                            nal.remove(0,3);
-                    }
+                    // some cameras( Digitalwatchdog sends extra start code in SPSPSS sdp string );
+                    nal = NALUnit::dropBorderedStartCodes(nal);
                     if( nal.size() > 0 && (nal[0] & 0x1f) == nuSPS )
                         decodeSpsInfo( nal );
 

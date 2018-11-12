@@ -98,7 +98,8 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP2 )
     QAuthenticator auth;
     auth.setUser( "root" );
     auth.setPassword( "ptth" );
-    QnRtspClient rtspClient(true, QnRtspClient::Config());
+    QnRtspClient::Config config{/*shouldGuessAuthDigest*/ true, /*backChannelAudioOnly*/ false};
+    QnRtspClient rtspClient(config);
     rtspClient.setAuth( auth, nx::network::http::header::AuthScheme::basic );
 
     rtspClient.setTransport( "tcp" );
@@ -127,7 +128,8 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP3 )
     QAuthenticator auth;
     auth.setUser( "root" );
     auth.setPassword( "ptth" );
-    QnRtspClient rtspClient(true, QnRtspClient::Config());
+    QnRtspClient::Config config{/*shouldGuessAuthDigest*/ true, /*backChannelAudioOnly*/ false};
+    QnRtspClient rtspClient(config);
     rtspClient.setAuth( auth, nx::network::http::header::AuthScheme::basic );
 
     rtspClient.setTransport( "tcp" );
@@ -236,7 +238,8 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP5 )
     QAuthenticator auth;
     auth.setUser( "root" );
     auth.setPassword( "ptth" );
-    QnRtspClient rtspClient(true, QnRtspClient::Config());
+    QnRtspClient::Config config{/*shouldGuessAuthDigest*/ true, /*backChannelAudioOnly*/ false};
+    QnRtspClient rtspClient(config);
     rtspClient.setAuth( auth, nx::network::http::header::AuthScheme::basic );
 
     rtspClient.setTransport( "tcp" );
@@ -414,9 +417,10 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP7 )
 
     std::vector<std::unique_ptr<QnRtspClient>> RtspClients;
     RtspClients.resize( SESSION_COUNT );
+    QnRtspClient::Config config{/*shouldGuessAuthDigest*/ true, /*backChannelAudioOnly*/ false};
     for( auto& rtspClient: RtspClients )
     {
-        rtspClient.reset( new QnRtspClient(true, QnRtspClient::Config()) );
+        rtspClient.reset(new QnRtspClient(config));
         rtspClient->setAuth( auth, nx::network::http::header::AuthScheme::basic );
         rtspClient->setTransport( "tcp" );
         ASSERT_TRUE( rtspClient->open( rtspUrl ).errorCode == 0 );
@@ -462,9 +466,10 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP8 )
 
     std::vector<std::unique_ptr<QnRtspClient>> RtspClients;
     RtspClients.resize( SESSION_COUNT );
+    QnRtspClient::Config config{/*shouldGuessAuthDigest*/ true, /*backChannelAudioOnly*/ false};
     for( auto& rtspClient: RtspClients )
     {
-        rtspClient.reset( new QnRtspClient(true, QnRtspClient::Config()) );
+        rtspClient.reset(new QnRtspClient(config));
         rtspClient->setAuth( auth, nx::network::http::header::AuthScheme::basic );
         rtspClient->setTransport( "tcp" );
         ASSERT_TRUE( rtspClient->open( rtspUrl ).errorCode == 0 );

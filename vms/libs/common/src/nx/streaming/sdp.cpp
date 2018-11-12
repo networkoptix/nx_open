@@ -27,7 +27,7 @@ static QString findCodecById(int num)
     }
 }
 
-bool parseRtpmap(const QString& line, Sdp::Rtpmap& rtpmap)
+bool parseRtpMap(const QString& line, Sdp::RtpMap& rtpmap)
 {
     QStringList params = line.split(' ');
     if (params.size() < 2)
@@ -37,7 +37,7 @@ bool parseRtpmap(const QString& line, Sdp::Rtpmap& rtpmap)
     if (trackInfo.size() < 2 || codecInfo.size() < 2)
         return false; // invalid data format
 
-    rtpmap.format = trackInfo[1].toUInt();
+    rtpmap.payloadType = trackInfo[1].toUInt();
     rtpmap.codecName = codecInfo[0];
     rtpmap.clockRate = codecInfo[1].toInt();
     if (codecInfo.size() >= 3)
@@ -54,7 +54,7 @@ bool parseFmtp(const QString& line, Sdp::Fmtp& fmtp)
     QStringList fmtpHeader = line.left(valueIndex).split(':');
     if (fmtpHeader.size() < 2)
         return false;
-    fmtp.format = fmtpHeader[1].toUInt();
+    fmtp.payloadType = fmtpHeader[1].toUInt();
     fmtp.params = line.mid(valueIndex + 1).split(';');
     for (QString& param: fmtp.params)
         param = param.trimmed();
@@ -69,33 +69,31 @@ Sdp::Media parseMedia(QStringList& lines)
     QStringList trackParams = line.mid(2).split(' ');
     media.mediaType = mediaTypeFromString(trackParams[0]);
     if (trackParams.size() >= 4)
-        media.format = trackParams[3].toInt();
+        media.payloadType = trackParams[3].toInt();
 
     lines.pop_front();
-    while (!lines.empty() && !lines.front().startsWith("m=", Qt::CaseInsensitive))
+    for (; !lines.empty() && !lines.front().startsWith("m=", Qt::CaseInsensitive); lines.pop_front())
     {
         line = lines.front().trimmed();
-        lines.pop_front();
-
         if (line.startsWith("a=", Qt::CaseInsensitive))
             media.sdpAttributes << line.toLower(); // save sdp for codec parser
 
         if (line.startsWith("a=rtpmap", Qt::CaseInsensitive))
         {
-            Sdp::Rtpmap rtpmap;
-            if (parseRtpmap(line, rtpmap) &&
-                (media.format == 0 || rtpmap.format == media.format)) // Ignore invalid rtpmap
+            Sdp::RtpMap rtpmap;
+            if (parseRtpMap(line, rtpmap) &&
+                (media.payloadType == 0 || rtpmap.payloadType == media.payloadType)) // Ignore invalid rtpmap
             {
                 media.rtpmap = rtpmap;
-                media.format = rtpmap.format;
+                media.payloadType = rtpmap.payloadType;
                 if (rtpmap.codecName.isEmpty())
-                    rtpmap.codecName = findCodecById(rtpmap.format);
+                    rtpmap.codecName = findCodecById(rtpmap.payloadType);
             }
         }
         else if (line.startsWith("a=fmtp", Qt::CaseInsensitive))
         {
             Sdp::Fmtp fmtp;
-            if (parseFmtp(line, fmtp) && fmtp.format == media.format)
+            if (parseFmtp(line, fmtp) && fmtp.payloadType == media.payloadType)
                 media.fmtp = fmtp;
         }
         else if (line.startsWith("a=control:", Qt::CaseInsensitive))

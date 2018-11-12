@@ -197,7 +197,6 @@ static std::atomic<int> RTPSessionInstanceCounter(0);
 // QnRtspClient
 
 QnRtspClient::QnRtspClient(
-    bool shoulGuessAuthDigest,
     const Config& config,
     std::unique_ptr<nx::network::AbstractStreamSocket> tcpSock)
     :
@@ -218,7 +217,7 @@ QnRtspClient::QnRtspClient(
     m_additionalReadBuffer( nullptr ),
     m_additionalReadBufferPos( 0 ),
     m_additionalReadBufferSize( 0 ),
-    m_rtspAuthCtx(shoulGuessAuthDigest),
+    m_rtspAuthCtx(config.shouldGuessAuthDigest),
     m_userAgent(nx::network::http::userAgentString()),
     m_defaultAuthScheme(nx::network::http::header::AuthScheme::basic)
 {

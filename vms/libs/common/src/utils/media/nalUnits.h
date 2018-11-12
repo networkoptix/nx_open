@@ -43,6 +43,9 @@ const char* const NALUnitDescr[30] =
 
 class NALUnit {
 public:
+    static constexpr uint8_t kStartCode[] = {0x00, 0x00, 0x01};
+    static constexpr uint8_t kStartCodeLong[] = {0x00, 0x00, 0x00, 0x01};
+
     const static int SPS_OR_PPS_NOT_READY = 1;
     const static int NOT_ENOUGHT_BUFFER = 2;
     const static int UNSUPPORTED_PARAM = 3;
@@ -89,6 +92,7 @@ public:
     //void setBuffer(quint8* buffer, quint8* end);
     void decodeBuffer(const quint8* buffer,const quint8* end);
     static quint8* addStartCode(quint8* buffer, quint8* boundStart);
+    static QByteArray dropBorderedStartCodes(const QByteArray& sourceNal);
 
     static int extractUEGolombCode(BitStreamReader& bitReader);
     static void writeUEGolombCode(BitStreamWriter& bitWriter, quint32 value);

@@ -242,6 +242,25 @@ QByteArray NALUnit::decodeNAL( const QByteArray& srcBuf )
     return decodedStreamBuf;
 }
 
+QByteArray NALUnit::dropBorderedStartCodes(const QByteArray& sourceNal)
+{
+    QByteArray startCode((char*)kStartCode, sizeof(kStartCode));
+    QByteArray startCodeLong((char*)kStartCodeLong, sizeof(kStartCodeLong));
+
+    QByteArray resutltNal = sourceNal;
+    if (resutltNal.endsWith(startCodeLong))
+        resutltNal.chop(startCodeLong.size());
+    else if (resutltNal.endsWith(startCode))
+        resutltNal.chop(startCode.size());
+
+    if (resutltNal.startsWith(startCodeLong))
+        resutltNal.remove(0, startCodeLong.size());
+    else if (resutltNal.startsWith(startCode))
+        resutltNal.remove(0, startCode.size());
+
+    return resutltNal;
+}
+
 int NALUnit::extractUEGolombCode()
 {
     uint cnt = 0;
