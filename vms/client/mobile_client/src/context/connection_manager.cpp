@@ -245,7 +245,7 @@ bool QnConnectionManager::connectByUserInput(
 {
     nx::utils::Url url = nx::utils::Url::fromUserInput(address);
     if (url.port() <= 0)
-        url.setPort(DEFAULT_APPSERVER_PORT);
+        url.setPort(kDefaultConnectionPort);
 
     url.setUserName(userName);
     url.setPassword(password);
