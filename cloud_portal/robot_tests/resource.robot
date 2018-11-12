@@ -143,13 +143,12 @@ Restore password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}
+    Wait Until Element Is Visible    ${RESET EMAIL SENT MESSAGE}
     ${link}    Get Email Link    ${email}    restore_password
     Go To    ${link}
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
-    #sometimes the DB doesn't update with the new code before it's used by the test.  This is to wait for the DB update.
-    Sleep    20
+    Click Element    ${RESET PASSWORD INPUT}
     Input Text    ${RESET PASSWORD INPUT}    ${BASE PASSWORD}
-
     Click Button    ${SAVE PASSWORD}
     Wait Until Elements Are Visible    ${RESET SUCCESS MESSAGE}    ${RESET SUCCESS LOG IN LINK}
     Click Link    ${RESET SUCCESS LOG IN LINK}
@@ -159,6 +158,8 @@ Restore password
 
 Share To
     [arguments]    ${random email}    ${permissions}
+    ${log}    get_browser_log
+    log    ${log}
     Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}

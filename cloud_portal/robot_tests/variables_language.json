@@ -47,6 +47,7 @@
     "CANCEL BUTTON TEXT"                   :    "Cancel",
     "SAVE BUTTON TEXT"                     :    "Save",
     "SHARE BUTTON TEXT"                    :    "Share",
+    "DISCONNECT BUTTON TEXT"               :    "Disconnect",
 
     "OWNER TEXT"                           :    "Owner",
     "ADMIN TEXT"                           :    "Administrator",

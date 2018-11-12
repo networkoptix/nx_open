@@ -247,7 +247,7 @@ ${PASSWORD INCORRECT BADGE}           //span[contains(@class,"badge") and contai
 ${LOGGED IN CONTINUE BUTTON}          //ngb-modal-window//button[contains(text(),'${CONTINUE BUTTON TEXT}')]
 ${LOGGED IN LOG OUT BUTTON}           //ngb-modal-window//button[contains(text(),'${LOG OUT BUTTON TEXT}')]
 
-${CONTINUE BUTTON}                    //ngb-modal-window//button[contains(text(), 'Continue')]
+${CONTINUE BUTTON}                    //ngb-modal-window//button[contains(text(), '${CONTINUE BUTTON TEXT}')]
 ${CONTINUE MODAL}                     //ngb-modal-window
 
 ${300CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmyy
