@@ -2464,10 +2464,10 @@ void MediaServerProcess::registerRestHandlers(
      *     camera settings.
      *     %value auto Default value. Use aspect ratio from camera settings (if any).
      *     %value source Use the source frame aspect ratio, despite the value in camera settings.
+     * %param[opt]:option ignoreExternalArchive If present and "time" parameter has value
+     *     "latest", the image will not be downloaded from archive of the dts-based devices.
      * %param[proprietary]:option local If present, the request should not be redirected to another
      *     server.
-     * %param[proprietary]:option ignoreExternalArchive If present and "time" parameter has value
-     *     "latest", the image will not be downloaded from archive of the dts-based devices.
      * %param[proprietary]:option extraFormatting If present and the requested result format is
      *     non-binary, indentation and spacing will be used to improve readability.
      * %param[default]:enum format
