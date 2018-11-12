@@ -198,8 +198,11 @@ bool parseAdminAccessResponse(const nx::Buffer& response, AdminAccess* outAdminA
     if (element.isNull() || element.tagName() != kAdminAccessElementTag)
         return false;
 
-    auto adminAccessProtocol = element.firstChildElement(kAdminAccessProtocolElementTag);
-    while (!adminAccessProtocol.isNull())
+    for (
+        auto adminAccessProtocol = element.firstChildElement(kAdminAccessProtocolElementTag);
+        !adminAccessProtocol.isNull();
+        adminAccessProtocol =
+            adminAccessProtocol.nextSiblingElement(kAdminAccessProtocolElementTag))
     {
         const auto protocolElement = adminAccessProtocol.firstChildElement("protocol");
         if (protocolElement.isNull())
