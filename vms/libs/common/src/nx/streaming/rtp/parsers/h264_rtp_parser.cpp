@@ -51,7 +51,7 @@ void H264Parser::setSdpInfo(const Sdp::Media& sdp)
                 QStringList nalUnits = h264SpsPps.split(',');
                 for(QString nalStr: nalUnits)
                 {
-                    QByteArray nal = QByteArray::fromBase64(nal);
+                    QByteArray nal = QByteArray::fromBase64(nalStr);
                     {
                         // some cameras( Digitalwatchdog sends extra start code in SPSPSS sdp string );
                         QByteArray startCode(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
