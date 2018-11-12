@@ -1,40 +1,17 @@
-#if defined(Q_OS_WIN)
-    #include <winsock2.h>
-#endif
-
-#if defined(__arm__)
-    #include <sys/ioctl.h>
-#endif
-
-#include <atomic>
-#include <QtCore/QFile>
-
 #include <nx/streaming/rtsp_client.h>
-
 #include <nx/utils/datetime.h>
 #include <nx/network/http/custom_headers.h>
-#include <network/tcp_connection_priv.h>
-#include <network/tcp_connection_processor.h>
-
-#include <utils/common/sleep.h>
-#include <utils/common/synctime.h>
-#include <utils/common/util.h>
-#include <utils/media/bitStream.h>
-
-#include <nx/network/http/http_types.h>
 #include <nx/network/rtsp/rtsp_types.h>
-#include <nx/network/deprecated/simple_http_client.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
-#include <nx/utils/system_error.h>
-#include <nx/utils/unused.h>
+
+#include <network/tcp_connection_priv.h>
+#include <network/tcp_connection_processor.h>
+#include <utils/common/sleep.h>
 
 #define DEFAULT_RTP_PORT 554
 #define RESERVED_TIMEOUT_TIME (10*1000)
-
-static const quint32 SSRC_CONST = 0x2a55a9e8;
-static const quint32 CSRC_CONST = 0xe8a9552a;
 
 static const int TCP_RECEIVE_TIMEOUT_MS = 1000 * 5;
 static const int TCP_CONNECT_TIMEOUT_MS = 1000 * 5;
@@ -191,8 +168,6 @@ void QnRtspIoDevice::processRtcpData()
 
 static const size_t ADDITIONAL_READ_BUFFER_CAPACITY = 64 * 1024;
 
-static std::atomic<int> RTPSessionInstanceCounter(0);
-
 //-------------------------------------------------------------------------------------------------
 // QnRtspClient
 
@@ -202,7 +177,6 @@ QnRtspClient::QnRtspClient(
     :
     m_config(config),
     m_csec(2),
-    //m_rtpIo(*this),
     m_transport(TRANSPORT_UDP),
     m_selectedAudioChannel(0),
     m_startTime(DATETIME_NOW),
@@ -309,16 +283,6 @@ void QnRtspClient::updateResponseStatus(const QByteArray& response)
 
 CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 startTime)
 {
-#ifdef _DUMP_STREAM
-    const int fileIndex = ++RTPSessionInstanceCounter;
-    std::ostringstream ss;
-    ss<<"C:\\tmp\\12\\in."<<fileIndex;
-    m_inStreamFile.open( ss.str(), std::ios_base::binary );
-    ss.arg(std::string());
-    ss<<"C:\\tmp\\12\\out."<<fileIndex;
-    m_outStreamFile.open( ss.str(), std::ios_base::binary );
-#endif
-
     if (startTime != AV_NOPTS_VALUE)
         m_openedTime = startTime;
 
@@ -484,11 +448,6 @@ const QByteArray& QnRtspClient::getSdp() const
     return m_sdp;
 }
 
-QByteArray QnRtspClient::calcDefaultNonce() const
-{
-    return QByteArray::number(qnSyncTime->currentUSecsSinceEpoch() , 16);
-}
-
 #if 1
 void QnRtspClient::addAuth( nx::network::http::Request* const request )
 {
@@ -565,9 +524,6 @@ bool QnRtspClient::sendRequestInternal(nx::network::http::Request&& request)
     addAdditionAttrs(&request);
     QByteArray requestBuf;
     request.serialize( &requestBuf );
-#ifdef _DUMP_STREAM
-    m_outStreamFile.write( requestBuf.constData(), requestBuf.size() );
-#endif
     return m_tcpSock->send(requestBuf.constData(), requestBuf.size()) > 0;
 }
 
@@ -956,9 +912,6 @@ bool QnRtspClient::sendKeepAlive()
 void QnRtspClient::sendBynaryResponse(const quint8* buffer, int size)
 {
     m_tcpSock->send(buffer, size);
-#ifdef _DUMP_STREAM
-    m_outStreamFile.write( (const char*)buffer, size );
-#endif
 }
 
 bool QnRtspClient::processTextResponseInsideBinData()
@@ -995,7 +948,6 @@ bool QnRtspClient::processTextResponseInsideBinData()
         QString tmp = extractRTSPParam(QLatin1String(textResponse), QLatin1String("Range:"));
         if (!tmp.isEmpty())
             parseRangeHeader(tmp);
-        emit gotTextResponse(textResponse);
     }
 
     return true;
@@ -1431,9 +1383,6 @@ int QnRtspClient::readSocketWithBuffering( quint8* buf, size_t bufSize, bool rea
 #endif
 
         m_additionalReadBufferSize = m_tcpSock->recv( m_additionalReadBuffer, ADDITIONAL_READ_BUFFER_CAPACITY );
-#ifdef _DUMP_STREAM
-        m_inStreamFile.write( m_additionalReadBuffer, m_additionalReadBufferSize );
-#endif
         m_additionalReadBufferPos = 0;
         if( m_additionalReadBufferSize <= 0 )
             return bufSize == bufSizeBak
@@ -1459,10 +1408,6 @@ bool QnRtspClient::sendRequestAndReceiveResponse( nx::network::http::Request&& r
             NX_VERBOSE(this, "Failed to send request: %2", SystemError::getLastOSErrorText());
             return false;
         }
-
-#ifdef _DUMP_STREAM
-        m_outStreamFile.write( requestBuf.constData(), requestBuf.size() );
-#endif
 
         if( !readTextResponce(responseBuf) )
         {

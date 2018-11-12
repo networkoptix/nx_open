@@ -1,8 +1,5 @@
 #pragma once
 
-#include <QtCore/QElapsedTimer>
-
-#include <fstream>
 #include <memory>
 #include <vector>
 #include <chrono>
@@ -21,21 +18,15 @@ extern "C"
 #include <QtCore/QUrl>
 
 #include <nx/network/socket.h>
-#include <nx/network/http/http_types.h>
 #include <nx/network/rtsp/rtsp_types.h>
 #include <nx/streaming/rtp/rtcp.h>
 #include <nx/streaming/sdp.h>
-#include <nx/streaming/rtp/camera_time_helper.h>
-
+#include <nx/utils/elapsed_timer.h>
 
 #include <utils/common/threadqueue.h>
 #include <utils/common/byte_array.h>
 #include <utils/camera/camera_diagnostics.h>
 #include <network/client_authenticate_helper.h>
-#include <nx/utils/elapsed_timer.h>
-
-//#define DEBUG_TIMINGS
-//#define _DUMP_STREAM
 
 class QnRtspClient;
 
@@ -79,9 +70,8 @@ private:
     bool m_forceRtcpReports;
 };
 
-class QnRtspClient: public QObject
+class QnRtspClient
 {
-    Q_OBJECT;
 public:
     struct Config
     {
@@ -236,8 +226,7 @@ public:
     bool processTcpRtcpData(const quint8* data, int size);
 
     QElapsedTimer lastReceivedDataTimer() const;
-signals:
-    void gotTextResponse(QByteArray text);
+
 private:
     void addRangeHeader( nx::network::http::Request* const request, qint64 startPos, qint64 endPos );
     nx::network::http::Request createDescribeRequest();
@@ -260,7 +249,6 @@ private:
     bool processTextResponseInsideBinData();
     static QByteArray getGuid();
     void registerRTPChannel(int rtpNum, int rtcpNum, int trackIndex);
-    QByteArray calcDefaultNonce() const;
     nx::network::http::Request createPlayRequest( qint64 startPos, qint64 endPos );
     bool sendPlayInternal(qint64 startPos, qint64 endPos);
     bool sendRequestInternal(nx::network::http::Request&& request);
@@ -289,19 +277,14 @@ private:
     bool m_playNowMode = false;
     // end of initialized fields
 
-    //unsigned char m_responseBuffer[MAX_RESPONCE_LEN];
     quint8* m_responseBuffer;
     int m_responseBufferLen;
     QByteArray m_sdp;
 
     std::unique_ptr<nx::network::AbstractStreamSocket> m_tcpSock;
-    //RtpIoTracks m_rtpIoTracks; // key: tracknum, value: track IO device
-
     nx::utils::Url m_url;
-
     QString m_SessionId;
     unsigned short m_ServerPort;
-    // format: key - track number, value - codec name
     std::vector<SDPTrackInfo> m_sdpTracks;
 
     QElapsedTimer m_keepAliveTime;
@@ -331,10 +314,6 @@ private:
     int m_additionalReadBufferSize;
     HttpAuthenticationClientContext m_rtspAuthCtx;
     QByteArray m_userAgent;
-#ifdef _DUMP_STREAM
-    std::ofstream m_inStreamFile;
-    std::ofstream m_outStreamFile;
-#endif
     nx::network::http::header::AuthScheme::Value m_defaultAuthScheme;
     mutable QnMutex m_socketMutex;
     QByteArray m_serverInfo;
