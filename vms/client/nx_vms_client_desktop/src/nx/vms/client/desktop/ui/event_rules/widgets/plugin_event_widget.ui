@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PluginEventWidget</class>
+ <widget class="QWidget" name="PluginEventWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>599</width>
+    <height>115</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string/>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0">
+      <widget class="nx::vms::client::desktop::LabelWithHint" name="pirLabel">
+       <property name="text">
+        <string>Source:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="nx::vms::client::desktop::LabelWithHint" name="captionLabel">
+       <property name="text">
+        <string>Caption contains:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QnTreeComboBox" name="pirComboBox"/>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="captionEdit">
+       <property name="placeholderText">
+        <string>Keywords separated by space</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="nx::vms::client::desktop::LabelWithHint" name="descriptionLabel">
+       <property name="text">
+        <string>Description contains:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="nx::vms::client::desktop::LabelWithHint" name="levelLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Level:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="descriptionEdit">
+       <property name="placeholderText">
+        <string>Keywords separated by space</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QWidget" name="widget" native="true">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QCheckBox" name="cbError">
+          <property name="text">
+           <string>ERROR</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="cbWarning">
+          <property name="text">
+           <string>WARNING</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="cbInfo">
+          <property name="text">
+           <string>INFO</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>nx::vms::client::desktop::LabelWithHint</class>
+   <extends>QLabel</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/widget_with_hint.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QnTreeComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">ui/widgets/common/tree_combo_box.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

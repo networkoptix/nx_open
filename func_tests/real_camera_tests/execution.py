@@ -181,11 +181,11 @@ class ServerStagesExecutor(object):
 
 
 class SpecificFeatures(object):
-    def __init__(self, items=[]):
-        self.items = set(items)
+    def __init__(self, items={}):
+        self.items = items
 
     def __getattr__(self, name):
-        return name in self.items
+        return self.items.get(name)
 
 
 class Stand(object):

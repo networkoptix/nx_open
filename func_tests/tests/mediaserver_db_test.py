@@ -92,7 +92,7 @@ def check_camera_absence_on_server(server, camera_guid):
                 if c['id'] == camera_guid]) == 0
 
 
-def wait_for_full_info_be_the_same(one, two, stage, artifact_factory):
+def wait_for_full_info_be_the_same(one, two, stage, artifacts_dir):
     try:
         wait_for_truthy(
             lambda: one.api.generic.get('ec2/getFullInfo') == two.api.generic.get('ec2/getFullInfo'),
@@ -101,24 +101,20 @@ def wait_for_full_info_be_the_same(one, two, stage, artifact_factory):
         # Store ec2/getFullInfo to artifacts
         full_info_one = one.api.generic.get('ec2/getFullInfo')
         full_info_two = two.api.generic.get('ec2/getFullInfo')
-        full_info_one_desc = 'full_info_one_{}'.format(stage)
-        full_info_two_desc = 'full_info_two_{}'.format(stage)
-        artifact_factory.make_artifact([full_info_one_desc],
-                         name=full_info_one_desc).save_as_json(full_info_one)
-        artifact_factory.make_artifact([full_info_two_desc],
-                         name=full_info_two_desc).save_as_json(full_info_two)
+        artifacts_dir.joinpath('full_info_one_{}'.format(stage)).write_json(full_info_one)
+        artifacts_dir.joinpath('full_info_two_{}'.format(stage)).write_json(full_info_two)
     return one.api.generic.get('ec2/getFullInfo')
 
 
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85690455/Mediaserver+database+test#Mediaserverdatabasetest-test_backup_restore
-def test_backup_restore(artifact_factory, one, two, camera):
+def test_backup_restore(artifacts_dir, one, two, camera):
     merge_systems(two, one)
     full_info_initial = wait_for_full_info_be_the_same(
-        one, two, "after_merge", artifact_factory)
+        one, two, "after_merge", artifacts_dir)
     backup = one.api.generic.get('ec2/dumpDatabase')
     camera_guid = two.api.add_camera(camera)
     full_info_with_new_camera = wait_for_full_info_be_the_same(
-        one, two, "after_adding_camera", artifact_factory)
+        one, two, "after_adding_camera", artifacts_dir)
     assert full_info_with_new_camera != full_info_initial, (
         "Servers ec2/getFullInfo data before and after saveCamera are not the same")
     # 90 seconds is empiric value (30 isn't enough to restart after restore database)
@@ -127,16 +123,14 @@ def test_backup_restore(artifact_factory, one, two, camera):
     wait_for_truthy(
         lambda: check_camera_absence_on_server(one, camera_guid),
         "Server ONE camera disappearance")
-    full_info_after_backup_restore = wait_for_full_info_be_the_same(
-        one, two, "after_restore_database", artifact_factory)
+    full_info_after = wait_for_full_info_be_the_same(
+        one, two, "after_restore_database", artifacts_dir)
     try:
-        assert full_info_after_backup_restore == full_info_initial, (
+        assert full_info_after == full_info_initial, (
             "Servers ec2/getFullInfo data before and after restoreDatabase are not the same, diff")
     except AssertionError:
-        artifact_factory.make_artifact(['full_info_initial'],
-                         name='full_info_initial').save_as_json(full_info_initial)
-        artifact_factory.make_artifact(['full_info_after_backup_restore'],
-                         name='full_info_after_backup_restore').save_as_json(full_info_after_backup_restore)
+        artifacts_dir.joinpath('full_info_initial').write_json(full_info_initial)
+        artifacts_dir.joinpath('full_info_after').write_json(full_info_after)
         raise
 
     assert not one.installation.list_core_dumps()
@@ -146,9 +140,9 @@ def test_backup_restore(artifact_factory, one, two, camera):
 # To detect VMS-5969
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85690455/Mediaserver+database+test#Mediaserverdatabasetest-test_server_guids_changed
 @pytest.mark.parametrize('db_version', ['current'])
-def test_server_guids_changed(one, two, artifact_factory):
+def test_server_guids_changed(one, two, artifacts_dir):
     merge_systems(two, one)
-    wait_for_full_info_be_the_same(one, two, "after_merge", artifact_factory)
+    wait_for_full_info_be_the_same(one, two, "after_merge", artifacts_dir)
 
     assert not one.installation.list_core_dumps()
     assert not two.installation.list_core_dumps()

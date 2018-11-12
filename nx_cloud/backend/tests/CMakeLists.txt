@@ -1,1 +1,0 @@
-add_subdirectory(cloud_connect_integration_tests)

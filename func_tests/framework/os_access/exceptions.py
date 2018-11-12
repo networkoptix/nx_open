@@ -1,26 +1,31 @@
 from pylru import lrudecorator
 
 
-def _error_message_from_stderr(stderr):
-    """Simple heuristic to get short message from STDERR: take last lines that doesn't begin with
+def _error_message_from_output(stdout, stderr):
+    """Simple heuristic to get short message from output: take last lines that doesn't begin with
     plus `+` (command trace). Some lines may be continuation lines which start with space or tab.
     First line of result is non-continuation, others are continuation.
 
     `stderr` decoded as UTF-8 because shell sometimes shows quotation mark (`b'\xe2\x80\x98'`).
     """
-    lines = []
-    for line in stderr.decode('utf-8').splitlines():
-        if line and not line.startswith('+'):  # Omit empty lines and lines from set -x.
-            if not line.startswith(' ') and not line.startswith('\t'):
-                lines = []
-            lines.append(line)
-    return '\n'.join(lines) if lines else 'stderr empty'
+    for name, output in (('stderr', stderr), ('stdout', stdout)):
+        if len(output) > 100 * 1024:
+            return name + ' bigger than 100 kilobytes'
+        lines = []
+        for line in output.decode('utf-8').splitlines():
+            if line and not line.startswith('+'):  # Omit empty lines and lines from set -x.
+                if not line.startswith(' ') and not line.startswith('\t'):
+                    lines = []
+                lines.append(line)
+        if lines:
+            return '\n'.join(lines)
+    return 'no output'
 
 
 class NonZeroExitStatus(Exception):
     def __init__(self, exit_status, stdout, stderr):
         super(NonZeroExitStatus, self).__init__(
-            u"{}".format(_error_message_from_stderr(stderr)))
+            u"{}".format(_error_message_from_output(stdout, stderr)))
         self.exit_status = exit_status
         self.stdout = stdout
         self.stderr = stderr
@@ -43,7 +48,12 @@ class Timeout(Exception):
         self.timeout_sec = timeout_sec
 
 
-class BadPath(Exception):
+class FileSystemError(OSError):
+    def __init__(self, errno, strerror):  # type: (int, str) -> ...
+        super(FileSystemError, self).__init__(errno, strerror)
+
+
+class BadPath(FileSystemError):
     pass
 
 
@@ -51,17 +61,15 @@ class DoesNotExist(BadPath):
     pass
 
 
-class CannotDownload(DoesNotExist):
+class CannotDownload(Exception):
     pass
 
 
-class AlreadyExists(Exception):
-    def __init__(self, message, path=None):
-        super(AlreadyExists, self).__init__(message)
-        self.path = path
+class AlreadyExists(FileSystemError):
+    pass
 
 
-class BadParent(Exception):
+class BadParent(FileSystemError):
     pass
 
 
@@ -73,7 +81,7 @@ class NotAFile(BadPath):
     pass
 
 
-class NotEmpty(Exception):
+class NotEmpty(FileSystemError):
     pass
 
 

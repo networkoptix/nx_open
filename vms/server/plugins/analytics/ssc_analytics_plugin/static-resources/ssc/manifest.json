@@ -1,0 +1,23 @@
+{
+    "capabilities": "", 
+    "eventTypes": [
+        {
+            "id": "nx.ssc.camera specify command", 
+            "name": {
+                "value": "gas gun is picked up", 
+                "localization": {}
+            }, 
+            "flags": "noFlags", 
+            "internalName": "camera specify command"
+        }, 
+        {
+            "id": "nx.ssc.reset command", 
+            "name": {
+                "value": "gas gun is hung down", 
+                "localization": {}
+            }, 
+            "flags": "noFlags", 
+            "internalName": "reset command"
+        }
+    ]
+}

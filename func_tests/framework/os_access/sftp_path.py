@@ -1,183 +1,149 @@
 import errno
-import fnmatch
+import functools
+import io
 import logging
 import stat
-from abc import ABCMeta, abstractproperty
-from functools import wraps
+import sys
 
 import paramiko
-from paramiko import SFTPFile
+import pathlib2 as pathlib
+import scandir
+import six
 
+from framework.method_caching import cached_property
 from framework.os_access import exceptions
-from framework.os_access.path import BasePosixPath
+from framework.os_access.path import FileSystemPath
 from framework.os_access.ssh_shell import SSH
 
 _logger = logging.getLogger(__name__)
 
 
-class _UnknownSftpError(Exception):
-    def __init__(self, e):
-        super(_UnknownSftpError, self).__init__('_UnknownSftpError [{}]: {}'.format(e.errno, e))
+def _reraise(errno_to_exc_cls, failure_exc_cls, func):
+    @functools.wraps(func)
+    def decorated_bound_method(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except IOError as e:
+            if e.errno is None and failure_exc_cls is not None:
+                six.reraise(failure_exc_cls, failure_exc_cls(e.errno, e.strerror),
+                            sys.exc_info()[2])
+            if e.errno not in errno_to_exc_cls:
+                raise
+            exc_cls = errno_to_exc_cls[e.errno]
+            exc = exc_cls(e.errno, e.strerror)
+            six.reraise(exc_cls, exc, sys.exc_info()[2])
+
+    return decorated_bound_method
 
 
-def _reraise_by_errno(errno_to_exception):
-    def decorator(func):
-        @wraps(func)
-        def decorated(self, *args, **kwargs):
-            try:
-                return func(self, *args, **kwargs)
-            except IOError as e:
-                if e.errno not in errno_to_exception:
-                    raise
-                raise errno_to_exception[e.errno]
-
-        return decorated
-
-    return decorator
+_on_existing = {
+    errno.ENOENT: exceptions.DoesNotExist,
+    errno.EISDIR: exceptions.NotAFile,
+    errno.ENOTEMPTY: exceptions.NotEmpty,
+    }
+_on_new = {
+    errno.ENOENT: exceptions.BadParent,
+    }
 
 
-class SftpPath(BasePosixPath):
-    __metaclass__ = ABCMeta
+def _wrap_unitary(client_bound_method):
+    @functools.wraps(client_bound_method)
+    def accessor_method(path, *args):
+        return client_bound_method(str(path), *args)
 
-    @abstractproperty
-    def _client(self):  # type: () -> paramiko.SFTPClient
-        pass
+    return accessor_method
+
+
+def _wrap_binary(client_bound_method):
+    @functools.wraps(client_bound_method)
+    def accessor_method(path, another_path, *args):
+        return client_bound_method(str(path), str(another_path), *args)
+
+    return accessor_method
+
+
+class _SftpDirEntry(object):
+    def __init__(self, attrs):
+        self.name = attrs.filename
+        self._attrs = attrs
+
+    def is_dir(self):
+        return stat.S_ISDIR(self._attrs.st_mode)
+
+
+class _SftpAccessor(object):
+    def __init__(self, sftp_client):  # type: (paramiko.SFTPClient) -> ...
+        self._client = sftp_client
+        self.readlink = sftp_client.readlink
+
+        self.stat = _reraise(_on_existing, None, _wrap_unitary(sftp_client.stat))
+        self.lstat = _reraise(_on_existing, None, _wrap_unitary(sftp_client.lstat))
+        self.listdir = _reraise(_on_existing, None, _wrap_unitary(sftp_client.listdir))
+        self.chmod = _reraise(_on_existing, None, _wrap_unitary(sftp_client.chmod))
+        self.mkdir = _reraise(_on_new, exceptions.AlreadyExists, _wrap_unitary(sftp_client.mkdir))
+        self.rmdir = _reraise(_on_existing, exceptions.NotEmpty, _wrap_unitary(sftp_client.rmdir))
+        self.rename = _reraise(_on_existing, None, _wrap_binary(sftp_client.rename))
+        self._symlink = _reraise(_on_new, exceptions.AlreadyExists, _wrap_binary(sftp_client.symlink))
+        self.utime = _reraise(_on_existing, None, _wrap_unitary(sftp_client.utime))
+        self.unlink = _reraise(_on_existing, exceptions.NotAFile, _wrap_unitary(sftp_client.remove))
+
+    def scandir(self, path):
+        for attrs in self._client.listdir_attr(str(path)):
+            dir_entry = scandir.GenericDirEntry(str(path), attrs.filename)
+            dir_entry._stat = dir_entry._lstat = attrs
+            yield dir_entry
+
+    def readlink(self, path_str):
+        return self._client.readlink(path_str)
+
+    def symlink(self, target, path, target_is_directory=None):
+        if target_is_directory is not None:
+            _logger.warning("`target_is_directory` is ignored but given: %r", target_is_directory)
+        self._symlink(target, path)
+
+
+class SftpPath(FileSystemPath):
+    _accessor = None  # type: _SftpAccessor
+    _flavour = pathlib._posix_flavour
 
     @classmethod
     def specific_cls(cls, ssh):  # type: (SSH) -> ...
         class SpecificSftpPath(cls):
+            @cached_property
+            def _accessor(self):
+                return _SftpAccessor(ssh._sftp())
+
             @classmethod
             def home(cls):
                 return cls(ssh.home_dir(ssh.current_user_name()))
 
-            @property
-            def _client(self):
-                return ssh._sftp()
+            @classmethod
+            def tmp(cls):
+                return cls('/tmp/func_tests')
 
         return SpecificSftpPath
 
-    @classmethod
-    def tmp(cls):
-        return cls(cls._tmp)
-
-    @_reraise_by_errno({2: exceptions.BadPath("Path doesn't exist or is a file")})
-    def glob(self, pattern):
-        return [self / name for name in fnmatch.filter(self._client.listdir(str(self)), pattern)]
-
-    def exists(self):
-        try:
-            self._client.stat(str(self))
-        except IOError as e:
-            if e.errno != errno.ENOENT:
-                raise
-            return False
-        else:
-            return True
-
-    @_reraise_by_errno({
-        errno.ENOENT: exceptions.DoesNotExist(),
-        None: exceptions.BadPath("Probably a dir."),
-        })
-    def unlink(self):
-        self._client.remove(str(self))
-
-    def expanduser(self):
-        raise NotImplementedError()
-
-    @_reraise_by_errno({
-        errno.ENOENT: exceptions.BadParent(),
-        None: exceptions.AlreadyExists("Already exists and may be dir or file"),
-        })
-    def _mkdir_raw(self):
-        self._client.mkdir(str(self))
-
-    def rmtree(self, ignore_errors=False):
-        try:
-            entries = self._client.listdir_attr(path=str(self))
-        except IOError as e:
-            if e.errno != errno.ENOENT:
-                raise
-            if ignore_errors:
-                return
-            raise exceptions.DoesNotExist()
-        for entry in entries:
-            if stat.S_ISDIR(entry.st_mode):
-                self.joinpath(entry.filename).rmtree(ignore_errors=False)
-            else:
-                self.joinpath(entry.filename).unlink()
-        self.rmdir()
-
-    @_reraise_by_errno({
-        errno.ENOENT: exceptions.DoesNotExist(),
-        None: exceptions.NotEmpty(),
-        })
-    def rmdir(self):
-        self._client.rmdir(str(self))
-
-    @_reraise_by_errno({
-        None: exceptions.NotAFile(),
-        errno.ENOENT: exceptions.DoesNotExist(),
-        })
-    def read_bytes(self, offset=None, max_length=None):
-        """Read paramiko.file.BufferedFile#read docstring and code. It does exactly what's needed:
-        returns either `max_length` bytes or bytes until the end of file.
-        """
-        if offset is not None:
-            with self.open('rb+') as f:
-                f.seek(offset)
-                return f.read(max_length)
-        else:
-            with self.open('rb') as f:
-                return f.read(max_length)
-
-    def write_bytes(self, contents, offset=None):
-        """paramiko.file.BufferedFile#write writes all it's fed. File is not buffered (it's set
-        when opening the file) -- no flushing is required.
-        """
-        if offset is not None:
-            with self.open('rb+') as f:
-                f.seek(offset)
-                f.write(contents)
-        else:
-            with self.open('wb') as f:
-                f.write(contents)
-        return len(contents)
-
-    @_reraise_by_errno({
-        2: exceptions.DoesNotExist(),
-        })
-    def stat(self):
-        s = self._client.stat(str(self))
-        return s
-
-    def open(self, mode):  # type: (str) -> SFTPFile
+    def open(self, mode='r', buffering=-1, encoding=None, errors=None, newline=None):
         """Open file in stream mode. Seeking is not possible. If opened for writing, file is
         truncated. Can be used not only for regular files."""
         try:
-            f = self._client.open(str(self), mode)
+            f = self._accessor._client.open(str(self), mode, bufsize=buffering)
         except IOError as e:
             if 'w' in mode:
                 if e.errno == errno.ENOENT:
-                    raise exceptions.BadParent()
+                    raise exceptions.BadParent(e.errno, e.strerror)
                 if e.errno is None:
-                    raise exceptions.NotAFile()
+                    raise exceptions.NotAFile(errno.EISDIR, e.strerror)
                 raise
             if 'r' in mode:
                 if e.errno == errno.ENOENT:
-                    raise exceptions.DoesNotExist()
+                    raise exceptions.DoesNotExist(e.errno, e.strerror)
                 if e.errno is None:
-                    raise exceptions.BadParent()
+                    raise exceptions.BadParent(errno.ENOTDIR, e.strerror)
                 raise
             raise
-        return f
-
-    @_reraise_by_errno({
-        errno.ENOENT: exceptions.BadParent(),
-        None: exceptions.AlreadyExists("Already exists"),
-        })
-    def symlink_to(self, target, target_is_directory=False):
-        if not isinstance(target, type(self)):
-            raise ValueError(
-                "Symlink can only point to same OS but link is {} and target is {}".format(
-                    self, target))
-        self._client.symlink(str(target), str(self))
+        if stat.S_ISDIR(f.stat().st_mode):
+            raise exceptions.NotAFile(errno.EISDIR, 'Probably a dir')
+        if 'b' in mode:
+            return f
+        return io.TextIOWrapper(f, encoding=encoding, errors=errors, newline=newline)

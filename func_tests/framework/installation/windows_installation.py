@@ -70,7 +70,7 @@ class WindowsInstallation(Installation):
             '.msi': ['MsiExec', '/i', remote_installer_path, '/passive', '/log', remote_log_path],
             '.exe': [remote_installer_path, '/passive', '/log', remote_log_path],
             }
-        self.windows_access.winrm.run_command(commands[installer.extension])
+        self.windows_access.winrm.run_command(commands[installer.extension], timeout_sec=300)
         self._backup_configuration()
 
     def parse_core_dump(self, path):
