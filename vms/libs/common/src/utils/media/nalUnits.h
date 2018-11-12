@@ -229,14 +229,14 @@ public:
     quint32 time_scale;
     int fixed_frame_rate_flag;
 
-    struct CPB
+    struct Cpb
     {
-        int bit_rate_value_minus1;
-        int cpb_size_value_minus1;
+        int bit_rate_value_minus1 = 0;
+        int cpb_size_value_minus1 = 0;
         quint8 cbr_flag;
     };
     static const int kCpbCntMax = 32;
-    CPB cpb[kCpbCntMax];
+    Cpb cpb[kCpbCntMax];
 
     int initial_cpb_removal_delay_length_minus1;
     int cpb_removal_delay_length_minus1;
@@ -329,7 +329,6 @@ public:
     bool isReady() {return m_ready;}
     int deserialize();
     void insertHdrParameters();
-    int getMaxBitrate();
 
 private:
     bool seq_scaling_list_present_flag[8];

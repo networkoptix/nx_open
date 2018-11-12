@@ -813,14 +813,6 @@ void SPSUnit::insertHdrParameters()
     m_nalBufferLen =  writer.getBitsCount()/8 + beforeBytes;
 }
 
-int SPSUnit::getMaxBitrate()
-{
-    int result = 0;
-    for (int i = 0; i <= cpb_cnt_minus1; ++i)
-        result = std::max(result, (cpb[i].bit_rate_value_minus1 + 1) << (6 + bit_rate_scale));
-    return result;
-}
-
 void SPSUnit::hrd_parameters()
 {
     cpb_cnt_minus1 = extractUEGolombCode();
