@@ -40,7 +40,7 @@ supported for a while, when noted below.
 
 In the case of <strong><code>InvalidParameter</code></strong> or <strong><code>MissingParameter</code></strong> error
 return status code has been changed from <strong><code><i>200 OK</i></code></strong>
-to <strong><code><b>422 Unprocessable Entity</b></code></strong>,
+to <strong><code><b>422 Unprocessable Entity</b></code></strong>;
 in the case of timeout return status code has been changed from <strong><code><i>200 OK</i></code></strong>
 to <strong><code><b>408 Request Timeout</b></code></strong> in methods:
 <pre>
@@ -49,8 +49,8 @@ to <strong><code><b>408 Request Timeout</b></code></strong> in methods:
 </pre>
 <p/>
 
-Output parameter value list contain not only parameters specified by the user but also additional parameter values affected by the
-set operation in method:
+Output parameter value list can contain not only parameters specified by the user 
+but also additional parameter values affected by the set operation in method:
 <pre>
     /api/setCameraParam
 </pre>
