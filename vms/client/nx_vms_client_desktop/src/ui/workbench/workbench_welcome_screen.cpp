@@ -26,6 +26,7 @@
 #include <nx/client/core/settings/secure_settings.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/common/utils/connection_url_parser.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/nx_style.h>
 #include <ui/dialogs/login_dialog.h>
@@ -58,16 +59,6 @@ namespace {
 QnResourceList extractResources(const QList<QUrl>& urls)
 {
     return QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(urls));
-}
-
-// Extracts url from string and changes port to default if it is invalid
-nx::utils::Url urlFromUserInput(const QString& value)
-{
-    auto result = nx::utils::Url::fromUserInput(value);
-    if (result.port() <= 0)
-        result.setPort(DEFAULT_APPSERVER_PORT);
-
-    return result;
 }
 
 } // namespace
@@ -333,9 +324,9 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(
     bool storePassword,
     bool autoLogin)
 {
-    connectToSystemInternal(
+    connectToSystemInternal(        
         systemId,
-        urlFromUserInput(serverUrl),
+        helpers::parseConnectionUrlFromUserInput(serverUrl),
         QnEncodedCredentials(userName, password),
         storePassword,
         autoLogin);

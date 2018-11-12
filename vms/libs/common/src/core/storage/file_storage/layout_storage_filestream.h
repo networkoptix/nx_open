@@ -28,9 +28,6 @@ public:
     virtual bool open(QIODevice::OpenMode openMode) override;
     virtual void close() override;
 
-    virtual void lockFile() override;
-    virtual void unlockFile() override;
-
     virtual void storeStateAndClose() override;
     virtual void restoreState() override;
 
