@@ -23,6 +23,9 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
 
     connect(m_downloader.get(), &Downloader::chunkDownloadFailed,
         this, &ClientUpdateTool::atChunkDownloadFailed);
+
+    connect(m_downloader.get(), &Downloader::downloadFailed,
+        this, &ClientUpdateTool::atDownloadFailed);
 }
 
 ClientUpdateTool::~ClientUpdateTool()
@@ -47,12 +50,14 @@ void ClientUpdateTool::setError(QString error)
 {
     m_state = State::error;
     m_lastError = error;
+    emit updateStateChanged((int)m_state, 0);
 }
 
 void ClientUpdateTool::setApplauncherError(QString error)
 {
     m_state = State::applauncherError;
     m_lastError = error;
+    emit updateStateChanged((int)m_state, 0);
 }
 
 std::future<UpdateContents> ClientUpdateTool::requestRemoteUpdateInfo()
@@ -107,7 +112,6 @@ void ClientUpdateTool::atRemoteUpdateInformation(const nx::update::Information& 
             NX_WARNING(this) << "atRemoteUpdateInformation have valid update info but no client package";
             setError("Missing client package inside UpdateInfo");
         }
-
         m_remoteUpdateInfoRequest.set_value(contents);
     }
 }
@@ -211,6 +215,15 @@ void ClientUpdateTool::atChunkDownloadFailed(const QString& fileName)
     // It is a breakpoint catcher.
     //NX_VERBOSE(this) << "atChunkDownloadFailed() failed to download chunk for" << fileName;
     //setError(tr("Update package is corrupted: %1").arg(error));
+}
+
+void ClientUpdateTool::atDownloadFailed(const QString& fileName)
+{
+    if (m_state == State::downloading)
+    {
+        NX_VERBOSE(this) << "atDownloadFailed() failed to download file" << fileName;
+        setError(tr("Failed to download update package: %1").arg(fileName));
+    }
 }
 
 void ClientUpdateTool::atExtractFilesFinished(int code)
