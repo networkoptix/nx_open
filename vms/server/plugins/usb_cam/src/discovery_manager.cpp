@@ -20,7 +20,7 @@ static constexpr const char * const kVendorName = "usb_cam";
 static constexpr const char * const kQtMacAddressDelimiter = ":";
 static constexpr const char * const kNxMacAddressDelimiter = "-";
 
-std::string getEthernetMacAddress()
+static std::string getEthernetMacAddress()
 {
     for (const auto & iFace : QNetworkInterface::allInterfaces())
     {

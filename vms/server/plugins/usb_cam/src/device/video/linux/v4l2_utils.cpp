@@ -43,12 +43,12 @@ struct DeviceInitializer
     int fileDescriptor = -1;
 };
 
-std::vector<std::string> getDevicePaths();
-unsigned int toV4L2PixelFormat(nxcip::CompressionType nxCodecID);
-std::string getDeviceName(int fileDescriptor);
-float toFrameRate(const v4l2_fract& frameInterval);
+static std::vector<std::string> getDevicePaths();
+static unsigned int toV4L2PixelFormat(nxcip::CompressionType nxCodecID);
+static std::string getDeviceName(int fileDescriptor);
+static float toFrameRate(const v4l2_fract& frameInterval);
 
-unsigned int toV4L2PixelFormat(nxcip::CompressionType nxCodecID)
+static unsigned int toV4L2PixelFormat(nxcip::CompressionType nxCodecID)
 {
     switch(nxCodecID)
     {

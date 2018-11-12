@@ -18,7 +18,7 @@ namespace {
 
 static constexpr int kMsecInSec = 1000;
 
-const char * ffmpegDeviceType()
+static const char * ffmpegDeviceType()
 {
 #ifdef _WIN32
     return "dshow";
@@ -243,13 +243,17 @@ int AudioStream::AudioStreamPrivate::initializeResampledFrame()
     auto resampledFrame = std::make_unique<ffmpeg::Frame>();
     auto context = m_encoder->codecContext();
 
-    int nbSamples = context->frame_size ? context->frame_size : 2000;
+    static constexpr int kDefaultFrameSize = 2000;
+
+    int nbSamples = context->frame_size ? context->frame_size : kDefaultFrameSize;
+
+    static constexpr int kDefaultAlignment =  32;
 
     int result = resampledFrame->getBuffer(
         context->sample_fmt,
         nbSamples,
         context->channel_layout,
-        32);
+        kDefaultAlignment);
     if (result < 0)
         return result;
 

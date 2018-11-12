@@ -188,18 +188,18 @@ bool TranscodeStreamReader::waitForTimeSpan(
         if (m_interrupted)
             return false;
 
-        std::set<uint64_t> allTimeStamps;
+        std::set<uint64_t> allTimestamps;
         
         auto videoTimeStamps = m_videoFrameConsumer->timestamps();
         for (const auto & k : videoTimeStamps)
-            allTimeStamps.insert(k);
+            allTimestamps.insert(k);
         
         auto audioTimeStamps = m_avConsumer->timestamps();
         for (const auto & k : audioTimeStamps)
-            allTimeStamps.insert(k);
+            allTimestamps.insert(k);
 
-        if (allTimeStamps.empty() 
-            || *allTimeStamps.rbegin() - *allTimeStamps.begin() < timeSpan.count())
+        if (allTimestamps.empty() 
+            || *allTimestamps.rbegin() - *allTimestamps.begin() < timeSpan.count())
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             if (m_camera->millisSinceEpoch() - waitStart >= timeOut.count())

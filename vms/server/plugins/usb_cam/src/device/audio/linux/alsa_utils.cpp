@@ -15,7 +15,7 @@ namespace detail {
 
 namespace {
 
-std::vector<std::string> kMotherBoardAudioList = 
+static std::vector<std::string> kMotherBoardAudioList = 
 {
     "HDA Intel PCH"
     // AMD? builtin audio card goes here
@@ -79,7 +79,7 @@ struct DeviceDescriptor
     }
 };
 
-std::vector<DeviceDescriptor> getDevices()
+static std::vector<DeviceDescriptor> getDevices()
 {
     std::vector<DeviceDescriptor> motherBoardDevices;
     std::vector<DeviceDescriptor> devices;

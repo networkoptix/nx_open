@@ -14,7 +14,7 @@ namespace usb_cam {
 
 namespace  {
 
-int kUsecInMsec = 1000;
+static constexpr int kUsecInMsec = 1000;
 
 }
 
