@@ -180,7 +180,7 @@ void ModuleConnector::Module::remakeConnection()
 
 void ModuleConnector::Module::setForbiddenEndpoints(std::set<SocketAddress> endpoints)
 {
-    NX_VERBOSE(this, lm("Forbid endpoints %1").container(endpoints));
+    NX_VERBOSE(this, lm("Forbid endpoints: %1").container(endpoints));
     NX_ASSERT(!m_id.isNull(), "Does not make sense to block endpoints for unknown servers");
 
     std::set<QString> forbiddenEndpoints;
@@ -201,6 +201,7 @@ ModuleConnector::Module::Priority
     if (m_id.isNull())
         return kDefault;
 
+    // TODO: incorrect check for localhost!
     if (host == HostAddress::localhost || host.toString().toLower() == lit("localhost"))
         return kLocalHost;
 
@@ -332,7 +333,11 @@ void ModuleConnector::Module::connectToEndpoint(
 
             // When the last endpoint in a group fails try the next group.
             if (m_httpClients.empty())
+            {
+                NX_VERBOSE(this, lm("Group %1 endpoints are not availabe for %2")
+                    .args(endpointsGroup->first, m_id));
                 connectToGroup(++endpointsGroup);
+            }
         });
 }
 
@@ -407,8 +412,11 @@ bool ModuleConnector::Module::saveConnection(
     m_socket->readSomeAsync(buffer.get(),
         [this, buffer](SystemError::ErrorCode code, size_t size)
         {
-            NX_VERBOSE(this, lm("Unexpected connection to %1 read size=%2: %3").args(
-                m_id, size, SystemError::toString(code)));
+            if (code == SystemError::noError && size !=0)
+                NX_VERBOSE(this, lm("Unexpected receive on connection to %1") .args(m_id));
+
+            NX_VERBOSE(this, lm("Closing connection to %1 (size: %2, error: %3)")
+                .args(m_id, size, SystemError::toString(code)));
 
             m_socket.reset();
             ensureConnection(); //< Reconnect attempt.
@@ -418,9 +426,9 @@ bool ModuleConnector::Module::saveConnection(
                 [this](){ m_parent->m_disconnectedHandler(m_id); });
         });
 
-    auto ip = m_socket->getForeignAddress().address;
-    NX_VERBOSE(this, lm("Connected to %1 by %2 ip %3").args(m_id, endpoint, ip));
-    m_parent->m_connectedHandler(information, std::move(endpoint), std::move(ip));
+    NX_VERBOSE(this, lm("Connected to %1 by %2 (resolved address: %3)")
+        .args(m_id, endpoint, m_socket->getForeignAddress()));
+    m_parent->m_connectedHandler(information, std::move(endpoint), m_socket->getForeignAddress());
     m_reconnectTimer.reset();
     m_disconnectTimer.cancelSync();
     return true;

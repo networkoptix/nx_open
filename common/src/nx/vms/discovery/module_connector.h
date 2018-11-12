@@ -19,8 +19,8 @@ class ModuleConnector:
     public network::aio::BasicPollable
 {
 public:
-    typedef nx::utils::MoveOnlyFunc<void(
-        QnModuleInformation, SocketAddress /*endpoint*/, HostAddress /*ip*/)> ConnectedHandler;
+    typedef nx::utils::MoveOnlyFunc<void(QnModuleInformation, SocketAddress /*requestedEndpoint*/,
+            SocketAddress /*resolvedEndpoint*/)> ConnectedHandler;
     typedef nx::utils::MoveOnlyFunc<void(QnUuid)> DisconnectedHandler;
 
     ModuleConnector(network::aio::AbstractAioThread* thread = nullptr);
