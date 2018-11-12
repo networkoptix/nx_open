@@ -40,7 +40,7 @@ void H264Parser::setSdpInfo(const Sdp::Media& sdp)
     if (sdp.rtpmap.clockRate > 0)
         StreamParser::setFrequency(sdp.rtpmap.clockRate);
     m_rtpChannel = sdp.format;
-    for(const QString& param: sdp.fmtp.params)
+    for (const QString& param: sdp.fmtp.params)
     {
         if (param.startsWith("sprop-parameter-sets"))
         {
@@ -49,9 +49,9 @@ void H264Parser::setSdpInfo(const Sdp::Media& sdp)
             {
                 QString h264SpsPps = param.mid(pos+1);
                 QStringList nalUnits = h264SpsPps.split(',');
-                for(QString nalStr: nalUnits)
+                for (QString nalStr: nalUnits)
                 {
-                    QByteArray nal = QByteArray::fromBase64(nalStr);
+                    QByteArray nal = QByteArray::fromBase64(nalStr.toUtf8());
                     {
                         // some cameras( Digitalwatchdog sends extra start code in SPSPSS sdp string );
                         QByteArray startCode(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
