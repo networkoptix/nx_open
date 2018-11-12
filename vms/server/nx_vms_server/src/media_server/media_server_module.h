@@ -110,7 +110,9 @@ class QnMediaServerModule : public QObject, public QnInstanceStorage
 
 public:
     QnMediaServerModule(
-        const nx::mediaserver::CmdLineArguments* arguments = nullptr, QObject* parent = nullptr);
+        const nx::mediaserver::CmdLineArguments* arguments = nullptr,
+        std::unique_ptr<MSSettings> serverSettings = nullptr,
+        QObject* parent = nullptr);
     virtual ~QnMediaServerModule() override;
 
 

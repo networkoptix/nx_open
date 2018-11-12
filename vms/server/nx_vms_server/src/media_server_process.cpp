@@ -3093,13 +3093,10 @@ nx::utils::log::Settings MediaServerProcess::makeLogSettings(
     return s;
 }
 
-void MediaServerProcess::initializeLogging()
+void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
 {
-    const auto roSettingsPath = cmdLineArguments().configFilePath;
-    const auto rwSettingsPath = cmdLineArguments().rwConfigFilePath;
-    auto mSettings = MSSettings(roSettingsPath, rwSettingsPath);
-    auto& settings = mSettings.settings();
-    auto roSettings = mSettings.roSettings();
+    auto& settings = serverSettings->settings();
+    auto roSettings = serverSettings->roSettings();
 
     const auto binaryPath = QFile::decodeName(m_argv[0]);
 
@@ -4129,10 +4126,15 @@ void MediaServerProcess::run()
     if (QThreadPool::globalInstance()->maxThreadCount() < kMinimalGlobalThreadPoolSize)
         QThreadPool::globalInstance()->setMaxThreadCount(kMinimalGlobalThreadPoolSize);
 
-    if (m_serviceMode)
-        initializeLogging();
+    auto serverSettings = std::make_unique<MSSettings>(
+        cmdLineArguments().configFilePath,
+        cmdLineArguments().rwConfigFilePath);
 
-    std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(&m_cmdLineArguments));
+    if (m_serviceMode)
+        initializeLogging(serverSettings.get());
+
+    std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(
+        &m_cmdLineArguments, std::move(serverSettings)));
     m_serverModule = serverModule;
 
     m_platform->setServerModule(serverModule.get());
