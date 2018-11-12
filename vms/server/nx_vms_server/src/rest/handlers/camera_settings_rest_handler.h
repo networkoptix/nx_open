@@ -52,6 +52,19 @@ public:
         const QnRestConnectionProcessor* /*owner*/) override;
 
 private:
+     nx::network::http::StatusCode::Value handleGetParamsRequest(
+        const QnRestConnectionProcessor* owner,
+        const QnVirtualCameraResourcePtr& camera,
+        const QSet<QString>& requestedParameterIds,
+        QnCameraAdvancedParamValueMap* outParameterMap);
+
+     nx::network::http::StatusCode::Value handleSetParamsRequest(
+        const QnRestConnectionProcessor* owner,
+        const QnVirtualCameraResourcePtr& camera,
+        const QnCameraAdvancedParamValueMap& parametersToSet,
+        QnCameraAdvancedParamValueMap* outParameterMap);
+
+private:
     QScopedPointer<QnCachingCameraAdvancedParamsReader> m_paramsReader;
     QnResourceCommandProcessor* m_commandProcessor = nullptr;
 };

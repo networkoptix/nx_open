@@ -24,7 +24,7 @@ public:
         QObject* parent = NULL);
 
     void displayParams(const QnCameraAdvancedParams &params);
-    void loadValues(const QnCameraAdvancedParamValueList &params);
+    void loadValues(const QnCameraAdvancedParamValueList &params, bool packetMode = false);
     std::optional<QString> parameterValue(const QString& parameterId) const;
 
 
