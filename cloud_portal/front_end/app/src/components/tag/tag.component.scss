@@ -8,8 +8,6 @@
     font-size        : rem(12px);
     padding          : 0 8px 2px;
     border-radius    : 2px;
-    color            : $light16;
-    background-color : $light4;
     cursor           : pointer;
     display          : flex;
     align-items      : center;
@@ -17,6 +15,7 @@
 
 #selected-tag {
     @extend #tag;
+    color: $light1;
     padding-right: 0px !important;
 }
 
@@ -41,13 +40,12 @@
 .selected {
     @extend #selected-tag;
     background-color: $light16;
-    color: $light1;
     
-    & > span:hover {
+    & > span.close-button:hover {
         background-color: $light17;
     }
     
-    & > span:active {
+    & > span.close-button:active {
         background-color: $light18;
     }
 }
@@ -55,13 +53,12 @@
 .selected-styled {
     @extend #selected-tag;
     background-color : $brand_core;
-    color            : $light1;
     
-    & > span:hover {
+    & > button.close-button:hover {
         background-color : $brand_d1;
     }
     
-    & > span:active {
+    & > button.close-button:active {
         background-color : $brand_d2;
     }
 }
@@ -70,6 +67,8 @@
 
 .tag {
     @extend #tag;
+    color            : $light16;
+    background-color : $light4;
     
     &:hover {
         background-color : $light5;
@@ -82,7 +81,6 @@
 
 .tag-styled {
     @extend #tag;
-    
     background-color : $brand_core;
     color            : $light1;
     

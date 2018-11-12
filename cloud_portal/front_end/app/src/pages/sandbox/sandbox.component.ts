@@ -16,6 +16,7 @@ export class NxSandboxComponent {
     show5: boolean;
     edit: boolean;
     sections: any;
+    options: any;
 
     submitted = false;
 
@@ -34,6 +35,14 @@ export class NxSandboxComponent {
             { title: 'section1', content: 'Some content' },
             { title: 'section2', content: 'Other content' }
         ];
+
+        this.options = [
+            { name: 'access control', selected: false },
+            { name: 'connector', selected: true },
+            { name: 'drone', selected: true },
+            { name: 'health monitor', selected: false },
+            { name: 'storage', selected: false }
+        ]
 
     }
 

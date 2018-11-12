@@ -1,12 +1,13 @@
 <span [ngClass]="{
-    'large'          : selected || isLarge,
+    'large'          : isLarge,
     'selected'       : selected && !isStyled,
     'selected-styled': selected && isStyled,
     'tag'            : !selected && !isStyled,
     'tag-styled'     : !selected && isStyled
-}">
+}" (click)="selectTag()">
     <ng-content></ng-content>
-    <span *ngIf="selected" class="close-button">
+    <input *ngIf="isSelectable" [value]="value" hidden>
+    <span *ngIf="selected" class="close-button" (click)="$event.stopPropagation();deselectTag()">
         <span class="glyphicon close-icon"></span>
     </span>
 </span>

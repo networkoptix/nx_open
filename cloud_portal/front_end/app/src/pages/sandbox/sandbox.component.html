@@ -251,6 +251,11 @@
 
             </form>
         </div>
+        <div class="col-12 col-md-4">
+            <h3 class="float-left m-0 mt-1 mr-1" *ngFor="let option of options">
+                <nx-tag [selectable]="true" [(ngModel)]="option.selected">{{ option.name }}</nx-tag>
+            </h3>
+        </div>
     </div>
 </div>
 
