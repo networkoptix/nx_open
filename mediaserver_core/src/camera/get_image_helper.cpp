@@ -62,7 +62,7 @@ QnGetImageHelper::QnGetImageHelper(QnMediaServerModule* serverModule):
 }
 
 QSize updateDstSize(
-    const QnVirtualCameraResource& camera,
+    const QnVirtualCameraResourcePtr& camera,
     const QSize& srcSize,
     const CLVideoDecoderOutput& outFrame,
     nx::api::ImageRequest::AspectRatio aspectRatio)
@@ -95,7 +95,7 @@ QSize updateDstSize(
     // If auto was requested, then should use aspect ratio like it is used in GUI.
     if (aspectRatio == nx::api::ImageRequest::AspectRatio::auto_)
     {
-        const auto customAr = camera.aspectRatio();
+        const auto customAr = camera->aspectRatio();
         if (customAr.isValid())
             dstSize.setWidth(dstSize.height() * customAr.toFloat());
     }
@@ -329,7 +329,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImage(const nx::api::CameraImageReq
     const auto secondaryResolution =
         request.camera->streamInfo(Qn::StreamIndex::secondary).getResolution();
     const bool usePrimaryStream =
-        request.size.width() <= 0 && request.size.height() <= 0
+        (request.size.width() <= 0 && request.size.height() <= 0)
         || request.size.width() > secondaryResolution.width()
         || request.size.height() > secondaryResolution.height();
 
