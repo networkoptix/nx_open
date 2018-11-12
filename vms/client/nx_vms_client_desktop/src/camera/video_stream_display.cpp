@@ -1136,7 +1136,14 @@ bool QnVideoStreamDisplay::getLastDecodedFrame( QnAbstractVideoDecoder* dec, QSh
         }
         else
         {
-            av_picture_copy( (AVPicture*)outFrame->data(), (AVPicture*)lastFrame, dec->GetPixelFormat(), dec->getWidth(), dec->getHeight() );
+            av_image_copy(
+                outFrame->data()->data,
+                outFrame->data()->linesize,
+                (const uint8_t **)lastFrame->data,
+                lastFrame->linesize,
+                dec->GetPixelFormat(),
+                dec->getWidth(),
+                dec->getHeight());
         }
         (*outFrame)->pkt_dts = lastFrame->pkt_dts;
     }
