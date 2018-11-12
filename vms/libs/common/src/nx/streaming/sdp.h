@@ -20,13 +20,11 @@ struct Sdp
     {
         QString codecName;
         int clockRate = 0;
-        int payloadType = -1; //< RTP payload type number
         int channels = 0;
     };
 
     struct Fmtp
     {
-        int payloadType = -1; //< RTP payload type number
         QStringList params;
     };
 

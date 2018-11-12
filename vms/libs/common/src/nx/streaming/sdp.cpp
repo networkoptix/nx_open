@@ -27,7 +27,7 @@ static QString findCodecById(int num)
     }
 }
 
-bool parseRtpMap(const QString& line, Sdp::RtpMap& rtpmap)
+bool parseRtpMap(const QString& line, Sdp::RtpMap& rtpmap, int& payloadType)
 {
     QStringList params = line.split(' ');
     if (params.size() < 2)
@@ -37,7 +37,7 @@ bool parseRtpMap(const QString& line, Sdp::RtpMap& rtpmap)
     if (trackInfo.size() < 2 || codecInfo.size() < 2)
         return false; // invalid data format
 
-    rtpmap.payloadType = trackInfo[1].toUInt();
+    payloadType = trackInfo[1].toUInt();
     rtpmap.codecName = codecInfo[0];
     rtpmap.clockRate = codecInfo[1].toInt();
     if (codecInfo.size() >= 3)
@@ -45,7 +45,7 @@ bool parseRtpMap(const QString& line, Sdp::RtpMap& rtpmap)
     return true;
 }
 
-bool parseFmtp(const QString& line, Sdp::Fmtp& fmtp)
+bool parseFmtp(const QString& line, Sdp::Fmtp& fmtp, int& payloadType)
 {
     int valueIndex = line.indexOf(' ');
     if (valueIndex == -1)
@@ -54,7 +54,7 @@ bool parseFmtp(const QString& line, Sdp::Fmtp& fmtp)
     QStringList fmtpHeader = line.left(valueIndex).split(':');
     if (fmtpHeader.size() < 2)
         return false;
-    fmtp.payloadType = fmtpHeader[1].toUInt();
+    payloadType = fmtpHeader[1].toUInt();
     fmtp.params = line.mid(valueIndex + 1).split(';');
     for (QString& param: fmtp.params)
         param = param.trimmed();
@@ -80,20 +80,22 @@ Sdp::Media parseMedia(QStringList& lines)
 
         if (line.startsWith("a=rtpmap", Qt::CaseInsensitive))
         {
+            int payloadType = 0;
             Sdp::RtpMap rtpmap;
-            if (parseRtpMap(line, rtpmap) &&
-                (media.payloadType == 0 || rtpmap.payloadType == media.payloadType)) // Ignore invalid rtpmap
+            if (parseRtpMap(line, rtpmap, payloadType) &&
+                (media.payloadType == 0 || payloadType == media.payloadType)) // Ignore invalid rtpmap
             {
                 media.rtpmap = rtpmap;
-                media.payloadType = rtpmap.payloadType;
+                media.payloadType = payloadType;
                 if (rtpmap.codecName.isEmpty())
-                    rtpmap.codecName = findCodecById(rtpmap.payloadType);
+                    rtpmap.codecName = findCodecById(payloadType);
             }
         }
         else if (line.startsWith("a=fmtp", Qt::CaseInsensitive))
         {
+            int payloadType = 0;
             Sdp::Fmtp fmtp;
-            if (parseFmtp(line, fmtp) && fmtp.payloadType == media.payloadType)
+            if (parseFmtp(line, fmtp, payloadType) && payloadType == media.payloadType)
                 media.fmtp = fmtp;
         }
         else if (line.startsWith("a=control:", Qt::CaseInsensitive))
