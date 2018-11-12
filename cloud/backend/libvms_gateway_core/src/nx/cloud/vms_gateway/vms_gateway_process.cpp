@@ -206,7 +206,7 @@ std::unique_ptr<nx::network::PublicIPDiscovery> VmsGatewayProcess::initializePub
 
     if (!settings.cloudConnect().publicIpAddress.isEmpty())
     {
-        publicAddressFetched(settings, settings.cloudConnect().publicIpAddress);
+        publicAddressFetched(settings.cloudConnect().publicIpAddress);
         return nullptr;
     }
 
@@ -215,18 +215,16 @@ std::unique_ptr<nx::network::PublicIPDiscovery> VmsGatewayProcess::initializePub
 
     QObject::connect(
         publicAddressFetcher.get(), &nx::network::PublicIPDiscovery::found,
-        [this, &settings](const QHostAddress& publicAddress)
+        [this](const QHostAddress& publicAddress)
         {
-            publicAddressFetched(settings, publicAddress.toString());
+            publicAddressFetched(publicAddress.toString());
         });
 
     publicAddressFetcher->update();
     return publicAddressFetcher;
 }
 
-void VmsGatewayProcess::publicAddressFetched(
-    const conf::Settings& settings,
-    const QString& publicAddress)
+void VmsGatewayProcess::publicAddressFetched(const QString& publicAddress)
 {
     NX_INFO(this, lm("Retrieved public address %1. This address will be used for cloud connect")
         .arg(publicAddress));

@@ -58,9 +58,8 @@ private:
 
     std::unique_ptr<nx::network::PublicIPDiscovery> initializePublicIpDiscovery(
         const conf::Settings& settings);
-    void publicAddressFetched(
-        const conf::Settings& settings,
-        const QString& publicAddress);
+
+    void publicAddressFetched(const QString& publicAddress);
 
     void registerApiHandlers(
         const conf::Settings& settings,
