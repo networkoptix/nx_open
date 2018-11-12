@@ -1,3 +1,8 @@
+
+#if defined(__arm__)
+    #include <sys/ioctl.h>
+#endif
+
 #include <nx/streaming/rtsp_client.h>
 #include <nx/utils/datetime.h>
 #include <nx/network/http/custom_headers.h>
