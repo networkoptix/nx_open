@@ -674,46 +674,51 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(
 {
     Q_D(QnRtspConnectionProcessor);
 
-    QnConstAbstractMediaDataPtr rez;
+    QnConstAbstractMediaDataPtr result;
 
-    // 1. check packet in GOP keeper
-    // Do not check audio for live point if not proprietary client
+    // 1. Check the packet in the GOP keeper.
+    // Do not check the audio for the live point if the client is not proprietary.
     bool canCheckLive = (dataType == QnAbstractMediaData::VIDEO) || (d->startTime == DATETIME_NOW);
     if (canCheckLive)
     {
         QnVideoCameraPtr camera;
-        bool isHQ = quality == MEDIA_Quality_High || quality == MEDIA_Quality_ForceHigh;
+        const Qn::StreamIndex streamIndex =
+            (quality == MEDIA_Quality_High || quality == MEDIA_Quality_ForceHigh)
+            ? Qn::StreamIndex::primary
+            : Qn::StreamIndex::secondary;
         if (getResource())
             camera = d->serverModule->videoCameraPool()->getVideoCamera(getResource()->toResourcePtr());
 
-        if (camera) {
+        if (camera)
+        {
             if (dataType == QnAbstractMediaData::VIDEO)
-                rez =  camera->getLastVideoFrame(isHQ, /*channel*/0);
+                result =  camera->getLastVideoFrame(streamIndex, /*channel*/ 0);
             else
-                rez = camera->getLastAudioFrame(isHQ);
-            if (rez)
-                return rez;
+                result = camera->getLastAudioFrame(streamIndex);
+            if (result)
+                return result;
         }
     }
 
-    // 2. find packet inside archive
+    // 2. Find a packet inside the archive.
+
     QnServerArchiveDelegate archive(d->serverModule, quality);
     if (!archive.open(getResource()->toResourcePtr(), d->serverModule->archiveIntegrityWatcher()))
-        return rez;
+        return result;
     if (d->startTime != DATETIME_NOW)
         archive.seek(d->startTime, true);
     if (archive.getAudioLayout()->channelCount() == 0 && dataType == QnAbstractMediaData::AUDIO)
-        return rez;
+        return result;
 
     for (int i = 0; i < 40; ++i)
     {
         QnConstAbstractMediaDataPtr media = archive.getNextData();
         if (!media)
-            return rez;
+            return result;
         if (media->dataType == dataType)
             return media;
     }
-    return rez;
+    return result;
 }
 
 QnConstMediaContextPtr QnRtspConnectionProcessor::getAudioCodecContext(int audioTrackIndex) const
@@ -1319,12 +1324,14 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePlay()
         int copySize = 0;
         if (!getResource()->toResource()->hasFlags(Qn::foreigner) && (status == Qn::Online || status == Qn::Recording))
         {
-            bool usePrimaryStream =
-                d->quality != MEDIA_Quality_Low && d->quality != MEDIA_Quality_LowIframesOnly;
+            const Qn::StreamIndex streamIndex =
+                (d->quality != MEDIA_Quality_Low && d->quality != MEDIA_Quality_LowIframesOnly)
+                ? Qn::StreamIndex::primary
+                : Qn::StreamIndex::secondary;
             bool iFramesOnly = d->quality == MEDIA_Quality_LowIframesOnly;
             copySize = d->dataProcessor->copyLastGopFromCamera(
                 camera,
-                usePrimaryStream,
+                streamIndex,
                 0, /* skipTime */
                 iFramesOnly);
         }
@@ -1464,11 +1471,14 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeSetParamete
                 d->dataProcessor->setLiveQuality(d->quality);
 
                 qint64 time = d->dataProcessor->lastQueuedTime();
-                bool usePrimaryStream = d->quality != MEDIA_Quality_Low && d->quality != MEDIA_Quality_LowIframesOnly;
+                const Qn::StreamIndex streamIndex =
+                    (d->quality != MEDIA_Quality_Low && d->quality != MEDIA_Quality_LowIframesOnly)
+                    ? Qn::StreamIndex::primary
+                    : Qn::StreamIndex::secondary;
                 bool iFramesOnly = d->quality == MEDIA_Quality_LowIframesOnly;
                 d->dataProcessor->copyLastGopFromCamera(
                     camera,
-                    usePrimaryStream,
+                    streamIndex,
                     time,
                     iFramesOnly); // for fast quality switching
 

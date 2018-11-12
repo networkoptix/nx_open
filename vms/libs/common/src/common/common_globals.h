@@ -717,6 +717,7 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
         secondary = 1
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamIndex)
+    QString toString(StreamIndex value);
 
     enum StorageStatus
     {
