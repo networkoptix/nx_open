@@ -19,9 +19,9 @@ class ModuleConnector:
     public nx::network::aio::BasicPollable
 {
 public:
-    typedef nx::utils::MoveOnlyFunc<void(api::ModuleInformation,
-        nx::network::SocketAddress /*endpoint*/, nx::network::HostAddress /*ip*/)> ConnectedHandler;
-
+    typedef nx::utils::MoveOnlyFunc<
+        void(api::ModuleInformation, nx::network::SocketAddress /*requestedEndpoint*/,
+        nx::network::SocketAddress /*resolvedEndpoint*/)> ConnectedHandler;
     typedef nx::utils::MoveOnlyFunc<void(QnUuid)> DisconnectedHandler;
 
     ModuleConnector(nx::network::aio::AbstractAioThread* thread = nullptr);
@@ -52,7 +52,7 @@ private:
             std::function<void(boost::optional<api::ModuleInformation>, QString)> handler);
 
         void start(const nx::network::SocketAddress& endpoint);
-        nx::network::HostAddress ip() const { return m_socket->getForeignAddress().address; }
+        nx::network::SocketAddress address() const { return m_socket->getForeignAddress(); }
 
     private:
         void readUntilError();

@@ -270,7 +270,8 @@ void CloudStreamSocket::connectAsync(
             port = address.port, handler = std::move(handler)](
                 SystemError::ErrorCode code, std::deque<AddressEntry> dnsEntries) mutable
         {
-            NX_VERBOSE(this, lm("done resolve. %1, %2").arg(code).arg(dnsEntries.size()));
+            NX_VERBOSE(this, lm("Address resolved. Code: %1, entries: %2")
+                .args(code, dnsEntries.size()));
 
             if (operationGuard->lock())
             {
