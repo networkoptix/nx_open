@@ -3,7 +3,6 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/cloud_connect_settings.h>
 #include <nx/network/cloud/mediator_connector.h>
-#include <nx/network/cloud/tunnel/tcp/reverse_connection_pool.h>
 #include <nx/network/http/auth_restriction_list.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/ssl/ssl_engine.h>
@@ -57,11 +56,6 @@ VmsGatewayProcess::~VmsGatewayProcess()
 const std::vector<network::SocketAddress>& VmsGatewayProcess::httpEndpoints() const
 {
     return m_httpEndpoints;
-}
-
-network::SocketAddress VmsGatewayProcess::reverseConnectionServerHttpEndpoint() const
-{
-    return nx::network::SocketGlobals::cloud().tcpReversePool().address();
 }
 
 relaying::RelayEngine& VmsGatewayProcess::relayEngine()
@@ -239,26 +233,6 @@ void VmsGatewayProcess::publicAddressFetched(
 
     nx::network::SocketGlobals::cloud().settings()
         .replaceOriginatingHostAddress(publicAddress);
-
-    const auto& rcSettings = settings.cloudConnect().tcpReverse;
-    if (rcSettings.poolSize != 0)
-    {
-        auto& pool = nx::network::SocketGlobals::cloud().tcpReversePool();
-        pool.setPoolSize(rcSettings.poolSize);
-        pool.setHttpConnectionInactivityTimeout(settings.http().connectionInactivityTimeout);
-        pool.setKeepAliveOptions(rcSettings.keepAlive);
-        pool.setStartTimeout(rcSettings.startTimeout);
-        if (pool.start(publicAddress, rcSettings.port))
-        {
-            NX_ALWAYS(this, lm("TCP reverse pool has started on address %1, poolSize=%2, keepAlive=%3")
-                .args(pool.address(), rcSettings.poolSize, rcSettings.keepAlive));
-        }
-        else
-        {
-            NX_ERROR(this, lm("Could not start TCP reverse pool on port %1")
-                .args(rcSettings.port));
-        }
-    }
 }
 
 void VmsGatewayProcess::registerApiHandlers(
