@@ -18,7 +18,8 @@
 namespace nx {
 namespace cdb {
 
-constexpr static const auto kMaxTimeToWaitForChangesToBePropagatedToCloud = std::chrono::seconds(10);
+static constexpr auto kMaxTimeToWaitForChangesToBePropagatedToCloud = std::chrono::minutes(1);
+static constexpr auto kRetrySyncCheckPeriod = std::chrono::milliseconds(10);
 
 Ec2MserverCloudSynchronization::Ec2MserverCloudSynchronization()
 {
@@ -380,7 +381,7 @@ void Ec2MserverCloudSynchronization::waitForUserToAppearInCloud(
         if (found)
             break;
 
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(kRetrySyncCheckPeriod);
     }
 }
 
@@ -409,7 +410,7 @@ void Ec2MserverCloudSynchronization::waitForUserToDisappearFromCloud(const std::
             break;
         }
 
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(kRetrySyncCheckPeriod);
     }
 }
 
@@ -438,7 +439,7 @@ void Ec2MserverCloudSynchronization::waitForUserToDisappearLocally(const QnUuid&
         if (userIter == users.cend())
             break;
 
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(kRetrySyncCheckPeriod);
     }
 }
 
@@ -660,7 +661,7 @@ void Ec2MserverCloudSynchronization::waitForCloudAndVmsToSyncUsers(
         }
         if (isLastRun)
             break;
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(kRetrySyncCheckPeriod);
     }
 
     if (assertOnFailure)
@@ -694,7 +695,7 @@ void Ec2MserverCloudSynchronization::waitForCloudAndVmsToSyncSystemData(
         }
         if (isLastRun)
             break;
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(kRetrySyncCheckPeriod);
     }
 
     if (assertOnFailure)
