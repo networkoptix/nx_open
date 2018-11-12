@@ -137,7 +137,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     xAnimator(new VariantAnimator(this)),
 
     m_showButton(NxUi::newBlinkingShowHideButton(parentWidget, context(),
-        action::PinNotificationsAction)),
+        action::ToggleNotificationsAction)),
     m_hidingProcessor(new HoverFocusProcessor(parentWidget)),
     m_showingProcessor(new HoverFocusProcessor(parentWidget)),
     m_opacityProcessor(new HoverFocusProcessor(parentWidget)),
@@ -171,12 +171,12 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
             emit geometryChanged();
         });
 
-    m_opened = (settings.state == Qn::PaneState::Opened);
-    setShowButtonIcon();
-    m_showButton->setTransform(QTransform::fromScale(-1, 1));
+    action(action::ToggleNotificationsAction)->setChecked(settings.state == Qn::PaneState::Opened);
+    m_showButton->setTransform(QTransform::fromScale(-1, 1)); // Achtung! Flips button horizontally.
     m_showButton->setFocusProxy(item);
     m_showButton->setZValue(BackgroundItemZOrder); /*< To make it paint under the tooltip. */
-    setHelpTopic(m_showButton, Qn::MainWindow_Pin_Help);
+    connect(action(action::ToggleNotificationsAction), &QAction::toggled,
+        this, [this](bool opened) { setOpened(opened); });
 
     m_opacityProcessor->addTargetItem(item);
     m_opacityProcessor->addTargetItem(m_showButton);
@@ -231,7 +231,7 @@ bool NotificationsWorkbenchPanel::isPinned() const
 
 bool NotificationsWorkbenchPanel::isOpened() const
 {
-    return m_opened;;
+    return action(action::ToggleNotificationsAction)->isChecked();
 }
 
 void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
@@ -242,7 +242,10 @@ void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
 
     m_showingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
-    m_opened = opened;
+    auto toggleAction = action(action::ToggleNotificationsAction);
+    toggleAction->blockSignals(true);
+    toggleAction->setChecked(opened);
+    toggleAction->blockSignals(false);
 
     xAnimator->stop();
     qnWorkbenchAnimations->setupAnimator(xAnimator, opened
@@ -257,8 +260,6 @@ void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
         xAnimator->animateTo(newX);
     else
         item->setX(newX);
-
-    setShowButtonIcon();
 
     emit openedChanged(opened, animate);
 }
@@ -334,14 +335,6 @@ void NotificationsWorkbenchPanel::stopAnimations()
 void NotificationsWorkbenchPanel::enableShowButton(bool enabled)
 {
     m_showButton->setAcceptedMouseButtons(enabled ? Qt::LeftButton : Qt::NoButton);
-}
-
-void NotificationsWorkbenchPanel::setShowButtonIcon()
-{
-    m_showButton->setIcon(qnSkin->icon(m_opened
-        ? "panel/slide_pin.png"
-        : "panel/slide_right.png",
-        "panel/slide_left.png"));
 }
 
 void NotificationsWorkbenchPanel::updateControlsGeometry()
