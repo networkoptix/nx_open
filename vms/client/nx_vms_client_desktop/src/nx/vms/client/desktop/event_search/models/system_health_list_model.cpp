@@ -71,38 +71,27 @@ QVariant SystemHealthListModel::data(const QModelIndex& index, int role) const
             return QVariant::fromValue(QnNotificationLevel::valueOf(d->message(index.row())));
 
         case Qn::TimeoutRole:
-            return d->locked(index.row()) ? -1 : static_cast<qint64>(kDisplayTimeout.count());
+            return d->locked(index.row())
+                ? QVariant()
+                : QVariant::fromValue(kDisplayTimeout);
 
         default:
             return base_type::data(index, role);
     }
 }
 
-bool SystemHealthListModel::setData(const QModelIndex& index, const QVariant& value, int role)
+bool SystemHealthListModel::defaultAction(const QModelIndex& index)
 {
-    if (!isValid(index))
+    const auto action = d->action(index.row());
+    if (action == ui::action::NoAction)
         return false;
 
-    switch (role)
-    {
-        case Qn::DefaultNotificationRole:
-        case Qn::ActivateLinkRole:
-        {
-            const auto action = d->action(index.row());
-            if (action == ui::action::NoAction)
-                return false;
+    menu()->triggerIfPossible(action, d->parameters(index.row()));
 
-            menu()->triggerIfPossible(action, d->parameters(index.row()));
+    if (d->message(index.row()) == QnSystemHealth::CloudPromo)
+        menu()->trigger(ui::action::HideCloudPromoAction);
 
-            if (d->message(index.row()) == QnSystemHealth::CloudPromo)
-                menu()->trigger(ui::action::HideCloudPromoAction);
-
-            return true;
-        }
-
-        default:
-            return false;
-    }
+    return true;
 }
 
 bool SystemHealthListModel::removeRows(int row, int count, const QModelIndex& parent)

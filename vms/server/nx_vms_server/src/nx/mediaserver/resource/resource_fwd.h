@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/resource/shared_resource_pointer.h>
+#include <core/resource/shared_resource_pointer_list.h>
 
 class QnActiResource;
 using QnActiResourcePtr = QnSharedResourcePointer<QnActiResource>;
@@ -56,6 +57,14 @@ namespace resource {
 
 class Camera;
 using CameraPtr = QnSharedResourcePointer<Camera>;
+
+class AnalyticsPluginResource;
+using AnalyticsPluginResourcePtr = QnSharedResourcePointer<AnalyticsPluginResource>;
+
+class AnalyticsEngineResource;
+using AnalyticsEngineResourcePtr = QnSharedResourcePointer<AnalyticsEngineResource>;
+
+using AnalyticsEngineResourceList = QnSharedResourcePointerList<AnalyticsEngineResource>;
 
 } // namespace resource
 } // namespace mediaserver

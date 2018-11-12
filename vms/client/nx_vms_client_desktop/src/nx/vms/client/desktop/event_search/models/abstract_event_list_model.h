@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <QtCore/QAbstractListModel>
 
 #include <ui/workbench/workbench_context_aware.h>
@@ -27,7 +29,7 @@ public:
 
 protected:
     bool isValid(const QModelIndex& index) const;
-    virtual QString timestampText(qint64 timestampUs) const;
+    virtual QString timestampText(std::chrono::microseconds timestamp) const;
 
     virtual bool defaultAction(const QModelIndex& index);
     virtual bool activateLink(const QModelIndex& index, const QString& link);

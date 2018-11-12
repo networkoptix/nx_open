@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QWidget>
@@ -70,9 +72,9 @@ public:
     void setAction(const CommandActionPtr& value);
 
     bool hasAutoClose() const;
-    int autoCloseTimeMs() const;
-    int autoCloseRemainingMs() const;
-    void setAutoCloseTimeMs(int value);
+    std::chrono::milliseconds autoCloseTime() const;
+    std::chrono::milliseconds autoCloseRemainingTime() const;
+    void setAutoCloseTime(std::chrono::milliseconds value);
 
     bool busyIndicatorVisible() const;
     void setBusyIndicatorVisible(bool value);
@@ -115,6 +117,9 @@ public:
 
     Style visualStyle() const;
     void setVisualStyle(Style value);
+
+    bool highlighted() const;
+    void setHighlighted(bool value);
 
 signals:
     void clicked();

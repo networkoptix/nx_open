@@ -24,6 +24,7 @@ extern "C"
 #include <nx/network/http/http_types.h>
 #include <nx/network/rtsp/rtsp_types.h>
 #include <nx/streaming/rtp/rtcp.h>
+#include <nx/streaming/sdp.h>
 #include <nx/streaming/rtp/camera_time_helper.h>
 
 
@@ -82,10 +83,11 @@ class QnRtspClient: public QObject
 {
     Q_OBJECT;
 public:
-    //typedef QMap<int, QScopedPointer<QnRtspIoDevice> > RtpIoTracks;
-
-    enum TrackType {TT_VIDEO, TT_VIDEO_RTCP, TT_AUDIO, TT_AUDIO_RTCP, TT_METADATA, TT_METADATA_RTCP, TT_UNKNOWN, TT_UNKNOWN2};
-    enum TransportType {TRANSPORT_UDP, TRANSPORT_TCP, TRANSPORT_AUTO };
+    struct Config
+    {
+        bool backChannelAudioOnly = false;
+    };
+    enum TransportType { TRANSPORT_UDP, TRANSPORT_TCP, TRANSPORT_AUTO };
 
     static const QByteArray kPlayCommand;
     static const QByteArray kSetupCommand;
@@ -104,92 +106,22 @@ public:
 
     struct SDPTrackInfo
     {
-        SDPTrackInfo(
-            const QString& codecName,
-            const QByteArray& trackTypeStr,
-            const QByteArray& setupURL,
-            int mapNumber,
-            QnRtspClient* owner,
-            bool useTCP)
-            :
-            SDPTrackInfo(owner, useTCP)
+        SDPTrackInfo() = default;
+        SDPTrackInfo(const nx::streaming::Sdp::Media& sdpMedia, QnRtspClient* owner, bool useTCP):
+            sdpMedia(sdpMedia)
         {
-            this->codecName = codecName;
-            this->trackType = trackTypeFromString(trackTypeStr);
-            this->setupURL = setupURL;
-            this->mapNumber = mapNumber;
-        }
-        SDPTrackInfo(QnRtspClient* owner, bool useTCP)
-        {
-            ioDevice = new QnRtspIoDevice(owner, useTCP);
+            ioDevice = std::make_shared<QnRtspIoDevice>(owner, useTCP);
             ioDevice->setHostAddress(nx::network::HostAddress(owner->getUrl().host()));
         }
-        ~SDPTrackInfo() { delete ioDevice; }
-
-        static TrackType trackTypeFromString(const QByteArray& value)
-        {
-            QByteArray trackTypeStr = value.toLower();
-            if (trackTypeStr == "audio")
-                return TT_AUDIO;
-            else if (trackTypeStr == "audio-rtcp")
-                return TT_AUDIO_RTCP;
-            else if (trackTypeStr == "video")
-                return TT_VIDEO;
-            else if (trackTypeStr == "video-rtcp")
-                return TT_VIDEO_RTCP;
-            else if (trackTypeStr == "metadata")
-                return TT_METADATA;
-            else
-                return TT_UNKNOWN;
-        }
-
-        void setMapNumber(int value)
-        {
-            mapNumber = value;
-            if (codecName.isEmpty())
-                codecName = findCodecById(mapNumber);
-        }
-
-        // see rfc1890 for full RTP predefined codec list
-        static QString findCodecById(int num)
-        {
-            switch (num)
-            {
-            case 0: return QLatin1String("PCMU");
-            case 8: return QLatin1String("PCMA");
-            case 26: return QLatin1String("JPEG");
-            default: return QString();
-            }
-        }
-
-        bool isValid() const
-        {
-            return mapNumber >= 0 && !codecName.isEmpty();
-        }
-
         void setRemoteEndpointRtcpPort(quint16 rtcpPort) { ioDevice->setRemoteEndpointRtcpPort(rtcpPort); };
 
-        void setSSRC(quint32 value);
-        quint32 getSSRC() const;
-
-        QString codecName;
-        TrackType trackType = TT_UNKNOWN;
-        QByteArray setupURL;
-        int mapNumber = -1;
-        int trackNumber = -1;
+        nx::streaming::Sdp::Media sdpMedia;
         QPair<int, int> interleaved{ -1, -1 };
-        QnRtspIoDevice* ioDevice = nullptr;
-        bool isBackChannel = false;
-        int timeBase = 0;
+        std::shared_ptr<QnRtspIoDevice> ioDevice;
     };
-
-    static QString mediaTypeToStr(TrackType tt);
-
-    //typedef QMap<int, QSharedPointer<SDPTrackInfo> > TrackMap;
-    typedef QVector<QSharedPointer<SDPTrackInfo> > TrackMap;
-
     QnRtspClient(
         bool shouldGuessAuthDigest,
+        const Config& config,
         std::unique_ptr<nx::network::AbstractStreamSocket> tcpSock = std::unique_ptr<nx::network::AbstractStreamSocket>());
 
     ~QnRtspClient();
@@ -203,7 +135,7 @@ public:
     * @param positionEnd end position at mksec
     * @param scale playback speed
     */
-    QnRtspClient::TrackMap play(qint64 positionStart, qint64 positionEnd, double scale);
+    bool play(qint64 positionStart, qint64 positionEnd, double scale);
 
     // returns true if there is no error delivering STOP
     bool stop();
@@ -225,9 +157,11 @@ public:
     void setTransport(const QString& transport);
     TransportType getTransport() const { return m_transport; }
     bool isTcpMode() const { return m_prefferedTransport != TRANSPORT_UDP; }
-    QString getTrackFormatByRtpChannelNum(int channelNum);
-    TrackType getTrackTypeByRtpChannelNum(int channelNum);
-    int getChannelNum(int rtpChannelNum);
+
+    const std::vector<SDPTrackInfo>& getTrackInfo() const;
+    QString getTrackCodec(int rtpChannelNum);
+    int getTrackNum(int rtpChannelNum);
+    bool isRtcp(int rtpChannelNum);
 
     qint64 startTime() const;
     qint64 endTime() const;
@@ -260,9 +194,8 @@ public:
 
     void setProxyAddr(const QString& addr, int port);
 
-    QList<QByteArray> getSdpByTrackNum(int trackNum) const;
-    QList<QByteArray> getSdpByType(TrackType trackType) const;
-    int getTrackCount(TrackType trackType) const;
+    QStringList getSdpByType(nx::streaming::Sdp::MediaType mediaType) const;
+    int getTrackCount(nx::streaming::Sdp::MediaType mediaType) const;
 
     nx::network::rtsp::StatusCodeValue getLastResponseCode() const;
 
@@ -286,15 +219,11 @@ public:
     int readBinaryResponce(std::vector<QnByteArray*>& demuxedData, int& channelNumber);
 
     void sendBynaryResponse(const quint8* buffer, int size);
-    void setUsePredefinedTracks(int numOfVideoChannel);
+    void setPlayNowModeAllowed(bool value);
     static quint8* prepareDemuxedData(std::vector<QnByteArray*>& demuxedData, int channel, int reserve);
     bool setTCPReadBufferSize(int value);
 
     QString getVideoLayout() const;
-    TrackMap getTrackInfo() const;
-
-    void setTrackInfo(const TrackMap& tracks);
-
     nx::network::AbstractStreamSocket* tcpSock(); //< This method need for UT. do not delete
     void setUserAgent(const QString& value);
 
@@ -312,9 +241,6 @@ signals:
     void gotTextResponse(QByteArray text);
 private:
     void addRangeHeader( nx::network::http::Request* const request, qint64 startPos, qint64 endPos );
-    QString getTrackFormat(int trackNum) const;
-    TrackType getTrackType(int trackNum) const;
-    //int readRAWData();
     nx::network::http::Request createDescribeRequest();
     bool sendDescribe();
     bool sendOptions();
@@ -328,14 +254,13 @@ private:
     void updateTransportHeader(QByteArray &responce);
 
     void parseSDP();
-    void updateTrackNum();
+
     void addAdditionAttrs( nx::network::http::Request* const request );
     void updateResponseStatus(const QByteArray& response);
 
-    void usePredefinedTracks();
     bool processTextResponseInsideBinData();
     static QByteArray getGuid();
-    void registerRTPChannel(int rtpNum, QSharedPointer<SDPTrackInfo> trackInfo);
+    void registerRTPChannel(int rtpNum, int rtcpNum, int trackIndex);
     QByteArray calcDefaultNonce() const;
     nx::network::http::Request createPlayRequest( qint64 startPos, qint64 endPos );
     bool sendPlayInternal(qint64 startPos, qint64 endPos);
@@ -346,6 +271,8 @@ private:
     QByteArray nptPosToString(qint64 posUsec) const;
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 65 };
+
+    Config m_config;
 
     // 'initialization in order' block
     unsigned int m_csec;
@@ -360,6 +287,7 @@ private:
     bool m_isAudioEnabled;
     int m_numOfPredefinedChannels;
     unsigned int m_TimeOut;
+    bool m_playNowMode = false;
     // end of initialized fields
 
     //unsigned char m_responseBuffer[MAX_RESPONCE_LEN];
@@ -375,7 +303,7 @@ private:
     QString m_SessionId;
     unsigned short m_ServerPort;
     // format: key - track number, value - codec name
-    TrackMap m_sdpTracks;
+    std::vector<SDPTrackInfo> m_sdpTracks;
 
     QElapsedTimer m_keepAliveTime;
 
@@ -389,7 +317,13 @@ private:
     static QByteArray m_guid; // client guid. used in proprietary extension
     static QnMutex m_guidMutex;
 
-    std::vector<QSharedPointer<SDPTrackInfo> > m_rtpToTrack;
+    struct RtpChannel
+    {
+        bool isRtcp = false;
+        int trackIndex = 0;
+    };
+
+    std::vector<RtpChannel> m_rtpToTrack;
     QString m_reasonPhrase;
     QString m_videoLayout;
 

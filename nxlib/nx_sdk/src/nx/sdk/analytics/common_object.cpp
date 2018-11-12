@@ -43,12 +43,12 @@ nxpl::NX_GUID CommonObject::id() const
     return m_id;
 }
 
-NX_ASCII const char* CommonObject::objectSubType() const
+const char* CommonObject::objectSubType() const
 {
     return m_objectSubType.data();
 }
 
-NX_LOCALE_DEPENDENT const Attribute* CommonObject::attribute(int index) const
+const Attribute* CommonObject::attribute(int index) const
 {
     return (index < (int) m_attributes.size()) ? &m_attributes[index] : nullptr;
 }

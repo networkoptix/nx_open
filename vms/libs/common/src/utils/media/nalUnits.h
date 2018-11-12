@@ -225,9 +225,14 @@ public:
     quint32 time_scale;
     int fixed_frame_rate_flag;
 
-    int* bit_rate_value_minus1;
-    int* cpb_size_value_minus1;
-    quint8* cbr_flag;
+    struct CPB
+    {
+        int bit_rate_value_minus1;
+        int cpb_size_value_minus1;
+        quint8 cbr_flag;
+    };
+    static const int kCpbCntMax = 32;
+    CPB cpb[kCpbCntMax];
 
     int initial_cpb_removal_delay_length_minus1;
     int cpb_removal_delay_length_minus1;
@@ -291,9 +296,6 @@ public:
         sar_width = sar_height = 0;
         num_units_in_tick = time_scale = 0;
         fixed_frame_rate_flag = -1;
-        bit_rate_value_minus1 = 0;
-        cpb_size_value_minus1 = 0;
-        cbr_flag = 0;
         num_units_in_tick_bit_pos = -1;
         //orig_hrd_parameters_present_flag =
         nal_hrd_parameters_present_flag = -1;
@@ -310,6 +312,7 @@ public:
         bit_depth_chroma = 0;
         qpprime_y_zero_transform_bypass_flag = 0;
         seq_scaling_matrix_present_flag = 0;
+        cpb_cnt_minus1 = -1;
         //m_pulldown = false;
 
         memset( ScalingList4x4, 16, sizeof(ScalingList4x4) );
@@ -317,14 +320,8 @@ public:
         std::fill( (bool*)UseDefaultScalingMatrix4x4Flag, ((bool*)UseDefaultScalingMatrix4x4Flag)+sizeof(UseDefaultScalingMatrix4x4Flag)/sizeof(*UseDefaultScalingMatrix4x4Flag), true );
         std::fill( (bool*)UseDefaultScalingMatrix8x8Flag, ((bool*)UseDefaultScalingMatrix8x8Flag)+sizeof(UseDefaultScalingMatrix8x8Flag)/sizeof(*UseDefaultScalingMatrix8x8Flag), true );
     }
-    virtual ~SPSUnit() {
-        delete [] bit_rate_value_minus1;
-        bit_rate_value_minus1 = 0;
-        delete [] cpb_size_value_minus1;
-        cpb_size_value_minus1 = 0;
-        delete [] cbr_flag;
-        cbr_flag = 0;
-    }
+    virtual ~SPSUnit() = default;
+
     bool isReady() {return m_ready;}
     int deserialize();
     void insertHdrParameters();

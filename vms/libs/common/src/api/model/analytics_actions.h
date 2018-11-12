@@ -29,9 +29,12 @@ struct AnalyticsAction
 };
 #define AnalyticsAction_Fields (pluginId)(actionId)(objectId)(cameraId)(timestampUs)(params)
 
+// TODO: #dmishin: Rename to AvailableAnalyticsActionsOfEngine.
 struct AvailableAnalyticsActionsOfPlugin
 {
+    // TODO: #dmishin: Rename to engineId.
     QString pluginId;
+
     QStringList actionIds;
 };
 #define AvailableAnalyticsActionsOfPlugin_Fields (pluginId)(actionIds)

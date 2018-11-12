@@ -187,6 +187,8 @@
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
+#include <nx/mediaserver/rest/device_analytics_settings_handler.h>
+#include <nx/mediaserver/rest/analytics_engine_settings_handler.h>
 
 #include <rtsp/rtsp_connection.h>
 
@@ -258,6 +260,7 @@
 #include <recorder/archive_integrity_watcher.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/mediaserver/analytics/manager.h>
+#include <nx/mediaserver/analytics/sdk_object_factory.h>
 #include <nx/utils/platform/current_process.h>
 #include <rest/handlers/change_camera_password_rest_handler.h>
 #include <nx/mediaserver/fs/media_paths/media_paths.h>
@@ -2593,6 +2596,37 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:string description Setiing description
      */
     reg("api/settingsDocumentation", new QnSettingsDocumentationHandler(&serverModule()->settings()));
+
+
+    /**%apidoc GET /ec2/analyticsEngineSettings
+     * Return settings values of the specified engine
+     * %return:object JSON object consisting of name-value settings pairs
+     *      %param:string engineId Id of analytics engine
+     *
+     * %apidoc POST /ec2/analyticsEngineSettings
+     * Applies passed settings values to correspondent analytics engine
+     * %param:string engineId Id of analytics engine
+     * %param settings JSON object consisting of name-value settings pairs
+     */
+    reg(
+        "ec2/analyticsEngineSettings",
+        new nx::mediaserver::rest::AnalyticsEngineSettingsHandler(serverModule()));
+
+    /**%apidoc GET /ec2/deviceAnalyticsSettings
+     * Return settings values of the specified device-engine pair
+     * %return:object JSON object consisting of name-value settings pairs
+     *      %param:string engineId Id of an analytics engine
+     *      %param:string deviceId Id of a device
+     *
+     * %apidoc POST /ec2/deviceAnalyticsSettings
+     * Applies passed settings values to the correspondent device-engine pair
+     * %param:string engineId Id of an analytics engine
+     * %param:string deviceId Id of a device
+     * %param settings JSON object consisting of name-value settings pairs
+     */
+    reg(
+        "ec2/deviceAnalyticsSettings",
+        new nx::mediaserver::rest::DeviceAnalyticsSettingsHandler(serverModule()));
 }
 
 template<class TcpConnectionProcessor, typename... ExtraParam>
@@ -3037,16 +3071,15 @@ void MediaServerProcess::updateGuidIfNeeded()
         commonModule()->setObsoleteServerGuid(obsoleteGuid);
 }
 
-nx::utils::log::Settings MediaServerProcess::makeLogSettings()
+nx::utils::log::Settings MediaServerProcess::makeLogSettings(
+    const nx::mediaserver::Settings& settings)
 {
-    const auto& settings = serverModule()->settings();
-
     nx::utils::log::Settings s;
     s.loggers.resize(1);
     s.loggers.front().maxBackupCount = settings.logArchiveSize();
     s.loggers.front().directory = settings.logDir();
     s.loggers.front().maxFileSize = settings.maxLogFileSize();
-    s.updateDirectoryIfEmpty(serverModule()->settings().dataDir());
+    s.updateDirectoryIfEmpty(settings.dataDir());
 
     for (const auto& loggerArg: cmdLineArguments().auxLoggers)
     {
@@ -3060,12 +3093,17 @@ nx::utils::log::Settings MediaServerProcess::makeLogSettings()
 
 void MediaServerProcess::initializeLogging()
 {
-    const auto& settings = serverModule()->settings();
+    const auto roSettingsPath = cmdLineArguments().configFilePath;
+    const auto rwSettingsPath = cmdLineArguments().rwConfigFilePath;
+    auto mSettings = MSSettings(roSettingsPath, rwSettingsPath);
+    auto& settings = mSettings.settings();
+    auto roSettings = mSettings.roSettings();
+
     const auto binaryPath = QFile::decodeName(m_argv[0]);
 
     // TODO: Implement "--log-file" option like in client_startup_parameters.cpp.
 
-    auto logSettings = makeLogSettings();
+    auto logSettings = makeLogSettings(settings);
 
     logSettings.loggers.front().level.parse(cmdLineArguments().logLevel,
         settings.logLevel(), toString(nx::utils::log::kDefaultLevel));
@@ -3077,9 +3115,9 @@ void MediaServerProcess::initializeLogging()
             binaryPath));
 
     if (auto path = nx::utils::log::mainLogger()->filePath())
-        serverModule()->roSettings()->setValue("logFile", path->replace(lit(".log"), QString()));
+        roSettings->setValue("logFile", path->replace(lit(".log"), QString()));
     else
-        serverModule()->roSettings()->remove("logFile");
+        roSettings->remove("logFile");
 
     logSettings.loggers.front().level.parse(cmdLineArguments().httpLogLevel,
         settings.httpLogLevel(), toString(nx::utils::log::Level::none));
@@ -3130,7 +3168,7 @@ void MediaServerProcess::initializeHardwareId()
 {
     const auto binaryPath = QFile::decodeName(m_argv[0]);
 
-    auto logSettings = makeLogSettings();
+    auto logSettings = makeLogSettings(serverModule()->settings());
 
     logSettings.loggers.front().level.parse(cmdLineArguments().systemLogLevel,
         serverModule()->settings().systemLogLevel(), toString(nx::utils::log::Level::info));
@@ -3366,6 +3404,7 @@ void MediaServerProcess::stopObjects()
 
     m_generalTaskTimer.reset();
     m_udtInternetTrafficTimer.reset();
+    m_createDbBackupTimer.reset();
 
     safeDisconnect(commonModule()->globalSettings(), this);
     safeDisconnect(m_universalTcpListener->authenticator(), this);
@@ -3724,6 +3763,15 @@ void MediaServerProcess::connectSignals()
             }
         });
 
+    m_createDbBackupTimer = std::make_unique<QTimer>();
+    connect(m_createDbBackupTimer.get(), &QTimer::timeout,
+        [this]()
+        {
+            auto utils = nx::mediaserver::Utils(serverModule());
+            if (utils.timeToMakeDbBackup())
+                utils.backupDatabase();
+        });
+
     connect(
         m_universalTcpListener.get(),
         &QnTcpListener::portChanged,
@@ -3869,6 +3917,7 @@ void MediaServerProcess::startObjects()
     at_timer();
     m_generalTaskTimer->start(QnVirtualCameraResource::issuesTimeoutMs());
     m_udtInternetTrafficTimer->start(UDT_INTERNET_TRAFIC_TIMER);
+    m_createDbBackupTimer->start(serverModule()->settings().dbBackupPeriodMS().count());
 
     const bool isDiscoveryDisabled = serverModule()->settings().noResourceDiscovery();
 
@@ -4078,6 +4127,9 @@ void MediaServerProcess::run()
     if (QThreadPool::globalInstance()->maxThreadCount() < kMinimalGlobalThreadPoolSize)
         QThreadPool::globalInstance()->setMaxThreadCount(kMinimalGlobalThreadPoolSize);
 
+    if (m_serviceMode)
+        initializeLogging();
+
     std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(&m_cmdLineArguments));
     m_serverModule = serverModule;
 
@@ -4087,9 +4139,6 @@ void MediaServerProcess::run()
         initializeHardwareId();
 
     prepareOsResources();
-
-    if (m_serviceMode)
-        initializeLogging();
 
     updateAllowedInterfaces();
 
@@ -4134,6 +4183,13 @@ void MediaServerProcess::run()
 
     if (!serverModule->serverDb()->open())
         return;
+
+    auto utils = nx::mediaserver::Utils(serverModule.get());
+    if (utils.timeToMakeDbBackup())
+    {
+        utils.backupDatabase(ec2::detail::QnDbManager::ecsDbFileName(
+            serverModule->settings().dataDir()));
+    }
 
     if (!connectToDatabase())
         return;
@@ -4204,6 +4260,7 @@ void MediaServerProcess::run()
 
     m_serverMessageProcessor->startReceivingLocalNotifications(m_ec2Connection);
 
+    serverModule->sdkObjectFactory()->init();
     serverModule->analyticsManager()->init();
 
     at_runtimeInfoChanged(commonModule()->runtimeInfoManager()->localInfo());

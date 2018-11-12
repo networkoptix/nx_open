@@ -57,6 +57,7 @@ Yunhong Gu, last updated 02/28/2012
 #include <sstream>
 #include "queue.h"
 #include "core.h"
+#include "multiplexer.h"
 
 using namespace std;
 
@@ -117,11 +118,7 @@ CUDT::CUDT()
     m_pSndTimeWindow = NULL;
     m_pRcvTimeWindow = NULL;
 
-    m_pSndQueue = NULL;
-    m_pRcvQueue = NULL;
     m_pPeerAddr = NULL;
-    m_pSNode = NULL;
-    m_pRNode = NULL;
 
     // Initilize mutex and condition variables
     initSynch();
@@ -171,11 +168,7 @@ CUDT::CUDT(const CUDT& ancestor)
     m_pSndTimeWindow = NULL;
     m_pRcvTimeWindow = NULL;
 
-    m_pSndQueue = NULL;
-    m_pRcvQueue = NULL;
     m_pPeerAddr = NULL;
-    m_pSNode = NULL;
-    m_pRNode = NULL;
 
     // Initilize mutex and condition variables
     initSynch();
@@ -220,8 +213,8 @@ CUDT::~CUDT()
     //   sending queue in case of async IO and enabled linger...
     //
     // This workaround is here to prevent a segfault:
-    if (m_pSNode)
-        m_pSndQueue->sndUList()->remove(this);
+    if (m_multiplexer)
+        m_multiplexer->sendQueue().sndUList().remove(this);
 
     // release mutex/condtion variables
     destroySynch();
@@ -239,6 +232,21 @@ CUDT::~CUDT()
     delete m_pPeerAddr;
     delete m_pSNode;
     delete m_pRNode;
+}
+
+CSndQueue& CUDT::sndQueue()
+{
+    return m_multiplexer->sendQueue();
+}
+
+CRcvQueue& CUDT::rcvQueue()
+{
+    return m_multiplexer->recvQueue();
+}
+
+void CUDT::setMultiplexer(const std::shared_ptr<Multiplexer>& multiplexer)
+{
+    m_multiplexer = multiplexer;
 }
 
 void CUDT::setOpt(UDTOpt optName, const void* optval, int)
@@ -573,18 +581,16 @@ void CUDT::open()
     m_llSndDuration = m_llSndDurationTotal = 0;
 
     // structures for queue
-    if (NULL == m_pSNode)
-        m_pSNode = new CSNode;
-    m_pSNode->m_pUDT = shared_from_this();
-    m_pSNode->m_llTimeStamp = 1;
-    m_pSNode->m_iHeapLoc = -1;
+    if (!m_pSNode)
+        m_pSNode = new CSNode();
+    m_pSNode->socket = shared_from_this();
+    m_pSNode->timestamp = 1;
+    m_pSNode->locationOnHeap = -1;
 
-    if (NULL == m_pRNode)
-        m_pRNode = new CRNode;
-    m_pRNode->m_pUDT = shared_from_this();
-    m_pRNode->m_llTimeStamp = 1;
-    m_pRNode->m_pPrev = m_pRNode->m_pNext = NULL;
-    m_pRNode->m_bOnList = false;
+    if (!m_pRNode)
+        m_pRNode = new CRNode();
+    m_pRNode->socket = shared_from_this();
+    m_pRNode->timestamp = 1;
 
     m_iRTT = 10 * m_iSYNInterval;
     m_iRTTVar = m_iRTT >> 1;
@@ -634,10 +640,10 @@ void CUDT::listen()
         m_StartTime,
         m_iSockType,
         m_SocketID,
-        m_pSndQueue,
+        &m_multiplexer->sendQueue(),
         m_sPollID);
     // if there is already another socket listening on the same port
-    if (m_pRcvQueue->setListener(m_synPacketHandler) < 0)
+    if (!rcvQueue().setListener(m_synPacketHandler))
         throw CUDTException(5, 11, 0);
 
     m_bListening = true;
@@ -660,6 +666,7 @@ void CUDT::connect(const sockaddr* serv_addr)
     delete m_pPeerAddr;
     m_pPeerAddr = (AF_INET == m_iIPversion) ? (sockaddr*)new sockaddr_in : (sockaddr*)new sockaddr_in6;
     memcpy(m_pPeerAddr, serv_addr, (AF_INET == m_iIPversion) ? sizeof(sockaddr_in) : sizeof(sockaddr_in6));
+    m_pPeerAddr->sa_family = m_iIPversion;
 
     // register this socket in the rendezvous queue
     // RendezevousQueue is used to temporarily store incoming handshake, non-rendezvous connections also require this function
@@ -667,7 +674,7 @@ void CUDT::connect(const sockaddr* serv_addr)
     if (m_bRendezvous)
         ttl *= 10;
     ttl += CTimer::getTime();
-    m_pRcvQueue->registerConnector(m_SocketID, shared_from_this(), m_iIPversion, serv_addr, ttl);
+    rcvQueue().registerConnector(m_SocketID, shared_from_this(), m_iIPversion, serv_addr, ttl);
 
     // This is my current configurations
     m_ConnReq.m_iVersion = m_iVersion;
@@ -699,7 +706,7 @@ void CUDT::connect(const sockaddr* serv_addr)
     int hs_size = m_iPayloadSize;
     m_ConnReq.serialize(reqdata, hs_size);
     request.setLength(hs_size);
-    m_pSndQueue->sendto(serv_addr, request);
+    sndQueue().sendto(serv_addr, request);
     m_llLastReqTime = CTimer::getTime();
 
     setConnecting(true);
@@ -728,12 +735,12 @@ void CUDT::connect(const sockaddr* serv_addr)
             request.setLength(hs_size);
             if (m_bRendezvous)
                 request.m_iID = m_ConnRes.m_iID;
-            m_pSndQueue->sendto(serv_addr, request);
+            sndQueue().sendto(serv_addr, request);
             m_llLastReqTime = CTimer::getTime();
         }
 
         response.setLength(m_iPayloadSize);
-        if (m_pRcvQueue->recvfrom(m_SocketID, response) > 0)
+        if (rcvQueue().recvfrom(m_SocketID, response) > 0)
         {
             internalConnectResult = connect(response);
             if (internalConnectResult <= 0)
@@ -822,7 +829,7 @@ int CUDT::connect(const CPacket& response)
 
 POST_CONNECT:
     // Remove from rendezvous queue
-    m_pRcvQueue->removeConnector(m_SocketID);
+    rcvQueue().removeConnector(m_SocketID);
 
     // Re-configure according to the negotiated values.
     m_iMSS = m_ConnRes.m_iMSS;
@@ -840,7 +847,7 @@ POST_CONNECT:
     try
     {
         m_pSndBuffer = new CSndBuffer(32, m_iPayloadSize);
-        m_pRcvBuffer = new CRcvBuffer(m_pRcvQueue->unitQueue(), m_iRcvBufSize);
+        m_pRcvBuffer = new CRcvBuffer(rcvQueue().unitQueue(), m_iRcvBufSize);
         // after introducing lite ACK, the sndlosslist may not be cleared in time, so it requires twice space.
         m_pSndLossList = new CSndLossList(m_iFlowWindowSize * 2);
         m_pRcvLossList = new CRcvLossList(m_iFlightFlagSize);
@@ -880,8 +887,8 @@ POST_CONNECT:
     m_bConnected = true;
 
     // register this socket for receiving data packets
-    m_pRNode->m_bOnList = true;
-    m_pRcvQueue->setNewEntry(shared_from_this());
+    m_pRNode->onList = true;
+    rcvQueue().addNewEntry(shared_from_this());
 
     // acknowledge the management module.
     s_UDTUnited.connect_complete(m_SocketID);
@@ -939,7 +946,7 @@ void CUDT::connect(const sockaddr* peer, CHandShake* hs)
     try
     {
         m_pSndBuffer = new CSndBuffer(32, m_iPayloadSize);
-        m_pRcvBuffer = new CRcvBuffer(m_pRcvQueue->unitQueue(), m_iRcvBufSize);
+        m_pRcvBuffer = new CRcvBuffer(rcvQueue().unitQueue(), m_iRcvBufSize);
         m_pSndLossList = new CSndLossList(m_iFlowWindowSize * 2);
         m_pRcvLossList = new CRcvLossList(m_iFlightFlagSize);
         m_pACKWindow = new CACKWindow(1024);
@@ -980,8 +987,8 @@ void CUDT::connect(const sockaddr* peer, CHandShake* hs)
     m_bConnected = true;
 
     // register this socket for receiving data packets
-    m_pRNode->m_bOnList = true;
-    m_pRcvQueue->setNewEntry(shared_from_this());
+    m_pRNode->onList = true;
+    rcvQueue().addNewEntry(shared_from_this());
 
     //send the response to the peer, see listen() for more discussions about this
     CPacket response;
@@ -990,7 +997,7 @@ void CUDT::connect(const sockaddr* peer, CHandShake* hs)
     hs->serialize(buffer, size);
     response.pack(ControlPacketType::Handshake, NULL, buffer, size);
     response.m_iID = m_PeerID;
-    m_pSndQueue->sendto(peer, response);
+    sndQueue().sendto(peer, response);
     delete[] buffer;
 }
 
@@ -1031,7 +1038,7 @@ void CUDT::close()
 
     // remove this socket from the snd queue
     if (m_bConnected)
-        m_pSndQueue->sndUList()->remove(this);
+        sndQueue().sndUList().remove(this);
 
     // trigger any pending IO events.
     s_UDTUnited.m_EPoll.update_events(m_SocketID, m_sPollID, UDT_EPOLL_ERR, true);
@@ -1056,12 +1063,10 @@ void CUDT::close()
 
     m_bListening = false;
 
-    if (m_pRcvQueue && m_synPacketHandler)
-        m_pRcvQueue->removeListener(m_synPacketHandler);
     m_synPacketHandler = nullptr;
 
-    if (m_pRcvQueue)
-        m_pRcvQueue->removeConnector(m_SocketID);
+    if (m_multiplexer)
+        m_multiplexer->recvQueue().removeConnector(m_SocketID);
 
     std::lock_guard<std::mutex> cg(m_ConnectionLock);
 
@@ -1184,7 +1189,7 @@ int CUDT::send(const char* data, int len)
     m_pSndBuffer->addBuffer(data, size);
 
     // insert this socket to snd list if it is not on the list yet
-    m_pSndQueue->sndUList()->update(shared_from_this(), false);
+    sndQueue().sndUList().update(shared_from_this(), false);
 
     if (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize())
     {
@@ -1364,7 +1369,7 @@ int CUDT::sendmsg(const char* data, int len, int msttl, bool inorder)
     m_pSndBuffer->addBuffer(data, len, msttl, inorder);
 
     // insert this socket to the snd list if it is not on the list yet
-    m_pSndQueue->sndUList()->update(shared_from_this(), false);
+    sndQueue().sndUList().update(shared_from_this(), false);
 
     if (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize())
     {
@@ -1550,7 +1555,7 @@ int64_t CUDT::sendfile(fstream& ifs, int64_t& offset, int64_t size, int block)
         }
 
         // insert this socket to snd list if it is not on the list yet
-        m_pSndQueue->sndUList()->update(shared_from_this(), false);
+        sndQueue().sndUList().update(shared_from_this(), false);
     }
 
     if (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize())
@@ -1810,7 +1815,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
             {
                 ctrlpkt.pack(pkttype, NULL, &ack, size);
                 ctrlpkt.m_iID = m_PeerID;
-                m_pSndQueue->sendto(m_pPeerAddr, ctrlpkt);
+                sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
                 break;
             }
@@ -1877,7 +1882,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
                 }
 
                 ctrlpkt.m_iID = m_PeerID;
-                m_pSndQueue->sendto(m_pPeerAddr, ctrlpkt);
+                sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
                 m_pACKWindow->store(m_iAckSeqNo, m_iRcvLastAck);
 
@@ -1891,7 +1896,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
         case ControlPacketType::AcknowledgementOfAcknowledgement: //110 - Acknowledgement of Acknowledgement
             ctrlpkt.pack(pkttype, lparam);
             ctrlpkt.m_iID = m_PeerID;
-            m_pSndQueue->sendto(m_pPeerAddr, ctrlpkt);
+            sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
             break;
 
@@ -1911,7 +1916,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
                 }
 
                 ctrlpkt.m_iID = m_PeerID;
-                m_pSndQueue->sendto(m_pPeerAddr, ctrlpkt);
+                sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
                 ++m_iSentNAK;
                 ++m_iSentNAKTotal;
@@ -1929,7 +1934,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
                 {
                     ctrlpkt.pack(pkttype, NULL, data, losslen * 4);
                     ctrlpkt.m_iID = m_PeerID;
-                    m_pSndQueue->sendto(m_pPeerAddr, ctrlpkt);
+                    sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
                     ++m_iSentNAK;
                     ++m_iSentNAKTotal;
@@ -1952,7 +1957,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
         case ControlPacketType::DelayWarning: //100 - Congestion Warning
             ctrlpkt.pack(pkttype);
             ctrlpkt.m_iID = m_PeerID;
-            m_pSndQueue->sendto(m_pPeerAddr, ctrlpkt);
+            sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
             CTimer::rdtsc(m_ullLastWarningTime);
 
@@ -1961,35 +1966,35 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
         case ControlPacketType::KeepAlive: //001 - Keep-alive
             ctrlpkt.pack(pkttype);
             ctrlpkt.m_iID = m_PeerID;
-            m_pSndQueue->sendto(m_pPeerAddr, ctrlpkt);
+            sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
             break;
 
         case ControlPacketType::Handshake: //000 - Handshake
             ctrlpkt.pack(pkttype, NULL, rparam, sizeof(CHandShake));
             ctrlpkt.m_iID = m_PeerID;
-            m_pSndQueue->sendto(m_pPeerAddr, ctrlpkt);
+            sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
             break;
 
         case ControlPacketType::Shutdown: //101 - Shutdown
             ctrlpkt.pack(pkttype);
             ctrlpkt.m_iID = m_PeerID;
-            m_pSndQueue->sendto(m_pPeerAddr, ctrlpkt);
+            sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
             break;
 
         case ControlPacketType::MsgDropRequest: //111 - Msg drop request
             ctrlpkt.pack(pkttype, lparam, rparam, 8);
             ctrlpkt.m_iID = m_PeerID;
-            m_pSndQueue->sendto(m_pPeerAddr, ctrlpkt);
+            sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
             break;
 
         case ControlPacketType::RemotePeerFailure: //1000 - acknowledge the peer side a special error
             ctrlpkt.pack(pkttype, lparam);
             ctrlpkt.m_iID = m_PeerID;
-            m_pSndQueue->sendto(m_pPeerAddr, ctrlpkt);
+            sndQueue().sendto(m_pPeerAddr, ctrlpkt);
 
             break;
 
@@ -2098,7 +2103,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
             s_UDTUnited.m_EPoll.update_events(m_SocketID, m_sPollID, UDT_EPOLL_OUT, true);
 
             // insert this socket to snd list if it is not on the list yet
-            m_pSndQueue->sndUList()->update(shared_from_this(), false);
+            sndQueue().sndUList().update(shared_from_this(), false);
 
             // Update RTT
             //m_iRTT = *((int32_t *)ctrlpkt.m_pcData + 1);
@@ -2214,7 +2219,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
             }
 
             // the lost packet (retransmission) should be sent out immediately
-            m_pSndQueue->sndUList()->update(shared_from_this());
+            sndQueue().sndUList().update(shared_from_this());
 
             ++m_iRecvNAK;
             ++m_iRecvNAKTotal;
@@ -2577,7 +2582,7 @@ void CUDT::checkTimers(bool forceAck)
             m_bShutdown = false;
 
             // update snd U list to remove this socket
-            m_pSndQueue->sndUList()->update(shared_from_this());
+            sndQueue().sndUList().update(shared_from_this());
 
             releaseSynch();
 
@@ -2604,7 +2609,7 @@ void CUDT::checkTimers(bool forceAck)
             CCUpdate();
 
             // immediately restart transmission
-            m_pSndQueue->sndUList()->update(shared_from_this());
+            sndQueue().sndUList().update(shared_from_this());
         }
         else
         {
@@ -2673,7 +2678,7 @@ ServerSideConnectionAcceptor::ServerSideConnectionAcceptor(
     m_StartTime(startTime),
     m_iSockType(sockType),
     m_SocketId(socketId),
-    m_pSndQueue(sndQueue),
+    m_sendQueue(sndQueue),
     m_pollIds(std::move(pollIds))
 {
 }
@@ -2707,7 +2712,7 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
         packet.m_iID = hs.m_iID;
         int size = packet.getLength();
         hs.serialize(packet.m_pcData, size);
-        m_pSndQueue->sendto(addr, packet);
+        m_sendQueue->sendto(addr, packet);
         return 0;
     }
     else
@@ -2735,7 +2740,7 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
             int size = CHandShake::m_iContentSize;
             hs.serialize(packet.m_pcData, size);
             packet.m_iID = id;
-            m_pSndQueue->sendto(addr, packet);
+            m_sendQueue->sendto(addr, packet);
         }
         else
         {
@@ -2750,7 +2755,7 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
                 int size = CHandShake::m_iContentSize;
                 hs.serialize(packet.m_pcData, size);
                 packet.m_iID = id;
-                m_pSndQueue->sendto(addr, packet);
+                m_sendQueue->sendto(addr, packet);
             }
             else
             {

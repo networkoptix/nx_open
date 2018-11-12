@@ -10,6 +10,8 @@
 #include <nx/utils/log/log_main.h>
 #include <nx/fusion/model_functions.h>
 
+#include <nx/sdk/common/string.h>
+
 namespace nx {
 namespace mediaserver_plugins {
 namespace analytics {
@@ -44,9 +46,14 @@ void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void DeviceAgent::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
+void DeviceAgent::setSettings(const nx::sdk::Settings* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
+}
+
+nx::sdk::Settings* DeviceAgent::settings() const
+{
+    return nullptr;
 }
 
 nx::sdk::Error DeviceAgent::setMetadataHandler(
@@ -56,7 +63,20 @@ nx::sdk::Error DeviceAgent::setMetadataHandler(
     return nx::sdk::Error::noError;
 }
 
-Error DeviceAgent::startFetchingMetadata(const char* const* typeList, int typeListSize)
+nx::sdk::Error DeviceAgent::setNeededMetadataTypes(
+    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
+{
+    if (metadataTypes->isNull())
+    {
+        stopFetchingMetadata();
+        return Error::noError;
+    }
+
+    return startFetchingMetadata(metadataTypes);
+}
+
+nx::sdk::Error DeviceAgent::startFetchingMetadata(
+    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
 {
     auto monitorHandler =
         [this](const HikvisionEventList& events)
@@ -92,8 +112,11 @@ Error DeviceAgent::startFetchingMetadata(const char* const* typeList, int typeLi
 
     NX_ASSERT(m_engine);
     std::vector<QString> eventTypes;
-    for (int i = 0; i < typeListSize; ++i)
-        eventTypes.push_back(typeList[i]);
+
+    const auto eventTypeList = metadataTypes->eventTypeIds();
+    for (int i = 0; i < eventTypeList->count(); ++i)
+        eventTypes.push_back(eventTypeList->at(i));
+
     m_monitor =
         std::make_unique<HikvisionMetadataMonitor>(
             m_engine->engineManifest(),
@@ -109,7 +132,7 @@ Error DeviceAgent::startFetchingMetadata(const char* const* typeList, int typeLi
     return Error::noError;
 }
 
-Error DeviceAgent::stopFetchingMetadata()
+void DeviceAgent::stopFetchingMetadata()
 {
     if (m_monitor)
         m_monitor->removeHandler(m_uniqueId);
@@ -117,10 +140,9 @@ Error DeviceAgent::stopFetchingMetadata()
     NX_ASSERT(m_engine);
 
     m_monitor = nullptr;
-    return Error::noError;
 }
 
-const char* DeviceAgent::manifest(Error* error)
+const IString* DeviceAgent::manifest(Error* error) const
 {
     if (m_deviceAgentManifest.isEmpty())
     {
@@ -129,11 +151,7 @@ const char* DeviceAgent::manifest(Error* error)
     }
 
     *error = Error::noError;
-    return m_deviceAgentManifest.constData();
-}
-
-void DeviceAgent::freeManifest(const char* data)
-{
+    return new common::String(m_deviceAgentManifest);
 }
 
 void DeviceAgent::setDeviceInfo(const nx::sdk::DeviceInfo& deviceInfo)

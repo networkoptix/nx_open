@@ -1,6 +1,7 @@
 #pragma once
 
 #include <deque>
+#include <set>
 
 #include <QtCore/QMetaType>
 #include <QtCore/QElapsedTimer>
@@ -14,6 +15,8 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/security_cam_resource.h>
 #include <nx/utils/url.h>
+
+#include <nx/vms/api/analytics/device_agent_manifest.h>
 
 class CameraMediaStreams;
 class CameraBitrates;
@@ -31,9 +34,13 @@ class QnVirtualCameraResource : public QnSecurityCamResource
     using base_type = QnSecurityCamResource;
 
 public:
-    static QString kEnabledAnalyticsEnginesProperty;
-    static QString kDeviceAgentsSettingsValuesProperty;
+    static const QString kEnabledAnalyticsEnginesProperty;
+    static const QString kDeviceAgentsSettingsValuesProperty;
+    static const QString kDeviceAgentManifestsProperty;
+    static const QString kSupportedAnalyticsEventsProperty;
+    static const QString kSupportedAnalyticsObjectsProperty;
 
+public:
     QnVirtualCameraResource(QnCommonModule* commonModule = nullptr);
 
     virtual QString getUniqueId() const override;
@@ -75,6 +82,7 @@ public:
      */
     virtual QnAdvancedStreamParams advancedLiveStreamParams() const;
 
+    const nx::vms::common::AnalyticsEngineResourceList enabledAnalyticsEngineResources() const;
     QSet<QnUuid> enabledAnalyticsEngines() const;
     void setEnabledAnalyticsEngines(const QSet<QnUuid>& engines);
 
@@ -84,6 +92,25 @@ public:
     QVariantMap deviceAgentSettingsValues(const QnUuid& engineId) const;
     void setDeviceAgentSettingsValues(const QnUuid& engineId, const QVariantMap& settingsValues);
 
+    std::optional<nx::vms::api::analytics::DeviceAgentManifest> deviceAgentManifest(
+        const QnUuid& engineId);
+
+    void setDeviceAgentManifest(
+        const QnUuid& engineId,
+        const nx::vms::api::analytics::DeviceAgentManifest& manifest);
+
+    virtual void setSupportedAnalyticsEventTypeIds(
+        QnUuid engineId, QSet<QString> supportedEvents);
+
+    virtual QMap<QnUuid, QSet<QString>> supportedAnalyticsEventTypeIds() const;
+    virtual QSet<QString> supportedAnalyticsEventTypeIds(const QnUuid& engineId) const;
+
+    virtual void setSupportedAnalyticsObjectTypeIds(
+        QnUuid engineId, QSet<QString> supportedObjects);
+
+    virtual QMap<QnUuid, QSet<QString>> supportedAnalyticsObjectTypeIds() const;
+    virtual QSet<QString> supportedAnalyticsObjectTypeIds(const QnUuid& engineId) const;
+
 signals:
     void ptzCapabilitiesChanged(const QnVirtualCameraResourcePtr& camera);
 
@@ -92,6 +119,16 @@ protected:
 
 private:
     void saveResolutionList( const CameraMediaStreams& supportedNativeStreams );
+
+    void setSupportedAnalyticsItemTypeIds(
+        const QString& propertyName,
+        QnUuid engineId,
+        QSet<QString> supportedItems);
+
+    QMap<QnUuid, QSet<QString>> supportedAnalyticsItemTypeIds(const QString& propertyName) const;
+    QSet<QString> supportedAnalyticsItemTypeIds(
+        const QString& propertyName,
+        const QnUuid& engineId) const;
 
 private:
     int m_issueCounter;

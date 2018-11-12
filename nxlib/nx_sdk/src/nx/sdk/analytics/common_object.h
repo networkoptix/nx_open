@@ -21,8 +21,8 @@ public:
     virtual const char* typeId() const override;
     virtual float confidence() const override;
     virtual nxpl::NX_GUID id() const override;
-    virtual NX_ASCII const char* objectSubType() const override;
-    virtual NX_LOCALE_DEPENDENT const Attribute* attribute(int index) const override;
+    virtual const char* objectSubType() const override;
+    virtual const Attribute* attribute(int index) const override;
     virtual int attributeCount() const override;
     virtual const char* auxilaryData() const override;
     virtual Rect boundingBox() const override;

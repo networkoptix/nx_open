@@ -1,10 +1,6 @@
 {
-    "pluginId": "nx.vca", 
-    "pluginName": {
-        "value": "VCA driver", 
-        "localization": {}
-    }, 
-    "outputEventTypes": [
+    "capabilities": "deviceModelDependent",
+    "eventTypes": [
         {
             "id": "nx.vca.md", 
             "name": {

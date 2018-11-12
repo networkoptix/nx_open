@@ -1,4 +1,5 @@
 import errno
+import json
 import logging
 import os
 import stat
@@ -150,6 +151,13 @@ class FileSystemPath(pathlib.Path):
             return destination
         copy_file(local_source_path, destination)
         return destination
+
+    def write_json(self, obj, indent=4, default=None, cls=None):
+        dumped = json.dumps(obj, indent=indent, default=default, cls=cls)
+        if isinstance(dumped, bytes):
+            return self.write_bytes(dumped)
+        else:
+            return self.write_text(dumped)
 
 
 def copy_file(source, destination, chunk_size_bytes=1024 * 1024):

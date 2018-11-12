@@ -26,7 +26,7 @@ public:
     /**
      * Disabled by default.
      */
-    void enableDbBackup(const QString& dataDirectory);
+    void enableDbBackup(const QString& backupDirectory);
 
     QnJsonRestResult merge(
         Qn::UserAccessData accessRights,
@@ -41,7 +41,7 @@ public:
     void setMergeError(QnJsonRestResult* result, ::utils::MergeSystemsStatus::Value mergeStatus);
 private:
     QnCommonModule* m_commonModule;
-    QString m_dataDirectory;
+    QString m_backupDirectory;
     QnAuthSession m_authSession;
     nx::vms::api::ModuleInformation m_localModuleInformation;
     nx::vms::api::ModuleInformationWithAddresses m_remoteModuleInformation;

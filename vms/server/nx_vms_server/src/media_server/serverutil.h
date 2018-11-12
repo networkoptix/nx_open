@@ -97,7 +97,8 @@ public:
     static void resumeConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus);
 
     void syncStoragesToSettings(const QnMediaServerResourcePtr& server);
-    bool backupDatabase();
+    bool backupDatabase(const boost::optional<QString>& dbFilePath = boost::none);
+    bool timeToMakeDbBackup() const;
 };
 
 } // namespace mediaserver

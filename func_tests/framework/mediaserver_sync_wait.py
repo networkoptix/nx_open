@@ -1,12 +1,13 @@
 '''Wait for mediaservers to synchronize between themselves'''
 
+from functools import partial
 import logging
 
 from .context_logger import context_logger
 from .data_differ import log_diff_list, full_info_differ, transaction_log_differ
 from .installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from .message_bus import message_bus_running
-from .utils import datetime_utc_now
+from .utils import datetime_utc_now, make_threaded_async_calls
 from .waiting import WaitTimeout, Wait
 
 _logger = logging.getLogger(__name__)
@@ -39,18 +40,17 @@ class SyncWaitTimeout(WaitTimeout):
         self.mismatched_result = mismatched_result
         self.diff_list = diff_list
 
-    def log_and_dump_results(self, artifact_factory):
+    def log_and_dump_results(self, artifacts_dir):
         _logger.info('Servers %s and %s still has unmatched %r:',
                      self.first_server, self.mismatched_server, self.api_path)
         log_diff_list(_logger.info, self.diff_list)
-        self._save_json_artifact(artifact_factory, self.first_server, self.first_result)
-        self._save_json_artifact(artifact_factory, self.mismatched_server, self.mismatched_result)
+        self._save_json_artifact(artifacts_dir, self.first_server, self.first_result)
+        self._save_json_artifact(artifacts_dir, self.mismatched_server, self.mismatched_result)
 
-    def _save_json_artifact(self, artifact_factory, server, value):
-        method_name = self.api_path.replace('/', '-')
-        part_list = ['result', method_name, server.name]
-        artifact = artifact_factory.make_artifact(part_list, name='%s-%s' % (method_name, server.name))
-        file_path = artifact.save_as_json(value)
+    def _save_json_artifact(self, artifacts_dir, server, value):
+        file_name = 'result-{}-{}'.format(self.api_path.replace('/', '-'), server.name)
+        file_path = artifacts_dir.joinpath(file_name).with_suffix('.json')
+        file_path.write_json(value)
         _logger.debug('Results from %s from server %s %s are stored to %s',
                       self.api_path, server.name, server, file_path)
 
@@ -79,15 +79,38 @@ def wait_for_api_path_match(
         server_0 = server_list[0]
         result_0 = api_path_getter(server_0, api_path)
 
-        for server in server_list[1:]:
-            result = api_path_getter(server, api_path)
+        other_server_list = server_list[1:]
+
+        if len(other_server_list) <= 3:
+            result_iter = ((server, api_path_getter(server, api_path))
+                           for server in other_server_list)
+        else:
+
+            def get_server_and_call_result(server):
+                return (server, api_path_getter(server, api_path))
+
+            # Make first 2 calls and checks synchronously,
+            # others asynchronously, if they are still required.
+            # This is because most of the time first several results are already different,
+            # so there is no need to call all servers for them.
+            def result_gen():
+                for server in other_server_list[:2]:
+                    yield (server, api_path_getter(server, api_path))
+                for (server, result) in make_threaded_async_calls(thread_count=64, call_gen=[
+                        partial(get_server_and_call_result, server) for server in other_server_list[2:]]):
+                    yield (server, result)
+
+            result_iter = result_gen()
+
+        for server, result in result_iter:
             diff_list = differ.diff(result_0, result)
             if diff_list:
-                break
+                break  # server and result from this scope will be used below
         else:
             _logger.info('Wait for %s: done, sync duration: %s',
                          description, datetime_utc_now() - start_time)
             return
+
         if not wait.again():
             raise SyncWaitTimeout(
                 timeout_sec,
@@ -110,7 +133,7 @@ def wait_until_no_transactions_from_servers(server_list, timeout_sec):
 
 
 def wait_for_servers_synced(
-        artifact_factory,
+        artifacts_dir,
         server_list,
         timeout_sec=DEFAULT_TIMEOUT_SEC,
         bus_timeout_sec=DEFAULT_BUS_TIMEOUT_SEC,
@@ -123,5 +146,5 @@ def wait_for_servers_synced(
         wait_for_api_path_match(
             server_list, 'ec2/getTransactionLog', transaction_log_differ, timeout_sec, api_path_getter)
     except SyncWaitTimeout as e:
-        e.log_and_dump_results(artifact_factory)
+        e.log_and_dump_results(artifacts_dir)
         raise

@@ -184,19 +184,17 @@ bool PluginManager::loadNxPlugin(
         return false;
     }
 
-    typedef nxpl::PluginInterface* (*EntryProc)();
-
     // TODO: Find a better solution. Needed to chech that libName equals Plugin::name().
     bool isAnalyticsPlugin = false;
 
-    auto entryProc = (EntryProc) lib.resolve("createNXPluginInstance");
-    if (entryProc == nullptr)
+    auto entryPoint = (nxpl::Plugin::EntryPoint) lib.resolve("createNXPluginInstance");
+    if (entryPoint == nullptr)
     {
-        entryProc = (EntryProc) lib.resolve("createNxAnalyticsPlugin");
-        if (entryProc)
+        entryPoint = (nxpl::Plugin::EntryPoint) lib.resolve("createNxAnalyticsPlugin");
+        if (entryPoint)
             isAnalyticsPlugin = true;
     }
-    if (entryProc == nullptr)
+    if (entryPoint == nullptr)
     {
         NX_ERROR(this, "Failed to load Nx plugin [%1]: "
             "Neither createNXPluginInstance() nor createNxAnalyticsPlugin() functions found",
@@ -205,7 +203,7 @@ bool PluginManager::loadNxPlugin(
         return false;
     }
 
-    nxpl::PluginInterface* obj = entryProc();
+    nxpl::PluginInterface* obj = entryPoint();
     if (!obj)
     {
         NX_ERROR(this, "Failed to load Nx plugin [%1]: entry function returned null", filename);
@@ -218,7 +216,7 @@ bool PluginManager::loadNxPlugin(
 
     if (auto pluginObj = nxpt::ScopedRef<nxpl::Plugin>(obj->queryInterface(nxpl::IID_Plugin)))
     {
-        if (pluginObj->name() != libName)
+        if (isAnalyticsPlugin && pluginObj->name() != libName)
         {
             NX_WARNING(this, "Analytics plugin name [%1] does not equal library name [%2]",
                 pluginObj->name(), libName);
@@ -233,11 +231,6 @@ bool PluginManager::loadNxPlugin(
     {
         if (m_pluginContainer)
             plugin2Obj->setPluginContainer(m_pluginContainer);
-    }
-
-    if (auto plugin3Obj = nxpt::ScopedRef<nxpl::Plugin3>(obj->queryInterface(nxpl::IID_Plugin3)))
-    {
-        plugin3Obj->setLocale("en_US"); //< TODO: Change to the real locale.
     }
 
     emit pluginLoaded();

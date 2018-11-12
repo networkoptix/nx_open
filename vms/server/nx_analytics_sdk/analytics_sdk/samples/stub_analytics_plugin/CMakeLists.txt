@@ -56,6 +56,7 @@ endif()
 
 add_executable(stub_analytics_plugin_ut
     ${UT_SRC}
+    ${SDK_SRC}
 )
 target_include_directories(stub_analytics_plugin_ut PRIVATE
     ${SDK_SRC_DIR}
@@ -63,5 +64,8 @@ target_include_directories(stub_analytics_plugin_ut PRIVATE
 target_link_libraries(stub_analytics_plugin_ut PRIVATE
     nx_kit
     stub_analytics_plugin
+)
+target_compile_definitions(stub_analytics_plugin_ut
+    PRIVATE NX_SDK_API=
 )
 add_test(NAME stub_analytics_plugin_ut COMMAND stub_analytics_plugin_ut)

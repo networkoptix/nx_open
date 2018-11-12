@@ -1400,7 +1400,7 @@ void initialize(Manager* manager, Action* root)
     factory(AnalyticsEngineSettingsAction)
         .flags(Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Analytics Engine Settings..."))
-        .condition(ConditionWrapper(new AnalyticsEngineCondition()));
+        .condition(condition::isAnalyticsEngine());
 
     factory(ConvertCameraToEntropix)
         .mode(DesktopMode)
@@ -1759,6 +1759,10 @@ void initialize(Manager* manager, Action* root)
             && !condition::tourIsRunning()
             && !condition::syncIsForced());
 
+    factory(JumpToTimeAction)
+        .flags(NoTarget)
+        .condition(new TimelineVisibleCondition());
+
     factory()
         .flags(Slider | TitleBar | Tree)
         .separator();
@@ -1814,6 +1818,10 @@ void initialize(Manager* manager, Action* root)
 
     factory(GoToPreviousItemAction)
         .flags(NoTarget);
+
+    factory(GoToResourceAction)
+        .flags(ResourceTarget | SingleTarget)
+        .condition(!condition::isLayoutTourReviewMode() && !condition::tourIsRunning());
 
     factory(ToggleCurrentItemMaximizationStateAction)
         .flags(NoTarget);

@@ -1,10 +1,6 @@
 {
-    "pluginId": "nx.hikvision", 
-    "pluginName": {
-        "value": "Hikvision metadata driver", 
-        "localization": {}
-    }, 
-    "outputEventTypes": [
+    "capabilities": "deviceModelDependent",
+    "eventTypes": [
         {
             "id": "nx.hikvision.loitering", 
             "name": {

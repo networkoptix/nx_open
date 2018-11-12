@@ -35,7 +35,7 @@ protected:
         m_staticCommon.reset(new QnStaticCommonModule());
         m_module.reset(new QnClientCoreModule());
         m_runtime.reset(new QnClientRuntimeSettings());
-        m_accessController.reset(new QnWorkbenchAccessController(m_module.data()));
+        m_accessController.reset(new QnWorkbenchAccessController(m_module->commonModule()));
     }
 
     // virtual void TearDown() will be called after each test is run.

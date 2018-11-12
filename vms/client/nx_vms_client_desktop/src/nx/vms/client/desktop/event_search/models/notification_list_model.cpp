@@ -28,11 +28,11 @@ NotificationListModel::~NotificationListModel()
 {
 }
 
-bool NotificationListModel::setData(const QModelIndex& index, const QVariant& value, int role)
+bool NotificationListModel::defaultAction(const QModelIndex& index)
 {
-    const auto result = base_type::setData(index, value, role);
-    if (role != Qn::DefaultNotificationRole || !result)
-        return result;
+    const auto result = base_type::defaultAction(index);
+    if (!result)
+        return false;
 
     const auto& event = getEvent(index.row());
     if (event.actionId != ui::action::NoAction)
@@ -41,7 +41,7 @@ bool NotificationListModel::setData(const QModelIndex& index, const QVariant& va
             getStatisticsAlias(QnLexical::serialized(event.actionId)));
     }
 
-    return result;
+    return true;
 }
 
 } // namespace nx::vms::client::desktop

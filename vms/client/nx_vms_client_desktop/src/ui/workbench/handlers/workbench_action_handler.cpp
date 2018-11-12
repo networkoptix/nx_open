@@ -149,6 +149,7 @@
 #include <ui/workbench/watchers/workbench_bookmarks_watcher.h>
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
 
+#include <utils/common/scoped_value_rollback.h>
 #include <utils/applauncher_utils.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <utils/common/delete_later.h>
@@ -161,7 +162,7 @@
 #include <utils/math/math.h>
 #include <nx/utils/std/cpp14.h>
 #include <utils/screen_manager.h>
-#include <vms_gateway_embeddable.h>
+#include <nx/cloud/vms_gateway/vms_gateway_embeddable.h>
 #include <utils/unity_launcher_workaround.h>
 #include <utils/connection_diagnostics_helper.h>
 #include <nx/vms/client/desktop/ui/workbench/layouts/layout_factory.h>
@@ -376,6 +377,12 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::TogglePanicModeAction), SIGNAL(toggled(bool)), this, SLOT(at_togglePanicModeAction_toggled(bool)));
 
     connect(context()->instance<QnWorkbenchScheduleWatcher>(), SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
+
+    connect(action(action::JumpToTimeAction), &QAction::triggered,
+        this, &ActionHandler::at_jumpToTimeAction_triggered);
+
+    connect(action(action::GoToResourceAction), &QAction::triggered,
+        this, &ActionHandler::at_goToResourceAction_triggered);
 
     /* Connect through lambda to handle forced parameter. */
     connect(action(action::DelayedForcedExitAction), &QAction::triggered, this, [this] {  closeApplication(true);    }, Qt::QueuedConnection);
@@ -1291,6 +1298,88 @@ void ActionHandler::at_systemAdministrationAction_triggered()
         : QnSystemAdministrationDialog::GeneralPage;
 
     openSystemAdministrationDialog(page);
+}
+
+void ActionHandler::at_jumpToTimeAction_triggered()
+{
+    auto slider = navigator()->timeSlider();
+    if (!slider)
+        return;
+
+    const auto parameters = menu()->currentParameters(sender());
+    if (!parameters.hasArgument(Qn::TimestampRole))
+    {
+        NX_ASSERT(false, "Timestamp must be specified");
+        return;
+    }
+
+    using namespace std::chrono;
+
+    const auto value = parameters.argument(Qn::TimestampRole);
+    if (!value.canConvert<microseconds>())
+    {
+        NX_ASSERT(false, "Unsupported timestamp value type");
+        return;
+    }
+
+    microseconds timestamp = value.value<microseconds>();;
+
+    if (timestamp < slider->minimum() || timestamp >= slider->maximum())
+        return;
+
+    // Pause playing for precise seek.
+    const QnScopedTypedPropertyRollback<bool, QnWorkbenchNavigator> playingRollback(navigator(),
+        &QnWorkbenchNavigator::setPlaying,
+        &QnWorkbenchNavigator::isPlaying,
+        false);
+
+    const QnScopedTypedPropertyRollback<bool, QnTimeSlider> downRollback(slider,
+        &QnTimeSlider::setSliderDown,
+        &QnTimeSlider::isSliderDown,
+        true);
+
+    slider->setValue(duration_cast<milliseconds>(timestamp), true);
+}
+
+void ActionHandler::at_goToResourceAction_triggered()
+{
+    const auto parameters = menu()->currentParameters(sender());
+    const auto resource = parameters.resource();
+    if (!resource)
+    {
+        NX_ASSERT(false, "Resource must be specified");
+        return;
+    }
+
+    const auto shouldRaise = parameters.argument<bool>(Qn::ForceRole);
+
+    const auto centralItem = workbench()->item(Qn::CentralRole);
+    if (centralItem && centralItem->resource() == resource)
+    {
+        if (shouldRaise)
+            workbench()->setItem(Qn::RaisedRole, centralItem);
+
+        return; //< Nothing more to do.
+    }
+
+    const auto items = workbench()->currentLayout()->items(resource);
+    for (const auto& item: items)
+    {
+        if (item->zoomRect().isValid())
+            continue; //< Skip zoom windows.
+
+        auto widget = display()->widget(item);
+        if (!widget)
+            break;
+
+        widget->scene()->clearSelection();
+        widget->setSelected(true);
+
+        if (shouldRaise)
+            workbench()->setItem(Qn::RaisedRole, item);
+
+        break;
+    }
 }
 
 void ActionHandler::openSystemAdministrationDialog(int page, const QUrl& url)

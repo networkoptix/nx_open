@@ -74,7 +74,7 @@ DeviceAgent::~DeviceAgent()
     NX_OUTPUT << __func__ << "(" << this << ") END";
 }
 
-std::string DeviceAgent::manifest()
+std::string DeviceAgent::manifest() const
 {
     return R"manifest(
         {

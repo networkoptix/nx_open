@@ -292,6 +292,7 @@ struct NX_VMS_DESKTOP_CLIENT_API CameraSettingsDialogState
         QList<AnalyticsEngineInfo> engines;
         UserEditable<QSet<QnUuid>> enabledEngines;
         QHash<QnUuid, UserEditable<QVariantMap>> settingsValuesByEngineId;
+        bool loading = false;
     };
     AnalyticsSettings analytics;
 

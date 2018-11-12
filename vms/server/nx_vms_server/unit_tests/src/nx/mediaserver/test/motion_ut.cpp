@@ -5,6 +5,7 @@
 #include <motion/motion_helper.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/mediaserver/camera_mock.h>
+#include <nx/fusion/model_functions.h>
 
 namespace nx::mediaserver::test
 {

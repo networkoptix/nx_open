@@ -2,6 +2,8 @@
 
 #include "abstract_event_list_model.h"
 
+#include <chrono>
+
 #include <QtCore/QScopedPointer>
 #include <QtGui/QPixmap>
 
@@ -27,16 +29,16 @@ public:
         QString title;
         QString description;
         QString toolTip;
-        qint64 timestampUs = 0;
+        std::chrono::microseconds timestamp{0};
         QPixmap icon;
         QColor titleColor;
         bool removable = false;
-        int lifetimeMs = -1;
+        std::chrono::milliseconds lifetime{0};
         int helpId = -1;
         QnNotificationLevel::Value level = QnNotificationLevel::Value::NoNotification;
         QnVirtualCameraResourcePtr previewCamera;
         QnVirtualCameraResourceList cameras;
-        qint64 previewTimeUs = 0; //< The latest thumbnail is used if previewTimeUs <= 0.
+        std::chrono::microseconds previewTime{0}; //< The latest thumbnail's used if previewTime <= 0.
         ui::action::IDType actionId = ui::action::NoAction;
         ui::action::Parameters actionParameters;
         CommandActionPtr extraAction;
@@ -51,8 +53,6 @@ public:
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
     virtual bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) override;
-    virtual bool setData(const QModelIndex& index, const QVariant& value,
-        int role = Qn::DefaultNotificationRole) override;
 
     void clear();
 
@@ -66,6 +66,8 @@ protected:
     bool addEvent(const EventData& event, Position where = Position::front);
     bool updateEvent(const EventData& event);
     bool removeEvent(const QnUuid& id);
+
+    virtual bool defaultAction(const QModelIndex& index) override;
 
     QModelIndex indexOf(const QnUuid& id) const;
     EventData getEvent(int row) const;

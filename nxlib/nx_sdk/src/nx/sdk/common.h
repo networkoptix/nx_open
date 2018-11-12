@@ -72,6 +72,14 @@ enum class Error
     networkError,
 };
 
+class IStringList
+{
+public:
+    virtual ~IStringList() = default;
+    virtual int count() const = 0;
+    virtual const char* at(int index) const = 0;
+};
+
 static inline const char* toString(Error error)
 {
     switch (error)

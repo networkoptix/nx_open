@@ -350,15 +350,6 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
         }
 
         camera->setEnabledAnalyticsEngines(state.analytics.enabledEngines());
-
-        auto deviceAgentSettingsValues = camera->deviceAgentSettingsValues();
-        const auto& valuesByEngine = state.analytics.settingsValuesByEngineId;
-        for (auto it = valuesByEngine.begin(); it != valuesByEngine.end(); ++it)
-        {
-            if (it->hasUser())
-                deviceAgentSettingsValues[it.key()] = it->get();
-        }
-        camera->setDeviceAgentSettingsValues(deviceAgentSettingsValues);
     }
 
     if (state.devicesDescription.isWearable == State::CombinedValue::All)

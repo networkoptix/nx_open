@@ -739,10 +739,11 @@ void SPSUnit::serializeHDRParameters(BitStreamWriter& writer)
     writeUEGolombCode(writer, cpb_cnt_minus1);
     writer.putBits(4, bit_rate_scale);
     writer.putBits(4, cpb_size_scale);
-    for(int SchedSelIdx = 0; SchedSelIdx <= cpb_cnt_minus1; SchedSelIdx++ ) {
-        writeUEGolombCode(writer, bit_rate_value_minus1[ SchedSelIdx]);
-        writeUEGolombCode(writer, cpb_size_value_minus1[ SchedSelIdx ]);
-        writer.putBit(cbr_flag[ SchedSelIdx ]);
+    for(int SchedSelIdx = 0; SchedSelIdx <= cpb_cnt_minus1; SchedSelIdx++ )
+    {
+        writeUEGolombCode(writer, cpb[SchedSelIdx].bit_rate_value_minus1);
+        writeUEGolombCode(writer, cpb[SchedSelIdx].cpb_size_value_minus1);
+        writer.putBit(cpb[SchedSelIdx].cbr_flag);
     }
     writer.putBits(5, initial_cpb_removal_delay_length_minus1);
     writer.putBits(5, cpb_removal_delay_length_minus1);
@@ -795,33 +796,26 @@ void SPSUnit::insertHdrParameters()
 
 int SPSUnit::getMaxBitrate()
 {
-    if (bit_rate_value_minus1 == 0)
-        return 0;
-    else
-        return (bit_rate_value_minus1[0]+1) << (6 + bit_rate_scale);
+    int result = 0;
+    for (int i = 0; i <= cpb_cnt_minus1; ++i)
+        result = std::max(result, (cpb[i].bit_rate_value_minus1 + 1) << (6 + bit_rate_scale));
+    return result;
 }
 
 void SPSUnit::hrd_parameters()
 {
     cpb_cnt_minus1 = extractUEGolombCode();
+    if (cpb_cnt_minus1 >= kCpbCntMax)
+        THROW_BITSTREAM_ERR;
+
     bit_rate_scale = bitReader.getBits(4);
     cpb_size_scale = bitReader.getBits(4);
 
-    if( bit_rate_value_minus1 )
-        delete[] bit_rate_value_minus1;
-    bit_rate_value_minus1 = new int[cpb_cnt_minus1 + 1];
-    if( cpb_size_value_minus1 )
-        delete[] cpb_size_value_minus1;
-    cpb_size_value_minus1 = new int[cpb_cnt_minus1 + 1];
-    if( cbr_flag )
-        delete[] cbr_flag;
-    cbr_flag = new quint8[cpb_cnt_minus1 + 1];
-
     for( int SchedSelIdx = 0; SchedSelIdx <= cpb_cnt_minus1; SchedSelIdx++)
     {
-        bit_rate_value_minus1[ SchedSelIdx ] = extractUEGolombCode();
-        cpb_size_value_minus1[ SchedSelIdx ] = extractUEGolombCode();
-        cbr_flag[ SchedSelIdx ] = bitReader.getBit();
+        cpb[SchedSelIdx].bit_rate_value_minus1 = extractUEGolombCode();
+        cpb[SchedSelIdx].cpb_size_value_minus1 = extractUEGolombCode();
+        cpb[SchedSelIdx].cbr_flag = bitReader.getBit();
     }
     initial_cpb_removal_delay_length_minus1 = bitReader.getBits(5);
     cpb_removal_delay_length_minus1 = bitReader.getBits(5);

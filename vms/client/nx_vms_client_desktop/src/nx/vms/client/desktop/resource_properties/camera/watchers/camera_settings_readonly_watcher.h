@@ -24,6 +24,8 @@ public:
     QnVirtualCameraResourceList cameras() const;
     void setCameras(const QnVirtualCameraResourceList& value);
 
+    bool isReadOnly() const;
+
 signals:
     void readOnlyChanged(bool value, QPrivateSignal);
 

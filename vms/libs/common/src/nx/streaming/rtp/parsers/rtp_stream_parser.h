@@ -3,6 +3,7 @@
 #include <deque>
 
 #include <nx/streaming/media_data_packet.h>
+#include <nx/streaming/sdp.h>
 #include <core/resource/resource_media_layout.h>
 
 namespace nx::streaming::rtp {
@@ -26,7 +27,7 @@ class StreamParser: public QObject
 public:
     virtual ~StreamParser() {};
 
-    virtual void setSdpInfo(QList<QByteArray> sdpInfo) = 0;
+    virtual void setSdpInfo(const Sdp::Media& sdp) = 0;
     virtual QnAbstractMediaDataPtr nextData() = 0;
     virtual bool processData(
         quint8* rtpBufferBase,
@@ -99,17 +100,9 @@ public:
     virtual QnAbstractMediaDataPtr nextData() override;
 
 protected:
-    void processIntParam(const QByteArray& checkName, int& setValue, const QByteArray& param);
-
-    void processHexParam(
-        const QByteArray& checkName,
-        QByteArray& setValue,
-        const QByteArray& param);
-
-    void processStringParam(
-        const QByteArray& checkName,
-        QByteArray& setValue,
-        const QByteArray& param);
+    void processIntParam(const QString& checkName, int& setValue, const QString& param);
+    void processHexParam(const QString& checkName, QByteArray& setValue, const QString& param);
+    void processStringParam(const QString& checkName, QString& setValue,const QString& param);
 protected:
     std::deque<QnAbstractMediaDataPtr> m_audioData;
 };

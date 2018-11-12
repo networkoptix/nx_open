@@ -728,8 +728,6 @@ protected:
 
     void whenAcceptConnectionAsync(std::function<void()> customHandler = nullptr)
     {
-        ASSERT_TRUE(m_serverSocket->setNonBlockingMode(true));
-
         m_serverSocket->acceptAsync(
             [this, customHandler = std::move(customHandler)](
                 SystemError::ErrorCode systemErrorCode,
@@ -816,6 +814,13 @@ protected:
         m_prevAcceptResult = m_acceptedConnections.pop();
 
         ASSERT_EQ(expected, std::get<0>(m_prevAcceptResult));
+    }
+
+    void thenAcceptFailed()
+    {
+        m_prevAcceptResult = m_acceptedConnections.pop();
+
+        ASSERT_NE(SystemError::noError, std::get<0>(m_prevAcceptResult));
     }
 
     void thenConnectionHasBeenAccepted()
@@ -943,7 +948,6 @@ protected:
     {
         this->whenClientSentPingAsync();
 
-        this->startReadingConnectionAsync();
         this->thenServerMessageIsReceived();
     }
 
@@ -1381,6 +1385,15 @@ TYPED_TEST_P(StreamSocketAcceptance, async_connect_is_cancelled_by_cancelling_wr
     this->thenSocketCanBeSafelyRemoved();
 }
 
+TYPED_TEST_P(StreamSocketAcceptance, async_connect_is_cancelled_by_pleaseStopSync)
+{
+    this->givenSocketInConnectStage();
+
+    this->connection()->pleaseStopSync();
+
+    this->thenSocketCanBeSafelyRemoved();
+}
+
 //---------------------------------------------------------------------------------------------
 // I/O data transfer tests.
 
@@ -1748,7 +1761,7 @@ TYPED_TEST_P(StreamSocketAcceptance, server_socket_accept_times_out)
 
 TYPED_TEST_P(StreamSocketAcceptance, server_socket_accept_async_times_out)
 {
-    this->givenListeningServerSocket();
+    this->givenListeningNonBlockingServerSocket();
     this->setServerSocketAcceptTimeout(std::chrono::milliseconds(1));
 
     this->whenAcceptConnectionAsync();
@@ -1756,9 +1769,16 @@ TYPED_TEST_P(StreamSocketAcceptance, server_socket_accept_async_times_out)
     this->thenAcceptReported(SystemError::timedOut);
 }
 
-TYPED_TEST_P(StreamSocketAcceptance, server_socket_can_be_freed_in_accept_handler)
+TYPED_TEST_P(StreamSocketAcceptance, accept_async_on_blocking_socket_results_in_error)
 {
     this->givenListeningServerSocket();
+    this->whenAcceptConnectionAsync();
+    this->thenAcceptFailed();
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, server_socket_can_be_freed_in_accept_handler)
+{
+    this->givenListeningNonBlockingServerSocket();
     this->setServerSocketAcceptTimeout(std::chrono::milliseconds(1));
 
     this->whenAcceptConnectionAsync(
@@ -1780,6 +1800,7 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     connect_including_resolve_is_cancelled_correctly,
     connect_including_resolving_unknown_name_is_cancelled_correctly,
     async_connect_is_cancelled_by_cancelling_write,
+    async_connect_is_cancelled_by_pleaseStopSync,
 
     //---------------------------------------------------------------------------------------------
     // I/O data transfer tests.
@@ -1822,6 +1843,7 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     DISABLED_server_socket_listen_queue_size_is_used,
     server_socket_accept_times_out,
     server_socket_accept_async_times_out,
+    accept_async_on_blocking_socket_results_in_error,
     server_socket_can_be_freed_in_accept_handler);
 
 } // namespace test

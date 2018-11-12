@@ -258,7 +258,7 @@
         }
     },
 
-    "nx::client::desktop::MessageBar": {
+    "nx::vms::client::desktop::MessageBar": {
         "palette": {
             "default": {
                 "window": "brand_d5",
@@ -268,7 +268,7 @@
         }
     },
 
-    "nx::client::desktop::AlertBar": {
+    "nx::vms::client::desktop::AlertBar": {
         "palette": {
             "default": {
                 "window": "#61282b"
@@ -328,7 +328,7 @@
         }
     },
 
-    "nx::client::desktop::PasswordStrengthIndicator": {
+    "nx::vms::client::desktop::PasswordStrengthIndicator": {
         "colors": {
             "inacceptable":      "red_core",
             "acceptable":        "yellow_core",
@@ -337,7 +337,7 @@
         }
     },
 
-    "nx::client::desktop::Panel": {
+    "nx::vms::client::desktop::Panel": {
         "palette": {
             "default": {
                 "window": "dark8",
@@ -346,7 +346,7 @@
         }
     },
 
-    "nx::client::desktop::ui::MainWindow": {
+    "nx::vms::client::desktop::MainWindow": {
         "palette": { "default": {
             "window": "dark4"
         }}
@@ -384,7 +384,7 @@
         }}
     },
 
-    "nx::client::desktop::TimelineScreenshotCursor": {
+    "nx::vms::client::desktop::TimelineScreenshotCursor": {
         "palette": { "default": {
             "window": "dark13",
             "windowText": "light3",
@@ -514,7 +514,7 @@
         "palette": { "default": { "window": "dark4" } }
     },
 
-    "nx::client::desktop::ui::workbench::LayoutTourItemWidget": {
+    "nx::vms::client::desktop::ui::workbench::LayoutTourItemWidget": {
         "_": "dark is used to paint darker text",
         "palette": {
             "default": {
@@ -536,7 +536,7 @@
         }
     },
 
-    "nx::client::desktop::ServerUpdatesModel": {
+    "nx::vms::client::desktop::ServerUpdatesModel": {
         "colors": {
             "latest": "green_l2",
             "target": "yellow_core",
@@ -772,7 +772,7 @@
         }
     },
 
-    "nx::client::desktop::ScheduleGridWidget": {
+    "nx::vms::client::desktop::ScheduleGridWidget": {
         "colors": {
             "normalLabel": "light10",
             "weekendLabel": "red_core",
@@ -818,7 +818,7 @@
         ]
     },
 
-    "nx::client::desktop::CameraMotionSettingsWidget": {
+    "nx::vms::client::desktop::CameraMotionSettingsWidget": {
         "sensitivityColors": [
             "light16",
             "#627cd6",
@@ -847,7 +847,7 @@
         ]
     },
 
-    "nx::client::desktop::FisheyeCalibrationWidget": {
+    "nx::vms::client::desktop::FisheyeCalibrationWidget": {
         "palette": { "default": { "window": "dark4" } }
     },
 
@@ -855,7 +855,7 @@
         "palette": { "default": { "window": "dark8" } }
     },
 
-    "nx::client::desktop::SelectableTextButton": {
+    "nx::vms::client::desktop::SelectableTextButton": {
         "palette": {
             "_1": "selected",
             "active": {
@@ -877,7 +877,7 @@
         }
     },
 
-    "nx::client::desktop::ui::graphics::SoftwareTriggerButton": {
+    "nx::vms::client::desktop::SoftwareTriggerButton": {
         "palette": {
             "default": {
                 "window": "dark1.setAlpha(128)",
@@ -889,14 +889,14 @@
         }
     },
 
-    "nx::client::desktop::ui::LayoutPreviewPainter": {
+    "nx::vms::client::desktop::ui::LayoutPreviewPainter": {
         "frameColor": "dark1",
         "fontColor": "light16",
         "backgroundColor": "dark7",
         "itemBackgroundColor": "dark5"
     },
 
-    "nx::client::desktop::EventTile": {
+    "nx::vms::client::desktop::EventTile": {
         "palette": {
             "default": {
                 "base": "dark7",
@@ -935,7 +935,7 @@
         }
     },
 
-    "nx::client::desktop::HintButton": {
+    "nx::vms::client::desktop::HintButton": {
         "palette": {
             "default": {
                 "text": "light16"
@@ -943,7 +943,7 @@
         }
     },
 
-    "nx::client::desktop::CompactTabBar": {
+    "nx::vms::client::desktop::CompactTabBar": {
         "palette": {
             "default": {
                 "windowText": "light12",
@@ -960,7 +960,7 @@
         }
     },
 
-    "nx::client::desktop::EventPanel": {
+    "nx::vms::client::desktop::EventPanel": {
         "palette": {
             "default": {
                 "dark": "dark4",
@@ -971,7 +971,7 @@
         }
     },
 
-    "nx::client::desktop::AsyncImageWidget": {
+    "nx::vms::client::desktop::AsyncImageWidget": {
         "palette": {
             "default": {
                 "shadow":        "dark7",
@@ -983,7 +983,7 @@
         }
     },
 
-    "nx::client::desktop::NotificationCounterLabel": {
+    "nx::vms::client::desktop::NotificationCounterLabel": {
         "palette": {
             "default": {
                 "window": "light10",

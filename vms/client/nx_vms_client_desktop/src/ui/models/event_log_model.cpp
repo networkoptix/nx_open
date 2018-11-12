@@ -9,7 +9,6 @@
 
 #include <nx/vms/event/events/reasoned_event.h>
 #include <nx/vms/event/strings_helper.h>
-#include <nx/vms/event/analytics_helper.h>
 
 #include <common/common_module.h>
 #include <translation/datetime_formatter.h>
@@ -42,15 +41,19 @@
 #include <api/helpers/camera_id_helper.h>
 #include <core/resource/camera_resource.h>
 
+#include <nx/analytics/descriptor_list_manager.h>
+#include <nx/vms/api/analytics/descriptors.h>
+#include <common/common_module.h>
+
 using namespace nx;
 
 using eventIterator = vms::event::ActionDataList::iterator;
 using nx::vms::api::EventType;
 using nx::vms::api::ActionType;
 
-// -------------------------------------------------------------------------- //
+//-------------------------------------------------------------------------------------------------
 // QnEventLogModel::DataIndex
-// -------------------------------------------------------------------------- //
+
 class QnEventLogModel::DataIndex
 {
 public:
@@ -112,7 +115,10 @@ public:
     bool lessThanEventType(eventIterator d1, eventIterator d2) const
     {
         if (d1->eventParams.eventType != d2->eventParams.eventType)
-            return m_lexComparator->lexicographicalLessThan(d1->eventParams.eventType, d2->eventParams.eventType);
+        {
+            return m_lexComparator->lexicographicalLessThan(
+                d1->eventParams.eventType, d2->eventParams.eventType);
+        }
         return lessThanTimestamp(d1, d2);
     }
 
@@ -176,9 +182,9 @@ private:
     QScopedPointer<QnBusinessTypesComparator> m_lexComparator;
 };
 
-// -------------------------------------------------------------------------- //
+//-------------------------------------------------------------------------------------------------
 // QnEventLogModel
-// -------------------------------------------------------------------------- //
+
 QnEventLogModel::QnEventLogModel(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -264,21 +270,24 @@ bool QnEventLogModel::hasVideoLink(const vms::event::ActionData& action) const
     return false;
 }
 
-QVariant QnEventLogModel::foregroundData(Column column, const vms::event::ActionData& action) const
+QVariant QnEventLogModel::foregroundData(
+    Column column, const vms::event::ActionData& action) const
 {
     if (column == DescriptionColumn && hasVideoLink(action))
         return m_linkBrush;
     return QVariant();
 }
 
-QVariant QnEventLogModel::mouseCursorData(Column column, const vms::event::ActionData& action) const
+QVariant QnEventLogModel::mouseCursorData(
+    Column column, const vms::event::ActionData& action) const
 {
     if (column == DescriptionColumn && hasVideoLink(action))
         return QVariant::fromValue<int>(Qt::PointingHandCursor);
     return QVariant();
 }
 
-QnResourcePtr QnEventLogModel::getResource(Column column, const vms::event::ActionData& action) const
+QnResourcePtr QnEventLogModel::getResource(
+    Column column, const vms::event::ActionData& action) const
 {
     switch (column)
     {
@@ -399,10 +408,13 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
                     action.eventParams.eventResourceId).
                     dynamicCast<QnVirtualCameraResource>();
 
-                QString eventName = camera
-                    ? m_analyticsHelper->eventTypeName(camera,
-                        action.eventParams.getAnalyticsEventTypeId(),
-                        qnRuntime->locale())
+                const auto descriptorListManager = commonModule()->analyticsDescriptorListManager();
+                const auto descriptor = descriptorListManager
+                    ->descriptor<nx::vms::api::analytics::EventTypeDescriptor>(
+                        action.eventParams.getAnalyticsEventTypeId());
+
+                QString eventName = descriptor
+                    ? descriptor->item.name.value
                     : QString();
 
                 if (!eventName.isEmpty())
@@ -449,7 +461,7 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
                 case ActionType::showOnAlarmLayoutAction:
                     return getResourceNameString(action.actionParams.actionResourceId);
 
-                // TODO: #future Rework code to use bookmark.description field for bookmark action.
+                // TODO: Future: Rework code to use bookmark.description field for bookmark action.
                 case ActionType::acknowledgeAction:
                     /*fallthrough*/
                 case ActionType::showTextOverlayAction:
@@ -470,7 +482,7 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
                 if (hasVideoLink(action))
                 {
                     const auto cameraId = action.eventParams.eventResourceId;
-                    result = (hasAccessToArchive(cameraId) ? tr("Motion video") : tr("Open camera"));
+                    result = hasAccessToArchive(cameraId) ? tr("Motion video") : tr("Open camera");
                 }
             }
             else
@@ -532,8 +544,8 @@ QString QnEventLogModel::tooltip(Column column, const vms::event::ActionData& ac
         return QString();
 
     QString result = textData(column, action);
-    // TODO: #GDM #3.1 following block must be moved to ::eventDetails method. Problem is to display
-    // too long text in the column (::textData() method).
+    // TODO: #sivanov #3.1 The following block must be moved to ::eventDetails method. The problem
+    // is to display too long text in the column (::textData() method).
     if (action.eventParams.eventType == EventType::licenseIssueEvent
         && action.eventParams.reasonCode == vms::api::EventReason::licenseRemoved)
     {
@@ -606,7 +618,8 @@ QString QnEventLogModel::motionUrl(Column column, const vms::event::ActionData& 
     if (column != DescriptionColumn || !action.hasFlags(vms::event::ActionData::VideoLinkExists))
         return QString();
 
-    return m_stringsHelper->urlForCamera(action.eventParams.eventResourceId, action.eventParams.eventTimestampUsec, true);
+    return m_stringsHelper->urlForCamera(
+        action.eventParams.eventResourceId, action.eventParams.eventTimestampUsec, true);
 }
 
 QnResourceList QnEventLogModel::resourcesForPlayback(const QModelIndex &index) const
@@ -617,11 +630,13 @@ QnResourceList QnEventLogModel::resourcesForPlayback(const QModelIndex &index) c
     const vms::event::ActionData& action = m_index->at(index.row());
     if (action.hasFlags(vms::event::ActionData::VideoLinkExists))
     {
-        QnResourcePtr resource = resourcePool()->getResourceById(action.eventParams.eventResourceId);
+        QnResourcePtr resource = 
+            resourcePool()->getResourceById(action.eventParams.eventResourceId);
         if (resource)
             result << resource;
     }
-    QnResourceList extraResources = resourcePool()->getCamerasByFlexibleIds(action.eventParams.metadata.cameraRefs);
+    QnResourceList extraResources = resourcePool()->getCamerasByFlexibleIds(
+        action.eventParams.metadata.cameraRefs);
     result << extraResources;
     return result;
 }
@@ -661,8 +676,11 @@ QVariant QnEventLogModel::headerData(int section, Qt::Orientation orientation, i
 
 QVariant QnEventLogModel::data(const QModelIndex& index, int role) const
 {
-    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
+    if (!index.isValid() || index.model() != this
+        || !hasIndex(index.row(), index.column(), index.parent()))
+    {
         return QVariant();
+    }
 
     Column column = m_columns[index.column()];
 

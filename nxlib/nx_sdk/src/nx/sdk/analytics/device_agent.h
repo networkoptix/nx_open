@@ -3,6 +3,9 @@
 #include <plugins/plugin_api.h>
 
 #include <nx/sdk/common.h>
+#include <nx/sdk/settings.h>
+#include <nx/sdk/i_string.h>
+#include <nx/sdk/analytics/metadata_types.h>
 #include <nx/sdk/analytics/metadata_packet.h>
 
 namespace nx {
@@ -15,7 +18,7 @@ static const int NX_UNKNOWN_PARAMETER = -41;
 static const int NX_MORE_DATA = -23;
 
 /**
- * Interface for handler that processes metadata incoming from the engine.
+ * Interface for handler that processes metadata incoming from the DeviceAgent.
  */
 class MetadataHandler
 {
@@ -24,7 +27,7 @@ public:
 
     /**
      * @param error Used for reporting errors to the outer code.
-     * @param metadata Incoming from the engine.
+     * @param metadata Metadata incoming from the DeviceAgent.
      */
     virtual void handleMetadata(Error error, MetadataPacket* metadata) = 0;
 };
@@ -53,47 +56,35 @@ public:
     /**
      * Called before other methods. Server provides the set of settings stored in its database for
      * the combination of a resource instance and a engine type.
-     * @param settings Values of settings declared in the manifest. The pointer is valid only
-     *     during the call. If count is 0, the pointer is null.
+     * @param settings Values of settings declared in the manifest.
      */
-    virtual void setSettings(const nxpl::Setting* settings, int count) = 0;
+    virtual void setSettings(const Settings* settings) = 0;
 
     /**
-     * Provides a 0-terminated UTF-8 string containing the JSON manifest.
-     * @return Pointer to a C-style string which MUST be valid until freeManifest() is invoked.
+     * @return DeviceAgent settings that are stored on the plugin side.
      */
-    virtual const char* manifest(Error* error) = 0;
+    virtual Settings* settings() const = 0;
 
     /**
-     * Tells DeviceAgent that the memory previously returned by manifest() pointed to
-     * by data is no longer needed and may be disposed.
+     * Provides DeviceAgent manifest in JSON format.
+     * @return JSON string in UTF-8.
      */
-    virtual void freeManifest(const char* data) = 0;
+    virtual const IString* manifest(Error* error) const = 0;
 
     /**
-     * @param handler Processes event metadata and object metadata fetched by the engine. The
-     *     engine will fetch events metadata after startFetchingMetadata() call. Errors should also
-     *     be reported via this handler. Also provides other services to the DeviceAgent, e.g.
-     *     reading settings that are stored by the Server.
+     * @param handler Processes event metadata and object metadata fetched by the Engine. The
+     *     Engine should fetch events metadata after setNeededMetadataTypes() call. Errors should
+     *     also be reported via this handler.
      * @return noError in case of success, other value otherwise.
      */
     virtual Error setMetadataHandler(MetadataHandler* handler) = 0;
 
     /**
-     * Starts fetching metadata from the resource.
-     * @param typeList List of types of events and objects as an array of C-style strings; null if
-     *     the array is empty.
-     * @param typeListSize Number of items in typeList array.
-     * @return noError in case of success, other value otherwise.
+     * Sets a list of metadata types that are needed by the Server. Empty list means that the
+     * Server doesn't need any metadata from this DeviceAgent.
+     * @param neededMetadataTypes Lists of type ids of events and objects.
      */
-    virtual Error startFetchingMetadata(
-        const char* const* typeList, int typeListSize) = 0;
-
-    /**
-     * Stops fetching metadata from the resource.
-     * @return noError in case of success, other value otherwise.
-     */
-    virtual Error stopFetchingMetadata() = 0;
+    virtual Error setNeededMetadataTypes(const IMetadataTypes* neededMetadataTypes) = 0;
 };
 
 } // namespace analytics

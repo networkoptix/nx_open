@@ -71,12 +71,18 @@ QVariant AbstractAsyncSearchListModel::data(const QModelIndex& index, int role) 
     if (role == Qn::AnimatedRole)
     {
         using namespace std::chrono;
-        return data(index, Qn::TimestampRole).value<qint64>()
-            >= microseconds(milliseconds(fetchedTimeWindow().startTimeMs)).count();
+        return data(index, Qn::TimestampRole).value<microseconds>()
+            >= fetchedTimeWindow().startTime();
     }
 
     bool handled = false;
     const auto result = d->data(index, role, handled);
+
+    if (role == Qt::DisplayRole && result.toString().isEmpty())
+    {
+        NX_ASSERT(false);
+        return QString("?"); //< Title must not be empty.
+    }
 
     return handled ? result : base_type::data(index, role);
 }

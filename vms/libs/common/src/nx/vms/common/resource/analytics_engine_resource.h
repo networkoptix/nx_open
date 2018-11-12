@@ -3,6 +3,7 @@
 #include <QtCore/QVariantMap>
 
 #include <core/resource/resource.h>
+#include <nx/vms/api/analytics/engine_manifest.h>
 
 namespace nx::vms::common {
 
@@ -12,12 +13,27 @@ class AnalyticsEngineResource: public QnResource
 
 public:
     static QString kSettingsValuesProperty;
+    static QString kEngineManifestProperty;
 
     AnalyticsEngineResource(QnCommonModule* commonModule = nullptr);
     virtual ~AnalyticsEngineResource() override;
 
-    QVariantMap settingsValues() const;
-    void setSettingsValues(const QVariantMap& values);
+    api::analytics::EngineManifest manifest() const;
+    void setManifest(const api::analytics::EngineManifest& manifest);
+
+    // TODO: REMOVE this since settings should be operated via REST methods.
+    virtual QVariantMap settingsValues() const;
+    virtual void setSettingsValues(const QVariantMap& values);
+
+    AnalyticsPluginResourcePtr plugin() const;
+
+    /**
+     * @return true if engine doesn't need to be assigned by the user and is assigned to every
+     * resource. Self assignable engine can decide on its own which resources are supported by it.
+     * A good example of self assignable engine is any camera (Hanwha, Axis, Hikvision, etc) plugin
+     * engine.
+     */
+    bool isSelfAssignable() const;
 };
 
 } // namespace nx::vms::common

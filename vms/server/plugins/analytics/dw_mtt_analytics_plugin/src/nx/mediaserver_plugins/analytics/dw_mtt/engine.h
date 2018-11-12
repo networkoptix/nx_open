@@ -24,17 +24,18 @@ public:
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
-    virtual void setSettings(const nxpl::Setting* settings, int count) override;
+    virtual void setSettings(const nx::sdk::Settings* settings) override;
+
+    virtual nx::sdk::Settings* settings() const override;
 
     virtual nx::sdk::analytics::DeviceAgent* obtainDeviceAgent(
         const nx::sdk::DeviceInfo* deviceInfo,
         nx::sdk::Error* outError) override;
 
-    virtual const char* manifest(
-        nx::sdk::Error* error) const override;
+    virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
 
     const EventType* eventTypeById(const QString& id) const noexcept;
- 
+
     virtual void executeAction(
         nx::sdk::analytics::Action* action, nx::sdk::Error* outError) override;
 

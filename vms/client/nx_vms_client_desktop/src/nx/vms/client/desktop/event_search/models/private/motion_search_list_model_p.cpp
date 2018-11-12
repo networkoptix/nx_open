@@ -14,6 +14,7 @@
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+#include <nx/client/core/utils/human_readable.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
@@ -93,10 +94,10 @@ QVariant MotionSearchListModel::Private::data(const QModelIndex& index, int role
             return QnBusiness::eventHelpId(vms::api::EventType::cameraMotionEvent);
 
         case Qn::TimestampRole:
-            return QVariant::fromValue(microseconds(chunk.period.startTime()).count());
+            return QVariant::fromValue(chunk.period.startTime());
 
         case Qn::DurationRole:
-            return QVariant::fromValue(microseconds(chunk.period.duration()).count());
+            return QVariant::fromValue(chunk.period.duration());
 
         case Qn::ResourceRole:
             return QVariant::fromValue<QnResourcePtr>(camera(chunk));
@@ -114,13 +115,14 @@ QVariant MotionSearchListModel::Private::data(const QModelIndex& index, int role
             if (!ini().showDebugTimeInformationInRibbon)
                 return QString();
 
-            return lm("Begin: %1<br>End: %2").args( //< Not translatable debug string.
+            return lm("Begin: %1<br>End: %2<br>Duration: %3").args( //< Not translatable debug string.
                 utils::timestampToDebugString(chunk.period.startTimeMs),
-                utils::timestampToDebugString(chunk.period.endTimeMs())).toQString();
+                utils::timestampToDebugString(chunk.period.endTimeMs()),
+                core::HumanReadable::timeSpan(chunk.period.duration())).toQString();
         }
 
         case Qn::PreviewTimeRole:
-            return QVariant::fromValue(midTime(chunk.period).count());
+            return QVariant::fromValue(midTime(chunk.period));
 
         case Qn::ForcePrecisePreviewRole:
             return true;

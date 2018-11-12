@@ -15,7 +15,8 @@ public:
     explicit NotificationListModel(QnWorkbenchContext* context, QObject* parent = nullptr);
     virtual ~NotificationListModel() override;
 
-    virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
+protected:
+    virtual bool defaultAction(const QModelIndex& index) override;
 
 private:
     class Private;

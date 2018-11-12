@@ -1,4 +1,4 @@
-﻿#include "engine.h"
+#include "engine.h"
 
 #include <QtCore/QString>
 #include <QtCore/QFile>
@@ -7,6 +7,8 @@
 #include <nx/fusion/model_functions.h>
 
 #include <nx/mediaserver_plugins/utils/uuid.h>
+
+#include <nx/sdk/common/string.h>
 
 #include "device_agent.h"
 #include "log.h"
@@ -71,8 +73,14 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void Engine::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
+void Engine::setSettings(const nx::sdk::Settings* settings)
 {
+    // There are no DeviceAgent settings for this plugin.
+}
+
+nx::sdk::Settings* Engine::settings() const
+{
+    return nullptr;
 }
 
 nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
@@ -88,10 +96,10 @@ nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
         return nullptr;
 }
 
-const char* Engine::manifest(Error* error) const
+const IString* Engine::manifest(Error* error) const
 {
     *error = Error::noError;
-    return m_manifest.constData();
+    return new common::String(m_manifest);
 }
 
 const EventType* Engine::eventTypeById(const QString& id) const noexcept
@@ -114,11 +122,26 @@ void Engine::executeAction(
 } // namespace mediaserver_plugins
 } // namespace nx
 
+namespace {
+
+static const std::string kLibName = "dw_mtt_analytics_plugin";
+static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
+{
+    "id": "nx.dw_mtt",
+    "name": "DW MTT analytics plugin",
+    "engineSettingsModel": ""
+}
+)json";
+
+} // namespace
+
 extern "C" {
 
 NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
-    return new nx::sdk::analytics::CommonPlugin("dw_mtt_analytics_plugin",
+    return new nx::sdk::analytics::CommonPlugin(
+        kLibName,
+        kPluginManifest,
         [](nx::sdk::analytics::Plugin* plugin)
         {
             return new nx::mediaserver_plugins::analytics::dw_mtt::Engine(

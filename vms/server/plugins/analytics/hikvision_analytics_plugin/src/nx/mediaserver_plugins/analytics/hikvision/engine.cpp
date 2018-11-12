@@ -15,6 +15,7 @@
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/sdk/common/string.h>
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -73,8 +74,14 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void Engine::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
+void Engine::setSettings(const nx::sdk::Settings* settings)
 {
+    // There are no DeviceAgent settings for this plugin.
+}
+
+nx::sdk::Settings* Engine::settings() const
+{
+    return nullptr;
 }
 
 nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
@@ -103,10 +110,10 @@ nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
     return deviceAgent;
 }
 
-const char* Engine::manifest(Error* error) const
+const nx::sdk::IString* Engine::manifest(Error* error) const
 {
     *error = Error::noError;
-    return m_manifest.constData();
+    return new common::String(m_manifest);
 }
 
 QList<QString> Engine::parseSupportedEvents(const QByteArray& data)
@@ -174,11 +181,26 @@ void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
 } // namespace mediaserver_plugins
 } // namespace nx
 
+namespace {
+
+static const std::string kLibName = "hikvision_analytics_plugin";
+static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
+{
+    "id": "nx.hikvision",
+    "name": "Hikvision analytics plugin",
+    "engineSettingsModel": ""
+}
+)json";
+
+} // namespace
+
 extern "C" {
 
 NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
-    return new nx::sdk::analytics::CommonPlugin("hikvision_analytics_plugin",
+    return new nx::sdk::analytics::CommonPlugin(
+        kLibName,
+        kPluginManifest,
         [](nx::sdk::analytics::Plugin* plugin)
         {
             return new nx::mediaserver_plugins::analytics::hikvision::Engine(

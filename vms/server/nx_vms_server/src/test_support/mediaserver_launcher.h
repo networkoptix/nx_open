@@ -68,6 +68,8 @@ public:
      * Return media server API url
      */
     nx::utils::Url apiUrl() const;
+    QString dataDir() const;
+
 signals:
     void started();
 private:

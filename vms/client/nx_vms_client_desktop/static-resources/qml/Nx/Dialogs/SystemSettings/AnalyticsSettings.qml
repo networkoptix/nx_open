@@ -33,6 +33,16 @@ Item
         }
     }
 
+    Connections
+    {
+        target: analyticsSettings.store || null
+        onSettingsValuesChanged:
+        {
+            if (engineId === currentEngineId)
+                settingsView.setValues(store.settingsValues(engineId))
+        }
+    }
+
     function activateEngine(engineId)
     {
         currentEngineId = engineId

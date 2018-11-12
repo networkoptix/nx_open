@@ -24,10 +24,10 @@ void AnalyticsNotificationManager::triggerNotification(
 {
     switch (tran.command)
     {
-        case ApiCommand::saveAnalyticsPlugin:
+        case ApiCommand::removeAnalyticsPlugin:
             emit analyticsPluginRemoved(QnUuid(tran.params.id));
             break;
-        case ApiCommand::saveAnalyticsEngine:
+        case ApiCommand::removeAnalyticsEngine:
             emit analyticsEngineRemoved(QnUuid(tran.params.id));
             break;
         default:

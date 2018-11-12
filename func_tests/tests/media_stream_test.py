@@ -8,7 +8,7 @@ from framework.mediaserver_api import TimePeriod
 # https://networkoptix.atlassian.net/browse/TEST-181
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/23920667/Media+stream+loading+test
 def test_media_stream_should_be_loaded_correctly(
-        artifact_factory, one_running_mediaserver, camera, sample_media_file, stream_type):
+        artifacts_dir, one_running_mediaserver, camera, sample_media_file, stream_type):
     # prepare media archive
     one_running_mediaserver.api.add_camera(camera)
     start_time = datetime(2017, 1, 27, tzinfo=pytz.utc)
@@ -19,8 +19,10 @@ def test_media_stream_should_be_loaded_correctly(
 
     # load stream
     stream = one_running_mediaserver.api.get_media_stream(stream_type, camera.mac_addr)
+    local_dir = artifacts_dir / 'stream-media-{}'.format(stream_type)
+    local_dir.mkdir(parents=True, exist_ok=True)
     metadata_list = stream.load_archive_stream_metadata(
-        artifact_factory.make_artifact(['stream-media', stream_type]),
+        local_dir,
         pos=start_time, duration=sample_media_file.duration)
     for metadata in metadata_list:
         assert metadata.width == sample_media_file.width

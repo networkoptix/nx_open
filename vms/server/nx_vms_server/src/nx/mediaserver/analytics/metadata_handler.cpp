@@ -16,6 +16,8 @@
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include <media_server/media_server_module.h>
 
+#include <core/resource/camera_resource.h>
+
 namespace nx {
 namespace mediaserver {
 namespace analytics {
@@ -31,12 +33,15 @@ MetadataHandler::MetadataHandler(QnMediaServerModule* serverModule):
         Qt::QueuedConnection);
 }
 
-nx::vms::api::analytics::EventType MetadataHandler::eventTypeDescriptor(const QString& eventTypeId) const
+nx::vms::api::analytics::EventType MetadataHandler::eventTypeDescriptor(
+    const QString& eventTypeId) const
 {
-    for (const auto& descriptor: m_manifest.eventTypes)
+    for (const auto& entry: m_eventTypeDescriptors)
     {
-        if (descriptor.id == eventTypeId)
-            return descriptor;
+        const auto& id = entry.first;
+        const auto& descriptor = entry.second;
+        if (id == eventTypeId)
+            return descriptor.item;
     }
     return nx::vms::api::analytics::EventType();
 }
@@ -149,8 +154,8 @@ void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<ObjectsMetadataPacket>
     if (data.timestampUsec <= 0)
         NX_WARNING(this, "Invalid ObjectsMetadataPacket timestamp: %1", data.timestampUsec);
 
-    if (m_dataReceptor && data.timestampUsec >= 0) //< Warn about 0 but still accept it.
-        m_dataReceptor->putData(nx::common::metadata::toMetadataPacket(data));
+    if (m_metadataSink && data.timestampUsec >= 0) //< Warn about 0 but still accept it.
+        m_metadataSink->putData(nx::common::metadata::toMetadataPacket(data));
 
     if (m_visualDebugger)
         m_visualDebugger->push(nx::common::metadata::toMetadataPacket(data));
@@ -186,7 +191,7 @@ void MetadataHandler::handleMetadataEvent(
 
     auto sdkEvent = nx::vms::event::AnalyticsSdkEventPtr::create(
         m_resource,
-        m_manifest.pluginId,
+        m_pluginId,
         eventTypeId,
         eventState,
         eventData->caption(),
@@ -203,24 +208,29 @@ void MetadataHandler::handleMetadataEvent(
     emit sdkEventTriggered(sdkEvent);
 }
 
-void MetadataHandler::setResource(const QnSecurityCamResourcePtr& resource)
+void MetadataHandler::setResource(QnVirtualCameraResourcePtr resource)
 {
-    m_resource = resource;
+    m_resource = std::move(resource);
 }
 
-void MetadataHandler::setManifest(const nx::vms::api::analytics::EngineManifest& manifest)
+void MetadataHandler::setPluginId(QString pluginId)
 {
-    m_manifest = manifest;
+    m_pluginId = std::move(pluginId);
 }
 
-void MetadataHandler::registerDataReceptor(QnAbstractDataReceptor* dataReceptor)
+void MetadataHandler::setEventTypeDescriptors(DescriptorMap descriptors)
 {
-    m_dataReceptor = dataReceptor;
+    m_eventTypeDescriptors = std::move(descriptors);
 }
 
-void MetadataHandler::removeDataReceptor(QnAbstractDataReceptor* dataReceptor)
+void MetadataHandler::setMetadataSink(QnAbstractDataReceptor* dataReceptor)
 {
-    m_dataReceptor = nullptr;
+    m_metadataSink = dataReceptor;
+}
+
+void MetadataHandler::removeMetadataSink(QnAbstractDataReceptor* dataReceptor)
+{
+    m_metadataSink = nullptr;
 }
 
 void MetadataHandler::setVisualDebugger(

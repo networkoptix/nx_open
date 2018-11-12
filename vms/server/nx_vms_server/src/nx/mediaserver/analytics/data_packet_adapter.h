@@ -2,9 +2,7 @@
 
 #include <nx/streaming/abstract_data_packet.h>
 
-namespace nx {
-namespace mediaserver {
-namespace analytics {
+namespace nx::mediaserver::analytics {
 
 /**
  * Wrapper for nx::sdk::analytics::DataPacket into internal VMS data packet.
@@ -20,6 +18,4 @@ private:
     nxpt::ScopedRef<nx::sdk::analytics::DataPacket> m_packet;
 };
 
-} // namespace analytics
-} // namespace mediaserver
-} // namespace nx
+} // namespace nx::mediaserver::analytics

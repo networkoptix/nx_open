@@ -9,6 +9,7 @@
 #include <nx/sdk/analytics/common_metadata_packet.h>
 #include <nx/sdk/analytics/common_event.h>
 #include <nx/sdk/analytics/common_object.h>
+#include <nx/sdk/common_settings.h>
 
 #define NX_PRINT_PREFIX (this->utils.printPrefix)
 #include <nx/kit/debug.h>
@@ -37,7 +38,7 @@ DeviceAgent::DeviceAgent(Engine* engine):
  * manifest. Also this manifest may declare supportedEventTypeIds and supportedObjectTypeIds lists
  * which are treated as white-list filters for the respective set.
  */
-std::string DeviceAgent::manifest()
+std::string DeviceAgent::manifest() const
 {
     return /*suppress newline*/1 + R"json(
 {
@@ -62,7 +63,7 @@ std::string DeviceAgent::manifest()
             },
             "flags": "stateDependent|regionDependent"
         }
-    ],
+    ]
 }
 )json";
 }
@@ -131,7 +132,18 @@ bool DeviceAgent::pullMetadataPackets(std::vector<MetadataPacket*>* metadataPack
     return true;
 }
 
-Error DeviceAgent::startFetchingMetadata(const char* const* /*typeList*/, int /*typeListSize*/)
+Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+{
+    if (metadataTypes->isNull())
+    {
+        stopFetchingMetadata();
+        return Error::noError;
+    }
+
+    return startFetchingMetadata(metadataTypes);
+}
+
+Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
 {
     NX_OUTPUT << __func__ << "() BEGIN";
 
@@ -155,14 +167,15 @@ Error DeviceAgent::startFetchingMetadata(const char* const* /*typeList*/, int /*
     if (ini().generateEvents)
     {
         NX_PRINT << "Starting event generation thread";
-        m_thread.reset(new std::thread(metadataDigger));
+        if (!m_thread)
+            m_thread.reset(new std::thread(metadataDigger));
     }
 
     NX_OUTPUT << __func__ << "() END -> noError";
     return Error::noError;
 }
 
-Error DeviceAgent::stopFetchingMetadata()
+void DeviceAgent::stopFetchingMetadata()
 {
     NX_OUTPUT << __func__ << "() BEGIN";
     m_stopping = true;
@@ -178,7 +191,14 @@ Error DeviceAgent::stopFetchingMetadata()
     m_stopping = false;
 
     NX_OUTPUT << __func__ << "() END -> noError";
-    return Error::noError;
+}
+
+nx::sdk::Settings* DeviceAgent::settings() const
+{
+    auto settings = new nx::sdk::CommonSettings();
+    settings->addSetting("nx.stub.device_agent.settings.number_0", "100");
+
+    return settings;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -266,7 +286,7 @@ MetadataPacket* DeviceAgent::cookSomeObjects()
     auto objectPacket = new CommonObjectsMetadataPacket();
 
     objectPacket->setTimestampUsec(m_lastVideoFrameTimestampUsec);
-    objectPacket->setDurationUsec(1000000LL * 10);
+    objectPacket->setDurationUsec(0);
     objectPacket->addItem(commonObject);
     return objectPacket;
 }
@@ -321,7 +341,23 @@ bool DeviceAgent::checkFrame(const UncompressedVideoFrame* frame) const
         }
 
         // Hex-dump some bytes from raw pixel data.
-        if (NX_DEBUG_ENABLE_OUTPUT)
+        if (frame->handle() != 0)
+        {
+            if (frame->data(0) != nullptr)
+            {
+                NX_PRINT << __func__
+                    << "() ERROR: data() is not null while handle() is not zero";
+                return false;
+            }
+            if (!frame->map())
+            {
+                NX_PRINT << __func__ << "() ERROR: map() failed";
+                return false;
+            }
+            NX_PRINT_HEX_DUMP("First byte of frame data(0)", frame->data(0), 1);
+            frame->unmap();
+        }
+        else if (NX_DEBUG_ENABLE_OUTPUT)
         {
             static const int dumpOffset = 0;
             static const int dumpSize = 12;
@@ -333,9 +369,9 @@ bool DeviceAgent::checkFrame(const UncompressedVideoFrame* frame) const
             }
             else
             {
-                NX_PRINT_HEX_DUMP(nx::kit::debug::format(
-                    "Plane %d bytes %d..%d of %d",
-                    plane, dumpOffset, dumpOffset + dumpSize - 1, frame->dataSize(plane)).c_str(),
+                NX_PRINT_HEX_DUMP(
+                    nx::kit::debug::format("Plane %d bytes %d..%d of %d",
+                        plane, dumpOffset, dumpOffset + dumpSize - 1, frame->dataSize(plane)).c_str(),
                     frame->data(plane) + dumpOffset, dumpSize);
             }
         }

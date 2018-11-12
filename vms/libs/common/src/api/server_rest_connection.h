@@ -417,6 +417,30 @@ public:
         Result<QList<nx::vms::api::ModuleInformation>>::type callback,
         QThread* targetThread = nullptr);
 
+    Handle getEngineAnalyticsSettings(
+        const nx::vms::common::AnalyticsEngineResourcePtr& engine,
+        Result<QJsonObject>::type&& callback,
+        QThread* targetThread = nullptr);
+    
+    Handle setEngineAnalyticsSettings(
+        const nx::vms::common::AnalyticsEngineResourcePtr& engine,
+        const QJsonObject& settings,
+        std::function<void (bool, Handle, const QJsonObject&)>&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle getDeviceAnalyticsSettings(
+        const QnVirtualCameraResourcePtr& device,
+        const nx::vms::common::AnalyticsEngineResourcePtr& engine,
+        Result<QJsonObject>::type&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle setDeviceAnalyticsSettings(
+        const QnVirtualCameraResourcePtr& device,
+        const nx::vms::common::AnalyticsEngineResourcePtr& engine,
+        const QJsonObject& settings,
+        std::function<void(bool, Handle, const QJsonObject&)>&& callback,
+        QThread* targetThread = nullptr);
+
     /**
      * Cancel running request by known requestID. If request is canceled, callback isn't called.
      * If target thread has been used then callback may be called after 'cancelRequest' in case of data already received and queued to a target thread.

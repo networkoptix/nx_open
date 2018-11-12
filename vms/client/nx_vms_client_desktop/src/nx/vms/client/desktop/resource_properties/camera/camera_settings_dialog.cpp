@@ -12,7 +12,9 @@
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
+#include <ui/common/read_only.h>
 #include <utils/common/html.h>
+#include <utils/common/event_processors.h>
 #include <utils/license_usage_helper.h>
 #include <client_core/client_core_module.h>
 
@@ -21,6 +23,7 @@
 #include "redux/camera_settings_dialog_store.h"
 #include "utils/camera_settings_dialog_state_conversion_functions.h"
 #include "utils/license_usage_provider.h"
+#include "utils/device_agent_settings_adaptor.h"
 #include "watchers/camera_settings_license_watcher.h"
 #include "watchers/camera_settings_readonly_watcher.h"
 #include "watchers/camera_settings_analytics_engines_watcher.h"
@@ -35,6 +38,7 @@
 #include "widgets/camera_analytics_settings_widget.h"
 #include "widgets/camera_web_page_widget.h"
 #include "widgets/io_module_settings_widget.h"
+#include "camera_advanced_settings_widget.h"
 
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
@@ -42,7 +46,7 @@
 
 namespace nx::vms::client::desktop {
 
-struct CameraSettingsDialog::Private
+struct CameraSettingsDialog::Private: public QObject
 {
     CameraSettingsDialog* const q;
     QPointer<CameraSettingsDialogStore> store;
@@ -53,13 +57,54 @@ struct CameraSettingsDialog::Private
     QnVirtualCameraResourceList cameras;
     QPointer<QnCamLicenseUsageHelper> licenseUsageHelper;
     QSharedPointer<CameraThumbnailManager> previewManager;
+    QPointer<CameraAdvancedSettingsWidget> advancedSettingsWidget;
+    QPointer<DeviceAgentSettingsAdaptor> deviceAgentSettingsAdaptor;
 
     Private(CameraSettingsDialog* q): q(q) {}
+
+    void tryReloadAdvancedSettings()
+    {
+        if (q->currentPage() == int(CameraSettingsTab::advanced))
+            advancedSettingsWidget->reloadData();
+    }
+
+    void initializeAdvancedSettingsWidget()
+    {
+        advancedSettingsWidget = new CameraAdvancedSettingsWidget(q->ui->tabWidget);
+        installEventHandler(q, QEvent::Show, advancedSettingsWidget,
+            [this](QObject* /*watched*/, QEvent* /*event*/)
+            {
+                advancedSettingsWidget->updateFromResource();
+            });
+
+        connect(advancedSettingsWidget, &CameraAdvancedSettingsWidget::hasChangesChanged,
+            q, &CameraSettingsDialog::updateButtonsAvailability);
+        connect(q->ui->tabWidget, &QTabWidget::currentChanged,
+            this, &Private::tryReloadAdvancedSettings);
+
+        const auto updateReadOnlyState =
+            [this]() { ::setReadOnly(advancedSettingsWidget, readOnlyWatcher->isReadOnly()); };
+        updateReadOnlyState();
+        connect(readOnlyWatcher, &CameraSettingsReadOnlyWatcher::readOnlyChanged,
+            this, updateReadOnlyState);
+    }
+
+    void handleCamerasChanged()
+    {
+        const bool advancedSettingsAreVisible = cameras.size() == 1;
+        q->setPageVisible(int(CameraSettingsTab::advanced), true);
+        if (advancedSettingsAreVisible)
+        {
+            advancedSettingsWidget->setCamera(cameras.first());
+            advancedSettingsWidget->updateFromResource();
+            tryReloadAdvancedSettings();
+        }
+    }
 
     bool hasChanges() const
     {
         return !cameras.empty()
-            && store->state().hasChanges
+            && (store->state().hasChanges || advancedSettingsWidget->hasChanges())
             && !store->state().readOnly;
     }
 
@@ -71,6 +116,8 @@ struct CameraSettingsDialog::Private
                 store->setRecordingEnabled(false);
         }
 
+        deviceAgentSettingsAdaptor->applySettings();
+
         store->applyChanges();
         const auto& state = store->state();
 
@@ -78,6 +125,8 @@ struct CameraSettingsDialog::Private
             [this, &state]
             {
                 CameraSettingsDialogStateConversionFunctions::applyStateToCameras(state, cameras);
+                if (advancedSettingsWidget->hasChanges())
+                    advancedSettingsWidget->submitToResource();
             };
 
         const auto backout =
@@ -93,6 +142,8 @@ struct CameraSettingsDialog::Private
     void resetChanges()
     {
         store->loadCameras(cameras);
+
+        handleCamerasChanged();
     }
 
     void handleAction(ui::action::IDType action)
@@ -184,6 +235,8 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     d->previewManager->setThumbnailSize(QSize(0, 0));
     d->previewManager->setAutoRefresh(false);
 
+    d->deviceAgentSettingsAdaptor = new DeviceAgentSettingsAdaptor(d->store, this);
+
     new CameraSettingsGlobalSettingsWatcher(d->store, this);
     new CameraSettingsGlobalPermissionsWatcher(d->store, this);
 
@@ -224,16 +277,29 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         new CameraFisheyeSettingsWidget(d->previewManager, d->store, ui->tabWidget),
         tr("Fisheye"));
 
+    d->initializeAdvancedSettingsWidget();
+    addPage(
+        int(CameraSettingsTab::advanced),
+        d->advancedSettingsWidget,
+        tr("Advanced"));
+
     addPage(
         int(CameraSettingsTab::web),
         new CameraWebPageWidget(d->store, ui->tabWidget),
         tr("Web Page"));
 
+    const auto analyticsSettingsWidget = new CameraAnalyticsSettingsWidget(
+        d->store, qnClientCoreModule->mainQmlEngine(), ui->tabWidget);
     addPage(
         int(CameraSettingsTab::analytics),
-        new CameraAnalyticsSettingsWidget(
-            d->store, qnClientCoreModule->mainQmlEngine(), ui->tabWidget),
+        analyticsSettingsWidget,
         tr("Analytics"));
+    connect(analyticsSettingsWidget, &CameraAnalyticsSettingsWidget::currentEngineIdChanged, this,
+        [this](const QnUuid& engineId)
+        {
+            if (!engineId.isNull())
+                d->deviceAgentSettingsAdaptor->refreshSettings(engineId);
+        });
 
     addPage(
         int(CameraSettingsTab::expert),
@@ -285,8 +351,8 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         [this]() { d->handleCamerasWithDefaultPasswordChanged(); });
 
     // Make sure we will not handle stateChanged, triggered when creating watchers.
-    connect(d->store, &CameraSettingsDialogStore::stateChanged, this,
-        &CameraSettingsDialog::loadState);
+    connect(d->store, &CameraSettingsDialogStore::stateChanged,
+        this, &CameraSettingsDialog::updateState);
 }
 
 CameraSettingsDialog::~CameraSettingsDialog()
@@ -313,7 +379,8 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
         !force
         && isVisible()
         && d->cameras != cameras
-        && d->hasChanges();
+        && (d->hasChanges()
+            || d->store->state().analytics.loading);
 
     if (askConfirmation)
     {
@@ -331,16 +398,19 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
         }
     }
 
+    const auto singleCamera = cameras.size() == 1 ? cameras.first() : QnVirtualCameraResourcePtr();
+
     d->cameras = cameras;
     d->resetChanges();
     d->licenseWatcher->setCameras(cameras);
     d->readOnlyWatcher->setCameras(cameras);
     d->wearableStateWatcher->setCameras(cameras);
-    d->previewManager->selectCamera(cameras.size() == 1
-        ? cameras.front()
-        : QnVirtualCameraResourcePtr());
+    d->previewManager->selectCamera(singleCamera);
+    d->deviceAgentSettingsAdaptor->setCamera(singleCamera);
 
     d->handleCamerasWithDefaultPasswordChanged();
+    d->handleCamerasChanged();
+
     return true;
 }
 
@@ -388,9 +458,28 @@ QDialogButtonBox::StandardButton CameraSettingsDialog::showConfirmationDialog()
     return QDialogButtonBox::StandardButton(messageBox.exec());
 }
 
-void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
+void CameraSettingsDialog::updateButtonsAvailability()
+{
+    if (!buttonBox())
+        return;
+
+    const auto& state = d->store->state();
+
+    const auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
+    const auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
+
+    if (okButton)
+        okButton->setEnabled(!state.readOnly);
+
+    if (applyButton)
+        applyButton->setEnabled(d->hasChanges());
+}
+
+void CameraSettingsDialog::updateState()
 {
     static const QString kWindowTitlePattern = lit("%1 - %2");
+
+    const auto& state = d->store->state();
 
     const QString caption = QnCameraDeviceStringSet(
         tr("Device Settings"),
@@ -407,17 +496,7 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
 
     setWindowTitle(kWindowTitlePattern.arg(caption).arg(description));
 
-    if (buttonBox())
-    {
-        const auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
-        const auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
-
-        if (okButton)
-            okButton->setEnabled(!state.readOnly);
-
-        if (applyButton)
-            applyButton->setEnabled(!state.readOnly && state.hasChanges);
-    }
+    updateButtonsAvailability();
 
     // TODO: #vkutin #gdm Ensure correct visibility/enabled state.
     // Legacy code has more complicated conditions.

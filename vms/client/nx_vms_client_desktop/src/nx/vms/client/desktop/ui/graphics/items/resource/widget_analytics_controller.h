@@ -1,7 +1,8 @@
 #pragma once
 
+#include <chrono>
+
 #include <nx/client/core/media/analytics_fwd.h>
-#include <client_core/connection_context_aware.h>
 
 class QnMediaResourceWidget;
 
@@ -9,15 +10,15 @@ namespace nx::vms::client::desktop {
 
 class AreaHighlightOverlayWidget;
 
-class WidgetAnalyticsController: public QObject, public QnConnectionContextAware
+class WidgetAnalyticsController: public QObject
 {
     using base_type = QObject;
 
 public:
     WidgetAnalyticsController(QnMediaResourceWidget* mediaResourceWidget);
-    virtual ~WidgetAnalyticsController();
+    virtual ~WidgetAnalyticsController() override;
 
-    void updateAreas(qint64 timestamp, int channel);
+    void updateAreas(std::chrono::microseconds timestamp, int channel);
     void clearAreas();
 
     void updateAreaForZoomWindow();
@@ -27,7 +28,7 @@ public:
 
 private:
     class Private;
-    QScopedPointer<Private> const d;
+    const QScopedPointer<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

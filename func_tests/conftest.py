@@ -11,7 +11,6 @@ from pathlib2 import Path
 from six.moves import shlex_quote
 
 from defaults import defaults
-from framework.artifact import Artifact, ArtifactFactory, ArtifactType
 from framework.ca import CA
 from framework.config import SingleTestConfig, TestParameter, TestsConfig
 from framework.metrics_saver import MetricsSaver
@@ -156,23 +155,15 @@ mimetypes.add_type('application/vnd.tcpdump.pcap', '.pcap')
 mimetypes.add_type('text/plain', '.log')
 mimetypes.add_type('application/x-yaml', '.yaml')
 mimetypes.add_type('application/x-yaml', '.yml')
+mimetypes.add_type('video/x-matroska', '.mkv')
 
 
 @pytest.fixture()
-def artifacts_dir(node_dir, artifact_set):
+def artifacts_dir(node_dir):
     artifacts_dir = node_dir / 'artifacts'
     artifacts_dir.mkdir(exist_ok=True)
     _logger.info("Artifacts dir: %s", artifacts_dir)
-    yield artifacts_dir
-    for entry in artifacts_dir.glob('**/*'):
-        if entry.is_dir():
-            continue
-        # noinspection PyUnresolvedReferences
-        mime_type = mimetypes.types_map.get(entry.suffix, 'application/octet-stream')
-        type = ArtifactType(entry.suffix[1:] if entry.suffix else 'unknown_type', mime_type, ext=entry.suffix)
-        name = str(entry.relative_to(artifacts_dir))
-        is_error = any(word in entry.name for word in {'core', 'backtrace'})
-        artifact_set.add(Artifact(entry, name=name, is_error=is_error, artifact_type=type))
+    return artifacts_dir
 
 
 @pytest.fixture(scope='session')
@@ -224,47 +215,40 @@ def test_config(request, tests_config):
         return tests_config.get_test_config(request.node.nodeid)
 
 
-@pytest.fixture()
-def junk_shop_repository(request):
+@pytest.fixture(autouse=True)
+def junk_shop_repository(request, artifacts_dir):
     db_capture_plugin = request.config.pluginmanager.getplugin(JUNK_SHOP_PLUGIN_NAME)
     if db_capture_plugin:
-        db_capture_repository = db_capture_plugin.repo
+        repository = db_capture_plugin.repo
         current_test_run = db_capture_plugin.current_test_run
         assert current_test_run
-    else:
-        db_capture_repository = None
-        current_test_run = None
-    return db_capture_repository, current_test_run
-
-
-@pytest.fixture()
-def artifact_set(junk_shop_repository):
-    artifact_set = set()
-    yield artifact_set
-    repository, current_test_run = junk_shop_repository
-    if repository:
-        for artifact in sorted(artifact_set, key=lambda artifact: artifact.name):
-            assert artifact.artifact_type, repr(artifact)
-            _logger.info('Storing artifact: %r', artifact)
-            if not artifact.path.exists():
-                _logger.warning('Artifact file is missing, skipping: %s' % artifact.path)
+        yield repository, current_test_run
+        for artifact_file in artifacts_dir.glob('**/*'):
+            if artifact_file.is_dir():
                 continue
-            data = artifact.path.read_bytes()
-            repository_artifact_type = artifact.artifact_type.produce_repository_type(repository)
-            _logger.info("Save artifact: %r", artifact)
+            _logger.info('Storing artifact: %r', artifact_file)
+            if artifact_file.suffix:
+                # noinspection PyUnresolvedReferences
+                mime_type = mimetypes.types_map.get(artifact_file.suffix, 'application/octet-stream')
+                repository_artifact_type = repository.artifact_type(
+                    artifact_file.suffix[1:].upper(), mime_type, artifact_file.suffix)
+            else:
+                repository_artifact_type = repository.artifact_type(
+                    'UNTYPED', 'application/octet-stream', '')
+            name = str(artifact_file.relative_to(artifacts_dir))
+            is_error = any(word in artifact_file.name for word in {'core', 'backtrace'})
+            data = artifact_file.read_bytes()
             repository.add_artifact_with_session(
                 current_test_run,
-                artifact.name,
-                artifact.full_name or artifact.name,
+                name,
+                name,
                 repository_artifact_type,
                 data,
-                artifact.is_error or False,
+                is_error,
                 )
 
-
-@pytest.fixture()
-def artifact_factory(node_dir, artifact_set):
-    return ArtifactFactory.from_path(artifact_set, node_dir)
+    else:
+        yield None, None
 
 
 @pytest.fixture()

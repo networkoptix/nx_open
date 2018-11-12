@@ -118,10 +118,9 @@ private:
 
     struct TrackInfo
     {
-        TrackInfo(): ioDevice(0), parser(0) {}
-        ~TrackInfo() { }
-        QnRtspIoDevice* ioDevice; //< External reference; do not delete.
+        QnRtspIoDevice* ioDevice = nullptr; //< External reference; do not delete.
         std::shared_ptr<nx::streaming::rtp::StreamParser> parser;
+        nx::streaming::Sdp::MediaType mediaType;
         std::optional<std::chrono::microseconds> onvifExtensionTimestamp;
         int rtcpChannelNumber = 0;
     };
@@ -143,7 +142,7 @@ private:
     void updateOnvifTime(
         int rtpBufferOffset,
         int rtpPacketSize,
-        int track,
+        TrackInfo& track,
         int rtpChannel);
 
 private slots:
@@ -154,6 +153,7 @@ private:
     QnRtspClient m_RtpSession;
     QVector<bool> m_gotKeyDataInfo;
     QVector<TrackInfo> m_tracks;
+    std::map<int, int> m_trackIndices;
 
     QString m_request;
 

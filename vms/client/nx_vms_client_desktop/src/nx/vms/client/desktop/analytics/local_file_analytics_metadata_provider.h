@@ -11,14 +11,14 @@ public:
     LocalFileAnalyticsMetadataProvider(const QnResourcePtr& resource);
 
     virtual nx::common::metadata::DetectionMetadataPacketPtr metadata(
-        qint64 timestamp,
+        std::chrono::microseconds timestamp,
         int channel) const override;
 
     virtual QList<nx::common::metadata::DetectionMetadataPacketPtr> metadataRange(
-        qint64 startTimestamp,
-        qint64 endTimestamp,
+        std::chrono::microseconds startTimestamp,
+        std::chrono::microseconds endTimestamp,
         int channel,
-        int maximumCount = -1) const override;
+        int maximumCount) const override;
 
 private:
     std::vector<nx::common::metadata::DetectionMetadataPacket> m_metadata;

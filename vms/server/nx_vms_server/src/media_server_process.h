@@ -183,7 +183,7 @@ private:
     void addCommandLineParametersFromConfig(MSSettings* settings);
     void saveServerInfo(const QnMediaServerResourcePtr& server);
 
-    nx::utils::log::Settings makeLogSettings();
+    nx::utils::log::Settings makeLogSettings(const nx::mediaserver::Settings& settings);
 
     void initializeLogging();
     void initializeHardwareId();
@@ -247,6 +247,7 @@ private:
     QnMediaServerResourcePtr m_mediaServer;
     std::unique_ptr<QTimer> m_generalTaskTimer;
     std::unique_ptr<QTimer> m_udtInternetTrafficTimer;
+    std::unique_ptr<QTimer> m_createDbBackupTimer;
     QVector<QString> m_hardwareIdHlist;
     QnServerMessageProcessor* m_serverMessageProcessor = nullptr;
 

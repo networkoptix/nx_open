@@ -1,7 +1,7 @@
 #include "system_commands.h"
-#include <utils/common/util.h>
-#include <utils/fs/file.h>
 #include <QtCore/QDir>
+#include <QtCore/QString>
+#include <windows.h>
 
 namespace nx {
 
@@ -72,14 +72,78 @@ bool SystemCommands::rename(const std::string& oldPath, const std::string& newPa
         (LPCTSTR) QString::fromStdString(newPath).constData());
 }
 
+namespace {
+
+bool isLocalPath(const QString& folder)
+{
+    return folder.length() >= 2 && folder[1] == L':';
+}
+
+QString getParentFolder(const QString& root)
+{
+    QString newRoot = QDir::toNativeSeparators(root);
+    if (newRoot.endsWith(QDir::separator()))
+        newRoot.chop(1);
+    return newRoot.left(newRoot.lastIndexOf(QDir::separator()) + 1);
+}
+
+int64_t freeSpaceImpl(const QString& root)
+{
+    quint64 freeBytesAvailableToCaller = -1;
+    quint64 totalNumberOfBytes = -1;
+    quint64 totalNumberOfFreeBytes = -1;
+    BOOL status = GetDiskFreeSpaceEx(
+        (LPCWSTR)root.data(), // pointer to the directory name
+        (PULARGE_INTEGER)&freeBytesAvailableToCaller, // receives the number of bytes on disk available to the caller
+        (PULARGE_INTEGER)&totalNumberOfBytes, // receives the number of bytes on disk
+        (PULARGE_INTEGER)&totalNumberOfFreeBytes // receives the free bytes on disk
+    );
+    if (!status && isLocalPath(root)) {
+        QString newRoot = getParentFolder(root);
+        if (!newRoot.isEmpty())
+            return freeSpaceImpl(newRoot); // try parent folder
+    }
+    return freeBytesAvailableToCaller;
+}
+
+int64_t totalSpaceImpl(const QString& root)
+{
+    quint64 freeBytesAvailableToCaller = -1;
+    quint64 totalNumberOfBytes = -1;
+    quint64 totalNumberOfFreeBytes = -1;
+    BOOL status = GetDiskFreeSpaceEx(
+        (LPCWSTR)root.data(), // pointer to the directory name
+        (PULARGE_INTEGER)&freeBytesAvailableToCaller, // receives the number of bytes on disk available to the caller
+        (PULARGE_INTEGER)&totalNumberOfBytes, // receives the number of bytes on disk
+        (PULARGE_INTEGER)&totalNumberOfFreeBytes // receives the free bytes on disk
+    );
+    if (!status && isLocalPath(root)) {
+        QString newRoot = getParentFolder(root);
+        if (!newRoot.isEmpty())
+            return totalSpaceImpl(newRoot); // try parent folder
+    }
+    return totalNumberOfBytes;
+}
+
+qint64 fileSizeImpl(const QString& fileName)
+{
+    struct _stat64 fstat;
+    int retCode = _wstat64((wchar_t*)fileName.utf16(), &fstat);
+    if (retCode != 0)
+        return -1;
+    return fstat.st_size;
+}
+
+} // namespace
+
 int64_t SystemCommands::freeSpace(const std::string& path)
 {
-    return getDiskFreeSpace(QString::fromStdString(path));
+    return freeSpaceImpl(QString::fromStdString(path));
 }
 
 int64_t SystemCommands::totalSpace(const std::string& path)
 {
-    return getDiskTotalSpace(QString::fromStdString(path));
+    return totalSpaceImpl(QString::fromStdString(path));
 }
 
 bool SystemCommands::isPathExists(const std::string& path)
@@ -94,7 +158,7 @@ std::string SystemCommands::serializedFileList(const std::string& /*path*/)
 
 int64_t SystemCommands::fileSize(const std::string& path)
 {
-    return QnFile::getFileSize(QString::fromStdString(path));
+    return fileSizeImpl(QString::fromStdString(path));
 }
 
 std::string SystemCommands::devicePath(const std::string& path)

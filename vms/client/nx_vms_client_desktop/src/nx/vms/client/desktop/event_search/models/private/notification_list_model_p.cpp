@@ -139,9 +139,8 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     const auto ruleId = action->getRuleId();
 
     auto title = m_helper->eventAtResource(params, qnSettings->extraInfoInTree());
-    const auto timestampUs = params.eventTimestampUsec;
-    const auto timestampMs =
-        duration_cast<milliseconds>(microseconds(params.eventTimestampUsec)).count();
+    const microseconds timestamp(params.eventTimestampUsec);
+    const qint64 timestampMs = duration_cast<milliseconds>(timestamp).count();
 
     QnResourcePtr resource = resourcePool()->getResourceById(params.eventResourceId);
     auto camera = resource.dynamicCast<QnVirtualCameraResource>();
@@ -172,7 +171,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
             {
                 for (const auto& id: ids)
                 {
-                    if (q->indexOf(id).data(Qn::TimestampRole).value<qint64>() == timestampUs)
+                    if (q->indexOf(id).data(Qn::TimestampRole).value<microseconds>() == timestamp)
                         return;
                 }
             }
@@ -210,7 +209,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     eventData.toolTip = tooltip.join(lit("<br>"));
     eventData.helpId = QnBusiness::eventHelpId(params.eventType);
     eventData.level = QnNotificationLevel::valueOf(action);
-    eventData.timestampUs = timestampUs;
+    eventData.timestamp = timestamp;
     eventData.removable = true;
     eventData.extraData = qVariantFromValue(ExtraData(action->getRuleId(), resource));
 
@@ -243,7 +242,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
                 eventData.actionParameters = action::Parameters(camera)
                     .withArgument(Qn::ItemTimeRole, timestampMs);
                 eventData.previewCamera = camera;
-                eventData.previewTimeUs = timestampUs;
+                eventData.previewTime = timestamp;
                 break;
             }
 
@@ -305,7 +304,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
                     if (sourceCameras.size() == 1)
                         eventData.previewCamera = sourceCameras[0];
                     eventData.cameras = sourceCameras;
-                    eventData.previewTimeUs = timestampUs;
+                    eventData.previewTime = timestamp;
                     camera = sourceCameras.first();
                 }
                 break;
@@ -317,7 +316,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     }
 
     if (eventData.removable && action->actionType() != ActionType::playSoundAction)
-        eventData.lifetimeMs = std::chrono::milliseconds(kDisplayTimeout).count();
+        eventData.lifetime = kDisplayTimeout;
 
     if (action->actionType() == ActionType::showPopupAction && camera)
         setupAcknowledgeAction(eventData, camera, action);

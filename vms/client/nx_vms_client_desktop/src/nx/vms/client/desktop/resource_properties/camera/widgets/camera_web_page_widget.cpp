@@ -22,7 +22,7 @@
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/url/url_builder.h>
 
-#include <vms_gateway_embeddable.h>
+#include <nx/cloud/vms_gateway/vms_gateway_embeddable.h>
 
 namespace nx::vms::client::desktop {
 

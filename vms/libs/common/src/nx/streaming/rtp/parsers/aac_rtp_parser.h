@@ -15,7 +15,7 @@ class AacParser: public AudioStreamParser
 public:
     AacParser();
     virtual ~AacParser();
-    virtual void setSdpInfo(QList<QByteArray> sdpInfo) override;
+    virtual void setSdpInfo(const Sdp::Media& sdp) override;
 
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, bool& gotData) override;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;
@@ -33,7 +33,7 @@ private:
     int m_channels;
     int m_streamtype;
     QByteArray m_config;
-    QByteArray m_mode;
+    QString m_mode;
     bool m_auHeaderExists;
 
     AACCodec m_aacHelper;

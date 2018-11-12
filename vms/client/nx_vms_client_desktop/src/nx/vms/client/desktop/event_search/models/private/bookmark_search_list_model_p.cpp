@@ -71,13 +71,10 @@ QVariant BookmarkSearchListModel::Private::data(const QModelIndex& index, int ro
 
         case Qn::TimestampRole:
         case Qn::PreviewTimeRole:
-        {
-            using namespace std::chrono;
-            return QVariant::fromValue(microseconds(bookmark.startTimeMs).count());
-        }
+            return QVariant::fromValue(bookmark.startTimeMs);
 
         case Qn::DurationRole:
-            return QVariant::fromValue(microseconds(bookmark.durationMs).count());
+            return QVariant::fromValue(bookmark.durationMs);
 
         case Qn::UuidRole:
             return QVariant::fromValue(bookmark.guid);

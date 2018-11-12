@@ -76,8 +76,8 @@ namespace nxpl
         Setting(const char* name, const char* value): name(name), value(value) {}
     };
 
-    // {E53CF93D-61D3-4261-9D25-9B7B3F3A812B}
-    static const NX_GUID IID_Plugin = { { 0xe5, 0x3c, 0xf9, 0x3d, 0x61, 0xd3, 0x42, 0x61, 0x9d, 0x25, 0x9b, 0x7b, 0x3f, 0x3a, 0x81, 0x2b } };
+    static const NX_GUID IID_Plugin = //< {E53CF93D-61D3-4261-9D25-9B7B3F3A812B}
+        {{0xe5,0x3c,0xf9,0x3d,0x61,0xd3,0x42,0x61,0x9d,0x25,0x9b,0x7b,0x3f,0x3a,0x81,0x2b}};
 
     /**
      * Optional interface with general plugin features (name, settings). Server tries to cast
@@ -87,6 +87,9 @@ namespace nxpl
     class Plugin: public nxpl::PluginInterface
     {
     public:
+        /** Prototype of a plugin entry point function. */
+        typedef PluginInterface* (*EntryPoint)();
+
         virtual ~Plugin() {}
 
         /** Name of the plugin, used for information purpose only. */
@@ -98,56 +101,19 @@ namespace nxpl
          * @param settings This memory cannot be accessed after this method returns.
          * @param count Size of the settings array.
         */
-        virtual void setSettings( const nxpl::Setting* settings, int count ) = 0;
+        virtual void setSettings(const nxpl::Setting* settings, int count) = 0;
     };
 
-    // {100AFC3E-CA63-47FB-9D5D-0440FC59F866}
-    static const NX_GUID IID_Plugin2 = { { 0x10, 0x0a, 0xfc, 0x3e, 0xca, 0x63, 0x47, 0xfb, 0x9d, 0x5d, 0x4, 0x40, 0xfc, 0x59, 0xf8, 0x66 } };
+    static const NX_GUID IID_Plugin2 = //< {100AFC3E-CA63-47FB-9D5D-0440FC59F866}
+        {{0x10,0x0a,0xfc,0x3e,0xca,0x63,0x47,0xfb,0x9d,0x5d,0x4,0x40,0xfc,0x59,0xf8,0x66}};
 
-    class Plugin2
-    :
-        public Plugin
+    class Plugin2: public Plugin
     {
     public:
-        //!Provides plugin container reference to plugin
-        /*!
-            "Plugin container" is a process that loaded plugin.
-            This reference can be used to access some data and functionality of the container
-        */
-        virtual void setPluginContainer( nxpl::PluginInterface* pluginContainer ) = 0;
+        /**
+         * Provides an object which the plugin can use for calling back to access some data and
+         * functionality provided by the process that uses the plugin.
+         */
+        virtual void setPluginContainer(nxpl::PluginInterface* pluginContainer) = 0;
     };
-
-    static const NX_GUID IID_Plugin3
-        = {{0x73, 0x6b, 0xd7, 0xab, 0x46, 0x1c, 0x46, 0xf0, 0x91, 0x92, 0x56, 0x3b, 0x02, 0xed, 0xa1, 0x78}};
-
-    class Plugin3
-    :
-        public Plugin2
-    {
-    public:
-        //!Sets locale information to be used by the plugin.
-        /*!
-            \param locale is BCP47 language tag
-        */
-        virtual void setLocale(const char* locale) = 0;
-    };
-
-    //!Type of plugin entry-point function
-    typedef PluginInterface* (*CreateNXPluginInstanceProc)();
 }
-
-// TODO: Move NX_PLUGIN_API definition from here to cmake.
-#if !defined(NX_PLUGIN_API)
-    #if defined(_WIN32)
-        #define NX_PLUGIN_API __declspec(dllexport)
-    #else
-        #define NX_PLUGIN_API
-    #endif
-#endif
-
-//!Define to mark locale dependent output parameters and return values.
-#define NX_LOCALE_DEPENDENT
-
-//!Define to mark ASCII only output parameters and return values.
-#define NX_ASCII
-

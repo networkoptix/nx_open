@@ -3,9 +3,6 @@
 #include <chrono>
 
 #include <translation/datetime_formatter.h>
-#include <ui/graphics/items/controls/time_slider.h>
-#include <ui/workbench/workbench_navigator.h>
-#include <utils/common/scoped_value_rollback.h>
 #include <utils/common/synctime.h>
 
 #include <nx/utils/datetime.h>
@@ -27,7 +24,7 @@ QVariant AbstractEventListModel::data(const QModelIndex& index, int role) const
     switch (role)
     {
         case Qn::TimestampTextRole:
-            return timestampText(index.data(Qn::TimestampRole).value<qint64>());
+            return timestampText(index.data(Qn::TimestampRole).value<std::chrono::microseconds>());
 
         case Qt::AccessibleTextRole:
         case Qt::StatusTipRole:
@@ -47,6 +44,9 @@ QVariant AbstractEventListModel::data(const QModelIndex& index, int role) const
 
 bool AbstractEventListModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
+    if (!isValid(index) || index.model() != this)
+        return false;
+
     switch (role)
     {
         case Qn::DefaultNotificationRole:
@@ -66,13 +66,15 @@ bool AbstractEventListModel::isValid(const QModelIndex& index) const
         && index.row() >= 0 && index.row() < rowCount();
 }
 
-QString AbstractEventListModel::timestampText(qint64 timestampUs) const
+QString AbstractEventListModel::timestampText(std::chrono::microseconds timestamp) const
 {
-    if (timestampUs <= 0)
+    using namespace std::chrono;
+    using namespace std::literals::chrono_literals;
+
+    if (timestamp <= 0ms)
         return QString();
 
-    using namespace std::chrono;
-    const auto timestampMs = duration_cast<milliseconds>(microseconds(timestampUs)).count();
+    const auto timestampMs = duration_cast<milliseconds>(timestamp).count();
     const auto dateTime = QDateTime::fromMSecsSinceEpoch(timestampMs);
     if (qnSyncTime->currentDateTime().date() != dateTime.date())
         return datetime::toString(dateTime.date());
@@ -82,33 +84,12 @@ QString AbstractEventListModel::timestampText(qint64 timestampUs) const
 
 bool AbstractEventListModel::defaultAction(const QModelIndex& index)
 {
-    if (!isValid(index) || index.model() != this)
-        return false;
-
-    // TODO: #vkutin Introduce a new QnAction instead of direct access.
-    auto slider = navigator()->timeSlider();
-    if (!slider)
-        return false;
-
-    const auto timestampUsVariant = index.data(Qn::TimestampRole);
-    if (!timestampUsVariant.canConvert<qint64>())
-        return false;
-
-    const QnScopedTypedPropertyRollback<bool, QnTimeSlider> downRollback(slider,
-        &QnTimeSlider::setSliderDown,
-        &QnTimeSlider::isSliderDown,
-        true);
-
-    using namespace std::chrono;
-    const auto timestampMs = duration_cast<milliseconds>(microseconds(
-        timestampUsVariant.value<qint64>()));
-
-    slider->setValue(timestampMs, true);
-    return true;
+    return false;
 }
 
 bool AbstractEventListModel::activateLink(const QModelIndex& index, const QString& /*link*/)
 {
+    // Default fallback implementation.
     return defaultAction(index);
 }
 

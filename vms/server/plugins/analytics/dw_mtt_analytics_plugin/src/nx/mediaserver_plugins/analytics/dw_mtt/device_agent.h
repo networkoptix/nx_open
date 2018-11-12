@@ -65,19 +65,17 @@ public:
     /** When some bytes received from notification server or when connection was broken/closed. */
     void onReceive(SystemError::ErrorCode, size_t);
 
-    virtual nx::sdk::Error startFetchingMetadata(
-        const char* const* typeList, int typeListSize) override;
-
     virtual nx::sdk::Error setMetadataHandler(
         nx::sdk::analytics::MetadataHandler* metadataHandler) override;
 
-    virtual nx::sdk::Error stopFetchingMetadata() override;
+    virtual nx::sdk::Error setNeededMetadataTypes(
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
 
-    virtual const char* manifest(nx::sdk::Error* error) override;
+    virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
 
-    virtual void freeManifest(const char* data) override;
+    virtual void setSettings(const nx::sdk::Settings* settings) override;
 
-    virtual void setSettings(const nxpl::Setting* settings, int count) override;
+    virtual nx::sdk::Settings* settings() const override;
 
     QDomDocument createDomFromRequest(const QByteArray& request);
 
@@ -89,6 +87,12 @@ public:
     void readNextNotificationAsync();
 
     QByteArray extractRequestFromBuffer();
+
+private:
+    nx::sdk::Error startFetchingMetadata(
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes);
+
+    void stopFetchingMetadata();
 
 private:
     Engine* const m_engine;

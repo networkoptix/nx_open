@@ -22,7 +22,6 @@
 
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
-#include <nx/vms/event/analytics_helper.h>
 
 #include <client/client_globals.h>
 #include <client/client_settings.h>
@@ -52,6 +51,9 @@
 #include <utils/common/delayed.h>
 
 #include <nx/utils/log/log.h>
+
+#include <nx/analytics/descriptor_list_manager.h>
+#include <nx/vms/api/analytics/descriptors.h>
 
 using namespace nx;
 using namespace nx::vms::event;
@@ -102,7 +104,6 @@ QnVirtualCameraResourceList cameras(const QSet<QnUuid>& ids)
 }
 
 } // namespace
-
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     base_type(parent),
@@ -237,32 +238,58 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
 {
     NX_ASSERT(rootItem);
 
-    auto allEventTypes = m_filterCameraList.empty()
-        ? AnalyticsHelper(commonModule()).systemSupportedAnalyticsEvents()
-        : AnalyticsHelper::supportedAnalyticsEvents(cameras(m_filterCameraList));
+    const auto descriptorListManager = commonModule()->analyticsDescriptorListManager();
+
+    const auto allEventTypes = m_filterCameraList.empty()
+        ? descriptorListManager->allDescriptorsInTheSystem<
+            nx::vms::api::analytics::EventTypeDescriptor>()
+        : descriptorListManager->deviceDescriptors<
+            nx::vms::api::analytics::EventTypeDescriptor>(cameras(m_filterCameraList));
 
     if (allEventTypes.empty())
         return;
 
-    auto eventName =
-        [hasDifferentDrivers = AnalyticsHelper::hasDifferentDrivers(allEventTypes),
-            locale = qnRuntime->locale()]
-        (const AnalyticsHelper::EventTypeDescriptor& eventType)
+    const auto pluginIds = descriptorListManager->pluginIds(allEventTypes);
+
+    auto eventNames =
+        [hasDifferentDrivers = pluginIds.size() > 1, descriptorListManager](
+            const nx::vms::api::analytics::EventTypeDescriptor& descriptor)
         {
             if (!hasDifferentDrivers)
-                return eventType.name.text(locale);
+                return QStringList(descriptor.item.name.value);
 
-            return lit("%1 - %2")
-                .arg(eventType.pluginName.text(locale))
-                .arg(eventType.name.text(locale));
+            QStringList names;
+            for (const auto& path: descriptor.paths)
+            {
+                auto pluginDescriptor = descriptorListManager
+                    ->descriptor<nx::vms::api::analytics::PluginDescriptor>(path.pluginId);
+
+                if (!pluginDescriptor)
+                    continue;
+
+                names.push_back(
+                    lit("%1 - %2")
+                        .arg(pluginDescriptor->name)
+                        .arg(descriptor.item.name.value));
+            }
+
+            return names;
         };
 
-    for (const auto& eventType: allEventTypes)
+    for (const auto& entry: allEventTypes)
     {
-        auto item = new QStandardItem(eventName(eventType));
-        item->setData(EventType::analyticsSdkEvent, EventTypeRole);
-        item->setData(qVariantFromValue(eventType.id), EventSubtypeRole);
-        rootItem->appendRow(item);
+        const auto& descriptor = entry.second;
+        const auto names = eventNames(descriptor);
+
+        for (const auto& name : names)
+        {
+            auto item = new QStandardItem(name);
+            item->setData(EventType::analyticsSdkEvent, EventTypeRole);
+            // TODO: #dmishin Pass plugin id somehow.
+            item->setData(qVariantFromValue(descriptor.getId()), EventSubtypeRole);
+            rootItem->appendRow(item);
+        }
+
     }
 
     rootItem->sortChildren(0);
@@ -521,13 +548,15 @@ void QnEventLogDialog::requestFinished()
     auto end = ui->dateRangeWidget->endDate();
     if (start != end)
     {
-        ui->statusLabel->setText(tr("Event log for period from %1 to %2 - %n event(s) found", "", m_model->rowCount())
+        ui->statusLabel->setText(
+            tr("Event log for period from %1 to %2 - %n event(s) found", "", m_model->rowCount())
             .arg(start.toString(Qt::DefaultLocaleLongDate))
             .arg(end.toString(Qt::DefaultLocaleLongDate)));
     }
     else
     {
-        ui->statusLabel->setText(tr("Event log for %1 - %n event(s) found", "", m_model->rowCount())
+        ui->statusLabel->setText(
+            tr("Event log for %1 - %n event(s) found", "", m_model->rowCount())
             .arg(start.toString(Qt::DefaultLocaleLongDate)));
     }
 
@@ -617,7 +646,8 @@ void QnEventLogDialog::at_filterAction_triggered()
         eventType = parentEventType;
 
     QSet<QnUuid> camList;
-    const auto cameraResource = m_model->eventResource(idx.row()).dynamicCast<QnVirtualCameraResource>();
+    const auto cameraResource =
+        m_model->eventResource(idx.row()).dynamicCast<QnVirtualCameraResource>();
     if (cameraResource)
         camList << cameraResource->getId();
 
@@ -669,7 +699,8 @@ void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
 
 void QnEventLogDialog::at_exportAction_triggered()
 {
-    QnTableExportHelper::exportToFile(ui->gridEvents, true, this, tr("Export selected events to file"));
+    QnTableExportHelper::exportToFile(ui->gridEvents, true, this,
+        tr("Export selected events to file"));
 }
 
 void QnEventLogDialog::at_clipboardAction_triggered()

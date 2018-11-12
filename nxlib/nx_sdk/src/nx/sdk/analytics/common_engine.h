@@ -5,6 +5,7 @@
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/utils.h>
+#include <nx/sdk/settings.h>
 #include <nx/sdk/analytics/engine.h>
 #include <nx/sdk/analytics/objects_metadata_packet.h>
 
@@ -30,8 +31,6 @@ protected:
 
 protected:
     /**
-     * @param pluginName Full plugin name in English, capitalized as a header.
-     * @param libName Short plugin name: small_letters_and_underscores, as in the library filename.
      * @param enableOutput Enables NX_OUTPUT. Typically, use NX_DEBUG_ENABLE_OUTPUT as a value.
      * @param printPrefix Prefix for NX_PRINT and NX_OUTPUT. If empty, will be made from libName.
      */
@@ -98,8 +97,10 @@ public:
 
 public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
-    virtual void setSettings(const nxpl::Setting* settings, int count) override;
-    virtual const char* manifest(Error* error) const override;
+    virtual void setSettings(const nx::sdk::Settings* settings) override;
+    virtual nx::sdk::Settings* settings() const override;
+    virtual const IString* manifest(Error* error) const override;
+
     virtual void executeAction(Action* action, Error* outError) override;
 
 private:
@@ -108,7 +109,6 @@ private:
 private:
     Plugin* const m_plugin;
     std::map<std::string, std::string> m_settings;
-    mutable std::string m_manifest; //< Cache the manifest to guarantee a lifetime for char*.
 };
 
 } // namespace analytics

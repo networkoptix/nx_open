@@ -61,7 +61,7 @@ static UncompressedVideoFrame* createUncompressedVideoFrameFromVideoDecoderOutpu
         std::move(data), std::move(lineSize));
 }
 
-DataPacket* FrameConverter::getDataPacket(boost::optional<PixelFormat> pixelFormat)
+DataPacket* FrameConverter::getDataPacket(std::optional<PixelFormat> pixelFormat)
 {
     if (!pixelFormat)
     {
@@ -79,14 +79,14 @@ DataPacket* FrameConverter::getDataPacket(boost::optional<PixelFormat> pixelForm
 
     if (const auto uncompressedFrame = m_getUncompressedFrame())
     {
-        auto it = m_uncompressedFrames.find(pixelFormat.get());
+        auto it = m_uncompressedFrames.find(*pixelFormat);
         if (it == m_uncompressedFrames.cend())
         {
             auto insertResult = m_uncompressedFrames.emplace(
-                pixelFormat.get(),
+                *pixelFormat,
                 nxpt::ScopedRef<UncompressedVideoFrame>(
                     createUncompressedVideoFrameFromVideoDecoderOutput(
-                        uncompressedFrame, pixelFormat.get()),
+                        uncompressedFrame, *pixelFormat),
                     /*increaseRef*/ false));
             it = insertResult.first;
         }

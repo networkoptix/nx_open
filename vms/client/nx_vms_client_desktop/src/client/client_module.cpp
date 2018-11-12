@@ -64,10 +64,10 @@
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/http/http_mod_manager.h>
-#include <vms_gateway_embeddable.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/app_info.h>
 #include <nx_ec/dummy_handler.h>
+#include <nx/cloud/vms_gateway/vms_gateway_embeddable.h>
 
 #include <platform/platform_abstraction.h>
 
@@ -706,6 +706,11 @@ QnCloudStatusWatcher* QnClientModule::cloudStatusWatcher() const
 QnCameraDataManager* QnClientModule::cameraDataManager() const
 {
     return m_cameraDataManager;
+}
+
+QnClientCoreModule* QnClientModule::clientCoreModule() const
+{
+    return m_clientCoreModule.data();
 }
 
 nx::vms::client::desktop::RadassController* QnClientModule::radassController() const

@@ -12,9 +12,10 @@
 
 namespace nx::vms::client::desktop {
 
-namespace {
+using namespace std::chrono;
+using namespace nx::common::metadata;
 
-static constexpr qint64 kDefaultDuration = 100;
+namespace {
 
 static QRectF randomRect()
 {
@@ -28,17 +29,17 @@ static QRectF randomRect()
         h);
 }
 
-struct DemoAnalyticsObject: nx::common::metadata::DetectedObject
+struct DemoAnalyticsObject: DetectedObject
 {
     QPointF movementSpeed;
 
-    DemoAnalyticsObject animated(std::chrono::milliseconds dt)
+    DemoAnalyticsObject animated(microseconds dt)
     {
         // Ping-pong movement animation.
 
         auto movedCoordinate = [dt](qreal value, qreal speed, qreal space)
             {
-                value = std::abs(value + speed * (dt.count() / 1000.0));
+                value = std::abs(value + speed * (dt.count() / 1000000.0));
 
                 int reflections = static_cast<int>(value / space);
                 value -= space * reflections;
@@ -62,10 +63,9 @@ class DemoAnalyticsMetadataProvider::Private
 {
 public:
     int objectsCount = 0;
-    qint64 duration = kDefaultDuration;
 
     QVector<DemoAnalyticsObject> objects;
-    std::chrono::milliseconds startTimestamp = std::chrono::milliseconds::zero();
+    microseconds startTimestamp = 0us;
 
 public:
     Private():
@@ -125,31 +125,26 @@ DemoAnalyticsMetadataProvider::DemoAnalyticsMetadataProvider():
 {
 }
 
-nx::common::metadata::DetectionMetadataPacketPtr DemoAnalyticsMetadataProvider::metadata(
-    qint64 timestampUs, int /*channel*/) const
+DetectionMetadataPacketPtr DemoAnalyticsMetadataProvider::metadata(
+    microseconds timestamp, int /*channel*/) const
 {
-    using namespace std::chrono;
-
     if (d->objectsCount <= 0)
-        return nx::common::metadata::DetectionMetadataPacketPtr();
+        return {};
 
     if (d->objects.isEmpty())
         d->createObjects();
 
-    const nx::common::metadata::DetectionMetadataPacketPtr metadata(
-        new nx::common::metadata::DetectionMetadataPacket());
+    const auto metadata = std::make_shared<DetectionMetadataPacket>();
 
     const auto precision = ini().demoAnalyticsProviderTimestampPrecisionUs;
     if (precision > 0)
-        timestampUs -= timestampUs % precision;
+        timestamp -= timestamp % precision;
 
-    const auto timestamp = duration_cast<milliseconds>(microseconds(timestampUs));
-    if (d->startTimestamp == milliseconds::zero())
+    if (d->startTimestamp == 0us)
         d->startTimestamp = timestamp;
     const auto dt = timestamp - d->startTimestamp;
 
-    metadata->timestampUsec = timestampUs;
-    metadata->durationUsec = d->duration * 1000;
+    metadata->timestampUsec = timestamp.count();
 
     for (auto& object: d->objects)
         metadata->objects.push_back(object.animated(dt));
@@ -157,21 +152,24 @@ nx::common::metadata::DetectionMetadataPacketPtr DemoAnalyticsMetadataProvider::
     return metadata;
 }
 
-QList<nx::common::metadata::DetectionMetadataPacketPtr> DemoAnalyticsMetadataProvider::metadataRange(
-    qint64 startTimestamp, qint64 endTimestamp, int channel, int maximumCount) const
+QList<DetectionMetadataPacketPtr> DemoAnalyticsMetadataProvider::metadataRange(
+    microseconds startTimestamp,
+    microseconds endTimestamp,
+    int channel,
+    int maximumCount) const
 {
-    const auto precision = ini().demoAnalyticsProviderTimestampPrecisionUs;
-    if (precision > 0)
-    {
-        startTimestamp = startTimestamp - startTimestamp % precision;
-        endTimestamp -= endTimestamp % precision;
-    }
+    constexpr microseconds kMinPrecision = 100000us;
 
-    QList<nx::common::metadata::DetectionMetadataPacketPtr> result;
-    if (maximumCount > 0)
+    const auto precision = std::max(
+        microseconds(ini().demoAnalyticsProviderTimestampPrecisionUs), kMinPrecision);
+    startTimestamp = startTimestamp - startTimestamp % precision;
+
+    QList<DetectionMetadataPacketPtr> result;
+    for (int i = 0; i < maximumCount && startTimestamp <= endTimestamp; ++i)
+    {
         result.append(metadata(startTimestamp, channel));
-    if (maximumCount > 1)
-        result.append(metadata(endTimestamp, channel));
+        startTimestamp += precision;
+    }
     return result;
 }
 

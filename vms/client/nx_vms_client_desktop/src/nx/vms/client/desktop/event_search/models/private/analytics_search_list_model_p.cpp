@@ -32,7 +32,9 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/pending_operation.h>
-#include <nx/vms/event/analytics_helper.h>
+
+#include <common/common_module.h>
+#include <nx/analytics/descriptor_list_manager.h>
 
 namespace nx::vms::client::desktop {
 
@@ -52,11 +54,11 @@ milliseconds startTime(const DetectedObject& object)
     return duration_cast<milliseconds>(microseconds(object.firstAppearanceTimeUsec));
 }
 
-qint64 objectDurationUs(const DetectedObject& object)
+microseconds objectDuration(const DetectedObject& object)
 {
     // TODO: #vkutin Is this duration formula good enough for us?
     //   Or we need to add some "lastAppearanceDurationUsec"?
-    return object.lastAppearanceTimeUsec - object.firstAppearanceTimeUsec;
+    return microseconds(object.lastAppearanceTimeUsec - object.firstAppearanceTimeUsec);
 }
 
 static const auto lowerBoundPredicate =
@@ -144,10 +146,29 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
     {
         case Qt::DisplayRole:
         {
-            const auto name = vms::event::AnalyticsHelper::objectTypeName(
-                camera(object), object.objectTypeId, kDefaultLocale);
+            const auto fallbackTitle =
+                [this, typeId = object.objectTypeId]()
+                {
+                    return QString("<%1>").arg(typeId.isEmpty() ? tr("Unknown object") : typeId);
+                };
 
-            return name.isEmpty() ? tr("Unknown object") : name;
+            const auto objectCamera = camera(object);
+            if (!objectCamera)
+                return fallbackTitle();
+
+            const auto descriptorListManager = objectCamera
+                ->commonModule()
+                ->analyticsDescriptorListManager();
+
+            auto objectTypeDescriptor = descriptorListManager
+                ->descriptor<nx::vms::api::analytics::ObjectTypeDescriptor>(object.objectTypeId);
+
+            if (!objectTypeDescriptor)
+                return fallbackTitle();
+
+            return objectTypeDescriptor->item.name.value.isEmpty()
+                ? fallbackTitle()
+                : objectTypeDescriptor->item.name.value;
         }
 
         case Qt::DecorationRole:
@@ -160,19 +181,25 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             return attributes(object);
 
         case Qn::TimestampRole:
-            return object.firstAppearanceTimeUsec;
+            return QVariant::fromValue(std::chrono::microseconds(object.firstAppearanceTimeUsec));
 
         case Qn::PreviewTimeRole:
-            return QVariant::fromValue(previewParams(object).timestamp.count());
+            return QVariant::fromValue(previewParams(object).timestamp);
 
         case Qn::DurationRole:
-            return objectDurationUs(object);
+            return QVariant::fromValue(objectDuration(object));
 
         case Qn::HelpTopicIdRole:
             return Qn::Empty_Help;
 
         case Qn::ResourceListRole:
-            return QVariant::fromValue(QnResourceList({camera(object)}));
+        {
+            const auto resource = camera(object);
+            if (resource)
+                return QVariant::fromValue(QnResourceList({resource}));
+
+            return QVariant::fromValue(QStringList({QString("<%1>").arg(tr("deleted camera"))}));
+        }
 
         case Qn::ResourceRole:
             return QVariant::fromValue<QnResourcePtr>(camera(object));
@@ -647,14 +674,14 @@ QString AnalyticsSearchListModel::Private::description(
 
     const auto timeWatcher = q->context()->instance<nx::vms::client::core::ServerTimeWatcher>();
     const auto start = timeWatcher->displayTime(startTime(object).count());
-    const auto durationUs = objectDurationUs(object);
+    const auto duration = objectDuration(object);
 
     using namespace std::chrono;
     return lm("Timestamp: %1 us<br>%2<br>Duration: %3 us<br>%4").args( //< Not translatable, debug.
         object.firstAppearanceTimeUsec,
         start.toString(Qt::RFC2822Date),
-        durationUs,
-        core::HumanReadable::timeSpan(duration_cast<milliseconds>(microseconds(durationUs))));
+        duration.count(),
+        core::HumanReadable::timeSpan(duration_cast<milliseconds>(duration)));
 }
 
 QString AnalyticsSearchListModel::Private::attributes(
@@ -698,25 +725,48 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
     auto servers = q->cameraHistoryPool()->getCameraFootageData(camera, true);
     servers.push_back(camera->getParentServer());
 
-    const auto allActions = vms::event::AnalyticsHelper::availableActions(
-        servers, object.objectTypeId);
-    if (allActions.isEmpty())
+    const auto descriptorListManager = camera
+        ->commonModule()
+        ->analyticsDescriptorListManager();
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    const auto allActions = descriptorListManager
+        ->descriptors<nx::vms::api::analytics::ActionTypeDescriptor>(servers);
+
+    if (allActions.empty())
+        return QSharedPointer<QMenu>();
+
+    QMap<QString, QList<nx::vms::api::analytics::ActionTypeDescriptor>> actionsByPlugin;
+    for (auto itr = allActions.cbegin(); itr != allActions.cend(); ++itr)
+    {
+        const auto& actionId = itr->first;
+        const auto& descriptor = itr->second;
+
+        if (!descriptor.item.supportedObjectTypeIds.contains(object.objectTypeId))
+            continue;
+
+        for (const auto& path: descriptor.paths)
+            actionsByPlugin[path.pluginId].push_back(descriptor);
+    }
+
+    if (actionsByPlugin.isEmpty())
         return QSharedPointer<QMenu>();
 
     QSharedPointer<QMenu> menu(new QMenu());
-    for (const auto& driverActions: allActions)
+    for (auto itr = actionsByPlugin.cbegin(); itr != actionsByPlugin.cend(); ++itr)
+        //const auto& driverActions: allActions)
     {
+        const auto& pluginId = itr.key();
+        const auto& descriptors = *itr;
         if (!menu->isEmpty())
             menu->addSeparator();
 
-        const auto& pluginId = driverActions.pluginId;
-        for (const auto& action: driverActions.actions)
+        for (const auto& actionDescriptor: descriptors)
         {
-            const auto name = action.name.text(QString());
+            const auto name = actionDescriptor.item.name.value;
             menu->addAction<std::function<void()>>(name, nx::utils::guarded(this,
-                [this, action, object, pluginId]()
+                [this, actionDescriptor, object, pluginId]()
                 {
-                    executePluginAction(pluginId, action, object);
+                    executePluginAction(pluginId, actionDescriptor, object);
                 }));
         }
     }
@@ -726,9 +776,11 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
 
 void AnalyticsSearchListModel::Private::executePluginAction(
     const QString& pluginId,
-    const nx::vms::api::analytics::EngineManifest::ObjectAction& action,
+    const nx::vms::api::analytics::ActionTypeDescriptor& actionDescriptor,
     const analytics::storage::DetectedObject& object) const
 {
+
+    const auto& actionType = actionDescriptor.item;
     const auto server = q->commonModule()->currentServer();
     NX_ASSERT(server && server->restConnection());
     if (!server || !server->restConnection())
@@ -757,7 +809,7 @@ void AnalyticsSearchListModel::Private::executePluginAction(
 
     AnalyticsAction actionData;
     actionData.pluginId = pluginId;
-    actionData.actionId = action.id;
+    actionData.actionId = actionType.id;
     actionData.objectId = object.objectAppearanceId;
 
     server->restConnection()->executeAnalyticsAction(

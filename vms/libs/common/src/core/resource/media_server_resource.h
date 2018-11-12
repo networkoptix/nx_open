@@ -110,6 +110,7 @@ public:
 
     nx::vms::api::ModuleInformationWithAddresses getModuleInformationWithAddresses() const;
 
+    // TODO: #sivanov: Get rid of the term "driver".
     QList<nx::vms::api::analytics::EngineManifest> analyticsDrivers() const;
     void setAnalyticsDrivers(const QList<nx::vms::api::analytics::EngineManifest>& drivers);
 

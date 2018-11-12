@@ -33,18 +33,23 @@ public:
 
     void sendEventPacket(const EventType& event) const;
 
-    virtual nx::sdk::Error startFetchingMetadata(
-        const char* const* tpeList, int typeListSize) override;
+    virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
 
-    virtual nx::sdk::Error stopFetchingMetadata() override;
+    virtual sdk::Error setMetadataHandler(
+        nx::sdk::analytics::MetadataHandler* metadataHandler) override;
 
-    virtual const char* manifest(nx::sdk::Error* error) override;
+    virtual sdk::Error setNeededMetadataTypes(
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
 
-    virtual void freeManifest(const char* data) override;
+    virtual void setSettings(const nx::sdk::Settings* settings) override;
 
-    virtual sdk::Error setMetadataHandler(nx::sdk::analytics::MetadataHandler* metadataHandler) override;
+    virtual nx::sdk::Settings* settings() const override;
 
-    virtual void setSettings(const nxpl::Setting* /*settings*/, int /*count*/) override {}
+private:
+    nx::sdk::Error startFetchingMetadata(
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes);
+
+    nx::sdk::Error stopFetchingMetadata();
 
 private:
     Engine* const m_engine;

@@ -4,6 +4,7 @@
 
 #include <plugins/plugin_api.h>
 #include <nx/sdk/common.h>
+#include <nx/sdk/i_string.h>
 
 #include "engine.h"
 
@@ -23,9 +24,17 @@ static const nxpl::NX_GUID IID_Plugin =
  * in its start via calls to Plugin* createNxAnalyticsPlugin() which should be exported as extern
  * "C" by the plugin library, and is destroyed (via releaseRef()) on Mediaserver shutdown.
  */
-class Plugin: public nxpl::Plugin3
+class Plugin: public nxpl::Plugin2
 {
 public:
+
+    /**
+     * Provides plugin manifest in JSON format.
+     * @param outError Status of the operation; is set to noError before this call.
+     * @return JSON string in UTF-8.
+     */
+    virtual const IString* manifest(nx::sdk::Error* outError) const = 0;
+
     /**
      * Creates a new instance of analytics::Engine.
      * @param outError Status of the operation; is set to noError before this call.
@@ -35,7 +44,7 @@ public:
     virtual Engine* createEngine(Error* outError) = 0;
 
     /**
-     * Name of the plugin dynamic library, without "lib" prefix and without extension. 
+     * Name of the plugin dynamic library, without "lib" prefix and without extension.
      */
     virtual const char* name() const override = 0;
 };

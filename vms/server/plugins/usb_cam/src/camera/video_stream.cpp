@@ -2,9 +2,9 @@
 
 #include <algorithm>
 
-#include <nx/utils/log/log.h>
 #include <nx/utils/app_info.h>
 #include <plugins/plugin_container_api.h>
+#include <utils/media/frame_type_extractor.h>
 
 #include "camera.h"
 #include "buffered_stream_consumer.h"
@@ -16,6 +16,8 @@ namespace usb_cam {
 
 namespace {
 
+static constexpr int kMsecInSec = 1000;
+
 const char * deviceType()
 {
     return
@@ -26,7 +28,17 @@ const char * deviceType()
 #endif
 }
 
-static constexpr int kMsecInSec = 1000;
+bool isIFrame(const ffmpeg::Packet * packet)
+{
+    if(!packet)
+        return false;
+
+    const quint8 * udata = static_cast<const quint8 *>(packet->data());
+
+    FrameTypeExtractor extractor(packet->codecId());
+
+    return extractor.getFrameType(udata, packet->size()) == FrameTypeExtractor::I_Frame;
+}
 
 } // namespace
 
@@ -399,6 +411,12 @@ std::shared_ptr<ffmpeg::Packet> VideoStream::readFrame()
         setLastError(result);
         return nullptr;
     }
+
+#ifdef _WIN32
+    // dshow input format does not set h264 key packet flag correctly, so do it manually
+    if (packet->codecId() == AV_CODEC_ID_H264 && isIFrame(packet.get()))
+        packet->packet()->flags |= AV_PKT_FLAG_KEY;
+#endif
 
     // Setting timestamp here because primary stream needs it even if there is no decoding.
     packet->setTimestamp(m_timeProvider->millisSinceEpoch());

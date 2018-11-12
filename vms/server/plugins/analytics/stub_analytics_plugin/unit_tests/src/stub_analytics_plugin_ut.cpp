@@ -7,6 +7,9 @@
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_tools.h>
 
+#include <nx/sdk/common_settings.h>
+#include <nx/sdk/analytics/common_metadata_types.h>
+
 #include <nx/sdk/analytics/engine.h>
 #include <nx/sdk/analytics/consuming_device_agent.h>
 #include <nx/sdk/analytics/uncompressed_video_frame.h>
@@ -25,7 +28,7 @@ static std::string trimString(const std::string& s)
     int start = 0;
     while (start < (int) s.size() && s.at(start) <= ' ')
         ++start;
-    int end = s.size() - 1;
+    int end = (int) s.size() - 1;
     while (end >= 0 && s.at(end) <= ' ')
         --end;
     if (end < start)
@@ -38,63 +41,71 @@ static const int noError = (int) nx::sdk::Error::noError;
 static void testEngineManifest(nx::sdk::analytics::Engine* engine)
 {
     nx::sdk::Error error = nx::sdk::Error::noError;
-    const char* manifest = engine->manifest(&error);
-    ASSERT_TRUE(manifest != nullptr);
-    ASSERT_EQ((int) nx::sdk::Error::noError, (int) error);
-    ASSERT_TRUE(manifest[0] != '\0');
-    NX_PRINT << "Engine manifest:\n" << manifest;
+    nxpt::ScopedRef<const nx::sdk::IString> manifest(
+        engine->manifest(&error), false);
 
-    const std::string trimmedEngineManifest = trimString(manifest);
+    ASSERT_TRUE(manifest);
+    const char* manifestStr = manifest->str();
+
+    ASSERT_TRUE(manifestStr != nullptr);
+    ASSERT_EQ((int) nx::sdk::Error::noError, (int) error);
+    ASSERT_TRUE(manifestStr[0] != '\0');
+    NX_PRINT << "Engine manifest:\n" << manifestStr;
+
+    const std::string trimmedEngineManifest = trimString(manifestStr);
     ASSERT_EQ('{', trimmedEngineManifest.front());
     ASSERT_EQ('}', trimmedEngineManifest.back());
 
     // This test assumes that the plugin consumes compressed frames - verify it in the manifest.
-    ASSERT_EQ(std::string::npos, std::string(manifest).find("needUncompressedVideoFrames"));
+    ASSERT_EQ(std::string::npos, std::string(manifestStr).find("needUncompressedVideoFrames"));
 }
 
 static void testDeviceAgentManifest(nx::sdk::analytics::DeviceAgent* deviceAgent)
 {
     nx::sdk::Error error = nx::sdk::Error::noError;
-    const char* manifest = deviceAgent->manifest(&error);
-    ASSERT_TRUE(manifest != nullptr);
+    nxpt::ScopedRef<const nx::sdk::IString> manifest(
+        deviceAgent->manifest(&error), false);
+
+    ASSERT_TRUE(manifest);
+    const char* manifestStr = manifest->str();
+    ASSERT_TRUE(manifestStr != nullptr);
     ASSERT_EQ(noError, (int) error);
-    ASSERT_TRUE(manifest[0] != '\0');
+    ASSERT_TRUE(manifestStr[0] != '\0');
     NX_PRINT << "DeviceAgent manifest:\n" << manifest;
 
-    const std::string trimmedDeviceAgentManifest = trimString(manifest);
+    const std::string trimmedDeviceAgentManifest = trimString(manifestStr);
     ASSERT_EQ('{', trimmedDeviceAgentManifest.front());
     ASSERT_EQ('}', trimmedDeviceAgentManifest.back());
-
-    deviceAgent->freeManifest(manifest);
 }
 
 static void testEngineSettings(nx::sdk::analytics::Engine* plugin)
 {
-    const nxpl::Setting settings[] = {
-        {"setting1", "value1"},
-        {"setting2", "value2"},
-    };
+    const auto settings = new nx::sdk::CommonSettings();
+    settings->addSetting("setting1", "value1");
+    settings->addSetting("setting2", "value2");
 
-    plugin->setSettings(nullptr, 0); //< Test assigning empty settings.
-    plugin->setSettings(settings, 1); //< Test assigning a single setting.
-    plugin->setSettings(settings, sizeof(settings) / sizeof(settings[0]));
+    plugin->setSettings(nullptr); //< Test assigning empty settings.
+    plugin->setSettings(settings); //< Test assigning some settings.
 }
 
 static void testDeviceAgentSettings(nx::sdk::analytics::DeviceAgent* deviceAgent)
 {
-    const nxpl::Setting settings[] = {
-        {"setting1", "value1"},
-        {"setting2", "value2"},
-    };
+    const auto settings = new nx::sdk::CommonSettings();
+    settings->addSetting("setting1", "value1");
+    settings->addSetting("setting2", "value2");
 
-    deviceAgent->setSettings(nullptr, 0); //< Test assigning empty settings.
-    deviceAgent->setSettings(settings, 1); //< Test assigning a single setting.
-    deviceAgent->setSettings(settings, sizeof(settings) / sizeof(settings[0]));
+    deviceAgent->setSettings(nullptr); //< Test assigning empty settings.
+    deviceAgent->setSettings(settings); //< Test assigning some settings.
 }
 
 class Action: public nx::sdk::analytics::Action
 {
 public:
+    Action():
+        m_params(new nx::sdk::CommonSettings())
+    {
+    }
+
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override
     {
         ASSERT_TRUE(false);
@@ -109,12 +120,22 @@ public:
     virtual nxpl::NX_GUID deviceId() override { return m_deviceId; }
     virtual int64_t timestampUs() override { return m_timestampUs; }
 
-    virtual const nxpl::Setting* params() override
+    virtual const nx::sdk::Settings* params() override
     {
-        return paramCount() == 0 ? nullptr : &m_params.front();
+        if (!m_params)
+            return nullptr;
+
+        m_params->addRef();
+        return m_params.get();
     }
 
-    virtual int paramCount() override { return (int) m_params.size(); }
+    virtual int paramCount() override
+    {
+        if (!m_params)
+            return 0;
+
+        return (int) m_params->count();
+    }
 
     virtual void handleResult(const char* actionUrl, const char* messageToUser) override
     {
@@ -153,10 +174,9 @@ public:
 
     void setParams(const std::vector<std::pair<std::string, std::string>>& params)
     {
-        m_paramsData = params;
-        m_params.clear();
-        for (const auto& param: m_paramsData)
-            m_params.push_back({param.first.c_str(), param.second.c_str()});
+        m_params.reset(new nx::sdk::CommonSettings());
+        for (const auto& param: params)
+            m_params->addSetting(param.first, param.second);
     }
 
 public:
@@ -169,8 +189,7 @@ public:
     bool m_expectedNonNullMessageToUser = false;
 
 private:
-    std::vector<std::pair<std::string, std::string>> m_paramsData; //< Owns strings for m_params.
-    std::vector<nxpl::Setting> m_params; //< Points to strings from m_paramsData.
+    nxpt::ScopedRef<nx::sdk::CommonSettings> m_params;
 };
 
 static void testExecuteActionNonExisting(nx::sdk::analytics::Engine* plugin)
@@ -242,7 +261,7 @@ public:
     virtual unsigned int addRef() { return ++m_refCounter; }
     virtual unsigned int releaseRef() { ASSERT_TRUE(m_refCounter > 1); return --m_refCounter; }
 
-    virtual int64_t timestampUsec() const override { return 42; }
+    virtual int64_t timestampUsec() const override { return /*dummy*/ 42; }
 
 private:
     int m_refCounter = 1;
@@ -253,7 +272,7 @@ TEST(stub_analytics_plugin, test)
     nx::sdk::Error error = nx::sdk::Error::noError;
 
     nxpl::PluginInterface* const pluginObject = createNxAnalyticsPlugin();
-    ASSERT_TRUE(pluginObject->queryInterface(nxpl::IID_Plugin3) != nullptr);
+    ASSERT_TRUE(pluginObject->queryInterface(nxpl::IID_Plugin2) != nullptr);
     pluginObject->releaseRef();
 
     const auto plugin = static_cast<nx::sdk::analytics::Plugin*>(
@@ -298,13 +317,15 @@ TEST(stub_analytics_plugin, test)
     MetadataHandler metadataHandler;
     ASSERT_EQ(noError, (int) deviceAgent->setMetadataHandler(&metadataHandler));
 
-    ASSERT_EQ(noError, (int) deviceAgent->startFetchingMetadata(
-        /*typeList*/ nullptr, /*typeListSize*/ 0));
+    nxpt::ScopedRef<nx::sdk::analytics::CommonMetadataTypes> metadataTypes(
+        new nx::sdk::analytics::CommonMetadataTypes());
+
+    ASSERT_EQ(noError, (int) deviceAgent->setNeededMetadataTypes(metadataTypes.get()));
 
     CompressedVideoFrame compressedVideoFrame;
     ASSERT_EQ(noError, (int) deviceAgent->pushDataPacket(&compressedVideoFrame));
 
-    ASSERT_EQ(noError, (int) deviceAgent->stopFetchingMetadata());
+    ASSERT_EQ(noError, (int) deviceAgent->setNeededMetadataTypes(metadataTypes.get()));
 
     deviceAgent->releaseRef();
     engine->releaseRef();

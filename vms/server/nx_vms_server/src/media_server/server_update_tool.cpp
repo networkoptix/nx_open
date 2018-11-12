@@ -343,13 +343,6 @@ bool QnServerUpdateTool::installUpdate(const QString& updateId, UpdateType updat
         return false;
     }
 
-    nx::mediaserver::Utils utils(serverModule());
-    if (!utils.backupDatabase())
-    {
-        NX_ERROR(this, "Could not create database backup.");
-        return false;
-    }
-
     QString version = map.value(lit("version")).toString();
 
     QString currentDir = QDir::currentPath();

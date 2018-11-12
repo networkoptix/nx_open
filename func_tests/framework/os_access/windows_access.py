@@ -17,7 +17,7 @@ from framework.networking.windows import WindowsNetworking
 from framework.os_access import exceptions
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.os_access_interface import OSAccess, Time, BaseFakeDisk
-from framework.os_access.smb_path import SMBPath
+from framework.os_access.smb_path import SMBPath, UsedByAnotherProcess
 from framework.os_access.windows_remoting import WinRM
 from framework.os_access.windows_remoting.env_vars import EnvVars
 from framework.os_access.windows_remoting.powershell import PowershellError
@@ -200,11 +200,12 @@ class WindowsAccess(OSAccess):
             )
 
     def file_md5(self, path):
-        output = self.winrm.command(['CertUtil', '-hashfile', path, 'md5']).decode()
-        match = re.search('\b[0-9a-fA-F]{32}\b', output)
+        try:
+            output = self.winrm.command(['CertUtil', '-hashfile', path, 'md5']).run().decode()
+        except exceptions.exit_status_error_cls(0x80070002):  # Misleading error code and message.
+            raise exceptions.NotAFile(errno.EISDIR, "Trying to get MD5 of dir.")
+        match = re.search(r'\b[0-9a-fA-F]{32}\b', output)
         if match is None:
-            if '0x80070002' in output:
-                raise exceptions.NotAFile(errno.EISDIR, "Trying to get MD5 of dir.")
             raise RuntimeError('Cannot get MD5 of {}:\n{}'.format(path, output))
         return match.group()
 
@@ -231,16 +232,23 @@ class _FakeDisk(BaseFakeDisk):
             six.reraise(OSError, OSError(errno.EINVAL, message_oneline), sys.exc_info()[2])
 
     def remove(self, letter='V'):
-        script_template = (
-            'SELECT VDISK file={image_path} NOERR' '\r\n'
-            'DETACH VDISK NOERR' '\r\n'  # When detaching, volume is unmounted automatically.
-        )
-        script = script_template.format(image_path=self._image_path, letter=self._letter)
-        self._diskpart('remove', script, 5)
+        # `DETACH` fails even with `NOERR`. The following scheme helps to work around this and
+        # save `diskpart` run if there is no disk mounted.
         try:
+            _logger.debug("Try to delete virtual disk file first: %s", self._image_path)
             self._image_path.unlink()
         except exceptions.DoesNotExist:
-            pass
+            _logger.debug("Skip diskpart: no virtual disk file: %s", self._image_path)
+        except UsedByAnotherProcess:
+            _logger.debug("Run diskpart to dismount and detach: %s", self._image_path)
+            script_template = (
+                'SELECT VDISK file={image_path}' '\r\n'
+                'DETACH VDISK' '\r\n'  # When detaching, volume is unmounted automatically.
+            )
+            script = script_template.format(image_path=self._image_path)
+            self._diskpart('remove', script, 5)
+            _logger.debug("Delete virtual disk file: %s", self._image_path)
+            self._image_path.unlink()
 
     def mount(self, size_bytes):
         """Make virtual disk and mount it.

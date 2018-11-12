@@ -11,7 +11,7 @@ namespace stub {
 struct Ini: public nx::kit::IniConfig
 {
     const std::string needUncompressedVideoFramesDescription =
-        "Respective capability in manifest: one of "
+        "Respective capability in the manifest: one of "
             + nx::sdk::analytics::allPixelFormatsToStdString(", ") + ".\n"
         "Empty means no such capability.";
 
@@ -23,6 +23,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(1, generateEvents, "");
     NX_INI_INT(1, generateObjectsEveryNFrames, "");
     NX_INI_FLAG(1, generatePreviewAttributes, "");
+    NX_INI_FLAG(0, deviceModelDependent, "Respective capability in the manifest");
 };
 
 inline Ini& ini()

@@ -113,8 +113,6 @@
 
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
         <CustomAction Id="GenerateGuidsForServers" BinaryKey="CustomActions.dll" DllEntry="GenerateGuidsForServers"/>
-        <CustomAction Id="DeleteDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="DeleteDatabaseFile" Execute="deferred" Impersonate="no"/>
-        <CustomAction Id="BackupDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="BackupDatabaseFile" Execute="deferred" Impersonate="no"/>
 
 
         <CustomAction Id="DeleteRegistryKeys_Cmd" Property="DeleteRegistryKeys" Value="$(var.ServerRegPath)" Execute="immediate" Impersonate="yes"/>
@@ -130,10 +128,6 @@
         <CustomAction Id="FixServerFolder" BinaryKey="CustomActions.dll" DllEntry="FixServerFolder"/>
         <CustomAction Id="GenerateSystemName" BinaryKey="CustomActions.dll" DllEntry="GenerateSystemName"/>
         <CustomAction Id="DetectIfSystemIsStandalone" BinaryKey="CustomActions.dll" DllEntry="DetectIfSystemIsStandalone"/>
-
-        <CustomAction Id="CopyDatabaseFile_Cmd" Property="CopyDatabaseFile" Execute="immediate"
-            Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\$(var.companyName)\Enterprise Controller\db\ecs.db;#LocalAppDataFolder#\$(var.companyName)\$(var.mediaserverName)\ecs.sqlite"/>
-        <CustomAction Id="CopyDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="CopyDatabaseFile" Execute="deferred" Impersonate="no"/>
 
         <CustomAction Id="CopyHostedFiles_Cmd" Property="CopyHostedFiles" Execute="immediate"
             Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\$(var.companyName)\Enterprise Controller\hostedfiles;#LocalAppDataFolder#\$(var.companyName)\$(var.mediaserverName)\vms_storedfiles"/>
@@ -169,15 +163,6 @@
             Return="ignore"
             Impersonate="no" />
 
-        <CustomAction Id="BackupDatabaseFile_Cmd"
-            Property="BackupDatabaseFile"
-            Execute="immediate"
-            Value="#LocalAppDataFolder#\$(var.companyName)\$(var.mediaserverName);Software\[Manufacturer]\version;"/>
-
-        <CustomAction Id="DeleteDatabaseFile_Cmd"
-            Property="DeleteDatabaseFile"
-            Execute="immediate"
-            Value="#LocalAppDataFolder#\$(var.companyName)\$(var.mediaserverName)"/>
 
         <CustomAction Id="LaunchTrayTool"
             Execute="immediate"
@@ -215,12 +200,6 @@
             <Custom Action="DetectIfSystemIsStandalone" Before="CostInitialize">$(var.VmsUpgrading)</Custom>
             <Custom Action="GenerateSystemName" After="DetectIfSystemIsStandalone">$(var.VmsUpgrading) AND NOT SYSTEM_NAME AND STANDALONE_SYSTEM="yes"</Custom>
 
-            <Custom Action="CopyDatabaseFile_Cmd" After="InstallFiles">
-                <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]>
-            </Custom>
-            <Custom Action="CopyDatabaseFile" After="CopyDatabaseFile_Cmd">
-                <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]>
-            </Custom>
             <Custom Action="CopyHostedFiles_Cmd" After="InstallFiles">
                 <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]>
             </Custom>
@@ -241,16 +220,10 @@
                 <![CDATA[ (!ServerFeature=3 OR &ServerFeature = 3) AND REMOVE <> "ALL" ]]>
             </Custom>
 
-            <Custom Action="BackupDatabaseFile_Cmd" After="StopServices">1</Custom>
-            <Custom Action="BackupDatabaseFile" After="BackupDatabaseFile_Cmd">1</Custom>
-
-            <Custom Action="DeleteDatabaseFile_Cmd" After="BackupDatabaseFile">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
-            <Custom Action="DeleteDatabaseFile" After="DeleteDatabaseFile_Cmd">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
-
             <Custom Action="DeleteAllRegistryKeys_Cmd" After="StopServices">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
             <Custom Action="DeleteAllRegistryKeys" After="DeleteAllRegistryKeys_Cmd">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
 
-            <Custom Action="DeleteRegistryKeys_Cmd" After="DeleteDatabaseFile">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+            <Custom Action="DeleteRegistryKeys_Cmd" After="StopServices">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
             <Custom Action="DeleteRegistryKeys" After="DeleteRegistryKeys_Cmd">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
         </InstallExecuteSequence>
 

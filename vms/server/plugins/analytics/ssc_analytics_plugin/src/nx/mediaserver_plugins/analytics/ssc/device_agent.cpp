@@ -4,6 +4,8 @@
 
 #include <nx/fusion/model_functions.h>
 
+#include <nx/sdk/common/string.h>
+
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 
 #include <nx/sdk/analytics/common_event.h>
@@ -89,7 +91,7 @@ void DeviceAgent::sendEventPacket(const EventType& event) const
 }
 
 nx::sdk::Error DeviceAgent::startFetchingMetadata(
-    const char* const* /*typeList*/, int /*typeListSize*/)
+    const nx::sdk::analytics::IMetadataTypes* /*metadataTypes*/)
 {
     m_engine->registerCamera(m_cameraLogicalId, this);
     return nx::sdk::Error::noError;
@@ -101,20 +103,38 @@ nx::sdk::Error DeviceAgent::stopFetchingMetadata()
     return nx::sdk::Error::noError;
 }
 
-const char* DeviceAgent::manifest(nx::sdk::Error* error)
+const nx::sdk::IString* DeviceAgent::manifest(nx::sdk::Error* error) const
 {
-    return m_deviceAgentManifest;
-}
-
-void DeviceAgent::freeManifest(const char* /*data*/)
-{
-    // Do nothing. Manifest string is stored in member-variable.
+    *error = nx::sdk::Error::noError;
+    return new nx::sdk::common::String(m_deviceAgentManifest);
 }
 
 sdk::Error DeviceAgent::setMetadataHandler(nx::sdk::analytics::MetadataHandler* metadataHandler)
 {
     m_metadataHandler = metadataHandler;
     return sdk::Error::noError;
+}
+
+sdk::Error DeviceAgent::setNeededMetadataTypes(
+    const sdk::analytics::IMetadataTypes* metadataTypes)
+{
+    if (metadataTypes->eventTypeIds()->count() == 0)
+    {
+        stopFetchingMetadata();
+        return sdk::Error::noError;
+    }
+
+    return startFetchingMetadata(metadataTypes);
+}
+
+void DeviceAgent::setSettings(const nx::sdk::Settings* /*settings*/)
+{
+    // There are no DeviceAgent settings for this plugin.
+}
+
+nx::sdk::Settings* DeviceAgent::settings() const
+{
+    return nullptr;
 }
 
 } // namespace ssc

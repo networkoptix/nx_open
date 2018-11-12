@@ -1,7 +1,11 @@
 #pragma once
 
+#include <chrono>
+
 #include <QtCore/QMetaType>
 #include <QtGui/QValidator>
+
+#include <common/common_meta_types.h>
 
 #include <nx/fusion/model_functions_fwd.h>
 
@@ -229,19 +233,19 @@ namespace Qn
         ForceShowCamerasList,                       /**< Used for default password dialog. */
         ParentWidgetRole,                           /**< Used for dialog's parent widget. */
 
-        TimestampRole,                              /**< Role for timestamp in microseconds since epoch (qint64). */
+        TimestampRole,                              /**< Role for timestamp in microseconds since epoch (std::chrono::microseconds). */
         TimestampTextRole,                          /**< Role for timestamp text (QString). */
         DescriptionTextRole,                        /**< Role for generic description text (QString). */
         AdditionalTextRole,                         /**< Role for additional description text (QString). */
         RemovableRole,                              /**< An item is removable (bool). */
         CommandActionRole,                          /**< Command action (QSharedPointer<QAction>). */
         ResourceListRole,                           /**< Resource list (QnResourceList). */
-        PreviewTimeRole,                            /**< Role for camera preview time in microseconds since epoch (qint64). */
-        TimeoutRole,                                /**< Role for timeout or lifetime in milliseconds (int). */
+        PreviewTimeRole,                            /**< Role for camera preview time in microseconds since epoch (std::chrono::microseconds). */
+        TimeoutRole,                                /**< Role for timeout or lifetime in milliseconds (std::chrono::milliseconds). */
         BusyIndicatorVisibleRole,                   /**< Role for toggling busy indicator (bool). */
         ProgressValueRole,                          /**< Role for specifying progress value [0..1] (float). */
         AnimatedRole,                               /**< Role for specifying whether item animation is allowed (bool). */
-        DurationRole,                               /**< Role for duration in microseconds (qint64). */
+        DurationRole,                               /**< Role for duration in microseconds (std::chrono::microseconds). */
         NotificationLevelRole,                      /**< Role for notification level (QnNotificationLevel::Value). */
         ContextMenuRole,                            /**< Role for context menu (QSharedPointer<QMenu>). */
         ForcePrecisePreviewRole,                    /**< Role for forcing precise preview frame (bool). */

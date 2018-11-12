@@ -247,9 +247,19 @@ public:
                     << QnDeviceDependentStrings::getNameFromSet(resourcePool, details, device);
                 break;
             }
-            case cameraPluginError:
+            case pluginError:
             {
-                errorMessageParts << tr("Camera plugin error. %1").arg(p1);
+                errorMessageParts << tr("Plugin error. %1").arg(p1);
+                break;
+            }
+            case pluginIsUnavailable:
+            {
+                errorMessageParts << tr("Plugin is unavailable");
+                break;
+            }
+            case internalServerError:
+            {
+                errorMessageParts << tr("Internal server error. %1").arg(p1);
                 break;
             }
             default:

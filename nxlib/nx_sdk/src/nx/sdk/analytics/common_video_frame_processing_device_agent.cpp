@@ -5,6 +5,7 @@
 #include <nx/kit/debug.h>
 
 #include <nx/sdk/utils.h>
+#include <nx/sdk/common/string.h>
 #include <nx/sdk/analytics/common_engine.h>
 #include <nx/sdk/analytics/plugin.h>
 
@@ -29,9 +30,9 @@ public:
 private:
     /** Used by the above NX_KIT_ASSERT (via NX_PRINT). */
     struct
-    { 
+    {
         const std::string printPrefix = "CommonVideoFrameProcessingDeviceAgent(): ";
-    } utils; 
+    } utils;
 };
 
 CommonVideoFrameProcessingDeviceAgent::CommonVideoFrameProcessingDeviceAgent(
@@ -163,39 +164,46 @@ Error CommonVideoFrameProcessingDeviceAgent::pushDataPacket(DataPacket* dataPack
     return Error::noError;
 }
 
+Error CommonVideoFrameProcessingDeviceAgent::setNeededMetadataTypes(
+    const IMetadataTypes* metadataTypes)
+{
+    if (metadataTypes->isNull())
+    {
+        stopFetchingMetadata();
+        return Error::noError;
+    }
+
+    return startFetchingMetadata(metadataTypes);
+}
+
 Error CommonVideoFrameProcessingDeviceAgent::startFetchingMetadata(
-    const char* const* /*typeList*/, int /*typeListSize*/)
+    const IMetadataTypes* /*metadataTypes*/)
 {
     NX_PRINT << __func__ << "() -> noError";
     return Error::noError;
 }
 
-Error CommonVideoFrameProcessingDeviceAgent::stopFetchingMetadata()
+void CommonVideoFrameProcessingDeviceAgent::stopFetchingMetadata()
 {
     NX_PRINT << __func__ << "() -> noError";
-    return Error::noError;
 }
 
-const char* CommonVideoFrameProcessingDeviceAgent::manifest(Error* /*error*/)
+const IString* CommonVideoFrameProcessingDeviceAgent::manifest(Error* /*error*/) const
 {
-    const std::string manifestStr = manifest();
-    char* manifestData = new char[manifestStr.size() + 1];
-    strncpy(manifestData, manifestStr.c_str(), manifestStr.size() + 1);
-    return manifestData;
+    return new common::String(manifest());
 }
 
-void CommonVideoFrameProcessingDeviceAgent::freeManifest(const char* data)
+void CommonVideoFrameProcessingDeviceAgent::setSettings(const nx::sdk::Settings* settings)
 {
-    delete[] data;
-}
-
-void CommonVideoFrameProcessingDeviceAgent::setSettings(
-    const nxpl::Setting* settings, int count)
-{
-    if (!utils.fillAndOutputSettingsMap(&m_settings, settings, count, "Received settings"))
+    if (!utils.fillAndOutputSettingsMap(&m_settings, settings, "Received settings"))
         return; //< The error is already logged.
 
     settingsChanged();
+}
+
+nx::sdk::Settings* CommonVideoFrameProcessingDeviceAgent::settings() const
+{
+    return nullptr;
 }
 
 //-------------------------------------------------------------------------------------------------

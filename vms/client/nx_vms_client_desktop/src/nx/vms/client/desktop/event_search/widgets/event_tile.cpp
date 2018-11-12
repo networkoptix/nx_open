@@ -13,6 +13,7 @@
 #include <ui/style/skin.h>
 #include <ui/widgets/common/elided_label.h>
 #include <utils/common/delayed.h>
+#include <utils/common/html.h>
 
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/close_button.h>
@@ -65,6 +66,7 @@ struct EventTile::Private
     bool isRead = false;
     bool footerEnabled = true;
     Style style = Style::standard;
+    bool highlighted = false;
 
     Private(EventTile* q):
         q(q),
@@ -101,21 +103,13 @@ struct EventTile::Private
     {
         auto pal = q->palette();
         const auto base = pal.color(QPalette::Base);
-        const auto lighter = colorTheme()->lighter(base, 1);
 
-        switch (style)
-        {
-            case Style::standard:
-                pal.setColor(QPalette::Window, base);
-                pal.setColor(QPalette::Midlight, lighter);
-                break;
+        int lighterBy = highlighted ? 2 : 0;
+        if (style == Style::informer)
+            ++lighterBy;
 
-            case Style::informer:
-                pal.setColor(QPalette::Window, lighter);
-                pal.setColor(QPalette::Midlight, colorTheme()->lighter(lighter, 1));
-                break;
-        }
-
+        pal.setColor(QPalette::Window, colorTheme()->lighter(base, lighterBy));
+        pal.setColor(QPalette::Midlight, colorTheme()->lighter(base, lighterBy + 1));
         q->setPalette(pal);
     }
 
@@ -128,8 +122,7 @@ struct EventTile::Private
         }
         else
         {
-            QString text = lm("<b>%1</b>").arg(list.join("<br>"));
-
+            QString text = list.join("<br>");
             if (andMore > 0)
             {
                 static constexpr int kQssFontWeightMultiplier = 8;
@@ -340,7 +333,10 @@ void EventTile::setResourceList(const QnResourceList& list)
 {
     QStringList items;
     for (int i = 0; i < std::min(list.size(), kMaximumResourceListSize); ++i)
-        items.push_back(list[i]->getName());
+    {
+        NX_ASSERT(list[i]); //< Null resource pointer is an abnormal situation.
+        items.push_back(list[i] ? htmlBold(list[i]->getName()) : "?");
+    }
 
     d->setResourceList(items, qMax(list.size() - kMaximumResourceListSize, 0));
 }
@@ -348,6 +344,9 @@ void EventTile::setResourceList(const QnResourceList& list)
 void EventTile::setResourceList(const QStringList& list)
 {
     QStringList items = list.mid(0, kMaximumResourceListSize);
+    for (auto& item: items)
+        item = ensureHtml(item);
+
     d->setResourceList(items, qMax(list.size() - kMaximumResourceListSize, 0));
 }
 
@@ -484,19 +483,21 @@ bool EventTile::hasAutoClose() const
     return closeable() && d->autoCloseTimer;
 }
 
-int EventTile::autoCloseTimeMs() const
+std::chrono::milliseconds EventTile::autoCloseTime() const
 {
-    return hasAutoClose() ? d->autoCloseTimer->interval() : -1;
+    return std::chrono::milliseconds(hasAutoClose() ? d->autoCloseTimer->interval() : 0);
 }
 
-int EventTile::autoCloseRemainingMs() const
+std::chrono::milliseconds EventTile::autoCloseRemainingTime() const
 {
-    return hasAutoClose() ? d->autoCloseTimer->remainingTime() : -1;
+    return std::chrono::milliseconds(hasAutoClose() ? d->autoCloseTimer->remainingTime() : 0);
 }
 
-void EventTile::setAutoCloseTimeMs(int value)
+void EventTile::setAutoCloseTime(std::chrono::milliseconds value)
 {
-    if (value <= 0)
+    using namespace std::literals::chrono_literals;
+
+    if (value <= 0ms)
     {
         if (!d->autoCloseTimer)
             return;
@@ -518,13 +519,13 @@ void EventTile::setAutoCloseTimeMs(int value)
         if (!d->isRead)
             d->autoCloseTimer->stop();
 
-        d->autoCloseTimer->setInterval(value);
+        d->autoCloseTimer->setInterval(value.count());
     }
     else
     {
         d->autoCloseTimer = new QTimer(this);
         d->autoCloseTimer->setSingleShot(true);
-        d->autoCloseTimer->setInterval(value);
+        d->autoCloseTimer->setInterval(value.count());
 
         connect(d->autoCloseTimer, &QTimer::timeout, this, autoClose);
 
@@ -681,6 +682,20 @@ void EventTile::setVisualStyle(Style value)
         return;
 
     d->style = value;
+    d->updatePalette();
+}
+
+bool EventTile::highlighted() const
+{
+    return d->highlighted;
+}
+
+void EventTile::setHighlighted(bool value)
+{
+    if (d->highlighted == value)
+        return;
+
+    d->highlighted = value;
     d->updatePalette();
 }
 

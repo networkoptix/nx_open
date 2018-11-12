@@ -126,7 +126,7 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
                 return QVariant();
             [[fallthrough]];
         case Qn::TimestampRole:
-            return QVariant::fromValue(eventParams.eventTimestampUsec);
+            return QVariant::fromValue(std::chrono::microseconds(eventParams.eventTimestampUsec));
 
         case Qn::ResourceListRole:
         {
@@ -139,7 +139,7 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
             const auto resource = q->resourcePool()->getResourceById(eventParams.eventResourceId);
             return resource
                 ? QVariant::fromValue(QnResourceList({resource}))
-                : QVariant();
+                : QVariant(); //< TODO: #vkutin Replace with <deleted camera> or <deleted server>?
         }
 
         case Qn::ResourceRole: //< Resource for thumbnail preview only.
@@ -405,7 +405,7 @@ QPixmap EventSearchListModel::Private::pixmap(const vms::event::EventParameters&
         // TODO: #vkutin Fill with actual pixmaps as soon as they're created.
         case nx::vms::api::EventType::cameraMotionEvent:
         case nx::vms::api::EventType::cameraInputEvent:
-            return qnSkin->pixmap("tree/camera.png");
+            return qnSkin->pixmap("tree/camera.svg");
 
         case nx::vms::api::EventType::analyticsSdkEvent:
             return QPixmap();

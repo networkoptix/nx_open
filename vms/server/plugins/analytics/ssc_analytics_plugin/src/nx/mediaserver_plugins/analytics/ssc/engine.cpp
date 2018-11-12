@@ -11,6 +11,8 @@
 
 #include <nx/fusion/model_functions.h>
 
+#include <nx/sdk/common/string.h>
+
 #include <nx/mediaserver_plugins/utils/uuid.h>
 
 #include <nx/kit/ini_config.h>
@@ -287,8 +289,14 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void Engine::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
+void Engine::setSettings(const nx::sdk::Settings* settings)
 {
+    // There are no DeviceAgent settings for this plugin.
+}
+
+nx::sdk::Settings* Engine::settings() const
+{
+    return nullptr;
 }
 
 void Engine::onDataReceived(int index)
@@ -367,10 +375,10 @@ nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
         return nullptr;
 }
 
-const char* Engine::manifest(Error* error) const
+const IString* Engine::manifest(Error* error) const
 {
     *error = Error::noError;
-    return m_manifest.constData();
+    return new common::String(m_manifest);
 }
 
 } // namespace ssc
@@ -378,11 +386,26 @@ const char* Engine::manifest(Error* error) const
 } // namespace mediaserver_plugins
 } // namespace nx
 
+namespace {
+
+static const std::string kLibName = "ssc_analytics_plugin";
+static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
+{
+    "id": "nx.ssc",
+    "name": "SSC analytics plugin",
+    "engineSettingsModel": ""
+}
+)json";
+
+} // namespace
+
 extern "C" {
 
 NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
-    return new nx::sdk::analytics::CommonPlugin("ssc_analytics_plugin",
+    return new nx::sdk::analytics::CommonPlugin(
+        kLibName,
+        kPluginManifest,
         [](nx::sdk::analytics::Plugin* plugin)
         {
             return new nx::mediaserver_plugins::analytics::ssc::Engine(

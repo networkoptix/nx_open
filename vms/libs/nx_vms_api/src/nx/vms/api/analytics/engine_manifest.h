@@ -2,6 +2,7 @@
 
 #include <QtCore/QList>
 #include <QtCore/QStringList>
+#include <QtCore/QJsonObject>
 
 #include <nx/vms/api/analytics/translatable_string.h>
 #include <nx/vms/api/analytics/manifest_items.h>
@@ -40,32 +41,29 @@ struct NX_VMS_API EngineManifest
         needUncompressedVideoFrames_bgra = 1 << 4,
         needUncompressedVideoFrames_rgb = 1 << 5,
         needUncompressedVideoFrames_bgr = 1 << 6,
-        cameraModelIndependent = 1 << 7,
+        deviceModelDependent = 1 << 7,
     };
     Q_DECLARE_FLAGS(Capabilities, Capability)
-
-    // TODO: Remove when not needed for GUI's EventTypeDescriptor.
-    QString pluginId;
-    TranslatableString pluginName;
 
     Capabilities capabilities;
 
     /** Types of Events that can potentially be produced by any DeviceAgent of this Engine. */
     QList<EventType> eventTypes;
-    
+
     /** Types of Objects that can potentially be produced by any DeviceAgent of this Engine. */
     QList<ObjectType> objectTypes;
-    
+
     /** Groups that are used to group Object and Event types declared by this manifest. */
     QList<Group> groups;
 
     QList<ObjectAction> objectActions;
 
-    // TODO: Add DeviceAgent settings and Engine settings.
+    QJsonObject deviceAgentSettingsModel;
+
+    // TODO: Add Engine dynamic settings.
 };
 #define EngineManifest_Fields \
-    (pluginId)(pluginName)(capabilities) \
-    (eventTypes)(objectTypes)(objectActions)(groups)
+    (capabilities)(eventTypes)(objectTypes)(objectActions)(groups)(deviceAgentSettingsModel)
 QN_FUSION_DECLARE_FUNCTIONS(EngineManifest, (json), NX_VMS_API)
 Q_DECLARE_OPERATORS_FOR_FLAGS(EngineManifest::Capabilities)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EngineManifest::Capability)
