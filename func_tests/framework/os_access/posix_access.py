@@ -278,14 +278,24 @@ class _FakeDisk(BaseFakeDisk):
         self._shell = posix_access.shell
 
     def remove(self):
-        # At least, in Ubuntu 14.04 trusty, multiple `/dev/loop*` devices may be mounted to single
-        # mount point. Files that are behind `/dev/loop*` may be deleted. To dismount such mounts,
-        # `umount -f /mnt/point` must be called unless it exists with error code 1 and says
-        # `umount2: Invalid argument` and `umount: /mnt/disk: not mounted`.
+        """At least, in Ubuntu 14.04 trusty, multiple `/dev/loop*` devices may be mounted to single
+        mount point. Files that are behind `/dev/loop*` may be deleted. To dismount such mounts,
+        `umount -l /mnt/point` must be called unless it exists with error code 1 and says
+        `umount: /mnt/disk: not mounted`.
+
+        Also note that lazy `umount` is used. From `man umount`: "Detach the filesystem from the
+        file hierarchy now, and clean up all references to this filesystem as soon as it is not
+        busy anymore." Image file can be deleted even if it's still used.
+        """
         while True:
             try:
-                self._shell.run_command(['umount', '-f', self.path])
-            except exceptions.exit_status_error_cls(1):
+                self._shell.run_command(['umount', '-l', self.path])
+            except exceptions.exit_status_error_cls(1) as e:
+                if e.stderr.decode().rstrip().endswith(': not found'):
+                    _logger.debug("No mount point %s, OK if never been mounted.", self.path)
+                    break
+                if not e.stderr.decode().rstrip().endswith(': not mounted'):
+                    raise
                 break
         # File should be deleted too. Otherwise, it may contain data from previous test.
         try:

@@ -18,7 +18,7 @@ from transaction_generator import (
     )
 from transaction_reader import reader_logger, transactions_watched
 from metrics import MetricsCollector
-from local_mediaservers import create_local_server_list
+from existing_mediaservers import create_existing_server_list
 from cmdline_logging import init_logging
 
 
@@ -40,7 +40,7 @@ def transaction_stage_running(
             yield
 
 
-def _reader_main():
+def _transaction_stage_main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--logging-config', default='default.yaml',
                         help=("Configuration file for logging, in yaml format."
@@ -70,7 +70,7 @@ def _reader_main():
         reader_logger.setLevel(logging.INFO)
         post_stamp_logger.setLevel(logging.WARNING)
 
-    watch_server_list = create_local_server_list(
+    watch_server_list = create_existing_server_list(
         args.watch_server_url, password='admin' if args.lws else None)
     post_server_list = address_and_count_to_server_list(
         args.post_server_address, args.post_server_count, args.base_port, args.lws)
@@ -88,4 +88,4 @@ def _reader_main():
 
 
 if __name__ == '__main__':
-    _reader_main()
+    _transaction_stage_main()

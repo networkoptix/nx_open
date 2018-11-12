@@ -39,7 +39,7 @@ _status_to_errno = {
     _STATUS_NOT_A_DIRECTORY: errno.ENOTDIR,
     _STATUS_FILE_IS_A_DIRECTORY: errno.EISDIR,
     _STATUS_ACCESS_DENIED: errno.EACCES,
-    _STATUS_SHARING_VIOLATION: errno.EACCES,
+    _STATUS_SHARING_VIOLATION: 32,  # Same as if Python cannot delete file on Windows.
     _STATUS_DELETE_PENDING: errno.EWOULDBLOCK,
     _STATUS_DIRECTORY_NOT_EMPTY: errno.ENOTEMPTY,
     _STATUS_REQUEST_NOT_ACCEPTED: errno.EPERM,
@@ -72,11 +72,16 @@ def _reraising_on_operation_failure(status_to_error_cls):
     return decorator
 
 
+class UsedByAnotherProcess(exceptions.FileSystemError):
+    pass
+
+
 _reraise_for_existing = _reraising_on_operation_failure({
     _STATUS_DIRECTORY_NOT_EMPTY: exceptions.NotEmpty,
     _STATUS_OBJECT_NAME_NOT_FOUND: exceptions.DoesNotExist,
     _STATUS_OBJECT_PATH_NOT_FOUND: exceptions.DoesNotExist,
     _STATUS_FILE_IS_A_DIRECTORY: exceptions.NotAFile,
+    _STATUS_SHARING_VIOLATION: UsedByAnotherProcess,
     })
 _reraise_for_new = _reraising_on_operation_failure({
     _STATUS_FILE_IS_A_DIRECTORY: exceptions.NotAFile,

@@ -1,3 +1,3 @@
-advanced_lens_control
-mediaserver_metrics
+advanced_lens_control=1
+mediaserver_metrics=1
 get_time_of_servers_version=2
