@@ -18,7 +18,7 @@ namespace {
 
 static constexpr int kMsecInSec = 1000;
 
-const char * deviceType()
+static const char * deviceType()
 {
     return
 #ifdef _WIN32
@@ -28,7 +28,7 @@ const char * deviceType()
 #endif
 }
 
-bool isIFrame(const ffmpeg::Packet * packet)
+static bool isKeyFrame(const ffmpeg::Packet * packet)
 {
     if(!packet)
         return false;
@@ -414,7 +414,7 @@ std::shared_ptr<ffmpeg::Packet> VideoStream::readFrame()
 
 #ifdef _WIN32
     // dshow input format does not set h264 key packet flag correctly, so do it manually
-    if (packet->codecId() == AV_CODEC_ID_H264 && isIFrame(packet.get()))
+    if (packet->codecId() == AV_CODEC_ID_H264 && isKeyFrame(packet.get()))
         packet->packet()->flags |= AV_PKT_FLAG_KEY;
 #endif
 
