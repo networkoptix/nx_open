@@ -42,23 +42,25 @@ void QnAbstractMediaStreamDataProvider::setNeedKeyData(int channel)
 {
     QnMutexLocker mtx( &m_mutex );
 
-    if (m_numberOfchannels == 0)
-    {
-        m_numberOfchannels = dynamic_cast<QnMediaResource*>(
-            m_mediaResource.data())->getVideoLayout(this)->channelCount();
-    }
+    updateNumberOfchannelsUnsafe();
 
     if (m_numberOfchannels < CL_MAX_CHANNEL_NUMBER && channel < m_numberOfchannels)
         m_gotKeyFrame[channel] = 0;
+}
+
+void QnAbstractMediaStreamDataProvider::updateNumberOfchannelsUnsafe() const
+{
+    if (m_numberOfchannels != 0)
+        return;
+    if (auto mediaRes = dynamic_cast<QnMediaResource*>(m_mediaResource.data()))
+        m_numberOfchannels = mediaRes->getVideoLayout(this)->channelCount();
 }
 
 void QnAbstractMediaStreamDataProvider::setNeedKeyData()
 {
     QnMutexLocker mtx( &m_mutex );
 
-    if (m_numberOfchannels==0)
-        m_numberOfchannels = dynamic_cast<QnMediaResource*>(m_mediaResource.data())->getVideoLayout(this)->channelCount();
-
+    updateNumberOfchannelsUnsafe();
 
     for (int i = 0; i < m_numberOfchannels; ++i)
         m_gotKeyFrame[i] = 0;
@@ -74,9 +76,7 @@ bool QnAbstractMediaStreamDataProvider::needKeyData() const
 {
     QnMutexLocker mtx( &m_mutex );
 
-    if (m_numberOfchannels==0)
-        m_numberOfchannels = dynamic_cast<QnMediaResource*>(m_mediaResource.data())->getVideoLayout(this)->channelCount();
-
+    updateNumberOfchannelsUnsafe();
 
     for (int i = 0; i < m_numberOfchannels; ++i)
         if (m_gotKeyFrame[i]==0)
