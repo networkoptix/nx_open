@@ -444,7 +444,7 @@ void QnLoginDialog::resetSavedSessionsModel()
     if (!m_lastUsedItem || customConnections.isEmpty())
     {
         nx::utils::Url url;
-        url.setPort(DEFAULT_APPSERVER_PORT);
+        url.setPort(kDefaultConnectionPort);
         url.setHost(QLatin1Literal(DEFAULT_APPSERVER_HOST));
         url.setUserName(helpers::kFactorySystemUser);
 
