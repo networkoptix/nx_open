@@ -81,7 +81,7 @@ class LwsInstallation(CustomPosixInstallation):
             ]
 
     def list_log_files(self):
-        return self.dir.glob('lws*.log') + [
+        return list(self.dir.glob('lws*.log')) + [
             self.dir / 'server.stderr',
             self.dir / 'server.stdout',
             ]
@@ -99,7 +99,7 @@ class LwsInstallation(CustomPosixInstallation):
         dist_dir = self._installation_group.get_unpacked_dist_dir(installer)
         self.dir.ensure_empty_dir()
         self._test_tmp_dir.ensure_empty_dir()
-        self.posix_access.run_command(['cp', '-a'] + dist_dir.glob('*') + [self.dir])
+        self.posix_access.run_command(['cp', '-a'] + list(dist_dir.glob('*')) + [self.dir])
         copy_file(lightweight_mediaserver_installer, self._lws_binary_path)
         self.posix_access.run_command(['chmod', '+x', self._lws_binary_path])
         self._write_server_info()

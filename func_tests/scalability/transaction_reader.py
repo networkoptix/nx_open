@@ -12,7 +12,7 @@ import dateutil.parser
 
 from framework.message_bus import SetResourceParamCommand, message_bus_running
 from framework.threaded import ThreadedCall
-from local_mediaservers import create_local_server_list
+from existing_mediaservers import create_existing_server_list
 from metrics import MetricsCollector
 from cmdline_logging import init_logging
 
@@ -79,7 +79,7 @@ def _reader_main():
     if not args.verbose:
         reader_logger.setLevel(logging.INFO)
 
-    server_list = create_local_server_list(
+    server_list = create_existing_server_list(
         args.server_url, password='admin' if args.lws else None)
     metrics_collector = MetricsCollector()
 

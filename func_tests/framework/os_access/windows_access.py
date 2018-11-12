@@ -5,9 +5,11 @@ import errno
 import logging
 import math
 import re
+import sys
 import timeit
 
 import pytz
+import six
 import tzlocal.windows_tz
 
 from framework.method_caching import cached_getter
@@ -15,7 +17,7 @@ from framework.networking.windows import WindowsNetworking
 from framework.os_access import exceptions
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.os_access_interface import OSAccess, Time, BaseFakeDisk
-from framework.os_access.smb_path import SMBPath
+from framework.os_access.smb_path import SMBPath, UsedByAnotherProcess
 from framework.os_access.windows_remoting import WinRM
 from framework.os_access.windows_remoting.env_vars import EnvVars
 from framework.os_access.windows_remoting.powershell import PowershellError
@@ -198,11 +200,12 @@ class WindowsAccess(OSAccess):
             )
 
     def file_md5(self, path):
-        output = self.winrm.command(['CertUtil', '-hashfile', path, 'md5']).decode()
-        match = re.search('\b[0-9a-fA-F]{32}\b', output)
+        try:
+            output = self.winrm.command(['CertUtil', '-hashfile', path, 'md5']).run().decode()
+        except exceptions.exit_status_error_cls(0x80070002):  # Misleading error code and message.
+            raise exceptions.NotAFile(errno.EISDIR, "Trying to get MD5 of dir.")
+        match = re.search(r'\b[0-9a-fA-F]{32}\b', output)
         if match is None:
-            if '0x80070002' in output:
-                raise exceptions.NotAFile(errno.EISDIR, "Trying to get MD5 of dir.")
             raise RuntimeError('Cannot get MD5 of {}:\n{}'.format(path, output))
         return match.group()
 
@@ -214,15 +217,38 @@ class _FakeDisk(BaseFakeDisk):
         self._image_path = windows_access.path_cls('C:\\{}.vhdx'.format(self._letter))
         self.winrm = windows_access.winrm
 
+    def _diskpart(self, name, script, timeout_sec):
+        _logger.debug('Diskpart script:\n%s', script)
+        script_path = self._image_path.with_name('{}.{}.diskpart.txt'.format(self._letter, name))
+        script_path.write_text(script)
+        # Error originate in VDS -- Virtual Disk Service.
+        # See: https://msdn.microsoft.com/en-us/library/dd208031.aspx.
+        command = self.winrm.command(['diskpart', '/s', script_path])
+        try:
+            command.run(timeout_sec=timeout_sec)
+        except exceptions.exit_status_error_cls(0x80070057) as e:
+            message_multiline = e.stdout.decode().rstrip().rsplit('\r\n\r\n')[-1]
+            message_oneline = message_multiline.replace('\r\n', ' ')
+            six.reraise(OSError, OSError(errno.EINVAL, message_oneline), sys.exc_info()[2])
+
     def remove(self, letter='V'):
+        # `DETACH` fails even with `NOERR`. The following scheme helps to work around this and
+        # save `diskpart` run if there is no disk mounted.
         try:
-            self.winrm.command(['MountVol', letter + ':', '/D']).run(timeout_sec=5)
-        except exceptions.exit_status_error_cls(1):
-            pass
-        try:
+            _logger.debug("Try to delete virtual disk file first: %s", self._image_path)
             self._image_path.unlink()
         except exceptions.DoesNotExist:
-            pass
+            _logger.debug("Skip diskpart: no virtual disk file: %s", self._image_path)
+        except UsedByAnotherProcess:
+            _logger.debug("Run diskpart to dismount and detach: %s", self._image_path)
+            script_template = (
+                'SELECT VDISK file={image_path}' '\r\n'
+                'DETACH VDISK' '\r\n'  # When detaching, volume is unmounted automatically.
+            )
+            script = script_template.format(image_path=self._image_path)
+            self._diskpart('remove', script, 5)
+            _logger.debug("Delete virtual disk file: %s", self._image_path)
+            self._image_path.unlink()
 
     def mount(self, size_bytes):
         """Make virtual disk and mount it.
@@ -234,28 +260,18 @@ class _FakeDisk(BaseFakeDisk):
         partition_mb = volume_mb + 1  # 1 MB for filesystem.
         disk_mb = partition_mb + 2  # 1 MB is for MBR/GPT headers.
         script_template = (
-            'CREATE VDISK file={image_path} MAXIMUM={disk_mb} NOERR' '\r\n'  # NOERR if exists.
+            'CREATE VDISK file={image_path} MAXIMUM={disk_mb}' '\r\n'  # NOERR if exists.
             'SELECT VDISK file={image_path}' '\r\n'  # No error if already selected.
-            'DETACH VDISK NOERR' '\r\n'  # NOERR if attached.
-            'EXPAND VDISK maximum={disk_mb} NOERR' '\r\n'  # NOERR if requested size is less.
-            'ATTACH VDISK' '\r\n'  # NOERR if attached. "Disk" of "vdisk" has been selected.
-            'CLEAN' '\r\n'  # Removes letter, wipes partition table.
+            'ATTACH VDISK' '\r\n'  # "Disk" of "vdisk" has been selected.
             'CONVERT MBR' '\r\n'
             'CREATE PARTITION PRIMARY size={partition_mb}' '\r\n'  # New partition and its volume have been selected.
             'FORMAT' '\r\n'  # Filesystem is default (NTFS).
             'ASSIGN LETTER={letter}' '\r\n'
-            'EXIT' '\r\n'
         )
         script = script_template.format(
             image_path=self._image_path,
             letter=self._letter,
             partition_mb=partition_mb,
             disk_mb=disk_mb)
-        _logger.debug('Diskpart script:\n%s', script)
-        # With script file, `diskpart` exits with non-zero code.
-        script_path = self._image_path.with_suffix('.diskpart.txt')
-        script_path.write_text(script)
-        # Error originate in VDS -- Virtual Disk Service.
-        # See: https://msdn.microsoft.com/en-us/library/dd208031.aspx.
-        command = self.winrm.command(['diskpart', '/s', script_path])
-        command.run(timeout_sec=10 + 0.05 * free_space_mb)
+        self._diskpart('mount', script, 10 + 0.05 * free_space_mb)
+

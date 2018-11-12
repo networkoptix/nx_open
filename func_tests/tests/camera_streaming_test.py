@@ -39,7 +39,7 @@ def check_media_stream_transports(server):
 # https://networkoptix.atlassian.net/browse/TEST-178
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/77234376/Camera+history+test
 @pytest.mark.testcam
-def test_camera_switching_should_be_represented_in_history(artifact_factory, two_merged_mediaservers, camera_pool, camera):
+def test_camera_switching_should_be_represented_in_history(artifacts_dir, two_merged_mediaservers, camera_pool, camera):
     for server in two_merged_mediaservers:
         server.installation.ini_config('test_camera').set('discoveryPort', str(camera_pool.discovery_port))
     one, two = two_merged_mediaservers  # type: (Mediaserver, Mediaserver)
@@ -74,10 +74,10 @@ def test_camera_switching_should_be_represented_in_history(artifact_factory, two
         wait_for_equal(two.api.camera(camera_id).history, history, timeout_sec=5)
 
     # https://networkoptix.atlassian.net/browse/VMS-4180
-    stream_type = 'hls'
-    stream = one.api.get_media_stream(stream_type, camera.mac_addr)
-    metadata_list = stream.load_archive_stream_metadata(
-        artifact_factory.make_artifact(['stream-media', stream_type]), pos=0, duration=3000)
+    stream = one.api.get_media_stream('hls', camera.mac_addr)
+    local_dir = artifacts_dir / 'stream-media-hls'
+    local_dir.mkdir(parents=True, exist_ok=True)
+    metadata_list = stream.load_archive_stream_metadata(local_dir, pos=0, duration=3000)
     assert metadata_list  # Must not be empty
 
     check_media_stream_transports(one)

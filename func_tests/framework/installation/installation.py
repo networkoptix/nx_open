@@ -80,7 +80,7 @@ class Installation(object):
     def list_log_files(self):
         logs_dir = self._var.joinpath('log')
         if logs_dir.exists():
-            return logs_dir.glob('*')
+            return list(logs_dir.glob('*'))
         else:
             return []
 
@@ -123,10 +123,22 @@ class Installation(object):
 
     def specific_features(self):
         path = self.dir / 'specific_features.txt'
+
+        def parse(line):
+            try:
+                key, value = line.split('=')
+                return key.strip(), int(value.strip())
+            except ValueError:
+                return line.strip(), 1
         try:
-            return path.read_text(encoding='ascii').splitlines()
+            lines = path.read_text(encoding='ascii').splitlines()
         except DoesNotExist:
-            return []
+            result = dict()
+        else:
+            result = dict([parse(line) for line in lines if line])
+
+        _logger.debug('Specific features: %s', result)
+        return result
 
     @abstractmethod
     def ini_config(self, name):
