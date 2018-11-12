@@ -340,9 +340,12 @@ void QnRtspConnectionProcessor::parseRequest()
     QString codec = urlQuery.queryItemValue("codec");
     if (!codec.isEmpty())
     {
-        AVOutputFormat* format = av_guess_format(codec.toLatin1().data(),NULL,NULL);
-        if (format)
-            d->transcodeParams.codecId = format->video_codec;
+        AVCodec* avCodec = avcodec_find_encoder_by_name(codec.toLatin1().data());
+        if (avCodec)
+            d->transcodeParams.codecId = avCodec->id;
+
+        if (d->transcodeParams.codecId == AV_CODEC_ID_NONE)
+            NX_LOG(lit("Requested codec: %1 not found").arg(codec), cl_logWARNING);
     };
 
     const QString pos = urlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME ).split('/')[0];
