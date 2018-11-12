@@ -474,7 +474,7 @@ void QnResourceBrowserWidget::updateSearchMode()
     filterEdit->setText(QString());
     filterEdit->setPlaceholderText(localResourcesMode
         ? tr("Local files")
-        : tr("Cameras & Resources"));
+        : tr("Search"));
 
     updateInstantFilter();
 }
