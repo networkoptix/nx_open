@@ -15,8 +15,10 @@
 #include <utils/common/delayed.h>
 #include <utils/common/html.h>
 
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/close_button.h>
+#include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/workbench/extensions/workbench_progress_manager.h>
 #include <nx/utils/log/log_message.h>
@@ -164,6 +166,7 @@ EventTile::EventTile(QWidget* parent):
     ui->timestampLabel->setSizePolicy(sizePolicy);
 
     ui->descriptionLabel->hide();
+    ui->debugPreviewTimeLabel->hide();
     ui->timestampLabel->hide();
     ui->actionHolder->hide();
     ui->footerLabel->hide();
@@ -179,6 +182,7 @@ EventTile::EventTile(QWidget* parent):
     ui->nameLabel->setForegroundRole(QPalette::Light);
     ui->timestampLabel->setForegroundRole(QPalette::WindowText);
     ui->descriptionLabel->setForegroundRole(QPalette::Light);
+    ui->debugPreviewTimeLabel->setForegroundRole(QPalette::Light);
     ui->resourceListLabel->setForegroundRole(QPalette::Light);
     ui->footerLabel->setForegroundRole(QPalette::Light);
 
@@ -202,6 +206,8 @@ EventTile::EventTile(QWidget* parent):
     ui->progressDescriptionLabel->setFont(font);
     ui->progressDescriptionLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->progressDescriptionLabel->setOpenExternalLinks(false);
+    ui->debugPreviewTimeLabel->setFont(font);
+    ui->debugPreviewTimeLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
 
     font.setWeight(kResourceListFontWeight);
     font.setPixelSize(kResourceListFontPixelSize);
@@ -397,8 +403,25 @@ ImageProvider* EventTile::preview() const
 
 void EventTile::setPreview(ImageProvider* value)
 {
+    if (preview())
+        preview()->disconnect(this);
+
     ui->previewWidget->setImageProvider(value);
     ui->previewWidget->parentWidget()->setHidden(!value);
+
+    if (!ini().showDebugTimeInformationInRibbon || !preview())
+        return;
+
+    const auto showPreviewTimestamp =
+        [this]()
+        {
+            auto provider = qobject_cast<CameraThumbnailProvider*>(preview());
+            ui->debugPreviewTimeLabel->setText(lit("Preview: %2 us").arg(provider->timestampUs()));
+            ui->debugPreviewTimeLabel->setVisible(provider->status() == Qn::ThumbnailStatus::Loaded);
+        };
+
+    showPreviewTimestamp();
+    connect(preview(), &ImageProvider::statusChanged, this, showPreviewTimestamp);
 }
 
 QRectF EventTile::previewCropRect() const
@@ -697,6 +720,28 @@ void EventTile::setHighlighted(bool value)
 
     d->highlighted = value;
     d->updatePalette();
+}
+
+void EventTile::clear()
+{
+    setCloseable(false);
+    setTitle({});
+    setDescription({});
+    setFooterText({});
+    setTimestamp({});
+    setIcon({});
+    setPreview({});
+    setPreviewCropRect({});
+    setAction({});
+    setAutoCloseTime({});
+    setBusyIndicatorVisible(false);
+    setProgressBarVisible(false);
+    setProgressValue(0.0);
+    setProgressTitle({});
+    setRead(false);
+    setResourceList(QStringList());
+    setToolTip({});
+    setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
 }
 
 } // namespace nx::vms::client::desktop
