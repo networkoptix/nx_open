@@ -179,7 +179,7 @@ QnConnectionManager::ConnectionType QnConnectionManager::connectionType() const
 
 int QnConnectionManager::defaultServerPort() const
 {
-    return DEFAULT_APPSERVER_PORT;
+    return kDefaultConnectionPort;
 }
 
 nx::utils::Url QnConnectionManager::currentUrl() const
