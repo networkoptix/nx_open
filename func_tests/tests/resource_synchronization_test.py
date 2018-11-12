@@ -67,47 +67,47 @@ def dumper(artifacts_dir, env):
 
 
 @pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml'])
-def test_initial_merge(artifact_factory, env):
-    wait_for_servers_synced(artifact_factory, env.servers)
+def test_initial_merge(artifacts_dir, env):
+    wait_for_servers_synced(artifacts_dir, env.servers)
     for server in env.servers:
         assert not server.installation.list_core_dumps()
 
 
-def wait_api_path_synced(artifact_factory, server_list, api_path, differ=raw_differ):
+def wait_api_path_synced(artifacts_dir, server_list, api_path, differ=raw_differ):
     try:
         wait_for_api_path_match(server_list, api_path, differ)
     except SyncWaitTimeout as e:
-        e.log_and_dump_results(artifact_factory)
+        e.log_and_dump_results(artifacts_dir)
         raise
 
 
 @pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml'])
-def test_api_get_methods(artifact_factory, env):
+def test_api_get_methods(artifacts_dir, env):
 
-    wait_api_path_synced(artifact_factory, env.servers, 'ec2/getResourceTypes')
-    wait_api_path_synced(artifact_factory, env.servers, 'ec2/getResourceParams')
-    wait_api_path_synced(artifact_factory, env.servers, 'ec2/getMediaServers')
-    wait_api_path_synced(artifact_factory, env.servers, 'ec2/getMediaServersEx')
-    wait_api_path_synced(artifact_factory, env.servers, 'ec2/getCameras')
-    wait_api_path_synced(artifact_factory, env.servers, 'ec2/getCamerasEx')
-    wait_api_path_synced(artifact_factory, env.servers, 'ec2/getCameraHistoryItems')
-    wait_api_path_synced(artifact_factory, env.servers, 'ec2/bookmarks/tags')
-    wait_api_path_synced(artifact_factory, env.servers, 'ec2/getEventRules')
-    wait_api_path_synced(artifact_factory, env.servers, 'ec2/getUsers')
-    wait_api_path_synced(artifact_factory, env.servers, 'ec2/getVideowalls')
-    wait_api_path_synced(artifact_factory, env.servers, 'ec2/getLayouts')
-    wait_api_path_synced(artifact_factory, env.servers, 'ec2/listDirectory')
-    wait_api_path_synced(artifact_factory, env.servers, 'ec2/getStoredFile')
-    wait_api_path_synced(artifact_factory, env.servers, 'ec2/getSettings')
-    wait_api_path_synced(artifact_factory, env.servers, 'ec2/getFullInfo', differ=full_info_differ)
-    wait_api_path_synced(artifact_factory, env.servers, 'ec2/getLicenses')
+    wait_api_path_synced(artifacts_dir, env.servers, 'ec2/getResourceTypes')
+    wait_api_path_synced(artifacts_dir, env.servers, 'ec2/getResourceParams')
+    wait_api_path_synced(artifacts_dir, env.servers, 'ec2/getMediaServers')
+    wait_api_path_synced(artifacts_dir, env.servers, 'ec2/getMediaServersEx')
+    wait_api_path_synced(artifacts_dir, env.servers, 'ec2/getCameras')
+    wait_api_path_synced(artifacts_dir, env.servers, 'ec2/getCamerasEx')
+    wait_api_path_synced(artifacts_dir, env.servers, 'ec2/getCameraHistoryItems')
+    wait_api_path_synced(artifacts_dir, env.servers, 'ec2/bookmarks/tags')
+    wait_api_path_synced(artifacts_dir, env.servers, 'ec2/getEventRules')
+    wait_api_path_synced(artifacts_dir, env.servers, 'ec2/getUsers')
+    wait_api_path_synced(artifacts_dir, env.servers, 'ec2/getVideowalls')
+    wait_api_path_synced(artifacts_dir, env.servers, 'ec2/getLayouts')
+    wait_api_path_synced(artifacts_dir, env.servers, 'ec2/listDirectory')
+    wait_api_path_synced(artifacts_dir, env.servers, 'ec2/getStoredFile')
+    wait_api_path_synced(artifacts_dir, env.servers, 'ec2/getSettings')
+    wait_api_path_synced(artifacts_dir, env.servers, 'ec2/getFullInfo', differ=full_info_differ)
+    wait_api_path_synced(artifacts_dir, env.servers, 'ec2/getLicenses')
 
     for server in env.servers:
         assert not server.installation.list_core_dumps()
 
 
 @pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml', 'direct-no_merge.yaml'])
-def test_camera_data_synchronization(artifact_factory, env):
+def test_camera_data_synchronization(artifacts_dir, env):
 
     def call_generator():
         for idx in range(TEST_SIZE):
@@ -121,13 +121,13 @@ def test_camera_data_synchronization(artifact_factory, env):
 
     make_async_calls(call_generator())
     merge_system_if_unmerged(env)
-    wait_for_servers_synced(artifact_factory, env.servers)
+    wait_for_servers_synced(artifacts_dir, env.servers)
     for server in env.servers:
         assert not server.installation.list_core_dumps()
 
 
 @pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml', 'direct-no_merge.yaml'])
-def test_user_data_synchronization(artifact_factory, env):
+def test_user_data_synchronization(artifacts_dir, env):
 
     def call_generator():
         for idx in range(TEST_SIZE):
@@ -137,13 +137,13 @@ def test_user_data_synchronization(artifact_factory, env):
 
     make_async_calls(call_generator())
     merge_system_if_unmerged(env)
-    wait_for_servers_synced(artifact_factory, env.servers)
+    wait_for_servers_synced(artifacts_dir, env.servers)
     for server in env.servers:
         assert not server.installation.list_core_dumps()
 
 
 @pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml', 'direct-no_merge.yaml'])
-def test_mediaserver_data_synchronization(artifact_factory, env):
+def test_mediaserver_data_synchronization(artifacts_dir, env):
 
     def call_generator():
         for idx in range(TEST_SIZE):
@@ -157,13 +157,13 @@ def test_mediaserver_data_synchronization(artifact_factory, env):
 
     make_async_calls(call_generator())
     merge_system_if_unmerged(env)
-    wait_for_servers_synced(artifact_factory, env.servers)
+    wait_for_servers_synced(artifacts_dir, env.servers)
     for server in env.servers:
         assert not server.installation.list_core_dumps()
 
 
 @pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml', 'direct-no_merge.yaml'])
-def test_storage_data_synchronization(artifact_factory, env):
+def test_storage_data_synchronization(artifacts_dir, env):
     server_to_id = {server: server.api.get_server_id() for server in env.servers}
 
     def call_generator():
@@ -174,13 +174,13 @@ def test_storage_data_synchronization(artifact_factory, env):
 
     make_async_calls(call_generator())
     merge_system_if_unmerged(env)
-    wait_for_servers_synced(artifact_factory, env.servers)
+    wait_for_servers_synced(artifacts_dir, env.servers)
     for server in env.servers:
         assert not server.installation.list_core_dumps()
 
 
 @pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml', 'direct-no_merge.yaml'])
-def test_resource_params_data_synchronization(artifact_factory, env):
+def test_resource_params_data_synchronization(artifacts_dir, env):
 
     def call_generator():
         for idx in range(TEST_SIZE):
@@ -199,13 +199,13 @@ def test_resource_params_data_synchronization(artifact_factory, env):
 
     make_async_calls(call_generator())
     merge_system_if_unmerged(env)
-    wait_for_servers_synced(artifact_factory, env.servers)
+    wait_for_servers_synced(artifacts_dir, env.servers)
     for server in env.servers:
         assert not server.installation.list_core_dumps()
 
 
 @pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml', 'direct-no_merge.yaml'])
-def test_remove_resource_params_data_synchronization(artifact_factory, env):
+def test_remove_resource_params_data_synchronization(artifacts_dir, env):
 
     def call_generator():
         for idx in range(TEST_SIZE):
@@ -233,7 +233,7 @@ def test_remove_resource_params_data_synchronization(artifact_factory, env):
     make_async_calls(remove_fn_list)
 
     merge_system_if_unmerged(env)
-    wait_for_servers_synced(artifact_factory, env.servers)
+    wait_for_servers_synced(artifacts_dir, env.servers)
     for server in env.servers:
         assert not server.installation.list_core_dumps()
 
@@ -242,7 +242,7 @@ MAX_LAYOUT_ITEMS = 10
 
 
 @pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml', 'direct-no_merge.yaml'])
-def test_layout_data_synchronization(artifact_factory, env):
+def test_layout_data_synchronization(artifacts_dir, env):
 
     admin_user_list = [user
                        for server in env.servers
@@ -314,13 +314,13 @@ def test_layout_data_synchronization(artifact_factory, env):
     make_async_calls(remove_fn_list[:layouts_to_remove_count * 3])
 
     merge_system_if_unmerged(env)
-    wait_for_servers_synced(artifact_factory, env.servers)
+    wait_for_servers_synced(artifacts_dir, env.servers)
     for server in env.servers:
         assert not server.installation.list_core_dumps()
 
 
 @pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml'])
-def test_resource_remove_update_conflict(artifact_factory, env):
+def test_resource_remove_update_conflict(artifacts_dir, env):
 
     def call_generator():
         for idx in range(TEST_SIZE):
@@ -357,10 +357,10 @@ def test_resource_remove_update_conflict(artifact_factory, env):
     change_remove_fn_list = flatten_list(change_remove_fn_list_list)
     make_async_calls(save_fn_list)
 
-    wait_for_servers_synced(artifact_factory, env.servers)
+    wait_for_servers_synced(artifacts_dir, env.servers)
 
     make_async_calls(change_remove_fn_list)
     
-    wait_for_servers_synced(artifact_factory, env.servers)
+    wait_for_servers_synced(artifacts_dir, env.servers)
     for server in env.servers:
         assert not server.installation.list_core_dumps()

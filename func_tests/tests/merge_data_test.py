@@ -62,11 +62,13 @@ def test_responses_are_equal(system, target_alias, proxy_alias):
     assert not system[proxy_alias].installation.list_core_dumps()
 
 
-def assert_server_stream(server, camera, sample_media_file, stream_type, artifact_factory, start_time):
+def assert_server_stream(server, camera, sample_media_file, stream_type, artifacts_dir, start_time):
     assert TimePeriod(start_time, sample_media_file.duration) in server.api.get_recorded_time_periods(camera.id)
     stream = server.api.get_media_stream(stream_type, camera.mac_addr)
+    local_dir = artifacts_dir / 'stream-media-{}'.format(stream_type)
+    local_dir.mkdir(parents=True, exist_ok=True)
     metadata_list = stream.load_archive_stream_metadata(
-        artifact_factory.make_artifact(['stream-media', stream_type]),
+        local_dir,
         pos=start_time, duration=sample_media_file.duration)
     for metadata in metadata_list:
         assert metadata.width == sample_media_file.width
@@ -76,7 +78,7 @@ def assert_server_stream(server, camera, sample_media_file, stream_type, artifac
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/23920653/Connection+behind+NAT#ConnectionbehindNAT-test_get_streams
 @pytest.mark.slow
 @pytest.mark.parametrize('layout_file', ['nat-merge_toward_inner.yaml'])
-def test_get_streams(artifact_factory, system, camera, sample_media_file, stream_type):
+def test_get_streams(artifacts_dir, system, camera, sample_media_file, stream_type):
     system['inner'].api.add_camera(camera)
     start_time_1 = datetime(2017, 1, 27, tzinfo=pytz.utc)
     system['outer'].storage.save_media_sample(camera, start_time_1, sample_media_file)
@@ -85,13 +87,13 @@ def test_get_streams(artifact_factory, system, camera, sample_media_file, stream
     system['inner'].storage.save_media_sample(camera, start_time_2, sample_media_file)
     system['inner'].api.rebuild_archive()
     assert_server_stream(
-        system['inner'], camera, sample_media_file, stream_type, artifact_factory, start_time_1)
+        system['inner'], camera, sample_media_file, stream_type, artifacts_dir, start_time_1)
     assert_server_stream(
-        system['outer'], camera, sample_media_file, stream_type, artifact_factory, start_time_1)
+        system['outer'], camera, sample_media_file, stream_type, artifacts_dir, start_time_1)
     assert_server_stream(
-        system['inner'], camera, sample_media_file, stream_type, artifact_factory, start_time_2)
+        system['inner'], camera, sample_media_file, stream_type, artifacts_dir, start_time_2)
     assert_server_stream(
-        system['outer'], camera, sample_media_file, stream_type, artifact_factory, start_time_2)
+        system['outer'], camera, sample_media_file, stream_type, artifacts_dir, start_time_2)
 
     assert not system['outer'].installation.list_core_dumps()
     assert not system['inner'].installation.list_core_dumps()

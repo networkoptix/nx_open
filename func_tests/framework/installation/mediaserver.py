@@ -150,11 +150,14 @@ class Mediaserver(BaseMediaserver):
     @property
     def storage(self):
         """Any non-backup storage"""
-        # GET /ec2/getStorages is not always possible: server sometimes is not started.
-        response = self.api.generic.get('ec2/getStorages')
-        for storage_data in response:
-            if not storage_data['isBackup']:
-                return Storage(self.os_access, self.os_access.path_cls(storage_data['url']))
+
+        def get_storage():
+            response = self.api.generic.get('ec2/getStorages')
+            for storage_data in response:
+                if not storage_data['isBackup']:
+                    return Storage(self.os_access, self.os_access.path_cls(storage_data['url']))
+
+        return wait_for_truthy(get_storage)
 
 
 class Storage(object):

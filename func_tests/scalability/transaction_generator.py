@@ -22,7 +22,7 @@ from framework.utils import (
     threadsafe_generator,
 )
 from metrics import MetricsCollector
-from local_mediaservers import create_local_server_list
+from existing_mediaservers import address_and_count_to_server_list
 from cmdline_logging import init_logging
 
 
@@ -168,10 +168,10 @@ def transactions_posted(
     pacer = _Pacer(rate, thread_count, metrics_collector)
 
     def issue_transaction():
-        fn = next(call_generator)
         context_1 = context_logger(post_stamp_logger, 'framework.http_api')
         context_2 = context_logger(post_stamp_logger, 'framework.mediaserver_api')
         with pacer.pace_call(), context_1, context_2:
+            fn = next(call_generator)
             post_stamp_logger.info('Post %s', fn.description)
             t = time.time()
             fn()
@@ -194,21 +194,6 @@ def transactions_posted(
 
         _logger.debug('Stopping transaction generating threads:')
     _logger.debug('Stopping transaction generating threads: done.')
-
-
-def address_and_count_to_server_list(server_address_list, server_count, base_port, is_lws):
-    if is_lws:
-        return create_local_server_list(
-            ['{}:{}'.format(server_address_list[-1], base_port)]
-            + ['{}:{}'.format(server_address_list[0], 8001 + idx)
-               for idx in range(server_count - 1)],
-            password='admin')
-    else:
-        return create_local_server_list([
-            '{}:{}'.format(address, base_port + idx)
-            for address in server_address_list
-            for idx in range(server_count // len(server_address_list))
-            ])
 
 
 def _generation_main():

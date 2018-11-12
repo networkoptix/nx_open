@@ -177,22 +177,23 @@ def first(iter):
     return l[0]
 
 
-def make_threaded_async_calls(thread_number, call_gen):
+def make_threaded_async_calls(thread_count, call_gen):
     failures = []
 
     def call(fn):
         try:
-            fn()
+            return fn()
         except:
             _logger.exception('Error calling %r:', fn)
             failures.append(None)
 
-    pool = ThreadPool(thread_number)
+    pool = ThreadPool(thread_count)
     # convert generator to list to avoid generator-from-thread issues and races
-    pool.map(call, list(call_gen))
+    result = pool.map(call, list(call_gen))
     pool.close()
     pool.join()
     assert not failures, 'There was %d errors while generated method calls, check for logs' % len(failures)
+    return result
 
 
 class MultiFunction(object):

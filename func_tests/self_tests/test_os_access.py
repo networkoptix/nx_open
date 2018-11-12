@@ -1,4 +1,6 @@
 import datetime
+import hashlib
+import os
 
 import pytest
 import pytz
@@ -66,8 +68,9 @@ def test_disk_space_limit_twice(os_access):
 
 def test_fake_disk(os_access):
     size = 500 * 1000 * 1000
-    mount_point = os_access.fake_disk().mount(size)
-    assert os_access._free_disk_space_bytes_on_all()[mount_point] == pytest.approx(size, rel=0.05)
+    fake_disk = os_access.fake_disk()
+    fake_disk.mount(size)
+    assert os_access._free_disk_space_bytes_on_all()[fake_disk.path] == pytest.approx(size, rel=0.05)
 
 
 def test_fake_disk_twice(os_access):
@@ -76,6 +79,7 @@ def test_fake_disk_twice(os_access):
     fake_disk.mount(size_1)
     assert os_access._free_disk_space_bytes_on_all()[fake_disk.path] == pytest.approx(size_1, rel=0.05)
     size_2 = 700 * 1000 * 1000
+    fake_disk.remove()
     fake_disk.mount(size_2)
     assert os_access._free_disk_space_bytes_on_all()[fake_disk.path] == pytest.approx(size_2, rel=0.05)
 
@@ -86,5 +90,38 @@ def test_fake_disk_twice_less_size(os_access):
     fake_disk.mount(size_1)
     assert os_access._free_disk_space_bytes_on_all()[fake_disk.path] == pytest.approx(size_1, rel=0.05)
     size_2 = 500 * 1000 * 1000
+    fake_disk.remove()
     fake_disk.mount(size_2)
     assert os_access._free_disk_space_bytes_on_all()[fake_disk.path] == pytest.approx(size_2, rel=0.05)
+
+
+def test_fake_disk_remove_twice(os_access):
+    fake_disk = os_access.fake_disk()
+    fake_disk.remove()
+    fake_disk.remove()
+
+
+def test_file_md5(os_access):
+    path = os_access.path_cls.tmp() / 'test_file_md5.txt'
+    data = os.urandom(100500)
+    path.write_bytes(data)
+    assert os_access.file_md5(path) == hashlib.md5(data).hexdigest()
+
+
+def test_tree_md5(os_access):
+    path = os_access.path_cls.tmp().joinpath('test_tree_md5')
+    path.rmtree(ignore_errors=True)
+    path.mkdir()
+    path.joinpath('d1').mkdir()
+    path.joinpath('d2').mkdir()
+    path.joinpath('d2', 'f21.txt').write_bytes(b'21')
+    path.joinpath('d2', 'd22').mkdir()
+    path.joinpath('d2', 'd22', 'f221.txt').write_bytes(b'221')
+    path.joinpath('d2', 'd22', 'f222.txt').write_bytes(b'222')
+    path.joinpath('f3.txt').write_bytes(b'3')
+    assert os_access.tree_md5(path) == {
+        ('d2', 'f21.txt'): hashlib.md5(b'21').hexdigest(),
+        ('d2', 'd22', 'f221.txt'): hashlib.md5(b'221').hexdigest(),
+        ('d2', 'd22', 'f222.txt'): hashlib.md5(b'222').hexdigest(),
+        ('f3.txt',): hashlib.md5(b'3').hexdigest(),
+        }
