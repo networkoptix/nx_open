@@ -17,7 +17,7 @@ bool isSamePort(int first, int second)
     static const auto isDefaultPort =
         [](int port)
         {
-            return ((port == DEFAULT_APPSERVER_PORT) || (port == 0) || (port == -1));
+            return ((port == kDefaultConnectionPort) || (port == 0) || (port == -1));
         };
 
     return ((first == second) || (isDefaultPort(first) == isDefaultPort(second)));
@@ -156,7 +156,7 @@ QVariant QnSystemHostsModel::HostsModel::data(const QModelIndex& index, int role
     switch (role)
     {
         case Qt::DisplayRole:
-            return (data.second.port() != DEFAULT_APPSERVER_PORT
+            return (data.second.port() != kDefaultConnectionPort
                 ? lit("%1:%2").arg(data.second.host(), QString::number(data.second.port()))
                 : data.second.host());
         case UrlRole:

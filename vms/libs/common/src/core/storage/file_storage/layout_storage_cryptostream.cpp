@@ -15,6 +15,7 @@ QnLayoutCryptoStream::QnLayoutCryptoStream(QnLayoutFileStorageResource& storageR
 QnLayoutCryptoStream::~QnLayoutCryptoStream()
 {
     close();
+    m_storageResource.removeFileCompletely(this);
 }
 
 bool QnLayoutCryptoStream::open(QIODevice::OpenMode openMode)
@@ -67,18 +68,9 @@ void QnLayoutCryptoStream::close()
     }
 }
 
-void QnLayoutCryptoStream::lockFile()
-{
-    m_mutex.lock();
-}
-
-void QnLayoutCryptoStream::unlockFile()
-{
-    m_mutex.unlock();
-}
-
 void QnLayoutCryptoStream::storeStateAndClose()
 {
+    QnMutexLocker lock(&m_mutex);
     m_storedPosition = m_position.position();
     m_storedOpenMode = m_openMode;
     close();
@@ -86,6 +78,7 @@ void QnLayoutCryptoStream::storeStateAndClose()
 
 void QnLayoutCryptoStream::restoreState()
 {
+    QnMutexLocker lock(&m_mutex);
     open(m_storedOpenMode);
     seek(m_storedPosition);
 }

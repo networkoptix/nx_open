@@ -413,13 +413,13 @@ quint16 QnRoutingManagementWidget::getCurrentServerPort()
 
     const auto addresses = m_serverAddressesModel->addressList();
     if (addresses.isEmpty())
-        return DEFAULT_APPSERVER_PORT;
+        return kDefaultConnectionPort;
 
     const auto currentPort = addresses.first().port();
     if (currentPort > 0)
         return currentPort;
 
-    return DEFAULT_APPSERVER_PORT;
+    return kDefaultConnectionPort;
 }
 
 void QnRoutingManagementWidget::at_addButton_clicked() {

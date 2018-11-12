@@ -179,7 +179,7 @@ QnConnectionManager::ConnectionType QnConnectionManager::connectionType() const
 
 int QnConnectionManager::defaultServerPort() const
 {
-    return DEFAULT_APPSERVER_PORT;
+    return kDefaultConnectionPort;
 }
 
 nx::utils::Url QnConnectionManager::currentUrl() const
@@ -245,7 +245,7 @@ bool QnConnectionManager::connectByUserInput(
 {
     nx::utils::Url url = nx::utils::Url::fromUserInput(address);
     if (url.port() <= 0)
-        url.setPort(DEFAULT_APPSERVER_PORT);
+        url.setPort(kDefaultConnectionPort);
 
     url.setUserName(userName);
     url.setPassword(password);

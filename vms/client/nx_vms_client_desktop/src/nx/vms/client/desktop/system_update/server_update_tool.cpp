@@ -12,8 +12,6 @@
 #include <utils/common/app_info.h>
 #include <utils/update/update_utils.h>
 
-#include <nx/utils/app_info.h>
-
 #include <client/client_settings.h>
 #include <client/client_module.h>
 #include <watchers/cloud_status_watcher.h>
@@ -22,6 +20,7 @@
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
 #include <network/system_helpers.h>
+#include <nx/utils/app_info.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
 
 #include <quazip/quazip.h>
@@ -340,7 +339,7 @@ void ServerUpdateTool::atUploadWorkerState(QnUuid serverId, const UploadState& s
 {
     if (!m_uploadStateById.count(state.id))
     {
-        NX_VERBOSE(this) << "at_uploadWorkerState() no upload state with id=" << state.id;
+        NX_VERBOSE(this) << "atUploadWorkerState() no upload state with id=" << state.id;
         return;
     }
 
@@ -348,18 +347,18 @@ void ServerUpdateTool::atUploadWorkerState(QnUuid serverId, const UploadState& s
     switch (state.status)
     {
         case UploadState::Done:
-            NX_VERBOSE(this) << "at_uploadWorkerState() uploaded file="
+            NX_VERBOSE(this) << "atUploadWorkerState() uploaded file="
                 << state.destination << "server:" << serverId;
             markUploadCompleted(state.id);
             break;
         case UploadState::Uploading:
-            NX_VERBOSE(this) << "at_uploadWorkerState() uploading file="
+            NX_VERBOSE(this) << "atUploadWorkerState() uploading file="
                 << state.destination << "bytes"
                 << state.uploaded << "of" << state.size
                 << "server:" << serverId;
             break;
         case UploadState::Error:
-            NX_VERBOSE(this) << "at_uploadWorkerState() error with file="
+            NX_VERBOSE(this) << "atUploadWorkerState() error with file="
                 << state.destination
                 << "error:" << state.errorMessage
                 << "server:" << serverId;
@@ -458,145 +457,15 @@ void ServerUpdateTool::stopUpload()
     changeUploadState(OfflineUpdateState::ready);
 }
 
-const nx::update::Package* findPackageForServer(
-    QnMediaServerResourcePtr server, const nx::update::Information& info)
-{
-    auto serverInfo = server->getSystemInfo();
-
-    for(const auto& pkg: info.packages)
-    {
-        if (pkg.component == nx::update::kComponentServer)
-        {
-            // Check arch and OS
-            if (pkg.arch == serverInfo.arch
-                && pkg.platform == serverInfo.platform
-                && pkg.variant == serverInfo.modification)
-                return &pkg;
-        }
-    }
-    return nullptr;
-}
-
 bool ServerUpdateTool::verifyUpdateManifest(UpdateContents& contents) const
 {
-    const nx::update::Information& info = contents.info;
-    if (contents.error != nx::update::InformationError::noError)
-        return false;
-
-    nx::utils::SoftwareVersion targetVersion(info.version);
-
-    contents.invalidVersion.clear();
-    contents.missingUpdate.clear();
-    contents.filesToUpload.clear();
-
-    // Check if some packages from manifest do not exist.
-    if (contents.sourceType == UpdateSourceType::file)
-    {
-        QList<nx::update::Package> checked;
-        for(auto& pkg: contents.info.packages)
-        {
-            if (contents.sourceType == UpdateSourceType::file)
-            {
-                QFileInfo file(contents.storageDir.filePath(pkg.file));
-                if (file.exists())
-                {
-                    contents.filesToUpload.push_back(pkg.file);
-                    pkg.url = "";
-                    pkg.file = m_uploadDestination + file.fileName();
-                    checked.push_back(pkg);
-                }
-                else
-                {
-                    NX_ERROR(this) << " missing update file" << pkg.file;
-                }
-            }
-        }
-        contents.info.packages = checked;
-    }
-
-    if (contents.info.eulaLink.startsWith(kFilePrefix))
-    {
-        // Need to adjust eula link to absolute path to this files.
-        QString eulaLocalPath = contents.info.eulaLink.mid(kFilePrefix.size());
-        contents.eulaPath = kFilePrefix + contents.storageDir.filePath(eulaLocalPath);
-    }
-    else
-    {
-        // TODO: Should get EULA file
-        contents.eulaPath = contents.info.eulaLink;
-    }
-
-    contents.clientPackage = findClientPackage(contents.info);
-
     std::map<QnUuid, QnMediaServerResourcePtr> activeServers;
     {
         std::scoped_lock<std::recursive_mutex> lock(m_statusLock);
         activeServers = m_activeServers;
     }
 
-    // Checking if all servers have update packages.
-    for(auto record: activeServers)
-    {
-        auto server = record.second;
-        bool isOurServer = !server->hasFlags(Qn::fake_server)
-            || helpers::serverBelongsToCurrentSystem(server);
-        if (!isOurServer)
-            continue;
-        auto serverInfo = server->getSystemInfo();
-
-        auto package = findPackageForServer(server, info);
-        if (!package)
-        {
-            NX_ERROR(this) << "verifyUpdateManifest server "
-                << server->getId()
-                << "arch" << serverInfo.arch
-                << "platform" << serverInfo.platform
-                << "is missing its update package";
-            contents.missingUpdate.insert(server);
-        }
-
-        nx::utils::SoftwareVersion serverVersion = server->getVersion();
-        // Prohibiting updates to previous version
-        if (serverVersion > targetVersion)
-        {
-            NX_ERROR(this) << "verifyUpdateManifest server "
-                << server->getId()
-                << "ver" << serverVersion.toString()
-                << "is incompatible with this update"
-                << "ver" << targetVersion.toString();
-            contents.invalidVersion.insert(server);
-        }
-    }
-
-    contents.cloudIsCompatible = checkCloudHost(commonModule(),
-        targetVersion, contents.info.cloudHost, getAllServers());
-
-    if (!contents.missingUpdate.empty() || !contents.clientPackage.isValid())
-    {
-        NX_WARNING(this) << "verifyUpdateManifest(" << contents.info.version <<") - detected missing packages";
-        contents.error = nx::update::InformationError::missingPackageError;
-    }
-
-    if (!contents.invalidVersion.empty())
-    {
-        NX_WARNING(this) << "verifyUpdateManifest(" << contents.info.version <<") - detected incompatible version error";
-        contents.error = nx::update::InformationError::incompatibleVersion;
-    }
-
-    // Update package has no packages at all.
-    if (contents.info.packages.empty())
-    {
-        NX_WARNING(this) << "verifyUpdateManifest(" << contents.info.version <<") - this update is completely empty";
-        contents.error = nx::update::InformationError::missingPackageError;
-    }
-
-    if (!contents.cloudIsCompatible)
-    {
-        NX_WARNING(this) << "verifyUpdateManifest(" << contents.info.version <<") - detected incompatible cloud";
-        contents.error = nx::update::InformationError::incompatibleCloudHostError;
-    }
-
-    return contents.isValid();
+    return verifyUpdateContents(commonModule(), contents, activeServers);
 }
 
 ServerUpdateTool::ProgressInfo ServerUpdateTool::calculateUploadProgress()

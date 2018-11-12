@@ -1370,8 +1370,8 @@ void MultiServerUpdatesWidget::syncUpdateCheck()
 
     ui->selectUpdateTypeButton->setText(toString(m_updateSourceMode));
 
-    bool showButton = m_updateSourceMode != UpdateSourceType::file
-        && !hasLatestVersion;
+    bool showButton = m_updateSourceMode != UpdateSourceType::file &&
+        (m_updateStateCurrent == WidgetUpdateState::ready || m_updateStateCurrent != WidgetUpdateState::initial);
     ui->manualDownloadButton->setVisible(showButton);
     auto version = versionText(m_updateInfo.getVersion());
     ui->targetVersionLabel->setText(version);
@@ -1539,6 +1539,8 @@ void MultiServerUpdatesWidget::loadDataToUi()
             QString("<a href=\"%1\">/ec2/updateInformation</a>").arg(m_serverUpdateTool->getUpdateInformationUrl()),
             QString("<a href=\"%1\">/ec2/installedUpdateInformation</a>").arg(m_serverUpdateTool->getInstalledUpdateInfomationUrl()),
         };
+
+        debugState << QString("lowestVersion=%1").arg(m_updatesModel->lowestInstalledVersion().toString());
 
         if (m_updateInfo.error != nx::update::InformationError::noError)
         {

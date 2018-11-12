@@ -4,22 +4,37 @@
 
 #include "test_options.h"
 
-namespace nx {
-namespace utils {
-namespace test {
+namespace nx::utils::test {
 
-TestWithTemporaryDirectory::TestWithTemporaryDirectory(QString moduleName, QString tmpDir):
-    m_tmpDir(tmpDir)
+namespace {
+
+QString calculateTestDirectory(const QString& moduleName, const QString& tmpDir)
 {
-    if (m_tmpDir.isEmpty())
-    {
-        m_tmpDir =
-            (TestOptions::temporaryDirectoryPath().isEmpty()
-                ? QDir::homePath() : TestOptions::temporaryDirectoryPath()) +
-            QString("/%1_ut.data").arg(moduleName);
-    }
+    // Explitly passed directory has the highest priority.
+    if (!tmpDir.isEmpty())
+        return tmpDir;
+
+    const QString moduleSuffix = QString("/%1_ut.data").arg(moduleName);
+
+    // Global temp dir is used if available. Module name is used as a subfolder.
+    if (auto globalTmpDir = TestOptions::temporaryDirectoryPath(); !globalTmpDir.isEmpty())
+        return globalTmpDir + moduleSuffix;
+
+    // Fallback to home directory with module name subfolder.
+    return QDir::homePath() + moduleSuffix;
+}
+
+} // namespace
+
+TestWithTemporaryDirectory::TestWithTemporaryDirectory(
+    const QString& moduleName,
+    const QString& tmpDir)
+    :
+    m_tmpDir(calculateTestDirectory(moduleName, tmpDir))
+{
+    // Auto-clean temporary folder contents before testing.
     m_tmpDir.removeRecursively();
-    bool created = m_tmpDir.mkpath(m_tmpDir.absolutePath());
+    const bool created = m_tmpDir.mkpath(m_tmpDir.absolutePath());
     NX_ASSERT(created);
 }
 
@@ -33,6 +48,4 @@ QString TestWithTemporaryDirectory::testDataDir() const
     return QDir::cleanPath(m_tmpDir.absolutePath());
 }
 
-} // namespace test
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils::test
