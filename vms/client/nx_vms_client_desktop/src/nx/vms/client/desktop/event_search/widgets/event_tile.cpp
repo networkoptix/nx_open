@@ -409,15 +409,24 @@ void EventTile::setPreview(ImageProvider* value)
     ui->previewWidget->setImageProvider(value);
     ui->previewWidget->parentWidget()->setHidden(!value);
 
-    if (!ini().showDebugTimeInformationInRibbon || !preview())
+    if (!ini().showDebugTimeInformationInRibbon)
         return;
 
     const auto showPreviewTimestamp =
         [this]()
         {
             auto provider = qobject_cast<CameraThumbnailProvider*>(preview());
-            ui->debugPreviewTimeLabel->setText(lit("Preview: %2 us").arg(provider->timestampUs()));
-            ui->debugPreviewTimeLabel->setVisible(provider->status() == Qn::ThumbnailStatus::Loaded);
+            if (provider)
+            {
+                ui->debugPreviewTimeLabel->setText(lm("Preview: %2 us").arg(provider->timestampUs()));
+                ui->debugPreviewTimeLabel->setVisible(
+                    provider->status() == Qn::ThumbnailStatus::Loaded);
+            }
+            else
+            {
+                ui->debugPreviewTimeLabel->hide();
+                ui->debugPreviewTimeLabel->setText({});
+            }
         };
 
     showPreviewTimestamp();
