@@ -35,81 +35,43 @@ H264Parser::~H264Parser()
 {
 }
 
-void H264Parser::setSdpInfo(QList<QByteArray> lines)
+void H264Parser::setSdpInfo(const Sdp::Media& sdp)
 {
-    for (int i = 0; i < lines.size(); ++ i)
+    if (sdp.rtpmap.clockRate > 0)
+        StreamParser::setFrequency(sdp.rtpmap.clockRate);
+    m_rtpChannel = sdp.format;
+    for (const QString& param: sdp.fmtp.params)
     {
-        lines[i] = lines[i].trimmed();
-        if (lines[i].startsWith("a=rtpmap:"))
+        if (param.startsWith("sprop-parameter-sets"))
         {
-            QList<QByteArray> values = lines[i].split(' ');
-            if (values.size() < 2)
-                continue;
-            QByteArray codecName = values[1];
-            if (!codecName.toUpper().startsWith("H264"))
-                continue;
-            QList<QByteArray> values2 = codecName.split('/');
-            if (values2.size() < 2)
-                continue;
-            StreamParser::setFrequency(values2[1].toUInt());
-
-            values = values[0].split(':');
-            if (values.size() < 2)
-                continue;
-            m_rtpChannel = values[1].toUInt();
-        }
-    }
-
-    for (int i = 0; i < lines.size(); ++ i)
-    {
-        lines[i] = lines[i].trimmed();
-        if (lines[i].startsWith("a=fmtp:"))
-        {
-            int valueIndex = lines[i].indexOf(' ');
-            if (valueIndex == -1)
-                continue;
-
-            QList<QByteArray> fmpParam = lines[i].left(valueIndex).split(':'); //values[0].split(':');
-            if (fmpParam.size() < 2 || fmpParam[1].toUInt() != (uint)m_rtpChannel)
-                continue;
-
-            QList<QByteArray> h264Params = lines[i].mid(valueIndex+1).split(';');
-            for (int i = 0; i < h264Params.size(); ++i)
+            int pos = param.indexOf('=');
+            if (pos >= 0)
             {
-                QByteArray h264Parma = h264Params[i].trimmed();
-                if (h264Parma.startsWith("sprop-parameter-sets"))
+                QString h264SpsPps = param.mid(pos+1);
+                QStringList nalUnits = h264SpsPps.split(',');
+                for (QString nalStr: nalUnits)
                 {
-                    int pos = h264Parma.indexOf('=');
-                    if (pos >= 0)
+                    QByteArray nal = QByteArray::fromBase64(nalStr.toUtf8());
                     {
-                        QByteArray h264SpsPps = h264Parma.mid(pos+1);
-                        QList<QByteArray> nalUnits = h264SpsPps.split(',');
-                        for(QByteArray nal: nalUnits)
-                        {
-                            nal = QByteArray::fromBase64(nal);
+                        // some cameras( Digitalwatchdog sends extra start code in SPSPSS sdp string );
+                        QByteArray startCode(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
+                        QByteArray startCodeShort(H264_NAL_SHORT_PREFIX, sizeof(H264_NAL_SHORT_PREFIX));
 
-                            {
-                                // some cameras( Digitalwatchdog sends extra start code in SPSPSS sdp string );
-                                QByteArray startCode(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
-                                QByteArray startCodeShort(H264_NAL_SHORT_PREFIX, sizeof(H264_NAL_SHORT_PREFIX));
-
-                                if (nal.endsWith(startCode))
-                                    nal.remove(nal.size()-4,4);
-                                else if (nal.endsWith(startCodeShort))
-                                    nal.remove(nal.size()-3,3);
+                        if (nal.endsWith(startCode))
+                            nal.remove(nal.size()-4,4);
+                        else if (nal.endsWith(startCodeShort))
+                            nal.remove(nal.size()-3,3);
 
 
-                                if (nal.startsWith(startCode))
-                                    nal.remove(0,4);
-                                else if (nal.startsWith(startCodeShort))
-                                    nal.remove(0,3);
-                            }
-                            if( nal.size() > 0 && (nal[0] & 0x1f) == nuSPS )
-                                decodeSpsInfo( nal );
-
-                            m_sdpSpsPps << QByteArray(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX)).append(nal);
-                        }
+                        if (nal.startsWith(startCode))
+                            nal.remove(0,4);
+                        else if (nal.startsWith(startCodeShort))
+                            nal.remove(0,3);
                     }
+                    if( nal.size() > 0 && (nal[0] & 0x1f) == nuSPS )
+                        decodeSpsInfo( nal );
+
+                    m_sdpSpsPps << QByteArray(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX)).append(nal);
                 }
             }
         }

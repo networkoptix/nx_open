@@ -31,8 +31,6 @@
 namespace nx::mediaserver::analytics {
 
 using namespace nx::vms::common;
-namespace analytics_sdk = nx::sdk::analytics;
-namespace analytics_api = nx::vms::api::analytics;
 
 class SdkObjectFactory;
 
@@ -148,16 +146,16 @@ bool SdkObjectFactory::initPluginResources()
     for (auto& analyticsPluginData: databaseAnalyticsPlugins)
         pluginDataById.emplace(analyticsPluginData.id, std::move(analyticsPluginData));
 
-    auto realAnalyticsPlugins = pluginManager->findNxPlugins<analytics_sdk::Plugin>(
+    auto realAnalyticsPlugins = pluginManager->findNxPlugins<nx::sdk::analytics::Plugin>(
         nx::sdk::analytics::IID_Plugin);
 
     std::map<QnUuid, PluginPtr> sdkPluginsById;
     for (const auto realAnalyticsPlugin: realAnalyticsPlugins)
     {
         auto realAnalyticsPluginPtr =
-            sdk_support::SharedPtr<analytics_sdk::Plugin>(realAnalyticsPlugin);
+            sdk_support::SharedPtr<nx::sdk::analytics::Plugin>(realAnalyticsPlugin);
 
-        const auto pluginManifest = sdk_support::manifest<analytics_api::PluginManifest>(
+        const auto pluginManifest = sdk_support::manifest<nx::vms::api::analytics::PluginManifest>(
             realAnalyticsPlugin,
             makeLogger(resource::AnalyticsPluginResourcePtr()));
 

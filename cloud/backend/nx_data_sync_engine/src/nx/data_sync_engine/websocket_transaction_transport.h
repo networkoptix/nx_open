@@ -18,7 +18,7 @@ namespace nx::data_sync_engine { class TransactionLog; }
 namespace nx::data_sync_engine::transport {
 
 class WebSocketTransactionTransport:
-    public AbstractTransactionTransport,
+    public AbstractConnection,
     public nx::p2p::ConnectionBase
 {
 public:

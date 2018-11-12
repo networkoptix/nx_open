@@ -2325,6 +2325,8 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(milliseconds value)
         updateLive();
         emit positionChanged();
     }
+
+    emit timelinePositionChanged();
 }
 
 void QnWorkbenchNavigator::at_timeSlider_sliderPressed()

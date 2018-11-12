@@ -5,6 +5,10 @@ VMS_DIR=$(dirname $(dirname "${BASH_SOURCE[0]}"))
 EXE="$VMS_DIR/bin/mediaserver-bin"
 ARGS="-e"
 
+source $VMS_DIR/build_info.txt
+FULL_VERSION="$version-$changeSet-$customization"
+[ ! -z "$beta" ] && FULL_VERSION+="-beta"
+
 # Switch off rp_filter for all interfaces to allow
 # discover/install cameras with invalid ip addresses
 for interface in /proc/sys/net/ipv4/conf/*/rp_filter; do
@@ -12,13 +16,15 @@ for interface in /proc/sys/net/ipv4/conf/*/rp_filter; do
 done
 
 # Process core dumps async
-if grep systemUser "$VMS_DIR/etc/mediaserver.conf"; then
+if [ "@withRootTool@" = "true" ]; then
     CRASH_DIR="$VMS_DIR/var/crash"
     ARGS+=" --crash-directory=$CRASH_DIR"
 else
-    CRASH_DIR="$HOME"
+    CRASH_DIR="/root"
 fi
-"$VMS_DIR/bin/shell_utils.sh" crash_gdb_bt "$VMS_DIR/bin/mediaserver-bin" "$CRASH_DIR"
+
+"$VMS_DIR/bin/shell_utils.sh" crash_gdb_bt \
+    "$VMS_DIR/bin/mediaserver-bin" "$CRASH_DIR" "$FULL_VERSION"
 
 lsblk -o MODEL -n | grep -v '^$' > /tmp/hddlist
 
@@ -30,8 +36,8 @@ ulimit -a
 echo
 echo --- Starting: $EXE $ARGS
 
-if [ "@withRootTool@" = "true" ]
-then
+if [ "@withRootTool@" = "true" ]; then
+    su @deb.customization.company.name@ -c 'ulimit -c unlimited; ulimit -a'
     exec start-stop-daemon --start \
         --chuid @deb.customization.company.name@:@deb.customization.company.name@ \
         -d "$VMS_DIR/bin" --exec $EXE -- $ARGS

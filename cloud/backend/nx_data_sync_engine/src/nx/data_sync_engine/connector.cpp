@@ -66,7 +66,7 @@ void Connector::connectToNodeAsync(const nx::utils::Url& url)
 void Connector::onConnectCompletion(
     const nx::utils::Url& url,
     transport::ConnectResultDescriptor result,
-    std::unique_ptr<transport::AbstractTransactionTransport> connection)
+    std::unique_ptr<transport::AbstractConnection> connection)
 {
     auto nodeIter = m_nodes.find(url);
     NX_CRITICAL(nodeIter != m_nodes.end());
@@ -90,7 +90,7 @@ void Connector::onConnectCompletion(
 void Connector::registerConnection(
     const nx::utils::Url& url,
     const NodeContext& nodeContext,
-    std::unique_ptr<transport::AbstractTransactionTransport> connection)
+    std::unique_ptr<transport::AbstractConnection> connection)
 {
     NX_DEBUG(this, lm("Connection %1 to %2 established successfully")
         .args(nodeContext.connectionId, url));

@@ -3,6 +3,7 @@ if (withMediaServer OR withTestCamera OR withTrayTool OR withDesktopClient OR wi
     add_subdirectory(appserver2)
     add_subdirectory(nx_vms_api)
     add_subdirectory(nx_update)
+    add_subdirectory(nx_system_commands)
 endif()
 
 if (withDesktopClient OR withMobileClient)
@@ -11,6 +12,5 @@ if (withDesktopClient OR withMobileClient)
 endif()
 
 if(withMediaServer)
-    add_subdirectory(nx_system_commands)
     add_subdirectory(nx_plugin_utils)
 endif()

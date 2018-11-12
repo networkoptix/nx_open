@@ -607,6 +607,8 @@ void EventRibbon::Private::clear()
     m_totalHeight = 0;
     m_live = true;
 
+    m_firstVisible = -1;
+
     clearShiftAnimations();
     setScrollBarRelevant(false);
 
@@ -730,6 +732,46 @@ void EventRibbon::Private::updateScrollBarVisibility()
     }
 }
 
+void EventRibbon::Private::updateHighlightedTiles()
+{
+    if (m_visible.empty())
+        return;
+
+    using namespace std::chrono;
+    using namespace std::literals::chrono_literals;
+
+    if (m_highlightedTimestamp == 0ms)
+    {
+        for (auto tile: m_visible)
+            tile->setHighlighted(false);
+    }
+    else
+    {
+        const auto shouldHighlightTile =
+            [this](int tileIndex) -> bool
+            {
+                const auto index = m_model->index(tileIndex);
+                const auto timestamp = index.data(Qn::TimestampRole).value<microseconds>();
+                if (timestamp == 0us)
+                    return false;
+
+                const auto duration = index.data(Qn::DurationRole).value<microseconds>();
+                if (duration == 0us)
+                    return false;
+
+                return m_highlightedTimestamp >= timestamp
+                    && (duration.count() == QnTimePeriod::infiniteDuration()
+                        || m_highlightedTimestamp <= (timestamp + duration));
+            };
+
+        const int begin = m_firstVisible;
+        const int end = m_firstVisible + m_visible.count();
+
+        for (int index = begin; index < end; ++index)
+            m_tiles[index]->setHighlighted(shouldHighlightTile(index));
+    }
+}
+
 Qt::ScrollBarPolicy EventRibbon::Private::scrollBarPolicy() const
 {
     return m_scrollBarPolicy;
@@ -742,6 +784,20 @@ void EventRibbon::Private::setScrollBarPolicy(Qt::ScrollBarPolicy value)
 
     m_scrollBarPolicy = value;
     updateScrollBarVisibility();
+}
+
+std::chrono::microseconds EventRibbon::Private::highlightedTimestamp() const
+{
+    return m_highlightedTimestamp;
+}
+
+void EventRibbon::Private::setHighlightedTimestamp(std::chrono::microseconds value)
+{
+    if (m_highlightedTimestamp == value)
+        return;
+
+    m_highlightedTimestamp = value;
+    updateHighlightedTiles();
 }
 
 bool EventRibbon::Private::live() const
@@ -897,6 +953,7 @@ void EventRibbon::Private::doUpdateView()
             oldVisibleTile->setVisible(false);
     }
 
+    m_firstVisible = firstIndexToUpdate;
     m_visible = newVisible;
     m_viewport->update();
 
@@ -905,6 +962,8 @@ void EventRibbon::Private::doUpdateView()
 
     const auto pos = WidgetUtils::mapFromGlobal(q, QCursor::pos());
     updateHover(q->rect().contains(pos), pos);
+
+    updateHighlightedTiles();
 
     if (!m_currentShifts.empty()) //< If has running animations.
         qApp->postEvent(m_viewport, new QEvent(QEvent::LayoutRequest));

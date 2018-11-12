@@ -1327,6 +1327,12 @@ void ActionHandler::at_jumpToTimeAction_triggered()
     if (timestamp < slider->minimum() || timestamp >= slider->maximum())
         return;
 
+    // Pause playing for precise seek.
+    const QnScopedTypedPropertyRollback<bool, QnWorkbenchNavigator> playingRollback(navigator(),
+        &QnWorkbenchNavigator::setPlaying,
+        &QnWorkbenchNavigator::isPlaying,
+        false);
+
     const QnScopedTypedPropertyRollback<bool, QnTimeSlider> downRollback(slider,
         &QnTimeSlider::setSliderDown,
         &QnTimeSlider::isSliderDown,
