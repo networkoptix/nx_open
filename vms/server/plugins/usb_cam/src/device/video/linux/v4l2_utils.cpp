@@ -24,8 +24,7 @@ namespace detail {
 
 namespace {
 
-static const std::string kV4l2DevicePathById = "/dev/v4l/by-id";
-static const std::string kV4l2DevicePathFallBack = "/dev";
+static const std::string kV4l2DevicePath = "/dev";
 
 // Convenience class for opening and closing devices represented by devicePath
 struct DeviceInitializer
@@ -44,8 +43,7 @@ struct DeviceInitializer
     int fileDescriptor = -1;
 };
 
-std::vector<std::string> getDevicePathsById();
-std::vector<std::string> getDevicePathsFallBack();
+std::vector<std::string> getDevicePaths();
 unsigned int toV4L2PixelFormat(nxcip::CompressionType nxCodecID);
 std::string getDeviceName(int fileDescriptor);
 float toFrameRate(const v4l2_fract& frameInterval);
@@ -73,32 +71,7 @@ std::string getDeviceName(int fileDescriptor)
         deviceCapability.card + sizeof(deviceCapability.card));
 };
 
-std::vector<std::string> getDevicePathsById()
-{
-    std::vector<std::string> devices;
-
-    DIR *directory = opendir(kV4l2DevicePathById.c_str());
-    if (!directory)
-        return devices;
-
-    struct dirent *directoryEntry;
-    while ((directoryEntry = readdir(directory)) != NULL)
-    {
-        if(strcmp(directoryEntry->d_name, ".") == 0 
-            || strcmp(directoryEntry->d_name, "..") == 0)
-        {
-            continue;   
-        }
-
-        std::string device = kV4l2DevicePathById + "/" + directoryEntry->d_name;
-        devices.push_back(device);
-    }
-
-    closedir(directory);
-    return devices;
-}
-
-std::vector<std::string> getDevicePathsFallBack()
+std::vector<std::string> getDevicePaths()
 {
     const auto isDeviceFile =
         [](const char *path)
@@ -110,7 +83,7 @@ std::vector<std::string> getDevicePathsFallBack()
 
     std::vector<std::string> devicePaths;
 
-    DIR *directory = opendir(kV4l2DevicePathFallBack.c_str());
+    DIR *directory = opendir(kV4l2DevicePath.c_str());
     if (!directory)
         return devicePaths;
 
@@ -120,7 +93,7 @@ std::vector<std::string> getDevicePathsFallBack()
         if (!strstr(directoryEntry->d_name, "video"))
             continue;
 
-        std::string devVideo = kV4l2DevicePathFallBack + "/" + directoryEntry->d_name;
+        std::string devVideo = kV4l2DevicePath + "/" + directoryEntry->d_name;
         if (isDeviceFile(devVideo.c_str()))
             devicePaths.push_back(devVideo);
     }
@@ -164,7 +137,7 @@ __u32 V4L2CompressionTypeDescriptor::pixelFormat() const
 
 nxcip::CompressionType V4L2CompressionTypeDescriptor::toNxCompressionType() const
 {
-    switch(m_descriptor->pixelformat)
+    switch (m_descriptor->pixelformat)
     {
         case V4L2_PIX_FMT_MPEG2:      return nxcip::AV_CODEC_ID_MPEG2VIDEO;
         case V4L2_PIX_FMT_H263:       return nxcip::AV_CODEC_ID_H263;
@@ -191,13 +164,7 @@ std::string getDeviceName(const char * devicePath)
 
 std::vector<DeviceData> getDeviceList()
 {
-    bool needsUniqueId = false;
-    std::vector<std::string> devicePaths = getDevicePathsById();
-    if (devicePaths.empty())
-    {
-        devicePaths = getDevicePathsFallBack();
-        needsUniqueId = true;
-    }
+    auto devicePaths = getDevicePaths();
     if (devicePaths.empty())
         return {};
 
@@ -210,14 +177,10 @@ std::vector<DeviceData> getDeviceList()
         if (fileDescriptor == -1)
             continue;
 
-        std::string uniqueId = needsUniqueId 
-            ? getDeviceUniqueId(devicePath.c_str())
-            : devicePath;
-
         deviceList.push_back(device::DeviceData(
             getDeviceName(fileDescriptor),
             devicePath,
-            uniqueId));
+            getDeviceUniqueId(devicePath.c_str())));
     }
     return deviceList;
 }
@@ -245,10 +208,13 @@ std::vector<ResolutionData> getResolutionList(
     const char * devicePath,
     const device::CompressionTypeDescriptorPtr& targetCodecID)
 {
+    if (rpi::isMmalCamera(getDeviceName(devicePath)))
+        return rpi::getMmalResolutionList();
+
     const auto getResolution =
         [](const v4l2_frmsizeenum& enumerator, int * width, int * height)
         {
-            if(enumerator.type == V4L2_FRMSIZE_TYPE_DISCRETE)
+            if (enumerator.type == V4L2_FRMSIZE_TYPE_DISCRETE)
             {
                 *width = enumerator.discrete.width;
                 *height = enumerator.discrete.height;
@@ -259,10 +225,6 @@ std::vector<ResolutionData> getResolutionList(
                 *height = enumerator.stepwise.max_height;
             }
         };
-
-
-    if (rpi::isMmalCamera(getDeviceName(devicePath)))
-        return rpi::getMmalResolutionList();
 
     DeviceInitializer initializer(devicePath);
     if(initializer.fileDescriptor == -1)
@@ -298,14 +260,14 @@ std::vector<ResolutionData> getResolutionList(
 
             resolutionList.push_back(ResolutionData(width, height, toFrameRate(v4l2FrameRate)));
 
-            if(frameRateEnum.type != V4L2_FRMIVAL_TYPE_DISCRETE)
+            if (frameRateEnum.type != V4L2_FRMIVAL_TYPE_DISCRETE)
                 break;
 
             ++frameRateEnum.index;
         }
 
         // There is only one resolution reported if this is true
-        if(frameSizeEnum.type != V4L2_FRMSIZE_TYPE_DISCRETE)
+        if (frameSizeEnum.type != V4L2_FRMSIZE_TYPE_DISCRETE)
             break;
 
         ++frameSizeEnum.index;
@@ -343,7 +305,7 @@ int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescript
         return rpi::getMmalMaxBitrate();
 
     DeviceInitializer initializer(devicePath);
-    if(initializer.fileDescriptor == -1)
+    if (initializer.fileDescriptor == -1)
         return 0;
 
     struct v4l2_ext_controls ecs = {0};
