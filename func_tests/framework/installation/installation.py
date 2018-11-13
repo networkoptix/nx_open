@@ -98,11 +98,7 @@ class Installation(object):
 
     def cleanup(self, new_key_pair):
         self.cleanup_core_dumps()
-        try:
-            _logger.info("Remove var directory %s.", self._var)
-            self._var.rmtree()
-        except DoesNotExist:
-            pass
+        self._var.rmtree(ignore_errors=True)
         key_pair_file = self._var / 'ssl' / 'cert.pem'
         _logger.info("Put key pair to %s.", key_pair_file)
         key_pair_file.parent.mkdir(parents=True, exist_ok=True)
