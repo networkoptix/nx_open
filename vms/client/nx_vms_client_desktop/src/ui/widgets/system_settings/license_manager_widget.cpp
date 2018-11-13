@@ -1016,7 +1016,9 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged()
 
     if (ui->licenseWidget->isOnline())
     {
-        updateFromServer(ui->licenseWidget->serialKey().toLatin1(), true, QUrl(QN_LICENSE_URL));
+        updateFromServer(
+            ui->licenseWidget->serialKey().toLatin1(), /*infoMode*/ true,
+            QnLicenseServer::kActivateUrl.toQUrl());
     }
     else
     {

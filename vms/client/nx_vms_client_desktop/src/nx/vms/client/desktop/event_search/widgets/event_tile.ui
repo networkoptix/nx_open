@@ -110,7 +110,7 @@
         <property name="verticalSpacing">
          <number>4</number>
         </property>
-        <item row="4" column="0" colspan="2">
+        <item row="5" column="0" colspan="2">
          <widget class="QLabel" name="footerLabel">
           <property name="text">
            <string notr="true">&lt;Extra description&gt;</string>
@@ -145,7 +145,7 @@
           </property>
          </widget>
         </item>
-        <item row="5" column="0">
+        <item row="6" column="0">
          <widget class="QWidget" name="actionHolder" native="true">
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <property name="spacing">
@@ -205,7 +205,7 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="0" colspan="2">
+        <item row="4" column="0" colspan="2">
          <widget class="QWidget" name="narrowHolder" native="true">
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <property name="spacing">
@@ -271,6 +271,13 @@
           </property>
           <property name="openExternalLinks">
            <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0" colspan="2">
+         <widget class="QLabel" name="debugPreviewTimeLabel">
+          <property name="text">
+           <string notr="true">&lt;Debug preview time&gt;</string>
           </property>
          </widget>
         </item>

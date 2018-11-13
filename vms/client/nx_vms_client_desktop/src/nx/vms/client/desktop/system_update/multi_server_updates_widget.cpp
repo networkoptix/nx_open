@@ -558,7 +558,7 @@ void MultiServerUpdatesWidget::pickSpecificBuild()
 
     m_targetVersion = nx::utils::SoftwareVersion(version.major(), version.minor(), version.bugfix(), buildNumber);
     m_targetChangeset = dialog.changeset();
-    m_updateCheck = m_serverUpdateTool->checkSpecificChangeset(dialog.changeset());
+    m_updateCheck = checkSpecificChangeset(dialog.changeset());
     loadDataToUi();
 }
 
@@ -1370,8 +1370,8 @@ void MultiServerUpdatesWidget::syncUpdateCheck()
 
     ui->selectUpdateTypeButton->setText(toString(m_updateSourceMode));
 
-    bool showButton = m_updateSourceMode != UpdateSourceType::file
-        && !hasLatestVersion;
+    bool showButton = m_updateSourceMode != UpdateSourceType::file &&
+        (m_updateStateCurrent == WidgetUpdateState::ready || m_updateStateCurrent != WidgetUpdateState::initial);
     ui->manualDownloadButton->setVisible(showButton);
     auto version = versionText(m_updateInfo.getVersion());
     ui->targetVersionLabel->setText(version);
@@ -1540,6 +1540,8 @@ void MultiServerUpdatesWidget::loadDataToUi()
             QString("<a href=\"%1\">/ec2/installedUpdateInformation</a>").arg(m_serverUpdateTool->getInstalledUpdateInfomationUrl()),
         };
 
+        debugState << QString("lowestVersion=%1").arg(m_updatesModel->lowestInstalledVersion().toString());
+
         if (m_updateInfo.error != nx::update::InformationError::noError)
         {
             QString internalError = nx::update::toString(m_updateInfo.error);
@@ -1629,7 +1631,7 @@ void MultiServerUpdatesWidget::checkForInternetUpdates()
     if (!m_updateCheck.valid())
     {
         clearUpdateInfo();
-        m_updateCheck = m_serverUpdateTool->checkLatestUpdate();
+        m_updateCheck = checkLatestUpdate();
         syncUpdateCheck();
     }
 }

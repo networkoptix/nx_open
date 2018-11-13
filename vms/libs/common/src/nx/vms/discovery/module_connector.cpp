@@ -289,7 +289,7 @@ void ModuleConnector::Module::remakeConnection()
 
 void ModuleConnector::Module::setForbiddenEndpoints(std::set<nx::network::SocketAddress> endpoints)
 {
-    NX_VERBOSE(this, lm("Forbid endpoints %1").container(endpoints));
+    NX_VERBOSE(this, lm("Forbid endpoints: %1").container(endpoints));
     NX_ASSERT(!m_id.isNull(), "Does not make sense to block endpoints for unknown servers");
     if (m_forbiddenEndpoints != endpoints)
     {
@@ -441,7 +441,11 @@ void ModuleConnector::Module::connectToEndpoint(
 
            // When the last endpoint in a group fails try the next group.
            if (m_attemptingReaders.empty())
+           {
+               NX_VERBOSE(this, "Group %1 endpoints are not availabe for %2",
+                    endpointsGroup->first, m_id);
                connectToGroup(std::next(endpointsGroup));
+           }
        });
 }
 
@@ -467,8 +471,8 @@ bool ModuleConnector::Module::saveConnection(nx::network::SocketAddress endpoint
         {
             if (information)
             {
-                NX_VERBOSE(this, lm("Module information update from %1").arg(endpoint));
-                return m_parent->m_connectedHandler(*information, endpoint, m_connectedReader->ip());
+                NX_VERBOSE(this, "Module information update from %1", endpoint);
+                return m_parent->m_connectedHandler(*information, endpoint, m_connectedReader->address());
             }
 
             NX_VERBOSE(this, lm("Connection to %1 is closed: %2").args(endpoint, description));
@@ -485,7 +489,9 @@ bool ModuleConnector::Module::saveConnection(nx::network::SocketAddress endpoint
                 });
         });
 
-    m_parent->m_connectedHandler(information, std::move(endpoint), m_connectedReader->ip());
+    NX_VERBOSE(this, "Connected to %1 by %2 (resolved address: %3)",
+        m_id, endpoint, m_connectedReader->address());
+    m_parent->m_connectedHandler(information, std::move(endpoint), m_connectedReader->address());
     m_reconnectTimer.reset();
     m_disconnectTimer.cancelSync();
     return true;

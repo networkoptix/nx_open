@@ -161,7 +161,7 @@ class Run(object):
                 self.communicate(timeout_sec=time_left_sec)
                 assert self.outcome is not None
                 assert self.outcome.is_error
-                raise exit_status_error_cls(self.outcome.code)(None, stderr_buffer.read())
+                raise exit_status_error_cls(self.outcome.code)(b'', stderr_buffer.read())
             if not expected_bytes.startswith(stdout, pos):
                 raise RuntimeError("Expected %r; left: %r; got: %r.", expected_bytes, expected_bytes[pos:], stdout)
             pos += len(stdout)

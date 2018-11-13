@@ -19,6 +19,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/common/utils/connection_url_parser.h>
 #include <ui/workbench/watchers/workbench_user_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/merge_systems_tool.h>
@@ -155,15 +156,9 @@ void QnMergeSystemsDialog::at_urlComboBox_activated(int index) {
 
 void QnMergeSystemsDialog::at_urlComboBox_editingFinished()
 {
-    const QString http = nx::network::http::urlSheme(/*isSecure*/ false);
-    const QString https = nx::network::http::urlSheme(/*isSecure*/ true);
-
-    const QString userInput = ui->urlComboBox->currentText();
-    nx::utils::Url url = nx::utils::Url::fromUserInput(userInput);
-    if (url.port() == -1)
-        url.setPort(DEFAULT_APPSERVER_PORT);
-    if (!userInput.startsWith(http + "://") && url.scheme() == http)
-        url.setScheme(https);
+    auto url = nx::vms::client::desktop::helpers::parseConnectionUrlFromUserInput(
+        ui->urlComboBox->currentText());
+    url.setScheme(nx::network::http::kSecureUrlSchemeName);
     ui->urlComboBox->setCurrentText(url.toString());
 }
 

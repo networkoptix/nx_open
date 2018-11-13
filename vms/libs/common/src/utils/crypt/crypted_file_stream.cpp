@@ -181,6 +181,7 @@ qint64 CryptedFileStream::writeData(const char* data, qint64 maxSize)
 bool CryptedFileStream::seek(qint64 offset)
 {
     QnMutexLocker lock(&m_mutex);
+    QIODevice::seek(offset);
 
     if (!isWriting() && (offset > m_header.dataSize))
         return false;
@@ -189,7 +190,6 @@ bool CryptedFileStream::seek(qint64 offset)
     m_position.setPosition(offset);
     loadCurrentBlock();
 
-    QIODevice::seek(offset);
     return true;
 }
 

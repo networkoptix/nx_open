@@ -79,6 +79,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
@@ -111,22 +112,6 @@ static void updateTreeItem(QnResourceTreeWidget* tree, const QnWorkbenchItem* it
 
     tree->update(resource);
 }
-
-// Must correlate with QnResourceTreeWidget::filterTags() method.
-static const auto kTagIndexToAllowedNodeMapping = QList<ResourceTreeNodeType>(
-    {
-        QnResourceSearchQuery::kAllowAllNodeTypes,
-        QnResourceSearchQuery::kAllowAllNodeTypes,
-        ResourceTreeNodeType::filteredServers,
-        ResourceTreeNodeType::filteredCameras,
-        ResourceTreeNodeType::filteredLayouts,
-        ResourceTreeNodeType::layoutTours,
-        ResourceTreeNodeType::filteredVideowalls,
-        ResourceTreeNodeType::webPages,
-        ResourceTreeNodeType::analyticsEngines,
-        ResourceTreeNodeType::filteredUsers,
-        ResourceTreeNodeType::localResources
-    });
 
 bool hasParentNodes(const QModelIndex& index)
 {
@@ -358,8 +343,8 @@ void QnResourceBrowserWidget::initInstantSearch()
 
     ui->tabWidget->tabBar()->hide();
 
-    ui->nothingFoundLabel->setForegroundRole(QPalette::Mid);
-    ui->nothingFoundDescriptionLabel->setForegroundRole(QPalette::Mid);
+    setPaletteColor(ui->nothingFoundLabel, QPalette::WindowText, colorTheme()->color("dark14"));
+    setPaletteColor(ui->nothingFoundDescriptionLabel, QPalette::WindowText, colorTheme()->color("dark14"));
 
     connect(ui->resourceTreeWidget, &QnResourceTreeWidget::filterEnterPressed,
         this, [this] { handleEnterPressed(false);});
@@ -479,12 +464,18 @@ void QnResourceBrowserWidget::updateSearchMode()
 {
     const auto filterEdit = ui->instantFilterLineEdit;
     const bool localResourcesMode = commonModule()->remoteGUID().isNull();
-    const auto tags = localResourcesMode ? QStringList() : filterTags();
+    QStringList tags;
+    if (!localResourcesMode)
+    {
+        auto tagsWithNodeTypes = filterTagsWithNodeTypes();
+        std::transform(tagsWithNodeTypes.begin(), tagsWithNodeTypes.end(), std::back_inserter(tags),
+            [](const auto& tagWithNodeType) { return tagWithNodeType.first; });
+    }
     filterEdit->setTags(tags);
     filterEdit->setText(QString());
     filterEdit->setPlaceholderText(localResourcesMode
         ? tr("Local files")
-        : tr("Cameras & Resources"));
+        : tr("Search"));
 
     updateInstantFilter();
 }
@@ -547,7 +538,7 @@ void QnResourceBrowserWidget::updateInstantFilter()
         filterEdit->clear();
 
     const auto index = filterEdit->selectedTagIndex();
-    if (index >= kTagIndexToAllowedNodeMapping.size())
+    if (index >= filterTagsWithNodeTypes().size())
     {
         NX_ASSERT(false, "Wrong tag index");
         return;
@@ -558,7 +549,7 @@ void QnResourceBrowserWidget::updateInstantFilter()
         [this, localResourcesMode, index]()
         {
             if (index > -1)
-                return kTagIndexToAllowedNodeMapping.at(index);
+                return filterTagsWithNodeTypes().at(index).second;
 
             return localResourcesMode
                 ? QnResourceSearchQuery::NodeType::localResources
@@ -752,22 +743,19 @@ void QnResourceBrowserWidget::updateHintVisibilityByBasicState()
         && ui->instantFilterLineEdit->focused());
 }
 
-QStringList QnResourceBrowserWidget::filterTags()
+QList<QnResourceBrowserWidget::FilterTagWithNodeType> QnResourceBrowserWidget::filterTagsWithNodeTypes() const
 {
-    // Must correlate with kTagIndexToAllowedNodeMapping.
-    static const auto kFilterCategories = QStringList({
-        tr("All types"),
-        QString(), // splitter
-        tr("Servers"),
-        tr("Cameras && Devices"),
-        tr("Layouts"),
-        tr("Showreels"),
-        tr("Video Walls"),
-        tr("Web Pages"),
-        tr("Users"),
-        tr("Local Files")});
-
-    return kFilterCategories;
+    return {
+        {tr("All types"),           QnResourceSearchQuery::kAllowAllNodeTypes}, 
+        {QString(),                 QnResourceSearchQuery::kAllowAllNodeTypes}, // splitter
+        {tr("Servers"),             ResourceTreeNodeType::filteredServers},
+        {tr("Cameras && Devices"),  ResourceTreeNodeType::filteredCameras},
+        {tr("Layouts"),             ResourceTreeNodeType::filteredLayouts},
+        {tr("Showreels"),           ResourceTreeNodeType::layoutTours},
+        {tr("Video Walls"),         ResourceTreeNodeType::filteredVideowalls},
+        {tr("Web Pages"),           ResourceTreeNodeType::webPages},
+        {tr("Users"),               ResourceTreeNodeType::filteredUsers},
+        {tr("Local Files"),         ResourceTreeNodeType::localResources}};
 }
 
 QComboBox* QnResourceBrowserWidget::typeComboBox() const

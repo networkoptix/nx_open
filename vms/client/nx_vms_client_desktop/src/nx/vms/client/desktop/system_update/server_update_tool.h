@@ -54,7 +54,6 @@ public:
 
     // Check if we should sync UI and data from here.
     bool hasRemoteChanges() const;
-
     bool hasOfflineUpdateChanges() const;
 
     /**
@@ -106,8 +105,6 @@ public:
         error,
     };
 
-    std::future<UpdateContents> checkLatestUpdate();
-    std::future<UpdateContents> checkSpecificChangeset(QString build);
     std::future<UpdateContents> checkUpdateFromFile(QString file);
     std::future<UpdateContents> checkRemoteUpdateInfo();
     // It is used to obtain future to update check that was started

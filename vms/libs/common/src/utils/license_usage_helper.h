@@ -4,13 +4,19 @@
 
 #include <QtCore/QPointer>
 
+#include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
 #include <licensing/license.h>
-
+#include <nx/utils/url.h>
 #include <utils/common/connective.h>
-#include <common/common_module_aware.h>
 
-static const QString QN_LICENSE_URL(lit("http://licensing.networkoptix.com/nxlicensed/activate.php"));
+struct QnLicenseServer
+{
+    static const nx::utils::Url kIndexUrl;
+    static const nx::utils::Url kActivateUrl;
+    static const nx::utils::Url kDiactivateUrl;
+    static const nx::utils::Url kValidateUrl;
+};
 
 struct LicenseCompatibility;
 

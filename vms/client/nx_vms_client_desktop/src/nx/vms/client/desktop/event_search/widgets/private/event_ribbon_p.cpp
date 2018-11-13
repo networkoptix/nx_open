@@ -331,16 +331,6 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
         ? nx::api::ImageRequest::RoundMethod::precise
         : nx::api::ImageRequest::RoundMethod::iFrameAfter;
 
-    const auto showPreviewTimestamp =
-        [tile](CameraThumbnailProvider* provider)
-        {
-            if (provider->status() == Qn::ThumbnailStatus::Loaded)
-            {
-                tile->setDescription(lit("%1<br>Preview: %2 us").arg(tile->description())
-                    .arg(provider->timestampUs()));
-            }
-        };
-
     if (tile->preview())
     {
         auto provider = qobject_cast<CameraThumbnailProvider*>(tile->preview());
@@ -349,12 +339,7 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
         if (!provider)
             return;
 
-        if (request.usecSinceEpoch == provider->requestData().usecSinceEpoch)
-        {
-            if (ini().showDebugTimeInformationInRibbon)
-                showPreviewTimestamp(provider);
-        }
-        else
+        if (request.usecSinceEpoch != provider->requestData().usecSinceEpoch)
         {
             provider->setRequestData(request);
             provider->loadAsync();
@@ -365,13 +350,6 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     {
         auto provider = new CameraThumbnailProvider(request, tile);
         tile->setPreview(provider);
-
-        if (ini().showDebugTimeInformationInRibbon)
-        {
-            connect(provider, &ImageProvider::statusChanged, tile,
-                [showPreviewTimestamp, provider]() { showPreviewTimestamp(provider); });
-        }
-
         tile->preview()->loadAsync();
         tile->setPreviewCropRect(previewCropRect);
     }

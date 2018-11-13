@@ -124,6 +124,7 @@ private:
     void processRemoteInitialState();
     void processRemoteDownloading();
     void processRemoteInstalling();
+    void processRemoteCanceling();
 
     bool processUploaderChanges(bool force = false);
 

@@ -62,3 +62,11 @@ TEST(Interval, truncation)
     ASSERT_TRUE(Interval(10, 20).truncatedRight(10).isEmpty());
     ASSERT_TRUE(Interval(10, 20).truncatedRight(0).isEmpty());
 }
+
+TEST(Interval, shift)
+{
+    ASSERT_EQ(Interval(10, 20).shifted(10), Interval(20, 30));
+    ASSERT_EQ(Interval(10, 20).shifted(-20), Interval(-10, 0));
+    ASSERT_EQ(Interval(10, 20).shifted(0), Interval(10, 20));
+    ASSERT_TRUE(Interval().shifted(10).isEmpty());
+}

@@ -349,11 +349,11 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
 {
     using namespace Qn;
     using Dialog = CompatibilityVersionInstallationDialog;
-
     QList<nx::utils::SoftwareVersion> versions;
     if (!getInstalledVersions(&versions))
         return handleApplauncherError(parentWidget);
     bool isInstalled = versions.contains(connectionInfo.version);
+    bool shouldAutoRestart = false;
 
     while (true)
     {
@@ -372,17 +372,20 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
             dialog.addButton(tr("Download && Install"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
             if (dialog.exec() != QDialogButtonBox::Cancel)
             {
-
                 QScopedPointer<Dialog> installationDialog(new Dialog(connectionInfo, parentWidget));
 
-                // TODO: Should pass URI to the server or we need to establish partial connection
                 //starting installation
-                installationDialog->installUpdate();
-
-                if (installationDialog->installationSucceeded())
+                installationDialog->exec();
+                // Possible scenarios: cancel, failed, success
+                if (installationDialog->installationResult() == Dialog::InstallResult::complete)
                 {
                     isInstalled = true;
-                    continue;   //offering to start newly-installed compatibility version
+                    shouldAutoRestart = installationDialog->shouldAutoRestart();
+                }
+                else
+                {
+                    // TODO: Say something meaningful about this strange installation results.
+                    //NX_ERROR(this) << "Failed to install client update";
                 }
             }
             return Qn::IncompatibleVersionConnectionResult;
@@ -393,14 +396,17 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
             tr("You have to restart %1 in compatibility"
                 " mode to connect to this Server.").arg(QnClientAppInfo::applicationDisplayName()));
 
-        QnMessageBox dialog(QnMessageBoxIcon::Question,
-            tr("Restart %1 in compatibility mode?").arg(QnClientAppInfo::applicationDisplayName()),
-            extras, QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, parentWidget);
+        if (!shouldAutoRestart)
+        {
+            QnMessageBox dialog(QnMessageBoxIcon::Question,
+                tr("Restart %1 in compatibility mode?").arg(QnClientAppInfo::applicationDisplayName()),
+                extras, QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, parentWidget);
 
-        dialog.addButton(tr("Restart"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
+            dialog.addButton(tr("Restart"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
 
-        if (dialog.exec() == QDialogButtonBox::Cancel)
-            return Qn::IncompatibleVersionConnectionResult;
+            if (dialog.exec() == QDialogButtonBox::Cancel)
+                return Qn::IncompatibleVersionConnectionResult;
+        }
 
         nx::utils::Url serverUrl = connectionInfo.ecUrl;
         if (serverUrl.scheme().isEmpty())
@@ -436,8 +442,11 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
                     //starting installation
                     QScopedPointer<Dialog> installationDialog(new Dialog(connectionInfo, parentWidget));
                     installationDialog->exec();
-                    if (installationDialog->installationSucceeded())
+                    if (installationDialog->installationResult() == Dialog::InstallResult::complete)
+                    {
+                        shouldAutoRestart = installationDialog->shouldAutoRestart();
                         continue;   //offering to start newly-installed compatibility version
+                    }
                 }
                 return Qn::IncompatibleVersionConnectionResult;
             }

@@ -2480,6 +2480,8 @@ void MediaServerProcess::registerRestHandlers(
      *     camera settings.
      *     %value auto Default value. Use aspect ratio from camera settings (if any).
      *     %value source Use the source frame aspect ratio, despite the value in camera settings.
+     * %param[opt]:option ignoreExternalArchive If present and "time" parameter has value
+     *     "latest", the image will not be downloaded from archive of the dts-based devices.
      * %param[proprietary]:option local If present, the request should not be redirected to another
      *     server.
      * %param[proprietary]:option extraFormatting If present and the requested result format is
@@ -4032,7 +4034,7 @@ void MediaServerProcess::loadResourceParamsData()
     const std::array<const char*,2> kUrlsToLoadResourceData =
     {
         "http://resources.vmsproxy.com/resource_data.json",
-        "http://beta.networkoptix.com/beta-builds/daily/resource_data.json"
+        "http://beta.vmsproxy.com/beta-builds/daily/resource_data.json"
     };
 
     auto manager = m_ec2Connection->getResourceManager(Qn::kSystemAccess);
