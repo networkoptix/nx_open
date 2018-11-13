@@ -100,12 +100,12 @@ QSize updateDstSize(
             dstSize.setWidth(dstSize.height() * customAr.toFloat());
     }
 
-    // Scale image to fit inside max size square.
+    // Scale the image to fit inside max size square.
     static constexpr int kMaxSize = nx::api::CameraImageRequest::kMaximumSize;
     if (dstSize.width() > kMaxSize || dstSize.height() > kMaxSize)
         dstSize.scale(kMaxSize, kMaxSize, Qt::KeepAspectRatio);
 
-    // Scale image to fit outside min size square.
+    // Scale the image to fit outside min size square.
     static constexpr int kMinSize = nx::api::CameraImageRequest::kMinimumSize;
     if (dstSize.height() < kMinSize && dstSize.height() > 0
         || dstSize.width() < kMinSize && dstSize.width() > 0)
@@ -331,7 +331,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImage(const nx::api::CameraImageReq
         || request.size.height() > secondaryResolution.height();
 
     #if defined(EDGE_SERVER)
-        usePrimaryStream = false;  //< On edge we always try to use secondary stream first.
+        usePrimaryStream = false; //< On edge, we always try to use the secondary stream first.
     #endif
 
     if (auto frame = getImageWithCertainQuality(usePrimaryStream, request))
