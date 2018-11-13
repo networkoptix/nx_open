@@ -15,6 +15,15 @@ from notifications import api
 User = get_user_model()
 
 
+class AccountAdminForm(forms.ModelForm):
+    class Meta:
+        model = Account
+        exclude = []
+        widgets = {
+            'groups': FilteredSelectMultiple('groups', False)
+        }
+
+
 # Create ModelForm based on the Group model.
 class GroupAdminForm(forms.ModelForm):
     class Meta:

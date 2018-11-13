@@ -45,6 +45,7 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
                   'subscribe', 'is_staff', 'language', 'customization')
 
     change_list_template = "api/account_changelist.html"
+    form = AccountAdminForm
 
     def save_model(self, request, obj, form, change):
         # forbid creating superusers outside specific domain
