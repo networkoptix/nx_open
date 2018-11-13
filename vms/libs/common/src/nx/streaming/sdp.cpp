@@ -27,7 +27,7 @@ static QString findCodecById(int num)
     }
 }
 
-bool parseRtpMap(const QString& line, Sdp::RtpMap& rtpmap, int& payloadType)
+bool parseRtpMap(const QString& line, Sdp::RtpMap* outRtpmap, int* outPayloadType)
 {
     QStringList params = line.split(' ');
     if (params.size() < 2)
@@ -37,15 +37,15 @@ bool parseRtpMap(const QString& line, Sdp::RtpMap& rtpmap, int& payloadType)
     if (trackInfo.size() < 2 || codecInfo.size() < 2)
         return false; // invalid data format
 
-    payloadType = trackInfo[1].toUInt();
-    rtpmap.codecName = codecInfo[0];
-    rtpmap.clockRate = codecInfo[1].toInt();
+    *outPayloadType = trackInfo[1].toUInt();
+    outRtpmap->codecName = codecInfo[0];
+    outRtpmap->clockRate = codecInfo[1].toInt();
     if (codecInfo.size() >= 3)
-        rtpmap.channels = codecInfo[2].toInt();
+        outRtpmap->channels = codecInfo[2].toInt();
     return true;
 }
 
-bool parseFmtp(const QString& line, Sdp::Fmtp& fmtp, int& payloadType)
+bool parseFmtp(const QString& line, Sdp::Fmtp* outFmtp, int* outPayloadType)
 {
     int valueIndex = line.indexOf(' ');
     if (valueIndex == -1)
@@ -54,9 +54,9 @@ bool parseFmtp(const QString& line, Sdp::Fmtp& fmtp, int& payloadType)
     QStringList fmtpHeader = line.left(valueIndex).split(':');
     if (fmtpHeader.size() < 2)
         return false;
-    payloadType = fmtpHeader[1].toUInt();
-    fmtp.params = line.mid(valueIndex + 1).split(';');
-    for (QString& param: fmtp.params)
+    *outPayloadType = fmtpHeader[1].toUInt();
+    outFmtp->params = line.mid(valueIndex + 1).split(';');
+    for (QString& param: outFmtp->params)
         param = param.trimmed();
 
     return true;
@@ -82,7 +82,7 @@ Sdp::Media parseMedia(QStringList& lines)
         {
             int payloadType = 0;
             Sdp::RtpMap rtpmap;
-            if (parseRtpMap(line, rtpmap, payloadType) &&
+            if (parseRtpMap(line, &rtpmap, &payloadType) &&
                 (media.payloadType == 0 || payloadType == media.payloadType)) // Ignore invalid rtpmap
             {
                 media.rtpmap = rtpmap;
@@ -95,7 +95,7 @@ Sdp::Media parseMedia(QStringList& lines)
         {
             int payloadType = 0;
             Sdp::Fmtp fmtp;
-            if (parseFmtp(line, fmtp, payloadType) && payloadType == media.payloadType)
+            if (parseFmtp(line, &fmtp, &payloadType) && payloadType == media.payloadType)
                 media.fmtp = fmtp;
         }
         else if (line.startsWith("a=control:", Qt::CaseInsensitive))
