@@ -23,8 +23,6 @@ static constexpr int kMaxGopLen = 100;
 
 static constexpr int kRoundFactor = 4;
 
-static const nx::utils::log::Tag kLogTag(lit("QnGetImageHelper"));
-
 static Qn::StreamIndex oppositeStreamIndex(Qn::StreamIndex streamIndex)
 {
     switch (streamIndex)
@@ -72,15 +70,17 @@ QnGetImageHelper::QnGetImageHelper(QnMediaServerModule* serverModule):
 {
 }
 
-QSize QnGetImageHelper::updateDstSize(
-    const QnVirtualCameraResourcePtr& camera,
+QSize updateDstSize(
+    const QnVirtualCameraResource* camera,
     const QSize& srcSize,
-    CLVideoDecoderOutputPtr outFrame,
-    nx::api::ImageRequest::AspectRatio aspectRatio) const
+    const CLVideoDecoderOutput& outFrame,
+    nx::api::ImageRequest::AspectRatio aspectRatio)
 {
     QSize dstSize(srcSize);
-    double sar = outFrame->sample_aspect_ratio;
-    double ar = sar * outFrame->width / outFrame->height;
+
+    const double sar = outFrame.sample_aspect_ratio;
+    const double ar = sar * outFrame.width / outFrame.height;
+    NX_ASSERT(ar > 0);
     if (!dstSize.isEmpty())
     {
         dstSize.setHeight(qPower2Ceil((unsigned)dstSize.height(), kRoundFactor));
@@ -89,7 +89,7 @@ QSize QnGetImageHelper::updateDstSize(
     else if (dstSize.height() > 0)
     {
         dstSize.setHeight(qPower2Ceil((unsigned)dstSize.height(), kRoundFactor));
-        dstSize.setWidth(qPower2Ceil((unsigned)(dstSize.height()*ar), kRoundFactor));
+        dstSize.setWidth(qPower2Ceil((unsigned)(dstSize.height() * ar), kRoundFactor));
     }
     else if (dstSize.width() > 0)
     {
@@ -98,20 +98,31 @@ QSize QnGetImageHelper::updateDstSize(
     }
     else
     {
-        dstSize = QSize(outFrame->width * sar, outFrame->height);
+        dstSize = QSize(outFrame.width * sar, outFrame.height);
     }
-    static constexpr int kMaxSize = nx::api::CameraImageRequest::kMaximumSize;
-    dstSize.setWidth(qMin(dstSize.width(), qMax(kMaxSize, outFrame->width) * sar));
-    dstSize.setHeight(qMin(dstSize.height(), qMax(kMaxSize, outFrame->height)));
 
+    // If auto was requested, then should use aspect ratio like it is used in GUI.
     if (aspectRatio == nx::api::ImageRequest::AspectRatio::auto_)
     {
-        const auto customAr = camera->customAspectRatio();
+        const auto customAr = camera->aspectRatio();
         if (customAr.isValid())
             dstSize.setWidth(dstSize.height() * customAr.toFloat());
     }
 
-    return QnCodecTranscoder::roundSize(dstSize);
+    // Scale the image to fit inside max size square.
+    static constexpr int kMaxSize = nx::api::CameraImageRequest::kMaximumSize;
+    if (dstSize.width() > kMaxSize || dstSize.height() > kMaxSize)
+        dstSize.scale(kMaxSize, kMaxSize, Qt::KeepAspectRatio);
+
+    // Scale the image to fit outside min size square.
+    static constexpr int kMinSize = nx::api::CameraImageRequest::kMinimumSize;
+    if (dstSize.height() < kMinSize && dstSize.height() > 0
+        || dstSize.width() < kMinSize && dstSize.width() > 0)
+        dstSize.scale(kMinSize, kMinSize, Qt::KeepAspectRatioByExpanding);
+
+    dstSize = QnCodecTranscoder::roundSize(dstSize);
+    NX_VERBOSE(typeid(QnGetImageHelper), "%1(): dstSize: %2", __func__, dstSize);
+    return dstSize;
 }
 
 CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
@@ -328,31 +339,19 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImage(const nx::api::CameraImageReq
         return nullptr;
     }
 
-    QSize dstSize(request.size);
-#ifdef EDGE_SERVER
-    if (dstSize.height() < 1)
-        dstSize.setHeight(360); //on edge instead of full-size image we return 360p
-#endif
-    static constexpr int kMinSize = nx::api::CameraImageRequest::kMinimumSize;
-    //if requested size is less than kMinSize in any dimension then upscaling to kMinSize
-    if (dstSize.height() < kMinSize && dstSize.height() > 0)
-    {
-        dstSize.setWidth(dstSize.width() * kMinSize / dstSize.height());
-        dstSize.setHeight(kMinSize);
-    }
-    if (dstSize.width() < kMinSize && dstSize.width() > 0)
-    {
-        dstSize.setWidth(kMinSize);
-        dstSize.setHeight(dstSize.height() * kMinSize / dstSize.width());
-    }
-
+    const auto secondaryResolution =
+        request.camera->streamInfo(Qn::StreamIndex::secondary).getResolution();
     const Qn::StreamIndex streamIndex = (
-            (dstSize.width() > 0 && dstSize.width() <= 480)
-            || (dstSize.height() > 0 && dstSize.height() <= 316))
-        ? Qn::StreamIndex::secondary
-        : Qn::StreamIndex::primary;
-    if (dstSize != request.size)
-        NX_VERBOSE(this, "%1(): dstSize: %2", __func__, dstSize);
+            (request.size.width() <= 0 && request.size.height() <= 0)
+            || request.size.width() > secondaryResolution.width()
+            || request.size.height() > secondaryResolution.height())
+        ? Qn::StreamIndex::primary
+        : Qn::StreamIndex::secondary;
+
+    #if defined(EDGE_SERVER)
+        // On edge, we always try to use the secondary stream first.
+        streamIndex = Qn::StreamIndex::secondary;
+    #endif
 
     if (auto frame = getImageWithCertainQuality(streamIndex, request))
     {
@@ -513,8 +512,6 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
 
     const auto camera = request.camera;
 
-    QSize dstSize = request.size;
-
     int rotation = request.rotation;
     if (rotation == nx::api::ImageRequest::kDefaultRotation)
         rotation = camera->getProperty(QnMediaResource::rotationKey()).toInt();
@@ -542,25 +539,16 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
         if (!frame)
         {
             gotNullFrame = true;
-            if (i == 0)
-            {
-                NX_VERBOSE(this, "%1() END -> null: frame not found", __func__);
-                return nullptr;
-            }
-            else
-            {
+            if (i != 0)
                 continue;
-            }
+            NX_VERBOSE(this, "%1() END -> null: frame not found", __func__);
+            return nullptr;
         }
         channelMask &= ~(1 << frame->channel);
         if (i == 0)
         {
-            dstSize = updateDstSize(camera, dstSize, frame, request.aspectRatio);
-            if (dstSize.width() <= 16 || dstSize.height() <= 8)
-            {
-                NX_VERBOSE(this, "%1() END -> null: frame too small", __func__);
-                return nullptr;
-            }
+            const QSize dstSize = updateDstSize(camera.get(),
+                request.size, *frame, request.aspectRatio);
             filterChain << QnAbstractImageFilterPtr(new QnScaleImageFilter(dstSize));
             filterChain << QnAbstractImageFilterPtr(new QnTiledImageFilter(layout));
             filterChain << QnAbstractImageFilterPtr(new QnRotateImageFilter(rotation));
@@ -594,7 +582,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
             }
         }
     }
-    NX_VERBOSE(this, "%1() END -> frame", __func__);
+    NX_VERBOSE(this, "%1() END -> frame %2", __func__, outFrame->size());
     return outFrame;
 }
 

@@ -22,6 +22,11 @@ typedef CLVideoDecoderOutputPtr CLVideoDecoderOutputPtr;
 class QnAbstractArchiveDelegate;
 class QnMediaServerModule;
 
+QSize updateDstSize(const QnVirtualCameraResource* camera,
+    const QSize& dstSize,
+    const CLVideoDecoderOutput& outFrame,
+    nx::api::ImageRequest::AspectRatio aspectRatio);
+
 class QnGetImageHelper: public nx::mediaserver::ServerModuleAware
 {
 public:
@@ -39,12 +44,6 @@ private:
         QnAbstractArchiveDelegate* archiveDelegate,
         int prefferedChannel,
         bool& isOpened) const;
-
-    QSize updateDstSize(
-        const QnVirtualCameraResourcePtr& camera,
-        const QSize& dstSize,
-        CLVideoDecoderOutputPtr outFrame,
-        nx::api::ImageRequest::AspectRatio aspectRatio) const;
 
     CLVideoDecoderOutputPtr getImageWithCertainQuality(
         Qn::StreamIndex streamIndex, const nx::api::CameraImageRequest& request) const;
