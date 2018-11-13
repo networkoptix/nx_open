@@ -31,7 +31,7 @@ class GroupFilter(SimpleListFilter):
 @admin.register(Account)
 class AccountAdmin(CMSAdmin, CSVExportAdmin):
     list_display = ('short_email', 'short_first_name', 'short_last_name', 'created_date', 'last_login',
-                    'subscribe', 'is_staff', 'language', 'customization')
+                    'is_staff', 'language', 'customization', 'user_groups')
     # forbid changing all fields which can be edited by user in cloud portal except sub
     readonly_fields = ('email', 'first_name', 'last_name', 'created_date', 'activated_date', 'last_login',
                        'subscribe', 'language', 'customization')
@@ -95,6 +95,9 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
         context['adminform'] = helpers.AdminForm(form, list([(None, {'fields': form.base_fields})]),
                                                  self.get_prepopulated_fields(request))
         return render(request, 'api/invite_form.html', context)
+
+    def user_groups(self, obj):
+        return [group.name for group in obj.groups.all()]
 
 
 @admin.register(AccountLoginHistory)
