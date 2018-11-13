@@ -233,33 +233,114 @@ boost::optional<int> HikvisionHevcStreamReader::rescaleQuality(
 CameraDiagnostics::Result HikvisionHevcStreamReader::fetchChannelProperties(
     ChannelProperties* outChannelProperties) const
 {
-    const auto kRequestName = lit("Fetch channel properties");
-    nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined;
-    for (const auto& path: {kIsapiChannelStreamingPathTemplate, kChannelStreamingPathTemplate})
+    boost::optional<int> rtspPort;
+    auto url = hikvisionRequestUrlFromPath(kIsapiChannelStreamingPathTemplate.arg(
+        buildChannelNumber(getRole(), m_hikvisionResource->getChannel())));
+
+    auto result = fetchRtspPortViaIsapi(&rtspPort);
+    if (result.errorCode == CameraDiagnostics::ErrorCode::notAuthorised)
+        return result;
+
+    if (!result)
     {
-        auto url = hikvisionRequestUrlFromPath(path.arg(
-            buildChannelNumber(getRole(), m_hikvisionResource->getChannel())));
-
-        nx::Buffer response;
-        if (!doGetRequest(url, m_hikvisionResource->getAuth(), &response, &statusCode))
-        {
-            if (statusCode == nx::network::http::StatusCode::Value::unauthorized)
-                return CameraDiagnostics::NotAuthorisedResult(url.toString());
-
-            if (statusCode != nx::network::http::StatusCode::Value::ok)
-                continue;
-        }
-
-        if (!parseChannelPropertiesResponse(response, outChannelProperties))
-            return CameraDiagnostics::CameraResponseParseErrorResult(url.toString(), kRequestName);
-
-        outChannelProperties->httpUrl = url;
-        return CameraDiagnostics::NoErrorResult();
+        NX_DEBUG(
+            this,
+            lm("Failed to fetch RTSP port via ISAPI request, error %1, device %2 (%3); "
+                "trying old-style API")
+                .args(
+                    result.toString(m_hikvisionResource->commonModule()->resourcePool()),
+                    m_hikvisionResource->getUserDefinedName(),
+                    m_hikvisionResource->getId()));
     }
-    if (statusCode != nx::network::http::StatusCode::Value::ok)
-        return CameraDiagnostics::RequestFailedResult(kRequestName, toString(statusCode));
 
-    return CameraDiagnostics::RequestFailedResult(kRequestName, lit("No sutable URL"));
+    if (!rtspPort)
+    {
+        url = hikvisionRequestUrlFromPath(kChannelStreamingPathTemplate.arg(
+            buildChannelNumber(getRole(), m_hikvisionResource->getChannel())));
+        result = fetchRtspPortViaOldApi(&rtspPort);
+    }
+
+    if (!result)
+        return result;
+
+    if (!rtspPort)
+    {
+        NX_DEBUG(
+            this,
+            lm("Unable to determine RTSP port for resource %1 (%2), using the default one").args(
+                m_hikvisionResource->getUserDefinedName(),
+                m_hikvisionResource->getId()));
+        rtspPort = nx::network::rtsp::DEFAULT_RTSP_PORT;
+    }
+
+    outChannelProperties->httpUrl = url;
+    outChannelProperties->rtspPort = *rtspPort;
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result HikvisionHevcStreamReader::fetchRtspPortViaIsapi(
+    boost::optional<int>* outRtspPort) const
+{
+    static const QString kAdminAccessPath("/ISAPI/Security/adminAccesses");
+    const auto url = hikvisionRequestUrlFromPath(kAdminAccessPath);
+
+    nx::Buffer response;
+    const auto result = fetchResponse(url, &response);
+    if (!result)
+        return result;
+
+    AdminAccess adminAccess;
+    const bool success = parseAdminAccessResponse(response, &adminAccess);
+    if (!success)
+        return CameraDiagnostics::CameraResponseParseErrorResult(kAdminAccessPath, "Admin access");
+
+    *outRtspPort = adminAccess.rtspPort;
+    return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result HikvisionHevcStreamReader::fetchRtspPortViaOldApi(
+    boost::optional<int>* outRtspPort) const
+{
+    auto url = hikvisionRequestUrlFromPath(kChannelStreamingPathTemplate.arg(
+        buildChannelNumber(getRole(), m_hikvisionResource->getChannel())));
+
+    nx::Buffer response;
+    const auto result = fetchResponse(url, &response);
+    if (!result)
+        return result;
+
+    ChannelProperties channelProperties;
+    if (!parseChannelPropertiesResponse(response, &channelProperties))
+    {
+        return CameraDiagnostics::CameraResponseParseErrorResult(
+            url.toString(),
+            "Fetch channel properties");
+    }
+
+    *outRtspPort = channelProperties.rtspPort;
+    return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result HikvisionHevcStreamReader::fetchResponse(
+    const nx::utils::Url& url,
+    nx::Buffer* outBuffer) const
+{
+    nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined;
+
+    if (!doGetRequest(url, m_hikvisionResource->getAuth(), outBuffer, &statusCode))
+    {
+        if (statusCode == nx::network::http::StatusCode::Value::unauthorized)
+            return CameraDiagnostics::NotAuthorisedResult(url.toString());
+
+        if (statusCode != nx::network::http::StatusCode::Value::ok)
+        {
+            return CameraDiagnostics::RequestFailedResult(
+                url.toString(), QString::fromUtf8(*outBuffer));
+        }
+    }
+
+    return CameraDiagnostics::NoErrorResult();
 }
 
 CameraDiagnostics::Result HikvisionHevcStreamReader::configureChannel(

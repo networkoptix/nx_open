@@ -197,6 +197,51 @@ boost::optional<CommonResponse> parseCommonResponse(nx::network::http::StringTyp
     return response;
 }
 
+bool parseAdminAccessResponse(const nx::Buffer& response, AdminAccess* outAdminAccess)
+{
+    QDomDocument doc;
+    doc.setContent(response);
+
+    auto element = doc.documentElement();
+    if (element.isNull() || element.tagName() != kAdminAccessElementTag)
+        return false;
+
+    for (auto adminAccessProtocol = element.firstChildElement(kAdminAccessProtocolElementTag);
+        !adminAccessProtocol.isNull();
+        adminAccessProtocol =
+            adminAccessProtocol.nextSiblingElement(kAdminAccessProtocolElementTag))
+    {
+        const auto protocolElement = adminAccessProtocol.firstChildElement("protocol");
+        if (protocolElement.isNull())
+            continue;
+
+        const auto portNumberElement = adminAccessProtocol.firstChildElement("portNo");
+        if (portNumberElement.isNull())
+            continue;
+
+        bool success = false;
+        const auto protocolString = protocolElement.text().toLower().trimmed();
+        const auto protocolPort = portNumberElement.text().trimmed().toInt(&success);
+
+        if (!success)
+            continue;
+
+        if (protocolString == "http")
+            outAdminAccess->httpPort = protocolPort;
+        else if (protocolString == "https")
+            outAdminAccess->httpsPort = protocolPort;
+        else if (protocolString == "rtsp")
+            outAdminAccess->rtspPort = protocolPort;
+        else if (protocolString == "dev_manage")
+            outAdminAccess->deviceManagementPort = protocolPort;
+
+        adminAccessProtocol =
+            adminAccessProtocol.nextSiblingElement(kAdminAccessProtocolElementTag);
+    }
+
+    return true;
+}
+
 bool parseChannelCapabilitiesResponse(
     const nx::Buffer& response,
     ChannelCapabilities* outCapabilities)

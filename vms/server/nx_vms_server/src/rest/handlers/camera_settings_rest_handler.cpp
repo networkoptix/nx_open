@@ -309,3 +309,5 @@ nx::network::http::StatusCode::Value QnCameraSettingsRestHandler::handleSetParam
 
     return StatusCode::ok;
 }
+
+
