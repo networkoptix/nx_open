@@ -2756,7 +2756,7 @@ QnCameraAdvancedParams HanwhaResource::filterParameters(
         {
             isSupported = false;
             if (!info->isChannelIndependent())
-                supportAttribute += lit("/%1").arg(getChannel());
+                supportAttribute += lit("/%1").arg(isBypassSupported() ? 0 : getChannel());
 
             const auto boolAttribute = attrs.attribute<bool>(supportAttribute);
             if (boolAttribute != boost::none)
