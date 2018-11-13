@@ -14,70 +14,81 @@ static const QString kEmailWithName("S. Ivanov <cloud1@gdm.su>");
 static const QString kEmailWithSuffix("cloud1+suffix@gdm.su");
 static const QString kEmailWithNameAndSuffix("S. Ivanov <cloud1+suffix@gdm.su>");
 
-}
+} // namespace
 
-TEST(QnEmail, EmptyValue)
+namespace nx::email {
+namespace test {
+
+TEST(QnEmail, emptyStringIsNotValidEmail)
 {
-    EXPECT_FALSE(QnEmailAddress("").isValid());
+    ASSERT_FALSE(isValidAddress(""));
 }
 
 TEST(QnEmail, ValidAddr)
 {
-    EXPECT_TRUE(QnEmailAddress(kEmail).isValid());
+    ASSERT_TRUE(isValidAddress(kEmail));
 }
 
 TEST(QnEmail, ValidFullName)
 {
-    EXPECT_TRUE(QnEmailAddress(kEmailWithName).isValid());
+    ASSERT_TRUE(isValidAddress(kEmailWithName));
 }
 
 TEST(QnEmail, ValidSuffix)
 {
-    EXPECT_TRUE(QnEmailAddress(kEmailWithSuffix).isValid());
+    ASSERT_TRUE(isValidAddress(kEmailWithSuffix));
 }
 
 TEST(QnEmail, ValidNameAndSuffix)
 {
-    EXPECT_TRUE(QnEmailAddress(kEmailWithNameAndSuffix).isValid());
+    ASSERT_TRUE(isValidAddress(kEmailWithNameAndSuffix));
 }
 
 TEST(QnEmail, TrimInput)
 {
-    EXPECT_EQ(QnEmailAddress(kEmail), QnEmailAddress(" " + kEmail + " "));
+    ASSERT_EQ(QnEmailAddress(kEmail), QnEmailAddress(" " + kEmail + " "));
 }
 
 TEST(QnEmail, ParseSimple)
 {
     QnEmailAddress addr(kEmail);
-    EXPECT_EQ(kEmail, addr.value());
-    EXPECT_EQ(QString(), addr.fullName());
-    EXPECT_EQ(kUser, addr.user());
-    EXPECT_EQ(kDomain, addr.domain());
+    ASSERT_EQ(kEmail, addr.value());
+    ASSERT_EQ(QString(), addr.fullName());
+    ASSERT_EQ(kUser, addr.user());
+    ASSERT_EQ(kDomain, addr.domain());
 }
 
 TEST(QnEmail, ParseName)
 {
     QnEmailAddress addr(kEmailWithName);
-    EXPECT_EQ(kEmail, addr.value());
-    EXPECT_EQ(kName, addr.fullName());
-    EXPECT_EQ(kUser, addr.user());
-    EXPECT_EQ(kDomain, addr.domain());
+    ASSERT_EQ(kEmail, addr.value());
+    ASSERT_EQ(kName, addr.fullName());
+    ASSERT_EQ(kUser, addr.user());
+    ASSERT_EQ(kDomain, addr.domain());
 }
 
 TEST(QnEmail, ParseSuffix)
 {
     QnEmailAddress addr(kEmailWithSuffix);
-    EXPECT_EQ(kEmailWithSuffix, addr.value());
-    EXPECT_EQ(QString(), addr.fullName());
-    EXPECT_EQ(kUser, addr.user());
-    EXPECT_EQ(kDomain, addr.domain());
+    ASSERT_EQ(kEmailWithSuffix, addr.value());
+    ASSERT_EQ(QString(), addr.fullName());
+    ASSERT_EQ(kUser, addr.user());
+    ASSERT_EQ(kDomain, addr.domain());
 }
 
 TEST(QnEmail, ParseNameAndSuffix)
 {
     QnEmailAddress addr(kEmailWithNameAndSuffix);
-    EXPECT_EQ(kEmailWithSuffix, addr.value());
-    EXPECT_EQ(kName, addr.fullName());
-    EXPECT_EQ(kUser, addr.user());
-    EXPECT_EQ(kDomain, addr.domain());
+    ASSERT_EQ(kEmailWithSuffix, addr.value());
+    ASSERT_EQ(kName, addr.fullName());
+    ASSERT_EQ(kUser, addr.user());
+    ASSERT_EQ(kDomain, addr.domain());
 }
+
+TEST(QnEmail, doubleDotIsInvalid)
+{
+    ASSERT_FALSE(isValidAddress("nhartleb@networkoptix..com"));
+}
+
+} // namespace test
+} // namespace nx::email
