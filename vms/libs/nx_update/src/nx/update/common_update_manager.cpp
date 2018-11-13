@@ -30,6 +30,10 @@ void CommonUpdateManager::connectToSignals()
     connect(
         downloader(), &Downloader::downloadFinished,
         this, &CommonUpdateManager::onDownloaderFinished, Qt::QueuedConnection);
+
+    connect(
+        downloader(), &Downloader::fileStatusChanged,
+        this, &CommonUpdateManager::onDownloaderFileStatusChanged, Qt::QueuedConnection);
 }
 
 update::Status CommonUpdateManager::start()
@@ -308,6 +312,16 @@ void CommonUpdateManager::onDownloaderFinished(const QString& fileName)
     installer()->prepareAsync(downloader()->filePath(fileName));
 }
 
+void CommonUpdateManager::onDownloaderFileStatusChanged(
+    const vms::common::p2p::downloader::FileInformation& fileInformation)
+{
+    if (fileInformation.status
+        == vms::common::p2p::downloader::FileInformation::Status::downloaded)
+    {
+        onDownloaderFinished(fileInformation.name);
+    }
+}
+
 void CommonUpdateManager::install(const QnAuthSession& authInfo)
 {
     if (installer()->state() != CommonUpdateInstaller::State::ok)
@@ -315,4 +329,5 @@ void CommonUpdateManager::install(const QnAuthSession& authInfo)
 
     installer()->install(authInfo);
 }
+
 } // namespace nx
