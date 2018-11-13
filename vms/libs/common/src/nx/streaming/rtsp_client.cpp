@@ -1,4 +1,3 @@
-
 #if defined(__arm__)
     #include <sys/ioctl.h>
 #endif
@@ -1313,88 +1312,40 @@ QString QnRtspClient::getVideoLayout() const
     return m_videoLayout;
 }
 
-static const size_t MAX_BITRATE_BITS_PER_SECOND = 50*1024*1024;
-static const size_t MAX_BITRATE_BYTES_PER_SECOND = MAX_BITRATE_BITS_PER_SECOND / CHAR_BIT;
-static_assert(
-    MAX_BITRATE_BYTES_PER_SECOND > ADDITIONAL_READ_BUFFER_CAPACITY * 10,
-    "MAX_BITRATE_BYTES_PER_SECOND MUST be 10 times greater than ADDITIONAL_READ_BUFFER_CAPACITY" );
-
 #ifdef __arm__
-static const size_t MS_PER_SEC = 1000;
-#endif
-
-int QnRtspClient::readSocketWithBuffering( quint8* buf, size_t bufSize, bool readSome )
+void sleepIfEmptySocket(nx::network::AbstractStreamSocket* socket)
 {
-#if 1
-#ifdef __arm__
+    static const size_t MS_PER_SEC = 1000;
+    static const size_t MAX_BITRATE_BITS_PER_SECOND = 50*1024*1024;
+    static const size_t MAX_BITRATE_BYTES_PER_SECOND = MAX_BITRATE_BITS_PER_SECOND / CHAR_BIT;
+    static_assert(
+        MAX_BITRATE_BYTES_PER_SECOND > ADDITIONAL_READ_BUFFER_CAPACITY * 10,
+        "MAX_BITRATE_BYTES_PER_SECOND MUST be 10 times greater than ADDITIONAL_READ_BUFFER_CAPACITY");
+
+    //TODO #ak Better to find other solution and remove this code.
+    //At least, move ioctl call to sockets, since socket->handle() is deprecated method
+    //(with nat traversal introduced, not every socket will have handle)
+    int bytesAv = 0;
+    if ((ioctl(socket->handle(), FIONREAD, &bytesAv) == 0) && //socket read buffer size is unknown to us
+        bytesAv == 0)    //socket read buffer is empty
     {
-        //TODO #ak Better to find other solution and remove this code.
-            //At least, move ioctl call to sockets, since m_tcpSock->handle() is deprecated method
-            //(with nat traversal introduced, not every socket will have handle)
-        int bytesAv = 0;
-        if( (ioctl( m_tcpSock->handle(), FIONREAD, &bytesAv ) == 0) &&  //socket read buffer size is unknown to us
-            (bytesAv == 0) )    //socket read buffer is empty
-        {
-            //This sleep somehow reduces CPU time spent by process in kernel space on arm platform
-                //Possibly, it is workaround of some other bug somewhere else
-                //This code works only on Raspberry and NX1
-            QThread::msleep( MS_PER_SEC / (MAX_BITRATE_BYTES_PER_SECOND / ADDITIONAL_READ_BUFFER_CAPACITY) );
-        }
+        //This sleep somehow reduces CPU time spent by process in kernel space on arm platform
+        //Possibly, it is workaround of some other bug somewhere else
+        //This code works only on Raspberry and NX1
+        QThread::msleep(MS_PER_SEC / (MAX_BITRATE_BYTES_PER_SECOND / ADDITIONAL_READ_BUFFER_CAPACITY));
     }
+}
 #endif
 
-    int bytesRead = m_tcpSock->recv( buf, (unsigned int) bufSize, readSome ? 0 : MSG_WAITALL );
+int QnRtspClient::readSocketWithBuffering(quint8* buf, size_t bufSize, bool readSome)
+{
+#ifdef __arm__
+    sleepIfEmptySocket(m_tcpSock.get());
+#endif
+    int bytesRead = m_tcpSock->recv(buf, (unsigned int) bufSize, readSome ? 0 : MSG_WAITALL);
     if (bytesRead > 0)
         m_lastReceivedDataTimer.restart();
     return bytesRead;
-#else
-    const size_t bufSizeBak = bufSize;
-
-    //this method introduced to minimize m_tcpSock->recv calls (on isd edge m_tcpSock->recv call is rather heavy)
-    // TODO: #ak remove extra data copying
-
-    for( ;; )
-    {
-        if( m_additionalReadBufferSize > 0 )
-        {
-            const size_t bytesToCopy = std::min<int>( m_additionalReadBufferSize, bufSize );
-            memcpy( buf, m_additionalReadBuffer + m_additionalReadBufferPos, bytesToCopy );
-            m_additionalReadBufferPos += bytesToCopy;
-            m_additionalReadBufferSize -= bytesToCopy;
-            bufSize -= bytesToCopy;
-            buf += bytesToCopy;
-        }
-
-        if( readSome && (bufSize < bufSizeBak) )
-            return bufSizeBak - bufSize;
-        if( bufSize == 0 )
-            return bufSizeBak;
-
-#ifdef __arm__
-        {
-            //TODO #ak Better to find other solution and remove this code.
-                //At least, move ioctl call to sockets, since m_tcpSock->handle() is deprecated method
-                //(with nat traversal introduced, not every socket will have handle)
-            int bytesAv = 0;
-            if( (ioctl( m_tcpSock->handle(), FIONREAD, &bytesAv ) != 0) ||  //socket read buffer size is unknown to us
-                (bytesAv == 0) )    //socket read buffer is empty
-            {
-                //This sleep somehow reduces CPU time spent by process in kernel space on arm platform
-                    //Possibly, it is workaround of some other bug somewhere else
-                    //This code works only on Raspberry and NX1
-                QThread::msleep( MS_PER_SEC / (MAX_BITRATE_BYTES_PER_SECOND / ADDITIONAL_READ_BUFFER_CAPACITY) );
-            }
-        }
-#endif
-
-        m_additionalReadBufferSize = m_tcpSock->recv( m_additionalReadBuffer, ADDITIONAL_READ_BUFFER_CAPACITY );
-        m_additionalReadBufferPos = 0;
-        if( m_additionalReadBufferSize <= 0 )
-            return bufSize == bufSizeBak
-                ? m_additionalReadBufferSize    //if could not read anything returning error
-                : bufSizeBak - bufSize;
-    }
-#endif
 }
 
 bool QnRtspClient::sendRequestAndReceiveResponse( nx::network::http::Request&& request, QByteArray& responseBuf )
