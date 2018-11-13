@@ -79,6 +79,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
@@ -342,8 +343,8 @@ void QnResourceBrowserWidget::initInstantSearch()
 
     ui->tabWidget->tabBar()->hide();
 
-    ui->nothingFoundLabel->setForegroundRole(QPalette::Mid);
-    ui->nothingFoundDescriptionLabel->setForegroundRole(QPalette::Mid);
+    setPaletteColor(ui->nothingFoundLabel, QPalette::WindowText, colorTheme()->color("dark14"));
+    setPaletteColor(ui->nothingFoundDescriptionLabel, QPalette::WindowText, colorTheme()->color("dark14"));
 
     connect(ui->resourceTreeWidget, &QnResourceTreeWidget::filterEnterPressed,
         this, [this] { handleEnterPressed(false);});

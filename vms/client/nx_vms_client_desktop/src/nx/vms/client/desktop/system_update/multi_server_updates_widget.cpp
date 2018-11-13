@@ -558,7 +558,7 @@ void MultiServerUpdatesWidget::pickSpecificBuild()
 
     m_targetVersion = nx::utils::SoftwareVersion(version.major(), version.minor(), version.bugfix(), buildNumber);
     m_targetChangeset = dialog.changeset();
-    m_updateCheck = m_serverUpdateTool->checkSpecificChangeset(dialog.changeset());
+    m_updateCheck = checkSpecificChangeset(dialog.changeset());
     loadDataToUi();
 }
 
@@ -1631,7 +1631,7 @@ void MultiServerUpdatesWidget::checkForInternetUpdates()
     if (!m_updateCheck.valid())
     {
         clearUpdateInfo();
-        m_updateCheck = m_serverUpdateTool->checkLatestUpdate();
+        m_updateCheck = checkLatestUpdate();
         syncUpdateCheck();
     }
 }

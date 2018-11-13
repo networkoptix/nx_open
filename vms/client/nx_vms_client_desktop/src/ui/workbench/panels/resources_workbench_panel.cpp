@@ -57,7 +57,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     xAnimator(new VariantAnimator(widget)),
     m_resizerWidget(new QnResizerWidget(Qt::Horizontal, parentWidget)),
     m_backgroundItem(new QnControlBackgroundWidget(Qt::LeftEdge, parentWidget)),
-    m_showButton(newShowHideButton(parentWidget, context(), action::PinTreeAction)),
+    m_showButton(newShowHideButton(parentWidget, context(), action::ToggleTreeAction)),
     m_hidingProcessor(new HoverFocusProcessor(parentWidget)),
     m_showingProcessor(new HoverFocusProcessor(parentWidget)),
     m_opacityProcessor(new HoverFocusProcessor(parentWidget)),
@@ -114,10 +114,12 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     connect(item, &QGraphicsWidget::geometryChanged, widget,
         &QnResourceBrowserWidget::hideToolTip);
 
-    m_opened = (settings.state == Qn::PaneState::Opened);
-    setShowButtonIcon();
+    action(action::ToggleTreeAction)->setChecked(settings.state == Qn::PaneState::Opened);
     m_showButton->setFocusProxy(item);
     m_showButton->setZValue(BackgroundItemZOrder); /*< To make it paint under the tooltip. */
+
+    connect(action(action::ToggleTreeAction), &QAction::toggled,
+        this, [this](bool opened) { setOpened(opened); });
 
     action(action::PinTreeAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
     connect(action(action::PinTreeAction), &QAction::toggled, this,
@@ -191,7 +193,7 @@ bool ResourceTreeWorkbenchPanel::isPinned() const
 
 bool ResourceTreeWorkbenchPanel::isOpened() const
 {
-    return m_opened;
+    return action(action::ToggleTreeAction)->isChecked();
 }
 
 void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
@@ -205,7 +207,10 @@ void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
 
     m_showingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
-    m_opened = opened;
+    auto toggleAction = action(action::ToggleTreeAction);
+    toggleAction->blockSignals(true);
+    toggleAction->setChecked(opened);
+    toggleAction->blockSignals(false);
 
     xAnimator->stop();
     qnWorkbenchAnimations->setupAnimator(xAnimator, opened
@@ -220,7 +225,6 @@ void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
         item->setX(newX);
 
     m_resizerWidget->setEnabled(opened);
-    setShowButtonIcon();
 
     emit openedChanged(opened, animate);
 }
@@ -336,14 +340,6 @@ void ResourceTreeWorkbenchPanel::setShowButtonUsed(bool used)
     m_showButton->setAcceptedMouseButtons(used ? Qt::LeftButton : Qt::NoButton);
 }
 
-void ResourceTreeWorkbenchPanel::setShowButtonIcon()
-{
-    m_showButton->setIcon(qnSkin->icon(m_opened
-        ? "panel/slide_pin.png"
-        : "panel/slide_right.png",
-        "panel/slide_left.png"));
-}
-
 void ResourceTreeWorkbenchPanel::at_resizerWidget_geometryChanged()
 {
     if (m_resizing)
@@ -391,7 +387,7 @@ void ResourceTreeWorkbenchPanel::at_showingProcessor_hoverEntered()
 {
     if (!isPinned() && !isOpened())
     {
-        setOpened(true, true);
+        setOpened(true);
 
         /* So that the click that may follow won't hide it. */
         setShowButtonUsed(false);

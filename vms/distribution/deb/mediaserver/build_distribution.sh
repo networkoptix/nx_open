@@ -65,30 +65,11 @@ copyMediaserverPlugins()
     echo ""
     echo "Copying mediaserver plugins"
 
-    local PLUGINS=(
-        generic_multicast_plugin
-        genericrtspplugin
-        mjpg_link
-    )
-    PLUGINS+=( # Metadata plugins.
-        hikvision_analytics_plugin
-        axis_analytics_plugin
-        dw_mtt_analytics_plugin
-        vca_analytics_plugin
-    )
-    if [ "$ENABLE_HANWHA" == "true" ]
-    then
-        PLUGINS+=( hanwha_analytics_plugin )
-    fi
-
-    distrib_copyMediaserverPlugins "plugins" "$STAGE_MODULE/bin" "${PLUGINS[@]}"
+    distrib_copyMediaserverPlugins "plugins" "$STAGE_MODULE/bin" "${SERVER_PLUGINS[@]}"
     stripIfNeeded "$STAGE_MODULE/bin/plugins"
 
-    local PLUGINS_OPTIONAL=(
-        stub_analytics_plugin
-    )
-
-    distrib_copyMediaserverPlugins "plugins_optional" "$STAGE_MODULE/bin" "${PLUGINS_OPTIONAL[@]}"
+    distrib_copyMediaserverPlugins "plugins_optional" "$STAGE_MODULE/bin" \
+        "${SERVER_PLUGINS_OPTIONAL[@]}"
     stripIfNeeded "$STAGE_MODULE/bin/plugins_optional"
 }
 

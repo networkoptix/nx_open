@@ -23,6 +23,8 @@ CompatibilityVersionInstallationDialog::CompatibilityVersionInstallationDialog(
     m_versionToInstall(connectionInfo.version)
 {
     m_ui->setupUi(this);
+    m_ui->autoRestart->setChecked(m_autoInstall);
+    connect(m_ui->autoRestart, &QCheckBox::stateChanged, this, &CompatibilityVersionInstallationDialog::atAutoRestartChanged);
     m_clientUpdateTool.reset(new nx::vms::client::desktop::ClientUpdateTool(this));
     m_clientUpdateTool->setServerUrl(connectionInfo.ecUrl, QnUuid(connectionInfo.ecsGuid));
 }
@@ -31,9 +33,19 @@ CompatibilityVersionInstallationDialog::~CompatibilityVersionInstallationDialog(
 {
 }
 
-bool CompatibilityVersionInstallationDialog::installationSucceeded() const
+void CompatibilityVersionInstallationDialog::atAutoRestartChanged(int state)
 {
-    return m_installationOk;
+    m_autoInstall = (state == Qt::Checked);
+}
+
+CompatibilityVersionInstallationDialog::InstallResult CompatibilityVersionInstallationDialog::installationResult() const
+{
+    return m_installationResult;
+}
+
+bool CompatibilityVersionInstallationDialog::shouldAutoRestart() const
+{
+    return m_autoInstall;
 }
 
 void CompatibilityVersionInstallationDialog::reject()
@@ -73,27 +85,37 @@ void CompatibilityVersionInstallationDialog::atUpdateStateChanged(int state, int
             break;
         }
         case ClientUpdateTool::State::downloading:
+            m_installationResult = InstallResult::downloading;
             setMessage(tr("Downloading update package"));
             finalProgress = 20 + 60 * progress / 100;
             break;
         case ClientUpdateTool::State::readyInstall:
             finalProgress = 80;
+            m_clientUpdateTool->installUpdate();
             break;
         case ClientUpdateTool::State::installing:
             setMessage(tr("Installing"));
+            m_installationResult = InstallResult::installing;
             finalProgress = 85;
             break;
         case ClientUpdateTool::State::complete:
+            m_installationResult = InstallResult::complete;
             setMessage(tr("Installation completed"));
             finalProgress = 100;
+            done(QDialogButtonBox::StandardButton::Ok);
             break;
         case ClientUpdateTool::State::error:
+            m_installationResult = InstallResult::failedInstall;
             setMessage(tr("Installation failed"));
             finalProgress = 100;
+            done(QDialogButtonBox::StandardButton::Ok);
             break;
         case ClientUpdateTool::State::applauncherError:
+            m_installationResult = InstallResult::complete;
+            m_installationResult = InstallResult::failedInstall;
             setMessage(tr("Installation failed"));
             finalProgress = 100;
+            done(QDialogButtonBox::StandardButton::Ok);
             break;
     }
 
@@ -113,7 +135,12 @@ int CompatibilityVersionInstallationDialog::installUpdate()
             const auto waitForUpdateInfo = 20s;
             if (updateInfo.wait_for(waitForUpdateInfo) == std::future_status::timeout)
             {
-                // No update. Just quit
+                if (dialog)
+                {
+                    // No update. Just quit
+                    dialog->m_installationResult = InstallResult::failedDownload;
+                    dialog->done(QDialogButtonBox::StandardButton::Discard);
+                }
                 return false;
             }
             return true;
@@ -125,9 +152,7 @@ int CompatibilityVersionInstallationDialog::installUpdate()
     setMessage(tr("Installing version %1").arg(m_versionToInstall.toString()));
     m_ui->buttonBox->setStandardButtons(QDialogButtonBox::Cancel);
 
-    //m_updateTool->startOnlineClientUpdate(m_versionToInstall);
     int result = base_type::exec();
-    //m_updateTool.reset();
     return result;
 }
 

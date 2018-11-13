@@ -76,7 +76,7 @@ ShortcutHintWidget::ShortcutHintWidget(QWidget* parent):
 
 void ShortcutHintWidget::setDescriptions(const DescriptionList& descriptions)
 {
-    static const auto kTextColor = colorTheme()->color("dark11")
+    static const auto kTextColor = colorTheme()->color("dark14")
         .name(QColor::HexArgb);
     static const auto kHtmlTemplate =
         lit("<html><body><center>"
