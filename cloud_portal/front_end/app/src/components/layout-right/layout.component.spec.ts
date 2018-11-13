@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NxLayoutComponent } from './layout.component';
+import { NxLayoutRightComponent } from './layout.component';
 
-describe('NxLayoutComponent', () => {
-    let component: NxLayoutComponent;
-    let fixture: ComponentFixture<NxLayoutComponent>;
+describe('NxLayoutRightComponent', () => {
+    let component: NxLayoutRightComponent;
+    let fixture: ComponentFixture<NxLayoutRightComponent>;
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-                declarations: [NxLayoutComponent ]
+                declarations: [NxLayoutRightComponent ]
             })
             .compileComponents();
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(NxLayoutComponent);
+        fixture = TestBed.createComponent(NxLayoutRightComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
