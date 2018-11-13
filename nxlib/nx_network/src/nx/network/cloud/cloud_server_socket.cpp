@@ -7,7 +7,6 @@
 
 #include "tunnel/relay/relay_connection_acceptor.h"
 #include "tunnel/udp/acceptor.h"
-#include "tunnel/tcp/reverse_tunnel_acceptor.h"
 
 namespace nx {
 namespace network {

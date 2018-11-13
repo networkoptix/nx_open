@@ -154,12 +154,7 @@ bool VmsSystem::connectToCloud(
     Cloud* cloud,
     const nx::cdb::AccountWithPassword& cloudAccount)
 {
-    if (!cloud->connectToCloud(peer(0), cloudAccount))
-        return false;
-
-    // TODO
-
-    return true;
+    return cloud->connectToCloud(peer(0), cloudAccount);
 }
 
 bool VmsSystem::isConnectedToCloud() const

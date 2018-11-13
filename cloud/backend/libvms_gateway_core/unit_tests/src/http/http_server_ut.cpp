@@ -68,42 +68,6 @@ TEST_F(HttpServer, inactive_not_identified_connection_is_dropped_by_timeout)
     waitForConnectionIsDroppedByServer();
 }
 
-//-------------------------------------------------------------------------------------------------
-
-class HttpServerReverseConnectionServer:
-    public HttpServer
-{
-    using base_type = HttpServer;
-
-protected:
-    virtual void SetUp() override
-    {
-        base_type::SetUp();
-
-        for (;;)
-        {
-            const auto endpoint =
-                moduleInstance()->impl()->reverseConnectionServerHttpEndpoint();
-            if (endpoint.port != 0)
-            {
-                setHttpEndpoint(nx::network::SocketAddress(
-                    nx::network::HostAddress::localhost, endpoint.port));
-                break;
-            }
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        }
-    }
-};
-
-TEST_F(
-    HttpServerReverseConnectionServer,
-    inactive_not_identified_connection_is_dropped_by_timeout)
-{
-    establishSilentConnection();
-    waitForConnectionIsDroppedByServer();
-}
-
 } // namespace test
 } // namespace gateway
 } // namespace cloud

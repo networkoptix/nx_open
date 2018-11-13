@@ -12,19 +12,20 @@
 
 namespace {
 
-static const QString kDeprecatedPhysicalIdParam = lit("physicalId");
-static const QString kDeprecatedMacParam = lit("mac");
-static const QString kCameraIdParam = lit("cameraId");
-static const QString kTimeParam = lit("time");
-static const QString kRotateParam = lit("rotate");
-static const QString kHeightParam = lit("height");
-static const QString kDeprecatedWidthParam = lit("widht");
-static const QString kWidthParam = lit("width");
-static const QString kImageFormatParam = lit("imageFormat");
-static const QString kRoundMethodParam = lit("method");
-static const QString kAspectRatioParam = lit("aspectRatio");
+static const QString kDeprecatedPhysicalIdParam = "physicalId";
+static const QString kDeprecatedMacParam = "mac";
+static const QString kCameraIdParam = "cameraId";
+static const QString kTimeParam = "time";
+static const QString kIgnoreExternalArchive = "ignoreExternalArchive";
+static const QString kRotateParam = "rotate";
+static const QString kHeightParam = "height";
+static const QString kDeprecatedWidthParam = "widht";
+static const QString kWidthParam = "width";
+static const QString kImageFormatParam = "imageFormat";
+static const QString kRoundMethodParam = "method";
+static const QString kAspectRatioParam = "aspectRatio";
 
-static const QString kLatestTimeValue = lit("latest");
+static const QString kLatestTimeValue = "latest";
 
 } // namespace
 
@@ -47,6 +48,9 @@ void QnThumbnailRequestData::loadFromParams(QnResourcePool* resourcePool,
             request.usecSinceEpoch = nx::api::ImageRequest::kLatestThumbnail;
         else
             request.usecSinceEpoch = nx::utils::parseDateTime(timeValue);
+
+        if (params.contains(kIgnoreExternalArchive))
+            request.ignoreExternalArchive = true;
     }
 
     request.rotation = QnLexical::deserialized<int>(params.value(kRotateParam), request.rotation);
@@ -75,6 +79,8 @@ QnRequestParamList QnThumbnailRequestData::toParams() const
         nx::api::CameraImageRequest::isSpecialTimeValue(request.usecSinceEpoch)
         ? kLatestTimeValue
         : QnLexical::serialized(request.usecSinceEpoch));
+    if (request.ignoreExternalArchive)
+        result.insert(kIgnoreExternalArchive, "");
     result.insert(kRotateParam, QnLexical::serialized(request.rotation));
     result.insert(kHeightParam, QnLexical::serialized(request.size.height()));
     result.insert(kWidthParam, QnLexical::serialized(request.size.width()));
@@ -94,6 +100,13 @@ boost::optional<QString> QnThumbnailRequestData::getError() const
         && request.usecSinceEpoch != nx::api::ImageRequest::kLatestThumbnail)
     {
         return lit("Invalid time");
+    }
+    if (request.ignoreExternalArchive
+        && request.usecSinceEpoch != nx::api::ImageRequest::kLatestThumbnail
+        && request.usecSinceEpoch != DATETIME_NOW)
+    {
+        return QString("'%1' applies only for \"latest\" timestamp")
+            .arg(kIgnoreExternalArchive);
     }
 
     const auto& size = request.size;

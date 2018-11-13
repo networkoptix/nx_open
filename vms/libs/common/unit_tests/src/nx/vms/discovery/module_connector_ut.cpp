@@ -35,7 +35,7 @@ public:
 
         connector.setConnectHandler(
             [this](nx::vms::api::ModuleInformation information,
-                nx::network::SocketAddress endpoint, nx::network::HostAddress /*ip*/)
+                nx::network::SocketAddress endpoint, nx::network::SocketAddress /*resolved*/)
             {
                 QnMutexLocker lock(&m_mutex);
                 auto& knownEndpoint = m_knownServers[information.id];

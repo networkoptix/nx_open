@@ -3,7 +3,6 @@
 #include <nx/utils/std/cpp14.h>
 
 #include "udp/acceptor.h"
-#include "tcp/reverse_tunnel_acceptor.h"
 
 namespace nx {
 namespace network {
@@ -58,14 +57,6 @@ std::vector<std::unique_ptr<AbstractTunnelAcceptor>>
         // making udp::TunnelAcceptor required for cloud connect to succeed with any method.
         if ((m_enabledConnectionMethods & hpm::api::ConnectionMethod::udpHolePunching) == 0)
             acceptor->setHolePunchingEnabled(false);
-        tunnelAcceptors.push_back(std::move(acceptor));
-    }
-
-    if ((event.connectionMethods & reverseConnect) && !event.tcpReverseEndpointList.empty())
-    {
-        auto acceptor = std::make_unique<tcp::ReverseTunnelAcceptor>(
-            std::move(event.tcpReverseEndpointList),
-            event.params);
         tunnelAcceptors.push_back(std::move(acceptor));
     }
 

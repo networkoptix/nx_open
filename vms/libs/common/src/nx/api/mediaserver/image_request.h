@@ -50,6 +50,12 @@ struct ImageRequest
      */
     qint64 usecSinceEpoch = kLatestThumbnail;
 
+    /**
+     * If enabled, images requested with "Latest" option will not be tried to download from an
+     * external archive like NVR.
+     */
+    bool ignoreExternalArchive = false;
+
     /** Forced rotation. Negative value means take default rotation from the camera settings. */
     int rotation = kDefaultRotation;
 

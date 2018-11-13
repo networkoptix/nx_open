@@ -204,6 +204,7 @@ IpV6WithScope HostAddress::ipV6() const
 
 bool HostAddress::isLocalHost() const
 {
+    // TODO: Incorrect check for localhost! IPv4 should be 127.0.0.0/8.
     return (m_string == localhost.m_string)
         || (ipV4() == localhost.m_ipV4)
         || (ipV6().first == localhost.m_ipV6);
@@ -213,6 +214,7 @@ bool HostAddress::isLocalNetwork() const
 {
     if (const auto& ip = ipV4())
     {
+        // TODO: Incorrect check for localhost! IPv4 should be 127.0.0.0/8, should call isLocalHost.
         const auto addr = ntohl(ip->s_addr);
         return (addr == 0x7F000001) // 127.0.0.1
             || (addr >= 0x0A000000 && addr <= 0x0AFFFFFF) // 10.*.*.*
