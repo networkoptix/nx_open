@@ -6,6 +6,7 @@
 #include <core/resource/media_server_resource.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
+#include <nx/fusion/serialization/json.h>
 
 namespace nx {
 namespace vms {
@@ -128,12 +129,15 @@ void Manager::initializeConnector()
 {
     m_moduleConnector = std::make_unique<ModuleConnector>();
     m_moduleConnector->setConnectHandler(
-        [this](QnModuleInformation information, SocketAddress endpoint, HostAddress ip)
+        [this](QnModuleInformation information, SocketAddress requestedEndpoint,
+            SocketAddress resolvedEndpoint)
         {
+            NX_VERBOSE(this, lm("Received module info: %1").arg(QJson::serialized(information)));
+
             if (!commonModule())
                 return;
 
-            ModuleEndpoint module(std::move(information), std::move(endpoint));
+            ModuleEndpoint module(std::move(information), std::move(requestedEndpoint));
             if (commonModule()->moduleGUID() == module.id)
             {
                 const auto runtimeId = commonModule()->runningInstanceGUID();
@@ -146,41 +150,48 @@ void Manager::initializeConnector()
 
             const QString newCloudHost = module.cloudId();
             QString oldCloudHost;
-            bool isNew = false;
+            bool isNew = true;
             {
                 QnMutexLocker lock(&m_mutex);
                 const auto insert = m_modules.emplace(module.id, module);
-                if (insert.second)
-                {
-                    isNew = true;
-                }
-                else
+                if (!insert.second)
                 {
                     if (insert.first->second == module)
                         return;
 
                     oldCloudHost = insert.first->second.cloudId();
                     insert.first->second = module;
+
+                    isNew = false;
                 }
             }
 
             if (isNew)
             {
-                NX_DEBUG(this, lm("Found module %1 endpoint %2").args(module.id, module.endpoint));
+                NX_DEBUG(this, lm("Found module %1 on endpoint %2")
+                    .args(module.id, module.endpoint));
                 emit found(module);
             }
             else
             {
-                NX_DEBUG(this, lm("Changed module %1 endpoint %2").args(module.id, module.endpoint));
+                NX_DEBUG(this, lm("Changed module %1 on endpoint %2")
+                         .args(module.id, module.endpoint));
                 emit changed(module);
             }
 
+            // Delete fixed addresses only if module cloud address changed.
             auto& resolver = network::SocketGlobals::addressResolver();
-            if (!oldCloudHost.isEmpty())
+            if (!oldCloudHost.isEmpty() && oldCloudHost != newCloudHost)
                 resolver.removeFixedAddress(oldCloudHost);
 
-            if (!newCloudHost.isEmpty() && ip.isIpAddress())
-                resolver.addFixedAddress(newCloudHost, SocketAddress(ip, module.endpoint.port));
+            // Add fixed address only if not a cloud address used for connection to avoid loop.
+            if (!newCloudHost.isEmpty()
+                && !resolver.isCloudHostName(module.endpoint.address.toString()))
+            {
+                NX_ASSERT(resolvedEndpoint.address.isIpAddress());
+                NX_ASSERT(resolvedEndpoint.port > 0);
+                resolver.addFixedAddress(newCloudHost, resolvedEndpoint);
+            }
         });
 
     m_moduleConnector->setDisconnectHandler(

@@ -9,7 +9,7 @@
 
 #define DEBUG_LOG(MESSAGE) do \
 { \
-    if (nx::network::SocketGlobals::debugIni().addressResolver) \
+    if (nx::network::SocketGlobals::debugIni().addressResolver)\
         NX_LOGX(MESSAGE, cl_logDEBUG1); \
 } while (0)
 
@@ -223,7 +223,7 @@ void AddressResolver::resolveAsync(
         if (inet_pton(AF_INET, hostStr.c_str(), &resolvedAddress) > 0)
         {
             // Resolved.
-            DEBUG_LOG(lm("Hostname %1 is IP v4 address").arg(hostStr));
+            DEBUG_LOG(lm("Hostname %1 is IPv4 address").arg(hostStr));
             AddressEntry entry(AddressType::direct, HostAddress(resolvedAddress));
             return handler(SystemError::noError, std::deque<AddressEntry>({ std::move(entry) }));
         }

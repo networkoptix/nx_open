@@ -30,7 +30,7 @@ public:
         connector.setReconnectPolicy(kReconnectPolicy);
 
         connector.setConnectHandler(
-            [this](QnModuleInformation information, SocketAddress endpoint, HostAddress /*ip*/)
+            [this](QnModuleInformation information, SocketAddress endpoint, SocketAddress /*ip*/)
             {
                 QnMutexLocker lock(&m_mutex);
                 auto& knownEndpoint = m_knownServers[information.id];
