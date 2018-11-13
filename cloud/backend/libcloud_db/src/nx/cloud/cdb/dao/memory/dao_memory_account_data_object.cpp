@@ -6,8 +6,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace dao {
 namespace memory {
 
@@ -121,5 +120,4 @@ void AccountDataObject::updateAccount(
 
 } // namespace memory
 } // namespace dao
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

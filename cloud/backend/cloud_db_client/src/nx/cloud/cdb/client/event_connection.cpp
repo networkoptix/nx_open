@@ -1,8 +1,3 @@
-/**********************************************************
-* Apr 29, 2016
-* akolesnikov
-***********************************************************/
-
 #include "event_connection.h"
 
 #include <nx/fusion/serialization/lexical.h>
@@ -17,10 +12,7 @@
 #include "cdb_request_path.h"
 #include "data/types.h"
 
-
-namespace nx {
-namespace cdb {
-namespace client {
+namespace nx::cdb::client {
 
 EventConnection::EventConnection(
     network::cloud::CloudModuleUrlFetcher* const endPointFetcher)
@@ -283,6 +275,4 @@ void EventConnection::onReceivingSerializedEvent(QByteArray serializedEvent)
     //TODO #ak reporting event
 }
 
-}   //namespace client
-}   //namespace cdb
-}   //namespace nx
+} // namespace nx::cdb::client

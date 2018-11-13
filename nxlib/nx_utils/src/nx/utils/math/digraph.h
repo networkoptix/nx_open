@@ -1,10 +1,4 @@
-/**********************************************************
-* 13 feb 2015
-* akolesnikov@networkoptix.com
-***********************************************************/
-
-#ifndef NX_DIGRAPH_H
-#define NX_DIGRAPH_H
+#pragma once
 
 #include <deque>
 #include <functional>
@@ -251,5 +245,3 @@ private:
         return false;
     }
 };
-
-#endif  //NX_DIGRAPH_H

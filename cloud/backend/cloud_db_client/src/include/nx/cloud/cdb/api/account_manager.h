@@ -5,9 +5,7 @@
 #include "account_data.h"
 #include "result_code.h"
 
-namespace nx {
-namespace cdb {
-namespace api {
+namespace nx::cdb::api {
 
 class AccountManager
 {
@@ -49,6 +47,4 @@ public:
         std::function<void(api::ResultCode, api::TemporaryCredentials)> completionHandler) = 0;
 };
 
-} // namespace api
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb::api

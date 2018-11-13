@@ -1,7 +1,6 @@
 #include "system_manager_stub.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 boost::optional<api::SystemData> SystemManagerStub::findSystemById(const std::string& id) const
@@ -59,5 +58,4 @@ void SystemManagerStub::addSystem(const api::SystemData& system)
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

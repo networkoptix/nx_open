@@ -17,8 +17,7 @@
 
 namespace nx { namespace data_sync_engine { class ConnectionManager; } }
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 class AbstractSystemHealthInfoProvider
 {
@@ -87,5 +86,4 @@ private:
         nx::sql::AsyncSqlQueryExecutor* const dbManager);
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

@@ -23,8 +23,7 @@
 #include "email_manager_mocked.h"
 #include "test_setup.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 class AccountTemporaryCredentials:
@@ -319,5 +318,4 @@ TEST_F(AccountTemporaryCredentials, temporary_credentials_are_low_case)
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

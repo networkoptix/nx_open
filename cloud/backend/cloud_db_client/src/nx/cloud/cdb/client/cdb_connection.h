@@ -8,9 +8,7 @@
 #include "maintenance_manager.h"
 #include "system_manager.h"
 
-namespace nx {
-namespace cdb {
-namespace client {
+namespace nx::cdb::client {
 
 class Connection:
     public api::Connection
@@ -59,6 +57,4 @@ private:
     AsyncRequestsExecutor m_requestExecutor;
 };
 
-} // namespace client
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb::client

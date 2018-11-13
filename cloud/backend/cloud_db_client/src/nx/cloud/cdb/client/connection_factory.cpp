@@ -1,8 +1,3 @@
-/**********************************************************
-* Sep 3, 2015
-* akolesnikov
-***********************************************************/
-
 #include "connection_factory.h"
 
 #include <nx/utils/std/cpp14.h>
@@ -11,9 +6,7 @@
 #include "cdb_connection.h"
 #include "event_connection.h"
 
-namespace nx {
-namespace cdb {
-namespace client {
+namespace nx::cdb::client {
 
 constexpr static auto kDefaultRequestTimeout = std::chrono::seconds(11);
 
@@ -73,6 +66,4 @@ void ConnectionFactory::setCloudUrl(const std::string& url)
     m_endPointFetcher.setUrl(nx::utils::Url(QString::fromStdString(url)));
 }
 
-}   //client
-}   //cdb
-}   //nx
+} // nx::cdb::client

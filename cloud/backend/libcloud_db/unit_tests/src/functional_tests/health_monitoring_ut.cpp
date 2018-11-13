@@ -5,8 +5,7 @@
 
 #include "health_monitoring_fixture.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 TEST_F(HealthMonitoring, system_status_is_correct)
@@ -74,5 +73,4 @@ TEST_F(HealthMonitoring, no_excess_system_online_records)
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

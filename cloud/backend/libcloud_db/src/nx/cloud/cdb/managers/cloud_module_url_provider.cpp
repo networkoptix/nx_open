@@ -2,8 +2,7 @@
 
 #include <QtCore/QFile>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 CloudModuleUrlProvider::CloudModuleUrlProvider(const QString& cloudModuleXmlTemplatePath)
 {
@@ -35,5 +34,4 @@ void CloudModuleUrlProvider::loadTemplate(const QString& cloudModuleXmlTemplateP
     }
 }
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

@@ -26,8 +26,7 @@
 #include "../stree/cdb_ns.h"
 #include "../stree/stree_manager.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 AccountManager::AccountManager(
     const conf::Settings& settings,
@@ -971,5 +970,4 @@ void AccountManager::temporaryCredentialsSaved(
         std::move(temporaryCredentials));
 }
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

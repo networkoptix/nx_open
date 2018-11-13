@@ -21,8 +21,7 @@
 #include "system_manager_stub.h"
 #include "vms_gateway_stub.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 class SystemMergeManager:
@@ -330,5 +329,4 @@ TEST_F(SystemMergeManager, merge_history_record_is_processed_even_if_system_is_i
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

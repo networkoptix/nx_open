@@ -10,8 +10,7 @@
 #include <nx/cloud/cdb/api/ec2_request_paths.h>
 #include <nx/vms/api/types/connection_types.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 TransactionConnectionHelper::TransactionConnectionHelper():
@@ -337,5 +336,4 @@ TransactionConnectionHelper::ConnectionId
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

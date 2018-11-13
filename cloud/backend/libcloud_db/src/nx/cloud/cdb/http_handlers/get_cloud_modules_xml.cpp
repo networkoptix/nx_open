@@ -4,8 +4,7 @@
 
 #include <nx/cloud/cdb/client/cdb_request_path.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace http_handler {
 
 const QString GetCloudModulesXml::kHandlerPath = QLatin1String(kDeprecatedCloudModuleXmlPath);
@@ -35,5 +34,4 @@ void GetCloudModulesXml::processRequest(
 }
 
 } // namespace http_handler
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

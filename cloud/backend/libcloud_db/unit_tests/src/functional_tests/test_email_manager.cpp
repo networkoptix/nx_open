@@ -1,7 +1,6 @@
 #include "test_email_manager.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 TestEmailManager::TestEmailManager(
     nx::utils::MoveOnlyFunc<void(const AbstractNotification&)> _delegate)
@@ -21,5 +20,4 @@ void TestEmailManager::sendAsync(
         completionHandler(true);
 }
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

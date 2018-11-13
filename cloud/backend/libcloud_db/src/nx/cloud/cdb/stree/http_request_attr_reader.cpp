@@ -2,8 +2,7 @@
 
 #include "cdb_ns.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 HttpRequestResourceReader::HttpRequestResourceReader(const nx::network::http::Request& request):
     m_request(request)
@@ -22,5 +21,4 @@ bool HttpRequestResourceReader::getAsVariant(int resId, QVariant* const value) c
     }
 }
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

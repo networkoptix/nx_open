@@ -1,22 +1,13 @@
-/**********************************************************
-* Sep 28, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef CDB_AUTH_DATA_H
-#define CDB_AUTH_DATA_H
+#pragma once
 
 #include <nx/utils/stree/resourcecontainer.h>
 
 #include <nx/cloud/cdb/client/data/auth_data.h>
 
-
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace data {
 
-class AuthRequest
-:
+class AuthRequest:
     public api::AuthRequest,
     public nx::utils::stree::AbstractResourceReader
 {
@@ -25,8 +16,5 @@ public:
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
 };
 
-}   //data
-}   //cdb
-}   //nx
-
-#endif   //CDB_AUTH_DATA_H
+} // namespace data
+} // namespace nx::cdb

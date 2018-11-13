@@ -17,8 +17,7 @@
 
 #include "access_control/login_enumeration_protector.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace conf {
 
 class Auth
@@ -175,5 +174,4 @@ private:
 };
 
 } // namespace conf
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

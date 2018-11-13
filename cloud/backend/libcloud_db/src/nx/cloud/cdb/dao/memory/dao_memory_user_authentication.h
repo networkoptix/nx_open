@@ -6,8 +6,7 @@
 
 #include "../abstract_user_authentication_data_object.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace dao {
 namespace memory {
 
@@ -63,5 +62,4 @@ private:
 
 } // namespace rdb
 } // namespace dao
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

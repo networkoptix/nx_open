@@ -1,7 +1,6 @@
 #pragma once
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 class CdbFunctionalTest;
@@ -9,5 +8,4 @@ class CdbFunctionalTest;
 void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup);
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

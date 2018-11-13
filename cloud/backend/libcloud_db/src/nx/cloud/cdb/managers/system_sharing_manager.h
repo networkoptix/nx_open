@@ -5,8 +5,7 @@
 
 #include <nx/cloud/cdb/api/system_data.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 enum class SharingType
 {
@@ -54,5 +53,4 @@ public:
     virtual void removeSystemSharingExtension(AbstractSystemSharingExtension* extension) = 0;
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

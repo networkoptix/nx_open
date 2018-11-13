@@ -9,8 +9,7 @@
 
 #include "../data/account_data.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace dao {
 
 // TODO: #ak Get rid of duplicate update and updateAccount methods.
@@ -87,5 +86,4 @@ private:
 };
 
 } // namespace dao
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

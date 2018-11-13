@@ -12,8 +12,7 @@
 
 #include "../data/system_data.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace dao {
 
 struct MergeInfo
@@ -68,5 +67,4 @@ private:
 };
 
 } // namespace dao
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

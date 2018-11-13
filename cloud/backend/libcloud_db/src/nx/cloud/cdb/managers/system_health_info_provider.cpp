@@ -6,8 +6,7 @@
 
 #include "managers_types.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 SystemHealthInfoProvider::SystemHealthInfoProvider(
     data_sync_engine::ConnectionManager* ec2ConnectionManager,
@@ -110,5 +109,4 @@ std::unique_ptr<AbstractSystemHealthInfoProvider> SystemHealthInfoProviderFactor
         dbManager);
 }
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

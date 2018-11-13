@@ -10,8 +10,7 @@
 #include <utils/common/app_info.h>
 #include <utils/common/id.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 std::string BusinessDataGenerator::generateRandomEmailAddress()
@@ -88,5 +87,4 @@ api::SystemSharingEx BusinessDataGenerator::generateRandomSharing(
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

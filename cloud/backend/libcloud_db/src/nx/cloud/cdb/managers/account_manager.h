@@ -20,8 +20,7 @@
 #include "../dao/account_data_object.h"
 #include "../data/account_data.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 class AbstractTemporaryAccountPasswordManager;
 class AbstractEmailManager;
@@ -258,5 +257,4 @@ private:
         std::function<void(api::ResultCode, api::TemporaryCredentials)> completionHandler);
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

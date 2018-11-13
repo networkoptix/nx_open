@@ -3,9 +3,7 @@
 #include "cdb_request_path.h"
 #include "data/maintenance_data.h"
 
-namespace nx {
-namespace cdb {
-namespace client {
+namespace nx::cdb::client {
 
 MaintenanceManager::MaintenanceManager(
     network::cloud::CloudModuleUrlFetcher* const cloudModuleEndpointFetcher)
@@ -32,6 +30,4 @@ void MaintenanceManager::getStatistics(
         std::bind(completionHandler, std::placeholders::_1, api::Statistics()));
 }
 
-} // namespace client
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb::client

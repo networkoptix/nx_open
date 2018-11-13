@@ -3,8 +3,7 @@
 #include <nx/network/http/http_types.h>
 #include <nx/utils/stree/resourcecontainer.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 class HttpRequestResourceReader:
     public nx::utils::stree::AbstractResourceReader
@@ -18,5 +17,4 @@ private:
     const nx::network::http::Request& m_request;
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

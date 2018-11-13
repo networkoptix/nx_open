@@ -1,13 +1,6 @@
-/**********************************************************
-* Sep 28, 2015
-* akolesnikov
-***********************************************************/
-
 #include "auth_data.h"
 
-
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace data {
 
 bool AuthRequest::getAsVariant( int /*resID*/, QVariant* const /*value*/ ) const
@@ -16,6 +9,5 @@ bool AuthRequest::getAsVariant( int /*resID*/, QVariant* const /*value*/ ) const
     return false;
 }
 
-}   //data
-}   //cdb
-}   //nx
+} // namespace data
+} // namespace nx::cdb

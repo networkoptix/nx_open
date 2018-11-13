@@ -2,8 +2,7 @@
 
 #include <nx/cloud/cdb/persistent_scheduler/persistent_scheduler.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 template<typename Predicate>
@@ -170,6 +169,5 @@ private:
 
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb
 

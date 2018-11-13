@@ -13,8 +13,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 } // namespace sql
 } // namespace nx
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace data {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
@@ -23,5 +22,4 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     _data_Fields)
 
 } // namespace data
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

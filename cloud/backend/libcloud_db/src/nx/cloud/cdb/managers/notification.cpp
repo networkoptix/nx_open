@@ -2,8 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 bool operator==(const BasicNotification& one, const BasicNotification& two)
 {
@@ -57,8 +56,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (json),
     _Fields)
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb, NotificationType,
     (nx::cdb::NotificationType::activateAccount, "activate_account")

@@ -4,8 +4,7 @@
 
 #include <nx/cloud/cdb/managers/temporary_account_password_manager.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 class TemporaryAccountPasswordManagerStub:
@@ -64,5 +63,4 @@ private:
 };
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

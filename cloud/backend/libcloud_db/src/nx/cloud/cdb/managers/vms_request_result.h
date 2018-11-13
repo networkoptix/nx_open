@@ -4,8 +4,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 enum class VmsResultCode
 {
@@ -26,5 +25,4 @@ struct VmsRequestResult
     std::string vmsErrorDescription;
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

@@ -12,8 +12,7 @@
 
 #include "test_setup.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 class ApiConventions:
@@ -269,5 +268,4 @@ TEST_F(ApiConventions, json_in_ok_response)
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

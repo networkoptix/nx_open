@@ -5,9 +5,7 @@
 #include "system_data.h"
 #include "../field_name.h"
 
-namespace nx {
-namespace cdb {
-namespace api {
+namespace nx::cdb::api {
 
 MAKE_FIELD_NAME_STR_CONST(AuthRequest, nonce)
 MAKE_FIELD_NAME_STR_CONST(AuthRequest, username)
@@ -49,6 +47,4 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     _Fields,
     (optional, false))
 
-} // namespace api
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb::api

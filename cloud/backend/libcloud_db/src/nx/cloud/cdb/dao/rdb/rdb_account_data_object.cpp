@@ -7,8 +7,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/sql/query.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace dao {
 namespace rdb {
 
@@ -330,5 +329,4 @@ void AccountDataObject::executeUpdateAccountQuery(
 
 } // namespace rdb
 } // namespace dao
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

@@ -9,8 +9,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/stree/resourcecontainer.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace data {
 
 class DataFilter:
@@ -41,5 +40,4 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, DataFilter* const dataFilter);
 bool deserialize(QnJsonContext*, const QJsonValue&, DataFilter*);
 
 } // namespace data
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

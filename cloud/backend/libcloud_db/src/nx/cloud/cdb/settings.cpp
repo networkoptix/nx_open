@@ -132,8 +132,7 @@ constexpr std::chrono::milliseconds kDefaultLoginLockoutLockPeriod =
 
 } // namespace
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace conf {
 
 Auth::Auth():
@@ -462,5 +461,4 @@ void Settings::loadLoginLockout()
 }
 
 } // namespace conf
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

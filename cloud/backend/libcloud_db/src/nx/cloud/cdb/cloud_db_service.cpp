@@ -15,8 +15,7 @@ static int registerQtResources()
     return 0;
 }
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 CloudDbService::CloudDbService(int argc, char **argv):
     base_type(argc, argv, QnLibCloudDbAppInfo::applicationDisplayName()),
@@ -86,5 +85,4 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
     return result;
 }
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

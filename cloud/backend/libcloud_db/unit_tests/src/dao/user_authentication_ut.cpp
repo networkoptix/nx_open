@@ -10,8 +10,7 @@
 #include <nx/cloud/cdb/dao/memory/dao_memory_user_authentication.h>
 #include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace dao {
 namespace rdb {
 namespace test {
@@ -463,5 +462,4 @@ INSTANTIATE_TYPED_TEST_CASE_P(
 } // namespace test
 } // namespace rdb
 } // namespace dao
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

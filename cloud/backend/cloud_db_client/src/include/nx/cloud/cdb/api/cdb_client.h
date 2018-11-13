@@ -2,9 +2,7 @@
 
 #include "connection.h"
 
-namespace nx {
-namespace cdb {
-namespace api {
+namespace nx::cdb::api {
 
 class CdbClient
 {
@@ -75,6 +73,4 @@ private:
     }
 };
 
-} // namespace api
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb::api

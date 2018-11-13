@@ -17,8 +17,7 @@
 #include "../dao/temporary_credentials_dao.h"
 #include "../data/account_data.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 namespace conf { class Settings; } // namespace
 
@@ -197,5 +196,4 @@ private:
         const data::TemporaryAccountCredentials& tempPasswordData);
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

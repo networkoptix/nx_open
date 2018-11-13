@@ -22,8 +22,7 @@
 
 #include "../stree/cdb_ns.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 TemporaryAccountPasswordManager::TemporaryAccountPasswordManager(
     const nx::utils::stree::ResourceNameSet& attributeNameset,
@@ -421,5 +420,4 @@ void TemporaryAccountPasswordManager::updateCredentialsInCache(
     }
 }
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

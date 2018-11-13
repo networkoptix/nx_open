@@ -13,11 +13,8 @@
 #include "result_code.h"
 #include "system_manager.h"
 
-namespace nx {
+namespace nx::network::aio { class AbstractAioThread; }
 
-namespace network { namespace aio { class AbstractAioThread; } }
-
-namespace cdb {
 /**
  * Contains classes and methods for manipulating cloud_db data.
  * Many methods accept completionHandler a an argument.
@@ -29,7 +26,7 @@ namespace cdb {
  * Generally, some methods can be forbidden for credentials.
  * E.g., if credentials are system credentials, api::AccountManager::getAccount is forbidden
  */
-namespace api {
+namespace nx::cdb::api {
 
 class ConnectionLostEvent
 {
@@ -146,9 +143,7 @@ public:
     virtual void setCloudUrl(const std::string& url) = 0;
 };
 
-} // namespace api
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb::api
 
 extern "C"
 {

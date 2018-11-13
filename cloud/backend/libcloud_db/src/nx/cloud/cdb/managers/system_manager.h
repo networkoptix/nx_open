@@ -41,8 +41,7 @@
 
 namespace nx { namespace data_sync_engine { class SyncronizationEngine; } }
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 namespace conf { class Settings; } // namespace conf
 
@@ -539,5 +538,4 @@ private:
         const Args&... args);
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

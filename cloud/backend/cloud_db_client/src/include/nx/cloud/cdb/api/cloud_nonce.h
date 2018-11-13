@@ -2,9 +2,7 @@
 
 #include <string>
 
-namespace nx {
-namespace cdb {
-namespace api {
+namespace nx::cdb::api {
 
 /**
  * @param timestamp This value is converted to network byte order to calculate hash
@@ -43,6 +41,4 @@ bool isNonceValidForSystem(
     const std::string& nonce,
     const std::string& systemId);
 
-} // namespace api
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb::api

@@ -2,8 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 api::ResultCode dbResultToApiResult(nx::sql::DBResult dbResult)
 {
@@ -58,8 +57,7 @@ api::ResultCode ec2ResultToResult(data_sync_engine::ResultCode resultCode)
     }
 }
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb, EntityType,
     (nx::cdb::EntityType::none, "none")

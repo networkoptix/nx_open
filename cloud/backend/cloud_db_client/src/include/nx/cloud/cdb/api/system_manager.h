@@ -6,9 +6,7 @@
 #include "result_code.h"
 #include "system_data.h"
 
-namespace nx {
-namespace cdb {
-namespace api {
+namespace nx::cdb::api {
 
 /**
  * Provides access to functionality related to cloud systems.
@@ -109,6 +107,4 @@ public:
         std::function<void(api::ResultCode)> completionHandler) = 0;
 };
 
-} // namespace api
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb::api

@@ -8,9 +8,7 @@
 
 #include <boost/optional.hpp>
 
-namespace nx {
-namespace cdb {
-namespace api {
+namespace nx::cdb::api {
 
 /**
  * Information required to register system in cloud.
@@ -321,6 +319,4 @@ public:
     std::map<FilterField, std::string> nameToValue;
 };
 
-} // namespace api
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb::api

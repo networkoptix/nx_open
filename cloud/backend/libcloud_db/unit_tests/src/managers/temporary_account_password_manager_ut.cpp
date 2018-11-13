@@ -10,8 +10,7 @@
 #include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
 #include <nx/cloud/cdb/test_support/business_data_generator.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 class TemporaryAccountPasswordManager:
@@ -56,5 +55,4 @@ TEST_F(TemporaryAccountPasswordManager, temporary_login_is_equal_to_account_emai
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

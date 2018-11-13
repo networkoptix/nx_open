@@ -4,8 +4,7 @@
 
 #include "ec2/cloud_vms_synchro_test_helper.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 /**
@@ -59,5 +58,4 @@ private:
 };
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

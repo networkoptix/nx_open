@@ -28,8 +28,7 @@
 #include "managers/vms_gateway.h"
 #include "stree/stree_manager.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 namespace conf { class Settings; }
 
@@ -108,5 +107,4 @@ private:
     void initializeSecurity();
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

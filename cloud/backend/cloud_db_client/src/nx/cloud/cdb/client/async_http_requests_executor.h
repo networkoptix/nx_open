@@ -20,9 +20,7 @@
 #include "include/nx/cloud/cdb/api/account_manager.h"
 #include "include/nx/cloud/cdb/api/result_code.h"
 
-namespace nx {
-namespace cdb {
-namespace client {
+namespace nx::cdb::client {
 
 /**
  * Executes HTTP requests asynchronously.
@@ -306,6 +304,4 @@ private:
     }
 };
 
-} // namespace client
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb::client

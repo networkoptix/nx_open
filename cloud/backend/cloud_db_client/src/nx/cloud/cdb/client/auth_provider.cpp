@@ -1,18 +1,10 @@
-/**********************************************************
-* Sep 28, 2015
-* akolesnikov
-***********************************************************/
-
 #include "auth_provider.h"
 
 #include "cdb_request_path.h"
 #include "data/auth_data.h"
 #include "data/system_data.h"
 
-
-namespace nx {
-namespace cdb {
-namespace client {
+namespace nx::cdb::client {
 
 AuthProvider::AuthProvider(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher):
     AsyncRequestsExecutor(cloudModuleEndPointFetcher)
@@ -50,6 +42,4 @@ void AuthProvider::getAuthenticationResponse(
         std::bind(completionHandler, std::placeholders::_1, api::AuthResponse()));
 }
 
-}   //client
-}   //cdb
-}   //nx
+} // namespace nx::cdb::client

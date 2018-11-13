@@ -7,8 +7,7 @@
 
 #include <nx_ec/ec_proto_version.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 MaintenanceManager::MaintenanceManager(
     const QnUuid& moduleGuid,
@@ -144,5 +143,4 @@ void MaintenanceManager::onTransactionLogRead(
         std::move(outData));
 }
 
-} // maintenance cdb
-} // maintenance nx
+} // namespace nx::cdb

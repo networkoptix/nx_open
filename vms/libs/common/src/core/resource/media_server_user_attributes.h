@@ -1,10 +1,4 @@
-/**********************************************************
-* 6 oct 2014
-* akolesnikov
-***********************************************************/
-
-#ifndef MEDIA_SERVER_USER_ATTRIBUTES_H
-#define MEDIA_SERVER_USER_ATTRIBUTES_H
+#pragma once
 
 #include <nx/utils/singleton.h>
 
@@ -45,8 +39,7 @@ Q_DECLARE_METATYPE(QnMediaServerUserAttributesPtr)
 Q_DECLARE_METATYPE(QnMediaServerUserAttributesList)
 
 
-class QnMediaServerUserAttributesPool
-:
+class QnMediaServerUserAttributesPool:
     public QObject,
     public QnGeneralAttributePool<QnUuid, QnMediaServerUserAttributesPtr>
 {
@@ -56,5 +49,3 @@ public:
 
     QnMediaServerUserAttributesList getAttributesList( const QList<QnUuid>& idList );
 };
-
-#endif  //MEDIA_SERVER_USER_ATTRIBUTES_H

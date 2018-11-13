@@ -7,9 +7,7 @@
 #include "result_code.h"
 #include "system_data.h"
 
-namespace nx {
-namespace cdb {
-namespace api {
+namespace nx::cdb::api {
 
 class NonceData
 {
@@ -135,6 +133,4 @@ public:
     }
 };
 
-} // namespace api
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb::api

@@ -3,8 +3,7 @@
 #include <nx_ec/ec_proto_version.h>
 #include <transaction/transaction_transport_base.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 class CommonHttpConnection:
@@ -33,5 +32,4 @@ private:
 };
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

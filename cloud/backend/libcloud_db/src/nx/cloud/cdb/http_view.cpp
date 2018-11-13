@@ -13,8 +13,7 @@
 #include "http_handlers/ping.h"
 #include "settings.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 HttpView::HttpView(
     const conf::Settings& settings,
@@ -431,5 +430,4 @@ void HttpView::registerWriteOnlyRestHandler(
         method);
 }
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

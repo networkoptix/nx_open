@@ -3,8 +3,7 @@
 #include <algorithm>
 #include <vector>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 template<typename Extension>
 class ExtensionPool
@@ -33,5 +32,4 @@ private:
     std::vector<Extension*> m_extensions;
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

@@ -1,7 +1,6 @@
 #include "temporary_account_password_manager_stub.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 void TemporaryAccountPasswordManagerStub::authenticateByName(
@@ -75,5 +74,4 @@ bool TemporaryAccountPasswordManagerStub::authorize(
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

@@ -7,8 +7,7 @@
 #include <nx/cloud/cdb/persistent_scheduler/persistent_scheduler_db_helper.h>
 #include "scheduler_user.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 static const QnUuid scheduleUser1FunctorId = QnUuid::createUuid();
@@ -630,5 +629,4 @@ TEST_F(SchedulerIntegrationTest, UnsubscribeFromExpiredTask)
 #endif
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

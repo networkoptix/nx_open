@@ -1,17 +1,9 @@
-/**********************************************************
-* Sep 3, 2015
-* akolesnikov
-***********************************************************/
-
 #include "account_manager.h"
 
 #include "cdb_request_path.h"
 #include <nx/utils/app_info.h>
 
-
-namespace nx {
-namespace cdb {
-namespace client {
+namespace nx::cdb::client {
 
 AccountManager::AccountManager(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher):
     AsyncRequestsExecutor(cloudModuleEndPointFetcher)
@@ -103,6 +95,4 @@ void AccountManager::createTemporaryCredentials(
         std::move(errorHandler));
 }
 
-}   //client
-}   //cdb
-}   //nx
+} // nx::cdb::client

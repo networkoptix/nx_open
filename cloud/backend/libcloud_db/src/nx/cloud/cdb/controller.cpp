@@ -11,8 +11,7 @@
 #include "http_handlers/ping.h"
 #include "settings.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 const int kMinSupportedProtocolVersion = 3024;
 const int kMaxSupportedProtocolVersion = nx_ec::EC2_PROTO_VERSION;
@@ -284,5 +283,4 @@ nx::sql::DBResult Controller::copyExternalTransaction(
         std::move(ownTransaction));
 }
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

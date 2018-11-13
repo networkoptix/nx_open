@@ -30,8 +30,7 @@
 #include "../settings.h"
 #include "../stree/cdb_ns.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 // TODO: #ak should get rid of following function
 static api::SystemSharingEx createDerivedFromBase(api::SystemSharing right)
@@ -2059,5 +2058,4 @@ nx::sql::DBResult SystemManager::invokeSystemSharingExtension(
     return nx::sql::DBResult::ok;
 }
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

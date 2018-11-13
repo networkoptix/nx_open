@@ -1,7 +1,6 @@
 #pragma once
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 /**
  * In case of type == etInsert or etUpdate object can be cast to corresponding DataInsertUpdateEvent.
@@ -24,5 +23,4 @@ public:
     DataType data;
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

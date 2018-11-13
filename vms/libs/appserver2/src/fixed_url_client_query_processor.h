@@ -1,8 +1,3 @@
-/**********************************************************
-* 4 feb 2014
-* akolesnikov
-***********************************************************/
-
 #ifndef FIXED_URL_CLIENT_QUERY_PROCESSOR_H
 #define FIXED_URL_CLIENT_QUERY_PROCESSOR_H
 

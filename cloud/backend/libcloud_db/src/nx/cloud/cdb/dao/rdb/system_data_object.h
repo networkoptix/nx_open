@@ -6,8 +6,7 @@
 
 #include "../abstract_system_data_object.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace dao {
 namespace rdb {
 
@@ -66,5 +65,4 @@ private:
 
 } // namespace rdb
 } // namespace dao
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

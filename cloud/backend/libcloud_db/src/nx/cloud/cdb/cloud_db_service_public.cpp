@@ -2,8 +2,7 @@
 
 #include "cloud_db_service.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 CloudDbServicePublic::CloudDbServicePublic(int argc, char **argv):
     m_impl(new CloudDbService(argc, argv))
@@ -42,5 +41,4 @@ CloudDbService* CloudDbServicePublic::impl()
     return m_impl;
 }
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

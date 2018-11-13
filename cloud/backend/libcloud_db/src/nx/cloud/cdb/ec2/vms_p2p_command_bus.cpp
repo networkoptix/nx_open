@@ -3,8 +3,7 @@
 #include <nx/data_sync_engine/synchronization_engine.h>
 #include <nx/cloud/cdb/ec2/vms_command_descriptor.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace ec2 {
 
 VmsP2pCommandBus::VmsP2pCommandBus(
@@ -27,5 +26,4 @@ nx::sql::DBResult VmsP2pCommandBus::saveResourceAttribute(
 }
 
 } // namespace ec2
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb
