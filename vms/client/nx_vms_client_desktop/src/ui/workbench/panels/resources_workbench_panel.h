@@ -55,7 +55,6 @@ protected:
 
 private:
     void setShowButtonUsed(bool used);
-    void setShowButtonIcon();
     void updateResizerGeometry();
     void updateControlsGeometry();
     void updatePaneWidth(qreal desiredWidth);
@@ -67,9 +66,8 @@ private:
 
 private:
     bool m_visible = false;
-    bool m_opened = false;
 
-    /** We are currently in the resize process. */
+    /** If we are currently in the resize process. */
     bool m_resizing = false;
     bool m_updateResizerGeometryLater = false;
 

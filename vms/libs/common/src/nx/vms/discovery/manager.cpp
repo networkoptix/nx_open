@@ -191,10 +191,10 @@ void Manager::initializeConnector()
 
             // Add fixed address only if not a cloud address used for connection to avoid loop.
             if (!newCloudHost.isEmpty()
-                && !resolver.isCloudHostName(module.endpoint.address.toString()))
+                && !resolver.isCloudHostName(module.endpoint.address.toString())
+                && NX_ASSERT(resolvedEndpoint.address.isIpAddress())
+                && NX_ASSERT(resolvedEndpoint.port > 0))
             {
-                NX_ASSERT(resolvedEndpoint.address.isIpAddress());
-                NX_ASSERT(resolvedEndpoint.port > 0);
                 resolver.addFixedAddress(newCloudHost, resolvedEndpoint);
             }
         });
