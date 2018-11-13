@@ -42,13 +42,13 @@ void QnAbstractMediaStreamDataProvider::setNeedKeyData(int channel)
 {
     QnMutexLocker mtx( &m_mutex );
 
-    updateNumberOfchannelsUnsafe();
+    loadNumberOfChannelsIfUndetected();
 
     if (m_numberOfchannels < CL_MAX_CHANNEL_NUMBER && channel < m_numberOfchannels)
         m_gotKeyFrame[channel] = 0;
 }
 
-void QnAbstractMediaStreamDataProvider::updateNumberOfchannelsUnsafe() const
+void QnAbstractMediaStreamDataProvider::loadNumberOfChannelsIfUndetected() const
 {
     if (m_numberOfchannels != 0)
         return;
@@ -60,7 +60,7 @@ void QnAbstractMediaStreamDataProvider::setNeedKeyData()
 {
     QnMutexLocker mtx( &m_mutex );
 
-    updateNumberOfchannelsUnsafe();
+    loadNumberOfChannelsIfUndetected();
 
     for (int i = 0; i < m_numberOfchannels; ++i)
         m_gotKeyFrame[i] = 0;
@@ -76,7 +76,7 @@ bool QnAbstractMediaStreamDataProvider::needKeyData() const
 {
     QnMutexLocker mtx( &m_mutex );
 
-    updateNumberOfchannelsUnsafe();
+    loadNumberOfChannelsIfUndetected();
 
     for (int i = 0; i < m_numberOfchannels; ++i)
         if (m_gotKeyFrame[i]==0)
