@@ -216,7 +216,7 @@ void ServerUpdateTool::atExtractFilesFinished(int code)
 
     UpdateContents contents;
     contents.sourceType = UpdateSourceType::file;
-    contents.source = lit("file://%1").arg(m_localUpdateFile);
+    contents.source = QString("file://%1").arg(m_localUpdateFile);
 
     if (code != QnZipExtractor::Ok)
     {
@@ -783,16 +783,16 @@ QUrl generateUpdatePackageUrl(const UpdateContents& contents, const QSet<QnUuid>
 
     if (targetVersion.isNull())
     {
-        query.addQueryItem(lit("version"), lit("latest"));
-        query.addQueryItem(lit("current"), getCurrentVersion(resourcePool).toString());
+        query.addQueryItem("version", "latest");
+        query.addQueryItem("current", getCurrentVersion(resourcePool).toString());
     }
     else
     {
         QString key = QString::number(targetVersion.build());
         QString password = passwordForBuild(key);
         qDebug() << "Generated password" << password << "for key" << key;
-        query.addQueryItem(lit("version"), targetVersion.toString());
-        query.addQueryItem(lit("password"), password);
+        query.addQueryItem("version", targetVersion.toString());
+        query.addQueryItem("password", password);
     }
 
     QSet<nx::vms::api::SystemInformation> systemInformationList;
@@ -821,11 +821,11 @@ QUrl generateUpdatePackageUrl(const UpdateContents& contents, const QSet<QnUuid>
     auto clientPlatform = nx::utils::AppInfo::applicationPlatform();
     QString clientRuntime = QString("%1_%2_%3").arg(clientPlatform, clientArch, clientPlatformModification);
 
-    query.addQueryItem(lit("client"), clientRuntime);
+    query.addQueryItem("client", clientRuntime);
     for(const auto &systemInformation: systemInformationList)
-        query.addQueryItem(lit("server"), systemInformation.toString().replace(L' ', L'_'));
+        query.addQueryItem("server", systemInformation.toString().replace(L' ', L'_'));
 
-    query.addQueryItem(lit("customization"), QnAppInfo::customizationName());
+    query.addQueryItem("customization", QnAppInfo::customizationName());
 
     QString path = qnSettings->updateCombineUrl();
     if (path.isEmpty())
