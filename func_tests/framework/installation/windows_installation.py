@@ -33,6 +33,7 @@ class WindowsInstallation(Installation):
                 user_profile_dir / 'AppData' / 'Local' / 'Temp',  # From task manager.
                 ],
             core_dump_glob='mediaserver*.dmp',
+            default_storage_dir=os_access.path_cls('c:\\', customization.storage_dir_name),
             )
         self._config_key = WindowsRegistry(os_access.winrm).key(customization.windows_registry_key)
         self._config_key_backup = WindowsRegistry(os_access.winrm).key(customization.windows_registry_key + ' Backup')
