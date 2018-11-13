@@ -430,7 +430,9 @@ void EventTile::setPreview(ImageProvider* value)
         };
 
     showPreviewTimestamp();
-    connect(preview(), &ImageProvider::statusChanged, this, showPreviewTimestamp);
+
+    if (preview())
+        connect(preview(), &ImageProvider::statusChanged, this, showPreviewTimestamp);
 }
 
 QRectF EventTile::previewCropRect() const
