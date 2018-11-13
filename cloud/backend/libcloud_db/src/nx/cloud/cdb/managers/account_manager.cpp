@@ -578,10 +578,14 @@ nx::sql::DBResult AccountManager::fillCache()
 nx::sql::DBResult AccountManager::fetchAccounts(
     nx::sql::QueryContext* queryContext)
 {
+    NX_VERBOSE(this, lm("Filling account cache"));
+
     std::vector<api::AccountData> accounts;
     auto dbResult = m_dao->fetchAccounts(queryContext, &accounts);
     if (dbResult != nx::sql::DBResult::ok)
         return dbResult;
+
+    NX_VERBOSE(this, lm("Read %1 accounts").args(accounts.size()));
 
     for (auto& account: accounts)
     {
@@ -591,6 +595,8 @@ nx::sql::DBResult AccountManager::fetchAccounts(
             NX_ASSERT(false);
         }
     }
+
+    NX_VERBOSE(this, lm("Account cache filled up"));
 
     return nx::sql::DBResult::ok;
 }

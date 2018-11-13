@@ -1768,12 +1768,16 @@ nx::sql::DBResult SystemManager::fillCache()
 {
     using namespace std::placeholders;
 
+    NX_VERBOSE(this, lm("Filling systems cache"));
+
     std::vector<data::SystemData> systems;
     auto result = doBlockingDbQuery(
         std::bind(&dao::AbstractSystemDataObject::fetchSystems, m_systemDao.get(),
             _1, nx::sql::InnerJoinFilterFields(), &systems));
     if (result != nx::sql::DBResult::ok)
         return result;
+
+    NX_VERBOSE(this, lm("Fetched %1 systems").args(systems.size()));
 
     for (auto& system: systems)
     {
@@ -1784,10 +1788,14 @@ nx::sql::DBResult SystemManager::fillCache()
         }
     }
 
+    NX_VERBOSE(this, lm("Fetching account<->system relations"));
+
     result = doBlockingDbQuery(
         std::bind(&SystemManager::fetchSystemToAccountBinder, this, _1));
     if (result != nx::sql::DBResult::ok)
         return result;
+
+    NX_VERBOSE(this, lm("Filled systems cache"));
 
     return nx::sql::DBResult::ok;
 }

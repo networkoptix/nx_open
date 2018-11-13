@@ -328,12 +328,16 @@ void TemporaryAccountPasswordManager::deleteExpiredCredentials()
 {
     using namespace std::chrono;
 
+    NX_VERBOSE(this, "Removing expired credentials");
+
     m_dbManager->executeSqlSync(lm(R"sql(
         DELETE FROM account_password
         WHERE expiration_timestamp_utc > 0
             AND (expiration_timestamp_utc + prolongation_period_sec) < %1;
         )sql").args(duration_cast<seconds>(nx::utils::timeSinceEpoch()).count())
             .toUtf8());
+
+    NX_DEBUG(this, "Removed expired credentials");
 }
 
 nx::sql::DBResult TemporaryAccountPasswordManager::fillCache()
@@ -357,6 +361,8 @@ nx::sql::DBResult TemporaryAccountPasswordManager::fillCache()
 nx::sql::DBResult TemporaryAccountPasswordManager::fetchTemporaryPasswords(
     nx::sql::QueryContext* queryContext)
 {
+    NX_DEBUG(this, "Filling temporary credentials cache");
+
     QSqlQuery readPasswordsQuery(*queryContext->connection()->qtSqlConnection());
     readPasswordsQuery.setForwardOnly(true);
     readPasswordsQuery.prepare(
@@ -379,6 +385,8 @@ nx::sql::DBResult TemporaryAccountPasswordManager::fetchTemporaryPasswords(
         return nx::sql::DBResult::ioError;
     }
 
+    NX_VERBOSE(this, lm("Fetch temporary credentials query succeeded"));
+
     std::vector<TemporaryAccountCredentialsEx> tmpPasswords;
     QnSql::fetch_many(readPasswordsQuery, &tmpPasswords);
     for (auto& tmpPassword: tmpPasswords)
@@ -394,6 +402,8 @@ nx::sql::DBResult TemporaryAccountPasswordManager::fetchTemporaryPasswords(
         std::string login = tmpPassword.login;
         m_temporaryCredentials.insert(std::move(tmpPassword));
     }
+
+    NX_DEBUG(this, lm("Restored %1 temporary credentials").args(m_temporaryCredentials.size()));
 
     return nx::sql::DBResult::ok;
 }
