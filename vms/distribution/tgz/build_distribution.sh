@@ -105,31 +105,8 @@ copyMediaserverPlugins()
 
     local -r BIN_DIR="$WORK_DIR/$MEDIASERVER_INSTALL_PATH/bin"
 
-    local PLUGINS=(
-        generic_multicast_plugin
-        genericrtspplugin
-        mjpg_link
-    )
-    PLUGINS+=( # Metadata plugins.
-        hikvision_analytics_plugin
-        axis_analytics_plugin
-        dw_mtt_analytics_plugin
-        vca_analytics_plugin
-    )
-    if [ "$ENABLE_HANWHA" == "true" ]
-    then
-        PLUGINS+=( hanwha_analytics_plugin )
-    fi
-
-    distrib_copyMediaserverPlugins "plugins" "$BIN_DIR" "${PLUGINS[@]}"
-
-    local PLUGINS_OPTIONAL=(
-        stub_analytics_plugin
-        deepstream_analytics_plugin
-        tegra_video_analytics_plugin
-    )
-
-    distrib_copyMediaserverPlugins "plugins_optional" "$BIN_DIR" "${PLUGINS_OPTIONAL[@]}"
+    distrib_copyMediaserverPlugins "plugins" "$BIN_DIR" "${SERVER_PLUGINS[@]}"
+    distrib_copyMediaserverPlugins "plugins_optional" "$BIN_DIR" "${SERVER_PLUGINS_OPTIONAL[@]}"
 }
 
 buildDistribution()
