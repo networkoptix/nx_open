@@ -27,7 +27,7 @@
     width           : 32px;
 }
 
-.close-icon {
+.tag-close-icon {
     margin: auto !important;
 }
 
@@ -54,11 +54,11 @@
     @extend #selected-tag;
     background-color : $brand_core;
     
-    & > button.close-button:hover {
+    & > span.close-button:hover {
         background-color : $brand_d1;
     }
     
-    & > button.close-button:active {
+    & > span.close-button:active {
         background-color : $brand_d2;
     }
 }

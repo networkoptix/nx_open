@@ -8,6 +8,6 @@
     <ng-content></ng-content>
     <input *ngIf="isSelectable" [value]="value" hidden>
     <span *ngIf="selected" class="close-button" (click)="$event.stopPropagation();deselectTag()">
-        <span class="glyphicon close-icon"></span>
+        <span class="glyphicon tag-close-icon"></span>
     </span>
 </span>
