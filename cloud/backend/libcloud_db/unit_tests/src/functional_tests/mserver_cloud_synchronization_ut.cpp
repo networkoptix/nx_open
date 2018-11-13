@@ -38,6 +38,47 @@ public:
     {
     }
 
+protected:
+    void renameSystemInCloud()
+    {
+        const std::string newSystemName(nx::utils::generateRandomName(10).data());
+
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            cdb()->renameSystem(
+                ownerAccount().email,
+                ownerAccount().password,
+                registeredSystemData().id,
+                newSystemName));
+    }
+
+    void renameSystemInVms()
+    {
+        const std::string newSystemName(nx::utils::generateRandomName(10).data());
+
+        nx::vms::api::ResourceParamWithRefData param;
+        param.resourceId = QnUserResource::kAdminGuid;
+        param.name = nx::settings_names::kNameSystemName;
+        param.value = QString::fromStdString(newSystemName);
+        nx::vms::api::ResourceParamWithRefDataList paramList;
+        paramList.push_back(std::move(param));
+
+        ASSERT_EQ(
+            ::ec2::ErrorCode::ok,
+            appserver2()->moduleInstance()->ecConnection()
+                ->getResourceManager(Qn::kSystemAccess)
+                ->saveSync(paramList));
+    }
+
+    void restartCloudDb()
+    {
+        appserver2()->moduleInstance()->ecConnection()
+            ->deleteRemotePeer(::ec2::kCloudPeerId);
+        ASSERT_TRUE(cdb()->restart());
+        appserver2()->moduleInstance()->ecConnection()
+            ->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
+    }
+
 private:
     void init()
     {
@@ -347,7 +388,8 @@ TEST_P(FtEc2MserverCloudSynchronization, new_transaction_timestamp)
 
 TEST_P(FtEc2MserverCloudSynchronization, rename_system)
 {
-    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
+    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(
+        ::ec2::kCloudPeerId, cdbEc2TransactionUrl());
 
     for (int i = 0; i < 4; ++i)
     {
@@ -355,40 +397,12 @@ TEST_P(FtEc2MserverCloudSynchronization, rename_system)
         const bool updateInCloud = i < 2;
 
         if (needRestart)
-        {
-            appserver2()->moduleInstance()->ecConnection()
-                ->deleteRemotePeer(::ec2::kCloudPeerId);
-            ASSERT_TRUE(cdb()->restart());
-            appserver2()->moduleInstance()->ecConnection()
-                ->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
-        }
+            restartCloudDb();
 
-        const std::string newSystemName(nx::utils::generateRandomName(10).data());
         if (updateInCloud)
-        {
-            ASSERT_EQ(
-                api::ResultCode::ok,
-                cdb()->renameSystem(
-                    ownerAccount().email,
-                    ownerAccount().password,
-                    registeredSystemData().id,
-                    newSystemName));
-        }
+            renameSystemInCloud();
         else
-        {
-            nx::vms::api::ResourceParamWithRefData param;
-            param.resourceId = QnUserResource::kAdminGuid;
-            param.name = nx::settings_names::kNameSystemName;
-            param.value = QString::fromStdString(newSystemName);
-            nx::vms::api::ResourceParamWithRefDataList paramList;
-            paramList.push_back(std::move(param));
-
-            ASSERT_EQ(
-                ::ec2::ErrorCode::ok,
-                appserver2()->moduleInstance()->ecConnection()
-                    ->getResourceManager(Qn::kSystemAccess)
-                    ->saveSync(paramList));
-        }
+            renameSystemInVms();
 
         // Checking that system name has been updated in mediaserver.
         waitForCloudAndVmsToSyncSystemData();

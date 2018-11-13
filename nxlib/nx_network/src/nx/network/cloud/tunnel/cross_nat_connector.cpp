@@ -11,7 +11,6 @@
 
 #include "outgoing_tunnel_connection_watcher.h"
 #include "outgoing_tunnel_pool.h"
-#include "tcp/outgoing_reverse_tunnel_connection.h"
 #include "udp/connector.h"
 #include "../cloud_connect_settings.h"
 
@@ -81,21 +80,6 @@ void CrossNatConnector::connect(
     post(
         [this, timeout, handler = std::move(handler)]() mutable
         {
-            const auto hostName = m_targetPeerAddress.host.toString().toUtf8();
-            if (auto holder = m_cloudConnectController->tcpReversePool().getConnectionSource(hostName))
-            {
-                s_mediatorResponseCounter.addResult(hpm::api::ResultCode::notImplemented);
-                NX_DEBUG(this, lm("Using TCP reverse connections from pool to connect to host %1")
-                    .arg(hostName));
-
-                m_remotePeerFullName = hostName;
-
-                return handler(
-                    SystemError::noError,
-                    std::make_unique<tcp::OutgoingReverseTunnelConnection>(
-                        getAioThread(), std::move(holder)));
-            }
-
             m_completionHandler = std::move(handler);
             if (timeout > std::chrono::milliseconds::zero())
                 m_connectTimeout = timeout;
