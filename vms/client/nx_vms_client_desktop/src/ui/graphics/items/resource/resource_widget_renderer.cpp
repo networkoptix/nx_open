@@ -53,10 +53,10 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
 
     m_glContext->makeCurrent();
 
-    for (const auto& ctx: m_channelRenderers)
+    for (int i = channelCount; i < m_channelRenderers.count(); ++i)
     {
-        delete ctx.renderer;
-        delete ctx.uploader;
+        delete m_channelRenderers[i].renderer;
+        delete m_channelRenderers[i].uploader;
     }
 
     m_panoFactor = channelCount;
