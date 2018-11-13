@@ -241,20 +241,17 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::fetchChannelProperties(
     if (result.errorCode == CameraDiagnostics::ErrorCode::notAuthorised)
         return result;
 
-    if (!result)
+    if (!rtspPort)
     {
         NX_DEBUG(
             this,
-            lm("Failed to fetch RTSP port via ISAPI request, error %1, device %2 (%3); "
-                "trying old-style API")
+            lm("Failed to fetch RTSP port via ISAPI request; Result: %1; Device %2 (%3); "
+                "Trying old-style API")
                 .args(
                     result.toString(m_hikvisionResource->commonModule()->resourcePool()),
                     m_hikvisionResource->getUserDefinedName(),
                     m_hikvisionResource->getId()));
-    }
 
-    if (!rtspPort)
-    {
         url = hikvisionRequestUrlFromPath(kChannelStreamingPathTemplate.arg(
             buildChannelNumber(getRole(), m_hikvisionResource->getChannel())));
         result = fetchRtspPortViaOldApi(&rtspPort);
