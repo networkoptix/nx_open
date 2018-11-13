@@ -48,6 +48,8 @@ using namespace nx::core;
 
 namespace {
 
+static const QString kBypassPrefix("Bypass");
+
 bool isTrue(const boost::optional<HanwhaCgiParameter>& param)
 {
     return param && param->possibleValues().contains(kHanwhaTrue);
@@ -1201,19 +1203,14 @@ CameraDiagnostics::Result HanwhaResource::initIo()
 
     QnIOPortDataList ioPorts;
 
-    const auto maxAlarmInputs = m_attributes.attribute<int>(
-        lit("Eventsource/MaxAlarmInput"));
-
-    const auto maxAlarmOutputs = m_attributes.attribute<int>(
-        lit("IO/MaxAlarmOutput"));
-
-    const auto maxAuxDevices = m_attributes.attribute<int>(
-        lit("IO/MaxAux"));
+    const auto maxAlarmInputs = m_attributes.attribute<int>("Eventsource/MaxAlarmInput");
+    const auto maxAlarmOutputs = m_attributes.attribute<int>("IO/MaxAlarmOutput");
+    const auto maxAuxDevices = m_attributes.attribute<int>("IO/MaxAux");
 
     if (isNvr())
     {
         const auto networkAlarmInputChannels =
-            m_cgiParameters.parameter(lit("eventsources/networkalarminput/view/Channel"));
+            m_cgiParameters.parameter("eventsources/networkalarminput/view/Channel");
 
         const bool gotNetworkAlarmInput = networkAlarmInputChannels.is_initialized()
             && networkAlarmInputChannels->possibleValues()
@@ -1223,19 +1220,39 @@ CameraDiagnostics::Result HanwhaResource::initIo()
         {
             QnIOPortData inputPortData;
             inputPortData.portType = Qn::PT_Input;
-            inputPortData.id = lit("Channel.%1.NetworkAlarmInput").arg(getChannel());
-            inputPortData.inputName = tr("Device Alarm Input #1");
+            inputPortData.id = lm("Channel.%1.NetworkAlarmInput").args(getChannel());
+            inputPortData.inputName = lm("Device Alarm Input #1");
 
             m_ioPortTypeById[inputPortData.id] = inputPortData;
             ioPorts.push_back(inputPortData);
 
             HanwhaRequestHelper helper(sharedContext());
             helper.set(
-                lit("eventsources/networkalarminput"),
+                "eventsources/networkalarminput",
                 {
                     {kHanwhaChannelProperty, QString::number(getChannel())},
-                    {lit("Enable"), kHanwhaTrue}
+                    {"Enable", kHanwhaTrue}
                 });
+        }
+
+        if (isBypassSupported())
+        {
+            const auto proxiedOutputCount =
+                m_bypassDeviceAttributes.attribute<int>("IO/MaxAlarmOutput");
+
+            if (proxiedOutputCount.is_initialized() && *proxiedOutputCount > 0)
+            {
+                for (auto i = 1; i <= proxiedOutputCount.get(); ++i)
+                {
+                    QnIOPortData outputPortData;
+                    outputPortData.portType = Qn::PT_Output;
+                    outputPortData.id = lm("%1.AlarmOutput.%2").args(kBypassPrefix, i);
+                    outputPortData.outputName = lm("Device Alarm Output #%1").args(i);
+
+                    m_ioPortTypeById[outputPortData.id] = outputPortData;
+                    ioPorts.push_back(outputPortData);
+                }
+            }
         }
     }
 
@@ -1266,10 +1283,9 @@ CameraDiagnostics::Result HanwhaResource::initIo()
         {
             QnIOPortData outputPortData;
             outputPortData.portType = Qn::PT_Output;
-            outputPortData.id = lit("AlarmOutput.%1").arg(i);
-            outputPortData.outputName = tr("%1Alarm Output #%2")
-                .arg(isNvr() ? lit("NVR ") : QString())
-                .arg(i);
+            outputPortData.id = lm("AlarmOutput.%1").args(i);
+            outputPortData.outputName = lm("%1Alarm Output #%2")
+                .args((isNvr() ? lit("NVR ") : QString()), i);
 
             m_ioPortTypeById[outputPortData.id] = outputPortData;
             ioPorts.push_back(outputPortData);
@@ -1282,15 +1298,13 @@ CameraDiagnostics::Result HanwhaResource::initIo()
         {
             QnIOPortData outputPortData;
             outputPortData.portType = Qn::PT_Output;
-            outputPortData.id = lit("Aux.%1").arg(i);
-            outputPortData.outputName = tr("Auxiliary Device #%1").arg(i);
+            outputPortData.id = lm("Aux.%1").args(i);
+            outputPortData.outputName = lm("Auxiliary Device #%1").args(i);
 
             m_ioPortTypeById[outputPortData.id] = outputPortData;
             ioPorts.push_back(outputPortData);
         }
     }
-
-    // TODO: #dmishin get alarm outputs via bypass if possible?
 
     setIoPortDescriptions(std::move(ioPorts), /*needMerge*/ true);
     return CameraDiagnostics::NoErrorResult();
@@ -3490,11 +3504,12 @@ boost::optional<HanwhaResource::HanwhaPortInfo> HanwhaResource::portInfoFromId(
 {
     HanwhaPortInfo result;
     auto split = id.split(L'.');
-    if (split.size() != 2)
+    if (split.size() != 2 && split.size() != 3)
         return boost::none;
 
-    result.prefix = split[0];
-    result.number = split[1];
+    result.isProxied = split.size() == 3 && split[0] == kBypassPrefix;
+    result.prefix = split[result.isProxied ? 1 : 0];
+    result.number = split[result.isProxied ? 2 : 1];
     result.submenu = result.prefix.toLower();
 
     return result;
@@ -3520,7 +3535,7 @@ bool HanwhaResource::setOutputPortStateInternal(const QString& outputId, bool ac
             lit("Always"));
     }
 
-    HanwhaRequestHelper helper(sharedContext());
+    HanwhaRequestHelper helper(sharedContext(), info->isProxied ? bypassChannel() : boost::none);
     const auto response = helper.control(
         lit("io/%1").arg(info->submenu),
         parameters);
