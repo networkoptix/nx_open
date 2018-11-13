@@ -32,6 +32,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/pending_operation.h>
+#include <nx/utils/range_adapters.h>
 
 #include <common/common_module.h>
 #include <nx/analytics/descriptor_list_manager.h>
@@ -717,9 +718,11 @@ QString AnalyticsSearchListModel::Private::attributes(
 QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
     const analytics::storage::DetectedObject& object) const
 {
+    using nx::vms::api::analytics::ActionTypeDescriptor;
+
     const auto camera = this->camera(object);
     if (!camera)
-        return QSharedPointer<QMenu>();
+        return {};
 
     // TODO: #vkutin Is this a correct way of choosing servers for analytics actions?
     auto servers = q->cameraHistoryPool()->getCameraFootageData(camera, true);
@@ -728,19 +731,14 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
     const auto descriptorListManager = camera
         ->commonModule()
         ->analyticsDescriptorListManager();
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    const auto allActions = descriptorListManager
-        ->descriptors<nx::vms::api::analytics::ActionTypeDescriptor>(servers);
 
+    const auto allActions = descriptorListManager->descriptors<ActionTypeDescriptor>(servers);
     if (allActions.empty())
-        return QSharedPointer<QMenu>();
+        return {};
 
-    QMap<QString, QList<nx::vms::api::analytics::ActionTypeDescriptor>> actionsByPlugin;
-    for (auto itr = allActions.cbegin(); itr != allActions.cend(); ++itr)
+    QMap<QString, QList<ActionTypeDescriptor>> actionsByPlugin;
+    for (const auto& [actionId, descriptor]: allActions)
     {
-        const auto& actionId = itr->first;
-        const auto& descriptor = itr->second;
-
         if (!descriptor.item.supportedObjectTypeIds.contains(object.objectTypeId))
             continue;
 
@@ -749,14 +747,11 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
     }
 
     if (actionsByPlugin.isEmpty())
-        return QSharedPointer<QMenu>();
+        return {};
 
     QSharedPointer<QMenu> menu(new QMenu());
-    for (auto itr = actionsByPlugin.cbegin(); itr != actionsByPlugin.cend(); ++itr)
-        //const auto& driverActions: allActions)
+    for (const auto& [pluginId, descriptors]: nx::utils::keyValueRange(actionsByPlugin))
     {
-        const auto& pluginId = itr.key();
-        const auto& descriptors = *itr;
         if (!menu->isEmpty())
             menu->addSeparator();
 
