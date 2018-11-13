@@ -226,9 +226,6 @@ bool parseAdminAccessResponse(const nx::Buffer& response, AdminAccess* outAdminA
             outAdminAccess->rtspPort = protocolPort;
         else if (protocolString == "dev_manage")
             outAdminAccess->deviceManagementPort = protocolPort;
-
-        adminAccessProtocol =
-            adminAccessProtocol.nextSiblingElement(kAdminAccessProtocolElementTag);
     }
 
     return true;
