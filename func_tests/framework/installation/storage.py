@@ -7,6 +7,7 @@ from pathlib2 import Path
 from framework.camera import Camera, SampleMediaFile
 from framework.os_access.local_shell import local_shell
 from framework.os_access.os_access_interface import OSAccess
+from framework.os_access.path import FileSystemPath
 from framework.utils import datetime_utc_to_timestamp
 
 _logger = logging.getLogger(__name__)
@@ -14,9 +15,10 @@ _logger = logging.getLogger(__name__)
 
 class Storage(object):
 
-    def __init__(self, os_access, dir):
+    def __init__(self, os_access, dir):  # type: (OSAccess, FileSystemPath) -> ...
+        assert isinstance(dir, os_access.path_cls)
         self.os_access = os_access  # type: OSAccess
-        self.dir = dir
+        self.dir = dir  # type: FileSystemPath
 
     def save_media_sample(self, camera, start_time, sample):
         assert isinstance(camera, Camera), repr(camera)
