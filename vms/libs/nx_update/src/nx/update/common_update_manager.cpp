@@ -11,6 +11,10 @@
 
 namespace nx {
 
+using vms::common::p2p::downloader::FileInformation;
+using vms::common::p2p::downloader::Downloader;
+namespace downloader = vms::common::p2p::downloader;
+
 CommonUpdateManager::CommonUpdateManager(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
 {
@@ -22,7 +26,6 @@ void CommonUpdateManager::connectToSignals()
         globalSettings(), &QnGlobalSettings::updateInformationChanged,
         this, &CommonUpdateManager::onGlobalUpdateSettingChanged, Qt::QueuedConnection);
 
-    using namespace vms::common::p2p::downloader;
     connect(
         downloader(), &Downloader::downloadFailed,
         this, &CommonUpdateManager::onDownloaderFailed, Qt::QueuedConnection);
@@ -54,7 +57,6 @@ update::Status CommonUpdateManager::start()
         installer()->stopSync();
     }
 
-    using namespace vms::common::p2p::downloader;
     if (!shouldDownload)
     {
         if (package.isValid()
@@ -86,23 +88,23 @@ update::Status CommonUpdateManager::start()
 
     switch (downloader()->addFile(fileInformation))
     {
-    case ResultCode::ok:
+    case downloader::ResultCode::ok:
         return update::Status(
             peerId,
             update::Status::Code::downloading,
             "Started downloading update file");
-    case ResultCode::fileDoesNotExist:
-    case ResultCode::ioError:
-    case ResultCode::invalidChecksum:
-    case ResultCode::invalidFileSize:
-    case ResultCode::invalidChunkIndex:
-    case ResultCode::invalidChunkSize:
+    case downloader::ResultCode::fileDoesNotExist:
+    case downloader::ResultCode::ioError:
+    case downloader::ResultCode::invalidChecksum:
+    case downloader::ResultCode::invalidFileSize:
+    case downloader::ResultCode::invalidChunkIndex:
+    case downloader::ResultCode::invalidChunkSize:
         m_downloaderFailed = true;
         return update::Status(
             peerId,
             update::Status::Code::error,
             "Downloader experienced internal error");
-    case ResultCode::noFreeSpace:
+    case downloader::ResultCode::noFreeSpace:
         m_downloaderFailed = true;
         return update::Status(peerId,
             update::Status::Code::error,
@@ -143,7 +145,6 @@ bool CommonUpdateManager::canDownloadFile(
     const QString& fileName,
     update::Status* outUpdateStatus)
 {
-    using namespace vms::common::p2p::downloader;
     auto fileInformation = downloader()->fileInformation(fileName);
     const auto peerId = commonModule()->moduleGUID();
 
@@ -312,14 +313,10 @@ void CommonUpdateManager::onDownloaderFinished(const QString& fileName)
     installer()->prepareAsync(downloader()->filePath(fileName));
 }
 
-void CommonUpdateManager::onDownloaderFileStatusChanged(
-    const vms::common::p2p::downloader::FileInformation& fileInformation)
+void CommonUpdateManager::onDownloaderFileStatusChanged(const FileInformation& fileInformation)
 {
-    if (fileInformation.status
-        == vms::common::p2p::downloader::FileInformation::Status::downloaded)
-    {
+    if (fileInformation.status == FileInformation::Status::downloaded)
         onDownloaderFinished(fileInformation.name);
-    }
 }
 
 void CommonUpdateManager::install(const QnAuthSession& authInfo)

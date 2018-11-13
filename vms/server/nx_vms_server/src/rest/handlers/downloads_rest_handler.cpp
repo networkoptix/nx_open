@@ -291,11 +291,7 @@ int Helper::handleAddUpload(const QString& fileName)
                     return makeDownloaderError(errorCode);
                 break;
             }
-            else
-            {
-                return makeDownloaderError(errorCode);
-            }
-            break;
+            return makeDownloaderError(errorCode);
         }
         case ResultCode::ok:
             break;
