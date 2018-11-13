@@ -452,7 +452,6 @@ const QByteArray& QnRtspClient::getSdp() const
     return m_sdp;
 }
 
-#if 1
 void QnRtspClient::addAuth( nx::network::http::Request* const request )
 {
     QnClientAuthHelper::addAuthorizationToRequest(
@@ -460,30 +459,6 @@ void QnRtspClient::addAuth( nx::network::http::Request* const request )
         request,
         &m_rtspAuthCtx );   //ignoring result
 }
-#else
-void QnRtspClient::addAuth(QByteArray& request)
-{
-    if (m_auth.isNull())
-        return;
-    if (m_useDigestAuth)
-    {
-        QByteArray firstLine = request.left(request.indexOf('\n'));
-        QList<QByteArray> methodAndUri = firstLine.split(' ');
-        if (methodAndUri.size() >= 2) {
-            QString uri = QLatin1String(methodAndUri[1]);
-            if (uri.startsWith(lit("rtsp://")))
-                uri = QUrl(uri).path();
-            request.append( CLSimpleHTTPClient::digestAccess(
-                m_auth, m_realm, m_nonce, QLatin1String(methodAndUri[0]),
-                uri, m_responseCode == nx::network::http::StatusCode::proxyAuthenticationRequired ));
-        }
-    }
-    else {
-        request.append(CLSimpleHTTPClient::basicAuth(m_auth));
-        request.append(QLatin1String("\r\n"));
-    }
-}
-#endif
 
 void QnRtspClient::addCommonHeaders(nx::network::http::HttpHeaders& headers)
 {
