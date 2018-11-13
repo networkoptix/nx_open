@@ -30,9 +30,6 @@ QnResourceSearchQuery QnResourceSearchProxyModel::query() const
 
 QModelIndex QnResourceSearchProxyModel::setQuery(const QnResourceSearchQuery& query)
 {
-    if (m_query == query)
-        return m_currentRootNode;
-
     m_query = query;
 
     setFilterWildcard(L'*' + query.text + L'*');
