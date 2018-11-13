@@ -62,7 +62,7 @@ QnGetImageHelper::QnGetImageHelper(QnMediaServerModule* serverModule):
 }
 
 QSize updateDstSize(
-    const QnVirtualCameraResourcePtr& camera,
+    const QnVirtualCameraResource* camera,
     const QSize& srcSize,
     const CLVideoDecoderOutput& outFrame,
     nx::api::ImageRequest::AspectRatio aspectRatio)
@@ -533,7 +533,8 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
         channelMask &= ~(1 << frame->channel);
         if (i == 0)
         {
-            const QSize dstSize = updateDstSize(camera, request.size, *frame, request.aspectRatio);
+            const QSize dstSize = updateDstSize(camera.get(),
+                request.size, *frame, request.aspectRatio);
             filterChain << QnAbstractImageFilterPtr(new QnScaleImageFilter(dstSize));
             filterChain << QnAbstractImageFilterPtr(new QnTiledImageFilter(layout));
             filterChain << QnAbstractImageFilterPtr(new QnRotateImageFilter(rotation));

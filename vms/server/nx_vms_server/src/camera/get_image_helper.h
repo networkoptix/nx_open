@@ -21,8 +21,7 @@ typedef CLVideoDecoderOutputPtr CLVideoDecoderOutputPtr;
 class QnAbstractArchiveDelegate;
 class QnMediaServerModule;
 
-QSize updateDstSize(
-    const QnVirtualCameraResourcePtr &camera,
+QSize updateDstSize(const QnVirtualCameraResource *camera,
     const QSize& dstSize,
     const CLVideoDecoderOutput& outFrame,
     nx::api::ImageRequest::AspectRatio aspectRatio);
