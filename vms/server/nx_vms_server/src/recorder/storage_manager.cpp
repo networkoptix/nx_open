@@ -2388,12 +2388,13 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
         migrateSqliteDatabase(fileStorage);
         addDataFromDatabase(fileStorage);
         NX_VERBOSE(this, lit("[Storage, scan]: storage %1 - finished loading data from DB. Ready for scan").arg(fileStorage->getUrl()));
+        m_spaceInfo.storageAdded(storageDbPool()->getStorageIndex(fileStorage),
+            fileStorage->getTotalSpace());
         {
             QnMutexLocker lock(&m_mutexRebuild);
             if (m_rebuildArchiveThread)
                 m_rebuildArchiveThread->addStorageToScan(fileStorage, true);
         }
-        m_spaceInfo.storageAdded(storageDbPool()->getStorageIndex(fileStorage), fileStorage->getTotalSpace());
     }
 
     fileStorage->setStatus(status);
