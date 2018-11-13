@@ -37,6 +37,8 @@ TemporaryAccountPasswordManager::TemporaryAccountPasswordManager(
     m_attributeNameset(attributeNameset),
     m_dbManager(dbManager)
 {
+    deleteExpiredCredentials();
+
     if (fillCache() != nx::sql::DBResult::ok)
         throw std::runtime_error("Failed to fill temporary account password cache");
 }
@@ -320,6 +322,18 @@ void TemporaryAccountPasswordManager::removeTemporaryCredentialsFromDbDelayed(
             std::string /*tempPasswordId*/)
         {
         });
+}
+
+void TemporaryAccountPasswordManager::deleteExpiredCredentials()
+{
+    using namespace std::chrono;
+
+    m_dbManager->executeSqlSync(lm(R"sql(
+        DELETE FROM account_password
+        WHERE expiration_timestamp_utc > 0
+            AND (expiration_timestamp_utc + prolongation_period_sec) < %1;
+        )sql").args(duration_cast<seconds>(nx::utils::timeSinceEpoch()).count())
+            .toUtf8());
 }
 
 nx::sql::DBResult TemporaryAccountPasswordManager::fillCache()

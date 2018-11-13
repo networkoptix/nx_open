@@ -193,6 +193,7 @@ private:
     void removeTemporaryCredentialsFromDbDelayed(
         const TemporaryAccountCredentialsEx& temporaryCredentials);
 
+    void deleteExpiredCredentials();
     nx::sql::DBResult fillCache();
     nx::sql::DBResult fetchTemporaryPasswords(nx::sql::QueryContext* queryContext);
 
