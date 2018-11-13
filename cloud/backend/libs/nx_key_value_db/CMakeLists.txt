@@ -12,5 +12,5 @@ target_compile_definitions(nx_key_value_db
     INTERFACE NX_KEY_VALUE_DB_API=${API_IMPORT_MACRO})
 
 if(withTests)
-    add_subdirectory(tests)
+    add_subdirectory(unit_tests)
 endif()

@@ -21,7 +21,6 @@ namespace cloud {
 class MediatorAddressPublisher;
 class OutgoingTunnelPool;
 class CloudConnectSettings;
-namespace tcp { class ReverseConnectionPool; }
 
 struct NX_NETWORK_API CloudConnectControllerImpl;
 
@@ -32,7 +31,7 @@ public:
         const QString& customCloudHost,
         aio::AIOService* aioService,
         AddressResolver* addressResolver);
-    ~CloudConnectController();
+    virtual ~CloudConnectController();
 
     void applyArguments(const utils::ArgumentParser& arguments);
 
@@ -41,7 +40,6 @@ public:
     MediatorAddressPublisher& addressPublisher();
     OutgoingTunnelPool& outgoingTunnelPool();
     CloudConnectSettings& settings();
-    tcp::ReverseConnectionPool& tcpReversePool();
 
     /**
      * Deletes all objects and creates them.
