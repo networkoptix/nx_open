@@ -500,38 +500,29 @@ nx::sql::DBResult AccountManager::createPasswordResetCode(
     tempPasswordData.isEmailCode = true;
     tempPasswordData.accessRights.requestsAllowed.add(kAccountUpdatePath);
 
-    data::Credentials credentials;
-    auto dbResultCode = m_tempPasswordManager->fetchTemporaryCredentials(
+    const auto credentials = m_tempPasswordManager->fetchTemporaryCredentials(
         queryContext,
-        tempPasswordData,
-        &credentials);
-    if (dbResultCode != nx::sql::DBResult::ok &&
-        dbResultCode != nx::sql::DBResult::notFound)
-    {
-        return dbResultCode;
-    }
+        tempPasswordData);
 
     std::string temporaryPassword;
-    if (dbResultCode == nx::sql::DBResult::ok)
+    if (credentials)
     {
         NX_VERBOSE(this, lm("Found existing password reset code (%1) for account %2")
-            .arg(credentials.password).arg(accountEmail));
-        temporaryPassword = credentials.password;
+            .args(credentials->password, accountEmail));
+        temporaryPassword = credentials->password;
 
         // Updating expiration time.
-        dbResultCode = m_tempPasswordManager->updateCredentialsAttributes(
+        m_tempPasswordManager->updateCredentialsAttributes(
             queryContext,
-            credentials,
+            *credentials,
             tempPasswordData);
-        if (dbResultCode != nx::sql::DBResult::ok)
-            return dbResultCode;
     }
     else
     {
         m_tempPasswordManager->addRandomCredentials(accountEmail, &tempPasswordData);
         temporaryPassword = tempPasswordData.password;
 
-        dbResultCode = m_tempPasswordManager->registerTemporaryCredentials(
+        const auto dbResultCode = m_tempPasswordManager->registerTemporaryCredentials(
             queryContext,
             std::move(tempPasswordData));
         if (dbResultCode != nx::sql::DBResult::ok)
@@ -854,11 +845,9 @@ nx::sql::DBResult AccountManager::updateAccountInDb(
 
     if (accountUpdateData.passwordHa1 || accountUpdateData.passwordHa1Sha256)
     {
-        auto dbResult = m_tempPasswordManager->removeTemporaryPasswordsFromDbByAccountEmail(
+        m_tempPasswordManager->removeTemporaryPasswordsFromDbByAccountEmail(
             queryContext,
             accountUpdateData.email);
-        if (dbResult != nx::sql::DBResult::ok)
-            return dbResult;
 
         auto account = m_dao->fetchAccountByEmail(queryContext, accountUpdateData.email);
         if (!account)
