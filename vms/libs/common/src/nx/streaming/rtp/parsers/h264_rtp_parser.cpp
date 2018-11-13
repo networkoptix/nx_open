@@ -3,8 +3,6 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <nx/streaming/rtp/rtp.h>
-#include <nx/streaming/config.h>
-#include <utils/common/synctime.h>
 #include <nx/utils/log/log.h>
 
 namespace nx::streaming::rtp {

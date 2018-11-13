@@ -31,7 +31,6 @@ extern "C"
 #include <nx/network/rtsp/rtsp_types.h>
 #include <nx/streaming/abstract_archive_delegate.h>
 #include <camera/camera_pool.h>
-#include <nx/streaming/rtsp_client.h>
 #include <recorder/recording_manager.h>
 #include <utils/common/util.h>
 #include <rtsp/rtsp_data_consumer.h>
