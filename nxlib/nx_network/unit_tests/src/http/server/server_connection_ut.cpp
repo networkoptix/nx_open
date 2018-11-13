@@ -78,11 +78,13 @@ TEST_F(HttpAsyncServerConnectionTest, connectionRemovedBeforeRequestHasBeenProce
 
     auto client = nx::network::http::AsyncHttpClient::create();
     client->doGet(url);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
     client.reset();
 
-    std::this_thread::sleep_for(std::chrono::seconds(10));
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 }
+
+//-------------------------------------------------------------------------------------------------
 
 namespace {
 
@@ -110,78 +112,112 @@ const nx::String PipeliningTestHandler::PATH = "/tst";
 
 } // namespace
 
-TEST_F(HttpAsyncServerConnectionTest, requestPipeliningTest)
+class HttpAsyncServerConnectionRequestPipelining:
+    public HttpAsyncServerConnectionTest
 {
-    static const int REQUESTS_TO_SEND = 100;
+    using base_type = HttpAsyncServerConnectionTest;
 
-    m_testHttpServer->registerRequestProcessor<PipeliningTestHandler>(
-        PipeliningTestHandler::PATH,
-        [&]()->std::unique_ptr<PipeliningTestHandler>
-        {
-            return std::make_unique<PipeliningTestHandler>();
-        });
-
-    ASSERT_TRUE(m_testHttpServer->bindAndListen());
-
-    //opening connection and sending multiple requests
-    nx::network::http::Request request;
-    request.requestLine.method = nx::network::http::Method::get;
-    request.requestLine.version = nx::network::http::http_1_1;
-    request.requestLine.url = PipeliningTestHandler::PATH;
-
-    auto sock = SocketFactory::createStreamSocket();
-    ASSERT_TRUE(sock->connect(SocketAddress(
-        HostAddress::localhost,
-        m_testHttpServer->serverAddress().port),
-        nx::network::kNoTimeout));
-
-    int msgCounter = 0;
-    for (; msgCounter < REQUESTS_TO_SEND; ++msgCounter)
+protected:
+    virtual void SetUp() override
     {
-        nx::network::http::insertOrReplaceHeader(
-            &request.headers,
-            nx::network::http::HttpHeader("Seq", nx::String::number(msgCounter)));
-        //sending request
-        auto serializedMessage = request.serialized();
-        ASSERT_EQ(sock->send(serializedMessage), serializedMessage.size());
+        base_type::SetUp();
+
+        m_testHttpServer->registerRequestProcessor<PipeliningTestHandler>(
+            PipeliningTestHandler::PATH,
+            [&]()->std::unique_ptr<PipeliningTestHandler>
+            {
+                return std::make_unique<PipeliningTestHandler>();
+            });
+
+        ASSERT_TRUE(m_testHttpServer->bindAndListen());
     }
 
-    //reading responses out of socket
-    nx::network::http::HttpStreamReader httpMsgReader;
-
-    nx::Buffer readBuf;
-    readBuf.resize(4 * 1024 * 1024);
-    int dataSize = 0;
-    ASSERT_TRUE(sock->setRecvTimeout(500));
-    while (msgCounter > 0)
+    void whenSendMultipleRequests(int count)
     {
-        if (dataSize == 0)
+        //opening connection and sending multiple requests
+        nx::network::http::Request request;
+        request.requestLine.method = nx::network::http::Method::get;
+        request.requestLine.version = nx::network::http::http_1_1;
+        request.requestLine.url = PipeliningTestHandler::PATH;
+
+        m_socket = SocketFactory::createStreamSocket();
+        ASSERT_TRUE(m_socket->connect(SocketAddress(
+            HostAddress::localhost,
+            m_testHttpServer->serverAddress().port),
+            nx::network::kNoTimeout));
+
+        int msgCounter = 0;
+        for (; msgCounter < count; ++msgCounter)
         {
-            auto bytesRead = sock->recv(
-                readBuf.data() + dataSize,
-                readBuf.size() - dataSize);
-            ASSERT_FALSE(bytesRead == 0 || bytesRead == -1);
-            dataSize += bytesRead;
+            nx::network::http::insertOrReplaceHeader(
+                &request.headers,
+                nx::network::http::HttpHeader("Seq", nx::String::number(msgCounter)));
+            //sending request
+            auto serializedMessage = request.serialized();
+            ASSERT_EQ(m_socket->send(serializedMessage), serializedMessage.size());
+        }
+    }
+
+    void thenMultipleResponsesAreReceived(int count)
+    {
+        int msgCounter = count;
+        while (msgCounter > 0)
+        {
+            readMoreData();
+            parseDataRead();
+
+            if (m_httpMsgReader.state() == nx::network::http::HttpStreamReader::messageDone)
+            {
+                ASSERT_TRUE(m_httpMsgReader.message().response != nullptr);
+                const auto& response = *m_httpMsgReader.message().response;
+
+                auto seqIter = response.headers.find("Seq");
+                ASSERT_TRUE(seqIter != response.headers.end());
+                ASSERT_EQ(seqIter->second.toInt(), count - msgCounter);
+                --msgCounter;
+            }
         }
 
+        ASSERT_EQ(0, msgCounter);
+    }
+
+private:
+    std::unique_ptr<AbstractStreamSocket> m_socket;
+    nx::network::http::HttpStreamReader m_httpMsgReader;
+    nx::Buffer m_readBuf;
+    int m_dataSize = 0;
+
+    void readMoreData()
+    {
+        if (m_readBuf.size() < 64 * 1024)
+            m_readBuf.resize(64 * 1024);
+
+        const auto bytesRead = m_socket->recv(
+            m_readBuf.data() + m_dataSize,
+            m_readBuf.size() - m_dataSize);
+        ASSERT_TRUE(bytesRead > 0)
+            << SystemError::getLastOSErrorText().toStdString();
+        m_dataSize += bytesRead;
+    }
+
+    void parseDataRead()
+    {
         size_t bytesParsed = 0;
         ASSERT_TRUE(
-            httpMsgReader.parseBytes(
-                QnByteArrayConstRef(readBuf, 0, dataSize),
+            m_httpMsgReader.parseBytes(
+                QnByteArrayConstRef(m_readBuf, 0, m_dataSize),
                 &bytesParsed));
-        readBuf.remove(0, bytesParsed);
-        dataSize -= bytesParsed;
-        if (httpMsgReader.state() == nx::network::http::HttpStreamReader::messageDone)
-        {
-            ASSERT_TRUE(httpMsgReader.message().response != nullptr);
-            auto seqIter = httpMsgReader.message().response->headers.find("Seq");
-            ASSERT_TRUE(seqIter != httpMsgReader.message().response->headers.end());
-            ASSERT_EQ(seqIter->second.toInt(), REQUESTS_TO_SEND - msgCounter);
-            --msgCounter;
-        }
+        m_readBuf.remove(0, bytesParsed);
+        m_dataSize -= bytesParsed;
     }
+};
 
-    ASSERT_EQ(0, msgCounter);
+TEST_F(HttpAsyncServerConnectionRequestPipelining, requestPipeliningTest)
+{
+    static constexpr int kRequestToSendCount = 17;
+
+    whenSendMultipleRequests(kRequestToSendCount);
+    thenMultipleResponsesAreReceived(kRequestToSendCount);
 }
 
 TEST_F(HttpAsyncServerConnectionTest, multipleRequestsTest)

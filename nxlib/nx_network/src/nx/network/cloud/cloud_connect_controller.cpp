@@ -14,7 +14,6 @@
 #include "mediator_connector.h"
 #include "tunnel/connector_factory.h"
 #include "tunnel/outgoing_tunnel_pool.h"
-#include "tunnel/tcp/reverse_connection_pool.h"
 
 namespace nx {
 namespace network {
@@ -45,7 +44,6 @@ struct CloudConnectControllerImpl
     MediatorAddressPublisher addressPublisher;
     OutgoingTunnelPool outgoingTunnelPool;
     CloudConnectSettings settings;
-    tcp::ReverseConnectionPool tcpReversePool;
 
     CloudConnectControllerImpl(
         const QString& customCloudHost,
@@ -58,11 +56,7 @@ struct CloudConnectControllerImpl
         mediatorConnector(cloudHost.toStdString()),
         addressPublisher(
             mediatorConnector.systemConnection(),
-            &mediatorConnector),
-        tcpReversePool(
-            aioService,
-            outgoingTunnelPool,
-            mediatorConnector.clientConnection())
+            &mediatorConnector)
     {
     }
 
@@ -73,7 +67,6 @@ struct CloudConnectControllerImpl
             utils::BarrierHandler barrier([&]() { cloudServicesStoppedPromise.set_value(); });
             addressPublisher.pleaseStop(barrier.fork());
             outgoingTunnelPool.pleaseStop(barrier.fork());
-            tcpReversePool.pleaseStop(barrier.fork());
         }
 
         cloudServicesStoppedPromise.get_future().wait();
@@ -126,11 +119,6 @@ OutgoingTunnelPool& CloudConnectController::outgoingTunnelPool()
 CloudConnectSettings& CloudConnectController::settings()
 {
     return m_impl->settings;
-}
-
-tcp::ReverseConnectionPool& CloudConnectController::tcpReversePool()
-{
-    return m_impl->tcpReversePool;
 }
 
 void CloudConnectController::reinitialize()
