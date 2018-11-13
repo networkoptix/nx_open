@@ -2019,7 +2019,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param[opt]:boolean showAddresses Set it to true to show server addresses.
      * %return:object JSON object with module information.
      */
-    reg("api/moduleInformation", new QnModuleInformationRestHandler());
+    reg("api/moduleInformation", new QnModuleInformationRestHandler(commonModule()));
 
     /**%apidoc GET /api/iflist
      * Get network settings (list of interfaces) for the server. Can be called only if server flags
@@ -2120,7 +2120,7 @@ void MediaServerProcess::registerRestHandlers(
      * The same as moduleInformation but requires authentication. Useful to test connection.
      * %return:object JSON object with module information.
      */
-    reg("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler());
+    reg("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler(commonModule()));
 
     /**%apidoc POST /api/configure
      * Configure various server parameters.
