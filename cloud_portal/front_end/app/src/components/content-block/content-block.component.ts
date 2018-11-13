@@ -35,7 +35,9 @@ import { Component, ElementRef, Input, OnInit, ViewChild, ViewEncapsulation } fr
     styleUrls  : [ 'content-block.component.scss' ],
 })
 export class NxContentBlockComponent implements OnInit {
-    @Input('type') class: string;
+    @Input('slim') slim: any;
+    @Input('gray') gray: any;
+    @Input('fixed') fixed: any;
     @Input('hoverable') hoverable: any;
 
     haveHeader: boolean;
@@ -53,6 +55,9 @@ export class NxContentBlockComponent implements OnInit {
         this.haveHeader = (this.headerWrapper.nativeElement.childNodes[ 0 ].childNodes.length > 0);
         this.haveFooter = (this.footerWrapper.nativeElement.childNodes.length > 0);
 
+        this.slim = (this.slim !== undefined);
+        this.gray = (this.gray !== undefined);
+        this.fixed = (this.fixed !== undefined);
         this.hoverable = (this.hoverable !== undefined);
     }
 }

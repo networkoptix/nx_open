@@ -1,7 +1,7 @@
 <div class="">
     <h1 class="pl-3">Right menu</h1>
 
-    <nx-right-layout>
+    <nx-layout-right>
         <nx-block first>
             <header>
                 Some data (TOP)
@@ -55,7 +55,18 @@
             </nx-section>
         </nx-block>
 
-        <nx-block>
+        <nx-block side>
+            <header>
+                Some other side data
+            </header>
+
+            <nx-section>
+                BODY
+            </nx-section>
+        </nx-block>
+
+
+        <nx-block slim>
             <header>
                 Some data
             </header>
@@ -75,15 +86,5 @@
             </nx-section>
         </nx-block>
 
-        <nx-block>
-            <header>
-                Some data
-            </header>
-
-            <nx-section>
-                BODY
-            </nx-section>
-        </nx-block>
-
-    </nx-right-layout>
+    </nx-layout-right>
 </div>

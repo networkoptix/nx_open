@@ -71,7 +71,16 @@
 }
 
 .side-pahel {
-    @include media-breakpoint-up(lg) {
-        position : absolute;
+    @include media-breakpoint-up(sm) {
+        position    : absolute;
+        margin-left : calc(66.66667% - 22px); // counter measure absolute positioning offset
+    }
+    
+    @include media-breakpoint-up(xl) {
+        margin-left : calc(58.33333% - 18px); // counter measure absolute positioning offset
+    }
+    
+    @include media-breakpoint-up(xxl) {
+        margin-left : calc(83.33333% - 26px); // counter measure absolute positioning offset
     }
 }

@@ -56,7 +56,11 @@
             border-bottom-color : $light6;
         }
         
-        .card--body, .card--footer {
+        .card--body {
+            background-color : $light4;
+        }
+    
+        .card--footer {
             background-color : $light4;
         }
     }

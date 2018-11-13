@@ -35,12 +35,12 @@ import { Component, ElementRef, Input, OnInit, ViewChild, ViewEncapsulation } fr
 */
 
 @Component({
-    selector   : 'nx-right-layout',
+    selector   : 'nx-layout-right',
     templateUrl: 'layout.component.html',
     encapsulation: ViewEncapsulation.None,
     styleUrls  : [ 'layout.component.scss' ],
 })
-export class NxLayoutComponent implements OnInit {
+export class NxLayoutRightComponent implements OnInit {
 
     constructor() {
     }

@@ -32,12 +32,15 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
 
                         if (this.plugin) {
                             // build static info if properties of plugin are populated
-                            // to simplify blocks vivsibility
+                            // to simplify blocks visibility
                             for (const param in this.plugin) {
                                 if (this.plugin.hasOwnProperty(param)) {
-                                    if (Object.keys(this.plugin[param]).length) {
-                                        this.plugin[param].hasInfo = false;
+                                    if (param === 'id') {
+                                        continue;
                                     }
+
+                                    this.plugin[param].hasInfo = false;
+
                                     for (const key in this.plugin[param]) {
                                         if (this.plugin[param].hasOwnProperty(key)) {
                                             if (key !== 'hasInfo' && this.plugin[param][key] !== '') {
