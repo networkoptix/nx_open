@@ -214,7 +214,7 @@ QVariantMap DeviceAnalyticsBinding::getSettings() const
 
     const auto engineManifest = m_engine->manifest();
     interactive_settings::JsonEngine jsonEngine;
-    jsonEngine.load(engineManifest.deviceAgentSettingsModel);
+    jsonEngine.loadModelFromJsonObject(engineManifest.deviceAgentSettingsModel);
 
     const auto settingsFromProperty = m_device->deviceAgentSettingsValues(m_engine->getId());
     jsonEngine.applyValues(settingsFromProperty);
@@ -261,7 +261,7 @@ void DeviceAnalyticsBinding::setSettings(const QVariantMap& settings)
 
     const auto engineManifest = m_engine->manifest();
     interactive_settings::JsonEngine jsonEngine;
-    jsonEngine.load(engineManifest.deviceAgentSettingsModel);
+    jsonEngine.loadModelFromJsonObject(engineManifest.deviceAgentSettingsModel);
 
     const auto settingsFromProperty = m_device->deviceAgentSettingsValues(m_engine->getId());
     jsonEngine.applyValues(settingsFromProperty);

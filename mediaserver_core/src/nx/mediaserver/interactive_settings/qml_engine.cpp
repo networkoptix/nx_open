@@ -1,18 +1,13 @@
 #include "qml_engine.h"
 
-#include <atomic>
-
-#include <QtCore/QPointer>
 #include <QtQml/QQmlEngine>
 #include <QtQml/QQmlComponent>
-
-#include <nx/utils/log/log.h>
 
 #include "components/items.h"
 
 namespace nx::mediaserver::interactive_settings {
 
-class QmlEngine::Private
+class QmlEngine::Private: public QObject
 {
 public:
     Private();
@@ -20,6 +15,7 @@ public:
 public:
     std::unique_ptr<QQmlEngine> engine{new QQmlEngine()};
     std::unique_ptr<QQmlComponent> component{new QQmlComponent(engine.get())};
+    Error lastError = ErrorCode::ok;
 };
 
 QmlEngine::Private::Private()
@@ -30,51 +26,52 @@ QmlEngine::Private::Private()
     engine->setPluginPathList({});
 }
 
-QmlEngine::QmlEngine(QObject* parent):
-    base_type(parent),
+QmlEngine::QmlEngine():
     d(new Private())
 {
-    connect(d->component.get(), &QQmlComponent::statusChanged, this,
+    QObject::connect(d->component.get(), &QQmlComponent::statusChanged, d.get(),
         [this](QQmlComponent::Status status)
         {
             if (status != QQmlComponent::Ready)
             {
                 if (status == QQmlComponent::Error)
                 {
-                    setStatus(Status::error);
+                    d->lastError = Error(ErrorCode::parseError, "QML engine reported errors:");
 
                     for (const auto& error: d->component->errors())
-                        NX_ERROR(this, error.toString());
+                    {
+                        d->lastError.message.append(L'\n');
+                        d->lastError.message.append(error.toString());
+                    }
                 }
-
                 return;
             }
 
             const auto settingsItem = qobject_cast<components::Settings*>(d->component->create());
             if (!settingsItem)
             {
-                setStatus(Status::error);
-                NX_ERROR(this, lm("Can't load %1. Root item must be Settings.").arg(
-                    d->component->url()));
+                d->lastError = Error(ErrorCode::parseError, "Root item must have Settings type.");
                 return;
             }
 
-            setSettingsItem(settingsItem);
-    });
+            d->lastError = setSettingsItem(settingsItem);
+        });
 }
 
 QmlEngine::~QmlEngine()
 {
 }
 
-void QmlEngine::load(const QByteArray& data)
+AbstractEngine::Error QmlEngine::loadModelFromData(const QByteArray& data)
 {
     d->component->setData(data, QUrl());
+    return d->lastError;
 }
 
-void QmlEngine::load(const QString& fileName)
+AbstractEngine::Error QmlEngine::loadModelFromFile(const QString& fileName)
 {
     d->component->loadUrl(fileName);
+    return d->lastError;
 }
 
 } // namespace nx::mediaserver::interactive_settings

@@ -5,7 +5,7 @@
 #include <QtCore/QSet>
 #include <QtCore/QFile>
 
-#include <nx/utils/log/log.h>
+#include <nx/utils/log/log_message.h>
 
 #include "components/items.h"
 
@@ -34,16 +34,7 @@ bool processValueItemsRecursively(Item* item, const std::function<bool(ValueItem
 
 } // namespace
 
-class AbstractEngine::Private
-{
-public:
-    QPointer<Settings> settingsItem;
-    AbstractEngine::Status status = AbstractEngine::Status::idle;
-};
-
-AbstractEngine::AbstractEngine(QObject* parent):
-    base_type(parent),
-    d(new Private())
+AbstractEngine::AbstractEngine()
 {
 }
 
@@ -51,81 +42,65 @@ AbstractEngine::~AbstractEngine()
 {
 }
 
-void AbstractEngine::load(const QString& fileName)
+AbstractEngine::Error AbstractEngine::loadModelFromFile(const QString& fileName)
 {
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly))
-    {
-        NX_ERROR(this, lm("Cannot open file %1.").arg(file.fileName()));
-        setStatus(Status::error);
-        return;
-    }
+        return Error(ErrorCode::cannotOpenFile, lm("Cannot open file %1.").arg(fileName));
 
     constexpr qint64 kMaxFileSize = 1024 * 1024;
     if (file.size() > kMaxFileSize)
     {
-        NX_ERROR(this, lm("Cannot load file %1. File is too big.").arg(file.fileName()));
-        setStatus(Status::error);
-        return;
+        return Error(
+            ErrorCode::fileIsTooLarge,
+            lm("Cannot load file %1. File is too large: %2 bytes (max: %3 bytes).").args(
+                fileName, file.size(), kMaxFileSize));
     }
 
     const QByteArray data = file.readAll();
 
     file.close();
 
-    load(data);
-}
-
-AbstractEngine::Status AbstractEngine::status() const
-{
-    return d->status;
-}
-
-QObject* AbstractEngine::rootObject() const
-{
-    return d->settingsItem;
-}
-
-void AbstractEngine::setStatus(AbstractEngine::Status status)
-{
-    if (d->status == status)
-        return;
-
-    d->status = status;
+    return loadModelFromData(data);
 }
 
 Settings* AbstractEngine::settingsItem() const
 {
-    return d->settingsItem;
+    return m_settingsItem;
 }
 
-void AbstractEngine::setSettingsItem(Settings* item)
+AbstractEngine::Error AbstractEngine::setSettingsItem(Settings* item)
 {
-    d->settingsItem = item;
+    m_settingsItem = item;
     if (!item)
-        return;
+        return ErrorCode::ok;
 
+    QString nonUniqueName;
     bool valid = processValueItemsRecursively(item,
-        [names = QSet<QString>()](ValueItem* item) mutable
+        [names = QSet<QString>(), &nonUniqueName](ValueItem* item) mutable
         {
-            if (names.contains(item->name()))
-                return false;
+            const auto name = item->name();
 
-            names.insert(item->name());
+            if (names.contains(name))
+            {
+                nonUniqueName = name;
+                return false;
+            }
+
+            names.insert(name);
             return true;
         });
 
     if (!valid)
     {
-        d->settingsItem = nullptr;
-        setStatus(Status::error);
-        return;
+        return Error(ErrorCode::itemNameIsNotUnique,
+            lm("Item name is not unique: %1").arg(nonUniqueName));
     }
 
-    setStatus(Status::loaded);
+    return ErrorCode::ok;
 }
 
-QJsonObject AbstractEngine::serialize() const
+QJsonObject AbstractEngine::serializeModel() const
 {
     if (const auto item = settingsItem())
         return item->serialize();
@@ -135,11 +110,11 @@ QJsonObject AbstractEngine::serialize() const
 
 QVariantMap AbstractEngine::values() const
 {
-    if (!d->settingsItem)
+    if (!m_settingsItem)
         return {};
 
     QVariantMap result;
-    processValueItemsRecursively(d->settingsItem,
+    processValueItemsRecursively(m_settingsItem,
         [&result](ValueItem* item)
         {
             result[item->name()] = item->value();
@@ -151,10 +126,10 @@ QVariantMap AbstractEngine::values() const
 
 void AbstractEngine::applyValues(const QVariantMap& values) const
 {
-    if (!d->settingsItem)
+    if (!m_settingsItem)
         return;
 
-    processValueItemsRecursively(d->settingsItem,
+    processValueItemsRecursively(m_settingsItem,
         [&values](ValueItem* item)
         {
             const auto it = values.find(item->name());
@@ -168,17 +143,18 @@ void AbstractEngine::applyValues(const QVariantMap& values) const
     return;
 }
 
-QJsonObject AbstractEngine::tryValues(const QVariantMap& values) const
+AbstractEngine::ModelAndValues AbstractEngine::tryValues(const QVariantMap& values) const
 {
     const auto originalValues = this->values();
 
     applyValues(values);
 
-    const auto result = serialize();
+    const auto newModel = serializeModel();
+    const auto newValues = this->values();
 
     applyValues(originalValues);
 
-    return result;
+    return {newModel, newValues};
 }
 
 } // namespace nx::mediaserver::interactive_settings
