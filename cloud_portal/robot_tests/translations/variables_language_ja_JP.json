@@ -14,7 +14,7 @@
     "AUTOTESTS OFFLINE TEXT": "オフライン",
     "NEW PERMISSIONS SAVED": "新しい権限の保存",
     "PERMISSIONS WERE REMOVED FROM": "%email% からアクセス権限が削除されました",
-    "SYSYEM DELETED FROM ACCOUNT": "システム {{message.system_name}} は、あなたのアカウントから正常に削除されました",
+    "SYSYEM DELETED FROM ACCOUNT": "システム {{message.system_name}} はあなたのアカウントから正常に削除されました",
     "RESET SUCCESS MESSAGE TEXT": "パスワードを更新しました",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "あなたのアカウントは正常に保存されました",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "あなたのアカウントは正常にアクティベートされました",
