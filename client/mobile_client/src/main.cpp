@@ -40,6 +40,7 @@
 #include <utils/intent_listener_android.h>
 #include <handlers/lite_client_handler.h>
 
+#include <nx/media/ios_device_info.h>
 #include <gl_context_synchronizer.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/std/cpp14.h>
@@ -64,6 +65,7 @@ extern "C"
 
 using namespace nx::mobile_client;
 using namespace std::chrono;
+using namespace nx::media;
 
 const nx::utils::log::Tag kLogTag(QString("main"));
 
@@ -169,6 +171,16 @@ int runUi(QtSingleGuiApplication* application)
 
     QSize maxFfmpegResolution = qnSettings->maxFfmpegResolution();
     QSize maxFfmpegHevcResolution = maxFfmpegResolution;
+
+    const bool forceSoftwareOnlyDecoderForIPhone =
+        #if defined(Q_OS_IOS)
+            ini().forceSoftwareDecoderForIPhoneXs
+            && iosDeviceInformation().majorVersion == IosDeviceInformation::iPhoneXs
+            && iosDeviceInformation().type == IosDeviceInformation::Type::iPhone;
+        #else
+            false;
+        #endif
+    
     if (maxFfmpegResolution.isEmpty())
     {
         // Use platform-dependent defaults.
@@ -179,6 +191,12 @@ int runUi(QtSingleGuiApplication* application)
             {
                 maxFfmpegResolution = QSize(1280, 720);
                 maxFfmpegHevcResolution = QSize(640, 480);
+            }
+            else if (forceSoftwareOnlyDecoderForIPhone)
+            {
+                static const QSize kDci4kResolution(4096, 2160);
+                maxFfmpegResolution = kDci4kResolution;
+                maxFfmpegHevcResolution = kDci4kResolution;
             }
             else
             {
@@ -193,7 +211,9 @@ int runUi(QtSingleGuiApplication* application)
     maxFfmpegResolutions[(int) AV_CODEC_ID_H265] = maxFfmpegHevcResolution;
 
     nx::media::DecoderRegistrar::registerDecoders(
-        maxFfmpegResolutions, /*isTranscodingEnabled*/ !context->liteMode());
+        maxFfmpegResolutions,
+        /*isTranscodingEnabled*/ !context->liteMode(),
+        !forceSoftwareOnlyDecoderForIPhone);
 
     #if defined(Q_OS_ANDROID)
         QUrl initialIntentData = getInitialIntentData();

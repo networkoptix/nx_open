@@ -20,7 +20,8 @@ namespace media {
 
 void DecoderRegistrar::registerDecoders(
     const QMap<int, QSize>& maxFfmpegResolutions,
-    bool isTranscodingEnabled)
+    bool isTranscodingEnabled,
+    bool enableHardwareDecoderOnIPhone)
 {
     VideoDecoderRegistry::instance()->setTranscodingEnabled(isTranscodingEnabled);
 
@@ -36,6 +37,7 @@ void DecoderRegistrar::registerDecoders(
     #endif
 
     #if defined(Q_OS_IOS)
+    if (enableHardwareDecoderOnIPhone)
     {
         static const int kHardwareDecodersCount = 1;
         VideoDecoderRegistry::instance()->addPlugin<IOSVideoDecoder>(kHardwareDecodersCount);
