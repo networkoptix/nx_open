@@ -20,6 +20,8 @@ class ProductFilter(SimpleListFilter):
         products = Product.objects.all()
         if not request.user.is_superuser:
             products = products.filter(customizations__name__in=request.user.customizations)
+            if request.user.groups.filter(name="Developer").exists():
+                products = products.exclude(product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
             return [(p.id, p.name) for p in products]
         return [(p.id, p.__str__()) for p in products]
 
@@ -300,6 +302,8 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
         qs = super(ProductCustomizationReviewAdmin, self).get_queryset(request)
         if not request.user.is_superuser:
             qs = qs.filter(customization__name__in=request.user.customizations)
+            if request.user.groups.filter(name="Developer").exists():
+                qs = qs.exclude(version__product__product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
         return qs
 
     def get_readonly_fields(self, request, obj=None):
