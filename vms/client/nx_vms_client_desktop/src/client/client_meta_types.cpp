@@ -1,5 +1,7 @@
 #include "client_meta_types.h"
 
+#include <atomic>
+
 #include <QtQml/QtQml>
 
 #include <common/common_meta_types.h>
@@ -48,12 +50,6 @@
 #include <nx/vms/client/desktop/ui/scene/instruments/instrument.h>
 #include <nx/vms/client/desktop/utils/cursor_manager.h>
 
-namespace {
-
-volatile bool qn_clientMetaTypes_initialized = false;
-
-} // namespace
-
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
 
 Q_DECLARE_METATYPE(nx::cloud::db::api::ResultCode)
@@ -65,13 +61,15 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qt, DateFormat)
 
 using namespace nx::vms::client::desktop;
 
-void QnClientMetaTypes::initialize() {
-    /* Note that running the code twice is perfectly OK,
-     * so we don't need heavyweight synchronization here. */
-    if(qn_clientMetaTypes_initialized)
+void QnClientMetaTypes::initialize()
+{
+    static std::atomic_bool initialized = false;
+
+    if (initialized.load())
         return;
 
-    QnCommonMetaTypes::initialize();
+    initialized = true;
+
     nx::vms::client::core::initializeMetaTypes();
 
     qRegisterMetaType<Qt::KeyboardModifiers>();
@@ -182,8 +180,6 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QVector<QnUuid> >();
 
     registerQmlTypes();
-
-    qn_clientMetaTypes_initialized = true;
 }
 
 void QnClientMetaTypes::registerQmlTypes()

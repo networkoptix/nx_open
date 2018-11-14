@@ -5,6 +5,7 @@
 #include <common/common_module.h>
 #include <common/static_common_module.h>
 
+#include <client_core/client_core_meta_types.h>
 #include <client_core/client_core_settings.h>
 
 #include <nx/core/access/access_types.h>
@@ -31,6 +32,8 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
     base_type(parent)
 {
     m_commonModule = new QnCommonModule(true, nx::core::access::Mode::cached, this);
+
+    initializeMetaTypes();
 
     m_commonModule->store(new QnClientCoreSettings());
     m_commonModule->store(new SecureSettings());

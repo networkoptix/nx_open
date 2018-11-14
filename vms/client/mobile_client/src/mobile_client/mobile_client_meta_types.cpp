@@ -1,5 +1,7 @@
 #include "mobile_client_meta_types.h"
 
+#include <atomic>
+
 #include <QtQml/QtQml>
 #include <private/qqmlvaluetype_p.h>
 
@@ -41,6 +43,13 @@ using namespace nx::client::mobile;
 
 void QnMobileClientMetaTypes::initialize()
 {
+    static std::atomic_bool initialized = false;
+
+    if (initialized.load())
+        return;
+
+    initialized = true;
+
     nx::vms::client::core::initializeMetaTypes();
 
     registerMetaTypes();
