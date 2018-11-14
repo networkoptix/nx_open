@@ -1,8 +1,8 @@
 #include "email.h"
 
 #include <QtCore/QDebug>
-#include <QtCore/QRegExp>
-#include <QHash>
+#include <QtCore/QRegularExpression>
+#include <QtCore/QHash>
 #include <QtCore/QFile>
 #include <QtCore/QThread>
 
@@ -15,10 +15,11 @@ namespace {
 typedef QHash<QString, QnEmailSmtpServerPreset> QnSmtpPresets;
 
 /* Top-level domains can already be up to 30 symbols length for now, so do not limiting them. */
-const QLatin1String emailPattern("\\b[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,255}\\b");
+static const QString kEmailPattern =
+    R"(^[-!#$%&'*+/=?^_`{}|~0-9a-zA-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9a-zA-Z]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,30}\.?$)";
 
 /* RFC5233 (sub-addressing, also known as plus addressing or tagged addressing). */
-const QLatin1String fullNamePattern("(.*)<(.+)>");
+static const QString kFullNamePattern = "^(?<fullname>.*)<(?<email>.+)>$";
 
 const int tlsPort = 587;
 const int sslPort = 465;
@@ -26,7 +27,7 @@ const int unsecurePort = 25;
 
 const int defaultSmtpTimeout = 300; //seconds, 5 min
 
-}
+} // namespace
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((SmtpOperationResult), (json), _Fields)
 
@@ -102,25 +103,24 @@ bool QnEmailSettings::equals(const QnEmailSettings &other, bool compareView /* =
 QnEmailAddress::QnEmailAddress(const QString &email):
     m_email(email.trimmed())
 {
-    QRegExp rx(fullNamePattern);
-    if (rx.exactMatch(m_email))
-    {
-        auto parts = rx.capturedTexts();
-        NX_ASSERT(parts.size() == 3);
-        if (parts.size() == 3)
-        {
-            m_fullName = parts[1].trimmed();
-            m_email = parts[2].trimmed();
-        }
-    }
+    QRegularExpression re(kFullNamePattern);
+    NX_ASSERT(re.isValid());
 
+    const auto match = re.match(m_email);
+    if (match.hasMatch())
+    {
+        m_fullName = match.captured("fullname").trimmed();
+        m_email = match.captured("email").trimmed();
+    }
     m_email = m_email.toLower();
 }
 
 bool QnEmailAddress::isValid() const
 {
-    QRegExp rx(emailPattern);
-    return rx.exactMatch(m_email);
+    QRegularExpression re(kEmailPattern);
+    NX_ASSERT(re.isValid());
+    const auto match = re.match(m_email);
+    return match.hasMatch();
 }
 
 QString QnEmailAddress::user() const

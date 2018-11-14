@@ -1,3 +1,4 @@
+import collections
 import json
 import time
 import timeit
@@ -162,24 +163,7 @@ class _GenericMediaserverApi(HttpApi):
         return data
 
 
-class TimePeriod(object):
-    def __init__(self, start, duration):
-        assert isinstance(start, datetime), repr(start)
-        assert isinstance(duration, timedelta), repr(duration)
-        self.start = start
-        self.duration = duration
-
-    def __repr__(self):
-        return 'TimePeriod(%s, %s)' % (self.start, self.duration)
-
-    def __eq__(self, other):
-        try:
-            return other.start == self.start and other.duration == self.duration
-        except AttributeError:
-            return NotImplemented
-
-    def __ne__(self, other):
-        return not self == other
+TimePeriod = collections.namedtuple('TimePeriod', ['start', 'duration'])
 
 
 class _MediaserverCameraApi(object):

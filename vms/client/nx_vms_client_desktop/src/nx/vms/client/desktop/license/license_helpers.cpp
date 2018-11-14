@@ -4,17 +4,15 @@
 
 #include <QtCore/QThread>
 
-#include <nx/network/deprecated/asynchttpclient.h>
-#include <nx/fusion/serialization_format.h>
-#include <nx/utils/scope_guard.h>
-
-#include <rest/server/json_rest_result.h>
-#include <utils/common/delayed.h>
-#include <utils/common/connective.h>
-
 #include <licensing/license.h>
-
 #include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization_format.h>
+#include <nx/network/deprecated/asynchttpclient.h>
+#include <nx/utils/scope_guard.h>
+#include <rest/server/json_rest_result.h>
+#include <utils/common/connective.h>
+#include <utils/common/delayed.h>
+#include <utils/license_usage_helper.cpp>
 
 namespace detail {
 
@@ -74,9 +72,6 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::vms::client::desktop::license::D
 namespace {
 
 using namespace std::chrono_literals;
-
-static const auto kDeactivateLicenseUrl =
-    nx::utils::Url::fromUserInput(lit("http://licensing.networkoptix.com/nxlicensed/api/v1/deactivate/"));
 
 static constexpr std::chrono::milliseconds kRequestTimeout = 30s;
 
@@ -209,7 +204,8 @@ LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
     static const QByteArray kJsonContentType(
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat));
 
-    m_httpClient->doPost(kDeactivateLicenseUrl, kJsonContentType, QJson::serialized(request));
+    m_httpClient->doPost(
+        QnLicenseServer::kDiactivateUrl, kJsonContentType, QJson::serialized(request));
 }
 
 }

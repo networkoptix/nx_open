@@ -250,20 +250,12 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
         if (!allAnalyticsEvents.empty())
         {
             QHash<QString, PluginInfo> pluginsById;
-            for (const auto& entry: allAnalyticsPlugins)
-            {
-                const auto& pluginId = entry.first;
-                const auto& descriptor = entry.second;
-
+            for (const auto& [pluginId, descriptor]: allAnalyticsPlugins)
                 pluginsById[pluginId].name = descriptor.name;
-            }
 
             for (const auto& entry: allAnalyticsEvents)
             {
-                const auto& eventId = entry.first;
-                const auto& descriptor = entry.second;
-
-                for (const auto& path: descriptor.paths)
+                for (const auto& path: entry.second.paths)
                     pluginsById[path.pluginId].eventTypes.insert(entry);
             }
 
@@ -291,12 +283,12 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
 
                 for (const auto entry: plugin.eventTypes)
                 {
-                    const auto& eventType = entry.second;
+                    const auto& descriptor = entry.second;
                     addMenuAction(currentMenu,
-                        eventType.item.name.value,
-                        EventType::analyticsSdkEvent, eventType.getId());
+                        descriptor.item.name.value,
+                        EventType::analyticsSdkEvent, descriptor.getId());
 
-                    if (!currentSelectionStillAvailable && currentSelection == eventType.getId())
+                    if (!currentSelectionStillAvailable && currentSelection == descriptor.getId())
                         currentSelectionStillAvailable = true;
                 }
             }

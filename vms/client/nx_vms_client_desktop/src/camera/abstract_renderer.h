@@ -1,8 +1,11 @@
 #pragma once
 
-#include "utils/media/frame_info.h"
-#include "nx/utils/thread/stoppable.h"
+#include <chrono>
 
+#include <nx/utils/thread/stoppable.h>
+#include <nx/utils/thread/mutex.h>
+
+#include <utils/media/frame_info.h>
 
 class CLVideoDecoderOutput;
 
@@ -19,9 +22,9 @@ class QnAbstractRenderer: public QObject, public QnStoppable
     Q_OBJECT
 
 public:
-    QnAbstractRenderer(QObject* parent = 0): QObject(parent), m_useCount(0), m_needStop(false) {}
+    QnAbstractRenderer(QObject* parent = nullptr): QObject(parent) {}
 
-    virtual ~QnAbstractRenderer() {}
+    virtual ~QnAbstractRenderer() override {}
 
     /**
      * This function is supposed to be called from <i>decoding</i> thread.
@@ -66,7 +69,7 @@ public:
      * \param channel                   Channel number.
      * \returns                         Size of the given channel on rendering device.
      */
-    virtual QSize sizeOnScreen(unsigned int channel) const = 0;
+    virtual QSize sizeOnScreen(int channel) const = 0;
 
     /**
      * This function is supposed to be called from <i>decoding</t> thread.
@@ -90,8 +93,8 @@ public:
     virtual void onNoVideo() {}
 
     //!Returns timestamp of frame that will be rendered next. It can be already displayed frame (if no new frames available)
-    virtual qint64 getTimestampOfNextFrameToRender(int channelNumber) const = 0;
-    virtual void blockTimeValue(int channelNumber, qint64  timestamp) const = 0;
+    virtual std::chrono::microseconds getTimestampOfNextFrameToRender(int channelNumber) const = 0;
+    virtual void blockTimeValue(int channelNumber, std::chrono::microseconds timestamp) const = 0;
     virtual void unblockTimeValue(int channelNumber) const = 0;
     virtual bool isTimeBlocked(int channelNumber) const = 0;
     virtual bool isDisplaying(const QSharedPointer<CLVideoDecoderOutput>& image) const = 0;
@@ -128,7 +131,7 @@ signals:
     void canBeDestroyed();
 
 private:
-    int m_useCount;
-    bool m_needStop;
+    int m_useCount = 0;
+    bool m_needStop = false;
     QnMutex m_usingMutex;
 };

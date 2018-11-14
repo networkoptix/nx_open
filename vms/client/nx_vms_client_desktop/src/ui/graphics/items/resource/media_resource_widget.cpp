@@ -2662,7 +2662,7 @@ qint64 QnMediaResourceWidget::getUtcCurrentTimeUsec() const
         channel = 0;
 
     qint64 timestampUsec = hasVideo()
-        ? m_renderer->getTimestampOfNextFrameToRender(channel)
+        ? m_renderer->getTimestampOfNextFrameToRender(channel).count()
         : display()->camDisplay()->getCurrentTime();
 
     return timestampUsec;
