@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/cloud/cdb/api/cloud_nonce.h>
+#include <nx/cloud/db/api/cloud_nonce.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/time.h>

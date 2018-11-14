@@ -4,10 +4,10 @@
 #include <nx/utils/timer_manager.h>
 
 #include <nx/data_sync_engine/synchronization_engine.h>
-#include <nx/cloud/cdb/controller.h>
-#include <nx/cloud/cdb/managers/system_manager.h>
-#include <nx/cloud/cdb/stree/stree_manager.h>
-#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
+#include <nx/cloud/db/controller.h>
+#include <nx/cloud/db/managers/system_manager.h>
+#include <nx/cloud/db/stree/stree_manager.h>
+#include <nx/cloud/db/test_support/base_persistent_data_test.h>
 
 #include "account_manager_stub.h"
 #include "system_health_info_provider_stub.h"

@@ -16,13 +16,13 @@
 #include <nx/data_sync_engine/outgoing_transaction_dispatcher.h>
 #include <nx/data_sync_engine/transaction_log.h>
 
-#include <nx/cloud/cdb/controller.h>
-#include <nx/cloud/cdb/data/account_data.h>
-#include <nx/cloud/cdb/data/system_data.h>
-#include <nx/cloud/cdb/ec2/data_conversion.h>
-#include <nx/cloud/cdb/ec2/vms_command_descriptor.h>
-#include <nx/cloud/cdb/test_support/business_data_generator.h>
-#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
+#include <nx/cloud/db/controller.h>
+#include <nx/cloud/db/data/account_data.h>
+#include <nx/cloud/db/data/system_data.h>
+#include <nx/cloud/db/ec2/data_conversion.h>
+#include <nx/cloud/db/ec2/vms_command_descriptor.h>
+#include <nx/cloud/db/test_support/business_data_generator.h>
+#include <nx/cloud/db/test_support/base_persistent_data_test.h>
 
 #include "test_outgoing_transaction_dispatcher.h"
 

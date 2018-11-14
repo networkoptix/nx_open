@@ -6,7 +6,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/sync_call.h>
 
-#include <nx/cloud/cdb/api/connection.h>
+#include <nx/cloud/db/api/connection.h>
 #include <nx/vms/cloud_integration/cloud_connection_manager.h>
 #include <nx/vms/cloud_integration/cloud_manager_group.h>
 #include <nx/vms/cloud_integration/vms_cloud_connection_processor.h>

@@ -3,8 +3,8 @@
 #include <nx/network/http/http_client.h>
 #include <nx/network/url/url_builder.h>
 
-#include <nx/cloud/cdb/client/cdb_request_path.h>
-#include <nx/cloud/cdb/statistics/provider.h>
+#include <nx/cloud/db/client/cdb_request_path.h>
+#include <nx/cloud/db/statistics/provider.h>
 
 #include "functional_tests/test_setup.h"
 

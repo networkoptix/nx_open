@@ -3,7 +3,7 @@
 #include <memory>
 #include <QtCore/QObject>
 
-#include <nx/cloud/cdb/api/connection.h>
+#include <nx/cloud/db/api/connection.h>
 
 #include <nx/utils/singleton.h>
 

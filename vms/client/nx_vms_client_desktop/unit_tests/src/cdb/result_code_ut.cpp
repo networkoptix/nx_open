@@ -1,7 +1,7 @@
 #include <vector>
 #include <gtest/gtest.h>
 
-#include <nx/cloud/cdb/api/result_code.h>
+#include <nx/cloud/db/api/result_code.h>
 #include <cloud/cloud_result_info.h>
 
 using namespace nx::cloud::db::api;

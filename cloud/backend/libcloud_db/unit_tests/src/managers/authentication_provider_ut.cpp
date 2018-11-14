@@ -11,15 +11,15 @@
 #include <nx/utils/test_support/settings_loader.h>
 
 #include <nx/data_sync_engine/synchronization_engine.h>
-#include <nx/cloud/cdb/api/cloud_nonce.h>
-#include <nx/cloud/cdb/client/data/auth_data.h>
-#include <nx/cloud/cdb/dao/user_authentication_data_object_factory.h>
-#include <nx/cloud/cdb/dao/memory/dao_memory_user_authentication.h>
-#include <nx/cloud/cdb/managers/authentication_provider.h>
-#include <nx/cloud/cdb/settings.h>
-#include <nx/cloud/cdb/stree/cdb_ns.h>
-#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
-#include <nx/cloud/cdb/test_support/business_data_generator.h>
+#include <nx/cloud/db/api/cloud_nonce.h>
+#include <nx/cloud/db/client/data/auth_data.h>
+#include <nx/cloud/db/dao/user_authentication_data_object_factory.h>
+#include <nx/cloud/db/dao/memory/dao_memory_user_authentication.h>
+#include <nx/cloud/db/managers/authentication_provider.h>
+#include <nx/cloud/db/settings.h>
+#include <nx/cloud/db/stree/cdb_ns.h>
+#include <nx/cloud/db/test_support/base_persistent_data_test.h>
+#include <nx/cloud/db/test_support/business_data_generator.h>
 
 #include "account_manager_stub.h"
 #include "system_sharing_manager_stub.h"

@@ -6,7 +6,7 @@
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/cloud/cdb/managers/vms_gateway.h>
+#include <nx/cloud/db/managers/vms_gateway.h>
 
 namespace nx::cloud::db {
 namespace test {

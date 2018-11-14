@@ -2,7 +2,7 @@
 
 #include <list>
 
-#include <nx/cloud/cdb/api/cdb_client.h>
+#include <nx/cloud/db/api/cdb_client.h>
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>

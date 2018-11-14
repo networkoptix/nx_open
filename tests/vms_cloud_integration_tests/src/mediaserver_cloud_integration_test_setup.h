@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/cloud/cdb/test_support/cdb_launcher.h>
+#include <nx/cloud/db/test_support/cdb_launcher.h>
 
 #include <common/static_common_module.h>
 #include <api/mediaserver_client.h>

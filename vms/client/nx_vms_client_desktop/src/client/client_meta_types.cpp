@@ -36,8 +36,8 @@
 #include <nx/vms/client/desktop/utils/wearable_payload.h>
 #include <nx/vms/client/desktop/utils/wearable_state.h>
 
-#include <nx/cloud/cdb/api/result_code.h>
-#include <nx/cloud/cdb/api/system_data.h>
+#include <nx/cloud/db/api/result_code.h>
+#include <nx/cloud/db/api/system_data.h>
 #include <api/server_rest_connection.h>
 
 #include <nx/vms/client/desktop/resource_properties/camera/widgets/motion_regions_item.h>

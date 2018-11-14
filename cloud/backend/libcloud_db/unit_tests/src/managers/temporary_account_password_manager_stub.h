@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include <nx/cloud/cdb/managers/temporary_account_password_manager.h>
+#include <nx/cloud/db/managers/temporary_account_password_manager.h>
 
 namespace nx::cloud::db {
 namespace test {

@@ -6,8 +6,8 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/log/log.h>
 
-#include <nx/cloud/cdb/api/auth_provider.h>
-#include <nx/cloud/cdb/client/data/auth_data.h>
+#include <nx/cloud/db/api/auth_provider.h>
+#include <nx/cloud/db/client/data/auth_data.h>
 
 #include <common/common_module.h>
 #include <core/resource/user_resource.h>

@@ -4,7 +4,7 @@
 
 #include <nx/utils/move_only_func.h>
 
-#include <nx/cloud/cdb/managers/email_manager.h>
+#include <nx/cloud/db/managers/email_manager.h>
 
 class TestEmailManager:
     public nx::cloud::db::AbstractEmailManager

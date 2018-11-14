@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/cloud/cdb/api/connection.h>
-#include <nx/cloud/cdb/test_support/business_data_generator.h>
+#include <nx/cloud/db/api/connection.h>
+#include <nx/cloud/db/test_support/business_data_generator.h>
 #include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/url/url_builder.h>

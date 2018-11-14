@@ -7,8 +7,8 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/app_info.h>
 
-#include <nx/cloud/cdb/client/data/account_data.h>
-#include <nx/cloud/cdb/client/data/types.h>
+#include <nx/cloud/db/client/data/account_data.h>
+#include <nx/cloud/db/client/data/types.h>
 
 #include "test_setup.h"
 

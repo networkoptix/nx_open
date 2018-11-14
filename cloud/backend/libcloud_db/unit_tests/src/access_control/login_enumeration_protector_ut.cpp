@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/cloud/cdb/access_control/login_enumeration_protector.h>
+#include <nx/cloud/db/access_control/login_enumeration_protector.h>
 #include <nx/utils/time.h>
 
 namespace nx::cloud::db::test {

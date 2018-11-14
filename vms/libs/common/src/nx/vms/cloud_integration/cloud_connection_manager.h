@@ -3,7 +3,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
-#include <nx/cloud/cdb/api/connection.h>
+#include <nx/cloud/db/api/connection.h>
 #include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>
 #include <nx/network/retry_timer.h>
 #include <nx/utils/thread/mutex.h>

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <nx/cloud/cdb/data/access_rules.h>
-#include <nx/cloud/cdb/stree/cdb_ns.h>
+#include <nx/cloud/db/data/access_rules.h>
+#include <nx/cloud/db/stree/cdb_ns.h>
 
 namespace nx::cloud::db {
 namespace data {

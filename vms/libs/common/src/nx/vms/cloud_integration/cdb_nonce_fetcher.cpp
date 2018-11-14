@@ -6,7 +6,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/sync_call.h>
 
-#include <nx/cloud/cdb/api/cloud_nonce.h>
+#include <nx/cloud/db/api/cloud_nonce.h>
 
 #include "cloud_connection_manager.h"
 

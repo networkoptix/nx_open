@@ -1,6 +1,6 @@
 #include "detach_from_system_rest_handler.h"
 
-#include <nx/cloud/cdb/api/connection.h>
+#include <nx/cloud/db/api/connection.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/log/log.h>
 

@@ -21,9 +21,9 @@
 #include <nx/utils/std/optional.h>
 #include <nx/utils/sync_call.h>
 
-#include <nx/cloud/cdb/api/cloud_nonce.h>
-#include <nx/cloud/cdb/data/account_data.h>
-#include <nx/cloud/cdb/test_support/business_data_generator.h>
+#include <nx/cloud/db/api/cloud_nonce.h>
+#include <nx/cloud/db/data/account_data.h>
+#include <nx/cloud/db/test_support/business_data_generator.h>
 
 #include "email_manager_mocked.h"
 #include "test_setup.h"

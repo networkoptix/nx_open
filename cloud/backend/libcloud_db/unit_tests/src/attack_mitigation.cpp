@@ -1,4 +1,4 @@
-#include <nx/cloud/cdb/test_support/business_data_generator.h>
+#include <nx/cloud/db/test_support/business_data_generator.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/time.h>

@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include <nx/cloud/cdb/test_support/cdb_launcher.h>
+#include <nx/cloud/db/test_support/cdb_launcher.h>
 
 #include <nx/network/http/test_http_server.h>
 

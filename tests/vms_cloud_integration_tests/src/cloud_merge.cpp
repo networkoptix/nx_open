@@ -5,8 +5,8 @@
 #include <test_support/peer_wrapper.h>
 #include <test_support/merge_test_fixture.h>
 
-#include <nx/cloud/cdb/ec2/data_conversion.h>
-#include <nx/cloud/cdb/test_support/cdb_launcher.h>
+#include <nx/cloud/db/ec2/data_conversion.h>
+#include <nx/cloud/db/test_support/cdb_launcher.h>
 #include <nx/network/app_info.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>

@@ -3,8 +3,8 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/cloud/cdb/client/data/auth_data.h>
-#include <nx/cloud/cdb/test_support/business_data_generator.h>
+#include <nx/cloud/db/client/data/auth_data.h>
+#include <nx/cloud/db/test_support/business_data_generator.h>
 #include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/string.h>

@@ -6,7 +6,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
 
-#include <nx/cloud/cdb/api/connection.h>
+#include <nx/cloud/db/api/connection.h>
 
 namespace nx {
 namespace hpm {

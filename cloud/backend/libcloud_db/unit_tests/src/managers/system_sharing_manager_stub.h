@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/cloud/cdb/managers/system_sharing_manager.h>
+#include <nx/cloud/db/managers/system_sharing_manager.h>
 #include <nx/utils/thread/mutex.h>
 
 namespace nx::cloud::db {

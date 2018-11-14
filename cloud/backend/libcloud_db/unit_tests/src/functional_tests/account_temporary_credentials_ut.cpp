@@ -17,8 +17,8 @@
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/sync_call.h>
 
-#include <nx/cloud/cdb/api/cloud_nonce.h>
-#include <nx/cloud/cdb/data/account_data.h>
+#include <nx/cloud/db/api/cloud_nonce.h>
+#include <nx/cloud/db/data/account_data.h>
 
 #include "email_manager_mocked.h"
 #include "test_setup.h"

@@ -19,7 +19,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/system_error.h>
 
-#include <nx/cloud/cdb/api/ec2_request_paths.h>
+#include <nx/cloud/db/api/ec2_request_paths.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx_ec/ec_proto_version.h>
 

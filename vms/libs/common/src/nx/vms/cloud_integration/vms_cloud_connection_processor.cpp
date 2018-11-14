@@ -11,7 +11,7 @@
 #include <core/resource/user_resource.h>
 #include <rest/server/json_rest_result.h>
 
-#include <nx/cloud/cdb/api/connection.h>
+#include <nx/cloud/db/api/connection.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/sync_call.h>
 #include <nx/vms/api/data/cloud_system_data.h>

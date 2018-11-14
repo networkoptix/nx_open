@@ -15,7 +15,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/safe_direct_connection.h>
 
-#include <nx/cloud/cdb/api/connection.h>
+#include <nx/cloud/db/api/connection.h>
 #include <nx/vms/auth/abstract_nonce_provider.h>
 
 #include "cloud_user_info_pool.h"

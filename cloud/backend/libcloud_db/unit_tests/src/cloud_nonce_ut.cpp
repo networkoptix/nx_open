@@ -1,7 +1,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/cloud/cdb/api/cloud_nonce.h>
+#include <nx/cloud/db/api/cloud_nonce.h>
 
 namespace nx::cloud::db {
 

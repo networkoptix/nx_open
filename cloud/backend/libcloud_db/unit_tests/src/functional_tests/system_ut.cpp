@@ -11,8 +11,8 @@
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/cloud/cdb/dao/rdb/system_data_object.h>
-#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
+#include <nx/cloud/db/dao/rdb/system_data_object.h>
+#include <nx/cloud/db/test_support/base_persistent_data_test.h>
 
 #include "test_setup.h"
 

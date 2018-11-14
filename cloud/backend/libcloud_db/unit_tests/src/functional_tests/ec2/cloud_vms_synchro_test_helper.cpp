@@ -6,7 +6,7 @@
 #include <transaction/abstract_transaction_transport.h>
 #include <utils/common/app_info.h>
 
-#include <nx/cloud/cdb/client/cdb_request_path.h>
+#include <nx/cloud/db/client/cdb_request_path.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>

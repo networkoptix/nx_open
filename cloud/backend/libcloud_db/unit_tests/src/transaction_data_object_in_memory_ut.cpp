@@ -6,10 +6,10 @@
 #include <nx/vms/api/data/user_data.h>
 
 #include <nx/data_sync_engine/dao/memory/transaction_data_object_in_memory.h>
-#include <nx/cloud/cdb/controller.h>
-#include <nx/cloud/cdb/ec2/data_conversion.h>
-#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
-#include <nx/cloud/cdb/test_support/business_data_generator.h>
+#include <nx/cloud/db/controller.h>
+#include <nx/cloud/db/ec2/data_conversion.h>
+#include <nx/cloud/db/test_support/base_persistent_data_test.h>
+#include <nx/cloud/db/test_support/business_data_generator.h>
 
 #include <transaction/transaction_descriptor.h>
 

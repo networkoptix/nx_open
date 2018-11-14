@@ -9,10 +9,10 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/cloud/cdb/managers/vms_gateway.h>
-#include <nx/cloud/cdb/settings.h>
-#include <nx/cloud/cdb/test_support/business_data_generator.h>
-#include <nx/cloud/cdb/api/cloud_nonce.h>
+#include <nx/cloud/db/managers/vms_gateway.h>
+#include <nx/cloud/db/settings.h>
+#include <nx/cloud/db/test_support/business_data_generator.h>
+#include <nx/cloud/db/api/cloud_nonce.h>
 
 #include <api/auth_util.h>
 

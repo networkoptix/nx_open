@@ -5,7 +5,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/cloud/cdb/client/cdb_request_path.h>
+#include <nx/cloud/db/client/cdb_request_path.h>
 
 #include "test_setup.h"
 

@@ -7,13 +7,13 @@
 #include <nx/utils/time.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/cloud/cdb/dao/account_data_object.h>
-#include <nx/cloud/cdb/dao/memory/dao_memory_account_data_object.h>
-#include <nx/cloud/cdb/managers/account_manager.h>
-#include <nx/cloud/cdb/managers/temporary_account_password_manager.h>
-#include <nx/cloud/cdb/stree/stree_manager.h>
-#include <nx/cloud/cdb/test_support/business_data_generator.h>
-#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
+#include <nx/cloud/db/dao/account_data_object.h>
+#include <nx/cloud/db/dao/memory/dao_memory_account_data_object.h>
+#include <nx/cloud/db/managers/account_manager.h>
+#include <nx/cloud/db/managers/temporary_account_password_manager.h>
+#include <nx/cloud/db/stree/stree_manager.h>
+#include <nx/cloud/db/test_support/business_data_generator.h>
+#include <nx/cloud/db/test_support/base_persistent_data_test.h>
 
 #include "temporary_account_password_manager_stub.h"
 #include "../functional_tests/test_email_manager.h"

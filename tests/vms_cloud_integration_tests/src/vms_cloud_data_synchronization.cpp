@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/cloud/cdb/ec2/data_conversion.h>
+#include <nx/cloud/db/ec2/data_conversion.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 
 #include "cloud_system_fixture.h"
