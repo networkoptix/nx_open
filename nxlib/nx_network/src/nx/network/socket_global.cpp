@@ -2,6 +2,8 @@
 
 #include <map>
 
+#include <udt/udt.h>
+
 #include <nx/utils/std/cpp14.h>
 
 #include "aio/aio_service.h"
@@ -71,6 +73,20 @@ public:
 };
 #endif
 
+class UdtInitializer
+{
+public:
+    UdtInitializer()
+    {
+        UDT::startup();
+    }
+
+    ~UdtInitializer()
+    {
+        UDT::cleanup();
+    }
+};
+
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
@@ -89,6 +105,7 @@ struct SocketGlobalsImpl
 #if defined(_WIN32)
     Win32SocketInitializer win32SocketInitializer;
 #endif
+    std::unique_ptr<UdtInitializer> udtInitializer;
 
     aio::PollSetFactory pollSetFactory;
     AioServiceGuard aioServiceGuard;
@@ -98,7 +115,6 @@ struct SocketGlobalsImpl
     std::unique_ptr<cloud::CloudConnectController> cloudConnectController;
 
     QnMutex mutex;
-    std::map<SocketGlobals::CustomInit, SocketGlobals::CustomDeinit> customInits;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -128,12 +144,6 @@ SocketGlobals::~SocketGlobals()
 
     m_impl->debugIniReloadTimer->pleaseStopSync();
     m_impl->addressResolver->pleaseStopSync();
-
-    for (const auto& init: m_impl->customInits)
-    {
-        if (init.second)
-            init.second();
-    }
 }
 
 const Ini& SocketGlobals::ini()
@@ -233,11 +243,9 @@ void SocketGlobals::applyArguments(const utils::ArgumentParser& arguments)
     cloud().applyArguments(arguments);
 }
 
-void SocketGlobals::customInit(CustomInit init, CustomDeinit deinit)
+bool SocketGlobals::isUdtEnabled() const
 {
-    QnMutexLocker lock(&s_instance->m_impl->mutex);
-    if (s_instance->m_impl->customInits.emplace(init, deinit).second)
-        init();
+    return (m_impl->initializationFlags & InitializationFlags::disableUdt) == 0;
 }
 
 void SocketGlobals::blockHost(const std::string& regexpString)
@@ -303,6 +311,9 @@ void SocketGlobals::setDebugIniReloadTimer()
 
 void SocketGlobals::initializeNetworking()
 {
+    if (isUdtEnabled())
+        m_impl->udtInitializer = std::make_unique<UdtInitializer>();
+
     m_impl->aioServiceGuard.initialize();
 
 #ifdef ENABLE_SSL
