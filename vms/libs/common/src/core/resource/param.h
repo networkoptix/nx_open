@@ -131,4 +131,6 @@ namespace Qn
     static const QString USER_FULL_NAME = lit("fullUserName");
 
     static const QString kResourceDataParamName = "resource_data.json";
+    static const QString kReloadAllAdvancedParameters(
+        "needToReloadAllAdvancedParametersAfterApply");
 }

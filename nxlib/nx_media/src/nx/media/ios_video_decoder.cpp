@@ -12,6 +12,7 @@ extern "C" {
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/media/ffmpeg_initializer.h>
 #include <utils/media/nalUnits.h>
+#include <utils/media/utils.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "aligned_mem_video_buffer.h"
@@ -243,9 +244,7 @@ void IOSVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& fr
     QSize frameSize = QSize(codecContext->width, codecContext->height);
     if (!isValidFrameSize(frameSize))
     {
-        frameSize = QSize(frame->width, frame->height);
-        if (!isValidFrameSize(frameSize))
-            frameSize = nx::media::AbstractVideoDecoder::mediaSizeFromRawData(frame);
+        frameSize = getFrameSize(frame);
         codecContext->width = frameSize.width();
         codecContext->height = frameSize.height();
     }

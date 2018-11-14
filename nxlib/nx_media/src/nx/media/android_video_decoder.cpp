@@ -17,6 +17,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <utils/media/h264_utils.h>
+#include <utils/media/utils.h>
 #include <nx/utils/log/log.h>
 
 #include <QAndroidJniObject>
@@ -53,13 +54,6 @@ static const GLfloat g_texture_data[] = {
     1.f, 1.f,
     0.f, 1.f
 };
-
-bool isValidFrameSize(const QSize& size)
-{
-    static const auto kMinimumFrameSize = QSize(64, 64);
-    return size.width() >= kMinimumFrameSize.width()
-        && size.height() >= kMinimumFrameSize.height();
-}
 
 /**
  * Convert codec from ffmpeg enum to Android codec string representation.
@@ -510,9 +504,7 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
         if (!frame)
             return 0;
 
-        d->frameSize = QSize(frame->width, frame->height);
-        if (!isValidFrameSize(d->frameSize))
-            d->frameSize = nx::media::AbstractVideoDecoder::mediaSizeFromRawData(frame);
+        d->frameSize = getFrameSize(frame);
         if (d->frameSize.isEmpty())
             return 0; //< Wait for I frame to be able to extract data from the binary stream.
 

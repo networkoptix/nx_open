@@ -4,9 +4,6 @@ namespace nx {
 namespace media_utils {
 namespace hevc {
 
-const uint8_t kNalUnitPrefix[] = {0x00, 0x00, 0x00, 0x01};
-const uint8_t kShortNalUnitPrefix[] = {0x00, 0x00, 0x01};
-
 enum class NalUnitType
 {
     trailN = 0, trailR, // Trailing pictures

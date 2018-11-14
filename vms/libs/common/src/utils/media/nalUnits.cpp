@@ -242,6 +242,25 @@ QByteArray NALUnit::decodeNAL( const QByteArray& srcBuf )
     return decodedStreamBuf;
 }
 
+QByteArray NALUnit::dropBorderedStartCodes(const QByteArray& sourceNal)
+{
+    QByteArray startCode((char*)kStartCode, sizeof(kStartCode));
+    QByteArray startCodeLong((char*)kStartCodeLong, sizeof(kStartCodeLong));
+
+    QByteArray resutltNal = sourceNal;
+    if (resutltNal.endsWith(startCodeLong))
+        resutltNal.chop(startCodeLong.size());
+    else if (resutltNal.endsWith(startCode))
+        resutltNal.chop(startCode.size());
+
+    if (resutltNal.startsWith(startCodeLong))
+        resutltNal.remove(0, startCodeLong.size());
+    else if (resutltNal.startsWith(startCode))
+        resutltNal.remove(0, startCode.size());
+
+    return resutltNal;
+}
+
 int NALUnit::extractUEGolombCode()
 {
     uint cnt = 0;
@@ -792,14 +811,6 @@ void SPSUnit::insertHdrParameters()
     delete [] m_nalBuffer;
     m_nalBuffer = newNalBuffer;
     m_nalBufferLen =  writer.getBitsCount()/8 + beforeBytes;
-}
-
-int SPSUnit::getMaxBitrate()
-{
-    int result = 0;
-    for (int i = 0; i <= cpb_cnt_minus1; ++i)
-        result = std::max(result, (cpb[i].bit_rate_value_minus1 + 1) << (6 + bit_rate_scale));
-    return result;
 }
 
 void SPSUnit::hrd_parameters()

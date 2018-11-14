@@ -19,7 +19,7 @@ TEST(Sdp, parsing)
     Sdp sdp;
     sdp.parse(sdpString);
     ASSERT_EQ(sdp.media.size(), 2);
-    ASSERT_EQ(sdp.media[0].format, 96);
+    ASSERT_EQ(sdp.media[0].payloadType, 96);
     ASSERT_EQ(sdp.media[0].mediaType, Sdp::MediaType::Video);
     ASSERT_EQ(sdp.media[0].control, "trackID=0");
     ASSERT_EQ(sdp.media[0].sendOnly, false);
@@ -27,7 +27,7 @@ TEST(Sdp, parsing)
     ASSERT_EQ(sdp.media[0].rtpmap.clockRate, 90000);
     ASSERT_EQ(sdp.media[0].rtpmap.channels, 0);
 
-    ASSERT_EQ(sdp.media[1].format, 14);
+    ASSERT_EQ(sdp.media[1].payloadType, 14);
     ASSERT_EQ(sdp.media[1].mediaType, Sdp::MediaType::Audio);
     ASSERT_EQ(sdp.media[1].control, "trackID=1");
     ASSERT_EQ(sdp.media[1].sendOnly, false);
@@ -59,21 +59,19 @@ TEST(Sdp, parsing)
         "a=rtpmap:98 vnd.onvif.metadata/90000\r\n";
     sdp.parse(sdpString1);
     ASSERT_EQ(sdp.media.size(), 2);
-    ASSERT_EQ(sdp.media[0].format, 96);
+    ASSERT_EQ(sdp.media[0].payloadType, 96);
     ASSERT_EQ(sdp.media[0].mediaType, Sdp::MediaType::Video);
     ASSERT_EQ(sdp.media[0].control, "track1");
     ASSERT_EQ(sdp.media[0].sendOnly, false);
-    ASSERT_EQ(sdp.media[0].rtpmap.format, 96);
     ASSERT_EQ(sdp.media[0].rtpmap.codecName, "H264");
     ASSERT_EQ(sdp.media[0].rtpmap.clockRate, 90000);
     ASSERT_EQ(sdp.media[0].rtpmap.channels, 0);
-    ASSERT_EQ(sdp.media[0].fmtp.format, 96);
     ASSERT_EQ(sdp.media[0].fmtp.params.size(), 3);
     ASSERT_EQ(sdp.media[0].fmtp.params[0], "packetization-mode=1");
     ASSERT_EQ(sdp.media[0].fmtp.params[1], "profile-level-id=640028");
     ASSERT_EQ(sdp.media[0].fmtp.params[2], "sprop-parameter-sets=Z2QAKK2EBUViuKxUdCAqKxXFYqOhAVFYrisVHQgKisVxWKjoQFRWK4rFR0ICorFcVio6ECSFITk8nyfk/k/J8nm5s00IEkKQnJ5Pk/J/J+T5PNzZprQFAW0qQAAAAwCAAAAPGBAAD0JAAAiVQve+F4RCNQAAAAE=,aO48sA==");
 
-    ASSERT_EQ(sdp.media[1].format, 98);
+    ASSERT_EQ(sdp.media[1].payloadType, 98);
     ASSERT_EQ(sdp.media[1].mediaType, Sdp::MediaType::Unknown);
     ASSERT_EQ(sdp.media[1].control, "track2");
     ASSERT_EQ(sdp.media[1].sendOnly, true);
@@ -105,21 +103,19 @@ TEST(Sdp, parsing)
         "a=control:track2\r\n";
     sdp.parse(sdpString2);
     ASSERT_EQ(sdp.media.size(), 2);
-    ASSERT_EQ(sdp.media[0].format, 96);
+    ASSERT_EQ(sdp.media[0].payloadType, 96);
     ASSERT_EQ(sdp.media[0].mediaType, Sdp::MediaType::Video);
     ASSERT_EQ(sdp.media[0].control, "track1");
     ASSERT_EQ(sdp.media[0].sendOnly, false);
-    ASSERT_EQ(sdp.media[0].rtpmap.format, 96);
     ASSERT_EQ(sdp.media[0].rtpmap.codecName, "H264");
     ASSERT_EQ(sdp.media[0].rtpmap.clockRate, 90000);
     ASSERT_EQ(sdp.media[0].rtpmap.channels, 0);
-    ASSERT_EQ(sdp.media[0].fmtp.format, 96);
     ASSERT_EQ(sdp.media[0].fmtp.params.size(), 3);
     ASSERT_EQ(sdp.media[0].fmtp.params[0], "packetization-mode=1");
     ASSERT_EQ(sdp.media[0].fmtp.params[1], "profile-level-id=4D401E");
     ASSERT_EQ(sdp.media[0].fmtp.params[2], "sprop-parameter-sets=Z01AHppkBQF/y/+AEAANtwEBAUAAAPoAAA2sOhgdgB167y40MDsAOvXeXCg=,aO48gA==");
 
-    ASSERT_EQ(sdp.media[1].format, 97);
+    ASSERT_EQ(sdp.media[1].payloadType, 97);
     ASSERT_EQ(sdp.media[1].mediaType, Sdp::MediaType::Audio);
     ASSERT_EQ(sdp.media[1].control, "track2");
     ASSERT_EQ(sdp.media[1].sendOnly, false);

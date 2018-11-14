@@ -14,16 +14,6 @@ VideoStreamParser::VideoStreamParser()
     m_chunks.reserve(kDefaultChunkContainerSize);
 }
 
-int StreamParser::logicalChannelNum() const
-{
-    return m_logicalChannelNum;
-}
-
-void StreamParser::setLogicalChannelNum(int value)
-{
-    m_logicalChannelNum = value;
-}
-
 void AudioStreamParser::processIntParam(
     const QString& checkName,
     int& setValue,

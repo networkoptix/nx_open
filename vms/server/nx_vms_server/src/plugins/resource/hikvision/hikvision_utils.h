@@ -28,6 +28,8 @@ const QString kSubStatusCodeOk = lit("ok");
 static const QString kVideoElementTag = lit("Video");
 static const QString kTransportElementTag = lit("Transport");
 static const QString kChannelRootElementTag = lit("StreamingChannel");
+static const QString kAdminAccessElementTag = lit("AdminAccessProtocolList");
+static const QString kAdminAccessProtocolElementTag = lit("AdminAccessProtocol");
 static const QString kOptionsAttribute = lit("opt");
 
 static const QString kVideoCodecTypeTag = lit("videoCodecType");
@@ -118,6 +120,14 @@ struct CommonResponse final
     QString subStatusCode;
 };
 
+struct AdminAccess final
+{
+    boost::optional<int> httpPort;
+    boost::optional<int> httpsPort;
+    boost::optional<int> rtspPort;
+    boost::optional<int> deviceManagementPort;
+};
+
 QnAudioFormat toAudioFormat(const QString& codecName, int sampleRateHz);
 
 std::vector<ChannelStatusResponse> parseAvailableChannelsResponse(
@@ -146,6 +156,8 @@ bool makeResolutionList(
     const std::vector<int>& widths,
     const std::vector<int>& heights,
     std::vector<QSize>* outResolutions);
+
+bool parseAdminAccessResponse(const nx::Buffer& response, AdminAccess* outAdminAccess);
 
 bool parseChannelPropertiesResponse(
     nx::Buffer& response,

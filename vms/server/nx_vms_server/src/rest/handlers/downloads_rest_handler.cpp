@@ -275,10 +275,29 @@ int Helper::handleAddUpload(const QString& fileName)
     }
 
     fileInfo.status = FileInformation::Status::uploading;
+    auto errorCode = addFile(fileInfo);
 
-    const auto errorCode = addFile(fileInfo);
-    if (errorCode != ResultCode::ok)
-        return makeDownloaderError(errorCode);
+    switch (errorCode)
+    {
+        case ResultCode::fileAlreadyExists:
+        {
+            const auto info = downloader->fileInformation(fileInfo.name);
+            NX_ASSERT(info.isValid());
+            if (info.status != FileInformation::Status::downloaded)
+            {
+                downloader->deleteFile(fileInfo.name);
+                errorCode = addFile(fileInfo);
+                if (errorCode != ResultCode::ok)
+                    return makeDownloaderError(errorCode);
+                break;
+            }
+            return makeDownloaderError(errorCode);
+        }
+        case ResultCode::ok:
+            break;
+        default:
+            return makeDownloaderError(errorCode);
+    }
 
     QnJsonRestResult restResult;
     restResult.setReply(errorCode);

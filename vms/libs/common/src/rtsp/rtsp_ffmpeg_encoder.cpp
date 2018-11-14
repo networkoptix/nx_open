@@ -4,7 +4,6 @@
 
 #include <nx/streaming/video_data_packet.h>
 #include <nx/streaming/av_codec_media_context.h>
-#include <nx/streaming/rtsp_client.h>
 #include <utils/common/util.h>
 #include <nx/network/socket.h>
 #include <nx/streaming/rtp/rtp.h>

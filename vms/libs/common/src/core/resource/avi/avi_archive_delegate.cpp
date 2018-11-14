@@ -107,21 +107,19 @@ public:
         {
             AVStream *strm= formatContext->streams[i];
 
-            AVCodecContext *codecContext = strm->codec;
-
-            if(codecContext->codec_type >= AVMEDIA_TYPE_NB)
+            if(strm->codecpar->codec_type >= AVMEDIA_TYPE_NB)
                 continue;
 
             if (strm->id && strm->id == lastStreamID)
                 continue; // duplicate
             lastStreamID = strm->id;
 
-            if (codecContext->codec_type == AVMEDIA_TYPE_AUDIO)
+            if (strm->codecpar->codec_type == AVMEDIA_TYPE_AUDIO)
             {
                 if (audioNum++ < index)
                     continue;
                 //result.codec = codecContext->codec_id;
-                result.codecContext = QnConstMediaContextPtr(new QnAvCodecMediaContext(codecContext));
+                result.codecContext = QnConstMediaContextPtr(new QnAvCodecMediaContext(strm->codec));
                 result.description = QString::number(++audioNumber);
                 result.description += QLatin1String(". ");
 
@@ -212,7 +210,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
             return QnAbstractMediaDataPtr();
 
         stream= m_formatContext->streams[packet.stream_index];
-        if (stream->codec->codec_id == AV_CODEC_ID_H264 && packet.size == 6)
+        if (stream->codecpar->codec_id == AV_CODEC_ID_H264 && packet.size == 6)
         {
             // may be H264 delimiter as separate packet. remove it
             if (packet.data[0] == 0x00 && packet.data[1] == 0x00 && packet.data[2] == 0x00 && packet.data[3] == 0x01 && packet.data[4] == nuDelimiter)
@@ -222,7 +220,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
         if (m_indexToChannel.isEmpty())
             initLayoutStreams();
 
-        switch(stream->codec->codec_type)
+        switch(stream->codecpar->codec_type)
         {
             case AVMEDIA_TYPE_VIDEO:
             {
@@ -239,7 +237,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 
             case AVMEDIA_TYPE_AUDIO:
             {
-                if (packet.stream_index != m_audioStreamIndex || stream->codec->channels < 1 /*|| m_indexToChannel[packet.stream_index] == -1*/)
+                if (packet.stream_index != m_audioStreamIndex || stream->codecpar->channels < 1 /*|| m_indexToChannel[packet.stream_index] == -1*/)
                     continue;
 
                 qint64 timestamp = packetTimestamp(packet);
@@ -265,7 +263,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
         break;
     }
 
-    data->compressionType = stream->codec->codec_id;
+    data->compressionType = stream->codecpar->codec_id;
     data->flags = static_cast<QnAbstractMediaData::MediaFlags>(packet.flags);
 
     /**
@@ -374,15 +372,15 @@ void QnAviArchiveDelegate::fixG726Bug()
     for (unsigned int i = 0; i < m_formatContext->nb_streams; i++)
     {
         const AVStream* stream = m_formatContext->streams[i];
-        if (stream->codec && stream->codec->codec_id == AV_CODEC_ID_ADPCM_G726
-            && stream->codec->bits_per_coded_sample == 16)
+        if (stream->codecpar && stream->codecpar->codec_id == AV_CODEC_ID_ADPCM_G726
+            && stream->codecpar->bits_per_coded_sample == 16)
         {
             // Workaround for ffmpeg bug. It loses 'bits_per_coded_sample' field when saves G726 to the MKV.
             // Valid range for this field is [2..5]. Try to restore value from field 'block_align' if possible.
             // Otherwise use default value 4. Value 2 can't be restored.
             // https://ffmpeg.org/pipermail/ffmpeg-devel/2014-January/153139.html
-            stream->codec->bits_per_coded_sample =
-                stream->codec->block_align > 1 ? stream->codec->block_align : 4;
+            stream->codecpar->bits_per_coded_sample =
+                stream->codecpar->block_align > 1 ? stream->codecpar->block_align : 4;
         }
     }
 }
@@ -609,16 +607,14 @@ void QnAviArchiveDelegate::initLayoutStreams()
     for(unsigned i = 0; i < m_formatContext->nb_streams; i++)
     {
         AVStream *strm= m_formatContext->streams[i];
-        AVCodecContext *codecContext = strm->codec;
-
-        if(codecContext->codec_type >= AVMEDIA_TYPE_NB)
+        if(strm->codecpar->codec_type >= AVMEDIA_TYPE_NB)
             continue;
 
         if (strm->id && strm->id == lastStreamID)
             continue; // duplicate
         lastStreamID = strm->id;
 
-        switch(codecContext->codec_type)
+        switch(strm->codecpar->codec_type)
         {
         case AVMEDIA_TYPE_VIDEO:
             if (m_firstVideoIndex == -1)
@@ -640,16 +636,14 @@ void QnAviArchiveDelegate::initLayoutStreams()
     for(unsigned i = 0; i < m_formatContext->nb_streams; i++)
     {
         AVStream *strm= m_formatContext->streams[i];
-        AVCodecContext *codecContext = strm->codec;
-
-        if(codecContext->codec_type >= AVMEDIA_TYPE_NB)
+        if(strm->codecpar->codec_type >= AVMEDIA_TYPE_NB)
             continue;
 
         if (strm->id && strm->id == lastStreamID)
             continue; // duplicate
         lastStreamID = strm->id;
 
-        switch(codecContext->codec_type)
+        switch(strm->codecpar->codec_type)
         {
         case AVMEDIA_TYPE_AUDIO:
             while ((uint)m_indexToChannel.size() <= i)

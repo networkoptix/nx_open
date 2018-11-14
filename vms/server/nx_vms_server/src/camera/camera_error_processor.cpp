@@ -88,7 +88,7 @@ void ErrorProcessor::processStreamError(
             const auto nowUs = qnSyncTime->currentUSecsSinceEpoch();
             for (int i = 0; i < ownerResource->getVideoLayout()->channelCount(); ++i)
             {
-                auto lastFrame = videoCamera->getLastVideoFrame(streamIndex == Qn::StreamIndex::primary, i);
+                auto lastFrame = videoCamera->getLastVideoFrame(streamIndex, i);
                 if (lastFrame && nowUs - lastFrame->timestamp < kMaxTimeFromPreviousFrameUs)
                     return true;
             }

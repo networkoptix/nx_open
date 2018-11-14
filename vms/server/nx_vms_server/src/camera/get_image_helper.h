@@ -4,6 +4,7 @@
 
 #include <QByteArray>
 
+#include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
 
 #include <nx/api/mediaserver/image_request.h>
@@ -21,6 +22,11 @@ typedef CLVideoDecoderOutputPtr CLVideoDecoderOutputPtr;
 class QnAbstractArchiveDelegate;
 class QnMediaServerModule;
 
+QSize updateDstSize(const QnVirtualCameraResource* camera,
+    const QSize& dstSize,
+    const CLVideoDecoderOutput& outFrame,
+    nx::api::ImageRequest::AspectRatio aspectRatio);
+
 class QnGetImageHelper: public nx::mediaserver::ServerModuleAware
 {
 public:
@@ -34,23 +40,17 @@ public:
 private:
     CLVideoDecoderOutputPtr readFrame(
         const nx::api::CameraImageRequest& request,
-        bool usePrimaryStream,
+        Qn::StreamIndex streamIndex,
         QnAbstractArchiveDelegate* archiveDelegate,
         int prefferedChannel,
         bool& isOpened) const;
 
-    QSize updateDstSize(
-        const QnVirtualCameraResourcePtr& camera,
-        const QSize& dstSize,
-        CLVideoDecoderOutputPtr outFrame,
-        nx::api::ImageRequest::AspectRatio aspectRatio) const;
-
     CLVideoDecoderOutputPtr getImageWithCertainQuality(
-        bool usePrimaryStream, const nx::api::CameraImageRequest& request) const;
+        Qn::StreamIndex streamIndex, const nx::api::CameraImageRequest& request) const;
 
     CLVideoDecoderOutputPtr decodeFrameFromCaches(
         QnVideoCameraPtr camera,
-        bool usePrimaryStream,
+        Qn::StreamIndex streamIndex,
         qint64 timestampUs,
         int preferredChannel,
         nx::api::ImageRequest::RoundMethod roundMethod) const;
@@ -60,8 +60,8 @@ private:
         std::unique_ptr<QnConstDataPacketQueue>& sequence, quint64 timestampUs) const;
 
     CLVideoDecoderOutputPtr decodeFrameFromLiveCache(
-        bool usePrimaryStream, qint64 timestampUs, QnVideoCameraPtr camera) const;
+        Qn::StreamIndex streamIndex, qint64 timestampUs, QnVideoCameraPtr camera) const;
 
     std::unique_ptr<QnConstDataPacketQueue> getLiveCacheGopTillTime(
-        bool usePrimaryStream, qint64 timestampUs, QnVideoCameraPtr camera) const;
+        Qn::StreamIndex streamIndex, qint64 timestampUs, QnVideoCameraPtr camera) const;
 };

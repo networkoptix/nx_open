@@ -320,6 +320,7 @@ private:
         QString submenu;
         QString number;
         QString prefix;
+        bool isProxied = false;
     };
 
     boost::optional<HanwhaPortInfo> portInfoFromId(const QString& id) const;
