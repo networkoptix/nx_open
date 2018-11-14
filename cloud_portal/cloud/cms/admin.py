@@ -25,7 +25,7 @@ class ProductFilter(SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value():
-            return queryset.filter(product=self.value())
+            return queryset.filter(version__product__id=self.value())
         return queryset
 
 
@@ -94,6 +94,12 @@ class ProductAdmin(CMSAdmin):
         if not request.user.is_superuser:
             return self.list_display[1:]
         return self.list_display
+
+    def get_queryset(self, request):
+        queryset = super(ProductAdmin, self).get_queryset(request)
+        if not request.user.is_superuser:
+            return queryset.filter(created_by=request.user)
+        return queryset
 
     def product_settings(self, obj):
         if obj.product_type and not obj.product_type.single_customization:
@@ -174,8 +180,7 @@ class ContextProxyAdmin(CMSAdmin):
         qs = super(ContextProxyAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
         qs = qs.filter(product_type__product__in=[request.session['product_id']])
         if not request.user.is_superuser:
-            qs = qs.filter(product_type__type=ProductType.PRODUCT_TYPES.cloud_portal).\
-                filter(hidden=False)  # only superuser sees hidden contexts
+            qs = qs.filter(hidden=False)  # only superuser sees hidden contexts
         return qs
 
 
