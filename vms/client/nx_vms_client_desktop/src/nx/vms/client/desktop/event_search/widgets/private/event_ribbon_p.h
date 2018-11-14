@@ -17,8 +17,8 @@
 #include <ui/style/helper.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <nx/utils/disconnect_helper.h>
 #include <nx/utils/interval.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
 
 class QScrollBar;
@@ -116,7 +116,7 @@ private:
 private:
     EventRibbon* const q = nullptr;
     QAbstractListModel* m_model = nullptr;
-    std::unique_ptr<QnDisconnectHelper> m_modelConnections;
+    nx::utils::ScopedConnections m_modelConnections;
     const std::unique_ptr<QScrollBar> m_scrollBar;
     const std::unique_ptr<QWidget> m_viewport;
 

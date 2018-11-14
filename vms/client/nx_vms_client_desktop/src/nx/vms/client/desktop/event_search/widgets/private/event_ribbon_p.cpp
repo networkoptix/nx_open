@@ -85,7 +85,6 @@ EventRibbon::Private::Private(EventRibbon* q):
 
 EventRibbon::Private::~Private()
 {
-    m_modelConnections.reset();
 }
 
 QAbstractListModel* EventRibbon::Private::model() const
@@ -98,7 +97,7 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
     if (m_model == model)
         return;
 
-    m_modelConnections.reset();
+    m_modelConnections = {};
     clear();
 
     m_model = model;
@@ -108,35 +107,33 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
 
     insertNewTiles(0, m_model->rowCount(), UpdateMode::instant);
 
-    m_modelConnections.reset(new QnDisconnectHelper());
-
-    *m_modelConnections << connect(m_model, &QObject::destroyed, this,
+    m_modelConnections << connect(m_model, &QObject::destroyed, this,
         [this]()
         {
             m_model = nullptr;
             clear();
         });
 
-    *m_modelConnections << connect(m_model, &QAbstractListModel::modelReset, this,
+    m_modelConnections << connect(m_model, &QAbstractListModel::modelReset, this,
         [this]()
         {
             clear();
             insertNewTiles(0, m_model->rowCount(), UpdateMode::instant);
         });
 
-    *m_modelConnections << connect(m_model, &QAbstractListModel::rowsInserted, this,
+    m_modelConnections << connect(m_model, &QAbstractListModel::rowsInserted, this,
         [this](const QModelIndex& /*parent*/, int first, int last)
         {
             insertNewTiles(first, last - first + 1, UpdateMode::animated);
         });
 
-    *m_modelConnections << connect(m_model, &QAbstractListModel::rowsAboutToBeRemoved, this,
+    m_modelConnections << connect(m_model, &QAbstractListModel::rowsAboutToBeRemoved, this,
         [this](const QModelIndex& /*parent*/, int first, int last)
         {
             removeTiles(first, last - first + 1, UpdateMode::animated);
         });
 
-    *m_modelConnections << connect(m_model, &QAbstractListModel::dataChanged, this,
+    m_modelConnections << connect(m_model, &QAbstractListModel::dataChanged, this,
         [this](const QModelIndex& first, const QModelIndex& last)
         {
             const auto updateRange = m_visible.intersected({first.row(), last.row() + 1});
@@ -144,13 +141,13 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
                 updateTile(i);
         });
 
-    *m_modelConnections << connect(m_model, &QAbstractListModel::rowsAboutToBeMoved, this,
+    m_modelConnections << connect(m_model, &QAbstractListModel::rowsAboutToBeMoved, this,
         [this](const QModelIndex& /*sourceParent*/, int sourceFirst, int sourceLast)
         {
             removeTiles(sourceFirst, sourceLast - sourceFirst + 1, UpdateMode::instant);
         });
 
-    *m_modelConnections << connect(m_model, &QAbstractListModel::rowsMoved, this,
+    m_modelConnections << connect(m_model, &QAbstractListModel::rowsMoved, this,
         [this](const QModelIndex& /*parent*/, int sourceFirst, int sourceLast,
             const QModelIndex& /*destinationParent*/, int destinationIndex)
         {

@@ -5,7 +5,7 @@
 #include <QtWidgets/QLabel>
 
 #include <nx/utils/std/optional.h>
-#include <nx/utils/disconnect_helper.h>
+#include <nx/utils/scoped_connections.h>
 
 #include <core/resource/camera_advanced_param.h>
 
@@ -69,7 +69,7 @@ private:
     QHash<QString, QWidget*> m_paramLabelsById;
     QMap<QString, QVector<std::function<void()>>> m_handlerChains;
     QHash<QString, QnCameraAdvancedParameter> m_parametersById;
-    QnDisconnectHelperPtr m_handlerChainConnections;
+    nx::utils::ScopedConnections m_handlerChainConnections;
 };
 
 } // namespace nx::vms::client::desktop
