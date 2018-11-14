@@ -20,10 +20,12 @@ stripIfNeeded() # dir
         for FILE in $(find "$DIR" -type f)
         do
             echo "  Stripping $FILE"
-            if ! strip "$FILE"
+            # `strip` does not print any errors to stderr, just returns a non-zero status.
+            local -i STRIP_STATUS=0
+            strip "$FILE" || STRIP_STATUS=$?
+            if [ $STRIP_STATUS != 0 ]
             then
-                local -i STRIP_STATUS=$?
-                echo "Strip failed (status $STRIP_STATUS) for $FILE" >&2
+                echo "\`strip\` failed (status $STRIP_STATUS) for $FILE" >&2
                 exit $STRIP_STATUS
             fi
         done
@@ -89,11 +91,8 @@ copyMediaserverPlugins()
     distrib_copyMediaserverPlugins "plugins" "$STAGE_MODULE/bin" "${PLUGINS[@]}"
     stripIfNeeded "$STAGE_MODULE/bin/plugins"
 
-    local PLUGINS_OPTIONAL=(
-        stub_analytics_plugin
-    )
-
-    distrib_copyMediaserverPlugins "plugins_optional" "$STAGE_MODULE/bin" "${PLUGINS_OPTIONAL[@]}"
+    distrib_copyMediaserverPlugins "plugins_optional" "$STAGE_MODULE/bin" \
+        "${SERVER_PLUGINS_OPTIONAL[@]}"
     stripIfNeeded "$STAGE_MODULE/bin/plugins_optional"
 }
 
