@@ -1,18 +1,11 @@
-/**********************************************************
-* 23 jun 2014
-* akolesnikov
-***********************************************************/
-
-#ifndef AUDIO_DATA_PACKET_H
-#define AUDIO_DATA_PACKET_H
+#pragma once
 
 #include <memory>
 
 #include <nx/streaming/config.h>
 #include "media_data_packet.h"
 
-class QnCodecAudioFormat
-:
+class QnCodecAudioFormat:
     public QnAudioFormat
 {
 public:
@@ -78,5 +71,3 @@ private:
 
 typedef std::shared_ptr<QnWritableCompressedAudioData> QnWritableCompressedAudioDataPtr;
 typedef std::shared_ptr<const QnWritableCompressedAudioData> QnConstWritableCompressedAudioDataPtr;
-
-#endif  //AUDIO_DATA_PACKET_H

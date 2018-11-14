@@ -7,8 +7,7 @@
 #include "test_email_manager.h"
 #include "test_setup.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class SystemSharingNew:
@@ -1196,5 +1195,4 @@ TEST_F(SystemSharingDisabledUser, user_get_empty_list_if_he_is_disabled_in_the_o
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db

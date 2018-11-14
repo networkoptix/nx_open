@@ -3,12 +3,11 @@
 #include <nx/network/url/url_builder.h>
 
 #include <nx_ec/ec_proto_version.h>
-#include <nx/cloud/cdb/test_support/transaction_connection_helper.h>
+#include <nx/cloud/db/test_support/transaction_connection_helper.h>
 
 #include "ec2/cloud_vms_synchro_test_helper.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 
 constexpr auto timeForConnectionToChangeState = std::chrono::seconds(10);
 constexpr auto allowedConnectionClosureTimeError = std::chrono::seconds(10);
@@ -92,5 +91,4 @@ INSTANTIATE_TEST_CASE_P(P2pMode, Ec2MserverCloudSynchronizationKeepAlive,
     ::testing::Values(TestParams(false), TestParams(true)
 ));
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db

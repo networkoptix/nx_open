@@ -1,15 +1,14 @@
 #include <gtest/gtest.h>
 
-#include <nx/cloud/cdb/dao/rdb/system_sharing_data_object.h>
-#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
+#include <nx/cloud/db/dao/rdb/system_sharing_data_object.h>
+#include <nx/cloud/db/test_support/base_persistent_data_test.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 namespace dao {
 namespace rdb {
 namespace test {
 
-using BasePersistentDataTest = cdb::test::BasePersistentDataTest;
+using BasePersistentDataTest = nx::cloud::db::test::BasePersistentDataTest;
 
 class SystemSharingDataObject:
     public ::testing::Test,
@@ -87,5 +86,4 @@ TEST_F(SystemSharingDataObject, system_sharing_update_replaces_record)
 } // namespace test
 } // namespace rdb
 } // namespace dao
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db

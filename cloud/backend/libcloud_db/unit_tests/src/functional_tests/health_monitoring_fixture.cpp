@@ -3,8 +3,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/time.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 namespace test {
 
 HealthMonitoring::HealthMonitoring()
@@ -181,5 +180,4 @@ void HealthMonitoring::saveHistoryItem(api::SystemHealth status)
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db

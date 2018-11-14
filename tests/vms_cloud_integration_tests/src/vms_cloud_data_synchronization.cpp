@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/cloud/cdb/ec2/data_conversion.h>
+#include <nx/cloud/db/ec2/data_conversion.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 
 #include "cloud_system_fixture.h"
@@ -106,8 +106,8 @@ protected:
 
         auto client = m_vmsSystem->peer(index).mediaServerClient();
 
-        nx::cdb::api::SystemSharing systemSharing;
-        systemSharing.accessRole = nx::cdb::api::SystemAccessRole::advancedViewer;
+        nx::cloud::db::api::SystemSharing systemSharing;
+        systemSharing.accessRole = nx::cloud::db::api::SystemAccessRole::advancedViewer;
         systemSharing.isEnabled = true;
         systemSharing.accountEmail = m_cloudAccounts.back().email;
         systemSharing.systemId = m_vmsSystem->cloudSystemId();
@@ -115,7 +115,7 @@ protected:
             QnUuid::fromArbitraryData(m_cloudAccounts.back().email).toSimpleString().toStdString();
 
         nx::vms::api::UserData userData;
-        nx::cdb::ec2::convert(systemSharing, &userData);
+        nx::cloud::db::ec2::convert(systemSharing, &userData);
 
         ASSERT_EQ(::ec2::ErrorCode::ok, client->ec2SaveUser(userData));
     }
@@ -123,8 +123,8 @@ protected:
 private:
     Cloud m_cloud;
     std::unique_ptr<VmsSystem> m_vmsSystem;
-    nx::cdb::AccountWithPassword m_ownerAccount;
-    std::vector<nx::cdb::AccountWithPassword> m_cloudAccounts;
+    nx::cloud::db::AccountWithPassword m_ownerAccount;
+    std::vector<nx::cloud::db::AccountWithPassword> m_cloudAccounts;
 
     static std::unique_ptr<QnStaticCommonModule> s_staticCommonModule;
 };

@@ -30,7 +30,7 @@ public:
         m_pool = pool;
     }
 
-    void setUserInfo(const nx::Buffer& name, const nx::cdb::api::AuthInfo& info)
+    void setUserInfo(const nx::Buffer& name, const nx::cloud::db::api::AuthInfo& info)
     {
         m_pool->userInfoChanged(name, info);
     }
@@ -84,29 +84,29 @@ protected:
     }
     void given2UsersInfosWithCommonFirstNonce()
     {
-        nx::cdb::api::AuthInfo vasyaAuthInfo;
+        nx::cloud::db::api::AuthInfo vasyaAuthInfo;
 
         auto vasya = "vasya";
         auto vasyaNonce1 = generateTestNonce(1);
         vasyaAuthInfo.records.push_back(
-            nx::cdb::api::AuthInfoRecord(
+            nx::cloud::db::api::AuthInfoRecord(
                 vasyaNonce1.toStdString(),
                 generateIntermediateResponse(vasya, vasyaNonce1).toStdString(),
                 std::chrono::system_clock::time_point(std::chrono::milliseconds(1))));
 
         auto vasyaNonce2 = generateTestNonce(2);
         vasyaAuthInfo.records.push_back(
-            nx::cdb::api::AuthInfoRecord(
+            nx::cloud::db::api::AuthInfoRecord(
                 vasyaNonce2.toStdString(),
                 generateIntermediateResponse(vasya, vasyaNonce2).toStdString(),
                 std::chrono::system_clock::time_point(std::chrono::milliseconds(5))));
 
-        nx::cdb::api::AuthInfo petyaAuthInfo;
+        nx::cloud::db::api::AuthInfo petyaAuthInfo;
 
         auto petyaNonce1 = vasyaNonce1;
         auto petya = "petya";
         petyaAuthInfo.records.push_back(
-            nx::cdb::api::AuthInfoRecord(
+            nx::cloud::db::api::AuthInfoRecord(
                 petyaNonce1.toStdString(),
                 generateIntermediateResponse(petya, petyaNonce1).toStdString(),
                 std::chrono::system_clock::time_point(std::chrono::milliseconds(2))));
@@ -117,19 +117,19 @@ protected:
 
     void andWhenSecondUserNonceInfoIsUpdated()
     {
-        nx::cdb::api::AuthInfo petyaAuthInfo;
+        nx::cloud::db::api::AuthInfo petyaAuthInfo;
 
         auto petyaNonce1 = generateTestNonce(1);
         auto petya = "petya";
         petyaAuthInfo.records.push_back(
-            nx::cdb::api::AuthInfoRecord(
+            nx::cloud::db::api::AuthInfoRecord(
                 petyaNonce1.toStdString(),
                 generateIntermediateResponse(petya, petyaNonce1).toStdString(),
                 std::chrono::system_clock::time_point(std::chrono::milliseconds(2))));
 
         auto petyaNonce2 = generateTestNonce(2);
         petyaAuthInfo.records.push_back(
-            nx::cdb::api::AuthInfoRecord(
+            nx::cloud::db::api::AuthInfoRecord(
                 petyaNonce2.toStdString(),
                 generateIntermediateResponse(petya, petyaNonce2).toStdString(),
                 std::chrono::system_clock::time_point(std::chrono::milliseconds(12))));
