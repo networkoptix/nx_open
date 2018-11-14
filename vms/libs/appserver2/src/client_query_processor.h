@@ -1,8 +1,3 @@
-/**********************************************************
-* 29 jan 2014
-* akolesnikov
-***********************************************************/
-
 #ifndef CLIENT_QUERY_PROCESSOR_H
 #define CLIENT_QUERY_PROCESSOR_H
 

@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include <nx/cloud/cdb/api/cdb_client.h>
+#include <nx/cloud/db/api/cdb_client.h>
 
 #include <nx/utils/sync_call.h>
 
@@ -17,7 +17,7 @@ int fetchSystems(api::CdbClient* cdbClient)
     std::tie(resultCode, systemDataList) =
         makeSyncCall<api::ResultCode, api::SystemDataExList>(
             std::bind(
-                &nx::cdb::api::SystemManager::getSystems,
+                &nx::cloud::db::api::SystemManager::getSystems,
                 cdbClient->systemManager(),
                 std::placeholders::_1));
     if (resultCode != api::ResultCode::ok)

@@ -3,12 +3,11 @@
 #include <unordered_set>
 #include <QtSql>
 #include <nx/utils/test_support/test_options.h>
-#include <nx/cloud/cdb/persistent_scheduler/persistent_scheduler.h>
-#include <nx/cloud/cdb/persistent_scheduler/persistent_scheduler_db_helper.h>
+#include <nx/cloud/db/persistent_scheduler/persistent_scheduler.h>
+#include <nx/cloud/db/persistent_scheduler/persistent_scheduler_db_helper.h>
 #include "scheduler_user.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 namespace test {
 
 static const QnUuid scheduleUser1FunctorId = QnUuid::createUuid();
@@ -630,5 +629,4 @@ TEST_F(SchedulerIntegrationTest, UnsubscribeFromExpiredTask)
 #endif
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db

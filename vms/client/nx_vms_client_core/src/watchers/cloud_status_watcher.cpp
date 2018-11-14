@@ -28,7 +28,7 @@
 #include <nx/utils/string.h>
 #include <nx/vms/api/data/cloud_system_data.h>
 
-using namespace nx::cdb;
+using namespace nx::cloud::db;
 
 //#define DEBUG_CLOUD_STATUS_WATCHER
 #ifdef DEBUG_CLOUD_STATUS_WATCHER
@@ -79,7 +79,7 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList& systemsList, b
         if (system.localId.isNull())
             system.localId = guidFromArbitraryData(system.cloudId);
 
-        system.online = (systemData.stateOfHealth == nx::cdb::api::SystemHealth::online);
+        system.online = (systemData.stateOfHealth == nx::cloud::db::api::SystemHealth::online);
         system.name = QString::fromStdString(systemData.name);
         system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail);
         system.ownerFullName = QString::fromStdString(systemData.ownerFullName);

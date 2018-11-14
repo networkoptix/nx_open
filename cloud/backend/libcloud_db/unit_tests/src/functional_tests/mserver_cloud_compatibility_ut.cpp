@@ -3,12 +3,11 @@
 #include <nx/data_sync_engine/compatible_ec2_protocol_version.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/cloud/cdb/controller.h>
+#include <nx/cloud/db/controller.h>
 
 #include "mserver_cloud_synchronization_connection_fixture.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class Ec2MserverCloudCompatibility:
@@ -84,15 +83,15 @@ private:
 TEST_F(Ec2MserverCloudCompatibility, compatible_protocol_range_is_meaningful)
 {
     ASSERT_LE(
-        nx::cdb::kMinSupportedProtocolVersion,
-        nx::cdb::kMaxSupportedProtocolVersion);
+        nx::cloud::db::kMinSupportedProtocolVersion,
+        nx::cloud::db::kMaxSupportedProtocolVersion);
 }
 
 TEST_F(Ec2MserverCloudCompatibility, any_compatible_proto_version_is_accepted_by_cloud)
 {
     for (int
-        version = nx::cdb::kMinSupportedProtocolVersion;
-        version <= nx::cdb::kMaxSupportedProtocolVersion;
+        version = nx::cloud::db::kMinSupportedProtocolVersion;
+        version <= nx::cloud::db::kMaxSupportedProtocolVersion;
         ++version)
     {
         assertCdbAcceptsConnectionOfVersion(version);
@@ -103,13 +102,13 @@ TEST_F(Ec2MserverCloudCompatibility, any_compatible_proto_version_is_accepted_by
 TEST_F(Ec2MserverCloudCompatibility, version_left_of_compatibility_range_is_rejected)
 {
     assertCdbDoesNotAcceptConnectionOfVersion(
-        nx::cdb::kMinSupportedProtocolVersion - 1);
+        nx::cloud::db::kMinSupportedProtocolVersion - 1);
 }
 
 TEST_F(Ec2MserverCloudCompatibility, version_right_of_compatibility_range_is_rejected)
 {
     assertCdbDoesNotAcceptConnectionOfVersion(
-        nx::cdb::kMaxSupportedProtocolVersion + 1);
+        nx::cloud::db::kMaxSupportedProtocolVersion + 1);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -117,12 +116,12 @@ TEST_F(Ec2MserverCloudCompatibility, version_right_of_compatibility_range_is_rej
 TEST(Ec2MserverCloudCompabilityCheckRoutine, compatible_versions)
 {
     const nx::data_sync_engine::ProtocolVersionRange cdbProtocolVersionRange(
-        nx::cdb::kMinSupportedProtocolVersion,
-        nx::cdb::kMaxSupportedProtocolVersion);
+        nx::cloud::db::kMinSupportedProtocolVersion,
+        nx::cloud::db::kMaxSupportedProtocolVersion);
 
     for (int
-        version = nx::cdb::kMinSupportedProtocolVersion;
-        version <= nx::cdb::kMaxSupportedProtocolVersion;
+        version = nx::cloud::db::kMinSupportedProtocolVersion;
+        version <= nx::cloud::db::kMaxSupportedProtocolVersion;
         ++version)
     {
         ASSERT_TRUE(cdbProtocolVersionRange.isCompatible(version));
@@ -132,15 +131,14 @@ TEST(Ec2MserverCloudCompabilityCheckRoutine, compatible_versions)
 TEST(Ec2MserverCloudCompabilityCheckRoutine, incompatible_versions)
 {
     const nx::data_sync_engine::ProtocolVersionRange cdbProtocolVersionRange(
-        nx::cdb::kMinSupportedProtocolVersion,
-        nx::cdb::kMaxSupportedProtocolVersion);
+        nx::cloud::db::kMinSupportedProtocolVersion,
+        nx::cloud::db::kMaxSupportedProtocolVersion);
 
     ASSERT_FALSE(cdbProtocolVersionRange.isCompatible(
-        nx::cdb::kMinSupportedProtocolVersion - 1));
+        nx::cloud::db::kMinSupportedProtocolVersion - 1));
     ASSERT_FALSE(cdbProtocolVersionRange.isCompatible(
-        nx::cdb::kMaxSupportedProtocolVersion + 1));
+        nx::cloud::db::kMaxSupportedProtocolVersion + 1));
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db

@@ -194,6 +194,7 @@
 #include <QtWidgets/QTableView>
 
 #include <nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.h>
+#include <utils/common/process.h>
 
 using nx::vms::client::core::Geometry;
 
@@ -1915,14 +1916,13 @@ void ActionHandler::at_serverIssuesAction_triggered()
 
 void ActionHandler::at_pingAction_triggered()
 {
-    QString host = menu()->currentParameters(sender()).argument(Qn::TextRole).toString();
+    const auto host = menu()->currentParameters(sender()).argument(Qn::TextRole).toString();
 
     if (nx::network::SocketGlobals::addressResolver().isCloudHostName(host))
         return;
 
 #ifdef Q_OS_WIN
-    QString cmd = lit("cmd /C ping %1 -t").arg(host);
-    QProcess::startDetached(cmd);
+    nx::startProcessDetached("cmd", {"/C", "ping", host, "-t"});
 #endif
 #ifdef Q_OS_LINUX
     QString cmd = lit("xterm -e ping %1").arg(host);

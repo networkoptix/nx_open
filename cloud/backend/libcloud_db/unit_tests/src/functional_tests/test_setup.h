@@ -2,10 +2,9 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/cloud/cdb/test_support/cdb_launcher.h>
+#include <nx/cloud/db/test_support/cdb_launcher.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class CdbFunctionalTest:
@@ -21,5 +20,4 @@ private:
 };
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db

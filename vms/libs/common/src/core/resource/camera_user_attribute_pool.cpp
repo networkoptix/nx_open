@@ -1,14 +1,4 @@
-/**********************************************************
-* 1 oct 2014
-* akolesnikov
-***********************************************************/
-
 #include "camera_user_attribute_pool.h"
-
-
-////////////////////////////////////////////////////////////
-//// QnCameraUserAttributePool
-////////////////////////////////////////////////////////////
 
 QnCameraUserAttributePool::QnCameraUserAttributePool(QObject *parent):
     QObject(parent),

@@ -125,6 +125,8 @@ public:
 
 signals:
     void clicked();
+    void doubleClicked();
+    void dragStarted();
 
     void closeRequested();
 

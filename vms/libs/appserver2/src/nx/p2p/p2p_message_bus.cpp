@@ -12,7 +12,7 @@
 #include <utils/math/math.h>
 #include <api/runtime_info_manager.h>
 
-#include <nx/cloud/cdb/api/ec2_request_paths.h>
+#include <nx/cloud/db/api/ec2_request_paths.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/url/url_parse_helper.h>

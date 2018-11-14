@@ -2,20 +2,24 @@
 
 #include "../event_ribbon.h"
 
+#include <array>
 #include <chrono>
+#include <deque>
+#include <memory>
+#include <stack>
 
 #include <QtCore/QModelIndex>
 #include <QtCore/QPointer>
-#include <QtCore/QScopedPointer>
 #include <QtCore/QHash>
-#include <QtCore/QList>
 #include <QtCore/QMap>
-#include <QtCore/QSet>
 
+#include <ui/common/notification_levels.h>
 #include <ui/style/helper.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <nx/utils/disconnect_helper.h>
+#include <nx/utils/interval.h>
+#include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
 
 class QScrollBar;
 class QVariantAnimation;
@@ -99,41 +103,51 @@ private:
 
     void updateHighlightedTiles(); //< By highlighted timestamp, not appearing animation.
 
-    int indexOf(EventTile* tile) const;
+    int indexOf(const EventTile* widget) const;
     int indexAtPos(const QPoint& pos) const;
 
-    // Creates a tile widget for a data model item using the following roles:
-    //     Qt::UuidRole for unique id
-    //     Qt::DisplayRole for title
-    //     Qt::DecorationRole for icon
-    //     Qn::TimestampTextRole for timestamp
-    //     Qn::DescriptionTextRole for description
-    //     Qt::ForegroundRole for titleColor
-    EventTile* createTile(const QModelIndex& index);
-    static void updateTile(EventTile* tile, const QModelIndex& index);
+    void updateTile(int index);
+    void updateTilePreview(int index);
+    void ensureWidget(int index);
+    void reserveWidget(int index);
 
     bool shouldSetTileRead(const EventTile* tile) const;
-
-    void debugCheckGeometries();
-    void debugCheckVisibility();
 
 private:
     EventRibbon* const q = nullptr;
     QAbstractListModel* m_model = nullptr;
-    QScopedPointer<QnDisconnectHelper> m_modelConnections;
+    std::unique_ptr<QnDisconnectHelper> m_modelConnections;
+    const std::unique_ptr<QScrollBar> m_scrollBar;
+    const std::unique_ptr<QWidget> m_viewport;
 
-    QScrollBar* const m_scrollBar = nullptr;
-    QWidget* const m_viewport = nullptr;
+    using Importance = QnNotificationLevel::Value;
+    static constexpr int kApproximateTileHeight = 48;
 
-    QList<EventTile*> m_tiles;
-    QHash<EventTile*, int> m_positions;
+    struct Tile
+    {
+        Tile() = default;
+        Tile(Tile&&) = default;
+        explicit Tile(int pos, Importance importance): position(pos), importance(importance) {}
+
+        int height = kApproximateTileHeight;
+        int position = 0;
+        Importance importance = Importance();
+        std::unique_ptr<CameraThumbnailProvider> preview;
+        std::unique_ptr<EventTile> widget;
+    };
+
+    using TilePtr = std::shared_ptr<Tile>;
+    using Interval = nx::utils::Interval<int>;
+
+    std::deque<TilePtr> m_tiles;
+    std::stack<std::unique_ptr<EventTile>> m_reserveWidgets;
+    QPointer<EventTile> m_hoveredWidget;
+    Interval m_visible;
+
+    std::array<int, int(Importance::LevelCount)> m_unreadCounts;
+    int m_totalUnreadCount = 0;
+
     int m_totalHeight = 0;
-
-    int m_firstVisible = -1;
-    QSet<EventTile*> m_visible;
-    QHash<EventTile*, QnNotificationLevel::Value> m_unread;
-
-    QPointer<EventTile> m_hoveredTile;
 
     // Maps animation object to item index. Duplicate indices are allowed.
     // Animation objects are owned by EventRibbon::Private object.

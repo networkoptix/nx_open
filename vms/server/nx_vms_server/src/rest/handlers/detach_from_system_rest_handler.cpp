@@ -1,6 +1,6 @@
 #include "detach_from_system_rest_handler.h"
 
-#include <nx/cloud/cdb/api/connection.h>
+#include <nx/cloud/db/api/connection.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/log/log.h>
 
@@ -53,7 +53,7 @@ int QnDetachFromSystemRestHandler::executePost(
 int QnDetachFromSystemRestHandler::execute(
     PasswordData data, const QnRestConnectionProcessor* owner, QnJsonRestResult& result)
 {
-    using namespace nx::cdb;
+    using namespace nx::cloud::db;
     const Qn::UserAccessData& accessRights = owner->accessRights();
 
     NX_DEBUG(this, lm("Detaching server from system started."));

@@ -1,5 +1,6 @@
-SET INSTALLER=${server_distribution_name}.exe
-cd %~dp0
+@echo off
+SET INSTALLER_FILENAME=${server_distribution_name}
+SET INSTALLER=%~dp0%INSTALLER_FILENAME%.exe
 
 if exist %INSTALLER% (
     echo Starting "%INSTALLER%"
@@ -9,8 +10,9 @@ if exist %INSTALLER% (
 )
 
 :update
-    start /wait "%INSTALLER%" /silent /norestart -l "%INSTALLER%.log"
-    type "%INSTALLER%.log" "%INSTALLER%_000_ServerPackage.log"
+    start "Updating server..." /D %~dp0 /WAIT "%INSTALLER%" /silent /norestart -l "%INSTALLER_FILENAME%.log"
+    type "%~dp0%INSTALLER_FILENAME%.log"
+    type "%~dp0%INSTALLER_FILENAME%_000_ServerPackage.log"
     exit /b
 
 if "%1" != "" (
