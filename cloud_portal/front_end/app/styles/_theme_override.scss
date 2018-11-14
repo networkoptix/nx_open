@@ -276,6 +276,11 @@ select {
         background-color : $light6;
         color            : $dark9;
     }
+    
+    &-danger {
+        background-color : $red_l2;
+        color            : $light1;
+    }
 }
 
 .table {
