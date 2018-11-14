@@ -3,7 +3,6 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <QtCore/QByteArray>
-#include <QtCore/QMap>
 
 #include <nx/streaming/rtp/parsers/rtp_stream_parser.h>
 #include <decoders/audio/aac.h>

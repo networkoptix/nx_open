@@ -145,7 +145,7 @@ DWC-MPA20M:
       - {codec: 'H264', resolution: '1280x720'}
     secondary:
       - {codec: 'H264', resolution: '640x352', fps: [8, 12]}
-      - {codec: 'H264', resolution: '320x240', fps: [24, 36]}
+      - {codec: 'H264', resolution: '320x240', fps: [13, 17]}
     stream_urls:
       '1': "rtsp://192.168.200.19:1554/h264"
       '2': "rtsp://192.168.200.19:8554/h264"

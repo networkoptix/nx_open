@@ -15,7 +15,6 @@
 #include <nx/utils/match/wildcard.h>
 #include <utils/fs/file.h>
 #include <nx/network/rtsp/rtsp_types.h>
-#include <nx/streaming/rtsp_client.h>
 
 #include <streaming/streaming_params.h>
 #include <network/universal_request_processor.h>

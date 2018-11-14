@@ -716,6 +716,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         "h263p",
         this);
 
+    m_defaultExportVideoCodecAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+        kDefaultExportVideoCodec,
+        "mpeg4",
+        this);
+
     m_lowQualityScreenVideoCodecAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         kLowQualityScreenVideoCodec,
         "mpeg2video",
@@ -927,6 +932,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_watermarkSettingsAdaptor
         << m_sessionTimeoutLimitMinutesAdaptor
         << m_defaultVideoCodecAdaptor
+        << m_defaultExportVideoCodecAdaptor
         << m_downloaderPeersAdaptor
         << m_lowQualityScreenVideoCodecAdaptor
         << m_maxProgressiveDownloaders;
@@ -1776,6 +1782,16 @@ QString QnGlobalSettings::defaultVideoCodec() const
 void QnGlobalSettings::setDefaultVideoCodec(const QString& value)
 {
     m_defaultVideoCodecAdaptor->setValue(value);
+}
+
+QString QnGlobalSettings::defaultExportVideoCodec() const
+{
+    return m_defaultExportVideoCodecAdaptor->value();
+}
+
+void QnGlobalSettings::setDefaultExportVideoCodec(const QString& value)
+{
+    m_defaultExportVideoCodecAdaptor->setValue(value);
 }
 
 QString QnGlobalSettings::lowQualityScreenVideoCodec() const

@@ -15,11 +15,11 @@
 
 #include <nx/streaming/rtp/rtp.h>
 #include <nx/streaming/rtp/onvif_header_extension.h>
-#include <nx/streaming/rtp/parsers//h264_rtp_parser.h>
-#include <nx/streaming/rtp/parsers//hevc_rtp_parser.h>
-#include <nx/streaming/rtp/parsers//aac_rtp_parser.h>
-#include <nx/streaming/rtp/parsers//simpleaudio_rtp_parser.h>
-#include <nx/streaming/rtp/parsers//mjpeg_rtp_parser.h>
+#include <nx/streaming/rtp/parsers/h264_rtp_parser.h>
+#include <nx/streaming/rtp/parsers/hevc_rtp_parser.h>
+#include <nx/streaming/rtp/parsers/aac_rtp_parser.h>
+#include <nx/streaming/rtp/parsers/simpleaudio_rtp_parser.h>
+#include <nx/streaming/rtp/parsers/mjpeg_rtp_parser.h>
 
 #include <nx/network/compat_poll.h>
 #include <nx/utils/log/log.h>
@@ -91,7 +91,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     std::unique_ptr<nx::network::AbstractStreamSocket> tcpSock)
 :
     QnResourceConsumer(res),
-    m_RtpSession(/*shouldGuessAuthDigest*/ false, QnRtspClient::Config(), std::move(tcpSock)),
+    m_RtpSession(QnRtspClient::Config(), std::move(tcpSock)),
     m_timeHelper(res->getUniqueId().toStdString(), timeOffset),
     m_pleaseStop(false),
     m_gotSomeFrame(false),
@@ -257,7 +257,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataInternal()
                     track.onvifExtensionTimestamp,
                     track.parser->getFrequency(),
                     m_role == Qn::CR_LiveVideo).count();
-                result->channelNumber = track.parser->logicalChannelNum();
+                result->channelNumber = track.logicalChannelNum;
                 if (result->dataType == QnAbstractMediaData::VIDEO)
                 {
                     result->channelNumber =
@@ -343,7 +343,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
                 length,
                 m_gotData))
             {
-                clearKeyData(track.parser->logicalChannelNum());
+                clearKeyData(track.logicalChannelNum);
                 m_demuxedData[rtpChannelNum]->clear();
                 if (++errorRetryCnt > m_maxRtpRetryCount) {
                     qWarning() << "Too many RTP errors for camera " << getResource()->getName() << ". Reopen stream";
@@ -429,7 +429,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
                         bytesRead,
                         gotData))
                 {
-                    clearKeyData(track.parser->logicalChannelNum());
+                    clearKeyData(track.logicalChannelNum);
                     m_demuxedData[rtpChannelNum]->clear();
                     if (++errorRetryCount > m_maxRtpRetryCount) {
                         qWarning() << "Too many RTP errors for camera " << getResource()->getName() << ". Reopen stream";
@@ -691,9 +691,9 @@ void QnMulticodecRtpReader::createTrackParsers()
                 m_audioLayout = audioParser->getAudioLayout();
 
             if (track.sdpMedia.mediaType == Sdp::MediaType::Video)
-                trackParser.parser->setLogicalChannelNum(logicalVideoNum++);
+                trackParser.logicalChannelNum = logicalVideoNum++;
             else
-                trackParser.parser->setLogicalChannelNum(m_numberOfVideoChannels);
+                trackParser.logicalChannelNum = m_numberOfVideoChannels;
 
             if (!m_RtpSession.isTcpMode())
             {

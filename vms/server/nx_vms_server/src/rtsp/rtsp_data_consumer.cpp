@@ -737,15 +737,15 @@ void QnRtspDataConsumer::addData(const QnAbstractMediaDataPtr& data)
 
 int QnRtspDataConsumer::copyLastGopFromCamera(
     QnVideoCameraPtr camera,
-    bool usePrimaryStream,
+    Qn::StreamIndex streamIndex,
     qint64 skipTime,
     bool iFramesOnly)
 {
     // Fast channel zapping
     int prevSize = m_dataQueue.size();
     int copySize = 0;
-    if (camera) // && !res->hasFlags(Qn::no_last_gop))
-        copySize = camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue, iFramesOnly);
+    if (camera /* && !res->hasFlags(Qn::no_last_gop) */) //< TODO: Add comment.
+        copySize = camera->copyLastGop(streamIndex, skipTime, m_dataQueue, iFramesOnly);
     m_dataQueue.setMaxSize(m_dataQueue.size()-prevSize + MAX_QUEUE_SIZE);
     m_fastChannelZappingSize = copySize;
 

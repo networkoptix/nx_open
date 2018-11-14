@@ -2,18 +2,12 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include <utils/media/nalUnits.h>
-#include <utils/common/synctime.h>
-#include <utils/math/math.h>
-
+#include <utils/media/bitStream.h>
 #include <nx/streaming/rtp/rtp.h>
 #include <nx/streaming/audio_data_packet.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/streaming/config.h>
-
-#include <nx/streaming/rtp/parsers/rtp_stream_parser.h>
-#include <nx/streaming/rtsp_client.h>
 
 namespace nx::streaming::rtp {
 

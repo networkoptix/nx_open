@@ -89,16 +89,15 @@ bool HanwhaPtzController::continuousMove(
 
     std::map<QString, QString> params;
     params.emplace(kHanwhaChannelProperty, channel());
-    QString command;
     if (speedVector.isNull())
     {
-        command = lit("ptzcontrol/stop");
-        params.emplace("OperationType", "All");
+        params.emplace(kHanwhaPanProperty, "0");
+        params.emplace(kHanwhaTiltProperty, "0");
+        params.emplace(kHanwhaZoomProperty, "0");
         m_lastParamValue.clear();
     }
     else
     {
-        command = lit("ptzcontrol/continuous");
         auto addIfNeeded = [&](const QString& paramName, float value)
         {
             if (!qFuzzyEquals(value, m_lastParamValue[paramName]))
@@ -116,7 +115,7 @@ bool HanwhaPtzController::continuousMove(
 
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     const auto response = helper.control(
-        command,
+        "ptzcontrol/continuous",
         params);
 
     return response.isSuccessful();
