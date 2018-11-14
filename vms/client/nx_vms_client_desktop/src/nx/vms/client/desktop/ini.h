@@ -48,6 +48,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, automaticFilterByTimelineSelection, "Automatically switch Right Panel time"
         "selection to \"Selected on Timeline\" mode when selection exists.");
     NX_INI_FLAG(0, raiseCameraFromClickedTile, "Raise camera after selecting it when Right Panel camera-related tile is clicked.");
+    NX_INI_INT(30, rightPanelPreviewReloadDelay, "Right Panel preview reload delay in seconds after receiving \"NO DATA\" (0 to disable).");
 };
 
 inline Ini& ini()

@@ -17,7 +17,6 @@
 #include <ui/style/helper.h>
 #include <ui/style/nx_style_p.h>
 #include <ui/workaround/hidpi_workarounds.h>
-#include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 
 #include <nx/api/mediaserver/image_request.h>
@@ -35,11 +34,6 @@
 namespace nx::vms::client::desktop {
 
 namespace {
-
-using namespace std::chrono;
-using namespace std::literals::chrono_literals;
-
-static constexpr milliseconds kPreviewRequestDelay = 100ms;
 
 static constexpr int kDefaultTileSpacing = 1;
 static constexpr int kScrollBarStep = 16;
@@ -290,30 +284,15 @@ void EventRibbon::Private::updateTilePreview(int index)
         ? nx::api::ImageRequest::RoundMethod::precise
         : nx::api::ImageRequest::RoundMethod::iFrameAfter;
 
-    const auto loadPreview =
-        [tile = std::weak_ptr<Tile>(m_tiles[index])]()
-        {
-            const auto locked = tile.lock();
-            if (locked && locked->preview && locked->widget)
-                locked->preview->loadAsync();
-        };
-
     auto& previewProvider = m_tiles[index]->preview;
-    if (previewProvider)
+    if (previewProvider && (request.camera != previewProvider->requestData().camera
+        || request.usecSinceEpoch != previewProvider->requestData().usecSinceEpoch))
     {
-        if (request.usecSinceEpoch != previewProvider->requestData().usecSinceEpoch
-            || request.camera != previewProvider->requestData().camera
-            || previewProvider->status() == Qn::ThumbnailStatus::Invalid)
-        {
-            previewProvider->setRequestData(request);
-            executeDelayedParented(loadPreview, kPreviewRequestDelay.count(), this);
-        }
+        previewProvider.reset();
     }
-    else
-    {
+
+    if (!previewProvider)
         previewProvider.reset(new CameraThumbnailProvider(request, widget));
-        executeDelayedParented(loadPreview, kPreviewRequestDelay.count(), this);
-    }
 
     widget->setPreview(previewProvider.get());
     widget->setPreviewCropRect(previewCropRect);
