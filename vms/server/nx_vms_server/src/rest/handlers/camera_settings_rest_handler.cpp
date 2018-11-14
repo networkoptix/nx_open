@@ -296,7 +296,7 @@ nx::network::http::StatusCode::Value QnCameraSettingsRestHandler::handleSetParam
     }
 
     const bool needToReloadAllParameters = camera->resourceData()
-        .value<bool>("needToReloadAllAdvancedParametersAfterApply", false);
+        .value<bool>(Qn::kReloadAllAdvancedParameters, false);
 
     if (needToReloadAllParameters)
     {

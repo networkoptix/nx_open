@@ -74,6 +74,13 @@ void CameraAdvancedParamWidgetsManager::displayParams(const QnCameraAdvancedPara
     currentItemChanged(m_groupWidget->currentItem());
 }
 
+
+/**
+ * @param params List of new parameter values
+ * @param packetMode If true than all the parameter widgets will be disabled and
+ *  reenabled back only if parameter is on the params list.
+ *  Otherwise only parameter values will be updated.
+ */
 void CameraAdvancedParamWidgetsManager::loadValues(
     const QnCameraAdvancedParamValueList& params,
     bool packetMode)

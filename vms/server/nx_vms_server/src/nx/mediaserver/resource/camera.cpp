@@ -470,7 +470,7 @@ CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
         containerString(m_advancedParametersProvidersByParameterId)));
 
     advancedParameters.packet_mode = resourceData()
-        .value<bool>("needToReloadAllAdvancedParametersAfterApply", false);
+        .value<bool>(Qn::kReloadAllAdvancedParameters, false);
 
     QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), advancedParameters);
     return CameraDiagnostics::NoErrorResult();
