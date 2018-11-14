@@ -29,7 +29,6 @@ using nx::vms::event::ActionData;
 using nx::vms::event::ActionDataList;
 
 using namespace std::chrono;
-using namespace std::literals::chrono_literals;
 
 namespace {
 
@@ -126,7 +125,7 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
                 return QVariant();
             [[fallthrough]];
         case Qn::TimestampRole:
-            return QVariant::fromValue(std::chrono::microseconds(eventParams.eventTimestampUsec));
+            return QVariant::fromValue(microseconds(eventParams.eventTimestampUsec));
 
         case Qn::ResourceListRole:
         {

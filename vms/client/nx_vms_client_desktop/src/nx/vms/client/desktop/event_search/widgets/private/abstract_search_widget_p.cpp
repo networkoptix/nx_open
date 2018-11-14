@@ -37,10 +37,9 @@
 
 namespace nx::vms::client::desktop {
 
-namespace {
-
-using namespace std::literals::chrono_literals;
 using namespace std::chrono;
+
+namespace {
 
 static constexpr int kPlaceholderFontPixelSize = 15;
 static constexpr milliseconds kQueuedFetchMoreDelay = 50ms;
@@ -204,7 +203,7 @@ void AbstractSearchWidget::Private::setupRibbon()
         [this]()
         {
             ui->ribbon->setHighlightedTimestamp(
-                std::chrono::microseconds(navigator()->positionUsec()));
+                microseconds(navigator()->positionUsec()));
         });
 }
 
@@ -361,8 +360,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
 
     // Setup day change watcher.
 
-    using namespace std::chrono;
-    m_dayChangeTimer->setInterval(milliseconds(seconds(1)).count());
+    m_dayChangeTimer->setInterval(1s);
 
     connect(m_dayChangeTimer.data(), &QTimer::timeout,
         this, &Private::updateCurrentTimePeriod);

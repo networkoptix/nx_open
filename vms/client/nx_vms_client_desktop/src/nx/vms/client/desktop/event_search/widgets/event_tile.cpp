@@ -24,10 +24,9 @@
 
 namespace nx::vms::client::desktop {
 
-namespace {
-
 using namespace std::chrono;
-using namespace std::literals::chrono_literals;
+
+namespace {
 
 // Delay after which preview is initially requested.
 static constexpr milliseconds kPreviewLoadDelay = 100ms;
@@ -179,7 +178,7 @@ struct EventTile::Private
         }
     }
 
-    void updatePreview(std::chrono::milliseconds delay)
+    void updatePreview(milliseconds delay)
     {
         if (isPreviewNeeded())
             loadPreviewTimer->start(delay);
@@ -455,7 +454,7 @@ void EventTile::setPreview(ImageProvider* value)
 
     d->updatePreview(kPreviewLoadDelay);
 
-    if (preview() && kPreviewReloadDelay > std::chrono::seconds(0))
+    if (preview() && kPreviewReloadDelay > 0s)
     {
         connect(preview(), &ImageProvider::statusChanged, this,
             [this](Qn::ThumbnailStatus status)
@@ -599,20 +598,18 @@ bool EventTile::hasAutoClose() const
     return closeable() && d->autoCloseTimer;
 }
 
-std::chrono::milliseconds EventTile::autoCloseTime() const
+milliseconds EventTile::autoCloseTime() const
 {
-    return std::chrono::milliseconds(hasAutoClose() ? d->autoCloseTimer->interval() : 0);
+    return milliseconds(hasAutoClose() ? d->autoCloseTimer->interval() : 0);
 }
 
-std::chrono::milliseconds EventTile::autoCloseRemainingTime() const
+milliseconds EventTile::autoCloseRemainingTime() const
 {
-    return std::chrono::milliseconds(hasAutoClose() ? d->autoCloseTimer->remainingTime() : 0);
+    return milliseconds(hasAutoClose() ? d->autoCloseTimer->remainingTime() : 0);
 }
 
-void EventTile::setAutoCloseTime(std::chrono::milliseconds value)
+void EventTile::setAutoCloseTime(milliseconds value)
 {
-    using namespace std::literals::chrono_literals;
-
     if (value <= 0ms)
     {
         d->autoCloseTimer.reset();

@@ -33,6 +33,8 @@
 
 namespace nx::vms::client::desktop {
 
+using namespace std::chrono;
+
 namespace {
 
 static constexpr int kDefaultTileSpacing = 1;
@@ -41,10 +43,10 @@ static constexpr int kScrollBarStep = 16;
 static constexpr int kDefaultThumbnailWidth = 224;
 static constexpr int kMaximumThumbnailWidth = 1024;
 
-static const auto kHighlightCurtainColor = QColor(Qt::white);
-static const qreal kHighlightCurtainOpacity = 0.25;
-static const auto kHighlightDuration = std::chrono::milliseconds(400);
-static const auto kAnimationDuration = std::chrono::milliseconds(250);
+static constexpr auto kHighlightCurtainColor = Qt::white;
+static constexpr qreal kHighlightCurtainOpacity = 0.25;
+static constexpr milliseconds kHighlightDuration = 400ms;
+static constexpr milliseconds kAnimationDuration = 250ms;
 
 QSize minimumWidgetSize(QWidget* widget)
 {
@@ -218,7 +220,7 @@ void EventRibbon::Private::updateTile(int index)
     widget->setFooterText(modelIndex.data(Qn::AdditionalTextRole).toString());
     widget->setToolTip(modelIndex.data(Qt::ToolTipRole).toString());
     widget->setCloseable(modelIndex.data(Qn::RemovableRole).toBool());
-    widget->setAutoCloseTime(modelIndex.data(Qn::TimeoutRole).value<std::chrono::milliseconds>());
+    widget->setAutoCloseTime(modelIndex.data(Qn::TimeoutRole).value<milliseconds>());
     widget->setAction(modelIndex.data(Qn::CommandActionRole).value<CommandActionPtr>());
 
     const auto resourceList = modelIndex.data(Qn::ResourceListRole);
@@ -263,7 +265,7 @@ void EventRibbon::Private::updateTilePreview(int index)
     if (!previewCamera)
         return;
 
-    const auto previewTime = modelIndex.data(Qn::PreviewTimeRole).value<std::chrono::microseconds>();
+    const auto previewTime = modelIndex.data(Qn::PreviewTimeRole).value<microseconds>();
     const auto previewCropRect = modelIndex.data(Qn::ItemZoomRectRole).value<QRectF>();
     const auto thumbnailWidth = previewCropRect.isEmpty()
         ? kDefaultThumbnailWidth
@@ -744,9 +746,6 @@ void EventRibbon::Private::updateHighlightedTiles()
     if (m_visible.isEmpty())
         return;
 
-    using namespace std::chrono;
-    using namespace std::literals::chrono_literals;
-
     const auto shouldHighlightTile =
         [this](int index) -> bool
         {
@@ -790,12 +789,12 @@ void EventRibbon::Private::setScrollBarPolicy(Qt::ScrollBarPolicy value)
     updateScrollBarVisibility();
 }
 
-std::chrono::microseconds EventRibbon::Private::highlightedTimestamp() const
+microseconds EventRibbon::Private::highlightedTimestamp() const
 {
     return m_highlightedTimestamp;
 }
 
-void EventRibbon::Private::setHighlightedTimestamp(std::chrono::microseconds value)
+void EventRibbon::Private::setHighlightedTimestamp(microseconds value)
 {
     if (m_highlightedTimestamp == value)
         return;
@@ -977,12 +976,10 @@ void EventRibbon::Private::highlightAppearance(EventTile* tile)
     if (!tile->isVisible())
         return;
 
-    using namespace std::chrono;
-
     auto animation = new QVariantAnimation(tile);
     animation->setStartValue(kHighlightCurtainOpacity);
     animation->setEndValue(0.0);
-    animation->setDuration(duration_cast<milliseconds>(kHighlightDuration).count());
+    animation->setDuration(kHighlightDuration.count());
     animation->setEasingCurve(QEasingCurve::InCubic);
 
     auto curtain = new CustomPainted<QWidget>(tile);
@@ -1011,13 +1008,11 @@ void EventRibbon::Private::addAnimatedShift(int index, int shift)
     if (shift == 0)
         return;
 
-    using namespace std::chrono;
-
     auto animator = new QVariantAnimation(this);
     animator->setStartValue(qreal(shift));
     animator->setEndValue(0.0);
     animator->setEasingCurve(QEasingCurve::OutCubic);
-    animator->setDuration(duration_cast<milliseconds>(kAnimationDuration).count());
+    animator->setDuration(kAnimationDuration.count());
 
     connect(animator, &QObject::destroyed, this,
         [this, animator]() { m_itemShiftAnimations.remove(animator); });
