@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <memory>
+#include <variant>
 
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonArray>
