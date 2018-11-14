@@ -144,6 +144,8 @@ class ContextProxyAdmin(CMSAdmin):
 
         extra_context['title'] = "Edit {}".format(Context.objects.get(id=object_id).name)
         extra_context['language_code'] = Customization.objects.get(name=settings.CUSTOMIZATION).default_language
+        extra_context['EXTERNAL_IMAGE'] = DataStructure.DATA_TYPES[
+            DataStructure.DATA_TYPES.external_image]
 
         if 'admin_language' in request.session:
             extra_context['language_code'] = request.session['admin_language']
