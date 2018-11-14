@@ -1137,7 +1137,7 @@ void EventRibbon::Private::navigateToSource(const QModelIndex& index) const
 
     if (camera)
     {
-        menu()->trigger(GoToLayoutItemAction, Parameters(camera)
+        menu()->triggerIfPossible(GoToLayoutItemAction, Parameters(camera)
             .withArgument(Qn::ForceRole, ini().raiseCameraFromClickedTile));
     }
 
@@ -1171,7 +1171,7 @@ void EventRibbon::Private::openSource(const QModelIndex& index, bool inNewTab) c
         connection.reset(connect(workbench()->currentLayout(), &QnWorkbenchLayout::itemAdded, this,
             [this](const QnWorkbenchItem* item)
             {
-                menu()->trigger(GoToLayoutItemAction, Parameters()
+                menu()->triggerIfPossible(GoToLayoutItemAction, Parameters()
                     .withArgument(Qn::ItemUuidRole, item->uuid())
                     .withArgument(Qn::ForceRole, ini().raiseCameraFromClickedTile));
             }));
