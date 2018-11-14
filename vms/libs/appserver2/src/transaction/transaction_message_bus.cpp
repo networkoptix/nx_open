@@ -17,7 +17,7 @@
 #include <utils/common/synctime.h>
 #include <utils/common/warnings.h>
 
-#include <nx/cloud/cdb/api/ec2_request_paths.h>
+#include <nx/cloud/db/api/ec2_request_paths.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/utils/system_error.h>
@@ -898,7 +898,7 @@ nx::utils::Url QnTransactionMessageBus::updateOutgoingUrl(
 {
     nx::utils::Url url(srcUrl);
     if (peer == ::ec2::kCloudPeerId)
-        url.setPath(nx::cdb::api::kEc2EventsPath);
+        url.setPath(nx::cloud::db::api::kEc2EventsPath);
     else
         url.setPath("/ec2/events");
     QUrlQuery q(url.query());

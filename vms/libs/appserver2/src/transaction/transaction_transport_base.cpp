@@ -19,7 +19,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/system_error.h>
 
-#include <nx/cloud/cdb/api/ec2_request_paths.h>
+#include <nx/cloud/db/api/ec2_request_paths.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx_ec/ec_proto_version.h>
 
@@ -1139,7 +1139,7 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
 
             m_postTranBaseUrl = m_remoteAddr;
             if (m_remotePeer.peerType == api::PeerType::cloudServer)
-                m_postTranBaseUrl.setPath(nx::cdb::api::kPushEc2TransactionPath);
+                m_postTranBaseUrl.setPath(nx::cloud::db::api::kPushEc2TransactionPath);
             else
                 m_postTranBaseUrl.setPath(lit("/ec2/forward_events"));
             m_postTranBaseUrl.setQuery(QString());

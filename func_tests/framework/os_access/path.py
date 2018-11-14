@@ -42,6 +42,7 @@ class FileSystemPath(pathlib.Path):
         is false and onerror is None, an exception is raised.
 
         """
+        _logger.debug("Remove dir tree: %s", self)
         if ignore_errors:
             def onerror(*_args):
                 pass

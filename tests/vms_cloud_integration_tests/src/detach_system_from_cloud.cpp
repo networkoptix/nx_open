@@ -89,7 +89,7 @@ protected:
 private:
     std::unique_ptr<VmsSystem> m_system;
     std::unique_ptr<VmsSystem> m_detachedSystem;
-    nx::cdb::AccountWithPassword m_cloudAccount;
+    nx::cloud::db::AccountWithPassword m_cloudAccount;
     CloudSystemFixture m_cloudSystemFixture;
 
     static std::unique_ptr<QnStaticCommonModule> s_staticCommonModule;

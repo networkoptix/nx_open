@@ -4034,7 +4034,7 @@ void MediaServerProcess::loadResourceParamsData()
     const std::array<const char*,2> kUrlsToLoadResourceData =
     {
         "http://resources.vmsproxy.com/resource_data.json",
-        "http://beta.networkoptix.com/beta-builds/daily/resource_data.json"
+        "http://beta.vmsproxy.com/beta-builds/daily/resource_data.json"
     };
 
     auto manager = m_ec2Connection->getResourceManager(Qn::kSystemAccess);

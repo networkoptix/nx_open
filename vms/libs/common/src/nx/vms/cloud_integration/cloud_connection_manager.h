@@ -3,7 +3,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
-#include <nx/cloud/cdb/api/connection.h>
+#include <nx/cloud/db/api/connection.h>
 #include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>
 #include <nx/network/retry_timer.h>
 #include <nx/utils/thread/mutex.h>
@@ -29,13 +29,13 @@ public:
 
     virtual bool boundToCloud() const = 0;
 
-    virtual std::unique_ptr<nx::cdb::api::Connection> getCloudConnection(
+    virtual std::unique_ptr<nx::cloud::db::api::Connection> getCloudConnection(
         const QString& cloudSystemId,
         const QString& cloudAuthKey) const = 0;
 
-    virtual std::unique_ptr<nx::cdb::api::Connection> getCloudConnection() = 0;
+    virtual std::unique_ptr<nx::cloud::db::api::Connection> getCloudConnection() = 0;
 
-    virtual void processCloudErrorCode(nx::cdb::api::ResultCode resultCode) = 0;
+    virtual void processCloudErrorCode(nx::cloud::db::api::ResultCode resultCode) = 0;
 
 signals:
     void cloudBindingStatusChanged(bool boundToCloud);
@@ -59,17 +59,17 @@ public:
     /**
      * @return null if not connected to the cloud.
      */
-    virtual std::unique_ptr<nx::cdb::api::Connection> getCloudConnection(
+    virtual std::unique_ptr<nx::cloud::db::api::Connection> getCloudConnection(
         const QString& cloudSystemId,
         const QString& cloudAuthKey) const override;
 
-    virtual std::unique_ptr<nx::cdb::api::Connection> getCloudConnection() override;
+    virtual std::unique_ptr<nx::cloud::db::api::Connection> getCloudConnection() override;
 
-    virtual void processCloudErrorCode(nx::cdb::api::ResultCode resultCode) override;
+    virtual void processCloudErrorCode(nx::cloud::db::api::ResultCode resultCode) override;
 
     void setCloudDbUrl(const nx::utils::Url &url);
 
-    const nx::cdb::api::ConnectionFactory& connectionFactory() const;
+    const nx::cloud::db::api::ConnectionFactory& connectionFactory() const;
 
     void setProxyVia(const nx::network::SocketAddress& proxyEndpoint);
 
@@ -85,7 +85,7 @@ private:
     boost::optional<nx::network::SocketAddress> m_proxyAddress;
     mutable QnMutex m_mutex;
     std::unique_ptr<
-        nx::cdb::api::ConnectionFactory,
+        nx::cloud::db::api::ConnectionFactory,
         decltype(&destroyConnectionFactory)> m_cdbConnectionFactory;
 
     void setCloudCredentials(const QString& cloudSystemId, const QString& cloudAuthKey);

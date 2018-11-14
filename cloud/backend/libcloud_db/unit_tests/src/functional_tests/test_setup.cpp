@@ -1,8 +1,3 @@
-/**********************************************************
-* Sep 29, 2015
-* akolesnikov
-***********************************************************/
-
 #include "test_setup.h"
 
 #include <gtest/gtest.h>
@@ -12,8 +7,7 @@
 
 #include "email_manager_mocked.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 namespace test {
 
 CdbFunctionalTest::CdbFunctionalTest()
@@ -29,5 +23,4 @@ CdbFunctionalTest::~CdbFunctionalTest()
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db

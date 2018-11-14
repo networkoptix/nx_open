@@ -5,12 +5,11 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/cloud/cdb/client/cdb_request_path.h>
+#include <nx/cloud/db/client/cdb_request_path.h>
 
 #include "test_setup.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class ModuleDiscovery:
@@ -81,5 +80,4 @@ TEST_F(ModuleDiscovery, cloud_modules_xml_with_multiple_mediator_ports)
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db

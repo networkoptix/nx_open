@@ -228,6 +228,8 @@ nx::sql::DBResult TransactionLog::fillCache()
     nx::utils::promise<nx::sql::DBResult> cacheFilledPromise;
     auto future = cacheFilledPromise.get_future();
 
+    NX_DEBUG(this, lm("Filling tranaction log cache"));
+
     // Starting async operation.
     using namespace std::placeholders;
     m_dbManager->executeSelect(
@@ -237,6 +239,8 @@ nx::sql::DBResult TransactionLog::fillCache()
             cacheFilledPromise.set_value(dbResult);
         });
 
+    NX_DEBUG(this, lm("Tranaction log cache filled up"));
+
     // Waiting for completion.
     future.wait();
     return future.get();
@@ -245,6 +249,8 @@ nx::sql::DBResult TransactionLog::fillCache()
 nx::sql::DBResult TransactionLog::fetchTransactionState(
     nx::sql::QueryContext* queryContext)
 {
+    NX_DEBUG(this, lm("Fetching transactions"));
+
     // TODO: #ak move to TransactionDataObject
     QSqlQuery selectTransactionStateQuery(*queryContext->connection()->qtSqlConnection());
     selectTransactionStateQuery.setForwardOnly(true);
@@ -270,7 +276,10 @@ nx::sql::DBResult TransactionLog::fetchTransactionState(
         return nx::sql::DBResult::ioError;
     }
 
+    NX_DEBUG(this, lm("Fetched transactions"));
+
     std::string prevSystemId;
+    int count = 0;
     while (selectTransactionStateQuery.next())
     {
         const std::string systemId = selectTransactionStateQuery.value("system_id").toString().toStdString();
@@ -297,7 +306,12 @@ nx::sql::DBResult TransactionLog::fetchTransactionState(
             // Switched to another system.
             prevSystemId = systemId;
         }
+
+        ++count;
     }
+
+    NX_DEBUG(this, lm("Restored transaction logs of %1 systems. %2 states total")
+        .args(m_systemIdToTransactionLog.size(), count));
 
     return nx::sql::DBResult::ok;
 }

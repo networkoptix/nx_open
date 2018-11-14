@@ -1,7 +1,6 @@
 #include "system_health_info_provider_stub.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 namespace test {
 
 bool SystemHealthInfoProviderStub::isSystemOnline(const std::string& systemId) const
@@ -25,5 +24,4 @@ void SystemHealthInfoProviderStub::setSystemStatus(const std::string& id, bool o
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db

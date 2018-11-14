@@ -1,11 +1,9 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/cloud/cdb/api/cloud_nonce.h>
+#include <nx/cloud/db/api/cloud_nonce.h>
 
-
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 
 TEST(CloudNonce, general)
 {
@@ -17,5 +15,4 @@ TEST(CloudNonce, general)
     }
 }
 
-}   // namespace cdb
-}   // namespace nx
+} // namespace nx::cloud::db

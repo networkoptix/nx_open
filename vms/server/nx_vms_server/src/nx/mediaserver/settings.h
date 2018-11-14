@@ -154,9 +154,9 @@ public:
         "Allows automatic inclusion of discovered local removable storages into the resource pool."
     };
     Option<QString> checkForUpdateUrl{this, "checkForUpdateUrl",
-        "http://updates.networkoptix.com/updates.json",
+        "http://updates.vmsproxy.com/updates.json",
         "Url used by mediaserver as a root update information source. Default = "
-        "http://updates.networkoptix.com.\n"
+        "http://updates.vmsproxy.com.\n"
         "See: https://networkoptix.atlassian.net/wiki/spaces/PM/pages/197394433/Updates"
     };
     Option<bool> secureAppserverConnection{this, "secureAppserverConnection", false, ""};

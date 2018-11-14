@@ -3,7 +3,7 @@
 #include <memory>
 #include <QtCore/QObject>
 
-#include <nx/cloud/cdb/api/connection.h>
+#include <nx/cloud/db/api/connection.h>
 
 #include <nx/utils/singleton.h>
 
@@ -16,7 +16,7 @@ public:
     QnCloudConnectionProvider(QObject* parent = nullptr);
     virtual ~QnCloudConnectionProvider();
 
-    std::unique_ptr<nx::cdb::api::Connection> createConnection() const;
+    std::unique_ptr<nx::cloud::db::api::Connection> createConnection() const;
 
 signals:
     void cdbEndpointChanged();
@@ -24,7 +24,7 @@ signals:
 private:
     /* Factory must exist all the time we are using the connection. */
     std::unique_ptr<
-        nx::cdb::api::ConnectionFactory,
+        nx::cloud::db::api::ConnectionFactory,
         decltype(&destroyConnectionFactory)> connectionFactory;
 };
 

@@ -6,7 +6,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/sync_call.h>
 
-#include <nx/cloud/cdb/api/connection.h>
+#include <nx/cloud/db/api/connection.h>
 #include <nx/vms/cloud_integration/cloud_connection_manager.h>
 #include <nx/vms/cloud_integration/cloud_manager_group.h>
 #include <nx/vms/cloud_integration/vms_cloud_connection_processor.h>
@@ -43,7 +43,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    using namespace nx::cdb;
+    using namespace nx::cloud::db;
 
     nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::ok;
     if (!authorize(owner->accessRights(), &result, &statusCode))

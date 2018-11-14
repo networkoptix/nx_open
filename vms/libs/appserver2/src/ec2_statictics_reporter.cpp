@@ -36,7 +36,7 @@ using namespace nx::vms;
 
 namespace ec2
 {
-    const QString Ec2StaticticsReporter::DEFAULT_SERVER_API = lit("http://stats.networkoptix.com");
+    const QString Ec2StaticticsReporter::DEFAULT_SERVER_API = lit("http://stats.vmsproxy.com");
 
     // Hardcoded credentials (because of no way to keep it better)
     const QString Ec2StaticticsReporter::AUTH_USER = lit("nx");

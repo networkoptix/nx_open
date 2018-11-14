@@ -2,10 +2,9 @@
 
 #include <nx/utils/move_only_func.h>
 
-#include <nx/cloud/cdb/ec2/vms_p2p_command_bus.h>
+#include <nx/cloud/db/ec2/vms_p2p_command_bus.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 namespace test {
 
 using OnSaveResourceAttribute =
@@ -29,5 +28,4 @@ private:
 };
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db

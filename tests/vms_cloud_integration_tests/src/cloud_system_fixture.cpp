@@ -26,14 +26,14 @@ bool Cloud::initialize()
     return m_cdb.startAndWaitUntilStarted();
 }
 
-nx::cdb::AccountWithPassword Cloud::registerCloudAccount()
+nx::cloud::db::AccountWithPassword Cloud::registerCloudAccount()
 {
     return m_cdb.addActivatedAccount2();
 }
 
 bool Cloud::connectToCloud(
     VmsPeer& peerWrapper,
-    const nx::cdb::AccountWithPassword& ownerAccount)
+    const nx::cloud::db::AccountWithPassword& ownerAccount)
 {
     const auto system = m_cdb.addRandomSystemToAccount(ownerAccount);
     if (!peerWrapper.saveCloudSystemCredentials(
@@ -59,38 +59,38 @@ bool Cloud::connectToCloud(
     return true;
 }
 
-nx::cdb::CdbLauncher& Cloud::cdb()
+nx::cloud::db::CdbLauncher& Cloud::cdb()
 {
     return m_cdb;
 }
 
-const nx::cdb::CdbLauncher& Cloud::cdb() const
+const nx::cloud::db::CdbLauncher& Cloud::cdb() const
 {
     return m_cdb;
 }
 
 bool Cloud::isSystemRegistered(
-    const nx::cdb::AccountWithPassword& account,
+    const nx::cloud::db::AccountWithPassword& account,
     const std::string& cloudSystemId) const
 {
-    nx::cdb::api::SystemDataEx system;
+    nx::cloud::db::api::SystemDataEx system;
     const auto resultCode =
         m_cdb.getSystem(account.email, account.password, cloudSystemId, &system);
-    return resultCode == nx::cdb::api::ResultCode::ok;
+    return resultCode == nx::cloud::db::api::ResultCode::ok;
 }
 
 bool Cloud::isSystemOnline(
-    const nx::cdb::AccountWithPassword& account,
+    const nx::cloud::db::AccountWithPassword& account,
     const std::string& cloudSystemId) const
 {
-    nx::cdb::api::SystemDataEx system;
+    nx::cloud::db::api::SystemDataEx system;
     if (m_cdb.getSystem(account.email, account.password, cloudSystemId, &system) !=
-            nx::cdb::api::ResultCode::ok)
+            nx::cloud::db::api::ResultCode::ok)
     {
         return false;
     }
 
-    return system.stateOfHealth == nx::cdb::api::SystemHealth::online;
+    return system.stateOfHealth == nx::cloud::db::api::SystemHealth::online;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -152,7 +152,7 @@ std::unique_ptr<VmsSystem> VmsSystem::detachServer(int index)
 
 bool VmsSystem::connectToCloud(
     Cloud* cloud,
-    const nx::cdb::AccountWithPassword& cloudAccount)
+    const nx::cloud::db::AccountWithPassword& cloudAccount)
 {
     return cloud->connectToCloud(peer(0), cloudAccount);
 }
@@ -213,7 +213,7 @@ std::unique_ptr<VmsSystem> CloudSystemFixture::createVmsSystem(int serverCount)
 void CloudSystemFixture::waitUntilVmsTransactionLogMatchesCloudOne(
     const VmsPeer& vmsPeer,
     const std::string& cloudSystemId,
-    const nx::cdb::AccountWithPassword& account)
+    const nx::cloud::db::AccountWithPassword& account)
 {
     auto mediaServerClient = vmsPeer.mediaServerClient();
 
@@ -242,7 +242,7 @@ void CloudSystemFixture::waitUntilVmsTransactionLogMatchesCloudOne(
 
 void CloudSystemFixture::waitUntilVmsTransactionLogMatchesCloudOne(
     VmsSystem* vmsSystem,
-    const nx::cdb::AccountWithPassword& account)
+    const nx::cloud::db::AccountWithPassword& account)
 {
     waitUntilVmsTransactionLogMatchesCloudOne(
         vmsSystem->peer(0),

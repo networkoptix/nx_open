@@ -10,19 +10,18 @@
 #include <nx/utils/thread/sync_queue.h>
 
 #include <nx/data_sync_engine/synchronization_engine.h>
-#include <nx/cloud/cdb/controller.h>
-#include <nx/cloud/cdb/managers/system_merge_manager.h>
-#include <nx/cloud/cdb/settings.h>
-#include <nx/cloud/cdb/stree/cdb_ns.h>
-#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
-#include <nx/cloud/cdb/test_support/business_data_generator.h>
+#include <nx/cloud/db/controller.h>
+#include <nx/cloud/db/managers/system_merge_manager.h>
+#include <nx/cloud/db/settings.h>
+#include <nx/cloud/db/stree/cdb_ns.h>
+#include <nx/cloud/db/test_support/base_persistent_data_test.h>
+#include <nx/cloud/db/test_support/business_data_generator.h>
 
 #include "system_health_info_provider_stub.h"
 #include "system_manager_stub.h"
 #include "vms_gateway_stub.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class SystemMergeManager:
@@ -47,14 +46,14 @@ protected:
 
     void givenOnlineMasterSystem()
     {
-        m_masterSystem = cdb::test::BusinessDataGenerator::generateRandomSystem(m_ownerAccount);
+        m_masterSystem = nx::cloud::db::test::BusinessDataGenerator::generateRandomSystem(m_ownerAccount);
         m_systemHealthInfoProviderStub.setSystemStatus(m_masterSystem.id, true);
         m_systemManagerStub.addSystem(m_masterSystem);
     }
 
     void givenOnlineSlaveSystem()
     {
-        m_slaveSystem = cdb::test::BusinessDataGenerator::generateRandomSystem(m_ownerAccount);
+        m_slaveSystem = nx::cloud::db::test::BusinessDataGenerator::generateRandomSystem(m_ownerAccount);
         m_systemHealthInfoProviderStub.setSystemStatus(m_slaveSystem.id, true);
         m_systemManagerStub.addSystem(m_slaveSystem);
     }
@@ -186,7 +185,7 @@ private:
     SystemHealthInfoProviderStub m_systemHealthInfoProviderStub;
     VmsGatewayStub m_vmsGatewayStub;
     std::unique_ptr<data_sync_engine::SyncronizationEngine> m_syncronizationEngine;
-    std::unique_ptr<cdb::SystemMergeManager> m_systemMergeManager;
+    std::unique_ptr<nx::cloud::db::SystemMergeManager> m_systemMergeManager;
     nx::utils::SyncQueue<api::ResultCode> m_mergeResults;
     boost::optional<std::future<void>> m_systemMergeManagerDestroyed;
     api::AccountData m_ownerAccount;
@@ -209,7 +208,7 @@ private:
                 kMaxSupportedProtocolVersion),
             &queryExecutor());
 
-        m_systemMergeManager = std::make_unique<cdb::SystemMergeManager>(
+        m_systemMergeManager = std::make_unique<nx::cloud::db::SystemMergeManager>(
             &m_systemManagerStub,
             m_systemHealthInfoProviderStub,
             &m_vmsGatewayStub,
@@ -330,5 +329,4 @@ TEST_F(SystemMergeManager, merge_history_record_is_processed_even_if_system_is_i
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db
