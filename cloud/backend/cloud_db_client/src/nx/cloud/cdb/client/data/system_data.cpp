@@ -5,7 +5,7 @@
 
 #include "../field_name.h"
 
-namespace nx::cdb::api {
+namespace nx::cloud::db::api {
 
 using namespace nx::network;
 
@@ -289,44 +289,44 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     _Fields/*,
     (optional, false)*/)
 
-} // namespace nx::cdb::api
+} // namespace nx::cloud::db::api
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, SystemStatus,
-    (nx::cdb::api::SystemStatus::invalid, "invalid")
-    (nx::cdb::api::SystemStatus::notActivated, "notActivated")
-    (nx::cdb::api::SystemStatus::activated, "activated")
-    (nx::cdb::api::SystemStatus::deleted_, "deleted")
-    (nx::cdb::api::SystemStatus::beingMerged, "beingMerged")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cloud::db::api, SystemStatus,
+    (nx::cloud::db::api::SystemStatus::invalid, "invalid")
+    (nx::cloud::db::api::SystemStatus::notActivated, "notActivated")
+    (nx::cloud::db::api::SystemStatus::activated, "activated")
+    (nx::cloud::db::api::SystemStatus::deleted_, "deleted")
+    (nx::cloud::db::api::SystemStatus::beingMerged, "beingMerged")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, SystemHealth,
-    (nx::cdb::api::SystemHealth::offline, "offline")
-    (nx::cdb::api::SystemHealth::online, "online")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cloud::db::api, SystemHealth,
+    (nx::cloud::db::api::SystemHealth::offline, "offline")
+    (nx::cloud::db::api::SystemHealth::online, "online")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, SystemAccessRole,
-    (nx::cdb::api::SystemAccessRole::none, "none")
-    (nx::cdb::api::SystemAccessRole::disabled, "disabled")
-    (nx::cdb::api::SystemAccessRole::custom, "custom")
-    (nx::cdb::api::SystemAccessRole::liveViewer, "liveViewer")
-    (nx::cdb::api::SystemAccessRole::viewer, "viewer")
-    (nx::cdb::api::SystemAccessRole::advancedViewer, "advancedViewer")
-    (nx::cdb::api::SystemAccessRole::localAdmin, "localAdmin")
-    (nx::cdb::api::SystemAccessRole::cloudAdmin, "cloudAdmin")
-    (nx::cdb::api::SystemAccessRole::maintenance, "maintenance")
-    (nx::cdb::api::SystemAccessRole::owner, "owner")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cloud::db::api, SystemAccessRole,
+    (nx::cloud::db::api::SystemAccessRole::none, "none")
+    (nx::cloud::db::api::SystemAccessRole::disabled, "disabled")
+    (nx::cloud::db::api::SystemAccessRole::custom, "custom")
+    (nx::cloud::db::api::SystemAccessRole::liveViewer, "liveViewer")
+    (nx::cloud::db::api::SystemAccessRole::viewer, "viewer")
+    (nx::cloud::db::api::SystemAccessRole::advancedViewer, "advancedViewer")
+    (nx::cloud::db::api::SystemAccessRole::localAdmin, "localAdmin")
+    (nx::cloud::db::api::SystemAccessRole::cloudAdmin, "cloudAdmin")
+    (nx::cloud::db::api::SystemAccessRole::maintenance, "maintenance")
+    (nx::cloud::db::api::SystemAccessRole::owner, "owner")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, FilterField,
-    (nx::cdb::api::FilterField::customization, "customization")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cloud::db::api, FilterField,
+    (nx::cloud::db::api::FilterField::customization, "customization")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, MergeRole,
-    (nx::cdb::api::MergeRole::none, "none")
-    (nx::cdb::api::MergeRole::master, "master")
-    (nx::cdb::api::MergeRole::slave, "slave")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cloud::db::api, MergeRole,
+    (nx::cloud::db::api::MergeRole::none, "none")
+    (nx::cloud::db::api::MergeRole::master, "master")
+    (nx::cloud::db::api::MergeRole::slave, "slave")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, SystemCapabilityFlag,
-    (nx::cdb::api::SystemCapabilityFlag::cloudMerge, "cloudMerge")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cloud::db::api, SystemCapabilityFlag,
+    (nx::cloud::db::api::SystemCapabilityFlag::cloudMerge, "cloudMerge")
 )

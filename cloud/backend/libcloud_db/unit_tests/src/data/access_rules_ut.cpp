@@ -3,7 +3,7 @@
 #include <nx/cloud/cdb/data/access_rules.h>
 #include <nx/cloud/cdb/stree/cdb_ns.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace data {
 namespace test {
 
@@ -146,4 +146,4 @@ TEST_F(AccessRestrictions, deny_rule_with_multiple_required_fields)
 
 } // namespace test
 } // namespace data
-} // namespace nx::cdb
+} // namespace nx::cloud::db

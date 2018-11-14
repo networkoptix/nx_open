@@ -2,7 +2,7 @@
 
 #include "../temporary_credentials_dao.h"
 
-namespace nx::cdb::dao::rdb {
+namespace nx::cloud::db::dao::rdb {
 
 class TemporaryCredentialsDao:
     public AbstractTemporaryCredentialsDao
@@ -49,4 +49,4 @@ private:
         const std::string& password);
 };
 
-} // namespace nx::cdb::dao::rdb
+} // namespace nx::cloud::db::dao::rdb

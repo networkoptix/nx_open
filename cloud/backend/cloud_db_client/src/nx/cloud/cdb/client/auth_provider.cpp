@@ -4,7 +4,7 @@
 #include "data/auth_data.h"
 #include "data/system_data.h"
 
-namespace nx::cdb::client {
+namespace nx::cloud::db::client {
 
 AuthProvider::AuthProvider(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher):
     AsyncRequestsExecutor(cloudModuleEndPointFetcher)
@@ -42,4 +42,4 @@ void AuthProvider::getAuthenticationResponse(
         std::bind(completionHandler, std::placeholders::_1, api::AuthResponse()));
 }
 
-} // namespace nx::cdb::client
+} // namespace nx::cloud::db::client

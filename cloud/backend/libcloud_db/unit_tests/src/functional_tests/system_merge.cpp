@@ -17,7 +17,7 @@
 
 #include "test_setup.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 namespace {
@@ -408,4 +408,4 @@ TEST_F(SystemMerge, fails_if_request_to_slave_system_fails)
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

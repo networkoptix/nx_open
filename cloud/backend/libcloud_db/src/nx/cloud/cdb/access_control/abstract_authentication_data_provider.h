@@ -7,7 +7,7 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/stree/resourcecontainer.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 class AbstractAuthenticationDataProvider
 {
@@ -27,4 +27,4 @@ public:
         nx::utils::MoveOnlyFunc<void(api::ResultCode /*authResult*/)> completionHandler) = 0;
 };
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

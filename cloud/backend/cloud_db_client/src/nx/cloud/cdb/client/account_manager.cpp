@@ -3,7 +3,7 @@
 #include "cdb_request_path.h"
 #include <nx/utils/app_info.h>
 
-namespace nx::cdb::client {
+namespace nx::cloud::db::client {
 
 AccountManager::AccountManager(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher):
     AsyncRequestsExecutor(cloudModuleEndPointFetcher)
@@ -95,4 +95,4 @@ void AccountManager::createTemporaryCredentials(
         std::move(errorHandler));
 }
 
-} // nx::cdb::client
+} // nx::cloud::db::client

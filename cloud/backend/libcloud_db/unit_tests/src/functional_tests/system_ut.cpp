@@ -16,7 +16,7 @@
 
 #include "test_setup.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 namespace {
@@ -1362,4 +1362,4 @@ TEST_F(SystemBeingMergedState, update_requests_are_forbidden)
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

@@ -1,6 +1,6 @@
 #include "security_manager.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 SecurityManager::SecurityManager(
     AuthenticationManager* authenticator,
@@ -33,4 +33,4 @@ const AuthorizationManager& SecurityManager::authorizer() const
     return m_authorizer;
 }
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

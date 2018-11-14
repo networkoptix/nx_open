@@ -5,7 +5,7 @@
 #include "account_data.h"
 #include "result_code.h"
 
-namespace nx::cdb::api {
+namespace nx::cloud::db::api {
 
 class AccountManager
 {
@@ -47,4 +47,4 @@ public:
         std::function<void(api::ResultCode, api::TemporaryCredentials)> completionHandler) = 0;
 };
 
-} // namespace nx::cdb::api
+} // namespace nx::cloud::db::api

@@ -212,22 +212,22 @@ nx::network::http::StatusCode::Value VmsCloudConnectionProcessor::detachFromClou
     }
 
     // Second, updating data in cloud.
-    nx::cdb::api::ResultCode cdbResultCode = nx::cdb::api::ResultCode::ok;
+    nx::cloud::db::api::ResultCode cdbResultCode = nx::cloud::db::api::ResultCode::ok;
     auto systemId = m_commonModule->globalSettings()->cloudSystemId();
     auto authKey = m_commonModule->globalSettings()->cloudAuthKey();
     auto cloudConnection = m_cloudManagerGroup->connectionManager.getCloudConnection(systemId, authKey);
-    std::tie(cdbResultCode) = makeSyncCall<nx::cdb::api::ResultCode>(
+    std::tie(cdbResultCode) = makeSyncCall<nx::cloud::db::api::ResultCode>(
         std::bind(
-            &nx::cdb::api::SystemManager::unbindSystem,
+            &nx::cloud::db::api::SystemManager::unbindSystem,
             cloudConnection->systemManager(),
             systemId.toStdString(),
             std::placeholders::_1));
-    if (cdbResultCode != nx::cdb::api::ResultCode::ok)
+    if (cdbResultCode != nx::cloud::db::api::ResultCode::ok)
     {
         // TODO: #ak: Rollback "admin" user modification?
 
         NX_WARNING(this, lm("Received error response from %1: %2").arg(nx::network::AppInfo::cloudName())
-            .arg(nx::cdb::api::toString(cdbResultCode)));
+            .arg(nx::cloud::db::api::toString(cdbResultCode)));
 
         // Ignoring cloud error in detach operation.
         // So, it is allowed to perform detach while offline.
@@ -394,18 +394,18 @@ bool VmsCloudConnectionProcessor::initializeCloudRelatedManagers(
     const CloudCredentialsData& /*data*/,
     QnJsonRestResult* result)
 {
-    using namespace nx::cdb;
+    using namespace nx::cloud::db;
 
-    nx::cdb::api::ResultCode resultCode =
+    nx::cloud::db::api::ResultCode resultCode =
         m_cloudManagerGroup->authenticationNonceFetcher.initializeConnectionToCloudSync();
-    if (resultCode != nx::cdb::api::ResultCode::ok)
+    if (resultCode != nx::cloud::db::api::ResultCode::ok)
     {
         NX_WARNING(this, lm("Failed to getch cloud nonce: %1")
-            .arg(nx::cdb::api::toString(resultCode)));
+            .arg(nx::cloud::db::api::toString(resultCode)));
         result->setError(
             QnJsonRestResult::CantProcessRequest,
             QObject::tr("Could not connect to cloud: %1")
-                .arg(QString::fromStdString(nx::cdb::api::toString(resultCode))));
+                .arg(QString::fromStdString(nx::cloud::db::api::toString(resultCode))));
         return false;
     }
 
@@ -419,28 +419,28 @@ bool VmsCloudConnectionProcessor::saveLocalSystemIdToCloud(
     api::CloudSystemData opaque;
     opaque.localSystemId = m_commonModule->globalSettings()->localSystemId();
 
-    nx::cdb::api::SystemAttributesUpdate systemAttributesUpdate;
+    nx::cloud::db::api::SystemAttributesUpdate systemAttributesUpdate;
     systemAttributesUpdate.systemId = data.cloudSystemID.toStdString();
     systemAttributesUpdate.opaque = QJson::serialized(opaque).toStdString();
 
     auto cloudConnection = m_cloudManagerGroup->connectionManager.getCloudConnection(
         data.cloudSystemID, data.cloudAuthKey);
-    nx::cdb::api::ResultCode cdbResultCode = nx::cdb::api::ResultCode::ok;
+    nx::cloud::db::api::ResultCode cdbResultCode = nx::cloud::db::api::ResultCode::ok;
     std::tie(cdbResultCode) =
-        makeSyncCall<nx::cdb::api::ResultCode>(
+        makeSyncCall<nx::cloud::db::api::ResultCode>(
             std::bind(
-                &nx::cdb::api::SystemManager::update,
+                &nx::cloud::db::api::SystemManager::update,
                 cloudConnection->systemManager(),
                 std::move(systemAttributesUpdate),
                 std::placeholders::_1));
-    if (cdbResultCode != nx::cdb::api::ResultCode::ok)
+    if (cdbResultCode != nx::cloud::db::api::ResultCode::ok)
     {
         NX_WARNING(this, lm("Received error response from cloud: %1")
-            .arg(nx::cdb::api::toString(cdbResultCode)));
+            .arg(nx::cloud::db::api::toString(cdbResultCode)));
         result->setError(
             QnJsonRestResult::CantProcessRequest,
             QObject::tr("Could not connect to cloud: %1")
-                .arg(QString::fromStdString(nx::cdb::api::toString(cdbResultCode))));
+                .arg(QString::fromStdString(nx::cloud::db::api::toString(cdbResultCode))));
         return false;
     }
 

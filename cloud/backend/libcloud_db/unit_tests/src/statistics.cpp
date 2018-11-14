@@ -8,7 +8,7 @@
 
 #include "functional_tests/test_setup.h"
 
-namespace nx::cdb::test {
+namespace nx::cloud::db::test {
 
 class Statistics:
     public CdbFunctionalTest
@@ -59,4 +59,4 @@ TEST_F(Statistics, statistics_is_available_through_http_api)
     assertStatisticsContainsExpectedData();
 }
 
-} // namespace nx::cdb::test
+} // namespace nx::cloud::db::test

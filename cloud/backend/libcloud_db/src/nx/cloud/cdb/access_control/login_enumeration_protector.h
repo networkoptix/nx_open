@@ -7,7 +7,7 @@
 #include <nx/utils/math/unique_value_count_per_period.h>
 #include <nx/utils/std/optional.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 struct LoginEnumerationProtectionSettings
 {
@@ -50,4 +50,4 @@ private:
     void setLockIfAppropriate(std::chrono::milliseconds* lockPeriod);
 };
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

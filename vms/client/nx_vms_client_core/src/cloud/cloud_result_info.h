@@ -10,10 +10,10 @@ class QnCloudResultInfo
     Q_DECLARE_TR_FUNCTIONS(QnCloudResultInfo)
 
 public:
-    QnCloudResultInfo(nx::cdb::api::ResultCode code);
+    QnCloudResultInfo(nx::cloud::db::api::ResultCode code);
     operator QString() const;
 
-    static QString toString(nx::cdb::api::ResultCode code);
+    static QString toString(nx::cloud::db::api::ResultCode code);
 
 private:
     QString m_text;

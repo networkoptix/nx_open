@@ -7,14 +7,14 @@
 #include <nx/cloud/cdb/managers/email_manager.h>
 
 class TestEmailManager:
-    public nx::cdb::AbstractEmailManager
+    public nx::cloud::db::AbstractEmailManager
 {
 public:
-    typedef nx::utils::MoveOnlyFunc<void(const nx::cdb::AbstractNotification&)>
+    typedef nx::utils::MoveOnlyFunc<void(const nx::cloud::db::AbstractNotification&)>
         OnNotificationHandler;
 
     virtual void sendAsync(
-        const nx::cdb::AbstractNotification& notification,
+        const nx::cloud::db::AbstractNotification& notification,
         std::function<void(bool)> completionHandler) override;
 
     void setOnReceivedNotification(OnNotificationHandler handler);
@@ -31,9 +31,9 @@ class EmailManagerMocked:
 public:
     MOCK_METHOD1(
         sendAsyncMocked,
-        void(const nx::cdb::AbstractNotification& notification));
+        void(const nx::cloud::db::AbstractNotification& notification));
 
     virtual void sendAsync(
-        const nx::cdb::AbstractNotification& notification,
+        const nx::cloud::db::AbstractNotification& notification,
         std::function<void(bool)> completionHandler) override;
 };

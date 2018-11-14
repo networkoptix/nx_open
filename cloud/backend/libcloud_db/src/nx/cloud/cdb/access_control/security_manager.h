@@ -1,6 +1,6 @@
 #pragma once
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 class AuthenticationManager;
 class AuthorizationManager;
@@ -27,4 +27,4 @@ private:
     const AccessBlocker& m_transportSecurityManager;
 };
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

@@ -1,6 +1,6 @@
 #include "login_enumeration_protector.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 static constexpr int kLoginLockPeriodGrowthRate = 2;
 
@@ -83,4 +83,4 @@ void LoginEnumerationProtector::setLockIfAppropriate(
         nx::utils::monotonicTime() + *lockPeriod;
 }
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

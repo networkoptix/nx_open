@@ -1,6 +1,6 @@
 #include "test_transaction_transport.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 constexpr static const std::chrono::seconds kTcpKeepAliveTimeout = std::chrono::seconds(5);
@@ -41,4 +41,4 @@ void CommonHttpConnection::fillAuthInfo(
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

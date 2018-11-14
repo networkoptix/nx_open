@@ -30,7 +30,7 @@
 #include "../settings.h"
 #include "../stree/cdb_ns.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 // TODO: #ak should get rid of following function
 static api::SystemSharingEx createDerivedFromBase(api::SystemSharing right)
@@ -157,7 +157,7 @@ void SystemManager::authenticateByName(
     }
 
     authProperties->put(
-        cdb::attr::authSystemId,
+        nx::cloud::db::attr::authSystemId,
         QString::fromStdString(systemIter->id));
 
     result = api::ResultCode::ok;
@@ -171,7 +171,7 @@ void SystemManager::bindSystemToAccount(
     std::function<void(api::ResultCode, data::SystemData)> completionHandler)
 {
     QString accountEmail;
-    if (!authzInfo.get(cdb::attr::authAccountEmail, &accountEmail))
+    if (!authzInfo.get(nx::cloud::db::attr::authAccountEmail, &accountEmail))
     {
         completionHandler(api::ResultCode::notAuthorized, data::SystemData());
         return;
@@ -259,7 +259,7 @@ void SystemManager::getSystems(
     api::SystemDataExList resultData;
     resultData.systems = std::move(*foundSystems);
 
-    const auto accountEmail = wholeFilterMap.get<std::string>(cdb::attr::authAccountEmail);
+    const auto accountEmail = wholeFilterMap.get<std::string>(nx::cloud::db::attr::authAccountEmail);
     if (accountEmail)
     {
         std::for_each(
@@ -781,7 +781,7 @@ nx::sql::DBResult SystemManager::insertOwnerSharingToDb(
     nx::sql::QueryContext* const queryContext,
     const std::string& systemId,
     const data::SystemRegistrationDataWithAccount& newSystem,
-    nx::cdb::data::SystemSharing* const ownerSharing)
+    nx::cloud::db::data::SystemSharing* const ownerSharing)
 {
     // Adding "owner" user to newly created system.
     ownerSharing->accountEmail = newSystem.accountEmail;
@@ -1122,11 +1122,11 @@ boost::optional<std::vector<api::SystemDataEx>> SystemManager::selectSystemsFrom
     const nx::utils::stree::AbstractResourceReader& requestResources,
     const data::DataFilter& filter)
 {
-    const auto accountEmail = requestResources.get<std::string>(cdb::attr::authAccountEmail);
+    const auto accountEmail = requestResources.get<std::string>(nx::cloud::db::attr::authAccountEmail);
 
-    auto systemId = requestResources.get<std::string>(cdb::attr::authSystemId);
+    auto systemId = requestResources.get<std::string>(nx::cloud::db::attr::authSystemId);
     if (!systemId)
-        systemId = requestResources.get<std::string>(cdb::attr::systemId);
+        systemId = requestResources.get<std::string>(nx::cloud::db::attr::systemId);
 
     std::vector<api::SystemDataEx> resultData;
 
@@ -2058,4 +2058,4 @@ nx::sql::DBResult SystemManager::invokeSystemSharingExtension(
     return nx::sql::DBResult::ok;
 }
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

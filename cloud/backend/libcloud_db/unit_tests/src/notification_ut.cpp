@@ -5,7 +5,7 @@
 #include "functional_tests/email_manager_mocked.h"
 #include "functional_tests/test_setup.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 namespace {
@@ -98,7 +98,7 @@ protected:
 private:
     TestEmailManager m_notificationSender;
     AccountWithPassword m_account;
-    std::vector<nx::cdb::BasicNotification> m_notifications;
+    std::vector<nx::cloud::db::BasicNotification> m_notifications;
     std::multimap<NotificationType, BasicNotification> m_expectedNotifications;
 
     void init()
@@ -122,20 +122,20 @@ private:
         EMailManagerFactory::setFactory(nullptr);
     }
 
-    void onReceivedNotification(const nx::cdb::AbstractNotification& notification)
+    void onReceivedNotification(const nx::cloud::db::AbstractNotification& notification)
     {
         const auto jsonString = notification.serializeToJson();
         bool deserializationSuccessful = false;
         auto notificationData =
-            QJson::deserialized<nx::cdb::BasicNotification>(
+            QJson::deserialized<nx::cloud::db::BasicNotification>(
                 jsonString,
-                nx::cdb::BasicNotification(),
+                nx::cloud::db::BasicNotification(),
                 &deserializationSuccessful);
         //validateNotification(notificationData);
         m_notifications.push_back(std::move(notificationData));
     }
 
-    void validateNotification(const nx::cdb::BasicNotification& notification)
+    void validateNotification(const nx::cloud::db::BasicNotification& notification)
     {
         const auto range = m_expectedNotifications.equal_range(notification.type);
         for (auto it = range.first; it != range.second; ++it)
@@ -175,4 +175,4 @@ TEST_F(NotificationGeneralFieldsValidation, invite_user_to_system)
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

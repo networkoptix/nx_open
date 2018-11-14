@@ -1,6 +1,6 @@
 #include "auth_types.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 AuthorizationInfo::AuthorizationInfo(nx::utils::stree::ResourceContainer rc):
     m_rc(std::move(rc))
@@ -22,4 +22,4 @@ bool AuthorizationInfo::accessAllowedToOwnDataOnly() const
     return false;
 }
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

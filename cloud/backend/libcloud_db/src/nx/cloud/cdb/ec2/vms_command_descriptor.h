@@ -4,7 +4,7 @@
 
 #include <transaction/transaction_descriptor.h>
 
-namespace nx::cdb::ec2::command {
+namespace nx::cloud::db::ec2::command {
 
 struct SaveUser:
     nx::data_sync_engine::command::BaseCommandDescriptor<
@@ -46,4 +46,4 @@ struct SaveSystemMergeHistoryRecord:
     static constexpr char name[] = "saveSystemMergeHistoryRecord";
 };
 
-} // namespace nx::cdb::ec2::command
+} // namespace nx::cloud::db::ec2::command

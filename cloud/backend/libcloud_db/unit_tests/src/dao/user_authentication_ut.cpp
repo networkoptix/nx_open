@@ -10,12 +10,12 @@
 #include <nx/cloud/cdb/dao/memory/dao_memory_user_authentication.h>
 #include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace dao {
 namespace rdb {
 namespace test {
 
-using BasePersistentDataTest = cdb::test::BasePersistentDataTest;
+using BasePersistentDataTest = nx::cloud::db::test::BasePersistentDataTest;
 
 template<typename DaoType>
 class DaoUserAuthentication:
@@ -462,4 +462,4 @@ INSTANTIATE_TYPED_TEST_CASE_P(
 } // namespace test
 } // namespace rdb
 } // namespace dao
-} // namespace nx::cdb
+} // namespace nx::cloud::db

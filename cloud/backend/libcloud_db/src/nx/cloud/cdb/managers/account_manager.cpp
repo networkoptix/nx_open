@@ -26,7 +26,7 @@
 #include "../stree/cdb_ns.h"
 #include "../stree/stree_manager.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 AccountManager::AccountManager(
     const conf::Settings& settings,
@@ -72,7 +72,7 @@ void AccountManager::authenticateByName(
         else if (validateHa1Func(account->passwordHa1.c_str()))
         {
             authProperties->put(
-                cdb::attr::authAccountEmail,
+                nx::cloud::db::attr::authAccountEmail,
                 username);
             completionHandler(api::ResultCode::ok);
             return;
@@ -96,7 +96,7 @@ void AccountManager::authenticateByName(
                 const auto authenticatedByEmailCode =
                     authProperties->get<bool>(attr::authenticatedByEmailCode);
                 const auto accountEmail =
-                    authProperties->get<std::string>(cdb::attr::authAccountEmail);
+                    authProperties->get<std::string>(nx::cloud::db::attr::authAccountEmail);
 
                 if (static_cast<bool>(authenticatedByEmailCode) && *authenticatedByEmailCode &&
                     static_cast<bool>(accountEmail))
@@ -970,4 +970,4 @@ void AccountManager::temporaryCredentialsSaved(
         std::move(temporaryCredentials));
 }
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

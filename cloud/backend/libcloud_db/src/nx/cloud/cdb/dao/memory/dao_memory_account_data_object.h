@@ -8,7 +8,7 @@
 
 #include "../account_data_object.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace dao {
 namespace memory {
 
@@ -68,4 +68,4 @@ private:
 
 } // namespace memory
 } // namespace dao
-} // namespace nx::cdb
+} // namespace nx::cloud::db

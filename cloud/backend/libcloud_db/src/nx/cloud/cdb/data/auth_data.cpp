@@ -1,6 +1,6 @@
 #include "auth_data.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace data {
 
 bool AuthRequest::getAsVariant( int /*resID*/, QVariant* const /*value*/ ) const
@@ -10,4 +10,4 @@ bool AuthRequest::getAsVariant( int /*resID*/, QVariant* const /*value*/ ) const
 }
 
 } // namespace data
-} // namespace nx::cdb
+} // namespace nx::cloud::db

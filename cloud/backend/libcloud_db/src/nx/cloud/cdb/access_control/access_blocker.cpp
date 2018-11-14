@@ -6,7 +6,7 @@
 
 #include "../settings.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 AccessBlocker::AccessBlocker(
     const conf::Settings& settings)
@@ -153,4 +153,4 @@ void AccessBlocker::updateHostLockoutState(
     }
 }
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

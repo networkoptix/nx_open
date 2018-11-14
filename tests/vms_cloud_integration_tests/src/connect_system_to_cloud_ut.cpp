@@ -251,7 +251,7 @@ private:
             std::string hash;
 
             ASSERT_TRUE(parseResult);
-            ASSERT_TRUE(nx::cdb::api::parseCloudNonceBase(
+            ASSERT_TRUE(nx::cloud::db::api::parseCloudNonceBase(
                 nonceWithoutTrailer.toStdString(),
                 &ts,
                 &hash));

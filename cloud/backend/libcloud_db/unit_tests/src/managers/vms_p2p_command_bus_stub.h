@@ -4,7 +4,7 @@
 
 #include <nx/cloud/cdb/ec2/vms_p2p_command_bus.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 using OnSaveResourceAttribute =
@@ -28,4 +28,4 @@ private:
 };
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

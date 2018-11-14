@@ -26,8 +26,8 @@ public:
 
 signals:
     void bindFinished(
-        nx::cdb::api::ResultCode result,
-        const nx::cdb::api::SystemData &systemData,
+        nx::cloud::db::api::ResultCode result,
+        const nx::cloud::db::api::SystemData &systemData,
         const rest::QnConnectionPtr &connection);
 
 protected:

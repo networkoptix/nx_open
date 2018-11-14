@@ -104,7 +104,7 @@ void QnConnectToCloudWatcher::addCloudPeer(nx::utils::Url url)
         .arg(url));
 
     m_cloudUrl = url;
-    m_cloudUrl.setPath(QString::fromUtf8(nx::cdb::api::kEc2EventsPath));
+    m_cloudUrl.setPath(QString::fromUtf8(nx::cloud::db::api::kEc2EventsPath));
     m_cloudUrl.setUserName(m_commonModule->globalSettings()->cloudSystemId());
     m_cloudUrl.setPassword(m_commonModule->globalSettings()->cloudAuthKey());
     m_ec2CloudConnector->startDataSynchronization(m_cloudUrl);

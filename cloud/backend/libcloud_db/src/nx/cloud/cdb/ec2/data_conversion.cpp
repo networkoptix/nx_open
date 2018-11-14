@@ -7,7 +7,7 @@
 #include <nx/vms/api/data/id_data.h>
 #include <nx/vms/api/data/user_data.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace ec2 {
 
 namespace {
@@ -101,4 +101,4 @@ void convert(const api::SystemSharing& from, nx::vms::api::IdData* const to)
 }
 
 } // namespace ec2
-} // namespace nx::cdb
+} // namespace nx::cloud::db

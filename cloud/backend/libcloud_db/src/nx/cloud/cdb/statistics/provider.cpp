@@ -2,7 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-namespace nx::cdb::statistics {
+namespace nx::cloud::db::statistics {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (Statistics),
@@ -26,4 +26,4 @@ Statistics Provider::statistics() const
         m_dataSyncEngineStatisticsProvider.statistics()};
 }
 
-} // namespace nx::cdb::statistics
+} // namespace nx::cloud::db::statistics

@@ -26,7 +26,7 @@
 #include "temporary_account_password_manager_stub.h"
 #include "vms_p2p_command_bus_stub.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class AuthenticationProvider:
@@ -51,7 +51,7 @@ public:
         m_vmsP2pCommandBusStub.setOnSaveResourceAttribute(
             std::bind(&AuthenticationProvider::onSaveResourceAttribute, this, _1, _2));
 
-        m_authenticationProvider = std::make_unique<cdb::AuthenticationProvider>(
+        m_authenticationProvider = std::make_unique<nx::cloud::db::AuthenticationProvider>(
             m_settingsLoader.settings(),
             &queryExecutor(),
             &m_accountManager,
@@ -191,7 +191,7 @@ protected:
         using namespace std::placeholders;
 
         nx::utils::stree::ResourceContainer rc;
-        rc.put(nx::cdb::attr::authSystemId, QString::fromStdString(m_systems[0].id));
+        rc.put(nx::cloud::db::attr::authSystemId, QString::fromStdString(m_systems[0].id));
 
         const auto nonce = m_userAuthenticationDao->fetchSystemNonce(
             nullptr, m_systems[0].id);
@@ -296,7 +296,7 @@ private:
     AccountManagerStub m_accountManager;
     SystemSharingManagerStub m_systemSharingManager;
     TemporaryAccountPasswordManagerStub m_temporaryAccountPasswordManager;
-    std::unique_ptr<cdb::AuthenticationProvider> m_authenticationProvider;
+    std::unique_ptr<nx::cloud::db::AuthenticationProvider> m_authenticationProvider;
     dao::UserAuthenticationDataObjectFactory::Function m_factoryBak;
     dao::memory::UserAuthentication* m_userAuthenticationDao = nullptr;
     AccountWithPassword m_ownerAccount;
@@ -493,4 +493,4 @@ TEST_F(AuthenticationProvider, does_not_try_to_calculate_auth_record_for_user_wi
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

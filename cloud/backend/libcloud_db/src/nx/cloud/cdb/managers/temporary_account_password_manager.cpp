@@ -22,7 +22,7 @@
 
 #include "../stree/cdb_ns.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 TemporaryAccountPasswordManager::TemporaryAccountPasswordManager(
     const nx::utils::stree::ResourceNameSet& attributeNameset,
@@ -59,14 +59,14 @@ void TemporaryAccountPasswordManager::authenticateByName(
     if (!credentials)
         return completionHandler(authResultCode);
 
-    authProperties->put(cdb::attr::credentialsId, QString::fromStdString(credentials->id));
+    authProperties->put(nx::cloud::db::attr::credentialsId, QString::fromStdString(credentials->id));
 
     // Preparing output data.
     authProperties->put(
-        cdb::attr::authAccountEmail,
+        nx::cloud::db::attr::authAccountEmail,
         QString::fromStdString(credentials->accountEmail));
     if (credentials->isEmailCode)
-        authProperties->put(cdb::attr::authenticatedByEmailCode, true);
+        authProperties->put(nx::cloud::db::attr::authenticatedByEmailCode, true);
 
     completionHandler(api::ResultCode::ok);
 }
@@ -420,4 +420,4 @@ void TemporaryAccountPasswordManager::updateCredentialsInCache(
     }
 }
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

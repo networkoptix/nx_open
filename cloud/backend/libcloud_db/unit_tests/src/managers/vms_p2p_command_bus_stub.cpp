@@ -1,6 +1,6 @@
 #include "vms_p2p_command_bus_stub.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 nx::sql::DBResult VmsP2pCommandBusStub::saveResourceAttribute(
@@ -20,4 +20,4 @@ void VmsP2pCommandBusStub::setOnSaveResourceAttribute(OnSaveResourceAttribute fu
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

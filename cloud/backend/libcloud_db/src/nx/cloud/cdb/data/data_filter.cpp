@@ -4,7 +4,7 @@
 
 #include "../stree/stree_manager.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace data {
 
 bool DataFilter::getAsVariant(int resId, QVariant* const value) const
@@ -89,4 +89,4 @@ bool deserialize(QnJsonContext*, const QJsonValue& value, DataFilter* dataFilter
 }
 
 } // namespace data
-} // namespace nx::cdb
+} // namespace nx::cloud::db

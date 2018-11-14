@@ -4,7 +4,7 @@
 
 #include "../abstract_system_merge_dao.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace dao {
 namespace rdb {
 
@@ -31,4 +31,4 @@ private:
 
 } // namespace rdb
 } // namespace dao
-} // namespace nx::cdb
+} // namespace nx::cloud::db

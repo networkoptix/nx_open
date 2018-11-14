@@ -10,7 +10,7 @@
 #include "../stree/cdb_ns.h"
 #include "../stree/stree_manager.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 AuthorizationManager::AuthorizationManager(
     const StreeManager& stree,
@@ -202,4 +202,4 @@ bool AuthorizationManager::checkDynamicRules(
     return false;
 }
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

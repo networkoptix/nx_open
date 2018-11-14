@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace nx::cdb::api {
+namespace nx::cloud::db::api {
 
 static const int kErrorCodeBase = 100;
 
@@ -48,4 +48,4 @@ enum class ResultCode
 
 std::string toString(ResultCode resultCode);
 
-} // namespace nx::cdb::api
+} // namespace nx::cloud::db::api

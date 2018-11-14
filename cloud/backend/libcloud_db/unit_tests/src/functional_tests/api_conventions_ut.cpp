@@ -12,7 +12,7 @@
 
 #include "test_setup.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class ApiConventions:
@@ -231,7 +231,7 @@ TEST_F(ApiConventions, json_in_ok_response)
     update.customization = account1.customization + "new";
 
     QUrlQuery urlQuery;
-    nx::cdb::api::serializeToUrlQuery(update, &urlQuery);
+    nx::cloud::db::api::serializeToUrlQuery(update, &urlQuery);
 
     nx::network::http::HttpClient client;
     nx::utils::Url url;
@@ -268,4 +268,4 @@ TEST_F(ApiConventions, json_in_ok_response)
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

@@ -11,7 +11,7 @@
 
 #include <nx/cloud/cdb/api/system_data.h>
 
-namespace nx::cdb::api {
+namespace nx::cloud::db::api {
 
 #define SystemRegistrationData_Fields (name)(customization)(opaque)
 
@@ -114,18 +114,18 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (SystemHealthHistoryItem)(SystemHealthHistory),
     (json));
 
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemStatus)
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemHealth)
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemAccessRole)
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::FilterField)
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::MergeRole)
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemCapabilityFlag)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cloud::db::api::SystemStatus)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cloud::db::api::SystemHealth)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cloud::db::api::SystemAccessRole)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cloud::db::api::FilterField)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cloud::db::api::MergeRole)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cloud::db::api::SystemCapabilityFlag)
 
-} // namespace nx::cdb::api
+} // namespace nx::cloud::db::api
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemStatus), (lexical))
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemHealth), (lexical))
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemAccessRole), (lexical))
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::FilterField), (lexical))
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::MergeRole), (lexical))
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemCapabilityFlag), (lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cloud::db::api::SystemStatus), (lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cloud::db::api::SystemHealth), (lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cloud::db::api::SystemAccessRole), (lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cloud::db::api::FilterField), (lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cloud::db::api::MergeRole), (lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cloud::db::api::SystemCapabilityFlag), (lexical))

@@ -5,7 +5,7 @@
 #include "async_http_requests_executor.h"
 #include "include/nx/cloud/cdb/api/maintenance_manager.h"
 
-namespace nx::cdb::client {
+namespace nx::cloud::db::client {
 
 class MaintenanceManager:
     public api::MaintenanceManager,
@@ -20,4 +20,4 @@ public:
         std::function<void(api::ResultCode, api::Statistics)> completionHandler) override;
 };
 
-} // namespace nx::cdb::client
+} // namespace nx::cloud::db::client

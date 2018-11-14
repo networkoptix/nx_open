@@ -4,7 +4,7 @@
 
 #include <nx/network/cloud/cloud_module_url_fetcher.h>
 
-namespace nx::cdb::client {
+namespace nx::cloud::db::client {
 
 class ConnectionFactory:
     public api::ConnectionFactory
@@ -34,4 +34,4 @@ private:
     network::cloud::CloudDbUrlFetcher m_endPointFetcher;
 };
 
-} // nx::cdb::client
+} // nx::cloud::db::client

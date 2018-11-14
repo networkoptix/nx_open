@@ -6,7 +6,7 @@
 #include "cdb_connection.h"
 #include "event_connection.h"
 
-namespace nx::cdb::client {
+namespace nx::cloud::db::client {
 
 constexpr static auto kDefaultRequestTimeout = std::chrono::seconds(11);
 
@@ -66,4 +66,4 @@ void ConnectionFactory::setCloudUrl(const std::string& url)
     m_endPointFetcher.setUrl(nx::utils::Url(QString::fromStdString(url)));
 }
 
-} // nx::cdb::client
+} // nx::cloud::db::client

@@ -2,7 +2,7 @@
 
 #include "cdb_ns.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 SocketResourceReader::SocketResourceReader(
     const network::AbstractCommunicatingSocket& sock)
@@ -26,4 +26,4 @@ bool SocketResourceReader::getAsVariant(int resID, QVariant* const value) const
     }
 }
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

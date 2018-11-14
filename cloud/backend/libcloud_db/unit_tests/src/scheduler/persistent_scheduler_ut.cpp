@@ -6,17 +6,17 @@
 #include <nx/cloud/cdb/persistent_scheduler/persistent_scheduler_db_helper.h>
 #include "scheduler_user.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 using namespace ::testing;
 
-class DbHelperStub: public nx::cdb::AbstractSchedulerDbHelper
+class DbHelperStub: public nx::cloud::db::AbstractSchedulerDbHelper
 {
 public:
     MOCK_CONST_METHOD2(
         getScheduleData,
-        nx::sql::DBResult(nx::sql::QueryContext*, nx::cdb::ScheduleData*));
+        nx::sql::DBResult(nx::sql::QueryContext*, nx::cloud::db::ScheduleData*));
     MOCK_METHOD4(
         subscribe,
         nx::sql::DBResult(nx::sql::QueryContext*, const QnUuid&, QnUuid*, const ScheduleTaskInfo&));
@@ -120,8 +120,8 @@ protected:
 
     void expectingGetScheduledDataFromDbWithSomeDataWillBeCalled()
     {
-        nx::cdb::TaskToParams taskParams;
-        nx::cdb::ScheduleTaskInfo taskInfo;
+        nx::cloud::db::TaskToParams taskParams;
+        nx::cloud::db::ScheduleTaskInfo taskInfo;
         const auto kDbTaskPeriod = std::chrono::milliseconds(10);
 
         taskInfo.params["key1"] = "dbValue1";
@@ -173,8 +173,8 @@ protected:
 
     void whenSchedulerAndUserInitialized()
     {
-        scheduler = std::unique_ptr<nx::cdb::PersistentScheduler>(
-            new nx::cdb::PersistentScheduler(&executor, &dbHelper));
+        scheduler = std::unique_ptr<nx::cloud::db::PersistentScheduler>(
+            new nx::cloud::db::PersistentScheduler(&executor, &dbHelper));
 
         user = std::unique_ptr<SchedulerUser>(new SchedulerUser(&executor, scheduler.get(), functorId));
         user->registerAsAnEventReceiver();
@@ -231,7 +231,7 @@ protected:
         }
     }
 
-    std::unique_ptr<nx::cdb::PersistentScheduler> scheduler;
+    std::unique_ptr<nx::cloud::db::PersistentScheduler> scheduler;
     std::unique_ptr<SchedulerUser> user;
     const std::chrono::milliseconds kSleepTimeout{ 100 };
     DbHelperStub dbHelper;
@@ -280,7 +280,7 @@ TEST_F(PersistentScheduler, unsubscribe)
     std::atomic<int> firedAlready;
     user->unsubscribe(
         taskId,
-        [&firedAlready](const QnUuid&, const nx::cdb::test::SchedulerUser::Task& task)
+        [&firedAlready](const QnUuid&, const nx::cloud::db::test::SchedulerUser::Task& task)
         {
             firedAlready = task.fired;
         });
@@ -310,7 +310,7 @@ TEST_F(PersistentScheduler, unsubscribe_dbError)
     int firedAlready = -1;
     user->unsubscribe(
         taskId,
-        [&firedAlready](const QnUuid&, const nx::cdb::test::SchedulerUser::Task& task)
+        [&firedAlready](const QnUuid&, const nx::cloud::db::test::SchedulerUser::Task& task)
         {
             firedAlready = task.fired;
         });
@@ -364,7 +364,7 @@ TEST_F(PersistentScheduler, unsubscribeFromHandler)
     int firedAlready;
     whenShouldUnsubscribeFromHandler(
         taskId,
-        [&firedAlready](const QnUuid&, const nx::cdb::test::SchedulerUser::Task& task)
+        [&firedAlready](const QnUuid&, const nx::cloud::db::test::SchedulerUser::Task& task)
         {
             firedAlready = task.fired;
         });
@@ -385,4 +385,4 @@ TEST_F(PersistentScheduler, tasksLoadedFromDb)
 #endif
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

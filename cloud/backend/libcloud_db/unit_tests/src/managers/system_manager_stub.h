@@ -4,7 +4,7 @@
 
 #include <nx/cloud/cdb/managers/system_manager.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class SystemManagerStub:
@@ -39,4 +39,4 @@ private:
 };
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

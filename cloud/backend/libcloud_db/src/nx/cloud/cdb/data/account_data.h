@@ -15,7 +15,7 @@
 
 #include "access_rules.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace data {
 
 class AccountRegistrationData:
@@ -120,4 +120,4 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 //    (sql_record))
 
 } // namespace data
-} // namespace nx::cdb
+} // namespace nx::cloud::db

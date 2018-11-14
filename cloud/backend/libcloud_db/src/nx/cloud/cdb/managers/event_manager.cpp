@@ -12,7 +12,7 @@
 #include "../http_handlers/base_http_handler.h"
 #include "../settings.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 class SubscribeToSystemEventsHandler:
     public AbstractFreeMsgBodyHttpHandler<>
@@ -82,7 +82,7 @@ void EventManager::subscribeToEvents(
     > completionHandler)
 {
     std::string systemId;
-    if (!authzInfo.get(cdb::attr::authSystemId, &systemId))
+    if (!authzInfo.get(nx::cloud::db::attr::authSystemId, &systemId))
     {
         NX_ASSERT(false);
         completionHandler(
@@ -187,4 +187,4 @@ void EventManager::onMediaServerIdlePeriodExpired(
         });
 }
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

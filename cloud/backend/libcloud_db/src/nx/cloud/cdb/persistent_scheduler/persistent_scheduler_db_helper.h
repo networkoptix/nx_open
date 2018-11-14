@@ -7,7 +7,7 @@
 
 #include "persistent_scheduler_common.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 class AbstractSchedulerDbHelper
 {
@@ -55,4 +55,4 @@ private:
     nx::sql::DbStructureUpdater m_dbStructureUpdater;
 };
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

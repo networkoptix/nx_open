@@ -4,7 +4,7 @@
 
 #include "../stree/cdb_ns.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 namespace api {
 
@@ -158,4 +158,4 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     _Fields);
 
 } // namespace data
-} // namespace nx::cdb
+} // namespace nx::cloud::db

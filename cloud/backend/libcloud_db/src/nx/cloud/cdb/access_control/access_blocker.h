@@ -13,7 +13,7 @@
 #include "auth_types.h"
 #include "login_enumeration_protector.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 namespace conf { class Settings; }
 
@@ -65,4 +65,4 @@ private:
         const std::string& login);
 };
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

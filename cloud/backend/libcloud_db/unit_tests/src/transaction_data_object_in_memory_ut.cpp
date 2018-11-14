@@ -13,7 +13,7 @@
 
 #include <transaction/transaction_descriptor.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace ec2 {
 namespace dao {
 namespace memory {
@@ -21,7 +21,7 @@ namespace test {
 
 class TransactionDataObjectInMemory:
     public ::testing::Test,
-    public nx::cdb::test::BasePersistentDataTest
+    public nx::cloud::db::test::BasePersistentDataTest
 {
 public:
     TransactionDataObjectInMemory():
@@ -108,8 +108,8 @@ private:
     void init()
     {
         const auto sharing =
-            cdb::test::BusinessDataGenerator::generateRandomSharing(
-                cdb::test::BusinessDataGenerator::generateRandomAccount(),
+            nx::cloud::db::test::BusinessDataGenerator::generateRandomSharing(
+                nx::cloud::db::test::BusinessDataGenerator::generateRandomAccount(),
                 m_systemId);
         ec2::convert(sharing, &m_transactionData);
     }
@@ -183,4 +183,4 @@ TEST_F(TransactionDataObjectInMemory, DISABLED_tran_rollback)
 } // namespace memory
 } // namespace dao
 } // namespace ec2
-} // namespace nx::cdb
+} // namespace nx::cloud::db

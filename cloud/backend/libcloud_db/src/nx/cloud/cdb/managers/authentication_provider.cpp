@@ -21,7 +21,7 @@
 #include "../access_control/authentication_manager.h"
 #include "../ec2/vms_p2p_command_bus.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 AuthenticationProvider::AuthenticationProvider(
     const conf::Settings& settings,
@@ -465,4 +465,4 @@ void AuthenticationProvider::startCheckForExpiredAuthRecordsTimer(sql::DBResult 
         std::bind(&AuthenticationProvider::checkForExpiredAuthRecordsAsync, this));
 }
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

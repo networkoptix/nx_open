@@ -4,7 +4,7 @@
 
 #include "data_event.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 template<typename DataType>
 class DataIterator
@@ -43,4 +43,4 @@ public:
     void setDataEventListener(std::function<void(Event)> eventReceiver);
 };
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

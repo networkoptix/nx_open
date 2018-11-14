@@ -17,7 +17,7 @@ class CloudModuleUrlFetcher;
 
 } // namespace nx::network::cloud
 
-namespace nx::cdb::client {
+namespace nx::cloud::db::client {
 
 class EventConnection:
     public QObject,
@@ -75,4 +75,4 @@ private:
     void onReceivingSerializedEvent(QByteArray serializedEvent);
 };
 
-} // namespace nx::cdb::client
+} // namespace nx::cloud::db::client

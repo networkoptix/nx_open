@@ -300,7 +300,7 @@ void CloudUserAuthenticator::fetchAuthorizationFromCloud(
     NX_VERBOSE(this, lm("Auth data for username %1, cloudNonce %2 not found in cache. Quering cloud...")
         .arg(userid).arg(cloudNonce));
 
-    nx::cdb::api::AuthRequest authRequest;
+    nx::cloud::db::api::AuthRequest authRequest;
     authRequest.nonce = cloudNonce.toStdString();
     authRequest.realm = nx::network::AppInfo::realm().toStdString();
     authRequest.username = userid.toStdString();
@@ -310,25 +310,25 @@ void CloudUserAuthenticator::fetchAuthorizationFromCloud(
 
     lk->unlock();
 
-    nx::cdb::api::ResultCode resultCode;
-    nx::cdb::api::AuthResponse authResponse;
+    nx::cloud::db::api::ResultCode resultCode;
+    nx::cloud::db::api::AuthResponse authResponse;
     {
         const auto connection = m_cloudConnectionManager->getCloudConnection();
         if (connection)
         {
             std::tie(resultCode, authResponse) =
-                makeSyncCall<nx::cdb::api::ResultCode, nx::cdb::api::AuthResponse>(
+                makeSyncCall<nx::cloud::db::api::ResultCode, nx::cloud::db::api::AuthResponse>(
                     std::bind(
-                        &nx::cdb::api::AuthProvider::getAuthenticationResponse,
+                        &nx::cloud::db::api::AuthProvider::getAuthenticationResponse,
                         connection->authProvider(),
                         std::move(authRequest),
                         std::placeholders::_1));
-            if (resultCode != nx::cdb::api::ResultCode::ok)
+            if (resultCode != nx::cloud::db::api::ResultCode::ok)
                 m_cloudConnectionManager->processCloudErrorCode(resultCode);
         }
         else
         {
-            resultCode = nx::cdb::api::ResultCode::forbidden;
+            resultCode = nx::cloud::db::api::ResultCode::forbidden;
         }
     }
 
@@ -336,7 +336,7 @@ void CloudUserAuthenticator::fetchAuthorizationFromCloud(
 
     m_requestInProgress.erase(requestIter);
 
-    if (resultCode == nx::cdb::api::ResultCode::ok)
+    if (resultCode == nx::cloud::db::api::ResultCode::ok)
     {
         NX_VERBOSE(this, lm("Received successful authenticate response from cloud. username %1, cloudNonce %2")
             .arg(userid).arg(cloudNonce));
@@ -357,8 +357,8 @@ void CloudUserAuthenticator::fetchAuthorizationFromCloud(
             .arg(userid).arg(cloudNonce)
             .arg(m_cloudConnectionManager->connectionFactory().toString(resultCode)));
 
-        if (resultCode != nx::cdb::api::ResultCode::networkError &&
-            resultCode != nx::cdb::api::ResultCode::unknownError)
+        if (resultCode != nx::cloud::db::api::ResultCode::networkError &&
+            resultCode != nx::cloud::db::api::ResultCode::unknownError)
         {
             // Caching invalid authorization result.
             CloudAuthenticationData authData;

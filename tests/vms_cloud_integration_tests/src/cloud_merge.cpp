@@ -90,7 +90,7 @@ protected:
         }
     }
 
-    nx::cdb::AccountWithPassword registerCloudUser()
+    nx::cloud::db::AccountWithPassword registerCloudUser()
     {
         return m_cdb.addActivatedAccount2();
     }
@@ -123,14 +123,14 @@ protected:
     {
         for (;;)
         {
-            std::vector<nx::cdb::api::SystemDataEx> systems;
+            std::vector<nx::cloud::db::api::SystemDataEx> systems;
             ASSERT_EQ(
-                nx::cdb::api::ResultCode::ok,
+                nx::cloud::db::api::ResultCode::ok,
                 m_cdb.getSystems(m_cloudAccounts[0].email, m_cloudAccounts[0].password, &systems));
             ASSERT_GT(systems.size(), 0U);
             bool everySystemIsOnline = true;
             for (const auto& system: systems)
-                everySystemIsOnline &= system.stateOfHealth == nx::cdb::api::SystemHealth::online;
+                everySystemIsOnline &= system.stateOfHealth == nx::cloud::db::api::SystemHealth::online;
 
             if (everySystemIsOnline)
                 break;
@@ -146,7 +146,7 @@ protected:
     void whenMergeSystemsWithCloudDbRequest()
     {
         ASSERT_EQ(
-            nx::cdb::api::ResultCode::ok,
+            nx::cloud::db::api::ResultCode::ok,
             m_cdb.mergeSystems(
                 m_cloudAccounts[0],
                 m_systemMergeFixture.peer(0).getCloudCredentials().systemId.toStdString(),
@@ -192,9 +192,9 @@ protected:
     void thenCloudCredentialsAreValid(
         const nx::hpm::api::SystemCredentials& cloudCredentials)
     {
-        nx::cdb::api::SystemDataEx systemData;
+        nx::cloud::db::api::SystemDataEx systemData;
         ASSERT_EQ(
-            nx::cdb::api::ResultCode::ok,
+            nx::cloud::db::api::ResultCode::ok,
             m_cdb.getSystem(
                 cloudCredentials.systemId.toStdString(), cloudCredentials.key.toStdString(),
                 cloudCredentials.systemId.toStdString(), &systemData));
@@ -203,9 +203,9 @@ protected:
     void thenCloudCredentialsAreNotValid(
         const nx::hpm::api::SystemCredentials& cloudCredentials)
     {
-        nx::cdb::api::SystemDataEx systemData;
+        nx::cloud::db::api::SystemDataEx systemData;
         ASSERT_NE(
-            nx::cdb::api::ResultCode::ok,
+            nx::cloud::db::api::ResultCode::ok,
             m_cdb.getSystem(
                 cloudCredentials.systemId.toStdString(), cloudCredentials.key.toStdString(),
                 cloudCredentials.systemId.toStdString(), &systemData));
@@ -219,12 +219,12 @@ protected:
             if (cloudCredentials.systemId == cloudCredentialsException.systemId)
                 continue;
 
-            nx::cdb::api::SystemDataEx systemData;
+            nx::cloud::db::api::SystemDataEx systemData;
             const auto resultCode = m_cdb.getSystem(
                 cloudCredentials.systemId.toStdString(), cloudCredentials.key.toStdString(),
                 cloudCredentials.systemId.toStdString(), &systemData);
 
-            if (resultCode == nx::cdb::api::ResultCode::ok)
+            if (resultCode == nx::cloud::db::api::ResultCode::ok)
                 return false;
         }
 
@@ -248,9 +248,9 @@ protected:
         // Waiting until cloud has all that users vms has.
         for (;;)
         {
-            std::vector<nx::cdb::api::SystemSharingEx> cloudUsers;
+            std::vector<nx::cloud::db::api::SystemSharingEx> cloudUsers;
             ASSERT_EQ(
-                nx::cdb::api::ResultCode::ok,
+                nx::cloud::db::api::ResultCode::ok,
                 m_cdb.getSystemSharings(
                     cloudCredentials.systemId.toStdString(),
                     cloudCredentials.key.toStdString(),
@@ -325,15 +325,15 @@ protected:
         }
     }
 
-    void shareSystem(int index, const nx::cdb::AccountWithPassword& cloudUser)
+    void shareSystem(int index, const nx::cloud::db::AccountWithPassword& cloudUser)
     {
         ASSERT_EQ(
-            nx::cdb::api::ResultCode::ok,
+            nx::cloud::db::api::ResultCode::ok,
             m_cdb.shareSystem(
                 m_cloudAccounts[index],
                 m_systemMergeFixture.peer(index).getCloudCredentials().systemId.toStdString(),
                 cloudUser.email,
-                nx::cdb::api::SystemAccessRole::cloudAdmin));
+                nx::cloud::db::api::SystemAccessRole::cloudAdmin));
     }
 
     void disconnectFromCloud(int index)
@@ -341,17 +341,17 @@ protected:
         ASSERT_TRUE(m_systemMergeFixture.peer(index).detachFromCloud());
     }
 
-    void assertUserIsAbleToLogin(int peerIndex, const nx::cdb::AccountWithPassword& cloudUser)
+    void assertUserIsAbleToLogin(int peerIndex, const nx::cloud::db::AccountWithPassword& cloudUser)
     {
         ASSERT_TRUE(testUserLogin(peerIndex, cloudUser));
     }
 
-    void assertUserIsNotAbleToLogin(int peerIndex, const nx::cdb::AccountWithPassword& cloudUser)
+    void assertUserIsNotAbleToLogin(int peerIndex, const nx::cloud::db::AccountWithPassword& cloudUser)
     {
         ASSERT_FALSE(testUserLogin(peerIndex, cloudUser));
     }
 
-    bool testUserLogin(int index, const nx::cdb::AccountWithPassword& cloudUser)
+    bool testUserLogin(int index, const nx::cloud::db::AccountWithPassword& cloudUser)
     {
         using namespace nx::network::http;
 
@@ -364,9 +364,9 @@ protected:
     }
 
 private:
-    nx::cdb::CdbLauncher m_cdb;
+    nx::cloud::db::CdbLauncher m_cdb;
     ::ec2::test::SystemMergeFixture m_systemMergeFixture;
-    std::vector<nx::cdb::AccountWithPassword> m_cloudAccounts;
+    std::vector<nx::cloud::db::AccountWithPassword> m_cloudAccounts;
     std::vector<nx::hpm::api::SystemCredentials> m_systemCloudCredentials;
     nx::network::http::TestHttpServer m_httpProxy;
 
@@ -396,7 +396,7 @@ private:
 
     bool connectToCloud(
         ::ec2::test::PeerWrapper& peerWrapper,
-        const nx::cdb::AccountWithPassword& ownerAccount)
+        const nx::cloud::db::AccountWithPassword& ownerAccount)
     {
         const auto system = m_cdb.addRandomSystemToAccount(ownerAccount);
         if (!peerWrapper.saveCloudSystemCredentials(

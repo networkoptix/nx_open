@@ -20,7 +20,7 @@ namespace vms {
 namespace cloud_integration {
 
 static const QString kCloudAuthInfoKey = 
-    QLatin1String(nx::cdb::api::kVmsUserAuthInfoAttributeName);
+    QLatin1String(nx::cloud::db::api::kVmsUserAuthInfoAttributeName);
 
 // CloudUserInfoPoolSupplier
 CloudUserInfoPoolSupplier::CloudUserInfoPoolSupplier(QnResourcePool* resourcePool):
@@ -91,7 +91,7 @@ void CloudUserInfoPoolSupplier::reportInfoChanged(
         return;
     }
 
-    nx::cdb::api::AuthInfo authInfo;
+    nx::cloud::db::api::AuthInfo authInfo;
     bool deserializeResult = QJson::deserialize(serializedValue, &authInfo);
     NX_ASSERT(deserializeResult);
 
@@ -195,7 +195,7 @@ boost::optional<nx::Buffer> CloudUserInfoPool::newestMostCommonNonce() const
 
 void CloudUserInfoPool::userInfoChanged(
     const nx::Buffer& userName,
-    const nx::cdb::api::AuthInfo& authInfo)
+    const nx::cloud::db::api::AuthInfo& authInfo)
 {
     NX_VERBOSE(this, lm("User info changed for user: %2").arg(userName));
     QnMutexLocker lock(&m_mutex);

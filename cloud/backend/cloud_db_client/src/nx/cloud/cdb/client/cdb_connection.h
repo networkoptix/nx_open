@@ -8,7 +8,7 @@
 #include "maintenance_manager.h"
 #include "system_manager.h"
 
-namespace nx::cdb::client {
+namespace nx::cloud::db::client {
 
 class Connection:
     public api::Connection
@@ -57,4 +57,4 @@ private:
     AsyncRequestsExecutor m_requestExecutor;
 };
 
-} // namespace nx::cdb::client
+} // namespace nx::cloud::db::client

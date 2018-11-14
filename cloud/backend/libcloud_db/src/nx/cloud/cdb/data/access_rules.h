@@ -3,7 +3,7 @@
 #include <nx/utils/stree/resourcecontainer.h>
 #include <nx/utils/stree/resourcenameset.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace data {
 
 class FieldRule
@@ -93,4 +93,4 @@ public:
 };
 
 } // namespace data
-} // namespace nx::cdb
+} // namespace nx::cloud::db

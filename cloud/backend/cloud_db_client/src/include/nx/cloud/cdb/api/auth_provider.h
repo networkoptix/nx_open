@@ -7,7 +7,7 @@
 #include "result_code.h"
 #include "system_data.h"
 
-namespace nx::cdb::api {
+namespace nx::cloud::db::api {
 
 class NonceData
 {
@@ -133,4 +133,4 @@ public:
     }
 };
 
-} // namespace nx::cdb::api
+} // namespace nx::cloud::db::api

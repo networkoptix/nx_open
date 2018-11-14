@@ -1216,7 +1216,7 @@ struct SetResourceParamTransactionType
             return TransactionType::Cloud;
         }
 
-        if (param.name == nx::cdb::api::kVmsUserAuthInfoAttributeName ||
+        if (param.name == nx::cloud::db::api::kVmsUserAuthInfoAttributeName ||
             param.name == Qn::USER_FULL_NAME)
         {
             return TransactionType::Cloud;

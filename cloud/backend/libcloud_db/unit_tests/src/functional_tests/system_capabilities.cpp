@@ -7,7 +7,7 @@
 
 #include "mserver_cloud_synchronization_connection_fixture.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class SystemCapabilities:
@@ -71,4 +71,4 @@ TEST_F(SystemCapabilities, cloud_merge_is_not_reported_for_old_protocol_version)
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

@@ -10,7 +10,7 @@
 
 #include "../settings.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 VmsGateway::VmsGateway(
     const conf::Settings& settings,
@@ -210,4 +210,4 @@ VmsRequestResult VmsGateway::convertVmsResultToResultCode(
     return result;
 }
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

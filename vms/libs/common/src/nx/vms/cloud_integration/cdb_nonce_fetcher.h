@@ -50,7 +50,7 @@ public:
     virtual bool isNonceValid(const QByteArray& nonce) const override;
 
     bool isValidCloudNonce(const QByteArray& nonce) const;
-    nx::cdb::api::ResultCode initializeConnectionToCloudSync();
+    nx::cloud::db::api::ResultCode initializeConnectionToCloudSync();
 
     static bool parseCloudNonce(
         const nx::network::http::BufferType& nonce,
@@ -76,13 +76,13 @@ private:
     /** map<cdb_nonce, valid_time>. */
     mutable std::deque<NonceCtx> m_cdbNonceQueue;
     QElapsedTimer m_monotonicClock;
-    std::unique_ptr<nx::cdb::api::Connection> m_connection;
+    std::unique_ptr<nx::cloud::db::api::Connection> m_connection;
     nx::network::aio::Timer m_timer;
     AbstractCloudUserInfoPool* m_cloudUserInfoPool;
 
     void fetchCdbNonceAsync();
-    void gotNonce(nx::cdb::api::ResultCode resCode, nx::cdb::api::NonceData nonce);
-    void saveCloudNonce(nx::cdb::api::NonceData nonce);
+    void gotNonce(nx::cloud::db::api::ResultCode resCode, nx::cloud::db::api::NonceData nonce);
+    void saveCloudNonce(nx::cloud::db::api::NonceData nonce);
     void removeExpiredNonce(const QnMutexLockerBase&, qint64 curClock);
 
     void cloudBindingStatusChangedUnsafe(const QnMutexLockerBase&, bool boundToCloud);

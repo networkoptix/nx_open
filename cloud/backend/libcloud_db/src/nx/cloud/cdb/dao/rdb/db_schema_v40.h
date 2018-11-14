@@ -1,6 +1,6 @@
 #pragma once
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace db {
 
 static const char kCreateDbVersion40[] =
@@ -174,4 +174,4 @@ CREATE TABLE transaction_source_settings (
 )sql";
 
 } // namespace db
-} // namespace nx::cdb
+} // namespace nx::cloud::db

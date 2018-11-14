@@ -11,7 +11,7 @@
 #include "../managers/system_manager.h"
 #include "../managers/managers_types.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace http_handler {
 
 class Ping:
@@ -43,4 +43,4 @@ private:
 };
 
 } // namespace http_handler
-} // namespace nx::cdb
+} // namespace nx::cloud::db

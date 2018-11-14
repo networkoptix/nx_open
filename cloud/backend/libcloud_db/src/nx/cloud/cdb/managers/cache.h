@@ -7,7 +7,7 @@
 
 #include <nx/utils/thread/mutex.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 /**
  * Data cache to be used by managers to reduce number of data fetch requests to DB.
@@ -100,4 +100,4 @@ private:
     std::map<KeyType, CachedType> m_data;
 };
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

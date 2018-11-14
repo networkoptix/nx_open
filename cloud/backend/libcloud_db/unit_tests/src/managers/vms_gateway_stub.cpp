@@ -1,6 +1,6 @@
 #include "vms_gateway_stub.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 VmsGatewayStub::~VmsGatewayStub()
@@ -77,4 +77,4 @@ void VmsGatewayStub::reportRequestResult(RequestContext requestContext)
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

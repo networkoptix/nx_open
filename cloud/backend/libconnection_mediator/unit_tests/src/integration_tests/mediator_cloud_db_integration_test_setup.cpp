@@ -10,7 +10,7 @@ MediatorCloudDbIntegrationTestSetup::MediatorCloudDbIntegrationTestSetup()
 {
     nx::network::SocketGlobalsHolder::instance()->reinitialize();
 
-    m_cdbLauncher = std::make_unique<cdb::CdbLauncher>();
+    m_cdbLauncher = std::make_unique<nx::cloud::db::CdbLauncher>();
     m_mediator = std::make_unique<hpm::MediatorFunctionalTest>(
         hpm::MediatorFunctionalTest::noFlags);
 }
@@ -29,7 +29,7 @@ bool MediatorCloudDbIntegrationTestSetup::startMediator()
     return m_mediator->startAndWaitUntilStarted();
 }
 
-cdb::CdbLauncher& MediatorCloudDbIntegrationTestSetup::cloudDb()
+nx::cloud::db::CdbLauncher& MediatorCloudDbIntegrationTestSetup::cloudDb()
 {
     return *m_cdbLauncher;
 }

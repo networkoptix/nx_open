@@ -7,7 +7,7 @@
 
 #include "ec2/cloud_vms_synchro_test_helper.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 constexpr auto timeForConnectionToChangeState = std::chrono::seconds(10);
 constexpr auto allowedConnectionClosureTimeError = std::chrono::seconds(10);
@@ -91,4 +91,4 @@ INSTANTIATE_TEST_CASE_P(P2pMode, Ec2MserverCloudSynchronizationKeepAlive,
     ::testing::Values(TestParams(false), TestParams(true)
 ));
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

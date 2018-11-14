@@ -8,13 +8,13 @@
 
 #include "business_data_generator.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
-using DbInstanceController = cdb::dao::rdb::DbInstanceController;
-using AccountDataObject = cdb::dao::rdb::AccountDataObject;
-using SystemDataObject = cdb::dao::rdb::SystemDataObject;
-using SystemSharingDataObject = cdb::dao::rdb::SystemSharingDataObject;
+using DbInstanceController = nx::cloud::db::dao::rdb::DbInstanceController;
+using AccountDataObject = nx::cloud::db::dao::rdb::AccountDataObject;
+using SystemDataObject = nx::cloud::db::dao::rdb::SystemDataObject;
+using SystemSharingDataObject = nx::cloud::db::dao::rdb::SystemSharingDataObject;
 
 DaoHelper::DaoHelper(const nx::sql::ConnectionOptions& dbConnectionOptions):
     m_dbConnectionOptions(dbConnectionOptions),
@@ -38,7 +38,7 @@ api::AccountData DaoHelper::insertRandomAccount()
 {
     using namespace std::placeholders;
 
-    auto account = cdb::test::BusinessDataGenerator::generateRandomAccount();
+    auto account = nx::cloud::db::test::BusinessDataGenerator::generateRandomAccount();
     executeUpdateQuerySyncThrow(
         std::bind(&AccountDataObject::insert, &m_accountDbController,
             _1, account));
@@ -48,7 +48,7 @@ api::AccountData DaoHelper::insertRandomAccount()
 
 api::SystemData DaoHelper::insertRandomSystem(const api::AccountData& account)
 {
-    auto system = cdb::test::BusinessDataGenerator::generateRandomSystem(account);
+    auto system = nx::cloud::db::test::BusinessDataGenerator::generateRandomSystem(account);
     insertSystem(account, system);
     return system;
 }
@@ -147,4 +147,4 @@ BasePersistentDataTest::BasePersistentDataTest(DbInitializationType dbInitializa
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

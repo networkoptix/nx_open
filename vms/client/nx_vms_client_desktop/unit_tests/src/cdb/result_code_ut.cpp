@@ -4,7 +4,7 @@
 #include <nx/cloud/cdb/api/result_code.h>
 #include <cloud/cloud_result_info.h>
 
-using namespace nx::cdb::api;
+using namespace nx::cloud::db::api;
 
 #define NX_CDB_RESULT_CODE_LIST(APPLY) \
     APPLY(ok) \

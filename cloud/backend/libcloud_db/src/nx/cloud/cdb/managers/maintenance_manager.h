@@ -16,7 +16,7 @@
 
 namespace nx { namespace data_sync_engine { class SyncronizationEngine; } }
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 class AuthorizationInfo;
 
@@ -66,4 +66,4 @@ private:
             ::ec2::ApiTransactionDataList)> completionHandler);
 };
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

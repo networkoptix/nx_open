@@ -4,7 +4,7 @@
 
 #include "rdb/system_data_object.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace dao {
 
 static SystemDataObjectFactory::CustomFactoryFunc customFactoryFunc;
@@ -25,4 +25,4 @@ SystemDataObjectFactory::CustomFactoryFunc SystemDataObjectFactory::setCustomFac
 }
 
 } // namespace dao
-} // namespace nx::cdb
+} // namespace nx::cloud::db

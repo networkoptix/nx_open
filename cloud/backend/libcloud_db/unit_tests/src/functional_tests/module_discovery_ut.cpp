@@ -9,7 +9,7 @@
 
 #include "test_setup.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class ModuleDiscovery:
@@ -80,4 +80,4 @@ TEST_F(ModuleDiscovery, cloud_modules_xml_with_multiple_mediator_ports)
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

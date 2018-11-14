@@ -15,13 +15,13 @@ static int registerQtResources()
     return 0;
 }
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 CloudDbService::CloudDbService(int argc, char **argv):
     base_type(argc, argv, QnLibCloudDbAppInfo::applicationDisplayName()),
     m_settings(nullptr)
 {
-    //if call Q_INIT_RESOURCE directly, linker will search for nx::cdb::libcloud_db and fail...
+    //if call Q_INIT_RESOURCE directly, linker will search for nx::cloud::db::libcloud_db and fail...
     registerQtResources();
 }
 
@@ -85,4 +85,4 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
     return result;
 }
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

@@ -3,7 +3,7 @@
 #include <nx/cloud/cdb/access_control/login_enumeration_protector.h>
 #include <nx/utils/time.h>
 
-namespace nx::cdb::test {
+namespace nx::cloud::db::test {
 
 class LoginEnumerationProtector:
     public ::testing::Test
@@ -14,7 +14,7 @@ public:
     {
         m_settings.minBlockPeriod = std::chrono::hours(1);
         m_settings.maxBlockPeriod = std::chrono::hours(1);
-        m_blocker = std::make_unique<cdb::LoginEnumerationProtector>(m_settings);
+        m_blocker = std::make_unique<nx::cloud::db::LoginEnumerationProtector>(m_settings);
     }
 
 protected:
@@ -52,8 +52,8 @@ protected:
     }
 
 private:
-    cdb::LoginEnumerationProtectionSettings m_settings;
-    std::unique_ptr<cdb::LoginEnumerationProtector> m_blocker;
+    nx::cloud::db::LoginEnumerationProtectionSettings m_settings;
+    std::unique_ptr<nx::cloud::db::LoginEnumerationProtector> m_blocker;
     nx::utils::test::ScopedTimeShift m_timeShift;
 };
 
@@ -70,4 +70,4 @@ TEST_F(LoginEnumerationProtector, lock_removed_after_timeout)
     thenLockIsRemoved();
 }
 
-} // namespace nx::cdb::test
+} // namespace nx::cloud::db::test

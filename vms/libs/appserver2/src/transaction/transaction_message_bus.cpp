@@ -898,7 +898,7 @@ nx::utils::Url QnTransactionMessageBus::updateOutgoingUrl(
 {
     nx::utils::Url url(srcUrl);
     if (peer == ::ec2::kCloudPeerId)
-        url.setPath(nx::cdb::api::kEc2EventsPath);
+        url.setPath(nx::cloud::db::api::kEc2EventsPath);
     else
         url.setPath("/ec2/events");
     QUrlQuery q(url.query());

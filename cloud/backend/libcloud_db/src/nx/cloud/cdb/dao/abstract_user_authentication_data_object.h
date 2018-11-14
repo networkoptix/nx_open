@@ -7,7 +7,7 @@
 
 #include <nx/cloud/cdb/api/auth_provider.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace dao {
 
 /**
@@ -66,4 +66,4 @@ public:
 };
 
 } // namespace dao
-} // namespace nx::cdb
+} // namespace nx::cloud::db

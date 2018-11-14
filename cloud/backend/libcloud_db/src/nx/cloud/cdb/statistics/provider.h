@@ -4,7 +4,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/connection_server/server_statistics.h>
 
-namespace nx::cdb::statistics {
+namespace nx::cloud::db::statistics {
 
 struct Statistics
 {
@@ -34,4 +34,4 @@ private:
     const data_sync_engine::statistics::Provider& m_dataSyncEngineStatisticsProvider;
 };
 
-} // namespace nx::cdb::statistics
+} // namespace nx::cloud::db::statistics

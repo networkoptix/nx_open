@@ -2,7 +2,7 @@
 
 #include <nx/cloud/cdb/api/account_data.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 class AccountWithPassword:
     public api::AccountData
@@ -11,4 +11,4 @@ public:
     std::string password;
 };
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

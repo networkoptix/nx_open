@@ -5,7 +5,7 @@
 #include "../managers/managers_types.h"
 #include "auth_types.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 class AbstractAccountManager;
 class StreeManager;
@@ -76,4 +76,4 @@ private:
         nx::utils::stree::AbstractResourceWriter* const outAuthzInfo) const;
 };
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

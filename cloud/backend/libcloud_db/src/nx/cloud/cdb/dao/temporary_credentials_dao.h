@@ -6,7 +6,7 @@
 
 #include "../data/account_data.h"
 
-namespace nx::cdb::data {
+namespace nx::cloud::db::data {
 
 // TODO: #ak Refactor it out.
 class Credentials
@@ -43,11 +43,11 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (TemporaryAccountCredentialsEx),
     (sql_record))
 
-} // namespace nx::cdb::data
+} // namespace nx::cloud::db::data
 
 //-------------------------------------------------------------------------------------------------
 
-namespace nx::cdb::dao {
+namespace nx::cloud::db::dao {
 
 class AbstractTemporaryCredentialsDao
 {
@@ -105,4 +105,4 @@ private:
     std::unique_ptr<AbstractTemporaryCredentialsDao> defaultFactoryFunction();
 };
 
-} // namespace nx::cdb::dao
+} // namespace nx::cloud::db::dao

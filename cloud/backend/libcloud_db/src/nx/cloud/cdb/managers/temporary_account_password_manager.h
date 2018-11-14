@@ -17,7 +17,7 @@
 #include "../dao/temporary_credentials_dao.h"
 #include "../data/account_data.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 namespace conf { class Settings; } // namespace
 
@@ -196,4 +196,4 @@ private:
         const data::TemporaryAccountCredentials& tempPasswordData);
 };
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

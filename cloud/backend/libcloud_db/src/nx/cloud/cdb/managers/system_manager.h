@@ -41,7 +41,7 @@
 
 namespace nx { namespace data_sync_engine { class SyncronizationEngine; } }
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 namespace conf { class Settings; } // namespace conf
 
@@ -318,7 +318,7 @@ private:
         nx::sql::QueryContext* const queryContext,
         const std::string& systemId,
         const data::SystemRegistrationDataWithAccount& newSystem,
-        nx::cdb::data::SystemSharing* const ownerSharing);
+        nx::cloud::db::data::SystemSharing* const ownerSharing);
 
     void systemAdded(
         nx::utils::Counter::ScopedIncrement asyncCallLocker,
@@ -538,4 +538,4 @@ private:
         const Args&... args);
 };
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

@@ -7,7 +7,7 @@
 
 #include "settings.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 class Controller;
 class HttpView;
@@ -36,4 +36,4 @@ private:
     Controller* m_controller = nullptr;
 };
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

@@ -6,7 +6,7 @@
 
 #include <boost/optional.hpp>
 
-namespace nx::cdb::api {
+namespace nx::cloud::db::api {
 
 enum class AccountStatus
 {
@@ -134,4 +134,4 @@ public:
     TemporaryCredentialsTimeouts timeouts;
 };
 
-} // namespace nx::cdb::api
+} // namespace nx::cloud::db::api

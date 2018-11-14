@@ -9,7 +9,7 @@
 
 #include "../data/account_data.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace dao {
 
 // TODO: #ak Get rid of duplicate update and updateAccount methods.
@@ -86,4 +86,4 @@ private:
 };
 
 } // namespace dao
-} // namespace nx::cdb
+} // namespace nx::cloud::db

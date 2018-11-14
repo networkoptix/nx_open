@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace nx::cdb::api {
+namespace nx::cloud::db::api {
 
 class ModuleInfo
 {
@@ -10,4 +10,4 @@ public:
     std::string realm;
 };
 
-} // namespace nx::cdb::api
+} // namespace nx::cloud::db::api

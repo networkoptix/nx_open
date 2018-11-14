@@ -18,7 +18,7 @@
 #include "temporary_account_password_manager_stub.h"
 #include "../functional_tests/test_email_manager.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class AccountManager:
@@ -48,7 +48,7 @@ public:
 
         m_settings.load(static_cast<std::size_t>(args.size()), args.data());
 
-        m_accountManager = std::make_unique<cdb::AccountManager>(
+        m_accountManager = std::make_unique<nx::cloud::db::AccountManager>(
             m_settings,
             m_streeManager,
             &m_tempPasswordManager,
@@ -74,7 +74,7 @@ protected:
     {
         using namespace std::placeholders;
 
-        using F = void (cdb::AccountManager::*)(
+        using F = void (nx::cloud::db::AccountManager::*)(
             const AuthorizationInfo& authzInfo,
             data::AccountUpdateData accountData,
             std::function<void(api::ResultCode)> completionHandler);
@@ -92,7 +92,7 @@ protected:
         api::ResultCode resultCode = api::ResultCode::ok;
         std::tie(resultCode) =
             makeSyncCall<api::ResultCode>(
-                std::bind(static_cast<F>(&cdb::AccountManager::updateAccount),
+                std::bind(static_cast<F>(&nx::cloud::db::AccountManager::updateAccount),
                     m_accountManager.get(), authzInfo, accountData, _1));
         ASSERT_EQ(api::ResultCode::ok, resultCode);
     }
@@ -101,7 +101,7 @@ protected:
     {
         using namespace std::placeholders;
 
-        using ResetPasswordFunc = void(cdb::AccountManager::*)(
+        using ResetPasswordFunc = void(nx::cloud::db::AccountManager::*)(
             const AuthorizationInfo&,
             data::AccountEmail,
             std::function<void(api::ResultCode, data::AccountConfirmationCode)>);
@@ -115,7 +115,7 @@ protected:
 
         const std::tuple<api::ResultCode, data::AccountConfirmationCode> result =
             makeSyncCall<api::ResultCode, data::AccountConfirmationCode>(
-                std::bind(static_cast<ResetPasswordFunc>(&cdb::AccountManager::resetPassword),
+                std::bind(static_cast<ResetPasswordFunc>(&nx::cloud::db::AccountManager::resetPassword),
                     m_accountManager.get(), authzInfo, accountEmail, _1));
         ASSERT_EQ(api::ResultCode::ok, std::get<0>(result));
     }
@@ -156,7 +156,7 @@ private:
     StreeManager m_streeManager;
     TemporaryAccountPasswordManagerStub m_tempPasswordManager;
     TestEmailManager m_emailManager;
-    std::unique_ptr<cdb::AccountManager> m_accountManager;
+    std::unique_ptr<nx::cloud::db::AccountManager> m_accountManager;
     nx::utils::SyncQueue<api::AccountData> m_extensionCalls;
     std::chrono::system_clock::time_point m_testStartTime;
 
@@ -198,7 +198,7 @@ private:
         api::ResultCode resultCode = api::ResultCode::ok;
         std::tie(resultCode, *accountConfirmationCode) =
             makeSyncCall<api::ResultCode, data::AccountConfirmationCode>(
-                std::bind(&cdb::AccountManager::registerAccount, m_accountManager.get(),
+                std::bind(&nx::cloud::db::AccountManager::registerAccount, m_accountManager.get(),
                     authzInfo, accountRegistrationData, _1));
         ASSERT_EQ(api::ResultCode::ok, resultCode);
     }
@@ -215,7 +215,7 @@ private:
         api::AccountEmail accountEmail;
         std::tie(resultCode, accountEmail) =
             makeSyncCall<api::ResultCode, api::AccountEmail>(
-                std::bind(&cdb::AccountManager::activate, m_accountManager.get(),
+                std::bind(&nx::cloud::db::AccountManager::activate, m_accountManager.get(),
                     authzInfo, accountConfirmationCode, _1));
         ASSERT_EQ(api::ResultCode::ok, resultCode);
     }
@@ -231,7 +231,7 @@ private:
         api::ResultCode resultCode = api::ResultCode::ok;
         std::tie(resultCode, *account) =
             makeSyncCall<api::ResultCode, api::AccountData>(
-                std::bind(&cdb::AccountManager::getAccount, m_accountManager.get(),
+                std::bind(&nx::cloud::db::AccountManager::getAccount, m_accountManager.get(),
                     authzInfo, _1));
         ASSERT_EQ(api::ResultCode::ok, resultCode);
     }
@@ -254,4 +254,4 @@ TEST_F(AccountManager, correct_password_reset_code)
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

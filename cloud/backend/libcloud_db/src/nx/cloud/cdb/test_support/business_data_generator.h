@@ -6,7 +6,7 @@
 #include "../data/account_data.h"
 #include "../data/system_data.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class BusinessDataGenerator
@@ -30,4 +30,4 @@ public:
 };
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

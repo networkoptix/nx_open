@@ -5,7 +5,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace dao {
 namespace rdb {
 
@@ -69,4 +69,4 @@ nx::sql::DBResult SystemHealthHistoryDataObject::selectHistoryBySystem(
 
 } // namespace rdb
 } // namespace dao
-} // namespace nx::cdb
+} // namespace nx::cloud::db

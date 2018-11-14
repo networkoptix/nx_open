@@ -6,7 +6,7 @@
 #include <nx/network/http/rest/http_rest_client.h>
 #include <nx/utils/app_info.h>
 
-namespace nx::cdb::client {
+namespace nx::cloud::db::client {
 
 SystemManager::SystemManager(
     network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher)
@@ -179,4 +179,4 @@ void SystemManager::startMerge(
         completionHandler);
 }
 
-} // namespace nx::cdb::client
+} // namespace nx::cloud::db::client

@@ -2,7 +2,7 @@
 
 #include <nx/network/deprecated/asynchttpclient.h>
 
-namespace nx::cdb::client {
+namespace nx::cloud::db::client {
 
 AsyncRequestsExecutor::AsyncRequestsExecutor(
     network::cloud::CloudModuleUrlFetcher* const cdbEndPointFetcher)
@@ -74,4 +74,4 @@ void AsyncRequestsExecutor::stopWhileInAioThread()
     m_runningRequests.clear();
 }
 
-} // namespace nx::cdb::client
+} // namespace nx::cloud::db::client

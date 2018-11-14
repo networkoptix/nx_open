@@ -6,7 +6,7 @@
 
 #include "../field_name.h"
 
-namespace nx::cdb::api {
+namespace nx::cloud::db::api {
 
 using namespace nx::network;
 
@@ -260,12 +260,12 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (json),
     _Fields)
 
-} // namespace nx::cdb::api
+} // namespace nx::cloud::db::api
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, AccountStatus,
-    (nx::cdb::api::AccountStatus::invalid, "invalid")
-    (nx::cdb::api::AccountStatus::awaitingActivation, "awaitingEmailConfirmation")
-    (nx::cdb::api::AccountStatus::activated, "activated")
-    (nx::cdb::api::AccountStatus::blocked, "blocked")
-    (nx::cdb::api::AccountStatus::invited, "invited")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cloud::db::api, AccountStatus,
+    (nx::cloud::db::api::AccountStatus::invalid, "invalid")
+    (nx::cloud::db::api::AccountStatus::awaitingActivation, "awaitingEmailConfirmation")
+    (nx::cloud::db::api::AccountStatus::activated, "activated")
+    (nx::cloud::db::api::AccountStatus::blocked, "blocked")
+    (nx::cloud::db::api::AccountStatus::invited, "invited")
 )

@@ -4,7 +4,7 @@
 
 #include <nx/cloud/cdb/managers/email_manager.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 class TestEmailManager:
     public AbstractEmailManager
@@ -21,4 +21,4 @@ private:
     nx::utils::MoveOnlyFunc<void(const AbstractNotification&)> m_delegate;
 };
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

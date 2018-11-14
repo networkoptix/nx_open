@@ -3,7 +3,7 @@
 #include "async_http_requests_executor.h"
 #include "include/nx/cloud/cdb/api/auth_provider.h"
 
-namespace nx::cdb::client {
+namespace nx::cloud::db::client {
 
 class AuthProvider:
     public api::AuthProvider,
@@ -23,4 +23,4 @@ public:
 };
 
 
-} // namespace nx::cdb::client
+} // namespace nx::cloud::db::client

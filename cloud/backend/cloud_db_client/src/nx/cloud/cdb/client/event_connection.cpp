@@ -12,7 +12,7 @@
 #include "cdb_request_path.h"
 #include "data/types.h"
 
-namespace nx::cdb::client {
+namespace nx::cloud::db::client {
 
 EventConnection::EventConnection(
     network::cloud::CloudModuleUrlFetcher* const endPointFetcher)
@@ -275,4 +275,4 @@ void EventConnection::onReceivingSerializedEvent(QByteArray serializedEvent)
     //TODO #ak reporting event
 }
 
-} // namespace nx::cdb::client
+} // namespace nx::cloud::db::client

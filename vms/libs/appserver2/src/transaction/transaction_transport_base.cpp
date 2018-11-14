@@ -1139,7 +1139,7 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
 
             m_postTranBaseUrl = m_remoteAddr;
             if (m_remotePeer.peerType == api::PeerType::cloudServer)
-                m_postTranBaseUrl.setPath(nx::cdb::api::kPushEc2TransactionPath);
+                m_postTranBaseUrl.setPath(nx::cloud::db::api::kPushEc2TransactionPath);
             else
                 m_postTranBaseUrl.setPath(lit("/ec2/forward_events"));
             m_postTranBaseUrl.setQuery(QString());

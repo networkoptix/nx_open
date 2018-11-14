@@ -6,7 +6,7 @@
 
 #include "persistent_scheduler_db_helper.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 static const int kSchedulerDbStartingVersion = 1;
 static const std::string kPersistentShedulerStructureName =
@@ -124,4 +124,4 @@ nx::sql::DBResult SchedulerDbHelper::unsubscribe(
     return nx::sql::DBResult::ok;
 }
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

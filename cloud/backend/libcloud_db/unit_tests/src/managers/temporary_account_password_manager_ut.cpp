@@ -10,7 +10,7 @@
 #include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
 #include <nx/cloud/cdb/test_support/business_data_generator.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class TemporaryAccountPasswordManager:
@@ -43,7 +43,7 @@ protected:
 
 private:
     CdbAttrNameSet m_attrNameset;
-    cdb::TemporaryAccountPasswordManager m_tempPasswordManager;
+    nx::cloud::db::TemporaryAccountPasswordManager m_tempPasswordManager;
     data::TemporaryAccountCredentials m_credentials;
     std::string m_email;
 };
@@ -55,4 +55,4 @@ TEST_F(TemporaryAccountPasswordManager, temporary_login_is_equal_to_account_emai
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

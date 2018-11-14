@@ -1,6 +1,6 @@
 #include "account_manager_stub.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 boost::optional<data::AccountData> AccountManagerStub::findAccountByUserName(
@@ -64,4 +64,4 @@ void AccountManagerStub::addAccount(AccountWithPassword account)
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

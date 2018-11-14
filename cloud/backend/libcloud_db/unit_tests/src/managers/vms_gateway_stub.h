@@ -8,7 +8,7 @@
 
 #include <nx/cloud/cdb/managers/vms_gateway.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 struct MergeRequestParameters
@@ -54,4 +54,4 @@ private:
 };
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

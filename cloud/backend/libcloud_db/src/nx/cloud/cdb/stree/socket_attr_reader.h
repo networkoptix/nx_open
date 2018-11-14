@@ -3,7 +3,7 @@
 #include <nx/utils/stree/resourcecontainer.h>
 #include <nx/network/socket.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 class SocketResourceReader:
     public nx::utils::stree::AbstractResourceReader
@@ -17,4 +17,4 @@ private:
     const network::AbstractCommunicatingSocket& m_socket;
 };
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

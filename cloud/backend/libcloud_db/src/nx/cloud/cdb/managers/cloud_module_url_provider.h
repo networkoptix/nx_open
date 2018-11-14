@@ -3,7 +3,7 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 class CloudModuleUrlProvider
 {
@@ -22,4 +22,4 @@ private:
     void loadTemplate(const QString& cloudModuleXmlTemplatePath);
 };
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

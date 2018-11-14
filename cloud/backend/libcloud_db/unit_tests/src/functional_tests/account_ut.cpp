@@ -28,7 +28,7 @@
 #include "email_manager_mocked.h"
 #include "test_setup.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 namespace {
@@ -842,7 +842,7 @@ protected:
         ASSERT_TRUE(startAndWaitUntilStarted());
     }
 
-    virtual void notificationReceived(const nx::cdb::AbstractNotification& /*notification*/)
+    virtual void notificationReceived(const nx::cloud::db::AbstractNotification& /*notification*/)
     {
     }
 
@@ -1133,7 +1133,7 @@ private:
     std::vector<ActivateAccountNotification> m_activateNotifications;
 
     virtual void notificationReceived(
-        const nx::cdb::AbstractNotification& notification) override
+        const nx::cloud::db::AbstractNotification& notification) override
     {
         const auto activateNotification =
             dynamic_cast<const ActivateAccountNotification*>(&notification);
@@ -1284,7 +1284,7 @@ private:
     }
 
     virtual void notificationReceived(
-        const nx::cdb::AbstractNotification& notification) override
+        const nx::cloud::db::AbstractNotification& notification) override
     {
         const auto inviteNotification =
             dynamic_cast<const InviteUserNotification*>(&notification);
@@ -1426,4 +1426,4 @@ TEST_F(AccountLockoutDisabled, account_is_not_locked_if_disabled)
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

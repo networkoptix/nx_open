@@ -43,7 +43,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    using namespace nx::cdb;
+    using namespace nx::cloud::db;
 
     nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::ok;
     if (!authorize(owner->accessRights(), &result, &statusCode))

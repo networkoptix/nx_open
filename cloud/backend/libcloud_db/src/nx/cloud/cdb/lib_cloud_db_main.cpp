@@ -9,7 +9,7 @@
 
 #include "cloud_db_service_public.h"
 
-static nx::cdb::CloudDbServicePublic* serviceInstance = NULL;
+static nx::cloud::db::CloudDbServicePublic* serviceInstance = NULL;
 
 void stopServer( int /*signal*/ )
 {
@@ -37,7 +37,7 @@ int libCloudDBMain(int argc, char* argv[])
     signal(SIGTERM, stopServer);
 #endif
 
-    nx::cdb::CloudDbServicePublic service(argc, argv);
+    nx::cloud::db::CloudDbServicePublic service(argc, argv);
     serviceInstance = &service;
     const int result = service.exec();
 

@@ -17,11 +17,11 @@ public:
     bool startCdb();
     bool startMediator();
 
-    cdb::CdbLauncher& cloudDb();
+    nx::cloud::db::CdbLauncher& cloudDb();
     hpm::MediatorFunctionalTest& mediator();
 
 private:
-    std::unique_ptr<cdb::CdbLauncher> m_cdbLauncher;
+    std::unique_ptr<nx::cloud::db::CdbLauncher> m_cdbLauncher;
     std::unique_ptr<hpm::MediatorFunctionalTest> m_mediator;
 };
 

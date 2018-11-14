@@ -8,7 +8,7 @@
 
 #include "../stree/cdb_ns.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace data {
 
 std::string FieldRule::toString(const nx::utils::stree::ResourceNameSet& nameset) const
@@ -239,4 +239,4 @@ bool AccessRestrictions::authorize(
 }
 
 } // namespace data
-} // namespace nx::cdb
+} // namespace nx::cloud::db

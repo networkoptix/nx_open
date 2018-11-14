@@ -21,7 +21,7 @@
 #include "system_manager_stub.h"
 #include "vms_gateway_stub.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class SystemMergeManager:
@@ -46,14 +46,14 @@ protected:
 
     void givenOnlineMasterSystem()
     {
-        m_masterSystem = cdb::test::BusinessDataGenerator::generateRandomSystem(m_ownerAccount);
+        m_masterSystem = nx::cloud::db::test::BusinessDataGenerator::generateRandomSystem(m_ownerAccount);
         m_systemHealthInfoProviderStub.setSystemStatus(m_masterSystem.id, true);
         m_systemManagerStub.addSystem(m_masterSystem);
     }
 
     void givenOnlineSlaveSystem()
     {
-        m_slaveSystem = cdb::test::BusinessDataGenerator::generateRandomSystem(m_ownerAccount);
+        m_slaveSystem = nx::cloud::db::test::BusinessDataGenerator::generateRandomSystem(m_ownerAccount);
         m_systemHealthInfoProviderStub.setSystemStatus(m_slaveSystem.id, true);
         m_systemManagerStub.addSystem(m_slaveSystem);
     }
@@ -185,7 +185,7 @@ private:
     SystemHealthInfoProviderStub m_systemHealthInfoProviderStub;
     VmsGatewayStub m_vmsGatewayStub;
     std::unique_ptr<data_sync_engine::SyncronizationEngine> m_syncronizationEngine;
-    std::unique_ptr<cdb::SystemMergeManager> m_systemMergeManager;
+    std::unique_ptr<nx::cloud::db::SystemMergeManager> m_systemMergeManager;
     nx::utils::SyncQueue<api::ResultCode> m_mergeResults;
     boost::optional<std::future<void>> m_systemMergeManagerDestroyed;
     api::AccountData m_ownerAccount;
@@ -208,7 +208,7 @@ private:
                 kMaxSupportedProtocolVersion),
             &queryExecutor());
 
-        m_systemMergeManager = std::make_unique<cdb::SystemMergeManager>(
+        m_systemMergeManager = std::make_unique<nx::cloud::db::SystemMergeManager>(
             &m_systemManagerStub,
             m_systemHealthInfoProviderStub,
             &m_vmsGatewayStub,
@@ -329,4 +329,4 @@ TEST_F(SystemMergeManager, merge_history_record_is_processed_even_if_system_is_i
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

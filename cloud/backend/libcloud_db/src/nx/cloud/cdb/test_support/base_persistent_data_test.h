@@ -12,7 +12,7 @@
 
 #include <nx/cloud/cdb/settings.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class DaoHelper
@@ -123,4 +123,4 @@ public:
 };
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

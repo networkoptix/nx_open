@@ -1,6 +1,6 @@
 #include "system_capabilities_info_provider.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 constexpr int kMinEc2ProtocolVersionWithCloudMergeSupport = 3041;
 
@@ -53,4 +53,4 @@ void SystemCapabilitiesProvider::onSystemStatusChanged(
         m_systemIdToProtoVersion.erase(systemId);
 }
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

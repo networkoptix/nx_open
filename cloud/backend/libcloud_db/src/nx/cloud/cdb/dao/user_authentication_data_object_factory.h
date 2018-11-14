@@ -4,7 +4,7 @@
 
 #include "abstract_user_authentication_data_object.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace dao {
 
 using UserAuthenticationDataObjectFactoryFunction =
@@ -25,4 +25,4 @@ private:
 };
 
 } // namespace dao
-} // namespace nx::cdb
+} // namespace nx::cloud::db

@@ -9,7 +9,7 @@
 
 #include "../test_setup.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 struct TestParams
 {
@@ -98,4 +98,4 @@ private:
     bool findAdminUserId(QnUuid* const id);
 };
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

@@ -1,6 +1,6 @@
 #include "cdb_ns.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 CdbAttrNameSet::CdbAttrNameSet()
 {
@@ -44,4 +44,4 @@ CdbAttrNameSet::CdbAttrNameSet()
     registerResource(attr::credentialsId, "credentials.id", QVariant::String);
 }
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

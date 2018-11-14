@@ -35,14 +35,14 @@ public:
     {
         QnMutexLocker lock(&m_mutex);
 
-        m_nonce = cdb::api::NonceData();
-        m_nonce->nonce = cdb::api::generateCloudNonceBase(systemId);
+        m_nonce = nx::cloud::db::api::NonceData();
+        m_nonce->nonce = nx::cloud::db::api::generateCloudNonceBase(systemId);
         m_nonce->validPeriod = expirationTime;
 
         return m_nonce->nonce;
     }
 
-    boost::optional<cdb::api::NonceData> getNonce() const
+    boost::optional<nx::cloud::db::api::NonceData> getNonce() const
     {
         QnMutexLocker lock(&m_mutex);
         if (m_nonce && m_fetchedNonceEventReceiver)
@@ -51,7 +51,7 @@ public:
     }
 
 private:
-    boost::optional<cdb::api::NonceData> m_nonce;
+    boost::optional<nx::cloud::db::api::NonceData> m_nonce;
     nx::utils::SyncQueue<std::string>* m_fetchedNonceEventReceiver = nullptr;
     mutable QnMutex m_mutex;
 };
@@ -59,7 +59,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 class DummyAuthProvider:
-    public cdb::api::AuthProvider
+    public nx::cloud::db::api::AuthProvider
 {
 public:
     DummyAuthProvider(CloudData* cloudData):
@@ -73,34 +73,34 @@ public:
     }
 
     virtual void getCdbNonce(
-        std::function<void(cdb::api::ResultCode, cdb::api::NonceData)> completionHandler) override
+        std::function<void(nx::cloud::db::api::ResultCode, nx::cloud::db::api::NonceData)> completionHandler) override
     {
         const auto nonce = m_cloudData->getNonce();
         if (nonce)
         {
             m_aioObject.post(std::bind(completionHandler,
-                cdb::api::ResultCode::ok, *nonce));
+                nx::cloud::db::api::ResultCode::ok, *nonce));
         }
         else
         {
             m_aioObject.post(std::bind(completionHandler,
-                cdb::api::ResultCode::forbidden, cdb::api::NonceData()));
+                nx::cloud::db::api::ResultCode::forbidden, nx::cloud::db::api::NonceData()));
         }
     }
 
     virtual void getCdbNonce(
         const std::string& /*systemId*/,
-        std::function<void(cdb::api::ResultCode, cdb::api::NonceData)> completionHandler) override
+        std::function<void(nx::cloud::db::api::ResultCode, nx::cloud::db::api::NonceData)> completionHandler) override
     {
-        m_aioObject.post(std::bind(completionHandler, cdb::api::ResultCode::ok, cdb::api::NonceData()));
+        m_aioObject.post(std::bind(completionHandler, nx::cloud::db::api::ResultCode::ok, nx::cloud::db::api::NonceData()));
     }
 
     virtual void getAuthenticationResponse(
-        const cdb::api::AuthRequest& /*authRequest*/,
-        std::function<void(cdb::api::ResultCode, cdb::api::AuthResponse)> completionHandler) override
+        const nx::cloud::db::api::AuthRequest& /*authRequest*/,
+        std::function<void(nx::cloud::db::api::ResultCode, nx::cloud::db::api::AuthResponse)> completionHandler) override
     {
         m_aioObject.post(std::bind(completionHandler,
-            cdb::api::ResultCode::notImplemented, cdb::api::AuthResponse()));
+            nx::cloud::db::api::ResultCode::notImplemented, nx::cloud::db::api::AuthResponse()));
     }
 
     void bindToAioThread(network::aio::AbstractAioThread* aioThread)
@@ -116,7 +116,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 class DummyCloudConnection:
-    public cdb::api::Connection
+    public nx::cloud::db::api::Connection
 {
 public:
     DummyCloudConnection(CloudData* cloudData):
@@ -160,18 +160,18 @@ public:
         return std::chrono::milliseconds::zero();
     }
 
-    virtual cdb::api::AccountManager* accountManager() override { return nullptr; }
+    virtual nx::cloud::db::api::AccountManager* accountManager() override { return nullptr; }
 
-    virtual cdb::api::SystemManager* systemManager() override { return nullptr; }
+    virtual nx::cloud::db::api::SystemManager* systemManager() override { return nullptr; }
 
-    virtual cdb::api::AuthProvider* authProvider() override { return &m_authProvider; }
+    virtual nx::cloud::db::api::AuthProvider* authProvider() override { return &m_authProvider; }
 
-    virtual cdb::api::MaintenanceManager* maintenanceManager() override { return nullptr; }
+    virtual nx::cloud::db::api::MaintenanceManager* maintenanceManager() override { return nullptr; }
 
     virtual void ping(
-        std::function<void(cdb::api::ResultCode, cdb::api::ModuleInfo)> completionHandler) override
+        std::function<void(nx::cloud::db::api::ResultCode, nx::cloud::db::api::ModuleInfo)> completionHandler) override
     {
-        m_aioObject.post(std::bind(completionHandler, cdb::api::ResultCode::ok, cdb::api::ModuleInfo()));
+        m_aioObject.post(std::bind(completionHandler, nx::cloud::db::api::ResultCode::ok, nx::cloud::db::api::ModuleInfo()));
     }
 
 private:
@@ -210,19 +210,19 @@ public:
         return !m_cloudSystemId.empty();
     }
 
-    virtual std::unique_ptr<nx::cdb::api::Connection> getCloudConnection(
+    virtual std::unique_ptr<nx::cloud::db::api::Connection> getCloudConnection(
         const QString& /*cloudSystemId*/,
         const QString& /*cloudAuthKey*/) const override
     {
         return std::make_unique<DummyCloudConnection>(m_cloudData);
     }
 
-    virtual std::unique_ptr<nx::cdb::api::Connection> getCloudConnection() override
+    virtual std::unique_ptr<nx::cloud::db::api::Connection> getCloudConnection() override
     {
         return std::make_unique<DummyCloudConnection>(m_cloudData);
     }
 
-    virtual void processCloudErrorCode(nx::cdb::api::ResultCode /*resultCode*/) override
+    virtual void processCloudErrorCode(nx::cloud::db::api::ResultCode /*resultCode*/) override
     {
     }
 
@@ -259,7 +259,7 @@ public:
 
     void emulateUserPresence()
     {
-        m_nonce = nx::cdb::api::generateCloudNonceBase(m_cloudSystemId).c_str();
+        m_nonce = nx::cloud::db::api::generateCloudNonceBase(m_cloudSystemId).c_str();
     }
 
 private:
@@ -268,7 +268,7 @@ private:
 
     virtual void userInfoChanged(
         const nx::Buffer& /*userName*/,
-        const nx::cdb::api::AuthInfo& /*authInfo*/) override
+        const nx::cloud::db::api::AuthInfo& /*authInfo*/) override
     {
     }
 

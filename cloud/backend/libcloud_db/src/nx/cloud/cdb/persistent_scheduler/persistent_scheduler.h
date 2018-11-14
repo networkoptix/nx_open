@@ -14,7 +14,7 @@
 #include "persistent_scheduler_db_helper.h"
 #include "persistent_scheduler_common.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 class PersistentScheduler;
 
@@ -72,7 +72,7 @@ private:
     void timerFunction(
         const QnUuid& functorId,
         const QnUuid& taskId,
-        const nx::cdb::ScheduleParams& params);
+        const nx::cloud::db::ScheduleParams& params);
 
 private:
     nx::sql::AbstractAsyncSqlQueryExecutor* m_sqlExecutor;
@@ -87,4 +87,4 @@ private:
     std::unordered_set<QnUuid> m_delayed;
 };
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

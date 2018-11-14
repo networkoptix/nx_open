@@ -16,7 +16,7 @@
 
 namespace nx { namespace data_sync_engine { class SyncronizationEngine; } }
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 class AccountManager;
 class AuthenticationProvider;
@@ -108,4 +108,4 @@ private:
         HandlerType handler);
 };
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

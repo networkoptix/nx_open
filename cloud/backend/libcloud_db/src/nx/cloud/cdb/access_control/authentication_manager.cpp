@@ -28,7 +28,7 @@
 #include "../stree/socket_attr_reader.h"
 #include "../stree/stree_manager.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 using namespace nx::network::http;
 
@@ -407,4 +407,4 @@ api::ResultCode AuthenticationHelper::authenticateInDataManagers(
 
 } // namespace detail
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

@@ -4,7 +4,7 @@
 
 #include <nx/cloud/cdb/client/data/auth_data.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace data {
 
 class AuthRequest:
@@ -17,4 +17,4 @@ public:
 };
 
 } // namespace data
-} // namespace nx::cdb
+} // namespace nx::cloud::db

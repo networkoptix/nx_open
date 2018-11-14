@@ -8,7 +8,7 @@
 
 #include <nx/cloud/cdb/client/data/auth_data.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace dao {
 namespace rdb {
 
@@ -264,4 +264,4 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 } // namespace api
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

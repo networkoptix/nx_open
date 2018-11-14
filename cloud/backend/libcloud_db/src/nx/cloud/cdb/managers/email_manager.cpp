@@ -14,7 +14,7 @@
 #include "notification.h"
 #include "../settings.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 EMailManager::EMailManager(const conf::Settings& settings):
     m_settings(settings),
@@ -137,4 +137,4 @@ EMailManagerFactory::FactoryFunc EMailManagerFactory::setFactory(FactoryFunc fac
     return previousFunc;
 }
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

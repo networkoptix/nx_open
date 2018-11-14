@@ -17,7 +17,7 @@
 
 #include "access_control/login_enumeration_protector.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace conf {
 
 class Auth
@@ -174,4 +174,4 @@ private:
 };
 
 } // namespace conf
-} // namespace nx::cdb
+} // namespace nx::cloud::db

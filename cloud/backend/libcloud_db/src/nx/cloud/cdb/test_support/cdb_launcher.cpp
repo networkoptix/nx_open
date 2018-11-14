@@ -26,7 +26,7 @@
 #include "../cloud_db_service.h"
 #include "../managers/email_manager.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 //-------------------------------------------------------------------------------------------------
 // CdbLauncher
@@ -118,7 +118,7 @@ bool CdbLauncher::waitUntilStarted()
         api::ResultCode result = api::ResultCode::ok;
         std::tie(result, m_moduleInfo) = makeSyncCall<api::ResultCode, api::ModuleInfo>(
             std::bind(
-                &nx::cdb::api::Connection::ping,
+                &nx::cloud::db::api::Connection::ping,
                 connection.get(),
                 std::placeholders::_1));
         if (result == api::ResultCode::ok)
@@ -133,12 +133,12 @@ network::SocketAddress CdbLauncher::endpoint() const
     return network::SocketAddress(network::HostAddress::localhost, m_port);
 }
 
-nx::cdb::api::ConnectionFactory* CdbLauncher::connectionFactory()
+nx::cloud::db::api::ConnectionFactory* CdbLauncher::connectionFactory()
 {
     return m_connectionFactory.get();
 }
 
-std::unique_ptr<nx::cdb::api::Connection> CdbLauncher::connection(
+std::unique_ptr<nx::cloud::db::api::Connection> CdbLauncher::connection(
     const std::string& login,
     const std::string& password)
 {
@@ -200,7 +200,7 @@ api::ResultCode CdbLauncher::addAccount(
     std::tie(result, *activationCode) =
         makeSyncCall<api::ResultCode, api::AccountConfirmationCode>(
             std::bind(
-                &nx::cdb::api::AccountManager::registerNewAccount,
+                &nx::cloud::db::api::AccountManager::registerNewAccount,
                 connection->accountManager(),
                 registrationData,
                 std::placeholders::_1));
@@ -220,10 +220,10 @@ api::ResultCode CdbLauncher::activateAccount(
     auto connection = connectionFactory()->createConnection();
 
     api::ResultCode result = api::ResultCode::ok;
-    nx::cdb::api::AccountEmail response;
-    std::tie(result, response) = makeSyncCall<api::ResultCode, nx::cdb::api::AccountEmail>(
+    nx::cloud::db::api::AccountEmail response;
+    std::tie(result, response) = makeSyncCall<api::ResultCode, nx::cloud::db::api::AccountEmail>(
         std::bind(
-            &nx::cdb::api::AccountManager::activateAccount,
+            &nx::cloud::db::api::AccountManager::activateAccount,
             connection->accountManager(),
             activationCode,
             std::placeholders::_1));
@@ -240,9 +240,9 @@ api::ResultCode CdbLauncher::reactivateAccount(
     api::ResultCode result = api::ResultCode::ok;
     api::AccountEmail accountEmail;
     accountEmail.email = email;
-    std::tie(result, *activationCode) = makeSyncCall<api::ResultCode, nx::cdb::api::AccountConfirmationCode>(
+    std::tie(result, *activationCode) = makeSyncCall<api::ResultCode, nx::cloud::db::api::AccountConfirmationCode>(
         std::bind(
-            &nx::cdb::api::AccountManager::reactivateAccount,
+            &nx::cloud::db::api::AccountManager::reactivateAccount,
             connection->accountManager(),
             std::move(accountEmail),
             std::placeholders::_1));
@@ -259,9 +259,9 @@ api::ResultCode CdbLauncher::getAccount(
 
     api::ResultCode resCode = api::ResultCode::ok;
     std::tie(resCode, *accountData) =
-        makeSyncCall<api::ResultCode, nx::cdb::api::AccountData>(
+        makeSyncCall<api::ResultCode, nx::cloud::db::api::AccountData>(
             std::bind(
-                &nx::cdb::api::AccountManager::getAccount,
+                &nx::cloud::db::api::AccountManager::getAccount,
                 connection->accountManager(),
                 std::placeholders::_1));
     return resCode;
@@ -308,7 +308,7 @@ api::ResultCode CdbLauncher::updateAccount(
     std::tie(resCode) =
         makeSyncCall<api::ResultCode>(
             std::bind(
-                &nx::cdb::api::AccountManager::updateAccount,
+                &nx::cloud::db::api::AccountManager::updateAccount,
                 connection->accountManager(),
                 std::move(updateData),
                 std::placeholders::_1));
@@ -331,7 +331,7 @@ api::ResultCode CdbLauncher::resetAccountPassword(
     std::tie(resCode, accountConfirmationCode) =
         makeSyncCall<api::ResultCode, api::AccountConfirmationCode>(
             std::bind(
-                &nx::cdb::api::AccountManager::resetPassword,
+                &nx::cloud::db::api::AccountManager::resetPassword,
                 connection->accountManager(),
                 std::move(accountEmail),
                 std::placeholders::_1));
@@ -354,7 +354,7 @@ api::ResultCode CdbLauncher::createTemporaryCredentials(
     std::tie(resultCode, *temporaryCredentials) =
         makeSyncCall<api::ResultCode, api::TemporaryCredentials>(
             std::bind(
-                &nx::cdb::api::AccountManager::createTemporaryCredentials,
+                &nx::cloud::db::api::AccountManager::createTemporaryCredentials,
                 connection->accountManager(),
                 params,
                 std::placeholders::_1));
@@ -391,7 +391,7 @@ api::ResultCode CdbLauncher::bindRandomNotActivatedSystem(
     std::tie(resCode, *systemData) =
         makeSyncCall<api::ResultCode, api::SystemData>(
             std::bind(
-                &nx::cdb::api::SystemManager::bindSystem,
+                &nx::cloud::db::api::SystemManager::bindSystem,
                 connection->systemManager(),
                 std::move(sysRegData),
                 std::placeholders::_1));
@@ -443,7 +443,7 @@ api::ResultCode CdbLauncher::unbindSystem(
     std::tie(resCode) =
         makeSyncCall<api::ResultCode>(
             std::bind(
-                &nx::cdb::api::SystemManager::unbindSystem,
+                &nx::cloud::db::api::SystemManager::unbindSystem,
                 connection->systemManager(),
                 systemId,
                 std::placeholders::_1));
@@ -464,7 +464,7 @@ api::ResultCode CdbLauncher::getSystems(
     std::tie(resCode, systemDataList) =
         makeSyncCall<api::ResultCode, api::SystemDataExList>(
             std::bind(
-                &nx::cdb::api::SystemManager::getSystems,
+                &nx::cloud::db::api::SystemManager::getSystems,
                 connection->systemManager(),
                 std::placeholders::_1));
     *systems = std::move(systemDataList.systems);
@@ -486,7 +486,7 @@ api::ResultCode CdbLauncher::getSystemsFiltered(
     std::tie(resCode, systemDataList) =
         makeSyncCall<api::ResultCode, api::SystemDataExList>(
             std::bind(
-                &nx::cdb::api::SystemManager::getSystemsFiltered,
+                &nx::cloud::db::api::SystemManager::getSystemsFiltered,
                 connection->systemManager(),
                 filter,
                 std::placeholders::_1));
@@ -509,7 +509,7 @@ api::ResultCode CdbLauncher::getSystem(
     std::tie(resCode, systemDataList) =
         makeSyncCall<api::ResultCode, api::SystemDataExList>(
             std::bind(
-                &nx::cdb::api::SystemManager::getSystem,
+                &nx::cloud::db::api::SystemManager::getSystem,
                 connection->systemManager(),
                 systemId,
                 std::placeholders::_1));
@@ -548,7 +548,7 @@ api::ResultCode CdbLauncher::shareSystem(
     std::tie(resCode) =
         makeSyncCall<api::ResultCode>(
             std::bind(
-                &nx::cdb::api::SystemManager::shareSystem,
+                &nx::cloud::db::api::SystemManager::shareSystem,
                 connection->systemManager(),
                 std::move(systemSharing),
                 std::placeholders::_1));
@@ -601,7 +601,7 @@ api::ResultCode CdbLauncher::updateSystemSharing(
     std::tie(resCode) =
         makeSyncCall<api::ResultCode>(
             std::bind(
-                &nx::cdb::api::SystemManager::shareSystem,
+                &nx::cloud::db::api::SystemManager::shareSystem,
                 connection->systemManager(),
                 std::move(systemSharing),
                 std::placeholders::_1));
@@ -631,7 +631,7 @@ api::ResultCode CdbLauncher::getSystemSharings(
     auto connection = connectionFactory()->createConnection();
     connection->setCredentials(email, password);
 
-    typedef void(nx::cdb::api::SystemManager::*GetCloudUsersOfSystemType)
+    typedef void(nx::cloud::db::api::SystemManager::*GetCloudUsersOfSystemType)
         (std::function<void(api::ResultCode, api::SystemSharingExList)>);
 
     api::ResultCode resCode = api::ResultCode::ok;
@@ -640,7 +640,7 @@ api::ResultCode CdbLauncher::getSystemSharings(
         makeSyncCall<api::ResultCode, api::SystemSharingExList>(
             std::bind(
                 static_cast<GetCloudUsersOfSystemType>(
-                    &nx::cdb::api::SystemManager::getCloudUsersOfSystem),
+                    &nx::cloud::db::api::SystemManager::getCloudUsersOfSystem),
                 connection->systemManager(),
                 std::placeholders::_1));
 
@@ -662,7 +662,7 @@ api::ResultCode CdbLauncher::getAccessRoleList(
     std::tie(resCode, accessRoleList) =
         makeSyncCall<api::ResultCode, api::SystemAccessRoleList>(
             std::bind(
-                &nx::cdb::api::SystemManager::getAccessRoleList,
+                &nx::cloud::db::api::SystemManager::getAccessRoleList,
                 connection->systemManager(),
                 systemId,
                 std::placeholders::_1));
@@ -685,7 +685,7 @@ api::ResultCode CdbLauncher::renameSystem(
     std::tie(resCode) =
         makeSyncCall<api::ResultCode>(
             std::bind(
-                &nx::cdb::api::SystemManager::rename,
+                &nx::cloud::db::api::SystemManager::rename,
                 connection->systemManager(),
                 systemId,
                 newSystemName,
@@ -704,7 +704,7 @@ api::ResultCode CdbLauncher::updateSystem(
     std::tie(resCode) =
         makeSyncCall<api::ResultCode>(
             std::bind(
-                &nx::cdb::api::SystemManager::update,
+                &nx::cloud::db::api::SystemManager::update,
                 connection->systemManager(),
                 updatedData,
                 std::placeholders::_1));
@@ -717,7 +717,7 @@ api::ResultCode CdbLauncher::getSystemSharings(
     const std::string& systemId,
     std::vector<api::SystemSharingEx>* const sharings)
 {
-    typedef void(nx::cdb::api::SystemManager::*GetCloudUsersOfSystemType)
+    typedef void(nx::cloud::db::api::SystemManager::*GetCloudUsersOfSystemType)
         (const std::string&, std::function<void(api::ResultCode, api::SystemSharingExList)>);
 
     auto connection = connectionFactory()->createConnection();
@@ -729,7 +729,7 @@ api::ResultCode CdbLauncher::getSystemSharings(
         makeSyncCall<api::ResultCode, api::SystemSharingExList>(
             std::bind(
                 static_cast<GetCloudUsersOfSystemType>(
-                    &nx::cdb::api::SystemManager::getCloudUsersOfSystem),
+                    &nx::cloud::db::api::SystemManager::getCloudUsersOfSystem),
                 connection->systemManager(),
                 systemId,
                 std::placeholders::_1));
@@ -768,7 +768,7 @@ api::ResultCode CdbLauncher::getCdbNonce(
     const std::string& authKey,
     api::NonceData* const nonceData)
 {
-    typedef void(nx::cdb::api::AuthProvider::*GetCdbNonceType)
+    typedef void(nx::cloud::db::api::AuthProvider::*GetCdbNonceType)
         (std::function<void(api::ResultCode, api::NonceData)>);
 
     auto connection = connectionFactory()->createConnection();
@@ -778,7 +778,7 @@ api::ResultCode CdbLauncher::getCdbNonce(
     std::tie(resCode, *nonceData) =
         makeSyncCall<api::ResultCode, api::NonceData>(
             std::bind(
-                static_cast<GetCdbNonceType>(&nx::cdb::api::AuthProvider::getCdbNonce),
+                static_cast<GetCdbNonceType>(&nx::cloud::db::api::AuthProvider::getCdbNonce),
                 connection->authProvider(),
                 std::placeholders::_1));
     return resCode;
@@ -790,7 +790,7 @@ api::ResultCode CdbLauncher::getCdbNonce(
     const std::string& systemId,
     api::NonceData* const nonceData)
 {
-    typedef void(nx::cdb::api::AuthProvider::*GetCdbNonceType)
+    typedef void(nx::cloud::db::api::AuthProvider::*GetCdbNonceType)
         (const std::string&, std::function<void(api::ResultCode, api::NonceData)>);
 
     auto connection = connectionFactory()->createConnection();
@@ -800,7 +800,7 @@ api::ResultCode CdbLauncher::getCdbNonce(
     std::tie(resCode, *nonceData) =
         makeSyncCall<api::ResultCode, api::NonceData>(
             std::bind(
-                static_cast<GetCdbNonceType>(&nx::cdb::api::AuthProvider::getCdbNonce),
+                static_cast<GetCdbNonceType>(&nx::cloud::db::api::AuthProvider::getCdbNonce),
                 connection->authProvider(),
                 systemId,
                 std::placeholders::_1));
@@ -815,11 +815,11 @@ api::ResultCode CdbLauncher::ping(
     connection->setCredentials(systemId, authKey);
 
     api::ResultCode resCode = api::ResultCode::ok;
-    nx::cdb::api::ModuleInfo cloudModuleInfo;
+    nx::cloud::db::api::ModuleInfo cloudModuleInfo;
     std::tie(resCode, cloudModuleInfo) =
-        makeSyncCall<nx::cdb::api::ResultCode, nx::cdb::api::ModuleInfo>(
+        makeSyncCall<nx::cloud::db::api::ResultCode, nx::cloud::db::api::ModuleInfo>(
             std::bind(
-                &nx::cdb::api::Connection::ping,
+                &nx::cloud::db::api::Connection::ping,
                 connection.get(),
                 std::placeholders::_1));
     return resCode;
@@ -883,7 +883,7 @@ api::ResultCode CdbLauncher::getSystemHealthHistory(
     std::tie(resCode, *history) =
         makeSyncCall<api::ResultCode, api::SystemHealthHistory>(
             std::bind(
-                &nx::cdb::api::SystemManager::getSystemHealthHistory,
+                &nx::cloud::db::api::SystemManager::getSystemHealthHistory,
                 connection->systemManager(),
                 systemId,
                 std::placeholders::_1));
@@ -899,9 +899,9 @@ api::ResultCode CdbLauncher::recordUserSessionStart(
 
     api::ResultCode resCode = api::ResultCode::ok;
     std::tie(resCode) =
-        makeSyncCall<nx::cdb::api::ResultCode>(
+        makeSyncCall<nx::cloud::db::api::ResultCode>(
             std::bind(
-                &nx::cdb::api::SystemManager::recordUserSessionStart,
+                &nx::cloud::db::api::SystemManager::recordUserSessionStart,
                 connection->systemManager(),
                 systemId,
                 std::placeholders::_1));
@@ -915,9 +915,9 @@ api::ResultCode CdbLauncher::getVmsConnections(
 
     api::ResultCode resCode = api::ResultCode::ok;
     std::tie(resCode, *vmsConnections) =
-        makeSyncCall<nx::cdb::api::ResultCode, api::VmsConnectionDataList>(
+        makeSyncCall<nx::cloud::db::api::ResultCode, api::VmsConnectionDataList>(
             std::bind(
-                &nx::cdb::api::MaintenanceManager::getConnectionsFromVms,
+                &nx::cloud::db::api::MaintenanceManager::getConnectionsFromVms,
                 connection->maintenanceManager(),
                 std::placeholders::_1));
     return resCode;
@@ -960,9 +960,9 @@ api::ResultCode CdbLauncher::getStatistics(api::Statistics* const statistics)
 
     api::ResultCode resCode = api::ResultCode::ok;
     std::tie(resCode, *statistics) =
-        makeSyncCall<nx::cdb::api::ResultCode, api::Statistics>(
+        makeSyncCall<nx::cloud::db::api::ResultCode, api::Statistics>(
             std::bind(
-                &nx::cdb::api::MaintenanceManager::getStatistics,
+                &nx::cloud::db::api::MaintenanceManager::getStatistics,
                 connection->maintenanceManager(),
                 std::placeholders::_1));
     return resCode;
@@ -978,9 +978,9 @@ api::ResultCode CdbLauncher::mergeSystems(
 
     api::ResultCode resCode = api::ResultCode::ok;
     std::tie(resCode) =
-        makeSyncCall<nx::cdb::api::ResultCode>(
+        makeSyncCall<nx::cloud::db::api::ResultCode>(
             std::bind(
-                &nx::cdb::api::SystemManager::startMerge,
+                &nx::cloud::db::api::SystemManager::startMerge,
                 connection->systemManager(),
                 systemToMergeTo,
                 systemBeingMerged,
@@ -1133,7 +1133,7 @@ bool operator==(const api::AccountData& left, const api::AccountData& right)
 //-------------------------------------------------------------------------------------------------
 // EmailManagerStub
 
-EmailManagerStub::EmailManagerStub(nx::cdb::AbstractEmailManager* const target):
+EmailManagerStub::EmailManagerStub(nx::cloud::db::AbstractEmailManager* const target):
     m_target(target)
 {
 }
@@ -1149,4 +1149,4 @@ void EmailManagerStub::sendAsync(
         std::move(completionHandler));
 }
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

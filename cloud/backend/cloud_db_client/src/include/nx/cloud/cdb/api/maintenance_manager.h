@@ -6,7 +6,7 @@
 
 #include "result_code.h"
 
-namespace nx::cdb::api {
+namespace nx::cloud::db::api {
 
 class VmsConnectionData
 {
@@ -50,4 +50,4 @@ public:
         std::function<void(api::ResultCode, api::Statistics)> completionHandler) = 0;
 };
 
-} // namespace nx::cdb::api
+} // namespace nx::cloud::db::api

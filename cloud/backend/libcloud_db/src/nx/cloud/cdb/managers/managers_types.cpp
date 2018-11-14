@@ -2,7 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 api::ResultCode dbResultToApiResult(nx::sql::DBResult dbResult)
 {
@@ -57,21 +57,21 @@ api::ResultCode ec2ResultToResult(data_sync_engine::ResultCode resultCode)
     }
 }
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb, EntityType,
-    (nx::cdb::EntityType::none, "none")
-    (nx::cdb::EntityType::module, "module")
-    (nx::cdb::EntityType::account, "account")
-    (nx::cdb::EntityType::system, "system")
-    (nx::cdb::EntityType::subscription, "subscription")
-    (nx::cdb::EntityType::product, "product")
-    (nx::cdb::EntityType::maintenance, "maintenance")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cloud::db, EntityType,
+    (nx::cloud::db::EntityType::none, "none")
+    (nx::cloud::db::EntityType::module, "module")
+    (nx::cloud::db::EntityType::account, "account")
+    (nx::cloud::db::EntityType::system, "system")
+    (nx::cloud::db::EntityType::subscription, "subscription")
+    (nx::cloud::db::EntityType::product, "product")
+    (nx::cloud::db::EntityType::maintenance, "maintenance")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb, DataActionType,
-    (nx::cdb::DataActionType::fetch, "fetch")
-    (nx::cdb::DataActionType::insert, "insert")
-    (nx::cdb::DataActionType::update, "update")
-    (nx::cdb::DataActionType::delete_, "delete")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cloud::db, DataActionType,
+    (nx::cloud::db::DataActionType::fetch, "fetch")
+    (nx::cloud::db::DataActionType::insert, "insert")
+    (nx::cloud::db::DataActionType::update, "update")
+    (nx::cloud::db::DataActionType::delete_, "delete")
 )

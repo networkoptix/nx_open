@@ -2,7 +2,7 @@
 
 #include "connection.h"
 
-namespace nx::cdb::api {
+namespace nx::cloud::db::api {
 
 class CdbClient
 {
@@ -60,7 +60,7 @@ public:
     }
 
 private:
-    nx::cdb::api::ConnectionFactory* m_connectionFactory;
+    nx::cloud::db::api::ConnectionFactory* m_connectionFactory;
     std::unique_ptr<api::Connection> m_connection;
     std::string m_userName;
     std::string m_password;
@@ -73,4 +73,4 @@ private:
     }
 };
 
-} // namespace nx::cdb::api
+} // namespace nx::cloud::db::api

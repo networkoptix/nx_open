@@ -5,7 +5,7 @@
 
 #include <nx/utils/time.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace dao {
 namespace memory {
 
@@ -147,4 +147,4 @@ void UserAuthentication::deleteSystemAuthRecords(
 
 } // namespace rdb
 } // namespace dao
-} // namespace nx::cdb
+} // namespace nx::cloud::db

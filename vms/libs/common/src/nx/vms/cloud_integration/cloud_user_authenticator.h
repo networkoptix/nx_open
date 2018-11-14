@@ -60,7 +60,7 @@ private:
     struct CloudAuthenticationData
     {
         bool authorized = false;
-        nx::cdb::api::AuthResponse data;
+        nx::cloud::db::api::AuthResponse data;
         qint64 expirationTime = 0;
     };
 

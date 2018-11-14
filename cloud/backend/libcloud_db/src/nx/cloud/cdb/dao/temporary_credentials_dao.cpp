@@ -4,18 +4,18 @@
 
 #include "rdb/temporary_credentials_dao.h"
 
-namespace nx::cdb::data {
+namespace nx::cloud::db::data {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (TemporaryAccountCredentialsEx),
     (sql_record),
     _Fields)
 
-} // namespace nx::cdb::data
+} // namespace nx::cloud::db::data
 
 //-------------------------------------------------------------------------------------------------
 
-namespace nx::cdb::dao {
+namespace nx::cloud::db::dao {
 
 TemporaryCredentialsDaoFactory::TemporaryCredentialsDaoFactory():
     base_type([this](){ return defaultFactoryFunction(); })
@@ -34,4 +34,4 @@ std::unique_ptr<AbstractTemporaryCredentialsDao>
     return std::make_unique<rdb::TemporaryCredentialsDao>();
 }
 
-} // namespace nx::cdb::dao
+} // namespace nx::cloud::db::dao

@@ -19,7 +19,7 @@
 
 #include "notification.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 namespace conf { class Settings; }
 
@@ -85,4 +85,4 @@ public:
     static FactoryFunc setFactory(FactoryFunc factoryFunc);
 };
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

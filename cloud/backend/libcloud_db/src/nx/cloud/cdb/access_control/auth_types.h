@@ -2,7 +2,7 @@
 
 #include <nx/utils/stree/resourcecontainer.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 enum class AccessRole
 {
@@ -56,4 +56,4 @@ private:
     nx::utils::stree::ResourceContainer m_rc;
 };
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

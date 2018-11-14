@@ -4,7 +4,7 @@
 
 #include "../abstract_user_authentication_data_object.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace dao {
 namespace rdb {
 
@@ -63,4 +63,4 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 
 } // namespace api
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

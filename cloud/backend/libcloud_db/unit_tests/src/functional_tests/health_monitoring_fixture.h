@@ -4,7 +4,7 @@
 
 #include "mserver_cloud_synchronization_connection_fixture.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class HealthMonitoring:
@@ -37,4 +37,4 @@ private:
 };
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

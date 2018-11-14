@@ -14,7 +14,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/time.h>
 
-namespace nx::cdb::dao::rdb {
+namespace nx::cloud::db::dao::rdb {
 
 void TemporaryCredentialsDao::insert(
     nx::sql::QueryContext* queryContext,
@@ -295,4 +295,4 @@ std::string TemporaryCredentialsDao::preparePasswordString(
     return boost::algorithm::join(passwordParts, ":");
 }
 
-} // namespace nx::cdb::dao::rdb
+} // namespace nx::cloud::db::dao::rdb

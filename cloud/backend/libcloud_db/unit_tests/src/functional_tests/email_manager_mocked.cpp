@@ -4,7 +4,7 @@
 // TestEmailManager
 
 void TestEmailManager::sendAsync(
-    const nx::cdb::AbstractNotification& notification,
+    const nx::cloud::db::AbstractNotification& notification,
     std::function<void(bool)> completionHandler)
 {
     if (m_onNotificationHandler)
@@ -22,7 +22,7 @@ void TestEmailManager::setOnReceivedNotification(OnNotificationHandler handler)
 // EmailManagerMocked
 
 void EmailManagerMocked::sendAsync(
-    const nx::cdb::AbstractNotification& notification,
+    const nx::cloud::db::AbstractNotification& notification,
     std::function<void(bool)> completionHandler)
 {
     sendAsyncMocked(notification);

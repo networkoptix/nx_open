@@ -6,7 +6,7 @@
 
 #include "rdb/dao_rdb_user_authentication.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace dao {
 
 UserAuthenticationDataObjectFactory::UserAuthenticationDataObjectFactory():
@@ -27,4 +27,4 @@ std::unique_ptr<AbstractUserAuthentication>
 }
 
 } // namespace dao
-} // namespace nx::cdb
+} // namespace nx::cloud::db

@@ -5,7 +5,7 @@
 #include "async_http_requests_executor.h"
 #include "include/nx/cloud/cdb/api/system_manager.h"
 
-namespace nx::cdb::client {
+namespace nx::cloud::db::client {
 
 class SystemManager:
     public api::SystemManager,
@@ -58,4 +58,4 @@ public:
         std::function<void(api::ResultCode)> completionHandler) override;
 };
 
-} // namespace nx::cdb::client
+} // namespace nx::cloud::db::client

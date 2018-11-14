@@ -56,8 +56,8 @@ volatile bool qn_clientMetaTypes_initialized = false;
 
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
 
-Q_DECLARE_METATYPE(nx::cdb::api::ResultCode)
-Q_DECLARE_METATYPE(nx::cdb::api::SystemData)
+Q_DECLARE_METATYPE(nx::cloud::db::api::ResultCode)
+Q_DECLARE_METATYPE(nx::cloud::db::api::SystemData)
 Q_DECLARE_METATYPE(rest::QnConnectionPtr)
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qt, Alignment)
@@ -141,8 +141,8 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<WearableState>();
     qRegisterMetaType<WearableUpload>();
 
-    qRegisterMetaType<nx::cdb::api::ResultCode>();
-    qRegisterMetaType<nx::cdb::api::SystemData>();
+    qRegisterMetaType<nx::cloud::db::api::ResultCode>();
+    qRegisterMetaType<nx::cloud::db::api::SystemData>();
     qRegisterMetaType<rest::QnConnectionPtr>();
 
     qRegisterMetaType<nx::vms::client::desktop::ExportMediaPersistentSettings>();

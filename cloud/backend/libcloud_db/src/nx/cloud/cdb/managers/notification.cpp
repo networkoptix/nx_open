@@ -2,7 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 bool operator==(const BasicNotification& one, const BasicNotification& two)
 {
@@ -56,11 +56,11 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (json),
     _Fields)
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb, NotificationType,
-    (nx::cdb::NotificationType::activateAccount, "activate_account")
-    (nx::cdb::NotificationType::restorePassword, "restore_password")
-    (nx::cdb::NotificationType::systemShared, "system_shared")
-    (nx::cdb::NotificationType::systemInvite, "system_invite")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cloud::db, NotificationType,
+    (nx::cloud::db::NotificationType::activateAccount, "activate_account")
+    (nx::cloud::db::NotificationType::restorePassword, "restore_password")
+    (nx::cloud::db::NotificationType::systemShared, "system_shared")
+    (nx::cloud::db::NotificationType::systemInvite, "system_invite")
 )

@@ -3,7 +3,7 @@
 #include <nx/network/http/server/abstract_http_request_handler.h>
 #include <nx/utils/move_only_func.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 class AuthorizationManager;
 
@@ -30,4 +30,4 @@ private:
 };
 
 } // namespace http_handler
-} // namespace nx::cdb
+} // namespace nx::cloud::db

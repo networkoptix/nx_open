@@ -26,7 +26,7 @@ namespace nx::network::aio { class AbstractAioThread; }
  * Generally, some methods can be forbidden for credentials.
  * E.g., if credentials are system credentials, api::AccountManager::getAccount is forbidden
  */
-namespace nx::cdb::api {
+namespace nx::cloud::db::api {
 
 class ConnectionLostEvent
 {
@@ -143,10 +143,10 @@ public:
     virtual void setCloudUrl(const std::string& url) = 0;
 };
 
-} // namespace nx::cdb::api
+} // namespace nx::cloud::db::api
 
 extern "C"
 {
-    nx::cdb::api::ConnectionFactory* createConnectionFactory();
-    void destroyConnectionFactory(nx::cdb::api::ConnectionFactory* factory);
+    nx::cloud::db::api::ConnectionFactory* createConnectionFactory();
+    void destroyConnectionFactory(nx::cloud::db::api::ConnectionFactory* factory);
 }

@@ -9,7 +9,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/stree/resourcecontainer.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace data {
 
 class DataFilter:
@@ -40,4 +40,4 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, DataFilter* const dataFilter);
 bool deserialize(QnJsonContext*, const QJsonValue&, DataFilter*);
 
 } // namespace data
-} // namespace nx::cdb
+} // namespace nx::cloud::db

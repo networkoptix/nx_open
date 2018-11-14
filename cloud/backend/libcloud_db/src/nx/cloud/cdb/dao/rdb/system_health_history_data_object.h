@@ -6,7 +6,7 @@
 
 #include "../../data/system_data.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace dao {
 namespace rdb {
 
@@ -28,4 +28,4 @@ public:
 
 } // namespace rdb
 } // namespace dao
-} // namespace nx::cdb
+} // namespace nx::cloud::db

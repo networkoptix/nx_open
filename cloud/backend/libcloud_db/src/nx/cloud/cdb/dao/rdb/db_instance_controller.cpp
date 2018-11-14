@@ -5,7 +5,7 @@
 #include "db_schema_v40.h"
 #include "structure_update_statements.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace dao {
 namespace rdb {
 
@@ -45,4 +45,4 @@ void DbInstanceController::initializeStructureMigration()
 
 } // namespace rdb
 } // namespace dao
-} // namespace nx::cdb
+} // namespace nx::cloud::db

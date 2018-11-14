@@ -2,7 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-namespace nx::cdb::api {
+namespace nx::cloud::db::api {
 
 // TODO: #ak too many different conversion functions here.
 
@@ -133,29 +133,29 @@ std::string toString(ResultCode resultCode)
     return QnLexical::serialized(resultCode).toStdString();
 }
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, ResultCode,
-    (nx::cdb::api::ResultCode::ok, "ok")
-    (nx::cdb::api::ResultCode::notAuthorized, "notAuthorized")
-    (nx::cdb::api::ResultCode::forbidden, "forbidden")
-    (nx::cdb::api::ResultCode::accountNotActivated, "accountNotActivated")
-    (nx::cdb::api::ResultCode::accountBlocked, "accountBlocked")
-    (nx::cdb::api::ResultCode::notFound, "notFound")
-    (nx::cdb::api::ResultCode::alreadyExists, "alreadyExists")
-    (nx::cdb::api::ResultCode::dbError, "dbError")
-    (nx::cdb::api::ResultCode::networkError, "networkError")
-    (nx::cdb::api::ResultCode::notImplemented, "notImplemented")
-    (nx::cdb::api::ResultCode::unknownRealm, "unknownRealm")
-    (nx::cdb::api::ResultCode::badUsername, "badUsername")
-    (nx::cdb::api::ResultCode::badRequest, "badRequest")
-    (nx::cdb::api::ResultCode::invalidNonce, "invalidNonce")
-    (nx::cdb::api::ResultCode::serviceUnavailable, "serviceUnavailable")
-    (nx::cdb::api::ResultCode::notAllowedInCurrentState, "notAllowedInCurrentState")
-    (nx::cdb::api::ResultCode::mergedSystemIsOffline, "mergedSystemIsOffline")
-    (nx::cdb::api::ResultCode::vmsRequestFailure, "vmsRequestFailure")
-    (nx::cdb::api::ResultCode::credentialsRemovedPermanently, "credentialsRemovedPermanently")
-    (nx::cdb::api::ResultCode::invalidFormat, "invalidFormat")
-    (nx::cdb::api::ResultCode::retryLater, "retryLater")
-    (nx::cdb::api::ResultCode::unknownError, "unknownError")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cloud::db::api, ResultCode,
+    (nx::cloud::db::api::ResultCode::ok, "ok")
+    (nx::cloud::db::api::ResultCode::notAuthorized, "notAuthorized")
+    (nx::cloud::db::api::ResultCode::forbidden, "forbidden")
+    (nx::cloud::db::api::ResultCode::accountNotActivated, "accountNotActivated")
+    (nx::cloud::db::api::ResultCode::accountBlocked, "accountBlocked")
+    (nx::cloud::db::api::ResultCode::notFound, "notFound")
+    (nx::cloud::db::api::ResultCode::alreadyExists, "alreadyExists")
+    (nx::cloud::db::api::ResultCode::dbError, "dbError")
+    (nx::cloud::db::api::ResultCode::networkError, "networkError")
+    (nx::cloud::db::api::ResultCode::notImplemented, "notImplemented")
+    (nx::cloud::db::api::ResultCode::unknownRealm, "unknownRealm")
+    (nx::cloud::db::api::ResultCode::badUsername, "badUsername")
+    (nx::cloud::db::api::ResultCode::badRequest, "badRequest")
+    (nx::cloud::db::api::ResultCode::invalidNonce, "invalidNonce")
+    (nx::cloud::db::api::ResultCode::serviceUnavailable, "serviceUnavailable")
+    (nx::cloud::db::api::ResultCode::notAllowedInCurrentState, "notAllowedInCurrentState")
+    (nx::cloud::db::api::ResultCode::mergedSystemIsOffline, "mergedSystemIsOffline")
+    (nx::cloud::db::api::ResultCode::vmsRequestFailure, "vmsRequestFailure")
+    (nx::cloud::db::api::ResultCode::credentialsRemovedPermanently, "credentialsRemovedPermanently")
+    (nx::cloud::db::api::ResultCode::invalidFormat, "invalidFormat")
+    (nx::cloud::db::api::ResultCode::retryLater, "retryLater")
+    (nx::cloud::db::api::ResultCode::unknownError, "unknownError")
 )
 
-} // namespace nx::cdb::api
+} // namespace nx::cloud::db::api

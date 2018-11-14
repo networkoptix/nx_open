@@ -11,7 +11,7 @@
 #include "http_handlers/ping.h"
 #include "settings.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 const int kMinSupportedProtocolVersion = 3024;
 const int kMaxSupportedProtocolVersion = nx_ec::EC2_PROTO_VERSION;
@@ -190,7 +190,7 @@ void Controller::generateUserAuthRecords(nx::sql::QueryContext* queryContext)
         m_authProvider.afterSharingSystem(
             queryContext,
             sharing,
-            nx::cdb::SharingType::sharingWithExistingAccount);
+            nx::cloud::db::SharingType::sharingWithExistingAccount);
     }
 }
 
@@ -283,4 +283,4 @@ nx::sql::DBResult Controller::copyExternalTransaction(
         std::move(ownTransaction));
 }
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

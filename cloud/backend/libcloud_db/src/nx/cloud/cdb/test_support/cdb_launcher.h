@@ -20,7 +20,7 @@
 #include "../cloud_db_service_public.h"
 #include "../managers/email_manager.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 class CdbLauncher:
     public utils::test::ModuleLauncher<CloudDbServicePublic>,
@@ -34,8 +34,8 @@ public:
 
     network::SocketAddress endpoint() const;
 
-    nx::cdb::api::ConnectionFactory* connectionFactory();
-    std::unique_ptr<nx::cdb::api::Connection> connection(
+    nx::cloud::db::api::ConnectionFactory* connectionFactory();
+    std::unique_ptr<nx::cloud::db::api::Connection> connection(
         const std::string& login,
         const std::string& password);
     api::ModuleInfo moduleInfo() const;
@@ -261,7 +261,7 @@ public:
 private:
     int m_port;
     std::unique_ptr<
-        nx::cdb::api::ConnectionFactory,
+        nx::cloud::db::api::ConnectionFactory,
         decltype(&destroyConnectionFactory)
     > m_connectionFactory;
     api::ModuleInfo m_moduleInfo;
@@ -280,17 +280,17 @@ bool operator==(const api::AccountData& left, const api::AccountData& right);
 } // namespace api
 
 class EmailManagerStub:
-    public nx::cdb::AbstractEmailManager
+    public nx::cloud::db::AbstractEmailManager
 {
 public:
-    EmailManagerStub(nx::cdb::AbstractEmailManager* const target);
+    EmailManagerStub(nx::cloud::db::AbstractEmailManager* const target);
 
     virtual void sendAsync(
         const AbstractNotification& notification,
         std::function<void(bool)> completionHandler) override;
 
 private:
-    nx::cdb::AbstractEmailManager* const m_target;
+    nx::cloud::db::AbstractEmailManager* const m_target;
 };
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

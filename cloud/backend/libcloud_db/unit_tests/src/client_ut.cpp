@@ -2,7 +2,7 @@
 
 #include "functional_tests/test_setup.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 TEST_F(CdbFunctionalTest, client_cancellation)
@@ -36,4 +36,4 @@ TEST_F(CdbFunctionalTest, client_cancellation)
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

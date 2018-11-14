@@ -3,7 +3,7 @@
 #include <nx/cloud/cdb/managers/system_sharing_manager.h>
 #include <nx/utils/thread/mutex.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class SystemSharingManagerStub:
@@ -34,4 +34,4 @@ private:
 };
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

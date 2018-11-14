@@ -8,7 +8,7 @@
 #include "data/account_data.h"
 #include "include/nx/cloud/cdb/api/account_manager.h"
 
-namespace nx::cdb::client {
+namespace nx::cloud::db::client {
 
 class AccountManager:
     public api::AccountManager,
@@ -48,4 +48,4 @@ public:
         std::function<void(api::ResultCode, api::TemporaryCredentials)> completionHandler) override;
 };
 
-} // nx::cdb::client
+} // nx::cloud::db::client

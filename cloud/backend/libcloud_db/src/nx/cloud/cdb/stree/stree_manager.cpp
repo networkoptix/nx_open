@@ -3,7 +3,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/fusion/model_functions.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 StreeManager::StreeManager(const QString& xmlFilePath) noexcept(false):
     m_impl(m_cdbAttrNameSet, xmlFilePath)
@@ -27,10 +27,10 @@ const nx::utils::stree::ResourceNameSet& StreeManager::resourceNameSet() const
     return m_impl.resourceNameSet();
 }
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb, StreeOperation,
-    (nx::cdb::StreeOperation::authentication, "authentication")
-    (nx::cdb::StreeOperation::authorization, "authorization")
-    (nx::cdb::StreeOperation::getTemporaryCredentialsParameters, "getTemporaryCredentialsParameters")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cloud::db, StreeOperation,
+    (nx::cloud::db::StreeOperation::authentication, "authentication")
+    (nx::cloud::db::StreeOperation::authorization, "authorization")
+    (nx::cloud::db::StreeOperation::getTemporaryCredentialsParameters, "getTemporaryCredentialsParameters")
 )

@@ -4,7 +4,7 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/future.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 namespace {
 
@@ -206,7 +206,7 @@ void PersistentScheduler::addTimer(
 void PersistentScheduler::timerFunction(
     const QnUuid& functorId,
     const QnUuid& taskId,
-    const nx::cdb::ScheduleParams& params)
+    const nx::cloud::db::ScheduleParams& params)
 {
     AbstractPersistentScheduleEventReceiver* receiver;
     {
@@ -269,4 +269,4 @@ void PersistentScheduler::stop()
     m_timerManager.reset();
 }
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db
