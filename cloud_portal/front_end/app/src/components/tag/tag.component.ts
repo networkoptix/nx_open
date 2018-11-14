@@ -12,8 +12,6 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
     }]
 })
 export class NxTagComponent implements OnInit, ControlValueAccessor {
-    @Input('large') isLarge: boolean;
-    @Input('selectable') isSelectable: boolean;
     @Input('styled') isStyled: boolean;
     @Input('value') selected: boolean;
     @Output() onClick = new EventEmitter<boolean>();
@@ -21,20 +19,15 @@ export class NxTagComponent implements OnInit, ControlValueAccessor {
     constructor(){}
 
     ngOnInit(){
-        if (this.isSelectable){
-            this.isLarge = true;
-        }
     }
 
     deselectTag(){
-        if (this.isSelectable) {
-            this.selected = false;
-            this.changeState(false)
-        }
+        this.selected = false;
+        this.changeState(false);
     }
 
     selectTag(){
-        if (this.isSelectable && !this.selected) {
+        if (!this.selected) {
             this.selected = true;
             this.changeState(true)
         }
