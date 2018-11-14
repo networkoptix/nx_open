@@ -682,6 +682,19 @@
             "meta": {
               "size": 1073741824
             }
+          },
+          {
+            "name": "downloadableInstructions",
+            "label": "Downloadable Instructions",
+            "value": "",
+            "description": "Upload instructions pdf.",
+            "type": "external_file",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824,
+              "format": "pdf"
+            }
           }
         ]
       },
