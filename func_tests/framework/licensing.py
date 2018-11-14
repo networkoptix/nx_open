@@ -4,7 +4,7 @@ from itertools import chain
 import requests
 
 DNS = 'licensing.networkoptix.com'
-TEST_SERVER_IP = '52.14.166.95'
+TEST_SERVER_IP = '3.16.179.39'
 TEST_SERVER_URL = 'http://nxlicensed.hdw.mx/nxlicensed'
 SERVICE_ACCOUNT = ('service@networkoptix.com', 'ARuMWFI3lnHP')
 

@@ -69,6 +69,8 @@ struct EventTile::Private
     bool footerEnabled = true;
     Style style = Style::standard;
     bool highlighted = false;
+    bool clickPending = false;
+    QPoint clickPoint;
 
     Private(EventTile* q):
         q(q),
@@ -430,7 +432,9 @@ void EventTile::setPreview(ImageProvider* value)
         };
 
     showPreviewTimestamp();
-    connect(preview(), &ImageProvider::statusChanged, this, showPreviewTimestamp);
+
+    if (preview())
+        connect(preview(), &ImageProvider::statusChanged, this, showPreviewTimestamp);
 }
 
 QRectF EventTile::previewCropRect() const
@@ -494,14 +498,40 @@ bool EventTile::event(QEvent* event)
             break;
 
         case QEvent::MouseButtonPress:
+        {
+            const auto mouseEvent = static_cast<QMouseEvent*>(event);
             base_type::event(event);
             event->accept();
+            d->clickPending = (mouseEvent->button() == Qt::LeftButton);
+            d->clickPoint = mouseEvent->pos();
             return true;
+        }
 
         case QEvent::MouseButtonRelease:
-            if (static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton)
+            if (d->clickPending && static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton)
                 emit clicked();
+            d->clickPending = false;
             break;
+
+        case QEvent::MouseButtonDblClick:
+            d->clickPending = false;
+            if (static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton)
+                emit doubleClicked();
+            break;
+
+        case QEvent::MouseMove:
+        {
+            const auto mouseEvent = static_cast<QMouseEvent*>(event);
+            if (!mouseEvent->buttons().testFlag(Qt::LeftButton))
+                break;
+
+            if ((mouseEvent->pos() - d->clickPoint).manhattanLength() < qApp->startDragDistance())
+                break;
+
+            d->clickPending = false;
+            emit dragStarted();
+            break;
+        }
 
         default:
             break;

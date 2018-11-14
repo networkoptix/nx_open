@@ -179,36 +179,39 @@ public:
     void updateIndex()
     {
         LessFunc lessThan = &lessThanTimestamp;
-        switch (m_sortCol) {
-        case SelectRowColumn:
-        case TimestampColumn:
-            lessThan = &lessThanTimestamp;
-            break;
-        case EndTimestampColumn:
-            lessThan = &lessThanEndTimestamp;
-            break;
-        case DurationColumn:
-            lessThan = &lessThanDuration;
-            break;
-        case UserNameColumn:
-            lessThan = &lessThanUserName;
-            break;
-        case UserHostColumn:
-            lessThan = &lessThanUserHost;
-            break;
-        case EventTypeColumn:
-            lessThan = &lessThanEventType;
-            break;
-        case CameraNameColumn:
-            lessThan = &lessThanCameraName;
-            break;
-        case CameraIpColumn:
-            lessThan = &lessThanCameraIp;
-            break;
+        switch (m_sortCol)
+        {
+            case SelectRowColumn:
+            case TimestampColumn:
+                lessThan = &lessThanTimestamp;
+                break;
+            case EndTimestampColumn:
+                lessThan = &lessThanEndTimestamp;
+                break;
+            case DurationColumn:
+                lessThan = &lessThanDuration;
+                break;
+            case UserNameColumn:
+                lessThan = &lessThanUserName;
+                break;
+            case UserHostColumn:
+                lessThan = &lessThanUserHost;
+                break;
+            case EventTypeColumn:
+                lessThan = &lessThanEventType;
+                break;
+            case CameraNameColumn:
+                lessThan = &lessThanCameraName;
+                break;
+            case CameraIpColumn:
+                lessThan = &lessThanCameraIp;
+                break;
 
-        case UserActivityColumn:
-            lessThan = &lessThanActivity;
-            break;
+            case UserActivityColumn:
+                lessThan = &lessThanActivity;
+                break;
+            default:
+                break;
         }
 
         std::sort(m_data.begin(), m_data.end(), lessThan);
@@ -474,7 +477,7 @@ QString QnAuditLogModel::htmlData(const Column& column, const QnAuditRecord* dat
             if (hasDetail(data))
             {
                 auto archiveData = data->extractParam("archiveExist");
-                int index = 0;
+                size_t index = 0;
                 for (const auto& camera : data->resources)
                 {
                     result += lit("<br> ");
@@ -549,51 +552,54 @@ QString QnAuditLogModel::textData(const Column& column, const QnAuditRecord* dat
 {
     switch (column)
     {
-    case SelectRowColumn:
-        return QString();
-
-    case TimestampColumn:
-        return formatDateTime(data->createdTimeSec, true, true);
-
-    case DateColumn:
-        return formatDateTime(data->createdTimeSec, true, false);
-
-    case TimeColumn:
-        return formatDateTime(data->createdTimeSec, false, true);
-
-    case EndTimestampColumn:
-        if (data->eventType == Qn::AR_Login)
-            return data->rangeEndSec ? formatDateTime(data->rangeEndSec, true, true) : QString();
-        else if (data->eventType == Qn::AR_UnauthorizedLogin)
-            return eventTypeToString(data->eventType);
-        break;
-
-    case DurationColumn:
-        if (data->rangeEndSec)
-            return formatDuration(data->rangeEndSec - data->rangeStartSec);
-        else
+        case SelectRowColumn:
             return QString();
 
-    case UserNameColumn:
-        return data->authSession.userName;
+        case TimestampColumn:
+            return formatDateTime(data->createdTimeSec, true, true);
 
-    case UserHostColumn:
-        return data->authSession.userHost;
+        case DateColumn:
+            return formatDateTime(data->createdTimeSec, true, false);
 
-    case EventTypeColumn:
-        return eventTypeToString(data->eventType);
+        case TimeColumn:
+            return formatDateTime(data->createdTimeSec, false, true);
 
-    case CameraNameColumn:
-        return firstResourceName(data);
+        case EndTimestampColumn:
+            if (data->eventType == Qn::AR_Login)
+                return data->rangeEndSec ? formatDateTime(data->rangeEndSec, true, true) : QString();
+            else if (data->eventType == Qn::AR_UnauthorizedLogin)
+                return eventTypeToString(data->eventType);
+            break;
 
-    case CameraIpColumn:
-        return firstResourceIp(data);
+        case DurationColumn:
+            if (data->rangeEndSec)
+                return formatDuration(data->rangeEndSec - data->rangeStartSec);
+            else
+                return QString();
 
-    case DescriptionColumn:
-        return eventDescriptionText(data);
+        case UserNameColumn:
+            return data->authSession.userName;
 
-    case UserActivityColumn:
-        return tr("%n action(s)", "", data->extractParam(ChildCntParamName).toUInt());
+        case UserHostColumn:
+            return data->authSession.userHost;
+
+        case EventTypeColumn:
+            return eventTypeToString(data->eventType);
+
+        case CameraNameColumn:
+            return firstResourceName(data);
+
+        case CameraIpColumn:
+            return firstResourceIp(data);
+
+        case DescriptionColumn:
+            return eventDescriptionText(data);
+
+        case UserActivityColumn:
+            return tr("%n action(s)", "", data->extractParam(ChildCntParamName).toUInt());
+
+        default:
+            break;
     }
 
     return QString();
@@ -627,35 +633,37 @@ QVariant QnAuditLogModel::headerData(int section, Qt::Orientation orientation, i
         const Column &column = m_columns[section];
         switch (column)
         {
-        case SelectRowColumn:
-            return QVariant();
-        case TimestampColumn:
-            return tr("Session begins");
-        case EndTimestampColumn:
-            return tr("Session ends");
-        case DurationColumn:
-            return tr("Duration");
-        case UserNameColumn:
-            return tr("User");
-        case UserHostColumn:
-            return tr("IP");
-        case UserActivityColumn:
-            return tr("Activity");
-        case EventTypeColumn:
-            return tr("Activity");
-        case CameraNameColumn:
-            return QnDeviceDependentStrings::getDefaultNameFromSet(
-                resourcePool(),
-                tr("Device name"),
-                tr("Camera name"));
-        case CameraIpColumn:
-            return tr("IP");
-        case DateColumn:
-            return tr("Date");
-        case TimeColumn:
-            return tr("Time");
-        case DescriptionColumn:
-            return tr("Description");
+            case SelectRowColumn:
+                return QVariant();
+            case TimestampColumn:
+                return tr("Session begins");
+            case EndTimestampColumn:
+                return tr("Session ends");
+            case DurationColumn:
+                return tr("Duration");
+            case UserNameColumn:
+                return tr("User");
+            case UserHostColumn:
+                return tr("IP");
+            case UserActivityColumn:
+                return tr("Activity");
+            case EventTypeColumn:
+                return tr("Activity");
+            case CameraNameColumn:
+                return QnDeviceDependentStrings::getDefaultNameFromSet(
+                    resourcePool(),
+                    tr("Device name"),
+                    tr("Camera name"));
+            case CameraIpColumn:
+                return tr("IP");
+            case DateColumn:
+                return tr("Date");
+            case TimeColumn:
+                return tr("Time");
+            case DescriptionColumn:
+                return tr("Description");
+            default:
+                break;
         }
     }
     return base_type::headerData(section, orientation, role);

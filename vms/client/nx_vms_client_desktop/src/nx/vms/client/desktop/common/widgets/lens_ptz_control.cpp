@@ -226,6 +226,8 @@ void LensPtzControl::onButtonClicked(ButtonType button, bool state)
         case ButtonDown:
             m_buttonState.vertical -= delta;
             break;
+        default:
+            break;
     }
 }
 
