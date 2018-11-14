@@ -60,8 +60,8 @@ export class Rule {
     }
 
     /**
-     * Sets a rule's id, whether its enabled or disabled, and/or the cameraIds
-     * associated with the rule.
+     * Sets a rule's id, whether its enabled or disabled, and/or the cameraIds associated with the
+     * rule.
      * @param {[p: string]: any} params
      */
     public config(params: { [key: string]: any }) {
