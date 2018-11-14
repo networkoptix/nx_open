@@ -5,13 +5,13 @@
     angular.module('nxCommon').controller('ViewCtrl',
         ['$scope', '$rootScope', '$location', '$routeParams', 'cameraRecords', 'chromeCast', '$q',
             'camerasProvider', '$sessionStorage', '$localStorage', '$timeout', 'systemAPI', 'voiceControl',
-            'dialogs', 'configService', 'languageService',
+            'dialogs', 'nxConfigService', 'languageService',
             
             function ($scope, $rootScope, $location, $routeParams, cameraRecords, chromeCast, $q,
                       camerasProvider, $sessionStorage, $localStorage, $timeout, systemAPI, voiceControl,
-                      dialogs, configService, languageService) {
+                      dialogs, nxConfigService, languageService) {
                 
-                const CONFIG = configService.config;
+                const CONFIG = nxConfigService.getConfig();
                 const LANG = languageService.lang;
                 
                 var channels = {

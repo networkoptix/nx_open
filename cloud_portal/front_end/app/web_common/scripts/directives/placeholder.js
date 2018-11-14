@@ -3,9 +3,9 @@
     'use strict';
     
     angular.module('nxCommon')
-        .directive('placeholder', ['configService', function (configService) {
+        .directive('placeholder', ['nxConfigService', function (nxConfigService) {
     
-            const CONFIG = configService.config;
+            const CONFIG = nxConfigService.getConfig();
             
             return {
                 restrict: 'E',

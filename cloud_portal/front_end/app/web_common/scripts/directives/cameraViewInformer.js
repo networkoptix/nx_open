@@ -2,9 +2,9 @@
     
     'use strict';
     
-    function CameraViewInformer(configService) {
+    function CameraViewInformer(nxConfigService) {
     
-        const CONFIG = configService.config;
+        const CONFIG = nxConfigService.getConfig();
         
         function updateTpl(scope) {
             //offline and unauthorized are special cases. All others can be set without editing
@@ -72,7 +72,7 @@
         };
     }
     
-    CameraViewInformer.$inject = ['configService'];
+    CameraViewInformer.$inject = ['nxConfigService'];
     
     angular
         .module('nxCommon')

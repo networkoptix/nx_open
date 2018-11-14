@@ -26,10 +26,10 @@ import * as Hls from 'hls.js';
     var flashPlayer = '';
     
     angular.module('nxCommon')
-        .directive('videowindow', ['$interval', '$timeout', 'animateScope', '$sce', '$log', '$http', '$window', '$document', '$compile', 'configService',
-            function ($interval, $timeout, animateScope, $sce, $log, $http, $window, $document, $compile, configService) {
+        .directive('videowindow', ['$interval', '$timeout', 'animateScope', '$sce', '$log', '$http', '$window', '$document', '$compile', 'nxConfigService',
+            function ($interval, $timeout, animateScope, $sce, $log, $http, $window, $document, $compile, nxConfigService) {
                 
-                const CONFIG = configService.config;
+                const CONFIG = nxConfigService.getConfig();
                 
                 return {
                     restrict: 'E',

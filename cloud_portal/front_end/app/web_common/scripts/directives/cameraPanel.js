@@ -3,9 +3,9 @@
     'use strict';
 
     function CameraPanel($localStorage, $timeout, $location, $routeParams,
-                         configService, languageService) {
+                         nxConfigService, languageService) {
     
-        const CONFIG = configService.config;
+        const CONFIG = nxConfigService.getConfig();
         const LANG = languageService.lang;
         
         return {
@@ -128,7 +128,7 @@
         };
     }
     
-    CameraPanel.$inject = ['$localStorage', '$timeout', '$location', '$routeParams', 'configService', 'languageService'];
+    CameraPanel.$inject = ['$localStorage', '$timeout', '$location', '$routeParams', 'nxConfigService', 'languageService'];
     
     angular
         .module('nxCommon')

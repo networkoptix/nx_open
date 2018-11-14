@@ -3,9 +3,9 @@
     'use strict';
 
     function NxHeader(NxDialogsService, cloudApi, account, $location, $route,
-                      systemsProvider, configService, $rootScope) {
+                      systemsProvider, nxConfigService, $rootScope) {
 
-        const CONFIG = configService.config;
+        const CONFIG = nxConfigService.getConfig();
     
         function isActive(val) {
             var currentPath = $location.path();
@@ -102,7 +102,7 @@
     }
     
     NxHeader.$inject = ['NxDialogsService', 'cloudApi', 'account', '$location', '$route',
-        'systemsProvider', 'configService', '$rootScope'];
+        'systemsProvider', 'nxConfigService', '$rootScope'];
     
     angular
         .module('cloudApp')

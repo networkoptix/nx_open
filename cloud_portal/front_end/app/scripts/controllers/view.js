@@ -6,13 +6,13 @@
         .module('cloudApp')
         .controller('ViewPageCtrl', [ '$rootScope', '$scope', '$window', 'account', 'system', '$routeParams', 'systemAPI', 'dialogs',
             '$location', '$q', '$poll', 'authorizationCheckService', 'camerasProvider',
-            'configService', 'languageService',
+            'nxConfigService', 'languageService',
 
             function ($rootScope, $scope, $window, account, system, $routeParams, systemAPI, dialogs,
                       $location, $q, $poll, authorizationCheckService, camerasProvider,
-                      configService, languageService) {
+                      nxConfigService, languageService) {
     
-                const CONFIG = configService.config;
+                const CONFIG = nxConfigService.getConfig();
                 const LANG = languageService.lang;
             
                 $scope.systemReady = false;
