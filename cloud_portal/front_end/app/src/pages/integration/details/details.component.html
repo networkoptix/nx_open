@@ -10,7 +10,7 @@
     </div>
 
     <nx-layout-right>
-        <nx-block first *ngIf="plugin.information.hasInfo || plugin.overview.hasInfo">
+        <nx-block first-elm *ngIf="plugin.information.hasInfo || plugin.overview.hasInfo">
             <header>
                 {{plugin.information.name}}
             </header>
@@ -30,7 +30,7 @@
             </nx-section>
         </nx-block>
 
-        <nx-block gray side *ngIf="plugin.downloadFiles.length > 0">
+        <nx-block alt-style side-elm *ngIf="plugin.downloadFiles.length > 0">
             <header translate>
                 Download
             </header>

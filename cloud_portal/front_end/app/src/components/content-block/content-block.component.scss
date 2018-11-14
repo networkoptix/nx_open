@@ -47,7 +47,7 @@
         }
     }
     
-    &.gray {
+    &.alt-style {
         background-color : $light4;
         border           : none;
         
@@ -65,7 +65,7 @@
         }
     }
     
-    &.fixed {
+    &.fixed-height {
         height   : 300px;
         overflow : hidden;
     }
