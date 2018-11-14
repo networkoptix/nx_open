@@ -113,6 +113,9 @@ private:
 
     bool shouldSetTileRead(const EventTile* tile) const;
 
+    void navigateToSource(const QModelIndex& index) const;
+    void openSource(const QModelIndex& index, bool inNewTab) const;
+
 private:
     EventRibbon* const q = nullptr;
     QAbstractListModel* m_model = nullptr;

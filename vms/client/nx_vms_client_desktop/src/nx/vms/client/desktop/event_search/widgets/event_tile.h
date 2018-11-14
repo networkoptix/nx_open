@@ -124,7 +124,7 @@ public:
     void clear();
 
 signals:
-    void clicked();
+    void clicked(Qt::MouseButton button, Qt::KeyboardModifiers modifiers);
     void doubleClicked();
     void dragStarted();
 

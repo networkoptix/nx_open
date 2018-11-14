@@ -1,4 +1,5 @@
 #include "event_ribbon_p.h"
+#include "event_ribbon_p.h"
 
 #include <algorithm>
 #include <chrono>
@@ -17,6 +18,9 @@
 #include <ui/style/helper.h>
 #include <ui/style/nx_style_p.h>
 #include <ui/workaround/hidpi_workarounds.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_layout.h>
 #include <utils/common/event_processors.h>
 
 #include <nx/api/mediaserver/image_request.h>
@@ -28,6 +32,7 @@
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/scoped_connections.h>
 
 #include <nx/vms/client/desktop/ini.h>
 
@@ -328,37 +333,32 @@ void EventRibbon::Private::ensureWidget(int index)
             });
 
         connect(widget.get(), &EventTile::clicked, this,
+            [this](Qt::MouseButton button, Qt::KeyboardModifiers modifiers)
+            {
+                const int tileIndex = indexOf(static_cast<EventTile*>(sender()));
+                if (!m_model || tileIndex < 0)
+                    return;
+
+                const auto index = m_model->index(tileIndex);
+
+                if (button == Qt::LeftButton && !modifiers.testFlag(Qt::ControlModifier))
+                {
+                    if (!m_model->setData(index, QVariant(), Qn::DefaultNotificationRole))
+                        navigateToSource(index);
+                }
+                else if (button == Qt::LeftButton && modifiers.testFlag(Qt::ControlModifier)
+                    || button == Qt::MiddleButton)
+                {
+                    openSource(index, true /*inNewTab*/);
+                }
+            });
+
+        connect(widget.get(), &EventTile::doubleClicked, this,
             [this]()
             {
                 const int index = indexOf(static_cast<EventTile*>(sender()));
-                if (!m_model || index < 0)
-                    return;
-
-                const auto modelIndex = m_model->index(index);
-                if (m_model->setData(modelIndex, QVariant(), Qn::DefaultNotificationRole))
-                    return;
-
-                const auto timestamp = modelIndex.data(Qn::TimestampRole);
-                if (!timestamp.isValid())
-                    return;
-
-                const auto cameraList = modelIndex.data(Qn::ResourceListRole).value<QnResourceList>()
-                    .filtered<QnVirtualCameraResource>();
-
-                const auto camera = cameraList.size() == 1
-                    ? cameraList.back()
-                    : QnVirtualCameraResourcePtr();
-
-                using namespace ui::action;
-
-                if (camera)
-                {
-                    menu()->triggerIfPossible(GoToResourceAction, Parameters(camera)
-                        .withArgument(Qn::ForceRole, ini().raiseCameraFromClickedTile));
-                }
-
-                menu()->triggerIfPossible(JumpToTimeAction,
-                    Parameters().withArgument(Qn::TimestampRole, timestamp));
+                if (m_model && index >= 0)
+                    openSource(m_model->index(index), false /*inNewTab*/);
             });
 
         connect(widget.get(), &QWidget::customContextMenuRequested, this,
@@ -1116,6 +1116,69 @@ int EventRibbon::Private::indexAtPos(const QPoint& pos) const
     return iter != end
         ? m_visible.lower() + std::distance(iter, end) - 1
         : -1;
+}
+
+void EventRibbon::Private::navigateToSource(const QModelIndex& index) const
+{
+    return;
+
+    const auto timestamp = index.data(Qn::TimestampRole);
+    if (!timestamp.isValid())
+        return;
+
+    const auto cameraList = index.data(Qn::ResourceListRole).value<QnResourceList>()
+        .filtered<QnVirtualCameraResource>();
+
+    const auto camera = cameraList.size() == 1
+        ? cameraList.back()
+        : QnVirtualCameraResourcePtr();
+
+    using namespace ui::action;
+
+    if (camera)
+    {
+        menu()->trigger(GoToLayoutItemAction, Parameters(camera)
+            .withArgument(Qn::ForceRole, ini().raiseCameraFromClickedTile));
+    }
+
+    menu()->triggerIfPossible(JumpToTimeAction,
+        Parameters().withArgument(Qn::TimestampRole, timestamp));
+}
+
+void EventRibbon::Private::openSource(const QModelIndex& index, bool inNewTab) const
+{
+    const auto cameraList = index.data(Qn::ResourceListRole).value<QnResourceList>()
+        .filtered<QnVirtualCameraResource>();
+
+    if (cameraList.empty())
+        return;
+
+    using namespace ui::action;
+    using namespace std::chrono;
+
+    Parameters parameters(cameraList);
+
+    const auto timestamp = index.data(Qn::TimestampRole);
+    if (timestamp.canConvert<microseconds>())
+    {
+        parameters.setArgument(Qn::ItemTimeRole,
+            duration_cast<milliseconds>(timestamp.value<microseconds>()).count());
+    }
+
+    nx::utils::ScopedConnection connection;
+    if (!inNewTab && cameraList.size() == 1 && workbench()->currentLayout())
+    {
+        connection.reset(connect(workbench()->currentLayout(), &QnWorkbenchLayout::itemAdded, this,
+            [this](const QnWorkbenchItem* item)
+            {
+                menu()->trigger(GoToLayoutItemAction, Parameters()
+                    .withArgument(Qn::ItemUuidRole, item->uuid())
+                    .withArgument(Qn::ForceRole, ini().raiseCameraFromClickedTile));
+            }));
+    }
+
+    const auto action = inNewTab ? OpenInNewTabAction : DropResourcesAction;
+    menu()->triggerIfPossible(action, parameters);
 }
 
 } // namespace nx::vms::client::desktop

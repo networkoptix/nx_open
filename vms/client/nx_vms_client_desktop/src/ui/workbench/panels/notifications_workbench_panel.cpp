@@ -3,6 +3,7 @@
 #include <QtCore/QTimer>
 
 #include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
 
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/ui/workbench/workbench_animations.h>
@@ -415,7 +416,7 @@ void NotificationsWorkbenchPanel::createEventPanel(QGraphicsWidget* parentWidget
 
 void NotificationsWorkbenchPanel::at_eventTileHovered(
     const QModelIndex& index,
-    const nx::vms::client::desktop::EventTile* tile)
+    nx::vms::client::desktop::EventTile* tile)
 {
     if (m_eventPanelHoverProcessor)
     {
@@ -456,8 +457,9 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
     toolTip->updateTailPos();
     toolTip->pointTo(tooltipPos);
 
-    connect(toolTip.data(), &QnNotificationToolTipWidget::thumbnailClicked,
-        tile, &nx::vms::client::desktop::EventTile::clicked);
+    // TODO: #vkutin Refactor tooltip clicks, now it looks hackish.
+    connect(toolTip.data(), &QnNotificationToolTipWidget::thumbnailClicked, tile,
+        [tile]() { emit tile->clicked(Qt::LeftButton, QApplication::keyboardModifiers()); });
 
     m_eventPanelHoverProcessor = new HoverFocusProcessor(parentWidget);
     m_eventPanelHoverProcessor->addTargetItem(toolTip);

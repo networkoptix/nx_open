@@ -77,7 +77,8 @@ struct EventTile::Private
     bool footerEnabled = true;
     Style style = Style::standard;
     bool highlighted = false;
-    bool clickPending = false;
+    Qt::MouseButton clickButton = Qt::NoButton;
+    Qt::KeyboardModifiers clickModifiers;
     QPoint clickPoint;
 
     Private(EventTile* q):
@@ -555,19 +556,23 @@ bool EventTile::event(QEvent* event)
             const auto mouseEvent = static_cast<QMouseEvent*>(event);
             base_type::event(event);
             event->accept();
-            d->clickPending = (mouseEvent->button() == Qt::LeftButton);
+            d->clickButton = mouseEvent->button();
+            d->clickModifiers = mouseEvent->modifiers();
             d->clickPoint = mouseEvent->pos();
             return true;
         }
 
         case QEvent::MouseButtonRelease:
-            if (d->clickPending && static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton)
-                emit clicked();
-            d->clickPending = false;
+        {
+            const auto mouseEvent = static_cast<QMouseEvent*>(event);
+            if (mouseEvent->button() == d->clickButton)
+                emit clicked(d->clickButton, mouseEvent->modifiers() & d->clickModifiers);
+            d->clickButton = Qt::NoButton;
             break;
+        }
 
         case QEvent::MouseButtonDblClick:
-            d->clickPending = false;
+            d->clickButton = Qt::NoButton;
             if (static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton)
                 emit doubleClicked();
             break;
@@ -575,14 +580,11 @@ bool EventTile::event(QEvent* event)
         case QEvent::MouseMove:
         {
             const auto mouseEvent = static_cast<QMouseEvent*>(event);
-            if (!mouseEvent->buttons().testFlag(Qt::LeftButton))
-                break;
-
             if ((mouseEvent->pos() - d->clickPoint).manhattanLength() < qApp->startDragDistance())
                 break;
-
-            d->clickPending = false;
-            emit dragStarted();
+            d->clickButton = Qt::NoButton;
+            if (mouseEvent->buttons().testFlag(Qt::LeftButton))
+                emit dragStarted();
             break;
         }
 
