@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <type_traits>
 
+#include <nx/utils/log/assert.h>
+
 namespace nx {
 namespace utils {
 
@@ -18,7 +20,11 @@ public:
     Interval() = default;
     Interval(const Interval& other) = default;
     Interval(T lower, T upper): m_lower(lower), m_upper(std::max(lower, upper)) {}
-    explicit Interval(T single): Interval(single, single + 1) {}
+
+    explicit Interval(T single): Interval(single, single + 1)
+    {
+        NX_ASSERT(!isEmpty(), "Arithmetic overflow");
+    }
 
     T lower() const { return m_lower; }
     T upper() const { return m_upper; }
@@ -77,6 +83,16 @@ public:
     Interval truncatedRight(T upper) const
     {
         return Interval(m_lower, std::min(m_upper, upper));
+    }
+
+    Interval shifted(T delta) const
+    {
+        if (isEmpty())
+            return *this;
+
+        const Interval result(m_lower + delta, m_upper + delta);
+        NX_ASSERT(!result.isEmpty(), "Arithmetic overflow");
+        return result;
     }
 
 private:
