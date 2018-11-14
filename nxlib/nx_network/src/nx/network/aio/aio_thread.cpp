@@ -171,10 +171,10 @@ bool AIOThread::isSocketBeingMonitored(Pollable* sock) const
     return false;
 }
 
+static constexpr std::chrono::milliseconds kErrorResetTimeout(1);
+
 void AIOThread::run()
 {
-    static const std::chrono::seconds kErrorResetTimeout(1);
-
     initSystemThreadId();
     NX_DEBUG(this, QLatin1String("AIO thread started"));
 
