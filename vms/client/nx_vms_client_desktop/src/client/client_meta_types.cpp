@@ -26,6 +26,7 @@
 
 #include <update/updates_common.h>
 #include <update/update_info.h>
+#include <nx/vms/client/desktop/system_update/update_contents.h>
 
 #include <utils/color_space/image_correction.h>
 #include <nx/fusion/model_functions.h>
@@ -148,6 +149,9 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaType<LayoutTemplate>();
 
     qRegisterMetaType<QnNotificationLevel::Value>();
+
+    qRegisterMetaType<nx::update::Information>();
+    qRegisterMetaType<UpdateContents>();
 
     QMetaType::registerComparators<QnUuid>();
 

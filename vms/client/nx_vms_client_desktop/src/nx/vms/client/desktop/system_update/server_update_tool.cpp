@@ -143,7 +143,7 @@ std::future<UpdateContents> ServerUpdateTool::checkUpdateFromFile(QString file)
     m_extractor->start();
     connect(m_extractor.get(), &QnZipExtractor::finished, this, &ServerUpdateTool::atExtractFilesFinished);
 
-    return m_offlineUpdateCheckResult.get_future();;
+    return m_offlineUpdateCheckResult.get_future();
 }
 
 std::future<UpdateContents> ServerUpdateTool::checkRemoteUpdateInfo()
