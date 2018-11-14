@@ -51,6 +51,26 @@ static std::atomic<InitState> s_initState(InitState::none);
 static size_t s_counter(0);
 static SocketGlobals* s_instance = nullptr;
 
+//-------------------------------------------------------------------------------------------------
+
+#if defined(_WIN32)
+class Win32SocketInitializer
+{
+public:
+    Win32SocketInitializer()
+    {
+        WSADATA wsaData;
+        WORD versionRequested = MAKEWORD(2, 0);
+        WSAStartup(versionRequested, &wsaData);
+    }
+
+    ~Win32SocketInitializer()
+    {
+        WSACleanup();
+    }
+};
+#endif
+
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
@@ -65,6 +85,10 @@ struct SocketGlobalsImpl
     /**
      * Regular networking services. (AddressResolver should be split to cloud and non-cloud).
      */
+
+#if defined(_WIN32)
+    Win32SocketInitializer win32SocketInitializer;
+#endif
 
     aio::PollSetFactory m_pollSetFactory;
     AioServiceGuard m_aioServiceGuard;
@@ -91,12 +115,6 @@ Ini::Ini():
 SocketGlobals::SocketGlobals(int initializationFlags):
     m_impl(std::make_unique<SocketGlobalsImpl>())
 {
-    #if defined(_WIN32)
-        WSADATA wsaData;
-        WORD versionRequested = MAKEWORD(2, 0);
-        WSAStartup(versionRequested, &wsaData);
-    #endif
-
     m_impl->m_initializationFlags = initializationFlags;
     if (m_impl->m_initializationFlags & InitializationFlags::disableUdt)
         m_impl->m_pollSetFactory.disableUdt();
@@ -116,10 +134,6 @@ SocketGlobals::~SocketGlobals()
         if (init.second)
             init.second();
     }
-
-    #if defined(_WIN32)
-        WSACleanup();
-    #endif
 }
 
 const Ini& SocketGlobals::ini()
