@@ -13,15 +13,7 @@
 #include <core/resource/resource_fwd.h>
 #include <common/common_globals.h>
 
-namespace nx {
-namespace cdb {
-namespace api {
-
-class AuthInfo;
-
-} // namespace api
-} // namespace cdb
-} // namespace nx
+namespace nx::cloud::db::api { class AuthInfo; }
 
 class QnResourcePool;
 
@@ -79,7 +71,7 @@ public:
     // It will break dependency loop also.
     virtual void userInfoChanged(
         const nx::Buffer& userName,
-        const nx::cdb::api::AuthInfo& authInfo) = 0;
+        const nx::cloud::db::api::AuthInfo& authInfo) = 0;
 
     virtual void userInfoRemoved(const nx::Buffer& userName) = 0;
 };
@@ -123,7 +115,7 @@ public:
 private:
     virtual void userInfoChanged(
         const nx::Buffer& userName,
-        const nx::cdb::api::AuthInfo& authInfo) override;
+        const nx::cloud::db::api::AuthInfo& authInfo) override;
 
     virtual void userInfoRemoved(const nx::Buffer& userName) override;
     void updateNonce();

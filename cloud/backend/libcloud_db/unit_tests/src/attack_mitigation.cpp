@@ -1,11 +1,11 @@
-#include <nx/cloud/cdb/test_support/business_data_generator.h>
+#include <nx/cloud/db/test_support/business_data_generator.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/time.h>
 
 #include "functional_tests/test_setup.h"
 
-namespace nx::cdb::test {
+namespace nx::cloud::db::test {
 
 class AttackAccountEnumeration:
     public CdbFunctionalTest
@@ -69,7 +69,7 @@ protected:
 
 private:
     nx::utils::SyncQueue<api::ResultCode> m_resetPasswordResults;
-    std::unique_ptr<nx::cdb::api::Connection> m_connection;
+    std::unique_ptr<nx::cloud::db::api::Connection> m_connection;
     nx::utils::test::ScopedTimeShift m_timeShift;
     nx::network::aio::BasicPollable m_aioObject;
 
@@ -110,4 +110,4 @@ TEST_F(AttackAccountEnumeration, block_is_removed_after_some_time)
     waitForBlockToBeRemoved();
 }
 
-} // namespace nx::cdb::test
+} // namespace nx::cloud::db::test

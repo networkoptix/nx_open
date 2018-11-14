@@ -9,17 +9,16 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/cloud/cdb/managers/vms_gateway.h>
-#include <nx/cloud/cdb/settings.h>
-#include <nx/cloud/cdb/test_support/business_data_generator.h>
-#include <nx/cloud/cdb/api/cloud_nonce.h>
+#include <nx/cloud/db/managers/vms_gateway.h>
+#include <nx/cloud/db/settings.h>
+#include <nx/cloud/db/test_support/business_data_generator.h>
+#include <nx/cloud/db/api/cloud_nonce.h>
 
 #include <api/auth_util.h>
 
 #include "account_manager_stub.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class VmsGateway:
@@ -120,7 +119,7 @@ private:
     boost::optional<nx::network::http::Request> m_prevReceivedVmsApiRequest;
     nx::utils::SyncQueue<VmsRequestResult> m_vmsRequestResults;
     conf::Settings m_settings;
-    std::unique_ptr<cdb::VmsGateway> m_vmsGateway;
+    std::unique_ptr<nx::cloud::db::VmsGateway> m_vmsGateway;
     std::string m_systemId;
     std::string m_idOfSystemToMergeTo;
     boost::optional<nx::network::http::StatusCode::Value> m_forcedHttpResponseStatus;
@@ -144,7 +143,7 @@ private:
         std::array<const char*, 2> args{"-vmsGateway/url", vmsUrl.c_str()};
 
         m_settings.load((int)args.size(), args.data());
-        m_vmsGateway = std::make_unique<cdb::VmsGateway>(m_settings, m_accountManagerStub);
+        m_vmsGateway = std::make_unique<nx::cloud::db::VmsGateway>(m_settings, m_accountManagerStub);
 
         m_systemId = QnUuid::createUuid().toSimpleByteArray().toStdString();
     }
@@ -253,5 +252,4 @@ TEST_F(VmsGateway, proper_error_is_reported_when_vms_rejects_request)
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db

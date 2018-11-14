@@ -2,10 +2,9 @@
 
 #include <set>
 
-#include <nx/cloud/cdb/managers/system_health_info_provider.h>
+#include <nx/cloud/db/managers/system_health_info_provider.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class SystemHealthInfoProviderStub:
@@ -26,5 +25,4 @@ private:
 };
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db

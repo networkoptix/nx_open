@@ -1,9 +1,5 @@
-/**********************************************************
-* 6 oct 2014
-* akolesnikov
-***********************************************************/
-
 #include "media_server_user_attributes.h"
+
 #include <nx/fusion/model_functions.h>
 
 QnMediaServerUserAttributes::QnMediaServerUserAttributes():

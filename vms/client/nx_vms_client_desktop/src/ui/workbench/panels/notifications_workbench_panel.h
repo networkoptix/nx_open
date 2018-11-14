@@ -60,7 +60,6 @@ public:
 
 private:
     void enableShowButton(bool used);
-    void setShowButtonIcon();
     void updateControlsGeometry();
 
 private:
@@ -72,7 +71,6 @@ private:
 
 private:
     bool m_visible = false;
-    bool m_opened = false;
 
     QnBlinkingImageButtonWidget* m_showButton;
 

@@ -28,14 +28,27 @@ public:
         const QnConnectionInfo &connectionInfo, QWidget* parent = nullptr);
     virtual ~CompatibilityVersionInstallationDialog();
 
-    bool installationSucceeded() const;
+    // Mirroring some states from ClientUpdateTool.
+    enum class InstallResult
+    {
+        initial,
+        downloading,
+        installing,
+        complete,
+        failedInstall,
+        failedDownload,
+    };
 
-    int installUpdate();
+    InstallResult installationResult() const;
+    bool shouldAutoRestart() const;
+
     virtual void reject() override;
     virtual int exec() override;
 
 protected:
+    int installUpdate();
     void atUpdateStateChanged(int state, int progress);
+    void atAutoRestartChanged(int state);
     void setMessage(const QString& message);
 
     QScopedPointer<Ui::QnCompatibilityVersionInstallationDialog> m_ui;
@@ -44,5 +57,7 @@ protected:
     std::shared_ptr<nx::vms::client::desktop::ClientUpdateTool> m_clientUpdateTool;
     // Timer for checking current status and timeouts.
     std::unique_ptr<QTimer> m_statusCheckTimer;
-    bool m_installationOk = false;
+
+    InstallResult m_installationResult = InstallResult::initial;
+    bool m_autoInstall = true;
 };

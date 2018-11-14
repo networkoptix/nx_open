@@ -127,35 +127,6 @@ std::future<UpdateContents> ServerUpdateTool::getUpdateCheck()
     return std::move(m_updateCheck);
 }
 
-std::future<UpdateContents> ServerUpdateTool::checkLatestUpdate()
-{
-    QString updateUrl = qnSettings->updateFeedUrl();
-    return std::async(std::launch::async,
-        [updateUrl]()
-        {
-            UpdateContents result;
-            result.info = nx::update::updateInformation(updateUrl, nx::update::kLatestVersion, &result.error);
-            result.sourceType = UpdateSourceType::internet;
-            result.source = lit("%1 for build=%2").arg(updateUrl, nx::update::kLatestVersion);
-            return result;
-        });
-}
-
-std::future<UpdateContents> ServerUpdateTool::checkSpecificChangeset(QString build)
-{
-    QString updateUrl = qnSettings->updateFeedUrl();
-
-    return std::async(std::launch::async,
-        [updateUrl, build]()
-        {
-            UpdateContents result;
-            result.info = nx::update::updateInformation(updateUrl, build, &result.error);
-            result.sourceType = UpdateSourceType::internetSpecific;
-            result.source = lit("%1 for build=%2").arg(updateUrl, build);
-            return result;
-        });
-}
-
 std::future<UpdateContents> ServerUpdateTool::checkUpdateFromFile(QString file)
 {
     NX_VERBOSE(this) << "checkUpdateFromFile(" << file << ")";

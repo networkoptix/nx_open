@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include <nx/cloud/cdb/test_support/cdb_launcher.h>
+#include <nx/cloud/db/test_support/cdb_launcher.h>
 #include <nx/cloud/mediator/test_support/mediator_functional_test.h>
 
 namespace nx {
@@ -17,11 +17,11 @@ public:
     bool startCdb();
     bool startMediator();
 
-    cdb::CdbLauncher& cloudDb();
+    nx::cloud::db::CdbLauncher& cloudDb();
     hpm::MediatorFunctionalTest& mediator();
 
 private:
-    std::unique_ptr<cdb::CdbLauncher> m_cdbLauncher;
+    std::unique_ptr<nx::cloud::db::CdbLauncher> m_cdbLauncher;
     std::unique_ptr<hpm::MediatorFunctionalTest> m_mediator;
 };
 

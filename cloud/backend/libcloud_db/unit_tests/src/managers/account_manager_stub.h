@@ -1,10 +1,9 @@
 #pragma once
 
-#include <nx/cloud/cdb/managers/account_manager.h>
-#include <nx/cloud/cdb/test_support/business_data_generator.h>
+#include <nx/cloud/db/managers/account_manager.h>
+#include <nx/cloud/db/test_support/business_data_generator.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class AccountManagerStub:
@@ -42,5 +41,4 @@ private:
 };
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db

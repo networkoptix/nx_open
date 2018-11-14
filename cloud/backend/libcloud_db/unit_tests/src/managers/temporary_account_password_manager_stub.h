@@ -2,10 +2,9 @@
 
 #include <vector>
 
-#include <nx/cloud/cdb/managers/temporary_account_password_manager.h>
+#include <nx/cloud/db/managers/temporary_account_password_manager.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class TemporaryAccountPasswordManagerStub:
@@ -31,24 +30,23 @@ public:
         nx::sql::QueryContext* const queryContext,
         data::TemporaryAccountCredentials tempPasswordData) override;
 
-    virtual nx::sql::DBResult fetchTemporaryCredentials(
+    virtual std::optional<data::Credentials> fetchTemporaryCredentials(
         nx::sql::QueryContext* const queryContext,
-        const data::TemporaryAccountCredentials& tempPasswordData,
-        data::Credentials* credentials) override;
+        const data::TemporaryAccountCredentials& tempPasswordData) override;
 
-    virtual nx::sql::DBResult updateCredentialsAttributes(
+    virtual void updateCredentialsAttributes(
         nx::sql::QueryContext* const queryContext,
         const data::Credentials& credentials,
         const data::TemporaryAccountCredentials& tempPasswordData) override;
 
-    virtual nx::sql::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
+    virtual void removeTemporaryPasswordsFromDbByAccountEmail(
         nx::sql::QueryContext* const queryContext,
         std::string accountEmail) override;
 
     virtual void removeTemporaryPasswordsFromCacheByAccountEmail(
         std::string accountEmail) override;
 
-    virtual boost::optional<TemporaryAccountCredentialsEx> getCredentialsByLogin(
+    virtual boost::optional<data::TemporaryAccountCredentialsEx> getCredentialsByLogin(
         const std::string& login) const override;
 
     virtual bool authorize(
@@ -65,5 +63,4 @@ private:
 };
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db

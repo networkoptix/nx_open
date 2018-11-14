@@ -10,6 +10,7 @@ nx_add_server_plugin(ssc_analytics_plugin OPTIONAL
         nx_utils
         nx_fusion
         nx_kit
+    ADD_TO_DISTRIBUTION_IF OFF
 )
 
 add_definitions(-DNX_PRINT_TO_LOG)

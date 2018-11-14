@@ -18,7 +18,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <utils/license_usage_helper.h>
 
-#include <nx/cloud/cdb/client/data/auth_data.h>
+#include <nx/cloud/db/client/data/auth_data.h>
 
 #include "ec_connection_notification_manager.h"
 
@@ -1216,7 +1216,7 @@ struct SetResourceParamTransactionType
             return TransactionType::Cloud;
         }
 
-        if (param.name == nx::cdb::api::kVmsUserAuthInfoAttributeName ||
+        if (param.name == nx::cloud::db::api::kVmsUserAuthInfoAttributeName ||
             param.name == Qn::USER_FULL_NAME)
         {
             return TransactionType::Cloud;

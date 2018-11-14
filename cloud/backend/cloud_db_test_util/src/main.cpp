@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
 
     if (loadMode)
     {
-        return nx::cdb::client::establishManyConnections(
+        return nx::cloud::db::client::establishManyConnections(
             cdbUrl.toStdString(),
             accountEmail.toStdString(),
             accountPassword.toStdString(),
@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
 
     if (testSystemsToGenerate > 0)
     {
-        return nx::cdb::client::generateSystems(
+        return nx::cloud::db::client::generateSystems(
             cdbUrl.toStdString(),
             accountEmail.toStdString(),
             accountPassword.toStdString(),
@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
 
     if (!fetchRequest.isEmpty())
     {
-        return nx::cdb::client::fetchData(
+        return nx::cloud::db::client::fetchData(
             cdbUrl.toStdString(),
             accountEmail.toStdString(),
             accountPassword.toStdString(),
@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
 
     if (testRequestCount > 0)
     {
-        return nx::cdb::client::makeApiRequests(
+        return nx::cloud::db::client::makeApiRequests(
             cdbUrl.toStdString(),
             accountEmail.toStdString(),
             accountPassword.toStdString(),

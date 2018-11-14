@@ -16,13 +16,13 @@
 #include <nx/data_sync_engine/outgoing_transaction_dispatcher.h>
 #include <nx/data_sync_engine/transaction_log.h>
 
-#include <nx/cloud/cdb/controller.h>
-#include <nx/cloud/cdb/data/account_data.h>
-#include <nx/cloud/cdb/data/system_data.h>
-#include <nx/cloud/cdb/ec2/data_conversion.h>
-#include <nx/cloud/cdb/ec2/vms_command_descriptor.h>
-#include <nx/cloud/cdb/test_support/business_data_generator.h>
-#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
+#include <nx/cloud/db/controller.h>
+#include <nx/cloud/db/data/account_data.h>
+#include <nx/cloud/db/data/system_data.h>
+#include <nx/cloud/db/ec2/data_conversion.h>
+#include <nx/cloud/db/ec2/vms_command_descriptor.h>
+#include <nx/cloud/db/test_support/business_data_generator.h>
+#include <nx/cloud/db/test_support/base_persistent_data_test.h>
 
 #include "test_outgoing_transaction_dispatcher.h"
 
@@ -31,15 +31,15 @@ namespace data_sync_engine {
 namespace test {
 
 class TransactionLog:
-    public cdb::test::BasePersistentDataTest,
+    public nx::cloud::db::test::BasePersistentDataTest,
     public ::testing::Test
 {
 public:
     TransactionLog(dao::DataObjectType dataObjectType):
         BasePersistentDataTest(DbInitializationType::delayed),
         m_protocolVersionRange(
-            nx::cdb::kMinSupportedProtocolVersion,
-            nx::cdb::kMaxSupportedProtocolVersion),
+            nx::cloud::db::kMinSupportedProtocolVersion,
+            nx::cloud::db::kMaxSupportedProtocolVersion),
         m_peerId(QnUuid::createUuid())
     {
         dbConnectionOptions().maxConnectionCount = 100;
@@ -127,7 +127,7 @@ class TransactionLogSameTransaction:
 public:
     TransactionLogSameTransaction():
         TransactionLog(dao::DataObjectType::rdbms),
-        m_systemId(cdb::test::BusinessDataGenerator::generateRandomSystemId()),
+        m_systemId(nx::cloud::db::test::BusinessDataGenerator::generateRandomSystemId()),
         m_otherPeerId(QnUuid::createUuid()),
         m_otherPeerDbId(QnUuid::createUuid()),
         m_otherPeerSequence(1),
@@ -182,9 +182,9 @@ protected:
             m_initialTransaction = transaction;
 
         const auto transactionHash = 
-            nx::cdb::ec2::command::SaveUser::hash(transaction.params);
+            nx::cloud::db::ec2::command::SaveUser::hash(transaction.params);
         auto transactionSerializer = std::make_unique<
-            UbjsonSerializedTransaction<nx::cdb::ec2::command::SaveUser>>(
+            UbjsonSerializedTransaction<nx::cloud::db::ec2::command::SaveUser>>(
                 std::move(transaction),
                 protocolVersionRange().currentVersion());
 
@@ -257,10 +257,10 @@ protected:
             m_initialTransaction = transaction;
 
         const auto resultCode = transactionLog()->checkIfNeededAndSaveToLog
-            <nx::cdb::ec2::command::SaveUser>(
+            <nx::cloud::db::ec2::command::SaveUser>(
                 queryContext.get(),
                 m_systemId.c_str(),
-                data_sync_engine::SerializableTransaction<nx::cdb::ec2::command::SaveUser>(
+                data_sync_engine::SerializableTransaction<nx::cloud::db::ec2::command::SaveUser>(
                     std::move(transaction)));
         ASSERT_EQ(nx::sql::DBResult::cancelled, resultCode);
     }
@@ -285,10 +285,10 @@ private:
     void init()
     {
         const auto sharing =
-            cdb::test::BusinessDataGenerator::generateRandomSharing(
-                cdb::test::BusinessDataGenerator::generateRandomAccount(),
+            nx::cloud::db::test::BusinessDataGenerator::generateRandomSharing(
+                nx::cloud::db::test::BusinessDataGenerator::generateRandomAccount(),
                 m_systemId);
-        cdb::ec2::convert(sharing, &m_transactionData);
+        nx::cloud::db::ec2::convert(sharing, &m_transactionData);
         ASSERT_TRUE(m_dbConnectionHolder.open());
 
         // Moving local peer sequence.
@@ -397,10 +397,10 @@ private:
     {
         auto queryContext = getQueryContext();
         const auto dbResult = transactionLog()->checkIfNeededAndSaveToLog
-            <nx::cdb::ec2::command::SaveUser>(
+            <nx::cloud::db::ec2::command::SaveUser>(
                 queryContext.get(),
                 m_systemId.c_str(),
-                data_sync_engine::UbjsonSerializedTransaction<nx::cdb::ec2::command::SaveUser>(
+                data_sync_engine::UbjsonSerializedTransaction<nx::cloud::db::ec2::command::SaveUser>(
                     std::move(transaction),
                     nx_ec::EC2_PROTO_VERSION));
         ASSERT_TRUE(dbResult == nx::sql::DBResult::ok || dbResult == nx::sql::DBResult::cancelled)
@@ -510,8 +510,8 @@ public:
 
     TestTransactionController(
         const std::unique_ptr<data_sync_engine::TransactionLog>& transactionLog,
-        const cdb::api::SystemData& system,
-        const cdb::api::AccountData& accountToShareWith)
+        const nx::cloud::db::api::SystemData& system,
+        const nx::cloud::db::api::AccountData& accountToShareWith)
         :
         m_transactionLog(transactionLog),
         m_system(system),
@@ -553,11 +553,11 @@ public:
 
 private:
     const std::unique_ptr<data_sync_engine::TransactionLog>& m_transactionLog;
-    const cdb::api::SystemData m_system;
-    const cdb::api::AccountData m_accountToShareWith;
+    const nx::cloud::db::api::SystemData m_system;
+    const nx::cloud::db::api::AccountData m_accountToShareWith;
     State m_completedState;
     State m_desiredState;
-    cdb::api::SystemSharingEx m_sharing;
+    nx::cloud::db::api::SystemSharingEx m_sharing;
     QnMutex m_mutex;
     QnWaitCondition m_cond;
     nx::utils::Counter m_startedAsyncCallsCounter;
@@ -617,7 +617,7 @@ private:
         m_sharing.systemId = m_system.id;
         m_sharing.accountId = m_accountToShareWith.id;
         m_sharing.accountEmail = m_accountToShareWith.email;
-        m_sharing.accessRole = cdb::api::SystemAccessRole::advancedViewer;
+        m_sharing.accessRole = nx::cloud::db::api::SystemAccessRole::advancedViewer;
         m_sharing.vmsUserId =
             guidFromArbitraryData(m_sharing.accountEmail).toSimpleString().toStdString();
     }
@@ -634,11 +634,11 @@ private:
     void addTransactionToLog(nx::sql::QueryContext* queryContext)
     {
         vms::api::UserData userData;
-        cdb::ec2::convert(m_sharing, &userData);
+        nx::cloud::db::ec2::convert(m_sharing, &userData);
         userData.isCloud = true;
         userData.fullName = QString::fromStdString(m_accountToShareWith.fullName);
         auto dbResult = m_transactionLog->generateTransactionAndSaveToLog
-            <cdb::ec2::command::SaveUser>(
+            <nx::cloud::db::ec2::command::SaveUser>(
                 queryContext,
                 m_sharing.systemId.c_str(),
                 std::move(userData));
@@ -775,13 +775,13 @@ private:
         nx::sql::QueryContext* queryContext,
         int originalTransactionIndex)
     {
-        cdb::api::SystemSharingEx sharing;
+        nx::cloud::db::api::SystemSharingEx sharing;
         sharing.systemId = getSystem(0).id;
         const auto& accountToShareWith =
             accounts().at(nx::utils::random::number<std::size_t>(1, accounts().size() - 1));
         sharing.accountId = accountToShareWith.id;
         sharing.accountEmail = accountToShareWith.email;
-        sharing.accessRole = cdb::api::SystemAccessRole::advancedViewer;
+        sharing.accessRole = nx::cloud::db::api::SystemAccessRole::advancedViewer;
 
         // It does not matter for transaction log whether we save application data or not.
         // TODO #ak But, it is still better to mockup data access object here.
@@ -790,11 +790,11 @@ private:
         //    systemSharingController().insertOrReplaceSharing(queryContext, sharing));
 
         vms::api::UserData userData;
-        cdb::ec2::convert(sharing, &userData);
+        nx::cloud::db::ec2::convert(sharing, &userData);
         userData.isCloud = true;
         userData.fullName = QString::fromStdString(accountToShareWith.fullName);
         auto dbResult = transactionLog()->generateTransactionAndSaveToLog
-            <cdb::ec2::command::SaveUser>(
+            <nx::cloud::db::ec2::command::SaveUser>(
                 queryContext,
                 sharing.systemId.c_str(),
                 std::move(userData));

@@ -6,10 +6,9 @@
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/cloud/cdb/managers/vms_gateway.h>
+#include <nx/cloud/db/managers/vms_gateway.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 namespace test {
 
 struct MergeRequestParameters
@@ -55,5 +54,4 @@ private:
 };
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db
