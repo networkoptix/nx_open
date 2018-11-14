@@ -116,6 +116,7 @@ ADMIN_DASHBOARD = ('cms.models.ContentVersion',
                    'cms.models.DataRecord',
                    'cms.models.DataStructure',
                    'cms.models.ExternalFile',
+                   'cms.models.Language',
                    'cms.models.ProductType',
                    'cms.models.UserGroupsToCustomizationPermissions',
                    'django_celery_results.*',
@@ -439,7 +440,7 @@ DOWNLOADS_VERSION_JSON = 'http://updates.hdwitness.com.s3.amazonaws.com/{{custom
 
 MAX_RETRIES = conf['max_retries']
 CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS = 30
-CMS_MAX_FILE_SIZE = 9
+CMS_MAX_FILE_SIZE = 9437184
 
 SUPERUSER_DOMAIN = '@networkoptix.com'  # Only user from this domain can have superuser permissions
 

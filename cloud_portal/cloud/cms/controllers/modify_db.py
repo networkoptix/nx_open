@@ -351,6 +351,11 @@ def check_meta_settings(data_structure, new_file):
                     data_structure.meta_settings['format'].replace(',', ' or '))
         return [(data_structure.name, error_msg)]
 
+    if 'size' in meta_settings and meta_settings['size'] < new_file.size:
+        error_msg = "The file's size it too large. Its size was {0:.2f}MB but must be less than {1:.2f}MB".\
+            format(new_file.size/BYTES_TO_MEGABYTES, meta_settings['size']/BYTES_TO_MEGABYTES)
+        return [(data_structure.name, error_msg)]
+
     if data_structure.type in [DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.external_image]:
 
         try:
@@ -365,10 +370,9 @@ def check_meta_settings(data_structure, new_file):
 
 # End of file upload helpers
 def upload_file(data_structure, new_file):
-    file_size = new_file.size / BYTES_TO_MEGABYTES
-    if file_size >= settings.CMS_MAX_FILE_SIZE:
-        return None, [(data_structure.name, 'Its size was {0:.2f}MB but must be less than {} MB'. \
-                       format(file_size, settings.CMS_MAX_FILE_SIZE))]
+    if new_file.size >= settings.CMS_MAX_FILE_SIZE:
+        return None, [(data_structure.name, 'Its size was {0:.2f}MB but must be less than {1:.2f} MB'. \
+                       format(new_file.size/BYTES_TO_MEGABYTES, settings.CMS_MAX_FILE_SIZE/BYTES_TO_MEGABYTES))]
 
     file_errors = check_meta_settings(data_structure, new_file)
     if file_errors:

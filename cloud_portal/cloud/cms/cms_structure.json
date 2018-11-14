@@ -392,7 +392,10 @@
             "value": "",
             "description": "Logo for integration",
             "type": "external_image",
-            "optional": true
+            "optional": true,
+            "meta": {
+              "size": 1073741824
+            }
           },
           {
             "name": "shortDescription",
@@ -543,7 +546,10 @@
             "description": "",
             "type": "external_file",
             "optional": true,
-            "public": true
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
           },
           {
             "name": "linux-x86-file",
@@ -552,7 +558,10 @@
             "description": "",
             "type": "external_file",
             "optional": true,
-            "public": true
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
           },
           {
             "name": "linux-x64-file",
@@ -561,7 +570,10 @@
             "description": "",
             "type": "external_file",
             "optional": true,
-            "public": true
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
           },
           {
             "name": "macos-file",
@@ -570,7 +582,10 @@
             "description": "",
             "type": "external_file",
             "optional": true,
-            "public": true
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
           },
           {
             "name": "rpi-file",
@@ -579,7 +594,10 @@
             "description": "",
             "type": "external_file",
             "optional": true,
-            "public": true
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
           },
           {
             "name": "windows-x86-file",
@@ -588,7 +606,10 @@
             "description": "",
             "type": "external_file",
             "optional": true,
-            "public": true
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
           },
           {
             "name": "windows-x64-file",
@@ -597,7 +618,10 @@
             "description": "",
             "type": "external_file",
             "optional": true,
-            "public": true
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
           },
           {
             "name": "additional-file-1-name",
@@ -614,7 +638,10 @@
             "description": "Upload any other necessary files.",
             "type": "external_file",
             "optional": true,
-            "public": true
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
           },
           {
             "name": "additional-file-2-name",
@@ -631,7 +658,10 @@
             "description": "Upload any other necessary files.",
             "type": "external_file",
             "optional": true,
-            "public": true
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
           },
           {
             "name": "additional-file-3-name",
@@ -648,7 +678,10 @@
             "description": "Upload any other necessary files.",
             "type": "external_file",
             "optional": true,
-            "public": true
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
           }
         ]
       },
@@ -661,7 +694,10 @@
             "label": "Screenshot 1",
             "value": "",
             "description": "",
-            "type": "external_image"
+            "type": "external_image",
+            "meta": {
+              "size": 1073741824
+            }
           },
           {
             "name": "screenshot2",
@@ -669,7 +705,10 @@
             "value": "",
             "description": "",
             "type": "external_image",
-            "optional": true
+            "optional": true,
+            "meta": {
+              "size": 1073741824
+            }
           },
           {
             "name": "screenshot3",
@@ -677,7 +716,10 @@
             "value": "",
             "description": "",
             "type": "external_image",
-            "optional": true
+            "optional": true,
+            "meta": {
+              "size": 1073741824
+            }
           }
         ]
       },

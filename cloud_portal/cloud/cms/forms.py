@@ -6,6 +6,7 @@ from .models import *
 
 from dal import autocomplete
 
+BYTES_TO_MEGABYTES = 1048576.0
 
 def convert_meta_to_description(meta):
     meta_to_plain = {"format": "Format:  %s",
@@ -18,6 +19,8 @@ def convert_meta_to_description(meta):
                      "size": "Size limit: %s MB",
                      }
     converted_msg = ""
+    if 'size' in meta:
+        meta['size'] = meta['size']/BYTES_TO_MEGABYTES
     for k in meta:
         if k in meta_to_plain:
             value = meta[k]
