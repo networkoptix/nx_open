@@ -24,9 +24,15 @@ public:
         QObject* parent = NULL);
 
     void displayParams(const QnCameraAdvancedParams &params);
+
+    /**
+     * @param params List of new parameter values
+     * @param packetMode If true than all the parameter widgets will be disabled and
+     *  reenabled back only if parameter is on the params list. Otherwise only parameter
+     *  values will be updated.
+     */
     void loadValues(const QnCameraAdvancedParamValueList &params, bool packetMode = false);
     std::optional<QString> parameterValue(const QString& parameterId) const;
-
 
     void clear();
 
