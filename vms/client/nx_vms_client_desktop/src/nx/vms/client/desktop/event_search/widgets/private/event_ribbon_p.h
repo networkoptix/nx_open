@@ -136,7 +136,7 @@ private:
         std::unique_ptr<EventTile> widget;
     };
 
-    using TilePtr = std::shared_ptr<Tile>;
+    using TilePtr = std::unique_ptr<Tile>;
     using Interval = nx::utils::Interval<int>;
 
     std::deque<TilePtr> m_tiles;
