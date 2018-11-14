@@ -134,7 +134,7 @@ struct QnCameraAdvancedParameter
     bool compact = false;
     QString unit;
     QString notes;
-    // If parameter with resync flag is changed than all parameters in a set should be reloaded.
+    // If parameter with resync flag is changed then all parameters in a set should be reloaded.
     bool resync = false;
     bool keepInitialValue = false;
     bool bindDefaultToMinimum = false;
