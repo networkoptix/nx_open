@@ -5,7 +5,7 @@
 
 #include "health_monitoring_fixture.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 TEST_F(HealthMonitoring, system_status_is_correct)
@@ -73,4 +73,4 @@ TEST_F(HealthMonitoring, no_excess_system_online_records)
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

@@ -4,7 +4,7 @@
 
 #include <utils/common/app_info.h>
 
-using namespace nx::cdb::api;
+using namespace nx::cloud::db::api;
 
 QnCloudResultInfo::QnCloudResultInfo(ResultCode code) : m_text(toString(code))
 {

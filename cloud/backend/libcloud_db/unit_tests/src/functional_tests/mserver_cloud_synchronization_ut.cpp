@@ -17,12 +17,12 @@
 #include <utils/common/id.h>
 #include <transaction/abstract_transaction_transport.h>
 
-#include <nx/cloud/cdb/test_support/transaction_connection_helper.h>
+#include <nx/cloud/db/test_support/transaction_connection_helper.h>
 
 #include "ec2/cloud_vms_synchro_test_helper.h"
 #include "email_manager_mocked.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 class FtEc2MserverCloudSynchronization:
     public Ec2MserverCloudSynchronization
@@ -562,4 +562,4 @@ INSTANTIATE_TEST_CASE_P(P2pMode, FtEc2MserverCloudSynchronization,
     ::testing::Values(TestParams(false), TestParams(true)
 ));
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

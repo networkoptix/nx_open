@@ -4,16 +4,16 @@
 #include <nx/utils/timer_manager.h>
 
 #include <nx/data_sync_engine/synchronization_engine.h>
-#include <nx/cloud/cdb/controller.h>
-#include <nx/cloud/cdb/managers/system_manager.h>
-#include <nx/cloud/cdb/stree/stree_manager.h>
-#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
+#include <nx/cloud/db/controller.h>
+#include <nx/cloud/db/managers/system_manager.h>
+#include <nx/cloud/db/stree/stree_manager.h>
+#include <nx/cloud/db/test_support/base_persistent_data_test.h>
 
 #include "account_manager_stub.h"
 #include "system_health_info_provider_stub.h"
 #include "../functional_tests/test_email_manager.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class SystemManager:
@@ -44,7 +44,7 @@ public:
 protected:
     void givenSystemInState(api::SystemStatus systemStatus)
     {
-        m_system = cdb::test::BusinessDataGenerator::generateRandomSystem(m_ownerAccount);
+        m_system = nx::cloud::db::test::BusinessDataGenerator::generateRandomSystem(m_ownerAccount);
         m_system.status = systemStatus;
         insertSystem(m_ownerAccount, m_system);
     }
@@ -139,7 +139,7 @@ private:
     SystemHealthInfoProviderStub m_systemHealthInfoProvider;
     TestEmailManager m_emailManager;
     data_sync_engine::SyncronizationEngine m_ec2SyncronizationEngine;
-    std::unique_ptr<cdb::SystemManager> m_systemManager;
+    std::unique_ptr<nx::cloud::db::SystemManager> m_systemManager;
     std::string m_systemId;
     api::AccountData m_ownerAccount;
     api::AccountData m_otherAccount;
@@ -159,7 +159,7 @@ private:
         if (m_systemManager)
             return;
 
-        m_systemManager = std::make_unique<cdb::SystemManager>(
+        m_systemManager = std::make_unique<nx::cloud::db::SystemManager>(
             m_settings,
             &m_timerManager,
             &m_accountManagerStub,
@@ -171,4 +171,4 @@ private:
 };
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

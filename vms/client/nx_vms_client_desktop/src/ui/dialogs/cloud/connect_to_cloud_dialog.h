@@ -3,8 +3,8 @@
 #include <ui/dialogs/common/button_box_dialog.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <api/server_rest_connection.h>
-#include <nx/cloud/cdb/api/result_code.h>
-#include <nx/cloud/cdb/api/system_data.h>
+#include <nx/cloud/db/api/result_code.h>
+#include <nx/cloud/db/api/system_data.h>
 
 namespace Ui {
 class ConnectToCloudDialog;
@@ -26,8 +26,8 @@ public:
 
 signals:
     void bindFinished(
-        nx::cdb::api::ResultCode result,
-        const nx::cdb::api::SystemData &systemData,
+        nx::cloud::db::api::ResultCode result,
+        const nx::cloud::db::api::SystemData &systemData,
         const rest::QnConnectionPtr &connection);
 
 protected:

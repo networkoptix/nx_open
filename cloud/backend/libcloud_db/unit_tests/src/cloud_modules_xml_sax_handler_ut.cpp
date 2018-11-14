@@ -5,7 +5,7 @@
 
 #include <nx/network/cloud/cloud_modules_xml_sax_handler.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace client {
 
 TEST(CloudModulesXmlHandler, common)
@@ -46,4 +46,4 @@ TEST(CloudModulesXmlHandler, common)
 }
 
 } // client
-} // nx::cdb
+} // nx::cloud::db

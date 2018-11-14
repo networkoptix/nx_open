@@ -6,7 +6,7 @@
 #include <transaction/abstract_transaction_transport.h>
 #include <utils/common/app_info.h>
 
-#include <nx/cloud/cdb/client/cdb_request_path.h>
+#include <nx/cloud/db/client/cdb_request_path.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
@@ -15,7 +15,7 @@
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/test_support/test_options.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 
 static constexpr auto kMaxTimeToWaitForChangesToBePropagatedToCloud = std::chrono::minutes(1);
 static constexpr auto kRetrySyncCheckPeriod = std::chrono::milliseconds(10);
@@ -767,4 +767,4 @@ api::ResultCode Ec2MserverCloudSynchronization::fetchTransactionLog(
     return api::ResultCode::ok;
 }
 
-} // namespace nx::cdb
+} // namespace nx::cloud::db

@@ -4,7 +4,7 @@
 
 #include <client_core/client_core_settings.h>
 
-using namespace nx::cdb::api;
+using namespace nx::cloud::db::api;
 
 QnCloudConnectionProvider::QnCloudConnectionProvider(QObject* parent):
     base_type(parent),

@@ -4,7 +4,7 @@
 
 #include "mserver_cloud_synchronization_connection_fixture.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 TEST_F(Ec2MserverCloudSynchronizationConnection, connection_drop_after_system_removal)
@@ -65,4 +65,4 @@ TEST_F(Ec2MserverCloudSynchronizationConnection, cloud_db_is_stable_when_connect
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

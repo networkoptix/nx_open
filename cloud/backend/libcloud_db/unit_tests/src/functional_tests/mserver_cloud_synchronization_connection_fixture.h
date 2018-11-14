@@ -1,10 +1,10 @@
 #pragma once
 
-#include <nx/cloud/cdb/test_support/transaction_connection_helper.h>
+#include <nx/cloud/db/test_support/transaction_connection_helper.h>
 
 #include "ec2/cloud_vms_synchro_test_helper.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 /**
@@ -58,4 +58,4 @@ private:
 };
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

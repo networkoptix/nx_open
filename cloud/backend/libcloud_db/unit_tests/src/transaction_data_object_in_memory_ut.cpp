@@ -6,14 +6,14 @@
 #include <nx/vms/api/data/user_data.h>
 
 #include <nx/data_sync_engine/dao/memory/transaction_data_object_in_memory.h>
-#include <nx/cloud/cdb/controller.h>
-#include <nx/cloud/cdb/ec2/data_conversion.h>
-#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
-#include <nx/cloud/cdb/test_support/business_data_generator.h>
+#include <nx/cloud/db/controller.h>
+#include <nx/cloud/db/ec2/data_conversion.h>
+#include <nx/cloud/db/test_support/base_persistent_data_test.h>
+#include <nx/cloud/db/test_support/business_data_generator.h>
 
 #include <transaction/transaction_descriptor.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace ec2 {
 namespace dao {
 namespace memory {
@@ -21,7 +21,7 @@ namespace test {
 
 class TransactionDataObjectInMemory:
     public ::testing::Test,
-    public nx::cdb::test::BasePersistentDataTest
+    public nx::cloud::db::test::BasePersistentDataTest
 {
 public:
     TransactionDataObjectInMemory():
@@ -108,8 +108,8 @@ private:
     void init()
     {
         const auto sharing =
-            cdb::test::BusinessDataGenerator::generateRandomSharing(
-                cdb::test::BusinessDataGenerator::generateRandomAccount(),
+            nx::cloud::db::test::BusinessDataGenerator::generateRandomSharing(
+                nx::cloud::db::test::BusinessDataGenerator::generateRandomAccount(),
                 m_systemId);
         ec2::convert(sharing, &m_transactionData);
     }
@@ -183,4 +183,4 @@ TEST_F(TransactionDataObjectInMemory, DISABLED_tran_rollback)
 } // namespace memory
 } // namespace dao
 } // namespace ec2
-} // namespace nx::cdb
+} // namespace nx::cloud::db

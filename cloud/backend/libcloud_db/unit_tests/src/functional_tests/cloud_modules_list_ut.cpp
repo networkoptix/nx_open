@@ -12,12 +12,12 @@
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/uuid.h>
 
-#include <nx/cloud/cdb/client/cdb_request_path.h>
-#include <nx/cloud/cdb/managers/cloud_module_url_provider.h>
+#include <nx/cloud/db/client/cdb_request_path.h>
+#include <nx/cloud/db/managers/cloud_module_url_provider.h>
 
 #include "test_setup.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 static const char xmlTemplate[] = R"xml(
@@ -55,13 +55,13 @@ protected:
     {
         const auto templateFilePath = createTemporaryXmlTemplateFile();
         m_moduleUrlProvider =
-            std::make_unique<cdb::CloudModuleUrlProvider>(templateFilePath);
+            std::make_unique<nx::cloud::db::CloudModuleUrlProvider>(templateFilePath);
     }
 
     void tryToLoadInvalidFile()
     {
         m_moduleUrlProvider =
-            std::make_unique<cdb::CloudModuleUrlProvider>(
+            std::make_unique<nx::cloud::db::CloudModuleUrlProvider>(
                 lm("/%1").arg(QnUuid::createUuid().toString()));
     }
 
@@ -76,7 +76,7 @@ protected:
     }
 
 private:
-    std::unique_ptr<cdb::CloudModuleUrlProvider> m_moduleUrlProvider;
+    std::unique_ptr<nx::cloud::db::CloudModuleUrlProvider> m_moduleUrlProvider;
     QByteArray m_resultingXml;
 
     QString createTemporaryXmlTemplateFile()
@@ -213,4 +213,4 @@ TEST_F(FtCloudModulesXml, default_xml_contains_cloud_db_url)
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

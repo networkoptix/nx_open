@@ -7,7 +7,7 @@
 
 #include "email_manager_mocked.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 CdbFunctionalTest::CdbFunctionalTest()
@@ -23,4 +23,4 @@ CdbFunctionalTest::~CdbFunctionalTest()
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

@@ -29,7 +29,7 @@ struct DetachFromCloudReply
     }
 
     ResultCode resultCode;
-    int cloudServerResultCode; //< Value is taken from nx::cdb::api::ResultCode; 0 means no error.
+    int cloudServerResultCode; //< Value is taken from nx::cloud::db::api::ResultCode; 0 means no error.
 };
 #define DetachFromCloudReply_Fields (resultCode)(cloudServerResultCode)
 

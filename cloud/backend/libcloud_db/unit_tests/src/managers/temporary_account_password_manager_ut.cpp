@@ -5,12 +5,12 @@
 
 #include <nx/utils/crc32.h>
 
-#include <nx/cloud/cdb/managers/temporary_account_password_manager.h>
-#include <nx/cloud/cdb/stree/cdb_ns.h>
-#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
-#include <nx/cloud/cdb/test_support/business_data_generator.h>
+#include <nx/cloud/db/managers/temporary_account_password_manager.h>
+#include <nx/cloud/db/stree/cdb_ns.h>
+#include <nx/cloud/db/test_support/base_persistent_data_test.h>
+#include <nx/cloud/db/test_support/business_data_generator.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class TemporaryAccountPasswordManager:
@@ -43,7 +43,7 @@ protected:
 
 private:
     CdbAttrNameSet m_attrNameset;
-    cdb::TemporaryAccountPasswordManager m_tempPasswordManager;
+    nx::cloud::db::TemporaryAccountPasswordManager m_tempPasswordManager;
     data::TemporaryAccountCredentials m_credentials;
     std::string m_email;
 };
@@ -55,4 +55,4 @@ TEST_F(TemporaryAccountPasswordManager, temporary_login_is_equal_to_account_emai
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

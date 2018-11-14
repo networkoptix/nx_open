@@ -1,8 +1,8 @@
 #pragma once
 
-#include <nx/cloud/cdb/persistent_scheduler/persistent_scheduler.h>
+#include <nx/cloud/db/persistent_scheduler/persistent_scheduler.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 template<typename Predicate>
@@ -15,7 +15,7 @@ void waitForPredicateBecomeTrue(Predicate p, const char* description)
     }
 }
 
-class SchedulerUser: public nx::cdb::AbstractPersistentScheduleEventReceiver
+class SchedulerUser: public nx::cloud::db::AbstractPersistentScheduleEventReceiver
 {
 public:
     struct Task
@@ -33,7 +33,7 @@ public:
 
     SchedulerUser(
         nx::sql::AbstractAsyncSqlQueryExecutor* executor,
-        nx::cdb::PersistentScheduler* scheduler,
+        nx::cloud::db::PersistentScheduler* scheduler,
         const QnUuid& functorId)
         :
         m_executor(executor),
@@ -106,7 +106,7 @@ public:
         std::chrono::milliseconds timeout,
         SubscribeCb completionHandler = [](const QnUuid&) {})
     {
-        nx::cdb::ScheduleParams params;
+        nx::cloud::db::ScheduleParams params;
         params["key1"] = "value1";
         params["key2"] = "value1";
 
@@ -157,7 +157,7 @@ public:
 
 private:
     nx::sql::AbstractAsyncSqlQueryExecutor* m_executor;
-    nx::cdb::PersistentScheduler* m_scheduler;
+    nx::cloud::db::PersistentScheduler* m_scheduler;
     std::atomic<bool> m_shouldUnsubscribe{false};
     std::atomic<bool> m_shouldSubscribe{false};
     UnsubscribeCb m_unsubscribeCallback;
@@ -169,5 +169,5 @@ private:
 
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db
 

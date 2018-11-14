@@ -2,7 +2,7 @@
 
 #include "test_setup.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class AuthProvider: public CdbFunctionalTest {};
@@ -44,4 +44,4 @@ TEST_F(AuthProvider, nonce)
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

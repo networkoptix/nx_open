@@ -17,13 +17,13 @@
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/sync_call.h>
 
-#include <nx/cloud/cdb/api/cloud_nonce.h>
-#include <nx/cloud/cdb/data/account_data.h>
+#include <nx/cloud/db/api/cloud_nonce.h>
+#include <nx/cloud/db/data/account_data.h>
 
 #include "email_manager_mocked.h"
 #include "test_setup.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class AccountTemporaryCredentials:
@@ -112,7 +112,7 @@ protected:
             std::tie(resultCode, authResponse) =
                 makeSyncCall<api::ResultCode, api::AuthResponse>(
                     std::bind(
-                        &nx::cdb::api::AuthProvider::getAuthenticationResponse,
+                        &nx::cloud::db::api::AuthProvider::getAuthenticationResponse,
                         cdbConnection->authProvider(),
                         authRequest,
                         std::placeholders::_1));
@@ -318,4 +318,4 @@ TEST_F(AccountTemporaryCredentials, temporary_credentials_are_low_case)
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

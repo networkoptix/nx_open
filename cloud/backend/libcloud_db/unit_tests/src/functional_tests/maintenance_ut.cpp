@@ -2,7 +2,7 @@
 
 #include "mserver_cloud_synchronization_connection_fixture.h"
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class FtMaintenance:
@@ -56,4 +56,4 @@ TEST_F(FtMaintenance, transaction_log_is_available_to_the_system_owner)
 }
 
 } // namespace test
-} // namespace nx::cdb
+} // namespace nx::cloud::db

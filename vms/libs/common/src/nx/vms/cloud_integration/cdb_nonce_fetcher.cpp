@@ -6,7 +6,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/sync_call.h>
 
-#include <nx/cloud/cdb/api/cloud_nonce.h>
+#include <nx/cloud/db/api/cloud_nonce.h>
 
 #include "cloud_connection_manager.h"
 
@@ -139,7 +139,7 @@ bool CdbNonceFetcher::isValidCloudNonce(const QByteArray& nonce) const
             return false;   //we can't say if that nonce is ok for us
         }
 
-        if (nx::cdb::api::isValidCloudNonceBase(
+        if (nx::cloud::db::api::isValidCloudNonceBase(
                 cloudNonceBase,
                 cloudSystemCredentials->systemId.constData()))
         {
@@ -159,9 +159,9 @@ bool CdbNonceFetcher::isValidCloudNonce(const QByteArray& nonce) const
     return false;
 }
 
-nx::cdb::api::ResultCode CdbNonceFetcher::initializeConnectionToCloudSync()
+nx::cloud::db::api::ResultCode CdbNonceFetcher::initializeConnectionToCloudSync()
 {
-    using namespace nx::cdb::api;
+    using namespace nx::cloud::db::api;
 
     auto newConnection = m_cloudConnectionManager->getCloudConnection();
     NX_ASSERT(newConnection);
@@ -211,7 +211,7 @@ void CdbNonceFetcher::fetchCdbNonceAsync()
 
     NX_VERBOSE(this, lm("Trying to fetch new cloud nonce"));
 
-    std::unique_ptr<nx::cdb::api::Connection> newConnection;
+    std::unique_ptr<nx::cloud::db::api::Connection> newConnection;
 
     QnMutexLocker lock(&m_mutex);
 
@@ -244,15 +244,15 @@ void CdbNonceFetcher::removeExpiredNonce(
 }
 
 void CdbNonceFetcher::gotNonce(
-    nx::cdb::api::ResultCode resCode,
-    nx::cdb::api::NonceData nonce)
+    nx::cloud::db::api::ResultCode resCode,
+    nx::cloud::db::api::NonceData nonce)
 {
     NX_ASSERT(m_timer.isInSelfAioThread());
 
     if (!m_cloudConnectionManager->boundToCloud())
         return;
 
-    if (resCode != nx::cdb::api::ResultCode::ok)
+    if (resCode != nx::cloud::db::api::ResultCode::ok)
     {
         NX_WARNING(this, lit("Failed to fetch nonce from cdb: %1").
             arg(static_cast<int>(resCode)));
@@ -272,7 +272,7 @@ void CdbNonceFetcher::gotNonce(
         std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this));
 }
 
-void CdbNonceFetcher::saveCloudNonce(nx::cdb::api::NonceData nonce)
+void CdbNonceFetcher::saveCloudNonce(nx::cloud::db::api::NonceData nonce)
 {
     using namespace std::chrono;
 

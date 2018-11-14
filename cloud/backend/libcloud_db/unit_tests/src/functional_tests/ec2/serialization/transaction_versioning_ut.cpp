@@ -6,7 +6,7 @@
 #include <nx/vms/api/data/resource_data.h>
 #include <nx/vms/api/data/user_data.h>
 
-namespace nx::cdb {
+namespace nx::cloud::db {
 namespace ec2 {
 
 namespace compatibility {
@@ -149,4 +149,4 @@ TEST_F(TransactionVersioning, ApiResourceParamWithRefData_relevance)
 }
 
 } // namespace ec2
-} // namespace nx::cdb
+} // namespace nx::cloud::db

@@ -25,7 +25,7 @@ protected:
 
         for (const auto customization: customizations)
         {
-            cdb::api::SystemData system;
+            nx::cloud::db::api::SystemData system;
             system.customization = customization;
             NX_GTEST_ASSERT_NO_THROW(
                 system = cloudDb().addRandomSystemToAccount(m_account, system));
@@ -59,8 +59,8 @@ protected:
     }
 
 private:
-    cdb::AccountWithPassword m_account;
-    std::vector<cdb::api::SystemData> m_systems;
+    nx::cloud::db::AccountWithPassword m_account;
+    std::vector<nx::cloud::db::api::SystemData> m_systems;
 
     void init()
     {
