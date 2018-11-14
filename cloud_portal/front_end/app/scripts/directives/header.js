@@ -19,12 +19,16 @@
                 scope.config = CONFIG;
                 scope.inline = typeof($location.search().inline) !== 'undefined';
 
-                scope.viewHeader = CONFIG.showHeaderAndFooter;
+                scope.viewHeader = scope.config.showHeaderAndFooter;
                 
                 $rootScope.$on('nx.layout.header', function (event, opt) {
                     // An event to control visibility of the header
                     // ... i.e. when in view camera in embed
-                    scope.viewHeader = !opt.state;
+                    // ... and check if Config.showHeaderAndFooter is false
+                    // as view controller resets header and footer on destroy
+                    if (scope.config.showHeaderAndFooter) {
+                        scope.viewHeader = !opt.state;
+                    }
                 });
 
                 if (scope.inline) {

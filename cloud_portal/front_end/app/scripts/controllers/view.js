@@ -42,6 +42,7 @@
                         loc: 'ViewPageCtrl - inIframe'
                     });
                 }
+                
                 function systemError(){
                     dialogs.notify(LANG.errorCodes.lostConnection.replace('{{systemName}}',
                         $scope.currentSystem.name || LANG.errorCodes.thisSystem), 'warning');
