@@ -147,7 +147,7 @@ Restore password
     ${link}    Get Email Link    ${email}    restore_password
     Go To    ${link}
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
-    Click Element    ${RESET PASSWORD INPUT}
+    Sleep    .5
     Input Text    ${RESET PASSWORD INPUT}    ${BASE PASSWORD}
     Click Button    ${SAVE PASSWORD}
     Wait Until Elements Are Visible    ${RESET SUCCESS MESSAGE}    ${RESET SUCCESS LOG IN LINK}
@@ -226,7 +226,7 @@ Failure Tasks
 Wait Until Elements Are Visible
     [arguments]    @{elements}
     :FOR     ${element}  IN  @{elements}
-    \  Wait Until Element Is Visible    ${element}    20
+    \  Wait Until Element Is Visible    ${element}    10
 
 Elements Should Not Be Visible
     [arguments]    @{elements}
