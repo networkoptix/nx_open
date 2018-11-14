@@ -25,13 +25,6 @@
 #include <api/model/manual_camera_seach_reply.h>
 #include <nx/update/update_information.h>
 
-/**
- * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
- * This class can be used either for client and server side.
- * Class calls callback methods from IO thread. So, caller code should be thread-safe.
- * Client MUST NOT make requests in callbacks as it will cause a deadlock.
- */
-
 namespace rest {
 
 struct RestResultWithDataBase
@@ -78,6 +71,12 @@ struct ServerConnectionBase::Result<QByteArray>
         const nx::network::http::HttpHeaders& headers)>;
 };
 
+/**
+ * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
+ * This class can be used either for client and server side.
+ * Class calls callback methods from IO thread. So, caller code should be thread-safe.
+ * Client MUST NOT make requests in callbacks as it will cause a deadlock.
+ */
 class ServerConnection:
     public QObject,
     public QnCommonModuleAware,
@@ -87,6 +86,21 @@ class ServerConnection:
     Q_OBJECT
 
 public:
+    /**
+     * @brief ServerConnection
+     *
+     * It has two modes of authentication:
+     *  - directUrl is empty. It will use ec2Connection and MediaServerResource to get
+     *    authentication data.
+     *  - directUrl has some valid data. ServerConnection will use this url for authentication.
+     *
+     * Second mode is used in cases, when we stil do not have proper resource pool and
+     * ec2Conenction instance, but need to send requests to the server.
+     *
+     * @param commonModule - ServerConnection takes a lot of objects from it.
+     * @param serverId - resource Id of the mediaserver.
+     * @param directUrl - direct Url to mediaserver.
+     */
     ServerConnection(
         QnCommonModule* commonModule,
         const QnUuid& serverId,
@@ -112,13 +126,13 @@ public:
     Handle getServerLocalTime(Result<QnJsonRestResult>::type callback, QThread* targetThread = nullptr);
 
     /**
-    * Get camera thumbnail for specified time.
-    *
-    * Returns immediately. On request completion callback is called.
-    *
-    * @param targetThread Callback thread. If not specified, callback is called in IO thread.
-    * @return Request handle.
-    */
+     * Get camera thumbnail for specified time.
+     *
+     * Returns immediately. On request completion callback is called.
+     *
+     * @param targetThread Callback thread. If not specified, callback is called in IO thread.
+     * @return Request handle.
+     */
     Handle cameraThumbnailAsync(
         const nx::api::CameraImageRequest& request,
         Result<QByteArray>::type callback,
@@ -142,17 +156,17 @@ public:
         , QThread *targetThread = nullptr);
 
     /**
-        * Detach the system from cloud. Admin password will be changed to provided (if provided).
-        * @param resetAdminPassword Change administrator password to the provided one.
-        */
+     * Detach the system from cloud. Admin password will be changed to provided (if provided).
+     * @param resetAdminPassword Change administrator password to the provided one.
+     */
     Handle detachSystemFromCloud(
         const QString& currentAdminPassword,
         const QString& resetAdminPassword,
         Result<QnRestResult>::type callback, QThread *targetThread = nullptr);
 
     /**
-        * Save the credentials returned by cloud to the database.
-        */
+     * Save the credentials returned by cloud to the database.
+     */
     Handle saveCloudSystemCredentials(
         const QString &cloudSystemId,
         const QString &cloudAuthKey,
@@ -473,6 +487,16 @@ private:
 
     QUrl prepareUrl(const QString& path, const QnRequestParamList& params) const;
 
+    /**
+     * prepareRequest fills in http request header with parameters like authentication or proxy.
+     * It will fall back to prepareDirectRequest if directUrl is not empty.
+     *
+     * @param method HTTP method, like {GET, PUT, POST, ...}
+     * @param url path to requested resource, like /ec2/updateStatus/
+     * @param contentType content type according to HTTP reference.
+     * @param messageBody message payload.
+     * @return generated request.
+     */
     nx::network::http::ClientPool::Request prepareRequest(
         nx::network::http::Method::ValueType method,
         const QUrl& url,

@@ -44,9 +44,13 @@ QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject
     QnWorkbenchContextAware(parent)
 {
     connect(action(action::CameraSettingsAction), &QAction::triggered, this,
-        &QnWorkbenchResourcesSettingsHandler::at_legacyCameraSettingsAction_triggered);
-    connect(action(action::CameraSettingsActionNew), &QAction::triggered, this,
-        &QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered);
+        [this]()
+        {
+            if (ini().redesignedCameraSettingsDialog)
+                at_cameraSettingsAction_triggered();
+            else
+                at_legacyCameraSettingsAction_triggered();
+        });
     connect(action(action::ServerSettingsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered);
     connect(action(action::NewUserAction), &QAction::triggered, this,

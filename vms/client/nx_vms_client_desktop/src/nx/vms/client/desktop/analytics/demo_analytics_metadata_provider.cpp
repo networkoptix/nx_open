@@ -136,8 +136,8 @@ DetectionMetadataPacketPtr DemoAnalyticsMetadataProvider::metadata(
 
     const auto metadata = std::make_shared<DetectionMetadataPacket>();
 
-    const auto precision = ini().demoAnalyticsProviderTimestampPrecisionUs;
-    if (precision > 0)
+    const microseconds precision{ini().demoAnalyticsProviderTimestampPrecisionUs};
+    if (precision > 0us)
         timestamp -= timestamp % precision;
 
     if (d->startTimestamp == 0us)
