@@ -32,7 +32,7 @@ def register(request):
     data['IP'] = get_ip(request)
 
     account = models.Account.objects.filter(email=data['email'])
-    if not (account.exists() and account[0].is_staff and not account[0].is_active):
+    if not (account.exists() and not account[0].is_active):
         AccountBackend.check_email_in_portal(data['email'], False)  # Check if account is in Cloud_db
     else:
         AccountManager().register_cloud_invite_user(data['email'], data['password'], data)
