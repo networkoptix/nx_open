@@ -218,7 +218,8 @@ void AIOThread::run()
             const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
             if (errorCode == SystemError::interrupted)
                 continue;
-            NX_DEBUG(this, QString::fromLatin1("AIOThread. poll failed. %1").arg(SystemError::toString(errorCode)));
+            NX_DEBUG(this, lm("AIOThread. poll failed. %1")
+                .args(SystemError::toString(errorCode)));
             std::this_thread::sleep_for(kErrorResetTimeout);
             continue;
         }
