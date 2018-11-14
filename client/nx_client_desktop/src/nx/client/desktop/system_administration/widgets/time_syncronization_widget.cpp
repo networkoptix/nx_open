@@ -15,12 +15,16 @@
 #include <ui/style/helper.h>
 #include <utils/common/synctime.h>
 
+#include <nx/client/desktop/ui/common/color_theme.h>
+
 #include "../redux/time_syncronization_widget_store.h"
 #include "../redux/time_syncronization_widget_state.h"
 #include "../models/time_synchronization_servers_model.h"
 #include "../delegates/time_synchronization_servers_delegate.h"
+#include "../watchers/time_syncronization_widget_watcher.h"
 #include <ui/style/skin.h>
 #include <core/resource/resource_display_info.h>
+#include <nx/client/desktop/common/utils/item_view_hover_tracker.h>
 
 namespace nx::client::desktop {
 
@@ -35,16 +39,17 @@ static constexpr int kDateFontPixelSize = 14;
 static constexpr int kDateFontWeight = QFont::Bold;
 static constexpr int kZoneFontPixelSize = 14;
 static constexpr int kZoneFontWeight = QFont::Normal;
+static constexpr int kServerTimeUpdateInterval = 15;
 
 QDateTime dateTimeFromMSecs(std::chrono::milliseconds value)
 {
     QDateTime result;
-    result.setTimeSpec(Qt::UTC);
+    //result.setTimeSpec(Qt::UTC);
     result.setMSecsSinceEpoch(value.count());
 
-    const auto offsetFromUtc = result.offsetFromUtc();
+    //const auto offsetFromUtc = result.offsetFromUtc();
     result.setTimeSpec(Qt::OffsetFromUTC);
-    result.setOffsetFromUtc(offsetFromUtc);
+    //result.setOffsetFromUtc(offsetFromUtc);
     return result;
 }
 
@@ -55,7 +60,10 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
     base_type(parent),
     ui(new Ui::TimeSynchronizationWidget),
     m_store(new TimeSynchronizationWidgetStore(this)),
-    m_serversModel(new Model(this))
+    m_serversModel(new Model(this)),
+    m_timeWatcher(new TimeSynchronizationWidgetWatcher(m_store, this)),
+    m_delegate(new TimeSynchronizationServersDelegate(this)),
+    m_tickCount(0)
 {
     setupUi();
 
@@ -65,24 +73,78 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
     connect(ui->syncWithInternetCheckBox, &QCheckBox::clicked, m_store,
         &TimeSynchronizationWidgetStore::setSyncTimeWithInternet);
 
-    connect(ui->disableSyncRadioButton, &QRadioButton::clicked, m_store,
-        &TimeSynchronizationWidgetStore::disableSync);
+    const auto handleDisableClick =
+        [this]
+        {
+            ui->disableSyncRadioButton->setChecked(true);
+            m_store->disableSync();
+        };
+    connect(ui->disableSyncRadioButton, &QRadioButton::clicked, this, handleDisableClick);
+
+    auto updateDelegate = 
+        [this]
+        {
+            m_delegate->setBaseRow(-1);
+        };
+
+    connect(ui->syncWithInternetCheckBox, &QCheckBox::clicked, this, updateDelegate);
+    connect(ui->disableSyncRadioButton, &QRadioButton::clicked, this, updateDelegate);
+
+    auto clearHovered = 
+        [this]
+        {
+            switch (m_store->state().status)
+            {
+                case State::Status::notSynchronized:
+                case State::Status::noInternetConnection:
+                case State::Status::selectedServerIsOffline:
+                    m_delegate->setBaseRow(-1);
+                default:
+                    break;
+            }
+        };
+    auto setHovered =
+        [this](int row)
+        {
+            switch (m_store->state().status)
+            {
+                case State::Status::notSynchronized:
+                case State::Status::noInternetConnection:
+                case State::Status::selectedServerIsOffline:
+                    m_delegate->setBaseRow(row);
+                default:
+                    break;
+            }
+        };
+
+    connect(ui->serversTable->hoverTracker(), &ItemViewHoverTracker::rowEnter, this, setHovered);
+    connect(ui->serversTable->hoverTracker(), &ItemViewHoverTracker::rowLeave, this, clearHovered);
 
     //connect(m_serversModel, &Model::serverSelected, m_store,
     //    &TimeSynchronizationWidgetStore::selectServer);
 
-    connect(ui->serversTable, &TableView::clicked, this,
+    connect(ui->serversTable, &TableView::pressed, this,
         [this](const QModelIndex& index)
         {
             const QnUuid& serverId = index.data(Model::ServerIdRole).value<QnUuid>();
+            // volatile: index is updated when we call m_store->selectServer,
+            // so we need to be sure that compiler won't move .row() call below
+            volatile const int row = index.row();
             if (!serverId.isNull())
+            {
                 m_store->selectServer(serverId);
+                if (m_store->state().status ==  State::Status::synchronizedWithSelectedServer)
+                    m_delegate->setBaseRow(row);
+            }
         });
 
     const auto updateTime =
         [this]
         {
             m_store->setVmsTime(std::chrono::milliseconds(qnSyncTime->currentMSecsSinceEpoch()));
+            if (m_tickCount == 0)
+                m_timeWatcher->updateTimestamps();
+            m_tickCount = (m_tickCount + 1) % kServerTimeUpdateInterval;
         };
 
     auto timer = new QTimer(this);
@@ -94,6 +156,7 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
     connect(qnSyncTime, &QnSyncTime::timeChanged, this, updateTime);
 
     updateTime();
+    m_timeWatcher->updateTimestamps();
 }
 
 TimeSynchronizationWidget::~TimeSynchronizationWidget()
@@ -173,15 +236,28 @@ void TimeSynchronizationWidget::setupUi()
     ui->zoneLabel->setFont(font);
     ui->zoneLabel->setForegroundRole(QPalette::Light);
 
+    QPalette palette(ui->timePlaceholderLabel->palette());
+    palette.setColor(QPalette::Foreground, colorTheme()->color("dark14"));
+    font.setPixelSize(kTimeFontPixelSize);
+    font.setWeight(kTimeFontWeight);
+    ui->timePlaceholderLabel->setFont(font);
+    ui->timePlaceholderLabel->setPalette(palette);
+
     auto* sortModel = new QSortFilterProxyModel(this);
     sortModel->setSourceModel(m_serversModel);
     ui->serversTable->setModel(sortModel);
     ui->serversTable->setProperty(style::Properties::kItemViewRadioButtons, true);
-    ui->serversTable->setItemDelegate(new TimeSynchronizationServersDelegate(this));
+    ui->serversTable->setItemDelegate(m_delegate);
+
+    const int kMinTimeWidth = 140; // Fixme: use font metrics, include offsets size
+    ui->serversTable->setColumnWidth(Model::OsTimeColumn, kMinTimeWidth);
+    ui->serversTable->setColumnWidth(Model::VmsTimeColumn, kMinTimeWidth);
 
     auto header = ui->serversTable->horizontalHeader();
     header->setSectionResizeMode(QHeaderView::ResizeToContents);
     header->setSectionResizeMode(Model::NameColumn, QHeaderView::Stretch);
+    header->setSectionResizeMode(Model::OsTimeColumn, QHeaderView::Fixed);
+    header->setSectionResizeMode(Model::VmsTimeColumn, QHeaderView::Fixed);
     header->setSectionsClickable(false);
     header->setDefaultAlignment(Qt::AlignLeft);
 
@@ -229,6 +305,22 @@ void TimeSynchronizationWidget::loadState(const State& state)
     ui->timeLabel->setText(datetime::toString(vmsDateTime.time()));
     ui->dateLabel->setText(datetime::toString(vmsDateTime.date()));
     ui->zoneLabel->setText(vmsDateTime.timeZoneAbbreviation());
+
+    switch (state.status)
+    {
+        case State::Status::synchronizedWithInternet:
+        case State::Status::synchronizedWithSelectedServer:
+        case State::Status::singleServerLocalTime:
+            ui->vmsTimeWidget->setCurrentWidget(ui->timePage);
+            break;
+        case State::Status::notSynchronized:
+        case State::Status::noInternetConnection:
+        case State::Status::selectedServerIsOffline:
+            ui->vmsTimeWidget->setCurrentWidget(ui->placeholderPage);
+            break;
+        default:
+            break;
+    }
 
     ui->detailsWidget->setCurrentWidget(state.status == State::Status::synchronizedWithInternet
         ? ui->synchronizedPage

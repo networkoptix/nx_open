@@ -9,6 +9,8 @@
 #include <nx/client/core/utils/human_readable.h>
 #include <nx/utils/guarded_callback.h>
 
+#include <translation/datetime_formatter.h>
+
 namespace {
 
 static const QVector<int> kTextRoles = {
@@ -104,13 +106,49 @@ QVariant TimeSynchronizationServersModel::data(const QModelIndex& index, int rol
                 case NameColumn:
                     return server.name;
                 case DateColumn:
-                    return server.osTime.count();
                 case TimezoneColumn:
-                    return server.timeZoneOffsetMs;
                 case OsTimeColumn:
-                    return server.osTime.count();
                 case VmsTimeColumn:
-                    return server.vmsTime.count();
+                {
+                    if (!server.online)
+                        return QString::fromStdWString(L"––––");
+
+                    const auto osTimestamp = m_vmsTime.count() + server.osTimeOffset;
+                    const auto vmsTimestamp = m_vmsTime.count() + server.vmsTimeOffset;
+                    auto osDateTime = QDateTime::fromMSecsSinceEpoch(osTimestamp);
+                    auto vmsDateTime = QDateTime::fromMSecsSinceEpoch(vmsTimestamp);
+
+                    //if (sameTimezone())
+                    //{
+                    //    dateTime.setTimeSpec(Qt::LocalTime);
+                    //    dateTime.setMSecsSinceEpoch(sinceEpochMs);
+                    //}
+                    //else
+                    //{
+                    //    const auto timeWatcher =
+                    //        context()->instance<nx::client::core::ServerTimeWatcher>();
+
+                    //    dateTime = timeWatcher->serverTime(server, sinceEpochMs);
+                    //}
+
+                    auto offsetFromUtc = osDateTime.offsetFromUtc();
+                    osDateTime.setTimeSpec(Qt::OffsetFromUTC);
+                    osDateTime.setOffsetFromUtc(offsetFromUtc);
+                    vmsDateTime.setTimeSpec(Qt::OffsetFromUTC);
+                    vmsDateTime.setOffsetFromUtc(offsetFromUtc);
+
+                    switch (column)
+                    {
+                        case DateColumn:
+                            return datetime::toString(osDateTime.date());
+                        case TimezoneColumn:
+                            return osDateTime.timeZoneAbbreviation();
+                        case OsTimeColumn:
+                            return datetime::toString(osDateTime.time());
+                        case VmsTimeColumn:
+                            return datetime::toString(vmsDateTime.time());
+                    }
+                }
 
                 default:
                     break;
@@ -131,7 +169,10 @@ QVariant TimeSynchronizationServersModel::data(const QModelIndex& index, int rol
         case Qt::DecorationRole:
             if (column == NameColumn)
             {
-                return qnResIconCache->icon(QnResourceIconCache::Server);
+                QnResourceIconCache::Key key = QnResourceIconCache::Server;
+                if (!server.online)
+                    key |= QnResourceIconCache::Offline;
+                return qnResIconCache->icon(key);
             }
             break;
 
@@ -140,6 +181,24 @@ QVariant TimeSynchronizationServersModel::data(const QModelIndex& index, int rol
 
         case ServerIdRole:
             return qVariantFromValue(server.id);
+
+        case ServerOnlineRole:
+            return server.online;
+
+        case TimeOffsetRole:
+        {
+            switch (column)
+            {
+            case OsTimeColumn:
+                return server.osTimeOffset;
+            case VmsTimeColumn:
+                return server.vmsTimeOffset;
+
+            default:
+                break;
+            }
+            break;
+        }
 
         default:
             break;
@@ -187,6 +246,7 @@ Qt::ItemFlags TimeSynchronizationServersModel::flags(const QModelIndex& index) c
 void TimeSynchronizationServersModel::loadState(const State& state)
 {
     beginResetModel();
+    m_vmsTime = state.vmsTime;
     m_servers = state.servers;
     m_selectedServer = state.primaryServer;
     endResetModel();

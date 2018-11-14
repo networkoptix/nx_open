@@ -104,7 +104,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="timePage">
          <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
@@ -166,7 +166,7 @@
              </font>
             </property>
             <property name="text">
-             <string notr="true">-- -- --</string>
+             <string notr="true">−− −− −−</string>
             </property>
            </widget>
           </item>
@@ -203,7 +203,7 @@
    <item>
     <widget class="QStackedWidget" name="detailsWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="synchronizedPage">
       <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -218,6 +218,21 @@
      </widget>
      <widget class="QWidget" name="serversTablePage">
       <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,1">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>8</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>8</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item>
         <widget class="nx::client::desktop::TableView" name="serversTable">
          <property name="frameShape">

@@ -26,6 +26,8 @@ struct TimeSynchronizationWidgetState: AbstractReduxState
 
     bool enabled = true;
     QnUuid primaryServer;
+    qint64 primaryOsTimeOffset = 0;
+    qint64 primaryVmsTimeOffset = 0;
 
     // Previous selected time server.
     QnUuid lastPrimaryServer;
@@ -40,8 +42,8 @@ struct TimeSynchronizationWidgetState: AbstractReduxState
         QString ipAddress;
         bool online = true;
         bool hasInternet = true;
-        std::chrono::milliseconds osTime = std::chrono::milliseconds(0);
-        std::chrono::milliseconds vmsTime = std::chrono::milliseconds(0);
+        qint64 osTimeOffset = 0;
+        qint64 vmsTimeOffset = 0;
         // QString timeZoneId;
         qint64 timeZoneOffsetMs = 0;
     };

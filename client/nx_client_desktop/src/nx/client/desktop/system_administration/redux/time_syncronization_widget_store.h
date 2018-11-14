@@ -14,6 +14,14 @@ class TimeSynchronizationWidgetStore: public QObject
 public:
     using State = TimeSynchronizationWidgetState;
 
+    struct TimeOffsetInfo
+    {
+        QnUuid serverId;
+        qint64 osTimeOffset = 0;
+        qint64 vmsTimeOffset = 0;
+    };
+    using TimeOffsetInfoList = QList<TimeOffsetInfo>;
+
     explicit TimeSynchronizationWidgetStore(QObject* parent = nullptr);
     virtual ~TimeSynchronizationWidgetStore() override;
 
@@ -30,6 +38,7 @@ public:
     void selectServer(const QnUuid& serverId);
 
     void setVmsTime(std::chrono::milliseconds value);
+    void setTimeOffsets(const TimeOffsetInfoList &offsetList);
 
 signals:
     void stateChanged(const TimeSynchronizationWidgetState& state);

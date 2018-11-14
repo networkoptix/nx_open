@@ -5,6 +5,8 @@
 #include "time_syncronization_widget_state.h"
 #include "time_syncronization_widget_state_reducer.h"
 
+#include <nx/utils/algorithm/index_of.h>
+
 namespace nx::client::desktop {
 
 using State = TimeSynchronizationWidgetState;
@@ -73,6 +75,36 @@ void TimeSynchronizationWidgetStore::selectServer(const QnUuid& serverId)
 void TimeSynchronizationWidgetStore::setVmsTime(std::chrono::milliseconds value)
 {
     d->executeAction([&](State state) { state.vmsTime = value; return state; });
+}
+
+void TimeSynchronizationWidgetStore::setTimeOffsets(const TimeOffsetInfoList &offsetList)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            for (auto& server: state.servers)
+            {
+                const auto idx = nx::utils::algorithm::index_of(offsetList,
+                    [&server](const TimeOffsetInfo& offsetInfo)
+                {
+                    return server.id == offsetInfo.serverId;
+                });
+
+                if (idx < 0)
+                {
+                    server.online = false;
+                    server.osTimeOffset = 0;
+                    server.vmsTimeOffset = 0;
+                }
+                else
+                {
+                    server.online = true;
+                    server.osTimeOffset = offsetList[idx].osTimeOffset;
+                    server.vmsTimeOffset = offsetList[idx].vmsTimeOffset;
+                }
+            }
+            return state;
+        });
 }
 
 } // namespace nx::client::desktop

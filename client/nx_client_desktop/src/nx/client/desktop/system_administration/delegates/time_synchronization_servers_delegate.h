@@ -24,8 +24,22 @@ public:
         const QStyleOptionViewItem& option,
         const QModelIndex& index) const override;
 
+    void setBaseRow(int row);
+
+private:
+    void paintName(
+        QPainter* painter,
+        const QStyleOptionViewItem& styleOption,
+        const QModelIndex& index) const;
+
+    void paintTime(
+        QPainter* painter,
+        const QStyleOptionViewItem& styleOption,
+        const QModelIndex& index) const;
+
 private:
     mutable QnTextPixmapCache m_textPixmapCache;
+    int m_baseRow;
 };
 
 } // namespace nx::client::desktop
