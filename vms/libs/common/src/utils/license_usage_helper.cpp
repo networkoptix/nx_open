@@ -26,10 +26,12 @@
 
 #include <nx/vms/api/types/connection_types.h>
 
-const nx::utils::Url QnLicenseServer::kIndexUrl("http://licensing.networkoptix.com/nxlicensed");
-const nx::utils::Url QnLicenseServer::kActivateUrl(kIndexUrl.toString() + "/activate.php");
-const nx::utils::Url QnLicenseServer::kDiactivateUrl(kIndexUrl.toString() + "/api/v1/deactivate/");
-const nx::utils::Url QnLicenseServer::kValidateUrl(kIndexUrl.toString() + "/api/v1/validate/");
+static const QString kLicenseServerUrl("http://licensing.vmsproxy.com/nxlicensed");
+
+const nx::utils::Url QnLicenseServer::kIndexUrl(kLicenseServerUrl);
+const nx::utils::Url QnLicenseServer::kActivateUrl(kLicenseServerUrl + "/activate.php");
+const nx::utils::Url QnLicenseServer::kDeactivateUrl(kLicenseServerUrl + "/api/v1/deactivate/");
+const nx::utils::Url QnLicenseServer::kValidateUrl(kLicenseServerUrl + "/api/v1/validate/");
 
 //#define QN_NO_LICENSE_CHECK
 
