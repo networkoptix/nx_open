@@ -20,8 +20,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 } // namespace sql
 } // namespace nx
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace data {
 
 struct Statistics
@@ -44,5 +43,4 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (json))
 
 } // namespace data
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

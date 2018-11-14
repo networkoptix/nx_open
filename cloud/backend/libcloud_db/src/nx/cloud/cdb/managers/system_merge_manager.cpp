@@ -10,8 +10,7 @@
 #include "../stree/cdb_ns.h"
 #include "system_health_info_provider.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 SystemMergeManager::SystemMergeManager(
     AbstractSystemManager* systemManager,
@@ -351,5 +350,4 @@ void SystemMergeManager::finishMerge(
     mergeRequestContext->completionHandler(resultCode);
 }
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

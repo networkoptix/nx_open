@@ -7,8 +7,7 @@
 #include <nx/cloud/cdb/client/data/types.h>
 #include <nx/fusion/serialization/lexical.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 void PrintTo(VmsResultCode val, ::std::ostream* os)
 {
@@ -33,5 +32,4 @@ void PrintTo(SystemStatus val, ::std::ostream* os)
 }
 
 } // namespace api
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

@@ -6,9 +6,7 @@
 
 #include <nx/cloud/cdb/api/auth_provider.h>
 
-namespace nx {
-namespace cdb {
-namespace api {
+namespace nx::cdb::api {
 
 // TODO: #ak Add corresponding parser/serializer to fusion and remove this function.
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, AuthRequest* const authRequest);
@@ -27,6 +25,4 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (NonceData)(AuthRequest)(AuthResponse)(AuthInfoRecord)(AuthInfo),
     (json))
 
-} // namespace api
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb::api

@@ -1,7 +1,6 @@
 #pragma once
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 extern const char* const kAccountRegisterPath;
 extern const char* const kAccountActivatePath;
@@ -50,5 +49,4 @@ extern const char* const kDiscoveryCloudModuleXmlPath;
 
 extern const char* const kSystemIdParam;
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

@@ -3,8 +3,7 @@
 #include <nx/utils/thread/stoppable.h>
 #include <nx/utils/thread/barrier_handler.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 class CloudDbService;
 
@@ -29,5 +28,4 @@ private:
     CloudDbService* m_impl;
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

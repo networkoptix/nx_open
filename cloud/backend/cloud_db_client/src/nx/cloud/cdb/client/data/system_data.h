@@ -11,9 +11,7 @@
 
 #include <nx/cloud/cdb/api/system_data.h>
 
-namespace nx {
-namespace cdb {
-namespace api {
+namespace nx::cdb::api {
 
 #define SystemRegistrationData_Fields (name)(customization)(opaque)
 
@@ -123,9 +121,7 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::FilterField)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::MergeRole)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemCapabilityFlag)
 
-} // namespace api
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb::api
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemStatus), (lexical))
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemHealth), (lexical))

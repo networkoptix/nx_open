@@ -14,8 +14,7 @@
 #include "persistent_scheduler_db_helper.h"
 #include "persistent_scheduler_common.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 class PersistentScheduler;
 
@@ -88,5 +87,4 @@ private:
     std::unordered_set<QnUuid> m_delayed;
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

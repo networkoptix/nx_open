@@ -2,8 +2,7 @@
 
 #include <nx/utils/stree/resourcenameset.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 /**
  * Attributes to be used with stree.
@@ -70,5 +69,4 @@ public:
     CdbAttrNameSet();
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

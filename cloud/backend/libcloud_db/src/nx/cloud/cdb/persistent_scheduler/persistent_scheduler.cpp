@@ -4,8 +4,7 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/future.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 namespace {
 
@@ -270,5 +269,4 @@ void PersistentScheduler::stop()
     m_timerManager.reset();
 }
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

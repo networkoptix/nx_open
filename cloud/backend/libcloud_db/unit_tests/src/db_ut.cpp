@@ -10,8 +10,7 @@
 #include "functional_tests/test_setup.h"
 #include "functional_tests/test_email_manager.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 class DbRegress:
@@ -197,5 +196,4 @@ TEST_F(DbFailure, timed_out_db_query_results_in_retryLater_result)
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

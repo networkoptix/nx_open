@@ -6,9 +6,7 @@
 
 #include "../field_name.h"
 
-namespace nx {
-namespace cdb {
-namespace api {
+namespace nx::cdb::api {
 
 using namespace nx::network;
 
@@ -262,9 +260,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (json),
     _Fields)
 
-} // namespace api
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb::api
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, AccountStatus,
     (nx::cdb::api::AccountStatus::invalid, "invalid")

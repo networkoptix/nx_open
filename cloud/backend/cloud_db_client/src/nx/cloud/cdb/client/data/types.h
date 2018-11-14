@@ -6,9 +6,7 @@
 
 #include <nx/cloud/cdb/api/result_code.h>
 
-namespace nx {
-namespace cdb {
-namespace api {
+namespace nx::cdb::api {
 
 nx::network::http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resultCode);
 ResultCode httpStatusCodeToResultCode(nx::network::http::StatusCode::Value statusCode);
@@ -19,6 +17,4 @@ ResultCode fusionRequestResultToResultCode(nx::network::http::FusionRequestResul
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResultCode)
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ResultCode), (lexical))
 
-} // namespace api
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb::api

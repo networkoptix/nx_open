@@ -1,10 +1,4 @@
-/**********************************************************
-* Sep 3, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_CDB_CL_ACCOUNT_MANAGER_H
-#define NX_CDB_CL_ACCOUNT_MANAGER_H
+#pragma once
 
 #include <deque>
 
@@ -14,10 +8,7 @@
 #include "data/account_data.h"
 #include "include/nx/cloud/cdb/api/account_manager.h"
 
-
-namespace nx {
-namespace cdb {
-namespace client {
+namespace nx::cdb::client {
 
 class AccountManager:
     public api::AccountManager,
@@ -57,8 +48,4 @@ public:
         std::function<void(api::ResultCode, api::TemporaryCredentials)> completionHandler) override;
 };
 
-}   //client
-}   //cdb
-}   //nx
-
-#endif  //NX_CDB_CL_ACCOUNT_MANAGER_H
+} // nx::cdb::client

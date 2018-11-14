@@ -1,10 +1,4 @@
-/**********************************************************
-* 23 jun 2014
-* akolesnikov
-***********************************************************/
-
-#ifndef VIDEO_DATA_PACKET_H
-#define VIDEO_DATA_PACKET_H
+#pragma once
 
 #include <memory>
 
@@ -76,5 +70,3 @@ private:
 
 typedef std::shared_ptr<QnWritableCompressedVideoData> QnWritableCompressedVideoDataPtr;
 typedef std::shared_ptr<const QnWritableCompressedVideoData> QnConstWritableCompressedVideoDataPtr;
-
-#endif  //VIDEO_DATA_PACKET_H

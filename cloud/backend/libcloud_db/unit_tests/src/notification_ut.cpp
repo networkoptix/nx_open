@@ -5,8 +5,7 @@
 #include "functional_tests/email_manager_mocked.h"
 #include "functional_tests/test_setup.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 namespace {
@@ -176,5 +175,4 @@ TEST_F(NotificationGeneralFieldsValidation, invite_user_to_system)
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

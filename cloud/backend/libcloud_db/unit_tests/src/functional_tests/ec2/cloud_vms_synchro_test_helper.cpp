@@ -15,8 +15,7 @@
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/test_support/test_options.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 static constexpr auto kMaxTimeToWaitForChangesToBePropagatedToCloud = std::chrono::minutes(1);
 static constexpr auto kRetrySyncCheckPeriod = std::chrono::milliseconds(10);
@@ -768,5 +767,4 @@ api::ResultCode Ec2MserverCloudSynchronization::fetchTransactionLog(
     return api::ResultCode::ok;
 }
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

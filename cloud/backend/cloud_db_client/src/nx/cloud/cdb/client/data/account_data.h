@@ -11,9 +11,7 @@
 
 #include <nx/cloud/cdb/api/account_data.h>
 
-namespace nx {
-namespace cdb {
-namespace api {
+namespace nx::cdb::api {
 
 //-------------------------------------------------------------------------------------------------
 // class AccountRegistrationData
@@ -93,8 +91,6 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (json))
 
 
-} // namespace api
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb::api
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::AccountStatus), (lexical))

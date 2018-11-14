@@ -6,8 +6,7 @@
 
 #include "rdb/rdb_account_data_object.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace dao {
 
 AccountDataObjectFactory::AccountDataObjectFactory():
@@ -27,5 +26,4 @@ std::unique_ptr<AbstractAccountDataObject> AccountDataObjectFactory::defaultFact
 }
 
 } // namespace dao
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

@@ -13,8 +13,7 @@
 #include "system_health_info_provider_stub.h"
 #include "../functional_tests/test_email_manager.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 class SystemManager:
@@ -172,5 +171,4 @@ private:
 };
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

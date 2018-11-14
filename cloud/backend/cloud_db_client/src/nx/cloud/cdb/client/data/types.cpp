@@ -2,9 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-namespace nx {
-namespace cdb {
-namespace api {
+namespace nx::cdb::api {
 
 // TODO: #ak too many different conversion functions here.
 
@@ -160,6 +158,4 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, ResultCode,
     (nx::cdb::api::ResultCode::unknownError, "unknownError")
 )
 
-} // namespace api
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb::api

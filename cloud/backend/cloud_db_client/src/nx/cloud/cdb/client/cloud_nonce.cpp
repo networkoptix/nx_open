@@ -15,9 +15,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/time.h>
 
-namespace nx {
-namespace cdb {
-namespace api {
+namespace nx::cdb::api {
 
 namespace {
 
@@ -163,6 +161,4 @@ bool isNonceValidForSystem(
         systemId);
 }
 
-} // namespace api
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb::api

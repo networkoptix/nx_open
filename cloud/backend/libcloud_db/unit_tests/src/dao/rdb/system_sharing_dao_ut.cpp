@@ -3,8 +3,7 @@
 #include <nx/cloud/cdb/dao/rdb/system_sharing_data_object.h>
 #include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace dao {
 namespace rdb {
 namespace test {
@@ -87,5 +86,4 @@ TEST_F(SystemSharingDataObject, system_sharing_update_replaces_record)
 } // namespace test
 } // namespace rdb
 } // namespace dao
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

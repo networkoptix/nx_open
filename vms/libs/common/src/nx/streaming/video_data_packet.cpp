@@ -1,8 +1,3 @@
-/**********************************************************
-* 23 jun 2014
-* akolesnikov
-***********************************************************/
-
 #include "video_data_packet.h"
 
 #include <utils/memory/cyclic_allocator.h>

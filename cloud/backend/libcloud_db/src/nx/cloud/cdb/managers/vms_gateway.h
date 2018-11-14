@@ -13,8 +13,7 @@
 #include "account_manager.h"
 #include "vms_request_result.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 namespace conf { class Settings; }
 
@@ -82,5 +81,4 @@ private:
         const QnJsonRestResult& vmsResult);
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

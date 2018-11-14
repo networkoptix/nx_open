@@ -6,8 +6,7 @@
 
 #include "../data/system_data.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 namespace conf { class Settings; }
 
@@ -77,5 +76,4 @@ public:
 };
 
 } // namespace dao
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

@@ -3,8 +3,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/fusion/model_functions.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 StreeManager::StreeManager(const QString& xmlFilePath) noexcept(false):
     m_impl(m_cdbAttrNameSet, xmlFilePath)
@@ -28,8 +27,7 @@ const nx::utils::stree::ResourceNameSet& StreeManager::resourceNameSet() const
     return m_impl.resourceNameSet();
 }
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb, StreeOperation,
     (nx::cdb::StreeOperation::authentication, "authentication")

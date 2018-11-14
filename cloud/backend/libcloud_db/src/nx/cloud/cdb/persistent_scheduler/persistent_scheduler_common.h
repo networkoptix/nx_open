@@ -7,8 +7,7 @@
 
 #include <nx/utils/uuid.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 using ScheduleParams = std::unordered_map<std::string, std::string>;
 struct ScheduleTaskInfo
@@ -27,5 +26,4 @@ struct ScheduleData
     TaskToParams taskToParams;
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

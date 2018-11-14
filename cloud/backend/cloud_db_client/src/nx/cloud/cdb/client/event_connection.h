@@ -1,8 +1,3 @@
-/**********************************************************
-* Apr 29, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <string>
@@ -16,19 +11,13 @@
 
 #include <include/nx/cloud/cdb/api/connection.h>
 
-
-namespace nx {
-
-namespace network {
-namespace cloud {
+namespace nx::network::cloud {
 
 class CloudModuleUrlFetcher;
 
-}   //namespace cloud
-}   //namespace network
+} // namespace nx::network::cloud
 
-namespace cdb {
-namespace client {
+namespace nx::cdb::client {
 
 class EventConnection:
     public QObject,
@@ -86,6 +75,4 @@ private:
     void onReceivingSerializedEvent(QByteArray serializedEvent);
 };
 
-}   //namespace client
-}   //namespace cdb
-}   //namespace nx
+} // namespace nx::cdb::client

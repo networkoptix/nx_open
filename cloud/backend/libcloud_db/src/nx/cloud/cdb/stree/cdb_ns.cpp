@@ -1,7 +1,6 @@
 #include "cdb_ns.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 CdbAttrNameSet::CdbAttrNameSet()
 {
@@ -45,5 +44,4 @@ CdbAttrNameSet::CdbAttrNameSet()
     registerResource(attr::credentialsId, "credentials.id", QVariant::String);
 }
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

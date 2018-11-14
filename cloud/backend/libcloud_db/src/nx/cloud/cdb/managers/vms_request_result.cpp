@@ -2,8 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb, VmsResultCode,
     (nx::cdb::VmsResultCode::ok, "ok")
@@ -14,5 +13,4 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb, VmsResultCode,
     (nx::cdb::VmsResultCode::unreachable, "unreachable")
 )
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

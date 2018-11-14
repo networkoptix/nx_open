@@ -6,8 +6,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/fusion/serialization/json.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 enum class NotificationType
 {
@@ -179,7 +178,6 @@ public:
     InviteUserNotification();
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::NotificationType), (lexical))

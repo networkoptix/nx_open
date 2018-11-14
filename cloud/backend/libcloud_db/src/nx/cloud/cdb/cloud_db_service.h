@@ -7,8 +7,7 @@
 
 #include "settings.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 class Controller;
 class HttpView;
@@ -37,5 +36,4 @@ private:
     Controller* m_controller = nullptr;
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

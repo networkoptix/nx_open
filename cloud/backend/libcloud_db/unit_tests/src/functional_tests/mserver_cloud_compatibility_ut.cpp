@@ -7,8 +7,7 @@
 
 #include "mserver_cloud_synchronization_connection_fixture.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 class Ec2MserverCloudCompatibility:
@@ -142,5 +141,4 @@ TEST(Ec2MserverCloudCompabilityCheckRoutine, incompatible_versions)
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

@@ -24,8 +24,7 @@ class AuthMethodRestrictionList;
 } // namespace network
 } // namespace http
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 class AccountManager;
 class SystemManager;
@@ -141,5 +140,4 @@ private:
 
 } // namespace detail
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

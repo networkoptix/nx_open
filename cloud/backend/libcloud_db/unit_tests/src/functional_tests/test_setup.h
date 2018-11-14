@@ -4,8 +4,7 @@
 
 #include <nx/cloud/cdb/test_support/cdb_launcher.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 class CdbFunctionalTest:
@@ -21,5 +20,4 @@ private:
 };
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

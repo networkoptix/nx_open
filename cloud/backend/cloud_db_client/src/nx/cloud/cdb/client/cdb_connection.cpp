@@ -5,9 +5,7 @@
 #include "cdb_request_path.h"
 #include "data/module_info.h"
 
-namespace nx {
-namespace cdb {
-namespace client {
+namespace nx::cdb::client {
 
 Connection::Connection(
     network::cloud::CloudModuleUrlFetcher* const endPointFetcher)
@@ -106,6 +104,4 @@ void Connection::ping(
         std::bind(completionHandler, std::placeholders::_1, api::ModuleInfo()));
 }
 
-} // namespace client
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb::client

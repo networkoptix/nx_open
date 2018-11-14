@@ -7,8 +7,7 @@
 #include "test_email_manager.h"
 #include "test_setup.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 class SystemSharingInvitingUser:
@@ -180,5 +179,4 @@ TEST_F(SystemSharingInvitingUser, basic_scenario)
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

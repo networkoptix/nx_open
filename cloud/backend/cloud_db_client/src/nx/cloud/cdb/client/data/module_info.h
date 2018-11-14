@@ -5,9 +5,7 @@
 
 #include <nx/cloud/cdb/api/module_info.h>
 
-namespace nx {
-namespace cdb {
-namespace api {
+namespace nx::cdb::api {
 
 #define ModuleInfo_Fields (realm)
 
@@ -15,6 +13,4 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (ModuleInfo),
     (json) )
 
-} // namespace api
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb::api

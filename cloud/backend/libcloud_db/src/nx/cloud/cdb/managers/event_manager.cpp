@@ -12,8 +12,7 @@
 #include "../http_handlers/base_http_handler.h"
 #include "../settings.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 class SubscribeToSystemEventsHandler:
     public AbstractFreeMsgBodyHttpHandler<>
@@ -188,5 +187,4 @@ void EventManager::onMediaServerIdlePeriodExpired(
         });
 }
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

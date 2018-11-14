@@ -1,7 +1,6 @@
 #include "system_sharing_manager_stub.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 api::SystemAccessRole SystemSharingManagerStub::getAccountRightsForSystem(
@@ -62,5 +61,4 @@ void SystemSharingManagerStub::add(api::SystemSharingEx sharing)
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

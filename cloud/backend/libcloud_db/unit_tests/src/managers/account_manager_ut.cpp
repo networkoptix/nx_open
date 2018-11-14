@@ -18,8 +18,7 @@
 #include "temporary_account_password_manager_stub.h"
 #include "../functional_tests/test_email_manager.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 class AccountManager:
@@ -255,5 +254,4 @@ TEST_F(AccountManager, correct_password_reset_code)
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

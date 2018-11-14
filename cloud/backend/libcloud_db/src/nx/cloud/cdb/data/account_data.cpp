@@ -6,8 +6,7 @@
 
 #include "../stree/cdb_ns.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace data {
 
 //-------------------------------------------------------------------------------------------------
@@ -154,5 +153,4 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     _Fields)
 
 } // namespace data
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

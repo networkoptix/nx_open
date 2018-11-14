@@ -2,8 +2,7 @@
 
 #include "test_setup.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 class AuthProvider: public CdbFunctionalTest {};
@@ -45,5 +44,4 @@ TEST_F(AuthProvider, nonce)
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

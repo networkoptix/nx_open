@@ -26,8 +26,7 @@
 #include "../cloud_db_service.h"
 #include "../managers/email_manager.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 //-------------------------------------------------------------------------------------------------
 // CdbLauncher
@@ -1150,5 +1149,4 @@ void EmailManagerStub::sendAsync(
         std::move(completionHandler));
 }
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

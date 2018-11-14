@@ -18,8 +18,7 @@
 
 #include "account_manager_stub.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 class VmsGateway:
@@ -253,5 +252,4 @@ TEST_F(VmsGateway, proper_error_is_reported_when_vms_rejects_request)
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

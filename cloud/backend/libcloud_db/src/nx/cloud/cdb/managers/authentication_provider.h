@@ -18,8 +18,7 @@
 #include "../data/auth_data.h"
 #include "../data/data_filter.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 namespace conf { class Settings; }
 namespace ec2 { class AbstractVmsP2pCommandBus; }
@@ -145,5 +144,4 @@ private:
     void startCheckForExpiredAuthRecordsTimer(sql::DBResult result);
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

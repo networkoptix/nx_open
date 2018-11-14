@@ -1,19 +1,10 @@
-/**********************************************************
-* Sep 3, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_CLOUD_DB_CLIENT_CONNECTION_FACTORY_H
-#define NX_CLOUD_DB_CLIENT_CONNECTION_FACTORY_H
+#pragma once
 
 #include "include/nx/cloud/cdb/api/connection.h"
 
 #include <nx/network/cloud/cloud_module_url_fetcher.h>
 
-
-namespace nx {
-namespace cdb {
-namespace client {
+namespace nx::cdb::client {
 
 class ConnectionFactory:
     public api::ConnectionFactory
@@ -43,8 +34,4 @@ private:
     network::cloud::CloudDbUrlFetcher m_endPointFetcher;
 };
 
-}   //client
-}   //cdb
-}   //nx
-
-#endif  //NX_CLOUD_DB_CLIENT_CONNECTION_FACTORY_H
+} // nx::cdb::client

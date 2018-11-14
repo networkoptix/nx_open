@@ -3,9 +3,7 @@
 
 #include <nx/cloud/cdb/api/cloud_nonce.h>
 
-
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 TEST(CloudNonce, general)
 {
@@ -17,5 +15,4 @@ TEST(CloudNonce, general)
     }
 }
 
-}   // namespace cdb
-}   // namespace nx
+} // namespace nx::cdb

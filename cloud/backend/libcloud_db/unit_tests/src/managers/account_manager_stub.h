@@ -3,8 +3,7 @@
 #include <nx/cloud/cdb/managers/account_manager.h>
 #include <nx/cloud/cdb/test_support/business_data_generator.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 class AccountManagerStub:
@@ -42,5 +41,4 @@ private:
 };
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

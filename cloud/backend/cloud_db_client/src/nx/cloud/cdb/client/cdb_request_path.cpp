@@ -1,7 +1,6 @@
 #include "cdb_request_path.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 const char* const kAccountRegisterPath = "/cdb/account/register";
 const char* const kAccountActivatePath = "/cdb/account/activate";
@@ -46,5 +45,4 @@ const char* const kDiscoveryCloudModuleXmlPath = "/discovery/v1/cloud_modules.xm
 
 const char* const kSystemIdParam = "systemId";
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

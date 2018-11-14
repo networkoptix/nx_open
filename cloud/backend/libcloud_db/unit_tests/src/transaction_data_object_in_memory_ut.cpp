@@ -13,8 +13,7 @@
 
 #include <transaction/transaction_descriptor.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace ec2 {
 namespace dao {
 namespace memory {
@@ -184,5 +183,4 @@ TEST_F(TransactionDataObjectInMemory, DISABLED_tran_rollback)
 } // namespace memory
 } // namespace dao
 } // namespace ec2
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

@@ -18,8 +18,7 @@
 #include "../dao/abstract_system_merge_dao.h"
 #include "../data/system_data.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 class AbstractSystemManager;
 class AbstractSystemHealthInfoProvider;
@@ -135,5 +134,4 @@ private:
         api::ResultCode resultCode);
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

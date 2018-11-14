@@ -17,8 +17,7 @@
 
 #include "test_setup.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 namespace {
@@ -409,5 +408,4 @@ TEST_F(SystemMerge, fails_if_request_to_slave_system_fails)
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

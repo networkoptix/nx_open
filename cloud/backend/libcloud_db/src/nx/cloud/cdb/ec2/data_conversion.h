@@ -6,8 +6,7 @@
 
 #include <common/common_globals.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 namespace api { class SystemSharing; }
 
@@ -24,5 +23,4 @@ void convert(const vms::api::UserData& from, api::SystemSharing* const to);
 void convert(const api::SystemSharing& from, nx::vms::api::IdData* const to);
 
 } // namespace ec2
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

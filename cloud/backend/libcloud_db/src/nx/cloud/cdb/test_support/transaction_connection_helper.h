@@ -9,8 +9,7 @@
 
 #include "test_transaction_transport.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 enum class KeepAlivePolicy
@@ -135,5 +134,4 @@ private:
 };
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

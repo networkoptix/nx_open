@@ -20,8 +20,7 @@
 #include "../stree/http_request_attr_reader.h"
 #include "../stree/socket_attr_reader.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace detail {
 
 template<typename Input = void, typename Output = void>
@@ -361,5 +360,4 @@ private:
     ExecuteRequestFunc m_requestFunc;
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

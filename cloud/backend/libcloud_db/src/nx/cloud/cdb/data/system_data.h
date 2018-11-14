@@ -13,8 +13,7 @@
 
 #include <nx/cloud/cdb/client/data/system_data.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace api {
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
@@ -127,5 +126,4 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (json));
 
 } // namespace data
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

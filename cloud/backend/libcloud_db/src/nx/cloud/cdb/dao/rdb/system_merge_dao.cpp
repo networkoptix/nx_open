@@ -3,8 +3,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/sql/query.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace dao {
 namespace rdb {
 
@@ -58,5 +57,4 @@ void SystemMergeDao::removeMergeBySlaveSystemId(
 
 } // namespace rdb
 } // namespace dao
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

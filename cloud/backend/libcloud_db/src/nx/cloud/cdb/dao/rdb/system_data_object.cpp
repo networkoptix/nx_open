@@ -11,8 +11,7 @@
 
 #include "../../settings.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace dao {
 namespace rdb {
 
@@ -287,5 +286,4 @@ nx::sql::DBResult SystemDataObject::deleteExpiredSystems(
 
 } // namespace rdb
 } // namespace dao
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

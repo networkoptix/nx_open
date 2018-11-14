@@ -6,8 +6,7 @@
 
 namespace nx { namespace data_sync_engine { class SyncronizationEngine; } }
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace ec2 {
 
 class AbstractVmsP2pCommandBus
@@ -39,5 +38,4 @@ private:
 };
 
 } // namespace ec2
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

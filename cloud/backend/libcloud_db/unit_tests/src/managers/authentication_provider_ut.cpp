@@ -26,8 +26,7 @@
 #include "temporary_account_password_manager_stub.h"
 #include "vms_p2p_command_bus_stub.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 class AuthenticationProvider:
@@ -494,5 +493,4 @@ TEST_F(AuthenticationProvider, does_not_try_to_calculate_auth_record_for_user_wi
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

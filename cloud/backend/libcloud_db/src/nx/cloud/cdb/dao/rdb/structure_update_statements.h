@@ -1,7 +1,6 @@
 #pragma once
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace db {
 
 static const char kCreateDbVersion13[] =
@@ -861,5 +860,4 @@ VALUES ('cloud_sync_engine_{C4105732-0097-48FB-AB9B-039A3C057F57}', 2);
 )sql";
 
 } // namespace db
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

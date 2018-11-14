@@ -9,8 +9,7 @@
 
 namespace nx { namespace data_sync_engine { class ConnectionManager; } }
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 class SystemCapabilitiesProvider:
     public AbstractSystemExtension
@@ -35,5 +34,4 @@ private:
         data_sync_engine::SystemStatusDescriptor statusDescription);
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

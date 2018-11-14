@@ -1,8 +1,3 @@
-/**********************************************************
-* Sep 9, 2015
-* akolesnikov
-***********************************************************/
-
 #include <gtest/gtest.h>
 
 #include <QtCore/QBuffer>
@@ -10,9 +5,7 @@
 
 #include <nx/network/cloud/cloud_modules_xml_sax_handler.h>
 
-
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace client {
 
 TEST(CloudModulesXmlHandler, common)
@@ -52,6 +45,5 @@ TEST(CloudModulesXmlHandler, common)
     ASSERT_EQ(*std::next(hpmEndpoints.begin(), 1), nx::network::SocketAddress("10.0.2.103:456"));
 }
 
-}   //client
-}   //cdb
-}   //nx
+} // client
+} // nx::cdb

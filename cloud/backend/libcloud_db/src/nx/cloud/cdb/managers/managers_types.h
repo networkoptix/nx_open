@@ -10,8 +10,7 @@
 #include <nx/cloud/cdb/api/result_code.h>
 #include <nx/data_sync_engine/result_code.h>
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 api::ResultCode dbResultToApiResult(nx::sql::DBResult);
 
@@ -41,8 +40,7 @@ enum class DataActionType
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(DataActionType)
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::EntityType), (lexical))
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::DataActionType), (lexical))

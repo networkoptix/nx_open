@@ -10,8 +10,7 @@
 #include "cdb_ns.h"
 #include "settings.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 enum class StreeOperation
 {
@@ -43,7 +42,6 @@ private:
     nx::utils::stree::StreeManager m_impl;
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::StreeOperation), (lexical));

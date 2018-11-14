@@ -17,8 +17,7 @@
 
 #include "test_setup.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace test {
 
 static const char xmlTemplate[] = R"xml(
@@ -214,5 +213,4 @@ TEST_F(FtCloudModulesXml, default_xml_contains_cloud_db_url)
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

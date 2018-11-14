@@ -1,12 +1,6 @@
-/**********************************************************
-* Sep 3, 2015
-* akolesnikov
-***********************************************************/
-
 #include "include/nx/cloud/cdb/api/connection.h"
 
 #include "connection_factory.h"
-
 
 extern "C"
 {

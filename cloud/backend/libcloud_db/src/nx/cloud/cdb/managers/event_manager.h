@@ -31,8 +31,7 @@ class MultipartMessageBodySource;
 } // namespace network
 } // namespace nx
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 namespace conf
 {
@@ -113,5 +112,4 @@ private:
         MediaServerConnectionContainer::iterator serverConnectionIter);
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

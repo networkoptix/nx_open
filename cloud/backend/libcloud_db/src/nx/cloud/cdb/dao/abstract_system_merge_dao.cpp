@@ -4,8 +4,7 @@
 
 #include "rdb/system_merge_dao.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 namespace dao {
 
 api::SystemMergeInfo MergeInfo::masterSystemInfo() const
@@ -52,5 +51,4 @@ std::unique_ptr<AbstractSystemMergeDao> SystemMergeDaoFactory::defaultFactoryFun
 }
 
 } // namespace dao
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb

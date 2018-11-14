@@ -20,8 +20,7 @@
 #include "../cloud_db_service_public.h"
 #include "../managers/email_manager.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cdb {
 
 class CdbLauncher:
     public utils::test::ModuleLauncher<CloudDbServicePublic>,
@@ -294,5 +293,4 @@ private:
     nx::cdb::AbstractEmailManager* const m_target;
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cdb
