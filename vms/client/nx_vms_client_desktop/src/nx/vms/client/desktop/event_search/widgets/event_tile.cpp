@@ -455,7 +455,7 @@ void EventTile::setPreview(ImageProvider* value)
 
     d->updatePreview(kPreviewLoadDelay);
 
-    if (preview())
+    if (preview() && kPreviewReloadDelay > std::chrono::seconds(0))
     {
         connect(preview(), &ImageProvider::statusChanged, this,
             [this](Qn::ThumbnailStatus status)
