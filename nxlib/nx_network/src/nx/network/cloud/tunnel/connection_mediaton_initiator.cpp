@@ -43,7 +43,7 @@ void ConnectionMediationInitiator::start(
 
     initiateConnectOverUdp();
 
-    // TODO: #ak If no UDP, do TCP without delay.
+    // TODO: #ak If UDP request has failed before timed, invoke initiateConnectOverTcp ASAP.
 
     m_tcpConnectDelayTimer.start(
         m_settings.delayBeforeSendingConnectToMediatorOverTcp,
