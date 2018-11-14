@@ -316,7 +316,7 @@ public:
     int pingSystemAsync(const nx::utils::Url &url, const QString& getKey, QObject* target, const char* slot);
     int getNonceAsync(const nx::utils::Url& url, QObject* target, const char* slot);
     int getRecordingStatisticsAsync(
-        qint64 bitrateAnalizePeriodMs, QObject* target, const char* slot);
+        qint64 bitrateAnalyzePeriodMs, QObject* target, const char* slot);
     int getAuditLogAsync(qint64 startTimeMs, qint64 endTimeMs, QObject* target, const char* slot);
 
     int testEmailSettingsAsync(const QnEmailSettings& settings, QObject* target, const char* slot);
