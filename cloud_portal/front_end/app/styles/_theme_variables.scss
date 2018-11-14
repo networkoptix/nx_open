@@ -211,5 +211,5 @@ $container-max-widths : (
 /* badge component */
 $badge-font-size: rem(12px);
 $badge-border-radius: rem(2px);
-$badge-padding-x : 8px;
-$badge-padding-y : 3px;
+$badge-padding-x : rem(8px);
+$badge-padding-y : rem(3px);
