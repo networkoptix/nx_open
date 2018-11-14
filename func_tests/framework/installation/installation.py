@@ -5,6 +5,7 @@ from pprint import pformat
 
 from framework.installation.installer import InstallIdentity
 from framework.installation.service import Service
+from framework.installation.storage import Storage
 from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.path import FileSystemPath
@@ -28,13 +29,14 @@ class Installation(object):
     """Install and access installed files in uniform way"""
     __metaclass__ = ABCMeta
 
-    def __init__(self, os_access, dir, binary_file, var_dir, core_dumps_dirs, core_dump_glob):
+    def __init__(self, os_access, dir, binary_file, var_dir, core_dumps_dirs, core_dump_glob, default_storage_dir):
         self.os_access = os_access  # type: OSAccess
         self.dir = dir  # type: FileSystemPath
         self.binary = dir / binary_file  # type: FileSystemPath
         self._var = dir / var_dir  # type: FileSystemPath
         self._core_dumps_dirs = [dir / core_dumps_dir for core_dumps_dir in core_dumps_dirs]
         self._core_dump_glob = core_dump_glob  # type: str
+        self.default_storage = Storage(os_access, default_storage_dir)
 
     def _build_info(self):
         path = self.dir / 'build_info.txt'
@@ -98,11 +100,8 @@ class Installation(object):
 
     def cleanup(self, new_key_pair):
         self.cleanup_core_dumps()
-        try:
-            _logger.info("Remove var directory %s.", self._var)
-            self._var.rmtree()
-        except DoesNotExist:
-            pass
+        self.default_storage.dir.rmtree(ignore_errors=True)  # Not in var dir on Windows.
+        self._var.rmtree(ignore_errors=True)
         key_pair_file = self._var / 'ssl' / 'cert.pem'
         _logger.info("Put key pair to %s.", key_pair_file)
         key_pair_file.parent.mkdir(parents=True, exist_ok=True)

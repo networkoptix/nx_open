@@ -258,7 +258,7 @@ class _FakeDisk(BaseFakeDisk):
         free_space_mb = int(math.ceil(size_bytes / 1024 / 1024))
         volume_mb = free_space_mb + 15  # 15 MB is for System Volume Information.
         partition_mb = volume_mb + 1  # 1 MB for filesystem.
-        disk_mb = partition_mb + 2  # 1 MB is for MBR/GPT headers.
+        disk_mb = partition_mb + 2  # 2 MB is for MBR/GPT headers.
         script_template = (
             'CREATE VDISK file={image_path} MAXIMUM={disk_mb}' '\r\n'  # NOERR if exists.
             'SELECT VDISK file={image_path}' '\r\n'  # No error if already selected.

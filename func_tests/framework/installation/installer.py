@@ -31,7 +31,7 @@ class PackageNameParseError(Exception):
 
 Customization = namedtuple('Customization', [
     'customization_name', 'installer_name', 'company_name',
-    'linux_service_name', 'linux_subdir',
+    'linux_service_name', 'linux_subdir', 'storage_dir_name',
     'windows_service_name', 'windows_installation_subdir', 'windows_app_data_subdir', 'windows_registry_key',
     ])
 
@@ -42,6 +42,7 @@ known_customizations = {
         company_name='Hanwha',
         linux_service_name='hanwha-mediaserver',
         linux_subdir=PurePosixPath('hanwha', 'mediaserver'),
+        storage_dir_name='Wisenet WAVE Media',
         windows_service_name='hanwhaMediaServer',
         windows_installation_subdir=PureWindowsPath(u'Hanwha', u'Wisenet WAVE', u'MediaServer'),
         windows_app_data_subdir=PureWindowsPath(u'Hanwha', u'Hanwha Media Server'),
@@ -53,6 +54,7 @@ known_customizations = {
         company_name='Network Optix',
         linux_service_name='networkoptix-mediaserver',
         linux_subdir=PurePosixPath('networkoptix/mediaserver'),
+        storage_dir_name='HD Witness Media',
         windows_service_name='defaultMediaServer',
         windows_installation_subdir=PureWindowsPath(u'Network Optix', u'Nx Witness', u'MediaServer'),
         windows_app_data_subdir=PureWindowsPath(u'Network Optix', u'Network Optix Media Server'),
@@ -64,6 +66,7 @@ known_customizations = {
         company_name='Network Optix',
         linux_service_name='networkoptix-mediaserver',
         linux_subdir=PurePosixPath('networkoptix/mediaserver'),
+        storage_dir_name='Nx MetaVMS Media',
         windows_service_name='metavmsMediaServer',
         windows_installation_subdir=PureWindowsPath(u'Network Optix', u'Nx MetaVMS', u'MediaServer'),
         windows_app_data_subdir=PureWindowsPath(u'Network Optix', u'Network Optix Media Server'),
@@ -75,6 +78,7 @@ known_customizations = {
         company_name='Digital Watchdog',
         linux_service_name='dwspectrum-mediaserver',
         linux_subdir=PurePosixPath('dwspectrum/mediaserver'),
+        storage_dir_name='DW Spectrum Media',
         windows_service_name='dwspectrumMediaServer',
         windows_installation_subdir=PureWindowsPath(u'Digital Watchdog', u'DW Spectrum', u'MediaServer'),
         windows_app_data_subdir=PureWindowsPath(u'Digital Watchdog', u'Digital Watchdog Media Server'),
