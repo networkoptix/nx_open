@@ -88,7 +88,7 @@ Going to the history page anonymous asks for login and login shows history page
     Log In    ${email}   ${password}    button=None
     Validate Log In
     Wait Until Element Is Visible    ${RELEASES TAB}
-    Location Should Be    ${url}/downloads/releases
+    Location Should Be    ${url}/downloads/history
 
 Going to the history page anonymous and logging in with someone who doesn't have access takes you to 404
     Go To    ${url}/downloads/history

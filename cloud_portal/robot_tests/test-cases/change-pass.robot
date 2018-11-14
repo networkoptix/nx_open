@@ -2,7 +2,7 @@
 Resource          ../resource.robot
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
-Suite Setup       Open Browser and go to URL    ${url}
+Suite Setup       Open browser and set user language to current
 Suite Teardown    Clean up
 
 *** Variables ***
@@ -13,6 +13,12 @@ ${email}               ${EMAIL VIEWER}
 ${url}                 ${ENV}
 
 *** Keywords ***
+Open browser and set user language to current
+    Open Browser and go to URL    ${url}
+    Log In    ${email}    ${password}
+    Validate Log In
+    Log Out
+
 Log In To Change Password Page
     Go To    ${url}/account/password
     Log In    ${email}    ${password}    None
