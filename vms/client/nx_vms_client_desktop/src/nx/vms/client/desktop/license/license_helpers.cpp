@@ -205,7 +205,7 @@ LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat));
 
     m_httpClient->doPost(
-        QnLicenseServer::kDiactivateUrl, kJsonContentType, QJson::serialized(request));
+        QnLicenseServer::kDeactivateUrl, kJsonContentType, QJson::serialized(request));
 }
 
 }

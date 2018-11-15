@@ -49,9 +49,8 @@ void OnvifAudioTransmitter::close()
 void OnvifAudioTransmitter::prepare()
 {
     close();
-    QnRtspClient::Config config;
-    config.backChannelAudioOnly = true;
-    m_rtspConnection.reset(new QnRtspClient(m_resource->toSharedPointer(), config));
+    QnRtspClient::Config config{/*shouldGuessAuthDigest*/ false, /*backChannelAudioOnly*/ true};
+    m_rtspConnection.reset(new QnRtspClient(config));
     m_rtspConnection->setAuth(m_resource->getAuth(), nx::network::http::header::AuthScheme::digest);
     m_rtspConnection->setAdditionAttribute("Require", "www.onvif.org/ver20/backchannel");
     m_rtspConnection->setTransport(QnRtspClient::TRANSPORT_TCP);
@@ -139,7 +138,7 @@ bool OnvifAudioTransmitter::sendData(const QnAbstractMediaDataPtr& audioData)
         0, //< ssrc
         audioData->dataSize(),
         timestamp,
-        m_trackInfo.sdpMedia.format,
+        m_trackInfo.sdpMedia.payloadType,
         m_sequence++);
 
     sendBuffer.data()[0] = '$';

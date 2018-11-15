@@ -77,6 +77,7 @@ private:
         const nx::sdk::DeviceInfo& deviceInfo);
 
     boost::optional<QList<QString>> eventTypeIdsFromParameters(
+        const nx::utils::Url& url,
         const nx::mediaserver_core::plugins::HanwhaCgiParameters& parameters,
         const nx::mediaserver_core::plugins::HanwhaResponse& eventStatuses,
         int channel) const;

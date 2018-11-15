@@ -2908,6 +2908,10 @@
             "disableMultiThreadDecoding": [
                 "hevc"
             ]
+        },
+        {
+            "keys": ["UNIVIEW|*"],
+            "needToReloadAllAdvancedParametersAfterApply": true
         }
     ]
 }

@@ -32,9 +32,6 @@ struct NX_NETWORK_API Ini:
 class NX_NETWORK_API SocketGlobals
 {
 public:
-    using CustomInit = void(*)();
-    using CustomDeinit = void(*)();
-
     static const Ini& ini();
     static aio::AIOService& aioService();
     static AddressResolver& addressResolver();
@@ -51,8 +48,7 @@ public:
     static void printArgumentsHelp(std::ostream* outputStream);
     static void applyArguments(const utils::ArgumentParser& arguments);
 
-    /** Invokes @param init only once, calls @param deinit in destructor. */
-    static void customInit(CustomInit init, CustomDeinit deinit = nullptr);
+    bool isUdtEnabled() const;
 
     void blockHost(const std::string& hostname);
     void unblockHost(const std::string& hostname);

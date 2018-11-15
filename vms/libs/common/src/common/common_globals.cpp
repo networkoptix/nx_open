@@ -101,6 +101,18 @@ QString toString(MediaStreamEvent value)
     }
 }
 
+QString toString(StreamIndex value)
+{
+    switch (value)
+    {
+        case StreamIndex::undefined: return "undefined";
+        case StreamIndex::primary: return "primary";
+        case StreamIndex::secondary: return "secondary";
+    }
+    NX_ASSERT(false, lm("Unexpected value %1").arg((int) value));
+    return lm("unexpected_value_%1").arg((int) value);
+}
+
 QString toString(ResourceStatus status)
 {
     return QnLexical::serialized(status);

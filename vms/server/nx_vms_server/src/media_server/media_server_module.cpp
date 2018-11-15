@@ -138,7 +138,10 @@ public:
 
 };
 
-QnMediaServerModule::QnMediaServerModule(const nx::mediaserver::CmdLineArguments* arguments, QObject* parent)
+QnMediaServerModule::QnMediaServerModule(
+    const nx::mediaserver::CmdLineArguments* arguments,
+    std::unique_ptr<MSSettings> serverSettings,
+    QObject* parent)
 {
     std::unique_ptr<CmdLineArguments> defaultArguments;
     if (!arguments)
@@ -148,14 +151,22 @@ QnMediaServerModule::QnMediaServerModule(const nx::mediaserver::CmdLineArguments
     }
 
     const auto enforcedMediatorEndpoint = arguments->enforcedMediatorEndpoint;
-    const auto roSettingsPath = arguments->configFilePath;
-    const auto rwSettingsPath = arguments->rwConfigFilePath;
 
     Q_INIT_RESOURCE(nx_vms_server);
     Q_INIT_RESOURCE(nx_vms_server_db);
     nx::mediaserver::MetaTypes::initialize();
 
-    m_settings = store(new MSSettings(roSettingsPath, rwSettingsPath));
+    if (serverSettings.get())
+    {
+        m_settings = store(serverSettings.release());
+    }
+    else
+    {
+        m_settings = store(new MSSettings(
+            arguments->configFilePath,
+            arguments->rwConfigFilePath));
+    }
+
 
 #ifdef ENABLE_VMAX
     // It depend on Vmax480Resources in the pool. Pool should be cleared before QnVMax480Server destructor.

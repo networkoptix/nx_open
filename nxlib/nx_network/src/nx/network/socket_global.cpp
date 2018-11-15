@@ -2,6 +2,8 @@
 
 #include <map>
 
+#include <udt/udt.h>
+
 #include <nx/utils/std/cpp14.h>
 
 #include "aio/aio_service.h"
@@ -71,16 +73,30 @@ public:
 };
 #endif
 
+class UdtInitializer
+{
+public:
+    UdtInitializer()
+    {
+        UDT::startup();
+    }
+
+    ~UdtInitializer()
+    {
+        UDT::cleanup();
+    }
+};
+
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
 
 struct SocketGlobalsImpl
 {
-    int m_initializationFlags = 0;
-    Ini m_ini;
+    int initializationFlags = 0;
+    Ini ini;
     /** map<string representation, regexp> */
-    std::map<std::string, QRegExp> m_disabledHostPatterns;
+    std::map<std::string, QRegExp> disabledHostPatterns;
 
     /**
      * Regular networking services. (AddressResolver should be split to cloud and non-cloud).
@@ -89,16 +105,16 @@ struct SocketGlobalsImpl
 #if defined(_WIN32)
     Win32SocketInitializer win32SocketInitializer;
 #endif
+    std::unique_ptr<UdtInitializer> udtInitializer;
 
-    aio::PollSetFactory m_pollSetFactory;
-    AioServiceGuard m_aioServiceGuard;
-    std::unique_ptr<AddressResolver> m_addressResolver;
-    std::unique_ptr<aio::Timer> m_debugIniReloadTimer;
+    aio::PollSetFactory pollSetFactory;
+    AioServiceGuard aioServiceGuard;
+    std::unique_ptr<AddressResolver> addressResolver;
+    std::unique_ptr<aio::Timer> debugIniReloadTimer;
 
     std::unique_ptr<cloud::CloudConnectController> cloudConnectController;
 
-    QnMutex m_mutex;
-    std::map<SocketGlobals::CustomInit, SocketGlobals::CustomDeinit> m_customInits;
+    QnMutex mutex;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -115,9 +131,9 @@ Ini::Ini():
 SocketGlobals::SocketGlobals(int initializationFlags):
     m_impl(std::make_unique<SocketGlobalsImpl>())
 {
-    m_impl->m_initializationFlags = initializationFlags;
-    if (m_impl->m_initializationFlags & InitializationFlags::disableUdt)
-        m_impl->m_pollSetFactory.disableUdt();
+    m_impl->initializationFlags = initializationFlags;
+    if (m_impl->initializationFlags & InitializationFlags::disableUdt)
+        m_impl->pollSetFactory.disableUdt();
 
     reloadIni();
 }
@@ -126,29 +142,23 @@ SocketGlobals::~SocketGlobals()
 {
     deinitializeCloudConnectivity();
 
-    m_impl->m_debugIniReloadTimer->pleaseStopSync();
-    m_impl->m_addressResolver->pleaseStopSync();
-
-    for (const auto& init: m_impl->m_customInits)
-    {
-        if (init.second)
-            init.second();
-    }
+    m_impl->debugIniReloadTimer->pleaseStopSync();
+    m_impl->addressResolver->pleaseStopSync();
 }
 
 const Ini& SocketGlobals::ini()
 {
-    return s_instance->m_impl->m_ini;
+    return s_instance->m_impl->ini;
 }
 
 aio::AIOService& SocketGlobals::aioService()
 {
-    return s_instance->m_impl->m_aioServiceGuard.aioService();
+    return s_instance->m_impl->aioServiceGuard.aioService();
 }
 
 AddressResolver& SocketGlobals::addressResolver()
 {
-    return *s_instance->m_impl->m_addressResolver;
+    return *s_instance->m_impl->addressResolver;
 }
 
 cloud::CloudConnectController& SocketGlobals::cloud()
@@ -158,7 +168,7 @@ cloud::CloudConnectController& SocketGlobals::cloud()
 
 int SocketGlobals::initializationFlags()
 {
-    return s_instance->m_impl->m_initializationFlags;
+    return s_instance->m_impl->initializationFlags;
 }
 
 void SocketGlobals::init(
@@ -173,7 +183,7 @@ void SocketGlobals::init(
         s_instance = new SocketGlobals(initializationFlags);
 
         s_instance->initializeNetworking();
-        // TODO: #ak Disable cloud based on m_initializationFlags.
+        // TODO: #ak Disable cloud based on initializationFlags.
         s_instance->initializeCloudConnectivity(customCloudHost);
 
         s_initState = InitState::done;
@@ -233,27 +243,25 @@ void SocketGlobals::applyArguments(const utils::ArgumentParser& arguments)
     cloud().applyArguments(arguments);
 }
 
-void SocketGlobals::customInit(CustomInit init, CustomDeinit deinit)
+bool SocketGlobals::isUdtEnabled() const
 {
-    QnMutexLocker lock(&s_instance->m_impl->m_mutex);
-    if (s_instance->m_impl->m_customInits.emplace(init, deinit).second)
-        init();
+    return (m_impl->initializationFlags & InitializationFlags::disableUdt) == 0;
 }
 
 void SocketGlobals::blockHost(const std::string& regexpString)
 {
-    QnMutexLocker lock(&m_impl->m_mutex);
+    QnMutexLocker lock(&m_impl->mutex);
 
-    m_impl->m_disabledHostPatterns.emplace(
+    m_impl->disabledHostPatterns.emplace(
         regexpString,
         QRegExp(regexpString.c_str(), Qt::CaseInsensitive, QRegExp::Wildcard));
 }
 
 void SocketGlobals::unblockHost(const std::string& regexpString)
 {
-    QnMutexLocker lock(&m_impl->m_mutex);
+    QnMutexLocker lock(&m_impl->mutex);
 
-    m_impl->m_disabledHostPatterns.erase(regexpString);
+    m_impl->disabledHostPatterns.erase(regexpString);
 }
 
 bool SocketGlobals::isHostBlocked(const HostAddress& host) const
@@ -262,7 +270,7 @@ bool SocketGlobals::isHostBlocked(const HostAddress& host) const
     if (s_initState != InitState::done)
         return false;
 
-    for (const auto& p: m_impl->m_disabledHostPatterns)
+    for (const auto& p: m_impl->disabledHostPatterns)
     {
         if (p.second.exactMatch(host.toString()))
             return true;
@@ -278,9 +286,9 @@ SocketGlobals& SocketGlobals::instance()
 
 void SocketGlobals::reloadIni()
 {
-    m_impl->m_ini.reload();
+    m_impl->ini.reload();
 
-    const auto disabledHosts = QString::fromUtf8(m_impl->m_ini.disableHosts).split(',');
+    const auto disabledHosts = QString::fromUtf8(m_impl->ini.disableHosts).split(',');
     for (const auto& regexpString: disabledHosts)
     {
         if (regexpString.isEmpty())
@@ -292,7 +300,7 @@ void SocketGlobals::reloadIni()
 
 void SocketGlobals::setDebugIniReloadTimer()
 {
-    m_impl->m_debugIniReloadTimer->start(
+    m_impl->debugIniReloadTimer->start(
         kDebugIniReloadInterval,
         [this]()
         {
@@ -303,22 +311,25 @@ void SocketGlobals::setDebugIniReloadTimer()
 
 void SocketGlobals::initializeNetworking()
 {
-    m_impl->m_aioServiceGuard.initialize();
+    if (isUdtEnabled())
+        m_impl->udtInitializer = std::make_unique<UdtInitializer>();
+
+    m_impl->aioServiceGuard.initialize();
 
 #ifdef ENABLE_SSL
     ssl::initOpenSSLGlobalLock();
 #endif
 
-    m_impl->m_addressResolver = std::make_unique<AddressResolver>();
-    m_impl->m_debugIniReloadTimer = std::make_unique<aio::Timer>();
+    m_impl->addressResolver = std::make_unique<AddressResolver>();
+    m_impl->debugIniReloadTimer = std::make_unique<aio::Timer>();
 }
 
 void SocketGlobals::initializeCloudConnectivity(const QString& customCloudHost)
 {
     m_impl->cloudConnectController = std::make_unique<cloud::CloudConnectController>(
         customCloudHost,
-        &m_impl->m_aioServiceGuard.aioService(),
-        m_impl->m_addressResolver.get());
+        &m_impl->aioServiceGuard.aioService(),
+        m_impl->addressResolver.get());
 }
 
 void SocketGlobals::deinitializeCloudConnectivity()

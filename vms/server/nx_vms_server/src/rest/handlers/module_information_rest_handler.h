@@ -3,14 +3,20 @@
 #include <nx/network/abstract_socket.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <rest/server/json_rest_handler.h>
+#include "nx/utils/safe_direct_connection.h"
+#include <common/common_module_aware.h>
 
 class QnCommonModule;
 
-class QnModuleInformationRestHandler: public QnJsonRestHandler
+class QnModuleInformationRestHandler:
+    public QnJsonRestHandler,
+    public QnCommonModuleAware,
+    public Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
 
 public:
+    QnModuleInformationRestHandler(QnCommonModule* commonModule);
     virtual ~QnModuleInformationRestHandler() override;
 
     virtual JsonRestResponse executeGet(const JsonRestRequest& request) override;
@@ -37,9 +43,11 @@ private:
     nx::network::aio::BasicPollable m_pollable;
     SocketList m_socketsToKeepOpen;
 
-    QnCommonModule* m_commonModule = nullptr;
     QByteArray m_moduleInformatiom;
     SocketList m_socketsToUpdate;
+
+    QnMutex m_mutex;
+    bool m_aboutToStop = false;
 private:
     static void clearSockets(SocketList* sockets);
 };

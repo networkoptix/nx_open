@@ -54,7 +54,8 @@ protected:
     void checkTime(const QnAbstractMediaDataPtr& data);
     void checkAndFixTimeFromCamera(const QnAbstractMediaDataPtr& data);
     void resetTimeCheck();
-
+private:
+    void loadNumberOfChannelsIfUndetected() const;
 protected:
     QnMediaStreamStatistics m_stat[CL_MAX_CHANNEL_NUMBER];
     int m_gotKeyFrame[CL_MAX_CHANNEL_NUMBER];

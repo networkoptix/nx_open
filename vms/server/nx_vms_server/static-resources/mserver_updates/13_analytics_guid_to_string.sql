@@ -58,6 +58,8 @@ UPDATE runtime_actions SET event_subtype = replace(event_subtype,
 
 -- Metadata plugin "nx.hanwha".
 UPDATE runtime_actions SET event_subtype = replace(event_subtype,
+    '{e068d6ff-a3ac-43aa-b2d6-1804440af506}', 'nx.hanwha.ShockDetection');
+UPDATE runtime_actions SET event_subtype = replace(event_subtype,
     '{5dfc6d1b-3b92-4e55-a627-0db2a2422db3}', 'nx.hanwha.FaceDetection');
 UPDATE runtime_actions SET event_subtype = replace(event_subtype,
     '{95f33b59-0ca8-4cb2-9248-1f5e616483f7}', 'nx.hanwha.FogDetection');

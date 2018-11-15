@@ -53,6 +53,10 @@ private:
     CameraDiagnostics::Result fetchChannelProperties(
         hikvision::ChannelProperties* outChannelProperties) const;
 
+    CameraDiagnostics::Result fetchRtspPortViaIsapi(boost::optional<int>* outRtspPort) const;
+
+    CameraDiagnostics::Result fetchRtspPortViaOldApi(boost::optional<int>* rtspPort) const;
+
     CameraDiagnostics::Result configureChannel(
         const hikvision::ChannelProperties& channelProperties,
         QSize resolution,
@@ -68,6 +72,8 @@ private:
         int fps,
         boost::optional<int> quality,
         boost::optional<int> bitrateKbps) const;
+
+    CameraDiagnostics::Result fetchResponse(const nx::utils::Url& url, nx::Buffer* outBuffer) const;
 
 private:
     HikvisionResourcePtr m_hikvisionResource;

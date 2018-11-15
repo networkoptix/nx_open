@@ -117,7 +117,9 @@ class Mediaserver(BaseMediaserver):
         self.service = installation.service
         forwarded_port = installation.os_access.port_map.remote.tcp(self.port)
         forwarded_address = installation.os_access.port_map.remote.address
-        self.api = MediaserverApi('{}:{}'.format(forwarded_address, forwarded_port), alias=name)
+        self.api = MediaserverApi(
+            '{}:{}'.format(forwarded_address, forwarded_port),
+            alias=name, specific_features=installation.specific_features())
 
     def __str__(self):
         return 'Mediaserver {} at {}'.format(self.name, self.api.generic.http.url(''))

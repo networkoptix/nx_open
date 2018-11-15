@@ -42,7 +42,7 @@ RUN_ARGS="\
 --msg-log-level=$HTTP_LOG_LEVEL \
 "
 
-source $INSTALL_DIR/build_info.txt
+source "$INSTALL_DIR/build_info.txt"
 FULL_VERSION="$version-$changeSet-$customization"
 [ ! -z "$beta" ] && FULL_VERSION+="-beta"
 

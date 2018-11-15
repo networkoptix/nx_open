@@ -5,6 +5,7 @@
 
 #include <utils/media/hevc_sps.h>
 #include <utils/common/synctime.h>
+#include <utils/media/nalUnits.h>
 
 namespace nx::streaming::rtp {
 
@@ -12,9 +13,6 @@ namespace {
 
 static const int kUninitializedPacketSequenceNumber = -1;
 static const int kInvalidHeaderSize = -1;
-static const nx::Buffer kSdpRtpMapPrefix("a=rtpmap:");
-static const nx::Buffer kSdpFmtpPrefix("a=fmtp:");
-static const nx::Buffer kSdpCodecNamePrefix("H265");
 
 static const nx::Buffer kSdpVpsPrefix("sprop-vps");
 static const nx::Buffer kSdpSpsPrefix("sprop-sps");
@@ -95,7 +93,7 @@ void HevcParser::setSdpInfo(const Sdp::Media& sdp)
 {
     if (sdp.rtpmap.clockRate > 0)
         StreamParser::setFrequency(sdp.rtpmap.clockRate);
-    m_context.rtpChannel = sdp.format;
+    m_context.rtpChannel = sdp.payloadType;
     parseFmtp(sdp.fmtp.params);
 }
 
@@ -116,33 +114,9 @@ void HevcParser::parseFmtp(const QStringList& fmtpParams)
             continue;
 
         auto parameterSet = nx::Buffer::fromBase64(param.mid(pos + 1).toUtf8());
-        nx::Buffer startCode(
-            (char*)hevc::kNalUnitPrefix,
-            sizeof(hevc::kNalUnitPrefix));
-        nx::Buffer startCodeShort(
-            (char*)hevc::kShortNalUnitPrefix,
-            sizeof(hevc::kShortNalUnitPrefix));
-
         // Some cameras (e.g. DigitalWatchdog)
         // may send extra start code in parameter set SDP string.
-        if (parameterSet.endsWith(startCode))
-        {
-            parameterSet.remove(
-                parameterSet.size() - sizeof(hevc::kNalUnitPrefix),
-                sizeof(hevc::kNalUnitPrefix));
-        }
-        else if (parameterSet.endsWith(startCodeShort))
-        {
-            parameterSet.remove(
-                parameterSet.size() - sizeof(hevc::kShortNalUnitPrefix),
-                sizeof(hevc::kShortNalUnitPrefix));
-        }
-
-        if (parameterSet.startsWith(startCode))
-            parameterSet.remove(0, sizeof(hevc::kNalUnitPrefix));
-        else if (parameterSet.startsWith(startCodeShort))
-            parameterSet.remove(0, sizeof(hevc::kShortNalUnitPrefix));
-
+        parameterSet = NALUnit::dropBorderedStartCodes(parameterSet);
         if (param.startsWith(kSdpVpsPrefix))
         {
             m_context.spropVps = parameterSet;
@@ -511,8 +485,8 @@ QnCompressedVideoDataPtr HevcParser::createVideoData(const uint8_t* rtpBuffer, u
         if (m_chunks[i].nalStart)
         {
             result->m_data.uncheckedWrite(
-                (const char*)hevc::kNalUnitPrefix,
-                sizeof(hevc::kNalUnitPrefix));
+                (const char*)NALUnit::kStartCodeLong,
+                sizeof(NALUnit::kStartCodeLong));
         }
 
         const auto chunkBufferStart = m_chunks[i].bufferStart
@@ -597,14 +571,14 @@ int HevcParser::additionalBufferSize() const
 
     // Space for parameter sets with NAL prefixes
     if (!m_context.inStreamVpsFound && m_context.spropVps)
-        additionalBufferSize += sizeof(hevc::kNalUnitPrefix) + m_context.spropVps->size();
+        additionalBufferSize += sizeof(NALUnit::kStartCodeLong) + m_context.spropVps->size();
     if (!m_context.inStreamSpsFound && m_context.spropSps)
-        additionalBufferSize += sizeof(hevc::kNalUnitPrefix) + m_context.spropSps->size();
+        additionalBufferSize += sizeof(NALUnit::kStartCodeLong) + m_context.spropSps->size();
     if (!m_context.inStreamPpsFound && m_context.spropPps)
-        additionalBufferSize += sizeof(hevc::kNalUnitPrefix) + m_context.spropPps->size();
+        additionalBufferSize += sizeof(NALUnit::kStartCodeLong) + m_context.spropPps->size();
 
     // Space for NAL prefixes
-    additionalBufferSize += m_numberOfNalUnits * sizeof(hevc::kNalUnitPrefix);
+    additionalBufferSize += m_numberOfNalUnits * sizeof(NALUnit::kStartCodeLong);
 
     return additionalBufferSize;
 }
@@ -614,8 +588,8 @@ void HevcParser::addSdpParameterSetsIfNeeded(QnByteArray& buffer)
     if (!m_context.inStreamVpsFound && m_context.spropVps)
     {
         buffer.uncheckedWrite(
-            (char*)hevc::kNalUnitPrefix,
-            sizeof(hevc::kNalUnitPrefix));
+            (char*)NALUnit::kStartCodeLong,
+            sizeof(NALUnit::kStartCodeLong));
 
         buffer.uncheckedWrite(
             m_context.spropVps.get().data(),
@@ -624,8 +598,8 @@ void HevcParser::addSdpParameterSetsIfNeeded(QnByteArray& buffer)
     if (!m_context.inStreamSpsFound && m_context.spropSps)
     {
         buffer.uncheckedWrite(
-            (char*)hevc::kNalUnitPrefix,
-            sizeof(hevc::kNalUnitPrefix));
+            (char*)NALUnit::kStartCodeLong,
+            sizeof(NALUnit::kStartCodeLong));
         buffer.uncheckedWrite(
             m_context.spropSps.get().data(),
             m_context.spropSps.get().size());
@@ -633,8 +607,8 @@ void HevcParser::addSdpParameterSetsIfNeeded(QnByteArray& buffer)
     if (!m_context.inStreamPpsFound && m_context.spropPps)
     {
         buffer.uncheckedWrite(
-            (char*)hevc::kNalUnitPrefix,
-            sizeof(hevc::kNalUnitPrefix));
+            (char*)NALUnit::kStartCodeLong,
+            sizeof(NALUnit::kStartCodeLong));
         buffer.uncheckedWrite(
             m_context.spropPps.get().data(),
             m_context.spropPps.get().size());

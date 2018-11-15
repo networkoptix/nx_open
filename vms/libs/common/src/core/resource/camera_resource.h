@@ -63,7 +63,7 @@ public:
     CameraMediaStreams mediaStreams() const;
     CameraMediaStreamInfo streamInfo(Qn::StreamIndex index = Qn::StreamIndex::primary) const;
 
-    QnAspectRatio aspectRatio() const;
+    virtual QnAspectRatio aspectRatio() const;
 
     // TODO: saveMediaStreamInfoIfNeeded and saveBitrateIfNeeded should be moved into
     // nx::mediaserver::resource::Camera, as soon as QnLiveStreamProvider moved into nx::mediaserver.

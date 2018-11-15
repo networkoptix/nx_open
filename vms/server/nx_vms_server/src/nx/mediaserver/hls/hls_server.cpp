@@ -336,8 +336,10 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getRequestedFil
         }
 
         QnConstCompressedVideoDataPtr lastVideoFrame = camera->getLastVideoFrame(
-            requestParams.find(StreamingParams::LO_QUALITY_PARAM_NAME) == requestParams.end(),
-            0);
+            (requestParams.find(StreamingParams::LO_QUALITY_PARAM_NAME) == requestParams.end())
+                ? Qn::StreamIndex::primary
+                : Qn::StreamIndex::secondary,
+            /*channel*/ 0);
         if( lastVideoFrame && (lastVideoFrame->compressionType != AV_CODEC_ID_H264) && (lastVideoFrame->compressionType != AV_CODEC_ID_NONE) )
         {
             //video is not in h.264 format
@@ -1042,7 +1044,11 @@ int HttpLiveStreamingProcessor::estimateStreamBitrate(
     if( bandwidth == -1 )
     {
         //estimating bitrate as we can
-        QnConstCompressedVideoDataPtr videoFrame = videoCamera->getLastVideoFrame( streamQuality == MEDIA_Quality_High, 0);
+        QnConstCompressedVideoDataPtr videoFrame = videoCamera->getLastVideoFrame(
+            (streamQuality == MEDIA_Quality_High)
+                ? Qn::StreamIndex::primary
+                : Qn::StreamIndex::secondary,
+            /*channel*/0);
         if( videoFrame )
             bandwidth = (int)(videoFrame->dataSize() * CHAR_BIT / COMMON_KEY_FRAME_TO_NON_KEY_FRAME_RATIO * camResource->getMaxFps());
     }
