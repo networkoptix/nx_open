@@ -128,7 +128,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     m_eventRibbon->setModel(new ConcatenationListModel(
         {systemHealthListModel, progressModel, separatorModel, m_notificationsModel}, this));
 
-    connect(m_eventRibbon, &EventRibbon::tileHovered, q, &NotificationListWidget::tileHovered);
+    connect(m_eventRibbon, &EventRibbon::hovered, q, &NotificationListWidget::tileHovered);
 
     connect(m_eventRibbon, &EventRibbon::unreadCountChanged,
         q, &NotificationListWidget::unreadCountChanged);
@@ -138,6 +138,9 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
         {
             m_placeholder->setVisible(count < 1);
         });
+
+    // TODO: FIXME: #vkutin Implement tile click interaction,
+    // avoid code duplication with AbstractSearchWidget
 }
 
 NotificationListWidget::Private::~Private()
