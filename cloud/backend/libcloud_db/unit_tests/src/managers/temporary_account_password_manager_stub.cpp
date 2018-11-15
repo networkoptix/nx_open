@@ -58,11 +58,11 @@ void TemporaryAccountPasswordManagerStub::removeTemporaryPasswordsFromCacheByAcc
 {
 }
 
-boost::optional<data::TemporaryAccountCredentialsEx>
+std::optional<data::TemporaryAccountCredentialsEx>
     TemporaryAccountPasswordManagerStub::getCredentialsByLogin(
         const std::string& /*login*/) const
 {
-    return boost::none;
+    return std::nullopt;
 }
 
 bool TemporaryAccountPasswordManagerStub::authorize(
