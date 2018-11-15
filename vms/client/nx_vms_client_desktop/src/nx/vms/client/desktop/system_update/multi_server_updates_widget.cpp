@@ -1535,7 +1535,7 @@ void MultiServerUpdatesWidget::loadDataToUi()
             QString("ClientTool=%1").arg(ClientUpdateTool::toString(m_clientUpdateTool->getState())),
             QString("validUpdate=%1").arg(m_haveValidUpdate),
             QString("targetVersion=%1").arg(m_updateInfo.info.version),
-            QString("<a href=\"%1\">/ec2/updateState</a>").arg(m_serverUpdateTool->getUpdateStateUrl()),
+            QString("<a href=\"%1\">/ec2/updateStatus</a>").arg(m_serverUpdateTool->getUpdateStateUrl()),
             QString("<a href=\"%1\">/ec2/updateInformation</a>").arg(m_serverUpdateTool->getUpdateInformationUrl()),
             QString("<a href=\"%1\">/ec2/installedUpdateInformation</a>").arg(m_serverUpdateTool->getInstalledUpdateInfomationUrl()),
         };

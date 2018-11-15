@@ -249,6 +249,7 @@ private:
     // Time at which install command was issued.
     TimePoint m_timeStartedInstall;
     bool m_protoProblemDetected = false;
+    QSet<rest::Handle> m_requestingInstall;
 };
 
 /**
