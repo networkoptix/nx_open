@@ -503,7 +503,7 @@
             "value": "",
             "description": "",
             "type": "external_image",
-            "option": true,
+            "optional": true,
             "public": true,
             "meta": {
               "size": 1073741824,
@@ -566,7 +566,7 @@
             "value": "",
             "description": "",
             "type": "external_image",
-            "option": true,
+            "optional": true,
             "public": true,
             "meta": {
               "size": 1073741824,
@@ -579,7 +579,7 @@
             "value": "",
             "description": "",
             "type": "external_image",
-            "option": true,
+            "optional": true,
             "public": true,
             "meta": {
               "size": 1073741824,
@@ -592,7 +592,7 @@
             "value": "",
             "description": "",
             "type": "external_image",
-            "option": true,
+            "optional": true,
             "public": true,
             "meta": {
               "size": 1073741824,
@@ -605,7 +605,7 @@
             "value": "",
             "description": "",
             "type": "external_image",
-            "option": true,
+            "optional": true,
             "public": true,
             "meta": {
               "size": 1073741824,
@@ -618,7 +618,7 @@
             "value": "",
             "description": "",
             "type": "external_image",
-            "option": true,
+            "optional": true,
             "public": true,
             "meta": {
               "size": 1073741824,
@@ -631,7 +631,7 @@
             "value": "",
             "description": "",
             "type": "external_image",
-            "option": true,
+            "optional": true,
             "public": true,
             "meta": {
               "size": 1073741824,
@@ -644,7 +644,7 @@
             "value": "",
             "description": "",
             "type": "external_image",
-            "option": true,
+            "optional": true,
             "public": true,
             "meta": {
               "size": 1073741824,
@@ -657,7 +657,7 @@
             "value": "",
             "description": "",
             "type": "external_image",
-            "option": true,
+            "optional": true,
             "public": true,
             "meta": {
               "size": 1073741824,
@@ -670,7 +670,7 @@
             "value": "",
             "description": "",
             "type": "external_image",
-            "option": true,
+            "optional": true,
             "public": true,
             "meta": {
               "size": 1073741824,
@@ -683,7 +683,7 @@
             "value": "",
             "description": "",
             "type": "external_image",
-            "option": true,
+            "optional": true,
             "public": true,
             "meta": {
               "size": 1073741824,
