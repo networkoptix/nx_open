@@ -28,6 +28,8 @@
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/search_line_edit.h>
 #include <nx/vms/client/desktop/event_search/models/private/busy_indicator_model_p.h>
+#include <nx/vms/client/desktop/ui/actions/action.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <nx/utils/log/assert.h>
@@ -197,7 +199,40 @@ void AbstractSearchWidget::Private::setupRibbon()
     connect(ui->ribbon->scrollBar(), &QScrollBar::valueChanged,
         this, &Private::requestFetchIfNeeded, Qt::QueuedConnection);
 
-    connect(ui->ribbon, &EventRibbon::tileHovered, q, &AbstractSearchWidget::tileHovered);
+    connect(ui->ribbon, &EventRibbon::hovered, q, &AbstractSearchWidget::tileHovered);
+
+    connect(ui->ribbon, &EventRibbon::linkActivated, this,
+        [this](const QModelIndex& index, const QString& link)
+        {
+            m_visualModel->setData(index, link, Qn::ActivateLinkRole);
+        });
+
+    connect(ui->ribbon, &EventRibbon::clicked, this,
+        [this](const QModelIndex& index, Qt::MouseButton button, Qt::KeyboardModifiers modifiers)
+        {
+            if (button == Qt::LeftButton && !modifiers.testFlag(Qt::ControlModifier))
+            {
+                if (!m_mainModel->setData(index, QVariant(), Qn::DefaultNotificationRole))
+                    navigateToSource(index);
+            }
+            else if (button == Qt::LeftButton && modifiers.testFlag(Qt::ControlModifier)
+                || button == Qt::MiddleButton)
+            {
+                openSource(index, true /*inNewTab*/);
+            }
+        });
+
+    connect(ui->ribbon, &EventRibbon::doubleClicked, this,
+        [this](const QModelIndex& index)
+        {
+            openSource(index, false /*inNewTab*/);
+        });
+
+    connect(ui->ribbon, &EventRibbon::dragStarted, this,
+        [this](const QModelIndex& index)
+        {
+            //TODO: #vkutin Implement me!
+        });
 
     connect(navigator(), &QnWorkbenchNavigator::timelinePositionChanged, this,
         [this]()
@@ -851,6 +886,67 @@ void AbstractSearchWidget::Private::handleItemCountChanged()
         ui->itemCounterLabel->setText(QString(">") + q->itemCounterText(kThreshold));
     else
         ui->itemCounterLabel->setText(q->itemCounterText(itemCount));
+}
+
+void AbstractSearchWidget::Private::navigateToSource(const QModelIndex& index) const
+{
+    const auto timestamp = index.data(Qn::TimestampRole);
+    if (!timestamp.isValid())
+        return;
+
+    const auto cameraList = index.data(Qn::ResourceListRole).value<QnResourceList>()
+        .filtered<QnVirtualCameraResource>();
+
+    const auto camera = cameraList.size() == 1
+        ? cameraList.back()
+        : QnVirtualCameraResourcePtr();
+
+    using namespace ui::action;
+
+    if (camera)
+    {
+        menu()->triggerIfPossible(GoToLayoutItemAction, Parameters(camera)
+            .withArgument(Qn::ForceRole, ini().raiseCameraFromClickedTile));
+    }
+
+    menu()->triggerIfPossible(JumpToTimeAction,
+        Parameters().withArgument(Qn::TimestampRole, timestamp));
+}
+
+void AbstractSearchWidget::Private::openSource(const QModelIndex& index, bool inNewTab) const
+{
+    const auto cameraList = index.data(Qn::ResourceListRole).value<QnResourceList>()
+        .filtered<QnVirtualCameraResource>();
+
+    if (cameraList.empty())
+        return;
+
+    using namespace ui::action;
+    using namespace std::chrono;
+
+    Parameters parameters(cameraList);
+
+    const auto timestamp = index.data(Qn::TimestampRole);
+    if (timestamp.canConvert<microseconds>())
+    {
+        parameters.setArgument(Qn::ItemTimeRole,
+            duration_cast<milliseconds>(timestamp.value<microseconds>()).count());
+    }
+
+    nx::utils::ScopedConnection connection;
+    if (!inNewTab && cameraList.size() == 1 && workbench()->currentLayout())
+    {
+        connection.reset(connect(workbench()->currentLayout(), &QnWorkbenchLayout::itemAdded, this,
+            [this](const QnWorkbenchItem* item)
+            {
+                menu()->triggerIfPossible(GoToLayoutItemAction, Parameters()
+                    .withArgument(Qn::ItemUuidRole, item->uuid())
+                    .withArgument(Qn::ForceRole, ini().raiseCameraFromClickedTile));
+            }));
+    }
+
+    const auto action = inNewTab ? OpenInNewTabAction : DropResourcesAction;
+    menu()->triggerIfPossible(action, parameters);
 }
 
 } // namespace nx::vms::client::desktop

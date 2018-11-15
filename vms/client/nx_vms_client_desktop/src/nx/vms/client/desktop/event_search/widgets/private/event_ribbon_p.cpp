@@ -18,17 +18,12 @@
 #include <ui/style/helper.h>
 #include <ui/style/nx_style_p.h>
 #include <ui/workaround/hidpi_workarounds.h>
-#include <ui/workbench/workbench.h>
-#include <ui/workbench/workbench_item.h>
-#include <ui/workbench/workbench_layout.h>
 #include <utils/common/event_processors.h>
 
 #include <nx/api/mediaserver/image_request.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
-#include <nx/vms/client/desktop/ui/actions/action.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
@@ -63,7 +58,6 @@ QSize minimumWidgetSize(QWidget* widget)
 } // namespace
 
 EventRibbon::Private::Private(EventRibbon* q):
-    QnWorkbenchContextAware(q),
     q(q),
     m_scrollBar(new QScrollBar(Qt::Vertical, q)),
     m_viewport(new QWidget(q))
@@ -329,28 +323,15 @@ void EventRibbon::Private::ensureWidget(int index)
             {
                 const int index = indexOf(static_cast<EventTile*>(sender()));
                 if (m_model && index >= 0)
-                    m_model->setData(m_model->index(index), link, Qn::ActivateLinkRole);
+                    emit q->linkActivated(m_model->index(index), link);
             });
 
         connect(widget.get(), &EventTile::clicked, this,
             [this](Qt::MouseButton button, Qt::KeyboardModifiers modifiers)
             {
-                const int tileIndex = indexOf(static_cast<EventTile*>(sender()));
-                if (!m_model || tileIndex < 0)
-                    return;
-
-                const auto index = m_model->index(tileIndex);
-
-                if (button == Qt::LeftButton && !modifiers.testFlag(Qt::ControlModifier))
-                {
-                    if (!m_model->setData(index, QVariant(), Qn::DefaultNotificationRole))
-                        navigateToSource(index);
-                }
-                else if (button == Qt::LeftButton && modifiers.testFlag(Qt::ControlModifier)
-                    || button == Qt::MiddleButton)
-                {
-                    openSource(index, true /*inNewTab*/);
-                }
+                const int index = indexOf(static_cast<EventTile*>(sender()));
+                if (m_model && index >= 0)
+                    emit q->clicked(m_model->index(index), button, modifiers);
             });
 
         connect(widget.get(), &EventTile::doubleClicked, this,
@@ -358,7 +339,15 @@ void EventRibbon::Private::ensureWidget(int index)
             {
                 const int index = indexOf(static_cast<EventTile*>(sender()));
                 if (m_model && index >= 0)
-                    openSource(m_model->index(index), false /*inNewTab*/);
+                    emit q->doubleClicked(m_model->index(index));
+            });
+
+        connect(widget.get(), &EventTile::dragStarted, this,
+            [this]()
+            {
+                const int index = indexOf(static_cast<EventTile*>(sender()));
+                if (m_model && index >= 0)
+                    emit q->dragStarted(m_model->index(index));
             });
 
         connect(widget.get(), &QWidget::customContextMenuRequested, this,
@@ -1071,7 +1060,7 @@ void EventRibbon::Private::updateHover(bool hovered, const QPoint& mousePos)
         m_hoveredWidget = widget;
 
         const auto modelIndex = (m_model && widget) ? m_model->index(index) : QModelIndex();
-        emit q->tileHovered(modelIndex, widget);
+        emit q->hovered(modelIndex, widget);
     }
     else
     {
@@ -1079,7 +1068,7 @@ void EventRibbon::Private::updateHover(bool hovered, const QPoint& mousePos)
             return;
 
         m_hoveredWidget = nullptr;
-        emit q->tileHovered(QModelIndex(), nullptr);
+        emit q->hovered(QModelIndex(), nullptr);
     }
 }
 
@@ -1116,69 +1105,6 @@ int EventRibbon::Private::indexAtPos(const QPoint& pos) const
     return iter != end
         ? m_visible.lower() + std::distance(iter, end) - 1
         : -1;
-}
-
-void EventRibbon::Private::navigateToSource(const QModelIndex& index) const
-{
-    return;
-
-    const auto timestamp = index.data(Qn::TimestampRole);
-    if (!timestamp.isValid())
-        return;
-
-    const auto cameraList = index.data(Qn::ResourceListRole).value<QnResourceList>()
-        .filtered<QnVirtualCameraResource>();
-
-    const auto camera = cameraList.size() == 1
-        ? cameraList.back()
-        : QnVirtualCameraResourcePtr();
-
-    using namespace ui::action;
-
-    if (camera)
-    {
-        menu()->triggerIfPossible(GoToLayoutItemAction, Parameters(camera)
-            .withArgument(Qn::ForceRole, ini().raiseCameraFromClickedTile));
-    }
-
-    menu()->triggerIfPossible(JumpToTimeAction,
-        Parameters().withArgument(Qn::TimestampRole, timestamp));
-}
-
-void EventRibbon::Private::openSource(const QModelIndex& index, bool inNewTab) const
-{
-    const auto cameraList = index.data(Qn::ResourceListRole).value<QnResourceList>()
-        .filtered<QnVirtualCameraResource>();
-
-    if (cameraList.empty())
-        return;
-
-    using namespace ui::action;
-    using namespace std::chrono;
-
-    Parameters parameters(cameraList);
-
-    const auto timestamp = index.data(Qn::TimestampRole);
-    if (timestamp.canConvert<microseconds>())
-    {
-        parameters.setArgument(Qn::ItemTimeRole,
-            duration_cast<milliseconds>(timestamp.value<microseconds>()).count());
-    }
-
-    nx::utils::ScopedConnection connection;
-    if (!inNewTab && cameraList.size() == 1 && workbench()->currentLayout())
-    {
-        connection.reset(connect(workbench()->currentLayout(), &QnWorkbenchLayout::itemAdded, this,
-            [this](const QnWorkbenchItem* item)
-            {
-                menu()->triggerIfPossible(GoToLayoutItemAction, Parameters()
-                    .withArgument(Qn::ItemUuidRole, item->uuid())
-                    .withArgument(Qn::ForceRole, ini().raiseCameraFromClickedTile));
-            }));
-    }
-
-    const auto action = inNewTab ? OpenInNewTabAction : DropResourcesAction;
-    menu()->triggerIfPossible(action, parameters);
 }
 
 } // namespace nx::vms::client::desktop

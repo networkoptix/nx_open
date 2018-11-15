@@ -57,7 +57,13 @@ public:
 signals:
     void countChanged(int count);
     void unreadCountChanged(int unreadCount, QnNotificationLevel::Value importance, QPrivateSignal);
-    void tileHovered(const QModelIndex& index, EventTile* tile);
+
+    // Tile interaction.
+    void hovered(const QModelIndex& index, EventTile* tile);
+    void clicked(const QModelIndex& index, Qt::MouseButton button, Qt::KeyboardModifiers modifiers);
+    void doubleClicked(const QModelIndex& index); //< With left mouse button.
+    void dragStarted(const QModelIndex& index); //< With left mouse button.
+    void linkActivated(const QModelIndex& index, const QString& link);
 
 protected:
     virtual bool event(QEvent* event) override;

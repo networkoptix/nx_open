@@ -15,7 +15,6 @@
 
 #include <ui/common/notification_levels.h>
 #include <ui/style/helper.h>
-#include <ui/workbench/workbench_context_aware.h>
 
 #include <nx/utils/interval.h>
 #include <nx/utils/scoped_connections.h>
@@ -26,9 +25,7 @@ class QVariantAnimation;
 
 namespace nx::vms::client::desktop {
 
-class EventRibbon::Private:
-    public QObject,
-    public QnWorkbenchContextAware
+class EventRibbon::Private: public QObject
 {
     Q_OBJECT
     using PrivateSignal = EventRibbon::QPrivateSignal;
@@ -112,9 +109,6 @@ private:
     void reserveWidget(int index);
 
     bool shouldSetTileRead(const EventTile* tile) const;
-
-    void navigateToSource(const QModelIndex& index) const;
-    void openSource(const QModelIndex& index, bool inNewTab) const;
 
 private:
     EventRibbon* const q = nullptr;
