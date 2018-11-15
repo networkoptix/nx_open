@@ -13,8 +13,13 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+#include <nx/utils/log/log.h>
+
 #include "device/video/rpi/rpi_utils.h"
 #include "udev_utils.h"
+
+#define NX_V4L2_LOG(...) \
+NX_DEBUG(nx::utils::log::Tag(std::string("v4l2_utils::")+__FUNCTION__), __VA_ARGS__)
 
 namespace nx {
 namespace usb_cam {
@@ -29,24 +34,24 @@ static const std::string kV4l2DevicePath = "/dev";
 // Convenience class for opening and closing devices represented by devicePath
 struct DeviceInitializer
 {
-    DeviceInitializer(const char * devicePath):
-        fileDescriptor(open(devicePath, O_RDWR))
+    DeviceInitializer(const char * devicePath, int oFlag = O_RDWR):
+        fileDescriptor(open(devicePath, oFlag))
     {
     }
 
     ~DeviceInitializer()
     {
-        if (fileDescriptor != -1)
+        if (fileDescriptor > 0)
             close(fileDescriptor);
     }
 
     int fileDescriptor = -1;
 };
 
-static std::vector<std::string> getDevicePaths();
-static unsigned int toV4L2PixelFormat(nxcip::CompressionType nxCodecID);
-static std::string getDeviceName(int fileDescriptor);
-static float toFrameRate(const v4l2_fract& frameInterval);
+// static std::vector<std::string> getDevicePaths();
+// static unsigned int toV4L2PixelFormat(nxcip::CompressionType nxCodecID);
+// static std::string getDeviceName(int fileDescriptor);
+// static float toFrameRate(const v4l2_fract& frameInterval);
 
 static unsigned int toV4L2PixelFormat(nxcip::CompressionType nxCodecID)
 {
@@ -85,7 +90,10 @@ std::vector<std::string> getDevicePaths()
 
     DIR *directory = opendir(kV4l2DevicePath.c_str());
     if (!directory)
+    {
+        NX_V4L2_LOG("opendir( %1 ) failed, returning empty list", kV4l2DevicePath);
         return devicePaths;
+    }
 
     struct dirent *directoryEntry;
     while ((directoryEntry = readdir(directory)) != NULL)
@@ -159,12 +167,20 @@ nxcip::CompressionType V4L2CompressionTypeDescriptor::toNxCompressionType() cons
 std::string getDeviceName(const char * devicePath)
 {
     DeviceInitializer initializer(devicePath);
+    if (initializer.fileDescriptor == -1)
+    {
+        int error = errno;
+        NX_V4L2_LOG("failed to open %1, reason: %2", devicePath, strerror(error));
+        return {};
+    }
     return getDeviceName(initializer.fileDescriptor);
 }
 
 std::vector<DeviceData> getDeviceList()
 {
     auto devicePaths = getDevicePaths();
+    NX_V4L2_LOG("found %1 devices", devicePaths.size());
+
     if (devicePaths.empty())
         return {};
 
@@ -175,7 +191,11 @@ std::vector<DeviceData> getDeviceList()
         DeviceInitializer initializer(devicePath.c_str());
         int fileDescriptor = initializer.fileDescriptor;
         if (fileDescriptor == -1)
+        {
+            int error = errno;
+            NX_V4L2_LOG("failed to open %1: %2", devicePath, strerror(error));
             continue;
+        }
 
         deviceList.push_back(device::DeviceData(
             getDeviceName(fileDescriptor),
@@ -228,7 +248,11 @@ std::vector<ResolutionData> getResolutionList(
 
     DeviceInitializer initializer(devicePath);
     if(initializer.fileDescriptor == -1)
+    {
+        int error = errno;
+        NX_V4L2_LOG("failed to open %1, %2:", devicePath, strerror(error));
         return {};
+    }
 
     auto descriptor = 
         std::dynamic_pointer_cast<const V4L2CompressionTypeDescriptor>(targetCodecID);
@@ -254,11 +278,11 @@ std::vector<ResolutionData> getResolutionList(
 
         while(ioctl(initializer.fileDescriptor, VIDIOC_ENUM_FRAMEINTERVALS, &frameRateEnum) == 0)
         {
-            struct v4l2_fract v4l2FrameRate = frameRateEnum.type == V4L2_FRMIVAL_TYPE_DISCRETE
+            struct v4l2_fract v4l2FrameInterval = frameRateEnum.type == V4L2_FRMIVAL_TYPE_DISCRETE
                 ? frameRateEnum.discrete
                 : frameRateEnum.stepwise.min;
 
-            resolutionList.push_back(ResolutionData(width, height, toFrameRate(v4l2FrameRate)));
+            resolutionList.push_back(ResolutionData(width, height, toFrameRate(v4l2FrameInterval)));
 
             if (frameRateEnum.type != V4L2_FRMIVAL_TYPE_DISCRETE)
                 break;
@@ -286,7 +310,11 @@ void setBitrate(
 
     DeviceInitializer initializer(devicePath);
     if (initializer.fileDescriptor == -1)
+    {
+        int error = errno;
+        NX_V4L2_LOG("failed to open %1: %2", devicePath, strerror(error));
         return;
+    }
 
     struct v4l2_ext_controls ecs = {0};
     struct v4l2_ext_control ec {0};
@@ -296,7 +324,12 @@ void setBitrate(
     ecs.controls = &ec;
     ecs.count = 1;
     ecs.ctrl_class = V4L2_CTRL_CLASS_MPEG;
-    ioctl(initializer.fileDescriptor, VIDIOC_S_EXT_CTRLS, &ecs);
+
+    if(ioctl(initializer.fileDescriptor, VIDIOC_S_EXT_CTRLS, &ecs) != 0)
+    {
+        int error = errno;
+        NX_V4L2_LOG("ioctl() failed: %1", strerror(error));
+    }
 }
 
 int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescriptorPtr& /*tagetCodecID*/)
@@ -306,7 +339,11 @@ int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescript
 
     DeviceInitializer initializer(devicePath);
     if (initializer.fileDescriptor == -1)
+    {
+        int error = errno;
+        NX_V4L2_LOG("failed to open %1: %2", devicePath, strerror(error));
         return 0;
+    }
 
     struct v4l2_ext_controls ecs = {0};
     struct v4l2_ext_control ec = {0};
@@ -319,10 +356,17 @@ int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescript
         return ec.value;
 
     int error = errno;
+
+    NX_V4L2_LOG("ioctl() failed: %1", strerror(error));
+
     if (error == ENOSPC)
     {
         if (ioctl(initializer.fileDescriptor, VIDIOC_G_EXT_CTRLS, &ecs))
             return ec.value;
+
+        error = errno;
+
+        NX_V4L2_LOG("ioctl() failed again: %1", strerror(error));
     }
 
     return 0;

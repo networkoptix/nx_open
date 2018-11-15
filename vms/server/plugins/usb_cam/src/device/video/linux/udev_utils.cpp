@@ -21,6 +21,7 @@ namespace
 
 static const char * const kSubSystem = "video4linux";
 static const char * const kIdSerialKey = "ID_SERIAL";
+static const char * const kDevNameKey = "DEVNAME";
 
 struct Udev
 {
