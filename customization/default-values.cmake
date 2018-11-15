@@ -3,7 +3,6 @@ set(mac.skip.sign "false")
 set(windows.skip.sign "false")
 
 set(help.language "english")
-set(quicksync "false")
 set(dynamic.customization "false")
 set(liteDeviceName "microserver")
 set(shortCloudName "Cloud")
