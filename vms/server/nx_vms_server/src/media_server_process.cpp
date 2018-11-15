@@ -9,6 +9,7 @@
     #include <signal.h>
     #include <sys/types.h>
     #include <sys/stat.h>
+    #include <sys/prctl.h>
     #include <unistd.h>
 #endif
 
@@ -3586,6 +3587,7 @@ void MediaServerProcess::initCrashDump()
 
 #ifdef __linux__
     linux_exception::setSignalHandlingDisabled(serverModule()->settings().createFullCrashDump());
+    prctl(PR_SET_DUMPABLE, 1, 0, 0, 0, 0);
 #endif
     m_crashReporter = std::make_unique<ec2::CrashReporter>(commonModule());
 }
