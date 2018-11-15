@@ -13,8 +13,9 @@ import { NxContentBlockComponent }        from './content-block/content-block.co
 import { NxContentBlockSectionComponent } from './content-block/section/section.component';
 import { NxMultiLineEllipsisComponent }   from './multi-line-ellipsis/mle.component';
 import { NxExternalVideoComponent }       from './external-video/external-video.component';
-import { NxLayoutRightComponent }              from './layout-right/layout.component';
+import { NxLayoutRightComponent }         from './layout-right/layout.component';
 import { NxTagComponent}                  from './tag/tag.component';
+import { NxCarouselComponent }            from './carousel/carousel.component'
 
 @NgModule({
     imports        : [
@@ -33,7 +34,8 @@ import { NxTagComponent}                  from './tag/tag.component';
         NxMultiLineEllipsisComponent,
         NxExternalVideoComponent,
         NxLayoutRightComponent,
-        NxTagComponent
+        NxTagComponent,
+        NxCarouselComponent
     ],
     entryComponents: [
         NxProcessButtonComponent,
@@ -45,7 +47,8 @@ import { NxTagComponent}                  from './tag/tag.component';
         NxMultiLineEllipsisComponent,
         NxExternalVideoComponent,
         NxLayoutRightComponent,
-        NxTagComponent
+        NxTagComponent,
+        NxCarouselComponent
     ],
     providers      : [
         NxProcessButtonComponent,
@@ -68,6 +71,7 @@ import { NxTagComponent}                  from './tag/tag.component';
         NxExternalVideoComponent,
         NxLayoutRightComponent,
         NxTagComponent,
+        NxCarouselComponent,
         MenuModule,
     ]
 })

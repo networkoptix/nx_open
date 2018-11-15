@@ -496,6 +496,42 @@
             }
           },
           {
+            "name": "overviewScreenshot1",
+            "label": "Screenshot 1",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "option": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
+          },
+          {
+            "name": "overviewScreenshot2",
+            "label": "Screenshot 2",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
+          },
+          {
+            "name": "overviewScreenshot3",
+            "label": "Screenshot 3",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
+          },
+          {
             "name": "description",
             "label": "Full functionality overview",
             "value": "",
@@ -517,6 +553,126 @@
             "optional": true,
             "meta": {
               "regex": "^https?:\\/\\/(?:(?:www\\.youtube\\.com\\/(?:embed\\/|watch\\?v=)|youtu\\.be\\/)[\\w]+|vimeo\\.com\\/[\\d]+)$"
+            }
+          },
+          {
+            "name": "instructionScreenshot1",
+            "label": "Screenshot 1",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "option": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
+          },
+          {
+            "name": "instructionScreenshot2",
+            "label": "Screenshot 2",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "option": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
+          },
+          {
+            "name": "instructionScreenshot3",
+            "label": "Screenshot 3",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "option": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
+          },
+          {
+            "name": "instructionScreenshot4",
+            "label": "Screenshot 4",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "option": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
+          },
+          {
+            "name": "instructionScreenshot5",
+            "label": "Screenshot 5",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "option": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
+          },
+          {
+            "name": "instructionScreenshot6",
+            "label": "Screenshot 6",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "option": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
+          },
+          {
+            "name": "instructionScreenshot7",
+            "label": "Screenshot 7",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "option": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
+          },
+          {
+            "name": "instructionScreenshot8",
+            "label": "Screenshot 8",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "option": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
+          },
+          {
+            "name": "instructionScreenshot9",
+            "label": "Screenshot 9",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "option": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
+          },
+          {
+            "name": "instructionScreenshot10",
+            "label": "Screenshot 10",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "option": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824
             }
           },
           {
@@ -694,44 +850,6 @@
             "meta": {
               "size": 1073741824,
               "format": "pdf"
-            }
-          }
-        ]
-      },
-      {
-        "name": "Screenshots",
-        "translatable": false,
-        "values": [
-          {
-            "name": "screenshot1",
-            "label": "Screenshot 1",
-            "value": "",
-            "description": "",
-            "type": "external_image",
-            "meta": {
-              "size": 1073741824
-            }
-          },
-          {
-            "name": "screenshot2",
-            "label": "Screenshot 2",
-            "value": "",
-            "description": "",
-            "type": "external_image",
-            "optional": true,
-            "meta": {
-              "size": 1073741824
-            }
-          },
-          {
-            "name": "screenshot3",
-            "label": "Screenshot 3",
-            "value": "",
-            "description": "",
-            "type": "external_image",
-            "optional": true,
-            "meta": {
-              "size": 1073741824
             }
           }
         ]

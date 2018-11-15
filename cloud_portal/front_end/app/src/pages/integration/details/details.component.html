@@ -28,6 +28,7 @@
             <nx-section *ngIf="plugin.overview.overviewVideo">
                 <nx-external-video [src]="plugin.overview.overviewVideo"></nx-external-video>
             </nx-section>
+            <nx-carousel [elements]="plugin.overview"></nx-carousel>
         </nx-block>
 
         <nx-block alt-style side-elm *ngIf="plugin.downloadFiles.length > 0">
