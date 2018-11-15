@@ -4,5 +4,5 @@ endif()
 
 if(withClouds)
     add_subdirectory(nx_clusterdb_engine)
-    add_subdirectory(nx_key_value_db)
+    add_subdirectory(nx_clusterdb_map)
 endif()
