@@ -177,6 +177,8 @@ private:
     //Probably turn QnResourceTreeModelUserNodes into such manager too.
     QnResourceTreeModelNodeManager* const m_nodeManager;
     QnResourceTreeModelLayoutNodeManager* const m_layoutNodeManager;
+
+    bool m_inModelResetState = false;
 };
 
 Q_DECLARE_METATYPE(QnResourceTreeModel::Scope)
