@@ -71,6 +71,7 @@ private:
 
 private:
     bool m_visible = false;
+    bool m_blockAction = false;
 
     QnBlinkingImageButtonWidget* m_showButton;
 

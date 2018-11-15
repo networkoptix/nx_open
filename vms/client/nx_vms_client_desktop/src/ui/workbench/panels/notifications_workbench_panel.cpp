@@ -177,7 +177,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     m_showButton->setFocusProxy(item);
     m_showButton->setZValue(BackgroundItemZOrder); /*< To make it paint under the tooltip. */
     connect(action(action::ToggleNotificationsAction), &QAction::toggled,
-        this, [this](bool opened) { setOpened(opened); });
+        this, [this](bool opened) { if (!m_blockAction) setOpened(opened); });
 
     m_opacityProcessor->addTargetItem(item);
     m_opacityProcessor->addTargetItem(m_showButton);
@@ -244,9 +244,9 @@ void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
     m_showingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
     auto toggleAction = action(action::ToggleNotificationsAction);
-    toggleAction->blockSignals(true);
+    m_blockAction = true;
     toggleAction->setChecked(opened);
-    toggleAction->blockSignals(false);
+    m_blockAction = false;
 
     xAnimator->stop();
     qnWorkbenchAnimations->setupAnimator(xAnimator, opened
