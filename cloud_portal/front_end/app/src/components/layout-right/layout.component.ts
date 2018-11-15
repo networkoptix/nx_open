@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 
 /* Usage
  <nx-right-layout>
@@ -46,6 +46,5 @@ export class NxLayoutRightComponent implements OnInit {
     }
 
     ngOnInit() {
-
     }
 }

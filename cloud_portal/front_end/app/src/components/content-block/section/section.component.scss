@@ -39,6 +39,10 @@
             height   : 200px;
             overflow : hidden;
         }
+        
+        & > div > *:last-child {
+            margin-bottom : 0;
+        }
     }
     
     &--separator {
