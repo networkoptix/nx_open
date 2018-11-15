@@ -596,7 +596,9 @@ void Ec2MserverCloudSynchronization::compareUsers(
     bool* result)
 {
     if (assertOnFailure)
+    {
         ASSERT_EQ(vmsUsers.size(), cloudUsers.size());
+    }
     
     if (vmsUsers.size() != cloudUsers.size())
         return;
