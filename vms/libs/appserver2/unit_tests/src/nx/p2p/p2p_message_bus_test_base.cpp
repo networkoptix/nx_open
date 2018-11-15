@@ -162,6 +162,11 @@ void P2pMessageBusTestBase::fullConnect(std::vector<Appserver2Ptr>& servers)
     }
 }
 
+// connect all servers to each others
+void P2pMessageBusTestBase::emptyConnect(std::vector<Appserver2Ptr>& servers)
+{
+}
+
 bool P2pMessageBusTestBase::waitForCondition(
     std::function<bool()> condition,
     std::chrono::milliseconds timeout)

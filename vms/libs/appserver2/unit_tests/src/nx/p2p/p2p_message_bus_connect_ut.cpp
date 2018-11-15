@@ -214,6 +214,13 @@ TEST_F(P2pMessageBusTest, FullConnect)
     testMain(fullConnect);
 }
 
+TEST_F(P2pMessageBusTest, EmptyConnect)
+{
+    nx::utils::ArgumentParser args(QCoreApplication::instance()->arguments());
+    if (args.get<QString>(kStandaloneModeParamName))
+        testMain(emptyConnect);
+}
+
 TEST_F(P2pMessageBusTest, RestartServer)
 {
     testMain(fullConnect);
