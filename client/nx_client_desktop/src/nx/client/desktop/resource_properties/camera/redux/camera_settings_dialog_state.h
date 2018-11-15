@@ -292,6 +292,7 @@ struct CameraSettingsDialogState
         UserEditable<QSet<QnUuid>> enabledEngines;
         QHash<QnUuid, UserEditable<QVariantMap>> settingsValuesByEngineId;
         bool loading = false;
+        QnUuid currentEngineId;
     };
     AnalyticsSettings analytics;
 

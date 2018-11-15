@@ -1,4 +1,4 @@
-#include "device_agent_settings_adaptor.h"
+#include "device_agent_settings_adapter.h"
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/guarded_callback.h>
@@ -17,16 +17,17 @@ namespace nx::client::desktop {
 
 using namespace nx::vms::common;
 
-class DeviceAgentSettingsAdaptor::Private: public QnConnectionContextAware
+class DeviceAgentSettingsAdapter::Private: public QnConnectionContextAware
 {
 public:
     CameraSettingsDialogStore* store = nullptr;
     QnVirtualCameraResourcePtr camera;
+    QnUuid currentEngineId;
     QList<rest::Handle> pendingRefreshRequests;
     QList<rest::Handle> pendingApplyRequests;
 };
 
-DeviceAgentSettingsAdaptor::DeviceAgentSettingsAdaptor(
+DeviceAgentSettingsAdapter::DeviceAgentSettingsAdapter(
     CameraSettingsDialogStore* store,
     QObject* parent)
     :
@@ -34,39 +35,55 @@ DeviceAgentSettingsAdaptor::DeviceAgentSettingsAdaptor(
     d(new Private())
 {
     d->store = store;
+
+    d->currentEngineId = d->store->currentAnalyticsEngineId();
+
+    connect(d->store, &CameraSettingsDialogStore::stateChanged, this,
+        [this]()
+        {
+            const auto id = d->store->currentAnalyticsEngineId();
+            if (d->currentEngineId == id)
+                return;
+
+            d->currentEngineId = id;
+            refreshSettings(id);
+        });
 }
 
-DeviceAgentSettingsAdaptor::~DeviceAgentSettingsAdaptor()
+DeviceAgentSettingsAdapter::~DeviceAgentSettingsAdapter()
 {
 }
 
-void DeviceAgentSettingsAdaptor::setCamera(const QnVirtualCameraResourcePtr& camera)
+void DeviceAgentSettingsAdapter::setCamera(const QnVirtualCameraResourcePtr& camera)
 {
-    if (d->camera == camera)
-        return;
-
-    d->camera = camera;
-
-    if (const auto& server = d->commonModule()->currentServer(); NX_ASSERT(server))
+    if (d->camera != camera)
     {
-        const auto& connection = server->restConnection();
+        d->camera = camera;
 
-        // We don't want refresh requests for previous camera, so cancel them.
-        for (const auto& requestId: d->pendingRefreshRequests)
-            connection->cancelRequest(requestId);
-        d->pendingRefreshRequests.clear();
+        if (const auto& server = d->commonModule()->currentServer(); NX_ASSERT(server))
+        {
+            const auto& connection = server->restConnection();
 
-        // However we want apply requests to be finished, we just don't need results.
-        d->pendingApplyRequests.clear();
+            // We don't want to refresh requests for previous camera, so cancel them.
+            for (const auto& requestId: d->pendingRefreshRequests)
+                connection->cancelRequest(requestId);
+            d->pendingRefreshRequests.clear();
+
+            // However we want to apply requests to be finished, we just don't need results.
+            d->pendingApplyRequests.clear();
+        }
     }
+
+    // Refresh settings even if camera is not changed. This happens when the dialog is re-opened.
+    refreshSettings(d->currentEngineId);
 }
 
-void DeviceAgentSettingsAdaptor::refreshSettings(const QnUuid& engineId, bool forceRefresh)
+void DeviceAgentSettingsAdapter::refreshSettings(const QnUuid& engineId, bool forceRefresh)
 {
     if (!d->camera)
         return;
 
-    if (!NX_ASSERT(!engineId.isNull()))
+    if (engineId.isNull())
         return;
 
     if (!forceRefresh && d->store->state().analytics.settingsValuesByEngineId.contains(engineId))
@@ -110,7 +127,7 @@ void DeviceAgentSettingsAdaptor::refreshSettings(const QnUuid& engineId, bool fo
     d->store->setAnalyticsSettingsLoading(true);
 }
 
-void DeviceAgentSettingsAdaptor::applySettings()
+void DeviceAgentSettingsAdapter::applySettings()
 {
     if (!d->camera)
         return;

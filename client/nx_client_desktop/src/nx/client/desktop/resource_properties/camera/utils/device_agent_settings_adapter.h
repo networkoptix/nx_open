@@ -9,13 +9,13 @@ namespace nx::client::desktop {
 
 class CameraSettingsDialogStore;
 
-class DeviceAgentSettingsAdaptor: public QObject
+class DeviceAgentSettingsAdapter: public QObject
 {
     using base_type = QObject;
 
 public:
-    DeviceAgentSettingsAdaptor(CameraSettingsDialogStore* store, QObject* parent = nullptr);
-    virtual ~DeviceAgentSettingsAdaptor() override;
+    DeviceAgentSettingsAdapter(CameraSettingsDialogStore* store, QObject* parent = nullptr);
+    virtual ~DeviceAgentSettingsAdapter() override;
 
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
