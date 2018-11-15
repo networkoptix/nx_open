@@ -28,10 +28,10 @@ bool VmsTransactionLogCache::isShouldBeIgnored(
     const auto currentSequence = m_committedData.transactionState.values.value(key);
     if (currentSequence >= tran.persistentInfo.sequence)
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG, lm("systemId %1. Ignoring transaction %2 (%3, hash %4)"
-                "because of persistent sequence: %5 <= %6")
-            .arg(systemId).arg(ApiCommand::toString(tran.command)).arg(tran)
-            .arg(hash).arg(tran.persistentInfo.sequence).arg(currentSequence));
+        NX_DEBUG(QnLog::EC2_TRAN_LOG, lm("systemId %1. Ignoring transaction %2 (%3, hash %4) "
+            "because of persistent sequence: %5 <= %6")
+            .args(systemId, ApiCommand::toString(tran.command), tran,
+                hash, tran.persistentInfo.sequence, currentSequence));
         return true;    //< Transaction should be ignored.
     }
 
@@ -45,10 +45,9 @@ bool VmsTransactionLogCache::isShouldBeIgnored(
         rez = key < itr->second.updatedBy;
     if (rez)
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG, lm("systemId %1. Ignoring transaction %2 (%3, hash %4)"
-                "because of timestamp: %5 <= %6")
-            .arg(systemId).arg(ApiCommand::toString(tran.command)).arg(tran)
-            .arg(hash).arg(tran.persistentInfo.timestamp).arg(lastTime));
+        NX_DEBUG(QnLog::EC2_TRAN_LOG, lm("systemId %1. Ignoring transaction %2 (%3, hash %4) "
+            "because of timestamp: %5 <= %6").args(systemId, ApiCommand::toString(tran.command),
+                tran, hash, tran.persistentInfo.timestamp, lastTime));
         return true;    //< Transaction should be ignored.
     }
 
