@@ -1,7 +1,7 @@
 <input [value]="value" hidden>
 <button class="large" [ngClass]="{
     'selected'       : selected && !isStyled,
-    'selected-styled': selected && isStyled,
+    'selected-brand': selected && isStyled,
     'badge'            : !selected && !isStyled,
     'badge-brand'     : !selected && isStyled
 }" (click)="selectTag()">
