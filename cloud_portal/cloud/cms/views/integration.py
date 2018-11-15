@@ -27,6 +27,7 @@ def make_integrations_json(integrations, contexts=[], show_pending=False):
         cloud_portal = cloud_portal.first()
 
         for integration in integrations:
+            integration_has_info = False
             integration_dict = {}
             current_version = integration.version_id()
             if show_pending:
@@ -48,9 +49,16 @@ def make_integrations_json(integrations, contexts=[], show_pending=False):
                     ds_name = datastructure.name
                     if not datastructure.public:
                         continue
-                    integration_dict[context_name][ds_name] = datastructure.find_actual_value(product=integration,
-                                                                                              version_id=current_version,
-                                                                                              draft=show_pending)
+
+                    record_value = datastructure.find_actual_value(product=integration,
+                                                                   version_id=current_version,
+                                                                   draft=show_pending)
+
+                    if not record_value:
+                        continue
+
+                    integration_dict[context_name][ds_name] = record_value
+
                     # If the DataStructure type is select and the multi flag is true we need to make the value an array
                     if datastructure.type == DataStructure.DATA_TYPES.select and\
                             'multi' in datastructure.meta_settings and\
@@ -58,6 +66,14 @@ def make_integrations_json(integrations, contexts=[], show_pending=False):
                         # Starts as a stringified list then turned into a list of strings
                         # "['1', '2', '3']" -> [u'1', u'2', u'3'] -> ['1', '2', '3']
                         integration_dict[context_name][ds_name] = map(str, json.loads(integration_dict[context_name][ds_name]))
+
+                context_has_info = bool(integration_dict[context_name])
+                integration_dict[context_name]['hasInfo'] = context_has_info
+                if context_has_info:
+                    integration_has_info = True
+
+            if not integration_has_info:
+                continue
 
             for global_context in global_contexts:
                 process_context_structure(cloud_portal, global_context, integration_dict, None, current_version, False, False)
