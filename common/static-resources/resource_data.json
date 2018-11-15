@@ -2880,6 +2880,47 @@
             "disableMultiThreadDecoding": [
                 "hevc"
             ]
+        },
+        {
+            "keys": [
+                "*|DS-7332HUHI-K4"
+            ],
+            "forcedOnvifParams": {
+                "ptzProfiles":[
+                    "ProfileToken001",
+                    "ProfileToken002",
+                    "ProfileToken003",
+                    "ProfileToken004",
+                    "ProfileToken005",
+                    "ProfileToken006",
+                    "ProfileToken007",
+                    "ProfileToken008",
+                    "ProfileToken009",
+                    "ProfileToken010",
+                    "ProfileToken011",
+                    "ProfileToken012",
+                    "ProfileToken013",
+                    "ProfileToken014",
+                    "ProfileToken015",
+                    "ProfileToken016",
+                    "ProfileToken017",
+                    "ProfileToken018",
+                    "ProfileToken019",
+                    "ProfileToken020",
+                    "ProfileToken021",
+                    "ProfileToken022",
+                    "ProfileToken023",
+                    "ProfileToken024",
+                    "ProfileToken025",
+                    "ProfileToken026",
+                    "ProfileToken027",
+                    "ProfileToken028",
+                    "ProfileToken029",
+                    "ProfileToken030",
+                    "ProfileToken031",
+                    "ProfileToken032"
+                ]
+            }
         }
     ]
 }
