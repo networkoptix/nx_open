@@ -85,6 +85,7 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
     m_encoders.resize( 2 ); //TODO all cameras support dual streaming???
 
     m_cameraCapabilities |= nxcip::BaseCameraManager::sharePixelsCapability;
+    m_cameraCapabilities |= nxcip::BaseCameraManager::fixedQualityCapability;
 }
 
 CameraManager::~CameraManager()

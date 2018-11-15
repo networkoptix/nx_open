@@ -27,7 +27,8 @@ CameraManager::CameraManager(
     m_pluginRef( Plugin::instance() ),
     m_capabilities(
         nxcip::BaseCameraManager::nativeMediaStreamCapability |
-        nxcip::BaseCameraManager::primaryStreamSoftMotionCapability),
+        nxcip::BaseCameraManager::primaryStreamSoftMotionCapability |
+        nxcip::BaseCameraManager::fixedQualityCapability),
     m_audioEnabled(false)
 {
     if(m_info.auxiliaryData[0] != '\0')

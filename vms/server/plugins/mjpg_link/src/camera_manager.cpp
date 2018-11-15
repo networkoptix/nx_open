@@ -20,7 +20,8 @@ CameraManager::CameraManager(const nxcip::CameraInfo& info,
         nxcip::BaseCameraManager::nativeMediaStreamCapability |
         nxcip::BaseCameraManager::primaryStreamSoftMotionCapability |
         nxcip::BaseCameraManager::shareIpCapability |
-        nxcip::BaseCameraManager::customMediaUrlCapability),
+        nxcip::BaseCameraManager::customMediaUrlCapability |
+        nxcip::BaseCameraManager::fixedQualityCapability),
     m_timeProvider(timeProvider)
 {
 }

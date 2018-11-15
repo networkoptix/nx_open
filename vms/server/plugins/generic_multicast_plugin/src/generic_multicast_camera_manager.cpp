@@ -34,7 +34,8 @@ GenericMulticastCameraManager::GenericMulticastCameraManager(const nxcip::Camera
         | nxcip::BaseCameraManager::shareIpCapability
         | nxcip::BaseCameraManager::primaryStreamSoftMotionCapability
         | nxcip::BaseCameraManager::nativeMediaStreamCapability
-        | nxcip::BaseCameraManager::relativeTimestampCapability;
+        | nxcip::BaseCameraManager::relativeTimestampCapability
+        | nxcip::BaseCameraManager::fixedQualityCapability;
 }
 
 GenericMulticastCameraManager::~GenericMulticastCameraManager()

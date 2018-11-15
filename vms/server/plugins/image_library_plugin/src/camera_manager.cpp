@@ -22,7 +22,8 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
     m_capabilities( 
         nxcip::BaseCameraManager::dtsArchiveCapability | 
         nxcip::BaseCameraManager::nativeMediaStreamCapability |
-        nxcip::BaseCameraManager::hardwareMotionCapability ),
+        nxcip::BaseCameraManager::hardwareMotionCapability |
+        nxcip::BaseCameraManager::fixedQualityCapability ),
     m_dirContentsManager(
         info.url,
         FRAME_DURATION_USEC )

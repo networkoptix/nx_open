@@ -54,6 +54,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         DualStreamingForLiveOnly            = 0x8000,
         customMediaPortCapability           = 0x10000, //< Camera's media streams port are editable.
         CameraTimeCapability                = 0x20000, //< Camera sends absolute timestamps in media stream
+        FixedQualityCapability              = 0x40000, //< Camera does not allow to change stream quality/fps
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)

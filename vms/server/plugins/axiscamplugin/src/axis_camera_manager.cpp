@@ -194,7 +194,10 @@ nxpt::CommonRefManager* AxisCameraManager::refManager()
 
 int AxisCameraManager::updateCameraInfo() const
 {
-    m_cameraCapabilities |= nxcip::BaseCameraManager::audioCapability | nxcip::BaseCameraManager::sharePixelsCapability;
+    m_cameraCapabilities |=
+        nxcip::BaseCameraManager::audioCapability
+        | nxcip::BaseCameraManager::sharePixelsCapability
+        | nxcip::BaseCameraManager::fixedQualityCapability;
 
     std::unique_ptr<SyncHttpClient> httpClient;
     if( std::strlen(m_info.modelName) == 0 )
