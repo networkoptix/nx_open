@@ -3587,6 +3587,9 @@ void MediaServerProcess::initCrashDump()
 
 #ifdef __linux__
     linux_exception::setSignalHandlingDisabled(serverModule()->settings().createFullCrashDump());
+    // This is needed because setting capability (CAP_NET_BIND_SERVICE in our case) on the
+    // executable automatically sets PR_SET_DUMPABLE to false which in turn stops core dumps from
+    // being created.
     prctl(PR_SET_DUMPABLE, 1, 0, 0, 0, 0);
 #endif
     m_crashReporter = std::make_unique<ec2::CrashReporter>(commonModule());
