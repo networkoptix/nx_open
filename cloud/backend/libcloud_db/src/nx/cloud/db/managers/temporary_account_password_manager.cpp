@@ -49,23 +49,23 @@ void TemporaryAccountPasswordManager::authenticateByName(
     nx::utils::stree::ResourceContainer* const authProperties,
     nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
-    QnMutexLocker lk(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
     auto authResultCode = api::ResultCode::notAuthorized;
-    boost::optional<const data::TemporaryAccountCredentialsEx&> credentials =
-        findMatchingCredentials(lk, username.toStdString(), checkPasswordHash, &authResultCode);
+    const data::TemporaryAccountCredentialsEx* credentials =
+        findMatchingCredentials(lock, username.toStdString(), checkPasswordHash, &authResultCode);
 
     if (!credentials)
         return completionHandler(authResultCode);
 
-    authProperties->put(nx::cloud::db::attr::credentialsId, QString::fromStdString(credentials->id));
+    authProperties->put(attr::credentialsId, QString::fromStdString(credentials->id));
 
     // Preparing output data.
     authProperties->put(
-        nx::cloud::db::attr::authAccountEmail,
+        attr::authAccountEmail,
         QString::fromStdString(credentials->accountEmail));
     if (credentials->isEmailCode)
-        authProperties->put(nx::cloud::db::attr::authenticatedByEmailCode, true);
+        authProperties->put(attr::authenticatedByEmailCode, true);
 
     completionHandler(api::ResultCode::ok);
 }
@@ -125,7 +125,7 @@ void TemporaryAccountPasswordManager::removeTemporaryPasswordsFromDbByAccountEma
 void TemporaryAccountPasswordManager::removeTemporaryPasswordsFromCacheByAccountEmail(
     std::string accountEmail)
 {
-    QnMutexLocker lk(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     auto& temporaryCredentialsByEmail = m_temporaryCredentials.get<kIndexByAccountEmail>();
     temporaryCredentialsByEmail.erase(accountEmail);
 }
@@ -167,15 +167,15 @@ void TemporaryAccountPasswordManager::updateCredentialsAttributes(
             credentials, tempPasswordData));
 }
 
-boost::optional<data::TemporaryAccountCredentialsEx>
+std::optional<data::TemporaryAccountCredentialsEx>
     TemporaryAccountPasswordManager::getCredentialsByLogin(
         const std::string& login) const
 {
-    QnMutexLocker lk(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     const auto& temporaryCredentialsByLogin = m_temporaryCredentials.get<kIndexByLogin>();
     auto it = temporaryCredentialsByLogin.find(login);
     if (it == temporaryCredentialsByLogin.cend())
-        return boost::none;
+        return std::nullopt;
     return *it;
 }
 
@@ -225,13 +225,13 @@ void TemporaryAccountPasswordManager::removeTemporaryCredentialsFromDbDelayed(
     const data::TemporaryAccountCredentialsEx& temporaryCredentials)
 {
     m_dbManager->executeUpdate<std::string>(
-        [this](auto&&... args) { return deleteTempPassword(std::move(args)...); },
-        temporaryCredentials.id,
-        [locker = m_startedAsyncCallsCounter.getScopedIncrement()](
-            nx::sql::DBResult /*resultCode*/,
-            std::string /*tempPasswordId*/)
+        [this](auto&&... args)
         {
-        });
+            m_dao->deleteById(std::move(args)...);
+            return nx::sql::DBResult::ok;
+        },
+        temporaryCredentials.id,
+        [locker = m_startedAsyncCallsCounter.getScopedIncrement()](auto...) {});
 }
 
 void TemporaryAccountPasswordManager::deleteExpiredCredentials()
@@ -281,22 +281,14 @@ nx::sql::DBResult TemporaryAccountPasswordManager::insertTempPassword(
 void TemporaryAccountPasswordManager::saveTempPasswordToCache(
     data::TemporaryAccountCredentialsEx tempPasswordData)
 {
-    QnMutexLocker lk(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     std::string login = tempPasswordData.login;
     m_temporaryCredentials.insert(std::move(tempPasswordData));
 }
 
-nx::sql::DBResult TemporaryAccountPasswordManager::deleteTempPassword(
-    nx::sql::QueryContext* const queryContext,
-    std::string tempPasswordId)
-{
-    m_dao->deleteById(queryContext, tempPasswordId);
-    return nx::sql::DBResult::ok;
-}
-
-boost::optional<const data::TemporaryAccountCredentialsEx&>
+const data::TemporaryAccountCredentialsEx*
     TemporaryAccountPasswordManager::findMatchingCredentials(
-        const QnMutexLockerBase& /*lk*/,
+        const QnMutexLockerBase& /*lock*/,
         const std::string& username,
         std::function<bool(const nx::Buffer&)> checkPasswordHash,
         api::ResultCode* authResultCode)
@@ -306,7 +298,7 @@ boost::optional<const data::TemporaryAccountCredentialsEx&>
     auto& temporaryCredentialsByLogin = m_temporaryCredentials.get<kIndexByLogin>();
     auto tmpPasswordsRange = temporaryCredentialsByLogin.equal_range(username);
     if (tmpPasswordsRange.first == temporaryCredentialsByLogin.end())
-        return boost::none;
+        return nullptr;
 
     for (auto it = tmpPasswordsRange.first; it != tmpPasswordsRange.second; )
     {
@@ -325,14 +317,14 @@ boost::optional<const data::TemporaryAccountCredentialsEx&>
             continue;
 
         *authResultCode = api::ResultCode::ok;
-        return *curIt;
+        return &(*curIt);
     }
 
-    return boost::none;
+    return nullptr;
 }
 
 void TemporaryAccountPasswordManager::runExpirationRulesOnSuccessfulLogin(
-    const QnMutexLockerBase& lk,
+    const QnMutexLockerBase& lock,
     const data::TemporaryAccountCredentialsEx& temporaryCredentials)
 {
     auto& uniqueIndexById = m_temporaryCredentials.get<kIndexById>();
@@ -343,7 +335,7 @@ void TemporaryAccountPasswordManager::runExpirationRulesOnSuccessfulLogin(
         return;
     }
 
-    updateExpirationRulesAfterSuccessfulLogin(lk, uniqueIndexById, it);
+    updateExpirationRulesAfterSuccessfulLogin(lock, uniqueIndexById, it);
     if (isTemporaryPasswordExpired(*it))
     {
         removeTemporaryCredentialsFromDbDelayed(*it);
@@ -353,7 +345,7 @@ void TemporaryAccountPasswordManager::runExpirationRulesOnSuccessfulLogin(
 
 template<typename Index, typename Iterator>
 void TemporaryAccountPasswordManager::updateExpirationRulesAfterSuccessfulLogin(
-    const QnMutexLockerBase& /*lk*/,
+    const QnMutexLockerBase& /*lock*/,
     Index& index,
     Iterator it)
 {
