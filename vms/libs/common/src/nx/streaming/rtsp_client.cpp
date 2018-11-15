@@ -1,40 +1,21 @@
-#if defined(Q_OS_WIN)
-    #include <winsock2.h>
-#endif
-
 #if defined(__arm__)
     #include <sys/ioctl.h>
 #endif
 
-#include <atomic>
-#include <QtCore/QFile>
-
 #include <nx/streaming/rtsp_client.h>
-
 #include <nx/utils/datetime.h>
 #include <nx/network/http/custom_headers.h>
-#include <network/tcp_connection_priv.h>
-#include <network/tcp_connection_processor.h>
-
-#include <utils/common/sleep.h>
-#include <utils/common/synctime.h>
-#include <utils/common/util.h>
-#include <utils/media/bitStream.h>
-
-#include <nx/network/http/http_types.h>
 #include <nx/network/rtsp/rtsp_types.h>
-#include <nx/network/deprecated/simple_http_client.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
-#include <nx/utils/system_error.h>
-#include <nx/utils/unused.h>
+
+#include <network/tcp_connection_priv.h>
+#include <network/tcp_connection_processor.h>
+#include <utils/common/sleep.h>
 
 #define DEFAULT_RTP_PORT 554
 #define RESERVED_TIMEOUT_TIME (10*1000)
-
-static const quint32 SSRC_CONST = 0x2a55a9e8;
-static const quint32 CSRC_CONST = 0xe8a9552a;
 
 static const int TCP_RECEIVE_TIMEOUT_MS = 1000 * 5;
 static const int TCP_CONNECT_TIMEOUT_MS = 1000 * 5;
@@ -191,19 +172,15 @@ void QnRtspIoDevice::processRtcpData()
 
 static const size_t ADDITIONAL_READ_BUFFER_CAPACITY = 64 * 1024;
 
-static std::atomic<int> RTPSessionInstanceCounter(0);
-
 //-------------------------------------------------------------------------------------------------
 // QnRtspClient
 
 QnRtspClient::QnRtspClient(
-    bool shoulGuessAuthDigest,
     const Config& config,
     std::unique_ptr<nx::network::AbstractStreamSocket> tcpSock)
     :
     m_config(config),
     m_csec(2),
-    //m_rtpIo(*this),
     m_transport(TRANSPORT_UDP),
     m_selectedAudioChannel(0),
     m_startTime(DATETIME_NOW),
@@ -218,7 +195,7 @@ QnRtspClient::QnRtspClient(
     m_additionalReadBuffer( nullptr ),
     m_additionalReadBufferPos( 0 ),
     m_additionalReadBufferSize( 0 ),
-    m_rtspAuthCtx(shoulGuessAuthDigest),
+    m_rtspAuthCtx(config.shouldGuessAuthDigest),
     m_userAgent(nx::network::http::userAgentString()),
     m_defaultAuthScheme(nx::network::http::header::AuthScheme::basic)
 {
@@ -310,16 +287,6 @@ void QnRtspClient::updateResponseStatus(const QByteArray& response)
 
 CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 startTime)
 {
-#ifdef _DUMP_STREAM
-    const int fileIndex = ++RTPSessionInstanceCounter;
-    std::ostringstream ss;
-    ss<<"C:\\tmp\\12\\in."<<fileIndex;
-    m_inStreamFile.open( ss.str(), std::ios_base::binary );
-    ss.arg(std::string());
-    ss<<"C:\\tmp\\12\\out."<<fileIndex;
-    m_outStreamFile.open( ss.str(), std::ios_base::binary );
-#endif
-
     if (startTime != AV_NOPTS_VALUE)
         m_openedTime = startTime;
 
@@ -485,12 +452,6 @@ const QByteArray& QnRtspClient::getSdp() const
     return m_sdp;
 }
 
-QByteArray QnRtspClient::calcDefaultNonce() const
-{
-    return QByteArray::number(qnSyncTime->currentUSecsSinceEpoch() , 16);
-}
-
-#if 1
 void QnRtspClient::addAuth( nx::network::http::Request* const request )
 {
     QnClientAuthHelper::addAuthorizationToRequest(
@@ -498,30 +459,6 @@ void QnRtspClient::addAuth( nx::network::http::Request* const request )
         request,
         &m_rtspAuthCtx );   //ignoring result
 }
-#else
-void QnRtspClient::addAuth(QByteArray& request)
-{
-    if (m_auth.isNull())
-        return;
-    if (m_useDigestAuth)
-    {
-        QByteArray firstLine = request.left(request.indexOf('\n'));
-        QList<QByteArray> methodAndUri = firstLine.split(' ');
-        if (methodAndUri.size() >= 2) {
-            QString uri = QLatin1String(methodAndUri[1]);
-            if (uri.startsWith(lit("rtsp://")))
-                uri = QUrl(uri).path();
-            request.append( CLSimpleHTTPClient::digestAccess(
-                m_auth, m_realm, m_nonce, QLatin1String(methodAndUri[0]),
-                uri, m_responseCode == nx::network::http::StatusCode::proxyAuthenticationRequired ));
-        }
-    }
-    else {
-        request.append(CLSimpleHTTPClient::basicAuth(m_auth));
-        request.append(QLatin1String("\r\n"));
-    }
-}
-#endif
 
 void QnRtspClient::addCommonHeaders(nx::network::http::HttpHeaders& headers)
 {
@@ -566,9 +503,6 @@ bool QnRtspClient::sendRequestInternal(nx::network::http::Request&& request)
     addAdditionAttrs(&request);
     QByteArray requestBuf;
     request.serialize( &requestBuf );
-#ifdef _DUMP_STREAM
-    m_outStreamFile.write( requestBuf.constData(), requestBuf.size() );
-#endif
     return m_tcpSock->send(requestBuf.constData(), requestBuf.size()) > 0;
 }
 
@@ -957,9 +891,6 @@ bool QnRtspClient::sendKeepAlive()
 void QnRtspClient::sendBynaryResponse(const quint8* buffer, int size)
 {
     m_tcpSock->send(buffer, size);
-#ifdef _DUMP_STREAM
-    m_outStreamFile.write( (const char*)buffer, size );
-#endif
 }
 
 bool QnRtspClient::processTextResponseInsideBinData()
@@ -996,7 +927,6 @@ bool QnRtspClient::processTextResponseInsideBinData()
         QString tmp = extractRTSPParam(QLatin1String(textResponse), QLatin1String("Range:"));
         if (!tmp.isEmpty())
             parseRangeHeader(tmp);
-        emit gotTextResponse(textResponse);
     }
 
     return true;
@@ -1357,91 +1287,40 @@ QString QnRtspClient::getVideoLayout() const
     return m_videoLayout;
 }
 
-static const size_t MAX_BITRATE_BITS_PER_SECOND = 50*1024*1024;
-static const size_t MAX_BITRATE_BYTES_PER_SECOND = MAX_BITRATE_BITS_PER_SECOND / CHAR_BIT;
-static_assert(
-    MAX_BITRATE_BYTES_PER_SECOND > ADDITIONAL_READ_BUFFER_CAPACITY * 10,
-    "MAX_BITRATE_BYTES_PER_SECOND MUST be 10 times greater than ADDITIONAL_READ_BUFFER_CAPACITY" );
-
 #ifdef __arm__
-static const size_t MS_PER_SEC = 1000;
-#endif
-
-int QnRtspClient::readSocketWithBuffering( quint8* buf, size_t bufSize, bool readSome )
+void sleepIfEmptySocket(nx::network::AbstractStreamSocket* socket)
 {
-#if 1
-#ifdef __arm__
+    static const size_t MS_PER_SEC = 1000;
+    static const size_t MAX_BITRATE_BITS_PER_SECOND = 50*1024*1024;
+    static const size_t MAX_BITRATE_BYTES_PER_SECOND = MAX_BITRATE_BITS_PER_SECOND / CHAR_BIT;
+    static_assert(
+        MAX_BITRATE_BYTES_PER_SECOND > ADDITIONAL_READ_BUFFER_CAPACITY * 10,
+        "MAX_BITRATE_BYTES_PER_SECOND MUST be 10 times greater than ADDITIONAL_READ_BUFFER_CAPACITY");
+
+    //TODO #ak Better to find other solution and remove this code.
+    //At least, move ioctl call to sockets, since socket->handle() is deprecated method
+    //(with nat traversal introduced, not every socket will have handle)
+    int bytesAv = 0;
+    if ((ioctl(socket->handle(), FIONREAD, &bytesAv) == 0) && //socket read buffer size is unknown to us
+        bytesAv == 0)    //socket read buffer is empty
     {
-        //TODO #ak Better to find other solution and remove this code.
-            //At least, move ioctl call to sockets, since m_tcpSock->handle() is deprecated method
-            //(with nat traversal introduced, not every socket will have handle)
-        int bytesAv = 0;
-        if( (ioctl( m_tcpSock->handle(), FIONREAD, &bytesAv ) == 0) &&  //socket read buffer size is unknown to us
-            (bytesAv == 0) )    //socket read buffer is empty
-        {
-            //This sleep somehow reduces CPU time spent by process in kernel space on arm platform
-                //Possibly, it is workaround of some other bug somewhere else
-                //This code works only on Raspberry and NX1
-            QThread::msleep( MS_PER_SEC / (MAX_BITRATE_BYTES_PER_SECOND / ADDITIONAL_READ_BUFFER_CAPACITY) );
-        }
+        //This sleep somehow reduces CPU time spent by process in kernel space on arm platform
+        //Possibly, it is workaround of some other bug somewhere else
+        //This code works only on Raspberry and NX1
+        QThread::msleep(MS_PER_SEC / (MAX_BITRATE_BYTES_PER_SECOND / ADDITIONAL_READ_BUFFER_CAPACITY));
     }
+}
 #endif
 
-    int bytesRead = m_tcpSock->recv( buf, (unsigned int) bufSize, readSome ? 0 : MSG_WAITALL );
+int QnRtspClient::readSocketWithBuffering(quint8* buf, size_t bufSize, bool readSome)
+{
+#ifdef __arm__
+    sleepIfEmptySocket(m_tcpSock.get());
+#endif
+    int bytesRead = m_tcpSock->recv(buf, (unsigned int) bufSize, readSome ? 0 : MSG_WAITALL);
     if (bytesRead > 0)
         m_lastReceivedDataTimer.restart();
     return bytesRead;
-#else
-    const size_t bufSizeBak = bufSize;
-
-    //this method introduced to minimize m_tcpSock->recv calls (on isd edge m_tcpSock->recv call is rather heavy)
-    // TODO: #ak remove extra data copying
-
-    for( ;; )
-    {
-        if( m_additionalReadBufferSize > 0 )
-        {
-            const size_t bytesToCopy = std::min<int>( m_additionalReadBufferSize, bufSize );
-            memcpy( buf, m_additionalReadBuffer + m_additionalReadBufferPos, bytesToCopy );
-            m_additionalReadBufferPos += bytesToCopy;
-            m_additionalReadBufferSize -= bytesToCopy;
-            bufSize -= bytesToCopy;
-            buf += bytesToCopy;
-        }
-
-        if( readSome && (bufSize < bufSizeBak) )
-            return bufSizeBak - bufSize;
-        if( bufSize == 0 )
-            return bufSizeBak;
-
-#ifdef __arm__
-        {
-            //TODO #ak Better to find other solution and remove this code.
-                //At least, move ioctl call to sockets, since m_tcpSock->handle() is deprecated method
-                //(with nat traversal introduced, not every socket will have handle)
-            int bytesAv = 0;
-            if( (ioctl( m_tcpSock->handle(), FIONREAD, &bytesAv ) != 0) ||  //socket read buffer size is unknown to us
-                (bytesAv == 0) )    //socket read buffer is empty
-            {
-                //This sleep somehow reduces CPU time spent by process in kernel space on arm platform
-                    //Possibly, it is workaround of some other bug somewhere else
-                    //This code works only on Raspberry and NX1
-                QThread::msleep( MS_PER_SEC / (MAX_BITRATE_BYTES_PER_SECOND / ADDITIONAL_READ_BUFFER_CAPACITY) );
-            }
-        }
-#endif
-
-        m_additionalReadBufferSize = m_tcpSock->recv( m_additionalReadBuffer, ADDITIONAL_READ_BUFFER_CAPACITY );
-#ifdef _DUMP_STREAM
-        m_inStreamFile.write( m_additionalReadBuffer, m_additionalReadBufferSize );
-#endif
-        m_additionalReadBufferPos = 0;
-        if( m_additionalReadBufferSize <= 0 )
-            return bufSize == bufSizeBak
-                ? m_additionalReadBufferSize    //if could not read anything returning error
-                : bufSizeBak - bufSize;
-    }
-#endif
 }
 
 bool QnRtspClient::sendRequestAndReceiveResponse( nx::network::http::Request&& request, QByteArray& responseBuf )
@@ -1460,10 +1339,6 @@ bool QnRtspClient::sendRequestAndReceiveResponse( nx::network::http::Request&& r
             NX_VERBOSE(this, "Failed to send request: %2", SystemError::getLastOSErrorText());
             return false;
         }
-
-#ifdef _DUMP_STREAM
-        m_outStreamFile.write( requestBuf.constData(), requestBuf.size() );
-#endif
 
         if( !readTextResponce(responseBuf) )
         {

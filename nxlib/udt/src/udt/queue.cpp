@@ -765,7 +765,7 @@ void CRendezvousQueue::updateConnStatus()
             {
                 // connection timer expired, acknowledge app via epoll
                 udtSocket->setConnecting(false);
-                CUDT::s_UDTUnited.m_EPoll.update_events(
+                CUDT::s_UDTUnited->m_EPoll.update_events(
                     i->id,
                     udtSocket->pollIds(),
                     UDT_EPOLL_ERR,

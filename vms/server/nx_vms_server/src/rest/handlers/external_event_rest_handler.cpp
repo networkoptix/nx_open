@@ -15,6 +15,7 @@
 #include <nx/utils/string.h>
 #include <nx/vms/event/event_parameters.h>
 #include <media_server/media_server_module.h>
+#include <api/helpers/camera_id_helper.h>
 
 using namespace nx;
 
@@ -50,7 +51,9 @@ int QnExternalEventRestHandler::executeGet(
         businessParams.eventTimestampUsec = nx::utils::parseDateTime(params["timestamp"]);
 
     if (params.contains("eventResourceId"))
-        businessParams.eventResourceId = QnUuid::fromStringSafe(params["eventResourceId"]);
+        businessParams.eventResourceId = nx::camera_id_helper::flexibleIdToId(
+            owner->commonModule()->resourcePool(),
+            params["eventResourceId"]);
 
     if (params.contains("state"))
     {

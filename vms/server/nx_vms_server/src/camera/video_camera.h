@@ -45,22 +45,22 @@ public:
     virtual QnLiveStreamProviderPtr getSecondaryReader() = 0;
 
     virtual int copyLastGop(
-        bool primaryLiveStream,
+        Qn::StreamIndex streamIndex,
         qint64 skipTime,
         QnDataPacketQueue& dstQueue,
         bool iFramesOnly) = 0;
 
     virtual QnConstCompressedVideoDataPtr getLastVideoFrame(
-        bool primaryLiveStream,
+        Qn::StreamIndex streamIndex,
         int channel) const = 0;
-    virtual QnConstCompressedAudioDataPtr getLastAudioFrame(bool primaryLiveStream) const = 0;
+    virtual QnConstCompressedAudioDataPtr getLastAudioFrame(Qn::StreamIndex streamIndex) const = 0;
 
     /**
      * @return I-frame and the following P-frames up to the desired frame. Can be null but not
      * empty.
      */
     virtual std::unique_ptr<QnConstDataPacketQueue> getFrameSequenceByTime(
-        bool primaryLiveStream,
+        Qn::StreamIndex streamIndex,
         qint64 time,
         int channel,
         nx::api::ImageRequest::RoundMethod roundMethod) const = 0;
@@ -113,18 +113,20 @@ public:
     virtual QnLiveStreamProviderPtr getSecondaryReader() override;
 
     virtual int copyLastGop(
-        bool primaryLiveStream,
+        Qn::StreamIndex streamIndex,
         qint64 skipTime,
         QnDataPacketQueue& dstQueue,
         bool iFramesOnly) override;
 
     virtual QnConstCompressedVideoDataPtr getLastVideoFrame(
-        bool primaryLiveStream,
+        Qn::StreamIndex streamIndex,
         int channel) const override;
-    virtual QnConstCompressedAudioDataPtr getLastAudioFrame(bool primaryLiveStream) const override;
+
+    virtual QnConstCompressedAudioDataPtr getLastAudioFrame(
+        Qn::StreamIndex streamIndex) const override;
 
     virtual std::unique_ptr<QnConstDataPacketQueue> getFrameSequenceByTime(
-        bool primaryLiveStream,
+        Qn::StreamIndex streamIndex,
         qint64 time,
         int channel,
         nx::api::ImageRequest::RoundMethod roundMethod) const;
@@ -168,13 +170,20 @@ private:
     const qint64 m_loStreamHlsInactivityPeriodMS;
     const qint64 m_hiStreamHlsInactivityPeriodMS;
 
-    QnLiveStreamProviderPtr getLiveReaderNonSafe(QnServer::ChunksCatalog catalog, bool ensureInitialized);
+    QElapsedTimer m_lastActivityTimer;
+
+private:
+    QnVideoCameraGopKeeper* getGopKeeper(Qn::StreamIndex streamIndex) const;
+
+    QnLiveStreamProviderPtr getLiveReaderNonSafe(
+        QnServer::ChunksCatalog catalog, bool ensureInitialized);
+
     void startLiveCacheIfNeeded();
+
     bool ensureLiveCacheStarted(
         MediaQuality streamQuality,
         const QnLiveStreamProviderPtr& primaryReader,
         qint64 targetDurationUSec );
-    QElapsedTimer m_lastActivityTimer;
 
 private slots:
     void at_camera_resourceChanged();

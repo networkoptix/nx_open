@@ -136,12 +136,12 @@ int QnCameraSettingsRestHandler::executeGet(
         if (notFoundCameraId.isNull())
         {
             result.setError(QnRestResult::MissingParameter, lit("Camera is not specified"));
-            return StatusCode::ok;
+            return StatusCode::unprocessableEntity;
         }
         else
         {
             result.setError(QnRestResult::InvalidParameter, lm("No camera %1").arg(notFoundCameraId));
-            return StatusCode::ok;
+            return StatusCode::unprocessableEntity;
         }
     }
 
@@ -166,95 +166,148 @@ int QnCameraSettingsRestHandler::executeGet(
     if (locParams.empty())
     {
         result.setError(QnRestResult::MissingParameter, lit("No valid camera parameters in request"));
-        return StatusCode::ok;
+        return StatusCode::unprocessableEntity;
     }
 
     QnCameraAdvancedParamValueMap values;
     for (auto iter = locParams.cbegin(); iter != locParams.cend(); ++iter)
         values.insert(iter.key(), iter.value());
 
-    nx::utils::AsyncOperationGuard operationGuard;
-    nx::utils::promise<void> operationPromise;
-
+    QnCameraAdvancedParamValueMap outParameterMap;
     const auto action = extractAction(path);
+    nx::network::http::StatusCode::Value resultCode = StatusCode::undefined;
     if (action == "getCameraParam")
     {
-
-        if (!owner->resourceAccessManager()->hasPermission(
-            owner->accessRights(),
+        resultCode = handleGetParamsRequest(
+            owner,
             camera,
-            Qn::Permission::ReadPermission))
-        {
-            return nx::network::http::StatusCode::forbidden;
-        }
-
-        m_commandProcessor->putData(
-                std::make_shared<GetAdvancedParametersCommand>(
-                    camera,
-                    values.ids(),
-                    [&, guard = operationGuard.sharedGuard()](
-                        const QnCameraAdvancedParamValueMap& resultParams)
-                    {
-                        if (const auto lock = guard->lock())
-                        {
-                            values = resultParams;
-                            operationPromise.set_value();
-                        }
-                    }));
+            values.ids(),
+            &outParameterMap);
     }
     else if (action == "setCameraParam")
     {
-        if (!owner->resourceAccessManager()->hasGlobalPermission(
-            owner->accessRights(),
-            GlobalPermission::editCameras))
-        {
-            return nx::network::http::StatusCode::forbidden;
-        }
-
-        if (!owner->resourceAccessManager()->hasPermission(
-            owner->accessRights(),
+        resultCode = handleSetParamsRequest(
+            owner,
             camera,
-            Qn::Permission::WritePermission))
-        {
-            return nx::network::http::StatusCode::forbidden;
-        }
-
-        m_commandProcessor->putData(
-                std::make_shared<SetAdvancedParametersCommand>(
-                    camera,
-                    values,
-                    [&, guard = operationGuard.sharedGuard()](
-                        const QSet<QString>& resultNames)
-                    {
-                        if (const auto lock = guard->lock())
-                        {
-                            for (auto it = values.begin(); it != values.end();)
-                            {
-                                if (resultNames.contains(it.key()))
-                                    ++it;
-                                else
-                                    it = values.erase(it);
-                            }
-                            operationPromise.set_value();
-                        }
-                    }));
+            values,
+            &outParameterMap);
     }
     else
     {
         result.setError(QnRestResult::InvalidParameter, lm("Unknown command: %1").arg(action));
-        return StatusCode::ok;
+        return StatusCode::unprocessableEntity;
     }
+
+    if (resultCode != StatusCode::ok)
+    {
+        result.setError(
+            QnRestResult::CantProcessRequest,
+            nx::network::http::StatusCode::toString(resultCode));
+        return resultCode;
+    }
+
+    NX_DEBUG(this, "Request %1 processed successfully for camera %2: %3",
+        path, camera->getId(), containerString(outParameterMap));
+
+    result.setReply(outParameterMap.toValueList());
+    return StatusCode::ok;
+}
+
+nx::network::http::StatusCode::Value QnCameraSettingsRestHandler::handleGetParamsRequest(
+    const QnRestConnectionProcessor* owner,
+    const QnVirtualCameraResourcePtr& camera,
+    const QSet<QString>& requestedParameterIds,
+    QnCameraAdvancedParamValueMap* outParameterMap)
+{
+    const bool hasPermissions = owner->resourceAccessManager()->hasPermission(
+        owner->accessRights(),
+        camera,
+        Qn::Permission::ReadPermission);
+
+    if (!hasPermissions)
+        return nx::network::http::StatusCode::forbidden;
+
+    nx::utils::AsyncOperationGuard operationGuard;
+    nx::utils::promise<void> operationPromise;
+
+    m_commandProcessor->putData(
+        std::make_shared<GetAdvancedParametersCommand>(
+            camera,
+            requestedParameterIds,
+            [&, guard = operationGuard.sharedGuard()](
+                const QnCameraAdvancedParamValueMap& resultParams)
+            {
+                if (const auto lock = guard->lock())
+                {
+                    *outParameterMap = resultParams;
+                    operationPromise.set_value();
+                }
+            }));
 
     if (operationPromise.get_future().wait_for(kMaxWaitTimeout) != std::future_status::ready)
     {
         operationGuard.reset();
-        result.setError(QnRestResult::CantProcessRequest, lit("Timed out"));
-        return StatusCode::ok;
+        return StatusCode::requestTimeOut;
     }
 
-    NX_DEBUG(this, lm("Request %1 processed successfully for camera %2: %3")
-        .args(path, camera->getId(), containerString(values)));
-
-    result.setReply(values.toValueList());
     return StatusCode::ok;
 }
+
+nx::network::http::StatusCode::Value QnCameraSettingsRestHandler::handleSetParamsRequest(
+    const QnRestConnectionProcessor* owner,
+    const QnVirtualCameraResourcePtr& camera,
+    const QnCameraAdvancedParamValueMap& parametersToSet,
+    QnCameraAdvancedParamValueMap* outParameterMap)
+{
+    const auto accessManager = owner->resourceAccessManager();
+    const auto accessRights = owner->accessRights();
+    const auto hasPermissions =
+        accessManager->hasGlobalPermission(accessRights, GlobalPermission::editCameras)
+        && accessManager->hasPermission(accessRights, camera, Qn::Permission::WritePermission);
+
+    if (!hasPermissions)
+        return nx::network::http::StatusCode::forbidden;
+
+    nx::utils::AsyncOperationGuard operationGuard;
+    nx::utils::promise<void> operationPromise;
+
+    m_commandProcessor->putData(
+        std::make_shared<SetAdvancedParametersCommand>(
+            camera,
+            parametersToSet,
+            [&, guard = operationGuard.sharedGuard()](const QSet<QString>& resultIds)
+            {
+                if (const auto lock = guard->lock())
+                {
+                    for (const auto& id: resultIds)
+                    {
+                        if (parametersToSet.contains(id))
+                            outParameterMap->insert(id, parametersToSet[id]);
+                    }
+
+                    operationPromise.set_value();
+                }
+            }));
+
+    if (operationPromise.get_future().wait_for(kMaxWaitTimeout) != std::future_status::ready)
+    {
+        operationGuard.reset();
+        return StatusCode::requestTimeOut;
+    }
+
+    const bool needToReloadAllParameters = camera->resourceData()
+        .value<bool>(Qn::kReloadAllAdvancedParameters, false);
+
+    if (needToReloadAllParameters)
+    {
+        const auto allParameterIds = QnCameraAdvancedParamsReader::paramsFromResource(camera)
+            .allParameterIds();
+
+        outParameterMap->clear();
+        return handleGetParamsRequest(owner, camera, allParameterIds, outParameterMap);
+    }
+
+    return StatusCode::ok;
+}
+
+

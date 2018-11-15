@@ -43,6 +43,9 @@ const char* const NALUnitDescr[30] =
 
 class NALUnit {
 public:
+    static constexpr uint8_t kStartCode[] = {0x00, 0x00, 0x01};
+    static constexpr uint8_t kStartCodeLong[] = {0x00, 0x00, 0x00, 0x01};
+
     const static int SPS_OR_PPS_NOT_READY = 1;
     const static int NOT_ENOUGHT_BUFFER = 2;
     const static int UNSUPPORTED_PARAM = 3;
@@ -89,6 +92,7 @@ public:
     //void setBuffer(quint8* buffer, quint8* end);
     void decodeBuffer(const quint8* buffer,const quint8* end);
     static quint8* addStartCode(quint8* buffer, quint8* boundStart);
+    static QByteArray dropBorderedStartCodes(const QByteArray& sourceNal);
 
     static int extractUEGolombCode(BitStreamReader& bitReader);
     static void writeUEGolombCode(BitStreamWriter& bitWriter, quint32 value);
@@ -225,14 +229,14 @@ public:
     quint32 time_scale;
     int fixed_frame_rate_flag;
 
-    struct CPB
+    struct Cpb
     {
-        int bit_rate_value_minus1;
-        int cpb_size_value_minus1;
+        int bit_rate_value_minus1 = 0;
+        int cpb_size_value_minus1 = 0;
         quint8 cbr_flag;
     };
     static const int kCpbCntMax = 32;
-    CPB cpb[kCpbCntMax];
+    Cpb cpb[kCpbCntMax];
 
     int initial_cpb_removal_delay_length_minus1;
     int cpb_removal_delay_length_minus1;
@@ -325,7 +329,6 @@ public:
     bool isReady() {return m_ready;}
     int deserialize();
     void insertHdrParameters();
-    int getMaxBitrate();
 
 private:
     bool seq_scaling_list_present_flag[8];

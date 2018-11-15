@@ -74,8 +74,17 @@ void CameraAdvancedParamWidgetsManager::displayParams(const QnCameraAdvancedPara
     currentItemChanged(m_groupWidget->currentItem());
 }
 
-void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamValueList& params)
+void CameraAdvancedParamWidgetsManager::loadValues(
+    const QnCameraAdvancedParamValueList& params,
+    bool packetMode)
 {
+    if (packetMode)
+    {
+        // Disable all parameter widgets, we'll enable only those that are on the list.
+        for (auto widget: m_paramWidgetsById)
+            widget->setEnabled(false);
+    }
+
     // Disconnect all watches to not trigger handler chains.
     m_handlerChainConnections = {};
 

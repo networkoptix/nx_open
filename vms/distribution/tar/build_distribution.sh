@@ -311,7 +311,7 @@ copyMediaserverPlugins()
     if [ "$BOX" = "edge1" ]
     then
         # NOTE: Plugins from $BUILD_DIR/bin/plugins are not needed on edge1.
-        local -r PLUGIN="libcpro_ipnc_plugin.so.1.0.0"
+        local -r PLUGIN="libcpro_ipnc_plugin.so.1.0.1"
         echo "  Copying $PLUGIN"
         mkdir -p "$STAGE_MEDIASERVER_BIN/plugins"
         cp -r "$BUILD_DIR/lib/$PLUGIN" "$STAGE_MEDIASERVER_BIN/plugins/"

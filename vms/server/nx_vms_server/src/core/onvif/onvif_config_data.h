@@ -14,8 +14,11 @@ struct QnOnvifConfigData
     QVector<QString> videoEncoders;
     QVector<QString> audioEncoders;
     QVector<QString> profiles;
+    QVector<QString> ptzConfigurations;
+    QVector<QString> ptzProfiles;
 };
-#define QnOnvifConfigData_Fields (videoEncoders)(audioEncoders)(profiles)
+#define QnOnvifConfigData_Fields (videoEncoders)(audioEncoders)(profiles)\
+    (ptzConfigurations)(ptzProfiles)
 
 Q_DECLARE_METATYPE(QnOnvifConfigDataPtr)
 

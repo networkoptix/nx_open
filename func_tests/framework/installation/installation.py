@@ -125,10 +125,12 @@ class Installation(object):
 
         def parse(line):
             try:
-                key, value = line.split('=')
-                return key.strip(), int(value.strip())
+                key, value = line.split('=', 1)
             except ValueError:
                 return line.strip(), 1
+            else:
+                return key.strip(), int(value.strip())
+
         try:
             lines = path.read_text(encoding='ascii').splitlines()
         except DoesNotExist:

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/global_fun.hpp>
 #include <boost/multi_index/identity.hpp>
@@ -61,7 +63,7 @@ public:
     virtual void removeTemporaryPasswordsFromCacheByAccountEmail(
         std::string accountEmail) = 0;
 
-    virtual boost::optional<data::TemporaryAccountCredentialsEx> getCredentialsByLogin(
+    virtual std::optional<data::TemporaryAccountCredentialsEx> getCredentialsByLogin(
         const std::string& login) const = 0;
 
     virtual bool authorize(
@@ -119,7 +121,7 @@ public:
         const data::Credentials& credentials,
         const data::TemporaryAccountCredentials& tempPasswordData) override;
 
-    virtual boost::optional<data::TemporaryAccountCredentialsEx> getCredentialsByLogin(
+    virtual std::optional<data::TemporaryAccountCredentialsEx> getCredentialsByLogin(
         const std::string& login) const override;
 
     virtual bool authorize(
@@ -160,27 +162,25 @@ private:
 
     bool isTemporaryPasswordExpired(
         const data::TemporaryAccountCredentialsEx& temporaryCredentials) const;
+
     void removeTemporaryCredentialsFromDbDelayed(
         const data::TemporaryAccountCredentialsEx& temporaryCredentials);
 
     void deleteExpiredCredentials();
-    nx::sql::DBResult fillCache();
-    nx::sql::DBResult fetchTemporaryPasswords(nx::sql::QueryContext* queryContext);
+    void fillCache();
 
     nx::sql::DBResult insertTempPassword(
         nx::sql::QueryContext* const queryContext,
         data::TemporaryAccountCredentialsEx tempPasswordData);
+
     void saveTempPasswordToCache(data::TemporaryAccountCredentialsEx tempPasswordData);
 
-    nx::sql::DBResult deleteTempPassword(
-        nx::sql::QueryContext* const queryContext,
-        std::string tempPasswordID);
-
-    boost::optional<const data::TemporaryAccountCredentialsEx&> findMatchingCredentials(
+    const data::TemporaryAccountCredentialsEx* findMatchingCredentials(
         const QnMutexLockerBase& lk,
         const std::string& username,
         std::function<bool(const nx::Buffer&)> checkPasswordHash,
         api::ResultCode* authResultCode);
+
     void runExpirationRulesOnSuccessfulLogin(
         const QnMutexLockerBase& lk,
         const data::TemporaryAccountCredentialsEx& temporaryCredentials);

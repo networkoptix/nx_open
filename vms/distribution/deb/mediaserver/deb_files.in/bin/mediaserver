@@ -5,7 +5,7 @@ VMS_DIR=$(dirname $(dirname "${BASH_SOURCE[0]}"))
 EXE="$VMS_DIR/bin/mediaserver-bin"
 ARGS="-e"
 
-source $VMS_DIR/build_info.txt
+source "$VMS_DIR/build_info.txt"
 FULL_VERSION="$version-$changeSet-$customization"
 [ ! -z "$beta" ] && FULL_VERSION+="-beta"
 

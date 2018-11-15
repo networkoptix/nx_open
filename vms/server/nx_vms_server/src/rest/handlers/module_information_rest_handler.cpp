@@ -34,12 +34,29 @@ bool updateStreamMode(const P& p) { return p.contains(lit("updateStream")); }
 
 } // namespace
 
+QnModuleInformationRestHandler::QnModuleInformationRestHandler(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
+{
+    Qn::directConnect(commonModule, &QnCommonModule::moduleInformationChanged, this,
+        &QnModuleInformationRestHandler::changeModuleInformation);
+}
+
 QnModuleInformationRestHandler::~QnModuleInformationRestHandler()
 {
+    directDisconnectAll();
+
+    {
+        QnMutex m_mutex;
+        m_aboutToStop = true;
+    }
+
+    nx::network::aio::BasicPollable stopPollable(m_pollable.getAioThread());
+
     nx::utils::promise<void> stopPromise;
-    m_pollable.pleaseStop(
+    stopPollable.post(
         [this, &stopPromise]()
         {
+            m_pollable.pleaseStopSync();
             NX_DEBUG(this, lm("Close all %1 kept and %2 updated connections on destruction")
                 .args(m_socketsToKeepOpen.size(), m_socketsToUpdate.size()));
 
@@ -130,12 +147,6 @@ void QnModuleInformationRestHandler::afterExecute(
         return;
     }
 
-    if (!m_commonModule)
-        m_commonModule = request.owner->commonModule();
-
-    connect(m_commonModule, &QnCommonModule::moduleInformationChanged,
-        this, &QnModuleInformationRestHandler::changeModuleInformation, Qt::UniqueConnection);
-
     m_pollable.post(
         [this, socket = std::move(socket), updateStreamMode = updateStreamMode(request.params)]() mutable
         {
@@ -171,6 +182,10 @@ void QnModuleInformationRestHandler::afterExecute(
 
 void QnModuleInformationRestHandler::changeModuleInformation()
 {
+    QnMutexLocker lock(&m_mutex);
+    if (m_aboutToStop)
+        return;
+
     m_pollable.cancelPostedCalls(
         [this]()
         {
@@ -200,7 +215,7 @@ int QnModuleInformationRestHandler::executeGet(
 void QnModuleInformationRestHandler::updateModuleImformation()
 {
     QnJsonRestResult result;
-    result.setReply(m_commonModule->moduleInformation());
+    result.setReply(commonModule()->moduleInformation());
     m_moduleInformatiom = QJson::serialized(result);
 }
 

@@ -79,7 +79,17 @@
             "internalName": "VideoAnalytics.Intrusion", 
             "description": "Intrusion %1", 
             "positiveState": "has been detected"
-        }, 
+        },
+        {
+            "id": "nx.hanwha.ShockDetection",
+            "name": {
+                "value": "Shock detection",
+                "localization": {}
+            },
+            "internalName": "ShockDetection",
+            "description": "ShockDetection %1",
+            "positiveState": "has been detected"
+        },
         {
             "id": "nx.hanwha.AudioDetection", 
             "name": {

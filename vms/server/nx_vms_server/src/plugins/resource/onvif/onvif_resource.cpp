@@ -1672,6 +1672,16 @@ void QnPlOnvifResource::setPtzConfigurationToken(const QString &src)
 
 QString QnPlOnvifResource::getPtzProfileToken() const
 {
+    if (resourceData().contains("forcedOnvifParams"))
+    {
+        const auto channel = getChannel();
+        const auto forcedOnvifParams =
+            resourceData().value<QnOnvifConfigDataPtr>(QString("forcedOnvifParams"));
+
+        if (forcedOnvifParams->ptzProfiles.size() > channel)
+            return forcedOnvifParams->ptzProfiles.at(channel);
+    }
+
     QnMutexLocker lock(&m_mutex);
     return m_ptzProfileToken;
 }
@@ -1772,6 +1782,19 @@ bool QnPlOnvifResource::fetchPtzInfo()
     {
         // #TODO: log.
         return false;
+    }
+
+    if (resourceData().contains("forcedOnvifParams"))
+    {
+        const auto channel = getChannel();
+        const auto forcedOnvifParams =
+            resourceData().value<QnOnvifConfigDataPtr>(QString("forcedOnvifParams"));
+
+        if (forcedOnvifParams->ptzConfigurations.size() > channel)
+        {
+            m_ptzConfigurationToken = forcedOnvifParams->ptzConfigurations.at(channel);
+            return true;
+        }
     }
     _onvifPtz__GetConfigurations request;
     _onvifPtz__GetConfigurationsResponse response;

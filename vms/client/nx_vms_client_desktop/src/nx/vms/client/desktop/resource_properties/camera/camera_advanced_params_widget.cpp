@@ -451,21 +451,25 @@ void CameraAdvancedParamsWidget::at_advancedParam_saved(int status, const QnCame
 
     /* Update stored parameters. */
     bool needResync = false;
+    const auto parameters = m_advancedParamsReader->params(m_camera);
     for (const QnCameraAdvancedParamValue &value: params) {
-        m_loadedValues[value.id] = m_currentValues[value.id];
+        m_loadedValues[value.id] = value.value;
         m_currentValues.remove(value.id);
 
-        const auto parameters = m_advancedParamsReader->params(m_camera);
         if (parameters.getParameterById(value.id).resync)
             needResync = true;
     }
+
+    // Update values with new ones in the case of packet mode.
+    if (parameters.packet_mode)
+        m_advancedParamWidgetsManager->loadValues(params, /*packetMode*/ true);
 
     /* Update state. */
     setState(State::Init);
     emit hasChangesChanged();
 
-    /* Reload all values if one of parameters requires resync. */
-    if (needResync)
+    // Reload all values if one of parameters requires resync.
+    if (needResync && !parameters.packet_mode)
         loadValues();
 }
 
