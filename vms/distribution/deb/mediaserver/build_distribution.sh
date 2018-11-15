@@ -20,7 +20,14 @@ stripIfNeeded() # dir
         for FILE in $(find "$DIR" -type f)
         do
             echo "  Stripping $FILE"
-            strip "$FILE"
+            # `strip` does not print any errors to stderr, just returns a non-zero status.
+            local -i STRIP_STATUS=0
+            strip "$FILE" || STRIP_STATUS=$?
+            if [ $STRIP_STATUS != 0 ]
+            then
+                echo "\`strip\` failed (status $STRIP_STATUS) for $FILE" >&2
+                exit $STRIP_STATUS
+            fi
         done
     fi
 }
@@ -41,7 +48,7 @@ copyLibs()
             && "$LIB_BASENAME" != libEnginio.so* \
             && "$LIB_BASENAME" != libqgsttools_p.* \
             && "$LIB_BASENAME" != libtegra_video.* \
-            && "$LIB_BASENAME" != libnx_client* ]]
+            && "$LIB_BASENAME" != libnx_vms_client* ]]
         then
             echo "  Copying $LIB_BASENAME"
             cp -P "$LIB" "$STAGE_LIB/"

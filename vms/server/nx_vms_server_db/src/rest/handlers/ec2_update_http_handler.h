@@ -23,48 +23,6 @@
 
 namespace ec2 {
 
-namespace update_http_handler_detail {
-
-// TODO: Move to IdData. Then consider moving this and fillId() methods out of *Data.
-
-template<typename RequestData>
-inline void fixRequestDataIfNeeded(RequestData* const /*requestData*/)
-{
-}
-
-template<>
-inline void fixRequestDataIfNeeded<nx::vms::api::UserData>(nx::vms::api::UserData* const userData)
-{
-    if (userData->isCloud)
-    {
-        if (userData->name.isEmpty())
-            userData->name = userData->email;
-
-        if (userData->digest.isEmpty())
-            userData->digest = nx::vms::api::UserData::kCloudPasswordStub;
-    }
-}
-
-template<>
-inline void fixRequestDataIfNeeded<nx::vms::api::UserDataEx>(
-    nx::vms::api::UserDataEx* const userDataEx)
-{
-    if (!userDataEx->password.isEmpty())
-    {
-        const auto hashes = PasswordData::calculateHashes(userDataEx->name, userDataEx->password,
-            userDataEx->isLdap);
-
-        userDataEx->realm = hashes.realm;
-        userDataEx->hash = hashes.passwordHash;
-        userDataEx->digest = hashes.passwordDigest;
-        userDataEx->cryptSha512Hash = hashes.cryptSha512Hash;
-    }
-
-    fixRequestDataIfNeeded<nx::vms::api::UserData>(userDataEx);
-}
-
-} // namespace update_http_handler_detail
-
 /**
  * RestAPI request handler for update requests.
  */
@@ -120,7 +78,7 @@ public:
         if (!success)
             return httpStatusCode;
 
-        switch (processUpdateAsync(command, ProcessedRequestData(requestData), owner))
+        switch (processUpdateAsync(command, requestData, owner))
         {
             case ErrorCode::ok:
                 return nx::network::http::StatusCode::ok;
@@ -174,8 +132,6 @@ private:
                     lit("Unsupported Content Type: \"%1\".").arg(QString(requestContentType)));
                 return nx::network::http::StatusCode::unsupportedMediaType;
         }
-
-        update_http_handler_detail::fixRequestDataIfNeeded(requestData);
 
         return nx::network::http::StatusCode::ok;
     }

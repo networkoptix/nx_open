@@ -122,38 +122,6 @@ std::vector<std::pair<const quint8*, size_t>> decodeNalUnits(
     return nalUnits;
 }
 
-void extractSpsPps(const QnConstCompressedVideoDataPtr& videoData, QSize* const newResolution)
-{
-    SPSUnit sps;
-    if (extractSps(videoData, sps))
-    {
-
-    }
-    std::vector<std::pair<const quint8*, size_t>> nalUnits = decodeNalUnits(videoData);
-
-    //generating profile-level-id and sprop-parameter-sets as in rfc6184
-    for (const std::pair<const quint8*, size_t>& nalu : nalUnits)
-    {
-        switch (*nalu.first & 0x1f)
-        {
-            case nuSPS:
-                if (nalu.second < 4)
-                    continue;   //invalid sps
-
-                if (newResolution)
-                {
-                    //parsing sps to get resolution
-                    SPSUnit sps;
-                    sps.decodeBuffer(nalu.first, nalu.first + nalu.second);
-                    sps.deserialize();
-                    newResolution->setWidth(sps.getWidth());
-                    newResolution->setHeight(sps.getHeight());
-                }
-                return;
-        }
-    }
-}
-
 } // namespace h264
 
 } // namespace media_utils

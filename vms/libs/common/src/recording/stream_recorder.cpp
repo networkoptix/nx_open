@@ -852,7 +852,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                     if (m_dstVideoCodec == AV_CODEC_ID_NONE)
                     {
                         m_dstVideoCodec = findVideoEncoder(
-                            commonModule()->globalSettings()->defaultVideoCodec());
+                            commonModule()->globalSettings()->defaultExportVideoCodec());
                     }
 
                     m_videoTranscoder = new QnFfmpegVideoTranscoder(

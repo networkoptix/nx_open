@@ -107,7 +107,7 @@ public:
 
     static QString mediaPortKey();
 private:
-    static QAuthenticator getAuthInternal(const QString& encodedAuth);
+    static QAuthenticator getAuthInternal(const QString& value);
 
 private:
     //QAuthenticator m_auth;

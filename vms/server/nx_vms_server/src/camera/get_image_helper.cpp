@@ -23,7 +23,16 @@ static constexpr int kMaxGopLen = 100;
 
 static constexpr int kRoundFactor = 4;
 
-static const nx::utils::log::Tag kLogTag(lit("QnGetImageHelper"));
+static Qn::StreamIndex oppositeStreamIndex(Qn::StreamIndex streamIndex)
+{
+    switch (streamIndex)
+    {
+        case Qn::StreamIndex::primary: return Qn::StreamIndex::secondary;
+        case Qn::StreamIndex::secondary: return Qn::StreamIndex::primary;
+    }
+    NX_ASSERT(false, "Insupported StreamIndex %1", (int) streamIndex);
+    return Qn::StreamIndex::undefined; //< Fallback for the failed assertion.
+}
 
 QnCompressedVideoDataPtr getNextArchiveVideoPacket(
     QnAbstractArchiveDelegate* archiveDelegate, qint64 ceilTimeUs)
@@ -61,15 +70,17 @@ QnGetImageHelper::QnGetImageHelper(QnMediaServerModule* serverModule):
 {
 }
 
-QSize QnGetImageHelper::updateDstSize(
-    const QnVirtualCameraResourcePtr& camera,
+QSize updateDstSize(
+    const QnVirtualCameraResource* camera,
     const QSize& srcSize,
-    CLVideoDecoderOutputPtr outFrame,
-    nx::api::ImageRequest::AspectRatio aspectRatio) const
+    const CLVideoDecoderOutput& outFrame,
+    nx::api::ImageRequest::AspectRatio aspectRatio)
 {
     QSize dstSize(srcSize);
-    double sar = outFrame->sample_aspect_ratio;
-    double ar = sar * outFrame->width / outFrame->height;
+
+    const double sar = outFrame.sample_aspect_ratio;
+    const double ar = sar * outFrame.width / outFrame.height;
+    NX_ASSERT(ar > 0);
     if (!dstSize.isEmpty())
     {
         dstSize.setHeight(qPower2Ceil((unsigned)dstSize.height(), kRoundFactor));
@@ -78,7 +89,7 @@ QSize QnGetImageHelper::updateDstSize(
     else if (dstSize.height() > 0)
     {
         dstSize.setHeight(qPower2Ceil((unsigned)dstSize.height(), kRoundFactor));
-        dstSize.setWidth(qPower2Ceil((unsigned)(dstSize.height()*ar), kRoundFactor));
+        dstSize.setWidth(qPower2Ceil((unsigned)(dstSize.height() * ar), kRoundFactor));
     }
     else if (dstSize.width() > 0)
     {
@@ -87,29 +98,46 @@ QSize QnGetImageHelper::updateDstSize(
     }
     else
     {
-        dstSize = QSize(outFrame->width * sar, outFrame->height);
+        dstSize = QSize(outFrame.width * sar, outFrame.height);
     }
-    static constexpr int kMaxSize = nx::api::CameraImageRequest::kMaximumSize;
-    dstSize.setWidth(qMin(dstSize.width(), qMax(kMaxSize, outFrame->width) * sar));
-    dstSize.setHeight(qMin(dstSize.height(), qMax(kMaxSize, outFrame->height)));
 
+    // If auto was requested, then should use aspect ratio like it is used in GUI.
     if (aspectRatio == nx::api::ImageRequest::AspectRatio::auto_)
     {
-        const auto customAr = camera->customAspectRatio();
+        const auto customAr = camera->aspectRatio();
         if (customAr.isValid())
             dstSize.setWidth(dstSize.height() * customAr.toFloat());
     }
 
-    return QnCodecTranscoder::roundSize(dstSize);
+    // Scale the image to fit inside max size square.
+    static constexpr int kMaxSize = nx::api::CameraImageRequest::kMaximumSize;
+    if (dstSize.width() > kMaxSize || dstSize.height() > kMaxSize)
+        dstSize.scale(kMaxSize, kMaxSize, Qt::KeepAspectRatio);
+
+    // Scale the image to fit outside min size square.
+    static constexpr int kMinSize = nx::api::CameraImageRequest::kMinimumSize;
+    if (dstSize.height() < kMinSize && dstSize.height() > 0
+        || dstSize.width() < kMinSize && dstSize.width() > 0)
+        dstSize.scale(kMinSize, kMinSize, Qt::KeepAspectRatioByExpanding);
+
+    dstSize = QnCodecTranscoder::roundSize(dstSize);
+    NX_VERBOSE(typeid(QnGetImageHelper), "%1(): dstSize: %2", __func__, dstSize);
+    return dstSize;
 }
 
 CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
     const nx::api::CameraImageRequest& request,
-    bool usePrimaryStream,
+    Qn::StreamIndex streamIndex,
     QnAbstractArchiveDelegate* archiveDelegate,
     int preferredChannel,
     bool& isOpened) const
 {
+    if (!NX_ASSERT(streamIndex == Qn::StreamIndex::primary
+        || streamIndex == Qn::StreamIndex::secondary))
+    {
+        return nullptr;
+    }
+
     const auto& resource = request.camera;
     qint64 timestampUs = request.usecSinceEpoch;
 
@@ -144,7 +172,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
     {
         if (camera)
         {
-            video = camera->getLastVideoFrame(usePrimaryStream, preferredChannel);
+            video = camera->getLastVideoFrame(streamIndex, preferredChannel);
             if (video)
                 NX_VERBOSE(this, "%1(NOW): Got camera last frame", __func__);
             else
@@ -160,10 +188,11 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
         NX_VERBOSE(this, "%1(LATEST): Get latest data", __func__);
         if (camera)
         {
-            video = camera->getLastVideoFrame(usePrimaryStream, preferredChannel);
+            video = camera->getLastVideoFrame(streamIndex, preferredChannel);
             if (!video)
             {
-                video = camera->getLastVideoFrame(!usePrimaryStream, preferredChannel);
+                video = camera->getLastVideoFrame(
+                    oppositeStreamIndex(streamIndex), preferredChannel);
                 if (video)
                 {
                     NX_VERBOSE(this, "%1(LATEST): Got camera last frame for the alternate stream",
@@ -213,12 +242,12 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
         if (!video && camera)
         {
             return decodeFrameFromCaches(
-                camera, usePrimaryStream, timestampUs, preferredChannel, request.roundMethod);
+                camera, streamIndex, timestampUs, preferredChannel, request.roundMethod);
         }
     }
 
     if (!video)
-        return CLVideoDecoderOutputPtr();
+        return nullptr;
 
     QnFfmpegVideoDecoder decoder(
         DecoderConfig::fromResource(resource), video->compressionType, video, false);
@@ -255,113 +284,105 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
 
 CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromCaches(
     QnVideoCameraPtr camera,
-    bool usePrimaryStream,
+    Qn::StreamIndex streamIndex,
     qint64 timestampUs,
     int preferredChannel,
     nx::api::ImageRequest::RoundMethod roundMethod) const
 {
     const auto logPrefix = lm("%1(%2, %3 us, channel: %4, %5):").args(__func__,
-        usePrimaryStream ? "primary" : "secondary", timestampUs, preferredChannel, roundMethod);
+        streamIndex, timestampUs, preferredChannel, roundMethod);
 
     // Try GopKeeper.
     auto videoSequence = camera->getFrameSequenceByTime(
-        usePrimaryStream, timestampUs, preferredChannel, roundMethod);
+        streamIndex, timestampUs, preferredChannel, roundMethod);
     if (videoSequence)
     {
-        NX_VERBOSE(kLogTag) << logPrefix << "Got from GopKeeper";
+        NX_VERBOSE(this, "%1 Got from GopKeeper", logPrefix);
         return decodeFrameSequence(camera->resource(), videoSequence, timestampUs);
     }
 
     // Try liveCache.
-    if (auto frame = decodeFrameFromLiveCache(usePrimaryStream, timestampUs, camera))
+    if (auto frame = decodeFrameFromLiveCache(streamIndex, timestampUs, camera))
     {
-        NX_VERBOSE(kLogTag) << logPrefix << lm("Got from liveCache: %1 us").arg(frame->pkt_dts);
+        NX_VERBOSE(this, "%1 Got from liveCache: %2 us", logPrefix, frame->pkt_dts);
         return frame;
     }
 
-    NX_VERBOSE(kLogTag) << logPrefix << "Missing from GopKeeper for both streams and liveCache";
-    return CLVideoDecoderOutputPtr();
+    NX_VERBOSE(this, "%1 Missing from GopKeeper for both streams and liveCache", logPrefix);
+    return nullptr;
 }
 
 CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromLiveCache(
-    bool usePrimaryStream, qint64 timestampUs, QnVideoCameraPtr camera) const
+    Qn::StreamIndex streamIndex, qint64 timestampUs, QnVideoCameraPtr camera) const
 {
-    NX_VERBOSE(kLogTag) << lm("%1()").arg(__func__);
+    NX_VERBOSE(this, "%1()", __func__);
 
-    auto gopFrames = getLiveCacheGopTillTime(usePrimaryStream, timestampUs, camera);
+    auto gopFrames = getLiveCacheGopTillTime(streamIndex, timestampUs, camera);
     if (!gopFrames)
-        return CLVideoDecoderOutputPtr();
+        return nullptr;
 
     if (auto decodedFrame = decodeFrameSequence(camera->resource(), gopFrames, timestampUs))
         return decodedFrame;
 
-    NX_VERBOSE(kLogTag) << lm("%1(): WARNING: liveCache decoding failed");
-    return CLVideoDecoderOutputPtr();
+    NX_VERBOSE(this, "%1(): WARNING: liveCache decoding failed", __func__);
+    return nullptr;
 }
 
 CLVideoDecoderOutputPtr QnGetImageHelper::getImage(const nx::api::CameraImageRequest& request) const
 {
-    NX_VERBOSE(kLogTag) << lm("%1(%2 us, roundMethod: %3, size: %4) BEGIN")
-        .args(__func__, request.usecSinceEpoch, request.roundMethod, request.size);
+    NX_VERBOSE(this, "%1(%2 us, roundMethod: %3, size: %4) BEGIN",
+        __func__, request.usecSinceEpoch, request.roundMethod, request.size);
 
     if (!request.camera)
     {
-        NX_VERBOSE(kLogTag) << lm("%1() END -> null: No camera").args(__func__);
-        return CLVideoDecoderOutputPtr();
+        NX_VERBOSE(this, "%1() END -> null: No camera", __func__);
+        return nullptr;
     }
 
-    QSize dstSize(request.size);
-#ifdef EDGE_SERVER
-    if (dstSize.height() < 1)
-        dstSize.setHeight(360); //on edge instead of full-size image we return 360p
-#endif
-    static constexpr int kMinSize = nx::api::CameraImageRequest::kMinimumSize;
-    //if requested size is less than kMinSize in any dimension then upscaling to kMinSize
-    if (dstSize.height() < kMinSize && dstSize.height() > 0)
-    {
-        dstSize.setWidth(dstSize.width() * kMinSize / dstSize.height());
-        dstSize.setHeight(kMinSize);
-    }
-    if (dstSize.width() < kMinSize && dstSize.width() > 0)
-    {
-        dstSize.setWidth(kMinSize);
-        dstSize.setHeight(dstSize.height() * kMinSize / dstSize.width());
-    }
+    const auto secondaryResolution =
+        request.camera->streamInfo(Qn::StreamIndex::secondary).getResolution();
+    const Qn::StreamIndex streamIndex = (
+            (request.size.width() <= 0 && request.size.height() <= 0)
+            || request.size.width() > secondaryResolution.width()
+            || request.size.height() > secondaryResolution.height())
+        ? Qn::StreamIndex::primary
+        : Qn::StreamIndex::secondary;
 
-    const bool usePrimaryStream = !(
-        (dstSize.width() > 0 && dstSize.width() <= 480)
-        || (dstSize.height() > 0 && dstSize.height() <= 316));
-    if (dstSize != request.size)
-        NX_VERBOSE(kLogTag) << lm("%1(): dstSize: %2").args(__func__, dstSize);
+    #if defined(EDGE_SERVER)
+        // On edge, we always try to use the secondary stream first.
+        streamIndex = Qn::StreamIndex::secondary;
+    #endif
 
-    if (auto frame = getImageWithCertainQuality(usePrimaryStream, request))
+    if (auto frame = getImageWithCertainQuality(streamIndex, request))
     {
-        NX_VERBOSE(kLogTag) << lm("%1() END -> frame").arg(__func__);
+        NX_VERBOSE(this, "%1() END -> frame", __func__);
         return frame;
     }
 
     // Attempting alternate stream if could not find the frame.
-    if (auto frame = getImageWithCertainQuality(!usePrimaryStream, request))
+    if (auto frame = getImageWithCertainQuality(oppositeStreamIndex(streamIndex), request))
     {
-        NX_VERBOSE(kLogTag) << lm("%1() END -> frame from alternate stream").arg(__func__);
+        NX_VERBOSE(this, "%1() END -> frame from alternate stream", __func__);
         return frame;
     }
 
-    NX_VERBOSE(kLogTag) << lm("%1() END -> null").arg(__func__);
-    return CLVideoDecoderOutputPtr();
+    NX_VERBOSE(this, "%1() END -> null", __func__);
+    return nullptr;
 }
 
 /**
  * @return Sequence from an I-frame to the desired frame. Can be null but not empty.
  */
 std::unique_ptr<QnConstDataPacketQueue> QnGetImageHelper::getLiveCacheGopTillTime(
-    bool usePrimaryStream, qint64 timestampUs, QnVideoCameraPtr camera) const
+    Qn::StreamIndex streamIndex, qint64 timestampUs, QnVideoCameraPtr camera) const
 {
-    const MediaQuality stream = usePrimaryStream ? MEDIA_Quality_High : MEDIA_Quality_Low;
+    const MediaQuality stream = (streamIndex == Qn::StreamIndex::primary)
+        ? MEDIA_Quality_High
+        : MEDIA_Quality_Low;
     if (!camera->liveCache(stream))
     {
-        NX_VERBOSE(kLogTag) << lm("%1(): NOTE: liveCache not initialized for %2 stream")
-            .args(__func__, usePrimaryStream ? "primary" : "secondary");
+        NX_VERBOSE(this, "%1(): NOTE: liveCache not initialized for %2 stream",
+            __func__, streamIndex);
         return nullptr;
     }
 
@@ -373,12 +394,12 @@ std::unique_ptr<QnConstDataPacketQueue> QnGetImageHelper::getLiveCacheGopTillTim
     auto iFrame = std::dynamic_pointer_cast<const QnCompressedVideoData>(iFrameData);
     if (!iFrame)
     {
-        NX_VERBOSE(kLogTag) << lm("%1(): WARNING: Wrong liveCache I-frame data for %2 us: %3")
-            .args(__func__, iFrameTimestampUs, iFrameData);
+        NX_VERBOSE(this, "%1(): WARNING: Wrong liveCache I-frame data for %2 us: %3",
+            __func__, iFrameTimestampUs, iFrameData);
         return nullptr;
     }
 
-    NX_VERBOSE(kLogTag) << lm("%1(): I-frame found: %2 us").args(__func__, iFrameTimestampUs);
+    NX_VERBOSE(this, "%1(): I-frame found: %2 us", __func__, iFrameTimestampUs);
 
     auto frames = std::make_unique<QnConstDataPacketQueue>();
     frames->push(iFrame);
@@ -388,9 +409,8 @@ std::unique_ptr<QnConstDataPacketQueue> QnGetImageHelper::getLiveCacheGopTillTim
         // Add subsequent P-frames.
         quint64 frameTimestampUs = iFrameTimestampUs;
 
-        static const int kMaxPFrames = 1000;
         int i = 0;
-        for (i = 0; i < kMaxPFrames; ++i)
+        for (i = 0; i < kMaxGopLen; ++i)
         {
             quint64 pFrameTimestampUs;
             QnAbstractDataPacketPtr pFrameData = camera->liveCache(stream)->getNextPacket(
@@ -405,16 +425,16 @@ std::unique_ptr<QnConstDataPacketQueue> QnGetImageHelper::getLiveCacheGopTillTim
             auto pFrame = std::dynamic_pointer_cast<const QnCompressedVideoData>(pFrameData);
             if (!pFrame)
             {
-                NX_VERBOSE(kLogTag) << lm("%1(): WARNING: Wrong liveCache P-frame data for %2 us: %3")
-                    .args(__func__, pFrameTimestampUs, pFrameData);
+                NX_VERBOSE(this, "%1(): WARNING: Wrong liveCache P-frame data for %2 us: %3",
+                    __func__, pFrameTimestampUs, pFrameData);
                 continue;
             }
 
-            NX_VERBOSE(kLogTag) << lm("%1(): P-frame found: %2 us").args(__func__, pFrameTimestampUs);
+            NX_VERBOSE(this, "%1(): P-frame found: %2 us", __func__, pFrameTimestampUs);
             frames->push(pFrame);
         }
-        if (i >= kMaxPFrames)
-            NX_VERBOSE(kLogTag) << lm("%1(): WARNING: Too many P-frames: %2").args(__func__, i);
+        if (i >= kMaxGopLen)
+            NX_VERBOSE(this, "%1(): WARNING: Too many P-frames: %2", __func__, i);
     }
 
     return frames;
@@ -455,11 +475,9 @@ QByteArray QnGetImageHelper::encodeImage(const CLVideoDecoderOutputPtr& outFrame
     AVCodec* codec = avcodec_find_encoder_by_name(format == "jpg" || format == "jpeg" ? "mjpeg" : format.constData());
     if (avcodec_open2(videoEncoderCodecCtx, codec, NULL) < 0)
     {
-        NX_WARNING(kLogTag,
-            lm("Can't initialize ffmpeg encoder to encode image. codec=%1, pixel format=%2, size=%3x%4")
-            .arg(codecId)
-            .arg(pixelFormat)
-            .arg(outFrame->width).arg(outFrame->height));
+        NX_WARNING(this, "Can't initialize ffmpeg encoder to encode image. "
+            "codec=%1, pixel format=%2, size=%3x%4",
+            codecId, pixelFormat, outFrame->width, outFrame->height);
     }
     else
     {
@@ -475,12 +493,8 @@ QByteArray QnGetImageHelper::encodeImage(const CLVideoDecoderOutputPtr& outFrame
         }
         else
         {
-            NX_WARNING(kLogTag,
-                lm("Can't encode image. codec=%1, pixel format=%2, size=%3x%4, errCode=%5")
-                .arg(codecId)
-                .arg(pixelFormat)
-                .arg(outFrame->width).arg(outFrame->height)
-                .arg(encodeResult));
+            NX_WARNING(this, "Can't encode image. codec=%1, pixel format=%2, size=%3x%4, errCode=%5",
+                codecId, pixelFormat, outFrame->width, outFrame->height, encodeResult);
         }
 
         qFreeAligned(m_videoEncodingBuffer);
@@ -491,14 +505,12 @@ QByteArray QnGetImageHelper::encodeImage(const CLVideoDecoderOutputPtr& outFrame
 }
 
 CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
-    bool usePrimaryStream, const nx::api::CameraImageRequest& request) const
+    Qn::StreamIndex streamIndex, const nx::api::CameraImageRequest& request) const
 {
-    NX_VERBOSE(kLogTag) << lm("%1(%2, %3 us, roundMethod: %4) BEGIN").args(__func__,
-        usePrimaryStream ? "primary" : "secondary", request.usecSinceEpoch, request.roundMethod);
+    NX_VERBOSE(this, "%1(%2, %3 us, roundMethod: %4) BEGIN",
+        __func__, streamIndex, request.usecSinceEpoch, request.roundMethod);
 
     const auto camera = request.camera;
-
-    QSize dstSize = request.size;
 
     int rotation = request.rotation;
     if (rotation == nx::api::ImageRequest::kDefaultRotation)
@@ -512,7 +524,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
     archiveDelegate->setPlaybackMode(PlaybackMode::ThumbNails);
     bool isOpened = false;
 
-    if (!usePrimaryStream)
+    if (streamIndex == Qn::StreamIndex::secondary)
         archiveDelegate->setQuality(MEDIA_Quality_Low, true, QSize());
 
     QList<QnAbstractImageFilterPtr> filterChain;
@@ -523,29 +535,20 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
     for (int i = 0; i < layout->channelCount(); ++i)
     {
         CLVideoDecoderOutputPtr frame = readFrame(
-            request, usePrimaryStream, archiveDelegate.get(), i, isOpened);
+            request, streamIndex, archiveDelegate.get(), i, isOpened);
         if (!frame)
         {
             gotNullFrame = true;
-            if (i == 0)
-            {
-                NX_VERBOSE(kLogTag) << lm("%1() END -> null: frame not found").args(__func__);
-                return CLVideoDecoderOutputPtr();
-            }
-            else
-            {
+            if (i != 0)
                 continue;
-            }
+            NX_VERBOSE(this, "%1() END -> null: frame not found", __func__);
+            return nullptr;
         }
         channelMask &= ~(1 << frame->channel);
         if (i == 0)
         {
-            dstSize = updateDstSize(camera, dstSize, frame, request.aspectRatio);
-            if (dstSize.width() <= 16 || dstSize.height() <= 8)
-            {
-                NX_VERBOSE(kLogTag) << lm("%1() END -> null: frame too small").args(__func__);
-                return CLVideoDecoderOutputPtr();
-            }
+            const QSize dstSize = updateDstSize(camera.get(),
+                request.size, *frame, request.aspectRatio);
             filterChain << QnAbstractImageFilterPtr(new QnScaleImageFilter(dstSize));
             filterChain << QnAbstractImageFilterPtr(new QnTiledImageFilter(layout));
             filterChain << QnAbstractImageFilterPtr(new QnRotateImageFilter(rotation));
@@ -565,7 +568,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
         for (int i = 0; i < 10; ++i)
         {
             CLVideoDecoderOutputPtr frame = readFrame(
-                request, usePrimaryStream, archiveDelegate.get(), 0, isOpened);
+                request, streamIndex, archiveDelegate.get(), 0, isOpened);
             if (frame)
             {
                 channelMask &= ~(1 << frame->channel);
@@ -579,7 +582,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
             }
         }
     }
-    NX_VERBOSE(kLogTag) << lm("%1() END -> frame").args(__func__);
+    NX_VERBOSE(this, "%1() END -> frame %2", __func__, outFrame->size());
     return outFrame;
 }
 
@@ -588,14 +591,14 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameSequence(
     std::unique_ptr<QnConstDataPacketQueue>& sequence, quint64 timestampUs) const
 {
     if (!sequence || sequence->isEmpty())
-        return CLVideoDecoderOutputPtr();
+        return nullptr;
 
     bool gotFrame = false;
     auto randomAccess = sequence->lock();
     auto firstFrame = std::dynamic_pointer_cast<const QnCompressedVideoData>(randomAccess.at(0));
 
     if (!firstFrame)
-        return CLVideoDecoderOutputPtr();
+        return nullptr;
 
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     QnFfmpegVideoDecoder decoder(
@@ -606,20 +609,18 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameSequence(
         auto frame = std::dynamic_pointer_cast<const QnCompressedVideoData>(randomAccess.at(i));
         gotFrame = decoder.decode(frame, &outFrame);
 
-        NX_VERBOSE(kLogTag) << lm("%1(): Decoded: gotFrame: %2, frame->timestamp: %3, timestampUs: %4")
-            .args(__func__, gotFrame ? "true" : "false", frame->timestamp, timestampUs);
+        NX_VERBOSE(this, "%1(): Decoded: gotFrame: %2, frame->timestamp: %3, timestampUs: %4",
+            __func__, gotFrame, frame->timestamp, timestampUs);
         if (frame->timestamp >= (qint64) timestampUs)
             break;
     }
     while (decoder.decode(QnConstCompressedVideoDataPtr(), &outFrame))
     {
-        NX_VERBOSE(kLogTag) << lm("%1(): Flushed: outFrame->pkt_dts: %2")
-            .args(__func__, outFrame->pkt_dts);
-
+        NX_VERBOSE(this, "%1(): Flushed: outFrame->pkt_dts: %2", __func__, outFrame->pkt_dts);
         gotFrame = true; //< flush decoder buffer
     }
     if (gotFrame)
         outFrame->channel = firstFrame->channelNumber;
 
-    return gotFrame ? outFrame : CLVideoDecoderOutputPtr();
+    return gotFrame ? outFrame : nullptr;
 }

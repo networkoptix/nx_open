@@ -99,7 +99,7 @@ public:
     void copyLastGopFromCamera(const QnVideoCameraPtr& camera)
     {
         camera->copyLastGop(
-            /*primaryLiveStream*/ true,
+            Qn::StreamIndex::primary,
             /*skipTime*/ 0,
             m_dataQueue,
             /*iFramesOnly*/ false);

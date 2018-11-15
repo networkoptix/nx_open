@@ -14,7 +14,7 @@ struct QnLicenseServer
 {
     static const nx::utils::Url kIndexUrl;
     static const nx::utils::Url kActivateUrl;
-    static const nx::utils::Url kDiactivateUrl;
+    static const nx::utils::Url kDeactivateUrl;
     static const nx::utils::Url kValidateUrl;
 };
 

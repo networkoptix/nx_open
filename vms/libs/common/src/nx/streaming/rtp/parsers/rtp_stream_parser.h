@@ -35,17 +35,12 @@ public:
         int bytesRead,
         bool& gotData) = 0;
 
-    int logicalChannelNum() const;
-    void setLogicalChannelNum(int value);
     int getFrequency() { return m_frequency; };
 
 signals:
     void packetLostDetected(quint32 prev, quint32 next);
 protected:
     void setFrequency(int frequency) { m_frequency = frequency; }
-
-protected:
-    int m_logicalChannelNum = 0;
 
 private:
     int m_frequency = 0;

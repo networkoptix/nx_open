@@ -19,6 +19,7 @@
 #include "common.h"
 #include "attributes_parser.h"
 #include "string_helper.h"
+#include <nx/utils/log/log_main.h>
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -83,6 +84,15 @@ Engine::Engine(CommonPlugin* plugin): m_plugin(plugin)
     QFile f(":/hanwha/manifest.json");
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
+    {
+        QFile file("plugins/hanwha/manifest.json");
+        if (file.open(QFile::ReadOnly))
+        {
+            NX_INFO(this,
+                lm("Switch to external manifest file %1").arg(QFileInfo(file).absoluteFilePath()));
+            m_manifest = file.readAll();
+        }
+    }
     m_engineManifest = QJson::deserialized<Hanwha::EngineManifest>(m_manifest);
 }
 
@@ -175,10 +185,13 @@ boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
     if (!eventStatuses || !eventStatuses->isSuccessful())
         return boost::none;
 
-    return eventTypeIdsFromParameters(cgiParameters, eventStatuses.value, deviceInfo.channel);
+    return eventTypeIdsFromParameters(
+        sharedRes->sharedContext->url(),
+        cgiParameters, eventStatuses.value, deviceInfo.channel);
 }
 
 boost::optional<QList<QString>> Engine::eventTypeIdsFromParameters(
+    const nx::utils::Url& url,
     const nx::mediaserver_core::plugins::HanwhaCgiParameters& parameters,
     const nx::mediaserver_core::plugins::HanwhaResponse& eventStatuses,
     int channel) const
@@ -195,6 +208,7 @@ boost::optional<QList<QString>> Engine::eventTypeIdsFromParameters(
     QSet<QString> result;
 
     const auto& supportedEvents = supportedEventsParameter->possibleValues();
+    NX_VERBOSE(this, lm("camera %1 report supported analytics events %2").arg(url).arg(supportedEvents));
     for (const auto& eventName: supportedEvents)
     {
         auto eventTypeId = m_engineManifest.eventTypeIdByName(eventName);

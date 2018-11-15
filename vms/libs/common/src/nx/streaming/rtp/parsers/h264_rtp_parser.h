@@ -8,7 +8,6 @@
 #include <nx/streaming/video_data_packet.h>
 #include <nx/streaming/rtp/parsers/rtp_stream_parser.h>
 #include <utils/media/nalUnits.h>
-#include <nx/streaming/rtsp_client.h>
 
 namespace nx::streaming::rtp {
 

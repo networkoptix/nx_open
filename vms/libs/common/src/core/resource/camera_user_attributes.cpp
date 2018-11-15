@@ -24,5 +24,7 @@ void QnCameraUserAttributes::assign(
         *modifiedFields << "backupQualitiesChanged";
     if (logicalId != right.logicalId)
         *modifiedFields << "logicalIdChanged";
+    if (audioEnabled != right.audioEnabled)
+        *modifiedFields << "audioEnabledChanged";
     *this = right;
 }

@@ -185,7 +185,7 @@ private:
 
     nx::utils::log::Settings makeLogSettings(const nx::mediaserver::Settings& settings);
 
-    void initializeLogging();
+    void initializeLogging(MSSettings* serverSettings);
     void initializeHardwareId();
     QString hardwareIdAsGuid() const;
     void updateGuidIfNeeded();

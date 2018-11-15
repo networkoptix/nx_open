@@ -21,18 +21,20 @@ public:
         bool ensureInitialized = true) override;
 
     virtual int copyLastGop(
-        bool primaryLiveStream,
+        Qn::StreamIndex streamIndex,
         qint64 skipTime,
         QnDataPacketQueue& dstQueue,
         bool iFramesOnly) override;
 
     virtual QnConstCompressedVideoDataPtr getLastVideoFrame(
-        bool primaryLiveStream,
+        Qn::StreamIndex streamIndex,
         int channel) const override;
-    virtual QnConstCompressedAudioDataPtr getLastAudioFrame(bool primaryLiveStream) const override;
+
+    virtual QnConstCompressedAudioDataPtr getLastAudioFrame(
+        Qn::StreamIndex streamIndex) const override;
 
     virtual std::unique_ptr<QnConstDataPacketQueue> getFrameSequenceByTime(
-        bool primaryLiveStream,
+        Qn::StreamIndex streamIndex,
         qint64 time,
         int channel,
         nx::api::ImageRequest::RoundMethod roundMethod) const override;

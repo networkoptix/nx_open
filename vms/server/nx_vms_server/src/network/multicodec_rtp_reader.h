@@ -123,6 +123,7 @@ private:
         nx::streaming::Sdp::MediaType mediaType;
         std::optional<std::chrono::microseconds> onvifExtensionTimestamp;
         int rtcpChannelNumber = 0;
+        int logicalChannelNum = 0;
     };
 
     void updateTimePolicy();
