@@ -1,10 +1,4 @@
-/**********************************************************
-* 12 sep 2013
-* akolesnikov
-***********************************************************/
-
-#ifndef ILP_MOTION_DATA_PICTURE_H
-#define ILP_MOTION_DATA_PICTURE_H
+#pragma once
 
 #include <stdint.h>
 
@@ -12,6 +6,7 @@
 
 #include <plugins/plugin_tools.h>
 
+namespace nx::vms_server_plugins::mjpeg_link {
 
 class MotionDataPicture
 :
@@ -58,4 +53,4 @@ private:
     size_t m_stride;
 };
 
-#endif  //ILP_MOTION_DATA_PICTURE_H
+} // namespace nx::vms_server_plugins::mjpeg_link

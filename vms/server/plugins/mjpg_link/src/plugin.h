@@ -1,10 +1,4 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov
-***********************************************************/
-
-#ifndef IMAGE_LIBRARY_PLUGIN_H
-#define IMAGE_LIBRARY_PLUGIN_H
+#pragma once
 
 #include <plugins/plugin_tools.h>
 
@@ -16,6 +10,8 @@
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
+
+namespace nx::vms_server_plugins::mjpeg_link {
 
 class DiscoveryManager;
 
@@ -67,4 +63,4 @@ private:
     std::map<nx::utils::Url, nx::utils::ElapsedTimer> m_streamStateCache;
 };
 
-#endif  //IMAGE_LIBRARY_PLUGIN_H
+} // namespace nx::vms_server_plugins::mjpeg_link

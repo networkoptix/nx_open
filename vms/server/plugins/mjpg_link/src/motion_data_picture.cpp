@@ -1,8 +1,3 @@
-/**********************************************************
-* 12 sep 2013
-* akolesnikov
-***********************************************************/
-
 #include "motion_data_picture.h"
 
 #include <climits>
@@ -10,6 +5,7 @@
 
 #include <nx/kit/utils.h>
 
+namespace nx::vms_server_plugins::mjpeg_link {
 
 MotionDataPicture::MotionDataPicture()
 :
@@ -129,3 +125,5 @@ void MotionDataPicture::fillRect( int left, int top, int width, int height, int 
             setPixel( x, y, val );
     }
 }
+
+} // namespace nx::vms_server_plugins::mjpeg_link

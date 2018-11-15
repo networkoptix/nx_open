@@ -1,10 +1,4 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov
-***********************************************************/
-
-#ifndef ILP_DISCOVERY_MANAGER_H
-#define ILP_DISCOVERY_MANAGER_H
+#pragma once
 
 #include <vector>
 
@@ -21,6 +15,8 @@ struct UrlPathReplaceRecord
     QString fromPath;
     QString toPath;
 };
+
+namespace nx::vms_server_plugins::mjpeg_link {
 
 //!Represents defined (in settings) image directories as cameras with dts archive storage
 class DiscoveryManager: public nxcip::CameraDiscoveryManager2
@@ -75,4 +71,4 @@ private:
     std::vector<UrlPathReplaceRecord> m_replaceData;
 };
 
-#endif  //ILP_DISCOVERY_MANAGER_H
+} // namespace nx::vms_server_plugins::mjpeg_link

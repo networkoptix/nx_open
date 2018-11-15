@@ -1,14 +1,10 @@
-/**********************************************************
-* 16 sep 2013
-* akolesnikov
-***********************************************************/
-
 #include "ilp_empty_packet.h"
 
 #include <algorithm>
 #include <cstring>
 #include <cstdlib>
 
+namespace nx::vms_server_plugins::mjpeg_link {
 
 ILPEmptyPacket::ILPEmptyPacket(
     int channelNumber,
@@ -107,3 +103,5 @@ nxcip::Picture* ILPEmptyPacket::getMotionData() const
 {
     return 0;
 }
+
+} // namespace nx::vms_server_plugins::mjpeg_link

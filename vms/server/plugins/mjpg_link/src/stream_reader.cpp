@@ -1,8 +1,3 @@
-/**********************************************************
-* 04 sep 2013
-* akolesnikov@networkoptix.com
-***********************************************************/
-
 #include "stream_reader.h"
 
 #ifdef _WIN32
@@ -40,6 +35,8 @@ static const nxcip::UsecUTCTimestamp USEC_IN_MS = 1000;
 static const nxcip::UsecUTCTimestamp USEC_IN_SEC = 1000*1000;
 static const nxcip::UsecUTCTimestamp NSEC_IN_USEC = 1000;
 static const int MAX_FRAME_SIZE = 4*1024*1024;
+
+namespace nx::vms_server_plugins::mjpeg_link {
 
 StreamReader::StreamReader(
     nxpt::CommonRefManager* const parentRefManager,
@@ -152,7 +149,7 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
         }
         else
         {
-            NX_DEBUG(this, QString::fromLatin1("Unsupported Content-Type %1").arg(QLatin1String(localHttpClientPtr->contentType())));
+            NX_DEBUG(this, "Unsupported Content-Type %1", localHttpClientPtr->contentType());
             return nxcip::NX_UNSUPPORTED_CODEC;
         }
     }
@@ -164,10 +161,17 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
             if(!httpClientHasBeenJustCreated)
             {
                 if(!waitForNextFrameTime())
+                {
+                    NX_DEBUG(this, "Interrupted");
                     return nxcip::NX_INTERRUPTED;
+                }
+
                 const int result = doRequest(localHttpClientPtr.get());
                 if(result != nxcip::NX_NO_ERROR)
+                {
+                    NX_DEBUG(this, "Error %1", result);
                     return result;
+                }
             }
 
             nx::network::http::BufferType msgBody;
@@ -178,12 +182,14 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
                     QnMutexLocker lk(&m_mutex);
                     if(m_terminated)
                     {
+                        NX_DEBUG(this, "Terminated");
                         m_terminated = false;
                         return nxcip::NX_INTERRUPTED;
                     }
                 }
                 if(localHttpClientPtr->eof())
                 {
+                    NX_DEBUG(this, "End of stream");
                     gotJpegFrame(msgBody.isEmpty() ? msgBodyBuf : (msgBody + msgBodyBuf));
                     localHttpClientPtr.reset();
                     break;
@@ -205,6 +211,7 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
                     QnMutexLocker lk(&m_mutex);
                     if(m_terminated)
                     {
+                        NX_DEBUG(this, "Terminated");
                         m_terminated = false;
                         return nxcip::NX_INTERRUPTED;
                     }
@@ -221,10 +228,12 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
         *lpPacket = m_videoPacket.release();
         nxpt::ScopedRef<HttpLinkPlugin> plugin(HttpLinkPlugin::instance());
         if (!plugin)
+        {
+            NX_DEBUG(this, "No plugin");
             return nxcip::NX_OTHER_ERROR;
+        }
 
         plugin->setStreamState(m_url, /*isStreamRunning*/ true);
-
         return nxcip::NX_NO_ERROR;
     }
 
@@ -235,6 +244,7 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
         m_httpClient.reset();
     }
 
+    NX_DEBUG(this, "Stream has ended");
     return nxcip::NX_NETWORK_ERROR;
 }
 
@@ -273,27 +283,31 @@ void StreamReader::updateMediaUrl(const QString& url)
     m_url = url;
 }
 
+QString StreamReader::idForToStringFromPtr() const
+{
+    return m_url;
+}
+
 int StreamReader::doRequest( nx::network::http::HttpClient* const httpClient )
 {
     httpClient->setUserName(m_login);
     httpClient->setUserPassword(m_password);
     if (!httpClient->doGet(nx::utils::Url(m_url)) || !httpClient->response())
     {
-        NX_DEBUG(this, QString::fromLatin1("Failed to request %1").arg(m_url));
+        NX_DEBUG(this, "Failed to request stream");
         return nxcip::NX_NETWORK_ERROR;
     }
     if(httpClient->response()->statusLine.statusCode == nx::network::http::StatusCode::unauthorized)
     {
-        NX_DEBUG(this, QString::fromLatin1("Failed to request %1: %2").arg(m_url).
-            arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)));
+        NX_DEBUG(this, "Failed to request stream: %1", httpClient->response()->statusLine.reasonPhrase);
         return nxcip::NX_NOT_AUTHORIZED;
     }
     if(httpClient->response()->statusLine.statusCode / 100 * 100 != nx::network::http::StatusCode::ok)
     {
-        NX_DEBUG(this, QString::fromLatin1("Failed to request %1: %2").arg(m_url).
-            arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)));
+        NX_DEBUG(this, "Failed to request stream: %1", httpClient->response()->statusLine.reasonPhrase);
         return nxcip::NX_NETWORK_ERROR;
     }
+    NX_DEBUG(this, "Stream is opened successfuly");
     return nxcip::NX_NO_ERROR;
 }
 
@@ -341,3 +355,5 @@ bool StreamReader::waitForNextFrameTime()
     m_prevFrameClock = m_timeProvider->millisSinceEpoch();
     return true;
 }
+
+} // namespace nx::vms_server_plugins::mjpeg_link

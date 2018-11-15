@@ -1,21 +1,18 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov
-***********************************************************/
-
 #include "plugin.h"
 
 #include <chrono>
 
 #include "discovery_manager.h"
 
+#include <nx/utils/log/log.h>
+
 using namespace std::chrono;
 using namespace std::literals::chrono_literals;
 
 namespace {
 
-static const milliseconds kStreamStateExpirationPeriod = 5000ms;
-static const minutes kStreamStateCacheCleanupPeriod = 5min;
+static const milliseconds kStreamStateExpirationPeriod = 5s;
+static const milliseconds kStreamStateCacheCleanupPeriod = 5min;
 
 } // namespace
 
@@ -26,9 +23,11 @@ extern "C"
 #endif
         nxpl::PluginInterface* createNXPluginInstance()
     {
-        return new HttpLinkPlugin();
+        return new nx::vms_server_plugins::mjpeg_link::HttpLinkPlugin();
     }
 }
+
+namespace nx::vms_server_plugins::mjpeg_link {
 
 static HttpLinkPlugin* httpLinkPluginInstance = NULL;
 
@@ -115,6 +114,8 @@ HttpLinkPlugin* HttpLinkPlugin::instance()
 
 void HttpLinkPlugin::setStreamState(const nx::utils::Url& url, bool isStreamRunning)
 {
+    NX_VERBOSE(this, "%1 set stream state = %2", url, isStreamRunning);
+
     QnMutexLocker lock(&m_mutex);
     if (!m_streamStateCacheCleanupTimer.isValid()
         || m_streamStateCacheCleanupTimer.hasExpired(kStreamStateCacheCleanupPeriod))
@@ -138,7 +139,9 @@ bool HttpLinkPlugin::isStreamRunning(const nx::utils::Url& url) const
         return false;
 
     const auto& timer = itr->second;
-    return timer.isValid() && !timer.hasExpired(kStreamStateExpirationPeriod);
+    const auto isRunning = timer.isValid() && !timer.hasExpired(kStreamStateExpirationPeriod);
+    NX_DEBUG(this, "%1 got stream state = %2", url, isRunning);
+    return isRunning;
 }
 
 void HttpLinkPlugin::cleanStreamCacheUp()
@@ -148,6 +151,7 @@ void HttpLinkPlugin::cleanStreamCacheUp()
         auto& timer = itr->second;
         if (!timer.isValid() || timer.hasExpired(kStreamStateExpirationPeriod))
         {
+            NX_VERBOSE(this, "%1 state is expired", itr->first);
             itr = m_streamStateCache.erase(itr);
         }
         else
@@ -157,3 +161,5 @@ void HttpLinkPlugin::cleanStreamCacheUp()
     }
     m_streamStateCacheCleanupTimer.restart();
 }
+
+} // namespace nx::vms_server_plugins::mjpeg_link

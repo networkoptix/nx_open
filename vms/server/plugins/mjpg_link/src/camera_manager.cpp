@@ -1,14 +1,10 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov
-***********************************************************/
-
 #include "camera_manager.h"
 
 #include <cstring>
 
 #include "media_encoder.h"
 
+namespace nx::vms_server_plugins::mjpeg_link {
 
 CameraManager::CameraManager(const nxcip::CameraInfo& info,
                              nxpl::TimeProvider *const timeProvider)
@@ -162,3 +158,5 @@ nxpt::CommonRefManager* CameraManager::refManager()
 {
     return &m_refManager;
 }
+
+} // namespace nx::vms_server_plugins::mjpeg_link

@@ -1,10 +1,4 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov@networkoptix.com
-***********************************************************/
-
-#ifndef ILP_MEDIA_ENCODER_H
-#define ILP_MEDIA_ENCODER_H
+#pragma once
 
 #include <memory>
 
@@ -15,6 +9,7 @@
 
 #include "stream_reader.h"
 
+namespace nx::vms_server_plugins::mjpeg_link {
 
 class CameraManager;
 
@@ -79,4 +74,4 @@ private:
     QString m_mediaUrl;
 };
 
-#endif  //ILP_MEDIA_ENCODER_H
+} // namespace nx::vms_server_plugins::mjpeg_link

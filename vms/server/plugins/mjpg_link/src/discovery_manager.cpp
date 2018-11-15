@@ -1,8 +1,3 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov
-***********************************************************/
-
 #include "discovery_manager.h"
 
 #include <sys/types.h>
@@ -30,6 +25,8 @@
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((UrlPathReplaceRecord), (json))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((UrlPathReplaceRecord), (json), _Fields)
+
+namespace nx::vms_server_plugins::mjpeg_link {
 
 DiscoveryManager::DiscoveryManager(nxpt::CommonRefManager* const refManager,
                                    nxpl::TimeProvider *const timeProvider)
@@ -113,16 +110,21 @@ bool DiscoveryManager::validateUrl(const nx::utils::Url& url)
 
     nx::network::http::HttpClient httpClient;
     if (!httpClient.doGet(url))
+    {
+        NX_DEBUG(typeid(DiscoveryManager), "Request %1 has failed", url);
         return false;
+    }
 
     //checking content-type
     nx::network::http::MultipartContentParser multipartContentParser;
     if (nx::network::http::strcasecmp(httpClient.contentType(), "image/jpeg") != 0 && //not a motion jpeg
         !multipartContentParser.setContentType(httpClient.contentType()))  //not a single jpeg
     {
-        //inappropriate content-type
+        NX_DEBUG(typeid(DiscoveryManager), "Response %1 has wrong content type", url);
         return false;
     }
+
+    NX_DEBUG(typeid(DiscoveryManager), "Url %1 is successfuly verified", url);
     return true;
 }
 
@@ -247,3 +249,5 @@ int DiscoveryManager::getReservedModelList( char** /*modelList*/, int* count )
     *count = 0;
     return nxcip::NX_NO_ERROR;
 }
+
+} // namespace nx::vms_server_plugins::mjpeg_link

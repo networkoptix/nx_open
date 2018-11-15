@@ -1,16 +1,12 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov
-***********************************************************/
-
 #include "media_encoder.h"
 
 #include "camera_manager.h"
 #include "stream_reader.h"
 
-
 static const double MIN_FPS = 1.0 / 86400.0; //once per day
 static const double MAX_FPS = 30;
+
+namespace nx::vms_server_plugins::mjpeg_link {
 
 MediaEncoder::MediaEncoder(CameraManager* const cameraManager,
                            nxpl::TimeProvider *const timeProvider,
@@ -193,3 +189,5 @@ int MediaEncoder::getVideoFormat(
 {
     return nxcip::NX_NO_ERROR;
 }
+
+} // namespace nx::vms_server_plugins::mjpeg_link

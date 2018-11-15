@@ -1,10 +1,4 @@
-/**********************************************************
-* 04 sep 2013
-* akolesnikov@networkoptix.com
-***********************************************************/
-
-#ifndef ILP_STREAM_READER_H
-#define ILP_STREAM_READER_H
+#pragma once
 
 #include <atomic>
 #include <memory>
@@ -23,6 +17,7 @@
 
 #include "ilp_video_packet.h"
 
+namespace nx::vms_server_plugins::mjpeg_link {
 
 //!Reads picture files from specified directory as video-stream
 class StreamReader
@@ -54,6 +49,8 @@ public:
     void setFps( float fps );
     void updateCredentials(const QString& login, const QString& password);
     void updateMediaUrl(const QString& url);
+
+    QString idForToStringFromPtr() const;
 
 private:
     enum StreamType
@@ -91,4 +88,4 @@ private:
     bool waitForNextFrameTime();
 };
 
-#endif  //ILP_STREAM_READER_H
+} // namespace nx::vms_server_plugins::mjpeg_link

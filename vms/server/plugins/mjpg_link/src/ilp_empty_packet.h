@@ -1,15 +1,10 @@
-/**********************************************************
-* 16 sep 2013
-* akolesnikov
-***********************************************************/
-
-#ifndef ELP_EMPTY_PACKET_H
-#define ELP_EMPTY_PACKET_H
+#pragma once
 
 #include <camera/camera_plugin.h>
 
 #include <plugins/plugin_tools.h>
 
+namespace nx::vms_server_plugins::mjpeg_link {
 
 class ILPEmptyPacket
 :
@@ -58,4 +53,4 @@ private:
     unsigned int m_cSeq;
 };
 
-#endif  //ELP_EMPTY_PACKET_H
+} // namespace nx::vms_server_plugins::mjpeg_link

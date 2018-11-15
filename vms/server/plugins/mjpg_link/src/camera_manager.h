@@ -1,10 +1,4 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov
-***********************************************************/
-
-#ifndef ILP_CAMERA_MANAGER_H
-#define ILP_CAMERA_MANAGER_H
+#pragma once
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
@@ -12,6 +6,7 @@
 #include <plugins/plugin_tools.h>
 #include "plugin.h"
 
+namespace nx::vms_server_plugins::mjpeg_link {
 
 class MediaEncoder;
 
@@ -75,4 +70,4 @@ private:
     std::unique_ptr<MediaEncoder> m_encoder[kEncoderCount];
 };
 
-#endif  //ILP_CAMERA_MANAGER_H
+} // namespace nx::vms_server_plugins::mjpeg_link

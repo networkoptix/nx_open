@@ -1,8 +1,3 @@
-/**********************************************************
-* 05 sep 2013
-* akolesnikov
-***********************************************************/
-
 #include "ilp_video_packet.h"
 
 #include <algorithm>
@@ -13,6 +8,8 @@
 #include <utils/memory/cyclic_allocator.h>
 
 #include <nx/kit/utils.h>
+
+namespace nx::vms_server_plugins::mjpeg_link {
 
 ILPVideoPacket::ILPVideoPacket(
     CyclicAllocator* const allocator,
@@ -160,3 +157,5 @@ void* ILPVideoPacket::data()
 {
     return m_buffer;
 }
+
+} // namespace nx::vms_server_plugins::mjpeg_link
