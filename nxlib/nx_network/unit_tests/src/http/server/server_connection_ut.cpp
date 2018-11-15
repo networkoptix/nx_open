@@ -163,7 +163,9 @@ protected:
         int msgCounter = count;
         while (msgCounter > 0)
         {
-            readMoreData();
+            if (m_dataSize == 0)
+                readMoreData();
+
             parseDataRead();
 
             if (m_httpMsgReader.state() == nx::network::http::HttpStreamReader::messageDone)
