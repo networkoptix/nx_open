@@ -504,7 +504,8 @@
             "option": true,
             "public": true,
             "meta": {
-              "size": 1073741824
+              "size": 1073741824,
+              "format": "png"
             }
           },
           {
@@ -516,7 +517,8 @@
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824
+              "size": 1073741824,
+              "format": "png"
             }
           },
           {
@@ -528,7 +530,8 @@
             "optional": true,
             "public": true,
             "meta": {
-              "size": 1073741824
+              "size": 1073741824,
+              "format": "png"
             }
           },
           {
@@ -564,7 +567,8 @@
             "option": true,
             "public": true,
             "meta": {
-              "size": 1073741824
+              "size": 1073741824,
+              "format": "png"
             }
           },
           {
@@ -576,7 +580,8 @@
             "option": true,
             "public": true,
             "meta": {
-              "size": 1073741824
+              "size": 1073741824,
+              "format": "png"
             }
           },
           {
@@ -588,7 +593,8 @@
             "option": true,
             "public": true,
             "meta": {
-              "size": 1073741824
+              "size": 1073741824,
+              "format": "png"
             }
           },
           {
@@ -600,7 +606,8 @@
             "option": true,
             "public": true,
             "meta": {
-              "size": 1073741824
+              "size": 1073741824,
+              "format": "png"
             }
           },
           {
@@ -612,7 +619,8 @@
             "option": true,
             "public": true,
             "meta": {
-              "size": 1073741824
+              "size": 1073741824,
+              "format": "png"
             }
           },
           {
@@ -624,7 +632,8 @@
             "option": true,
             "public": true,
             "meta": {
-              "size": 1073741824
+              "size": 1073741824,
+              "format": "png"
             }
           },
           {
@@ -636,7 +645,8 @@
             "option": true,
             "public": true,
             "meta": {
-              "size": 1073741824
+              "size": 1073741824,
+              "format": "png"
             }
           },
           {
@@ -648,7 +658,8 @@
             "option": true,
             "public": true,
             "meta": {
-              "size": 1073741824
+              "size": 1073741824,
+              "format": "png"
             }
           },
           {
@@ -660,7 +671,8 @@
             "option": true,
             "public": true,
             "meta": {
-              "size": 1073741824
+              "size": 1073741824,
+              "format": "png"
             }
           },
           {
@@ -672,7 +684,8 @@
             "option": true,
             "public": true,
             "meta": {
-              "size": 1073741824
+              "size": 1073741824,
+              "format": "png"
             }
           },
           {
