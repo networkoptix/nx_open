@@ -9,6 +9,7 @@
 #include <utils/common/delayed.h>
 
 #include <ui/models/resource/resource_tree_model.h>
+#include <ui/workbench/workbench_context.h>
 
 #include <nx/vms/client/desktop/resource_views/data/node_type.h>
 #include <nx/vms/client/desktop/resources/search_helper.h>
@@ -29,18 +30,24 @@ QnResourceSearchQuery QnResourceSearchProxyModel::query() const
 
 QModelIndex QnResourceSearchProxyModel::setQuery(const QnResourceSearchQuery& query)
 {
-    if (m_query == query)
-        return m_currentRootNode;
-
     m_query = query;
 
     setFilterWildcard(L'*' + query.text + L'*');
     invalidateFilterLater();
 
+    QnResourceTreeModel* resourceTreeModel = qobject_cast<QnResourceTreeModel*>(sourceModel());
+    if (!resourceTreeModel)
+        return QModelIndex();
+
+    bool isLoggedIn = !resourceTreeModel->context()->user().isNull();
+      
     m_currentRootNode =
-        [this]()
+        [this, isLoggedIn]()
         {
             if (m_query.allowedNode == QnResourceSearchQuery::kAllowAllNodeTypes)
+                return QModelIndex();
+
+            if (!isLoggedIn && m_query.allowedNode == ResourceTreeNodeType::localResources)
                 return QModelIndex();
 
             const int count = rowCount();
@@ -203,7 +210,9 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
         return false;
 
     // Simply filter by text first.
-    if (!resources::search_helper::matches(m_query.text, resource))
+    // Show everything that's allowed if nothing entered into search query text input.
+    if (resources::search_helper::isSearchStringValid(m_query.text) 
+        && !resources::search_helper::matches(m_query.text, resource))
         return false;
 
     // Check if no further filtering is required.

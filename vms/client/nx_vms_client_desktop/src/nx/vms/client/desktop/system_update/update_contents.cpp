@@ -3,6 +3,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <client_core/client_core_module.h>
+#include <client/client_settings.h>
 #include <network/system_helpers.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
@@ -247,5 +248,35 @@ bool verifyUpdateContents(QnCommonModule* commonModule, UpdateContents& contents
 
     return contents.isValid();
 }
+
+std::future<UpdateContents> checkLatestUpdate()
+{
+    QString updateUrl = qnSettings->updateFeedUrl();
+    return std::async(std::launch::async,
+        [updateUrl]()
+        {
+            UpdateContents result;
+            result.info = nx::update::updateInformation(updateUrl, nx::update::kLatestVersion, &result.error);
+            result.sourceType = UpdateSourceType::internet;
+            result.source = lit("%1 for build=%2").arg(updateUrl, nx::update::kLatestVersion);
+            return result;
+        });
+}
+
+std::future<UpdateContents> checkSpecificChangeset(QString build)
+{
+    QString updateUrl = qnSettings->updateFeedUrl();
+
+    return std::async(std::launch::async,
+        [updateUrl, build]()
+        {
+            UpdateContents result;
+            result.info = nx::update::updateInformation(updateUrl, build, &result.error);
+            result.sourceType = UpdateSourceType::internetSpecific;
+            result.source = lit("%1 for build=%2").arg(updateUrl, build);
+            return result;
+        });
+}
+
 
 } // namespace nx::vms::client::desktop

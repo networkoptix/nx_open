@@ -68,7 +68,7 @@ bool CloudConnectionManager::boundToCloud() const
     return !cloudSystemId.isEmpty() && !cloudAuthKey.isEmpty();
 }
 
-std::unique_ptr<nx::cdb::api::Connection> CloudConnectionManager::getCloudConnection(
+std::unique_ptr<nx::cloud::db::api::Connection> CloudConnectionManager::getCloudConnection(
     const QString& cloudSystemId,
     const QString& cloudAuthKey) const
 {
@@ -99,7 +99,7 @@ std::unique_ptr<nx::cdb::api::Connection> CloudConnectionManager::getCloudConnec
     return result;
 }
 
-std::unique_ptr<nx::cdb::api::Connection> CloudConnectionManager::getCloudConnection()
+std::unique_ptr<nx::cloud::db::api::Connection> CloudConnectionManager::getCloudConnection()
 {
     const auto cloudSystemId = qnGlobalSettings->cloudSystemId();
     const auto cloudAuthKey = qnGlobalSettings->cloudAuthKey();
@@ -111,21 +111,21 @@ std::unique_ptr<nx::cdb::api::Connection> CloudConnectionManager::getCloudConnec
         cloudAuthKey);
 }
 
-const nx::cdb::api::ConnectionFactory& CloudConnectionManager::connectionFactory() const
+const nx::cloud::db::api::ConnectionFactory& CloudConnectionManager::connectionFactory() const
 {
     return *m_cdbConnectionFactory;
 }
 
 void CloudConnectionManager::processCloudErrorCode(
-    nx::cdb::api::ResultCode resultCode)
+    nx::cloud::db::api::ResultCode resultCode)
 {
     NX_DEBUG(this, lm("Error %1 while referring to cloud")
-        .arg(nx::cdb::api::toString(resultCode)));
+        .arg(nx::cloud::db::api::toString(resultCode)));
 
-    if (resultCode == nx::cdb::api::ResultCode::credentialsRemovedPermanently)
+    if (resultCode == nx::cloud::db::api::ResultCode::credentialsRemovedPermanently)
     {
         NX_DEBUG(this, lm("Error. Cloud reported %1 error. Removing local cloud credentials...")
-            .arg(nx::cdb::api::toString(resultCode)));
+            .arg(nx::cloud::db::api::toString(resultCode)));
 
         // System has been disconnected from cloud: cleaning up cloud credentials...
         if (!detachSystemFromCloud())

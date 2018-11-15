@@ -96,7 +96,7 @@ def wait_for_api_path_match(
             def result_gen():
                 for server in other_server_list[:2]:
                     yield (server, api_path_getter(server, api_path))
-                for (server, result) in make_threaded_async_calls(thread_count=64, call_gen=[
+                for (server, result) in make_threaded_async_calls(thread_count=8, call_gen=[
                         partial(get_server_and_call_result, server) for server in other_server_list[2:]]):
                     yield (server, result)
 

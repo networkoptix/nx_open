@@ -8,8 +8,7 @@
 
 #include "functional_tests/test_setup.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 namespace test {
 
 class Settings:
@@ -107,5 +106,4 @@ TEST_F(SettingsHttp, tcpBacklogSize_applied)
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db

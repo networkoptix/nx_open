@@ -440,7 +440,7 @@ class VirtualBox(Hypervisor):
         vm_import_file_path = self._get_file_path_for_import_vm(vm_image_path, timeout_sec=600)
         self.manage(['import', vm_import_file_path, '--vsys', 0, '--vmname', vm_name], timeout_sec=600)
         # Group is assigned only when imported: cloned VMs are created nearby.
-        group = '/' + vm_name.rsplit('-', 1)[0]
+        group = '/' + vm_name  # Usually, a template is imported, group name is same as VM name.
         try:
             self.manage(['modifyvm', vm_name, '--groups', group])
         except virtual_box_error_cls('NS_ERROR_INVALID_ARG') as e:

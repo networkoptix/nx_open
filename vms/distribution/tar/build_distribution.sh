@@ -318,31 +318,9 @@ copyMediaserverPlugins()
         return
     fi
 
-    local PLUGINS=(
-        generic_multicast_plugin
-        genericrtspplugin
-        mjpg_link
-        usb_cam
-    )
-    PLUGINS+=( # Metadata plugins.
-        hikvision_analytics_plugin
-        axis_analytics_plugin
-        dw_mtt_analytics_plugin
-        vca_analytics_plugin
-    )
-    if [ "$ENABLE_HANWHA" == "true" ]
-    then
-        PLUGINS+=( hanwha_analytics_plugin )
-    fi
-
-    distrib_copyMediaserverPlugins "plugins" "$STAGE_MEDIASERVER_BIN" "${PLUGINS[@]}"
-
-    local PLUGINS_OPTIONAL=(
-        stub_analytics_plugin
-    )
-
-    distrib_copyMediaserverPlugins \
-        "plugins_optional" "$STAGE_MEDIASERVER_BIN" "${PLUGINS_OPTIONAL[@]}"
+    distrib_copyMediaserverPlugins "plugins" "$STAGE_MEDIASERVER_BIN" "${SERVER_PLUGINS[@]}"
+    distrib_copyMediaserverPlugins "plugins_optional" "$STAGE_MEDIASERVER_BIN" \
+        "${SERVER_PLUGINS_OPTIONAL[@]}"
 }
 
 # [in] STAGE_VMS

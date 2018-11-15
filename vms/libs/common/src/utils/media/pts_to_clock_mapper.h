@@ -1,10 +1,4 @@
-/**********************************************************
-* 28 mar 2014
-* akolesnikov@networkoptix.com
-***********************************************************/
-
-#ifndef PTS_TO_CLOCK_MAPPER_H
-#define PTS_TO_CLOCK_MAPPER_H
+#pragma once
 
 #include <nx/utils/thread/mutex.h>
 
@@ -88,5 +82,3 @@ private:
         PtsToClockMapper::pts_type two ) const;
     void recalcPtsCorrection( pts_type ptsCorrection, pts_type* const pts );
 };
-
-#endif  //PTS_TO_CLOCK_MAPPER_H

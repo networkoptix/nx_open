@@ -219,8 +219,6 @@ if(withClouds)
         add_subdirectory(cloud_portal)
         add_custom_target(cloud-frontend DEPENDS cloud_portal)
         add_dependencies(cloud cloud-frontend)
-
-        add_subdirectory(nx_cloud_deploy)
     endif()
 endif()
 

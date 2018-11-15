@@ -7,10 +7,11 @@
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <llutil/hardware_id.h>
-#include <utils/common/delayed.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/ec_api.h>
+#include <utils/common/delayed.h>
+#include <utils/license_usage_helper.h>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/buffer_source.h>
@@ -22,7 +23,6 @@
 namespace nx {
 namespace mediaserver {
 
-static const nx::utils::Url kLicenseServerUrl("http://licensing.networkoptix.com/nxlicensed/api/v1/validate/");
 static const std::chrono::milliseconds kCheckInterval = std::chrono::hours(24);
 
 struct ServerInfo
@@ -129,7 +129,7 @@ void LicenseWatcher::validateData()
     // Object guard is required so we could cancel async operation if it's scheduled when watcher
     // is destroyed.
     QPointer<QObject> objectGuard(this);
-    m_httpClient->doPost(kLicenseServerUrl,
+    m_httpClient->doPost(QnLicenseServer::kValidateUrl,
         [this, objectGuard]()
         {
             NX_ASSERT(objectGuard, "Destructor must wait for m_httpClient stop.");

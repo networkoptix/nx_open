@@ -1,3 +1,4 @@
+import collections
 import json
 import time
 import timeit
@@ -162,24 +163,7 @@ class _GenericMediaserverApi(HttpApi):
         return data
 
 
-class TimePeriod(object):
-    def __init__(self, start, duration):
-        assert isinstance(start, datetime), repr(start)
-        assert isinstance(duration, timedelta), repr(duration)
-        self.start = start
-        self.duration = duration
-
-    def __repr__(self):
-        return 'TimePeriod(%s, %s)' % (self.start, self.duration)
-
-    def __eq__(self, other):
-        try:
-            return other.start == self.start and other.duration == self.duration
-        except AttributeError:
-            return NotImplemented
-
-    def __ne__(self, other):
-        return not self == other
+TimePeriod = collections.namedtuple('TimePeriod', ['start', 'duration'])
 
 
 class _MediaserverCameraApi(object):
@@ -213,13 +197,14 @@ class _MediaserverCameraApi(object):
 class MediaserverApi(object):
     """Collection of front-end methods to work with HTTP API with handy ins and outs."""
 
-    def __init__(self, base_url, alias=None, ca_cert=None):
+    def __init__(self, base_url, alias=None, ca_cert=None, specific_features=dict()):
         # type: (Union[str, Url], Optional[str], Optional[str]) -> None
         """Parameters are passed further to `_GenericMediaserverApi`."""
 
         ## `.generic` should be rarely used, only when no request and/or response processing is
         # required. Most existing usages of `.generic` should be transformed into methods hereof.
         self.generic = _GenericMediaserverApi(base_url, alias=alias, ca_cert=ca_cert)
+        self.specific_features = specific_features
 
         # TODO: Split this class into composing parts: `SystemApi`, `CamerasApi`, etc.
 
@@ -557,13 +542,15 @@ class MediaserverApi(object):
         self.generic.post('ec2/removeResource', dict(id=id))
 
     def set_camera_credentials(self, id, login, password):
-        # Do not try to understand this code, this is hardcoded the same way as in common library.
         data = ':'.join([login, password])
-        data += chr(0) * (16 - (len(data) % 16))
-        key = '4453D6654C634636990B2E5AA69A1312'.decode('hex')
-        iv = '000102030405060708090a0b0c0d0e0f'.decode('hex')
-        c = AES.new(key, AES.MODE_CBC, iv).encrypt(data).encode('hex')
-        self.generic.post("ec2/setResourceParams", [dict(resourceId=id, name='credentials', value=c)])
+        if 'camera_auth_server_side_encryption' not in self.specific_features:
+            # Do not try to understand this code, this is hardcoded the same way as in common library.
+            data += chr(0) * (16 - (len(data) % 16))
+            key = '4453D6654C634636990B2E5AA69A1312'.decode('hex')
+            iv = '000102030405060708090a0b0c0d0e0f'.decode('hex')
+            data = AES.new(key, AES.MODE_CBC, iv).encrypt(data).encode('hex')
+        self.generic.post(
+            "ec2/setResourceParams", [dict(resourceId=id, name='credentials', value=data)])
 
     def interfaces(self):
         response = self.generic.get('api/iflist')

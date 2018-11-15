@@ -1347,23 +1347,6 @@ void initialize(Manager* manager, Action* root)
                 !condition::isLayoutTourReviewMode()
                 && !condition::isPreviewSearchMode()));
 
-    factory(CameraSettingsActionNew)
-        .mode(DesktopMode)
-        .flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
-        .dynamicText(new DevicesNameTextFactory(
-            QnCameraDeviceStringSet(
-                ContextMenu::tr("Device Settings (new)..."), ContextMenu::tr("Devices Settings (new)..."),
-                ContextMenu::tr("Camera Settings (new)..."), ContextMenu::tr("Cameras Settings (new)..."),
-                ContextMenu::tr("I/O Module Settings (new)..."), ContextMenu::tr("I/O Modules Settings (new)...")
-            ), manager))
-        .requiredGlobalPermission(GlobalPermission::editCameras)
-        .condition(condition::hasFlags(Qn::live_cam, MatchMode::Any)
-            && !condition::tourIsRunning()
-            && condition::isTrue(ini().redesignedCameraSettingsDialog)
-            && condition::scoped(SceneScope,
-                !condition::isLayoutTourReviewMode()
-                && !condition::isPreviewSearchMode()));
-
     factory(CopyRecordingScheduleAction)
         .mode(DesktopMode)
         .flags(SingleTarget | ResourceTarget)
@@ -1803,10 +1786,21 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Minimize")) //< To be displayed on button tooltip
         .icon(qnSkin->icon("titlebar/dropdown.png"));
 
+    factory(ToggleTreeAction)
+        .flags(NoTarget)
+        .text(ContextMenu::tr("Show Tree")) //< To be displayed on button tooltip
+        .toggledText(ContextMenu::tr("Hide Tree"))
+        .condition(condition::treeNodeType(ResourceTreeNodeType::root));
+
     factory(ToggleTimelineAction)
         .flags(NoTarget)
         .text(ContextMenu::tr("Show Timeline")) //< To be displayed on button tooltip
         .toggledText(ContextMenu::tr("Hide Timeline"));
+
+    factory(ToggleNotificationsAction)
+        .flags(NoTarget)
+        .text(ContextMenu::tr("Show Notifications")) //< To be displayed on button tooltip
+        .toggledText(ContextMenu::tr("Hide Notifications"));
 
     factory(PinNotificationsAction)
         .flags(Notifications | NoTarget)

@@ -32,7 +32,7 @@
 #include <nx/network/app_info.h>
 #include <nx/utils/guarded_callback.h>
 
-using namespace nx::cdb;
+using namespace nx::cloud::db;
 using namespace nx::vms::client::desktop;
 
 namespace {
@@ -256,7 +256,7 @@ void QnConnectToCloudDialogPrivate::bindSystem()
     const auto password = q->ui->passwordInputField->text().trimmed();
     cloudConnection->setCredentials(user.toStdString(), password.toStdString());
 
-    nx::cdb::api::SystemRegistrationData sysRegistrationData;
+    nx::cloud::db::api::SystemRegistrationData sysRegistrationData;
     sysRegistrationData.name = qnGlobalSettings->systemName().toStdString();
     sysRegistrationData.customization = QnAppInfo::customizationName().toStdString();
 

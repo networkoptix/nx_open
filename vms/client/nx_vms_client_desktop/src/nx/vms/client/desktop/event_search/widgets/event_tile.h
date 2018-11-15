@@ -121,8 +121,12 @@ public:
     bool highlighted() const;
     void setHighlighted(bool value);
 
+    void clear();
+
 signals:
     void clicked();
+    void doubleClicked();
+    void dragStarted();
 
     void closeRequested();
 

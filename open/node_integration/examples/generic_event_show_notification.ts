@@ -27,10 +27,9 @@ const saveRuleToConfig = (rule: Rule | null) => {
 // Makes all of the rules on the target system.
 const makeExampleRules = () => {
     const promiseRules: any[] = [];
-
     /*
-     * Makes a rule that displays a notification when a generic event
-     * with 'node.js' as the source is received.
+     * Makes a rule that displays a notification when a generic event with 'node.js' as the source
+     * is received.
      */
     const genericEvent: GenericEvent = new GenericEvent('Node.js');
     const showNotification: ShowPopup = new ShowPopup();

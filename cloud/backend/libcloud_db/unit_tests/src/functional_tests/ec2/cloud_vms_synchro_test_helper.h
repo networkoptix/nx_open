@@ -9,8 +9,7 @@
 
 #include "../test_setup.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 
 struct TestParams
 {
@@ -55,13 +54,18 @@ protected:
     void testSynchronizingCloudOwner();
     void testSynchronizingUserFromCloudToMediaServer();
     void testSynchronizingUserFromMediaServerToCloud();
+
     void addCloudUserLocally(
         const std::string& accountEmail,
         nx::vms::api::UserData* const accountVmsData);
+
     void waitForUserToAppearInCloud(
         const nx::vms::api::UserData& accountVmsData);
+
     void waitForUserToDisappearFromCloud(const std::string& email);
+
     void waitForUserToDisappearLocally(const QnUuid& userId);
+
     /**
      * @param found[out] Set to \a true if user has been found and verified. \a false otherwise
      */
@@ -69,21 +73,40 @@ protected:
         const api::SystemSharingEx& sharingData,
         bool* const found = nullptr,
         bool assertOnUserAbsense = true);
+
+    void waitForCloudUserToAppearInLocalDb(
+        const api::SystemSharingEx& sharingData,
+        std::optional<std::chrono::milliseconds> maxTimeToWait = std::nullopt);
+
     void fetchOwnerSharing(api::SystemSharingEx* const ownerSharing);
+
+    void waitUntilCloudAndVmsUsersMatch();
+
     void verifyThatUsersMatchInCloudAndVms(
         bool assertOnFailure = true,
         bool* const result = nullptr);
+
+    void compareUsers(
+        const std::vector<api::SystemSharingEx>& cloudUsers,
+        const vms::api::UserDataList& vmsUsers,
+        bool assertOnFailure,
+        bool* result);
+
     void verifyThatSystemDataMatchInCloudAndVms(
         bool assertOnFailure = true,
         bool* const result = nullptr);
+
     void waitForCloudAndVmsToSyncUsers(
         bool assertOnFailure = true,
         bool* const result = nullptr);
+
     void waitForCloudAndVmsToSyncSystemData(
         bool assertOnFailure = true,
         bool* const result = nullptr);
+
     api::ResultCode fetchCloudTransactionLog(
         ::ec2::ApiTransactionDataList* const transactionList);
+    
     api::ResultCode fetchCloudTransactionLogFromMediaserver(
         ::ec2::ApiTransactionDataList* const transactionList);
 
@@ -99,5 +122,4 @@ private:
     bool findAdminUserId(QnUuid* const id);
 };
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db

@@ -15,7 +15,7 @@ const logging = factory.getLogger('System');
  * @class
  */
 export class System extends MediaserverApi {
-    public ruleManager: EventRuleManager; // Helps manage rules on the system and in the code.
+    public ruleManager: EventRuleManager; //< Helps manage rules on the system and in the code.
     public cameras: any = [];
 
     /**

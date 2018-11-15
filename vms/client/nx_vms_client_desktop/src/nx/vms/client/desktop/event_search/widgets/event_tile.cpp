@@ -15,8 +15,10 @@
 #include <utils/common/delayed.h>
 #include <utils/common/html.h>
 
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/close_button.h>
+#include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/workbench/extensions/workbench_progress_manager.h>
 #include <nx/utils/log/log_message.h>
@@ -67,6 +69,8 @@ struct EventTile::Private
     bool footerEnabled = true;
     Style style = Style::standard;
     bool highlighted = false;
+    bool clickPending = false;
+    QPoint clickPoint;
 
     Private(EventTile* q):
         q(q),
@@ -164,6 +168,7 @@ EventTile::EventTile(QWidget* parent):
     ui->timestampLabel->setSizePolicy(sizePolicy);
 
     ui->descriptionLabel->hide();
+    ui->debugPreviewTimeLabel->hide();
     ui->timestampLabel->hide();
     ui->actionHolder->hide();
     ui->footerLabel->hide();
@@ -179,6 +184,7 @@ EventTile::EventTile(QWidget* parent):
     ui->nameLabel->setForegroundRole(QPalette::Light);
     ui->timestampLabel->setForegroundRole(QPalette::WindowText);
     ui->descriptionLabel->setForegroundRole(QPalette::Light);
+    ui->debugPreviewTimeLabel->setForegroundRole(QPalette::Light);
     ui->resourceListLabel->setForegroundRole(QPalette::Light);
     ui->footerLabel->setForegroundRole(QPalette::Light);
 
@@ -202,6 +208,8 @@ EventTile::EventTile(QWidget* parent):
     ui->progressDescriptionLabel->setFont(font);
     ui->progressDescriptionLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->progressDescriptionLabel->setOpenExternalLinks(false);
+    ui->debugPreviewTimeLabel->setFont(font);
+    ui->debugPreviewTimeLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
 
     font.setWeight(kResourceListFontWeight);
     font.setPixelSize(kResourceListFontPixelSize);
@@ -397,8 +405,36 @@ ImageProvider* EventTile::preview() const
 
 void EventTile::setPreview(ImageProvider* value)
 {
+    if (preview())
+        preview()->disconnect(this);
+
     ui->previewWidget->setImageProvider(value);
     ui->previewWidget->parentWidget()->setHidden(!value);
+
+    if (!ini().showDebugTimeInformationInRibbon)
+        return;
+
+    const auto showPreviewTimestamp =
+        [this]()
+        {
+            auto provider = qobject_cast<CameraThumbnailProvider*>(preview());
+            if (provider)
+            {
+                ui->debugPreviewTimeLabel->setText(lm("Preview: %2 us").arg(provider->timestampUs()));
+                ui->debugPreviewTimeLabel->setVisible(
+                    provider->status() == Qn::ThumbnailStatus::Loaded);
+            }
+            else
+            {
+                ui->debugPreviewTimeLabel->hide();
+                ui->debugPreviewTimeLabel->setText({});
+            }
+        };
+
+    showPreviewTimestamp();
+
+    if (preview())
+        connect(preview(), &ImageProvider::statusChanged, this, showPreviewTimestamp);
 }
 
 QRectF EventTile::previewCropRect() const
@@ -462,14 +498,40 @@ bool EventTile::event(QEvent* event)
             break;
 
         case QEvent::MouseButtonPress:
+        {
+            const auto mouseEvent = static_cast<QMouseEvent*>(event);
             base_type::event(event);
             event->accept();
+            d->clickPending = (mouseEvent->button() == Qt::LeftButton);
+            d->clickPoint = mouseEvent->pos();
             return true;
+        }
 
         case QEvent::MouseButtonRelease:
-            if (static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton)
+            if (d->clickPending && static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton)
                 emit clicked();
+            d->clickPending = false;
             break;
+
+        case QEvent::MouseButtonDblClick:
+            d->clickPending = false;
+            if (static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton)
+                emit doubleClicked();
+            break;
+
+        case QEvent::MouseMove:
+        {
+            const auto mouseEvent = static_cast<QMouseEvent*>(event);
+            if (!mouseEvent->buttons().testFlag(Qt::LeftButton))
+                break;
+
+            if ((mouseEvent->pos() - d->clickPoint).manhattanLength() < qApp->startDragDistance())
+                break;
+
+            d->clickPending = false;
+            emit dragStarted();
+            break;
+        }
 
         default:
             break;
@@ -697,6 +759,28 @@ void EventTile::setHighlighted(bool value)
 
     d->highlighted = value;
     d->updatePalette();
+}
+
+void EventTile::clear()
+{
+    setCloseable(false);
+    setTitle({});
+    setDescription({});
+    setFooterText({});
+    setTimestamp({});
+    setIcon({});
+    setPreview({});
+    setPreviewCropRect({});
+    setAction({});
+    setAutoCloseTime({});
+    setBusyIndicatorVisible(false);
+    setProgressBarVisible(false);
+    setProgressValue(0.0);
+    setProgressTitle({});
+    setRead(false);
+    setResourceList(QStringList());
+    setToolTip({});
+    setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
 }
 
 } // namespace nx::vms::client::desktop

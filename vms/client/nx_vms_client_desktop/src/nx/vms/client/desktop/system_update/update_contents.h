@@ -2,6 +2,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QStringList>
+#include <future>
 
 #include <core/resource/resource_fwd.h>
 #include <nx/update/update_information.h>
@@ -96,5 +97,8 @@ bool checkCloudHost(
  */
 bool verifyUpdateContents(QnCommonModule* commonModule, UpdateContents& contents,
     std::map<QnUuid, QnMediaServerResourcePtr> servers);
+
+std::future<UpdateContents> checkLatestUpdate();
+std::future<UpdateContents> checkSpecificChangeset(QString build);
 
 } // namespace nx::vms::client::desktop

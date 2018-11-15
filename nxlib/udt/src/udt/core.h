@@ -377,7 +377,7 @@ public: // internal API
 
     static const int m_iSYNInterval;             // Periodical Rate Control Interval, 10000 microsecond
     static const int m_iSelfClockInterval;       // ACK interval for self-clocking
-    static CUDTUnited s_UDTUnited;               // UDT global management base
+    static CUDTUnited* s_UDTUnited;               // UDT global management base
 
 public:
     static const UDTSOCKET INVALID_SOCK;         // invalid socket descriptor

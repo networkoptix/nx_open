@@ -9,16 +9,15 @@
 #include <nx/network/http/test_http_server.h>
 #include <nx/utils/std/algorithm.h>
 
-#include <nx/cloud/cdb/cloud_db_service.h>
-#include <nx/cloud/cdb/controller.h>
-#include <nx/cloud/cdb/managers/system_health_info_provider.h>
+#include <nx/cloud/db/cloud_db_service.h>
+#include <nx/cloud/db/controller.h>
+#include <nx/cloud/db/managers/system_health_info_provider.h>
 
 #include <rest/server/json_rest_result.h>
 
 #include "test_setup.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 namespace test {
 
 namespace {
@@ -409,5 +408,4 @@ TEST_F(SystemMerge, fails_if_request_to_slave_system_fails)
 }
 
 } // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db

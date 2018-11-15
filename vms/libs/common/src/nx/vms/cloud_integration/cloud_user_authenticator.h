@@ -11,8 +11,8 @@
 #include <nx/utils/safe_direct_connection.h>
 #include <nx/utils/subscription.h>
 
-#include <nx/cloud/cdb/api/auth_provider.h>
-#include <nx/cloud/cdb/api/connection.h>
+#include <nx/cloud/db/api/auth_provider.h>
+#include <nx/cloud/db/api/connection.h>
 #include <nx/vms/auth/abstract_user_data_provider.h>
 
 #include <core/resource/resource_fwd.h>
@@ -60,7 +60,7 @@ private:
     struct CloudAuthenticationData
     {
         bool authorized = false;
-        nx::cdb::api::AuthResponse data;
+        nx::cloud::db::api::AuthResponse data;
         qint64 expirationTime = 0;
     };
 

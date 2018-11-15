@@ -6,6 +6,7 @@ extern "C" {
 } // extern "C"
 
 #include <algorithm>
+#include <chrono>
 
 #include <client/client_settings.h>
 #include <core/resource/param.h>
@@ -24,6 +25,8 @@ extern "C" {
 #include "ui/graphics/opengl/gl_functions.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include <decoders/video/ffmpeg_video_decoder.h>
+
+using namespace std::chrono;
 
 static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes
 static const double FPS_EPS = 1e-6;
@@ -939,7 +942,7 @@ void QnVideoStreamDisplay::overrideTimestampOfNextFrameToRender(qint64 value)
 {
     foreach(QnAbstractRenderer* render, m_renderList)
     {
-        render->blockTimeValue(m_channelNumber, value);
+        render->blockTimeValue(m_channelNumber, microseconds(value));
         if (m_bufferedFrameDisplayer)
             m_bufferedFrameDisplayer->clear();
         render->finishPostedFramesRender(m_channelNumber);
@@ -955,17 +958,17 @@ qint64 QnVideoStreamDisplay::getTimestampOfNextFrameToRender() const
     {
         QnResourceWidgetRenderer* r = dynamic_cast<QnResourceWidgetRenderer*>(renderer);
         if (r && r->isEnabled(m_channelNumber))
-            return r->getTimestampOfNextFrameToRender(m_channelNumber);
+            return r->getTimestampOfNextFrameToRender(m_channelNumber).count();
     }
 
     QnAbstractRenderer* renderer = *m_renderList.begin();
-    return renderer->getTimestampOfNextFrameToRender(m_channelNumber);
+    return renderer->getTimestampOfNextFrameToRender(m_channelNumber).count();
 }
 
 void QnVideoStreamDisplay::blockTimeValue(qint64 time)
 {
     foreach(QnAbstractRenderer* render, m_renderList)
-        render->blockTimeValue(m_channelNumber, time);
+        render->blockTimeValue(m_channelNumber, microseconds(time));
 }
 
 void QnVideoStreamDisplay::setPausedSafe(bool value)
@@ -982,7 +985,7 @@ void QnVideoStreamDisplay::blockTimeValueSafe(qint64 time)
 {
     QnMutexLocker lock( &m_renderListMtx );
     foreach(QnAbstractRenderer* render, m_renderList)
-        render->blockTimeValue(m_channelNumber, time);
+        render->blockTimeValue(m_channelNumber, microseconds(time));
 }
 
 bool QnVideoStreamDisplay::isTimeBlocked() const

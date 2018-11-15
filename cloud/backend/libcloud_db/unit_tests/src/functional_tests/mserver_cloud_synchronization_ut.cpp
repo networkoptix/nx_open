@@ -17,13 +17,12 @@
 #include <utils/common/id.h>
 #include <transaction/abstract_transaction_transport.h>
 
-#include <nx/cloud/cdb/test_support/transaction_connection_helper.h>
+#include <nx/cloud/db/test_support/transaction_connection_helper.h>
 
 #include "ec2/cloud_vms_synchro_test_helper.h"
 #include "email_manager_mocked.h"
 
-namespace nx {
-namespace cdb {
+namespace nx::cloud::db {
 
 class FtEc2MserverCloudSynchronization:
     public Ec2MserverCloudSynchronization
@@ -36,6 +35,47 @@ public:
 
     ~FtEc2MserverCloudSynchronization()
     {
+    }
+
+protected:
+    void renameSystemInCloud()
+    {
+        const std::string newSystemName(nx::utils::generateRandomName(10).data());
+
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            cdb()->renameSystem(
+                ownerAccount().email,
+                ownerAccount().password,
+                registeredSystemData().id,
+                newSystemName));
+    }
+
+    void renameSystemInVms()
+    {
+        const std::string newSystemName(nx::utils::generateRandomName(10).data());
+
+        nx::vms::api::ResourceParamWithRefData param;
+        param.resourceId = QnUserResource::kAdminGuid;
+        param.name = nx::settings_names::kNameSystemName;
+        param.value = QString::fromStdString(newSystemName);
+        nx::vms::api::ResourceParamWithRefDataList paramList;
+        paramList.push_back(std::move(param));
+
+        ASSERT_EQ(
+            ::ec2::ErrorCode::ok,
+            appserver2()->moduleInstance()->ecConnection()
+                ->getResourceManager(Qn::kSystemAccess)
+                ->saveSync(paramList));
+    }
+
+    void restartCloudDb()
+    {
+        appserver2()->moduleInstance()->ecConnection()
+            ->deleteRemotePeer(::ec2::kCloudPeerId);
+        ASSERT_TRUE(cdb()->restart());
+        appserver2()->moduleInstance()->ecConnection()
+            ->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
     }
 
 private:
@@ -56,7 +96,7 @@ TEST_P(FtEc2MserverCloudSynchronization, general)
             ::ec2::kCloudPeerId,
             cdbEc2TransactionUrl());
         if (i > 0)
-            verifyThatUsersMatchInCloudAndVms();
+            waitUntilCloudAndVmsUsersMatch();
         verifyTransactionConnection();
         testSynchronizingCloudOwner();
         testSynchronizingUserFromCloudToMediaServer();
@@ -347,7 +387,8 @@ TEST_P(FtEc2MserverCloudSynchronization, new_transaction_timestamp)
 
 TEST_P(FtEc2MserverCloudSynchronization, rename_system)
 {
-    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
+    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(
+        ::ec2::kCloudPeerId, cdbEc2TransactionUrl());
 
     for (int i = 0; i < 4; ++i)
     {
@@ -355,40 +396,12 @@ TEST_P(FtEc2MserverCloudSynchronization, rename_system)
         const bool updateInCloud = i < 2;
 
         if (needRestart)
-        {
-            appserver2()->moduleInstance()->ecConnection()
-                ->deleteRemotePeer(::ec2::kCloudPeerId);
-            ASSERT_TRUE(cdb()->restart());
-            appserver2()->moduleInstance()->ecConnection()
-                ->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
-        }
+            restartCloudDb();
 
-        const std::string newSystemName(nx::utils::generateRandomName(10).data());
         if (updateInCloud)
-        {
-            ASSERT_EQ(
-                api::ResultCode::ok,
-                cdb()->renameSystem(
-                    ownerAccount().email,
-                    ownerAccount().password,
-                    registeredSystemData().id,
-                    newSystemName));
-        }
+            renameSystemInCloud();
         else
-        {
-            nx::vms::api::ResourceParamWithRefData param;
-            param.resourceId = QnUserResource::kAdminGuid;
-            param.name = nx::settings_names::kNameSystemName;
-            param.value = QString::fromStdString(newSystemName);
-            nx::vms::api::ResourceParamWithRefDataList paramList;
-            paramList.push_back(std::move(param));
-
-            ASSERT_EQ(
-                ::ec2::ErrorCode::ok,
-                appserver2()->moduleInstance()->ecConnection()
-                    ->getResourceManager(Qn::kSystemAccess)
-                    ->saveSync(paramList));
-        }
+            renameSystemInVms();
 
         // Checking that system name has been updated in mediaserver.
         waitForCloudAndVmsToSyncSystemData();
@@ -549,5 +562,4 @@ INSTANTIATE_TEST_CASE_P(P2pMode, FtEc2MserverCloudSynchronization,
     ::testing::Values(TestParams(false), TestParams(true)
 ));
 
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db

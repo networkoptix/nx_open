@@ -272,7 +272,7 @@ void QnStorageAnalyticsWidget::querySpaceFromServer()
 
     // If next call fails, it will return -1 meaning "no request".
     m_spaceRequestHandle = m_server->apiConnection()->getStorageSpaceAsync(false,
-        this, SLOT(at_receivedSpaceInfo(int, const QnStorageSpaceReply&, int)));
+        this, SLOT(atReceivedSpaceInfo(int, const QnStorageSpaceReply&, int)));
 }
 
 void QnStorageAnalyticsWidget::queryStatsFromServer(qint64 bitrateAveragingPeriodMs)
@@ -286,7 +286,7 @@ void QnStorageAnalyticsWidget::queryStatsFromServer(qint64 bitrateAveragingPerio
     // If next call fails, it will return -1 meaning "no request".
     m_statsRequest[index].averagingPeriod = bitrateAveragingPeriodMs;
     m_statsRequest[index].handle = m_server->apiConnection()->getRecordingStatisticsAsync(
-        bitrateAveragingPeriodMs, this, SLOT(at_receivedStats(int, const QnRecordingStatsReply&, int)));
+        bitrateAveragingPeriodMs, this, SLOT(atReceivedStats(int, const QnRecordingStatsReply&, int)));
 }
 
 bool QnStorageAnalyticsWidget::requestsInProgress() const

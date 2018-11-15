@@ -1022,6 +1022,11 @@ enum IDType
     ToggleTitleBarAction,
 
     /**
+     * Shows/hides tree.
+     */
+    ToggleTreeAction,
+
+    /**
      * Pins/unpins tree.
      */
     PinTreeAction,
@@ -1040,6 +1045,11 @@ enum IDType
      * Shows/hides timeline.
      */
     ToggleTimelineAction,
+
+    /**
+    * Shows/hides notification panel.
+    */
+    ToggleNotificationsAction,
 
     PinNotificationsAction,
 
@@ -1155,12 +1165,6 @@ enum IDType
 
     // TODO: #dklychkov Remove when the new scene engine becomes default.
     OpenNewSceneAction,
-
-    /**
-     * Opens legacy camera settings dialog.
-     */
-    // TODO: #vkutin #gdm Remove when the legacy dialog is completely removed.
-    CameraSettingsActionNew,
 
     ActionCount,
 
