@@ -284,10 +284,11 @@ void setCredentials(const State::Credentials& value, const Cameras& cameras)
         // Change only password, fetch logins from cameras.
         for (const auto& camera: cameras)
         {
-            if (camera->getAuth().password() == authenticator.password())
+            const auto oldAuth = camera->getAuth();
+            if (oldAuth.password() == authenticator.password())
                 continue;
 
-            authenticator.setUser(camera->getAuth().user());
+            authenticator.setUser(oldAuth.user());
             setCredentials(camera, authenticator);
         }
     }
@@ -296,10 +297,11 @@ void setCredentials(const State::Credentials& value, const Cameras& cameras)
         // Change only login, fetch passwords from cameras.
         for (const auto& camera: cameras)
         {
-            if (camera->getAuth().user() == authenticator.user())
+            const auto oldAuth = camera->getAuth();
+            if (oldAuth.user() == authenticator.user())
                 continue;
 
-            authenticator.setPassword(camera->getAuth().password());
+            authenticator.setPassword(oldAuth.password());
             setCredentials(camera, authenticator);
         }
     }
