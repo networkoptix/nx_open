@@ -228,14 +228,14 @@ void ConnectionProcessor::run()
         auto errorMessage = lm("Invalid WEB socket request. Validation failed. Error: %1").arg((int)error);
         sendResponse(nx::network::http::StatusCode::forbidden, errorMessage.toUtf8());
         NX_ERROR(this, errorMessage);
-        d->socket->close();
         return;
     }
 
     serializePeerData(d->response, localPeer(), remotePeer.dataFormat);
 
+    using nx::network::http;
     sendResponse(
-        nx::network::http::StatusCode::switchingProtocols,
+        error == websocket::Error::noError ? StatusCode::switchingProtocols : StatusCode::ok,
         nx::network::http::StringType());
 
 
@@ -249,19 +249,25 @@ void ConnectionProcessor::run()
 
     d->socket->setNonBlockingMode(true);
     auto keepAliveTimeout = std::chrono::milliseconds(remotePeer.aliveUpdateIntervalMs);
-    WebSocketPtr webSocket(new websocket::WebSocket(
-        std::move(d->socket),
+
+    auto p2pSocket = std::make_unique<P2pServerTransport>(
         remotePeer.dataFormat == Qn::JsonFormat
-            ? websocket::FrameType::text
-            : websocket::FrameType::binary));
+            ? P2pTransport::DataFormat::text
+            : P2pTransport::DataFormat::binary);
+
+    p2pSocket->newIncomingConnectionReceived(
+        std::move(d->socket),
+        P2pServerTransport::connectionGuid(d->request),
+        P2pServerTransport::Direction::bidirection);
+
+
     if (keepAliveTimeout > std::chrono::milliseconds::zero())
-        webSocket->setAliveTimeout(keepAliveTimeout);
-    webSocket->start();
+        p2pSocket->setAliveTimeout(keepAliveTimeout);
 
     messageBus->gotConnectionFromRemotePeer(
         remotePeer,
         std::move(connectionLockGuard),
-        std::move(webSocket),
+        std::move(p2pSocket),
         QUrlQuery(d->request.requestLine.url.query()),
         userAccessData(remotePeer),
         onConnectionClosedCallback);
