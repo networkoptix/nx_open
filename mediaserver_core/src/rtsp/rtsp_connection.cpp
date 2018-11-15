@@ -233,6 +233,7 @@ public:
     //QMap<int, QnRtspEncoderPtr> encoders; // associate trackID with RTP codec encoder
     ServerTrackInfoMap trackInfo;
     bool useProprietaryFormat;
+    bool multiChannelVideo = true;
 
     struct TranscodeParams
     {
@@ -377,6 +378,9 @@ void QnRtspConnectionProcessor::parseRequest()
         if (d->transcodeParams.codecId == AV_CODEC_ID_NONE)
             d->transcodeParams.codecId = DEFAULT_VIDEO_CODEC;
     }
+
+    if (urlQuery.hasQueryItem("transcoding") && d->transcodeParams.codecId == AV_CODEC_ID_NONE)
+        d->transcodeParams.codecId = DEFAULT_VIDEO_CODEC;
 
     QString qualityStr = nx_http::getHeaderValue(d->request.headers, "x-media-quality");
     if (!qualityStr.isEmpty())
@@ -775,6 +779,10 @@ int QnRtspConnectionProcessor::composeDescribe()
     if (!d->mediaRes)
         return CODE_NOT_FOUND;
 
+    // if transcoding used -> multiple channels will be sticked to single stream video
+    if (d->transcodeParams.codecId != AV_CODEC_ID_NONE)
+        d->multiChannelVideo = false;
+
     d->playbackMode = getStreamingMode();
 
     createDataProvider();
@@ -785,9 +793,7 @@ int QnRtspConnectionProcessor::composeDescribe()
 
     QTextStream sdp(&d->response.messageBody);
 
-
     QnConstResourceVideoLayoutPtr videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
-
 
     int numAudio = 0;
     QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
@@ -803,7 +809,9 @@ int QnRtspConnectionProcessor::composeDescribe()
             numAudio = audioLayout->channelCount();
     }
 
-    int numVideo = videoLayout && d->useProprietaryFormat ? videoLayout->channelCount() : 1;
+    int numVideo = 1;
+    if (videoLayout && (d->useProprietaryFormat || d->multiChannelVideo))
+        numVideo = videoLayout->channelCount();
 
     addResponseRangeHeader();
 
@@ -1093,7 +1101,7 @@ void QnRtspConnectionProcessor::createDataProvider()
                 speed = tmpSpeed;
         }
         d->dataProcessor->setStreamingSpeed(speed);
-        d->dataProcessor->setMultiChannelVideo(d->useProprietaryFormat);
+        d->dataProcessor->setMultiChannelVideo(d->useProprietaryFormat || d->multiChannelVideo);
     }
     else
         d->dataProcessor->clearUnprocessedData();
