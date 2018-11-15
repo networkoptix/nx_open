@@ -96,9 +96,6 @@ private:
 
     void updateRibbonLiveMode();
 
-    void navigateToSource(const QModelIndex& index) const;
-    void openSource(const QModelIndex& index, bool inNewTab) const;
-
 private:
     const QScopedPointer<AbstractSearchListModel> m_mainModel;
     const QScopedPointer<BusyIndicatorModel> m_headIndicatorModel;

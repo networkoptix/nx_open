@@ -1,4 +1,5 @@
 #include "notification_list_widget_p.h"
+#include "tile_interaction_handler_p.h"
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QHBoxLayout>
@@ -139,8 +140,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
             m_placeholder->setVisible(count < 1);
         });
 
-    // TODO: FIXME: #vkutin Implement tile click interaction,
-    // avoid code duplication with AbstractSearchWidget
+    TileInteractionHandler::install(m_eventRibbon);
 }
 
 NotificationListWidget::Private::~Private()
