@@ -26,7 +26,7 @@
                     // ... i.e. when in view camera in embed
                     // ... and check if Config.showHeaderAndFooter is false
                     // as view controller resets header and footer on destroy
-                    if (scope.config.showHeaderAndFooter) {
+                    if (CONFIG.showHeaderAndFooter) {
                         scope.viewHeader = !opt.state;
                     }
                 });
