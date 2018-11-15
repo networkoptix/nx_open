@@ -6,17 +6,17 @@ SERVER_STAGES:
   before if features.mediaserver_metrics:
     api/metrics?brief:
       offlineStatus: 0
-      transactions: {"errors": 0, "local": [1, 2], "success": [20, 30]}
+      transactions: {"errors": 0, "local": [1, 5], "success": [20, 30]}
 
   after if features.mediaserver_metrics:
     api/metrics?brief:
       offlineStatus: 0
-      transactions: {"errors": 0, "local": [1, 5], "success": [500, 600]}
+      transactions: {"errors": 0, "local": [1, 10], "success": [300, 500]}
 
   delayed if features.mediaserver_metrics:
     api/metrics?brief:
       offlineStatus: 0]
-      transactions: {"errors": 0, "local": [1, 5], "success": [500, 600]}
+      transactions: {"errors": 0, "local": [1, 10], "success": [300, 500]}
 
 
 Axis_M3046V:
@@ -145,7 +145,7 @@ DWC-MPA20M:
       - {codec: 'H264', resolution: '1280x720'}
     secondary:
       - {codec: 'H264', resolution: '640x352', fps: [8, 12]}
-      - {codec: 'H264', resolution: '320x240', fps: [24, 36]}
+      - {codec: 'H264', resolution: '320x240', fps: [13, 17]}
     stream_urls:
       '1': "rtsp://192.168.200.19:1554/h264"
       '2': "rtsp://192.168.200.19:8554/h264"
@@ -279,10 +279,6 @@ Hikvision_DS-2CD2132F-IWS:
   authorization:
     login: admin
     password: Hikvision1
-
-  attributes:
-    firmware: V5.4.5 build 170123
-    isAudioSupported: 1
 
   recording:
     primary: {codec: 'H264', resolution: '2048x1536', fps: [[13, 17], [8, 12]]}

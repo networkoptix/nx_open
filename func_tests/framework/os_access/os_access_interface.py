@@ -10,7 +10,7 @@ from typing import Any, Callable, Mapping, Optional, Type
 
 from framework.networking.interface import Networking
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
-from framework.os_access.exceptions import DoesNotExist
+from framework.os_access.exceptions import DoesNotExist, NotAFile
 from framework.os_access.local_path import LocalPath
 from framework.os_access.path import FileSystemPath
 from framework.os_access.traffic_capture import TrafficCapture
@@ -111,6 +111,21 @@ class ReciprocalPortMap(object):
         cls(to_remote, to_local_from_remote)
 
 
+class BaseFakeDisk(object):
+    __metaclass__ = ABCMeta
+
+    def __init__(self, path):
+        self.path = path
+
+    @abstractmethod
+    def remove(self):
+        pass
+
+    @abstractmethod
+    def mount(self, size_bytes):
+        pass
+
+
 class OSAccess(object):
     __metaclass__ = ABCMeta
 
@@ -158,12 +173,8 @@ class OSAccess(object):
         pass
 
     @abstractmethod
-    def _dismount_fake_disk(self):
+    def fake_disk(self):  # type: () -> BaseFakeDisk
         pass
-
-    @abstractmethod
-    def make_fake_disk(self, name, size_bytes):
-        return self.path_cls()
 
     @abstractmethod
     def _fs_root(self):
@@ -247,3 +258,18 @@ class OSAccess(object):
     @abstractmethod
     def _download_by_smb(self, source_hostname, source_path, destination_dir, timeout_sec):
         return self.path_cls()
+
+    @abstractmethod
+    def file_md5(self, file_path):
+        pass
+
+    def tree_md5(self, tree_path):
+        assert isinstance(tree_path, self.path_cls)
+        files_md5 = {}
+        for file_path in tree_path.glob('**/*'):
+            parts = file_path.relative_to(tree_path).parts
+            try:
+                files_md5[parts] = self.file_md5(file_path)
+            except NotAFile:
+                pass
+        return files_md5

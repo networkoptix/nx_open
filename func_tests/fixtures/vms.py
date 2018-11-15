@@ -1,18 +1,11 @@
-from functools import partial
-
 import pytest
-from netaddr import IPAddress
 from netaddr.ip import IPNetwork
-from parse import parse
-from pathlib2 import Path
-from pylru import lrudecorator
 
 from defaults import defaults
 from framework.os_access.posix_access import local_access
-from framework.serialize import load
 from framework.vms.hypervisor.virtual_box import VirtualBox
 from framework.vms.networks import setup_flat_network
-from framework.vms.vm_type import VMType
+from framework.vms.vm_type import vm_types_from_config
 
 
 def pytest_addoption(parser):
@@ -21,14 +14,6 @@ def pytest_addoption(parser):
         help=(
             "Prefix for template_file parameter in configuration file. "
             "Supports: http://, https://, smb://, file://. "))
-
-
-@lrudecorator(1)
-def vm_types_configuration():
-    # It's a function, not a fixture, because used when parameters are generated.
-    path = Path(__file__).with_name('configuration.yaml')
-    configuration = load(path.read_text())
-    return configuration['vm_types']
 
 
 @pytest.fixture(scope='session')
@@ -50,43 +35,17 @@ def persistent_dir(slot, host_os_access):
 
 @pytest.fixture(scope='session')
 def hypervisor(host_os_access):
-    return VirtualBox(host_os_access, IPAddress('127.0.0.1'))
+    return VirtualBox(host_os_access=host_os_access)
 
 
 @pytest.fixture(scope='session')
 def vm_types(request, slot, hypervisor, persistent_dir):
-    vm_types = {
-        vm_type_name: VMType(
-            vm_type_name,
-            hypervisor,
-            vm_type_conf['os_family'],
-            vm_type_conf['power_on_timeout_sec'],
-            vm_type_conf['vm']['registry_path'].format(slot=slot),
-            partial(vm_type_conf['vm']['name_format'].format, slot=slot),
-            vm_type_conf['vm']['machines_per_slot'],
-            vm_type_conf['vm']['template_vm'].format(slot=slot),
-            partial(vm_type_conf['vm']['mac_address_format'].format, slot=slot),
-            {
-                'host_ports_base': (
-                    vm_type_conf['vm']['port_forwarding']['host_ports_base']
-                    + (
-                        slot
-                        * vm_type_conf['vm']['machines_per_slot']
-                        * vm_type_conf['vm']['port_forwarding']['host_ports_per_vm']
-                        )
-                    ),
-                'host_ports_per_vm': vm_type_conf['vm']['port_forwarding']['host_ports_per_vm'],
-                'vm_ports_to_host_port_offsets': {
-                    parse('{}/{:d}', key): hint
-                    for key, hint
-                    in vm_type_conf['vm']['port_forwarding']['vm_ports_to_host_port_offsets'].items()
-                    },
-                },
-            request.config.getoption('template_url_prefix') + vm_type_conf['vm']['template_file'],
-            persistent_dir,
-            )
-        for vm_type_name, vm_type_conf in vm_types_configuration().items()
-        }
+    template_url_prefix = request.config.getoption('template_url_prefix')
+    vm_types = vm_types_from_config(
+        downloads_dir=persistent_dir,
+        template_url_prefix=template_url_prefix,
+        hypervisor=hypervisor,
+        slot=slot)
     if request.config.getoption('--clean'):
         for vm_type in vm_types.values():
             vm_type.cleanup()

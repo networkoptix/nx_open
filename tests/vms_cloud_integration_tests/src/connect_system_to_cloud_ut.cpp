@@ -5,7 +5,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/sync_call.h>
 
-#include <nx/cloud/cdb/api/cloud_nonce.h>
+#include <nx/cloud/db/api/cloud_nonce.h>
 #include <nx/vms/cloud_integration/cdb_nonce_fetcher.h>
 
 #include <api/global_settings.h>
@@ -251,7 +251,7 @@ private:
             std::string hash;
 
             ASSERT_TRUE(parseResult);
-            ASSERT_TRUE(nx::cdb::api::parseCloudNonceBase(
+            ASSERT_TRUE(nx::cloud::db::api::parseCloudNonceBase(
                 nonceWithoutTrailer.toStdString(),
                 &ts,
                 &hash));

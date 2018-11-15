@@ -168,7 +168,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         sync("%s/pandoc" % platform, path_variable="pandoc_directory")
 
     if box == "edge1":
-        sync("cpro-1.0.0-2")
+        sync("cpro-1.0.1")
         sync("gdb")
 
     if arch == "x64":

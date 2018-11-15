@@ -4,12 +4,13 @@ from collections import OrderedDict
 from pprint import pformat
 from uuid import UUID, uuid1
 
-from netaddr import EUI, IPNetwork
+from netaddr import EUI, IPAddress, IPNetwork
 from netaddr.strategy.eui48 import mac_bare
 from pylru import lrudecorator
 
 from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.os_access_interface import OneWayPortMap, ReciprocalPortMap
+from framework.os_access.posix_access import local_access
 from framework.port_check import port_is_open
 from framework.vms.hypervisor import VMAlreadyExists, VMNotFound, VmHardware, VmNotReady
 from framework.vms.hypervisor.hypervisor import Hypervisor
@@ -385,7 +386,7 @@ class VirtualBox(Hypervisor):
     # other NIC is used to make it possible to control traffic by the means of VirtualBox.
     _nat_subnet = IPNetwork('192.168.253.0/24')
 
-    def __init__(self, host_os_access, runner_address):
+    def __init__(self, host_os_access=local_access, runner_address=IPAddress('127.0.0.1')):
         """Create VirtualBox hypervisor.
         @param runner_address: Address of machine this process is running on as seen from machine
             VirtualBox is working on. If it's the same machine, and the address of the machine is
@@ -439,7 +440,7 @@ class VirtualBox(Hypervisor):
         vm_import_file_path = self._get_file_path_for_import_vm(vm_image_path, timeout_sec=600)
         self.manage(['import', vm_import_file_path, '--vsys', 0, '--vmname', vm_name], timeout_sec=600)
         # Group is assigned only when imported: cloned VMs are created nearby.
-        group = '/' + vm_name.rsplit('-', 1)[0]
+        group = '/' + vm_name  # Usually, a template is imported, group name is same as VM name.
         try:
             self.manage(['modifyvm', vm_name, '--groups', group])
         except virtual_box_error_cls('NS_ERROR_INVALID_ARG') as e:

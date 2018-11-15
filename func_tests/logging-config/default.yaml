@@ -52,11 +52,12 @@ loggers:
   framework.installation.lightweight_mediaserver.mediaserver_api: {level: INFO}
 
   resource_synchronization_test.dumper.mediaserver_api: {level: INFO}
-  scalability_test.create_test_data: {level: INFO}
-  scalability_test.merge: {level: INFO}
-  scalability_test.stamp: {level: INFO}
-  scalability_test.dumper: {level: INFO}
-  scalability_test.post_check: {level: INFO}
+  scalability.create_test_data: {level: INFO}
+  scalability.merge: {level: INFO}
+  scalability.transaction_generator.init: {level: INFO}
+  scalability.transaction_generator.stamp: {level: INFO}
+  scalability.dumper: {level: INFO}
+  scalability.post_check: {level: INFO}
 
 root:
   handlers: [stderr]
