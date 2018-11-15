@@ -296,7 +296,7 @@ void EventRibbon::Private::updateTilePreview(int index)
     }
 
     if (!previewProvider)
-        previewProvider.reset(new CameraThumbnailProvider(request, widget));
+        previewProvider.reset(new CameraThumbnailProvider(request));
 
     widget->setPreview(previewProvider.get());
     widget->setPreviewCropRect(previewCropRect);
