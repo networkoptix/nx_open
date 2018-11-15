@@ -2,7 +2,7 @@
 
 #include "dao/structure_updater.h"
 
-namespace nx::data_sync_engine::test {
+namespace nx::clusterdb::engine::test {
 
 static constexpr char kApplicationId[] = "customer_db";
 
@@ -39,4 +39,4 @@ void CustomerDbNode::teardown()
     m_customerDao.reset();
 }
 
-} // namespace nx::data_sync_engine::test
+} // namespace nx::clusterdb::engine::test

@@ -2,7 +2,7 @@
 
 #include <limits>
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 const ProtocolVersionRange ProtocolVersionRange::any(
     0, std::numeric_limits<int>::max());
@@ -28,4 +28,4 @@ bool ProtocolVersionRange::isCompatible(int version) const
     return (version >= m_begin) && (version <= m_end);
 }
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

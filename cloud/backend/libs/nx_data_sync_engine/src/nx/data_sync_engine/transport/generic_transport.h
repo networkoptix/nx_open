@@ -11,9 +11,9 @@
 #include "../transaction_log_reader.h"
 #include "../transaction_transport_header.h"
 
-namespace nx::data_sync_engine { class TransactionLog; }
+namespace nx::clusterdb::engine { class TransactionLog; }
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 /**
  * Synchronizes two pees over command pipeline.
@@ -105,4 +105,4 @@ private:
     void enableOutputChannel();
 };
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

@@ -13,9 +13,9 @@
 
 #include "compatible_ec2_protocol_version.h"
 
-namespace nx::data_sync_engine { class TransactionLog; }
+namespace nx::clusterdb::engine { class TransactionLog; }
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 class WebSocketTransactionTransport:
     public AbstractConnection,
@@ -80,4 +80,4 @@ private:
     QnUuid m_connectionGuid;
 };
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

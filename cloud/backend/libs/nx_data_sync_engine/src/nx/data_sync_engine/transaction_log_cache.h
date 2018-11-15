@@ -11,7 +11,7 @@
 #include "command.h"
 #include "transaction_timestamp_calculator.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 struct UpdateHistoryData
 {
@@ -100,4 +100,4 @@ private:
         TranId tranId) const;
 };
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

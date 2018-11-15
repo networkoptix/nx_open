@@ -1,6 +1,6 @@
 #include "transaction_timestamp_calculator.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 constexpr const int kTimeShiftDelta = 1000;
 
@@ -76,4 +76,4 @@ void TransactionTimestampCalculator::shiftTimestampIfNeeded(
     m_lastTimestamp = qMax(m_lastTimestamp, receivedTransactionTimestamp);
 }
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

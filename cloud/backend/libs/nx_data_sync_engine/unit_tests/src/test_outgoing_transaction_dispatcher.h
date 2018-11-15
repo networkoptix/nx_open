@@ -9,7 +9,7 @@
 
 #include <nx/data_sync_engine/outgoing_transaction_dispatcher.h>
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 namespace test {
 
 class TestOutgoingTransactionDispatcher:
@@ -53,4 +53,4 @@ private:
 };
 
 } // namespace test
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

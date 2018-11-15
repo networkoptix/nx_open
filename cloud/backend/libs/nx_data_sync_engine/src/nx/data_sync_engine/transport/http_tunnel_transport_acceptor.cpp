@@ -6,7 +6,7 @@
 #include "http_tunnel_transport_connection.h"
 #include "../connection_manager.h"
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 HttpTunnelTransportAcceptor::HttpTunnelTransportAcceptor(
     const QnUuid& peerId,
@@ -101,4 +101,4 @@ void HttpTunnelTransportAcceptor::saveCreatedTunnel(
     }
 }
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

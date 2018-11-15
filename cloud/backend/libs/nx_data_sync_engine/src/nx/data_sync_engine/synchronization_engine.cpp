@@ -4,7 +4,7 @@
 
 #include "statistics/provider.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 SyncronizationEngine::SyncronizationEngine(
     const std::string& /*applicationId*/, // TODO: #ak CLOUD-2249.
@@ -214,4 +214,4 @@ void SyncronizationEngine::onSystemDeleted(const std::string& systemId)
         });
 }
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

@@ -14,7 +14,7 @@
 
 #include "../abstract_transaction_data_object.h"
 
-namespace nx::data_sync_engine::dao::memory {
+namespace nx::clusterdb::engine::dao::memory {
 
 class NX_DATA_SYNC_ENGINE_API TransactionDataObject:
     public AbstractTransactionDataObject
@@ -83,4 +83,4 @@ private:
     const int m_transactionFormatVersion;
 };
 
-} // namespace nx::data_sync_engine::dao::memory
+} // namespace nx::clusterdb::engine::dao::memory

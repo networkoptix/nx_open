@@ -141,7 +141,7 @@ public:
     const AccountManager& accountManager() const;
     const SystemManager& systemManager() const;
     const EventManager& eventManager() const;
-    const data_sync_engine::SynchronizationSettings& p2pDb() const;
+    const clusterdb::engine::SynchronizationSettings& p2pDb() const;
     const QString& changeUser() const;
     const ModuleFinder& moduleFinder() const;
     const Http& http() const;
@@ -160,7 +160,7 @@ private:
     AccountManager m_accountManager;
     SystemManager m_systemManager;
     EventManager m_eventManager;
-    data_sync_engine::SynchronizationSettings m_p2pDb;
+    clusterdb::engine::SynchronizationSettings m_p2pDb;
     QString m_changeUser;
     ModuleFinder m_moduleFinder;
     Http m_http;

@@ -5,7 +5,7 @@
 #include "../command_descriptor.h"
 #include "../transaction_transport.h"
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 /** Holding in queue not more then this transaction count. */
 static constexpr int kMaxTransactionsPerIteration = 17;
@@ -344,4 +344,4 @@ void GenericTransport::enableOutputChannel()
     }
 }
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

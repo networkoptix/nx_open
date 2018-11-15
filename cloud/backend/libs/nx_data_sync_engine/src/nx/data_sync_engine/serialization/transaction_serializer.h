@@ -2,7 +2,7 @@
 
 #include "../transaction_transport_header.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 /**
  * Holds transaction inside and is able to serialize it to a requested format.
@@ -30,4 +30,4 @@ public:
         int transactionFormatVersion) const = 0;
 };
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

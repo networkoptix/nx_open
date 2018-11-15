@@ -1,6 +1,6 @@
 #include "outgoing_transaction_dispatcher.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 static const QnUuid kCdbGuid("{674bafd7-4eec-4bba-84aa-a1baea7fc6db}");
 
@@ -29,4 +29,4 @@ OutgoingTransactionDispatcher::OnNewTransactionSubscription&
     return m_onNewTransactionSubscription;
 }
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

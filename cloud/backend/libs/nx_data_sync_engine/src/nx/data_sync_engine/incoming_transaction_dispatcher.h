@@ -13,7 +13,7 @@
 #include "transaction_processor.h"
 #include "transaction_transport_header.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 class TransactionLog;
 
@@ -110,4 +110,4 @@ private:
     void removeHandler(int commandCode);
 };
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

@@ -3,7 +3,7 @@
 #include <nx/fusion/serialization/sql.h>
 #include <nx/sql/query.h>
 
-namespace nx::data_sync_engine::test::dao {
+namespace nx::clusterdb::engine::test::dao {
 
 CustomerDao::CustomerDao(
     nx::sql::AsyncSqlQueryExecutor* queryExecutor)
@@ -70,4 +70,4 @@ nx::sql::AsyncSqlQueryExecutor& CustomerDao::queryExecutor()
     return *m_queryExecutor;
 }
 
-} // namespace nx::data_sync_engine::test::dao
+} // namespace nx::clusterdb::engine::test::dao

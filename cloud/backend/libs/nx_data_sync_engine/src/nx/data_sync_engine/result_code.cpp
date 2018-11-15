@@ -1,6 +1,6 @@
 #include "result_code.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 std::string toString(ResultCode resultCode)
 {
@@ -23,4 +23,4 @@ std::string toString(ResultCode resultCode)
     }
 }
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

@@ -5,7 +5,7 @@
 
 #include <nx/utils/log/log.h>
 
-namespace nx::data_sync_engine::dao::rdb {
+namespace nx::clusterdb::engine::dao::rdb {
 
 TransactionDataObject::TransactionDataObject(int transactionFormatVersion):
     m_transactionFormatVersion(transactionFormatVersion)
@@ -110,4 +110,4 @@ nx::sql::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
     return nx::sql::DBResult::ok;
 }
 
-} // namespace nx::data_sync_engine::dao::rdb
+} // namespace nx::clusterdb::engine::dao::rdb

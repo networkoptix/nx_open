@@ -7,7 +7,7 @@
 
 #include "http_paths.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 template<typename ManagerType>
 class SyncConnectionRequestHandler:
@@ -69,4 +69,4 @@ private:
     }
 };
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

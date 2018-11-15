@@ -8,7 +8,7 @@
 #include "../abstract_transaction_transport.h"
 #include "../compatible_ec2_protocol_version.h"
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 class HttpTunnelTransportConnection:
     public AbstractCommandPipeline
@@ -53,4 +53,4 @@ private:
     int highestProtocolVersionCompatibleWithRemotePeer() const;
 };
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

@@ -5,11 +5,11 @@
 #include <nx/utils/subscription.h>
 #include <nx/utils/thread/mutex.h>
 
-namespace nx::data_sync_engine { class ConnectionManager; }
-namespace nx::data_sync_engine { class IncomingTransactionDispatcher; }
-namespace nx::data_sync_engine { class OutgoingTransactionDispatcher; }
+namespace nx::clusterdb::engine { class ConnectionManager; }
+namespace nx::clusterdb::engine { class IncomingTransactionDispatcher; }
+namespace nx::clusterdb::engine { class OutgoingTransactionDispatcher; }
 
-namespace nx::data_sync_engine::statistics {
+namespace nx::clusterdb::engine::statistics {
 
 struct CommandStatistics
 {
@@ -71,4 +71,4 @@ private:
     void updateOutgoingTransactionStatistics();
 };
 
-} // namespace nx::data_sync_engine::statistics
+} // namespace nx::clusterdb::engine::statistics

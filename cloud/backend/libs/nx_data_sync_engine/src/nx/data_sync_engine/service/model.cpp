@@ -2,7 +2,7 @@
 
 #include "settings.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 Model::Model(const Settings& settings)
 {
@@ -17,4 +17,4 @@ nx::sql::AsyncSqlQueryExecutor& Model::queryExecutor()
     return *m_sqlQueryExecutor;
 }
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

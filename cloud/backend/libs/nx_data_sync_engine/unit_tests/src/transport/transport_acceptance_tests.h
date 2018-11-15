@@ -9,7 +9,7 @@
 
 #include "../cluster_test_fixture.h"
 
-namespace nx::data_sync_engine::transport::test {
+namespace nx::clusterdb::engine::transport::test {
 
 template<typename TransportTypeSet>
 class TransportAcceptance:
@@ -109,7 +109,7 @@ private:
         }
     };
 
-    data_sync_engine::test::ClusterTestFixture m_nodeCluster;
+    clusterdb::engine::test::ClusterTestFixture m_nodeCluster;
     std::vector<std::unique_ptr<AbstractCommandPipelineConnector>> m_connectors;
     nx::utils::SyncQueue<ConnectResult> m_connectResults;
     std::optional<ConnectResult> m_prevConnectResult;
@@ -163,4 +163,4 @@ REGISTER_TYPED_TEST_CASE_P(TransportAcceptance,
     transport_connection_is_removed_before_http_response_has_been_sent
 );
 
-} // namespace nx::data_sync_engine::transport::test
+} // namespace nx::clusterdb::engine::transport::test

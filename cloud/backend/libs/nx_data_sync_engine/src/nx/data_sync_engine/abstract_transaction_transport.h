@@ -12,7 +12,7 @@
 #include "transaction_transport_header.h"
 #include "transport/connect_request_attributes.h"
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 using ConnectionClosedSubscription =
     nx::utils::Subscription<SystemError::ErrorCode>;
@@ -73,4 +73,4 @@ public:
     virtual void start() = 0;
 };
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

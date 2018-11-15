@@ -6,7 +6,7 @@
 
 #include "command.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 class TransactionTransportHeader
 {
@@ -29,4 +29,4 @@ public:
     }
 };
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

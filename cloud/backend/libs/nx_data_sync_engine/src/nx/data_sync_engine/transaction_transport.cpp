@@ -7,7 +7,7 @@
 #include "compatible_ec2_protocol_version.h"
 #include "command_descriptor.h"
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 constexpr static const std::chrono::seconds kTcpKeepAliveTimeout = std::chrono::seconds(5);
 constexpr static const int kKeepAliveProbeCount = 3;
@@ -320,4 +320,4 @@ void CommonHttpConnection::onInactivityTimeout()
     m_baseTransactionTransport->setState(::ec2::QnTransactionTransportBase::Error);
 }
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

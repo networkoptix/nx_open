@@ -7,7 +7,7 @@
 #include <nx/network/http/http_types.h>
 #include <nx/utils/move_only_func.h>
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 class AbstractCommandPipeline;
 class AbstractConnection;
@@ -82,4 +82,4 @@ public:
     virtual void connect(Handler completionHandler) = 0;
 };
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

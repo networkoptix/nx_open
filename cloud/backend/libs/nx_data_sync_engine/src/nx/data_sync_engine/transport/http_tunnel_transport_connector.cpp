@@ -4,7 +4,7 @@
 
 #include "http_tunnel_transport_connection.h"
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 HttpTunnelTransportConnector::HttpTunnelTransportConnector(
     const std::string& systemId,
@@ -69,4 +69,4 @@ void HttpTunnelTransportConnector::processOpenTunnelResult(
         nullptr);
 }
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

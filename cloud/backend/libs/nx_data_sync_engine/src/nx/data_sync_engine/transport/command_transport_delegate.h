@@ -2,7 +2,7 @@
 
 #include "../abstract_transaction_transport.h"
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 class NX_DATA_SYNC_ENGINE_API CommandTransportDelegate:
     public AbstractConnection
@@ -37,4 +37,4 @@ private:
     AbstractConnection* m_delegatee = nullptr;
 };
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

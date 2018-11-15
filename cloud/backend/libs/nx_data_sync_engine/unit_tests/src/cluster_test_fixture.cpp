@@ -7,7 +7,7 @@
 
 #include <nx/data_sync_engine/http/http_paths.h>
 
-namespace nx::data_sync_engine::test {
+namespace nx::clusterdb::engine::test {
 
 nx::utils::test::ModuleLauncher<CustomerDbNode>& Peer::process()
 {
@@ -109,4 +109,4 @@ bool ClusterTestFixture::allPeersAreSynchronized() const
     return true;
 }
 
-} // namespace nx::data_sync_engine::test
+} // namespace nx::clusterdb::engine::test

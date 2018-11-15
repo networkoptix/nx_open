@@ -7,7 +7,7 @@
 
 #include "abstract_transaction_transport_connector.h"
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 class HttpTunnelTransportConnector:
     public AbstractTransactionTransportConnector
@@ -38,4 +38,4 @@ private:
         nx::network::http::tunneling::OpenTunnelResult result);
 };
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

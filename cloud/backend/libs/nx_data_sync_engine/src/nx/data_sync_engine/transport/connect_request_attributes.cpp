@@ -6,7 +6,7 @@
 
 #include <nx/vms/api/types/connection_types.h>
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 bool fetchDataFromConnectRequest(
     const nx::network::http::Request& request,
@@ -69,4 +69,4 @@ bool fetchDataFromConnectRequest(
     return true;
 }
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

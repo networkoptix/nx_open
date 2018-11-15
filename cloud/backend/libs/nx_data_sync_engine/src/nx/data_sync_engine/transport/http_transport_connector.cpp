@@ -8,7 +8,7 @@
 #include "generic_transport.h"
 #include "../transaction_transport.h"
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 static constexpr auto kTcpKeepAliveTimeout = std::chrono::seconds(7);
 static constexpr int kKeepAliveProbeCount = 3;
@@ -211,4 +211,4 @@ void HttpTransportConnector::onPipelineConnectCompleted(
         std::move(newTransport));
 }
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

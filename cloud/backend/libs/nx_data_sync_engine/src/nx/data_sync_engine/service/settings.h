@@ -8,7 +8,7 @@
 
 class QnSettings;
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 class NX_DATA_SYNC_ENGINE_API Settings:
     public nx::utils::BasicServiceSettings
@@ -35,4 +35,4 @@ private:
     nx::network::http::server::Settings m_http;
 };
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

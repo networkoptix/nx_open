@@ -11,7 +11,7 @@
 #include "../connection_manager.h"
 #include "../compatible_ec2_protocol_version.h"
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 class AcceptedCommonHttpConnection:
     public CommandTransportDelegate
@@ -314,4 +314,4 @@ void CommonHttpAcceptor::postTransactionToTransport(
         });
 }
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

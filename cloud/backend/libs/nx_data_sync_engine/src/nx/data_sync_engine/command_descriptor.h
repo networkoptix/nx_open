@@ -4,7 +4,7 @@
 
 #include "command.h"
 
-namespace nx::data_sync_engine::command {
+namespace nx::clusterdb::engine::command {
 
 template<typename CommandDescriptor>
 struct CommandDataHashFunctor
@@ -78,4 +78,4 @@ Command<typename CommandDescriptor::Data> make(
 
 static constexpr int kUserCommand = 20000;
 
-} // namespace nx::data_sync_engine::command
+} // namespace nx::clusterdb::engine::command

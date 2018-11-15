@@ -10,7 +10,7 @@
 
 namespace nx::sql { class AsyncSqlQueryExecutor; }
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 class Controller;
 class Model;
@@ -58,4 +58,4 @@ private:
     View* m_view = nullptr;
 };
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

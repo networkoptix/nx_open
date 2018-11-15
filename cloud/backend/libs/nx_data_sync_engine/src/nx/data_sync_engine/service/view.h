@@ -7,7 +7,7 @@
 
 #include "controller.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 class Settings;
 
@@ -27,4 +27,4 @@ private:
     std::unique_ptr<nx::network::http::server::HttpServer> m_httpServer;
 };
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

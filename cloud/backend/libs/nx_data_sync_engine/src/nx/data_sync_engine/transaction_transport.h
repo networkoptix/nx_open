@@ -21,9 +21,9 @@ class QnTransactionTransportBase;
 class ConnectionGuardSharedState;
 } // namespace ec2
 
-namespace nx::data_sync_engine { class TransactionLog; }
+namespace nx::clusterdb::engine { class TransactionLog; }
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 class CommonHttpConnection:
     public QObject,
@@ -119,4 +119,4 @@ private:
     void onInactivityTimeout();
 };
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

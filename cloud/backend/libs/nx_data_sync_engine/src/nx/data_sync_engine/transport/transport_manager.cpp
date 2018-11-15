@@ -2,7 +2,7 @@
 
 #include "http_tunnel_transport_connector.h"
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 std::unique_ptr<AbstractTransactionTransportConnector> TransportManager::createConnector(
     const std::string& systemId,
@@ -15,4 +15,4 @@ std::unique_ptr<AbstractTransactionTransportConnector> TransportManager::createC
         targetUrl);
 }
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

@@ -3,7 +3,7 @@
 #include "outgoing_command_filter.h"
 #include "transaction_log.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 TransactionLogReader::TransactionLogReader(
     TransactionLog* const transactionLog,
@@ -97,4 +97,4 @@ std::string TransactionLogReader::systemId() const
     return m_systemId;
 }
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

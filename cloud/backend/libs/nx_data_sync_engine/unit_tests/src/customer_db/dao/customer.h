@@ -4,7 +4,7 @@
 
 #include "../data.h"
 
-namespace nx::data_sync_engine::test::dao {
+namespace nx::clusterdb::engine::test::dao {
 
 class CustomerDao
 {
@@ -27,4 +27,4 @@ private:
     nx::sql::AsyncSqlQueryExecutor* m_queryExecutor;
 };
 
-} // namespace nx::data_sync_engine::test::dao
+} // namespace nx::clusterdb::engine::test::dao

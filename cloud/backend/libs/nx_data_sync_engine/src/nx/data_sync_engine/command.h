@@ -3,7 +3,7 @@
 #include <transaction/transaction.h>
 #include <transaction/transaction_transport_header.h>
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 using CommandHeader = ::ec2::QnAbstractTransaction;
 
@@ -37,4 +37,4 @@ public:
 
 using CommandTransportHeader = ::ec2::QnTransactionTransportHeader;
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

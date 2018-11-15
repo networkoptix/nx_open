@@ -1,6 +1,6 @@
 #pragma once
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 class NX_DATA_SYNC_ENGINE_API ProtocolVersionRange
 {
@@ -21,4 +21,4 @@ private:
     int m_end = 0;
 };
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

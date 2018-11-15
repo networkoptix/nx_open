@@ -3,7 +3,7 @@
 #include "model.h"
 #include "settings.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 Controller::Controller(
     const std::string& applicationId,
@@ -24,4 +24,4 @@ SyncronizationEngine& Controller::syncronizationEngine()
     return m_syncronizationEngine;
 }
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

@@ -2,7 +2,7 @@
 
 #include <nx/utils/random.h>
 
-namespace nx::data_sync_engine::test {
+namespace nx::clusterdb::engine::test {
 
 class ConnectingPeers:
     public ::testing::Test,
@@ -62,4 +62,4 @@ TEST_F(ConnectingPeers, DISABLED_connected_peers_exchange_data)
     thenPeersSynchronizedEventually();
 }
 
-} // namespace nx::data_sync_engine::test
+} // namespace nx::clusterdb::engine::test

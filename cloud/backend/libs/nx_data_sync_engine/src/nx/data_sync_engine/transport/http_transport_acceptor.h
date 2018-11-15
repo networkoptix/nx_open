@@ -16,16 +16,16 @@
 #include "../transaction_transport.h"
 #include "command_transport_delegate.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 class ConnectionManager;
 class ProtocolVersionRange;
 class OutgoingCommandFilter;
 class TransactionLog;
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 class GenericTransport;
 
@@ -77,4 +77,4 @@ private:
         bool* foundConnectionOfExpectedType);
 };
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

@@ -8,7 +8,7 @@
 
 #include "transaction_log.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 class OutgoingCommandFilter;
 
@@ -55,4 +55,4 @@ private:
         TransactionsReadHandler completionHandler);
 };
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

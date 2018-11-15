@@ -14,7 +14,7 @@
 #include "../data/statistics_data.h"
 #include "../data/system_data.h"
 
-namespace nx { namespace data_sync_engine { class SyncronizationEngine; } }
+namespace nx::clusterdb::engine { class SyncronizationEngine; }
 
 namespace nx::cloud::db {
 
@@ -25,7 +25,7 @@ class MaintenanceManager
 public:
     MaintenanceManager(
         const QnUuid& moduleGuid,
-        data_sync_engine::SyncronizationEngine* const syncronizationEngine,
+        clusterdb::engine::SyncronizationEngine* const syncronizationEngine,
         const nx::sql::InstanceController& dbInstanceController);
     ~MaintenanceManager();
 
@@ -50,7 +50,7 @@ public:
 
 private:
     const QnUuid m_moduleGuid;
-    data_sync_engine::SyncronizationEngine* const m_syncronizationEngine;
+    clusterdb::engine::SyncronizationEngine* const m_syncronizationEngine;
     const nx::sql::InstanceController& m_dbInstanceController;
     nx::network::aio::Timer m_timer;
     nx::utils::Counter m_startedAsyncCallsCounter;
@@ -58,8 +58,8 @@ private:
     void onTransactionLogRead(
         nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
         const std::string& systemId,
-        data_sync_engine::ResultCode resultCode,
-        std::vector<data_sync_engine::dao::TransactionLogRecord> serializedTransactions,
+        clusterdb::engine::ResultCode resultCode,
+        std::vector<clusterdb::engine::dao::TransactionLogRecord> serializedTransactions,
         vms::api::TranState readedUpTo,
         std::function<void(
             api::ResultCode,

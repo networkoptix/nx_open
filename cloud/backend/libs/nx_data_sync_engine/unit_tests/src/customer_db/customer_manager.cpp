@@ -2,7 +2,7 @@
 
 #include "dao/customer.h"
 
-namespace nx::data_sync_engine::test {
+namespace nx::clusterdb::engine::test {
 
 CustomerManager::CustomerManager(
     SyncronizationEngine* syncronizationEngine,
@@ -116,7 +116,7 @@ nx::sql::DBResult CustomerManager::removeCustomerFromDb(
 nx::sql::DBResult CustomerManager::processSaveCustomer(
     nx::sql::QueryContext* queryContext,
     const std::string& /*systemId*/,
-    data_sync_engine::Command<Customer> command)
+    clusterdb::engine::Command<Customer> command)
 {
     m_customerDao->saveCustomer(queryContext, command.params);
     return nx::sql::DBResult::ok;
@@ -125,10 +125,10 @@ nx::sql::DBResult CustomerManager::processSaveCustomer(
 nx::sql::DBResult CustomerManager::processRemoveCustomer(
     nx::sql::QueryContext* queryContext,
     const std::string& /*systemId*/,
-    data_sync_engine::Command<Id> command)
+    clusterdb::engine::Command<Id> command)
 {
     m_customerDao->removeCustomer(queryContext, command.params.id);
     return nx::sql::DBResult::ok;
 }
 
-} // namespace nx::data_sync_engine::test
+} // namespace nx::clusterdb::engine::test

@@ -24,7 +24,7 @@
 #include "transaction_log_cache.h"
 #include "transaction_transport_header.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 class AbstractOutgoingTransactionDispatcher;
 
@@ -62,7 +62,7 @@ public:
         nx::sql::DBResult(
             nx::sql::QueryContext* /*queryContext*/,
             const std::string& /*systemId*/,
-            const nx::data_sync_engine::EditableSerializableTransaction& /*transaction*/)>;
+            const nx::clusterdb::engine::EditableSerializableTransaction& /*transaction*/)>;
 
     /**
      * Fills internal cache.
@@ -359,4 +359,4 @@ private:
     static ResultCode dbResultToApiResult(nx::sql::DBResult dbResult);
 };
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

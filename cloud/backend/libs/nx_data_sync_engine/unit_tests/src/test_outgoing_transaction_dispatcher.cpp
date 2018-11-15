@@ -6,7 +6,7 @@
 
 #include <nx/utils/random.h>
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 namespace test {
 
 void TestOutgoingTransactionDispatcher::dispatchTransaction(
@@ -67,4 +67,4 @@ void TestOutgoingTransactionDispatcher::assertIfCouldNotFindTransactionWithHeade
 }
 
 } // namespace test
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 enum class ResultCode
 {
@@ -16,4 +16,4 @@ enum class ResultCode
 
 std::string toString(ResultCode);
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

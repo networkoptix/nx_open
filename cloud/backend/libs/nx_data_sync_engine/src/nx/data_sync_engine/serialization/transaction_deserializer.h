@@ -8,7 +8,7 @@
 #include "ubjson_serialized_transaction.h"
 #include "../command.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 class DeserializableCommandData;
 
@@ -142,4 +142,4 @@ std::unique_ptr<SerializableTransaction<CommandDescriptor>>
         commandFormatVersion);
 }
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

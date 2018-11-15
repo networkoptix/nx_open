@@ -7,7 +7,7 @@
 namespace nx::cloud::db::ec2::command {
 
 struct SaveUser:
-    nx::data_sync_engine::command::BaseCommandDescriptor<
+    nx::clusterdb::engine::command::BaseCommandDescriptor<
         vms::api::UserData,
         ::ec2::ApiCommand::saveUser>
 {
@@ -15,7 +15,7 @@ struct SaveUser:
 };
 
 struct RemoveUser:
-    nx::data_sync_engine::command::BaseCommandDescriptor<
+    nx::clusterdb::engine::command::BaseCommandDescriptor<
         vms::api::IdData,
         ::ec2::ApiCommand::removeUser>
 {
@@ -23,7 +23,7 @@ struct RemoveUser:
 };
 
 struct SetResourceParam:
-    nx::data_sync_engine::command::BaseCommandDescriptor<
+    nx::clusterdb::engine::command::BaseCommandDescriptor<
         vms::api::ResourceParamWithRefData,
         ::ec2::ApiCommand::setResourceParam>
 {
@@ -31,7 +31,7 @@ struct SetResourceParam:
 };
 
 struct RemoveResourceParam:
-    nx::data_sync_engine::command::BaseCommandDescriptor<
+    nx::clusterdb::engine::command::BaseCommandDescriptor<
         vms::api::ResourceParamWithRefData,
         ::ec2::ApiCommand::removeResourceParam>
 {
@@ -39,7 +39,7 @@ struct RemoveResourceParam:
 };
 
 struct SaveSystemMergeHistoryRecord:
-    nx::data_sync_engine::command::BaseCommandDescriptor<
+    nx::clusterdb::engine::command::BaseCommandDescriptor<
         vms::api::SystemMergeHistoryRecord,
         ::ec2::ApiCommand::saveSystemMergeHistoryRecord>
 {

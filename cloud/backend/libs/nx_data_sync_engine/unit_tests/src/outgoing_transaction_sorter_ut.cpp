@@ -10,7 +10,7 @@
 
 #include "test_outgoing_transaction_dispatcher.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 namespace test {
 
 class TestOutgoingTransactionSorter:
@@ -357,4 +357,4 @@ TEST_F(FtOutgoingTransactionSorter, concurrent_transactions)
 }
 
 } // namespace test
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

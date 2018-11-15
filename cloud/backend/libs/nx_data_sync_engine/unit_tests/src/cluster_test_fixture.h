@@ -11,7 +11,7 @@
 
 #include "customer_db/node.h"
 
-namespace nx::data_sync_engine::test {
+namespace nx::clusterdb::engine::test {
 
 class Peer
 {
@@ -50,4 +50,4 @@ private:
     std::atomic<int> m_peerCounter{0};
 };
 
-} // namespace nx::data_sync_engine::test
+} // namespace nx::clusterdb::engine::test

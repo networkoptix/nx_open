@@ -36,7 +36,7 @@ class MessageDispatcher;
 } // namespace network
 } // namespace http
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 class SynchronizationSettings;
 
@@ -190,4 +190,4 @@ private:
     void onTransactionDone(const std::string& connectionId, ResultCode resultCode);
 };
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

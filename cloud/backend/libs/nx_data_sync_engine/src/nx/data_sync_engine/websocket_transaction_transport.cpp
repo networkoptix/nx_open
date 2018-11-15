@@ -6,7 +6,7 @@
 #include "compatible_ec2_protocol_version.h"
 #include "transaction_log.h"
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 static constexpr int kMaxTransactionsPerIteration = 17;
 
@@ -257,4 +257,4 @@ void WebSocketTransactionTransport::fillAuthInfo(
     NX_ASSERT(0, "This method is used for outgoing connections only. Not implemented");
 }
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

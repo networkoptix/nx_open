@@ -8,7 +8,7 @@
 #include "data.h"
 #include "dao/customer.h"
 
-namespace nx::data_sync_engine::test {
+namespace nx::clusterdb::engine::test {
 
 /**
  * Test instance of data_sync_engine.
@@ -33,4 +33,4 @@ private:
     std::unique_ptr<dao::CustomerDao> m_customerDao;
 };
 
-} // namespace nx::data_sync_engine::test
+} // namespace nx::clusterdb::engine::test

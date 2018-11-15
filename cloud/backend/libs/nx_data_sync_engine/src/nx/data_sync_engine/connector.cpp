@@ -6,7 +6,7 @@
 #include "connection_manager.h"
 #include "transport/transport_manager.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 static constexpr std::chrono::seconds kRetryConnectTimeout(7);
 
@@ -126,4 +126,4 @@ void Connector::onConnectionClosed(
         [url, this]() { connectToNodeAsync(url); });
 }
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

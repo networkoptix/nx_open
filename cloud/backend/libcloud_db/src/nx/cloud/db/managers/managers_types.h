@@ -14,7 +14,7 @@ namespace nx::cloud::db {
 
 api::ResultCode dbResultToApiResult(nx::sql::DBResult);
 
-api::ResultCode ec2ResultToResult(data_sync_engine::ResultCode resultCode);
+api::ResultCode ec2ResultToResult(clusterdb::engine::ResultCode resultCode);
 
 enum class EntityType
 {

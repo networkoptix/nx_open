@@ -1,6 +1,6 @@
 #include "command_transport_delegate.h"
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 CommandTransportDelegate::CommandTransportDelegate(
     AbstractConnection* delegatee)
@@ -64,4 +64,4 @@ void CommandTransportDelegate::start()
     m_delegatee->start();
 }
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

@@ -4,7 +4,7 @@
 #include "settings.h"
 #include "../http/http_paths.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 View::View(
     const Settings& settings,
@@ -30,4 +30,4 @@ void View::listen()
     m_httpServer->listen();
 }
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

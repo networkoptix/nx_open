@@ -184,7 +184,7 @@ private:
     SystemManagerStub m_systemManagerStub;
     SystemHealthInfoProviderStub m_systemHealthInfoProviderStub;
     VmsGatewayStub m_vmsGatewayStub;
-    std::unique_ptr<data_sync_engine::SyncronizationEngine> m_syncronizationEngine;
+    std::unique_ptr<clusterdb::engine::SyncronizationEngine> m_syncronizationEngine;
     std::unique_ptr<nx::cloud::db::SystemMergeManager> m_systemMergeManager;
     nx::utils::SyncQueue<api::ResultCode> m_mergeResults;
     boost::optional<std::future<void>> m_systemMergeManagerDestroyed;
@@ -199,11 +199,11 @@ private:
 
         m_ownerAccount = insertRandomAccount();
 
-        m_syncronizationEngine = std::make_unique<data_sync_engine::SyncronizationEngine>(
+        m_syncronizationEngine = std::make_unique<clusterdb::engine::SyncronizationEngine>(
             std::string(),
             QnUuid::createUuid(),
             m_settings.p2pDb(),
-            nx::data_sync_engine::ProtocolVersionRange(
+            nx::clusterdb::engine::ProtocolVersionRange(
                 kMinSupportedProtocolVersion,
                 kMaxSupportedProtocolVersion),
             &queryExecutor());

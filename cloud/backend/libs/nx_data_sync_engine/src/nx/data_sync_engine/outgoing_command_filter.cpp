@@ -2,7 +2,7 @@
 
 #include "transaction_log.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 static const QnUuid kCdbGuid("{674bafd7-4eec-4bba-84aa-a1baea7fc6db}");
 
@@ -30,4 +30,4 @@ void OutgoingCommandFilter::updateReadFilter(ReadCommandsFilter* readFilter) con
         readFilter->sources = {kCdbGuid};
 }
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

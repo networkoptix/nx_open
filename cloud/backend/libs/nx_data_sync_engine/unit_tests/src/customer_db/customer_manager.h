@@ -6,7 +6,7 @@
 
 #include "data.h"
 
-namespace nx::data_sync_engine::test {
+namespace nx::clusterdb::engine::test {
 
 namespace dao { class CustomerDao; }
 
@@ -50,12 +50,12 @@ private:
     nx::sql::DBResult processSaveCustomer(
         nx::sql::QueryContext* queryContext,
         const std::string& systemId,
-        data_sync_engine::Command<Customer> command);
+        clusterdb::engine::Command<Customer> command);
 
     nx::sql::DBResult processRemoveCustomer(
         nx::sql::QueryContext* queryContext,
         const std::string& systemId,
-        data_sync_engine::Command<Id> command);
+        clusterdb::engine::Command<Id> command);
 };
 
-} // namespace nx::data_sync_engine::test
+} // namespace nx::clusterdb::engine::test

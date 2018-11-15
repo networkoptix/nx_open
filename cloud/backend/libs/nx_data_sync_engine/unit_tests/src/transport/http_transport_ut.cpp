@@ -3,7 +3,7 @@
 
 #include "transport_acceptance_tests.h"
 
-namespace nx::data_sync_engine::transport::test {
+namespace nx::clusterdb::engine::transport::test {
 
 struct HttpTransportTypes
 {
@@ -17,4 +17,4 @@ INSTANTIATE_TYPED_TEST_CASE_P(
     TransportAcceptance,
     HttpTransportTypes);
 
-} // namespace nx::data_sync_engine::transport::test
+} // namespace nx::clusterdb::engine::transport::test

@@ -7,16 +7,16 @@
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/vms/api/data/peer_data.h>
 
-namespace nx::data_sync_engine { 
+namespace nx::clusterdb::engine { 
 
 class ConnectionManager;
 class ProtocolVersionRange;
 class OutgoingCommandFilter;
 class TransactionLog;
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 class WebSocketTransportAcceptor
 {
@@ -48,4 +48,4 @@ private:
         const std::string& userAgent);
 };
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

@@ -11,7 +11,7 @@
 #include "../compatible_ec2_protocol_version.h"
 #include "../websocket_transaction_transport.h"
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 WebSocketTransportAcceptor::WebSocketTransportAcceptor(
     const QnUuid& moduleGuid,
@@ -131,4 +131,4 @@ void WebSocketTransportAcceptor::addWebSocketTransactionTransport(
     }
 }
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

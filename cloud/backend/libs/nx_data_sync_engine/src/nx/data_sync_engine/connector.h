@@ -11,7 +11,7 @@
 
 #include "transport/abstract_transaction_transport_connector.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 class ConnectionManager;
 
@@ -64,4 +64,4 @@ private:
         SystemError::ErrorCode systemErrorCode);
 };
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

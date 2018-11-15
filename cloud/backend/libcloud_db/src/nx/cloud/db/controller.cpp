@@ -37,7 +37,7 @@ Controller::Controller(const conf::Settings& settings):
         std::string(), //< No application id.
         kCdbGuid,
         settings.p2pDb(),
-        nx::data_sync_engine::ProtocolVersionRange(
+        nx::clusterdb::engine::ProtocolVersionRange(
             kMinSupportedProtocolVersion,
             kMaxSupportedProtocolVersion),
         &m_dbInstanceController.queryExecutor()),
@@ -117,7 +117,7 @@ EventManager& Controller::eventManager()
     return m_eventManager;
 }
 
-data_sync_engine::SyncronizationEngine& Controller::ec2SyncronizationEngine()
+clusterdb::engine::SyncronizationEngine& Controller::ec2SyncronizationEngine()
 {
     return m_ec2SyncronizationEngine;
 }
@@ -236,7 +236,7 @@ void Controller::initializeDataSynchronizationEngine()
 {
     using namespace std::placeholders;
 
-    nx::data_sync_engine::OutgoingCommandFilterConfiguration outgoingCommandFilter;
+    nx::clusterdb::engine::OutgoingCommandFilterConfiguration outgoingCommandFilter;
     outgoingCommandFilter.sendOnlyOwnCommands = true;
 
     m_ec2SyncronizationEngine.setOutgoingCommandFilter(outgoingCommandFilter);
@@ -249,7 +249,7 @@ void Controller::initializeDataSynchronizationEngine()
             [this](
                 nx::sql::QueryContext* queryContext,
                 const std::string& /*systemId*/,
-                data_sync_engine::Command<nx::vms::api::SystemMergeHistoryRecord> data)
+                clusterdb::engine::Command<nx::vms::api::SystemMergeHistoryRecord> data)
             {
                 m_systemMergeManager.processMergeHistoryRecord(queryContext, data.params);
                 return nx::sql::DBResult::ok;
@@ -264,7 +264,7 @@ void Controller::initializeDataSynchronizationEngine()
 nx::sql::DBResult Controller::copyExternalTransaction(
     nx::sql::QueryContext* queryContext,
     const std::string& systemId,
-    const nx::data_sync_engine::EditableSerializableTransaction& transaction)
+    const nx::clusterdb::engine::EditableSerializableTransaction& transaction)
 {
     if (transaction.header().peerID == m_ec2SyncronizationEngine.peerId())
         return nx::sql::DBResult::ok;

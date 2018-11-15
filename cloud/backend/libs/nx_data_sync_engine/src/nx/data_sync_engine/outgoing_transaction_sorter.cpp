@@ -7,7 +7,7 @@
 
 #include "outgoing_transaction_dispatcher.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 OutgoingTransactionSorter::OutgoingTransactionSorter(
     const std::string& systemId,
@@ -214,4 +214,4 @@ void OutgoingTransactionSorter::registerTransactionSequence(
     }
 }
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

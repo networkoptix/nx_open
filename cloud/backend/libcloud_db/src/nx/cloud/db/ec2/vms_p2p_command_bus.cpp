@@ -7,7 +7,7 @@ namespace nx::cloud::db {
 namespace ec2 {
 
 VmsP2pCommandBus::VmsP2pCommandBus(
-    data_sync_engine::SyncronizationEngine* syncronizationEngine)
+    clusterdb::engine::SyncronizationEngine* syncronizationEngine)
     :
     m_syncronizationEngine(syncronizationEngine)
 {

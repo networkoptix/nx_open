@@ -1,6 +1,6 @@
 #include "settings.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 Settings::Settings():
     base_type("", "", "") //< TODO
@@ -44,4 +44,4 @@ void Settings::loadSettings()
         m_http.endpoints.push_back(nx::network::SocketAddress::anyPrivateAddressV4);
 }
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

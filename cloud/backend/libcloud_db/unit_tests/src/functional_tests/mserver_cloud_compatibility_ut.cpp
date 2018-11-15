@@ -115,7 +115,7 @@ TEST_F(Ec2MserverCloudCompatibility, version_right_of_compatibility_range_is_rej
 
 TEST(Ec2MserverCloudCompabilityCheckRoutine, compatible_versions)
 {
-    const nx::data_sync_engine::ProtocolVersionRange cdbProtocolVersionRange(
+    const nx::clusterdb::engine::ProtocolVersionRange cdbProtocolVersionRange(
         nx::cloud::db::kMinSupportedProtocolVersion,
         nx::cloud::db::kMaxSupportedProtocolVersion);
 
@@ -130,7 +130,7 @@ TEST(Ec2MserverCloudCompabilityCheckRoutine, compatible_versions)
 
 TEST(Ec2MserverCloudCompabilityCheckRoutine, incompatible_versions)
 {
-    const nx::data_sync_engine::ProtocolVersionRange cdbProtocolVersionRange(
+    const nx::clusterdb::engine::ProtocolVersionRange cdbProtocolVersionRange(
         nx::cloud::db::kMinSupportedProtocolVersion,
         nx::cloud::db::kMaxSupportedProtocolVersion);
 

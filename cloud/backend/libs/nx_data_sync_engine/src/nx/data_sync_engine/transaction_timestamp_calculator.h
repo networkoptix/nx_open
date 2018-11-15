@@ -8,7 +8,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/timestamp.h>
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 using Timestamp = nx::vms::api::Timestamp;
 
@@ -35,4 +35,4 @@ private:
     mutable QnMutex m_timeMutex;
 };
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

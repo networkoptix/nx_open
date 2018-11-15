@@ -28,7 +28,7 @@ public:
             std::string(),
             QnUuid::createUuid(),
             m_settings.p2pDb(),
-            nx::data_sync_engine::ProtocolVersionRange(
+            nx::clusterdb::engine::ProtocolVersionRange(
                 kMinSupportedProtocolVersion,
                 kMaxSupportedProtocolVersion),
             &persistentDbManager()->queryExecutor())
@@ -138,7 +138,7 @@ private:
     AccountManagerStub m_accountManagerStub;
     SystemHealthInfoProviderStub m_systemHealthInfoProvider;
     TestEmailManager m_emailManager;
-    data_sync_engine::SyncronizationEngine m_ec2SyncronizationEngine;
+    clusterdb::engine::SyncronizationEngine m_ec2SyncronizationEngine;
     std::unique_ptr<nx::cloud::db::SystemManager> m_systemManager;
     std::string m_systemId;
     api::AccountData m_ownerAccount;

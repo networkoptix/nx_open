@@ -15,7 +15,7 @@
 #include "transaction_transport.h"
 #include "transaction_transport_header.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 ConnectionManager::ConnectionManager(
     const QnUuid& moduleGuid,
@@ -409,4 +409,4 @@ void ConnectionManager::onTransactionDone(
     }
 }
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

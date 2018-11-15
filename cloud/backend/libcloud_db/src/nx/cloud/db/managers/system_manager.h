@@ -39,7 +39,7 @@
 #include "../data/data_filter.h"
 #include "../data/system_data.h"
 
-namespace nx { namespace data_sync_engine { class SyncronizationEngine; } }
+namespace nx::clusterdb::engine { class SyncronizationEngine; }
 
 namespace nx::cloud::db {
 
@@ -118,7 +118,7 @@ public:
         const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
         nx::sql::AsyncSqlQueryExecutor* const dbManager,
         AbstractEmailManager* const emailManager,
-        data_sync_engine::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false);
+        clusterdb::engine::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false);
     virtual ~SystemManager();
 
     virtual void authenticateByName(
@@ -287,7 +287,7 @@ private:
     const AbstractSystemHealthInfoProvider& m_systemHealthInfoProvider;
     nx::sql::AsyncSqlQueryExecutor* const m_dbManager;
     AbstractEmailManager* const m_emailManager;
-    data_sync_engine::SyncronizationEngine* const m_ec2SyncronizationEngine;
+    clusterdb::engine::SyncronizationEngine* const m_ec2SyncronizationEngine;
     SystemsDict m_systems;
     mutable QnMutex m_mutex;
     AccountSystemAccessRoleDict m_accountAccessRoleForSystem;
@@ -511,12 +511,12 @@ private:
     nx::sql::DBResult processEc2SaveUser(
         nx::sql::QueryContext* queryContext,
         const std::string& systemId,
-        data_sync_engine::Command<nx::vms::api::UserData> data);
+        clusterdb::engine::Command<nx::vms::api::UserData> data);
 
     nx::sql::DBResult processEc2RemoveUser(
         nx::sql::QueryContext* queryContext,
         const std::string& systemId,
-        data_sync_engine::Command<nx::vms::api::IdData> data);
+        clusterdb::engine::Command<nx::vms::api::IdData> data);
 
     void removeVmsUserFromCache(
         const std::string& systemId,
@@ -525,12 +525,12 @@ private:
     nx::sql::DBResult processSetResourceParam(
         nx::sql::QueryContext* queryContext,
         const std::string& systemId,
-        data_sync_engine::Command<nx::vms::api::ResourceParamWithRefData> data);
+        clusterdb::engine::Command<nx::vms::api::ResourceParamWithRefData> data);
 
     nx::sql::DBResult processRemoveResourceParam(
         nx::sql::QueryContext* queryContext,
         const std::string& systemId,
-        data_sync_engine::Command<nx::vms::api::ResourceParamWithRefData> data);
+        clusterdb::engine::Command<nx::vms::api::ResourceParamWithRefData> data);
 
     template<typename ExtensionFuncPtr, typename... Args>
     nx::sql::DBResult invokeSystemSharingExtension(

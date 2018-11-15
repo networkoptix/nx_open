@@ -2,7 +2,7 @@
 
 #include "serializable_transaction.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 template<typename BaseType>
 class BaseUbjsonSerializedTransaction:
@@ -146,4 +146,4 @@ public:
     TransactionUbjsonDataSource& operator=(TransactionUbjsonDataSource&&) = default;
 };
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

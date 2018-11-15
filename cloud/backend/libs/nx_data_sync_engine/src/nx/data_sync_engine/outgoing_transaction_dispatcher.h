@@ -9,7 +9,7 @@
 #include "serialization/transaction_serializer.h"
 #include "transaction_transport_header.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 class NX_DATA_SYNC_ENGINE_API AbstractOutgoingTransactionDispatcher
 {
@@ -46,4 +46,4 @@ private:
     const OutgoingCommandFilter& m_filter;
 };
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

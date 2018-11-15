@@ -17,7 +17,7 @@ Database::Database(
         kKeyValueDbApplicationId,
         m_moduleId,
         settings.dataSyncEngineSettings,
-        nx::data_sync_engine::ProtocolVersionRange(1, 1),
+        nx::clusterdb::engine::ProtocolVersionRange(1, 1),
         dbManager),
     m_structureUpdater(dbManager),
     m_dataManager(dbManager),

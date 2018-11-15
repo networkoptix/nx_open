@@ -1,6 +1,6 @@
 #include "structure_updater.h"
 
-namespace nx::data_sync_engine::test::dao {
+namespace nx::clusterdb::engine::test::dao {
 
 static constexpr char kSchemaName[] = 
     "customer_db_b3ad7d30-bdb6-492e-8be5-aeb1bdaf9c1f";
@@ -27,4 +27,4 @@ StructureUpdater::StructureUpdater(
         throw std::runtime_error("Failed to update DB structure");
 }
 
-} // namespace nx::data_sync_engine::test::dao
+} // namespace nx::clusterdb::engine::test::dao

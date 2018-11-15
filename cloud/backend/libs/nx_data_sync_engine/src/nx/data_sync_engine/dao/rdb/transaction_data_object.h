@@ -5,7 +5,7 @@
 
 #include "../abstract_transaction_data_object.h"
 
-namespace nx::data_sync_engine::dao::rdb {
+namespace nx::clusterdb::engine::dao::rdb {
 
 class TransactionDataObject:
     public AbstractTransactionDataObject
@@ -35,4 +35,4 @@ private:
     const int m_transactionFormatVersion;
 };
 
-} // namespace nx::data_sync_engine::dao::rdb
+} // namespace nx::clusterdb::engine::dao::rdb

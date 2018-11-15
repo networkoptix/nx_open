@@ -9,14 +9,14 @@
 #include "settings.h"
 #include "view.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 Service::Service(
     const std::string& applicationId,
     int argc,
     char **argv)
     :
-    base_type(argc, argv, "nx::data_sync_engine service"),
+    base_type(argc, argv, "nx::clusterdb::engine service"),
     m_applicationId(applicationId)
 {
 }
@@ -81,4 +81,4 @@ SyncronizationEngine& Service::syncronizationEngine()
     return m_controller->syncronizationEngine();
 }
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

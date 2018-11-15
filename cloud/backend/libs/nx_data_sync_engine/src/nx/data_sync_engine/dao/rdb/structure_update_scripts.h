@@ -1,6 +1,6 @@
 #pragma once
 
-namespace nx::data_sync_engine::dao::rdb {
+namespace nx::clusterdb::engine::dao::rdb {
 
 /**
  * CLOUD-587. Moving data syncronization logic to a separate module.
@@ -32,4 +32,4 @@ CREATE INDEX idx_transaction_time
 
 )sql";
 
-} // namespace nx::data_sync_engine::dao::rdb
+} // namespace nx::clusterdb::engine::dao::rdb

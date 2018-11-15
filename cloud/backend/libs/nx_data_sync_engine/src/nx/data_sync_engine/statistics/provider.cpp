@@ -6,7 +6,7 @@
 #include "../incoming_transaction_dispatcher.h"
 #include "../outgoing_transaction_dispatcher.h"
 
-namespace nx::data_sync_engine::statistics {
+namespace nx::clusterdb::engine::statistics {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (CommandStatistics)(Statistics),
@@ -77,4 +77,4 @@ void Provider::updateOutgoingTransactionStatistics()
     m_outgoingTransactionPerMinuteCalculator.add(1);
 }
 
-} // namespace nx::data_sync_engine::statistics
+} // namespace nx::clusterdb::engine::statistics

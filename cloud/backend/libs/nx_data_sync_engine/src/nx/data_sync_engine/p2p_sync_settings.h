@@ -2,7 +2,7 @@
 
 class QnSettings;
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 class NX_DATA_SYNC_ENGINE_API SynchronizationSettings
 {
@@ -14,4 +14,4 @@ public:
     void load(const QnSettings& settings);
 };
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

@@ -1,6 +1,6 @@
 #include "http_tunnel_transport_connection.h"
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 HttpTunnelTransportConnection::HttpTunnelTransportConnection(
     const ProtocolVersionRange& protocolVersionRange,
@@ -85,4 +85,4 @@ int HttpTunnelTransportConnection::highestProtocolVersionCompatibleWithRemotePee
         : m_connectionRequestAttributes.remotePeerProtocolVersion;
 }
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

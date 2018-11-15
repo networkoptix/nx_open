@@ -7,7 +7,7 @@
 
 #include "abstract_transaction_transport_connector.h"
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 class TransportManager
 {
@@ -18,4 +18,4 @@ public:
         const nx::utils::Url& targetUrl);
 };
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

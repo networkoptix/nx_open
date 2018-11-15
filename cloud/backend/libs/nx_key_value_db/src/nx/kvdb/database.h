@@ -33,7 +33,7 @@ private:
     //const Settings& m_settings;
     //nx::sql::AsyncSqlQueryExecutor* m_dbManager;
     const QnUuid m_moduleId;
-    nx::data_sync_engine::SyncronizationEngine m_syncEngine;
+    nx::clusterdb::engine::SyncronizationEngine m_syncEngine;
     dao::rdb::StructureUpdater m_structureUpdater;
     DataManager m_dataManager;
     EventProvider m_eventProvider;

@@ -20,7 +20,7 @@
 #include "transport/transport_manager.h"
 #include "transport/websocket_transport_acceptor.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 class SynchronizationSettings;
 
@@ -104,4 +104,4 @@ private:
     void onSystemDeleted(const std::string& systemId);
 };
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

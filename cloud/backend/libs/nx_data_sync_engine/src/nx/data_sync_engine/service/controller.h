@@ -4,7 +4,7 @@
 
 #include "../synchronization_engine.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 class Settings;
 class Model;
@@ -23,4 +23,4 @@ private:
     SyncronizationEngine m_syncronizationEngine;
 };
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

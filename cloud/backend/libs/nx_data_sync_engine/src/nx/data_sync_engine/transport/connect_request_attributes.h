@@ -6,7 +6,7 @@
 
 #include <nx/vms/api/data/peer_data.h>
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 struct ConnectionRequestAttributes
 {
@@ -20,4 +20,4 @@ bool fetchDataFromConnectRequest(
     const nx::network::http::Request& request,
     ConnectionRequestAttributes* connectionRequestAttributes);
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

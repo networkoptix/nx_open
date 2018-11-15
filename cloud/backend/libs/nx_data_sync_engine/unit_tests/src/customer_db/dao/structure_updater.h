@@ -2,7 +2,7 @@
 
 #include <nx/sql/db_structure_updater.h>
 
-namespace nx::data_sync_engine::test::dao {
+namespace nx::clusterdb::engine::test::dao {
 
 class StructureUpdater
 {
@@ -17,4 +17,4 @@ private:
     nx::sql::DbStructureUpdater m_updater;
 };
 
-} // namespace nx::data_sync_engine::test::dao
+} // namespace nx::clusterdb::engine::test::dao

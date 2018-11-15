@@ -2,7 +2,7 @@
 
 #include "command.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 struct ReadCommandsFilter;
 
@@ -28,4 +28,4 @@ private:
     OutgoingCommandFilterConfiguration m_configuration;
 };
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

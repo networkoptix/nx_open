@@ -2,7 +2,7 @@
 
 #include <nx/utils/deprecated_settings.h>
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 namespace {
 
@@ -25,4 +25,4 @@ void SynchronizationSettings::load(const QnSettings& settings)
         kMaxConcurrentConnectionsFromSystemDefault).toInt();
 }
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

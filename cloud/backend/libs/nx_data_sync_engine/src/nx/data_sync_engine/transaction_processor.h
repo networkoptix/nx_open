@@ -12,7 +12,7 @@
 #include "transaction_log.h"
 #include "transaction_transport_header.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 class TransactionLog;
 
@@ -289,4 +289,4 @@ private:
     }
 };
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

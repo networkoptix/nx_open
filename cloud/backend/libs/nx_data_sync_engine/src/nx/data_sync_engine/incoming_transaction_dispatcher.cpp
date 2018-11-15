@@ -8,7 +8,7 @@
 #include "command_descriptor.h"
 #include "serialization/transaction_deserializer.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 IncomingTransactionDispatcher::IncomingTransactionDispatcher(
     TransactionLog* const transactionLog)
@@ -93,4 +93,4 @@ void IncomingTransactionDispatcher::removeHandler(int commandCode)
     }
 }
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

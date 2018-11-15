@@ -7,14 +7,14 @@
 #include "abstract_transaction_transport_connector.h"
 #include "../compatible_ec2_protocol_version.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 class TransactionLog;
 class OutgoingCommandFilter;
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 class NX_DATA_SYNC_ENGINE_API HttpCommandPipelineConnector:
     public AbstractCommandPipelineConnector
@@ -87,4 +87,4 @@ private:
         std::unique_ptr<AbstractCommandPipeline> connection);
 };
 
-} // namespace nx::data_sync_engine::transport {
+} // namespace nx::clusterdb::engine::transport {

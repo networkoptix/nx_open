@@ -9,16 +9,16 @@
 
 #include "../abstract_transaction_transport.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 class ConnectionManager;
 class ProtocolVersionRange;
 class OutgoingCommandFilter;
 class TransactionLog;
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine
 
-namespace nx::data_sync_engine::transport {
+namespace nx::clusterdb::engine::transport {
 
 namespace detail {
 
@@ -67,4 +67,4 @@ private:
         detail::ConnectRequestContext connectRequestContext);
 };
 
-} // namespace nx::data_sync_engine::transport
+} // namespace nx::clusterdb::engine::transport

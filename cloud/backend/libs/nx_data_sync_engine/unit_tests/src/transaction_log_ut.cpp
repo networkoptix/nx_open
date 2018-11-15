@@ -26,7 +26,7 @@
 
 #include "test_outgoing_transaction_dispatcher.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 namespace test {
 
 class TransactionLog:
@@ -45,7 +45,7 @@ public:
         initializeDatabase();
 
         m_factoryFuncBak =
-             data_sync_engine::dao::TransactionDataObjectFactory::instance()
+             clusterdb::engine::dao::TransactionDataObjectFactory::instance()
                 .setDataObjectType(dataObjectType);
 
         initializeTransactionLog();
@@ -53,7 +53,7 @@ public:
 
     ~TransactionLog()
     {
-        data_sync_engine::dao::TransactionDataObjectFactory::instance()
+        clusterdb::engine::dao::TransactionDataObjectFactory::instance()
             .setCustomFunc(std::move(m_factoryFuncBak));
     }
 
@@ -71,13 +71,13 @@ public:
         // Initializing system's transaction log.
         const std::string systemId = getSystem(0).id.c_str();
         const auto dbResult = executeUpdateQuerySync(
-            std::bind(&data_sync_engine::TransactionLog::updateTimestampHiForSystem,
+            std::bind(&clusterdb::engine::TransactionLog::updateTimestampHiForSystem,
                 m_transactionLog.get(), _1, systemId, getSystem(0).systemSequence));
         ASSERT_EQ(nx::sql::DBResult::ok, dbResult);
     }
 
 protected:
-    const std::unique_ptr<data_sync_engine::TransactionLog>& transactionLog()
+    const std::unique_ptr<clusterdb::engine::TransactionLog>& transactionLog()
     {
         return m_transactionLog;
     }
@@ -106,13 +106,13 @@ protected:
 private:
     TestOutgoingTransactionDispatcher m_outgoingTransactionDispatcher;
     ProtocolVersionRange m_protocolVersionRange;
-    std::unique_ptr<data_sync_engine::TransactionLog> m_transactionLog;
+    std::unique_ptr<clusterdb::engine::TransactionLog> m_transactionLog;
     const QnUuid m_peerId;
-    data_sync_engine::dao::TransactionDataObjectFactory::Function m_factoryFuncBak;
+    clusterdb::engine::dao::TransactionDataObjectFactory::Function m_factoryFuncBak;
 
     void initializeTransactionLog()
     {
-        m_transactionLog = std::make_unique<data_sync_engine::TransactionLog>(
+        m_transactionLog = std::make_unique<clusterdb::engine::TransactionLog>(
             m_peerId,
             m_protocolVersionRange,
             &persistentDbManager()->queryExecutor(),
@@ -259,7 +259,7 @@ protected:
             <nx::cloud::db::ec2::command::SaveUser>(
                 queryContext.get(),
                 m_systemId.c_str(),
-                data_sync_engine::SerializableTransaction<nx::cloud::db::ec2::command::SaveUser>(
+                clusterdb::engine::SerializableTransaction<nx::cloud::db::ec2::command::SaveUser>(
                     std::move(transaction)));
         ASSERT_EQ(nx::sql::DBResult::cancelled, resultCode);
     }
@@ -399,7 +399,7 @@ private:
             <nx::cloud::db::ec2::command::SaveUser>(
                 queryContext.get(),
                 m_systemId.c_str(),
-                data_sync_engine::UbjsonSerializedTransaction<nx::cloud::db::ec2::command::SaveUser>(
+                clusterdb::engine::UbjsonSerializedTransaction<nx::cloud::db::ec2::command::SaveUser>(
                     std::move(transaction),
                     nx_ec::EC2_PROTO_VERSION));
         ASSERT_TRUE(dbResult == nx::sql::DBResult::ok || dbResult == nx::sql::DBResult::cancelled)
@@ -508,7 +508,7 @@ public:
     };
 
     TestTransactionController(
-        const std::unique_ptr<data_sync_engine::TransactionLog>& transactionLog,
+        const std::unique_ptr<clusterdb::engine::TransactionLog>& transactionLog,
         const nx::cloud::db::api::SystemData& system,
         const nx::cloud::db::api::AccountData& accountToShareWith)
         :
@@ -551,7 +551,7 @@ public:
     }
 
 private:
-    const std::unique_ptr<data_sync_engine::TransactionLog>& m_transactionLog;
+    const std::unique_ptr<clusterdb::engine::TransactionLog>& m_transactionLog;
     const nx::cloud::db::api::SystemData m_system;
     const nx::cloud::db::api::AccountData m_accountToShareWith;
     State m_completedState;
@@ -852,4 +852,4 @@ TEST_F(FtTransactionLogOverlappingTransactions, multiple_simultaneous_transactio
 }
 
 } // namespace test
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine

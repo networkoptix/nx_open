@@ -6,7 +6,7 @@
 #include <nx/data_sync_engine/command_descriptor.h>
 #include <nx/fusion/model_functions_fwd.h>
 
-namespace nx::data_sync_engine::test {
+namespace nx::clusterdb::engine::test {
 
 struct Id
 {
@@ -43,7 +43,7 @@ namespace command {
 
 enum Code
 {
-    saveCustomer = nx::data_sync_engine::command::kUserCommand + 1,
+    saveCustomer = nx::clusterdb::engine::command::kUserCommand + 1,
     removeCustomer,
 };
 
@@ -73,4 +73,4 @@ struct RemoveCustomer
 
 } // namespace command
 
-} // namespace nx::data_sync_engine::test
+} // namespace nx::clusterdb::engine::test

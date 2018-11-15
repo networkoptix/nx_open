@@ -11,7 +11,7 @@
 #include "serialization/serializable_transaction.h"
 #include "transaction_log_cache.h"
 
-namespace nx::data_sync_engine {
+namespace nx::clusterdb::engine {
 
 class AbstractOutgoingTransactionDispatcher;
 
@@ -86,4 +86,4 @@ private:
         TransactionSequence transactionSequence);
 };
 
-} // namespace nx::data_sync_engine
+} // namespace nx::clusterdb::engine
