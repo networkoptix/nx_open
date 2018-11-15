@@ -143,9 +143,7 @@ int Pipeline::performHandshakeInternal()
         m_state = State::handshakeDone;
 
     // Zero is a "controlled" TLS handshake shutdown. To make life simpler, handling it as an error.
-    return resultCode == 0
-        ? -1
-        : resultCode;
+    return resultCode == 0 ? -1 : resultCode;
 }
 
 int Pipeline::bioRead(void* buffer, unsigned int bufferLen)
