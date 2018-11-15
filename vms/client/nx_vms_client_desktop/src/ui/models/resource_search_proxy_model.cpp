@@ -40,7 +40,7 @@ QModelIndex QnResourceSearchProxyModel::setQuery(const QnResourceSearchQuery& qu
         return QModelIndex();
 
     bool isLoggedIn = !resourceTreeModel->context()->user().isNull();
-      
+
     m_currentRootNode =
         [this, isLoggedIn]()
         {
@@ -211,7 +211,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
 
     // Simply filter by text first.
     // Show everything that's allowed if nothing entered into search query text input.
-    if (resources::search_helper::isSearchStringValid(m_query.text) 
+    if (resources::search_helper::isSearchStringValid(m_query.text)
         && !resources::search_helper::matches(m_query.text, resource))
         return false;
 
