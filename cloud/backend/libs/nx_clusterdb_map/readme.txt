@@ -4,5 +4,5 @@ Each node stores copy of the whole DB, so every data access operation is process
 Even after loosing connection to every other node, DB stays fully operational.
 After restoring connection data will synchronized and merged, if needed.
 
-Based on nx_data_sync_engine.
-Can use any backend supported by nx_data_sync_engine (e.g., sqlite, mysql).
+Based on nx_clusterdb_engine.
+Can use any backend supported by nx_clusterdb_engine (e.g., sqlite, mysql).
