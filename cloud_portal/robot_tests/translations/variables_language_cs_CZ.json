@@ -14,7 +14,7 @@
     "AUTOTESTS OFFLINE TEXT": "offline",
     "NEW PERMISSIONS SAVED": "Nová oprávnění byla uložena",
     "PERMISSIONS WERE REMOVED FROM": "Oprávnění byla odstraněna z adresy %email%",
-    "SYSYEM DELETED FROM ACCOUNT": "System {{message.system_name}} is successfully deleted from your account",
+    "SYSYEM DELETED FROM ACCOUNT": "Systém {{system_name}} byl úspěšně odstraněna z Vašeho účtu",
     "RESET SUCCESS MESSAGE TEXT": "Heslo bylo úspěšně uloženo",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "Váš účet byl úspěšně uložen",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "Váš účet byl úspěšně aktivován",

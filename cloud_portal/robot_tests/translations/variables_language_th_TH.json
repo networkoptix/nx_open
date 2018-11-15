@@ -14,7 +14,7 @@
     "AUTOTESTS OFFLINE TEXT": "ออฟไลน์",
     "NEW PERMISSIONS SAVED": "อนุญาตสิทธิ์ใหม่แล้ว",
     "PERMISSIONS WERE REMOVED FROM": "สิทธิ์ถูกนำออกจาก %email%",
-    "SYSYEM DELETED FROM ACCOUNT": "System {{message.system_name}} is successfully deleted from your account",
+    "SYSYEM DELETED FROM ACCOUNT": "ระบบ {{system_name}} จะถูกลบออกจากบัญชีของคุณเรียบร้อยแล้ว",
     "RESET SUCCESS MESSAGE TEXT": "บันทึกรหัสผ่านเรียบร้อยแล้ว",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "บันทึกบัญชีของคุณเรียบร้อยแล้ว",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "เปิดใช้งานบัญชีของคุณเรียบร้อยแล้ว",

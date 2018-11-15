@@ -14,7 +14,7 @@
     "AUTOTESTS OFFLINE TEXT": "offline",
     "NEW PERMISSIONS SAVED": "Spremljene su nove dozvole",
     "PERMISSIONS WERE REMOVED FROM": "Permissions were removed from %email%",
-    "SYSYEM DELETED FROM ACCOUNT": "System {{message.system_name}} is successfully deleted from your account",
+    "SYSYEM DELETED FROM ACCOUNT": "System {{system_name}} is successfully deleted from your account",
     "RESET SUCCESS MESSAGE TEXT": "Lozinka je uspješno spremljena",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "Vaš je račun uspješno spremljen",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "Vaš je račun uspješno aktiviran",

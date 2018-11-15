@@ -14,7 +14,7 @@
     "AUTOTESTS OFFLINE TEXT": "غير متصل على الانترنت",
     "NEW PERMISSIONS SAVED": "تم حفظ الأذونات الجديدة",
     "PERMISSIONS WERE REMOVED FROM": "Permissions were removed from %email%",
-    "SYSYEM DELETED FROM ACCOUNT": "System {{message.system_name}} is successfully deleted from your account",
+    "SYSYEM DELETED FROM ACCOUNT": "System {{system_name}} is successfully deleted from your account",
     "RESET SUCCESS MESSAGE TEXT": "تم حفظ كلمة المرور بنجاح",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "تم حفظ حسابك بنجاح",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "تم تنشيط حسابك بنجاح",
