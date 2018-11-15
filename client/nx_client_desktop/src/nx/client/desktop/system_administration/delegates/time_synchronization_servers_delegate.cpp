@@ -2,6 +2,7 @@
 
 #include "../models/time_synchronization_servers_model.h"
 
+#include <nx/client/core/utils/human_readable.h>
 #include <nx/client/desktop/ui/common/color_theme.h>
 #include <ui/style/helper.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -12,9 +13,13 @@ using Model = TimeSynchronizationServersModel;
 
 namespace {
 
-static constexpr int kMinimumDateTimeWidth = 84;
+using namespace std::chrono_literals;
+
+static constexpr int kMinimumDateWidth = 84;
+static constexpr int kMinimumTimeWidth = 128;
 static constexpr int kRowHeight = 24;
 static constexpr int kExtraTextMargin = 5;
+static constexpr int kTimeOffsetFontSize = 11;
 
 static const QList<QColor> kOffsetColors = {
     QColor::fromRgb(0x91, 0xa7, 0xb2),
@@ -28,59 +33,36 @@ static const QList<QColor> kOffsetColors = {
     QColor::fromRgb(0xf0, 0x2c, 0x2c)
 };
 
-static const QList<int> kOffsetThresholds = {2, 5, 10, 20, 30, 60, 300, 1800};
+static const QList<std::chrono::seconds> kOffsetThresholds = {2s, 5s, 10s, 20s, 30s, 1min, 5min, 30min};
 
-inline const QColor& offsetColor(qint64 mSecs)
+inline const QColor& offsetColor(std::chrono::seconds offset)
 {
-    auto offset = mSecs;
-    if (offset < 0)
+    if (offset.count() < 0)
         offset = -offset;
-    offset = (offset + 500) / 1000;
 
-    int index = std::upper_bound(kOffsetThresholds.begin(), kOffsetThresholds.end(), offset)
+    int index = std::lower_bound(kOffsetThresholds.begin(), kOffsetThresholds.end(), offset)
         - kOffsetThresholds.begin();
 
     return kOffsetColors[qBound(0, index, kOffsetColors.size() - 1)];
 }
 
-QString offsetString(qint64 mSecs)
+QString offsetString(std::chrono::seconds offset)
 {
-    QString result;
-    if (mSecs > 0)
-    {
-        result = '+';
-    }
-    else
-    {
-        result = '-';
-        mSecs = -mSecs;
-    }
-    
-    auto rest = (mSecs + 500) / 1000;
-    if (!rest)
+    if (!offset.count())
         return QString();
+
+    using nx::client::core::HumanReadable;
+    QString result = HumanReadable::timeSpan(offset,
+        HumanReadable::TimeSpanUnit::DaysAndTime,
+        HumanReadable::SuffixFormat::Short,
+        QString(" "),
+        HumanReadable::kNoSuppressSecondUnit);
     
-    auto secs = rest % 60;
-    rest /= 60;
-    
-    auto mins = rest % 60;
-    rest = rest /= 60;
-
-    auto hours = rest % 24;
-    rest = rest / 24;
-
-    auto days = rest;
-
-    if (days)
-        result += days + "d ";
-    if (hours)
-        result += hours + "h ";
-    if (mins)
-        result += mins + "m ";
-    result += QString::number(secs) + "s"; // Show "0s" to indicate that the offset value is not rounded?
+    if (offset.count() > 0)
+        result = "+" + result;
 
     return result;
-}
+ }
 
 bool isRowSelected(const QModelIndex& index)
 {
@@ -91,8 +73,7 @@ bool isRowSelected(const QModelIndex& index)
 } // namespace
 
 TimeSynchronizationServersDelegate::TimeSynchronizationServersDelegate(QObject* parent):
-    base_type(parent),
-    m_baseRow(-1)
+    base_type(parent)
 {
 }
 
@@ -125,7 +106,7 @@ void TimeSynchronizationServersDelegate::paintName(
 
     QStyle* style = option.widget->style();
     const int kOffset = -8;
-    /* Obtain sub-element rectangles: */
+    // Obtain sub-element rectangles
     QRect textRect = style->subElementRect(
         QStyle::SE_ItemViewItemText,
         &option,
@@ -139,15 +120,15 @@ void TimeSynchronizationServersDelegate::paintName(
 
     const bool selected = isRowSelected(index);
 
-    /* Paint background: */
+    // Paint background
     style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, option.widget);
 
-    /* Draw icon: */
+    // Draw icon
     const QIcon::Mode iconMode = selected ? QIcon::Selected : QIcon::Normal;
     if (option.features.testFlag(QStyleOptionViewItem::HasDecoration))
         option.icon.paint(painter, iconRect, option.decorationAlignment, iconMode, QIcon::On);
 
-    /* Draw text: */
+    // Draw text
     const QString extraInfo = index.data(Model::IpAddressRole).toString();
     const QColor textColor = selected
         ? colorTheme()->color("light4")
@@ -156,7 +137,7 @@ void TimeSynchronizationServersDelegate::paintName(
         ? colorTheme()->color("light10")
         : colorTheme()->color("dark17");
 
-    const int textPadding = style->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1; /* As in Qt */
+    const int textPadding = style->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1; // As in Qt
     const int textEnd = textRect.right() - textPadding + 1;
 
     QPoint textPos = textRect.topLeft()
@@ -205,7 +186,7 @@ void TimeSynchronizationServersDelegate::paintTime(
 
     QStyle* style = option.widget->style();
 
-    /* Obtain sub-element rectangles: */
+    // Obtain sub-element rectangles
     QRect textRect = style->subElementRect(
         QStyle::SE_ItemViewItemText,
         &option,
@@ -214,30 +195,32 @@ void TimeSynchronizationServersDelegate::paintTime(
 
     const bool selected = isRowSelected(index);
 
-    /* Paint background: */
+    // Paint background
     style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, option.widget);
 
-    /* Draw text: */
+    // Draw text
     const QColor textColor = selected
         ? colorTheme()->color("light4")
         : colorTheme()->color("light10");
     
-    const int textPadding = style->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1; /* As in Qt */
+    const int textPadding = style->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1; // As in Qt
     const int textEnd = textRect.right() - textPadding + 1;
 
     QPoint textPos = textRect.topLeft()
         + QPoint(textPadding, option.fontMetrics.ascent()
             + std::ceil((textRect.height() - option.fontMetrics.height()) / 2.0));
 
-    /* Prepare offset string.  */
+    // Prepare offset string
     auto timeOffset = index.data(Model::TimeOffsetRole).toLongLong();
     timeOffset -= index.sibling(m_baseRow, index.column()).data(Model::TimeOffsetRole).toLongLong();
 
     const bool showOffset = (m_baseRow >= 0) && index.data(Model::ServerOnlineRole).toBool()
         && index.sibling(m_baseRow, index.column()).data(Model::ServerOnlineRole).toBool();
 
-    const QString extraInfo = showOffset ? offsetString(timeOffset) : "";
-    const QColor extraColor = offsetColor(timeOffset);
+    auto roundedOffset = std::chrono::round<std::chrono::seconds>(std::chrono::milliseconds(timeOffset));
+
+    const QString extraInfo = showOffset ? offsetString(roundedOffset) : "";
+    const QColor extraColor = offsetColor(roundedOffset);
 
     if (textEnd > textPos.x())
     {
@@ -257,6 +240,7 @@ void TimeSynchronizationServersDelegate::paintTime(
         if (textEnd > textPos.x() && !main.elided() && !extraInfo.isEmpty())
         {
             option.font.setWeight(QFont::Normal);
+            option.font.setPixelSize(kTimeOffsetFontSize);
 
             const auto extra = m_textPixmapCache.pixmap(
                 extraInfo,
@@ -279,9 +263,11 @@ QSize TimeSynchronizationServersDelegate::sizeHint(
     switch (index.column())
     {
         case Model::DateColumn:
+            size.setWidth(std::max(size.width(), kMinimumDateWidth));
+            break;
         case Model::OsTimeColumn:
         case Model::VmsTimeColumn:
-            size.setWidth(std::max(size.width(), kMinimumDateTimeWidth));
+            size.setWidth(std::max(size.width(), kMinimumTimeWidth));
             break;
 
         default:

@@ -9,14 +9,10 @@
 #include <nx/utils/guarded_callback.h>
 #include <utils/common/synctime.h>
 
-//#include <ui/workbench/workbench_access_controller.h>
-//#include <ui/workbench/workbench_context.h>
-
 #include <nx/utils/log/assert.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop
+{
 
 class TimeSynchronizationWidgetWatcher::Private : public QObject
 {
@@ -44,29 +40,29 @@ public:
 
         const auto callback = nx::utils::guarded(this,
             [this, apiConnection]
-        (bool success, rest::Handle handle, rest::MultiServerTimeData data)
-        {
-            if (m_currentRequest != handle)
-                return;
-
-            m_currentRequest = rest::Handle(); //< Reset.
-            if (!success)
-                return;
-
-            const auto syncTime = qnSyncTime->currentMSecsSinceEpoch();
-            TimeSynchronizationWidgetStore::TimeOffsetInfoList offsetList;
-
-            for (const auto& record: data.data)
+            (bool success, rest::Handle handle, rest::MultiServerTimeData data)
             {
-                TimeSynchronizationWidgetStore::TimeOffsetInfo offsetInfo;
-                offsetInfo.serverId = record.serverId;
-                offsetInfo.osTimeOffset = record.timeSinceEpochMs - syncTime;
-                offsetInfo.vmsTimeOffset = 0; // FIXME: use real value
-                offsetList += offsetInfo;
-            }
+                if (m_currentRequest != handle)
+                    return;
 
-            m_store->setTimeOffsets(offsetList);
-        });
+                m_currentRequest = rest::Handle(); //< Reset.
+                if (!success)
+                    return;
+
+                const auto syncTime = qnSyncTime->currentMSecsSinceEpoch();
+                TimeSynchronizationWidgetStore::TimeOffsetInfoList offsetList;
+
+                for (const auto& record: data.data)
+                {
+                    TimeSynchronizationWidgetStore::TimeOffsetInfo offsetInfo;
+                    offsetInfo.serverId = record.serverId;
+                    offsetInfo.osTimeOffset = record.timeSinceEpochMs - syncTime;
+                    offsetInfo.vmsTimeOffset = 0; // FIXME: use real value
+                    offsetList += offsetInfo;
+                }
+
+                m_store->setTimeOffsets(offsetList);
+            });
 
         m_currentRequest = apiConnection->getTimeOfServersAsync(callback, thread());
     }
@@ -81,7 +77,7 @@ TimeSynchronizationWidgetWatcher::TimeSynchronizationWidgetWatcher(
     QObject* parent)
     :
     base_type(parent),
-    QnWorkbenchContextAware(parent, InitializationMode::lazy),
+    QnCommonModuleAware(parent),
     d(new Private(this, store))
 {
 }
@@ -91,6 +87,4 @@ void TimeSynchronizationWidgetWatcher::updateTimestamps()
     d->updateTimestamps();
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

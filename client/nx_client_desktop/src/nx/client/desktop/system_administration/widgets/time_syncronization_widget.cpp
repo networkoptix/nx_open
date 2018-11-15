@@ -44,12 +44,13 @@ static constexpr int kServerTimeUpdateInterval = 15;
 QDateTime dateTimeFromMSecs(std::chrono::milliseconds value)
 {
     QDateTime result;
-    //result.setTimeSpec(Qt::UTC);
+    result.setTimeSpec(Qt::LocalTime);
     result.setMSecsSinceEpoch(value.count());
 
-    //const auto offsetFromUtc = result.offsetFromUtc();
+    const auto offsetFromUtc = result.offsetFromUtc();
     result.setTimeSpec(Qt::OffsetFromUTC);
-    //result.setOffsetFromUtc(offsetFromUtc);
+    result.setOffsetFromUtc(offsetFromUtc);
+
     return result;
 }
 
@@ -249,20 +250,14 @@ void TimeSynchronizationWidget::setupUi()
     ui->serversTable->setProperty(style::Properties::kItemViewRadioButtons, true);
     ui->serversTable->setItemDelegate(m_delegate);
 
-    const int kMinTimeWidth = 140; // Fixme: use font metrics, include offsets size
-    ui->serversTable->setColumnWidth(Model::OsTimeColumn, kMinTimeWidth);
-    ui->serversTable->setColumnWidth(Model::VmsTimeColumn, kMinTimeWidth);
+    auto hHeader = ui->serversTable->horizontalHeader();
+    hHeader->setSectionResizeMode(QHeaderView::ResizeToContents);
+    hHeader->setSectionResizeMode(Model::NameColumn, QHeaderView::Stretch);
+    hHeader->setSectionsClickable(false);
+    hHeader->setDefaultAlignment(Qt::AlignLeft);
 
-    auto header = ui->serversTable->horizontalHeader();
-    header->setSectionResizeMode(QHeaderView::ResizeToContents);
-    header->setSectionResizeMode(Model::NameColumn, QHeaderView::Stretch);
-    header->setSectionResizeMode(Model::OsTimeColumn, QHeaderView::Fixed);
-    header->setSectionResizeMode(Model::VmsTimeColumn, QHeaderView::Fixed);
-    header->setSectionsClickable(false);
-    header->setDefaultAlignment(Qt::AlignLeft);
-
-    auto vheader = ui->serversTable->verticalHeader();
-    vheader->setSectionResizeMode(QHeaderView::ResizeToContents);
+    auto vHeader = ui->serversTable->verticalHeader();
+    vHeader->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
 void TimeSynchronizationWidget::loadState(const State& state)
@@ -297,6 +292,7 @@ void TimeSynchronizationWidget::loadState(const State& state)
             showWarning = true;
             break;
         default:
+            NX_ASSERT(false, "All states must be handled");
             break;
     }
     ui->statusLabel->setText(detailsText);
@@ -319,6 +315,7 @@ void TimeSynchronizationWidget::loadState(const State& state)
             ui->vmsTimeWidget->setCurrentWidget(ui->placeholderPage);
             break;
         default:
+            NX_ASSERT(false, "All states must be handled");
             break;
     }
 
@@ -331,6 +328,25 @@ void TimeSynchronizationWidget::loadState(const State& state)
 
     ui->disableSyncRadioButton->setChecked(!state.enabled);
     setReadOnly(ui->disableSyncRadioButton, state.readOnly);
+
+    switch (state.status)
+    {
+        case State::Status::singleServerLocalTime:
+            ui->disableSyncRadioButton->hide();
+            ui->serversTable->hideColumn(Model::CheckboxColumn);
+            ui->serversTable->hideColumn(Model::VmsTimeColumn);
+            break;
+        case State::Status::noInternetConnection:
+            ui->disableSyncRadioButton->hide();
+            ui->serversTable->hideColumn(Model::CheckboxColumn);
+            ui->serversTable->showColumn(Model::VmsTimeColumn);
+            break;
+        default:
+            ui->disableSyncRadioButton->show();
+            ui->serversTable->showColumn(Model::CheckboxColumn);
+            ui->serversTable->showColumn(Model::VmsTimeColumn);
+            break;
+    }
 
     m_serversModel->loadState(state);
 

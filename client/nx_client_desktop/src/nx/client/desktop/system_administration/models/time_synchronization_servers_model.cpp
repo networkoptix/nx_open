@@ -110,8 +110,9 @@ QVariant TimeSynchronizationServersModel::data(const QModelIndex& index, int rol
                 case OsTimeColumn:
                 case VmsTimeColumn:
                 {
+                    static const QString kPlaceholder = QString::fromWCharArray(L"\x2014\x2014\x2014\x2014");
                     if (!server.online)
-                        return QString::fromStdWString(L"––––");
+                        return kPlaceholder;
 
                     const auto osTimestamp = m_vmsTime.count() + server.osTimeOffset;
                     const auto vmsTimestamp = m_vmsTime.count() + server.vmsTimeOffset;
@@ -189,13 +190,13 @@ QVariant TimeSynchronizationServersModel::data(const QModelIndex& index, int rol
         {
             switch (column)
             {
-            case OsTimeColumn:
-                return server.osTimeOffset;
-            case VmsTimeColumn:
-                return server.vmsTimeOffset;
+                case OsTimeColumn:
+                    return server.osTimeOffset;
+                case VmsTimeColumn:
+                    return server.vmsTimeOffset;
 
-            default:
-                break;
+                default:
+                    break;
             }
             break;
         }

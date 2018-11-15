@@ -39,7 +39,7 @@ private:
 
 private:
     mutable QnTextPixmapCache m_textPixmapCache;
-    int m_baseRow;
+    int m_baseRow = -1;
 };
 
 } // namespace nx::client::desktop
