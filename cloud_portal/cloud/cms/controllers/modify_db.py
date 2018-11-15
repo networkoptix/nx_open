@@ -154,7 +154,7 @@ def save_unrevisioned_records(product, context, language, data_structures,
             new_record_value = request_data[data_structure_name]
             if data_structure.type == DataStructure.DATA_TYPES.text and 'regex' in data_structure.meta_settings:
                 pattern = data_structure.meta_settings['regex']
-                if not re.match(pattern, new_record_value):
+                if new_record_value and not re.match(pattern, new_record_value):
                     upload_errors.append((data_structure_name, 'Invalid input'))
                     continue
 
