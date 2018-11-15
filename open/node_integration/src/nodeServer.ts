@@ -70,8 +70,8 @@ export class NodeServer {
 
     /**
      * Adds the http callback to a route.
-     * @param {string} key The key can be anything depending on which route
-     *     you want it to be handled by.
+     * @param {string} key The key can be anything depending on which route you want it to be
+     * handled by.
      * @param {boolean} isDefault States if the callback is being added to default route handler.
      * @param callback Callback function for route.
      */

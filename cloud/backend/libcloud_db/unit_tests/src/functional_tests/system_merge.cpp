@@ -263,7 +263,7 @@ private:
     boost::optional<nx::network::http::StatusCode::Value> m_vmsApiResult;
 
     std::unique_ptr<AbstractSystemHealthInfoProvider> createSystemHealthInfoProvider(
-        data_sync_engine::ConnectionManager*,
+        clusterdb::engine::ConnectionManager*,
         nx::sql::AsyncSqlQueryExecutor*)
     {
         auto systemHealthInfoProvider = std::make_unique<SystemHealthInfoProviderStub>();

@@ -535,8 +535,11 @@ def mediaserver():
 
     client = docker.client.from_env()
 
+    volumes = {'/srv/containers/mediaserver/etc': {'bind': '/opt/networkoptix/mediaserver/etc', 'mode': 'rw'},
+                '/srv/containers/mediaserver/var': {'bind': '/opt/networkoptix/mediaserver/var', 'mode': 'rw'}}
+
     log.info('Running mediaserver')
-    container = client.containers.run(image, ports={7001: 7001}, detach=True)
+    container = client.containers.run(image, ports={7001: 7001},volumes=volumes,  detach=True)
 
     try:
         mediaserver_ip = client.containers.get(container.id).attrs['NetworkSettings']['IPAddress']

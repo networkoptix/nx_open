@@ -3,11 +3,11 @@
 #include <nx/utils/subscription.h>
 #include <nx/utils/thread/mutex.h>
 
-#include <nx/data_sync_engine/connection_manager.h>
+#include <nx/clusterdb/engine/connection_manager.h>
 
 #include "system_manager.h"
 
-namespace nx { namespace data_sync_engine { class ConnectionManager; } }
+namespace nx::clusterdb::engine { class ConnectionManager; }
 
 namespace nx::cloud::db {
 
@@ -17,7 +17,7 @@ class SystemCapabilitiesProvider:
 public:
     SystemCapabilitiesProvider(
         AbstractSystemManager* systemManager,
-        data_sync_engine::ConnectionManager* ec2ConnectionManager);
+        clusterdb::engine::ConnectionManager* ec2ConnectionManager);
     virtual ~SystemCapabilitiesProvider();
 
     virtual void modifySystemBeforeProviding(api::SystemDataEx* system) override;
@@ -25,13 +25,13 @@ public:
 private:
     mutable QnMutex m_mutex;
     AbstractSystemManager* m_systemManager;
-    data_sync_engine::ConnectionManager* m_ec2ConnectionManager;
+    clusterdb::engine::ConnectionManager* m_ec2ConnectionManager;
     nx::utils::SubscriptionId m_systemStatusChangedSubscriptionId;
     std::map<std::string /*system id*/, int /*proto version*/> m_systemIdToProtoVersion;
 
     void onSystemStatusChanged(
         const std::string& systemId,
-        data_sync_engine::SystemStatusDescriptor statusDescription);
+        clusterdb::engine::SystemStatusDescriptor statusDescription);
 };
 
 } // namespace nx::cloud::db
