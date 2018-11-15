@@ -7,8 +7,7 @@
 
 #include <nx/data_sync_engine/transaction_log_cache.h>
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine {
 namespace test {
 
 class TransactionLogCache:
@@ -269,5 +268,4 @@ TEST_F(TransactionLogCache, timestamp_is_not_decreasing)
 }
 
 } // namespace test
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine

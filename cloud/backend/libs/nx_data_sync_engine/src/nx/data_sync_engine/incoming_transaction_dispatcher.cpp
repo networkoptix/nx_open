@@ -8,8 +8,7 @@
 #include "command_descriptor.h"
 #include "serialization/transaction_deserializer.h"
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine {
 
 IncomingTransactionDispatcher::IncomingTransactionDispatcher(
     TransactionLog* const transactionLog)
@@ -94,5 +93,4 @@ void IncomingTransactionDispatcher::removeHandler(int commandCode)
     }
 }
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine

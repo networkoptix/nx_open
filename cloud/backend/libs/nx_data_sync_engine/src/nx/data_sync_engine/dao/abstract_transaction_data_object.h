@@ -10,9 +10,7 @@
 
 #include "../serialization/ubjson_serialized_transaction.h"
 
-namespace nx {
-namespace data_sync_engine {
-namespace dao {
+namespace nx::data_sync_engine::dao {
 
 struct TransactionData
 {
@@ -97,6 +95,4 @@ private:
         int commandFormatVersion);
 };
 
-} // namespace dao
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine::dao

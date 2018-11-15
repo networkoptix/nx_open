@@ -2,8 +2,7 @@
 
 #include "../transaction_transport_header.h"
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine {
 
 /**
  * Holds transaction inside and is able to serialize it to a requested format.
@@ -31,5 +30,4 @@ public:
         int transactionFormatVersion) const = 0;
 };
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine

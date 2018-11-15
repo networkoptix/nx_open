@@ -6,8 +6,7 @@
 
 #include "command.h"
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine {
 
 class TransactionTransportHeader
 {
@@ -30,5 +29,4 @@ public:
     }
 };
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine

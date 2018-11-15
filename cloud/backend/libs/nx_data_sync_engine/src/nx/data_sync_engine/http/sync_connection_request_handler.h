@@ -7,8 +7,7 @@
 
 #include "http_paths.h"
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine {
 
 template<typename ManagerType>
 class SyncConnectionRequestHandler:
@@ -70,5 +69,4 @@ private:
     }
 };
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine

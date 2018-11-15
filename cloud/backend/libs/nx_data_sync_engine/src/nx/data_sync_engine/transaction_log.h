@@ -24,11 +24,7 @@
 #include "transaction_log_cache.h"
 #include "transaction_transport_header.h"
 
-namespace nx {
-
-namespace db { class AsyncSqlQueryExecutor; } // namespace db
-
-namespace data_sync_engine {
+namespace nx::data_sync_engine {
 
 class AbstractOutgoingTransactionDispatcher;
 
@@ -363,5 +359,4 @@ private:
     static ResultCode dbResultToApiResult(nx::sql::DBResult dbResult);
 };
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine

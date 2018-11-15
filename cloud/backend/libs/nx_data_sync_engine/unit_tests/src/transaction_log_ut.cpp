@@ -26,8 +26,7 @@
 
 #include "test_outgoing_transaction_dispatcher.h"
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine {
 namespace test {
 
 class TransactionLog:
@@ -853,5 +852,4 @@ TEST_F(FtTransactionLogOverlappingTransactions, multiple_simultaneous_transactio
 }
 
 } // namespace test
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine

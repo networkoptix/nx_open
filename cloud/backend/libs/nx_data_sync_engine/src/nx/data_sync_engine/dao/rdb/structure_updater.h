@@ -2,10 +2,7 @@
 
 #include <nx/sql/db_structure_updater.h>
 
-namespace nx {
-namespace data_sync_engine {
-namespace dao {
-namespace rdb {
+namespace nx::data_sync_engine::dao::rdb {
 
 class StructureUpdater
 {
@@ -20,7 +17,4 @@ private:
     nx::sql::DbStructureUpdater m_updater;
 };
 
-} // namespace rdb
-} // namespace dao
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine::dao::rdb

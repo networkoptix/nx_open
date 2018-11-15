@@ -8,8 +8,7 @@
 
 #include "outgoing_transaction_dispatcher.h"
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine {
 
 const ReadCommandsFilter ReadCommandsFilter::kEmptyFilter = {
     std::nullopt,
@@ -583,5 +582,4 @@ ResultCode TransactionLog::dbResultToApiResult(
     }
 }
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine

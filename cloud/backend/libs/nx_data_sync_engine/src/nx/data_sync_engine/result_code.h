@@ -2,8 +2,7 @@
 
 #include <string>
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine {
 
 enum class ResultCode
 {
@@ -17,5 +16,4 @@ enum class ResultCode
 
 std::string toString(ResultCode);
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine

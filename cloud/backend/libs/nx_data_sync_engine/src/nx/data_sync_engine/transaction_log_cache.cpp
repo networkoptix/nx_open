@@ -3,8 +3,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine {
 
 using VmsDataState = VmsTransactionLogCache::VmsDataState;
 
@@ -258,5 +257,4 @@ const VmsTransactionLogCache::TranContext* VmsTransactionLogCache::findTranConte
     return it != m_tranIdToContext.end() ? &it->second : nullptr;
 }
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine

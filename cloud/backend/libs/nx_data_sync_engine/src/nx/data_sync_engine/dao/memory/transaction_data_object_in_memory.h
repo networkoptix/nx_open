@@ -14,10 +14,7 @@
 
 #include "../abstract_transaction_data_object.h"
 
-namespace nx {
-namespace data_sync_engine {
-namespace dao {
-namespace memory {
+namespace nx::data_sync_engine::dao::memory {
 
 class NX_DATA_SYNC_ENGINE_API TransactionDataObject:
     public AbstractTransactionDataObject
@@ -86,7 +83,4 @@ private:
     const int m_transactionFormatVersion;
 };
 
-} // namespace memory
-} // namespace dao
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine::dao::memory

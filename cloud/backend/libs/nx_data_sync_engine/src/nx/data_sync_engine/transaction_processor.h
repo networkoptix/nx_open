@@ -12,8 +12,7 @@
 #include "transaction_log.h"
 #include "transaction_transport_header.h"
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine {
 
 class TransactionLog;
 
@@ -290,5 +289,4 @@ private:
     }
 };
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine

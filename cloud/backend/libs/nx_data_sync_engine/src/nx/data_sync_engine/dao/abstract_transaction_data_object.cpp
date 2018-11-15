@@ -5,9 +5,7 @@
 #include "rdb/transaction_data_object.h"
 #include "memory/transaction_data_object_in_memory.h"
 
-namespace nx {
-namespace data_sync_engine {
-namespace dao {
+namespace nx::data_sync_engine::dao {
 
 TransactionDataObjectFactory::TransactionDataObjectFactory():
     base_type(std::bind(&TransactionDataObjectFactory::defaultFactoryFunction, this,
@@ -43,6 +41,4 @@ std::unique_ptr<AbstractTransactionDataObject>
     return std::make_unique<rdb::TransactionDataObject>(commandFormatVersion);
 }
 
-} // namespace dao
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine::dao

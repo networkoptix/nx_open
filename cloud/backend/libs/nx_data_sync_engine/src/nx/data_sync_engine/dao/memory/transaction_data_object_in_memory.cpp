@@ -5,10 +5,7 @@
 
 #include <nx/utils/log/log.h>
 
-namespace nx {
-namespace data_sync_engine {
-namespace dao {
-namespace memory {
+namespace nx::data_sync_engine::dao::memory {
 
 //-------------------------------------------------------------------------------------------------
 // TransactionDataObject::TransactionSourceKey
@@ -107,7 +104,4 @@ nx::sql::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
     return nx::sql::DBResult::ok;
 }
 
-} // namespace memory
-} // namespace dao
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine::dao::memory

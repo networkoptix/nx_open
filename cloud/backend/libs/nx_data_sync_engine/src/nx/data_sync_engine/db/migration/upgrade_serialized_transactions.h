@@ -8,8 +8,7 @@
 #include <nx/fusion/serialization/sql.h>
 #include <nx/utils/log/log.h>
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine {
 namespace migration {
 namespace detail {
 
@@ -111,5 +110,4 @@ nx::sql::DBResult upgradeSerializedTransactions(
 
 } // namespace detail
 } // namespace migration
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine

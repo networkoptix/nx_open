@@ -20,8 +20,7 @@
 #include "transport/transport_manager.h"
 #include "transport/websocket_transport_acceptor.h"
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine {
 
 class SynchronizationSettings;
 
@@ -105,5 +104,4 @@ private:
     void onSystemDeleted(const std::string& systemId);
 };
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine

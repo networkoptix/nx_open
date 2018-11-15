@@ -2,8 +2,7 @@
 
 #include "serializable_transaction.h"
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine {
 
 template<typename BaseType>
 class BaseUbjsonSerializedTransaction:
@@ -147,5 +146,4 @@ public:
     TransactionUbjsonDataSource& operator=(TransactionUbjsonDataSource&&) = default;
 };
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine

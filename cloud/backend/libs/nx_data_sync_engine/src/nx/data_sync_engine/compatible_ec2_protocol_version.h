@@ -1,7 +1,6 @@
 #pragma once
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine {
 
 class NX_DATA_SYNC_ENGINE_API ProtocolVersionRange
 {
@@ -22,5 +21,4 @@ private:
     int m_end = 0;
 };
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine

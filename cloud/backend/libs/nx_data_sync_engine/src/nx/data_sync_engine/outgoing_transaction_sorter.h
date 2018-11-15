@@ -11,8 +11,7 @@
 #include "serialization/serializable_transaction.h"
 #include "transaction_log_cache.h"
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine {
 
 class AbstractOutgoingTransactionDispatcher;
 
@@ -87,5 +86,4 @@ private:
         TransactionSequence transactionSequence);
 };
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine

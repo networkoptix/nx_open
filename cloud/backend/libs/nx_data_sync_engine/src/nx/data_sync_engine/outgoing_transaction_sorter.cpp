@@ -7,8 +7,7 @@
 
 #include "outgoing_transaction_dispatcher.h"
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine {
 
 OutgoingTransactionSorter::OutgoingTransactionSorter(
     const std::string& systemId,
@@ -215,5 +214,4 @@ void OutgoingTransactionSorter::registerTransactionSequence(
     }
 }
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine

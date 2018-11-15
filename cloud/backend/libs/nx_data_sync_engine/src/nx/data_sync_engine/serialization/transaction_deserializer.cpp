@@ -2,8 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine {
 
 bool TransactionDeserializer::deserialize(
     QnUbjsonReader<QByteArray>* const stream,
@@ -103,5 +102,4 @@ const CommandHeader& DeserializableCommandData::header() const
     return m_commandHeader;
 }
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine

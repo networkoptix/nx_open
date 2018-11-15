@@ -36,8 +36,7 @@ class MessageDispatcher;
 } // namespace network
 } // namespace http
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine {
 
 class SynchronizationSettings;
 
@@ -191,5 +190,4 @@ private:
     void onTransactionDone(const std::string& connectionId, ResultCode resultCode);
 };
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine

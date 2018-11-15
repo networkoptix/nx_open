@@ -3,8 +3,7 @@
 #include "transaction_serializer.h"
 #include "../command.h"
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine {
 
 class NX_DATA_SYNC_ENGINE_API SerializableAbstractTransaction:
     public TransactionSerializer
@@ -117,5 +116,4 @@ std::unique_ptr<SerializableTransaction<CommandDescriptor>> makeSerializer(
     return std::make_unique<Serializer>(std::move(command));
 }
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine

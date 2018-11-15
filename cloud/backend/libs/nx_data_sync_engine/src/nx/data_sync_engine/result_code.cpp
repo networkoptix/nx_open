@@ -1,7 +1,6 @@
 #include "result_code.h"
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine {
 
 std::string toString(ResultCode resultCode)
 {
@@ -24,5 +23,4 @@ std::string toString(ResultCode resultCode)
     }
 }
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine

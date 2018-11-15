@@ -8,8 +8,7 @@
 #include "ubjson_serialized_transaction.h"
 #include "../command.h"
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine {
 
 class DeserializableCommandData;
 
@@ -143,5 +142,4 @@ std::unique_ptr<SerializableTransaction<CommandDescriptor>>
         commandFormatVersion);
 }
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine

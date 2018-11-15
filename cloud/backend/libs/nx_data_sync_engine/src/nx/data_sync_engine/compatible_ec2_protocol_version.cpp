@@ -2,8 +2,7 @@
 
 #include <limits>
 
-namespace nx {
-namespace data_sync_engine {
+namespace nx::data_sync_engine {
 
 const ProtocolVersionRange ProtocolVersionRange::any(
     0, std::numeric_limits<int>::max());
@@ -29,5 +28,4 @@ bool ProtocolVersionRange::isCompatible(int version) const
     return (version >= m_begin) && (version <= m_end);
 }
 
-} // namespace data_sync_engine
-} // namespace nx
+} // namespace nx::data_sync_engine
