@@ -96,7 +96,7 @@ TEST_P(FtEc2MserverCloudSynchronization, general)
             ::ec2::kCloudPeerId,
             cdbEc2TransactionUrl());
         if (i > 0)
-            verifyThatUsersMatchInCloudAndVms();
+            waitUntilCloudAndVmsUsersMatch();
         verifyTransactionConnection();
         testSynchronizingCloudOwner();
         testSynchronizingUserFromCloudToMediaServer();
