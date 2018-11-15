@@ -245,24 +245,14 @@ void Ec2MserverCloudSynchronization::verifyTransactionConnection()
 
 void Ec2MserverCloudSynchronization::testSynchronizingCloudOwner()
 {
-    constexpr static const auto testTime = std::chrono::seconds(5);
+    api::SystemSharingEx sharingData;
+    sharingData.accountEmail = ownerAccount().email;
+    sharingData.accountFullName = ownerAccount().fullName;
+    sharingData.isEnabled = true;
+    sharingData.accessRole = api::SystemAccessRole::owner;
 
-    const auto deadline = std::chrono::steady_clock::now() + testTime;
-    while (std::chrono::steady_clock::now() < deadline)
-    {
-        api::SystemSharingEx sharingData;
-        sharingData.accountEmail = ownerAccount().email;
-        sharingData.accountFullName = ownerAccount().fullName;
-        sharingData.isEnabled = true;
-        sharingData.accessRole = api::SystemAccessRole::owner;
-        bool found = false;
-        verifyCloudUserPresenceInLocalDb(sharingData, &found, false);
-        if (found)
-            return;
-    }
-
-    // Cloud owner has not arrived to local system.
-    ASSERT_TRUE(false);
+    constexpr auto testTime = std::chrono::minutes(1);
+    waitForCloudUserToAppearInLocalDb(sharingData, testTime);
 }
 
 void Ec2MserverCloudSynchronization::testSynchronizingUserFromCloudToMediaServer()
@@ -285,17 +275,8 @@ void Ec2MserverCloudSynchronization::testSynchronizingUserFromCloudToMediaServer
         cdb()->shareSystem(ownerAccount().email, ownerAccount().password, sharingData));
 
     // Waiting for new cloud user to arrive to local system.
-    constexpr const auto maxTimetoWait = std::chrono::seconds(10);
-    for (const auto t0 = std::chrono::steady_clock::now();
-        std::chrono::steady_clock::now() < (t0 + maxTimetoWait);)
-    {
-        bool found = false;
-        verifyCloudUserPresenceInLocalDb(sharingData, &found, false);
-        if (found)
-            return;
-    }
-
-    ASSERT_TRUE(false);
+    constexpr auto maxTimeToWait = std::chrono::minutes(1);
+    waitForCloudUserToAppearInLocalDb(sharingData, maxTimeToWait);
 }
 
 void Ec2MserverCloudSynchronization::testSynchronizingUserFromMediaServerToCloud()
@@ -518,7 +499,30 @@ void Ec2MserverCloudSynchronization::verifyCloudUserPresenceInLocalDb(
         *found = true;
 }
 
-void Ec2MserverCloudSynchronization::fetchOwnerSharing(api::SystemSharingEx* const ownerSharing)
+void Ec2MserverCloudSynchronization::waitForCloudUserToAppearInLocalDb(
+    const api::SystemSharingEx& sharingData,
+    std::optional<std::chrono::milliseconds> maxTimeToWait)
+{
+    const auto t0 = std::chrono::steady_clock::now();
+    // Waiting for new cloud user to arrive to local system.
+    for (;;)
+    {
+        if (maxTimeToWait && (std::chrono::steady_clock::now() > (t0 + *maxTimeToWait)))
+            break;
+
+        bool found = false;
+        verifyCloudUserPresenceInLocalDb(sharingData, &found, false);
+        if (found)
+            return;
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+
+    ASSERT_TRUE(false);
+}
+
+void Ec2MserverCloudSynchronization::fetchOwnerSharing(
+    api::SystemSharingEx* const ownerSharing)
 {
     std::vector<api::SystemSharingEx> systemUsers;
     ASSERT_EQ(
@@ -540,12 +544,35 @@ void Ec2MserverCloudSynchronization::fetchOwnerSharing(api::SystemSharingEx* con
     ASSERT_TRUE(false);
 }
 
+void Ec2MserverCloudSynchronization::waitUntilCloudAndVmsUsersMatch()
+{
+    for (;;)
+    {
+        bool usersMatch = false;
+        verifyThatUsersMatchInCloudAndVms(false, &usersMatch);
+        if (usersMatch)
+            return;
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+}
+
 void Ec2MserverCloudSynchronization::verifyThatUsersMatchInCloudAndVms(
     bool assertOnFailure,
     bool* const result)
 {
     if (result)
         *result = false;
+
+    // Selecting cloud users.
+    std::vector<api::SystemSharingEx> cloudUsers;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        cdb()->getSystemSharings(
+            ownerAccount().email,
+            ownerAccount().password,
+            registeredSystemData().id,
+            &cloudUsers));
 
     // Selecting local users.
     vms::api::UserDataList vmsUsers;
@@ -554,33 +581,30 @@ void Ec2MserverCloudSynchronization::verifyThatUsersMatchInCloudAndVms(
         appserver2()->moduleInstance()->ecConnection()
             ->getUserManager(Qn::kSystemAccess)->getUsersSync(&vmsUsers));
 
-    // Selecting cloud users.
-    std::vector<api::SystemSharingEx> sharings;
-    ASSERT_EQ(
-        api::ResultCode::ok,
-        cdb()->getSystemSharings(
-            ownerAccount().email,
-            ownerAccount().password,
-            registeredSystemData().id,
-            &sharings));
+    vmsUsers.erase(
+        vmsUsers.begin(),
+        std::remove_if(vmsUsers.begin(), vmsUsers.end(),
+            [](auto& user) { return user.isCloud; }));
 
-    // Checking that number of cloud users in vms match that in cloud.
-    const std::size_t numberOfCloudUsersInVms = std::count_if(
-        vmsUsers.cbegin(), vmsUsers.cend(),
-        [](const vms::api::UserData& data) { return data.isCloud; });
+    compareUsers(cloudUsers, vmsUsers, assertOnFailure, result);
+}
+
+void Ec2MserverCloudSynchronization::compareUsers(
+    const std::vector<api::SystemSharingEx>& cloudUsers,
+    const vms::api::UserDataList& vmsUsers,
+    bool assertOnFailure,
+    bool* result)
+{
     if (assertOnFailure)
-    {
-        ASSERT_EQ(numberOfCloudUsersInVms, sharings.size());
-    }
-    else if (numberOfCloudUsersInVms != sharings.size())
-    {
+        ASSERT_EQ(vmsUsers.size(), cloudUsers.size());
+    
+    if (vmsUsers.size() != cloudUsers.size())
         return;
-    }
 
-    for (const auto& sharingData: sharings)
+    for (const auto& cloudUser: cloudUsers)
     {
         bool found = false;
-        verifyCloudUserPresenceInLocalDb(sharingData, &found, assertOnFailure);
+        verifyCloudUserPresenceInLocalDb(cloudUser, &found, assertOnFailure);
         if (!found)
             return;
     }
@@ -640,7 +664,7 @@ void Ec2MserverCloudSynchronization::verifyThatSystemDataMatchInCloudAndVms(
 
 void Ec2MserverCloudSynchronization::waitForCloudAndVmsToSyncUsers(
     bool assertOnFailure,
-    bool* const result)
+    bool* result)
 {
     for (auto t0 = std::chrono::steady_clock::now();
         std::chrono::steady_clock::now() - t0 < kMaxTimeToWaitForChangesToBePropagatedToCloud;
