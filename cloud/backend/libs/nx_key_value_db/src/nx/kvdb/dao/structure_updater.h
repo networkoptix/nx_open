@@ -2,7 +2,7 @@
 
 #include <nx/sql/db_structure_updater.h>
 
-namespace nx::kvdb::dao::rdb {
+namespace nx::clusterdb::map::dao::rdb {
 
 class NX_KEY_VALUE_DB_API StructureUpdater
 {
@@ -17,4 +17,4 @@ private:
     nx::sql::DbStructureUpdater m_updater;
 };
 
-} // namespace nx::kvdb::dao::rdb
+} // namespace nx::clusterdb::map::dao::rdb

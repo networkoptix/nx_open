@@ -2,7 +2,7 @@
 
 #include <nx/clusterdb/engine/p2p_sync_settings.h>
 
-namespace nx::kvdb {
+namespace nx::clusterdb::map {
 
 class NX_KEY_VALUE_DB_API Settings
 {
@@ -12,4 +12,4 @@ public:
     void load(const QnSettings& settings);
 };
 
-} // namespace nx::kvdb
+} // namespace nx::clusterdb::map

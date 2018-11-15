@@ -1,6 +1,6 @@
 #include "database.h"
 
-namespace nx::kvdb {
+namespace nx::clusterdb::map {
 
 // TODO: This should be passed to m_syncEngine
 // to allow connections with this guid only.
@@ -46,4 +46,4 @@ EventProvider& Database::eventProvider()
     return m_eventProvider;
 }
 
-} // namespace nx::kvdb
+} // namespace nx::clusterdb::map

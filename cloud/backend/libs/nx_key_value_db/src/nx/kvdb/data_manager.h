@@ -7,7 +7,7 @@
 
 namespace nx::sql { class AsyncSqlQueryExecutor; }
 
-namespace nx::kvdb {
+namespace nx::clusterdb::map {
 
 enum class ResultCode
 {
@@ -73,4 +73,4 @@ private:
     //nx::sql::AsyncSqlQueryExecutor* m_dbManager;
 };
 
-} // namespace nx::kvdb
+} // namespace nx::clusterdb::map

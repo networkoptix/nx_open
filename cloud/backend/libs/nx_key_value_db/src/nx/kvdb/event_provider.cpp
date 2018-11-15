@@ -2,7 +2,7 @@
 
 #include <nx/sql/async_sql_query_executor.h>
 
-namespace nx::kvdb {
+namespace nx::clusterdb::map {
 
 EventProvider::EventProvider(
     nx::sql::AsyncSqlQueryExecutor* /*dbManager*/)
@@ -11,4 +11,4 @@ EventProvider::EventProvider(
 {
 }
 
-} // namespace nx::kvdb
+} // namespace nx::clusterdb::map

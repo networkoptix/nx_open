@@ -2,7 +2,7 @@
 
 #include <nx/sql/async_sql_query_executor.h>
 
-namespace nx::kvdb {
+namespace nx::clusterdb::map {
 
 DataManager::DataManager(
     nx::sql::AsyncSqlQueryExecutor* /*dbManager*/)
@@ -56,4 +56,4 @@ std::optional<std::string> DataManager::get(
     return std::nullopt;
 }
 
-} // namespace nx::kvdb
+} // namespace nx::clusterdb::map

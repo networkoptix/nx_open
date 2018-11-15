@@ -1,4 +1,4 @@
-nx_add_test(nx_key_value_db_ut
+nx_add_test(nx_clusterdb_map_ut
     WERROR
     PUBLIC_LIBS
-        nx_key_value_db)
+        nx_clusterdb_map)

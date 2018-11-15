@@ -1,6 +1,6 @@
 #pragma once
 
-namespace nx::kvdb::dao::rdb {
+namespace nx::clusterdb::map::dao::rdb {
 
 static const char kInitialDbStructure[] = R"sql(
 
@@ -14,4 +14,4 @@ CREATE UNIQUE INDEX idx_data_key ON data(key);
 
 )sql";
 
-} // namespace nx::kvdb::dao::rdb
+} // namespace nx::clusterdb::map::dao::rdb

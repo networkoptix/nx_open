@@ -9,7 +9,7 @@
 #include "event_provider.h"
 #include "settings.h"
 
-namespace nx::kvdb {
+namespace nx::clusterdb::map {
 
 class NX_KEY_VALUE_DB_API Database
 {
@@ -39,4 +39,4 @@ private:
     EventProvider m_eventProvider;
 };
 
-} // namespace nx::kvdb
+} // namespace nx::clusterdb::map
