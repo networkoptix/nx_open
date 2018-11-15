@@ -893,40 +893,63 @@ void MultiServerUpdatesWidget::processRemoteInitialState()
 
 void MultiServerUpdatesWidget::processRemoteDownloading()
 {
-    for (auto id: m_serverUpdateTool->getServersInState(StatusCode::readyToInstall))
-    {
-        if (m_serversActive.contains(id))
-        {
-            NX_VERBOSE(this)
-                << "processRemoteDownloading() - server "
-                << id << "completed downloading and is ready to install";
-            m_serversComplete.insert(id);
-            m_serversActive.remove(id);
-        }
-    }
+    auto allStates = m_serverUpdateTool->getAllServerStates();
 
-    for (auto id: m_serverUpdateTool->getServersInState(StatusCode::error))
+    for (auto record: allStates)
     {
-        if (m_serversActive.contains(id))
+        StatusCode state = record.second;
+        auto id = record.first;
+        switch (state)
         {
-            NX_VERBOSE(this)
-                << "processRemoteDownloading() - server "
-                << id << "failed to download update package";
-            m_serversFailed.insert(id);
-            m_serversActive.remove(id);
-        }
-    }
-
-    // Idle servers are concidered failed as well.
-    for (auto id: m_serverUpdateTool->getServersInState(StatusCode::idle))
-    {
-        if (m_serversActive.contains(id))
-        {
-            NX_VERBOSE(this)
-                << "processRemoteDownloading() - server "
-                << id << "failed to download update package";
-            m_serversFailed.insert(id);
-            m_serversActive.remove(id);
+            case StatusCode::readyToInstall:
+                if (m_serversActive.contains(id))
+                {
+                    NX_VERBOSE(this)
+                        << "processRemoteDownloading() - server "
+                        << id << "completed downloading and is ready to install";
+                    m_serversComplete.insert(id);
+                    m_serversActive.remove(id);
+                }
+                break;
+            case StatusCode::error:
+            case StatusCode::idle:
+                if (m_serversActive.contains(id))
+                {
+                    NX_VERBOSE(this)
+                        << "processRemoteDownloading() - server "
+                        << id << "failed to download update package";
+                    m_serversFailed.insert(id);
+                    m_serversActive.remove(id);
+                }
+                break;
+            case StatusCode::preparing:
+            case StatusCode::downloading:
+                if (!m_serversActive.contains(id) && m_serversIssued.contains(id))
+                {
+                    NX_VERBOSE(this)
+                        << "processRemoteDownloading() - server "
+                        << id << "resumed downloading.";
+                    m_serversActive.remove(id);
+                }
+                break;
+            case StatusCode::latestUpdateInstalled:
+                if (m_serversActive.contains(id))
+                {
+                    NX_VERBOSE(this)
+                        << "processRemoteDownloading() - server "
+                        << id << "have already installed this package.";
+                    m_serversActive.remove(id);
+                }
+                break;
+            case StatusCode::offline:
+                if (m_serversActive.contains(id))
+                {
+                    NX_VERBOSE(this)
+                        << "processRemoteDownloading() - server "
+                        << id << "went offline during download.";
+                    m_serversActive.remove(id);
+                }
+                break;
         }
     }
 

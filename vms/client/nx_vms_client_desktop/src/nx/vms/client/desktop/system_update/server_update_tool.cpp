@@ -659,6 +659,19 @@ QSet<QnUuid> ServerUpdateTool::getAllServers() const
     return result;
 }
 
+std::map<QnUuid, nx::update::Status::Code> ServerUpdateTool::getAllServerStates() const
+{
+    std::map<QnUuid, nx::update::Status::Code> result;
+
+    for (const auto& item: m_updatesModel->getServerData())
+    {
+        if (!item->server)
+            continue;
+        result.insert(std::make_pair(item->server->getId(), item->state));
+    }
+    return result;
+}
+
 QSet<QnUuid> ServerUpdateTool::getServersInState(StatusCode state) const
 {
     QSet<QnUuid> result;
