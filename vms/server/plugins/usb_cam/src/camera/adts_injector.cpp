@@ -20,6 +20,9 @@ static int writePacket(void *opaque, uint8_t *buffer, int bufferSize)
     AdtsInjector * injector = static_cast<AdtsInjector*>(opaque);
     ffmpeg::Packet * packet = injector->currentPacket();
 
+    if (!packet)
+        return 0;
+
     packet->unreference();
     packet->newPacket(bufferSize);
     memcpy(packet->data(), buffer, bufferSize);
@@ -86,7 +89,12 @@ int AdtsInjector::inject(ffmpeg::Packet * packet)
     }
 
     m_currentPacket = packet;
-    return av_write_frame(m_formatContext, packet->packet());
+
+    int result = av_write_frame(m_formatContext, packet->packet());
+
+    m_currentPacket = nullptr;
+
+    return result;
 }
 
 ffmpeg::Packet * AdtsInjector::currentPacket()
