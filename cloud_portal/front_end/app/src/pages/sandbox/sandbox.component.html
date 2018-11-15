@@ -321,6 +321,11 @@
                 <br/>
 
             </form>
+            <br>
+            <br>
+            <div *ngFor="let option of options">
+                <nx-tag [value]="option.selected">{{ option.name }}</nx-tag>
+            </div>
         </div>
     </div>
 </div>
