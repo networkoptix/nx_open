@@ -390,11 +390,13 @@
             "name": "logo",
             "label": "Logo",
             "value": "",
-            "description": "Logo for integration",
+            "description": "Logo for integration.<br>Must have a transparent background.",
             "type": "external_image",
             "optional": true,
             "meta": {
-              "size": 1073741824
+              "size": 512000,
+              "format": "png",
+              "height_ge": 128
             }
           },
           {
