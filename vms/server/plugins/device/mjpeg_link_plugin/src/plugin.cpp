@@ -89,7 +89,7 @@ unsigned int HttpLinkPlugin::releaseRef()
 
 const char* HttpLinkPlugin::name() const
 {
-    return "mjpg_link";
+    return "mjpeg_link_plugin";
 }
 
 void HttpLinkPlugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)

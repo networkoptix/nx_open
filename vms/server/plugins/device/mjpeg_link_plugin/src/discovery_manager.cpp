@@ -35,11 +35,11 @@ DiscoveryManager::DiscoveryManager(nxpt::CommonRefManager* const refManager,
     m_timeProvider( timeProvider )
 {
     QByteArray data;
-    QFile file(":/mjpg_link/manifest.json");
+    QFile file(":/mjpeg_link_plugin/manifest.json");
     if (file.open(QFile::ReadOnly))
         m_replaceData = QJson::deserialized<std::vector<UrlPathReplaceRecord>>(file.readAll());
     {
-        QFile file("plugins/mjpg_link/manifest.json");
+        QFile file("plugins/mjpeg_link_plugin/manifest.json");
         if (file.open(QFile::ReadOnly))
         {
             NX_INFO(this,

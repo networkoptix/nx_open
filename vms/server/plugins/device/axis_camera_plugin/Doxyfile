@@ -26,7 +26,7 @@ DOXYFILE_ENCODING      = UTF-8
 # identify the project. Note that if you do not use Doxywizard you need
 # to put quotes around the project name if it contains spaces.
 
-PROJECT_NAME           = "axiscamplugin"
+PROJECT_NAME           = "axis_camera_plugin"
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number.
 # This could be handy for archiving the generated documentation or
@@ -668,7 +668,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-# Have to add paths for generating from develop/axiscamplugin folder and from nx_sdk folder, since I do not know how to sed on mswin (AK)
+# Have to add paths for generating from develop/axis_camera_plugin folder and from nx_sdk folder, since I do not know how to sed on mswin (AK)
 INPUT                  = src/ ../common/src/plugins/plugin_api.h ../common/src/plugins/plugin_tools.h ../common/src/plugins/camera_plugin.h ../common/src/plugins/camera_plugin_types.h ../../include/plugins/
 
 # This tag can be used to specify the character encoding of the source files

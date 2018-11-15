@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 
-set(AXIS_TARGET axiscamplugin)
+set(AXIS_TARGET axis_camera_plugin)
 
 project(${AXIS_TARGET})
 
