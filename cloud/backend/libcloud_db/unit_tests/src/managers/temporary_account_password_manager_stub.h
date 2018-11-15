@@ -46,7 +46,7 @@ public:
     virtual void removeTemporaryPasswordsFromCacheByAccountEmail(
         std::string accountEmail) override;
 
-    virtual boost::optional<data::TemporaryAccountCredentialsEx> getCredentialsByLogin(
+    virtual std::optional<data::TemporaryAccountCredentialsEx> getCredentialsByLogin(
         const std::string& login) const override;
 
     virtual bool authorize(
