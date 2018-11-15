@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 
 /* Usage
  <nx-right-layout>
@@ -41,6 +41,8 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
     styleUrls  : [ 'layout.component.scss' ],
 })
 export class NxLayoutRightComponent implements OnInit {
+
+    @Input('loading') loading: any;
 
     constructor() {
     }

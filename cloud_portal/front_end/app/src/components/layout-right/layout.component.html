@@ -1,4 +1,6 @@
-<div class="layout m-0 p-3">
+<nx-pre-loader type="page" *ngIf="loading"></nx-pre-loader>
+
+<div class="layout m-0 p-3" *ngIf="!loading">
     <div class="card-columns pl-2 pr-2">
         <ng-content select="[first-elm]"></ng-content>
         <ng-content select="[side-elm]"></ng-content>

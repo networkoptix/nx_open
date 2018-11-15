@@ -1,6 +1,4 @@
-<nx-pre-loader type="page" *ngIf="!plugin"></nx-pre-loader>
-
-<div class="" *ngIf="plugin">
+<div>
 
     <div class="row m-0 pt-3 pl-4">
         <button class="btn btn-default btn-back" routerLink="/integrations">
@@ -9,7 +7,7 @@
         </button>
     </div>
 
-    <nx-layout-right>
+    <nx-layout-right [loading]="!plugin">
         <nx-block first-elm *ngIf="plugin.information.hasInfo || plugin.overview.hasInfo">
             <header>
                 {{plugin.information.name}}
