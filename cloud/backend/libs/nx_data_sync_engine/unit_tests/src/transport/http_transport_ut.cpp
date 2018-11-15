@@ -1,5 +1,5 @@
-#include <nx/data_sync_engine/transport/http_transport_acceptor.h>
-#include <nx/data_sync_engine/transport/http_transport_connector.h>
+#include <nx/clusterdb/engine/transport/http_transport_acceptor.h>
+#include <nx/clusterdb/engine/transport/http_transport_connector.h>
 
 #include "transport_acceptance_tests.h"
 

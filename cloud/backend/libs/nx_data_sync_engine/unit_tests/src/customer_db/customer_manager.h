@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/data_sync_engine/synchronization_engine.h>
+#include <nx/clusterdb/engine/synchronization_engine.h>
 #include <nx/sql/query_context.h>
 #include <nx/utils/move_only_func.h>
 

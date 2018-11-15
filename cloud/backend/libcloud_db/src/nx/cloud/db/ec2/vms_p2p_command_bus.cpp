@@ -1,6 +1,6 @@
 #include "vms_p2p_command_bus.h"
 
-#include <nx/data_sync_engine/synchronization_engine.h>
+#include <nx/clusterdb/engine/synchronization_engine.h>
 #include <nx/cloud/db/ec2/vms_command_descriptor.h>
 
 namespace nx::cloud::db {

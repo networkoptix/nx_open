@@ -7,7 +7,7 @@
 
 #include <nx/utils/move_only_func.h>
 
-#include <nx/data_sync_engine/outgoing_transaction_dispatcher.h>
+#include <nx/clusterdb/engine/outgoing_transaction_dispatcher.h>
 
 namespace nx::clusterdb::engine {
 namespace test {

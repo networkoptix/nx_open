@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/data_sync_engine/statistics/provider.h>
+#include <nx/clusterdb/engine/statistics/provider.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/connection_server/server_statistics.h>
 

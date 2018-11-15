@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/data_sync_engine/p2p_sync_settings.h>
+#include <nx/clusterdb/engine/p2p_sync_settings.h>
 
 namespace nx::kvdb {
 

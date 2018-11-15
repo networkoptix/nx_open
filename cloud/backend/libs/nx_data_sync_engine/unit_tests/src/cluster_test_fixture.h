@@ -5,7 +5,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/data_sync_engine/service/service.h>
+#include <nx/clusterdb/engine/service/service.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 

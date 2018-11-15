@@ -3,7 +3,7 @@
 #include <nx/utils/log/log.h>
 
 #include <nx/cloud/db/managers/managers_types.h>
-#include <nx/data_sync_engine/synchronization_engine.h>
+#include <nx/clusterdb/engine/synchronization_engine.h>
 
 #include <nx_ec/ec_proto_version.h>
 

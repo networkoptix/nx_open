@@ -5,7 +5,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/string.h>
 
-#include <nx/data_sync_engine/http/http_paths.h>
+#include <nx/clusterdb/engine/http/http_paths.h>
 
 namespace nx::clusterdb::engine::test {
 

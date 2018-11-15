@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/data_sync_engine/compatible_ec2_protocol_version.h>
+#include <nx/clusterdb/engine/compatible_ec2_protocol_version.h>
 #include <nx/utils/thread/sync_queue.h>
 
 #include <nx/cloud/db/controller.h>

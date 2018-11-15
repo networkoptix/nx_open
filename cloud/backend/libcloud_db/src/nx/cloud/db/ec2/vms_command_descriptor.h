@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/data_sync_engine/command_descriptor.h>
+#include <nx/clusterdb/engine/command_descriptor.h>
 
 #include <transaction/transaction_descriptor.h>
 

@@ -12,9 +12,9 @@
 
 #include <nx_ec/ec_proto_version.h>
 
-#include <nx/data_sync_engine/dao/memory/transaction_data_object_in_memory.h>
-#include <nx/data_sync_engine/outgoing_transaction_dispatcher.h>
-#include <nx/data_sync_engine/transaction_log.h>
+#include <nx/clusterdb/engine/dao/memory/transaction_data_object_in_memory.h>
+#include <nx/clusterdb/engine/outgoing_transaction_dispatcher.h>
+#include <nx/clusterdb/engine/transaction_log.h>
 
 #include <nx/cloud/db/controller.h>
 #include <nx/cloud/db/data/account_data.h>

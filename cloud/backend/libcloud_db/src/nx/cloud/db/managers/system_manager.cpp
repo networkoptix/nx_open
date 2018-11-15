@@ -14,7 +14,7 @@
 #include <nx/utils/sync_call.h>
 
 #include <nx/cloud/db/ec2/data_conversion.h>
-#include <nx/data_sync_engine/synchronization_engine.h>
+#include <nx/clusterdb/engine/synchronization_engine.h>
 
 #include <api/global_settings.h>
 #include <core/resource/param.h>

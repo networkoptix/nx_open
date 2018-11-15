@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include <nx/data_sync_engine/service/service.h>
+#include <nx/clusterdb/engine/service/service.h>
 
 #include "customer_manager.h"
 #include "data.h"

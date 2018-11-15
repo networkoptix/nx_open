@@ -5,8 +5,8 @@
 #include <nx/network/http/auth_restriction_list.h>
 #include <nx/utils/timer_manager.h>
 
-#include <nx/data_sync_engine/serialization/serializable_transaction.h>
-#include <nx/data_sync_engine/synchronization_engine.h>
+#include <nx/clusterdb/engine/serialization/serializable_transaction.h>
+#include <nx/clusterdb/engine/synchronization_engine.h>
 
 #include "access_control/authentication_manager.h"
 #include "access_control/authorization_manager.h"

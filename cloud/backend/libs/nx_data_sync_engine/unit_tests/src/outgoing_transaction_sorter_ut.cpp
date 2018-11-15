@@ -6,7 +6,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/thread.h>
 
-#include <nx/data_sync_engine/outgoing_transaction_sorter.h>
+#include <nx/clusterdb/engine/outgoing_transaction_sorter.h>
 
 #include "test_outgoing_transaction_dispatcher.h"
 

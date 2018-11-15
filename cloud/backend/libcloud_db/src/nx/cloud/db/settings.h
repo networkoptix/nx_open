@@ -13,7 +13,7 @@
 #include <nx/utils/basic_service_settings.h>
 #include <nx/utils/std/optional.h>
 
-#include <nx/data_sync_engine/p2p_sync_settings.h>
+#include <nx/clusterdb/engine/p2p_sync_settings.h>
 
 #include "access_control/login_enumeration_protector.h"
 

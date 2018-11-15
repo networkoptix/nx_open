@@ -8,8 +8,8 @@
 #include <nx/utils/counter.h>
 #include <nx/sql/db_instance_controller.h>
 
-#include <nx/data_sync_engine/serialization/transaction_serializer.h>
-#include <nx/data_sync_engine/transaction_log.h>
+#include <nx/clusterdb/engine/serialization/transaction_serializer.h>
+#include <nx/clusterdb/engine/transaction_log.h>
 
 #include "../data/statistics_data.h"
 #include "../data/system_data.h"

@@ -8,7 +8,7 @@
 #include <nx/sql/types.h>
 
 #include <nx/cloud/db/api/result_code.h>
-#include <nx/data_sync_engine/result_code.h>
+#include <nx/clusterdb/engine/result_code.h>
 
 namespace nx::cloud::db {
 

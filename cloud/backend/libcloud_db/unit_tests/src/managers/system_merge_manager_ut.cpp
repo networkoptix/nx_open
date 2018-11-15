@@ -9,7 +9,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/data_sync_engine/synchronization_engine.h>
+#include <nx/clusterdb/engine/synchronization_engine.h>
 #include <nx/cloud/db/controller.h>
 #include <nx/cloud/db/managers/system_merge_manager.h>
 #include <nx/cloud/db/settings.h>

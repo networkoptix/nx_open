@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include <nx/data_sync_engine/command_descriptor.h>
+#include <nx/clusterdb/engine/command_descriptor.h>
 #include <nx/fusion/model_functions_fwd.h>
 
 namespace nx::clusterdb::engine::test {

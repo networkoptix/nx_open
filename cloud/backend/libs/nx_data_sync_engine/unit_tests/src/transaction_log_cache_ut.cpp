@@ -5,7 +5,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/uuid.h>
 
-#include <nx/data_sync_engine/transaction_log_cache.h>
+#include <nx/clusterdb/engine/transaction_log_cache.h>
 
 namespace nx::clusterdb::engine {
 namespace test {

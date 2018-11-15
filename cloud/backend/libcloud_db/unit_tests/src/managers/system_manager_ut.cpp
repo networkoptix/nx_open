@@ -3,7 +3,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/timer_manager.h>
 
-#include <nx/data_sync_engine/synchronization_engine.h>
+#include <nx/clusterdb/engine/synchronization_engine.h>
 #include <nx/cloud/db/controller.h>
 #include <nx/cloud/db/managers/system_manager.h>
 #include <nx/cloud/db/stree/stree_manager.h>
