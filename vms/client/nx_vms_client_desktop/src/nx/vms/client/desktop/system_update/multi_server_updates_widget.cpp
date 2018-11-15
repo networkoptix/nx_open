@@ -541,6 +541,9 @@ void MultiServerUpdatesWidget::pickLocalFile()
     if (fileName.isEmpty())
         return;
 
+    m_updateSourceMode = UpdateSourceType::file;
+    m_updateLocalStateChanged = true;
+
     clearUpdateInfo();
     m_updateCheck = m_serverUpdateTool->checkUpdateFromFile(fileName);
     loadDataToUi();
@@ -551,6 +554,9 @@ void MultiServerUpdatesWidget::pickSpecificBuild()
     QnBuildNumberDialog dialog(this);
     if (!dialog.exec())
         return;
+
+    m_updateSourceMode = UpdateSourceType::internetSpecific;
+    m_updateLocalStateChanged = true;
 
     clearUpdateInfo();
     nx::utils::SoftwareVersion version = qnStaticCommon->engineVersion();
@@ -567,12 +573,11 @@ void MultiServerUpdatesWidget::setUpdateSourceMode(UpdateSourceType mode)
     if (m_updateSourceMode == mode)
         return;
 
-    m_updateSourceMode = mode;
-    m_updateLocalStateChanged = true;
-
     switch(mode)
     {
         case UpdateSourceType::internet:
+            m_updateSourceMode = mode;
+            m_updateLocalStateChanged = true;
             clearUpdateInfo();
             checkForInternetUpdates();
             loadDataToUi();
