@@ -1,12 +1,12 @@
-<div *ngIf="keys.length > 0" class="embed-responsive embed-responsive-16by9">
+<div class="embed-responsive embed-responsive-16by9">
     <div class="carousel slide embed-responsive-item">
         <div class="carousel-inner h-100">
             <div class="carousel-item"
-                 *ngFor="let key of keys; let i = index"
+                 *ngFor="let screenshot of screenshots; let i = index"
                  [ngClass]=" { 'active': i == currentIndex }"
                  [@visibilityChange]="i == currentIndex ? 'enter' : 'leave'">
                 <div class="d-flex justify-content-center align-items-center h-100">
-                    <img class="img-fluid" [src]="elements[key]">
+                    <img class="img-fluid" [src]="screenshot">
                 </div>
             </div>
         </div>

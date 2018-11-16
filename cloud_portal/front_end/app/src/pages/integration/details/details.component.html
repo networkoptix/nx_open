@@ -26,8 +26,8 @@
             <nx-section *ngIf="plugin.overview.overviewVideo">
                 <nx-external-video [src]="plugin.overview.overviewVideo"></nx-external-video>
             </nx-section>
-            <nx-section *ngIf="plugin.overview.screenShots">
-                <nx-carousel [elements]="plugin.overview" [keys]="plugin.overview.screenShots"></nx-carousel>
+            <nx-section *ngIf="plugin.overview.screenshots">
+                <nx-carousel [screenshots]="plugin.overview.screenshots"></nx-carousel>
             </nx-section>
         </nx-block>
 
@@ -54,8 +54,8 @@
             <nx-section *ngIf="plugin.instructions.instructionVideo">
                 <nx-external-video [src]="plugin.instructions.instructionVideo"></nx-external-video>
             </nx-section>
-            <nx-section *ngIf="plugin.instructions.screenShots">
-                <nx-carousel [elements]="plugin.instructions" [keys]="plugin.instructions.screenShots"></nx-carousel>
+            <nx-section *ngIf="plugin.instructions.screenshots">
+                <nx-carousel [screenshots]="plugin.instructions.screenshots"></nx-carousel>
             </nx-section>
 
             <nx-section>

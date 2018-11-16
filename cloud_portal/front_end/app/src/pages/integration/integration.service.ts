@@ -37,7 +37,7 @@ export class IntegrationService implements OnDestroy {
     private getScreenshots(section): string[] {
         return Object.keys(section).filter((element) => {
             return element.match(/screenshot/i) && section[element];
-        });
+        }).sort().map((key) => section[key]);
     }
 
     private formatPlugins() {
@@ -89,10 +89,10 @@ export class IntegrationService implements OnDestroy {
             }
 
             if (plugin.instructions) {
-                plugin.instructions.screenShots = this.getScreenshots(plugin.instructions);
+                plugin.instructions.screenshots = this.getScreenshots(plugin.instructions);
             }
             if (plugin.overview) {
-                plugin.overview.screenShots = this.getScreenshots(plugin.overview);
+                plugin.overview.screenshots = this.getScreenshots(plugin.overview);
             }
         });
     }

@@ -26,25 +26,22 @@ import { trigger, style, animate, transition } from '@angular/animations';
     ]
 })
 export class NxCarouselComponent implements OnInit {
-    @Input() elements: any;
-    @Input() keys: any;
+    @Input() screenshots: any;
 
     private currentIndex = 0;
-    constructor(){}
+    constructor() {}
 
-    ngOnInit(){
-         this.keys = this.keys.sort();
-    }
+    ngOnInit() {}
 
     private mod(n, m) {
         return ((n % m) + m) % m;
     }
 
-    previousElement(){
-        this.currentIndex = this.mod((this.currentIndex-1), this.keys.length);
+    previousElement() {
+        this.currentIndex = this.mod((this.currentIndex-1), this.screenshots.length);
     }
 
-    nextElement(){
-        this.currentIndex = this.mod((this.currentIndex + 1), this.keys.length);
+    nextElement() {
+        this.currentIndex = this.mod((this.currentIndex + 1), this.screenshots.length);
     }
 }
