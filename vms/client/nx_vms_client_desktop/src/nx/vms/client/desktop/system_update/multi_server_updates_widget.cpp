@@ -808,6 +808,8 @@ ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress
 
 void MultiServerUpdatesWidget::processRemoteInitialState()
 {
+    if (!isVisible())
+        return;
     auto downloaded = m_serverUpdateTool->getServersInState(StatusCode::readyToInstall);
     auto downloading = m_serverUpdateTool->getServersInState(StatusCode::downloading);
     auto installing = m_serverUpdateTool->getServersInstalling();
@@ -1624,6 +1626,7 @@ void MultiServerUpdatesWidget::discardChanges()
     }
 
     clearUpdateInfo();
+    setTargetState(WidgetUpdateState::initial, {});
 }
 
 bool MultiServerUpdatesWidget::hasChanges() const
@@ -1662,6 +1665,8 @@ void MultiServerUpdatesWidget::hideStatusColumns(bool value)
 void MultiServerUpdatesWidget::checkForInternetUpdates()
 {
     if (m_updateSourceMode != UpdateSourceType::internet)
+        return;
+    if (!isVisible())
         return;
 
     // No need to check for updates if we are already installing something.
