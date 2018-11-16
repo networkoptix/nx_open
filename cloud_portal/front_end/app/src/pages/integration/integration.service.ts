@@ -25,7 +25,7 @@ export class IntegrationService implements OnDestroy {
 
         this.getIntegrations().subscribe(result => {
             this.plugins = result.data;
-            this.formatDownloads();
+            this.formatPlugins();
             this.pluginsSubject.next(this.plugins);
         });
     }
@@ -34,7 +34,13 @@ export class IntegrationService implements OnDestroy {
         return this.api.getIntegrations();
     }
 
-    private formatDownloads() {
+    private getScreenshots(section): string[] {
+        return Object.keys(section).filter((element) => {
+            return element.match(/screenshot/i) && section[element];
+        });
+    }
+
+    private formatPlugins() {
         if (!this.plugins) {
             return;
         }
@@ -80,6 +86,13 @@ export class IntegrationService implements OnDestroy {
                     }
                     return 0;
                 });
+            }
+
+            if (plugin.instructions) {
+                plugin.instructions.screenShots = this.getScreenshots(plugin.instructions);
+            }
+            if (plugin.overview) {
+                plugin.overview.screenShots = this.getScreenshots(plugin.overview);
             }
         });
     }

@@ -27,15 +27,12 @@ import { trigger, style, animate, transition } from '@angular/animations';
 })
 export class NxCarouselComponent implements OnInit {
     @Input() elements: any;
-    keys: any;
+    @Input() keys: any;
 
     private currentIndex = 0;
     constructor(){}
 
     ngOnInit(){
-         this.keys = Object.keys(this.elements).filter((element) => {
-            return element.match(/screenshot/i) && this.elements[element];
-         });
          this.keys = this.keys.sort();
     }
 
