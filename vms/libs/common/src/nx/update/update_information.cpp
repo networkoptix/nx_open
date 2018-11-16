@@ -26,9 +26,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
     (nx::update::InformationError::notFoundError, "not found")
     (nx::update::InformationError::noNewVersion, "no new version"))
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Package, (xml)(csv_record)(ubjson)(json), Package_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Information, (xml)(csv_record)(ubjson)(json), Information_Fields)
-
 QString toString(InformationError error)
 {
     QString result;
@@ -36,9 +33,12 @@ QString toString(InformationError error)
     return result;
 }
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::update::Package, (xml)(csv_record)(ubjson)(json)(datastream), Package_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::update::Information, (xml)(csv_record)(ubjson)(json)(datastream), Information_Fields)
+
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::update::Status, Code)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::update::Status, (xml)(csv_record)(ubjson)(json), UpdateStatus_Fields)
 
+
 } // namespace update
 } // namespace nx
-

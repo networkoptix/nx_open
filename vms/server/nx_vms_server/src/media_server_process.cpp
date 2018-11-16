@@ -278,7 +278,7 @@
 #include <nx/network/http/http_client.h>
 #include <core/resource_management/resource_data_pool.h>
 
-#if !defined(EDGE_SERVER) && !defined(__aarch64__)
+#if !defined(EDGE_SERVER)
     #include <nx_speech_synthesizer/text_to_wav.h>
     #include <nx/utils/file_system.h>
 #endif
@@ -4533,7 +4533,7 @@ int MediaServerProcess::main(int argc, char* argv[])
         signal( SIGUSR1, SIGUSR1_handler );
     #endif
 
-    #if !defined(EDGE_SERVER) && !defined(__aarch64__)
+    #if !defined(EDGE_SERVER)
         // Festival should be initialized before QnVideoService has started because of a bug in
         // festival.
         std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(

@@ -10,7 +10,7 @@
 #include <ui/customization/customized.h>
 
 #include <nx/vms/client/desktop/common/utils/command_action.h>
-#include <nx/utils/disconnect_helper.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/utils/uuid.h>
 
 class QModelIndex;
@@ -124,7 +124,7 @@ public:
     void clear();
 
 signals:
-    void clicked();
+    void clicked(Qt::MouseButton button, Qt::KeyboardModifiers modifiers);
     void doubleClicked();
     void dragStarted();
 

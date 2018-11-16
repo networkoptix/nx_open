@@ -1098,14 +1098,13 @@ void QnWorkbenchNavigator::updateCentralWidget()
     if (m_centralWidget == centralWidget)
         return;
 
-    m_centralWidgetConnections.clear();
+    m_centralWidgetConnections = {};
 
     m_centralWidget = centralWidget;
 
     if (m_centralWidget)
     {
-        m_centralWidgetConnections = QnDisconnectHelper::create();
-        *m_centralWidgetConnections << connect(m_centralWidget->resource(),
+        m_centralWidgetConnections << connect(m_centralWidget->resource(),
             &QnResource::parentIdChanged,
             this,
             &QnWorkbenchNavigator::updateLocalOffset);
@@ -1128,7 +1127,7 @@ void QnWorkbenchNavigator::updateCurrentWidget()
 
     WidgetFlags previousWidgetFlags = m_currentWidgetFlags;
 
-    m_currentWidgetConnections.clear();
+    m_currentWidgetConnections = {};
 
     if (m_currentWidget)
     {
@@ -1166,14 +1165,12 @@ void QnWorkbenchNavigator::updateCurrentWidget()
 
     if (m_currentWidget)
     {
-        m_currentWidgetConnections = QnDisconnectHelper::create();
-
-        *m_currentWidgetConnections << connect(m_currentWidget,
+        m_currentWidgetConnections << connect(m_currentWidget,
             &QnMediaResourceWidget::aspectRatioChanged,
             this,
             &QnWorkbenchNavigator::updateThumbnailsLoader);
 
-        *m_currentWidgetConnections << connect(m_currentWidget->resource(),
+        m_currentWidgetConnections << connect(m_currentWidget->resource(),
             &QnResource::nameChanged,
             this,
             &QnWorkbenchNavigator::updateLines);

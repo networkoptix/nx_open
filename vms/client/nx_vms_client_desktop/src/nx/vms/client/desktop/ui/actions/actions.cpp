@@ -1813,8 +1813,8 @@ void initialize(Manager* manager, Action* root)
     factory(GoToPreviousItemAction)
         .flags(NoTarget);
 
-    factory(GoToResourceAction)
-        .flags(ResourceTarget | SingleTarget)
+    factory(GoToLayoutItemAction)
+        .flags(SingleTarget | ResourceTarget | NoTarget)
         .condition(!condition::isLayoutTourReviewMode() && !condition::tourIsRunning());
 
     factory(ToggleCurrentItemMaximizationStateAction)

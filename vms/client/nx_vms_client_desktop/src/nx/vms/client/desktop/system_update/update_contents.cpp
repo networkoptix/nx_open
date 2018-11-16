@@ -199,7 +199,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, UpdateContents& contents
                 << "arch" << serverInfo.arch
                 << "platform" << serverInfo.platform
                 << "is missing its update package";
-            contents.missingUpdate.insert(server);
+            contents.missingUpdate.insert(server->getId());
         }
 
         nx::utils::SoftwareVersion serverVersion = server->getVersion();
@@ -211,7 +211,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, UpdateContents& contents
                 << "ver" << serverVersion.toString()
                 << "is incompatible with this update"
                 << "ver" << targetVersion.toString();
-            contents.invalidVersion.insert(server);
+            contents.invalidVersion.insert(server->getId());
         }
 
         allServers << record.first;
@@ -249,34 +249,43 @@ bool verifyUpdateContents(QnCommonModule* commonModule, UpdateContents& contents
     return contents.isValid();
 }
 
-std::future<UpdateContents> checkLatestUpdate()
+std::future<UpdateContents> checkLatestUpdate(UpdateCheckSignal* signaller)
 {
     QString updateUrl = qnSettings->updateFeedUrl();
     return std::async(std::launch::async,
-        [updateUrl]()
+        [updateUrl, signaller]()
         {
             UpdateContents result;
             result.info = nx::update::updateInformation(updateUrl, nx::update::kLatestVersion, &result.error);
             result.sourceType = UpdateSourceType::internet;
             result.source = lit("%1 for build=%2").arg(updateUrl, nx::update::kLatestVersion);
+            if (signaller)
+            {
+                emit signaller->atFinished(result);
+                signaller->deleteLater();
+            }
             return result;
         });
 }
 
-std::future<UpdateContents> checkSpecificChangeset(QString build)
+std::future<UpdateContents> checkSpecificChangeset(QString build, UpdateCheckSignal* signaller)
 {
     QString updateUrl = qnSettings->updateFeedUrl();
 
     return std::async(std::launch::async,
-        [updateUrl, build]()
+        [updateUrl, build, signaller]()
         {
             UpdateContents result;
             result.info = nx::update::updateInformation(updateUrl, build, &result.error);
             result.sourceType = UpdateSourceType::internetSpecific;
             result.source = lit("%1 for build=%2").arg(updateUrl, build);
+            if (signaller)
+            {
+                emit signaller->atFinished(result);
+                signaller->deleteLater();
+            }
             return result;
         });
 }
-
 
 } // namespace nx::vms::client::desktop

@@ -67,10 +67,11 @@ private:
 
     void createEventPanel(QGraphicsWidget* parentWidget);
 
-    void at_eventTileHovered(const QModelIndex& index, const nx::vms::client::desktop::EventTile* tile);
+    void at_eventTileHovered(const QModelIndex& index, nx::vms::client::desktop::EventTile* tile);
 
 private:
     bool m_visible = false;
+    bool m_blockAction = false;
 
     QnBlinkingImageButtonWidget* m_showButton;
 
