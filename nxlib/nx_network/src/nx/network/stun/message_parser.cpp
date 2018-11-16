@@ -14,7 +14,7 @@ using namespace attrs;
 
 MessageParser::MessageParser()
 {
-    m_header.transactionId.resize(Header::TRANSACTION_ID_SIZE);
+    reset();
 }
 
 void MessageParser::setMessage(Message* const msg)
@@ -37,6 +37,7 @@ void MessageParser::reset()
     m_attribute = {};
     m_leftMessageLength = 0;
     m_state = HEADER_INITIAL_AND_TYPE;
+    m_tempBuffer.clear();
 }
 
 // Parsing for each specific type
