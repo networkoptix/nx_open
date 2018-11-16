@@ -5,6 +5,7 @@
 
 #include <transaction/transaction_message_bus_priv.h>
 #include <utils/common/delayed.h>
+#include <nx/network/p2p_transport/p2p_transport.h>
 
 namespace {
 
@@ -397,10 +398,26 @@ void ServerMessageBus::sendInitialDataToCloud(const P2pConnectionPtr& connection
     context(connection)->isLocalStarted = true;
 }
 
+bool ServerMessageBus::gotPostConnection(
+    const vms::api::PeerDataEx& remotePeer,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket)
+{
+    {
+        QnMutexLocker lock(&m_mutex);
+        auto& connection = m_connections.value(remotePeer.id);
+        if (connection->remotePeer().connectionGuid == remotePeer.connectionGuid)
+        {
+            connection->gotPostConnection(std::move(socket));
+            return true;
+        }
+    }
+    return false;
+}
+
 void ServerMessageBus::gotConnectionFromRemotePeer(
     const vms::api::PeerDataEx& remotePeer,
     ec2::ConnectionLockGuard connectionLockGuard,
-    nx::network::WebSocketPtr webSocket,
+    nx::network::P2pTransportPtr p2pTransport,
     const QUrlQuery& requestUrlQuery,
     const Qn::UserAccessData& userAccessData,
     std::function<void()> onConnectionClosedCallback)
@@ -415,7 +432,7 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
         commonModule(),
         remotePeer,
         localPeerEx(),
-        std::move(webSocket),
+        std::move(p2pTransport),
         requestUrlQuery,
         userAccessData,
         std::make_unique<nx::p2p::ConnectionContext>(),

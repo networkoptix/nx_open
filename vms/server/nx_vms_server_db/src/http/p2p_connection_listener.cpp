@@ -140,6 +140,45 @@ Qn::UserAccessData ConnectionProcessor::userAccessData(const vms::api::PeerDataE
     return access;
 }
 
+bool ConnectionProcessor::canAcceptConnection(const vms::api::PeerDataEx& remotePeer)
+{
+    Q_D(QnTCPConnectionProcessor);
+
+    if (commonModule()->isStandAloneMode())
+    {
+        NX_DEBUG(this,
+            "Incoming messageBus connections are temporary disabled. Ignore new incoming "
+            "connection.");
+        sendResponse(nx::network::http::StatusCode::forbidden,
+            "The media server is running in standalone mode");
+        return false;
+    }
+
+    if (!isPeerCompatible(remotePeer))
+    {
+        sendResponse(nx::network::http::StatusCode::forbidden, "Peer is not compatible");
+        return false;
+    }
+
+    const auto commonModule = d->owner->commonModule();
+    const auto connection = commonModule->ec2Connection();
+    auto messageBus = (connection->messageBus()->dynamicCast<ServerMessageBus*>());
+    if (!messageBus)
+    {
+        sendResponse(
+            nx::network::http::StatusCode::forbidden, "The media server is not is in P2p mode");
+        return false;
+    }
+
+    if (!messageBus->validateRemotePeerData(remotePeer))
+    {
+        sendResponse(nx::network::http::StatusCode::forbidden,
+            "The media server is going to restart to replace its database");
+        return false;
+    }
+    return true;
+}
+
 void ConnectionProcessor::run()
 {
     Q_D(QnTCPConnectionProcessor);
@@ -149,40 +188,38 @@ void ConnectionProcessor::run()
         return;
     parseRequest();
 
-    if (commonModule()->isStandAloneMode())
-    {
-        NX_DEBUG(this, "Incoming messageBus connections are temporary disabled. Ignore new incoming connection.");
-        sendResponse(nx::network::http::StatusCode::forbidden,
-            "The media server is running in standalone mode");
-        return;
-    }
-
     vms::api::PeerDataEx remotePeer = deserializePeerData(d->request);
-    if (!isPeerCompatible(remotePeer))
-    {
-        sendResponse(nx::network::http::StatusCode::forbidden, "Peer is not compatible");
+    if (!canAcceptConnection(remotePeer))
         return;
-    }
 
-    const auto commonModule = d->owner->commonModule();
-    const auto connection = commonModule->ec2Connection();
+    auto connection = commonModule()->ec2Connection();
     auto messageBus = (connection->messageBus()->dynamicCast<ServerMessageBus*>());
-    if (!messageBus)
+    if (d->request.requestLine.method == "POST")
     {
-        sendResponse(nx::network::http::StatusCode::forbidden,
-            "The media server is not is in P2p mode");
-        return;
-    }
+        if (!messageBus->gotPostConnection(remotePeer, std::move(d->socket)))
+        {
+            sendResponse(nx::network::http::StatusCode::forbidden,
+                lm("Missing corresponding GET connection %1. It needs to be opened first.")
+                    .arg(remotePeer.connectionGuid).toUtf8());
+        }
+#if 0
+            []()
+            {
+                auto response = createResponse(
+                    nx::network::http::StatusCode::forbidden,
+                    contentType,
+                    contentEncoding);
 
-    if (!messageBus->validateRemotePeerData(remotePeer))
-    {
-        sendResponse(nx::network::http::StatusCode::forbidden,
-            "The media server is going to restart to replace its database");
+                sendResponse(nx::network::http::StatusCode::forbidden,
+                    lm("Connection from peer %1 already established").arg(remotePeer.id).toUtf8());
+
+            });
+#endif
         return;
     }
 
     ec2::ConnectionLockGuard connectionLockGuard(
-        commonModule->moduleGUID(),
+        commonModule()->moduleGUID(),
         messageBus->connectionGuardSharedState(),
         remotePeer.id,
         ec2::ConnectionLockGuard::Direction::Incoming);
@@ -213,7 +250,7 @@ void ConnectionProcessor::run()
     }
 
     if(!connectionLockGuard.tryAcquireConnected() || //< lock failed
-        remotePeer.id == commonModule->moduleGUID() || //< can't connect to itself
+        remotePeer.id == commonModule()->moduleGUID() || //< can't connect to itself
         isDisabledPeer(remotePeer)) //< allowed peers are strict
     {
         sendResponse(nx::network::http::StatusCode::forbidden,
@@ -221,21 +258,29 @@ void ConnectionProcessor::run()
         return;
     }
 
-    using namespace nx::network;
-    auto error = websocket::validateRequest(d->request, &d->response);
-    if (error != websocket::Error::noError)
+    using namespace nx::vms::api;
+    using namespace nx::network::http;
+
+    bool canUseWebSocket = d->request.requestLine.method == "GET" && remotePeer.transport != P2pTransportMode::http;
+    bool useWebSocket = false;
+    if (canUseWebSocket)
     {
-        auto errorMessage = lm("Invalid WEB socket request. Validation failed. Error: %1").arg((int)error);
-        sendResponse(nx::network::http::StatusCode::forbidden, errorMessage.toUtf8());
-        NX_ERROR(this, errorMessage);
-        d->socket->close();
-        return;
+        using namespace nx::network;
+        auto error = websocket::validateRequest(d->request, &d->response);
+        if (error != websocket::Error::noError && remotePeer.transport == P2pTransportMode::websocket)
+        {
+            auto errorMessage = lm("Invalid WEB socket request. Validation failed. Error: %1").arg((int)error);
+            sendResponse(nx::network::http::StatusCode::forbidden, errorMessage.toUtf8());
+            NX_ERROR(this, errorMessage);
+            return;
+        }
+        useWebSocket = (error == websocket::Error::noError);
     }
 
     serializePeerData(d->response, localPeer(), remotePeer.dataFormat);
 
     sendResponse(
-        nx::network::http::StatusCode::switchingProtocols,
+        useWebSocket ? StatusCode::switchingProtocols : StatusCode::ok,
         nx::network::http::StringType());
 
 
@@ -243,25 +288,26 @@ void ConnectionProcessor::run()
     if (remotePeer.isClient())
     {
         auto session = authSession();
-        commonModule->auditManager()->at_connectionOpened(session);
-        onConnectionClosedCallback = std::bind(&QnAuditManager::at_connectionClosed, commonModule->auditManager(), session);
+        commonModule()->auditManager()->at_connectionOpened(session);
+        onConnectionClosedCallback = std::bind(&QnAuditManager::at_connectionClosed, commonModule()->auditManager(), session);
     }
 
     d->socket->setNonBlockingMode(true);
     auto keepAliveTimeout = std::chrono::milliseconds(remotePeer.aliveUpdateIntervalMs);
-    WebSocketPtr webSocket(new websocket::WebSocket(
-        std::move(d->socket),
-        remotePeer.dataFormat == Qn::JsonFormat
-            ? websocket::FrameType::text
-            : websocket::FrameType::binary));
-    if (keepAliveTimeout > std::chrono::milliseconds::zero())
-        webSocket->setAliveTimeout(keepAliveTimeout);
-    webSocket->start();
+
+    using namespace nx::network;
+    auto dataFormat = remotePeer.dataFormat == Qn::JsonFormat
+        ? P2pTransport::DataFormat::text : P2pTransport::DataFormat::binary;
+    std::unique_ptr<P2pTransport> p2pTransport;
+    if (useWebSocket)
+        p2pTransport = std::make_unique<P2pWebsocketServerTransport>(dataFormat, std::move(d->socket));
+    else
+        p2pTransport = std::make_unique<P2pHttpServerTransport>(dataFormat, std::move(d->socket));
 
     messageBus->gotConnectionFromRemotePeer(
         remotePeer,
         std::move(connectionLockGuard),
-        std::move(webSocket),
+        std::move(p2pTransport),
         QUrlQuery(d->request.requestLine.url.query()),
         userAccessData(remotePeer),
         onConnectionClosedCallback);

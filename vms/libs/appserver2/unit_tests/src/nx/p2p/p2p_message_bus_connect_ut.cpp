@@ -16,6 +16,8 @@
 #include <nx_ec/dummy_handler.h>
 #include <nx/utils/argument_parser.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource_management/status_dictionary.h>
 
 namespace nx {
 namespace p2p {
@@ -32,6 +34,7 @@ static const char kPropertyCountParamName[] = "propertyCount";
 static const char kUserCountParamName[] = "userCount";
 static const char kServerPortParamName[] = "tcpPort";
 static const char kStandaloneModeParamName[] = "standaloneMode";
+static const char kTransactionsPerServerInSecond[] = "transactionsPerServerInSecond";
 
 int getIntParam(const nx::utils::ArgumentParser& args, const QString& name, int defaultValue = 0)
 {
@@ -133,6 +136,7 @@ protected:
 
         const int instanceCount = getIntParam(args, kServerCountParamName, kDefaultInstanceCount);
         const int serverPort = getIntParam(args, kServerPortParamName);
+        auto transactionsPerServerInSecond = args.get<QString>(kTransactionsPerServerInSecond);
         startServers(instanceCount, keepDbAtServerIndex, serverPort);
 
         QElapsedTimer t;
@@ -166,8 +170,37 @@ protected:
             commonModule->bindModuleInformation(serverRes);
         }
 
+        using namespace std::chrono;
+        std::chrono::microseconds sleepInterval = 1s;
+        if (transactionsPerServerInSecond != boost::none)
+            sleepInterval = microseconds(int(1000000.0 / transactionsPerServerInSecond->toFloat()));
+
+        auto cameras = m_servers[0]->moduleInstance()
+            ->commonModule()->resourcePool()->getAllCameras();
+        int cameraIndex = 0;
+
         while (args.get<QString>(kStandaloneModeParamName))
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+        {
+            if (!cameras.isEmpty() && transactionsPerServerInSecond != boost::none)
+            {
+
+                for (auto& server: m_servers)
+                {
+                    auto connection = server->moduleInstance()->commonModule()->ec2Connection();
+                    auto resourceManager = connection->getResourceManager(Qn::kSystemAccess);
+
+                    auto resourceId = cameras[cameraIndex]->getId();
+                    cameraIndex = (cameraIndex + 1) % cameras.size();
+                    auto statusDict = server->moduleInstance()->commonModule()->statusDictionary();
+                    auto oldStatus = statusDict->value(resourceId);
+                    auto status = oldStatus == Qn::Offline ? Qn::Online : Qn::Offline;
+
+                    statusDict->setValue(resourceId, status);
+                    resourceManager->setResourceStatusSync(resourceId, status);
+                }
+            }
+            std::this_thread::sleep_for(sleepInterval);
+        }
     }
 };
 
@@ -179,6 +212,13 @@ TEST_F(P2pMessageBusTest, SequenceConnect)
 TEST_F(P2pMessageBusTest, FullConnect)
 {
     testMain(fullConnect);
+}
+
+TEST_F(P2pMessageBusTest, EmptyConnect)
+{
+    nx::utils::ArgumentParser args(QCoreApplication::instance()->arguments());
+    if (args.get<QString>(kStandaloneModeParamName))
+        testMain(emptyConnect);
 }
 
 TEST_F(P2pMessageBusTest, RestartServer)

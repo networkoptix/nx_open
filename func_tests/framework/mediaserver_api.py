@@ -651,12 +651,15 @@ class MediaserverApi(object):
             result.append(_MediaserverCameraApi(self.generic, camera_info['id']))
         return result
 
+    def get_event_rules(self):
+        return self.generic.get('/ec2/getEventRules')
+
     def make_event_rule(
             self, event_type, event_state, action_type, event_resource_ids=[],
-            event_condition_resource='', action_resource_ids=[]):
+            event_condition_resource='', action_resource_ids=[], allUsers=False):
         self.generic.post('ec2/saveEventRule', dict(
             actionParams=json.dumps(dict(
-                allUsers=False,
+                allUsers=allUsers,
                 authType='authBasicAndDigest',
                 durationMs=5000,
                 forced=True,
