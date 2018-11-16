@@ -61,7 +61,7 @@ Connection::Connection(
     QnCommonModule* commonModule,
     const vms::api::PeerDataEx& remotePeer,
     const vms::api::PeerDataEx& localPeer,
-    nx::network::WebSocketPtr webSocket,
+    nx::network::P2pTransportPtr p2pTransport,
     const QUrlQuery& requestUrlQuery,
     const Qn::UserAccessData& userAccessData,
     std::unique_ptr<QObject> opaqueObject,
@@ -70,31 +70,13 @@ Connection::Connection(
     ConnectionBase(
         remotePeer,
         localPeer,
-        std::move(webSocket),
+        std::move(p2pTransport),
         requestUrlQuery,
         std::move(opaqueObject),
         std::make_unique<ConnectionLockGuard>(std::move(connectionLockGuard))),
     QnCommonModuleAware(commonModule)
 {
     commonModule->metrics()->tcpConnections().p2p()++;
-}
-
-bool Connection::gotPostConnection(
-    std::unique_ptr<nx::network::AbstractStreamServerSocket> socket)
-{
-    m_timer.post(
-        [this, socket = std::move(socket)]()
-        {
-            if (m_p2pTransport)
-            {
-                m_p2pTransport->setSecondaryOutgoingConnection(std::move(socket));
-            }
-            else
-            {
-                QByteArray response;
-                socket->sendAsync(response);
-            }
-        });
 }
 
 Connection::~Connection()

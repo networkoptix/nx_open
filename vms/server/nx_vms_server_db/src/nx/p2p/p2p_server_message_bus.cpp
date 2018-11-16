@@ -5,6 +5,7 @@
 
 #include <transaction/transaction_message_bus_priv.h>
 #include <utils/common/delayed.h>
+#include <nx/network/p2p_transport/p2p_transport.h>
 
 namespace {
 
@@ -397,7 +398,7 @@ void ServerMessageBus::sendInitialDataToCloud(const P2pConnectionPtr& connection
     context(connection)->isLocalStarted = true;
 }
 
-bool ServerMessageBus::gotPostConnectionFromRemotePeer(
+bool ServerMessageBus::gotPostConnection(
     const vms::api::PeerDataEx& remotePeer,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket)
 {
@@ -407,18 +408,16 @@ bool ServerMessageBus::gotPostConnectionFromRemotePeer(
         if (connection->remotePeer().connectionGuid == remotePeer.connectionGuid)
         {
             connection->gotPostConnection(std::move(socket));
-            return;
+            return true;
         }
     }
-    sendResponse(nx::network::http::StatusCode::forbidden,
-        lm("Missing corresponding GET connection %1. It needs to be opened first.").arg(remotePeer.connectionGuid).toUtf8());
-
+    return false;
 }
 
 void ServerMessageBus::gotConnectionFromRemotePeer(
     const vms::api::PeerDataEx& remotePeer,
     ec2::ConnectionLockGuard connectionLockGuard,
-    nx::network::P2pSocketPtr webSocket,
+    nx::network::P2pTransportPtr p2pTransport,
     const QUrlQuery& requestUrlQuery,
     const Qn::UserAccessData& userAccessData,
     std::function<void()> onConnectionClosedCallback)
@@ -429,12 +428,11 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
         return;
     }
 
-
     P2pConnectionPtr connection(new Connection(
         commonModule(),
         remotePeer,
         localPeerEx(),
-        std::move(webSocket),
+        std::move(p2pTransport),
         requestUrlQuery,
         userAccessData,
         std::make_unique<nx::p2p::ConnectionContext>(),
