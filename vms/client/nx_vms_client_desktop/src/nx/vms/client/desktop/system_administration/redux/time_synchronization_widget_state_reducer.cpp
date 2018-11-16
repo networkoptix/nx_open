@@ -1,5 +1,7 @@
 #include "time_synchronization_widget_state_reducer.h"
 
+#include <nx/utils/log/assert.h>
+
 namespace nx::vms::client::desktop {
 
 using State = TimeSynchronizationWidgetReducer::State;
@@ -132,14 +134,14 @@ Result TimeSynchronizationWidgetReducer::addServer(State state, const State::Ser
         servers.push_back(serverInfo);
         return {true, std::move(state)};
     }
-    else
-        return {false, std::move(state)};
+
+    return {false, std::move(state)};
 }
 
 Result TimeSynchronizationWidgetReducer::removeServer(State state, const QnUuid& id)
 {
     auto& servers = state.servers;
-    auto& it = std::find_if(servers.begin(), servers.end(),
+    auto it = std::find_if(servers.begin(), servers.end(),
         [id](const auto& info) { return info.id == id; });
     if (it != servers.end())
     {
@@ -147,8 +149,8 @@ Result TimeSynchronizationWidgetReducer::removeServer(State state, const QnUuid&
         state.status = actualStatus(state);
         return {true, std::move(state)};
     }
-    else
-        return {false, std::move(state)};
+
+    return {false, std::move(state)};
 }
 
 Result TimeSynchronizationWidgetReducer::setServerOnline(State state, const QnUuid& serverId, bool isOnline)
@@ -163,8 +165,8 @@ Result TimeSynchronizationWidgetReducer::setServerOnline(State state, const QnUu
                 state.status = actualStatus(state);
                 return {true, std::move(state)};
             }
-            else
-                return {false, std::move(state)};
+
+            return {false, std::move(state)};
         }
     }
     return {false, std::move(state)};

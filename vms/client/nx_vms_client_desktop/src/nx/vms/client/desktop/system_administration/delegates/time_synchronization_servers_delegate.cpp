@@ -1,11 +1,13 @@
 #include "time_synchronization_servers_delegate.h"
 
-#include "../models/time_synchronization_servers_model.h"
+#include <cmath>
 
 #include <nx/client/core/utils/human_readable.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/style/helper.h>
 #include <utils/common/scoped_painter_rollback.h>
+
+#include "../models/time_synchronization_servers_model.h"
 
 namespace nx::vms::client::desktop {
 
