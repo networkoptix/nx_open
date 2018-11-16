@@ -15,6 +15,8 @@ public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
     virtual const IStringList* eventTypeIds() const override;
     virtual const IStringList* objectTypeIds() const override;
+
+    // TODO: #mshevchenko: Rename to isEmpty().
     virtual bool isNull() const override;
 
     void addEventType(std::string eventTypeString);
