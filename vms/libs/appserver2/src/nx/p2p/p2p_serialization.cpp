@@ -501,7 +501,14 @@ vms::api::PeerDataEx deserializePeerData(const network::http::Request& request)
 
     if (result.id.isNull())
         result.id = QnUuid::createUuid();
+    if (result.connectionGuid.isNull())
+        result.connectionGuid = QnUuid::createUuid();
+
     result.dataFormat = dataFormat;
+
+    if (query.hasQueryItem(QString::fromLatin1("transport")))
+        QnLexical::deserialize(query.queryItemValue(QString::fromLatin1("transport")), &result.transport);
+
     return result;
 }
 

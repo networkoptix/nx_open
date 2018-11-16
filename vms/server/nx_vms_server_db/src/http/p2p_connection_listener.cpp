@@ -21,9 +21,14 @@
 #include <nx/network/socket_delegate.h>
 #include <transaction/message_bus_adapter.h>
 #include <nx/p2p/p2p_server_message_bus.h>
+#include <nx/network/p2p_transport/p2p_http_server_transport.h>
+#include <nx/network/p2p_transport/p2p_websocket_server_transport.h>
 
 namespace nx {
 namespace p2p {
+
+using namespace nx::vms::api;
+using namespace nx::network::http;
 
 // -------------------------- ConnectionProcessor ---------------------
 
@@ -196,25 +201,7 @@ void ConnectionProcessor::run()
     auto messageBus = (connection->messageBus()->dynamicCast<ServerMessageBus*>());
     if (d->request.requestLine.method == "POST")
     {
-        if (!messageBus->gotPostConnection(remotePeer, std::move(d->socket)))
-        {
-            sendResponse(nx::network::http::StatusCode::forbidden,
-                lm("Missing corresponding GET connection %1. It needs to be opened first.")
-                    .arg(remotePeer.connectionGuid).toUtf8());
-        }
-#if 0
-            []()
-            {
-                auto response = createResponse(
-                    nx::network::http::StatusCode::forbidden,
-                    contentType,
-                    contentEncoding);
-
-                sendResponse(nx::network::http::StatusCode::forbidden,
-                    lm("Connection from peer %1 already established").arg(remotePeer.id).toUtf8());
-
-            });
-#endif
+        messageBus->gotPostConnection(remotePeer, std::move(d->socket));
         return;
     }
 
@@ -258,9 +245,6 @@ void ConnectionProcessor::run()
         return;
     }
 
-    using namespace nx::vms::api;
-    using namespace nx::network::http;
-
     bool canUseWebSocket = d->request.requestLine.method == "GET" && remotePeer.transport != P2pTransportMode::http;
     bool useWebSocket = false;
     if (canUseWebSocket)
@@ -297,12 +281,12 @@ void ConnectionProcessor::run()
 
     using namespace nx::network;
     auto dataFormat = remotePeer.dataFormat == Qn::JsonFormat
-        ? P2pTransport::DataFormat::text : P2pTransport::DataFormat::binary;
-    std::unique_ptr<P2pTransport> p2pTransport;
+        ? websocket::FrameType::text : websocket::FrameType::binary;
+    std::unique_ptr<P2PTransport> p2pTransport;
     if (useWebSocket)
-        p2pTransport = std::make_unique<P2pWebsocketServerTransport>(dataFormat, std::move(d->socket));
+        p2pTransport = std::make_unique<P2PWebsocketServerTransport>(std::move(d->socket), dataFormat);
     else
-        p2pTransport = std::make_unique<P2pHttpServerTransport>(dataFormat, std::move(d->socket));
+        p2pTransport = std::make_unique<P2PHttpServerTransport>(std::move(d->socket));
 
     messageBus->gotConnectionFromRemotePeer(
         remotePeer,

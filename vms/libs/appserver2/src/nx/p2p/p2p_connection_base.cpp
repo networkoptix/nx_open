@@ -11,6 +11,9 @@
 #include <nx/network/http/buffer_source.h>
 #include <transaction/transaction_message_bus_base.h>
 #include <nx/network/p2p_transport/p2p_http_client_transport.h>
+#include <nx/network/p2p_transport/p2p_http_server_transport.h>
+#include <nx/network/p2p_transport/p2p_websocket_client_transport.h>
+#include <nx/network/p2p_transport/p2p_http_client_transport.h>
 
 // For debug purpose only
 //#define CHECK_SEQUENCE
@@ -97,7 +100,7 @@ void ConnectionBase::gotPostConnection(
         [this, socket = std::move(socket)]() mutable
         {
             using namespace nx::network;
-            if(auto httpTransport = dynamic_cast<P2pHttpServerTransport*>(m_p2pTransport.get()))
+            if(auto httpTransport = dynamic_cast<P2PHttpServerTransport*>(m_p2pTransport.get()))
             {
                 httpTransport->gotPostConnection(std::move(socket));
             }
@@ -296,13 +299,13 @@ void ConnectionBase::onHttpClientDone()
     socket->setNonBlockingMode(true);
 
     using namespace nx::network;
-    auto dataFormat = remotePeer.dataFormat == Qn::JsonFormat
-        ? P2pTransport::DataFormat::text
-        : P2pTransport::DataFormat::binary;
+    websocket::FrameType frameType = remotePeer.dataFormat == Qn::JsonFormat
+        ? websocket::FrameType::text
+        : websocket::FrameType::binary;
     if (useWebsocketMode)
-        m_p2pTransport.reset(new P2pWebsocketClientTransport(dataFormat, std::move(socket)));
+        m_p2pTransport.reset(new P2PWebsocketClientTransport(std::move(socket), frameType));
     else
-        m_p2pTransport.reset(new P2pHttpClientTransport(dataFormat, std::move(socket), m_httpClient->url(), nullptr));
+        m_p2pTransport.reset(new P2PHttpClientTransport(std::move(socket), m_httpClient->url(), nullptr));
 
     m_httpClient.reset();
     setState(State::Connected);

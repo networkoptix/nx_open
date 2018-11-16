@@ -113,6 +113,9 @@ struct PeerDataEx: public PeerData
 } // namespace vms
 } // namespace nx
 
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::P2pTransportMode, (lexical))
+
 Q_DECLARE_METATYPE(nx::vms::api::PersistentIdData)
 Q_DECLARE_METATYPE(nx::vms::api::PeerData)
 Q_DECLARE_METATYPE(nx::vms::api::PeerDataEx)
+

@@ -8,7 +8,8 @@ namespace nx::network {
 class P2PWebsocketClientTransport : public P2PTransport
 {
 public:
-    P2PWebsocketClientTransport(std::unique_ptr<AbstractStreamSocket> socket,
+    P2PWebsocketClientTransport(
+        std::unique_ptr<AbstractStreamSocket> socket,
         websocket::FrameType frameType);
 };
 
