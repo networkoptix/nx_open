@@ -1,9 +1,9 @@
-<input [value]="value" hidden>
+<!--input [value]="value" hidden-->
 <button class="large" [ngClass]="{
-    'selected'       : selected && !isStyled,
-    'selected-brand': selected && isStyled,
-    'badge'            : !selected && !isStyled,
-    'badge-brand'     : !selected && isStyled
+    'selected'       : selected && !useBrand,
+    'selected-brand' : selected && useBrand,
+    'badge'          : !selected && !useBrand,
+    'badge-brand'    : !selected && useBrand
 }" (click)="selectTag()">
     <ng-content></ng-content>
     <span *ngIf="selected" class="close-button" (click)="$event.stopPropagation();deselectTag()">

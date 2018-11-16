@@ -12,7 +12,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
     }]
 })
 export class NxTagComponent implements OnInit, ControlValueAccessor {
-    @Input('styled') isStyled: boolean;
+    @Input('brand') useBrand: boolean;
     @Input('value') selected: boolean;
     @Output() onClick = new EventEmitter<boolean>();
 
