@@ -1,14 +1,14 @@
 #pragma once
 
-#include "i_p2p_transport_delegate.h"
+#include "detail/i_p2p_transport_delegate.h"
 #include <memory>
 
-namespace nx::network::detail {
+namespace nx::network {
 
-class P2PTransportBase: public IP2PSocketDelegate
+class P2PTransport: public detail::IP2PSocketDelegate
 {
 public:
-    P2PTransportBase(std::unique_ptr<detail::IP2PSocketDelegate> transportDelegate);
+    P2PTransport(std::unique_ptr<detail::IP2PSocketDelegate> transportDelegate);
 
     virtual void readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler) override;
     virtual void sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler) override;
@@ -22,4 +22,5 @@ private:
     std::unique_ptr<detail::IP2PSocketDelegate> m_transportDelegate;
 };
 
-} // namespace nx::network::detail
+using P2pTransportPtr = std::unique_ptr<P2PTransport>;
+} // namespace nx::network
