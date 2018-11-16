@@ -42,16 +42,12 @@ void fillCameraAuxiliaryData(nxcip::CameraInfo* cameras, int cameraCount)
             {
                 mute = false;
                 audioTaken[device] = true;
-                
-                // Duplicate audio devices in windows are prepended with an index, making them
-                // unique. Therefore, it is safe to use the device name instead of its path. In
-                // fact, the path requires further parsing before use by ffmpeg, as ffmpeg
-                // replaces all ':' chars wtih '_' in audio alternative names. Oddly, it does not
-                // do this for video.
+
                 strncpy(
                     camera->auxiliaryData,
-                    device->data.deviceName.c_str(),
+                    device->data.devicePath.c_str(),
                     sizeof(camera->auxiliaryData) - 1);
+
                 break;
             }
         }
@@ -76,7 +72,7 @@ bool pluggedIn(const char * devicePath)
     auto devices = video::detail::getAudioDeviceList();
     for (const auto & device : devices)
     {
-        if (strcmp(device.data.deviceName.c_str(), devicePath) == 0)
+        if (strcmp(device.data.devicePath.c_str(), devicePath) == 0)
             return true;
     }
     return false;

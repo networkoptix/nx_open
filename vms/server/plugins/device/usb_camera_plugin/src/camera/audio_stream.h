@@ -75,7 +75,7 @@ private:
         AdtsInjector m_adtsInjector;
 
     private:
-        std::string ffmpegUrl() const;
+        std::string ffmpegUrlPlatformDependent() const;
         bool waitForConsumers();
         int initialize();
         void uninitialize();

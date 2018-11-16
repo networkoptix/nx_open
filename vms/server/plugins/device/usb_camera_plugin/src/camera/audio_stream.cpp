@@ -96,10 +96,29 @@ int AudioStream::sampleRate() const
     return m_streamReader ? m_streamReader->sampleRate() : 0;
 }
 
-std::string AudioStream::AudioStreamPrivate::ffmpegUrl() const
+std::string AudioStream::AudioStreamPrivate::ffmpegUrlPlatformDependent() const
 {
 #ifdef _WIN32
-    return std::string("audio=") + m_url;
+    static const std::string kWindowsAudioPrefix = "audio=";
+    
+    // ffmpeg replaces all ":" with "_" in the audio devices alternative name.
+    // It expects the modified alternative name or it wont open.
+    auto replaceWindowsDelimitter =
+        [](std::string * outDevicePath)
+        {
+            static constexpr const char kWindowsAudioDelimitter = ':';
+            static constexpr const char kFfmpegAudioDelimitter = '_';
+            for(int i = 0; i < outDevicePath->size(); ++i)
+            {
+                if((*outDevicePath)[i] == kWindowsAudioDelimitter)
+                    (*outDevicePath)[i] = kFfmpegAudioDelimitter;
+            }
+        };
+
+    std::string url = m_url;
+    replaceWindowsDelimitter(&url);
+    
+    return kWindowsAudioPrefix + url;
 #else
     return m_url;
 #endif
@@ -203,7 +222,7 @@ int AudioStream::AudioStreamPrivate::initializeInputFormat()
     inputFormat->setEntry("audio_buffer_size", (int64_t)80); //< 80 milliseconds
 #endif
 
-    result = inputFormat->open(ffmpegUrl().c_str());
+    result = inputFormat->open(ffmpegUrlPlatformDependent().c_str());
     if (result < 0)
         return result;
 
@@ -554,6 +573,7 @@ std::string AudioStream::url() const
 
 void AudioStream::setEnabled(bool enabled)
 {
+    std::cout << "ENABLED: " << enabled << std::endl;
     if (enabled)
     {
         if(!m_streamReader)

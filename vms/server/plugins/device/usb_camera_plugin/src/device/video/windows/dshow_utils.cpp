@@ -603,6 +603,7 @@ std::vector<AudioDeviceDescriptor> getAudioDeviceList()
     IMoniker *pMoniker = NULL;
     while (S_OK == pEnum->Next(1, &pMoniker, NULL))
     {
+        // Intentionally using getDisplayName, it returns the device's instance id
         std::string devicePath = getDisplayName(pMoniker);
         DeviceData data(getDeviceName(pMoniker), devicePath, devicePath);
         devices.push_back(AudioDeviceDescriptor(data, getWaveInID(pMoniker)));
