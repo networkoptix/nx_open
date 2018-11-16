@@ -288,7 +288,9 @@ void ConnectionProcessor::run()
         useWebSocket = (error == websocket::Error::noError);
     }
 
-    serializePeerData(d->response, localPeer(), remotePeer.dataFormat);
+    auto peer = localPeer();
+    peer.connectionGuid = remotePeer.connectionGuid;
+    serializePeerData(d->response, peer, remotePeer.dataFormat);
 
     sendResponse(
         useWebSocket ? StatusCode::switchingProtocols : StatusCode::ok,

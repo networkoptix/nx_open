@@ -491,6 +491,9 @@ vms::api::PeerDataEx deserializePeerData(const network::http::Request& request)
         if (query.hasQueryItem("runtime-guid"))
             result.instanceId = QnUuid(query.queryItemValue("runtime-guid"));
     }
+    if (query.hasQueryItem(Qn::EC2_CONNECTION_GUID_HEADER_NAME))
+        result.connectionGuid = QnUuid(query.queryItemValue(Qn::EC2_CONNECTION_GUID_HEADER_NAME));
+
 
     if (result.peerType == nx::vms::api::PeerType::notDefined)
     {
