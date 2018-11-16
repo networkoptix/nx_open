@@ -46,10 +46,6 @@ DeviceAgent::DeviceAgent(Engine* engine):
         m_tracker.setObjectTypeId("nx.tegraVideo.car");
     }
 
-    // TODO: Move all the ctor code below to startFetchingMetadata() when it starts being called.
-
-    stopFetchingMetadata();
-
     TegraVideo::Params params;
     params.id = "metadata";
     params.deployFile = ini().deployFile;
