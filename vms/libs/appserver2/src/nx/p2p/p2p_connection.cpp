@@ -79,6 +79,24 @@ Connection::Connection(
     commonModule->metrics()->tcpConnections().p2p()++;
 }
 
+bool Connection::gotPostConnection(
+    std::unique_ptr<nx::network::AbstractStreamServerSocket> socket)
+{
+    m_timer.post(
+        [this, socket = std::move(socket)]()
+        {
+            if (m_p2pTransport)
+            {
+                m_p2pTransport->setSecondaryOutgoingConnection(std::move(socket));
+            }
+            else
+            {
+                QByteArray response;
+                socket->sendAsync(response);
+            }
+        });
+}
+
 Connection::~Connection()
 {
     if (m_direction == Direction::incoming)

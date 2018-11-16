@@ -139,7 +139,7 @@ private:
     vms::api::PeerDataEx m_remotePeer;
     vms::api::PeerDataEx m_localPeer;
 
-    nx::network::WebSocketPtr m_webSocket;
+    nx::network::P2pTransportPtr m_p2pTransport;
     std::atomic<State> m_state{State::Connecting};
 
     nx::utils::Url m_remotePeerUrl;

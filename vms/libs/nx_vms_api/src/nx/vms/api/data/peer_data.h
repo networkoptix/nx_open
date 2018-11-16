@@ -78,6 +78,13 @@ struct NX_VMS_API PeerData: PersistentIdData
 
 using PeerSet = QSet<QnUuid>;
 
+enum class P2pTransport
+{
+    automatic,
+    websocket,
+    http
+};
+
 struct PeerDataEx: public PeerData
 {
     QnUuid systemId;
@@ -85,6 +92,8 @@ struct PeerDataEx: public PeerData
     qint64 identityTime = 0;
     int aliveUpdateIntervalMs = 0;
     int protoVersion = 0;
+    P2pTransport transport = P2pTransport::automatic;
+    QnUuid connectionGuid;
 
     void assign(const PeerData& data) { PeerData::operator=(data); }
 };
@@ -95,7 +104,9 @@ struct PeerDataEx: public PeerData
     (cloudHost) \
     (identityTime) \
     (aliveUpdateIntervalMs) \
-    (protoVersion)
+    (protoVersion) \
+    (transport) \
+    (connectionGuid)
 
 } // namespace api
 } // namespace vms

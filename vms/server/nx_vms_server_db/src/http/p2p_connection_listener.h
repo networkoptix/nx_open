@@ -32,6 +32,7 @@ private:
     bool isDisabledPeer(const vms::api::PeerData& remotePeer) const;
     bool isPeerCompatible(const vms::api::PeerDataEx& remotePeer) const;
     Qn::UserAccessData userAccessData(const vms::api::PeerDataEx& remotePeer) const;
+    bool canAcceptConnection(const vms::api::PeerDataEx& remotePeer);
 private:
     QnMediaServerModule* m_serverModule = nullptr;
 };

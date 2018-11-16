@@ -397,10 +397,28 @@ void ServerMessageBus::sendInitialDataToCloud(const P2pConnectionPtr& connection
     context(connection)->isLocalStarted = true;
 }
 
+bool ServerMessageBus::gotPostConnectionFromRemotePeer(
+    const vms::api::PeerDataEx& remotePeer,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket)
+{
+    {
+        QnMutexLocker lock(&m_mutex);
+        auto& connection = m_connections.value(remotePeer.id);
+        if (connection->remotePeer().connectionGuid == remotePeer.connectionGuid)
+        {
+            connection->gotPostConnection(std::move(socket));
+            return;
+        }
+    }
+    sendResponse(nx::network::http::StatusCode::forbidden,
+        lm("Missing corresponding GET connection %1. It needs to be opened first.").arg(remotePeer.connectionGuid).toUtf8());
+
+}
+
 void ServerMessageBus::gotConnectionFromRemotePeer(
     const vms::api::PeerDataEx& remotePeer,
     ec2::ConnectionLockGuard connectionLockGuard,
-    nx::network::WebSocketPtr webSocket,
+    nx::network::P2pSocketPtr webSocket,
     const QUrlQuery& requestUrlQuery,
     const Qn::UserAccessData& userAccessData,
     std::function<void()> onConnectionClosedCallback)
@@ -410,6 +428,7 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
         NX_DEBUG(this, "P2p message bus is not started yet. Ignore incoming connection");
         return;
     }
+
 
     P2pConnectionPtr connection(new Connection(
         commonModule(),
