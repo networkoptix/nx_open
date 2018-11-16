@@ -44,6 +44,7 @@ client_components = [
     'client_libraries',
     'Associations',
     'ClientDlg',
+    'client/msi_interface',
     'ClientFonts',
     'vox',
     'ClientBg',

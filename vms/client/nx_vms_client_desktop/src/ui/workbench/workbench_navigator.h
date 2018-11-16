@@ -124,6 +124,8 @@ public:
     qint64 positionUsec() const;
     void setPosition(qint64 positionUsec);
 
+    QnTimePeriod timelineRange() const;
+
     QnResourceWidget* currentWidget() const;
     WidgetFlags currentWidgetFlags() const;
 

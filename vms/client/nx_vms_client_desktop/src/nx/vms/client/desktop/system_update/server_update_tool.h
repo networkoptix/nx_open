@@ -45,6 +45,7 @@ class ServerUpdateTool:
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
+    using UpdateContents = nx::update::UpdateContents;
 
 public:
     ServerUpdateTool(QObject* parent = nullptr);
@@ -259,6 +260,8 @@ private:
  * Upcombiner is special server utility, that combines several update packages
  * to a single zip archive.
  */
-QUrl generateUpdatePackageUrl(const UpdateContents& contents, const QSet<QnUuid>& targets, QnResourcePool* resourcePool);
+QUrl generateUpdatePackageUrl(
+    const nx::update::UpdateContents& contents,
+    const QSet<QnUuid>& targets, QnResourcePool* resourcePool);
 
 } // namespace nx::vms::client::desktop

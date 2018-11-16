@@ -45,6 +45,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, enableSessionTimeout, "Enable admin-configurable absolute session timeout.");
     NX_INI_STRING("press", passwordPreviewActivationMode, "Password preview activation mode: \"press\", \"hover\" or \"toggle\".");
     NX_INI_FLAG(0, enablePluginEvents, "Enable plugin events in Event Rules dialog.");
+    NX_INI_FLAG(0, redesignedTimeSynchronization, "Redesigned time synchronization widget in the System Adminstration dialog.");
     NX_INI_FLAG(0, automaticFilterByTimelineSelection, "Automatically switch Right Panel time"
         "selection to \"Selected on Timeline\" mode when selection exists.");
     NX_INI_FLAG(0, raiseCameraFromClickedTile, "Raise camera after selecting it when Right Panel camera-related tile is clicked.");

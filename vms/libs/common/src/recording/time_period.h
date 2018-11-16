@@ -65,6 +65,7 @@ public:
     bool isContainedIn(const QnTimePeriod& other) const;
 
     bool contains(qint64 timeMs) const;
+    bool contains(std::chrono::milliseconds time) const { return contains(time.count()); }
     bool contains(const QnTimePeriod &timePeriod) const;
 
     /**

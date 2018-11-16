@@ -7,18 +7,18 @@
 
 class QTimer;
 
-namespace nx::vms::client::desktop {
+namespace nx::update {
 struct UpdateContents;
 class UpdateCheckSignal;
-} // namespace nx::vms::client::desktop
+} // namespace nx::update
 
 class QnWorkbenchUpdateWatcher:
     public QObject,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using UpdateContents = nx::vms::client::desktop::UpdateContents;
-    using UpdateCheckSignal = nx::vms::client::desktop::UpdateCheckSignal;
+    using UpdateContents = nx::update::UpdateContents;
+    using UpdateCheckSignal = nx::update::UpdateCheckSignal;
 
 public:
     QnWorkbenchUpdateWatcher(QObject* parent = nullptr);

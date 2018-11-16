@@ -309,8 +309,15 @@
           </item>
           <item>
            <widget class="QLabel" name="releaseDescriptionLabel">
+            <property name="styleSheet">
+             <string notr="true">border: 1px solid red;
+border-radius: 2px;</string>
+            </property>
             <property name="text">
              <string notr="true">&lt;Here will be release description (if not empty)&gt;</string>
+            </property>
+            <property name="margin">
+             <number>16</number>
             </property>
            </widget>
           </item>
@@ -561,7 +568,7 @@
        </widget>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_4">
+       <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,0">
         <property name="leftMargin">
          <number>8</number>
         </property>

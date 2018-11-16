@@ -189,7 +189,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     connect(ui->browseUpdate, &QPushButton::clicked,
         this, [this]()
         {
-            if (m_updateSourceMode == UpdateSourceType::internet)
+            if (m_updateSourceMode == nx::update::UpdateSourceType::internet)
             {
                 // We should be here only if we have latest version and want to check specific build
                 setUpdateSourceMode(UpdateSourceType::internetSpecific);
@@ -417,11 +417,11 @@ void MultiServerUpdatesWidget::initDownloadActions()
 void MultiServerUpdatesWidget::atUpdateCurrentState()
 {
     NX_ASSERT(m_serverUpdateTool);
+
     if (isHidden())
         return;
 
     // We poll all our tools for new information. Then we update UI if there are any changes
-
     if (m_updateCheck.valid() && m_updateCheck.wait_for(kWaitForUpdateCheck) == std::future_status::ready)
     {
         auto checkResponse = m_updateCheck.get();
@@ -525,10 +525,10 @@ void MultiServerUpdatesWidget::clearUpdateInfo()
 {
     NX_INFO(this) << "clearUpdateInfo()";
     m_targetVersion = nx::utils::SoftwareVersion();
-    m_updateInfo = UpdateContents();
+    m_updateInfo = nx::update::UpdateContents();
     m_updatesModel->setUpdateTarget(nx::utils::SoftwareVersion());
     m_updateLocalStateChanged = true;
-    m_updateCheck = std::future<UpdateContents>();
+    m_updateCheck = std::future<nx::update::UpdateContents>();
 }
 
 void MultiServerUpdatesWidget::pickLocalFile()
@@ -552,7 +552,7 @@ void MultiServerUpdatesWidget::pickLocalFile()
 void MultiServerUpdatesWidget::pickSpecificBuild()
 {
     QnBuildNumberDialog dialog(this);
-    if (!dialog.exec())
+    if (dialog.exec() != QDialog::Accepted)
         return;
 
     m_updateSourceMode = UpdateSourceType::internetSpecific;
@@ -564,7 +564,8 @@ void MultiServerUpdatesWidget::pickSpecificBuild()
 
     m_targetVersion = nx::utils::SoftwareVersion(version.major(), version.minor(), version.bugfix(), buildNumber);
     m_targetChangeset = dialog.changeset();
-    m_updateCheck = checkSpecificChangeset(dialog.changeset());
+    QString updateUrl = qnSettings->updateFeedUrl();
+    m_updateCheck = nx::update::checkSpecificChangeset(updateUrl, dialog.changeset());
     loadDataToUi();
 }
 
@@ -807,6 +808,8 @@ ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress
 
 void MultiServerUpdatesWidget::processRemoteInitialState()
 {
+    if (!isVisible())
+        return;
     auto downloaded = m_serverUpdateTool->getServersInState(StatusCode::readyToInstall);
     auto downloading = m_serverUpdateTool->getServersInState(StatusCode::downloading);
     auto installing = m_serverUpdateTool->getServersInstalling();
@@ -828,7 +831,7 @@ void MultiServerUpdatesWidget::processRemoteInitialState()
          */
         if (updateInfo.isValid())
         {
-            m_updateCheck = std::future<UpdateContents>();
+            m_updateCheck = std::future<nx::update::UpdateContents>();
             m_updateInfo = updateInfo;
             m_haveValidUpdate = true;
             m_clientUpdateTool->downloadUpdate(updateInfo);
@@ -1310,7 +1313,8 @@ void MultiServerUpdatesWidget::closePanelNotifications()
 void MultiServerUpdatesWidget::syncUpdateCheck()
 {
     bool isChecking = m_updateCheck.valid();
-    bool hasLatestVersion = ((m_updateInfo.isValid() || m_updatesModel->lowestInstalledVersion() >= m_updateInfo.getVersion())
+    bool hasEqualUpdateInfo = m_updatesModel->lowestInstalledVersion() >= m_updateInfo.getVersion();
+    bool hasLatestVersion = ((m_updateInfo.isValid() || hasEqualUpdateInfo)
         || m_updateInfo.error == nx::update::InformationError::noNewVersion);
 
     if (m_updateStateCurrent != WidgetUpdateState::ready
@@ -1356,6 +1360,16 @@ void MultiServerUpdatesWidget::syncUpdateCheck()
             else
             {
                 ui->infoStackedWidget->setCurrentWidget(ui->emptyInfoPage);
+            }
+
+            if (!m_updateInfo.info.description.isEmpty())
+            {
+                ui->releaseDescriptionLabel->setText(m_updateInfo.info.description);
+                ui->releaseDescriptionLabel->show();
+            }
+            else
+            {
+                ui->releaseDescriptionLabel->hide();
             }
         }
         else if (hasLatestVersion)
@@ -1612,6 +1626,7 @@ void MultiServerUpdatesWidget::discardChanges()
     }
 
     clearUpdateInfo();
+    setTargetState(WidgetUpdateState::initial, {});
 }
 
 bool MultiServerUpdatesWidget::hasChanges() const
@@ -1651,6 +1666,8 @@ void MultiServerUpdatesWidget::checkForInternetUpdates()
 {
     if (m_updateSourceMode != UpdateSourceType::internet)
         return;
+    if (!isVisible())
+        return;
 
     // No need to check for updates if we are already installing something.
     if (m_updateStateCurrent != WidgetUpdateState::initial && m_updateStateCurrent != WidgetUpdateState::ready)
@@ -1659,7 +1676,8 @@ void MultiServerUpdatesWidget::checkForInternetUpdates()
     if (!m_updateCheck.valid())
     {
         clearUpdateInfo();
-        m_updateCheck = checkLatestUpdate();
+        QString updateUrl = qnSettings->updateFeedUrl();
+        m_updateCheck = nx::update::checkLatestUpdate(updateUrl);
         syncUpdateCheck();
     }
 }
@@ -1738,18 +1756,17 @@ QString MultiServerUpdatesWidget::toString(ServerUpdateTool::OfflineUpdateState 
     return "Unknown update source mode";
 }
 
-QString MultiServerUpdatesWidget::toString(UpdateSourceType mode)
+QString MultiServerUpdatesWidget::toString(nx::update::UpdateSourceType mode)
 {
-    // These strings are internal and are not intended to be visible to regular user.
     switch(mode)
     {
-        case UpdateSourceType::internet:
+        case nx::update::UpdateSourceType::internet:
             return tr("Available Update");
-        case UpdateSourceType::internetSpecific:
+        case nx::update::UpdateSourceType::internetSpecific:
             return tr("Specific Build...");
-        case UpdateSourceType::file:
+        case nx::update::UpdateSourceType::file:
             return tr("Browse for Update File...");
-        case UpdateSourceType::mediaservers:
+        case nx::update::UpdateSourceType::mediaservers:
             // This string should not appear at UI.
             return tr("Update from mediaservers");
     }
