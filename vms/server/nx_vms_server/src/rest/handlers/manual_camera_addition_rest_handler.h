@@ -2,11 +2,15 @@
 
 #include <nx/utils/uuid.h>
 
+// TODO: move to cpp, remove redundant
 #include <core/resource_management/manual_camera_searcher.h>
 #include <rest/server/json_rest_handler.h>
 #include <nx/utils/concurrent.h>
 #include <api/model/manual_camera_data.h>
 #include <nx/mediaserver/server_module_aware.h>
+
+#include <memory>
+#include <unordered_map>
 
 class QnManualCameraAdditionRestHandler: 
     public QnJsonRestHandler,
@@ -16,7 +20,7 @@ class QnManualCameraAdditionRestHandler:
 
 public:
     QnManualCameraAdditionRestHandler(QnMediaServerModule* serverModule);
-    ~QnManualCameraAdditionRestHandler();
+    ~QnManualCameraAdditionRestHandler() = default;
 
     virtual int executeGet(
         const QString& path, const QnRequestParams& params, QnJsonRestResult& result,
@@ -56,9 +60,10 @@ private:
         const QnRestConnectionProcessor* owner);
 
 private:
+    using QnManualCameraSearcherPtr = std::unique_ptr<QnManualCameraSearcher>;
+
     // Mutex that is used to synchronize access to manual camera addition progress.
     QnMutex m_searchProcessMutex;
-
-    QHash<QnUuid, QnManualCameraSearcher*> m_searchProcesses;
-    QHash<QnUuid, nx::utils::concurrent::Future<bool>> m_searchProcessRuns;
+    std::unordered_map<QnUuid, QnManualCameraSearcherPtr> m_searchProcesses;
+    QHash<QnUuid, nx::utils::concurrent::Future<bool>> m_searchProcessRuns;  // TODO: remove it.
 };

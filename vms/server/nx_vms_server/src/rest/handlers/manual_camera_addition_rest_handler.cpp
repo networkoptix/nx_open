@@ -21,16 +21,6 @@
 QnManualCameraAdditionRestHandler::QnManualCameraAdditionRestHandler(QnMediaServerModule* serverModule):
     nx::mediaserver::ServerModuleAware(serverModule)
 {
-    NX_DEBUG(this, lm("Created"));
-}
-
-QnManualCameraAdditionRestHandler::~QnManualCameraAdditionRestHandler()
-{
-    for (QnManualCameraSearcher* process: m_searchProcesses)
-    {
-        process->cancel();
-        delete process;
-    }
 }
 
 int QnManualCameraAdditionRestHandler::searchStartAction(
@@ -38,8 +28,6 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    QElapsedTimer timer;
-    timer.restart();
     NX_DEBUG(this, lm("Start searching new cameras"));
 
     QAuthenticator auth;
@@ -61,12 +49,12 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
         addr2.clear();
 
     QnUuid processUuid = QnUuid::createUuid();
-
-    QnManualCameraSearcher* searcher = new QnManualCameraSearcher(owner->commonModule());
-
     {
-        QnMutexLocker lock( &m_searchProcessMutex );
-        m_searchProcesses.insert(processUuid, searcher);
+        QnMutexLocker lock(&m_searchProcessMutex);
+        auto [searcher, inserted] = m_searchProcesses.try_emplace(processUuid,
+                std::make_unique<QnManualCameraSearcher>(owner->commonModule()));
+        if (!inserted)
+            return nx::network::http::StatusCode::internalServerError;
         NX_VERBOSE(this, "Created search process with UUID=%1", processUuid);
 
         // TODO: #ak: better not to use concurrent here, since calling QtConcurrent::run from
@@ -77,13 +65,14 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
         const auto threadPool = owner->commonModule()->resourceDiscoveryManager()->threadPool();
         m_searchProcessRuns.insert(processUuid,
             nx::utils::concurrent::run(threadPool, std::bind(
-                &QnManualCameraSearcher::run, searcher, threadPool, addr1, addr2, auth, port)));
+                &QnManualCameraSearcher::run, searcher->second.get(), threadPool, addr1, addr2, auth, port)));
     }
+
     // TODO: Nobody removes finished searchers!
 
     QnManualCameraSearchReply reply(processUuid, getSearchStatus(processUuid));
     result.setReply(reply);
-    NX_DEBUG(this, lm("New cameras search was initiated. Working time=%1ms").arg(timer.elapsed()));
+    NX_DEBUG(this, "New cameras search was initiated.");
     return nx::network::http::StatusCode::ok;
 }
 
@@ -115,14 +104,14 @@ int QnManualCameraAdditionRestHandler::searchStopAction(
         return nx::network::http::StatusCode::unprocessableEntity;
 
     NX_VERBOSE(this, "Stopping search process with UUID=%1", processUuid);
-    QnManualCameraSearcher* process(NULL);
+    QnManualCameraSearcherPtr process;
     {
-        QnMutexLocker lock( &m_searchProcessMutex );
-        if (m_searchProcesses.contains(processUuid))
+        QnMutexLocker lock(&m_searchProcessMutex);
+        if (m_searchProcesses.count(processUuid))
         {
-            process = m_searchProcesses[processUuid];
+            process = std::move(m_searchProcesses[processUuid]);
             process->cancel();
-            m_searchProcesses.remove(processUuid);
+            m_searchProcesses.erase(processUuid);
         }
         if (m_searchProcessRuns.contains(processUuid))
         {
@@ -138,8 +127,6 @@ int QnManualCameraAdditionRestHandler::searchStopAction(
         QnManualCameraSearchProcessStatus processStatus = process->status();
         reply.status = processStatus.status;
         reply.cameras = processStatus.cameras;
-
-        delete process;
     }
     result.setReply(reply);
 
@@ -228,7 +215,10 @@ int QnManualCameraAdditionRestHandler::addCameras(
         owner->commonModule()->auditManager()->addAuditRecord(auditRecord);
     }
 
-    return registered.size() > 0 ? nx::network::http::StatusCode::ok : nx::network::http::StatusCode::internalServerError;
+    if (registered.size() > 0)
+        return nx::network::http::StatusCode::ok;
+    else
+        return nx::network::http::StatusCode::internalServerError;
 }
 
 int QnManualCameraAdditionRestHandler::executeGet(
@@ -269,7 +259,7 @@ QnManualCameraSearchProcessStatus QnManualCameraAdditionRestHandler::getSearchSt
 {
     QnMutexLocker lock(&m_searchProcessMutex);
 
-    if (!m_searchProcesses.contains(searchProcessUuid))
+    if (!m_searchProcesses.count(searchProcessUuid))
         return QnManualCameraSearchProcessStatus();
 
     return m_searchProcesses[searchProcessUuid]->status();
@@ -279,5 +269,5 @@ bool QnManualCameraAdditionRestHandler::isSearchActive(
     const QnUuid &searchProcessUuid)
 {
     QnMutexLocker lock(&m_searchProcessMutex);
-    return m_searchProcesses.contains(searchProcessUuid);
+    return m_searchProcesses.count(searchProcessUuid);
 }
