@@ -90,10 +90,9 @@ void QnVirtualCameraResource::forceDisableAudio()
 
 void QnVirtualCameraResource::updateDefaultAuthIfEmpty(const QString& login, const QString& password)
 {
-    auto decodedCredentials = nx::utils::decodeStringFromHexStringAES128CBC(
-        getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME));
+    auto credentials = getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME);
 
-    if (decodedCredentials.isEmpty() || decodedCredentials == lit(":"))
+    if (credentials.isEmpty() || credentials == lit(":"))
     {
         setDefaultAuth(login, password);
         saveParams();
