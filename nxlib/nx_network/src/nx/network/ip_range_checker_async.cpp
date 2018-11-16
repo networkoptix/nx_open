@@ -13,6 +13,7 @@ QnIpRangeCheckerAsync::QnIpRangeCheckerAsync():
     m_endIpv4(0),
     m_nextIPToCheck(0)
 {
+    NX_VERBOSE(this, "Created");
 }
 
 QnIpRangeCheckerAsync::~QnIpRangeCheckerAsync()
@@ -23,6 +24,8 @@ QnIpRangeCheckerAsync::~QnIpRangeCheckerAsync()
 
 void QnIpRangeCheckerAsync::pleaseStop()
 {
+    NX_VERBOSE(this, "Terminate requested, range (%1, %2)!",
+        QHostAddress(m_startIpv4), QHostAddress(m_endIpv4));
     {
         QnMutexLocker lk(&m_mutex);
         m_terminated = true;
@@ -31,9 +34,11 @@ void QnIpRangeCheckerAsync::pleaseStop()
 
 void QnIpRangeCheckerAsync::join()
 {
+    NX_VERBOSE(this, "Waiting to finish");
     QnMutexLocker lk(&m_mutex);
     while (!m_socketsBeingScanned.empty())
         m_cond.wait(lk.mutex());
+    NX_VERBOSE(this, "Finished");
 }
 
 QStringList QnIpRangeCheckerAsync::onlineHosts(
@@ -41,6 +46,7 @@ QStringList QnIpRangeCheckerAsync::onlineHosts(
     const QHostAddress& endAddr,
     int portToScan)
 {
+    NX_VERBOSE(this, "Starting search in range (%1, %2)", startAddr, endAddr);
     {
         QnMutexLocker lk(&m_mutex);
         m_openedIPs.clear();
@@ -62,6 +68,8 @@ QStringList QnIpRangeCheckerAsync::onlineHosts(
 
     join();
 
+    NX_VERBOSE(this, "Search in range (%1, %2) has finished, %3 hosts are online",
+        startAddr, endAddr, m_openedIPs.size());
     return m_openedIPs;
 }
 
@@ -82,8 +90,9 @@ bool QnIpRangeCheckerAsync::launchHostCheck()
         return false;
 
     if (m_nextIPToCheck > m_endIpv4)
-        return false;  //all ip addresses are being scanned at the moment
+        return false;  // All ip addresses are being scanned at the moment.
     quint32 ipToCheck = m_nextIPToCheck++;
+    NX_VERBOSE(this, "Checking IP: %1", QHostAddress(ipToCheck));
 
     auto httpClientIter = m_socketsBeingScanned.insert(
         std::make_unique<nx::network::http::AsyncClient>()).first;
@@ -103,8 +112,17 @@ void QnIpRangeCheckerAsync::onDone(Requests::iterator httpClientIter)
     QnMutexLocker lk(&m_mutex);
 
     NX_ASSERT(httpClientIter != m_socketsBeingScanned.end());
+
+    const auto host = (*httpClientIter)->url().host();
     if ((*httpClientIter)->bytesRead() > 0)
-        m_openedIPs.push_back((*httpClientIter)->url().host());
+    {
+        m_openedIPs.push_back(host);
+        NX_VERBOSE(this, "Checked IP: %1 (online)", host);
+    }
+    else
+    {
+        NX_VERBOSE(this, "Checked IP: %1 (offline)", host);
+    }
 
     m_socketsBeingScanned.erase(httpClientIter);
 

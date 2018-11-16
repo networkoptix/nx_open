@@ -21,6 +21,7 @@
 QnManualCameraAdditionRestHandler::QnManualCameraAdditionRestHandler(QnMediaServerModule* serverModule):
     nx::mediaserver::ServerModuleAware(serverModule)
 {
+    NX_DEBUG(this, lm("Created"));
 }
 
 QnManualCameraAdditionRestHandler::~QnManualCameraAdditionRestHandler()
@@ -66,6 +67,7 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
     {
         QnMutexLocker lock( &m_searchProcessMutex );
         m_searchProcesses.insert(processUuid, searcher);
+        NX_VERBOSE(this, "Created search process with UUID=%1", processUuid);
 
         // TODO: #ak: better not to use concurrent here, since calling QtConcurrent::run from
         // running task looks unreliable in some extreme case.
@@ -77,10 +79,11 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
             nx::utils::concurrent::run(threadPool, std::bind(
                 &QnManualCameraSearcher::run, searcher, threadPool, addr1, addr2, auth, port)));
     }
+    // TODO: Nobody removes finished searchers!
 
     QnManualCameraSearchReply reply(processUuid, getSearchStatus(processUuid));
     result.setReply(reply);
-    NX_DEBUG(this, lm("Finish searching new cameras. Working time=%1ms").arg(timer.elapsed()));
+    NX_DEBUG(this, lm("New cameras search was initiated. Working time=%1ms").arg(timer.elapsed()));
     return nx::network::http::StatusCode::ok;
 }
 
@@ -102,6 +105,7 @@ int QnManualCameraAdditionRestHandler::searchStatusAction(
 }
 
 
+// TODO: check if crash can be there. We are deleted process here before it may finish
 int QnManualCameraAdditionRestHandler::searchStopAction(
     const QnRequestParams& params, QnJsonRestResult& result)
 {
@@ -110,6 +114,7 @@ int QnManualCameraAdditionRestHandler::searchStopAction(
     if (processUuid.isNull())
         return nx::network::http::StatusCode::unprocessableEntity;
 
+    NX_VERBOSE(this, "Stopping search process with UUID=%1", processUuid);
     QnManualCameraSearcher* process(NULL);
     {
         QnMutexLocker lock( &m_searchProcessMutex );

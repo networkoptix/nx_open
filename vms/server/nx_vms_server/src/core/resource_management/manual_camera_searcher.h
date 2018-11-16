@@ -15,6 +15,7 @@
 #include <nx/network/ip_range_checker_async.h>
 #include <common/common_module_aware.h>
 
+// TODO: The way to cancel task should be added.
 class QnSearchTask
 {
 
@@ -99,8 +100,11 @@ private:
         const QString& endAddr,
         int port = nx::network::http::DEFAULT_HTTP_PORT);
 
+    void waitToFinishSearch();
+    void changeStateUnsafe(QnManualResourceSearchStatus::State newState);
     void runTasksUnsafe(QThreadPool* threadPool);
     QList<QnAbstractNetworkResourceSearcher*> getAllNetworkSearchers() const;
+
 private:
     mutable QnMutex m_mutex;
     QnManualResourceSearchList m_results;

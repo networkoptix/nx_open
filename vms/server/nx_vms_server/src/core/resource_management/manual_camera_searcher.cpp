@@ -124,6 +124,8 @@ QnSearchTask::QnSearchTask(
 
     if (port)
         m_url.setPort(port);
+
+    NX_VERBOSE(this, "Created with URL %1", m_url);
 }
 
 void QnSearchTask::setSearchers(const SearcherList& searchers)
@@ -158,10 +160,12 @@ bool QnSearchTask::doesInterruptTaskProcessing() const
 
 void QnSearchTask::doSearch()
 {
+    NX_VERBOSE(this, "Starting search on URL %1 with %2 searcher(s)", m_url, m_searchers.size());
     QnManualResourceSearchList results;
     for (const auto& checker: m_searchers)
     {
         auto seqResults = checker->checkHostAddr(m_url, m_auth, true);
+        NX_VERBOSE(this, "Got %1 resources from searcher", seqResults.size());
 
         for (const auto& res: seqResults)
         {
@@ -182,11 +186,13 @@ void QnSearchTask::doSearch()
 
         if (!results.isEmpty() && m_breakIfGotResult)
         {
+            NX_VERBOSE(this, "Found %1 resources", results.size());
             m_callback(results, this);
             return;
         }
     }
 
+    NX_VERBOSE(this, "Found %1 resources", results.size());
     m_callback(results, this);
 }
 
@@ -205,6 +211,7 @@ QString QnSearchTask::toString()
     return str;
 }
 
+// TODO: Add UUID here.
 QnManualCameraSearcher::QnManualCameraSearcher(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule),
     m_state(QnManualResourceSearchStatus::Init),
@@ -213,10 +220,14 @@ QnManualCameraSearcher::QnManualCameraSearcher(QnCommonModule* commonModule):
     m_totalTaskCount(0),
     m_remainingTaskCount(0)
 {
+    NX_VERBOSE(this, "Created");
 }
 
 QnManualCameraSearcher::~QnManualCameraSearcher()
 {
+    NX_VERBOSE(this, "Destroying (state: %1)", m_state);
+    cancel();
+    // TODO: should make sure that all tasks has finished and notify cond var!
 }
 
 QList<QnAbstractNetworkResourceSearcher*> QnManualCameraSearcher::getAllNetworkSearchers() const
@@ -227,7 +238,7 @@ QList<QnAbstractNetworkResourceSearcher*> QnManualCameraSearcher::getAllNetworkS
     {
         QnAbstractNetworkResourceSearcher* ns =
             dynamic_cast<QnAbstractNetworkResourceSearcher*>(as);
-        Q_ASSERT(ns);
+        NX_ASSERT(ns);
 
         result.push_back(ns);
     }
@@ -290,9 +301,7 @@ bool QnManualCameraSearcher::run(
 
     QnSearchTask::SearcherList sequentialSearchers;
     QnSearchTask::SearcherList parallelSearchers;
-
     auto searchers = getAllNetworkSearchers();
-
     for (const auto& searcher: searchers)
     {
         if (searcher->isSequential())
@@ -300,24 +309,25 @@ bool QnManualCameraSearcher::run(
         else
             parallelSearchers.push_back(searcher);
     }
+    NX_VERBOSE(this, "Will use %1 sequential and %2 concurrent searchers",
+        sequentialSearchers.size(), parallelSearchers.size());
 
     QStringList onlineHosts;
-
     if (endAddr.isNull())
         onlineHosts.push_back(startAddr);
     else
         onlineHosts = getOnlineHosts(startAddr, endAddr, port);
+    NX_VERBOSE(this, "Will check %1 hosts", onlineHosts.size());
 
     for (const auto& host: onlineHosts)
     {
-        QString hostToCheck;
-
         QnSearchTask sequentialTask(commonModule(), host, port, auth, true);
         sequentialTask.setSearchers(sequentialSearchers);
         sequentialTask.setSearchDoneCallback(callback);
         sequentialTask.setBlocking(true);
         sequentialTask.setInterruptTaskProcessing(true);
 
+        QString hostToCheck;
         hostToCheck = sequentialTask.url().toString();
 
         m_urlSearchTaskQueues[hostToCheck].enqueue(sequentialTask);
@@ -341,66 +351,43 @@ bool QnManualCameraSearcher::run(
     }
 
     m_totalTaskCount = m_remainingTaskCount;
-    int kMaxWaitTimeMs = 2000;
-
-    auto hasRunningTasks =
-        [this]() -> bool
-        {
-            for (const auto& context: m_searchQueueContexts)
-            {
-                if (context.isInterrupted)
-                    continue;
-
-                if (context.runningTaskCount > 0)
-                    return true;
-            }
-
-            return false;
-        };
-
-    QnMutexLocker lock(&m_mutex);
-    m_state = QnManualResourceSearchStatus::CheckingHost;
-    if (m_cancelled)
     {
-        m_state = QnManualResourceSearchStatus::Aborted;
-        return true;
+        QnMutexLocker lock(&m_mutex);
+        if (m_cancelled)
+            return true;
+        changeStateUnsafe(QnManualResourceSearchStatus::CheckingHost);
+        runTasksUnsafe(threadPool);
     }
 
-    runTasksUnsafe(threadPool);
-
-    while((m_remainingTaskCount > 0 && !m_cancelled) || hasRunningTasks())
-        m_waitCondition.wait(&m_mutex, kMaxWaitTimeMs);
-
+    waitToFinishSearch(); //< NOTE: It maybe a long wait!
     if (!m_cancelled)
-        m_state = QnManualResourceSearchStatus::Finished;
+        changeStateUnsafe(QnManualResourceSearchStatus::Finished);
 
     return true;
 }
 
 void QnManualCameraSearcher::cancel() {
 
-    QnMutexLocker lock( &m_mutex );
-    m_cancelled = true;
-
-    switch (m_state)
     {
-        case QnManualResourceSearchStatus::Finished:
+        QnMutexLocker lock(&m_mutex);
+        NX_VERBOSE(this, "Canceling search, remaining tasks: %1", m_remainingTaskCount);
+        m_cancelled = true;
+        switch (m_state)
         {
-            return;
+            case QnManualResourceSearchStatus::Finished:
+                return;
+            case QnManualResourceSearchStatus::CheckingOnline:
+                m_ipChecker.pleaseStop();
+                break;
+            default:
+                break;
         }
-        case QnManualResourceSearchStatus::CheckingOnline:
-        {
-            m_ipChecker.pleaseStop();
-            m_ipChecker.join();
-            break;
-        }
-        default:
-        {
-            break;
-        }
+        changeStateUnsafe(QnManualResourceSearchStatus::Aborted);
     }
 
-    m_state = QnManualResourceSearchStatus::Aborted;
+    // TODO: Add state aborting.
+    m_ipChecker.join();
+    waitToFinishSearch();
 }
 
 QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
@@ -483,6 +470,7 @@ QStringList QnManualCameraSearcher::getOnlineHosts(
     const QString& endAddr,
     int port)
 {
+    NX_VERBOSE(this, "Getting online hosts in range (%1, %2)", startAddr, endAddr);
     QStringList onlineHosts;
 
     const quint32 startIPv4Addr = QHostAddress(startAddr).toIPv4Address();
@@ -494,13 +482,9 @@ QStringList QnManualCameraSearcher::getOnlineHosts(
     {
         QnMutexLocker lock(&m_mutex);
         m_hostRangeSize = endIPv4Addr - startIPv4Addr;
-        m_state = QnManualResourceSearchStatus::CheckingOnline;
-
         if (m_cancelled)
-        {
-            m_state = QnManualResourceSearchStatus::Aborted;
             return QStringList();
-        }
+        changeStateUnsafe(QnManualResourceSearchStatus::CheckingOnline);
     }
 
     onlineHosts = m_ipChecker.onlineHosts(
@@ -510,26 +494,50 @@ QStringList QnManualCameraSearcher::getOnlineHosts(
 
     {
         QnMutexLocker lock( &m_mutex );
-        if( m_cancelled )
-        {
-            m_state = QnManualResourceSearchStatus::Aborted;
+        if (m_cancelled)
             return QStringList();
-        }
     }
 
     return onlineHosts;
 }
 
+void QnManualCameraSearcher::waitToFinishSearch()
+{
+    const int kMaxWaitTimeMs = 2000;
+    const auto hasRunningTasks =
+        [this]() -> bool
+        {
+            for (const auto& context: m_searchQueueContexts)
+            {
+                if (context.isInterrupted)
+                    continue;
+
+                if (context.runningTaskCount > 0)
+                    return true;
+            }
+
+            return false;
+        };
+
+    QnMutexLocker lock(&m_mutex);
+    NX_VERBOSE(this, "Waiting search to finish, tasks: %1", m_remainingTaskCount);
+    while((m_remainingTaskCount > 0 && !m_cancelled) || hasRunningTasks())
+        m_waitCondition.wait(&m_mutex, kMaxWaitTimeMs);
+    NX_VERBOSE(this, "Search has finished");
+}
+
+void QnManualCameraSearcher::changeStateUnsafe(QnManualResourceSearchStatus::State newState)
+{
+    NX_VERBOSE(this, "State change: %1 -> %2", m_state, newState);
+    m_state = newState;
+}
+
 void QnManualCameraSearcher::runTasksUnsafe(QThreadPool* threadPool)
 {
     if (m_cancelled)
-    {
-        m_state = QnManualResourceSearchStatus::Aborted;
         return;
-    }
 
     int totalRunningTasks = 0;
-
     for (const auto& context: m_searchQueueContexts)
     {
         if (!context.isInterrupted)
