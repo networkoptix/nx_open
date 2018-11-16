@@ -1,7 +1,7 @@
 import { Component, ElementRef, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 
 /* Usage
-<nx-block alt-style? fixed-height? hoverable?>
+<nx-block type?="gray | ...more to come" fixed-height? hoverable?>
     <header>
         TITLE
     </header>
@@ -35,7 +35,7 @@ import { Component, ElementRef, Input, OnInit, ViewChild, ViewEncapsulation } fr
     styleUrls  : [ 'content-block.component.scss' ],
 })
 export class NxContentBlockComponent implements OnInit {
-    @Input('alt-style') altStyle: any;
+    @Input('type') style: string;
     @Input('fixed-height') fixedHeight: any;
     @Input('hoverable') hoverable: any;
 
@@ -54,7 +54,6 @@ export class NxContentBlockComponent implements OnInit {
         this.haveHeader = (this.headerWrapper.nativeElement.childNodes[ 0 ].childNodes.length > 0);
         this.haveFooter = (this.footerWrapper.nativeElement.childNodes.length > 0);
 
-        this.altStyle = (this.altStyle !== undefined);
         this.fixedHeight = (this.fixedHeight !== undefined);
         this.hoverable = (this.hoverable !== undefined);
     }
