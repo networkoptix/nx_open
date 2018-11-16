@@ -1,5 +1,7 @@
 #include "client_core_meta_types.h"
 
+#include <atomic>
+
 #include <QtQml/QtQml>
 
 #include <core/ptz/media_dewarping_params.h>
@@ -17,6 +19,7 @@
 #include <client/forgotten_systems_manager.h>
 #include <utils/common/app_info.h>
 #include <helpers/nx_globals_object.h>
+#include <common/common_meta_types.h>
 
 #include <nx/client/core/animation/kinetic_animation.h>
 #include <nx/client/core/media/media_player.h>
@@ -51,6 +54,15 @@ static QObject* createAppInfo(QQmlEngine*, QJSEngine*)
 
 void initializeMetaTypes()
 {
+    static std::atomic_bool initialized = false;
+
+    if (initialized.load())
+        return;
+
+    initialized = true;
+
+    QnCommonMetaTypes::initialize();
+
     qRegisterMetaType<QnStringSet>();
     qRegisterMetaTypeStreamOperators<QnStringSet>();
 

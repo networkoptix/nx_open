@@ -249,6 +249,14 @@ QVariant QnClientSettings::readValueFromSettings(QSettings* settings, int id,
             return QVariant::fromValue(QnSystemHealth::unpackVisibleInSettings(packed));
         }
 
+        case LATEST_UPDATE_INFO:
+        {
+            QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant())
+                .value<QString>().toUtf8();
+            return QVariant::fromValue(QJson::deserialized<nx::update::Information>(asJson,
+                defaultValue.value<nx::update::Information>()));
+        }
+
         default:
             return base_type::readValueFromSettings(settings, id, defaultValue);
             break;
@@ -366,6 +374,14 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
             packed = QnSystemHealth::packVisibleInSettings(packed,
                 value.value<QSet<QnSystemHealth::MessageType>>());
             base_type::writeValueToSettings(settings, id, packed);
+            break;
+        }
+
+        case LATEST_UPDATE_INFO:
+        {
+            nx::update::Information updateInfo = value.value<nx::update::Information>();
+            QString asJson = QString::fromUtf8(QJson::serialized(updateInfo));
+            base_type::writeValueToSettings(settings, id, asJson);
             break;
         }
 

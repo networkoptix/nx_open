@@ -32,21 +32,23 @@ struct Information
     QString version;
     QString cloudHost;
     QString eulaLink;
-    // This is EULA text for offline update package.
-    // We need to be able to show this data without internet.
-    QString eulaContents;
     int eulaVersion = 0;
     QString releaseNotesUrl;
     // This is release notes for offline update package.
     // We need to be able to show this data without internet.
-    QString releaseNotesContents;
+    QString description;
     QList<Package> packages;
+
+    // Release date - in msecs since epoch.
+    qint64 releaseDateMs = 0;
+    // Maximum days for release delivery.
+    int releaseDeliveryDays = 0;
 
     bool isValid() const { return !version.isNull(); }
     bool isEmpty() const { return packages.isEmpty(); }
 };
 
-#define Information_Fields (version)(cloudHost)(eulaLink)(eulaContents)(eulaVersion)(releaseNotesUrl)(releaseNotesContents)(packages)
+#define Information_Fields (version)(cloudHost)(eulaLink)(eulaVersion)(releaseNotesUrl)(packages)
 QN_FUSION_DECLARE_FUNCTIONS(Information, (xml)(csv_record)(ubjson)(json))
 
 enum class InformationError
@@ -116,3 +118,4 @@ QN_FUSION_DECLARE_FUNCTIONS(Status, (xml)(csv_record)(ubjson)(json))
 } // namespace update
 } // namespace nx
 
+Q_DECLARE_METATYPE(nx::update::Information);

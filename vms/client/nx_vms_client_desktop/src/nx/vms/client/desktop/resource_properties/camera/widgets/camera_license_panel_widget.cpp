@@ -8,7 +8,7 @@
 
 #include <nx/vms/client/desktop/common/utils/provided_text_display.h>
 #include <nx/vms/client/desktop/common/utils/check_box_utils.h>
-#include <nx/utils/disconnect_helper.h>
+#include <nx/utils/scoped_connections.h>
 
 namespace nx::vms::client::desktop {
 
@@ -38,12 +38,12 @@ void CameraLicensePanelWidget::init(
     AbstractTextProvider* licenseUsageTextProvider, CameraSettingsDialogStore* store)
 {
     m_licenseUsageDisplay->setTextProvider(licenseUsageTextProvider);
-    m_storeConnections.reset(new QnDisconnectHelper());
+    m_storeConnections = {};
 
-    *m_storeConnections << connect(ui->useLicenseCheckBox, &QCheckBox::clicked,
+    m_storeConnections << connect(ui->useLicenseCheckBox, &QCheckBox::clicked,
         store, &CameraSettingsDialogStore::setRecordingEnabled);
 
-    *m_storeConnections << connect(store, &CameraSettingsDialogStore::stateChanged,
+    m_storeConnections << connect(store, &CameraSettingsDialogStore::stateChanged,
         this, &CameraLicensePanelWidget::loadState);
 }
 

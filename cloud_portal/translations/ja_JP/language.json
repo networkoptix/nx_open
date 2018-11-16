@@ -167,7 +167,7 @@
     "confirmRenameTitle": "システム名",
     "confirmRenameAction": "保存",
     "successRename": "システム名は保存されました",
-    "confirmDisconnectTitle": "%PRODUCT_NAME% からシステムを切断しますか？",
+    "confirmDisconnectTitle": "%PRODUCT_NAME% からシステムを切断?",
     "confirmDisconnectAction": "切断",
     "confirmUnshareFromMe": "あなたのアカウントからこのシステムを切断しようとしています　もうこのシステムにアクセスすることはできません\n切断しますか？",
     "confirmUnshareFromMeTitle": "システムを切断しますか？",

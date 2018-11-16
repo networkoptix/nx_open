@@ -508,6 +508,9 @@ void WorkbenchExportHandler::handleExportBookmarksAction()
     dialog.setLayout(layoutFromBookmarks(bookmarks, resourcePool()));
     dialog.setBookmarks(bookmarks);
 
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+
     auto context = prepareExportTool(dialog);
     runExport(std::move(context));
 }

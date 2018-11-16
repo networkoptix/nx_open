@@ -98,7 +98,7 @@ public:
 
 signals:
     /** This signal is for displaying external tooltips. */
-    void tileHovered(const QModelIndex& index, const EventTile* tile);
+    void tileHovered(const QModelIndex& index, EventTile* tile);
 
     /** This signal is sent when current camera selection type or actual camera set changes. */
     void cameraSetChanged(const QnVirtualCameraResourceSet& value);

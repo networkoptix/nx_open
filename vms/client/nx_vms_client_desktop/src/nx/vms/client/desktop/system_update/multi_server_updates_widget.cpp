@@ -541,6 +541,9 @@ void MultiServerUpdatesWidget::pickLocalFile()
     if (fileName.isEmpty())
         return;
 
+    m_updateSourceMode = UpdateSourceType::file;
+    m_updateLocalStateChanged = true;
+
     clearUpdateInfo();
     m_updateCheck = m_serverUpdateTool->checkUpdateFromFile(fileName);
     loadDataToUi();
@@ -551,6 +554,9 @@ void MultiServerUpdatesWidget::pickSpecificBuild()
     QnBuildNumberDialog dialog(this);
     if (!dialog.exec())
         return;
+
+    m_updateSourceMode = UpdateSourceType::internetSpecific;
+    m_updateLocalStateChanged = true;
 
     clearUpdateInfo();
     nx::utils::SoftwareVersion version = qnStaticCommon->engineVersion();
@@ -567,12 +573,11 @@ void MultiServerUpdatesWidget::setUpdateSourceMode(UpdateSourceType mode)
     if (m_updateSourceMode == mode)
         return;
 
-    m_updateSourceMode = mode;
-    m_updateLocalStateChanged = true;
-
     switch(mode)
     {
         case UpdateSourceType::internet:
+            m_updateSourceMode = mode;
+            m_updateLocalStateChanged = true;
             clearUpdateInfo();
             checkForInternetUpdates();
             loadDataToUi();
@@ -888,40 +893,63 @@ void MultiServerUpdatesWidget::processRemoteInitialState()
 
 void MultiServerUpdatesWidget::processRemoteDownloading()
 {
-    for (auto id: m_serverUpdateTool->getServersInState(StatusCode::readyToInstall))
-    {
-        if (m_serversActive.contains(id))
-        {
-            NX_VERBOSE(this)
-                << "processRemoteDownloading() - server "
-                << id << "completed downloading and is ready to install";
-            m_serversComplete.insert(id);
-            m_serversActive.remove(id);
-        }
-    }
+    auto allStates = m_serverUpdateTool->getAllServerStates();
 
-    for (auto id: m_serverUpdateTool->getServersInState(StatusCode::error))
+    for (auto record: allStates)
     {
-        if (m_serversActive.contains(id))
+        StatusCode state = record.second;
+        auto id = record.first;
+        switch (state)
         {
-            NX_VERBOSE(this)
-                << "processRemoteDownloading() - server "
-                << id << "failed to download update package";
-            m_serversFailed.insert(id);
-            m_serversActive.remove(id);
-        }
-    }
-
-    // Idle servers are concidered failed as well.
-    for (auto id: m_serverUpdateTool->getServersInState(StatusCode::idle))
-    {
-        if (m_serversActive.contains(id))
-        {
-            NX_VERBOSE(this)
-                << "processRemoteDownloading() - server "
-                << id << "failed to download update package";
-            m_serversFailed.insert(id);
-            m_serversActive.remove(id);
+            case StatusCode::readyToInstall:
+                if (m_serversActive.contains(id))
+                {
+                    NX_VERBOSE(this)
+                        << "processRemoteDownloading() - server "
+                        << id << "completed downloading and is ready to install";
+                    m_serversComplete.insert(id);
+                    m_serversActive.remove(id);
+                }
+                break;
+            case StatusCode::error:
+            case StatusCode::idle:
+                if (m_serversActive.contains(id))
+                {
+                    NX_VERBOSE(this)
+                        << "processRemoteDownloading() - server "
+                        << id << "failed to download update package";
+                    m_serversFailed.insert(id);
+                    m_serversActive.remove(id);
+                }
+                break;
+            case StatusCode::preparing:
+            case StatusCode::downloading:
+                if (!m_serversActive.contains(id) && m_serversIssued.contains(id))
+                {
+                    NX_VERBOSE(this)
+                        << "processRemoteDownloading() - server "
+                        << id << "resumed downloading.";
+                    m_serversActive.remove(id);
+                }
+                break;
+            case StatusCode::latestUpdateInstalled:
+                if (m_serversActive.contains(id))
+                {
+                    NX_VERBOSE(this)
+                        << "processRemoteDownloading() - server "
+                        << id << "have already installed this package.";
+                    m_serversActive.remove(id);
+                }
+                break;
+            case StatusCode::offline:
+                if (m_serversActive.contains(id))
+                {
+                    NX_VERBOSE(this)
+                        << "processRemoteDownloading() - server "
+                        << id << "went offline during download.";
+                    m_serversActive.remove(id);
+                }
+                break;
         }
     }
 
@@ -1535,7 +1563,7 @@ void MultiServerUpdatesWidget::loadDataToUi()
             QString("ClientTool=%1").arg(ClientUpdateTool::toString(m_clientUpdateTool->getState())),
             QString("validUpdate=%1").arg(m_haveValidUpdate),
             QString("targetVersion=%1").arg(m_updateInfo.info.version),
-            QString("<a href=\"%1\">/ec2/updateState</a>").arg(m_serverUpdateTool->getUpdateStateUrl()),
+            QString("<a href=\"%1\">/ec2/updateStatus</a>").arg(m_serverUpdateTool->getUpdateStateUrl()),
             QString("<a href=\"%1\">/ec2/updateInformation</a>").arg(m_serverUpdateTool->getUpdateInformationUrl()),
             QString("<a href=\"%1\">/ec2/installedUpdateInformation</a>").arg(m_serverUpdateTool->getInstalledUpdateInfomationUrl()),
         };

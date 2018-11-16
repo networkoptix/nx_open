@@ -324,13 +324,17 @@ public:
 
         const QnTimeSliderColors& colors = slider->colors();
 
-        m_pastColor[Qn::RecordingContent]           = colors.pastRecording;
-        m_pastColor[Qn::MotionContent]              = colors.pastMotion;
-        m_pastColor[Qn::TimePeriodContentCount]     = colors.pastBackground;
+        // TODO: #vkutin This is a hack.
+        // Refactor this class to operate with "recording" and "extra" content types.
+        const bool analytics = m_slider->selectedExtraContent() == Qn::AnalyticsContent;
 
-        m_futureColor[Qn::RecordingContent]         = colors.futureRecording;
-        m_futureColor[Qn::MotionContent]            = colors.futureMotion;
-        m_futureColor[Qn::TimePeriodContentCount]   = colors.futureBackground;
+        m_pastColor[Qn::RecordingContent] = colors.pastRecording;
+        m_pastColor[Qn::MotionContent] = analytics ? colors.pastAnalytics : colors.pastMotion;
+        m_pastColor[Qn::TimePeriodContentCount] = colors.pastBackground;
+
+        m_futureColor[Qn::RecordingContent] = colors.futureRecording;
+        m_futureColor[Qn::MotionContent] = analytics ? colors.futureAnalytics : colors.futureMotion;
+        m_futureColor[Qn::TimePeriodContentCount] = colors.futureBackground;
 
         m_position = m_centralPosition = m_minChunkLength = 0ms;
     }
@@ -2523,7 +2527,7 @@ void QnTimeSlider::drawPeriodsBar(QPainter* painter, const QnTimePeriodList& rec
     QnTimeSliderChunkPainter chunkPainter(this, painter);
     chunkPainter.start(value, sliderTimePosition(), milliseconds(qint64(m_msecsPerPixel)), rect);
 
-    while(value != maximumValue)
+    while (value != maximumValue)
     {
         milliseconds nextValue[Qn::TimePeriodContentCount] = {maximumValue, maximumValue};
         for (int i = 0; i < Qn::TimePeriodContentCount; i++)

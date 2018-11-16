@@ -4,6 +4,7 @@
 #include <cmath> /* For std::fmod. */
 
 #include <QtCore/QtAlgorithms>
+#include <QtCore/QScopedValueRollback>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QGraphicsProxyWidget>
 #include <QtOpenGL/QGLContext>
@@ -928,6 +929,13 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
     }
 
     emit widgetChanged(role);
+
+    if (role == Qn::SingleSelectedRole && !m_inChangeSelection && widget && widget->isVisible()
+        && scene()->selectedItems() != QList<QGraphicsItem*>({widget}))
+    {
+        QScopedValueRollback updateGuard(m_inChangeSelection, true);
+        widget->selectThisWidget(true);
+    }
 }
 
 void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout)
@@ -1806,6 +1814,12 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate)
 
     widget->show(); //< It may have been hidden in a call to adjustGeometryLater.
 
+    if (m_widgetByRole[Qn::SingleSelectedRole] == widget)
+    {
+        QScopedValueRollback updateGuard(m_inChangeSelection, true);
+        widget->selectThisWidget(true);
+    }
+
     /* Calculate target position. */
     QPointF newPos;
     if (item->geometry().width() < 0 || item->geometry().height() < 0)
@@ -2303,8 +2317,10 @@ void QnWorkbenchDisplay::at_scene_destroyed()
 
 void QnWorkbenchDisplay::at_scene_selectionChanged()
 {
-    if (!m_instrumentManager->scene())
+    if (!m_instrumentManager->scene() || m_inChangeSelection)
         return; /* Do nothing if scene is being destroyed. */
+
+    QScopedValueRollback updateGuard(m_inChangeSelection, true);
 
     /* Update single selected item. */
     QList<QGraphicsItem *> selection = m_scene->selectedItems();

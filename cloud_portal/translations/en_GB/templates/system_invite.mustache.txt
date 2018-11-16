@@ -11,5 +11,5 @@ You are invited you to join %PRODUCT_NAME%.
 You have been granted access to {{message.system_name}}.
 {{/message.sharer_name}}
 
-Register and view the system: {{config.portal_url}}/register/{{message.code}}
+{{config.portal_url}}/register/{{message.code}}
 

@@ -382,8 +382,8 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::JumpToTimeAction), &QAction::triggered,
         this, &ActionHandler::at_jumpToTimeAction_triggered);
 
-    connect(action(action::GoToResourceAction), &QAction::triggered,
-        this, &ActionHandler::at_goToResourceAction_triggered);
+    connect(action(action::GoToLayoutItemAction), &QAction::triggered,
+        this, &ActionHandler::at_goToLayoutItemAction_triggered);
 
     /* Connect through lambda to handle forced parameter. */
     connect(action(action::DelayedForcedExitAction), &QAction::triggered, this, [this] {  closeApplication(true);    }, Qt::QueuedConnection);
@@ -1342,45 +1342,58 @@ void ActionHandler::at_jumpToTimeAction_triggered()
     slider->setValue(duration_cast<milliseconds>(timestamp), true);
 }
 
-void ActionHandler::at_goToResourceAction_triggered()
+void ActionHandler::at_goToLayoutItemAction_triggered()
 {
-    const auto parameters = menu()->currentParameters(sender());
-    const auto resource = parameters.resource();
-    if (!resource)
-    {
-        NX_ASSERT(false, "Resource must be specified");
+    const auto currentLayout = workbench()->currentLayout();
+    if (!currentLayout)
         return;
-    }
+
+    const auto parameters = menu()->currentParameters(sender());
+    const auto uuid = parameters.argument(Qn::ItemUuidRole).value<QnUuid>();
 
     const auto shouldRaise = parameters.argument<bool>(Qn::ForceRole);
-
     const auto centralItem = workbench()->item(Qn::CentralRole);
-    if (centralItem && centralItem->resource() == resource)
-    {
-        if (shouldRaise)
-            workbench()->setItem(Qn::RaisedRole, centralItem);
 
-        return; //< Nothing more to do.
+    QnWorkbenchItem* targetItem = nullptr;
+
+    if (uuid.isNull())
+    {
+        const auto resource = parameters.resource();
+        if (!resource)
+        {
+            NX_ASSERT(false, "Either item id or resource must be specified");
+            return;
+        }
+
+        if (centralItem && centralItem->resource() == resource)
+        {
+            targetItem = centralItem;
+        }
+        else
+        {
+            const auto items = currentLayout->items(resource);
+            for (const auto& item: items)
+            {
+                if (item->zoomRect().isValid())
+                    continue; //< Skip zoom windows.
+
+                targetItem = item;
+                break;
+            }
+        }
+    }
+    else
+    {
+        targetItem = currentLayout->item(uuid);
     }
 
-    const auto items = workbench()->currentLayout()->items(resource);
-    for (const auto& item: items)
-    {
-        if (item->zoomRect().isValid())
-            continue; //< Skip zoom windows.
+    if (!targetItem)
+        return;
 
-        auto widget = display()->widget(item);
-        if (!widget)
-            break;
+    workbench()->setItem(Qn::SingleSelectedRole, targetItem);
 
-        widget->scene()->clearSelection();
-        widget->setSelected(true);
-
-        if (shouldRaise)
-            workbench()->setItem(Qn::RaisedRole, item);
-
-        break;
-    }
+    if (shouldRaise)
+        workbench()->setItem(Qn::RaisedRole, targetItem);
 }
 
 void ActionHandler::openSystemAdministrationDialog(int page, const QUrl& url)

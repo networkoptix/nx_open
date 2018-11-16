@@ -1,38 +1,43 @@
-#ifndef QN_WORKBENCH_UPDATE_WATCHER_H
-#define QN_WORKBENCH_UPDATE_WATCHER_H
-
+#pragma once
 #include <QtCore/QObject>
 
 #include <ui/workbench/workbench_context_aware.h>
-
 #include <nx/utils/software_version.h>
+#include <nx/utils/url.h>
 
-class QnUpdateChecker;
 class QTimer;
-struct QnUpdateInfo;
+
+namespace nx::vms::client::desktop {
+struct UpdateContents;
+class UpdateCheckSignal;
+} // namespace nx::vms::client::desktop
 
 class QnWorkbenchUpdateWatcher:
     public QObject,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
+    using UpdateContents = nx::vms::client::desktop::UpdateContents;
+    using UpdateCheckSignal = nx::vms::client::desktop::UpdateCheckSignal;
 
 public:
     QnWorkbenchUpdateWatcher(QObject* parent = nullptr);
     virtual ~QnWorkbenchUpdateWatcher() override;
 
-public:
     void start();
     void stop();
 
 private:
-    void showUpdateNotification(const QnUpdateInfo& info);
-    void at_checker_updateAvailable(const QnUpdateInfo& info);
+    void showUpdateNotification(nx::utils::SoftwareVersion targetVersion,
+                                nx::utils::Url releaseNotesUrl,
+                                QString description);
+    //void at_checker_updateAvailable(const QnUpdateInfo& info);
+    void atCheckerUpdateAvailable(const UpdateContents& info);
+    void atStartCheckUpdate();
 
 private:
-    QnUpdateChecker* const m_checker;
     QTimer* const m_timer;
+    QPointer<UpdateCheckSignal> m_signal;
     nx::utils::SoftwareVersion m_notifiedVersion;
+    std::future<UpdateContents> m_updateInfo;
 };
-
-#endif // QN_WORKBENCH_UPDATE_WATCHER_H

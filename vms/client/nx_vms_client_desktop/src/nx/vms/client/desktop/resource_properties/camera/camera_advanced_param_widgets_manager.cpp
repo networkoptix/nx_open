@@ -86,7 +86,7 @@ void CameraAdvancedParamWidgetsManager::loadValues(
     }
 
     // Disconnect all watches to not trigger handler chains.
-    m_handlerChainConnections = QnDisconnectHelper::create();
+    m_handlerChainConnections = {};
 
     // Set widget values and store initial values that should be kept.
     QMap<QString, QString> valuesToKeep;
@@ -114,11 +114,10 @@ void CameraAdvancedParamWidgetsManager::loadValues(
         for (auto& func: handlerChains)
         {
             auto watchWidget = m_paramWidgetsById[watch];
-            m_handlerChainConnections->add(
-                connect(
-                    watchWidget,
-                    &AbstractCameraAdvancedParamWidget::valueChanged,
-                    func));
+            m_handlerChainConnections << connect(
+                watchWidget,
+                &AbstractCameraAdvancedParamWidget::valueChanged,
+                func);
         }
     }
 

@@ -4,6 +4,7 @@
 #include <core/ptz/ptz_preset.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/client_camera.h>
 
 #include <nx/client/core/motion/motion_grid.h>
 #include <nx/fusion/model_functions.h>
@@ -260,6 +261,14 @@ void setAudioEnabled(bool value, const Cameras& cameras)
         camera->setAudioEnabled(value);
 }
 
+void setCredentials(const QnVirtualCameraResourcePtr& camera, const QAuthenticator& authenticator)
+{
+    if ((camera->isMultiSensorCamera() || camera->isNvr()) && !camera->getGroupId().isEmpty())
+        QnClientCameraResource::setAuthToCameraGroup(camera, authenticator);
+    else
+        camera->setAuth(authenticator);
+}
+
 void setCredentials(const State::Credentials& value, const Cameras& cameras)
 {
     NX_ASSERT(value.login.hasValue() || value.password.hasValue());
@@ -275,8 +284,12 @@ void setCredentials(const State::Credentials& value, const Cameras& cameras)
         // Change only password, fetch logins from cameras.
         for (const auto& camera: cameras)
         {
-            authenticator.setUser(camera->getAuth().user());
-            camera->setAuth(authenticator);
+            const auto oldAuth = camera->getAuth();
+            if (oldAuth.password() == authenticator.password())
+                continue;
+
+            authenticator.setUser(oldAuth.user());
+            setCredentials(camera, authenticator);
         }
     }
     else if (!value.password.hasValue())
@@ -284,15 +297,22 @@ void setCredentials(const State::Credentials& value, const Cameras& cameras)
         // Change only login, fetch passwords from cameras.
         for (const auto& camera: cameras)
         {
-            authenticator.setPassword(camera->getAuth().password());
-            camera->setAuth(authenticator);
+            const auto oldAuth = camera->getAuth();
+            if (oldAuth.user() == authenticator.user())
+                continue;
+
+            authenticator.setPassword(oldAuth.password());
+            setCredentials(camera, authenticator);
         }
     }
     else
     {
         // Change both login and password.
         for (const auto& camera: cameras)
-            camera->setAuth(authenticator);
+        {
+            if (camera->getAuth() != authenticator)
+                setCredentials(camera, authenticator);
+        }
     }
 }
 

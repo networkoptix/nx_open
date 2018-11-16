@@ -3,7 +3,7 @@
 #include <QtGui/QPainter>
 
 #include <nx/vms/client/desktop/watermark/watermark_painter.h>
-#include <nx/utils/disconnect_helper.h>
+#include <nx/utils/scoped_connections.h>
 
 namespace nx::vms::client::desktop {
 
@@ -20,7 +20,6 @@ WatermarkProxyProvider::WatermarkProxyProvider(ImageProvider* sourceProvider, QO
 
 WatermarkProxyProvider::~WatermarkProxyProvider()
 {
-    m_sourceProviderConnections.reset();
 }
 
 QImage WatermarkProxyProvider::image() const
@@ -53,21 +52,21 @@ void WatermarkProxyProvider::setSourceProvider(ImageProvider* sourceProvider)
     if (m_sourceProvider == sourceProvider)
         return;
 
-    m_sourceProviderConnections.reset(new QnDisconnectHelper());
+    m_sourceProviderConnections = {};
     m_sourceProvider = sourceProvider;
 
     if (m_sourceProvider)
     {
-        *m_sourceProviderConnections << connect(m_sourceProvider, &QObject::destroyed,
+        m_sourceProviderConnections << connect(m_sourceProvider, &QObject::destroyed,
             this, [this]() { setSourceProvider(nullptr); });
 
-        *m_sourceProviderConnections << connect(m_sourceProvider, &ImageProvider::statusChanged,
+        m_sourceProviderConnections << connect(m_sourceProvider, &ImageProvider::statusChanged,
             this, &WatermarkProxyProvider::statusChanged);
 
-        *m_sourceProviderConnections << connect(m_sourceProvider, &ImageProvider::sizeHintChanged,
+        m_sourceProviderConnections << connect(m_sourceProvider, &ImageProvider::sizeHintChanged,
             this, &WatermarkProxyProvider::sizeHintChanged);
 
-        *m_sourceProviderConnections << connect(m_sourceProvider, &ImageProvider::imageChanged,
+        m_sourceProviderConnections << connect(m_sourceProvider, &ImageProvider::imageChanged,
             this, &WatermarkProxyProvider::setImage);
 
         setImage(m_sourceProvider->image());

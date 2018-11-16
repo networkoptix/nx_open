@@ -9,10 +9,11 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ComponentsModule }         from '../../components/components.module';
 import { ReleaseComponent }         from './release/release.component';
 import { DownloadHistoryComponent } from './download-history.component';
+import { TranslateModule }          from '@ngx-translate/core';
 
 const appRoutes: Routes = [
     {path: 'downloads/history', component: DownloadHistoryComponent},
-    {path: 'downloads/:build', component: DownloadHistoryComponent}
+    {path: 'downloads/:type', component: DownloadHistoryComponent}
 ];
 
 @NgModule({
@@ -21,6 +22,7 @@ const appRoutes: Routes = [
         BrowserModule,
         UpgradeModule,
         NgbModule,
+        TranslateModule,
 
         ComponentsModule
         // RouterModule.forChild(appRoutes)

@@ -18,7 +18,7 @@ namespace {
 
 static constexpr int kMsecInSec = 1000;
 
-const char * deviceType()
+static const char * deviceType()
 {
     return
 #ifdef _WIN32
@@ -28,7 +28,7 @@ const char * deviceType()
 #endif
 }
 
-bool isIFrame(const ffmpeg::Packet * packet)
+static bool isKeyFrame(const ffmpeg::Packet * packet)
 {
     if(!packet)
         return false;
@@ -296,11 +296,16 @@ void VideoStream::uninitialize()
     m_frameConsumerManager.flush();
 
     // Some cameras segfault if they are unintialized while there are still packets and / or frames
-    // allocated. They own the memory being referred to be the packet, so the packet needs to go
-    // be deallocated first.
+    // allocated. They own the memory being referred to be the packet, so the packets / frames
+    // need to be deallocated first. Beware, any strong references to the packets should be
+    // released ASAP to avoid endless spinning here.
     while (*m_packetCount > 0 || *m_frameCount > 0)
-        std::this_thread::sleep_for(std::chrono::milliseconds(30));
+    {
+        static constexpr std::chrono::milliseconds kSleep(30);
+        std::this_thread::sleep_for(kSleep);
+    }
 
+    // flush the decoder to avoid memory ownership problems described above.
     if (m_decoder)
         m_decoder->flush();
     m_decoder.reset(nullptr);
@@ -414,7 +419,7 @@ std::shared_ptr<ffmpeg::Packet> VideoStream::readFrame()
 
 #ifdef _WIN32
     // dshow input format does not set h264 key packet flag correctly, so do it manually
-    if (packet->codecId() == AV_CODEC_ID_H264 && isIFrame(packet.get()))
+    if (packet->codecId() == AV_CODEC_ID_H264 && isKeyFrame(packet.get()))
         packet->packet()->flags |= AV_PKT_FLAG_KEY;
 #endif
 

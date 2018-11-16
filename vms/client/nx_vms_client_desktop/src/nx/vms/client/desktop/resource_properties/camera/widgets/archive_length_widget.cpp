@@ -11,7 +11,7 @@
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/common/utils/check_box_utils.h>
 #include <nx/vms/client/desktop/common/utils/spin_box_utils.h>
-#include <nx/utils/disconnect_helper.h>
+#include <nx/utils/scoped_connections.h>
 
 namespace nx::vms::client::desktop {
 
@@ -46,21 +46,21 @@ Aligner* ArchiveLengthWidget::aligner() const
 
 void ArchiveLengthWidget::setStore(CameraSettingsDialogStore* store)
 {
-    m_storeConnections.reset(new QnDisconnectHelper());
+    m_storeConnections = {};
 
-    *m_storeConnections << connect(store, &CameraSettingsDialogStore::stateChanged,
+    m_storeConnections << connect(store, &CameraSettingsDialogStore::stateChanged,
         this, &ArchiveLengthWidget::loadState);
 
-    *m_storeConnections << connect(ui->checkBoxMinArchive, &QCheckBox::clicked,
+    m_storeConnections << connect(ui->checkBoxMinArchive, &QCheckBox::clicked,
         store, &CameraSettingsDialogStore::setMinRecordingDaysAutomatic);
 
-    *m_storeConnections << connect(ui->spinBoxMinDays, QnSpinboxIntValueChanged,
+    m_storeConnections << connect(ui->spinBoxMinDays, QnSpinboxIntValueChanged,
         store, &CameraSettingsDialogStore::setMinRecordingDaysValue);
 
-    *m_storeConnections << connect(ui->checkBoxMaxArchive, &QCheckBox::clicked,
+    m_storeConnections << connect(ui->checkBoxMaxArchive, &QCheckBox::clicked,
         store, &CameraSettingsDialogStore::setMaxRecordingDaysAutomatic);
 
-    *m_storeConnections << connect(ui->spinBoxMaxDays, QnSpinboxIntValueChanged,
+    m_storeConnections << connect(ui->spinBoxMaxDays, QnSpinboxIntValueChanged,
         store, &CameraSettingsDialogStore::setMaxRecordingDaysValue);
 }
 

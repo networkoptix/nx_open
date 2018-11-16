@@ -111,6 +111,16 @@ const localStorageProvider = {
     deps: ['$injector']
 };
 
+function locationProxyFactory(i: any) {
+    return i.get('locationProxyService');
+}
+
+const locationProxyProvider = {
+    provide   : 'locationProxyService',
+    useFactory: locationProxyFactory,
+    deps      : [ '$injector' ]
+};
+
 @NgModule({
     providers: [
         cloudApiServiceProvider
@@ -195,4 +205,12 @@ export class authorizationCheckServiceModule {
     ]
 })
 export class localStorageModule {
+}
+
+@NgModule({
+    providers: [
+        locationProxyProvider
+    ]
+})
+export class locationProxyModule {
 }

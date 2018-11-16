@@ -62,7 +62,6 @@
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <plugins/plugin_manager.h>
-#include <nx/mediaserver/server_meta_types.h>
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
 
 #include "wearable_lock_manager.h"
@@ -154,7 +153,6 @@ QnMediaServerModule::QnMediaServerModule(
 
     Q_INIT_RESOURCE(nx_vms_server);
     Q_INIT_RESOURCE(nx_vms_server_db);
-    nx::mediaserver::MetaTypes::initialize();
 
     if (serverSettings.get())
     {

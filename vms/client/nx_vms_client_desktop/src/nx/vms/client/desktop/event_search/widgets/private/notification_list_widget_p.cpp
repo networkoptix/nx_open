@@ -1,4 +1,5 @@
 #include "notification_list_widget_p.h"
+#include "tile_interaction_handler_p.h"
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QHBoxLayout>
@@ -128,7 +129,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     m_eventRibbon->setModel(new ConcatenationListModel(
         {systemHealthListModel, progressModel, separatorModel, m_notificationsModel}, this));
 
-    connect(m_eventRibbon, &EventRibbon::tileHovered, q, &NotificationListWidget::tileHovered);
+    connect(m_eventRibbon, &EventRibbon::hovered, q, &NotificationListWidget::tileHovered);
 
     connect(m_eventRibbon, &EventRibbon::unreadCountChanged,
         q, &NotificationListWidget::unreadCountChanged);
@@ -138,6 +139,8 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
         {
             m_placeholder->setVisible(count < 1);
         });
+
+    TileInteractionHandler::install(m_eventRibbon);
 }
 
 NotificationListWidget::Private::~Private()

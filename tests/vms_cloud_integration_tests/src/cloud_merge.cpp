@@ -158,7 +158,7 @@ protected:
         m_cdb.stop();
     }
 
-    void thenMergeSucceded()
+    void thenMergeSucceeded()
     {
         ASSERT_EQ(QnRestResult::Error::NoError, m_systemMergeFixture.prevMergeResult());
     }
@@ -182,6 +182,17 @@ protected:
         {
             ASSERT_TRUE(systemMergeHistory.front().verify(m_systemCloudCredentials.back().key));
         }
+    }
+
+    void andSlaveSystemDisappearedFromCloudDb()
+    {
+        std::vector<nx::cloud::db::api::SystemDataEx> systems;
+        ASSERT_EQ(
+            nx::cloud::db::api::ResultCode::ok,
+            m_cdb.getSystems(
+                m_cloudAccounts[0].email, m_cloudAccounts[0].password,
+                &systems));
+        ASSERT_EQ(1U, systems.size());
     }
 
     void thenMergedSystemDisappearedFromCloud()
@@ -287,13 +298,31 @@ protected:
 
     void thenMergeFullyCompleted()
     {
-        thenMergeSucceded();
+        thenMergeSucceeded();
         andAllServersAreInterconnected();
         andAllServersSynchronizedData();
         andMergeHistoryRecordIsAdded();
+
+        waitUntilVmsTransactionLogMatchesCloudOne();
+
+        andSlaveSystemDisappearedFromCloudDb();
     }
 
-    void waitUntilVmsTranscationLogMatchesCloudOne(int peerIndex = 0)
+    void waitToSystemToBeOnline()
+    {
+        for (;;)
+        {
+            if (systemIsOnline(m_systemMergeFixture.peer(0)
+                    .getCloudCredentials().systemId.toStdString()))
+            {
+                break;
+            }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+    }
+
+    void waitUntilVmsTransactionLogMatchesCloudOne(int peerIndex = 0)
     {
         auto mediaServerClient = m_systemMergeFixture.peer(peerIndex).mediaServerClient();
 
@@ -317,6 +346,13 @@ protected:
                 m_cloudAccounts[peerIndex].password,
                 m_systemMergeFixture.peer(peerIndex).getCloudCredentials().systemId.toStdString(),
                 &cloudTransactionLog);
+
+            std::sort(
+                vmsTransactionLog.begin(), vmsTransactionLog.end(),
+                [](const auto& left, const auto& right) { return left.tranGuid < right.tranGuid; });
+            std::sort(
+                cloudTransactionLog.begin(), cloudTransactionLog.end(),
+                [](const auto& left, const auto& right) { return left.tranGuid < right.tranGuid; });
 
             if (vmsTransactionLog == cloudTransactionLog)
                 break;
@@ -420,6 +456,20 @@ private:
             peerWrapper.endpoint());
         return true;
     }
+
+    bool systemIsOnline(const std::string& systemId)
+    {
+        nx::cloud::db::api::SystemDataEx system;
+        if (m_cdb.getSystem(
+                m_cloudAccounts[0].email, m_cloudAccounts[0].password,
+                systemId,
+                &system) != nx::cloud::db::api::ResultCode::ok)
+        {
+            return false;
+        }
+
+        return system.stateOfHealth == nx::cloud::db::api::SystemHealth::online;
+    }
 };
 
 std::unique_ptr<QnStaticCommonModule> CloudMerge::s_staticCommonModule;
@@ -467,7 +517,7 @@ TEST_F(CloudMerge, merging_non_cloud_system_to_a_cloud_one_does_not_affect_data_
     whenMergeSystems();
 
     thenMergeFullyCompleted();
-    waitUntilVmsTranscationLogMatchesCloudOne();
+    waitUntilVmsTransactionLogMatchesCloudOne();
 }
 
 TEST_F(CloudMerge, system_disconnected_from_cloud_is_properly_merged_with_a_cloud_system)
@@ -478,20 +528,20 @@ TEST_F(CloudMerge, system_disconnected_from_cloud_is_properly_merged_with_a_clou
     const auto someCloudUser = registerCloudUser();
 
     shareSystem(newerSystemIndex, someCloudUser);
-    waitUntilVmsTranscationLogMatchesCloudOne(newerSystemIndex);
+    waitUntilVmsTransactionLogMatchesCloudOne(newerSystemIndex);
 
     disconnectFromCloud(newerSystemIndex); //< Every cloud user is removed from system.
     assertUserIsNotAbleToLogin(newerSystemIndex, someCloudUser);
 
-    waitUntilVmsTranscationLogMatchesCloudOne(olderSystemIndex);
+    waitUntilVmsTransactionLogMatchesCloudOne(olderSystemIndex);
 
     whenMergeSystems();
     thenMergeFullyCompleted();
 
-    waitUntilVmsTranscationLogMatchesCloudOne(olderSystemIndex);
+    waitUntilVmsTransactionLogMatchesCloudOne(olderSystemIndex);
 
     shareSystem(olderSystemIndex, someCloudUser);
-    waitUntilVmsTranscationLogMatchesCloudOne(olderSystemIndex);
+    waitUntilVmsTransactionLogMatchesCloudOne(olderSystemIndex);
     assertUserIsAbleToLogin(olderSystemIndex, someCloudUser);
 }
 

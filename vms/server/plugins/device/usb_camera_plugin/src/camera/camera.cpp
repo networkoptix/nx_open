@@ -10,7 +10,7 @@ namespace usb_cam {
 
 namespace {
 
-size_t getPriorityCodecIndex(
+static size_t getPriorityCodecIndex(
     const std::vector<nxcip::CompressionType>& videoCodecPriorityList,
     const std::vector<device::CompressionTypeDescriptorPtr>& codecDescriptorList)
 {
@@ -27,7 +27,7 @@ size_t getPriorityCodecIndex(
     return codecDescriptorList.size();
 }
 
-device::CompressionTypeDescriptorPtr getPriorityDescriptor(
+static device::CompressionTypeDescriptorPtr getPriorityDescriptor(
     const std::vector<nxcip::CompressionType>& videoCodecPriorityList,
     const std::vector<device::CompressionTypeDescriptorPtr>& codecDescriptorList)
 {

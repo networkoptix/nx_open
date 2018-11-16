@@ -1,5 +1,7 @@
 #include "common_meta_types.h"
 
+#include <atomic>
+
 #include <QtCore/QMetaType>
 
 #include <nx/network/socket_common.h>
@@ -108,21 +110,19 @@
 
 #include <nx/utils/metatypes.h>
 
-namespace {
-bool qn_commonMetaTypes_initialized = false;
-}
-
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ResourceInfoLevel);
 
 void QnCommonMetaTypes::initialize()
 {
+    static std::atomic_bool initialized = false;
+
+    if (initialized.load())
+        return;
+
+    initialized = true;
+
     nx::utils::Metatypes::initialize();
     nx::vms::api::Metatypes::initialize();
-
-    /* Note that running the code twice is perfectly OK,
-     * so we don't need heavyweight synchronization here. */
-    if (qn_commonMetaTypes_initialized)
-        return;
 
     qRegisterMetaType<uintptr_t>("uintptr_t");
 
@@ -362,6 +362,4 @@ void QnCommonMetaTypes::initialize()
     QMetaType::registerConverter<std::chrono::seconds, std::chrono::milliseconds>();
     QMetaType::registerConverter<std::chrono::seconds, std::chrono::microseconds>();
     QMetaType::registerConverter<std::chrono::milliseconds, std::chrono::microseconds>();
-
-    qn_commonMetaTypes_initialized = true;
 }

@@ -30,7 +30,7 @@ private:
     QMutex m_mutex;
     const bool m_isAnalyzerInUse = false;
     std::uintptr_t threadHoldingMutex;
-    size_t recursiveLockCount;
+    size_t recursiveLockCount = 0;
     std::stack<MutexLockKey> currentLockStack; //< For recursive mutexes.
 };
 

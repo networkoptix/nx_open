@@ -1,4 +1,5 @@
 #include "abstract_search_widget_p.h"
+#include "tile_interaction_handler_p.h"
 #include "ui_abstract_search_widget.h"
 
 #include <chrono>
@@ -37,10 +38,9 @@
 
 namespace nx::vms::client::desktop {
 
-namespace {
-
-using namespace std::literals::chrono_literals;
 using namespace std::chrono;
+
+namespace {
 
 static constexpr int kPlaceholderFontPixelSize = 15;
 static constexpr milliseconds kQueuedFetchMoreDelay = 50ms;
@@ -198,14 +198,16 @@ void AbstractSearchWidget::Private::setupRibbon()
     connect(ui->ribbon->scrollBar(), &QScrollBar::valueChanged,
         this, &Private::requestFetchIfNeeded, Qt::QueuedConnection);
 
-    connect(ui->ribbon, &EventRibbon::tileHovered, q, &AbstractSearchWidget::tileHovered);
+    connect(ui->ribbon, &EventRibbon::hovered, q, &AbstractSearchWidget::tileHovered);
 
     connect(navigator(), &QnWorkbenchNavigator::timelinePositionChanged, this,
         [this]()
         {
             ui->ribbon->setHighlightedTimestamp(
-                std::chrono::microseconds(navigator()->positionUsec()));
+                microseconds(navigator()->positionUsec()));
         });
+
+    TileInteractionHandler::install(ui->ribbon);
 }
 
 void AbstractSearchWidget::Private::setupToolbar()
@@ -361,8 +363,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
 
     // Setup day change watcher.
 
-    using namespace std::chrono;
-    m_dayChangeTimer->setInterval(milliseconds(seconds(1)).count());
+    m_dayChangeTimer->setInterval(1s);
 
     connect(m_dayChangeTimer.data(), &QTimer::timeout,
         this, &Private::updateCurrentTimePeriod);

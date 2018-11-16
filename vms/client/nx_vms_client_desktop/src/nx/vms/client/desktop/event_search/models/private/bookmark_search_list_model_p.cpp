@@ -23,7 +23,6 @@ namespace nx::vms::client::desktop {
 namespace {
 
 using namespace std::chrono;
-using namespace std::literals::chrono_literals;
 
 static const auto lowerBoundPredicate =
     [](const QnCameraBookmark& left, milliseconds right) { return left.startTimeMs > right; };

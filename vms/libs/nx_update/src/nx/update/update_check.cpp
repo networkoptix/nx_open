@@ -31,13 +31,15 @@ struct CustomizationInfo
     QString updates_prefix;
     QString release_notes;
     QString description;
+    qint64 release_date = 0;
+    int release_delivery = 0;
     QMap<QString, nx::vms::api::SoftwareVersion> releases;
 };
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     CustomizationInfo,
     (json),
-    (current_release)(updates_prefix)(release_notes)(description)(releases))
+    (current_release)(updates_prefix)(release_notes)(release_date)(release_delivery)(description)(releases))
 
 struct FileData
 {
@@ -108,6 +110,8 @@ static InformationError findCustomizationInfo(
     }
 
     result->releaseNotesUrl = customizationInfo->release_notes;
+    result->releaseDeliveryDays = customizationInfo->release_delivery;
+    result->releaseDateMs = customizationInfo->release_date;
     return InformationError::noError;
 }
 
@@ -275,13 +279,6 @@ Information updateInformation(
 {
     auto version = qnStaticCommon->engineVersion();
     return updateInformationImpl(url, publicationKey, version, error, /*checkAlternativeServers*/ true);
-}
-
-Information updateInformation(const QString& /*zipFileName*/, InformationError* /*error*/)
-{
-    // TODO: Implement it.
-    // Right now ServerUpdateTool deals with zip package.
-    return Information();
 }
 
 static void setErrorMessage (const QString& message, QString* outMessage)

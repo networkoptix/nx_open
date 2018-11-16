@@ -55,5 +55,5 @@
      <button type="button" class="btn" ng-class="settings.buttonClass" enter-button
  ng-disabled="settings.needOldPassword && !settings.oldPassword || settings.createLoginAndPassword && !forms.localForm.$valid"
             ng-if="!settings.cancellable" ng-click="ok()" >{{settings.actionLabel}}</button>
-     <button type="button" class="btn" ng-class="settings.buttonClass" enter-button auto-focus ng-if="settings.cancellable" ng-click="close()" >Закрити</button>
+     <button type="button" class="btn" ng-class="settings.buttonClass" enter-button ng-if="settings.cancellable" ng-click="close()" >Закрити</button>
 </div>

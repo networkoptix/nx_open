@@ -5,24 +5,27 @@ import { BrowserAnimationsModule }                                        from '
 import { RouterModule, UrlHandlingStrategy, UrlTree }                     from '@angular/router';
 import { HttpClient, HttpClientModule }                                   from '@angular/common/http';
 
-import { NgbModule, NgbModal }              from '@ng-bootstrap/ng-bootstrap';
-import { OrderModule }                      from 'ngx-order-pipe';
-import { DeviceDetectorModule }             from 'ngx-device-detector';
-import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
-import { TranslateHttpLoader }              from '@ngx-translate/http-loader';
-import { CookieService }                    from 'ngx-cookie-service';
+import { NgbModule, NgbModal }                                from '@ng-bootstrap/ng-bootstrap';
+import { OrderModule }                                        from 'ngx-order-pipe';
+import { DeviceDetectorModule }                               from 'ngx-device-detector';
+import { TranslateModule, TranslateService, TranslateLoader } from '@ngx-translate/core';
+import { TranslateHttpLoader }                                from '@ngx-translate/http-loader';
+import { CookieService }                                      from 'ngx-cookie-service';
 
 import {
     cloudApiServiceModule, systemModule, systemsModule, languageServiceModule,
     accountServiceModule, processServiceModule, uuid2ServiceModule,
-    ngToastModule, configServiceModule, authorizationCheckServiceModule, localStorageModule
+    ngToastModule, configServiceModule, authorizationCheckServiceModule,
+    localStorageModule, locationProxyModule
 } from './src/ajs-upgrade/ajs-upgraded-providers';
 
-import { AppComponent }     from './app.component';
-import { DropdownsModule }  from './src/dropdowns/dropdowns.module';
-import { DialogsModule }    from './src/dialogs/dialogs.module';
-import { PagesModule }      from './src/pages/pages.module';
-import { DirectivesModule } from './src/directives/directives.module';
+import { AppComponent }        from './app.component';
+import { DropdownsModule }     from './src/dropdowns/dropdowns.module';
+import { DialogsModule }       from './src/dialogs/dialogs.module';
+import { PagesModule }         from './src/pages/pages.module';
+import { DirectivesModule }    from './src/directives/directives.module';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { ServiceModule }    from './src/services/services.module';
 
 // AoT requires an exported function for factories
 export function createTranslateLoader(http: HttpClient) {
@@ -32,10 +35,10 @@ export function createTranslateLoader(http: HttpClient) {
 class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
     shouldProcessUrl(url: UrlTree) {
         return url.toString().startsWith('/sandbox');
-        //return false;
-        //url.toString().startsWith('/download') ||
-        //url.toString().startsWith('/downloads') ||
-        //url.toString().startsWith('/browser');
+        // return false;
+        // url.toString().startsWith('/download') ||
+        // url.toString().startsWith('/downloads') ||
+        // url.toString().startsWith('/browser');
     }
 
     extract(url: UrlTree) {
@@ -48,7 +51,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
 }
 
 @NgModule({
-    imports: [
+    imports        : [
         CommonModule,
         BrowserModule,
         BrowserAnimationsModule,
@@ -65,40 +68,41 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         ngToastModule,
         configServiceModule,
         authorizationCheckServiceModule,
+        locationProxyModule,
         DropdownsModule,
         DialogsModule,
+        ServiceModule,
         PagesModule,
         DirectivesModule,
 
         TranslateModule.forRoot({
             loader: {
-                provide: TranslateLoader,
+                provide   : TranslateLoader,
                 useFactory: (createTranslateLoader),
-                deps: [HttpClient]
+                deps      : [ HttpClient ]
             }
         }),
         DeviceDetectorModule.forRoot(),
         NgbModule.forRoot(),
-        RouterModule.forRoot([], {initialNavigation: true})
+        RouterModule.forRoot([], { initialNavigation: true })
     ],
     entryComponents: [],
-    providers: [
+    providers      : [
         NgbModal,
         Location,
         CookieService,
-        {provide: LocationStrategy, useClass: PathLocationStrategy},
-        {provide: UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy},
+        TranslateService,
+        { provide: LocationStrategy, useClass: PathLocationStrategy },
+        { provide: UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy },
     ],
-    declarations: [
+    declarations   : [
         AppComponent
     ],
-    bootstrap: [AppComponent]
+    bootstrap      : [ AppComponent ]
 })
 
 export class AppModule {
     ngDoBootstrap() {
     }
 }
-
-
 

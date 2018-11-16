@@ -1,4 +1,4 @@
-Hello {{message.userFullName}},
+Bonjour {{message.userFullName}},
 
   S.V.P ouvrir le lien ci-dessous pour confirmer votre courriel et activer le compte.
 

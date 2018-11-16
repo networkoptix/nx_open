@@ -1,4 +1,4 @@
-Bienvenido a %PRODUCT_NAME%
+Bienvenido/a a %PRODUCT_NAME%
 
 {{#message.sharer_name}}
 {{message.sharer_name}} ({{message.sharer_email}}) le invita a unirse a %PRODUCT_NAME% Y compartió su sistema {{message.system_name}} con usted.
@@ -9,5 +9,5 @@ Es invitado a unirse %PRODUCT_NAME%.
 Se les ha concedido acceso a {{message.system_name}}.
 {{/message.sharer_name}}
 
-Registrar y ver el sistema: {{config.portal_url}}/register/{{message.code}}
+Registrar y ver el sistema: {{config.portal_url}}/registrar/{{message.code}}
 
