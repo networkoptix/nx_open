@@ -191,7 +191,7 @@ protected slots:
 
     void at_jumpToTimeAction_triggered();
 
-    void at_goToResourceAction_triggered();
+    void at_goToLayoutItemAction_triggered();
 
 private:
     void showSingleCameraErrorMessage(const QString& explanation = QString());

@@ -143,7 +143,7 @@ std::future<UpdateContents> ServerUpdateTool::checkUpdateFromFile(QString file)
     m_extractor->start();
     connect(m_extractor.get(), &QnZipExtractor::finished, this, &ServerUpdateTool::atExtractFilesFinished);
 
-    return m_offlineUpdateCheckResult.get_future();;
+    return m_offlineUpdateCheckResult.get_future();
 }
 
 std::future<UpdateContents> ServerUpdateTool::checkRemoteUpdateInfo()
@@ -566,9 +566,19 @@ void ServerUpdateTool::requestInstallAction(QSet<QnUuid> targets)
     NX_VERBOSE(this) << "requestInstallAction() for" << targets;
     m_updatesModel->setServersInstalling(targets);
 
+    auto callback = [tool=QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle)
+        {
+            Q_UNUSED(success)
+            if (tool)
+                tool->m_requestingInstall.remove(handle);
+        };
+
     for (auto it : m_activeServers)
         if (auto connection = getServerConnection(it.second))
-            connection->updateActionInstall({});
+        {
+            if (auto handle = connection->updateActionInstall(callback, thread()))
+                m_requestingInstall.insert(handle);
+        }
 }
 
 void ServerUpdateTool::atUpdateStatusResponse(bool success, rest::Handle handle,
@@ -645,6 +655,19 @@ QSet<QnUuid> ServerUpdateTool::getAllServers() const
         if (!item->server)
             continue;
         result.insert(item->server->getId());
+    }
+    return result;
+}
+
+std::map<QnUuid, nx::update::Status::Code> ServerUpdateTool::getAllServerStates() const
+{
+    std::map<QnUuid, nx::update::Status::Code> result;
+
+    for (const auto& item: m_updatesModel->getServerData())
+    {
+        if (!item->server)
+            continue;
+        result.insert(std::make_pair(item->server->getId(), item->state));
     }
     return result;
 }

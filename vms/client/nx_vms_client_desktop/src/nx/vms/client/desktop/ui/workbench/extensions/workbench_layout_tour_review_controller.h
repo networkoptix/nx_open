@@ -10,7 +10,7 @@
 
 #include <utils/common/connective.h>
 
-#include <nx/utils/disconnect_helper.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/utils/uuid.h>
 
 class QnWorkbenchLayout;
@@ -83,7 +83,7 @@ private:
     void at_removeCurrentLayoutTourAction_triggered();
 
 private:
-    QnDisconnectHelperPtr m_connections;
+    nx::utils::ScopedConnections m_connections;
     QHash<QnUuid, QnLayoutResourcePtr> m_reviewLayouts;
     QHash<QPoint, QSharedPointer<LayoutTourDropPlaceholder> > m_dropPlaceholders;
     QSet<QnUuid> m_saveToursQueue;

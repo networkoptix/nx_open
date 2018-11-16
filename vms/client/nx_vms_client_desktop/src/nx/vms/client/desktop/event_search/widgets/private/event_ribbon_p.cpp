@@ -1,4 +1,5 @@
 #include "event_ribbon_p.h"
+#include "event_ribbon_p.h"
 
 #include <algorithm>
 #include <chrono>
@@ -17,29 +18,24 @@
 #include <ui/style/helper.h>
 #include <ui/style/nx_style_p.h>
 #include <ui/workaround/hidpi_workarounds.h>
-#include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 
 #include <nx/api/mediaserver/image_request.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
-#include <nx/vms/client/desktop/ui/actions/action.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/scoped_connections.h>
 
 #include <nx/vms/client/desktop/ini.h>
 
 namespace nx::vms::client::desktop {
 
-namespace {
-
 using namespace std::chrono;
-using namespace std::literals::chrono_literals;
 
-static constexpr milliseconds kPreviewRequestDelay = 100ms;
+namespace {
 
 static constexpr int kDefaultTileSpacing = 1;
 static constexpr int kScrollBarStep = 16;
@@ -47,10 +43,10 @@ static constexpr int kScrollBarStep = 16;
 static constexpr int kDefaultThumbnailWidth = 224;
 static constexpr int kMaximumThumbnailWidth = 1024;
 
-static const auto kHighlightCurtainColor = QColor(Qt::white);
-static const qreal kHighlightCurtainOpacity = 0.25;
-static const auto kHighlightDuration = std::chrono::milliseconds(400);
-static const auto kAnimationDuration = std::chrono::milliseconds(250);
+static constexpr auto kHighlightCurtainColor = Qt::white;
+static constexpr qreal kHighlightCurtainOpacity = 0.25;
+static constexpr milliseconds kHighlightDuration = 400ms;
+static constexpr milliseconds kAnimationDuration = 250ms;
 
 QSize minimumWidgetSize(QWidget* widget)
 {
@@ -62,7 +58,6 @@ QSize minimumWidgetSize(QWidget* widget)
 } // namespace
 
 EventRibbon::Private::Private(EventRibbon* q):
-    QnWorkbenchContextAware(q),
     q(q),
     m_scrollBar(new QScrollBar(Qt::Vertical, q)),
     m_viewport(new QWidget(q))
@@ -89,7 +84,6 @@ EventRibbon::Private::Private(EventRibbon* q):
 
 EventRibbon::Private::~Private()
 {
-    m_modelConnections.reset();
 }
 
 QAbstractListModel* EventRibbon::Private::model() const
@@ -102,7 +96,7 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
     if (m_model == model)
         return;
 
-    m_modelConnections.reset();
+    m_modelConnections = {};
     clear();
 
     m_model = model;
@@ -112,35 +106,33 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
 
     insertNewTiles(0, m_model->rowCount(), UpdateMode::instant);
 
-    m_modelConnections.reset(new QnDisconnectHelper());
-
-    *m_modelConnections << connect(m_model, &QObject::destroyed, this,
+    m_modelConnections << connect(m_model, &QObject::destroyed, this,
         [this]()
         {
             m_model = nullptr;
             clear();
         });
 
-    *m_modelConnections << connect(m_model, &QAbstractListModel::modelReset, this,
+    m_modelConnections << connect(m_model, &QAbstractListModel::modelReset, this,
         [this]()
         {
             clear();
             insertNewTiles(0, m_model->rowCount(), UpdateMode::instant);
         });
 
-    *m_modelConnections << connect(m_model, &QAbstractListModel::rowsInserted, this,
+    m_modelConnections << connect(m_model, &QAbstractListModel::rowsInserted, this,
         [this](const QModelIndex& /*parent*/, int first, int last)
         {
             insertNewTiles(first, last - first + 1, UpdateMode::animated);
         });
 
-    *m_modelConnections << connect(m_model, &QAbstractListModel::rowsAboutToBeRemoved, this,
+    m_modelConnections << connect(m_model, &QAbstractListModel::rowsAboutToBeRemoved, this,
         [this](const QModelIndex& /*parent*/, int first, int last)
         {
             removeTiles(first, last - first + 1, UpdateMode::animated);
         });
 
-    *m_modelConnections << connect(m_model, &QAbstractListModel::dataChanged, this,
+    m_modelConnections << connect(m_model, &QAbstractListModel::dataChanged, this,
         [this](const QModelIndex& first, const QModelIndex& last)
         {
             const auto updateRange = m_visible.intersected({first.row(), last.row() + 1});
@@ -148,13 +140,13 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
                 updateTile(i);
         });
 
-    *m_modelConnections << connect(m_model, &QAbstractListModel::rowsAboutToBeMoved, this,
+    m_modelConnections << connect(m_model, &QAbstractListModel::rowsAboutToBeMoved, this,
         [this](const QModelIndex& /*sourceParent*/, int sourceFirst, int sourceLast)
         {
             removeTiles(sourceFirst, sourceLast - sourceFirst + 1, UpdateMode::instant);
         });
 
-    *m_modelConnections << connect(m_model, &QAbstractListModel::rowsMoved, this,
+    m_modelConnections << connect(m_model, &QAbstractListModel::rowsMoved, this,
         [this](const QModelIndex& /*parent*/, int sourceFirst, int sourceLast,
             const QModelIndex& /*destinationParent*/, int destinationIndex)
         {
@@ -224,7 +216,7 @@ void EventRibbon::Private::updateTile(int index)
     widget->setFooterText(modelIndex.data(Qn::AdditionalTextRole).toString());
     widget->setToolTip(modelIndex.data(Qt::ToolTipRole).toString());
     widget->setCloseable(modelIndex.data(Qn::RemovableRole).toBool());
-    widget->setAutoCloseTime(modelIndex.data(Qn::TimeoutRole).value<std::chrono::milliseconds>());
+    widget->setAutoCloseTime(modelIndex.data(Qn::TimeoutRole).value<milliseconds>());
     widget->setAction(modelIndex.data(Qn::CommandActionRole).value<CommandActionPtr>());
 
     const auto resourceList = modelIndex.data(Qn::ResourceListRole);
@@ -269,7 +261,7 @@ void EventRibbon::Private::updateTilePreview(int index)
     if (!previewCamera)
         return;
 
-    const auto previewTime = modelIndex.data(Qn::PreviewTimeRole).value<std::chrono::microseconds>();
+    const auto previewTime = modelIndex.data(Qn::PreviewTimeRole).value<microseconds>();
     const auto previewCropRect = modelIndex.data(Qn::ItemZoomRectRole).value<QRectF>();
     const auto thumbnailWidth = previewCropRect.isEmpty()
         ? kDefaultThumbnailWidth
@@ -290,30 +282,15 @@ void EventRibbon::Private::updateTilePreview(int index)
         ? nx::api::ImageRequest::RoundMethod::precise
         : nx::api::ImageRequest::RoundMethod::iFrameAfter;
 
-    const auto loadPreview =
-        [tile = std::weak_ptr<Tile>(m_tiles[index])]()
-        {
-            const auto locked = tile.lock();
-            if (locked && locked->preview && locked->widget)
-                locked->preview->loadAsync();
-        };
-
     auto& previewProvider = m_tiles[index]->preview;
-    if (previewProvider)
+    if (previewProvider && (request.camera != previewProvider->requestData().camera
+        || request.usecSinceEpoch != previewProvider->requestData().usecSinceEpoch))
     {
-        if (request.usecSinceEpoch != previewProvider->requestData().usecSinceEpoch
-            || request.camera != previewProvider->requestData().camera
-            || previewProvider->status() == Qn::ThumbnailStatus::Invalid)
-        {
-            previewProvider->setRequestData(request);
-            executeDelayedParented(loadPreview, kPreviewRequestDelay.count(), this);
-        }
+        previewProvider.reset();
     }
-    else
-    {
-        previewProvider.reset(new CameraThumbnailProvider(request, widget));
-        executeDelayedParented(loadPreview, kPreviewRequestDelay.count(), this);
-    }
+
+    if (!previewProvider)
+        previewProvider.reset(new CameraThumbnailProvider(request));
 
     widget->setPreview(previewProvider.get());
     widget->setPreviewCropRect(previewCropRect);
@@ -346,41 +323,31 @@ void EventRibbon::Private::ensureWidget(int index)
             {
                 const int index = indexOf(static_cast<EventTile*>(sender()));
                 if (m_model && index >= 0)
-                    m_model->setData(m_model->index(index), link, Qn::ActivateLinkRole);
+                    emit q->linkActivated(m_model->index(index), link);
             });
 
         connect(widget.get(), &EventTile::clicked, this,
+            [this](Qt::MouseButton button, Qt::KeyboardModifiers modifiers)
+            {
+                const int index = indexOf(static_cast<EventTile*>(sender()));
+                if (m_model && index >= 0)
+                    emit q->clicked(m_model->index(index), button, modifiers);
+            });
+
+        connect(widget.get(), &EventTile::doubleClicked, this,
             [this]()
             {
                 const int index = indexOf(static_cast<EventTile*>(sender()));
-                if (!m_model || index < 0)
-                    return;
+                if (m_model && index >= 0)
+                    emit q->doubleClicked(m_model->index(index));
+            });
 
-                const auto modelIndex = m_model->index(index);
-                if (m_model->setData(modelIndex, QVariant(), Qn::DefaultNotificationRole))
-                    return;
-
-                const auto timestamp = modelIndex.data(Qn::TimestampRole);
-                if (!timestamp.isValid())
-                    return;
-
-                const auto cameraList = modelIndex.data(Qn::ResourceListRole).value<QnResourceList>()
-                    .filtered<QnVirtualCameraResource>();
-
-                const auto camera = cameraList.size() == 1
-                    ? cameraList.back()
-                    : QnVirtualCameraResourcePtr();
-
-                using namespace ui::action;
-
-                if (camera)
-                {
-                    menu()->triggerIfPossible(GoToResourceAction, Parameters(camera)
-                        .withArgument(Qn::ForceRole, ini().raiseCameraFromClickedTile));
-                }
-
-                menu()->triggerIfPossible(JumpToTimeAction,
-                    Parameters().withArgument(Qn::TimestampRole, timestamp));
+        connect(widget.get(), &EventTile::dragStarted, this,
+            [this]()
+            {
+                const int index = indexOf(static_cast<EventTile*>(sender()));
+                if (m_model && index >= 0)
+                    emit q->dragStarted(m_model->index(index));
             });
 
         connect(widget.get(), &QWidget::customContextMenuRequested, this,
@@ -765,9 +732,6 @@ void EventRibbon::Private::updateHighlightedTiles()
     if (m_visible.isEmpty())
         return;
 
-    using namespace std::chrono;
-    using namespace std::literals::chrono_literals;
-
     const auto shouldHighlightTile =
         [this](int index) -> bool
         {
@@ -811,12 +775,12 @@ void EventRibbon::Private::setScrollBarPolicy(Qt::ScrollBarPolicy value)
     updateScrollBarVisibility();
 }
 
-std::chrono::microseconds EventRibbon::Private::highlightedTimestamp() const
+microseconds EventRibbon::Private::highlightedTimestamp() const
 {
     return m_highlightedTimestamp;
 }
 
-void EventRibbon::Private::setHighlightedTimestamp(std::chrono::microseconds value)
+void EventRibbon::Private::setHighlightedTimestamp(microseconds value)
 {
     if (m_highlightedTimestamp == value)
         return;
@@ -998,12 +962,10 @@ void EventRibbon::Private::highlightAppearance(EventTile* tile)
     if (!tile->isVisible())
         return;
 
-    using namespace std::chrono;
-
     auto animation = new QVariantAnimation(tile);
     animation->setStartValue(kHighlightCurtainOpacity);
     animation->setEndValue(0.0);
-    animation->setDuration(duration_cast<milliseconds>(kHighlightDuration).count());
+    animation->setDuration(kHighlightDuration.count());
     animation->setEasingCurve(QEasingCurve::InCubic);
 
     auto curtain = new CustomPainted<QWidget>(tile);
@@ -1032,13 +994,11 @@ void EventRibbon::Private::addAnimatedShift(int index, int shift)
     if (shift == 0)
         return;
 
-    using namespace std::chrono;
-
     auto animator = new QVariantAnimation(this);
     animator->setStartValue(qreal(shift));
     animator->setEndValue(0.0);
     animator->setEasingCurve(QEasingCurve::OutCubic);
-    animator->setDuration(duration_cast<milliseconds>(kAnimationDuration).count());
+    animator->setDuration(kAnimationDuration.count());
 
     connect(animator, &QObject::destroyed, this,
         [this, animator]() { m_itemShiftAnimations.remove(animator); });
@@ -1100,7 +1060,7 @@ void EventRibbon::Private::updateHover(bool hovered, const QPoint& mousePos)
         m_hoveredWidget = widget;
 
         const auto modelIndex = (m_model && widget) ? m_model->index(index) : QModelIndex();
-        emit q->tileHovered(modelIndex, widget);
+        emit q->hovered(modelIndex, widget);
     }
     else
     {
@@ -1108,7 +1068,7 @@ void EventRibbon::Private::updateHover(bool hovered, const QPoint& mousePos)
             return;
 
         m_hoveredWidget = nullptr;
-        emit q->tileHovered(QModelIndex(), nullptr);
+        emit q->hovered(QModelIndex(), nullptr);
     }
 }
 

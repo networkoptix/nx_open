@@ -119,7 +119,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     m_showButton->setZValue(BackgroundItemZOrder); /*< To make it paint under the tooltip. */
 
     connect(action(action::ToggleTreeAction), &QAction::toggled,
-        this, [this](bool opened) { setOpened(opened); });
+        this, [this](bool opened) { if (!m_blockAction) setOpened(opened); });
 
     action(action::PinTreeAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
     connect(action(action::PinTreeAction), &QAction::toggled, this,
@@ -208,9 +208,9 @@ void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
     m_showingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
     auto toggleAction = action(action::ToggleTreeAction);
-    toggleAction->blockSignals(true);
+    m_blockAction = true;
     toggleAction->setChecked(opened);
-    toggleAction->blockSignals(false);
+    m_blockAction = false;
 
     xAnimator->stop();
     qnWorkbenchAnimations->setupAnimator(xAnimator, opened

@@ -145,6 +145,8 @@ public:
     // Get current set of servers.
     QSet<QnUuid> getAllServers() const;
 
+    std::map<QnUuid, nx::update::Status::Code> getAllServerStates() const;
+
     // Get servers with specified update status.
     QSet<QnUuid> getServersInState(nx::update::Status::Code status) const;
 
@@ -249,6 +251,7 @@ private:
     // Time at which install command was issued.
     TimePoint m_timeStartedInstall;
     bool m_protoProblemDetected = false;
+    QSet<rest::Handle> m_requestingInstall;
 };
 
 /**

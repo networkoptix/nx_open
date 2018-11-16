@@ -25,6 +25,9 @@ AIOService::~AIOService()
 
 void AIOService::pleaseStopSync()
 {
+    for (auto& thread: m_aioThreadPool)
+        thread->pleaseStop();
+
     m_aioThreadPool.clear();
 }
 
