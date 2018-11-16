@@ -1,0 +1,25 @@
+BUILD_CONFIGURATION=release
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+NX_VMS_DIR=${NX_VMS_DIR:-$(dirname $DIR)}
+
+NX_PORTAL_DIR=$NX_VMS_DIR/cloud_portal
+
+if [ -n "$NX_VMS_DIR" -a -f "$NX_VMS_DIR/build_variables/target/version" ]
+then
+    VERSION=$(cat $NX_VMS_DIR/build_variables/target/version 2> /dev/null)
+    QT_VERSION=$(xmlstarlet sel -t -v '/_:project/_:profiles/_:profile[_:id="linux-noarm"]/_:properties/_:qt.version' $NX_VMS_DIR/pom.xml)
+else
+    VERSION=${VERSION:-3.0.0.0}
+    QT_VERSION=unknown
+fi
+
+export VERSION QT_VERSION
+
+# Build variables. No need to export.
+
+REVISION="$(cd $NX_VMS_DIR; hg id -i)"
+BUILD_DATE="$(TZ=GMT date)"
+BUILD_HOST="$(hostname)"
+BUILD_USER="$(id -un)"
