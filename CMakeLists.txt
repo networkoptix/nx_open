@@ -199,9 +199,10 @@ endif()
 #add_subdirectory(_dw_mtt_controller)
 
 add_subdirectory(vms)
+
+if(withWebsocketUtility)
     add_subdirectory(websocket_utility)
 endif()
-
 
 if(withTests)
     add_subdirectory(tests)
