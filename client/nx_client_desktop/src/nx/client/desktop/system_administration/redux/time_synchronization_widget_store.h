@@ -2,7 +2,7 @@
 
 #include <QtCore/QObject>
 
-#include "time_syncronization_widget_state.h"
+#include "time_synchronization_widget_state.h"
 
 namespace nx::client::desktop {
 

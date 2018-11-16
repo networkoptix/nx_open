@@ -6,7 +6,7 @@
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/utils/uuid.h>
 
-#include "../redux/time_syncronization_widget_state.h"
+#include "../redux/time_synchronization_widget_state.h"
 
 namespace nx::client::desktop {
 

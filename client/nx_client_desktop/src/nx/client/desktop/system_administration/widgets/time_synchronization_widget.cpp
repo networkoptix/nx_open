@@ -1,5 +1,5 @@
-#include "time_syncronization_widget.h"
-#include "ui_time_syncronization_widget.h"
+#include "time_synchronization_widget.h"
+#include "ui_time_synchronization_widget.h"
 
 #include <QtCore/QTimer>
 
@@ -17,12 +17,12 @@
 
 #include <nx/client/desktop/ui/common/color_theme.h>
 
-#include "../redux/time_syncronization_widget_store.h"
-#include "../redux/time_syncronization_widget_state.h"
+#include "../redux/time_synchronization_widget_store.h"
+#include "../redux/time_synchronization_widget_state.h"
 #include "../models/time_synchronization_servers_model.h"
 #include "../delegates/time_synchronization_servers_delegate.h"
-#include "../watchers/time_syncronization_server_time_watcher.h"
-#include "../watchers/time_syncronization_server_state_watcher.h"
+#include "../watchers/time_synchronization_server_time_watcher.h"
+#include "../watchers/time_synchronization_server_state_watcher.h"
 #include <ui/style/skin.h>
 #include <core/resource/resource_display_info.h>
 #include <nx/client/desktop/common/utils/item_view_hover_tracker.h>

@@ -1,4 +1,4 @@
-#include "time_syncronization_widget_state_reducer.h"
+#include "time_synchronization_widget_state_reducer.h"
 
 namespace nx::client::desktop {
 

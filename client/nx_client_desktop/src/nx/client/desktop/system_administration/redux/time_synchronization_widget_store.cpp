@@ -1,9 +1,9 @@
-#include "time_syncronization_widget_store.h"
+#include "time_synchronization_widget_store.h"
 
 #include <nx/client/desktop/common/redux/private_redux_store.h>
 
-#include "time_syncronization_widget_state.h"
-#include "time_syncronization_widget_state_reducer.h"
+#include "time_synchronization_widget_state.h"
+#include "time_synchronization_widget_state_reducer.h"
 
 #include <nx/utils/algorithm/index_of.h>
 
