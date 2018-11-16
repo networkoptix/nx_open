@@ -13,6 +13,18 @@
         h3 {
             margin : 0;
         }
+    
+        &-logo {
+            float               : left;
+            display             : flex;
+            align-items         : center;
+            height              : 48px;
+            max-width           : 160px;
+            background-size     : contain;
+            width               : 100%;
+            background-position : left center;
+            background-repeat   : no-repeat;
+        }
     }
     
     &--body {

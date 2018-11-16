@@ -9,8 +9,8 @@
 
             <nx-block fixed-height hoverable>
                 <header>
-                    <div class="card--header-logo">
-                        <img [src]="plugin.information.logo || defaultLogo">
+                    <div class="card--header-logo"
+                         [style.backgroundImage]="'url(' + plugin.information.logo + ')'">
                     </div>
                     <div class="card--header-info">
                         <div class="version">v. {{ plugin.information.version }}</div>

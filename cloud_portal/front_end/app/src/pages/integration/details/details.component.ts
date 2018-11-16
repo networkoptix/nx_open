@@ -30,24 +30,24 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
                     this._route.params.subscribe(params => {
                         this.plugin = this.integrationService.getPluginBy(params.plugin);
 
-                        if (this.plugin) {
-                            // build static info if properties of plugin are populated
-                            // to simplify blocks visibility
-                            for (const param in this.plugin) {
-                                if (this.plugin.hasOwnProperty(param) && typeof(this.plugin[param]) === 'object') {
-                                    this.plugin[param].hasInfo = false;
-
-                                    for (const key in this.plugin[param]) {
-                                        if (this.plugin[param].hasOwnProperty(key)) {
-                                            if (key !== 'hasInfo' && this.plugin[param][key] !== '') {
-                                                this.plugin[param].hasInfo = true;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        // if (this.plugin) {
+                        //     // build static info if properties of plugin are populated
+                        //     // to simplify blocks visibility
+                        //     for (const param in this.plugin) {
+                        //         if (this.plugin.hasOwnProperty(param) && typeof(this.plugin[param]) === 'object') {
+                        //             this.plugin[param].hasInfo = false;
+                        //
+                        //             for (const key in this.plugin[param]) {
+                        //                 if (this.plugin[param].hasOwnProperty(key)) {
+                        //                     if (key !== 'hasInfo' && this.plugin[param][key] !== '') {
+                        //                         this.plugin[param].hasInfo = true;
+                        //                         break;
+                        //                     }
+                        //                 }
+                        //             }
+                        //         }
+                        //     }
+                        // }
                     });
                 });
     }

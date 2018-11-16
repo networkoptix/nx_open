@@ -44,6 +44,10 @@ export class NxIntegrationsListComponent implements OnInit, OnDestroy, OnChanges
         return platformIcons;
     }
 
+    setPlugunLogo(plugin) {
+        plugin.information.logo = plugin.information.logo || this.defaultLogo;
+    }
+
     ngOnInit(): void {
     }
 
@@ -55,6 +59,7 @@ export class NxIntegrationsListComponent implements OnInit, OnDestroy, OnChanges
             // inject platform icons info
             this.list.forEach((plugin) => {
                 plugin.information.platforms.icons = this.getPlatformIconsFor(plugin);
+                this.setPlugunLogo(plugin);
             });
         }
     }
