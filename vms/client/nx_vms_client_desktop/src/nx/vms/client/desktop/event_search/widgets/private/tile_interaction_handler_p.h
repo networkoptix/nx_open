@@ -21,6 +21,8 @@ class TileInteractionHandler:
     using base_type = QObject;
 
 public:
+    virtual ~TileInteractionHandler() override;
+
     static TileInteractionHandler* install(EventRibbon* ribbon);
 
 private:

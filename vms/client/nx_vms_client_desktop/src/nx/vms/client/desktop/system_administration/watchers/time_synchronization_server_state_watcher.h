@@ -22,6 +22,7 @@ class TimeSynchronizationServerStateWatcher:
 public:
     explicit TimeSynchronizationServerStateWatcher(TimeSynchronizationWidgetStore* store,
         QObject* parent = nullptr);
+    virtual ~TimeSynchronizationServerStateWatcher() override;
 
 private:
     class Private;

@@ -34,6 +34,10 @@ milliseconds doubleClickInterval()
 
 } // namespace
 
+TileInteractionHandler::~TileInteractionHandler()
+{
+}
+
 TileInteractionHandler* TileInteractionHandler::install(EventRibbon* ribbon)
 {
     NX_ASSERT(ribbon);

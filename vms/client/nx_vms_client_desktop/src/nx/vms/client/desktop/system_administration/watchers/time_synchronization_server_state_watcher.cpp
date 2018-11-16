@@ -96,4 +96,8 @@ TimeSynchronizationServerStateWatcher::TimeSynchronizationServerStateWatcher(
 {
 }
 
+TimeSynchronizationServerStateWatcher::~TimeSynchronizationServerStateWatcher()
+{
+}
+
 } // namespace nx::vms::client::desktop

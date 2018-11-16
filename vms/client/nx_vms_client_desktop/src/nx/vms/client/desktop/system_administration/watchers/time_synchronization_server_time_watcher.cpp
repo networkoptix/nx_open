@@ -81,7 +81,11 @@ TimeSynchronizationServerTimeWatcher::TimeSynchronizationServerTimeWatcher(
     d(new Private(this, store))
 {
 }
-    
+
+TimeSynchronizationServerTimeWatcher::~TimeSynchronizationServerTimeWatcher()
+{
+}
+
 void TimeSynchronizationServerTimeWatcher::updateTimestamps()
 {
     d->updateTimestamps();

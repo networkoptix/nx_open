@@ -22,6 +22,7 @@ class TimeSynchronizationServerTimeWatcher:
 public:
     explicit TimeSynchronizationServerTimeWatcher(TimeSynchronizationWidgetStore* store,
         QObject* parent = nullptr);
+    virtual ~TimeSynchronizationServerTimeWatcher() override;
 
 public slots:
     void updateTimestamps();
