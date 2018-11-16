@@ -49,7 +49,7 @@ add_subdirectory(generic_multicast_plugin)
 
 add_subdirectory(analytics)
 
-if (NOT box OR box STREQUAL "none" OR box STREQUAL "rpi")
+if(NOT box MATCHES "bpi|bananapi|edge1")
     add_subdirectory(usb_cam)
 endif()
 
