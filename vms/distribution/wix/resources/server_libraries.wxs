@@ -23,9 +23,9 @@
         <ComponentGroup Id="server_plugins"
                 Source="$(var.PluginsDir)"
                 Directory="plugins">
-            <Component><File Name="genericrtspplugin.dll" KeyPath="yes"/></Component>
-            <Component><File Name="mjpg_link.dll" KeyPath="yes"/></Component>
-            <Component><File Name="usb_cam.dll" KeyPath="yes"/></Component>
+            <Component><File Name="generic_rtsp_plugin.dll" KeyPath="yes"/></Component>
+            <Component><File Name="mjpeg_link_plugin.dll" KeyPath="yes"/></Component>
+            <Component><File Name="usb_camera_plugin.dll" KeyPath="yes"/></Component>
             <Component><File Name="generic_multicast_plugin.dll" KeyPath="yes"/></Component>
             <Component><File Name="dw_mtt_analytics_plugin.dll" KeyPath="yes"/></Component>
             <Component><File Name="hikvision_analytics_plugin.dll" KeyPath="yes"/></Component>

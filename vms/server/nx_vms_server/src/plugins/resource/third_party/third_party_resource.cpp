@@ -31,6 +31,34 @@ static const QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
 static const float DEFAULT_MAX_FPS_IN_CASE_IF_UNKNOWN = 30.0;
 const QString QnThirdPartyResource::AUX_DATA_PARAM_NAME = QLatin1String("aux_data");
 
+static const std::map<Qn::CameraCapability, nxcip::BaseCameraManager::CameraCapability>
+    kDeviceCapabilityMap =
+{
+    {Qn::CameraTimeCapability, nxcip::BaseCameraManager::cameraTimeCapability},
+    {Qn::InputPortCapability, nxcip::BaseCameraManager::relayOutputCapability},
+    {Qn::OutputPortCapability, nxcip::BaseCameraManager::relayOutputCapability},
+    {Qn::ShareIpCapability, nxcip::BaseCameraManager::shareIpCapability},
+    {Qn::CustomMediaUrlCapability, nxcip::BaseCameraManager::customMediaUrlCapability},
+    {Qn::FixedQualityCapability, nxcip::BaseCameraManager::fixedQualityCapability},
+};
+
+static const std::map<Ptz::Capability, nxcip::CameraPtzManager::Capability>
+    kPtzCapabilityMap =
+{
+    {Ptz::ContinuousPanCapability, nxcip::CameraPtzManager::ContinuousPanCapability},
+    {Ptz::ContinuousTiltCapability, nxcip::CameraPtzManager::ContinuousTiltCapability},
+    {Ptz::ContinuousZoomCapability, nxcip::CameraPtzManager::ContinuousZoomCapability},
+
+    {Ptz::AbsolutePanCapability, nxcip::CameraPtzManager::AbsolutePanCapability},
+    {Ptz::AbsoluteTiltCapability, nxcip::CameraPtzManager::AbsoluteTiltCapability},
+    {Ptz::AbsoluteZoomCapability, nxcip::CameraPtzManager::AbsoluteZoomCapability},
+
+    {Ptz::FlipPtzCapability, nxcip::CameraPtzManager::FlipPtzCapability},
+    {Ptz::LimitsPtzCapability, nxcip::CameraPtzManager::LimitsPtzCapability},
+    {Ptz::DevicePositioningPtzCapability, nxcip::CameraPtzManager::DevicePositioningPtzCapability},
+    {Ptz::LogicalPositioningPtzCapability, nxcip::CameraPtzManager::LogicalPositioningPtzCapability},
+};
+
 QnThirdPartyResource::QnThirdPartyResource(
     QnMediaServerModule* serverModule,
     const nxcip::CameraInfo& camInfo,
@@ -511,44 +539,18 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
         return CameraDiagnostics::UnknownErrorResult();
     }
 
-    setCameraCapability(Qn::CameraTimeCapability,
-        cameraCapabilities & nxcip::BaseCameraManager::cameraTimeCapability);
-    if(cameraCapabilities & nxcip::BaseCameraManager::relayInputCapability)
-        setCameraCapability( Qn::InputPortCapability, true );
-    if(cameraCapabilities & nxcip::BaseCameraManager::relayOutputCapability)
-        setCameraCapability( Qn::OutputPortCapability, true );
-    if(cameraCapabilities & nxcip::BaseCameraManager::shareIpCapability)
-        setCameraCapability( Qn::ShareIpCapability, true );
-    if(cameraCapabilities & nxcip::BaseCameraManager::customMediaUrlCapability)
-        setCameraCapability( Qn::CustomMediaUrlCapability, true );
-    if(cameraCapabilities & nxcip::BaseCameraManager::ptzCapability)
+    for (const auto& [nxCapabilty, pluginCapability]: kDeviceCapabilityMap)
+        setCameraCapability(nxCapabilty, cameraCapabilities & pluginCapability);
+
+    if (cameraCapabilities & nxcip::BaseCameraManager::ptzCapability)
     {
-        nxcip::CameraPtzManager* ptzManager = m_camManager->getPtzManager();
-        if( ptzManager )
+        if (nxcip::CameraPtzManager* ptzManager = m_camManager->getPtzManager())
         {
             const int ptzCapabilities = ptzManager->getCapabilities();
-            if(ptzCapabilities & nxcip::CameraPtzManager::ContinuousPanCapability)
-                setPtzCapability( Ptz::ContinuousPanCapability, true );
-            if(ptzCapabilities & nxcip::CameraPtzManager::ContinuousTiltCapability)
-                setPtzCapability( Ptz::ContinuousTiltCapability, true );
-            if(ptzCapabilities & nxcip::CameraPtzManager::ContinuousZoomCapability)
-                setPtzCapability( Ptz::ContinuousZoomCapability, true );
-            if(ptzCapabilities & nxcip::CameraPtzManager::AbsolutePanCapability)
-                setPtzCapability( Ptz::AbsolutePanCapability, true );
-            if(ptzCapabilities & nxcip::CameraPtzManager::AbsoluteTiltCapability)
-                setPtzCapability( Ptz::AbsoluteTiltCapability, true );
-            if(ptzCapabilities & nxcip::CameraPtzManager::AbsoluteZoomCapability)
-                setPtzCapability( Ptz::AbsoluteZoomCapability, true );
-            if(ptzCapabilities & nxcip::CameraPtzManager::FlipPtzCapability)
-                setPtzCapability( Ptz::FlipPtzCapability, true );
-            if(ptzCapabilities & nxcip::CameraPtzManager::LimitsPtzCapability)
-                setPtzCapability( Ptz::LimitsPtzCapability, true );
-            if(ptzCapabilities & nxcip::CameraPtzManager::DevicePositioningPtzCapability)
-                setPtzCapability( Ptz::DevicePositioningPtzCapability, true );
-            if(ptzCapabilities & nxcip::CameraPtzManager::LogicalPositioningPtzCapability)
-                setPtzCapability( Ptz::LogicalPositioningPtzCapability, true );
+            ptzManager->releaseRef();
+            for (const auto& [nxCapabilty, pluginCapability]: kPtzCapabilityMap)
+                setPtzCapability(nxCapabilty, ptzCapabilities & pluginCapability);
         }
-        ptzManager->releaseRef();
     }
 
     bool hasDualStreaming = m_encoderCount > 1;

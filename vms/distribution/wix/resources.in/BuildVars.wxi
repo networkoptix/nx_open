@@ -48,7 +48,6 @@
         <?define clientExeName = "${display.product.name}"?>
         <?define nxtoolExeName = "${nxtool.company.name} Server Tool"?>
 
-        <?define quicksync = "${quicksync}"?>
         <?define defaultTranslation = "${defaultTranslation}"?>
         <?define companyInstallPath = "${windowsInstallPath}"?>
 

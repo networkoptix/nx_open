@@ -39,20 +39,7 @@ function(nx_add_server_plugin target)
     )
 endfunction()
 
-add_subdirectory(genericrtspplugin)
-
-add_subdirectory(image_library_plugin)
-
-add_subdirectory(mjpg_link)
-
-add_subdirectory(generic_multicast_plugin)
-
 add_subdirectory(analytics)
 
-if(NOT box MATCHES "bpi|bananapi|edge1")
-    add_subdirectory(usb_cam)
-endif()
+add_subdirectory(device)
 
-if(LINUX AND box STREQUAL "none")
-    add_subdirectory(it930x_plugin)
-endif()

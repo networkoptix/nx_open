@@ -15,13 +15,6 @@
             <Component><File Name="OpenAL32.dll" KeyPath="yes"/></Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="client_plugins" Source="$(var.PluginsDir)" Directory="plugins">
-            <?if $(var.quicksync) = true ?>
-                <Component><File Name="quicksyncdecoder.dll" KeyPath="yes"/></Component>
-                <Component><File Name="hw_decoding_conf.xml" KeyPath="yes"/></Component>
-            <?endif?>
-        </ComponentGroup>
-
         <ComponentGroup Id="client_qt_libraries" Source="$(var.QtDir)" Directory="InstallDirRoot">
             <Component><File Name="Qt5OpenGL.dll" KeyPath="yes"/></Component>
             <Component><File Name="Qt5WebChannel.dll" KeyPath="yes"/></Component>

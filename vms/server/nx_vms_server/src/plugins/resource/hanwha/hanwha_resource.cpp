@@ -1087,15 +1087,15 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
         return CameraDiagnostics::ServerTerminatedResult();
 
     if (isNvr() && !isVideoSourceActive())
-        return CameraDiagnostics::CameraInvalidParams(lit("Video source is not active"));
+        return CameraDiagnostics::CameraInvalidParams("Video source is not active");
 
     const auto videoProfiles = sharedContext()->videoProfiles();
     if (!videoProfiles)
         return videoProfiles.diagnostics;
 
     const auto channel = getChannel();
-    m_capabilities.hasAudio = m_attributes.attribute<int>(
-        lit("Media/MaxAudioInput/%1").arg(channel)) > 0;
+    m_capabilities.hasAudio = isNvr() //< We assume NVR channels are always capable of audio stream.
+        || m_attributes.attribute<int>(lm("Media/MaxAudioInput/%1").arg(channel)) > 0;
 
     if (isConnectedViaSunapi())
     {
@@ -3567,6 +3567,36 @@ boost::optional<int> HanwhaResource::bypassChannel() const
     return boost::none;
 }
 
+CameraDiagnostics::Result HanwhaResource::enableAudioInput()
+{
+    const auto audioInputEnabledParameter =
+        m_cgiParameters.parameter("media/audioinput/set/Enable");
+
+    if (!audioInputEnabledParameter)
+    {
+        NX_DEBUG(
+            this,
+            "media/audioinput/set/Enable parameter is not supported by device: %1 (%2)",
+            getUserDefinedName(), getId());
+
+        return CameraDiagnostics::NoErrorResult();
+    }
+
+    HanwhaRequestHelper helper(sharedContext());
+    const auto response = helper.set("media/audioinput", {
+        {"Enable", kHanwhaTrue},
+        {"Channel", QString::number(getChannel())}
+    });
+
+    if (!response.isSuccessful())
+    {
+        return CameraDiagnostics::RequestFailedResult(
+            response.requestUrl(), response.errorString());
+    }
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
 bool HanwhaResource::isNvr() const
 {
     return m_deviceType == HanwhaDeviceType::nvr;
@@ -3803,7 +3833,7 @@ HanwhaProfileParameters HanwhaResource::makeProfileParameters(
     else
         result.emplace(kHanwhaProfileNumberProperty, QString::number(profileByRole(role)));
 
-    auto audioInputEnableParameter = cgiParameters().parameter(
+    const auto audioInputEnableParameter = cgiParameters().parameter(
         QString("media/videoprofile/add_update/") + kHanwhaAudioInputEnableProperty);
 
     if (flags.testFlag(HanwhaProfileParameterFlag::audioSupported) && audioInputEnableParameter)
