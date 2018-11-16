@@ -155,7 +155,7 @@ protected:
             modifiedTran = srcTran;
             ec2::amendOutputDataIfNeeded(connection.staticCast<Connection>()->userAccessData(), &modifiedTran.params);
         }
-        const ec2::QnTransaction<T>& tran(connection->remotePeer().isServer() ? srcTran : modifiedTran);
+        const ec2::QnTransaction<T>& tran(connection->remotePeer().isClient() ? modifiedTran : srcTran);
 
         if (connection->remotePeer().isServer())
         {
