@@ -14,7 +14,7 @@
     "AUTOTESTS OFFLINE TEXT": "desconectado",
     "NEW PERMISSIONS SAVED": "Nuevos permisos guardados",
     "PERMISSIONS WERE REMOVED FROM": "Los permisos fueron removidos de %email%",
-    "SYSYEM DELETED FROM ACCOUNT": "Sistema {{message.system_name}} se ha eliminado de su cuenta",
+    "SYSYEM DELETED FROM ACCOUNT": "Sistema {{system_name}} se ha eliminado de su cuenta",
     "RESET SUCCESS MESSAGE TEXT": "Contraseña establecida exitosamente",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "Su cuenta se ha guardado",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "Su cuenta se ha guardado",

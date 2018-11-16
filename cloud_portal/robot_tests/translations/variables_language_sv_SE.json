@@ -14,7 +14,7 @@
     "AUTOTESTS OFFLINE TEXT": "frånkopplade",
     "NEW PERMISSIONS SAVED": "Nya behörigheter sparades",
     "PERMISSIONS WERE REMOVED FROM": "Permissions were removed from %email%",
-    "SYSYEM DELETED FROM ACCOUNT": "System {{message.system_name}} is successfully deleted from your account",
+    "SYSYEM DELETED FROM ACCOUNT": "System {{system_name}} har tagits bort från ditt konto",
     "RESET SUCCESS MESSAGE TEXT": "Lösenordet har sparats",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "Ditt konto har sparats",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "Ditt konto har aktiverats",

@@ -14,7 +14,7 @@
     "AUTOTESTS OFFLINE TEXT": "오프라인",
     "NEW PERMISSIONS SAVED": "새 권한이 저장되었습니다.",
     "PERMISSIONS WERE REMOVED FROM": "권한이 %email% 에서 제거 되었습니다.",
-    "SYSYEM DELETED FROM ACCOUNT": "{{message.system_name}} 시스템이 계정에서 성공적으로 삭제되었습니다.",
+    "SYSYEM DELETED FROM ACCOUNT": "시스템 {{system_name}}이 (가) 귀하의 계정에서 성공적으로 삭제되었습니다.",
     "RESET SUCCESS MESSAGE TEXT": "암호가 정상적으로 저장되었습니다",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "계정이 성공적으로 저장되었습니다.",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "당신의 계정이 성공적으로 활성화 되었습니다",

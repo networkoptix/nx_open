@@ -70,7 +70,7 @@ Log In
     Click Button    ${LOG IN BUTTON}
 
 Validate Log In
-    Wait Until Page Contains Element    ${AUTHORIZED BODY}    20
+    Wait Until Page Contains Element    ${AUTHORIZED BODY}
     Wait Until Elements Are Visible    ${ACCOUNT DROPDOWN}
     Check Language
     Sleep    1    #this is a test to see if it eliminates a problem with the login dialog popping up on logout
@@ -87,7 +87,7 @@ Log Out
 
 Validate Log Out
     Wait Until Element Is Not Visible    ${BACKDROP}
-    Wait Until Page Contains Element    ${ANONYMOUS BODY}    20
+    Wait Until Page Contains Element    ${ANONYMOUS BODY}
 
 Register
     [arguments]    ${first name}    ${last name}    ${email}    ${password}    ${checked}=false
@@ -226,7 +226,7 @@ Failure Tasks
 Wait Until Elements Are Visible
     [arguments]    @{elements}
     :FOR     ${element}  IN  @{elements}
-    \  Wait Until Element Is Visible    ${element}    10
+    \  Wait Until Element Is Visible    ${element}
 
 Elements Should Not Be Visible
     [arguments]    @{elements}

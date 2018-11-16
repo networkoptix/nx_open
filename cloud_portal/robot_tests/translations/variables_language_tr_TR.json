@@ -14,7 +14,7 @@
     "AUTOTESTS OFFLINE TEXT": "çevrimdışı",
     "NEW PERMISSIONS SAVED": "Yeni izin kaydedildi",
     "PERMISSIONS WERE REMOVED FROM": "İzinler %email%'den kaldırıldı",
-    "SYSYEM DELETED FROM ACCOUNT": "System {{message.system_name}} is successfully deleted from your account",
+    "SYSYEM DELETED FROM ACCOUNT": "{{system_name}} sistemi hesabınızdan başarıyla silindi",
     "RESET SUCCESS MESSAGE TEXT": "Parola başarıyla kaydedildi",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "Hesabınız başarıyla kaydedildi",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "Hesabın başarıyla aktif edildi",

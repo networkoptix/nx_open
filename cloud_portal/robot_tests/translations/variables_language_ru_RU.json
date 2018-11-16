@@ -14,7 +14,7 @@
     "AUTOTESTS OFFLINE TEXT": "не в сети",
     "NEW PERMISSIONS SAVED": "Новые полномочия сохранены",
     "PERMISSIONS WERE REMOVED FROM": "%email% был лишен полномочий",
-    "SYSYEM DELETED FROM ACCOUNT": "Система {{message.system_name}} успешно удалена из вашей учетной записи",
+    "SYSYEM DELETED FROM ACCOUNT": "Система {{system_name}} успешно удалена из вашей учетной записи",
     "RESET SUCCESS MESSAGE TEXT": "Пароль успешно сохранен",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "Ваша учетная запись успешно сохранена",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "Ваша учетная запись успешно активирована",

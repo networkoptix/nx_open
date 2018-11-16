@@ -14,7 +14,7 @@
     "AUTOTESTS OFFLINE TEXT": "離線",
     "NEW PERMISSIONS SAVED": "新權限已儲存",
     "PERMISSIONS WERE REMOVED FROM": "權限從 %email% 被移除",
-    "SYSYEM DELETED FROM ACCOUNT": "從您的帳戶成功刪除系統 {{message.system_name}}",
+    "SYSYEM DELETED FROM ACCOUNT": "從您的帳戶成功刪除系統 {{system_name}}",
     "RESET SUCCESS MESSAGE TEXT": "密碼已成功儲存",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "您的帳號已成功儲存",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "您的帳號已成功啟動",

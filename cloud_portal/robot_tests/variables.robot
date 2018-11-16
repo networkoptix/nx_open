@@ -254,8 +254,8 @@ ${300CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfg
 ${255CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopas
 
 #Eye icons for password forms
-${EYE ICON OPEN}             //span[contains(@class, "glyphicon-eye-open")]
-${EYE ICON CLOSED}           //span[contains(@class, "glyphicon-eye-close")]
+${EYE ICON OPEN}             //span[@ng-if="!passwordVisible"]
+${EYE ICON CLOSED}           //span[@ng-if="passwordVisible"]
 
 #ASCII
 ${ESCAPE}                             \\27
