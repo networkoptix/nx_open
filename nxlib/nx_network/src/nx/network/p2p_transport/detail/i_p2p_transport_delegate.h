@@ -7,7 +7,7 @@ namespace nx::network::detail {
 class IP2PSocketDelegate: public aio::AbstractAsyncChannel
 {
 public:
-    virtual void start() = 0;
+    virtual SocketAddress getForeignAddress() const = 0;
 };
 
 } // namespace nx::network::detail
