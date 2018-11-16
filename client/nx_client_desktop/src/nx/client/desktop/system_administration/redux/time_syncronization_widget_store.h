@@ -32,6 +32,10 @@ public:
         const QnUuid& primaryTimeServer,
         const QList<State::ServerInfo>& servers);
 
+    void addServer(const State::ServerInfo& serverInfo);
+    void removeServer(const QnUuid& id);
+    void setServerOnline(const QnUuid &id, bool isOnline);
+
     void setReadOnly(bool value);
     void setSyncTimeWithInternet(bool value);
     void disableSync();

@@ -49,6 +49,24 @@ void TimeSynchronizationWidgetStore::initialize(
         });
 }
 
+void TimeSynchronizationWidgetStore::addServer(const State::ServerInfo &serverInfo)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::addServer(std::move(state), serverInfo); });
+}
+
+void TimeSynchronizationWidgetStore::removeServer(const QnUuid& id)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::removeServer(std::move(state), id); });
+}
+
+void TimeSynchronizationWidgetStore::setServerOnline(const QnUuid &id, bool isOnline)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setServerOnline(std::move(state), id, isOnline); });
+}
+
 void TimeSynchronizationWidgetStore::setReadOnly(bool value)
 {
     d->executeAction([&](State state) { return Reducer::setReadOnly(std::move(state), value); });
@@ -90,15 +108,8 @@ void TimeSynchronizationWidgetStore::setTimeOffsets(const TimeOffsetInfoList &of
                     return server.id == offsetInfo.serverId;
                 });
 
-                if (idx < 0)
+                if (idx >= 0)
                 {
-                    server.online = false;
-                    server.osTimeOffset = 0;
-                    server.vmsTimeOffset = 0;
-                }
-                else
-                {
-                    server.online = true;
                     server.osTimeOffset = offsetList[idx].osTimeOffset;
                     server.vmsTimeOffset = offsetList[idx].vmsTimeOffset;
                 }

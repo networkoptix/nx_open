@@ -121,6 +121,55 @@ Result TimeSynchronizationWidgetReducer::selectServer(State state, const QnUuid&
     return {true, std::move(state)};
 }
 
+
+Result TimeSynchronizationWidgetReducer::addServer(State state, const State::ServerInfo& serverInfo)
+{
+    const auto& id = serverInfo.id;
+    auto& servers = state.servers;
+    if (std::find_if(servers.cbegin(), servers.cend(),
+        [id](const auto& info) { return info.id == id; }) == servers.cend())
+    {
+        servers.push_back(serverInfo);
+        return {true, std::move(state)};
+    }
+    else
+        return {false, std::move(state)};
+}
+
+Result TimeSynchronizationWidgetReducer::removeServer(State state, const QnUuid& id)
+{
+    auto& servers = state.servers;
+    auto& it = std::find_if(servers.begin(), servers.end(),
+        [id](const auto& info) { return info.id == id; });
+    if (it != servers.end())
+    {
+        servers.erase(it);
+        state.status = actualStatus(state);
+        return {true, std::move(state)};
+    }
+    else
+        return {false, std::move(state)};
+}
+
+Result TimeSynchronizationWidgetReducer::setServerOnline(State state, const QnUuid& serverId, bool isOnline)
+{
+    for (auto& server: state.servers)
+    {
+        if (server.id == serverId)
+        {
+            if (server.online != isOnline)
+            {
+                server.online = isOnline;
+                state.status = actualStatus(state);
+                return {true, std::move(state)};
+            }
+            else
+                return {false, std::move(state)};
+        }
+    }
+    return {false, std::move(state)};
+}
+
 State::ServerInfo TimeSynchronizationWidgetReducer::actualPrimaryServer(const State& state)
 {
     if (!state.enabled)

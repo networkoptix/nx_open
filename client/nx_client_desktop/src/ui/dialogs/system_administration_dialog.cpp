@@ -104,15 +104,6 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
 
     connect(this, &QnGenericTabbedDialog::dialogClosed,
         this, [generalWidget]() { generalWidget->resetWarnings(); });
-
-    const auto updateTimeSyncPage =
-        [this]
-        {
-            setPageEnabled(TimeServerSelection, globalSettings()->isTimeSynchronizationEnabled());
-        };
-    connect(globalSettings(), &QnGlobalSettings::timeSynchronizationSettingsChanged, this,
-        updateTimeSyncPage);
-    updateTimeSyncPage();
 }
 
 QnSystemAdministrationDialog::~QnSystemAdministrationDialog() = default;

@@ -21,7 +21,8 @@
 #include "../redux/time_syncronization_widget_state.h"
 #include "../models/time_synchronization_servers_model.h"
 #include "../delegates/time_synchronization_servers_delegate.h"
-#include "../watchers/time_syncronization_widget_watcher.h"
+#include "../watchers/time_syncronization_server_time_watcher.h"
+#include "../watchers/time_syncronization_server_state_watcher.h"
 #include <ui/style/skin.h>
 #include <core/resource/resource_display_info.h>
 #include <nx/client/desktop/common/utils/item_view_hover_tracker.h>
@@ -30,6 +31,8 @@ namespace nx::client::desktop {
 
 using State = TimeSynchronizationWidgetState;
 using Model = TimeSynchronizationServersModel;
+using TimeWatcher = TimeSynchronizationServerTimeWatcher;
+using StateWatcher = TimeSynchronizationServerStateWatcher;
 
 namespace {
 
@@ -62,7 +65,8 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
     ui(new Ui::TimeSynchronizationWidget),
     m_store(new TimeSynchronizationWidgetStore(this)),
     m_serversModel(new Model(this)),
-    m_timeWatcher(new TimeSynchronizationWidgetWatcher(m_store, this)),
+    m_timeWatcher(new TimeSynchronizationServerTimeWatcher(m_store, this)),
+    m_stateWatcher(new TimeSynchronizationServerStateWatcher(m_store, this)),
     m_delegate(new TimeSynchronizationServersDelegate(this)),
     m_tickCount(0)
 {

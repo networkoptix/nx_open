@@ -13,7 +13,8 @@ namespace nx::client::desktop {
 struct TimeSynchronizationWidgetState;
 class TimeSynchronizationWidgetStore;
 class TimeSynchronizationServersModel;
-class TimeSynchronizationWidgetWatcher;
+class TimeSynchronizationServerTimeWatcher;
+class TimeSynchronizationServerStateWatcher;
 class TimeSynchronizationServersDelegate;
 
 class TimeSynchronizationWidget:
@@ -43,7 +44,8 @@ private:
     QScopedPointer<Ui::TimeSynchronizationWidget> ui;
     QPointer<TimeSynchronizationWidgetStore> m_store;
     QPointer<TimeSynchronizationServersModel> m_serversModel;
-    QPointer<TimeSynchronizationWidgetWatcher> m_timeWatcher;
+    QPointer<TimeSynchronizationServerTimeWatcher> m_timeWatcher;
+    QPointer<TimeSynchronizationServerStateWatcher> m_stateWatcher;
     QPointer<TimeSynchronizationServersDelegate> m_delegate;
     int m_tickCount;
 };
