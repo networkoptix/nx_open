@@ -250,6 +250,9 @@ namespace Qn
         ContextMenuRole,                            /**< Role for context menu (QSharedPointer<QMenu>). */
         ForcePrecisePreviewRole,                    /**< Role for forcing precise preview frame (bool). */
 
+        SelectOnOpeningRole,                        /**< Role for single-selecting an item (or first of multiple items) added to current layout (bool). */
+        RaiseSelectionRole,                         /**< Role for raising a single-selected item (bool). */
+
         // Model notification roles. Do not necessarily pass any data but implement
         // item-related view-to-model notifications via setData which can be proxied.
         DefaultNotificationRole,                    /**< Role to perform default item action (no data). */

@@ -66,7 +66,7 @@ public:
     int unreadCount() const;
     QnNotificationLevel::Value highestUnreadImportance() const;
 
-    void updateHover(bool hovered, const QPoint& mousePos);
+    void updateHover();
 
 protected:
     virtual bool eventFilter(QObject* object, QEvent* event) override;

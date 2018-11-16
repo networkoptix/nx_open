@@ -595,7 +595,7 @@ bool EventTile::event(QEvent* event)
                 break;
             d->clickButton = Qt::NoButton;
             if (mouseEvent->buttons().testFlag(Qt::LeftButton))
-                emit dragStarted();
+                emit dragStarted(d->clickPoint, size());
             break;
         }
 

@@ -859,6 +859,11 @@ bool QnResourceTreeModel::canDropMimeData(const QMimeData* mimeData, Qt::DropAct
     if (!intersects(mimeData->formats(), MimeData::mimeTypes()))
         return base_type::canDropMimeData(mimeData, action, row, column, parent);
 
+    // Check if the drop is targeted for the scene.
+    MimeData data(mimeData, resourcePool());
+    if (data.arguments().contains(Qn::ItemTimeRole))
+        return false;
+
     auto node = dropNode(mimeData, row, column, parent, true /*checkOnly*/);
     if (!node)
         return false;

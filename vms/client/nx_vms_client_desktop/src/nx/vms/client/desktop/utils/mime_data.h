@@ -5,6 +5,7 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 #include <QtCore/QMimeData>
+#include <QtCore/QVariant>
 
 #include <core/resource/resource_fwd.h>
 
@@ -49,6 +50,9 @@ public:
     QList<QnUuid> entities() const;
     void setEntities(const QList<QnUuid>& ids);
 
+    QHash<int, QVariant> arguments() const;
+    void setArguments(const QHash<int, QVariant>& value);
+
     QString serialized() const;
     static MimeData deserialized(QByteArray data, QnResourcePool* resourcePool);
 
@@ -63,6 +67,7 @@ private:
 
     QList<QnUuid> m_entities;
     QnResourceList m_resources;
+    QHash<int, QVariant> m_arguments;
 };
 
 } // namespace nx::vms::client::desktop

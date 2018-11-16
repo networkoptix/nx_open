@@ -340,11 +340,11 @@ void EventRibbon::Private::ensureWidget(int index)
             });
 
         connect(widget.get(), &EventTile::dragStarted, this,
-            [this]()
+            [this](const QPoint& pos, const QSize& size)
             {
                 const int index = indexOf(static_cast<EventTile*>(sender()));
                 if (m_model && index >= 0)
-                    emit q->dragStarted(m_model->index(index));
+                    emit q->dragStarted(m_model->index(index), pos, size);
             });
 
         connect(widget.get(), &QWidget::customContextMenuRequested, this,
@@ -829,14 +829,14 @@ void EventRibbon::Private::doUpdateView()
     if (m_tiles.empty())
     {
         clear();
-        updateHover(false, QPoint());
+        updateHover();
         return;
     }
 
     if (!q->isVisible())
     {
         clearShiftAnimations();
-        updateHover(false, QPoint());
+        updateHover();
         return;
     }
 
@@ -934,10 +934,7 @@ void EventRibbon::Private::doUpdateView()
     m_viewport->update();
 
     updateScrollRange();
-
-    const auto pos = WidgetUtils::mapFromGlobal(q, QCursor::pos());
-    updateHover(q->rect().contains(pos), pos);
-
+    updateHover();
     updateHighlightedTiles();
 
     if (!m_currentShifts.empty()) //< If has running animations.
@@ -1041,15 +1038,16 @@ QnNotificationLevel::Value EventRibbon::Private::highestUnreadImportance() const
     return Importance();
 }
 
-void EventRibbon::Private::updateHover(bool hovered, const QPoint& mousePos)
+void EventRibbon::Private::updateHover()
 {
-    if (hovered)
+    const auto pos = WidgetUtils::mapFromGlobal(q, QCursor::pos());
+    if (const bool hovered = q->rect().contains(pos))
     {
         if (m_hoveredWidget && m_hoveredWidget->underMouse()) //< Nothing changed.
             return;
 
-        const int index = indexAtPos(mousePos);
-        const auto widget = index >= 0 ? m_tiles[index]->widget.get() : nullptr;
+        const int index = indexAtPos(pos);
+        auto widget = index >= 0 ? m_tiles[index]->widget.get() : nullptr;
 
         if (widget == m_hoveredWidget)
             return;
