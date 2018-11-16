@@ -11,8 +11,6 @@ extern "C" {
 #include "ffmpeg/utils.h"
 #include "device/audio/utils.h"
 
-#include <iostream>
-
 namespace nx {
 namespace usb_cam {
 
@@ -573,7 +571,6 @@ std::string AudioStream::url() const
 
 void AudioStream::setEnabled(bool enabled)
 {
-    std::cout << "ENABLED: " << enabled << std::endl;
     if (enabled)
     {
         if(!m_streamReader)
