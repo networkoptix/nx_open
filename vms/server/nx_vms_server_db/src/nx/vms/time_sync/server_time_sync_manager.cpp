@@ -221,13 +221,19 @@ void ServerTimeSyncManager::updateTime()
 
     const auto primaryTimeServerId = getPrimaryTimeServerId();
     const auto ownId = commonModule()->moduleGUID();
-    bool syncWithInternel = commonModule()->globalSettings()->isSynchronizingTimeWithInternet();
+    bool syncWithInternel = primaryTimeServerId.isNull();
 
-    auto networkTimeSyncInterval = commonModule()->globalSettings()->syncTimeExchangePeriod();
+    auto globalSettings = commonModule()->globalSettings();
+    auto networkTimeSyncInterval = globalSettings->syncTimeExchangePeriod();
+    const bool isTimeSyncEnabled = globalSettings->isTimeSynchronizationEnabled();
     const bool isTimeRecentlySync = m_lastNetworkSyncTime.isValid()
         && !m_lastNetworkSyncTime.hasExpired(networkTimeSyncInterval);
 
-    if (syncWithInternel)
+    if (primaryTimeServerId == ownId || !isTimeSyncEnabled)
+    {
+        loadTimeFromLocalClock();
+    }
+    else if (syncWithInternel)
     {
         QnRoute route = routeToNearestServerWithInternet();
         if (!route.isValid() && !route.reverseConnect)
@@ -245,10 +251,6 @@ void ServerTimeSyncManager::updateTime()
             m_timeLoadFromServer = route.id;
             m_lastNetworkSyncTime.restart();
         }
-    }
-    else if (primaryTimeServerId.isNull() || primaryTimeServerId == ownId)
-    {
-        loadTimeFromLocalClock();
     }
     else
     {
