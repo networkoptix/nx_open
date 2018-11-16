@@ -71,8 +71,13 @@ static void handleQtMessage(
 {
     // Catch invalid number of arguments, invalid numeric translations, invalid old-style connects
     // and some metatype errors.
-    if (message.contains(QStringLiteral("QString:")) || message.contains(QStringLiteral("QObject:")))
+    if (message.contains("QString:")
+        || message.contains("QObject:")
+        || message.contains("unable to save")
+        )
+    {
         assertFailure(/*isCritical*/ false, message);
+    }
 
     switch (type)
     {

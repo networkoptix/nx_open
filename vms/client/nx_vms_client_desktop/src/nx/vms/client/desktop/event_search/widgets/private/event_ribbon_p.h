@@ -15,10 +15,9 @@
 
 #include <ui/common/notification_levels.h>
 #include <ui/style/helper.h>
-#include <ui/workbench/workbench_context_aware.h>
 
-#include <nx/utils/disconnect_helper.h>
 #include <nx/utils/interval.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
 
 class QScrollBar;
@@ -26,9 +25,7 @@ class QVariantAnimation;
 
 namespace nx::vms::client::desktop {
 
-class EventRibbon::Private:
-    public QObject,
-    public QnWorkbenchContextAware
+class EventRibbon::Private: public QObject
 {
     Q_OBJECT
     using PrivateSignal = EventRibbon::QPrivateSignal;
@@ -116,7 +113,7 @@ private:
 private:
     EventRibbon* const q = nullptr;
     QAbstractListModel* m_model = nullptr;
-    std::unique_ptr<QnDisconnectHelper> m_modelConnections;
+    nx::utils::ScopedConnections m_modelConnections;
     const std::unique_ptr<QScrollBar> m_scrollBar;
     const std::unique_ptr<QWidget> m_viewport;
 
@@ -136,7 +133,7 @@ private:
         std::unique_ptr<EventTile> widget;
     };
 
-    using TilePtr = std::shared_ptr<Tile>;
+    using TilePtr = std::unique_ptr<Tile>;
     using Interval = nx::utils::Interval<int>;
 
     std::deque<TilePtr> m_tiles;

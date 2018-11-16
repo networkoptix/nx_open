@@ -1,0 +1,15 @@
+@import '../../../../../app/styles/native-theme/theme_palette';
+@import '../../../../../app/styles/custom/custom_palette';
+@import '../../../../styles/theme_palette';
+@import '../../../../styles/theme_variables';
+
+.title {
+    font-family : $font-family-medium;
+}
+
+.subtitle {
+    color       : $light11;
+    display     : flex;
+    align-items : flex-end;
+    height      : rem(22px);
+}

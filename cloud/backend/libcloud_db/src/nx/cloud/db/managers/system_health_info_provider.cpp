@@ -9,7 +9,7 @@
 namespace nx::cloud::db {
 
 SystemHealthInfoProvider::SystemHealthInfoProvider(
-    data_sync_engine::ConnectionManager* ec2ConnectionManager,
+    clusterdb::engine::ConnectionManager* ec2ConnectionManager,
     nx::sql::AsyncSqlQueryExecutor* const dbManager)
     :
     m_ec2ConnectionManager(ec2ConnectionManager),
@@ -63,7 +63,7 @@ void SystemHealthInfoProvider::getSystemHealthHistory(
 
 void SystemHealthInfoProvider::onSystemStatusChanged(
     const std::string& systemId,
-    data_sync_engine::SystemStatusDescriptor statusDescription)
+    clusterdb::engine::SystemStatusDescriptor statusDescription)
 {
     using namespace std::placeholders;
 
@@ -101,7 +101,7 @@ SystemHealthInfoProviderFactory& SystemHealthInfoProviderFactory::instance()
 }
 
 std::unique_ptr<AbstractSystemHealthInfoProvider> SystemHealthInfoProviderFactory::defaultFactory(
-    data_sync_engine::ConnectionManager* ec2ConnectionManager,
+    clusterdb::engine::ConnectionManager* ec2ConnectionManager,
     nx::sql::AsyncSqlQueryExecutor* const dbManager)
 {
     return std::make_unique<SystemHealthInfoProvider>(

@@ -796,7 +796,8 @@ Handle ServerConnection::updateActionStop(std::function<void (Handle, bool)>&& c
 {
     auto internalCallback = [callback=std::move(callback)](bool success, rest::Handle handle, EmptyResponseType /*response*/)
         {
-            callback(handle, success);
+            if (callback)
+                callback(handle, success);
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     return executePost<EmptyResponseType>(lit("/ec2/cancelUpdate"),
@@ -812,7 +813,8 @@ Handle ServerConnection::updateActionInstall(
     auto internalCallback =
         [callback=std::move(callback)](bool success, rest::Handle handle, EmptyResponseType /*response*/)
         {
-            callback(handle, success);
+            if (callback)
+                callback(handle, success);
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     return executePost<EmptyResponseType>(lit("/api/installUpdate"),

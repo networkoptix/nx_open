@@ -5,7 +5,8 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnDisconnectHelper;
+#include <nx/utils/scoped_connections.h>
+
 namespace Ui { class WearableCameraMotionWidget; }
 
 namespace nx::vms::client::desktop {
@@ -32,7 +33,7 @@ private:
 
 private:
     const QScopedPointer<Ui::WearableCameraMotionWidget> ui;
-    QScopedPointer<QnDisconnectHelper> m_storeConnections;
+    nx::utils::ScopedConnections m_storeConnections;
     Aligner* const m_aligner = nullptr;
 };
 

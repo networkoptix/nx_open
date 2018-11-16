@@ -3,11 +3,10 @@
         <div class="row">
             <ul class="nav navbar-nav col-6 col-md-8 flex-column flex-lg-row">
                 <li>
-                    <nx-language-select dropup="true" short="true"></nx-language-select>
+                    <nx-language-select dropup="true" short="true" instant-reload="true"></nx-language-select>
                 </li>
                 <li><a href="/content/about">About <span class="product-name">%PRODUCT_NAME%</span></a></li>
                 <li><a href="/download">Download %VMS_NAME%</a></li>
-                <li ng-if="canViewHistory"><a href="/downloads/history">Releases</a></li>
                 <li><a href="/content/faq">Known limitations</a></li>
                 <li><a href="%SUPPORT_LINK%" target="_blank">Support</a></li>
                 <li><a href="/content/eula">Terms</a></li>

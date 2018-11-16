@@ -159,7 +159,6 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     m_filterTimerId(0),
     m_tooltipWidget(nullptr),
     m_hoverProcessor(nullptr),
-    m_disconnectHelper(new QnDisconnectHelper()),
     m_thumbnailManager(new CameraThumbnailManager())
 {
     ui->setupUi(this);
@@ -231,21 +230,21 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     setHelpTopic(this, Qn::MainWindow_Tree_Help);
     setHelpTopic(ui->searchTab, Qn::MainWindow_Tree_Search_Help);
 
-    *m_disconnectHelper << connect(ui->typeComboBox, QnComboboxCurrentIndexChanged,
+    m_connections << connect(ui->typeComboBox, QnComboboxCurrentIndexChanged,
         this, [this]() { updateFilter(false); });
-    *m_disconnectHelper << connect(ui->filterLineEdit, &SearchLineEdit::textChanged,
+    m_connections << connect(ui->filterLineEdit, &SearchLineEdit::textChanged,
         this, [this]() { updateFilter(false); });
-    *m_disconnectHelper << connect(ui->filterLineEdit->lineEdit(), &QLineEdit::editingFinished,
+    m_connections << connect(ui->filterLineEdit->lineEdit(), &QLineEdit::editingFinished,
         this, [this]() { updateFilter(true); });
 
-    *m_disconnectHelper << connect(ui->resourceTreeWidget, &QnResourceTreeWidget::activated,
+    m_connections << connect(ui->resourceTreeWidget, &QnResourceTreeWidget::activated,
         this, &QnResourceBrowserWidget::handleItemActivated);
-    *m_disconnectHelper << connect(ui->searchTreeWidget, &QnResourceTreeWidget::activated,
+    m_connections << connect(ui->searchTreeWidget, &QnResourceTreeWidget::activated,
         this, &QnResourceBrowserWidget::handleItemActivated);
 
-    *m_disconnectHelper << connect(ui->tabWidget, &QTabWidget::currentChanged,
+    m_connections << connect(ui->tabWidget, &QTabWidget::currentChanged,
         this, &QnResourceBrowserWidget::at_tabWidget_currentChanged);
-    *m_disconnectHelper << connect(ui->resourceTreeWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
+    m_connections << connect(ui->resourceTreeWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
         this, &QnResourceBrowserWidget::selectionChanged);
 
     /* Connect to context. */
@@ -256,24 +255,24 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     ui->tabWidget->setProperty(style::Properties::kTabBarIndent, style::Metrics::kDefaultTopLevelMargin);
     ui->tabWidget->tabBar()->setMaximumHeight(32);
 
-    *m_disconnectHelper << connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged,
+    m_connections << connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged,
         this, &QnResourceBrowserWidget::at_workbench_currentLayoutAboutToBeChanged);
-    *m_disconnectHelper << connect(workbench(), &QnWorkbench::currentLayoutChanged,
+    m_connections << connect(workbench(), &QnWorkbench::currentLayoutChanged,
         this, &QnResourceBrowserWidget::at_workbench_currentLayoutChanged);
-    *m_disconnectHelper << connect(workbench(), &QnWorkbench::itemAboutToBeChanged,
+    m_connections << connect(workbench(), &QnWorkbench::itemAboutToBeChanged,
         this, &QnResourceBrowserWidget::at_workbench_itemChange);
-    *m_disconnectHelper << connect(workbench(), &QnWorkbench::itemChanged,
+    m_connections << connect(workbench(), &QnWorkbench::itemChanged,
         this, &QnResourceBrowserWidget::at_workbench_itemChange);
 
-    *m_disconnectHelper << connect(accessController(),
+    m_connections << connect(accessController(),
         &QnWorkbenchAccessController::globalPermissionsChanged,
         this,
         &QnResourceBrowserWidget::updateIcons);
 
-    *m_disconnectHelper << connect(this->context(), &QnWorkbenchContext::userChanged,
+    m_connections << connect(this->context(), &QnWorkbenchContext::userChanged,
         this, [this]() { ui->tabWidget->setCurrentWidget(ui->resourcesTab); });
 
-    *m_disconnectHelper << connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
+    m_connections << connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
         {
             if (resource == m_tooltipResource)
@@ -302,7 +301,7 @@ QnResourceBrowserWidget::~QnResourceBrowserWidget()
     ui->resourceTreeWidget->setWorkbench(nullptr);
 
     /* This class is one of the most significant reasons of crashes on exit. Workarounding it.. */
-    m_disconnectHelper.reset();
+    m_connections = {};
 
     ui->typeComboBox->setEnabled(false); // #3797
 }
@@ -746,7 +745,7 @@ void QnResourceBrowserWidget::updateHintVisibilityByBasicState()
 QList<QnResourceBrowserWidget::FilterTagWithNodeType> QnResourceBrowserWidget::filterTagsWithNodeTypes() const
 {
     return {
-        {tr("All types"),           QnResourceSearchQuery::kAllowAllNodeTypes}, 
+        {tr("All types"),           QnResourceSearchQuery::kAllowAllNodeTypes},
         {QString(),                 QnResourceSearchQuery::kAllowAllNodeTypes}, // splitter
         {tr("Servers"),             ResourceTreeNodeType::filteredServers},
         {tr("Cameras && Devices"),  ResourceTreeNodeType::filteredCameras},

@@ -1,13 +1,13 @@
 <div class="container">
     <div ng-if="data.activateCode" process-loading="activate">
-        <h1 class="process-success" ng-if="activate.success">
+        <h1 class="process-success" ng-if="activate.success && !loading">
             당신의 계정이 성공적으로 활성화 되었습니다
         </h1>
-        <h1 class="process-success" ng-if="activate.success">
+        <h1 class="process-success" ng-if="activate.success && !loading">
             <a class="btn btn-default" href="/login">로그인</a>
         </h1>
 
-        <h1 class="process-success" ng-if="!activate.success">
+        <h1 class="process-success" ng-if="!activate.success && !loading">
             계정이 이미 활성화되었거나 확인 코드가 잘못되었습니다.
         </h1>
     </div>
@@ -24,8 +24,8 @@
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
             <h1>%PRODUCT_NAME% 에 등록했습니다.</h1>
-            <p>We've sent you a letter with activation link to {{data.email}}.<br>
-                Please activate your account by visiting this link.</p>
+            <p>계정 활성화 링크를 {{data.email}} 로 이메일로 보냈습니다.<br>
+            링크를 방문 하여 계정을 활성화 하시기 바랍니다.</p>
         </div>
         <h1 ng-if="!data.email">귀하의 계정을 활성화 합니다</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
@@ -43,9 +43,8 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block input-error"
-                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email is required</span>
-                    <span class="help-block input-error"
-                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Please enter a valid Email</span>
+                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required"> 이메일이 필요합니다. </span> <span class="help-block input-error"
+                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email"> 유효한 이메일을 입력하십시오. </span>
                 </div>
             </div>
             <div class="form-group">
@@ -80,9 +79,8 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block input-error"
-                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email is required</span>
-                    <span class="help-block input-error"
-                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Please enter a valid Email</span>
+                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.required"> 이메일이 필요합니다. </span> <span class="help-block input-error"
+                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.email"> 유효한 이메일을 입력하십시오. </span>
                 </div>
             </div>
             <div class="form-group">

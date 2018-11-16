@@ -27,7 +27,7 @@ void ActionPushButton::setAction(QAction* value)
     if (m_action == value)
         return;
 
-    m_actionConnections.reset();
+    m_actionConnections = {};
 
     m_action = value;
     updateFromAction();
@@ -38,18 +38,18 @@ void ActionPushButton::setAction(QAction* value)
     if (isCheckable())
         setChecked(m_action->isChecked());
 
-    m_actionConnections.reset(new QnDisconnectHelper());
+    m_actionConnections = {};
 
-    *m_actionConnections << connect(m_action.data(), &QAction::changed,
+    m_actionConnections << connect(m_action.data(), &QAction::changed,
         this, &ActionPushButton::updateFromAction);
 
-    *m_actionConnections << connect(m_action.data(), &QAction::toggled,
+    m_actionConnections << connect(m_action.data(), &QAction::toggled,
         this, &ActionPushButton::setChecked);
 
-    *m_actionConnections << connect(this, &QPushButton::toggled,
+    m_actionConnections << connect(this, &QPushButton::toggled,
         m_action.data(), &QAction::setChecked);
 
-    *m_actionConnections << connect(this, &QPushButton::clicked, m_action.data(),
+    m_actionConnections << connect(this, &QPushButton::clicked, m_action.data(),
         [this]()
         {
             if (!isCheckable())

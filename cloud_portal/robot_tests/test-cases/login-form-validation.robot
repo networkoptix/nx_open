@@ -1,6 +1,5 @@
 *** Settings ***
 Resource          ../resource.robot
-Resource          ../variables.robot
 Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close Browser
 Test Teardown     Run Keyword If Test Failed    Restart

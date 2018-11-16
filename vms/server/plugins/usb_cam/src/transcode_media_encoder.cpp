@@ -10,9 +10,9 @@ namespace usb_cam {
 
 namespace {
 
-int constexpr kDefaultSecondaryFps = 5;
-int constexpr kDefaultSecondaryWidth = 640;
-int constexpr kDefaultBitrate = 5000000;
+static constexpr int kDefaultSecondaryFps = 5;
+static constexpr int kDefaultSecondaryWidth = 640;
+static constexpr int kDefaultBitrate = 5000000;
 
 }
 

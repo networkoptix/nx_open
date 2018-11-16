@@ -11,6 +11,8 @@ extern "C" {
 #include "ffmpeg/utils.h"
 #include "device/audio/utils.h"
 
+#include <iostream>
+
 namespace nx {
 namespace usb_cam {
 
@@ -18,7 +20,7 @@ namespace {
 
 static constexpr int kMsecInSec = 1000;
 
-const char * ffmpegDeviceType()
+static const char * ffmpegDeviceType()
 {
 #ifdef _WIN32
     return "dshow";
@@ -139,6 +141,10 @@ int AudioStream::AudioStreamPrivate::initialize()
     if (m_initCode < 0)
         return m_initCode;
 
+    m_initCode = m_adtsInjector.initialize(m_encoder.get());
+    if (m_initCode < 0)
+        return m_initCode;
+
     m_decodedFrame = std::make_unique<ffmpeg::Frame>();
     m_initialized = true;
     return 0;
@@ -150,7 +156,10 @@ void AudioStream::AudioStreamPrivate::uninitialize()
     m_packetMergeBuffer.clear();
 
     while(*m_packetCount > 0)
-        std::this_thread::sleep_for(std::chrono::milliseconds(30));
+    {
+        static constexpr std::chrono::milliseconds kSleep(30);
+        std::this_thread::sleep_for(kSleep);
+    }
 
     if (m_decoder)
         m_decoder->flush();
@@ -162,6 +171,8 @@ void AudioStream::AudioStreamPrivate::uninitialize()
     if (m_encoder)
         m_encoder->flush();
     m_encoder.reset(nullptr);
+
+    m_adtsInjector.uninitialize();
 
     m_inputFormat.reset(nullptr);
     m_initialized = false;
@@ -243,13 +254,17 @@ int AudioStream::AudioStreamPrivate::initializeResampledFrame()
     auto resampledFrame = std::make_unique<ffmpeg::Frame>();
     auto context = m_encoder->codecContext();
 
-    int nbSamples = context->frame_size ? context->frame_size : 2000;
+    static constexpr int kDefaultFrameSize = 2000;
+
+    int nbSamples = context->frame_size ? context->frame_size : kDefaultFrameSize;
+
+    static constexpr int kDefaultAlignment =  32;
 
     int result = resampledFrame->getBuffer(
         context->sample_fmt,
         nbSamples,
         context->channel_layout,
-        32);
+        kDefaultAlignment);
     if (result < 0)
         return result;
 
@@ -381,14 +396,21 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int 
         if (*outFfmpegError == 0)
             break;
     }
-    
-    
-    // AAC audio encoder puts out too many packets, bogging down the fps. Providing less packets 
-    // fixes the issue, but we don't want to lose any, so merge multiple packets.
-    if (auto pkt = mergePackets(packet, outFfmpegError))
-        return pkt;
 
-    return nullptr;
+    //TODO: use AACPermanently in default_audio_encoder.cpp after archiving issues are fixed.
+    if(packet->codecId() == AV_CODEC_ID_AAC)
+    {
+        // Inject ADTS header into each packet becuase AAC encoder does not do it.
+        if (m_adtsInjector.inject(packet.get()) < 0)
+            return nullptr;
+
+        // AAC audio encoder puts out many small packets, causing choppy audio on the client side.
+        // Merging multiple smaller packets into one larger one fixes the issue.
+        if (auto pkt = mergePackets(packet, outFfmpegError))
+            return pkt;
+    }
+
+    return packet;
 }
 
 std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::mergePackets(
@@ -398,9 +420,6 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::mergePackets(
     *outFfmpegError = 0;
 
     packet->setTimestamp(m_timeProvider->millisSinceEpoch());
-
-    if(m_encoder->codecId() == AV_CODEC_ID_PCM_S16LE)
-        return packet;
 
     // Only merge if the timestamp difference is >= the amount of time it takes to produce a 
     // video frame.
@@ -415,7 +434,7 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::mergePackets(
 
     auto newPacket = std::make_shared<ffmpeg::Packet>(
         packet->codecId(),
-        AVMEDIA_TYPE_AUDIO);
+        packet->mediaType());
 
     *outFfmpegError = newPacket->newPacket(size);
     if (*outFfmpegError < 0)

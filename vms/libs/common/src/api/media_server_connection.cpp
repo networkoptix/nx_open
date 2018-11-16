@@ -1257,10 +1257,10 @@ int QnMediaServerConnection::getNonceAsync(const nx::utils::Url& url, QObject* t
 }
 
 int QnMediaServerConnection::getRecordingStatisticsAsync(
-    qint64 bitrateAnalizePeriodMs, QObject* target, const char* slot)
+    qint64 bitrateAnalyzePeriodMs, QObject* target, const char* slot)
 {
     QnRequestParamList params;
-    params << QnRequestParam("bitrateAnalizePeriodMs", bitrateAnalizePeriodMs);
+    params << QnRequestParam("bitrateAnalyzePeriodMs", bitrateAnalyzePeriodMs);
     return sendAsyncGetRequestLogged(RecordingStatsObject,
         params, QN_STRINGIZE_TYPE(QnRecordingStatsReply), target, slot);
 }

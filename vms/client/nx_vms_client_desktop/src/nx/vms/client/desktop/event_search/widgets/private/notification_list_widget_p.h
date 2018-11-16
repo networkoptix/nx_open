@@ -9,7 +9,6 @@
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 
 class QToolButton;
-class QnDisconnectHelper;
 
 namespace nx::vms::client::desktop {
 

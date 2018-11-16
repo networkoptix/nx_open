@@ -185,7 +185,7 @@ void LayoutTourReviewController::startListeningLayout()
         return;
 
     NX_ASSERT(m_reviewLayouts.values().contains(workbench()->currentLayout()->resource()));
-    m_connections.reset(new QnDisconnectHelper());
+    m_connections = {};
     connectToLayout(workbench()->currentLayout());
     updateOrder();
     updateButtons(workbench()->currentLayout()->resource());
@@ -194,7 +194,7 @@ void LayoutTourReviewController::startListeningLayout()
 
 void LayoutTourReviewController::stopListeningLayout()
 {
-    m_connections.reset();
+    m_connections = {};
     m_dropPlaceholders.clear();
 }
 
@@ -264,11 +264,11 @@ void LayoutTourReviewController::connectToLayout(QnWorkbenchLayout* layout)
         };
 
     // Queued connection to call save after batch operation is complete.
-    *m_connections << connect(layout, &QnWorkbenchLayout::itemAdded, this, saveAndUpdateLayout,
+    m_connections << connect(layout, &QnWorkbenchLayout::itemAdded, this, saveAndUpdateLayout,
         Qt::QueuedConnection);
-    *m_connections << connect(layout, &QnWorkbenchLayout::itemsMoved, this, saveAndUpdateLayout,
+    m_connections << connect(layout, &QnWorkbenchLayout::itemsMoved, this, saveAndUpdateLayout,
         Qt::QueuedConnection);
-    *m_connections << connect(layout, &QnWorkbenchLayout::itemRemoved, this, saveAndUpdateLayout,
+    m_connections << connect(layout, &QnWorkbenchLayout::itemRemoved, this, saveAndUpdateLayout,
         Qt::QueuedConnection);
 }
 

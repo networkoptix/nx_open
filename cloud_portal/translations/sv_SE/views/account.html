@@ -1,6 +1,6 @@
 
 <div class="container" ng-if="accountMode">
-    <h1>Account</h1>
+    <h1>Konto</h1>
     <form name="accountForm" class="form-horizontal" novalidate>
 
         <div class="form-group row">
@@ -17,7 +17,10 @@
                 <label for="firstName" class="text-left text-md-right control-label">First name</label>
             </div>
             <div class="col-md-4">
-                <input type="text" class="form-control" ng-model="account.first_name" name="firstName" id="firstName" maxlength="255" required>
+                <input type="text" class="form-control" ng-model="account.first_name"
+                       name="firstName" id="firstName" maxlength="255"
+                       required
+ autofocus>
             </div>
             <div class="col-md-4">
                 <span class="help-block input-error" ng-if="accountForm.firstName.$touched && accountForm.firstName.$error.required">First name is required</span>
@@ -39,7 +42,7 @@
                 <label for="lastName" class="text-left text-md-right control-label">Language</label>
             </div>
             <div class="col-md-4">
-                <nx-language-select></nx-language-select>
+                <nx-language-select (on-selected)="changeLanguage($event)"></nx-language-select>
                 <!--<language-select account-mode="true" ng-model="account.language"></language-select>-->
             </div>
             <div class="col-md-4">
@@ -66,8 +69,8 @@
             <div class="col-md-4">
                 <input type="password" class="form-control"
                        ng-model="pass.password"
-                       name="password"
-                       id="password" required>
+                       name="password" autofocus
+ id="password" required>
             </div>
             <div class="col-md-4">
                 <span class="help-block input-error" ng-if="passwordForm.password.$touched && passwordForm.password.$error.required">Current password is required</span>

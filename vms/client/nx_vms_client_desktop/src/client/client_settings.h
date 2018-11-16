@@ -22,6 +22,7 @@
 #include <nx/utils/singleton.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/software_version.h>
+#include <nx/update/update_information.h>
 
 class QSettings;
 
@@ -221,7 +222,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     updateCombineUrl,       setUpdateCombinerUrl,       UPDATE_COMBINER_URL,        QString())
         QN_DECLARE_RW_PROPERTY(QVariantList,                alternativeUpdateServers,   setAlternativeUpdateServers,    ALTERNATIVE_UPDATE_SERVERS, QVariantList())
         QN_DECLARE_RW_PROPERTY(nx::vms::api::SoftwareVersion, ignoredUpdateVersion, setIgnoredUpdateVersion,    IGNORED_UPDATE_VERSION,     {})
-        QN_DECLARE_RW_PROPERTY(QnUpdateInfo,                latestUpdateInfo,       setLatestUpdateInfo,        LATEST_UPDATE_INFO,         QnUpdateInfo())
+        QN_DECLARE_RW_PROPERTY(nx::update::Information,     latestUpdateInfo,       setLatestUpdateInfo,        LATEST_UPDATE_INFO,         nx::update::Information())
         QN_DECLARE_RW_PROPERTY(qint64,                      updateDeliveryDate,     setUpdateDeliveryDate,      UPDATE_DELIVERY_DATE,       0)
 
         QN_DECLARE_RW_PROPERTY(bool,                        isClientUpdateDisabled, setClientUpdateDisabled,    NO_CLIENT_UPDATE,           false)

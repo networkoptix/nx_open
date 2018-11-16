@@ -1139,9 +1139,10 @@ enum IDType
     GoToPreviousItemAction,
 
     /**
-     * Go to the first item of specified resource on layout
+     * Go to either specified item on current layout (argument with Qn::ItemUuidRole)
+     * or to the first item of specified resource on current layout (resource parameter)
      */
-    GoToResourceAction,
+    GoToLayoutItemAction,
 
     /**
      * Maximizes/Unmaximizes current item

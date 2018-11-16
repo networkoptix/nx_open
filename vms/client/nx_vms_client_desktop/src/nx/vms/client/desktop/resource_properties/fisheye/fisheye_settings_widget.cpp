@@ -37,7 +37,13 @@ FisheyeSettingsWidget::FisheyeSettingsWidget(QWidget* parent):
     connect(ui->angleSpinBox, QnDoubleSpinBoxValueChanged, this, &FisheyeSettingsWidget::dataChanged);
     connect(ui->calibrateWidget, &FisheyeCalibrationWidget::dataChanged, this, &FisheyeSettingsWidget::dataChanged);
 
-    connect(ui->fisheyeEnabledButton,  &QPushButton::toggled, this, &FisheyeSettingsWidget::dataChanged);
+    connect(ui->fisheyeEnabledButton, &QPushButton::toggled, ui->calibrateWidget,
+        &FisheyeCalibrationWidget::setEnabled);
+    connect(ui->fisheyeEnabledButton, &QPushButton::toggled, ui->settingsWidget,
+        &FisheyeSettingsWidget::setEnabled);
+    connect(ui->fisheyeEnabledButton, &QPushButton::toggled, this,
+        &FisheyeSettingsWidget::dataChanged);
+
     connect(ui->horizontalRadioButton, &QPushButton::clicked, this, &FisheyeSettingsWidget::dataChanged);
     connect(ui->viewDownButton,        &QPushButton::clicked, this, &FisheyeSettingsWidget::dataChanged);
     connect(ui->viewUpButton,          &QPushButton::clicked, this, &FisheyeSettingsWidget::dataChanged);

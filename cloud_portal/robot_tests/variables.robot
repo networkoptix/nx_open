@@ -14,7 +14,7 @@ ${DOWNLOAD LINK}                      //footer//a[@href="/download"]
 @{LANGUAGES LIST}                        en_US           en_GB           ru_RU               fr_FR         de_DE              es_ES         hu_HU             zh_CN     zh_TW    ja_JP       ko_KR       tr_TR          th_TH         nl_NL            he_IL      pl_PL         vi_VN
 @{LANGUAGES ACCOUNT TEXT LIST}           Account         Account         Учетная запись      Compte        Account            Cuenta        Fiók              帐户      帳號     アカウント      계정         Hesap         บัญชีผู้ใช้  Account         חשבון        Konto         Tài khoản
 @{LANGUAGES CREATE ACCOUNT TEXT LIST}    Create Account  Create Account  Зарегистрироваться  Créer compte  Account erstellen  Crear Cuenta  Fiók létrehozása  创建帐户  新建帳號  アカウント作成  계정 만들기  Hesap oluştur  สร้างบัญชี   Account aanmaken  צור חשבון   Utwórz konto  Tạo tài khoản
-@{USER TYPE LIST}    ${OWNER TEXT}    ${ADMIN TEXT}    ${ADV VIEWER TEXT}    ${VIEWER TEXT}    ${LIVE VIEWER TEXT}    ${CUSTOM TEXT
+@{USER TYPE LIST}    ${OWNER TEXT}    ${ADMIN TEXT}    ${ADV VIEWER TEXT}    ${VIEWER TEXT}    ${LIVE VIEWER TEXT}    ${CUSTOM TEXT}
 
 ${BACKDROP}                           //ngb-modal-window
 
@@ -27,9 +27,12 @@ ${TM TEXT}                            qweasdzxc123®™
 #Log In Elements
 ${LOG IN MODAL}                       //form[@name='loginForm']
 ${EMAIL INPUT}                        //form[@name='loginForm']//input[@id='login_email']
-${PASSWORD INPUT}                     //form[@name='loginForm']//input[@id='login_password']
+${PASSWORD INPUT}                     //form[@name='loginForm']//input[@id='login_password' and @name="login_password" and @type="password"]
 ${LOG IN BUTTON}                      //form[@name='loginForm']//nx-process-button//button
-${REMEMBER ME CHECKBOX}               //form[@name='loginForm']//input[@id='remember']/following-sibling::span[@class="checkmark"]
+
+${REMEMBER ME CHECKBOX VISIBLE}       //form[@name='loginForm']//input[@id='remember']/following-sibling::span[@class="checkmark"]/..
+${REMEMBER ME CHECKBOX REAL}          //form[@name='loginForm']//input[@id='remember']
+
 ${FORGOT PASSWORD}                    //form[@name='loginForm']//a[@href='/restore_password']
 ${LOG IN CLOSE BUTTON}                //button[@data-dismiss='modal']
 ${ACCOUNT NOT FOUND}                  //form[@name='loginForm']//label[contains(text(), '${ACCOUNT NOT FOUND TEXT}')]
@@ -41,8 +44,9 @@ ${LOG IN NAV BAR}                     //nav//a[contains(@ng-click, 'login()')]
 ${YOU HAVE NO SYSTEMS}                //span[contains(text(),"${YOU HAVE NO SYSTEMS TEXT}")]
 
 #Header
-${ACCOUNT DROPDOWN}                   //header//nx-account-settings-select//button[@id='accountSettingsSelect']
+${ACCOUNT DROPDOWN}                   //header//nx-account-settings-select//button[@id='accountSettingsSelect' and @data-toggle="dropdown"]
 ${LOG OUT BUTTON}                     //li[contains(@class, 'collapse-first')]//a[contains(text(), "${LOG OUT BUTTON TEXT}")]
+${LOGO LINK}                          //header//a[@href='/']
 ${ACCOUNT SETTINGS BUTTON}            //li//a[@href = '/account/']
 ${CHANGE PASSWORD BUTTON DROPDOWN}    //li//a[@href = '/account/password/']
 ${RELEASE HISTORY BUTTON}             //a[@href="/downloads/history" and contains(text(), "${RELEASE HISTORY BUTTON TEXT}")]
@@ -53,6 +57,8 @@ ${AUTHORIZED BODY}                    //body[contains(@class, 'authorized')]
 ${ANONYMOUS BODY}                     //body[contains(@class,'anonymous')]
 ${CREATE ACCOUNT HEADER}              //header//a[@href='/register']
 ${CREATE ACCOUNT BODY}                //nx-app//a[@href='/register']
+
+${LOG IN BODY}                        //nx-app//a[@href='/login']
 
 #Forgot Password
 ${RESET PASSWORD FORM}                //form[@name='restorePasswordWithCode']
@@ -82,7 +88,10 @@ ${REGISTER LAST NAME INPUT}           //form[@name= 'registerForm']//input[@ng-m
 ${REGISTER EMAIL INPUT}               //form[@name= 'registerForm']//input[@ng-model='account.email']
 ${REGISTER EMAIL INPUT LOCKED}        //form[@name= 'registerForm']//input['readOnly' and @ng-if='lockEmail']
 ${REGISTER PASSWORD INPUT}            //form[@name= 'registerForm']//password-input[@ng-model='account.password']//input
-${TERMS AND CONDITIONS CHECKBOX}      //form[@name= 'registerForm']//input[@ng-model='account.accept']/following-sibling::span[@class="checkmark"]
+
+${TERMS AND CONDITIONS CHECKBOX VISIBLE}    //form[@name= 'registerForm']//input[@ng-model='account.accept']/following-sibling::span[@class="checkmark"]
+${TERMS AND CONDITIONS CHECKBOX REAL}       //form[@name= 'registerForm']//input[@ng-model='account.accept']
+
 ${CREATE ACCOUNT BUTTON}              //form[@name= 'registerForm']//button[contains(text(), "${CREATE ACCOUNT BUTTON TEXT}")]
 ${TERMS AND CONDITIONS LINK}          //form[@name= 'registerForm']//a[@href='/content/eula']
 ${TERMS AND CONDITIONS ERROR}         //form[@name= 'registerForm']//span[@ng-if='registerForm.accept.$dirty && registerForm.accept.$error.required' and contains(text(), "${TERMS AND CONDITIONS ERROR TEXT}")]
@@ -119,13 +128,17 @@ ${SYSTEM NAME}                        //h1[@ng-if="gettingSystem.success"]
 ${FIRST USER OWNER}                   //table[@ng-if='system.users.length']/tbody/tr/td[3]/span[contains(text(),"${OWNER TEXT}")]
 ${DISCONNECT FROM NX}                 //button[@ng-click='disconnect()']
 ${RENAME SYSTEM}                      //button[@ng-click='rename()']
-${RENAME CANCEL}                      //form[@name='renameForm']//button[text()='Cancel']
+${RENAME CANCEL}                      //form[@name='renameForm']//button[text()='${CANCEL BUTTON TEXT}']
 ${RENAME X BUTTON}                    //form[@name='renameForm']//button[@class='close']
-${RENAME SAVE}                        //form[@name='renameForm']//button[text()='Save']
+${RENAME SAVE}                        //form[@name='renameForm']//button[text()='${SAVE BUTTON TEXT}']
 
 ${RENAME INPUT}                       //form[@name='renameForm']//input[@id='systemName']
 ${RENAME INPUT WITH ERROR}            //form[@name='renameForm']//input[@id='systemName' and contains(@class,'ng-invalid')]
 ${SYSTEM NAME IS REQUIRED}            //form[@name='renameForm']//span[@class='input-error' and contains(text(),'${SYSTEM NAME IS REQUIRED TEXT}')]
+
+${OWNER NAME}                         //h3[contains(@class,"user-name") and text()="${TEST FIRST NAME} ${TEST LAST NAME}"]
+${OWNER EMAIL}                        //a[@ng-href="mailto:${EMAIL OWNER}"]
+${YOUR PERMISSIONS}                   //ng-include[@src="$root.C.viewsDir + 'components/system-card.html'"]//p[contains(text(), "${YOUR PERMISSIONS TEXT}")]
 
 ${DISCONNECT FROM MY ACCOUNT}         //button[@ng-click='delete()']
 ${SHARE BUTTON SYSTEMS}               //div[@process-loading='gettingSystem']//button[@ng-click='share()']
@@ -134,7 +147,7 @@ ${OPEN IN NX BUTTON}                  //div[@process-loading='gettingSystem']//b
 ${OPEN IN NX BUTTON DISABLED}         //div[@process-loading='gettingSystem']//button[@ng-click='checkForm()' and @ng-disabled='buttonDisabled']
 ${DELETE USER MODAL}                  //div[@uib-modal-transclude]
 ${DELETE USER BUTTON}                 //button[contains(text(), '${DELETE USER BUTTON TEXT}')]
-${DELETE USER CANCEL BUTTON}          //button[@ng-click='cancel()' and contains(text(), "${DELETE USER CANCEL BUTTON TEXT}")]
+${DELETE USER CANCEL BUTTON}          //ngb-modal-window//button[contains(text(), "${CANCEL BUTTON TEXT}")]
 ${SYSTEM NAME OFFLINE}                //span[@ng-if='!system.isOnline']
 ${USERS LIST}                         //div[@process-loading='gettingSystemUsers']
 
@@ -143,7 +156,7 @@ ${AVAILABLE SYSTEMS LIST}             //a[@href='/systems']
 
 #Disconnect from cloud portal
 ${DISCONNECT FORM}                    //form[@name='disconnectForm']
-${DISCONNECT FORM CANCEL}             //form[@name='disconnectForm']//button[text()='Cancel']
+${DISCONNECT FORM CANCEL}             //form[@name='disconnectForm']//button[text()='${CANCEL BUTTON TEXT}']
 ${DISCONNECT FORM HEADER}             //h1["${DISCONNECT FORM HEADER TEXT}"]
 
 #Disconnect from my account
@@ -160,14 +173,14 @@ ${ALREADY ACTIVATED}                  //h1[@ng-if='!activate.success && !loading
 ${SHARE MODAL}                        //form[@name='shareForm']
 ${SHARE EMAIL}                        //form[@name='shareForm']//input[@id='email']
 ${SHARE PERMISSIONS DROPDOWN}         //form[@name='shareForm']//nx-permissions-select//button[@id='permissionsSelect']
-${SHARE BUTTON MODAL}                 //form[@name='shareForm']//button[text()='Share']
-${SHARE CANCEL}                       //form[@name='shareForm']//button[text()='Cancel']
+${SHARE BUTTON MODAL}                 //form[@name='shareForm']//button[text()='${SHARE BUTTON TEXT}']
+${SHARE CANCEL}                       //form[@name='shareForm']//button[text()='${CANCEL BUTTON TEXT}']
 ${SHARE CLOSE}                        //form[@name='shareForm']//button[@data-dismiss='modal']
 ${SHARE PERMISSIONS HINT}             //form[@name='shareForm']//span[contains(@class,'help-block')]
 
 ${EDIT PERMISSIONS EMAIL}             //form[@name='shareForm']//input[@ng-model='user.email']
 ${EDIT PERMISSIONS DROPDOWN}          //form[@name='shareForm']//button[@id='permissionsSelect']
-${EDIT PERMISSIONS SAVE}              //form[@name='shareForm']//button[text()='Save']
+${EDIT PERMISSIONS SAVE}              //form[@name='shareForm']//button[text()='${SAVE BUTTON TEXT}']
 ${EDIT PERMISSIONS CANCEL}            //form[@name='shareForm']//button[@ng-click='close()']
 ${EDIT PERMISSIONS CLOSE}             //div[@uib-modal-transclude]//div[@ng-if='settings.title']//button[@ng-click='close()']
 ${EDIT PERMISSIONS ADMINISTRATOR}     //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='Administrator']
@@ -183,6 +196,7 @@ ${ACCOUNT FIRST NAME}                 //form[@name='accountForm']//input[@ng-mod
 ${ACCOUNT LAST NAME}                  //form[@name='accountForm']//input[@ng-model='account.last_name']
 ${ACCOUNT LANGUAGE DROPDOWN}          //form[@name='accountForm']//nx-language-select//button[@id='dropdownMenuButton']
 ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-click='checkForm()']
+
 #Downloads
 ${DOWNLOADS HEADER}                   //h1["${DOWNLOADS HEADER TEXT}"]
 ${DOWNLOAD WINDOWS VMS LINK}                  //div[text()="Windows x64 - ${CLIENT ONLY TEXT}"]/../..
@@ -197,7 +211,7 @@ ${MAC OS TAB}                         //a[@id="MacOS"]
 ${RELEASES TAB}                       //span[@class='tab-heading' and text()='${RELEASES TEXT}']/..
 ${PATCHES TAB}                        //span[@class='tab-heading' and text()='${PATCHES TEXT}']/..
 ${BETAS TAB}                          //span[@class='tab-heading' and text()='${BETAS TEXT}']/..
-${RELEASE NUMBER}                     //div[contains(@class,"active")]//h1/b
+${RELEASE NUMBER}                     //div[contains(@class,"active")]//h1
 
 #About
 ${ABOUT CLOUD NAME}                        //span[contains(@class,'product-name') and text()='${PRODUCT_NAME}']
@@ -208,7 +222,7 @@ ${FOOTER KNOWN LIMITS LINK}          //footer//a[contains(text(),"${KNOWN LIMITA
 ${FOOTER SUPPORT LINK}               //footer//a[contains(text(),"${SUPPORT}")]
 ${FOOTER TERMS LINK}                 //footer//a[contains(text(),"${TERMS}")]
 ${FOOTER PRIVACY LINK}               //footer//a[contains(text(),"${PRIVACY}")]
-${FOOTER COPYWRIGHT LINK}            //footer//a[contains(text(),"${COPYWRIGHT TEXT}")]
+${FOOTER COPYRIGHT LINK}             //footer//a[contains(text(),"${COPYRIGHT TEXT}")]
 
 #Misc
 ${PAGE NOT FOUND}                     //h1[contains(text(), '${PAGE NOT FOUND TEXT}')]
@@ -230,9 +244,8 @@ ${PASSWORD IS GOOD BADGE}             //span[contains(@class,"badge") and contai
 ${PASSWORD INCORRECT BADGE}           //span[contains(@class,"badge") and contains(text(),'${PASSWORD INCORRECT BADGE TEXT}')]
 
 #Already logged in modal
-#extra spaces here temporarily
-${LOGGED IN CONTINUE BUTTON}          //ngb-modal-window//button[text()='Continue ']
-${LOGGED IN LOG OUT BUTTON}           //ngb-modal-window//button[text()='Log Out ']
+${LOGGED IN CONTINUE BUTTON}          //ngb-modal-window//button[contains(text(),'${CONTINUE BUTTON TEXT}')]
+${LOGGED IN LOG OUT BUTTON}           //ngb-modal-window//button[contains(text(),'${LOG OUT BUTTON TEXT}')]
 
 ${CONTINUE BUTTON}                    //ngb-modal-window//button[contains(text(), 'Continue')]
 ${CONTINUE MODAL}                     //ngb-modal-window
@@ -250,4 +263,3 @@ ${ENTER}                              \\13
 ${TAB}                                \\9
 ${SPACEBAR}                           \\32
 ${BACKSPACE}                          \\8
-

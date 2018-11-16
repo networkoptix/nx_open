@@ -12,7 +12,6 @@
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/elided_label.h>
-#include <utils/common/delayed.h>
 #include <utils/common/html.h>
 
 #include <nx/vms/client/desktop/ini.h>
@@ -25,7 +24,15 @@
 
 namespace nx::vms::client::desktop {
 
+using namespace std::chrono;
+
 namespace {
+
+// Delay after which preview is initially requested.
+static constexpr milliseconds kPreviewLoadDelay = 100ms;
+
+// Delay after which preview is requested again in case of receiving "NO DATA".
+static const milliseconds kPreviewReloadDelay = seconds(ini().rightPanelPreviewReloadDelay);
 
 static constexpr auto kRoundingRadius = 2;
 
@@ -63,20 +70,25 @@ struct EventTile::Private
     bool closeable = false;
     CommandActionPtr action; //< Button action.
     QnElidedLabel* const progressLabel;
-    QTimer* autoCloseTimer = nullptr;
+    QScopedPointer<QTimer, QScopedPointerDeleteLater> autoCloseTimer;
+    const QScopedPointer<QTimer> loadPreviewTimer;
     qreal progressValue = 0.0;
     bool isRead = false;
     bool footerEnabled = true;
     Style style = Style::standard;
     bool highlighted = false;
-    bool clickPending = false;
+    Qt::MouseButton clickButton = Qt::NoButton;
+    Qt::KeyboardModifiers clickModifiers;
     QPoint clickPoint;
 
     Private(EventTile* q):
         q(q),
         closeButton(new CloseButton(q)),
-        progressLabel(new QnElidedLabel(q))
+        progressLabel(new QnElidedLabel(q)),
+        loadPreviewTimer(new QTimer(q))
     {
+        loadPreviewTimer->setSingleShot(true);
+        QObject::connect(loadPreviewTimer.get(), &QTimer::timeout, [this]() { requestPreview(); });
     }
 
     void handleHoverChanged(bool hovered)
@@ -143,6 +155,36 @@ struct EventTile::Private
             q->ui->resourceListLabel->setText(text);
             q->ui->resourceListLabel->show();
         }
+    }
+
+    bool isPreviewNeeded() const
+    {
+        return q->preview() && q->previewEnabled();
+    }
+
+    void requestPreview()
+    {
+        if (!isPreviewNeeded())
+            return;
+
+        switch (q->preview()->status())
+        {
+            case Qn::ThumbnailStatus::Invalid:
+            case Qn::ThumbnailStatus::NoData:
+                q->preview()->loadAsync();
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    void updatePreview(milliseconds delay)
+    {
+        if (isPreviewNeeded())
+            loadPreviewTimer->start(delay);
+        else
+            loadPreviewTimer->stop();
     }
 };
 
@@ -411,6 +453,18 @@ void EventTile::setPreview(ImageProvider* value)
     ui->previewWidget->setImageProvider(value);
     ui->previewWidget->parentWidget()->setHidden(!value);
 
+    d->updatePreview(kPreviewLoadDelay);
+
+    if (preview() && kPreviewReloadDelay > 0s)
+    {
+        connect(preview(), &ImageProvider::statusChanged, this,
+            [this](Qn::ThumbnailStatus status)
+            {
+                if (status == Qn::ThumbnailStatus::NoData)
+                    d->updatePreview(kPreviewReloadDelay);
+            });
+    }
+
     if (!ini().showDebugTimeInformationInRibbon)
         return;
 
@@ -502,19 +556,23 @@ bool EventTile::event(QEvent* event)
             const auto mouseEvent = static_cast<QMouseEvent*>(event);
             base_type::event(event);
             event->accept();
-            d->clickPending = (mouseEvent->button() == Qt::LeftButton);
+            d->clickButton = mouseEvent->button();
+            d->clickModifiers = mouseEvent->modifiers();
             d->clickPoint = mouseEvent->pos();
             return true;
         }
 
         case QEvent::MouseButtonRelease:
-            if (d->clickPending && static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton)
-                emit clicked();
-            d->clickPending = false;
+        {
+            const auto mouseEvent = static_cast<QMouseEvent*>(event);
+            if (mouseEvent->button() == d->clickButton)
+                emit clicked(d->clickButton, mouseEvent->modifiers() & d->clickModifiers);
+            d->clickButton = Qt::NoButton;
             break;
+        }
 
         case QEvent::MouseButtonDblClick:
-            d->clickPending = false;
+            d->clickButton = Qt::NoButton;
             if (static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton)
                 emit doubleClicked();
             break;
@@ -522,14 +580,11 @@ bool EventTile::event(QEvent* event)
         case QEvent::MouseMove:
         {
             const auto mouseEvent = static_cast<QMouseEvent*>(event);
-            if (!mouseEvent->buttons().testFlag(Qt::LeftButton))
-                break;
-
             if ((mouseEvent->pos() - d->clickPoint).manhattanLength() < qApp->startDragDistance())
                 break;
-
-            d->clickPending = false;
-            emit dragStarted();
+            d->clickButton = Qt::NoButton;
+            if (mouseEvent->buttons().testFlag(Qt::LeftButton))
+                emit dragStarted();
             break;
         }
 
@@ -545,27 +600,21 @@ bool EventTile::hasAutoClose() const
     return closeable() && d->autoCloseTimer;
 }
 
-std::chrono::milliseconds EventTile::autoCloseTime() const
+milliseconds EventTile::autoCloseTime() const
 {
-    return std::chrono::milliseconds(hasAutoClose() ? d->autoCloseTimer->interval() : 0);
+    return milliseconds(hasAutoClose() ? d->autoCloseTimer->interval() : 0);
 }
 
-std::chrono::milliseconds EventTile::autoCloseRemainingTime() const
+milliseconds EventTile::autoCloseRemainingTime() const
 {
-    return std::chrono::milliseconds(hasAutoClose() ? d->autoCloseTimer->remainingTime() : 0);
+    return milliseconds(hasAutoClose() ? d->autoCloseTimer->remainingTime() : 0);
 }
 
-void EventTile::setAutoCloseTime(std::chrono::milliseconds value)
+void EventTile::setAutoCloseTime(milliseconds value)
 {
-    using namespace std::literals::chrono_literals;
-
     if (value <= 0ms)
     {
-        if (!d->autoCloseTimer)
-            return;
-
-        d->autoCloseTimer->deleteLater();
-        d->autoCloseTimer = nullptr;
+        d->autoCloseTimer.reset();
         return;
     }
 
@@ -585,11 +634,11 @@ void EventTile::setAutoCloseTime(std::chrono::milliseconds value)
     }
     else
     {
-        d->autoCloseTimer = new QTimer(this);
+        d->autoCloseTimer.reset(new QTimer(this));
         d->autoCloseTimer->setSingleShot(true);
         d->autoCloseTimer->setInterval(value.count());
 
-        connect(d->autoCloseTimer, &QTimer::timeout, this, autoClose);
+        connect(d->autoCloseTimer.get(), &QTimer::timeout, this, autoClose);
 
         if (d->isRead)
             d->autoCloseTimer->start();
@@ -672,8 +721,13 @@ bool EventTile::previewEnabled() const
 
 void EventTile::setPreviewEnabled(bool value)
 {
+    if (previewEnabled() == value)
+        return;
+
     ui->previewWidget->setHidden(!value);
     ui->previewWidget->parentWidget()->setHidden(!value || !ui->previewWidget->imageProvider());
+
+    d->updatePreview(kPreviewLoadDelay);
 }
 
 bool EventTile::footerEnabled() const

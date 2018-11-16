@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <optional>
 
 extern "C" {
 #include <libavdevice/avdevice.h>
@@ -28,16 +29,13 @@ AVMediaType toAVMediaType(nxcip::DataPacketType mediaType);
 nxcip::CompressionType toNxCompressionType(AVCodecID codecId);
 AVCodecID toAVCodecId(nxcip::CompressionType compressionType);
 
-nxcip::AudioFormat::SampleType toNxSampleType(
-    AVSampleFormat format,
-    bool * planar = nullptr,
-    bool * ok = nullptr);
+std::optional<nxcip::AudioFormat::SampleType> toNxSampleType(AVSampleFormat format);
 
 uint64_t suggestChannelLayout(const AVCodec* codec);
 AVSampleFormat suggestSampleFormat(const AVCodec * codec);
 int suggestSampleRate(const AVCodec * codec);
 
-void toFraction(float number, int *outNumerator, int * outDenominator);
+AVRational toFraction(float number, int precision = 100);
 
 } // namespace utils
 } // namespace ffmpeg

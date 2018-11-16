@@ -1,6 +1,6 @@
 #pragma once
 
-//#define TEST_FISHEYE_CALIBRATOR
+#include <memory>
 
 #include <QtCore/QObject>
 #include <QtCore/QVector>
@@ -8,11 +8,9 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <client/client_globals.h>
-
 #include <camera/abstract_renderer.h>
-#include "utils/color_space/image_correction.h"
-#include "core/resource/resource_media_layout.h"
-#include "ui/fisheye/fisheye_ptz_controller.h"
+#include <utils/color_space/image_correction.h>
+#include <ui/fisheye/fisheye_ptz_controller.h>
 
 class QGLContext;
 class DecodedPictureToOpenGLUploader;
@@ -56,21 +54,20 @@ public:
 
     virtual bool constantDownscaleFactor() const override;
 
-    void setChannelScreenSize(const QSize &screenSize);
+    void setChannelScreenSize(const QSize& screenSize);
 
     /** Set blur in range [0..1]. */
     void setBlurFactor(qreal value);
 
-    Qn::RenderStatus paint(int channel, const QRectF &sourceRect, const QRectF &targetRect, qreal opacity);
+    Qn::RenderStatus paint(
+        int channel, const QRectF& sourceRect, const QRectF& targetRect, qreal opacity);
     Qn::RenderStatus discardFrame(int channel);
     void skip(int channel); // TODO: #Elric replace with setEnabled
 
     virtual std::chrono::microseconds getTimestampOfNextFrameToRender(int channel) const override;
-    virtual void blockTimeValue(
-        int channelNumber, std::chrono::microseconds timestamp) const override;
-    virtual void unblockTimeValue(int channelNumber) const  override;
-    virtual bool isTimeBlocked(int channelNumber) const override;
-
+    virtual void blockTimeValue(int channel, std::chrono::microseconds timestamp) override;
+    virtual void unblockTimeValue(int channel) override;
+    virtual bool isTimeBlocked(int channel) const override;
 
     bool isLowQualityImage(int channel) const;
     bool isHardwareDecoderUsed(int channel) const;
@@ -88,7 +85,7 @@ public:
 
     void setDisplayedRect(int channel, const QRectF& rect);
 
-    virtual bool isEnabled(int channelNumber) const override;
+    virtual bool isEnabled(int channel) const override;
     virtual void setEnabled(int channel, bool enabled) override;
 
     virtual void setPaused(bool value) override;
@@ -106,22 +103,23 @@ private:
     QSize getMostFrequentChannelSourceSize() const;
 
 private:
-    struct RenderingTools
+    struct RenderingContext
     {
-        QnGLRenderer* renderer = nullptr;
-        DecodedPictureToOpenGLUploader* uploader = nullptr;
+        std::shared_ptr<QnGLRenderer> renderer;
+        std::shared_ptr<DecodedPictureToOpenGLUploader> uploader;
         bool timestampBlocked = false;
         std::chrono::microseconds forcedTimestampValue{AV_NOPTS_VALUE};
         int framesSinceJump = 0;
+        bool renderingEnabled = true;
+        QSize channelSourceSize;
+        QRectF displayRect{0, 0, 1, 1};
     };
 
-    /** Renderers that are used to render the channels. */
-    mutable QVector<RenderingTools> m_channelRenderers;
+    /** Renderering contexts that are used to render the channels. */
+    QVector<RenderingContext> m_renderingContexts;
 
     /** Current source size, in square pixels. */
     QSize m_sourceSize;
-
-    QVector<QSize> m_channelSourceSize;
 
     /** Mutex that is used for synchronization. */
     mutable QnMutex m_mutex;
@@ -131,13 +129,7 @@ private:
 
     QGLContext* m_glContext;
 
-    QRectF m_displayRect[CL_MAX_CHANNELS];
-
-    QVector<bool> m_renderingEnabled;
     ScreenshotInterface* m_screenshotInterface = nullptr;
     int m_panoFactor = 1;
     qreal m_blurFactor = 0;
-#ifdef TEST_FISHEYE_CALIBRATOR
-    bool m_isCircleDetected;
-#endif
 };

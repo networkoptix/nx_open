@@ -19,6 +19,7 @@ Open Browser and go to URL
     run keyword if    "${docker}"=="false"    Regular Open Browser    ${url}
     ...          ELSE    Docker Open Browser    ${url}
     Set Selenium Speed    0
+    Set Selenium Timeout    10
     Check Language
     Go To    ${url}
 
@@ -51,24 +52,28 @@ Check Language
     Run Keyword If    "${status}"=="FAIL"    Set Language
 
 Set Language
+    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}    20
     Click Button    ${LANGUAGE DROPDOWN}
     Wait Until Element Is Visible    ${LANGUAGE TO SELECT}
     Click Element    ${LANGUAGE TO SELECT}
     Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    5
+    Sleep    1    #to wait for language to fully change before continuing.  This caused issues with login.
 
 Log In
     [arguments]    ${email}    ${password}    ${button}=${LOG IN NAV BAR}
     Run Keyword Unless    '''${button}''' == "None"    Wait Until Element Is Visible    ${button}
     Run Keyword Unless    '''${button}''' == "None"    Click Link    ${button}
-    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${REMEMBER ME CHECKBOX}    ${FORGOT PASSWORD}    ${LOG IN CLOSE BUTTON}
+    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${REMEMBER ME CHECKBOX VISIBLE}    ${FORGOT PASSWORD}    ${LOG IN CLOSE BUTTON}
     Input Text    ${EMAIL INPUT}    ${email}
     Input Text    ${PASSWORD INPUT}    ${password}
     Wait Until Element Is Visible    ${LOG IN BUTTON}
     Click Button    ${LOG IN BUTTON}
 
 Validate Log In
-    Wait Until Page Contains Element    ${AUTHORIZED BODY}    10
+    Wait Until Page Contains Element    ${AUTHORIZED BODY}    20
+    Wait Until Elements Are Visible    ${ACCOUNT DROPDOWN}
     Check Language
+    Sleep    1    #this is a test to see if it eliminates a problem with the login dialog popping up on logout
 
 Log Out
     Wait Until Page Does Not Contain Element    ${BACKDROP}
@@ -82,7 +87,7 @@ Log Out
 
 Validate Log Out
     Wait Until Element Is Not Visible    ${BACKDROP}
-    Wait Until Page Contains Element    ${ANONYMOUS BODY}    10
+    Wait Until Page Contains Element    ${ANONYMOUS BODY}    20
 
 Register
     [arguments]    ${first name}    ${last name}    ${email}    ${password}    ${checked}=false
@@ -92,7 +97,7 @@ Register
     ${read only}    Run Keyword And Return Status    Wait Until Element Is Visible    ${REGISTER EMAIL INPUT LOCKED}
     Run Keyword Unless    ${read only}    Input Text    ${REGISTER EMAIL INPUT}    ${email}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
-    Run Keyword If    "${checked}"=="false"    Click Element    ${TERMS AND CONDITIONS CHECKBOX}
+    Run Keyword If    "${checked}"=="false"    Click Element    ${TERMS AND CONDITIONS CHECKBOX VISIBLE}
     Click Button    ${CREATE ACCOUNT BUTTON}
 
 Validate Register Success
@@ -132,9 +137,29 @@ Activate
     Element Should Be Visible    ${ACTIVATION SUCCESS}
     Location Should Be    ${url}/activate/success
 
+Restore password
+    [arguments]    ${email}
+    Open Browser and go to URL    ${url}/restore_password
+    Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
+    Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
+    Click Button    ${RESET PASSWORD BUTTON}
+    ${link}    Get Email Link    ${email}    restore_password
+    Go To    ${link}
+    Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
+    #sometimes the DB doesn't update with the new code before it's used by the test.  This is to wait for the DB update.
+    Sleep    20
+    Input Text    ${RESET PASSWORD INPUT}    ${BASE PASSWORD}
+
+    Click Button    ${SAVE PASSWORD}
+    Wait Until Elements Are Visible    ${RESET SUCCESS MESSAGE}    ${RESET SUCCESS LOG IN LINK}
+    Click Link    ${RESET SUCCESS LOG IN LINK}
+    Log In    ${email}    ${BASE PASSWORD}    None
+    Validate Log In
+    Close Browser
+
 Share To
     [arguments]    ${random email}    ${permissions}
-    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
     Input Text    ${SHARE EMAIL}    ${random email}
@@ -200,7 +225,12 @@ Failure Tasks
 Wait Until Elements Are Visible
     [arguments]    @{elements}
     :FOR     ${element}  IN  @{elements}
-    \  Wait Until Element Is Visible    ${element}
+    \  Wait Until Element Is Visible    ${element}    20
+
+Elements Should Not Be Visible
+    [arguments]    @{elements}
+    :FOR     ${element}  IN  @{elements}
+    \  Element Should Not Be Visible    ${element}
 
 #Reset resources
 Clean up email noperm
@@ -275,17 +305,6 @@ Reset user owner first/last name
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Close Browser
-
-Reset user password to base
-    [arguments]    ${email}    ${current password}
-    Open Browser and go to URL    ${url}/account/password
-    Log In    ${email}    ${current password}    None
-    Validate Log In
-    Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
-    Input Text    ${CURRENT PASSWORD INPUT}    ${current password}
-    Input Text    ${NEW PASSWORD INPUT}    ${BASE PASSWORD}
-    Click Button    ${CHANGE PASSWORD BUTTON}
-    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
 
 Add notowner
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}

@@ -43,7 +43,6 @@ public:
 
     int setFps(float fps);
     int setResolution(int width, int height);
-    void resolution(int * width, int * height) const;
 
 private:
     AVFormatContext * m_formatContext = nullptr;

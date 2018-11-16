@@ -3,7 +3,7 @@
 . ../environment
 . ../common.sh
 
-SRC_DIR=../../nx_cloud/backend/cloud_tests/monitoring
+SRC_DIR=../../backend/cloud_tests/monitoring
 MAKE_SH=$SRC_DIR/make.sh
 
 MODULE=monitoring_simple

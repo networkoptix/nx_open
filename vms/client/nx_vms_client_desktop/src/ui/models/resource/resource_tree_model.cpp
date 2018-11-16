@@ -129,7 +129,20 @@ QnResourceTreeModel::QnResourceTreeModel(
     m_nodeManager(new QnResourceTreeModelNodeManager(this)),
     m_layoutNodeManager(new QnResourceTreeModelLayoutNodeManager(this))
 {
+    connect(this, &QnResourceTreeModel::modelAboutToBeReset, this,
+    [this]()
+    {
+        m_inModelResetState = true;
+    });
+
+    connect(this, &QnResourceTreeModel::modelReset, this,
+    [this]()
+    {
+        m_inModelResetState = false;
+    });
+
     /* Create top-level nodes. */
+    beginResetModel();
     for (NodeType t: rootNodeTypes())
     {
         const auto node = QnResourceTreeModelNodeFactory::createNode(
@@ -141,6 +154,7 @@ QnResourceTreeModel::QnResourceTreeModel(
             node->initialize();
         }
     }
+    endResetModel();
 
     if (scope != CamerasScope)
     {
@@ -187,8 +201,8 @@ QnResourceTreeModel::QnResourceTreeModel(
 
 QnResourceTreeModel::~QnResourceTreeModel()
 {
-    QSignalBlocker scopedSignalBlocker(this);
-
+    QSignalBlocker scopedSignalBlocker(this); // TODO: #vbreus Ideally this shouldn't be needed
+    m_inModelResetState = true;
     for (auto node: m_allNodes)
         node->deinitialize();
 }

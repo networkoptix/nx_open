@@ -3,13 +3,13 @@
     <div class="card-body">
         <h2 class="mb-3">Your System</h2>
         <p>
-            <button class="btn btn-default" ng-click="rename()">Rename System</button>
+            <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Rename System</button>
         </p>
         <p>
-            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Merge with Another System</button>
+            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Merge with Another System</button>
         </p>
         <hr />
-        <button class="btn btn-default" ng-click="disconnect()">Disconnect from
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Disconnect from
             <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
     </div>
 </div>
@@ -30,14 +30,22 @@
         <button class="btn btn-default" ng-click="delete()">Disconnect from my account</button>
     </div>
 </div>
-<div class="card card-default" ng-if="currentlyMerging">
+<div class="mt-3 card card-default" ng-if="currentlyMerging">
     <div class="card-body" ng-if="isMaster && system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
         <div><strong>{{mergeTargetSystem.name}}</strong>
             is being merged to this system</div>
         <hr />
         <div class="merge-info-text">Depending of the size of the database it may take up to several hours</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
         <div>This system is being merged to
             <strong>{{mergeTargetSystem.name}}</strong></div>
         <hr />

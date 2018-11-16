@@ -3,13 +3,13 @@
     <div class="card-body">
         <h2 class="mb-3">ご利用のシステム</h2>
         <p>
-            <button class="btn btn-default" ng-click="rename()">システム名を変更</button>
+            <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">システム名を変更</button>
         </p>
         <p>
-            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">別のシステムと統合する</button>
+            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">別のシステムと統合する</button>
         </p>
         <hr />
-        <button class="btn btn-default" ng-click="disconnect()"><span class="product-name">&nbsp;%PRODUCT_NAME%</span> から切断</button>
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()"><span class="product-name">&nbsp;%PRODUCT_NAME%</span> から切断</button>
     </div>
 </div>
 <div class="card card-condensed" ng-if="!system.isMine">
@@ -29,14 +29,22 @@
         <button class="btn btn-default" ng-click="delete()">自分のアカウントから切断</button>
     </div>
 </div>
-<div class="card card-default" ng-if="currentlyMerging">
+<div class="mt-3 card card-default" ng-if="currentlyMerging">
     <div class="card-body" ng-if="isMaster && system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
         <div><strong>{{mergeTargetSystem.name}}</strong>
             がこのシステムに統合されています</div>
         <hr />
         <div class="merge-info-text">データベースのサイズに応じて、数時間かかる場合があります</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
         <div>このシステムは次のシステムに統合されています
             <strong>{{mergeTargetSystem.name}}</strong></div>
         <hr />

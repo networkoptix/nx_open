@@ -169,12 +169,9 @@ int Codec::initializeDecoder(const char * codecName)
 
 void Codec::setFps(float fps)
 {
-    int numerator = 0;
-    int denominator = 0;
-    utils::toFraction(fps, &numerator, &denominator);
-
-    m_codecContext->framerate = {numerator, denominator};
-    m_codecContext->time_base = {denominator, numerator};
+    AVRational fraction = utils::toFraction(fps);
+    m_codecContext->framerate = fraction;
+    m_codecContext->time_base = {fraction.den, fraction.num};
 }
 
 void Codec::setResolution(int width, int height)

@@ -7,6 +7,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/update/update_information.h>
 #include <nx/vms/api/data/software_version.h>
+#include <nx/utils/uuid.h>
 
 class QnCommonModule;
 
@@ -33,9 +34,9 @@ struct UpdateContents
     QString source;
 
     // A set of servers without proper update file.
-    QSet<QnMediaServerResourcePtr> missingUpdate;
+    QSet<QnUuid> missingUpdate;
     // A set of servers that can not accept update version.
-    QSet<QnMediaServerResourcePtr> invalidVersion;
+    QSet<QnUuid> invalidVersion;
 
     QString eulaPath;
     // A folder with offline update packages.
@@ -98,7 +99,39 @@ bool checkCloudHost(
 bool verifyUpdateContents(QnCommonModule* commonModule, UpdateContents& contents,
     std::map<QnUuid, QnMediaServerResourcePtr> servers);
 
-std::future<UpdateContents> checkLatestUpdate();
-std::future<UpdateContents> checkSpecificChangeset(QString build);
+/**
+ * The UpdateCheckSignal class
+ * We use this class when regular polling for std::future<UpdateInformation> is not convenient.
+ */
+class UpdateCheckSignal: public QObject
+{
+    Q_OBJECT
+
+public:
+    using QObject::QObject;
+
+signals:
+    void atFinished(const nx::vms::client::desktop::UpdateContents& contents);
+};
+
+/**
+ * Checks update from the internet.
+ * It starts asynchronously. If signaller is specified, it will emit signaller->atFinished.
+ * signaller will be disposed by deleteLater
+ * @param signaller signaller to catch completion signal
+ * @return future object to be checked for completion
+ */
+std::future<UpdateContents> checkLatestUpdate(UpdateCheckSignal* signaller = nullptr);
+
+/**
+ * Checks update for specific build from the internet.
+ * It starts asynchronously. If signaller is specified, it will emit signaller->atFinished.
+ * signaller will be disposed by deleteLater
+ * @param signaller signaller to catch completion signal
+ * @return future object to be checked for completion
+ */
+std::future<UpdateContents> checkSpecificChangeset(QString build, UpdateCheckSignal* signaller = nullptr);
 
 } // namespace nx::vms::client::desktop
+
+Q_DECLARE_METATYPE(nx::vms::client::desktop::UpdateContents);

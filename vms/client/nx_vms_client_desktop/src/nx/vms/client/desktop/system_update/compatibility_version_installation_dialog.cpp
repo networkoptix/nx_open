@@ -105,13 +105,15 @@ void CompatibilityVersionInstallationDialog::atUpdateStateChanged(int state, int
             done(QDialogButtonBox::StandardButton::Ok);
             break;
         case ClientUpdateTool::State::error:
-            m_installationResult = InstallResult::failedInstall;
+            if (m_installationResult == InstallResult::installing)
+                m_installationResult = InstallResult::failedInstall;
+            else
+                m_installationResult = InstallResult::failedDownload;
             setMessage(tr("Installation failed"));
             finalProgress = 100;
             done(QDialogButtonBox::StandardButton::Ok);
             break;
         case ClientUpdateTool::State::applauncherError:
-            m_installationResult = InstallResult::complete;
             m_installationResult = InstallResult::failedInstall;
             setMessage(tr("Installation failed"));
             finalProgress = 100;
