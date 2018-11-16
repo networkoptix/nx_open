@@ -73,12 +73,10 @@
 }
 
 $theme-colors : (
-    "success": #28a745,
-    "info": #17a2b8,
-    "warning": #ffc107,
-    "danger": #d92a2a,
-    "light": $light10,
-    "dark": #343a40
+    "success": $brand-success,
+    "info": $brand-info,
+    "warning": $brand-warning,
+    "danger": $brand-danger,
 );
 
 @each $color, $value in $theme-colors {

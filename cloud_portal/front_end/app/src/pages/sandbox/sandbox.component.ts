@@ -42,9 +42,7 @@ export class NxSandboxComponent {
             { name: 'danger', selected: true, type: 'danger' },
             { name: 'warning', selected: false, type: 'warning' },
             { name: 'info', selected: false, type: 'info' },
-            { name: 'default', selected: true },
-            { name: 'light', selected: true, type: 'light' },
-            { name: 'dark', selected: false, type: 'dark' }
+            { name: 'default', selected: true }
         ]
 
     }
