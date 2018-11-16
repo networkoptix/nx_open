@@ -1651,10 +1651,13 @@ void MediaServerProcess::registerRestHandlers(
      *     rules to assign actions depending on this text.
      * %param[opt]:objectJson metadata Additional information associated with the event, in the
      *     form of a JSON object. Currently this object can specify the only field "cameraRefs",
-     *     but other fields could be added in the future. <ul> <li>"cameraRefs" specifies the list
-     *     of cameras which are linked to the event (e.g. the event will appear on their
-     *     timelines), in the form of a list of camera ids (can be obtained from "id" field via
-     *     /ec2/getCamerasEx or /ec2/getCameras?extraFormatting). </li> </ul>
+     *     but other fields could be added in the future.
+     *     <ul>
+     *         <li>"cameraRefs" specifies the list of cameras which are linked to the event (e.g.
+     *         the event will appear on their timelines), in the form of a list of camera ids (can
+     *         be obtained from "id" field via /ec2/getCamerasEx or
+     *         /ec2/getCameras?extraFormatting).</li>
+     *     </ul>
      * %param[opt]:enum state Generic events can be used either with "long" actions like
      *     "do recording", or instant actions like "send email". This parameter should be specified
      *     in case "long" actions are going to be used with generic events.
