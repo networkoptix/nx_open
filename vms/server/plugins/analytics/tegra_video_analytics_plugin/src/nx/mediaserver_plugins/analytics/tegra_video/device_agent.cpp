@@ -229,7 +229,7 @@ bool DeviceAgent::makeMetadataPacketsFromRectsPostprocCar(
 {
     auto objectPacket = new CommonObjectsMetadataPacket();
     objectPacket->setTimestampUsec(ptsUs);
-    objectPacket->setDurationUsec(1000000LL * 10); //< TODO: #mshevchenko: Ask #rvasilenko.
+    objectPacket->setDurationUsec(0);
 
     m_tracker.filterAndTrack(metadataPackets, rects, ptsUs);
 
