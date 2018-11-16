@@ -12,7 +12,7 @@
 #include <rest/server/json_rest_result.h>
 #include <utils/common/connective.h>
 #include <utils/common/delayed.h>
-#include <utils/license_usage_helper.cpp>
+#include <utils/license_usage_helper.h>
 
 namespace detail {
 
