@@ -552,7 +552,7 @@ void MultiServerUpdatesWidget::pickLocalFile()
 void MultiServerUpdatesWidget::pickSpecificBuild()
 {
     QnBuildNumberDialog dialog(this);
-    if (!dialog.exec())
+    if (dialog.exec() != QDialog::Accepted)
         return;
 
     m_updateSourceMode = UpdateSourceType::internetSpecific;
