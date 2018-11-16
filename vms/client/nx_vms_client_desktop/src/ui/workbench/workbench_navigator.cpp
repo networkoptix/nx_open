@@ -766,6 +766,13 @@ void QnWorkbenchNavigator::setPosition(qint64 positionUsec)
     emit positionChanged();
 }
 
+QnTimePeriod QnWorkbenchNavigator::timelineRange() const
+{
+    return m_timeSlider && m_timelineRelevant
+        ? QnTimePeriod::fromInterval(m_timeSlider->minimum(), m_timeSlider->maximum())
+        : QnTimePeriod();
+}
+
 void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget)
 {
     if (widget == NULL)
