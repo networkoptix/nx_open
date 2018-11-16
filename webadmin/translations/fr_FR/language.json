@@ -116,7 +116,7 @@
         "updateNotificationsEnabled": "Notifications de mise à jour activées",
         "upnpPortMappingEnabled": "Mappage de port UPNP activé",
         "useTextEmailFormat": "Envoyer des courriels en texte brut",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
+        "useWindowsEmailLineFeed": "Utiliser le Windows 'line feed' dans les courriels",
         "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
         "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
         "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
@@ -156,7 +156,7 @@
     },
     "login": {
         "incorrectPassword": "Identifiant ou mot de passe incorrect",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "Trop de tentatives. Réessayez dans une minute."
     },
     "navigaion": {
         "cannotGetUser": "Panne du serveur : impossible de récupérer les données d’usager actuel"

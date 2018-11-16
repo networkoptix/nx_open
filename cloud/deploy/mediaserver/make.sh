@@ -6,6 +6,17 @@
 MODULE=mediaserver
 VERSION=3.1.0.17256
 
+function publish_state
+{
+    local state_file=mediaserver-state-$VERSION-$(date +%Y-%m-%d).tar.gz
+
+    tar -C /opt/networkoptix/mediaserver -czf $state_file etc var
+    aws s3 cp $state_file s3://nxcloud-prod-internal-data/monitoring/$state_file
+    rm $state_file
+
+    echo "State is s3://nxcloud-prod-internal-data/monitoring/$state_file"
+}
+
 function build ()
 {
     rm -rf build

@@ -3,7 +3,7 @@
 #include <nx/utils/log/log.h>
 
 #include <nx/cloud/db/managers/managers_types.h>
-#include <nx/data_sync_engine/synchronization_engine.h>
+#include <nx/clusterdb/engine/synchronization_engine.h>
 
 #include <nx_ec/ec_proto_version.h>
 
@@ -11,7 +11,7 @@ namespace nx::cloud::db {
 
 MaintenanceManager::MaintenanceManager(
     const QnUuid& moduleGuid,
-    data_sync_engine::SyncronizationEngine* const syncronizationEngine,
+    clusterdb::engine::SyncronizationEngine* const syncronizationEngine,
     const nx::sql::InstanceController& dbInstanceController)
     :
     m_moduleGuid(moduleGuid),
@@ -62,7 +62,7 @@ void MaintenanceManager::getTransactionLog(
 
     m_syncronizationEngine->transactionLog().readTransactions(
         systemId.systemId.c_str(),
-        nx::data_sync_engine::ReadCommandsFilter::kEmptyFilter,
+        nx::clusterdb::engine::ReadCommandsFilter::kEmptyFilter,
         std::bind(&MaintenanceManager::onTransactionLogRead, this,
             m_startedAsyncCallsCounter.getScopedIncrement(),
             systemId.systemId,
@@ -93,8 +93,8 @@ void MaintenanceManager::getStatistics(
 void MaintenanceManager::onTransactionLogRead(
     nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     const std::string& systemId,
-    data_sync_engine::ResultCode ec2ResultCode,
-    std::vector<data_sync_engine::dao::TransactionLogRecord> serializedTransactions,
+    clusterdb::engine::ResultCode ec2ResultCode,
+    std::vector<clusterdb::engine::dao::TransactionLogRecord> serializedTransactions,
     vms::api::TranState /*readedUpTo*/,
     std::function<void(
         api::ResultCode,

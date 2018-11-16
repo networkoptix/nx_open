@@ -9,7 +9,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/data_sync_engine/synchronization_engine.h>
+#include <nx/clusterdb/engine/synchronization_engine.h>
 #include <nx/cloud/db/controller.h>
 #include <nx/cloud/db/managers/system_merge_manager.h>
 #include <nx/cloud/db/settings.h>
@@ -184,7 +184,7 @@ private:
     SystemManagerStub m_systemManagerStub;
     SystemHealthInfoProviderStub m_systemHealthInfoProviderStub;
     VmsGatewayStub m_vmsGatewayStub;
-    std::unique_ptr<data_sync_engine::SyncronizationEngine> m_syncronizationEngine;
+    std::unique_ptr<clusterdb::engine::SyncronizationEngine> m_syncronizationEngine;
     std::unique_ptr<nx::cloud::db::SystemMergeManager> m_systemMergeManager;
     nx::utils::SyncQueue<api::ResultCode> m_mergeResults;
     boost::optional<std::future<void>> m_systemMergeManagerDestroyed;
@@ -199,11 +199,11 @@ private:
 
         m_ownerAccount = insertRandomAccount();
 
-        m_syncronizationEngine = std::make_unique<data_sync_engine::SyncronizationEngine>(
+        m_syncronizationEngine = std::make_unique<clusterdb::engine::SyncronizationEngine>(
             std::string(),
             QnUuid::createUuid(),
             m_settings.p2pDb(),
-            nx::data_sync_engine::ProtocolVersionRange(
+            nx::clusterdb::engine::ProtocolVersionRange(
                 kMinSupportedProtocolVersion,
                 kMaxSupportedProtocolVersion),
             &queryExecutor());

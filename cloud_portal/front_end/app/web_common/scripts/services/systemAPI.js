@@ -29,11 +29,11 @@ angular.module('nxCommon')
         * Service is initialised to work with specific system and server.
         * Each instance representing a single connection and is cached
         *
-        * 
+        *
         * TODO (v 3.2): Support websocket connection to server as well
         * */
 
-        
+
         function ServerConnection(userEmail, systemId, serverId, unauthorizedCallBack){
             // If we have systemId - this is a cloud connection
             // if we have serverId - we ought to use proxy
@@ -84,9 +84,9 @@ angular.module('nxCommon')
         };
         ServerConnection.prototype._wrapRequest = function(method, url, data, repeat){
             var self = this;
-            var auth = method=='GET'? this.authGet() : this.authPost();
-            var getData = method=='GET'? data : null;
-            var postData = method=='POST'? data : null;
+            var auth = method =='GET'? this.authGet() : this.authPost();
+            var getData = method =='GET'? data : null;
+            var postData = method =='POST'? data : null;
             var requestUrl = this._setGetParams(url, getData, this.systemId && auth);
 
             var canceler = $q.defer();
@@ -98,7 +98,7 @@ angular.module('nxCommon')
             });
 
             var promise = request.catch(function(error){
-                if(error.status == 401 || error.status == 403  || error.data && error.data.resultCode == "forbidden"){
+                if(error.status == 401 || error.status == 403  || error.data && error.data.resultCode === "forbidden"){
                     if(!repeat && self.unauthorizedCallBack){ // first attempt
                         // Here we call a handler for unauthorised request. If handler promises success - we repeat the request once again.
                         // Handler is supposed to try and update auth keys
@@ -125,6 +125,7 @@ angular.module('nxCommon')
                 canceler = null;
             });
             promise.abort = function(reason){
+                this.abortReason = reason; // Save this information for the promise handler
                 if(canceler) {
                     canceler.resolve('abort request: ' + reason);
                 }
@@ -161,7 +162,7 @@ angular.module('nxCommon')
 
         /* Authentication */
         ServerConnection.prototype.getCurrentUser = function (forcereload){
-            if(forcereload){ // Clean cache to 
+            if(forcereload){ // Clean cache to
                 self.currentUser = null;
                 self.userRequest = null;
             }
@@ -171,12 +172,12 @@ angular.module('nxCommon')
             if(this.userRequest){ // Currently requesting user
                 return this.userRequest;
             }
-            
+
             var self = this;
             if(self.userEmail){ // Cloud portal mode - getCurrentUser is not working
                 this.userRequest = this._get('/ec2/getUsers').then(function(result){
                     self.currentUser = _.find(result.data, function(user){
-                        return user.name.toLowerCase() == self.userEmail.toLowerCase();
+                        return user.name.toLowerCase() === self.userEmail.toLowerCase();
                     });
                     return self.currentUser;
                 });
@@ -230,6 +231,10 @@ angular.module('nxCommon')
         /* Server settings */
         ServerConnection.prototype.getServerTimes = function(){
             return this._get('/ec2/getTimeOfServers');
+        };
+    
+        ServerConnection.prototype.getSystemTime = function () {
+            return this._get('/api/synchronizedTime');
         };
         /* End of Server settings */
 
@@ -294,7 +299,7 @@ angular.module('nxCommon')
         };
         ServerConnection.prototype.getMediaServersAndCameras = function(){
             return this._get('/api/aggregator?exec_cmd=ec2%2FgetMediaServersEx&exec_cmd=ec2%2FgetCamerasEx');
-        }
+        };
         ServerConnection.prototype.getResourceTypes = function(){
             return this._get('/ec2/getResourceTypes');
         };
@@ -356,7 +361,7 @@ angular.module('nxCommon')
                 endTime: endTime,
                 detail: detail,
                 periodsType: periodsType
-            }
+            };
             if(limit){
                 params.limit = limit
             }
@@ -366,9 +371,15 @@ angular.module('nxCommon')
         /* End of Working with archive*/
 
         ServerConnection.prototype.setCameraPath = function(cameraId){
-            var systemLink = '';
+            var systemLink = '',
+                route = ($location.path().indexOf('/embed') === 0) ? '/embed/' : '';
+
             if(this.systemId){
-                systemLink = '/systems/' + this.systemId;
+                if (route !== '') {
+                    systemLink = route + this.systemId;
+                } else {
+                    systemLink = '/systems/' + this.systemId;
+                }
             }
             $location.path(systemLink + '/view/' + cleanId(cameraId), false);
         };

@@ -6,7 +6,7 @@
   "dialogs": {
     "okButton": "Ok",
     "cancelButton": "Annuler",
-    "loginTitle": "Connexion à %PRODUCT_NAME%",
+    "loginTitle": "Connecter à %PRODUCT_NAME%",
     "loginButton": "Connexion",
     "logoutAuthorisedTitle": "Vous êtes déjà connecté",
     "logoutAuthorisedContinueButton": "Continuer",
@@ -62,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "Visualisateur avancé",
-      "description": "Can view live video, browse the archive, control PTZ etc"
+      "description": "Peut visionner vidéo en direct, parcourir les archives, contrôler le PTZ, etc"
     },
     "Administrator": {
       "label": "Administrateur",
@@ -177,7 +177,7 @@
     "confirmUnshareAction": "Supprimer",
     "successDisconnected": "Système correctement déconnecté de %PRODUCT_NAME%",
     "successDeleted": "Système {{systemName}} a correctement été supprimé de votre compte",
-    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
+    "successMerge": "Système {{systemName}} a été fusionné avec {{systemName}}",
     "permissionsRemoved": "Autorisations retirées de {{email}}"
   },
   "account": {
@@ -279,7 +279,7 @@
       "copyActiveText": "copié dvers presse-papiers"
     },
     "systemOffline": "System Hors ligne",
-    "systemHasNoCameras": "NO CAMERAS",
+    "systemHasNoCameras": "AUCUNE CAMÉRA",
     "cameraStates": {
       "offline": "Hors ligne",
       "error": "Erreur",

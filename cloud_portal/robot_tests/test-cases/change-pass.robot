@@ -1,6 +1,5 @@
 *** Settings ***
 Resource          ../resource.robot
-Resource          ../variables.robot
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
 Suite Setup       Open Browser and go to URL    ${url}
@@ -20,6 +19,14 @@ Log In To Change Password Page
     Validate Log In
     Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
 
+Reset user password to base
+    [arguments]    ${email}    ${current password}
+    Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
+    Input Text    ${CURRENT PASSWORD INPUT}    ${current password}
+    Input Text    ${NEW PASSWORD INPUT}    ${BASE PASSWORD}
+    Click Button    ${CHANGE PASSWORD BUTTON}
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
+
 Restart
     Register Keyword To Run On Failure    NONE
     ${status}    Run Keyword And Return Status    Validate Log In
@@ -30,11 +37,11 @@ Restart
 
 Clean up
     Close Browser
-    Run Keyword If Any Tests Failed    Reset user noperm first/last name
+    Restore Password    ${email}
 
 Reset DB and Open New Browser On Failure
     Close Browser
-    Reset user password to base    ${EMAIL VIEWER}    ${ALT PASSWORD}
+    Restore Password    ${email}
     Open Browser and go to URL    ${url}
 
 *** Test Cases ***
@@ -75,12 +82,7 @@ password is actually changed, so login works with new password
     Wait Until Element Is Visible    ${WRONG PASSWORD MESSAGE}
     Log In    ${email}    ${ALT PASSWORD}    None
     Validate Log In
-
-    Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
-    Input Text    ${CURRENT PASSWORD INPUT}    ${ALT PASSWORD}
-    Input Text    ${NEW PASSWORD INPUT}    ${password}
-    Click Button    ${CHANGE PASSWORD BUTTON}
-    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
+    Reset user password to base    ${email}    ${ALT PASSWORD}
 
 password with symbols pass!@#$%^&*()_-+=;:'"`~,./\|?[]{} is valid
     [tags]    C41834
@@ -96,12 +98,7 @@ password with symbols pass!@#$%^&*()_-+=;:'"`~,./\|?[]{} is valid
     Wait Until Element Is Visible    ${WRONG PASSWORD MESSAGE}
     Log In    ${email}    ${symbol password}    None
     Validate Log In
-
-    Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
-    Input Text    ${CURRENT PASSWORD INPUT}    ${symbol password}
-    Input Text    ${NEW PASSWORD INPUT}    ${password}
-    Click Button    ${CHANGE PASSWORD BUTTON}
-    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
+    Reset user password to base    ${email}    ${symbol password}
 
 password with space in the middle is valid
     [tags]    C41835
@@ -117,12 +114,7 @@ password with space in the middle is valid
     Wait Until Element Is Visible    ${WRONG PASSWORD MESSAGE}
     Log In    ${email}    ${space password}    None
     Validate Log In
-
-    Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
-    Input Text    ${CURRENT PASSWORD INPUT}    ${space password}
-    Input Text    ${NEW PASSWORD INPUT}    ${password}
-    Click Button    ${CHANGE PASSWORD BUTTON}
-    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
+    Reset user password to base    ${email}    ${space password}
 
 more than 255 symbols can be entered in new password field and then are cut to 255
     Log In To Change Password Page

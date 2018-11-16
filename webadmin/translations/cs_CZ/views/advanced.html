@@ -116,36 +116,20 @@
 
     <h2>Deník nastavení</h2>
     <form class="form" role="form" name="logLevels" novalidate>
-        <div class="form-group">
-            <label class="col-sm-4">Úroveň hlavního deníku</label>
+        <div ng-repeat="(name, level) in loggers" class="form-group">
+            <label class="col-sm-4">{{name}} log level</label>
             <div class="col-sm-8">
-
-                <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">Žádné: Zaznamenávání je zakázáno.</option>
-                    <option value="ALWAYS">Vždy: Chyby protokolu, varování a nejdůležitější zprávy.</option>
-                    <option value="ERROR">Chyba: Zaznamenat pouze chyby.</option>
-                    <option value="WARNING">Upozornění: Zaznamenat upozornění a chyby.</option>
-                    <option value="INFO">Info: Zaznamenat chyby, varování a všechny zprávy.</option>
-                    <option value="DEBUG">Ladění: Zaznamenat každou systémovou zprávu a informace o ladění.</option>
-                    <option value="DEBUG2">Ladění 2: Zaznamenat každou systémovou zprávu a rozšířené informace o ladění.</option>
+                <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
+                    <option value="none">Žádné: Zaznamenávání je zakázáno.</option>
+                    <option value="always">Vždy: Chyby protokolu, varování a nejdůležitější zprávy.</option>
+                    <option value="error">Chyba: Zaznamenat pouze chyby.</option>
+                    <option value="warning">Upozornění: Zaznamenat upozornění a chyby.</option>
+                    <option value="info">Info: Zaznamenat chyby, varování a všechny zprávy.</option>
+                    <option value="debug">Ladění: Zaznamenat každou systémovou zprávu a informace o ladění.</option>
+                    <option value="debug2">Ladění 2: Zaznamenat každou systémovou zprávu a rozšířené informace o ladění.</option>
                 </select>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-sm-4">Úroveň transakčního deníku</label>
-            <div class="col-sm-8">
-                <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">Žádné: Zaznamenávání je zakázáno.</option>
-                    <option value="ALWAYS">Vždy: Chyby protokolu, varování a nejdůležitější zprávy.</option>
-                    <option value="ERROR">Chyba: Zaznamenat pouze chyby.</option>
-                    <option value="WARNING">Upozornění: Zaznamenat upozornění a chyby.</option>
-                    <option value="INFO">Info: Zaznamenat chyby, varování a všechny zprávy.</option>
-                    <option value="DEBUG">Ladění: Zaznamenat každou systémovou zprávu a informace o ladění.</option>
-                    <option value="DEBUG2">Ladění 2: Zaznamenat každou systémovou zprávu a rozšířené informace o ladění.</option>
-                </select>
-            </div>
-        </div>
-
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="changeLogLevels()" >Uložit</button>
         </div>

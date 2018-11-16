@@ -116,36 +116,20 @@
 
     <h2>הגדרות יומן רישום</h2>
     <form class="form" role="form" name="logLevels" novalidate>
-        <div class="form-group">
-            <label class="col-sm-4">רמת יומן הראשי</label>
+        <div ng-repeat="(name, level) in loggers" class="form-group">
+            <label class="col-sm-4">{{name}} log level</label>
             <div class="col-sm-8">
-
-                <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">ללא: יומן רישום כבוי.</option>
-                    <option value="ALWAYS">הכל: שמור שגיאות, אזהרות ואת ההודעות ההחשובות ביותר.</option>
-                    <option value="ERROR">שגיאה: שמור שגיאות בלבד.</option>
-                    <option value="WARNING">אזהרה: שמור אזהרות ושגיאות.</option>
-                    <option value="INFO">מידע: שמור שגיאות, אזהרות ואת כל ההודעות.</option>
-                    <option value="DEBUG">איתור באגים: שמור כל הודעת מערכת ומידע לאיתור באגים.</option>
-                    <option value="DEBUG2">איתור באגים 2: שמור כל הודעת מערכת ומידע מורחב לאיתור באגים.</option>
+                <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
+                    <option value="none">ללא: יומן רישום כבוי.</option>
+                    <option value="always">הכל: שמור שגיאות, אזהרות ואת ההודעות ההחשובות ביותר.</option>
+                    <option value="error">שגיאה: שמור שגיאות בלבד.</option>
+                    <option value="warning">אזהרה: שמור אזהרות ושגיאות.</option>
+                    <option value="info">מידע: שמור שגיאות, אזהרות ואת כל ההודעות.</option>
+                    <option value="debug">איתור באגים: שמור כל הודעת מערכת ומידע לאיתור באגים.</option>
+                    <option value="debug2">איתור באגים 2: שמור כל הודעת מערכת ומידע מורחב לאיתור באגים.</option>
                 </select>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-sm-4">רמת יומן הטרנזקציות</label>
-            <div class="col-sm-8">
-                <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">ללא: יומן רישום כבוי.</option>
-                    <option value="ALWAYS">הכל: שמור שגיאות, אזהרות ואת ההודעות ההחשובות ביותר.</option>
-                    <option value="ERROR">שגיאה: שמור שגיאות בלבד.</option>
-                    <option value="WARNING">אזהרה: שמור אזהרות ושגיאות.</option>
-                    <option value="INFO">מידע: שמור שגיאות, אזהרות ואת כל ההודעות.</option>
-                    <option value="DEBUG">איתור באגים: שמור כל הודעת מערכת ומידע לאיתור באגים.</option>
-                    <option value="DEBUG2">איתור באגים 2: שמור כל הודעת מערכת ומידע מורחב לאיתור באגים.</option>
-                </select>
-            </div>
-        </div>
-
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="changeLogLevels()" >שמור</button>
         </div>

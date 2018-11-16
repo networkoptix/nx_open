@@ -17,7 +17,7 @@
          [style.display]="show ? 'inline-block' : 'none'"
          aria-labelledby="permissionsSelect">
 
-        <li class="dropdown-item-container" *ngFor="let role of roles">
+        <li class="dropdown-item-container" *ngFor="let role of accessRoles">
 
             <a href class="dropdown-item inset"
                [ngClass]="{'selected': role.optionLabel == selection}"

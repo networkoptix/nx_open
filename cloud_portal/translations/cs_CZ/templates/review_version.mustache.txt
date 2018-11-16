@@ -1,6 +1,6 @@
 K dispozici je nová verze pro {{ message.product }}
 
-Kliknutím na odkaz zobrazíte koncept {{ message.id }} pro {{ message.product }}
+Kliknutím na odkaz zobrazíte koncept revize {{ message.id }} pro {{ message.product }}
 
 Odkaz k zobrazení revize: {{ config.portal_url }}/ admin / cms / version /{{ message.id }}
 

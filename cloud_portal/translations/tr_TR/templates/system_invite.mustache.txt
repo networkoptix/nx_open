@@ -9,5 +9,5 @@ Sizi %PRODUCT_NAME%'e davet ettiniz.
 {{message.system_name}} adresine erişim izni verildi.
 {{/message.sharer_name}}
 
-Sistemi kaydettirin ve görüntüleyin: {{config.portal_url}}/register/{{message.code}}
+Sistemi kaydettirin ve görüntüleyin: {{config.portal_url}} / register / {{message.code}}
 
