@@ -37,11 +37,14 @@ export class NxSandboxComponent {
         ];
 
         this.options = [
-            { name: 'access control', selected: false },
-            { name: 'connector', selected: true },
-            { name: 'drone', selected: true },
-            { name: 'health monitor', selected: false },
-            { name: 'storage', selected: false }
+            { name: 'brand', selected: false, type: 'brand' },
+            { name: 'success', selected: true, type: 'success' },
+            { name: 'danger', selected: true, type: 'danger' },
+            { name: 'warning', selected: false, type: 'warning' },
+            { name: 'info', selected: false, type: 'info' },
+            { name: 'default', selected: true },
+            { name: 'light', selected: true, type: 'light' },
+            { name: 'dark', selected: false, type: 'dark' }
         ]
 
     }

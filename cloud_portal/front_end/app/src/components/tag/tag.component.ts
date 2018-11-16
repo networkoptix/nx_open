@@ -12,23 +12,30 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
     }]
 })
 export class NxTagComponent implements OnInit, ControlValueAccessor {
-    @Input('brand') useBrand: boolean;
+    @Input() type: string;
     @Input('value') selected: boolean;
     @Output() onClick = new EventEmitter<boolean>();
+    private badgeClass: string;
 
     constructor(){}
 
-    ngOnInit(){
+    ngOnInit() {
+        this.badgeClass = this.type !== undefined ? `-${this.type}` : '';
+        if (this.selected) {
+            this.badgeClass = `${this.badgeClass}-selected`;
+        }
     }
 
-    deselectTag(){
+    deselectTag() {
         this.selected = false;
+        this.badgeClass = this.type ? `-${this.type}`: '';
         this.changeState(false);
     }
 
-    selectTag(){
+    selectTag() {
         if (!this.selected) {
             this.selected = true;
+            this.badgeClass = this.type ? `-${this.type}-selected`: '-selected';
             this.changeState(true)
         }
     }

@@ -322,8 +322,8 @@
             </form>
             <br>
             <br>
-            <div *ngFor="let option of options">
-                <nx-tag [brand]="true" [value]="option.selected">{{ option.name }}</nx-tag>
+            <div class="d-inline-block" *ngFor="let option of options">
+                <nx-tag [type]="option.type" [value]="option.selected">{{ option.name }}</nx-tag>
             </div>
         </div>
     </div>
