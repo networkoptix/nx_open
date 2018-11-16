@@ -132,7 +132,7 @@ std::string Engine::manifest() const
         "items": [
             {
                 "type": "TextField",
-                "name": "nx.stub.device_agent.settings.text_0",
+                "name": "test_text_field",
                 "caption": "Device Agent Text Field",
                 "description": "A text field",
                 "defaultValue": "a text"
@@ -144,7 +144,7 @@ std::string Engine::manifest() const
                     {
                         "type": "SpinBox",
                         "caption": "Device Agent SpinBox",
-                        "name": "nx.stub.device_agent.settings.number_0",
+                        "name": "test_spin_box",
                         "defaultValue": 42,
                         "minValue": 0,
                         "maxValue": 100
@@ -152,14 +152,14 @@ std::string Engine::manifest() const
                     {
                         "type": "DoubleSpinBox",
                         "caption": "Device Agent DoubleSpinBox",
-                        "name": "nx.stub.device_agent.settings.double_0",
+                        "name": "test_double_spin_box",
                         "defaultValue": 3.1415,
                         "minValue": 0.0,
                         "maxValue": 100.0
                     },
                     {
                         "type": "ComboBox",
-                        "name": "nx.stub.device_agent.settings.combobox_0",
+                        "name": "test_combo_box",
                         "caption": "Device Agent ComboBox",
                         "defaultValue": "value2",
                         "range": ["value1", "value2", "value3"]
@@ -168,15 +168,9 @@ std::string Engine::manifest() const
                         "type": "Row",
                         "items": [
                             {
-                                "type": "Button",
-                                "caption": "Device Agent Button",
-                                "name": "nx.stub.device_agent.settings.button_0",
-                                "caption": "Button"
-                            },
-                            {
                                 "type": "CheckBox",
                                 "caption": "Device Agent CheckBox",
-                                "name": "nx.stub.device_agent.settings.checkbox_0",
+                                "name": "test_check_box",
                                 "defaultValue": true,
                                 "value": true
                             }
@@ -264,21 +258,21 @@ static const std::string kPluginManifest = R"json(
                 "items": [
                     {
                         "type": "SpinBox",
-                        "name": "nx.stub.engine.settings.number_0",
+                        "name": "test_spin_box",
                         "defaultValue": 42,
                         "minValue": 0,
                         "maxValue": 100
                     },
                     {
                         "type": "DoubleSpinBox",
-                        "name": "nx.stub.engine.settings.double_0",
+                        "name": "test_double_spin_box",
                         "defaultValue": 3.1415,
                         "minValue": 0.0,
                         "maxValue": 100.0
                     },
                     {
                         "type": "ComboBox",
-                        "name": "nx.stub.engine.settings.combobox_0",
+                        "name": "test_double_combo_box",
                         "defaultValue": "value2",
                         "range": ["value1", "value2", "value3"]
                     },
@@ -286,13 +280,8 @@ static const std::string kPluginManifest = R"json(
                         "type": "Row",
                         "items": [
                             {
-                                "type": "Button",
-                                "name": "nx.stub.engine.settings.button_0",
-                                "caption": "Button"
-                            },
-                            {
                                 "type": "CheckBox",
-                                "name": "nx.stub.engine.settings.checkbox_0",
+                                "name": "test_check_box",
                                 "defaultValue": true,
                                 "value": true
                             }
