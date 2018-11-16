@@ -341,7 +341,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImage(const nx::api::CameraImageReq
 
     const auto secondaryResolution =
         request.camera->streamInfo(Qn::StreamIndex::secondary).getResolution();
-    const Qn::StreamIndex streamIndex = (
+    Qn::StreamIndex streamIndex = (
             (request.size.width() <= 0 && request.size.height() <= 0)
             || request.size.width() > secondaryResolution.width()
             || request.size.height() > secondaryResolution.height())
