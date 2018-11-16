@@ -65,5 +65,4 @@ private:
     // Mutex that is used to synchronize access to manual camera addition progress.
     QnMutex m_searchProcessMutex;
     std::unordered_map<QnUuid, QnManualCameraSearcherPtr> m_searchProcesses;
-    QHash<QnUuid, nx::utils::concurrent::Future<bool>> m_searchProcessRuns;  // TODO: remove it.
 };

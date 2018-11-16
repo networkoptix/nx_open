@@ -63,11 +63,9 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
         // NOTE: boost::bind is here temporarily, until nx::utils::concurrent::run supports arbitrary
         // number of arguments.
         const auto threadPool = owner->commonModule()->resourceDiscoveryManager()->threadPool();
-        m_searchProcessRuns.insert(processUuid,
-            nx::utils::concurrent::run(threadPool, std::bind(
-                &QnManualCameraSearcher::run, searcher->second.get(), threadPool, addr1, addr2, auth, port)));
+        nx::utils::concurrent::run(threadPool, std::bind(
+            &QnManualCameraSearcher::run, searcher->second.get(), threadPool, addr1, addr2, auth, port));
     }
-
     // TODO: Nobody removes finished searchers!
 
     QnManualCameraSearchReply reply(processUuid, getSearchStatus(processUuid));
@@ -99,32 +97,28 @@ int QnManualCameraAdditionRestHandler::searchStopAction(
     const QnRequestParams& params, QnJsonRestResult& result)
 {
     QnUuid processUuid = QnUuid(params.value("uuid"));
-
     if (processUuid.isNull())
         return nx::network::http::StatusCode::unprocessableEntity;
 
     NX_VERBOSE(this, "Stopping search process with UUID=%1", processUuid);
-    QnManualCameraSearcherPtr process;
+    QnManualCameraSearcherPtr searcher;
     {
         QnMutexLocker lock(&m_searchProcessMutex);
         if (m_searchProcesses.count(processUuid))
         {
-            process = std::move(m_searchProcesses[processUuid]);
-            process->cancel();
+            searcher = std::move(m_searchProcesses[processUuid]);
+            searcher->cancel();
             m_searchProcesses.erase(processUuid);
         }
-        if (m_searchProcessRuns.contains(processUuid))
-        {
-            m_searchProcessRuns[processUuid].waitForFinished();
-            m_searchProcessRuns.remove(processUuid);
-        }
+        // TODO: Should return 404 if not found.
     }
+    //< TODO: Should make sure the searcher is stopped here!
 
     QnManualCameraSearchReply reply;
     reply.processUuid = processUuid;
-    if (process)
+    if (searcher)
     {
-        QnManualCameraSearchProcessStatus processStatus = process->status();
+        QnManualCameraSearchProcessStatus processStatus = searcher->status();
         reply.status = processStatus.status;
         reply.cameras = processStatus.cameras;
     }
