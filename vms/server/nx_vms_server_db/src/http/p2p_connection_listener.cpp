@@ -184,6 +184,29 @@ bool ConnectionProcessor::canAcceptConnection(const vms::api::PeerDataEx& remote
     return true;
 }
 
+class ConnectionLocker
+{
+public:
+    ConnectionLocker(const QnUuid& id): m_id(id)
+    {
+        QnMutexLocker lock(&m_commonMutex);
+        auto& connectionMutex = m_mutexList[id];
+        if (!connectionMutex)
+            connectionMutex.reset();
+        connectionMutex->lock();
+    }
+    ~ConnectionLocker()
+    {
+        QnMutexLocker lock(&m_commonMutex);
+        m_mutexList[m_id]->unlock();
+        m_mutexList.erase(m_id);
+    }
+private:
+    QnUuid m_id;
+    static std::map<QnUuid, std::unique_ptr<QnMutex>> m_mutexList;
+    static QnMutex m_commonMutex;
+};
+
 void ConnectionProcessor::run()
 {
     Q_D(QnTCPConnectionProcessor);
@@ -199,6 +222,10 @@ void ConnectionProcessor::run()
 
     auto connection = commonModule()->ec2Connection();
     auto messageBus = (connection->messageBus()->dynamicCast<ServerMessageBus*>());
+
+    // Strict GET and POST running at the same time for the same connection.
+    ConnectionLocker connectionLocker(remotePeer.connectionGuid);
+
     if (d->request.requestLine.method == "POST")
     {
         messageBus->gotPostConnection(remotePeer, std::move(d->socket));
