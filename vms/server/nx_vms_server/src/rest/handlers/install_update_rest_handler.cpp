@@ -13,17 +13,20 @@ bool allServersAreReadyForInstall(const QnRestConnectionProcessor* processor)
         QnRequestParamList());
 
     request.isLocal = true;
-    QnMultiserverRequestContext<QnEmptyRequestData> context(
-        request,
+    QnMultiserverRequestContext<QnEmptyRequestData> context(request,
         processor->owner()->getPort());
 
     QList<nx::update::Status> reply;
-    detail::checkUpdateStatusRemotely(processor->commonModule(), "/ec2/updateStatus", &reply, &context);
+    detail::checkUpdateStatusRemotely(processor->commonModule(), "/ec2/updateStatus", &reply,
+        &context);
 
     for (const auto& status: reply)
     {
-        if (status.code != nx::update::Status::Code::readyToInstall)
+        if (status.code != nx::update::Status::Code::readyToInstall
+            && status.code != nx::update::Status::Code::latestUpdateInstalled)
+        {
             return false;
+        }
     }
 
     return true;

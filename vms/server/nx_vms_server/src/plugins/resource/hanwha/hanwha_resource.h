@@ -154,6 +154,8 @@ public:
     bool isBypassSupported() const;
     boost::optional<int> bypassChannel() const;
 
+    CameraDiagnostics::Result enableAudioInput();
+
 protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
