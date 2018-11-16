@@ -152,10 +152,7 @@
         "member-access"                   : false,
         // [true, "no-public"]
         "no-conditional-assignment"       : false,
-        "no-console"                      : false,
-        "no-debugger"                     : false,
         "no-empty-interface"              : false,
-        "no-eval"                         : false,
         "no-empty"                        : false,
         "no-object-literal-type-assertion": false,
         "no-shadowed-variable"            : false,

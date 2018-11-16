@@ -6,7 +6,7 @@
   "dialogs": {
     "okButton": "ตกลง",
     "cancelButton": "ยกเลิก",
-    "loginTitle": "ยินดีต้อนรับสู่ %PRODUCT_NAME%",
+    "loginTitle": "เข้าสู่ระบบ %PRODUCT_NAME%",
     "loginButton": "ลงชื่อเข้าสู่ระบบ",
     "logoutAuthorisedTitle": "คุณกำลังอยู่ในระบบ",
     "logoutAuthorisedContinueButton": "ดำเนิน​การ",
@@ -167,7 +167,7 @@
     "confirmRenameTitle": "ชื่อระบบ",
     "confirmRenameAction": "บันทึก",
     "successRename": "ระบบเปลี่ยนชื่อ",
-    "confirmDisconnectTitle": "ตัดการเชื่อมต่อระบบจาก %PRODUCT_NAME% หรือไม่?",
+    "confirmDisconnectTitle": "ยกเลิกการเชื่อมต่อระบบจาก %PRODUCT_NAME%?",
     "confirmDisconnectAction": "ตัดการเชื่อมต่อ",
     "confirmUnshareFromMe": "คุณกำลังจะยกเลิกการเชื่อมต่อระบบนี้จากบัญชีของคุณ คุณจะไม่สามารถเข้าถึงระบบนี้ได้อีกต่อไป คุณแน่ใจไหม?",
     "confirmUnshareFromMeTitle": "ยกเลิกการเชื่อมต่อระบบหรือไม่?",

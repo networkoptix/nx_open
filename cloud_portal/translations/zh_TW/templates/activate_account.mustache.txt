@@ -1,4 +1,4 @@
-Hello {{message.userFullName}},
+您好 {{message.userFullName}},
 
   請點擊下面的按鈕以確認您的電子郵件地址並啟動帳號.
 

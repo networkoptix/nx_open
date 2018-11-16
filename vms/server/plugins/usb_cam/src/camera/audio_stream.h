@@ -15,6 +15,7 @@
 #include "ffmpeg/codec.h"
 #include "ffmpeg/packet.h"
 #include "ffmpeg/frame.h"
+#include "adts_injector.h"
 
 struct SwrContext;
 namespace nxpl { class TimeProvider; }
@@ -70,6 +71,8 @@ private:
         std::shared_ptr<std::atomic_int> m_packetCount;
         
         std::vector<std::shared_ptr<ffmpeg::Packet>> m_packetMergeBuffer;
+
+        AdtsInjector m_adtsInjector;
 
     private:
         std::string ffmpegUrl() const;

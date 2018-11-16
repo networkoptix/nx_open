@@ -1,22 +1,22 @@
 import { NgModule } from '@angular/core';
 
-import { SandboxModule }               from './sandbox/sandbox.module';
+import { SandboxModule } from './sandbox/sandbox.module';
 
-import { DownloadModule }               from './download/download.module';
-import { DownloadHistoryModule }        from './download-history/download-history.module';
-import { NonSupportedBrowserModule }    from "./non-supported-browser/non-supported-browser.module";
+import { DownloadModule }            from './download/download.module';
+import { DownloadHistoryModule }     from './download-history/download-history.module';
+import { NonSupportedBrowserModule } from './non-supported-browser/non-supported-browser.module';
 
 @NgModule({
-    imports: [
+    imports        : [
         SandboxModule,
         DownloadModule,
         DownloadHistoryModule,
         NonSupportedBrowserModule
     ],
-    declarations: [],
+    declarations   : [],
     entryComponents: [],
-    providers: [],
-    exports: [
+    providers      : [],
+    exports        : [
         SandboxModule,
         DownloadModule,
         DownloadHistoryModule,

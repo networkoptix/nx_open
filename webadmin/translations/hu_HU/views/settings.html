@@ -4,23 +4,23 @@
             <system-info></system-info>
         </div>
         <div class="col-md-8 col-md-pull-4">
-            <alert type="danger" ng-if="settings.flags.noHDD">
+            <uib-alert type="danger" ng-if="settings.flags.noHDD">
                 Ezen eszköz beépített merevlemezekkel történő működésre lett kifejlesztve.<br>
 Kapcsolja ki a készüléket és telepítse a merevlemezt.
-            </alert>
-            <alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
+            </uib-alert>
+            <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
                 A készülék működéséhez Internetkapcsolat szükséges. <br>
 Kérjük csatlakoztassa a rendszerét az Internetre
-            </alert>
-            <alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
+            </uib-alert>
+            <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 A készülék hálózati konfigurációja hibás. <br>
 Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
-            </alert>
+            </uib-alert>
 
 
             <uib-tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
                 <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
-                    <div>
+                    <div ng-if="user.isOwner">
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
                             <h3>Port</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
@@ -104,12 +104,12 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <alert type="warning">Ez a rendszer nem kapcsolódik {{Config.cloud.productName}} felhőre
+                            <uib-alert type="warning">Ez a rendszer nem kapcsolódik {{Config.cloud.productName}} felhőre
 <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
-                                   target="_blank">további info</a></alert>
-                            <alert type="error" ng-if="!hasInternetOnServer">{{Config.cloud.productName}} beállításainak elvégzéséhez csatlakozzon az Internetre</alert>
-                            <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Internet kapcsolat szükséges {{Config.cloud.productName}} felhőhöz való csatlakozáshoz</alert>
+                                   target="_blank">további info</a></uib-alert>
+                            <uib-alert type="error" ng-if="!hasInternetOnServer">{{Config.cloud.productName}} beállításainak elvégzéséhez csatlakozzon az Internetre</uib-alert>
+                            <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Internet kapcsolat szükséges {{Config.cloud.productName}} felhőhöz való csatlakozáshoz</uib-alert>
                             <p ng-if="canConnectToCloud"  ><button
                                     class="btn btn-default"
                                     ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Csatlakozás {{Config.cloud.productName}} felhőhöz</button>
@@ -121,18 +121,20 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
 
 
                     <div>
-                        <h3>Forgalom titkosítás</h3>
+                        <h3>Traffic encryption</h3>
                         <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> Kényszerített forgalom titkosítás
+                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> Force Traffic Encryption
                                 </label>
                             </div>
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox"
                                            ng-disabled="!trafficSettings.trafficEncryptionForced"
-                                           ng-model="trafficSettings.videoTrafficEncryptionForced"> Kényszerített videó forgalom titkosítás
+                                           ng-model="trafficSettings.videoTrafficEncryptionForced"
+                                           ng-checked="checkTrafficEncryption()">
+                                    Force Video Traffic Encryption
                                 </label>
                             </div>
                             <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Mentés</button>

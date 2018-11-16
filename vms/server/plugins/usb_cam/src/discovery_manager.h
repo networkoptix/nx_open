@@ -43,7 +43,7 @@ public:
         nxcip::CameraInfo* cameraInfo) override;
     virtual nxcip::BaseCameraManager* createCameraManager( const nxcip::CameraInfo& info ) override;
     virtual int getReservedModelList( char** modelList, int* count ) override;
-    void addFfmpegUrl(const std::string& uniqueId, const std::string& ffmpegUrl);
+    void addFfmpegUrl(const device::DeviceData& device);
     std::string getFfmpegUrl(const std::string& uniqueId) const;
     std::vector<device::DeviceData> findCamerasInternal();
 

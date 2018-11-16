@@ -1,12 +1,12 @@
 {
-  "language": "en_US",
+  "language": "es_ES",
   "language_name": "Español",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Ok",
     "cancelButton": "Cancelar",
-    "loginTitle": "Iniciar sesión a %PRODUCT_NAME%",
+    "loginTitle": "Inicie sesión en %PRODUCT_NAME%",
     "loginButton": "Inicia sesión",
     "logoutAuthorisedTitle": "Ya se ha conectado",
     "logoutAuthorisedContinueButton": "Continuar",
@@ -62,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "Visor avanzado",
-      "description": "Can view live video, browse the archive, control PTZ etc"
+      "description": "Puede ver video en vivo, navegar por el archivo, controlar PTZ, etc"
     },
     "Administrator": {
       "label": "Administrador",
@@ -137,7 +137,7 @@
     "cantOpenClient": "%VMS_NAME% aplicación no es detectada.<a href=\"/download\">Descargar</a>",
     "lostConnection": "Conexión al {{systemName}} se ha perdido",
     "thisSystem": "el sistema",
-    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported"
+    "oldSafariNotSupported": "Las versiones de Safari anteriores a 10 no son compatibles"
   },
   "passwordRequirements": {
     "minLengthMessage": "La contraseña debe tener al menos 8 caracteres",
@@ -167,7 +167,7 @@
     "confirmRenameTitle": "Nombre del sistema",
     "confirmRenameAction": "Guardar",
     "successRename": "Nombre del sistema guardado",
-    "confirmDisconnectTitle": "Desconectar el sistema de %PRODUCT_NAME%?",
+    "confirmDisconnectTitle": "¿Desconectar el Sistema de %PRODUCT_NAME%?",
     "confirmDisconnectAction": "Desconectar",
     "confirmUnshareFromMe": "Está a punto de desconectar este sistema de su cuenta. Usted no podrá acceder a este sistema. ¿Está seguro?",
     "confirmUnshareFromMeTitle": "Desconectar el Sistema?",
@@ -177,7 +177,7 @@
     "confirmUnshareAction": "Borrar",
     "successDisconnected": "El sistema está desconectado de %PRODUCT_NAME%",
     "successDeleted": "Sistema {{systemName}} se ha eliminado de su cuenta",
-    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
+    "successMerge": "El sistema {{systemName}} se ha fusionado con {{systemName}}",
     "permissionsRemoved": "Los permisos fueron removidos de {{email}}"
   },
   "account": {
@@ -279,7 +279,7 @@
       "copyActiveText": "copiado al portapapeles"
     },
     "systemOffline": "Sistema está desconectado",
-    "systemHasNoCameras": "NO CAMERAS",
+    "systemHasNoCameras": "NO CÁMARAS",
     "cameraStates": {
       "offline": "Desconectado",
       "error": "Error",

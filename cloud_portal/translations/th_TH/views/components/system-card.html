@@ -3,13 +3,13 @@
     <div class="card-body">
         <h2 class="mb-3">ระบบของคุณ</h2>
         <p>
-            <button class="btn btn-default" ng-click="rename()">เปลี่ยนชื่อระบบ</button>
+            <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">เปลี่ยนชื่อระบบ</button>
         </p>
         <p>
-            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">ผสานกับระบบอื่น</button>
+            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">ผสานกับระบบอื่น</button>
         </p>
         <hr />
-        <button class="btn btn-default" ng-click="disconnect()">Disconnect from
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Disconnect from
             <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
     </div>
 </div>
@@ -29,13 +29,21 @@
         <button class="btn btn-default" ng-click="delete()">ตัดการเชื่อมต่อจากบัญชีของฉัน</button>
     </div>
 </div>
-<div class="card card-default" ng-if="currentlyMerging">
+<div class="mt-3 card card-default" ng-if="currentlyMerging">
     <div class="card-body" ng-if="isMaster && system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
         <div><strong>{{mergeTargetSystem.name}}</strong> กำลังถูกรวมเข้ากับระบบนี้</div>
         <hr />
         <div class="merge-info-text">อาจใช้เวลาหลายชั่วโมงทั้งนี้ขึ้นอยู่กับขนาดของฐานข้อมูล</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
         <div>ระบบนี้จะถูกผสานเป็น <strong>{{mergeTargetSystem.name}}</strong></div>
         <hr />
         <div class="merge-info-text">
