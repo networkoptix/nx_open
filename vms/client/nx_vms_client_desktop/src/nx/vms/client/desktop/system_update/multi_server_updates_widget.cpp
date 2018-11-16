@@ -417,11 +417,11 @@ void MultiServerUpdatesWidget::initDownloadActions()
 void MultiServerUpdatesWidget::atUpdateCurrentState()
 {
     NX_ASSERT(m_serverUpdateTool);
+
     if (isHidden())
         return;
 
     // We poll all our tools for new information. Then we update UI if there are any changes
-
     if (m_updateCheck.valid() && m_updateCheck.wait_for(kWaitForUpdateCheck) == std::future_status::ready)
     {
         auto checkResponse = m_updateCheck.get();
@@ -1311,7 +1311,8 @@ void MultiServerUpdatesWidget::closePanelNotifications()
 void MultiServerUpdatesWidget::syncUpdateCheck()
 {
     bool isChecking = m_updateCheck.valid();
-    bool hasLatestVersion = ((m_updateInfo.isValid() || m_updatesModel->lowestInstalledVersion() >= m_updateInfo.getVersion())
+    bool hasEqualUpdateInfo = m_updatesModel->lowestInstalledVersion() >= m_updateInfo.getVersion();
+    bool hasLatestVersion = ((m_updateInfo.isValid() || hasEqualUpdateInfo)
         || m_updateInfo.error == nx::update::InformationError::noNewVersion);
 
     if (m_updateStateCurrent != WidgetUpdateState::ready
@@ -1357,6 +1358,16 @@ void MultiServerUpdatesWidget::syncUpdateCheck()
             else
             {
                 ui->infoStackedWidget->setCurrentWidget(ui->emptyInfoPage);
+            }
+
+            if (!m_updateInfo.info.description.isEmpty())
+            {
+                ui->releaseDescriptionLabel->setText(m_updateInfo.info.description);
+                ui->releaseDescriptionLabel->show();
+            }
+            else
+            {
+                ui->releaseDescriptionLabel->hide();
             }
         }
         else if (hasLatestVersion)

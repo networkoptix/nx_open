@@ -111,6 +111,7 @@ static InformationError findCustomizationInfo(
     result->releaseNotesUrl = customizationInfo->release_notes;
     result->releaseDeliveryDays = customizationInfo->release_delivery;
     result->releaseDateMs = customizationInfo->release_date;
+    result->description = customizationInfo->description;
     return InformationError::noError;
 }
 
@@ -167,6 +168,12 @@ static InformationError parseAndExtractInformation(
     {
         NX_WARNING(typeid(Information)) << "no eulaLink at" << baseUpdateUrl;
     }
+
+    QString description;
+    // We take update's description from the root updates.json and
+    // override it by description in packages.json
+    if(QJson::deserialize(topLevelObject, "description", &description) && !description.isEmpty())
+        result->description = description;
 
     return InformationError::noError;
 }

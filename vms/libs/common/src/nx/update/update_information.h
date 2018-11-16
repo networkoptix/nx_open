@@ -50,7 +50,7 @@ struct Information
     bool isEmpty() const { return packages.isEmpty(); }
 };
 
-#define Information_Fields (version)(cloudHost)(eulaLink)(eulaVersion)(releaseNotesUrl)(packages)
+#define Information_Fields (version)(cloudHost)(eulaLink)(eulaVersion)(releaseNotesUrl)(description)(packages)
 QN_FUSION_DECLARE_FUNCTIONS(Information, (xml)(csv_record)(ubjson)(json))
 
 enum class InformationError
