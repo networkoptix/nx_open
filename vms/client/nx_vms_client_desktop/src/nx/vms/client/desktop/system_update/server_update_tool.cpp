@@ -20,7 +20,10 @@
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
 #include <network/system_helpers.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/app_info.h>
+#include <nx/update/update_check.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
 
 #include <quazip/quazip.h>
@@ -122,12 +125,12 @@ void ServerUpdateTool::saveInternalState()
     qnSettings->setSystemUpdaterState(raw);
 }
 
-std::future<UpdateContents> ServerUpdateTool::getUpdateCheck()
+std::future<nx::update::UpdateContents> ServerUpdateTool::getUpdateCheck()
 {
     return std::move(m_updateCheck);
 }
 
-std::future<UpdateContents> ServerUpdateTool::checkUpdateFromFile(QString file)
+std::future<nx::update::UpdateContents> ServerUpdateTool::checkUpdateFromFile(QString file)
 {
     NX_VERBOSE(this) << "checkUpdateFromFile(" << file << ")";
 
@@ -146,7 +149,7 @@ std::future<UpdateContents> ServerUpdateTool::checkUpdateFromFile(QString file)
     return m_offlineUpdateCheckResult.get_future();
 }
 
-std::future<UpdateContents> ServerUpdateTool::checkRemoteUpdateInfo()
+std::future<nx::update::UpdateContents> ServerUpdateTool::checkRemoteUpdateInfo()
 {
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
@@ -161,7 +164,7 @@ std::future<UpdateContents> ServerUpdateTool::checkRemoteUpdateInfo()
                 {
                     contents.info = response;
                 }
-                contents.sourceType = UpdateSourceType::mediaservers;
+                contents.sourceType = nx::update::UpdateSourceType::mediaservers;
                 promise->set_value(contents);
             });
         return result;
@@ -188,7 +191,7 @@ void ServerUpdateTool::changeUploadState(OfflineUpdateState newState)
 void ServerUpdateTool::readUpdateManifest(QString path, UpdateContents& result)
 {
     result.error = nx::update::InformationError::jsonError;
-    result.sourceType = UpdateSourceType::file;
+    result.sourceType = nx::update::UpdateSourceType::file;
 
     QFile file(path);
 
@@ -215,7 +218,7 @@ void ServerUpdateTool::atExtractFilesFinished(int code)
     NX_ASSERT(m_offlineUpdaterState == OfflineUpdateState::unpack);
 
     UpdateContents contents;
-    contents.sourceType = UpdateSourceType::file;
+    contents.sourceType = nx::update::UpdateSourceType::file;
     contents.source = QString("file://%1").arg(m_localUpdateFile);
 
     if (code != QnZipExtractor::Ok)
@@ -518,13 +521,24 @@ bool ServerUpdateTool::haveActiveUpdate() const
     return m_updateManifest.isValid();
 }
 
-UpdateContents ServerUpdateTool::getRemoteUpdateContents() const
+nx::update::UpdateContents ServerUpdateTool::getRemoteUpdateContents() const
 {
     UpdateContents contents;
-    contents.sourceType = UpdateSourceType::mediaservers;
+    contents.sourceType = nx::update::UpdateSourceType::mediaservers;
     contents.source = "mediaservers";
     contents.info = m_updateManifest;
-    contents.clientPackage = findClientPackage(m_updateManifest);
+    auto clientInfo = QnAppInfo::currentSystemInformation();
+    QString errorMessage;
+    /* Update is allowed if either target version has the same cloud host or
+       there are no servers linked to the cloud in the system. */
+    QString cloudUrl = nx::network::SocketGlobals::cloud().cloudHost();
+    bool boundToCloud = !commonModule()->globalSettings()->cloudSystemId().isEmpty();
+
+    nx::update::findPackage(
+        clientInfo,
+        m_updateManifest,
+        true, cloudUrl, boundToCloud, &contents.clientPackage, &errorMessage);
+    //contents.clientPackage =
     verifyUpdateManifest(contents);
     return contents;
 }
@@ -796,9 +810,9 @@ nx::utils::SoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
     return minimalVersion;
 }
 
-QUrl generateUpdatePackageUrl(const UpdateContents& contents, const QSet<QnUuid>& targets, QnResourcePool* resourcePool)
+QUrl generateUpdatePackageUrl(const nx::update::UpdateContents& contents, const QSet<QnUuid>& targets, QnResourcePool* resourcePool)
 {
-    bool useLatest = contents.sourceType == UpdateSourceType::internet;
+    bool useLatest = contents.sourceType == nx::update::UpdateSourceType::internet;
     auto changeset = contents.info.version;
     nx::utils::SoftwareVersion targetVersion = useLatest ? nx::utils::SoftwareVersion() : contents.getVersion();
 

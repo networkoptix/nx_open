@@ -28,6 +28,9 @@
 #include <utils/common/util.h>
 #include <nx/utils/random.h>
 
+#include <nx/update/update_information.h>
+#include <nx/update/update_check.h>
+
 using namespace nx::vms::client::desktop::ui;
 
 namespace {
@@ -70,7 +73,8 @@ void QnWorkbenchUpdateWatcher::atStartCheckUpdate()
     connect(m_signal, &UpdateCheckSignal::atFinished,
         this, &QnWorkbenchUpdateWatcher::atCheckerUpdateAvailable);
     // Note: m_signal will be deleted inside checkLatestUpdate
-    m_updateInfo = nx::vms::client::desktop::checkLatestUpdate(m_signal);
+    QString updateUrl = qnSettings->updateFeedUrl();
+    m_updateInfo = nx::update::checkLatestUpdate(updateUrl, m_signal);
 }
 
 void QnWorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& contents)

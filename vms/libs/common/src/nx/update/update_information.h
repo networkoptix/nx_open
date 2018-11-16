@@ -2,9 +2,11 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QString>
+#include <QtCore/QDir>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
+#include <nx/utils/software_version.h>
 
 namespace nx {
 namespace update {
@@ -115,7 +117,55 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Status::Code)
 QN_FUSION_DECLARE_FUNCTIONS(Status::Code, (lexical))
 QN_FUSION_DECLARE_FUNCTIONS(Status, (xml)(csv_record)(ubjson)(json))
 
+/**
+ * Source type for update information.
+ */
+enum class UpdateSourceType
+{
+    // Got update info from the internet.
+    internet,
+    // Got update info from the internet for specific build.
+    internetSpecific,
+    // Got update info from offline update package.
+    file,
+    // Got update info from mediaserver swarm.
+    mediaservers,
+};
+
+/**
+ * Wraps up update info and summary for its verification.
+ * All update tools inside client work with this structure directly,
+ * instead of nx::update::Information
+ */
+struct UpdateContents
+{
+    UpdateSourceType sourceType = UpdateSourceType::internet;
+    QString source;
+
+    // A set of servers without proper update file.
+    QSet<QnUuid> missingUpdate;
+    // A set of servers that can not accept update version.
+    QSet<QnUuid> invalidVersion;
+
+    QString eulaPath;
+    // A folder with offline update packages.
+    QDir storageDir;
+    // A list of files to be uploaded.
+    QStringList filesToUpload;
+    // Information for the clent update.
+    nx::update::Package clientPackage;
+    nx::update::Information info;
+    nx::update::InformationError error = nx::update::InformationError::noError;
+    bool cloudIsCompatible = true;
+    bool verified = false;
+
+    nx::utils::SoftwareVersion getVersion() const;
+    // Check if we can apply this update.
+    bool isValid() const;
+};
+
 } // namespace update
 } // namespace nx
 
 Q_DECLARE_METATYPE(nx::update::Information);
+Q_DECLARE_METATYPE(nx::update::UpdateContents);

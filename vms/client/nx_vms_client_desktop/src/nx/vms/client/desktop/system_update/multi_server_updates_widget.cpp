@@ -189,7 +189,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     connect(ui->browseUpdate, &QPushButton::clicked,
         this, [this]()
         {
-            if (m_updateSourceMode == UpdateSourceType::internet)
+            if (m_updateSourceMode == nx::update::UpdateSourceType::internet)
             {
                 // We should be here only if we have latest version and want to check specific build
                 setUpdateSourceMode(UpdateSourceType::internetSpecific);
@@ -525,10 +525,10 @@ void MultiServerUpdatesWidget::clearUpdateInfo()
 {
     NX_INFO(this) << "clearUpdateInfo()";
     m_targetVersion = nx::utils::SoftwareVersion();
-    m_updateInfo = UpdateContents();
+    m_updateInfo = nx::update::UpdateContents();
     m_updatesModel->setUpdateTarget(nx::utils::SoftwareVersion());
     m_updateLocalStateChanged = true;
-    m_updateCheck = std::future<UpdateContents>();
+    m_updateCheck = std::future<nx::update::UpdateContents>();
 }
 
 void MultiServerUpdatesWidget::pickLocalFile()
@@ -564,7 +564,8 @@ void MultiServerUpdatesWidget::pickSpecificBuild()
 
     m_targetVersion = nx::utils::SoftwareVersion(version.major(), version.minor(), version.bugfix(), buildNumber);
     m_targetChangeset = dialog.changeset();
-    m_updateCheck = checkSpecificChangeset(dialog.changeset());
+    QString updateUrl = qnSettings->updateFeedUrl();
+    m_updateCheck = nx::update::checkSpecificChangeset(updateUrl, dialog.changeset());
     loadDataToUi();
 }
 
@@ -828,7 +829,7 @@ void MultiServerUpdatesWidget::processRemoteInitialState()
          */
         if (updateInfo.isValid())
         {
-            m_updateCheck = std::future<UpdateContents>();
+            m_updateCheck = std::future<nx::update::UpdateContents>();
             m_updateInfo = updateInfo;
             m_haveValidUpdate = true;
             m_clientUpdateTool->downloadUpdate(updateInfo);
@@ -1659,7 +1660,8 @@ void MultiServerUpdatesWidget::checkForInternetUpdates()
     if (!m_updateCheck.valid())
     {
         clearUpdateInfo();
-        m_updateCheck = checkLatestUpdate();
+        QString updateUrl = qnSettings->updateFeedUrl();
+        m_updateCheck = nx::update::checkLatestUpdate(updateUrl);
         syncUpdateCheck();
     }
 }
@@ -1738,18 +1740,17 @@ QString MultiServerUpdatesWidget::toString(ServerUpdateTool::OfflineUpdateState 
     return "Unknown update source mode";
 }
 
-QString MultiServerUpdatesWidget::toString(UpdateSourceType mode)
+QString MultiServerUpdatesWidget::toString(nx::update::UpdateSourceType mode)
 {
-    // These strings are internal and are not intended to be visible to regular user.
     switch(mode)
     {
-        case UpdateSourceType::internet:
+        case nx::update::UpdateSourceType::internet:
             return tr("Available Update");
-        case UpdateSourceType::internetSpecific:
+        case nx::update::UpdateSourceType::internetSpecific:
             return tr("Specific Build...");
-        case UpdateSourceType::file:
+        case nx::update::UpdateSourceType::file:
             return tr("Browse for Update File...");
-        case UpdateSourceType::mediaservers:
+        case nx::update::UpdateSourceType::mediaservers:
             // This string should not appear at UI.
             return tr("Update from mediaservers");
     }
