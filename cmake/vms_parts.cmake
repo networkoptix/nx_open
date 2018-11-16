@@ -74,6 +74,7 @@ option(withTests "Enable unit tests" ${_withTests})
 option(withCassandraTests "Enable cassandra related tests" ${_withCassandraTests})
 option(withMiniLauncher "Enable minilauncher" ${_withMiniLauncher})
 option(withScreenChecker "Enable screen checker" OFF)
+option(withNovBrowser "Enable Nov Browser" OFF)
 nx_option(withRootTool "Enable root tool" ${_withRootTool})
 nx_option(withWebsocketUtility "Enable websocket utility" ${_withWebsocketUtility})
 

@@ -11,7 +11,7 @@ set(cloudName "Nx Meta Cloud")
 set(uri.protocol "nx-metavms")
 set(mediaserver_application_name "Network Optix MetaVMS Media Server")
 set(mediaserver_service_name "Network Optix MetaVMS Media Server")
-set(metaVersion "R3")
+set(metaVersion "R3.1")
 
 # Default settings
 set(backgroundImage
@@ -49,7 +49,3 @@ set(mac.protocol_handler_bundle.identifier "com.networkoptix.protocol_handler")
 set(freeLicenseIsTrial "true")
 set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0029")
-
-# Installer Customizations
-set(sign.password "qweasd123")
-set(sign.cer "app.p12")

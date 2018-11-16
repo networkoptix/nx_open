@@ -1,14 +1,14 @@
 import base64
-from contextlib import contextmanager, closing
 import hashlib
 import json
 from abc import ABCMeta, abstractmethod
+from contextlib import closing, contextmanager
 from pprint import pformat
 
 import requests
+import requests.auth
 import requests.exceptions
-from requests.auth import HTTPDigestAuth
-from urllib3.util import Url
+import urllib3.util
 import websocket
 
 from .context_logger import ContextLogger
@@ -16,7 +16,6 @@ from .context_logger import ContextLogger
 _logger = ContextLogger(__name__, 'http')
 
 
-STANDARD_PASSWORDS = ['admin', 'qweasd123']  # do not mask these passwords in log files
 REST_API_TIMEOUT_SEC = 20
 
 
@@ -33,17 +32,17 @@ class HttpError(Exception):
 
 class HttpClient(object):
     def __init__(self, base_url, ca_cert=None):
-        self._base_url = base_url  # type: Url
+        self._base_url = base_url  # type: urllib3.util.Url
         self.ca_cert = ca_cert
         if self.ca_cert is not None:
             _logger.info("Trust CA cert: %s.", self.ca_cert)
         username, password = self._base_url.auth.split(':', 1)
-        self._auth = HTTPDigestAuth(username, password)
+        self._auth = requests.auth.HTTPDigestAuth(username, password)
         self.user = username  # Only for interface.
         self.password = password  # Only for interface.
 
     def __repr__(self):
-        assert isinstance(self._base_url, Url)
+        assert isinstance(self._base_url, urllib3.util.Url)
         # noinspection PyProtectedMember
         return "<HttpClient {}>".format(self._base_url._replace(auth=None))
 
@@ -53,7 +52,7 @@ class HttpClient(object):
         self.password = password
         # noinspection PyProtectedMember
         self._base_url = self._base_url._replace(auth='{}:{}'.format(username, password))
-        self._auth = HTTPDigestAuth(username, password)
+        self._auth = requests.auth.HTTPDigestAuth(username, password)
 
     def auth_key(self, method, path, realm, nonce):
         # `requests.auth.HTTPDigestAuth.build_digest_header` does the same but it substitutes empty path with '/'.
@@ -77,15 +76,17 @@ class HttpClient(object):
         # noinspection PyProtectedMember
         return self._base_url._replace(scheme='rtsp', path='/' + path.lstrip('/')).url
 
-    @contextmanager
-    def websocket_opened(self, path, timeout_sec=0.5):
+    def open_websocket(self, path, timeout_sec=0.5):
         url = self._base_url._replace(scheme='ws', path=path).url
         credentials = '%s:%s' % (self.user, self.password)
         authorization = 'Basic ' + base64.b64encode(credentials.encode())
         headers = dict(Authorization=authorization)
         _logger.debug('Create websocket connection: %s', url)
-        ws = websocket.create_connection(url, header=headers, timeout=timeout_sec)
-        with closing(ws):
+        return websocket.create_connection(url, header=headers, timeout=timeout_sec)
+
+    @contextmanager
+    def websocket_opened(self, path, timeout_sec=0.5):
+        with closing(self.open_websocket(path, timeout_sec)) as ws:
             yield ws
 
     def request(self, method, path, timeout=None, **kwargs):

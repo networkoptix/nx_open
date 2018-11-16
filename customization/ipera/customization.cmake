@@ -64,8 +64,6 @@ set(freeLicenseKey "0000-0000-0000-0011")
 # Installer Customizations
 set(installerLanguage "ru_RU")
 set(installer.cultures "ru-ru")
-set(sign.password "qweasd123")
-set(sign.cer "app.p12")
 
 # Localization
 set(defaultTranslation ru_RU)

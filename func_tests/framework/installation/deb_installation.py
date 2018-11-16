@@ -28,6 +28,7 @@ class DebInstallation(Installation):
             var_dir=dir / 'var',
             core_dumps_dirs=core_dumps_dirs or [dir / 'bin'],
             core_dump_glob='core.*',
+            default_storage_dir=dir / 'var' / 'data',
             )
         self._posix_shell = os_access.shell  # type: Shell
         self._config = self.dir / 'etc' / 'mediaserver.conf'

@@ -8,7 +8,7 @@ from typing import Callable, Generator, Optional
 from framework.http_api import HttpError
 from framework.installation.mediaserver import Mediaserver
 from framework.mediaserver_api import MediaserverApiError, MediaserverApiRequestError
-from framework.utils import datetime_utc_now, Timer
+from framework.waiting import Timer
 from .checks import Failure, Halt, Result, Success
 
 _logger = logging.getLogger(__name__)
@@ -81,7 +81,7 @@ class Stage(object):
 
         while True:
             run.clear_cache()
-            yield actions.next()
+            yield next(actions)
 
 
 class Executor(object):
@@ -104,7 +104,7 @@ class Executor(object):
         """
         steps = self.stage.steps(server, self.camera_name, self.camera_id, self._rules)
         self._result = Halt('Stage is not finished')
-        self._start_time = datetime_utc_now()
+        self._start_time = datetime.now(pytz.UTC)
         timer = Timer()
         _logger.info('Stage "%s" is started for %s', self.stage.name, self.camera_name)
         while not self._execute_next_step(steps, timer):
@@ -143,7 +143,7 @@ class Executor(object):
         """ :returns True if stage is finished, False otherwise.
         """
         try:
-            self._result = stage_steps.next()
+            self._result = next(stage_steps)
 
         except HttpError as error:
             self._result = Failure(str(error))
@@ -156,7 +156,7 @@ class Executor(object):
             return True
 
         finally:
-            self._duration = timer.duration
+            self._duration = timer.from_start
 
         if isinstance(self._result, Success):
             return True

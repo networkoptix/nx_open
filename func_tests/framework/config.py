@@ -44,7 +44,6 @@ def timedelta_representer(dumper, data):
 
 yaml.add_constructor(u'!timedelta', timedelta_constructor)
 yaml.add_representer(datetime.timedelta, timedelta_representer)
-yaml.add_implicit_resolver(u'!timedelta', TIMEDELTA_REGEXP)
 
 
 class TestParameter(object):
@@ -152,6 +151,8 @@ class SingleTestConfig(object):
             return value
         if t is int:
             return int(value)
+        if t is float:
+            return float(value)
         if t is bool:
             if value.lower() in ['true', 'yes', 'on']:
                 return True

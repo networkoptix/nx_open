@@ -31,7 +31,7 @@ def camera_pool(request, bin_dir, sample_media_file, service_ports):
 
 @pytest.fixture()
 def camera(camera_pool):
-    return camera_pool.add_camera('TestCameraLive', '11:22:33:44:55:66')
+    return camera_pool.add_camera('TestCameraLive', '11-22-33-44-55-66')
 
 
 @pytest.fixture()

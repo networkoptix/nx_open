@@ -1,32 +1,39 @@
+from __future__ import division
+
 import datetime
+import errno
+import logging
+import math
+import re
+import sys
 import timeit
 
-import dateutil.parser
 import pytz
+import six
 import tzlocal.windows_tz
 
 from framework.method_caching import cached_getter
 from framework.networking.windows import WindowsNetworking
 from framework.os_access import exceptions
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
-from framework.os_access.os_access_interface import OSAccess, Time
-from framework.os_access.smb_path import SMBPath
+from framework.os_access.os_access_interface import OSAccess, Time, BaseFakeDisk
+from framework.os_access.smb_path import SMBPath, UsedByAnotherProcess
 from framework.os_access.windows_remoting import WinRM
-from framework.os_access.windows_remoting._powershell import PowershellError
 from framework.os_access.windows_remoting.env_vars import EnvVars
+from framework.os_access.windows_remoting.powershell import PowershellError
 from framework.os_access.windows_remoting.users import Users
 from framework.os_access.windows_traffic_capture import WindowsTrafficCapture
 from framework.utils import RunningTime
+
+_logger = logging.getLogger(__name__)
 
 
 class WindowsTime(Time):
     def __init__(self, winrm):
         self.winrm = winrm
 
-    @cached_getter
-    def _get_timezone(self):
-        timezone_result, = self.winrm.wmi_query(u'Win32_TimeZone',
-                                                {}).enumerate()  # Mind enumeration!
+    def get_tz(self):
+        timezone_result, = self.winrm.wmi.cls(u'Win32_TimeZone').enumerate({})  # Mind enumeration!
         windows_timezone_name = timezone_result[u'StandardName']
         # tzlocal.windows_tz.windows_tz contains popular timezones, including Pacific and Moscow time.
         # In case of problems, look for another timezone name mapping.
@@ -43,21 +50,15 @@ class WindowsTime(Time):
 
     def get(self):
         started_at = timeit.default_timer()
-        result = self.winrm.wmi_query(u'Win32_OperatingSystem', {}).get()
+        result = self.winrm.wmi.cls(u'Win32_OperatingSystem').singleton()
         delay_sec = timeit.default_timer() - started_at
-        raw = result[u'LocalDateTime'][u'cim:Datetime']
-        time = dateutil.parser.parse(raw).astimezone(self._get_timezone())
+        time = result[u'LocalDateTime'].astimezone(self.get_tz())
         return RunningTime(time, datetime.timedelta(seconds=delay_sec))
 
     def set(self, new_time):  # type: (datetime.datetime) -> RunningTime
-        localized = new_time.astimezone(self._get_timezone())
+        localized = new_time.astimezone(self.get_tz())
         started_at = timeit.default_timer()
-        # TODO: Do that with Win32_OperatingSystem.SetDateTime WMI method.
-        # See: https://superuser.com/q/1323610/174311
-        self.winrm.run_powershell_script(
-            # language=PowerShell
-            '''Set-Date $dateTime''',
-            variables={'dateTime': new_time.astimezone(pytz.utc).isoformat()})
+        self.winrm.wmi.cls('Win32_OperatingSystem').static().invoke_method('SetDateTime', {'LocalDateTime': new_time})
         delay_sec = timeit.default_timer() - started_at
         return RunningTime(localized, datetime.timedelta(seconds=delay_sec))
 
@@ -146,13 +147,23 @@ class WindowsAccess(OSAccess):
             )
         return output.decode('ascii')
 
-    def make_fake_disk(self, name, size_bytes):
-        raise NotImplementedError()
+    def fake_disk(self):
+        return _FakeDisk(self)
 
-    def free_disk_space_bytes(self):
-        disks = self.winrm.wmi_query('Win32_LogicalDisk', {}).enumerate()
-        disk_c, = (disk for disk in disks if disk['Name'] == 'C:')
-        return int(disk_c['FreeSpace'])
+    def _fs_root(self):
+        return self.path_cls('C:\\')
+
+    def _free_disk_space_bytes_on_all(self):
+        mount_point_iter = self.winrm.wmi.cls('Win32_MountPoint').enumerate({})
+        volume_iter = self.winrm.wmi.cls('Win32_Volume').enumerate({})
+        volume_list = list(volume_iter)
+        result = {}
+        for mount_point in mount_point_iter:
+            # Rely on fact that single identifying selector of `Directory` is its name.
+            dir_path = self.path_cls(mount_point['Directory']['Name'])
+            volume, = (v for v in volume_list if v.ref == mount_point['Volume'])
+            result[dir_path] = int(volume['FreeSpace'])
+        return result
 
     def _hold_disk_space(self, to_consume_bytes):
         holder_path = self._disk_space_holder()
@@ -167,9 +178,7 @@ class WindowsAccess(OSAccess):
         _, file_name = source_url.rsplit('/', 1)
         destination = destination_dir / file_name
         if destination.exists():
-            raise exceptions.AlreadyExists(
-                "Cannot download {!s} to {!s}".format(source_url, destination_dir),
-                destination)
+            return destination
         variables = {'out': str(destination), 'url': source_url, 'timeoutSec': timeout_sec}
         # language=PowerShell
         try:
@@ -189,3 +198,80 @@ class WindowsAccess(OSAccess):
             "What is to be attempted: Kerberos authentication. "
             "To debug try `Invoke-Command` from another Windows machine. "
             )
+
+    def file_md5(self, path):
+        try:
+            output = self.winrm.command(['CertUtil', '-hashfile', path, 'md5']).run().decode()
+        except exceptions.exit_status_error_cls(0x80070002):  # Misleading error code and message.
+            raise exceptions.NotAFile(errno.EISDIR, "Trying to get MD5 of dir.")
+        match = re.search(r'\b[0-9a-fA-F]{32}\b', output)
+        if match is None:
+            raise RuntimeError('Cannot get MD5 of {}:\n{}'.format(path, output))
+        return match.group()
+
+
+class _FakeDisk(BaseFakeDisk):
+    def __init__(self, windows_access):  # type: (WindowsAccess) -> ...
+        self._letter = 'V'
+        super(_FakeDisk, self).__init__(windows_access.path_cls('{}:\\'.format(self._letter)))
+        self._image_path = windows_access.path_cls('C:\\{}.vhdx'.format(self._letter))
+        self.winrm = windows_access.winrm
+
+    def _diskpart(self, name, script, timeout_sec):
+        _logger.debug('Diskpart script:\n%s', script)
+        script_path = self._image_path.with_name('{}.{}.diskpart.txt'.format(self._letter, name))
+        script_path.write_text(script)
+        # Error originate in VDS -- Virtual Disk Service.
+        # See: https://msdn.microsoft.com/en-us/library/dd208031.aspx.
+        command = self.winrm.command(['diskpart', '/s', script_path])
+        try:
+            command.run(timeout_sec=timeout_sec)
+        except exceptions.exit_status_error_cls(0x80070057) as e:
+            message_multiline = e.stdout.decode().rstrip().rsplit('\r\n\r\n')[-1]
+            message_oneline = message_multiline.replace('\r\n', ' ')
+            six.reraise(OSError, OSError(errno.EINVAL, message_oneline), sys.exc_info()[2])
+
+    def remove(self, letter='V'):
+        # `DETACH` fails even with `NOERR`. The following scheme helps to work around this and
+        # save `diskpart` run if there is no disk mounted.
+        try:
+            _logger.debug("Try to delete virtual disk file first: %s", self._image_path)
+            self._image_path.unlink()
+        except exceptions.DoesNotExist:
+            _logger.debug("Skip diskpart: no virtual disk file: %s", self._image_path)
+        except UsedByAnotherProcess:
+            _logger.debug("Run diskpart to dismount and detach: %s", self._image_path)
+            script_template = (
+                'SELECT VDISK file={image_path}' '\r\n'
+                'DETACH VDISK' '\r\n'  # When detaching, volume is unmounted automatically.
+            )
+            script = script_template.format(image_path=self._image_path)
+            self._diskpart('remove', script, 5)
+            _logger.debug("Delete virtual disk file: %s", self._image_path)
+            self._image_path.unlink()
+
+    def mount(self, size_bytes):
+        """Make virtual disk and mount it.
+        When Windows 7 is not supported, move to Windows Storage Management Provider.
+        See: https://docs.microsoft.com/en-us/previous-versions/windows/desktop/stormgmt/windows-storage-management-api-portal
+        """
+        free_space_mb = int(math.ceil(size_bytes / 1024 / 1024))
+        volume_mb = free_space_mb + 15  # 15 MB is for System Volume Information.
+        partition_mb = volume_mb + 1  # 1 MB for filesystem.
+        disk_mb = partition_mb + 2  # 2 MB is for MBR/GPT headers.
+        script_template = (
+            'CREATE VDISK file={image_path} MAXIMUM={disk_mb}' '\r\n'  # NOERR if exists.
+            'SELECT VDISK file={image_path}' '\r\n'  # No error if already selected.
+            'ATTACH VDISK' '\r\n'  # "Disk" of "vdisk" has been selected.
+            'CONVERT MBR' '\r\n'
+            'CREATE PARTITION PRIMARY size={partition_mb}' '\r\n'  # New partition and its volume have been selected.
+            'FORMAT' '\r\n'  # Filesystem is default (NTFS).
+            'ASSIGN LETTER={letter}' '\r\n'
+        )
+        script = script_template.format(
+            image_path=self._image_path,
+            letter=self._letter,
+            partition_mb=partition_mb,
+            disk_mb=disk_mb)
+        self._diskpart('mount', script, 10 + 0.05 * free_space_mb)
+

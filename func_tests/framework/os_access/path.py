@@ -1,89 +1,95 @@
+import errno
+import json
 import logging
 import os
+import stat
+import sys
 from abc import ABCMeta, abstractmethod
 
-from pathlib2 import PurePath
+import pathlib2 as pathlib
+import six
 
 from framework.os_access import exceptions
-from framework.os_access.exceptions import DoesNotExist, NotADir
 
 _logger = logging.getLogger(__name__)
 
 
-class FileSystemPath(PurePath):
+class FileSystemPath(pathlib.Path):
     __metaclass__ = ABCMeta
 
-    def __init__(self, *parts):  # type: (*str) -> None
-        """Merely for type hinting"""
+    def __new__(cls, *args, **kwargs):
+        return cls._from_parts(args)
 
-    @classmethod
-    @abstractmethod
-    def home(cls):
-        return cls()
+    def _init(self, template=None):
+        if template is not None:
+            assert isinstance(template, type(self))
+            assert template._accessor is self._accessor
+        self._closed = False
 
     @classmethod
     @abstractmethod
     def tmp(cls):
         return cls()
 
-    @abstractmethod
-    def exists(self):
-        return True
+    def rmtree(self, ignore_errors=False, onerror=None):
+        """Recursively delete a directory tree.
 
-    @abstractmethod
-    def unlink(self):
-        pass
+        If ignore_errors is set, errors are ignored; otherwise, if onerror
+        is set, it is called to handle the error with arguments (func,
+        path, exc_info) where func is os.listdir, os.remove, or os.rmdir;
+        path is the argument to that function that caused it to fail; and
+        exc_info is a tuple returned by sys.exc_info().  If ignore_errors
+        is false and onerror is None, an exception is raised.
 
-    @abstractmethod
-    def expanduser(self):
-        return self.__class__()
-
-    @abstractmethod
-    def glob(self, pattern):
-        return [FileSystemPath()]
-
-    def walk(self):
-        children = self.glob('*')
+        """
+        _logger.debug("Remove dir tree: %s", self)
+        if ignore_errors:
+            def onerror(*_args):
+                pass
+        elif onerror is None:
+            def onerror(_failed_func, _path, exc_info):
+                six.reraise(*exc_info)
+        try:
+            if self.is_symlink():
+                # symlinks to directories are forbidden, see bug #1669
+                raise OSError("Cannot call rmtree on a symbolic link")
+        except OSError:
+            onerror(self.is_symlink, self, sys.exc_info())
+            # can't continue even if onerror hook returns
+            return
+        children = []
+        try:
+            children = list(self.iterdir())
+        except OSError:
+            onerror(self.iterdir, self, sys.exc_info())
         for child in children:
-            try:
-                for descendant in child.walk():
-                    yield descendant
-            except NotADir:
-                yield child
+            if child.is_dir():
+                child.rmtree(ignore_errors=ignore_errors, onerror=onerror)
+            else:
+                try:
+                    child.unlink()
+                except OSError:
+                    onerror(self.unlink, child, sys.exc_info())
+        try:
+            self.rmdir()
+        except OSError:
+            onerror(self.rmdir, self, sys.exc_info())
 
-    @abstractmethod
-    def mkdir(self, parents=False, exist_ok=True):
-        pass
+    def yank(self, offset, max_length=None):
+        with self.open('rb+') as f:
+            f.seek(offset)
+            return f.read(max_length)
 
-    @abstractmethod
-    def rmtree(self, ignore_errors=False):
-        pass
+    def patch(self, offset, data):
+        with self.open('rb+') as f:
+            f.seek(offset)
+            return f.write(data)
 
-    @abstractmethod
-    def read_bytes(self, offset=0, max_length=None):
-        return b''
-
-    @abstractmethod
-    def write_bytes(self, contents, offset=None):
-        return 0
-
-    @abstractmethod
-    def read_text(self, encoding, errors):
-        return u''
-
-    @abstractmethod
-    def write_text(self, data, encoding, errors):
-        return 0
-
-    @abstractmethod
     def size(self):
-        return 0
-
-    def copy_to(self, destination):
-        copy_file_using_read_and_write(self, destination)
-
-    def copy_from(self, source):
-        copy_file_using_read_and_write(source, self)
+        path_stat = self.stat()
+        if not stat.S_ISREG(path_stat.st_mode):
+            raise exceptions.NotAFile(errno.EISDIR, "Stat: {}".format(path_stat))
+        return path_stat.st_size
 
     def ensure_empty_dir(self):
         if self.exists():
@@ -108,12 +114,12 @@ class FileSystemPath(PurePath):
             _logger.debug("Read file with offset %s.", offset_path)
             try:
                 offset_str = offset_path.read_text()
-            except DoesNotExist:
+            except exceptions.DoesNotExist:
                 _logger.debug("Cannot find file with offset %s.", offset_path)
                 return
             offset = int(offset_str)
             _logger.debug("Check offset %d in %s.", offset, self)
-            chunk = self.read_bytes(offset=offset, max_length=300)  # Length is arbitrary.
+            chunk = self.yank(offset, max_length=300)  # Length is arbitrary.
             match = regex.match(chunk)
             if match is None:
                 return
@@ -133,7 +139,8 @@ class FileSystemPath(PurePath):
             _logger.info("New value is same as old %s.", new_value)
         if len(new_value) > end - begin:
             raise ValueError("New value %r is too long, max length is %d.", new_value, end - begin)
-        self.write_bytes(new_value.ljust(end - begin, b'\0'), offset=begin)
+        patch = new_value.ljust(end - begin, b'\0')
+        self.patch(begin, patch)
         return old_value
 
     def take_from(self, local_source_path):
@@ -142,16 +149,29 @@ class FileSystemPath(PurePath):
             raise exceptions.CannotDownload(
                 "Local file {} doesn't exist.".format(local_source_path))
         if destination.exists():
-            raise exceptions.AlreadyExists(
-                "Cannot copy {!s} to {!s}".format(local_source_path, self),
-                destination)
+            return destination
         copy_file(local_source_path, destination)
         return destination
 
+    def write_json(self, obj, indent=4, default=None, cls=None):
+        dumped = json.dumps(obj, indent=indent, default=default, cls=cls)
+        if isinstance(dumped, bytes):
+            return self.write_bytes(dumped)
+        else:
+            return self.write_text(dumped)
 
-def copy_file(source, destination):  # type: (FileSystemPath, FileSystemPath) -> None
+
+def copy_file(source, destination, chunk_size_bytes=1024 * 1024):
+    # type: (FileSystemPath, FileSystemPath, int) -> None
     _logger.info("Copy from %s to %s", source, destination)
-    source.copy_to(destination)
-
-def copy_file_using_read_and_write(source, destination):  # type: (FileSystemPath, FileSystemPath) -> None
-    destination.write_bytes(source.read_bytes())
+    copied_bytes = 0
+    while True:
+        chunk = source.yank(copied_bytes, max_length=chunk_size_bytes)
+        if copied_bytes == 0:
+            destination.write_bytes(chunk)
+        else:
+            destination.patch(copied_bytes, chunk)
+        copied_bytes += len(chunk)
+        if len(chunk) < chunk_size_bytes:
+            break
+        assert len(chunk) == chunk_size_bytes

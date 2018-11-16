@@ -1,14 +1,16 @@
 import logging
 import time
-from datetime import timedelta
+from datetime import datetime, timedelta
 from collections import OrderedDict
 from fnmatch import fnmatch
 
+import pytz
 from typing import List, Dict
 
 from framework.installation.mediaserver import Mediaserver
-from framework.utils import datetime_utc_now, Timer
+from framework.waiting import Timer
 from . import checks, stage, stages
+from framework.mediaserver_api import MediaserverApiRequestError
 
 _logger = logging.getLogger(__name__)
 
@@ -31,10 +33,12 @@ def report(status, start_time=None, duration=None, **details
 class CameraStagesExecutor(object):
     """ Controls camera stages execution flow and provides report.
     """
-    def __init__(self, server, name, stage_rules, stage_hard_timeout):
+    def __init__(self, server, name, stage_rules, stage_hard_timeout, is_enabled=True):
             # type: (Mediaserver, str, dict, timedelta) -> None
         self.name = name
         self.id = stage_rules.get('discovery', {}).get('physicalId')
+        if not is_enabled:
+            stage_rules = {}
         self._stage_executors = self._make_stage_executors(stage_rules, stage_hard_timeout)
         self._warnings = ['Unknown stage ' + name for name in stage_rules]
         self._all_stage_steps = self._make_all_stage_steps(server)
@@ -51,7 +55,7 @@ class CameraStagesExecutor(object):
         """ :returns True if all stages are finished, False otherwise (retry is required).
         """
         try:
-            self._all_stage_steps.next()
+            next(self._all_stage_steps)
             return False
 
         except StopIteration:
@@ -73,21 +77,21 @@ class CameraStagesExecutor(object):
             ))
 
     def _make_all_stage_steps(self, server):  # types: (Mediaserver) -> Generator[None]
-        self._start_time = datetime_utc_now()
+        self._start_time = datetime.now(pytz.UTC)
         timer = Timer()
         for executors in self._stage_executors:
             steps = executors.steps(server)
             while True:
                 try:
-                    steps.next()
-                    self._duration = timer.duration
+                    next(steps)
+                    self._duration = timer.from_start
                     yield
 
                 except StopIteration:
                     _logger.info('%s stages result %s', self.name, executors.details)
                     if not executors.is_successful and executors.stage.is_essential:
                         _logger.error('Essential stage is failed, skip other stages')
-                        self._duration = timer.duration
+                        self._duration = timer.from_start
                         return
                     break
 
@@ -118,7 +122,7 @@ class ServerStagesExecutor(object):
             self.name = name
             self.rules = rules
             self.result = checks.Halt('Is not executed')
-            self.start_time = datetime_utc_now()
+            self.start_time = datetime.now(pytz.UTC)
             self.duration = None
 
         @property
@@ -138,6 +142,7 @@ class ServerStagesExecutor(object):
         if delay:
             _logger.debug(self, 'Server stage %r delay %s', name, delay)
             time.sleep(delay.seconds)
+            _logger.debug('####### Server performance stats:\n %s', self.server.api.get_server_statistics())
 
         _logger.debug(self, 'Server stage %r', name)
         current_stage = self.Stage(name, rules)
@@ -154,7 +159,7 @@ class ServerStagesExecutor(object):
         else:
             current_stage.result = checker.result()
 
-        current_stage.duration = timer.duration
+        current_stage.duration = timer.from_start
         self.stages.append(current_stage)
         _logger.info(self, 'Server stage %r result %r', name, current_stage.result.details)
 
@@ -176,11 +181,11 @@ class ServerStagesExecutor(object):
 
 
 class SpecificFeatures(object):
-    def __init__(self, items=[]):
-        self.items = set(items)
+    def __init__(self, items={}):
+        self.items = items
 
     def __getattr__(self, name):
-        return name in self.items
+        return self.items.get(name)
 
 
 class Stand(object):
@@ -193,9 +198,10 @@ class Stand(object):
             config.pop(SERVER_STAGES_KEY) if SERVER_STAGES_KEY in config else {}
         ))
         self.camera_stages = [
-            CameraStagesExecutor(server, name, self._stage_rules(config_rules), stage_hard_timeout)
-            for name, config_rules in config.items()
-            if any(fnmatch(name, f) for f in camera_filters)
+            CameraStagesExecutor(
+                server, name, self._stage_rules(config_rules), stage_hard_timeout,
+                is_enabled=any(fnmatch(name, f) for f in camera_filters)
+            ) for name, config_rules in config.items()
         ]
 
     def run_all_stages(self, camera_cycle_delay, server_stage_delay):
@@ -242,6 +248,7 @@ class Stand(object):
 
     def _run_camera_stages(self, cycle_delay):  # types: (timedelta) -> None
         _logger.info('Run all stages')
+        self._log_statistics()
         while True:
             cameras_left = 0
             for camera in self.camera_stages:
@@ -254,6 +261,18 @@ class Stand(object):
 
             _logger.debug('Wait for cycle delay %s, %s cameras left', cycle_delay, cameras_left)
             time.sleep(cycle_delay.total_seconds())
+            self._log_statistics()
+
+    def _log_statistics(self):
+        message = 'Server performance statistics'
+        try:
+            stats = self.server.api.get_server_statistics()['statistics'][:3]
+        except MediaserverApiRequestError as error:
+            _logger.debug(message + ': {!s}'.format(error))
+        else:
+            out = {s['description']: s['value'] for s in stats}
+            out['HDD'] = out.get('sda')
+            _logger.debug(message + ': CPU {CPU}, RAM {RAM}, HDD {HDD}'.format(**out))
 
     def _stage_rules(self, rules):  # (dict) -> dict
         for name, rule in rules.items():
@@ -271,6 +290,7 @@ class Stand(object):
                     self._merge_dict(rules, base_name, rule)
 
         return rules
+
 
     @classmethod
     def _merge_dict(cls, container, key, value):

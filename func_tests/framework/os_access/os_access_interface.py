@@ -6,11 +6,11 @@ from datetime import datetime
 import six
 from netaddr import IPAddress
 from pathlib2 import PureWindowsPath
-from typing import Callable, ContextManager, Optional, Type
+from typing import Any, Callable, Mapping, Optional, Type
 
 from framework.networking.interface import Networking
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
-from framework.os_access.exceptions import DoesNotExist
+from framework.os_access.exceptions import DoesNotExist, NotAFile
 from framework.os_access.local_path import LocalPath
 from framework.os_access.path import FileSystemPath
 from framework.os_access.traffic_capture import TrafficCapture
@@ -34,6 +34,10 @@ class _AllPorts(object):
 
 @six.add_metaclass(ABCMeta)
 class Time(object):
+    @abstractmethod
+    def get_tz(self):
+        pass
+
     @abstractmethod
     def get(self):  # type: () -> RunningTime
         pass
@@ -107,6 +111,21 @@ class ReciprocalPortMap(object):
         cls(to_remote, to_local_from_remote)
 
 
+class BaseFakeDisk(object):
+    __metaclass__ = ABCMeta
+
+    def __init__(self, path):
+        self.path = path
+
+    @abstractmethod
+    def remove(self):
+        pass
+
+    @abstractmethod
+    def mount(self, size_bytes):
+        pass
+
+
 class OSAccess(object):
     __metaclass__ = ABCMeta
 
@@ -117,7 +136,7 @@ class OSAccess(object):
             networking,  # type: Optional[Networking]
             time,  # type: Time
             traffic_capture,  # type: Optional[TrafficCapture]
-            lock_acquired,  # type: Optional[Callable[[FileSystemPath, ...], ContextManager[None]]]
+            lock_acquired,  # type: Optional[Callable[[FileSystemPath, ...], Any]]
             path_cls,  # type: Type[FileSystemPath]
             ):
         self.alias = alias
@@ -154,15 +173,23 @@ class OSAccess(object):
         pass
 
     @abstractmethod
-    def make_fake_disk(self, name, size_bytes):
+    def fake_disk(self):  # type: () -> BaseFakeDisk
+        pass
+
+    @abstractmethod
+    def _fs_root(self):
         return self.path_cls()
 
     def _disk_space_holder(self):  # type: () -> FileSystemPath
-        return self.path_cls.tmp() / 'space_holder.tmp'
+        return self._fs_root() / 'space_holder.tmp'
 
     @abstractmethod
-    def free_disk_space_bytes(self):  # type: () -> int
+    def _free_disk_space_bytes_on_all(self):  # type: () -> Mapping[FileSystemPath, int]
         pass
+
+    def free_disk_space_bytes(self):  # type: () -> int
+        result_on_all = self._free_disk_space_bytes_on_all()
+        return result_on_all[self._fs_root()]
 
     @abstractmethod
     def _hold_disk_space(self, to_consume_bytes):  # type: (int) -> None
@@ -186,7 +213,7 @@ class OSAccess(object):
 
     @contextmanager
     def free_disk_space_limited(self, should_leave_bytes, interval_sec=1):
-        # type: (int, float) -> ContextManager[...]
+        # type: (int, float) -> ...
         """Try to maintain limited free disk space while in this context.
 
         One-time allocation (reservation) of disk space is not enough. OS or other software
@@ -231,3 +258,18 @@ class OSAccess(object):
     @abstractmethod
     def _download_by_smb(self, source_hostname, source_path, destination_dir, timeout_sec):
         return self.path_cls()
+
+    @abstractmethod
+    def file_md5(self, file_path):
+        pass
+
+    def tree_md5(self, tree_path):
+        assert isinstance(tree_path, self.path_cls)
+        files_md5 = {}
+        for file_path in tree_path.glob('**/*'):
+            parts = file_path.relative_to(tree_path).parts
+            try:
+                files_md5[parts] = self.file_md5(file_path)
+            except NotAFile:
+                pass
+        return files_md5

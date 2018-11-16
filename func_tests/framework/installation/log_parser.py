@@ -6,7 +6,7 @@ _ts_format = '%Y-%m-%d %H:%M:%S.%f'
 _split_re = re.compile(
     r'''
         ^ (?P<ts> \d{4}-\d{2}-\d{2} \s+ \d{2}:\d{2}:\d{2}.\d{3} )
-        \x20+ (?P<thread>\d{1,6})
+        \x20+ (?P<thread>[0-9a-fA-F]{1,6})
         \x20+ (?P<level>ALWAYS|ERROR|WARNING|INFO|DEBUG|VERBOSE)
         \x20 (?P<tag> .*?)
         :\x20
@@ -31,14 +31,14 @@ def _record(prev_match, message):
         'name': prev_match.group('tag'),
         'levelname': prev_match.group('level'),
         'levelno': _level_map[prev_match.group('level')],
-        'thread': int(prev_match.group('thread')),
+        'thread': prev_match.group('thread'),  # Hex on Windows, decimal on Linux.
         }
 
 
 def parse_mediaserver_logs(log_bytes):
     log_text = log_bytes.decode('utf-8-sig')
     matches_iter = _split_re.finditer(log_text)
-    prev_match = matches_iter.next()
+    prev_match = next(matches_iter)
     assert prev_match.start() == 0
     for next_match in matches_iter:
         message = log_text[prev_match.end():next_match.start() - 1]

@@ -193,6 +193,7 @@ full_info_differ = _DataDiffer('full-info', [
     (_PathPattern('layouts'), _KeyInfo('layout', ['id'], ['name'])),
     (_PathPattern('layouts/*/items'), _KeyInfo('layout_item', ['id'], ['id'])),
     (_PathPattern('allProperties'), _KeyInfo('property', ['resourceId', 'name'], ['resourceId', 'name'])),
+    (_PathPattern('resStatusList'), _KeyInfo('status', ['id'], ['id'])),
     ])
 
 transaction_log_differ = _DataDiffer('transaction-log', [

@@ -1,0 +1,3 @@
+nx_add_test(vms_gateway_ut
+    PUBLIC_LIBS
+        vms_gateway_core)

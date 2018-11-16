@@ -33,6 +33,7 @@ class WindowsInstallation(Installation):
                 user_profile_dir / 'AppData' / 'Local' / 'Temp',  # From task manager.
                 ],
             core_dump_glob='mediaserver*.dmp',
+            default_storage_dir=os_access.path_cls('c:\\', customization.storage_dir_name),
             )
         self._config_key = WindowsRegistry(os_access.winrm).key(customization.windows_registry_key)
         self._config_key_backup = WindowsRegistry(os_access.winrm).key(customization.windows_registry_key + ' Backup')
@@ -70,7 +71,7 @@ class WindowsInstallation(Installation):
             '.msi': ['MsiExec', '/i', remote_installer_path, '/passive', '/log', remote_log_path],
             '.exe': [remote_installer_path, '/passive', '/log', remote_log_path],
             }
-        self.windows_access.winrm.run_command(commands[installer.extension])
+        self.windows_access.winrm.run_command(commands[installer.extension], timeout_sec=300)
         self._backup_configuration()
 
     def parse_core_dump(self, path):

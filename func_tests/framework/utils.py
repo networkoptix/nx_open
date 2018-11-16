@@ -52,9 +52,6 @@ def log_list(name, values):
 def flatten_list(list_of_lists):
     return list(itertools.chain(*tuple(list_of_lists)))
 
-def quote(s, char='"'):
-    return '%c%s%c' % (char, s, char)
-
 
 def bool_to_str(val, false_str='false', true_str='true'):
     if val:
@@ -174,22 +171,29 @@ def single(iter):
     return l[0]
 
 
-def make_threaded_async_calls(thread_number, call_gen):
+def first(iter):
+    l = list(iter)
+    assert len(l) >= 1, 'At least one item is expected'
+    return l[0]
+
+
+def make_threaded_async_calls(thread_count, call_gen):
     failures = []
 
     def call(fn):
         try:
-            fn()
+            return fn()
         except:
             _logger.exception('Error calling %r:', fn)
             failures.append(None)
 
-    pool = ThreadPool(thread_number)
+    pool = ThreadPool(thread_count)
     # convert generator to list to avoid generator-from-thread issues and races
-    pool.map(call, list(call_gen))
+    result = pool.map(call, list(call_gen))
     pool.close()
     pool.join()
     assert not failures, 'There was %d errors while generated method calls, check for logs' % len(failures)
+    return result
 
 
 class MultiFunction(object):
@@ -236,11 +240,13 @@ def threadsafe_generator(generator_fn):
     return safe_generator_fn
 
 
-class Timer:
-
-    def __init__(self):
-        self._start = timeit.default_timer()
-
-    @property
-    def duration(self):
-        return timedelta(seconds=timeit.default_timer() - self._start)
+def description_from_func(func):  # type: (Any) -> str
+    try:
+        object_bound_to = func.__self__
+    except AttributeError:
+        if func.__name__ == '<lambda>':
+            raise ValueError("Cannot make description from lambda")
+        return func.__name__
+    if object_bound_to is None:
+        raise ValueError("Cannot make description from unbound method")
+    return '{func.__self__!r}.{func.__name__!s}'.format(func=func)

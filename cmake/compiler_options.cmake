@@ -56,7 +56,7 @@ if(WINDOWS)
     set(API_EXPORT_MACRO "__declspec(dllexport)")
 else()
     set(API_IMPORT_MACRO "")
-    set(API_EXPORT_MACRO "")
+    set(API_EXPORT_MACRO "") #< TODO: Consider using "__attribute__((visibility(\"default\")))".
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -79,15 +79,22 @@ if(WINDOWS)
         /wd4100
 
         /we4717
+
         # Deletion of pointer to incomplete type 'X'; no destructor called.
         /we4150
+
         # Not all control paths return a value.
         /we4715
+
         # Macro redefinition.
         /we4005
+
         # Unsafe operation: no value of type 'INTEGRAL' promoted to type 'ENUM' can equal the given
         # constant.
         /we4806
+
+        # 'identifier' : type name first seen using 'objecttype1' now seen using 'objecttype2'
+        /we4099
     )
     add_definitions(-D_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING)
     add_definitions(-D_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING)
@@ -140,6 +147,7 @@ if(UNIX)
         add_compile_options(
             -Wno-c++14-extensions
             -Wno-inconsistent-missing-override
+            -Werror=mismatched-tags
         )
     endif()
 endif()
