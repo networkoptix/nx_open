@@ -340,7 +340,7 @@ void EventTile::setCloseable(bool value)
         return;
 
     d->closeable = value;
-    d->handleHoverChanged(d->closeable && underMouse());
+    d->handleHoverChanged(underMouse());
 }
 
 QString EventTile::title() const
@@ -548,7 +548,12 @@ bool EventTile::event(QEvent* event)
 
         case QEvent::Leave:
         case QEvent::HoverLeave:
+        case QEvent::Hide:
             d->handleHoverChanged(false);
+            break;
+
+        case QEvent::Show:
+            d->handleHoverChanged(underMouse());
             break;
 
         case QEvent::MouseButtonPress:
