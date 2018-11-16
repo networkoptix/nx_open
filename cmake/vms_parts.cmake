@@ -9,6 +9,7 @@ set(_withTestCamera ON)
 set(_withTests ON)
 set(_withMiniLauncher OFF)
 set(_withRootTool OFF)
+set(_withWebsocketUtility OFF)
 
 if("${platform}" STREQUAL "linux")
     if("${arch}" MATCHES "arm|aarch64")
@@ -75,6 +76,7 @@ option(withMiniLauncher "Enable minilauncher" ${_withMiniLauncher})
 option(withScreenChecker "Enable screen checker" OFF)
 option(withNovBrowser "Enable Nov Browser" OFF)
 nx_option(withRootTool "Enable root tool" ${_withRootTool})
+nx_option(withWebsocketUtility "Enable websocket utility" ${_withWebsocketUtility})
 
 cmake_dependent_option(withDistributions "Enable distributions build"
     OFF "developerBuild"
@@ -100,3 +102,4 @@ unset(_withTests)
 unset(_withCassandraTests)
 unset(_withMiniLauncher)
 unset(_withRootTool)
+unset(_withWebsocketUtility)
