@@ -174,7 +174,7 @@ class CloudSession(object):
 
     def purge_queue(self, queue):
         log.info('Purging queue')
-        queue.purge_queue()
+        queue.purge()
 
         log.info('Sleeping 60 seconds')
         time.sleep(60)
