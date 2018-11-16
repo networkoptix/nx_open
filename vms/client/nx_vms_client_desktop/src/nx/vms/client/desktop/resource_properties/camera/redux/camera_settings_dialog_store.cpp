@@ -426,6 +426,20 @@ void CameraSettingsDialogStore::setEnabledAnalyticsEngines(const QSet<QnUuid>& v
         [&](State state) { return Reducer::setEnabledAnalyticsEngines(std::move(state), value); });
 }
 
+QnUuid CameraSettingsDialogStore::currentAnalyticsEngineId() const
+{
+    return d->state.analytics.currentEngineId;
+}
+
+void CameraSettingsDialogStore::setCurrentAnalyticsEngineId(const QnUuid& value)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            return Reducer::setCurrentAnalyticsEngineId(std::move(state), value);
+        });
+}
+
 bool CameraSettingsDialogStore::analyticsSettingsLoading() const
 {
     return d->state.analytics.loading;

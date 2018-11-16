@@ -1315,6 +1315,13 @@ State CameraSettingsDialogStateReducer::setAnalyticsEngines(
     return state;
 }
 
+State CameraSettingsDialogStateReducer::setCurrentAnalyticsEngineId(
+    State state, const QnUuid& value)
+{
+    state.analytics.currentEngineId = value;
+    return state;
+}
+
 State CameraSettingsDialogStateReducer::setAnalyticsSettingsLoading(State state, bool value)
 {
     state.analytics.loading = value;
