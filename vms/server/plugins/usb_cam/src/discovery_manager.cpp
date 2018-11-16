@@ -17,9 +17,9 @@ namespace usb_cam {
 
 namespace {
 
-static constexpr const char * const kVendorName = "usb_cam";
-static constexpr const char * const kQtMacAddressDelimiter = ":";
-static constexpr const char * const kNxMacAddressDelimiter = "-";
+static constexpr const char kVendorName[] = "usb_cam";
+static constexpr const char kQtMacAddressDelimiter[] = ":";
+static constexpr const char kNxMacAddressDelimiter[] = "-";
 
 static std::string getEthernetMacAddress()
 {

@@ -16,12 +16,10 @@ namespace device {
 namespace video {
 namespace detail {
 
-namespace
-{
+namespace {
 
-static const char * const kSubSystem = "video4linux";
-static const char * const kIdSerialKey = "ID_SERIAL";
-static const char * const kDevNameKey = "DEVNAME";
+static constexpr char kSubSystem[] = "video4linux";
+static constexpr char kIdSerialKey[] = "ID_SERIAL";
 
 struct Udev
 {
@@ -89,45 +87,10 @@ struct UdevDevice
         if (udevDevice)
             udev_device_unref(udevDevice);
     }
-    
-    const char * getSubSystem()
-    {
-        return udev_device_get_subsystem(udevDevice);
-    }
-
-    const char * getDevPath()
-    {
-        return udev_device_get_devpath(udevDevice);
-    }
-
-    const char * getDevType() //< hangs, don't use it!
-    {
-        return udev_device_get_devtype(udevDevice);
-    }
-
-    const char * getSysPath()
-    {
-        return udev_device_get_syspath(udevDevice);
-    }
-
-    const char * getSysName()
-    {
-        return udev_device_get_sysname(udevDevice);
-    }
-
-    const char * getSysNum()
-    {
-        return udev_device_get_sysnum(udevDevice);
-    }
 
     const char * getDevNode()
     {
         return udev_device_get_devnode(udevDevice);
-    }
-
-    int getIsInitialized()
-    {
-        return udev_device_get_is_initialized(udevDevice);
     }
 
     const char * getPropertyValue(const char * key)

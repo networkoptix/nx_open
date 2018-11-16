@@ -15,7 +15,7 @@ namespace detail {
 
 namespace {
 
-static std::vector<std::string> kMotherBoardAudioList = 
+static const std::vector<std::string> kMotherBoardAudioList = 
 {
     "HDA Intel PCH"
     // AMD? builtin audio card goes here

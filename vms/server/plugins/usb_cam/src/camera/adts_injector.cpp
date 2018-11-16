@@ -12,7 +12,7 @@ namespace usb_cam {
 
 namespace {
 
-static constexpr const char * kOutputFormat = "adts";
+static constexpr const char kOutputFormat[] = "adts";
 static constexpr int kDefaultBufferSize = 512;
 
 static int writePacket(void *opaque, uint8_t *buffer, int bufferSize)

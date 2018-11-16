@@ -19,7 +19,7 @@
 #include "udev_utils.h"
 
 #define NX_V4L2_LOG(...) \
-NX_DEBUG(nx::utils::log::Tag(std::string("v4l2_utils::")+__FUNCTION__), __VA_ARGS__)
+NX_DEBUG(nx::utils::log::Tag(std::string("usb_cam::v4l2_utils::")+__FUNCTION__), __VA_ARGS__)
 
 namespace nx {
 namespace usb_cam {
