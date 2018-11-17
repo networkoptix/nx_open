@@ -112,7 +112,7 @@ protected:
     {
         auto originalTran = createTran<Data>(paramName, "user:password");
         auto amendedTran = whenTransactionProcessed(originalTran);
-        ec2::detail::amendOutputDataIfNeeded(accessData, &amendedTran.params);
+        ec2::amendOutputDataIfNeeded(accessData, &amendedTran.params);
 
         if (shouldBeEqual)
         {
