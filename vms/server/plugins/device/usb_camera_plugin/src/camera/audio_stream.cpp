@@ -11,8 +11,6 @@ extern "C" {
 #include "ffmpeg/utils.h"
 #include "device/audio/utils.h"
 
-#include <iostream>
-
 namespace nx {
 namespace usb_cam {
 
