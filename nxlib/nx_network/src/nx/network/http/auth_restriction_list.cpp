@@ -15,6 +15,10 @@ AuthMethod::Values AuthMethodRestrictionList::getAllowedAuthMethods(
     AuthMethod::Values allowed = kDefaults;
 
     QnMutexLocker lock(&m_mutex);
+    const auto methodIter = m_allowedHttpMethods.find(request.requestLine.method);
+    if (methodIter != m_allowedHttpMethods.end())
+        allowed |= methodIter->second.methods;
+
     for (const auto& rule: m_allowed)
     {
         if (rule.second.expression.exactMatch(path))
@@ -46,6 +50,14 @@ void AuthMethodRestrictionList::deny(const QString& pathMask, AuthMethod::Values
 {
     QnMutexLocker lock(&m_mutex);
     m_denied.emplace(pathMask, Rule(pathMask, method));
+}
+
+void AuthMethodRestrictionList::allowMethod(
+    const Method::ValueType& httpMethod,
+    AuthMethod::Values authMethod)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_allowedHttpMethods.emplace(httpMethod, Rule(QString(), authMethod));
 }
 
 } // namespace nx

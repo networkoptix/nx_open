@@ -81,6 +81,11 @@ public:
      */
     void deny(const QString& pathMask, AuthMethod::Values method);
 
+    // TODO: #ak Should be (method, path), not method or path only.
+    void allowMethod(
+        const Method::ValueType& httpMethod,
+        AuthMethod::Values authMethod);
+
 private:
     struct Rule
     {
@@ -93,6 +98,7 @@ private:
     std::map<QString, Rule> m_allowed;
     std::map<QString, Rule> m_denied;
     std::set<QString> m_allowCookieWithotScrf;
+    std::map<Method::ValueType, Rule> m_allowedHttpMethods;
 };
 
 } // namespace nx

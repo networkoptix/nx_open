@@ -175,6 +175,7 @@
 #include <rest/handlers/execute_analytics_action_rest_handler.h>
 #include <rest/handlers/get_analytics_actions_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
+#include <rest/server/options_request_handler.h>
 #include <rest/handlers/get_hardware_info_rest_handler.h>
 #include <rest/handlers/system_settings_handler.h>
 #include <rest/handlers/audio_transmission_rest_handler.h>
@@ -1438,19 +1439,6 @@ void MediaServerProcess::registerRestHandlers(
     processorPool->registerRedirectRule(lit("/static"), welcomePage);
     processorPool->registerRedirectRule(lit("/static/"), welcomePage);
 
-    auto reg =
-        [this, processorPool](
-            const QString& path,
-            QnRestRequestHandler* handler,
-            GlobalPermission permission = GlobalPermission::none)
-        {
-            processorPool->registerHandler(path, handler, permission);
-
-            const auto& cameraIdUrlParams = handler->cameraIdUrlParams();
-            if (!cameraIdUrlParams.isEmpty())
-                m_autoRequestForwarder->addCameraIdUrlParams(path, cameraIdUrlParams);
-        };
-
     // TODO: When supported by apidoctool, the comment to these constants should be parsed.
     const auto kAdmin = GlobalPermission::admin;
     const auto kViewLogs = GlobalPermission::viewLogs;
@@ -1461,7 +1449,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:integer utcTimeMs Server synchronized time.
      *     %param:boolean isTakenFromInternet Whether the server has got the time from the internet.
      */
-    reg(nx::vms::time_sync::TimeSyncManager::kTimeSyncUrlPath.mid(1),
+    registerRestHandler(nx::vms::time_sync::TimeSyncManager::kTimeSyncUrlPath.mid(1),
         new ::rest::handlers::SyncTimeRestHandler());
 
     /**%apidoc POST /ec2/forcePrimaryTimeServer
@@ -1469,7 +1457,7 @@ void MediaServerProcess::registerRestHandlers(
      * If id field is missing, primary time server is turned off.
      * %return:object JSON object with error message and error code (0 means OK).
      */
-    reg("ec2/forcePrimaryTimeServer",
+    registerRestHandler("ec2/forcePrimaryTimeServer",
         new ::rest::handlers::SetPrimaryTimeServerRestHandler(), kAdmin);
 
     /**%apidoc GET /api/storageStatus
@@ -1478,19 +1466,19 @@ void MediaServerProcess::registerRestHandlers(
      * %return:object JSON data. "OK" if specified folder may be used for writing on the server.
      *     Otherwise returns "FAIL"
      */
-    reg("api/storageStatus", new QnStorageStatusRestHandler(serverModule()));
+    registerRestHandler("api/storageStatus", new QnStorageStatusRestHandler(serverModule()));
 
     /**%apidoc GET /api/storageSpace
      * Return a list of all server storages.
      * %return:object JSON data with server storages.
      */
-    reg("api/storageSpace", new QnStorageSpaceRestHandler(serverModule()));
+    registerRestHandler("api/storageSpace", new QnStorageSpaceRestHandler(serverModule()));
 
     /**%apidoc GET /api/statistics
      * Return server info: CPU usage, HDD usage e.t.c.
      * %return:object JSON data with statistics.
      */
-    reg("api/statistics", new QnStatisticsRestHandler(serverModule()));
+    registerRestHandler("api/statistics", new QnStatisticsRestHandler(serverModule()));
 
     /**%apidoc GET /api/getCameraParam
      * Read camera parameters. For instance: brightness, contrast e.t.c. Parameters to read should
@@ -1502,7 +1490,7 @@ void MediaServerProcess::registerRestHandlers(
      * %return:object Required parameter values in form of paramName=paramValue, each parameter on
      *     a new line.
      */
-    reg("api/getCameraParam", new QnCameraSettingsRestHandler(serverModule()->resourceCommandProcessor()));
+    registerRestHandler("api/getCameraParam", new QnCameraSettingsRestHandler(serverModule()->resourceCommandProcessor()));
 
     /**%apidoc POST /api/setCameraParam
      * Sets values of several camera parameters. These parameters are used on the Advanced tab in
@@ -1514,7 +1502,7 @@ void MediaServerProcess::registerRestHandlers(
      * %return:object "OK" if all parameters have been set, otherwise return error 500 (Internal
      *     server error) and the result of setting for every parameter.
      */
-    reg("api/setCameraParam", new QnCameraSettingsRestHandler(serverModule()->resourceCommandProcessor()));
+    registerRestHandler("api/setCameraParam", new QnCameraSettingsRestHandler(serverModule()->resourceCommandProcessor()));
 
     /**%apidoc GET /api/manualCamera/search
      * Start searching for the cameras in manual mode.
@@ -1585,9 +1573,9 @@ void MediaServerProcess::registerRestHandlers(
      *         "reply.cameras[].manufacturer" field in the result of /api/manualCamera/status.
      * %return:object JSON object with error message and error code (0 means OK).
      */
-    reg("api/manualCamera", new QnManualCameraAdditionRestHandler(serverModule()));
+    registerRestHandler("api/manualCamera", new QnManualCameraAdditionRestHandler(serverModule()));
 
-    reg("api/wearableCamera", new QnWearableCameraRestHandler(serverModule()));
+    registerRestHandler("api/wearableCamera", new QnWearableCameraRestHandler(serverModule()));
 
     /**%apidoc GET /api/ptz
      * Perform reading or writing PTZ operation
@@ -1622,7 +1610,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %value GetPresetsPtzCommand Read PTZ presets list.
      * %return:object JSON object with an error code (0 means OK) and error message.
      */
-    reg("api/ptz", new QnPtzRestHandler(serverModule()));
+    registerRestHandler("api/ptz", new QnPtzRestHandler(serverModule()));
 
     /**%apidoc GET /api/createEvent
      * Using this method it is possible to trigger a generic event in the system from a 3rd party
@@ -1666,7 +1654,7 @@ void MediaServerProcess::registerRestHandlers(
      *         stop.
      * %return:object JSON result with error code.
      */
-    reg("api/createEvent", new QnExternalEventRestHandler(serverModule()));
+    registerRestHandler("api/createEvent", new QnExternalEventRestHandler(serverModule()));
 
     static const char kGetTimePath[] = "api/gettime";
     /**%apidoc GET /api/gettime
@@ -1674,9 +1662,9 @@ void MediaServerProcess::registerRestHandlers(
      * is added for convenience)
      * %return:object JSON data.
      */
-    reg(kGetTimePath, new QnTimeRestHandler());
+    registerRestHandler(kGetTimePath, new QnTimeRestHandler());
 
-    reg("ec2/getTimeOfServers", new QnMultiserverTimeRestHandler(QLatin1String("/") + kGetTimePath));
+    registerRestHandler("ec2/getTimeOfServers", new QnMultiserverTimeRestHandler(QLatin1String("/") + kGetTimePath));
 
     /**%apidoc GET /api/getTimeZones
      * Return the complete list of time zones supported by the server machine.
@@ -1694,7 +1682,7 @@ void MediaServerProcess::registerRestHandlers(
      *         %value true
      *     %param:integer offsetFromUtc Time zone offset from UTC (in seconds).
      */
-    reg("api/getTimeZones", new QnGetTimeZonesRestHandler());
+    registerRestHandler("api/getTimeZones", new QnGetTimeZonesRestHandler());
 
     /**%apidoc GET /api/getNonce
      * Return authentication parameters: "nonce" and "realm".
@@ -1704,12 +1692,12 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:string nonce A session key for the current user. The current server time is used
      *         as a nonce value, and the nonce is valid for about 5 minutes.
      */
-    reg("api/getNonce", new QnGetNonceRestHandler());
+    registerRestHandler("api/getNonce", new QnGetNonceRestHandler());
 
-    reg("api/getRemoteNonce", new QnGetNonceRestHandler(lit("/api/getNonce")));
-    reg("api/cookieLogin", new QnCookieLoginRestHandler());
-    reg("api/cookieLogout", new QnCookieLogoutRestHandler());
-    reg("api/getCurrentUser", new QnCurrentUserRestHandler());
+    registerRestHandler("api/getRemoteNonce", new QnGetNonceRestHandler(lit("/api/getNonce")));
+    registerRestHandler("api/cookieLogin", new QnCookieLoginRestHandler());
+    registerRestHandler("api/cookieLogout", new QnCookieLogoutRestHandler());
+    registerRestHandler("api/getCurrentUser", new QnCurrentUserRestHandler());
 
     /**%apidoc POST /api/activateLicense
      * Activate new license and return license JSON data if success. It requires internet to
@@ -1717,24 +1705,24 @@ void MediaServerProcess::registerRestHandlers(
      * %param:string licenseKey License serial number.
      * %return:object License JSON data.
      */
-    reg("api/activateLicense", new QnActivateLicenseRestHandler());
+    registerRestHandler("api/activateLicense", new QnActivateLicenseRestHandler());
 
-    reg("api/testEmailSettings", new QnTestEmailSettingsHandler());
+    registerRestHandler("api/testEmailSettings", new QnTestEmailSettingsHandler());
 
     /**%apidoc[proprietary] GET /api/getHardwareInfo
      * Get hardware information
      * %return:object JSON with hardware information.
      */
-    reg("api/getHardwareInfo", new QnGetHardwareInfoHandler());
+    registerRestHandler("api/getHardwareInfo", new QnGetHardwareInfoHandler());
 
-    reg("api/testLdapSettings", new QnTestLdapSettingsHandler());
+    registerRestHandler("api/testLdapSettings", new QnTestLdapSettingsHandler());
 
     /**%apidoc GET /api/ping
      * Ping the server
      * %return:object JSON with error code, error string and module unique id in case of
      *     successful ping.
      */
-    reg("api/ping", new QnPingRestHandler());
+    registerRestHandler("api/ping", new QnPingRestHandler());
 
     /**%apidoc GET /api/metrics
      * %param[opt]:string brief Suppress parameters description and other details in result JSON file.
@@ -1742,10 +1730,10 @@ void MediaServerProcess::registerRestHandlers(
      * %return:object JSON with various counters that display server load, amount of DB transactions e.t.c.
      * These counters may be used for server health monitoring e.t.c.
      */
-    reg("api/metrics", new QnMetricsRestHandler());
+    registerRestHandler("api/metrics", new QnMetricsRestHandler());
 
-    reg(::rest::helper::P2pStatistics::kUrlPath, new QnP2pStatsRestHandler());
-    reg("api/recStats", new QnRecordingStatsRestHandler(serverModule()));
+    registerRestHandler(::rest::helper::P2pStatistics::kUrlPath, new QnP2pStatsRestHandler());
+    registerRestHandler("api/recStats", new QnRecordingStatsRestHandler(serverModule()));
 
     /**%apidoc GET /api/auditLog
      * Return audit log information in the requested format.
@@ -1759,9 +1747,9 @@ void MediaServerProcess::registerRestHandlers(
      *     - the format is auto-detected).
      * %return:text Tail of the server log file in text format
      */
-    reg("api/auditLog", new QnAuditLogRestHandler(serverModule()), kAdmin);
+    registerRestHandler("api/auditLog", new QnAuditLogRestHandler(serverModule()), kAdmin);
 
-    reg("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
+    registerRestHandler("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
 
     /**%apidoc GET /api/pingSystem
      * Ping the system.
@@ -1773,7 +1761,7 @@ void MediaServerProcess::registerRestHandlers(
      *     authentication credentials are invalid, and "INCOMPATIBLE" if the found system has
      *     incompatible version or different customization.
      */
-    reg("api/pingSystem", new QnPingSystemRestHandler());
+    registerRestHandler("api/pingSystem", new QnPingSystemRestHandler());
 
     /**%apidoc POST /api/changeCameraPassword
      * Change password for already existing user on a camera.
@@ -1786,7 +1774,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param:string password New password to set.
      * %return:object JSON result with error code
      */
-    reg("api/changeCameraPassword", new QnChangeCameraPasswordRestHandler(), kAdmin);
+    registerRestHandler("api/changeCameraPassword", new QnChangeCameraPasswordRestHandler(), kAdmin);
 
     /**%apidoc GET /api/rebuildArchive
      * Start or stop the server archive rebuilding, also can report this process status.
@@ -1797,7 +1785,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param:integer mainPool 1 (for the main storage) or 0 (for the backup storage)
      * %return:object Rebuild progress status or an error code.
      */
-    reg("api/rebuildArchive", new QnRebuildArchiveRestHandler(serverModule()));
+    registerRestHandler("api/rebuildArchive", new QnRebuildArchiveRestHandler(serverModule()));
 
     /**%apidoc GET /api/backupControl
      * Start or stop the recorded data backup process, also can report this process status.
@@ -1807,7 +1795,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %value <any_other_value_or_no_parameter> Report the backup process status.
      * %return:object Bakcup process progress status or an error code.
      */
-    reg("api/backupControl", new QnBackupControlRestHandler(serverModule()));
+    registerRestHandler("api/backupControl", new QnBackupControlRestHandler(serverModule()));
 
     /**%apidoc[proprietary] GET /api/events
      * Return event log in the proprietary binary format.
@@ -1818,7 +1806,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param[opt]:uuid brule_id Event rule id.
      * %return:binary Server event log in the proprietary binary format.
      */
-    reg("api/events", new QnEventLogRestHandler(serverModule()), kViewLogs); //< deprecated, still used in the client
+    registerRestHandler("api/events", new QnEventLogRestHandler(serverModule()), kViewLogs); //< deprecated, still used in the client
 
     /**%apidoc GET /api/getEvents
      * Get server event log information.
@@ -1960,10 +1948,10 @@ void MediaServerProcess::registerRestHandlers(
      *     %param[proprietary]:flags flags Combination (via "|") or the following flags:
      *         %value VideoLinkExists
      */
-    reg("api/getEvents", new QnEventLog2RestHandler(serverModule()), kViewLogs); //< new version
+    registerRestHandler("api/getEvents", new QnEventLog2RestHandler(serverModule()), kViewLogs); //< new version
 
     // TODO: add API doc tool comments here
-    reg("ec2/getEvents", new QnMultiserverEventsRestHandler(serverModule(), lit("ec2/getEvents")), kViewLogs);
+    registerRestHandler("ec2/getEvents", new QnMultiserverEventsRestHandler(serverModule(), lit("ec2/getEvents")), kViewLogs);
 
     /**%apidoc GET /api/showLog
      * Return tail of the server log file
@@ -1974,9 +1962,9 @@ void MediaServerProcess::registerRestHandlers(
      *     %value 3 Transaction log
      * %return:text Tail of the server log file in text format
      */
-    reg("api/showLog", new QnLogRestHandler());
+    registerRestHandler("api/showLog", new QnLogRestHandler());
 
-    reg("api/getSystemId", new QnGetSystemIdRestHandler());
+    registerRestHandler("api/getSystemId", new QnGetSystemIdRestHandler());
 
     /**%apidoc GET /api/doCameraDiagnosticsStep
      * Performs camera diagnostics.
@@ -1989,7 +1977,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %value mediaStreamIntegrity Checks additional media stream parameters
      * %return:object JSON object with an error code, error message and diagnostics result.
      */
-    reg("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler(serverModule()));
+    registerRestHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler(serverModule()));
 
     /**%apidoc[proprietary] POST /api/installUpdate
      * Updates server by the package contained in POST body
@@ -2001,18 +1989,18 @@ void MediaServerProcess::registerRestHandlers(
      *     EXTRACTION_ERROR if some extraction problems were found (e.g. not enough space);
      *     INSTALLATION_ERROR if the server could not execute installation script.
      */
-    reg("api/installUpdate", new QnUpdateRestHandler(serverModule()->serverUpdateTool()));
+    registerRestHandler("api/installUpdate", new QnUpdateRestHandler(serverModule()->serverUpdateTool()));
 
-    reg("api/installUpdateUnauthenticated", new QnUpdateUnauthenticatedRestHandler(serverModule()->serverUpdateTool()));
+    registerRestHandler("api/installUpdateUnauthenticated", new QnUpdateUnauthenticatedRestHandler(serverModule()->serverUpdateTool()));
 
     /**%apidoc GET /api/restart
      * Restarts the server.
      * %permissions Administrator.
      * %return:object JSON with error code.
      */
-    reg("api/restart", new QnRestartRestHandler(), kAdmin);
+    registerRestHandler("api/restart", new QnRestartRestHandler(), kAdmin);
 
-    reg("api/connect", new QnOldClientConnectRestHandler());
+    registerRestHandler("api/connect", new QnOldClientConnectRestHandler());
 
     /**%apidoc GET /api/moduleInformation
      * Get information about the server.
@@ -2020,7 +2008,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param[opt]:boolean showAddresses Set it to true to show server addresses.
      * %return:object JSON object with module information.
      */
-    reg("api/moduleInformation", new QnModuleInformationRestHandler(commonModule()));
+    registerRestHandler("api/moduleInformation", new QnModuleInformationRestHandler(commonModule()));
 
     /**%apidoc GET /api/iflist
      * Get network settings (list of interfaces) for the server. Can be called only if server flags
@@ -2042,7 +2030,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:string dns_servers Space-separated list of IP addresses with dot-separated
      *         decimal components.
      */
-    reg("api/iflist", new QnIfListRestHandler());
+    registerRestHandler("api/iflist", new QnIfListRestHandler());
 
     /**%apidoc GET /api/aggregator
      * This function allows to execute several requests with json content type and returns result
@@ -2052,7 +2040,7 @@ void MediaServerProcess::registerRestHandlers(
      *     "exec_cmd" and before next "exec_cmd" are passed as parameters to the nested method.
      * %return:object Merged JSON data from nested methods.
      */
-    reg("api/aggregator", new QnJsonAggregatorRestHandler());
+    registerRestHandler("api/aggregator", new QnJsonAggregatorRestHandler());
 
     /**%apidoc POST /api/ifconfig
      * Set new network settings (list of interfaces) for the server. Can be called only if server
@@ -2076,9 +2064,9 @@ void MediaServerProcess::registerRestHandlers(
      * %param:string dns_servers Space-separated list of IP addresses with dot-separated decimal
      *     components.
      */
-    reg("api/ifconfig", new QnIfConfigRestHandler(), kAdmin);
+    registerRestHandler("api/ifconfig", new QnIfConfigRestHandler(), kAdmin);
 
-    reg("api/downloads/", new QnDownloadsRestHandler(serverModule()));
+    registerRestHandler("api/downloads/", new QnDownloadsRestHandler(serverModule()));
 
     /**%apidoc[proprietary] GET /api/settime
      * Set current time on the server machine. Can be called only if server flags include
@@ -2091,7 +2079,7 @@ void MediaServerProcess::registerRestHandlers(
      *     <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code>
      *     - the format is auto-detected).
      */
-    reg("api/settime", new QnSetTimeRestHandler(), kAdmin); //< deprecated
+    registerRestHandler("api/settime", new QnSetTimeRestHandler(), kAdmin); //< deprecated
 
     /**%apidoc POST /api/setTime
      * Set current time on the server machine.
@@ -2115,13 +2103,13 @@ void MediaServerProcess::registerRestHandlers(
      *     <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code>
      *     - the format is auto-detected).
      */
-    reg("api/setTime", new QnSetTimeRestHandler(), kAdmin); //< new version
+    registerRestHandler("api/setTime", new QnSetTimeRestHandler(), kAdmin); //< new version
 
     /**%apidoc GET /api/moduleInformationAuthenticated
      * The same as moduleInformation but requires authentication. Useful to test connection.
      * %return:object JSON object with module information.
      */
-    reg("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler(commonModule()));
+    registerRestHandler("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler(commonModule()));
 
     /**%apidoc POST /api/configure
      * Configure various server parameters.
@@ -2134,7 +2122,7 @@ void MediaServerProcess::registerRestHandlers(
      *     server must be restarted to apply settings. Error string contains a hint to identify the
      *     problem: "SYSTEM_NAME" or "PORT".
      */
-    reg("api/configure", new QnConfigureRestHandler(serverModule()), kAdmin);
+    registerRestHandler("api/configure", new QnConfigureRestHandler(serverModule()), kAdmin);
 
     /**%apidoc POST /api/detachFromCloud
      * Detach media server from cloud. Local admin user is enabled, admin password is changed to
@@ -2145,9 +2133,9 @@ void MediaServerProcess::registerRestHandlers(
      * %param[opt]:string currentPassword Required if new admin password is provided.
      * %return JSON result with error code
      */
-    reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(serverModule(), cloudManagerGroup), kAdmin);
+    registerRestHandler("api/detachFromCloud", new QnDetachFromCloudRestHandler(serverModule(), cloudManagerGroup), kAdmin);
 
-    reg("api/detachFromSystem", new QnDetachFromSystemRestHandler(
+    registerRestHandler("api/detachFromSystem", new QnDetachFromSystemRestHandler(
         serverModule(),
         &cloudManagerGroup->connectionManager, messageBus), kAdmin);
 
@@ -2158,7 +2146,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param:string currentPassword Current admin password
      * %return:object JSON result with an error code and an error string.
      */
-    reg("api/restoreState", new QnRestoreStateRestHandler(serverModule()), kAdmin);
+    registerRestHandler("api/restoreState", new QnRestoreStateRestHandler(serverModule()), kAdmin);
 
     /**%apidoc POST /api/setupLocalSystem
      * Configure server system name and password. This function can be called for server with
@@ -2169,7 +2157,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param:string systemName New system name
      * %return:object JSON result with error code
      */
-    reg("api/setupLocalSystem", new QnSetupLocalSystemRestHandler(serverModule()), kAdmin);
+    registerRestHandler("api/setupLocalSystem", new QnSetupLocalSystemRestHandler(serverModule()), kAdmin);
 
     /**%apidoc POST /api/setupCloudSystem
      * Configure server system name and attach it to cloud. This function can be called for server
@@ -2181,7 +2169,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param:string cloudSystemID could system id
      * %return:object JSON result with error code
      */
-    reg("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(serverModule(), cloudManagerGroup), kAdmin);
+    registerRestHandler("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(serverModule(), cloudManagerGroup), kAdmin);
 
     /**%apidoc POST /api/mergeSystems
      * Merge two Systems. <br/> The System that joins another System is called the current System,
@@ -2223,19 +2211,19 @@ void MediaServerProcess::registerRestHandlers(
      *     found system has incompatible version or different customization, and "BACKUP_ERROR" if
      *     database backup could not been created.
      */
-    reg("api/mergeSystems", new QnMergeSystemsRestHandler(serverModule()), kAdmin);
+    registerRestHandler("api/mergeSystems", new QnMergeSystemsRestHandler(serverModule()), kAdmin);
 
     /**%apidoc GET /api/backupDatabase
      * Back up server database.
      * %return:object JSON with error code.
      */
-    reg("api/backupDatabase", new QnBackupDbRestHandler(serverModule()));
+    registerRestHandler("api/backupDatabase", new QnBackupDbRestHandler(serverModule()));
 
     /**%apidoc GET /api/discoveredPeers
      * Return a list of the discovered peers.
      * %return:object JSON with a list of the discovered peers.
      */
-    reg("api/discoveredPeers", new QnDiscoveredPeersRestHandler());
+    registerRestHandler("api/discoveredPeers", new QnDiscoveredPeersRestHandler());
 
     /**%apidoc GET /api/logLevel
      * Get or set server log level.
@@ -2253,7 +2241,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %value Debug Log debug messages.
      *     %value Debug2 Log additional debug messages.
      */
-    reg("api/logLevel", new QnLogLevelRestHandler());
+    registerRestHandler("api/logLevel", new QnLogLevelRestHandler());
 
     /**%apidoc[proprietary] GET /api/execute
      * Execute any script from subfolder "scripts" of media server. Script name provides directly
@@ -2262,14 +2250,14 @@ void MediaServerProcess::registerRestHandlers(
      * %permissions Administrator.
      * %return:object JSON with error code.
      */
-    reg("api/execute", new QnExecScript(serverModule()->settings().dataDir()), kAdmin);
+    registerRestHandler("api/execute", new QnExecScript(serverModule()->settings().dataDir()), kAdmin);
 
     /**%apidoc[proprietary] GET /api/scriptList
      * Return list of scripts to execute.
      * %permissions Administrator.
      * %return:object JSON object with string list.
      */
-    reg("api/scriptList", new QnScriptListRestHandler(serverModule()->settings().dataDir()), kAdmin);
+    registerRestHandler("api/scriptList", new QnScriptListRestHandler(serverModule()->settings().dataDir()), kAdmin);
 
     /**%apidoc GET /api/systemSettings
      * Get or set global system settings. If called with no arguments, just returns list of all
@@ -2277,15 +2265,15 @@ void MediaServerProcess::registerRestHandlers(
      * %param[opt]:string <param_name> name of system parameter. E.g., ec2AliveUpdateIntervalSec
      * %param[opt]:string <param_value> New value for the specified parameter
      */
-    reg("api/systemSettings", new QnSystemSettingsHandler());
+    registerRestHandler("api/systemSettings", new QnSystemSettingsHandler());
 
-    reg("api/transmitAudio", new QnAudioTransmissionRestHandler(serverModule()));
+    registerRestHandler("api/transmitAudio", new QnAudioTransmissionRestHandler(serverModule()));
 
     // TODO: Introduce constants for API methods registered here, also use them in
     // media_server_connection.cpp. Get rid of static/global urlPath passed to some handler ctors,
     // except when it is the path of some other api method.
 
-    reg("api/RecordedTimePeriods", new QnRecordedChunksRestHandler(serverModule())); //< deprecated
+    registerRestHandler("api/RecordedTimePeriods", new QnRecordedChunksRestHandler(serverModule())); //< deprecated
 
     /**%apidoc GET /ec2/recordedTimePeriods
      * Return the recorded chunks info for the specified cameras.
@@ -2343,9 +2331,9 @@ void MediaServerProcess::registerRestHandlers(
      *     for all requested cameras. Start time and duration are in milliseconds since epoch.
      *     Duration of -1 means the last chunk is being recorded now.
      */
-    reg(QnMultiserverChunksRestHandler::kUrlPath, new QnMultiserverChunksRestHandler(serverModule())); //< new version
+    registerRestHandler(QnMultiserverChunksRestHandler::kUrlPath, new QnMultiserverChunksRestHandler(serverModule())); //< new version
 
-    reg("ec2/cameraHistory", new QnCameraHistoryRestHandler(serverModule()));
+    registerRestHandler("ec2/cameraHistory", new QnCameraHistoryRestHandler(serverModule()));
 
     /**%apidoc GET /ec2/bookmarks
      * Read bookmarks using the specified parameters.
@@ -2426,9 +2414,9 @@ void MediaServerProcess::registerRestHandlers(
      *     non-binary, indentation and spacing will be used to improve readability.
      * %param[default]:enum format
      */
-    reg("ec2/bookmarks", new QnMultiserverBookmarksRestHandler(serverModule(), "ec2/bookmarks"));
+    registerRestHandler("ec2/bookmarks", new QnMultiserverBookmarksRestHandler(serverModule(), "ec2/bookmarks"));
 
-    reg("api/mergeLdapUsers", new QnMergeLdapUsersRestHandler());
+    registerRestHandler("api/mergeLdapUsers", new QnMergeLdapUsersRestHandler());
 
     /**%apidoc[proprietary] GET /ec2/updateInformation/freeSpaceForUpdateFiles
      * Get free space available for downloading and extracting update files.
@@ -2440,11 +2428,11 @@ void MediaServerProcess::registerRestHandlers(
      * %return The amount of free space available for update files in bytes for each online server
      *     in the system, in the specified format.
      */
-    reg("ec2/updateInformation", new QnUpdateInformationRestHandler(&serverModule()->settings()));
-    reg("ec2/startUpdate", new QnStartUpdateRestHandler(serverModule()));
-    reg("ec2/updateStatus", new QnUpdateStatusRestHandler(serverModule()));
-    reg("api/installUpdate", new QnInstallUpdateRestHandler(serverModule()));
-    reg("ec2/cancelUpdate", new QnCancelUpdateRestHandler(serverModule()));
+    registerRestHandler("ec2/updateInformation", new QnUpdateInformationRestHandler(&serverModule()->settings()));
+    registerRestHandler("ec2/startUpdate", new QnStartUpdateRestHandler(serverModule()));
+    registerRestHandler("ec2/updateStatus", new QnUpdateStatusRestHandler(serverModule()));
+    registerRestHandler("api/installUpdate", new QnInstallUpdateRestHandler(serverModule()));
+    registerRestHandler("ec2/cancelUpdate", new QnCancelUpdateRestHandler(serverModule()));
 
     /**%apidoc GET /ec2/cameraThumbnail
      * Get the static image from the camera.
@@ -2489,9 +2477,9 @@ void MediaServerProcess::registerRestHandlers(
      *     non-binary, indentation and spacing will be used to improve readability.
      * %param[default]:enum format
      */
-    reg("ec2/cameraThumbnail", new QnMultiserverThumbnailRestHandler(serverModule(), "ec2/cameraThumbnail"));
+    registerRestHandler("ec2/cameraThumbnail", new QnMultiserverThumbnailRestHandler(serverModule(), "ec2/cameraThumbnail"));
 
-    reg("ec2/statistics", new QnMultiserverStatisticsRestHandler("ec2/statistics"));
+    registerRestHandler("ec2/statistics", new QnMultiserverStatisticsRestHandler("ec2/statistics"));
 
     /**%apidoc GET /ec2/analyticsLookupDetectedObjects
      * Search analytics DB for objects that match filter specified.
@@ -2518,7 +2506,7 @@ void MediaServerProcess::registerRestHandlers(
      *     results are merged. Otherwise, request is processed on receiving server only.
      * %return JSON data.
      */
-    reg("ec2/analyticsLookupDetectedObjects", new QnMultiserverAnalyticsLookupDetectedObjects(
+    registerRestHandler("ec2/analyticsLookupDetectedObjects", new QnMultiserverAnalyticsLookupDetectedObjects(
         commonModule(), serverModule()->analyticsEventsStorage()));
 
     /**%apidoc GET /api/getAnalyticsActions
@@ -2531,7 +2519,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %param actions[].actionIds List of action ids (strings).
      *     %param actions[].pluginId Id of a analytics plugin which offers the actions.
      */
-    reg("api/getAnalyticsActions", new QnGetAnalyticsActionsRestHandler());
+    registerRestHandler("api/getAnalyticsActions", new QnGetAnalyticsActionsRestHandler());
 
     /**%apidoc POST /api/executeAnalyticsAction
      * Execute analytics action from the particular analytics plugin on this server. The action is
@@ -2550,7 +2538,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %param messageToUser If not empty, provides a message composed by the plugin, to be
      *         shown to the user who triggered the action.
      */
-    reg("api/executeAnalyticsAction", new QnExecuteAnalyticsActionRestHandler(serverModule()));
+    registerRestHandler("api/executeAnalyticsAction", new QnExecuteAnalyticsActionRestHandler(serverModule()));
 
     /**%apidoc POST /api/saveCloudSystemCredentials
      * Sets or resets cloud credentials (systemId and authorization key) to be used by system
@@ -2560,18 +2548,18 @@ void MediaServerProcess::registerRestHandlers(
      *     %value true If specified, removes cloud credentials from DB. System will not connect to
      *         cloud anymore
      */
-    reg("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler(serverModule(), cloudManagerGroup));
+    registerRestHandler("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler(serverModule(), cloudManagerGroup));
 
-    reg("favicon.ico", new QnFavIconRestHandler());
-    reg("api/dev-mode-key", new QnCrashServerHandler(), kAdmin);
+    registerRestHandler("favicon.ico", new QnFavIconRestHandler());
+    registerRestHandler("api/dev-mode-key", new QnCrashServerHandler(), kAdmin);
 
-    reg("api/startLiteClient", new QnStartLiteClientRestHandler(serverModule()));
+    registerRestHandler("api/startLiteClient", new QnStartLiteClientRestHandler(serverModule()));
 
     #if defined(_DEBUG)
-        reg("api/debugEvent", new QnDebugEventsRestHandler(serverModule()));
+        registerRestHandler("api/debugEvent", new QnDebugEventsRestHandler(serverModule()));
     #endif
 
-    reg("ec2/runtimeInfo", new QnRuntimeInfoRestHandler());
+    registerRestHandler("ec2/runtimeInfo", new QnRuntimeInfoRestHandler());
 
     static const char kGetHardwareIdsPath[] = "api/getHardwareIds";
     /**%apidoc GET /api/getHardwareIds
@@ -2579,7 +2567,7 @@ void MediaServerProcess::registerRestHandlers(
      * %return:object JSON with an error code, error message and a list of strings in "reply"
      *     field.
      */
-    reg(kGetHardwareIdsPath, new QnGetHardwareIdsRestHandler());
+    registerRestHandler(kGetHardwareIdsPath, new QnGetHardwareIdsRestHandler());
 
     /**%apidoc GET /ec2/getHardwareIdsOfServers
      * Return the list of Hardware Ids for each server in the system which is online at the moment
@@ -2589,7 +2577,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:uuid serverId Id of a server.
      *     %param:stringArray hardwareIds All Hardware Ids of the server, as a list of strings.
      */
-    reg("ec2/getHardwareIdsOfServers", new QnMultiserverGetHardwareIdsRestHandler(QLatin1String("/") + kGetHardwareIdsPath));
+    registerRestHandler("ec2/getHardwareIdsOfServers", new QnMultiserverGetHardwareIdsRestHandler(QLatin1String("/") + kGetHardwareIdsPath));
 
     /**%apidoc GET /api/settingsDocumentation
      * Return settings documentation
@@ -2598,7 +2586,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:string defaultValue Setting default value
      *     %param:string description Setiing description
      */
-    reg("api/settingsDocumentation", new QnSettingsDocumentationHandler(&serverModule()->settings()));
+    registerRestHandler("api/settingsDocumentation", new QnSettingsDocumentationHandler(&serverModule()->settings()));
 
 
     /**%apidoc GET /ec2/analyticsEngineSettings
@@ -2611,7 +2599,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param:string engineId Id of analytics engine
      * %param settings JSON object consisting of name-value settings pairs
      */
-    reg(
+    registerRestHandler(
         "ec2/analyticsEngineSettings",
         new nx::mediaserver::rest::AnalyticsEngineSettingsHandler(serverModule()));
 
@@ -2627,9 +2615,36 @@ void MediaServerProcess::registerRestHandlers(
      * %param:string deviceId Id of a device
      * %param settings JSON object consisting of name-value settings pairs
      */
-    reg(
+    registerRestHandler(
         "ec2/deviceAnalyticsSettings",
         new nx::mediaserver::rest::DeviceAnalyticsSettingsHandler(serverModule()));
+
+    registerRestHandler(
+        nx::network::http::Method::options,
+        QnRestProcessorPool::kAnyPath,
+        new OptionsRequestHandler());
+}
+
+void MediaServerProcess::registerRestHandler(
+    const QString& path,
+    QnRestRequestHandler* handler,
+    GlobalPermission permission)
+{
+    registerRestHandler(QnRestProcessorPool::kAnyHttpMethod, path, handler, permission);
+}
+
+void MediaServerProcess::registerRestHandler(
+    const nx::network::http::Method::ValueType& method,
+    const QString& path,
+    QnRestRequestHandler* handler,
+    GlobalPermission permission)
+{
+    m_universalTcpListener->processorPool()->registerHandler(
+        method, path, handler, permission);
+
+    const auto& cameraIdUrlParams = handler->cameraIdUrlParams();
+    if (!cameraIdUrlParams.isEmpty())
+        m_autoRequestForwarder->addCameraIdUrlParams(path, cameraIdUrlParams);
 }
 
 template<class TcpConnectionProcessor, typename... ExtraParam>
@@ -4592,5 +4607,9 @@ void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodR
     // authentication is implemented.
     // WARNING: This is severe vulnerability introduced in 3.0.
     restrictions->allow(webPrefix + lit("/api/installUpdateUnauthenticated"),
+        nx::network::http::AuthMethod::noAuth);
+
+    restrictions->allowMethod(
+        nx::network::http::Method::options,
         nx::network::http::AuthMethod::noAuth);
 }
