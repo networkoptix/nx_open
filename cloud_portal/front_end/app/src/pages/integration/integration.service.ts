@@ -34,8 +34,8 @@ export class IntegrationService implements OnDestroy {
         return this.api.getIntegrations();
     }
 
-    private getScreenshots(section): string[] {
-        return Object.keys(section).filter((element) => {
+    private setScreenshots(section) {
+        section.screenshots = Object.keys(section).filter((element) => {
             return element.match(/screenshot/i) && section[element];
         }).sort().map((key) => section[key]);
     }
@@ -88,12 +88,8 @@ export class IntegrationService implements OnDestroy {
                 });
             }
 
-            if (plugin.instructions) {
-                plugin.instructions.screenshots = this.getScreenshots(plugin.instructions);
-            }
-            if (plugin.overview) {
-                plugin.overview.screenshots = this.getScreenshots(plugin.overview);
-            }
+            this.setScreenshots(plugin.instructions);
+            this.setScreenshots(plugin.overview);
         });
     }
 
