@@ -1,5 +1,5 @@
 {
-  "language": "en_US",
+  "language": "tr_TR",
   "language_name": "Türk",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
@@ -62,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "Gelişmiş Görüntüleyici",
-      "description": "Can view live video, browse the archive, control PTZ etc"
+      "description": "Canlı vidyo izleyebilir, arşivi görüntüleyebilir, kameraları ayarlayabilir, PTZ'yi kontrol edebilir"
     },
     "Administrator": {
       "label": "Yönetici",
@@ -123,7 +123,7 @@
     "wrongCodeRestore": "Onay kodu zaten kullanılmış veya yanlış",
     "forbidden": "Bu işlemi gerçekleştirecek izinlere sahip değilsiniz",
     "accountNotActivated": "Bu hesap henüz etkinleştirilmedi. <a href=\"/activate\">Yalnızca etkinleştirme bağlantısını gönder</a>",
-    "accountBlocked": "This account is temporarily blocked. Please try again in a few minutes.",
+    "accountBlocked": "Bu hesap geçici olarak kilitlendi.Lütfen bir süre sonra tekrar deneyin.",
     "notFound": "Bulunamadı",
     "alreadyExists": "Bu hesap zaten mevcut",
     "unknownError": "Beklenmedik bir hata oluştu",

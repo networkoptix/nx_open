@@ -101,7 +101,7 @@
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <uib-alert type="warning">このシステムは、{{Config.cloud.productName}}にリンクされていません。
+                            <uib-alert type="warning">このシステムは、{{Config.cloud.productName}}にリンクされていません
 <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
                                    target="_blank">詳細情報</a></uib-alert>
@@ -119,11 +119,11 @@
 
 
                     <div>
-                        <h3>Traffic encryption</h3>
+                        <h3>トラフィックの暗号化</h3>
                         <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> Force Traffic Encryption
+                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> トラフィック暗号化
                                 </label>
                             </div>
                             <div class="checkbox">
@@ -132,7 +132,7 @@
                                            ng-disabled="!trafficSettings.trafficEncryptionForced"
                                            ng-model="trafficSettings.videoTrafficEncryptionForced"
                                            ng-checked="checkTrafficEncryption()">
-                                    Force Video Traffic Encryption
+                                    ビデオトラフィック暗号化
                                 </label>
                             </div>
                             <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">保存</button>
