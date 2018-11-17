@@ -138,6 +138,7 @@ private:
     std::string ffmpegUrlPlatformDependent() const;
     bool consumersEmpty() const;
     bool waitForConsumers();
+    void terminate();
     void tryStart();
     void start();
     void stop();

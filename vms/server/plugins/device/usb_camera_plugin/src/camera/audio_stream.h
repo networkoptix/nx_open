@@ -57,9 +57,9 @@ private:
 
         bool m_initialized = false;
         int m_initCode = 0;
-        bool m_ioError = false;
+        std::atomic_bool m_ioError = false;
 
-        bool m_terminated = true;
+        std::atomic_bool m_terminated = true;
         mutable std::mutex m_mutex;
         std::condition_variable m_wait;
         std::thread m_runThread;
@@ -90,6 +90,7 @@ private:
         std::chrono::milliseconds resampleDelay() const;
         int encode(const ffmpeg::Frame *frame, ffmpeg::Packet * outPacket);
         std::shared_ptr<ffmpeg::Packet> nextPacket(int * outError);
+        void terminate();
 
         /**
          * Buffers the given packet to be merged later with packets given previously.

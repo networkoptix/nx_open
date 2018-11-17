@@ -201,6 +201,11 @@ bool VideoStream::waitForConsumers()
     return !m_terminated;
 }
 
+void VideoStream::terminate()
+{
+    m_terminated = true;
+}
+
 void VideoStream::tryStart()
 {
     if (m_terminated)
@@ -221,7 +226,7 @@ void VideoStream::start()
 
 void VideoStream::stop()
 {
-    m_terminated = true;
+    terminate();
     m_wait.notify_all();
     if (m_videoThread.joinable())
         m_videoThread.join();
@@ -268,7 +273,8 @@ bool VideoStream::ensureInitialized()
     {
         std::lock_guard<std::mutex>lock(m_mutex);
         m_initCode = initialize();
-        m_terminated = checkIoError(m_initCode);
+        if (checkIoError(m_initCode))
+            terminate();
         if (m_initCode < 0)
             setLastError(m_initCode);
     }
@@ -409,10 +415,10 @@ std::shared_ptr<ffmpeg::Packet> VideoStream::readFrame()
         m_packetCount);
 
     int result = m_inputFormat->readFrame(packet->packet());
-    m_terminated = checkIoError(result);
-
     if (result < 0)
     {
+        if (checkIoError(result))
+            terminate();
         setLastError(result);
         return nullptr;
     }

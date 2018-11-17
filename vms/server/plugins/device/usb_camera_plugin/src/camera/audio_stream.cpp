@@ -11,6 +11,8 @@ extern "C" {
 #include "ffmpeg/utils.h"
 #include "device/audio/utils.h"
 
+#include <iostream>
+
 namespace nx {
 namespace usb_cam {
 
@@ -201,7 +203,8 @@ bool AudioStream::AudioStreamPrivate::ensureInitialized()
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_initCode = initialize();
-        m_terminated = checkIoError(m_initCode);
+        if(checkIoError(m_initCode))
+            terminate();
         if (m_initCode < 0)
             setLastError(m_initCode);
     }
@@ -346,7 +349,7 @@ int AudioStream::AudioStreamPrivate::resample(
         m_initCode = initalizeResampleContext(frame);
         if(m_initCode < 0)
         {
-            m_terminated = true;
+            terminate();
             setLastError(m_initCode);
             return m_initCode;
         }
@@ -428,6 +431,11 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int 
     }
 
     return packet;
+}
+
+void AudioStream::AudioStreamPrivate::terminate()
+{
+    m_terminated = true;
 }
 
 std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::mergePackets(
@@ -512,7 +520,7 @@ void AudioStream::AudioStreamPrivate::start()
 
 void AudioStream::AudioStreamPrivate::stop()
 {
-    m_terminated = true;
+    terminate();
     m_wait.notify_all();
     if (m_runThread.joinable())
         m_runThread.join();
@@ -530,10 +538,10 @@ void AudioStream::AudioStreamPrivate::run()
 
         int result = 0;
         auto packet = nextPacket(&result);
-        m_terminated = checkIoError(result);
-
         if (result < 0)
         {
+            if (checkIoError(result))
+                terminate();
             setLastError(result);
             continue;
         }
