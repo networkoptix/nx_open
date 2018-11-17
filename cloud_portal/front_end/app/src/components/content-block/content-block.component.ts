@@ -35,7 +35,7 @@ import { Component, ElementRef, Input, OnInit, ViewChild, ViewEncapsulation } fr
     styleUrls  : [ 'content-block.component.scss' ],
 })
 export class NxContentBlockComponent implements OnInit {
-    @Input('type') style: string;
+    @Input('type') type: string;
     @Input('fixed-height') fixedHeight: any;
     @Input('hoverable') hoverable: any;
 
