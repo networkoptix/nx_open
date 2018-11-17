@@ -1,7 +1,9 @@
-import { Component, Inject, OnInit, Input, ViewEncapsulation, Renderer2, ViewChild } from '@angular/core';
-import { Location }                                                                  from '@angular/common';
-import { NgbModal, NgbActiveModal, NgbModalRef }                                     from '@ng-bootstrap/ng-bootstrap';
-import { EmailValidator }                                                            from '@angular/forms';
+import {
+    Component, Inject, OnInit, Input,
+    ViewEncapsulation, Renderer2, ViewChild }     from '@angular/core';
+import { Location }                               from '@angular/common';
+import { NgbModal, NgbActiveModal, NgbModalRef }  from '@ng-bootstrap/ng-bootstrap';
+import { EmailValidator }                         from '@angular/forms';
 
 @Component({
     selector: 'nx-modal-disconnect-content',
@@ -78,7 +80,11 @@ export class NxModalDisconnectComponent implements OnInit {
     }
 
     private dialog(systemId) {
-        this.modalRef = this.modalService.open(DisconnectModalContent, {backdrop: 'static', centered: true});
+        this.modalRef = this.modalService.open(DisconnectModalContent,
+                {
+                            windowClass: 'modal-holder',
+                            backdrop: 'static'
+                        });
         this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.disconnect = this.disconnect;
         this.modalRef.componentInstance.systemId = systemId;

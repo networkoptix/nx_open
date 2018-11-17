@@ -100,7 +100,11 @@ export class NxModalEmbedComponent implements OnInit {
     }
 
     private dialog() {
-        this.modalRef = this.modalService.open(EmbedModalContent, { backdrop: 'static', centered: true });
+        this.modalRef = this.modalService.open(EmbedModalContent,
+                {
+                            windowClass: 'modal-holder',
+                            backdrop: 'static'
+                        });
         this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.closable = true;
 
