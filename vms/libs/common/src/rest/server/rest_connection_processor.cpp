@@ -91,7 +91,7 @@ QnRestRequestHandlerPtr QnRestProcessorPool::findHandlerByPath(
 {
     const auto normalizedPath = QnTcpListener::normalizedPath(path);
 
-    auto i = handlersByPath.upperBound(path);
+    auto i = handlersByPath.upperBound(normalizedPath);
     if (i == handlersByPath.begin())
         return normalizedPath.startsWith(i.key()) ? i.value() : nullptr;
     while (i-- != handlersByPath.begin())
