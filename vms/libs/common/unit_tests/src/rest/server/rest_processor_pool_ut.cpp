@@ -20,28 +20,6 @@ public:
         return m_id;
     }
 
-    virtual int executeGet(
-        const QString& /*path*/,
-        const QnRequestParamList& /*params*/,
-        QByteArray& /*result*/,
-        QByteArray& /*contentType*/,
-        const QnRestConnectionProcessor* /*owner*/) override
-    {
-        return nx::network::http::StatusCode::ok;
-    }
-
-    virtual int executePost(
-        const QString& /*path*/,
-        const QnRequestParamList& /*params*/,
-        const QByteArray& /*body*/,
-        const QByteArray& /*srcBodyContentType*/,
-        QByteArray& /*result*/,
-        QByteArray& /*resultContentType*/,
-        const QnRestConnectionProcessor* /*owner*/) override
-    {
-        return nx::network::http::StatusCode::ok;
-    }
-
 private:
     const int m_id;
 };
