@@ -8,7 +8,7 @@
     </div>
 
     <nx-layout-right [loading]="!plugin">
-        <nx-block first-element *ngIf="plugin && (plugin.information.hasInfo || plugin.overview.hasInfo)">
+        <nx-block first-element *ngIf="plugin && (plugin.information || plugin.overview)">
             <header>
                 {{plugin.information.name}}
             </header>
@@ -46,7 +46,7 @@
             </nx-section>
         </nx-block>
 
-        <nx-block *ngIf="plugin && plugin.instructions.hasInfo">
+        <nx-block *ngIf="plugin && plugin.instructions">
             <header translate>
                 Instructions
             </header>
@@ -63,7 +63,7 @@
             </nx-section>
         </nx-block>
 
-        <nx-block *ngIf="plugin && plugin.support.hasInfo">
+        <nx-block *ngIf="plugin && plugin.support">
             <header translate>
                 Support
             </header>
@@ -76,7 +76,7 @@
             </nx-section>
         </nx-block>
 
-        <nx-block *ngIf="plugin && plugin.additionalInformation.hasInfo">
+        <nx-block *ngIf="plugin && plugin.additionalInformation">
             <header translate>
                 Additional information
             </header>

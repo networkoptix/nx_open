@@ -2,7 +2,7 @@ import { Injectable, OnDestroy }        from '@angular/core';
 import { HttpClient }                   from '@angular/common/http';
 import { BehaviorSubject, Observable }  from 'rxjs';
 import { NxCloudApiService }            from '../../services/nx-cloud-api';
-import { NxConfigService }              from "../../services/nx-config";
+import { NxConfigService }              from '../../services/nx-config';
 
 
 interface Platform {
@@ -35,9 +35,11 @@ export class IntegrationService implements OnDestroy {
     }
 
     private setScreenshots(section) {
-        section.screenshots = Object.keys(section).filter((element) => {
-            return element.match(/screenshot/i) && section[element];
-        }).sort().map((key) => section[key]);
+        if (section) {
+            section.screenshots = Object.keys(section).filter((element) => {
+                return element.match(/screenshot/i) && section[element];
+            }).sort().map((key) => section[key]);
+        }
     }
 
     private formatPlugins() {
