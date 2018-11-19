@@ -69,8 +69,8 @@ void QnWorkbenchUpdateWatcher::atStartCheckUpdate()
     // This signal will be removed when update check is complete.
     if (m_updateInfo.valid())
         return;
-    m_signal = new UpdateCheckSignal(this);
-    connect(m_signal, &UpdateCheckSignal::atFinished,
+    m_signal = new UpdateCheckNotifier(this);
+    connect(m_signal, &UpdateCheckNotifier::finished,
         this, &QnWorkbenchUpdateWatcher::atCheckerUpdateAvailable);
     // Note: m_signal will be deleted inside checkLatestUpdate
     QString updateUrl = qnSettings->updateFeedUrl();
@@ -144,9 +144,9 @@ void QnWorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& co
 }
 
 void QnWorkbenchUpdateWatcher::showUpdateNotification(
-    nx::utils::SoftwareVersion targetVersion,
-    nx::utils::Url releaseNotesUrl,
-    QString description)
+    const nx::utils::SoftwareVersion& targetVersion,
+    const nx::utils::Url& releaseNotesUrl,
+    const QString& description)
 {
     m_notifiedVersion = targetVersion;
 

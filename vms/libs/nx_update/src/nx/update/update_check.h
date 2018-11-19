@@ -51,15 +51,15 @@ FindPackageResult findPackage(
  * @return first package with specified data, or nullptr if no package is found. Note: it points
  *     to the object inside updateInfo. So be careful with the lifetime of updateInfo.
  */
-const nx::update::Package* findPackage(QString component,
+const nx::update::Package* findPackage(
+    const QString& component,
     nx::vms::api::SystemInformation& systemInfo,
     const nx::update::Information& updateInfo);
 
 /**
- * The UpdateCheckSignal class
  * We use this class when regular polling for std::future<UpdateInformation> is not convenient.
  */
-class UpdateCheckSignal: public QObject
+class UpdateCheckNotifier: public QObject
 {
     Q_OBJECT
 
@@ -67,30 +67,33 @@ public:
     using QObject::QObject;
 
 signals:
-    void atFinished(const nx::update::UpdateContents& contents);
+    void finished(const nx::update::UpdateContents& contents);
 };
 
 /**
  * Checks update from the internet.
- * It starts asynchronously. If signaller is specified, it will emit signaller->atFinished.
- * signaller will be disposed by deleteLater
- * @param signaller signaller to catch completion signal
- * @return future object to be checked for completion
+ * It starts asynchronously. If signaller is specified, it will emit notifier->atFinished.
+ * @param updateUrl Url to update server. It should lead directly to updates.json file,
+ *     like http://vms_updates:8080/updates/updates.json.
+ * @param notifier Notifier object to catch completion signal. It will be disposed by deleteLater
+ * @return Future object to be checked for completion.
  */
 std::future<UpdateContents> checkLatestUpdate(
-    QString updateUrl,
-    UpdateCheckSignal* signaller = nullptr);
+    const QString& updateUrl,
+    UpdateCheckNotifier* notifier = nullptr);
 
 /**
  * Checks update for specific build from the internet.
- * It starts asynchronously. If signaller is specified, it will emit signaller->atFinished.
- * signaller will be disposed by deleteLater
- * @param signaller signaller to catch completion signal
- * @return future object to be checked for completion
+ * It starts asynchronously. If signaler is specified, it will emit notifier->finished.
+ * @param updateUrl Url to update server. It should lead directly to updates.json file,
+ *     like http://vms_updates:8080/updates/updates.json.
+ * @param build Build number, like "28057".
+ * @param notifier Notifier object to catch completion signal. It will be disposed by deleteLater
+ * @return Future object to be checked for completion.
  */
 std::future<UpdateContents> checkSpecificChangeset(
-    QString updateUrl,
-    QString build,
-    UpdateCheckSignal* signaller = nullptr);
+    const QString& updateUrl,
+    const QString& build,
+    UpdateCheckNotifier* notifier = nullptr);
 
 } // namespace nx::update

@@ -394,7 +394,7 @@ FindPackageResult findPackage(
 }
 
 const nx::update::Package* findPackage(
-    QString component,
+    const QString& component,
     nx::vms::api::SystemInformation& systemInfo,
     const nx::update::Information& info)
 {
@@ -412,37 +412,42 @@ const nx::update::Package* findPackage(
     return nullptr;
 }
 
-std::future<UpdateContents> checkLatestUpdate(QString updateUrl, UpdateCheckSignal* signaller)
+std::future<UpdateContents> checkLatestUpdate(
+    const QString& updateUrl,
+    UpdateCheckNotifier* notifier)
 {
     return std::async(std::launch::async,
-        [updateUrl, signaller]()
+        [updateUrl, notifier]()
         {
             UpdateContents result;
             result.info = nx::update::updateInformation(updateUrl, nx::update::kLatestVersion, &result.error);
             result.sourceType = UpdateSourceType::internet;
             result.source = lit("%1 for build=%2").arg(updateUrl, nx::update::kLatestVersion);
-            if (signaller)
+            if (notifier)
             {
-                emit signaller->atFinished(result);
-                signaller->deleteLater();
+                emit notifier->finished(result);
+                notifier->deleteLater();
             }
             return result;
         });
 }
 
-std::future<UpdateContents> checkSpecificChangeset(QString updateUrl, QString build, UpdateCheckSignal* signaller)
+std::future<UpdateContents> checkSpecificChangeset(
+    const QString& updateUrl,
+    const QString& build,
+    UpdateCheckNotifier* notifier)
 {
     return std::async(std::launch::async,
-        [updateUrl, build, signaller]()
+        [updateUrl, build, notifier]()
         {
             UpdateContents result;
             result.info = nx::update::updateInformation(updateUrl, build, &result.error);
             result.sourceType = UpdateSourceType::internetSpecific;
             result.source = lit("%1 for build=%2").arg(updateUrl, build);
-            if (signaller)
+            if (notifier)
             {
-                emit signaller->atFinished(result);
-                signaller->deleteLater();
+                emit notifier->finished(result);
+                notifier->deleteLater();
             }
             return result;
         });
