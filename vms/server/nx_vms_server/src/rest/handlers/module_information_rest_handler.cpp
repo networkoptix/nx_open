@@ -7,6 +7,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/random.h>
 #include <nx/vms/api/data/module_information.h>
 #include <rest/helpers/permissions_helper.h>
 #include <rest/server/rest_connection_processor.h>
@@ -30,7 +31,17 @@ template<typename P>
 bool keepConnectionOpenMode(const P& p) { return p.contains(lit("keepConnectionOpen")); }
 
 template<typename P>
-bool updateStreamMode(const P& p) { return p.contains(lit("updateStream")); }
+std::optional<std::chrono::milliseconds> updateStreamTime(const P& p)
+{
+    if (!p.contains("updateStream"))
+        return std::nullopt;
+
+    std::chrono::seconds requestedTime(p.value("updateStream").toInt());
+    if (requestedTime.count() == 0)
+        requestedTime = kKeepAliveOptions.inactivityPeriodBeforeFirstProbe / 2;
+
+    return std::chrono::milliseconds(requestedTime);
+}
 
 } // namespace
 
@@ -83,11 +94,13 @@ JsonRestResponse QnModuleInformationRestHandler::executeGet(const JsonRestReques
             request.owner->resourcePool(), request.owner->accessRights()))
     {
         JsonRestResponse response;
-        response.statusCode = (nx::network::http::StatusCode::Value) QnPermissionsHelper::notOwnerError(response.json);
+        response.statusCode = (nx::network::http::StatusCode::Value)
+            QnPermissionsHelper::notOwnerError(response.json);
         return response;
     }
 
-    JsonRestResponse response(nx::network::http::StatusCode::ok, {}, updateStreamMode(request.params));
+    JsonRestResponse response(nx::network::http::StatusCode::ok, {},
+        (bool) updateStreamTime(request.params));
     if (allModulesMode(request.params))
     {
         const auto allServers = request.owner->resourcePool()->getAllServers(Qn::AnyStatus);
@@ -121,7 +134,7 @@ JsonRestResponse QnModuleInformationRestHandler::executeGet(const JsonRestReques
     }
 
     response.statusCode = nx::network::http::StatusCode::ok;
-    if (updateStreamMode(request.params))
+    if (updateStreamTime(request.params))
         response.isUndefinedContentLength = true;
 
     return response;
@@ -130,11 +143,12 @@ JsonRestResponse QnModuleInformationRestHandler::executeGet(const JsonRestReques
 void QnModuleInformationRestHandler::afterExecute(
     const RestRequest& request, const QByteArray& response)
 {
-    if (!keepConnectionOpenMode(request.params) && !updateStreamMode(request.params))
+    if (!keepConnectionOpenMode(request.params) && !updateStreamTime(request.params))
         return;
 
     // TODO: Probably owner is supposed to be passed as mutable.
-    std::unique_ptr<nx::network::AbstractStreamSocket> socket = const_cast<QnRestConnectionProcessor*>(request.owner)->takeSocket();
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket =
+        const_cast<QnRestConnectionProcessor*>(request.owner)->takeSocket();
 
     socket->bindToAioThread(m_pollable.getAioThread());
     if (!socket->setNonBlockingMode(true)
@@ -148,17 +162,18 @@ void QnModuleInformationRestHandler::afterExecute(
     }
 
     m_pollable.post(
-        [this, socket = std::move(socket), updateStreamMode = updateStreamMode(request.params)]() mutable
+        [this, socket = std::move(socket), updateStreamTime = updateStreamTime(request.params)
+            ]() mutable
         {
             auto socketPtr = socket.get();
 
-            if (updateStreamMode)
+            if (updateStreamTime)
             {
-                NX_VERBOSE(this, lm("Connection %1 asks for update stream, %2 total")
-                    .args(socket, m_socketsToKeepOpen.size()));
+                NX_VERBOSE(this, lm("Connection %1 asks for update stream (interval %2), %3 total")
+                    .args(socket, *updateStreamTime, m_socketsToKeepOpen.size()));
 
                 m_socketsToUpdate.emplace(socketPtr, std::move(socket));
-                sendKeepAliveByTimer(socketPtr);
+                sendKeepAliveByTimer(socketPtr, *updateStreamTime);
             }
             else
             {
@@ -225,7 +240,6 @@ void QnModuleInformationRestHandler::sendModuleImformation(
     if (m_moduleInformatiom.isEmpty())
         updateModuleImformation();
 
-    socket->cancelIOSync(nx::network::aio::etNone);
     socket->sendAsync(m_moduleInformatiom,
         [this, socket](SystemError::ErrorCode code, size_t)
         {
@@ -233,7 +247,7 @@ void QnModuleInformationRestHandler::sendModuleImformation(
                 .args(socket, SystemError::toString(code)));
 
             if (code == SystemError::noError)
-                return sendKeepAliveByTimer(socket);
+                return;
 
             socket->cancelIOSync(nx::network::aio::etNone);
             m_socketsToUpdate.erase(socket);
@@ -242,19 +256,23 @@ void QnModuleInformationRestHandler::sendModuleImformation(
 
 
 void QnModuleInformationRestHandler::sendKeepAliveByTimer(
-    nx::network::AbstractStreamSocket* socket)
+    nx::network::AbstractStreamSocket* socket, std::chrono::milliseconds interval, bool firstUpdate)
 {
-    socket->registerTimer(kKeepAliveOptions.inactivityPeriodBeforeFirstProbe / 2,
-        [this, socket]()
+    using Duration = decltype(interval);
+    if (firstUpdate)
+        interval = Duration(nx::utils::random::number<Duration::rep>(1, interval.count()));
+
+    socket->registerTimer(interval,
+        [this, socket, interval]()
         {
             static const auto kEmptyObject = QJson::serialize(QJsonObject());
             socket->sendAsync(kEmptyObject,
-                [this, socket](SystemError::ErrorCode code, size_t)
+                [this, socket, interval](SystemError::ErrorCode code, size_t)
                 {
                     if (code == SystemError::noError)
-                        return sendKeepAliveByTimer(socket);
+                        return sendKeepAliveByTimer(socket, interval, /*firstUpdate*/ false);
 
-                    NX_DEBUG(this, lm("Unable to send keep alive toconnection %1: %2")
+                    NX_DEBUG(this, lm("Unable to send keep alive to connection %1: %2")
                         .args(socket, SystemError::toString(code)));
 
                     socket->cancelIOSync(nx::network::aio::etNone);
