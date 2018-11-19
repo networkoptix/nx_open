@@ -25,7 +25,7 @@ class CompatibilityVersionInstallationDialog: public Connective<QnDialog>
 
 public:
     CompatibilityVersionInstallationDialog(
-        const QnConnectionInfo &connectionInfo, QWidget* parent = nullptr);
+        const QnConnectionInfo& connectionInfo, QWidget* parent = nullptr);
     virtual ~CompatibilityVersionInstallationDialog();
 
     // Mirroring some states from ClientUpdateTool.
