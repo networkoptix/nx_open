@@ -3,8 +3,7 @@
 RestResponse OptionsRequestHandler::executeRequest(
     nx::network::http::Method::ValueType /*method*/,
     const RestRequest& request,
-    const nx::String& /*requestContentType*/,
-    const QByteArray& /*requestBody*/)
+    const RestContent& /*content*/)
 {
     const auto origin = nx::network::http::getHeaderValue(
         request.httpRequest->headers, "Origin");

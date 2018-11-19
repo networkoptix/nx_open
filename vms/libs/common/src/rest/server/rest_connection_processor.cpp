@@ -171,8 +171,7 @@ void QnRestConnectionProcessor::run()
         response = handler->executeRequest(
             method,
             request,
-            requestContentType,
-            d->requestBody);
+            {requestContentType, d->requestBody});
     }
     else
     {

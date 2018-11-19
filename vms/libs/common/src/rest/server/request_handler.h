@@ -69,8 +69,7 @@ public:
     virtual RestResponse executeRequest(
         nx::network::http::Method::ValueType method,
         const RestRequest& request,
-        const nx::String& requestContentType,
-        const QByteArray& requestBody);
+        const RestContent& content);
 
     // TODO: By default these methods use protected virtual functions, which should be removed.
     // Only new functions are supposed to be used in future

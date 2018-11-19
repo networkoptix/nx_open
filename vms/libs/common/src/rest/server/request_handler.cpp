@@ -38,8 +38,7 @@ QnRestRequestHandler::QnRestRequestHandler()
 RestResponse QnRestRequestHandler::executeRequest(
     nx::network::http::Method::ValueType method,
     const RestRequest& request,
-    const nx::String& requestContentType,
-    const QByteArray& requestBody)
+    const RestContent& content)
 {
     RestResponse response;
 
@@ -49,11 +48,11 @@ RestResponse QnRestRequestHandler::executeRequest(
     }
     else if (method == nx::network::http::Method::post)
     {
-        response = executePost(request, {requestContentType, requestBody});
+        response = executePost(request, content);
     }
     else if (method == nx::network::http::Method::put)
     {
-        response = executePut(request, {requestContentType, requestBody});
+        response = executePut(request, content);
     }
     else if (method == nx::network::http::Method::delete_)
     {
