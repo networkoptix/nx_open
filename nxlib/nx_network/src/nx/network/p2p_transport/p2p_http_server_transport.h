@@ -8,7 +8,9 @@ namespace nx::network {
 class P2PHttpServerTransport: public P2PTransport
 {
 public:
-      P2PHttpServerTransport(std::unique_ptr<AbstractStreamSocket> socket);
+      P2PHttpServerTransport(
+          std::unique_ptr<AbstractStreamSocket> socket,
+          const QByteArray& contentType);
 
     void gotPostConnection(std::unique_ptr<AbstractStreamSocket> socket);
 };

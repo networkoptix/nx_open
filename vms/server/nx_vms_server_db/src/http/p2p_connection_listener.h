@@ -6,6 +6,7 @@
 #include <core/resource_access/user_access_data.h>
 
 #include <nx/vms/api/data/peer_data.h>
+#include <transaction/connection_guard.h>
 
 class QnMediaServerModule;
 
@@ -33,6 +34,12 @@ private:
     bool isPeerCompatible(const vms::api::PeerDataEx& remotePeer) const;
     Qn::UserAccessData userAccessData(const vms::api::PeerDataEx& remotePeer) const;
     bool canAcceptConnection(const vms::api::PeerDataEx& remotePeer);
+    bool tryAcquireConnecting(
+        ec2::ConnectionLockGuard& connectionLockGuard, 
+        const vms::api::PeerDataEx& remotePeer);
+    bool tryAcquireConnected(
+        ec2::ConnectionLockGuard& connectionLockGuard,
+        const vms::api::PeerDataEx& remotePeer);
 private:
     QnMediaServerModule* m_serverModule = nullptr;
 };
