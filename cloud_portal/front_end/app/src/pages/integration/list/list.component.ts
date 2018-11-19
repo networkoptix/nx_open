@@ -19,7 +19,7 @@ export class NxIntegrationsListComponent implements OnInit, OnDestroy, OnChanges
     config: any;
 
     private setupDefaults() {
-        this.defaultLogo = '/static/icons/integration_tile_preview_plugin.svg';
+
     }
 
     constructor(configService: NxConfigService) {
@@ -28,6 +28,9 @@ export class NxIntegrationsListComponent implements OnInit, OnDestroy, OnChanges
     }
 
     getPlatformIconsFor(plugin) {
+
+        this.defaultLogo = this.config.icons.default;
+
         const platformIcons = [];
 
         this.config.icons.platforms.forEach(icon => {

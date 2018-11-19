@@ -210,6 +210,7 @@ export class NxConfigService {
                 ]
             },
             icons : {
+                default : '/static/icons/integration_tile_preview_plugin.svg',
                 platforms : [
                     { name: 'arm', src: '/static/icons/integration_tile_os_arm.svg' },
                     { name: 'linux', src: '/static/icons/integration_tile_os_linux.svg' },
