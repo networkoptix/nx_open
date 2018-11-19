@@ -394,6 +394,13 @@ private:
         const P2pConnectionPtr& connection,
         const TransportHeader& records);
 
+    /*
+     * in P2P mode a Client gets transactions only, without any protocol related system messages.
+     * It causes client doesn't receive peerFound/peerLost signals from messageBus any more.
+     * This function sends removeRuntimeInfoData transactions to the all connected clients
+     * for the current peer.
+     */
+    void sendRuntimeInfoRemovedToClients(const QnUuid& id);
 private slots:
     void at_gotMessage(QWeakPointer<ConnectionBase> connection, MessageType messageType, const QByteArray& payload);
     void at_stateChanged(QWeakPointer<ConnectionBase> connection, Connection::State state);

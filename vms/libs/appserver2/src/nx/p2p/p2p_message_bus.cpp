@@ -1198,10 +1198,22 @@ void MessageBus::emitPeerFoundLostSignals()
                 .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
                 .arg(qnStaticCommon->moduleDisplayName(peer.id)));
             emit peerLost(peer.id, peer.peerType);
+            sendRuntimeInfoRemovedToClients(peer.id);
         }
     }
 
     m_lastAlivePeers = newAlivePeers;
+}
+
+void MessageBus::sendRuntimeInfoRemovedToClients(const QnUuid& id)
+{
+    QnTransaction<nx::vms::api::IdData> tran(ApiCommand::runtimeInfoRemoved, id);
+    tran.params.id = id;
+    for (const auto& connection: m_connections)
+    {
+        if (connection->remotePeer().isClient())
+            sendTransactionImpl(connection, tran, TransportHeader());
+    }
 }
 
 void MessageBus::setDelayIntervals(const DelayIntervals& intervals)

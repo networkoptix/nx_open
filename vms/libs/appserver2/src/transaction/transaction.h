@@ -1309,6 +1309,19 @@ APPLY(9010, dumpDatabaseToFile, nx::vms::api::DatabaseDumpToFileData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
+APPLY(9011, runtimeInfoRemoved, nx::vms::api::IdData, false, true,                                                \
+                        InvalidGetHashHelper(),                                                                   \
+                        [](const QnTransaction<nx::vms::api::IdData>& tran,                                       \
+                            const NotificationParams& notificationParams) {                                       \
+                            NX_ASSERT(tran.command == ApiCommand::runtimeInfoRemoved);                            \
+                            emit notificationParams.ecConnection->runtimeInfoRemoved(tran.params);                \
+                        },                                                                                        \
+                        AllowForAllAccess(),      /* save permission checker */                                   \
+                        AllowForAllAccess(),      /* read permission checker */                                   \
+                        InvalidFilterFunc(),      /* Filter save func */                                          \
+                        InvalidFilterFunc(),      /* Filter read func */                                          \
+                        AllowForAllAccessOut(),   /* Check remote peer rights for outgoing transaction */         \
+                        RegularTransactionType()) /* regular transaction type */ \
 APPLY(10000, getTransactionLog, ApiTransactionDataList, \
                        false, \
                        false, \
