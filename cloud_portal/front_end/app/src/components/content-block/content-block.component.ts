@@ -1,7 +1,7 @@
 import { Component, ElementRef, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 
 /* Usage
-<nx-block type?=['gray' | empty] hoverable?>
+<nx-block type?="gray | ...more to come" fixed-height? hoverable?>
     <header>
         TITLE
     </header>
@@ -35,7 +35,8 @@ import { Component, ElementRef, Input, OnInit, ViewChild, ViewEncapsulation } fr
     styleUrls  : [ 'content-block.component.scss' ],
 })
 export class NxContentBlockComponent implements OnInit {
-    @Input('type') class: string;
+    @Input('type') type: string;
+    @Input('fixed-height') fixedHeight: any;
     @Input('hoverable') hoverable: any;
 
     haveHeader: boolean;
@@ -53,6 +54,7 @@ export class NxContentBlockComponent implements OnInit {
         this.haveHeader = (this.headerWrapper.nativeElement.childNodes[ 0 ].childNodes.length > 0);
         this.haveFooter = (this.footerWrapper.nativeElement.childNodes.length > 0);
 
+        this.fixedHeight = (this.fixedHeight !== undefined);
         this.hoverable = (this.hoverable !== undefined);
     }
 }

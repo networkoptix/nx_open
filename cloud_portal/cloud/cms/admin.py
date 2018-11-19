@@ -20,12 +20,14 @@ class ProductFilter(SimpleListFilter):
         products = Product.objects.all()
         if not request.user.is_superuser:
             products = products.filter(customizations__name__in=request.user.customizations)
+            if request.user.groups.filter(name="Developer").exists():
+                products = products.exclude(product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
             return [(p.id, p.name) for p in products]
         return [(p.id, p.__str__()) for p in products]
 
     def queryset(self, request, queryset):
         if self.value():
-            return queryset.filter(product=self.value())
+            return queryset.filter(version__product__id=self.value())
         return queryset
 
 
@@ -95,6 +97,12 @@ class ProductAdmin(CMSAdmin):
             return self.list_display[1:]
         return self.list_display
 
+    def get_queryset(self, request):
+        queryset = super(ProductAdmin, self).get_queryset(request)
+        if not request.user.is_superuser:
+            return queryset.filter(created_by=request.user)
+        return queryset
+
     def product_settings(self, obj):
         if obj.product_type and not obj.product_type.single_customization:
             return format_html('')
@@ -136,6 +144,8 @@ class ContextProxyAdmin(CMSAdmin):
 
         extra_context['title'] = "Edit {}".format(Context.objects.get(id=object_id).name)
         extra_context['language_code'] = Customization.objects.get(name=settings.CUSTOMIZATION).default_language
+        extra_context['EXTERNAL_IMAGE'] = DataStructure.DATA_TYPES[
+            DataStructure.DATA_TYPES.external_image]
 
         if 'admin_language' in request.session:
             extra_context['language_code'] = request.session['admin_language']
@@ -174,8 +184,7 @@ class ContextProxyAdmin(CMSAdmin):
         qs = super(ContextProxyAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
         qs = qs.filter(product_type__product__in=[request.session['product_id']])
         if not request.user.is_superuser:
-            qs = qs.filter(product_type__type=ProductType.PRODUCT_TYPES.cloud_portal).\
-                filter(hidden=False)  # only superuser sees hidden contexts
+            qs = qs.filter(hidden=False)  # only superuser sees hidden contexts
         return qs
 
 
@@ -295,6 +304,8 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
         qs = super(ProductCustomizationReviewAdmin, self).get_queryset(request)
         if not request.user.is_superuser:
             qs = qs.filter(customization__name__in=request.user.customizations)
+            if request.user.groups.filter(name="Developer").exists():
+                qs = qs.exclude(version__product__product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
         return qs
 
     def get_readonly_fields(self, request, obj=None):

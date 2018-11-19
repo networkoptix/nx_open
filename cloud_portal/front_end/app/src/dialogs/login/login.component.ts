@@ -6,17 +6,17 @@ import {
     ViewEncapsulation,
     ViewChild,
     Renderer2
-}                                                                     from '@angular/core';
+} from '@angular/core';
 import { DOCUMENT, Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
-import { NgbModal, NgbActiveModal, NgbModalRef }                      from '@ng-bootstrap/ng-bootstrap';
-import { NxModalGenericComponent }                                    from '../generic/generic.component';
-import { NxConfigService }                                            from '../../services/nx-config';
+import { NgbModal, NgbActiveModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NxModalGenericComponent } from '../generic/generic.component';
+import { NxConfigService } from '../../services/nx-config';
 
 @Component({
     selector: 'ngbd-modal-content',
     templateUrl: 'login.component.html',
     styleUrls: [],
-    providers: [Location, {provide: LocationStrategy, useClass: PathLocationStrategy}],
+    providers: [Location, { provide: LocationStrategy, useClass: PathLocationStrategy }]
 })
 export class LoginModalContent implements OnInit {
     @Input() language;
@@ -57,22 +57,22 @@ export class LoginModalContent implements OnInit {
         this.activeModal.close();
 
         this.process.init(() => {
-                return this.cloudApi.reactivate(email);
-            }, {
-                errorCodes: {
-                    forbidden: this.language.lang.errorCodes.accountAlreadyActivated,
-                    notFound: this.language.lang.errorCodes.emailNotFound
-                },
-                holdAlerts: true,
-                errorPrefix: this.language.lang.errorCodes.cantSendConfirmationPrefix
-            })
-            .run()
-            .then(() => {
-                this.genericModal.openConfirm(
-                    'Check your inbox and visit provided link to activate account',
-                    'Activation email sent',
-                    'OK');
-            });
+            return this.cloudApi.reactivate(email);
+        }, {
+            errorCodes: {
+                forbidden: this.language.lang.errorCodes.accountAlreadyActivated,
+                notFound: this.language.lang.errorCodes.emailNotFound
+            },
+            holdAlerts: true,
+            errorPrefix: this.language.lang.errorCodes.cantSendConfirmationPrefix
+        })
+                .run()
+                .then(() => {
+                    this.genericModal.openConfirm(
+                            'Check your inbox and visit provided link to activate account',
+                            'Activation email sent',
+                            'OK');
+                });
     }
 
     gotoRegister() {
@@ -109,12 +109,12 @@ export class LoginModalContent implements OnInit {
                     this.loginForm.controls['login_password'].markAsPristine();
                     this.loginForm.controls['login_password'].markAsUntouched();
 
-                    this.loginForm.controls['login_email'].setErrors({'not_activated': true});
+                    this.loginForm.controls['login_email'].setErrors({ 'not_activated': true });
                     this.renderer.selectRootElement('#login_email').select();
                 },
                 notAuthorized: () => {
                     this.wrongPassword = true;
-                    this.loginForm.controls['login_password'].setErrors({'nx_wrong_password': true});
+                    this.loginForm.controls['login_password'].setErrors({ 'nx_wrong_password': true });
                     this.password = '';
 
                     this.renderer.selectRootElement('#login_password').focus();
@@ -125,7 +125,7 @@ export class LoginModalContent implements OnInit {
                     this.loginForm.controls['login_password'].markAsPristine();
                     this.loginForm.controls['login_password'].markAsUntouched();
 
-                    this.loginForm.controls['login_email'].setErrors({'no_user': true});
+                    this.loginForm.controls['login_email'].setErrors({ 'no_user': true });
                     this.renderer.selectRootElement('#login_email').select();
                 },
                 accountBlocked: () => {
@@ -133,7 +133,7 @@ export class LoginModalContent implements OnInit {
                     this.loginForm.controls['login_password'].markAsUntouched();
 
                     this.accountBlocked = true;
-                    this.loginForm.controls['login_password'].setErrors({'nx_account_blocked': true});
+                    this.loginForm.controls['login_password'].setErrors({ 'nx_account_blocked': true });
                 },
                 wrongParameters: () => {
                 },
@@ -191,7 +191,14 @@ export class NxModalLoginComponent implements OnInit {
     }
 
     private dialog(keepPage?) {
-        this.modalRef = this.modalService.open(LoginModalContent, {backdrop: 'static', size: 'sm', centered: true});
+        // TODO: Refactor dialog to use generic dialog
+        // TODO: retire loading ModalContent (CLOUD-2493)
+        this.modalRef = this.modalService.open(LoginModalContent,
+                {
+                            windowClass: 'modal-holder',
+                            backdrop: 'static',
+                            size: 'sm'
+                        });
         this.modalRef.componentInstance.language = this.language;
         this.modalRef.componentInstance.login = this.login;
         this.modalRef.componentInstance.cancellable = !keepPage || false;
@@ -204,15 +211,15 @@ export class NxModalLoginComponent implements OnInit {
 
     open(keepPage?) {
         return this.dialog(keepPage)
-                   .result
-                   // handle how the dialog was closed
-                   // required if we need to have dismissible dialog otherwise
-                   // will raise a JS error ( Uncaught [in promise] )
-                   .then((result) => {
-                       this.closeResult = `Closed with: ${result}`;
-                   }, (reason) => {
-                       this.closeResult = 'Dismissed';
-                   });
+                .result
+                // handle how the dialog was closed
+                // required if we need to have dismissible dialog otherwise
+                // will raise a JS error ( Uncaught [in promise] )
+                .then((result) => {
+                    this.closeResult = `Closed with: ${result}`;
+                }, (reason) => {
+                    this.closeResult = 'Dismissed';
+                });
     }
 
     ngOnInit() {

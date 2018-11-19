@@ -31,7 +31,7 @@ class GroupFilter(SimpleListFilter):
 @admin.register(Account)
 class AccountAdmin(CMSAdmin, CSVExportAdmin):
     list_display = ('short_email', 'short_first_name', 'short_last_name', 'created_date', 'last_login',
-                    'subscribe', 'is_staff', 'language', 'customization')
+                    'is_staff', 'language', 'customization', 'user_groups')
     # forbid changing all fields which can be edited by user in cloud portal except sub
     readonly_fields = ('email', 'first_name', 'last_name', 'created_date', 'activated_date', 'last_login',
                        'subscribe', 'language', 'customization')
@@ -45,6 +45,7 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
                   'subscribe', 'is_staff', 'language', 'customization')
 
     change_list_template = "api/account_changelist.html"
+    form = AccountAdminForm
 
     def save_model(self, request, obj, form, change):
         # forbid creating superusers outside specific domain
@@ -85,16 +86,19 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
         }
 
         if request.method == 'POST':
-            form = UserInviteFrom(request.POST)
+            form = UserInviteFrom(request.POST, user=request.user)
             if form.is_valid():
-                user_id = form.add_user(request, request.POST['email'])
+                user_id = form.add_user(request)
                 return redirect(reverse('admin:api_account_change', args=[user_id]))
         else:
-            form = UserInviteFrom()
+            form = UserInviteFrom(user=request.user)
         context['form'] = form
         context['adminform'] = helpers.AdminForm(form, list([(None, {'fields': form.base_fields})]),
                                                  self.get_prepopulated_fields(request))
         return render(request, 'api/invite_form.html', context)
+
+    def user_groups(self, obj):
+        return [group.name for group in obj.groups.all()]
 
 
 @admin.register(AccountLoginHistory)

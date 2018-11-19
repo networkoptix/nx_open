@@ -91,8 +91,8 @@ $border-radius-small:     $border-radius-base;
 // Variables from Bootstrap 3 ****************************
 $line-height-base : 1.5 !default;
 $line-height-computed : floor(($font-size-base * $line-height-base)); // ~20px
-$brand-primary : $blue10;
-$brand-info : $blue8;
+$brand-primary : $brand_core;
+$brand-info : $brand_l2;
 $brand-success : $green_main;
 $brand-warning : $yellow_main;
 $brand-danger : $red_main;
@@ -207,3 +207,9 @@ $container-max-widths : (
         xl: 1140px,
         xxl: 1380px
 );
+
+/* badge component */
+$badge-font-size: rem(12px);
+$badge-border-radius: rem(2px);
+$badge-padding-x : rem(8px);
+$badge-padding-y : rem(3px);

@@ -137,13 +137,15 @@ header {
         padding          : 4px 0;
         
         &--list {
-            max-height : 312px;
-            overflow   : auto;
-            padding    : 0;
+            max-height      : 312px;
+            overflow        : auto;
+            padding         : 0;
+            list-style-type : none;
         }
-    
+        
         &--footer {
-            padding    : 0;
+            padding         : 0;
+            list-style-type : none;
         }
         
         .multi-column-dropdown {

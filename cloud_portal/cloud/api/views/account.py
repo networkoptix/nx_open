@@ -7,7 +7,7 @@ import base64
 from django.utils import timezone
 
 from api.controllers.cloud_api import Account
-from api.account_backend import AccountBackend, get_ip
+from api.account_backend import AccountBackend, AccountManager, get_ip
 from api.helpers.exceptions import handle_exceptions, APIRequestException, APINotAuthorisedException, \
     APIInternalException, APINotFoundException, api_success, ErrorCodes, require_params, kill_session
 from api.views.account_serializers import AccountSerializer, CreateAccountSerializer, AccountUpdateSerializer
@@ -30,7 +30,14 @@ def register(request):
     data = request.data.copy()
     data['language'] = lang
     data['IP'] = get_ip(request)
-    AccountBackend.check_email_in_portal(data['email'], False)  # Check if account is in Cloud_db
+
+    account = models.Account.objects.filter(email=data['email'])
+    if not (account.exists() and not account[0].is_active):
+        AccountBackend.check_email_in_portal(data['email'], False)  # Check if account is in Cloud_db
+    else:
+        AccountManager().register_cloud_invite_user(data['email'], data['password'], data)
+        logger.debug('/api/account/register completed')
+        return api_success()
     serializer = CreateAccountSerializer(data=data)
     if not serializer.is_valid():
         raise APIRequestException('Wrong form parameters', ErrorCodes.wrong_parameters, error_data=serializer.errors)

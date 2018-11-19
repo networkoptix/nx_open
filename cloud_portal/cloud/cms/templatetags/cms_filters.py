@@ -60,3 +60,8 @@ def get_product_type(product):
 @register.simple_tag
 def get_review_state(state):
     return ProductCustomizationReview.REVIEW_STATES[state]
+
+
+@register.simple_tag
+def has_permission(user, permission):
+    return UserGroupsToCustomizationPermissions.check_permission(user, settings.CUSTOMIZATION, permission)

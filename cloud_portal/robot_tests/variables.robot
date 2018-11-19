@@ -27,7 +27,7 @@ ${TM TEXT}                            qweasdzxc123®™
 #Log In Elements
 ${LOG IN MODAL}                       //form[@name='loginForm']
 ${EMAIL INPUT}                        //form[@name='loginForm']//input[@id='login_email']
-${PASSWORD INPUT}                     //form[@name='loginForm']//input[@id='login_password']
+${PASSWORD INPUT}                     //form[@name='loginForm']//input[@id='login_password' and @name="login_password" and @type="password"]
 ${LOG IN BUTTON}                      //form[@name='loginForm']//nx-process-button//button
 
 ${REMEMBER ME CHECKBOX VISIBLE}       //form[@name='loginForm']//input[@id='remember']/following-sibling::span[@class="checkmark"]/..
@@ -163,7 +163,7 @@ ${DISCONNECT FORM HEADER}             //h1["${DISCONNECT FORM HEADER TEXT}"]
 ${DISCONNECT MODAL WARNING}              //p[contains(text(), "${DISCONNECT MODAL WARNING TEXT}")]
 # extra spaces here temporarily
 ${DISCONNECT MODAL CANCEL}               //button[text()='Cancel ']
-${DISCONNECT MODAL DISCONNECT BUTTON}    //button[text()='Disconnect ']
+${DISCONNECT MODAL DISCONNECT BUTTON}    //button[text()='${DISCONNECT BUTTON TEXT} ']
 
 ${JUMBOTRON}                          //div[@class='jumbotron']
 ${PROMO BLOCK}                        //div[contains(@class,'promo-block') and not(contains(@class, 'col-sm-4'))]
@@ -247,15 +247,15 @@ ${PASSWORD INCORRECT BADGE}           //span[contains(@class,"badge") and contai
 ${LOGGED IN CONTINUE BUTTON}          //ngb-modal-window//button[contains(text(),'${CONTINUE BUTTON TEXT}')]
 ${LOGGED IN LOG OUT BUTTON}           //ngb-modal-window//button[contains(text(),'${LOG OUT BUTTON TEXT}')]
 
-${CONTINUE BUTTON}                    //ngb-modal-window//button[contains(text(), 'Continue')]
+${CONTINUE BUTTON}                    //ngb-modal-window//button[contains(text(), '${CONTINUE BUTTON TEXT}')]
 ${CONTINUE MODAL}                     //ngb-modal-window
 
 ${300CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmyy
 ${255CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopas
 
 #Eye icons for password forms
-${EYE ICON OPEN}             //span[contains(@class, "glyphicon-eye-open")]
-${EYE ICON CLOSED}           //span[contains(@class, "glyphicon-eye-close")]
+${EYE ICON OPEN}             //span[@ng-if="!passwordVisible"]
+${EYE ICON CLOSED}           //span[@ng-if="passwordVisible"]
 
 #ASCII
 ${ESCAPE}                             \\27

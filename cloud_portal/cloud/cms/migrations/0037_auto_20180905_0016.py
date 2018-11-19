@@ -6,9 +6,6 @@ from django.conf import settings
 from django.db import connection, migrations, models
 import django.db.models.deletion
 
-from cms.models import ContentVersion, Customization, DataRecord, Product, ProductType
-from cms.controllers.structure import find_or_add_product, find_or_add_product_type
-
 
 class Migration(migrations.Migration):
 
@@ -16,57 +13,6 @@ class Migration(migrations.Migration):
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('cms', '0036_convert_to_utf8mb4'),
     ]
-
-    def create_new_cloudportals_for_each_customization(apps, schema_editor):
-        print "\nCreating cloud portal for each customization"
-        customizations = Customization.objects.all()
-
-        for customization in customizations:
-            records_with_name = DataRecord.objects.filter(data_structure__name="%PRODUCT_NAME%", customization=customization) \
-                .exclude(version=None)
-            if records_with_name.exists():
-                product_name = records_with_name.latest('id').value
-                print "\tProduct name for {} is {}".format(customization.name, product_name)
-            else:
-                product_name = "Nx Cloud"
-                print "\tCouldnt find product name for {} using {}".format(customization.name, product_name)
-            cloud = find_or_add_product(product_name, customization)
-            cloud.customizations = [customization.id]
-            cloud.save()
-            print "\t\t", cloud.customizations.all()
-        print "Done creating new cloud portals"
-
-    def move_contexts_to_producttype(apps, schema_editor):
-        print "\nMoving contexts from original cloud portal to product_type cloud_portal"
-        cloud_portal = Product.objects.get(name="cloud_portal")
-        cloud_portal_type = find_or_add_product_type(ProductType.PRODUCT_TYPES.cloud_portal)
-
-        for context in cloud_portal.context_set.all():
-            print "\tMoving {}".format(context.name)
-            context.product_type = cloud_portal_type
-            context.save()
-        print "Done moving contexts to product_type cloud_portal"
-
-    def move_revisions_to_new_cloud_portals(apps, schema_editor):
-        print "Moving revisions to new cloud portals"
-        original_cloud_portal = Product.objects.get(id=1)
-
-        new_clouds = Product.objects.filter(product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)\
-                                    .exclude(id=original_cloud_portal.id)
-
-        original_content_versions = ContentVersion.objects.filter(product=original_cloud_portal)
-
-        for cloud in new_clouds:
-            print "\tMoving {} revisions to {}".format(cloud.customizations.first(), cloud.name)
-            customization_content_versions = original_content_versions.filter(
-                customization=cloud.customizations.first())
-            for content_version in customization_content_versions:
-                content_version.product = cloud
-                content_version.save()
-                for datarecord in content_version.datarecord_set.all():
-                    datarecord.product = cloud
-                    datarecord.save()
-        print "Done moving revisions to new cloud portals"
 
     operations = [
         migrations.CreateModel(
@@ -136,7 +82,4 @@ class Migration(migrations.Migration):
             name='customizations',
             field=models.ManyToManyField(blank=True, default=None, to='cms.Customization'),
         ),
-        migrations.RunPython(move_contexts_to_producttype),
-        migrations.RunPython(create_new_cloudportals_for_each_customization),
-        migrations.RunPython(move_revisions_to_new_cloud_portals)
     ]

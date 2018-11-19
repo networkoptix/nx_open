@@ -18,6 +18,7 @@
     <div class="form-row {% if field.field.disabled %} disabled-row{% endif %}">
         <div>
             {% get_data_structure field.name original as data_structure %}
+            {% get_datastructure_type data_structure as data_structure_type %}
             {% is_external_file_or_image field.name original as is_external %}
             {% has_value field.name product original language as record_exists %}
             <label {% if data_structure.advanced %} class="text-danger" {% endif %}
@@ -43,6 +44,10 @@
                             <label><input id="delete_{{ field.name }}" type="checkbox" name="delete_{{ field.name }}"
                                           value="false"/>&nbsp;Clear Value</label>
                         {% endif %}
+                        {% if data_structure_type == EXTERNAL_IMAGE %}
+                            <img class="preview-image context-preview {% if data_structure.optional and not record_exists %} optional-image {% endif %}"
+                                 src="{{ field.value }}">
+                        {% else %}
                         <a href={% if not is_external %}
                                     "{% url 'download_file' field.name %}?lang={{ language_code }}&draft"
                                 {% else %}
@@ -54,6 +59,7 @@
                                 Download
                             {% endif %}
                         </a>
+                        {% endif %}
                     </div>
                 {% endif %}
                 {% if not field.field.disabled %}

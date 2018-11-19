@@ -251,10 +251,25 @@ export class NxConfigService {
                 chunksOnTimeline: false // timeline.js - draw debug events
             },
             responseOk                    : 'ok',
-            vimeoEmbed            : 'https://player.vimeo.com/video/',
-            vimeoRegex            : '^https?:\\/\\/vimeo\\.com\\/([\\d]+)$',
-            youtubeEmbed          : 'https://www.youtube.com/embed/',
-            youtubeRegex          : '^https?:\\/\\/(?:www\\.youtube\\.com\\/(?:embed\\/|watch\\?v=)|youtu\\.be\\/)([\\w]+)$',
+            embedInfo                     : {
+                vimeo : {
+                    link : 'https://player.vimeo.com/video/',
+                    regex : '^https?:\\/\\/vimeo\\.com\\/([\\d]+)$'
+                },
+                youtube : {
+                    link: 'https://www.youtube.com/embed/',
+                    regex: '^https?:\\/\\/(?:www\\.youtube\\.com\\/(?:embed\\/|watch\\?v=)|youtu\\.be\\/)([\\w]+)$'
+                }
+            },
+            defaultPlatformNames                 : {
+                'arm-file'        : 'Arm',
+                'linux-x64-file'  : 'Linux x64',
+                'linux-x86-file'  : 'Linux x86',
+                'macos-file'      : 'Mac OS',
+                'rpi-file'        : 'Raspberry Pi',
+                'windows-x64-file': 'Windows x64',
+                'windows-x86-file': 'Windows x86'
+            }
         };
     }
 

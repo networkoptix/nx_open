@@ -9,11 +9,82 @@ import json
 import codecs
 from cloud import settings
 from ...controllers import structure
-from ...models import Product, Context, Language, ContextTemplate, DataStructure, Customization, ProductType
+from ...models import *
 from django.core.management.base import BaseCommand
 
 
 SOURCE_DIR = 'static/_source/{{skin}}/'
+
+
+def create_new_cloudportals_for_each_customization(logger):
+    logger.stdout.write(logger.style.SUCCESS("\nCreating cloud portal for each customization"))
+    customizations = Customization.objects.all()
+
+    for customization in customizations:
+        records_with_name = DataRecord.objects.filter(data_structure__name="%PRODUCT_NAME%",
+                                                      customization=customization) \
+            .exclude(version=None)
+        if records_with_name.exists():
+            product_name = records_with_name.latest('id').value
+            logger.stdout.write(logger.style.SUCCESS("\tProduct name for {} is {}".\
+                                                     format(customization.name, product_name)))
+        else:
+            product_name = "Nx Cloud"
+            logger.stdout.write(logger.style.SUCCESS("\tCouldnt find product name for {} using {}".
+                                                     format(customization.name, product_name)))
+        cloud = structure.find_or_add_product(product_name, customization)
+        cloud.customizations = [customization.id]
+        cloud.save()
+    logger.stdout.write(logger.style.SUCCESS("Done creating new cloud portals"))
+
+
+def move_contexts_to_producttype(logger):
+    logger.stdout.write(
+        logger.style.SUCCESS("\nMoving contexts from original cloud portal to product_type cloud_portal"))
+    cloud_portal = Product.objects.get(name="cloud_portal")
+    cloud_portal_type = structure.find_or_add_product_type(ProductType.PRODUCT_TYPES.cloud_portal)
+
+    for context in cloud_portal.context_set.all():
+        logger.stdout.write(logger.style.SUCCESS("\tMoving {}".format(context.name)))
+        context.product_type = cloud_portal_type
+        context.save()
+    logger.stdout.write(logger.style.SUCCESS("Done moving contexts to product_type cloud_portal"))
+
+
+def move_revisions_to_new_cloud_portals(logger):
+    logger.stdout.write(logger.style.SUCCESS("Moving revisions to new cloud portals"))
+    original_cloud_portal = Product.objects.get(id=1)
+
+    new_clouds = Product.objects.filter(product_type__type=ProductType.PRODUCT_TYPES.cloud_portal) \
+        .exclude(id=original_cloud_portal.id)
+
+    original_content_versions = ContentVersion.objects.filter(product=original_cloud_portal)
+
+    for cloud in new_clouds:
+        logger.stdout.write(
+            logger.style.SUCCESS("\tMoving {} revisions to {}".\
+                                 format(cloud.customizations.first(), cloud.name)))
+        customization_content_versions = original_content_versions.filter(
+            customization=cloud.customizations.first())
+        for content_version in customization_content_versions:
+            content_version.product = cloud
+            content_version.save()
+            for datarecord in content_version.datarecord_set.all():
+                datarecord.product = cloud
+                datarecord.save()
+    logger.stdout.write(logger.style.SUCCESS("Done moving revisions to new cloud portals"))
+
+
+def migrate_18_3_to_18_4(logger):
+    if ProductType.objects.all().exists():
+        logger.stdout.write(logger.style.SUCCESS("Migration has already been completed skipping this step"))
+        return
+
+    move_contexts_to_producttype(logger)
+    create_new_cloudportals_for_each_customization(logger)
+    move_revisions_to_new_cloud_portals(logger)
+
+    logger.stdout.write(logger.style.SUCCESS("Done moving records from 18.3 to 18.4"))
 
 
 def context_for_file(filename, skin_name):
@@ -137,6 +208,7 @@ class Command(BaseCommand):
         parser.add_argument('product_type', nargs='?', default='cloud_portal')
 
     def handle(self, *args, **options):
+        migrate_18_3_to_18_4(self)
         product_type = ProductType.get_type_by_name(options['product_type'])
         read_languages(settings.DEFAULT_SKIN)
         if not Customization.objects.filter(name=settings.CUSTOMIZATION).exists():

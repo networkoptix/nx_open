@@ -53,9 +53,9 @@ loop links
     [arguments]    ${downloads}
     : FOR    ${download}    IN    @{downloads}
     \    ${link}    Get Element Attribute    ${download}    href
-    \    ${matches}    Get Regexp Matches    ${link}    updates.networkoptix.com
+    \    ${matches}    Get Regexp Matches    ${link}    ${DOWNLOADS DOMAIN}
     \    Run Keyword If    ${matches}    Check File Exists    ${link}
-    ...    ELSE    Fail    URL did not begin with updates.networkoptix.com
+    ...    ELSE    Fail    URL did not begin with ${DOWNLOADS DOMAIN}
 
 *** Test Cases ***
 History link is not in the downloads page for user without access
@@ -88,7 +88,7 @@ Going to the history page anonymous asks for login and login shows history page
     Log In    ${email}   ${password}    button=None
     Validate Log In
     Wait Until Element Is Visible    ${RELEASES TAB}
-    Location Should Be    ${url}/downloads/releases
+    Location Should Be    ${url}/downloads/history
 
 Going to the history page anonymous and logging in with someone who doesn't have access takes you to 404
     Go To    ${url}/downloads/history

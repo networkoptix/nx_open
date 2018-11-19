@@ -154,7 +154,7 @@ def save_unrevisioned_records(product, context, language, data_structures,
             new_record_value = request_data[data_structure_name]
             if data_structure.type == DataStructure.DATA_TYPES.text and 'regex' in data_structure.meta_settings:
                 pattern = data_structure.meta_settings['regex']
-                if not re.match(pattern, new_record_value):
+                if new_record_value and not re.match(pattern, new_record_value):
                     upload_errors.append((data_structure_name, 'Invalid input'))
                     continue
 
@@ -351,6 +351,11 @@ def check_meta_settings(data_structure, new_file):
                     data_structure.meta_settings['format'].replace(',', ' or '))
         return [(data_structure.name, error_msg)]
 
+    if 'size' in meta_settings and meta_settings['size'] < new_file.size:
+        error_msg = "The file's size it too large. Its size was {0:.2f}MB but must be less than {1:.2f}MB".\
+            format(new_file.size/BYTES_TO_MEGABYTES, meta_settings['size']/BYTES_TO_MEGABYTES)
+        return [(data_structure.name, error_msg)]
+
     if data_structure.type in [DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.external_image]:
 
         try:
@@ -365,10 +370,9 @@ def check_meta_settings(data_structure, new_file):
 
 # End of file upload helpers
 def upload_file(data_structure, new_file):
-    file_size = new_file.size / BYTES_TO_MEGABYTES
-    if file_size >= settings.CMS_MAX_FILE_SIZE:
-        return None, [(data_structure.name, 'Its size was {0:.2f}MB but must be less than {} MB'. \
-                       format(file_size, settings.CMS_MAX_FILE_SIZE))]
+    if new_file.size >= settings.CMS_MAX_FILE_SIZE:
+        return None, [(data_structure.name, 'Its size was {0:.2f}MB but must be less than {1:.2f} MB'. \
+                       format(new_file.size/BYTES_TO_MEGABYTES, settings.CMS_MAX_FILE_SIZE/BYTES_TO_MEGABYTES))]
 
     file_errors = check_meta_settings(data_structure, new_file)
     if file_errors:

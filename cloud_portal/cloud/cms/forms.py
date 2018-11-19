@@ -1,10 +1,12 @@
 import yaml
 from django import forms
 from django.core.validators import RegexValidator
+from django.contrib.admin.widgets import FilteredSelectMultiple
 from .models import *
 
 from dal import autocomplete
 
+BYTES_TO_MEGABYTES = 1048576.0
 
 def convert_meta_to_description(meta):
     meta_to_plain = {"format": "Format:  %s",
@@ -17,6 +19,8 @@ def convert_meta_to_description(meta):
                      "size": "Size limit: %s MB",
                      }
     converted_msg = ""
+    if 'size' in meta:
+        meta['size'] = meta['size']/BYTES_TO_MEGABYTES
     for k in meta:
         if k in meta_to_plain:
             value = meta[k]
@@ -117,12 +121,13 @@ class CustomContextForm(forms.Form):
                 queryset = [(choice, choice) for choice in queryset]
                 if 'multi' in data_structure.meta_settings and data_structure.meta_settings['multi']:
                     record_value = yaml.safe_load(record_value)
-                    self.initial[data_structure.name] = record_value
                     self.fields[data_structure.name] = forms.MultipleChoiceField(label=ds_label,
                                                                                  help_text=ds_description,
+                                                                                 initial=record_value,
                                                                                  choices=queryset,
                                                                                  required=False,
-                                                                                 disabled=disabled)
+                                                                                 disabled=disabled,
+                                                                                 widget=forms.CheckboxSelectMultiple)
                 else:
                     self.fields[data_structure.name] = forms.ChoiceField(label=ds_label,
                                                                          help_text=ds_description,
@@ -176,7 +181,8 @@ class ProductForm(forms.ModelForm):
                                                                 'data-placeholder': 'Email ...',
                                                                 #  Only trigger autocompletion after 2 characters have been typed
                                                                 'data-minimum-input-length': 2
-                                                            })
+                                                            }),
+            'customizations': FilteredSelectMultiple('customizations', False)
         }
 
     def __init__(self, *args, **kwargs):
@@ -202,6 +208,9 @@ class CustomizationForm(forms.ModelForm):
     class Meta:
         model = Customization
         exclude = []
+        widgets = {
+            'languages': FilteredSelectMultiple('languages', False)
+        }
 
     def __init__(self, *args, **kwargs):
         super(CustomizationForm, self).__init__(*args, **kwargs)

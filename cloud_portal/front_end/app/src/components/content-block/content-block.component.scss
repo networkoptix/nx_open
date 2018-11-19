@@ -13,6 +13,18 @@
         h3 {
             margin : 0;
         }
+    
+        &-logo {
+            float               : left;
+            display             : flex;
+            align-items         : center;
+            height              : 48px;
+            max-width           : 160px;
+            background-size     : contain;
+            width               : 100%;
+            background-position : left center;
+            background-repeat   : no-repeat;
+        }
     }
     
     &--body {
@@ -56,12 +68,16 @@
             border-bottom-color : $light6;
         }
         
-        .card--body, .card--footer {
+        .card--body {
+            background-color : $light4;
+        }
+    
+        .card--footer {
             background-color : $light4;
         }
     }
     
-    &.fixed {
+    &.fixed-height {
         height   : 300px;
         overflow : hidden;
     }

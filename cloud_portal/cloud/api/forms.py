@@ -6,11 +6,22 @@ from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.contrib.auth.models import Group
 from dal import autocomplete
 
+import base64
 from api.account_backend import AccountBackend
 from api.models import Account
 from cms.models import Customization, UserGroupsToCustomizationPermissions
+from notifications import api
 
 User = get_user_model()
+
+
+class AccountAdminForm(forms.ModelForm):
+    class Meta:
+        model = Account
+        exclude = []
+        widgets = {
+            'groups': FilteredSelectMultiple('groups', False)
+        }
 
 
 # Create ModelForm based on the Group model.
@@ -73,13 +84,29 @@ class GroupAdminForm(forms.ModelForm):
 
 class UserInviteFrom(forms.Form):
     email = forms.CharField(max_length=100, validators=[EmailValidator()])
+    customization = forms.ChoiceField(choices=[])
+    message = forms.CharField(widget=forms.Textarea)
 
-    def add_user(self, request, email):
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super(UserInviteFrom, self).__init__(*args, **kwargs)
+        if self.user:
+            self.fields['customization'].choices = [(customization[0], customization[0]) for customization in self.user.customizations]
+
+    def add_user(self, request):
+        email = request.POST['email']
+        customization = request.POST['customization']
+        message = request.POST['message']
         if AccountBackend.is_email_in_portal(email):
             messages.error(request, "User already has a cloud account!")
             return Account.objects.get(email=email).id
 
         messages.success(request, "User has been invited to cloud.")
-        user = Account(email=email)
+        language_code = Customization.objects.get(name=customization).default_language.code
+        user = Account(email=email, customization=customization, language=language_code, is_active=False)
         user.save()
+        # Password in the encoded email doesnt matter its just a place holder.
+        encode_email = base64.b64encode("password:{}".format(email))
+        api.send(email, 'cloud_invite', {"message": message, "code": encode_email}, customization)
+
         return user.id

@@ -655,10 +655,20 @@ td{
 .promo-block {
     padding    : 32px 74px;
     text-align : center;
-    color      : $light15;
+    
+    h2, h4 {
+        color           : $light15;
+        font-family     : $font-family-bold;
+        justify-content : center;
+    }
+    
+    h4 {
+        margin : 0.5rem !important;
+    }
     
     .welcome-caption {
         justify-content : center;
+        color           : $brand_core;
     }
 }
 
@@ -944,6 +954,10 @@ h1 .badge {
 .close-icon{
   @include icon;
   background-position: -32px 0;
+}
+.tag-close-icon {
+    @include icon;
+    background-position: -96px 0;
 }
 
 .wide-button{

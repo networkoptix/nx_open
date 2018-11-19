@@ -9,17 +9,17 @@
 
 .card {
     &--header {
-        &-logo {
-            float       : left;
-            display     : flex;
-            align-items : center;
-            height      : 100%;
-            max-width   : 160px;
-            
-            img {
-                height : 48px;
-            }
-        }
+        //&-logo {
+        //    float               : left;
+        //    display             : flex;
+        //    align-items         : center;
+        //    height              : 48px;
+        //    max-width           : 160px;
+        //    background-size     : contain;
+        //    width               : 100%;
+        //    background-position : left center;
+        //    background-repeat   : no-repeat;
+        //}
         
         &-info {
             float      : right;

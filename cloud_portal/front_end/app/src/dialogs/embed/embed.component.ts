@@ -64,14 +64,15 @@ export class EmbedModalContent {
         for (const paramsKey in params) {
             if (params.hasOwnProperty(paramsKey)) {
                 // filter checkboxes in form
-                if (this.params[ paramsKey ] !== undefined && (!params[ paramsKey ] || params[ paramsKey ] !== '')) {
+                if (this.params[ paramsKey ] !== undefined && !params[ paramsKey ]) {
                     uri += (uri === '') ? '?' : '&';
                     uri += (typeof params[ paramsKey ] === 'boolean') ? paramsKey : params[ paramsKey ];
                 }
             }
         }
 
-        uri += '&auth=' + btoa(params.login_email + ':' + params.login_password);
+        uri += (uri === '') ? '?' : '&';
+        uri += 'auth=' + btoa(params.login_email + ':' + params.login_password);
 
         this.embedUrl = '<iframe ' +
                             'src = "' + url + uri + '" >' +
@@ -99,7 +100,13 @@ export class NxModalEmbedComponent implements OnInit {
     }
 
     private dialog() {
-        this.modalRef = this.modalService.open(EmbedModalContent, { backdrop: 'static', centered: true });
+        // TODO: Refactor dialog to use generic dialog
+        // TODO: retire loading ModalContent (CLOUD-2493)
+        this.modalRef = this.modalService.open(EmbedModalContent,
+                {
+                            windowClass: 'modal-holder',
+                            backdrop: 'static'
+                        });
         this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.closable = true;
 

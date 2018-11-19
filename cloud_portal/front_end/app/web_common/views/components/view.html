@@ -28,7 +28,7 @@
                               show-camera-panel="showCameraPanel"
                               is-embeded="isEmbeded"
                               class="cameras-panel-wrapper"
-                              ng-class="{'hide-panel':!showCameraPanel}"></camera-panel>
+                              ng-class="{'hide-panel':!showCameraPanel, 'on-top': showOnTop}"></camera-panel>
             </div>
         </td>
         <td width="100%">
@@ -88,7 +88,7 @@
                                                 </li>
                                                 <li class="video-settings-divider buffer" ></li>
                                                 <li class="video-settings-button"
-                                                    ng-if="betaMode && !isEmbeded"
+                                                    ng-if="debugMode && !isEmbeded"
                                                     ng-click="showEmbed();">
                                                         <span>
                                                             <span class="glyphicon glyphicon-bullhorn"></span>
@@ -107,7 +107,7 @@
                                             </span>
                                     </div>
                                     <div class="hide-excess-text video-title">
-                                            <span class="visible-xs" ng-click="showCamerasPanel()"
+                                            <span class="d-block d-md-none float-left" ng-click="showCamerasPanel()"
                                                   ng-class="{'back-button': !showCameraPanel}">
                                                 <span
                                                         class="glyphicon glyphicon-arrow-left"

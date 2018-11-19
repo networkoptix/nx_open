@@ -17,17 +17,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='UserGroupsToCustomizationPermissions',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('customization', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='cms.Customization')),
-            ],
-            options={
-                'db_table': 'cms_usergroupstocustomizationpermissions',
-                'permissions': (('can_view_pending', 'Can view pending versions of integrations'),),
-            },
-        ),
-        migrations.CreateModel(
             name='ProxyGroup',
             fields=[
             ],
@@ -40,10 +29,5 @@ class Migration(migrations.Migration):
             managers=[
                 ('objects', django.contrib.auth.models.GroupManager()),
             ],
-        ),
-        migrations.AddField(
-            model_name='usergroupstocustomizationpermissions',
-            name='group',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='auth.Group'),
         ),
     ]

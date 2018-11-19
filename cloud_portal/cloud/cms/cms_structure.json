@@ -390,9 +390,14 @@
             "name": "logo",
             "label": "Logo",
             "value": "",
-            "description": "Logo for integration",
+            "description": "Logo for integration.<br>Must have a transparent background.",
             "type": "external_image",
-            "optional": true
+            "optional": true,
+            "meta": {
+              "size": 512000,
+              "format": "png",
+              "height_ge": 128
+            }
           },
           {
             "name": "shortDescription",
@@ -485,11 +490,50 @@
             "name": "overviewVideo",
             "label": "Overview Video",
             "value": "",
-            "description": "A youtube or vimeo link for the overview video.",
+            "description": "<br><br><br>A youtube or vimeo link for a overview video.<br>Links can be:<br>https://www.youtube.com/watch?v={video id}<br>https://www.youtube.com/embed/{video id}<br>https://youtu.be/{video id}<br>https://vimeo.com/{video id}",
             "type": "text",
             "optional": true,
             "meta": {
               "regex": "^https?:\\/\\/(?:(?:www\\.youtube\\.com\\/(?:embed\\/|watch\\?v=)|youtu\\.be\\/)[\\w]+|vimeo\\.com\\/[\\d]+)$"
+            }
+          },
+          {
+            "name": "overviewScreenshot1",
+            "label": "Screenshot 1",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot2",
+            "label": "Screenshot 2",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824,
+              "format": "png"
+            }
+          },
+          {
+            "name": "overviewScreenshot3",
+            "label": "Screenshot 3",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824,
+              "format": "png"
             }
           },
           {
@@ -509,11 +553,141 @@
             "name": "instructionVideo",
             "label": "Instruction Video",
             "value": "",
-            "description": "A youtube or vimeo embed link for the instruction video.",
+            "description": "<br><br><br>A youtube or vimeo link for a instruction video.<br>Links can be:<br>https://www.youtube.com/watch?v={video id}<br>https://www.youtube.com/embed/{video id}<br>https://youtu.be/{video id}<br>https://vimeo.com/{video id}",
             "type": "text",
             "optional": true,
             "meta": {
               "regex": "^https?:\\/\\/(?:(?:www\\.youtube\\.com\\/(?:embed\\/|watch\\?v=)|youtu\\.be\\/)[\\w]+|vimeo\\.com\\/[\\d]+)$"
+            }
+          },
+          {
+            "name": "instructionScreenshot1",
+            "label": "Screenshot 1",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824,
+              "format": "png"
+            }
+          },
+          {
+            "name": "instructionScreenshot2",
+            "label": "Screenshot 2",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824,
+              "format": "png"
+            }
+          },
+          {
+            "name": "instructionScreenshot3",
+            "label": "Screenshot 3",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824,
+              "format": "png"
+            }
+          },
+          {
+            "name": "instructionScreenshot4",
+            "label": "Screenshot 4",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824,
+              "format": "png"
+            }
+          },
+          {
+            "name": "instructionScreenshot5",
+            "label": "Screenshot 5",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824,
+              "format": "png"
+            }
+          },
+          {
+            "name": "instructionScreenshot6",
+            "label": "Screenshot 6",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824,
+              "format": "png"
+            }
+          },
+          {
+            "name": "instructionScreenshot7",
+            "label": "Screenshot 7",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824,
+              "format": "png"
+            }
+          },
+          {
+            "name": "instructionScreenshot8",
+            "label": "Screenshot 8",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824,
+              "format": "png"
+            }
+          },
+          {
+            "name": "instructionScreenshot9",
+            "label": "Screenshot 9",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824,
+              "format": "png"
+            }
+          },
+          {
+            "name": "instructionScreenshot10",
+            "label": "Screenshot 10",
+            "value": "",
+            "description": "",
+            "type": "external_image",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824,
+              "format": "png"
             }
           },
           {
@@ -543,7 +717,10 @@
             "description": "",
             "type": "external_file",
             "optional": true,
-            "public": true
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
           },
           {
             "name": "linux-x86-file",
@@ -552,7 +729,10 @@
             "description": "",
             "type": "external_file",
             "optional": true,
-            "public": true
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
           },
           {
             "name": "linux-x64-file",
@@ -561,7 +741,10 @@
             "description": "",
             "type": "external_file",
             "optional": true,
-            "public": true
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
           },
           {
             "name": "macos-file",
@@ -570,7 +753,10 @@
             "description": "",
             "type": "external_file",
             "optional": true,
-            "public": true
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
           },
           {
             "name": "rpi-file",
@@ -579,7 +765,10 @@
             "description": "",
             "type": "external_file",
             "optional": true,
-            "public": true
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
           },
           {
             "name": "windows-x86-file",
@@ -588,7 +777,10 @@
             "description": "",
             "type": "external_file",
             "optional": true,
-            "public": true
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
           },
           {
             "name": "windows-x64-file",
@@ -597,63 +789,83 @@
             "description": "",
             "type": "external_file",
             "optional": true,
-            "public": true
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
           },
           {
-            "name": "generic-file-1",
-            "label": "Generic file 1",
+            "name": "additional-file-1-name",
+            "label": "Additional File 1 Name",
             "value": "",
-            "description": "Upload any other necessary files.",
-            "type": "external_file",
-            "optional": true,
-            "public": true
-          },
-          {
-            "name": "generic-file-2",
-            "label": "Generic file 2",
-            "value": "",
-            "description": "Upload any other necessary files.",
-            "type": "external_file",
-            "optional": true,
-            "public": true
-          },
-          {
-            "name": "generic-file-3",
-            "label": "Generic file 3",
-            "value": "",
-            "description": "Upload any other necessary files.",
-            "type": "external_file",
-            "optional": true,
-            "public": true
-          }
-        ]
-      },
-      {
-        "name": "Screenshots",
-        "translatable": false,
-        "values": [
-          {
-            "name": "screenshot1",
-            "label": "Screenshot 1",
-            "value": "",
-            "description": "",
-            "type": "external_image"
-          },
-          {
-            "name": "screenshot2",
-            "label": "Screenshot 2",
-            "value": "",
-            "description": "",
-            "type": "external_image",
+            "description": "Name for additional file 1.",
+            "type": "text",
             "optional": true
           },
           {
-            "name": "screenshot3",
-            "label": "Screenshot 3",
+            "name": "additional-file-1",
+            "label": "Additional file 1",
             "value": "",
-            "description": "",
-            "type": "external_image",
+            "description": "Upload any other necessary files.",
+            "type": "external_file",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
+          },
+          {
+            "name": "additional-file-2-name",
+            "label": "Additional File 2 Name",
+            "value": "",
+            "description": "Name for additional file 2.",
+            "type": "text",
             "optional": true
+          },
+          {
+            "name": "additional-file-2",
+            "label": "Additional file 2",
+            "value": "",
+            "description": "Upload any other necessary files.",
+            "type": "external_file",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
+          },
+          {
+            "name": "additional-file-3-name",
+            "label": "Additional File 3 Name",
+            "value": "",
+            "description": "Name for additional file 3.",
+            "type": "text",
+            "optional": true
+          },
+          {
+            "name": "additional-file-3",
+            "label": "Additional file 3",
+            "value": "",
+            "description": "Upload any other necessary files.",
+            "type": "external_file",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824
+            }
+          },
+          {
+            "name": "downloadableInstructions",
+            "label": "Downloadable Instructions",
+            "value": "",
+            "description": "Upload instructions pdf.",
+            "type": "external_file",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "size": 1073741824,
+              "format": "pdf"
+            }
           }
         ]
       },
@@ -665,7 +877,7 @@
             "name": "additionalVideo",
             "label": "Additional Video",
             "value": "",
-            "description": "A youtube or vimeo embed link for a video.",
+            "description": "<br><br><br>A youtube or vimeo link for a support video.<br>Links can be:<br>https://www.youtube.com/watch?v={video id}<br>https://www.youtube.com/embed/{video id}<br>https://youtu.be/{video id}<br>https://vimeo.com/{video id}",
             "type": "text",
             "optional": true,
             "meta": {

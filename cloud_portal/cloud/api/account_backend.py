@@ -113,6 +113,27 @@ class AccountManager(db.models.Manager):
     def create_superuser(self, email, password, **extra_fields):
         return self._create_user(email, password, **extra_fields)
 
+    def register_cloud_invite_user(self, email, password, data):
+        ip = data.pop("IP", "")
+        first_name = data.pop("first_name")
+        last_name = data.pop("last_name")
+
+        Account.register(ip, email, password, first_name, last_name)
+        user = models.Account.objects.get(email=email)
+        """
+        When an account is created using cloud invites it is disabled because its registration
+        is different from regular users. Once the user has registered their account it is set to
+        active in this function.
+        """
+        user.is_active = True
+        user.first_name = first_name
+        user.last_name = last_name
+        user.save()
+
+        return user
+
+
+
 
 def get_ip(request):
     return request.META.get('HTTP_X_FORWARDED_FOR')

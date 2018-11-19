@@ -6,6 +6,7 @@ ${CLOUD DEV}                          https://cloud-dev2.hdw.mx
 ${CLOUD TEST REGISTER}                https://cloud-test.hdw.mx/register
 ${CLOUD STAGE}                        https://cloud-stage.hdw.mx
 ${VM 201}                             https://vm201.la.hdw.mx
+${DOWNLOADS DOMAIN}                   updates.networkoptix.com
 ${ENV}                                ${VM 201}
 ${SCREENSHOTDIRECTORY}                \Screenshots
 

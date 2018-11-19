@@ -7,16 +7,16 @@
         <a class="plugin m-0"
            [routerLink]="['/integrations', plugin.id]">
 
-            <nx-block type="fixed" hoverable>
+            <nx-block fixed-height hoverable>
                 <header>
-                    <div class="card--header-logo">
-                        <img [src]="plugin.information.logo || defaultLogo">
+                    <div class="card--header-logo"
+                         [style.backgroundImage]="'url(' + plugin.information.logo + ')'">
                     </div>
                     <div class="card--header-info">
                         <div class="version">v. {{ plugin.information.version }}</div>
                         <div class="platforms">
-                            <div *ngFor="let os of config.icons.platforms;">
-                                <img [src]="os.src" *ngIf="isSupported(plugin, os.name)">
+                            <div *ngFor="let icon of plugin.information.platforms.icons">
+                                <img [src]="icon.src">
                             </div>
                         </div>
                     </div>
@@ -28,12 +28,11 @@
                 </nx-section>
 
                 <footer>
-                    <!--<h3 class="float-left m-0 mt-1 mr-1" >-->
-                    <!--<span class="tag-primary" translate>Recommended</span>-->
-                    <!--</h3>-->
-
+                    <h3 class="float-left m-0 mt-1 mr-1" *ngIf="plugin.pending">
+                        <span class="badge badge-danger">In Review</span>
+                    </h3>
                     <h3 class="float-left m-0 mt-1 mr-1" *ngFor="let type of plugin.information.type">
-                        <span class="tag" [innerHtml]="type"></span>
+                        <span class="badge">{{type}}</span>
                     </h3>
                 </footer>
             </nx-block>

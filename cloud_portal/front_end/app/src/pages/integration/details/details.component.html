@@ -1,6 +1,4 @@
-<nx-pre-loader type="page" *ngIf="!plugin"></nx-pre-loader>
-
-<div class="" *ngIf="plugin">
+<div *ngIf="plugin">
 
     <div class="row m-0 pt-3 pl-4">
         <button class="btn btn-default btn-back" routerLink="/integrations">
@@ -9,80 +7,91 @@
         </button>
     </div>
 
-    <div class="row m-0 p-3">
-        <div class="row m-0 p-0 col-12 col-md-8 col-xl-7 col-xxl-10">
-            <div class="col-12 col-xxl-6 pb-3">
-                <nx-block>
-                    <header>
-                        {{plugin.information.name}}
-                    </header>
+    <nx-layout-right [loading]="!plugin">
+        <nx-block first-elm *ngIf="plugin && (plugin.information.hasInfo || plugin.overview.hasInfo)">
+            <header>
+                {{plugin.information.name}}
+            </header>
 
-                    <nx-section *ngIf="plugin.information.logo">
-                        <div class="card--body-logo">
-                            <img [src]="plugin.information.logo">
-                        </div>
-                    </nx-section>
+            <nx-section *ngIf="plugin.information.logo">
+                <div class="card--body-logo"
+                     [style.backgroundImage]="'url(' + plugin.information.logo + ')'">
+                </div>
+            </nx-section>
 
-                    <nx-section>
-                        {{plugin.overview.description}}
-                    </nx-section>
-                </nx-block>
-            </div>
+            <nx-section *ngIf="plugin.overview.description">
+                <div [innerHtml]="plugin.overview.description"></div>
+            </nx-section>
 
-            <div class="col-12 col-xxl-6 pb-3" *ngIf="plugin.instructions.downloadLinks">
-                <nx-block >
-                    <header translate>
-                        Download links
-                    </header>
+            <nx-section *ngIf="plugin.overview.overviewVideo">
+                <nx-external-video [src]="plugin.overview.overviewVideo"></nx-external-video>
+            </nx-section>
+            <nx-section *ngIf="plugin.overview.screenshots">
+                <nx-carousel [screenshots]="plugin.overview.screenshots"></nx-carousel>
+            </nx-section>
+        </nx-block>
 
-                    <nx-section>
-                        <div [innerHtml]="plugin.instructions.downloadLinks"></div>
-                    </nx-section>
-                </nx-block>
-            </div>
+        <nx-block side-elm type="gray" *ngIf="plugin && plugin.downloadFiles.length > 0">
+            <header translate>
+                Download
+            </header>
 
-            <div class="col-12 col-xxl-6 pb-3" *ngIf="plugin.support.supportInformation">
-                <nx-block>
-                    <header translate>
-                        Support
-                    </header>
-
-                    <nx-section>
-                        <div [innerHtml]="plugin.support.supportInformation"></div>
-                    </nx-section>
-                </nx-block>
-            </div>
-
-            <div class="col-12 col-xxl-6 pb-3" *ngIf="plugin.additionalInformation.additionalInformation || plugin.additionalInformation.usefulLinks">
-                <nx-block>
-                    <header translate>
-                        Additional information
-                    </header>
-
-                    <nx-section>
-                        <div [innerHtml]="plugin.additionalInformation.additionalInformation"></div>
-                        <div class="mt-3" [innerHtml]="plugin.additionalInformation.usefulLinks"></div>
-                    </nx-section>
-                </nx-block>
-            </div>
-        </div>
-
-        <div *ngIf="plugin.downloadFiles" class="col-12 col-md-4 col-xl-3 col-xxl-2">
-            <nx-block type='gray'>
-                <header translate>
-                    Download
-                </header>
-
-                <nx-section>
-                    <div *ngFor="let platform of plugin.downloadFiles" class="mt-3">
-                        {{ platform.name}}
-                        <div>
-                            <a href="{{ platform.url }}">{{ platform.file }}</a>
-                        </div>
+            <nx-section>
+                <div *ngFor="let platform of plugin.downloadFiles" class="mt-3">
+                    <div *ngIf="platform.name">{{ platform.name}}</div>
+                    <div>
+                        <a href="{{ platform.url }}">{{ platform.file }}</a>
                     </div>
-                </nx-section>
-            </nx-block>
-        </div>
-    </div>
+                </div>
+            </nx-section>
+        </nx-block>
+
+        <nx-block *ngIf="plugin && plugin.instructions.hasInfo">
+            <header translate>
+                Instructions
+            </header>
+
+            <nx-section *ngIf="plugin.instructions.instructionVideo">
+                <nx-external-video [src]="plugin.instructions.instructionVideo"></nx-external-video>
+            </nx-section>
+            <nx-section *ngIf="plugin.instructions.screenshots">
+                <nx-carousel [screenshots]="plugin.instructions.screenshots"></nx-carousel>
+            </nx-section>
+
+            <nx-section>
+                <div [innerHtml]="plugin.instructions.downloadLinks"></div>
+            </nx-section>
+        </nx-block>
+
+        <nx-block *ngIf="plugin && plugin.support.hasInfo">
+            <header translate>
+                Support
+            </header>
+            <nx-section *ngIf="plugin.support.supportVideo">
+                <nx-external-video [src]="plugin.support.supportVideo"></nx-external-video>
+            </nx-section>
+
+            <nx-section *ngIf="plugin.support.supportInformation">
+                <div [innerHtml]="sanitizer.bypassSecurityTrustHtml(plugin.support.supportInformation)"></div>
+            </nx-section>
+        </nx-block>
+
+        <nx-block *ngIf="plugin && plugin.additionalInformation.hasInfo">
+            <header translate>
+                Additional information
+            </header>
+            <nx-section *ngIf="plugin.additionalInformation.additionalVideo">
+                <nx-external-video [src]="plugin.additionalInformation.additionalVideo"></nx-external-video>
+            </nx-section>
+
+            <nx-section *ngIf="plugin.additionalInformation.additionalInformation">
+                <div [innerHtml]="plugin.additionalInformation.additionalInformation"></div>
+            </nx-section>
+            <nx-section *ngIf="plugin.additionalInformation.usefulLinks">
+                <div class="mt-3"
+                     [innerHtml]="plugin.additionalInformation.usefulLinks"></div>
+            </nx-section>
+        </nx-block>
+    </nx-layout-right>
 </div>
 

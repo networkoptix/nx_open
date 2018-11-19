@@ -12,7 +12,10 @@ import { MenuModule }                     from './menu/menu.module';
 import { NxContentBlockComponent }        from './content-block/content-block.component';
 import { NxContentBlockSectionComponent } from './content-block/section/section.component';
 import { NxMultiLineEllipsisComponent }   from './multi-line-ellipsis/mle.component';
-import { NxExternalVideoComponent }       from "./external-video/external-video.component";
+import { NxExternalVideoComponent }       from './external-video/external-video.component';
+import { NxLayoutRightComponent }         from './layout-right/layout.component';
+import { NxTagComponent}                  from './tag/tag.component';
+import { NxCarouselComponent }            from './carousel/carousel.component'
 
 @NgModule({
     imports        : [
@@ -30,6 +33,9 @@ import { NxExternalVideoComponent }       from "./external-video/external-video.
         NxContentBlockSectionComponent,
         NxMultiLineEllipsisComponent,
         NxExternalVideoComponent,
+        NxLayoutRightComponent,
+        NxTagComponent,
+        NxCarouselComponent
     ],
     entryComponents: [
         NxProcessButtonComponent,
@@ -40,6 +46,9 @@ import { NxExternalVideoComponent }       from "./external-video/external-video.
         NxContentBlockSectionComponent,
         NxMultiLineEllipsisComponent,
         NxExternalVideoComponent,
+        NxLayoutRightComponent,
+        NxTagComponent,
+        NxCarouselComponent
     ],
     providers      : [
         NxProcessButtonComponent,
@@ -49,6 +58,7 @@ import { NxExternalVideoComponent }       from "./external-video/external-video.
         NxContentBlockComponent,
         NxContentBlockSectionComponent,
         NxMultiLineEllipsisComponent,
+        NxLayoutRightComponent,
     ],
     exports        : [
         NxProcessButtonComponent,
@@ -59,6 +69,9 @@ import { NxExternalVideoComponent }       from "./external-video/external-video.
         NxContentBlockSectionComponent,
         NxMultiLineEllipsisComponent,
         NxExternalVideoComponent,
+        NxLayoutRightComponent,
+        NxTagComponent,
+        NxCarouselComponent,
         MenuModule,
     ]
 })

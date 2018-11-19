@@ -53,7 +53,13 @@ export class NxModalRenameComponent implements OnInit {
     }
 
     private dialog(systemId, systemName) {
-        this.modalRef = this.modalService.open(RenameModalContent, {backdrop: 'static', centered: true});
+        // TODO: Refactor dialog to use generic dialog
+        // TODO: retire loading ModalContent (CLOUD-2493)
+        this.modalRef = this.modalService.open(RenameModalContent,
+                {
+                            windowClass: 'modal-holder',
+                            backdrop: 'static'
+                        });
         this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.systemId = systemId;
         this.modalRef.componentInstance.systemName = systemName;
