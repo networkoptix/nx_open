@@ -1754,7 +1754,7 @@ void MediaServerProcess::registerRestHandlers(
     /**%apidoc GET /api/pingSystem
      * Ping the system.
      * %param:string url System URL to ping.
-     * %param:string password System administrator password.
+     * %param:string getKey Authorization key ("auth" param) for the system to ping.
      * %return:object JSON with error code, error string and module information in case of
      *     successful ping. Error string could be empty in case of successful ping, "FAIL" if the
      *     specified system is unreachable or there is no any system, "UNAUTHORIZED" if the
