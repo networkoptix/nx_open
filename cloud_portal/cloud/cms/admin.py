@@ -16,14 +16,18 @@ class ProductFilter(SimpleListFilter):
     title = 'Product'
     parameter_name = 'product'
 
+    # TODO: show available products base on role/whats available
     def lookups(self, request, model_admin):
         products = Product.objects.all()
         if not request.user.is_superuser:
             products = products.filter(customizations__name__in=request.user.customizations)
-            if request.user.groups.filter(name="Developer").exists():
-                products = products.exclude(product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
-            return [(p.id, p.name) for p in products]
-        return [(p.id, p.__str__()) for p in products]
+        # TODO: Get list of available products for non context managers
+        if not UserGroupsToCustomizationPermissions.check_permission(request.user,
+                                                                     settings.CUSTOMIZATION,
+                                                                     'cms.publish_version'):
+            products = products.filter(created_by=request.user)
+
+        return [(p.id, p.name) for p in products]
 
     def queryset(self, request, queryset):
         if self.value():
@@ -300,12 +304,17 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
             request, object_id, form_url, extra_context=extra_context,
         )
 
+    # TODO: filter visible reviews
     def get_queryset(self, request):
         qs = super(ProductCustomizationReviewAdmin, self).get_queryset(request)
         if not request.user.is_superuser:
             qs = qs.filter(customization__name__in=request.user.customizations)
-            if request.user.groups.filter(name="Developer").exists():
-                qs = qs.exclude(version__product__product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
+
+        if not UserGroupsToCustomizationPermissions.check_permission(request.user,
+                                                                     settings.CUSTOMIZATION,
+                                                                     'cms.publish_version'):
+            qs = qs.filter(product__created_by=request.user)
+
         return qs
 
     def get_readonly_fields(self, request, obj=None):
