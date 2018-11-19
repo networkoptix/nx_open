@@ -243,6 +243,9 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
                 .arg(getAnalyticsSdkEventName(params))
                 .arg(resourceName);
 
+        case EventType::pluginEvent:
+            if (!params.caption.isEmpty())
+                return tr("%1 - %2").arg(resourceName).arg(params.caption);
         default:
             return tr("An unknown event has occurred");
     }
@@ -370,6 +373,7 @@ QStringList StringsHelper::eventDetails(const EventParameters& params) const
 
         case EventType::analyticsSdkEvent:
         case EventType::userDefinedEvent:
+        case EventType::pluginEvent:
             if (!params.description.isEmpty())
                 result << params.description;
             break;
