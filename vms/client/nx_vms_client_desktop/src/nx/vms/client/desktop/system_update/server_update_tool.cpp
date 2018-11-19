@@ -580,9 +580,8 @@ void ServerUpdateTool::requestInstallAction(QSet<QnUuid> targets)
     NX_VERBOSE(this) << "requestInstallAction() for" << targets;
     m_updatesModel->setServersInstalling(targets);
 
-    auto callback = [tool=QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle)
+    auto callback = [tool=QPointer<ServerUpdateTool>(this)](bool /*success*/, rest::Handle handle)
         {
-            Q_UNUSED(success)
             if (tool)
                 tool->m_requestingInstall.remove(handle);
         };

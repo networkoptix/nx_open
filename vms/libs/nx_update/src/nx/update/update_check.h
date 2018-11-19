@@ -48,7 +48,8 @@ FindPackageResult findPackage(
  * @param component component string: {server, client}
  * @param systemInfo system info of package being searched
  * @param updateInfo update contents
- * @return first package with specified data, or nullptr if no package is found
+ * @return first package with specified data, or nullptr if no package is found. Note: it points
+ *     to the object inside updateInfo. So be careful with the lifetime of updateInfo.
  */
 const nx::update::Package* findPackage(QString component,
     nx::vms::api::SystemInformation& systemInfo,

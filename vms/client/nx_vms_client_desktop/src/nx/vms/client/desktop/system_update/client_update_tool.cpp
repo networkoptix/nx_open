@@ -1,3 +1,5 @@
+#include "client_update_tool.h"
+
 #include <common/common_module.h>
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
@@ -8,7 +10,6 @@
 #include <nx/utils/log/log.h>
 #include <nx/update/update_check.h>
 #include "nx/vms/common/p2p/downloader/private/single_connection_peer_manager.h"
-#include "client_update_tool.h"
 
 namespace nx::vms::client::desktop {
 
@@ -73,9 +74,8 @@ std::future<nx::update::UpdateContents> ClientUpdateTool::requestRemoteUpdateInf
     {
         // Requesting remote update info.
         m_serverConnection->getUpdateInfo(
-            [tool=QPointer<ClientUpdateTool>(this)](bool success, rest::Handle handle, const nx::update::Information& response)
+            [tool=QPointer<ClientUpdateTool>(this)](bool success, rest::Handle /*handle*/, const nx::update::Information& response)
             {
-                Q_UNUSED(handle)
                 if (tool && success)
                     tool->atRemoteUpdateInformation(response);
             }, thread());
@@ -227,9 +227,8 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
     }
 }
 
-void ClientUpdateTool::atChunkDownloadFailed(const QString& fileName)
+void ClientUpdateTool::atChunkDownloadFailed(const QString& /*fileName*/)
 {
-    Q_UNUSED(fileName)
     // It is a breakpoint catcher.
     //NX_VERBOSE(this) << "atChunkDownloadFailed() failed to download chunk for" << fileName;
 }
