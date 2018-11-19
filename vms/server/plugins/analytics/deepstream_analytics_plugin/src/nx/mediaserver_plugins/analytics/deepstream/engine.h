@@ -44,7 +44,7 @@ public:
 
     std::chrono::microseconds currentTimeUs() const;
     
-    nx::sdk::Error CommonEngine::setHandler(nx::sdk::analytics::Engine::IHandler* handler);
+    nx::sdk::Error setHandler(nx::sdk::analytics::Engine::IHandler* handler);
 
 private:
     std::vector<ObjectClassDescription> loadObjectClasses() const;

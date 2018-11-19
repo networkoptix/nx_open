@@ -273,7 +273,7 @@ std::string Engine::buildManifestObectTypeString(const ObjectClassDescription& d
         })json";
 }
 
-nx::sdk::Error CommonEngine::setHandler(nx::sdk::analytics::Engine::IHandler* handler)
+nx::sdk::Error Engine::setHandler(nx::sdk::analytics::Engine::IHandler* handler)
 {
     // TODO: implement.
     return nx::sdk::Error::noError;
