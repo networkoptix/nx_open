@@ -171,6 +171,8 @@ export class NxModalShareComponent implements OnInit {
     }
 
     private dialog(system?, user?) {
+        // TODO: Refactor dialog to use generic dialog
+        // TODO: retire loading ModalContent (CLOUD-2493)
         this.modalRef = this.modalService.open(ShareModalContent,
                 {
                             windowClass: 'modal-holder',

@@ -100,6 +100,8 @@ export class NxModalEmbedComponent implements OnInit {
     }
 
     private dialog() {
+        // TODO: Refactor dialog to use generic dialog
+        // TODO: retire loading ModalContent (CLOUD-2493)
         this.modalRef = this.modalService.open(EmbedModalContent,
                 {
                             windowClass: 'modal-holder',

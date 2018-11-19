@@ -80,6 +80,8 @@ export class NxModalDisconnectComponent implements OnInit {
     }
 
     private dialog(systemId) {
+        // TODO: Refactor dialog to use generic dialog
+        // TODO: retire loading ModalContent (CLOUD-2493)
         this.modalRef = this.modalService.open(DisconnectModalContent,
                 {
                             windowClass: 'modal-holder',

@@ -133,6 +133,8 @@ export class NxModalMergeComponent {
     }
 
     private dialog(system) {
+        // TODO: Refactor dialog to use generic dialog
+        // TODO: retire loading ModalContent (CLOUD-2493)
         this.modalRef = this.modalService.open(MergeModalContent,
                 {
                             windowClass: 'modal-holder',

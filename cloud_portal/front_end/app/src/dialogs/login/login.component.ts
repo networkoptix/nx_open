@@ -191,6 +191,8 @@ export class NxModalLoginComponent implements OnInit {
     }
 
     private dialog(keepPage?) {
+        // TODO: Refactor dialog to use generic dialog
+        // TODO: retire loading ModalContent (CLOUD-2493)
         this.modalRef = this.modalService.open(LoginModalContent,
                 {
                             windowClass: 'modal-holder',
