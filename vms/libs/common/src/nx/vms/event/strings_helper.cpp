@@ -246,7 +246,7 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
         case EventType::pluginEvent:
         {
             const QString caption = params.caption.isEmpty()
-                ? "Unknown plugin event"
+                ? tr("Unknown plugin event")
                 : params.caption;
 
             return tr("%1 - %2").arg(resourceName).arg(caption);
