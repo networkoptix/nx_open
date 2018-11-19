@@ -65,8 +65,8 @@ public:
     /** When some bytes received from notification server or when connection was broken/closed. */
     void onReceive(SystemError::ErrorCode, size_t);
 
-    virtual nx::sdk::Error setMetadataHandler(
-        nx::sdk::analytics::MetadataHandler* metadataHandler) override;
+    virtual nx::sdk::Error setHandler(
+        nx::sdk::analytics::DeviceAgent::IHandler* handler) override;
 
     virtual nx::sdk::Error setNeededMetadataTypes(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
@@ -101,7 +101,7 @@ private:
     QByteArray m_cameraManifest;
     ElapsedEvents m_eventsToCatch;
     QByteArray m_buffer;
-    nx::sdk::analytics::MetadataHandler* m_metadataHandler = nullptr;
+    nx::sdk::analytics::DeviceAgent::IHandler* m_handler = nullptr;
     nx::network::aio::Timer m_reconnectTimer;
     mutable uint64_t m_packetId = 0; //< autoincrement packet number for log and debug
     nx::dw_mtt::CameraController m_cameraController;

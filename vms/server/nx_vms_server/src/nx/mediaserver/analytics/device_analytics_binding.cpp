@@ -19,6 +19,7 @@
 
 #include <nx/mediaserver/analytics/data_packet_adapter.h>
 #include <nx/mediaserver/analytics/debug_helpers.h>
+#include <nx/mediaserver/analytics/device_agent_handler.h>
 #include <nx/mediaserver/analytics/event_rule_watcher.h>
 #include <nx/mediaserver/sdk_support/utils.h>
 #include <nx/mediaserver/sdk_support/traits.h>
@@ -135,8 +136,8 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
         if (!updateDescriptorsWithManifest(*manifest))
             return false;
 
-        m_metadataHandler = createMetadataHandler();
-        m_sdkDeviceAgent->setMetadataHandler(m_metadataHandler.get());
+        m_handler = createHandler();
+        m_sdkDeviceAgent->setHandler(m_handler.get());
         updateDeviceWithManifest(*manifest);
     }
 
@@ -277,8 +278,8 @@ void DeviceAnalyticsBinding::setMetadataSink(QnAbstractDataReceptorPtr metadataS
 {
     QnMutexLocker lock(&m_mutex);
     m_metadataSink = std::move(metadataSink);
-    if (m_metadataHandler)
-        m_metadataHandler->setMetadataSink(m_metadataSink.get());
+    if (m_handler)
+        m_handler->setMetadataSink(m_metadataSink.get());
 }
 
 bool DeviceAnalyticsBinding::isStreamConsumer() const
@@ -366,7 +367,7 @@ sdk_support::SharedPtr<DeviceAnalyticsBinding::DeviceAgent>
     return deviceAgent;
 }
 
-std::shared_ptr<MetadataHandler> DeviceAnalyticsBinding::createMetadataHandler()
+std::unique_ptr<DeviceAgentHandler> DeviceAnalyticsBinding::createHandler()
 {
     if (!m_engine)
     {
@@ -381,10 +382,7 @@ std::shared_ptr<MetadataHandler> DeviceAnalyticsBinding::createMetadataHandler()
     auto eventDescriptors = descriptorListManager
         ->deviceDescriptors<EventTypeDescriptor>(m_device);
 
-    auto handler = std::make_shared<MetadataHandler>(m_engine->serverModule());
-    handler->setResource(m_device);
-    handler->setPluginId(m_engine->plugin()->manifest().id);
-    handler->setEventTypeDescriptors(eventDescriptors);
+    auto handler = std::make_unique<DeviceAgentHandler>(serverModule(), m_engine, m_device);
     handler->setMetadataSink(m_metadataSink.get());
 
     return handler;

@@ -8,6 +8,8 @@
 #include <nx/sdk/common_settings.h>
 #include <nx/sdk/common/string.h>
 
+#include <nx/sdk/common/plugin_event.h>
+
 #include "plugin.h"
 
 namespace nx {
@@ -51,6 +53,26 @@ std::string CommonEngine::getParamValue(const char* paramName)
     if (paramName == nullptr)
         return "";
     return m_settings[paramName];
+}
+
+void CommonEngine::pushPluginEvent(
+    nx::sdk::IPluginEvent::Level level,
+    std::string caption,
+    std::string description)
+{
+    std::scoped_lock lock(m_mutex);
+    if (!m_handler)
+    {
+        NX_PRINT << __func__ << "(): "
+            << "INTERNAL ERROR: setHandler() was not called; ignoring plugin event";
+        return;
+    }
+
+    nxpt::ScopedRef<IPluginEvent> event(
+        new common::PluginEvent(level, std::move(caption), std::move(description)),
+        /*increaseRef*/ false);
+
+    m_handler->handlePluginEvent(event.get());
 }
 
 CommonEngine::~CommonEngine()
@@ -137,6 +159,13 @@ void CommonEngine::executeAction(Action* action, Error* outError)
     const char* const actionUrlPtr = actionUrl.empty() ? nullptr : actionUrl.c_str();
     const char* const messageToUserPtr = messageToUser.empty() ? nullptr : messageToUser.c_str();
     action->handleResult(actionUrlPtr, messageToUserPtr);
+}
+
+nx::sdk::Error CommonEngine::setHandler(nx::sdk::analytics::Engine::IHandler* handler)
+{
+    std::scoped_lock lock(m_mutex);
+    m_handler = handler;
+    return nx::sdk::Error::noError;
 }
 
 void CommonEngine::assertPluginCasted(void* plugin) const

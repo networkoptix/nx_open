@@ -81,16 +81,16 @@ nx::sdk::Settings* DeviceAgent::settings() const
     return nullptr;
 }
 
-nx::sdk::Error DeviceAgent::setMetadataHandler(MetadataHandler* metadataHandler)
+nx::sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::DeviceAgent::IHandler* handler)
 {
     NX_OUTPUT << __func__ << " Setting metadata handler";
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_metadataHandler = metadataHandler;
+    m_handler = handler;
     m_pipeline->setMetadataCallback(
         [this](MetadataPacket* packet)
         {
             NX_OUTPUT << __func__ << " Calling metadata handler";
-            m_metadataHandler->handleMetadata(Error::noError, packet);
+            m_handler->handleMetadata(packet);
         });
 
     NX_OUTPUT << __func__ << "() END -> noError";

@@ -43,6 +43,8 @@ public:
     std::vector<ObjectClassDescription> objectClassDescritions() const;
 
     std::chrono::microseconds currentTimeUs() const;
+    
+    nx::sdk::Error CommonEngine::setHandler(nx::sdk::analytics::Engine::IHandler* handler);
 
 private:
     std::vector<ObjectClassDescription> loadObjectClasses() const;

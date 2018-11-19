@@ -2,6 +2,7 @@
 
 #include <string>
 #include <map>
+#include <mutex>
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/utils.h>
@@ -76,6 +77,14 @@ protected:
     }
 
     /**
+     * Sends plugin event to the Server.
+     */
+    void pushPluginEvent(
+        nx::sdk::IPluginEvent::Level level,
+        std::string caption,
+        std::string description);
+
+    /**
      * Intended to be called from a method of a derived class overriding plugin().
      * @return Parent Plugin, casted to the specified type.
      */
@@ -102,13 +111,16 @@ public:
     virtual const IString* manifest(Error* error) const override;
 
     virtual void executeAction(Action* action, Error* outError) override;
+    virtual nx::sdk::Error setHandler(nx::sdk::analytics::Engine::IHandler* handler) override;
 
 private:
     void assertPluginCasted(void* plugin) const;
 
 private:
+    mutable std::mutex m_mutex;
     Plugin* const m_plugin;
     std::map<std::string, std::string> m_settings;
+    nx::sdk::analytics::Engine::IHandler* m_handler = nullptr;
 };
 
 } // namespace analytics

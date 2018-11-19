@@ -50,9 +50,9 @@ void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-nx::sdk::Error DeviceAgent::setMetadataHandler(MetadataHandler* metadataHandler)
+nx::sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::DeviceAgent::IHandler* handler)
 {
-    m_metadataHandler = metadataHandler;
+    m_handler = handler;
     return Error::noError;
 }
 
@@ -115,9 +115,9 @@ nx::sdk::Error DeviceAgent::startFetchingMetadata(
                 packet->addItem(event);
             }
 
-            NX_ASSERT(m_metadataHandler, "Handler should exist");
-            if (m_metadataHandler)
-                m_metadataHandler->handleMetadata(Error::noError, packet);
+            NX_ASSERT(m_handler, "Handler should exist");
+            if (m_handler)
+                m_handler->handleMetadata(packet);
 
             packet->releaseRef();
         };

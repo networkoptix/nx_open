@@ -3,6 +3,7 @@
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/plugin_manifest.h>
+#include <nx/mediaserver/analytics/engine_handler.h>
 
 #include <nx/sdk/analytics/engine.h>
 
@@ -40,6 +41,7 @@ protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
 private:
+    std::unique_ptr<analytics::EngineHandler> m_handler;
     sdk_support::SharedPtr<nx::sdk::analytics::Engine> m_sdkEngine;
 };
 

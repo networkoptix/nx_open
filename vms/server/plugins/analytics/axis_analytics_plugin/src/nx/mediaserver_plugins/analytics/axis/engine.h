@@ -43,6 +43,8 @@ public:
     virtual void executeAction(
         nx::sdk::analytics::Action* action, nx::sdk::Error* outError) override;
 
+    virtual nx::sdk::Error setHandler(nx::sdk::analytics::Engine::IHandler* handler) override;
+
 private:
     EngineManifest fetchSupportedEvents(
         const nx::sdk::DeviceInfo& deviceInfo);

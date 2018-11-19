@@ -19,6 +19,7 @@
 #include <nx/mediaserver/resource/resource_fwd.h>
 #include <nx/mediaserver/analytics/metadata_handler.h>
 #include <nx/mediaserver/server_module_aware.h>
+#include <nx/mediaserver/analytics/device_agent_handler.h>
 
 #include <nx/mediaserver/sdk_support/loggers.h>
 
@@ -62,7 +63,7 @@ private:
     void stopAnalyticsUnsafe();
 
     sdk_support::SharedPtr<DeviceAgent> createDeviceAgent();
-    std::shared_ptr<MetadataHandler> createMetadataHandler();
+    std::unique_ptr<nx::mediaserver::analytics::DeviceAgentHandler> createHandler();
     std::optional<nx::vms::api::analytics::DeviceAgentManifest> loadDeviceAgentManifest(
         const sdk_support::SharedPtr<DeviceAgent>& deviceAgent);
 
@@ -81,7 +82,7 @@ private:
     // TODO: #dmishin: Rename to m_engineResource.
     nx::mediaserver::resource::AnalyticsEngineResourcePtr m_engine;
 
-    std::shared_ptr<MetadataHandler> m_metadataHandler;
+    std::unique_ptr<nx::mediaserver::analytics::DeviceAgentHandler> m_handler;
 
     // TODO: #dmishin: Rename to m_deviceAgent.
     sdk_support::SharedPtr<DeviceAgent> m_sdkDeviceAgent;

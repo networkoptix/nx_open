@@ -326,6 +326,12 @@ std::shared_ptr<Engine::SharedResources> Engine::sharedResources(
     return sharedResourcesItr.value();
 }
 
+nx::sdk::Error Engine::setHandler(nx::sdk::analytics::Engine::IHandler* /*handler*/)
+{
+    // TODO: Use the handler for error reporting.
+    return nx::sdk::Error::noError;
+}
+
 } // namespace hanwha
 } // namespace analytics
 } // namespace mediaserver_plugins

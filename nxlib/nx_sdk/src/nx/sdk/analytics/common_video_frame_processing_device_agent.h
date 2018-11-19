@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <mutex>
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/utils.h>
@@ -89,6 +90,11 @@ protected:
     void pushMetadataPacket(MetadataPacket* metadataPacket);
 
     /**
+     * Sends plugin event to the Server. Can be called at any time, from any thread.
+     */
+    void pushPluginEvent(IPluginEvent::Level level, std::string caption, std::string description);
+
+    /**
      * Called when any of the settings (param values) change.
      */
     virtual void settingsChanged() {}
@@ -136,7 +142,7 @@ public:
 
 public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
-    virtual Error setMetadataHandler(MetadataHandler* handler) override;
+    virtual Error setHandler(DeviceAgent::IHandler* handler) override;
     virtual Error pushDataPacket(DataPacket* dataPacket) override;
     virtual Error setNeededMetadataTypes(const IMetadataTypes* metadataTypes) override;
     virtual const IString* manifest(Error* error) const override;
@@ -147,8 +153,9 @@ private:
     void assertEngineCasted(void* engine) const;
 
 private:
+    mutable std::mutex m_mutex;
     Engine* const m_engine;
-    MetadataHandler* m_handler = nullptr;
+    DeviceAgent::IHandler* m_handler = nullptr;
     std::map<std::string, std::string> m_settings;
 };
 

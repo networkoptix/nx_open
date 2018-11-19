@@ -117,6 +117,12 @@ void Engine::executeAction(
 {
 }
 
+nx::sdk::Error Engine::setHandler(nx::sdk::analytics::Engine::IHandler* /*handler*/)
+{
+    // TODO: Use the handler for error reporting.
+    return nx::sdk::Error::noError;
+}
+
 } // namespace dw_mtt
 } // namespace analytics
 } // namespace mediaserver_plugins

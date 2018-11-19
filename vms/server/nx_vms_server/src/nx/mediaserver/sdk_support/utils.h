@@ -24,6 +24,7 @@
 #include <nx/mediaserver/sdk_support/loggers.h>
 
 #include <nx/sdk/settings.h>
+#include <nx/sdk/i_plugin_event.h>
 #include <plugins/settings.h>
 
 class QnMediaServerModule;
@@ -83,7 +84,7 @@ std::optional<ManifestType> manifest(
     const auto rawString = manifestStr->str();
     if (!NX_ASSERT(rawString))
         return std::nullopt;
-   
+
     bool success = false;
     auto deserializedManifest = QJson::deserialized(rawString, ManifestType(), &success);
     if (!success)
@@ -184,5 +185,7 @@ std::map<QString, Descriptor> descriptorsFromItemList(
 
     return result;
 }
+
+nx::vms::api::EventLevel fromSdkPluginEventLevel(nx::sdk::IPluginEvent::Level level);
 
 } // namespace nx::mediaserver::sdk_support

@@ -109,6 +109,12 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
         .args(getName(), getId()));
 
     if (!m_sdkEngine)
+        return CameraDiagnostics::InternalServerErrorResult("SDK Engine object is not set");
+
+    m_handler = std::make_unique<analytics::EngineHandler>(serverModule(), toSharedPointer(this));
+    m_sdkEngine->setHandler(m_handler.get());
+
+    if (!m_sdkEngine)
         return CameraDiagnostics::PluginErrorResult("SDK analytics engine object is not set");
 
     const auto manifest = sdk_support::manifest<nx::vms::api::analytics::EngineManifest>(

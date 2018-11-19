@@ -36,8 +36,8 @@ public:
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
-    virtual nx::sdk::Error setMetadataHandler(
-        nx::sdk::analytics::MetadataHandler* metadataHandler) override;
+    virtual nx::sdk::Error setHandler(
+        nx::sdk::analytics::DeviceAgent::IHandler* handler) override;
 
     virtual nx::sdk::Error setNeededMetadataTypes(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
@@ -76,7 +76,7 @@ private:
      */
     mutable QList<QByteArray> m_givenManifests;
 
-    nx::sdk::analytics::MetadataHandler* m_metadataHandler = nullptr;
+    nx::sdk::analytics::DeviceAgent::IHandler* m_handler = nullptr;
 };
 
 } // namespace axis

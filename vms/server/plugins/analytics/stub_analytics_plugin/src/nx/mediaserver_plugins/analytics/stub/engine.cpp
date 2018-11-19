@@ -19,6 +19,21 @@ using namespace nx::sdk::analytics;
 Engine::Engine(Plugin* plugin): CommonEngine(plugin, NX_DEBUG_ENABLE_OUTPUT)
 {
     initCapabilities();
+
+    if (ini().throwPluginEventsFromEngine)
+    {
+        NX_PRINT << "Starting plugin event generation thread";
+        if (!m_thread)
+            m_thread.reset(new std::thread([this]() { processPluginEvents(); }));
+    }
+}
+
+Engine::~Engine()
+{
+    m_terminated.store(true);
+    m_pluginEventGenerationLoopCondition.notify_all();
+    if (m_thread)
+        m_thread->join();
 }
 
 nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
@@ -50,6 +65,36 @@ void Engine::initCapabilities()
     // Delete first '|', if any.
     if (!m_capabilities.empty() && m_capabilities.at(0) == '|')
         m_capabilities.erase(0, 1);
+}
+
+void Engine::processPluginEvents()
+{
+    while (!m_terminated)
+    {
+        using namespace std::chrono_literals;
+
+        pushPluginEvent(
+            IPluginEvent::Level::info,
+            "Info message from Engine",
+            "Info message description");
+
+        pushPluginEvent(
+            IPluginEvent::Level::warning,
+            "Warning message from Engine",
+            "Warning message description");
+
+        pushPluginEvent(
+            IPluginEvent::Level::error,
+            "Error message from Engine",
+            "Error message description");
+
+        // Sleep until the next event pack needs to be generated, or the thread is ordered to
+        // terminate (hence condition variable instead of sleep()). Return value (whether
+        // the timeout has occurred) and spurious wake-ups are ignored.
+        static const std::chrono::seconds kEventGenerationPeriod{ 10 };
+        std::unique_lock lock(m_pluginEventGenerationLoopMutex);
+        m_pluginEventGenerationLoopCondition.wait_for(lock, kEventGenerationPeriod);
+    }
 }
 
 std::string Engine::manifest() const

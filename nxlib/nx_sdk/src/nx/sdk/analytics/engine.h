@@ -2,7 +2,9 @@
 
 #include <plugins/plugin_api.h>
 #include <nx/sdk/common.h>
+
 #include <nx/sdk/i_string.h>
+#include <nx/sdk/i_plugin_event.h>
 
 #include "device_agent.h"
 #include "action.h"
@@ -35,6 +37,13 @@ static const nxpl::NX_GUID IID_Engine =
 class Engine: public nxpl::PluginInterface
 {
 public:
+    class IHandler
+    {
+    public:
+        virtual ~IHandler() = default;
+        virtual void handlePluginEvent(IPluginEvent* event) = 0;
+    };
+
     /** @return Parent Plugin. */
     virtual Plugin* plugin() const = 0;
 
@@ -92,6 +101,12 @@ public:
      * @param outError Status of the operation; is set to noError before this call.
      */
     virtual void executeAction(Action* action, Error* outError) = 0;
+
+    /**
+     * @param handler Generic Engine-related events (errors, warning, info messages)
+     *     might be reported via this handler.
+     */
+    virtual Error setHandler(IHandler* handler) = 0;
 };
 
 } // namespace analytics

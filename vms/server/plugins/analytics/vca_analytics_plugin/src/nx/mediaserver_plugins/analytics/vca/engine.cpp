@@ -104,6 +104,12 @@ void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
 {
 }
 
+nx::sdk::Error Engine::setHandler(nx::sdk::analytics::Engine::IHandler* /*handler*/)
+{
+    // TODO: Use the handler for error reporting.
+    return nx::sdk::Error::noError;
+}
+
 } // namespace vca
 } // namespace analytics
 } // namespace mediaserver_plugins

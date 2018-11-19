@@ -318,7 +318,7 @@ void DeviceAgent::sendEventStartedPacket(const EventType& event) const
 {
     ++m_packetId;
     auto packet = createCommonEventMetadataPacket(event, /*active*/ true);
-    m_metadataHandler->handleMetadata(nx::sdk::Error::noError, packet);
+    m_handler->handleMetadata(packet);
     NX_URL_PRINT
         << (event.isStateful() ? "Event [start] " : "Event [pulse] ")
         << "packetId = " << m_packetId << " "
@@ -331,7 +331,7 @@ void DeviceAgent::sendEventStoppedPacket(const EventType& event) const
 {
     ++m_packetId;
     auto packet = createCommonEventMetadataPacket(event, /*active*/ false);
-    m_metadataHandler->handleMetadata(nx::sdk::Error::noError, packet);
+    m_handler->handleMetadata(packet);
     NX_URL_PRINT
         << "Event [stop]  "
         << "packetId = " << m_packetId << " "
@@ -405,10 +405,9 @@ QByteArray DeviceAgent::extractRequestFromBuffer()
     return request;
 }
 
-nx::sdk::Error DeviceAgent::setMetadataHandler(
-    nx::sdk::analytics::MetadataHandler* metadataHandler)
+nx::sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::DeviceAgent::IHandler* handler)
 {
-    m_metadataHandler = metadataHandler;
+    m_handler = handler;
     return nx::sdk::Error::noError;
 }
 

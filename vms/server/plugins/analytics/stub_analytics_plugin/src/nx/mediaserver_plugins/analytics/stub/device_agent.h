@@ -18,6 +18,7 @@ class DeviceAgent: public nx::sdk::analytics::CommonVideoFrameProcessingDeviceAg
 {
 public:
     DeviceAgent(Engine* engine);
+    virtual ~DeviceAgent() override;
 
     virtual nx::sdk::Error setNeededMetadataTypes(
         const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
@@ -48,17 +49,24 @@ private:
 
     bool checkFrame(const nx::sdk::analytics::UncompressedVideoFrame* videoFrame) const;
 
-    // TODO: #dmishin Get rid of these methods. 
+    // TODO: #dmishin Get rid of these methods.
     virtual nx::sdk::Error startFetchingMetadata(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
 
     virtual void stopFetchingMetadata() override;
 
+    void processPluginEvents();
+
 private:
-    std::unique_ptr<std::thread> m_thread;
-    std::atomic<bool> m_stopping{false};
+    std::unique_ptr<std::thread> m_pluginEventThread;
+    std::mutex m_pluginEventGenerationLoopMutex;
+    std::condition_variable m_pluginEventGenerationLoopCondition;
+    std::atomic<bool> m_terminated{false};
+
+    std::unique_ptr<std::thread> m_eventThread;
     std::condition_variable m_eventGenerationLoopCondition;
     std::mutex m_eventGenerationLoopMutex;
+    std::atomic<bool> m_stopping{false};
 
     bool m_previewAttributesGenerated = false;
     int m_frameCounter = 0;

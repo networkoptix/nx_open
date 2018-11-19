@@ -5,6 +5,7 @@
 #include <nx/sdk/common.h>
 #include <nx/sdk/settings.h>
 #include <nx/sdk/i_string.h>
+#include <nx/sdk/i_plugin_event.h>
 #include <nx/sdk/analytics/metadata_types.h>
 #include <nx/sdk/analytics/metadata_packet.h>
 
@@ -16,21 +17,6 @@ namespace analytics {
 static const int NX_NO_ERROR = 0;
 static const int NX_UNKNOWN_PARAMETER = -41;
 static const int NX_MORE_DATA = -23;
-
-/**
- * Interface for handler that processes metadata incoming from the DeviceAgent.
- */
-class MetadataHandler
-{
-public:
-    virtual ~MetadataHandler() = default;
-
-    /**
-     * @param error Used for reporting errors to the outer code.
-     * @param metadata Metadata incoming from the DeviceAgent.
-     */
-    virtual void handleMetadata(Error error, MetadataPacket* metadata) = 0;
-};
 
 /**
  * Each class that implements DeviceAgent interface should properly handle this GUID in
@@ -50,6 +36,14 @@ class Engine; //< Forward declaration for the parent object.
 class DeviceAgent: public nxpl::PluginInterface
 {
 public:
+    class IHandler
+    {
+    public:
+        virtual ~IHandler() = default;
+        virtual void handleMetadata(MetadataPacket* metadataPacket) = 0;
+        virtual void handlePluginEvent(IPluginEvent* event) = 0;
+    };
+
     /** @return Parent Engine. */
     virtual Engine* engine() const = 0;
 
@@ -72,12 +66,13 @@ public:
     virtual const IString* manifest(Error* error) const = 0;
 
     /**
-     * @param handler Processes event metadata and object metadata fetched by the Engine. The
-     *     Engine should fetch events metadata after setNeededMetadataTypes() call. Errors should
-     *     also be reported via this handler.
+     * @param handler Processes event metadata and object metadata fetched by DeviceAgent.
+     *  DeviceAgent should fetch events metadata after setNeededMetadataTypes() call.
+     *  Generic device related events (errors, warning, info messages) might also be reported
+     *  via this handler.
      * @return noError in case of success, other value otherwise.
      */
-    virtual Error setMetadataHandler(MetadataHandler* handler) = 0;
+    virtual Error setHandler(IHandler* handler) = 0;
 
     /**
      * Sets a list of metadata types that are needed by the Server. Empty list means that the

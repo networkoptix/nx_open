@@ -381,6 +381,17 @@ const IString* Engine::manifest(Error* error) const
     return new common::String(m_manifest);
 }
 
+void Engine::executeAction(nx::sdk::analytics::Action* /*action*/, sdk::Error* /*outError*/)
+{
+    // Do nothing.
+}
+
+nx::sdk::Error Engine::setHandler(nx::sdk::analytics::Engine::IHandler* /*handler*/)
+{
+    // TODO: Use the handler for error reporting.
+    return nx::sdk::Error::noError;
+}
+
 } // namespace ssc
 } // namespace analytics
 } // namespace mediaserver_plugins

@@ -322,4 +322,23 @@ resource::AnalyticsEngineResourceList toServerEngineList(
     return result;
 }
 
+nx::vms::api::EventLevel fromSdkPluginEventLevel(nx::sdk::IPluginEvent::Level level)
+{
+    using namespace nx::sdk;
+    using namespace nx::vms::api;
+
+    switch (level)
+    {
+        case IPluginEvent::Level::info:
+            return EventLevel::InfoEventLevel;
+        case IPluginEvent::Level::warning:
+            return EventLevel::WarningEventLevel;
+        case IPluginEvent::Level::error:
+            return EventLevel::ErrorEventLevel;
+        default:
+            NX_ASSERT(false, "Wrong plugin event level");
+            return EventLevel::UndefinedEventLevel;
+    }
+}
+
 } // namespace nx::mediaserver::sdk_support

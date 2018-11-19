@@ -55,6 +55,8 @@ public:
 
     void deviceAgentIsAboutToBeDestroyed(const QString& sharedId);
 
+    virtual nx::sdk::Error setHandler(nx::sdk::analytics::Engine::IHandler* handler) override;
+
 private:
     struct SharedResources
     {
