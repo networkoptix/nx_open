@@ -25,6 +25,7 @@ public:
     QnIpRangeCheckerAsync();
     ~QnIpRangeCheckerAsync();
 
+    // TODO: remove join and add callback to pleaseStop?
     virtual void pleaseStop() override;
     virtual void join() override;
 

@@ -36,6 +36,7 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
 
     QString addr1 = params.value("start_ip");
     QString addr2 = params.value("end_ip");
+    // TODO: Should convert here to HostAddress and check if valid
 
     int port = params.value("port").toInt();
 
@@ -57,14 +58,13 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
             return nx::network::http::StatusCode::internalServerError;
         NX_VERBOSE(this, "Created search process with UUID=%1", processUuid);
 
-        // TODO: #ak: better not to use concurrent here, since calling QtConcurrent::run from
-        // running task looks unreliable in some extreme case.
-        // Consider using async fsm here (this one should be quite simple).
-        // NOTE: boost::bind is here temporarily, until nx::utils::concurrent::run supports arbitrary
-        // number of arguments.
-        const auto threadPool = owner->commonModule()->resourceDiscoveryManager()->threadPool();
-        nx::utils::concurrent::run(threadPool, std::bind(
-            &QnManualCameraSearcher::run, searcher->second.get(), threadPool, addr1, addr2, auth, port));
+        // TODO: Check return code!
+        searcher->second->run(
+            [this](QnManualCameraSearcher*)
+            {
+                NX_VERBOSE(this, "Search was finished");
+            },
+            addr1, addr2, auth, port);
     }
     // TODO: Nobody removes finished searchers!
 

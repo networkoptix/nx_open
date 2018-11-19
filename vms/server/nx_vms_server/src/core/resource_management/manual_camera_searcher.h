@@ -15,17 +15,17 @@
 #include <nx/network/ip_range_checker_async.h>
 #include <common/common_module_aware.h>
 
-// TODO: The way to cancel task should be added.
+// TODO: make sure threadPool is available on any call and it is not possible to destroy threadPool
+//      before QnSearchTask;
+// TODO: The way to cancel task should be added. Inherit from QnStoppable and implement pleaseStop.
 class QnSearchTask
 {
-
 public:
     typedef QList<QnAbstractNetworkResourceSearcher*> SearcherList;
     typedef std::function<void(
         const QnManualResourceSearchList& results, QnSearchTask* const task)> SearchDoneCallback;
 
-    QnSearchTask(){};
-
+    QnSearchTask() = delete;
     QnSearchTask(
         QnCommonModule* commonModule,
         const QString& addr,
@@ -66,10 +66,9 @@ private:
     SearcherList m_searchers;
 };
 
-//!Scans different addresses simultaneously (using aio or concurrent operations)
+//! Scans different addresses simultaneously (using aio or concurrent operations)
 class QnManualCameraSearcher: public QnCommonModuleAware
 {
-
     struct SearchTaskQueueContext
     {
         SearchTaskQueueContext() :
@@ -82,14 +81,13 @@ class QnManualCameraSearcher: public QnCommonModuleAware
         int runningTaskCount;
     };
 
+    using SearchDoneCallback = nx::utils::MoveOnlyFunc<void(QnManualCameraSearcher*)>;
+
 public:
     QnManualCameraSearcher(QnCommonModule* commonModule);
     ~QnManualCameraSearcher();
 
-    /*!
-        \param pool Thread pool to use for running concurrent operations
-    */
-    bool run(QThreadPool* pool, const QString& startAddr, const QString& endAddr,
+    bool run(SearchDoneCallback callback, const QString& startAddr, const QString& endAddr,
         const QAuthenticator& auth, int port);
     void cancel();
     QnManualCameraSearchProcessStatus status() const;
@@ -100,9 +98,11 @@ private:
         const QString& endAddr,
         int port = nx::network::http::DEFAULT_HTTP_PORT);
 
-    void waitToFinishSearch();
+    // TODO: Rename?
+    void searchTaskDoneHandler(const QnManualResourceSearchList& results, QnSearchTask* const task);
+
     void changeStateUnsafe(QnManualResourceSearchStatus::State newState);
-    void runTasksUnsafe(QThreadPool* threadPool);
+    void runTasksUnsafe();
     QList<QnAbstractNetworkResourceSearcher*> getAllNetworkSearchers() const;
 
 private:
@@ -114,14 +114,13 @@ private:
     QnIpRangeCheckerAsync m_ipChecker;
     int m_hostRangeSize;
 
-    QnWaitCondition m_waitCondition;
+    SearchDoneCallback m_searchDoneCallback;
 
     int m_totalTaskCount;
     int m_remainingTaskCount;
 
     QMap<QString, QQueue<QnSearchTask>> m_urlSearchTaskQueues;
     QMap<QString, SearchTaskQueueContext> m_searchQueueContexts;
-
 };
 
 #endif // MANUAL_CAMERA_SEARCHER_H
