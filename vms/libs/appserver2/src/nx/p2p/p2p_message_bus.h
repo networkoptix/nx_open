@@ -19,6 +19,7 @@
 #include "routing_helpers.h"
 #include "connection_context.h"
 #include "p2p_serialization.h"
+#include <transaction/amend_transaction_data.h>
 
 namespace nx {
 namespace p2p {

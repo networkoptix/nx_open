@@ -96,11 +96,21 @@ protected:
         assertParamsRestored<Data>(
             /* param name */ Qn::CAMERA_CREDENTIALS_PARAM_NAME,
             /* access */ Qn::kVideowallUserAccess,
-            /* should be equal */ false);
+            /* should be equal */ true);
 
         assertParamsRestored<Data>(
             /* param name */ Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME,
             /* access */ Qn::kVideowallUserAccess,
+            /* should be equal */ true);
+
+        assertParamsRestored<Data>(
+            /* param name */ Qn::CAMERA_CREDENTIALS_PARAM_NAME,
+            Qn::UserAccessData(QnUuid::createUuid(), Qn::UserAccessData::Access::Default),
+            /* should be equal */ false);
+
+        assertParamsRestored<Data>(
+            /* param name */ Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME,
+            Qn::UserAccessData(QnUuid::createUuid(), Qn::UserAccessData::Access::Default),
             /* should be equal */ false);
     }
 

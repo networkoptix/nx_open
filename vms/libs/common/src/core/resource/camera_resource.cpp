@@ -92,7 +92,7 @@ void QnVirtualCameraResource::updateDefaultAuthIfEmpty(const QString& login, con
 {
     auto credentials = getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME);
 
-    if (credentials.isEmpty() || credentials == lit(":"))
+    if (credentials.isEmpty() || credentials == ":")
     {
         setDefaultAuth(login, password);
         saveParams();
