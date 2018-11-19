@@ -23,7 +23,7 @@ public:
     virtual nx::sdk::Error setNeededMetadataTypes(
         const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
 
-    virtual nx::sdk::Settings* settings() const override;
+    virtual nx::sdk::Settings* pluginSideSettings() const override;
 
 protected:
     virtual std::string manifest() const override;

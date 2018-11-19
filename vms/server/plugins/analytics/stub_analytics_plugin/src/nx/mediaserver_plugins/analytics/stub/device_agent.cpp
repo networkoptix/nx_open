@@ -148,7 +148,7 @@ bool DeviceAgent::pullMetadataPackets(std::vector<MetadataPacket*>* metadataPack
 
 Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
-    if (metadataTypes->isNull())
+    if (metadataTypes->isEmpty())
     {
         stopFetchingMetadata();
         return Error::noError;
@@ -237,7 +237,7 @@ void DeviceAgent::processPluginEvents()
     }
 }
 
-nx::sdk::Settings* DeviceAgent::settings() const
+nx::sdk::Settings* DeviceAgent::pluginSideSettings() const
 {
     auto settings = new nx::sdk::CommonSettings();
     settings->addSetting("nx.stub.device_agent.settings.number_0", "100");

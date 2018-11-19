@@ -172,7 +172,7 @@ Error CommonVideoFrameProcessingDeviceAgent::pushDataPacket(DataPacket* dataPack
 Error CommonVideoFrameProcessingDeviceAgent::setNeededMetadataTypes(
     const IMetadataTypes* metadataTypes)
 {
-    if (metadataTypes->isNull())
+    if (metadataTypes->isEmpty())
     {
         stopFetchingMetadata();
         return Error::noError;
@@ -206,7 +206,7 @@ void CommonVideoFrameProcessingDeviceAgent::setSettings(const nx::sdk::Settings*
     settingsChanged();
 }
 
-nx::sdk::Settings* CommonVideoFrameProcessingDeviceAgent::settings() const
+nx::sdk::Settings* CommonVideoFrameProcessingDeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }

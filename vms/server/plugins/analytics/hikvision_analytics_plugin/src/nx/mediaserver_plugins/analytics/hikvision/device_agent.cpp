@@ -51,7 +51,7 @@ void DeviceAgent::setSettings(const nx::sdk::Settings* /*settings*/)
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::Settings* DeviceAgent::settings() const
+nx::sdk::Settings* DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }
@@ -65,7 +65,7 @@ nx::sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::DeviceAgent::IHandler
 nx::sdk::Error DeviceAgent::setNeededMetadataTypes(
     const nx::sdk::analytics::IMetadataTypes* metadataTypes)
 {
-    if (metadataTypes->isNull())
+    if (metadataTypes->isEmpty())
     {
         stopFetchingMetadata();
         return Error::noError;

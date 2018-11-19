@@ -55,9 +55,15 @@ public:
     virtual void setSettings(const Settings* settings) = 0;
 
     /**
+     * In addition to the settings stored in a Server database, a DeviceAgent can have some
+     * settings which are stored somewhere "under the hood" of the Engine, e.g. on a device acting
+     * as a DeviceAgent's backend. Such settings do not need to be explicitly marked in the Settings
+     * Model, but every time the Server offers the user to edit the values, it calls this method and
+     * merges the received values with the ones in its database.
+     * 
      * @return DeviceAgent settings that are stored on the plugin side.
      */
-    virtual Settings* settings() const = 0;
+    virtual Settings* pluginSideSettings() const = 0;
 
     /**
      * Provides DeviceAgent manifest in JSON format.

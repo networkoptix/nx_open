@@ -103,7 +103,7 @@ void Engine::setSettings(const nx::sdk::Settings* settings)
     NX_OUTPUT << "}";
 }
 
-nx::sdk::Settings* Engine::settings() const
+nx::sdk::Settings* Engine::pluginSideSettings() const
 {
     return nullptr;
 }

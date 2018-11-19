@@ -46,7 +46,7 @@ public:
     void setDeviceAgentManifest(const QByteArray& manifest);
     void setEngineManifest(const Hikvision::EngineManifest& manifest);
     virtual void setSettings(const nx::sdk::Settings* settings) override;
-    virtual nx::sdk::Settings* settings() const override;
+    virtual nx::sdk::Settings* pluginSideSettings() const override;
 
 private:
     nx::sdk::Error startFetchingMetadata(

@@ -147,7 +147,7 @@ public:
     virtual Error setNeededMetadataTypes(const IMetadataTypes* metadataTypes) override;
     virtual const IString* manifest(Error* error) const override;
     virtual void setSettings(const nx::sdk::Settings* settings) override;
-    virtual nx::sdk::Settings* settings() const override;
+    virtual nx::sdk::Settings* pluginSideSettings() const override;
 
 private:
     void assertEngineCasted(void* engine) const;

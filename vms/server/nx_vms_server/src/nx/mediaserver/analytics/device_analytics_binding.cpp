@@ -220,8 +220,9 @@ QVariantMap DeviceAnalyticsBinding::getSettings() const
     const auto settingsFromProperty = m_device->deviceAgentSettingsValues(m_engine->getId());
     jsonEngine.applyValues(settingsFromProperty);
 
-    sdk_support::UniquePtr<nx::sdk::Settings> settings(deviceAgent->settings());
-    if (!settings)
+    sdk_support::UniquePtr<nx::sdk::Settings> pluginSideSettings(
+        deviceAgent->pluginSideSettings());
+    if (!pluginSideSettings)
     {
         NX_DEBUG(this, "Got null device agent settings for device %1 (%2) and engine %3 (%4)",
             m_device->getUserDefinedName(),
@@ -233,9 +234,9 @@ QVariantMap DeviceAnalyticsBinding::getSettings() const
     }
 
     QVariantMap result;
-    const auto count = settings->count();
+    const auto count = pluginSideSettings->count();
     for (auto i = 0; i < count; ++i)
-        result.insert(settings->key(i), settings->value(i));
+        result.insert(pluginSideSettings->key(i), pluginSideSettings->value(i));
 
     jsonEngine.applyValues(result);
     return jsonEngine.values();

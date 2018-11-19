@@ -51,7 +51,7 @@ public:
 
     virtual void setSettings(const nx::sdk::Settings* settings) override;
 
-    virtual nx::sdk::Settings* settings() const override;
+    virtual nx::sdk::Settings* pluginSideSettings() const override;
 
     /** @return Null if not found. */
     const EventType* eventTypeById(const QString& id) const noexcept;

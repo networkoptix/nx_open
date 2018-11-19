@@ -107,7 +107,7 @@ public:
 public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
     virtual void setSettings(const nx::sdk::Settings* settings) override;
-    virtual nx::sdk::Settings* settings() const override;
+    virtual nx::sdk::Settings* pluginSideSettings() const override;
     virtual const IString* manifest(Error* error) const override;
 
     virtual void executeAction(Action* action, Error* outError) override;

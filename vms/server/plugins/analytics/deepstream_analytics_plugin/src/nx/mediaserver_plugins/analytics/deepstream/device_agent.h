@@ -30,7 +30,7 @@ public:
 
     virtual void setSettings(const nx::sdk::Settings* settings) override;
 
-    virtual nx::sdk::Settings* settings() const override;
+    virtual nx::sdk::Settings* pluginSideSettings() const override;
 
     virtual nx::sdk::Error setHandler(nx::sdk::analytics::DeviceAgent::IHandler* handler) override;
 

@@ -16,7 +16,7 @@ public:
     virtual ~IMetadataTypes() = default;
     virtual const IStringList* eventTypeIds() const = 0;
     virtual const IStringList* objectTypeIds() const = 0;
-    virtual bool isNull() const = 0;
+    virtual bool isEmpty() const = 0;
 };
 
 } // namespace analytics

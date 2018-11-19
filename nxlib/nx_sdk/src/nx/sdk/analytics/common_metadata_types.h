@@ -16,8 +16,7 @@ public:
     virtual const IStringList* eventTypeIds() const override;
     virtual const IStringList* objectTypeIds() const override;
 
-    // TODO: #mshevchenko: Rename to isEmpty().
-    virtual bool isNull() const override;
+    virtual bool isEmpty() const override;
 
     void addEventType(std::string eventTypeString);
     void addObjectType(std::string objectTypeString);

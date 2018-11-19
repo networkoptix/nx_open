@@ -76,7 +76,7 @@ void DeviceAgent::setSettings(const nx::sdk::Settings* settings)
     NX_OUTPUT << "}";
 }
 
-nx::sdk::Settings* DeviceAgent::settings() const
+nx::sdk::Settings* DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }
@@ -120,7 +120,7 @@ nx::sdk::Error DeviceAgent::pushDataPacket(nx::sdk::analytics::DataPacket* dataP
 nx::sdk::Error DeviceAgent::setNeededMetadataTypes(
     const nx::sdk::analytics::IMetadataTypes* metadataTypes)
 {
-    if (metadataTypes->isNull())
+    if (metadataTypes->isEmpty())
     {
         stopFetchingMetadata();
         return nx::sdk::Error::noError;

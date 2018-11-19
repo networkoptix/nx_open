@@ -498,7 +498,7 @@ void DeviceAgent::setSettings(const nx::sdk::Settings* settings)
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::Settings* DeviceAgent::settings() const
+nx::sdk::Settings* DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }

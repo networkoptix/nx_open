@@ -103,7 +103,7 @@ void CommonEngine::setSettings(const nx::sdk::Settings* settings)
     settingsChanged();
 }
 
-nx::sdk::Settings* CommonEngine::settings() const
+nx::sdk::Settings* CommonEngine::pluginSideSettings() const
 {
     auto settingsValues = new nx::sdk::CommonSettings();
     settingsValues->addSetting("nx.stub.engine.settings.double_0", "2.7182");
