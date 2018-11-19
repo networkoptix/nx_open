@@ -164,7 +164,7 @@ static InformationError parseAndExtractInformation(
         NX_WARNING(typeid(Information)) << "no eulaVersion at" << baseUpdateUrl;
     }
 
-    if(!QJson::deserialize(topLevelObject, "eulaLink", &result->eulaLink))
+    if (!QJson::deserialize(topLevelObject, "eulaLink", &result->eulaLink))
     {
         NX_WARNING(typeid(Information)) << "no eulaLink at" << baseUpdateUrl;
     }
@@ -172,7 +172,7 @@ static InformationError parseAndExtractInformation(
     QString description;
     // We take update's description from the root updates.json and
     // override it by description in packages.json
-    if(QJson::deserialize(topLevelObject, "description", &description) && !description.isEmpty())
+    if (QJson::deserialize(topLevelObject, "description", &description) && !description.isEmpty())
         result->description = description;
 
     return InformationError::noError;
@@ -432,7 +432,6 @@ std::future<UpdateContents> checkLatestUpdate(QString updateUrl, UpdateCheckSign
 
 std::future<UpdateContents> checkSpecificChangeset(QString updateUrl, QString build, UpdateCheckSignal* signaller)
 {
-    //QString updateUrl = qnSettings->updateFeedUrl();
     return std::async(std::launch::async,
         [updateUrl, build, signaller]()
         {
