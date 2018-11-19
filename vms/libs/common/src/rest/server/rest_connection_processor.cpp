@@ -91,13 +91,13 @@ QnRestRequestHandlerPtr QnRestProcessorPool::findHandlerByPath(
 {
     const auto normalizedPath = QnTcpListener::normalizedPath(path);
 
-    auto i = handlersByPath.upperBound(normalizedPath);
-    if (i == handlersByPath.begin())
-        return normalizedPath.startsWith(i.key()) ? i.value() : nullptr;
-    while (i-- != handlersByPath.begin())
+    auto it = handlersByPath.upperBound(normalizedPath);
+    if (it == handlersByPath.begin())
+        return normalizedPath.startsWith(it.key()) ? it.value() : nullptr;
+    while (it-- != handlersByPath.begin())
     {
-        if (normalizedPath.startsWith(i.key()))
-            return i.value();
+        if (normalizedPath.startsWith(it.key()))
+            return it.value();
     }
 
     if (handlersByPath.contains(kAnyPath))
