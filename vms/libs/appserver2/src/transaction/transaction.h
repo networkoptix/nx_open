@@ -11,9 +11,6 @@
 #include <nx/fusion/serialization/xml.h>
 #include <nx/vms/api/data/timestamp.h>
 #include <utils/crypt/symmetrical.h>
-#include <nx/vms/api/data/full_info_data.h>
-#include <nx/vms/api/data/license_data.h>
-#include <nx/vms/api/data/resource_type_data.h>
 
 /**
  * This class describes all possible transactions and defines various access righs check for them.
