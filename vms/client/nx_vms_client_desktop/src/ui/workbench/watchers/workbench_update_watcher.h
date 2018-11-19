@@ -9,7 +9,6 @@ class QTimer;
 
 namespace nx::update {
 struct UpdateContents;
-class UpdateCheckNotifier;
 } // namespace nx::update
 
 class QnWorkbenchUpdateWatcher:
@@ -18,7 +17,6 @@ class QnWorkbenchUpdateWatcher:
 {
     Q_OBJECT
     using UpdateContents = nx::update::UpdateContents;
-    using UpdateCheckNotifier = nx::update::UpdateCheckNotifier;
 
 public:
     QnWorkbenchUpdateWatcher(QObject* parent = nullptr);
@@ -37,7 +35,6 @@ private:
 
 private:
     QTimer* const m_timer;
-    QPointer<UpdateCheckNotifier> m_signal;
     nx::utils::SoftwareVersion m_notifiedVersion;
     std::future<UpdateContents> m_updateInfo;
 };

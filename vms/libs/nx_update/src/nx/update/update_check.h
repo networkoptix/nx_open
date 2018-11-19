@@ -56,44 +56,29 @@ const nx::update::Package* findPackage(
     nx::vms::api::SystemInformation& systemInfo,
     const nx::update::Information& updateInfo);
 
+using UpdateCheckCallback = std::function<void (const UpdateContents&)>;
 /**
- * We use this class when regular polling for std::future<UpdateInformation> is not convenient.
- */
-class UpdateCheckNotifier: public QObject
-{
-    Q_OBJECT
-
-public:
-    using QObject::QObject;
-
-signals:
-    void finished(const nx::update::UpdateContents& contents);
-};
-
-/**
- * Checks update from the internet.
- * It starts asynchronously. If signaller is specified, it will emit notifier->atFinished.
+ * Checks update for specific build from the internet. It starts asynchronously.
  * @param updateUrl Url to update server. It should lead directly to updates.json file,
  *     like http://vms_updates:8080/updates/updates.json.
- * @param notifier Notifier object to catch completion signal. It will be disposed by deleteLater
+ * @param callback Callback to be called when update info is obtained.
  * @return Future object to be checked for completion.
  */
 std::future<UpdateContents> checkLatestUpdate(
     const QString& updateUrl,
-    UpdateCheckNotifier* notifier = nullptr);
+    UpdateCheckCallback&& callback = {});
 
 /**
- * Checks update for specific build from the internet.
- * It starts asynchronously. If signaler is specified, it will emit notifier->finished.
+ * Checks update for specific build from the internet. It starts asynchronously.
  * @param updateUrl Url to update server. It should lead directly to updates.json file,
  *     like http://vms_updates:8080/updates/updates.json.
  * @param build Build number, like "28057".
- * @param notifier Notifier object to catch completion signal. It will be disposed by deleteLater
+ * @param callback Callback to be called when update info is obtained.
  * @return Future object to be checked for completion.
  */
 std::future<UpdateContents> checkSpecificChangeset(
     const QString& updateUrl,
     const QString& build,
-    UpdateCheckNotifier* notifier = nullptr);
+    UpdateCheckCallback&& callback = {});
 
 } // namespace nx::update

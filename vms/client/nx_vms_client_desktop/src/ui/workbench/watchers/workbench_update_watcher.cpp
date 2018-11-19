@@ -69,12 +69,13 @@ void QnWorkbenchUpdateWatcher::atStartCheckUpdate()
     // This signal will be removed when update check is complete.
     if (m_updateInfo.valid())
         return;
-    m_signal = new UpdateCheckNotifier(this);
-    connect(m_signal, &UpdateCheckNotifier::finished,
-        this, &QnWorkbenchUpdateWatcher::atCheckerUpdateAvailable);
-    // Note: m_signal will be deleted inside checkLatestUpdate
     QString updateUrl = qnSettings->updateFeedUrl();
-    m_updateInfo = nx::update::checkLatestUpdate(updateUrl, m_signal);
+    auto callback = [watcher=QPointer(this)](const UpdateContents& contents)
+        {
+            if (watcher)
+                watcher->atCheckerUpdateAvailable(contents);
+        };
+    m_updateInfo = nx::update::checkLatestUpdate(updateUrl, std::move(callback));
 }
 
 void QnWorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& contents)

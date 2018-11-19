@@ -5,6 +5,7 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/app_info.h>
+#include <utils/common/delayed.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/vms/api/data/software_version.h>
 #include <nx/utils/scope_guard.h>
@@ -414,19 +415,22 @@ const nx::update::Package* findPackage(
 
 std::future<UpdateContents> checkLatestUpdate(
     const QString& updateUrl,
-    UpdateCheckNotifier* notifier)
+    UpdateCheckCallback&& callback)
 {
     return std::async(std::launch::async,
-        [updateUrl, notifier]()
+        [updateUrl, callback = std::move(callback), thread = QThread::currentThread()]()
         {
             UpdateContents result;
             result.info = nx::update::updateInformation(updateUrl, nx::update::kLatestVersion, &result.error);
             result.sourceType = UpdateSourceType::internet;
             result.source = lit("%1 for build=%2").arg(updateUrl, nx::update::kLatestVersion);
-            if (notifier)
+            if (callback)
             {
-                emit notifier->finished(result);
-                notifier->deleteLater();
+                executeDelayed(
+                    [callback = std::move(callback), result]()
+                    {
+                        callback(result);
+                    }, 0, thread);
             }
             return result;
         });
@@ -435,19 +439,22 @@ std::future<UpdateContents> checkLatestUpdate(
 std::future<UpdateContents> checkSpecificChangeset(
     const QString& updateUrl,
     const QString& build,
-    UpdateCheckNotifier* notifier)
+    UpdateCheckCallback&& callback)
 {
     return std::async(std::launch::async,
-        [updateUrl, build, notifier]()
+        [updateUrl, build, callback = std::move(callback), thread = QThread::currentThread()]()
         {
             UpdateContents result;
             result.info = nx::update::updateInformation(updateUrl, build, &result.error);
             result.sourceType = UpdateSourceType::internetSpecific;
             result.source = lit("%1 for build=%2").arg(updateUrl, build);
-            if (notifier)
+            if (callback)
             {
-                emit notifier->finished(result);
-                notifier->deleteLater();
+                executeDelayed(
+                    [callback = std::move(callback), result]()
+                    {
+                        callback(result);
+                    }, 0, thread);
             }
             return result;
         });
