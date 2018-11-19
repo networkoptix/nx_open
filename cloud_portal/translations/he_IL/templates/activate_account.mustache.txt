@@ -1,4 +1,4 @@
-Hello {{message.userFullName}},
+שלום {{message.userFullName}},
 
   לחץ על הלחצן למטה כדי לאשר את כתובת הדוא"ל שלך ולהפעיל את החשבון.
 

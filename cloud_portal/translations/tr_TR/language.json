@@ -177,7 +177,7 @@
     "confirmUnshareAction": "Sil",
     "successDisconnected": "Sistem %PRODUCT_NAME%'den başarıyla çıkarıldı",
     "successDeleted": "{{systemName}} sistemi hesabınızdan başarıyla silindi",
-    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
+    "successMerge": "Sistem {{systemName}}, {{systemName}} ile birleştirildi",
     "permissionsRemoved": "İzinler {{email}}'den kaldırıldı"
   },
   "account": {
@@ -279,7 +279,7 @@
       "copyActiveText": "panoya kopyalandı"
     },
     "systemOffline": "Sistem çevrimdışı",
-    "systemHasNoCameras": "NO CAMERAS",
+    "systemHasNoCameras": "KAMERA YOK",
     "cameraStates": {
       "offline": "Çevrimdışı",
       "error": "Hata",
