@@ -2702,7 +2702,7 @@ bool MediaServerProcess::initTcpListener(
     // starting with "web" path.
     m_universalTcpListener->setPathIgnorePrefix("web/");
     m_universalTcpListener->authenticator()->restrictionList()->deny(
-        lit("/web/.+"), nx::network::http::AuthMethod::http);
+        "/web/.+", nx::network::http::AuthMethod::http);
 
     nx::network::http::AuthMethod::Values methods = (nx::network::http::AuthMethod::Values) (
         nx::network::http::AuthMethod::cookie |
@@ -4576,37 +4576,38 @@ const nx::mediaserver::CmdLineArguments MediaServerProcess::cmdLineArguments() c
 void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodRestrictionList* restrictions)
 {
     // For "OPTIONS * RTSP/1.0"
-    restrictions->allow(lit("\\*"), nx::network::http::AuthMethod::noAuth);
+    restrictions->allow("\\*", nx::network::http::AuthMethod::noAuth);
 
-    const auto webPrefix = lit("(/web)?(/proxy/[^/]*(/[^/]*)?)?");
-    restrictions->allow(webPrefix + lit("/api/ping"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/camera_event.*"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/moduleInformation"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/gettime"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + nx::vms::time_sync::TimeSyncManager::kTimeSyncUrlPath,
+    const auto webPrefix = std::string("(/web)?(/proxy/[^/]*(/[^/]*)?)?");
+    restrictions->allow(webPrefix + "/api/ping", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + "/api/camera_event.*", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + "/api/moduleInformation", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + "/api/gettime", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(
+        webPrefix + nx::vms::time_sync::TimeSyncManager::kTimeSyncUrlPath.toStdString(),
         nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/getTimeZones"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/getNonce"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/cookieLogin"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/cookieLogout"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/getCurrentUser"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/static/.*"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(lit("/crossdomain.xml"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(lit("/favicon.ico"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/startLiteClient"), nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + "/api/getTimeZones", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + "/api/getNonce", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + "/api/cookieLogin", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + "/api/cookieLogout", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + "/api/getCurrentUser", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + "/static/.*", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow("/crossdomain.xml", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow("/favicon.ico", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + "/api/startLiteClient", nx::network::http::AuthMethod::noAuth);
 
     // For open in new browser window.
-    restrictions->allow(webPrefix + lit("/api/showLog.*"),
+    restrictions->allow(webPrefix + "/api/showLog.*",
         nx::network::http::AuthMethod::urlQueryDigest | nx::network::http::AuthMethod::allowWithourCsrf);
 
     // For inserting in HTML <img src="...">.
-    restrictions->allow(webPrefix + lit("/ec2/cameraThumbnail"),
+    restrictions->allow(webPrefix + "/ec2/cameraThumbnail",
         nx::network::http::AuthMethod::allowWithourCsrf);
 
     // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud
     // authentication is implemented.
     // WARNING: This is severe vulnerability introduced in 3.0.
-    restrictions->allow(webPrefix + lit("/api/installUpdateUnauthenticated"),
+    restrictions->allow(webPrefix + "/api/installUpdateUnauthenticated",
         nx::network::http::AuthMethod::noAuth);
 
     restrictions->allowMethod(

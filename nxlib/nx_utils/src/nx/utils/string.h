@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cctype>
 #include <memory>
 #include <vector>
 
@@ -323,6 +324,8 @@ String<CharType> maxPrefix(const String<CharType>& one, const String<CharType>& 
  * Format Json string with indentation to make it human-readable.
  */
 NX_UTILS_API QByteArray formatJsonString(const QByteArray& data);
+
+NX_UTILS_API int stricmp(const std::string& left, const std::string& right);
 
 } // namespace utils
 } // namespace nx
