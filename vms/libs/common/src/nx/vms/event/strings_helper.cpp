@@ -244,8 +244,13 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
                 .arg(resourceName);
 
         case EventType::pluginEvent:
-            if (!params.caption.isEmpty())
-                return tr("%1 - %2").arg(resourceName).arg(params.caption);
+        {
+            const QString caption = params.caption.isEmpty()
+                ? "Unknown plugin event"
+                : params.caption;
+
+            return tr("%1 - %2").arg(resourceName).arg(caption);
+        }
         default:
             return tr("An unknown event has occurred");
     }
