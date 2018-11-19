@@ -8,7 +8,7 @@
     </div>
 
     <nx-layout-right [loading]="!plugin">
-        <nx-block first-elm *ngIf="plugin && (plugin.information.hasInfo || plugin.overview.hasInfo)">
+        <nx-block first-element *ngIf="plugin && (plugin.information.hasInfo || plugin.overview.hasInfo)">
             <header>
                 {{plugin.information.name}}
             </header>
@@ -31,7 +31,7 @@
             </nx-section>
         </nx-block>
 
-        <nx-block side-elm type="gray" *ngIf="plugin && plugin.downloadFiles.length > 0">
+        <nx-block side-element type="gray" *ngIf="plugin && plugin.downloadFiles.length > 0">
             <header translate>
                 Download
             </header>
