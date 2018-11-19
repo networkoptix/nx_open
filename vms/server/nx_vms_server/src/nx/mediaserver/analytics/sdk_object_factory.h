@@ -38,7 +38,7 @@ private:
 
     nx::vms::api::AnalyticsEngineData createEngineData(
         const resource::AnalyticsPluginResourcePtr& plugin,
-        const int engineIndex) const;
+        const QnUuid& engineId) const;
 
     std::unique_ptr<sdk_support::AbstractManifestLogger> makeLogger(
         resource::AnalyticsPluginResourcePtr pluginResource) const;

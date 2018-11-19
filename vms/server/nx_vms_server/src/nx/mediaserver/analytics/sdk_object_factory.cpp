@@ -91,10 +91,9 @@ ec2::AbstractAnalyticsManagerPtr getAnalyticsManager(QnMediaServerModule* server
     return analyticsManager;
 }
 
-QnUuid engineId(const QnUuid& pluginId, int engineIndex)
+QnUuid defaultEngineId(const QnUuid& pluginId)
 {
-    return QnUuid::fromArbitraryData(
-        "engine_" + QString::number(engineIndex) + "_" + pluginId.toString());
+    return QnUuid::fromArbitraryData("engine_" + pluginId.toString());
 }
 
 } // namespace
@@ -263,9 +262,9 @@ bool SdkObjectFactory::initEngineResources()
         const auto& pluginId = plugin->getId();
         auto& pluginEngineList = engineDataByPlugin[pluginId];
 
-        // TODO: Create default engine only if plugin has correspondent capability.
+        // TODO: Decide on a proper creation policy for Engines.
         if (pluginEngineList.empty())
-            pluginEngineList.push_back(createEngineData(plugin, /*engineIndex*/ 0));
+            pluginEngineList.push_back(createEngineData(plugin, defaultEngineId(plugin->getId())));
     }
 
     std::map<QnUuid, EnginePtr> sdkEnginesById;
@@ -354,7 +353,7 @@ bool SdkObjectFactory::initEngineResources()
 
 nx::vms::api::AnalyticsEngineData SdkObjectFactory::createEngineData(
     const resource::AnalyticsPluginResourcePtr& plugin,
-    int engineIndex) const
+    const QnUuid& engineId) const
 {
     using namespace nx::vms::api;
 
@@ -362,11 +361,9 @@ nx::vms::api::AnalyticsEngineData SdkObjectFactory::createEngineData(
     const auto pluginName = plugin->getName();
 
     AnalyticsEngineData engineData;
-    engineData.id = engineId(pluginId, engineIndex);
+    engineData.id = engineId;
     engineData.parentId = pluginId;
-
-    // TODO: Plugin name should be used here.
-    engineData.name = pluginName + " - Engine " + QString::number(engineIndex);
+    engineData.name = pluginName;
     engineData.typeId = nx::vms::api::AnalyticsEngineData::kResourceTypeId;
 
     return engineData;
