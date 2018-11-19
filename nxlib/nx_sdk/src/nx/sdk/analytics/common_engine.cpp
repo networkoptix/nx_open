@@ -60,7 +60,7 @@ void CommonEngine::pushPluginEvent(
     std::string caption,
     std::string description)
 {
-    std::scoped_lock lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (!m_handler)
     {
         NX_PRINT << __func__ << "(): "
@@ -163,7 +163,7 @@ void CommonEngine::executeAction(Action* action, Error* outError)
 
 nx::sdk::Error CommonEngine::setHandler(nx::sdk::analytics::Engine::IHandler* handler)
 {
-    std::scoped_lock lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_handler = handler;
     return nx::sdk::Error::noError;
 }

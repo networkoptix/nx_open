@@ -79,7 +79,7 @@ void* CommonVideoFrameProcessingDeviceAgent::queryInterface(const nxpl::NX_GUID&
 
 Error CommonVideoFrameProcessingDeviceAgent::setHandler(DeviceAgent::IHandler* handler)
 {
-    std::scoped_lock lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_handler = handler;
     return Error::noError;
 }
@@ -147,7 +147,7 @@ Error CommonVideoFrameProcessingDeviceAgent::pushDataPacket(DataPacket* dataPack
     }
 
     {
-        std::scoped_lock lock(m_mutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         for (auto& metadataPacket: metadataPackets)
         {
             if (metadataPacket)
@@ -199,7 +199,7 @@ void CommonVideoFrameProcessingDeviceAgent::pushMetadataPacket(
         return;
     }
 
-    std::scoped_lock lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (!m_handler)
     {
         NX_PRINT << __func__ << "(): "
@@ -218,7 +218,7 @@ void CommonVideoFrameProcessingDeviceAgent::pushPluginEvent(
     std::string caption,
     std::string description)
 {
-    std::scoped_lock lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (!m_handler)
     {
         NX_PRINT << __func__ << "(): "

@@ -92,7 +92,7 @@ void Engine::processPluginEvents()
         // terminate (hence condition variable instead of sleep()). Return value (whether
         // the timeout has occurred) and spurious wake-ups are ignored.
         static const std::chrono::seconds kEventGenerationPeriod{ 10 };
-        std::unique_lock lock(m_pluginEventGenerationLoopMutex);
+        std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
         m_pluginEventGenerationLoopCondition.wait_for(lock, kEventGenerationPeriod);
     }
 }
