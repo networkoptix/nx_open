@@ -27,7 +27,6 @@ def make_integrations_json(integrations, contexts=[], show_pending=False):
         cloud_portal = cloud_portal.first()
 
         for integration in integrations:
-            integration_has_info = False
             integration_dict = {}
             current_version = integration.version_id()
             if show_pending:
@@ -44,7 +43,7 @@ def make_integrations_json(integrations, contexts=[], show_pending=False):
                 context_name = context_name[0].lower() + context_name[1:]
                 context_name = context_name.replace(' ', '')
 
-                integration_dict[context_name] = {}
+                context_dict = {}
                 for datastructure in context.datastructure_set.all():
                     ds_name = datastructure.name
                     if not datastructure.public:
@@ -57,7 +56,7 @@ def make_integrations_json(integrations, contexts=[], show_pending=False):
                     if not record_value:
                         continue
 
-                    integration_dict[context_name][ds_name] = record_value
+                    context_dict[ds_name] = record_value
 
                     # If the DataStructure type is select and the multi flag is true we need to make the value an array
                     if datastructure.type == DataStructure.DATA_TYPES.select and\
@@ -65,14 +64,12 @@ def make_integrations_json(integrations, contexts=[], show_pending=False):
                             datastructure.meta_settings['multi']:
                         # Starts as a stringified list then turned into a list of strings
                         # "['1', '2', '3']" -> [u'1', u'2', u'3'] -> ['1', '2', '3']
-                        integration_dict[context_name][ds_name] = map(str, json.loads(integration_dict[context_name][ds_name]))
+                        context_dict[ds_name] = map(str, json.loads(context_dict[ds_name]))
 
-                context_has_info = bool(integration_dict[context_name])
-                integration_dict[context_name]['hasInfo'] = context_has_info
-                if context_has_info:
-                    integration_has_info = True
+                if context_dict:
+                    integration_dict[context_name] = context_dict
 
-            if not integration_has_info:
+            if not integration_dict:
                 continue
 
             for global_context in global_contexts:
