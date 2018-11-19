@@ -70,6 +70,13 @@ DeviceAgent::~DeviceAgent()
     NX_OUTPUT << __func__ << "(" << this << ") END";
 }
 
+nx::sdk::Error DeviceAgent::setNeededMetadataTypes(
+    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
+{
+    NX_OUTPUT << __func__ << "() -> noError";
+    return nx::sdk::Error::noError;
+}
+
 std::string DeviceAgent::manifest() const
 {
     return R"manifest(

@@ -169,30 +169,6 @@ Error CommonVideoFrameProcessingDeviceAgent::pushDataPacket(DataPacket* dataPack
     return Error::noError;
 }
 
-Error CommonVideoFrameProcessingDeviceAgent::setNeededMetadataTypes(
-    const IMetadataTypes* metadataTypes)
-{
-    if (metadataTypes->isEmpty())
-    {
-        stopFetchingMetadata();
-        return Error::noError;
-    }
-
-    return startFetchingMetadata(metadataTypes);
-}
-
-Error CommonVideoFrameProcessingDeviceAgent::startFetchingMetadata(
-    const IMetadataTypes* /*metadataTypes*/)
-{
-    NX_PRINT << __func__ << "() -> noError";
-    return Error::noError;
-}
-
-void CommonVideoFrameProcessingDeviceAgent::stopFetchingMetadata()
-{
-    NX_PRINT << __func__ << "() -> noError";
-}
-
 const IString* CommonVideoFrameProcessingDeviceAgent::manifest(Error* /*error*/) const
 {
     return new common::String(manifest());

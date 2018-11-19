@@ -49,11 +49,10 @@ private:
 
     bool checkFrame(const nx::sdk::analytics::UncompressedVideoFrame* videoFrame) const;
 
-    // TODO: #dmishin Get rid of these methods.
-    virtual nx::sdk::Error startFetchingMetadata(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
+    nx::sdk::Error startFetchingMetadata(
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes);
 
-    virtual void stopFetchingMetadata() override;
+    void stopFetchingMetadata();
 
     void processPluginEvents();
 

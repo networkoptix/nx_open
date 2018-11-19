@@ -108,17 +108,7 @@ protected:
      */
     std::string getParamValue(const char* paramName);
 
-    /**
-     * Starts fetching metadata. This method is called from setNeededMetadataTypes. This method
-     * is called from setNeededMetatadatTypes if metadata types list passed to it is empty.
-     */
-    virtual nx::sdk::Error startFetchingMetadata(const IMetadataTypes* metadataTypes);
-
-    /**
-     * Stops fetching metadata. This method is called from setNeededMetatadatTypes if metadata
-     * types list passed to it is empty.
-     */
-    virtual void stopFetchingMetadata();
+    virtual Error setNeededMetadataTypes(const IMetadataTypes* metadataTypes) override = 0;
 
 public:
     virtual ~CommonVideoFrameProcessingDeviceAgent() override;
@@ -144,7 +134,6 @@ public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
     virtual Error setHandler(DeviceAgent::IHandler* handler) override;
     virtual Error pushDataPacket(DataPacket* dataPacket) override;
-    virtual Error setNeededMetadataTypes(const IMetadataTypes* metadataTypes) override;
     virtual const IString* manifest(Error* error) const override;
     virtual void setSettings(const nx::sdk::Settings* settings) override;
     virtual nx::sdk::Settings* pluginSideSettings() const override;
