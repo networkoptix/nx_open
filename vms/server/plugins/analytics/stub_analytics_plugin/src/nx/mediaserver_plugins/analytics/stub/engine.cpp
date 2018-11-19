@@ -101,10 +101,6 @@ std::string Engine::manifest() const
 {
     return /*suppress newline*/1 + R"json(
 {
-    "pluginId": "nx.stub",
-    "pluginName": {
-        "value": "Stub Analytics Plugin"
-    },
     "eventTypes": [
         {
             "id": ")json" + kLineCrossingEventType + R"json(",
