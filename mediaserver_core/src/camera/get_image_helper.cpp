@@ -302,15 +302,14 @@ QByteArray QnGetImageHelper::encodeImage(const QSharedPointer<CLVideoDecoderOutp
     }
     else
     {
-        const int MAX_VIDEO_FRAME = outFrame->width * outFrame->height * 3 / 2;
-        quint8* m_videoEncodingBuffer = (quint8*)qMallocAligned(MAX_VIDEO_FRAME, 32);
-        //int encoded = avcodec_encode_video(videoEncoderCodecCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, outFrame.data());
-        QnFfmpegAvPacket outPacket(m_videoEncodingBuffer, MAX_VIDEO_FRAME);
+        QnFfmpegAvPacket outPacket;
         int got_packet = 0;
-        int encodeResult = avcodec_encode_video2(videoEncoderCodecCtx, &outPacket, outFrame.data(), &got_packet);
+        int encodeResult = avcodec_encode_video2(
+            videoEncoderCodecCtx, &outPacket, outFrame.data(), &got_packet);
+
         if (encodeResult == 0 && got_packet)
         {
-            result.append((const char*)m_videoEncodingBuffer, outPacket.size);
+            result.append((const char*) outPacket.data, outPacket.size);
         }
         else
         {
@@ -322,10 +321,9 @@ QByteArray QnGetImageHelper::encodeImage(const QSharedPointer<CLVideoDecoderOutp
                 .arg(encodeResult));
         }
 
-        qFreeAligned(m_videoEncodingBuffer);
     }
-    QnFfmpegHelper::deleteAvCodecContext(videoEncoderCodecCtx);
 
+    QnFfmpegHelper::deleteAvCodecContext(videoEncoderCodecCtx);
     return result;
 }
 
