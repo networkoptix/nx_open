@@ -4610,7 +4610,10 @@ void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodR
     restrictions->allow(webPrefix + "/api/installUpdateUnauthenticated",
         nx::network::http::AuthMethod::noAuth);
 
-    restrictions->allowMethod(
-        nx::network::http::Method::options,
+    nx::network::http::AuthMethodRestrictionList::Filter filter;
+    filter.protocol = nx::network::http::http_1_0.protocol;
+    filter.method = nx::network::http::Method::options;
+    restrictions->allow(
+        filter,
         nx::network::http::AuthMethod::noAuth);
 }
