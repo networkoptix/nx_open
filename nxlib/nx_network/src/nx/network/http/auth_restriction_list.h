@@ -1,7 +1,6 @@
 #pragma once
 
 #include <map>
-#include <set>
 
 #include <QtCore/QString>
 #include <QtCore/QRegExp>
@@ -97,7 +96,6 @@ private:
     mutable QnMutex m_mutex;
     std::map<QString, Rule> m_allowed;
     std::map<QString, Rule> m_denied;
-    std::set<QString> m_allowCookieWithotScrf;
     std::map<Method::ValueType, Rule> m_allowedHttpMethods;
 };
 
