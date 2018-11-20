@@ -6,9 +6,10 @@ Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close All Browsers
 
 *** Variables ***
-${email}           ${EMAIL OWNER}
-${password}        ${BASE PASSWORD}
-${url}             ${ENV}
+${email}             ${EMAIL OWNER}
+${password}          ${BASE PASSWORD}
+${url}               ${ENV}
+${other packages}    //div[contains(@class,"card-body")]//div[contains(@class, "installers")]//a
 
 *** Keywords ***
 Restart
@@ -40,6 +41,12 @@ Check for file by OS
     Wait Until Element Is Visible    ${DOWNLOAD ${os} VMS LINK}
     ${url}    Get Element Attribute    ${DOWNLOAD ${os} VMS LINK}    href
     Check File Exists    ${url}
+
+Check other packages
+    ${packages}    Get WebElements    ${other packages}
+    :FOR  ${element}  IN  @{packages}
+    \  ${url}    Get Element Attribute    ${element}    href
+    \  Check File Exists    ${url}
 
 *** Test Cases ***
 Download link is in the footer
@@ -84,14 +91,20 @@ Make sure each tab changes the text to show the corresponding OS and url
     Location Should Be    ${url}/download/MacOS
     Wait Until Elements Are Visible    ${DOWNLOAD MAC OS VMS LINK}    ${MAC OS TAB}
 
-Validate the windows download link
+Validate the windows download links
+    [tags]    C41552
     Go to download page
     Check for file by OS    WINDOWS
+    Check other packages
 
-Validate the ubuntu download link
+Validate the ubuntu download links
+    [tags]    C41552
     Go to download page
     Check for file by OS    UBUNTU
+    Check other packages
 
-Validate the mac download link
+Validate the mac download links
+    [tags]    C41552
     Go to download page
     Check for file by OS    MAC OS
+    Check other packages
