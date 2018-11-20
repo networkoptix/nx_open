@@ -86,7 +86,7 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
         };
     connect(ui->disableSyncRadioButton, &QRadioButton::clicked, this, handleDisableClick);
 
-    auto updateDelegate = 
+    auto updateDelegate =
         [this]
         {
             m_delegate->setBaseRow(-1);
@@ -95,7 +95,7 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
     connect(ui->syncWithInternetCheckBox, &QCheckBox::clicked, this, updateDelegate);
     connect(ui->disableSyncRadioButton, &QRadioButton::clicked, this, updateDelegate);
 
-    auto clearHovered = 
+    auto clearHovered =
         [this]
         {
             switch (m_store->state().status)
@@ -223,7 +223,7 @@ void TimeSynchronizationWidget::setupUi()
     ui->syncWithInternetCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->syncWithInternetCheckBox->setForegroundRole(QPalette::ButtonText);
 
-    ui->placeholderImageLabel->setPixmap(qnSkin->pixmap("placeholders/time_placeholder.png"));
+    ui->placeholderImageLabel->setPixmap(qnSkin->pixmap("placeholders/time_placeholder.svg", true, QSize(128, 128)));
 
     QFont font;
     font.setPixelSize(kTimeFontPixelSize);
