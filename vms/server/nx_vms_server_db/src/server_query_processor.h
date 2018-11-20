@@ -519,19 +519,6 @@ private:
         // Handler is invoked asynchronously.
     }
 
-    template<class HandlerType>
-    void removeResourceAsync(
-        QnTransaction<nx::vms::api::IdData>& tran,
-        ApiObjectType resourceType,
-        HandlerType handler)
-    {
-        using namespace std::placeholders;
-        executeTranCall(
-            tran,
-            handler,
-            std::bind(&ServerQueryProcessor::removeResourceSync, this, _1, resourceType, _2));
-    }
-
     ErrorCode removeHelper(
         const QnUuid& id,
         ApiCommand::Value command,
