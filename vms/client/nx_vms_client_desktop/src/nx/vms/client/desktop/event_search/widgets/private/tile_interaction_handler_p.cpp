@@ -209,9 +209,9 @@ void TileInteractionHandler::performDragAndDrop(
     arguments[Qn::SelectOnOpeningRole] = true;
 
     const auto timestamp = index.data(Qn::TimestampRole);
-    arguments[Qn::ItemTimeRole] = timestamp.canConvert<microseconds>()
+    arguments[Qn::ItemTimeRole] = QVariant::fromValue<qint64>(timestamp.canConvert<microseconds>()
         ? duration_cast<milliseconds>(timestamp.value<microseconds>()).count()
-        : milliseconds(DATETIME_NOW).count();
+        : milliseconds(DATETIME_NOW).count());
 
     MimeData data(baseMimeData.get(), nullptr);
     data.setResources(cameraList);
