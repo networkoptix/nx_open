@@ -18,12 +18,6 @@ if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo")
     endif()
 endif()
 
-if(developerBuild)
-    set(CMAKE_WIN32_EXECUTABLE OFF)
-else()
-    set(CMAKE_WIN32_EXECUTABLE ON)
-endif()
-
 add_definitions(
     -DUSE_NX_HTTP
     -D__STDC_CONSTANT_MACROS
@@ -127,6 +121,9 @@ if(WINDOWS)
 
     set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /DEBUG")
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG")
+    if(NOT developerBuild)
+        set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /SUBSYSTEM:WINDOWS /entry:mainCRTStartup")
+    endif()
     unset(_extra_linker_flags)
 endif()
 

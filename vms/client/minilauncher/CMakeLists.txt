@@ -10,7 +10,4 @@ nx_add_target(minilauncher EXECUTABLE SIGNED
 )
 
 string(REPLACE ".exe" "" binary_name ${minilauncher.binary.name})
-set_target_properties(minilauncher PROPERTIES
-    OUTPUT_NAME ${binary_name}
-    WIN32_EXECUTABLE ON
-)
+set_target_properties(minilauncher PROPERTIES OUTPUT_NAME ${binary_name})
