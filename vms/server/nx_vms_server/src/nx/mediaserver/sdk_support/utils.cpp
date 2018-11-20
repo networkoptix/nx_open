@@ -59,7 +59,6 @@ static QString manifestFileDir()
 
 } // namespace
 
-
 analytics::SdkObjectFactory* getSdkObjectFactory(QnMediaServerModule* serverModule)
 {
     if (!serverModule)

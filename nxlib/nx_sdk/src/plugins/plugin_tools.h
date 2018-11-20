@@ -223,6 +223,9 @@ class CommonRefCounter: public T
 public:
     CommonRefCounter(const CommonRefCounter&) = delete;
     CommonRefCounter& operator=(const CommonRefCounter&) = delete;
+    CommonRefCounter(CommonRefCounter&&) = delete;
+    CommonRefCounter& operator=(CommonRefCounter&&) = delete;
+    virtual ~CommonRefCounter() = default;
 
     virtual unsigned int addRef() override { return m_refManager.addRef(); }
     virtual unsigned int releaseRef() override { return m_refManager.releaseRef(); }

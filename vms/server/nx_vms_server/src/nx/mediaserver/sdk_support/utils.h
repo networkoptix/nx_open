@@ -43,13 +43,13 @@ class SdkObjectFactory;
 
 namespace nx::mediaserver::sdk_support {
 
-namespace details {
+namespace detail {
 
 DECLARE_FIELD_DETECTOR(hasGroupId, groupId, std::set<QString>);
 DECLARE_FIELD_DETECTOR(hasPaths, paths, std::set<nx::vms::api::analytics::HierarchyPath>);
 DECLARE_FIELD_DETECTOR_SIMPLE(hasItem, item);
 
-} // namespace details
+} // namespace detail
 
 template<typename ManifestType, typename SdkObjectPtr>
 std::optional<ManifestType> manifest(
@@ -159,7 +159,7 @@ std::map<QString, Descriptor> descriptorsFromItemList(
     for (const auto& item: itemList)
     {
         Descriptor descriptor;
-        if constexpr(details::hasItem<Descriptor>::value)
+        if constexpr(detail::hasItem<Descriptor>::value)
         {
             descriptor.item = item;
         }
@@ -169,12 +169,12 @@ std::map<QString, Descriptor> descriptorsFromItemList(
             descriptor.name = item.name.value;
         }
 
-        if constexpr (details::hasPaths<Descriptor>::value)
+        if constexpr (detail::hasPaths<Descriptor>::value)
         {
             nx::vms::api::analytics::HierarchyPath path;
             path.pluginId = pluginId;
 
-            if constexpr (details::hasGroupId<Item>::value)
+            if constexpr (detail::hasGroupId<Item>::value)
                 path.groupId = item.groupId;
 
             descriptor.paths.insert(path);
