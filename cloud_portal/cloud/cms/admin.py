@@ -297,6 +297,8 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
         extra_context['customization_reviews'] = version.productcustomizationreview_set.\
             filter(customization__name__in=request.user.customizations)
 
+        extra_context['DataStructureTypes'] = DataStructure.DATA_TYPES
+
         if request.user == version.product.created_by:
             extra_context['customization_reviews'] = version.productcustomizationreview_set.all()
 
