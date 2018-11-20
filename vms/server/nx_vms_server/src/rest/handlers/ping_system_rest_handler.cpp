@@ -46,7 +46,7 @@ int QnPingSystemRestHandler::executeGet(
     if (getKey.isEmpty())
     {
         result.setError(QnRestResult::ErrorDescriptor(
-            QnJsonRestResult::MissingParameter, lit("password")));
+            QnJsonRestResult::MissingParameter, lit("getKey")));
         return nx::network::http::StatusCode::ok;
     }
 

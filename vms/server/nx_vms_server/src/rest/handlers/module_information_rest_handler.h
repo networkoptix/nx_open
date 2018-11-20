@@ -34,7 +34,8 @@ private:
 
     void updateModuleImformation();
     void sendModuleImformation(nx::network::AbstractStreamSocket* socket);
-    void sendKeepAliveByTimer(nx::network::AbstractStreamSocket* socket);
+    void sendKeepAliveByTimer(nx::network::AbstractStreamSocket* socket,
+        std::chrono::milliseconds interval, bool firstUpdate = true);
 
 private:
     using Socket = nx::network::AbstractStreamSocket;

@@ -14,10 +14,10 @@ namespace nx {
 namespace vms {
 namespace discovery {
 
-static const nx::utils::Url kUrl(lit(
-    "http://localhost/api/moduleInformation?showAddresses=false&keepConnectionOpen&updateStream"));
+static const QString kUrl(
+    "http://localhost/api/moduleInformation?showAddresses=false&keepConnectionOpen&updateStream=%1");
 
-std::chrono::seconds kDefaultDisconnectTimeout(10);
+static const std::chrono::seconds kDefaultDisconnectTimeout(15);
 static const network::RetryPolicy kDefaultRetryPolicy(
     network::RetryPolicy::kInfiniteRetries, std::chrono::seconds(5), 2, std::chrono::minutes(1));
 
@@ -155,9 +155,12 @@ void ModuleConnector::InformationReader::start(const nx::network::SocketAddress&
             readUntilError();
         };
 
+    const auto keepAlive = std::chrono::duration_cast<std::chrono::seconds>(
+        (m_parent->m_disconnectTimeout / 3) * 2).count();
+
     QObject::connect(m_httpClient.get(), &nx::network::http::AsyncHttpClient::responseReceived, handler);
     QObject::connect(m_httpClient.get(), &nx::network::http::AsyncHttpClient::done, handler);
-    m_httpClient->doGet(nx::network::url::Builder(kUrl).setEndpoint(endpoint));
+    m_httpClient->doGet(nx::network::url::Builder(kUrl.arg(keepAlive)).setEndpoint(endpoint));
 }
 
 static inline boost::optional<nx::Buffer> takeJsonObject(nx::Buffer* buffer)

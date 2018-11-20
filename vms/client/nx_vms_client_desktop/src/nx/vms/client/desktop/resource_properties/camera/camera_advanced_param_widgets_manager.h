@@ -26,15 +26,15 @@ public:
     void displayParams(const QnCameraAdvancedParams &params);
 
     /**
-     * @param params List of new parameter values
+     * @param params List of new parameter values.
      * @param packetMode If true than all the parameter widgets will be disabled and
-     *  reenabled back only if parameter is on the params list. Otherwise only parameter
+     *  reenabled back only if parameter is in the params list. Otherwise only parameter
      *  values will be updated.
      *  This parameter is needed for some cameras that include/exclude
      *  some parameter values in the response depending on the other parameter states.
-     *  Some cameras are also permit to change some parameters only if their dependencies
+     *  Some cameras also permit to change some parameters only if their dependencies
      *  are in the certain state.
-     *  Those parameters can implicitly change its value or implicitly become enabled/disabled.
+     *  Those parameters can implicitly change their values or implicitly become enabled/disabled.
      *  Because of that server has to send all the values of all the parameters regardless
      *  of the parameter requested to change.
      *  It's pretty expensive opertaion, so it's enabled only for certain cameras.

@@ -249,7 +249,7 @@ main()
     fi
 
     if [ "$BOX" = "rpi" ]; then
-        source nx_rpi_cam_setup.sh
+        source $INSTALLER_DIR/nx_rpi_cam_setup.sh
         if [ "$NX_RPI_REBOOT" = "1" ]; then
             reboot
             exit 0
