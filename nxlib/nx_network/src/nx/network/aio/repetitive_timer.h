@@ -44,7 +44,7 @@ private:
     nx::utils::ObjectDestructionFlag m_destructionFlag;
     std::atomic<bool> m_cancelled = {false};
 
-    void onTimer();
+    void onTimerEvent();
 };
 
 } // namespace nx::network::aio

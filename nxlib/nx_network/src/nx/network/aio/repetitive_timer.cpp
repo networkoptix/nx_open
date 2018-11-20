@@ -27,7 +27,7 @@ void RepetitiveTimer::start(
     m_timeout = timeout;
     m_timerFunc = std::exchange(timerFunc, nullptr);
 
-    m_timer.start(m_timeout, [this]() { onTimer(); });
+    m_timer.start(m_timeout, [this]() { onTimerEvent(); });
 }
 
 void RepetitiveTimer::cancelSync()
@@ -43,7 +43,7 @@ void RepetitiveTimer::stopWhileInAioThread()
     m_timer.pleaseStopSync();
 }
 
-void RepetitiveTimer::onTimer()
+void RepetitiveTimer::onTimerEvent()
 {
     nx::utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
 
@@ -55,7 +55,7 @@ void RepetitiveTimer::onTimer()
         return;
     }
 
-    m_timer.start(m_timeout, [this]() { onTimer(); });
+    m_timer.start(m_timeout, [this]() { onTimerEvent(); });
 }
 
 } // namespace nx::network::aio
