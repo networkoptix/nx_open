@@ -622,6 +622,7 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
         int newEula = m_updateInfo.info.eulaVersion;
         const bool showEula =  acceptedEula < newEula;
 
+        // FIXME: #GDM Eula message displaying must not be in the `context()` interface.
         if (showEula && !context()->showEulaMessage(m_updateInfo.eulaPath))
         {
             return;
