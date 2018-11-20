@@ -39,7 +39,7 @@ void CommandTransportDelegate::setOnGotTransaction(CommandHandler handler)
     m_delegatee->setOnGotTransaction(std::move(handler));
 }
 
-QnUuid CommandTransportDelegate::connectionGuid() const
+std::string CommandTransportDelegate::connectionGuid() const
 {
     return m_delegatee->connectionGuid();
 }
