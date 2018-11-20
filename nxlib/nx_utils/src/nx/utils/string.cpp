@@ -627,7 +627,7 @@ QByteArray formatJsonString(const QByteArray& data)
 int stricmp(const std::string& left, const std::string& right)
 {
     const auto count = std::min(left.size(), right.size());
-    for (int i = 0; i < count; ++i)
+    for (std::size_t i = 0; i < count; ++i)
     {
         const auto leftCh = std::tolower(left[i]);
         const auto rightCh = std::tolower(right[i]);

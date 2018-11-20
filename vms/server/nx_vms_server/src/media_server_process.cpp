@@ -4611,8 +4611,8 @@ void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodR
         nx::network::http::AuthMethod::noAuth);
 
     nx::network::http::AuthMethodRestrictionList::Filter filter;
-    filter.protocol = nx::network::http::http_1_0.protocol;
-    filter.method = nx::network::http::Method::options;
+    filter.protocol = nx::network::http::http_1_0.protocol.toStdString();
+    filter.method = nx::network::http::Method::options.toStdString();
     restrictions->allow(
         filter,
         nx::network::http::AuthMethod::noAuth);
