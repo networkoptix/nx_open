@@ -98,6 +98,7 @@ private:
 
     std::unique_ptr<ffmpeg::InputFormat> m_inputFormat;
     std::unique_ptr<ffmpeg::Codec> m_decoder;
+    std::atomic_int m_decoderPixelFormat = -1;
     bool m_waitForKeyPacket = true;
 
     std::atomic_int m_updatingFps = 0;
@@ -124,7 +125,6 @@ private:
     PacketConsumerManager m_packetConsumerManager;
 
     std::thread m_videoThread;
-    std::condition_variable m_wait;
     mutable std::mutex m_mutex;
     std::atomic_bool m_terminated = true;
     std::atomic_bool m_ioError = false;
@@ -136,8 +136,7 @@ private:
      * Get the url of the video stream, modified appropriately based on platform.
      */
     std::string ffmpegUrlPlatformDependent() const;
-    bool consumersEmpty() const;
-    bool waitForConsumers();
+    bool noConsumers() const;
     void terminate();
     void tryStart();
     void start();

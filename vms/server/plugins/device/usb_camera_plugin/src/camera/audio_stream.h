@@ -43,8 +43,6 @@ private:
         void addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
         void removePacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
 
-        int sampleRate() const;
-
     private:    
         std::string m_url;
         std::weak_ptr<Camera> m_camera;
@@ -61,7 +59,6 @@ private:
 
         std::atomic_bool m_terminated = true;
         mutable std::mutex m_mutex;
-        std::condition_variable m_wait;
         std::thread m_runThread;
 
         std::unique_ptr<ffmpeg::Frame> m_decodedFrame;
@@ -76,7 +73,6 @@ private:
 
     private:
         std::string ffmpegUrlPlatformDependent() const;
-        bool waitForConsumers();
         int initialize();
         void uninitialize();
         bool ensureInitialized();
@@ -127,8 +123,6 @@ public:
 
     void addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
     void removePacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
-
-    int sampleRate() const;
 
 private:
     std::string m_url;

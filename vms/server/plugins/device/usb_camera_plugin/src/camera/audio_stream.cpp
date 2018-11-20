@@ -18,7 +18,7 @@ namespace {
 
 static constexpr int kMsecInSec = 1000;
 
-static const char * ffmpegDeviceType()
+static const char * ffmpegDeviceTypePlatformDependent()
 {
 #ifdef _WIN32
     return "dshow";
@@ -67,31 +67,27 @@ bool AudioStream::AudioStreamPrivate::ioError() const
 void AudioStream::AudioStreamPrivate::addPacketConsumer(
     const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    m_packetConsumerManager->addConsumer(consumer);
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_packetConsumerManager->addConsumer(consumer);
+    }
 
     tryStart();
-
-    m_wait.notify_all();
 }
 
 void AudioStream::AudioStreamPrivate::removePacketConsumer(
     const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    m_packetConsumerManager->removeConsumer(consumer);
-    m_wait.notify_all();
-}
+    bool shouldStop;
 
-int AudioStream::AudioStreamPrivate::sampleRate() const
-{
-    std::lock_guard<std::mutex> lock(m_mutex);
-    return m_encoder ? m_encoder->codecContext()->sample_rate : 0;
-}
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_packetConsumerManager->removeConsumer(consumer);
+        shouldStop = m_packetConsumerManager->empty();
+    }
 
-int AudioStream::sampleRate() const
-{
-    return m_streamReader ? m_streamReader->sampleRate() : 0;
+    if (shouldStop)
+        stop();
 }
 
 std::string AudioStream::AudioStreamPrivate::ffmpegUrlPlatformDependent() const
@@ -122,26 +118,8 @@ std::string AudioStream::AudioStreamPrivate::ffmpegUrlPlatformDependent() const
 #endif
 }
 
-bool AudioStream::AudioStreamPrivate::waitForConsumers()
-{
-    std::unique_lock<std::mutex> lock(m_mutex);
-    if (m_packetConsumerManager->empty())
-    {
-        uninitialize();
-        m_wait.wait(lock, 
-            [&]()
-            {
-                return m_terminated || !m_packetConsumerManager->empty(); 
-            });
-
-        return !m_terminated;
-    }
-    return true;
-}
-
 int AudioStream::AudioStreamPrivate::initialize()
 {
-    m_initCode = 0;
     m_initCode = initializeInputFormat();
     if (m_initCode < 0) 
         return m_initCode;
@@ -164,15 +142,20 @@ int AudioStream::AudioStreamPrivate::initialize()
 
     m_decodedFrame = std::make_unique<ffmpeg::Frame>();
     m_initialized = true;
+
     return 0;
 }
 
 void AudioStream::AudioStreamPrivate::uninitialize()
 {
-    m_packetConsumerManager->flush();
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_packetConsumerManager->flush();
+    }
+
     m_packetMergeBuffer.clear();
 
-    while(*m_packetCount > 0)
+    while (*m_packetCount > 0)
     {
         static constexpr std::chrono::milliseconds kSleep(30);
         std::this_thread::sleep_for(kSleep);
@@ -192,6 +175,7 @@ void AudioStream::AudioStreamPrivate::uninitialize()
     m_adtsInjector.uninitialize();
 
     m_inputFormat.reset(nullptr);
+
     m_initialized = false;
 }
 
@@ -199,12 +183,13 @@ bool AudioStream::AudioStreamPrivate::ensureInitialized()
 {
     if(!m_initialized)
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
         m_initCode = initialize();
-        if(checkIoError(m_initCode))
-            terminate();
-        if (m_initCode < 0)
+        if(m_initCode < 0)
+        {
             setLastError(m_initCode);
+            if (checkIoError(m_initCode))
+                terminate();
+        }
     }
     return m_initialized;
 }
@@ -212,7 +197,7 @@ bool AudioStream::AudioStreamPrivate::ensureInitialized()
 int AudioStream::AudioStreamPrivate::initializeInputFormat()
 {
     auto inputFormat = std::make_unique<ffmpeg::InputFormat>();
-    int result = inputFormat->initialize(ffmpegDeviceType());
+    int result = inputFormat->initialize(ffmpegDeviceTypePlatformDependent());
     if (result < 0)
         return result;
     
@@ -264,6 +249,7 @@ int AudioStream::AudioStreamPrivate::initializeEncoder()
         return result;
 
     m_encoder = std::move(encoder);
+
     return 0;
 }
 
@@ -289,6 +275,7 @@ int AudioStream::AudioStreamPrivate::initializeResampledFrame()
     resampledFrame->frame()->sample_rate = context->sample_rate;
 
     m_resampledFrame = std::move(resampledFrame);
+
     return result;
 }
 
@@ -327,7 +314,7 @@ int AudioStream::AudioStreamPrivate::decodeNextFrame(ffmpeg::Frame * outFrame)
             return result;
 
         result = m_decoder->sendPacket(packet.packet());
-        if(result < 0 && result != AVERROR(EAGAIN))
+        if (result < 0 && result != AVERROR(EAGAIN))
             return result;
 
         result = m_decoder->receiveFrame(outFrame->frame());
@@ -501,36 +488,37 @@ void AudioStream::AudioStreamPrivate::tryStart()
 {
     if (m_terminated)
     {
-        bool plugged = pluggedIn();
-        if(plugged)
+        if (pluggedIn())
             start();
     }
 }
 
 void AudioStream::AudioStreamPrivate::start()
 {
-    if(m_runThread.joinable())
-        m_runThread.join();
+    if (m_terminated)
+    {
+        if (m_runThread.joinable())
+            m_runThread.join();
 
-    m_terminated = false;
-    m_runThread = std::thread(&AudioStream::AudioStreamPrivate::run, this);
+        m_terminated = false;
+        m_runThread = std::thread(&AudioStream::AudioStreamPrivate::run, this);
+    }
 }
 
 void AudioStream::AudioStreamPrivate::stop()
 {
-    terminate();
-    m_wait.notify_all();
-    if (m_runThread.joinable())
-        m_runThread.join();
+    if (!m_terminated)
+    {
+        terminate();
+        if (m_runThread.joinable())
+            m_runThread.join();
+    }
 }
 
 void AudioStream::AudioStreamPrivate::run()
 {
     while (!m_terminated)
     {
-        if (!waitForConsumers())
-            continue;
-
         if (!ensureInitialized())
             continue;
 
@@ -538,20 +526,21 @@ void AudioStream::AudioStreamPrivate::run()
         auto packet = nextPacket(&result);
         if (result < 0)
         {
+            setLastError(result);
             if (checkIoError(result))
                 terminate();
-            setLastError(result);
             continue;
         }
 
         // If the encoder is AAC, some packets are buffered and copied before delivering.
-        // In that case, this packet is nullptr.
-        if(!packet)
-            continue;
-
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_packetConsumerManager->givePacket(packet);
+        // In that case, packet is nullptr.
+        if (packet)
+        {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            m_packetConsumerManager->givePacket(packet);
+        }
     }
+
     uninitialize();
 }
 
@@ -588,7 +577,9 @@ void AudioStream::setEnabled(bool enabled)
         }
     }
     else
+    {
         m_streamReader.reset(nullptr);
+    }
 }
 
 bool AudioStream::enabled() const
