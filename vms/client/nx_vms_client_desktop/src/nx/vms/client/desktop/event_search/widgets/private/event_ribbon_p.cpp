@@ -118,10 +118,11 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
 
     m_model = model;
 
-    m_autoCloseTimer->stop();
-
     if (!m_model)
+    {
+        m_autoCloseTimer->stop();
         return;
+    }
 
     m_autoCloseTimer->start();
 
