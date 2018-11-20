@@ -1,6 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { trigger, style, animate, transition } from '@angular/animations';
 
+import { NxConfigService } from '../../services/nx-config';
+
+const config = new NxConfigService().config;
 
 @Component({
     selector: 'nx-carousel',
@@ -13,14 +16,14 @@ import { trigger, style, animate, transition } from '@angular/animations';
                     opacity: 1,
                     visibility: 'visible'
                 }),
-                animate('0.25s ease-out', style({ opacity: 0, visibility: 'hidden'}))
+                animate(config.animation.easeOut, style({ opacity: 0, visibility: 'hidden'}))
             ]),
             transition('* => enter', [
                 style({
                     opacity: 0,
                     visibility: 'hidden'
                 }),
-                animate('0.25s ease-in', style({ opacity: 1, visibility: 'visible'}))
+                animate(config.animation.easeIn, style({ opacity: 1, visibility: 'visible'}))
             ])
         ])
     ]

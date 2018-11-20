@@ -270,6 +270,10 @@ export class NxConfigService {
                 'rpi-file'        : 'Raspberry Pi',
                 'windows-x64-file': 'Windows x64',
                 'windows-x86-file': 'Windows x86'
+            },
+            animation: {
+                easeIn: '0.25s ease-in',
+                easeOut: '0.25s ease-out'
             }
         };
     }
