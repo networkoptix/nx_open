@@ -864,6 +864,66 @@
             }
           },
           {
+            "name": "url-file-1-name",
+            "label": "Url To File 1 Name",
+            "value": "",
+            "description": "Name for downloadable url file 1.",
+            "type": "text",
+            "optional": true
+          },
+          {
+            "name": "url-file-1",
+            "label": "Url To File 1",
+            "value": "",
+            "description": "Provide a download url for your files.",
+            "type": "text",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "regex": "(?:https?:\\/\\/)?(?:[\\w]+\\.)?[\\w]+\\.[\\w+]+(?:\\:[\\d]{2,5})?(?:/.*)?"
+            }
+          },
+          {
+            "name": "url-file-2-name",
+            "label": "Url To File 2 Name",
+            "value": "",
+            "description": "Name for downloadable url file 2.",
+            "type": "text",
+            "optional": true
+          },
+          {
+            "name": "url-file-2",
+            "label": "Url To File 2",
+            "value": "",
+            "description": "Provide a download url for your files.",
+            "type": "text",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "regex": "(?:https?:\\/\\/)?(?:[\\w]+\\.)?[\\w]+\\.[\\w+]+(?:\\:[\\d]{2,5})?(?:/.*)?"
+            }
+          },
+          {
+            "name": "url-file-3-name",
+            "label": "Url To File 3 Name",
+            "value": "",
+            "description": "Name for downloadable url file 3.",
+            "type": "text",
+            "optional": true
+          },
+          {
+            "name": "url-file-3",
+            "label": "Url To File 3",
+            "value": "",
+            "description": "Provide a download url for your files.",
+            "type": "text",
+            "optional": true,
+            "public": true,
+            "meta": {
+              "regex": "(?:https?:\\/\\/)?(?:[\\w]+\\.)?[\\w]+\\.[\\w+]+(?:\\:[\\d]{2,5})?(?:/.*)?"
+            }
+          },
+          {
             "name": "downloadableInstructions",
             "label": "Downloadable Instructions",
             "value": "",

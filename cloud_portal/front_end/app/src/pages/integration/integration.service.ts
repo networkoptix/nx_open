@@ -55,14 +55,14 @@ export class IntegrationService implements OnDestroy {
                     // If there is no file url or its the name for an additional field skip
                     if (typeof downloadPlatforms[platformName] !== 'string' ||
                         !downloadPlatforms[platformName] ||
-                        platformName.match(/additional-file-[\d]+-name/)) {
+                        platformName.match(/-file-[\d]+-name/)) {
 
                         continue;
                     }
 
                     const platform: Platform = { file: '', name: '', url: '' };
                     // If the platformName is additional file we replace it with the correct name
-                    if (platformName.match(/additional-file-[\d]+/)) {
+                    if (platformName.match(/-file-[\d]+/)) {
                         platform.name = downloadPlatforms[`${platformName}-name`];
                     } else {
                         platform.name = this.config.config.defaultPlatformNames[platformName];
@@ -70,6 +70,9 @@ export class IntegrationService implements OnDestroy {
 
                     platform.url = downloadPlatforms[platformName];
                     platform.file = platform.url.slice(platform.url.lastIndexOf('/') + 1);
+                    if (!platform.file) {
+                        platform.file = platform.url;
+                    }
                     plugin.downloadFiles.push(platform);
                 }
                 // sort by name and then sort by file name.
