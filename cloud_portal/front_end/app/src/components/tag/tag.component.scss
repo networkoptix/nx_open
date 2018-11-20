@@ -8,6 +8,11 @@
     padding-right: 0px !important;
 }
 
+button {
+    font-size: rem(13px);
+    font-weight: 400;
+}
+
 .close-button {
     border-radius: 2px;
     display: flex;
@@ -44,23 +49,17 @@
     }
 }
 
-.badge {
+.badge,
+.badge-brand {
+    color : $light16;
+    background-color: $light4;
+    
     &:hover {
         background-color : $light5;
     }
     
     &:active {
         background-color : $light6;
-    }
-}
-
-.badge-brand {
-    &:hover {
-        background-color : $brand_d1;
-    }
-    
-    &:active {
-        background-color : $brand_d2;
     }
 }
 
@@ -81,12 +80,11 @@ $theme-colors : (
 
 @each $color, $value in $theme-colors {
     .badge-#{$color} {
-        color : $light1;
+        @extend .badge;
         padding: 0 12px !important;
-        
-        @include badge-effects ($value, darken($value, 10%), darken($value, 15%))
     }
     .badge-#{$color}-selected {
+        color: $light1;
         @include badge-selected($value, darken($value, 10%), darken($value, 15%))
     }
 }
