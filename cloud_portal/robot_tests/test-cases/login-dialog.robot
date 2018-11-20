@@ -208,3 +208,25 @@ handles two tabs, updates second tab state if logout is done on first
     Location Should Be    ${url}/systems
     Reload Page
     Wait Until Element Is Visible    ${LOG IN MODAL}
+
+Log in more than 10 times
+    [tags]    C42075
+    Go To    ${url}/register
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Register    ${TEST FIRST NAME}    ${TEST LAST NAME}    ${email}    ${BASE PASSWORD}
+    Activate    ${email}
+    Wait Until Element Is Visible    ${LOG IN NAV BAR}
+    Click Link    ${LOG IN NAV BAR}
+    Wait Until Elements Are Visible    ${LOG IN MODAL}    ${BACKDROP}    ${LOG IN BUTTON}    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN CLOSE BUTTON}
+    Input Text    ${EMAIL INPUT}    ${email}
+    :FOR  ${x}  IN RANGE  10
+    \  Input Text    ${PASSWORD INPUT}    incorrect
+    \  Wait Until Element Is Visible    ${LOG IN BUTTON}
+    \  Click Button    ${LOG IN BUTTON}
+    \  Sleep    1
+    Wait Until Element Is Visible    ${TOO MANY ATTEMPTS MESSAGE}
+    Sleep    65
+    Input Text    ${PASSWORD INPUT}    ${BASE PASSWORD}
+    Wait Until Element Is Visible    ${LOG IN BUTTON}
+    Click Button    ${LOG IN BUTTON}
+    Validate Log In

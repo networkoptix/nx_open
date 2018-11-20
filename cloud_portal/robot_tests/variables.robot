@@ -39,6 +39,7 @@ ${ACCOUNT NOT FOUND}                  //form[@name='loginForm']//label[contains(
 ${RESEND ACTIVATION EMAIL LINK}       //form[@name='loginForm']//a[text()='${RESEND ACTIVATION LINK BUTTON TEXT}']
 ${WRONG PASSWORD MESSAGE}             //form[@name='loginForm']//label[text()="${WRONG PASSWORD}"]
 ${ACCOUNT NOT FOUND MESSAGE}          //form[@name='loginForm']//label[text()="${ACCOUNT DOES NOT EXIST}"]
+${TOO MANY ATTEMPTS MESSAGE}          //form[@name='loginForm']//label[text()="${TOO MANY ATTEMPTS TEXT}"]
 
 ${LOG IN NAV BAR}                     //nav//a[contains(@ng-click, 'login()')]
 ${YOU HAVE NO SYSTEMS}                //span[contains(text(),"${YOU HAVE NO SYSTEMS TEXT}")]
