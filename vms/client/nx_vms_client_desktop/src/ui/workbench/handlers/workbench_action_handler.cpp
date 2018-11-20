@@ -1304,7 +1304,7 @@ void ActionHandler::at_systemAdministrationAction_triggered()
 void ActionHandler::at_jumpToTimeAction_triggered()
 {
     auto slider = navigator()->timeSlider();
-    if (!slider)
+    if (!slider || !navigator()->isTimelineRelevant())
         return;
 
     const auto parameters = menu()->currentParameters(sender());

@@ -41,6 +41,7 @@ class MultiServerUpdatesWidget:
     Q_OBJECT
     using base_type = QnAbstractPreferencesWidget;
     using LocalStatusCode = nx::update::Status::Code;
+    using UpdateSourceType = nx::update::UpdateSourceType;
 
 public:
     MultiServerUpdatesWidget(QWidget* parent = nullptr);
@@ -98,12 +99,12 @@ private:
         complete,
     };
 
-    static QString toString(UpdateSourceType mode);
+    static QString toString(nx::update::UpdateSourceType mode);
     static QString toString(WidgetUpdateState state);
     static QString toString(LocalStatusCode stage);
     static QString toString(ServerUpdateTool::OfflineUpdateState state);
 
-    void setUpdateSourceMode(UpdateSourceType mode);
+    void setUpdateSourceMode(nx::update::UpdateSourceType mode);
 
     void initDropdownActions();
     void initDownloadActions();
@@ -152,7 +153,7 @@ private:
     // and a label with internal widget states
     bool m_showDebugData = false;
 
-    UpdateSourceType m_updateSourceMode = UpdateSourceType::internet;
+    nx::update::UpdateSourceType m_updateSourceMode = nx::update::UpdateSourceType::internet;
 
     std::unique_ptr<ServerUpdateTool> m_serverUpdateTool;
     std::unique_ptr<ClientUpdateTool> m_clientUpdateTool;
@@ -161,9 +162,9 @@ private:
     std::unique_ptr<ServerStatusItemDelegate> m_statusItemDelegate;
 
     // ServerUpdateTool promises this.
-    std::future<UpdateContents> m_updateCheck;
+    std::future<nx::update::UpdateContents> m_updateCheck;
 
-    UpdateContents m_updateInfo;
+    nx::update::UpdateContents m_updateInfo;
     QString m_updateCheckError;
     nx::utils::SoftwareVersion m_targetVersion;
 

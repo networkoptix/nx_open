@@ -12,8 +12,7 @@
 
 #include <common/static_common_module.h>
 
-namespace nx {
-namespace update {
+namespace nx::update {
 
 struct AlternativeServerData
 {
@@ -112,6 +111,7 @@ static InformationError findCustomizationInfo(
     result->releaseNotesUrl = customizationInfo->release_notes;
     result->releaseDeliveryDays = customizationInfo->release_delivery;
     result->releaseDateMs = customizationInfo->release_date;
+    result->description = customizationInfo->description;
     return InformationError::noError;
 }
 
@@ -168,6 +168,12 @@ static InformationError parseAndExtractInformation(
     {
         NX_WARNING(typeid(Information)) << "no eulaLink at" << baseUpdateUrl;
     }
+
+    QString description;
+    // We take update's description from the root updates.json and
+    // override it by description in packages.json
+    if(QJson::deserialize(topLevelObject, "description", &description) && !description.isEmpty())
+        result->description = description;
 
     return InformationError::noError;
 }
@@ -387,6 +393,60 @@ FindPackageResult findPackage(
         outPackage, outMessage);
 }
 
-} // namespace update
-} // namespace nx
+const nx::update::Package* findPackage(
+    QString component,
+    nx::vms::api::SystemInformation& systemInfo,
+    const nx::update::Information& info)
+{
+    for(const auto& pkg: info.packages)
+    {
+        if (pkg.component == component)
+        {
+            // Check arch and OS
+            if (pkg.arch == systemInfo.arch
+                && pkg.platform == systemInfo.platform
+                && pkg.variant == systemInfo.modification)
+                return &pkg;
+        }
+    }
+    return nullptr;
+}
 
+std::future<UpdateContents> checkLatestUpdate(QString updateUrl, UpdateCheckSignal* signaller)
+{
+    return std::async(std::launch::async,
+        [updateUrl, signaller]()
+        {
+            UpdateContents result;
+            result.info = nx::update::updateInformation(updateUrl, nx::update::kLatestVersion, &result.error);
+            result.sourceType = UpdateSourceType::internet;
+            result.source = lit("%1 for build=%2").arg(updateUrl, nx::update::kLatestVersion);
+            if (signaller)
+            {
+                emit signaller->atFinished(result);
+                signaller->deleteLater();
+            }
+            return result;
+        });
+}
+
+std::future<UpdateContents> checkSpecificChangeset(QString updateUrl, QString build, UpdateCheckSignal* signaller)
+{
+    //QString updateUrl = qnSettings->updateFeedUrl();
+    return std::async(std::launch::async,
+        [updateUrl, build, signaller]()
+        {
+            UpdateContents result;
+            result.info = nx::update::updateInformation(updateUrl, build, &result.error);
+            result.sourceType = UpdateSourceType::internetSpecific;
+            result.source = lit("%1 for build=%2").arg(updateUrl, build);
+            if (signaller)
+            {
+                emit signaller->atFinished(result);
+                signaller->deleteLater();
+            }
+            return result;
+        });
+}
+
+} // namespace nx::update

@@ -151,7 +151,7 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaType<QnNotificationLevel::Value>();
 
     qRegisterMetaType<nx::update::Information>();
-    qRegisterMetaType<UpdateContents>();
+    qRegisterMetaType<nx::update::UpdateContents>();
 
     QMetaType::registerComparators<QnUuid>();
 

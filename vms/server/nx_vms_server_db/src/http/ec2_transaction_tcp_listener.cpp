@@ -128,7 +128,7 @@ void QnTransactionTcpProcessor::run()
             sendResponse( nx::network::http::StatusCode::forbidden, nx::network::http::StringType() );
             return;
         }
-        const QnUuid connectionGuid( connectionGuidIter->second );
+        const std::string connectionGuid = connectionGuidIter->second.toStdString();
 
         auto connectionDirectionIter = d->request.headers.find( Qn::EC2_CONNECTION_DIRECTION_HEADER_NAME );
         if( connectionDirectionIter == d->request.headers.end() )
@@ -243,12 +243,12 @@ void QnTransactionTcpProcessor::run()
                 commonModule->globalSettings()->connectionKeepAliveTimeout()).toString());
     }
 
-    QnUuid connectionGuid;
+    std::string connectionGuid;
     auto connectionGuidIter = d->request.headers.find( Qn::EC2_CONNECTION_GUID_HEADER_NAME );
     if( connectionGuidIter == d->request.headers.end() )
-        connectionGuid = QnUuid::createUuid();  //generating random connection guid
+        connectionGuid = QnUuid::createUuid().toSimpleString().toStdString();  //generating random connection guid
     else
-        connectionGuid = QnUuid::fromStringSafe(connectionGuidIter->second);
+        connectionGuid = connectionGuidIter->second.toStdString();
 
     ConnectionType::Type requestedConnectionType = ConnectionType::none;
     auto connectionDirectionIter = d->request.headers.find( Qn::EC2_CONNECTION_DIRECTION_HEADER_NAME );

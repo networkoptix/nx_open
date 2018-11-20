@@ -85,7 +85,7 @@ void GenericTransport::setOnGotTransaction(
     m_gotCommandHandler = std::move(handler);
 }
 
-QnUuid GenericTransport::connectionGuid() const
+std::string GenericTransport::connectionGuid() const
 {
     return m_commandPipeline->connectionGuid();
 }

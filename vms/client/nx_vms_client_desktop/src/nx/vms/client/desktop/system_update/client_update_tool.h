@@ -32,6 +32,7 @@ class ClientUpdateTool:
     using FileInformation = vms::common::p2p::downloader::FileInformation;
     using PeerManagerPtr = nx::vms::common::p2p::downloader::AbstractPeerManager*;
     using SingleConnectionPeerManager = nx::vms::common::p2p::downloader::SingleConnectionPeerManager;
+    using UpdateContents = nx::update::UpdateContents;
 
 public:
     ClientUpdateTool(QObject* parent = nullptr);

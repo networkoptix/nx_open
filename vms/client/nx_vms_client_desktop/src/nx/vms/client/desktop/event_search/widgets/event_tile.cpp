@@ -77,6 +77,7 @@ struct EventTile::Private
     bool footerEnabled = true;
     Style style = Style::standard;
     bool highlighted = false;
+    QPalette defaultTitlePalette;
     Qt::MouseButton clickButton = Qt::NoButton;
     Qt::KeyboardModifiers clickModifiers;
     QPoint clickPoint;
@@ -294,6 +295,9 @@ EventTile::EventTile(QWidget* parent):
     ui->progressBar->setRange(0, kProgressBarResolution);
     ui->progressBar->setValue(0);
 
+    ui->nameLabel->ensurePolished();
+    d->defaultTitlePalette = ui->nameLabel->palette();
+
     connect(d->closeButton, &QPushButton::clicked, this, &EventTile::closeRequested);
 
     const auto activateLink =
@@ -340,7 +344,7 @@ void EventTile::setCloseable(bool value)
         return;
 
     d->closeable = value;
-    d->handleHoverChanged(d->closeable && underMouse());
+    d->handleHoverChanged(underMouse());
 }
 
 QString EventTile::title() const
@@ -362,8 +366,10 @@ QColor EventTile::titleColor() const
 
 void EventTile::setTitleColor(const QColor& value)
 {
-    ui->nameLabel->ensurePolished();
-    setPaletteColor(ui->nameLabel, ui->nameLabel->foregroundRole(), value);
+    if (value.isValid())
+        setPaletteColor(ui->nameLabel, ui->nameLabel->foregroundRole(), value);
+    else
+        ui->nameLabel->setPalette(d->defaultTitlePalette);
 }
 
 QString EventTile::description() const
@@ -548,7 +554,12 @@ bool EventTile::event(QEvent* event)
 
         case QEvent::Leave:
         case QEvent::HoverLeave:
+        case QEvent::Hide:
             d->handleHoverChanged(false);
+            break;
+
+        case QEvent::Show:
+            d->handleHoverChanged(underMouse());
             break;
 
         case QEvent::MouseButtonPress:
@@ -819,6 +830,7 @@ void EventTile::clear()
 {
     setCloseable(false);
     setTitle({});
+    setTitleColor({});
     setDescription({});
     setFooterText({});
     setTimestamp({});

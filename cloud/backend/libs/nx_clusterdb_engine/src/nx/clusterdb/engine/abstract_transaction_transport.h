@@ -41,7 +41,7 @@ public:
 
     virtual void setOnGotTransaction(CommandDataHandler handler) = 0;
 
-    virtual QnUuid connectionGuid() const = 0;
+    virtual std::string connectionGuid() const = 0;
 
     virtual void sendTransaction(
         TransactionTransportHeader transportHeader,
@@ -62,7 +62,7 @@ public:
 
     virtual void setOnGotTransaction(CommandHandler handler) = 0;
 
-    virtual QnUuid connectionGuid() const = 0;
+    virtual std::string connectionGuid() const = 0;
 
     virtual const TransactionTransportHeader& commonTransportHeaderOfRemoteTransaction() const = 0;
 

@@ -218,6 +218,10 @@ void EventRibbon::Private::updateTile(int index)
     widget->setCloseable(modelIndex.data(Qn::RemovableRole).toBool());
     widget->setAutoCloseTime(modelIndex.data(Qn::TimeoutRole).value<milliseconds>());
     widget->setAction(modelIndex.data(Qn::CommandActionRole).value<CommandActionPtr>());
+    widget->setTitleColor(modelIndex.data(Qt::ForegroundRole).value<QColor>());
+    widget->setFooterEnabled(m_footersEnabled);
+
+    setHelpTopic(widget, modelIndex.data(Qn::HelpTopicIdRole).toInt());
 
     const auto resourceList = modelIndex.data(Qn::ResourceListRole);
     if (resourceList.isValid())
@@ -228,13 +232,6 @@ void EventRibbon::Private::updateTile(int index)
             widget->setResourceList(resourceList.value<QStringList>());
     }
 
-    setHelpTopic(widget, modelIndex.data(Qn::HelpTopicIdRole).toInt());
-
-    const auto color = modelIndex.data(Qt::ForegroundRole).value<QColor>();
-    if (color.isValid())
-        widget->setTitleColor(color);
-
-    widget->setFooterEnabled(m_footersEnabled);
     updateTilePreview(index);
 }
 

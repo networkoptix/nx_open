@@ -13,6 +13,7 @@
 #include <utils/common/aspect_ratio.h>
 
 #include <nx/vms/client/desktop/common/data/rotation.h>
+#include <nx/vms/client/desktop/common/redux/abstract_redux_state.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/schedule_cell_params.h>
 #include <nx/vms/client/desktop/utils/wearable_state.h>
 #include <nx/utils/std/optional.h>
@@ -23,7 +24,7 @@
 
 namespace nx::vms::client::desktop {
 
-struct NX_VMS_DESKTOP_CLIENT_API CameraSettingsDialogState
+struct NX_VMS_DESKTOP_CLIENT_API CameraSettingsDialogState: AbstractReduxState
 {
     template<class T>
     struct UserEditable
@@ -97,13 +98,6 @@ struct NX_VMS_DESKTOP_CLIENT_API CameraSettingsDialogState
         // Selection attempt produced too many motion sensitivity rectangles.
         motionDetectionTooManySensitivityRectangles
     };
-
-    CameraSettingsDialogState() = default;
-    CameraSettingsDialogState(const CameraSettingsDialogState& other) = delete;
-    CameraSettingsDialogState(CameraSettingsDialogState&& other) = default;
-    CameraSettingsDialogState& operator=(const CameraSettingsDialogState&) = delete;
-    CameraSettingsDialogState& operator=(CameraSettingsDialogState&&) = default;
-    ~CameraSettingsDialogState() = default;
 
     bool hasChanges = false;
     bool readOnly = true;
