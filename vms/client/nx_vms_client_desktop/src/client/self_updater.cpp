@@ -65,12 +65,12 @@ bool runMinilaucherInternal(const QStringList& args)
 
 /**
  * Developer builds cannot be run without predefined environment on windows. We must not use these
- * builds as url handlers or copy applauncher from them. Detecting by checking if Qt5Core exists.
+ * builds as url handlers or copy applauncher from them.
  */
-bool isDeveloperBuild()
+bool canBeRunFromTheCurrentDirectory()
 {
     if (!nx::utils::AppInfo::isWindows())
-        return false;
+        return true;
 
     const QString binaryPath = qApp->applicationFilePath();
     const QString qt5LibFile =
@@ -80,7 +80,8 @@ bool isDeveloperBuild()
             "Qt5Core.dll";
         #endif
 
-    return !QFileInfo::exists(QDir(binaryPath).absoluteFilePath(qt5LibFile));
+    // Detecting by checking if Qt5Core exists. It will give us 99% correctness.
+    return QFileInfo::exists(QDir(binaryPath).absoluteFilePath(qt5LibFile));
 }
 
 } // namespace
@@ -121,7 +122,7 @@ bool SelfUpdater::registerUriHandler()
     if (nx::utils::AppInfo::isMacOsX())
         return true;
 
-    if (isDeveloperBuild())
+    if (!canBeRunFromTheCurrentDirectory())
         return true;
 
     QString binaryPath = qApp->applicationFilePath();
@@ -204,7 +205,7 @@ bool SelfUpdater::updateApplauncher()
     using namespace applauncher::api;
     using namespace nx::utils::file_system;
 
-    if (isDeveloperBuild())
+    if (!canBeRunFromTheCurrentDirectory())
         return true;
 
     /* Check if applauncher binary exists in our installation. */
