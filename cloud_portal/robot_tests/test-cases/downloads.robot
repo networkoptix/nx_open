@@ -108,3 +108,17 @@ Validate the mac download links
     Go to download page
     Check for file by OS    MAC OS
     Check other packages
+
+Check Play Store Link
+    [tags]    C41554
+    Go to download page
+    ${url}    Get Element Attribute    ${PLAY STORE DOWNLOAD BUTTON}    href
+    Should Be Equal    ${url}    ${PLAY STORE LINK}
+    Check File Exists    ${url}
+
+Check iTunes Store Link
+    [tags]    C41554
+    Go to download page
+    ${url}    Get Element Attribute    ${ITUNES STORE DOWNLOAD BUTTON}    href
+    Should Be Equal    ${url}    ${ITUNES STORE LINK}
+    Check File Exists    ${url}

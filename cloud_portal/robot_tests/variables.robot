@@ -199,9 +199,11 @@ ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-cl
 
 #Downloads
 ${DOWNLOADS HEADER}                   //h1["${DOWNLOADS HEADER TEXT}"]
-${DOWNLOAD WINDOWS VMS LINK}                  //div[text()="Windows x64 - ${CLIENT ONLY TEXT}"]/../..
-${DOWNLOAD UBUNTU VMS LINK}                  //div[text()="Ubuntu x64 - ${CLIENT ONLY TEXT}"]/../..
-${DOWNLOAD MAC OS VMS LINK}                  //div[text()="Mac OS X - ${CLIENT ONLY TEXT}"]/../..
+${DOWNLOAD WINDOWS VMS LINK}          //div[text()="Windows x64 - ${CLIENT ONLY TEXT}"]/../..
+${DOWNLOAD UBUNTU VMS LINK}           //div[text()="Ubuntu x64 - ${CLIENT ONLY TEXT}"]/../..
+${DOWNLOAD MAC OS VMS LINK}           //div[text()="Mac OS X - ${CLIENT ONLY TEXT}"]/../..
+${ITUNES STORE DOWNLOAD BUTTON}       //a[@class="mobile-link iOS"]
+${PLAY STORE DOWNLOAD BUTTON}         //a[@class="mobile-link Android"]
 
 ${WINDOWS TAB}                        //a[@id="Windows"]
 ${UBUNTU TAB}                         //a[@id="Linux"]
