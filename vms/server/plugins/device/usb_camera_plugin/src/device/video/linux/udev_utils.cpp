@@ -118,7 +118,7 @@ std::string getDeviceUniqueId(const std::string& devicePath)
         if (!device.udevDevice)
             continue;
 
-        if (strcmp(devicePath, device.getDevNode()) != 0)
+        if (strcmp(devicePath.c_str(), device.getDevNode()) != 0)
             continue;
 
         const char * property = device.getPropertyValue(kIdSerialKey);

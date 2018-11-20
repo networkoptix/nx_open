@@ -97,7 +97,7 @@ std::vector<std::string> getDevicePaths()
             continue;
 
         std::string devVideo = kV4l2DevicePath + "/" + directoryEntry->d_name;
-        if (isDeviceFile(devVideo.c_str()))
+        if (isDeviceFile(devVideo))
             devicePaths.push_back(devVideo);
     }
 
@@ -183,7 +183,7 @@ std::vector<DeviceData> getDeviceList()
 
     for (const auto& devicePath : devicePaths)
     {
-        DeviceInitializer initializer(devicePath.c_str());
+        DeviceInitializer initializer(devicePath);
         int fileDescriptor = initializer.fileDescriptor;
         if (fileDescriptor == -1)
         {
@@ -297,7 +297,7 @@ std::vector<ResolutionData> getResolutionList(
 }
 
 void setBitrate(
-    const char * devicePath,
+    const std::string& devicePath,
     int bitrate,
     const device::CompressionTypeDescriptorPtr& /*targetCodecID*/)
 {
@@ -328,7 +328,7 @@ void setBitrate(
     }
 }
 
-int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescriptorPtr& /*tagetCodecID*/)
+int getMaxBitrate(const std::string& devicePath, const device::CompressionTypeDescriptorPtr& /*tagetCodecID*/)
 {
     if (rpi::isMmalCamera(getDeviceName(devicePath)))
         return rpi::getMmalMaxBitrate();
