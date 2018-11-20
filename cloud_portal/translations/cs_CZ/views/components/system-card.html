@@ -3,13 +3,13 @@
     <div class="card-body">
         <h2 class="mb-3">Váš systém</h2>
         <p>
-            <button class="btn btn-default" ng-click="rename()">Přejmenovat systém</button>
+            <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Přejmenovat systém</button>
         </p>
         <p>
-            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Sloučit s jiným systémem</button>
+            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Sloučit s jiným systémem</button>
         </p>
         <hr />
-        <button class="btn btn-default" ng-click="disconnect()">Disconnect from
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Disconnect from
             <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
     </div>
 </div>
