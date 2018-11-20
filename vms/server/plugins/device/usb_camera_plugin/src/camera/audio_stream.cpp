@@ -1,5 +1,7 @@
 #include "audio_stream.h"
 
+#include <algorithm>
+
 extern "C" {
 #include <libswresample/swresample.h>
 } // extern "C"
@@ -96,22 +98,13 @@ std::string AudioStream::AudioStreamPrivate::ffmpegUrlPlatformDependent() const
     static const std::string kWindowsAudioPrefix = "audio=";
     
     // ffmpeg replaces all ":" with "_" in the audio devices alternative name.
-    // It expects the modified alternative name or it wont open.
-    auto replaceWindowsDelimitter =
-        [](std::string * outDevicePath)
-        {
-            static constexpr const char kWindowsAudioDelimitter = ':';
-            static constexpr const char kFfmpegAudioDelimitter = '_';
-            for(int i = 0; i < outDevicePath->size(); ++i)
-            {
-                if((*outDevicePath)[i] == kWindowsAudioDelimitter)
-                    (*outDevicePath)[i] = kFfmpegAudioDelimitter;
-            }
-        };
+    // It expects the modified alternative name or it will not open.
+    static constexpr const char kWindowsAudioDelimitter = ':';
+    static constexpr const char kFfmpegAudioDelimitter = '_';
 
     std::string url = m_url;
-    replaceWindowsDelimitter(&url);
-    
+    std::replace(url.begin(), url.end(), kWindowsAudioDelimitter, kFfmpegAudioDelimitter);
+
     return kWindowsAudioPrefix + url;
 #else
     return m_url;
