@@ -207,10 +207,12 @@ int AudioStream::AudioStreamPrivate::initializeInputFormat()
         return result;
     
 #ifdef _WIN32
-    // Decrease audio latency by reducing audio buffer size
-    inputFormat->setEntry("audio_buffer_size", (int64_t)80); //< 80 milliseconds
+    // Decrease audio latency by reducing audio buffer size.
+    static constexpr char kAudioBufferSizeKey[] = "audio_buffer_size";
+    static constexpr int64_t kAudioBufferSizeValue = 80; // < milliseconds
+    inputFormat->setEntry(kAudioBufferSizeKey, kAudioBufferSizeValue);
 
-    // Dshow audio input format does not recognize io errors, so we set this flag to treate a
+    // Dshow audio input format does not recognize io errors, so we set this flag to treat a
     // long timeout as an io error.
     inputFormat->formatContext()->flags |= AVFMT_FLAG_NONBLOCK;
 #endif
@@ -320,7 +322,7 @@ int AudioStream::AudioStreamPrivate::decodeNextFrame(ffmpeg::Frame * outFrame)
         ffmpeg::Packet packet(m_inputFormat->audioCodecID(), AVMEDIA_TYPE_AUDIO);
         int result = m_inputFormat->readFrame(packet.packet());
 
-#ifdef _WIN32 //< corresponds to setting AVFMT_NONBLOCK
+#ifdef _WIN32 //< Corresponds to setting AVFMT_FLAG_NONBLOCK.
         uint64_t start = m_timeProvider->millisSinceEpoch();
         while (result == AVERROR(EAGAIN) && m_timeProvider->millisSinceEpoch() - start < kMsecInSec)
         {
@@ -328,13 +330,12 @@ int AudioStream::AudioStreamPrivate::decodeNextFrame(ffmpeg::Frame * outFrame)
             std::this_thread::sleep_for(kSleep);
             result = m_inputFormat->readFrame(packet.packet());
         }
-        if (result < 0)
-        {
-            // Assume if there was a timeout that there was an io error.
+        // Assume if there was a timeout that there was an io error.
+        if (result == AVERROR(EAGAIN))
             result = AVERROR(EIO);
-            return result;
-        }
 #endif
+        if (result < 0)
+            return result;
 
         result = m_decoder->sendPacket(packet.packet());
         if (result < 0 && result != AVERROR(EAGAIN))

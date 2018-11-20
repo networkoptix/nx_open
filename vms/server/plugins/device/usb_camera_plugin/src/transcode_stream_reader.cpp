@@ -265,17 +265,18 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxErr
 
     for (;;)
     {
-        auto videoFrame = m_videoFrameConsumer->popOldest(timeOut);
-        if (interrupted() || ioError())
-            return nullptr;
-        if (!shouldDrop(videoFrame.get()))
         {
-            if (auto videoPacket = transcodeVideo(videoFrame.get(), outNxError))
-                m_avConsumer->givePacket(videoPacket);
-        }
+            // videoFrame needs to be released after this scope to prevent deadlock
+            auto videoFrame = m_videoFrameConsumer->popOldest(timeOut);
 
-        // Release the reference so that internally VideoStream::m_frameCount will be decremented.
-        videoFrame = nullptr;
+            if (interrupted() || ioError())
+                return nullptr;
+            if (!shouldDrop(videoFrame.get()))
+            {
+                if (auto videoPacket = transcodeVideo(videoFrame.get(), outNxError))
+                    m_avConsumer->givePacket(videoPacket);
+            }
+        }
 
         auto peeked = m_avConsumer->peekOldest(timeOut);
         if (!peeked)
