@@ -4,7 +4,7 @@
 
 namespace nx::vms::client::desktop {
 
-struct Ini: public nx::kit::IniConfig
+struct Ini: nx::kit::IniConfig
 {
     Ini(): IniConfig("desktop_client.ini") {}
 
@@ -34,7 +34,12 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, showDebugTimeInformationInRibbon, "Show extra timestamp information in event ribbon");
     NX_INI_FLAG(0, showPreciseItemTimestamps, "Show precise timestamps on scene items");
     NX_INI_FLAG(1, massSystemUpdatePrototype, "Enable experimental system update.");
-    NX_INI_INT(0, massSystemUpdateDebugInfo, "Show additional debug information for experimental update system.");
+    NX_INI_FLAG(0, massSystemUpdateDebugInfo,
+        "Show additional debug information for experimental update system.");
+    NX_INI_FLAG(0, massSystemUpdateClearDownloads,
+        "Forces client to remove downloaded data for system updates.");
+    NX_INI_FLAG(0, forceCompatibilityMode,
+        "Forces compatibility mode dialog to appear during connect to the system.");
     NX_INI_FLAG(0, allowOsScreenSaver, "Allow OS to enable screensaver when user is not active.");
     NX_INI_FLAG(0, enableWebKitDeveloperExtras, "Enable WebKit developer tools like Inspector.");
     NX_INI_FLAG(1, enableWebKitPlugins, "Enable WebKit NPAPI plugins (Flash, Java, etc.)");

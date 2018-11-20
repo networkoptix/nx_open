@@ -1,3 +1,5 @@
+#include "client_update_tool.h"
+
 #include <common/common_module.h>
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
@@ -7,8 +9,8 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/update/update_check.h>
-#include "nx/vms/common/p2p/downloader/private/single_connection_peer_manager.h"
-#include "client_update_tool.h"
+#include <nx/vms/common/p2p/downloader/private/single_connection_peer_manager.h>
+#include <nx/vms/client/desktop/ini.h>
 
 namespace nx::vms::client::desktop {
 
@@ -17,6 +19,9 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
     m_outputDir(QDir::temp().absoluteFilePath("nx_updates/client"))
 {
     // Expecting m_outputDir to be like /temp/nx_updates/client
+
+    if (ini().massSystemUpdateClearDownloads)
+        clearDownloadFolder();
 
     vms::common::p2p::downloader::AbstractPeerSelectorPtr peerSelector;
     m_peerManager.reset(new SingleConnectionPeerManager(commonModule(), std::move(peerSelector)));
@@ -73,9 +78,8 @@ std::future<nx::update::UpdateContents> ClientUpdateTool::requestRemoteUpdateInf
     {
         // Requesting remote update info.
         m_serverConnection->getUpdateInfo(
-            [tool=QPointer<ClientUpdateTool>(this)](bool success, rest::Handle handle, const nx::update::Information& response)
+            [tool=QPointer<ClientUpdateTool>(this)](bool success, rest::Handle /*handle*/, const nx::update::Information& response)
             {
-                Q_UNUSED(handle)
                 if (tool && success)
                     tool->atRemoteUpdateInformation(response);
             }, thread());
@@ -100,8 +104,8 @@ void ClientUpdateTool::atRemoteUpdateInformation(const nx::update::Information& 
 {
     auto clientInfo = QnAppInfo::currentSystemInformation();
     QString errorMessage;
-    /* Update is allowed if either target version has the same cloud host or
-       there are no servers linked to the cloud in the system. */
+    // Update is allowed if either target version has the same cloud host or
+    // there are no servers linked to the cloud in the system.
     QString cloudUrl = nx::network::SocketGlobals::cloud().cloudHost();
     bool boundToCloud = !commonModule()->globalSettings()->cloudSystemId().isEmpty();
 
@@ -227,9 +231,8 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
     }
 }
 
-void ClientUpdateTool::atChunkDownloadFailed(const QString& fileName)
+void ClientUpdateTool::atChunkDownloadFailed(const QString& /*fileName*/)
 {
-    Q_UNUSED(fileName)
     // It is a breakpoint catcher.
     //NX_VERBOSE(this) << "atChunkDownloadFailed() failed to download chunk for" << fileName;
 }
@@ -410,6 +413,14 @@ void ClientUpdateTool::resetState()
     m_updateVersion = nx::utils::SoftwareVersion();
     m_clientPackage = nx::update::Package();
     m_remoteUpdateContents = UpdateContents();
+}
+
+void ClientUpdateTool::clearDownloadFolder()
+{
+    // Clear existing folder for downloaded update files.
+    m_outputDir.removeRecursively();
+    if (!m_outputDir.exists())
+        m_outputDir.mkpath(".");
 }
 
 ClientUpdateTool::State ClientUpdateTool::getState() const

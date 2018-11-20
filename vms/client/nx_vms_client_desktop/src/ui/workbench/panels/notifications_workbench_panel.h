@@ -91,6 +91,8 @@ private:
     QGraphicsProxyWidget* m_eventPanelContainer = nullptr;
     QScopedPointer<nx::vms::client::desktop::EventPanel> m_eventPanel;
     QPointer<HoverFocusProcessor> m_eventPanelHoverProcessor;
+
+    // Required to correctly display tooltip.
     const nx::vms::client::desktop::EventTile* m_lastHoveredTile = nullptr;
 };
 

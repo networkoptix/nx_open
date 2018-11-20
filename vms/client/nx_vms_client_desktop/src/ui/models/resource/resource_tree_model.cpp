@@ -773,25 +773,17 @@ QMimeData* QnResourceTreeModel::mimeData(const QModelIndexList& indexes) const
     return data.createMimeData();
 }
 
-bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction action,
-    int row, int column, const QModelIndex& index)
+QnResourceTreeModelNodePtr QnResourceTreeModel::dropNode(const QMimeData* mimeData,
+    int row, int column, const QModelIndex& parent, bool checkOnly) const
 {
     if (!mimeData)
-        return false;
-
-    // Check if the action is supported.
-    if (!supportedDropActions().testFlag(action))
-        return false;
-
-    // Check if the format is supported.
-    if (!intersects(mimeData->formats(), MimeData::mimeTypes()))
-        return base_type::dropMimeData(mimeData, action, row, column, index);
+        return {};
 
     // Check where we're dropping it.
-    auto node = this->node(index);
+    auto node = this->node(parent);
     NX_ASSERT(node);
     if (!node)
-        return false;
+        return {};
 
     auto check =
         [](const QnResourceTreeModelNodePtr& node, Qn::ResourceFlags flags)
@@ -803,8 +795,8 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
             return result;
         };
 
-    TRACE("Dropping on the node " << node->data(Qt::DisplayRole, 0).toString() << " type " << (int)
-        node->type());
+    TRACE((checkOnly ? "Checking if drop allowed on the node" : "Dropping on the node ")
+        << node->data(Qt::DisplayRole, 0).toString() << " type " << (int) node->type());
 
     // There are some drag&drop behaviours, that require to move up through the tree
 
@@ -813,7 +805,7 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
     {
         node = node->parent();
         if (!check(node, Qn::layout))
-            return false;
+            return {};
     }
 
     // Dropping into accessible layouts is the same as dropping into a user.
@@ -821,7 +813,7 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
     {
         node = node->parent();
         if (node->type() != ResourceTreeNodeType::role && !check(node, Qn::user))
-            return false;
+            return {};
     }
 
     // Dropping into a server camera is the same as dropping into a server.
@@ -829,7 +821,7 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
     {
         node = node->parent();
         if (!check(node, Qn::server))
-            return false;
+            return {};
     }
 
     // Dropping something into a group of resources.
@@ -841,12 +833,63 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
     {
         node = node->parent();
         if (!node)
-            return false;
+            return {};
         auto parentType = node->type();
         if (parentType != ResourceTreeNodeType::role
             && parentType != ResourceTreeNodeType::resource)
-            return false;
+        {
+            return {};
+        }
     }
+
+    return node;
+}
+
+bool QnResourceTreeModel::canDropMimeData(const QMimeData* mimeData, Qt::DropAction action,
+    int row, int column, const QModelIndex& parent) const
+{
+    if (!mimeData)
+        return false;
+
+    // Check if the action is supported.
+    if (!supportedDropActions().testFlag(action))
+        return false;
+
+    // Check if the format is supported.
+    if (!intersects(mimeData->formats(), MimeData::mimeTypes()))
+        return base_type::canDropMimeData(mimeData, action, row, column, parent);
+
+    // Check if the drop is targeted for the scene.
+    MimeData data(mimeData, resourcePool());
+    if (data.arguments().contains(Qn::ItemTimeRole))
+        return false;
+
+    auto node = dropNode(mimeData, row, column, parent, true /*checkOnly*/);
+    if (!node)
+        return false;
+
+    // TODO: #vkutin #gdm Add actual check if supplied entites/resources can be dropped on the node.
+
+    return true;
+}
+
+bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction action,
+    int row, int column, const QModelIndex& parent)
+{
+    if (!mimeData)
+        return false;
+
+    // Check if the action is supported.
+    if (!supportedDropActions().testFlag(action))
+        return false;
+
+    // Check if the format is supported.
+    if (!intersects(mimeData->formats(), MimeData::mimeTypes()))
+        return base_type::dropMimeData(mimeData, action, row, column, parent);
+
+    auto node = dropNode(mimeData, row, column, parent, false /*checkOnly*/);
+    if (!node)
+        return false;
 
     // Decode.
     // Resource tree drop is working only for resources that are already in the pool.
@@ -907,7 +950,6 @@ Qt::DropActions QnResourceTreeModel::supportedDropActions() const
 {
     return Qt::CopyAction | Qt::MoveAction;
 }
-
 
 // -------------------------------------------------------------------------- //
 // QnResourceTreeModel :: handlers

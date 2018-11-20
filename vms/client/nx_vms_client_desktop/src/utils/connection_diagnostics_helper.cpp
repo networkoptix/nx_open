@@ -28,6 +28,8 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 
+using namespace nx::vms::client::desktop;
+
 namespace {
 
 Qn::HelpTopic helpTopic(Qn::ConnectionResult result)
@@ -145,9 +147,9 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::validateConnection(
     if (result == Qn::SuccessConnectionResult)
     {
         // Forcing compatibility mode for debug purposes.
-        int level = nx::vms::client::desktop::ini().massSystemUpdateDebugInfo;
-        if (level & 2)
+        if (ini().forceCompatibilityMode)
             return handleCompatibilityMode(connectionInfo, parentWidget);
+
         return result;
     }
 

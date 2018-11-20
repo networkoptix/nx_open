@@ -5,6 +5,7 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/app_info.h>
+#include <utils/common/delayed.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/vms/api/data/software_version.h>
 #include <nx/utils/scope_guard.h>
@@ -164,7 +165,7 @@ static InformationError parseAndExtractInformation(
         NX_WARNING(typeid(Information)) << "no eulaVersion at" << baseUpdateUrl;
     }
 
-    if(!QJson::deserialize(topLevelObject, "eulaLink", &result->eulaLink))
+    if (!QJson::deserialize(topLevelObject, "eulaLink", &result->eulaLink))
     {
         NX_WARNING(typeid(Information)) << "no eulaLink at" << baseUpdateUrl;
     }
@@ -172,7 +173,7 @@ static InformationError parseAndExtractInformation(
     QString description;
     // We take update's description from the root updates.json and
     // override it by description in packages.json
-    if(QJson::deserialize(topLevelObject, "description", &description) && !description.isEmpty())
+    if (QJson::deserialize(topLevelObject, "description", &description) && !description.isEmpty())
         result->description = description;
 
     return InformationError::noError;
@@ -394,7 +395,7 @@ FindPackageResult findPackage(
 }
 
 const nx::update::Package* findPackage(
-    QString component,
+    const QString& component,
     nx::vms::api::SystemInformation& systemInfo,
     const nx::update::Information& info)
 {
@@ -412,38 +413,48 @@ const nx::update::Package* findPackage(
     return nullptr;
 }
 
-std::future<UpdateContents> checkLatestUpdate(QString updateUrl, UpdateCheckSignal* signaller)
+std::future<UpdateContents> checkLatestUpdate(
+    const QString& updateUrl,
+    UpdateCheckCallback&& callback)
 {
     return std::async(std::launch::async,
-        [updateUrl, signaller]()
+        [updateUrl, callback = std::move(callback), thread = QThread::currentThread()]()
         {
             UpdateContents result;
             result.info = nx::update::updateInformation(updateUrl, nx::update::kLatestVersion, &result.error);
             result.sourceType = UpdateSourceType::internet;
             result.source = lit("%1 for build=%2").arg(updateUrl, nx::update::kLatestVersion);
-            if (signaller)
+            if (callback)
             {
-                emit signaller->atFinished(result);
-                signaller->deleteLater();
+                executeDelayed(
+                    [callback = std::move(callback), result]()
+                    {
+                        callback(result);
+                    }, 0, thread);
             }
             return result;
         });
 }
 
-std::future<UpdateContents> checkSpecificChangeset(QString updateUrl, QString build, UpdateCheckSignal* signaller)
+std::future<UpdateContents> checkSpecificChangeset(
+    const QString& updateUrl,
+    const QString& build,
+    UpdateCheckCallback&& callback)
 {
-    //QString updateUrl = qnSettings->updateFeedUrl();
     return std::async(std::launch::async,
-        [updateUrl, build, signaller]()
+        [updateUrl, build, callback = std::move(callback), thread = QThread::currentThread()]()
         {
             UpdateContents result;
             result.info = nx::update::updateInformation(updateUrl, build, &result.error);
             result.sourceType = UpdateSourceType::internetSpecific;
             result.source = lit("%1 for build=%2").arg(updateUrl, build);
-            if (signaller)
+            if (callback)
             {
-                emit signaller->atFinished(result);
-                signaller->deleteLater();
+                executeDelayed(
+                    [callback = std::move(callback), result]()
+                    {
+                        callback(result);
+                    }, 0, thread);
             }
             return result;
         });

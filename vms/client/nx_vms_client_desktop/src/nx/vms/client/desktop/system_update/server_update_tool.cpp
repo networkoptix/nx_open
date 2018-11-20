@@ -529,8 +529,6 @@ nx::update::UpdateContents ServerUpdateTool::getRemoteUpdateContents() const
     contents.info = m_updateManifest;
     auto clientInfo = QnAppInfo::currentSystemInformation();
     QString errorMessage;
-    /* Update is allowed if either target version has the same cloud host or
-       there are no servers linked to the cloud in the system. */
     QString cloudUrl = nx::network::SocketGlobals::cloud().cloudHost();
     bool boundToCloud = !commonModule()->globalSettings()->cloudSystemId().isEmpty();
 
@@ -538,7 +536,6 @@ nx::update::UpdateContents ServerUpdateTool::getRemoteUpdateContents() const
         clientInfo,
         m_updateManifest,
         true, cloudUrl, boundToCloud, &contents.clientPackage, &errorMessage);
-    //contents.clientPackage =
     verifyUpdateManifest(contents);
     return contents;
 }
@@ -580,9 +577,8 @@ void ServerUpdateTool::requestInstallAction(QSet<QnUuid> targets)
     NX_VERBOSE(this) << "requestInstallAction() for" << targets;
     m_updatesModel->setServersInstalling(targets);
 
-    auto callback = [tool=QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle)
+    auto callback = [tool=QPointer<ServerUpdateTool>(this)](bool /*success*/, rest::Handle handle)
         {
-            Q_UNUSED(success)
             if (tool)
                 tool->m_requestingInstall.remove(handle);
         };

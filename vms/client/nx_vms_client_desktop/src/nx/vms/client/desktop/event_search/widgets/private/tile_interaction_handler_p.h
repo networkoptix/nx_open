@@ -3,7 +3,9 @@
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSet>
+#include <QtGui/QPixmap>
 
+#include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnGraphicsMessageBox;
@@ -30,10 +32,13 @@ private:
 
     void navigateToSource(const QModelIndex& index);
     void openSource(const QModelIndex& index, bool inNewTab);
+    void performDragAndDrop(const QModelIndex& index, const QPoint& pos, const QSize& size);
 
     void showMessage(const QString& text);
     void showMessageDelayed(const QString& text, std::chrono::milliseconds delay);
     void hideMessages();
+
+    QPixmap createDragPixmap(const QnVirtualCameraResourceList& cameras, int width) const;
 
 private:
     const QPointer<EventRibbon> m_ribbon;

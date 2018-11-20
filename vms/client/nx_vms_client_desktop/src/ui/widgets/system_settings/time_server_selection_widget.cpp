@@ -264,8 +264,8 @@ void QnTimeServerSelectionWidget::updateTime()
 void QnTimeServerSelectionWidget::updateDescription()
 {
     ui->descriptionLabel->setText(ui->syncWithInternetCheckBox->isChecked()
-        ? tr("System time is synchronized with the Internet and does not depend on local time on servers.")
-        : tr("System time is synchronized with local time on the selected server and does not depend on local time on other servers."));
+        ? tr("VMS time is synchronized with the Internet and does not depend on local time on servers.")
+        : tr("VMS time is synchronized with local time on the selected server and does not depend on local time on other servers."));
 }
 
 void QnTimeServerSelectionWidget::updateAlert()
