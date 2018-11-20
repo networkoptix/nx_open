@@ -400,6 +400,15 @@
             }
           },
           {
+            "name": "contactEmail",
+            "label": "Contact Email",
+            "value": "",
+            "description": "Please provide an email which will be able to address all questions about this integration and support tickets. This email will not be visible on the Integration page, but will be used by us and our partners to address issues.",
+            "type": "text",
+            "optional": false,
+            "public": false
+          },
+          {
             "name": "shortDescription",
             "label": "Description",
             "value": "",
