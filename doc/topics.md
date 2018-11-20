@@ -9,3 +9,5 @@
 @subpage right_panel
 
 @subpage root_tool
+
+@subpage widgets_lib
