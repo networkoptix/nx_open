@@ -59,6 +59,7 @@ Download link takes you to the /downloads page
 #    Wait Until Element Is Visible    ${LOG IN MODAL}
 
 Going to the downloads page anonymous asks for login and closing takes you back to home
+    [tags]    C42069
     Wait Until Element Is Visible    ${DOWNLOAD LINK}
     Click Link    ${DOWNLOAD LINK}
     Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
@@ -66,6 +67,7 @@ Going to the downloads page anonymous asks for login and closing takes you back 
     Location Should Be    ${url}/
 
 Going to the downloads page anonymous asks for login and login shows downloads page
+    [tags]    C42069
     Go to download page
 
 Going to the downloads page should show you the tab according to your OS
