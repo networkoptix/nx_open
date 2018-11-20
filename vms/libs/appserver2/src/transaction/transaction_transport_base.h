@@ -98,7 +98,7 @@ public:
     /** Initializer for incoming connection. */
     QnTransactionTransportBase(
         const QnUuid& localSystemId,
-        const QnUuid& connectionGuid,
+        const std::string& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
         const nx::vms::api::PeerData& localPeer,
         const nx::vms::api::PeerData& remotePeer,
@@ -106,14 +106,18 @@ public:
         const nx::network::http::Request& request,
         const QByteArray& contentEncoding,
         std::chrono::milliseconds tcpKeepAliveTimeout,
-        int keepAliveProbeCount);
+        int keepAliveProbeCount,
+        nx::network::aio::AbstractAioThread* aioThread = nullptr);
+
     //!Initializer for outgoing connection
     QnTransactionTransportBase(
         const QnUuid& localSystemId,
         ConnectionGuardSharedState* const connectionGuardSharedState,
         const nx::vms::api::PeerData& localPeer,
         std::chrono::milliseconds tcpKeepAliveTimeout,
-        int keepAliveProbeCount);
+        int keepAliveProbeCount,
+        nx::network::aio::AbstractAioThread* aioThread = nullptr);
+
     ~QnTransactionTransportBase();
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
@@ -192,7 +196,7 @@ public:
 
     void transactionProcessed();
 
-    QnUuid connectionGuid() const;
+    std::string connectionGuid() const;
     void setIncomingTransactionChannelSocket(
         std::unique_ptr<nx::network::AbstractCommunicatingSocket> socket,
         const nx::network::http::Request& request,
@@ -284,7 +288,7 @@ private:
     std::shared_ptr<nx::utils::bstream::AbstractByteStreamFilter> m_incomingTransactionStreamParser;
     std::shared_ptr<nx::utils::bstream::AbstractByteStreamFilter> m_sizedDecoder;
     bool m_compressResponseMsgBody;
-    QnUuid m_connectionGuid;
+    std::string m_connectionGuid;
     ConnectionGuardSharedState* const m_connectionGuardSharedState;
     std::unique_ptr<ConnectionLockGuard> m_connectionLockGuard;
     nx::network::http::AsyncHttpClientPtr m_outgoingTranClient;
@@ -317,7 +321,8 @@ private:
         const nx::vms::api::PeerData& localPeer,
         PeerRole peerRole,
         std::chrono::milliseconds tcpKeepAliveTimeout,
-        int keepAliveProbeCount);
+        int keepAliveProbeCount,
+        nx::network::aio::AbstractAioThread* aioThread);
 
     void sendHttpKeepAlive();
     void processTransactionData( const QByteArray& data);

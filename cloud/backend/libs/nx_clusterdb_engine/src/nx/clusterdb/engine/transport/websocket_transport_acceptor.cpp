@@ -105,7 +105,7 @@ void WebSocketTransportAcceptor::addWebSocketTransactionTransport(
     auto webSocket = std::make_unique<network::websocket::WebSocket>(
         std::move(connection));
 
-    auto connectionId = QnUuid::createUuid();
+    const auto connectionId = QnUuid::createUuid().toSimpleString().toStdString();
 
     auto transactionTransport = std::make_unique<WebSocketTransactionTransport>(
         m_protocolVersionRange,
@@ -119,7 +119,7 @@ void WebSocketTransportAcceptor::addWebSocketTransactionTransport(
 
     ConnectionManager::ConnectionContext context{
         std::move(transactionTransport),
-        connectionId.toSimpleByteArray().toStdString(),
+        connectionId,
         {systemId, remotePeerInfo.id.toByteArray().toStdString()},
         userAgent};
 

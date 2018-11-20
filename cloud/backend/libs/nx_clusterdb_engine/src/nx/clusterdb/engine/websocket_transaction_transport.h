@@ -27,7 +27,7 @@ public:
         TransactionLog* const transactionLog,
         const std::string& systemId,
         const OutgoingCommandFilter& filter,
-        const QnUuid& connectionId,
+        const std::string& connectionId,
         std::unique_ptr<network::websocket::WebSocket> webSocket,
         vms::api::PeerDataEx localPeerData,
         vms::api::PeerDataEx remotePeerData);
@@ -35,7 +35,7 @@ public:
     virtual network::SocketAddress remotePeerEndpoint() const override;
     virtual ConnectionClosedSubscription& connectionClosedSubscription() override;
     virtual void setOnGotTransaction(CommandHandler handler) override;
-    virtual QnUuid connectionGuid() const override;
+    virtual std::string connectionGuid() const override;
     virtual const TransactionTransportHeader& commonTransportHeaderOfRemoteTransaction() const override;
     virtual void sendTransaction(
         TransactionTransportHeader transportHeader,
@@ -77,7 +77,7 @@ private:
     bool m_tranLogRequestInProgress = false;
     vms::api::TranState m_remoteSubscription; //< remote -> local subscription
     const std::string m_systemId;
-    QnUuid m_connectionGuid;
+    std::string m_connectionGuid;
 };
 
 } // namespace nx::clusterdb::engine::transport
