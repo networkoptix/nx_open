@@ -9,6 +9,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/update/update_check.h>
+#include <nx/vms/client/desktop/ini.h>
 #include "nx/vms/common/p2p/downloader/private/single_connection_peer_manager.h"
 
 namespace nx::vms::client::desktop {
@@ -18,6 +19,10 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
     m_outputDir(QDir::temp().absoluteFilePath("nx_updates/client"))
 {
     // Expecting m_outputDir to be like /temp/nx_updates/client
+
+    auto debugFlags = Ini::UpdateDebugFlags(ini().massSystemUpdateDebugInfo);
+    if (debugFlags.testFlag(Ini::UpdateDebugFlag::forceClientDownloaderCleanup))
+        cleanDownloadFolder();
 
     vms::common::p2p::downloader::AbstractPeerSelectorPtr peerSelector;
     m_peerManager.reset(new SingleConnectionPeerManager(commonModule(), std::move(peerSelector)));
@@ -409,6 +414,14 @@ void ClientUpdateTool::resetState()
     m_updateVersion = nx::utils::SoftwareVersion();
     m_clientPackage = nx::update::Package();
     m_remoteUpdateContents = UpdateContents();
+}
+
+void ClientUpdateTool::cleanDownloadFolder()
+{
+    // Clean up existing folder for updates.
+    m_outputDir.removeRecursively();
+    if (!m_outputDir.exists())
+        m_outputDir.mkpath(".");
 }
 
 ClientUpdateTool::State ClientUpdateTool::getState() const

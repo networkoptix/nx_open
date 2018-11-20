@@ -127,10 +127,8 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
 {
     ui->setupUi(this);
 
-    using Ini = nx::vms::client::desktop::Ini;
-    const auto& ini = nx::vms::client::desktop::ini();
-    auto debugFlags = Ini::UpdateDebugFlags(ini.massSystemUpdateDebugInfo);
-    m_showDebugData = debugFlags.testFlag(Ini::UpdateDebugFlag::ShowInfo);
+    auto debugFlags = Ini::UpdateDebugFlags(ini().massSystemUpdateDebugInfo);
+    m_showDebugData = debugFlags.testFlag(Ini::UpdateDebugFlag::showInfo);
 
     m_serverUpdateTool.reset(new ServerUpdateTool(this));
     m_clientUpdateTool.reset(new ClientUpdateTool(this));

@@ -149,6 +149,7 @@ protected:
     void setState(State newState);
     void setError(QString error);
     void setApplauncherError(QString error);
+    void cleanDownloadFolder();
 
     std::unique_ptr<Downloader> m_downloader;
     // Directory to store unpacked files.

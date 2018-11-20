@@ -148,7 +148,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::validateConnection(
         using Ini = nx::vms::client::desktop::Ini;
         const auto& ini = nx::vms::client::desktop::ini();
         auto debugFlags = Ini::UpdateDebugFlags(ini.massSystemUpdateDebugInfo);
-        if (debugFlags.testFlag(Ini::UpdateDebugFlag::ForceCompatibilityDialog))
+        if (debugFlags.testFlag(Ini::UpdateDebugFlag::forceCompatibilityDialog))
             return handleCompatibilityMode(connectionInfo, parentWidget);
 
         return result;

@@ -32,8 +32,10 @@ class ServerStatusItemDelegate;
 
 struct UpdateItem;
 
-// Widget deals with update for multiple servers.
-// Widget is spawned as a tab for System Administraton menu.
+/**
+ * Deals with update for multiple servers.
+ * It is spawned as a tab for System Administraton menu.
+ */
 class MultiServerUpdatesWidget:
     public QnAbstractPreferencesWidget,
     public QnSessionAwareDelegate

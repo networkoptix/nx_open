@@ -9,10 +9,12 @@ struct Ini: nx::kit::IniConfig
 {
     enum class UpdateDebugFlag
     {
-        /// MultiServerUpdateWidget will show a lot of internal information.
-        ShowInfo = 1 << 1,
-        /// Force CompatibilityMode dialog to appear when we connect to the system.
-        ForceCompatibilityDialog = 1 << 2,
+        // MultiServerUpdateWidget will show a lot of internal information.
+        showInfo = 1,
+        // Force CompatibilityMode dialog to appear when we connect to the system.
+        forceCompatibilityDialog = 1 << 1,
+        // Force ClientUpdateTool to clean up downloaded data when it starts.
+        forceClientDownloaderCleanup = 1 << 2,
     };
     Q_DECLARE_FLAGS(UpdateDebugFlags, UpdateDebugFlag);
 
