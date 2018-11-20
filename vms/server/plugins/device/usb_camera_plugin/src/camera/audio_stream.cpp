@@ -197,7 +197,7 @@ int AudioStream::AudioStreamPrivate::initializeInputFormat()
     int result = inputFormat->initialize(ffmpegDeviceType());
     if (result < 0)
         return result;
-    
+
 #ifdef WIN32
     // Decrease audio latency by reducing audio buffer size
     inputFormat->setEntry("audio_buffer_size", (int64_t)80); //< 80 milliseconds
@@ -439,14 +439,14 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::mergePackets(
     *outFfmpegError = newPacket->newPacket(size);
     if (*outFfmpegError < 0)
         return nullptr;
-       
+
     uint8_t * data = newPacket->data();
     for (const auto & pkt : m_packetMergeBuffer)
     {
         memcpy(data, pkt->data(), pkt->size());
         data += pkt->size();
     }
-    
+
     newPacket->setTimestamp(packet->timestamp());
     m_packetMergeBuffer.clear();
 
