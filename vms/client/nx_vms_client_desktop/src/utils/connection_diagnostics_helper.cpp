@@ -145,9 +145,12 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::validateConnection(
     if (result == Qn::SuccessConnectionResult)
     {
         // Forcing compatibility mode for debug purposes.
-        int level = nx::vms::client::desktop::ini().massSystemUpdateDebugInfo;
-        if (level & 2)
+        using Ini = nx::vms::client::desktop::Ini;
+        const auto& ini = nx::vms::client::desktop::ini();
+        auto debugFlags = Ini::UpdateDebugFlags(ini.massSystemUpdateDebugInfo);
+        if (debugFlags.testFlag(Ini::UpdateDebugFlag::ForceCompatibilityDialog))
             return handleCompatibilityMode(connectionInfo, parentWidget);
+
         return result;
     }
 

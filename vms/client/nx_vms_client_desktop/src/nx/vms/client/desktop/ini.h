@@ -1,11 +1,21 @@
 #pragma once
 
+#include <QtCore/QFlags>
 #include <nx/kit/ini_config.h>
 
 namespace nx::vms::client::desktop {
 
-struct Ini: public nx::kit::IniConfig
+struct Ini: nx::kit::IniConfig
 {
+    enum class UpdateDebugFlag
+    {
+        /// MultiServerUpdateWidget will show a lot of internal information.
+        ShowInfo = 1 << 1,
+        /// Force CompatibilityMode dialog to appear when we connect to the system.
+        ForceCompatibilityDialog = 1 << 2,
+    };
+    Q_DECLARE_FLAGS(UpdateDebugFlags, UpdateDebugFlag);
+
     Ini(): IniConfig("desktop_client.ini") {}
 
     NX_INI_STRING("", cloudHost, "Overridden Cloud Host");
