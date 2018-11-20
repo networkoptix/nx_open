@@ -127,8 +127,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
 {
     ui->setupUi(this);
 
-    auto debugFlags = Ini::UpdateDebugFlags(ini().massSystemUpdateDebugInfo);
-    m_showDebugData = debugFlags.testFlag(Ini::UpdateDebugFlag::showInfo);
+    m_showDebugData = ini().massSystemUpdateDebugInfo;
 
     m_serverUpdateTool.reset(new ServerUpdateTool(this));
     m_clientUpdateTool.reset(new ClientUpdateTool(this));

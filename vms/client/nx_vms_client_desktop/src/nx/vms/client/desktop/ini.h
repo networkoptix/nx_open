@@ -1,23 +1,11 @@
 #pragma once
 
-#include <QtCore/QFlags>
 #include <nx/kit/ini_config.h>
 
 namespace nx::vms::client::desktop {
 
 struct Ini: nx::kit::IniConfig
 {
-    enum class UpdateDebugFlag
-    {
-        // MultiServerUpdateWidget will show a lot of internal information.
-        showInfo = 1,
-        // Force CompatibilityMode dialog to appear when we connect to the system.
-        forceCompatibilityDialog = 1 << 1,
-        // Force ClientUpdateTool to clean up downloaded data when it starts.
-        forceClientDownloaderCleanup = 1 << 2,
-    };
-    Q_DECLARE_FLAGS(UpdateDebugFlags, UpdateDebugFlag);
-
     Ini(): IniConfig("desktop_client.ini") {}
 
     NX_INI_STRING("", cloudHost, "Overridden Cloud Host");
@@ -46,7 +34,12 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(0, showDebugTimeInformationInRibbon, "Show extra timestamp information in event ribbon");
     NX_INI_FLAG(0, showPreciseItemTimestamps, "Show precise timestamps on scene items");
     NX_INI_FLAG(1, massSystemUpdatePrototype, "Enable experimental system update.");
-    NX_INI_INT(0, massSystemUpdateDebugInfo, "Show additional debug information for experimental update system.");
+    NX_INI_FLAG(0, massSystemUpdateDebugInfo,
+        "Show additional debug information for experimental update system.");
+    NX_INI_FLAG(0, massSystemUpdateClearDownloads,
+        "Forces client to remove downloaded data for system updates.");
+    NX_INI_FLAG(0, forceCompatibilityMode,
+        "Forces compatibility mode dialog to appear during connect to the system.");
     NX_INI_FLAG(0, allowOsScreenSaver, "Allow OS to enable screensaver when user is not active.");
     NX_INI_FLAG(0, enableWebKitDeveloperExtras, "Enable WebKit developer tools like Inspector.");
     NX_INI_FLAG(1, enableWebKitPlugins, "Enable WebKit NPAPI plugins (Flash, Java, etc.)");
