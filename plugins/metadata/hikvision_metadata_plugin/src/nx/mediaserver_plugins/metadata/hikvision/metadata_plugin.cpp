@@ -4,6 +4,8 @@
 #include "string_helper.h"
 #include "attributes_parser.h"
 
+#include <chrono>
+
 #include <QtCore/QString>
 #include <QtCore/QUrlQuery>
 #include <QtCore/QFile>
@@ -24,6 +26,7 @@ namespace {
 const char* kPluginName = "Hikvision metadata plugin";
 const QString kHikvisionTechwinVendor = lit("hikvision");
 static const std::chrono::seconds kCacheTimeout{60};
+static const std::chrono::seconds kRequestTimeout{10};
 
 } // namespace
 
@@ -175,23 +178,50 @@ boost::optional<QList<QnUuid>> MetadataPlugin::fetchSupportedEvents(
     if (!data.hasExpired())
         return data.supportedEventTypes;
 
+    using namespace std::chrono;
+
     QUrl url(cameraInfo.url);
     url.setPath("/ISAPI/Event/triggersCap");
-    url.setUserInfo(cameraInfo.login);
-    url.setPassword(cameraInfo.password);
-    int statusCode = 0;
-    QByteArray buffer;
-    if (nx_http::downloadFileSync(url, &statusCode, &buffer) != SystemError::noError ||
-        statusCode != nx_http::StatusCode::ok)
+
+    nx_http::HttpClient httpClient;
+    httpClient.setResponseReadTimeoutMs(
+        (unsigned int) duration_cast<milliseconds>(kRequestTimeout).count());
+    httpClient.setSendTimeoutMs(
+        (unsigned int) duration_cast<milliseconds>(kRequestTimeout).count());
+    httpClient.setMessageBodyReadTimeoutMs(
+        (unsigned int) duration_cast<milliseconds>(kRequestTimeout).count());
+    httpClient.setUserName(cameraInfo.login);
+    httpClient.setUserPassword(cameraInfo.password);
+
+    const auto result = httpClient.doGet(url);
+    const auto response = httpClient.response();
+
+    if (!result || !response)
     {
-        NX_WARNING(this,lm("Can't fetch supported events for device %1. HTTP status code: %2").
-            arg(cameraInfo.url).arg(statusCode));
+        NX_WARNING(
+            this,
+            lm("No response for supported events request %1.").args(cameraInfo.url));
+        data.timeout.invalidate();
         return boost::optional<QList<QnUuid>>();
     }
+
+    const auto statusCode = response->statusLine.statusCode;
+    const auto buffer = httpClient.fetchEntireMessageBody();
+    if (!nx_http::StatusCode::isSuccessCode(statusCode) || !buffer)
+    {
+        NX_WARNING(
+            this,
+            lm("Unable to fetch supported events for device %1. HTTP status code: %2")
+                .args(cameraInfo.url, statusCode));
+        data.timeout.invalidate();
+        return boost::optional<QList<QnUuid>>();
+    }
+
     NX_DEBUG(this, lm("Device url %1. RAW list of supported analytics events: %2").
         arg(cameraInfo.url).arg(buffer));
 
-    data.supportedEventTypes = parseSupportedEvents(buffer);
+    data.supportedEventTypes = parseSupportedEvents(*buffer);
+    data.timeout.restart();
     return data.supportedEventTypes;
 }
 
