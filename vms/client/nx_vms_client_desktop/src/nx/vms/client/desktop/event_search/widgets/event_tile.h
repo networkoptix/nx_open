@@ -71,11 +71,6 @@ public:
     CommandActionPtr action() const;
     void setAction(const CommandActionPtr& value);
 
-    bool hasAutoClose() const;
-    std::chrono::milliseconds autoCloseTime() const;
-    std::chrono::milliseconds autoCloseRemainingTime() const;
-    void setAutoCloseTime(std::chrono::milliseconds value);
-
     bool busyIndicatorVisible() const;
     void setBusyIndicatorVisible(bool value);
 
@@ -87,9 +82,6 @@ public:
 
     QString progressTitle() const;
     void setProgressTitle(const QString& value);
-
-    bool isRead() const;
-    void setRead(bool value);
 
     bool previewEnabled() const;
     void setPreviewEnabled(bool value);

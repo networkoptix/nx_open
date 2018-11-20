@@ -70,7 +70,6 @@ struct EventTile::Private
     bool closeable = false;
     CommandActionPtr action; //< Button action.
     QnElidedLabel* const progressLabel;
-    QScopedPointer<QTimer, QScopedPointerDeleteLater> autoCloseTimer;
     const QScopedPointer<QTimer> loadPreviewTimer;
     qreal progressValue = 0.0;
     bool isRead = false;
@@ -101,14 +100,6 @@ struct EventTile::Private
 
         if (showCloseButton)
             closeButton->raise();
-
-        if (autoCloseTimer)
-        {
-            if (hovered)
-                autoCloseTimer->stop();
-            else
-                autoCloseTimer->start();
-        }
     }
 
     void updateBackgroundRole(bool hovered)
@@ -606,56 +597,6 @@ bool EventTile::event(QEvent* event)
     return base_type::event(event);
 }
 
-bool EventTile::hasAutoClose() const
-{
-    return closeable() && d->autoCloseTimer;
-}
-
-milliseconds EventTile::autoCloseTime() const
-{
-    return milliseconds(hasAutoClose() ? d->autoCloseTimer->interval() : 0);
-}
-
-milliseconds EventTile::autoCloseRemainingTime() const
-{
-    return milliseconds(hasAutoClose() ? d->autoCloseTimer->remainingTime() : 0);
-}
-
-void EventTile::setAutoCloseTime(milliseconds value)
-{
-    if (value <= 0ms)
-    {
-        d->autoCloseTimer.reset();
-        return;
-    }
-
-    const auto autoClose =
-        [this]()
-        {
-            if (closeable())
-                emit closeRequested();
-        };
-
-    if (d->autoCloseTimer)
-    {
-        if (!d->isRead)
-            d->autoCloseTimer->stop();
-
-        d->autoCloseTimer->setInterval(value.count());
-    }
-    else
-    {
-        d->autoCloseTimer.reset(new QTimer(this));
-        d->autoCloseTimer->setSingleShot(true);
-        d->autoCloseTimer->setInterval(value.count());
-
-        connect(d->autoCloseTimer.get(), &QTimer::timeout, this, autoClose);
-
-        if (d->isRead)
-            d->autoCloseTimer->start();
-    }
-}
-
 bool EventTile::busyIndicatorVisible() const
 {
     return !ui->busyIndicator->isHidden();
@@ -710,19 +651,6 @@ QString EventTile::progressTitle() const
 void EventTile::setProgressTitle(const QString& value)
 {
     d->progressLabel->setText(value);
-}
-
-bool EventTile::isRead() const
-{
-    return d->isRead;
-}
-
-void EventTile::setRead(bool value)
-{
-    d->isRead = value;
-
-    if (d->isRead && d->autoCloseTimer)
-        d->autoCloseTimer->start();
 }
 
 bool EventTile::previewEnabled() const
@@ -838,12 +766,10 @@ void EventTile::clear()
     setPreview({});
     setPreviewCropRect({});
     setAction({});
-    setAutoCloseTime({});
     setBusyIndicatorVisible(false);
     setProgressBarVisible(false);
     setProgressValue(0.0);
     setProgressTitle({});
-    setRead(false);
     setResourceList(QStringList());
     setToolTip({});
     setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);

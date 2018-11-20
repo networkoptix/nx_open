@@ -27,6 +27,8 @@
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/range_adapters.h>
 #include <nx/utils/scoped_connections.h>
 
 #include <nx/vms/client/desktop/ini.h>
@@ -48,6 +50,17 @@ static constexpr qreal kHighlightCurtainOpacity = 0.25;
 static constexpr milliseconds kHighlightDuration = 400ms;
 static constexpr milliseconds kAnimationDuration = 250ms;
 
+/*
+ * Tiles can have optional timed auto-close mode.
+ * When such tile is first created, expiration timer is set to kInvisibleAutoCloseDelay.
+ * Every time the tile becomes visible, remaining time is reset to kVisibleAutoCloseDelay.
+ * When the tile becomes invisible, remaining time is not changed.
+ * When the tile is hovered, the timer is ignored.
+ * When the tile stops being hovered, remaining time is reset to kVisibleAutoCloseDelay.
+ */
+static constexpr milliseconds kVisibleAutoCloseDelay = 20s;
+static constexpr milliseconds kInvisibleAutoCloseDelay = 80s;
+
 QSize minimumWidgetSize(QWidget* widget)
 {
     return widget->minimumSizeHint()
@@ -60,7 +73,8 @@ QSize minimumWidgetSize(QWidget* widget)
 EventRibbon::Private::Private(EventRibbon* q):
     q(q),
     m_scrollBar(new QScrollBar(Qt::Vertical, q)),
-    m_viewport(new QWidget(q))
+    m_viewport(new QWidget(q)),
+    m_autoCloseTimer(new QTimer())
 {
     q->setAttribute(Qt::WA_Hover);
     m_viewport->setAttribute(Qt::WA_Hover);
@@ -78,6 +92,9 @@ EventRibbon::Private::Private(EventRibbon* q):
         this, &Private::updateView);
 
     connect(m_scrollBar.get(), &QScrollBar::valueChanged, this, &Private::updateView);
+
+    m_autoCloseTimer->setInterval(1s);
+    connect(m_autoCloseTimer.get(), &QTimer::timeout, this, &Private::closeExpiredTiles);
 
     NX_ASSERT(Importance() == Importance::NoNotification);
 }
@@ -101,8 +118,12 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
 
     m_model = model;
 
+    m_autoCloseTimer->stop();
+
     if (!m_model)
         return;
+
+    m_autoCloseTimer->start();
 
     insertNewTiles(0, m_model->rowCount(), UpdateMode::instant);
 
@@ -182,7 +203,6 @@ void EventRibbon::Private::updateTile(int index)
         constexpr int kIndicatorHeight = 24;
         widget->setFixedHeight(kIndicatorHeight);
         widget->setBusyIndicatorVisible(busyIndicatorVisibility.toBool());
-        widget->setRead(true);
         return;
     }
 
@@ -216,7 +236,6 @@ void EventRibbon::Private::updateTile(int index)
     widget->setFooterText(modelIndex.data(Qn::AdditionalTextRole).toString());
     widget->setToolTip(modelIndex.data(Qt::ToolTipRole).toString());
     widget->setCloseable(modelIndex.data(Qn::RemovableRole).toBool());
-    widget->setAutoCloseTime(modelIndex.data(Qn::TimeoutRole).value<milliseconds>());
     widget->setAction(modelIndex.data(Qn::CommandActionRole).value<CommandActionPtr>());
     widget->setTitleColor(modelIndex.data(Qt::ForegroundRole).value<QColor>());
     widget->setFooterEnabled(m_footersEnabled);
@@ -362,6 +381,7 @@ void EventRibbon::Private::ensureWidget(int index)
     }
 
     widget->show();
+    handleWidgetChanged(index);
 }
 
 void EventRibbon::Private::reserveWidget(int index)
@@ -369,12 +389,13 @@ void EventRibbon::Private::reserveWidget(int index)
     NX_CRITICAL(index >= 0 && index < count());
 
     auto& widget = m_tiles[index]->widget;
-    if (widget)
-    {
-        widget->hide();
-        widget->clear();
-        m_reserveWidgets.emplace(widget.release());
-    }
+    if (!widget)
+        return;
+
+    widget->hide();
+    widget->clear();
+    m_reserveWidgets.emplace(widget.release());
+    handleWidgetChanged(index);
 }
 
 void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRelativeToTile)
@@ -394,6 +415,73 @@ void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRel
     menu->exec(globalPos);
 }
 
+void EventRibbon::Private::cleanupDeletingTile(int index)
+{
+    const auto& tile = m_tiles[index];
+    NX_ASSERT(tile);
+    if (!tile)
+        return;
+
+    m_deadlines.remove(tile.get());
+    reserveWidget(index);
+
+    if (m_hoveredTile == tile.get())
+        m_hoveredTile = nullptr;
+
+    const auto importance = tile->importance;
+    if (importance != Importance())
+    {
+        --m_unreadCounts[int(importance)];
+        --m_totalUnreadCount;
+    }
+}
+
+void EventRibbon::Private::handleWidgetChanged(int index)
+{
+    if (!m_tiles[index]->widget)
+        return;
+
+    const auto iter = m_deadlines.find(m_tiles[index].get());
+    if (iter != m_deadlines.end())
+        iter->timer.setRemainingTime(kVisibleAutoCloseDelay);
+}
+
+void EventRibbon::Private::closeExpiredTiles()
+{
+    if (!m_model)
+        return;
+
+    QList<Tile*> expired;
+    const int oldDeadlineCount = m_deadlines.size();
+
+    for (const auto& [tile, deadline]: nx::utils::keyValueRange(m_deadlines))
+    {
+        if (tile != m_hoveredTile && deadline.timer.hasExpired() && deadline.index.isValid())
+            expired.push_back(tile);
+    }
+
+    if (expired.empty())
+        return;
+
+    const auto unreadCountGuard = makeUnreadCountGuard();
+
+    for (const auto tile: expired)
+        m_model->removeRows(m_deadlines[tile].index.row(), 1);
+
+    NX_VERBOSE(q) << "Expired" << expired.size() << "tiles";
+    NX_ASSERT(expired.size() == (oldDeadlineCount - m_deadlines.size()));
+};
+
+nx::utils::Guard EventRibbon::Private::makeUnreadCountGuard()
+{
+    return nx::utils::Guard(
+        [this, oldUnreadCount = m_totalUnreadCount]()
+        {
+            if (m_totalUnreadCount != oldUnreadCount)
+                emit q->unreadCountChanged(m_totalUnreadCount, highestUnreadImportance(), {});
+        });
+}
+
 void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updateMode)
 {
     if (!m_model || count == 0)
@@ -409,7 +497,7 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
         ? m_tiles[index - 1]->position + m_tiles[index - 1]->height + kDefaultTileSpacing
         : 0;
 
-    const auto oldUnreadCount = unreadCount();
+    const auto unreadCountGuard = makeUnreadCountGuard();
     const bool viewportVisible = m_viewport->isVisible() && m_viewport->width() > 0;
 
     if (!viewportVisible)
@@ -420,8 +508,16 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
 
     for (int i = index; i < endIndex; ++i)
     {
-        const auto importance = m_model->index(i).data(Qn::NotificationLevelRole).value<Importance>();
-        m_tiles.insert(m_tiles.begin() + i, TilePtr(new Tile(currentPosition, importance)));
+        const auto modelIndex = m_model->index(i);
+        const auto importance = modelIndex.data(Qn::NotificationLevelRole).value<Importance>();
+        const auto closeable = modelIndex.data(Qn::RemovableRole).toBool();
+        const auto timeout = modelIndex.data(Qn::TimeoutRole).value<milliseconds>();
+
+        TilePtr tile(new Tile(currentPosition, importance));
+        if (closeable && timeout > 0ms)
+            m_deadlines[tile.get()] = Deadline{kInvisibleAutoCloseDelay, modelIndex};
+
+        m_tiles.insert(m_tiles.begin() + i, std::move(tile));
         currentPosition += kApproximateTileHeight + kDefaultTileSpacing;
 
         if (importance != Importance())
@@ -488,9 +584,6 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
         }
     }
 
-    if (unreadCount() != oldUnreadCount)
-        emit q->unreadCountChanged(unreadCount(), highestUnreadImportance(), PrivateSignal());
-
     emit q->countChanged(this->count());
 }
 
@@ -506,13 +599,11 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMo
         return;
     }
 
+    const auto unreadCountGuard = makeUnreadCountGuard();
+
     const int end = first + count;
     const int last = end - 1;
     const int nextPosition = m_tiles[last]->position + m_tiles[last]->height + kDefaultTileSpacing;
-
-    const auto reserveRange = m_visible.intersected({first, end});
-    for (int i = reserveRange.lower(); i != reserveRange.upper(); ++i)
-        reserveWidget(i);
 
     int delta = 0;
     const bool topmostTileWasVisible = m_visible.contains(first);
@@ -532,16 +623,9 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMo
 
     m_visible = newVisible;
 
-    const auto oldUnreadCount = unreadCount();
     for (int i = first; i < end; ++i)
     {
-        const auto importance = m_tiles[i]->importance;
-        if (importance != Importance())
-        {
-            --m_unreadCounts[int(importance)];
-            --m_totalUnreadCount;
-        }
-
+        cleanupDeletingTile(i);
         delta += m_tiles[i]->height + kDefaultTileSpacing;
     }
 
@@ -574,21 +658,19 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMo
 
     doUpdateView();
 
-    if (unreadCount() != oldUnreadCount)
-        emit q->unreadCountChanged(unreadCount(), highestUnreadImportance(), PrivateSignal());
-
     emit q->countChanged(this->count());
 }
 
 void EventRibbon::Private::clear()
 {
-    const auto hadUnreadTiles = unreadCount() != 0;
+    const auto unreadCountGuard = makeUnreadCountGuard();
     m_unreadCounts = {};
     m_totalUnreadCount = 0;
+    m_deadlines = {};
 
     m_tiles.clear();
     m_visible = {};
-    m_hoveredWidget = nullptr;
+    m_hoveredTile = nullptr;
     m_totalHeight = 0;
     m_live = true;
 
@@ -596,9 +678,6 @@ void EventRibbon::Private::clear()
     setScrollBarRelevant(false);
 
     q->updateGeometry();
-
-    if (hadUnreadTiles)
-        emit q->unreadCountChanged(0, Importance(), PrivateSignal());
 
     emit q->countChanged(count());
 }
@@ -817,11 +896,8 @@ void EventRibbon::Private::setViewportMargins(int top, int bottom)
 
 void EventRibbon::Private::updateView()
 {
-    const auto oldUnreadCount = unreadCount();
+    const auto unreadCountGuard = makeUnreadCountGuard();
     doUpdateView();
-
-    if (unreadCount() != oldUnreadCount)
-        emit q->unreadCountChanged(unreadCount(), highestUnreadImportance(), PrivateSignal());
 }
 
 void EventRibbon::Private::doUpdateView()
@@ -891,12 +967,11 @@ void EventRibbon::Private::doUpdateView()
         }
         else
         {
-            if (tile->importance != Importance() && shouldSetTileRead(tile->widget.get()))
+            if (tile->importance != Importance())
             {
                 --m_totalUnreadCount;
                 --m_unreadCounts[int(tile->importance)];
                 tile->importance = Importance();
-                tile->widget->setRead(true);
             }
         }
 
@@ -939,16 +1014,6 @@ void EventRibbon::Private::doUpdateView()
 
     if (!m_currentShifts.empty()) //< If has running animations.
         qApp->postEvent(m_viewport.get(), new QEvent(QEvent::LayoutRequest));
-}
-
-bool EventRibbon::Private::shouldSetTileRead(const EventTile* tile) const
-{
-    const auto rect = tile->geometry();
-    const auto height = m_viewport->height();
-
-    return rect.bottom() < height
-        ? (rect.top() >= 0)
-        : (rect.top() <= 0); //< Case for hypothetical tiles bigger than viewport.
 }
 
 void EventRibbon::Private::highlightAppearance(EventTile* tile)
@@ -1043,26 +1108,32 @@ void EventRibbon::Private::updateHover()
     const auto pos = WidgetUtils::mapFromGlobal(q, QCursor::pos());
     if (const bool hovered = q->rect().contains(pos))
     {
-        if (m_hoveredWidget && m_hoveredWidget->underMouse()) //< Nothing changed.
-            return;
-
         const int index = indexAtPos(pos);
-        auto widget = index >= 0 ? m_tiles[index]->widget.get() : nullptr;
 
-        if (widget == m_hoveredWidget)
+        auto tile = index >= 0 ? m_tiles[index].get() : nullptr;
+        const auto widget = tile ? tile->widget.get() : nullptr;
+
+        NX_ASSERT(!tile || widget);
+        if (tile && !widget)
+            tile = nullptr;
+
+        if (tile == m_hoveredTile)
             return;
 
-        m_hoveredWidget = widget;
+        if (m_hoveredTile && m_deadlines.contains(m_hoveredTile))
+            m_deadlines[m_hoveredTile].timer.setRemainingTime(kVisibleAutoCloseDelay);
 
-        const auto modelIndex = (m_model && widget) ? m_model->index(index) : QModelIndex();
+        m_hoveredTile = tile;
+
+        const auto modelIndex = (m_model && tile) ? m_model->index(index) : QModelIndex();
         emit q->hovered(modelIndex, widget);
     }
     else
     {
-        if (!m_hoveredWidget)
+        if (!m_hoveredTile)
             return;
 
-        m_hoveredWidget = nullptr;
+        m_hoveredTile = nullptr;
         emit q->hovered(QModelIndex(), nullptr);
     }
 }
