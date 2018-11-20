@@ -23,6 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": " Potvrzovací email je odeslán na adresu %email%",
     "CANNOT SAVE PASSWORD": "Heslo nelze uložit:",
     "PASSWORD INCORRECT": "Aktuální heslo je nesprávné.",
+    "TOO MANY ATTEMPTS TEXT": "Too many attempts. Try again in a minute.",
     "WRONG PASSWORD": "Chybné heslo",
     "ACCOUNT NOT FOUND TEXT": "Účet nebyl nalezen",
     "CANNOT SEND CONFIRMATION EMAIL": "Nelze odeslat potvrzovací email:",

@@ -23,6 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": "Confirmation message is sent to %email%",
     "CANNOT SAVE PASSWORD": "Cannot save password:",
     "PASSWORD INCORRECT": "Current password is incorrect.",
+    "TOO MANY ATTEMPTS TEXT": "Too many attempts. Try again in a minute.",
     "WRONG PASSWORD": "Wrong password",
     "ACCOUNT NOT FOUND TEXT": "Account not found",
     "CANNOT SEND CONFIRMATION EMAIL": "Cannot send confirmation Email:",

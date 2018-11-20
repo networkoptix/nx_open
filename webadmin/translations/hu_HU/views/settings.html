@@ -9,8 +9,8 @@
 Kapcsolja ki a készüléket és telepítse a merevlemezt.
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
-                A készülék működéséhez Internetkapcsolat szükséges. <br>
-Kérjük csatlakoztassa a rendszerét az Internetre
+                This device needs network connection to work.<br>
+                Please connect it to the local network or Internet
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 A készülék hálózati konfigurációja hibás. <br>

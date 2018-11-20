@@ -23,6 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": "%email%に確認メッセージを送信します",
     "CANNOT SAVE PASSWORD": "パスワードを保存できません:",
     "PASSWORD INCORRECT": "パスワードが違います.",
+    "TOO MANY ATTEMPTS TEXT": "Too many attempts. Try again in a minute.",
     "WRONG PASSWORD": "間違ったパスワード",
     "ACCOUNT NOT FOUND TEXT": "アカウントが見つかりません",
     "CANNOT SEND CONFIRMATION EMAIL": "確認メールを送信できません:",

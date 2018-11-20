@@ -23,6 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": "ข้อความยืนยันจะถูกส่งไปที่ %email%",
     "CANNOT SAVE PASSWORD": "ไม่สามารถบันทึกรหัสผ่านได้:",
     "PASSWORD INCORRECT": "ต้องระบุรหัสผ่านปัจจุบัน.",
+    "TOO MANY ATTEMPTS TEXT": "Too many attempts. Try again in a minute.",
     "WRONG PASSWORD": "รหัสผ่านผิด",
     "ACCOUNT NOT FOUND TEXT": "ไม่พบบัญชีนี้",
     "CANNOT SEND CONFIRMATION EMAIL": "ไม่สามารถส่งอีเมลยืนยัน:",

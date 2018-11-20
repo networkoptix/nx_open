@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "fiók létrehozása",
         "errorNoHDD": "Ezen eszköz beépített merevlemezekkel történő működésre lett kifejlesztve.<br>\nKapcsolja ki a készüléket és telepítse a merevlemezt.",
-        "errorNoNetwork": "A készülék működéséhez Internetkapcsolat szükséges. <br>\nKérjük csatlakoztassa a rendszerét az Internetre"
+        "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to the local network or Internet"
     },
     "passwordRequirements": {
         "minLengthMessage": "A jelszónak legalább 8 karakterből kell állnia",

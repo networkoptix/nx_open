@@ -23,6 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": "Wiadomość z potwierdzeniem została wysłana na adres %email%",
     "CANNOT SAVE PASSWORD": "Nie można zapisać hasła:",
     "PASSWORD INCORRECT": "Bieżące hasło jest nieprawidłowe.",
+    "TOO MANY ATTEMPTS TEXT": "Too many attempts. Try again in a minute.",
     "WRONG PASSWORD": "Nieprawidłowe hasło",
     "ACCOUNT NOT FOUND TEXT": "Nie znaleziono konta",
     "CANNOT SEND CONFIRMATION EMAIL": "Nie można wysłać e-maila z potwierdzeniem:",

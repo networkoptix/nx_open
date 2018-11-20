@@ -23,6 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": "확인 메세지가 %email% 로 전송되었습니다.",
     "CANNOT SAVE PASSWORD": "패스워드를 저장할 수 없습니다.:",
     "PASSWORD INCORRECT": "현재 패스워드가 잘못되었습니다.",
+    "TOO MANY ATTEMPTS TEXT": "Too many attempts. Try again in a minute.",
     "WRONG PASSWORD": "패스워드가 틀립니다.",
     "ACCOUNT NOT FOUND TEXT": "계정을 찾을 수 없습니다",
     "CANNOT SEND CONFIRMATION EMAIL": "확인 이메일을 보낼 수 없습니다.:",

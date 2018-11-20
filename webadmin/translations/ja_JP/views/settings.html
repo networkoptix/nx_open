@@ -8,7 +8,8 @@
                 このデバイスは、インストールされているハード ディスク ドライブで動作するものです<br>デバイスをオフにして、ハード ディスク ドライブを取り付けます
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
-                このデバイスにはネットワーク接続が必要です<br>ローカルネットワークやインターネットに接続してください
+                This device needs network connection to work.<br>
+                Please connect it to the local network or Internet
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 このデバイスは、不適切なネットワーク構成です<br> IP アドレスを設定しネットワークに接続してください

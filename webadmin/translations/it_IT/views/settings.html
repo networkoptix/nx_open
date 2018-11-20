@@ -8,7 +8,8 @@
                 Questo dispositivo è progettato per funzionare con l'unità disco fisso installata. <br> Spegni il dispositivo e installa un'unità disco fisso.
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
-                Questo dispositivo necessita di una connessione di rete per funzionare.<br>Si prega di collegarlo alla rete locale o Internet
+                This device needs network connection to work.<br>
+                Please connect it to the local network or Internet
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 Questo dispositivo ha una configurazione di rete errata. <br> Collegalo alla rete o impostare un indirizzo IP corretto.

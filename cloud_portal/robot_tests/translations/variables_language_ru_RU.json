@@ -23,6 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": "Подтверждение отправлено на адрес %email%",
     "CANNOT SAVE PASSWORD": "Не удается сохранить пароль:",
     "PASSWORD INCORRECT": "Текущий пароль указан неверно.",
+    "TOO MANY ATTEMPTS TEXT": "Too many attempts. Try again in a minute.",
     "WRONG PASSWORD": "Неправильный пароль",
     "ACCOUNT NOT FOUND TEXT": "Учетная запись не найдена",
     "CANNOT SEND CONFIRMATION EMAIL": "Не удается отправить подтверждение по Email:",

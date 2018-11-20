@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "hesap oluştur",
         "errorNoHDD": "Bu cihaz dahili bir disk ile çalışabilir.<br>Lütfen cihazı kapatıp bir disk ekleyin.",
-        "errorNoNetwork": "Bu cihazın çalışması için ağ bağlantısına ihtiyaç vardır. <br>Lütfen yerel bir ağa veya internete bağlayın"
+        "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to the local network or Internet"
     },
     "passwordRequirements": {
         "minLengthMessage": "Parola en az 8 karakterden oluşmalıdır",

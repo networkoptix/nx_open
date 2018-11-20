@@ -8,7 +8,8 @@
                 อุปกรณ์นี้มีวัตถุประสงค์เพื่อทำงานกับฮาร์ดดิสก์ที่ติดตั้ง <br>กรุณาปิดอุปกรณ์ และติดตั้งฮาร์ดดิสก์ไดรฟ์
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
-                อุปกรณ์นี้ต้องการเชื่อมต่อเครือข่ายการทำงาน <br>โปรดเชื่อมต่อกับท้องถิ่น ot ของเครือข่ายอินเทอร์เน็ต
+                This device needs network connection to work.<br>
+                Please connect it to the local network or Internet
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 อุปกรณ์นี้มีการกำหนดค่าเครือข่ายไม่ถูกต้อง <br>โปรดเชื่อมต่อกับเครือข่าย หรือกำหนดที่อยู่ IP ถูกต้อง
