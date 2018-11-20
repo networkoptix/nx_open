@@ -406,6 +406,8 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int 
         // Merging multiple smaller packets into one larger one fixes the issue.
         if (auto pkt = mergePackets(packet, outFfmpegError))
             return pkt;
+
+        return nullptr; //< Only mergePackets should return if audio codec is AAC
     }
 
     return packet;

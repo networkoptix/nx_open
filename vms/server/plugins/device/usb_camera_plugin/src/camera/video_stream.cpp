@@ -262,10 +262,9 @@ void VideoStream::run()
 
         auto frame = maybeDecode(packet.get());
 
-        updateActualFps(m_timeProvider->millisSinceEpoch());
-
         {
             std::lock_guard<std::mutex> lock(m_mutex);
+            updateActualFps(m_timeProvider->millisSinceEpoch());
             m_packetConsumerManager.givePacket(packet);
             if (frame)
                 m_frameConsumerManager.giveFrame(frame);
