@@ -249,7 +249,7 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
                 ? tr("Unknown plugin event")
                 : params.caption;
 
-            return tr("%1 - %2").arg(resourceName).arg(caption);
+            return lm("%1 - %2").args(resourceName, caption);
         }
         default:
             return tr("An unknown event has occurred");
