@@ -975,9 +975,15 @@
                 "HIKVISION|DS-2CD4A26FWD-*", "hikvision|DS-2CD4A26FWD-*",
                 "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*",
                 "ONVIF|NC328-VBZ",
-                "Hikvision|DS-2DF8223*"
+                "Hikvision|DS-2DF8223*",
+                "hikvision|DS-2CD2155FWD-IS"
             ],
             "parseOnvifNotificationsWithHttpReader": true
+        },
+        {
+            "keys": ["hikvision|*"],
+            "additionalInputSourceNames": ["alarmintoken"],
+            "additionalNotificationTopics":["Trigger/AlarmIn"]
         },
         {
             "keys": [

@@ -1103,10 +1103,13 @@ void QnPlOnvifResource::notificationReceived(
     }
     eventTopic = eventTopicTokens.join(QLatin1Char('/'));
 
-    if (eventTopic.indexOf(lit("Trigger/Relay")) == -1 &&
-        eventTopic.indexOf(lit("IO/Port")) == -1 &&
-        eventTopic.indexOf(lit("Trigger/DigitalInput")) == -1 &&
-        eventTopic.indexOf(lit("Device/IO/VirtualPort")) == -1)
+    const auto topicsToCheck = notificationTopicsForMonitoring();
+    const bool topicIsFound = std::any_of(
+        topicsToCheck.cbegin(),
+        topicsToCheck.cend(),
+        [&eventTopic](const QString& topic) { return eventTopic.indexOf(topic) != -1; });
+
+    if (!topicIsFound)
     {
         NX_LOGX(lit("Received notification with unknown topic: %1. Ignoring...").
             arg(QLatin1String(notification.oasisWsnB2__Topic->__item)), cl_logDEBUG2);
@@ -1132,11 +1135,10 @@ void QnPlOnvifResource::notificationReceived(
 
     //checking that there is single source and this source is a relay port
     auto portSourceIter = handler.source.cend();
+    const auto inputSourceNames = allowedInputSourceNames();
     for (auto it = handler.source.cbegin(); it != handler.source.cend(); ++it)
     {
-        if (it->name == lit("port") ||
-            it->name == lit("RelayToken") ||
-            it->name == lit("Index"))
+        if (inputSourceNames.find(it->name.toLower()) != inputSourceNames.cend())
         {
             portSourceIter = it;
             break;
@@ -1149,11 +1151,14 @@ void QnPlOnvifResource::notificationReceived(
         }
     }
 
+    static const std::set<QString> kStateStrings{
+        "logicalstate",
+        "state",
+        "level",
+        "relaylogicalstate"};
+
     if (portSourceIter == handler.source.end()  //< source is not port
-        || (handler.data.name != lit("LogicalState") &&
-            handler.data.name != lit("state") &&
-            handler.data.name != lit("Level") &&
-            handler.data.name != lit("RelayLogicalState")))
+        || kStateStrings.find(handler.data.name.toLower()) == kStateStrings.cend())
     {
         return;
     }
@@ -2702,6 +2707,34 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetAudioSource()
     return CameraDiagnostics::RequestFailedResult(
         QLatin1String("getAudioSourceConfigurations"),
         QLatin1String("missing channel configuration (2)"));
+}
+
+std::set<QString> QnPlOnvifResource::notificationTopicsForMonitoring() const
+{
+    std::set<QString> result{
+        "Trigger/Relay", "IO/Port", "Trigger/DigitalInput", "Device/IO/VirtualPort"
+    };
+    const auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    const auto additionalNotificationTopics = resourceData.value<std::vector<QString>>(
+        "additionalNotificationTopics");
+
+    for (auto& topic: additionalNotificationTopics)
+        result.insert(topic);
+
+    return result;
+}
+
+std::set<QString> QnPlOnvifResource::allowedInputSourceNames() const
+{
+    std::set<QString> result{"port", "relaytoken", "index"};
+    const auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    const auto additionalInputSourceNames = resourceData.value<std::vector<QString>>(
+        "additionalInputSourceNames");
+
+    for (const auto& sourceName: additionalInputSourceNames)
+        result.insert(sourceName.toLower());
+
+    return result;
 }
 
 bool QnPlOnvifResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values)
