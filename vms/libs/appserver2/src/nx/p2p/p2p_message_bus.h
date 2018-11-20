@@ -19,6 +19,7 @@
 #include "routing_helpers.h"
 #include "connection_context.h"
 #include "p2p_serialization.h"
+#include <transaction/amend_transaction_data.h>
 
 namespace nx {
 namespace p2p {
@@ -121,33 +122,42 @@ protected:
     template<class T>
     void sendTransactionImpl(
         const P2pConnectionPtr& connection,
-        const ec2::QnTransaction<T>& tran,
+        const ec2::QnTransaction<T>& srcTran,
         TransportHeader transportHeader)
     {
-        NX_ASSERT(tran.command != ApiCommand::NotDefined);
+        NX_ASSERT(srcTran.command != ApiCommand::NotDefined);
 
-        if (!connection->shouldTransactionBeSentToPeer(tran))
+        if (!connection->shouldTransactionBeSentToPeer(srcTran))
             return; //< This peer doesn't handle transactions of such type.
 
         if (transportHeader.via.find(connection->remotePeer().id) != transportHeader.via.end())
             return; //< Already processed by remote peer
 
         const vms::api::PersistentIdData remotePeer(connection->remotePeer());
-        const auto& descriptor = ec2::getTransactionDescriptorByTransaction(tran);
+        const auto& descriptor = ec2::getTransactionDescriptorByTransaction(srcTran);
         auto remoteAccess = descriptor->checkRemotePeerAccessFunc(
-            commonModule(), connection.staticCast<Connection>()->userAccessData(), tran.params);
+            commonModule(), connection.staticCast<Connection>()->userAccessData(), srcTran.params);
         if (remoteAccess == RemotePeerAccess::Forbidden)
         {
             NX_VERBOSE(
                 this,
                 lm("Permission check failed while sending transaction %1 to peer %2")
-                .arg(tran.toString())
+                .arg(srcTran.toString())
                 .arg(remotePeer.id.toString()));
             return;
         }
 
-        const vms::api::PersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
+        const vms::api::PersistentIdData peerId(srcTran.peerID, srcTran.persistentInfo.dbID);
         const auto context = this->context(connection);
+
+        ec2::QnTransaction<T> modifiedTran;
+        if (connection->remotePeer().isClient())
+        {
+            modifiedTran = srcTran;
+            ec2::amendOutputDataIfNeeded(connection.staticCast<Connection>()->userAccessData(), &modifiedTran.params);
+        }
+        const ec2::QnTransaction<T>& tran(connection->remotePeer().isClient() ? modifiedTran : srcTran);
+
         if (connection->remotePeer().isServer())
         {
             if (descriptor->isPersistent)
@@ -384,6 +394,13 @@ private:
         const P2pConnectionPtr& connection,
         const TransportHeader& records);
 
+    /*
+     * in P2P mode a Client gets transactions only, without any protocol related system messages.
+     * It causes client doesn't receive peerFound/peerLost signals from messageBus any more.
+     * This function sends removeRuntimeInfoData transactions to the all connected clients
+     * for the current peer.
+     */
+    void sendRuntimeInfoRemovedToClients(const QnUuid& id);
 private slots:
     void at_gotMessage(QWeakPointer<ConnectionBase> connection, MessageType messageType, const QByteArray& payload);
     void at_stateChanged(QWeakPointer<ConnectionBase> connection, Connection::State state);

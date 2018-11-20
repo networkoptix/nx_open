@@ -349,8 +349,15 @@ bool MessageBus::needStartConnection(
     const RouteToPeerMap& allPeerDistances = m_peers->allPeerDistances;
     qint32 currentDistance = allPeerDistances.value(peer).minDistance();
     const auto& subscribedVia = currentSubscription.value(peer);
-    return currentDistance > m_miscData.maxDistanceToUseProxy
+    auto result = currentDistance > m_miscData.maxDistanceToUseProxy
         || (subscribedVia && context(subscribedVia)->localSubscription.size() > m_miscData.maxSubscriptionToResubscribe);
+
+    if (!result && peer.id == ::ec2::kCloudPeerId)
+    {
+        NX_WARNING(this, "Skip outgoing connection to the cloud peer because it is already subscribed via another peer. "
+            "Current distance %1, subscribedVia %2", currentDistance, subscribedVia);
+    }
+    return result;
 }
 
 bool MessageBus::needStartConnection(
@@ -1191,10 +1198,22 @@ void MessageBus::emitPeerFoundLostSignals()
                 .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
                 .arg(qnStaticCommon->moduleDisplayName(peer.id)));
             emit peerLost(peer.id, peer.peerType);
+            sendRuntimeInfoRemovedToClients(peer.id);
         }
     }
 
     m_lastAlivePeers = newAlivePeers;
+}
+
+void MessageBus::sendRuntimeInfoRemovedToClients(const QnUuid& id)
+{
+    QnTransaction<nx::vms::api::IdData> tran(ApiCommand::runtimeInfoRemoved, id);
+    tran.params.id = id;
+    for (const auto& connection: m_connections)
+    {
+        if (connection->remotePeer().isClient())
+            sendTransactionImpl(connection, tran, TransportHeader());
+    }
 }
 
 void MessageBus::setDelayIntervals(const DelayIntervals& intervals)
