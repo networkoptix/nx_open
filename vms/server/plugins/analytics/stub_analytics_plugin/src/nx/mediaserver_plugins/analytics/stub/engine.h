@@ -32,7 +32,7 @@ public:
 protected:
     virtual std::string manifest() const override;
 
-    virtual void settingsChanged() override;
+    virtual void settingsReceived() override;
 
     virtual void executeAction(
         const std::string& actionId,

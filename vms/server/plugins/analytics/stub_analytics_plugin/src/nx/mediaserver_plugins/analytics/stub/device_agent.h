@@ -28,7 +28,7 @@ public:
 protected:
     virtual std::string manifest() const override;
 
-    virtual void settingsChanged() override;
+    virtual void settingsReceived() override;
 
     virtual bool pushCompressedVideoFrame(
         const nx::sdk::analytics::CompressedVideoPacket* videoFrame) override;

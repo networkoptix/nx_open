@@ -51,8 +51,8 @@ public:
      * Called before other methods. Server provides the set of settings stored in its database for
      * this Engine instance.
      *
-     * @param settings Values of settings declared in the manifest. The pointer is valid only
-     *     during the call. If count is 0, the pointer is null.
+     * @param settings Values of settings declared in the manifest. Never null. Valid only during
+     *     the call.
      */
     virtual void setSettings(const Settings* settings) = 0;
 

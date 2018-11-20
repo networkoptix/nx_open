@@ -43,9 +43,10 @@ protected:
     virtual std::string manifest() const = 0;
 
     /**
-     * Called when any of the seetings (param values) change.
+     * Called when the settings are received from the server (even if the values are not changed).
+     * Should perform any required (re)initialization. Called even if the settings model is empty.
      */
-    virtual void settingsChanged() {}
+    virtual void settingsReceived() {}
 
     /**
      * Provides access to the Plugin global settings stored by the server.
@@ -77,7 +78,8 @@ protected:
     }
 
     /**
-     * Sends plugin event to the Server.
+     * Sends a PluginEvent to the Server. Can be called from any thread, but if called before
+     * settingsReceived() was called, will be ignored in case setHandler() was not called yet.
      */
     void pushPluginEvent(
         nx::sdk::IPluginEvent::Level level,
@@ -95,6 +97,8 @@ protected:
         assetPluginCasted(plugin);
         return plugin;
     }
+
+    nx::sdk::analytics::Engine::IHandler* handler() { return m_handler; }
 
 public:
     virtual ~CommonEngine() override;

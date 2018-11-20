@@ -30,12 +30,6 @@ DeviceAgent::DeviceAgent(Engine* engine):
 {
     // TODO: #vkutin #mshevchenko Replace with true UUID generation when possible.
     *reinterpret_cast<void**>(m_objectId.bytes + sizeof(m_objectId) - sizeof(void*)) = this;
-
-    if (ini().throwPluginEventsFromDeviceAgent)
-    {
-        NX_PRINT << "Starting plugin event generation thread";
-        m_pluginEventThread.reset(new std::thread([this]() { processPluginEvents(); }));
-    }
 }
 
 DeviceAgent::~DeviceAgent()
@@ -82,9 +76,17 @@ std::string DeviceAgent::manifest() const
 )json";
 }
 
-void DeviceAgent::settingsChanged()
+void DeviceAgent::settingsReceived()
 {
-    NX_PRINT << __func__ << "()";
+    if (ini().throwPluginEventsFromDeviceAgent)
+    {
+        NX_PRINT << __func__ << "(): Starting plugin event generation thread";
+        m_pluginEventThread.reset(new std::thread([this]() { processPluginEvents(); }));
+    }
+    else
+    {
+        NX_PRINT << __func__ << "()";
+    }
 }
 
 bool DeviceAgent::pushCompressedVideoFrame(const CompressedVideoPacket* videoFrame)

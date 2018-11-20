@@ -19,13 +19,6 @@ using namespace nx::sdk::analytics;
 Engine::Engine(Plugin* plugin): CommonEngine(plugin, NX_DEBUG_ENABLE_OUTPUT)
 {
     initCapabilities();
-
-    if (ini().throwPluginEventsFromEngine)
-    {
-        NX_PRINT << "Starting plugin event generation thread";
-        if (!m_thread)
-            m_thread.reset(new std::thread([this]() { processPluginEvents(); }));
-    }
 }
 
 Engine::~Engine()
@@ -89,9 +82,9 @@ void Engine::processPluginEvents()
             "Error message description");
 
         // Sleep until the next event pack needs to be generated, or the thread is ordered to
-        // terminate (hence condition variable instead of sleep()). Return value (whether
-        // the timeout has occurred) and spurious wake-ups are ignored.
-        static const std::chrono::seconds kEventGenerationPeriod{ 10 };
+        // terminate (hence condition variable instead of sleep()). Return value (whether the
+        // timeout has occurred) and spurious wake-ups are ignored.
+        static const std::chrono::seconds kEventGenerationPeriod{10};
         std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
         m_pluginEventGenerationLoopCondition.wait_for(lock, kEventGenerationPeriod);
     }
@@ -225,9 +218,18 @@ std::string Engine::manifest() const
 )json";
 }
 
-void Engine::settingsChanged()
+void Engine::settingsReceived()
 {
-    NX_PRINT << __func__ << "()";
+    if (ini().throwPluginEventsFromEngine)
+    {
+        NX_PRINT << __func__ << "(): Starting plugin event generation thread";
+        if (!m_thread)
+            m_thread.reset(new std::thread([this]() { processPluginEvents(); }));
+    }
+    else
+    {
+        NX_PRINT << __func__ << "()";
+    }
 }
 
 void Engine::executeAction(

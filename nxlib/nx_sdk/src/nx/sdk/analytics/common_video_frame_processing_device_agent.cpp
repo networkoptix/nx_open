@@ -179,7 +179,7 @@ void CommonVideoFrameProcessingDeviceAgent::setSettings(const nx::sdk::Settings*
     if (!utils.fillAndOutputSettingsMap(&m_settings, settings, "Received settings"))
         return; //< The error is already logged.
 
-    settingsChanged();
+    settingsReceived();
 }
 
 nx::sdk::Settings* CommonVideoFrameProcessingDeviceAgent::pluginSideSettings() const

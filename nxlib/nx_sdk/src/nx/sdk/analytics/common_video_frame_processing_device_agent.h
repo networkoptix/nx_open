@@ -90,18 +90,20 @@ protected:
     void pushMetadataPacket(MetadataPacket* metadataPacket);
 
     /**
-     * Sends plugin event to the Server. Can be called at any time, from any thread.
+     * Sends a PluginEvent to the Server. Can be called from any thread, but if called before
+     * settingsReceived() was called, will be ignored in case setHandler() was not called yet.
      */
     void pushPluginEvent(IPluginEvent::Level level, std::string caption, std::string description);
 
     /**
-     * Called when any of the settings (param values) change.
+     * Called when the settings are received from the server (even if the values are not changed).
+     * Should perform any required (re)initialization. Called even if the settings model is empty.
      */
-    virtual void settingsChanged() {}
+    virtual void settingsReceived() {}
 
     /**
      * Provides access to the Manager settings stored by the server for a particular Resource.
-     * ATTENTION: If settingsChanged() has not been called yet, it means that the DeviceAgent has
+     * ATTENTION: If settingsReceived() has not been called yet, it means that the DeviceAgent has
      * not received its settings from the server yet, and thus this method will yield empty values.
      * @return Param value, or an empty string if such param does not exist, having logged the
      *     error.

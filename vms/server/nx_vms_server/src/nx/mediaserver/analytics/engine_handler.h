@@ -14,7 +14,8 @@ class EngineHandler:
     public nx::mediaserver::ServerModuleAware,
     public nx::sdk::analytics::Engine::IHandler
 {
-    Q_OBJECT;
+    Q_OBJECT
+
 public:
     EngineHandler(
         QnMediaServerModule* serverModule,

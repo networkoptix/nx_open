@@ -17,7 +17,8 @@ class DeviceAgentHandler:
     public nx::mediaserver::ServerModuleAware,
     public nx::sdk::analytics::DeviceAgent::IHandler
 {
-    Q_OBJECT;
+    Q_OBJECT
+
 public:
     DeviceAgentHandler(
         QnMediaServerModule* serverModule,

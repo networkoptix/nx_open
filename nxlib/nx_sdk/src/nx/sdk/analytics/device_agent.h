@@ -49,8 +49,10 @@ public:
 
     /**
      * Called before other methods. Server provides the set of settings stored in its database for
-     * the combination of a resource instance and a engine type.
-     * @param settings Values of settings declared in the manifest.
+     * the combination of a device instance and an Engine instance.
+     * 
+     * @param settings Values of settings declared in the manifest. Never null. Valid only during
+     *     the call.
      */
     virtual void setSettings(const Settings* settings) = 0;
 
