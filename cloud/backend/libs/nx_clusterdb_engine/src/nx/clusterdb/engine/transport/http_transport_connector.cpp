@@ -193,8 +193,7 @@ void HttpTransportConnector::onPipelineConnectCompleted(
     connectionRequestAttributes.remotePeer = transport->remotePeer();
     connectionRequestAttributes.remotePeerProtocolVersion =
         transport->remotePeerProtocolVersion();
-    connectionRequestAttributes.connectionId = 
-        transport->connectionGuid().toSimpleString().toStdString();
+    connectionRequestAttributes.connectionId = transport->connectionGuid();
 
     auto newTransport = std::make_unique<GenericTransport>(
         m_protocolVersionRange,

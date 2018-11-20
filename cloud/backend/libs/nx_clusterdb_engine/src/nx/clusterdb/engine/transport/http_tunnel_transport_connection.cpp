@@ -41,9 +41,9 @@ void HttpTunnelTransportConnection::setOnGotTransaction(
     m_gotTransactionEventHandler = std::move(handler);
 }
 
-QnUuid HttpTunnelTransportConnection::connectionGuid() const
+std::string HttpTunnelTransportConnection::connectionGuid() const
 {
-    return QnUuid::fromStringSafe(m_connectionRequestAttributes.connectionId);
+    return m_connectionRequestAttributes.connectionId;
 }
 
 void HttpTunnelTransportConnection::sendTransaction(
