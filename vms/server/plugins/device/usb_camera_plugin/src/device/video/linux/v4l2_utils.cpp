@@ -34,8 +34,8 @@ static const std::string kV4l2DevicePath = "/dev";
 // Convenience class for opening and closing devices represented by devicePath
 struct DeviceInitializer
 {
-    DeviceInitializer(const char * devicePath, int oFlag = O_RDWR):
-        fileDescriptor(open(devicePath, oFlag))
+    DeviceInitializer(const std::string& devicePath, int oFlag = O_RDWR):
+        fileDescriptor(open(devicePath.c_str(), oFlag))
     {
     }
 
@@ -74,10 +74,10 @@ std::string getDeviceName(int fileDescriptor)
 std::vector<std::string> getDevicePaths()
 {
     const auto isDeviceFile =
-        [](const char *path)
+        [](const std::string& devicePath)
         {
             struct stat buffer;
-            stat(path, &buffer);
+            stat(devicePath.c_str(), &buffer);
             return S_ISCHR(buffer.st_mode);
         };
 
@@ -159,7 +159,7 @@ nxcip::CompressionType V4L2CompressionTypeDescriptor::toNxCompressionType() cons
 //--------------------------------------------------------------------------------------------------
 // public api
 
-std::string getDeviceName(const char * devicePath)
+std::string getDeviceName(const std::string& devicePath)
 {
     DeviceInitializer initializer(devicePath);
     if (initializer.fileDescriptor == -1)
@@ -195,13 +195,14 @@ std::vector<DeviceData> getDeviceList()
         deviceList.push_back(device::DeviceData(
             getDeviceName(fileDescriptor),
             devicePath,
-            getDeviceUniqueId(devicePath.c_str())));
+            getDeviceUniqueId(devicePath)));
     }
+
     return deviceList;
 }
 
 std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> getSupportedCodecs(
-    const char * devicePath)
+    const std::string& devicePath)
 {
     DeviceInitializer initializer(devicePath);
 
@@ -220,7 +221,7 @@ std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> getSupportedCode
 }
 
 std::vector<ResolutionData> getResolutionList(
-    const char * devicePath,
+    const std::string& devicePath,
     const device::CompressionTypeDescriptorPtr& targetCodecID)
 {
     if (rpi::isMmalCamera(getDeviceName(devicePath)))

@@ -205,12 +205,12 @@ void fillCameraAuxiliaryData(nxcip::CameraInfo* cameras, int cameraCount)
     }
 }
 
-bool pluggedIn(const char* devicePath)
+bool pluggedIn(const std::string& devicePath)
 {
     auto devices = getDevices();
     for (const auto & device : devices)
     {
-        if (strcmp(device.path.c_str(), devicePath) == 0)
+        if (device.path == devicePath)
             return true;
     }
     return false;

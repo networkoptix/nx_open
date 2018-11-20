@@ -101,7 +101,7 @@ struct UdevDevice
 
 } // namespace
 
-std::string getDeviceUniqueId(const char * devicePath)
+std::string getDeviceUniqueId(const std::string& devicePath)
 {
     Udev udev;
     UdevEnumerate enumerator(udev.udev);

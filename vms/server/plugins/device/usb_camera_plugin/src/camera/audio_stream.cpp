@@ -58,7 +58,7 @@ AudioStream::AudioStreamPrivate::~AudioStreamPrivate()
 
 bool AudioStream::AudioStreamPrivate::pluggedIn() const
 {
-    return device::audio::pluggedIn(m_url.c_str());
+    return device::audio::pluggedIn(m_url);
 }
 
 bool AudioStream::AudioStreamPrivate::ioError() const

@@ -383,7 +383,7 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
         {
             // ffmpeg doesn't have an option for setting the bitrate on AVFormatContext.
             device::video::setBitrate(
-                url().c_str(),
+                url(),
                 m_codecParams.bitrate,
                 cam->compressionTypeDescriptor());
         }

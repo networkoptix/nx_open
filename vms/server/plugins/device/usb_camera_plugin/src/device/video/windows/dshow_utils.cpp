@@ -64,7 +64,7 @@ BITMAPINFOHEADER *  DShowCompressionTypeDescriptor::videoInfoBitMapHeader() cons
 //-------------------------------------------------------------------------------------------------
 // public api
 
-std::string getDeviceName(const char * devicePath)
+std::string getDeviceName(const std::string& devicePath)
 {
     DShowInitializer init;
     IMoniker * pMoniker = NULL;
@@ -96,7 +96,7 @@ std::vector<DeviceData> getDeviceList()
     return devices;
 }
 
-std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const char * devicePath)
+std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const std::string& devicePath)
 {
     //todo figure out how to avoid this init everytime
     DShowInitializer init;
@@ -115,7 +115,7 @@ std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const char 
 }
 
 std::vector<ResolutionData> getResolutionList(
-    const char * devicePath,
+    const std::string& devicePath,
     const device::CompressionTypeDescriptorPtr& targetCodec)
 {
     //todo figure out how to avoid this init everytime
@@ -138,7 +138,7 @@ std::vector<ResolutionData> getResolutionList(
 }
 
 void setBitrate(
-    const char * devicePath,
+    const std::string& devicePath,
     int bitrate,
     const device::CompressionTypeDescriptorPtr& targetCodec)
 {
@@ -197,7 +197,7 @@ void setBitrate(
     delete[] array;
 }
 
-int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescriptorPtr& targetCodec)
+int getMaxBitrate(const std::string& devicePath, const device::CompressionTypeDescriptorPtr& targetCodec)
 {
 #if 0
     DShowInitializer init;
@@ -393,14 +393,14 @@ HRESULT enumerateDevices(REFGUID category, IEnumMoniker ** ppEnum)
     return result;
 }
 
-HRESULT findDevice(REFGUID category, const char * devicePath, IMoniker ** outMoniker)
+HRESULT findDevice(REFGUID category, const std::string& devicePath, IMoniker ** outMoniker)
 {
     IEnumMoniker * pEnum;
     HRESULT result = enumerateDevices(category, &pEnum);
     if (FAILED(result))
         return result;
 
-    CComBSTR devicePathBstr(devicePath);
+    CComBSTR devicePathBstr(devicePath.c_str());
 
     IMoniker *pMoniker = NULL;
     while (S_OK == (result = pEnum->Next(1, &pMoniker, NULL)))
