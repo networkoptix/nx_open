@@ -128,6 +128,8 @@ private:
     mutable std::mutex m_mutex;
     std::atomic_bool m_terminated = true;
     std::atomic_bool m_ioError = false;
+    std::atomic_bool m_isStopping = false;
+    std::condition_variable m_wait;
     int m_initCode = 0;
 
 private:
@@ -136,6 +138,7 @@ private:
      * Get the url of the video stream, modified appropriately based on platform.
      */
     std::string ffmpegUrlPlatformDependent() const;
+    bool waitForConsumers();
     bool noConsumers() const;
     void terminate();
     void tryStart();

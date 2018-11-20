@@ -59,6 +59,7 @@ private:
 
         std::atomic_bool m_terminated = true;
         mutable std::mutex m_mutex;
+        std::condition_variable m_wait;
         std::thread m_runThread;
 
         std::unique_ptr<ffmpeg::Frame> m_decodedFrame;
@@ -73,6 +74,7 @@ private:
 
     private:
         std::string ffmpegUrlPlatformDependent() const;
+        bool waitForConsumers();
         int initialize();
         void uninitialize();
         bool ensureInitialized();
