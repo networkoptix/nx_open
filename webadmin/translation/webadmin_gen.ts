@@ -79,7 +79,7 @@
     </message>
     <message>
       <location/>
-      <source>This device needs network connection to work.&lt;br&gt;Please connect it to the  local network ot Internet</source>
+      <source>This device needs network connection to work.&lt;br&gt;Please connect it to the local network or Internet</source>
       <translation> </translation>
     </message>
     <message>
