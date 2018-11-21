@@ -107,7 +107,7 @@ void GenericTransport::sendTransaction(
     post(
         [this, transportHeader = std::move(transportHeader), transactionSerializer]()
         {
-            if (::ec2::ApiCommand::isSystem(transactionSerializer->header().command)
+            if (isHandshakeCommand(transactionSerializer->header().command)
                 || m_canSendCommands)
             {
                 m_commandPipeline->sendTransaction(
