@@ -14,8 +14,9 @@ import { NxContentBlockSectionComponent } from './content-block/section/section.
 import { NxMultiLineEllipsisComponent }   from './multi-line-ellipsis/mle.component';
 import { NxExternalVideoComponent }       from './external-video/external-video.component';
 import { NxLayoutRightComponent }         from './layout-right/layout.component';
-import { NxTagComponent}                  from './tag/tag.component';
-import { NxCarouselComponent }            from './carousel/carousel.component'
+import { NxTagComponent }                 from './tag/tag.component';
+import { NxCarouselComponent }            from './carousel/carousel.component';
+import { NxRibbonComponent }              from './ribbon/ribbon.component';
 
 @NgModule({
     imports        : [
@@ -35,7 +36,8 @@ import { NxCarouselComponent }            from './carousel/carousel.component'
         NxExternalVideoComponent,
         NxLayoutRightComponent,
         NxTagComponent,
-        NxCarouselComponent
+        NxCarouselComponent,
+        NxRibbonComponent,
     ],
     entryComponents: [
         NxProcessButtonComponent,
@@ -48,7 +50,8 @@ import { NxCarouselComponent }            from './carousel/carousel.component'
         NxExternalVideoComponent,
         NxLayoutRightComponent,
         NxTagComponent,
-        NxCarouselComponent
+        NxCarouselComponent,
+        NxRibbonComponent,
     ],
     providers      : [
         NxProcessButtonComponent,
@@ -59,6 +62,9 @@ import { NxCarouselComponent }            from './carousel/carousel.component'
         NxContentBlockSectionComponent,
         NxMultiLineEllipsisComponent,
         NxLayoutRightComponent,
+        NxTagComponent,
+        NxCarouselComponent,
+        NxRibbonComponent,
     ],
     exports        : [
         NxProcessButtonComponent,
@@ -72,6 +78,7 @@ import { NxCarouselComponent }            from './carousel/carousel.component'
         NxLayoutRightComponent,
         NxTagComponent,
         NxCarouselComponent,
+        NxRibbonComponent,
         MenuModule,
     ]
 })
@@ -82,4 +89,5 @@ declare var angular: angular.IAngularStatic;
 angular
     .module('cloudApp.directives')
     .directive('nxProcessButton', downgradeComponent({ component: NxProcessButtonComponent }) as angular.IDirectiveFactory)
-    .directive('nxPreLoader', downgradeComponent({ component: NxPreLoaderComponent }) as angular.IDirectiveFactory);
+    .directive('nxPreLoader', downgradeComponent({ component: NxPreLoaderComponent }) as angular.IDirectiveFactory)
+    .directive('nxRibbon', downgradeComponent({ component: NxRibbonComponent }) as angular.IDirectiveFactory);

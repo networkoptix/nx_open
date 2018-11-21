@@ -28,7 +28,10 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
                 .pluginsSubject
                 .subscribe(res => {
                     this._route.params.subscribe(params => {
-                        this.plugin = this.integrationService.getPluginBy(params.plugin);
+                        this.integrationService.getPluginBy(params.plugin);
+                        this.integrationService.selectedPluginSubject.subscribe(plugin => {
+                            this.plugin = plugin;
+                        });
                     });
                 });
     }

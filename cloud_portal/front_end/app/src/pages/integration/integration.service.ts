@@ -18,6 +18,8 @@ export class IntegrationService implements OnDestroy {
 
     plugins: any;
     pluginsSubject = new BehaviorSubject([]);
+    selectedPluginSubject = new BehaviorSubject(undefined);
+    inReview: boolean;
 
     constructor(private http: HttpClient,
                 private api: NxCloudApiService,
@@ -46,7 +48,14 @@ export class IntegrationService implements OnDestroy {
         if (!this.plugins) {
             return;
         }
+
+        this.inReview = false;
+
         this.plugins.forEach((plugin) => {
+            if (!this.inReview && plugin.pending) {
+                this.inReview = true;
+            }
+
             if (plugin.downloadFiles) {
                 const downloadPlatforms = plugin.downloadFiles;
                 plugin.downloadFiles = [];
@@ -100,7 +109,7 @@ export class IntegrationService implements OnDestroy {
 
     getPluginBy(id) {
         if (this.plugins) {
-            return this.plugins.find(plugin => plugin.id === Number(id));
+            this.selectedPluginSubject.next(this.plugins.find(plugin => plugin.id === Number(id)));
         }
 
         return undefined;

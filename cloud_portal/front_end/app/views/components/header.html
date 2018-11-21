@@ -1,5 +1,10 @@
 <!--suppress ALL -->
 <header ng-if="viewHeader">
+    <nx-ribbon ng-if="active.integrations"
+               message="This page is a preview of the latest changes, and it doesn't match publicly available version."
+               action="Back to the editing interfaces"
+               [action-url]="config.links.admin.product">
+    </nx-ribbon>
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="app-header-left">
@@ -16,15 +21,7 @@
                     </a>
                 </div>
 
-                <ul ng-if="!activeSystem" class="nav navbar-nav auth-visible d-none d-sm-flex">
-
-                    <li ng-class="{ 'active' :active.integrations }">
-                        <a class="inset" ng-href="/integrations">Integrations store</a>
-                    </li>
-
-                </ul>
-
-                <ul ng-if="activeSystem" class="nav navbar-nav auth-visible d-none d-sm-flex">
+                <ul ng-if="activeSystem && !active.integrations" class="nav navbar-nav auth-visible d-none d-sm-flex">
                     <li ng-class="{ 'active' :active.view }">
                         <a class="inset" ng-href="/systems/{{activeSystem.id}}/view">View</a>
                     </li>

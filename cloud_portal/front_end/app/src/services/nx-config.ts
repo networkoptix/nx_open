@@ -35,7 +35,11 @@ export class NxConfigService {
             redirectAuthorised  : '/systems', // Page for redirecting all authorised users
             redirectUnauthorised: '/', // Page for redirecting all unauthorised users by default
 
-
+            links: {
+                admin: {
+                    product: '/admin/cms/product/'
+                }
+            },
             systemStatuses                : {
                 onlineStatus: 'online',
                 sortOrder   : [
