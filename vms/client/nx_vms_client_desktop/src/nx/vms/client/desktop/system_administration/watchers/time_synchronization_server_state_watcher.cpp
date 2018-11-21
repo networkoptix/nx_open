@@ -28,8 +28,7 @@ public:
 
         for (const auto& server: q->resourcePool()->getAllServers(Qn::AnyStatus))
         {
-            connect(server.get(), &QnMediaServerResource::statusChanged,
-                this, &TimeSynchronizationServerStateWatcher::Private::onStatusChanged);
+            onServerAddedInternal(server);
         }
 
         connect(q->resourcePool(), &QnResourcePool::resourceAdded,
@@ -39,15 +38,14 @@ public:
             this, &TimeSynchronizationServerStateWatcher::Private::onServerRemoved);
     }
 
-public slots:
+private:
     void onServerAdded(const QnResourcePtr& resource)
     {
-        const auto& server = resource.dynamicCast<QnMediaServerResource>();
-        if (server)
-        {
-            connect(server.get(), &QnMediaServerResource::statusChanged,
-                this, &TimeSynchronizationServerStateWatcher::Private::onStatusChanged);
+        onServerAddedInternal(resource);
 
+        const auto& server = resource.dynamicCast<QnMediaServerResource>();
+        if (server && !server->hasFlags(Qn::fake))
+        {
             TimeSynchronizationWidgetState::ServerInfo serverInfo;
             serverInfo.id = server->getId();
             serverInfo.name = server->getName();
@@ -60,14 +58,22 @@ public slots:
         }
     }
 
+    void onServerAddedInternal(const QnResourcePtr& resource)
+    {
+        const auto& server = resource.dynamicCast<QnMediaServerResource>();
+        if (server && !server->hasFlags(Qn::fake))
+        {
+            connect(server.get(), &QnMediaServerResource::statusChanged,
+                this, &TimeSynchronizationServerStateWatcher::Private::onStatusChanged);
+        }
+    }
+
     void onServerRemoved(const QnResourcePtr& resource)
     {
         const auto& server = resource.dynamicCast<QnMediaServerResource>();
-        if (server)
+        if (server && !server->hasFlags(Qn::fake))
         {
-            Qn::disconnect(server.get(), &QnMediaServerResource::statusChanged,
-                this, &TimeSynchronizationServerStateWatcher::Private::onStatusChanged);
-
+            server->disconnect(this);
             m_store->removeServer(server->getId());
         }
     }
@@ -75,13 +81,13 @@ public slots:
     void onStatusChanged(const QnResourcePtr& resource)
     {
         const auto& server = resource.dynamicCast<QnMediaServerResource>();
-        if (server)
+        if (server && !server->hasFlags(Qn::fake)) //< BTW, fakes shouldn't be connected here
         {
             m_store->setServerOnline(server->getId(), server->getStatus() == Qn::Online);
             // TODO: has internet?
         }
     }
-   
+
 private:
     QPointer<TimeSynchronizationWidgetStore> m_store;
 };
