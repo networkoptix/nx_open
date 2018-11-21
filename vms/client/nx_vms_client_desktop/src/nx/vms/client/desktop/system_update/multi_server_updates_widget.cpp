@@ -1315,12 +1315,16 @@ void MultiServerUpdatesWidget::syncUpdateCheck()
 {
     bool isChecking = m_updateCheck.valid();
     bool hasEqualUpdateInfo = m_updatesModel->lowestInstalledVersion() >= m_updateInfo.getVersion();
-    bool hasLatestVersion = ((m_updateInfo.isValid() || hasEqualUpdateInfo)
+    bool hasLatestVersion = ((m_updateInfo.isValid() || hasEqualUpdateInfo || m_updateInfo.alreadyInstalled)
         || m_updateInfo.error == nx::update::InformationError::noNewVersion);
 
     if (m_updateStateCurrent != WidgetUpdateState::ready
-        && m_updateStateCurrent != WidgetUpdateState::initial)
+        && m_updateStateCurrent != WidgetUpdateState::initial
+        && hasLatestVersion)
+    {
+        NX_DEBUG(this) << "syncUpdateCheck() dropping hasLatestVersion flag";
         hasLatestVersion = false;
+    }
 
     ui->manualDownloadButton->setVisible(!isChecking);
     ui->updateStackedWidget->setVisible(!isChecking);
@@ -1339,7 +1343,13 @@ void MultiServerUpdatesWidget::syncUpdateCheck()
         ui->versionStackedWidget->setCurrentWidget(ui->versionPage);
         ui->releaseNotesLabel->setVisible(!m_updateInfo.info.releaseNotesUrl.isEmpty());
 
-        if (m_haveValidUpdate)
+        if (hasLatestVersion)
+        {
+            ui->versionStackedWidget->setCurrentWidget(ui->latestVersionPage);
+            ui->infoStackedWidget->setCurrentWidget(ui->emptyInfoPage);
+            ui->downloadButton->setVisible(false);
+        }
+        else if (m_haveValidUpdate)
         {
             if (m_updateSourceMode == UpdateSourceType::file)
             {
@@ -1372,12 +1382,6 @@ void MultiServerUpdatesWidget::syncUpdateCheck()
             {
                 ui->releaseDescriptionLabel->hide();
             }
-        }
-        else if (hasLatestVersion)
-        {
-            ui->versionStackedWidget->setCurrentWidget(ui->latestVersionPage);
-            ui->infoStackedWidget->setCurrentWidget(ui->emptyInfoPage);
-            ui->downloadButton->setVisible(false);
         }
         else if (!m_updateCheckError.isEmpty())
         {
