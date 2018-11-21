@@ -156,7 +156,7 @@ TEST_F(TemporaryAccountPasswordManager, credentials_work)
     assertCredentialsAreAuthenticated();
 }
 
-TEST_F(TemporaryAccountPasswordManager, DISABLED_credentials_are_removed_after_expiration)
+TEST_F(TemporaryAccountPasswordManager, credentials_are_removed_after_expiration)
 {
     addTemporaryCredentials();
     whenExpirationPeriodPasses();
