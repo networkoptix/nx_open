@@ -44,6 +44,8 @@
 
 #include <nx/vms/client/desktop/ini.h>
 
+#include <nx/fusion/serialization/lexical.h>
+
 using namespace nx;
 
 using nx::vms::api::EventType;
@@ -502,6 +504,17 @@ void QnBusinessRuleViewModel::setEventType(const vms::api::EventType value)
     case EventType::cameraInputEvent:
         m_eventParams.inputPortId = QString();
         break;
+
+    case EventType::pluginEvent:
+        {
+            using namespace nx::vms::api;
+            EventLevels levels = 0;
+            levels |= ErrorEventLevel;
+            levels |= WarningEventLevel;
+            levels |= InfoEventLevel;
+            m_eventParams.inputPortId = QnLexical::serialized(levels);
+            break;
+        }
 
     case EventType::softwareTriggerEvent:
         m_eventParams.inputPortId = QnUuid::createUuid().toSimpleString();
