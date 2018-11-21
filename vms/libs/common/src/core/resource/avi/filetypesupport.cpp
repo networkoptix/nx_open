@@ -4,7 +4,7 @@
 
 bool FileTypeSupport::isMovieFileExt(const QString &filename)
 {
-    static const std::vector<QString> kVideoExtensions {
+    static const std::vector<QString> kVideoExtensions{
         "3g2", "3gp", "3gp2", "3gpp", "amv", "asf", "avi", "divx", "dv", "flv", "gxf", "m1v",
         "m2t", "m2v", "m2ts", "m4v", "mkv", "mov", "mp2", "mp2v", "mp4", "mp4v", "mpa", "mpe",
         "mpeg", "mpeg1", "mpeg2", "mpeg4", "mpg", "mpv2", "mts", "mxf", "nsv", "nuv", "ogg", "ogm",
@@ -23,7 +23,7 @@ bool FileTypeSupport::isMovieFileExt(const QString &filename)
 
 bool FileTypeSupport::isImageFileExt(const QString &filename)
 {
-    static const std::vector<QString> kImageExtensions {
+    static const std::vector<QString> kImageExtensions{
         "jpg", "jpeg", "png", "bmp", "gif", "tif", "tiff"
     };
 
