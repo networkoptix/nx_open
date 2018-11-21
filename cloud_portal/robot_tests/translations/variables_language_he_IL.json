@@ -23,7 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": "הודעת האישור נשלחת לדוא אל %email%",
     "CANNOT SAVE PASSWORD": "לא ניתן לשמור סיסמה:",
     "PASSWORD INCORRECT": "הסיסמא הנוכחית אינה נכונה.",
-    "TOO MANY ATTEMPTS TEXT": "Too many attempts. Try again in a minute.",
+    "TOO MANY ATTEMPTS TEXT": "יותר מדי ניסיונות. נסה שוב בעוד דקה.",
     "WRONG PASSWORD": "סיסמה שגויה",
     "ACCOUNT NOT FOUND TEXT": "חשבון לא נמצא",
     "CANNOT SEND CONFIRMATION EMAIL": "אין אפשרות לשלוח מייל אישור:",
@@ -84,7 +84,7 @@
     "PASSWORD TOO SHORT BADGE TEXT": "קצר מדי",
     "PASSWORD TOO COMMON BADGE TEXT": "נפוץ מדי",
     "PASSWORD IS WEAK BADGE TEXT": "חלש",
-    "PASSWORD IS FAIR BADGE TEXT": "סביר",
+    "PASSWORD IS FAIR BADGE TEXT": "הוגן",
     "PASSWORD IS GOOD BADGE TEXT": "טוב",
     "PASSWORD INCORRECT BADGE TEXT": "שגוי"
 }

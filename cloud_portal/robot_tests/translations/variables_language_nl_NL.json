@@ -23,7 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": "Een bevestigingsbericht wordt verzonden naar%email%",
     "CANNOT SAVE PASSWORD": "Kan geen wachtwoord opslaan:",
     "PASSWORD INCORRECT": "Dit wachtwoord is onjuist.",
-    "TOO MANY ATTEMPTS TEXT": "Too many attempts. Try again in a minute.",
+    "TOO MANY ATTEMPTS TEXT": "Te veel pogingen. Probeer het later opnieuw.",
     "WRONG PASSWORD": "Wachtwoord onjuist",
     "ACCOUNT NOT FOUND TEXT": "Account niet gevonden",
     "CANNOT SEND CONFIRMATION EMAIL": "Kan geen bevestigingsmail versturen:",
@@ -86,5 +86,5 @@
     "PASSWORD IS WEAK BADGE TEXT": "zwak",
     "PASSWORD IS FAIR BADGE TEXT": "redelijk",
     "PASSWORD IS GOOD BADGE TEXT": "goed",
-    "PASSWORD INCORRECT BADGE TEXT": "onjuist"
+    "PASSWORD INCORRECT BADGE TEXT": "incorrect"
 }

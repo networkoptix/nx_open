@@ -81,10 +81,10 @@
     "PATCHES TEXT": "Patches",
     "BETAS TEXT": "Betas",
     "CLIENT ONLY TEXT": "ไคลเอ็นต์เท่านั้น",
-    "PASSWORD TOO SHORT BADGE TEXT": "too short",
-    "PASSWORD TOO COMMON BADGE TEXT": "too common",
-    "PASSWORD IS WEAK BADGE TEXT": "รหัสผ่านเดาได้ง่ายไป",
-    "PASSWORD IS FAIR BADGE TEXT": "ปลอดโปร่ง",
+    "PASSWORD TOO SHORT BADGE TEXT": "สั้นเกินไป",
+    "PASSWORD TOO COMMON BADGE TEXT": "บ่อยเกินไป",
+    "PASSWORD IS WEAK BADGE TEXT": "อ่อนแอ",
+    "PASSWORD IS FAIR BADGE TEXT": "ยุติธรรม",
     "PASSWORD IS GOOD BADGE TEXT": "ดี",
     "PASSWORD INCORRECT BADGE TEXT": "ไม่ถูกต้อง"
 }

@@ -81,10 +81,10 @@
     "PATCHES TEXT": "Патчи",
     "BETAS TEXT": "Бета",
     "CLIENT ONLY TEXT": "Только клиент",
-    "PASSWORD TOO SHORT BADGE TEXT": "слишком короткий",
-    "PASSWORD TOO COMMON BADGE TEXT": "слишком распространенный",
+    "PASSWORD TOO SHORT BADGE TEXT": "короткий",
+    "PASSWORD TOO COMMON BADGE TEXT": "часто встречающийся",
     "PASSWORD IS WEAK BADGE TEXT": "слабый",
     "PASSWORD IS FAIR BADGE TEXT": "средний",
-    "PASSWORD IS GOOD BADGE TEXT": "хорошее",
+    "PASSWORD IS GOOD BADGE TEXT": "хороший",
     "PASSWORD INCORRECT BADGE TEXT": "некорректный"
 }

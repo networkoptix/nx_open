@@ -81,10 +81,10 @@
     "PATCHES TEXT": "Patches",
     "BETAS TEXT": "Betas",
     "CLIENT ONLY TEXT": "Chỉ máy trạm",
-    "PASSWORD TOO SHORT BADGE TEXT": "too short",
-    "PASSWORD TOO COMMON BADGE TEXT": "too common",
+    "PASSWORD TOO SHORT BADGE TEXT": "quá ngắn",
+    "PASSWORD TOO COMMON BADGE TEXT": "quá phổ biến",
     "PASSWORD IS WEAK BADGE TEXT": "yếu",
-    "PASSWORD IS FAIR BADGE TEXT": "hợp lý",
+    "PASSWORD IS FAIR BADGE TEXT": "công bằng",
     "PASSWORD IS GOOD BADGE TEXT": "tốt",
-    "PASSWORD INCORRECT BADGE TEXT": "không đúng"
+    "PASSWORD INCORRECT BADGE TEXT": "không chính xác"
 }

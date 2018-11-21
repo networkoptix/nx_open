@@ -23,7 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": "Onay mesajı E-posta adresine gönderildi %email%",
     "CANNOT SAVE PASSWORD": "Parola kaydedilemiyor:",
     "PASSWORD INCORRECT": "Parola hatalı.",
-    "TOO MANY ATTEMPTS TEXT": "Too many attempts. Try again in a minute.",
+    "TOO MANY ATTEMPTS TEXT": "Çok fazla deneme yapıldı. Daha sonra tekrar deneyin.",
     "WRONG PASSWORD": "Hatalı parola",
     "ACCOUNT NOT FOUND TEXT": "Hesap bulunamadı",
     "CANNOT SEND CONFIRMATION EMAIL": "Onay e-posta gönderemezsiniz:",

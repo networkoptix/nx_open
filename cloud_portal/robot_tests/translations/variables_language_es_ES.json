@@ -84,7 +84,7 @@
     "PASSWORD TOO SHORT BADGE TEXT": "demasiado corto",
     "PASSWORD TOO COMMON BADGE TEXT": "demasiado común",
     "PASSWORD IS WEAK BADGE TEXT": "débil",
-    "PASSWORD IS FAIR BADGE TEXT": "justo",
+    "PASSWORD IS FAIR BADGE TEXT": "regular",
     "PASSWORD IS GOOD BADGE TEXT": "bueno",
     "PASSWORD INCORRECT BADGE TEXT": "incorrecto"
 }
