@@ -13,6 +13,7 @@
 #include <nx/utils/time_helper.h>
 
 static const qint64 TIME_RESYNC_THRESHOLD = 1000000ll * 15;
+static const qint64 kMinAudioFrameDurationUsec = 1000;
 
 QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(const QnResourcePtr& res)
     :
@@ -157,9 +158,12 @@ void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& 
             }
             else if (m_lastMediaTime[channel] != AV_NOPTS_VALUE)
             {
+                int64_t minFrameDurationUsec = media->dataType == QnAbstractMediaData::AUDIO ?
+                    kMinAudioFrameDurationUsec : MIN_FRAME_DURATION_USEC;
+
                 qint64 timeDiff = media->timestamp - m_lastMediaTime[channel];
                 // if timeDiff < -N it may be time correction or dayling time change
-                if (timeDiff >= -TIME_RESYNC_THRESHOLD && timeDiff < MIN_FRAME_DURATION_USEC)
+                if (timeDiff >= -TIME_RESYNC_THRESHOLD && timeDiff < minFrameDurationUsec)
                 {
                     // Most likely, timestamps reported by the camera are not so good.
                     NX_VERBOSE(this, lit("Timestamp correction. ts diff %1, camera %2, %3 stream").
@@ -167,8 +171,7 @@ void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& 
                         arg(m_mediaResource ? m_mediaResource->getName() : QString()).
                         arg((media->flags & QnAbstractMediaData::MediaFlags_LowQuality) ? lit("low") : lit("high")));
 
-                    media->timestamp = m_lastMediaTime[channel] + MIN_FRAME_DURATION_USEC;
-
+                    media->timestamp = m_lastMediaTime[channel] + minFrameDurationUsec;
                 }
             }
         }
