@@ -661,6 +661,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
 
             std::sort(m_availFps[i].begin(), m_availFps[i].end());
         }
+        setMaxFps(m_availFps[0].last());
     }
     auto rtspPortString = makeActiRequest(lit("system"), lit("V2_PORT_RTSP"), status);
 
@@ -691,7 +692,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
     fetchAndSetAdvancedParameters();
 
     setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0);
-    setProperty(Qn::MAX_FPS_PARAM_NAME, getMaxFps());
+
     setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, !m_resolutionList[1].isEmpty() ? 1 : 0);
     QString serialNumber = report.value(QnActiResourceSearcher::kSystemInfoProductionIdParamName);
     if (!serialNumber.isEmpty())
@@ -917,12 +918,6 @@ QSet<QString> QnActiResource::setApiParameters(const QnCameraAdvancedParamValueM
         resultIds.insert(value.id);
 
     return resultIds;
-}
-
-int QnActiResource::getMaxFps() const
-{
-    QnMutexLocker lock(&m_mutex);
-    return m_availFps[0].last();
 }
 
 QString QnActiResource::formatBitrateString(int bitrateKbps) const

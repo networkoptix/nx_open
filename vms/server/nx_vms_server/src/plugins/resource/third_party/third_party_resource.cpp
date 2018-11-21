@@ -221,7 +221,6 @@ QnAbstractStreamDataProvider* QnThirdPartyResource::createLiveDataProvider()
     if (m_camManager->getCameraCapabilities(&camCapabilities) == nxcip::NX_NO_ERROR)
         result->setNeedCorrectTime(camCapabilities & nxcip::BaseCameraManager::relativeTimestampCapability);
 
-
     return result;
 }
 
@@ -583,12 +582,11 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
         setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid"));
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::shareFpsCapability )
-		setStreamFpsSharingMethod(Qn::BasicFpsSharing);
+        setStreamFpsSharingMethod(Qn::BasicFpsSharing);
     else if( cameraCapabilities & nxcip::BaseCameraManager::sharePixelsCapability )
-		setStreamFpsSharingMethod(Qn::PixelsFpsSharing);
+        setStreamFpsSharingMethod(Qn::PixelsFpsSharing);
     else
         setStreamFpsSharingMethod(Qn::NoFpsSharing);
-
 
     QVector<EncoderData> encoderDataTemp;
     encoderDataTemp.resize( m_encoderCount );
@@ -632,7 +630,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
     if( !maxFps )
         maxFps = DEFAULT_MAX_FPS_IN_CASE_IF_UNKNOWN;
 
-    setProperty( MAX_FPS_PARAM_NAME, maxFps);
+    setMaxFps(maxFps);
 
     if( (cameraCapabilities & nxcip::BaseCameraManager::relayInputCapability) ||
         (cameraCapabilities & nxcip::BaseCameraManager::relayOutputCapability) )

@@ -16,7 +16,6 @@ namespace Qn
     static const QString ANALOG_PARAM_NAME = lit("analog");
     static const QString IS_AUDIO_SUPPORTED_PARAM_NAME = lit("isAudioSupported");
     static const QString STREAM_FPS_SHARING_PARAM_NAME = lit("streamFpsSharing");
-    static const QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
     static const QString MOTION_WINDOW_CNT_PARAM_NAME = lit("motionWindowCnt");
     static const QString MOTION_MASK_WINDOW_CNT_PARAM_NAME = lit("motionMaskWindowCnt");
     static const QString MOTION_SENS_WINDOW_CNT_PARAM_NAME = lit("motionSensWindowCnt");
@@ -25,6 +24,10 @@ namespace Qn
     static const QString DESIRED_TRANSPORT_PARAM_NAME = lit("desiredTransport");
     static const QString ONVIF_INPUT_PORT_ALIASES_PARAM_NAME = lit("onvifInputPortAliases");
     static const QString ONVIF_MANUFACTURER_REPLACEMENT = lit("onvifManufacturerReplacement");
+
+    // Do not use this value. It is for compatibility with vms 3.1 only
+    static const QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
+
     /*!
         String parameter with following values allowed:\n
         - \a softwaregrid. Software motion calculated on mediaserver

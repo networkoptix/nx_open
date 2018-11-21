@@ -1029,11 +1029,6 @@ QSize QnPlOnvifResource::findSecondaryResolution(
     return result;
 }
 
-void QnPlOnvifResource::setMaxFps(int f)
-{
-    setProperty(Qn::MAX_FPS_PARAM_NAME, f);
-}
-
 const QString QnPlOnvifResource::getAudioEncoderId() const
 {
     QnMutexLocker lock(&m_mutex);

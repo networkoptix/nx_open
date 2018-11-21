@@ -259,6 +259,13 @@ int QnSecurityCamResource::getMaxFps() const
     return value.isNull() ? kDefaultMaxFps : value.toInt();
 }
 
+void QnSecurityCamResource::setMaxFps(int fps)
+{
+    nx::media::CameraMediaCapability capability = cameraMediaCapability();
+    capability.streamCapabilities[Qn::StreamIndex::primary].maxFps = fps;
+    setCameraMediaCapability(capability);
+}
+
 int QnSecurityCamResource::reservedSecondStreamFps() const
 {
     QString value = getProperty(lit("reservedSecondStreamFps"));
@@ -875,7 +882,6 @@ void QnSecurityCamResource::setTrustCameraTime(bool value)
 {
     setProperty(Qn::TRUST_CAMERA_TIME_NAME, boolToPropertyStr(value));
 }
-
 
 QString QnSecurityCamResource::getVendor() const
 {
