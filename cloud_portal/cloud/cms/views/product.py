@@ -161,7 +161,8 @@ def review(request):
                                                                                                 settings.CUSTOMIZATION,
                                                                                                 'cms.force_update'):
         if product.product_type.can_preview:
-            filldata.init_skin(product)
+            filldata.init_skin(product, preview=False)
+            filldata.init_skin(product, preview=True)
             messages.success(request, "Version {} was force updated ".format(product_review.version.id))
         else:
             messages.error(request, "You cannot force update this product")

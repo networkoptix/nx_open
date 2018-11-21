@@ -198,7 +198,7 @@ def generate_languages_json(save_location, language_codes, preview):
     save_content(target_file_name, json.dumps(languages_json, ensure_ascii=False))
 
 
-def init_skin(product, preview=False, run_both=True):
+def init_skin(product, preview=False):
     # 1. read skin for this customization
     customization_name = product.customizations.first().name
     skin = product.read_global_value('%SKIN%')
@@ -209,11 +209,11 @@ def init_skin(product, preview=False, run_both=True):
     target_dir = TARGET_DIR.replace("{{customization}}", customization_name)
 
     # 3. run fill_content
-    if not preview or run_both:
+    if not preview:
         distutils.dir_util.copy_tree(from_dir, target_dir)
         logger.info("Fill content for " + product.__str__())
         fill_content(product, preview=False, incremental=False)
-    if preview or run_both:
+    if preview:
         distutils.dir_util.copy_tree(from_dir, os.path.join(target_dir, 'preview'))
         logger.info("Fill preview for " + product.__str__())
         fill_content(product, preview=True, incremental=False)

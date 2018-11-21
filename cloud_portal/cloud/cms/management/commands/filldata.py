@@ -17,11 +17,11 @@ class Command(BaseCommand):
         if options['customization'] == 'all':
             for custom in Customization.objects.all():
                 product = get_cloud_portal_product(custom.name)
-                filldata.init_skin(product, options['preview'], run_both=False)
+                filldata.init_skin(product, options['preview'])
                 self.stdout.write(self.style.SUCCESS('Initiated static content for ' + product.__str__()))
         else:
             product = get_cloud_portal_product(options['customization'])
-            filldata.init_skin(product, options['preview'], run_both=False)
+            filldata.init_skin(product, options['preview'])
             self.stdout.write(self.style.SUCCESS(
                 'Initiated static content for ' + product.__str__()))
 
