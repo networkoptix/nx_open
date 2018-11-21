@@ -130,27 +130,6 @@ static const char DB_INSTANCE_KEY[] = "DB_INSTANCE_ID";
 
 using std::nullptr_t;
 
-static bool removeDirRecursive(const QString & dirName)
-{
-    bool result = true;
-    QDir dir(dirName);
-
-    if (dir.exists(dirName)) {
-        for(const QFileInfo& info: dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst))
-        {
-            if (info.isDir())
-                result = removeDir(info.absoluteFilePath());
-            else
-                result = QFile::remove(info.absoluteFilePath());
-
-            if (!result)
-                return result;
-        }
-        result = dir.rmdir(dirName);
-    }
-    return result;
-}
-
 template <class T>
 void assertSorted(std::vector<T> &data) {
 #ifdef _DEBUG
@@ -513,7 +492,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
         if (addedStoredFilesCnt > 0)
             m_resyncFlags |= ResyncFiles;
 
-        removeDirRecursive(storedFilesDir);
+        QDir(storedFilesDir).removeRecursively();
 
         // updateDBVersion();
         QSqlQuery insVersionQuery(m_sdb);

@@ -5,32 +5,6 @@
 #include <QtCore/QString>
 
 /**
- * Remove directory recursively.
- *
- * \param dirName                       Name of the directory to remove.
- * \returns                             Whether the operation completer successfully.
- */
-bool removeDir(const QString &dirName);
-
-/**
- * Convert path from native to universal.
- *
- * \param path                          Path to convert.
- * \returns                             Converted path.
- */
-QString fromNativePath(const QString &path);
-
-/**
- * \returns                             User movies directory.
- */
-QString getMoviesDirectory();
-
-/**
- * \returns                             User backrounds directory.
- */
-QString getBackgroundsDirectory();
-
-/**
  * \param num                           Number.
  * \returns                             Number of digits in decimal representation of the given number.
  */

@@ -92,10 +92,11 @@ QString ServerFileCache::folderName() const {
     return m_folderName;
 }
 
-void ServerFileCache::clearLocalCache() {
-    QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-    QString dir = QDir::toNativeSeparators(QString(lit("%1/cache/")).arg(path));
-    removeDir(dir);
+void ServerFileCache::clearLocalCache()
+{
+    QDir dir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+    if (dir.cd("cache"))
+        dir.removeRecursively();
 }
 
 bool ServerFileCache::isConnectedToServer() const {

@@ -19,67 +19,11 @@
 #include <QtNetwork/QHostInfo>
 
 #include <common/common_globals.h>
-#include <utils/mac_utils.h>
+
 #include <utils/common/app_info.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/datetime.h>
 #include <nx/system_commands.h>
-
-bool removeDir(const QString &dirName)
-{
-    bool result = true;
-    QDir dir(dirName);
-
-    if (dir.exists(dirName))
-    {
-        for(const QFileInfo& info: dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst))
-        {
-            if (info.isDir())
-                result &= removeDir(info.absoluteFilePath());
-            else
-                result &= QFile::remove(info.absoluteFilePath());
-        }
-
-        result &= dir.rmdir(dirName);
-    }
-
-    return result;
-}
-
-QString fromNativePath(const QString &path)
-{
-    QString result = QDir::cleanPath(QDir::fromNativeSeparators(path));
-
-    if (!result.isEmpty() && result.endsWith(QLatin1Char('/')))
-        result.chop(1);
-
-    return result;
-}
-
-QString getMoviesDirectory()
-{
-#ifdef Q_OS_MACX
-    QString moviesDir = mac_getMoviesDir();
-    return moviesDir.isEmpty() ? QString() : moviesDir + QLatin1String("/") + QnAppInfo::mediaFolderName();
-#else
-    const QStringList& moviesDirs = QStandardPaths::standardLocations(QStandardPaths::MoviesLocation);
-    return moviesDirs.isEmpty() ? QString() : (moviesDirs[0] + QLatin1String("/") + QnAppInfo::mediaFolderName()) ;
-#endif
-}
-
-QString getBackgroundsDirectory() {
-    const QStringList& pictureFolderList = QStandardPaths::standardLocations(QStandardPaths::PicturesLocation);
-    QString baseDir = pictureFolderList.isEmpty() ? QString(): pictureFolderList[0];
-#ifdef Q_OS_WIN
-    QString productDir = baseDir + QDir::toNativeSeparators(QString(lit("/%1 Backgrounds")).arg(QnAppInfo::productNameLong()));
-#else
-    QString productDir = QDir::toNativeSeparators(QString(lit("/opt/%1/client/share/pictures/sample-backgrounds")).arg(QnAppInfo::linuxOrganizationName()));
-#endif
-
-    return QDir(productDir).exists()
-            ? productDir
-            : baseDir;
-}
 
 int digitsInNumber(unsigned num)
 {
