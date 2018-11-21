@@ -27,6 +27,7 @@
 #include <motion/motion_detection.h>
 #include <utils/common/synctime.h>
 #include <core/resource/param.h>
+#include <decoders/audio/aac.h>
 
 namespace
 {
@@ -649,6 +650,12 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader(
         outExtras->extradataBlob.resize(extradataSize);
         memcpy(outExtras->extradataBlob.data(), mediaDataPacket2->extradata(), mediaDataPacket2->extradataSize());
         mediaDataPacket2->releaseRef();
+    }
+    else if (packet->codecType() == nxcip::AV_CODEC_ID_AAC)
+    {
+        AdtsHeader header;
+        if (header.decodeFromFrame((const uint8_t*)packet->data(), packet->dataSize()))
+            header.encodeToFfmpegExtradata(&outExtras->extradataBlob);
     }
 
     switch( packet->type() )

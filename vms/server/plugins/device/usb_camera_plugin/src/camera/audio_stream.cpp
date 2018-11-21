@@ -19,6 +19,7 @@ namespace usb_cam {
 namespace {
 
 static constexpr int kMsecInSec = 1000;
+static constexpr int kResyncThresholdMsec = 1000;
 
 static const char * ffmpegDeviceType()
 {
@@ -153,8 +154,6 @@ int AudioStream::AudioStreamPrivate::initialize()
 void AudioStream::AudioStreamPrivate::uninitialize()
 {
     m_packetConsumerManager->flush();
-    m_packetMergeBuffer.clear();
-
     while(*m_packetCount > 0)
     {
         static constexpr std::chrono::milliseconds kSleep(30);
@@ -400,57 +399,24 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int 
     //TODO: use AACPermanently in default_audio_encoder.cpp after archiving issues are fixed.
     if(packet->codecId() == AV_CODEC_ID_AAC)
     {
+        int64_t duration = packet->packet()->duration;
         // Inject ADTS header into each packet becuase AAC encoder does not do it.
         if (m_adtsInjector.inject(packet.get()) < 0)
             return nullptr;
 
-        // AAC audio encoder puts out many small packets, causing choppy audio on the client side.
-        // Merging multiple smaller packets into one larger one fixes the issue.
-        if (auto pkt = mergePackets(packet, outFfmpegError))
-            return pkt;
+        const AVRational sourceRate = {1, m_encoder->sampleRate()};
+        const AVRational targetRate = {1, 1000};
+        int64_t offsetMsec = av_rescale_q(m_offsetTicks, sourceRate, targetRate);
+        if (labs(m_timeProvider->millisSinceEpoch() - m_baseTimestamp - offsetMsec) > kResyncThresholdMsec)
+        {
+            m_offsetTicks = 0;
+            offsetMsec = 0;
+            m_baseTimestamp = m_timeProvider->millisSinceEpoch();
+        }
+        packet->setTimestamp(m_baseTimestamp + offsetMsec);
+        m_offsetTicks += duration;
     }
-
     return packet;
-}
-
-std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::mergePackets(
-    const std::shared_ptr<ffmpeg::Packet>& packet,
-    int * outFfmpegError)
-{
-    *outFfmpegError = 0;
-
-    packet->setTimestamp(m_timeProvider->millisSinceEpoch());
-
-    // Only merge if the timestamp difference is >= the amount of time it takes to produce a 
-    // video frame.
-    m_packetMergeBuffer.push_back(packet);
-    if (packet->timestamp() - m_packetMergeBuffer[0]->timestamp() < timePerVideoFrame().count())
-        return nullptr;
-
-    // Do the merge now
-    int size = 0;
-    for (const auto& pkt : m_packetMergeBuffer)
-        size += pkt->size();
-
-    auto newPacket = std::make_shared<ffmpeg::Packet>(
-        packet->codecId(),
-        packet->mediaType());
-
-    *outFfmpegError = newPacket->newPacket(size);
-    if (*outFfmpegError < 0)
-        return nullptr;
-
-    uint8_t * data = newPacket->data();
-    for (const auto & pkt : m_packetMergeBuffer)
-    {
-        memcpy(data, pkt->data(), pkt->size());
-        data += pkt->size();
-    }
-
-    newPacket->setTimestamp(packet->timestamp());
-    m_packetMergeBuffer.clear();
-
-    return newPacket;
 }
 
 std::chrono::milliseconds AudioStream::AudioStreamPrivate::timePerVideoFrame() const
