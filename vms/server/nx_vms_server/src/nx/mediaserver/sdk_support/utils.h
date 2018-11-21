@@ -137,11 +137,6 @@ UniquePtr<nx::sdk::Settings> toSdkSettings(const QString& settingsJson);
 
 QVariantMap fromSdkSettings(const nx::sdk::Settings* sdkSettings);
 
-void saveManifestToFile(
-    const nx::utils::log::Tag& logTag,
-    const QString& manifest,
-    const QString& baseFileName);
-
 std::optional<nx::sdk::analytics::UncompressedVideoFrame::PixelFormat>
     pixelFormatFromEngineManifest(
         const nx::vms::api::analytics::EngineManifest& manifest,

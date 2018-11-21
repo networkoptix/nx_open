@@ -109,6 +109,10 @@ void Manager::initExistingResources()
     const auto devices = resourcePool()->getAllCameras(mediaServer, /*ignoreDesktopCamera*/ true);
     for (const auto& device: devices)
         at_deviceAdded(device);
+
+    const auto engines = resourcePool()->getResources<resource::AnalyticsEngineResource>();
+    for (const auto& engine: engines)
+        at_engineAdded(engine);
 }
 
 QSharedPointer<DeviceAnalyticsContext> Manager::context(const QnUuid& deviceId) const
@@ -369,21 +373,33 @@ void Manager::updateEngineSettings(const resource::AnalyticsEngineResourcePtr& e
     NX_DEBUG(this, "Updating engine %1 (%2) with settings",
         engine->getName(), engine->getId());
 
+    sdk_support::UniquePtr<nx::sdk::Settings> sdkSettings;
     if (pluginsIni().analyticsEngineSettingsPath[0] != 0)
     {
         NX_WARNING(
             this,
-            "Passing engine settings from file, engine %1 (%2)",
+            "Trying to load settings for the Engine from the file. Engine %1 (%2)",
             engine->getName(),
             engine->getId());
 
-        debug_helpers::setEngineSettings(sdkEngine);
+        sdkSettings = analytics::debug_helpers::loadEngineSettingsFromFile(engine);
     }
-    else
+
+    if (!sdkSettings)
+        sdkSettings = sdk_support::toSdkSettings(engine->settingsValues());
+
+    if (!sdkSettings)
     {
-        auto sdkSettings = sdk_support::toSdkSettings(engine->settingsValues());
-        sdkEngine->setSettings(sdkSettings.get());
+        NX_ERROR(
+            this,
+            "Unable to get settings for Engine %1 (%2)",
+            engine->getName(),
+            engine->getId());
+
+        return;
     }
+
+    sdkEngine->setSettings(sdkSettings.get());
 }
 
 void Manager::registerMetadataSink(

@@ -145,30 +145,30 @@ bool SdkObjectFactory::initPluginResources()
     for (auto& analyticsPluginData: databaseAnalyticsPlugins)
         pluginDataById.emplace(analyticsPluginData.id, std::move(analyticsPluginData));
 
-    auto realAnalyticsPlugins = pluginManager->findNxPlugins<nx::sdk::analytics::Plugin>(
+    auto analyticsPlugins = pluginManager->findNxPlugins<nx::sdk::analytics::Plugin>(
         nx::sdk::analytics::IID_Plugin);
 
     std::map<QnUuid, PluginPtr> sdkPluginsById;
-    for (const auto realAnalyticsPlugin: realAnalyticsPlugins)
+    for (const auto analyticsPlugin: analyticsPlugins)
     {
-        auto realAnalyticsPluginPtr =
-            sdk_support::SharedPtr<nx::sdk::analytics::Plugin>(realAnalyticsPlugin);
+        auto analyticsPluginPtr =
+            sdk_support::SharedPtr<nx::sdk::analytics::Plugin>(analyticsPlugin);
 
         const auto pluginManifest = sdk_support::manifest<nx::vms::api::analytics::PluginManifest>(
-            realAnalyticsPlugin,
-            makeLogger(resource::AnalyticsPluginResourcePtr()));
+            analyticsPlugin,
+            makeLogger(analyticsPlugin));
 
         if (!pluginManifest)
         {
             NX_ERROR(
                 this,
                 "Can't fetch a manifest from the analytics plugin %1",
-                realAnalyticsPlugin->name());
+                analyticsPlugin->name());
             continue;
         }
 
         const auto id = QnUuid::fromArbitraryData(pluginManifest->id);
-        sdkPluginsById.emplace(id, realAnalyticsPluginPtr);
+        sdkPluginsById.emplace(id, analyticsPluginPtr);
 
         NX_DEBUG(
             this,
@@ -372,13 +372,19 @@ nx::vms::api::AnalyticsEngineData SdkObjectFactory::createEngineData(
 std::unique_ptr<sdk_support::AbstractManifestLogger> SdkObjectFactory::makeLogger(
     resource::AnalyticsPluginResourcePtr pluginResource) const
 {
-    const QString messageTemplate(
-        "Error occurred while fetching Plugin manifest: {:error}");
-
+    const QString messageTemplate("Error occurred while fetching Plugin manifest: {:error}");
     return std::make_unique<sdk_support::ManifestLogger>(
         nx::utils::log::Tag(typeid(this)),
         messageTemplate,
         std::move(pluginResource));
+}
+
+std::unique_ptr<sdk_support::AbstractManifestLogger> SdkObjectFactory::makeLogger(
+    const nx::sdk::analytics::Plugin* plugin) const
+{
+    return std::make_unique<sdk_support::StartupPluginManifestLogger>(
+        nx::utils::log::Tag(typeid(this)),
+        plugin);
 }
 
 } // namespace nx::mediaserver::analytics

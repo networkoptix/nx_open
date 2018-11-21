@@ -30,7 +30,6 @@ public:
     sdk_support::SharedPtr<nx::sdk::analytics::Engine> sdkEngine() const;
 
     virtual QVariantMap settingsValues() const override;
-
     virtual void setSettingsValues(const QVariantMap& values) override;
 
 private:

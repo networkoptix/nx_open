@@ -153,25 +153,40 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
         return false;
     }
 
-    if (pluginsIni().analyticsDeviceAgentSettingsPath[0] != 0)
+    sdk_support::UniquePtr<nx::sdk::Settings> sdkSettings;
+    if (pluginsIni().analyticsDeviceAgentSettingsPath[0] != '\0')
     {
         NX_WARNING(
             this,
-            "Passing settings from file to device agent. "
-            "Device: %1 (%2), engine: %3 (%4)",
+            "Trying to load settings for the DeviceAgent from the file. "
+            "Device: %1 (%2), Engine: %3 (%4)",
             m_device->getUserDefinedName(),
             m_device->getId(),
             m_engine->getName(),
             m_engine->getId());
 
-        debug_helpers::setDeviceAgentSettings(m_sdkDeviceAgent, m_device);
+        sdkSettings = debug_helpers::loadDeviceAgentSettingsFromFile(m_device, m_engine);
     }
-    else if (m_currentSettings != settings)
+
+    if (!sdkSettings)
     {
-        const auto sdkSettings = sdk_support::toSdkSettings(settings);
-        m_sdkDeviceAgent->setSettings(sdkSettings.get());
-        m_currentSettings = settings;
+        const auto settingValues = augmentedSettings(settings);
+        sdkSettings = sdk_support::toSdkSettings(settingValues);
     }
+
+    if (!sdkSettings)
+    {
+        NX_ERROR(
+            this,
+            "Unable to get settings for DeviceAgent. Device: %1 (%2), Engine: %3 %4)",
+            m_device->getUserDefinedName(),
+            m_device->getId(),
+            m_engine->getName(),
+            m_engine->getId());
+        return false;
+    }
+
+    m_sdkDeviceAgent->setSettings(sdkSettings.get());
 
     if (!m_started)
     {
@@ -261,16 +276,40 @@ void DeviceAnalyticsBinding::setSettings(const QVariantMap& settings)
         return;
     }
 
-    const auto engineManifest = m_engine->manifest();
-    interactive_settings::JsonEngine jsonEngine;
-    jsonEngine.loadModelFromJsonObject(engineManifest.deviceAgentSettingsModel);
+    sdk_support::UniquePtr<nx::sdk::Settings> sdkSettings;
+    QVariantMap settingsValues;
+    if (pluginsIni().analyticsDeviceAgentSettingsPath[0] != '\0')
+    {
+        NX_WARNING(
+            this,
+            "Trying to load settings for the DeviceAgent from the file. "
+            "Device: %1 (%2), Engine: %3 (%4)",
+            m_device->getUserDefinedName(),
+            m_device->getId(),
+            m_engine->getName(),
+            m_engine->getId());
 
-    const auto settingsFromProperty = m_device->deviceAgentSettingsValues(m_engine->getId());
-    jsonEngine.applyValues(settingsFromProperty);
-    jsonEngine.applyValues(settings);
+        sdkSettings = debug_helpers::loadDeviceAgentSettingsFromFile(m_device, m_engine);
+    }
 
-    const auto settingsValues = jsonEngine.values();
-    auto sdkSettings = sdk_support::toSdkSettings(settingsValues);
+    if (!sdkSettings)
+    {
+        settingsValues = augmentedSettings(settings);
+        sdkSettings = sdk_support::toSdkSettings(settingsValues);
+    }
+
+    if (!sdkSettings)
+    {
+        NX_ERROR(
+            this,
+            "Unable to get settings for DeviceAgent. Device: %1 (%2), Engine: %3 %4)",
+            m_device->getUserDefinedName(),
+            m_device->getId(),
+            m_engine->getName(),
+            m_engine->getId());
+        return;
+    }
+
     deviceAgent->setSettings(sdkSettings.get());
     m_device->setDeviceAgentSettingsValues(m_engine->getId(), settingsValues);
 }
@@ -514,6 +553,19 @@ std::unique_ptr<sdk_support::AbstractManifestLogger> DeviceAnalyticsBinding::mak
         messageTemplate,
         m_device,
         m_engine);
+}
+QVariantMap DeviceAnalyticsBinding::augmentedSettings(
+    const QVariantMap& settings) const
+{
+    const auto engineManifest = m_engine->manifest();
+    interactive_settings::JsonEngine jsonEngine;
+    jsonEngine.loadModelFromJsonObject(engineManifest.deviceAgentSettingsModel);
+
+    const auto settingsFromProperty = m_device->deviceAgentSettingsValues(m_engine->getId());
+    jsonEngine.applyValues(settingsFromProperty);
+    jsonEngine.applyValues(settings);
+
+    return jsonEngine.values();
 }
 
 void DeviceAnalyticsBinding::putData(const QnAbstractDataPacketPtr& data)

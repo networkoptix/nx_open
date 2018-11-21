@@ -75,6 +75,8 @@ private:
     std::unique_ptr<sdk_support::AbstractManifestLogger> makeLogger(
         const QString& manifestTypes) const;
 
+    QVariantMap augmentedSettings(const QVariantMap& settings) const;
+
 private:
     mutable QnMutex m_mutex;
     QnVirtualCameraResourcePtr m_device;
@@ -89,7 +91,6 @@ private:
 
     QnAbstractDataReceptorPtr m_metadataSink;
 
-    QVariantMap m_currentSettings;
     std::atomic<bool> m_started{false};
     std::atomic<bool>m_isStreamConsumer{false};
 };

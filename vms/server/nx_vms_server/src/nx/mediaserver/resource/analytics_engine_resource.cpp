@@ -124,21 +124,28 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
     if (!manifest)
         return CameraDiagnostics::PluginErrorResult("Can't deserialize engine manifest");
 
-    if (pluginsIni().analyticsEngineSettingsPath[0])
+    sdk_support::UniquePtr<nx::sdk::Settings> sdkSettings;
+    if (pluginsIni().analyticsEngineSettingsPath[0] != '\0')
     {
         NX_WARNING(
             this,
-            "Passing engine settings from file, engine %1 (%2)",
+            "Trying to load settings for the Engine from the file. Engine %1 (%2)",
             getName(),
             getId());
 
-        analytics::debug_helpers::setEngineSettings(m_sdkEngine);
+        sdkSettings = analytics::debug_helpers::loadEngineSettingsFromFile(toSharedPointer(this));
     }
-    else
+
+    if (!sdkSettings)
+        sdkSettings = sdk_support::toSdkSettings(settingsValues());
+
+    if (!sdkSettings)
     {
-        auto sdkSettings = sdk_support::toSdkSettings(settingsValues());
-        m_sdkEngine->setSettings(sdkSettings.get());
+        NX_ERROR(this, "Unable to get settings for Engine %1 (%2)", getName(), getId());
+        return CameraDiagnostics::InternalServerErrorResult("Unable to fetch settings");
     }
+
+    m_sdkEngine->setSettings(sdkSettings.get());
 
     auto analyticsDescriptorListManager = sdk_support::getDescriptorListManager(serverModule());
     if (!analyticsDescriptorListManager)
