@@ -216,21 +216,11 @@ void GenericTransport::processHandshakeCommand(
     TransactionTransportHeader transportHeader,
     std::unique_ptr<DeserializableCommandData> commandData)
 {
-    switch (commandData->header().command)
+    if (commandData->header().command == command::TranSyncRequest::code)
     {
-        case command::TranSyncRequest::code:
-        {
-            auto commandWrapper = commandData->deserialize<command::TranSyncRequest>(
-                transportHeader.transactionFormatVersion);
-            processHandshakeCommand(commandWrapper->take());
-            break;
-        }
-    
-        case command::TranSyncResponse::code:
-        {
-            int x = 0;
-            break;
-        }
+        auto commandWrapper = commandData->deserialize<command::TranSyncRequest>(
+            transportHeader.transactionFormatVersion);
+        processHandshakeCommand(commandWrapper->take());
     }
 }
 

@@ -24,7 +24,7 @@ TransportManager::TransportManager(
 
 std::unique_ptr<AbstractTransactionTransportConnector> TransportManager::createConnector(
     const std::string& systemId,
-    const std::string& connectionId,
+    const std::string& /*connectionId*/,
     const nx::utils::Url& targetUrl)
 {
     using namespace nx::network;
