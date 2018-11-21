@@ -171,6 +171,7 @@ Should respond to tab and go in the correct order
     Element Should Be Focused    ${ACCOUNT SAVE}
 
 Langauge is changeable on the account page
+    [tags]    C41574
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
@@ -191,3 +192,30 @@ Langauge is changeable on the account page
     Sleep    1
     Verify In Account Page
     Wait Until Element Is Visible    //h1['${ACCOUNT TEXT}']
+
+Language changed in account is new default
+    [tags]    C41574
+    Go To    ${url}/account
+    Log In    ${EMAIL NOPERM}    ${password}    button=None
+    Validate Log In
+    Verify In Account Page
+    Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
+    Wait Until Element Is Visible    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='en_US']
+    Click Element    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='en_US']/..
+    Click Button    ${ACCOUNT SAVE}
+    Wait Until Element Is Visible    //h1[text()='Account']
+    Log Out
+    Validate Log Out
+
+
+    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}    20
+    Click Button    ${LANGUAGE DROPDOWN}
+    Wait Until Element Is Visible    //nx-footer//span[@lang='ru_RU']/..
+    Click Element    //nx-footer//span[@lang='ru_RU']/..
+    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='ru_RU']    5
+    Sleep    1    #to wait for language to fully change before continuing.  This caused issues with login.
+    Go To    ${url}/account
+    Log In    ${EMAIL NOPERM}    ${password}    button=None
+    Validate Log In
+    Verify In Account Page
+    Wait Until Element Is Visible    //h1[text()='Account']

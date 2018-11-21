@@ -52,11 +52,12 @@ Check Language
     Run Keyword If    "${status}"=="FAIL"    Set Language
 
 Set Language
+    [arguments]    ${lang}=${LANGUAGE}
     Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}    20
     Click Button    ${LANGUAGE DROPDOWN}
     Wait Until Element Is Visible    ${LANGUAGE TO SELECT}
     Click Element    ${LANGUAGE TO SELECT}
-    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    5
+    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${lang}']    5
     Sleep    1    #to wait for language to fully change before continuing.  This caused issues with login.
 
 Log In
