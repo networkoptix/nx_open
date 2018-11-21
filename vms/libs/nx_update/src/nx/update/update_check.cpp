@@ -426,11 +426,11 @@ std::future<UpdateContents> checkLatestUpdate(
             result.source = lit("%1 for build=%2").arg(updateUrl, nx::update::kLatestVersion);
             if (callback)
             {
-                executeDelayed(
+                executeInThread(thread,
                     [callback = std::move(callback), result]()
                     {
                         callback(result);
-                    }, 0, thread);
+                    });
             }
             return result;
         });
@@ -450,11 +450,11 @@ std::future<UpdateContents> checkSpecificChangeset(
             result.source = lit("%1 for build=%2").arg(updateUrl, build);
             if (callback)
             {
-                executeDelayed(
+                executeInThread(thread,
                     [callback = std::move(callback), result]()
                     {
                         callback(result);
-                    }, 0, thread);
+                    });
             }
             return result;
         });
