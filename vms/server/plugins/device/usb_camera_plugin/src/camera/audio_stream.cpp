@@ -72,8 +72,8 @@ void AudioStream::AudioStreamPrivate::addPacketConsumer(
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_packetConsumerManager->addConsumer(consumer);
-        m_wait.notify_all();
     }
+    m_wait.notify_all();
 
     tryStart();
 }
@@ -114,7 +114,7 @@ bool AudioStream::AudioStreamPrivate::waitForConsumers()
     if (wait)
         uninitialize(); // < Don't stream the camera if there are no consumers
     
-    // Check again if there are no consuemrs because they could have been added during unitialize.
+    // Check again if there are no consumers because they could have been added during unitialize.
     std::unique_lock<std::mutex> lock(m_mutex);
     if(m_packetConsumerManager->empty())
     {

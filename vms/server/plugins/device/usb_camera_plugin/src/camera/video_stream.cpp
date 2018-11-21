@@ -102,18 +102,19 @@ void VideoStream::addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>&
 
         m_packetConsumerManager.addConsumer(consumer, skipUntilNextKeyPacket);
         updateUnlocked();
-
-        m_wait.notify_all();
     }
+    m_wait.notify_all();
 
     tryStart();
 }
 
 void VideoStream::removePacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    m_packetConsumerManager.removeConsumer(consumer);
-    updateUnlocked();
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_packetConsumerManager.removeConsumer(consumer);
+        updateUnlocked();
+    }
     m_wait.notify_all();
 }
 
@@ -123,21 +124,22 @@ void VideoStream::addFrameConsumer(const std::weak_ptr<AbstractFrameConsumer>& c
         std::lock_guard<std::mutex> lock(m_mutex);
         m_frameConsumerManager.addConsumer(consumer);
         updateUnlocked();
-        m_wait.notify_all();
     }
+    m_wait.notify_all();
 
     tryStart();
 }
 
 void VideoStream::removeFrameConsumer(const std::weak_ptr<AbstractFrameConsumer>& consumer)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    m_frameConsumerManager.removeConsumer(consumer);
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_frameConsumerManager.removeConsumer(consumer);
 
-    // Raspberry Pi: reinitialize the camera to recover frame rate on the primary stream.
-    if (nx::utils::AppInfo::isRaspberryPi() && m_frameConsumerManager.empty())
-        m_cameraState = csModified;
-
+        // Raspberry Pi: reinitialize the camera to recover frame rate on the primary stream.
+        if (nx::utils::AppInfo::isRaspberryPi() && m_frameConsumerManager.empty())
+            m_cameraState = csModified;
+    }
     m_wait.notify_all();
 }
 
@@ -203,7 +205,7 @@ bool VideoStream::waitForConsumers()
     if (wait)
         uninitialize(); // < Don't stream the camera if there are no consumers
 
-    // Check again if there are no consuemrs because they could have been added during unitialize.
+    // Check again if there are no consumers because they could have been added during unitialize.
     std::unique_lock<std::mutex> lock(m_mutex);
     if(noConsumers())
     {
