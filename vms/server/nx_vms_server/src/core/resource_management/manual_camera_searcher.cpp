@@ -32,8 +32,7 @@ QnManualCameraSearcher::QnManualCameraSearcher(QnCommonModule* commonModule):
     m_state(QnManualResourceSearchStatus::Init),
     m_cancelled(false),
     m_hostRangeSize(0),
-    m_totalTaskCount(0),
-    m_remainingTaskCount(0)
+    m_taskManager(commonModule)
 {
     NX_VERBOSE(this, "Created");
 }
@@ -69,21 +68,23 @@ bool QnManualCameraSearcher::run(
     const QAuthenticator& auth,
     int port)
 {
-    using namespace std::placeholders;
-
     {
-        QnMutexLocker lock( &m_mutex );
+        QnMutexLocker lock(&m_mutex);
         // TODO: Use assert? Allow to run only from init state?
         if (m_state == QnManualResourceSearchStatus::Aborted)
             return false;
 
-        m_totalTaskCount = 0;
-        m_remainingTaskCount = 0;
-        m_urlSearchTaskQueues.clear();
-        m_searchQueueContexts.clear();
         m_cancelled = false;
         m_searchDoneCallback = std::move(callback);
+        // TODO: reset TaskManager
     }
+
+    QStringList onlineHosts;
+    if (endAddr.isNull())
+        onlineHosts.push_back(startAddr);
+    else
+        onlineHosts = getOnlineHosts(startAddr, endAddr, port);
+    NX_VERBOSE(this, "Will check %1 hosts", onlineHosts.size());
 
     QnSearchTask::SearcherList sequentialSearchers;
     QnSearchTask::SearcherList parallelSearchers;
@@ -98,64 +99,37 @@ bool QnManualCameraSearcher::run(
     NX_VERBOSE(this, "Will use %1 sequential and %2 concurrent searchers",
         sequentialSearchers.size(), parallelSearchers.size());
 
-    QStringList onlineHosts;
-    if (endAddr.isNull())
-        onlineHosts.push_back(startAddr);
-    else
-        onlineHosts = getOnlineHosts(startAddr, endAddr, port);
-    NX_VERBOSE(this, "Will check %1 hosts", onlineHosts.size());
-
     for (const auto& host: onlineHosts)
     {
-        QnSearchTask sequentialTask(commonModule(), host, port, auth, true);
-        sequentialTask.setSearchers(sequentialSearchers);
-        sequentialTask.setSearchDoneCallback(
-            std::bind(&QnManualCameraSearcher::searchTaskDoneHandler, this, _1, _2));
-        sequentialTask.setBlocking(true);
-        sequentialTask.setInterruptTaskProcessing(true);
-
-        QString hostToCheck;
-        hostToCheck = sequentialTask.url().toString();
-
-        m_urlSearchTaskQueues[hostToCheck].enqueue(sequentialTask);
-        m_searchQueueContexts[hostToCheck] = SearchTaskQueueContext();
-
-        m_remainingTaskCount++;
+        m_taskManager.addTask(nx::network::SocketAddress(host, port),
+            auth, sequentialSearchers, /*isSequential*/ true);
 
         for (const auto& searcher: parallelSearchers)
         {
-            QnSearchTask::SearcherList searcherList;
-            searcherList.push_back(searcher);
-
-            QnSearchTask parallelTask(commonModule(), host, port, auth, false);
-            parallelTask.setSearchers(searcherList);
-            sequentialTask.setSearchDoneCallback(
-                std::bind(&QnManualCameraSearcher::searchTaskDoneHandler, this, _1, _2));
-
-            m_urlSearchTaskQueues[hostToCheck].enqueue(parallelTask);
-
-            m_remainingTaskCount++;
+            m_taskManager.addTask(nx::network::SocketAddress(host, port),
+                auth, {searcher}, /*isSequential*/ false);
         }
     }
 
-    m_totalTaskCount = m_remainingTaskCount;
     {
         QnMutexLocker lock(&m_mutex);
+        // TODO: Should I run callback here? It seems yes...
         if (m_cancelled)
             return true;
         changeStateUnsafe(QnManualResourceSearchStatus::CheckingHost);
-        runTasksUnsafe();
+        m_taskManager.startTasks([this](auto result){ searchTaskDoneHandler(std::move(result)); });
     }
 
-    // TODO: Should I run callback here?
     return true;
 }
 
-void QnManualCameraSearcher::cancel() {
-
+// TODO: revise it implementation and usage.
+// Implement pleaseStop pair?
+void QnManualCameraSearcher::cancel()
+{
     {
         QnMutexLocker lock(&m_mutex);
-        NX_VERBOSE(this, "Canceling search, remaining tasks: %1", m_remainingTaskCount);
+        NX_VERBOSE(this, "Canceling search");
         m_cancelled = true;
         switch (m_state)
         {
@@ -163,16 +137,16 @@ void QnManualCameraSearcher::cancel() {
                 return;
             case QnManualResourceSearchStatus::CheckingOnline:
                 m_ipChecker.pleaseStop();
+                m_ipChecker.join(); // TODO: remove it from here
+                break;
+            case QnManualResourceSearchStatus::CheckingHost:
+                m_taskManager.pleaseStopSync();  // TODO: make it async
                 break;
             default:
                 break;
         }
         changeStateUnsafe(QnManualResourceSearchStatus::Aborted);
     }
-
-    // TODO: Add state aborting.
-    m_ipChecker.join();
-//    waitToFinishSearch(); // TODO: should somehow wait here?
 }
 
 QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
@@ -184,8 +158,8 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
     {
         case QnManualResourceSearchStatus::CheckingHost:
         {
-            // TODO: Why saving result here? Can it have any cameras?
-            result.cameras = m_results;
+            // TODO: Should take it from m_taskManager if required such logic!
+//            result.cameras = m_results;
             break;
         }
         case QnManualResourceSearchStatus::Finished:
@@ -206,9 +180,7 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
         case QnManualResourceSearchStatus::Aborted:
         {
             result.status = QnManualResourceSearchStatus(m_state, MAX_PERCENT, MAX_PERCENT);
-            NX_DEBUG(this, lit("%1 : %2")
-                .arg(result.status.current)
-                .arg(result.status.total));
+            NX_DEBUG(this, "Status: %1 (%2 max)", result.status.current, result.status.total);
             break;
         }
         case QnManualResourceSearchStatus::CheckingOnline:
@@ -220,25 +192,15 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
                 : 0;
 
             result.status = QnManualResourceSearchStatus(m_state, currentProgress, MAX_PERCENT);
-
-            NX_DEBUG(this, lit("%1 : %2")
-                .arg(result.status.current)
-                .arg(result.status.total));
+            NX_DEBUG(this, "Status: %1 (%2 max)", result.status.current, result.status.total);
             break;
         }
         case QnManualResourceSearchStatus::CheckingHost:
         {
-            auto currentPercent = m_totalTaskCount ?
-               std::floor(0.5
-                    + (static_cast<double>(MAX_PERCENT) - PORT_SCAN_MAX_PROGRESS_PERCENT)
-                    * (m_totalTaskCount - m_remainingTaskCount)
-                    / m_totalTaskCount) + PORT_SCAN_MAX_PROGRESS_PERCENT : 0;
-
-            result.status = QnManualResourceSearchStatus(
-                m_state,
-                currentPercent,
-                MAX_PERCENT);
-
+            auto currentPercent = std::floor(0.5
+                + (static_cast<double>(MAX_PERCENT) - PORT_SCAN_MAX_PROGRESS_PERCENT)
+                * m_taskManager.doneToTotalTasksRatio()) + PORT_SCAN_MAX_PROGRESS_PERCENT;
+            result.status = QnManualResourceSearchStatus(m_state, currentPercent, MAX_PERCENT);
             break;
         }
         default:
@@ -288,54 +250,14 @@ QStringList QnManualCameraSearcher::getOnlineHosts(
 }
 
 void QnManualCameraSearcher::searchTaskDoneHandler(
-    const QnManualResourceSearchList &results, QnSearchTask * const task)
+    QnManualResourceSearchList results)
 {
     QnMutexLocker lock(&m_mutex);
-    auto queueName = task->url().toString();
-
-    m_remainingTaskCount--;
-
-    auto& context = m_searchQueueContexts[queueName];
-
-    context.isBlocked = false;
-    context.runningTaskCount--;
-
-    if (!m_cancelled)
-    {
-        m_results.append(results);
-
-        if (task->doesInterruptTaskProcessing() && !results.isEmpty())
-        {
-            m_remainingTaskCount -= m_urlSearchTaskQueues[queueName].size();
-            context.isInterrupted = true;
-        }
-
-        runTasksUnsafe();
-    }
-
-    const auto hasRunningTasks =
-        [this]() -> bool
-        {
-            for (const auto& context: m_searchQueueContexts)
-            {
-                if (context.isInterrupted)
-                    continue;
-
-                if (context.runningTaskCount > 0)
-                    return true;
-            }
-
-            return false;
-        };
-
-    if ((m_remainingTaskCount > 0 && !m_cancelled) || hasRunningTasks())
-        return;
-
+    m_results = std::move(results);
     if (!m_cancelled)
         changeStateUnsafe(QnManualResourceSearchStatus::Finished);
     else
         NX_ASSERT(m_state == QnManualResourceSearchStatus::Aborted);
-    NX_VERBOSE(this, "Search has finished, found %1 resources", m_results.size());
 
     NX_ASSERT(m_searchDoneCallback);
     m_searchDoneCallback(this);
@@ -347,80 +269,3 @@ void QnManualCameraSearcher::changeStateUnsafe(QnManualResourceSearchStatus::Sta
     m_state = newState;
 }
 
-void QnManualCameraSearcher::runTasksUnsafe()
-{
-    if (m_cancelled)
-        return;
-
-    QThreadPool* threadPool = commonModule()->resourceDiscoveryManager()->threadPool();
-
-    int totalRunningTasks = 0;
-    for (const auto& context: m_searchQueueContexts)
-    {
-        if (!context.isInterrupted)
-            totalRunningTasks += context.runningTaskCount;
-    }
-
-    // TODO: make normal function
-    auto canRunTask =
-        [&totalRunningTasks, threadPool, this]() -> bool
-        {
-            bool allQueuesAreBlocked = true;
-            for (const auto& queueName: m_urlSearchTaskQueues.keys())
-            {
-                auto& context = m_searchQueueContexts[queueName];
-                if (!context.isBlocked)
-                {
-                    allQueuesAreBlocked = false;
-                    break;
-                }
-            }
-            return (totalRunningTasks <= threadPool->maxThreadCount())
-                && !m_urlSearchTaskQueues.isEmpty()
-                && !allQueuesAreBlocked;
-        };
-
-    /**
-     * We are launching tasks until count of running tasks do not exceeds
-     * maximum thread count in pool.
-     */
-    while(canRunTask())
-    {
-        // Take one task from each queue.
-        for (auto it = m_urlSearchTaskQueues.begin(); it != m_urlSearchTaskQueues.end();)
-        {
-            auto queueName = it.key();
-
-            auto& queue = m_urlSearchTaskQueues[queueName];
-            auto& context = m_searchQueueContexts[queueName];
-
-            if (it->isEmpty() || context.isInterrupted)
-            {
-                it = m_urlSearchTaskQueues.erase(it);
-                continue;
-            }
-
-            it++;
-
-            if (!canRunTask())
-                break;
-
-            if (context.isBlocked)
-                continue;
-
-            QnSearchTask task = queue.dequeue();
-
-            auto taskFn = std::bind(&QnSearchTask::doSearch, task); // TODO: Is it copy of task?
-            nx::utils::concurrent::run(threadPool, taskFn); //< TODO: Change to lambda.
-
-            context.runningTaskCount++;
-            totalRunningTasks++;
-
-            if (task.isBlocking())
-            {
-                context.isBlocked = true;
-                break;
-            }
-        }
-    }
-}

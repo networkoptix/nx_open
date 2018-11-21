@@ -84,8 +84,7 @@ QnManualResourceSearchEntry entryFromResource(const QnResourcePtr& resource)
 
 QnSearchTask::QnSearchTask(
     QnCommonModule* commonModule,
-    const QString& addr,
-    int port,
+    const nx::network::SocketAddress& address,
     const QAuthenticator& auth,
     bool breakOnGotResult)
 :
@@ -96,20 +95,7 @@ QnSearchTask::QnSearchTask(
     m_interruptTaskProcesing(false)
 {
     NX_ASSERT(commonModule);
-    if (QUrl(addr).scheme().isEmpty())
-        m_url.setHost(addr);
-    else
-        m_url.setUrl(addr);
-
-    if (!m_url.userInfo().isEmpty())
-    {
-        m_auth.setUser(m_url.userName());
-        m_auth.setPassword(m_url.password());
-        m_url.setUserInfo(QString());
-    }
-
-    if (port)
-        m_url.setPort(port);
+    m_url.setAuthority(address.toString());
 
     NX_VERBOSE(this, "Created with URL %1", m_url);
 }
@@ -151,7 +137,7 @@ void QnSearchTask::doSearch()
     for (const auto& checker: m_searchers)
     {
         auto seqResults = checker->checkHostAddr(m_url, m_auth, true);
-        NX_VERBOSE(this, "Got %1 resources from searcher", seqResults.size());
+        NX_VERBOSE(this, "Got %1 resources from searcher %2", seqResults.size(), checker);
 
         for (const auto& res: seqResults)
         {
@@ -174,7 +160,8 @@ void QnSearchTask::doSearch()
             break;
     }
 
-    NX_VERBOSE(this, "Found %1 resources", results.size());
+    NX_VERBOSE(this, "Found %1 resources on URL %2 (interrupts: %3)",
+        results.size(), m_url, m_interruptTaskProcesing);
     m_callback(results, this);
 }
 
