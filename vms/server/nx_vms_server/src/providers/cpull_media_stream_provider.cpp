@@ -73,7 +73,6 @@ void QnClientPullMediaStreamProvider::run()
         {
             data->flags |= QnAbstractMediaData::MediaFlags_LIVE;
         }
-        checkTime(data);
 
         QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
 
