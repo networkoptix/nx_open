@@ -628,7 +628,8 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
 
         NX_ASSERT(md->timestamp >= 0);
 
-        QnFfmpegAvPacket avPkt;
+        AVPacket avPkt;
+        av_init_packet(&avPkt);
         qint64 dts = av_rescale_q(getPacketTimeUsec(md), srcRate, stream->time_base);
         if (stream->cur_dts > 0)
             avPkt.dts = qMax((qint64)stream->cur_dts + 1, dts);
