@@ -1,7 +1,7 @@
 import { NgModule }           from '@angular/core';
 import { CommonModule }       from '@angular/common';
 import { TranslateModule }    from '@ngx-translate/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent, downgradeInjectable } from '@angular/upgrade/static';
 import { RouterModule }       from '@angular/router';
 
 import { NxProcessButtonComponent }       from './process-button/process-button.component';
@@ -17,6 +17,7 @@ import { NxLayoutRightComponent }         from './layout-right/layout.component'
 import { NxTagComponent }                 from './tag/tag.component';
 import { NxCarouselComponent }            from './carousel/carousel.component';
 import { NxRibbonComponent }              from './ribbon/ribbon.component';
+import { NxRibbonService }                from './ribbon/ribbon.service';
 
 @NgModule({
     imports        : [
@@ -65,6 +66,8 @@ import { NxRibbonComponent }              from './ribbon/ribbon.component';
         NxTagComponent,
         NxCarouselComponent,
         NxRibbonComponent,
+
+        NxRibbonService,
     ],
     exports        : [
         NxProcessButtonComponent,
@@ -91,3 +94,7 @@ angular
     .directive('nxProcessButton', downgradeComponent({ component: NxProcessButtonComponent }) as angular.IDirectiveFactory)
     .directive('nxPreLoader', downgradeComponent({ component: NxPreLoaderComponent }) as angular.IDirectiveFactory)
     .directive('nxRibbon', downgradeComponent({ component: NxRibbonComponent }) as angular.IDirectiveFactory);
+
+angular
+        .module('cloudApp.services')
+        .service('NxRibbonService', downgradeInjectable(NxRibbonService));

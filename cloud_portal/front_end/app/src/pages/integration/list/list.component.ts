@@ -4,6 +4,7 @@ import {
 } from '@angular/core';
 
 import { NxConfigService } from '../../../services/nx-config';
+import { NxRibbonService } from '../../../components/ribbon/ribbon.service';
 
 @Component({
     selector: 'integrations-list-component',
@@ -19,12 +20,12 @@ export class NxIntegrationsListComponent implements OnInit, OnDestroy, OnChanges
     config: any;
 
     private setupDefaults() {
-
+        this.config = this.configService.getConfig();
     }
 
-    constructor(configService: NxConfigService) {
+    constructor(private configService: NxConfigService,
+                private ribbonService: NxRibbonService) {
         this.setupDefaults();
-        this.config = configService.getConfig();
     }
 
     getPlatformIconsFor(plugin) {
@@ -55,15 +56,27 @@ export class NxIntegrationsListComponent implements OnInit, OnDestroy, OnChanges
     }
 
     ngOnDestroy() {
+        this.ribbonService.hide();
     }
 
     ngOnChanges(changes: SimpleChanges) {
+        let haveInReview = false;
         if (changes.list) {
             // inject platform icons info
             this.list.forEach((plugin) => {
                 plugin.information.platforms.icons = this.getPlatformIconsFor(plugin);
                 this.setPlugunLogo(plugin);
+
+                haveInReview = haveInReview || plugin.pending;
             });
+
+            if (haveInReview) {
+                this.ribbonService.show(
+                        'This page is a preview of the latest changes, and it doesn\'t match publicly available version.',
+                        'Back to the editing interfaces',
+                        this.config.links.admin.product
+                );
+            }
         }
     }
 }

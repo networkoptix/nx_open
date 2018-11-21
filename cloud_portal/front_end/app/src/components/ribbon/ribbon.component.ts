@@ -1,5 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { IntegrationService }       from '../../pages/integration/integration.service';
+import { Component, OnInit } from '@angular/core';
+import { NxRibbonService } from './ribbon.service';
 
 @Component({
     selector: 'nx-ribbon',
@@ -7,24 +7,26 @@ import { IntegrationService }       from '../../pages/integration/integration.se
     styleUrls: ['ribbon.component.scss'],
 })
 export class NxRibbonComponent implements OnInit {
-    @Input() message: string;
-    @Input() action: string;
-    @Input() actionUrl: any;
+    message: string;
+    action: string;
+    actionUrl: string;
+    showRibbon: boolean;
 
-    private inReview: boolean;
+    private setupDefaults() {
+        this.showRibbon = false;
+        this.message = '';
+        this.action = '';
+        this.actionUrl = '';
+    }
 
-    constructor(private integrationService: IntegrationService) {
-        this.inReview = false;
-        this.integrationService.pluginsSubject.subscribe(plugins => {
-            this.inReview = plugins.filter(plugin => {
-                return plugin.pending;
-            }).length > 0;
-        });
+    constructor(private ribbonService: NxRibbonService) {
+        this.setupDefaults();
 
-        this.integrationService.selectedPluginSubject.subscribe(plugin => {
-            if (plugin) {
-                this.inReview = plugin.pending || false;
-            }
+        this.ribbonService.contextSubject.subscribe(context => {
+            this.showRibbon = context.visibility || false;
+            this.message = context.message || '';
+            this.action = context.text || '';
+            this.actionUrl = context.url || '';
         });
     }
 
