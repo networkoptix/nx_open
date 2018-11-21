@@ -493,7 +493,7 @@ private:
      */
 
     template<class QueryDataType, class SyncFunctionType>
-    void executeTranCall(
+    ErrorCode executeTranCall(
         QnTransaction<QueryDataType>& tran,
         PostProcessList* const postProcessList,
         SyncFunctionType syncFunction)
@@ -924,10 +924,10 @@ public:
                     return selfCopy.executeTranCall(
                         multiTran,
                         postProcessList,
-                        [self, subCommand](QnTransaction<QueryDataType>& multiTran,
+                        [selfCopy, subCommand](QnTransaction<QueryDataType>& multiTran,
                             PostProcessList* const postProcessList) mutable -> ErrorCode
                         {
-                            return self.processMultiUpdateSync(subCommand, multiTran.transactionType,
+                            return selfCopy.processMultiUpdateSync(subCommand, multiTran.transactionType,
                                 multiTran.params, postProcessList);
                         });
                 }
