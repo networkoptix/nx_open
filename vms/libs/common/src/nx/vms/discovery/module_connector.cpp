@@ -155,12 +155,12 @@ void ModuleConnector::InformationReader::start(const nx::network::SocketAddress&
             readUntilError();
         };
 
-    const auto keepAlive = std::chrono::duration_cast<std::chrono::seconds>(
-        (m_parent->m_disconnectTimeout / 3) * 2).count();
-
     QObject::connect(m_httpClient.get(), &nx::network::http::AsyncHttpClient::responseReceived, handler);
     QObject::connect(m_httpClient.get(), &nx::network::http::AsyncHttpClient::done, handler);
-    m_httpClient->doGet(nx::network::url::Builder(kUrl.arg(keepAlive)).setEndpoint(endpoint));
+
+    const auto keepAlive = m_parent->m_disconnectTimeout * 2 / 3;
+    const auto keepAliveSec = std::chrono::duration_cast<std::chrono::seconds>(keepAlive).count();
+    m_httpClient->doGet(nx::network::url::Builder(kUrl.arg(keepAliveSec)).setEndpoint(endpoint));
 }
 
 static inline boost::optional<nx::Buffer> takeJsonObject(nx::Buffer* buffer)
