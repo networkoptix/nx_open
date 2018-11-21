@@ -111,7 +111,6 @@ AbstractSearchWidget::Private::Private(
     setupPlaceholder();
     setupTimeSelection();
     setupCameraSelection();
-    setupAreaSelection();
 
     installEventHandler(q, QEvent::Show, this, &Private::requestFetchIfNeeded);
 
@@ -496,47 +495,6 @@ void AbstractSearchWidget::Private::setupCameraSelection()
         });
 }
 
-void AbstractSearchWidget::Private::setupAreaSelection()
-{
-    ui->areaSelectionButton->setSelectable(false);
-    ui->areaSelectionButton->setDeactivatable(true);
-    ui->areaSelectionButton->setAccented(true);
-    ui->areaSelectionButton->setText(tr("In selected area"));
-    ui->areaSelectionButton->setDeactivatedText(tr("Anywhere on the video"));
-    ui->areaSelectionButton->setIcon(qnSkin->icon("text_buttons/area.png"));
-    setReadOnly(ui->areaSelectionButton, true);
-
-    connect(q, &AbstractSearchWidget::cameraSetChanged, this,
-        [this]()
-        {
-            const auto cameras = q->cameras();
-            ui->areaSelectionButton->setEnabled(
-                cameras.size() == 1 && (*cameras.cbegin())->hasVideo());
-
-            ui->areaSelectionButton->deactivate();
-        });
-
-    const auto handleStateChanged =
-        [this](SelectableTextButton::State state)
-        {
-            setWholeArea(state == SelectableTextButton::State::deactivated);
-            ui->areaSelectionButton->setToolTip(m_wholeArea
-                ? tr("Select some area on video to use it as a filter")
-                : QString());
-        };
-
-    connect(ui->areaSelectionButton, &SelectableTextButton::stateChanged, this, handleStateChanged);
-    handleStateChanged(ui->areaSelectionButton->state());
-
-    connect(q, &AbstractSearchWidget::selectedAreaChanged, this,
-        [this](bool wholeArea)
-        {
-            ui->areaSelectionButton->setState(wholeArea
-                ? SelectableTextButton::State::deactivated
-                : SelectableTextButton::State::unselected);
-        });
-}
-
 AbstractSearchListModel* AbstractSearchWidget::Private::model() const
 {
     return m_mainModel.data();
@@ -555,7 +513,6 @@ AbstractSearchWidget::Controls AbstractSearchWidget::Private::relevantControls()
     Controls result;
     result.setFlag(Control::cameraSelector, !ui->cameraSelectionButton->isHidden());
     result.setFlag(Control::timeSelector, !ui->timeSelectionButton->isHidden());
-    result.setFlag(Control::areaSelector, !ui->areaSelectionHolder->isHidden());
     result.setFlag(Control::freeTextFilter, !m_textFilterEdit->isHidden());
     result.setFlag(Control::footersToggler, !ui->toggleFootersButton->isHidden());
     result.setFlag(Control::previewsToggler, !ui->togglePreviewsButton->isHidden());
@@ -566,7 +523,6 @@ void AbstractSearchWidget::Private::setRelevantControls(Controls value)
 {
     ui->cameraSelectionButton->setVisible(value.testFlag(Control::cameraSelector));
     ui->timeSelectionButton->setVisible(value.testFlag(Control::timeSelector));
-    ui->areaSelectionHolder->setVisible(value.testFlag(Control::areaSelector));
     m_textFilterEdit->setVisible(value.testFlag(Control::freeTextFilter));
     ui->toggleFootersButton->setVisible(value.testFlag(Control::footersToggler));
     ui->togglePreviewsButton->setVisible(value.testFlag(Control::previewsToggler));
@@ -674,20 +630,6 @@ void AbstractSearchWidget::Private::setSelectedCameras(Cameras value)
     updateCurrentCameras();
 }
 
-bool AbstractSearchWidget::Private::wholeArea() const
-{
-    return ui->areaSelectionButton->state() == SelectableTextButton::State::deactivated;
-}
-
-void AbstractSearchWidget::Private::setWholeArea(bool value)
-{
-    if (m_wholeArea == value)
-        return;
-
-    m_wholeArea = value;
-    emit q->selectedAreaChanged(m_wholeArea);
-}
-
 QnVirtualCameraResourceSet AbstractSearchWidget::Private::cameras() const
 {
     return m_mainModel->cameraSet()->cameras();
@@ -717,8 +659,6 @@ void AbstractSearchWidget::Private::updateCurrentCameras()
 {
     if (!m_mainModel->isOnline())
         return;
-
-    ui->areaSelectionButton->setVisible(m_cameras == Cameras::current);
 
     switch (m_cameras)
     {
@@ -773,7 +713,6 @@ void AbstractSearchWidget::Private::resetFilters()
 {
     ui->cameraSelectionButton->deactivate();
     ui->timeSelectionButton->deactivate();
-    ui->areaSelectionButton->deactivate();
     m_textFilterEdit->clear();
 }
 

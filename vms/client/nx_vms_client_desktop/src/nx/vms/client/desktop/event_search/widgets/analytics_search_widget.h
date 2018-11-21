@@ -1,6 +1,10 @@
 #pragma once
 
+#include <QtCore/QScopedPointer>
+
 #include "abstract_search_widget.h"
+
+class QnMediaResourceWidget;
 
 namespace nx::vms::client::desktop {
 
@@ -11,9 +15,9 @@ class AnalyticsSearchWidget: public AbstractSearchWidget
 
 public:
     AnalyticsSearchWidget(QnWorkbenchContext* context, QWidget* parent = nullptr);
-    virtual ~AnalyticsSearchWidget() override = default;
+    virtual ~AnalyticsSearchWidget() override;
 
-    void setFilterRect(const QRectF& value);
+    void setCurrentMediaWidget(QnMediaResourceWidget* value);
 
 private:
     virtual QString placeholderText(bool constrained) const override;
@@ -21,7 +25,9 @@ private:
 
     virtual void resetFilters() override;
 
-    void updateTimelineDisplay();
+private:
+    class Private;
+    const QScopedPointer<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

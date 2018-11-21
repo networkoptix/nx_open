@@ -108,7 +108,6 @@ void EventPanel::Private::rebuildTabs()
     m_tabs->clear();
     m_motionSearchSynchronizer->reset();
     m_bookmarkSearchSynchronizer->reset();
-    m_analyticsSearchSynchronizer->reset();
 
     const auto updateTab =
         [this](QWidget* tab, bool condition, const QIcon& icon, const QString& text)
@@ -219,12 +218,13 @@ EventPanel::Private::MotionSearchSynchronizer::MotionSearchSynchronizer(EventPan
     connect(m_main->m_tabs, &QTabWidget::currentChanged,
         this, &MotionSearchSynchronizer::updateState);
 
-    connect(m_main->m_motionTab, &AbstractSearchWidget::selectedAreaChanged, this,
-        [this](bool wholeArea)
-        {
-            if (wholeArea && widget())
-                widget()->clearMotionSelection();
-        });
+    // FIXME!!!
+    //connect(m_main->m_motionTab, &AbstractSearchWidget::selectedAreaChanged, this,
+    //    [this](bool wholeArea)
+    //    {
+    //        if (wholeArea && widget())
+    //            widget()->clearMotionSelection();
+    //    });
 }
 
 void EventPanel::Private::MotionSearchSynchronizer::reset()
@@ -384,81 +384,92 @@ void EventPanel::Private::BookmarkSearchSynchronizer::reset()
 
 EventPanel::Private::AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
     EventPanel::Private* main)
-    :
-    m_main(main)
 {
-    connect(m_main, &Private::currentMediaWidgetAboutToBeChanged,
-        this, &AnalyticsSearchSynchronizer::handleCurrentWidgetAboutToBeChanged);
-
-    connect(m_main, &Private::currentMediaWidgetChanged,
-        this, &AnalyticsSearchSynchronizer::handleCurrentWidgetChanged);
-
-    connect(m_main->m_analyticsTab, &AbstractSearchWidget::cameraSetChanged,
-        this, &AnalyticsSearchSynchronizer::syncWidgetWithPanel);
-
-    connect(m_main->m_tabs, &QTabWidget::currentChanged,
-        this, &AnalyticsSearchSynchronizer::syncWidgetWithPanel);
-
-    connect(m_main->m_analyticsTab, &AbstractSearchWidget::selectedAreaChanged, this,
-        [this](bool wholeArea)
+    const auto updateMediaWidget =
+        [main]()
         {
-            if (wholeArea && m_main->m_currentMediaWidget)
-                m_main->m_currentMediaWidget->setAnalyticsSelection({});
-        });
+            main->m_analyticsTab->setCurrentMediaWidget(
+                main->m_tabs->currentWidget() == main->m_analyticsTab
+                    ? main->m_currentMediaWidget
+                    : nullptr);
+        };
+
+    connect(main, &Private::currentMediaWidgetChanged, this, updateMediaWidget);
+    connect(main->m_tabs, &QTabWidget::currentChanged, this, updateMediaWidget);
+
+    //connect(m_main, &Private::currentMediaWidgetAboutToBeChanged,
+    //    this, &AnalyticsSearchSynchronizer::handleCurrentWidgetAboutToBeChanged);
+
+    //connect(m_main, &Private::currentMediaWidgetChanged,
+    //    this, &AnalyticsSearchSynchronizer::handleCurrentWidgetChanged);
+
+    //connect(m_main->m_analyticsTab, &AbstractSearchWidget::cameraSetChanged,
+    //    this, &AnalyticsSearchSynchronizer::syncWidgetWithPanel);
+
+    //connect(m_main->m_tabs, &QTabWidget::currentChanged,
+    //    this, &AnalyticsSearchSynchronizer::syncWidgetWithPanel);
+
+    //connect(m_main->m_analyticsTab, &AnalyticsSearchWidget::filterRectChanged, this,
+    //    [this](const QRectF& value)
+    //    {
+    //        // FIXME!!! Only in single-camera mode. Only when reset.
+    //        //if (m_main->m_currentMediaWidget)
+    //          //  m_main->m_currentMediaWidget->setAnalyticsSelection({0, 0, 1, 1});
+    //    });
 }
 
-void EventPanel::Private::AnalyticsSearchSynchronizer::reset()
-{
-    setWidgetAnalyticsSelectionEnabled(false);
-}
-
-void EventPanel::Private::AnalyticsSearchSynchronizer::handleCurrentWidgetAboutToBeChanged()
-{
-    if (!m_main->m_currentMediaWidget)
-        return;
-
-    m_main->m_currentMediaWidget->disconnect(this);
-    setWidgetAnalyticsSelectionEnabled(false);
-}
-
-void EventPanel::Private::AnalyticsSearchSynchronizer::handleCurrentWidgetChanged()
-{
-    if (!m_main->m_currentMediaWidget)
-        return;
-
-    connect(m_main->m_currentMediaWidget.data(), &QnMediaResourceWidget::analyticsSelectionChanged,
-        this, &AnalyticsSearchSynchronizer::handleAnalyticsSelectionChanged);
-
-    syncWidgetWithPanel();
-    handleAnalyticsSelectionChanged();
-}
-
-void EventPanel::Private::AnalyticsSearchSynchronizer::handleAnalyticsSelectionChanged()
-{
-    if (!analyticsAreaSelection())
-        return;
-
-    m_main->m_analyticsTab->setFilterRect(m_main->m_currentMediaWidget
-        ? m_main->m_currentMediaWidget->analyticsSelection()
-        : QRectF());
-}
-
-bool EventPanel::Private::AnalyticsSearchSynchronizer::analyticsAreaSelection() const
-{
-    return m_main->m_tabs->currentWidget() == m_main->m_analyticsTab
-        && m_main->m_analyticsTab->selectedCameras() == AbstractSearchWidget::Cameras::current;
-}
-
-void EventPanel::Private::AnalyticsSearchSynchronizer::setWidgetAnalyticsSelectionEnabled(
-    bool value)
-{
-    if (m_main->m_currentMediaWidget)
-        m_main->m_currentMediaWidget->setAnalyticsSelectionEnabled(value);
-}
-
-void EventPanel::Private::AnalyticsSearchSynchronizer::syncWidgetWithPanel()
-{
-    setWidgetAnalyticsSelectionEnabled(analyticsAreaSelection());
-}
+//void EventPanel::Private::AnalyticsSearchSynchronizer::reset()
+//{
+//    setWidgetAnalyticsSelectionEnabled(false);
+//}
+//
+//void EventPanel::Private::AnalyticsSearchSynchronizer::handleCurrentWidgetAboutToBeChanged()
+//{
+//    if (!m_main->m_currentMediaWidget)
+//        return;
+//
+//    m_main->m_currentMediaWidget->disconnect(this);
+//    setWidgetAnalyticsSelectionEnabled(false);
+//}
+//
+//void EventPanel::Private::AnalyticsSearchSynchronizer::handleCurrentWidgetChanged()
+//{
+//    if (!m_main->m_currentMediaWidget)
+//        return;
+//
+//    connect(m_main->m_currentMediaWidget.data(), &QnMediaResourceWidget::analyticsSelectionChanged,
+//        this, &AnalyticsSearchSynchronizer::handleAnalyticsSelectionChanged);
+//
+//    syncWidgetWithPanel();
+//    handleAnalyticsSelectionChanged();
+//}
+//
+//void EventPanel::Private::AnalyticsSearchSynchronizer::handleAnalyticsSelectionChanged()
+//{
+//    if (!analyticsAreaSelection())
+//        return;
+//
+//    m_main->m_analyticsTab->setFilterRect(m_main->m_currentMediaWidget
+//        ? m_main->m_currentMediaWidget->analyticsSelection()
+//        : QRectF());
+//}
+//
+//bool EventPanel::Private::AnalyticsSearchSynchronizer::analyticsAreaSelection() const
+//{
+//    return m_main->m_tabs->currentWidget() == m_main->m_analyticsTab
+//        && m_main->m_analyticsTab->selectedCameras() == AbstractSearchWidget::Cameras::current;
+//}
+//
+//void EventPanel::Private::AnalyticsSearchSynchronizer::setWidgetAnalyticsSelectionEnabled(
+//    bool value)
+//{
+//    if (m_main->m_currentMediaWidget)
+//        m_main->m_currentMediaWidget->setAnalyticsSelectionEnabled(value);
+//}
+//
+//void EventPanel::Private::AnalyticsSearchSynchronizer::syncWidgetWithPanel()
+//{
+//    setWidgetAnalyticsSelectionEnabled(analyticsAreaSelection());
+//}
 
 } // namespace nx::vms::client::desktop

@@ -47,13 +47,12 @@ public:
     {
         cameraSelector = 0x01,
         timeSelector = 0x02,
-        areaSelector = 0x04,
-        freeTextFilter = 0x08,
-        footersToggler = 0x10,
-        previewsToggler = 0x20,
+        freeTextFilter = 0x04,
+        footersToggler = 0x08,
+        previewsToggler = 0x10,
 
         defaults = cameraSelector | timeSelector | freeTextFilter | previewsToggler,
-        all = defaults | areaSelector | footersToggler
+        all = defaults | footersToggler
     };
     Q_DECLARE_FLAGS(Controls, Control)
 
@@ -105,7 +104,6 @@ signals:
 
     void textFilterChanged(const QString& value);
     void timePeriodChanged(const QnTimePeriod& value);
-    void selectedAreaChanged(bool wholeArea); //< Area was reset to whole.
 
 protected:
     /** Sets an icon for no data placeholder. */

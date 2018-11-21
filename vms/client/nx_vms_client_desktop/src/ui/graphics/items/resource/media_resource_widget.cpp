@@ -541,7 +541,7 @@ void QnMediaResourceWidget::initAreaSelectOverlay()
     addOverlayWidget(m_areaSelectOverlayWidget, detail::OverlayParams(Visible, true, true));
 
     connect(m_areaSelectOverlayWidget, &AreaSelectOverlayWidget::selectedAreaChanged,
-        this, &QnMediaResourceWidget::analyticsSelectionChanged);
+        this, &QnMediaResourceWidget::handleSelectedAreaChanged);
 }
 
 void QnMediaResourceWidget::initAreaHighlightOverlay()
@@ -602,33 +602,108 @@ void QnMediaResourceWidget::initStatusOverlayController()
          });
 }
 
-void QnMediaResourceWidget::setAnalyticsSelectionEnabled(bool enabled)
+QnMediaResourceWidget::AreaType QnMediaResourceWidget::areaSelectionType() const
+{
+    return m_areaSelectionType;
+}
+
+void QnMediaResourceWidget::setAreaSelectionType(AreaType value)
+{
+    if (m_areaSelectionType == value)
+        return;
+
+    const auto oldType = m_areaSelectionType;
+    m_areaSelectionType = value;
+
+    // Reset old selection dependencies.
+    if (oldType == AreaType::motion)
+        setMotionSearchModeEnabled(false);
+
+    if (m_areaSelectOverlayWidget)
+        m_areaSelectOverlayWidget->setActive(false);
+
+    if (m_areaSelectionType == AreaType::motion)
+        setMotionSearchModeEnabled(true);
+
+    updateSelectedArea();
+    emit areaSelectionTypeChanged();
+}
+
+bool QnMediaResourceWidget::areaSelectionEnabled() const
+{
+    return m_areaSelectOverlayWidget && m_areaSelectionType != AreaType::none
+        ? m_areaSelectOverlayWidget->active()
+        : false;
+}
+
+void QnMediaResourceWidget::setAreaSelectionEnabled(bool value)
 {
     if (!m_areaSelectOverlayWidget)
         return;
 
-    m_areaSelectOverlayWidget->setActive(enabled);
-    if (enabled)
+    if (m_areaSelectionType == AreaType::none || m_areaSelectionType == AreaType::motion)
+        value = false;
+
+    if (value == m_areaSelectOverlayWidget->active())
+        return;
+
+    m_areaSelectOverlayWidget->setActive(value);
+    emit areaSelectionEnabledChanged();
+}
+
+QRectF QnMediaResourceWidget::analyticsFilterRect() const
+{
+    return m_analyticsFilterRect;
+}
+
+void QnMediaResourceWidget::setAnalyticsFilterRect(const QRectF& value)
+{
+    if (qFuzzyEquals(m_analyticsFilterRect, value))
+        return;
+
+    m_analyticsFilterRect = value;
+    updateSelectedArea();
+
+    emit analyticsFilterRectChanged();
+}
+
+void QnMediaResourceWidget::updateSelectedArea()
+{
+    switch (m_areaSelectionType)
     {
-        titleBar()->rightButtonsBar()->setButtonsChecked(
-            Qn::MotionSearchButton | Qn::PtzButton | Qn::FishEyeButton | Qn::ZoomWindowButton,
-            false);
-    }
-    else
-    {
-        m_areaSelectOverlayWidget->clearSelectedArea();
+        case AreaType::motion:
+            // TODO: #vkutin Ensure stored motion regions are used by motion selection instrument.
+            [[fallthrough]];
+        case AreaType::none:
+            if (m_areaSelectOverlayWidget)
+                m_areaSelectOverlayWidget->setSelectedArea({});
+            break;
+
+        case AreaType::analytics:
+            if (m_areaSelectOverlayWidget)
+                m_areaSelectOverlayWidget->setSelectedArea(m_analyticsFilterRect);
+            break;
     }
 }
 
-QRectF QnMediaResourceWidget::analyticsSelection() const
+void QnMediaResourceWidget::handleSelectedAreaChanged()
 {
-    return m_areaSelectOverlayWidget ? m_areaSelectOverlayWidget->selectedArea() : QRectF();
-}
+    switch (m_areaSelectionType)
+    {
+        case AreaType::none:
+        case AreaType::motion:
+            NX_ASSERT(m_areaSelectOverlayWidget->selectedArea().isEmpty());
+            break;
 
-void QnMediaResourceWidget::setAnalyticsSelection(const QRectF& value)
-{
-    if (m_areaSelectOverlayWidget)
-        m_areaSelectOverlayWidget->setSelectedArea(value); //< May emit analyticsSelectionChanged.
+        case AreaType::analytics:
+            NX_ASSERT(m_areaSelectOverlayWidget);
+            if (!m_areaSelectOverlayWidget)
+                break;
+
+            setAnalyticsFilterRect(m_areaSelectOverlayWidget->selectedArea());
+            setAreaSelectionEnabled(false);
+            break;
+    }
 }
 
 QString QnMediaResourceWidget::overlayCustomButtonText(
@@ -2730,10 +2805,14 @@ void QnMediaResourceWidget::setMotionSearchModeEnabled(bool enabled)
     {
         titleBar()->rightButtonsBar()->setButtonsChecked(
             Qn::PtzButton | Qn::FishEyeButton | Qn::ZoomWindowButton, false);
-        action(action::ToggleTimelineAction)->setChecked(true);
 
-        if (m_areaSelectOverlayWidget)
-            m_areaSelectOverlayWidget->setActive(false);
+        action(action::ToggleTimelineAction)->setChecked(true);
+        setAreaSelectionType(AreaType::motion);
+    }
+    else
+    {
+        if (m_areaSelectionType == AreaType::motion)
+            setAreaSelectionType(AreaType::none);
     }
 
     setOption(WindowResizingForbidden, enabled);

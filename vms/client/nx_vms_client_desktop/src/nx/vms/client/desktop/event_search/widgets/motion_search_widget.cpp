@@ -26,8 +26,7 @@ MotionSearchListModel* motionModel(MotionSearchWidget* widget)
 MotionSearchWidget::MotionSearchWidget(QnWorkbenchContext* context, QWidget* parent):
     base_type(context, new MotionSearchListModel(context), parent)
 {
-    setRelevantControls(Control::cameraSelector | Control::timeSelector | Control::areaSelector
-        | Control::previewsToggler);
+    setRelevantControls(Control::cameraSelector | Control::timeSelector | Control::previewsToggler);
     setPlaceholderPixmap(qnSkin->pixmap("events/placeholders/motion.png"));
 
     selectCameras(AbstractSearchWidget::Cameras::current);
@@ -41,12 +40,12 @@ MotionSearchWidget::MotionSearchWidget(QnWorkbenchContext* context, QWidget* par
     connect(navigator(), &QnWorkbenchNavigator::currentResourceChanged,
         this, &MotionSearchWidget::updateTimelineDisplay);
 
-    connect(this, &AbstractSearchWidget::selectedAreaChanged, this,
-        [this](bool wholeArea)
-        {
-            if (wholeArea)
-                setFilterRegions({});
-        });
+    //connect(this, &AbstractSearchWidget::selectedAreaChanged, this,
+    //    [this](bool wholeArea)
+    //    {
+    //        if (wholeArea)
+    //            setFilterRegions({});
+    //    });
 }
 
 QString MotionSearchWidget::placeholderText(bool constrained) const
@@ -63,7 +62,7 @@ void MotionSearchWidget::setFilterRegions(const QList<QRegion>& value)
 {
     auto model = motionModel(this);
     model->setFilterRegions(value);
-    setWholeArea(model->isFilterEmpty());
+    //setWholeArea(model->isFilterEmpty());
 }
 
 void MotionSearchWidget::resetFilters()

@@ -114,19 +114,6 @@ class EventPanel::Private::AnalyticsSearchSynchronizer: public QObject
 {
 public:
     AnalyticsSearchSynchronizer(EventPanel::Private* main);
-    void reset();
-
-private:
-    void handleCurrentWidgetAboutToBeChanged();
-    void handleCurrentWidgetChanged();
-    void handleAnalyticsSelectionChanged();
-
-    void syncWidgetWithPanel();
-    bool analyticsAreaSelection() const; //< Whether analytics area selection mode is required.
-    void setWidgetAnalyticsSelectionEnabled(bool value);
-
-private:
-    EventPanel::Private* const m_main;
 };
 
 // ------------------------------------------------------------------------------------------------

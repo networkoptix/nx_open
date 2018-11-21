@@ -98,16 +98,6 @@ void AbstractSearchWidget::addDeviceDependentAction(
     d->addDeviceDependentAction(action, mixedString, cameraString);
 }
 
-bool AbstractSearchWidget::wholeArea() const
-{
-    return d->wholeArea();
-}
-
-void AbstractSearchWidget::setWholeArea(bool value)
-{
-    d->setWholeArea(value);
-}
-
 void AbstractSearchWidget::selectCameras(Cameras value)
 {
     d->selectCameras(value);
