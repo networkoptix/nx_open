@@ -213,7 +213,7 @@ def init_skin(product, preview=False):
         distutils.dir_util.copy_tree(from_dir, target_dir)
         logger.info("Fill content for " + product.__str__())
         fill_content(product, preview=False, incremental=False)
-    if preview:
+    else:
         distutils.dir_util.copy_tree(from_dir, os.path.join(target_dir, 'preview'))
         logger.info("Fill preview for " + product.__str__())
         fill_content(product, preview=True, incremental=False)

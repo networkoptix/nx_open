@@ -11,6 +11,6 @@ def timer(func):
         func(*args, **kwargs)
         end = time.time()
 
-        logging.info("{} elapsed time: {}".format(func.__name__, end - start))
+        logger.info("{} elapsed time: {}".format(func.__name__, end - start))
 
     return exec_foo
