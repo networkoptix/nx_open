@@ -8,6 +8,8 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QFile>
+#include <QtCore/QDir>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/literal.h>
 #include "../file.h"

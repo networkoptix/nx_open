@@ -1,5 +1,7 @@
 #include "filetypesupport.h"
 
+#include <vector>
+
 #include <nx/core/layout/layout_file_info.h>
 
 bool FileTypeSupport::isMovieFileExt(const QString &filename)

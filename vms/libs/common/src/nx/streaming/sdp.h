@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <QtCore/QString>
+#include <QtCore/QStringList>
 
 namespace nx::streaming {
 

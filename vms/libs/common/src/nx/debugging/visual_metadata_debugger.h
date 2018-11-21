@@ -10,6 +10,8 @@
 #include <nx/utils/thread/long_runnable.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
 
+class QFile;
+
 namespace nx {
 namespace debugging {
 
@@ -27,7 +29,7 @@ public:
         int maxFrameCacheSize,
         int maxMetadataCacheSize);
 
-    virtual ~VisualMetadataDebugger();
+    virtual ~VisualMetadataDebugger() override;
 
 public:
     virtual void push(const QnConstCompressedVideoDataPtr& video) override;

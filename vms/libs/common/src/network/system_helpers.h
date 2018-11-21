@@ -13,8 +13,8 @@ class QnCommonModule;
 
 namespace helpers {
 
-static const QString kFactorySystemUser = lit("admin");
-static const QString kFactorySystemPassword = lit("admin");
+static const QString kFactorySystemUser = "admin";
+static const QString kFactorySystemPassword = "admin";
 
 /*
 * Extracts system id. Result is:

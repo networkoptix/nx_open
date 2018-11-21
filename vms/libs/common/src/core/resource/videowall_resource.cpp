@@ -1,5 +1,7 @@
 #include "videowall_resource.h"
 
+#include <boost/algorithm/cxx11/all_of.hpp>
+
 #include <nx/vms/api/data/videowall_data.h>
 
 QnVideoWallResource::QnVideoWallResource(QnCommonModule* commonModule):
