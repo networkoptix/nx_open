@@ -38,27 +38,25 @@ public:
     ClientUpdateTool(QObject* parent = nullptr);
     ~ClientUpdateTool();
 
-    void useServer(nx::utils::Url url, QnUuid serverId);
-
     enum State
     {
-        // Tool starts to this state.
+        /** Tool starts at this state. */
         initial,
-        // Waiting for mediaserver's response with current update info.
+        /** Waiting for mediaserver's response with current update info. */
         pendingUpdateInfo,
-        // Got update info and ready to download.
+        /** Got update info and ready to download. */
         readyDownload,
-        // Downloading client package.
+        /** Downloading client package. */
         downloading,
-        // Ready to install client package.
+        /** Ready to install client package. */
         readyInstall,
-        // Installing update using applauncher.
+        /** Installing update using applauncher. */
         installing,
-        // Installation is complete, client has newest version.
+        /** Installation is complete, client has newest version. */
         complete,
-        // Got some critical error and can not continue installation.
+        /** Got some critical error and can not continue installation. */
         error,
-        // Got an error during installation.
+        /** Got an error during installation. */
         applauncherError,
     };
 
@@ -123,7 +121,7 @@ public:
 
     std::future<UpdateContents> requestRemoteUpdateInfo();
 
-    // Get cached update information from the mediaservers.
+    /** Get cached update information from the mediaservers. */
     UpdateContents getRemoteUpdateInfo() const;
 
     static QString toString(State state);
@@ -133,7 +131,7 @@ signals:
      * This event is emitted every time update state changes,
      * or its internal state is updated.
      * @param state - current state, corresponds to enum ClientUpdateTool::State;
-     * @param percentComlete - progress for this state.
+     * @param percentComplete - progress for this state.
      */
     void updateStateChanged(int state, int percentComplete);
 
@@ -152,10 +150,10 @@ protected:
     void clearDownloadFolder();
 
     std::unique_ptr<Downloader> m_downloader;
-    // Directory to store unpacked files.
+    /** Directory to store unpacked files. */
     QDir m_outputDir;
 
-    // Special peer manager to be used in the downloader.
+    /** Special peer manager to be used in the downloader. */
     std::unique_ptr<vms::common::p2p::downloader::SingleConnectionPeerManager> m_peerManager;
     nx::update::Package m_clientPackage;
     State m_state = State::initial;
@@ -163,9 +161,9 @@ protected:
     bool m_stateChanged = false;
     nx::utils::SoftwareVersion m_updateVersion;
 
-    // Direct connection to the mediaserver.
+    /** Direct connection to the mediaserver. */
     rest::QnConnectionPtr m_serverConnection;
-    // Full path to update package.
+    /** Full path to update package. */
     QString m_updateFile;
     QString m_lastError;
 
