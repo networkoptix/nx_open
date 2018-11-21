@@ -9,6 +9,8 @@ import errno
 import traceback
 from StringIO import StringIO
 
+from cloud.debug import timer
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -196,7 +198,7 @@ def generate_languages_json(save_location, language_codes, preview):
     save_content(target_file_name, json.dumps(languages_json, ensure_ascii=False))
 
 
-def init_skin(product):
+def init_skin(product, preview=False, run_both=True):
     # 1. read skin for this customization
     customization_name = product.customizations.first().name
     skin = product.read_global_value('%SKIN%')
@@ -205,16 +207,19 @@ def init_skin(product):
     # 2. copy directory
     from_dir = SOURCE_DIR.replace("{{skin}}", skin)
     target_dir = TARGET_DIR.replace("{{customization}}", customization_name)
-    distutils.dir_util.copy_tree(from_dir, target_dir)
-    distutils.dir_util.copy_tree(from_dir, os.path.join(target_dir, 'preview'))
 
     # 3. run fill_content
-    logger.info("Fill content for " + product.__str__())
-    fill_content(product, preview=False, incremental=False)
-    logger.info("Fill preview for " + product.__str__())
-    fill_content(product, preview=True, incremental=False)
+    if not preview or run_both:
+        distutils.dir_util.copy_tree(from_dir, target_dir)
+        logger.info("Fill content for " + product.__str__())
+        fill_content(product, preview=False, incremental=False)
+    if preview or run_both:
+        distutils.dir_util.copy_tree(from_dir, os.path.join(target_dir, 'preview'))
+        logger.info("Fill preview for " + product.__str__())
+        fill_content(product, preview=True, incremental=False)
 
 
+@timer
 def fill_content(product,
                  preview=True,
                  version_id=None,
