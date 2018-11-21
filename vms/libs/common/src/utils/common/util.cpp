@@ -25,33 +25,6 @@
 #include <nx/utils/datetime.h>
 #include <nx/system_commands.h>
 
-int digitsInNumber(unsigned num)
-{
-    int digits = 1;
-    while(num /= 10)
-        digits++;
-
-    return digits;
-}
-
-
-QString getParamFromString(const QString& str, const QString& param)
-{
-    if (!str.contains(param))
-        return QString();
-
-    int param_index = str.indexOf(param);
-    param_index += param.length();
-
-    int first_index = str.indexOf(QLatin1Char('\"'), param_index);
-    if (first_index == -1)
-        return QString();
-
-    int second_index = str.indexOf(QLatin1Char('\"'), first_index + 1);
-
-    return str.mid(first_index+1, second_index - (first_index+1));
-}
-
 QString strPadLeft(const QString &str, int len, char ch)
 {
     int diff = len - str.length();
@@ -200,13 +173,6 @@ uint qt4Hash(const QString &key)
 {
     return hash(key.unicode(), key.size());
 }
-
-#ifdef _DEBUG
-QString debugTime(qint64 timeMSec, const QString &fmt) {
-    QString format = fmt.isEmpty() ? lit("hh:mm:ss") : fmt;
-    return QDateTime::fromMSecsSinceEpoch(timeMSec).toString(format);
-}
-#endif
 
 QString mksecToDateTime(qint64 valueUsec)
 {
