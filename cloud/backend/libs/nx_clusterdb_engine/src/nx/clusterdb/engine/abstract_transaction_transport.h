@@ -35,6 +35,11 @@ class AbstractCommandPipeline:
     public nx::network::aio::BasicPollable
 {
 public:
+    /**
+     * MUST be called to start receiving/sending data.
+     */
+    virtual void start() = 0;
+
     virtual network::SocketAddress remotePeerEndpoint() const = 0;
 
     virtual void setOnConnectionClosed(ConnectionClosedEventHandler handler) = 0;

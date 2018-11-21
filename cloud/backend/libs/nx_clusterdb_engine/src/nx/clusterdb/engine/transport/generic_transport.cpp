@@ -136,6 +136,8 @@ void GenericTransport::start()
         lm("Starting outgoing transaction channel to %1")
             .arg(m_commonTransportHeaderOfRemoteTransaction));
 
+    m_commandPipeline->start();
+
     // Sending tranSyncRequest.
     auto requestTran = command::make<command::TranSyncRequest>(
         m_localPeer.id);
@@ -214,11 +216,21 @@ void GenericTransport::processHandshakeCommand(
     TransactionTransportHeader transportHeader,
     std::unique_ptr<DeserializableCommandData> commandData)
 {
-    if (commandData->header().command == command::TranSyncRequest::code)
+    switch (commandData->header().command)
     {
-        auto commandWrapper = commandData->deserialize<command::TranSyncRequest>(
-            transportHeader.transactionFormatVersion);
-        processHandshakeCommand(commandWrapper->take());
+        case command::TranSyncRequest::code:
+        {
+            auto commandWrapper = commandData->deserialize<command::TranSyncRequest>(
+                transportHeader.transactionFormatVersion);
+            processHandshakeCommand(commandWrapper->take());
+            break;
+        }
+    
+        case command::TranSyncResponse::code:
+        {
+            int x = 0;
+            break;
+        }
     }
 }
 

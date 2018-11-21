@@ -24,6 +24,11 @@ void HttpTunnelTransportConnection::bindToAioThread(
     m_messagePipeline.bindToAioThread(aioThread);
 }
 
+void HttpTunnelTransportConnection::start()
+{
+    // TODO
+}
+
 network::SocketAddress HttpTunnelTransportConnection::remotePeerEndpoint() const
 {
     return m_remoteEndpoint;
