@@ -2,9 +2,14 @@
 #include "ui_compatibility_version_installation_dialog.h"
 
 #include <QtWidgets/QPushButton>
+
+#include <nx/update/update_check.h>
 #include <nx/vms/client/desktop/system_update/client_update_tool.h>
+#include <client/client_settings.h>
+#include <nx/utils/log/log.h>
 #include "update/media_server_update_tool.h"
 #include "ui/workbench/handlers/workbench_connect_handler.h"
+
 
 #include <chrono>
 
@@ -60,14 +65,31 @@ int CompatibilityVersionInstallationDialog::exec()
     return installUpdate();
 }
 
+void CompatibilityVersionInstallationDialog::atRecievedUpdateContents(const nx::update::UpdateContents& contents)
+{
+    auto commonModule = m_clientUpdateTool->commonModule();
+    nx::update::UpdateContents verifiedContents = contents;
+    if (nx::vms::client::desktop::verifyUpdateContents(commonModule, verifiedContents, {}))
+    {
+        m_clientUpdateTool->downloadUpdate(verifiedContents);
+    }
+    else
+    {
+        NX_ERROR(this) << "atRecievedUpdateContents() got invalid update contents from" << contents.source;
+        m_installationResult = InstallResult::failedDownload;
+        setMessage(tr("Installation failed"));
+        done(QDialogButtonBox::StandardButton::Ok);
+    }
+}
+
 void CompatibilityVersionInstallationDialog::atUpdateStateChanged(int state, int progress)
 {
     qDebug() << "CompatibilityVersionInstallationDialog::atUpdateStateChanged("
         << ClientUpdateTool::toString(ClientUpdateTool::State(state)) << "," << progress << ")";
     // Progress:
     // [0-20] - Requesting update info
-    // [20-80] - Downloading
-    // [80-100] - Installing
+    // [20-90] - Downloading
+    // [90-100] - Installing
     int finalProgress = 0;
     switch (ClientUpdateTool::State(state))
     {
@@ -80,6 +102,7 @@ void CompatibilityVersionInstallationDialog::atUpdateStateChanged(int state, int
         case ClientUpdateTool::State::readyDownload:
         {
             finalProgress = 20;
+            setMessage(tr("Downloading update package"));
             auto contents = m_clientUpdateTool->getRemoteUpdateInfo();
             m_clientUpdateTool->downloadUpdate(contents);
             break;
@@ -87,16 +110,27 @@ void CompatibilityVersionInstallationDialog::atUpdateStateChanged(int state, int
         case ClientUpdateTool::State::downloading:
             m_installationResult = InstallResult::downloading;
             setMessage(tr("Downloading update package"));
-            finalProgress = 20 + 60 * progress / 100;
+            finalProgress = 20 + 70 * progress / 100;
             break;
         case ClientUpdateTool::State::readyInstall:
-            finalProgress = 80;
-            m_clientUpdateTool->installUpdate();
+            finalProgress = 90;
+            // TODO: We should wrap it inside some thread. This call can be long.
+            if (!m_clientUpdateTool->installUpdate())
+            {
+                //setMessage(tr("Installation failed"));
+                //m_installationResult = InstallResult::failedInstall;
+            }
+            else
+            {
+                //setMessage(tr("Installation completed"));
+                //m_installationResult = InstallResult::complete;
+            }
+            //done(QDialogButtonBox::StandardButton::Ok);
             break;
         case ClientUpdateTool::State::installing:
             setMessage(tr("Installing"));
             m_installationResult = InstallResult::installing;
-            finalProgress = 85;
+            finalProgress = 95;
             break;
         case ClientUpdateTool::State::complete:
             m_installationResult = InstallResult::complete;
@@ -129,27 +163,48 @@ int CompatibilityVersionInstallationDialog::installUpdate()
     // TODO:
     // 1. Check update info from the mediaservers. Wait until info arrives or timeout occurs.
     // 2. Initiate downloading process.
-    auto future = std::async(std::launch::async,
-        [dialog = QPointer(this), updateTool = m_clientUpdateTool]()
-        {
-            auto updateInfo = updateTool->requestRemoteUpdateInfo();
+    std::future<nx::update::UpdateContents> future;
 
-            const auto waitForUpdateInfo = 20s;
-            if (updateInfo.wait_for(waitForUpdateInfo) == std::future_status::timeout)
+    if (m_versionToInstall < nx::utils::SoftwareVersion("4.0.0"))
+    {
+
+    }
+    else
+    {
+        /*
+        auto future = std::async(std::launch::async,
+            [dialog = QPointer(this), updateTool = m_clientUpdateTool]()
             {
-                if (dialog)
+                auto updateInfo = updateTool->requestRemoteUpdateInfo();
+                const auto waitForUpdateInfo = 20s;
+                if (updateInfo.wait_for(waitForUpdateInfo) == std::future_status::timeout)
                 {
-                    // No update. Just quit
-                    dialog->m_installationResult = InstallResult::failedDownload;
-                    dialog->done(QDialogButtonBox::StandardButton::Discard);
+                    if (dialog)
+                    {
+                        // TODO: Fall back to specific build
+                        // No update. We should get specific build for this version
+                        dialog->m_installationResult = InstallResult::failedDownload;
+                        dialog->done(QDialogButtonBox::StandardButton::Discard);
+                    }
+                    return false;
                 }
-                return false;
-            }
-            return true;
-        });
+                return true;
+            });*/
+    }
 
     connect(m_clientUpdateTool, &ClientUpdateTool::updateStateChanged,
         this, &CompatibilityVersionInstallationDialog::atUpdateStateChanged);
+
+    // Should request specific build from the internet
+    QString updateUrl = qnSettings->updateFeedUrl();
+    auto callback = [dialog = QPointer(this)](const nx::update::UpdateContents& contents)
+        {
+            if (dialog)
+                dialog->atRecievedUpdateContents(contents);
+        };
+    QString build = QString::number(m_versionToInstall.build());
+    // Callback will be called on this thread.
+    future = nx::update::checkSpecificChangeset(updateUrl, build, callback);
 
     setMessage(tr("Installing version %1").arg(m_versionToInstall.toString()));
     m_ui->buttonBox->setStandardButtons(QDialogButtonBox::Cancel);

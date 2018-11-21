@@ -132,7 +132,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     bool alreadyInstalled = true;
 
     if (!clientInfo.version.isEmpty()
-        && (nx::utils::SoftwareVersion(clientInfo.version) < contents.getVersion()))
+        && (nx::utils::SoftwareVersion(clientInfo.version) != contents.getVersion()))
         alreadyInstalled = false;
 
     nx::update::findPackage(
@@ -173,7 +173,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
                 << "ver" << targetVersion.toString();
             contents.invalidVersion.insert(server->getId());
         }
-        else if (serverVersion < targetVersion)
+        else if (serverVersion != targetVersion)
             alreadyInstalled = false;
 
         allServers << record.first;
@@ -196,7 +196,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     }
 
     // Update package has no packages at all.
-    if (contents.info.packages.empty())
+    if (contents.info.packages.empty() && !activeServers.empty())
     {
         NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest(" << contents.info.version <<") - this update is completely empty";
         contents.error = nx::update::InformationError::missingPackageError;
