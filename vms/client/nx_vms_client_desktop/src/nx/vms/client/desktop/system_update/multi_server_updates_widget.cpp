@@ -1315,8 +1315,11 @@ void MultiServerUpdatesWidget::syncUpdateCheck()
 {
     bool isChecking = m_updateCheck.valid();
     bool hasEqualUpdateInfo = m_updatesModel->lowestInstalledVersion() >= m_updateInfo.getVersion();
-    bool hasLatestVersion = ((m_updateInfo.isValid() || hasEqualUpdateInfo || m_updateInfo.alreadyInstalled)
-        || m_updateInfo.error == nx::update::InformationError::noNewVersion);
+    bool hasLatestVersion = false;
+    if (!m_updateInfo.isValid() || m_updateInfo.error == nx::update::InformationError::noNewVersion)
+        hasLatestVersion = true;
+    else if (hasEqualUpdateInfo || m_updateInfo.alreadyInstalled)
+        hasLatestVersion = false;
 
     if (m_updateStateCurrent != WidgetUpdateState::ready
         && m_updateStateCurrent != WidgetUpdateState::initial
