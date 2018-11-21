@@ -133,7 +133,7 @@ QnResourceTreeModel::QnResourceTreeModel(
     for (NodeType nodeType : rootNodeTypes())
         m_rootNodes[nodeType] = QnResourceTreeModelNodeFactory::createNode(nodeType, this, false);
 
-    for (auto rootNode : m_rootNodes)
+    for (auto rootNode: m_rootNodes)
     {
         if (rootNode)
         {
