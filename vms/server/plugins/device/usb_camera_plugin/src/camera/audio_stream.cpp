@@ -111,14 +111,17 @@ bool AudioStream::AudioStreamPrivate::waitForConsumers()
         std::lock_guard<std::mutex> lockGuard(m_mutex);
         wait = m_packetConsumerManager->empty();
     }
-
     if (wait)
+        uninitialize(); // < Don't stream the camera if there are no consumers
+    
+    // Check again if there are no consuemrs because they could have been added during unitialize.
+    std::unique_lock<std::mutex> lock(m_mutex);
+    if(m_packetConsumerManager->empty())
     {
-        uninitialize();
-        std::unique_lock<std::mutex> lock(m_mutex);
         m_wait.wait(lock, [&]() { return m_terminated || !m_packetConsumerManager->empty(); });
         return !m_terminated;
     }
+
     return true;
 }
 

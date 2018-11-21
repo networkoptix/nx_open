@@ -201,12 +201,16 @@ bool VideoStream::waitForConsumers()
         wait = noConsumers();
     }
     if (wait)
+        uninitialize(); // < Don't stream the camera if there are no consumers
+
+    // Check again if there are no consuemrs because they could have been added during unitialize.
+    std::unique_lock<std::mutex> lock(m_mutex);
+    if(noConsumers())
     {
-        uninitialize();
-        std::unique_lock<std::mutex> lock(m_mutex);
         m_wait.wait(lock, [&]() { return m_terminated || !noConsumers(); });
         return !m_terminated;
     }
+
     return true;
 }
 
