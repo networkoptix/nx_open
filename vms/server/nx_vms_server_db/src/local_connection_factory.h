@@ -18,7 +18,7 @@
 
 namespace ec2 {
 
-struct ServerQueryProcessorAccess;
+class ServerQueryProcessorAccess;
 class QnDistributedMutexManager;
 class ClientRegistrar;
 
