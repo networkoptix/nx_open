@@ -130,8 +130,9 @@ QnResourceTreeModel::QnResourceTreeModel(
     m_layoutNodeManager(new QnResourceTreeModelLayoutNodeManager(this))
 {
     /* Create top-level nodes. */
-    for (NodeType nodeType : rootNodeTypes())
-        m_rootNodes[nodeType] = QnResourceTreeModelNodeFactory::createNode(nodeType, this, false);
+    for (NodeType nodeType: rootNodeTypes())
+        m_rootNodes[nodeType] =
+            QnResourceTreeModelNodeFactory::createNode(nodeType, this, /*initialize*/ false);
 
     for (auto rootNode: m_rootNodes)
     {
