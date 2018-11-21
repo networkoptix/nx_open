@@ -53,7 +53,9 @@ public:
 
     Cameras selectedCameras() const;
     QnVirtualCameraResourceSet cameras() const;
-    void setSingleCameraMode(bool value);
+
+    void selectCameras(Cameras value);
+    Cameras previousCameras() const;
 
     QString textFilter() const;
 

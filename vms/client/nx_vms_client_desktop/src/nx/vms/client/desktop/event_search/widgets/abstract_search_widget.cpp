@@ -64,11 +64,6 @@ QnVirtualCameraResourceSet AbstractSearchWidget::cameras() const
     return d->cameras();
 }
 
-void AbstractSearchWidget::setSingleCameraMode(bool value)
-{
-    d->setSingleCameraMode(value);
-}
-
 QString AbstractSearchWidget::textFilter() const
 {
     return d->textFilter();
@@ -111,6 +106,16 @@ bool AbstractSearchWidget::wholeArea() const
 void AbstractSearchWidget::setWholeArea(bool value)
 {
     d->setWholeArea(value);
+}
+
+void AbstractSearchWidget::selectCameras(Cameras value)
+{
+    d->selectCameras(value);
+}
+
+AbstractSearchWidget::Cameras AbstractSearchWidget::previousCameras() const
+{
+    return d->previousCameras();
 }
 
 } // namespace nx::vms::client::desktop
