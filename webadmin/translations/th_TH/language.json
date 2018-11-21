@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "สร้างบัญชี",
         "errorNoHDD": "อุปกรณ์นี้มีวัตถุประสงค์เพื่อทำงานกับฮาร์ดดิสก์ที่ติดตั้ง <br>กรุณาปิดอุปกรณ์ และติดตั้งฮาร์ดดิสก์ไดรฟ์",
-        "errorNoNetwork": "อุปกรณ์นี้ต้องการการเชื่อมต่อเครือข่ายเพื่อใช้งานได้.<br>กรุณาเชื่อมต่อเครือข่ายกับอินเทอร์เน็ตในระบบเครือข่ายภายใน"
+        "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to the local network or Internet"
     },
     "passwordRequirements": {
         "minLengthMessage": "รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัว",

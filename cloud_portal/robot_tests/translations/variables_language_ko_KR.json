@@ -23,6 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": "확인 메세지가 %email% 로 전송되었습니다.",
     "CANNOT SAVE PASSWORD": "패스워드를 저장할 수 없습니다.:",
     "PASSWORD INCORRECT": "현재 패스워드가 잘못되었습니다.",
+    "TOO MANY ATTEMPTS TEXT": "Too many attempts. Try again in a minute.",
     "WRONG PASSWORD": "패스워드가 틀립니다.",
     "ACCOUNT NOT FOUND TEXT": "계정을 찾을 수 없습니다",
     "CANNOT SEND CONFIRMATION EMAIL": "확인 이메일을 보낼 수 없습니다.:",
@@ -81,9 +82,9 @@
     "BETAS TEXT": "베타들",
     "CLIENT ONLY TEXT": "클라이언트만",
     "PASSWORD TOO SHORT BADGE TEXT": "너무 짧음",
-    "PASSWORD TOO COMMON BADGE TEXT": "너무 흔한",
+    "PASSWORD TOO COMMON BADGE TEXT": "너무 평범",
     "PASSWORD IS WEAK BADGE TEXT": "약함",
-    "PASSWORD IS FAIR BADGE TEXT": "fair",
+    "PASSWORD IS FAIR BADGE TEXT": "보통",
     "PASSWORD IS GOOD BADGE TEXT": "좋음",
-    "PASSWORD INCORRECT BADGE TEXT": "올바르지 않은 값이 입력됨"
+    "PASSWORD INCORRECT BADGE TEXT": "부적합"
 }

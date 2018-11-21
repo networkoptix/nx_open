@@ -23,6 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": "Подтверждение отправлено на адрес %email%",
     "CANNOT SAVE PASSWORD": "Не удается сохранить пароль:",
     "PASSWORD INCORRECT": "Текущий пароль указан неверно.",
+    "TOO MANY ATTEMPTS TEXT": "Too many attempts. Try again in a minute.",
     "WRONG PASSWORD": "Неправильный пароль",
     "ACCOUNT NOT FOUND TEXT": "Учетная запись не найдена",
     "CANNOT SEND CONFIRMATION EMAIL": "Не удается отправить подтверждение по Email:",
@@ -80,10 +81,10 @@
     "PATCHES TEXT": "Патчи",
     "BETAS TEXT": "Бета",
     "CLIENT ONLY TEXT": "Только клиент",
-    "PASSWORD TOO SHORT BADGE TEXT": "слишком короткий",
-    "PASSWORD TOO COMMON BADGE TEXT": "слишком распространенный",
+    "PASSWORD TOO SHORT BADGE TEXT": "короткий",
+    "PASSWORD TOO COMMON BADGE TEXT": "часто встречающийся",
     "PASSWORD IS WEAK BADGE TEXT": "слабый",
     "PASSWORD IS FAIR BADGE TEXT": "средний",
-    "PASSWORD IS GOOD BADGE TEXT": "хорошее",
+    "PASSWORD IS GOOD BADGE TEXT": "хороший",
     "PASSWORD INCORRECT BADGE TEXT": "некорректный"
 }

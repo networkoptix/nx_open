@@ -23,6 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": "ข้อความยืนยันจะถูกส่งไปที่ %email%",
     "CANNOT SAVE PASSWORD": "ไม่สามารถบันทึกรหัสผ่านได้:",
     "PASSWORD INCORRECT": "ต้องระบุรหัสผ่านปัจจุบัน.",
+    "TOO MANY ATTEMPTS TEXT": "Too many attempts. Try again in a minute.",
     "WRONG PASSWORD": "รหัสผ่านผิด",
     "ACCOUNT NOT FOUND TEXT": "ไม่พบบัญชีนี้",
     "CANNOT SEND CONFIRMATION EMAIL": "ไม่สามารถส่งอีเมลยืนยัน:",
@@ -80,10 +81,10 @@
     "PATCHES TEXT": "Patches",
     "BETAS TEXT": "Betas",
     "CLIENT ONLY TEXT": "ไคลเอ็นต์เท่านั้น",
-    "PASSWORD TOO SHORT BADGE TEXT": "too short",
-    "PASSWORD TOO COMMON BADGE TEXT": "too common",
-    "PASSWORD IS WEAK BADGE TEXT": "รหัสผ่านเดาได้ง่ายไป",
-    "PASSWORD IS FAIR BADGE TEXT": "ปลอดโปร่ง",
+    "PASSWORD TOO SHORT BADGE TEXT": "สั้นเกินไป",
+    "PASSWORD TOO COMMON BADGE TEXT": "บ่อยเกินไป",
+    "PASSWORD IS WEAK BADGE TEXT": "อ่อนแอ",
+    "PASSWORD IS FAIR BADGE TEXT": "ยุติธรรม",
     "PASSWORD IS GOOD BADGE TEXT": "ดี",
     "PASSWORD INCORRECT BADGE TEXT": "ไม่ถูกต้อง"
 }

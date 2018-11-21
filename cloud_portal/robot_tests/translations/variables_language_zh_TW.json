@@ -23,6 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": "確認訊息已發送至電子郵件 %email%",
     "CANNOT SAVE PASSWORD": "無法儲存密碼:",
     "PASSWORD INCORRECT": "目前密碼不正確.",
+    "TOO MANY ATTEMPTS TEXT": "Too many attempts. Try again in a minute.",
     "WRONG PASSWORD": "密碼不正確",
     "ACCOUNT NOT FOUND TEXT": "未找到該帳戶",
     "CANNOT SEND CONFIRMATION EMAIL": "無法發送確認郵件:",
@@ -82,8 +83,8 @@
     "CLIENT ONLY TEXT": "僅用戶端",
     "PASSWORD TOO SHORT BADGE TEXT": "太短",
     "PASSWORD TOO COMMON BADGE TEXT": "太常見",
-    "PASSWORD IS WEAK BADGE TEXT": "太弱",
-    "PASSWORD IS FAIR BADGE TEXT": "普通",
-    "PASSWORD IS GOOD BADGE TEXT": "好",
+    "PASSWORD IS WEAK BADGE TEXT": "弱",
+    "PASSWORD IS FAIR BADGE TEXT": "尚可",
+    "PASSWORD IS GOOD BADGE TEXT": "很好",
     "PASSWORD INCORRECT BADGE TEXT": "不正確"
 }

@@ -8,7 +8,8 @@
                 Это устройство предназначено для работы с жестким диском. <br>Пожалуйста, выключите устройство и установите жесткий диск.
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
-                Для работы этого устройства необходимо сетевое подключение. <br>Пожалуйста, подключите его к вашей локальной сети или сети Интернет
+                This device needs network connection to work.<br>
+                Please connect it to the local network or Internet
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 У этого устройства некорректная сетевая конфигурация. <br>Требуется подключить его к сети или настроить правильный IP-адрес.
@@ -108,9 +109,10 @@
                             <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Для подключения системы к {{Config.cloud.productName}} необходимо подключение к сети Интернет</uib-alert>
                             <p ng-if="canConnectToCloud"  ><button
                                     class="btn btn-default"
-                                    ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Подключиться к {{Config.cloud.productName}}</button>                                 <a ng-if="!mode.liteClient"  class="btn btn-default"
+                                    ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Подключиться к {{Config.cloud.productName}}</button>
+                                 <a ng-if="!mode.liteClient"  class="btn btn-default"
                                    ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}"
-                                   target="_blank">Создать учётную запись {{Config.cloud.productName}}</a></p>
+                                   target="_blank">Зарегистрироваться в {{Config.cloud.productName}}</a></p>
                         </div>
                     </div>
 

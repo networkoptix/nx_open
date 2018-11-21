@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "створити обліковий запис",
         "errorNoHDD": "Цей пристрій призначений для роботи з жорстким диском. <br> Будь ласка, вимкніть пристрій та встановіть жорсткий диск.",
-        "errorNoNetwork": "Для роботи цього пристрою необхідно встановити з'єднання з мережею. <br> Будь ласка, підключіть його до вашої локальної мережі або мережі Інтернет"
+        "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to the local network or Internet"
     },
     "passwordRequirements": {
         "minLengthMessage": "Пароль має містити принаймні 8 символів",

@@ -39,6 +39,7 @@ ${ACCOUNT NOT FOUND}                  //form[@name='loginForm']//label[contains(
 ${RESEND ACTIVATION EMAIL LINK}       //form[@name='loginForm']//a[text()='${RESEND ACTIVATION LINK BUTTON TEXT}']
 ${WRONG PASSWORD MESSAGE}             //form[@name='loginForm']//label[text()="${WRONG PASSWORD}"]
 ${ACCOUNT NOT FOUND MESSAGE}          //form[@name='loginForm']//label[text()="${ACCOUNT DOES NOT EXIST}"]
+${TOO MANY ATTEMPTS MESSAGE}          //form[@name='loginForm']//label[text()="${TOO MANY ATTEMPTS TEXT}"]
 
 ${LOG IN NAV BAR}                     //nav//a[contains(@ng-click, 'login()')]
 ${YOU HAVE NO SYSTEMS}                //span[contains(text(),"${YOU HAVE NO SYSTEMS TEXT}")]
@@ -199,9 +200,11 @@ ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-cl
 
 #Downloads
 ${DOWNLOADS HEADER}                   //h1["${DOWNLOADS HEADER TEXT}"]
-${DOWNLOAD WINDOWS VMS LINK}                  //div[text()="Windows x64 - ${CLIENT ONLY TEXT}"]/../..
-${DOWNLOAD UBUNTU VMS LINK}                  //div[text()="Ubuntu x64 - ${CLIENT ONLY TEXT}"]/../..
-${DOWNLOAD MAC OS VMS LINK}                  //div[text()="Mac OS X - ${CLIENT ONLY TEXT}"]/../..
+${DOWNLOAD WINDOWS VMS LINK}          //div[text()="Windows x64 - ${CLIENT ONLY TEXT}"]/../..
+${DOWNLOAD UBUNTU VMS LINK}           //div[text()="Ubuntu x64 - ${CLIENT ONLY TEXT}"]/../..
+${DOWNLOAD MAC OS VMS LINK}           //div[text()="Mac OS X - ${CLIENT ONLY TEXT}"]/../..
+${ITUNES STORE DOWNLOAD BUTTON}       //a[@class="mobile-link iOS"]
+${PLAY STORE DOWNLOAD BUTTON}         //a[@class="mobile-link Android"]
 
 ${WINDOWS TAB}                        //a[@id="Windows"]
 ${UBUNTU TAB}                         //a[@id="Linux"]

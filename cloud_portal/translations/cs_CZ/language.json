@@ -1,12 +1,12 @@
 {
-  "language": "en_US",
+  "language": "cs_CZ",
   "language_name": "Čeština",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "OK",
     "cancelButton": "Zrušit",
-    "loginTitle": "Přihlásit se k %PRODUCT_NAME%",
+    "loginTitle": "Přihlaste se k %PRODUCT_NAME%",
     "loginButton": "Přihlásit se",
     "logoutAuthorisedTitle": "Již jste přihlášen",
     "logoutAuthorisedContinueButton": "Pokračovat",

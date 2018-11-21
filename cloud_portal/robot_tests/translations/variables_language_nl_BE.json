@@ -23,6 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": "Een bevestigingsbericht wordt verzonden naar%email%",
     "CANNOT SAVE PASSWORD": "Wachtwoord kan niet worden opgeslagen:",
     "PASSWORD INCORRECT": "Dit wachtwoord is onjuist.",
+    "TOO MANY ATTEMPTS TEXT": "Too many attempts. Try again in a minute.",
     "WRONG PASSWORD": "Wachtwoord onjuist",
     "ACCOUNT NOT FOUND TEXT": "Account niet gevonden",
     "CANNOT SEND CONFIRMATION EMAIL": "Kan geen bevestigingsmail versturen:",

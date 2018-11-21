@@ -23,6 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": "Wiadomość z potwierdzeniem została wysłana na adres %email%",
     "CANNOT SAVE PASSWORD": "Nie można zapisać hasła:",
     "PASSWORD INCORRECT": "Bieżące hasło jest nieprawidłowe.",
+    "TOO MANY ATTEMPTS TEXT": "Too many attempts. Try again in a minute.",
     "WRONG PASSWORD": "Nieprawidłowe hasło",
     "ACCOUNT NOT FOUND TEXT": "Nie znaleziono konta",
     "CANNOT SEND CONFIRMATION EMAIL": "Nie można wysłać e-maila z potwierdzeniem:",
@@ -80,10 +81,10 @@
     "PATCHES TEXT": "Poprawki",
     "BETAS TEXT": "Bety",
     "CLIENT ONLY TEXT": "Tylko klient",
-    "PASSWORD TOO SHORT BADGE TEXT": "za krótkie",
+    "PASSWORD TOO SHORT BADGE TEXT": "zbty krótkie",
     "PASSWORD TOO COMMON BADGE TEXT": "zbyt popularne",
     "PASSWORD IS WEAK BADGE TEXT": "słabe",
     "PASSWORD IS FAIR BADGE TEXT": "średnie",
     "PASSWORD IS GOOD BADGE TEXT": "dobry",
-    "PASSWORD INCORRECT BADGE TEXT": "nieprawidłowy"
+    "PASSWORD INCORRECT BADGE TEXT": "nieprawidłowe"
 }
