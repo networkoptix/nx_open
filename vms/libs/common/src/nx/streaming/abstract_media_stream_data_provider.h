@@ -51,6 +51,9 @@ protected:
 
     virtual bool beforeGetData() { return true; }
 
+    void checkTime(const QnAbstractMediaDataPtr& data);
+    void checkAndFixTimeFromCamera(const QnAbstractMediaDataPtr& data);
+    void resetTimeCheck();
 private:
     void loadNumberOfChannelsIfUndetected() const;
 protected:
@@ -61,6 +64,7 @@ protected:
 
 private:
     mutable int m_numberOfchannels;
+    qint64 m_lastMediaTime[CL_MAX_CHANNELS + 1]; //< max video channels + audio channel
     bool m_isCamera;
     qint64 m_unloopingPeriodStartUs = 0;
 };

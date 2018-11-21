@@ -22,6 +22,7 @@ QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(const QnRes
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
     m_mediaResource = res;
     NX_ASSERT(dynamic_cast<QnMediaResource*>(m_mediaResource.data()));
+    resetTimeCheck();
     m_isCamera = dynamic_cast<const QnSecurityCamResource*>(res.data()) != nullptr;
 
     connect(
@@ -131,6 +132,73 @@ float QnAbstractMediaStreamDataProvider::getAverageGopSize() const
         rez += m_stat[i].getAverageGopSize();
 
     return rez / getNumberOfChannels();
+}
+
+void QnAbstractMediaStreamDataProvider::resetTimeCheck()
+{
+    for (int i = 0; i < CL_MAX_CHANNELS+1; ++i)
+        m_lastMediaTime[i] = AV_NOPTS_VALUE;
+}
+
+void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& media)
+{
+    if (m_isCamera && media && (media->dataType == QnAbstractMediaData::VIDEO || media->dataType == QnAbstractMediaData::AUDIO))
+    {
+        // correct packets timestamp if we have got several packets very fast
+        int channel = media->channelNumber;
+        if (media->dataType == QnAbstractMediaData::AUDIO)
+            channel = CL_MAX_CHANNELS; //< use last vector element for audio timings control
+
+        if (nxStreamingIni().enableTimeCorrection)
+        {
+            if (media->flags & (QnAbstractMediaData::MediaFlags_BOF | QnAbstractMediaData::MediaFlags_ReverseBlockStart))
+            {
+                resetTimeCheck();
+            }
+            else if (m_lastMediaTime[channel] != AV_NOPTS_VALUE)
+            {
+                qint64 timeDiff = media->timestamp - m_lastMediaTime[channel];
+                // if timeDiff < -N it may be time correction or dayling time change
+                if (timeDiff >= -TIME_RESYNC_THRESHOLD && timeDiff < MIN_FRAME_DURATION_USEC)
+                {
+                    // Most likely, timestamps reported by the camera are not so good.
+                    NX_VERBOSE(this, lit("Timestamp correction. ts diff %1, camera %2, %3 stream").
+                        arg(timeDiff).
+                        arg(m_mediaResource ? m_mediaResource->getName() : QString()).
+                        arg((media->flags & QnAbstractMediaData::MediaFlags_LowQuality) ? lit("low") : lit("high")));
+
+                    media->timestamp = m_lastMediaTime[channel] + MIN_FRAME_DURATION_USEC;
+
+                }
+            }
+        }
+        m_lastMediaTime[channel] = media->timestamp;
+    }
+}
+
+void QnAbstractMediaStreamDataProvider::checkAndFixTimeFromCamera(
+    const QnAbstractMediaDataPtr& media)
+{
+    const int modulusUs = nxStreamingIni().unloopCameraPtsWithModulus;
+    if (modulusUs <= 0)
+    {
+        checkTime(media);
+        return;
+    }
+
+    if (!m_isCamera || !media || media->dataType != QnAbstractMediaData::VIDEO)
+        return;
+
+    const int channel = media->channelNumber;
+    const qint64 pts = media->timestamp;
+    media->timestamp = nx::utils::TimeHelper::unloopCameraPtsWithModulus(
+        []() { return std::chrono::milliseconds(qnSyncTime->currentMSecsSinceEpoch()); },
+        AV_NOPTS_VALUE,
+        modulusUs,
+        pts,
+        m_lastMediaTime[channel],
+        &m_unloopingPeriodStartUs);
+    m_lastMediaTime[channel] = pts;
 }
 
 QnConstMediaContextPtr QnAbstractMediaStreamDataProvider::getCodecContext() const
