@@ -567,10 +567,6 @@ void AudioStream::AudioStreamPrivate::run()
             std::lock_guard<std::mutex> lock(m_mutex);
             m_packetConsumerManager->givePacket(packet);
         }
-
-        // Dshow audio input hangs on the next call to av_read_frame if device was unplugged.
-        // Prevent by terminating if video stream has an io error.
-        //terminateIfVideoStreamHasIoError();
     }
 
     uninitialize();
