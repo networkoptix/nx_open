@@ -4,53 +4,57 @@
 #include <memory>
 #include <atomic>
 
-#include <QtCore/QFuture>
 #include <QtNetwork/QAuthenticator>
 
 #include <api/model/manual_camera_seach_reply.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/utils/concurrent.h>
-#include <utils/common/threadqueue.h>
 #include <nx/network/ip_range_checker_async.h>
 #include <common/common_module_aware.h>
 
 #include "manual_camera_search_task_manager.h"
 
 //! Scans different addresses simultaneously (using aio or concurrent operations)
-class QnManualCameraSearcher: public QnCommonModuleAware
+class QnManualCameraSearcher: public QnCommonModuleAware, public nx::network::QnStoppableAsync
 {
     using SearchDoneCallback = nx::utils::MoveOnlyFunc<void(QnManualCameraSearcher*)>;
 
 public:
     QnManualCameraSearcher(QnCommonModule* commonModule);
-    ~QnManualCameraSearcher();
+    virtual ~QnManualCameraSearcher() override;
 
-    bool run(SearchDoneCallback callback, const QString& startAddr, const QString& endAddr,
-        const QAuthenticator& auth, int port);
-    void cancel();
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+
+    void run(
+        SearchDoneCallback callback,
+        const QString& startAddr,
+        const QString& endAddr,
+        const QAuthenticator& auth,
+        int port);
+
     QnManualCameraSearchProcessStatus status() const;
 
 private:
-    QStringList getOnlineHosts(
-        const QString& startAddr,
-        const QString& endAddr,
-        int port = nx::network::http::DEFAULT_HTTP_PORT);
+    void startOnlineHostsScan(
+        QString startAddr,
+        QString endAddr,
+        QAuthenticator auth,
+        int port = nx::network::http::DEFAULT_HTTP_PORT
+        );
 
-    // TODO: Rename?
-    void searchTaskDoneHandler(QnManualResourceSearchList results);
+    void onOnlineHostsScanDone(QStringList onlineHosts, int port, QAuthenticator auth);
+    void onManualSearchDone(QnManualResourceSearchList results);
 
-    void changeStateUnsafe(QnManualResourceSearchStatus::State newState);
-    void runTasksUnsafe();
+    void changeState(QnManualResourceSearchStatus::State newState);
+    void runTasks();
     QList<QnAbstractNetworkResourceSearcher*> getAllNetworkSearchers() const;
 
 private:
-    mutable QnMutex m_mutex;
     QnManualResourceSearchList m_results;
-    QnManualResourceSearchStatus::State m_state;
-    std::atomic<bool> m_cancelled;
+    std::atomic<QnManualResourceSearchStatus::State> m_state;
 
-    QnIpRangeCheckerAsync m_ipChecker;
+    nx::network::aio::BasicPollable m_pollable;
     int m_hostRangeSize;
+    QnIpRangeCheckerAsync m_ipChecker;
     QnManualSearchTaskManager m_taskManager;
 
     SearchDoneCallback m_searchDoneCallback;

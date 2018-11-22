@@ -30,18 +30,42 @@ static_assert( PORT_SCAN_MAX_PROGRESS_PERCENT < MAX_PERCENT, "PORT_SCAN_MAX_PROG
 QnManualCameraSearcher::QnManualCameraSearcher(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule),
     m_state(QnManualResourceSearchStatus::Init),
-    m_cancelled(false),
     m_hostRangeSize(0),
-    m_taskManager(commonModule)
+    m_ipChecker(m_pollable.getAioThread()),
+    m_taskManager(commonModule, m_pollable.getAioThread())
 {
     NX_VERBOSE(this, "Created");
 }
 
 QnManualCameraSearcher::~QnManualCameraSearcher()
 {
-    NX_VERBOSE(this, "Destroying (state: %1)", m_state);
-    cancel();
-    // TODO: should make sure that all tasks has finished and notify cond var!
+    NX_VERBOSE(this, "Destroying (state: %1)", m_state.load());
+    pleaseStopSync();
+}
+
+void QnManualCameraSearcher::pleaseStop(nx::utils::MoveOnlyFunc<void ()> completionHandler)
+{
+    m_pollable.dispatch(
+        [this, handler = std::move(completionHandler)]() mutable
+        {
+            NX_VERBOSE(this, "Canceling search");
+            m_pollable.pleaseStopSync();
+            // TODO: Is it possible that after pleaseStopSync posts occur? How does BasicPollable
+            // handle posts after pleaseStop?
+
+            switch (m_state) {
+            case QnManualResourceSearchStatus::State::CheckingOnline:
+                m_ipChecker.pleaseStop(std::move(handler));
+                break;
+            case QnManualResourceSearchStatus::State::CheckingHost:
+                m_taskManager.pleaseStop(std::move(handler));
+                break;
+            default:
+                handler();
+                break;
+            }
+            changeState(QnManualResourceSearchStatus::Aborted);
+        });
 }
 
 QList<QnAbstractNetworkResourceSearcher*> QnManualCameraSearcher::getAllNetworkSearchers() const
@@ -60,106 +84,38 @@ QList<QnAbstractNetworkResourceSearcher*> QnManualCameraSearcher::getAllNetworkS
     return result;
 }
 
-// TODO: Use QnIpRangeCheckerAsync asynchronously.
-bool QnManualCameraSearcher::run(
+void QnManualCameraSearcher::run(
     SearchDoneCallback callback,
     const QString& startAddr,
     const QString& endAddr,
     const QAuthenticator& auth,
     int port)
 {
-    {
-        QnMutexLocker lock(&m_mutex);
-        // TODO: Use assert? Allow to run only from init state?
-        if (m_state == QnManualResourceSearchStatus::Aborted)
-            return false;
-
-        m_cancelled = false;
-        m_searchDoneCallback = std::move(callback);
-        // TODO: reset TaskManager
-    }
-
-    QStringList onlineHosts;
-    if (endAddr.isNull())
-        onlineHosts.push_back(startAddr);
-    else
-        onlineHosts = getOnlineHosts(startAddr, endAddr, port);
-    NX_VERBOSE(this, "Will check %1 hosts", onlineHosts.size());
-
-    QnSearchTask::SearcherList sequentialSearchers;
-    QnSearchTask::SearcherList parallelSearchers;
-    auto searchers = getAllNetworkSearchers();
-    for (const auto& searcher: searchers)
-    {
-        if (searcher->isSequential())
-            sequentialSearchers.push_back(searcher);
-        else
-            parallelSearchers.push_back(searcher);
-    }
-    NX_VERBOSE(this, "Will use %1 sequential and %2 concurrent searchers",
-        sequentialSearchers.size(), parallelSearchers.size());
-
-    for (const auto& host: onlineHosts)
-    {
-        m_taskManager.addTask(nx::network::SocketAddress(host, port),
-            auth, sequentialSearchers, /*isSequential*/ true);
-
-        for (const auto& searcher: parallelSearchers)
+    m_pollable.dispatch(
+        [=, callback = std::move(callback)]() mutable
         {
-            m_taskManager.addTask(nx::network::SocketAddress(host, port),
-                auth, {searcher}, /*isSequential*/ false);
-        }
-    }
+            NX_ASSERT(m_state == QnManualResourceSearchStatus::Init);
+            m_searchDoneCallback = std::move(callback);
 
-    {
-        QnMutexLocker lock(&m_mutex);
-        // TODO: Should I run callback here? It seems yes...
-        if (m_cancelled)
-            return true;
-        changeStateUnsafe(QnManualResourceSearchStatus::CheckingHost);
-        m_taskManager.startTasks([this](auto result){ searchTaskDoneHandler(std::move(result)); });
-    }
+            if (endAddr.isNull())
+                onOnlineHostsScanDone({std::move(startAddr)}, port, std::move(auth));
+            else
+                startOnlineHostsScan(std::move(startAddr), std::move(endAddr), std::move(auth), port);
 
-    return true;
+            return;
+        });
 }
 
-// TODO: revise it implementation and usage.
-// Implement pleaseStop pair?
-void QnManualCameraSearcher::cancel()
-{
-    {
-        QnMutexLocker lock(&m_mutex);
-        NX_VERBOSE(this, "Canceling search");
-        m_cancelled = true;
-        switch (m_state)
-        {
-            case QnManualResourceSearchStatus::Finished:
-                return;
-            case QnManualResourceSearchStatus::CheckingOnline:
-                m_ipChecker.pleaseStop();
-                m_ipChecker.join(); // TODO: remove it from here
-                break;
-            case QnManualResourceSearchStatus::CheckingHost:
-                m_taskManager.pleaseStopSync();  // TODO: make it async
-                break;
-            default:
-                break;
-        }
-        changeStateUnsafe(QnManualResourceSearchStatus::Aborted);
-    }
-}
-
+// TODO: should do from IOthread
 QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
 {
-    QnMutexLocker lock(&m_mutex);
     QnManualCameraSearchProcessStatus result;
 
     switch (m_state)
     {
         case QnManualResourceSearchStatus::CheckingHost:
         {
-            // TODO: Should take it from m_taskManager if required such logic!
-//            result.cameras = m_results;
+            result.cameras = m_taskManager.foundResources();
             break;
         }
         case QnManualResourceSearchStatus::Finished:
@@ -213,59 +169,83 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
     return result;
 }
 
-QStringList QnManualCameraSearcher::getOnlineHosts(
-    const QString& startAddr,
-    const QString& endAddr,
+void QnManualCameraSearcher::startOnlineHostsScan(
+    QString startAddr,
+    QString endAddr,
+    QAuthenticator auth,
     int port)
 {
+    NX_ASSERT(m_pollable.isInSelfAioThread());
+    NX_ASSERT(m_state == QnManualResourceSearchStatus::Init);
     NX_VERBOSE(this, "Getting online hosts in range (%1, %2)", startAddr, endAddr);
-    QStringList onlineHosts;
 
     const quint32 startIPv4Addr = QHostAddress(startAddr).toIPv4Address();
     const quint32 endIPv4Addr = QHostAddress(endAddr).toIPv4Address();
 
-    if (endIPv4Addr < startIPv4Addr)
-        return QStringList();
+    NX_ASSERT(endIPv4Addr >= startIPv4Addr); // TODO: implement that check in request
 
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_hostRangeSize = endIPv4Addr - startIPv4Addr;
-        if (m_cancelled)
-            return QStringList();
-        changeStateUnsafe(QnManualResourceSearchStatus::CheckingOnline);
-    }
+    m_hostRangeSize = endIPv4Addr - startIPv4Addr;
+    changeState(QnManualResourceSearchStatus::CheckingOnline);
 
-    onlineHosts = m_ipChecker.onlineHosts(
+    m_ipChecker.onlineHosts(
+        [this, port, auth = std::move(auth)](auto results){ onOnlineHostsScanDone(results, port, auth); },
         QHostAddress(startAddr),
         QHostAddress(endAddr),
-        port ? port : nx::network::http::DEFAULT_HTTP_PORT );
-
-    {
-        QnMutexLocker lock( &m_mutex );
-        if (m_cancelled)
-            return QStringList();
-    }
-
-    return onlineHosts;
+        port);
 }
 
-void QnManualCameraSearcher::searchTaskDoneHandler(
+void QnManualCameraSearcher::onOnlineHostsScanDone(
+    QStringList onlineHosts, int port, QAuthenticator auth)
+{
+    NX_ASSERT(m_pollable.isInSelfAioThread());
+    NX_ASSERT(m_state == QnManualResourceSearchStatus::Init
+        || m_state == QnManualResourceSearchStatus::CheckingOnline);
+    NX_VERBOSE(this, "Will check %1 hosts", onlineHosts.size());
+
+    QnSearchTask::SearcherList sequentialSearchers;
+    QnSearchTask::SearcherList parallelSearchers;
+    auto searchers = getAllNetworkSearchers();
+    for (const auto& searcher: searchers)
+    {
+        if (searcher->isSequential())
+            sequentialSearchers.push_back(searcher);
+        else
+            parallelSearchers.push_back(searcher);
+    }
+    NX_VERBOSE(this, "Will use %1 sequential and %2 concurrent searchers",
+        sequentialSearchers.size(), parallelSearchers.size());
+
+    for (const auto& host: onlineHosts)
+    {
+        m_taskManager.addTask(nx::network::SocketAddress(host, port),
+            auth, sequentialSearchers, /*isSequential*/ true);
+
+        for (const auto& searcher: parallelSearchers)
+        {
+            m_taskManager.addTask(nx::network::SocketAddress(host, port),
+                auth, {searcher}, /*isSequential*/ false);
+        }
+    }
+
+    changeState(QnManualResourceSearchStatus::CheckingHost);
+    m_taskManager.startTasks([this](auto result){ onManualSearchDone(std::move(result)); });
+}
+
+void QnManualCameraSearcher::onManualSearchDone(
     QnManualResourceSearchList results)
 {
-    QnMutexLocker lock(&m_mutex);
-    m_results = std::move(results);
-    if (!m_cancelled)
-        changeStateUnsafe(QnManualResourceSearchStatus::Finished);
-    else
-        NX_ASSERT(m_state == QnManualResourceSearchStatus::Aborted);
+    NX_ASSERT(m_pollable.isInSelfAioThread());
+    NX_ASSERT(m_state == QnManualResourceSearchStatus::CheckingHost);
+    changeState(QnManualResourceSearchStatus::Finished);
 
+    m_results = std::move(results);
     NX_ASSERT(m_searchDoneCallback);
     m_searchDoneCallback(this);
 }
 
-void QnManualCameraSearcher::changeStateUnsafe(QnManualResourceSearchStatus::State newState)
+void QnManualCameraSearcher::changeState(QnManualResourceSearchStatus::State newState)
 {
-    NX_VERBOSE(this, "State change: %1 -> %2", m_state, newState);
+    NX_VERBOSE(this, "State change: %1 -> %2", m_state.load(), newState);
     m_state = newState;
 }
 

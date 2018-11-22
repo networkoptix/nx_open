@@ -107,12 +107,12 @@ int QnManualCameraAdditionRestHandler::searchStopAction(
         if (m_searchProcesses.count(processUuid))
         {
             searcher = std::move(m_searchProcesses[processUuid]);
-            searcher->cancel();
+            searcher->pleaseStopSync(); // TODO: #dliman Make it async?
             m_searchProcesses.erase(processUuid);
         }
-        // TODO: Should return 404 if not found.
+        // TODO: #dliman Should return 404 if not found.
     }
-    //< TODO: Should make sure the searcher is stopped here!
+    // TODO: #dliman Should make sure the searcher is stopped here!
 
     QnManualCameraSearchReply reply;
     reply.processUuid = processUuid;

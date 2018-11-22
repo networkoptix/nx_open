@@ -6,12 +6,12 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_discovery_manager.h>
 
-//#include <nx/utils/
-
-QnManualSearchTaskManager::QnManualSearchTaskManager(QnCommonModule *commonModule):
-    QnCommonModuleAware(commonModule)
+QnManualSearchTaskManager::QnManualSearchTaskManager(
+    QnCommonModule *commonModule, nx::network::aio::AbstractAioThread *thread)
+    :
+    QnCommonModuleAware(commonModule),
+    m_pollable(thread)
 {
-
 }
 
 QnManualSearchTaskManager::~QnManualSearchTaskManager()
@@ -19,13 +19,42 @@ QnManualSearchTaskManager::~QnManualSearchTaskManager()
     pleaseStopSync();
 }
 
+void QnManualSearchTaskManager::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
+{
+    m_pollable.dispatch(
+        [this, completionHandler = std::move(completionHandler)]() mutable
+        {
+            NX_VERBOSE(this, "PleaseStop called, running tasks: %1", m_runningTaskCount);
+            m_state = State::canceled;
+
+            // TODO: #dliman All running tasks should be canceled here.
+
+            // If there are no running tasks -- we should run handler right away, otherwise it will
+            // be never called.
+            if (m_runningTaskCount == 0)
+            {
+                m_pollable.pleaseStopSync();
+                completionHandler();
+            }
+            else
+            {
+                // Replace original callback to the pleaseStop one.
+                m_tasksFinishedCallback =
+                    [this, handler = std::move(completionHandler)](QnManualResourceSearchList)
+                    {
+                        m_pollable.pleaseStopSync();
+                        handler();
+                    };
+            }
+        });
+}
+
 void QnManualSearchTaskManager::addTask(
     nx::network::SocketAddress address,
     const QAuthenticator& auth,
-    const std::vector<QnAbstractNetworkResourceSearcher*>& searchers, bool isSequential)
+    std::vector<QnAbstractNetworkResourceSearcher*> searchers, bool isSequential)
 {
     using namespace std::placeholders;
-    // TODO: Add log message.
 
     QnSearchTask task(commonModule(), address, auth, /*breakOnGotResult*/ isSequential);
 
@@ -39,113 +68,118 @@ void QnManualSearchTaskManager::addTask(
         task.setInterruptTaskProcessing(true);
     }
 
-    NX_MUTEX_LOCKER lock(&m_lock);
-    NX_ASSERT(m_state == State::init); //< NOTE: It is not supported to add tasks after run.
-    m_urlSearchTaskQueues[address.address].push(std::move(task));
-    m_searchQueueContexts[address.address]; //< Create if does not exist.
+    m_pollable.dispatch(
+        [this, task = std::move(task), address, isSequential]() mutable
+        {
+            NX_VERBOSE(this, "Adding task on %1 (sequential: %2)", task.url(), isSequential);
+            NX_ASSERT(m_state == State::init); //< NOTE: It is not supported to add tasks after run.
+            m_urlSearchTaskQueues[address.address].push(std::move(task));
+            m_searchQueueContexts[address.address]; //< Create if does not exist.
 
-    m_totalTaskCount++;
+            m_totalTaskCount++;
+        });
 }
 
 void QnManualSearchTaskManager::startTasks(TasksFinishedCallback callback)
 {
-    NX_VERBOSE(this, "Running %1 tasks", m_totalTaskCount);
+    m_pollable.dispatch(
+        [this, callback = std::move(callback)]() mutable
+        {
+            NX_VERBOSE(this, "Running %1 tasks", m_totalTaskCount.load());
+            NX_ASSERT(m_state == State::init); //< NOTE: It supports being started only once.
+            m_state = State::running;
+            m_remainingTaskCount = m_totalTaskCount.load();
+            m_runningTaskCount = 0;
+            m_tasksFinishedCallback = std::move(callback);
 
-    NX_MUTEX_LOCKER lock(&m_lock);
-    NX_ASSERT(m_state == State::init); //< NOTE: It supports being started only once.
-    m_state = State::running;
-    m_remainingTaskCount = m_totalTaskCount;
-    m_runningTaskCount = 0;
-    m_tasksFinishedCallback = std::move(callback);
-
-    runSomePendingTasksUnsafe();
-}
-
-void QnManualSearchTaskManager::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
-{
-    NX_MUTEX_LOCKER lock(&m_lock);
-    NX_VERBOSE(this, "PleaseStop called, running tasks: %1", m_runningTaskCount);
-    m_state = State::canceled;
-
-    // TODO: is it OK that original handler for startTasks will not be called?
-
-    // If there are no running tasks -- we should run handler right away, otherwise it will be
-    // never called.
-    if (m_runningTaskCount == 0)
-    {
-        nx::utils::Unlocker unlocker(&lock);
-        completionHandler();
-    }
-    else
-    {
-        m_tasksFinishedCallback =
-            [handler = std::move(completionHandler)](QnManualResourceSearchList) { handler(); };
-    }
+            runSomePendingTasks();
+        });
 }
 
 double QnManualSearchTaskManager::doneToTotalTasksRatio() const
 {
-    NX_MUTEX_LOCKER lock(&m_lock);
-    if (m_totalTaskCount == 0)
+    int totalTasks = m_totalTaskCount;
+    if (totalTasks == 0)
         return 0;
 
-    return (m_totalTaskCount - m_remainingTaskCount) / m_totalTaskCount;
+    return (totalTasks - m_remainingTaskCount) / totalTasks;
+}
+
+QnManualResourceSearchList QnManualSearchTaskManager::foundResources() const
+{
+    if (m_pollable.isInSelfAioThread())
+        return m_foundResources;
+
+    QnManualResourceSearchList result;
+    std::promise<void> result_promise;
+    auto result_ready = result_promise.get_future();
+    m_pollable.post(
+        [this, &result, &result_promise]()
+        {
+            result = m_foundResources;
+            result_promise.set_value();
+        });
+
+    result_ready.wait();
+    return result;
 }
 
 void QnManualSearchTaskManager::searchTaskDoneHandler(
     const QnManualResourceSearchList& results, QnSearchTask* const task)
 {
-    {
-        NX_MUTEX_LOCKER lock(&m_lock);
-        nx::network::HostAddress queueName(task->url().host());
-        auto& context = m_searchQueueContexts[queueName];
-
-        context.isBlocked = false;
-        context.runningTaskCount--;
-        m_remainingTaskCount--;
-        m_runningTaskCount--;
-
-        NX_VERBOSE(this, "Remained: %1; Running: %2", m_remainingTaskCount, m_runningTaskCount);
-        if (m_state == State::running)
+    m_pollable.dispatch(
+        [this, &results, task]()
         {
-            m_foundResources.append(results);
+            NX_VERBOSE(this, "Remained: %1; Running: %2",
+                m_remainingTaskCount.load(), m_runningTaskCount);
 
-            if (task->doesInterruptTaskProcessing() && !results.isEmpty())
+            nx::network::HostAddress queueName(task->url().host());
+            auto& context = m_searchQueueContexts[queueName];
+
+            context.isBlocked = false;
+            context.runningTaskCount--;
+            m_remainingTaskCount--;
+            m_runningTaskCount--;
+
+            if (m_state == State::running)
             {
-                m_remainingTaskCount -= m_urlSearchTaskQueues[queueName].size();
-                context.isInterrupted = true;
+                m_foundResources.append(results);
+
+                if (task->doesInterruptTaskProcessing() && !results.isEmpty())
+                {
+                    m_remainingTaskCount -= m_urlSearchTaskQueues[queueName].size();
+                    context.isInterrupted = true;
+                }
+
+                runSomePendingTasks();
             }
 
-            runSomePendingTasksUnsafe();
-        }
+            // Should not do anything else if it was not the last task ran.
+            if (m_runningTaskCount > 0)
+                return;
 
-        // Should not do anything else if it was not the last task ran.
-        if (m_runningTaskCount > 0)
-            return;
+            // It is an error if the state is running and there are some pending tasks, but no
+            // tasks are running.
+            NX_ASSERT(m_runningTaskCount == 0);
+            NX_ASSERT((m_state == State::running && m_remainingTaskCount == 0)
+                || m_state == State::canceled);
 
-        // It is an error if the state is running and there are some pending tasks, but no tasks are
-        // running.
-        NX_ASSERT(m_runningTaskCount == 0);
-        NX_ASSERT((m_state == State::running && m_remainingTaskCount == 0) || m_state == State::canceled);
+            m_state = State::finished;
+            NX_VERBOSE(this, "Search has finished, found %1 resources", m_foundResources.size());
 
-        m_state = State::finished;
-        NX_VERBOSE(this, "Search has finished, found %1 resources", m_foundResources.size());
-    }
-
-    // TODO: Try to fix race: when called pleaseStop() right after unlock of mutex...
-    // NOTE: Race is possible here, but it should not occur in real world.
-    NX_ASSERT(m_tasksFinishedCallback);
-    m_tasksFinishedCallback(std::move(m_foundResources));
+            m_tasksFinishedCallback(std::move(m_foundResources));
+        });
 }
 
-void QnManualSearchTaskManager::runSomePendingTasksUnsafe()
+void QnManualSearchTaskManager::runSomePendingTasks()
 {
+    NX_ASSERT(m_pollable.isInSelfAioThread());
     NX_ASSERT(m_state == State::running);
 
-    // TODO: Should it use its own thread pool? Is it possible to use aio instead?
+    // TODO: #dliman Should it use its own thread pool?
     QThreadPool* threadPool = commonModule()->resourceDiscoveryManager()->threadPool();
 
-    while (canRunTaskUnsafe(threadPool))
+    while (canRunTask(threadPool))
     {
         // Take one task from each queue.
         for (auto it = m_urlSearchTaskQueues.begin(); it != m_urlSearchTaskQueues.end();)
@@ -161,7 +195,7 @@ void QnManualSearchTaskManager::runSomePendingTasksUnsafe()
             }
             it++;
 
-            if (!canRunTaskUnsafe(threadPool))
+            if (!canRunTask(threadPool))
                 break;
 
             if (context.isBlocked)
@@ -185,8 +219,9 @@ void QnManualSearchTaskManager::runSomePendingTasksUnsafe()
     }
 }
 
-bool QnManualSearchTaskManager::canRunTaskUnsafe(QThreadPool *threadPool)
+bool QnManualSearchTaskManager::canRunTask(QThreadPool *threadPool)
 {
+    NX_ASSERT(m_pollable.isInSelfAioThread());
     bool allQueuesAreBlocked = true;
     for (const auto& [queueName, queue]: m_urlSearchTaskQueues)
     {
