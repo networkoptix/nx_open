@@ -51,15 +51,14 @@ std::unique_ptr<sdk_support::AbstractManifestLogger> AnalyticsPluginResource::ma
         "Error occurred while fetching Engine manifest for engine: {:engine}: {:error}");
 
     return std::make_unique<sdk_support::ManifestLogger>(
-        nx::utils::log::Tag(typeid(this)),
+        typeid(this), //< Using the same tag for all instances.
         messageTemplate,
         toSharedPointer(this));
 }
 
 CameraDiagnostics::Result AnalyticsPluginResource::initInternal()
 {
-    NX_DEBUG(this, lm("Initializing analytics plugin resource %1 (%2)")
-        .args(getName(), getId()));
+    NX_DEBUG(this, "Initializing analytics plugin resource %1 (%2)", getName(), getId());
 
     if (!m_sdkPlugin)
         return CameraDiagnostics::InternalServerErrorResult("SDK plugin object is not set");

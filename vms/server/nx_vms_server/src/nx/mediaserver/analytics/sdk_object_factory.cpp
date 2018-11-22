@@ -160,9 +160,7 @@ bool SdkObjectFactory::initPluginResources()
 
         if (!pluginManifest)
         {
-            NX_ERROR(
-                this,
-                "Can't fetch a manifest from the analytics plugin %1",
+            NX_ERROR(this, "Can't fetch a manifest from the analytics plugin %1",
                 analyticsPlugin->name());
             continue;
         }
@@ -170,9 +168,7 @@ bool SdkObjectFactory::initPluginResources()
         const auto id = QnUuid::fromArbitraryData(pluginManifest->id);
         sdkPluginsById.emplace(id, analyticsPluginPtr);
 
-        NX_DEBUG(
-            this,
-            "Creating an analytics plugin resource. Id: %1; Name: %2",
+        NX_DEBUG(this, "Creating an analytics plugin resource. Id: %1; Name: %2",
             id, pluginManifest->name);
 
         auto& data = pluginDataById[id];
@@ -242,10 +238,8 @@ bool SdkObjectFactory::initEngineResources()
 
     if (errorCode != ec2::ErrorCode::ok)
     {
-        NX_ERROR(
-            this,
-            lm("Error has occured while retrieving engines from the database: %1")
-                .args(errorCode));
+        NX_ERROR(this, "Error has occured while retrieving engines from the database: %1",
+            errorCode);
         return false;
     }
 
@@ -280,8 +274,7 @@ bool SdkObjectFactory::initEngineResources()
 
             if (!engineResource)
             {
-                NX_WARNING(
-                    this,
+                NX_WARNING(this,
                     "Unable to find an analytics engine resource in the resource pool. "
                     "Engine name: %1, engine Id: (%2)",
                     engine.name, engine.id);
@@ -294,8 +287,7 @@ bool SdkObjectFactory::initEngineResources()
 
             if (!parentPlugin)
             {
-                NX_WARNING(
-                    this,
+                NX_WARNING(this,
                     "Unable to find a parent analytics plugin for the engine %1 (%2)",
                     engineResource->getName(), engineResource->getId());
 
@@ -305,8 +297,7 @@ bool SdkObjectFactory::initEngineResources()
             auto sdkPlugin = parentPlugin->sdkPlugin();
             if (!sdkPlugin)
             {
-                NX_WARNING(
-                    this,
+                NX_WARNING(this,
                     "Plugin resource %1 (%2) has no correspondent SDK object",
                     parentPlugin->getName(), parentPlugin->getId());
 
@@ -374,7 +365,7 @@ std::unique_ptr<sdk_support::AbstractManifestLogger> SdkObjectFactory::makeLogge
 {
     const QString messageTemplate("Error occurred while fetching Plugin manifest: {:error}");
     return std::make_unique<sdk_support::ManifestLogger>(
-        nx::utils::log::Tag(typeid(this)),
+        typeid(this), //< Using the same tag for all instances.
         messageTemplate,
         std::move(pluginResource));
 }

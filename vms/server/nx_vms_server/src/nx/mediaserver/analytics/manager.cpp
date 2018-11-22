@@ -65,14 +65,14 @@ Manager::Manager(QnMediaServerModule* serverModule):
     m_visualMetadataDebugger(
         VisualMetadataDebuggerFactory::makeDebugger(DebuggerType::analyticsManager))
 {
-    m_thread->setObjectName(lit("AnalyticsManager"));
+    m_thread->setObjectName("analytics::Manager");
     moveToThread(m_thread);
     m_thread->start();
 }
 
 Manager::~Manager()
 {
-    NX_DEBUG(this, lit("Destroying AnalyticsManager."));
+    NX_DEBUG(this, "Destroying");
     stop();
 }
 
@@ -86,7 +86,7 @@ void Manager::stop()
 
 void Manager::init()
 {
-    NX_DEBUG(this, lit("Initializing AnalyticsManager."));
+    NX_DEBUG(this, "Initializing");
 
     connect(
         resourcePool(), &QnResourcePool::resourceAdded,
