@@ -2130,11 +2130,17 @@ void MediaServerProcess::registerRestHandlers(
      * be called either via GET or POST method. POST data should be a json object.
      * %permissions Administrator.
      * %param[opt]:string password Set new admin password after detach.
-     * %param[opt]:string currentPassword Required if new admin password is provided.
-     * %return JSON result with error code
+     * %param:string currentPassword Current user password.
+     * %return JSON result with error code.
      */
     reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(serverModule(), cloudManagerGroup), kAdmin);
 
+    /**%apidoc POST /api/detachFromSystem
+     * Detach media server from system and resets it's state to initial.
+     * %permissions Administrator.
+     * %param:string currentPassword Current user password.
+     * %return JSON result with error code.
+     */
     reg("api/detachFromSystem", new QnDetachFromSystemRestHandler(
         serverModule(),
         &cloudManagerGroup->connectionManager, messageBus), kAdmin);
