@@ -177,16 +177,14 @@ QPixmap QnSkin::getPixmapInternal(const QString& name)
     return pixmap;
 }
 
-QPixmap QnSkin::getPixmapFromSvgInternal(const QString &name, bool correctDevicePixelRatio, const QSize& size)
+QPixmap QnSkin::getPixmapFromSvgInternal(const QString& name, bool correctDevicePixelRatio, const QSize& size)
 {
-    static const QString kSeparator = lit("=^_^=");
-    const auto key = name + kSeparator + QString("%1:%2:%3").arg(correctDevicePixelRatio).arg(size.width()).arg(size.height());
+    const auto key = name + QString(":%1:%2:%3").arg(correctDevicePixelRatio).arg(size.width()).arg(size.height());
 
     QPixmap pixmap;
     if (!QPixmapCache::find(key, &pixmap))
     {
-        const auto basePath = path(name);
-        QFile source(basePath);
+        QFile source(path(name));
         if (!source.open(QIODevice::ReadOnly))
         {
             NX_ASSERT(false, "Cannot load svg");
