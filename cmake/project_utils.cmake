@@ -18,7 +18,7 @@ function(nx_target_enable_werror target werror_condition)
     endif()
 
     if(${werror_condition})
-        target_compile_options(${target} PRIVATE -Werror -Wall -Wextra)
+        target_compile_options(${target} PRIVATE -Werror)
     endif()
 endfunction()
 
