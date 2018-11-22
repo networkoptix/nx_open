@@ -2491,7 +2491,7 @@ ErrorCode QnDbManager::executeTransactionInternal(
 {
     QFile f(m_sdb.databaseName() + QString(lit(".backup")));
     if (!f.open(QFile::WriteOnly))
-        return ErrorCode::failure;
+        return ErrorCode::dbError;
     f.write(tran.params.data);
     f.close();
 
@@ -3144,28 +3144,6 @@ ErrorCode QnDbManager::executeTransactionInternal(
     {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;
-    }
-    return ErrorCode::ok;
-}
-
-ErrorCode QnDbManager::checkExistingUser(const QString &name, qint32 internalId) {
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    query.prepare("SELECT r.id\
-                  FROM vms_resource r \
-                  JOIN vms_userprofile p on p.resource_ptr_id = r.id \
-                  WHERE p.resource_ptr_id != :id and r.name = :name");
-
-    query.bindValue(":id", internalId);
-    query.bindValue(":name", name);
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
-        return ErrorCode::dbError;
-    }
-    if(query.next())
-    {
-        qWarning() << Q_FUNC_INFO << "Duplicate user with name "<<name<<" found";
-        return ErrorCode::failure;  // another user with same name already exists
     }
     return ErrorCode::ok;
 }
@@ -5241,7 +5219,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<LicenseOve
     query.addBindValue(QByteArray::number(tran.params.time));
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
-        return ErrorCode::failure;
+        return ErrorCode::dbError;
     }
 
     return ErrorCode::ok;
@@ -5251,13 +5229,13 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<CleanupDat
 {
     ErrorCode result = ErrorCode::ok;
     if (tran.params.cleanupDbObjects)
-        result = cleanupDanglingDbObjects() ? ErrorCode::ok : ErrorCode::failure;
+        result = cleanupDanglingDbObjects() ? ErrorCode::ok : ErrorCode::dbError;
 
     if (result != ErrorCode::ok)
         return result;
 
     if (tran.params.cleanupTransactionLog)
-        result = m_tranLog->clear() && resyncTransactionLog() ? ErrorCode::ok : ErrorCode::failure;
+        result = m_tranLog->clear() && resyncTransactionLog() ? ErrorCode::ok : ErrorCode::dbError;
 
     return result;
 }

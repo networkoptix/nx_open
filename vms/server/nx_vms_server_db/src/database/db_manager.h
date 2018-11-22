@@ -667,7 +667,6 @@ namespace detail
         ErrorCode deleteUserProfileTable(const qint32 id);
         ErrorCode removeUser( const QnUuid& guid );
         ErrorCode insertOrReplaceUser(const nx::vms::api::UserData& data, qint32 internalId);
-        ErrorCode checkExistingUser(const QString &name, qint32 internalId);
         ErrorCode insertOrReplaceUserRole(const nx::vms::api::UserRoleData& data);
         ErrorCode removeUserRole( const QnUuid& guid );
         ErrorCode setAccessRights(const nx::vms::api::AccessRightsData& data);
