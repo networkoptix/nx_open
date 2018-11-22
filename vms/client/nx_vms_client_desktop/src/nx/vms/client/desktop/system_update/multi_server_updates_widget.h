@@ -119,6 +119,7 @@ private:
     // Do not call them from anywhere else.
     void syncUpdateCheck();
     void syncRemoteUpdateState();
+    void syncProgress();
 
     ServerUpdateTool::ProgressInfo calculateActionProgress() const;
 
@@ -136,6 +137,7 @@ private:
     // Advances UI FSM towards selected state.
     void setTargetState(WidgetUpdateState state, QSet<QnUuid> targets = {});
     void completeInstallation(bool clientUpdated);
+    static bool stateHasProgress(WidgetUpdateState state);
 
 private:
     QScopedPointer<Ui::MultiServerUpdatesWidget> ui;
