@@ -23,7 +23,6 @@
 #include <utils/common/app_info.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/datetime.h>
-#include <nx/system_commands.h>
 
 QString strPadLeft(const QString &str, int len, char ch)
 {
@@ -46,71 +45,6 @@ QString closeDirPath(const QString& value)
     else
         return value + separator;
 }
-
-#ifdef Q_OS_WIN32
-
-qint64 getDiskFreeSpace(const QString& root)
-{
-    return nx::SystemCommands().freeSpace(root.toStdString());
-};
-
-qint64 getDiskTotalSpace(const QString& root)
-{
-    return nx::SystemCommands().totalSpace(root.toStdString());
-};
-
-#elif defined(Q_OS_ANDROID)
-
-qint64 getDiskFreeSpace(const QString& root) {
-    return 0; // TODO: #android
-}
-
-qint64 getDiskTotalSpace(const QString& root) {
-    return 0; // TODO: #android
-}
-
-#else
-
-//TODO #ak introduce single function for getting partition info
-    //and place platform-specific code in a single pace
-
-#ifdef __APPLE__
-#define statvfs64 statvfs
-#endif
-
-qint64 getDiskFreeSpace(const QString& root) {
-    struct statvfs64 buf;
-    if (statvfs64(root.toUtf8().data(), &buf) == 0)
-    {
-        //qint64 disk_size = buf.f_blocks * (qint64) buf.f_bsize;
-        //TODO #ak if we run under root, MUST use buf.f_bfree, else buf.f_bavail
-        qint64 free = buf.f_bavail * (qint64) buf.f_bsize;
-        //qint64 used = disk_size - free;
-
-        return free;
-    }
-    else {
-        return -1;
-    }
-}
-
-qint64 getDiskTotalSpace(const QString& root) {
-    struct statvfs64 buf;
-    if (statvfs64(root.toUtf8().data(), &buf) == 0)
-    {
-        qint64 disk_size = buf.f_blocks * (qint64) buf.f_frsize;
-        //qint64 free = buf.f_bavail * (qint64) buf.f_bsize;
-        //qint64 used = disk_size - free;
-
-        return disk_size;
-    }
-    else {
-        return -1;
-    }
-}
-
-#endif
-
 
 quint64 getUsecTimer()
 {
