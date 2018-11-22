@@ -6,14 +6,11 @@
 
 #include <core/resource/camera_resource.h>
 #include <ui/common/read_only.h>
-#include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/style/skin.h>
-#include <ui/workbench/workbench_navigator.h>
 
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/motion_search_list_model.h>
 #include <nx/utils/log/assert.h>
-#include <nx/utils/scoped_connections.h>
 
 namespace nx::vms::client::desktop {
 
@@ -40,49 +37,14 @@ public:
         connect(m_areaSelectionButton, &SelectableTextButton::stateChanged, this,
             [this](SelectableTextButton::State state)
             {
-                if (state == SelectableTextButton::State::deactivated && m_mediaWidget)
-                    m_mediaWidget->clearMotionSelection();
+                if (state == SelectableTextButton::State::deactivated)
+                    setFilterRegions({});
             });
-    }
-
-    void setMediaWidget(QnMediaResourceWidget* value)
-    {
-        if (value == m_mediaWidget)
-            return;
-
-        m_mediaWidgetConnections = {};
-
-        m_mediaWidget = value;
-        updateFilterRegions();
-
-        if (!m_mediaWidget)
-            return;
-
-        m_mediaWidgetConnections << connect(m_mediaWidget, &QObject::destroyed, this,
-            [this]()
-            {
-                m_mediaWidget = nullptr;
-                updateFilterRegions();
-            });
-
-        m_mediaWidgetConnections << connect(
-            m_mediaWidget, &QnMediaResourceWidget::motionSelectionChanged,
-            this, &Private::updateFilterRegions);
     }
 
     QList<QRegion> filterRegions() const
     {
         return m_model->filterRegions();
-    }
-
-private:
-    void updateFilterRegions()
-    {
-        setFilterRegions(m_mediaWidget ? m_mediaWidget->motionSelection() : QList<QRegion>());
-
-        m_areaSelectionButton->setState(m_mediaWidget && !m_mediaWidget->isMotionSelectionEmpty()
-            ? SelectableTextButton::State::unselected
-            : SelectableTextButton::State::deactivated);
     }
 
     void setFilterRegions(const QList<QRegion>& regions)
@@ -91,14 +53,17 @@ private:
             return;
 
         m_model->setFilterRegions(regions);
+
+        m_areaSelectionButton->setState(m_model->isFilterEmpty()
+            ? SelectableTextButton::State::deactivated
+            : SelectableTextButton::State::unselected);
+
         emit q->filterRegionsChanged(m_model->filterRegions());
     }
 
 private:
     MotionSearchListModel* const m_model;
     SelectableTextButton* const m_areaSelectionButton;
-    QnMediaResourceWidget* m_mediaWidget = nullptr;
-    nx::utils::ScopedConnections m_mediaWidgetConnections;
 };
 
 MotionSearchWidget::MotionSearchWidget(QnWorkbenchContext* context, QWidget* parent):
@@ -115,9 +80,9 @@ MotionSearchWidget::~MotionSearchWidget()
 {
 }
 
-void MotionSearchWidget::setMediaWidget(QnMediaResourceWidget* value)
+void MotionSearchWidget::setFilterRegions(const QList<QRegion>& value)
 {
-    d->setMediaWidget(value);
+    d->setFilterRegions(value);
 }
 
 QList<QRegion> MotionSearchWidget::filterRegions() const

@@ -1,17 +1,12 @@
 #include "analytics_search_widget.h"
 
 #include <core/resource/camera_resource.h>
-#include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/style/skin.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_navigator.h>
-#include <utils/common/event_processors.h>
 
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
-#include <nx/utils/scoped_connections.h>
 
 namespace nx::vms::client::desktop {
 
@@ -37,52 +32,27 @@ public:
         m_areaSelectionButton->setIcon(qnSkin->icon("text_buttons/area.png"));
         m_areaSelectionButton->hide();
 
-        connect(q, &AbstractSearchWidget::cameraSetChanged, this, &Private::updateAreaRelevancy);
+        connect(q, &AbstractSearchWidget::cameraSetChanged, this,
+            [this]() { setAreaSelectionEnabled(this->q->selectedCameras() == Cameras::current); });
 
         connect(m_areaSelectionButton, &SelectableTextButton::stateChanged,
             [this](SelectableTextButton::State state)
             {
-                if (state == SelectableTextButton::State::deactivated && m_mediaWidget)
-                    m_mediaWidget->setAnalyticsFilterRect({});
+                if (state == SelectableTextButton::State::deactivated)
+                    setFilterRect({});
             });
 
         connect(m_areaSelectionButton, &SelectableTextButton::clicked, this,
-            [this]() { emit this->q->areaSelectionRequested({}); });
+            [this]()
+            {
+                m_areaSelectionButton->setText(tr("Select some area on the video..."));
+                m_areaSelectionButton->setAccented(true);
+                m_areaSelectionButton->setState(SelectableTextButton::State::unselected);
+                emit this->q->areaSelectionRequested({});
+            });
 
         connect(q, &AbstractSearchWidget::textFilterChanged,
             m_model, &AnalyticsSearchListModel::setFilterText);
-    }
-
-    void setMediaWidget(QnMediaResourceWidget* value)
-    {
-        if (value && !(value->resource() && value->resource()->hasVideo()))
-            value = nullptr;
-
-        if (value == m_mediaWidget)
-            return;
-
-        m_mediaWidgetConnections = {};
-
-        m_mediaWidget = value;
-        updateAreaRelevancy();
-
-        if (!m_mediaWidget)
-            return;
-
-        m_mediaWidgetConnections << connect(m_mediaWidget, &QObject::destroyed, this,
-            [this]()
-            {
-                m_mediaWidget = nullptr;
-                updateAreaRelevancy();
-            });
-
-        m_mediaWidgetConnections << connect(
-            m_mediaWidget, &QnMediaResourceWidget::areaSelectionEnabledChanged,
-            this, &Private::updateButtonAppearance);
-
-        m_mediaWidgetConnections << connect(
-            m_mediaWidget, &QnMediaResourceWidget::analyticsFilterRectChanged,
-            this, &Private::updateAreaRelevancy);
     }
 
     QRectF filterRect() const
@@ -90,12 +60,6 @@ public:
         return m_model->filterRect();
     }
 
-    bool areaSelectionEnabled() const
-    {
-        return m_areaSelectionEnabled;
-    }
-
-private:
     void setFilterRect(const QRectF& value)
     {
         if (qFuzzyEquals(m_model->filterRect(), value))
@@ -107,17 +71,20 @@ private:
         emit q->filterRectChanged(m_model->filterRect());
     }
 
-    void updateAreaRelevancy()
+    bool areaSelectionEnabled() const
     {
-        const bool relevant = q->selectedCameras() == Cameras::current && m_mediaWidget;
-        if (m_areaSelectionEnabled != relevant)
-        {
-            m_areaSelectionEnabled = relevant;
-            m_areaSelectionButton->setVisible(m_areaSelectionEnabled);
-            emit q->areaSelectionEnabledChanged(m_areaSelectionEnabled, {});
-        }
+        return m_areaSelectionEnabled;
+    }
 
-        setFilterRect(m_areaSelectionEnabled ? m_mediaWidget->analyticsFilterRect() : QRectF());
+private:
+    void setAreaSelectionEnabled(bool value)
+    {
+        if (m_areaSelectionEnabled == value)
+            return;
+
+        m_areaSelectionEnabled = value;
+        m_areaSelectionButton->setVisible(m_areaSelectionEnabled);
+        emit q->areaSelectionEnabledChanged(m_areaSelectionEnabled, {});
     }
 
     void updateButtonAppearance()
@@ -125,22 +92,17 @@ private:
         if (!m_areaSelectionEnabled)
             return;
 
-        const bool selecting = m_mediaWidget && m_mediaWidget->areaSelectionEnabled();
-        m_areaSelectionButton->setState(selecting || m_model->filterRect().isValid()
+        m_areaSelectionButton->setState(m_model->filterRect().isValid()
             ? SelectableTextButton::State::unselected
             : SelectableTextButton::State::deactivated);
 
-        m_areaSelectionButton->setAccented(selecting);
-        m_areaSelectionButton->setText(selecting
-            ? tr("Select some area on the video...")
-            : tr("In selected area"));
+        m_areaSelectionButton->setAccented(false);
+        m_areaSelectionButton->setText(tr("In selected area"));
     }
 
 private:
     AnalyticsSearchListModel* const m_model;
     SelectableTextButton* const m_areaSelectionButton;
-    QnMediaResourceWidget* m_mediaWidget = nullptr;
-    nx::utils::ScopedConnections m_mediaWidgetConnections;
     bool m_areaSelectionEnabled = false;
 };
 
@@ -160,9 +122,9 @@ AnalyticsSearchWidget::~AnalyticsSearchWidget()
 {
 }
 
-void AnalyticsSearchWidget::setMediaWidget(QnMediaResourceWidget* value)
+void AnalyticsSearchWidget::setFilterRect(const QRectF& value)
 {
-    d->setMediaWidget(value);
+    d->setFilterRect(value.intersected({0, 0, 1, 1}));
 }
 
 QRectF AnalyticsSearchWidget::filterRect() const

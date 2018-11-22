@@ -246,41 +246,62 @@ void EventPanel::Private::handleMediaWidgetChanged()
 // ------------------------------------------------------------------------------------------------
 // EventPanel::Private::MotionSearchSynchronizer
 
-EventPanel::Private::MotionSearchSynchronizer::MotionSearchSynchronizer(EventPanel::Private* main)
+EventPanel::Private::MotionSearchSynchronizer::MotionSearchSynchronizer(EventPanel::Private* main):
+    m_main(main)
 {
-    connect(main, &Private::mediaWidgetAboutToBeChanged, this,
-        [this, main]()
+    connect(m_main, &Private::mediaWidgetAboutToBeChanged, this,
+        [this]()
         {
-            if (!main->m_mediaWidget)
+            if (!m_main->m_mediaWidget)
                 return;
 
-            main->m_mediaWidget->disconnect(this);
-            main->m_mediaWidget->setMotionSearchModeEnabled(false);
+            m_main->m_mediaWidget->disconnect(this);
+            m_main->m_mediaWidget->setMotionSearchModeEnabled(false);
         });
 
-    connect(main, &Private::mediaWidgetChanged,
-        [this, main]()
+    connect(m_main, &Private::mediaWidgetChanged, this,
+        [this]()
         {
-            main->m_motionTab->setMediaWidget(main->m_mediaWidget);
-            if (!main->m_mediaWidget)
+            updateAreaSelection();
+            if (!m_main->m_mediaWidget)
                 return;
 
-            main->m_mediaWidget->setMotionSearchModeEnabled(
-                main->m_tabs->currentWidget() == main->m_motionTab);
+            m_main->m_mediaWidget->setMotionSearchModeEnabled(isMotionTab());
 
-            connect(main->m_mediaWidget, &QnMediaResourceWidget::motionSearchModeEnabled, this,
-                [main](bool enabled) { main->setTabCurrent(main->m_motionTab, enabled); });
+            connect(m_main->m_mediaWidget, &QnMediaResourceWidget::motionSearchModeEnabled, this,
+                [this](bool enabled) { m_main->setTabCurrent(m_main->m_motionTab, enabled); });
+
+            connect(m_main->m_mediaWidget, &QnMediaResourceWidget::motionSelectionChanged,
+                this, &MotionSearchSynchronizer::updateAreaSelection);
         });
 
-    connect(main->m_tabs, &QTabWidget::currentChanged,
-        [main]()
+    connect(m_main->m_tabs, &QTabWidget::currentChanged, this,
+        [this]()
         {
-            const bool isMotionTab = main->m_tabs->currentWidget() == main->m_motionTab;
-            main->setTimeContentDisplayed(Qn::MotionContent, isMotionTab);
+            updateAreaSelection();
+            m_main->setTimeContentDisplayed(Qn::MotionContent, isMotionTab());
 
-            if (main->m_mediaWidget)
-                main->m_mediaWidget->setMotionSearchModeEnabled(isMotionTab);
+            if (m_main->m_mediaWidget)
+                m_main->m_mediaWidget->setMotionSearchModeEnabled(isMotionTab());
         });
+
+    connect(m_main->m_motionTab, &MotionSearchWidget::filterRegionsChanged, this,
+        [this](const QList<QRegion>& value)
+        {
+            if (m_main->m_mediaWidget && m_main->m_mediaWidget->isMotionSearchModeEnabled())
+                m_main->m_mediaWidget->setMotionSelection(value);
+        });
+}
+
+bool EventPanel::Private::MotionSearchSynchronizer::isMotionTab() const
+{
+    return m_main->m_tabs->currentWidget() == m_main->m_motionTab;
+}
+
+void EventPanel::Private::MotionSearchSynchronizer::updateAreaSelection()
+{
+    if (m_main->m_mediaWidget && isMotionTab())
+        m_main->m_motionTab->setFilterRegions(m_main->m_mediaWidget->motionSelection());
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -340,32 +361,34 @@ EventPanel::Private::AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
             m_main->m_mediaWidget->unsetAreaSelectionType(QnMediaResourceWidget::AreaType::analytics);
         });
 
-    connect(main, &Private::mediaWidgetChanged,
+    connect(main, &Private::mediaWidgetChanged, this,
         [this]()
         {
-            m_main->m_analyticsTab->setMediaWidget(m_main->m_mediaWidget);
             if (!m_main->m_mediaWidget)
                 return;
 
-            updateAreaSelectionRelevancy();
+            updateAreaSelection();
 
             connect(m_main->m_mediaWidget, &QnMediaResourceWidget::analyticsFilterRectChanged, this,
                 [this]()
                 {
+                    updateAreaSelection();
+
+                    // Stop selection after selecting once.
                     m_main->m_mediaWidget->setAreaSelectionEnabled(
                         QnMediaResourceWidget::AreaType::analytics, false);
                 });
         });
 
-    connect(m_main->m_tabs, &QTabWidget::currentChanged,
+    connect(m_main->m_tabs, &QTabWidget::currentChanged, this,
         [this]()
         {
-            updateAreaSelectionRelevancy();
+            updateAreaSelection();
             updateTimelineDisplay();
         });
 
     connect(main->m_analyticsTab, &AnalyticsSearchWidget::areaSelectionEnabledChanged,
-        this, &AnalyticsSearchSynchronizer::updateAreaSelectionRelevancy);
+        this, &AnalyticsSearchSynchronizer::updateAreaSelection);
 
     connect(main->m_analyticsTab, &AnalyticsSearchWidget::areaSelectionRequested, this,
         [this]()
@@ -383,8 +406,16 @@ EventPanel::Private::AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
     connect(m_main->m_analyticsTab, &AnalyticsSearchWidget::textFilterChanged,
         this, &AnalyticsSearchSynchronizer::updateTimelineDisplay);
 
-    connect(m_main->m_analyticsTab, &AnalyticsSearchWidget::filterRectChanged,
-        this, &AnalyticsSearchSynchronizer::updateTimelineDisplay);
+    connect(m_main->m_analyticsTab, &AnalyticsSearchWidget::filterRectChanged, this,
+        [this](const QRectF& value)
+        {
+            updateTimelineDisplay();
+            if (value.isNull() && m_main->m_mediaWidget
+                && m_main->m_analyticsTab->areaSelectionEnabled())
+            {
+                m_main->m_mediaWidget->setAnalyticsFilterRect({});
+            }
+        });
 
     connect(m_main->q->navigator(), &QnWorkbenchNavigator::currentResourceChanged,
         this, &AnalyticsSearchSynchronizer::updateTimelineDisplay);
@@ -395,10 +426,14 @@ bool EventPanel::Private::AnalyticsSearchSynchronizer::isAnalyticsTab() const
     return m_main->m_tabs->currentWidget() == m_main->m_analyticsTab;
 }
 
-void EventPanel::Private::AnalyticsSearchSynchronizer::updateAreaSelectionRelevancy()
+void EventPanel::Private::AnalyticsSearchSynchronizer::updateAreaSelection()
 {
     if (!m_main->m_mediaWidget || !isAnalyticsTab())
         return;
+
+    m_main->m_analyticsTab->setFilterRect(m_main->m_analyticsTab->areaSelectionEnabled()
+        ? m_main->m_mediaWidget->analyticsFilterRect()
+        : QRectF());
 
     m_main->m_mediaWidget->setAreaSelectionType(m_main->m_analyticsTab->areaSelectionEnabled()
         ? QnMediaResourceWidget::AreaType::analytics

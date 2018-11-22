@@ -1,10 +1,10 @@
 #pragma once
 
 #include <QtCore/QScopedPointer>
+#include <QtCore/QList>
+#include <QtGui/QRegion>
 
 #include "abstract_search_widget.h"
-
-class QnMediaResourceWidget;
 
 namespace nx::vms::client::desktop {
 
@@ -17,9 +17,8 @@ public:
     MotionSearchWidget(QnWorkbenchContext* context, QWidget* parent = nullptr);
     virtual ~MotionSearchWidget() override;
 
-    void setMediaWidget(QnMediaResourceWidget* value);
-
     QList<QRegion> filterRegions() const;
+    void setFilterRegions(const QList<QRegion>& value);
 
 signals:
     void filterRegionsChanged(const QList<QRegion>& value);

@@ -86,8 +86,14 @@ private:
 
 class EventPanel::Private::MotionSearchSynchronizer: public QObject
 {
+    EventPanel::Private* const m_main;
+
 public:
     MotionSearchSynchronizer(EventPanel::Private* main);
+
+private:
+    bool isMotionTab() const;
+    void updateAreaSelection();
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -102,7 +108,7 @@ public:
 
 private:
     bool isAnalyticsTab() const;
-    void updateAreaSelectionRelevancy();
+    void updateAreaSelection();
     void updateTimelineDisplay();
 };
 

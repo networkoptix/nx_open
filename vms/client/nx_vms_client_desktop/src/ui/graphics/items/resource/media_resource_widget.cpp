@@ -1281,13 +1281,22 @@ void QnMediaResourceWidget::clearMotionSelection()
     emit motionSelectionChanged();
 }
 
-void QnMediaResourceWidget::setMotionSelection(const QList<QRegion> &regions)
+void QnMediaResourceWidget::setMotionSelection(const QList<QRegion>& regions)
 {
-    if (regions.size() != m_motionSelection.size())
+    if (regions.empty())
     {
-        qWarning() << "invalid motion selection list";
+        clearMotionSelection();
         return;
     }
+
+    if (regions.size() != m_motionSelection.size())
+    {
+        NX_ASSERT(false, "invalid motion selection channel count");
+        return;
+    }
+
+    if (m_motionSelection == regions)
+        return;
 
     m_motionSelection = regions;
     invalidateMotionSelectionCache();

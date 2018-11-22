@@ -4,8 +4,6 @@
 
 #include "abstract_search_widget.h"
 
-class QnMediaResourceWidget;
-
 namespace nx::vms::client::desktop {
 
 class AnalyticsSearchWidget: public AbstractSearchWidget
@@ -17,10 +15,10 @@ public:
     AnalyticsSearchWidget(QnWorkbenchContext* context, QWidget* parent = nullptr);
     virtual ~AnalyticsSearchWidget() override;
 
-    void setMediaWidget(QnMediaResourceWidget* value);
+    QRectF filterRect() const;
+    void setFilterRect(const QRectF& value);
 
     bool areaSelectionEnabled() const;
-    QRectF filterRect() const;
 
 signals:
     void areaSelectionEnabledChanged(bool value, QPrivateSignal);
