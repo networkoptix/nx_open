@@ -3,7 +3,6 @@
 #include <iostream>
 #include <chrono>
 #include <ctime>
-#include <math.h>
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/analytics/common_metadata_packet.h>
@@ -242,7 +241,7 @@ void DeviceAgent::processPluginEvents()
 nx::sdk::Settings* DeviceAgent::pluginSideSettings() const
 {
     auto settings = new nx::sdk::CommonSettings();
-    settings->addSetting("nx.stub.device_agent.settings.number_0", "100");
+    settings->addSetting("plugin_side_number", "100");
 
     return settings;
 }

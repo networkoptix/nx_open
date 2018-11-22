@@ -290,7 +290,7 @@ static const std::string kPluginManifest = R"json(
         "items": [
             {
                 "type": "TextField",
-                "name": "nx.stub.engine.settings.text_0",
+                "name": "text",
                 "caption": "Text Field",
                 "description": "A text field",
                 "defaultValue": "a text"
