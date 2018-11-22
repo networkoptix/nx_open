@@ -1318,7 +1318,7 @@ void MultiServerUpdatesWidget::syncUpdateCheck()
     if (!m_updateInfo.isValid() || m_updateInfo.error == nx::update::InformationError::noNewVersion)
         hasLatestVersion = true;
     else if (hasEqualUpdateInfo || m_updateInfo.alreadyInstalled)
-        hasLatestVersion = false;
+        hasLatestVersion = true;
 
     if (m_updateStateCurrent != WidgetUpdateState::ready
         && m_updateStateCurrent != WidgetUpdateState::initial

@@ -14,22 +14,6 @@ namespace nx {
 namespace vms {
 namespace utils {
 
-struct DbBackupFileData
-{
-    QString fullPath;
-    int build = -1;
-    qint64 timestamp = -1;
-};
-
-bool backupDatabase(const QString& backupDir,
-    std::shared_ptr<ec2::AbstractECConnection> connection,
-    const boost::optional<QString>& dbFilePath = boost::none);
-
-QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir);
-
-/* Newest files come first */
-void deleteOldBackupFilesIfNeeded(const QString& backupDir, qint64 freeSpace);
-
 bool configureLocalPeerAsPartOfASystem(
     QnCommonModule* commonModule,
     const ConfigureSystemData& data);

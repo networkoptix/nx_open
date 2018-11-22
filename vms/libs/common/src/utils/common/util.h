@@ -9,10 +9,6 @@ QString strPadLeft(const QString &str, int len, char ch);
 QString closeDirPath(const QString &value);
 QString getPathSeparator(const QString& path);
 
-qint64 getDiskFreeSpace(const QString &root);
-
-qint64 getDiskTotalSpace(const QString &root);
-
 // TODO: #ynikitenkov move to cpp, get rid of define
 #define DEFAULT_APPSERVER_HOST "127.0.0.1"
 static constexpr int kDefaultConnectionPort = 7001;

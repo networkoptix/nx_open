@@ -167,37 +167,34 @@ int QnLayoutFileStorageResource::getCapabilities() const
 
 Qn::StorageInitResult QnLayoutFileStorageResource::initOrUpdate()
 {
-    QString tmpDir = closeDirPath(getPath()) + QLatin1String("tmp")
+     const QString tmpDir = closeDirPath(getUrl())
+        + "tmp"
         + QString::number(nx::utils::random::number<uint>());
 
     QDir dir(tmpDir);
-    if (dir.exists())
-    {
-        dir.remove(tmpDir);
+    if (dir.exists() && dir.removeRecursively())
         return Qn::StorageInit_Ok;
-    }
-    else
-    {
-        if (dir.mkpath(tmpDir))
-        {
-            dir.rmdir(tmpDir);
-            return Qn::StorageInit_Ok;
-        }
-    }
+
+    if (dir.mkpath(tmpDir) && dir.rmdir(tmpDir))
+        return Qn::StorageInit_Ok;
 
     return Qn::StorageInit_WrongPath;
 }
 
-QnAbstractStorageResource::FileInfoList QnLayoutFileStorageResource::getFileList(const QString& dirName)
+QnAbstractStorageResource::FileInfoList QnLayoutFileStorageResource::getFileList(
+    const QString& dirName)
 {
     QDir dir;
-    dir.cd(dirName);
-    return QnAbstractStorageResource::FIListFromQFIList(dir.entryInfoList(QDir::Files));
+    if (dir.cd(dirName))
+        return FIListFromQFIList(dir.entryInfoList(QDir::Files));
+
+    return FileInfoList();
 }
 
 qint64 QnLayoutFileStorageResource::getFileSize(const QString& /*url*/) const
 {
-    return 0; //< not implemented
+    NX_ASSERT("false", "This is a server-only method");
+    return 0;
 }
 
 bool QnLayoutFileStorageResource::removeFile(const QString& url)
@@ -232,12 +229,14 @@ bool QnLayoutFileStorageResource::isDirExists(const QString& url)
 
 qint64 QnLayoutFileStorageResource::getFreeSpace()
 {
-    return getDiskFreeSpace(getUrl());
+    NX_ASSERT("false", "This is a server-only method");
+    return 0;
 }
 
 qint64 QnLayoutFileStorageResource::getTotalSpace() const
 {
-    return getDiskTotalSpace(getUrl());
+    NX_ASSERT("false", "This is a server-only method");
+    return 0;
 }
 
 bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QString& newName, bool dataInOldFile)

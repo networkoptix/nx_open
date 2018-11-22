@@ -1,37 +1,42 @@
 #include "qtfile_storage_resource.h"
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include <QtCore/QDir>
 
 #include <nx/utils/random.h>
 #include <utils/common/util.h>
 
-QIODevice* QnQtFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
-{
-    QString fileName = removeProtocolPrefix(url);
+namespace {
 
-    QFile* rez = new QFile(fileName);
+QString removeProtocolPrefix(const QString& url)
+{
+    const int prefix = url.indexOf("://");
+    return prefix == -1 ? url : url.mid(prefix + 3);
+}
+
+} // namespace
+
+QIODevice* QnQtFileStorageResource::open(const QString& fileName, QIODevice::OpenMode openMode)
+{
+    const QString cleanFileName = removeProtocolPrefix(fileName);
+
+    auto rez = new QFile(cleanFileName);
     if (!rez->open(openMode))
     {
         delete rez;
-        return 0;
+        return nullptr;
     }
     return rez;
 }
 
 int QnQtFileStorageResource::getCapabilities() const
 {
-    return m_capabilities;
+    return ListFile | ReadFile;
 }
 
 QnQtFileStorageResource::QnQtFileStorageResource(QnCommonModule* commonModule):
-    base_type(commonModule),
-    m_capabilities(0)
+    base_type(commonModule)
 {
-    m_capabilities |= cap::ListFile;
-    m_capabilities |= cap::ReadFile;
-};
+}
 
 bool QnQtFileStorageResource::removeFile(const QString& url)
 {
@@ -47,7 +52,7 @@ bool QnQtFileStorageResource::removeDir(const QString& url)
 {
     QDir dir(removeProtocolPrefix(url));
     QList<QFileInfo> list = dir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-    for(const QFileInfo& fi: list)
+    for (const QFileInfo& fi: list)
         removeFile(fi.absoluteFilePath());
     return true;
 }
@@ -65,60 +70,49 @@ bool QnQtFileStorageResource::isFileExists(const QString& url)
 
 qint64 QnQtFileStorageResource::getFreeSpace()
 {
-    return getDiskFreeSpace(removeProtocolPrefix(getUrl()));
+    NX_ASSERT("false", "This is a server-only method");
+    return 0;
 }
 
 qint64 QnQtFileStorageResource::getTotalSpace() const
 {
-    return getDiskTotalSpace(removeProtocolPrefix(getUrl()));
+    NX_ASSERT("false", "This is a server-only method");
+    return 0;
 }
 
-QnAbstractStorageResource::FileInfoList QnQtFileStorageResource::getFileList(const QString& dirName)
+QnAbstractStorageResource::FileInfoList QnQtFileStorageResource::getFileList(
+    const QString& dirName)
 {
     QDir dir;
     if (dir.cd(dirName))
-        return QnAbstractStorageResource::FIListFromQFIList(dir.entryInfoList(QDir::Files));
-    else
-        return QnAbstractStorageResource::FileInfoList();
+        return FIListFromQFIList(dir.entryInfoList(QDir::Files));
+
+    return FileInfoList();
 }
 
 qint64 QnQtFileStorageResource::getFileSize(const QString& /*url*/) const
 {
-    return 0; //< not implemented
+    NX_ASSERT("false", "This is a server-only method");
+    return 0;
 }
 
 Qn::StorageInitResult QnQtFileStorageResource::initOrUpdate()
 {
-    QString tmpDir = closeDirPath(getUrl()) + QLatin1String("tmp")
+    const QString tmpDir = closeDirPath(getUrl())
+        + "tmp"
         + QString::number(nx::utils::random::number<uint>());
 
     QDir dir(tmpDir);
-    if (dir.exists()) {
-        dir.remove(tmpDir);
+    if (dir.exists() && dir.removeRecursively())
         return Qn::StorageInit_Ok;
-    }
-    else {
-        if (dir.mkpath(tmpDir))
-        {
-            dir.rmdir(tmpDir);
-            return Qn::StorageInit_Ok;
-        }
-        else
-            return Qn::StorageInit_WrongPath;
-    }
+
+    if (dir.mkpath(tmpDir) && dir.rmdir(tmpDir))
+        return Qn::StorageInit_Ok;
 
     return Qn::StorageInit_WrongPath;
-}
-
-QString QnQtFileStorageResource::removeProtocolPrefix(const QString& url) const
-{
-    int prefix = url.indexOf(QLatin1String("://"));
-    return prefix == -1 ? url : url.mid(prefix + 3);
 }
 
 QnStorageResource* QnQtFileStorageResource::instance(QnCommonModule* commonModule, const QString&)
 {
     return new QnQtFileStorageResource(commonModule);
 }
-
-#endif //ENABLE_DATA_PROVIDERS

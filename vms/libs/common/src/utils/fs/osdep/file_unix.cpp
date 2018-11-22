@@ -193,12 +193,3 @@ bool QnFile::fileExists( const QString& fileName )
     int retCode = stat64( fileName.toLocal8Bit(), &fstat );
     return retCode == 0;
 }
-
-qint64 QnFile::getFileSize( const QString& fileName )
-{
-    struct stat64 fstat;
-    int retCode = stat64( fileName.toLocal8Bit(), &fstat );
-    if( retCode != 0 )
-        return -1;
-    return fstat.st_size;
-}

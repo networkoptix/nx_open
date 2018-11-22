@@ -358,8 +358,8 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
     QList<QString> versionStrings;
     for (auto version: versions)
         versionStrings.append(version.toString());
-    NX_INFO(typeid(QnConnectionDiagnosticsHelper))
-        << "handleCompatibilityMode() - have the following versions installed: " << versionStrings;
+    NX_INFO(NX_SCOPE_TAG,
+        "handleCompatibilityMode() - have the following versions installed: %1", versionStrings);
     bool isInstalled = versions.contains(connectionInfo.version);
     bool shouldAutoRestart = false;
 
