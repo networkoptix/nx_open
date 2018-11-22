@@ -154,7 +154,8 @@ static InformationError parseLegacyPackages(
     if (!topLevelObject.contains("clientPackages"))
         return InformationError::brokenPackageError;
 
-    auto readPackages = [](const QString& component, const QJsonValue& source, QList<Package>& output)
+    auto readPackages =
+        [](const QString& component, const QJsonValue& source, QList<Package>& output)
         {
             if (!source.isObject())
                 return InformationError::jsonError;
@@ -169,19 +170,21 @@ static InformationError parseLegacyPackages(
                 {
                     if (!itArch->isObject())
                         return InformationError::jsonError;
-                    // Arch actually consists of arch_variant
+
+                    // Arch actually consists of arch_variant.
                     QStringList archAndVariant = itArch.key().split("_");
                     if (archAndVariant.empty())
                         return InformationError::jsonError;
+
                     Package package;
-                    // It should fill in file, md5 and size fields
+                    // It should fill in file, md5 and size fields.
                     if (!QJson::deserialize(itArch.value(), &package))
                         return InformationError::jsonError;
 
                     package.component = component;
                     package.arch = archAndVariant[0];
                     package.platform = itOs.key();
-                    package.variant = archAndVariant.size() == 2 ? archAndVariant[1] : QString("");
+                    package.variant = archAndVariant.size() == 2 ? archAndVariant[1] : QString();
                     // TODO: Do we need to do anything with variantVersion? It does not seem to be used.
                     output.append(package);
                 }

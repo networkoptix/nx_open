@@ -133,7 +133,9 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
 
     if (!clientInfo.version.isEmpty()
         && (nx::utils::SoftwareVersion(clientInfo.version) != contents.getVersion()))
+    {
         alreadyInstalled = false;
+    }
 
     nx::update::findPackage(
         clientInfo,
@@ -174,7 +176,9 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
             contents.invalidVersion.insert(server->getId());
         }
         else if (serverVersion != targetVersion)
+        {
             alreadyInstalled = false;
+        }
 
         allServers << record.first;
     }

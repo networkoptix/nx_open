@@ -51,7 +51,7 @@ protected:
     int installUpdate();
     void atUpdateStateChanged(int state, int progress);
     void atAutoRestartChanged(int state);
-    void atRecievedUpdateContents(const nx::update::UpdateContents& contents);
+    void atReceivedUpdateContents(const nx::update::UpdateContents& contents);
     void setMessage(const QString& message);
 
     QScopedPointer<Ui::QnCompatibilityVersionInstallationDialog> m_ui;
