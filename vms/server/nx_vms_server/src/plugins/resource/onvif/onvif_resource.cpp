@@ -2031,6 +2031,9 @@ bool QnPlOnvifResource::registerNotificationConsumer()
 
 void QnPlOnvifResource::scheduleRenewSubscriptionTimer(unsigned int timeoutSec)
 {
+    if (!m_inputMonitored)
+        return;
+
     if (timeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS)
         timeoutSec -= RENEW_NOTIFICATION_FORWARDING_SECS;
 
@@ -3604,6 +3607,7 @@ bool QnPlOnvifResource::createPullPointSubscription()
     const int soapCallResult = soapWrapper.createPullPointSubscription(request, response);
     if (soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND)
     {
+        QnMutexLocker lk(&m_ioPortMutex);
         NX_WARNING(this, lm("Failed to subscribe to %1").arg(soapWrapper.endpoint()));
         scheduleRenewSubscriptionTimer(RENEW_NOTIFICATION_FORWARDING_SECS);
         return false;
