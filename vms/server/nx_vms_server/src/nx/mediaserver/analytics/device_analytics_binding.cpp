@@ -272,7 +272,6 @@ void DeviceAnalyticsBinding::setSettings(const QVariantMap& settings)
             m_device->getId(),
             m_engine->getName(),
             m_engine->getId());
-
         return;
     }
 
@@ -280,9 +279,7 @@ void DeviceAnalyticsBinding::setSettings(const QVariantMap& settings)
     QVariantMap settingsValues;
     if (pluginsIni().analyticsDeviceAgentSettingsPath[0] != '\0')
     {
-        NX_WARNING(
-            this,
-            "Trying to load settings for the DeviceAgent from the file. "
+        NX_WARNING(this, "Trying to load settings for the DeviceAgent from the file. "
             "Device: %1 (%2), Engine: %3 (%4)",
             m_device->getUserDefinedName(),
             m_device->getId(),
@@ -300,9 +297,7 @@ void DeviceAnalyticsBinding::setSettings(const QVariantMap& settings)
 
     if (!sdkSettings)
     {
-        NX_ERROR(
-            this,
-            "Unable to get settings for DeviceAgent. Device: %1 (%2), Engine: %3 %4)",
+        NX_ERROR(this, "Unable to get settings for DeviceAgent. Device: %1 (%2), Engine: %3 %4)",
             m_device->getUserDefinedName(),
             m_device->getId(),
             m_engine->getName(),

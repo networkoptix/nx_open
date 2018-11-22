@@ -126,11 +126,8 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
     sdk_support::UniquePtr<nx::sdk::Settings> sdkSettings;
     if (pluginsIni().analyticsEngineSettingsPath[0] != '\0')
     {
-        NX_WARNING(
-            this,
-            "Trying to load settings for the Engine from the file. Engine %1 (%2)",
-            getName(),
-            getId());
+        NX_WARNING(this, "Trying to load settings for the Engine from the file. Engine %1 (%2)",
+            getName(), getId());
 
         sdkSettings = analytics::debug_helpers::loadEngineSettingsFromFile(toSharedPointer(this));
     }
