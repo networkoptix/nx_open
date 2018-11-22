@@ -125,15 +125,19 @@ QnManualResourceSearchList QnManualSearchTaskManager::foundResources() const
 }
 
 void QnManualSearchTaskManager::searchTaskDoneHandler(
-    const QnManualResourceSearchList& results, QnSearchTask* const task)
+    QnManualResourceSearchList results, QnSearchTask* const task)
 {
+    bool taskInterruptProcessing = task->doesInterruptTaskProcessing();
+    auto taskUrl = task->url();
+
+    // NOTE: Task may be deleted after call to dispatch.
     m_pollable.dispatch(
-        [this, &results, task]()
+        [this, results = std::move(results), taskInterruptProcessing, taskUrl]()
         {
             NX_VERBOSE(this, "Remained: %1; Running: %2",
                 m_remainingTaskCount.load(), m_runningTaskCount);
 
-            nx::network::HostAddress queueName(task->url().host());
+            nx::network::HostAddress queueName(taskUrl.host());
             auto& context = m_searchQueueContexts[queueName];
 
             context.isBlocked = false;
@@ -145,7 +149,7 @@ void QnManualSearchTaskManager::searchTaskDoneHandler(
             {
                 m_foundResources.append(results);
 
-                if (task->doesInterruptTaskProcessing() && !results.isEmpty())
+                if (taskInterruptProcessing && !results.isEmpty())
                 {
                     m_remainingTaskCount -= m_urlSearchTaskQueues[queueName].size();
                     context.isInterrupted = true;

@@ -162,7 +162,7 @@ void QnSearchTask::doSearch()
 
     NX_VERBOSE(this, "Found %1 resources on URL %2 (interrupts: %3)",
         results.size(), m_url, m_interruptTaskProcesing);
-    m_callback(results, this);
+    m_callback(std::move(results), this);
 }
 
 nx::utils::Url QnSearchTask::url()

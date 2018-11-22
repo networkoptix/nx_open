@@ -46,7 +46,7 @@ private:
     bool canRunTask(QThreadPool* threadPool);
     void runSomePendingTasks();
 
-    void searchTaskDoneHandler(const QnManualResourceSearchList& results, QnSearchTask* const task);
+    void searchTaskDoneHandler(QnManualResourceSearchList results, QnSearchTask* const task);
 
     QnManualResourceSearchList m_foundResources;
     TasksFinishedCallback m_tasksFinishedCallback;

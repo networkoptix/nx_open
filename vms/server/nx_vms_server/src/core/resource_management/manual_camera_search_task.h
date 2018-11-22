@@ -17,7 +17,7 @@ class QnSearchTask
 public:
     typedef std::vector<QnAbstractNetworkResourceSearcher*> SearcherList;
     typedef std::function<void(
-        const QnManualResourceSearchList& results, QnSearchTask* const task)> SearchDoneCallback;
+        QnManualResourceSearchList results, QnSearchTask* const task)> SearchDoneCallback;
     // TODO: Should be move-only func.
 
     QnSearchTask() = delete;
