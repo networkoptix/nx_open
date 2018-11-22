@@ -29,57 +29,82 @@ namespace ec2 {
 typedef std::vector<std::function<void()>> PostProcessList;
 typedef std::vector<std::function<void()>> CommandList;
 
-namespace detail { class ServerQueryProcessor; }
+namespace detail {
 
-struct Command
-{
-    std::function<void(ErrorCode)> complitionHandler;
-    std::function<ErrorCode (PostProcessList* const)> execTranFunc;
-    ErrorCode result = ErrorCode::ok;
-    PostProcessList postProcList;
-};
+class ServerQueryProcessor;
 
-class ServerQueryProcessorAccess: public QnLongRunnable
+static const int kMaxQueueSize = 1000;
+
+class TransactionExecutor: public QnLongRunnable
 {
 public:
 
+    struct Command
+    {
+        std::function<void(ErrorCode)> completionHandler;
+        std::function<ErrorCode(PostProcessList* const)> execTranFunc;
+        ErrorCode result = ErrorCode::notImplemented;
+        PostProcessList postProcList;
+    };
+
+    TransactionExecutor(QnDbManager* db): m_db(db)
+    {
+        start();
+    }
+
+    virtual ~TransactionExecutor()
+    {
+        stop();
+    }
+
+    void enqueData(Command command);
+
+    virtual void stop() override;
+    virtual void run() override;
+
+private:
+    QnDbManager* m_db;
+    QnMutex m_mutex;
+    QnWaitCondition m_waitCondition;
+    std::vector<Command> m_commandQueue;
+};
+
+}
+
+struct ServerQueryProcessorAccess
+{
     // TODO: for compatibility with ClientQueryProcessor. It is not need actually. Remove it.
     QString userName() const { return QString(); }
 
     ServerQueryProcessorAccess(detail::QnDbManager* db, TransactionMessageBusAdapter* messageBus):
         m_db(db),
-        m_messageBus(messageBus)
+        m_messageBus(messageBus),
+        m_transactionExecutor(db)
     {
-        start();
     }
-
-    virtual void stop() override;
-    virtual void run() override;
 
     virtual ~ServerQueryProcessorAccess()
     {
-        stop();
     }
 
+    void stop()
+    {
+        m_transactionExecutor.stop();
+        Ec2ThreadPool::instance()->clear();
+        Ec2ThreadPool::instance()->waitForDone();
+    }
 
     detail::ServerQueryProcessor getAccess(const Qn::UserAccessData userAccessData);
 
     detail::QnDbManager* getDb() const { return m_db; }
     TransactionMessageBusAdapter* messageBus() { return m_messageBus; }
-    PostProcessList* postProcessList() { return &m_postProcessList; }
-    QnMutex* updateMutex() { return &m_updateMutex; }
-    QnWaitCondition& waitCondition() { return m_waitCondition; }
     QnCommonModule* commonModule() const { return m_messageBus->commonModule();  }
-    std::vector<Command>& commandQueue() { return m_commandQueue; }
+    detail::TransactionExecutor* transactionExecutor() { return &m_transactionExecutor; }
 
   private:
     detail::QnDbManager* m_db;
     TransactionMessageBusAdapter* m_messageBus;
-    PostProcessList m_postProcessList;
-    QnMutex m_updateMutex;
-    QnWaitCondition m_waitCondition;
-
-    std::vector<Command> m_commandQueue;
+    detail::TransactionExecutor m_transactionExecutor;
 };
 
 namespace detail {
@@ -247,9 +272,8 @@ public:
     void processUpdateAsync(
         QnTransaction<QueryDataType>& tran, HandlerType completionHandler, void* /*dummy*/ = 0)
     {
-        QnMutexLocker lock(m_owner->updateMutex());
-        m_owner->commandQueue().push_back(
-            Command{
+        m_owner->transactionExecutor()->enqueData(
+            TransactionExecutor::Command{
                 [completionHandler = std::move(completionHandler)](ErrorCode errorCode)
                 {
                     completionHandler(errorCode);
@@ -257,18 +281,11 @@ public:
                 [selfCopy = *this, tran = std::move(tran)](
                     PostProcessList* const postProcessList) mutable
                 {
-                    return selfCopy.executeTranCall(
-                        tran,
-                        postProcessList,
-                        [selfCopy](
-                            QnTransaction<QueryDataType>& tran,
-                            PostProcessList* const postProcessList) mutable -> ErrorCode
-                        {
-                            return selfCopy.processUpdateSync(tran, postProcessList);
-                        });
+                    if (ApiCommand::isPersistent(tran.command))
+                        return selfCopy.processUpdateSync(tran, postProcessList);
+                    return selfCopy.processNonPersistentTransaction(tran, postProcessList);
                 }
             });
-        m_owner->waitCondition().wakeOne();
     }
 
     /**
@@ -472,15 +489,11 @@ private:
      *     PostProcessList*)
      */
 
-    template<class QueryDataType, class SyncFunctionType>
-    ErrorCode executeTranCall(
+    template<class QueryDataType>
+    ErrorCode processNonPersistentTransaction(
         QnTransaction<QueryDataType>& tran,
-        PostProcessList* const postProcessList,
-        SyncFunctionType syncFunction)
+        PostProcessList* const postProcessList)
     {
-        if (ApiCommand::isPersistent(tran.command))
-            return syncFunction(tran, postProcessList);
-
         if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_owner->commonModule(), m_db.userAccessData(), tran.params))
             return ErrorCode::forbidden;
 
@@ -891,9 +904,8 @@ public:
         HandlerType completionHandler,
         ApiCommand::Value subCommand)
     {
-        QnMutexLocker lock(m_owner->updateMutex());
-        m_owner->commandQueue().push_back(
-            Command{
+        m_owner->transactionExecutor()->enqueData(
+            TransactionExecutor::Command{
                 [completionHandler = std::move(completionHandler)](ErrorCode errorCode)
                 {
                     completionHandler(errorCode);
@@ -901,18 +913,15 @@ public:
                 [selfCopy = *this, multiTran = std::move(multiTran), subCommand](
                     PostProcessList* const postProcessList) mutable
                 {
-                    return selfCopy.executeTranCall(
-                        multiTran,
-                        postProcessList,
-                        [selfCopy, subCommand](QnTransaction<QueryDataType>& multiTran,
-                            PostProcessList* const postProcessList) mutable -> ErrorCode
-                        {
-                            return selfCopy.processMultiUpdateSync(subCommand, multiTran.transactionType,
-                                multiTran.params, postProcessList);
-                        });
+                    if (ApiCommand::isPersistent(multiTran.command))
+                    {
+                        return selfCopy.processMultiUpdateSync(subCommand,
+                            multiTran.transactionType, multiTran.params, postProcessList);
+                    }
+
+                    return selfCopy.processNonPersistentTransaction(multiTran, postProcessList);
                 }
             });
-        m_owner->waitCondition().wakeOne();
     }
 
 private:
