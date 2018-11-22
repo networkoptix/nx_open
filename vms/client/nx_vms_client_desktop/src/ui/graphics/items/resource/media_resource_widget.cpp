@@ -629,6 +629,12 @@ void QnMediaResourceWidget::setAreaSelectionType(AreaType value)
     emit areaSelectionTypeChanged();
 }
 
+void QnMediaResourceWidget::unsetAreaSelectionType(AreaType value)
+{
+    if (m_areaSelectionType == value)
+        setAreaSelectionType(AreaType::none);
+}
+
 bool QnMediaResourceWidget::areaSelectionEnabled() const
 {
     return m_areaSelectOverlayWidget && m_areaSelectionType != AreaType::none
@@ -642,13 +648,27 @@ void QnMediaResourceWidget::setAreaSelectionEnabled(bool value)
         return;
 
     if (m_areaSelectionType == AreaType::none || m_areaSelectionType == AreaType::motion)
-        value = false;
+        return;
 
     if (value == m_areaSelectOverlayWidget->active())
         return;
 
     m_areaSelectOverlayWidget->setActive(value);
     emit areaSelectionEnabledChanged();
+}
+
+void QnMediaResourceWidget::setAreaSelectionEnabled(AreaType areaType, bool value)
+{
+    if (value)
+    {
+        setAreaSelectionType(areaType);
+        setAreaSelectionEnabled(true);
+    }
+    else
+    {
+        if (m_areaSelectionType == areaType)
+            setAreaSelectionEnabled(false);
+    }
 }
 
 QRectF QnMediaResourceWidget::analyticsFilterRect() const
@@ -701,7 +721,6 @@ void QnMediaResourceWidget::handleSelectedAreaChanged()
                 break;
 
             setAnalyticsFilterRect(m_areaSelectOverlayWidget->selectedArea());
-            setAreaSelectionEnabled(false);
             break;
     }
 }
@@ -2798,6 +2817,9 @@ void QnMediaResourceWidget::setZoomWindowCreationModeEnabled(bool enabled)
 
 void QnMediaResourceWidget::setMotionSearchModeEnabled(bool enabled)
 {
+    if (isMotionSearchModeEnabled() == enabled)
+        return;
+
     setOption(DisplayMotion, enabled);
     titleBar()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton, enabled);
 
@@ -2811,8 +2833,7 @@ void QnMediaResourceWidget::setMotionSearchModeEnabled(bool enabled)
     }
     else
     {
-        if (m_areaSelectionType == AreaType::motion)
-            setAreaSelectionType(AreaType::none);
+        unsetAreaSelectionType(AreaType::motion);
     }
 
     setOption(WindowResizingForbidden, enabled);

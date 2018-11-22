@@ -173,9 +173,11 @@ public:
 
     AreaType areaSelectionType() const;
     void setAreaSelectionType(AreaType value);
+    void unsetAreaSelectionType(AreaType value);
 
     bool areaSelectionEnabled() const;
     void setAreaSelectionEnabled(bool value);
+    void setAreaSelectionEnabled(AreaType areaType, bool value);
     QRectF analyticsFilterRect() const;
     void setAnalyticsFilterRect(const QRectF& value);
 

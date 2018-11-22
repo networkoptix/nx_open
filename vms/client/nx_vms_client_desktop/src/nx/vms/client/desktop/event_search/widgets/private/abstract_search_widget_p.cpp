@@ -495,6 +495,12 @@ void AbstractSearchWidget::Private::setupCameraSelection()
         });
 }
 
+void AbstractSearchWidget::Private::setCamerasReadOnly(bool value)
+{
+    ui->cameraSelectionButton->setDeactivatable(!value);
+    setReadOnly(ui->cameraSelectionButton, value);
+}
+
 AbstractSearchListModel* AbstractSearchWidget::Private::model() const
 {
     return m_mainModel.data();
@@ -711,7 +717,7 @@ void AbstractSearchWidget::Private::requestFetchIfNeeded()
 
 void AbstractSearchWidget::Private::resetFilters()
 {
-    ui->cameraSelectionButton->deactivate();
+    ui->cameraSelectionButton->deactivate(); //< Will do nothing if selector is set to read-only.
     ui->timeSelectionButton->deactivate();
     m_textFilterEdit->clear();
 }

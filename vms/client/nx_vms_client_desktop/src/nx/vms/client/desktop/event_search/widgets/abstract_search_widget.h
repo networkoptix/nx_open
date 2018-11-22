@@ -87,7 +87,6 @@ public:
     Cameras previousCameras() const;
 
     QString textFilter() const;
-    bool wholeArea() const;
 
     /**
      * Resets all filters to their default state.
@@ -115,8 +114,8 @@ protected:
     /** Creates a child menu with dropdown appearance. */
     QMenu* createDropdownMenu();
 
-    /** Set whether some area on the video is selected in external selection tool. */
-    void setWholeArea(bool value);
+    /** Make camera selector read-only, locked in current state. */
+    void setCamerasReadOnly(bool value);
 
     /**
      * Adds specified action to the list of device dependent actions.

@@ -12,6 +12,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
 #include <ui/workaround/hidpi_workarounds.h>
+#include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
@@ -28,6 +29,8 @@
 #include <nx/vms/client/desktop/event_search/widgets/notification_list_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/notification_counter_label.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 
 namespace nx::vms::client::desktop {
 
@@ -36,14 +39,15 @@ namespace nx::vms::client::desktop {
 
 EventPanel::Private::Private(EventPanel* q):
     QObject(q),
+    QnWorkbenchContextAware(q),
     q(q),
     m_tabs(new AnimatedTabWidget(new CompactTabBar(), q)),
     m_notificationsTab(new NotificationListWidget(m_tabs)),
     m_counterLabel(new NotificationCounterLabel(m_tabs->tabBar())),
-    m_motionTab(new MotionSearchWidget(q->context(), m_tabs)),
-    m_bookmarksTab(new BookmarkSearchWidget(q->context(), m_tabs)),
-    m_eventsTab(new EventSearchWidget(q->context(), m_tabs)),
-    m_analyticsTab(new AnalyticsSearchWidget(q->context(), m_tabs)),
+    m_motionTab(new MotionSearchWidget(context(), m_tabs)),
+    m_bookmarksTab(new BookmarkSearchWidget(context(), m_tabs)),
+    m_eventsTab(new EventSearchWidget(context(), m_tabs)),
+    m_analyticsTab(new AnalyticsSearchWidget(context(), m_tabs)),
     m_motionSearchSynchronizer(new MotionSearchSynchronizer(this)),
     m_bookmarkSearchSynchronizer(new BookmarkSearchSynchronizer(this)),
     m_analyticsSearchSynchronizer(new AnalyticsSearchSynchronizer(this))
@@ -55,6 +59,14 @@ EventPanel::Private::Private(EventPanel* q):
     static constexpr int kTabBarShift = 10;
     m_tabs->setProperty(style::Properties::kTabBarIndent, kTabBarShift);
     setTabShape(m_tabs->tabBar(), style::TabShape::Compact);
+
+    connect(m_tabs, &QTabWidget::currentChanged, this,
+        [this]()
+        {
+            m_previousTab = m_lastTab;
+            m_lastTab = m_tabs->currentWidget();
+            NX_VERBOSE(this->q, "Tab changed; previous: %1, current: %2", m_previousTab, m_lastTab);
+        });
 
     q->setAutoFillBackground(false);
     q->setAttribute(Qt::WA_TranslucentBackground);
@@ -72,13 +84,13 @@ EventPanel::Private::Private(EventPanel* q):
                 tab->goToLive();
         });
 
-    connect(q->accessController(), &QnWorkbenchAccessController::globalPermissionsChanged,
+    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged,
         this, &Private::rebuildTabs);
 
     rebuildTabs();
 
     using Tabs = std::initializer_list<AbstractSearchWidget*>;
-    for (auto tab: Tabs{m_eventsTab, m_motionTab, m_bookmarksTab, m_analyticsTab})
+    for (auto tab: Tabs{ m_eventsTab, m_motionTab, m_bookmarksTab, m_analyticsTab })
         connect(tab, &AbstractSearchWidget::tileHovered, q, &EventPanel::tileHovered);
 
     connect(m_notificationsTab, &NotificationListWidget::tileHovered,
@@ -91,11 +103,11 @@ EventPanel::Private::Private(EventPanel* q):
     connect(q, &EventPanel::customContextMenuRequested,
         this, &EventPanel::Private::showContextMenu);
 
-    connect(q->navigator(), &QnWorkbenchNavigator::currentWidgetAboutToBeChanged, this,
-        [this]() { emit currentMediaWidgetAboutToBeChanged({}); });
+    connect(navigator(), &QnWorkbenchNavigator::currentWidgetAboutToBeChanged, this,
+        [this]() { emit mediaWidgetAboutToBeChanged({}); });
 
-    connect(q->navigator(), &QnWorkbenchNavigator::currentWidgetChanged,
-        this, &Private::handleCurrentMediaWidgetChanged);
+    connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,
+        this, &Private::handleMediaWidgetChanged);
 }
 
 EventPanel::Private::~Private()
@@ -103,11 +115,42 @@ EventPanel::Private::~Private()
     // Required here for forward-declared scoped pointer destruction.
 }
 
+void EventPanel::Private::setTabCurrent(QWidget* tab, bool current)
+{
+    if (current)
+    {
+        m_tabs->setCurrentWidget(tab);
+        NX_ASSERT(m_tabs->currentWidget() == tab);
+    }
+    else
+    {
+        if (m_previousTab && m_tabs->currentWidget() == tab)
+            m_tabs->setCurrentWidget(m_previousTab);
+    }
+}
+
+void EventPanel::Private::setTimeContentDisplayed(Qn::TimePeriodContent content, bool displayed)
+{
+    NX_ASSERT(content != Qn::RecordingContent);
+    if (content == Qn::RecordingContent)
+        return;
+
+    if (displayed)
+    {
+        navigator()->setSelectedExtraContent(content);
+    }
+    else
+    {
+        if (navigator()->selectedExtraContent() == content)
+            navigator()->setSelectedExtraContent(Qn::RecordingContent /*means none*/);
+    }
+}
+
 void EventPanel::Private::rebuildTabs()
 {
     m_tabs->clear();
-    m_motionSearchSynchronizer->reset();
-    m_bookmarkSearchSynchronizer->reset();
+    m_previousTab = nullptr;
+    m_lastTab = nullptr;
 
     const auto updateTab =
         [this](QWidget* tab, bool condition, const QIcon& icon, const QString& text)
@@ -135,12 +178,12 @@ void EventPanel::Private::rebuildTabs()
         tr("Motion", "Motion tab title"));
 
     updateTab(m_bookmarksTab,
-        q->accessController()->hasGlobalPermission(vms::api::GlobalPermission::viewBookmarks),
+        accessController()->hasGlobalPermission(vms::api::GlobalPermission::viewBookmarks),
         qnSkin->icon(lit("events/tabs/bookmarks.png")),
         tr("Bookmarks", "Bookmarks tab title"));
 
     updateTab(m_eventsTab,
-        q->accessController()->hasGlobalPermission(vms::api::GlobalPermission::viewLogs),
+        accessController()->hasGlobalPermission(vms::api::GlobalPermission::viewLogs),
         qnSkin->icon(lit("events/tabs/events.png")),
         tr("Events", "Events tab title"));
 
@@ -179,160 +222,65 @@ void EventPanel::Private::updateUnreadCounter(int count, QnNotificationLevel::Va
 void EventPanel::Private::showContextMenu(const QPoint& pos)
 {
     QMenu contextMenu;
-    contextMenu.addAction(q->action(ui::action::OpenBusinessLogAction));
-    contextMenu.addAction(q->action(ui::action::BusinessEventsAction));
-    contextMenu.addAction(q->action(ui::action::PreferencesNotificationTabAction));
+    contextMenu.addAction(action(ui::action::OpenBusinessLogAction));
+    contextMenu.addAction(action(ui::action::BusinessEventsAction));
+    contextMenu.addAction(action(ui::action::PreferencesNotificationTabAction));
     contextMenu.addSeparator();
-    contextMenu.addAction(q->action(ui::action::PinNotificationsAction));
+    contextMenu.addAction(action(ui::action::PinNotificationsAction));
     contextMenu.exec(QnHiDpiWorkarounds::safeMapToGlobal(q, pos));
 }
 
-void EventPanel::Private::handleCurrentMediaWidgetChanged()
+void EventPanel::Private::handleMediaWidgetChanged()
 {
     const auto signalGuard = nx::utils::makeScopeGuard(
-        [this]() { emit currentMediaWidgetChanged({}); });
+        [this]() { emit mediaWidgetChanged({}); });
 
-    m_currentMediaWidget = qobject_cast<QnMediaResourceWidget*>(q->navigator()->currentWidget());
-    if (!m_currentMediaWidget)
+    m_mediaWidget = qobject_cast<QnMediaResourceWidget*>(navigator()->currentWidget());
+    if (!m_mediaWidget)
         return;
 
-    if (!q->navigator()->currentResource().dynamicCast<QnVirtualCameraResource>())
-        m_currentMediaWidget = nullptr;
+    if (!navigator()->currentResource().dynamicCast<QnVirtualCameraResource>())
+        m_mediaWidget = nullptr;
 }
 
 // ------------------------------------------------------------------------------------------------
 // EventPanel::Private::MotionSearchSynchronizer
 
-EventPanel::Private::MotionSearchSynchronizer::MotionSearchSynchronizer(EventPanel::Private* main):
-    m_main(main)
+EventPanel::Private::MotionSearchSynchronizer::MotionSearchSynchronizer(EventPanel::Private* main)
 {
-    connect(m_main, &Private::currentMediaWidgetAboutToBeChanged,
-        this, &MotionSearchSynchronizer::handleCurrentWidgetAboutToBeChanged);
+    connect(main, &Private::mediaWidgetAboutToBeChanged, this,
+        [this, main]()
+        {
+            if (!main->m_mediaWidget)
+                return;
 
-    connect(m_main, &Private::currentMediaWidgetChanged,
-        this, &MotionSearchSynchronizer::handleCurrentWidgetChanged);
+            main->m_mediaWidget->disconnect(this);
+            main->m_mediaWidget->setMotionSearchModeEnabled(false);
+        });
 
-    connect(m_main->m_motionTab, &AbstractSearchWidget::cameraSetChanged,
-        this, &MotionSearchSynchronizer::updateState);
+    connect(main, &Private::mediaWidgetChanged,
+        [this, main]()
+        {
+            main->m_motionTab->setMediaWidget(main->m_mediaWidget);
+            if (!main->m_mediaWidget)
+                return;
 
-    connect(m_main->m_tabs, &QTabWidget::currentChanged,
-        this, &MotionSearchSynchronizer::updateState);
+            main->m_mediaWidget->setMotionSearchModeEnabled(
+                main->m_tabs->currentWidget() == main->m_motionTab);
 
-    // FIXME!!!
-    //connect(m_main->m_motionTab, &AbstractSearchWidget::selectedAreaChanged, this,
-    //    [this](bool wholeArea)
-    //    {
-    //        if (wholeArea && widget())
-    //            widget()->clearMotionSelection();
-    //    });
-}
+            connect(main->m_mediaWidget, &QnMediaResourceWidget::motionSearchModeEnabled, this,
+                [main](bool enabled) { main->setTabCurrent(main->m_motionTab, enabled); });
+        });
 
-void EventPanel::Private::MotionSearchSynchronizer::reset()
-{
-    QScopedValueRollback updateGuard(m_updating, true);
-    m_state = State::irrelevant;
-    m_revertTab = nullptr;
-    setCurrentWidgetMotionSearch(false);
-}
+    connect(main->m_tabs, &QTabWidget::currentChanged,
+        [main]()
+        {
+            const bool isMotionTab = main->m_tabs->currentWidget() == main->m_motionTab;
+            main->setTimeContentDisplayed(Qn::MotionContent, isMotionTab);
 
-void EventPanel::Private::MotionSearchSynchronizer::handleCurrentWidgetAboutToBeChanged()
-{
-    if (!widget())
-        return;
-
-    widget()->disconnect(this);
-    setCurrentWidgetMotionSearch(false); //< Must be after signal disconnection.
-}
-
-void EventPanel::Private::MotionSearchSynchronizer::handleCurrentWidgetChanged()
-{
-    if (!widget())
-        return;
-
-    connect(widget(), &QnMediaResourceWidget::motionSearchModeEnabled,
-        this, &MotionSearchSynchronizer::syncPanelWithWidget);
-
-    connect(widget(), &QnMediaResourceWidget::motionSelectionChanged,
-        this, &MotionSearchSynchronizer::handleMotionSelectionChanged);
-
-    // If Right Panel is in current camera motion search mode,
-    // enable Motion Search for newly selected media widget.
-    if (m_state == State::syncedMotion)
-        syncWidgetWithPanel();
-    // Otherwise, if Motion Search is activated for newly selected media widget,
-    // switch Right Panel into current camera motion search mode.
-    else if (widget()->isMotionSearchModeEnabled())
-        syncPanelWithWidget();
-}
-
-void EventPanel::Private::MotionSearchSynchronizer::handleMotionSelectionChanged()
-{
-    m_main->m_motionTab->setFilterRegions(widget() && widget()->isMotionSearchModeEnabled()
-        ? widget()->motionSelection()
-        : QList<QRegion>());
-}
-
-void EventPanel::Private::MotionSearchSynchronizer::updateState()
-{
-    m_state = calculateState();
-    syncWidgetWithPanel();
-}
-
-EventPanel::Private::MotionSearchSynchronizer::State
-    EventPanel::Private::MotionSearchSynchronizer::calculateState() const
-{
-    if (m_main->m_tabs->currentWidget() != m_main->m_motionTab)
-        return State::irrelevant;
-
-    return m_main->m_motionTab->selectedCameras() == AbstractSearchWidget::Cameras::current
-        ? State::syncedMotion
-        : State::unsyncedMotion;
-}
-
-void EventPanel::Private::MotionSearchSynchronizer::setCurrentWidgetMotionSearch(bool value)
-{
-    if (widget() && widget()->isMotionSearchModeEnabled() != value)
-        widget()->setMotionSearchModeEnabled(value);
-}
-
-void EventPanel::Private::MotionSearchSynchronizer::syncWidgetWithPanel()
-{
-    if (m_updating)
-        return;
-
-    QScopedValueRollback updateGuard(m_updating, true);
-    setCurrentWidgetMotionSearch(m_state == State::syncedMotion);
-    m_revertTab = nullptr;
-}
-
-void EventPanel::Private::MotionSearchSynchronizer::syncPanelWithWidget()
-{
-    if (m_updating)
-        return;
-
-    QScopedValueRollback updateGuard(m_updating, true);
-
-    const bool on = widget()->isMotionSearchModeEnabled();
-    const bool fromOtherTab = m_state == State::irrelevant;
-
-    if (on)
-    {
-        m_main->m_motionTab->selectCameras(AbstractSearchWidget::Cameras::current);
-        m_revertTab = fromOtherTab ? m_main->m_tabs->currentWidget() : nullptr;
-        m_main->m_tabs->setCurrentWidget(m_main->m_motionTab);
-        handleMotionSelectionChanged();
-    }
-    else
-    {
-        m_main->m_motionTab->selectCameras(m_main->m_motionTab->previousCameras());
-        if (m_revertTab)
-            m_main->m_tabs->setCurrentWidget(m_revertTab);
-    }
-}
-
-QnMediaResourceWidget* EventPanel::Private::MotionSearchSynchronizer::widget() const
-{
-    return m_main->m_currentMediaWidget;
+            if (main->m_mediaWidget)
+                main->m_mediaWidget->setMotionSearchModeEnabled(isMotionTab);
+        });
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -340,43 +288,38 @@ QnMediaResourceWidget* EventPanel::Private::MotionSearchSynchronizer::widget() c
 
 EventPanel::Private::BookmarkSearchSynchronizer::BookmarkSearchSynchronizer(
     EventPanel::Private* main)
-    :
-    m_main(main)
 {
-    connect(main->m_tabs, &QTabWidget::currentChanged,
-        this, &BookmarkSearchSynchronizer::handleCurrentTabChanged);
+    connect(main->context()->action(ui::action::BookmarksModeAction), &QAction::toggled, this,
+        [main](bool on) { main->setTabCurrent(main->m_bookmarksTab, on); });
 
-    connect(main->q->context()->action(ui::action::BookmarksModeAction), &QAction::toggled,
-        this, &BookmarkSearchSynchronizer::setBookmarksTabActive);
-}
+    connect(main->m_tabs, &QTabWidget::currentChanged, this,
+        [main]()
+        {
+            main->context()->action(ui::action::BookmarksModeAction)->setChecked(
+                main->m_tabs->currentWidget() == main->m_bookmarksTab);
+        });
 
-void EventPanel::Private::BookmarkSearchSynchronizer::handleCurrentTabChanged()
-{
-    m_main->q->context()->action(ui::action::BookmarksModeAction)->setChecked(
-        m_main->m_tabs->currentWidget() == m_main->m_bookmarksTab);
+    const auto updateTimelineBookmarks =
+        [main]()
+        {
+            auto watcher = main->context()->instance<QnTimelineBookmarksWatcher>();
+            if (!watcher)
+                return;
 
-    m_revertTab = m_lastTab;
-    m_lastTab = m_main->m_tabs->currentWidget();
-}
+            const auto currentCamera = main->q->navigator()->currentResource()
+                .dynamicCast<QnVirtualCameraResource>();
 
-void EventPanel::Private::BookmarkSearchSynchronizer::setBookmarksTabActive(bool value)
-{
-    if (value)
-    {
-        m_main->m_tabs->setCurrentWidget(m_main->m_bookmarksTab);
-    }
-    else
-    {
-        if (m_revertTab && m_main->m_tabs->currentWidget() == m_main->m_bookmarksTab)
-            m_main->m_tabs->setCurrentWidget(m_revertTab);
-    }
-}
+            const bool relevant = currentCamera
+                && main->m_bookmarksTab->cameras().contains(currentCamera);
 
-void EventPanel::Private::BookmarkSearchSynchronizer::reset()
-{
-    m_lastTab = nullptr;
-    m_revertTab = nullptr;
-    m_main->q->context()->action(ui::action::BookmarksModeAction)->setChecked(false);
+            watcher->setTextFilter(relevant ? main->m_bookmarksTab->textFilter() : QString());
+        };
+
+    connect(main->m_bookmarksTab, &BookmarkSearchWidget::cameraSetChanged,
+        this, updateTimelineBookmarks);
+
+    connect(main->q->navigator(), &QnWorkbenchNavigator::currentResourceChanged,
+        this, updateTimelineBookmarks);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -384,92 +327,108 @@ void EventPanel::Private::BookmarkSearchSynchronizer::reset()
 
 EventPanel::Private::AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
     EventPanel::Private* main)
+    :
+    m_main(main)
 {
-    const auto updateMediaWidget =
-        [main]()
+    connect(main, &Private::mediaWidgetAboutToBeChanged, this,
+        [this]()
         {
-            main->m_analyticsTab->setCurrentMediaWidget(
-                main->m_tabs->currentWidget() == main->m_analyticsTab
-                    ? main->m_currentMediaWidget
-                    : nullptr);
-        };
+            if (!m_main->m_mediaWidget)
+                return;
 
-    connect(main, &Private::currentMediaWidgetChanged, this, updateMediaWidget);
-    connect(main->m_tabs, &QTabWidget::currentChanged, this, updateMediaWidget);
+            m_main->m_mediaWidget->disconnect(this);
+            m_main->m_mediaWidget->unsetAreaSelectionType(QnMediaResourceWidget::AreaType::analytics);
+        });
 
-    //connect(m_main, &Private::currentMediaWidgetAboutToBeChanged,
-    //    this, &AnalyticsSearchSynchronizer::handleCurrentWidgetAboutToBeChanged);
+    connect(main, &Private::mediaWidgetChanged,
+        [this]()
+        {
+            m_main->m_analyticsTab->setMediaWidget(m_main->m_mediaWidget);
+            if (!m_main->m_mediaWidget)
+                return;
 
-    //connect(m_main, &Private::currentMediaWidgetChanged,
-    //    this, &AnalyticsSearchSynchronizer::handleCurrentWidgetChanged);
+            updateAreaSelectionRelevancy();
 
-    //connect(m_main->m_analyticsTab, &AbstractSearchWidget::cameraSetChanged,
-    //    this, &AnalyticsSearchSynchronizer::syncWidgetWithPanel);
+            connect(m_main->m_mediaWidget, &QnMediaResourceWidget::analyticsFilterRectChanged, this,
+                [this]()
+                {
+                    m_main->m_mediaWidget->setAreaSelectionEnabled(
+                        QnMediaResourceWidget::AreaType::analytics, false);
+                });
+        });
 
-    //connect(m_main->m_tabs, &QTabWidget::currentChanged,
-    //    this, &AnalyticsSearchSynchronizer::syncWidgetWithPanel);
+    connect(m_main->m_tabs, &QTabWidget::currentChanged,
+        [this]()
+        {
+            updateAreaSelectionRelevancy();
+            updateTimelineDisplay();
+        });
 
-    //connect(m_main->m_analyticsTab, &AnalyticsSearchWidget::filterRectChanged, this,
-    //    [this](const QRectF& value)
-    //    {
-    //        // FIXME!!! Only in single-camera mode. Only when reset.
-    //        //if (m_main->m_currentMediaWidget)
-    //          //  m_main->m_currentMediaWidget->setAnalyticsSelection({0, 0, 1, 1});
-    //    });
+    connect(main->m_analyticsTab, &AnalyticsSearchWidget::areaSelectionEnabledChanged,
+        this, &AnalyticsSearchSynchronizer::updateAreaSelectionRelevancy);
+
+    connect(main->m_analyticsTab, &AnalyticsSearchWidget::areaSelectionRequested, this,
+        [this]()
+        {
+            if (m_main->m_mediaWidget && isAnalyticsTab())
+            {
+                m_main->m_mediaWidget->setAreaSelectionEnabled(
+                    QnMediaResourceWidget::AreaType::analytics, true);
+            }
+        });
+
+    connect(m_main->m_analyticsTab, &AnalyticsSearchWidget::cameraSetChanged,
+        this, &AnalyticsSearchSynchronizer::updateTimelineDisplay);
+
+    connect(m_main->m_analyticsTab, &AnalyticsSearchWidget::textFilterChanged,
+        this, &AnalyticsSearchSynchronizer::updateTimelineDisplay);
+
+    connect(m_main->m_analyticsTab, &AnalyticsSearchWidget::filterRectChanged,
+        this, &AnalyticsSearchSynchronizer::updateTimelineDisplay);
+
+    connect(m_main->q->navigator(), &QnWorkbenchNavigator::currentResourceChanged,
+        this, &AnalyticsSearchSynchronizer::updateTimelineDisplay);
 }
 
-//void EventPanel::Private::AnalyticsSearchSynchronizer::reset()
-//{
-//    setWidgetAnalyticsSelectionEnabled(false);
-//}
-//
-//void EventPanel::Private::AnalyticsSearchSynchronizer::handleCurrentWidgetAboutToBeChanged()
-//{
-//    if (!m_main->m_currentMediaWidget)
-//        return;
-//
-//    m_main->m_currentMediaWidget->disconnect(this);
-//    setWidgetAnalyticsSelectionEnabled(false);
-//}
-//
-//void EventPanel::Private::AnalyticsSearchSynchronizer::handleCurrentWidgetChanged()
-//{
-//    if (!m_main->m_currentMediaWidget)
-//        return;
-//
-//    connect(m_main->m_currentMediaWidget.data(), &QnMediaResourceWidget::analyticsSelectionChanged,
-//        this, &AnalyticsSearchSynchronizer::handleAnalyticsSelectionChanged);
-//
-//    syncWidgetWithPanel();
-//    handleAnalyticsSelectionChanged();
-//}
-//
-//void EventPanel::Private::AnalyticsSearchSynchronizer::handleAnalyticsSelectionChanged()
-//{
-//    if (!analyticsAreaSelection())
-//        return;
-//
-//    m_main->m_analyticsTab->setFilterRect(m_main->m_currentMediaWidget
-//        ? m_main->m_currentMediaWidget->analyticsSelection()
-//        : QRectF());
-//}
-//
-//bool EventPanel::Private::AnalyticsSearchSynchronizer::analyticsAreaSelection() const
-//{
-//    return m_main->m_tabs->currentWidget() == m_main->m_analyticsTab
-//        && m_main->m_analyticsTab->selectedCameras() == AbstractSearchWidget::Cameras::current;
-//}
-//
-//void EventPanel::Private::AnalyticsSearchSynchronizer::setWidgetAnalyticsSelectionEnabled(
-//    bool value)
-//{
-//    if (m_main->m_currentMediaWidget)
-//        m_main->m_currentMediaWidget->setAnalyticsSelectionEnabled(value);
-//}
-//
-//void EventPanel::Private::AnalyticsSearchSynchronizer::syncWidgetWithPanel()
-//{
-//    setWidgetAnalyticsSelectionEnabled(analyticsAreaSelection());
-//}
+bool EventPanel::Private::AnalyticsSearchSynchronizer::isAnalyticsTab() const
+{
+    return m_main->m_tabs->currentWidget() == m_main->m_analyticsTab;
+}
+
+void EventPanel::Private::AnalyticsSearchSynchronizer::updateAreaSelectionRelevancy()
+{
+    if (!m_main->m_mediaWidget || !isAnalyticsTab())
+        return;
+
+    m_main->m_mediaWidget->setAreaSelectionType(m_main->m_analyticsTab->areaSelectionEnabled()
+        ? QnMediaResourceWidget::AreaType::analytics
+        : QnMediaResourceWidget::AreaType::none);
+}
+
+void EventPanel::Private::AnalyticsSearchSynchronizer::updateTimelineDisplay()
+{
+    if (!isAnalyticsTab())
+    {
+        m_main->setTimeContentDisplayed(Qn::AnalyticsContent, false);
+        return;
+    }
+
+    const auto currentCamera = m_main->q->navigator()->currentResource()
+        .dynamicCast<QnVirtualCameraResource>();
+
+    const bool relevant = currentCamera && m_main->m_analyticsTab->cameras().contains(currentCamera);
+    if (!relevant)
+    {
+        m_main->q->navigator()->setSelectedExtraContent(Qn::RecordingContent /*means none*/);
+        return;
+    }
+
+    analytics::storage::Filter filter;
+    filter.deviceIds = {currentCamera->getId()};
+    filter.boundingBox = m_main->m_analyticsTab->filterRect();
+    filter.freeText = m_main->m_analyticsTab->textFilter();
+    m_main->q->navigator()->setAnalyticsFilter(filter);
+    m_main->q->navigator()->setSelectedExtraContent(Qn::AnalyticsContent);
+}
 
 } // namespace nx::vms::client::desktop

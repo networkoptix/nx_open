@@ -68,6 +68,8 @@ public:
     void addDeviceDependentAction(
         QAction* action, const QString& mixedString, const QString& cameraString);
 
+    void setCamerasReadOnly(bool value);
+
 private:
     void setupModels();
     void setupRibbon();

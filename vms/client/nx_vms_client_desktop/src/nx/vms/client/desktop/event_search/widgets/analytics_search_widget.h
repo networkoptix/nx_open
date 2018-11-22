@@ -17,7 +17,15 @@ public:
     AnalyticsSearchWidget(QnWorkbenchContext* context, QWidget* parent = nullptr);
     virtual ~AnalyticsSearchWidget() override;
 
-    void setCurrentMediaWidget(QnMediaResourceWidget* value);
+    void setMediaWidget(QnMediaResourceWidget* value);
+
+    bool areaSelectionEnabled() const;
+    QRectF filterRect() const;
+
+signals:
+    void areaSelectionEnabledChanged(bool value, QPrivateSignal);
+    void areaSelectionRequested(QPrivateSignal);
+    void filterRectChanged(const QRectF& value);
 
 private:
     virtual QString placeholderText(bool constrained) const override;

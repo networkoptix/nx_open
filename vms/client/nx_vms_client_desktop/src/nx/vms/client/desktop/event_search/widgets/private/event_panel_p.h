@@ -5,10 +5,13 @@
 #include <QtCore/QPointer>
 #include <QtCore/QScopedPointer>
 
+#include <common/common_globals.h>
+
 class QTabWidget;
 class QStackedWidget;
 class QnMediaResourceWidget;
 class QAbstractItemModel;
+class QAction;
 
 namespace QnNotificationLevel { enum class Value; }
 
@@ -27,7 +30,9 @@ class AnalyticsSearchWidget;
 // ------------------------------------------------------------------------------------------------
 // EventPanel::Private
 
-class EventPanel::Private: public QObject
+class EventPanel::Private:
+    public QObject,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
 
@@ -35,16 +40,19 @@ public:
     Private(EventPanel* q);
     virtual ~Private() override;
 
+    void setTabCurrent(QWidget* tab, bool current);
+    void setTimeContentDisplayed(Qn::TimePeriodContent content, bool displayed);
+
 signals:
-    void currentMediaWidgetAboutToBeChanged(QPrivateSignal);
-    void currentMediaWidgetChanged(QPrivateSignal);
+    void mediaWidgetAboutToBeChanged(QPrivateSignal);
+    void mediaWidgetChanged(QPrivateSignal);
 
 private:
     void rebuildTabs();
     bool systemHasAnalytics() const;
     void updateUnreadCounter(int count, QnNotificationLevel::Value importance);
     void showContextMenu(const QPoint& pos);
-    void handleCurrentMediaWidgetChanged();
+    void handleMediaWidgetChanged();
 
 private:
     EventPanel* const q;
@@ -58,7 +66,10 @@ private:
     EventSearchWidget* const m_eventsTab;
     AnalyticsSearchWidget* const m_analyticsTab;
 
-    QPointer<QnMediaResourceWidget> m_currentMediaWidget;
+    QWidget* m_previousTab = nullptr;
+    QWidget* m_lastTab = nullptr;
+
+    QPointer<QnMediaResourceWidget> m_mediaWidget;
 
     class MotionSearchSynchronizer;
     const QScopedPointer<MotionSearchSynchronizer> m_motionSearchSynchronizer;
@@ -77,34 +88,6 @@ class EventPanel::Private::MotionSearchSynchronizer: public QObject
 {
 public:
     MotionSearchSynchronizer(EventPanel::Private* main);
-    void reset();
-
-private:
-    void handleCurrentWidgetAboutToBeChanged();
-    void handleCurrentWidgetChanged();
-    void handleMotionSelectionChanged();
-
-    void updateState();
-    void syncWidgetWithPanel();
-    void syncPanelWithWidget();
-
-    enum class State
-    {
-        irrelevant, //< Other than Motion tab is selected.
-        unsyncedMotion, //< Motion tab and other than current camera mode are selected.
-        syncedMotion //< Motion tab and current camera mode are selected.
-    };
-
-    State calculateState() const;
-
-    void setCurrentWidgetMotionSearch(bool value);
-    QnMediaResourceWidget* widget() const;
-
-private:
-    EventPanel::Private* const m_main;
-    State m_state = State::irrelevant;
-    bool m_updating = false;
-    QWidget* m_revertTab = nullptr;
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -112,8 +95,15 @@ private:
 
 class EventPanel::Private::AnalyticsSearchSynchronizer: public QObject
 {
+    EventPanel::Private* const m_main;
+
 public:
     AnalyticsSearchSynchronizer(EventPanel::Private* main);
+
+private:
+    bool isAnalyticsTab() const;
+    void updateAreaSelectionRelevancy();
+    void updateTimelineDisplay();
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -123,16 +113,6 @@ class EventPanel::Private::BookmarkSearchSynchronizer: public QObject
 {
 public:
     BookmarkSearchSynchronizer(EventPanel::Private* main);
-    void reset();
-
-private:
-    void handleCurrentTabChanged();
-    void setBookmarksTabActive(bool value);
-
-private:
-    EventPanel::Private* const m_main;
-    QWidget* m_revertTab = nullptr;
-    QWidget* m_lastTab = nullptr;
 };
 
 } // namespace nx::vms::client::desktop
