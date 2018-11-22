@@ -196,7 +196,8 @@ protected:
                     auto status = oldStatus == Qn::Offline ? Qn::Online : Qn::Offline;
 
                     statusDict->setValue(resourceId, status);
-                    resourceManager->setResourceStatusSync(resourceId, status);
+                    resourceManager->setResourceStatus(resourceId, status,
+                        ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
                 }
             }
             std::this_thread::sleep_for(sleepInterval);

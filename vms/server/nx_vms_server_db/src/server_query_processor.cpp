@@ -81,4 +81,53 @@ detail::ServerQueryProcessor ServerQueryProcessorAccess::getAccess(
     return detail::ServerQueryProcessor(this, userAccessData);
 }
 
+
+void ServerQueryProcessorAccess::stop()
+{
+    pleaseStop();
+    m_waitCondition.wakeOne();
+    QnLongRunnable::stop();
+    Ec2ThreadPool::instance()->clear();
+    Ec2ThreadPool::instance()->waitForDone();
+}
+
+void ServerQueryProcessorAccess::run()
+{
+    while (!needToStop())
+    {
+        std::vector<Command> queue;
+        {
+            QnMutexLocker lock(&m_updateMutex);
+            while (m_commandQueue.empty() && !needToStop())
+                m_waitCondition.wait(&m_updateMutex);
+            std::swap(m_commandQueue, queue);
+        }
+
+        ErrorCode result = ErrorCode::ok;
+        detail::QnDbManager::QnDbTransactionLocker transaction(m_db->getTransaction());
+        {
+            for (auto& command: queue)
+            {
+                result = command.result = command.execTranFunc(&command.postProcList);
+                if (result == ErrorCode::dbError)
+                    break;
+            }
+            if (result != ErrorCode::dbError)
+                transaction.commit();
+        }
+
+        for (auto& command: queue)
+        {
+            if (result == ErrorCode::dbError)
+                command.result = ErrorCode::dbError; //< Mark all transactions as error because data is rollback.
+            if (command.result == ErrorCode::ok)
+            {
+                for (const auto& postProcFunc: command.postProcList)
+                    postProcFunc();
+            }
+            command.execHandler(command.result);
+        }
+    }
+}
+
 } //namespace ec2

@@ -25,8 +25,8 @@
 
 namespace ec2 {
 
-typedef QnUnsafeQueue<std::function<void()>> PostProcessList;
-typedef QnUnsafeQueue<std::function<void()>> CommandList;
+typedef std::vector<std::function<void()>> PostProcessList;
+typedef std::vector<std::function<void()>> CommandList;
 
 namespace detail { class ServerQueryProcessor; }
 
@@ -34,6 +34,8 @@ struct Command
 {
     std::function<void(ErrorCode)> execHandler;
     std::function<ErrorCode (PostProcessList* const)> execTranFunc;
+    ErrorCode result = ErrorCode::ok;
+    PostProcessList postProcList;
 };
 
 class ServerQueryProcessorAccess: public QnLongRunnable
@@ -47,27 +49,17 @@ public:
         m_db(db),
         m_messageBus(messageBus)
     {
+        start();
     }
 
-    virtual void run() override
-    {
-        QnMutexLocker lock(&m_updateMutex);
-        while (m_commandQueue.empty())
-            m_waitCondition.wait(&m_updateMutex);
-
-        auto& command = m_commandQueue.front();
-        m_commandQueue.pop_front();
-
-    }
+    virtual void stop() override;
+    virtual void run() override;
 
     virtual ~ServerQueryProcessorAccess()
     {
-        waitForAsyncTasks();
+        stop();
     }
 
-    void waitForAsyncTasks()
-    {
-    }
 
     detail::ServerQueryProcessor getAccess(const Qn::UserAccessData userAccessData);
 
@@ -75,8 +67,9 @@ public:
     TransactionMessageBusAdapter* messageBus() { return m_messageBus; }
     PostProcessList* postProcessList() { return &m_postProcessList; }
     QnMutex* updateMutex() { return &m_updateMutex; }
+    QnWaitCondition& waitCondition() { return m_waitCondition; }
     QnCommonModule* commonModule() const { return m_messageBus->commonModule();  }
-    std::deque<Command>& commandQueue() { return m_commandQueue; }
+    std::vector<Command>& commandQueue() { return m_commandQueue; }
 
   private:
     detail::QnDbManager* m_db;
@@ -84,9 +77,8 @@ public:
     PostProcessList m_postProcessList;
     QnMutex m_updateMutex;
     QnWaitCondition m_waitCondition;
-    QnWaitCondition m_runnigAsyncOperationsCondition;
 
-    std::deque<Command> m_commandQueue;
+    std::vector<Command> m_commandQueue;
 };
 
 namespace detail {
@@ -254,6 +246,7 @@ public:
     void processUpdateAsync(
         QnTransaction<QueryDataType>& tran, HandlerType completionHandler, void* /*dummy*/ = 0)
     {
+        QnMutexLocker lock(m_owner->updateMutex());
         m_owner->commandQueue().push_back(
             Command{
                 [completionHandler = std::move(completionHandler)](ErrorCode errorCode)
@@ -274,21 +267,7 @@ public:
                         });
                 }
             });
-#if 0
-            [self = *this, tran = std::move(tran), handler = std::move(handler)]() mutable
-            {
-                self.executeTranCall(
-                    tran,
-                    handler,
-                    [self](
-                        QnTransaction<QueryDataType>& tran,
-                        PostProcessList* const transactionsPostProcessList) mutable -> ErrorCode
-                    {
-                        auto ErrorCode = self.processUpdateSync(tran, transactionsPostProcessList);
-                        return errorCode;
-                    });
-            });
-#endif
+        m_owner->waitCondition().wakeOne();
     }
 
     /**
@@ -504,7 +483,7 @@ private:
         if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_owner->commonModule(), m_db.userAccessData(), tran.params))
             return ErrorCode::forbidden;
 
-        postProcessList->push(std::bind(
+        postProcessList->push_back(std::bind(
             PostProcessTransactionFunction(), m_owner->messageBus(), createAuditDataCopy(), tran));
         return ErrorCode::ok;
     }
@@ -800,7 +779,7 @@ public:
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        transactionsPostProcessList->push(std::bind(
+        transactionsPostProcessList->push_back(std::bind(
             PostProcessTransactionFunction(),
             m_owner->messageBus(),
             createAuditDataCopy(),
@@ -911,7 +890,7 @@ public:
         HandlerType completionHandler,
         ApiCommand::Value subCommand)
     {
-
+        QnMutexLocker lock(m_owner->updateMutex());
         m_owner->commandQueue().push_back(
             Command{
                 [completionHandler = std::move(completionHandler)](ErrorCode errorCode)
@@ -932,26 +911,7 @@ public:
                         });
                 }
             });
-#if 0
-        m_owner->incRunningAsyncOperationsCount();
-        nx::utils::concurrent::run(Ec2ThreadPool::instance(),
-            [self = *this, multiTran = std::move(multiTran), handler = std::move(handler), subCommand]() mutable
-            {
-                self.executeTranCall(
-                    multiTran,
-                    handler,
-                    [self, subCommand](
-                        QnTransaction<QueryDataType>& multiTran,
-                        PostProcessList* const transactionsPostProcessList) mutable -> ErrorCode
-                    {
-                        auto errorCode = self.processMultiUpdateSync(
-                            subCommand, multiTran.transactionType, multiTran.params,
-                            transactionsPostProcessList);
-                        return errorCode;
-                    });
-                self.m_owner->decRunningAsyncOperationsCount();
-            });
-#endif
+        m_owner->waitCondition().wakeOne();
     }
 
 private:
