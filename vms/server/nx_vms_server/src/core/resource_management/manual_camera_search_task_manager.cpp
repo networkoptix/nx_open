@@ -111,16 +111,16 @@ QnManualResourceSearchList QnManualSearchTaskManager::foundResources() const
         return m_foundResources;
 
     QnManualResourceSearchList result;
-    std::promise<void> result_promise;
-    auto result_ready = result_promise.get_future();
+    std::promise<void> resultPromise;
+    auto resultReady = resultPromise.get_future();
     m_pollable.post(
-        [this, &result, &result_promise]()
+        [this, &result, &resultPromise]()
         {
             result = m_foundResources;
-            result_promise.set_value();
+            resultPromise.set_value();
         });
 
-    result_ready.wait();
+    resultReady.wait();
     return result;
 }
 

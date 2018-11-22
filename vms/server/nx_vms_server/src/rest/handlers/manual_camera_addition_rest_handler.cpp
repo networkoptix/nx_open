@@ -58,7 +58,6 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
             return nx::network::http::StatusCode::internalServerError;
         NX_VERBOSE(this, "Created search process with UUID=%1", processUuid);
 
-        // TODO: Check return code!
         searcher->second->run(
             [this](QnManualCameraSearcher*)
             {
@@ -66,7 +65,7 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
             },
             addr1, addr2, auth, port);
     }
-    // TODO: Nobody removes finished searchers!
+    // NOTE: Finished searchers are removed only in in stop request and destructor!
 
     QnManualCameraSearchReply reply(processUuid, getSearchStatus(processUuid));
     result.setReply(reply);

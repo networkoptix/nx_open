@@ -52,7 +52,7 @@ private:
     QnManualResourceSearchList m_results;
     std::atomic<QnManualResourceSearchStatus::State> m_state;
 
-    nx::network::aio::BasicPollable m_pollable;
+    mutable nx::network::aio::BasicPollable m_pollable;
     int m_hostRangeSize;
     QnIpRangeCheckerAsync m_ipChecker;
     QnManualSearchTaskManager m_taskManager;

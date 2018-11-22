@@ -106,66 +106,56 @@ void QnManualCameraSearcher::run(
         });
 }
 
-// TODO: should do from IOthread
 QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
 {
     QnManualCameraSearchProcessStatus result;
+    std::promise<void> resultPromise;
+    auto resultReady = resultPromise.get_future();
 
-    switch (m_state)
-    {
-        case QnManualResourceSearchStatus::CheckingHost:
+    m_pollable.dispatch(
+        [this, &result, &resultPromise]()
         {
-            result.cameras = m_taskManager.foundResources();
-            break;
-        }
-        case QnManualResourceSearchStatus::Finished:
-        case QnManualResourceSearchStatus::Aborted:
-        {
-            result.cameras = m_results;
-            break;
-        }
-        default:
-        {
-            break;
-        }
-    }
+            switch (m_state)
+            {
+                case QnManualResourceSearchStatus::Finished:
+                case QnManualResourceSearchStatus::Aborted:
+                {
+                    result.cameras = m_results;
+                    result.status = QnManualResourceSearchStatus(m_state, MAX_PERCENT, MAX_PERCENT);
+                    NX_DEBUG(this, "Status: %1 (%2 max)", result.status.current, result.status.total);
+                    break;
+                }
+                case QnManualResourceSearchStatus::CheckingOnline:
+                {
+                    Q_ASSERT(m_hostRangeSize);
+                    int currentProgress = m_hostRangeSize
+                        ? (int) m_ipChecker.hostsChecked() * PORT_SCAN_MAX_PROGRESS_PERCENT
+                            / m_hostRangeSize
+                        : 0;
 
-    switch (m_state)
-    {
-        case QnManualResourceSearchStatus::Finished:
-        case QnManualResourceSearchStatus::Aborted:
-        {
-            result.status = QnManualResourceSearchStatus(m_state, MAX_PERCENT, MAX_PERCENT);
-            NX_DEBUG(this, "Status: %1 (%2 max)", result.status.current, result.status.total);
-            break;
-        }
-        case QnManualResourceSearchStatus::CheckingOnline:
-        {
-            Q_ASSERT(m_hostRangeSize);
-            int currentProgress = m_hostRangeSize
-                ? (int) m_ipChecker.hostsChecked() * PORT_SCAN_MAX_PROGRESS_PERCENT
-                    / m_hostRangeSize
-                : 0;
+                    result.status = QnManualResourceSearchStatus(m_state, currentProgress, MAX_PERCENT);
+                    NX_DEBUG(this, "Status: %1 (%2 max)", result.status.current, result.status.total);
+                    break;
+                }
+                case QnManualResourceSearchStatus::CheckingHost:
+                {
+                    result.cameras = m_taskManager.foundResources();
+                    auto currentPercent = std::floor(0.5
+                        + (static_cast<double>(MAX_PERCENT) - PORT_SCAN_MAX_PROGRESS_PERCENT)
+                        * m_taskManager.doneToTotalTasksRatio()) + PORT_SCAN_MAX_PROGRESS_PERCENT;
+                    result.status = QnManualResourceSearchStatus(m_state, currentPercent, MAX_PERCENT);
+                    break;
+                }
+                default:
+                {
+                    result.status = QnManualResourceSearchStatus(m_state, 0, MAX_PERCENT);
+                    break;
+                }
+            }
+            resultPromise.set_value();
+        });
 
-            result.status = QnManualResourceSearchStatus(m_state, currentProgress, MAX_PERCENT);
-            NX_DEBUG(this, "Status: %1 (%2 max)", result.status.current, result.status.total);
-            break;
-        }
-        case QnManualResourceSearchStatus::CheckingHost:
-        {
-            auto currentPercent = std::floor(0.5
-                + (static_cast<double>(MAX_PERCENT) - PORT_SCAN_MAX_PROGRESS_PERCENT)
-                * m_taskManager.doneToTotalTasksRatio()) + PORT_SCAN_MAX_PROGRESS_PERCENT;
-            result.status = QnManualResourceSearchStatus(m_state, currentPercent, MAX_PERCENT);
-            break;
-        }
-        default:
-        {
-            result.status = QnManualResourceSearchStatus(m_state, 0, MAX_PERCENT);
-            break;
-        }
-    }
-
+    resultReady.wait();
     return result;
 }
 
