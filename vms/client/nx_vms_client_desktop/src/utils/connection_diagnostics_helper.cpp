@@ -354,6 +354,12 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
     QList<nx::utils::SoftwareVersion> versions;
     if (!getInstalledVersions(&versions))
         return handleApplauncherError(parentWidget);
+
+    QList<QString> versionStrings;
+    for (auto version: versions)
+        versionStrings.append(version.toString());
+    NX_INFO(typeid(QnConnectionDiagnosticsHelper))
+        << "handleCompatibilityMode() - have the following versions installed: " << versionStrings;
     bool isInstalled = versions.contains(connectionInfo.version);
     bool shouldAutoRestart = false;
 
@@ -372,28 +378,29 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
                 QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, parentWidget);
 
             dialog.addButton(tr("Download && Install"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
-            if (dialog.exec() != QDialogButtonBox::Cancel)
-            {
-                QScopedPointer<Dialog> installationDialog(new Dialog(connectionInfo, parentWidget));
 
-                //starting installation
-                installationDialog->exec();
-                // Possible scenarios: cancel, failed, success
-                auto result = installationDialog->installationResult();
-                if (result == Dialog::InstallResult::complete)
-                {
-                    isInstalled = true;
-                    shouldAutoRestart = installationDialog->shouldAutoRestart();
-                }
-                else
-                {
-                    QnMessageBox dialog(QnMessageBoxIcon::Critical,
-                        tr("Failed to enter compatibility mode for version %1").arg(versionString), extras,
-                        QDialogButtonBox::Ok, QDialogButtonBox::NoButton, parentWidget);
-                    dialog.exec();
-                }
+            if (dialog.exec() == QDialogButtonBox::Cancel)
+                return Qn::IncompatibleVersionConnectionResult;
+
+            QScopedPointer<Dialog> installationDialog(new Dialog(connectionInfo, parentWidget));
+
+            //starting installation
+            installationDialog->exec();
+            // Possible scenarios: cancel, failed, success
+            auto result = installationDialog->installationResult();
+            if (result == Dialog::InstallResult::complete)
+            {
+                isInstalled = true;
+                shouldAutoRestart = installationDialog->shouldAutoRestart();
             }
-            return Qn::IncompatibleVersionConnectionResult;
+            else
+            {
+                QnMessageBox dialog(QnMessageBoxIcon::Critical,
+                    tr("Failed to enter compatibility mode for version %1").arg(versionString), extras,
+                    QDialogButtonBox::Ok, QDialogButtonBox::NoButton, parentWidget);
+                dialog.exec();
+                return Qn::IncompatibleVersionConnectionResult;
+            }
         }
 
         //version is installed, trying to run
@@ -442,27 +449,27 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
                 dialog.addButton(
                     tr("Try Again"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
 
-                if (dialog.exec() != QDialogButtonBox::Cancel)
+                if (dialog.exec() == QDialogButtonBox::Cancel)
+                    return Qn::IncompatibleVersionConnectionResult;
+
+                //starting installation
+                QScopedPointer<Dialog> installationDialog(new Dialog(connectionInfo, parentWidget));
+                installationDialog->exec();
+                auto result = installationDialog->installationResult();
+                if (result == Dialog::InstallResult::complete)
                 {
-                    //starting installation
-                    QScopedPointer<Dialog> installationDialog(new Dialog(connectionInfo, parentWidget));
-                    installationDialog->exec();
-                    auto result = installationDialog->installationResult();
-                    if (result == Dialog::InstallResult::complete)
-                    {
-                        isInstalled = true;
-                        shouldAutoRestart = installationDialog->shouldAutoRestart();
-                        continue;   //offering to start newly-installed compatibility version
-                    }
-                    else
-                    {
-                        QnMessageBox dialog(QnMessageBoxIcon::Critical,
-                            tr("Failed to enter compatibility mode for version %1").arg(versionString), extras,
-                            QDialogButtonBox::Ok, QDialogButtonBox::NoButton, parentWidget);
-                        dialog.exec();
-                    }
+                    isInstalled = true;
+                    shouldAutoRestart = installationDialog->shouldAutoRestart();
+                    continue;   //offering to start newly-installed compatibility version
                 }
-                return Qn::IncompatibleVersionConnectionResult;
+                else
+                {
+                    QnMessageBox dialog(QnMessageBoxIcon::Critical,
+                        tr("Failed to enter compatibility mode for version %1").arg(versionString), extras,
+                        QDialogButtonBox::Ok, QDialogButtonBox::NoButton, parentWidget);
+                    dialog.exec();
+                    return Qn::IncompatibleVersionConnectionResult;
+                }
             }
         } // switch restartClient
 

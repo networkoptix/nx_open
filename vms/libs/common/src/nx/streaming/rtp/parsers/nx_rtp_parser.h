@@ -1,7 +1,8 @@
 #pragma once
 
-#include <QByteArray>
-#include <QMap>
+#include <QtCore/QByteArray>
+#include <QtCore/QMap>
+#include <QtCore/QFile>
 
 #include <nx/streaming/rtp/parsers/rtp_stream_parser.h>
 #include <nx/debugging/abstract_visual_metadata_debugger.h>
@@ -14,7 +15,7 @@ public:
     /** @param debugSourceId Human-readable stream source id for logging. */
     QnNxRtpParser(const QString& debugSourceId = QString());
 
-    virtual ~QnNxRtpParser();
+    virtual ~QnNxRtpParser() override;
 
     virtual void setSdpInfo(const Sdp::Media& /*sdp*/) override {};
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, bool& gotData) override;

@@ -4,44 +4,6 @@
 
 #include <QtCore/QString>
 
-/**
- * Remove directory recursively.
- *
- * \param dirName                       Name of the directory to remove.
- * \returns                             Whether the operation completer successfully.
- */
-bool removeDir(const QString &dirName);
-
-/**
- * Convert path from native to universal.
- *
- * \param path                          Path to convert.
- * \returns                             Converted path.
- */
-QString fromNativePath(const QString &path);
-
-/**
- * \returns                             User movies directory.
- */
-QString getMoviesDirectory();
-
-/**
- * \returns                             User backrounds directory.
- */
-QString getBackgroundsDirectory();
-
-/**
- * \param num                           Number.
- * \returns                             Number of digits in decimal representation of the given number.
- */
-int digitsInNumber(unsigned num);
-
-/**
- * Gets param from string;   for example str= {param1="param_val" sdhksjh}
- * function return param_val
- */
-QString getParamFromString(const QString &str, const QString &param);
-
 QString strPadLeft(const QString &str, int len, char ch);
 
 QString closeDirPath(const QString &value);
@@ -89,10 +51,5 @@ static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1000000ll * 3600*24*100;
  * \returns                             has of string. Added for compatibility with QT4 code
  */
 uint qt4Hash(const QString& key);
-
-#ifdef _DEBUG
-QString debugTime(qint64 timeMSec, const QString &fmt = QString());
-#endif
-
 
 QString mksecToDateTime(qint64 valueUsec);

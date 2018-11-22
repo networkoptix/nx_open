@@ -6,6 +6,8 @@
 #include <QtCore/QString>
 #include <QtCore/QLocale>
 
+#include <nx/utils/literal.h>
+
 namespace datetime {
 
 namespace {
@@ -13,7 +15,8 @@ namespace {
 // This class is to define context for Qt Linguist only.
 class DateTimeFormats
 {
-    Q_DECLARE_TR_FUNCTIONS(DateTimeFormats);
+    Q_DECLARE_TR_FUNCTIONS(DateTimeFormats)
+
 public:
     static void setFormats();
 };

@@ -315,15 +315,16 @@ void EventPanel::Private::MotionSearchSynchronizer::syncPanelWithWidget()
     const bool on = widget()->isMotionSearchModeEnabled();
     const bool fromOtherTab = m_state == State::irrelevant;
 
-    m_main->m_motionTab->setSingleCameraMode(on);
     if (on)
     {
+        m_main->m_motionTab->selectCameras(AbstractSearchWidget::Cameras::current);
         m_revertTab = fromOtherTab ? m_main->m_tabs->currentWidget() : nullptr;
         m_main->m_tabs->setCurrentWidget(m_main->m_motionTab);
         handleMotionSelectionChanged();
     }
     else
     {
+        m_main->m_motionTab->selectCameras(m_main->m_motionTab->previousCameras());
         if (m_revertTab)
             m_main->m_tabs->setCurrentWidget(m_revertTab);
     }

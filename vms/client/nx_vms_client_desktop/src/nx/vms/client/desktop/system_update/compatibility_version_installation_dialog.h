@@ -15,10 +15,12 @@ namespace Ui {
 class QnCompatibilityVersionInstallationDialog;
 }
 
+namespace nx::update { struct UpdateContents; }
 namespace nx::vms::client::desktop { class ClientUpdateTool; }
 
 // TODO: #dklychkov rename class in 2.4
-class CompatibilityVersionInstallationDialog: public Connective<QnDialog>
+class CompatibilityVersionInstallationDialog:
+    public Connective<QnDialog>
 {
     Q_OBJECT
     using base_type = Connective<QnDialog>;
@@ -49,6 +51,7 @@ protected:
     int installUpdate();
     void atUpdateStateChanged(int state, int progress);
     void atAutoRestartChanged(int state);
+    void atRecievedUpdateContents(const nx::update::UpdateContents& contents);
     void setMessage(const QString& message);
 
     QScopedPointer<Ui::QnCompatibilityVersionInstallationDialog> m_ui;

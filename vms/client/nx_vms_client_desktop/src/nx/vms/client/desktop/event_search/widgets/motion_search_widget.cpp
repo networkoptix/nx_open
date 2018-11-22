@@ -30,6 +30,8 @@ MotionSearchWidget::MotionSearchWidget(QnWorkbenchContext* context, QWidget* par
         | Control::previewsToggler);
     setPlaceholderPixmap(qnSkin->pixmap("events/placeholders/motion.png"));
 
+    selectCameras(AbstractSearchWidget::Cameras::current);
+
     installEventHandler(this, {QEvent::Show, QEvent::Hide},
         this, &MotionSearchWidget::updateTimelineDisplay);
 
@@ -62,6 +64,12 @@ void MotionSearchWidget::setFilterRegions(const QList<QRegion>& value)
     auto model = motionModel(this);
     model->setFilterRegions(value);
     setWholeArea(model->isFilterEmpty());
+}
+
+void MotionSearchWidget::resetFilters()
+{
+    base_type::resetFilters();
+    selectCameras(AbstractSearchWidget::Cameras::current);
 }
 
 void MotionSearchWidget::updateTimelineDisplay()

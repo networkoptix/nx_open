@@ -31,6 +31,9 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
     connect(m_downloader.get(), &Downloader::fileStatusChanged,
         this, &ClientUpdateTool::atDownloaderStatusChanged);
 
+    connect(m_downloader.get(), &Downloader::fileInformationChanged,
+        this, &ClientUpdateTool::atDownloaderStatusChanged);
+
     connect(m_downloader.get(), &Downloader::chunkDownloadFailed,
         this, &ClientUpdateTool::atChunkDownloadFailed);
 
@@ -178,7 +181,7 @@ void ClientUpdateTool::downloadUpdate(const UpdateContents& contents)
                 break;
             case Code::fileAlreadyExists:
                 NX_VERBOSE(this) << "requestStartUpdate() - file is already here"
-                    << info.name;
+                    << m_updateFile;
                 setState(State::readyInstall);
                 break;
             default:
@@ -223,7 +226,7 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
             break;
         case FileInformation::Status::downloading:
             m_progress = fileInformation.calculateDownloadProgress();
-            emit updateStateChanged(int(FileInformation::Status::downloading), m_progress);
+            emit updateStateChanged(int(State::downloading), m_progress);
             break;
         default:
             // Nothing to do here
@@ -298,7 +301,7 @@ bool ClientUpdateTool::installUpdate()
                 return true;
 
             case Result::ok:
-                setState(State::installing);
+                setState(State::complete);
                 return true;
 
             case Result::otherError:

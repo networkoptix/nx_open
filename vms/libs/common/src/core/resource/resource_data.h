@@ -7,6 +7,8 @@
 
 #include <utils/common/warnings.h>
 
+class QnJsonContext;
+
 class QnResourceData {
 public:
     QnResourceData() {}

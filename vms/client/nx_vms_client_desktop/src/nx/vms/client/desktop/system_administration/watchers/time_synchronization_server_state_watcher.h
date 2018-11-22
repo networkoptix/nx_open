@@ -18,7 +18,7 @@ class TimeSynchronizationServerStateWatcher:
 {
     Q_OBJECT
     using base_type = QObject;
-    
+
 public:
     explicit TimeSynchronizationServerStateWatcher(TimeSynchronizationWidgetStore* store,
         QObject* parent = nullptr);

@@ -27,6 +27,7 @@
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
 #include <nx/utils/random.h>
+#include <nx/utils/guarded_callback.h>
 
 #include <nx/update/update_information.h>
 #include <nx/update/update_check.h>
@@ -70,11 +71,11 @@ void QnWorkbenchUpdateWatcher::atStartCheckUpdate()
     if (m_updateInfo.valid())
         return;
     QString updateUrl = qnSettings->updateFeedUrl();
-    auto callback = [watcher=QPointer(this)](const UpdateContents& contents)
+    auto callback = nx::utils::guarded(this,
+        [this](const UpdateContents& contents)
         {
-            if (watcher)
-                watcher->atCheckerUpdateAvailable(contents);
-        };
+            atCheckerUpdateAvailable(contents);
+        });
     m_updateInfo = nx::update::checkLatestUpdate(updateUrl, std::move(callback));
 }
 
@@ -86,32 +87,32 @@ void QnWorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& co
     if (!contents.info.isValid())
         return;
 
-    /* We are not interested in updates right now. */
+    // We are not interested in updates right now.
     if (!m_timer->isActive())
         return;
 
-    /* We have no access rights. */
+    // We have no access rights.
     if (!menu()->canTrigger(action::SystemUpdateAction))
         return;
 
     auto targetVersion = contents.getVersion();
-    /* User was already notified about this release. */
+    // User was already notified about this release.
     if (m_notifiedVersion == targetVersion)
         return;
 
-    /* Current version is greater or equal to latest. */
+    // Current version is greater or equal to latest.
     if (qnStaticCommon->engineVersion() >= targetVersion)
         return;
 
-    /* User is not interested in this update. */
+    // User is not interested in this update.
     if (qnSettings->ignoredUpdateVersion() >= targetVersion)
         return;
 
-    /* Administrator disabled update notifications globally. */
+    // Administrator disabled update notifications globally.
     if (!qnGlobalSettings->isUpdateNotificationsEnabled())
         return;
 
-    /* Do not show notifications near the end of the week or on our holidays. */
+    // Do not show notifications near the end of the week or on our holidays.
      if (QDateTime::currentDateTime().date().dayOfWeek() >= kTooLateDayOfWeek)
          return;
 
@@ -126,18 +127,20 @@ void QnWorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& co
         || oldUpdateInfo.releaseDateMs != releaseDateMs
         || oldUpdateInfo.releaseDeliveryDays != releaseDeliveryDays)
     {
-        /* New release was published - or we decided to change delivery period. Estimating new delivery date. */
+        // New release was published - or we decided to change delivery period.
+        // Estimating new delivery date.
         QDateTime releaseDate = QDateTime::fromMSecsSinceEpoch(releaseDateMs);
 
-        /* We do not need high precision, selecting time to deliver. */
-        int timeToDeliverMinutes = nx::utils::random::number(0, releaseDeliveryDays * kHoursPerDay * kMinutesPerHour);
+        // We do not need high precision, selecting time to deliver.
+        int timeToDeliverMinutes = nx::utils::random::number(0,
+            releaseDeliveryDays * kHoursPerDay * kMinutesPerHour);
         qint64 timeToDeliverMs = timeToDeliverMinutes * kSecsPerMinute;
         qnSettings->setUpdateDeliveryDate(releaseDate.addSecs(timeToDeliverMs).toMSecsSinceEpoch());
     }
     qnSettings->setLatestUpdateInfo(contents.info);
     qnSettings->save();
 
-    /* Update is postponed */
+    // Update is postponed
     if (qnSettings->updateDeliveryDate() > QDateTime::currentMSecsSinceEpoch())
         return;
 

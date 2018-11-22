@@ -84,8 +84,8 @@ public:
     Cameras selectedCameras() const;
     QnVirtualCameraResourceSet cameras() const;
 
-    /** Temporarily set Cameras::current mode, or restore previous mode. */
-    void setSingleCameraMode(bool value);
+    void selectCameras(Cameras value);
+    Cameras previousCameras() const;
 
     QString textFilter() const;
     bool wholeArea() const;

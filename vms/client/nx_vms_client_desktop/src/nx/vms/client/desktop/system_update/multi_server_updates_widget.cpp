@@ -621,7 +621,6 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
         int newEula = m_updateInfo.info.eulaVersion;
         const bool showEula =  acceptedEula < newEula;
 
-        // FIXME: #GDM Eula message displaying must not be in the `context()` interface.
         if (showEula && !context()->showEulaMessage(m_updateInfo.eulaPath))
         {
             return;
@@ -1315,8 +1314,11 @@ void MultiServerUpdatesWidget::syncUpdateCheck()
 {
     bool isChecking = m_updateCheck.valid();
     bool hasEqualUpdateInfo = m_updatesModel->lowestInstalledVersion() >= m_updateInfo.getVersion();
-    bool hasLatestVersion = ((m_updateInfo.isValid() || hasEqualUpdateInfo || m_updateInfo.alreadyInstalled)
-        || m_updateInfo.error == nx::update::InformationError::noNewVersion);
+    bool hasLatestVersion = false;
+    if (!m_updateInfo.isValid() || m_updateInfo.error == nx::update::InformationError::noNewVersion)
+        hasLatestVersion = true;
+    else if (hasEqualUpdateInfo || m_updateInfo.alreadyInstalled)
+        hasLatestVersion = false;
 
     if (m_updateStateCurrent != WidgetUpdateState::ready
         && m_updateStateCurrent != WidgetUpdateState::initial
@@ -1330,7 +1332,6 @@ void MultiServerUpdatesWidget::syncUpdateCheck()
     ui->updateStackedWidget->setVisible(!isChecking);
     ui->selectUpdateTypeButton->setEnabled(!isChecking);
 
-    // NOTE: I broke my brain here. Twice.
     if (isChecking)
     {
         ui->versionStackedWidget->setCurrentWidget(ui->checkingPage);

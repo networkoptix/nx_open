@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 namespace nx {
 namespace media_utils {
 namespace hevc {
