@@ -1,14 +1,15 @@
 #pragma once
 
-#include "detail/i_p2p_transport_delegate.h"
-#include <memory>
+#include "../i_p2p_transport.h"
+#include <nx/network/websocket/websocket.h>
 
-namespace nx::network {
+namespace nx::network::detail {
 
-class P2PTransport: public detail::IP2PSocketDelegate
+class NX_NETWORK_API P2BaseWebsocketTransport: public IP2PTransport
 {
 public:
-    P2PTransport(std::unique_ptr<detail::IP2PSocketDelegate> transportDelegate);
+    P2BaseWebsocketTransport(std::unique_ptr<AbstractStreamSocket> streamSocket,
+        websocket::FrameType frameType = websocket::FrameType::binary);
 
     virtual void readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler) override;
     virtual void sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler) override;
@@ -19,8 +20,7 @@ public:
     virtual SocketAddress getForeignAddress() const override;
 
 private:
-    std::unique_ptr<detail::IP2PSocketDelegate> m_transportDelegate;
+    WebSocketPtr m_webSocket;
 };
 
-using P2pTransportPtr = std::unique_ptr<P2PTransport>;
-} // namespace nx::network
+} // namespace nx::network::detail

@@ -1,8 +1,8 @@
-#include "p2p_transport_websocket_delegate.h"
+#include "p2p_base_websocket_transport.h"
 
 namespace nx::network::detail {
 
-P2TransportWebsocketDelegate::P2TransportWebsocketDelegate(
+P2BaseWebsocketTransport::P2BaseWebsocketTransport(
     std::unique_ptr<AbstractStreamSocket> streamSocket,
     websocket::FrameType frameType)
     :
@@ -13,38 +13,38 @@ P2TransportWebsocketDelegate::P2TransportWebsocketDelegate(
     m_webSocket->start();
 }
 
-void P2TransportWebsocketDelegate::readSomeAsync(nx::Buffer* const buffer,
+void P2BaseWebsocketTransport::readSomeAsync(nx::Buffer* const buffer,
     IoCompletionHandler handler)
 {
     m_webSocket->readSomeAsync(buffer, std::move(handler));
 }
 
-void P2TransportWebsocketDelegate::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
+void P2BaseWebsocketTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
 {
     m_webSocket->sendAsync(buffer, std::move(handler));
 }
 
-void P2TransportWebsocketDelegate::bindToAioThread(aio::AbstractAioThread* aioThread)
+void P2BaseWebsocketTransport::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     m_webSocket->bindToAioThread(aioThread);
 }
 
-void P2TransportWebsocketDelegate::cancelIoInAioThread(nx::network::aio::EventType eventType)
+void P2BaseWebsocketTransport::cancelIoInAioThread(nx::network::aio::EventType eventType)
 {
     m_webSocket->cancelIoInAioThread(eventType);
 }
 
-aio::AbstractAioThread* P2TransportWebsocketDelegate::getAioThread() const
+aio::AbstractAioThread* P2BaseWebsocketTransport::getAioThread() const
 {
     return m_webSocket->getAioThread();
 }
 
-void P2TransportWebsocketDelegate::pleaseStopSync()
+void P2BaseWebsocketTransport::pleaseStopSync()
 {
     m_webSocket->pleaseStopSync();
 }
 
-SocketAddress P2TransportWebsocketDelegate::getForeignAddress() const
+SocketAddress P2BaseWebsocketTransport::getForeignAddress() const
 {
     return m_webSocket->socket()->getForeignAddress();
 }
