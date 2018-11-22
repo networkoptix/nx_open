@@ -207,8 +207,11 @@ private:
     static QnMutex m_commonMutex;
 };
 
+std::map<QnUuid, std::unique_ptr<QnMutex>> ConnectionLocker::m_mutexList{};
+QnMutex ConnectionLocker::m_commonMutex;
+
 bool ConnectionProcessor::tryAcquireConnecting(
-    ec2::ConnectionLockGuard& connectionLockGuard, 
+    ec2::ConnectionLockGuard& connectionLockGuard,
     const vms::api::PeerDataEx& remotePeer)
 {
     Q_D(QnTCPConnectionProcessor);
@@ -235,7 +238,7 @@ bool ConnectionProcessor::tryAcquireConnecting(
 }
 
 bool ConnectionProcessor::tryAcquireConnected(
-    ec2::ConnectionLockGuard& connectionLockGuard, 
+    ec2::ConnectionLockGuard& connectionLockGuard,
     const vms::api::PeerDataEx& remotePeer)
 {
     if (!connectionLockGuard.tryAcquireConnected() ||    //< lock failed
@@ -319,16 +322,16 @@ void ConnectionProcessor::run()
     d->socket->setNonBlockingMode(true);
     auto keepAliveTimeout = std::chrono::milliseconds(remotePeer.aliveUpdateIntervalMs);
 
-    std::unique_ptr<P2PTransport> p2pTransport;
+    P2pTransportPtr p2pTransport;
     if (useWebSocket)
     {
-        auto dataFormat = remotePeer.dataFormat == Qn::JsonFormat 
+        auto dataFormat = remotePeer.dataFormat == Qn::JsonFormat
             ? websocket::FrameType::text : websocket::FrameType::binary;
         p2pTransport = std::make_unique<P2PWebsocketServerTransport>(std::move(d->socket), dataFormat);
     }
     else
     {
-        p2pTransport = std::make_unique<P2PHttpServerTransport>(std::move(d->socket), 
+        p2pTransport = std::make_unique<P2PHttpServerTransport>(std::move(d->socket),
             Qn::serializationFormatToHttpContentType(remotePeer.dataFormat));
     }
 

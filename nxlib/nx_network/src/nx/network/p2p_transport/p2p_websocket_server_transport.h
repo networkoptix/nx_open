@@ -1,11 +1,11 @@
 #pragma once
 
-#include <nx/network/p2p_transport/p2p_transport.h>
+#include <nx/network/p2p_transport/detail/p2p_base_websocket_transport.h>
 #include <nx/network/websocket/websocket_common_types.h>
 
 namespace nx::network {
 
-class P2PWebsocketServerTransport: public P2PTransport
+class NX_NETWORK_API P2PWebsocketServerTransport: public detail::P2BaseWebsocketTransport
 {
 public:
     P2PWebsocketServerTransport(std::unique_ptr<AbstractStreamSocket> socket,

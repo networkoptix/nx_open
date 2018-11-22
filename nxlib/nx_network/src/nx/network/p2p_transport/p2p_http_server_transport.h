@@ -1,16 +1,17 @@
 #pragma once
 
-#include <nx/network/p2p_transport/p2p_transport.h>
+#include <nx/network/p2p_transport/detail/p2p_base_http_transport.h>
 #include <nx/network/websocket/websocket_common_types.h>
 
 namespace nx::network {
 
-class P2PHttpServerTransport: public P2PTransport
+class NX_NETWORK_API P2PHttpServerTransport: public detail::P2PBaseHttpTransport
 {
 public:
       P2PHttpServerTransport(
           std::unique_ptr<AbstractStreamSocket> socket,
-          const QByteArray& contentType);
+          const QByteArray& contentType,
+          websocket::FrameType frameType = websocket::FrameType::binary);
 
     void gotPostConnection(std::unique_ptr<AbstractStreamSocket> socket);
 };
