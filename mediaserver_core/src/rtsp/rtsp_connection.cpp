@@ -341,7 +341,10 @@ void QnRtspConnectionProcessor::parseRequest()
     QString codec = urlQuery.queryItemValue("codec");
     if (!codec.isEmpty())
     {
-        AVCodec* avCodec = avcodec_find_encoder_by_name(codec.toLatin1().data());
+        QString codecLower = codec.toLower();
+        if (codecLower == "h264")
+            codecLower = "libopenh264";
+        AVCodec* avCodec = avcodec_find_encoder_by_name(codecLower.toLatin1().data());
         if (avCodec)
             d->transcodeParams.codecId = avCodec->id;
 
