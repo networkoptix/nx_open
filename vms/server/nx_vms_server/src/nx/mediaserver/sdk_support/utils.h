@@ -9,7 +9,7 @@
 
 #include <nx/utils/std/optional.h>
 #include <nx/utils/log/log_level.h>
-#include <nx/utils/meta/member_detector.h>
+#include <nx/utils/member_detector.h>
 
 #include <nx/sdk/common.h>
 #include <nx/sdk/analytics/uncompressed_video_frame.h>
@@ -45,9 +45,9 @@ namespace nx::mediaserver::sdk_support {
 
 namespace detail {
 
-DECLARE_FIELD_DETECTOR(hasGroupId, groupId, std::set<QString>);
-DECLARE_FIELD_DETECTOR(hasPaths, paths, std::set<nx::vms::api::analytics::HierarchyPath>);
-DECLARE_FIELD_DETECTOR_SIMPLE(hasItem, item);
+NX_UTILS_DECLARE_FIELD_DETECTOR(hasGroupId, groupId, std::set<QString>);
+NX_UTILS_DECLARE_FIELD_DETECTOR(hasPaths, paths, std::set<nx::vms::api::analytics::HierarchyPath>);
+NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(hasItem, item);
 
 } // namespace detail
 

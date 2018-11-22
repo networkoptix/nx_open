@@ -348,18 +348,16 @@ nx::vms::common::AnalyticsPluginResourcePtr
     QnMServerResourceDiscoveryManager::createAnalyticsPluginResource(
         const QnResourceParams& /*parameters*/)
 {
-    namespace mserver = nx::mediaserver::resource;
-    return mserver::AnalyticsPluginResourcePtr(
-        new mserver::AnalyticsPluginResource(m_serverModule));
+    return nx::mediaserver::resource::AnalyticsPluginResourcePtr(
+        new nx::mediaserver::resource::AnalyticsPluginResource(m_serverModule));
 }
 
 nx::vms::common::AnalyticsEngineResourcePtr
     QnMServerResourceDiscoveryManager::createAnalyticsEngineResource(
         const QnResourceParams& /*parameters*/)
 {
-    namespace mserver = nx::mediaserver::resource;
-    return mserver::AnalyticsEngineResourcePtr(
-        new mserver::AnalyticsEngineResource(m_serverModule));
+    return nx::mediaserver::resource::AnalyticsEngineResourcePtr(
+        new nx::mediaserver::resource::AnalyticsEngineResource(m_serverModule));
 }
 
 bool QnMServerResourceDiscoveryManager::hasIpConflict(const QSet<QnNetworkResourcePtr>& cameras)

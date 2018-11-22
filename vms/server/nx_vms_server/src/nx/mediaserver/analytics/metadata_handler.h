@@ -25,9 +25,11 @@ class MetadataHandler:
     public QObject,
     public ServerModuleAware
 {
-    Q_OBJECT;
-    using DescriptorMap = std::map<QString, nx::vms::api::analytics::EventTypeDescriptor>;
+    Q_OBJECT
+
 public:
+    using DescriptorMap = std::map<QString, nx::vms::api::analytics::EventTypeDescriptor>;
+
     MetadataHandler(QnMediaServerModule* serverModule);
 
     void handleMetadata(nx::sdk::analytics::MetadataPacket* metadata);

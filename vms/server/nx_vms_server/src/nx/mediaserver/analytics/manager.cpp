@@ -504,11 +504,11 @@ QWeakPointer<QnAbstractDataReceptor> Manager::metadataSink(
 
 QWeakPointer<QnAbstractDataReceptor> Manager::metadataSink(const QnUuid& deviceId) const
 {
-    auto itr = m_metadataSinks.find(deviceId);
-    if (itr == m_metadataSinks.cend())
+    auto it = m_metadataSinks.find(deviceId);
+    if (it == m_metadataSinks.cend())
         return QWeakPointer<QnAbstractDataReceptor>();
 
-    return itr->second;
+    return it->second;
 }
 
 QWeakPointer<ProxyVideoDataReceptor> Manager::mediaSource(
@@ -519,11 +519,11 @@ QWeakPointer<ProxyVideoDataReceptor> Manager::mediaSource(
 
 QWeakPointer<ProxyVideoDataReceptor> Manager::mediaSource(const QnUuid& deviceId) const
 {
-    auto itr = m_mediaSources.find(deviceId);
-    if (itr == m_mediaSources.cend())
+    auto it = m_mediaSources.find(deviceId);
+    if (it == m_mediaSources.cend())
         return QWeakPointer<ProxyVideoDataReceptor>();
 
-    return itr->second;
+    return it->second;
 }
 
 } // namespace nx::mediaserver::analytics

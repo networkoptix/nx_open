@@ -182,8 +182,8 @@ void DeviceAnalyticsContext::putFrame(
         uncompressedFrame ? "uncompressedFrame" : "/*uncompressedFrame*/ nullptr");
 
     FrameConverter frameConverter(
-        [&]() { return compressedFrame; },
-        [&, this]()
+        [&compressedFrame]() { return compressedFrame; },
+        [&uncompressedFrame, this]()
         {
             if (!uncompressedFrame)
                 issueMissingUncompressedFrameWarningOnce();

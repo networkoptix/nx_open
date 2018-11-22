@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/utils/meta/member_detector.h>
+#include <nx/utils/member_detector.h>
 
 namespace {
 
@@ -34,11 +34,11 @@ struct HasSomeMethod
     int method(double& /*someArg*/) { return 0; };
 };
 
-DECLARE_FIELD_DETECTOR(hasStringField, stringField, QString);
-DECLARE_FIELD_DETECTOR(hasStructField, structField, HasStringField);
-DECLARE_METHOD_DETECTOR(hasSomeMethod, method, int(double&));
-DECLARE_FIELD_DETECTOR(hasTemplatedField, templatedField, std::set<QString>);
-DECLARE_FIELD_DETECTOR_SIMPLE(hasStringFieldSimple, stringField);
+NX_UTILS_DECLARE_FIELD_DETECTOR(hasStringField, stringField, QString);
+NX_UTILS_DECLARE_FIELD_DETECTOR(hasStructField, structField, HasStringField);
+NX_UTILS_DECLARE_METHOD_DETECTOR(hasSomeMethod, method, int(double&));
+NX_UTILS_DECLARE_FIELD_DETECTOR(hasTemplatedField, templatedField, std::set<QString>);
+NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(hasStringFieldSimple, stringField);
 
 } // namespace
 

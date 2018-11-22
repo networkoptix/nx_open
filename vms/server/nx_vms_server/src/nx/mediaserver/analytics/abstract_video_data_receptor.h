@@ -22,14 +22,13 @@ public:
     virtual NeededUncompressedPixelFormats neededUncompressedPixelFormats() const = 0;
 
     /**
-    * Call the callback for a video frame.
-    * @param compressedFrame Not null.
-    * @param uncompressedFrame Can be null if uncompressed frame will not be needed.
-    */
+     * Call the callback for a video frame.
+     * @param compressedFrame Not null.
+     * @param uncompressedFrame Can be null if uncompressed frame would not be needed.
+     */
     virtual void putFrame(
         const QnConstCompressedVideoDataPtr& compressedFrame,
         const CLConstVideoDecoderOutputPtr& uncompressedFrame) = 0;
-
 };
 
 using AbstractVideoDataReceptorPtr = QSharedPointer<AbstractVideoDataReceptor>;

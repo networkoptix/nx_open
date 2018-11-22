@@ -5,14 +5,13 @@
 
 #include <nx/mediaserver/sdk_support/utils.h>
 #include <nx/mediaserver/sdk_support/pointers.h>
-#include <nx/mediaserver/analytics/sdk_object_factory.h>
 #include <nx/mediaserver/analytics/debug_helpers.h>
 #include <nx/mediaserver/interactive_settings/json_engine.h>
 
 #include <nx/vms/api/analytics/descriptors.h>
 
 #include <nx/sdk/analytics/plugin.h>
-#include <nx/utils/meta/member_detector.h>
+#include <nx/utils/member_detector.h>
 #include <nx/analytics/descriptor_list_manager.h>
 
 namespace nx::mediaserver::resource {

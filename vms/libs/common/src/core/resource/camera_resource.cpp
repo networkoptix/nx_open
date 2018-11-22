@@ -500,18 +500,14 @@ const nx::vms::common::AnalyticsEngineResourceList
         return AnalyticsEngineResourceList();
 
     auto common = commonModule();
-    if (!common)
-    {
-        NX_ASSERT(false, "Can't access common module");
+    if (!NX_ASSERT(common, "Can't access common module"))
         return AnalyticsEngineResourceList();
-    }
 
-    return common->resourcePool()
-        ->getResources<nx::vms::common::AnalyticsEngineResource>(
-            [&enabledEngines](const AnalyticsEngineResourcePtr& engineResource)
-    {
-        return enabledEngines.find(engineResource->getId()) != enabledEngines.cend();
-    });
+    return common->resourcePool()->getResources<nx::vms::common::AnalyticsEngineResource>(
+        [&enabledEngines](const AnalyticsEngineResourcePtr& engineResource)
+        {
+            return enabledEngines.find(engineResource->getId()) != enabledEngines.cend();
+        });
 }
 
 QSet<QnUuid> QnVirtualCameraResource::enabledAnalyticsEngines() const

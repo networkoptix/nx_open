@@ -12,6 +12,8 @@ class CommonStringList: public IStringList
 {
 public:
     virtual int count() const override;
+
+    /** @return Null if index is incorrect. */
     virtual const char* at(int index) const override;
 
     void addString(std::string str);

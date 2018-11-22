@@ -23,6 +23,7 @@ class DeviceAnalyticsContext:
     public AbstractVideoDataReceptor
 {
     using base_type = nx::mediaserver::ServerModuleAware;
+
 public:
     DeviceAnalyticsContext(
         QnMediaServerModule* severModule,

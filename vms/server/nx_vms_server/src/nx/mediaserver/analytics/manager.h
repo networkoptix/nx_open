@@ -41,6 +41,7 @@ class Manager final:
     public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
+
 public:
     Manager(QnMediaServerModule* serverModule);
     ~Manager();
@@ -53,7 +54,6 @@ public:
 
     void at_resourceParentIdChanged(const QnResourcePtr& resource);
     void at_resourcePropertyChanged(const QnResourcePtr& resource, const QString& propertyName);
-
 
     void registerMetadataSink(
         const QnResourcePtr& device,
@@ -112,7 +112,7 @@ private:
 
     std::map<QnUuid, QSharedPointer<DeviceAnalyticsContext>> m_deviceAnalyticsContexts;
 
-    // TODO: switch to std pointers.
+    // TODO: Switch to std pointers.
     std::map<QnUuid, QWeakPointer<QnAbstractDataReceptor>> m_metadataSinks;
     std::map<QnUuid, QSharedPointer<ProxyVideoDataReceptor>> m_mediaSources;
 };

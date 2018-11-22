@@ -342,17 +342,11 @@ std::optional<EngineManifest> DeviceAnalyticsBinding::engineManifest() const
 sdk_support::SharedPtr<DeviceAnalyticsBinding::DeviceAgent>
     DeviceAnalyticsBinding::createDeviceAgent()
 {
-    if (!m_device)
-    {
-        NX_ASSERT(false, "Device is empty");
+    if (!NX_ASSERT(m_device, "Device is empty"))
         return nullptr;
-    }
 
-    if (!m_engine)
-    {
-        NX_ASSERT(false, "Engine is empty");
+    if (!NX_ASSERT(m_engine, "Engine is empty"))
         return nullptr;
-    }
 
     NX_DEBUG(
         this,
@@ -409,11 +403,8 @@ sdk_support::SharedPtr<DeviceAnalyticsBinding::DeviceAgent>
 
 std::unique_ptr<DeviceAgentHandler> DeviceAnalyticsBinding::createHandler()
 {
-    if (!m_engine)
-    {
-        NX_ASSERT(false, "No analytics engine is set");
+    if (!NX_ASSERT(m_engine, "No analytics engine is set"))
         return nullptr;
-    }
 
     const auto descriptorListManager = serverModule()
         ->commonModule()
@@ -431,17 +422,11 @@ std::unique_ptr<DeviceAgentHandler> DeviceAnalyticsBinding::createHandler()
 std::optional<DeviceAgentManifest> DeviceAnalyticsBinding::loadDeviceAgentManifest(
     const sdk_support::SharedPtr<DeviceAgent>& deviceAgent)
 {
-    if (!deviceAgent)
-    {
-        NX_ASSERT(false, "Invalid device agent");
+    if (!NX_ASSERT(deviceAgent, "Invalid device agent"))
         return std::nullopt;
-    }
 
-    if (!m_device)
-    {
-        NX_ASSERT(false, "Invalid device");
+    if (!NX_ASSERT(m_device, "Invalid device"))
         return std::nullopt;
-    }
 
     const auto deviceAgentManifest = sdk_support::manifest<DeviceAgentManifest>(
         deviceAgent, makeLogger("DeviceAgent"));
@@ -512,21 +497,15 @@ sdk_support::UniquePtr<CommonMetadataTypes> DeviceAnalyticsBinding::neededMetada
     const auto deviceAgentManifest = sdk_support::manifest<DeviceAgentManifest>(
         m_sdkDeviceAgent, makeLogger("DeviceAgent"));
 
-    if (!deviceAgentManifest)
-    {
-        NX_ASSERT(false, "Got invlaid device agent manifest");
+    if (!NX_ASSERT(deviceAgentManifest, "Got invlaid device agent manifest"))
         return sdk_support::UniquePtr<CommonMetadataTypes>();
-    }
 
     const auto eventTypes = supportedEventTypes(*deviceAgentManifest);
     const auto objectTypes = supportedObjectTypes(*deviceAgentManifest);
 
     const auto ruleWatcher = serverModule()->analyticsEventRuleWatcher();
-    if (!ruleWatcher)
-    {
-        NX_ASSERT(false, "Can't access analytics rule watcher");
+    if (!NX_ASSERT(ruleWatcher, "Can't access analytics rule watcher"))
         return sdk_support::UniquePtr<CommonMetadataTypes>();
-    }
 
     auto neededEventTypes = ruleWatcher->watchedEventsForResource(m_device->getId());
     neededEventTypes.intersect(eventTypes);

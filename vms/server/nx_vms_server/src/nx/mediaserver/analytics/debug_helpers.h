@@ -14,7 +14,7 @@
 
 namespace nx::mediaserver::analytics::debug_helpers {
 
-/** @return nullptr if the file does not exist, or on error. */
+/** @return Null if the file does not exist, or on error. */
 sdk_support::UniquePtr<nx::sdk::Settings> loadSettingsFromFile(
     const QString& fileDescription,
     const QString& filename);

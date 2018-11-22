@@ -157,9 +157,8 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             if (!objectCamera)
                 return fallbackTitle();
 
-            const auto descriptorListManager = objectCamera
-                ->commonModule()
-                ->analyticsDescriptorListManager();
+            const auto descriptorListManager =
+                objectCamera->commonModule()->analyticsDescriptorListManager();
 
             auto objectTypeDescriptor = descriptorListManager
                 ->descriptor<nx::vms::api::analytics::ObjectTypeDescriptor>(object.objectTypeId);
