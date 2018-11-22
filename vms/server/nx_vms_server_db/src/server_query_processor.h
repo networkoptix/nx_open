@@ -22,6 +22,7 @@
 #include "utils/common/threadqueue.h"
 #include <transaction/message_bus_adapter.h>
 #include <transaction/amend_transaction_data.h>
+#include <nx/utils/thread/long_runnable.h>
 
 namespace ec2 {
 
