@@ -102,7 +102,7 @@ double QnManualSearchTaskManager::doneToTotalTasksRatio() const
     if (totalTasks == 0)
         return 0;
 
-    return (totalTasks - m_remainingTaskCount) / totalTasks;
+    return (totalTasks - m_remainingTaskCount) / double(totalTasks);
 }
 
 QnManualResourceSearchList QnManualSearchTaskManager::foundResources() const

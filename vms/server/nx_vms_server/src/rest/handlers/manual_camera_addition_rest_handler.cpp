@@ -77,6 +77,7 @@ int QnManualCameraAdditionRestHandler::searchStatusAction(
     const QnRequestParams& params, QnJsonRestResult& result)
 {
     QnUuid processUuid = QnUuid(params.value("uuid"));
+    NX_VERBOSE(this, "Status of the search %1 was requested", processUuid);
 
     if (processUuid.isNull())
         return nx::network::http::StatusCode::unprocessableEntity;
@@ -90,8 +91,6 @@ int QnManualCameraAdditionRestHandler::searchStatusAction(
     return nx::network::http::StatusCode::ok;
 }
 
-
-// TODO: check if crash can be there. We are deleted process here before it may finish
 int QnManualCameraAdditionRestHandler::searchStopAction(
     const QnRequestParams& params, QnJsonRestResult& result)
 {
@@ -106,12 +105,11 @@ int QnManualCameraAdditionRestHandler::searchStopAction(
         if (m_searchProcesses.count(processUuid))
         {
             searcher = std::move(m_searchProcesses[processUuid]);
-            searcher->pleaseStopSync(); // TODO: #dliman Make it async?
+            searcher->pleaseStopSync(); // TODO: #dliman Use async?
             m_searchProcesses.erase(processUuid);
         }
         // TODO: #dliman Should return 404 if not found.
     }
-    // TODO: #dliman Should make sure the searcher is stopped here!
 
     QnManualCameraSearchReply reply;
     reply.processUuid = processUuid;

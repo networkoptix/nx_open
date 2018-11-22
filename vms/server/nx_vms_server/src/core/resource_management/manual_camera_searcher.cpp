@@ -122,19 +122,17 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
                 {
                     result.cameras = m_results;
                     result.status = QnManualResourceSearchStatus(m_state, MAX_PERCENT, MAX_PERCENT);
-                    NX_DEBUG(this, "Status: %1 (%2 max)", result.status.current, result.status.total);
                     break;
                 }
                 case QnManualResourceSearchStatus::CheckingOnline:
                 {
-                    Q_ASSERT(m_hostRangeSize);
+                    NX_ASSERT(m_hostRangeSize);
                     int currentProgress = m_hostRangeSize
                         ? (int) m_ipChecker.hostsChecked() * PORT_SCAN_MAX_PROGRESS_PERCENT
                             / m_hostRangeSize
                         : 0;
 
                     result.status = QnManualResourceSearchStatus(m_state, currentProgress, MAX_PERCENT);
-                    NX_DEBUG(this, "Status: %1 (%2 max)", result.status.current, result.status.total);
                     break;
                 }
                 case QnManualResourceSearchStatus::CheckingHost:
@@ -152,6 +150,8 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
                     break;
                 }
             }
+
+            NX_DEBUG(this, "Status: %1 (%2 max)", result.status.current, result.status.total);
             resultPromise.set_value();
         });
 
