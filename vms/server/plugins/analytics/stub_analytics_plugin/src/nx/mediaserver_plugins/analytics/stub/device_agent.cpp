@@ -3,6 +3,7 @@
 #include <iostream>
 #include <chrono>
 #include <ctime>
+#include <cmath>
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/analytics/common_metadata_packet.h>
