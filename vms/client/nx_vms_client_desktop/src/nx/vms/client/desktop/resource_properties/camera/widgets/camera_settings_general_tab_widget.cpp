@@ -78,6 +78,11 @@ void CameraSettingsGeneralTabWidget::loadState(const CameraSettingsDialogState& 
 
     check_box_utils::setupTristateCheckbox(ui->enableAudioCheckBox, state.audioEnabled);
 
+    // Enable checkbox if no cameras has forced audio and at least one camera supports audio.
+    ui->enableAudioCheckBox->setEnabled(
+        state.devicesDescription.supportsAudio != CombinedValue::None
+        && state.devicesDescription.isAudioForced == CombinedValue::None);
+
     ::setReadOnly(ui->enableAudioCheckBox, state.readOnly);
     ::setReadOnly(ui->editCredentialsButton, state.readOnly);
 
