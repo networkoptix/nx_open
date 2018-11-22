@@ -78,10 +78,10 @@ std::string DeviceAgent::manifest() const
 
 void DeviceAgent::settingsReceived()
 {
-    if (ini().throwPluginEventsFromDeviceAgent)
+    if (ini().throwPluginEventsFromDeviceAgent && !m_pluginEventThread)
     {
         NX_PRINT << __func__ << "(): Starting plugin event generation thread";
-        m_pluginEventThread.reset(new std::thread([this]() { processPluginEvents(); }));
+        m_pluginEventThread = std::make_unique<std::thread>([this]() { processPluginEvents(); });
     }
     else
     {
