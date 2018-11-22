@@ -126,7 +126,10 @@ void TransactionExecutor::run()
                     break;
             }
             if (result != ErrorCode::dbError)
-                dbTranLocker.commit();
+            {
+                if (!NX_ASSERT(dbTranLocker.commit()))
+                    result = ErrorCode::dbError;
+            }
         }
 
         for (auto& command: queue)
