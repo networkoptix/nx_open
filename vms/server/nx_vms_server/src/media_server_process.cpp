@@ -4212,7 +4212,8 @@ void MediaServerProcess::run()
     if (utils.timeToMakeDbBackup())
     {
         utils.backupDatabase(ec2::detail::QnDbManager::ecsDbFileName(
-            serverModule->settings().dataDir()));
+            serverModule->settings().dataDir()),
+            ec2::detail::QnDbManager::currentBuildNumber(appServerConnectionUrl().toLocalFile()));
     }
 
     if (!connectToDatabase())

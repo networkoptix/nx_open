@@ -28,11 +28,15 @@ struct VmsUtilsFunctionsTag{};
 
 bool backupDatabase(const QString& backupDir,
     std::shared_ptr<ec2::AbstractECConnection> connection,
-    const boost::optional<QString>& dbFilePath)
+    const boost::optional<QString>& dbFilePath,
+    const boost::optional<int>& buildNumber)
 {
-    const QString fileName = lm("%1_%2_%3.backup").args(closeDirPath(backupDir) + "ecs", 
-        nx::utils::SoftwareVersion(nx::utils::AppInfo::applicationVersion()).build(), 
-        qnSyncTime->currentMSecsSinceEpoch());
+    const auto buildNumberArg = buildNumber
+        ? *buildNumber
+        : nx::utils::SoftwareVersion(nx::utils::AppInfo::applicationVersion()).build();
+
+    const QString fileName = lm("%1_%2_%3.backup").args(closeDirPath(backupDir) + "ecs",
+        buildNumberArg, qnSyncTime->currentMSecsSinceEpoch());
 
     QDir dir(backupDir);
     if (!dir.exists() && !dir.mkdir(backupDir))

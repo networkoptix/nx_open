@@ -38,6 +38,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/network/app_info.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/camera_data_ex.h>
@@ -393,6 +394,47 @@ bool QnDbManager::setMediaServersStatus(Qn::ResourceStatus status)
 QString QnDbManager::ecsDbFileName(const QString& basePath)
 {
     return closeDirPath(basePath) + QString::fromLatin1("ecs.sqlite");
+}
+
+int QnDbManager::currentBuildNumber(const QString& basePath)
+{
+    const QString dbFileName = ecsDbFileName(basePath);
+    if (!QFile(dbFileName).exists())
+    {
+        NX_WARNING(typeid(QnDbManager),
+            lm("currentBuildNumber: File %1 does not exist").arg(dbFileName));
+        return 0;
+    }
+
+    const static QString buildNumberConnectionName = "GetBuildNumberDB";
+    auto sdb = QSqlDatabase::addDatabase(lit("QSQLITE"), "GetBuildNumberDB");
+    sdb.setDatabaseName(dbFileName);
+    if (!sdb.open())
+    {
+        NX_WARNING(typeid(QnDbManager),
+            lm("currentBuildNumber: Failed to open db %1").arg(dbFileName));
+        return 0;
+    }
+
+    auto dbCloseGuard = nx::utils::makeScopeGuard(
+        [&]()
+        {
+            sdb.close();
+            sdb = QSqlDatabase();
+            QSqlDatabase::removeDatabase(buildNumberConnectionName);
+        });
+
+    QSqlQuery getVersionQuery(sdb);
+    const QString queryString = "SELECT data FROM misc_data WHERE key = 'VERSION'";
+    if (!getVersionQuery.prepare(queryString) || !getVersionQuery.exec()
+        || !getVersionQuery.next())
+    {
+        NX_WARNING(typeid(QnDbManager),
+            lm("currentBuildNumber: Failed to prepare or execute query %1").arg(queryString));
+        return 0;
+    }
+
+    return nx::utils::SoftwareVersion(getVersionQuery.value(0).toString()).build();
 }
 
 bool QnDbManager::init(const nx::utils::Url& dbUrl)
