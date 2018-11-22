@@ -33,7 +33,7 @@ namespace detail { class ServerQueryProcessor; }
 
 struct Command
 {
-    std::function<void(ErrorCode)> execHandler;
+    std::function<void(ErrorCode)> complitionHandler;
     std::function<ErrorCode (PostProcessList* const)> execTranFunc;
     ErrorCode result = ErrorCode::ok;
     PostProcessList postProcList;

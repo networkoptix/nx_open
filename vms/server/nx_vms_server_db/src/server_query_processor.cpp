@@ -125,7 +125,7 @@ void ServerQueryProcessorAccess::run()
                 for (const auto& postProcFunc: command.postProcList)
                     postProcFunc();
             }
-            command.execHandler(command.result);
+            command.complitionHandler(command.result);
         }
     }
 }
