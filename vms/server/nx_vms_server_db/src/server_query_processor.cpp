@@ -93,7 +93,7 @@ void TransactionExecutor::stop()
 void TransactionExecutor::enqueData(Command command)
 {
     QnMutexLocker lock(&m_mutex);
-    if (m_commandQueue.size() > kMaxQueueSize)
+    if (m_commandQueue.size() >= kMaxQueueSize)
     {
         command.completionHandler(ErrorCode::failure);
         return;
