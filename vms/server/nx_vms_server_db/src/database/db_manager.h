@@ -868,6 +868,7 @@ namespace detail
         ec2::database::api::QueryCache m_insertCameraScheduleQuery;
         ec2::database::api::QueryCache m_insertKvPairQuery;
         ec2::database::api::QueryContext m_resourceQueries;
+        ec2::database::api::QueryCache m_changeStatusQuery;
     };
 
     class PersistentStorage : public AbstractPersistentStorage

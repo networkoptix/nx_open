@@ -294,7 +294,8 @@ QnDbManager::QnDbManager(QnCommonModule* commonModule):
     m_insertCameraUserAttrQuery(&m_queryCachePool),
     m_insertCameraScheduleQuery(&m_queryCachePool),
     m_insertKvPairQuery(&m_queryCachePool),
-    m_resourceQueries(m_sdb, &m_queryCachePool)
+    m_resourceQueries(m_sdb, &m_queryCachePool),
+    m_changeStatusQuery(&m_queryCachePool)
 {
 }
 
@@ -2516,31 +2517,15 @@ ErrorCode QnDbManager::executeTransactionInternal(
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ResourceStatusData>& tran)
 {
-    QSqlQuery query(m_sdb);
-    query.prepare("INSERT OR REPLACE INTO vms_resource_status values (?, ?)");
-    query.addBindValue(tran.params.id.toRfc4122());
-    query.addBindValue((int)tran.params.status);
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
+    const auto query = m_changeStatusQuery.get(m_sdb, R"sql(
+        INSERT OR REPLACE INTO vms_resource_status values (?, ?)
+        )sql");
+    query->addBindValue(tran.params.id.toRfc4122());
+    query->addBindValue((int) tran.params.status);
+    if (!execSQLQuery(query.get(), Q_FUNC_INFO))
         return ErrorCode::dbError;
-    }
     return ErrorCode::ok;
 }
-
-/*
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiSetResourceDisabledData>& tran)
-{
-    QSqlQuery query(m_sdb);
-    query.prepare("UPDATE vms_resource set disabled = :disabled where guid = :guid");
-    query.bindValue(":disabled", tran.params.disabled);
-    query.bindValue(":guid", tran.params.id.toRfc4122());
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
-        return ErrorCode::dbError;
-    }
-    return ErrorCode::ok;
-}
-*/
 
 ErrorCode QnDbManager::saveCamera(const CameraData& params)
 {
