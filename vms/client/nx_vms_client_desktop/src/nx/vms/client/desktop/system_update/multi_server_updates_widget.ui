@@ -53,6 +53,12 @@
    </item>
    <item>
     <widget class="nx::vms::client::desktop::Panel" name="controlsPanel" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <layout class="QVBoxLayout" name="controlsVerticalLayout">
       <property name="leftMargin">
        <number>16</number>
@@ -287,6 +293,12 @@
          <number>0</number>
         </property>
         <widget class="QWidget" name="releaseNotesPage">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <property name="leftMargin">
            <number>0</number>
@@ -302,6 +314,12 @@
           </property>
           <item>
            <widget class="QLabel" name="releaseNotesLabel">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="text">
              <string notr="true" extracomment="Text should not be translatable, set from cpp">&lt;a href='notes'&gt;Release notes&lt;/a&gt;</string>
             </property>
@@ -309,6 +327,12 @@
           </item>
           <item>
            <widget class="QLabel" name="releaseDescriptionLabel">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="styleSheet">
              <string notr="true">border: 1px solid red;
 border-radius: 2px;</string>
@@ -505,7 +529,7 @@ border-radius: 2px;</string>
    </item>
    <item>
     <widget class="QWidget" name="widget" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,1">
+     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,1,0">
       <property name="leftMargin">
        <number>8</number>
       </property>
@@ -599,6 +623,19 @@ border-radius: 2px;</string>
          </widget>
         </item>
        </layout>
+      </item>
+      <item>
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>

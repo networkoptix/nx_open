@@ -266,7 +266,14 @@ rest::Handle SingleConnectionPeerManager::downloadChunkFromInternet(
             using namespace network;
             QByteArray result;
 
+            if (!client)
+                return callback(false, handle, result);
+
             auto response = client->response();
+
+            if (!response)
+                return callback(false, handle, result);
+
             auto statusCode = response->statusLine.statusCode;
 
             auto okResponse = response &&
@@ -275,7 +282,6 @@ rest::Handle SingleConnectionPeerManager::downloadChunkFromInternet(
 
             if (!client->failed() && okResponse)
                 result = client->fetchMessageBodyBuffer();
-
             callback(!result.isNull(), handle, result);
         });
 
