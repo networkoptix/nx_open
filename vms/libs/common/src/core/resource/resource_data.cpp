@@ -24,18 +24,16 @@ public:
         registerKey<QStringList>(lit("vistaFocusDevices"));
         registerKey<QnIOPortDataList>(lit("ioSettings"));
         registerKey<QList<nx::common::utils::Credentials>>(
-            Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
-        registerKey<nx::common::utils::Credentials>(Qn::FORCED_DEFAULT_CREDENTIALS_PARAM_NAME);
+            ResourceDataKey::kPossibleDefaultCredentials);
+        registerKey<nx::common::utils::Credentials>(ResourceDataKey::kForcedDefaultCredentials);
         registerKey<QList<QnResourceChannelMapping>>(
             Qn::VIDEO_MULTIRESOURCE_CHANNEL_MAPPING_PARAM_NAME);
         registerKey<QnHttpConfigureRequestList>(Qn::PRE_SRTEAM_CONFIGURE_REQUESTS_PARAM_NAME);
-        registerKey<QnBitrateList>(Qn::HIGH_STREAM_AVAILABLE_BITRATES_PARAM_NAME);
-        registerKey<QnBitrateList>(Qn::LOW_STREAM_AVAILABLE_BITRATES_PARAM_NAME);
+        registerKey<QnBitrateList>(ResourceDataKey::kHighStreamAvailableBitrates);
+        registerKey<QnBitrateList>(ResourceDataKey::kLowStreamAvailableBitrates);
+        registerKey<QnBounds>(ResourceDataKey::kHighStreamBitrateBounds);
+        registerKey<QnBounds>(ResourceDataKey::kLowStreamBitrateBounds);
         registerKey<TwoWayAudioParams>(Qn::TWO_WAY_AUDIO_PARAM_NAME);
-
-        registerKey<QnBounds>(Qn::HIGH_STREAM_BITRATE_BOUNDS_PARAM_NAME);
-        registerKey<QnBounds>(Qn::LOW_STREAM_BITRATE_BOUNDS_PARAM_NAME);
-
         registerKey<std::vector<QnCameraAdvancedParameterOverload>>(Qn::ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME);
         registerKey<nx::core::ptz::Override>(nx::core::ptz::Override::kPtzOverrideKey);
     }

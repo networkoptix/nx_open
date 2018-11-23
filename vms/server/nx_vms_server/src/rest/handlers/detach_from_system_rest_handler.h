@@ -32,9 +32,10 @@ public:
 
 private:
     int execute(
-        PasswordData passwordData,
+        CurrentPasswordData passwordData,
         const QnRestConnectionProcessor* owner,
         QnJsonRestResult& result);
+
 private:
     nx::vms::cloud_integration::CloudConnectionManager* const m_cloudConnectionManager;
     ec2::AbstractTransactionMessageBus* m_messageBus;

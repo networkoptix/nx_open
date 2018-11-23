@@ -61,7 +61,7 @@ Camera::Camera(
 {
     auto codecList = device::video::getSupportedCodecs(url().c_str());
     m_compressionTypeDescriptor = getPriorityDescriptor(kVideoCodecPriorityList, codecList);
-    
+
     // If m_compressionTypeDescriptor is null, there probably is no camera plugged in.
     if(m_compressionTypeDescriptor)
         m_defaultVideoParams = getDefaultVideoParameters();
@@ -85,7 +85,7 @@ std::shared_ptr<AudioStream> Camera::audioStream()
 {
     return m_audioStream;
 }
-    
+
 std::shared_ptr<VideoStream> Camera::videoStream()
 {
     return m_videoStream;
@@ -183,7 +183,7 @@ CodecParameters Camera::getDefaultVideoParameters()
             maxBitrate,
             nxcip::Resolution(it->width, it->height));
     }
-    
+
     // Should never reach here if m_compressionTypeDescriptor is valid
     return CodecParameters();
 }

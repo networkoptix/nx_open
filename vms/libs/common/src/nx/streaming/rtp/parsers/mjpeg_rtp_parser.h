@@ -12,7 +12,6 @@ class MjpegParser: public VideoStreamParser
 {
 public:
     MjpegParser();
-    virtual ~MjpegParser();
     virtual void setSdpInfo(const Sdp::Media& sdp) override;
 
     virtual bool processData(

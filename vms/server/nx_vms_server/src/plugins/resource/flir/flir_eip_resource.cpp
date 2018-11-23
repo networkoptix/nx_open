@@ -62,7 +62,7 @@ CameraDiagnostics::Result QnFlirEIPResource::initializeCameraDriver()
     initializeIO();
 
     fetchAndSetAdvancedParameters();
-    saveParams();
+    saveProperties();
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -182,7 +182,6 @@ MessageRouterRequest QnFlirEIPResource::buildEIPGetRequest(const QnCameraAdvance
             cipPath.attributeId);
     }
 
-
     return request;
 }
 
@@ -290,7 +289,6 @@ quint32 QnFlirEIPResource::parseInt32EIPResponse(const MessageRouterResponse& re
     stream >> num;
     return num;
 }
-
 
 QString QnFlirEIPResource::parseEIPResponse(const MessageRouterResponse &response, const QnCameraAdvancedParameter &param) const
 {
@@ -606,7 +604,6 @@ bool QnFlirEIPResource::setOutputPortState(const QString &outputID, bool activat
         m_outputPorts[0].id :
         outputID;
 
-
     if (!activate)
     {
         for (auto it = m_autoResetTimers.begin(); it != m_autoResetTimers.end(); ++it)
@@ -758,7 +755,6 @@ void QnFlirEIPResource::checkAlarmStatus()
         scheduleNextAlarmCheck();
 }
 
-
 void QnFlirEIPResource::checkAlarmStatusDone()
 {
     auto response = m_alarmsEipAsyncClient->getResponse();
@@ -808,7 +804,6 @@ void QnFlirEIPResource::getAlarmMeasurementFuncTypeDone()
     }
 }
 
-
 void QnFlirEIPResource::getAlarmMeasurementFuncId()
 {
     QString measFuncIdAttr = lit(".image.sysimg.alarms.measfunc.")
@@ -841,7 +836,6 @@ void QnFlirEIPResource::getAlarmMeasurementFuncIdDone()
 
     scheduleNextAlarmCheck();
 }
-
 
 quint8 QnFlirEIPResource::getInputPortCIPAttribute(size_t portNum) const
 {

@@ -653,7 +653,7 @@ void QnRecordingManager::disableLicensesIfNeed()
                 camera->setLicenseUsed(true); // rollback
                 continue;
             }
-            camera->saveParams();
+            camera->saveProperties();
             NX_INFO(this, "Turn off recording for camera %1 because there is not enough licenses",
                 camera->getUniqueId());
             disabledCameras << camera->getId().toString();

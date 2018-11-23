@@ -344,7 +344,7 @@ QAuthenticator QnPlAxisResourceSearcher::determineResourceCredentials(
 
     auto resData = dataPool()->data(resource->getVendor(), resource->getModel());
     auto possibleCredentials = resData.value<QList<nx::common::utils::Credentials>>(
-        Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
+        ResourceDataKey::kPossibleDefaultCredentials);
 
     for (const auto& credentials: possibleCredentials)
     {

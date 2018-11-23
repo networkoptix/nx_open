@@ -23,7 +23,8 @@ bool allServersAreReadyForInstall(const QnRestConnectionProcessor* processor)
     for (const auto& status: reply)
     {
         if (status.code != nx::update::Status::Code::readyToInstall
-            && status.code != nx::update::Status::Code::latestUpdateInstalled)
+            && status.code != nx::update::Status::Code::latestUpdateInstalled
+            && status.code != nx::update::Status::Code::offline)
         {
             return false;
         }

@@ -228,7 +228,7 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initializeCameraDriver()
         setCameraCapability(Qn::OutputPortCapability, true);
 
     setFirmware(firmwareVersion);
-    saveParams();
+    saveProperties();
 
     setApiParameter(lit("mdzonesize"), QString::number(zone_size));
     m_zoneSite = zone_size;

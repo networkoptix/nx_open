@@ -241,7 +241,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
 
         auto resData = dataPool()->data(manufacturer, modelName);
         const auto manufacturerReplacement = resData.value<QString>(
-            Qn::ONVIF_MANUFACTURER_REPLACEMENT);
+            ResourceDataKey::kOnvifManufacturerReplacement);
 
         if (!manufacturerReplacement.isEmpty())
         {

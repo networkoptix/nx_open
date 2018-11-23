@@ -14,51 +14,6 @@ VideoStreamParser::VideoStreamParser()
     m_chunks.reserve(kDefaultChunkContainerSize);
 }
 
-void AudioStreamParser::processIntParam(
-    const QString& checkName,
-    int& setValue,
-    const QString& param)
-{
-    int valuePos = param.indexOf('=');
-    if (valuePos == -1)
-        return;
-
-    const auto paramName = param.left(valuePos);
-    const auto paramValue = param.mid(valuePos+1);
-    if (paramName.toLower() == checkName.toLower())
-        setValue = paramValue.toInt();
-}
-
-void AudioStreamParser::processHexParam(
-    const QString& checkName,
-    QByteArray& setValue,
-    const QString& param)
-{
-    int valuePos = param.indexOf('=');
-    if (valuePos == -1)
-        return;
-
-    const auto paramName = param.left(valuePos);
-    const auto paramValue = param.mid(valuePos+1);
-    if (paramName.toLower() == checkName.toLower())
-        setValue = QByteArray::fromHex(paramValue.toUtf8());
-}
-
-void AudioStreamParser::processStringParam(
-    const QString& checkName,
-    QString& setValue,
-    const QString& param)
-{
-    int valuePos = param.indexOf('=');
-    if (valuePos == -1)
-        return;
-
-    const auto paramName = param.left(valuePos);
-    const auto paramValue = param.mid(valuePos+1);
-    if (paramName.toLower() == checkName.toLower())
-        setValue = paramValue;
-}
-
 QnAbstractMediaDataPtr VideoStreamParser::nextData()
 {
     if (m_mediaData)

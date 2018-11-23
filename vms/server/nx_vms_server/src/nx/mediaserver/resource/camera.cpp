@@ -355,7 +355,7 @@ QSize Camera::closestResolution(
 CameraDiagnostics::Result Camera::initInternal()
 {
     auto resData = resourceData();
-    int timeoutSec = resData.value<int>(Qn::kUnauthrizedTimeoutParamName);
+    auto timeoutSec = resData.value<int>(ResourceDataKey::kUnauthorizedTimeoutSec);
     auto credentials = getAuth();
     auto status = getStatus();
     if (timeoutSec > 0 &&

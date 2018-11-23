@@ -171,8 +171,8 @@ inline void fixRequestDataIfNeeded(nx::vms::api::UserDataEx* const userDataEx)
 
 inline void fixRequestDataIfNeeded(nx::vms::api::ResourceParamData* const paramData)
 {
-    if (paramData->name == Qn::CAMERA_CREDENTIALS_PARAM_NAME
-    || paramData->name == Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME)
+    if (paramData->name == ResourcePropertyKey::kCredentials
+    || paramData->name == ResourcePropertyKey::kDefaultCredentials)
     {
         paramData->value = nx::utils::encodeHexStringFromStringAES128CBC(paramData->value);
     }
@@ -517,19 +517,6 @@ private:
             postProcessAction();
 
         // Handler is invoked asynchronously.
-    }
-
-    template<class HandlerType>
-    void removeResourceAsync(
-        QnTransaction<nx::vms::api::IdData>& tran,
-        ApiObjectType resourceType,
-        HandlerType handler)
-    {
-        using namespace std::placeholders;
-        executeTranCall(
-            tran,
-            handler,
-            std::bind(&ServerQueryProcessor::removeResourceSync, this, _1, resourceType, _2));
     }
 
     ErrorCode removeHelper(

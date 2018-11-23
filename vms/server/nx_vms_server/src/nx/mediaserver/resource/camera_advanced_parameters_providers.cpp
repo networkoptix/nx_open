@@ -155,7 +155,7 @@ StreamCapabilityAdvancedParametersProvider::StreamCapabilityAdvancedParametersPr
     if (!QJson::deserialize(camera->getProperty(proprtyName()).toUtf8(), &m_parameters))
         m_parameters = m_defaults;
     updateMediaCapabilities();
-    m_camera->saveParams();
+    m_camera->saveProperties();
 }
 
 QnLiveStreamParams StreamCapabilityAdvancedParametersProvider::getParameters() const
@@ -199,7 +199,7 @@ bool StreamCapabilityAdvancedParametersProvider::setParameters(const QnLiveStrea
         }
     }
     updateMediaCapabilities();
-    return m_camera->saveParams();
+    return m_camera->saveProperties();
 }
 
 void StreamCapabilityAdvancedParametersProvider::updateMediaCapabilities()
@@ -636,4 +636,3 @@ boost::optional<QString> StreamCapabilityAdvancedParametersProvider::getValue(
 } // namespace resource
 } // namespace mediaserver
 } // namespace nx
-

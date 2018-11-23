@@ -175,7 +175,8 @@ void QnResourcePropertyDictionary::markAllParamsDirty(const QnUuid& resourceId)
     }
 }
 
-bool QnResourcePropertyDictionary::setValue(const QnUuid& resourceId, const QString& key, const QString& value, bool markDirty, bool replaceIfExists)
+bool QnResourcePropertyDictionary::setValue(const QnUuid& resourceId, const QString& key,
+    const QString& value, bool markDirty, bool replaceIfExists)
 {
     QnMutexLocker lock( &m_mutex );
     auto itr = m_items.find(resourceId);
@@ -196,7 +197,8 @@ bool QnResourcePropertyDictionary::setValue(const QnUuid& resourceId, const QStr
     }
     else
     {
-        //if parameter marked as modified, removing mark. I.e. parameter value has been reset to already saved value
+        // If parameter marked as modified, removing mark,
+        // i.e. parameter value has been reset to already saved value.
         QnResourcePropertyList& modifiedProperties = m_modifiedItems[resourceId];
         auto propertyIter = modifiedProperties.find( key );
         if( propertyIter != modifiedProperties.end() )

@@ -504,7 +504,7 @@ QString QnResource::getResourceProperty(
     const QnUuid &resourceTypeId)
 {
     // TODO: #GDM think about code duplication
-    NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is requred.");
+    NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is required.");
 
     NX_ASSERT(commonModule);
     QString value = commonModule
@@ -513,7 +513,6 @@ QString QnResource::getResourceProperty(
 
     if (value.isNull())
     {
-        // find default value in resourceType
         QnResourceTypePtr resType = qnResTypePool->getResourceType(resourceTypeId);
         if (resType)
             return resType->defaultValue(key);
@@ -533,10 +532,11 @@ bool QnResource::setProperty(const QString &key, const QString &value, PropertyO
         QnMutexLocker lk(&m_mutex);
         if (useLocalProperties())
         {
-            //saving property to some internal dictionary. Will apply to global dictionary when id is known
+            // Saving property to some internal dictionary.
+            // Will apply to global dictionary when id is known.
             m_locallySavedProperties[key] = LocalPropertyValue(value, markDirty, replaceIfExists);
 
-            //calling propertyDictionary()->saveParams(...) does not make any sense
+            //calling propertyDictionary()->saveProperties(...) does not make any sense
             return false;
         }
     }
@@ -605,6 +605,22 @@ nx::vms::api::ResourceParamDataList QnResource::getAllProperties() const
 
     std::copy(runtimeProperties.cbegin(), runtimeProperties.cend(), std::back_inserter(result));
     return result;
+}
+
+bool QnResource::saveProperties()
+{
+    NX_ASSERT(commonModule() && !getId().isNull());
+    if (auto module = commonModule())
+        return module->propertyDictionary()->saveParams(getId());
+    return false;
+}
+
+int QnResource::savePropertiesAsync()
+{
+    NX_ASSERT(commonModule() && !getId().isNull());
+    if (auto module = commonModule())
+        return module->propertyDictionary()->saveParamsAsync(getId());
+    return false;
 }
 
 void QnResource::emitModificationSignals(const QSet<QByteArray>& modifiedFields)
@@ -760,20 +776,4 @@ QnCommonModule* QnResource::commonModule() const
 QString QnResource::idForToStringFromPtr() const
 {
     return getId().toSimpleString();
-}
-
-bool QnResource::saveParams()
-{
-    NX_ASSERT(commonModule() && !getId().isNull());
-    if (auto module = commonModule())
-        return module->propertyDictionary()->saveParams(getId());
-    return false;
-}
-
-int QnResource::saveParamsAsync()
-{
-    NX_ASSERT(commonModule() && !getId().isNull());
-    if (auto module = commonModule())
-        return module->propertyDictionary()->saveParamsAsync(getId());
-    return false;
 }

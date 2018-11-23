@@ -245,7 +245,7 @@ void VideoStream::run()
 
         uint64_t now = m_timeProvider->millisSinceEpoch();
 
-        std::lock_guard<std::mutex> lock(m_mutex);        
+        std::lock_guard<std::mutex> lock(m_mutex);
         updateActualFps(now);
         m_packetConsumerManager.givePacket(packet);
         if (frame)

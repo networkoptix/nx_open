@@ -336,7 +336,6 @@ bool QnLiveStreamProvider::needMetadata()
     if (!m_metadataReceptor->metadataQueue.isEmpty())
         return true;
 
-
     if (m_cameraRes->getMotionType() == Qn::MotionType::MT_SoftwareGrid)
     {
         if (needAnalyzeMotion(getRole()))
@@ -492,12 +491,12 @@ void QnLiveStreamProvider::onGotAudioFrame(const QnCompressedAudioDataPtr& audio
         getRole() == Qn::CR_LiveVideo) // only primary stream
     {
         // save only once
-        const auto savedCodec = m_cameraRes->getProperty(Qn::CAMERA_AUDIO_CODEC_PARAM_NAME);
+        const auto savedCodec = m_cameraRes->getProperty(ResourcePropertyKey::kAudioCodec);
         const QString actualCodec = QnAvCodecHelper::codecIdToString(audioData->compressionType);
         if (savedCodec.isEmpty())
         {
-            m_cameraRes->setProperty(Qn::CAMERA_AUDIO_CODEC_PARAM_NAME, actualCodec);
-            m_cameraRes->saveParams();
+            m_cameraRes->setProperty(ResourcePropertyKey::kAudioCodec, actualCodec);
+            m_cameraRes->saveProperties();
         }
     }
 }
@@ -603,7 +602,7 @@ void QnLiveStreamProvider::updateStreamResolution(int channelNumber, const QSize
             m_cameraRes->setCameraCapability( Qn::PrimaryStreamSoftMotionCapability, true );
         else
             m_cameraRes->setCameraCapabilities( m_cameraRes->getCameraCapabilities() & ~Qn::PrimaryStreamSoftMotionCapability );
-        m_cameraRes->saveParams();
+        m_cameraRes->saveProperties();
     }
 
     m_softMotionRole = Qn::CR_Default;    //it will be auto-detected on the next frame
@@ -632,7 +631,7 @@ void QnLiveStreamProvider::saveMediaStreamParamsIfNeeded(const QnCompressedVideo
         videoData->compressionType);
 
     if( m_cameraRes->saveMediaStreamInfoIfNeeded( mediaStreamInfo ) )
-        m_cameraRes->saveParamsAsync();
+        m_cameraRes->savePropertiesAsync();
 }
 
 void QnLiveStreamProvider::saveBitrateIfNeeded(
@@ -661,7 +660,7 @@ void QnLiveStreamProvider::saveBitrateIfNeeded(
 
     if (m_cameraRes->saveBitrateIfNeeded(info))
     {
-        m_cameraRes->saveParamsAsync();
+        m_cameraRes->savePropertiesAsync();
         NX_INFO(this, lm("bitrateInfo has been updated for %1 stream")
                 .arg(QnLexical::serialized(info.encoderIndex)));
     }

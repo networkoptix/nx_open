@@ -154,7 +154,13 @@ protected:
         if (connection->remotePeer().isClient())
         {
             modifiedTran = srcTran;
-            ec2::amendOutputDataIfNeeded(connection.staticCast<Connection>()->userAccessData(), &modifiedTran.params);
+            if (ec2::amendOutputDataIfNeeded(connection.staticCast<Connection>()->userAccessData(),
+                    &modifiedTran.params))
+            {
+                // Make persistent info null in case if data has been amended. We don't want such
+                // transactions be checked against serialized transactions cache.
+                modifiedTran.persistentInfo = ec2::QnAbstractTransaction::PersistentInfo();
+            }
         }
         const ec2::QnTransaction<T>& tran(connection->remotePeer().isClient() ? modifiedTran : srcTran);
 

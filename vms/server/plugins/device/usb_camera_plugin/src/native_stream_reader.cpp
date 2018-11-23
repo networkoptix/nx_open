@@ -47,7 +47,7 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
         if (m_camera->ioError())
             return nxcip::NX_IO_ERROR;
-        
+
         return nxcip::NX_OTHER_ERROR;
     }
 
@@ -96,7 +96,7 @@ std::shared_ptr<ffmpeg::Packet> NativeStreamReader::nextPacket()
                 break;
             else if (m_interrupted || m_camera->ioError())
                     return nullptr;
-        }            
+        }
     }
 
     for(;;)
@@ -117,7 +117,6 @@ void NativeStreamReader::removeVideoConsumer()
     m_camera->videoStream()->removePacketConsumer(m_avConsumer);
     m_videoConsumerAdded = false;
 }
-
 
 } // namespace usb_cam
 } // namespace nx

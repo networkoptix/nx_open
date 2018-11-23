@@ -2,7 +2,6 @@
 
 #include <QtGui/QImage>
 
-
 #include <utils/common/warnings.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/math/fuzzy.h>
@@ -34,14 +33,18 @@ static const QString primaryStreamValue = QnLexical::serialized(MotionStreamType
 static const QString secondaryStreamValue = QnLexical::serialized(MotionStreamType::secondary);
 static const QString edgeStreamValue = QnLexical::serialized(MotionStreamType::edge);
 
-/** Special value for absent custom aspect ratio. Should not be changed without a reason because a lot of modules check it as qFuzzyIsNull. */
+/**
+ Special value for absent custom aspect ratio. Should not be changed without a reason, because
+ a lot of modules check it as qFuzzyIsNull.
+ */
 static constexpr qreal noCustomAspectRatio = 0.0;
 
 } // namespace
 
-// -------------------------------------------------------------------------- //
+//-------------------------------------------------------------------------------------------------
 // QnMediaResource
-// -------------------------------------------------------------------------- //
+//-------------------------------------------------------------------------------------------------
+
 QnMediaResource::QnMediaResource()
 {
 }
@@ -55,19 +58,21 @@ Qn::StreamQuality QnMediaResource::getBestQualityForSuchOnScreenSize(const QSize
     return Qn::StreamQuality::normal;
 }
 
-QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, Qn::StreamQuality /*quality*/) const
+QImage QnMediaResource::getImage(
+    int /*channel*/, QDateTime /*time*/, Qn::StreamQuality /*quality*/) const
 {
     return QImage();
 }
 
-static QSharedPointer<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
-
+static QSharedPointer<QnDefaultResourceVideoLayout> defaultVideoLayout(
+    new QnDefaultResourceVideoLayout());
 QnConstResourceVideoLayoutPtr QnMediaResource::getDefaultVideoLayout()
 {
     return defaultVideoLayout;
 }
 
-QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
+QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(
+    const QnAbstractStreamDataProvider* dataProvider) const
 {
     QnMutexLocker lock( &m_layoutMutex );
 
@@ -84,8 +89,10 @@ QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractSt
     {
         return defaultVideoLayout;
     }
-    else {
-        if (m_cachedLayout != strVal || !m_customVideoLayout) {
+    else
+    {
+        if (m_cachedLayout != strVal || !m_customVideoLayout)
+        {
             m_customVideoLayout = QnCustomResourceVideoLayout::fromString(strVal);
             m_cachedLayout = strVal;
         }
@@ -93,8 +100,9 @@ QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractSt
     }
 }
 
-static QSharedPointer<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );
-QnConstResourceAudioLayoutPtr QnMediaResource::getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/) const
+static QSharedPointer<QnEmptyResourceAudioLayout> audioLayout(new QnEmptyResourceAudioLayout());
+QnConstResourceAudioLayoutPtr QnMediaResource::getAudioLayout(
+    const QnAbstractStreamDataProvider* /*dataProvider*/) const
 {
     return audioLayout;
 }
@@ -111,14 +119,17 @@ QnCameraUserAttributePool* QnMediaResource::userAttributesPool() const
 
 QnMediaDewarpingParams QnMediaResource::getDewarpingParams() const
 {
-    QnCameraUserAttributePool::ScopedLock userAttributesLock(userAttributesPool(), toResource()->getId() );
+    QnCameraUserAttributePool::ScopedLock userAttributesLock(
+        userAttributesPool(), toResource()->getId());
     return (*userAttributesLock)->dewarpingParams;
 }
 
 void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params)
 {
     {
-        QnCameraUserAttributePool::ScopedLock userAttributesLock(userAttributesPool(), toResource()->getId() );
+        QnCameraUserAttributePool::ScopedLock userAttributesLock(
+            userAttributesPool(), toResource()->getId());
+
         if ((*userAttributesLock)->dewarpingParams == params)
             return;
 
@@ -160,8 +171,8 @@ Ptz::Capabilities QnMediaResource::getPtzCapabilities(core_ptz::Type ptzType) co
         case core_ptz::Type::operational:
             return operationalPtzCapabilities();
         case core_ptz::Type::configurational:
-            return Ptz::Capabilities(
-                toResource()->getProperty(Qn::kConfigurationalPtzCapabilities).toInt());
+            return Ptz::Capabilities(toResource()->getProperty(
+                ResourcePropertyKey::kConfigurationalPtzCapabilities).toInt());
         default:
             NX_ASSERT(false, "Wrong ptz type, we should never be here");
             return Ptz::NoPtzCapabilities;
@@ -190,7 +201,8 @@ void QnMediaResource::setPtzCapabilities(
         }
         case core_ptz::Type::configurational:
         {
-            toResource()->setProperty(Qn::kConfigurationalPtzCapabilities, (int) capabilities);
+            toResource()->setProperty(
+                ResourcePropertyKey::kConfigurationalPtzCapabilities, (int) capabilities);
             break;
         }
         default:
