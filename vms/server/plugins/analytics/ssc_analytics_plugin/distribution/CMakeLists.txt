@@ -1,12 +1,17 @@
 set(installerLanguage "en_US")
 set(installerMsiFile "${distribution_output_dir}/${ssc_analytics_plugin_distribution_name}.msi")
-set(themeFile "${CMAKE_SOURCE_DIR}/distribution/wix/common/theme.xml")
-set(localizationFile "${CMAKE_SOURCE_DIR}/distribution/wix/common/theme_${installerLanguage}.wxl")
+set(themeFile "${CMAKE_SOURCE_DIR}/vms/distribution/wix/common/theme.xml")
+set(localizationFile "${CMAKE_SOURCE_DIR}/vms/distribution/wix/common/theme_${installerLanguage}.wxl")
 
-# Project is actual to default customization only, so hardcode.
-set(productId "{557E96C5-8DFD-4D2B-92EC-584D4CD404AE}")
-set(productUpgradeCode "{6604116D-33EB-4204-866B-1AFC4AC1714D}")
-set(bundleUpgradeCode "{48AD07BB-7A58-45D1-A39D-0857C07B450A}")
+# Project is actual to ionetworks customization only, so hardcode.
+if(customization STREQUAL "ionetworks")
+    set(productId "{557E96C5-8DFD-4D2B-92EC-584D4CD404AE}")
+    set(productUpgradeCode "{6604116D-33EB-4204-866B-1AFC4AC1714D}")
+    set(bundleUpgradeCode "{48AD07BB-7A58-45D1-A39D-0857C07B450A}")
+else()
+    message(FATAL_ERROR "Only ionetworks customization is supported.")
+endif()
+
 
 if(codeSigning)
     set(installerUnsignedExeFile "${CMAKE_CURRENT_BINARY_DIR}/${ssc_analytics_plugin_distribution_name}-unsigned.exe")
