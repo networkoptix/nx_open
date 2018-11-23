@@ -502,7 +502,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
     }
 
     auto desiredTransport = resourceData().value<QString>(
-        Qn::DESIRED_TRANSPORT_PARAM_NAME,
+        ResourceDataKey::kDesiredTransport,
         RtpTransport::_auto);
 
     m_desiredTransport = RtpTransport::fromString(desiredTransport);
@@ -691,9 +691,9 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
 
     fetchAndSetAdvancedParameters();
 
-    setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0);
+    setProperty(ResourcePropertyKey::kIsAudioSupported, m_hasAudio ? 1 : 0);
 
-    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, !m_resolutionList[1].isEmpty() ? 1 : 0);
+    setProperty(ResourcePropertyKey::kHasDualStreaming, !m_resolutionList[1].isEmpty() ? 1 : 0);
     QString serialNumber = report.value(QnActiResourceSearcher::kSystemInfoProductionIdParamName);
     if (!serialNumber.isEmpty())
         setProperty(QnActiResourceSearcher::kSystemInfoProductionIdParamName, serialNumber);
@@ -702,7 +702,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
     if (!result)
         return result;
 
-    saveParams();
+    saveProperties();
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -975,7 +975,7 @@ bool QnActiResource::isAudioSupported() const
 
 bool QnActiResource::hasDualStreamingInternal() const
 {
-    return getProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME).toInt() > 0;
+    return getProperty(ResourcePropertyKey::kHasDualStreaming).toInt() > 0;
 }
 
 QnAbstractPtzController *QnActiResource::createPtzControllerInternal() const

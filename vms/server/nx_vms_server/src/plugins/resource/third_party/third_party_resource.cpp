@@ -27,7 +27,6 @@
 
 namespace core_ptz = nx::core::ptz;
 
-static const QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
 static const float DEFAULT_MAX_FPS_IN_CASE_IF_UNKNOWN = 30.0;
 const QString QnThirdPartyResource::AUX_DATA_PARAM_NAME = QLatin1String("aux_data");
 
@@ -558,28 +557,28 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
     {
         hasDualStreaming = false;
     }
-    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, hasDualStreaming ? 1 : 0);
+    setProperty(ResourcePropertyKey::kHasDualStreaming, hasDualStreaming ? 1 : 0);
 
     setProperty(
-        Qn::IS_AUDIO_SUPPORTED_PARAM_NAME,
+        ResourcePropertyKey::kIsAudioSupported,
         (cameraCapabilities & nxcip::BaseCameraManager::audioCapability) ? 1 : 0);
     if( cameraCapabilities & nxcip::BaseCameraManager::dtsArchiveCapability )
     {
-        setProperty( Qn::DTS_PARAM_NAME, 1);
-        setProperty( Qn::ANALOG_PARAM_NAME, 1);
+        setProperty(ResourcePropertyKey::kDts, 1);
+        setProperty(ResourcePropertyKey::kAnalog, 1);
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::hardwareMotionCapability )
     {
         //setMotionType( Qn::MotionType::MT_HardwareGrid );
-        setProperty( Qn::MOTION_WINDOW_CNT_PARAM_NAME, 100);
-        setProperty( Qn::MOTION_MASK_WINDOW_CNT_PARAM_NAME, 100);
-        setProperty( Qn::MOTION_SENS_WINDOW_CNT_PARAM_NAME, 100);
-        setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid,hardwaregrid"));
+        setProperty(ResourcePropertyKey::kMotionWindowCnt, 100);
+        setProperty(ResourcePropertyKey::kMotionMaskWindowCnt, 100);
+        setProperty(ResourcePropertyKey::kMotionSensWindowCnt, 100);
+        setProperty(ResourcePropertyKey::kSupportedMotion, QStringLiteral("softwaregrid,hardwaregrid"));
     }
     else
     {
         //setMotionType( Qn::MotionType::MT_SoftwareGrid );
-        setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid"));
+        setProperty(ResourcePropertyKey::kSupportedMotion, QStringLiteral("softwaregrid"));
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::shareFpsCapability )
         setStreamFpsSharingMethod(Qn::BasicFpsSharing);
@@ -698,7 +697,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
         m_selectedEncoderResolutions = std::move( selectedEncoderResolutions );
     }
 
-    saveParams();
+    saveProperties();
 
     return CameraDiagnostics::NoErrorResult();
 }

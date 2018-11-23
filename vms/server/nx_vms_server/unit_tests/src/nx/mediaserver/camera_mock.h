@@ -48,7 +48,7 @@ public:
         const QString& value,
         PropertyOptions options) override;
 
-    virtual bool saveParams() override;
+    virtual bool saveProperties() override;
 
 protected:
     virtual QString getDriverName() const override;

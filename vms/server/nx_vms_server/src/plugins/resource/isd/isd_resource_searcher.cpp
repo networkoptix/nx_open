@@ -103,7 +103,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(
         QList<QnResourcePtr> resList;
         auto resData = dataPool()->data(manufacture(), lit("*"));
         auto possibleCreds = resData.value<DefaultCredentialsList>(
-            Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
+            ResourceDataKey::kPossibleDefaultCredentials);
 
         possibleCreds << Credentials(kDefaultIsdUsername, kDefaultIsdPassword);
 
@@ -126,13 +126,13 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(
 QnResourceList QnPlISDResourceSearcher::findResources(void)
 {
 
-	QnResourceList upnpResults;
-	{
-		QnMutexLocker lock(&m_mutex);
-		upnpResults = m_foundUpnpResources;
-		m_foundUpnpResources.clear();
-		m_alreadyFoundMacAddresses.clear();
-	}
+    QnResourceList upnpResults;
+    {
+        QnMutexLocker lock(&m_mutex);
+        upnpResults = m_foundUpnpResources;
+        m_foundUpnpResources.clear();
+        m_alreadyFoundMacAddresses.clear();
+    }
 
     QnResourceList mdnsResults;
     auto consumerData = serverModule()->mdnsListener()->getData((std::uintptr_t) this);
@@ -413,7 +413,7 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
     {
         auto resData = dataPool()->data(manufacture(), name);
         auto possibleCreds = resData.value<DefaultCredentialsList>(
-            Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
+            ResourceDataKey::kPossibleDefaultCredentials);
 
         for (const auto& creds: possibleCreds)
         {
@@ -460,7 +460,7 @@ bool QnPlISDResourceSearcher::processPacket(
     {
         auto resData = dataPool()->data(manufacture(), model);
         auto possibleCreds = resData.value<DefaultCredentialsList>(
-            Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
+            ResourceDataKey::kPossibleDefaultCredentials);
 
         cameraAuth.setUser(kDefaultIsdUsername);
         cameraAuth.setPassword(kDefaultIsdPassword);
@@ -477,22 +477,22 @@ bool QnPlISDResourceSearcher::processPacket(
         }
     }
 
-	{
-		QnMutexLocker lock(&m_mutex);
+    {
+        QnMutexLocker lock(&m_mutex);
 
-		if (m_alreadyFoundMacAddresses.find(cameraMAC.toString()) == m_alreadyFoundMacAddresses.end())
-		{
-			m_alreadyFoundMacAddresses.insert(cameraMAC.toString());
-			createResource( devInfo, cameraMAC, cameraAuth, m_foundUpnpResources);
-		}
+        if (m_alreadyFoundMacAddresses.find(cameraMAC.toString()) == m_alreadyFoundMacAddresses.end())
+        {
+            m_alreadyFoundMacAddresses.insert(cameraMAC.toString());
+            createResource( devInfo, cameraMAC, cameraAuth, m_foundUpnpResources);
+        }
         else
         {
             NX_VERBOSE(this, lm("UPnP from %1 vendor: %2, model: %3, MAC: %4 is known")
                 .args(deviceEndpoint, devInfo.manufacturer, devInfo.modelName, cameraMAC));
         }
-	}
+    }
 
-	return true;
+    return true;
 }
 
 void QnPlISDResourceSearcher::createResource(

@@ -171,8 +171,8 @@ Ptz::Capabilities QnMediaResource::getPtzCapabilities(core_ptz::Type ptzType) co
         case core_ptz::Type::operational:
             return operationalPtzCapabilities();
         case core_ptz::Type::configurational:
-            return Ptz::Capabilities(
-                toResource()->getProperty(Qn::kConfigurationalPtzCapabilities).toInt());
+            return Ptz::Capabilities(toResource()->getProperty(
+                ResourcePropertyKey::kConfigurationalPtzCapabilities).toInt());
         default:
             NX_ASSERT(false, "Wrong ptz type, we should never be here");
             return Ptz::NoPtzCapabilities;
@@ -201,7 +201,8 @@ void QnMediaResource::setPtzCapabilities(
         }
         case core_ptz::Type::configurational:
         {
-            toResource()->setProperty(Qn::kConfigurationalPtzCapabilities, (int) capabilities);
+            toResource()->setProperty(
+                ResourcePropertyKey::kConfigurationalPtzCapabilities, (int) capabilities);
             break;
         }
         default:

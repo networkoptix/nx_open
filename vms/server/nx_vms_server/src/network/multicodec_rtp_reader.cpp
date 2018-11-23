@@ -513,7 +513,7 @@ void QnMulticodecRtpReader::at_propertyChanged(const QnResourcePtr & res, const 
     if (isTransportChanged || isMediaPortChanged)
         pleaseStop();
 
-    if (key == Qn::TRUST_CAMERA_TIME_NAME)
+    if (key == ResourcePropertyKey::kTrustCameraTime)
         updateTimePolicy();
 }
 
@@ -617,7 +617,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
             if (camRes && m_role == Qn::CR_LiveVideo &&
                 camRes->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout))
             {
-                camRes->saveParams();
+                camRes->saveProperties();
             }
         }
     }

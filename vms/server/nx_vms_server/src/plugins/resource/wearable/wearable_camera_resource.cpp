@@ -22,10 +22,10 @@ CameraDiagnostics::Result QnWearableCameraResource::initInternal()
 {
     CameraDiagnostics::Result result = base_type::initInternal();
 
-    setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, lit("1"));
-    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, lit("0"));
-    setProperty(Qn::SUPPORTED_MOTION_PARAM_NAME, lit("softwaregrid"));
-    saveParams();
+    setProperty(ResourcePropertyKey::kIsAudioSupported, lit("1"));
+    setProperty(ResourcePropertyKey::kHasDualStreaming, lit("0"));
+    setProperty(ResourcePropertyKey::kSupportedMotion, lit("softwaregrid"));
+    saveProperties();
 
     return result;
 }

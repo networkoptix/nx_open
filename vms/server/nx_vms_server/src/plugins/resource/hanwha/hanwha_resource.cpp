@@ -638,7 +638,7 @@ QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueM
             *info,
             value.value);
     }
-    saveParams();
+    saveProperties();
 
     bool success = true;
     for (const auto& request: requests)
@@ -676,7 +676,7 @@ QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueM
     if (reopenPrimaryStream || reopenSecondaryStream)
     {
         initMediaStreamCapabilities();
-        saveParams();
+        saveProperties();
         reopenStreams(reopenPrimaryStream, reopenSecondaryStream);
     }
 
@@ -820,7 +820,7 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
         {
             setCameraCapability(Qn::IsDefaultPasswordCapability, isDefaultPassword);
             setCameraCapability(Qn::IsOldFirmwareCapability, isOldFirmware);
-            saveParams();
+            saveProperties();
         });
 
     const auto sharedContext = serverModule()->sharedContextPool()
@@ -3480,7 +3480,7 @@ bool HanwhaResource::resetProfileToDefault(Qn::ConnectionRole role)
         setProperty(kSecondaryStreamBitrateParamName, defaultBitrateForStream(role));
     }
 
-    saveParams();
+    saveProperties();
     return true;
 }
 
@@ -3713,7 +3713,6 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(
     NX_ASSERT(numberOfOverlappedIds <= 1, lit("There should be only one overlapped ID for NVR"));
     if (numberOfOverlappedIds != 1)
         return QnTimePeriodList();
-
 
     const auto& periods = timeline.cbegin()->second;
     auto itr = std::lower_bound(periods.begin(), periods.end(), startTimeMs);

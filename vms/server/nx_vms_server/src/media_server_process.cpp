@@ -451,7 +451,6 @@ void calculateSpaceLimitOrLoadFromConfig(
     fileStorage->setSpaceLimit(fileStorage->calcInitialSpaceLimit());
 }
 
-
 #ifdef Q_OS_WIN
 static int freeGB(QString drive)
 {
@@ -888,7 +887,7 @@ void MediaServerProcess::dumpSystemUsageStats()
 
     const auto networkIfInfo = networkIfList.join(lit(", "));
     if (m_mediaServer->setProperty(Qn::NETWORK_INTERFACES, networkIfInfo))
-        m_mediaServer->saveParams();
+        m_mediaServer->saveProperties();
 
     QnMutexLocker lk( &m_mutex );
     if(m_dumpSystemResourceUsageTaskId == 0)  //monitoring cancelled
@@ -1221,7 +1220,7 @@ void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
         }
     }
 
-    server->saveParams();
+    server->saveProperties();
     m_mediaServer->setStatus(Qn::Online);
 
     #ifdef ENABLE_EXTENDED_STATISTICS
@@ -1229,7 +1228,7 @@ void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
             [server](size_t count)
             {
                 server->setProperty(Qn::BOOKMARK_COUNT, QString::number(count));
-                server->saveParams();
+                server->saveProperties();
             });
     #endif
 }
@@ -1266,7 +1265,7 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIp)
         }
 
         if (server->setProperty(Qn::PUBLIC_IP, publicIp.toString(), QnResource::NO_ALLOW_EMPTY))
-            server->saveParams();
+            server->saveProperties();
 
         updateAddressesList(); //< update interface list to add/remove publicIP
     }
@@ -2594,7 +2593,6 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/settingsDocumentation", new QnSettingsDocumentationHandler(&serverModule()->settings()));
 
-
     /**%apidoc GET /ec2/analyticsEngineSettings
      * Return settings values of the specified engine
      * %return:object JSON object consisting of name-value settings pairs
@@ -3445,7 +3443,6 @@ void MediaServerProcess::stopObjects()
     WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(QThread::currentThread(), 3);
     waitingForObjectsToBeFreed.join();
 
-
     m_discoveryMonitor.reset();
     m_crashReporter.reset();
 
@@ -3781,7 +3778,7 @@ void MediaServerProcess::connectSignals()
             const auto current = nx::network::UdtStatistics::global.internetBytesTransfered.load();
             const auto update = old + (qulonglong)current;
             if (server->setProperty(Qn::UDT_INTERNET_TRFFIC, QString::number(update))
-                && server->saveParams())
+                && server->saveProperties())
             {
                 NX_DEBUG(kLogTag, lm("%1 is updated to %2").args(Qn::UDT_INTERNET_TRFFIC, update));
                 nx::network::UdtStatistics::global.internetBytesTransfered -= current;

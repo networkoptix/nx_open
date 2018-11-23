@@ -71,7 +71,6 @@ const int kMaxRecorderQueueSizePacketsDefault = 1000;
 const QString kMaxProgressiveDownloadersName("maxProgressiveDowloaders");
 const int kMaxProgressiveDownloadersDefault = 2;
 
-
 const QString kTakeCameraOwnershipWithoutLock("takeCameraOwnershipWithoutLock");
 const int kTakeCameraOwnershipWithoutLockDefault = true;
 
@@ -1244,7 +1243,7 @@ bool QnGlobalSettings::takeFromSettings(QSettings* settings, const QnResourcePtr
                 m_statisticsAllowedAdaptor->setValue(QnOptionalBool(value));
             }
             mediaServer->setProperty(kStatisticsReportAllowed, QString());
-            mediaServer->saveParams();
+            mediaServer->saveProperties();
         }
     }
 

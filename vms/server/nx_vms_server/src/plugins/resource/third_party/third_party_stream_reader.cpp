@@ -65,7 +65,6 @@ namespace
     }
 }
 
-
 ThirdPartyStreamReader::ThirdPartyStreamReader(
     QnThirdPartyResourcePtr res,
     nxcip::BaseCameraManager* camManager )
@@ -85,7 +84,7 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
         this,
         [this](const QnResourcePtr& resource, const QString& propertyName)
         {
-            if (propertyName == Qn::CAMERA_STREAM_URLS)
+            if (propertyName == ResourcePropertyKey::kStreamUrls)
             {
                 // Reinitialize camera driver. hasDualStreaming may be changed.
                 m_resource->setStatus(Qn::Offline);

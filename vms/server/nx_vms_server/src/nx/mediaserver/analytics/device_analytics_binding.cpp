@@ -464,7 +464,7 @@ bool DeviceAnalyticsBinding::updateDescriptorsWithManifest(
         m_engine->getId(),
         supportedObjectTypes(manifest));
 
-    m_device->saveParams();
+    m_device->saveProperties();
 
     return true;
 }

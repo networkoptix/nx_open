@@ -114,7 +114,7 @@ CameraDiagnostics::Result FcResource::initializeCameraDriver()
     allPorts.insert(allPorts.begin(), outputPorts.begin(), outputPorts.end());
 
     setIoPortDescriptions(std::move(allPorts), /*needMerge*/ true);
-    saveParams();
+    saveProperties();
     return CameraDiagnostics::NoErrorResult();
 }
 

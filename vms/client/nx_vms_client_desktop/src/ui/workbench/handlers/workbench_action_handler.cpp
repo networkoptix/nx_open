@@ -212,7 +212,6 @@ static constexpr int kSectionHeight = 20;
 //!time that is given to process to exit. After that, applauncher (if present) will try to terminate it
 static const quint32 PROCESS_TERMINATE_TIMEOUT = 15000;
 
-
 namespace nx::vms::client::desktop {
 namespace ui {
 namespace workbench {
@@ -1141,7 +1140,7 @@ void ActionHandler::at_convertCameraToEntropix_triggered()
                         QRectF(0.5, 0, 0.5, 1.0))
                 });
         }
-        camera->saveParamsAsync();
+        camera->savePropertiesAsync();
     }
 }
 
@@ -1692,7 +1691,6 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
         }
     }
 
-
     /* List of possible time steps, in milliseconds. */
     const qint64 steps[] = {
         1000ll * 10,                    /* 10 seconds. */
@@ -2173,7 +2171,6 @@ void ActionHandler::closeApplication(bool force) {
 void ActionHandler::at_beforeExitAction_triggered() {
     deleteDialogs();
 }
-
 
 QnAdjustVideoDialog* ActionHandler::adjustVideoDialog() {
     return m_adjustVideoDialog.data();

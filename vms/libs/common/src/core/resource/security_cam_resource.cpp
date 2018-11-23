@@ -89,10 +89,10 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     m_cachedCameraCapabilities(
         [this]()->Qn::CameraCapabilities {
             return static_cast<Qn::CameraCapabilities>(
-                getProperty(Qn::CAMERA_CAPABILITIES_PARAM_NAME).toInt()); },
+                getProperty(ResourcePropertyKey::kCameraCapabilities).toInt()); },
         &m_mutex ),
     m_cachedIsDtsBased(
-        [this]()->bool{ return getProperty(Qn::DTS_PARAM_NAME).toInt() > 0; },
+        [this]()->bool{ return getProperty(ResourcePropertyKey::kDts).toInt() > 0; },
         &m_mutex ),
     m_motionType(
         std::bind( &QnSecurityCamResource::calculateMotionType, this ),
@@ -151,10 +151,10 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     connect(this, &QnNetworkResource::propertyChanged, this,
         [this](const QnResourcePtr& /*resource*/, const QString& key)
         {
-            if (key == Qn::CAMERA_CAPABILITIES_PARAM_NAME)
+            if (key == ResourcePropertyKey::kCameraCapabilities)
                 emit capabilitiesChanged(toSharedPointer());
 
-            if (key == Qn::DTS_PARAM_NAME)
+            if (key == ResourcePropertyKey::kDts)
                 emit licenseTypeChanged(toSharedPointer(this));
 
             if (key == Qn::kDeviceType)
@@ -255,7 +255,7 @@ int QnSecurityCamResource::getMaxFps() const
         return result;
 
     // Compatibility with version < 3.1.2
-    QString value = getProperty(Qn::MAX_FPS_PARAM_NAME);
+    QString value = getProperty(ResourcePropertyKey::kMaxFps);
     return value.isNull() ? kDefaultMaxFps : value.toInt();
 }
 
@@ -445,7 +445,7 @@ void QnSecurityCamResource::setCameraMediaCapability(const nx::media::CameraMedi
     setProperty(
         nx::media::kCameraMediaCapabilityParamName, QString::fromLatin1(QJson::serialized(value)));
     m_cachedCameraMediaCapabilities.reset();
-    saveParams();
+    saveProperties();
 }
 
 bool QnSecurityCamResource::hasDualStreamingInternal() const
@@ -455,7 +455,7 @@ bool QnSecurityCamResource::hasDualStreamingInternal() const
         return true;
 
     // Compatibility with version < 3.1.2
-    QString val = getProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME);
+    QString val = getProperty(ResourcePropertyKey::kHasDualStreaming);
     return val.toInt() > 0;
 }
 
@@ -471,7 +471,7 @@ bool QnSecurityCamResource::canConfigureRecording() const
 
 bool QnSecurityCamResource::isAnalog() const
 {
-    QString val = getProperty(Qn::ANALOG_PARAM_NAME);
+    QString val = getProperty(ResourcePropertyKey::kAnalog);
     return val.toInt() > 0;
 }
 
@@ -543,7 +543,7 @@ Qn::LicenseType QnSecurityCamResource::licenseType() const
 }
 
 Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const {
-    QString sval = getProperty(Qn::STREAM_FPS_SHARING_PARAM_NAME);
+    QString sval = getProperty(ResourcePropertyKey::kStreamFpsSharing);
     if (sval.isEmpty())
         return kDefaultStreamFpsSharingMethod;
 
@@ -559,13 +559,13 @@ void QnSecurityCamResource::setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod
     switch( value )
     {
         case Qn::BasicFpsSharing:
-            setProperty(Qn::STREAM_FPS_SHARING_PARAM_NAME, lit("shareFps"));
+            setProperty(ResourcePropertyKey::kStreamFpsSharing, lit("shareFps"));
             break;
         case Qn::NoFpsSharing:
-            setProperty(Qn::STREAM_FPS_SHARING_PARAM_NAME, lit("noSharing"));
+            setProperty(ResourcePropertyKey::kStreamFpsSharing, lit("noSharing"));
             break;
         default:
-            setProperty(Qn::STREAM_FPS_SHARING_PARAM_NAME, lit("sharePixels"));
+            setProperty(ResourcePropertyKey::kStreamFpsSharing, lit("sharePixels"));
             break;
     }
 }
@@ -642,19 +642,19 @@ void QnSecurityCamResource::at_motionRegionChanged()
 
 int QnSecurityCamResource::motionWindowCount() const
 {
-    QString val = getProperty(Qn::MOTION_WINDOW_CNT_PARAM_NAME);
+    QString val = getProperty(ResourcePropertyKey::kMotionWindowCnt);
     return val.toInt();
 }
 
 int QnSecurityCamResource::motionMaskWindowCount() const
 {
-    QString val = getProperty(Qn::MOTION_MASK_WINDOW_CNT_PARAM_NAME);
+    QString val = getProperty(ResourcePropertyKey::kMotionMaskWindowCnt);
     return val.toInt();
 }
 
 int QnSecurityCamResource::motionSensWindowCount() const
 {
-    QString val = getProperty(Qn::MOTION_SENS_WINDOW_CNT_PARAM_NAME);
+    QString val = getProperty(ResourcePropertyKey::kMotionSensWindowCnt);
     return val.toInt();
 }
 
@@ -670,7 +670,7 @@ bool QnSecurityCamResource::isAudioSupported() const
         return true;
 
     // Compatibility with version < 3.1.2
-    QString val = getProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME);
+    QString val = getProperty(ResourcePropertyKey::kIsAudioSupported);
     return val.toInt() > 0;
 }
 
@@ -744,7 +744,7 @@ bool QnSecurityCamResource::hasCameraCapabilities(Qn::CameraCapabilities capabil
 
 void QnSecurityCamResource::setCameraCapabilities(Qn::CameraCapabilities capabilities)
 {
-    setProperty(Qn::CAMERA_CAPABILITIES_PARAM_NAME, static_cast<int>(capabilities));
+    setProperty(ResourcePropertyKey::kCameraCapabilities, static_cast<int>(capabilities));
     m_cachedCameraCapabilities.reset();
 }
 
@@ -875,12 +875,12 @@ void QnSecurityCamResource::setFirmware(const QString &firmware)
 
 bool QnSecurityCamResource::trustCameraTime() const
 {
-    return QnLexical::deserialized<bool>(getProperty(Qn::TRUST_CAMERA_TIME_NAME));
+    return QnLexical::deserialized<bool>(getProperty(ResourcePropertyKey::kTrustCameraTime));
 }
 
 void QnSecurityCamResource::setTrustCameraTime(bool value)
 {
-    setProperty(Qn::TRUST_CAMERA_TIME_NAME, boolToPropertyStr(value));
+    setProperty(ResourcePropertyKey::kTrustCameraTime, boolToPropertyStr(value));
 }
 
 QString QnSecurityCamResource::getVendor() const
@@ -1277,7 +1277,7 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
 
 Qn::MotionTypes QnSecurityCamResource::calculateSupportedMotionType() const
 {
-    QString val = getProperty(Qn::SUPPORTED_MOTION_PARAM_NAME);
+    QString val = getProperty(ResourcePropertyKey::kSupportedMotion);
     if (val.isEmpty())
         return Qn::MotionType::MT_SoftwareGrid;
 
@@ -1386,48 +1386,48 @@ nx::core::ptz::PresetType QnSecurityCamResource::preferredPtzPresetType() const
 nx::core::ptz::PresetType QnSecurityCamResource::userPreferredPtzPresetType() const
 {
     return QnLexical::deserialized(
-        getProperty(Qn::kUserPreferredPtzPresetType),
+        getProperty(ResourcePropertyKey::kUserPreferredPtzPresetType),
         nx::core::ptz::PresetType::undefined);
 }
 
 void QnSecurityCamResource::setUserPreferredPtzPresetType(nx::core::ptz::PresetType presetType)
 {
-    setProperty(Qn::kUserPreferredPtzPresetType, QnLexical::serialized(presetType));
+    setProperty(ResourcePropertyKey::kUserPreferredPtzPresetType, QnLexical::serialized(presetType));
 }
 
 nx::core::ptz::PresetType QnSecurityCamResource::defaultPreferredPtzPresetType() const
 {
     return QnLexical::deserialized(
-        getProperty(Qn::kDefaultPreferredPtzPresetType),
+        getProperty(ResourcePropertyKey::kDefaultPreferredPtzPresetType),
         nx::core::ptz::PresetType::native);
 }
 
 void QnSecurityCamResource::setDefaultPreferredPtzPresetType(nx::core::ptz::PresetType presetType)
 {
-    setProperty(Qn::kDefaultPreferredPtzPresetType, QnLexical::serialized(presetType));
+    setProperty(ResourcePropertyKey::kDefaultPreferredPtzPresetType, QnLexical::serialized(presetType));
 }
 
 bool QnSecurityCamResource::isUserAllowedToModifyPtzCapabilities() const
 {
-    return QnLexical::deserialized(getProperty(Qn::kUserIsAllowedToOverridePtzCapabilities), false);
+    return QnLexical::deserialized(getProperty(ResourcePropertyKey::kUserIsAllowedToOverridePtzCapabilities), false);
 }
 
 void QnSecurityCamResource::setIsUserAllowedToModifyPtzCapabilities(bool allowed)
 {
     setProperty(
-        Qn::kUserIsAllowedToOverridePtzCapabilities,
+        ResourcePropertyKey::kUserIsAllowedToOverridePtzCapabilities,
         QnLexical::serialized(allowed));
 }
 
 Ptz::Capabilities QnSecurityCamResource::ptzCapabilitiesAddedByUser() const
 {
     return QnLexical::deserialized<Ptz::Capabilities>(
-        getProperty(Qn::kPtzCapabilitiesAddedByUser), Ptz::NoPtzCapabilities);
+        getProperty(ResourcePropertyKey::kPtzCapabilitiesAddedByUser), Ptz::NoPtzCapabilities);
 }
 
 void QnSecurityCamResource::setPtzCapabilitiesAddedByUser(Ptz::Capabilities capabilities)
 {
-    setProperty(Qn::kPtzCapabilitiesAddedByUser, QnLexical::serialized(capabilities));
+    setProperty(ResourcePropertyKey::kPtzCapabilitiesAddedByUser, QnLexical::serialized(capabilities));
 }
 
 int QnSecurityCamResource::suggestBitrateKbps(const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const

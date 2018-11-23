@@ -177,7 +177,7 @@ Qn::MotionType CameraMock::getMotionType() const
     return Qn::MotionType::MT_SoftwareGrid;
 }
 
-bool CameraMock::saveParams()
+bool CameraMock::saveProperties()
 {
     return true;
 }
@@ -225,4 +225,3 @@ QnMediaServerModule* CameraTest::serverModule() const
 } // namespace resource
 } // namespace mediaserver
 } // namespace nx
-
