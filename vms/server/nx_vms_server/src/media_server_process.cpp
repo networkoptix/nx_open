@@ -2595,43 +2595,40 @@ void MediaServerProcess::registerRestHandlers(
     reg("ec2/getHardwareIdsOfServers", new QnMultiserverGetHardwareIdsRestHandler(QLatin1String("/") + kGetHardwareIdsPath));
 
     /**%apidoc GET /api/settingsDocumentation
-     * Return settings documentation
+     * Return settings documentation.
      * %return:array List of setting descriptions.
-     *     %param:string name Setting name
-     *     %param:string defaultValue Setting default value
-     *     %param:string description Setiing description
+     *     %param:string name Setting name.
+     *     %param:string defaultValue Setting default value.
+     *     %param:string description Setiing description.
      */
     reg("api/settingsDocumentation", new QnSettingsDocumentationHandler(&serverModule()->settings()));
 
-
     /**%apidoc GET /ec2/analyticsEngineSettings
-     * Return settings values of the specified engine
-     * %return:object JSON object consisting of name-value settings pairs
-     *      %param:string engineId Id of analytics engine
+     * Return settings values of the specified engine.
+     * %return:object JSON object consisting of name-value settings pairs.
+     *      %param:string engineId Id of analytics engine.
      *
      * %apidoc POST /ec2/analyticsEngineSettings
-     * Applies passed settings values to correspondent analytics engine
-     * %param:string engineId Id of analytics engine
-     * %param settings JSON object consisting of name-value settings pairs
+     * Applies passed settings values to correspondent analytics engine.
+     * %param:string engineId Unique Id of analytics engine.
+     * %param settings JSON object consisting of name-value settings pairs.
      */
-    reg(
-        "ec2/analyticsEngineSettings",
+    reg("ec2/analyticsEngineSettings",
         new nx::mediaserver::rest::AnalyticsEngineSettingsHandler(serverModule()));
 
     /**%apidoc GET /ec2/deviceAnalyticsSettings
-     * Return settings values of the specified device-engine pair
-     * %return:object JSON object consisting of name-value settings pairs
-     *      %param:string engineId Id of an analytics engine
-     *      %param:string deviceId Id of a device
+     * Return settings values of the specified device-engine pair.
+     * %return:object JSON object consisting of name-value settings pairs.
+     *      %param:string engineId Unique Id of an analytics engine.
+     *      %param:string deviceId Id of a device.
      *
      * %apidoc POST /ec2/deviceAnalyticsSettings
-     * Applies passed settings values to the correspondent device-engine pair
-     * %param:string engineId Id of an analytics engine
-     * %param:string deviceId Id of a device
-     * %param settings JSON object consisting of name-value settings pairs
+     * Applies passed settings values to the correspondent device-engine pair.
+     * %param:string engineId Unique Id of an analytics engine.
+     * %param:string deviceId Id of a device.
+     * %param settings JSON object consisting of name-value settings pairs.
      */
-    reg(
-        "ec2/deviceAnalyticsSettings",
+    reg("ec2/deviceAnalyticsSettings",
         new nx::mediaserver::rest::DeviceAnalyticsSettingsHandler(serverModule()));
 }
 

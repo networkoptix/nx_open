@@ -96,10 +96,6 @@ void Manager::init()
         resourcePool(), &QnResourcePool::resourceRemoved,
         this, &Manager::at_resourceRemoved);
 
-    connect(
-        serverModule()->analyticsEventRuleWatcher(), &EventRuleWatcher::rulesUpdated,
-        this, &Manager::at_rulesUpdated);
-
     QMetaObject::invokeMethod(this, "initExistingResources");
 }
 
@@ -205,32 +201,11 @@ void Manager::at_resourceRemoved(const QnResourcePtr& resource)
     at_engineRemoved(engine);
 }
 
-void Manager::at_rulesUpdated(const QSet<QnUuid>& affectedResources)
-{
-#if 0
-    NX_VERBOSE(
-        this,
-        lm("Rules have been updated. Affected resources: %1").arg(affectedResources));
-
-    for (const auto& resourceId: affectedResources)
-    {
-        auto resource = resourcePool()->getResourceById(resourceId);
-        if (!resource)
-            releaseDeviceAgentsUnsafe(resourceId);
-        else
-            handleResourceChanges(resource);
-    }
-#endif
-}
-
 void Manager::at_resourceParentIdChanged(const QnResourcePtr& resource)
 {
     auto device = resource.dynamicCast<QnVirtualCameraResource>();
-    if (!device)
-    {
-        NX_WARNING(this, "Resource is not a device.");
+    if (!NX_ASSERT(device))
         return;
-    }
 
     at_deviceParentIdChanged(device);
 }
@@ -245,11 +220,8 @@ void Manager::at_resourcePropertyChanged(const QnResourcePtr& resource, const QS
     }
 
     auto engine = resource.dynamicCast<resource::AnalyticsEngineResource>();
-    if (!engine)
-    {
-        NX_WARNING(this, "Resource is not a device or engine");
+    if (!NX_ASSERT(engine))
         return;
-    }
 
     at_enginePropertyChanged(engine, propertyName);
 }

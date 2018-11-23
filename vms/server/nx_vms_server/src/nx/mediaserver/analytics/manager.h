@@ -50,7 +50,6 @@ public:
     void stop();
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_resourceRemoved(const QnResourcePtr& resource);
-    void at_rulesUpdated(const QSet<QnUuid>& affectedResources);
 
     void at_resourceParentIdChanged(const QnResourcePtr& resource);
     void at_resourcePropertyChanged(const QnResourcePtr& resource, const QString& propertyName);
