@@ -22,7 +22,7 @@
 #include <transaction/message_bus_adapter.h>
 #include <nx/p2p/p2p_server_message_bus.h>
 #include <nx/network/p2p_transport/p2p_http_server_transport.h>
-#include <nx/network/p2p_transport/p2p_websocket_server_transport.h>
+#include <nx/network/p2p_transport/p2p_websocket_transport.h>
 
 namespace nx {
 namespace p2p {
@@ -316,24 +316,20 @@ void ConnectionProcessor::run()
     {
         auto session = authSession();
         commonModule()->auditManager()->at_connectionOpened(session);
-        onConnectionClosedCallback = std::bind(&QnAuditManager::at_connectionClosed, commonModule()->auditManager(), session);
+        onConnectionClosedCallback = std::bind(&QnAuditManager::at_connectionClosed,
+            commonModule()->auditManager(), session);
     }
 
     d->socket->setNonBlockingMode(true);
     auto keepAliveTimeout = std::chrono::milliseconds(remotePeer.aliveUpdateIntervalMs);
 
     P2pTransportPtr p2pTransport;
+    const auto dataFormat = remotePeer.dataFormat == Qn::JsonFormat
+        ? websocket::FrameType::text : websocket::FrameType::binary;
     if (useWebSocket)
-    {
-        auto dataFormat = remotePeer.dataFormat == Qn::JsonFormat
-            ? websocket::FrameType::text : websocket::FrameType::binary;
-        p2pTransport = std::make_unique<P2PWebsocketServerTransport>(std::move(d->socket), dataFormat);
-    }
+        p2pTransport = std::make_unique<P2PWebsocketTransport>(std::move(d->socket), dataFormat);
     else
-    {
-        p2pTransport = std::make_unique<P2PHttpServerTransport>(std::move(d->socket),
-            Qn::serializationFormatToHttpContentType(remotePeer.dataFormat));
-    }
+        p2pTransport = std::make_unique<P2PHttpServerTransport>(std::move(d->socket), dataFormat);
 
     messageBus->gotConnectionFromRemotePeer(
         remotePeer,

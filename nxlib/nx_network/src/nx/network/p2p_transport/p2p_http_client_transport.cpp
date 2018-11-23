@@ -4,7 +4,7 @@ namespace nx::network {
 
 P2PHttpClientTransport::P2PHttpClientTransport(
     std::unique_ptr<AbstractStreamSocket> socket,
-    const nx::utils::Url& postConnectionUrl,
+    const nx::utils::Url& getConnectionUrl,
     nx::utils::MoveOnlyFunc<void()> onPostConnectionEstablished,
     websocket::FrameType frameType)
     :

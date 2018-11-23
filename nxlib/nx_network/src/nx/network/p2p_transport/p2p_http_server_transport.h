@@ -8,9 +8,7 @@ namespace nx::network {
 class NX_NETWORK_API P2PHttpServerTransport: public detail::P2PBaseHttpTransport
 {
 public:
-      P2PHttpServerTransport(
-          std::unique_ptr<AbstractStreamSocket> socket,
-          const QByteArray& contentType,
+      P2PHttpServerTransport(std::unique_ptr<AbstractStreamSocket> socket,
           websocket::FrameType frameType = websocket::FrameType::binary);
 
     void gotPostConnection(std::unique_ptr<AbstractStreamSocket> socket);

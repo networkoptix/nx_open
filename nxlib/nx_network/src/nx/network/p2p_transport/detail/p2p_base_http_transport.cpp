@@ -2,13 +2,14 @@
 
 namespace nx::network::detail {
 
-P2PBaseHttpTransport::P2PBaseHttpTransport(std::unique_ptr<AbstractStreamSocket> streamSocket,
-    websocket::FrameType frameType)
+P2PBaseHttpTransport::P2PBaseHttpTransport(websocket::FrameType messageType):
+    m_messageType(messageType)
 {
 }
 
 void P2PBaseHttpTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler)
 {
+    NX_ASSERT(m_readHttpClient);
 }
 
 void P2PBaseHttpTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)

@@ -12,7 +12,7 @@
 #include <transaction/transaction_message_bus_base.h>
 #include <nx/network/p2p_transport/p2p_http_client_transport.h>
 #include <nx/network/p2p_transport/p2p_http_server_transport.h>
-#include <nx/network/p2p_transport/p2p_websocket_client_transport.h>
+#include <nx/network/p2p_transport/p2p_websocket_transport.h>
 #include <nx/network/p2p_transport/p2p_http_client_transport.h>
 
 // For debug purpose only
@@ -303,7 +303,7 @@ void ConnectionBase::onHttpClientDone()
         ? websocket::FrameType::text
         : websocket::FrameType::binary;
     if (useWebsocketMode)
-        m_p2pTransport.reset(new P2PWebsocketClientTransport(std::move(socket), frameType));
+        m_p2pTransport.reset(new P2PWebsocketTransport(std::move(socket), frameType));
     else
         m_p2pTransport.reset(new P2PHttpClientTransport(std::move(socket), m_httpClient->url(), nullptr));
 
