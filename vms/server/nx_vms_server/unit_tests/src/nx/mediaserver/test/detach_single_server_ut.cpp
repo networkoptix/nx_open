@@ -113,8 +113,9 @@ public:
         auto client = std::make_unique<nx::network::http::HttpClient>();
         client->setUserName("admin");
         client->setUserPassword("admin");
-        DetachFromCloudData data;
-        data.password = "My1nsAnelYSaf3P4ssW0rd";
+
+        CurrentPasswordData data;
+        data.currentPassword = "admin";
 
         nx::utils::Url url = mediaServerLauncher->apiUrl();
         url.setPath("/api/detachFromSystem");
