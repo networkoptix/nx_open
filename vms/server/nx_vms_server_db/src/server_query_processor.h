@@ -33,7 +33,7 @@ namespace detail {
 
 class ServerQueryProcessor;
 
-static const int kMaxQueueSize = 1000;
+static const int kMaxQueueSize = 5000;
 
 class TransactionExecutor: public QnLongRunnable
 {
