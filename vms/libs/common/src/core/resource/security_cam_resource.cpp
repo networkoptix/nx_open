@@ -107,7 +107,7 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
         [this]()
         {
             return QJson::deserialized<nx::media::CameraMediaCapability>(
-                getProperty(nx::media::kCameraMediaCapabilityParamName).toUtf8());
+                getProperty(ResourcePropertyKey::kMediaCapabilities).toUtf8());
         },
         &m_mutex),
     m_cachedDeviceType(
@@ -265,8 +265,8 @@ void QnSecurityCamResource::setMaxFps(int fps)
     capability.streamCapabilities[Qn::StreamIndex::primary].maxFps = fps;
 
     // We use direct setProperty() call instead of setCameraMediaCapability(),
-    // because this functions should not save parameters.
-    setProperty(nx::media::kCameraMediaCapabilityParamName,
+    // because setMaxFps function should not save parameters.
+    setProperty(ResourcePropertyKey::kMediaCapabilities,
         QString::fromLatin1(QJson::serialized(capability)));
 }
 int QnSecurityCamResource::reservedSecondStreamFps() const
@@ -446,7 +446,7 @@ nx::media::CameraMediaCapability QnSecurityCamResource::cameraMediaCapability() 
 void QnSecurityCamResource::setCameraMediaCapability(const nx::media::CameraMediaCapability& value)
 {
     setProperty(
-        nx::media::kCameraMediaCapabilityParamName, QString::fromLatin1(QJson::serialized(value)));
+        ResourcePropertyKey::kMediaCapabilities, QString::fromLatin1(QJson::serialized(value)));
     m_cachedCameraMediaCapabilities.reset();
     saveProperties();
 }

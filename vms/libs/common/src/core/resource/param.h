@@ -25,7 +25,9 @@ static const QString kDts("dts");
  * kMaxFpsThis property key is for compatibility with vms 3.1 only.
  * Do not confuse it with ResourceDataKey::kMaxFps.
  */
-static const QString kMaxFps("MaxFPS"); //<
+static const QString kMaxFps("MaxFPS");
+
+static const QString kMediaCapabilities("mediaCapabilities");
 static const QString kMotionWindowCnt("motionWindowCnt");
 static const QString kMotionMaskWindowCnt("motionMaskWindowCnt");
 static const QString kMotionSensWindowCnt("motionSensWindowCnt");

@@ -897,7 +897,7 @@ void HanwhaResource::initMediaStreamCapabilities()
     m_capabilities.streamCapabilities[Qn::StreamIndex::secondary] =
         mediaCapabilityForRole(Qn::ConnectionRole::CR_SecondaryLiveVideo);
     setProperty(
-        nx::media::kCameraMediaCapabilityParamName,
+        ResourcePropertyKey::kMediaCapabilities,
         QString::fromLatin1(QJson::serialized(m_capabilities)));
 }
 
