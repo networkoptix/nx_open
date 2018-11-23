@@ -422,7 +422,7 @@ bool QnVirtualCameraResource::saveBitrateIfNeeded( const CameraBitrateInfo& bitr
 
 void QnVirtualCameraResource::emitPropertyChanged(const QString& key)
 {
-    if (key == Qn::PTZ_CAPABILITIES_PARAM_NAME)
+    if (key == ResourcePropertyKey::kPtzCapabilities)
         emit ptzCapabilitiesChanged(::toSharedPointer(this));
     base_type::emitPropertyChanged(key);
 }

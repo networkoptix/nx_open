@@ -58,17 +58,20 @@ static const QString kConfigurationalPtzCapabilities("configurationalPtzCapabili
 static const QString kCombinedSensorsDescription("combinedSensorsDescription");
 static const QString kForcedAudioStream("forcedAudioStream");
 
-} // namespace PropertyKey
+// see ResourceDataKey::kOperationalPtzCapabilities
+static const QString kPtzCapabilities("ptzCapabilities");
+
+} // namespace ResourcePropertyKey
 
 //-------------------------------------------------------------------------------------------------
 
 /**
- Contains the keys to get specific data of resources.
- Specific data is read-only information of a resource that is taken from "resource_data.json".
- Different specific data pieces have different types.
- Usually the data is received like this:
-    QnResourceData resData = commonModule->dataPool()->data(manufacturer, model);
-    auto maxFps = resourceData.value<float>(ResourceDataKey::kMaxFps, 0.0);
+ * Contains the keys to get specific data of resources.
+ * Specific data is read-only information of a resource that is taken from "resource_data.json".
+ * Different specific data pieces have different types.
+ * Usually the data is received like this:
+ *     QnResourceData resData = commonModule->dataPool()->data(manufacturer, model);
+ *     auto maxFps = resourceData.value<float>(ResourceDataKey::kMaxFps, 0.0);
  */
 namespace ResourceDataKey
 {
@@ -101,6 +104,10 @@ static const QString kPreStreamConfigureRequests("preStreamConfigureRequests");
 static const QString kDisableMultiThreadDecoding("disableMultiThreadDecoding");
 static const QString kConfigureAllStitchedSensors("configureAllStitchedSensors");
 static const QString kTwoWayAudio("2WayAudio");
+
+// see ResourcePropertyKey::kPtzCapabilities
+static const QString kOperationalPtzCapabilities("operationalPtzCapabilities");
+static const QString kConfigurationalPtzCapabilities("configurationalPtzCapabilities");
 
 } // namespace ResourceDataKey
 
@@ -136,8 +143,6 @@ static const QString IO_PORT_DISPLAY_NAMES_PARAM_NAME = lit("ioDisplayName");
 static const QString IO_OVERLAY_STYLE_PARAM_NAME = lit("ioOverlayStyle");
 static const QString FORCE_ONVIF_PARAM_NAME = lit("forceONVIF");
 static const QString IGNORE_ONVIF_PARAM_NAME = lit("ignoreONVIF");
-static const QString PTZ_CAPABILITIES_PARAM_NAME = lit("ptzCapabilities");
-//operationalPtzCapabilities
 
 static const QString DW_REBRANDED_TO_ISD_MODEL = lit("isdDwCam");
 static const QString ONVIF_VENDOR_SUBTYPE = lit("onvifVendorSubtype");

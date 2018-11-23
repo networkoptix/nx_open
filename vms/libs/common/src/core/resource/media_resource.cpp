@@ -190,8 +190,8 @@ void QnMediaResource::setPtzCapabilities(
         case core_ptz::Type::operational:
         {
             // TODO: #rvasilenko Why do we need this check?
-            if (toResource()->hasParam(Qn::PTZ_CAPABILITIES_PARAM_NAME))
-                toResource()->setProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME, (int) capabilities);
+            if (toResource()->hasParam(ResourcePropertyKey::kPtzCapabilities))
+                toResource()->setProperty(ResourcePropertyKey::kPtzCapabilities, (int) capabilities);
             break;
         }
         case core_ptz::Type::configurational:
@@ -218,13 +218,14 @@ void QnMediaResource::setPtzCapability(
 
 Ptz::Capabilities QnMediaResource::operationalPtzCapabilities() const
 {
-    return Ptz::Capabilities(toResource()->getProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME).toInt());
+    return Ptz::Capabilities(toResource()->getProperty(
+        ResourcePropertyKey::kPtzCapabilities).toInt());
 }
 
 void QnMediaResource::setOperationalPtzCapabilities(Ptz::Capabilities capabilities)
 {
-    if (toResource()->hasParam(Qn::PTZ_CAPABILITIES_PARAM_NAME))
-        toResource()->setProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME, static_cast<int>(capabilities));
+    if (toResource()->hasParam(ResourcePropertyKey::kPtzCapabilities))
+        toResource()->setProperty(ResourcePropertyKey::kPtzCapabilities, static_cast<int>(capabilities));
 }
 
 bool QnMediaResource::canSwitchPtzPresetTypes() const
