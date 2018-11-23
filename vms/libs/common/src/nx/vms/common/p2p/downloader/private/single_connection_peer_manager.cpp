@@ -237,7 +237,7 @@ rest::QnConnectionPtr SingleConnectionPeerManager::getConnection(const QnUuid& p
     NX_ASSERT(peerId != selfId());
     if (peerId == selfId())
         return rest::QnConnectionPtr();
-    NX_ASSERT(m_directConnection);
+    //NX_ASSERT(m_directConnection);
     return m_directConnection;
 }
 

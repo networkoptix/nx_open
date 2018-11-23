@@ -22,6 +22,9 @@ struct Package
     QString md5;
     qint64 size = 0;
 
+    /** List of targets that should receive this package. */
+    QList<QnUuid> targets;
+
     bool isValid() const { return !file.isEmpty(); }
 };
 
@@ -155,6 +158,11 @@ struct UpdateContents
     nx::update::Package clientPackage;
     nx::update::Information info;
     nx::update::InformationError error = nx::update::InformationError::noError;
+    /**
+     * Packages for manual download. This packages should be downloaded by the client and
+     * pushed to mediaservers without internet.
+     */
+    QList<Package> manualPackages;
     bool cloudIsCompatible = true;
     bool verified = false;
     /** We have already installed this version. Widget will show appropriate status.*/

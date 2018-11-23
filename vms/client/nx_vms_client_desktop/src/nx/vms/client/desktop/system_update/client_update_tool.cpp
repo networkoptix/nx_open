@@ -170,20 +170,48 @@ void ClientUpdateTool::downloadUpdate(const UpdateContents& contents)
         NX_ASSERT(info.isValid());
         auto code = m_downloader->addFile(info);
         using Code = vms::common::p2p::downloader::ResultCode;
-        m_updateFile =  m_downloader->filePath(m_clientPackage.file);
+        QString file =  m_downloader->filePath(m_clientPackage.file);
+
+        m_updateFile = file;
 
         switch (code)
         {
             case Code::ok:
                 NX_VERBOSE(this) << "requestStartUpdate() - downloading client package"
-                    << info.name << " from url="<<m_clientPackage.url;
+                    << info.name << " from url=" << m_clientPackage.url;
                 setState(State::downloading);
                 break;
-            case Code::fileAlreadyExists:
-                NX_VERBOSE(this) << "requestStartUpdate() - file is already here"
-                    << m_updateFile;
+            case Code::fileAlreadyDownloaded:
+                NX_VERBOSE(this) << "requestStartUpdate() - file is already downloaded"
+                    << file;
                 setState(State::readyInstall);
                 break;
+            case Code::fileAlreadyExists:
+            {
+                auto fileInfo = m_downloader->fileInformation(m_clientPackage.file);
+                if (fileInfo.status == FileInformation::Status::downloaded)
+                {
+                    NX_VERBOSE(this) << "requestStartUpdate() - file is already downloaded"
+                        << file;
+                    setState(State::readyInstall);
+                }
+                else if (fileInfo.status == FileInformation::Status::downloading)
+                {
+                    NX_VERBOSE(this)
+                        << "requestStartUpdate() - file"
+                        << info.name << "exists but not fully downloaded"
+                        << "from url="<< m_clientPackage.url;
+                    setState(State::downloading);
+                }
+                else
+                {
+                    NX_VERBOSE(this)
+                        << "requestStartUpdate() - file" << info.name << "exists and something wrong with it"
+                        << "from url=" << m_clientPackage.url;
+                    setState(State::downloading);
+                }
+                break;
+            }
             default:
             // Some sort of an error here.
             {
@@ -202,9 +230,6 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
     if (fileInformation.name != m_clientPackage.file)
         return;
 
-    NX_VERBOSE(this) << "at_downloaderStatusChanged("<< fileInformation.name
-        << ") - status changed to " << fileInformation.status;
-
     if (m_state != State::downloading)
     {
         // WTF are we doing here?
@@ -219,6 +244,8 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
         case FileInformation::Status::uploading:
             break;
         case FileInformation::Status::downloaded:
+            NX_VERBOSE(this) << "atDownloaderStatusChanged("<< fileInformation.name
+                << ") - finally downloaded file to" << m_downloader->filePath(fileInformation.name);
             setState(State::readyInstall);
             break;
         case FileInformation::Status::corrupted:
@@ -266,7 +293,7 @@ int ClientUpdateTool::getDownloadProgress() const
 {
     if (m_state == State::readyInstall)
         return 100;
-    return m_progress;
+    return std::min(m_progress, 100);
 }
 
 bool ClientUpdateTool::isDownloadComplete() const
