@@ -2,6 +2,7 @@
 
 #include "../event_panel.h"
 
+#include <QtCore/QHash>
 #include <QtCore/QPointer>
 #include <QtCore/QScopedPointer>
 
@@ -27,6 +28,8 @@ class BookmarkSearchWidget;
 class EventSearchWidget;
 class AnalyticsSearchWidget;
 
+class AbstractSearchSynchronizer;
+
 // ------------------------------------------------------------------------------------------------
 // EventPanel::Private
 
@@ -40,19 +43,12 @@ public:
     Private(EventPanel* q);
     virtual ~Private() override;
 
-    void setTabCurrent(QWidget* tab, bool current);
-    void setTimeContentDisplayed(Qn::TimePeriodContent content, bool displayed);
-
-signals:
-    void mediaWidgetAboutToBeChanged(QPrivateSignal);
-    void mediaWidgetChanged(QPrivateSignal);
-
 private:
     void rebuildTabs();
     bool systemHasAnalytics() const;
     void updateUnreadCounter(int count, QnNotificationLevel::Value importance);
     void showContextMenu(const QPoint& pos);
-    void handleMediaWidgetChanged();
+    void setTabCurrent(QWidget* tab, bool current);
 
 private:
     EventPanel* const q;
@@ -66,59 +62,11 @@ private:
     EventSearchWidget* const m_eventsTab;
     AnalyticsSearchWidget* const m_analyticsTab;
 
+    const QHash<QWidget*, AbstractSearchSynchronizer*> m_synchronizers;
+
     QWidget* m_previousTab = nullptr;
     QWidget* m_lastTab = nullptr;
 
-    QPointer<QnMediaResourceWidget> m_mediaWidget;
-
-    class MotionSearchSynchronizer;
-    const QScopedPointer<MotionSearchSynchronizer> m_motionSearchSynchronizer;
-
-    class BookmarkSearchSynchronizer;
-    const QScopedPointer<BookmarkSearchSynchronizer> m_bookmarkSearchSynchronizer;
-
-    class AnalyticsSearchSynchronizer;
-    const QScopedPointer<AnalyticsSearchSynchronizer> m_analyticsSearchSynchronizer;
-};
-
-// ------------------------------------------------------------------------------------------------
-// EventPanel::Private::MotionSearchSynchronizer
-
-class EventPanel::Private::MotionSearchSynchronizer: public QObject
-{
-    EventPanel::Private* const m_main;
-
-public:
-    MotionSearchSynchronizer(EventPanel::Private* main);
-
-private:
-    bool isMotionTab() const;
-    void updateAreaSelection();
-};
-
-// ------------------------------------------------------------------------------------------------
-// EventPanel::Private::AnalyticsSearchSynchronizer
-
-class EventPanel::Private::AnalyticsSearchSynchronizer: public QObject
-{
-    EventPanel::Private* const m_main;
-
-public:
-    AnalyticsSearchSynchronizer(EventPanel::Private* main);
-
-private:
-    bool isAnalyticsTab() const;
-    void updateAreaSelection();
-    void updateTimelineDisplay();
-};
-
-// ------------------------------------------------------------------------------------------------
-// EventPanel::Private::BookmarkSearchSynchronizer
-
-class EventPanel::Private::BookmarkSearchSynchronizer: public QObject
-{
-public:
-    BookmarkSearchSynchronizer(EventPanel::Private* main);
 };
 
 } // namespace nx::vms::client::desktop
