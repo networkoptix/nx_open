@@ -32,7 +32,7 @@ bool matches(const QString& searchString, const QnResourcePtr& resource)
 
 Matches matchValues(const QString& searchString, const QnResourcePtr& resource)
 {
-    const int idMatchingSubstrSize = 4;
+    static constexpr int kIdMatchLength = 4;
 
     Matches result;
 
@@ -40,39 +40,42 @@ Matches matchValues(const QString& searchString, const QnResourcePtr& resource)
         return result;
 
     // Combining search values with AND logic.
-    QStringList values = searchString.toLower().split(" ", QString::SkipEmptyParts);
-    for (const auto& searchValue: values)
+    QStringList searchWords = searchString.split(" ", QString::SkipEmptyParts);
+    for (const auto& searchWord: searchWords)
     {
         auto checkParameter =
-            [&result, &searchValue](Parameter parameter, QString value, int matchingSubstrSize = 1)
+            [&result, &searchWord](Parameter parameter, QString value, int matchLength = 1)
             {
-                if (value.size() < matchingSubstrSize && searchValue == value.toLower())
+                if (value.compare(searchWord, Qt::CaseInsensitive) == 0)
                     result.emplace(parameter, value);
 
-                if (value.size() >= matchingSubstrSize && searchValue.size() >= matchingSubstrSize
-                    && value.toLower().contains(searchValue))
-                {
+                if (searchWord.size() >= matchLength && value.contains(searchWord, Qt::CaseInsensitive))
                     result.emplace(parameter, value);
-                }
+            };
+
+        auto checkParameterFullMatch =
+            [&result, &searchWord](Parameter parameter, QString value)
+            {
+                if (value.compare(searchWord, Qt::CaseInsensitive) == 0)
+                    result.emplace(parameter, value);
             };
 
         if (resource->logicalId() > 0)
-            checkParameter(Parameter::logicalId, QString::number(resource->logicalId()),
-                idMatchingSubstrSize);
+            checkParameterFullMatch(Parameter::logicalId, QString::number(resource->logicalId()));
         checkParameter(Parameter::name, resource->getName());
         checkParameter(Parameter::url, resource->getUrl());
 
         if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
         {
             // Check ids by at least 4 character substring match, both with and without braces.
-            checkParameter(Parameter::id, camera->getId().toSimpleString(), idMatchingSubstrSize);
-            checkParameter(Parameter::id, camera->getId().toString(), idMatchingSubstrSize);
+            checkParameter(Parameter::id, camera->getId().toSimpleString(), kIdMatchLength);
+            checkParameter(Parameter::id, camera->getId().toString(), kIdMatchLength);
             checkParameter(Parameter::mac, camera->getMAC().toString());
             checkParameter(Parameter::host, camera->getHostAddress());
             checkParameter(Parameter::model, camera->getModel());
             checkParameter(Parameter::vendor, camera->getVendor());
             checkParameter(Parameter::firmware, camera->getFirmware());
-            checkParameter(Parameter::physicalId, camera->getPhysicalId(), idMatchingSubstrSize);
+            checkParameter(Parameter::physicalId, camera->getPhysicalId(), kIdMatchLength);
         }
 
         if (const auto& user = resource.dynamicCast<QnUserResource>())
