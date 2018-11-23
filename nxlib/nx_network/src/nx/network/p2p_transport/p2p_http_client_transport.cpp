@@ -8,8 +8,9 @@ P2PHttpClientTransport::P2PHttpClientTransport(
     nx::utils::MoveOnlyFunc<void()> onPostConnectionEstablished,
     websocket::FrameType frameType)
     :
-    P2PBaseHttpTransport(std::move(socket), frameType)
+    P2PBaseHttpTransport(frameType)
 {
+    m_readHttpClient.reset(new http::AsyncClient(std::move(socket)));
 }
 
 } // namespace nx::network
