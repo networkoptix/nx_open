@@ -540,6 +540,7 @@ void QnVirtualCameraResource::setDeviceAgentSettingsValues(
         result.insert(it.key(), QJsonObject::fromVariantMap(it.value()));
 
     setProperty(kDeviceAgentsSettingsValuesProperty, QString::fromUtf8(QJson::serialized(result)));
+    saveParams();
 }
 
 QVariantMap QnVirtualCameraResource::deviceAgentSettingsValues(const QnUuid& engineId) const
@@ -589,6 +590,7 @@ void QnVirtualCameraResource::setDeviceAgentManifest(
     setProperty(
         kDeviceAgentManifestsProperty,
         QString::fromUtf8(QJson::serialized(manifests)));
+    saveParams();
 }
 
 void QnVirtualCameraResource::setSupportedAnalyticsEventTypeIds(
@@ -642,6 +644,7 @@ void QnVirtualCameraResource::setSupportedAnalyticsItemTypeIds(
 
     serialized = QString::fromUtf8(QJson::serialized(supportedItemMap));
     setProperty(propertyName, serialized);
+    saveParams();
 }
 
 QMap<QnUuid, QSet<QString>> QnVirtualCameraResource::supportedAnalyticsItemTypeIds(
