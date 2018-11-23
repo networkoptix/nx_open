@@ -1108,13 +1108,16 @@ QVector<QnTransportConnectionInfo> MessageBus::connectionsInfo() const
 
     for (const auto& connection: m_connections)
     {
+        const auto& context = this->context(connection);
+
         QnTransportConnectionInfo info;
         info.url = connection->remoteAddr();
         info.state = toString(connection->state());
         info.isIncoming = connection->direction() == Connection::Direction::incoming;
         info.remotePeerId = connection->remotePeer().id;
-        info.isStarted = context(connection)->isLocalStarted;
-        info.subscription = context(connection)->localSubscription;
+        info.isStarted = context->isLocalStarted;
+        info.gotAnswer = !context->remotePeersMessage.isEmpty();
+        info.subscription = context->localSubscription;
         result.push_back(info);
     }
 
@@ -1123,6 +1126,22 @@ QVector<QnTransportConnectionInfo> MessageBus::connectionsInfo() const
         [this](const RemoteConnection& data)
         {
             return m_connections.contains(data.peerId);
+        }),
+        remoteUrls.end());
+
+    for (const auto& connection: m_outgoingConnections.values())
+    {
+        QnTransportConnectionInfo info;
+        info.url = connection->remoteAddr();
+        info.state = lit("Connecting...");
+        info.isIncoming = false;
+        info.remotePeerId = connection->remotePeer().id;
+        result.push_back(info);
+    }
+    remoteUrls.erase(std::remove_if(remoteUrls.begin(), remoteUrls.end(),
+        [this](const RemoteConnection& data)
+        {
+            return m_outgoingConnections.contains(data.peerId);
         }),
         remoteUrls.end());
 

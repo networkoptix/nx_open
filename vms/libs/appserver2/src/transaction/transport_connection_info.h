@@ -16,11 +16,12 @@ namespace ec2
         QString state;
         bool isIncoming = false;
         bool isStarted = false;
+        bool gotAnswer = false;
         QVector<nx::vms::api::PersistentIdData> subscription;
     };
 
 #define QnTransportConnectionInfo_Fields \
-    (remotePeerId)(url)(state)(isIncoming)(isStarted)(subscription)
+    (remotePeerId)(url)(state)(isIncoming)(isStarted)(gotAnswer)(subscription)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnTransportConnectionInfo), (json));
 
