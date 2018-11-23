@@ -16,6 +16,7 @@ public:
         const QnUuid& primaryTimeServer,
         const QList<State::ServerInfo>& servers);
 
+    static Result applyChanges(State state);
     static Result setReadOnly(State state, bool value);
     static Result setSyncTimeWithInternet(State state, bool value);
     static Result disableSync(State state);
