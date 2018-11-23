@@ -32,6 +32,8 @@ public:
     virtual QVariantMap settingsValues() const override;
     virtual void setSettingsValues(const QVariantMap& values) override;
 
+    bool sendSettingsToSdkEngine();
+
 private:
     std::optional<nx::vms::api::analytics::PluginManifest> pluginManifest() const;
     std::unique_ptr<sdk_support::AbstractManifestLogger> makeLogger() const;

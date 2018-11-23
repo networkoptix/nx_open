@@ -20,8 +20,7 @@ namespace nx::mediaserver::analytics::debug_helpers {
 namespace {
 
 static nx::utils::log::Tag kLogTag(QString("AnalyticsDebugHelpers"));
-static const QString kSettingsFilenamePostfix("settings");
-static const QString kManifestFilenamePostfix("manifest");
+static const QString kSettingsFilenamePostfix("_settings.json");
 
 // Examples of filenames used to save manifests to:
 // DeviceAgent: stub_analytics_plugin_device_a25c01be-f7dc-4600-8b8e-915bf4c0a688_manifest.json
@@ -75,7 +74,7 @@ QString filename(
     if (!NX_ASSERT(!libName.isEmpty()))
         return QString();
 
-    return libName + "_device_" + device->getId().toSimpleString() + "_" + postfix + ".json";
+    return libName + "_device_" + device->getId().toSimpleString() + postfix;
 }
 
 QString filename(
@@ -89,7 +88,7 @@ QString filename(
     if (!NX_ASSERT(!libName.isEmpty()))
         return QString();
 
-    return libName + "_engine_" + postfix + ".json";
+    return libName + "_engine" + postfix;
 }
 
 QString buildFilename(const QString& libName, const QString& postfix)
@@ -100,7 +99,7 @@ QString buildFilename(const QString& libName, const QString& postfix)
     if (!NX_ASSERT(!postfix.isEmpty()))
         return QString();
 
-    return libName + "_" + postfix + ".json";
+    return libName + postfix;
 }
 
 QString debugFilesDirectoryPath(const QString& path)
@@ -217,9 +216,9 @@ QString filename(const nx::sdk::analytics::Plugin* plugin, const QString& postfi
     return buildFilename(pluginLibName(plugin), postfix);
 }
 
-void saveManifestToFile(
+void dumpStringToFile(
     const nx::utils::log::Tag& logTag,
-    const QString& manifest,
+    const QString& stringToDump,
     const QString& directoryPath,
     const QString& filename)
 {
@@ -227,7 +226,7 @@ void saveManifestToFile(
     auto log = //< Can be used to return after logging: return log(...).
         [&logTag, &filename](Level level, const QString& message)
         {
-            NX_UTILS_LOG(level, logTag, "Analytics manifest: %1: [%2]", message, filename);
+            NX_UTILS_LOG(level, logTag, "Dumping to file: %1: [%2]", message, filename);
         };
 
     log(Level::info, "Saving to file");
@@ -240,7 +239,7 @@ void saveManifestToFile(
     if (!f.open(QFile::WriteOnly))
         return log(Level::error, "Unable to (re)create file");
 
-    if (f.write(manifest.toUtf8()) < 0)
+    if (f.write(stringToDump.toUtf8()) < 0)
         return log(Level::error, "Unable to write to file");
 }
 

@@ -96,8 +96,6 @@ private:
         const resource::AnalyticsEngineResourcePtr& engine,
         const QString& propertyName);
 
-    void updateEngineSettings(const resource::AnalyticsEngineResourcePtr& engine);
-
     QWeakPointer<QnAbstractDataReceptor> metadataSink(
         const QnVirtualCameraResourcePtr& device) const;
     QWeakPointer<QnAbstractDataReceptor> metadataSink(const QnUuid& device) const;

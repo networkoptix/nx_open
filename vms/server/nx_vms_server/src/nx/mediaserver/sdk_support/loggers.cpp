@@ -12,7 +12,7 @@ namespace nx::mediaserver::sdk_support {
 
 namespace {
 
-static const QString kManifestFilenamePostfix("manifest");
+static const QString kManifestFilenamePostfix("_manifest.json");
 static const QString kPluginPlaceholder("{:plugin}");
 static const QString kDevicePlaceholder("{:device}");
 static const QString kEnginePlaceholder("{:engine}");
@@ -91,7 +91,7 @@ void ManifestLogger::log(
 {
     if (pluginsIni().analyticsManifestOutputPath[0])
     {
-        analytics::debug_helpers::saveManifestToFile(
+        analytics::debug_helpers::dumpStringToFile(
             m_logTag,
             manifestStr,
             QString(pluginsIni().analyticsManifestOutputPath),
@@ -141,7 +141,7 @@ void StartupPluginManifestLogger::log(
 {
     if (pluginsIni().analyticsManifestOutputPath[0])
     {
-        analytics::debug_helpers::saveManifestToFile(
+        analytics::debug_helpers::dumpStringToFile(
             m_logTag,
             manifestStr,
             QString(pluginsIni().analyticsManifestOutputPath),

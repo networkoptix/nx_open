@@ -75,7 +75,9 @@ private:
     std::unique_ptr<sdk_support::AbstractManifestLogger> makeLogger(
         const QString& manifestTypes) const;
 
-    QVariantMap augmentedSettings(const QVariantMap& settings) const;
+    QVariantMap mergeWithDbAndDefaultSettings(const QVariantMap& settingsFromUser) const;
+
+    bool setSettingsInternal(const QVariantMap& settingsFromUser);
 
 private:
     mutable QnMutex m_mutex;

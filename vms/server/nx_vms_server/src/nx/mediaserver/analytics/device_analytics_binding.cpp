@@ -16,6 +16,7 @@
 #include <nx/sdk/analytics/device_agent.h>
 #include <nx/sdk/analytics/consuming_device_agent.h>
 #include <nx/sdk/analytics/common_metadata_types.h>
+#include <nx/sdk/common/to_string.h>
 
 #include <nx/mediaserver/analytics/data_packet_adapter.h>
 #include <nx/mediaserver/analytics/debug_helpers.h>
@@ -153,40 +154,9 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
         return false;
     }
 
-    sdk_support::UniquePtr<nx::sdk::Settings> sdkSettings;
-    if (pluginsIni().analyticsDeviceAgentSettingsPath[0] != '\0')
-    {
-        NX_WARNING(
-            this,
-            "Trying to load settings for the DeviceAgent from the file. "
-            "Device: %1 (%2), Engine: %3 (%4)",
-            m_device->getUserDefinedName(),
-            m_device->getId(),
-            m_engine->getName(),
-            m_engine->getId());
-
-        sdkSettings = debug_helpers::loadDeviceAgentSettingsFromFile(m_device, m_engine);
-    }
-
-    if (!sdkSettings)
-    {
-        const auto settingValues = augmentedSettings(settings);
-        sdkSettings = sdk_support::toSdkSettings(settingValues);
-    }
-
-    if (!sdkSettings)
-    {
-        NX_ERROR(
-            this,
-            "Unable to get settings for DeviceAgent. Device: %1 (%2), Engine: %3 %4)",
-            m_device->getUserDefinedName(),
-            m_device->getId(),
-            m_engine->getName(),
-            m_engine->getId());
-        return false;
-    }
-
-    m_sdkDeviceAgent->setSettings(sdkSettings.get());
+    const auto actualSettings = setSettingsInternal(settings);
+    if (!actualSettings)
+        return false; //< Error is already logged.
 
     if (!m_started)
     {
@@ -259,13 +229,8 @@ QVariantMap DeviceAnalyticsBinding::getSettings() const
 
 void DeviceAnalyticsBinding::setSettings(const QVariantMap& settings)
 {
-    decltype(m_sdkDeviceAgent) deviceAgent;
-    {
-        QnMutexLocker lock(&m_mutex);
-        deviceAgent = m_sdkDeviceAgent;
-    }
-
-    if (!deviceAgent)
+    QnMutexLocker lock(&m_mutex);
+    if (!m_sdkDeviceAgent)
     {
         NX_WARNING(this, "Can't access device agent for device %1 (%2) and engine %3 (%4)",
             m_device->getUserDefinedName(),
@@ -275,8 +240,12 @@ void DeviceAnalyticsBinding::setSettings(const QVariantMap& settings)
         return;
     }
 
-    sdk_support::UniquePtr<nx::sdk::Settings> sdkSettings;
-    QVariantMap settingsValues;
+    setSettingsInternal(settings);
+}
+
+bool DeviceAnalyticsBinding::setSettingsInternal(const QVariantMap& settingsFromUser)
+{
+    sdk_support::UniquePtr<nx::sdk::Settings> effectiveSettings;
     if (pluginsIni().analyticsDeviceAgentSettingsPath[0] != '\0')
     {
         NX_WARNING(this, "Trying to load settings for the DeviceAgent from the file. "
@@ -286,27 +255,42 @@ void DeviceAnalyticsBinding::setSettings(const QVariantMap& settings)
             m_engine->getName(),
             m_engine->getId());
 
-        sdkSettings = debug_helpers::loadDeviceAgentSettingsFromFile(m_device, m_engine);
+        effectiveSettings = debug_helpers::loadDeviceAgentSettingsFromFile(m_device, m_engine);
     }
 
-    if (!sdkSettings)
+    if (!effectiveSettings)
     {
-        settingsValues = augmentedSettings(settings);
-        sdkSettings = sdk_support::toSdkSettings(settingsValues);
+        effectiveSettings =
+            sdk_support::toSdkSettings(mergeWithDbAndDefaultSettings(settingsFromUser));
     }
 
-    if (!sdkSettings)
+    if (!NX_ASSERT(effectiveSettings, lm("Device: %1 (%2), Engine: %3 (%4)").args(
+        m_device->getUserDefinedName(), m_device->getId(),
+        m_engine->getName(), m_engine->getId())))
     {
-        NX_ERROR(this, "Unable to get settings for DeviceAgent. Device: %1 (%2), Engine: %3 %4)",
-            m_device->getUserDefinedName(),
-            m_device->getId(),
-            m_engine->getName(),
-            m_engine->getId());
-        return;
+        return false;
     }
 
-    deviceAgent->setSettings(sdkSettings.get());
-    m_device->setDeviceAgentSettingsValues(m_engine->getId(), settingsValues);
+    if (pluginsIni().analyticsSettingsOutputPath[0] != '\0')
+    {
+        debug_helpers::dumpStringToFile(
+            this,
+            QString::fromStdString(nx::sdk::common::toString(effectiveSettings.get())),
+            pluginsIni().analyticsSettingsOutputPath,
+            debug_helpers::filename(
+                m_device,
+                m_engine,
+                nx::mediaserver::resource::AnalyticsPluginResourcePtr(),
+                "_effective_settings.json"));
+    }
+
+    m_sdkDeviceAgent->setSettings(effectiveSettings.get());
+
+    m_device->setDeviceAgentSettingsValues(
+        m_engine->getId(),
+        sdk_support::fromSdkSettings(effectiveSettings.get()));
+
+    return true;
 }
 
 void DeviceAnalyticsBinding::setMetadataSink(QnAbstractDataReceptorPtr metadataSink)
@@ -528,8 +512,9 @@ std::unique_ptr<sdk_support::AbstractManifestLogger> DeviceAnalyticsBinding::mak
         m_device,
         m_engine);
 }
-QVariantMap DeviceAnalyticsBinding::augmentedSettings(
-    const QVariantMap& settings) const
+
+QVariantMap DeviceAnalyticsBinding::mergeWithDbAndDefaultSettings(
+    const QVariantMap& settingsFromUser) const
 {
     const auto engineManifest = m_engine->manifest();
     interactive_settings::JsonEngine jsonEngine;
@@ -537,7 +522,7 @@ QVariantMap DeviceAnalyticsBinding::augmentedSettings(
 
     const auto settingsFromProperty = m_device->deviceAgentSettingsValues(m_engine->getId());
     jsonEngine.applyValues(settingsFromProperty);
-    jsonEngine.applyValues(settings);
+    jsonEngine.applyValues(settingsFromUser);
 
     return jsonEngine.values();
 }

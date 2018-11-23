@@ -357,41 +357,7 @@ void Manager::at_enginePropertyChanged(
     }
 
     if (propertyName == nx::vms::common::AnalyticsEngineResource::kSettingsValuesProperty)
-        updateEngineSettings(engine);
-}
-
-void Manager::updateEngineSettings(const resource::AnalyticsEngineResourcePtr& engine)
-{
-    auto sdkEngine = engine->sdkEngine();
-    if (!sdkEngine)
-    {
-        NX_ERROR(this, "Can't access underlying SDK analytics engine object for %1 (%2)",
-            engine->getName(), engine->getId());
-        return;
-    }
-
-    NX_DEBUG(this, "Updating engine %1 (%2) with settings", engine->getName(), engine->getId());
-
-    sdk_support::UniquePtr<nx::sdk::Settings> sdkSettings;
-    if (pluginsIni().analyticsEngineSettingsPath[0] != '\0')
-    {
-        NX_WARNING(this, "Trying to load settings for the Engine from the file. Engine %1 (%2)",
-            engine->getName(), engine->getId());
-
-        sdkSettings = analytics::debug_helpers::loadEngineSettingsFromFile(engine);
-    }
-
-    if (!sdkSettings)
-        sdkSettings = sdk_support::toSdkSettings(engine->settingsValues());
-
-    if (!sdkSettings)
-    {
-        NX_ERROR(this, "Unable to get settings for Engine %1 (%2)",
-            engine->getName(), engine->getId());
-        return;
-    }
-
-    sdkEngine->setSettings(sdkSettings.get());
+        engine->sendSettingsToSdkEngine();
 }
 
 void Manager::registerMetadataSink(

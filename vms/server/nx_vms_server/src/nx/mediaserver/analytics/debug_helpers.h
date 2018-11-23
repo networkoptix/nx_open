@@ -34,9 +34,9 @@ QString filename(
 
 QString filename(const nx::sdk::analytics::Plugin* plugin, const QString& postfix);
 
-void saveManifestToFile(
+void dumpStringToFile(
     const nx::utils::log::Tag& logTag,
-    const QString& manifest,
+    const QString& stringToDump,
     const QString& directoryPath,
     const QString& filename);
 
