@@ -119,7 +119,7 @@ public:
 
         nx::utils::Url url = mediaServerLauncher->apiUrl();
         url.setPath("/api/detachFromSystem");
-        client->doPost(url, "application/json", QJson::serialized(data));
+        ASSERT_TRUE(client->doPost(url, "application/json", QJson::serialized(data)));
     }
 
     void thenUserRemovedFromFirstServerOnly()
