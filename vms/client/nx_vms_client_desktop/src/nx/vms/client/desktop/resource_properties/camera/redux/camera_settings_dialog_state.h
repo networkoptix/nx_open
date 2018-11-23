@@ -165,6 +165,9 @@ struct NX_VMS_DESKTOP_CLIENT_API CameraSettingsDialogState: AbstractReduxState
         CombinedValue isWearable;
         CombinedValue isIoModule;
         CombinedValue isArecontCamera;
+        CombinedValue supportsAudio;
+        CombinedValue supportsVideo;
+        CombinedValue isAudioForced;
         CombinedValue hasMotion;
         CombinedValue hasDualStreamingCapability;
         CombinedValue hasRemoteArchiveCapability;
@@ -172,6 +175,7 @@ struct NX_VMS_DESKTOP_CLIENT_API CameraSettingsDialogState: AbstractReduxState
         CombinedValue canForcePtzCapabilities;
         CombinedValue supportsMotionStreamOverride;
         CombinedValue hasCustomMediaPortCapability;
+        CombinedValue supportsRecording;
 
         int maxFps = 0;
         int maxDualStreamingFps = 0;
@@ -327,7 +331,15 @@ struct NX_VMS_DESKTOP_CLIENT_API CameraSettingsDialogState: AbstractReduxState
     bool supportsSchedule() const
     {
         return devicesDescription.isDtsBased == CombinedValue::None
-            && devicesDescription.isWearable == CombinedValue::None;
+            && devicesDescription.isWearable == CombinedValue::None
+            && devicesDescription.supportsRecording == CombinedValue::All;
+    }
+
+    bool supportsVideoStreamControl() const
+    {
+        return devicesDescription.isWearable == CombinedValue::None
+            && devicesDescription.isDtsBased == CombinedValue::None
+            && devicesDescription.supportsVideo == CombinedValue::All;
     }
 
     bool canSwitchPtzPresetTypes() const

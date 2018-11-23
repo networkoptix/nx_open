@@ -62,8 +62,8 @@ public:
 private:
     void init(const QStringList& paths);
 
-    QPixmap getPixmapInternal(const QString &name);
-    QPixmap getPixmapFromSvgInternal(const QString &name, bool correctDevicePixelRatio, const QSize& size);
+    QPixmap getPixmapInternal(const QString& name);
+    QPixmap getPixmapFromSvgInternal(const QString& name, bool correctDevicePixelRatio, const QSize& size);
 
 private:
     QStringList m_paths;

@@ -129,32 +129,20 @@ QnResourceTreeModel::QnResourceTreeModel(
     m_nodeManager(new QnResourceTreeModelNodeManager(this)),
     m_layoutNodeManager(new QnResourceTreeModelLayoutNodeManager(this))
 {
-    connect(this, &QnResourceTreeModel::modelAboutToBeReset, this,
-    [this]()
-    {
-        m_inModelResetState = true;
-    });
-
-    connect(this, &QnResourceTreeModel::modelReset, this,
-    [this]()
-    {
-        m_inModelResetState = false;
-    });
-
     /* Create top-level nodes. */
-    beginResetModel();
-    for (NodeType t: rootNodeTypes())
+    for (NodeType nodeType: rootNodeTypes())
+        m_rootNodes[nodeType] =
+            QnResourceTreeModelNodeFactory::createNode(nodeType, this, /*initialize*/ false);
+
+    for (auto rootNode: m_rootNodes)
     {
-        const auto node = QnResourceTreeModelNodeFactory::createNode(
-            t, this, false);
-        m_rootNodes[t] = node;
-        if (node)
+        if (rootNode)
         {
-            m_allNodes.append(node);
-            node->initialize();
+            m_allNodes.append(rootNode);
+            updateNodeParent(rootNode);
+            rootNode->initialize();
         }
     }
-    endResetModel();
 
     if (scope != CamerasScope)
     {
@@ -202,7 +190,6 @@ QnResourceTreeModel::QnResourceTreeModel(
 QnResourceTreeModel::~QnResourceTreeModel()
 {
     QSignalBlocker scopedSignalBlocker(this); // TODO: #vbreus Ideally this shouldn't be needed
-    m_inModelResetState = true;
     for (auto node: m_allNodes)
         node->deinitialize();
 }

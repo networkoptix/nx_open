@@ -1,5 +1,6 @@
-#ifndef __QN_CYCLE_BUFFER_H_
-#define __QN_CYCLE_BUFFER_H_
+#pragma once
+
+#include <vector>
 
 /*!
     Fixed size cyclic buffer implementation.
@@ -66,5 +67,3 @@ private:
     size_type m_offset;
     int m_align;
 };
-
-#endif // _QN_CYCLE_BUFFER_H_

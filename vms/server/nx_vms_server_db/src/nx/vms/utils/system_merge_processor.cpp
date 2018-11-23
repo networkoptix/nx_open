@@ -24,7 +24,8 @@
 #include <rest/server/json_rest_result.h>
 #include <utils/common/app_info.h>
 
-#include "vms_utils.h"
+#include <nx/vms/utils/vms_utils.h>
+#include "system_helpers.h"
 
 namespace nx {
 namespace vms {

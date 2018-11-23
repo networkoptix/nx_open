@@ -1,9 +1,7 @@
-#ifndef QN_SINGLETON_H
-#define QN_SINGLETON_H
+#pragma once
 
 #include <cassert>
 #include <typeinfo>
-
 
 /**
  * Singleton base class that provides instance access, but does not manage
@@ -32,7 +30,7 @@ protected:
 
     ~Singleton() {
         if(s_instance == this)
-            s_instance = NULL;
+            s_instance = nullptr;
     }
 
 private:
@@ -40,6 +38,4 @@ private:
 };
 
 template<class Derived>
-Derived *Singleton<Derived>::s_instance = NULL;
-
-#endif // QN_SINGLETON_H
+Derived *Singleton<Derived>::s_instance = nullptr;

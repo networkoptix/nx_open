@@ -222,6 +222,8 @@ protected slots:
     void updatePlayingSupported();
     void updateSpeed();
     void updateSpeedRange();
+
+    bool calculateTimelineRelevancy() const;
     void updateTimelineRelevancy();
     void updateSyncIsForced();
 

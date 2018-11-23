@@ -92,7 +92,6 @@ struct CameraSettingsDialog::Private: public QObject
     void handleCamerasChanged()
     {
         const bool advancedSettingsAreVisible = cameras.size() == 1;
-        q->setPageVisible(int(CameraSettingsTab::advanced), true);
         if (advancedSettingsAreVisible)
         {
             advancedSettingsWidget->setCamera(cameras.first());
@@ -502,26 +501,36 @@ void CameraSettingsDialog::updateState()
     // Legacy code has more complicated conditions.
 
     using CombinedValue = CameraSettingsDialogState::CombinedValue;
-    const bool hasWearableCameras = state.devicesDescription.isWearable != CombinedValue::None;
 
-    setPageVisible(int(CameraSettingsTab::motion), state.isSingleCamera() && !hasWearableCameras
-        && state.devicesDescription.hasMotion == CombinedValue::All);
+    setPageVisible(int(CameraSettingsTab::motion),
+        state.isSingleCamera()
+            && state.devicesDescription.isWearable == CombinedValue::None
+            && state.devicesDescription.isDtsBased == CombinedValue::None
+            && state.devicesDescription.supportsVideo == CombinedValue::All
+            && state.devicesDescription.hasMotion == CombinedValue::All);
 
-    setPageVisible(int(CameraSettingsTab::recording), !hasWearableCameras);
+    setPageVisible(int(CameraSettingsTab::recording), state.supportsSchedule());
 
-    setPageVisible(int(CameraSettingsTab::fisheye), state.isSingleCamera()
-        && state.singleCameraProperties.hasVideo);
+    setPageVisible(int(CameraSettingsTab::fisheye),
+        state.isSingleCamera()
+            && state.singleCameraProperties.hasVideo);
 
-    setPageVisible(int(CameraSettingsTab::io), state.isSingleCamera() && !hasWearableCameras
-        && state.devicesDescription.isIoModule == CombinedValue::All);
+    setPageVisible(int(CameraSettingsTab::io),
+        state.isSingleCamera()
+            && state.devicesDescription.isWearable == CombinedValue::None
+            && state.devicesDescription.isIoModule == CombinedValue::All);
 
-    setPageVisible(int(CameraSettingsTab::web), state.isSingleCamera()
-        && !state.singleCameraProperties.settingsUrlPath.isEmpty());
+    setPageVisible(int(CameraSettingsTab::web),
+        state.isSingleCamera()
+            && !state.singleCameraProperties.settingsUrlPath.isEmpty());
+
+    setPageVisible(int(CameraSettingsTab::advanced), state.isSingleCamera());
 
     setPageVisible(int(CameraSettingsTab::analytics), state.isSingleCamera());
 
-    setPageVisible(int(CameraSettingsTab::expert), !hasWearableCameras
-        && state.devicesDescription.isIoModule == CombinedValue::None);
+    // Always displaying for single camera as it contains Logical Id setup.
+    setPageVisible(int(CameraSettingsTab::expert),
+        state.supportsVideoStreamControl() || state.isSingleCamera());
 }
 
 } // namespace nx::vms::client::desktop

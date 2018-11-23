@@ -465,7 +465,7 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
     }
 
     if (rtpHeader->padding != 0)
-        bytesLeft -= ntohl(rtpHeader->padding);
+        bytesLeft -= qFromBigEndian(rtpHeader->padding);
 
     if (bytesLeft < 8)
         return false;
@@ -646,7 +646,7 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
         videoData->width = width * 8;
         videoData->height = height * 8;
 
-        videoData->timestamp = ntohl(rtpHeader->timestamp);
+        videoData->timestamp = qFromBigEndian(rtpHeader->timestamp);
         gotData = true;
     }
     return true;

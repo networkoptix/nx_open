@@ -47,7 +47,6 @@ private:
     QPointer<TimeSynchronizationServerTimeWatcher> m_timeWatcher;
     QPointer<TimeSynchronizationServerStateWatcher> m_stateWatcher;
     QPointer<TimeSynchronizationServersDelegate> m_delegate;
-    int m_tickCount;
 };
 
 } // namespace nx::vms::client::desktop

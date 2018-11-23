@@ -2,6 +2,8 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+#include <QtCore/QtEndian>
+
 #include <nx/streaming/rtp/rtp.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/audio_data_packet.h>
@@ -83,7 +85,7 @@ bool SimpleAudioParser::processData(quint8* rtpBufferBase, int bufferOffset, int
     QnWritableCompressedAudioDataPtr audioData = QnWritableCompressedAudioDataPtr(new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, end - curPtr));
     audioData->compressionType = !m_context? AV_CODEC_ID_NONE : m_context->getCodecId();
     audioData->context = m_context;
-    audioData->timestamp = ntohl(rtpHeader->timestamp);
+    audioData->timestamp = qFromBigEndian(rtpHeader->timestamp);
     audioData->m_data.write((const char*)curPtr, end - curPtr);
     m_audioData.push_back(audioData);
     gotData = true;

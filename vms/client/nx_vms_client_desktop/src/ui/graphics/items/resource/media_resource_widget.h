@@ -388,6 +388,8 @@ private:
     void initAreaHighlightOverlay();
     void initStatusOverlayController();
 
+    inline SoftwareTriggerInfo makeTriggerInfo(const nx::vms::event::RulePtr& rule) const;
+
     void createTriggerIfRelevant(const nx::vms::event::RulePtr& rule);
     bool isRelevantTriggerRule(const nx::vms::event::RulePtr& rule) const;
 
@@ -420,7 +422,7 @@ private:
         ButtonHandler executor);
 
     using TriggerDataList = QList<SoftwareTrigger>;
-    TriggerDataList::iterator lowerBoundbyTriggerRuleId(const QnUuid& id);
+    TriggerDataList::iterator lowerBoundbyTriggerName(const nx::vms::event::RulePtr& rule);
 
     void updateSelectedArea();
     void handleSelectedAreaChanged();

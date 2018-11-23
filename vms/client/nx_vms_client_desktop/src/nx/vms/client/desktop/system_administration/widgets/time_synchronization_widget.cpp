@@ -42,7 +42,6 @@ static constexpr int kDateFontPixelSize = 14;
 static constexpr int kDateFontWeight = QFont::Bold;
 static constexpr int kZoneFontPixelSize = 14;
 static constexpr int kZoneFontWeight = QFont::Normal;
-static constexpr int kServerTimeUpdateInterval = 15;
 
 QDateTime dateTimeFromMSecs(std::chrono::milliseconds value)
 {
@@ -67,8 +66,7 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
     m_serversModel(new Model(this)),
     m_timeWatcher(new TimeSynchronizationServerTimeWatcher(m_store, this)),
     m_stateWatcher(new TimeSynchronizationServerStateWatcher(m_store, this)),
-    m_delegate(new TimeSynchronizationServersDelegate(this)),
-    m_tickCount(0)
+    m_delegate(new TimeSynchronizationServersDelegate(this))
 {
     setupUi();
 
@@ -147,9 +145,6 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
         [this]
         {
             m_store->setVmsTime(std::chrono::milliseconds(qnSyncTime->currentMSecsSinceEpoch()));
-            if (m_tickCount == 0)
-                m_timeWatcher->updateTimestamps();
-            m_tickCount = (m_tickCount + 1) % kServerTimeUpdateInterval;
         };
 
     auto timer = new QTimer(this);
@@ -161,7 +156,6 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
     connect(qnSyncTime, &QnSyncTime::timeChanged, this, updateTime);
 
     updateTime();
-    m_timeWatcher->updateTimestamps();
 }
 
 TimeSynchronizationWidget::~TimeSynchronizationWidget()

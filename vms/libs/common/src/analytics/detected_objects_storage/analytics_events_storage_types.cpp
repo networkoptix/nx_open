@@ -5,6 +5,7 @@
 
 #include <nx/fusion/model_functions.h>
 
+#include <common/common_globals.h>
 #include <utils/math/math.h>
 
 namespace nx {
