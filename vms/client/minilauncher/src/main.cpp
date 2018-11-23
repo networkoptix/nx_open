@@ -1,11 +1,8 @@
 #include <string>
 #include <vector>
 #include <locale>
-#include <codecvt>
 #include <iostream>
-#include <cassert>
 
-#include <tchar.h>
 #include <Windows.h>
 #include "Shlwapi.h"
 #include "shlobj.h"
@@ -18,27 +15,6 @@ static constexpr auto kQuote = L'\"';
 static constexpr auto kSpace = L' ';
 static constexpr auto kSlash = L'/';
 static constexpr auto kBackSlash = L'\\';
-
-// Converts an UTF8 string to a wide Unicode String.
-std::wstring utf8_decode(const std::string& str)
-{
-    if (str.empty())
-        return std::wstring();
-
-    const int size_needed = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), nullptr, 0);
-    std::wstring wstrTo(size_needed, 0);
-    MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
-    return wstrTo;
-}
-
-// Converts an UTF8 string to a wide Unicode String (deprecated but guaranteed to work).
-std::wstring utf8toUtf16(const std::string& str)
-{
-    std::wstring_convert< std::codecvt_utf8_utf16<wchar_t> > converter;
-    const auto result = converter.from_bytes(str);
-    assert(result == utf8_decode(str));
-    return result;
-}
 
 // Appends unix-style slashe to the end of the directory name if needed.
 std::wstring closeDirPath(const std::wstring& name)
@@ -120,17 +96,19 @@ bool startProcessAsync(
     );
 }
 
-bool launchInDir(const std::wstring& currentDirectory, int argc, char* argv[])
+bool launchInDir(const std::wstring& currentDirectory, int argc, LPWSTR* argv)
 {
-    std::wcout << L"Launching in path " << currentDirectory;
+    std::wcout << L"Launching in path " << currentDirectory << std::endl;
     const auto applicationPath = getFullFileName(currentDirectory, QN_APPLAUNCHER_BINARY_NAME);
     auto commandLine = kQuote + applicationPath + kQuote;
 
     for (int i = 1; i < argc; ++i)
     {
-        std::wstring argument(utf8toUtf16(argv[i]));
+        std::wstring argument(argv[i]);
         commandLine += kSpace + argument;
     }
+
+    std::wcout << L"Command line: " << commandLine.c_str() << std::endl;
 
     try
     {
@@ -142,7 +120,7 @@ bool launchInDir(const std::wstring& currentDirectory, int argc, char* argv[])
     }
 }
 
-int launchFile(int argc, char* argv[])
+int launchFile(int argc, LPWSTR* argv)
 {
     if (launchInDir(getSharedApplauncherDir(), argc, argv))
         return 0;
@@ -155,10 +133,15 @@ int launchFile(int argc, char* argv[])
 
 } // namespace
 
-int _tmain(int argc, char* argv[])
+int main()
 {
     try
     {
+        int argc{};
+        LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+
+        setlocale(LC_CTYPE, ""); //< For correct std::wcout work.
+
         /* All additional arguments are passed to applauncher. */
         return launchFile(argc, argv);
     }
@@ -167,4 +150,3 @@ int _tmain(int argc, char* argv[])
         return 2;
     }
 }
-
