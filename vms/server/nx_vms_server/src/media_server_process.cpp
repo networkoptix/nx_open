@@ -2124,7 +2124,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/configure", new QnConfigureRestHandler(serverModule()), kAdmin);
 
     /**%apidoc POST /api/detachFromCloud
-     * Detach media server from cloud. Local admin user is enabled, admin password is changed to
+     * Detaches the Server from the Cloud. Local admin user is enabled, admin password is changed to
      * new value (if specified), all cloud users are disabled. Cloud link is removed. Function can
      * be called either via GET or POST method. POST data should be a json object.
      * %permissions Administrator.
@@ -2135,14 +2135,13 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(serverModule(), cloudManagerGroup), kAdmin);
 
     /**%apidoc POST /api/detachFromSystem
-     * Detach media server from system and resets it's state to initial.
+     * Detaches the Server from the System and resets its state to the initial one.
      * %permissions Administrator.
      * %param:string currentPassword Current user password.
      * %return JSON result with error code.
      */
     reg("api/detachFromSystem", new QnDetachFromSystemRestHandler(
-        serverModule(),
-        &cloudManagerGroup->connectionManager, messageBus), kAdmin);
+        serverModule(), &cloudManagerGroup->connectionManager, messageBus), kAdmin);
 
     /**%apidoc[proprietary] POST /api/restoreState
      * Restore initial server state, i.e. <b>delete server's database</b>.
