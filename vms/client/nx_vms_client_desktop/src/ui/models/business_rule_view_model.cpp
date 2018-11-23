@@ -44,7 +44,7 @@
 
 #include <nx/vms/client/desktop/ini.h>
 
-#include <nx/fusion/serialization/lexical.h>
+#include <nx/fusion/model_functions.h>
 
 using namespace nx;
 
@@ -496,35 +496,42 @@ void QnBusinessRuleViewModel::setEventType(const vms::api::EventType value)
     bool cameraRequired = vms::event::requiresCameraResource(m_eventType);
     bool serverRequired = vms::event::requiresServerResource(m_eventType);
 
+    // Store params for the current event type
+    m_cachedEventParams[m_eventType] = m_eventParams;
+
     m_eventType = value;
     m_modified = true;
 
-    switch (m_eventType)
+    // Create or load params for the new event type
+    if (!m_cachedEventParams.contains(m_eventType))
     {
-    case EventType::cameraInputEvent:
-        m_eventParams.inputPortId = QString();
-        break;
+        nx::vms::event::EventParameters eventParams;
 
-    case EventType::pluginEvent:
+        switch (m_eventType)
         {
-            using namespace nx::vms::api;
-            EventLevels levels = 0;
-            levels |= ErrorEventLevel;
-            levels |= WarningEventLevel;
-            levels |= InfoEventLevel;
-            m_eventParams.inputPortId = QnLexical::serialized(levels);
-            break;
+            case EventType::pluginEvent:
+            {
+                using namespace nx::vms::api;
+                EventLevels levels = 0;
+                levels |= ErrorEventLevel;
+                levels |= WarningEventLevel;
+                levels |= InfoEventLevel;
+                eventParams.inputPortId = QnLexical::serialized(levels);
+                break;
+            }
+
+            case EventType::softwareTriggerEvent:
+                eventParams.inputPortId = QnUuid::createUuid().toSimpleString();
+                eventParams.description = QnSoftwareTriggerPixmaps::defaultPixmapName();
+                break;
+
+            default:
+                break;
         }
 
-    case EventType::softwareTriggerEvent:
-        m_eventParams.inputPortId = QnUuid::createUuid().toSimpleString();
-        m_eventParams.description = QnSoftwareTriggerPixmaps::defaultPixmapName();
-        m_eventParams.caption = QString();
-        break;
-
-    default:
-        m_eventParams.caption = m_eventParams.description = QString();
+        m_cachedEventParams[m_eventType] = eventParams;
     }
+    m_eventParams = m_cachedEventParams[m_eventType];
 
     Fields fields = Field::eventType | Field::modified;
 
