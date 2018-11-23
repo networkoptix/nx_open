@@ -6,7 +6,7 @@
 
 static const int kMaxHostsCheckedSimultaneously = 256;
 
-QnIpRangeCheckerAsync::QnIpRangeCheckerAsync(nx::network::aio::AbstractAioThread *aioThread):
+QnIpRangeScannerAsync::QnIpRangeScannerAsync(nx::network::aio::AbstractAioThread *aioThread):
     m_pollable(aioThread),
     m_terminated(false),
     m_portToScan(0),
@@ -17,17 +17,17 @@ QnIpRangeCheckerAsync::QnIpRangeCheckerAsync(nx::network::aio::AbstractAioThread
     NX_VERBOSE(this, "Created");
 }
 
-QnIpRangeCheckerAsync::~QnIpRangeCheckerAsync()
+QnIpRangeScannerAsync::~QnIpRangeScannerAsync()
 {
     pleaseStopSync();
 }
 
-void QnIpRangeCheckerAsync::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
+void QnIpRangeScannerAsync::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_pollable.dispatch(
         [this, completionHandler = std::move(completionHandler)]() mutable
         {
-            NX_VERBOSE(this, "Terminate requested, range (%1, %2)",
+            NX_VERBOSE(this, "Terminate requested, range [%1, %2]",
                 QHostAddress(m_startIpv4), QHostAddress(m_endIpv4));
 
             for (auto& httpClientPtr: m_socketsBeingScanned)
@@ -39,7 +39,7 @@ void QnIpRangeCheckerAsync::pleaseStop(nx::utils::MoveOnlyFunc<void()> completio
 }
 
 
-void QnIpRangeCheckerAsync::onlineHosts(
+void QnIpRangeScannerAsync::scanOnlineHosts(
     CompletionHandler callback,
     const QHostAddress& startAddr,
     const QHostAddress& endAddr,
@@ -48,7 +48,7 @@ void QnIpRangeCheckerAsync::onlineHosts(
     m_pollable.dispatch(
         [=, callback = std::move(callback)]() mutable
         {
-            NX_VERBOSE(this, "Starting search in range (%1, %2)", startAddr, endAddr);
+            NX_VERBOSE(this, "Starting search in range [%1, %2]", startAddr, endAddr);
             m_onlineHosts.clear();
 
             m_completionHandler = std::move(callback);
@@ -59,21 +59,21 @@ void QnIpRangeCheckerAsync::onlineHosts(
 
             m_nextIPToCheck = m_startIpv4;
             for (int i = 0; i < kMaxHostsCheckedSimultaneously; ++i)
-                launchHostCheck();
+                startHostScan();
         });
 }
 
-size_t QnIpRangeCheckerAsync::hostsChecked() const
+size_t QnIpRangeScannerAsync::hostsChecked() const
 {
     return m_hostsChecked;
 }
 
-int QnIpRangeCheckerAsync::maxHostsCheckedSimultaneously()
+int QnIpRangeScannerAsync::maxHostsCheckedSimultaneously()
 {
     return kMaxHostsCheckedSimultaneously;
 }
 
-bool QnIpRangeCheckerAsync::launchHostCheck()
+bool QnIpRangeScannerAsync::startHostScan()
 {
     NX_ASSERT(m_pollable.isInSelfAioThread());
     NX_ASSERT(!m_terminated);
@@ -87,9 +87,9 @@ bool QnIpRangeCheckerAsync::launchHostCheck()
         std::make_unique<nx::network::http::AsyncClient>()).first;
     (*httpClientIter)->bindToAioThread(m_pollable.getAioThread());
     (*httpClientIter)->setOnResponseReceived(
-        std::bind(&QnIpRangeCheckerAsync::onDone, this, httpClientIter));
+        std::bind(&QnIpRangeScannerAsync::onDone, this, httpClientIter));
     (*httpClientIter)->setOnDone(
-        std::bind(&QnIpRangeCheckerAsync::onDone, this, httpClientIter));
+        std::bind(&QnIpRangeScannerAsync::onDone, this, httpClientIter));
 
     (*httpClientIter)->setMaxNumberOfRedirects(0);
     (*httpClientIter)->doGet(nx::utils::Url(
@@ -97,7 +97,7 @@ bool QnIpRangeCheckerAsync::launchHostCheck()
     return true;
 }
 
-void QnIpRangeCheckerAsync::onDone(Requests::iterator httpClientIter)
+void QnIpRangeScannerAsync::onDone(Requests::iterator httpClientIter)
 {
     NX_ASSERT(m_pollable.isInSelfAioThread());
     NX_ASSERT(!m_terminated);
@@ -118,11 +118,11 @@ void QnIpRangeCheckerAsync::onDone(Requests::iterator httpClientIter)
 
     m_socketsBeingScanned.erase(httpClientIter);
 
-    launchHostCheck();
-    if (!m_socketsBeingScanned.empty()) // Check if it was the las host check.
+    startHostScan();
+    if (!m_socketsBeingScanned.empty()) // Check if it was the last host check.
         return;
 
-    NX_VERBOSE(this, "Search in range (%1, %2) has finished, %3 hosts are online (terminated: %4)",
+    NX_VERBOSE(this, "Search in range [%1, %2] has finished, %3 hosts are online (terminated: %4)",
         QHostAddress(m_startIpv4), QHostAddress(m_endIpv4), m_onlineHosts.size(), m_terminated);
 
     nx::utils::moveAndCall(m_completionHandler, std::move(m_onlineHosts));

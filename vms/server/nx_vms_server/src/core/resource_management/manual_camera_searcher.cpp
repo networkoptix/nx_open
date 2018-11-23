@@ -177,7 +177,7 @@ void QnManualCameraSearcher::startOnlineHostsScan(
     m_hostRangeSize = endIPv4Addr - startIPv4Addr;
     changeState(QnManualResourceSearchStatus::CheckingOnline);
 
-    m_ipChecker.onlineHosts(
+    m_ipChecker.scanOnlineHosts(
         [this, port, auth = std::move(auth)](auto results){ onOnlineHostsScanDone(results, port, auth); },
         QHostAddress(startAddr),
         QHostAddress(endAddr),

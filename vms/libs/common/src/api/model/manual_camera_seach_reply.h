@@ -37,26 +37,7 @@ struct QnManualResourceSearchStatus {
 
 #define QnManualResourceSearchStatus_Fields (state)(current)(total)
 
-static QString toString(QnManualResourceSearchStatus::State state)
-{
-    switch (state) {
-    case QnManualResourceSearchStatus::Init:
-        return "Init";
-    case QnManualResourceSearchStatus::CheckingOnline:
-        return "CheckingOnline";
-    case QnManualResourceSearchStatus::CheckingHost:
-        return "CheckingHost";
-    case QnManualResourceSearchStatus::Finished:
-        return "Finished";
-    case QnManualResourceSearchStatus::Aborted:
-        return "Aborted";
-    case QnManualResourceSearchStatus::Count:
-        return "Count";
-    default:
-        NX_ASSERT(false);
-    }
-    return "Undefined";
-}
+QString toString(QnManualResourceSearchStatus::State state);
 
 // TODO: #wearable better split this struct in two. name, vendor & existsInPool unused in add requests.
 struct QnManualResourceSearchEntry {

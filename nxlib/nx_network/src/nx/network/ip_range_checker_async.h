@@ -11,21 +11,20 @@
 
 #include "http/http_async_client.h"
 
-// TODO: #ak Inherit from aio::BasicPollable.
-// TODO: Migrate to HostAddr instead of strings... (0;;0)
+// TODO: Migrate to HostAddr instead of strings...
 // TODO: Remove Qt from here.
 
 /**
  * Asynchronously scans specified ip address range for specified port to be opened and listening.
  */
-class NX_NETWORK_API QnIpRangeCheckerAsync:
+class NX_NETWORK_API QnIpRangeScannerAsync:
     public nx::network::QnStoppableAsync
 {
 public:
     using CompletionHandler = nx::utils::MoveOnlyFunc<void(QStringList)>;
 
-    QnIpRangeCheckerAsync(nx::network::aio::AbstractAioThread* aioThread);
-    virtual ~QnIpRangeCheckerAsync() override;
+    QnIpRangeScannerAsync(nx::network::aio::AbstractAioThread* aioThread);
+    virtual ~QnIpRangeScannerAsync() override;
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
@@ -33,7 +32,7 @@ public:
      * Asynchronously scans specified ip address range for portToScan to be opened and listening.
      * @return List of ip address from [startAddr; endAddr] range which have portToScan opened and listening.
      */
-    void onlineHosts(
+    void scanOnlineHosts(
         CompletionHandler callback,
         const QHostAddress& startAddr,
         const QHostAddress& endAddr,
@@ -57,6 +56,6 @@ private:
     quint32 m_nextIPToCheck;
     std::atomic<size_t> m_hostsChecked = 0;
 
-    bool launchHostCheck();
+    bool startHostScan();
     void onDone(Requests::iterator requestIter);
 };

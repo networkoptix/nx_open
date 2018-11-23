@@ -54,7 +54,7 @@ private:
 
     mutable nx::network::aio::BasicPollable m_pollable;
     int m_hostRangeSize;
-    QnIpRangeCheckerAsync m_ipChecker;
+    QnIpRangeScannerAsync m_ipChecker;
     QnManualSearchTaskManager m_taskManager;
 
     SearchDoneCallback m_searchDoneCallback;
