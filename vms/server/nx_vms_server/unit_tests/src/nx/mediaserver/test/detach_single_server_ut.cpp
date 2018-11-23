@@ -122,15 +122,25 @@ public:
         ASSERT_TRUE(client->doPost(url, "application/json", QJson::serialized(data)));
     }
 
-    void thenUserRemovedFromFirstServerOnly()
+    void thenUserRemovedFromFirstServer()
     {
         auto ec2Connection = mediaServerLauncher->commonModule()->ec2Connection();
         vms::api::UserDataList users;
-        ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
-        ASSERT_EQ(1, users.size());
+        for (int i = 0; i < 10; ++i) //< Detach may take some time in rear cases.
+        {
+            users.clear();
+            ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
+            if (users.size() == 1)
+                return;
 
-        // Make sure server2 is not synchronized with server1 any more
-        for (int i = 0; i < 10; ++i)
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+        ASSERT_EQ(1, users.size());
+    }
+
+    void butSecondServerRemainUnchanged()
+    {
+        for (int i = 0; i < 10; ++i) //< Make sure server2 is not synchronized with server1.
         {
             vms::api::UserDataList users2;
             NX_TEST_API_GET(makeUrl(server2, "/ec2/getUsers"), &users2);
@@ -151,7 +161,8 @@ TEST_F(DetachSingleServerTest, main)
     givenTwoSynchronizedServers();
 
     whenDetachFirstServerFromSystem();
-    thenUserRemovedFromFirstServerOnly();
+    thenUserRemovedFromFirstServer();
+    butSecondServerRemainUnchanged();
 }
 
 } // namespace test
