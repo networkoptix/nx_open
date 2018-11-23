@@ -774,7 +774,6 @@ void AnalyticsSearchListModel::Private::executePluginAction(
     const nx::vms::api::analytics::ActionTypeDescriptor& actionDescriptor,
     const analytics::storage::DetectedObject& object) const
 {
-
     const auto& actionType = actionDescriptor.item;
     const auto server = q->commonModule()->currentServer();
     NX_ASSERT(server && server->restConnection());

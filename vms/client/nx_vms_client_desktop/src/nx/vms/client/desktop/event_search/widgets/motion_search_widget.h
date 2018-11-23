@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QtCore/QScopedPointer>
 #include <QtCore/QList>
 #include <QtGui/QRegion>
 
@@ -14,17 +15,21 @@ class MotionSearchWidget: public AbstractSearchWidget
 
 public:
     MotionSearchWidget(QnWorkbenchContext* context, QWidget* parent = nullptr);
-    virtual ~MotionSearchWidget() override = default;
+    virtual ~MotionSearchWidget() override;
 
-    void setFilterRegions(const QList<QRegion>& value); //< One region per channel.
+    QList<QRegion> filterRegions() const;
+    void setFilterRegions(const QList<QRegion>& value);
+
+signals:
+    void filterRegionsChanged(const QList<QRegion>& value);
 
 private:
     virtual QString placeholderText(bool constrained) const override;
     virtual QString itemCounterText(int count) const override;
 
-    virtual void resetFilters() override;
-
-    void updateTimelineDisplay();
+private:
+    class Private;
+    const QScopedPointer<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

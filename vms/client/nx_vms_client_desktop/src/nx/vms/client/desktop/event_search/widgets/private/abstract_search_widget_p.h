@@ -59,9 +59,6 @@ public:
 
     QString textFilter() const;
 
-    bool wholeArea() const;
-    void setWholeArea(bool value);
-
     void setPlaceholderPixmap(const QPixmap& value);
     SelectableTextButton* createCustomFilterButton();
 
@@ -71,6 +68,8 @@ public:
     void addDeviceDependentAction(
         QAction* action, const QString& mixedString, const QString& cameraString);
 
+    void setCamerasReadOnly(bool value);
+
 private:
     void setupModels();
     void setupRibbon();
@@ -78,7 +77,6 @@ private:
     void setupPlaceholder();
     void setupTimeSelection();
     void setupCameraSelection();
-    void setupAreaSelection();
 
     void updateCurrentTimePeriod();
     void setSelectedPeriod(Period value);
@@ -114,7 +112,6 @@ private:
     Cameras m_cameras = Cameras::all;
     QnTimePeriod m_currentTimePeriod = QnTimePeriod::anytime();
     QnVirtualCameraResourceSet m_currentCameras;
-    bool m_wholeArea = true;
 
     Period m_previousPeriod = Period::all;
     QHash<Period, QAction*> m_timeSelectionActions;
