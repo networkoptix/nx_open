@@ -1142,18 +1142,18 @@ bool QnDbManager::resyncTransactionLog()
         return false;
     }
 
-    if (!fillTransactionLogInternal <
+    if (!fillTransactionLogInternal<
         QnUuid,
         AnalyticsPluginData,
-        AnalyticsPluginDataList > (ApiCommand::saveAnalyticsPlugin))
+        AnalyticsPluginDataList>(ApiCommand::saveAnalyticsPlugin))
     {
         return false;
     }
 
-    if (!fillTransactionLogInternal <
+    if (!fillTransactionLogInternal<
         QnUuid,
         AnalyticsEngineData,
-        AnalyticsEngineDataList > (ApiCommand::saveAnalyticsEngine))
+        AnalyticsEngineDataList>(ApiCommand::saveAnalyticsEngine))
     {
         return false;
     }
