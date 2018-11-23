@@ -4,16 +4,44 @@
 namespace nx::network {
 
 P2PHttpServerTransport::P2PHttpServerTransport(std::unique_ptr<AbstractStreamSocket> socket,
-    websocket::FrameType frameType)
+    websocket::FrameType messageType)
     :
-    P2PBaseHttpTransport(frameType)
+    m_messageType(messageType)
 {
-    m_writeHttpClient.reset(new http::AsyncClient(std::move(socket)));
 }
 
 void P2PHttpServerTransport::gotPostConnection(std::unique_ptr<AbstractStreamSocket> socket)
 {
-    m_readHttpClient.reset(new http::AsyncClient(std::move(socket)));
+}
+
+void P2PHttpServerTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler)
+{
+}
+
+void P2PHttpServerTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
+{
+}
+
+void P2PHttpServerTransport::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+}
+
+void P2PHttpServerTransport::cancelIoInAioThread(nx::network::aio::EventType eventType)
+{
+}
+
+aio::AbstractAioThread* P2PHttpServerTransport::getAioThread() const
+{
+    return nullptr;
+}
+
+void P2PHttpServerTransport::pleaseStopSync()
+{
+}
+
+SocketAddress P2PHttpServerTransport::getForeignAddress() const
+{
+    return SocketAddress();
 }
 
 } // namespace nx::network

@@ -295,17 +295,20 @@ void ConnectionBase::onHttpClientDone()
         m_httpAuthCacheItem = m_httpClient->authCacheItem();
     }
 
-    auto socket = m_httpClient->takeSocket();
-    socket->setNonBlockingMode(true);
-
     using namespace nx::network;
     websocket::FrameType frameType = remotePeer.dataFormat == Qn::JsonFormat
         ? websocket::FrameType::text
         : websocket::FrameType::binary;
     if (useWebsocketMode)
+    {
+        auto socket = m_httpClient->takeSocket();
+        socket->setNonBlockingMode(true);
         m_p2pTransport.reset(new P2PWebsocketTransport(std::move(socket), frameType));
+    }
     else
-        m_p2pTransport.reset(new P2PHttpClientTransport(std::move(socket), m_httpClient->url(), nullptr));
+    {
+        m_p2pTransport.reset(new P2PHttpClientTransport(std::move(m_httpClient), nullptr));
+    }
 
     m_httpClient.reset();
     setState(State::Connected);

@@ -3,14 +3,43 @@
 namespace nx::network {
 
 P2PHttpClientTransport::P2PHttpClientTransport(
-    std::unique_ptr<AbstractStreamSocket> socket,
-    const nx::utils::Url& getConnectionUrl,
+    HttpClientPtr readHttpClient,
     nx::utils::MoveOnlyFunc<void()> onPostConnectionEstablished,
-    websocket::FrameType frameType)
+    websocket::FrameType messageType)
     :
-    P2PBaseHttpTransport(frameType)
+    m_readHttpClient(std::move(readHttpClient)),
+    m_messageType(messageType)
 {
-    m_readHttpClient.reset(new http::AsyncClient(std::move(socket)));
+}
+
+void P2PHttpClientTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler)
+{
+}
+
+void P2PHttpClientTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
+{
+}
+
+void P2PHttpClientTransport::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+}
+
+void P2PHttpClientTransport::cancelIoInAioThread(nx::network::aio::EventType eventType)
+{
+}
+
+aio::AbstractAioThread* P2PHttpClientTransport::getAioThread() const
+{
+    return nullptr;
+}
+
+void P2PHttpClientTransport::pleaseStopSync()
+{
+}
+
+SocketAddress P2PHttpClientTransport::getForeignAddress() const
+{
+    return SocketAddress();
 }
 
 } // namespace nx::network
