@@ -334,10 +334,6 @@ MjpegParser::MjpegParser()
     m_frameSize = 0;
 }
 
-MjpegParser::~MjpegParser()
-{
-}
-
 void MjpegParser::setSdpInfo(const Sdp::Media& sdp)
 {
     for (int i = 0; i < sdp.sdpAttributes.size(); ++i)
