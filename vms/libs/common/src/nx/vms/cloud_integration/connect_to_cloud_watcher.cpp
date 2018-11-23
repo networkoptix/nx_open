@@ -66,7 +66,10 @@ void QnConnectToCloudWatcher::at_updateConnection()
         !m_commonModule->globalSettings()->cloudSystemId().isEmpty() &&
         !m_commonModule->globalSettings()->cloudAuthKey().isEmpty();
 
-    NX_DEBUG(this, "Update needCloudConnect. Value=%1", needCloudConnect);
+    NX_DEBUG(this, "Update needCloudConnect. Value=%1, cloudSystemId=%2, cloudAuthKey empty=%3",
+        needCloudConnect,
+        m_commonModule->globalSettings()->cloudSystemId(),
+        m_commonModule->globalSettings()->cloudAuthKey().isEmpty());
     if (!needCloudConnect)
     {
         if (!m_cloudUrl.isEmpty())

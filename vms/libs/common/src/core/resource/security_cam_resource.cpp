@@ -263,9 +263,12 @@ void QnSecurityCamResource::setMaxFps(int fps)
 {
     nx::media::CameraMediaCapability capability = cameraMediaCapability();
     capability.streamCapabilities[Qn::StreamIndex::primary].maxFps = fps;
-    setCameraMediaCapability(capability);
-}
 
+    // We use direct setProperty() call instead of setCameraMediaCapability(),
+    // because this functions should not save parameters.
+    setProperty(nx::media::kCameraMediaCapabilityParamName,
+        QString::fromLatin1(QJson::serialized(capability)));
+}
 int QnSecurityCamResource::reservedSecondStreamFps() const
 {
     QString value = getProperty(lit("reservedSecondStreamFps"));
