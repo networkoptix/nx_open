@@ -1,6 +1,8 @@
 #pragma once
 #if defined(ENABLE_DATA_PROVIDERS)
 
+#include <memory>
+
 #include <QtGui/QImage>
 
 #include <transcoding/filters/abstract_image_filter.h>

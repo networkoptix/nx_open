@@ -57,6 +57,8 @@
 #include <api/model/password_data.h>
 #include <database/db_manager.h>
 
+#include <nx/vms/utils/system_helpers.h>
+
 namespace
 {
     static const QByteArray SYSTEM_NAME_KEY("systemName");

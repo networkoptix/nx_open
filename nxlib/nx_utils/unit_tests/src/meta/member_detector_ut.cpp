@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <QtCore/QString>
+
 #include <nx/utils/meta/member_detector.h>
 
 namespace {

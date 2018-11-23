@@ -19,6 +19,7 @@
     <Fragment Id='FragmentClientConditions'>
         <?include BuildVars.wxi ?>
 
+        <!-- Returns advertised (1), absent (2), or locally installed (5). -->
         <util:ProductSearch
             Id="ClientMsiSearch"
             UpgradeCode="$(var.clientUpgradeCode)"
@@ -31,6 +32,7 @@
             Result="version"
             Variable="InstalledClientVersion" />
 
+        <!-- Returns advertised (1), absent (2), or locally installed (5). -->
         <util:ProductSearch
             Id="ServerMsiSearch2"
             UpgradeCode="$(var.serverUpgradeCode)"

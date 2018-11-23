@@ -2,6 +2,7 @@
 
 #include <nx/utils/uuid.h>
 #include <nx/utils/thread/mutex.h>
+#include <common/common_globals.h>
 #include <common/common_module_aware.h>
 
 class QnResourceStatusDictionary: public QObject, public QnCommonModuleAware

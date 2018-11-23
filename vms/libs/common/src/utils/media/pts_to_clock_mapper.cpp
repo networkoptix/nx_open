@@ -104,7 +104,8 @@ PtsToClockMapper::ts_type PtsToClockMapper::getTimestamp( pts_type pts )
         std::cout<<"stream "<<m_sourceID<<". discontinuity found"<<std::endl;
 #endif
         //pts discontinuity. Considering as if pts grows by m_ptsDeltaInCaseOfDiscontinuity
-        NX_WARNING (this, lit("Stream %1. Pts discontinuity (current %2, prev %3)").arg(m_sourceID).arg(pts).arg(m_prevPts));
+        NX_WARNING(this, "Stream %1. Pts discontinuity (current %2, prev %3)",
+            m_sourceID, pts, m_prevPts);
         const pts_type localCorrection = (ptsDelta - m_ptsDeltaInCaseOfDiscontinuity) & m_ptsMask;
         recalcPtsCorrection( localCorrection, &pts );
         m_prevPts = (pts - m_ptsDeltaInCaseOfDiscontinuity) & m_ptsMask;
@@ -126,14 +127,14 @@ PtsToClockMapper::ts_type PtsToClockMapper::getTimestamp( pts_type pts )
     }
 
     m_prevPts = pts;
-    const ts_type totalPtsChange = 
+    const ts_type totalPtsChange =
            (ts_type)(pts & m_ptsMask)                       //current pts
            + m_ptsOverflowCount * ((ts_type)m_ptsMask+1);   //overflows
 
-    const ts_type currentTimestamp = 
+    const ts_type currentTimestamp =
         m_baseClock + totalPtsChange * USEC_IN_SEC / m_ptsFrequency;
 
-    NX_VERBOSE(this, lit("pts %1, timestamp %2, %3").arg(pts).arg(currentTimestamp).arg(m_sourceID));
+    NX_VERBOSE(this, "pts %1, timestamp %2, %3", pts, currentTimestamp, m_sourceID);
 #ifdef DEBUG_OUTPUT
     std::cout<<"stream "<<m_sourceID<<". pts "<<pts<<", ts "<<currentTimestamp<<std::endl;
 #endif

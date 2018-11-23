@@ -1,5 +1,6 @@
-#ifndef QN_LDAP_H
-#define QN_LDAP_H
+#pragma once
+
+#include <QtCore/QUrl>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <utils/common/ldap_fwd.h>
@@ -30,5 +31,3 @@ struct QnLdapUser {
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnLdapSettings)(QnLdapUser), (json)(eq)(metatype))
 
 Q_DECLARE_METATYPE(QnLdapUsers)
-
-#endif // QN_LDAP_H

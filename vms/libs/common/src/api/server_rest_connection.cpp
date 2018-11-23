@@ -61,7 +61,7 @@ namespace rest
 ServerConnection::ServerConnection(
     QnCommonModule* commonModule,
     const QnUuid& serverId,
-    nx::utils::Url directUrl)
+    const nx::utils::Url& directUrl)
     :
     QObject(),
     QnCommonModuleAware(commonModule),

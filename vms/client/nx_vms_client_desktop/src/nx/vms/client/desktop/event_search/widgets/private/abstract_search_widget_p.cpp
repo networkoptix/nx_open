@@ -648,16 +648,20 @@ AbstractSearchWidget::Cameras AbstractSearchWidget::Private::selectedCameras() c
     return m_cameras;
 }
 
-void AbstractSearchWidget::Private::setSingleCameraMode(bool value)
+void AbstractSearchWidget::Private::selectCameras(Cameras value)
 {
-    const bool currentlyEnabled = m_cameras == Cameras::current;
-    if (currentlyEnabled == value)
+    if (m_cameras == value)
         return;
 
-    const auto action = m_cameraSelectionActions.value(value ? Cameras::current : m_previousCameras);
+    const auto action = m_cameraSelectionActions.value(value);
     NX_ASSERT(action);
     if (action)
         action->trigger();
+}
+
+AbstractSearchWidget::Cameras AbstractSearchWidget::Private::previousCameras() const
+{
+    return m_previousCameras;
 }
 
 void AbstractSearchWidget::Private::setSelectedCameras(Cameras value)

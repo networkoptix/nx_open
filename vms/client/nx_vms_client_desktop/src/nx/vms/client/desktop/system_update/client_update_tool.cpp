@@ -1,9 +1,16 @@
-#include <utils/applauncher_utils.h>
-#include <nx/utils/log/log.h>
-#include <api/server_rest_connection.h>
-
-#include "nx/vms/common/p2p/downloader/private/single_connection_peer_manager.h"
 #include "client_update_tool.h"
+
+#include <common/common_module.h>
+#include <api/global_settings.h>
+#include <api/server_rest_connection.h>
+#include <utils/applauncher_utils.h>
+#include <utils/common/app_info.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
+#include <nx/utils/log/log.h>
+#include <nx/update/update_check.h>
+#include <nx/vms/common/p2p/downloader/private/single_connection_peer_manager.h>
+#include <nx/vms/client/desktop/ini.h>
 
 namespace nx::vms::client::desktop {
 
@@ -13,12 +20,18 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
 {
     // Expecting m_outputDir to be like /temp/nx_updates/client
 
+    if (ini().massSystemUpdateClearDownloads)
+        clearDownloadFolder();
+
     vms::common::p2p::downloader::AbstractPeerSelectorPtr peerSelector;
     m_peerManager.reset(new SingleConnectionPeerManager(commonModule(), std::move(peerSelector)));
     m_peerManager->setParent(this);
 
     m_downloader.reset(new Downloader(m_outputDir, commonModule(), this));
     connect(m_downloader.get(), &Downloader::fileStatusChanged,
+        this, &ClientUpdateTool::atDownloaderStatusChanged);
+
+    connect(m_downloader.get(), &Downloader::fileInformationChanged,
         this, &ClientUpdateTool::atDownloaderStatusChanged);
 
     connect(m_downloader.get(), &Downloader::chunkDownloadFailed,
@@ -60,7 +73,7 @@ void ClientUpdateTool::setApplauncherError(QString error)
     emit updateStateChanged((int)m_state, 0);
 }
 
-std::future<UpdateContents> ClientUpdateTool::requestRemoteUpdateInfo()
+std::future<nx::update::UpdateContents> ClientUpdateTool::requestRemoteUpdateInfo()
 {
     m_remoteUpdateInfoRequest = std::promise<UpdateContents>();
 
@@ -68,7 +81,7 @@ std::future<UpdateContents> ClientUpdateTool::requestRemoteUpdateInfo()
     {
         // Requesting remote update info.
         m_serverConnection->getUpdateInfo(
-            [tool=QPointer<ClientUpdateTool>(this)](bool success, rest::Handle handle, const nx::update::Information& response)
+            [tool=QPointer<ClientUpdateTool>(this)](bool success, rest::Handle /*handle*/, const nx::update::Information& response)
             {
                 if (tool && success)
                     tool->atRemoteUpdateInformation(response);
@@ -92,12 +105,23 @@ void ClientUpdateTool::setServerUrl(nx::utils::Url serverUrl, QnUuid serverId)
 
 void ClientUpdateTool::atRemoteUpdateInformation(const nx::update::Information& updateInformation)
 {
-    auto clientPackage = findClientPackage(updateInformation);
+    auto clientInfo = QnAppInfo::currentSystemInformation();
+    QString errorMessage;
+    // Update is allowed if either target version has the same cloud host or
+    // there are no servers linked to the cloud in the system.
+    QString cloudUrl = nx::network::SocketGlobals::cloud().cloudHost();
+    bool boundToCloud = !commonModule()->globalSettings()->cloudSystemId().isEmpty();
+
+    nx::update::Package clientPackage;
+    nx::update::findPackage(
+        clientInfo,
+        updateInformation,
+        true, cloudUrl, boundToCloud, &clientPackage, &errorMessage);
 
     if (getState() == State::initial)
     {
         UpdateContents contents;
-        contents.sourceType = UpdateSourceType::mediaservers;
+        contents.sourceType = nx::update::UpdateSourceType::mediaservers;
         contents.source = "mediaserver";
         contents.info = updateInformation;
         contents.clientPackage = clientPackage;
@@ -116,7 +140,7 @@ void ClientUpdateTool::atRemoteUpdateInformation(const nx::update::Information& 
     }
 }
 
-UpdateContents ClientUpdateTool::getRemoteUpdateInfo() const
+nx::update::UpdateContents ClientUpdateTool::getRemoteUpdateInfo() const
 {
     return m_remoteUpdateContents;
 }
@@ -129,7 +153,7 @@ void ClientUpdateTool::downloadUpdate(const UpdateContents& contents)
 
     m_updateVersion = nx::utils::SoftwareVersion(contents.info.version);
 
-    if (contents.sourceType == UpdateSourceType::file)
+    if (contents.sourceType == nx::update::UpdateSourceType::file)
     {
         // Expecting that file is stored at:
         QString path = contents.storageDir.filePath(m_clientPackage.file);
@@ -157,7 +181,7 @@ void ClientUpdateTool::downloadUpdate(const UpdateContents& contents)
                 break;
             case Code::fileAlreadyExists:
                 NX_VERBOSE(this) << "requestStartUpdate() - file is already here"
-                    << info.name;
+                    << m_updateFile;
                 setState(State::readyInstall);
                 break;
             default:
@@ -202,7 +226,7 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
             break;
         case FileInformation::Status::downloading:
             m_progress = fileInformation.calculateDownloadProgress();
-            emit updateStateChanged(int(FileInformation::Status::downloading), m_progress);
+            emit updateStateChanged(int(State::downloading), m_progress);
             break;
         default:
             // Nothing to do here
@@ -210,11 +234,10 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
     }
 }
 
-void ClientUpdateTool::atChunkDownloadFailed(const QString& fileName)
+void ClientUpdateTool::atChunkDownloadFailed(const QString& /*fileName*/)
 {
     // It is a breakpoint catcher.
     //NX_VERBOSE(this) << "atChunkDownloadFailed() failed to download chunk for" << fileName;
-    //setError(tr("Update package is corrupted: %1").arg(error));
 }
 
 void ClientUpdateTool::atDownloadFailed(const QString& fileName)
@@ -278,7 +301,7 @@ bool ClientUpdateTool::installUpdate()
                 return true;
 
             case Result::ok:
-                setState(State::installing);
+                setState(State::complete);
                 return true;
 
             case Result::otherError:
@@ -393,6 +416,14 @@ void ClientUpdateTool::resetState()
     m_updateVersion = nx::utils::SoftwareVersion();
     m_clientPackage = nx::update::Package();
     m_remoteUpdateContents = UpdateContents();
+}
+
+void ClientUpdateTool::clearDownloadFolder()
+{
+    // Clear existing folder for downloaded update files.
+    m_outputDir.removeRecursively();
+    if (!m_outputDir.exists())
+        m_outputDir.mkpath(".");
 }
 
 ClientUpdateTool::State ClientUpdateTool::getState() const

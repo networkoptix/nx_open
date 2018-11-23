@@ -28,6 +28,8 @@ AnalyticsSearchWidget::AnalyticsSearchWidget(QnWorkbenchContext* context, QWidge
     setRelevantControls(Control::defaults | Control::areaSelector | Control::footersToggler);
     setPlaceholderPixmap(qnSkin->pixmap("events/placeholders/analytics.png"));
 
+    selectCameras(AbstractSearchWidget::Cameras::layout);
+
     installEventHandler(this, {QEvent::Show, QEvent::Hide},
         this, &AnalyticsSearchWidget::updateTimelineDisplay);
 
@@ -67,6 +69,12 @@ QString AnalyticsSearchWidget::placeholderText(bool constrained) const
 QString AnalyticsSearchWidget::itemCounterText(int count) const
 {
     return tr("%n objects", "", count);
+}
+
+void AnalyticsSearchWidget::resetFilters()
+{
+    base_type::resetFilters();
+    selectCameras(AbstractSearchWidget::Cameras::layout);
 }
 
 void AnalyticsSearchWidget::updateTimelineDisplay()

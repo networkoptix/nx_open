@@ -19,8 +19,8 @@ class SelectableTextButton;
 class AbstractSearchListModel;
 
 /**
- * Base class for Right Panel search tabs. Contains common filter setup controls,
- * EventRibbon to display data and all mechanics to fetch data when needed.
+ * Base class for Right Panel search tabs. Contains common filter setup controls, tiles view
+ * (also known as EventRibbon) to display data and all mechanics to fetch data when needed.
  */
 class AbstractSearchWidget:
     public QWidget,
@@ -84,8 +84,8 @@ public:
     Cameras selectedCameras() const;
     QnVirtualCameraResourceSet cameras() const;
 
-    /** Temporarily set Cameras::current mode, or restore previous mode. */
-    void setSingleCameraMode(bool value);
+    void selectCameras(Cameras value);
+    Cameras previousCameras() const;
 
     QString textFilter() const;
     bool wholeArea() const;

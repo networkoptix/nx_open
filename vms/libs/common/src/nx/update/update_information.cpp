@@ -10,8 +10,7 @@
 #include <nx/vms/api/data/software_version.h>
 #include <nx/utils/scope_guard.h>
 
-namespace nx {
-namespace update {
+namespace nx::update {
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
     nx::update, InformationError,
@@ -39,6 +38,18 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::update::Information, (xml)(csv_record)(ubjs
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::update::Status, Code)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::update::Status, (xml)(csv_record)(ubjson)(json), UpdateStatus_Fields)
 
+nx::utils::SoftwareVersion UpdateContents::getVersion() const
+{
+    return nx::utils::SoftwareVersion(info.version);
+}
 
-} // namespace update
-} // namespace nx
+bool UpdateContents::isValid() const
+{
+    return missingUpdate.empty()
+        && !info.version.isEmpty()
+        && invalidVersion.empty()
+        && clientPackage.isValid()
+        && error == nx::update::InformationError::noError;
+}
+
+} // namespace nx::update

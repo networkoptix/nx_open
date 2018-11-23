@@ -32,6 +32,10 @@ namespace {
         "\x08\x00\x27"      /* virtualbox */
     };
 
+template <typename T, size_t N>
+char (&ArraySizeHelper(T (&array)[N]))[N];
+#define arraysize(array) (sizeof(ArraySizeHelper(array)))
+
 bool isVirtualMacAddress(const nx::utils::MacAddress& macAddress)
 {
     for (size_t i = 0; i < arraysize(virtualMacs); i++)

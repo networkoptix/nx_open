@@ -649,7 +649,7 @@ QString QnMediaResourceWidget::overlayCustomButtonText(
 void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr& rule)
 {
     const auto ruleId = rule->id();
-    const auto triggerIt = lowerBoundbyTriggerRuleId(ruleId);
+    const auto triggerIt = lowerBoundbyTriggerName(rule);
 
     if (triggerIt == m_triggers.end())
         return;
@@ -2814,22 +2814,28 @@ nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr
 * Soft Triggers
 */
 
+QnMediaResourceWidget::SoftwareTriggerInfo QnMediaResourceWidget::makeTriggerInfo(
+    const nx::vms::event::RulePtr& rule) const
+{
+    return SoftwareTriggerInfo({
+        rule->eventParams().inputPortId,
+        rule->eventParams().caption,
+        rule->eventParams().description,
+        rule->isActionProlonged() });
+}
+
 void QnMediaResourceWidget::createTriggerIfRelevant(
     const vms::event::RulePtr& rule)
 {
     const auto ruleId = rule->id();
-    const auto it = lowerBoundbyTriggerRuleId(ruleId);
+    const auto it = lowerBoundbyTriggerName(rule);
 
     NX_ASSERT(it == m_triggers.end() || it->ruleId != ruleId);
 
     if (!isRelevantTriggerRule(rule))
         return;
 
-    const SoftwareTriggerInfo info({
-        rule->eventParams().inputPortId,
-        rule->eventParams().caption,
-        rule->eventParams().description,
-        rule->isActionProlonged() });
+    const SoftwareTriggerInfo info = makeTriggerInfo(rule);
 
     std::function<void()> clientSideHandler;
 
@@ -2854,15 +2860,17 @@ void QnMediaResourceWidget::createTriggerIfRelevant(
 }
 
 QnMediaResourceWidget::TriggerDataList::iterator
-    QnMediaResourceWidget::lowerBoundbyTriggerRuleId(const QnUuid& id)
+    QnMediaResourceWidget::lowerBoundbyTriggerName(const nx::vms::event::RulePtr& rule)
 {
     static const auto compareFunction =
         [](const SoftwareTrigger& left, const SoftwareTrigger& right)
         {
-            return left.ruleId > right.ruleId; // Bottom in the thick client - right in the mobile.
+            return left.info.name < right.info.name
+                || (left.info.name == right.info.name
+                    && left.info.icon < right.info.icon);
         };
 
-    const auto idValue = SoftwareTrigger{id, SoftwareTriggerInfo(), QnUuid()};
+    const auto idValue = SoftwareTrigger{rule->id(), makeTriggerInfo(rule), QnUuid()};
     return std::lower_bound(m_triggers.begin(), m_triggers.end(), idValue, compareFunction);
 }
 
@@ -3106,7 +3114,8 @@ void QnMediaResourceWidget::resetTriggers()
 
 void QnMediaResourceWidget::at_eventRuleRemoved(const QnUuid& id)
 {
-    const auto it = lowerBoundbyTriggerRuleId(id);
+    const auto it = std::find_if(m_triggers.begin(), m_triggers.end(),
+        [id](const auto& val) { return val.ruleId == id; });
     if (it == m_triggers.end() || it->ruleId != id)
         return;
 
@@ -3125,7 +3134,7 @@ void QnMediaResourceWidget::clearEntropixEnhancedImage()
 void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const vms::event::RulePtr& rule)
 {
     const auto ruleId = rule->id();
-    const auto it = lowerBoundbyTriggerRuleId(ruleId);
+    const auto it = lowerBoundbyTriggerName(rule);
     if (it == m_triggers.end() || it->ruleId != ruleId)
     {
         /* Create trigger if the rule is relevant: */

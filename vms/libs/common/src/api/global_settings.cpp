@@ -395,12 +395,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initTimeSynchronizationAdaptors(
         this);
     timeSynchronizationAdaptors << m_timeSynchronizationEnabledAdaptor;
 
-    m_synchronizeTimeWithInternetAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        kNameSynchronizeTimeWithInternet,
-        true,
-        this);
-    timeSynchronizationAdaptors << m_synchronizeTimeWithInternetAdaptor;
-
     m_primaryTimeServerAdaptor = new QnLexicalResourcePropertyAdaptor<QnUuid>(
         kNamePrimaryTimeServer,
         QnUuid(),
@@ -1441,16 +1435,6 @@ bool QnGlobalSettings::isTimeSynchronizationEnabled() const
 void QnGlobalSettings::setTimeSynchronizationEnabled(bool value)
 {
     m_timeSynchronizationEnabledAdaptor->setValue(value);
-}
-
-bool QnGlobalSettings::isSynchronizingTimeWithInternet() const
-{
-    return m_synchronizeTimeWithInternetAdaptor->value();
-}
-
-void QnGlobalSettings::setSynchronizingTimeWithInternet(bool value)
-{
-    m_synchronizeTimeWithInternetAdaptor->setValue(value);
 }
 
 QnUuid QnGlobalSettings::primaryTimeServer() const

@@ -22,6 +22,8 @@ private:
     virtual QString placeholderText(bool constrained) const override;
     virtual QString itemCounterText(int count) const override;
 
+    virtual void resetFilters() override;
+
     void updateTimelineDisplay();
 };
 

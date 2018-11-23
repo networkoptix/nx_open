@@ -925,6 +925,19 @@ void ActionHandler::at_openInCurrentLayoutAction_triggered()
             return;
     }
 
+    nx::utils::ScopedConnection connection;
+    if (parameters.argument<bool>(Qn::SelectOnOpeningRole))
+    {
+        connection.reset(connect(workbench()->currentLayout(), &QnWorkbenchLayout::itemAdded, this,
+            [this, &connection](const QnWorkbenchItem* item)
+            {
+                menu()->trigger(action::GoToLayoutItemAction, action::Parameters()
+                    .withArgument(Qn::ItemUuidRole, item->uuid()));
+
+                connection.reset();
+            }));
+    }
+
     parameters.setArgument(Qn::LayoutResourceRole, currentLayout->resource());
     menu()->trigger(action::OpenInLayoutAction, parameters);
 }
@@ -1303,7 +1316,7 @@ void ActionHandler::at_systemAdministrationAction_triggered()
 void ActionHandler::at_jumpToTimeAction_triggered()
 {
     auto slider = navigator()->timeSlider();
-    if (!slider)
+    if (!slider || !navigator()->isTimelineRelevant())
         return;
 
     const auto parameters = menu()->currentParameters(sender());
@@ -1350,7 +1363,7 @@ void ActionHandler::at_goToLayoutItemAction_triggered()
     const auto parameters = menu()->currentParameters(sender());
     const auto uuid = parameters.argument(Qn::ItemUuidRole).value<QnUuid>();
 
-    const auto shouldRaise = parameters.argument<bool>(Qn::ForceRole);
+    const auto shouldRaise = parameters.argument<bool>(Qn::RaiseSelectionRole);
     const auto centralItem = workbench()->item(Qn::CentralRole);
 
     QnWorkbenchItem* targetItem = nullptr;

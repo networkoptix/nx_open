@@ -131,27 +131,6 @@ static const char DB_INSTANCE_KEY[] = "DB_INSTANCE_ID";
 
 using std::nullptr_t;
 
-static bool removeDirRecursive(const QString & dirName)
-{
-    bool result = true;
-    QDir dir(dirName);
-
-    if (dir.exists(dirName)) {
-        for(const QFileInfo& info: dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst))
-        {
-            if (info.isDir())
-                result = removeDir(info.absoluteFilePath());
-            else
-                result = QFile::remove(info.absoluteFilePath());
-
-            if (!result)
-                return result;
-        }
-        result = dir.rmdir(dirName);
-    }
-    return result;
-}
-
 template <class T>
 void assertSorted(std::vector<T> &data) {
 #ifdef _DEBUG
@@ -555,7 +534,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
         if (addedStoredFilesCnt > 0)
             m_resyncFlags |= ResyncFiles;
 
-        removeDirRecursive(storedFilesDir);
+        QDir(storedFilesDir).removeRecursively();
 
         // updateDBVersion();
         QSqlQuery insVersionQuery(m_sdb);
@@ -1997,6 +1976,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     }
 
     if (updateName.endsWith("/99_20181031_rename_smptPassword_parameter.sql"))
+        return resyncIfNeeded(ResyncGlobalSettings);
+
+    if (updateName.endsWith("/99_20181102_remove_sync_with_internet_option.sql"))
         return resyncIfNeeded(ResyncGlobalSettings);
 
     NX_DEBUG(this, lit("SQL update %1 does not require post-actions.").arg(updateName));
