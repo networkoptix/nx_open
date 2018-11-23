@@ -5,11 +5,11 @@
 #include <QString>
 
 /**
- Contains the keys to treat properties of resources (QnResource and its inheritors)
- Properties are mutable attributes of a resource.
- The type of any property is QString.
- QnResource has a bunch of methods to work with its properties:
-     hasPropery, getProperty, setProperty, updateProperty, saveProperties and savePropertiesAsync
+ * Contains the keys to treat properties of resources (QnResource and its inheritors)
+ * Properties are mutable attributes of a resource.
+ * The type of any property is QString.
+ * QnResource has a bunch of methods to work with its properties:
+ *     hasPropery, getProperty, setProperty, updateProperty, saveProperties, savePropertiesAsync.
  */
 namespace ResourcePropertyKey
 {
@@ -21,23 +21,24 @@ static const QString kHasDualStreaming("hasDualStreaming");
 static const QString kStreamFpsSharing("streamFpsSharing");
 static const QString kDts("dts");
 
-/*
- kMaxFpsThis property key is for compatibility with vms 3.1 only.
- Do not confuse it with ResourceDataKey::kMaxFps.
-*/
+/**
+ * kMaxFpsThis property key is for compatibility with vms 3.1 only.
+ * Do not confuse it with ResourceDataKey::kMaxFps.
+ */
 static const QString kMaxFps("MaxFPS"); //<
 static const QString kMotionWindowCnt("motionWindowCnt");
 static const QString kMotionMaskWindowCnt("motionMaskWindowCnt");
 static const QString kMotionSensWindowCnt("motionSensWindowCnt");
 
-/*!
-    String parameter with following values allowed:\n
-    - \a softwaregrid. Software motion calculated on mediaserver
-    - \a hardwaregrid. Motion provided by camera
-    \a softwaregrid and \a hardwaregrid can be combined as list split with comma
-    Empty string means no motion is allowed
-*/
+/**
+ * String parameter with following values allowed:
+ * - softwaregrid. Software motion calculated on mediaserver.
+ * - hardwaregrid. Motion provided by camera.
+ * softwaregrid and hardwaregrid can be combined as list split with comma.
+ * Empty string means no motion is allowed.
+ */
 static const QString kSupportedMotion("supportedMotion");
+
 static const QString kTrustCameraTime("trustCameraTime");
 static const QString kCredentials("credentials");
 static const QString kDefaultCredentials("defaultCredentials");
@@ -52,6 +53,8 @@ static const QString kUserIsAllowedToOverridePtzCapabilities(
     "userIsAllowedToOverridePtzCapabilities");
 static const QString kPtzCapabilitiesAddedByUser("ptzCapabilitiesAddedByUser");
 static const QString kConfigurationalPtzCapabilities("configurationalPtzCapabilities");
+static const QString kCombinedSensorsDescription("combinedSensorsDescription");
+static const QString kForcedAudioStream("forcedAudioStream");
 
 } // namespace PropertyKey
 
@@ -89,7 +92,13 @@ static const QString kHighStreamAvailableBitrates("highStreamAvailableBitrates")
 static const QString kLowStreamAvailableBitrates("lowStreamAvailableBitrates");
 static const QString kHighStreamBitrateBounds("highStreamBitrateBounds");
 static const QString kLowStreamBitrateBounds("lowStreamBitrateBounds");
-static const QString kUnauthorizedTimeoutSec = lit("unauthorizedTimeoutSec");
+static const QString kUnauthorizedTimeoutSec("unauthorizedTimeoutSec");
+static const QString kAdvancedParameterOverloads("advancedParameterOverloads");
+static const QString kShouldAppearAsSingleChannel("shouldAppearAsSingleChannel");
+static const QString kPreStreamConfigureRequests("preStreamConfigureRequests");
+static const QString kDisableMultiThreadDecoding("disableMultiThreadDecoding");
+static const QString kConfigureAllStitchedSensors("configureAllStitchedSensors");
+static const QString kTwoWayAudio("2WayAudio");
 
 } // namespace ResourceDataKey
 
@@ -102,30 +111,23 @@ static const QString kUnauthorizedTimeoutSec = lit("unauthorizedTimeoutSec");
 namespace Qn
 {
 
+//seem to be buggy
+static const QString VIDEO_DISABLED_PARAM_NAME = lit("noVideoSupport");
 static const QString FORCE_BITRATE_PER_GOP = lit("bitratePerGOP");
+//seem to be buggy
 
 static const QString VIDEO_LAYOUT_PARAM_NAME = lit("VideoLayout");
 static const QString VIDEO_LAYOUT_PARAM_NAME2 = lit("videoLayout"); //used in resource_data.json
-static const QString TWO_WAY_AUDIO_PARAM_NAME = lit("2WayAudio");
-static const QString kCombinedSensorsDescriptionParamName = lit("combinedSensorsDescription");
 static const QString kAnalyticsDriversParamName = lit("analyticsDrivers"); //< TODO: Rename to supportedAnalyticsEventTypeIds.
 static const QString kGroupPlayParamName = lit("groupplay");
 static const QString kCanShareLicenseGroup = lit("canShareLicenseGroup");
 static const QString kMediaTraits = lit("mediaTraits");
 static const QString kDeviceType = lit("deviceType");
-static const QString kConfigureAllStitchedSensors("configureAllStitchedSensors");
-static const QString kDisableMultiThreadDecoding("disableMultiThreadDecoding");
 
-static const QString ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME = lit("advancedParameterOverloads");
-
-static const QString PRE_SRTEAM_CONFIGURE_REQUESTS_PARAM_NAME = lit("preStreamConfigureRequests");
-
-static const QString SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME = lit("shouldAppearAsSingleChannel");
 //!Contains QnCameraAdvancedParams in ubjson-serialized state
 static const QString CAMERA_ADVANCED_PARAMETERS = lit("cameraAdvancedParams");
+
 static const QString FIRMWARE_PARAM_NAME = lit("firmware");
-static const QString IS_AUDIO_FORCED_PARAM_NAME = lit("forcedAudioStream");
-static const QString VIDEO_DISABLED_PARAM_NAME = lit("noVideoSupport");
 static const QString IO_SETTINGS_PARAM_NAME = lit("ioSettings");
 static const QString IO_CONFIG_PARAM_NAME = lit("ioConfigCapability");
 static const QString IO_PORT_DISPLAY_NAMES_PARAM_NAME = lit("ioDisplayName");
@@ -133,6 +135,7 @@ static const QString IO_OVERLAY_STYLE_PARAM_NAME = lit("ioOverlayStyle");
 static const QString FORCE_ONVIF_PARAM_NAME = lit("forceONVIF");
 static const QString IGNORE_ONVIF_PARAM_NAME = lit("ignoreONVIF");
 static const QString PTZ_CAPABILITIES_PARAM_NAME = lit("ptzCapabilities");
+//operationalPtzCapabilities
 
 static const QString DW_REBRANDED_TO_ISD_MODEL = lit("isdDwCam");
 static const QString ONVIF_VENDOR_SUBTYPE = lit("onvifVendorSubtype");

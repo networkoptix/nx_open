@@ -488,14 +488,14 @@ bool QnSecurityCamResource::isAnalogEncoder() const
 
 CombinedSensorsDescription QnSecurityCamResource::combinedSensorsDescription() const
 {
-    const auto& value = getProperty(Qn::kCombinedSensorsDescriptionParamName);
+    const auto& value = getProperty(ResourcePropertyKey::kCombinedSensorsDescription);
     return QJson::deserialized<CombinedSensorsDescription>(value.toLatin1());
 }
 
 void QnSecurityCamResource::setCombinedSensorsDescription(
     const CombinedSensorsDescription& sensorsDescription)
 {
-    setProperty(Qn::kCombinedSensorsDescriptionParamName,
+    setProperty(ResourcePropertyKey::kCombinedSensorsDescription,
         QString::fromLatin1(QJson::serialized(sensorsDescription)));
 }
 
@@ -1046,7 +1046,7 @@ void QnSecurityCamResource::setAudioEnabled(bool enabled)
 
 bool QnSecurityCamResource::isAudioForced() const
 {
-    return getProperty(Qn::IS_AUDIO_FORCED_PARAM_NAME).toInt() > 0;
+    return getProperty(ResourcePropertyKey::kForcedAudioStream).toInt() > 0;
 }
 
 bool QnSecurityCamResource::isAudioEnabled() const
@@ -1323,7 +1323,6 @@ bool QnSecurityCamResource::useBitratePerGop() const
         return result.toInt() > 0;
 
     return resourceData().value<bool>(Qn::FORCE_BITRATE_PER_GOP);
-    return false;
 }
 
 bool QnSecurityCamResource::isIOModule() const
