@@ -71,7 +71,7 @@ void QnManualSearchTaskManager::addTask(
     m_pollable.dispatch(
         [this, task = std::move(task), address, isSequential]() mutable
         {
-            NX_VERBOSE(this, "Adding task on %1 (sequential: %2)", task.url(), isSequential);
+            NX_VERBOSE(this, "Adding task %1 on %2 (sequential: %3)", task, task.url(), isSequential);
             NX_ASSERT(m_state == State::init); //< NOTE: It is not supported to add tasks after run.
             m_urlSearchTaskQueues[address.address].push(std::move(task));
             m_searchQueueContexts[address.address]; //< Create if does not exist.
@@ -127,6 +127,7 @@ QnManualResourceSearchList QnManualSearchTaskManager::foundResources() const
 void QnManualSearchTaskManager::searchTaskDoneHandler(
     QnManualResourceSearchList results, QnSearchTask* const task)
 {
+    NX_VERBOSE(this, "Task %1 done", *task);
     bool taskInterruptProcessing = task->doesInterruptTaskProcessing();
     auto taskUrl = task->url();
 
@@ -207,7 +208,7 @@ void QnManualSearchTaskManager::runSomePendingTasks()
 
             bool isTaskBlocking = queue.front().isBlocking();
             nx::utils::concurrent::run(threadPool,
-                std::bind(&QnSearchTask::doSearch, std::move(queue.front())));
+                std::bind(&QnSearchTask::start, std::move(queue.front())));
             queue.pop();
 
             context.runningTaskCount++;

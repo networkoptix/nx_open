@@ -1,6 +1,7 @@
 #include "manual_camera_search_task.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/log/to_string.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -9,20 +10,20 @@
 
 namespace {
 
-bool restrictNewManualCameraByIP(const QnSecurityCamResourcePtr& netRes)
+bool restrictNewManualCameraByIp(const QnSecurityCamResourcePtr& netRes)
 {
     if (netRes->hasCameraCapabilities(Qn::ShareIpCapability))
-        return false; //< don't block
+        return false; //< Don't block.
 
     auto resCommonModule = netRes->commonModule();
     NX_ASSERT(resCommonModule, lit("Common module should be set for resource"));
     if (!resCommonModule)
-        return true; //< Don't add resource without properly set common module
+        return true; //< Don't add resource without properly set common module.
 
     auto resPool = resCommonModule->resourcePool();
     NX_ASSERT(resPool, "Resource should have correspondent resource pool");
     if (!resPool)
-        return true; // Don't add resource without properly set resource pool
+        return true; // Don't add resource without properly set resource pool.
 
     QnNetworkResourceList existResList =
         resPool->getAllNetResourceByHostAddress(netRes->getHostAddress());
@@ -40,18 +41,18 @@ bool restrictNewManualCameraByIP(const QnSecurityCamResourcePtr& netRes)
             continue;
 
         if (existCam->hasCameraCapabilities(Qn::ShareIpCapability))
-            return false; //< don't block
+            return false; //< Don't block.
 
         if (!existCam->isManuallyAdded())
-            return true; //< block manual and auto camera at same IP
+            return true; //< Block manual and auto camera at same IP.
 
         if (existRes->getTypeId() != netRes->getTypeId())
         {
-            // allow several manual cameras with the same IP if cameras have different ports
+            // Allow several manual cameras with the same IP if cameras have different ports.
             QUrl url1(existRes->getUrl());
             QUrl url2(netRes->getUrl());
             if (url1.port() == url2.port())
-                return true; //< camera found by different drivers with the same port
+                return true; //< Camera found by different drivers with the same port.
         }
     }
     return false;
@@ -64,7 +65,7 @@ QnManualResourceSearchEntry entryFromCamera(const QnSecurityCamResourcePtr& came
 
     const bool exists =
         (resourceInPool && resourceInPool->getHostAddress() == camera->getHostAddress())
-        || restrictNewManualCameraByIP(camera);
+        || restrictNewManualCameraByIp(camera);
 
     return QnManualResourceSearchEntry(
         camera->getName(), camera->getUrl(), type->getName(),
@@ -90,9 +91,7 @@ QnSearchTask::QnSearchTask(
 :
     m_commonModule(commonModule),
     m_auth(auth),
-    m_breakIfGotResult(breakOnGotResult),
-    m_blocking(false),
-    m_interruptTaskProcesing(false)
+    m_breakIfGotResult(breakOnGotResult)
 {
     NX_ASSERT(commonModule);
     m_url.setAuthority(address.toString());
@@ -130,9 +129,9 @@ bool QnSearchTask::doesInterruptTaskProcessing() const
     return m_interruptTaskProcesing;
 }
 
-void QnSearchTask::doSearch()
+void QnSearchTask::start()
 {
-    NX_VERBOSE(this, "Starting search on URL %1 with %2 searcher(s)", m_url, m_searchers.size());
+    NX_VERBOSE(this, "Starting search on URL %1", m_url);
     QnManualResourceSearchList results;
     for (const auto& checker: m_searchers)
     {
@@ -143,14 +142,13 @@ void QnSearchTask::doSearch()
         {
             res->setCommonModule(checker->commonModule());
             QnSecurityCamResourcePtr camRes = res.dynamicCast<QnSecurityCamResource>();
-            Q_ASSERT(camRes);
-            // Checking, if found resource is reserved by some other searcher
-            if(camRes && !m_commonModule->cameraDriverRestrictionList()->driverAllowedForCamera(
+            NX_ASSERT(camRes);
+            if (camRes && !m_commonModule->cameraDriverRestrictionList()->driverAllowedForCamera(
                 checker->manufacture(),
                 camRes->getVendor(),
                 camRes->getModel()))
             {
-                continue;   //< Camera is not allowed to be used with this driver.
+                continue;
             }
 
             results.push_back(entryFromResource(res));
@@ -170,12 +168,13 @@ nx::utils::Url QnSearchTask::url()
     return m_url;
 }
 
-QString QnSearchTask::toString()
+QString QnSearchTask::toString() const
 {
-    QString str;
+    QString str = ::toString(this) + "( ";
 
     for (const auto& searcher: m_searchers)
-        str += searcher->manufacture() + lit(" ");
+        str += "'" + searcher->manufacture() + "' ";
 
+    str += ")";
     return str;
 }

@@ -4,8 +4,6 @@
 #include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource_management/resource_searcher.h>
-
-// TODO: Remove dependency.
 #include <api/model/manual_camera_seach_reply.h>
 
 // TODO: Make sure threadPool is available on any call and it is not possible to destroy threadPool
@@ -18,7 +16,6 @@ public:
     typedef std::vector<QnAbstractNetworkResourceSearcher*> SearcherList;
     typedef std::function<void(
         QnManualResourceSearchList results, QnSearchTask* const task)> SearchDoneCallback;
-    // TODO: Should be move-only func.
 
     QnSearchTask() = delete;
     QnSearchTask(
@@ -35,10 +32,10 @@ public:
     bool isBlocking() const;
     bool doesInterruptTaskProcessing() const;
 
-    void doSearch();
+    void start();
 
     nx::utils::Url url();
-    QString toString();
+    QString toString() const;
 
 private:
     QnCommonModule * m_commonModule = nullptr;
@@ -49,13 +46,13 @@ private:
      * If one of the searchers in task found a resource than other searchers in the same task
      * won't be launched.
      */
-    bool m_breakIfGotResult;
+    bool m_breakIfGotResult = false;
 
     // Need to wait while task will be done before launching next task in queue.
-    bool m_blocking;
+    bool m_blocking = false;
 
     // If we got some results from this task then other tasks in queue shouldn't be launched.
-    bool m_interruptTaskProcesing;
+    bool m_interruptTaskProcesing = false;
     SearchDoneCallback m_callback;
     SearcherList m_searchers;
 };
