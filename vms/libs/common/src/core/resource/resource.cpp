@@ -589,13 +589,13 @@ nx::vms::api::ResourceParamDataList QnResource::getAllProperties() const
     if (const auto module = commonModule())
         runtimeProperties = module->propertyDictionary()->allProperties(getId());
 
-    ParamTypeMap staticDefaultProperties;
+    ParamTypeMap defaultProperties;
 
     QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
     if (resType)
-        staticDefaultProperties = resType->paramTypeList();
+        defaultProperties = resType->paramTypeList();
 
-    for (auto it = staticDefaultProperties.cbegin(); it != staticDefaultProperties.cend(); ++it)
+    for (auto it = defaultProperties.cbegin(); it != defaultProperties.cend(); ++it)
     {
         auto runtimeIt = std::find_if(runtimeProperties.cbegin(), runtimeProperties.cend(),
             [it](const auto& param) { return it.key() == param.name; });

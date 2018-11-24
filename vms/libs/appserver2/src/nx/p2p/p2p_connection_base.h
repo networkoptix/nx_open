@@ -36,6 +36,7 @@ public:
 
     enum class State
     {
+        NotDefined,
         Connecting,
         Connected,
         Error,

@@ -1565,7 +1565,7 @@ void QnPlAxisResource::fetchAndSetAdvancedParameters()
 
     auto resData = resourceData();
     auto overloads = resData.value<std::vector<QnCameraAdvancedParameterOverload>>(
-                Qn::ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME);
+                ResourceDataKey::kAdvancedParameterOverloads);
 
     params.applyOverloads(overloads);
 

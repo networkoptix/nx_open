@@ -255,7 +255,8 @@ bool QnResourcePropertyDictionary::on_resourceParamRemoved(
     return true;
 }
 
-nx::vms::api::ResourceParamDataList QnResourcePropertyDictionary::allProperties(const QnUuid& resourceId) const
+nx::vms::api::ResourceParamDataList QnResourcePropertyDictionary::allProperties(
+    const QnUuid& resourceId) const
 {
     nx::vms::api::ResourceParamDataList result;
 
@@ -270,8 +271,9 @@ nx::vms::api::ResourceParamDataList QnResourcePropertyDictionary::allProperties(
     return result;
 }
 
-QHash<QnUuid, QSet<QString> > QnResourcePropertyDictionary::allPropertyNamesByResource() const {
-    QHash<QnUuid, QSet<QString> > result;
+QHash<QnUuid, QSet<QString>> QnResourcePropertyDictionary::allPropertyNamesByResource() const
+{
+    QHash<QnUuid, QSet<QString>> result;
 
     QnMutexLocker lock( &m_mutex );
     for (auto iter = m_items.constBegin(); iter != m_items.constEnd(); ++iter) {

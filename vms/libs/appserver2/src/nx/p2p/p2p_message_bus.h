@@ -401,10 +401,10 @@ private:
         const TransportHeader& records);
 
     /*
-     * in P2P mode a Client gets transactions only, without any protocol related system messages.
-     * It causes client doesn't receive peerFound/peerLost signals from messageBus any more.
+     * In P2P mode a Client gets transactions only, without any protocol related system messages.
+     * It causes client do not receive peerFound/peerLost signals from messageBus any more.
      * This function sends removeRuntimeInfoData transactions to the all connected clients
-     * for the current peer.
+     * about peer with specified id.
      */
     void sendRuntimeInfoRemovedToClients(const QnUuid& id);
 private slots:
@@ -491,6 +491,7 @@ private:
     QElapsedTimer m_outConnectionsTimer;
     std::set<vms::api::PeerData> m_lastAlivePeers;
     std::atomic<bool> m_started{false};
+    QMap<QnUuid, Connection::State> m_lastConnectionState;
 };
 
 } // namespace p2p

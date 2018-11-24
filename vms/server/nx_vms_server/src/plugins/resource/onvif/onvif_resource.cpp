@@ -614,8 +614,8 @@ void QnPlOnvifResource::setAudioCodec(QnPlOnvifResource::AUDIO_CODEC c)
 QnAbstractStreamDataProvider* QnPlOnvifResource::createLiveDataProvider()
 {
     auto resData = resourceData();
-    bool shouldAppearAsSingleChannel = resData.value<bool>(
-        Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
+    auto shouldAppearAsSingleChannel = resData.value<bool>(
+        ResourceDataKey::kShouldAppearAsSingleChannel);
 
     if (shouldAppearAsSingleChannel)
         return new nx::plugins::utils::MultisensorDataProvider(toSharedPointer(this));
@@ -4419,7 +4419,7 @@ void QnPlOnvifResource::setAudioOutputConfigurationToken(const QString& value)
 QnAudioTransmitterPtr QnPlOnvifResource::initializeTwoWayAudioByResourceData()
 {
     QnAudioTransmitterPtr result;
-    TwoWayAudioParams params = resourceData().value<TwoWayAudioParams>(Qn::TWO_WAY_AUDIO_PARAM_NAME);
+    const auto params = resourceData().value<TwoWayAudioParams>(ResourceDataKey::kTwoWayAudio);
     if (params.engine.toLower() == QString("onvif"))
     {
         result.reset(new nx::mediaserver_core::plugins::OnvifAudioTransmitter(this));

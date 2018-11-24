@@ -436,7 +436,7 @@ void LegacyCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &c
         connect(camera, &QnResource::propertyChanged, this,
             [this](const QnResourcePtr& resource, const QString& propertyName)
             {
-                if (propertyName == nx::media::kCameraMediaCapabilityParamName
+                if (propertyName == ResourcePropertyKey::kMediaCapabilities
                     || propertyName == ResourcePropertyKey::kMediaStreams)
                 {
                     syncBitrateWithFps();

@@ -22,8 +22,8 @@ const static QString __CAMERA_RESOURCE_PARAMS[] =
     ResourcePropertyKey::kCameraCapabilities,
     ResourcePropertyKey::kHasDualStreaming,
     ResourcePropertyKey::kIsAudioSupported,
-    ResourcePropertyKey::kMaxFps,
-    Qn::PTZ_CAPABILITIES_PARAM_NAME,
+    ResourcePropertyKey::kMediaCapabilities,
+    ResourcePropertyKey::kPtzCapabilities,
     ResourcePropertyKey::kStreamFpsSharing,
     ResourcePropertyKey::kSupportedMotion,
 };

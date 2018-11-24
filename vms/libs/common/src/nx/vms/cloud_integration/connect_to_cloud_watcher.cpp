@@ -49,6 +49,7 @@ QnConnectToCloudWatcher::~QnConnectToCloudWatcher()
 
 void QnConnectToCloudWatcher::setCloudDbUrl(const nx::utils::Url& cloudDbUrl)
 {
+    QnMutexLocker lock(&m_mutex);
     m_cloudDbUrl = cloudDbUrl;
 }
 
@@ -95,8 +96,8 @@ void QnConnectToCloudWatcher::at_updateConnection()
                     metaObject()->invokeMethod(this, "restartTimer", Qt::QueuedConnection);
                     return;
                 }
-
-                addCloudPeer(url);
+                setCloudDbUrl(url);
+                metaObject()->invokeMethod(this, "at_updateConnection", Qt::QueuedConnection);
             });
     }
 }

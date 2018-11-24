@@ -107,7 +107,7 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
         [this]()
         {
             return QJson::deserialized<nx::media::CameraMediaCapability>(
-                getProperty(nx::media::kCameraMediaCapabilityParamName).toUtf8());
+                getProperty(ResourcePropertyKey::kMediaCapabilities).toUtf8());
         },
         &m_mutex),
     m_cachedDeviceType(
@@ -265,8 +265,8 @@ void QnSecurityCamResource::setMaxFps(int fps)
     capability.streamCapabilities[Qn::StreamIndex::primary].maxFps = fps;
 
     // We use direct setProperty() call instead of setCameraMediaCapability(),
-    // because this functions should not save parameters.
-    setProperty(nx::media::kCameraMediaCapabilityParamName,
+    // because setMaxFps function should not save parameters.
+    setProperty(ResourcePropertyKey::kMediaCapabilities,
         QString::fromLatin1(QJson::serialized(capability)));
 }
 int QnSecurityCamResource::reservedSecondStreamFps() const
@@ -446,7 +446,7 @@ nx::media::CameraMediaCapability QnSecurityCamResource::cameraMediaCapability() 
 void QnSecurityCamResource::setCameraMediaCapability(const nx::media::CameraMediaCapability& value)
 {
     setProperty(
-        nx::media::kCameraMediaCapabilityParamName, QString::fromLatin1(QJson::serialized(value)));
+        ResourcePropertyKey::kMediaCapabilities, QString::fromLatin1(QJson::serialized(value)));
     m_cachedCameraMediaCapabilities.reset();
     saveProperties();
 }
@@ -488,14 +488,14 @@ bool QnSecurityCamResource::isAnalogEncoder() const
 
 CombinedSensorsDescription QnSecurityCamResource::combinedSensorsDescription() const
 {
-    const auto& value = getProperty(Qn::kCombinedSensorsDescriptionParamName);
+    const auto& value = getProperty(ResourcePropertyKey::kCombinedSensorsDescription);
     return QJson::deserialized<CombinedSensorsDescription>(value.toLatin1());
 }
 
 void QnSecurityCamResource::setCombinedSensorsDescription(
     const CombinedSensorsDescription& sensorsDescription)
 {
-    setProperty(Qn::kCombinedSensorsDescriptionParamName,
+    setProperty(ResourcePropertyKey::kCombinedSensorsDescription,
         QString::fromLatin1(QJson::serialized(sensorsDescription)));
 }
 
@@ -1046,7 +1046,7 @@ void QnSecurityCamResource::setAudioEnabled(bool enabled)
 
 bool QnSecurityCamResource::isAudioForced() const
 {
-    return getProperty(Qn::IS_AUDIO_FORCED_PARAM_NAME).toInt() > 0;
+    return getProperty(ResourcePropertyKey::kForcedAudioStream).toInt() > 0;
 }
 
 bool QnSecurityCamResource::isAudioEnabled() const
@@ -1323,7 +1323,6 @@ bool QnSecurityCamResource::useBitratePerGop() const
         return result.toInt() > 0;
 
     return resourceData().value<bool>(Qn::FORCE_BITRATE_PER_GOP);
-    return false;
 }
 
 bool QnSecurityCamResource::isIOModule() const

@@ -214,8 +214,8 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
         auto resData = commonModule()->dataPool()
             ->data(rpResource->getVendor(), rpResource->getModel());
 
-        bool shouldAppearAsSingleChannel = resData.value<bool>(
-            Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
+        auto shouldAppearAsSingleChannel = resData.value<bool>(
+            ResourceDataKey::kShouldAppearAsSingleChannel);
 
         if (rpResource->getMaxChannels() > 1  && !shouldAppearAsSingleChannel) {
             resource->setGroupId(rpResource->getPhysicalId());
@@ -303,8 +303,8 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
             //    resource->updateToChannel(channel-1);
             resList << resource;
 
-            bool shouldAppearAsSingleChannel = resData
-                .value<bool>(Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
+            auto shouldAppearAsSingleChannel = resData
+                .value<bool>(ResourceDataKey::kShouldAppearAsSingleChannel);
 
             // checking for multichannel encoders
             if (isSearchAction && !shouldAppearAsSingleChannel)

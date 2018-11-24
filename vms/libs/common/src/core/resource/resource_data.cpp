@@ -19,7 +19,6 @@ public:
     {
         registerKey<QnPtzMapperPtr>(lit("ptzMapper"));
         registerKey<QnOnvifConfigDataPtr>(lit("forcedOnvifParams"));
-        registerKey<Ptz::Capabilities>(Qn::PTZ_CAPABILITIES_PARAM_NAME);
         registerKey<Ptz::Traits>(lit("ptzTraits"));
         registerKey<QStringList>(lit("vistaFocusDevices"));
         registerKey<QnIOPortDataList>(lit("ioSettings"));
@@ -28,13 +27,14 @@ public:
         registerKey<nx::common::utils::Credentials>(ResourceDataKey::kForcedDefaultCredentials);
         registerKey<QList<QnResourceChannelMapping>>(
             Qn::VIDEO_MULTIRESOURCE_CHANNEL_MAPPING_PARAM_NAME);
-        registerKey<QnHttpConfigureRequestList>(Qn::PRE_SRTEAM_CONFIGURE_REQUESTS_PARAM_NAME);
+        registerKey<QnHttpConfigureRequestList>(ResourceDataKey::kPreStreamConfigureRequests);
         registerKey<QnBitrateList>(ResourceDataKey::kHighStreamAvailableBitrates);
         registerKey<QnBitrateList>(ResourceDataKey::kLowStreamAvailableBitrates);
         registerKey<QnBounds>(ResourceDataKey::kHighStreamBitrateBounds);
         registerKey<QnBounds>(ResourceDataKey::kLowStreamBitrateBounds);
-        registerKey<TwoWayAudioParams>(Qn::TWO_WAY_AUDIO_PARAM_NAME);
-        registerKey<std::vector<QnCameraAdvancedParameterOverload>>(Qn::ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME);
+        registerKey<TwoWayAudioParams>(ResourceDataKey::kTwoWayAudio);
+        registerKey<std::vector<QnCameraAdvancedParameterOverload>>(
+            ResourceDataKey::kAdvancedParameterOverloads);
         registerKey<nx::core::ptz::Override>(nx::core::ptz::Override::kPtzOverrideKey);
     }
 

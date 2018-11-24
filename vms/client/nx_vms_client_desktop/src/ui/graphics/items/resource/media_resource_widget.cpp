@@ -2310,7 +2310,7 @@ void QnMediaResourceWidget::at_resource_propertyChanged(
         updateCustomAspectRatio();
     else if (key == ResourcePropertyKey::kCameraCapabilities)
         ensureTwoWayAudioWidget();
-    else if (key == Qn::kCombinedSensorsDescriptionParamName)
+    else if (key == ResourcePropertyKey::kCombinedSensorsDescription)
         updateAspectRatio();
     else if (key == ResourcePropertyKey::kMediaStreams)
         updateAspectRatio();

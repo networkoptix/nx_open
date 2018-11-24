@@ -206,6 +206,7 @@ void MessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
     deleteRemoveUrlById(id);
 
     m_outgoingConnections.remove(id);
+    m_lastConnectionState.remove(id);
     auto itr = m_connections.find(id);
     if (itr != m_connections.end() && itr.value()->direction() == Connection::Direction::outgoing)
         itr.value()->setState(Connection::State::Error);
@@ -448,6 +449,8 @@ void MessageBus::at_stateChanged(
     QnMutexLocker lock(&m_mutex);
 
     const auto& remoteId = connection->remotePeer().id;
+    m_lastConnectionState[remoteId] = connection->state();
+
     switch (connection->state())
     {
         case Connection::State::Connected:
@@ -1106,36 +1109,55 @@ QVector<QnTransportConnectionInfo> MessageBus::connectionsInfo() const
     QVector<QnTransportConnectionInfo> result;
     QnMutexLocker lock(&m_mutex);
 
-    for (const auto& connection: m_connections)
-    {
-        QnTransportConnectionInfo info;
-        info.url = connection->remoteAddr();
-        info.state = toString(connection->state());
-        info.isIncoming = connection->direction() == Connection::Direction::incoming;
-        info.remotePeerId = connection->remotePeer().id;
-        info.isStarted = context(connection)->isLocalStarted;
-        info.subscription = context(connection)->localSubscription;
-        result.push_back(info);
-    }
-
     auto remoteUrls = m_remoteUrls;
-    remoteUrls.erase(std::remove_if(remoteUrls.begin(), remoteUrls.end(),
-        [this](const RemoteConnection& data)
+
+    auto addDataToResult = [&](const QMap<QnUuid, P2pConnectionPtr>& connections)
+    {
+        for (const auto& connection: connections)
         {
-            return m_connections.contains(data.peerId);
-        }),
-        remoteUrls.end());
+            const auto& context = this->context(connection);
+
+            QnTransportConnectionInfo info;
+            info.url = connection->remoteAddr();
+            info.state = toString(connection->state());
+            info.isIncoming = connection->direction() == Connection::Direction::incoming;
+            info.remotePeerId = connection->remotePeer().id;
+            info.isStarted = context->isLocalStarted;
+            info.subscription = context->localSubscription;
+            info.peerType = connection->remotePeer().peerType;
+
+            // Has got peerInfo message from remote server. Open new connection is blocked
+            // unless server have opening connection that hasn't got this answer from remote server
+            // yet. It caused by optimization to do not open all connections to each other.
+            info.gotPeerInfo = !context->remotePeersMessage.isEmpty();
+
+            result.push_back(info);
+        }
+
+        remoteUrls.erase(std::remove_if(remoteUrls.begin(), remoteUrls.end(),
+            [&](const RemoteConnection& data)
+            {
+                return connections.contains(data.peerId);
+            }),
+            remoteUrls.end());
+    };
+
+    addDataToResult(m_connections);
+    addDataToResult(m_outgoingConnections);
 
     for (const auto& peer: remoteUrls)
     {
         QnTransportConnectionInfo info;
         info.url = peer.url;
-        info.state = lit("Not opened");
+        info.state = "Not opened";
         info.isIncoming = false;
         info.remotePeerId = peer.peerId;
         result.push_back(info);
     }
 
+    for (auto& record: result)
+        record.previousState = toString(m_lastConnectionState.value(record.remotePeerId));
+    
     return result;
 }
 

@@ -307,7 +307,7 @@ bool QnOnvifStreamReader::executePreConfigurationRequests()
     auto resData = m_onvifRes->resourceData();
 
     auto requests = resData.value<QnHttpConfigureRequestList>(
-        Qn::PRE_SRTEAM_CONFIGURE_REQUESTS_PARAM_NAME);
+        ResourceDataKey::kPreStreamConfigureRequests);
 
     if (requests.empty())
         return true;

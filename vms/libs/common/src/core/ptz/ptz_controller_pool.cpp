@@ -35,8 +35,6 @@ void moveControllerToThread(QnPtzControllerPtr controller, QThread* thread)
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
-// QnPtzControllerPoolPrivate
-//-------------------------------------------------------------------------------------------------
 
 class QnPtzControllerPoolPrivate
 {
@@ -49,7 +47,7 @@ public:
     {
     }
 
-    void updateController(const QnResourcePtr &resource);
+    void updateController(const QnResourcePtr& resource);
 
     mutable QnMutex mutex;
     QAtomicInt mode;
@@ -61,35 +59,27 @@ public:
 };
 
 //-------------------------------------------------------------------------------------------------
-// QnPtzControllerPoolPrivate
-//-------------------------------------------------------------------------------------------------
 
 class QnPtzControllerCreationCommand: public QRunnable
 {
 public:
-    QnPtzControllerCreationCommand(const QnResourcePtr &resource, QnPtzControllerPool *pool):
+    QnPtzControllerCreationCommand(const QnResourcePtr& resource, QnPtzControllerPool* pool):
         m_resource(resource),
         m_pool(pool)
     {
     }
 
-    virtual void run() override;
+    virtual void run() override { m_pool->d->updateController(m_resource); }
 
 private:
     QnResourcePtr m_resource;
     QnPtzControllerPool *m_pool;
 };
 
-void QnPtzControllerCreationCommand::run()
-{
-    m_pool->d->updateController(m_resource);
-}
-
 //-------------------------------------------------------------------------------------------------
-// QnPtzControllerPool
-//-------------------------------------------------------------------------------------------------
+// QnPtzControllerPool methods
 
-QnPtzControllerPool::QnPtzControllerPool(QObject *parent):
+QnPtzControllerPool::QnPtzControllerPool(QObject* parent):
     base_type(parent),
     QnCommonModuleAware(parent),
     d(new QnPtzControllerPoolPrivate())
@@ -132,8 +122,8 @@ void QnPtzControllerPool::deinitialize()
             unregisterResource(resourcePtr);
         }
 
-        //have to wait until all posted events have been processed, deleteLater can be called
-        //within event slot, that's why we specify second parameter
+        // Have to wait until all posted events have been processed, delete later can be called
+        // within event slot, that's why we specify second parameter.
         WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(d->executorThread, 3);
         waitingForObjectsToBeFreed.join();
 
@@ -147,12 +137,12 @@ void QnPtzControllerPool::deinitialize()
     }
 }
 
-QThread *QnPtzControllerPool::executorThread() const
+QThread* QnPtzControllerPool::executorThread() const
 {
     return d->executorThread;
 }
 
-QThreadPool *QnPtzControllerPool::commandThreadPool() const
+QThreadPool* QnPtzControllerPool::commandThreadPool() const
 {
     return d->commandThreadPool;
 }
@@ -167,23 +157,23 @@ void QnPtzControllerPool::setConstructionMode(ControllerConstructionMode mode)
     d->mode.storeRelease(mode);
 }
 
-QnPtzControllerPtr QnPtzControllerPool::controller(const QnResourcePtr &resource) const
+QnPtzControllerPtr QnPtzControllerPool::controller(const QnResourcePtr& resource) const
 {
     QnMutexLocker locker(&d->mutex);
     return d->controllerByResource.value(resource);
 }
 
-QnPtzControllerPtr QnPtzControllerPool::createController(const QnResourcePtr &) const
+QnPtzControllerPtr QnPtzControllerPool::createController(const QnResourcePtr& /*resource*/) const
 {
     return QnPtzControllerPtr();
 }
 
-void QnPtzControllerPool::registerResource(const QnResourcePtr &resource)
+void QnPtzControllerPool::registerResource(const QnResourcePtr& resource)
 {
     updateController(resource);
 }
 
-void QnPtzControllerPool::unregisterResource(const QnResourcePtr &resource)
+void QnPtzControllerPool::unregisterResource(const QnResourcePtr& resource)
 {
     QnPtzControllerPtr oldController;
 
@@ -199,7 +189,7 @@ void QnPtzControllerPool::unregisterResource(const QnResourcePtr &resource)
     }
 }
 
-void QnPtzControllerPool::updateController(const QnResourcePtr &resource)
+void QnPtzControllerPool::updateController(const QnResourcePtr& resource)
 {
     if (d->mode.loadAcquire() == NormalControllerConstruction)
     {
@@ -213,7 +203,7 @@ void QnPtzControllerPool::updateController(const QnResourcePtr &resource)
     }
 }
 
-void QnPtzControllerPoolPrivate::updateController(const QnResourcePtr &resource)
+void QnPtzControllerPoolPrivate::updateController(const QnResourcePtr& resource)
 {
     QnPtzControllerPtr controller = q->createController(resource);
     QnPtzControllerPtr oldController;
@@ -232,10 +222,11 @@ void QnPtzControllerPoolPrivate::updateController(const QnResourcePtr &resource)
         controllerByResource.insert(resource, controller);
     }
 
-    /* Some controller require an event loop to function, so we move them
-     * to executor thread. Note that controllers don't run synchronous requests
-     * in their associated thread, so this won't present any problems for
-     * other users of the executor thread. */
+    /**
+     * Some controllers require an event loop to function, so we move them to executor thread.
+     * Note that controllers don't run synchronous requests in their associated thread, so this
+     * won't make any problems for other users of the executor thread.
+     */
     moveControllerToThread(controller, executorThread);
     auto weakRef = controller.toWeakRef();
     executeDelayed(

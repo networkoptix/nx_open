@@ -31,7 +31,6 @@ namespace {
 
 } // anonymous namespace
 
-
 QnVistaFocusPtzController::QnVistaFocusPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
     m_resource(baseController->resource().dynamicCast<QnVistaResource>()),
@@ -79,7 +78,7 @@ void QnVistaFocusPtzController::init() {
     if(options.contains(lit("PTZ"))) {
         QnResourceData data = m_resource->resourceData();
         Ptz::Capabilities extraCaps = Ptz::NoPtzCapabilities;
-        data.value(Qn::PTZ_CAPABILITIES_PARAM_NAME, &extraCaps);
+        data.value(ResourceDataKey::kOperationalPtzCapabilities, &extraCaps);
         if(extraCaps & Ptz::ContinuousFocusCapability) {
             m_capabilities |= Ptz::ContinuousFocusCapability;
             m_isMotor = false;
