@@ -491,6 +491,7 @@ private:
     QElapsedTimer m_outConnectionsTimer;
     std::set<vms::api::PeerData> m_lastAlivePeers;
     std::atomic<bool> m_started{false};
+    QMap<QnUuid, Connection::State> m_lastConnectionState;
 };
 
 } // namespace p2p
