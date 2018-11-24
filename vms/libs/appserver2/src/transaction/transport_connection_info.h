@@ -19,10 +19,11 @@ namespace ec2
         bool isStarted = false;
         bool gotPeerInfo = false;
         QVector<nx::vms::api::PersistentIdData> subscription;
+        nx::vms::api::PeerType peerType;
     };
 
 #define QnTransportConnectionInfo_Fields \
-    (remotePeerId)(url)(state)(previousState)(isIncoming)(isStarted)(gotPeerInfo)(subscription)
+    (remotePeerId)(url)(state)(previousState)(isIncoming)(isStarted)(gotPeerInfo)(subscription)(peerType)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnTransportConnectionInfo), (json));
 

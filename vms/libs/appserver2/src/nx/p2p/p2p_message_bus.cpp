@@ -1123,8 +1123,14 @@ QVector<QnTransportConnectionInfo> MessageBus::connectionsInfo() const
             info.isIncoming = connection->direction() == Connection::Direction::incoming;
             info.remotePeerId = connection->remotePeer().id;
             info.isStarted = context->isLocalStarted;
-            info.gotPeerInfo = !context->remotePeersMessage.isEmpty();
             info.subscription = context->localSubscription;
+            info.peerType = connection->remotePeer().peerType;
+
+            // Has got peerInfo message from remote server. Open new connection is blocked
+            // unless server have opening connection that hasn't got this answer from remote server
+            // yet. It caused by optimization to do not open all connections to each other.
+            info.gotPeerInfo = !context->remotePeersMessage.isEmpty();
+
             result.push_back(info);
         }
 
