@@ -321,7 +321,7 @@ public:
     int maxRecorderQueueSizeBytes() const;
     int maxRecorderQueueSizePackets() const;
 
-    int maxProgressiveDownloaders() const;
+    int maxWebMTranscoders() const;
 
     bool hanwhaDeleteProfilesOnInitIfNeeded() const;
     void setHanwhaDeleteProfilesOnInitIfNeeded(bool deleteProfiles);
@@ -493,7 +493,7 @@ private:
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizeBytes = nullptr;
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizePackets = nullptr;
 
-    QnResourcePropertyAdaptor<int>* m_maxProgressiveDownloaders = nullptr;
+    QnResourcePropertyAdaptor<int>* m_maxWebMTranscoders = nullptr;
 
     QnResourcePropertyAdaptor<int>* m_maxRtpRetryCount = nullptr;
 
