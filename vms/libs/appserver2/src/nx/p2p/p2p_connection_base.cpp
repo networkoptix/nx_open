@@ -83,7 +83,7 @@ ConnectionBase::ConnectionBase(
     m_connectionLockGuard(std::move(connectionLockGuard))
 {
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
-    m_timer.bindToAioThread(p2pTransport->getAioThread());
+    m_timer.bindToAioThread(m_p2pTransport->getAioThread());
 
     const auto& queryItems = requestUrlQuery.queryItems();
     std::transform(

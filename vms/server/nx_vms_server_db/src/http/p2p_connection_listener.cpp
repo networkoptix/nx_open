@@ -192,7 +192,7 @@ public:
         QnMutexLocker lock(&m_commonMutex);
         auto& connectionMutex = m_mutexList[id];
         if (!connectionMutex)
-            connectionMutex.reset();
+            connectionMutex.reset(new QnMutex());
         connectionMutex->lock();
     }
     ~ConnectionLocker()
