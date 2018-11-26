@@ -446,6 +446,11 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int 
     return packet;
 }
 
+void AudioStream::AudioStreamPrivate::terminate()
+{
+    m_terminated = true;
+}
+
 std::chrono::milliseconds AudioStream::AudioStreamPrivate::timePerVideoFrame() const
 {
     if(auto cam = m_camera.lock())
