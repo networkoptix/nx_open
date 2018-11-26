@@ -27,7 +27,8 @@ void QnManualSearchTaskManager::pleaseStop(nx::utils::MoveOnlyFunc<void()> compl
             NX_VERBOSE(this, "PleaseStop called, running tasks: %1", m_runningTaskCount);
             m_state = State::canceled;
 
-            // TODO: #dliman All running tasks should be canceled here.
+            // TODO: #dliman All running tasks should be canceled here but they do not support
+            // cancelation.
 
             // If there are no running tasks -- we should run handler right away, otherwise it will
             // be never called.
@@ -56,6 +57,9 @@ void QnManualSearchTaskManager::addTask(
 {
     using namespace std::placeholders;
 
+    // Task runs searchers sequentially, so if we want search to be parallel we should not run more
+    // than one searcher in a task.
+    NX_ASSERT(isSequential == false || searchers.size() == 1);
     QnSearchTask task(commonModule(), address, auth, /*breakOnGotResult*/ isSequential);
 
     task.setSearchers(searchers);
@@ -72,8 +76,8 @@ void QnManualSearchTaskManager::addTask(
         [this, task = std::move(task), address, isSequential]() mutable
         {
             NX_VERBOSE(this, "Adding task %1 on %2 (sequential: %3)", task, task.url(), isSequential);
-            NX_ASSERT(m_state == State::init); //< NOTE: It is not supported to add tasks after run.
-            m_urlSearchTaskQueues[address.address].push(std::move(task));
+            NX_CRITICAL(m_state == State::init); //< NOTE: It is not supported to add tasks after run.
+            m_searchTasksQueues[address.address].push(std::move(task));
             m_searchQueueContexts[address.address]; //< Create if does not exist.
 
             m_totalTaskCount++;
@@ -86,7 +90,7 @@ void QnManualSearchTaskManager::startTasks(TasksFinishedCallback callback)
         [this, callback = std::move(callback)]() mutable
         {
             NX_VERBOSE(this, "Running %1 tasks", m_totalTaskCount.load());
-            NX_ASSERT(m_state == State::init); //< NOTE: It supports being started only once.
+            NX_CRITICAL(m_state == State::init); //< NOTE: It supports being started only once.
             m_state = State::running;
             m_remainingTaskCount = m_totalTaskCount.load();
             m_runningTaskCount = 0;
@@ -152,7 +156,7 @@ void QnManualSearchTaskManager::searchTaskDoneHandler(
 
                 if (taskInterruptProcessing && !results.isEmpty())
                 {
-                    m_remainingTaskCount -= m_urlSearchTaskQueues[queueName].size();
+                    m_remainingTaskCount -= m_searchTasksQueues[queueName].size();
                     context.isInterrupted = true;
                 }
 
@@ -187,7 +191,7 @@ void QnManualSearchTaskManager::runSomePendingTasks()
     while (canRunTask(threadPool))
     {
         // Take one task from each queue.
-        for (auto it = m_urlSearchTaskQueues.begin(); it != m_urlSearchTaskQueues.end();)
+        for (auto it = m_searchTasksQueues.begin(); it != m_searchTasksQueues.end();)
         {
             auto queueName = it->first;
             auto& queue = it->second;
@@ -195,7 +199,7 @@ void QnManualSearchTaskManager::runSomePendingTasks()
 
             if (queue.empty() || context.isInterrupted)
             {
-                it = m_urlSearchTaskQueues.erase(it);
+                it = m_searchTasksQueues.erase(it);
                 continue;
             }
             it++;
@@ -228,7 +232,7 @@ bool QnManualSearchTaskManager::canRunTask(QThreadPool *threadPool)
 {
     NX_ASSERT(m_pollable.isInSelfAioThread());
     bool allQueuesAreBlocked = true;
-    for (const auto& [queueName, queue]: m_urlSearchTaskQueues)
+    for (const auto& [queueName, queue]: m_searchTasksQueues)
     {
         nx::utils::unused(queue);
         auto& context = m_searchQueueContexts[queueName];
@@ -240,6 +244,6 @@ bool QnManualSearchTaskManager::canRunTask(QThreadPool *threadPool)
     }
 
     return (m_runningTaskCount <= threadPool->maxThreadCount())
-        && !m_urlSearchTaskQueues.empty()
+        && !m_searchTasksQueues.empty()
             && !allQueuesAreBlocked;
 }

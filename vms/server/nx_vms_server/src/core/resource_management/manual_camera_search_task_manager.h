@@ -28,8 +28,6 @@ public:
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
-    // TODO: Assert that if isSequential false -- searchers.size() <= 1. <- Why?
-    // TODO: #dliman Rafactor sequential and parallel logic.
     void addTask(nx::network::SocketAddress address,
         const QAuthenticator& auth,
         std::vector<QnAbstractNetworkResourceSearcher *> searchers,
@@ -58,7 +56,6 @@ private:
 
     mutable nx::network::aio::BasicPollable m_pollable;
 
-    // TODO: Merge or refactor maps. Rename them
-    std::map<nx::network::HostAddress, std::queue<QnSearchTask>> m_urlSearchTaskQueues;
+    std::map<nx::network::HostAddress, std::queue<QnSearchTask>> m_searchTasksQueues;
     std::map<nx::network::HostAddress, SearchTaskQueueContext> m_searchQueueContexts;
 };
