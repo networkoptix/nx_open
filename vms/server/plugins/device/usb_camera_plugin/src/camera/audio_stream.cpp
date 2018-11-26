@@ -423,32 +423,35 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int 
             break;
     }
 
-    //TODO: use AACPermanently in default_audio_encoder.cpp after archiving issues are fixed.
-    if(packet->codecId() == AV_CODEC_ID_AAC)
-    {
-        int64_t duration = packet->packet()->duration;
-        // Inject ADTS header into each packet becuase AAC encoder does not do it.
-        if (m_adtsInjector.inject(packet.get()) < 0)
-            return nullptr;
+    // Get duration before injecting into the packet because injection erases other fields.
+    int64_t duration = packet->packet()->duration;
 
-        const AVRational sourceRate = {1, m_encoder->sampleRate()};
-        const AVRational targetRate = {1, 1000};
-        int64_t offsetMsec = av_rescale_q(m_offsetTicks, sourceRate, targetRate);
-        if (labs(m_timeProvider->millisSinceEpoch() - m_baseTimestamp - offsetMsec) > kResyncThresholdMsec)
-        {
-            m_offsetTicks = 0;
-            offsetMsec = 0;
-            m_baseTimestamp = m_timeProvider->millisSinceEpoch();
-        }
-        packet->setTimestamp(m_baseTimestamp + offsetMsec);
-        m_offsetTicks += duration;
-    }
+    // Inject ADTS header into each packet becuase AAC encoder does not do it.
+    if (m_adtsInjector.inject(packet.get()) < 0)
+        return nullptr;
+
+    packet->setTimestamp(calculateTimestamp(duration));
+
     return packet;
 }
 
-void AudioStream::AudioStreamPrivate::terminate()
+uint64_t AudioStream::AudioStreamPrivate::calculateTimestamp(int64_t duration)
 {
-    m_terminated = true;
+    const AVRational sourceRate = { 1, m_encoder->sampleRate() };
+    const AVRational targetRate = { 1, 1000 };
+    int64_t offsetMsec = av_rescale_q(m_offsetTicks, sourceRate, targetRate);
+
+    if (labs(m_timeProvider->millisSinceEpoch() - m_baseTimestamp - offsetMsec) > kResyncThresholdMsec)
+    {
+        m_offsetTicks = 0;
+        offsetMsec = 0;
+        m_baseTimestamp = m_timeProvider->millisSinceEpoch();
+    }
+
+    uint64_t timestamp = m_baseTimestamp + offsetMsec;
+    m_offsetTicks += duration;
+
+    return timestamp;
 }
 
 std::chrono::milliseconds AudioStream::AudioStreamPrivate::timePerVideoFrame() const
@@ -470,6 +473,11 @@ void AudioStream::AudioStreamPrivate::setLastError(int ffmpegError)
 {
     if (auto cam = m_camera.lock())
         cam->setLastError(ffmpegError);
+}
+
+void AudioStream::AudioStreamPrivate::terminate()
+{
+    m_terminated = true;
 }
 
 void AudioStream::AudioStreamPrivate::tryStart()

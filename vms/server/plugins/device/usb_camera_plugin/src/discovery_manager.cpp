@@ -152,7 +152,7 @@ void DiscoveryManager::addOrUpdateCamera(const DeviceDataWithNxId& device)
     auto it = m_cameras.find(device.nxId);
     if(it == m_cameras.end())
     {
-        NX_DEBUG(this, "Adding new device : %1", device.toString());
+        NX_DEBUG(this, "Found new device: %1", device.toString());
         m_cameras.emplace(device.nxId, device);
     }
     else
@@ -176,13 +176,7 @@ std::string DiscoveryManager::getFfmpegUrl(const std::string& nxId) const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     auto it = m_cameras.find(nxId);
-    bool found  = it != m_cameras.end();
-    if(found)
-        NX_DEBUG(this, "nxId %1 found, returning %2", nxId, it->second.device.path);
-    else
-        NX_DEBUG(this, "nxId %1 not found", nxId);
-
-    return found ? it->second.device.path : std::string();
+    return it != m_cameras.end() ? it->second.device.path : std::string();
 }
 
 std::vector<DiscoveryManager::DeviceDataWithNxId> DiscoveryManager::findCamerasInternal()

@@ -89,12 +89,13 @@ private:
         std::chrono::milliseconds resampleDelay() const;
         int encode(const ffmpeg::Frame *frame, ffmpeg::Packet * outPacket);
         std::shared_ptr<ffmpeg::Packet> nextPacket(int * outError);
-        void terminate();
+        uint64_t calculateTimestamp(int64_t duration);
 
         std::chrono::milliseconds timePerVideoFrame() const;
 
         bool checkIoError(int ffmpegError);
         void setLastError(int ffmpegError);
+        void terminate();
         void tryStart();
         void start();
         void stop();
