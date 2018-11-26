@@ -86,21 +86,23 @@ QList<QnAbstractNetworkResourceSearcher*> QnManualCameraSearcher::getAllNetworkS
 
 void QnManualCameraSearcher::run(
     SearchDoneCallback callback,
-    const QString& startAddr,
-    const QString& endAddr,
-    const QAuthenticator& auth,
+    nx::network::HostAddress startAddr,
+    std::optional<nx::network::HostAddress> endAddr,
+    QAuthenticator auth,
     int port)
 {
+    NX_ASSERT(startAddr.isIpAddress());
+
     m_pollable.dispatch(
-        [=, callback = std::move(callback)]() mutable
+        [this, callback = std::move(callback), startAddr, endAddr, auth = std::move(auth), port]() mutable
         {
             NX_ASSERT(m_state == QnManualResourceSearchStatus::Init);
             m_searchDoneCallback = std::move(callback);
 
-            if (endAddr.isNull())
+            if (!endAddr.has_value())
                 onOnlineHostsScanDone({std::move(startAddr)}, port, std::move(auth));
             else
-                startOnlineHostsScan(std::move(startAddr), std::move(endAddr), std::move(auth), port);
+                startOnlineHostsScan(std::move(startAddr), std::move(*endAddr), std::move(auth), port);
 
             return;
         });
@@ -160,32 +162,33 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
 }
 
 void QnManualCameraSearcher::startOnlineHostsScan(
-    QString startAddr,
-    QString endAddr,
+    nx::network::HostAddress startAddr,
+    nx::network::HostAddress endAddr,
     QAuthenticator auth,
     int port)
 {
     NX_ASSERT(m_pollable.isInSelfAioThread());
     NX_ASSERT(m_state == QnManualResourceSearchStatus::Init);
-    NX_VERBOSE(this, "Getting online hosts in range (%1, %2)", startAddr, endAddr);
+    NX_VERBOSE(this, "Getting online hosts in range [%1, %2]", startAddr, endAddr);
 
-    const quint32 startIPv4Addr = QHostAddress(startAddr).toIPv4Address();
-    const quint32 endIPv4Addr = QHostAddress(endAddr).toIPv4Address();
+    const auto startIPv4Addr = ntohl(startAddr.ipV4().get().s_addr);
+    const auto endIPv4Addr = ntohl(endAddr.ipV4().get().s_addr);
 
-    NX_ASSERT(endIPv4Addr >= startIPv4Addr); // TODO: implement that check in request
+    NX_ASSERT(endIPv4Addr >= startIPv4Addr);
 
-    m_hostRangeSize = endIPv4Addr - startIPv4Addr;
+    m_hostRangeSize = endIPv4Addr - startIPv4Addr + 1;
     changeState(QnManualResourceSearchStatus::CheckingOnline);
 
     m_ipChecker.scanOnlineHosts(
-        [this, port, auth = std::move(auth)](auto results){ onOnlineHostsScanDone(results, port, auth); },
-        QHostAddress(startAddr),
-        QHostAddress(endAddr),
-        port);
+        [this, port, auth = std::move(auth)](auto results)
+        {
+            onOnlineHostsScanDone(std::move(results), port, auth);
+        },
+        std::move(startAddr), std::move(endAddr), port);
 }
 
 void QnManualCameraSearcher::onOnlineHostsScanDone(
-    QStringList onlineHosts, int port, QAuthenticator auth)
+    std::vector<nx::network::HostAddress> onlineHosts, int port, QAuthenticator auth)
 {
     NX_ASSERT(m_pollable.isInSelfAioThread());
     NX_ASSERT(m_state == QnManualResourceSearchStatus::Init

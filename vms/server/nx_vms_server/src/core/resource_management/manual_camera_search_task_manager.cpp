@@ -59,7 +59,7 @@ void QnManualSearchTaskManager::addTask(
 
     // Task runs searchers sequentially, so if we want search to be parallel we should not run more
     // than one searcher in a task.
-    NX_ASSERT(isSequential == false || searchers.size() == 1);
+    NX_ASSERT(isSequential == true || searchers.size() == 1);
     QnSearchTask task(commonModule(), address, auth, /*breakOnGotResult*/ isSequential);
 
     task.setSearchers(searchers);
@@ -139,10 +139,10 @@ void QnManualSearchTaskManager::searchTaskDoneHandler(
     m_pollable.dispatch(
         [this, results = std::move(results), taskInterruptProcessing, taskUrl]()
         {
-            NX_VERBOSE(this, "Remained: %1; Running: %2",
-                m_remainingTaskCount.load(), m_runningTaskCount);
+            NX_VERBOSE(this, "Remained: %1; Running: %2; Url: %3",
+                m_remainingTaskCount.load(), m_runningTaskCount, taskUrl);
 
-            nx::network::HostAddress queueName(taskUrl.host());
+            auto queueName = nx::network::HostAddress(taskUrl.host()).ipV4().get();
             auto& context = m_searchQueueContexts[queueName];
 
             context.isBlocked = false;

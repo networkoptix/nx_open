@@ -24,24 +24,23 @@ public:
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
-    void run(
-        SearchDoneCallback callback,
-        const QString& startAddr,
-        const QString& endAddr,
-        const QAuthenticator& auth,
+    void run(SearchDoneCallback callback,
+        nx::network::HostAddress startAddr,
+        std::optional<nx::network::HostAddress> endAddr,
+        QAuthenticator auth,
         int port);
 
     QnManualCameraSearchProcessStatus status() const;
 
 private:
     void startOnlineHostsScan(
-        QString startAddr,
-        QString endAddr,
+        nx::network::HostAddress startAddr,
+        nx::network::HostAddress endAddr,
         QAuthenticator auth,
         int port = nx::network::http::DEFAULT_HTTP_PORT
         );
 
-    void onOnlineHostsScanDone(QStringList onlineHosts, int port, QAuthenticator auth);
+    void onOnlineHostsScanDone(std::vector<nx::network::HostAddress> onlineHosts, int port, QAuthenticator auth);
     void onManualSearchDone(QnManualResourceSearchList results);
 
     void changeState(QnManualResourceSearchStatus::State newState);

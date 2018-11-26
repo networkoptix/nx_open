@@ -34,20 +34,38 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
     auth.setUser(params.value("user", "admin"));
     auth.setPassword(params.value("password", "admin"));
 
-    QString addr1 = params.value("start_ip");
-    QString addr2 = params.value("end_ip");
-    // TODO: Should convert here to HostAddress and check if valid
-
-    int port = params.value("port").toInt();
-
-    if (addr1.isNull())
+    auto startIpValue = nx::network::HostAddress::ipV4from(params.value("start_ip"));
+    auto endIpValue = nx::network::HostAddress::ipV4from(params.value("end_ip"));
+    if (!startIpValue)
     {
-        NX_WARNING(this, lm("Invalid parameter 'start_ip'."));
+        NX_WARNING(this, lm("Invalid value for parameter 'start_ip'"));
         return nx::network::http::StatusCode::unprocessableEntity;
     }
 
-    if (addr2 == addr1)
-        addr2.clear();
+    nx::network::HostAddress startIp(startIpValue.get());
+    std::optional<nx::network::HostAddress> endIp;
+    if (endIpValue && endIpValue != startIpValue)
+    {
+        if (endIpValue->s_addr < startIpValue->s_addr)
+        {
+            NX_WARNING(this, lm("Invalid ip range, 'end_ip' must be greater than 'start_ip'"));
+            return nx::network::http::StatusCode::unprocessableEntity;
+        }
+        endIp = nx::network::HostAddress(*endIpValue);
+    }
+
+    int port = 0;
+    const auto portStr = params.value("port");
+    if (!portStr.isEmpty())
+    {
+        bool ok;
+        port = portStr.toUShort(&ok);
+        if (!ok)
+        {
+            NX_WARNING(this, lm("Invalid value for parameter 'port'"));
+            return nx::network::http::StatusCode::unprocessableEntity;
+        }
+    }
 
     QnUuid processUuid = QnUuid::createUuid();
     {
@@ -59,17 +77,18 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
         NX_VERBOSE(this, "Created search process with UUID=%1", processUuid);
 
         searcher->second->run(
-            [this](QnManualCameraSearcher*)
+            [this](QnManualCameraSearcher* searcher)
             {
-                NX_VERBOSE(this, "Search was finished");
+                NX_VERBOSE(this, "Search (%1) was finished, found %2 resources",
+                     searcher, searcher->status().cameras.size());
             },
-            addr1, addr2, auth, port);
+            startIp, endIp, auth, port);
     }
     // NOTE: Finished searchers are removed only in in stop request and destructor!
 
     QnManualCameraSearchReply reply(processUuid, getSearchStatus(processUuid));
     result.setReply(reply);
-    NX_DEBUG(this, "New cameras search was initiated.");
+    NX_DEBUG(this, "New cameras search was initiated");
     return nx::network::http::StatusCode::ok;
 }
 
