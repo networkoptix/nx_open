@@ -28,8 +28,12 @@ public:
         m_factoryFuncBak = dao::TemporaryCredentialsDaoFactory::instance()
             .setCustomFunc([this]() { return createDao(); });
 
+        conf::AccountManager settings;
+        settings.removeExpiredTemporaryCredentialsPeriod = std::chrono::milliseconds(1);
+
         m_tempPasswordManager =
             std::make_unique<nx::cloud::db::TemporaryAccountPasswordManager>(
+                settings,
                 m_attrNameset,
                 &persistentDbManager()->queryExecutor());
 
@@ -152,7 +156,7 @@ TEST_F(TemporaryAccountPasswordManager, credentials_work)
     assertCredentialsAreAuthenticated();
 }
 
-TEST_F(TemporaryAccountPasswordManager, DISABLED_credentials_are_removed_after_expiration)
+TEST_F(TemporaryAccountPasswordManager, credentials_are_removed_after_expiration)
 {
     addTemporaryCredentials();
     whenExpirationPeriodPasses();

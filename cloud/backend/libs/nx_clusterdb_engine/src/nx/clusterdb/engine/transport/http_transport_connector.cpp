@@ -6,6 +6,7 @@
 #include <nx/vms/api/types/connection_types.h>
 
 #include "generic_transport.h"
+#include "http_transport_paths.h"
 #include "../transaction_transport.h"
 
 namespace nx::clusterdb::engine::transport {
@@ -21,9 +22,11 @@ HttpCommandPipelineConnector::HttpCommandPipelineConnector(
     const std::string& nodeId)
     :
     m_protocolVersionRange(protocolVersionRange),
-    m_nodeUrl(nx::network::url::Builder(nodeUrl)
+    m_getCommandsNodeUrl(nx::network::url::Builder(nodeUrl)
         .appendPath(kHttpTransportPathBase)
         .setQuery(lm("guid=%1").args(nodeId)).toUrl()),
+    m_postCommandsNodeUrl(nx::network::url::Builder(nodeUrl)
+        .appendPath(kPushEc2TransactionPathWithoutSequence)),
     m_systemId(systemId),
     m_connectionGuardSharedState(std::make_shared<::ec2::ConnectionGuardSharedState>())
 {
@@ -58,7 +61,7 @@ void HttpCommandPipelineConnector::connect(Handler completionHandler)
         m_connection.get(), &::ec2::QnTransactionTransportBase::stateChanged,
         [this](auto&&... args) { onStateChanged(std::move(args)...); });
 
-    m_connection->doOutgoingConnect(m_nodeUrl);
+    m_connection->doOutgoingConnect(m_getCommandsNodeUrl);
 }
 
 void HttpCommandPipelineConnector::stopWhileInAioThread()
@@ -104,13 +107,15 @@ void HttpCommandPipelineConnector::processSuccessfulConnect()
 
     m_connection->disconnect(m_stateChangedConnection);
 
+    m_connection->setPostTranUrl(m_postCommandsNodeUrl);
+
     auto commandPipeline = std::make_unique<CommonHttpConnection>(
         m_protocolVersionRange,
         std::exchange(m_connection, nullptr),
         //getAioThread(),
         m_connectionGuardSharedState,
         m_systemId,
-        nx::network::url::getEndpoint(m_nodeUrl));
+        nx::network::url::getEndpoint(m_getCommandsNodeUrl));
 
     nx::utils::swapAndCall(
         m_completionHandler,

@@ -48,7 +48,9 @@ Customers CustomerDao::fetchCustomers(
 {
     auto query = queryContext->connection()->createQuery();
     query->prepare(R"sql(
-        SELECT id, full_name, address FROM customer
+        SELECT id, full_name, address 
+        FROM customer
+        ORDER BY id
     )sql");
     query->exec();
 
