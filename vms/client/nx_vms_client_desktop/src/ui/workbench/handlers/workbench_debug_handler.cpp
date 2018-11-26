@@ -206,10 +206,10 @@ public:
                 presets.push_back(Ptz::ContinuousZoomCapability);
                 presets.push_back(Ptz::ContinuousZoomCapability | Ptz::ContinuousFocusCapability);
                 presets.push_back(Ptz::ContinuousZoomCapability | Ptz::ContinuousFocusCapability
-                    | Ptz::AuxilaryPtzCapability);
+                    | Ptz::AuxiliaryPtzCapability);
                 presets.push_back(Ptz::ContinuousPanTiltCapabilities);
                 presets.push_back(Ptz::ContinuousPtzCapabilities | Ptz::ContinuousFocusCapability
-                    | Ptz::AuxilaryPtzCapability | Ptz::PresetsPtzCapability);
+                    | Ptz::AuxiliaryPtzCapability | Ptz::PresetsPtzCapability);
 
                 for (const auto& camera: resourcePool()->getAllCameras(QnResourcePtr(), true))
                 {

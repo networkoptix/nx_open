@@ -87,8 +87,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         UpdateHomeObjectPtzCommand,
         GetHomeObjectPtzCommand,
 
-        GetAuxilaryTraitsPtzCommand,
-        RunAuxilaryCommandPtzCommand,
+        GetAuxiliaryTraitsPtzCommand,
+        RunAuxiliaryCommandPtzCommand,
 
         GetDataPtzCommand,
 
@@ -109,7 +109,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         ToursPtzField           = 0x080,
         ActiveObjectPtzField    = 0x100,
         HomeObjectPtzField      = 0x200,
-        AuxilaryTraitsPtzField  = 0x400,
+        AuxiliaryTraitsPtzField  = 0x400,
         NoPtzFields             = 0x000,
         AllPtzFields            = 0xFFF
     };

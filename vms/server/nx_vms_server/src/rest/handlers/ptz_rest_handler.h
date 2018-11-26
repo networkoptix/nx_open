@@ -132,12 +132,12 @@ private:
         const QnRequestParams& params,
         QnJsonRestResult& result);
 
-    int executeGetAuxilaryTraits(
+    int executeGetAuxiliaryTraits(
         const QnPtzControllerPtr& controller,
         const QnRequestParams& params,
         QnJsonRestResult& result);
 
-    int executeRunAuxilaryCommand(
+    int executeRunAuxiliaryCommand(
         const QnPtzControllerPtr& controller,
         const QnRequestParams& params,
         QnJsonRestResult& result);

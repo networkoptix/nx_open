@@ -56,7 +56,7 @@ TEST(RelativeMoveWorkaround, extending)
             | Ptz::ToursPtzCapability
             | Ptz::HomePtzCapability
             | Ptz::ActivityPtzCapability
-            | Ptz::AuxilaryPtzCapability
+            | Ptz::AuxiliaryPtzCapability
             | Ptz::AsynchronousPtzCapability
             | Ptz::SynchronizedPtzCapability
             | Ptz::LogicalPositioningPtzCapability

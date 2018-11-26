@@ -55,7 +55,7 @@ nx::sdk::analytics::CommonEvent* createCommonEvent(
     commonEvent->setDescription(eventType.name.value.toStdString());
     commonEvent->setIsActive(active);
     commonEvent->setConfidence(1.0);
-    commonEvent->setAuxilaryData(eventType.internalName.toStdString());
+    commonEvent->setAuxiliaryData(eventType.internalName.toStdString());
     return commonEvent;
 }
 
