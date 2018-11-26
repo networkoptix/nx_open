@@ -17,15 +17,16 @@ AVCodecID QnAbstractAudioTransmitter::toFfmpegCodec(const QString& codec, int* o
             *outDefaultBitrate *= 1000; // Convert KHz to Hz.
     }
 
-    if (codec == lit("AAC"))
+    const auto lCodec = codec.toLower();
+    if (lCodec == lit("aac") || lCodec == lit("mpeg4-generic"))
         return AV_CODEC_ID_AAC;
-    else if (codec.startsWith(lit("G726")))
+    else if (lCodec.startsWith(lit("g726")))
         return AV_CODEC_ID_ADPCM_G726;
-    else if (codec == lit("MULAW"))
+    else if (lCodec == lit("pcmu") || lCodec == lit("mulaw"))
         return AV_CODEC_ID_PCM_MULAW;
-    else if (codec == lit("ALAW"))
+    else if (lCodec == lit("pcma") || lCodec == lit("alaw"))
         return AV_CODEC_ID_PCM_ALAW;
-    else if (codec == lit("PCM_S16LE"))
+    else if (lCodec == lit("pcm_s16Le"))
         return AV_CODEC_ID_PCM_S16LE;
     else
         return AV_CODEC_ID_NONE;
