@@ -50,7 +50,7 @@ int AdtsInjector::initialize(ffmpeg::Codec * codec)
 
 void AdtsInjector::uninitialize()
 {
-    // write trailer before doing actual uninitialize
+    // Write trailer before doing actual uninitialization.
     if (m_formatContext)
         av_write_trailer(m_formatContext);
 
