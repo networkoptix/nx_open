@@ -3461,8 +3461,8 @@ void QnTimeSlider::startDrag(DragInfo* info)
             break;
 
         case CreateSelectionMarker:
-            setSelectionValid(true);
             setSelection(pos, pos);
+            setSelectionValid(true);
             m_dragMarker = SelectionStartMarker;
             /* FALL THROUGH */
         case SelectionStartMarker:

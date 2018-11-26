@@ -327,7 +327,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
         {
             if (ini().automaticFilterByTimelineSelection)
             {
-                const bool selectionExists = !m_timelineSelection.isEmpty();
+                const bool selectionExists = !m_timelineSelection.isNull();
                 const bool selectionFilter = m_period == Period::selection;
 
                 if (selectionExists != selectionFilter)
@@ -354,7 +354,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
                 return;
 
             // If selection was cleared, update immediately, otherwise update after small delay.
-            if (m_timelineSelection.isEmpty())
+            if (m_timelineSelection.isNull())
                 applyTimePeriod->fire();
             else
                 applyTimePeriod->requestOperation();
