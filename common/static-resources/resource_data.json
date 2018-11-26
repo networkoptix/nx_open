@@ -487,7 +487,9 @@
                     "password": "12345"
                 }
             ],
-            "unauthorizedTimeoutSec": 185
+            "unauthorizedTimeoutSec": 185,
+            "additionalInputSourceNames": [ "alarmintoken" ],
+            "additionalNotificationTopics":[ "Trigger/AlarmIn" ]
         },
         {
             "keys": [
@@ -970,20 +972,15 @@
                 "HIKVISION|DS-2CD4032FWD*",
                 "HIKVISION|DS-2CD2142FWD*",
                 "hikvision|DS-2CD2142FWD*",
-                "Hikvision|DS-6716*", "HIKVISION|DS-6716*",
-                "Hikvision|DS-6708*", "HIKVISION|DS-6708*",
-                "HIKVISION|DS-2CD4A26FWD-*", "hikvision|DS-2CD4A26FWD-*",
-                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*",
+                "Hikvision|DS-6716*",
+                "Hikvision|DS-6708*",
+                "HIKVISION|DS-2CD4A26FWD-*",
+                "HIKVISION|iDS-2CD8426*",
                 "ONVIF|NC328-VBZ",
                 "Hikvision|DS-2DF8223*",
                 "hikvision|DS-2CD2155FWD-IS"
             ],
             "parseOnvifNotificationsWithHttpReader": true
-        },
-        {
-            "keys": ["hikvision|*"],
-            "additionalInputSourceNames": ["alarmintoken"],
-            "additionalNotificationTopics":["Trigger/AlarmIn"]
         },
         {
             "keys": [
@@ -1006,10 +1003,10 @@
                 "*|NC304-WDA",
                 "HIKVISION|DS-2CD2142FWD*",
                 "hikvision|DS-2CD2142FWD*",
-                "HIKVISION|DS-2CD4A26FWD-*", "hikvision|DS-2CD4A26FWD-*",
-                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*",
-                "Hikvision|DS-2CD2625FWD*", "hikvision|DS-2CD2625FWD*", "HIKVISION|DS-2CD2625FWD*",
-                "Hikvision|DS-2TD2166*", "hikvision|DS-2TD2166", "HIKVISION|DS-2TD2166"
+                "HIKVISION|DS-2CD4A26FWD-*",
+                "HIKVISION|iDS-2CD8426*",
+                "Hikvision|DS-2CD2625FWD*",
+                "Hikvision|DS-2TD2166*",
             ],
             "relayOutputInversed": true,
             "portNamePrefixToIgnore": "AlarmOut"

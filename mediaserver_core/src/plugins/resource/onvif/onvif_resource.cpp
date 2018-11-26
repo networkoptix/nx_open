@@ -2718,9 +2718,7 @@ std::set<QString> QnPlOnvifResource::notificationTopicsForMonitoring() const
     const auto additionalNotificationTopics = resourceData.value<std::vector<QString>>(
         "additionalNotificationTopics");
 
-    for (auto& topic: additionalNotificationTopics)
-        result.insert(topic);
-
+    result.insert(additionalNotificationTopics.cbegin(), additionalNotificationTopics.cend());
     return result;
 }
 
@@ -2731,9 +2729,7 @@ std::set<QString> QnPlOnvifResource::allowedInputSourceNames() const
     const auto additionalInputSourceNames = resourceData.value<std::vector<QString>>(
         "additionalInputSourceNames");
 
-    for (const auto& sourceName: additionalInputSourceNames)
-        result.insert(sourceName.toLower());
-
+    result.insert(additionalInputSourceNames.cbegin(), additionalInputSourceNames.cend());
     return result;
 }
 
