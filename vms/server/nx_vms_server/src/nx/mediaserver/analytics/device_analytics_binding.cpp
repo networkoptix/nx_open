@@ -23,7 +23,7 @@
 #include <nx/mediaserver/analytics/device_agent_handler.h>
 #include <nx/mediaserver/analytics/event_rule_watcher.h>
 #include <nx/mediaserver/sdk_support/utils.h>
-#include <nx/mediaserver/sdk_support/traits.h>
+#include <nx/mediaserver/sdk_support/to_string.h>
 #include <nx/mediaserver/resource/analytics_engine_resource.h>
 #include <nx/mediaserver/resource/analytics_plugin_resource.h>
 #include <nx/mediaserver/interactive_settings/json_engine.h>
