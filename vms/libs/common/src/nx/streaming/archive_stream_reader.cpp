@@ -514,7 +514,6 @@ begin_label:
         }
     }
 
-
     // jump command
     if (jumpTime != qint64(AV_NOPTS_VALUE) && reverseMode == prevReverseMode) // if reverse mode is changing, ignore seek, because of reverseMode generate seek operation
     {
@@ -567,7 +566,6 @@ begin_label:
         qint64 displayTime = displayTimeToJump();
 
         m_delegate->setSpeed(displayTime, speed);
-
 
         if (!delegateForNegativeSpeed)
         {
@@ -644,7 +642,6 @@ begin_label:
         setCurrentTime(m_currentData->timestamp);
     }
 
-
     if (videoData || m_eof) // in case of video packet or EOF
     {
         if (reverseMode && !delegateForNegativeSpeed)
@@ -653,7 +650,6 @@ begin_label:
             // Same frame sometimes Key sometimes not. It is VC1 codec.
             // Manual detection for it stream better, but has artefacts too. I thinks some data lost in stream after jump
             // (after sequence header always P-frame, not I-Frame. But I returns I, because no I frames at all in other case)
-
 
             bool isKeyFrame = false;
             if (videoData)
@@ -848,8 +844,6 @@ begin_label:
             m_codecContext = videoData->context;
     }
 
-
-
     if (reverseMode && !delegateForNegativeSpeed)
         m_currentData->flags |= QnAbstractMediaData::MediaFlags_Reverse;
 
@@ -862,7 +856,6 @@ begin_label:
 
     //if (m_currentData)
     //    qDebug() << "timestamp=" << QDateTime::fromMSecsSinceEpoch(m_currentData->timestamp/1000).toString("hh:mm:ss.zzz") << "flags=" << m_currentData->flags;
-
 
     // Do not display archive in a future
     if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_UnsyncTime))
@@ -1231,7 +1224,6 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
     if (newTime != mksec)
         skipTime = 0;
 
-
     bool useMutex = !m_externalLocked;
     if (useMutex)
         m_jumpMtx.lock();
@@ -1352,7 +1344,6 @@ void QnArchiveStreamReader::unlock()
     m_jumpMtx.unlock();
 }
 
-
 void QnArchiveStreamReader::setArchiveDelegate(QnAbstractArchiveDelegate* contextDelegate)
 {
     m_delegate = contextDelegate;
@@ -1435,7 +1426,7 @@ void QnArchiveStreamReader::setGroupId(const QByteArray& guid)
 
 bool QnArchiveStreamReader::isPaused() const
 {
-    if (getResource()->hasParam(Qn::kGroupPlayParamName))
+    if (getResource()->hasDefaultProperty(ResourcePropertyKey::kGroupPlayParamName))
     {
         QnMutexLocker lock(&m_stopMutex);
         return m_stopCond;
@@ -1448,7 +1439,7 @@ bool QnArchiveStreamReader::isPaused() const
 
 void QnArchiveStreamReader::pause()
 {
-    if (getResource()->hasParam(Qn::kGroupPlayParamName))
+    if (getResource()->hasDefaultProperty(ResourcePropertyKey::kGroupPlayParamName))
     {
         QnMutexLocker lock( &m_stopMutex );
         m_delegate->beforeClose();
@@ -1462,7 +1453,8 @@ void QnArchiveStreamReader::pause()
 
 void QnArchiveStreamReader::resume()
 {
-    if (getResource()->hasParam(lit("groupplay"))) {
+    if (getResource()->hasDefaultProperty(ResourcePropertyKey::kGroupPlayParamName))
+    {
         QnMutexLocker lock( &m_stopMutex );
         m_stopCond = false; // for VMAX
         m_stopWaitCond.wakeAll();

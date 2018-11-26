@@ -276,7 +276,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
             }
         }
 
-        auto manufacturerAlias = resData.value<QString>(Qn::ONVIF_VENDOR_SUBTYPE);
+        auto manufacturerAlias = resData.value<QString>(ResourceDataKey::kOnvifVendorSubtype);
         manufacturer = manufacturerAlias.isEmpty() ? manufacturer : manufacturerAlias;
 
         QnUuid rt = m_informationFetcher->getOnvifResourceType(manufacturer, modelName);

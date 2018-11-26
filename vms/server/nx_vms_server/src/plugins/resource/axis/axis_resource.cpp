@@ -653,7 +653,7 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
     // Copy information from build-in resource type to runtime params
     // because mobile client doesn't load resource type information.
     if (isIOModule())
-        setProperty(Qn::IO_CONFIG_PARAM_NAME, QString("1"));
+        setProperty(ResourcePropertyKey::kIoConfigCapability, QString("1"));
 
     saveProperties();
 
@@ -1246,7 +1246,7 @@ bool QnPlAxisResource::ioPortErrorOccured()
 
 void QnPlAxisResource::readPortIdLIst()
 {
-    QString value = getProperty(Qn::IO_PORT_DISPLAY_NAMES_PARAM_NAME);
+    QString value = getProperty(ResourcePropertyKey::kIoDisplayName);
     if (value.isEmpty())
         return;
 
@@ -1454,7 +1454,9 @@ bool QnPlAxisResource::readCurrentIOStateAsync()
 
 void QnPlAxisResource::updateIOSettings()
 {
-    const auto newValue = QJson::deserialized<QnIOPortDataList>(getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
+    const auto newValue = QJson::deserialized<QnIOPortDataList>(
+        getProperty(ResourcePropertyKey::kIoSettings).toUtf8());
+
     QnIOPortDataList prevValue;
     {
         QnMutexLocker lock(&m_mutex);
@@ -1478,7 +1480,7 @@ void QnPlAxisResource::updateIOSettings()
 
 void QnPlAxisResource::at_propertyChanged(const QnResourcePtr& res, const QString& key)
 {
-    if (key == Qn::IO_SETTINGS_PARAM_NAME && res && !res->hasFlags(Qn::foreigner))
+    if (key == ResourcePropertyKey::kIoSettings && res && !res->hasFlags(Qn::foreigner))
     {
         auto weakPtr = weakPointer();
         nx::utils::concurrent::run(

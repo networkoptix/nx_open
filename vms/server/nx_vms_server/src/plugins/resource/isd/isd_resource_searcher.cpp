@@ -228,14 +228,14 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
     }
 
     QnResourceData resourceData = dataPool()->data(manufacture(), name);
-    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+    if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
     {
         NX_VERBOSE(this, lm("ONVIF is forced for vendor: %1, model: %2").args(manufacture(), name));
         return QList<QnResourcePtr>();
     }
 
     QnPlIsdResourcePtr resource (new QnPlIsdResource(serverModule()));
-    auto isDW = resourceData.value<bool>(Qn::DW_REBRANDED_TO_ISD_MODEL);
+    auto isDW = resourceData.value<bool>(ResourceDataKey::kIsdDwCam);
 
     vendor = isDW ? kDwFullVendorName : vendor;
     name = vendor == kIsdFullVendorName ?
@@ -282,7 +282,7 @@ bool QnPlISDResourceSearcher::isDwOrIsd(const QString &vendorName, const QString
         vendorName.toLower().trimmed() == lit("digitalwatchdog"))
     {
         QnResourceData resourceData = dataPool()->data("DW", model);
-        if (resourceData.value<bool>(Qn::DW_REBRANDED_TO_ISD_MODEL))
+        if (resourceData.value<bool>(ResourceDataKey::kIsdDwCam))
             return true;
     }
 
@@ -382,7 +382,7 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
     }
 
     QnResourceData resourceData = dataPool()->data(manufacture(), name);
-    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+    if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
     {
         NX_VERBOSE(this, lm("ONVIF is forced for vendor: %1, model: %2").args(manufacture(), name));
         return QnResourcePtr();
@@ -514,14 +514,14 @@ void QnPlISDResourceSearcher::createResource(
     }
 
     QnResourceData resourceData = dataPool()->data(devInfo.manufacturer, devInfo.modelName);
-    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+    if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
     {
         NX_VERBOSE(this, lm("ONVIF is forced for vendor: %1, model: %2").args(
             devInfo.manufacturer, devInfo.modelName));
         return;
     }
 
-    auto isDW = resourceData.value<bool>(Qn::DW_REBRANDED_TO_ISD_MODEL);
+    auto isDW = resourceData.value<bool>(ResourceDataKey::kIsdDwCam);
     auto vendor = isDW ? kDwFullVendorName :
         (devInfo.manufacturer == lit("ISD") || devInfo.manufacturer == kIsdFullVendorName) ?
             manufacture() :

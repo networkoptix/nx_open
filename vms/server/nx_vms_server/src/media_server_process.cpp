@@ -886,8 +886,11 @@ void MediaServerProcess::dumpSystemUsageStats()
                                                      .arg(iface.bytesPerSecMax));
 
     const auto networkIfInfo = networkIfList.join(lit(", "));
-    if (m_mediaServer->setProperty(Qn::NETWORK_INTERFACES, networkIfInfo))
+    if (m_mediaServer->setProperty(
+        ResourcePropertyKey::MediaServer::Statistics::kNetworkInterfaces, networkIfInfo))
+    {
         m_mediaServer->saveProperties();
+    }
 
     QnMutexLocker lk( &m_mutex );
     if(m_dumpSystemResourceUsageTaskId == 0)  //monitoring cancelled
@@ -1193,29 +1196,32 @@ void MediaServerProcess::updateAddressesList()
 
 void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
 {
+    namespace Statistics = ResourcePropertyKey::MediaServer::Statistics;
     const auto hwInfo = HardwareInformation::instance();
-    server->setProperty(Qn::CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
-    server->setProperty(Qn::CPU_MODEL_NAME, hwInfo.cpuModelName);
-    server->setProperty(Qn::PHYSICAL_MEMORY, QString::number(hwInfo.physicalMemory));
-
-    server->setProperty(Qn::PRODUCT_NAME_SHORT, QnAppInfo::productNameShort());
-    server->setProperty(Qn::FULL_VERSION, nx::utils::AppInfo::applicationFullVersion());
-    server->setProperty(Qn::BETA, QString::number(QnAppInfo::beta() ? 1 : 0));
-    server->setProperty(Qn::PUBLIC_IP, m_ipDiscovery->publicIP().toString());
-    server->setProperty(Qn::SYSTEM_RUNTIME, nx::vms::api::SystemInformation::currentSystemRuntime());
+    server->setProperty(Statistics::kCpuArchitecture, hwInfo.cpuArchitecture);
+    server->setProperty(Statistics::kCpuModelName, hwInfo.cpuModelName);
+    server->setProperty(Statistics::kPhysicalMemory, QString::number(hwInfo.physicalMemory));
+    server->setProperty(Statistics::kProductNameShort, QnAppInfo::productNameShort());
+    server->setProperty(Statistics::kFullVersion, nx::utils::AppInfo::applicationFullVersion());
+    server->setProperty(Statistics::kBeta, QString::number(QnAppInfo::beta() ? 1 : 0));
+    server->setProperty(Statistics::kPublicIp, m_ipDiscovery->publicIP().toString());
+    server->setProperty(Statistics::kSystemRuntime, nx::vms::api::SystemInformation::currentSystemRuntime());
 
     if (m_mediaServer->getPanicMode() == Qn::PM_BusinessEvents)
         server->setPanicMode(Qn::PM_None);
 
-    QFile hddList(Qn::HDD_LIST_FILE);
+    static const QString kHddListFilename("/tmp/hddlist");
+
+    QFile hddList(kHddListFilename);
     if (hddList.open(QFile::ReadOnly))
     {
         const auto content = QString::fromUtf8(hddList.readAll());
         if (content.size())
         {
             auto hhds = content.split(lit("\n"), QString::SkipEmptyParts);
-            for (auto& hdd : hhds) hdd = hdd.trimmed();
-            server->setProperty(Qn::HDD_LIST, hhds.join(", "),
+            for (auto& hdd : hhds)
+                hdd = hdd.trimmed();
+            server->setProperty(Statistics::kHddList, hhds.join(", "),
                                 QnResource::NO_ALLOW_EMPTY);
         }
     }
@@ -1227,7 +1233,7 @@ void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
         qnServerDb->setBookmarkCountController(
             [server](size_t count)
             {
-                server->setProperty(Qn::BOOKMARK_COUNT, QString::number(count));
+                server->setProperty(Statistics::kBookmarkCount, QString::number(count));
                 server->saveProperties();
             });
     #endif
@@ -1264,7 +1270,8 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIp)
             ec2Connection->getMediaServerManager(Qn::kSystemAccess)->save(apiServer, this, [] {});
         }
 
-        if (server->setProperty(Qn::PUBLIC_IP, publicIp.toString(), QnResource::NO_ALLOW_EMPTY))
+        if (server->setProperty(ResourcePropertyKey::MediaServer::Statistics::kPublicIp,
+            publicIp.toString(), QnResource::NO_ALLOW_EMPTY))
             server->saveProperties();
 
         updateAddressesList(); //< update interface list to add/remove publicIP
@@ -3772,14 +3779,16 @@ void MediaServerProcess::connectSignals()
     connect(m_udtInternetTrafficTimer.get(), &QTimer::timeout,
         [common = commonModule()]()
         {
+            namespace Statistics = ResourcePropertyKey::MediaServer::Statistics;
             QnResourcePtr server = common->resourcePool()->getResourceById(common->moduleGUID());
-            const auto old = server->getProperty(Qn::UDT_INTERNET_TRFFIC).toULongLong();
+            const auto old = server->getProperty(Statistics::kUdtInternetTraffic_bytes).toULongLong();
             const auto current = nx::network::UdtStatistics::global.internetBytesTransfered.load();
             const auto update = old + (qulonglong)current;
-            if (server->setProperty(Qn::UDT_INTERNET_TRFFIC, QString::number(update))
+            if (server->setProperty(Statistics::kUdtInternetTraffic_bytes, QString::number(update))
                 && server->saveProperties())
             {
-                NX_DEBUG(kLogTag, lm("%1 is updated to %2").args(Qn::UDT_INTERNET_TRFFIC, update));
+                NX_DEBUG(kLogTag, lm("%1 is updated to %2").args(
+                    Statistics::kUdtInternetTraffic_bytes, update));
                 nx::network::UdtStatistics::global.internetBytesTransfered -= current;
             }
         });

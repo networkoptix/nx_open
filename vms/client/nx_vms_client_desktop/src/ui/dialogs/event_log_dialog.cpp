@@ -369,7 +369,7 @@ void QnEventLogDialog::initEventsModel()
             connect(resource, &QnResource::propertyChanged, this,
                 [this](const QnResourcePtr& /*res*/, const QString& key)
                 {
-                    if (key == Qn::kAnalyticsDriversParamName)
+                    if (key == ResourcePropertyKey::kAnalyticsDriversParamName)
                         updateAnalyticsEvents();
                 });
 

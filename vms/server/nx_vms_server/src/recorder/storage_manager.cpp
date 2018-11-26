@@ -438,7 +438,7 @@ public:
             if (status == Qn::Online)
             {
                 const auto space = QString::number(storage->getTotalSpace());
-                if (storage->setProperty(Qn::SPACE, space))
+                if (storage->setProperty(ResourceDataKey::kSpace, space))
                     m_owner->propertyDictionary()->saveParams(storage->getId());
             }
         }
@@ -2512,7 +2512,6 @@ void QnStorageManager::startAuxTimerTasks()
         },
         kRemoveEmptyDirsInterval,
         kRemoveEmptyDirsInterval);
-
 
     static const std::chrono::seconds kTestStorageInterval(40);
     m_auxTasksTimerManager.addNonStopTimer(

@@ -634,7 +634,9 @@ QString StringsHelper::urlForCamera(const QnUuid& id, qint64 timestampUsec, bool
         appServerUrl = server->getApiUrl();
         if (isPublic)
         {
-            const auto publicIP = server->getProperty(Qn::PUBLIC_IP);
+            const auto publicIP = server->getProperty(
+                ResourcePropertyKey::MediaServer::Statistics::kPublicIp);
+
             if (publicIP.isEmpty())
                 return QString();
 

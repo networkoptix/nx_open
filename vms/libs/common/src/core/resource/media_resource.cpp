@@ -190,7 +190,7 @@ void QnMediaResource::setPtzCapabilities(
         case core_ptz::Type::operational:
         {
             // TODO: #rvasilenko Why do we need this check?
-            if (toResource()->hasParam(ResourcePropertyKey::kPtzCapabilities))
+            if (toResource()->hasDefaultProperty(ResourcePropertyKey::kPtzCapabilities))
                 toResource()->setProperty(ResourcePropertyKey::kPtzCapabilities, (int) capabilities);
             break;
         }
@@ -224,7 +224,7 @@ Ptz::Capabilities QnMediaResource::operationalPtzCapabilities() const
 
 void QnMediaResource::setOperationalPtzCapabilities(Ptz::Capabilities capabilities)
 {
-    if (toResource()->hasParam(ResourcePropertyKey::kPtzCapabilities))
+    if (toResource()->hasDefaultProperty(ResourcePropertyKey::kPtzCapabilities))
         toResource()->setProperty(ResourcePropertyKey::kPtzCapabilities, static_cast<int>(capabilities));
 }
 
