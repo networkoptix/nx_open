@@ -104,11 +104,11 @@ ${REGISTER EYE ICON CLOSED}           ${REGISTER FORM}${EYE ICON CLOSED}
 ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    {{message.sharer_name}} invites you to %PRODUCT_NAME%
 
 #Register form errors
-${FIRST NAME IS REQUIRED}      //span[@ng-if='registerForm.firstName.$touched && registerForm.firstName.$error.required' and contains(text(),'${FIRST NAME IS REQUIRED TEXT}')]
+${FIRST NAME IS REQUIRED}      //span[@ng-if='registerForm.firstName.$touched && registerForm.firstName.$error.required' and contains(text(),"${FIRST NAME IS REQUIRED TEXT}")]
 ${LAST NAME IS REQUIRED}       //span[@ng-if='registerForm.lastName.$touched && registerForm.lastName.$error.required' and contains(text(),'${LAST NAME IS REQUIRED TEXT}')]
 ${EMAIL IS REQUIRED}           //span[@ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required" and contains(text(),"${EMAIL IS REQUIRED TEXT}")]
 ${EMAIL ALREADY REGISTERED}    //span[@ng-if='registerForm.registerEmail.$error.alreadyExists' and contains(text(),'${EMAIL ALREADY REGISTERED TEXT}')]
-${EMAIL INVALID}               //span[@ng-if='registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email' and contains(text(),'${EMAIL INVALID TEXT}')]
+${EMAIL INVALID}               //span[@ng-if='registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email' and contains(text(),"${EMAIL INVALID TEXT}")]
 ${PASSWORD SPECIAL CHARS}      //span[contains(@ng-if,'form.passwordNew.$error.pattern &&') and contains(@ng-if,'!form.passwordNew.$error.minlength') and contains(text(),'${PASSWORD SPECIAL CHARS TEXT}')]
 ${PASSWORD TOO SHORT}          //span[contains(@ng-if,'form.passwordNew.$error.minlength') and contains(text(),'${PASSWORD TOO SHORT TEXT}')]
 ${PASSWORD TOO COMMON}         //span[contains(@ng-if,'form.passwordNew.$error.common &&') and contains(@ng-if,'!form.passwordNew.$error.required') and contains(text(),'${PASSWORD TOO COMMON TEXT}')]

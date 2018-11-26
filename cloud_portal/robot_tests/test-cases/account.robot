@@ -7,7 +7,7 @@ Suite Teardown    Close Browser
 *** Variables ***
 ${password}    ${BASE PASSWORD}
 ${url}         ${ENV}
-${FIRST NAME IS REQUIRED}      //span[@ng-if='accountForm.firstName.$touched && accountForm.firstName.$error.required' and contains(text(),'${FIRST NAME IS REQUIRED TEXT}')]
+${FIRST NAME IS REQUIRED}      //span[@ng-if='accountForm.firstName.$touched && accountForm.firstName.$error.required' and contains(text(),"${FIRST NAME IS REQUIRED TEXT}")]
 ${LAST NAME IS REQUIRED}       //span[@ng-if='accountForm.lastName.$touched && accountForm.lastName.$error.required' and contains(text(),'${LAST NAME IS REQUIRED TEXT}')]
 
 *** Keywords ***
