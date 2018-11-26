@@ -120,7 +120,7 @@ void Connector::registerConnection(
     // NOTE: Not relying on connectionId.
     m_connectionManager->modifyConnectionByIdSafe(
         nodeContext.connectionId,
-        [this, connectionSequence](auto abstractConnection)
+        [connectionSequence](auto abstractConnection)
         {
             const auto connection = 
                 dynamic_cast<ConnectionWithSequence*>(abstractConnection);
