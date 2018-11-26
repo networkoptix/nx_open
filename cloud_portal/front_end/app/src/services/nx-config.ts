@@ -276,8 +276,8 @@ export class NxConfigService {
                 'windows-x86-file': 'Windows x86'
             },
             animation: {
-                easeIn: '0.25s ease-in',
-                easeOut: '0.25s ease-out'
+                carouselImageEnter: '0.25s ease-in',
+                carouselImageLeave: '0.25s ease-out'
             }
         };
     }

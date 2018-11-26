@@ -16,14 +16,14 @@ const config = new NxConfigService().config;
                     opacity: 1,
                     visibility: 'visible'
                 }),
-                animate(config.animation.easeOut, style({ opacity: 0, visibility: 'hidden'}))
+                animate(config.animation.carouselImageLeave, style({ opacity: 0, visibility: 'hidden'}))
             ]),
             transition('* => enter', [
                 style({
                     opacity: 0,
                     visibility: 'hidden'
                 }),
-                animate(config.animation.easeIn, style({ opacity: 1, visibility: 'visible'}))
+                animate(config.animation.carouselImageEnter, style({ opacity: 1, visibility: 'visible'}))
             ])
         ])
     ]
