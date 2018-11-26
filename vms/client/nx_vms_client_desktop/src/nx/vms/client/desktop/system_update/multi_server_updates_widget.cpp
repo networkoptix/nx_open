@@ -178,6 +178,15 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         horizontalHeader->setSectionsClickable(false);
     }
 
+    connect(m_serverUpdateTool.get(), &ServerUpdateTool::packageDownloaded,
+        this, &MultiServerUpdatesWidget::atServerPackageDownloaded);
+
+    connect(m_serverUpdateTool.get(), &ServerUpdateTool::packageDownloadFailed,
+        this, &MultiServerUpdatesWidget::atServerPackageDownloadFailed);
+
+    void packageDownloaded(const nx::update::Package& package);
+    void packageDownloadFailed(const nx::update::Package& package);
+
     connect(ui->cancelProgressAction, &QPushButton::clicked, this,
         &MultiServerUpdatesWidget::atCancelCurrentAction);
 
@@ -292,6 +301,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         QnUuid serverId = QnUuid(connectionInfo.ecsGuid);
         nx::utils::Url serverUrl = connectionInfo.ecUrl;
         m_clientUpdateTool->setServerUrl(serverUrl, serverId);
+        m_serverUpdateTool->setServerUrl(serverUrl, serverId);
         m_clientUpdateTool->requestRemoteUpdateInfo();
     }
     // Force update when we open dialog.
@@ -690,6 +700,8 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
             setTargetState(WidgetUpdateState::downloading, targets);
             m_serverUpdateTool->requestStartUpdate(m_updateInfo.info);
             m_clientUpdateTool->downloadUpdate(m_updateInfo);
+            if (!m_updateInfo.manualPackages.empty())
+                m_serverUpdateTool->startManualDownloads(m_updateInfo);
         }
     }
     else
@@ -754,39 +766,95 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
     return true;
 }
 
+void MultiServerUpdatesWidget::atServerPackageDownloaded(const nx::update::Package& package)
+{
+    if (m_updateStateCurrent == WidgetUpdateState::downloading)
+    {
+        NX_INFO(this)
+            << "atServerPackageDownloaded() - downloaded server package"
+            << package.file;
+
+        m_serverUpdateTool->uploadPackage(package, m_serverUpdateTool->getDownloadDir());
+    }
+    else
+    {
+        NX_INFO(this)
+            << "atServerPackageDownloaded() - download server package"
+            << package.file << "and widget is not in downloading state";
+    }
+}
+
+void MultiServerUpdatesWidget::atServerPackageDownloadFailed(
+    const nx::update::Package& package,
+    const QString& error)
+{
+    if (m_updateStateCurrent == WidgetUpdateState::downloading)
+    {
+        NX_INFO(this)
+            << "atServerPackageDownloadFailed() - failed to download server package"
+            << package.file << "error:" << error;
+        for (auto id: package.targets)
+            m_serversFailed.insert(id);
+    }
+    else
+    {
+        NX_INFO(this)
+            << "atServerPackageDownloadFailed() - failed to download server package"
+            << package.file << "and widget is not in downloading state" << "error:" << error;
+    }
+}
+
 ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress() const
 {
+    ServerUpdateTool::ProgressInfo result;
     if (m_updateStateCurrent == WidgetUpdateState::pushing)
     {
-        return m_serverUpdateTool->calculateUploadProgress();
+        m_serverUpdateTool->calculateUploadProgress(result);
     }
     else if (m_updateStateCurrent == WidgetUpdateState::downloading)
     {
-        ServerUpdateTool::ProgressInfo result;
         for (auto id : m_serversIssued)
         {
             auto item = m_updatesModel->findItemById(id);
             if (!item)
                 continue;
+
             if (item->state == nx::update::Status::Code::downloading)
+            {
                 result.current += item->progress;
+                result.active++;
+            }
             else
+            {
                 result.current += 100;
-            result.max += 100;
+                result.done++;
+            }
         }
+
+        result.max += 100 * m_serversIssued.size();
         result.downloadingServers = !m_serversActive.empty();
+
+        if (m_serverUpdateTool->hasManualDownloads())
+            m_serverUpdateTool->calculateManualDownloadProgress(result);
 
         if (m_clientUpdateTool->hasUpdate())
         {
             result.current += m_clientUpdateTool->getDownloadProgress();
             result.max += 100;
-            result.downloadingClient = !m_clientUpdateTool->isDownloadComplete();
+            if (m_clientUpdateTool->isDownloadComplete())
+            {
+                result.done++;
+                result.downloadingClient = false;
+            }
+            else
+            {
+                result.active++;
+                result.downloadingClient = true;
+            }
         }
-        return result;
     }
     else if (m_updateStateCurrent == WidgetUpdateState::installing)
     {
-        ServerUpdateTool::ProgressInfo result;
         auto installing = m_serverUpdateTool->getServersInstalling();
         auto installed = m_serverUpdateTool->getServersCompleteInstall();
         // TODO: Deal with it.
@@ -805,10 +873,9 @@ ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress
             result.installingClient = !complete;
             result.max += 100;
         }
-        return result;
     }
 
-    return ServerUpdateTool::ProgressInfo();
+    return result;
 }
 
 void MultiServerUpdatesWidget::processRemoteInitialState()
@@ -937,7 +1004,7 @@ void MultiServerUpdatesWidget::processRemoteDownloading()
                     NX_VERBOSE(this)
                         << "processRemoteDownloading() - server "
                         << id << "resumed downloading.";
-                    m_serversActive.remove(id);
+                    m_serversActive.insert(id);
                 }
                 break;
             case StatusCode::latestUpdateInstalled:
@@ -1625,6 +1692,12 @@ void MultiServerUpdatesWidget::loadDataToUi()
         {
             QString internalError = nx::update::toString(m_updateInfo.error);
             debugState << QString("updateInfoError=%1").arg(internalError);
+        }
+
+        if (stateHasProgress(m_updateStateCurrent))
+        {
+            ServerUpdateTool::ProgressInfo info = calculateActionProgress();
+            debugState << lm("progress=%1 of %2, active=%3, done=%4").args(info.current, info.max, info.active, info.done);
         }
         ui->debugStateLabel->setText(debugState.join("<br>"));
     }

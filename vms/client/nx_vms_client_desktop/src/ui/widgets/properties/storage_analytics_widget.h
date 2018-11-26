@@ -43,11 +43,6 @@ private:
     nx::vms::client::desktop::TableView* currentTable() const;
     qint64 currentForecastAveragingPeriod();
 
-    QnRecordingStatsReply getForecastData(qint64 extraSizeBytes);
-
-    // Removes "foreign" and hidden cameras and aggregates their data in one pseudo-camera.
-    QnRecordingStatsReply filterStatsReply(const QnRecordingStatsReply& cameraStats);
-
     // Starts server request.
     void querySpaceFromServer();
     void queryStatsFromServer(qint64 bitrateAveragingPeriodMs);
@@ -81,28 +76,8 @@ private:
 
     // Map from averaging period to recording stats.
     QMap<quint64, QnRecordingStatsReply> m_recordingsStatData;
-    //QnRecordingStatsReply m_recordingsStatData;
-    QVector<QnStorageSpaceData> m_availableStorages;
-
-    // Forecast-related data.
-    struct ForecastDataPerCamera
-    {
-        QnCamRecordingStatsData stats; //< Forecasted statistics.
-        bool expand = false; //< Expand archive for that camera in the forecast.
-        int minDays = 0; //< Cached camera 'minDays' value.
-        int maxDays = 0; //< Cached camera 'maxDays' value.
-        qint64 byterate = 0; //< How may bytes camera gives per second (bytes/second).
-    };
-
-    struct ForecastData
-    {
-        qint64 totalSpace = 0; //< Total space for all storages.
-        QVector<ForecastDataPerCamera> cameras; //< Camera list by server.
-    };
-
-    QnRecordingStatsReply doForecast(ForecastData forecastData);
-    void spendData(ForecastData& forecastData, qint64 needSeconds,
-        std::function<bool (const ForecastDataPerCamera& stats)> predicate);
+    QnStorageSpaceDataList m_availableStorages;
+    qint64 m_availableStorageSpace = 0;
 
     virtual void resizeEvent(QResizeEvent*) override; //< Use this to resize table columns; accepts null.
     virtual void showEvent(QShowEvent*) override; //< Resizes columns when shown.

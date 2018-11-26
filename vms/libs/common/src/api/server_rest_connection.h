@@ -218,12 +218,6 @@ public:
         AddUploadCallback callback,
         QThread* targetThread = nullptr);
 
-    Handle validateFileInformation(
-        const QString& url,
-        int expectedSize,
-        GetCallback callback,
-        QThread* targetThread = nullptr);
-
     Handle removeFileDownload(
         const QString& fileName,
         bool deleteData,

@@ -51,10 +51,10 @@ FindPackageResult findPackage(
  * @return first package with specified data, or nullptr if no package is found. Note: it points
  *     to the object inside updateInfo. So be careful with the lifetime of updateInfo.
  */
-const nx::update::Package* findPackage(
+nx::update::Package* findPackage(
     const QString& component,
     nx::vms::api::SystemInformation& systemInfo,
-    const nx::update::Information& updateInfo);
+    nx::update::Information& updateInfo);
 
 using UpdateCheckCallback = std::function<void (const UpdateContents&)>;
 /**

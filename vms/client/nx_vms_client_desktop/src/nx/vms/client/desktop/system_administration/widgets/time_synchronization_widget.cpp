@@ -194,6 +194,8 @@ void TimeSynchronizationWidget::applyChanges()
     qnGlobalSettings->setTimeSynchronizationEnabled(state.enabled);
     qnGlobalSettings->setPrimaryTimeServer(state.primaryServer);
     qnGlobalSettings->synchronizeNow();
+
+    m_store->applyChanges();
 }
 
 bool TimeSynchronizationWidget::hasChanges() const

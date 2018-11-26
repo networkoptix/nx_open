@@ -5,11 +5,11 @@
 #include <client_core/connection_context_aware.h>
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
+#include <nx/vms/common/p2p/downloader/private/abstract_peer_manager.h>
 #include <nx/vms/api/data/software_version.h>
 #include <nx/update/update_information.h>
 #include <utils/common/connective.h>
 #include <utils/update/zip_utils.h>
-#include <nx/vms/common/p2p/downloader/private/abstract_peer_manager.h>
 #include "update_contents.h"
 
 namespace nx::vms::common::p2p::downloader { class SingleConnectionPeerManager; }

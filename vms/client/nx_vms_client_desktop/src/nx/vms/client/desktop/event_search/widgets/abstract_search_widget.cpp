@@ -92,20 +92,15 @@ QMenu* AbstractSearchWidget::createDropdownMenu()
     return result;
 }
 
+void AbstractSearchWidget::setCamerasReadOnly(bool value)
+{
+    d->setCamerasReadOnly(value);
+}
+
 void AbstractSearchWidget::addDeviceDependentAction(
     QAction* action, const QString& mixedString, const QString& cameraString)
 {
     d->addDeviceDependentAction(action, mixedString, cameraString);
-}
-
-bool AbstractSearchWidget::wholeArea() const
-{
-    return d->wholeArea();
-}
-
-void AbstractSearchWidget::setWholeArea(bool value)
-{
-    d->setWholeArea(value);
 }
 
 void AbstractSearchWidget::selectCameras(Cameras value)

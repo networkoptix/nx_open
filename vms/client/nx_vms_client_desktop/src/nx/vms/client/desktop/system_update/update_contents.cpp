@@ -72,7 +72,7 @@ bool checkCloudHost(QnCommonModule* commonModule, nx::utils::SoftwareVersion tar
 bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateContents& contents,
     std::map<QnUuid, QnMediaServerResourcePtr> activeServers)
 {
-    const nx::update::Information& info = contents.info;
+    nx::update::Information& info = contents.info;
     if (contents.error != nx::update::InformationError::noError)
         return false;
     // Hack to prevent double verification of update package.
@@ -143,6 +143,10 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
         true, cloudUrl, boundToCloud, &contents.clientPackage, &errorMessage);
 
     QSet<QnUuid> allServers;
+
+    // We store here a set of packages that should be downloaded manually by the client.
+    // We will convert it to a list of values later.
+    QSet<nx::update::Package*> manualPackages;
     // Checking if all servers have update packages.
     for(auto record: activeServers)
     {
@@ -162,10 +166,11 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
                 << "platform" << serverInfo.platform
                 << "is missing its update package";
             contents.missingUpdate.insert(server->getId());
+            continue;
         }
 
         nx::utils::SoftwareVersion serverVersion = server->getVersion();
-        // Prohibiting updates to previous version
+        // Prohibiting updates to previous version.
         if (serverVersion > targetVersion)
         {
             NX_ERROR(typeid(UpdateContents)) << "verifyUpdateManifest server "
@@ -180,8 +185,19 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
             alreadyInstalled = false;
         }
 
+        if (package)
+        {
+            package->targets.push_back(server->getId());
+            auto hasInternet = server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);
+            if (!hasInternet)
+                manualPackages.insert(package);
+        }
+
         allServers << record.first;
     }
+
+    for(auto package: manualPackages)
+        contents.manualPackages.push_back(*package);
 
     contents.alreadyInstalled = alreadyInstalled;
 
@@ -210,6 +226,12 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     {
         NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest(" << contents.info.version <<") - detected incompatible cloud";
         contents.error = nx::update::InformationError::incompatibleCloudHostError;
+    }
+
+    if (!contents.manualPackages.empty())
+    {
+        QStringList files;
+        NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest(" << contents.info.version << ") - detected some servers can not download update packages.";
     }
 
     contents.verified = true;

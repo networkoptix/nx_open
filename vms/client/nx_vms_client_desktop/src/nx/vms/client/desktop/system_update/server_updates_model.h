@@ -34,6 +34,8 @@ struct UpdateItem
     // Flag for servers, that can be updated using legacy 3.2 system
     bool onlyLegacyUpdate = false;
     bool legacyUpdateUsed = false;
+    /** Client is uploading files to this server. */
+    bool uploading = false;
     bool offline = false;
     bool skipped = false;
     bool installed = false;

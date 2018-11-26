@@ -68,10 +68,11 @@ public:
 protected:
     // This one is called by timer periodically.
     void atUpdateCurrentState();
-    void atClientDownloadFinished();
     void atModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
     void atStartUpdateAction();
     bool atCancelCurrentAction();
+    void atServerPackageDownloaded(const nx::update::Package& package);
+    void atServerPackageDownloadFailed(const nx::update::Package& package, const QString& error);
 
     void hideStatusColumns(bool value);
     void clearUpdateInfo();
