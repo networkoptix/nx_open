@@ -24,15 +24,6 @@ public:
     int receivePacket(AVPacket * outPacket) const;
     int receiveFrame(AVFrame * outFrame) const;
 
-    int decode(AVFrame * outFrame, const AVPacket * packet, int * outGotFrame);
-    int encode(const AVFrame * frame, AVPacket * outPacket, int * outGotPacket);
-
-    int decodeVideo(AVFrame * outFrame, const AVPacket * packet, int * outGotFrame);
-    int encodeVideo(const AVFrame * frame, AVPacket * outPacket, int * outGotPacket);
-
-    int decodeAudio(AVFrame * outFrame, const AVPacket * packet, int * outGotFrame);
-    int encodeAudio(const AVFrame * frame, AVPacket * outPacket, int * outGotPacket);
-
     int initializeEncoder(AVCodecID codecId);
     int initializeEncoder(const char *codecName);
 
@@ -54,7 +45,7 @@ public:
 
     // Video
     AVPixelFormat pixelFormat() const;
-    
+
     // Audio
     AVSampleFormat sampleFormat() const;
     int sampleRate() const;

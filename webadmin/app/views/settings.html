@@ -125,15 +125,15 @@
                         <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> Force Traffic Encryption
+                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"
+                                           ng-change="checkTrafficEncryption()"> Force Traffic Encryption
                                 </label>
                             </div>
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox"
                                            ng-disabled="!trafficSettings.trafficEncryptionForced"
-                                           ng-model="trafficSettings.videoTrafficEncryptionForced"
-                                           ng-checked="checkTrafficEncryption()">
+                                           ng-model="trafficSettings.videoTrafficEncryptionForced">
                                     Force Video Traffic Encryption
                                 </label>
                             </div>

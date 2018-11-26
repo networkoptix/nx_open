@@ -23,10 +23,6 @@ SimpleAudioParser::SimpleAudioParser():
     m_bits_per_coded_sample = 16;
 }
 
-SimpleAudioParser::~SimpleAudioParser()
-{
-}
-
 void SimpleAudioParser::setCodecId(AVCodecID codecId)
 {
     m_codecId = codecId;

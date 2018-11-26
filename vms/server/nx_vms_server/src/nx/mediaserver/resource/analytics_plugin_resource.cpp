@@ -80,7 +80,7 @@ CameraDiagnostics::Result AnalyticsPluginResource::initInternal()
 
     analyticsDescriptorListManager->addDescriptor(descriptorFromManifest(*manifest));
     setManifest(*manifest);
-    saveParams();
+    saveProperties();
 
     return CameraDiagnostics::NoErrorResult();
 }

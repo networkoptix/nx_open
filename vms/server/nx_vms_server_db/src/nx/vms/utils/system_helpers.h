@@ -19,7 +19,9 @@ struct DbBackupFileData
 
 bool backupDatabase(const QString& backupDir,
     std::shared_ptr<ec2::AbstractECConnection> connection,
-    const boost::optional<QString>& dbFilePath = boost::none);
+    const boost::optional<QString>& dbFilePath = boost::none,
+    const boost::optional<int>& buildNumber = boost::none);
+
 
 QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir);
 

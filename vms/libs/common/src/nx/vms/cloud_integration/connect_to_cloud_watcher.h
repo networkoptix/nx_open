@@ -55,6 +55,7 @@ private:
     QTimer m_timer;
     std::unique_ptr<nx::network::cloud::CloudDbUrlFetcher> m_cdbEndPointFetcher;
     boost::optional<nx::utils::Url> m_cloudDbUrl;
+    QnMutex m_mutex;
 };
 
 } // namespace cloud_integration

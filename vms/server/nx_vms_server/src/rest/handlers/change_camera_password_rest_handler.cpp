@@ -83,7 +83,7 @@ int QnChangeCameraPasswordRestHandler::executePost(
     for (auto camera: allCamerasInGroup(requestedCamera))
     {
         camera->setAuth(auth);
-        if (!camera->saveParams())
+        if (!camera->saveProperties())
         {
             result.setError(QnJsonRestResult::CantProcessRequest, "Internal server error");
             return nx::network::http::StatusCode::ok;

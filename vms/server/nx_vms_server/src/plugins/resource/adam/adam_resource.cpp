@@ -87,7 +87,7 @@ CameraDiagnostics::Result QnAdamResource::initializeCameraDriver()
     setProperty(Qn::VIDEO_DISABLED_PARAM_NAME, 1);
     setProperty(Qn::IO_CONFIG_PARAM_NAME, 1);
 
-    saveParams();
+    saveProperties();
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -234,7 +234,7 @@ void QnAdamResource::at_propertyChanged(const QnResourcePtr& res, const QString&
         auto ports = ioPortDescriptions();
         setPortDefaultStates();
         setIoPortDescriptions(std::move(ports), /*needMerge*/ true);
-        saveParams();
+        saveProperties();
     }
 }
 

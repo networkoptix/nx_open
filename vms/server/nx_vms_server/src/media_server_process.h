@@ -159,12 +159,15 @@ private:
         QnUniversalTcpListener* tcpListener,
         ec2::TransactionMessageBusAdapter* messageBus);
 
-    void registerRestHandler(
+    /**
+     * This weird name is an apidoctool requirement.
+     */
+    void reg(
         const QString& path,
         QnRestRequestHandler* handler,
         GlobalPermission permission = GlobalPermission::none);
 
-    void registerRestHandler(
+    void reg(
         const nx::network::http::Method::ValueType& method,
         const QString& path,
         QnRestRequestHandler* handler,

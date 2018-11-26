@@ -71,7 +71,7 @@ void AdtsInjector::uninitialize()
         avformat_free_context(m_formatContext);
     }
     m_formatContext = nullptr;
-    
+
     uninitializeIoContext();
 
     if(m_outputStream)
@@ -150,6 +150,6 @@ int AdtsInjector::reinitializeIoContext(int bufferSize)
 
     return result;
 }
-    
+
 } // namespace usb_cam
 } // namespace nx

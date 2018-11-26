@@ -203,7 +203,7 @@ QnPtzControllerPtr ServerPtzControllerPool::createController(
                 .args(camera->getName(), camera->getId(), controllerCapabilities));
 
         camera->setPtzCapabilities(controllerCapabilities);
-        camera->saveParamsAsync();
+        camera->savePropertiesAsync();
     }
 
     return controller;
@@ -212,10 +212,10 @@ QnPtzControllerPtr ServerPtzControllerPool::createController(
 void ServerPtzControllerPool::at_cameraPropertyChanged(
     const QnResourcePtr& resource, const QString& key)
 {
-    const bool isPtzKey = key == Qn::kUserPreferredPtzPresetType
-        || key == Qn::kDefaultPreferredPtzPresetType
-        || key == Qn::kPtzCapabilitiesAddedByUser
-        || key == Qn::kUserIsAllowedToOverridePtzCapabilities;
+    const bool isPtzKey = key == ResourcePropertyKey::kUserPreferredPtzPresetType
+        || key == ResourcePropertyKey::kDefaultPreferredPtzPresetType
+        || key == ResourcePropertyKey::kPtzCapabilitiesAddedByUser
+        || key == ResourcePropertyKey::kUserIsAllowedToOverridePtzCapabilities;
 
     if (isPtzKey)
     {

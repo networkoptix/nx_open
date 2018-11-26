@@ -152,7 +152,7 @@ std::unique_ptr<ILPMediaPacket> StreamReaderPrivate::toNxPacket(const ffmpeg::Pa
 
     std::unique_ptr<ILPMediaPacket> nxPacket(new ILPMediaPacket(
         &m_allocator,
-        0,
+        packet->mediaType() == AVMEDIA_TYPE_VIDEO ? 0 : 1,
         ffmpeg::utils::toNxDataPacketType(packet->mediaType()),
         ffmpeg::utils::toNxCompressionType(packet->codecId()),
         packet->timestamp() * kUsecInMsec,

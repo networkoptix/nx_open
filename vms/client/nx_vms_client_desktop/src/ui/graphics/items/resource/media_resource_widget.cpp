@@ -36,7 +36,6 @@
 #include <common/common_module.h>
 #include <translation/datetime_formatter.h>
 
-
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
@@ -807,7 +806,6 @@ void QnMediaResourceWidget::createButtons()
             &QnMediaResourceWidget::setMotionSearchModeEnabled);
         titleBar()->rightButtonsBar()->addButton(Qn::MotionSearchButton, searchButton);
     }
-
 
     createActionAndButton(
         "item/ptz.png",
@@ -1796,7 +1794,6 @@ void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, cons
             gridLines[0] << QPointF(0.0, y * yStep) << QPointF(rect.width(), y * yStep);
     }
 
-
     QnScopedPainterTransformRollback transformRollback(painter);
     painter->translate(rect.topLeft());
 
@@ -2058,7 +2055,6 @@ QString QnMediaResourceWidget::calculateDetailsText() const
     if (QnConstMediaContextPtr codecContext = d->display()->mediaProvider()->getCodecContext())
         codecString = codecContext->getCodecName();
 
-
     QString hqLqString;
     if (hasVideo() && !d->resource->hasFlags(Qn::local))
         hqLqString = (m_renderer->isLowQualityImage(0)) ? tr("Lo-Res") : tr("Hi-Res");
@@ -2129,7 +2125,6 @@ QString QnMediaResourceWidget::calculatePositionText() const
     static const int kPositionTextPixelSize = 14;
     return htmlFormattedParagraph(timeString, kPositionTextPixelSize, true);
 }
-
 
 QString QnMediaResourceWidget::calculateTitleText() const
 {
@@ -2267,7 +2262,6 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     {
         if (d->isPlayingLive() && d->camera->needsToChangeDefaultPassword())
             return Qn::PasswordRequiredOverlay;
-
 
         const Qn::Permission requiredPermission = d->isPlayingLive()
             ? Qn::ViewLivePermission
@@ -2417,11 +2411,11 @@ void QnMediaResourceWidget::at_resource_propertyChanged(
 {
     if (key == QnMediaResource::customAspectRatioKey())
         updateCustomAspectRatio();
-    else if (key == Qn::CAMERA_CAPABILITIES_PARAM_NAME)
+    else if (key == ResourcePropertyKey::kCameraCapabilities)
         ensureTwoWayAudioWidget();
-    else if (key == Qn::kCombinedSensorsDescriptionParamName)
+    else if (key == ResourcePropertyKey::kCombinedSensorsDescription)
         updateAspectRatio();
-    else if (key == Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME)
+    else if (key == ResourcePropertyKey::kMediaStreams)
         updateAspectRatio();
 }
 

@@ -325,7 +325,7 @@ bool HevcParser::handleSingleNalUnitPacket(
 }
 
 bool HevcParser::handleAggregationPacket(
-    const hevc::NalUnitHeader* header,
+    const hevc::NalUnitHeader* /*header*/,
     const uint8_t* payload,
     int payloadLength)
 {
@@ -395,9 +395,9 @@ bool HevcParser::handleFragmentationPacket(
 }
 
 bool HevcParser::handlePaciPacket(
-    const nx::media_utils::hevc::NalUnitHeader* header,
-    const uint8_t* payload,
-    int payloadLength)
+    const nx::media_utils::hevc::NalUnitHeader* /*header*/,
+    const uint8_t* /*payload*/,
+    int /*payloadLength*/)
 {
     NX_WARNING(this, "HEVC PACI RTP packet handling is not implemented yet.");
     return false;

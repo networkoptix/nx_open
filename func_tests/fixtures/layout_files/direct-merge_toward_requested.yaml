@@ -1,9 +1,0 @@
-machines:
-  - {alias: first, type: linux}
-  - {alias: second, type: linux}
-mergers:
-  - {local: second, remote: first}
-networks:
-  10.254.0.0/28:
-    first:
-    second:
