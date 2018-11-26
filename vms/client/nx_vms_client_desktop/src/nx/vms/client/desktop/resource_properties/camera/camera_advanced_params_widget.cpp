@@ -468,7 +468,7 @@ void CameraAdvancedParamsWidget::at_advancedParam_saved(int status, const QnCame
     setState(State::Init);
     emit hasChangesChanged();
 
-    // Reload all values if one of parameters requires resync.
+    // Reload all values if one of the parameters requires resync.
     if (needResync && !parameters.packet_mode)
         loadValues();
 }
