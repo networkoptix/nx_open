@@ -59,7 +59,7 @@ TEST_F(AnalyticsStorageTypesFilter, serialize_and_deserialize_are_symmetric)
 
 TEST_F(AnalyticsStorageTypesFilter, freeText_does_not_contain_spaces_after_serialize)
 {
-    setFreeText(lit("Hello world with empty  spaces"));
+    setFreeText("Hello world with empty  spaces");
     serializeFilter();
     assertSerializedFreeTextDoesNotContainSpaces();
 }

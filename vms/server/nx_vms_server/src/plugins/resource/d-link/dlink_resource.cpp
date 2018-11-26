@@ -361,7 +361,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initializeCameraDriver()
             ++it;
     }
 
-    saveParams();
+    saveProperties();
 
     return CameraDiagnostics::NoErrorResult();
 

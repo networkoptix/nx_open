@@ -400,8 +400,6 @@ protected:
         return CameraDiagnostics::NoErrorResult();
     }
 
-    void setMaxFps(int f);
-
     void setPrimaryVideoCapabilities(const VideoOptionsLocal& capabilities)
     {
         m_primaryStreamCapabilities = capabilities;

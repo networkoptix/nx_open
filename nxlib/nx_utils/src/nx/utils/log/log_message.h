@@ -72,9 +72,9 @@ Message makeMessage(const Format& format)
 }
 
 template<typename Format, typename ... Arguments>
-Message makeMessage(const Format& format, Arguments ... args)
+Message makeMessage(const Format& format, const Arguments& ... args)
 {
-    return makeMessage(format).args(std::forward<Arguments>(args) ...);
+    return makeMessage(format).args(args ...);
 }
 
 } // namespace log

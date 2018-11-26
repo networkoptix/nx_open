@@ -539,7 +539,7 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
     }
     else
     {
-        setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, QString("0"));
+        setProperty(ResourcePropertyKey::kHasDualStreaming, QString("0"));
     }
 
     {
@@ -655,7 +655,7 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
     if (isIOModule())
         setProperty(Qn::IO_CONFIG_PARAM_NAME, QString("1"));
 
-    saveParams();
+    saveProperties();
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -962,7 +962,7 @@ bool QnPlAxisResource::initializeAudio(CLSimpleHTTPClient * const http)
     auto status = readAxisParameter(http, AXIS_TWO_WAY_AUDIO_MODES, &duplexModeList);
     if (status != CLHttpStatus::CL_HTTP_SUCCESS)
     {
-        setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, QString("0"));
+        setProperty(ResourcePropertyKey::kIsAudioSupported, QString("0"));
         return true;
     }
     const QSet<QString> supportedModes = duplexModeList.split(',').toSet();
@@ -973,7 +973,7 @@ bool QnPlAxisResource::initializeAudio(CLSimpleHTTPClient * const http)
     const bool fromCameraAudioFound = supportedModes.intersects(kFromCameraModes);
 
     if (fromCameraAudioFound)
-        setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, QString("1"));
+        setProperty(ResourcePropertyKey::kIsAudioSupported, QString("1"));
 
     if (!twoWayAudioFound)
         return true;
@@ -1565,7 +1565,7 @@ void QnPlAxisResource::fetchAndSetAdvancedParameters()
 
     auto resData = resourceData();
     auto overloads = resData.value<std::vector<QnCameraAdvancedParameterOverload>>(
-                Qn::ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME);
+                ResourceDataKey::kAdvancedParameterOverloads);
 
     params.applyOverloads(overloads);
 

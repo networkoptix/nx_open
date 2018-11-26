@@ -2,61 +2,139 @@
 
 #include <core/resource/camera_resource.h>
 #include <ui/style/skin.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_navigator.h>
-#include <utils/common/event_processors.h>
 
+#include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/math/fuzzy.h>
 
 namespace nx::vms::client::desktop {
 
-namespace {
+// ------------------------------------------------------------------------------------------------
+// AnalyticsSearchWidget::Private
 
-AnalyticsSearchListModel* analyticsModel(AnalyticsSearchWidget* widget)
+class AnalyticsSearchWidget::Private: public QObject
 {
-    const auto result = qobject_cast<AnalyticsSearchListModel*>(widget->model());
-    NX_CRITICAL(result);
-    return result;
-}
+    AnalyticsSearchWidget* const q;
 
-} // namespace
+public:
+    Private(AnalyticsSearchWidget* q):
+        q(q),
+        m_model(qobject_cast<AnalyticsSearchListModel*>(q->model())),
+        m_areaSelectionButton(q->createCustomFilterButton())
+    {
+        NX_CRITICAL(m_model);
+
+        m_areaSelectionButton->setSelectable(false);
+        m_areaSelectionButton->setDeactivatable(true);
+        m_areaSelectionButton->setAccented(true);
+        m_areaSelectionButton->setDeactivatedText(tr("Select area"));
+        m_areaSelectionButton->setIcon(qnSkin->icon("text_buttons/area.png"));
+        m_areaSelectionButton->hide();
+
+        connect(q, &AbstractSearchWidget::cameraSetChanged, this,
+            [this]() { setAreaSelectionEnabled(this->q->selectedCameras() == Cameras::current); });
+
+        connect(m_areaSelectionButton, &SelectableTextButton::stateChanged,
+            [this](SelectableTextButton::State state)
+            {
+                if (state == SelectableTextButton::State::deactivated)
+                    setFilterRect({});
+            });
+
+        connect(m_areaSelectionButton, &SelectableTextButton::clicked, this,
+            [this]()
+            {
+                m_areaSelectionButton->setText(tr("Select some area on the video..."));
+                m_areaSelectionButton->setAccented(true);
+                m_areaSelectionButton->setState(SelectableTextButton::State::unselected);
+                emit this->q->areaSelectionRequested({});
+            });
+
+        connect(q, &AbstractSearchWidget::textFilterChanged,
+            m_model, &AnalyticsSearchListModel::setFilterText);
+    }
+
+    QRectF filterRect() const
+    {
+        return m_model->filterRect();
+    }
+
+    void setFilterRect(const QRectF& value)
+    {
+        if (qFuzzyEquals(m_model->filterRect(), value))
+            return;
+
+        m_model->setFilterRect(value);
+        updateButtonAppearance();
+
+        emit q->filterRectChanged(m_model->filterRect());
+    }
+
+    bool areaSelectionEnabled() const
+    {
+        return m_areaSelectionEnabled;
+    }
+
+private:
+    void setAreaSelectionEnabled(bool value)
+    {
+        if (m_areaSelectionEnabled == value)
+            return;
+
+        m_areaSelectionEnabled = value;
+        m_areaSelectionButton->setVisible(m_areaSelectionEnabled);
+        emit q->areaSelectionEnabledChanged(m_areaSelectionEnabled, {});
+    }
+
+    void updateButtonAppearance()
+    {
+        if (!m_areaSelectionEnabled)
+            return;
+
+        m_areaSelectionButton->setState(m_model->filterRect().isValid()
+            ? SelectableTextButton::State::unselected
+            : SelectableTextButton::State::deactivated);
+
+        m_areaSelectionButton->setAccented(false);
+        m_areaSelectionButton->setText(tr("In selected area"));
+    }
+
+private:
+    AnalyticsSearchListModel* const m_model;
+    SelectableTextButton* const m_areaSelectionButton;
+    bool m_areaSelectionEnabled = false;
+};
+
+// ------------------------------------------------------------------------------------------------
+// AnalyticsSearchWidget
 
 AnalyticsSearchWidget::AnalyticsSearchWidget(QnWorkbenchContext* context, QWidget* parent):
-    base_type(context, new AnalyticsSearchListModel(context), parent)
+    base_type(context, new AnalyticsSearchListModel(context), parent),
+    d(new Private(this))
 {
-    setRelevantControls(Control::defaults | Control::areaSelector | Control::footersToggler);
+    setRelevantControls(Control::defaults | Control::footersToggler);
     setPlaceholderPixmap(qnSkin->pixmap("events/placeholders/analytics.png"));
+    selectCameras(AbstractSearchWidget::Cameras::layout);
+}
 
-    installEventHandler(this, {QEvent::Show, QEvent::Hide},
-        this, &AnalyticsSearchWidget::updateTimelineDisplay);
-
-    connect(this, &AbstractSearchWidget::cameraSetChanged,
-        this, &AnalyticsSearchWidget::updateTimelineDisplay);
-
-    connect(navigator(), &QnWorkbenchNavigator::currentResourceChanged,
-        this, &AnalyticsSearchWidget::updateTimelineDisplay);
-
-    connect(this, &AbstractSearchWidget::textFilterChanged,
-        [this](const QString& text)
-        {
-            analyticsModel(this)->setFilterText(text);
-            updateTimelineDisplay();
-        });
-
-    connect(this, &AbstractSearchWidget::selectedAreaChanged, this,
-        [this](bool wholeArea)
-        {
-            if (wholeArea)
-                setFilterRect({});
-        });
+AnalyticsSearchWidget::~AnalyticsSearchWidget()
+{
 }
 
 void AnalyticsSearchWidget::setFilterRect(const QRectF& value)
 {
-    analyticsModel(this)->setFilterRect(value);
-    setWholeArea(value.isEmpty());
-    updateTimelineDisplay();
+    d->setFilterRect(value.intersected({0, 0, 1, 1}));
+}
+
+QRectF AnalyticsSearchWidget::filterRect() const
+{
+    return d->filterRect();
+}
+
+bool AnalyticsSearchWidget::areaSelectionEnabled() const
+{
+    return d->areaSelectionEnabled();
 }
 
 QString AnalyticsSearchWidget::placeholderText(bool constrained) const
@@ -69,31 +147,10 @@ QString AnalyticsSearchWidget::itemCounterText(int count) const
     return tr("%n objects", "", count);
 }
 
-void AnalyticsSearchWidget::updateTimelineDisplay()
+void AnalyticsSearchWidget::resetFilters()
 {
-    if (!isVisible())
-    {
-        if (navigator()->selectedExtraContent() == Qn::AnalyticsContent)
-            navigator()->setSelectedExtraContent(Qn::RecordingContent /*means none*/);
-        return;
-    }
-
-    const auto currentCamera = navigator()->currentResource()
-        .dynamicCast<QnVirtualCameraResource>();
-
-    const bool relevant = currentCamera && cameras().contains(currentCamera);
-    if (!relevant)
-    {
-        navigator()->setSelectedExtraContent(Qn::RecordingContent /*means none*/);
-        return;
-    }
-
-    analytics::storage::Filter filter;
-    filter.deviceIds = {currentCamera->getId()};
-    filter.boundingBox = analyticsModel(this)->filterRect();
-    filter.freeText = textFilter();
-    navigator()->setAnalyticsFilter(filter);
-    navigator()->setSelectedExtraContent(Qn::AnalyticsContent);
+    base_type::resetFilters();
+    selectCameras(AbstractSearchWidget::Cameras::layout);
 }
 
 } // namespace nx::vms::client::desktop

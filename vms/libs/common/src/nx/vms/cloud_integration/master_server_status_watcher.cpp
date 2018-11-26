@@ -1,9 +1,10 @@
 #include "master_server_status_watcher.h"
 
+#include <nx/utils/log/log.h>
+
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <nx/utils/log/log_main.h>
 
 namespace nx {
 namespace vms {
@@ -41,9 +42,15 @@ QnMasterServerStatusWatcher::QnMasterServerStatusWatcher(
         m_commonModule->runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved,
         this, &QnMasterServerStatusWatcher::at_updateMasterFlag, Qt::QueuedConnection);
 
-    connect(&m_timer, &QTimer::timeout, this, [this]() { setMasterFlag(true); } );
-    m_timer.setSingleShot(true);
-    m_timer.setInterval(m_delayBeforeSettingMasterFlag.count());
+    connect(&m_takeMasterFlagTimer, &QTimer::timeout, this, [this]() { setMasterFlag(true); } );
+    m_takeMasterFlagTimer.setSingleShot(true);
+    m_takeMasterFlagTimer.setInterval(m_delayBeforeSettingMasterFlag.count());
+
+    connect(
+        &m_checkIfMasterFlagCanBeTakenTimer, &QTimer::timeout,
+        this, [this]() { at_updateMasterFlag(); });
+    m_checkIfMasterFlagCanBeTakenTimer.setInterval(m_delayBeforeSettingMasterFlag.count());
+    m_checkIfMasterFlagCanBeTakenTimer.start();
 }
 
 bool QnMasterServerStatusWatcher::localPeerCanBeMaster() const
@@ -56,25 +63,32 @@ bool QnMasterServerStatusWatcher::localPeerCanBeMaster() const
 void QnMasterServerStatusWatcher::at_updateMasterFlag()
 {
     auto items = m_commonModule->runtimeInfoManager()->items()->getItems();
-    bool hasBetterMaster = std::any_of(items.begin(), items.end(),
+    const auto betterMasterIter = std::find_if(items.begin(), items.end(),
         [this](const QnPeerRuntimeInfo& item)
         {
             return item.data.peer.id < m_commonModule->moduleGUID()
                 && item.data.flags.testFlag(api::RuntimeFlag::masterCloudSync);
         });
+    const auto hasBetterMaster = betterMasterIter != items.end();
 
     QnPeerRuntimeInfo localInfo = m_commonModule->runtimeInfoManager()->localInfo();
     bool isLocalMaster = localInfo.data.flags.testFlag(api::RuntimeFlag::masterCloudSync);
     bool canBeMaster = localPeerCanBeMaster() && !hasBetterMaster;
+
+    NX_VERBOSE(this, lm("Checking local peer master flag state. "
+        "isLocalMaster %1, canBeMaster %2, betterMasterPeerId %3")
+        .args(isLocalMaster, canBeMaster,
+            betterMasterIter != items.end() ? betterMasterIter->uuid.toSimpleByteArray() : ""));
+
     if (!canBeMaster && isLocalMaster)
     {
-        m_timer.stop();
+        m_takeMasterFlagTimer.stop();
         setMasterFlag(false);
     }
     else if (canBeMaster && !isLocalMaster)
     {
-        if (!m_timer.isActive())
-            m_timer.start(); //< Set master flag with delay.
+        if (!m_takeMasterFlagTimer.isActive())
+            m_takeMasterFlagTimer.start(); //< Set master flag with delay.
     }
 }
 

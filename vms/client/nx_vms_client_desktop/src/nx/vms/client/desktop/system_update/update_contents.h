@@ -13,56 +13,6 @@ class QnCommonModule;
 
 namespace nx::vms::client::desktop {
 
-enum class UpdateSourceType
-{
-    // Got update info from the internet.
-    internet,
-    // Got update info from the internet for specific build.
-    internetSpecific,
-    // Got update info from offline update package.
-    file,
-    // Got update info from mediaserver swarm.
-    mediaservers,
-};
-
-/**
- * Wraps up update info and summary for its verification.
- */
-struct UpdateContents
-{
-    UpdateSourceType sourceType = UpdateSourceType::internet;
-    QString source;
-
-    // A set of servers without proper update file.
-    QSet<QnUuid> missingUpdate;
-    // A set of servers that can not accept update version.
-    QSet<QnUuid> invalidVersion;
-
-    QString eulaPath;
-    // A folder with offline update packages.
-    QDir storageDir;
-    // A list of files to be uploaded.
-    QStringList filesToUpload;
-    // Information for the clent update.
-    nx::update::Package clientPackage;
-    nx::update::Information info;
-    nx::update::InformationError error = nx::update::InformationError::noError;
-    bool cloudIsCompatible = true;
-    bool verified = false;
-
-    nx::utils::SoftwareVersion getVersion() const;
-    // Check if we can apply this update.
-    bool isValid() const;
-};
-
-/**
- * Search update contents for the client package, suitable for current architecture/platform.
- * @param updateInfo - update information. It can be obtained from the internet, offline update
- * or a set of mediaservers
- * @return package data
- */
-nx::update::Package findClientPackage(const nx::update::Information& updateInfo);
-
 /**
  * Tries to find update package for the specified server.
  * @param server
@@ -96,42 +46,9 @@ bool checkCloudHost(
  * @param servers - servers to be used for update verification
  * @returns true if everything is ok.
  */
-bool verifyUpdateContents(QnCommonModule* commonModule, UpdateContents& contents,
+bool verifyUpdateContents(
+    QnCommonModule* commonModule,
+    nx::update::UpdateContents& contents,
     std::map<QnUuid, QnMediaServerResourcePtr> servers);
 
-/**
- * The UpdateCheckSignal class
- * We use this class when regular polling for std::future<UpdateInformation> is not convenient.
- */
-class UpdateCheckSignal: public QObject
-{
-    Q_OBJECT
-
-public:
-    using QObject::QObject;
-
-signals:
-    void atFinished(const nx::vms::client::desktop::UpdateContents& contents);
-};
-
-/**
- * Checks update from the internet.
- * It starts asynchronously. If signaller is specified, it will emit signaller->atFinished.
- * signaller will be disposed by deleteLater
- * @param signaller signaller to catch completion signal
- * @return future object to be checked for completion
- */
-std::future<UpdateContents> checkLatestUpdate(UpdateCheckSignal* signaller = nullptr);
-
-/**
- * Checks update for specific build from the internet.
- * It starts asynchronously. If signaller is specified, it will emit signaller->atFinished.
- * signaller will be disposed by deleteLater
- * @param signaller signaller to catch completion signal
- * @return future object to be checked for completion
- */
-std::future<UpdateContents> checkSpecificChangeset(QString build, UpdateCheckSignal* signaller = nullptr);
-
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::UpdateContents);

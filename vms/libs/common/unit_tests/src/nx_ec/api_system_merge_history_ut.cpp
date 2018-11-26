@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/random.h>
+#include <nx/network/buffer.h>
 
 #include <nx/vms/api/data/system_merge_history_record.h>
 

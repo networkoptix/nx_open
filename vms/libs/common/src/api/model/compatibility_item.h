@@ -1,5 +1,6 @@
-#ifndef QN_COMPATIBILITY_ITEM_H
-#define QN_COMPATIBILITY_ITEM_H
+#pragma once
+
+#include <QtCore/QString>
 
 struct QnCompatibilityItem
 {
@@ -20,5 +21,3 @@ struct QnCompatibilityItem
     QString ver2;
 };
 #define QnCompatibilityItem_Fields (ver1)(comp1)(ver2)
-
-#endif // QN_COMPATIBILITY_ITEM_H

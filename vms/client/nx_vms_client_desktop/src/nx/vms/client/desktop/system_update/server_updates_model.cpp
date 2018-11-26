@@ -83,7 +83,7 @@ void ServerUpdatesModel::setUpdateStatus(const std::map<QnUuid, nx::update::Stat
     {
         if (auto item = findItemById(status.first))
         {
-            item->progress = status.second.progress;
+            item->progress = status.second.progress * 100;
             item->statusMessage = status.second.message;
             item->state = status.second.code;
             item->offline = (status.second.code == StatusCode::offline);

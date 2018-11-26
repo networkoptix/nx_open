@@ -9,6 +9,7 @@
     #include <signal.h>
     #include <sys/types.h>
     #include <sys/stat.h>
+    #include <sys/prctl.h>
     #include <unistd.h>
 #endif
 
@@ -175,6 +176,7 @@
 #include <rest/handlers/execute_analytics_action_rest_handler.h>
 #include <rest/handlers/get_analytics_actions_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
+#include <rest/server/options_request_handler.h>
 #include <rest/handlers/get_hardware_info_rest_handler.h>
 #include <rest/handlers/system_settings_handler.h>
 #include <rest/handlers/audio_transmission_rest_handler.h>
@@ -449,7 +451,6 @@ void calculateSpaceLimitOrLoadFromConfig(
 
     fileStorage->setSpaceLimit(fileStorage->calcInitialSpaceLimit());
 }
-
 
 #ifdef Q_OS_WIN
 static int freeGB(QString drive)
@@ -886,7 +887,7 @@ void MediaServerProcess::dumpSystemUsageStats()
     }
     const auto networkIfInfo = networkIfList.join(", ");
     if (m_mediaServer->setProperty(Qn::NETWORK_INTERFACES, networkIfInfo))
-        m_mediaServer->saveParams();
+        m_mediaServer->saveProperties();
 
     QnMutexLocker lk( &m_mutex );
     if(m_dumpSystemResourceUsageTaskId == 0)  //monitoring cancelled
@@ -1221,7 +1222,7 @@ void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
         }
     }
 
-    server->saveParams();
+    server->saveProperties();
     m_mediaServer->setStatus(Qn::Online);
 
     #ifdef ENABLE_EXTENDED_STATISTICS
@@ -1229,7 +1230,7 @@ void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
             [server](size_t count)
             {
                 server->setProperty(Qn::BOOKMARK_COUNT, QString::number(count));
-                server->saveParams();
+                server->saveProperties();
             });
     #endif
 }
@@ -1266,7 +1267,7 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIp)
         }
 
         if (server->setProperty(Qn::PUBLIC_IP, publicIp.toString(), QnResource::NO_ALLOW_EMPTY))
-            server->saveParams();
+            server->saveProperties();
 
         updateAddressesList(); //< update interface list to add/remove publicIP
     }
@@ -1437,19 +1438,6 @@ void MediaServerProcess::registerRestHandlers(
     processorPool->registerRedirectRule("/", welcomePage);
     processorPool->registerRedirectRule("/static", welcomePage);
     processorPool->registerRedirectRule("/static/", welcomePage);
-
-    auto reg =
-        [this, processorPool](
-            const QString& path,
-            QnRestRequestHandler* handler,
-            GlobalPermission permission = GlobalPermission::none)
-        {
-            processorPool->registerHandler(path, handler, permission);
-
-            const auto& cameraIdUrlParams = handler->cameraIdUrlParams();
-            if (!cameraIdUrlParams.isEmpty())
-                m_autoRequestForwarder->addCameraIdUrlParams(path, cameraIdUrlParams);
-        };
 
     // TODO: When supported by apidoctool, the comment to these constants should be parsed.
     const auto kAdmin = GlobalPermission::admin;
@@ -1769,7 +1757,7 @@ void MediaServerProcess::registerRestHandlers(
     /**%apidoc GET /api/pingSystem
      * Ping the system.
      * %param:string url System URL to ping.
-     * %param:string password System administrator password.
+     * %param:string getKey Authorization key ("auth" param) for the system to ping.
      * %return:object JSON with error code, error string and module information in case of
      *     successful ping. Error string could be empty in case of successful ping, "FAIL" if the
      *     specified system is unreachable or there is no any system, "UNAUTHORIZED" if the
@@ -2140,19 +2128,24 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/configure", new QnConfigureRestHandler(serverModule()), kAdmin);
 
     /**%apidoc POST /api/detachFromCloud
-     * Detach media server from cloud. Local admin user is enabled, admin password is changed to
+     * Detaches the Server from the Cloud. Local admin user is enabled, admin password is changed to
      * new value (if specified), all cloud users are disabled. Cloud link is removed. Function can
      * be called either via GET or POST method. POST data should be a json object.
      * %permissions Administrator.
      * %param[opt]:string password Set new admin password after detach.
-     * %param[opt]:string currentPassword Required if new admin password is provided.
-     * %return JSON result with error code
+     * %param:string currentPassword Current user password.
+     * %return JSON result with error code.
      */
     reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(serverModule(), cloudManagerGroup), kAdmin);
 
+    /**%apidoc POST /api/detachFromSystem
+     * Detaches the Server from the System and resets its state to the initial one.
+     * %permissions Administrator.
+     * %param:string currentPassword Current user password.
+     * %return JSON result with error code.
+     */
     reg("api/detachFromSystem", new QnDetachFromSystemRestHandler(
-        serverModule(),
-        &cloudManagerGroup->connectionManager, messageBus), kAdmin);
+        serverModule(), &cloudManagerGroup->connectionManager, messageBus), kAdmin);
 
     /**%apidoc[proprietary] POST /api/restoreState
      * Restore initial server state, i.e. <b>delete server's database</b>.
@@ -2630,6 +2623,33 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("ec2/deviceAnalyticsSettings",
         new nx::mediaserver::rest::DeviceAnalyticsSettingsHandler(serverModule()));
+
+    reg(
+        nx::network::http::Method::options,
+        QnRestProcessorPool::kAnyPath,
+        new OptionsRequestHandler());
+}
+
+void MediaServerProcess::reg(
+    const QString& path,
+    QnRestRequestHandler* handler,
+    GlobalPermission permission)
+{
+    reg(QnRestProcessorPool::kAnyHttpMethod, path, handler, permission);
+}
+
+void MediaServerProcess::reg(
+    const nx::network::http::Method::ValueType& method,
+    const QString& path,
+    QnRestRequestHandler* handler,
+    GlobalPermission permission)
+{
+    m_universalTcpListener->processorPool()->registerHandler(
+        method, path, handler, permission);
+
+    const auto& cameraIdUrlParams = handler->cameraIdUrlParams();
+    if (!cameraIdUrlParams.isEmpty())
+        m_autoRequestForwarder->addCameraIdUrlParams(path, cameraIdUrlParams);
 }
 
 template<class TcpConnectionProcessor, typename... ExtraParam>
@@ -3425,7 +3445,6 @@ void MediaServerProcess::stopObjects()
     WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(QThread::currentThread(), 3);
     waitingForObjectsToBeFreed.join();
 
-
     m_discoveryMonitor.reset();
     m_crashReporter.reset();
 
@@ -3589,6 +3608,10 @@ void MediaServerProcess::initCrashDump()
 
 #ifdef __linux__
     linux_exception::setSignalHandlingDisabled(serverModule()->settings().createFullCrashDump());
+    // This is needed because setting capability (CAP_NET_BIND_SERVICE in our case) on the
+    // executable automatically sets PR_SET_DUMPABLE to false which in turn stops core dumps from
+    // being created.
+    prctl(PR_SET_DUMPABLE, 1, 0, 0, 0, 0);
 #endif
     m_crashReporter = std::make_unique<ec2::CrashReporter>(commonModule());
 }
@@ -3720,7 +3743,7 @@ void MediaServerProcess::connectSignals()
     using namespace nx::vms::common::p2p::downloader;
     connect(
         this, &MediaServerProcess::started,
-        [this]() {this->serverModule()->findInstance<Downloader>()->atServerStart(); });
+        [this]() {this->serverModule()->findInstance<Downloader>()->startFoundDownloads(); });
 
     connect(commonModule()->resourceDiscoveryManager(),
         &QnResourceDiscoveryManager::CameraIPConflict, this,
@@ -3758,7 +3781,7 @@ void MediaServerProcess::connectSignals()
             const auto current = nx::network::UdtStatistics::global.internetBytesTransfered.load();
             const auto update = old + (qulonglong)current;
             if (server->setProperty(Qn::UDT_INTERNET_TRFFIC, QString::number(update))
-                && server->saveParams())
+                && server->saveProperties())
             {
                 NX_DEBUG(kLogTag, lm("%1 is updated to %2").args(Qn::UDT_INTERNET_TRFFIC, update));
                 nx::network::UdtStatistics::global.internetBytesTransfered -= current;
@@ -4195,7 +4218,8 @@ void MediaServerProcess::run()
     if (utils.timeToMakeDbBackup())
     {
         utils.backupDatabase(ec2::detail::QnDbManager::ecsDbFileName(
-            serverModule->settings().dataDir()));
+            serverModule->settings().dataDir()),
+            ec2::detail::QnDbManager::currentBuildNumber(appServerConnectionUrl().toLocalFile()));
     }
 
     if (!connectToDatabase())
@@ -4561,12 +4585,13 @@ void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodR
     // For "OPTIONS * RTSP/1.0"
     restrictions->allow("\\*", nx::network::http::AuthMethod::noAuth);
 
-    const auto webPrefix = QStringLiteral("(/web)?(/proxy/[^/]*(/[^/]*)?)?");
+    const auto webPrefix = std::string("(/web)?(/proxy/[^/]*(/[^/]*)?)?");
     restrictions->allow(webPrefix + "/api/ping", nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + "/api/camera_event.*", nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + "/api/moduleInformation", nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + "/api/gettime", nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + nx::vms::time_sync::TimeSyncManager::kTimeSyncUrlPath,
+    restrictions->allow(
+        webPrefix + nx::vms::time_sync::TimeSyncManager::kTimeSyncUrlPath.toStdString(),
         nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + "/api/getTimeZones", nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + "/api/getNonce", nx::network::http::AuthMethod::noAuth);
@@ -4590,5 +4615,12 @@ void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodR
     // authentication is implemented.
     // WARNING: This is severe vulnerability introduced in 3.0.
     restrictions->allow(webPrefix + "/api/installUpdateUnauthenticated",
+        nx::network::http::AuthMethod::noAuth);
+
+    nx::network::http::AuthMethodRestrictionList::Filter filter;
+    filter.protocol = nx::network::http::http_1_0.protocol.toStdString();
+    filter.method = nx::network::http::Method::options.toStdString();
+    restrictions->allow(
+        filter,
         nx::network::http::AuthMethod::noAuth);
 }

@@ -76,10 +76,10 @@ namespace ec2
             return;
         }
 
-        QnUuid connectionGuid;
+        std::string connectionGuid;
         for( ;; )
         {
-            if( !connectionGuid.isNull() )
+            if( !connectionGuid.empty() )
             {
                 //waiting for connection to be ready to receive more transactions
                 d->messageBus->waitForNewTransactionsReady( connectionGuid );
@@ -89,8 +89,8 @@ namespace ec2
             {
                 if( d->prevSocketError == SystemError::timedOut )
                 {
-                    NX_DEBUG(this, lit("Keep-alive timeout on transaction connection %1 from peer %2").
-                        arg(connectionGuid.toString()).arg(d->socket->getForeignAddress().toString()));
+                    NX_DEBUG(this, lm("Keep-alive timeout on transaction connection %1 from peer %2")
+                        .args(connectionGuid, d->socket->getForeignAddress().toString()));
                 }
                 break;
             }
@@ -109,8 +109,8 @@ namespace ec2
                 break;
             }
 
-            const QnUuid requestConnectionGuid( connectionGuidIter->second );
-            if( connectionGuid.isNull() )
+            const std::string requestConnectionGuid = connectionGuidIter->second.toStdString();
+            if( connectionGuid.empty() )
             {
                 connectionGuid = requestConnectionGuid;
                 d->messageBus->waitForNewTransactionsReady( connectionGuid ); // wait while transaction transport goes to the ReadyForStreamingState
@@ -127,9 +127,11 @@ namespace ec2
                     d->request,
                     d->requestBody ) )
             {
-                NX_WARNING(this, lit("Received transaction from %1 for unknown connection %2").
-                    arg(d->socket->getForeignAddress().toString()).arg(connectionGuid.toString()));
-                sendResponse( nx::network::http::StatusCode::notFound, nx::network::http::StringType() );
+                NX_WARNING(this, lm("Received transaction from %1 for unknown connection %2")
+                    .args(d->socket->getForeignAddress().toString(), connectionGuid));
+                sendResponse(
+                    nx::network::http::StatusCode::notFound,
+                    nx::network::http::StringType());
                 break;
             }
 
@@ -154,7 +156,7 @@ namespace ec2
                 break;
         }
 
-        if( !connectionGuid.isNull() )
+        if( !connectionGuid.empty() )
             d->messageBus->connectionFailure( connectionGuid );
     }
 }

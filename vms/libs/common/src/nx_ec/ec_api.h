@@ -1134,6 +1134,7 @@ signals :
     */
     void initNotification(const nx::vms::api::FullInfoData& fullData);
     void runtimeInfoChanged(const nx::vms::api::RuntimeData& runtimeInfo);
+    void runtimeInfoRemoved(const nx::vms::api::IdData& runtimeInfo);
 
     void reverseConnectionRequested(const nx::vms::api::ReverseConnectionData& reverseConnetionData);
 

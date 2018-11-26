@@ -184,7 +184,7 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
             pluginManifest.id, manifest->objectActions));
 
     setManifest(*manifest);
-    saveParams();
+    saveProperties();
     return CameraDiagnostics::NoErrorResult();
 }
 

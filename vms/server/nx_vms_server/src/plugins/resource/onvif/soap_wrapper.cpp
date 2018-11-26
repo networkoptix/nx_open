@@ -189,7 +189,7 @@ std::list<nx::common::utils::Credentials> DeviceSoapWrapper::getPossibleCredenti
 {
     QnResourceData resData = commonModule->dataPool()->data(manufacturer, model);
     auto credentials = resData.value<QList<nx::common::utils::Credentials>>(
-        Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
+        ResourceDataKey::kPossibleDefaultCredentials);
 
     return credentials.toStdList();
 }
@@ -201,7 +201,7 @@ nx::common::utils::Credentials DeviceSoapWrapper::getForcedCredentials(
 {
     QnResourceData resData = commonModule->dataPool()->data(manufacturer, model);
     auto credentials = resData.value<nx::common::utils::Credentials>(
-        Qn::FORCED_DEFAULT_CREDENTIALS_PARAM_NAME);
+        ResourceDataKey::kForcedDefaultCredentials);
 
     return credentials;
 }
@@ -232,14 +232,14 @@ bool DeviceSoapWrapper::fetchLoginPassword(
     }
 
     QnResourceData resData = commonModule->dataPool()->data(manufacturer, model);
-    int timeoutSec = resData.value<int>(Qn::kUnauthrizedTimeoutParamName);
+    auto timeoutSec = resData.value<int>(ResourceDataKey::kUnauthorizedTimeoutSec);
     if (timeoutSec > 0 && possibleCredentials.size() > 1)
     {
         possibleCredentials.erase(possibleCredentials.begin() + 1, possibleCredentials.end());
         NX_WARNING(this,
             lm("strict credentials list for camera %1 to 1 record. because of non zero '%2' parameter.").
             arg(endpoint()).
-            arg(Qn::kUnauthrizedTimeoutParamName));
+            arg(ResourceDataKey::kUnauthorizedTimeoutSec));
     }
 
     if (possibleCredentials.size() <= 1)

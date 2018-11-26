@@ -20,7 +20,7 @@ public:
 
     virtual void setOnGotTransaction(CommandHandler handler) override;
 
-    virtual QnUuid connectionGuid() const override;
+    virtual std::string connectionGuid() const override;
 
     virtual const TransactionTransportHeader& commonTransportHeaderOfRemoteTransaction() const override;
 

@@ -29,42 +29,28 @@ std::unique_ptr<AbstractLogger> buildLogger(
 
 void initializeGlobally(const nx::utils::ArgumentParser& arguments)
 {
-    bool defaultLoggerInitialized = false;
-
-    if (const auto value = arguments.get("log-file", "lf"))
-    {
-        log::Settings logSettings;
-        logSettings.loggers.resize(1);
-        logSettings.loggers.front().logBaseName = *value;
-        setMainLogger(buildLogger(logSettings, QString()));
-        defaultLoggerInitialized = true;
-    }
-
-    if (const auto value = arguments.get("log-level", "ll"))
-    {
-        LevelSettings level;
-        level.parse(*value);
-        mainLogger()->setDefaultLevel(level.primary);
-        mainLogger()->setLevelFilters(level.filters);
-        defaultLoggerInitialized = true;
-    }
-    
-    if (!defaultLoggerInitialized)
-        mainLogger()->setDefaultLevel(Level::none);
-
     log::Settings logSettings;
     logSettings.load(QnSettings(arguments));
+    const auto mainSettings =
+        [&logSettings]()
+        {
+            if (logSettings.loggers.empty())
+                logSettings.loggers.push_back(LoggerSettings());
+
+            return logSettings.loggers.front();
+        };
+
+    if (const auto value = arguments.get("log-file", "lf"))
+        mainSettings().logBaseName = *value;
+
+    if (const auto value = arguments.get("log-level", "ll"))
+        mainSettings().level.parse(*value);
+
     if (logSettings.loggers.empty())
-        return;
-
-    auto logger = buildLogger(logSettings, QString());
-    if (!logger)
-        return;
-
-    if (defaultLoggerInitialized)
-        addLogger(std::move(logger));
-    else
-        setMainLogger(std::move(logger));
+    {
+        if (auto logger = buildLogger(logSettings, QString()))
+            setMainLogger(std::move(logger));
+    }
 }
 
 } // namespace log

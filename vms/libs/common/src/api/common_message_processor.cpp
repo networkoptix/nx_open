@@ -128,6 +128,12 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         this,
         &QnCommonMessageProcessor::runtimeInfoChanged,
         connectionType);
+    connect(
+        connection,
+        &ec2::AbstractECConnection::runtimeInfoRemoved,
+        this,
+        &QnCommonMessageProcessor::runtimeInfoRemoved,
+        connectionType);
 
     const auto resourceManager = connection->getResourceNotificationManager();
     connect(

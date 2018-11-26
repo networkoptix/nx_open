@@ -180,9 +180,12 @@ void QnServerMessageProcessor::onResourceStatusChanged(
     {
         // It's own server. change status to online.
         auto connection = commonModule()->ec2Connection();
-        auto deviceAgent = connection->getResourceManager(Qn::kSystemAccess);
-        deviceAgent->setResourceStatusSync(resource->getId(), Qn::Online);
-        resource->setStatus(Qn::Online, Qn::StatusChangeReason::GotFromRemotePeer);
+        if (connection)
+        {
+            auto resourceManager = connection->getResourceManager(Qn::kSystemAccess);
+            resourceManager->setResourceStatusSync(resource->getId(), Qn::Online);
+            resource->setStatus(Qn::Online, Qn::StatusChangeReason::GotFromRemotePeer);
+        }
     }
     else if (resource->getParentId() == commonModule()->moduleGUID() &&
         resource.dynamicCast<QnStorageResource>())

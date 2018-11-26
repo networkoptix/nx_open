@@ -73,10 +73,7 @@ include(CMakeParseArguments)
 include(CMakeDependentOption)
 include(ExternalProject)
 
-cmake_dependent_option(codeSigning "Enable code signing"
-    ON "NOT developerBuild"
-    OFF
-)
+nx_option(codeSigning "Enable code signing" OFF)
 
 include(target_detection)
 include(utils)

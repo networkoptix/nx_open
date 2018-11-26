@@ -79,7 +79,7 @@ JsonRestResponse AnalyticsEngineSettingsHandler::executePost(
     }
 
     engine->setSettingsValues(settings.toVariantMap());
-    engine->saveParams();
+    engine->saveProperties();
 
     JsonRestResponse response(http::StatusCode::ok);
     response.json.setReply(QJsonObject::fromVariantMap(engine->settingsValues()));

@@ -42,7 +42,6 @@ QnJsonRestResult SetPrimaryTimeServerRestHandler::execute(
 
     auto settings = commonModule->globalSettings();
     settings->setPrimaryTimeServer(id);
-    settings->setSynchronizingTimeWithInternet(id.isNull());
     settings->synchronizeNow();
     return result;
 }

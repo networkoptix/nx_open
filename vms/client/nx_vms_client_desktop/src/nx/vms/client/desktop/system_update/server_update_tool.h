@@ -19,15 +19,17 @@
 #include <utils/update/zip_utils.h>
 #include <nx/vms/client/desktop/utils/upload_state.h>
 
+#include <nx/vms/common/p2p/downloader/downloader.h>
+#include <nx/vms/common/p2p/downloader/private/abstract_peer_manager.h>
+
 #include "update_contents.h"
+
+namespace nx::vms::common::p2p::downloader { class SingleConnectionPeerManager; }
 
 namespace nx::vms::client::desktop {
 
 class UploadManager;
 class ServerUpdatesModel;
-
-using Downloader = vms::common::p2p::downloader::Downloader;
-using FileInformation = vms::common::p2p::downloader::FileInformation;
 
 /**
  * A tool to interact with remote server state.
@@ -40,11 +42,17 @@ using FileInformation = vms::common::p2p::downloader::FileInformation;
  * Note: this class should survive some time until its internal threads are dead.
  */
 class ServerUpdateTool:
-        public Connective<QObject>,
-        public QnConnectionContextAware
+    public Connective<QObject>,
+    public QnConnectionContextAware,
+    public nx::vms::common::p2p::downloader::AbstractPeerManagerFactory
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
+    using UpdateContents = nx::update::UpdateContents;
+    using Downloader = vms::common::p2p::downloader::Downloader;
+    using FileInformation = vms::common::p2p::downloader::FileInformation;
+    using SingleConnectionPeerManager = nx::vms::common::p2p::downloader::SingleConnectionPeerManager;
+    using PeerManagerPtr = nx::vms::common::p2p::downloader::AbstractPeerManager*;
 
 public:
     ServerUpdateTool(QObject* parent = nullptr);
@@ -118,22 +126,34 @@ public:
 
     // Start uploading local update packages to the server(s).
     bool startUpload(const UpdateContents& contents);
+    void startUpload(
+        const QnMediaServerResourcePtr& server,
+        const QStringList& files,
+        QDir directory);
     void stopUpload();
+
+    QDir getDownloadDir() const;
 
     struct ProgressInfo
     {
         int current = 0;
         int max = 0;
+        int active = 0;
+        int done = 0;
         // This flags help UI to pick proper caption for a progress.
         bool downloadingClient = false;
         bool downloadingServers = false;
+        /** Client is downloading files for the servers without internet. */
+        bool downloadingForServers = false;
+        /** Client is uploading update files to mediaservers. */
         bool uploading = false;
         bool installingServers = false;
         bool installingClient = false;
     };
 
     // Calculates a progress for uploading files to the server.
-    ProgressInfo calculateUploadProgress();
+    void calculateUploadProgress(ProgressInfo& progress);
+    void calculateManualDownloadProgress(ProgressInfo& progress);
 
     OfflineUpdateState getUploaderState() const;
 
@@ -178,6 +198,34 @@ public:
     QString getUpdateInformationUrl() const;
     QString getInstalledUpdateInfomationUrl() const;
 
+    virtual PeerManagerPtr createPeerManager(
+        FileInformation::PeerSelectionPolicy peerPolicy,
+        const QList<QnUuid>& additionalPeers) override;
+
+    /** Starts downloading the packages for the servers without internet. */
+    void startManualDownloads(const UpdateContents& contents);
+
+    /** Checks if there are any manual downloads. */
+    bool hasManualDownloads() const;
+
+    /**
+     * Starts uploading package to the servers.
+     * It will upload package to servers, mentioned in package.targets.
+     * This field is set when we verify update contents.
+     * @param package Package to be uploaded
+     * @param sourceDir Directory that contains this package
+     */
+    void uploadPackage(const nx::update::Package& package, QDir sourceDir);
+
+    /**
+     * Updates URL of the current mediaserver.
+     */
+    void setServerUrl(nx::utils::Url serverUrl, QnUuid serverId);
+
+signals:
+    void packageDownloaded(const nx::update::Package& package);
+    void packageDownloadFailed(const nx::update::Package& package, const QString& error);
+
 private:
     // Handlers for resource updates.
     void atResourceAdded(const QnResourcePtr& resource);
@@ -201,6 +249,13 @@ private:
     void saveInternalState();
     void loadInternalState();
     void changeUploadState(OfflineUpdateState newState);
+
+    /** Callbacks for m_downloader. */
+    void atDownloaderStatusChanged(const FileInformation& fileInformation);
+    void atChunkDownloadFailed(const QString& fileName);
+    void atDownloadFailed(const QString& fileName);
+
+    const nx::update::Package* findPackageForFile(const QString& fileName) const;
 
 private:
     OfflineUpdateState m_offlineUpdaterState = OfflineUpdateState::initial;
@@ -227,6 +282,12 @@ private:
     std::unique_ptr<UploadManager> m_uploadManager;
     std::set<QString> m_activeUploads;
     std::set<QString> m_completedUploads;
+
+    std::map<QString, int> m_activeDownloads;
+    std::set<QString> m_completeDownloads;
+    std::set<QString> m_failedDownloads;
+    std::set<QString> m_issuedDownloads;
+
     std::map<QString, nx::vms::client::desktop::UploadState> m_uploadStateById;
 
     // Current update manifest. We get it from mediaservers, or overriding it by calling
@@ -252,6 +313,15 @@ private:
     TimePoint m_timeStartedInstall;
     bool m_protoProblemDetected = false;
     QSet<rest::Handle> m_requestingInstall;
+
+    /** We use this downloader when client downloads updates for server without internet. */
+    std::unique_ptr<Downloader> m_downloader;
+    /** Special peer manager to be used in the downloader. */
+    std::unique_ptr<vms::common::p2p::downloader::SingleConnectionPeerManager> m_peerManager;
+    /** List of packages to be downloaded and uploaded by the client. */
+    QList<nx::update::Package> m_manualPackages;
+    /** Direct connection to the mediaserver. */
+    rest::QnConnectionPtr m_serverConnection;
 };
 
 /**
@@ -259,6 +329,8 @@ private:
  * Upcombiner is special server utility, that combines several update packages
  * to a single zip archive.
  */
-QUrl generateUpdatePackageUrl(const UpdateContents& contents, const QSet<QnUuid>& targets, QnResourcePool* resourcePool);
+QUrl generateUpdatePackageUrl(
+    const nx::update::UpdateContents& contents,
+    const QSet<QnUuid>& targets, QnResourcePool* resourcePool);
 
 } // namespace nx::vms::client::desktop

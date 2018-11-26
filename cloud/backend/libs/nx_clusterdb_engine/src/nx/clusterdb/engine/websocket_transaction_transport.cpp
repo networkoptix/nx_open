@@ -15,7 +15,7 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
     TransactionLog* const transactionLog,
     const std::string& systemId,
     const OutgoingCommandFilter& filter,
-    const QnUuid& connectionId,
+    const std::string& connectionId,
     std::unique_ptr<network::websocket::WebSocket> webSocket,
     vms::api::PeerDataEx localPeerData,
     vms::api::PeerDataEx remotePeerData)
@@ -41,7 +41,7 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
     m_commonTransactionHeader.systemId = systemId;
     m_commonTransactionHeader.peerId = remotePeerData.id.toSimpleByteArray().toStdString();
     m_commonTransactionHeader.endpoint = remotePeerEndpoint();
-    m_commonTransactionHeader.connectionId = connectionId.toSimpleString().toStdString();
+    m_commonTransactionHeader.connectionId = connectionId;
     m_commonTransactionHeader.vmsTransportHeader.sender = remotePeerData.id;
     m_commonTransactionHeader.transactionFormatVersion = remotePeerData.protoVersion;
 
@@ -121,7 +121,7 @@ void WebSocketTransactionTransport::reportCommandReceived(
     TransactionTransportHeader cdbTransportHeader(m_protocolVersionRange.currentVersion());
     cdbTransportHeader.endpoint = remotePeerEndpoint();
     cdbTransportHeader.systemId = m_transactionLogReader->systemId();
-    cdbTransportHeader.connectionId = connectionGuid().toSimpleByteArray().toStdString();
+    cdbTransportHeader.connectionId = connectionGuid();
     //cdbTransportHeader.vmsTransportHeader //< Empty vms transport header
     cdbTransportHeader.transactionFormatVersion = highestProtocolVersionCompatibleWithRemotePeer();
 
@@ -215,7 +215,7 @@ void WebSocketTransactionTransport::setOnGotTransaction(CommandHandler handler)
     m_gotTransactionEventHandler = std::move(handler);
 }
 
-QnUuid WebSocketTransactionTransport::connectionGuid() const
+std::string WebSocketTransactionTransport::connectionGuid() const
 {
     return m_connectionGuid;
 }

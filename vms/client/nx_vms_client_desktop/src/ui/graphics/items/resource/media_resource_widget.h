@@ -164,15 +164,30 @@ public:
     bool isAnalyticsEnabled() const;
     void setAnalyticsEnabled(bool analyticsEnabled);
 
-    void setAnalyticsSelectionEnabled(bool enabled);
-    QRectF analyticsSelection() const;
-    void setAnalyticsSelection(const QRectF& value);
+    enum class AreaType
+    {
+        none,
+        motion,
+        analytics
+    };
+
+    AreaType areaSelectionType() const;
+    void setAreaSelectionType(AreaType value);
+    void unsetAreaSelectionType(AreaType value);
+
+    bool areaSelectionEnabled() const;
+    void setAreaSelectionEnabled(bool value);
+    void setAreaSelectionEnabled(AreaType areaType, bool value);
+    QRectF analyticsFilterRect() const;
+    void setAnalyticsFilterRect(const QRectF& value);
 
     nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr analyticsMetadataProvider() const;
 
 signals:
     void motionSelectionChanged();
-    void analyticsSelectionChanged();
+    void areaSelectionTypeChanged();
+    void areaSelectionEnabledChanged();
+    void analyticsFilterRectChanged();
     void displayChanged();
     void fisheyeChanged();
     void dewarpingParamsChanged();
@@ -373,6 +388,8 @@ private:
     void initAreaHighlightOverlay();
     void initStatusOverlayController();
 
+    inline SoftwareTriggerInfo makeTriggerInfo(const nx::vms::event::RulePtr& rule) const;
+
     void createTriggerIfRelevant(const nx::vms::event::RulePtr& rule);
     bool isRelevantTriggerRule(const nx::vms::event::RulePtr& rule) const;
 
@@ -405,7 +422,10 @@ private:
         ButtonHandler executor);
 
     using TriggerDataList = QList<SoftwareTrigger>;
-    TriggerDataList::iterator lowerBoundbyTriggerRuleId(const QnUuid& id);
+    TriggerDataList::iterator lowerBoundbyTriggerName(const nx::vms::event::RulePtr& rule);
+
+    void updateSelectedArea();
+    void handleSelectedAreaChanged();
 
 private:
     QScopedPointer<nx::vms::client::desktop::MediaResourceWidgetPrivate> d;
@@ -470,6 +490,9 @@ private:
 
     nx::vms::client::desktop::AreaHighlightOverlayWidget* m_areaHighlightOverlayWidget = nullptr;
     nx::vms::client::desktop::AreaSelectOverlayWidget* m_areaSelectOverlayWidget = nullptr;
+
+    AreaType m_areaSelectionType{AreaType::none};
+    QRectF m_analyticsFilterRect;
 
     TriggerDataList m_triggers;
 

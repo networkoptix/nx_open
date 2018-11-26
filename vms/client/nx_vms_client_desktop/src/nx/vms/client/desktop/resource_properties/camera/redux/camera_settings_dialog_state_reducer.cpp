@@ -487,10 +487,21 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     state.devicesDescription.isDtsBased = combinedValue(cameras,
         [](const Camera& camera) { return camera->isDtsBased(); });
+    state.devicesDescription.supportsRecording = combinedValue(cameras,
+        [](const Camera& camera) { return camera->hasVideo() || camera->isAudioSupported(); });
+
     state.devicesDescription.isWearable = combinedValue(cameras,
         [](const Camera& camera) { return camera->hasFlags(Qn::wearable_camera); });
     state.devicesDescription.isIoModule = combinedValue(cameras,
         [](const Camera& camera) { return camera->isIOModule(); });
+
+    state.devicesDescription.supportsVideo = combinedValue(cameras,
+        [](const Camera& camera) { return camera->hasVideo(); });
+    state.devicesDescription.supportsAudio = combinedValue(cameras,
+        [](const Camera& camera) { return camera->isAudioSupported(); });
+    state.devicesDescription.isAudioForced = combinedValue(cameras,
+        [](const Camera& camera) { return camera->isAudioForced(); });
+
     state.devicesDescription.hasMotion = combinedValue(cameras,
         [](const Camera& camera) { return camera->hasMotion(); });
     state.devicesDescription.hasDualStreamingCapability = combinedValue(cameras,
@@ -1344,17 +1355,17 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsV
         state.analytics.engines.end(),
         [engineId](const auto& engine) { return engine.id == engineId; }))
     {
-        return std::make_pair(false, std::move(state));
+        return {false, std::move(state)};
     }
 
     auto& storedValues = state.analytics.settingsValuesByEngineId[engineId];
     if (storedValues.get() == values)
-        return std::make_pair(false, std::move(state));
+        return {false, std::move(state)};
 
     storedValues.setUser(values);
     state.hasChanges = true;
 
-    return std::make_pair(true, std::move(state));
+    return {true, std::move(state)};
 }
 
 std::pair<bool, State> CameraSettingsDialogStateReducer::resetDeviceAgentSettingsValues(

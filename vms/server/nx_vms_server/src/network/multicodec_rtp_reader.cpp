@@ -456,7 +456,7 @@ nx::streaming::rtp::StreamParser* QnMulticodecRtpReader::createParser(const QStr
     if (codecName.isEmpty())
         return 0;
     else if (codecName == QLatin1String("H264"))
-        result = new nx::streaming::rtp::H264Parser(getResource()->getUniqueId());
+        result = new nx::streaming::rtp::H264Parser();
     else if (codecName == QLatin1String("H265"))
         result = new nx::streaming::rtp::HevcParser();
     else if (codecName == QLatin1String("JPEG"))
@@ -513,7 +513,7 @@ void QnMulticodecRtpReader::at_propertyChanged(const QnResourcePtr & res, const 
     if (isTransportChanged || isMediaPortChanged)
         pleaseStop();
 
-    if (key == Qn::TRUST_CAMERA_TIME_NAME)
+    if (key == ResourcePropertyKey::kTrustCameraTime)
         updateTimePolicy();
 }
 
@@ -617,7 +617,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
             if (camRes && m_role == Qn::CR_LiveVideo &&
                 camRes->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout))
             {
-                camRes->saveParams();
+                camRes->saveProperties();
             }
         }
     }
@@ -626,7 +626,6 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
 
     bool videoExist = false;
     bool audioExist = false;
-    int logicalVideoNum = 0;
     for (const auto& track: m_RtpSession.getTrackInfo())
     {
         videoExist |= track.sdpMedia.mediaType == nx::streaming::Sdp::MediaType::Video;
@@ -865,7 +864,7 @@ void QnMulticodecRtpReader::updateOnvifTime(
     if (!header->extension)
         return;
 
-    const auto bytesTillExtension = header->payloadOffset();
+    const int bytesTillExtension = header->payloadOffset();
     if (rtpPacketSize < bytesTillExtension)
     {
         NX_WARNING(this, "RTP packet size is less than expected, resetting onvif time");

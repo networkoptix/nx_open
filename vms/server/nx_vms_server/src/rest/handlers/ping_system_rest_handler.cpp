@@ -13,12 +13,11 @@
 #include <rest/server/rest_connection_processor.h>
 #include <licensing/license_validator.h>
 
-//#define START_LICENSES_DEBUG
+// #define START_LICENSES_DEBUG
 
-namespace
-{
-    const int defaultTimeoutMs = 10 * 1000;
-}
+static const int kDefaultTimeoutMs = 10 * 1000;
+static const QString kUrlParameter("url");
+static const QString kKeyParameter("getKey");
 
 int QnPingSystemRestHandler::executeGet(
         const QString& /*path*/,
@@ -26,27 +25,27 @@ int QnPingSystemRestHandler::executeGet(
         QnJsonRestResult& result,
         const QnRestConnectionProcessor* owner)
 {
-    nx::utils::Url url = params.value(lit("url"));
-    QString getKey = params.value(lit("getKey"));
+    nx::utils::Url url = params.value(kUrlParameter);
+    QString getKey = params.value(kKeyParameter);
 
     if (url.isEmpty())
     {
         result.setError(QnRestResult::ErrorDescriptor(
-            QnJsonRestResult::MissingParameter, lit("url")));
+            QnJsonRestResult::MissingParameter, kUrlParameter));
         return nx::network::http::StatusCode::ok;
     }
 
     if (!url.isValid())
     {
         result.setError(QnRestResult::ErrorDescriptor(
-            QnJsonRestResult::InvalidParameter, lit("url")));
+            QnJsonRestResult::InvalidParameter, kUrlParameter));
         return nx::network::http::StatusCode::ok;
     }
 
     if (getKey.isEmpty())
     {
         result.setError(QnRestResult::ErrorDescriptor(
-            QnJsonRestResult::MissingParameter, lit("password")));
+            QnJsonRestResult::MissingParameter, kKeyParameter));
         return nx::network::http::StatusCode::ok;
     }
 
@@ -114,7 +113,7 @@ nx::vms::api::ModuleInformation QnPingSystemRestHandler::remoteModuleInformation
         const QString& getKey,
         int &status)
 {
-    CLSimpleHTTPClient client(url, defaultTimeoutMs, QAuthenticator());
+    CLSimpleHTTPClient client(url, kDefaultTimeoutMs, QAuthenticator());
     status = client.doGET(
         lit("api/moduleInformationAuthenticated?checkOwnerPermissions=true&%1=%2").
         arg(QLatin1String(Qn::URL_QUERY_AUTH_KEY_NAME)).arg(getKey));

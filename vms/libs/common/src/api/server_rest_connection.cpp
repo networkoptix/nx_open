@@ -61,7 +61,7 @@ namespace rest
 ServerConnection::ServerConnection(
     QnCommonModule* commonModule,
     const QnUuid& serverId,
-    nx::utils::Url directUrl)
+    const nx::utils::Url& directUrl)
     :
     QObject(),
     QnCommonModuleAware(commonModule),
@@ -408,19 +408,6 @@ Handle ServerConnection::addFileUpload(
     };
     QString path = lit("/api/downloads/%1").arg(fileName);
     return executePost(path, params, QByteArray(), QByteArray(), callback, targetThread);
-}
-
-Handle ServerConnection::validateFileInformation(
-    const QString& url,
-    int expectedSize,
-    GetCallback callback,
-    QThread* targetThread)
-{
-    return executeGet(
-        lit("/api/downloads/%1/validate").arg(url),
-        QnRequestParamList{{lit("expected"), QString::number(expectedSize)}},
-        callback,
-        targetThread);
 }
 
 Handle ServerConnection::removeFileDownload(

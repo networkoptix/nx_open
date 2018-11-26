@@ -12,27 +12,50 @@ class QnHttpConnectionListener;
 
 class QnRestProcessorPool
 {
+    using HandlersByPath = QMap<QString, QnRestRequestHandlerPtr>;
+    using Handlers = std::map<nx::network::http::Method::ValueType, HandlersByPath>;
+    using RedirectRules = QMap<QString, QString>;
+
 public:
-    typedef QMap<QString, QnRestRequestHandlerPtr> Handlers;
-    typedef QMap<QString, QString> RedirectRules;
+    static const nx::network::http::Method::ValueType kAnyHttpMethod;
+    static const QString kAnyPath;
 
-    QnRestProcessorPool();
-
-    /*!
-        Takes ownership of \a handler
-    */
-    void registerHandler(const QString& path, QnRestRequestHandler* handler,
+    void registerHandler(
+        const QString& path,
+        QnRestRequestHandler* handler,
         GlobalPermission permission = GlobalPermission::none);
-    QnRestRequestHandlerPtr findHandler( QString path ) const;
-    const Handlers& handlers() const;
 
-    void registerRedirectRule( const QString& path, const QString& newPath );
-    boost::optional<QString> getRedirectRule( const QString& path );
+    void registerHandler(
+        nx::network::http::Method::ValueType httpMethod,
+        const QString& path,
+        QnRestRequestHandler* handler,
+        GlobalPermission permission = GlobalPermission::none);
+
+    QnRestRequestHandlerPtr findHandler(
+        const nx::network::http::Method::ValueType& httpMethod,
+        const QString& path) const;
+
+    void registerRedirectRule(const QString& path, const QString& newPath);
+    boost::optional<QString> getRedirectRule(const QString& path);
 
 private:
+    QnRestRequestHandlerPtr findHandlerForSpecificMethod(
+        const nx::network::http::Method::ValueType& httpMethod,
+        const QString& path) const;
+
+    QnRestRequestHandlerPtr findHandlerByPath(
+        const HandlersByPath& handlersByPath,
+        const QString& path) const;
+
+private:
+    /**
+     * NOTE: Empty method name means any method.
+     */
     Handlers m_handlers;
     RedirectRules m_redirectRules;
 };
+
+//-------------------------------------------------------------------------------------------------
 
 class QnRestConnectionProcessor: public QnTCPConnectionProcessor
 {

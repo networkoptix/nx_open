@@ -5,6 +5,7 @@
 #include <QtGui/QHoverEvent>
 
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
+#include <nx/vms/client/desktop/utils/widget_utils.h>
 
 namespace nx::vms::client::desktop {
 
@@ -118,17 +119,11 @@ bool EventRibbon::event(QEvent* event)
         }
 
         case QEvent::Enter:
-            d->updateHover(true, static_cast<QEnterEvent*>(event)->pos());
-            break;
-
-        case QEvent::HoverEnter:
-        case QEvent::HoverMove:
-            d->updateHover(true, static_cast<QHoverEvent*>(event)->pos());
-            break;
-
         case QEvent::Leave:
+        case QEvent::HoverEnter:
         case QEvent::HoverLeave:
-            d->updateHover(false, QPoint());
+        case QEvent::HoverMove:
+            d->updateHover();
             break;
 
         default:

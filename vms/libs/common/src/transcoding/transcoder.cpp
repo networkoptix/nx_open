@@ -134,7 +134,7 @@ QSize findSavedResolution(const QnConstCompressedVideoDataPtr& video)
     QnResourcePtr res = video->dataProvider->getResource();
     if (!res)
         return result;
-    const CameraMediaStreams supportedMediaStreams = QJson::deserialized<CameraMediaStreams>(res->getProperty( Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME ).toLatin1() );
+    const CameraMediaStreams supportedMediaStreams = QJson::deserialized<CameraMediaStreams>(res->getProperty(ResourcePropertyKey::kMediaStreams).toLatin1() );
     for(const auto& stream: supportedMediaStreams.streams)
     {
         QStringList resolutionInfo = stream.resolution.split(L'x');

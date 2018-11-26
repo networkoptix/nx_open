@@ -11,29 +11,29 @@
 
 namespace {
 
-static const QString kDefaultSearchPath(lit(":/translations"));
-static const QString kDefaultPrefix(lit("common"));
-static const QString kTranslationPathPrefix = lit(":/translations/common_");
-static const QString kTranslationPathExtension = lit(".qm");
+static const QString kDefaultSearchPath(":/translations");
+static const QString kDefaultPrefix("common");
+static const QString kTranslationPathPrefix = ":/translations/common_";
+static const QString kTranslationPathExtension = ".qm";
 
 // Handling compatibility with older clients.
 static const QMap<QString, QString> kLocaleCodes30to31{
-    {lit("ar"), lit("ar_SA")},
-    {lit("de"), lit("de_DE")},
-    {lit("es"), lit("es_ES")},
-    {lit("fil"), lit("fil_PH")},
-    {lit("fr"), lit("fr_FR")},
-    {lit("he"), lit("he_IL")},
-    {lit("hr"), lit("hr_HR")},
-    {lit("hu"), lit("hu_HU")},
-    {lit("id"), lit("id_ID")},
-    {lit("ja"), lit("ja_JP")},
-    {lit("km"), lit("km_KH")},
-    {lit("ko"), lit("ko_KR")},
-    {lit("pl"), lit("pl_PL")},
-    {lit("ru"), lit("ru_RU")},
-    {lit("th"), lit("th_TH")},
-    {lit("tr"), lit("tr_TR")}
+    {"ar", "ar_SA"},
+    {"de", "de_DE"},
+    {"es", "es_ES"},
+    {"fil", "fil_PH"},
+    {"fr", "fr_FR"},
+    {"he", "he_IL"},
+    {"hr", "hr_HR"},
+    {"hu", "hu_HU"},
+    {"id", "id_ID"},
+    {"ja", "ja_JP"},
+    {"km", "km_KH"},
+    {"ko", "ko_KR"},
+    {"pl", "pl_PL"},
+    {"ru", "ru_RU"},
+    {"th", "th_TH"},
+    {"tr", "tr_TR"}
 };
 
 } // namespace
@@ -43,7 +43,7 @@ QnTranslationManager::QnTranslationManager(QObject *parent):
     m_translationsValid(false)
 {
     addPrefix(kDefaultPrefix);
-    addPrefix(lit("qtbase"));
+    addPrefix("qtbase");
     addSearchPath(kDefaultSearchPath);
 }
 

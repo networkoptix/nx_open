@@ -9,7 +9,6 @@
 class QnPlIsdResource: public nx::mediaserver::resource::Camera
 {
 public:
-    static QString MAX_FPS_PARAM_NAME;
     static const QString MANUFACTURE;
 
     QnPlIsdResource(QnMediaServerModule* serverModule);
@@ -35,7 +34,6 @@ protected:
     virtual void setCroppingPhysical(QRect cropping);
 
 private:
-    void setMaxFps(int f);
     CameraDiagnostics::Result doISDApiRequest( const nx::utils::Url& apiRequestUrl, QByteArray* const msgBody );
 };
 

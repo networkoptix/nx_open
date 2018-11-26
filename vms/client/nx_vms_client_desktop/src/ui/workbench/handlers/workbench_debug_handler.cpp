@@ -181,7 +181,7 @@ public:
                         camera->setCameraCapabilities(camera->getCameraCapabilities() & ~caps);
                     else
                         camera->setCameraCapabilities(camera->getCameraCapabilities() | caps);
-                    camera->saveParamsAsync();
+                    camera->savePropertiesAsync();
                 }
 
             });
@@ -378,7 +378,7 @@ public:
                     auto manifests = server->analyticsDrivers();
                     manifests.push_back(manifest);
                     server->setAnalyticsDrivers(manifests);
-                    server->saveParamsAsync();
+                    server->savePropertiesAsync();
 
                     serverIndex = (serverIndex + 1) % servers.size();
                 }
@@ -400,7 +400,7 @@ public:
 
                         camera->setSupportedAnalyticsEventTypeIds(QnUuid(), eventTypeIds);
 
-                        camera->saveParamsAsync();
+                        camera->savePropertiesAsync();
                     }
                 }
             });
@@ -411,13 +411,13 @@ public:
                 for (auto camera: resourcePool()->getAllCameras({}))
                 {
                     camera->setSupportedAnalyticsEventTypeIds(QnUuid(), {});
-                    camera->saveParamsAsync();
+                    camera->savePropertiesAsync();
                 }
 
                 for (auto server: resourcePool()->getAllServers(Qn::AnyStatus))
                 {
                     server->setAnalyticsDrivers({});
-                    server->saveParamsAsync();
+                    server->savePropertiesAsync();
                 }
             });
     }

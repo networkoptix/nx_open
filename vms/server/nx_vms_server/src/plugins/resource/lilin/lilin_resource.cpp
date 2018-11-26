@@ -23,7 +23,7 @@ CameraDiagnostics::Result LilinResource::initializeCameraDriver()
         return result;
 
     setCameraCapability(Qn::RemoteArchiveCapability, true);
-    saveParams();
+    saveProperties();
 
     return CameraDiagnostics::NoErrorResult();
 }

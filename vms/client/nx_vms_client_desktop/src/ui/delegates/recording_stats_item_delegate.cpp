@@ -10,6 +10,8 @@
 
 #include <utils/common/scoped_painter_rollback.h>
 
+using RowType = QnRecordingStatsModel::RowType;
+
 namespace {
 
 const int kMinColumnWidth = 160;
@@ -18,6 +20,11 @@ const int kTotalLineOffset = 4;
 const int kTotalCamerasFontWeight = QFont::Bold;
 const int kForeignCamerasFontWeight = QFont::Normal;
 const int kFontWeight = QFont::DemiBold;
+
+QnRecordingStatsModel::RowType rowType(const QModelIndex& index)
+{
+    return index.data(QnRecordingStatsModel::RowKind).value<RowType>();
+}
 
 } // namespace
 
@@ -47,7 +54,7 @@ void QnRecordingStatsItemDelegate::paint(QPainter* painter, const QStyleOptionVi
     const bool isCameraName = index.column() == QnRecordingStatsModel::CameraNameColumn;
 
     const auto type = rowType(index);
-    if (isCameraName && (type == RowType::normal))
+    if (isCameraName && (type == RowType::Normal))
     {
         m_resourceDelegate->paint(painter, option, index);
         return;
@@ -63,7 +70,7 @@ void QnRecordingStatsItemDelegate::paint(QPainter* painter, const QStyleOptionVi
 
     opt.text = QString();
 
-    const bool isTotal = (type == RowType::total);
+    const bool isTotal = (type == RowType::Totals);
 
     if (isTotal)
         opt.rect = opt.rect.adjusted(0, kTotalLineOffset, 0, 0);
@@ -73,7 +80,7 @@ void QnRecordingStatsItemDelegate::paint(QPainter* painter, const QStyleOptionVi
     if (!isCameraName)
     {
         /* Draw chart manually: */
-        qreal chartData = index.data(Qn::RecordingStatChartDataRole).toReal();
+        qreal chartData = index.data(QnRecordingStatsModel::ChartData).toReal();
         QRect chartRect = opt.rect.adjusted(style::Metrics::kStandardPadding, 1, -1, -1);
         chartRect.setWidth(chartRect.width() * chartData);
         painter->fillRect(chartRect, m_colors.chartBackground);
@@ -97,7 +104,7 @@ void QnRecordingStatsItemDelegate::paint(QPainter* painter, const QStyleOptionVi
 QSize QnRecordingStatsItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
     const auto type = rowType(index);
-    const bool isNormal = (type == RowType::normal);
+    const bool isNormal = (type == RowType::Normal);
 
     if (isNormal && index.column() == QnRecordingStatsModel::CameraNameColumn)
         return m_resourceDelegate->sizeHint(option, index);
@@ -105,7 +112,7 @@ QSize QnRecordingStatsItemDelegate::sizeHint(const QStyleOptionViewItem& option,
     QSize size = base_type::sizeHint(option, index);
     if (isNormal)
         size.setWidth(std::max(size.width(), kMinColumnWidth));
-    else if (type == RowType::total)
+    else if (type == RowType::Totals)
         size.setHeight(size.height() + kTotalLineOffset * 3);
 
     return size;
@@ -116,18 +123,18 @@ void QnRecordingStatsItemDelegate::initStyleOption(QStyleOptionViewItem* option,
     base_type::initStyleOption(option, index);
     switch (rowType(index))
     {
-        case RowType::normal:
+        case RowType::Normal:
             option->font.setWeight(kFontWeight);
             option->palette.setColor(QPalette::Text, m_colors.chartForeground);
             break;
-        case RowType::foreign:
+        case RowType::Foreign:
             option->font.setWeight(kForeignCamerasFontWeight);
             option->palette.setColor(QPalette::Text,
                 index.column() == QnRecordingStatsModel::CameraNameColumn
                     ? m_colors.foreignForeground
                     : m_colors.chartForeground);
                 break;
-        case RowType::total:
+        case RowType::Totals:
             option->font.setWeight(kTotalCamerasFontWeight);
             option->palette.setColor(QPalette::Text, m_colors.totalForeground);
             break;
@@ -141,15 +148,3 @@ void QnRecordingStatsItemDelegate::initStyleOption(QStyleOptionViewItem* option,
     option->fontMetrics = QFontMetrics(option->font);
 }
 
-QnRecordingStatsItemDelegate::RowType QnRecordingStatsItemDelegate::rowType(const QModelIndex& index) const
-{
-    auto data = index.data(Qn::RecordingStatsDataRole).value<QnCamRecordingStatsData>();
-
-    if (data.uniqueId.isEmpty())
-        return RowType::total;
-
-    if (data.uniqueId == QnSortedRecordingStatsModel::kForeignCameras)
-        return RowType::foreign;
-
-    return RowType::normal;
-}

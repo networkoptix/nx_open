@@ -154,7 +154,13 @@ protected:
         if (connection->remotePeer().isClient())
         {
             modifiedTran = srcTran;
-            ec2::amendOutputDataIfNeeded(connection.staticCast<Connection>()->userAccessData(), &modifiedTran.params);
+            if (ec2::amendOutputDataIfNeeded(connection.staticCast<Connection>()->userAccessData(),
+                    &modifiedTran.params))
+            {
+                // Make persistent info null in case if data has been amended. We don't want such
+                // transactions be checked against serialized transactions cache.
+                modifiedTran.persistentInfo = ec2::QnAbstractTransaction::PersistentInfo();
+            }
         }
         const ec2::QnTransaction<T>& tran(connection->remotePeer().isClient() ? modifiedTran : srcTran);
 
@@ -394,6 +400,13 @@ private:
         const P2pConnectionPtr& connection,
         const TransportHeader& records);
 
+    /*
+     * In P2P mode a Client gets transactions only, without any protocol related system messages.
+     * It causes client do not receive peerFound/peerLost signals from messageBus any more.
+     * This function sends removeRuntimeInfoData transactions to the all connected clients
+     * about peer with specified id.
+     */
+    void sendRuntimeInfoRemovedToClients(const QnUuid& id);
 private slots:
     void at_gotMessage(QWeakPointer<ConnectionBase> connection, MessageType messageType, const QByteArray& payload);
     void at_stateChanged(QWeakPointer<ConnectionBase> connection, Connection::State state);
@@ -478,6 +491,7 @@ private:
     QElapsedTimer m_outConnectionsTimer;
     std::set<vms::api::PeerData> m_lastAlivePeers;
     std::atomic<bool> m_started{false};
+    QMap<QnUuid, Connection::State> m_lastConnectionState;
 };
 
 } // namespace p2p

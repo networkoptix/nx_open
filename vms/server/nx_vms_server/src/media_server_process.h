@@ -153,10 +153,25 @@ private:
     void moveHandlingCameras();
     void updateAddressesList();
     void initStoragesAsync(QnCommonMessageProcessor* messageProcessor);
+    
     void registerRestHandlers(
         nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup,
         QnUniversalTcpListener* tcpListener,
         ec2::TransactionMessageBusAdapter* messageBus);
+
+    /**
+     * This weird name is an apidoctool requirement.
+     */
+    void reg(
+        const QString& path,
+        QnRestRequestHandler* handler,
+        GlobalPermission permission = GlobalPermission::none);
+
+    void reg(
+        const nx::network::http::Method::ValueType& method,
+        const QString& path,
+        QnRestRequestHandler* handler,
+        GlobalPermission permission = GlobalPermission::none);
 
     template<class TcpConnectionProcessor, typename... ExtraParam>
     void regTcp(const QByteArray& protocol, const QString& path, ExtraParam... extraParam);
