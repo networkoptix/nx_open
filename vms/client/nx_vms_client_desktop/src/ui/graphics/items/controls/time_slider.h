@@ -182,6 +182,10 @@ public:
     milliseconds value() const;
     void setValue(milliseconds value, bool keepInWindow);
 
+    // Has different visual behavior from setValue(value, true).
+    // Acts as if user clicked timeline at specified position.
+    void navigateTo(milliseconds value);
+
     milliseconds selectionStart() const;
     void setSelectionStart(milliseconds selectionStart);
 
@@ -437,6 +441,9 @@ private:
     void setTargetEnd(milliseconds end);
     milliseconds targetStart();
     milliseconds targetEnd();
+
+    // Similar to ensureWindowContains, but honors side paddings.
+    void scrollIntoWindow(milliseconds position, bool animated);
 
     void generateProgressPatterns();
 
