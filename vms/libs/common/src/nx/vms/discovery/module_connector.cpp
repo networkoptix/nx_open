@@ -369,6 +369,7 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
     {
         if (!m_id.isNull())
         {
+            m_reconnectTimer.cancelSync();
             m_reconnectTimer.scheduleNextTry([this](){ connectToGroup(m_endpoints.begin()); });
             NX_VERBOSE(this, lm("No more endpoints, retry in %1").arg(m_reconnectTimer.currentDelay()));
             m_parent->m_disconnectedHandler(m_id);
