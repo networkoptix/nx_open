@@ -1,5 +1,4 @@
-#ifndef MANUAL_CAMERA_SEARCHER_H
-#define MANUAL_CAMERA_SEARCHER_H
+#pragma once
 
 #include <memory>
 #include <atomic>
@@ -13,7 +12,7 @@
 
 #include "manual_camera_search_task_manager.h"
 
-//! Scans different addresses simultaneously (using aio or concurrent operations)
+//! Scans different addresses simultaneously (using aio or concurrent operations).
 class QnManualCameraSearcher: public QnCommonModuleAware, public nx::network::QnStoppableAsync
 {
     using SearchDoneCallback = nx::utils::MoveOnlyFunc<void(QnManualCameraSearcher*)>;
@@ -37,10 +36,12 @@ private:
         nx::network::HostAddress startAddr,
         nx::network::HostAddress endAddr,
         QAuthenticator auth,
-        int port = nx::network::http::DEFAULT_HTTP_PORT
-        );
+        int port = nx::network::http::DEFAULT_HTTP_PORT);
 
-    void onOnlineHostsScanDone(std::vector<nx::network::HostAddress> onlineHosts, int port, QAuthenticator auth);
+    void onOnlineHostsScanDone(
+        std::vector<nx::network::HostAddress> onlineHosts,
+        int port,
+        QAuthenticator auth);
     void onManualSearchDone(QnManualResourceSearchList results);
 
     void changeState(QnManualResourceSearchStatus::State newState);
@@ -58,5 +59,3 @@ private:
 
     SearchDoneCallback m_searchDoneCallback;
 };
-
-#endif // MANUAL_CAMERA_SEARCHER_H

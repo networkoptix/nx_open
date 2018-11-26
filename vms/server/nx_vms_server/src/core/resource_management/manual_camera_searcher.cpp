@@ -1,13 +1,8 @@
-
 #include "manual_camera_searcher.h"
 
 #include <type_traits>
 #include <functional>
 
-#include <QtCore/QFutureWatcher>
-#include <QtConcurrent/QtConcurrentMap>
-
-#include <utils/common/scoped_thread_rollback.h>
 #include <nx/utils/log/log.h>
 
 #include <core/resource_management/camera_driver_restriction_list.h>
@@ -26,7 +21,6 @@ static const int PORT_SCAN_MAX_PROGRESS_PERCENT = 10;
 static_assert( PORT_SCAN_MAX_PROGRESS_PERCENT < MAX_PERCENT, "PORT_SCAN_MAX_PROGRESS_PERCENT must be less than MAX_PERCENT" );
 
 
-// TODO: Add UUID here.
 QnManualCameraSearcher::QnManualCameraSearcher(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule),
     m_state(QnManualResourceSearchStatus::Init),
@@ -45,26 +39,27 @@ QnManualCameraSearcher::~QnManualCameraSearcher()
 
 void QnManualCameraSearcher::pleaseStop(nx::utils::MoveOnlyFunc<void ()> completionHandler)
 {
-    m_pollable.dispatch(
+    // Stopping: task manager -> ip checker -> m_pollable -> completionHandler called.
+
+    auto onTaskManagerStop =
         [this, handler = std::move(completionHandler)]() mutable
         {
-            NX_VERBOSE(this, "Canceling search");
-            m_pollable.pleaseStopSync();
-            // TODO: Is it possible that after pleaseStopSync posts occur? How does BasicPollable
-            // handle posts after pleaseStop?
+            if (m_state != QnManualResourceSearchStatus::Finished)
+                changeState(QnManualResourceSearchStatus::Aborted);
+            m_pollable.pleaseStop(std::move(handler));
+        };
 
-            switch (m_state) {
-            case QnManualResourceSearchStatus::State::CheckingOnline:
-                m_ipChecker.pleaseStop(std::move(handler));
-                break;
-            case QnManualResourceSearchStatus::State::CheckingHost:
-                m_taskManager.pleaseStop(std::move(handler));
-                break;
-            default:
-                handler();
-                break;
-            }
-            changeState(QnManualResourceSearchStatus::Aborted);
+    auto onIpCheckerStop =
+        [this, handler = std::move(onTaskManagerStop)]() mutable
+        {
+            m_taskManager.pleaseStop(std::move(handler));
+        };
+
+    NX_VERBOSE(this, "Canceling search");
+    m_pollable.dispatch(
+        [this, handler = std::move(onIpCheckerStop)]() mutable
+        {
+            m_ipChecker.pleaseStop(std::move(handler));
         });
 }
 
@@ -76,7 +71,7 @@ QList<QnAbstractNetworkResourceSearcher*> QnManualCameraSearcher::getAllNetworkS
     {
         QnAbstractNetworkResourceSearcher* ns =
             dynamic_cast<QnAbstractNetworkResourceSearcher*>(as);
-        NX_ASSERT(ns);
+        NX_CRITICAL(ns);
 
         result.push_back(ns);
     }
@@ -241,4 +236,3 @@ void QnManualCameraSearcher::changeState(QnManualResourceSearchStatus::State new
     NX_VERBOSE(this, "State change: %1 -> %2", m_state.load(), newState);
     m_state = newState;
 }
-

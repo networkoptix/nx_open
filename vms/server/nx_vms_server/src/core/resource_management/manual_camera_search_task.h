@@ -6,8 +6,6 @@
 #include <core/resource_management/resource_searcher.h>
 #include <api/model/manual_camera_seach_reply.h>
 
-// TODO: Make sure threadPool is available on any call and it is not possible to destroy threadPool
-//      before QnSearchTask;
 // TODO: The way to cancel task should be added. Inherit from QnStoppableAsync and implement pleaseStop,
 // should call pleaseStop of searchers.
 class QnSearchTask

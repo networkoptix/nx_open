@@ -185,7 +185,6 @@ void QnManualSearchTaskManager::runSomePendingTasks()
     NX_ASSERT(m_pollable.isInSelfAioThread());
     NX_ASSERT(m_state == State::running);
 
-    // TODO: #dliman Should it use its own thread pool?
     QThreadPool* threadPool = commonModule()->resourceDiscoveryManager()->threadPool();
 
     while (canRunTask(threadPool))

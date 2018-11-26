@@ -2,10 +2,8 @@
 
 #include <nx/utils/uuid.h>
 
-// TODO: move to cpp, remove redundant
 #include <core/resource_management/manual_camera_searcher.h>
 #include <rest/server/json_rest_handler.h>
-#include <nx/utils/concurrent.h>
 #include <api/model/manual_camera_data.h>
 #include <nx/mediaserver/server_module_aware.h>
 

@@ -127,7 +127,6 @@ int QnManualCameraAdditionRestHandler::searchStopAction(
             searcher->pleaseStopSync(); // TODO: #dliman Use async?
             m_searchProcesses.erase(processUuid);
         }
-        // TODO: #dliman Should return 404 if not found.
     }
 
     QnManualCameraSearchReply reply;
