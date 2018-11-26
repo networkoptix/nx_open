@@ -3,7 +3,7 @@
 #include <iostream>
 #include <chrono>
 #include <ctime>
-#include <math.h>
+#include <cmath>
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/analytics/common_metadata_packet.h>
@@ -30,6 +30,14 @@ DeviceAgent::DeviceAgent(Engine* engine):
 {
     // TODO: #vkutin #mshevchenko Replace with true UUID generation when possible.
     *reinterpret_cast<void**>(m_objectId.bytes + sizeof(m_objectId) - sizeof(void*)) = this;
+}
+
+DeviceAgent::~DeviceAgent()
+{
+    m_terminated.store(true);
+    m_pluginEventGenerationLoopCondition.notify_all();
+    if (m_pluginEventThread)
+        m_pluginEventThread->join();
 }
 
 /**
@@ -68,9 +76,17 @@ std::string DeviceAgent::manifest() const
 )json";
 }
 
-void DeviceAgent::settingsChanged()
+void DeviceAgent::settingsReceived()
 {
-    NX_PRINT << __func__ << "()";
+    if (ini().throwPluginEventsFromDeviceAgent && !m_pluginEventThread)
+    {
+        NX_PRINT << __func__ << "(): Starting plugin event generation thread";
+        m_pluginEventThread = std::make_unique<std::thread>([this]() { processPluginEvents(); });
+    }
+    else
+    {
+        NX_PRINT << __func__ << "()";
+    }
 }
 
 bool DeviceAgent::pushCompressedVideoFrame(const CompressedVideoPacket* videoFrame)
@@ -134,7 +150,7 @@ bool DeviceAgent::pullMetadataPackets(std::vector<MetadataPacket*>* metadataPack
 
 Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
-    if (metadataTypes->isNull())
+    if (metadataTypes->isEmpty())
     {
         stopFetchingMetadata();
         return Error::noError;
@@ -149,26 +165,26 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/
 
     m_eventTypeId = kLineCrossingEventType; //< First event to produce.
 
-    auto metadataDigger =
-        [this]()
-        {
-            while (!m_stopping)
-            {
-                using namespace std::chrono_literals;
-                pushMetadataPacket(cookSomeEvents());
-                std::unique_lock<std::mutex> lock(m_eventGenerationLoopMutex);
-                // Sleep until the next event needs to be generated, or the thread is ordered to
-                // terminate (hence condition variable instead of sleep()). Return value (whether
-                // the timeout has occurred) and spurious wake-ups are ignored.
-                m_eventGenerationLoopCondition.wait_for(lock, 3000ms);
-            }
-        };
-
     if (ini().generateEvents)
     {
+        auto metadataDigger =
+            [this]()
+            {
+                while (!m_stopping)
+                {
+                    using namespace std::chrono_literals;
+                    pushMetadataPacket(cookSomeEvents());
+                    std::unique_lock<std::mutex> lock(m_eventGenerationLoopMutex);
+                    // Sleep until the next event needs to be generated, or the thread is ordered
+                    // to terminate (hence condition variable instead of sleep()). Return value
+                    // (whether the timeout has occurred) and spurious wake-ups are ignored.
+                    m_eventGenerationLoopCondition.wait_for(lock, 3000ms);
+                }
+            };
+
         NX_PRINT << "Starting event generation thread";
-        if (!m_thread)
-            m_thread.reset(new std::thread(metadataDigger));
+        if (!m_eventThread)
+            m_eventThread.reset(new std::thread(metadataDigger));
     }
 
     NX_OUTPUT << __func__ << "() END -> noError";
@@ -183,20 +199,50 @@ void DeviceAgent::stopFetchingMetadata()
     // Wake up event generation thread to avoid waiting until its sleeping period expires.
     m_eventGenerationLoopCondition.notify_all();
 
-    if (m_thread)
+    if (m_eventThread)
     {
-        m_thread->join();
-        m_thread.reset();
+        m_eventThread->join();
+        m_eventThread.reset();
     }
     m_stopping = false;
 
     NX_OUTPUT << __func__ << "() END -> noError";
 }
 
-nx::sdk::Settings* DeviceAgent::settings() const
+void DeviceAgent::processPluginEvents()
+{
+    while (!m_terminated)
+    {
+        using namespace std::chrono_literals;
+
+        pushPluginEvent(
+            IPluginEvent::Level::info,
+            "Info message from DeviceAgent",
+            "Info message description");
+
+        pushPluginEvent(
+            IPluginEvent::Level::warning,
+            "Warning message from DeviceAgent",
+            "Warning message description");
+
+        pushPluginEvent(
+            IPluginEvent::Level::error,
+            "Error message from DeviceAgent",
+            "Error message description");
+
+        // Sleep until the next event needs to be generated, or the thread is ordered to
+        // terminate (hence condition variable instead of sleep()). Return value (whether
+        // the timeout has occurred) and spurious wake-ups are ignored.
+        static const std::chrono::seconds kPluginEventGenerationPeriod{10};
+        std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
+        m_pluginEventGenerationLoopCondition.wait_for(lock, kPluginEventGenerationPeriod);
+    }
+}
+
+nx::sdk::Settings* DeviceAgent::pluginSideSettings() const
 {
     auto settings = new nx::sdk::CommonSettings();
-    settings->addSetting("nx.stub.device_agent.settings.number_0", "100");
+    settings->addSetting("plugin_side_number", "100");
 
     return settings;
 }

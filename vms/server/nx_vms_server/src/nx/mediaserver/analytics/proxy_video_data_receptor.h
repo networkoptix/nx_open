@@ -22,7 +22,6 @@ public:
 private:
     mutable QnMutex m_mutex;
     QWeakPointer<AbstractVideoDataReceptor> m_proxiedReceptor;
-
 };
 
 using ProxyVideoDataReceptorPtr = QSharedPointer<ProxyVideoDataReceptor>;

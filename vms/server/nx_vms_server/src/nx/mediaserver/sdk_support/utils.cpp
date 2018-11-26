@@ -38,27 +38,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 
 nx::utils::log::Tag kLogTag(QString("SdkSupportUtils"));
 
-/** @return Dir ending with "/", intended to receive manifest files. */
-static QString manifestFileDir()
-{
-    QString dir = QDir::cleanPath( //< Normalize to use forward slashes, as required by QFile.
-        QString::fromUtf8(pluginsIni().analyticsManifestOutputPath));
-
-    if (QFileInfo(dir).isRelative())
-    {
-        dir.insert(0,
-            // NOTE: QDir::cleanPath() removes trailing '/'.
-            QDir::cleanPath(QString::fromUtf8(nx::kit::IniConfig::iniFilesDir())) + lit("/"));
-    }
-
-    if (!dir.isEmpty() && dir.at(dir.size() - 1) != '/')
-        dir.append('/');
-
-    return dir;
-}
-
 } // namespace
-
 
 analytics::SdkObjectFactory* getSdkObjectFactory(QnMediaServerModule* serverModule)
 {
@@ -227,35 +207,6 @@ QVariantMap fromSdkSettings(const nx::sdk::Settings* sdkSettings)
     return result;
 }
 
-void saveManifestToFile(
-    const nx::utils::log::Tag& logTag,
-    const QString& manifest,
-    const QString& baseFileName)
-{
-    const QString dir = manifestFileDir();
-    const QString filename = dir + baseFileName + lit("_manifest.json");
-
-    using nx::utils::log::Level;
-    auto log = //< Can be used to return after logging: return log(...).
-        [&](Level level, const QString& message)
-        {
-            NX_UTILS_LOG(level, logTag) << lm("Analytics manifest: %1: [%2]")
-                .args(message, filename);
-        };
-
-    log(Level::info, lit("Saving to file"));
-
-    if (!nx::utils::file_system::ensureDir(dir))
-        return log(Level::error, lit("Unable to create directory for file"));
-
-    QFile f(filename);
-    if (!f.open(QFile::WriteOnly))
-        return log(Level::error, lit("Unable to (re)create file"));
-
-    if (f.write(manifest.toUtf8()) < 0)
-        return log(Level::error, lit("Unable to write to file"));
-}
-
 std::optional<nx::sdk::analytics::UncompressedVideoFrame::PixelFormat>
     pixelFormatFromEngineManifest(
         const nx::vms::api::analytics::EngineManifest& manifest,
@@ -320,6 +271,25 @@ resource::AnalyticsEngineResourceList toServerEngineList(
     }
 
     return result;
+}
+
+nx::vms::api::EventLevel fromSdkPluginEventLevel(nx::sdk::IPluginEvent::Level level)
+{
+    using namespace nx::sdk;
+    using namespace nx::vms::api;
+
+    switch (level)
+    {
+        case IPluginEvent::Level::info:
+            return EventLevel::InfoEventLevel;
+        case IPluginEvent::Level::warning:
+            return EventLevel::WarningEventLevel;
+        case IPluginEvent::Level::error:
+            return EventLevel::ErrorEventLevel;
+        default:
+            NX_ASSERT(false, "Wrong plugin event level");
+            return EventLevel::UndefinedEventLevel;
+    }
 }
 
 } // namespace nx::mediaserver::sdk_support

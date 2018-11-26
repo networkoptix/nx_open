@@ -82,7 +82,7 @@ void axisHandler::processRequest(
     const int kGuidStringLength = 36; //< Size of guid string.
     const int startIndex = request.toString().indexOf(kMessage);
     const QString uuid = request.toString().mid(startIndex + kMessage.size(), kGuidStringLength);
-    
+
     ElapsedEvents& m_events = m_monitor->eventsToCatch();
     const auto it = std::find_if(m_events.begin(), m_events.end(),
         [&uuid](ElapsedEvent& event) { return event.type.id == uuid; });
@@ -103,13 +103,13 @@ Monitor::Monitor(
     DeviceAgent* deviceAgent,
     const QUrl& url,
     const QAuthenticator& auth,
-    nx::sdk::analytics::MetadataHandler* metadataHandler)
+    nx::sdk::analytics::DeviceAgent::IHandler* handler)
     :
     m_deviceAgent(deviceAgent),
     m_url(url),
     m_endpoint(url.toString() + "/vapix/services"),
     m_auth(auth),
-    m_metadataHandler(metadataHandler),
+    m_handler(handler),
     m_httpServer(nullptr)
 {
 }
@@ -278,7 +278,7 @@ std::chrono::milliseconds Monitor::timeTillCheck() const
 void Monitor::sendEventStartedPacket(const EventType& event) const
 {
     auto packet = createCommonEventsMetadataPacket(event, /*active*/ true);
-    m_metadataHandler->handleMetadata(nx::sdk::Error::noError, packet);
+    m_handler->handleMetadata(packet);
     NX_PRINT
         << (event.isStateful() ? "Event [start] " : "Event [pulse] ")
         << event.fullName().toStdString() << " sent to server";
@@ -287,7 +287,7 @@ void Monitor::sendEventStartedPacket(const EventType& event) const
 void Monitor::sendEventStoppedPacket(const EventType& event) const
 {
     auto packet = createCommonEventsMetadataPacket(event, /*active*/ false);
-    m_metadataHandler->handleMetadata(nx::sdk::Error::noError, packet);
+    m_handler->handleMetadata(packet);
     NX_PRINT << "Event [stop] " << event.fullName().toUtf8().constData()
         << " sent to server";
 }

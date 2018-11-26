@@ -15,15 +15,13 @@ namespace nx::vms::common {
 
 using namespace nx::vms::api::analytics;
 
-QString AnalyticsEngineResource::kSettingsValuesProperty("settingsValues");
-QString AnalyticsEngineResource::kEngineManifestProperty("engineManifest");
+const QString AnalyticsEngineResource::kSettingsValuesProperty{"settingsValues"};
+const QString AnalyticsEngineResource::kEngineManifestProperty{"engineManifest"};
 
 AnalyticsEngineResource::AnalyticsEngineResource(QnCommonModule* commonModule):
     base_type(commonModule)
 {
 }
-
-AnalyticsEngineResource::~AnalyticsEngineResource() = default;
 
 EngineManifest AnalyticsEngineResource::manifest() const
 {
@@ -50,20 +48,11 @@ void AnalyticsEngineResource::setSettingsValues(const QVariantMap& values)
 AnalyticsPluginResourcePtr AnalyticsEngineResource::plugin() const
 {
     auto common = commonModule();
-    if (!common)
-    {
-        NX_ASSERT(false, "Can't access common module");
+    if (!NX_ASSERT(common, "Can't access common module"))
         return AnalyticsPluginResourcePtr();
-    }
 
     return common->resourcePool()->getResourceById(getParentId())
         .dynamicCast<AnalyticsPluginResource>();
-}
-
-bool AnalyticsEngineResource::isSelfAssignable() const
-{
-    // TODO: #dmishin take this value from manifest.
-    return true;
 }
 
 } // namespace nx::vms::common

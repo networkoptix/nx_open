@@ -76,21 +76,21 @@ void DeviceAgent::setSettings(const nx::sdk::Settings* settings)
     NX_OUTPUT << "}";
 }
 
-nx::sdk::Settings* DeviceAgent::settings() const
+nx::sdk::Settings* DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }
 
-nx::sdk::Error DeviceAgent::setMetadataHandler(MetadataHandler* metadataHandler)
+nx::sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::DeviceAgent::IHandler* handler)
 {
     NX_OUTPUT << __func__ << " Setting metadata handler";
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_metadataHandler = metadataHandler;
+    m_handler = handler;
     m_pipeline->setMetadataCallback(
         [this](MetadataPacket* packet)
         {
             NX_OUTPUT << __func__ << " Calling metadata handler";
-            m_metadataHandler->handleMetadata(Error::noError, packet);
+            m_handler->handleMetadata(packet);
         });
 
     NX_OUTPUT << __func__ << "() END -> noError";
@@ -120,7 +120,7 @@ nx::sdk::Error DeviceAgent::pushDataPacket(nx::sdk::analytics::DataPacket* dataP
 nx::sdk::Error DeviceAgent::setNeededMetadataTypes(
     const nx::sdk::analytics::IMetadataTypes* metadataTypes)
 {
-    if (metadataTypes->isNull())
+    if (metadataTypes->isEmpty())
     {
         stopFetchingMetadata();
         return nx::sdk::Error::noError;

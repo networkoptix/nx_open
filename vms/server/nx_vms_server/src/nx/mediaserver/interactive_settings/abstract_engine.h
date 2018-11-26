@@ -1,52 +1,87 @@
 #pragma once
 
-#include <memory>
-
-#include <QtCore/QObject>
+#include <QtCore/QPointer>
 #include <QtCore/QJsonObject>
 #include <QtCore/QVariantMap>
-#include <QtCore/QUrl>
 
 namespace nx::mediaserver::interactive_settings {
 
 namespace components { class Settings; }
 
-class AbstractEngine: public QObject
+/**
+ * Base class for interactive settings engines.
+ *
+ * The engine represents a model of interactive items. The model can be searialized to a simple
+ * JSON suitable for building GUI from it in client applications. Interactive items can be divided
+ * into the following categories:
+ *     - Value items: items which have value (like TextField, SpinBox)
+ *     - Triggers (so far this is only Button)
+ *     - Grouping items (like GroupBox or Row)
+ * All value items and triggers have unique names. For value items, the engine provides a values
+ * map. Some items constrain their values (e.g. min and max value of SpinBox). Also certain engines
+ * (like QML engine) may allow dependencies between item properties (e.g. min value of a SpinBox
+ * may depend on the value of a CheckBox). Engine handles such dependencies internally, no support
+ * from the client side is needed. Instead, after changing the values, a client application need to
+ * send items values to the engine, request an updated JSON model, and apply the new constraints to
+ * the created GUI controls.
+ */
+class AbstractEngine
 {
-    using base_type = QObject;
-
 public:
-    enum class Status
+    enum class ErrorCode
     {
-        idle,
-        loaded,
-        error,
+        ok,
+        cannotOpenFile,
+        fileIsTooLarge,
+        itemNameIsNotUnique,
+        parseError,
     };
 
-    AbstractEngine(QObject* parent = nullptr);
-    virtual ~AbstractEngine() override;
+    struct Error
+    {
+        ErrorCode code = ErrorCode::ok;
+        QString message;
 
-    virtual void load(const QByteArray& data) = 0;
-    virtual void load(const QString& fileName);
+        Error(ErrorCode code, const QString& message = QString()): code(code), message(message) {}
+    };
 
-    QJsonObject serialize() const;
+    AbstractEngine();
+    virtual ~AbstractEngine();
+
+    virtual Error loadModelFromData(const QByteArray& data) = 0;
+    virtual Error loadModelFromFile(const QString& fileName);
+
+    QJsonObject serializeModel() const;
+
+    /**
+     * @return Map from value name to a typed value.
+     */
     QVariantMap values() const;
 
+    /**
+     * @param values Map from value map to either a typed value or a string value representation.
+     */
     void applyValues(const QVariantMap& values) const;
-    QJsonObject tryValues(const QVariantMap& values) const;
 
-    Status status() const;
+    struct ModelAndValues
+    {
+        QJsonObject model;
+        QVariantMap values;
+    };
 
-    QObject* rootObject() const;
+    /**
+     * Applies the values, computes dependent properties, returns corrected model and values, and
+     * finally rolls back the changes to the stored model and values.
+     * @param values Map from value map to either a typed value or a string value representation.
+     */
+    ModelAndValues tryValues(const QVariantMap& values) const;
 
 protected:
-    void setStatus(Status status);
     components::Settings* settingsItem() const;
-    void setSettingsItem(components::Settings* item);
+    Error setSettingsItem(components::Settings* item);
 
 private:
-    class Private;
-    std::unique_ptr<Private> d;
+    QPointer<components::Settings> m_settingsItem;
 };
 
 } // namespace nx::mediaserver::interactive_settings

@@ -15,7 +15,7 @@ echo on
     mkdir "%BUILD_DIR%" || goto :end
     cd "%BUILD_DIR%" || goto :end
 
-    cmake "%SOURCE_DIR%" -Ax64 -Thost=x64 -G "Visual Studio 14 2015" || goto :end
+    cmake "%SOURCE_DIR%" -Ax64 -Tv140,host=x64 || goto :end
     cmake --build . || goto :end
 @echo off
 
@@ -38,6 +38,6 @@ echo Plugin built:
 echo %ARTIFACT%
 
 :end
-set RESULT=%ERRORLEVEL%
-endlocal
+:: Export the exit status behind endlocal.
+endlocal && set RESULT=%ERRORLEVEL%
 exit /b %RESULT%

@@ -6,16 +6,16 @@ namespace analytics {
 
 CommonAttribute::CommonAttribute(
     AttributeType attributeType,
-    const std::string& attributeName,
-    const std::string& attributeValue)
+    std::string attributeName,
+    std::string attributeValue)
     :
     m_type(attributeType),
-    m_name(attributeName),
-    m_value(attributeValue)
+    m_name(std::move(attributeName)),
+    m_value(std::move(attributeValue))
 {
 }
 
-const AttributeType CommonAttribute::type() const
+AttributeType CommonAttribute::type() const
 {
     return m_type;
 }

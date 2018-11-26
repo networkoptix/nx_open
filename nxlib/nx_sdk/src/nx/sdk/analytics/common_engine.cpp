@@ -8,6 +8,8 @@
 #include <nx/sdk/common_settings.h>
 #include <nx/sdk/common/string.h>
 
+#include <nx/sdk/common/plugin_event.h>
+
 #include "plugin.h"
 
 namespace nx {
@@ -53,6 +55,26 @@ std::string CommonEngine::getParamValue(const char* paramName)
     return m_settings[paramName];
 }
 
+void CommonEngine::pushPluginEvent(
+    nx::sdk::IPluginEvent::Level level,
+    std::string caption,
+    std::string description)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if (!m_handler)
+    {
+        NX_PRINT << __func__ << "(): "
+            << "INTERNAL ERROR: setHandler() was not called; ignoring plugin event";
+        return;
+    }
+
+    nxpt::ScopedRef<IPluginEvent> event(
+        new common::PluginEvent(level, std::move(caption), std::move(description)),
+        /*increaseRef*/ false);
+
+    m_handler->handlePluginEvent(event.get());
+}
+
 CommonEngine::~CommonEngine()
 {
     NX_PRINT << "Destroyed " << this;
@@ -78,10 +100,10 @@ void CommonEngine::setSettings(const nx::sdk::Settings* settings)
     if (!utils.fillAndOutputSettingsMap(&m_settings, settings, "Received settings"))
         return; //< The error is already logged.
 
-    settingsChanged();
+    settingsReceived();
 }
 
-nx::sdk::Settings* CommonEngine::settings() const
+nx::sdk::Settings* CommonEngine::pluginSideSettings() const
 {
     auto settingsValues = new nx::sdk::CommonSettings();
     settingsValues->addSetting("nx.stub.engine.settings.double_0", "2.7182");
@@ -137,6 +159,13 @@ void CommonEngine::executeAction(Action* action, Error* outError)
     const char* const actionUrlPtr = actionUrl.empty() ? nullptr : actionUrl.c_str();
     const char* const messageToUserPtr = messageToUser.empty() ? nullptr : messageToUser.c_str();
     action->handleResult(actionUrlPtr, messageToUserPtr);
+}
+
+nx::sdk::Error CommonEngine::setHandler(nx::sdk::analytics::Engine::IHandler* handler)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_handler = handler;
+    return nx::sdk::Error::noError;
 }
 
 void CommonEngine::assertPluginCasted(void* plugin) const
