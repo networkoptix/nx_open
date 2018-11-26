@@ -1,23 +1,23 @@
 #include <gtest/gtest.h>
-#include <server/server_globals.h>
-#include <test_support/utils.h>
-#include <test_support/mediaserver_launcher.h>
+
 #include <api/app_server_connection.h>
-#include <nx/network/http/http_client.h>
-
-#include <nx/fusion/model_functions.h>
-#include "common/common_module.h"
 #include <api/global_settings.h>
-#include <rest/handlers/detach_from_cloud_rest_handler.h>
 #include <api/model/detach_from_cloud_data.h>
-
-#include <test_support/appserver2_process.h>
-#include <nx/utils/test_support/module_instance_launcher.h>
-#include <media_server/server_connector.h>
 #include <api/test_api_requests.h>
+#include <common/common_module.h>
+#include <media_server/server_connector.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/network/app_info.h>
+#include <nx/network/http/http_client.h>
 #include <nx/utils/elapsed_timer.h>
+#include <nx/utils/test_support/module_instance_launcher.h>
 #include <nx/utils/test_support/test_options.h>
+#include <rest/handlers/detach_from_cloud_rest_handler.h>
+#include <rest/server/json_rest_result.h>
+#include <server/server_globals.h>
+#include <test_support/appserver2_process.h>
+#include <test_support/mediaserver_launcher.h>
+#include <test_support/utils.h>
 
 namespace nx {
 namespace mediaserver {
@@ -120,6 +120,12 @@ public:
         nx::utils::Url url = mediaServerLauncher->apiUrl();
         url.setPath("/api/detachFromSystem");
         ASSERT_TRUE(client->doPost(url, "application/json", QJson::serialized(data)));
+
+        const auto buffer = client->fetchEntireMessageBody();
+        ASSERT_TRUE(buffer);
+
+        const auto result = QJson::deserialized<QnJsonRestResult>(*buffer);
+        ASSERT_EQ(QnRestResult::NoError, result.error) << result.errorString.toStdString();
     }
 
     void thenUserRemovedFromFirstServer()
