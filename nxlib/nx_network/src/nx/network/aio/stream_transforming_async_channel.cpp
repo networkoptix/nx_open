@@ -1,5 +1,6 @@
 #include "stream_transforming_async_channel.h"
 
+#include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
 
 namespace nx {
@@ -166,6 +167,7 @@ std::tuple<SystemError::ErrorCode, int /*bytesTransferred*/>
 
     if (m_converter->failed())
     {
+        NX_VERBOSE(this, "Converter reported failure");
         // This is actually converter error. E.g., ssl stream corruption. Not a system error!
         // TODO: #ak Set converter-specific error code.
         return std::make_tuple(SystemError::connectionReset, -1);
@@ -173,11 +175,14 @@ std::tuple<SystemError::ErrorCode, int /*bytesTransferred*/>
 
     if (m_converter->eof())
     {
+        NX_VERBOSE(this, "Converter reported EOF");
         // Correct stream shutdown.
         return std::make_tuple(SystemError::noError, 0);
     }
 
-    NX_ASSERT(result == utils::bstream::StreamIoError::wouldBlock);
+    NX_ASSERT(
+        result == utils::bstream::StreamIoError::wouldBlock,
+        lm("result = %1").args(result));
     return std::make_tuple(SystemError::wouldBlock, -1);
 }
 

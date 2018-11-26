@@ -1,6 +1,7 @@
 #include "ssl_pipeline.h"
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 
 #include "ssl_static_data.h"
 
@@ -42,6 +43,7 @@ bool Pipeline::performHandshake()
     if (resultCode <= 0)
     {
         handleSslIoResult(resultCode);
+        NX_VERBOSE(this, lm("Handshake failed. %1").args(resultCode));
         return false;
     }
 
@@ -172,6 +174,7 @@ int Pipeline::handleSslIoResult(int resultCode)
             return resultCode;
 
         case SSL_ERROR_ZERO_RETURN:
+            NX_VERBOSE(this, "SSL EOF");
             m_eof = true;
             return 0;
 
@@ -183,6 +186,7 @@ int Pipeline::handleSslIoResult(int resultCode)
         }
 
         case SSL_ERROR_SSL:
+            NX_VERBOSE(this, "SSL error");
             m_eof = true;
             m_failed = true;
             return utils::bstream::StreamIoError::nonRecoverableError;
