@@ -322,11 +322,8 @@ void Manager::at_enginePropertyChanged(
     const resource::AnalyticsEngineResourcePtr& engine,
     const QString& propertyName)
 {
-    if (!engine)
-    {
-        NX_WARNING(this, "Got empty analytics engine resource, skipping");
+    if (!NX_ASSERT(engine))
         return;
-    }
 
     if (propertyName == nx::vms::common::AnalyticsEngineResource::kSettingsValuesProperty)
         engine->sendSettingsToSdkEngine();
@@ -373,11 +370,8 @@ void Manager::setSettings(
         analyticsContext = context(QnUuid(deviceId));
     }
 
-    if (!analyticsContext)
-    {
-        NX_WARNING(this, "Can't find analytics context for device with id %1", deviceId);
+    if (!NX_ASSERT(analyticsContext, lm("Device %1").arg(deviceId)))
         return;
-    }
 
     return analyticsContext->setSettings(engineId, deviceAgentSettings);
 }
@@ -401,11 +395,8 @@ void Manager::setSettings(const QString& engineId, const QVariantMap& engineSett
     auto engine = sdk_support::find<resource::AnalyticsEngineResource>(
         serverModule(), engineId);
 
-    if (!engine)
-    {
-        NX_WARNING(this, "Can't find engine resource with id %1", engineId);
+    if (!NX_ASSERT(engine, lm("Engine %1").arg(engineId)))
         return;
-    }
 
     NX_DEBUG(this, "Setting settings for engine %1 (%2)", engine->getName(), engine->getId());
     engine->setSettingsValues(engineSettings);
@@ -416,11 +407,8 @@ QVariantMap Manager::getSettings(const QString& engineId) const
     auto engine = sdk_support::find<resource::AnalyticsEngineResource>(
         serverModule(), engineId);
 
-    if (!engine)
-    {
-        NX_WARNING(this, "Can't find engine resource with id %1", engineId);
+    if (!NX_ASSERT(engine, lm("Engine %1").arg(engineId)))
         return QVariantMap();
-    }
 
     NX_DEBUG(this, "Getting settings for engine %1 (%2)", engine->getName(), engine->getId());
     return engine->settingsValues();
