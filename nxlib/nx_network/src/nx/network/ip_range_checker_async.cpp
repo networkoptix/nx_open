@@ -22,8 +22,8 @@ void QnIpRangeScannerAsync::pleaseStop(nx::utils::MoveOnlyFunc<void()> completio
         [this, completionHandler = std::move(completionHandler)]() mutable
         {
             NX_VERBOSE(this, "Terminate requested, range [%1, %2]",
-                nx::network::HostAddress(in_addr{htonl(m_startIpv4)}),
-                nx::network::HostAddress(in_addr{htonl(m_endIpv4)}));
+                nx::network::HostAddress(nx::network::HostAddress::ipV4from(m_startIpv4)),
+                nx::network::HostAddress(nx::network::HostAddress::ipV4from(m_endIpv4)));
 
             for (auto& httpClientPtr: m_socketsBeingScanned)
                 httpClientPtr->pleaseStopSync();
@@ -78,8 +78,9 @@ bool QnIpRangeScannerAsync::startHostScan()
 
     if (m_nextIPToCheck > m_endIpv4)
         return false;  // All ip addresses are being scanned at the moment.
-    in_addr_t ipToCheck = htonl(m_nextIPToCheck++);
-    NX_VERBOSE(this, "Checking IP: %1", nx::network::HostAddress(in_addr{ipToCheck}));
+    uint32_t ipToCheck = m_nextIPToCheck++;
+    NX_VERBOSE(this, "Checking IP: %1",
+        nx::network::HostAddress(nx::network::HostAddress::ipV4from(ipToCheck)));
 
     auto httpClientIter = m_socketsBeingScanned.insert(
         std::make_unique<nx::network::http::AsyncClient>()).first;
@@ -92,7 +93,8 @@ bool QnIpRangeScannerAsync::startHostScan()
     (*httpClientIter)->setMaxNumberOfRedirects(0);
     (*httpClientIter)->doGet(nx::network::url::Builder()
         .setScheme(nx::network::http::kUrlSchemeName)
-        .setEndpoint({nx::network::HostAddress(in_addr{ipToCheck}), uint16_t(m_portToScan)})
+        .setEndpoint({nx::network::HostAddress(nx::network::HostAddress::ipV4from(ipToCheck)),
+            uint16_t(m_portToScan)})
         .toUrl());
     return true;
 }
@@ -123,8 +125,8 @@ void QnIpRangeScannerAsync::onDone(Requests::iterator httpClientIter)
         return;
 
     NX_VERBOSE(this, "Search in range [%1, %2] has finished, %3 hosts are online (terminated: %4)",
-        nx::network::HostAddress(in_addr{htonl(m_startIpv4)}),
-        nx::network::HostAddress(in_addr{htonl(m_endIpv4)}),
+        nx::network::HostAddress(nx::network::HostAddress::ipV4from(m_startIpv4)),
+        nx::network::HostAddress(nx::network::HostAddress::ipV4from(m_endIpv4)),
         m_onlineHosts.size(), m_terminated);
 
     nx::utils::moveAndCall(m_completionHandler, std::move(m_onlineHosts));

@@ -140,6 +140,7 @@ public:
         const in6_addr& addr,
         boost::optional<uint32_t> scopeId);
 
+    static in_addr ipV4from(const uint32_t& ip);
     static boost::optional<in_addr> ipV4from(const QString& ip);
     static IpV6WithScope ipV6from(const QString& ip);
 
