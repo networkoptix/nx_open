@@ -1290,7 +1290,7 @@ CameraDiagnostics::Result HanwhaResource::initIo()
             m_ioPortTypeById[outputPortData.id] = outputPortData;
             ioPorts.push_back(outputPortData);
 
-            if (i == 1)
+            if (m_defaultOutputPortId.isEmpty())
                 m_defaultOutputPortId = outputPortData.id;
         }
     }
