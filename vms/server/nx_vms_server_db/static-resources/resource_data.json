@@ -211,7 +211,8 @@
             "adamStartInputCoil": 0,
             "adamInputCount": 12,
             "adamStartOutputCoil": 16,
-            "adamOutputCount": 6
+            "adamOutputCount": 6,
+            "noVideoSupport": true
         },
         {
             "keys": [
@@ -220,7 +221,8 @@
             "adamStartInputCoil": 0,
             "adamInputCount": 14,
             "adamStartOutputCoil": 16,
-            "adamOutputCount": 2
+            "adamOutputCount": 2,
+            "noVideoSupport": true
         },
         {
             "keys": [
@@ -239,7 +241,8 @@
             "adamStartInputCoil": 0,
             "adamInputCount": 6,
             "adamStartOutputCoil": 16,
-            "adamOutputCount": 6
+            "adamOutputCount": 6,
+            "noVideoSupport": true
         },
         {
             "keys": ["FLIR|FC*"],
