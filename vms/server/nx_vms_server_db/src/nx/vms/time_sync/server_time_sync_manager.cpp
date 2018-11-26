@@ -196,15 +196,16 @@ void ServerTimeSyncManager::saveSystemTimeDeltaMs(qint64 systemTimeDeltaMs)
         kTimeDeltaParamName,
         QByteArray::number(systemTimeDeltaMs));
 
-    // Avoid passing this in async callback.
-    auto logTag = nx::utils::log::Tag(this);
+    // TODO: Avoid passing `this` in async callback.
+    const auto logTag = nx::utils::log::Tag(this);
     connection->getMiscManager(Qn::kSystemAccess)->saveMiscParam(
-        deltaData, this,
+        deltaData,
+        this,
         [logTag](int /*reqID*/, ec2::ErrorCode errorCode)
-    {
-        if (errorCode != ec2::ErrorCode::ok)
-            NX_WARNING(logTag, lm("Failed to save time delta data to the database"));
-    });
+        {
+            if (errorCode != ec2::ErrorCode::ok)
+                NX_WARNING(logTag, "Failed to save time delta data to the database");
+        });
 }
 
 void ServerTimeSyncManager::updateSyncTimeToOsTimeDelta()

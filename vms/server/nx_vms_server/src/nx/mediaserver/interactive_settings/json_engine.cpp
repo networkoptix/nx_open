@@ -1,6 +1,8 @@
 #include "json_engine.h"
 
 #include <functional>
+#include <memory>
+#include <variant>
 
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonArray>
@@ -18,15 +20,23 @@ namespace {
 
 using namespace components;
 
-Item* createItem(Item* parent, const QJsonObject& object)
+std::variant<AbstractEngine::Error, Item*> createItem(Item* parent, const QJsonObject& object)
 {
     const auto type = object["type"].toString();
     if (type.isEmpty())
-        return nullptr;
+    {
+        return AbstractEngine::Error(
+            AbstractEngine::ErrorCode::parseError,
+            lm("Object does not have type: %1").arg(
+                QString::fromUtf8(QJsonDocument(object).toJson(QJsonDocument::Compact))));
+    }
 
-    Item* item = Factory::createItem(type, parent);
+    std::unique_ptr<Item> item(Factory::createItem(type, parent));
     if (!item)
-        return nullptr;
+    {
+        return AbstractEngine::Error(AbstractEngine::ErrorCode::parseError,
+            lm("Unknown item type: %1").arg(type));
+    }
 
     const auto metaObject = item->metaObject();
     const int skippedProperties = QObject::staticMetaObject.propertyCount();
@@ -40,52 +50,59 @@ Item* createItem(Item* parent, const QJsonObject& object)
         if (!value.isValid())
             continue;
 
-        if (!property.write(item, value))
+        if (!property.write(item.get(), value))
         {
-            NX_WARNING(typeid(JsonEngine), lm("Cannot write value %1 to property %2").args(
+            NX_WARNING(NX_SCOPE_TAG, lm("Cannot write value %1 to property %2").args(
                 value, property.name()));
         }
     }
 
-    if (const auto group = qobject_cast<Group*>(item))
+    if (const auto group = qobject_cast<Group*>(item.get()))
     {
         auto itemsProperty = group->items();
 
-        for (const QJsonValue& itemValue: object["items"].toArray())
+        for (const QJsonValue itemValue: object["items"].toArray())
         {
             const QJsonObject itemObject = itemValue.toObject();
-            Item* childItem = createItem(item, itemObject);
+            const auto result = createItem(item.get(), itemObject);
 
-            if (childItem)
-                itemsProperty.append(&itemsProperty, childItem);
+            if (const auto childItem = std::get_if<Item*>(&result))
+                itemsProperty.append(&itemsProperty, *childItem);
+            else
+                return result;
         }
     }
 
-    return item;
+    return item.release();
 }
 
 } // namespace
 
-JsonEngine::JsonEngine(QObject* parent):
-    base_type(parent)
+JsonEngine::JsonEngine()
 {
     components::Factory::registerTypes();
 }
 
-JsonEngine::~JsonEngine()
-{
-}
-
-void JsonEngine::load(const QJsonObject& json)
+AbstractEngine::Error JsonEngine::loadModelFromJsonObject(const QJsonObject& json)
 {
     auto object = json;
     object["type"] = "Settings";
-    setSettingsItem(static_cast<Settings*>(createItem(nullptr, object)));
+
+    const auto result = createItem(nullptr, object);
+    if (const auto item = std::get_if<Item*>(&result))
+        return setSettingsItem(static_cast<Settings*>(*item));
+
+    return std::get<Error>(result);
 }
 
-void JsonEngine::load(const QByteArray& data)
+AbstractEngine::Error JsonEngine::loadModelFromData(const QByteArray& data)
 {
-    load(QJsonDocument::fromJson(data).object());
+    QJsonParseError error;
+    const auto& json = QJsonDocument::fromJson(data, &error);
+    if (error.error != QJsonParseError::NoError)
+        return Error(ErrorCode::parseError, error.errorString());
+
+    return loadModelFromJsonObject(json.object());
 }
 
 } // namespace nx::mediaserver::interactive_settings

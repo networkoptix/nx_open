@@ -29,7 +29,7 @@ struct Customer
     }
 };
 
-#define Customer_Fields (fullName)(address)
+#define Customer_Fields (id)(fullName)(address)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Id)(Customer),

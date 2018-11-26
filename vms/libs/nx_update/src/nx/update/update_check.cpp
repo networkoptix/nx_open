@@ -520,12 +520,12 @@ FindPackageResult findPackage(
         outPackage, outMessage);
 }
 
-const nx::update::Package* findPackage(
+nx::update::Package* findPackage(
     const QString& component,
     nx::vms::api::SystemInformation& systemInfo,
-    const nx::update::Information& info)
+    nx::update::Information& info)
 {
-    for(const auto& pkg: info.packages)
+    for(auto& pkg: info.packages)
     {
         if (pkg.component == component)
         {

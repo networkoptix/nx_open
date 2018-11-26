@@ -29,6 +29,7 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(1, redesignedCameraSettingsDialog, "Enable redesigned camera settings dialog.");
     NX_INI_FLAG(1, enableDetectedObjectsInterpolation, "Allow interpolation of detected objects between frames.");
     NX_INI_FLAG(0, displayAnalyticsDelay, "Add delay label to detected object description.");
+    NX_INI_FLAG(0, displayAnalyticsEnginesInResourceTree, "Display analytics engine items in the resource tree.");
     NX_INI_FLAG(0, debugThumbnailProviders, "Enable debug mode for thumbnail providers");
     NX_INI_FLAG(0, ignoreZoomWindowConstraints, "Ignore constrains for a zoom region");
     NX_INI_FLAG(0, showDebugTimeInformationInRibbon, "Show extra timestamp information in event ribbon");
@@ -55,6 +56,7 @@ struct Ini: nx::kit::IniConfig
         "selection to \"Selected on Timeline\" mode when selection exists.");
     NX_INI_FLAG(0, raiseCameraFromClickedTile, "Raise camera after selecting it when Right Panel camera-related tile is clicked.");
     NX_INI_INT(30, rightPanelPreviewReloadDelay, "Right Panel preview reload delay in seconds after receiving \"NO DATA\" (0 to disable).");
+    NX_INI_FLAG(0, exclusiveMotionSelection, "Whether selecting a motion search region on a camera clears motion selection on other cameras on the layout.");
 };
 
 inline Ini& ini()

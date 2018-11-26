@@ -115,12 +115,15 @@ int QnExternalEventRestHandler::executeGet(
     businessParams.sourceServerId = owner->commonModule()->moduleGUID();
 
     if (businessParams.eventType == vms::api::EventType::undefinedEvent)
-        businessParams.eventType = vms::api::EventType::userDefinedEvent; // default value for type is 'CustomEvent'
+        businessParams.eventType = vms::api::EventType::userDefinedEvent;
 
     const auto& userId = owner->accessRights().userId;
 
-    if (!serverModule()->eventConnector()->createEventFromParams(businessParams, eventState, userId, &errStr))
+    if (!serverModule()->eventConnector()->createEventFromParams(
+        businessParams, eventState, userId, &errStr))
+    {
         result.setError(QnRestResult::InvalidParameter, errStr);
+    }
 
     return nx::network::http::StatusCode::ok;
 }

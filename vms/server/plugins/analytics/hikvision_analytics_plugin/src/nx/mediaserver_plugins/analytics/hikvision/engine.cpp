@@ -79,7 +79,7 @@ void Engine::setSettings(const nx::sdk::Settings* settings)
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::Settings* Engine::settings() const
+nx::sdk::Settings* Engine::pluginSideSettings() const
 {
     return nullptr;
 }
@@ -125,14 +125,14 @@ QList<QString> Engine::parseSupportedEvents(const QByteArray& data)
     for (const auto& internalName: *supportedEvents)
     {
         const QString eventTypeId = m_engineManifest.eventTypeByInternalName(internalName);
-        if (!eventTypeId.isNull())
+        if (!eventTypeId.isEmpty())
         {
             result << eventTypeId;
             const auto descriptor = m_engineManifest.eventTypeDescriptorById(eventTypeId);
             for (const auto& dependedName: descriptor.dependedEvent.split(','))
             {
                 auto descriptor = m_engineManifest.eventTypeDescriptorByInternalName(dependedName);
-                if (!descriptor.id.isNull())
+                if (!descriptor.id.isEmpty())
                     result << descriptor.id;
             }
         }
@@ -174,6 +174,12 @@ const Hikvision::EngineManifest& Engine::engineManifest() const
 
 void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
 {
+}
+
+nx::sdk::Error Engine::setHandler(nx::sdk::analytics::Engine::IHandler* /*handler*/)
+{
+    // TODO: Use the handler for error reporting.
+    return nx::sdk::Error::noError;
 }
 
 } // namespace hikvision

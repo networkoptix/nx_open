@@ -225,6 +225,11 @@ void EventConnector::at_analyticsSdkEvent(const nx::vms::event::AnalyticsSdkEven
     serverModule()->eventRuleProcessor()->processEvent(event);
 }
 
+void EventConnector::at_pluginEvent(const nx::vms::event::PluginEventPtr& event)
+{
+    serverModule()->eventRuleProcessor()->processEvent(event);
+}
+
 void EventConnector::at_customEvent(const QString& resourceName, const QString& caption,
     const QString& description, const vms::event::EventMetaData& metadata,
     vms::api::EventState eventState, qint64 timeStampUsec)

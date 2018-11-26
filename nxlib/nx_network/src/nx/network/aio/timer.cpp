@@ -24,7 +24,7 @@ Timer::~Timer()
 
 void Timer::start(
     std::chrono::milliseconds timeout,
-    nx::utils::MoveOnlyFunc<void()> timerFunc)
+    TimerEventHandler timerFunc)
 {
     // TODO: #ak m_aioService.registerTimer currently does not support zero timeouts,
     // so using following hack

@@ -208,9 +208,6 @@ namespace Qn
 
         IOPortDataRole,                             /**< Return QnIOPortData object. Used in IOPortDataModel */
 
-        RecordingStatsDataRole,                     /**< Return QnCamRecordingStatsData object. Used in QnRecordingStatsModel */
-        RecordingStatChartDataRole,                 /**< Return qreal for chart. Real value. Used in QnRecordingStatsModel */
-
         AuditRecordDataRole,                        /**< Return QnAuditRecord object */
         ColumnDataRole,                             /**< convert index col count to column enumerator */
         DecorationHoveredRole,                      /**< Same as Qt::DecorationRole but for hovered item */

@@ -8,8 +8,9 @@
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 
-#include <nx/utils/counter.h>
+#include <nx/network/aio/repetitive_timer.h>
 #include <nx/sql/async_sql_query_executor.h>
+#include <nx/utils/counter.h>
 #include <nx/utils/stree/resourcecontainer.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -18,6 +19,7 @@
 #include "../access_control/auth_types.h"
 #include "../dao/temporary_credentials_dao.h"
 #include "../data/account_data.h"
+#include "../settings.h"
 
 namespace nx::cloud::db {
 
@@ -78,6 +80,7 @@ class TemporaryAccountPasswordManager:
 {
 public:
     TemporaryAccountPasswordManager(
+        const conf::AccountManager& settings,
         const nx::utils::stree::ResourceNameSet& attributeNameset,
         nx::sql::AsyncSqlQueryExecutor* const dbManager) noexcept(false);
     virtual ~TemporaryAccountPasswordManager();
@@ -153,12 +156,15 @@ private:
     constexpr static const int kIndexByLogin = 1;
     constexpr static const int kIndexByAccountEmail = 2;
 
+    const conf::AccountManager m_settings;
     const nx::utils::stree::ResourceNameSet& m_attributeNameset;
     nx::sql::AsyncSqlQueryExecutor* const m_dbManager;
     nx::utils::Counter m_startedAsyncCallsCounter;
     TemporaryCredentialsDictionary m_temporaryCredentials;
     mutable QnMutex m_mutex;
     std::unique_ptr<dao::AbstractTemporaryCredentialsDao> m_dao;
+    nx::network::aio::Timer m_removeExpiredCredentialsTimer;
+    bool m_terminated = false;
 
     bool isTemporaryPasswordExpired(
         const data::TemporaryAccountCredentialsEx& temporaryCredentials) const;
@@ -168,6 +174,9 @@ private:
 
     void deleteExpiredCredentials();
     void fillCache();
+
+    void schedulePeriodicRemovalOfExpiredCredentials();
+    void doPeriodicRemovalOfExpiredCredentials();
 
     nx::sql::DBResult insertTempPassword(
         nx::sql::QueryContext* const queryContext,

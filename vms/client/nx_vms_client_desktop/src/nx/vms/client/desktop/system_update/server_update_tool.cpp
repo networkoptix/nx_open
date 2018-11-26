@@ -25,6 +25,7 @@
 #include <nx/utils/app_info.h>
 #include <nx/update/update_check.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
+#include <nx/vms/common/p2p/downloader/private/single_connection_peer_manager.h>
 
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
@@ -70,12 +71,32 @@ ServerUpdateTool::ServerUpdateTool(QObject* parent):
     m_uploadManager.reset(new UploadManager());
     m_updatesModel.reset(new ServerUpdatesModel(this));
 
+    vms::common::p2p::downloader::AbstractPeerSelectorPtr peerSelector;
+    m_peerManager.reset(new SingleConnectionPeerManager(commonModule(), std::move(peerSelector)));
+    m_peerManager->setParent(this);
+
+    m_downloader.reset(new Downloader(m_outputDir, commonModule(), this));
+    connect(m_downloader.get(), &Downloader::fileStatusChanged,
+        this, &ServerUpdateTool::atDownloaderStatusChanged);
+
+    connect(m_downloader.get(), &Downloader::fileInformationChanged,
+        this, &ServerUpdateTool::atDownloaderStatusChanged);
+
+    connect(m_downloader.get(), &Downloader::chunkDownloadFailed,
+        this, &ServerUpdateTool::atChunkDownloadFailed);
+
+    connect(m_downloader.get(), &Downloader::downloadFailed,
+        this, &ServerUpdateTool::atDownloadFailed);
+
     loadInternalState();
 }
 
 ServerUpdateTool::~ServerUpdateTool()
 {
     saveInternalState();
+    m_downloader->disconnect(this);
+    m_serverConnection.reset();
+    m_peerManager.reset();
     NX_VERBOSE(this) << "~ServerUpdateTool() done";
 }
 
@@ -157,7 +178,7 @@ std::future<nx::update::UpdateContents> ServerUpdateTool::checkRemoteUpdateInfo(
         auto result = promise->get_future();
         // Requesting remote update info.
         connection->getUpdateInfo(
-            [promise = std::move(promise)](bool success, rest::Handle handle, const nx::update::Information& response)
+            [promise = std::move(promise)](bool success, rest::Handle /*handle*/, const nx::update::Information& response)
             {
                 UpdateContents contents;
                 if (success)
@@ -309,6 +330,116 @@ ServerUpdateTool::OfflineUpdateState ServerUpdateTool::getUploaderState() const
     return m_offlineUpdaterState;
 }
 
+QDir ServerUpdateTool::getDownloadDir() const
+{
+    return m_outputDir;
+}
+
+void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
+{
+    NX_ASSERT(m_downloader);
+    // TODO: Stop previous manual downloads
+    m_manualPackages = contents.manualPackages;
+
+    for (auto package: contents.manualPackages)
+    {
+        FileInformation info;
+        info.md5 = QByteArray::fromHex(package.md5.toLatin1());
+        info.size = package.size;
+        info.name = package.file;
+        info.url = package.url;
+        NX_ASSERT(info.isValid());
+        auto code = m_downloader->addFile(info);
+        using Code = vms::common::p2p::downloader::ResultCode;
+        QString file =  m_downloader->filePath(package.file);
+
+        m_issuedDownloads.insert(package.file);
+
+        switch (code)
+        {
+            case Code::ok:
+                NX_VERBOSE(this) << "startManualDownloads() - downloading client package"
+                    << info.name << " from url=" << package.url;
+                m_activeDownloads.insert(std::make_pair(package.file, 0));
+                break;
+            case Code::fileAlreadyExists:
+            case Code::fileAlreadyDownloaded:
+            {
+                auto fileInfo = m_downloader->fileInformation(package.file);
+                m_activeDownloads.insert(std::make_pair(package.file, 0));
+                atDownloaderStatusChanged(fileInfo);
+                break;
+            }
+            default:
+            // Some sort of an error here.
+            {
+                QString error = vms::common::p2p::downloader::toString(code);
+                NX_VERBOSE(this) << "requestStartUpdate() - failed to add client package "
+                    << info.name << error;
+                m_failedDownloads.insert(file);
+                break;
+            }
+        }
+    }
+}
+
+bool ServerUpdateTool::hasManualDownloads() const
+{
+    return !m_issuedDownloads.empty();
+}
+
+void ServerUpdateTool::uploadPackage(const nx::update::Package& package, QDir storageDir)
+{
+    NX_ASSERT(package.isValid());
+
+    QString path = package.file;
+    if (package.targets.empty())
+    {
+        NX_ERROR(this) << "uploadPackage(" << package.file << ") - no server wants this package";
+        return;
+    }
+
+    NX_INFO(this) << "uploadPackage(" << package.file << ") - going to upload package to servers";
+
+    UploadState config;
+    config.source = storageDir.absoluteFilePath(path);
+    config.destination = m_uploadDestination + path;
+    // Updates should land to updates/publication_key/file_name.
+    config.ttl = -1; //< This should mean 'infinite time'
+
+    for (auto serverId: package.targets)
+    {
+        auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
+        if (!server)
+        {
+            NX_ERROR(this) << "uploadPackage(" << package.file << ") - lost server for upload" << serverId;
+            continue;
+        }
+
+        auto callback = [tool=QPointer<ServerUpdateTool>(this), serverId](const UploadState& state)
+        {
+            if (tool)
+                tool->atUploadWorkerState(serverId, state);
+        };
+
+        auto id = m_uploadManager->addUpload(server, config, this, callback);
+
+        if (!id.isEmpty())
+        {
+            m_uploadStateById[id] = config;
+            m_activeUploads.insert(id);
+        }
+        else
+        {
+            NX_VERBOSE(this) << "uploadPackage(" << package.file << ") - failed to start uploading file="
+                << path
+                << "reason="
+                << config.errorMessage;
+            m_completedUploads.insert(id);
+        }
+    }
+}
+
 void ServerUpdateTool::atUploadWorkerState(QnUuid serverId, const UploadState& state)
 {
     if (!m_uploadStateById.count(state.id))
@@ -317,7 +448,6 @@ void ServerUpdateTool::atUploadWorkerState(QnUuid serverId, const UploadState& s
         return;
     }
 
-    auto server = m_activeServers[serverId];
     switch (state.status)
     {
         case UploadState::Done:
@@ -357,6 +487,41 @@ void ServerUpdateTool::markUploadCompleted(QString uploadId)
     }
 }
 
+void ServerUpdateTool::startUpload(const QnMediaServerResourcePtr& server, const QStringList& filesToUpload, QDir storageDir)
+{
+    NX_ASSERT(server);
+    auto serverId = server->getId();
+    for (auto path: filesToUpload)
+    {
+        auto callback = [tool=QPointer<ServerUpdateTool>(this), serverId](const UploadState& state)
+        {
+            if (tool)
+                tool->atUploadWorkerState(serverId, state);
+        };
+
+        UploadState config;
+        config.source = storageDir.absoluteFilePath(path);
+        config.destination = m_uploadDestination + path;
+        // Updates should land to updates/publication_key/file_name.
+        config.ttl = -1; //< This should mean 'infinite time'
+        auto id = m_uploadManager->addUpload(server, config, this, callback);
+
+        if (!id.isEmpty())
+        {
+            m_uploadStateById[id] = config;
+            m_activeUploads.insert(id);
+        }
+        else
+        {
+            NX_VERBOSE(this) << "uploadNext - failed to start uploading file="
+                << path
+                << "reason="
+                << config.errorMessage;
+            m_completedUploads.insert(id);
+        }
+    }
+}
+
 bool ServerUpdateTool::startUpload(const UpdateContents& contents)
 {
     NX_VERBOSE(this) << "startUpload()";
@@ -376,38 +541,7 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents)
     m_uploadStateById.clear();
 
     for(auto server: recipients)
-    {
-        QnUuid serverId = server->getId();
-        for (auto path: contents.filesToUpload)
-        {
-            auto callback = [tool=QPointer<ServerUpdateTool>(this), serverId](const UploadState& state)
-            {
-                if (tool)
-                    tool->atUploadWorkerState(serverId, state);
-            };
-
-            UploadState config;
-            config.source = contents.storageDir.absoluteFilePath(path);
-            config.destination = m_uploadDestination + path;
-            // Updates should land to updates/publication_key/file_name.
-            config.ttl = -1; //< This should mean 'infinite time'
-            auto id = m_uploadManager->addUpload(server, config, this, callback);
-
-            if (!id.isEmpty())
-            {
-                m_uploadStateById[id] = config;
-                m_activeUploads.insert(id);
-            }
-            else
-            {
-                NX_VERBOSE(this) << "uploadNext - failed to start uploading file="
-                    << path
-                    << "reason="
-                    << config.errorMessage;
-                m_completedUploads.insert(id);
-            }
-        }
-    }
+        startUpload(server, contents.filesToUpload, contents.storageDir);
 
     if (m_activeUploads.empty() && !m_completedUploads.empty())
         changeUploadState(OfflineUpdateState::done);
@@ -442,10 +576,9 @@ bool ServerUpdateTool::verifyUpdateManifest(UpdateContents& contents) const
     return verifyUpdateContents(commonModule(), contents, activeServers);
 }
 
-ServerUpdateTool::ProgressInfo ServerUpdateTool::calculateUploadProgress()
+void ServerUpdateTool::calculateUploadProgress(ProgressInfo& result)
 {
-    ProgressInfo result;
-
+    int uploading = 0;
     for(const auto record: m_uploadStateById)
     {
         result.max += 100;
@@ -454,17 +587,39 @@ ServerUpdateTool::ProgressInfo ServerUpdateTool::calculateUploadProgress()
         {
             case UploadState::Uploading:
                 progress = 100*record.second.uploaded / record.second.size;
+                uploading++;
+                result.active++;
                 break;
             case UploadState::Done:
                 progress = 100;
+                result.done++;
                 break;
             default:
                 progress = 0;
                 break;
         }
         result.current += progress;
+
     }
-    return result;
+    result.uploading = uploading != 0;
+}
+
+void ServerUpdateTool::calculateManualDownloadProgress(ProgressInfo& progress)
+{
+    if (m_issuedDownloads.empty())
+        return;
+
+    progress.downloadingForServers = !m_activeDownloads.empty();
+
+    for (const auto record: m_activeDownloads)
+    {
+        progress.current += record.second;
+        progress.active++;
+    }
+
+    progress.current += 100*m_completeDownloads.size();
+    progress.done += m_completeDownloads.size();
+    progress.max += 100*m_issuedDownloads.size();
 }
 
 void ServerUpdateTool::atResourceAdded(const QnResourcePtr& resource)
@@ -540,6 +695,13 @@ nx::update::UpdateContents ServerUpdateTool::getRemoteUpdateContents() const
     return contents;
 }
 
+void ServerUpdateTool::setServerUrl(nx::utils::Url serverUrl, QnUuid serverId)
+{
+    m_serverConnection.reset(new rest::ServerConnection(commonModule(), serverId, serverUrl));
+    m_peerManager->setServerUrl(serverUrl, serverId);
+}
+
+
 void ServerUpdateTool::requestStopAction()
 {
     m_updateManifest = nx::update::Information();
@@ -551,6 +713,10 @@ void ServerUpdateTool::requestStopAction()
         m_skippedRequests.unite(m_activeRequests);
         NX_VERBOSE(this) << "requestStopAction() will skip requests" << m_skippedRequests;
     }
+
+    for (auto file: m_activeDownloads)
+        m_downloader->deleteFile(file.first);
+    m_activeDownloads.clear();
 
     m_updatesModel->clearState();
 }
@@ -572,23 +738,23 @@ void ServerUpdateTool::requestInstallAction(QSet<QnUuid> targets)
 {
     if (!m_activeRequests.empty())
         m_skippedRequests.unite(m_activeRequests);
-    m_remoteUpdateStatus = {};
-
     NX_VERBOSE(this) << "requestInstallAction() for" << targets;
+    m_remoteUpdateStatus = {};
     m_updatesModel->setServersInstalling(targets);
 
-    auto callback = [tool=QPointer<ServerUpdateTool>(this)](bool /*success*/, rest::Handle handle)
+    auto callback = [tool=QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle)
         {
+            if (!success)
+                NX_ERROR(typeid(ServerUpdateTool)) << "requestInstallAction() - response success=false";
             if (tool)
                 tool->m_requestingInstall.remove(handle);
         };
 
-    for (auto it : m_activeServers)
-        if (auto connection = getServerConnection(it.second))
-        {
-            if (auto handle = connection->updateActionInstall(callback, thread()))
-                m_requestingInstall.insert(handle);
-        }
+    if (auto connection = getServerConnection(commonModule()->currentServer()))
+    {
+        if (auto handle = connection->updateActionInstall(callback, thread()))
+            m_requestingInstall.insert(handle);
+    }
 }
 
 void ServerUpdateTool::atUpdateStatusResponse(bool success, rest::Handle handle,
@@ -763,6 +929,96 @@ QSet<QnUuid> ServerUpdateTool::getServersWithChangedProtocol() const
 std::shared_ptr<ServerUpdatesModel> ServerUpdateTool::getModel()
 {
     return m_updatesModel;
+}
+
+ServerUpdateTool::PeerManagerPtr ServerUpdateTool::createPeerManager(
+    FileInformation::PeerSelectionPolicy /*peerPolicy*/, const QList<QnUuid>& /*additionalPeers*/)
+{
+    return m_peerManager.get();
+}
+
+const nx::update::Package* ServerUpdateTool::findPackageForFile(const QString& fileName) const
+{
+    for (const auto& package: m_manualPackages)
+    {
+        if (package.file == fileName)
+            return &package;
+    }
+    return nullptr;
+}
+
+void ServerUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInformation)
+{
+    auto it = m_activeDownloads.find(fileInformation.name);
+    if (it == m_activeDownloads.end())
+    {
+        NX_ERROR(this) << "Did not found a file"<<fileInformation.name << "in m_activeDownloads";
+        return;
+    }
+
+    auto package = findPackageForFile(fileInformation.name);
+    if (!package)
+    {
+        NX_ERROR(this)
+            << "Did not found a package for a file"
+            << fileInformation.name << ". Why were we downloading it?";
+        return;
+    }
+
+    switch (fileInformation.status)
+    {
+        case FileInformation::Status::notFound:
+            NX_VERBOSE(this) << "atDownloaderStatusChanged("<< fileInformation.name
+                << ") - status changed to " << fileInformation.status;
+            emit packageDownloadFailed(*package, "Update file is not found");
+            m_activeDownloads.erase(it);
+            m_failedDownloads.insert(it->first);
+            break;
+        case FileInformation::Status::uploading:
+            break;
+        case FileInformation::Status::downloaded:
+            NX_VERBOSE(this) << "atDownloaderStatusChanged("<< fileInformation.name
+                << ") - finally downloaded it to" << m_downloader->filePath(fileInformation.name);
+            m_activeDownloads.erase(it);
+            m_completeDownloads.insert(it->first);
+            emit packageDownloaded(*package);
+            break;
+        case FileInformation::Status::corrupted:
+            NX_VERBOSE(this) << "atDownloaderStatusChanged("<< fileInformation.name
+                << ") - status changed to " << fileInformation.status;
+            emit packageDownloadFailed(*package, "Update file is corrupted");
+            m_activeDownloads.erase(it);
+            m_failedDownloads.insert(it->first);
+            break;
+        case FileInformation::Status::downloading:
+            it->second = fileInformation.calculateDownloadProgress();
+            break;
+        default:
+            // Nothing to do here
+            break;
+    }
+}
+
+void ServerUpdateTool::atChunkDownloadFailed(const QString& /*fileName*/)
+{
+    // It is a breakpoint catcher.
+    //NX_VERBOSE(this) << "atChunkDownloadFailed() failed to download chunk for" << fileName;
+}
+
+void ServerUpdateTool::atDownloadFailed(const QString& fileName)
+{
+    auto package = findPackageForFile(fileName);
+    if (package)
+    {
+        NX_ERROR(this)
+            << "atDownloadFailed(" << fileName << ") - failed to download update package.";
+    }
+    else
+    {
+        NX_ERROR(this)
+            << "atDownloadFailed(" << fileName << ") - did not found a package for a file."
+            << "Why were we downloading this file?";
+    }
 }
 
 QString getServerUrl(QnCommonModule* commonModule, QString path)

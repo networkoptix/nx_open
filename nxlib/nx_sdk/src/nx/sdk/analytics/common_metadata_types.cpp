@@ -31,7 +31,7 @@ const IStringList* CommonMetadataTypes::objectTypeIds() const
     return &m_objectTypeList;
 }
 
-bool CommonMetadataTypes::isNull() const
+bool CommonMetadataTypes::isEmpty() const
 {
     return (m_eventTypeList.count() == 0) && (m_objectTypeList.count() == 0);
 }

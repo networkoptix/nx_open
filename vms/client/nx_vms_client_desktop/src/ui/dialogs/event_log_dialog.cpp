@@ -268,9 +268,7 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
                     continue;
 
                 names.push_back(
-                    lit("%1 - %2")
-                        .arg(pluginDescriptor->name)
-                        .arg(descriptor.item.name.value));
+                    lm("%1 - %2").args(pluginDescriptor->name, descriptor.item.name.value));
             }
 
             return names;
@@ -281,7 +279,7 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
         const auto& descriptor = entry.second;
         const auto names = eventNames(descriptor);
 
-        for (const auto& name : names)
+        for (const auto& name: names)
         {
             auto item = new QStandardItem(name);
             item->setData(EventType::analyticsSdkEvent, EventTypeRole);

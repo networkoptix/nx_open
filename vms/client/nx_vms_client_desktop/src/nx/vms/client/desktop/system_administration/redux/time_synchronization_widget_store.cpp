@@ -67,6 +67,11 @@ void TimeSynchronizationWidgetStore::setServerOnline(const QnUuid &id, bool isOn
         [&](State state) { return Reducer::setServerOnline(std::move(state), id, isOnline); });
 }
 
+void TimeSynchronizationWidgetStore::applyChanges()
+{
+    d->executeAction([](State state) { return Reducer::applyChanges(std::move(state)); });
+}
+
 void TimeSynchronizationWidgetStore::setReadOnly(bool value)
 {
     d->executeAction([&](State state) { return Reducer::setReadOnly(std::move(state), value); });

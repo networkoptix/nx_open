@@ -46,10 +46,6 @@ DeviceAgent::DeviceAgent(Engine* engine):
         m_tracker.setObjectTypeId("nx.tegraVideo.car");
     }
 
-    // TODO: Move all the ctor code below to startFetchingMetadata() when it starts being called.
-
-    stopFetchingMetadata();
-
     TegraVideo::Params params;
     params.id = "metadata";
     params.deployFile = ini().deployFile;
@@ -72,6 +68,13 @@ DeviceAgent::~DeviceAgent()
         NX_OUTPUT << __func__ << "(): ERROR: TegraVideo::stop() failed";
 
     NX_OUTPUT << __func__ << "(" << this << ") END";
+}
+
+nx::sdk::Error DeviceAgent::setNeededMetadataTypes(
+    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
+{
+    NX_OUTPUT << __func__ << "() -> noError";
+    return nx::sdk::Error::noError;
 }
 
 std::string DeviceAgent::manifest() const
@@ -229,7 +232,7 @@ bool DeviceAgent::makeMetadataPacketsFromRectsPostprocCar(
 {
     auto objectPacket = new CommonObjectsMetadataPacket();
     objectPacket->setTimestampUsec(ptsUs);
-    objectPacket->setDurationUsec(1000000LL * 10); //< TODO: #mshevchenko: Ask #rvasilenko.
+    objectPacket->setDurationUsec(0);
 
     m_tracker.filterAndTrack(metadataPackets, rects, ptsUs);
 

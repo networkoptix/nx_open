@@ -410,19 +410,6 @@ Handle ServerConnection::addFileUpload(
     return executePost(path, params, QByteArray(), QByteArray(), callback, targetThread);
 }
 
-Handle ServerConnection::validateFileInformation(
-    const QString& url,
-    int expectedSize,
-    GetCallback callback,
-    QThread* targetThread)
-{
-    return executeGet(
-        lit("/api/downloads/%1/validate").arg(url),
-        QnRequestParamList{{lit("expected"), QString::number(expectedSize)}},
-        callback,
-        targetThread);
-}
-
 Handle ServerConnection::removeFileDownload(
     const QString& fileName,
     bool deleteData,

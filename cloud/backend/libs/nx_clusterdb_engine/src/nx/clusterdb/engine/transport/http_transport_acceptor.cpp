@@ -14,9 +14,9 @@
 namespace nx::clusterdb::engine::transport {
 
 class AcceptedCommonHttpConnection:
-    public CommandTransportDelegate
+    public CommandTransportDelegateWithData<int /*sequence*/>
 {
-    using base_type = CommandTransportDelegate;
+    using base_type = CommandTransportDelegateWithData<int /*sequence*/>;
 
 public:
     AcceptedCommonHttpConnection(
@@ -24,22 +24,14 @@ public:
         int connectionSeq,
         AbstractCommandPipeline* commandPipeline)
         :
-        base_type(delegatee.get()),
-        m_delegatee(std::move(delegatee)),
-        m_connectionSeq(connectionSeq),
+        base_type(std::move(delegatee), connectionSeq),
         m_commandPipeline(commandPipeline)
     {
     }
 
-    int seq() const { return m_connectionSeq; }
-
-    AbstractConnection* delegatee() { return m_delegatee.get(); };
-
     AbstractCommandPipeline* commandPipeline() { return m_commandPipeline; }
 
 private:
-    std::unique_ptr<AbstractConnection> m_delegatee;
-    const int m_connectionSeq = 0;
     AbstractCommandPipeline* m_commandPipeline = nullptr;
 };
 
@@ -279,7 +271,7 @@ void CommonHttpAcceptor::startOutgoingChannel(
             auto acceptedTransportConnection =
                 dynamic_cast<AcceptedCommonHttpConnection*>(transportConnection);
             if (!acceptedTransportConnection || 
-                acceptedTransportConnection->seq() != connectionSeq)
+                acceptedTransportConnection->data() != connectionSeq)
             {
                 // connectionId is not globally unique.
                 return;

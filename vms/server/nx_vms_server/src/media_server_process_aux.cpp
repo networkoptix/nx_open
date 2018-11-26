@@ -87,7 +87,7 @@ QnStorageResourceList getUnmountedStorages(
 
     auto mediaPathList = get(FilterConfig::createDefault(platform, /*includeNonHdd*/ true, settings));
     NX_VERBOSE(
-        nx::utils::log::Tag(typeid(UnmountedLocalStoragesFilter)),
+        typeid(UnmountedLocalStoragesFilter),
         lm("Record folders: %1").container(mediaPathList));
 
     QnStorageResourceList filteredStorages;

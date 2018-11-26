@@ -105,6 +105,7 @@ Downloader::Downloader(
     const QDir& downloadsDirectory,
     QnCommonModule* commonModule,
     AbstractPeerManagerFactory* peerManagerFactory,
+    StartupPolicy startupPolicy,
     QObject* parent)
     :
     AbstractDownloader(parent),
@@ -128,13 +129,9 @@ Downloader::Downloader(
         d->peerManagerFactory = factory.get();
         d->peerManagerFactoryOwner = std::move(factory);
     }
-}
 
-void Downloader::atServerStart()
-{
-    Q_D(Downloader);
-    for (const auto& fileName : d->storage->files())
-        d->createWorker(fileName);
+    if (startupPolicy == StartupPolicy::startFoundDownloads)
+        startFoundDownloads();
 }
 
 Downloader::~Downloader()
@@ -225,6 +222,13 @@ QVector<QByteArray> Downloader::getChunkChecksums(const QString& fileName)
 {
     Q_D(Downloader);
     return d->storage->getChunkChecksums(fileName);
+}
+
+void Downloader::startFoundDownloads()
+{
+    Q_D(Downloader);
+    for (const auto& fileName: d->storage->files())
+        d->createWorker(fileName);
 }
 
 void Downloader::validateAsync(const QString& url, bool onlyConnectionCheck, int expectedSize,

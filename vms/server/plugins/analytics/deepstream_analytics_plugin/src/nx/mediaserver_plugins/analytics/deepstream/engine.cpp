@@ -103,7 +103,7 @@ void Engine::setSettings(const nx::sdk::Settings* settings)
     NX_OUTPUT << "}";
 }
 
-nx::sdk::Settings* Engine::settings() const
+nx::sdk::Settings* Engine::pluginSideSettings() const
 {
     return nullptr;
 }
@@ -271,6 +271,12 @@ std::string Engine::buildManifestObectTypeString(const ObjectClassDescription& d
                 "localization": {}
             }
         })json";
+}
+
+nx::sdk::Error Engine::setHandler(nx::sdk::analytics::Engine::IHandler* handler)
+{
+    // TODO: implement.
+    return nx::sdk::Error::noError;
 }
 
 } // namespace deepstream

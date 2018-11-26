@@ -59,8 +59,6 @@ struct NX_VMS_API EngineManifest
     QList<ObjectAction> objectActions;
 
     QJsonObject deviceAgentSettingsModel;
-
-    // TODO: Add Engine dynamic settings.
 };
 #define EngineManifest_Fields \
     (capabilities)(eventTypes)(objectTypes)(objectActions)(groups)(deviceAgentSettingsModel)

@@ -147,11 +147,13 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePerio
 
     filter.limit = currentRequest().batchSize;
 
-    NX_VERBOSE(q) << "Requesting bookmarks from"
-        << utils::timestampToDebugString(period.startTimeMs) << "to"
-        << utils::timestampToDebugString(period.endTimeMs()) << "in"
-        << QVariant::fromValue(filter.orderBy.order).toString()
-        << "maximum count" << filter.limit;
+    NX_VERBOSE(q, "Requesting bookmarks:\n"
+        "    from: %1\n    to: %2\n    text filter: %3\n    sort: %4\n    limit: %5",
+        utils::timestampToDebugString(period.startTimeMs),
+        utils::timestampToDebugString(period.endTimeMs()),
+        filter.text,
+        QVariant::fromValue(filter.orderBy.order).toString(),
+        filter.limit);
 
     const auto callback =
         [this](bool success, const QnCameraBookmarkList& bookmarks, int requestId)
@@ -194,13 +196,13 @@ bool BookmarkSearchListModel::Private::commitPrefetch(
     const auto count = std::distance(begin, end);
     if (count <= 0)
     {
-        NX_VERBOSE(q) << "Committing no bookmarks";
+        NX_VERBOSE(q, "Committing no bookmarks");
         return false;
     }
 
-    NX_VERBOSE(q) << "Committing" << count << "bookmarks from"
-        << utils::timestampToDebugString(((end - 1)->startTimeMs).count()) << "to"
-        << utils::timestampToDebugString((begin->startTimeMs).count());
+    NX_VERBOSE(q, "Committing %1 bookmarks:\n    from: %2\n    to: %3", count,
+        utils::timestampToDebugString(((end - 1)->startTimeMs).count()),
+        utils::timestampToDebugString((begin->startTimeMs).count()));
 
     ScopedInsertRows insertRows(q, position, position + count - 1);
     m_data.insert(m_data.begin() + position, begin, end);

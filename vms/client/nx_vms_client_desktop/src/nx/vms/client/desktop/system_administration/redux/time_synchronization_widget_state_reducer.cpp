@@ -43,6 +43,17 @@ State TimeSynchronizationWidgetReducer::initialize(
     return state;
 }
 
+Result TimeSynchronizationWidgetReducer::applyChanges(State state)
+{
+    NX_ASSERT(!state.readOnly);
+
+    if(state.hasChanges == false)
+        return {false, std::move(state)};
+
+    state.hasChanges = false;
+    return {true, std::move(state)};
+}
+
 Result TimeSynchronizationWidgetReducer::setReadOnly(
     State state,
     bool value)

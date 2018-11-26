@@ -20,11 +20,9 @@ namespace migrations {
 
 namespace {
 
-static const QString kLogPrefix("ec2::database::migrations::");
-
 void log(const QString& message)
 {
-    NX_DEBUG(nx::utils::log::Tag(kLogPrefix), message);
+    NX_DEBUG(nx::utils::log::Tag(QStringLiteral("ec2::database::migrations::")), message);
 }
 
 struct LayoutOnVideoWall

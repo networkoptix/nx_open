@@ -6,7 +6,6 @@
 #include <rest/server/json_rest_result.h>
 #include <common/common_module.h>
 #include "peer_selection/abstract_peer_selector.h"
-#include "../validate_result.h"
 #include "../downloader.h"
 #include "resource_pool_peer_manager.h"
 
@@ -207,80 +206,6 @@ rest::Handle ResourcePoolPeerManager::downloadChunk(
 
     return connection->downloadFileChunk(fileName, chunkIndex, std::move(internalCallback),
         thread());
-}
-
-rest::Handle ResourcePoolPeerManager::validateFileInformation(
-    const QnUuid& peerId,
-    const FileInformation& fileInformation,
-    AbstractPeerManager::ValidateCallback callback)
-{
-    if (peerId != selfId())
-    {
-        NX_VERBOSE(
-            this,
-            lm("[Downloader, validate] File %1 via other peer %2")
-                .args(fileInformation.name, peerId));
-
-        const auto& connection = getConnection(peerId);
-        if (!connection)
-        {
-            NX_WARNING(this, lm("[Downloader, validate] File %1. No rest connection for %2")
-                .args(fileInformation.name, peerId));
-            return -1;
-        }
-
-        auto handleReply =
-            [this, callback, fileInformation, peerId](
-                bool success,
-                rest::Handle handle,
-                const QnJsonRestResult& result)
-            {
-                if (!success)
-                {
-                    NX_WARNING(this, lm("[Downloader, validate] File %1. Rest connection to %2 response error")
-                        .args(fileInformation.name, peerId));
-                    return callback(success, handle);
-                }
-
-                const auto validateResult = result.deserialized<ValidateResult>();
-                if (!validateResult.success)
-                {
-                    NX_WARNING(this, lm("[Downloader, validate] File %1. peer %2 responded that validation had failed")
-                        .args(fileInformation.name, peerId));
-                    return callback(false, handle);
-                }
-
-                NX_VERBOSE(this, lm("[Downloader, validate] File %1. peer %2 validation successful")
-                    .args(fileInformation.name, peerId));
-
-                callback(success, handle);
-            };
-
-        return connection->validateFileInformation(
-            QString::fromLatin1(fileInformation.url.toString().toLocal8Bit().toBase64()),
-            fileInformation.size, handleReply, thread());
-    }
-
-    NX_VERBOSE(
-        this,
-        lm("[Downloader, validate] Trying to validate %1 directly")
-            .args(fileInformation.name));
-
-    auto handle = ++m_currentSelfRequestHandle;
-    if (handle < 0)
-    {
-        m_currentSelfRequestHandle = 1;
-        handle = 1;
-    }
-
-    Downloader::validateAsync(
-        fileInformation.url.toString(), /* onlyConnectionCheck */ false, fileInformation.size,
-        [callback, handle](bool success)
-        {
-            callback(success, handle);
-        });
-
-    return handle;
 }
 
 rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(

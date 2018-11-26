@@ -1,11 +1,15 @@
 #pragma once
 
+#include <string>
+
 #include <transaction/transaction.h>
 #include <transaction/transaction_transport_header.h>
 
 namespace nx::clusterdb::engine {
 
 using CommandHeader = ::ec2::QnAbstractTransaction;
+
+NX_DATA_SYNC_ENGINE_API std::string toString(const CommandHeader& header);
 
 template<typename Data>
 class Command:

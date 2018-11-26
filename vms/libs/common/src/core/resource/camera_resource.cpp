@@ -502,18 +502,14 @@ const nx::vms::common::AnalyticsEngineResourceList
         return AnalyticsEngineResourceList();
 
     auto common = commonModule();
-    if (!common)
-    {
-        NX_ASSERT(false, "Can't access common module");
+    if (!NX_ASSERT(common, "Can't access common module"))
         return AnalyticsEngineResourceList();
-    }
 
-    return common->resourcePool()
-        ->getResources<nx::vms::common::AnalyticsEngineResource>(
-            [&enabledEngines](const AnalyticsEngineResourcePtr& engineResource)
-    {
-        return enabledEngines.find(engineResource->getId()) != enabledEngines.cend();
-    });
+    return common->resourcePool()->getResources<nx::vms::common::AnalyticsEngineResource>(
+        [&enabledEngines](const AnalyticsEngineResourcePtr& engineResource)
+        {
+            return enabledEngines.find(engineResource->getId()) != enabledEngines.cend();
+        });
 }
 
 QSet<QnUuid> QnVirtualCameraResource::enabledAnalyticsEngines() const
@@ -546,6 +542,7 @@ void QnVirtualCameraResource::setDeviceAgentSettingsValues(
         result.insert(it.key(), QJsonObject::fromVariantMap(it.value()));
 
     setProperty(kDeviceAgentsSettingsValuesProperty, QString::fromUtf8(QJson::serialized(result)));
+    saveProperties();
 }
 
 QVariantMap QnVirtualCameraResource::deviceAgentSettingsValues(const QnUuid& engineId) const
@@ -595,6 +592,7 @@ void QnVirtualCameraResource::setDeviceAgentManifest(
     setProperty(
         kDeviceAgentManifestsProperty,
         QString::fromUtf8(QJson::serialized(manifests)));
+    saveProperties();
 }
 
 void QnVirtualCameraResource::setSupportedAnalyticsEventTypeIds(
@@ -648,6 +646,7 @@ void QnVirtualCameraResource::setSupportedAnalyticsItemTypeIds(
 
     serialized = QString::fromUtf8(QJson::serialized(supportedItemMap));
     setProperty(propertyName, serialized);
+    saveProperties();
 }
 
 QMap<QnUuid, QSet<QString>> QnVirtualCameraResource::supportedAnalyticsItemTypeIds(

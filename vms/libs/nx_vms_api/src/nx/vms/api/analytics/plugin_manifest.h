@@ -14,6 +14,7 @@ namespace nx::vms::api::analytics {
 struct NX_VMS_API PluginManifest
 {
     Q_GADGET
+
 public: //< Required for Qt MOC run.
     QString id;
     QString name;

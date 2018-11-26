@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <map>
 #include <memory>
 #include <string>
@@ -46,6 +47,7 @@ private:
     transport::TransportManager* m_transportManager = nullptr;
     ConnectionManager* m_connectionManager = nullptr;
     std::map<nx::utils::Url, NodeContext> m_nodes;
+    std::atomic<int> m_connectionSequence{0};
 
     void connectToNodeAsync(const nx::utils::Url& url);
     
