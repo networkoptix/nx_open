@@ -5,21 +5,6 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
-AVCodecID toFfmpegCodec(const QString& codec)
-{
-    const auto lCodec = codec.toLower();
-    if (lCodec == lit("aac") || lCodec == lit("mpeg4-generic"))
-        return AV_CODEC_ID_AAC;
-    else if (lCodec == lit("g726"))
-        return AV_CODEC_ID_ADPCM_G726;
-    else if (lCodec == lit("pcmu"))
-        return AV_CODEC_ID_PCM_MULAW;
-    else if (lCodec == lit("pcma"))
-        return AV_CODEC_ID_PCM_ALAW;
-    else
-        return AV_CODEC_ID_NONE;
-}
-
 OnvifAudioTransmitter::OnvifAudioTransmitter(QnVirtualCameraResource* res):
     QnAbstractAudioTransmitter(),
     m_resource(res)
@@ -76,10 +61,14 @@ void OnvifAudioTransmitter::prepare()
     }
 
     m_trackInfo = tracks[0];
-    m_transcoder.reset(new QnFfmpegAudioTranscoder(toFfmpegCodec(m_trackInfo.sdpMedia.rtpmap.codecName)));
+    int defaultBitrate = 0;
+    auto codecId = QnAbstractAudioTransmitter::toFfmpegCodec(m_trackInfo.sdpMedia.rtpmap.codecName, &defaultBitrate);
+    m_transcoder.reset(new QnFfmpegAudioTranscoder(codecId));
     m_transcoder->setSampleRate(m_trackInfo.sdpMedia.rtpmap.clockRate);
     if (m_bitrateKbps > 0)
         m_transcoder->setBitrate(m_bitrateKbps);
+    else if (defaultBitrate > 0)
+        m_transcoder->setBitrate(defaultBitrate);
 }
 
 bool OnvifAudioTransmitter::processAudioData(const QnConstCompressedAudioDataPtr& audioData)

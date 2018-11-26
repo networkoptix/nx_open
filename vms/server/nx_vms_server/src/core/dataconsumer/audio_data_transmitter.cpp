@@ -7,6 +7,31 @@
 #include <utils/common/sleep.h>
 #include <core/resource/resource.h>
 
+AVCodecID QnAbstractAudioTransmitter::toFfmpegCodec(const QString& codec, int* outDefaultBitrate)
+{
+    int bitratePos = codec.lastIndexOf(L'-');
+    if (bitratePos >= 0)
+    {
+        *outDefaultBitrate = codec.mid(bitratePos + 1).toInt();
+        if (*outDefaultBitrate < 1000)
+            *outDefaultBitrate *= 1000; // Convert KHz to Hz.
+    }
+
+    if (codec == lit("AAC"))
+        return AV_CODEC_ID_AAC;
+    else if (codec.startsWith(lit("G726")))
+        return AV_CODEC_ID_ADPCM_G726;
+    else if (codec == lit("MULAW"))
+        return AV_CODEC_ID_PCM_MULAW;
+    else if (codec == lit("ALAW"))
+        return AV_CODEC_ID_PCM_ALAW;
+    else if (codec == lit("PCM_S16LE"))
+        return AV_CODEC_ID_PCM_S16LE;
+    else
+        return AV_CODEC_ID_NONE;
+}
+
+
 QnAbstractAudioTransmitter::QnAbstractAudioTransmitter():
     QnAbstractDataConsumer(1000),
     m_transmittedPacketDuration(0),
