@@ -18,35 +18,6 @@
 
 namespace nx::vms::common::p2p::downloader {
 
-namespace {
-
-PeerInformationList otherPeersInfos(QnCommonModule* commonModule)
-{
-    PeerInformationList result;
-
-    const auto& selfId = commonModule->moduleGUID();
-
-    for (const auto& server: commonModule->resourcePool()->getAllServers(Qn::Online))
-    {
-        if (const auto& id = server->getId(); id != selfId)
-            result.append(PeerInformation{server->getSystemInfo(), id});
-    }
-
-    return result;
-}
-
-QList<QnUuid> otherPeersIds(QnCommonModule* commonModule)
-{
-    QList<QnUuid> result;
-
-    for (const auto& info: otherPeersInfos(commonModule))
-        result.append(info.id);
-
-    return result;
-}
-
-} // namespace
-
 nx::network::http::AsyncHttpClientPtr createHttpClient()
 {
     static const int kDownloadRequestTimeoutMs = 10 * 60 * 1000;
@@ -61,6 +32,8 @@ nx::network::http::AsyncHttpClientPtr createHttpClient()
 
 class ResourcePoolPeerManager::Private
 {
+    ResourcePoolPeerManager* const q = nullptr;
+
 public:
     QScopedPointer<InternetOnlyPeerManager> internetPeerManger;
     QHash<QnUuid, rest::QnConnectionPtr> directConnectionByServerId;
@@ -72,6 +45,11 @@ public:
     QHash<rest::Handle, std::function<void()>> cancelFunctionByRequestId;
 
 public:
+    Private(ResourcePoolPeerManager* q):
+        q(q)
+    {
+    }
+
     void saveCanceller(rest::Handle handle, std::function<void()>&& canceller)
     {
         NX_MUTEX_LOCKER lock(&mutex);
@@ -83,6 +61,40 @@ public:
         NX_MUTEX_LOCKER lock(&mutex);
         cancelFunctionByRequestId.remove(handle);
     }
+
+    PeerInformationList otherPeersInfos() const
+    {
+        PeerInformationList result;
+
+        const auto& selfId = q->commonModule()->moduleGUID();
+
+        for (const auto& server: q->commonModule()->resourcePool()->getAllServers(Qn::Online))
+        {
+            if (const auto& id = server->getId(); id != selfId)
+                result.append(PeerInformation{server->getSystemInfo(), id});
+        }
+
+        for (const auto& id: directConnectionByServerId.keys())
+        {
+            if (!std::any_of(result.begin(), result.end(),
+                [&id](const PeerInformation& info) { return info.id == id; }))
+            {
+                result.append(PeerInformation{nx::vms::api::SystemInformation(), id});
+            }
+        }
+
+        return result;
+    }
+
+    QList<QnUuid> otherPeersIds() const
+    {
+        QList<QnUuid> result;
+
+        for (const auto& info: otherPeersInfos())
+            result.append(info.id);
+
+        return result;
+    }
 };
 
 ResourcePoolPeerManager::ResourcePoolPeerManager(
@@ -91,7 +103,7 @@ ResourcePoolPeerManager::ResourcePoolPeerManager(
     bool isClient)
     :
     QnCommonModuleAware(commonModule),
-    d(new Private())
+    d(new Private(this))
 {
     d->internetPeerManger.reset(new InternetOnlyPeerManager());
     d->peerSelector = std::move(peerSelector);
@@ -132,7 +144,7 @@ QString ResourcePoolPeerManager::peerString(const QnUuid& peerId) const
 
 QList<QnUuid> ResourcePoolPeerManager::getAllPeers() const
 {
-    return otherPeersIds(commonModule());
+    return d->otherPeersIds();
 }
 
 int ResourcePoolPeerManager::distanceTo(const QnUuid& peerId) const
@@ -378,7 +390,7 @@ rest::QnConnectionPtr ResourcePoolPeerManager::getConnection(const QnUuid& peerI
 
 QList<QnUuid> ResourcePoolPeerManager::peers() const
 {
-    return d->peerSelector->peers(otherPeersInfos(commonModule()));
+    return d->peerSelector->peers(d->otherPeersInfos());
 }
 
 ResourcePoolPeerManagerFactory::ResourcePoolPeerManagerFactory(QnCommonModule* commonModule):
