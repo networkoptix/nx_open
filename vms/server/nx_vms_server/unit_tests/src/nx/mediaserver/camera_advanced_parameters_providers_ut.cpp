@@ -396,7 +396,7 @@ TEST_F(CameraAdvancedParametersProviders, SameAspectRatioRestrictions)
 
 TEST_F(CameraAdvancedParametersProviders, AdvancedParametersEquality)
 {
-    auto camera = newCamera([](CameraMock* camera) {});
+    auto camera = newCamera([](CameraMock* /*camera*/) {});
     auto parameters = QnCameraAdvancedParamsReader::paramsFromResource(camera);
     ASSERT_EQ(parameters, QnCameraAdvancedParams());
 
