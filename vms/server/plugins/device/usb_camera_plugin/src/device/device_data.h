@@ -8,17 +8,17 @@ namespace device {
 
 struct DeviceData
 {
-    std::string deviceName;
-    std::string devicePath;
+    std::string name;
+    std::string path;
     std::string uniqueId;
 
     DeviceData(
-        const std::string& deviceName,
-        const std::string& devicePath,
+        const std::string& name,
+        const std::string& path,
         const std::string& uniqueId)
         :
-        deviceName(deviceName),
-        devicePath(devicePath),
+        name(name),
+        path(path),
         uniqueId(uniqueId)
     {
     }

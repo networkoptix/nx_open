@@ -19,7 +19,7 @@
 #include "udev_utils.h"
 
 #define NX_V4L2_LOG(...) \
-NX_DEBUG(nx::utils::log::Tag(std::string("usb_cam::v4l2_utils::")+__FUNCTION__), __VA_ARGS__)
+NX_DEBUG(nx::utils::log::Tag(std::string("nx::usb_cam::v4l2_utils::")+__FUNCTION__), __VA_ARGS__)
 
 namespace nx {
 namespace usb_cam {
@@ -66,9 +66,11 @@ std::string getDeviceName(int fileDescriptor)
     struct v4l2_capability deviceCapability;
     if (ioctl(fileDescriptor, VIDIOC_QUERYCAP, &deviceCapability) == -1)
         return std::string();
+    
+    //force a null terminator on the end of the string with c_str()
     return std::string(
         deviceCapability.card,
-        deviceCapability.card + sizeof(deviceCapability.card));
+        deviceCapability.card + sizeof(deviceCapability.card)).c_str();
 };
 
 std::vector<std::string> getDevicePaths()

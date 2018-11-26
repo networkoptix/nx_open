@@ -38,14 +38,14 @@ void fillCameraAuxiliaryData(nxcip::CameraInfo* cameras, int cameraCount)
             if (audioTaken[device])
                 continue;
 
-            if(device->data.deviceName.find(camera->modelName) != std::string::npos)
+            if(device->data.name.find(camera->modelName) != std::string::npos)
             {
                 mute = false;
                 audioTaken[device] = true;
 
                 strncpy(
                     camera->auxiliaryData,
-                    device->data.devicePath.c_str(),
+                    device->data.path.c_str(),
                     sizeof(camera->auxiliaryData) - 1);
 
                 break;
@@ -61,7 +61,7 @@ void fillCameraAuxiliaryData(nxcip::CameraInfo* cameras, int cameraCount)
         {
             strncpy(
                 muteCamera->auxiliaryData,
-                defaults[0]->data.deviceName.c_str(),
+                defaults[0]->data.name.c_str(),
                 sizeof(muteCamera->auxiliaryData) - 1);
         }
     }
@@ -72,7 +72,7 @@ bool pluggedIn(const std::string& devicePath)
     auto devices = video::detail::getAudioDeviceList();
     for (const auto & device : devices)
     {
-        if (device.data.devicePath == devicePath)
+        if (device.data.path == devicePath)
             return true;
     }
     return false;
