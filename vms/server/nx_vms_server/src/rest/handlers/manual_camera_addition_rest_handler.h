@@ -18,7 +18,7 @@ class QnManualCameraAdditionRestHandler:
 
 public:
     QnManualCameraAdditionRestHandler(QnMediaServerModule* serverModule);
-    ~QnManualCameraAdditionRestHandler() = default;
+    ~QnManualCameraAdditionRestHandler();
 
     virtual int executeGet(
         const QString& path, const QnRequestParams& params, QnJsonRestResult& result,

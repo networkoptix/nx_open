@@ -17,10 +17,24 @@
 #include <common/common_module.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/thread/barrier_handler.h>
+
 
 QnManualCameraAdditionRestHandler::QnManualCameraAdditionRestHandler(QnMediaServerModule* serverModule):
     nx::mediaserver::ServerModuleAware(serverModule)
 {
+}
+
+QnManualCameraAdditionRestHandler::~QnManualCameraAdditionRestHandler()
+{
+    NX_MUTEX_LOCKER lock(&m_searchProcessMutex);
+    {
+        nx::utils::BarrierWaiter barrier;
+        for (auto& [uuid, searcher]: m_searchProcesses)
+        {
+            searcher->pleaseStop(barrier.fork());
+        }
+    }
 }
 
 int QnManualCameraAdditionRestHandler::searchStartAction(
@@ -69,7 +83,7 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
 
     QnUuid processUuid = QnUuid::createUuid();
     {
-        QnMutexLocker lock(&m_searchProcessMutex);
+        NX_MUTEX_LOCKER lock(&m_searchProcessMutex);
         auto [searcher, inserted] = m_searchProcesses.try_emplace(processUuid,
                 std::make_unique<QnManualCameraSearcher>(owner->commonModule()));
         if (!inserted)
@@ -120,7 +134,7 @@ int QnManualCameraAdditionRestHandler::searchStopAction(
     NX_VERBOSE(this, "Stopping search process with UUID=%1", processUuid);
     QnManualCameraSearcherPtr searcher;
     {
-        QnMutexLocker lock(&m_searchProcessMutex);
+        NX_MUTEX_LOCKER lock(&m_searchProcessMutex);
         if (m_searchProcesses.count(processUuid))
         {
             searcher = std::move(m_searchProcesses[processUuid]);
@@ -266,7 +280,7 @@ int QnManualCameraAdditionRestHandler::executePost(
 QnManualCameraSearchProcessStatus QnManualCameraAdditionRestHandler::getSearchStatus(
     const QnUuid& searchProcessUuid)
 {
-    QnMutexLocker lock(&m_searchProcessMutex);
+    NX_MUTEX_LOCKER lock(&m_searchProcessMutex);
 
     if (!m_searchProcesses.count(searchProcessUuid))
         return QnManualCameraSearchProcessStatus();
@@ -277,6 +291,6 @@ QnManualCameraSearchProcessStatus QnManualCameraAdditionRestHandler::getSearchSt
 bool QnManualCameraAdditionRestHandler::isSearchActive(
     const QnUuid &searchProcessUuid)
 {
-    QnMutexLocker lock(&m_searchProcessMutex);
+    NX_MUTEX_LOCKER lock(&m_searchProcessMutex);
     return m_searchProcesses.count(searchProcessUuid);
 }
