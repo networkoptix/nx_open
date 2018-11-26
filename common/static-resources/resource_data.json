@@ -1006,7 +1006,7 @@
                 "HIKVISION|DS-2CD4A26FWD-*",
                 "HIKVISION|iDS-2CD8426*",
                 "Hikvision|DS-2CD2625FWD*",
-                "Hikvision|DS-2TD2166*",
+                "Hikvision|DS-2TD2166*"
             ],
             "relayOutputInversed": true,
             "portNamePrefixToIgnore": "AlarmOut"
