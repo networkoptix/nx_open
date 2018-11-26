@@ -65,7 +65,7 @@ Manager::Manager(QnMediaServerModule* serverModule):
     m_visualMetadataDebugger(
         VisualMetadataDebuggerFactory::makeDebugger(DebuggerType::analyticsManager))
 {
-    m_thread->setObjectName("analytics::Manager");
+    m_thread->setObjectName(toString(this));
     moveToThread(m_thread);
     m_thread->start();
 }

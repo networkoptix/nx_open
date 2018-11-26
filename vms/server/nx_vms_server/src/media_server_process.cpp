@@ -4001,7 +4001,7 @@ void MediaServerProcess::writeMutableSettingsData()
 void MediaServerProcess::createTcpListener()
 {
     const int maxConnections = serverModule()->settings().maxConnections();
-    NX_INFO(this, lm("Max TCP connections fomr server= %1").arg(maxConnections));
+    NX_INFO(this, lm("Max TCP connections from server= %1").arg(maxConnections));
 
     // Accept SSL connections in all cases as it is always in use by cloud modules and old clients,
     // config value only affects server preference listed in moduleInformation.
