@@ -776,9 +776,10 @@
         },
         {
             "keys": [
-                "ACTI|KCM3311","ACTI|KCM7211","ACTI|KCM5611","ACTI|KCM5311","Sony|SNC-EM600","Sony|SNC-CX600","Sony|SNC-DH120T",
-                "Sony|SNC-XM636",
-            "DW|DWC-MB421TIR","Win4NET Co., Ltd.|Clebo-BL20","DW|DWC-MD421D"
+                "ACTI|KCM3311", "ACTI|KCM7211", "ACTI|KCM5611", "ACTI|KCM5311",
+                "Sony|SNC-EM600","Sony|SNC-CX600","Sony|SNC-DH120T", "Sony|SNC-XM636",
+                "DW|DWC-MB421TIR", "DW|DWC-MD421D", "DW|DWC-MV85DiA",
+                "Win4NET Co., Ltd.|Clebo-BL20"
             ],
             "operationalPtzCapabilities": "ContinuousZoomCapability"
         },
@@ -864,7 +865,7 @@
                 "VISTA|VK2-600PTZ",
                 "VISTA|VK2-1080PTZ",
                 "VISTA|VK2-ENCODER",
-        "Pelco|D5220",
+                "Pelco|D5220",
                 "Pelco|PelcoD5220"
             ],
             "operationalPtzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability|PresetsPtzCapability"
