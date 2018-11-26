@@ -8,22 +8,21 @@
 namespace {
 
 QnBaseSystemDescription::ServersList subtractLists(
-    const QnBaseSystemDescription::ServersList& first,
-    const QnBaseSystemDescription::ServersList& second)
+    QnBaseSystemDescription::ServersList minuend,
+    const QnBaseSystemDescription::ServersList& subtrahend)
 {
-    QnBaseSystemDescription::ServersList result;
-    std::copy_if(first.begin(), first.end(), std::back_inserter(result),
-        [&second](const nx::vms::api::ModuleInformation& first)
+    const auto newEnd = std::remove_if(minuend.begin(), minuend.end(),
+        [subtrahend](const nx::vms::api::ModuleInformation& current)
         {
-            const auto secondIt = std::find_if(second.begin(), second.end(),
-                [first](const nx::vms::api::ModuleInformation& second)
+            return std::any_of(subtrahend.begin(), subtrahend.end(),
+                [currentId = current.id](const nx::vms::api::ModuleInformation& other)
                 {
-                    return (first.id == second.id);
+                    return other.id == currentId;
                 });
-
-            return (secondIt == second.end()); // add to result if not found in second
         });
-    return result;
+
+    minuend.erase(newEnd, minuend.end());
+    return minuend;
 };
 
 bool isSameSystem(
@@ -279,28 +278,17 @@ void QnSystemDescriptionAggregator::updateServers()
     const auto toAdd = subtractLists(newServers, m_servers);
 
     m_servers = newServers;
-    for (const auto& server : toRemove)
+    for (const auto& server: toRemove)
         emit serverRemoved(server.id);
 
-    for (const auto& server : toAdd)
+    for (const auto& server: toAdd)
         emit serverAdded(server.id);
 
     /**
      * Updates server host in case we remove cloud system but have accesible local one.
      * See VMS-5884.
      */
-
-    const bool hasRemovedCloudServers = std::any_of(toRemove.begin(), toRemove.end(),
-        [this](const nx::vms::api::ModuleInformation& info)
-        {
-            const auto host = getServerHost(info.id);
-            return nx::network::SocketGlobals::addressResolver().isCloudHostName(host.toString());
-        });
-
-    if (!hasRemovedCloudServers)
-        return;
-
-    for (const auto& server: subtractLists(m_servers, toAdd))
+    for (const auto& server: subtractLists(newServers, toAdd))
         emit serverChanged(server.id, QnServerField::Host);
 }
 
