@@ -65,14 +65,14 @@ Manager::Manager(QnMediaServerModule* serverModule):
     m_visualMetadataDebugger(
         VisualMetadataDebuggerFactory::makeDebugger(DebuggerType::analyticsManager))
 {
-    m_thread->setObjectName(lit("AnalyticsManager"));
+    m_thread->setObjectName("analytics::Manager");
     moveToThread(m_thread);
     m_thread->start();
 }
 
 Manager::~Manager()
 {
-    NX_DEBUG(this, lit("Destroying AnalyticsManager."));
+    NX_DEBUG(this, "Destroying");
     stop();
 }
 
@@ -86,7 +86,7 @@ void Manager::stop()
 
 void Manager::init()
 {
-    NX_DEBUG(this, lit("Initializing AnalyticsManager."));
+    NX_DEBUG(this, "Initializing");
 
     connect(
         resourcePool(), &QnResourcePool::resourceAdded,
@@ -95,10 +95,6 @@ void Manager::init()
     connect(
         resourcePool(), &QnResourcePool::resourceRemoved,
         this, &Manager::at_resourceRemoved);
-
-    connect(
-        serverModule()->analyticsEventRuleWatcher(), &EventRuleWatcher::rulesUpdated,
-        this, &Manager::at_rulesUpdated);
 
     QMetaObject::invokeMethod(this, "initExistingResources");
 }
@@ -109,6 +105,10 @@ void Manager::initExistingResources()
     const auto devices = resourcePool()->getAllCameras(mediaServer, /*ignoreDesktopCamera*/ true);
     for (const auto& device: devices)
         at_deviceAdded(device);
+
+    const auto engines = resourcePool()->getResources<resource::AnalyticsEngineResource>();
+    for (const auto& engine: engines)
+        at_engineAdded(engine);
 }
 
 QSharedPointer<DeviceAnalyticsContext> Manager::context(const QnUuid& deviceId) const
@@ -201,32 +201,11 @@ void Manager::at_resourceRemoved(const QnResourcePtr& resource)
     at_engineRemoved(engine);
 }
 
-void Manager::at_rulesUpdated(const QSet<QnUuid>& affectedResources)
-{
-#if 0
-    NX_VERBOSE(
-        this,
-        lm("Rules have been updated. Affected resources: %1").arg(affectedResources));
-
-    for (const auto& resourceId: affectedResources)
-    {
-        auto resource = resourcePool()->getResourceById(resourceId);
-        if (!resource)
-            releaseDeviceAgentsUnsafe(resourceId);
-        else
-            handleResourceChanges(resource);
-    }
-#endif
-}
-
 void Manager::at_resourceParentIdChanged(const QnResourcePtr& resource)
 {
     auto device = resource.dynamicCast<QnVirtualCameraResource>();
-    if (!device)
-    {
-        NX_WARNING(this, "Resource is not a device.");
+    if (!NX_ASSERT(device))
         return;
-    }
 
     at_deviceParentIdChanged(device);
 }
@@ -241,11 +220,8 @@ void Manager::at_resourcePropertyChanged(const QnResourcePtr& resource, const QS
     }
 
     auto engine = resource.dynamicCast<resource::AnalyticsEngineResource>();
-    if (!engine)
-    {
-        NX_WARNING(this, "Resource is not a device or engine");
+    if (!NX_ASSERT(engine))
         return;
-    }
 
     at_enginePropertyChanged(engine, propertyName);
 }
@@ -353,37 +329,7 @@ void Manager::at_enginePropertyChanged(
     }
 
     if (propertyName == nx::vms::common::AnalyticsEngineResource::kSettingsValuesProperty)
-        updateEngineSettings(engine);
-}
-
-void Manager::updateEngineSettings(const resource::AnalyticsEngineResourcePtr& engine)
-{
-    auto sdkEngine = engine->sdkEngine();
-    if (!sdkEngine)
-    {
-        NX_ERROR(this, "Can't access underlying SDK analytics engine object for %1 (%2)",
-            engine->getName(), engine->getId());
-        return;
-    }
-
-    NX_DEBUG(this, "Updating engine %1 (%2) with settings",
-        engine->getName(), engine->getId());
-
-    if (pluginsIni().analyticsEngineSettingsPath[0] != 0)
-    {
-        NX_WARNING(
-            this,
-            "Passing engine settings from file, engine %1 (%2)",
-            engine->getName(),
-            engine->getId());
-
-        debug_helpers::setEngineSettings(sdkEngine);
-    }
-    else
-    {
-        auto sdkSettings = sdk_support::toSdkSettings(engine->settingsValues());
-        sdkEngine->setSettings(sdkSettings.get());
-    }
+        engine->sendSettingsToSdkEngine();
 }
 
 void Manager::registerMetadataSink(
@@ -488,11 +434,11 @@ QWeakPointer<QnAbstractDataReceptor> Manager::metadataSink(
 
 QWeakPointer<QnAbstractDataReceptor> Manager::metadataSink(const QnUuid& deviceId) const
 {
-    auto itr = m_metadataSinks.find(deviceId);
-    if (itr == m_metadataSinks.cend())
+    auto it = m_metadataSinks.find(deviceId);
+    if (it == m_metadataSinks.cend())
         return QWeakPointer<QnAbstractDataReceptor>();
 
-    return itr->second;
+    return it->second;
 }
 
 QWeakPointer<ProxyVideoDataReceptor> Manager::mediaSource(
@@ -503,11 +449,11 @@ QWeakPointer<ProxyVideoDataReceptor> Manager::mediaSource(
 
 QWeakPointer<ProxyVideoDataReceptor> Manager::mediaSource(const QnUuid& deviceId) const
 {
-    auto itr = m_mediaSources.find(deviceId);
-    if (itr == m_mediaSources.cend())
+    auto it = m_mediaSources.find(deviceId);
+    if (it == m_mediaSources.cend())
         return QWeakPointer<ProxyVideoDataReceptor>();
 
-    return itr->second;
+    return it->second;
 }
 
 } // namespace nx::mediaserver::analytics

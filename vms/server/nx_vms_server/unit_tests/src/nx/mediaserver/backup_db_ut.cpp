@@ -3,6 +3,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/vms/utils/vms_utils.h>
+#include <nx/vms/utils/system_helpers.h>
 #include <api/model/merge_system_data.h>
 #include <api/model/configure_system_data.h>
 #include <api/model/getnonce_reply.h>

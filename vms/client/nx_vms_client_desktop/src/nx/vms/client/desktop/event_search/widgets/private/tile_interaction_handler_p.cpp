@@ -1,12 +1,17 @@
 #include "tile_interaction_handler_p.h"
 
 #include <QtCore/QModelIndex>
+#include <QtGui/QDrag>
 #include <QtWidgets/QApplication>
 
 #include <client/client_globals.h>
+#include <core/resource/resource_display_info.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_resource.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
+#include <ui/style/helper.h>
+#include <ui/style/resource_icon_cache.h>
+#include <ui/style/skin.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -18,6 +23,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 
 namespace nx::vms::client::desktop {
@@ -82,7 +88,7 @@ TileInteractionHandler::TileInteractionHandler(EventRibbon* parent):
                 if (!m_ribbon->model()->setData(index, QVariant(), Qn::DefaultNotificationRole))
                     navigateToSource(index);
             }
-            else if (button == Qt::LeftButton && modifiers.testFlag(Qt::ControlModifier)
+            else if ((button == Qt::LeftButton && modifiers.testFlag(Qt::ControlModifier))
                 || button == Qt::MiddleButton)
             {
                 openSource(index, true /*inNewTab*/);
@@ -95,11 +101,8 @@ TileInteractionHandler::TileInteractionHandler(EventRibbon* parent):
             openSource(index, false /*inNewTab*/);
         });
 
-    connect(m_ribbon.data(), &EventRibbon::dragStarted, this,
-        [this](const QModelIndex& index)
-        {
-            //TODO: #vkutin Implement me!
-        });
+    connect(m_ribbon.data(), &EventRibbon::dragStarted,
+        this, &TileInteractionHandler::performDragAndDrop);
 }
 
 void TileInteractionHandler::navigateToSource(const QModelIndex& index)
@@ -138,8 +141,8 @@ void TileInteractionHandler::navigateToSource(const QModelIndex& index)
     const auto camera = openCameras.empty() ? QnVirtualCameraResourcePtr() : openCameras.front();
     if (camera)
     {
-        menu()->triggerIfPossible(GoToLayoutItemAction, Parameters(camera)
-            .withArgument(Qn::ForceRole, ini().raiseCameraFromClickedTile));
+        menu()->trigger(GoToLayoutItemAction, Parameters(camera)
+            .withArgument(Qn::RaiseSelectionRole, ini().raiseCameraFromClickedTile));
     }
 
     // If timeline is hidden, do no navigation.
@@ -174,6 +177,7 @@ void TileInteractionHandler::openSource(const QModelIndex& index, bool inNewTab)
         return;
 
     Parameters parameters(cameraList);
+    parameters.setArgument(Qn::SelectOnOpeningRole, true);
 
     const auto timestamp = index.data(Qn::TimestampRole);
     if (timestamp.canConvert<microseconds>())
@@ -182,22 +186,112 @@ void TileInteractionHandler::openSource(const QModelIndex& index, bool inNewTab)
             duration_cast<milliseconds>(timestamp.value<microseconds>()).count());
     }
 
-    nx::utils::ScopedConnection connection;
-    if (!inNewTab && cameraList.size() == 1 && workbench()->currentLayout())
-    {
-        connection.reset(connect(workbench()->currentLayout(), &QnWorkbenchLayout::itemAdded, this,
-            [this](const QnWorkbenchItem* item)
-            {
-                menu()->triggerIfPossible(GoToLayoutItemAction, Parameters()
-                    .withArgument(Qn::ItemUuidRole, item->uuid())
-                    .withArgument(Qn::ForceRole, ini().raiseCameraFromClickedTile));
-            }));
-    }
-
     hideMessages();
 
     const auto action = inNewTab ? OpenInNewTabAction : DropResourcesAction;
-    menu()->triggerIfPossible(action, parameters);
+    menu()->trigger(action, parameters);
+}
+
+void TileInteractionHandler::performDragAndDrop(
+    const QModelIndex& index, const QPoint& pos, const QSize& size)
+{
+    const auto cameraList = index.data(Qn::ResourceListRole).value<QnResourceList>()
+        .filtered<QnVirtualCameraResource>();
+
+    if (cameraList.empty())
+        return;
+
+    QScopedPointer<QMimeData> baseMimeData(index.model()->mimeData({index}));
+    if (!baseMimeData)
+        return;
+
+    QHash<int, QVariant> arguments;
+    arguments[Qn::SelectOnOpeningRole] = true;
+
+    const auto timestamp = index.data(Qn::TimestampRole);
+    arguments[Qn::ItemTimeRole] = QVariant::fromValue<qint64>(timestamp.canConvert<microseconds>()
+        ? duration_cast<milliseconds>(timestamp.value<microseconds>()).count()
+        : milliseconds(DATETIME_NOW).count());
+
+    MimeData data(baseMimeData.get(), nullptr);
+    data.setResources(cameraList);
+    data.setArguments(arguments);
+
+    QScopedPointer<QDrag> drag(new QDrag(this));
+    drag->setMimeData(data.createMimeData());
+    drag->setPixmap(createDragPixmap(cameraList, size.width()));
+    drag->setHotSpot({pos.x(), 0});
+
+    drag->exec(Qt::CopyAction);
+}
+
+QPixmap TileInteractionHandler::createDragPixmap(
+    const QnVirtualCameraResourceList& cameras, int width) const
+{
+    if (cameras.empty())
+        return {};
+
+    static constexpr int kMaximumRows = 10;
+    static constexpr int kFontPixelSize = 13;
+    static constexpr int kFontWeight = QFont::Medium;
+    static constexpr int kTextIndent = 4;
+
+    static constexpr int kTextFlags = Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine;
+
+    const auto iconSize = qnSkin->maximumSize(qnResIconCache->icon(QnResourceIconCache::Camera));
+
+    const int overflow = qMax(cameras.size() - kMaximumRows, 0);
+    const int cameraRows = cameras.size() - overflow;
+    const int totalRows = overflow ? (cameraRows + 1) : cameraRows;
+
+    const int height = totalRows * iconSize.height();
+
+    const auto devicePixelRatio = qApp->devicePixelRatio();
+    const auto palette = m_ribbon->palette();
+
+    auto font = m_ribbon->font();
+    font.setPixelSize(kFontPixelSize);
+    font.setWeight(kFontWeight);
+
+    QPixmap target(QSize(width, height) * devicePixelRatio);
+    target.setDevicePixelRatio(devicePixelRatio);
+    target.fill(palette.color(QPalette::Window));
+
+    QPainter painter(&target);
+    painter.setPen(palette.color(QPalette::Text));
+    painter.setFont(font);
+
+    QColor background = palette.color(QPalette::Highlight);
+    background.setAlphaF(style::Hints::kDisabledItemOpacity);
+    painter.fillRect(QRect(0, 0, width, height), background);
+
+    QRect rect(style::Metrics::kStandardPadding, 0, width, iconSize.height());
+    for (int i = 0; i < cameraRows; ++i)
+    {
+        const auto icon = qnResIconCache->icon(cameras[i]);
+        icon.paint(&painter, rect, {Qt::AlignLeft | Qt::AlignVCenter}, QIcon::Selected);
+
+        const auto text = QnResourceDisplayInfo(cameras[i]).name();
+        const auto textRect = rect.adjusted(iconSize.width() + kTextIndent, 0, 0, 0);
+        painter.drawText(textRect,
+            kTextFlags,
+            QFontMetrics(font).elidedText(text, Qt::ElideRight, textRect.width()));
+
+        rect.moveTop(rect.top() + iconSize.height());
+    }
+
+    if (overflow)
+    {
+        font.setWeight(QFont::Normal);
+        painter.setFont(font);
+        painter.setPen(palette.color(QPalette::WindowText));
+
+        painter.drawText(rect.adjusted(kTextIndent, 0, 0, 0),
+            kTextFlags,
+            tr("... and %n more", "", overflow));
+    }
+
+    return target;
 }
 
 void TileInteractionHandler::showMessage(const QString& text)

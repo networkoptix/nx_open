@@ -66,8 +66,8 @@ public:
 
     nx::sdk::Error stopFetchingMetadata();
 
-    virtual nx::sdk::Error setMetadataHandler(
-        nx::sdk::analytics::MetadataHandler* metadataHandler) override;
+    virtual nx::sdk::Error setHandler(
+        nx::sdk::analytics::DeviceAgent::IHandler* handler) override;
 
     bool isTimerNeeded() const;
 
@@ -86,7 +86,7 @@ public:
 
     virtual void setSettings(const nx::sdk::Settings* settings) override;
 
-    virtual nx::sdk::Settings* settings() const override;
+    virtual nx::sdk::Settings* pluginSideSettings() const override;
 
 private:
     Engine* const m_engine;
@@ -96,7 +96,7 @@ private:
     QByteArray m_cameraManifest;
     ElapsedEvents m_eventsToCatch;
     QByteArray m_buffer;
-    nx::sdk::analytics::MetadataHandler* m_metadataHandler = nullptr;
+    nx::sdk::analytics::DeviceAgent::IHandler* m_handler = nullptr;
 
     std::unique_ptr<nx::network::TCPSocket> m_tcpSocket;
     nx::network::aio::Timer m_stopEventTimer;

@@ -49,6 +49,7 @@ QnConnectToCloudWatcher::~QnConnectToCloudWatcher()
 
 void QnConnectToCloudWatcher::setCloudDbUrl(const nx::utils::Url& cloudDbUrl)
 {
+    QnMutexLocker lock(&m_mutex);
     m_cloudDbUrl = cloudDbUrl;
 }
 
@@ -66,7 +67,10 @@ void QnConnectToCloudWatcher::at_updateConnection()
         !m_commonModule->globalSettings()->cloudSystemId().isEmpty() &&
         !m_commonModule->globalSettings()->cloudAuthKey().isEmpty();
 
-    NX_DEBUG(this, "Update needCloudConnect. Value=%1", needCloudConnect);
+    NX_DEBUG(this, "Update needCloudConnect. Value=%1, cloudSystemId=%2, cloudAuthKey empty=%3",
+        needCloudConnect,
+        m_commonModule->globalSettings()->cloudSystemId(),
+        m_commonModule->globalSettings()->cloudAuthKey().isEmpty());
     if (!needCloudConnect)
     {
         if (!m_cloudUrl.isEmpty())
@@ -92,8 +96,8 @@ void QnConnectToCloudWatcher::at_updateConnection()
                     metaObject()->invokeMethod(this, "restartTimer", Qt::QueuedConnection);
                     return;
                 }
-
-                addCloudPeer(url);
+                setCloudDbUrl(url);
+                metaObject()->invokeMethod(this, "at_updateConnection", Qt::QueuedConnection);
             });
     }
 }

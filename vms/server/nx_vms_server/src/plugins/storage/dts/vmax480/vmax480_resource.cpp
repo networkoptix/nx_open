@@ -148,7 +148,7 @@ CameraDiagnostics::Result QnPlVmax480Resource::initializeCameraDriver()
     Qn::CameraCapabilities addFlags = Qn::PrimaryStreamSoftMotionCapability;
     setCameraCapabilities(getCameraCapabilities() | addFlags);
 
-    saveParams();
+    saveProperties();
 
     QnMutexLocker lock( &m_chunkReaderMutex );
     QnVMax480ChunkReader* chunkReader = m_chunkReaderMap.value(getHostAddress());

@@ -7,6 +7,7 @@
 #include <nx/sdk/utils.h>
 #include <nx/sdk/common/string.h>
 #include <nx/sdk/analytics/common_engine.h>
+#include <nx/sdk/common/plugin_event.h>
 #include <nx/sdk/analytics/plugin.h>
 
 namespace nx {
@@ -76,8 +77,9 @@ void* CommonVideoFrameProcessingDeviceAgent::queryInterface(const nxpl::NX_GUID&
     return nullptr;
 }
 
-Error CommonVideoFrameProcessingDeviceAgent::setMetadataHandler(MetadataHandler* handler)
+Error CommonVideoFrameProcessingDeviceAgent::setHandler(DeviceAgent::IHandler* handler)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_handler = handler;
     return Error::noError;
 }
@@ -144,48 +146,27 @@ Error CommonVideoFrameProcessingDeviceAgent::pushDataPacket(DataPacket* dataPack
         return Error::unknownError;
     }
 
-    for (auto& metadataPacket: metadataPackets)
     {
-        if (metadataPacket)
+        std::lock_guard<std::mutex> lock(m_mutex);
+        for (auto& metadataPacket: metadataPackets)
         {
-            NX_KIT_ASSERT(metadataPacket->timestampUsec() >= 0);
-            if (metadataPacket->timestampUsec() == 0)
-                NX_OUTPUT << __func__ << "(): WARNING: Metadata packet has timestamp 0.";
-            m_handler->handleMetadata(Error::noError, metadataPacket);
-            metadataPacket->releaseRef();
-        }
-        else
-        {
-            NX_OUTPUT << __func__ << "(): WARNING: Null metadata packet found; discarded.";
+            if (metadataPacket)
+            {
+                NX_KIT_ASSERT(metadataPacket->timestampUsec() >= 0);
+                if (metadataPacket->timestampUsec() == 0)
+                    NX_OUTPUT << __func__ << "(): WARNING: Metadata packet has timestamp 0.";
+                m_handler->handleMetadata(metadataPacket);
+                metadataPacket->releaseRef();
+            }
+            else
+            {
+                NX_OUTPUT << __func__ << "(): WARNING: Null metadata packet found; discarded.";
+            }
         }
     }
 
     NX_OUTPUT << __func__ << "() END -> noError";
     return Error::noError;
-}
-
-Error CommonVideoFrameProcessingDeviceAgent::setNeededMetadataTypes(
-    const IMetadataTypes* metadataTypes)
-{
-    if (metadataTypes->isNull())
-    {
-        stopFetchingMetadata();
-        return Error::noError;
-    }
-
-    return startFetchingMetadata(metadataTypes);
-}
-
-Error CommonVideoFrameProcessingDeviceAgent::startFetchingMetadata(
-    const IMetadataTypes* /*metadataTypes*/)
-{
-    NX_PRINT << __func__ << "() -> noError";
-    return Error::noError;
-}
-
-void CommonVideoFrameProcessingDeviceAgent::stopFetchingMetadata()
-{
-    NX_PRINT << __func__ << "() -> noError";
 }
 
 const IString* CommonVideoFrameProcessingDeviceAgent::manifest(Error* /*error*/) const
@@ -198,10 +179,10 @@ void CommonVideoFrameProcessingDeviceAgent::setSettings(const nx::sdk::Settings*
     if (!utils.fillAndOutputSettingsMap(&m_settings, settings, "Received settings"))
         return; //< The error is already logged.
 
-    settingsChanged();
+    settingsReceived();
 }
 
-nx::sdk::Settings* CommonVideoFrameProcessingDeviceAgent::settings() const
+nx::sdk::Settings* CommonVideoFrameProcessingDeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }
@@ -218,17 +199,38 @@ void CommonVideoFrameProcessingDeviceAgent::pushMetadataPacket(
         return;
     }
 
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (!m_handler)
     {
         NX_PRINT << __func__ << "(): "
-            << "INTERNAL ERROR: setMetadataHandler() was not called; ignoring the packet";
+            << "INTERNAL ERROR: setHandler() was not called; ignoring the packet";
     }
     else
     {
-        m_handler->handleMetadata(Error::noError, metadataPacket);
+        m_handler->handleMetadata(metadataPacket);
     }
 
     metadataPacket->releaseRef();
+}
+
+void CommonVideoFrameProcessingDeviceAgent::pushPluginEvent(
+    IPluginEvent::Level level,
+    std::string caption,
+    std::string description)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if (!m_handler)
+    {
+        NX_PRINT << __func__ << "(): "
+            << "INTERNAL ERROR: setHandler() was not called; ignoring plugin event";
+        return;
+    }
+
+    nxpt::ScopedRef<IPluginEvent> event(
+        new common::PluginEvent(level, caption, description),
+        /*increaseRef*/ false);
+
+    m_handler->handlePluginEvent(event.get());
 }
 
 // TODO: Consider making a template with param type, checked according to the manifest.

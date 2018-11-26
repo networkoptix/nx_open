@@ -22,7 +22,7 @@ namespace
 
         if (!nx::utils::file_system::ensureDir(dir))
         {
-            NX_WARNING(nx::utils::log::Tag(lit("Statistics")),
+            NX_WARNING(nx::utils::log::Tag(QStringLiteral("Statistics")),
                 lm("Unable to create directory %1").arg(dir));
             return QDir();
         }
@@ -32,18 +32,16 @@ namespace
 
     QDir getStatisticsDirectory()
     {
-        static const auto kStatisticsDirectoryName = lit("statistics");
-        static const auto kResult =
-            getCustomDirectory(kStatisticsDirectoryName);
+        static const auto kStatisticsDirectoryName = "statistics";
+        static const auto kResult = getCustomDirectory(kStatisticsDirectoryName);
 
         return kResult;
     }
 
     QDir getCustomDataDirectory()
     {
-        static const auto kCustomDirectoryName = lit("custom_properties");
-        static const auto kResult =
-            getCustomDirectory(kCustomDirectoryName);
+        static const auto kCustomDirectoryName = "custom_properties";
+        static const auto kResult = getCustomDirectory(kCustomDirectoryName);
 
         return kResult;
     }

@@ -2,7 +2,6 @@
 
 #include <core/resource/camera_resource.h>
 #include <ui/style/skin.h>
-#include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
 
@@ -16,31 +15,12 @@ BookmarkSearchWidget::BookmarkSearchWidget(QnWorkbenchContext* context, QWidget*
 {
     setPlaceholderPixmap(qnSkin->pixmap("events/placeholders/bookmarks.png"));
 
-    const auto updateTimelineBookmarks =
-        [this]()
-        {
-            auto watcher = this->context()->instance<QnTimelineBookmarksWatcher>();
-            if (!watcher)
-                return;
-
-            const auto currentCamera = navigator()->currentResource()
-                .dynamicCast<QnVirtualCameraResource>();
-            const bool relevant = currentCamera && cameras().contains(currentCamera);
-            watcher->setTextFilter(relevant ? textFilter() : QString());
-        };
-
-    connect(this, &AbstractSearchWidget::cameraSetChanged, updateTimelineBookmarks);
-
-    connect(navigator(), &QnWorkbenchNavigator::currentResourceChanged,
-        this, updateTimelineBookmarks);
-
     connect(this, &AbstractSearchWidget::textFilterChanged,
-        [this, updateTimelineBookmarks](const QString& text)
+        [this](const QString& text)
         {
             auto bookmarksModel = qobject_cast<BookmarkSearchListModel*>(model());
             NX_CRITICAL(bookmarksModel);
             bookmarksModel->setFilterText(text);
-            updateTimelineBookmarks();
         });
 }
 

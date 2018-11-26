@@ -51,22 +51,21 @@ void DeviceAgent::setSettings(const nx::sdk::Settings* /*settings*/)
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::Settings* DeviceAgent::settings() const
+nx::sdk::Settings* DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }
 
-nx::sdk::Error DeviceAgent::setMetadataHandler(
-    nx::sdk::analytics::MetadataHandler* metadataHandler)
+nx::sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::DeviceAgent::IHandler* handler)
 {
-    m_metadataHandler = metadataHandler;
+    m_handler = handler;
     return nx::sdk::Error::noError;
 }
 
 nx::sdk::Error DeviceAgent::setNeededMetadataTypes(
     const nx::sdk::analytics::IMetadataTypes* metadataTypes)
 {
-    if (metadataTypes->isNull())
+    if (metadataTypes->isEmpty())
     {
         stopFetchingMetadata();
         return Error::noError;
@@ -107,7 +106,7 @@ nx::sdk::Error DeviceAgent::startFetchingMetadata(
                 packet->addItem(event);
             }
 
-            m_metadataHandler->handleMetadata(Error::noError, packet);
+            m_handler->handleMetadata(packet);
         };
 
     NX_ASSERT(m_engine);

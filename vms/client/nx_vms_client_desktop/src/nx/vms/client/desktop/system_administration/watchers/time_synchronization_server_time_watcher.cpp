@@ -14,6 +14,8 @@
 namespace nx::vms::client::desktop
 {
 
+static constexpr int kDelayTickCount = 15;
+
 class TimeSynchronizationServerTimeWatcher::Private : public QObject
 {
     TimeSynchronizationServerTimeWatcher* q = nullptr;
@@ -26,20 +28,30 @@ public:
         m_currentRequest(rest::Handle())
     {
         NX_ASSERT(store);
+
+        auto timer = new QTimer(this);
+        timer->setInterval(1000);
+        timer->setSingleShot(false);
+        connect(timer, &QTimer::timeout, this, &Private::tick);
+        timer->start();
     }
 
-    void updateTimestamps()
+    void tick()
     {
+        if (m_tickCount++ < kDelayTickCount) //< In case of refactoring don't lose the ++
+            return;
+
         if (m_currentRequest)
             return;
 
         const auto server = q->commonModule()->currentServer();
         if (!server)
             return;
+
         auto apiConnection = server->restConnection();
 
         const auto callback = nx::utils::guarded(this,
-            [this, apiConnection]
+            [this]
             (bool success, rest::Handle handle, rest::MultiServerTimeData data)
             {
                 if (m_currentRequest != handle)
@@ -61,15 +73,19 @@ public:
                     offsetList += offsetInfo;
                 }
 
-                m_store->setTimeOffsets(offsetList);
+                if (m_store)
+                    m_store->setTimeOffsets(offsetList);
             });
 
+        m_tickCount = 0;
         m_currentRequest = apiConnection->getTimeOfServersAsync(callback, thread());
     }
+
 private:
     QPointer<TimeSynchronizationWidgetStore> m_store;
     rest::Handle m_currentRequest;
     qint64 m_currentRequestStartTime;
+    int m_tickCount = kDelayTickCount; //< Fire request right after creation
 };
 
 TimeSynchronizationServerTimeWatcher::TimeSynchronizationServerTimeWatcher(
@@ -84,11 +100,6 @@ TimeSynchronizationServerTimeWatcher::TimeSynchronizationServerTimeWatcher(
 
 TimeSynchronizationServerTimeWatcher::~TimeSynchronizationServerTimeWatcher()
 {
-}
-
-void TimeSynchronizationServerTimeWatcher::updateTimestamps()
-{
-    d->updateTimestamps();
 }
 
 } // namespace nx::vms::client::desktop

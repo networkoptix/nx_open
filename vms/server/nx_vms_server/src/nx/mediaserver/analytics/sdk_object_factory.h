@@ -38,10 +38,13 @@ private:
 
     nx::vms::api::AnalyticsEngineData createEngineData(
         const resource::AnalyticsPluginResourcePtr& plugin,
-        const int engineIndex) const;
+        const QnUuid& engineId) const;
 
     std::unique_ptr<sdk_support::AbstractManifestLogger> makeLogger(
         resource::AnalyticsPluginResourcePtr pluginResource) const;
+
+    std::unique_ptr<sdk_support::AbstractManifestLogger> makeLogger(
+        const nx::sdk::analytics::Plugin* plugin) const;
 };
 
 } // namespace nx::mediaserver::analytics

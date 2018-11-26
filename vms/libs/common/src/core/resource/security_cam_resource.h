@@ -64,6 +64,8 @@ public:
 
     virtual int getMaxFps() const;
 
+    virtual void setMaxFps(int fps);
+
     virtual int reservedSecondStreamFps() const;
 
     /** sets the distance between I frames */

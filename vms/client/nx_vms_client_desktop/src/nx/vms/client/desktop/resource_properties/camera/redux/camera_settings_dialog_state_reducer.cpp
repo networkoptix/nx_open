@@ -487,10 +487,21 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     state.devicesDescription.isDtsBased = combinedValue(cameras,
         [](const Camera& camera) { return camera->isDtsBased(); });
+    state.devicesDescription.supportsRecording = combinedValue(cameras,
+        [](const Camera& camera) { return camera->hasVideo() || camera->isAudioSupported(); });
+
     state.devicesDescription.isWearable = combinedValue(cameras,
         [](const Camera& camera) { return camera->hasFlags(Qn::wearable_camera); });
     state.devicesDescription.isIoModule = combinedValue(cameras,
         [](const Camera& camera) { return camera->isIOModule(); });
+
+    state.devicesDescription.supportsVideo = combinedValue(cameras,
+        [](const Camera& camera) { return camera->hasVideo(); });
+    state.devicesDescription.supportsAudio = combinedValue(cameras,
+        [](const Camera& camera) { return camera->isAudioSupported(); });
+    state.devicesDescription.isAudioForced = combinedValue(cameras,
+        [](const Camera& camera) { return camera->isAudioForced(); });
+
     state.devicesDescription.hasMotion = combinedValue(cameras,
         [](const Camera& camera) { return camera->hasMotion(); });
     state.devicesDescription.hasDualStreamingCapability = combinedValue(cameras,
@@ -1312,6 +1323,13 @@ State CameraSettingsDialogStateReducer::setAnalyticsEngines(
     State state, const QList<AnalyticsEngineInfo>& value)
 {
     state.analytics.engines = value;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setCurrentAnalyticsEngineId(
+    State state, const QnUuid& value)
+{
+    state.analytics.currentEngineId = value;
     return state;
 }
 

@@ -3,6 +3,7 @@
 #include <QtCore/QString>
 
 #include <nx/sdk/common.h>
+#include <nx/sdk/analytics/plugin.h>
 
 #include <core/resource/resource_fwd.h>
 #include <nx/mediaserver/resource/resource_fwd.h>
@@ -58,6 +59,29 @@ private:
     QnVirtualCameraResourcePtr m_device;
     resource::AnalyticsPluginResourcePtr m_pluginResource;
     resource::AnalyticsEngineResourcePtr m_engineResource;
+};
+
+/**
+ * Used on server startup when resources are not available yet.
+ */
+class StartupPluginManifestLogger: public AbstractManifestLogger
+{
+public:
+    StartupPluginManifestLogger(
+        nx::utils::log::Tag logTag,
+        const nx::sdk::analytics::Plugin* plugin);
+
+    virtual void log(
+        const QString& manifestStr,
+        nx::sdk::Error error,
+        const QString& customError) override;
+
+private:
+    QString buildLogString(const QString& error) const;
+
+private:
+    nx::utils::log::Tag m_logTag;
+    const nx::sdk::analytics::Plugin* m_plugin = nullptr;
 };
 
 } // namespace nx::mediaserver::sdk_support

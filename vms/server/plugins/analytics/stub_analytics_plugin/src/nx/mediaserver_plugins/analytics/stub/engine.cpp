@@ -21,6 +21,14 @@ Engine::Engine(Plugin* plugin): CommonEngine(plugin, NX_DEBUG_ENABLE_OUTPUT)
     initCapabilities();
 }
 
+Engine::~Engine()
+{
+    m_terminated.store(true);
+    m_pluginEventGenerationLoopCondition.notify_all();
+    if (m_thread)
+        m_thread->join();
+}
+
 nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
     const DeviceInfo* /*deviceInfo*/, Error* /*outError*/)
 {
@@ -52,14 +60,40 @@ void Engine::initCapabilities()
         m_capabilities.erase(0, 1);
 }
 
+void Engine::processPluginEvents()
+{
+    while (!m_terminated)
+    {
+        using namespace std::chrono_literals;
+
+        pushPluginEvent(
+            IPluginEvent::Level::info,
+            "Info message from Engine",
+            "Info message description");
+
+        pushPluginEvent(
+            IPluginEvent::Level::warning,
+            "Warning message from Engine",
+            "Warning message description");
+
+        pushPluginEvent(
+            IPluginEvent::Level::error,
+            "Error message from Engine",
+            "Error message description");
+
+        // Sleep until the next event pack needs to be generated, or the thread is ordered to
+        // terminate (hence condition variable instead of sleep()). Return value (whether the
+        // timeout has occurred) and spurious wake-ups are ignored.
+        static const std::chrono::seconds kEventGenerationPeriod{10};
+        std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
+        m_pluginEventGenerationLoopCondition.wait_for(lock, kEventGenerationPeriod);
+    }
+}
+
 std::string Engine::manifest() const
 {
     return /*suppress newline*/1 + R"json(
 {
-    "pluginId": "nx.stub",
-    "pluginName": {
-        "value": "Stub Analytics Plugin"
-    },
     "eventTypes": [
         {
             "id": ")json" + kLineCrossingEventType + R"json(",
@@ -132,7 +166,7 @@ std::string Engine::manifest() const
         "items": [
             {
                 "type": "TextField",
-                "name": "nx.stub.device_agent.settings.text_0",
+                "name": "test_text_field",
                 "caption": "Device Agent Text Field",
                 "description": "A text field",
                 "defaultValue": "a text"
@@ -144,7 +178,7 @@ std::string Engine::manifest() const
                     {
                         "type": "SpinBox",
                         "caption": "Device Agent SpinBox",
-                        "name": "nx.stub.device_agent.settings.number_0",
+                        "name": "test_spin_box",
                         "defaultValue": 42,
                         "minValue": 0,
                         "maxValue": 100
@@ -152,14 +186,14 @@ std::string Engine::manifest() const
                     {
                         "type": "DoubleSpinBox",
                         "caption": "Device Agent DoubleSpinBox",
-                        "name": "nx.stub.device_agent.settings.double_0",
+                        "name": "test_double_spin_box",
                         "defaultValue": 3.1415,
                         "minValue": 0.0,
                         "maxValue": 100.0
                     },
                     {
                         "type": "ComboBox",
-                        "name": "nx.stub.device_agent.settings.combobox_0",
+                        "name": "test_combo_box",
                         "caption": "Device Agent ComboBox",
                         "defaultValue": "value2",
                         "range": ["value1", "value2", "value3"]
@@ -168,15 +202,9 @@ std::string Engine::manifest() const
                         "type": "Row",
                         "items": [
                             {
-                                "type": "Button",
-                                "caption": "Device Agent Button",
-                                "name": "nx.stub.device_agent.settings.button_0",
-                                "caption": "Button"
-                            },
-                            {
                                 "type": "CheckBox",
                                 "caption": "Device Agent CheckBox",
-                                "name": "nx.stub.device_agent.settings.checkbox_0",
+                                "name": "test_check_box",
                                 "defaultValue": true,
                                 "value": true
                             }
@@ -190,9 +218,18 @@ std::string Engine::manifest() const
 )json";
 }
 
-void Engine::settingsChanged()
+void Engine::settingsReceived()
 {
-    NX_PRINT << __func__ << "()";
+    if (ini().throwPluginEventsFromEngine)
+    {
+        NX_PRINT << __func__ << "(): Starting plugin event generation thread";
+        if (!m_thread)
+            m_thread.reset(new std::thread([this]() { processPluginEvents(); }));
+    }
+    else
+    {
+        NX_PRINT << __func__ << "()";
+    }
 }
 
 void Engine::executeAction(
@@ -253,7 +290,7 @@ static const std::string kPluginManifest = R"json(
         "items": [
             {
                 "type": "TextField",
-                "name": "nx.stub.engine.settings.text_0",
+                "name": "text",
                 "caption": "Text Field",
                 "description": "A text field",
                 "defaultValue": "a text"
@@ -264,21 +301,21 @@ static const std::string kPluginManifest = R"json(
                 "items": [
                     {
                         "type": "SpinBox",
-                        "name": "nx.stub.engine.settings.number_0",
+                        "name": "test_spin_box",
                         "defaultValue": 42,
                         "minValue": 0,
                         "maxValue": 100
                     },
                     {
                         "type": "DoubleSpinBox",
-                        "name": "nx.stub.engine.settings.double_0",
+                        "name": "test_double_spin_box",
                         "defaultValue": 3.1415,
                         "minValue": 0.0,
                         "maxValue": 100.0
                     },
                     {
                         "type": "ComboBox",
-                        "name": "nx.stub.engine.settings.combobox_0",
+                        "name": "test_double_combo_box",
                         "defaultValue": "value2",
                         "range": ["value1", "value2", "value3"]
                     },
@@ -286,13 +323,8 @@ static const std::string kPluginManifest = R"json(
                         "type": "Row",
                         "items": [
                             {
-                                "type": "Button",
-                                "name": "nx.stub.engine.settings.button_0",
-                                "caption": "Button"
-                            },
-                            {
                                 "type": "CheckBox",
-                                "name": "nx.stub.engine.settings.checkbox_0",
+                                "name": "test_check_box",
                                 "defaultValue": true,
                                 "value": true
                             }

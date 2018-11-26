@@ -1,7 +1,6 @@
 #pragma once
 
-#include <map>
-#include <set>
+#include <vector>
 
 #include <QtCore/QString>
 #include <QtCore/QRegExp>
@@ -9,9 +8,7 @@
 #include <nx/network/http/http_types.h>
 #include <nx/utils/thread/mutex.h>
 
-namespace nx {
-namespace network {
-namespace http {
+namespace nx::network::http {
 
 namespace AuthMethod {
 
@@ -65,36 +62,54 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Values);
 class NX_NETWORK_API AuthMethodRestrictionList
 {
 public:
+    struct Filter
+    {
+        std::optional<std::string> protocol;
+        std::optional<std::string> method;
+        /** Regular expression. */
+        std::optional<std::string> path;
+    };
+
     static const AuthMethod::Values kDefaults;
+
+    AuthMethodRestrictionList() = default;
+    AuthMethodRestrictionList(AuthMethod::Values allowedByDefault);
 
     /**
      * @return Bit mask of auth methods (AuthMethod::Value enumeration).
      */
     AuthMethod::Values getAllowedAuthMethods(const nx::network::http::Request& request) const;
 
+    void allow(const Filter& filter, AuthMethod::Values authMethod);
+    
     /**
-     * @param pathMask Wildcard-mask of path.
+     * Allow using path filter only.
      */
-    void allow(const QString& pathMask, AuthMethod::Values method);
+    void allow(const std::string& pathMask, AuthMethod::Values method);
+
+    void deny(const Filter& filter, AuthMethod::Values authMethod);
+    
     /**
-     * @param pathMask Wildcard-mask of path.
+     * Deny using path filter only.
      */
-    void deny(const QString& pathMask, AuthMethod::Values method);
+    void deny(const std::string& pathMask, AuthMethod::Values method);
 
 private:
     struct Rule
     {
-        QRegExp expression;
+        Filter filter;
+        QRegExp pathRegexp;
         AuthMethod::Values methods;
-        Rule(const QString& expression, AuthMethod::Values methods);
+
+        Rule(const Filter& filter, AuthMethod::Values methods);
+
+        bool matches(const Request& request) const;
     };
 
+    const AuthMethod::Values m_allowedByDefault = kDefaults;
     mutable QnMutex m_mutex;
-    std::map<QString, Rule> m_allowed;
-    std::map<QString, Rule> m_denied;
-    std::set<QString> m_allowCookieWithotScrf;
+    std::vector<Rule> m_allowed;
+    std::vector<Rule> m_denied;
 };
 
-} // namespace nx
-} // namespace network
-} // namespace http
+} // namespace nx::network::http

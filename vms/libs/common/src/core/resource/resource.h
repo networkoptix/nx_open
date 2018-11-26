@@ -158,11 +158,12 @@ public:
         return setProperty(key, update(getProperty(key)));
     }
 
-    //!Call this with proper field names to emit corresponding *changed signals. Signal can be defined in a derived class
+    //!Call this with proper field names to emit corresponding *changed signals.
+    // Signal can be defined in a derived class.
     void emitModificationSignals(const QSet<QByteArray>& modifiedFields);
 
-    virtual bool saveParams();
-    virtual int saveParamsAsync();
+    virtual bool saveProperties();
+    virtual int savePropertiesAsync();
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QString &param) const;
     void statusChanged(const QnResourcePtr &resource, Qn::StatusChangeReason reason);
@@ -265,7 +266,7 @@ private:
         }
     };
 
-    /** Resource pool this this resource belongs to. */
+    /** Resource pool this resource belongs to. */
     QnResourcePool* m_resourcePool = nullptr;
 
     /** Identifier of this resource. */

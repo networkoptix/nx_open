@@ -37,6 +37,16 @@ void addParserParam(QnCommandLineParser& parser, ValueType* valuePtr, const char
 static const QString kEncodeAuthMagic = lit("@@");
 static const nx::vms::api::SoftwareVersion kEncodeSupportVersion(3, 0, 0, 14350);
 
+QString fromNativePath(const QString &path)
+{
+    QString result = QDir::cleanPath(QDir::fromNativeSeparators(path));
+
+    if (!result.isEmpty() && result.endsWith(QLatin1Char('/')))
+        result.chop(1);
+
+    return result;
+}
+
 } // namespace
 
 const QString QnStartupParameters::kScreenKey(lit("--screen"));

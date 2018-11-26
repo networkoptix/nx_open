@@ -53,16 +53,17 @@ void AdtsInjector::uninitialize()
     // write trailer before doing actual uninitialize
     if (m_formatContext)
         av_write_trailer(m_formatContext);
+        avformat_free_context(m_formatContext);
+    }
+    m_formatContext = nullptr;
+
+    uninitializeIoContext();
 
     if(m_outputStream)
         avcodec_free_context(&m_outputStream->codec);
     m_outputStream = nullptr;
 
     if (m_formatContext)
-        avformat_free_context(m_formatContext);
-    m_formatContext = nullptr;
-    
-    uninitializeIoContext();
 
     m_currentPacket = nullptr;
 }

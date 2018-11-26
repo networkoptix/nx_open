@@ -40,9 +40,9 @@ public:
     QIcon icon(const QIcon& icon);
 
     /// @brief Loads pixmap with appropriate size according to current hidpi settings
-    QPixmap pixmap(const char* name, bool correctDevicePixelRatio = true);
-
-    QPixmap pixmap(const QString& name, bool correctDevicePixelRatio = true);
+    /// @param desiredSize is used for svg images only,
+    /// this size may be corrected internally if #correctDevicePixelRatio is set to true
+    QPixmap pixmap(const QString& name, bool correctDevicePixelRatio = true, const QSize& desiredSize = QSize());
 
     QMovie* newMovie(const QString& name, QObject* parent = nullptr);
     QMovie* newMovie(const char* name, QObject* parent = nullptr);
@@ -62,7 +62,8 @@ public:
 private:
     void init(const QStringList& paths);
 
-    QPixmap getPixmapInternal(const QString &name);
+    QPixmap getPixmapInternal(const QString& name);
+    QPixmap getPixmapFromSvgInternal(const QString& name, bool correctDevicePixelRatio, const QSize& size);
 
 private:
     QStringList m_paths;

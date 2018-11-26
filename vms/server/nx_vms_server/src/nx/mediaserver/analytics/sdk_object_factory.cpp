@@ -91,10 +91,9 @@ ec2::AbstractAnalyticsManagerPtr getAnalyticsManager(QnMediaServerModule* server
     return analyticsManager;
 }
 
-QnUuid engineId(const QnUuid& pluginId, int engineIndex)
+QnUuid defaultEngineId(const QnUuid& pluginId)
 {
-    return QnUuid::fromArbitraryData(
-        "engine_" + QString::number(engineIndex) + "_" + pluginId.toString());
+    return QnUuid::fromArbitraryData("engine_" + pluginId.toString());
 }
 
 } // namespace
@@ -146,34 +145,30 @@ bool SdkObjectFactory::initPluginResources()
     for (auto& analyticsPluginData: databaseAnalyticsPlugins)
         pluginDataById.emplace(analyticsPluginData.id, std::move(analyticsPluginData));
 
-    auto realAnalyticsPlugins = pluginManager->findNxPlugins<nx::sdk::analytics::Plugin>(
+    auto analyticsPlugins = pluginManager->findNxPlugins<nx::sdk::analytics::Plugin>(
         nx::sdk::analytics::IID_Plugin);
 
     std::map<QnUuid, PluginPtr> sdkPluginsById;
-    for (const auto realAnalyticsPlugin: realAnalyticsPlugins)
+    for (const auto analyticsPlugin: analyticsPlugins)
     {
-        auto realAnalyticsPluginPtr =
-            sdk_support::SharedPtr<nx::sdk::analytics::Plugin>(realAnalyticsPlugin);
+        auto analyticsPluginPtr =
+            sdk_support::SharedPtr<nx::sdk::analytics::Plugin>(analyticsPlugin);
 
         const auto pluginManifest = sdk_support::manifest<nx::vms::api::analytics::PluginManifest>(
-            realAnalyticsPlugin,
-            makeLogger(resource::AnalyticsPluginResourcePtr()));
+            analyticsPlugin,
+            makeLogger(analyticsPlugin));
 
         if (!pluginManifest)
         {
-            NX_ERROR(
-                this,
-                "Can't fetch a manifest from the analytics plugin %1",
-                realAnalyticsPlugin->name());
+            NX_ERROR(this, "Can't fetch a manifest from the analytics plugin %1",
+                analyticsPlugin->name());
             continue;
         }
 
         const auto id = QnUuid::fromArbitraryData(pluginManifest->id);
-        sdkPluginsById.emplace(id, realAnalyticsPluginPtr);
+        sdkPluginsById.emplace(id, analyticsPluginPtr);
 
-        NX_DEBUG(
-            this,
-            "Creating an analytics plugin resource. Id: %1; Name: %2",
+        NX_DEBUG(this, "Creating an analytics plugin resource. Id: %1; Name: %2",
             id, pluginManifest->name);
 
         auto& data = pluginDataById[id];
@@ -243,10 +238,8 @@ bool SdkObjectFactory::initEngineResources()
 
     if (errorCode != ec2::ErrorCode::ok)
     {
-        NX_ERROR(
-            this,
-            lm("Error has occured while retrieving engines from the database: %1")
-                .args(errorCode));
+        NX_ERROR(this, "Error has occured while retrieving engines from the database: %1",
+            errorCode);
         return false;
     }
 
@@ -263,9 +256,9 @@ bool SdkObjectFactory::initEngineResources()
         const auto& pluginId = plugin->getId();
         auto& pluginEngineList = engineDataByPlugin[pluginId];
 
-        // TODO: Create default engine only if plugin has correspondent capability.
+        // TODO: Decide on a proper creation policy for Engines.
         if (pluginEngineList.empty())
-            pluginEngineList.push_back(createEngineData(plugin, /*engineIndex*/ 0));
+            pluginEngineList.push_back(createEngineData(plugin, defaultEngineId(plugin->getId())));
     }
 
     std::map<QnUuid, EnginePtr> sdkEnginesById;
@@ -281,8 +274,7 @@ bool SdkObjectFactory::initEngineResources()
 
             if (!engineResource)
             {
-                NX_WARNING(
-                    this,
+                NX_WARNING(this,
                     "Unable to find an analytics engine resource in the resource pool. "
                     "Engine name: %1, engine Id: (%2)",
                     engine.name, engine.id);
@@ -295,8 +287,7 @@ bool SdkObjectFactory::initEngineResources()
 
             if (!parentPlugin)
             {
-                NX_WARNING(
-                    this,
+                NX_WARNING(this,
                     "Unable to find a parent analytics plugin for the engine %1 (%2)",
                     engineResource->getName(), engineResource->getId());
 
@@ -306,8 +297,7 @@ bool SdkObjectFactory::initEngineResources()
             auto sdkPlugin = parentPlugin->sdkPlugin();
             if (!sdkPlugin)
             {
-                NX_WARNING(
-                    this,
+                NX_WARNING(this,
                     "Plugin resource %1 (%2) has no correspondent SDK object",
                     parentPlugin->getName(), parentPlugin->getId());
 
@@ -354,7 +344,7 @@ bool SdkObjectFactory::initEngineResources()
 
 nx::vms::api::AnalyticsEngineData SdkObjectFactory::createEngineData(
     const resource::AnalyticsPluginResourcePtr& plugin,
-    int engineIndex) const
+    const QnUuid& engineId) const
 {
     using namespace nx::vms::api;
 
@@ -362,11 +352,9 @@ nx::vms::api::AnalyticsEngineData SdkObjectFactory::createEngineData(
     const auto pluginName = plugin->getName();
 
     AnalyticsEngineData engineData;
-    engineData.id = engineId(pluginId, engineIndex);
+    engineData.id = engineId;
     engineData.parentId = pluginId;
-
-    // TODO: Plugin name should be used here.
-    engineData.name = pluginName + " - Engine " + QString::number(engineIndex);
+    engineData.name = pluginName;
     engineData.typeId = nx::vms::api::AnalyticsEngineData::kResourceTypeId;
 
     return engineData;
@@ -375,13 +363,19 @@ nx::vms::api::AnalyticsEngineData SdkObjectFactory::createEngineData(
 std::unique_ptr<sdk_support::AbstractManifestLogger> SdkObjectFactory::makeLogger(
     resource::AnalyticsPluginResourcePtr pluginResource) const
 {
-    const QString messageTemplate(
-        "Error occurred while fetching Plugin manifest: {:error}");
-
+    const QString messageTemplate("Error occurred while fetching Plugin manifest: {:error}");
     return std::make_unique<sdk_support::ManifestLogger>(
-        nx::utils::log::Tag(typeid(this)),
+        typeid(this), //< Using the same tag for all instances.
         messageTemplate,
         std::move(pluginResource));
+}
+
+std::unique_ptr<sdk_support::AbstractManifestLogger> SdkObjectFactory::makeLogger(
+    const nx::sdk::analytics::Plugin* plugin) const
+{
+    return std::make_unique<sdk_support::StartupPluginManifestLogger>(
+        nx::utils::log::Tag(typeid(this)),
+        plugin);
 }
 
 } // namespace nx::mediaserver::analytics

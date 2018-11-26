@@ -6,6 +6,8 @@
 #include <media_server/media_server_module.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <nx/utils/log/log.h>
+
 #include <nx/mediaserver/resource/analytics_plugin_resource.h>
 #include <nx/mediaserver/resource/analytics_engine_resource.h>
 
@@ -77,7 +79,7 @@ JsonRestResponse AnalyticsEngineSettingsHandler::executePost(
     }
 
     engine->setSettingsValues(settings.toVariantMap());
-    engine->saveParams();
+    engine->saveProperties();
 
     JsonRestResponse response(http::StatusCode::ok);
     response.json.setReply(QJsonObject::fromVariantMap(engine->settingsValues()));

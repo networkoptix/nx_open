@@ -6,6 +6,8 @@
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/split.hpp>
 
+#include <nx/utils/time.h>
+
 namespace nx::cloud::db::dao::memory {
 
 void TemporaryCredentialsDao::insert(
@@ -60,7 +62,18 @@ void TemporaryCredentialsDao::deleteById(
 void TemporaryCredentialsDao::deleteExpiredCredentials(
     nx::sql::QueryContext* /*queryContext*/)
 {
-    // TODO
+    const auto currentTime = nx::utils::timeSinceEpoch();
+
+    removeByCondition(
+        [currentTime](const auto& credentials)
+        {
+            const bool isExpired =
+                (credentials.expirationTimestampUtc > 0) &&
+                (credentials.expirationTimestampUtc <= currentTime.count());
+
+            return isExpired
+                || credentials.useCount >= credentials.maxUseCount;
+        });
 }
 
 std::vector<data::TemporaryAccountCredentialsEx> TemporaryCredentialsDao::fetchAll(

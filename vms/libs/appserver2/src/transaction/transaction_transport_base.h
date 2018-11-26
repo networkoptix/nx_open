@@ -208,6 +208,8 @@ public:
 
     void addDataToTheSendQueue(QByteArray data);
 
+    void setPostTranUrl(const nx::utils::Url& url);
+
 signals:
     void gotTransaction(
         Qn::SerializationFormat tranFormat,
@@ -294,6 +296,7 @@ private:
     nx::network::http::AsyncHttpClientPtr m_outgoingTranClient;
     bool m_authOutgoingConnectionByServerKey;
     nx::utils::Url m_postTranBaseUrl;
+    std::optional<nx::utils::Url> m_mockedUpPostTranUrl;
     nx::Buffer m_dummyReadBuffer;
     bool m_base64EncodeOutgoingTransactions;
     std::vector<nx::network::http::HttpHeader> m_outgoingClientHeaders;

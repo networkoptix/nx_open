@@ -83,7 +83,7 @@ public:
 
             m_camera->setProperty(kPtzHotkeysPropertyName, serialized);
 
-            m_camera->saveParamsAsync();
+            m_camera->savePropertiesAsync();
         }
     }
 
@@ -94,7 +94,6 @@ private:
     std::unique_ptr<QnJsonResourcePropertyHandler<QnPtzIdByHotkeyHash>> m_propertyHandler;
     mutable QnMutex m_mutex;
 };
-
 
 bool getDevicePosition(const QnPtzControllerPtr &controller, nx::core::ptz::Vector* outPosition)
 {

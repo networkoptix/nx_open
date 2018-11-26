@@ -1,5 +1,7 @@
 #include "scoped_timer.h"
 
+#include <QtCore/QDebug>
+
 QnScopedTimer::QnScopedTimer(const QString &description, qint64 detailMs)
     : m_description(description)
     , m_detailMs(detailMs)

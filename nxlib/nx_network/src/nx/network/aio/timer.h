@@ -10,9 +10,9 @@
 #include "aio_event_handler.h"
 #include "basic_pollable.h"
 
-namespace nx {
-namespace network {
-namespace aio {
+namespace nx::network::aio {
+
+using TimerEventHandler = nx::utils::MoveOnlyFunc<void()>;
 
 /**
  * Single-shot timer that runs in aio thread.
@@ -33,7 +33,7 @@ public:
      */
     void start(
         std::chrono::milliseconds timeout,
-        nx::utils::MoveOnlyFunc<void()> timerFunc);
+        TimerEventHandler timerFunc);
 
     boost::optional<std::chrono::nanoseconds> timeToEvent() const;
     void cancelAsync(nx::utils::MoveOnlyFunc<void()> completionHandler);
@@ -49,7 +49,7 @@ protected:
     virtual void eventTriggered(Pollable* sock, aio::EventType eventType) throw() override;
 
 private:
-    nx::utils::MoveOnlyFunc<void()> m_handler;
+    TimerEventHandler m_handler;
     std::chrono::milliseconds m_timeout;
     boost::optional<std::chrono::steady_clock::time_point> m_timerStartClock;
     AIOService& m_aioService;
@@ -58,6 +58,4 @@ private:
     QnMutex m_mutex;
 };
 
-} // namespace aio
-} // namespace network
-} // namespace nx
+} // namespace nx::network::aio

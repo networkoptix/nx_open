@@ -46,9 +46,7 @@ nx::vms::api::analytics::EventType MetadataHandler::eventTypeDescriptor(
     return nx::vms::api::analytics::EventType();
 }
 
-void MetadataHandler::handleMetadata(
-    Error error,
-    MetadataPacket* metadata)
+void MetadataHandler::handleMetadata(MetadataPacket* metadata)
 {
     if (metadata == nullptr)
     {
@@ -56,15 +54,7 @@ void MetadataHandler::handleMetadata(
         return;
     }
 
-    if (error != Error::noError)
-    {
-        NX_VERBOSE(this) << "WARNING: Received metadata packet along with an error ccde "
-            << (int) error << "; ignoring";
-        return;
-    }
-
     bool handled = false;
-
     nxpt::ScopedRef<EventsMetadataPacket> eventsPacket(
         metadata->queryInterface(IID_EventsMetadataPacket));
     if (eventsPacket)

@@ -84,7 +84,7 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
         return;
 
     Ptz::Capabilities overridedCaps;
-    if(data.value(Qn::PTZ_CAPABILITIES_PARAM_NAME, &overridedCaps))
+    if(data.value(ResourceDataKey::kOperationalPtzCapabilities, &overridedCaps))
         m_capabilities = overridedCaps;
 
     m_capabilities |= initMove();

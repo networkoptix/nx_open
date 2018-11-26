@@ -1,3 +1,5 @@
+#include "client_update_tool.h"
+
 #include <common/common_module.h>
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
@@ -7,8 +9,8 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/update/update_check.h>
-#include "nx/vms/common/p2p/downloader/private/single_connection_peer_manager.h"
-#include "client_update_tool.h"
+#include <nx/vms/common/p2p/downloader/private/single_connection_peer_manager.h>
+#include <nx/vms/client/desktop/ini.h>
 
 namespace nx::vms::client::desktop {
 
@@ -18,12 +20,18 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
 {
     // Expecting m_outputDir to be like /temp/nx_updates/client
 
+    if (ini().massSystemUpdateClearDownloads)
+        clearDownloadFolder();
+
     vms::common::p2p::downloader::AbstractPeerSelectorPtr peerSelector;
     m_peerManager.reset(new SingleConnectionPeerManager(commonModule(), std::move(peerSelector)));
     m_peerManager->setParent(this);
 
     m_downloader.reset(new Downloader(m_outputDir, commonModule(), this));
     connect(m_downloader.get(), &Downloader::fileStatusChanged,
+        this, &ClientUpdateTool::atDownloaderStatusChanged);
+
+    connect(m_downloader.get(), &Downloader::fileInformationChanged,
         this, &ClientUpdateTool::atDownloaderStatusChanged);
 
     connect(m_downloader.get(), &Downloader::chunkDownloadFailed,
@@ -73,9 +81,8 @@ std::future<nx::update::UpdateContents> ClientUpdateTool::requestRemoteUpdateInf
     {
         // Requesting remote update info.
         m_serverConnection->getUpdateInfo(
-            [tool=QPointer<ClientUpdateTool>(this)](bool success, rest::Handle handle, const nx::update::Information& response)
+            [tool=QPointer<ClientUpdateTool>(this)](bool success, rest::Handle /*handle*/, const nx::update::Information& response)
             {
-                Q_UNUSED(handle)
                 if (tool && success)
                     tool->atRemoteUpdateInformation(response);
             }, thread());
@@ -100,8 +107,8 @@ void ClientUpdateTool::atRemoteUpdateInformation(const nx::update::Information& 
 {
     auto clientInfo = QnAppInfo::currentSystemInformation();
     QString errorMessage;
-    /* Update is allowed if either target version has the same cloud host or
-       there are no servers linked to the cloud in the system. */
+    // Update is allowed if either target version has the same cloud host or
+    // there are no servers linked to the cloud in the system.
     QString cloudUrl = nx::network::SocketGlobals::cloud().cloudHost();
     bool boundToCloud = !commonModule()->globalSettings()->cloudSystemId().isEmpty();
 
@@ -163,20 +170,48 @@ void ClientUpdateTool::downloadUpdate(const UpdateContents& contents)
         NX_ASSERT(info.isValid());
         auto code = m_downloader->addFile(info);
         using Code = vms::common::p2p::downloader::ResultCode;
-        m_updateFile =  m_downloader->filePath(m_clientPackage.file);
+        QString file =  m_downloader->filePath(m_clientPackage.file);
+
+        m_updateFile = file;
 
         switch (code)
         {
             case Code::ok:
                 NX_VERBOSE(this) << "requestStartUpdate() - downloading client package"
-                    << info.name << " from url="<<m_clientPackage.url;
+                    << info.name << " from url=" << m_clientPackage.url;
                 setState(State::downloading);
                 break;
-            case Code::fileAlreadyExists:
-                NX_VERBOSE(this) << "requestStartUpdate() - file is already here"
-                    << info.name;
+            case Code::fileAlreadyDownloaded:
+                NX_VERBOSE(this) << "requestStartUpdate() - file is already downloaded"
+                    << file;
                 setState(State::readyInstall);
                 break;
+            case Code::fileAlreadyExists:
+            {
+                auto fileInfo = m_downloader->fileInformation(m_clientPackage.file);
+                if (fileInfo.status == FileInformation::Status::downloaded)
+                {
+                    NX_VERBOSE(this) << "requestStartUpdate() - file is already downloaded"
+                        << file;
+                    setState(State::readyInstall);
+                }
+                else if (fileInfo.status == FileInformation::Status::downloading)
+                {
+                    NX_VERBOSE(this)
+                        << "requestStartUpdate() - file"
+                        << info.name << "exists but not fully downloaded"
+                        << "from url="<< m_clientPackage.url;
+                    setState(State::downloading);
+                }
+                else
+                {
+                    NX_VERBOSE(this)
+                        << "requestStartUpdate() - file" << info.name << "exists and something wrong with it"
+                        << "from url=" << m_clientPackage.url;
+                    setState(State::downloading);
+                }
+                break;
+            }
             default:
             // Some sort of an error here.
             {
@@ -195,9 +230,6 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
     if (fileInformation.name != m_clientPackage.file)
         return;
 
-    NX_VERBOSE(this) << "at_downloaderStatusChanged("<< fileInformation.name
-        << ") - status changed to " << fileInformation.status;
-
     if (m_state != State::downloading)
     {
         // WTF are we doing here?
@@ -212,6 +244,8 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
         case FileInformation::Status::uploading:
             break;
         case FileInformation::Status::downloaded:
+            NX_VERBOSE(this) << "atDownloaderStatusChanged("<< fileInformation.name
+                << ") - finally downloaded file to" << m_downloader->filePath(fileInformation.name);
             setState(State::readyInstall);
             break;
         case FileInformation::Status::corrupted:
@@ -219,7 +253,7 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
             break;
         case FileInformation::Status::downloading:
             m_progress = fileInformation.calculateDownloadProgress();
-            emit updateStateChanged(int(FileInformation::Status::downloading), m_progress);
+            emit updateStateChanged(int(State::downloading), m_progress);
             break;
         default:
             // Nothing to do here
@@ -227,9 +261,8 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
     }
 }
 
-void ClientUpdateTool::atChunkDownloadFailed(const QString& fileName)
+void ClientUpdateTool::atChunkDownloadFailed(const QString& /*fileName*/)
 {
-    Q_UNUSED(fileName)
     // It is a breakpoint catcher.
     //NX_VERBOSE(this) << "atChunkDownloadFailed() failed to download chunk for" << fileName;
 }
@@ -260,7 +293,7 @@ int ClientUpdateTool::getDownloadProgress() const
 {
     if (m_state == State::readyInstall)
         return 100;
-    return m_progress;
+    return std::min(m_progress, 100);
 }
 
 bool ClientUpdateTool::isDownloadComplete() const
@@ -295,7 +328,7 @@ bool ClientUpdateTool::installUpdate()
                 return true;
 
             case Result::ok:
-                setState(State::installing);
+                setState(State::complete);
                 return true;
 
             case Result::otherError:
@@ -410,6 +443,14 @@ void ClientUpdateTool::resetState()
     m_updateVersion = nx::utils::SoftwareVersion();
     m_clientPackage = nx::update::Package();
     m_remoteUpdateContents = UpdateContents();
+}
+
+void ClientUpdateTool::clearDownloadFolder()
+{
+    // Clear existing folder for downloaded update files.
+    m_outputDir.removeRecursively();
+    if (!m_outputDir.exists())
+        m_outputDir.mkpath(".");
 }
 
 ClientUpdateTool::State ClientUpdateTool::getState() const

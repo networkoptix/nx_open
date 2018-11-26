@@ -151,8 +151,6 @@ main()
     then
         echo "*** Reboot for changes to take effect ***"
     fi
-
-    exit 0
 }
 
 main

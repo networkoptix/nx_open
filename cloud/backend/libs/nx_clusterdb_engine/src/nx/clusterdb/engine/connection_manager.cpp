@@ -61,8 +61,8 @@ void ConnectionManager::dispatchTransaction(
     const std::string& systemId,
     std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer)
 {
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1. Dispatching transaction %2")
-        .arg(systemId).arg(transactionSerializer->header()));
+    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1. Dispatching command %2")
+        .args(systemId, toString(transactionSerializer->header())));
 
     // Generating transport header.
     TransactionTransportHeader transportHeader(m_protocolVersionRange.currentVersion());

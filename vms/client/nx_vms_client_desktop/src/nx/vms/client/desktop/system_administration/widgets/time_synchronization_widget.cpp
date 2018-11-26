@@ -42,7 +42,6 @@ static constexpr int kDateFontPixelSize = 14;
 static constexpr int kDateFontWeight = QFont::Bold;
 static constexpr int kZoneFontPixelSize = 14;
 static constexpr int kZoneFontWeight = QFont::Normal;
-static constexpr int kServerTimeUpdateInterval = 15;
 
 QDateTime dateTimeFromMSecs(std::chrono::milliseconds value)
 {
@@ -67,8 +66,7 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
     m_serversModel(new Model(this)),
     m_timeWatcher(new TimeSynchronizationServerTimeWatcher(m_store, this)),
     m_stateWatcher(new TimeSynchronizationServerStateWatcher(m_store, this)),
-    m_delegate(new TimeSynchronizationServersDelegate(this)),
-    m_tickCount(0)
+    m_delegate(new TimeSynchronizationServersDelegate(this))
 {
     setupUi();
 
@@ -86,7 +84,7 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
         };
     connect(ui->disableSyncRadioButton, &QRadioButton::clicked, this, handleDisableClick);
 
-    auto updateDelegate = 
+    auto updateDelegate =
         [this]
         {
             m_delegate->setBaseRow(-1);
@@ -95,7 +93,7 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
     connect(ui->syncWithInternetCheckBox, &QCheckBox::clicked, this, updateDelegate);
     connect(ui->disableSyncRadioButton, &QRadioButton::clicked, this, updateDelegate);
 
-    auto clearHovered = 
+    auto clearHovered =
         [this]
         {
             switch (m_store->state().status)
@@ -147,9 +145,6 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
         [this]
         {
             m_store->setVmsTime(std::chrono::milliseconds(qnSyncTime->currentMSecsSinceEpoch()));
-            if (m_tickCount == 0)
-                m_timeWatcher->updateTimestamps();
-            m_tickCount = (m_tickCount + 1) % kServerTimeUpdateInterval;
         };
 
     auto timer = new QTimer(this);
@@ -161,7 +156,6 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
     connect(qnSyncTime, &QnSyncTime::timeChanged, this, updateTime);
 
     updateTime();
-    m_timeWatcher->updateTimestamps();
 }
 
 TimeSynchronizationWidget::~TimeSynchronizationWidget()
@@ -200,6 +194,8 @@ void TimeSynchronizationWidget::applyChanges()
     qnGlobalSettings->setTimeSynchronizationEnabled(state.enabled);
     qnGlobalSettings->setPrimaryTimeServer(state.primaryServer);
     qnGlobalSettings->synchronizeNow();
+
+    m_store->applyChanges();
 }
 
 bool TimeSynchronizationWidget::hasChanges() const
@@ -223,7 +219,7 @@ void TimeSynchronizationWidget::setupUi()
     ui->syncWithInternetCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->syncWithInternetCheckBox->setForegroundRole(QPalette::ButtonText);
 
-    ui->placeholderImageLabel->setPixmap(qnSkin->pixmap("placeholders/time_placeholder.png"));
+    ui->placeholderImageLabel->setPixmap(qnSkin->pixmap("placeholders/time_placeholder.svg", true, QSize(128, 128)));
 
     QFont font;
     font.setPixelSize(kTimeFontPixelSize);

@@ -302,8 +302,8 @@ void OnvifResourceInformationFetcher::findResources(
         return;
 
     QnResourceData resourceData = res->commonModule()->dataPool()->data(res->getVendor(), res->getModel());
-    bool shouldAppearAsSingleChannel =
-        resourceData.value<bool>(Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
+    auto shouldAppearAsSingleChannel =
+        resourceData.value<bool>(ResourceDataKey::kShouldAppearAsSingleChannel);
 
     QnPlOnvifResourcePtr onvifRes = existResource.dynamicCast<QnPlOnvifResource>();
 

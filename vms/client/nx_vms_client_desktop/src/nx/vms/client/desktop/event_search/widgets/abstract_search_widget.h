@@ -19,8 +19,8 @@ class SelectableTextButton;
 class AbstractSearchListModel;
 
 /**
- * Base class for Right Panel search tabs. Contains common filter setup controls,
- * EventRibbon to display data and all mechanics to fetch data when needed.
+ * Base class for Right Panel search tabs. Contains common filter setup controls, tiles view
+ * (also known as EventRibbon) to display data and all mechanics to fetch data when needed.
  */
 class AbstractSearchWidget:
     public QWidget,
@@ -47,13 +47,12 @@ public:
     {
         cameraSelector = 0x01,
         timeSelector = 0x02,
-        areaSelector = 0x04,
-        freeTextFilter = 0x08,
-        footersToggler = 0x10,
-        previewsToggler = 0x20,
+        freeTextFilter = 0x04,
+        footersToggler = 0x08,
+        previewsToggler = 0x10,
 
         defaults = cameraSelector | timeSelector | freeTextFilter | previewsToggler,
-        all = defaults | areaSelector | footersToggler
+        all = defaults | footersToggler
     };
     Q_DECLARE_FLAGS(Controls, Control)
 
@@ -84,11 +83,10 @@ public:
     Cameras selectedCameras() const;
     QnVirtualCameraResourceSet cameras() const;
 
-    /** Temporarily set Cameras::current mode, or restore previous mode. */
-    void setSingleCameraMode(bool value);
+    void selectCameras(Cameras value);
+    Cameras previousCameras() const;
 
     QString textFilter() const;
-    bool wholeArea() const;
 
     /**
      * Resets all filters to their default state.
@@ -105,7 +103,6 @@ signals:
 
     void textFilterChanged(const QString& value);
     void timePeriodChanged(const QnTimePeriod& value);
-    void selectedAreaChanged(bool wholeArea); //< Area was reset to whole.
 
 protected:
     /** Sets an icon for no data placeholder. */
@@ -117,8 +114,8 @@ protected:
     /** Creates a child menu with dropdown appearance. */
     QMenu* createDropdownMenu();
 
-    /** Set whether some area on the video is selected in external selection tool. */
-    void setWholeArea(bool value);
+    /** Make camera selector read-only, locked in current state. */
+    void setCamerasReadOnly(bool value);
 
     /**
      * Adds specified action to the list of device dependent actions.

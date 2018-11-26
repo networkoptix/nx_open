@@ -32,8 +32,10 @@ class ServerStatusItemDelegate;
 
 struct UpdateItem;
 
-// Widget deals with update for multiple servers.
-// Widget is spawned as a tab for System Administraton menu.
+/**
+ * Deals with update for multiple servers.
+ * It is spawned as a tab for System Administraton menu.
+ */
 class MultiServerUpdatesWidget:
     public QnAbstractPreferencesWidget,
     public QnSessionAwareDelegate
@@ -66,10 +68,11 @@ public:
 protected:
     // This one is called by timer periodically.
     void atUpdateCurrentState();
-    void atClientDownloadFinished();
     void atModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
     void atStartUpdateAction();
     bool atCancelCurrentAction();
+    void atServerPackageDownloaded(const nx::update::Package& package);
+    void atServerPackageDownloadFailed(const nx::update::Package& package, const QString& error);
 
     void hideStatusColumns(bool value);
     void clearUpdateInfo();
@@ -117,6 +120,7 @@ private:
     // Do not call them from anywhere else.
     void syncUpdateCheck();
     void syncRemoteUpdateState();
+    void syncProgress();
 
     ServerUpdateTool::ProgressInfo calculateActionProgress() const;
 
@@ -134,6 +138,7 @@ private:
     // Advances UI FSM towards selected state.
     void setTargetState(WidgetUpdateState state, QSet<QnUuid> targets = {});
     void completeInstallation(bool clientUpdated);
+    static bool stateHasProgress(WidgetUpdateState state);
 
 private:
     QScopedPointer<Ui::MultiServerUpdatesWidget> ui;

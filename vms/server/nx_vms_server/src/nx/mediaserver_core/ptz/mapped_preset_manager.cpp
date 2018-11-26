@@ -101,7 +101,7 @@ void MappedPresetManager::createOrUpdateMapping(
         m_resource->setProperty(kPtzPresetMappingPropertyName, serialized);
     }
 
-    m_resource->saveParams();
+    m_resource->saveProperties();
 }
 
 void MappedPresetManager::removeMapping(const QString& nxPresetId, const QString& nativePresetId)
@@ -118,7 +118,7 @@ void MappedPresetManager::removeMapping(const QString& nxPresetId, const QString
         m_resource->setProperty(kPtzPresetMappingPropertyName, serialized);
     }
 
-    m_resource->saveParams();
+    m_resource->saveProperties();
 }
 
 void MappedPresetManager::applyMapping(
@@ -162,7 +162,7 @@ void MappedPresetManager::applyMapping(
     {
         const QString serialized = QJson::serialized(m_presetMapping);
         m_resource->setProperty(kPtzPresetMappingPropertyName, serialized);
-        m_resource->saveParams();
+        m_resource->saveProperties();
     }
 }
 

@@ -25,9 +25,11 @@
 namespace nx::cloud::db {
 
 TemporaryAccountPasswordManager::TemporaryAccountPasswordManager(
+    const conf::AccountManager& settings,
     const nx::utils::stree::ResourceNameSet& attributeNameset,
     nx::sql::AsyncSqlQueryExecutor* const dbManager) noexcept(false)
 :
+    m_settings(settings),
     m_attributeNameset(attributeNameset),
     m_dbManager(dbManager),
     m_dao(dao::TemporaryCredentialsDaoFactory::instance().create())
@@ -35,10 +37,18 @@ TemporaryAccountPasswordManager::TemporaryAccountPasswordManager(
     deleteExpiredCredentials();
 
     fillCache();
+
+    schedulePeriodicRemovalOfExpiredCredentials();
 }
 
 TemporaryAccountPasswordManager::~TemporaryAccountPasswordManager()
 {
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_terminated = true;
+    }
+    m_removeExpiredCredentialsTimer.pleaseStopSync();
+
     // Waiting for async calls to complete.
     m_startedAsyncCallsCounter.wait();
 }
@@ -258,6 +268,34 @@ void TemporaryAccountPasswordManager::fillCache()
 
     NX_DEBUG(this, lm("Restored %1 temporary credentials")
         .args(m_temporaryCredentials.size()));
+}
+
+void TemporaryAccountPasswordManager::schedulePeriodicRemovalOfExpiredCredentials()
+{
+    QnMutexLocker lock(&m_mutex);
+
+    if (m_terminated)
+        return;
+
+    m_removeExpiredCredentialsTimer.start(
+        m_settings.removeExpiredTemporaryCredentialsPeriod,
+        [this]() { doPeriodicRemovalOfExpiredCredentials(); });
+}
+
+void TemporaryAccountPasswordManager::doPeriodicRemovalOfExpiredCredentials()
+{
+    NX_VERBOSE(this, "Periodic removal of expired credentials");
+
+    m_dbManager->executeUpdate(
+        [this](auto&&... args)
+        {
+            m_dao->deleteExpiredCredentials(std::move(args)...);
+            return nx::sql::DBResult::ok;
+        },
+        [this, locker = m_startedAsyncCallsCounter.getScopedIncrement()](auto...)
+        {
+            schedulePeriodicRemovalOfExpiredCredentials();
+        });
 }
 
 nx::sql::DBResult TemporaryAccountPasswordManager::insertTempPassword(

@@ -25,7 +25,7 @@ namespace usb_cam {
 
 class StreamReaderPrivate;
 
-class StreamReader: public nxcip::StreamReader 
+class StreamReader: public nxcip::StreamReader
 {
 public:
     StreamReader(
@@ -53,7 +53,8 @@ private:
     std::unique_ptr<StreamReaderPrivate> m_streamReader;
 };
 
-class StreamReaderPrivate{
+class StreamReaderPrivate
+{
 public:
     StreamReaderPrivate(
         int encoderIndex,

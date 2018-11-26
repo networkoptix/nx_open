@@ -8,15 +8,15 @@ namespace nx {
 namespace sdk {
 namespace analytics {
 
-class CommonAttribute: public Attribute
+class CommonAttribute: public IAttribute
 {
 public:
     CommonAttribute(
         AttributeType attributeType,
-        const std::string& attributeName,
-        const std::string& attributeValue);
+        std::string attributeName,
+        std::string attributeValue);
 
-    virtual const AttributeType type() const override;
+    virtual AttributeType type() const override;
     virtual const char* name() const override;
     virtual const char* value() const override;
 

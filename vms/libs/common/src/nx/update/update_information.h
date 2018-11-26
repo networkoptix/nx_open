@@ -8,8 +8,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/utils/software_version.h>
 
-namespace nx {
-namespace update {
+namespace nx::update {
 
 struct Package
 {
@@ -22,6 +21,9 @@ struct Package
     QString url;
     QString md5;
     qint64 size = 0;
+
+    /** List of targets that should receive this package. */
+    QList<QnUuid> targets;
 
     bool isValid() const { return !file.isEmpty(); }
 };
@@ -36,14 +38,14 @@ struct Information
     QString eulaLink;
     int eulaVersion = 0;
     QString releaseNotesUrl;
-    // This is release notes for offline update package.
-    // We need to be able to show this data without internet.
+    /** This is release notes for offline update package. */
+    /** We need to be able to show this data without internet. */
     QString description;
     QList<Package> packages;
 
-    // Release date - in msecs since epoch.
+    /** Release date - in msecs since epoch. */
     qint64 releaseDateMs = 0;
-    // Maximum days for release delivery.
+    /** Maximum days for release delivery. */
     int releaseDeliveryDays = 0;
 
     bool isValid() const { return !version.isNull(); }
@@ -80,11 +82,11 @@ public:
     enum class Code
     {
         idle,
-        // Server is downloading an update package.
+        /** Server is downloading an update package. */
         downloading,
-        // Server is verifying an update package after downloading has finished successfully.
+        /** Server is verifying an update package after downloading has finished successfully. */
         preparing,
-        // Update package has been downloaded and verified.
+        /** Update package has been downloaded and verified. */
         readyToInstall,
         latestUpdateInstalled,
         offline,
@@ -122,50 +124,56 @@ QN_FUSION_DECLARE_FUNCTIONS(Status, (xml)(csv_record)(ubjson)(json))
  */
 enum class UpdateSourceType
 {
-    // Got update info from the internet.
+    /** Got update info from the internet. */
     internet,
-    // Got update info from the internet for specific build.
+    /** Got update info from the internet for specific build. */
     internetSpecific,
-    // Got update info from offline update package.
+    /** Got update info from offline update package. */
     file,
-    // Got update info from mediaserver swarm.
+    /** Got update info from mediaserver swarm. */
     mediaservers,
 };
 
 /**
  * Wraps up update info and summary for its verification.
  * All update tools inside client work with this structure directly,
- * instead of nx::update::Information
+ * instead of nx::update::Information.
  */
 struct UpdateContents
 {
     UpdateSourceType sourceType = UpdateSourceType::internet;
     QString source;
 
-    // A set of servers without proper update file.
+    /** A set of servers without proper update file. */
     QSet<QnUuid> missingUpdate;
-    // A set of servers that can not accept update version.
+    /** A set of servers that can not accept update version. */
     QSet<QnUuid> invalidVersion;
-
+    /** Path to eula file. */
     QString eulaPath;
-    // A folder with offline update packages.
+    /** A folder with offline update packages. */
     QDir storageDir;
-    // A list of files to be uploaded.
+    /** A list of files to be uploaded. */
     QStringList filesToUpload;
-    // Information for the clent update.
+    /** Information for the clent update. */
     nx::update::Package clientPackage;
     nx::update::Information info;
     nx::update::InformationError error = nx::update::InformationError::noError;
+    /**
+     * Packages for manual download. This packages should be downloaded by the client and
+     * pushed to mediaservers without internet.
+     */
+    QList<Package> manualPackages;
     bool cloudIsCompatible = true;
     bool verified = false;
+    /** We have already installed this version. Widget will show appropriate status.*/
+    bool alreadyInstalled = false;
 
     nx::utils::SoftwareVersion getVersion() const;
-    // Check if we can apply this update.
+    /** Check if we can apply this update. */
     bool isValid() const;
 };
 
-} // namespace update
-} // namespace nx
+} // namespace nx::update
 
 Q_DECLARE_METATYPE(nx::update::Information);
 Q_DECLARE_METATYPE(nx::update::UpdateContents);

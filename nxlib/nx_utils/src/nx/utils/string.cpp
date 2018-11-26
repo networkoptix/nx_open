@@ -3,6 +3,7 @@
 #include <array>
 #include <cmath>
 
+#include <QtCore/QByteArray>
 #include <QtCore/QRegularExpression>
 
 #include <nx/utils/log/assert.h>
@@ -622,6 +623,11 @@ QByteArray formatJsonString(const QByteArray& data)
     result.resize(doFormatJsonString(data.data(), data.data() + data.size(), 0));
     doFormatJsonString(data.data(), data.data() + data.size(), result.data());
     return result;
+}
+
+int stricmp(const std::string& left, const std::string& right)
+{
+    return qstricmp(left.c_str(), right.c_str());
 }
 
 } // namespace utils

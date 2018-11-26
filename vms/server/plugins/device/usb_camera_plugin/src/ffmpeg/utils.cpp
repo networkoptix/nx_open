@@ -79,7 +79,7 @@ nxcip::DataPacketType toNxDataPacketType(AVMediaType mediaType)
             return nxcip::dptVideo;
         case AVMEDIA_TYPE_AUDIO:
             return nxcip::dptAudio;
-        default: 
+        default:
             return nxcip::dptEmpty;
     }
 }

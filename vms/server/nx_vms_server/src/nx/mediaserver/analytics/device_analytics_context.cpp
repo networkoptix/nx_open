@@ -182,8 +182,8 @@ void DeviceAnalyticsContext::putFrame(
         uncompressedFrame ? "uncompressedFrame" : "/*uncompressedFrame*/ nullptr");
 
     FrameConverter frameConverter(
-        [&]() { return compressedFrame; },
-        [&, this]()
+        [&compressedFrame]() { return compressedFrame; },
+        [&uncompressedFrame, this]()
         {
             if (!uncompressedFrame)
                 issueMissingUncompressedFrameWarningOnce();
@@ -257,7 +257,7 @@ void DeviceAnalyticsContext::at_devicePropertyChanged(
         return;
     }
 
-    if (propertyName == Qn::CAMERA_CREDENTIALS_PARAM_NAME)
+    if (propertyName == ResourcePropertyKey::kCredentials)
     {
         NX_DEBUG(
             this,

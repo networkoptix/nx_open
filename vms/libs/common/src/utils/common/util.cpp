@@ -19,94 +19,10 @@
 #include <QtNetwork/QHostInfo>
 
 #include <common/common_globals.h>
-#include <utils/mac_utils.h>
+
 #include <utils/common/app_info.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/datetime.h>
-#include <nx/system_commands.h>
-
-bool removeDir(const QString &dirName)
-{
-    bool result = true;
-    QDir dir(dirName);
-
-    if (dir.exists(dirName))
-    {
-        for(const QFileInfo& info: dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst))
-        {
-            if (info.isDir())
-                result &= removeDir(info.absoluteFilePath());
-            else
-                result &= QFile::remove(info.absoluteFilePath());
-        }
-
-        result &= dir.rmdir(dirName);
-    }
-
-    return result;
-}
-
-QString fromNativePath(const QString &path)
-{
-    QString result = QDir::cleanPath(QDir::fromNativeSeparators(path));
-
-    if (!result.isEmpty() && result.endsWith(QLatin1Char('/')))
-        result.chop(1);
-
-    return result;
-}
-
-QString getMoviesDirectory()
-{
-#ifdef Q_OS_MACX
-    QString moviesDir = mac_getMoviesDir();
-    return moviesDir.isEmpty() ? QString() : moviesDir + QLatin1String("/") + QnAppInfo::mediaFolderName();
-#else
-    const QStringList& moviesDirs = QStandardPaths::standardLocations(QStandardPaths::MoviesLocation);
-    return moviesDirs.isEmpty() ? QString() : (moviesDirs[0] + QLatin1String("/") + QnAppInfo::mediaFolderName()) ;
-#endif
-}
-
-QString getBackgroundsDirectory() {
-    const QStringList& pictureFolderList = QStandardPaths::standardLocations(QStandardPaths::PicturesLocation);
-    QString baseDir = pictureFolderList.isEmpty() ? QString(): pictureFolderList[0];
-#ifdef Q_OS_WIN
-    QString productDir = baseDir + QDir::toNativeSeparators(QString(lit("/%1 Backgrounds")).arg(QnAppInfo::productNameLong()));
-#else
-    QString productDir = QDir::toNativeSeparators(QString(lit("/opt/%1/client/share/pictures/sample-backgrounds")).arg(QnAppInfo::linuxOrganizationName()));
-#endif
-
-    return QDir(productDir).exists()
-            ? productDir
-            : baseDir;
-}
-
-int digitsInNumber(unsigned num)
-{
-    int digits = 1;
-    while(num /= 10)
-        digits++;
-
-    return digits;
-}
-
-
-QString getParamFromString(const QString& str, const QString& param)
-{
-    if (!str.contains(param))
-        return QString();
-
-    int param_index = str.indexOf(param);
-    param_index += param.length();
-
-    int first_index = str.indexOf(QLatin1Char('\"'), param_index);
-    if (first_index == -1)
-        return QString();
-
-    int second_index = str.indexOf(QLatin1Char('\"'), first_index + 1);
-
-    return str.mid(first_index+1, second_index - (first_index+1));
-}
 
 QString strPadLeft(const QString &str, int len, char ch)
 {
@@ -129,71 +45,6 @@ QString closeDirPath(const QString& value)
     else
         return value + separator;
 }
-
-#ifdef Q_OS_WIN32
-
-qint64 getDiskFreeSpace(const QString& root)
-{
-    return nx::SystemCommands().freeSpace(root.toStdString());
-};
-
-qint64 getDiskTotalSpace(const QString& root)
-{
-    return nx::SystemCommands().totalSpace(root.toStdString());
-};
-
-#elif defined(Q_OS_ANDROID)
-
-qint64 getDiskFreeSpace(const QString& root) {
-    return 0; // TODO: #android
-}
-
-qint64 getDiskTotalSpace(const QString& root) {
-    return 0; // TODO: #android
-}
-
-#else
-
-//TODO #ak introduce single function for getting partition info
-    //and place platform-specific code in a single pace
-
-#ifdef __APPLE__
-#define statvfs64 statvfs
-#endif
-
-qint64 getDiskFreeSpace(const QString& root) {
-    struct statvfs64 buf;
-    if (statvfs64(root.toUtf8().data(), &buf) == 0)
-    {
-        //qint64 disk_size = buf.f_blocks * (qint64) buf.f_bsize;
-        //TODO #ak if we run under root, MUST use buf.f_bfree, else buf.f_bavail
-        qint64 free = buf.f_bavail * (qint64) buf.f_bsize;
-        //qint64 used = disk_size - free;
-
-        return free;
-    }
-    else {
-        return -1;
-    }
-}
-
-qint64 getDiskTotalSpace(const QString& root) {
-    struct statvfs64 buf;
-    if (statvfs64(root.toUtf8().data(), &buf) == 0)
-    {
-        qint64 disk_size = buf.f_blocks * (qint64) buf.f_frsize;
-        //qint64 free = buf.f_bavail * (qint64) buf.f_bsize;
-        //qint64 used = disk_size - free;
-
-        return disk_size;
-    }
-    else {
-        return -1;
-    }
-}
-
-#endif
-
 
 quint64 getUsecTimer()
 {
@@ -256,13 +107,6 @@ uint qt4Hash(const QString &key)
 {
     return hash(key.unicode(), key.size());
 }
-
-#ifdef _DEBUG
-QString debugTime(qint64 timeMSec, const QString &fmt) {
-    QString format = fmt.isEmpty() ? lit("hh:mm:ss") : fmt;
-    return QDateTime::fromMSecsSinceEpoch(timeMSec).toString(format);
-}
-#endif
 
 QString mksecToDateTime(qint64 valueUsec)
 {

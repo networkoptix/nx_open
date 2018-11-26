@@ -50,7 +50,6 @@ public:
     virtual void setIframeDistance(int frames, int timems) override;
 
     virtual bool hasDualStreamingInternal() const override;
-    virtual int getMaxFps() const override;
 
     QString getRtspUrl(int actiChannelNum) const; // in range 1..N
 
@@ -214,7 +213,6 @@ private:
             return height() < other.height();
         }
     };
-
 
     QList<QSize> m_resolutionList[MAX_STREAMS];
     QList<int> m_availFps[MAX_STREAMS];

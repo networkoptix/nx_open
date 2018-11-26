@@ -2,7 +2,9 @@
 
 #include <plugins/plugin_api.h>
 #include <nx/sdk/common.h>
+
 #include <nx/sdk/i_string.h>
+#include <nx/sdk/i_plugin_event.h>
 
 #include "device_agent.h"
 #include "action.h"
@@ -35,6 +37,13 @@ static const nxpl::NX_GUID IID_Engine =
 class Engine: public nxpl::PluginInterface
 {
 public:
+    class IHandler
+    {
+    public:
+        virtual ~IHandler() = default;
+        virtual void handlePluginEvent(IPluginEvent* event) = 0;
+    };
+
     /** @return Parent Plugin. */
     virtual Plugin* plugin() const = 0;
 
@@ -42,15 +51,22 @@ public:
      * Called before other methods. Server provides the set of settings stored in its database for
      * this Engine instance.
      *
-     * @param settings Values of settings declared in the manifest. The pointer is valid only
-     *     during the call. If count is 0, the pointer is null.
+     * @param settings Values of settings declared in the manifest. Never null. Valid only during
+     *     the call.
      */
     virtual void setSettings(const Settings* settings) = 0;
 
     /**
-     * @return Engine settings that are stored on the plugin side.
+     * In addition to the settings stored in a Server database, an Engine can have some settings
+     * which are stored somewhere "under the hood" of the Engine, e.g. on a device acting as an
+     * Engine's backend. Such settings do not need to be explicitly marked in the Settings Model,
+     * but every time the Server offers the user to edit the values, it calls this method and
+     * merges the received values with the ones in its database.
+     *
+     * @return Engine settings that are stored on the plugin side, or null if there are no such
+     * settings.
      */
-    virtual Settings* settings() const = 0;
+    virtual Settings* pluginSideSettings() const = 0;
 
     /**
      * Provides a JSON manifest for this Engine instance. See the example of such manifest in
@@ -84,6 +100,12 @@ public:
      * @param outError Status of the operation; is set to noError before this call.
      */
     virtual void executeAction(Action* action, Error* outError) = 0;
+
+    /**
+     * @param handler Generic Engine-related events (errors, warning, info messages)
+     *     might be reported via this handler.
+     */
+    virtual Error setHandler(IHandler* handler) = 0;
 };
 
 } // namespace analytics
