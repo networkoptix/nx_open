@@ -45,9 +45,21 @@ protected:
             });
     }
 
-    void assertIfTimerHasNotShot()
+    void cancelTimer()
+    {
+        m_timer->cancelSync();
+    }
+
+    void assertTimerEventRaised()
     {
         ASSERT_TRUE(m_timedoutPromise.get_future().get());
+    }
+
+    void assertTimerEventNotRaised(std::chrono::milliseconds timeToWait)
+    {
+        ASSERT_EQ(
+            std::future_status::timeout,
+            m_timedoutPromise.get_future().wait_for(timeToWait));
     }
 
 private:
@@ -57,13 +69,13 @@ private:
 TEST_F(AioTimer, handler_gets_called)
 {
     startTimerFor(std::chrono::milliseconds(12));
-    assertIfTimerHasNotShot();
+    assertTimerEventRaised();
 }
 
 TEST_F(AioTimer, zero_timeout)
 {
     startTimerFor(std::chrono::milliseconds::zero());
-    assertIfTimerHasNotShot();
+    assertTimerEventRaised();
 }
 
 TEST_F(AioTimer, destroying_in_timeout_handler)
@@ -71,7 +83,7 @@ TEST_F(AioTimer, destroying_in_timeout_handler)
     startTimerFor(
         std::chrono::milliseconds::zero(),
         [this](){ m_timer.reset(); });
-    assertIfTimerHasNotShot();
+    assertTimerEventRaised();
 }
 
 TEST_F(AioTimer, cancel_timer_does_not_cancel_posted_calls)
@@ -88,45 +100,26 @@ TEST_F(AioTimer, cancel_timer_does_not_cancel_posted_calls)
     postInvokedPromise.get_future().wait();
 }
 
-class FtAioTimer:
-    public AioTimer
+TEST_F(AioTimer, modify_timeout)
 {
-};
+    startTimerFor(std::chrono::hours(24));
+    startTimerFor(std::chrono::milliseconds(1));
 
-TEST_F(FtAioTimer, modify_timeout)
-{
-    for (int i = 0; i < 29; ++i)
-    {
-        aio::Timer timer;
-        auto timerGuard = nx::utils::makeScopeGuard([&timer]() { timer.pleaseStopSync(); });
-
-        nx::utils::promise<void> timedoutPromise;
-        auto timeoutHandler = [&timedoutPromise]{ timedoutPromise.set_value(); };
-        timer.start(std::chrono::seconds(250), timeoutHandler);
-        timer.start(std::chrono::milliseconds(250), timeoutHandler);
-
-        ASSERT_EQ(
-            std::future_status::ready,
-            timedoutPromise.get_future().wait_for(std::chrono::seconds(3)));
-    }
+    assertTimerEventRaised();
 }
 
-TEST_F(FtAioTimer, cancellation)
+TEST_F(AioTimer, cancelled_timer_is_not_raised)
 {
-    const auto timeout = std::chrono::seconds(2);
+    const auto timeout = std::chrono::milliseconds(1);
 
-    nx::utils::promise<void> timedoutPromise;
-    auto timeoutHandler = [&timedoutPromise] { timedoutPromise.set_value(); };
+    m_timer->executeInAioThreadSync(
+        [this, timeout]()
+        {
+            startTimerFor(timeout);
+            cancelTimer();
+        });
 
-    aio::Timer timer;
-    auto timerGuard = nx::utils::makeScopeGuard([&timer]() { timer.pleaseStopSync(); });
-
-    timer.start(timeout, timeoutHandler);
-    timer.post([&timer]{ timer.cancelSync(); });
-
-    ASSERT_EQ(
-        std::future_status::timeout,
-        timedoutPromise.get_future().wait_for(timeout*2));
+    assertTimerEventNotRaised(timeout*10);
 }
 
 } // namespace test
