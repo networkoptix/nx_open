@@ -68,6 +68,7 @@ should confirm, if not owner deletes system (You will loose access to this syste
     Wait Until Page Does Not Contain Element    ${DELETE USER MODAL}
 
 Cancel should cancel disconnection and disconnect should remove it when not owner
+    [tags]    C41884
     Log In To Auto Tests System    ${EMAIL NOT OWNER}
     Validate Log In
     Wait Until Element Is Visible    ${DISCONNECT FROM MY ACCOUNT}
