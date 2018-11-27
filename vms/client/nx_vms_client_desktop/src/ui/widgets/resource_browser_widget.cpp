@@ -356,7 +356,7 @@ void QnResourceBrowserWidget::initInstantSearch()
         this, &QnResourceBrowserWidget::updateInstantFilter);
     connect(filterEdit, &SearchEdit::editingFinished,
         this, &QnResourceBrowserWidget::updateInstantFilter);
-    connect(filterEdit, &SearchEdit::currentFilterChanged,
+    connect(filterEdit, &SearchEdit::currentTagDataChanged,
         this, &QnResourceBrowserWidget::updateInstantFilter);
     connect(filterEdit, &SearchEdit::focusedChanged,
         this, &QnResourceBrowserWidget::updateHintVisibilityByBasicState);
@@ -378,8 +378,10 @@ void QnResourceBrowserWidget::initInstantSearch()
     connect(searchModel, &QAbstractItemModel::modelReset,
         this, &QnResourceBrowserWidget::handleInstantFilterUpdated);
 
-    filterEdit->setFilterOptionsSource(std::bind(&QnResourceBrowserWidget::createFilterMenu, this),
-        std::bind(&QnResourceBrowserWidget::getFilterName, this, std::placeholders::_1));
+    auto filterMenuCreator = [this]() { return createFilterMenu(); };
+    auto filterNameProvider = [this](const QVariant& data)
+        { return getFilterName(data.value<ResourceTreeNodeType>()); };
+    filterEdit->setTagOptionsSource(filterMenuCreator, filterNameProvider);
 
     updateSearchMode();
     handleInstantFilterUpdated();
@@ -535,15 +537,16 @@ void QnResourceBrowserWidget::updateInstantFilter()
     const auto allowedNode =
         [this, localResourcesMode, filterEdit]()
         {
-            if (filterEdit->currentFilter())
-                return *filterEdit->currentFilter();
+            if (!filterEdit->currentTagData().isNull())
+                return filterEdit->currentTagData().value<ResourceTreeNodeType>();
 
             return localResourcesMode
                 ? QnResourceSearchQuery::NodeType::localResources
                 : QnResourceSearchQuery::kAllowAllNodeTypes;
         }();
 
-    const bool filtering = !trimmed.isEmpty() || (!localResourcesMode && filterEdit->currentFilter());
+    const bool filtering = !trimmed.isEmpty()
+        || (!localResourcesMode && !filterEdit->currentTagData().isNull());
     const bool filteringUpdated = updateFilteringMode(filtering);
     if (filteringUpdated && filtering)
         storeExpandedStates();

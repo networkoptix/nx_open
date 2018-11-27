@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QtWidgets/QWidget>
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
 
 class QMenu;
 class QLineEdit;
@@ -36,9 +35,11 @@ public:
     bool isMenuEnabled() const;
     void setMenuEnabled(bool enabled);
 
-    void setFilterOptionsSource(std::function<QMenu*()> filterMenuCreator,
-        std::function<QString(ResourceTreeNodeType)> filterNameProvider);
-    std::optional<ResourceTreeNodeType> currentFilter() const;
+    QVariant currentTagData() const;
+    void setCurrentTagData(const QVariant& tagData);
+
+    void setTagOptionsSource(std::function<QMenu*()> tagMenuCreator,
+        std::function<QString(const QVariant&)> tagNameProvider);
 
     bool focused() const;
 
@@ -49,7 +50,7 @@ public:
 signals:
     void textChanged();
     void editingFinished();
-    void currentFilterChanged();
+    void currentTagDataChanged();
     void enterPressed();
     void ctrlEnterPressed();
     void focusedChanged();
@@ -68,7 +69,6 @@ protected:
 private:
     void setupMenuButton();
     void updatePalette();
-    void setCurrentFilter(std::optional<ResourceTreeNodeType> allowedNodeType);
     void handleTagButtonStateChanged();
     void updateTagButton();
     void setHovered(bool value);

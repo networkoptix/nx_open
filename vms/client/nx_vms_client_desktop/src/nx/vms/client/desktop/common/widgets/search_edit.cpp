@@ -153,9 +153,9 @@ struct SearchEdit::Private
     bool hovered = false;
 
     bool isMenuEnabled = false;
-    std::optional<ResourceTreeNodeType> currentFilter;
-    std::function<QMenu*()> filterMenuCreator;
-    std::function<QString(ResourceTreeNodeType)> filterNameProvider;
+    QVariant currentTagData;
+    std::function<QMenu*()> tagMenuCreator;
+    std::function<QString(const QVariant&)> tagNameProvider;
 };
 
 SearchEdit::SearchEdit(QWidget* parent):
@@ -273,10 +273,8 @@ void SearchEdit::updateFocused()
 {
     auto menuHasFocus = [this]() -> bool
         {
-            for (auto menu: findChildren<QMenu*>())
-                if (menu->hasFocus())
-                    return true;
-            return false;
+            auto menus = findChildren<QMenu*>();
+            return std::any_of(menus.begin(), menus.end(), [](auto menu) { return menu->hasFocus(); });
         };
 
     setFocused(hasFocus()
@@ -347,10 +345,10 @@ void SearchEdit::setPlaceholderText(const QString& value)
 
 void SearchEdit::showFilterMenu()
 {
-    if (!isMenuEnabled() || !d->filterMenuCreator)
+    if (!isMenuEnabled() || !d->tagMenuCreator)
         return;
 
-    auto menu = d->filterMenuCreator();
+    auto menu = d->tagMenuCreator();
     menu->setParent(this, menu->windowFlags());
 
     connect(menu, &QMenu::aboutToHide, this, [this]() { d->lineEdit->setFocus(); });
@@ -360,7 +358,7 @@ void SearchEdit::showFilterMenu()
         connect(action, &QAction::triggered, this,
             [this, action]()
             {
-                setCurrentFilter(action->data().value<ResourceTreeNodeType>());
+                setCurrentTagData(action->data());
             });
 
     const auto buttonGeometry = d->menuButton->geometry();
@@ -369,17 +367,17 @@ void SearchEdit::showFilterMenu()
     QnHiDpiWorkarounds::showMenu(menu, globalPoint);
 }
 
-void SearchEdit::setFilterOptionsSource(std::function<QMenu*()> filterMenuCreator,
-    std::function<QString(ResourceTreeNodeType)> filterNameProvider)
+void SearchEdit::setTagOptionsSource(std::function<QMenu*()> tagMenuCreator,
+    std::function<QString(const QVariant&)> tagNameProvider)
 {
-    d->filterMenuCreator = filterMenuCreator;
-    d->filterNameProvider = filterNameProvider;
+    d->tagMenuCreator = tagMenuCreator;
+    d->tagNameProvider= tagNameProvider;
 }
 
 void SearchEdit::handleTagButtonStateChanged()
 {
     if (d->tagButton->state() == SelectableTextButton::State::deactivated)
-        setCurrentFilter(std::optional<ResourceTreeNodeType>());
+        setCurrentTagData(QVariant());
 }
 
 void SearchEdit::updatePalette()
@@ -401,26 +399,26 @@ void SearchEdit::updatePalette()
     d->menuButton->setPalette(controlPalette);
 }
 
-void SearchEdit::setCurrentFilter(std::optional<ResourceTreeNodeType> allowedNodeType)
+void SearchEdit::setCurrentTagData(const QVariant& tagData)
 {
-    if (allowedNodeType == d->currentFilter)
+    if (tagData == d->currentTagData)
         return;
 
-    d->currentFilter = allowedNodeType;
+    d->currentTagData = tagData;
     updateTagButton();
-    emit currentFilterChanged();
+    emit currentTagDataChanged();
 }
 
 void SearchEdit::updateTagButton()
 {
-    if (d->currentFilter)
+    if (!d->currentTagData.isNull())
     {
-        if (d->filterNameProvider)
-            d->tagButton->setText(d->filterNameProvider(*d->currentFilter));
+        if (d->tagNameProvider)
+            d->tagButton->setText(d->tagNameProvider(d->currentTagData));
         d->tagButton->setState(SelectableTextButton::State::unselected);
     }
 
-    const bool tagVisible = d->currentFilter.has_value();
+    const bool tagVisible = !d->currentTagData.isNull();
     setFixedHeight(tagVisible
         ? kLineEditHeight + kTagHolderHeight + kLineHeight
         : kLineEditHeight);
@@ -535,9 +533,9 @@ bool SearchEdit::event(QEvent* event)
     return result;
 }
 
-std::optional<ResourceTreeNodeType> SearchEdit::currentFilter() const
+QVariant SearchEdit::currentTagData() const
 {
-    return d->currentFilter;
+    return d->currentTagData;
 }
 
 bool SearchEdit::isMenuEnabled() const
