@@ -12,8 +12,9 @@ const static QString __CAMERA_EXCEPT_PARAMS[] =
     ResourcePropertyKey::kCredentials,
     ResourcePropertyKey::kDefaultCredentials,
     ResourcePropertyKey::kCameraAdvancedParams,
-    QLatin1String("DeviceID"), QLatin1String("DeviceUrl"), // from plugin onvif
-    QLatin1String("MediaUrl"),
+    ResourcePropertyKey::Onvif::kDeviceID,
+    ResourcePropertyKey::Onvif::kDeviceUrl,
+    ResourcePropertyKey::Onvif::kMediaUrl
 };
 
 const static QString __CAMERA_RESOURCE_PARAMS[] =

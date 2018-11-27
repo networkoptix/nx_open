@@ -179,9 +179,6 @@ public:
     };
 
     static const QString MANUFACTURE;
-    static QString MEDIA_URL_PARAM_NAME;
-    static QString ONVIF_URL_PARAM_NAME;
-    static QString ONVIF_ID_PARAM_NAME;
     static const float QUALITY_COEF;
     static const int MAX_AUDIO_BITRATE;
     static const int MAX_AUDIO_SAMPLERATE;

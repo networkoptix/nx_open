@@ -79,7 +79,7 @@ QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(
     }
 #endif //ENABLE_DATA_PROVIDERS
 
-    QString strVal = toResource()->getProperty(Qn::VIDEO_LAYOUT_PARAM_NAME);
+    QString strVal = toResource()->getProperty(ResourcePropertyKey::kVideoLayout);
     if (strVal.isEmpty())
     {
         return defaultVideoLayout;

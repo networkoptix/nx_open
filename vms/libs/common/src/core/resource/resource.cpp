@@ -560,7 +560,7 @@ bool QnResource::setProperty(const QString &key, const QVariant& value, Property
 
 void QnResource::emitPropertyChanged(const QString& key)
 {
-    if (key == Qn::VIDEO_LAYOUT_PARAM_NAME)
+    if (key == ResourcePropertyKey::kVideoLayout)
         emit videoLayoutChanged(::toSharedPointer(this));
 
     emit propertyChanged(toSharedPointer(this), key);

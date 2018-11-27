@@ -85,9 +85,6 @@ const QString QnPlOnvifResource::MANUFACTURE(lit("OnvifDevice"));
 const char* QnPlOnvifResource::ONVIF_PROTOCOL_PREFIX = "http://";
 const char* QnPlOnvifResource::ONVIF_URL_SUFFIX = ":80/onvif/device_service";
 const int QnPlOnvifResource::DEFAULT_IFRAME_DISTANCE = 20;
-QString QnPlOnvifResource::MEDIA_URL_PARAM_NAME = QLatin1String("MediaUrl");
-QString QnPlOnvifResource::ONVIF_URL_PARAM_NAME = QLatin1String("DeviceUrl");
-QString QnPlOnvifResource::ONVIF_ID_PARAM_NAME = QLatin1String("DeviceID");
 const float QnPlOnvifResource::QUALITY_COEF = 0.2f;
 const int QnPlOnvifResource::MAX_AUDIO_BITRATE = 64; //kbps
 const int QnPlOnvifResource::MAX_AUDIO_SAMPLERATE = 32; //khz
@@ -1051,7 +1048,7 @@ QString QnPlOnvifResource::getDeviceOnvifUrl() const
 {
     QnMutexLocker lock(&m_mutex);
     if (m_serviceUrls.deviceServiceUrl.isEmpty())
-        m_serviceUrls.deviceServiceUrl = getProperty(ONVIF_URL_PARAM_NAME);
+        m_serviceUrls.deviceServiceUrl = getProperty(ResourcePropertyKey::Onvif::kDeviceUrl);
 
     return m_serviceUrls.deviceServiceUrl;
 }
@@ -1063,7 +1060,7 @@ void QnPlOnvifResource::setDeviceOnvifUrl(const QString& src)
         m_serviceUrls.deviceServiceUrl = src;
     }
 
-    setProperty(ONVIF_URL_PARAM_NAME, src);
+    setProperty(ResourcePropertyKey::Onvif::kDeviceUrl, src);
 }
 
 QString QnPlOnvifResource::fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort)
@@ -4056,7 +4053,7 @@ QnConstResourceVideoLayoutPtr QnPlOnvifResource::getVideoLayout(
     }
 
     auto resData = resourceData();
-    auto layoutStr = resData.value<QString>(Qn::VIDEO_LAYOUT_PARAM_NAME2);
+    auto layoutStr = resData.value<QString>(ResourceDataKey::kVideoLayout);
     auto videoLayout = layoutStr.isEmpty()
         ? QnMediaResource::getVideoLayout(dataProvider)
         : QnConstResourceVideoLayoutPtr(QnCustomResourceVideoLayout::fromString(layoutStr));
@@ -4065,7 +4062,7 @@ QnConstResourceVideoLayoutPtr QnPlOnvifResource::getVideoLayout(
     {
         QnMutexLocker lock(&m_layoutMutex);
         m_videoLayout = videoLayout;
-        nonConstThis->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, videoLayout->toString());
+        nonConstThis->setProperty(ResourcePropertyKey::kVideoLayout, videoLayout->toString());
         nonConstThis->saveProperties();
     }
 
