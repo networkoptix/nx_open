@@ -38,6 +38,17 @@ public:
     QVariant currentTagData() const;
     void setCurrentTagData(const QVariant& tagData);
 
+    /**
+    * SearchEdit control can display discardable badge with certain meaning and description.
+    *     It may be assigned by both picking some option from context menu or directly calling
+    *     setCurrentTagData method.
+    *
+    * @param tagMenuCreator Factory functor that returns pointer to QMenu instance. Picking one of
+    *     menu actions will cause setCurrentTagData method call parametrized with menu action data.
+    *
+    * @param tagNameProvider Functor that provides descriptive name for tag badge based on value
+    *     returned by currentTagData method.
+    */
     void setTagOptionsSource(std::function<QMenu*()> tagMenuCreator,
         std::function<QString(const QVariant&)> tagNameProvider);
 

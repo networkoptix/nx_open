@@ -750,9 +750,7 @@ QMenu* QnResourceBrowserWidget::createFilterMenu() const
             action->setData(QVariant::fromValue(filterNodeType));
         };
 
-    addMenuItem(QnResourceSearchQuery::kAllowAllNodeTypes);
-    result->addSeparator();
-    for (auto filterNodeType: {
+    const QList<ResourceTreeNodeType> filterNodeOptions = {
         ResourceTreeNodeType::filteredServers,
         ResourceTreeNodeType::filteredCameras,
         ResourceTreeNodeType::filteredLayouts,
@@ -760,7 +758,11 @@ QMenu* QnResourceBrowserWidget::createFilterMenu() const
         ResourceTreeNodeType::filteredVideowalls,
         ResourceTreeNodeType::webPages,
         ResourceTreeNodeType::filteredUsers,
-        ResourceTreeNodeType::localResources})
+        ResourceTreeNodeType::localResources};
+
+    addMenuItem(QnResourceSearchQuery::kAllowAllNodeTypes);
+    result->addSeparator();
+    for (auto filterNodeType: filterNodeOptions)
     {
         if (!m_resourceModel->rootNode(filterNodeType)->children().isEmpty())
             addMenuItem(filterNodeType);
