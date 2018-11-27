@@ -153,12 +153,12 @@ void QnPlDlinkResource::checkIfOnlineAsync( std::function<void(bool)> completion
     QAuthenticator auth = getAuth();
 
     nx::utils::Url apiUrl;
-    apiUrl.setScheme( lit("http") );
+    apiUrl.setScheme( nx::network::http::kUrlSchemeName );
     apiUrl.setHost( getHostAddress() );
     apiUrl.setPort( QUrl(getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT) );
     apiUrl.setUserName( auth.user() );
     apiUrl.setPassword( auth.password() );
-    apiUrl.setPath( lit("/common/info.cgi") );
+    apiUrl.setPath( "/common/info.cgi" );
 
     QString resourceMac = getMAC().toString();
     auto requestCompletionFunc = [resourceMac, completionHandler]
