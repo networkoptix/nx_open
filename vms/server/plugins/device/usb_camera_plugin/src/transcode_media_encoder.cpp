@@ -72,16 +72,17 @@ int TranscodeMediaEncoder::setFps(const float& fps, float* selectedFps)
 
 nxcip::StreamReader* TranscodeMediaEncoder::getLiveStreamReader()
 {
-    NX_ALWAYS(this, "%1 : Secondary stream requested", m_camera->info().modelName);
+    NX_DEBUG(this, "%1 : Secondary stream requested", m_camera->info().modelName);
 
     if (!m_streamReader)
-    {
+    {        
+        static constexpr bool kForceTranscoding = true;
         m_streamReader.reset(new StreamReader(
             &m_refManager,
             m_encoderIndex,
             m_codecParams,
             m_camera,
-            true /*forceTranscoding*/));
+            kForceTranscoding));
     }
 
     m_streamReader->addRef();

@@ -25,7 +25,7 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
         case QnSystemHealth::UsersEmailIsEmpty:
             return tr("Some users have not set their email addresses");
         case QnSystemHealth::SystemIsReadOnly:
-            return tr("System is in safe mode");
+            return tr("The system is in safe mode");
         case QnSystemHealth::EmailSendError:
             return tr("Error while sending email");
         case QnSystemHealth::StoragesNotConfigured:
@@ -39,7 +39,7 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
         case QnSystemHealth::ArchiveIntegrityFailed:
             return tr("Archive integrity problem detected");
         case QnSystemHealth::NoInternetForTimeSync:
-            return tr("No internet access for time synchronization");
+            return tr("The system has no internet access for time synchronization");
         default:
             break;
     }

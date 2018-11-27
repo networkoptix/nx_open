@@ -5,6 +5,7 @@
 #include <utils/common/delayed.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "../downloader.h"
 
@@ -21,7 +22,8 @@ static const milliseconds kDownloadRequestTimeout = 10min;
 class InternetOnlyPeerManager::Private
 {
 public:
-    rest::Handle nextRequestId = 0;
+    QnMutex mutex;
+    rest::Handle nextRequestId = 1;
     QHash<rest::Handle, std::shared_ptr<nx::network::http::AsyncClient>> requestClients;
 };
 
@@ -111,22 +113,30 @@ rest::Handle InternetOnlyPeerManager::downloadChunkFromInternet(
         QString("bytes=%1-%2").arg(pos).arg(pos + chunkSize - 1).toLatin1());
 
     const auto requestId = d->nextRequestId;
-    d->requestClients[requestId] = httpClient;
+
+    {
+        NX_MUTEX_LOCKER lock(&d->mutex);
+        d->requestClients[requestId] = httpClient;
+    }
+
     ++d->nextRequestId;
 
     httpClient->doGet(url,
-        [this, callback, requestId, httpClient, thread = QThread::currentThread()]()
+        [this, callback, requestId, httpClient, thread = thread()]()
         {
             executeInThread(thread, nx::utils::guarded(this,
                 [this, callback, requestId, httpClient]()
                 {
-                    d->requestClients.remove(requestId);
+                    {
+                        NX_MUTEX_LOCKER lock(&d->mutex);
+                        d->requestClients.remove(requestId);
+                    }
 
                     const bool success = httpClient->hasRequestSucceeded();
 
                     QByteArray result;
                     if (success)
-                        httpClient->fetchMessageBodyBuffer();
+                        result = httpClient->fetchMessageBodyBuffer();
 
                     callback(success, requestId, result);
                 }));
@@ -140,6 +150,7 @@ void InternetOnlyPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle h
     if (!peerId.isNull())
         return;
 
+    NX_MUTEX_LOCKER lock(&d->mutex);
     d->requestClients.remove(handle);
 }
 

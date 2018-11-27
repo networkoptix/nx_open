@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtWidgets/QWidget>
+#include <nx/vms/client/desktop/resource_views/data/node_type.h>
 
 class QMenu;
 class QLineEdit;
@@ -18,7 +19,6 @@ class SearchEdit: public QWidget
 
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
     Q_PROPERTY(QString placeholderText READ placeholderText WRITE setPlaceholderText)
-    Q_PROPERTY(int selectedTagIndex READ selectedTagIndex NOTIFY selectedTagIndexChanged)
 
 public:
     SearchEdit(QWidget* parent = nullptr);
@@ -33,13 +33,12 @@ public:
     QString placeholderText() const;
     void setPlaceholderText(const QString& value);
 
-    QStringList tagsList() const;
-    void setTags(const QStringList& value);
+    bool isMenuEnabled() const;
+    void setMenuEnabled(bool enabled);
 
-    int selectedTagIndex() const;
-
-    void setClearingTagIndex(int index);
-    int clearingTagIndex() const;
+    void setFilterOptionsSource(std::function<QMenu*()> filterMenuCreator,
+        std::function<QString(ResourceTreeNodeType)> filterNameProvider);
+    std::optional<ResourceTreeNodeType> currentFilter() const;
 
     bool focused() const;
 
@@ -50,8 +49,7 @@ public:
 signals:
     void textChanged();
     void editingFinished();
-    void selectedTagIndexChanged();
-
+    void currentFilterChanged();
     void enterPressed();
     void ctrlEnterPressed();
     void focusedChanged();
@@ -65,20 +63,18 @@ protected:
     void inputMethodEvent(QInputMethodEvent* event) override;
     void enterEvent(QEvent* event) override;
     void leaveEvent(QEvent* event) override;
-
     bool event(QEvent* event) override;
 
 private:
     void setupMenuButton();
-
     void updatePalette();
-    void setSelectedTagIndex(int value);
+    void setCurrentFilter(std::optional<ResourceTreeNodeType> allowedNodeType);
     void handleTagButtonStateChanged();
     void updateTagButton();
     void setHovered(bool value);
     void setButtonHovered(bool value);
     void updateMenuButtonIcon();
-
+    void showFilterMenu();
     void setFocused(bool value);
     void updateFocused();
 

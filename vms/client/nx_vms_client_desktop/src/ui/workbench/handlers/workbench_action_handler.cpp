@@ -1351,7 +1351,7 @@ void ActionHandler::at_jumpToTimeAction_triggered()
         &QnTimeSlider::isSliderDown,
         true);
 
-    slider->setValue(duration_cast<milliseconds>(timestamp), true);
+    slider->navigateTo(duration_cast<milliseconds>(timestamp));
 }
 
 void ActionHandler::at_goToLayoutItemAction_triggered()

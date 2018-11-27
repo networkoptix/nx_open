@@ -16,7 +16,7 @@ void fillCameraAuxiliaryData(nxcip::CameraInfo* cameras, int cameraCount)
     detail::fillCameraAuxiliaryData(cameras, cameraCount);
 }
 
-bool pluggedIn(const char * devicePath)
+bool pluggedIn(const std::string& devicePath)
 {
     return detail::pluggedIn(devicePath);
 }

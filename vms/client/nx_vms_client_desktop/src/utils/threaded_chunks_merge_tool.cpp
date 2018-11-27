@@ -76,7 +76,7 @@ void QnThreadedChunksMergeTool::processData() {
 
         std::vector<QnTimePeriodList> intersectedPeriods;
         for(const auto& list: periodsList)
-            intersectedPeriods.push_back(list.intersectedPeriods(QnTimePeriod(startTimeMs, QnTimePeriod::infiniteDuration())));
+            intersectedPeriods.push_back(list.intersectedPeriods(QnTimePeriod(startTimeMs, QnTimePeriod::kInfiniteDuration)));
 
         auto syncedAppending = QnTimePeriodList::mergeTimePeriods(intersectedPeriods);
         QnTimePeriodList::overwriteTail(result, syncedAppending, startTimeMs);

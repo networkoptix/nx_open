@@ -13,12 +13,35 @@
 
 namespace {
 
+enum class Protocol
+{
+    unknown = -1,
+    v10,
+    v31,
+    v40
+};
+
 enum
 {
     RESOURCES_BINARY_V1_TAG = 0xE1E00001,
     RESOURCES_BINARY_V2_TAG = 0xE1E00002,
     RESOURCES_BINARY_V3_TAG = 0xE1E00003,
 };
+
+Protocol protocolFromTag(quint32 tag)
+{
+    switch (tag)
+    {
+        case RESOURCES_BINARY_V1_TAG:
+            return Protocol::v10;
+        case RESOURCES_BINARY_V2_TAG:
+            return Protocol::v31;
+        case RESOURCES_BINARY_V3_TAG:
+            return Protocol::v40;
+        default:
+            return Protocol::unknown;
+    }
+}
 
 Q_GLOBAL_STATIC_WITH_ARGS(quint64, qn_localMagic, (QDateTime::currentMSecsSinceEpoch()));
 
@@ -57,12 +80,10 @@ std::pair<QList<QnUuid>, QHash<int, QVariant>> deserializeFromInternal(const QBy
 
     quint32 tag;
     stream >> tag;
-    if (tag != RESOURCES_BINARY_V1_TAG
-        && tag != RESOURCES_BINARY_V2_TAG
-        && tag != RESOURCES_BINARY_V3_TAG)
-    {
+
+    const auto protocol = protocolFromTag(tag);
+    if (protocol == Protocol::unknown)
         return result;
-    }
 
     bool fromOtherApp = false;
 
@@ -88,19 +109,15 @@ std::pair<QList<QnUuid>, QHash<int, QVariant>> deserializeFromInternal(const QBy
 
         result.first.push_back(QnUuid(id));
 
-        if (tag == RESOURCES_BINARY_V1_TAG)
+        if (protocol == Protocol::v10)
         {
             QString uniqueId; //< Is not used in the later format.
             stream >> uniqueId;
         }
     }
 
-    if (stream.status() != QDataStream::Ok
-        || tag == RESOURCES_BINARY_V1_TAG
-        || tag == RESOURCES_BINARY_V2_TAG)
-    {
+    if (stream.status() != QDataStream::Ok || protocol < Protocol::v40)
         return result;
-    }
 
     count = 0;
     stream >> count;

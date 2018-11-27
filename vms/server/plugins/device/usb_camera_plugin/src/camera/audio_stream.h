@@ -43,8 +43,6 @@ private:
         void addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
         void removePacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
 
-        int sampleRate() const;
-
     private:
         std::string m_url;
         std::weak_ptr<Camera> m_camera;
@@ -57,12 +55,12 @@ private:
 
         bool m_initialized = false;
         int m_initCode = 0;
-        bool m_ioError = false;
+        std::atomic_bool m_ioError = false;
 
         int64_t m_offsetTicks = 0;
         int64_t m_baseTimestamp = 0;
 
-        bool m_terminated = true;
+        std::atomic_bool m_terminated = true;
         mutable std::mutex m_mutex;
         std::condition_variable m_wait;
         std::thread m_runThread;
@@ -76,7 +74,7 @@ private:
         AdtsInjector m_adtsInjector;
 
     private:
-        std::string ffmpegUrl() const;
+        std::string ffmpegUrlPlatformDependent() const;
         bool waitForConsumers();
         int initialize();
         void uninitialize();
@@ -91,11 +89,13 @@ private:
         std::chrono::milliseconds resampleDelay() const;
         int encode(const ffmpeg::Frame *frame, ffmpeg::Packet * outPacket);
         std::shared_ptr<ffmpeg::Packet> nextPacket(int * outError);
+        uint64_t calculateTimestamp(int64_t duration);
 
         std::chrono::milliseconds timePerVideoFrame() const;
 
         bool checkIoError(int ffmpegError);
         void setLastError(int ffmpegError);
+        void terminate();
         void tryStart();
         void start();
         void stop();
@@ -114,8 +114,6 @@ public:
 
     void addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
     void removePacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
-
-    int sampleRate() const;
 
 private:
     std::string m_url;

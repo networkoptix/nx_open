@@ -316,7 +316,7 @@ bool ClientUpdateTool::installUpdate()
     static const int kMaxTries = 5;
     QString absolutePath = QFileInfo(m_updateFile).absoluteFilePath();
 
-    for (int retries = 0; retries < kMaxTries; retries++)
+    for (int retries = 0; retries < kMaxTries; ++retries)
     {
         using Result = applauncher::api::ResultType::Value;
         Result result = applauncher::api::installZip(m_updateVersion, absolutePath);

@@ -13,7 +13,7 @@ namespace usb_cam {
 namespace device {
 namespace video {
 
-std::string getDeviceName(const char * devicePath)
+std::string getDeviceName(const std::string& devicePath)
 {
     return detail::getDeviceName(devicePath);
 }
@@ -23,13 +23,13 @@ std::vector<DeviceData> getDeviceList()
     return detail::getDeviceList();
 }
 
-std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const char *devicePath)
+std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const std::string& devicePath)
 {
     return detail::getSupportedCodecs(devicePath);
 }
 
 std::vector<ResolutionData> getResolutionList(
-    const char * devicePath,
+    const std::string& devicePath,
     const device::CompressionTypeDescriptorPtr& targetCodecID)
 {
     if (!targetCodecID)
@@ -45,7 +45,7 @@ std::vector<ResolutionData> getResolutionList(
 }
 
 void setBitrate(
-    const char * devicePath,
+    const std::string& devicePath,
     int bitrate,
     const device::CompressionTypeDescriptorPtr& targetCodecID)
 {
@@ -54,7 +54,7 @@ void setBitrate(
 }
 
 int getMaxBitrate(
-    const char * devicePath,
+    const std::string& devicePath,
     const device::CompressionTypeDescriptorPtr& targetCodecID)
 {
     if(!targetCodecID)

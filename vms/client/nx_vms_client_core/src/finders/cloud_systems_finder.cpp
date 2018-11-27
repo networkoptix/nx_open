@@ -242,6 +242,11 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
                         systemDescription->addServer(moduleInformation, 0);
                     }
 
+                    // Since we have responding server we suppose system is running.
+                    // In case we have offline (by cloud response) system with alive server we
+                    // suppose it is bug in mediaserver<->cloud interaction.
+                    systemDescription->setRunning(true);
+
                     nx::utils::Url url;
                     url.setHost(moduleInformation.cloudId());
                     url.setScheme(nx::network::http::urlSheme(moduleInformation.sslAllowed));

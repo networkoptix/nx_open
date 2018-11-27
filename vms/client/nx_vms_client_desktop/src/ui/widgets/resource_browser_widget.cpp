@@ -53,6 +53,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/resource/resource_tree_model.h>
+#include <ui/models/resource/resource_tree_model_node.h>
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/models/resource_search_synchronizer.h>
@@ -338,7 +339,6 @@ void forEachIndex(
 void QnResourceBrowserWidget::initInstantSearch()
 {
     const auto filterEdit = ui->instantFilterLineEdit;
-    //filterEdit->setVisible(true);
 
     ui->tabWidget->tabBar()->hide();
 
@@ -352,13 +352,11 @@ void QnResourceBrowserWidget::initInstantSearch()
 
     // Initializes new filter edit
 
-    filterEdit->setClearingTagIndex(0);
-
     connect(filterEdit, &SearchEdit::textChanged,
         this, &QnResourceBrowserWidget::updateInstantFilter);
     connect(filterEdit, &SearchEdit::editingFinished,
         this, &QnResourceBrowserWidget::updateInstantFilter);
-    connect(filterEdit, &SearchEdit::selectedTagIndexChanged,
+    connect(filterEdit, &SearchEdit::currentFilterChanged,
         this, &QnResourceBrowserWidget::updateInstantFilter);
     connect(filterEdit, &SearchEdit::focusedChanged,
         this, &QnResourceBrowserWidget::updateHintVisibilityByBasicState);
@@ -379,6 +377,9 @@ void QnResourceBrowserWidget::initInstantSearch()
         this, &QnResourceBrowserWidget::handleInstantFilterUpdated);
     connect(searchModel, &QAbstractItemModel::modelReset,
         this, &QnResourceBrowserWidget::handleInstantFilterUpdated);
+
+    filterEdit->setFilterOptionsSource(std::bind(&QnResourceBrowserWidget::createFilterMenu, this),
+        std::bind(&QnResourceBrowserWidget::getFilterName, this, std::placeholders::_1));
 
     updateSearchMode();
     handleInstantFilterUpdated();
@@ -463,14 +464,8 @@ void QnResourceBrowserWidget::updateSearchMode()
 {
     const auto filterEdit = ui->instantFilterLineEdit;
     const bool localResourcesMode = commonModule()->remoteGUID().isNull();
-    QStringList tags;
-    if (!localResourcesMode)
-    {
-        auto tagsWithNodeTypes = filterTagsWithNodeTypes();
-        std::transform(tagsWithNodeTypes.begin(), tagsWithNodeTypes.end(), std::back_inserter(tags),
-            [](const auto& tagWithNodeType) { return tagWithNodeType.first; });
-    }
-    filterEdit->setTags(tags);
+
+    filterEdit->setMenuEnabled(!localResourcesMode);
     filterEdit->setText(QString());
     filterEdit->setPlaceholderText(localResourcesMode
         ? tr("Local files")
@@ -536,26 +531,19 @@ void QnResourceBrowserWidget::updateInstantFilter()
     if (trimmed.isEmpty())
         filterEdit->clear();
 
-    const auto index = filterEdit->selectedTagIndex();
-    if (index >= filterTagsWithNodeTypes().size())
-    {
-        NX_ASSERT(false, "Wrong tag index");
-        return;
-    }
-
     const bool localResourcesMode = commonModule()->remoteGUID().isNull();
     const auto allowedNode =
-        [this, localResourcesMode, index]()
+        [this, localResourcesMode, filterEdit]()
         {
-            if (index > -1)
-                return filterTagsWithNodeTypes().at(index).second;
+            if (filterEdit->currentFilter())
+                return *filterEdit->currentFilter();
 
             return localResourcesMode
                 ? QnResourceSearchQuery::NodeType::localResources
                 : QnResourceSearchQuery::kAllowAllNodeTypes;
         }();
 
-    const bool filtering = !trimmed.isEmpty() || (!localResourcesMode && index != -1);
+    const bool filtering = !trimmed.isEmpty() || (!localResourcesMode && filterEdit->currentFilter());
     const bool filteringUpdated = updateFilteringMode(filtering);
     if (filteringUpdated && filtering)
         storeExpandedStates();
@@ -742,19 +730,69 @@ void QnResourceBrowserWidget::updateHintVisibilityByBasicState()
         && ui->instantFilterLineEdit->focused());
 }
 
-QList<QnResourceBrowserWidget::FilterTagWithNodeType> QnResourceBrowserWidget::filterTagsWithNodeTypes() const
+QMenu* QnResourceBrowserWidget::createFilterMenu() const
 {
-    return {
-        {tr("All types"),           QnResourceSearchQuery::kAllowAllNodeTypes},
-        {QString(),                 QnResourceSearchQuery::kAllowAllNodeTypes}, // splitter
-        {tr("Servers"),             ResourceTreeNodeType::filteredServers},
-        {tr("Cameras && Devices"),  ResourceTreeNodeType::filteredCameras},
-        {tr("Layouts"),             ResourceTreeNodeType::filteredLayouts},
-        {tr("Showreels"),           ResourceTreeNodeType::layoutTours},
-        {tr("Video Walls"),         ResourceTreeNodeType::filteredVideowalls},
-        {tr("Web Pages"),           ResourceTreeNodeType::webPages},
-        {tr("Users"),               ResourceTreeNodeType::filteredUsers},
-        {tr("Local Files"),         ResourceTreeNodeType::localResources}};
+    QMenu* result = new QMenu();
+
+    auto escapeActionText =
+        [](const QString& text)
+        {
+            return QString(text).replace(lit("&"), lit("&&"));
+        };
+
+    auto addMenuItem =
+        [this, result, escapeActionText](ResourceTreeNodeType filterNodeType)
+        {
+            auto action = result->addAction(escapeActionText(getFilterName(filterNodeType)));
+            action->setData(QVariant::fromValue(filterNodeType));
+        };
+
+    addMenuItem(QnResourceSearchQuery::kAllowAllNodeTypes);
+    result->addSeparator();
+    for (auto filterNodeType: {
+        ResourceTreeNodeType::filteredServers,
+        ResourceTreeNodeType::filteredCameras,
+        ResourceTreeNodeType::filteredLayouts,
+        ResourceTreeNodeType::layoutTours,
+        ResourceTreeNodeType::filteredVideowalls,
+        ResourceTreeNodeType::webPages,
+        ResourceTreeNodeType::filteredUsers,
+        ResourceTreeNodeType::localResources})
+    {
+        if (!m_resourceModel->rootNode(filterNodeType)->children().isEmpty())
+            addMenuItem(filterNodeType);
+    }
+
+    return result;
+}
+
+QString QnResourceBrowserWidget::getFilterName(ResourceTreeNodeType allowedNodeType) const
+{
+    switch (allowedNodeType)
+    {
+        case QnResourceSearchQuery::kAllowAllNodeTypes:
+            return tr("All types");
+        case ResourceTreeNodeType::filteredServers:
+            return tr("Servers");
+        case ResourceTreeNodeType::filteredCameras:
+            return tr("Cameras & Devices");
+        case ResourceTreeNodeType::filteredLayouts:
+            return tr("Layouts");
+        case ResourceTreeNodeType::layoutTours:
+            return tr("Showreels");
+        case ResourceTreeNodeType::filteredVideowalls:
+            return tr("Video Walls");
+        case ResourceTreeNodeType::webPages:
+            return tr("Web Pages");
+        case ResourceTreeNodeType::filteredUsers:
+            return tr("Users");
+        case ResourceTreeNodeType::localResources:
+            return tr("Local Files");
+        default:
+            NX_ASSERT(false);
+            break;
+    }
+    return QString();
 }
 
 QComboBox* QnResourceBrowserWidget::typeComboBox() const

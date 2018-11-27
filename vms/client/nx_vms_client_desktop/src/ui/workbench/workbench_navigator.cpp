@@ -870,7 +870,7 @@ void QnWorkbenchNavigator::updateItemDataFromSlider(QnResourceWidget *widget) co
 
     QnTimePeriod window(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
     if (m_timeSlider->windowEnd() == m_timeSlider->maximum()) // TODO: #Elric check that widget supports live.
-        window.durationMs = QnTimePeriod::infiniteDuration();
+        window.durationMs = QnTimePeriod::kInfiniteDuration;
     item->setData(Qn::ItemSliderWindowRole, QVariant::fromValue<QnTimePeriod>(window));
 
     if (workbench()->currentLayout()->isSearchLayout())
@@ -899,7 +899,7 @@ void QnWorkbenchNavigator::updateSliderFromItemData(QnResourceWidget *widget, bo
     else
     {
         if (window.isEmpty())
-            window = QnTimePeriod(0, QnTimePeriod::infiniteDuration());
+            window = QnTimePeriod::anytime();
 
         milliseconds windowStart = milliseconds(window.startTimeMs);
         milliseconds windowEnd = window.isInfinite()

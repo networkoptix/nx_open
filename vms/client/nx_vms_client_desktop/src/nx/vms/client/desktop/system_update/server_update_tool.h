@@ -220,7 +220,7 @@ public:
     /**
      * Updates URL of the current mediaserver.
      */
-    void setServerUrl(nx::utils::Url serverUrl, QnUuid serverId);
+    void setServerUrl(const nx::utils::Url& serverUrl, const QnUuid& serverId);
 
 signals:
     void packageDownloaded(const nx::update::Package& package);
