@@ -91,7 +91,7 @@ CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
         nx::network::rtsp::DEFAULT_RTSP_PORT).arg(requestStr);
 
     m_rtpStreamParser.setRequest(url);
-	m_camera->updateSourceUrl(m_rtpStreamParser.getCurrentStreamUrl(), getRole());
+    m_camera->updateSourceUrl(m_rtpStreamParser.getCurrentStreamUrl(), getRole());
     return m_rtpStreamParser.openStream();
 }
 

@@ -54,7 +54,6 @@ int TranscodeMediaEncoder::getResolutionList(
     infoList[index].maxFps = secondary.fps;
 
     *infoListCount = index + 1;
-    
     return nxcip::NX_NO_ERROR;
 }
 
@@ -76,7 +75,7 @@ nxcip::StreamReader* TranscodeMediaEncoder::getLiveStreamReader()
     NX_ALWAYS(this, "%1 : Secondary stream requested", m_camera->info().modelName);
 
     if (!m_streamReader)
-    {        
+    {
         m_streamReader.reset(new StreamReader(
             &m_refManager,
             m_encoderIndex,
