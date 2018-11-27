@@ -135,8 +135,8 @@ private:
     void updateInstantFilter();
     void handleInstantFilterUpdated();
 
-    using FilterTagWithNodeType = QPair<QString, nx::vms::client::desktop::ResourceTreeNodeType>;
-    QList<FilterTagWithNodeType> filterTagsWithNodeTypes() const;
+    QMenu* createFilterMenu() const;
+    QString getFilterName(nx::vms::client::desktop::ResourceTreeNodeType allowedNodeType) const;
 
     void setHintVisible(bool value);
 
