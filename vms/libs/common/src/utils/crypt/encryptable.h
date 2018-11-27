@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QString>
+
 namespace nx::utils {
 
 /**
@@ -18,9 +20,9 @@ private: //< These functions do nothing and should be overwritten as public, at 
     /** Returns true if the entity is encrypted and no valid password is provided. */
     virtual bool requiresPassword() const { return false; }
     /** Attempts to set a password for opening existing entity. */
-    virtual bool usePasswordToRead(const QString& password) { return true; }
+    virtual bool usePasswordToRead(const QString& /*password*/) { return true; }
     /** Sets a password for writing new entity. */
-    virtual void setPasswordToWrite(const QString& password) {}
+    virtual void setPasswordToWrite(const QString& /*password*/) {}
     /** Drops password. */
     virtual void forgetPassword() {}
     /** Returns password */

@@ -79,7 +79,7 @@ signals:
     void hasChangesChanged();
 
 protected:
-    virtual void setReadOnlyInternal(bool readOnly) {}
+    virtual void setReadOnlyInternal(bool /*readOnly*/) {}
 
 private:
     bool m_readOnly = false;
