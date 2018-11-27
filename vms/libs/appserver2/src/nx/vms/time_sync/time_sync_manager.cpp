@@ -96,7 +96,7 @@ void TimeSyncManager::loadTimeFromLocalClock()
 
     if (setSyncTime(newValue, kMaxJitterForLocalClock))
     {
-        NX_DEBUG(this, lm("Set time %1 from the local clock")
+        NX_INFO(this, lm("Set time %1 from the local clock")
             .arg(QDateTime::fromMSecsSinceEpoch(newValue.count()).toString(Qt::ISODate)));
     }
     m_isTimeTakenFromInternet = false;
