@@ -13,33 +13,33 @@ ${email}    ${EMAIL OWNER}
 
 *** Test Cases ***      EMAIL
 Invalid Email 1 noptixqagmail.com         noptixqagmail.com
-    [tags]    C41875
+    [tags]    C41902
 Invalid Email 2 @gmail.com                @gmail.com
-    [tags]    C41875
+    [tags]    C41902
 Invalid Email 3 noptixqa@gmail..com       noptixqa@gmail..com
-    [tags]    C41875
+    [tags]    C41902
 Invalid Email 4 noptixqa@192.168.1.1.0    noptixqa@192.168.1.1.0
-    [tags]    C41875
+    [tags]    C41902
 Invalid Email 5 noptixqa.@gmail.com       noptixqa.@gmail.com
-    [tags]    C41875
+    [tags]    C41902
 Invalid Email 6 noptixq..a@gmail.c        noptixq..a@gmail.c
-    [tags]    C41875
+    [tags]    C41902
 Invalid Email 7 noptixqa@-gmail.com       noptixqa@-gmail.com
-    [tags]    C41875
+    [tags]    C41902
 Invalid Email 8 myemail                   myemail
-    [tags]    C41875
+    [tags]    C41902
 Invalid Email 9 myemail@                  myemail@
-    [tags]    C41875
+    [tags]    C41902
 Invalid Email 10 myemail@gmail            myemail@gmail
-    [tags]    C41875
+    [tags]    C41902
 Invalid Email 11 myemail@.com             myemail@.com
-    [tags]    C41875
+    [tags]    C41902
 Invalid Email 12 my@email@gmail.com       my@email@gmail.com
-    [tags]    C41875
+    [tags]    C41902
 Invalid Email 13 myemail@ gmail.com       myemail@ gmail.com
-    [tags]    C41875
+    [tags]    C41902
 Invalid Email 14 myemail@gmail.com;       myemail@gmail.com;
-    [tags]    C41875
+    [tags]    C41902
 Space Email                               ${SPACE}
 Empty Email                               ${EMPTY}
     [tags]    C41888
