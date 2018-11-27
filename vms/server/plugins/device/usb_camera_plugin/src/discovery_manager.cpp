@@ -148,8 +148,8 @@ int DiscoveryManager::getReservedModelList(char** /*modelList*/, int* count)
 void DiscoveryManager::addOrUpdateCamera(const DeviceDataWithNxId& device)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-
     auto it = m_cameras.find(device.nxId);
+    NX_DEBUG(this, "addOrUpdateCamera");
     if(it == m_cameras.end())
     {
         NX_DEBUG(this, "Found new device: %1", device.toString());
@@ -157,17 +157,23 @@ void DiscoveryManager::addOrUpdateCamera(const DeviceDataWithNxId& device)
     }
     else
     {
-        NX_DEBUG(this, "Device already found: %1" , device.toString());
-        if (it->second.device.path != device.device.path)
+        if (it->second != device)
         {
-            std::string oldPath = it->second.device.path;
+            DeviceDataWithNxId old = it->second;
             NX_DEBUG(
                 this,
-                "Device path changed: %1 -> %2",
-                oldPath,
-                device.device.path);
+                "Device with nxId already found but device changed: old: %1, new: %2",
+                old.toString(),
+                device.toString());
 
             it->second = device;
+        }
+        else
+        {
+            NX_DEBUG(
+                this,
+                "Device already found: %1",
+                device.toString());
         }
     }
 }
