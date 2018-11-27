@@ -109,6 +109,8 @@ void StreamTransformingAsyncChannel::processTask(UserTask* task)
 
 void StreamTransformingAsyncChannel::processReadTask(ReadTask* task)
 {
+    NX_VERBOSE(this, "Processing read task");
+
     SystemError::ErrorCode sysErrorCode = SystemError::noError;
     int bytesRead = 0;
     std::tie(sysErrorCode, bytesRead) = invokeConverter(
@@ -116,7 +118,13 @@ void StreamTransformingAsyncChannel::processReadTask(ReadTask* task)
             task->buffer->data() + task->buffer->size(),
             task->buffer->capacity() - task->buffer->size()));
     if (sysErrorCode == SystemError::wouldBlock)
+    {
+        NX_VERBOSE(this, "Failed to process read task. wouldBlock");
         return;
+    }
+
+    NX_VERBOSE(this, lm("Read task completed. Result %1, bytesWritten %2")
+        .args(sysErrorCode, bytesRead));
 
     task->buffer->resize(task->buffer->size() + bytesRead);
 
@@ -127,6 +135,8 @@ void StreamTransformingAsyncChannel::processReadTask(ReadTask* task)
 
 void StreamTransformingAsyncChannel::processWriteTask(WriteTask* task)
 {
+    NX_VERBOSE(this, lm("Processing write task (%1 bytes)").args(task->buffer.size()));
+
     SystemError::ErrorCode sysErrorCode = SystemError::noError;
     int bytesWritten = 0;
 
@@ -137,9 +147,15 @@ void StreamTransformingAsyncChannel::processWriteTask(WriteTask* task)
             task->buffer.data(),
             task->buffer.size()));
     if (sysErrorCode == SystemError::wouldBlock)
+    {
+        NX_VERBOSE(this, "Failed to process write task. wouldBlock");
         return; //< Could not schedule user data send.
+    }
 
     task->status = UserTaskStatus::done;
+
+    NX_VERBOSE(this, lm("Write task completed. Result %1, bytesWritten %2")
+        .args(sysErrorCode, bytesWritten));
 
     if (m_rawWriteQueue.size() > rawWriteQueueSizeBak)
     {
