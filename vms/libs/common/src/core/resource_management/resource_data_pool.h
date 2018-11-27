@@ -29,6 +29,7 @@ public:
     QnResourceData data(const QnConstSecurityCamResourcePtr &camera) const;
     QnResourceData data(const QString& _vendor, const QString& model, const QString& firmware = QString()) const;
 
+    static QString getVersion(const QByteArray& data);
     bool validateData(const QByteArray& data) const;
     bool loadFile(const QString &fileName);
     bool loadData(const QByteArray& data);

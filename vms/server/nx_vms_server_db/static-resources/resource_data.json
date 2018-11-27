@@ -15,7 +15,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0",
+    "version": "1.0.1",
     "data": [
         {
             "keys": ["Hanwha|*"],
@@ -481,6 +481,7 @@
             "keys": [
                 "DW|*"
             ],
+            "sendBackChannelAttribute": false,
             "possibleDefaultCredentials": [
                 {
                     "user": "admin",
