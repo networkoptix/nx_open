@@ -7,26 +7,6 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/media_server_resource.h>
 
-namespace {
-
-AVCodecID toFfmpegCodec(const QString& codec)
-{
-    if (codec == lit("AAC"))
-        return AV_CODEC_ID_AAC;
-    else if (codec == lit("G726"))
-        return AV_CODEC_ID_ADPCM_G726;
-    else if (codec == lit("MULAW"))
-        return AV_CODEC_ID_PCM_MULAW;
-    else if (codec == lit("ALAW"))
-        return AV_CODEC_ID_PCM_ALAW;
-    else if (codec == lit("PCM_S16LE"))
-        return AV_CODEC_ID_PCM_S16LE;
-    else
-        return AV_CODEC_ID_NONE;
-}
-
-} // namespace
-
 BaseHttpAudioTransmitter::BaseHttpAudioTransmitter(QnSecurityCamResource* res):
     QnAbstractAudioTransmitter(),
     m_resource(res),
@@ -91,10 +71,13 @@ bool BaseHttpAudioTransmitter::isInitialized() const
 void BaseHttpAudioTransmitter::prepare()
 {
     QnMutexLocker lock(&m_mutex);
-    m_transcoder.reset(new QnFfmpegAudioTranscoder(toFfmpegCodec(m_outputFormat.codec())));
+    int defaultBitrate = 0;
+    m_transcoder.reset(new QnFfmpegAudioTranscoder(toFfmpegCodec(m_outputFormat.codec(), &defaultBitrate)));
     m_transcoder->setSampleRate(m_outputFormat.sampleRate());
     if (m_bitrateKbps > 0)
         m_transcoder->setBitrate(m_bitrateKbps);
+    else if (defaultBitrate > 0)
+        m_transcoder->setBitrate(defaultBitrate);
 }
 
 bool BaseHttpAudioTransmitter::processAudioData(const QnConstCompressedAudioDataPtr& audioData)

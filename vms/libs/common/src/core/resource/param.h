@@ -5,11 +5,11 @@
 #include <QString>
 
 /**
- * Contains the keys to treat properties of resources (QnResource and its inheritors)
- * Properties are mutable attributes of a resource.
- * The type of any property is QString.
+ * Contains the keys to treat properties of resources (QnResource and its inheritors).
+ * Properties are mutable attributes of a resource. The type of any property is QString.
  * QnResource has a bunch of methods to work with its properties:
  *     hasPropery, getProperty, setProperty, updateProperty, saveProperties, savePropertiesAsync.
+ * Some properties have default read-only values, which can be read with hasDefaultProperty.
  */
 namespace ResourcePropertyKey
 {
@@ -49,6 +49,7 @@ static const QString kMediaStreams("mediaStreams");
 static const QString kBitrateInfos("bitrateInfos");
 static const QString kStreamUrls("streamUrls");
 static const QString kAudioCodec("audioCodec");
+static const QString kPtzCapabilities("ptzCapabilities");
 static const QString kUserPreferredPtzPresetType("userPreferredPtzPresetType");
 static const QString kDefaultPreferredPtzPresetType("defaultPreferredPtzPresetType");
 static const QString kUserIsAllowedToOverridePtzCapabilities(
@@ -58,9 +59,53 @@ static const QString kConfigurationalPtzCapabilities("configurationalPtzCapabili
 static const QString kCombinedSensorsDescription("combinedSensorsDescription");
 static const QString kForcedAudioStream("forcedAudioStream");
 
-// see ResourceDataKey::kOperationalPtzCapabilities
-static const QString kPtzCapabilities("ptzCapabilities");
+// Used as default property only.
+static const QString kGroupPlayParamName("groupplay");
+static const QString kNoRecordingParams("noRecordingParams");
 
+static const QString kCanConfigureRemoteRecording("canConfigureRemoteRecording");
+
+// Contains QnCameraAdvancedParams in ubjson-serialized state.
+static const QString kCameraAdvancedParams("cameraAdvancedParams");
+
+// TODO: Rename to supportedAnalyticsEventTypeIds.
+static const QString kAnalyticsDriversParamName("analyticsDrivers");
+
+static const QString kFirmware("firmware");
+static const QString kDeviceType("deviceType");
+static const QString kIoConfigCapability("ioConfigCapability");
+
+// TODO: rename to kIoDisplayNames
+static const QString kIoDisplayName("ioDisplayName");
+
+static const QString kIoOverlayStyle("ioOverlayStyle");
+
+// The next three keys are used both as property keys and as data keys, so they are defined both
+// in ResourcePropertyKey and ResourceDataKey namespaces.
+static const QString kNoVideoSupport("noVideoSupport");
+static const QString kBitratePerGOP("bitratePerGOP");
+static const QString kIoSettings("ioSettings");
+
+namespace MediaServer
+{
+static const QString kTimezoneUtcOffset("timezoneUtcOffset");
+
+namespace Statistics
+{
+static const QString kCpuArchitecture("cpuArchitecture");
+static const QString kCpuModelName("cpuModelName");
+static const QString kPhysicalMemory("physicalMemory");
+static const QString kProductNameShort("productNameShort");
+static const QString kFullVersion("fullVersion");
+static const QString kBeta("beta");
+static const QString kPublicIp("publicIp");
+static const QString kSystemRuntime("systemRuntime");
+static const QString kNetworkInterfaces("networkInterfaces");
+static const QString kBookmarkCount("bookmarkCount");
+static const QString kUdtInternetTraffic_bytes("udtInternetTraffic_bytes");
+static const QString kHddList("hddList");
+} // namespace Statistics
+} // namespace Medaiserver
 } // namespace ResourcePropertyKey
 
 //-------------------------------------------------------------------------------------------------
@@ -72,6 +117,8 @@ static const QString kPtzCapabilities("ptzCapabilities");
  * Usually the data is received like this:
  *     QnResourceData resData = commonModule->dataPool()->data(manufacturer, model);
  *     auto maxFps = resourceData.value<float>(ResourceDataKey::kMaxFps, 0.0);
+ * Sometimes (seldom) keys are absent in "resource_data.json", but are used in code, this means,
+ * that such keys are reserved for future.
  */
 namespace ResourceDataKey
 {
@@ -105,80 +152,56 @@ static const QString kDisableMultiThreadDecoding("disableMultiThreadDecoding");
 static const QString kConfigureAllStitchedSensors("configureAllStitchedSensors");
 static const QString kTwoWayAudio("2WayAudio");
 
-// see ResourcePropertyKey::kPtzCapabilities
 static const QString kOperationalPtzCapabilities("operationalPtzCapabilities");
 static const QString kConfigurationalPtzCapabilities("configurationalPtzCapabilities");
+
+// Rename to kForceOnvif and kIgnoreOnvif
+static const QString kForceONVIF("forceONVIF");
+static const QString kIgnoreONVIF("ignoreONVIF");
+
+static const QString kOnvifVendorSubtype("onvifVendorSubtype");
+
+static const QString kCanShareLicenseGroup("canShareLicenseGroup");
+
+static const QString kMediaTraits("mediaTraits");
+
+// TODO: rename to kDwRebrandedToIsd
+static const QString kIsdDwCam("isdDwCam");
+
+static const QString kDoNotAddVendorToDeviceName("doNotAddVendorToDeviceName");
+
+static const QString kMultiresourceVideoChannelMapping("multiresourceVideoChannelMapping");
+
+static const QString kParseOnvifNotificationsWithHttpReader("parseOnvifNotificationsWithHttpReader");
+static const QString kDisableHevc("disableHevc");
+
+// Rename?
+static const QString kNeedToReloadAllAdvancedParametersAfterApply("needToReloadAllAdvancedParametersAfterApply");
+
+// Storage
+// Rename?
+static const QString kSpace("space");
+
+// The next three keys are used both as property keys and as data keys, so they are defined both
+// in ResourcePropertyKey and ResourceDataKey namespaces.
+static const QString kNoVideoSupport("noVideoSupport");
+static const QString kBitratePerGOP("bitratePerGOP");
+static const QString kIoSettings("ioSettings");
 
 } // namespace ResourceDataKey
 
 //-------------------------------------------------------------------------------------------------
 
-/**
- Contains unsorted keys, that should be divided into
- namespaces ResourcePropertyKey and ResourceDataKey and renamed.
- */
 namespace Qn
 {
-
-//seem to be buggy
-static const QString VIDEO_DISABLED_PARAM_NAME = lit("noVideoSupport");
-static const QString FORCE_BITRATE_PER_GOP = lit("bitratePerGOP");
-//seem to be buggy
-
-static const QString VIDEO_LAYOUT_PARAM_NAME = lit("VideoLayout");
-static const QString VIDEO_LAYOUT_PARAM_NAME2 = lit("videoLayout"); //used in resource_data.json
-static const QString kAnalyticsDriversParamName = lit("analyticsDrivers"); //< TODO: Rename to supportedAnalyticsEventTypeIds.
-static const QString kGroupPlayParamName = lit("groupplay");
-static const QString kCanShareLicenseGroup = lit("canShareLicenseGroup");
-static const QString kMediaTraits = lit("mediaTraits");
-static const QString kDeviceType = lit("deviceType");
-
-//!Contains QnCameraAdvancedParams in ubjson-serialized state
-static const QString CAMERA_ADVANCED_PARAMETERS = lit("cameraAdvancedParams");
-
-static const QString FIRMWARE_PARAM_NAME = lit("firmware");
-static const QString IO_SETTINGS_PARAM_NAME = lit("ioSettings");
-static const QString IO_CONFIG_PARAM_NAME = lit("ioConfigCapability");
-static const QString IO_PORT_DISPLAY_NAMES_PARAM_NAME = lit("ioDisplayName");
-static const QString IO_OVERLAY_STYLE_PARAM_NAME = lit("ioOverlayStyle");
-static const QString FORCE_ONVIF_PARAM_NAME = lit("forceONVIF");
-static const QString IGNORE_ONVIF_PARAM_NAME = lit("ignoreONVIF");
-
-static const QString DW_REBRANDED_TO_ISD_MODEL = lit("isdDwCam");
-static const QString ONVIF_VENDOR_SUBTYPE = lit("onvifVendorSubtype");
-static const QString DO_NOT_ADD_VENDOR_TO_DEVICE_NAME = lit("doNotAddVendorToDeviceName");
-static const QString VIDEO_MULTIRESOURCE_CHANNEL_MAPPING_PARAM_NAME = lit("multiresourceVideoChannelMapping");
-static const QString NO_RECORDING_PARAMS_PARAM_NAME = lit("noRecordingParams");
-static const QString PARSE_ONVIF_NOTIFICATIONS_WITH_HTTP_READER = lit("parseOnvifNotificationsWithHttpReader");
-static const QString DISABLE_HEVC_PARAMETER_NAME = lit("disableHevc");
-static const QString kCanConfigureRemoteRecording = lit("canConfigureRemoteRecording");
-
-// Mediaserver common info
-static const QString kTimezoneUtcOffset = lit("timezoneUtcOffset");
-
-// Mediaserver info for Statistics
-static const QString CPU_ARCHITECTURE = lit("cpuArchitecture");
-static const QString CPU_MODEL_NAME = lit("cpuModelName");
-static const QString PHYSICAL_MEMORY = lit("physicalMemory");
-static const QString BETA = lit("beta");
-static const QString PUBLIC_IP = lit("publicIp");
-static const QString NETWORK_INTERFACES = lit("networkInterfaces");
-static const QString FULL_VERSION = lit("fullVersion");
-static const QString PRODUCT_NAME_SHORT = lit("productNameShort");
-static const QString SYSTEM_RUNTIME = lit("systemRuntime");
-static const QString BOOKMARK_COUNT = lit("bookmarkCount");
-static const QString UDT_INTERNET_TRFFIC = lit("udtInternetTraffic_bytes");
-static const QString HDD_LIST = lit("hddList");
-static const QString HDD_LIST_FILE = lit("/tmp/hddlist");
-
-// Storage
-static const QString SPACE = lit("space");
+// VIDEO_LAYOUT_PARAM_NAME and VIDEO_LAYOUT_PARAM_NAME2 should be renamed and moved to
+// another namespaces.
+static const QString VIDEO_LAYOUT_PARAM_NAME("VideoLayout");
+static const QString VIDEO_LAYOUT_PARAM_NAME2("videoLayout"); //used in resource_data.json
 
 // User
-static const QString USER_FULL_NAME = lit("fullUserName");
+static const QString USER_FULL_NAME("fullUserName");
 
-static const QString kResourceDataParamName = "resource_data.json";
-static const QString kReloadAllAdvancedParameters(
-    "needToReloadAllAdvancedParametersAfterApply");
+static const QString kResourceDataParamName("resource_data.json");
 
 } // namespace Qn

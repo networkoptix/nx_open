@@ -28,7 +28,7 @@
 namespace core_ptz = nx::core::ptz;
 
 static const float DEFAULT_MAX_FPS_IN_CASE_IF_UNKNOWN = 30.0;
-const QString QnThirdPartyResource::AUX_DATA_PARAM_NAME = QLatin1String("aux_data");
+const QString QnThirdPartyResource::AUX_DATA_PARAM_NAME("aux_data");
 
 static const std::map<Qn::CameraCapability, nxcip::BaseCameraManager::CameraCapability>
     kDeviceCapabilityMap =
@@ -178,7 +178,7 @@ bool QnThirdPartyResource::ping()
     return true;
 }
 
-static const QString PROPERTIES_TO_MERGE[] = { QnThirdPartyResource::AUX_DATA_PARAM_NAME, Qn::FIRMWARE_PARAM_NAME };
+static const QString PROPERTIES_TO_MERGE[] = { QnThirdPartyResource::AUX_DATA_PARAM_NAME, ResourcePropertyKey::kFirmware };
 
 bool QnThirdPartyResource::mergeResourcesIfNeeded( const QnNetworkResourcePtr& newResource )
 {

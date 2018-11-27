@@ -146,9 +146,8 @@ void setUseBitratePerGOP(bool value, const Cameras& cameras)
 {
     const auto valueStr = boolToPropertyStr(value);
     for (const auto& camera: cameras)
-        camera->setProperty(Qn::FORCE_BITRATE_PER_GOP, valueStr);
+        camera->setProperty(ResourcePropertyKey::kBitratePerGOP, valueStr);
 }
-
 
 void setPrimaryRecordingDisabled(bool value, const Cameras& cameras)
 {
@@ -361,7 +360,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 
         if (camera->isIOModule() && state.devicesDescription.isIoModule == State::CombinedValue::All)
         {
-            camera->setProperty(Qn::IO_OVERLAY_STYLE_PARAM_NAME, QnLexical::serialized(
+            camera->setProperty(ResourcePropertyKey::kIoOverlayStyle, QnLexical::serialized(
                 state.singleIoModuleSettings.visualStyle()));
 
             const auto ioPortDataList = state.singleIoModuleSettings.ioPortsData();

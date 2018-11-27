@@ -252,7 +252,7 @@ void QnModuleInformationRestHandler::send(Connections::iterator connection, nx::
         connection->dataToSend,
         [this, connection](SystemError::ErrorCode code, size_t size)
         {
-            if (code == SystemError::noError)
+            if (code != SystemError::noError)
             {
                 NX_VERBOSE(this, "Connection from %1 is lost",
                     connection->socket->getForeignAddress());

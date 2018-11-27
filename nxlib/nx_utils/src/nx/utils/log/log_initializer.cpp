@@ -29,28 +29,18 @@ std::unique_ptr<AbstractLogger> buildLogger(
 
 void initializeGlobally(const nx::utils::ArgumentParser& arguments)
 {
-    log::Settings logSettings;
-    logSettings.load(QnSettings(arguments));
-    const auto mainSettings =
-        [&logSettings]()
-        {
-            if (logSettings.loggers.empty())
-                logSettings.loggers.push_back(LoggerSettings());
-
-            return logSettings.loggers.front();
-        };
-
-    if (const auto value = arguments.get("log-file", "lf"))
-        mainSettings().logBaseName = *value;
-
-    if (const auto value = arguments.get("log-level", "ll"))
-        mainSettings().level.parse(*value);
-
-    if (logSettings.loggers.empty())
+    log::Settings settings;
+    settings.load(QnSettings(arguments), "log"/*, deafultCompatibilityLevel "none"*/);
+    for (auto& logger: settings.loggers)
     {
-        if (auto logger = buildLogger(logSettings, QString()))
-            setMainLogger(std::move(logger));
+        if (logger.logBaseName.isEmpty())
+            logger.logBaseName = "-"; // < Default output is console.
     }
+
+    if (auto logger = buildLogger(settings, QString()))
+        setMainLogger(std::move(logger));
+
+    lockConfiguration();
 }
 
 } // namespace log

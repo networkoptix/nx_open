@@ -53,6 +53,12 @@ void QnConnectToCloudWatcher::setCloudDbUrl(const nx::utils::Url& cloudDbUrl)
     m_cloudDbUrl = cloudDbUrl;
 }
 
+boost::optional<nx::utils::Url> QnConnectToCloudWatcher::cloudDbUrl() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_cloudDbUrl;
+}
+
 void QnConnectToCloudWatcher::restartTimer()
 {
     m_timer.start();
@@ -78,9 +84,10 @@ void QnConnectToCloudWatcher::at_updateConnection()
         return;
     }
 
-    if (m_cloudDbUrl)
+    auto cloudDbUrl = this->cloudDbUrl();
+    if (cloudDbUrl)
     {
-        addCloudPeer(*m_cloudDbUrl);
+        addCloudPeer(*cloudDbUrl);
     }
     else
     {

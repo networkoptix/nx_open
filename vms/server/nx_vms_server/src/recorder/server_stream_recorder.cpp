@@ -133,7 +133,7 @@ void QnServerStreamRecorder::at_camera_propertyChanged(const QnResourcePtr &, co
     if (liveProvider) {
         if (key == QnMediaResource::motionStreamKey())
             liveProvider->updateSoftwareMotionStreamNum();
-        else if (key == Qn::FORCE_BITRATE_PER_GOP)
+        else if (key == ResourcePropertyKey::kBitratePerGOP)
             liveProvider->pleaseReopenStream();
     }
 }
@@ -413,7 +413,7 @@ void QnServerStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr
         QnMutexLocker lock( &m_scheduleMutex );
         task = m_currentScheduleTask;
     }
-    bool isRecording = task.recordingType != Qn::RecordingType::never 
+    bool isRecording = task.recordingType != Qn::RecordingType::never
         && m_serverModule->normalStorageManager()->isWritableStoragesAvailable();
     if (!m_resource->hasFlags(Qn::foreigner)) {
         if (isRecording) {
