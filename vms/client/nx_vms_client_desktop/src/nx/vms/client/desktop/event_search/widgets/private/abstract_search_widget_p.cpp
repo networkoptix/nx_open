@@ -602,7 +602,7 @@ QnTimePeriod AbstractSearchWidget::Private::effectiveTimePeriod() const
     auto current = qnSyncTime->currentDateTime();
     current.setTime(QTime(0, 0, 0, 0));
     return QnTimePeriod(current.addDays(1 - days).toMSecsSinceEpoch(),
-        QnTimePeriod::infiniteDuration());
+        QnTimePeriod::kInfiniteDuration);
 }
 
 AbstractSearchWidget::Cameras AbstractSearchWidget::Private::selectedCameras() const

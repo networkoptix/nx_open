@@ -41,7 +41,7 @@ QnLayoutFileCameraDataLoader::~QnLayoutFileCameraDataLoader()
 
 int QnLayoutFileCameraDataLoader::sendDataDelayed(const QnAbstractCameraDataPtr& data) {
     int handle = qn_fakeHandle.fetchAndAddAcquire(1);
-    emit delayedReady(data, QnTimePeriod(0, QnTimePeriod::infiniteDuration()), handle);
+    emit delayedReady(data, QnTimePeriod::anytime(), handle);
     return handle;
 }
 

@@ -861,7 +861,7 @@ void EventRibbon::Private::updateHighlightedTiles()
                 return false;
 
             return m_highlightedTimestamp >= timestamp
-                && (duration.count() == QnTimePeriod::infiniteDuration()
+                && (duration.count() == QnTimePeriod::kInfiniteDuration
                     || m_highlightedTimestamp <= (timestamp + duration));
         };
 
