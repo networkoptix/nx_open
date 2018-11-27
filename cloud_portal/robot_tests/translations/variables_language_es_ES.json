@@ -23,6 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": "Mensaje de confirmación es enviado a %email%",
     "CANNOT SAVE PASSWORD": "No se puede guardar la contraseña:",
     "PASSWORD INCORRECT": "La contraseña actual es incorrecta.",
+    "TOO MANY ATTEMPTS TEXT": "Too many attempts. Try again in a minute.",
     "WRONG PASSWORD": "Contraseña incorrecta",
     "ACCOUNT NOT FOUND TEXT": "Cuenta no encontrada",
     "CANNOT SEND CONFIRMATION EMAIL": "No se puede enviar el correo electrónico de confirmación:",
@@ -83,7 +84,7 @@
     "PASSWORD TOO SHORT BADGE TEXT": "demasiado corto",
     "PASSWORD TOO COMMON BADGE TEXT": "demasiado común",
     "PASSWORD IS WEAK BADGE TEXT": "débil",
-    "PASSWORD IS FAIR BADGE TEXT": "justo",
+    "PASSWORD IS FAIR BADGE TEXT": "regular",
     "PASSWORD IS GOOD BADGE TEXT": "bueno",
     "PASSWORD INCORRECT BADGE TEXT": "incorrecto"
 }

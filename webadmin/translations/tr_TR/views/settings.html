@@ -8,8 +8,8 @@
                 Bu cihaz dahili bir disk ile çalışabilir.<br>Lütfen cihazı kapatıp bir disk ekleyin.
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
-                Cihazın çalışabilmesi için ağ bağlantısına ihtiyacı var.<br>
-Lütfen cihazı yerel ağa bağlayın
+                This device needs network connection to work.<br>
+                Please connect it to the local network or Internet
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 Cihaz yanlış ağ ayarına sahip.<br>

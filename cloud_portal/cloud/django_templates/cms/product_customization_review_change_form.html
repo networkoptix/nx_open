@@ -69,7 +69,6 @@
                     {% for record in records %}
                         {% with data_structure=record.data_structure language=record.language %}
                         <li>
-                            {% get_datastructure_type data_structure as data_structure_type %}
                             {% if data_structure.label %}
                                 {{ data_structure.label }}:
                             {% else %}
@@ -80,11 +79,18 @@
                                 ({{ language.code }})
                             {% endif %}
 
-                            {% if data_structure_type == "Image" %}
-                                <div><img class="preview-image review-preview" src="data:image/png;base64,{{ record }}"></div>
-                            {% elif data_structure_type == "File" %}
+                            {% if data_structure.type == DataStructureTypes.image or data_structure.type == DataStructureTypes.external_image  %}
+                                <div><img class="preview-image review-preview"
+                                          {% if data_structure.type == DataStructureTypes.image %}
+                                            src="data:image/png;base64,{{ record }}"
+                                          {% else %}
+                                            src="{{ record }}"
+                                          {% endif %}></div>
+                            {% elif data_structure.type == DataStructureTypes.file %}
                                 <a href="{% url 'download_file' data_structure.name %}?version_id={{ version.id }}&lang={{ language.code }}&draft"
                                    download>Download</a>
+                            {% elif data_structure.type == DataStructureTypes.external_file %}
+                                <a href="{{ record }}">Download</a>
                             {% else %}
                                 <div class="show-html">{{ record|safe }}</div>
                             {% endif %}

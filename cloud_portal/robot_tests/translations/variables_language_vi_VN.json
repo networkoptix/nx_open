@@ -23,6 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": "Thông báo xác nhận được gửi tới Email %email%",
     "CANNOT SAVE PASSWORD": "Không thể lưu mật khẩu:",
     "PASSWORD INCORRECT": "Mật khẩu hiện tại không đúng.",
+    "TOO MANY ATTEMPTS TEXT": "Too many attempts. Try again in a minute.",
     "WRONG PASSWORD": "Sai mật khẩu",
     "ACCOUNT NOT FOUND TEXT": "Không tìm thấy tài khoản",
     "CANNOT SEND CONFIRMATION EMAIL": "Không thể gửi Email xác nhận:",
@@ -80,10 +81,10 @@
     "PATCHES TEXT": "Patches",
     "BETAS TEXT": "Betas",
     "CLIENT ONLY TEXT": "Chỉ máy trạm",
-    "PASSWORD TOO SHORT BADGE TEXT": "too short",
-    "PASSWORD TOO COMMON BADGE TEXT": "too common",
+    "PASSWORD TOO SHORT BADGE TEXT": "quá ngắn",
+    "PASSWORD TOO COMMON BADGE TEXT": "quá phổ biến",
     "PASSWORD IS WEAK BADGE TEXT": "yếu",
-    "PASSWORD IS FAIR BADGE TEXT": "hợp lý",
+    "PASSWORD IS FAIR BADGE TEXT": "công bằng",
     "PASSWORD IS GOOD BADGE TEXT": "tốt",
-    "PASSWORD INCORRECT BADGE TEXT": "không đúng"
+    "PASSWORD INCORRECT BADGE TEXT": "không chính xác"
 }

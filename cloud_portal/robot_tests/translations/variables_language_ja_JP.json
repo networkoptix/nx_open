@@ -23,6 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": "%email%に確認メッセージを送信します",
     "CANNOT SAVE PASSWORD": "パスワードを保存できません:",
     "PASSWORD INCORRECT": "パスワードが違います.",
+    "TOO MANY ATTEMPTS TEXT": "試行回数が多すぎます。暫くしてからもう一度お試しください",
     "WRONG PASSWORD": "間違ったパスワード",
     "ACCOUNT NOT FOUND TEXT": "アカウントが見つかりません",
     "CANNOT SEND CONFIRMATION EMAIL": "確認メールを送信できません:",
@@ -82,8 +83,8 @@
     "CLIENT ONLY TEXT": "クライアントのみ",
     "PASSWORD TOO SHORT BADGE TEXT": "短すぎ",
     "PASSWORD TOO COMMON BADGE TEXT": "あまりにも一般的",
-    "PASSWORD IS WEAK BADGE TEXT": "弱い",
-    "PASSWORD IS FAIR BADGE TEXT": "普通",
-    "PASSWORD IS GOOD BADGE TEXT": "良い",
-    "PASSWORD INCORRECT BADGE TEXT": "間違っています"
+    "PASSWORD IS WEAK BADGE TEXT": "弱",
+    "PASSWORD IS FAIR BADGE TEXT": "可",
+    "PASSWORD IS GOOD BADGE TEXT": "良好",
+    "PASSWORD INCORRECT BADGE TEXT": "無効"
 }

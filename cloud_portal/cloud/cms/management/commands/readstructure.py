@@ -8,6 +8,7 @@ import re
 import json
 import codecs
 from cloud import settings
+from cloud.debug import timer
 from ...controllers import structure
 from ...models import *
 from django.core.management.base import BaseCommand
@@ -172,7 +173,6 @@ def read_structure(product_type):
             read_structure_file(file, product_type, global_strings, skin)
 
 
-
 def find_or_add_language(language_code):
     language = Language.by_code(language_code)
     if not language:
@@ -207,6 +207,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('product_type', nargs='?', default='cloud_portal')
 
+    @timer
     def handle(self, *args, **options):
         migrate_18_3_to_18_4(self)
         product_type = ProductType.get_type_by_name(options['product_type'])

@@ -2,7 +2,7 @@ import { Injectable, OnDestroy }        from '@angular/core';
 import { HttpClient }                   from '@angular/common/http';
 import { BehaviorSubject, Observable }  from 'rxjs';
 import { NxCloudApiService }            from '../../services/nx-cloud-api';
-import { NxConfigService }              from "../../services/nx-config";
+import { NxConfigService }              from '../../services/nx-config';
 
 
 interface Platform {
@@ -18,6 +18,8 @@ export class IntegrationService implements OnDestroy {
 
     plugins: any;
     pluginsSubject = new BehaviorSubject([]);
+    selectedPluginSubject = new BehaviorSubject(undefined);
+    inReview: boolean;
 
     constructor(private http: HttpClient,
                 private api: NxCloudApiService,
@@ -35,16 +37,25 @@ export class IntegrationService implements OnDestroy {
     }
 
     private setScreenshots(section) {
-        section.screenshots = Object.keys(section).filter((element) => {
-            return element.match(/screenshot/i) && section[element];
-        }).sort().map((key) => section[key]);
+        if (section) {
+            section.screenshots = Object.keys(section).filter((element) => {
+                return element.match(/screenshot/i) && section[element];
+            }).sort().map((key) => section[key]);
+        }
     }
 
     private formatPlugins() {
         if (!this.plugins) {
             return;
         }
+
+        this.inReview = false;
+
         this.plugins.forEach((plugin) => {
+            if (!this.inReview && plugin.pending) {
+                this.inReview = true;
+            }
+
             if (plugin.downloadFiles) {
                 const downloadPlatforms = plugin.downloadFiles;
                 plugin.downloadFiles = [];
@@ -53,14 +64,14 @@ export class IntegrationService implements OnDestroy {
                     // If there is no file url or its the name for an additional field skip
                     if (typeof downloadPlatforms[platformName] !== 'string' ||
                         !downloadPlatforms[platformName] ||
-                        platformName.match(/additional-file-[\d]+-name/)) {
+                        platformName.match(/-file-[\d]+-name/)) {
 
                         continue;
                     }
 
                     const platform: Platform = { file: '', name: '', url: '' };
                     // If the platformName is additional file we replace it with the correct name
-                    if (platformName.match(/additional-file-[\d]+/)) {
+                    if (platformName.match(/-file-[\d]+/)) {
                         platform.name = downloadPlatforms[`${platformName}-name`];
                     } else {
                         platform.name = this.config.config.defaultPlatformNames[platformName];
@@ -68,6 +79,9 @@ export class IntegrationService implements OnDestroy {
 
                     platform.url = downloadPlatforms[platformName];
                     platform.file = platform.url.slice(platform.url.lastIndexOf('/') + 1);
+                    if (!platform.file) {
+                        platform.file = platform.url;
+                    }
                     plugin.downloadFiles.push(platform);
                 }
                 // sort by name and then sort by file name.
@@ -95,7 +109,7 @@ export class IntegrationService implements OnDestroy {
 
     getPluginBy(id) {
         if (this.plugins) {
-            return this.plugins.find(plugin => plugin.id === Number(id));
+            this.selectedPluginSubject.next(this.plugins.find(plugin => plugin.id === Number(id)));
         }
 
         return undefined;

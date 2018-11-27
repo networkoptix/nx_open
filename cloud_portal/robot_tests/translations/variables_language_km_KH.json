@@ -23,6 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": "Confirmation message is sent to %email%",
     "CANNOT SAVE PASSWORD": "មិនអាចរក្សាទុកពាក្យសម្ងាត់:",
     "PASSWORD INCORRECT": "ពាក្យសម្ងាត់បច្ចុប្បន្នមិនត្រឹមត្រូវ។",
+    "TOO MANY ATTEMPTS TEXT": "Too many attempts. Try again in a minute.",
     "WRONG PASSWORD": "លេខសំងាត់​ខុស",
     "ACCOUNT NOT FOUND TEXT": "Account not found",
     "CANNOT SEND CONFIRMATION EMAIL": "មិនអាចផ្ញើអ៊ីមែលបញ្ជាក់បានទេ:",

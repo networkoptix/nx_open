@@ -23,6 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": "Messaggio di conferma viene inviato a %email%",
     "CANNOT SAVE PASSWORD": "Impossibile salvare la password:",
     "PASSWORD INCORRECT": "Password corrente non è corretta.",
+    "TOO MANY ATTEMPTS TEXT": "Troppi tentativi. Riprovare tra un minuto.",
     "WRONG PASSWORD": "Password errata",
     "ACCOUNT NOT FOUND TEXT": "Account non trovato",
     "CANNOT SEND CONFIRMATION EMAIL": "Non è possibile inviare e-mail di conferma:",
@@ -40,7 +41,7 @@
     "CANCEL BUTTON TEXT": "Annulla",
     "SAVE BUTTON TEXT": "Salvare",
     "SHARE BUTTON TEXT": "Condividere",
-    "DISCONNECT BUTTON TEXT": "Scollegare",
+    "DISCONNECT BUTTON TEXT": "Scollegati",
     "OWNER TEXT": "Proprietario",
     "ADMIN TEXT": "Amministratore",
     "ADV VIEWER TEXT": "Visualizzatore avanzato",
@@ -83,7 +84,7 @@
     "PASSWORD TOO SHORT BADGE TEXT": "troppo corto",
     "PASSWORD TOO COMMON BADGE TEXT": "troppo comune",
     "PASSWORD IS WEAK BADGE TEXT": "debole",
-    "PASSWORD IS FAIR BADGE TEXT": "discreto",
+    "PASSWORD IS FAIR BADGE TEXT": "giusta",
     "PASSWORD IS GOOD BADGE TEXT": "buono",
-    "PASSWORD INCORRECT BADGE TEXT": "non corretto"
+    "PASSWORD INCORRECT BADGE TEXT": "errato"
 }

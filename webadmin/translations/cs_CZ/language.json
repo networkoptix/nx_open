@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "vytvořit účet",
         "errorNoHDD": "Toto zařízení je určeno pro práci s nainstalovanou jednotkou pevného disku.<br>Vypněte prosím zařízení a nainstalujte jednotku pevného disku.",
-        "errorNoNetwork": "Toto zařízení vyžaduje připojení k síti. <br>Prosím připojte zařízení k místní síti nebo Internetu"
+        "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to the local network or Internet"
     },
     "passwordRequirements": {
         "minLengthMessage": "Heslo musí obsahovat nejméně 8 znaků",

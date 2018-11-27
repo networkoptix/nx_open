@@ -19,7 +19,7 @@
             float               : left;
             display             : flex;
             align-items         : center;
-            height              : 48px;
+            height              : rem(48px);
             max-width           : 160px;
             background-size     : contain;
             width               : 100%;
@@ -36,7 +36,7 @@
         }
         
         &.fixed {
-            height   : 200px;
+            height   : rem(200px);
             overflow : hidden;
         }
         

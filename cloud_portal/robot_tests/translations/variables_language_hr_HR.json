@@ -23,6 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": "Confirmation message is sent to %email%",
     "CANNOT SAVE PASSWORD": "Nije moguće spremiti zaporku:",
     "PASSWORD INCORRECT": "Trenutna zaporka je pogrešna.",
+    "TOO MANY ATTEMPTS TEXT": "Too many attempts. Try again in a minute.",
     "WRONG PASSWORD": "Pogrešna lozinka",
     "ACCOUNT NOT FOUND TEXT": "Account not found",
     "CANNOT SEND CONFIRMATION EMAIL": "Nije moguće poslati e-poštu za potvrdu:",

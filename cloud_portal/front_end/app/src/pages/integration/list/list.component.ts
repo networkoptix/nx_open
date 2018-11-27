@@ -4,6 +4,8 @@ import {
 } from '@angular/core';
 
 import { NxConfigService } from '../../../services/nx-config';
+import { NxRibbonService } from '../../../components/ribbon/ribbon.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'integrations-list-component',
@@ -19,15 +21,20 @@ export class NxIntegrationsListComponent implements OnInit, OnDestroy, OnChanges
     config: any;
 
     private setupDefaults() {
-        this.defaultLogo = '/static/icons/integration_tile_preview_plugin.svg';
+        this.config = this.configService.getConfig();
     }
 
-    constructor(configService: NxConfigService) {
+    constructor(private configService: NxConfigService,
+                private ribbonService: NxRibbonService,
+                private translate: TranslateService) {
+
         this.setupDefaults();
-        this.config = configService.getConfig();
     }
 
     getPlatformIconsFor(plugin) {
+
+        this.defaultLogo = this.config.icons.default;
+
         const platformIcons = [];
 
         this.config.icons.platforms.forEach(icon => {
@@ -52,15 +59,34 @@ export class NxIntegrationsListComponent implements OnInit, OnDestroy, OnChanges
     }
 
     ngOnDestroy() {
+        this.ribbonService.hide();
     }
 
     ngOnChanges(changes: SimpleChanges) {
+        let haveInReview = false;
         if (changes.list) {
             // inject platform icons info
-            this.list.forEach((plugin) => {
+            this.list.forEach(plugin => {
                 plugin.information.platforms.icons = this.getPlatformIconsFor(plugin);
                 this.setPlugunLogo(plugin);
+
+                haveInReview = haveInReview || plugin.pending;
             });
+
+            if (haveInReview) {
+                this.translate
+                        .get([
+                                'This page is a preview of the latest changes, and it doesn\'t match publicly available version.',
+                                'Back to the editing interfaces'
+                        ])
+                        .subscribe(res => {
+                            this.ribbonService.show(
+                                    res['This page is a preview of the latest changes, and it doesn\'t match publicly available version.'],
+                                    res['Back to the editing interfaces'],
+                                    this.config.links.admin.product
+                            );
+                        });
+            }
         }
     }
 }

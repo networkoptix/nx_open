@@ -8,6 +8,7 @@ from dal import autocomplete
 
 BYTES_TO_MEGABYTES = 1048576.0
 
+
 def convert_meta_to_description(meta):
     meta_to_plain = {"format": "Format:  %s",
                      "height": "Height: %spx",

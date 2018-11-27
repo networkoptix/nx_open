@@ -23,6 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": "Confirmation message is sent to %email%",
     "CANNOT SAVE PASSWORD": "Hindi mai-save ang password:",
     "PASSWORD INCORRECT": "Kasalukuyang password ay hindi tama.",
+    "TOO MANY ATTEMPTS TEXT": "Too many attempts. Try again in a minute.",
     "WRONG PASSWORD": "Maling password",
     "ACCOUNT NOT FOUND TEXT": "Account not found",
     "CANNOT SEND CONFIRMATION EMAIL": "Hindi maipadala ang Email ng kumpirmasyon:",

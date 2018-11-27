@@ -48,7 +48,7 @@ def has_value(data_structure_name, product, context, language):
 
 @register.simple_tag
 def get_datastructure_type(data_structure):
-    return DataStructure.DATA_TYPES[data_structure.type]
+    return DataStructure.DATA_TYPES[data_structure.type] if data_structure else 0
 
 
 @register.simple_tag

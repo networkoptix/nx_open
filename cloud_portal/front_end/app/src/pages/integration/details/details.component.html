@@ -8,7 +8,7 @@
     </div>
 
     <nx-layout-right [loading]="!plugin">
-        <nx-block first-elm *ngIf="plugin && (plugin.information.hasInfo || plugin.overview.hasInfo)">
+        <nx-block first-element *ngIf="plugin && (plugin.information || plugin.overview)">
             <header>
                 {{plugin.information.name}}
             </header>
@@ -19,19 +19,19 @@
                 </div>
             </nx-section>
 
-            <nx-section *ngIf="plugin.overview.description">
+            <nx-section *ngIf="plugin.overview && plugin.overview.description">
                 <div [innerHtml]="plugin.overview.description"></div>
             </nx-section>
 
-            <nx-section *ngIf="plugin.overview.overviewVideo">
+            <nx-section *ngIf="plugin.overview && plugin.overview.overviewVideo">
                 <nx-external-video [src]="plugin.overview.overviewVideo"></nx-external-video>
             </nx-section>
-            <nx-section *ngIf="plugin.overview.screenshots">
+            <nx-section *ngIf="plugin.overview && plugin.overview.screenshots">
                 <nx-carousel [screenshots]="plugin.overview.screenshots"></nx-carousel>
             </nx-section>
         </nx-block>
 
-        <nx-block side-elm type="gray" *ngIf="plugin && plugin.downloadFiles.length > 0">
+        <nx-block side-element type="gray" *ngIf="plugin && plugin.downloadFiles.length > 0">
             <header translate>
                 Download
             </header>
@@ -46,7 +46,7 @@
             </nx-section>
         </nx-block>
 
-        <nx-block *ngIf="plugin && plugin.instructions.hasInfo">
+        <nx-block *ngIf="plugin && plugin.instructions">
             <header translate>
                 Instructions
             </header>
@@ -63,7 +63,7 @@
             </nx-section>
         </nx-block>
 
-        <nx-block *ngIf="plugin && plugin.support.hasInfo">
+        <nx-block *ngIf="plugin && plugin.support">
             <header translate>
                 Support
             </header>
@@ -76,7 +76,7 @@
             </nx-section>
         </nx-block>
 
-        <nx-block *ngIf="plugin && plugin.additionalInformation.hasInfo">
+        <nx-block *ngIf="plugin && plugin.additionalInformation">
             <header translate>
                 Additional information
             </header>

@@ -17,6 +17,8 @@ export class NxSandboxComponent {
     edit: boolean;
     sections: any;
     options: any;
+    items: any;
+    itemsSelected: any;
 
     submitted = false;
 
@@ -38,12 +40,23 @@ export class NxSandboxComponent {
 
         this.options = [
             { name: 'brand', selected: false, type: 'brand' },
+            { name: 'really long name break', selected: false, type: 'brand' },
             { name: 'success', selected: true, type: 'success' },
             { name: 'danger', selected: true, type: 'danger' },
             { name: 'warning', selected: false, type: 'warning' },
             { name: 'info', selected: false, type: 'info' },
             { name: 'default', selected: true }
-        ]
+        ];
+
+        this.items = [
+            { label: 'Administrator', id: 'qwerty1' },
+            { label: 'Advanced Viewer', id: 'qwerty2'},
+            { label: 'Viewer', id: 'qwerty3'},
+            { label: 'Live Viewer', id: 'qwerty4' },
+        ];
+
+        this.itemsSelected = ['qwerty2', 'qwerty3'];
+
 
     }
 

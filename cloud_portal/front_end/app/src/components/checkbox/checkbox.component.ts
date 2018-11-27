@@ -1,7 +1,7 @@
 import {
     Component, Input, Output,
     EventEmitter, forwardRef,
-    Optional, Inject, OnInit, ViewEncapsulation
+    OnInit, ViewEncapsulation
 } from '@angular/core';
 import {
     NG_VALUE_ACCESSOR, ControlValueAccessor,
@@ -16,7 +16,7 @@ import {
       (click)?="onClick($event)"
       checked?
       disabled?
-      required?>LABEL
+      required?>
 </nx-checkbox>
 */
 
@@ -86,7 +86,9 @@ export class NxCheckboxComponent implements OnInit, ControlValueAccessor, Valida
 
         setTimeout(() => {
             // set state after model was updated
-            this.value = (this.checked !== undefined) || false;
+            if (this.checked !== undefined) {
+                this.value = this.checked;
+            }
             this.setState();
         });
     }

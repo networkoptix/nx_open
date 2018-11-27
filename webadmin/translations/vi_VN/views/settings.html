@@ -8,7 +8,8 @@
                 Thiết bị này được sử dụng để làm việc với ổ cứng đã được cài đặt. <br> Vui lòng tắt thiết bị để cài đặt một đĩa cứng mới.
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
-                Thiết bị này cần kết nối mạng để hoạt động. <br> Vui lòng kết nối với mạng Internet
+                This device needs network connection to work.<br>
+                Please connect it to the local network or Internet
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 Cấu hình thiết bị mạng sai. <br> Hãy kết nối mạng hoặc thiết lập một địa chỉ IP chính xác.

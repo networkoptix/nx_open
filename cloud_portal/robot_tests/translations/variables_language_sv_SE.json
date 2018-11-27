@@ -23,6 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": " Bekräftelsemail skickas till %email%",
     "CANNOT SAVE PASSWORD": "Kan inte spara lösenord:",
     "PASSWORD INCORRECT": "Nuvarande lösenord är inkorrekt.",
+    "TOO MANY ATTEMPTS TEXT": "Too many attempts. Try again in a minute.",
     "WRONG PASSWORD": "Fel lösenord",
     "ACCOUNT NOT FOUND TEXT": "Account not found",
     "CANNOT SEND CONFIRMATION EMAIL": "Kan inte skicka bekräftelse-e-post:",

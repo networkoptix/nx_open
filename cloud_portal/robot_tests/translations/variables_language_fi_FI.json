@@ -23,6 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": "Confirmation message is sent to %email%",
     "CANNOT SAVE PASSWORD": "Salasanaa ei voi tallentaa:",
     "PASSWORD INCORRECT": "Nykyinen salasana on väärä.",
+    "TOO MANY ATTEMPTS TEXT": "Too many attempts. Try again in a minute.",
     "WRONG PASSWORD": "Väärä salasana",
     "ACCOUNT NOT FOUND TEXT": "Account not found",
     "CANNOT SEND CONFIRMATION EMAIL": "Sähköpostiviestiä ei voi lähettää:",

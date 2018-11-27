@@ -35,7 +35,11 @@ export class NxConfigService {
             redirectAuthorised  : '/systems', // Page for redirecting all authorised users
             redirectUnauthorised: '/', // Page for redirecting all unauthorised users by default
 
-
+            links: {
+                admin: {
+                    product: '/admin/cms/product/'
+                }
+            },
             systemStatuses                : {
                 onlineStatus: 'online',
                 sortOrder   : [
@@ -210,6 +214,7 @@ export class NxConfigService {
                 ]
             },
             icons : {
+                default : '/static/icons/integration_tile_preview_plugin.svg',
                 platforms : [
                     { name: 'arm', src: '/static/icons/integration_tile_os_arm.svg' },
                     { name: 'linux', src: '/static/icons/integration_tile_os_linux.svg' },
@@ -269,6 +274,10 @@ export class NxConfigService {
                 'rpi-file'        : 'Raspberry Pi',
                 'windows-x64-file': 'Windows x64',
                 'windows-x86-file': 'Windows x86'
+            },
+            animation: {
+                carouselImageEnter: '0.25s ease-in',
+                carouselImageLeave: '0.25s ease-out'
             }
         };
     }

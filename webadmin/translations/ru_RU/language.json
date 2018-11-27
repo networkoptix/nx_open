@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "создать учётную запись",
         "errorNoHDD": "Это устройство предназначено для работы с жестким диском. <br>Пожалуйста, выключите устройство и установите жесткий диск.",
-        "errorNoNetwork": "Для работы этого устройство необходимо сетевое подключение. <br>Пожалуйста, подключите его к вашей локальной сети или сети Интернет"
+        "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to the local network or Internet"
     },
     "passwordRequirements": {
         "minLengthMessage": "Пароль должен быть длиной не меньше 8 символов",

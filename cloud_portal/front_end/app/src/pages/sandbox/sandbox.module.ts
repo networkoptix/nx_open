@@ -9,6 +9,7 @@ import { TranslateModule }      from '@ngx-translate/core';
 
 import { NxSandboxComponent } from './sandbox.component';
 import { ComponentsModule }   from '../../components/components.module';
+import { DropdownsModule }    from '../../dropdowns/dropdowns.module';
 
 const appRoutes: Routes = [
     { path: 'sandbox', component: NxSandboxComponent }
@@ -23,6 +24,7 @@ const appRoutes: Routes = [
         FormsModule,
         TranslateModule,
         ComponentsModule,
+        DropdownsModule,
 
         RouterModule.forChild(appRoutes)
     ],

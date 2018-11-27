@@ -47,6 +47,7 @@
                 // scope.activeSystem = {};
 
                 function updateActive() {
+                    scope.active.integrations = isActive('/integrations');
                     scope.active.register = isActive('/register');
                     scope.active.view = isActive('/view');
                     scope.active.settings = $route.current.params.systemId && !isActive('/view');
