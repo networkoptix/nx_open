@@ -152,7 +152,7 @@ struct SearchEdit::Private
     bool focused = false;
     bool hovered = false;
 
-    bool menuEnabled = false;
+    bool isMenuEnabled = false;
     std::optional<ResourceTreeNodeType> currentFilter;
     std::function<QMenu*()> filterMenuCreator;
     std::function<QString(ResourceTreeNodeType)> filterNameProvider;
@@ -273,7 +273,7 @@ void SearchEdit::updateFocused()
 {
     auto menuHasFocus = [this]() -> bool
         {
-            for (auto menu : findChildren<QMenu*>())
+            for (auto menu: findChildren<QMenu*>())
                 if (menu->hasFocus())
                     return true;
             return false;
@@ -294,7 +294,7 @@ void SearchEdit::setupMenuButton()
     connect(d->menuButton, &QPushButton::clicked, this,
         [this]()
         {
-            if (menuEnabled())
+            if (isMenuEnabled())
                 showFilterMenu();
             else
                 d->lineEdit->setFocus();
@@ -305,14 +305,14 @@ void SearchEdit::setupMenuButton()
 
 void SearchEdit::updateMenuButtonIcon()
 {
-    const auto kIcon = menuEnabled()
+    const auto kIcon = isMenuEnabled()
         ? qnSkin->icon("tree/search_drop.png")
         : qnSkin->icon("tree/search.png");
-    const auto kSelectedIcon = menuEnabled()
+    const auto kSelectedIcon = isMenuEnabled()
         ? qnSkin->icon("tree/search_drop_selected.png")
         : qnSkin->icon("tree/search_selected.png");
 
-    d->menuButton->setFixedSize(menuEnabled() ? QSize(40, 32) : QSize(32, 32));
+    d->menuButton->setFixedSize(isMenuEnabled() ? QSize(40, 32) : QSize(32, 32));
     d->menuButton->setIcon(d->lineEdit->text().isEmpty() ? kIcon : kSelectedIcon);
 }
 
@@ -347,7 +347,7 @@ void SearchEdit::setPlaceholderText(const QString& value)
 
 void SearchEdit::showFilterMenu()
 {
-    if (!menuEnabled() || !d->filterMenuCreator)
+    if (!isMenuEnabled() || !d->filterMenuCreator)
         return;
 
     auto menu = d->filterMenuCreator();
@@ -540,19 +540,19 @@ std::optional<ResourceTreeNodeType> SearchEdit::currentFilter() const
     return d->currentFilter;
 }
 
-bool SearchEdit::menuEnabled() const
+bool SearchEdit::isMenuEnabled() const
 {
-    return d->menuEnabled;
+    return d->isMenuEnabled;
 }
 
 void SearchEdit::setMenuEnabled(bool enabled)
 {
-    if (d->menuEnabled == enabled)
+    if (d->isMenuEnabled == enabled)
         return;
 
-    d->menuEnabled = enabled;
+    d->isMenuEnabled = enabled;
 
-    d->lineEdit->setIndentOn(!d->menuEnabled);
+    d->lineEdit->setIndentOn(!d->isMenuEnabled);
     updateMenuButtonIcon();
 }
 

@@ -734,17 +734,18 @@ QMenu* QnResourceBrowserWidget::createFilterMenu() const
 {
     QMenu* result = new QMenu();
 
-    auto escapeActionText = [](const QString& text)
-    {
-        return QString(text).replace(lit("&"), lit("&&"));
-    };
+    auto escapeActionText =
+        [](const QString& text)
+        {
+            return QString(text).replace(lit("&"), lit("&&"));
+        };
 
-    auto addMenuItem = [this, &result, &escapeActionText](ResourceTreeNodeType filterNodeType)
-    {
-        auto action = result->addAction(
-            escapeActionText(getFilterName(filterNodeType)));
-        action->setData(QVariant::fromValue(filterNodeType));
-    };
+    auto addMenuItem =
+        [this, result, escapeActionText](ResourceTreeNodeType filterNodeType)
+        {
+            auto action = result->addAction(escapeActionText(getFilterName(filterNodeType)));
+            action->setData(QVariant::fromValue(filterNodeType));
+        };
 
     addMenuItem(QnResourceSearchQuery::kAllowAllNodeTypes);
     result->addSeparator();

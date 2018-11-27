@@ -19,7 +19,6 @@ class SearchEdit: public QWidget
 
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
     Q_PROPERTY(QString placeholderText READ placeholderText WRITE setPlaceholderText)
-    Q_PROPERTY(std::optional<ResourceTreeNodeType> currentFilter READ currentFilter NOTIFY currentFilterChanged)
 
 public:
     SearchEdit(QWidget* parent = nullptr);
@@ -34,7 +33,7 @@ public:
     QString placeholderText() const;
     void setPlaceholderText(const QString& value);
 
-    bool menuEnabled() const;
+    bool isMenuEnabled() const;
     void setMenuEnabled(bool enabled);
 
     void setFilterOptionsSource(std::function<QMenu*()> filterMenuCreator,
