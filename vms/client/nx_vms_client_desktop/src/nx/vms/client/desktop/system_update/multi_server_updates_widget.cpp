@@ -1196,8 +1196,7 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
     // No servers are installing anything right now. We should check if installation is complete.
     if (m_serversActive.empty())
     {
-        bool clientInstallComplete = m_clientUpdateTool->isInstallComplete();
-        if (!completeInstall.empty() && clientInstallComplete)
+        if (!completeInstall.empty())
         {
             NX_VERBOSE(this) << "processRemoteInstalling() - installation is complete";
             setTargetState(WidgetUpdateState::complete);
@@ -1228,7 +1227,33 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
 
             auto clicked = messageBox->clickedButton();
             if (clicked == installNow)
-                completeInstallation(clientInstallComplete);
+            {
+                if (m_clientUpdateTool->hasUpdate())
+                {
+                    NX_INFO(this) << "processRemoteInstalling() installing client package";
+                    if (!m_clientUpdateTool->installUpdate())
+                    {
+                        NX_ERROR(this) << "processRemoteInstalling() failed to install client package";
+                        QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
+                        messageBox->setIcon(QnMessageBoxIcon::Critical);
+                        messageBox->setText(tr("Failed to install client package"));
+                        messageBox->addButton(tr("OK"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
+                        messageBox->exec();
+                    }
+                    else
+                    {
+                        completeInstallation(true);
+                    }
+                }
+                else
+                {
+                    NX_WARNING(this) << "processRemoteInstalling() ClientUpdateTool has no package to install";
+                }
+            }
+            else
+            {
+                NX_WARNING(this) << "processRemoteInstalling() client was not going to install its own update package";
+            }
         }
         // No servers have installed updates
         else if (completeInstall.empty() && !failed.empty())
@@ -1381,8 +1406,9 @@ void MultiServerUpdatesWidget::setTargetState(WidgetUpdateState state, QSet<QnUu
                 break;
             case WidgetUpdateState::installing:
                 m_serverUpdateTool->requestInstallAction(targets);
-                if (m_clientUpdateTool->hasUpdate())
-                    m_clientUpdateTool->installUpdate();
+                // Should not install update before mediaservers has completed its update process.
+                //if (m_clientUpdateTool->hasUpdate())
+                //    m_clientUpdateTool->installUpdate();
                 break;
             case WidgetUpdateState::complete:
                 stopProcess = true;
