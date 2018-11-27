@@ -36,9 +36,6 @@ QVariant AbstractEventListModel::data(const QModelIndex& index, int role) const
         case Qt::AccessibleDescriptionRole:
             return index.data(Qn::DescriptionTextRole);
 
-        case Qn::AnimatedRole:
-            return true;
-
         default:
             return QVariant();
     }

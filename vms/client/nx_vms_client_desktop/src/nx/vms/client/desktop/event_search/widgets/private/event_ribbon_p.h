@@ -128,13 +128,10 @@ private:
 
     struct Tile
     {
-        Tile() = default;
-        Tile(Tile&&) = default;
-        explicit Tile(int pos, Importance importance): position(pos), importance(importance) {}
-
         int height = kApproximateTileHeight;
         int position = 0;
         Importance importance = Importance();
+        bool animated = false;
         std::unique_ptr<CameraThumbnailProvider> preview;
         std::unique_ptr<EventTile> widget;
     };
@@ -176,6 +173,7 @@ private:
     bool m_footersEnabled = true;
     bool m_scrollBarRelevant = true;
     bool m_live = true;
+    bool m_updating = false;
 
     std::chrono::microseconds m_highlightedTimestamp{0};
 

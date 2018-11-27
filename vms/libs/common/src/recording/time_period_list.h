@@ -80,7 +80,7 @@ public:
             const qint64 lastEndTime = last.endTimeMs();
             if (itr->startTimeMs - lastEndTime < detailLevel)
             {
-                last.durationMs = itr->isInfinite() ? QnTimePeriod::infiniteDuration()
+                last.durationMs = itr->isInfinite() ? QnTimePeriod::kInfiniteDuration
                     : qMax(last.durationMs, itr->endTimeMs() - last.startTimeMs);
             }
             else
@@ -166,7 +166,7 @@ public:
      * \returns                         Bounding period for this period list.
      * \param truncateInfinite          Whether the infinite period should be truncated to fixed value.
      */
-    QnTimePeriod boundingPeriod(qint64 truncateInfinite = QnTimePeriod::infiniteDuration()) const;
+    QnTimePeriod boundingPeriod(qint64 truncateInfinite = QnTimePeriod::kInfiniteDuration) const;
 
 #ifdef QN_TIME_PERIODS_STD
     const QnTimePeriod &first() const { return *begin(); }

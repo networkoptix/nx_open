@@ -259,7 +259,7 @@ void MotionSearchListModel::Private::fetchLive()
         return; //< Don't fetch live if first fetch from archive is in progress.
 
     const milliseconds from = (m_data.empty() ? 0ms : m_data.front().period.startTime());
-    m_liveFetch.period = QnTimePeriod(from.count(), QnTimePeriod::infiniteDuration());
+    m_liveFetch.period = QnTimePeriod(from.count(), QnTimePeriod::kInfiniteDuration);
     m_liveFetch.direction = FetchDirection::later;
     m_liveFetch.batchSize = q->fetchBatchSize();
 

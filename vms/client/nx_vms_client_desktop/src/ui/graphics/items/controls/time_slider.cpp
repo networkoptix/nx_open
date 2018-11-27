@@ -1135,6 +1135,25 @@ void QnTimeSlider::ensureWindowContains(milliseconds position)
         shiftWindow(position - m_windowEnd);
 }
 
+void QnTimeSlider::scrollIntoWindow(milliseconds position, bool animated)
+{
+    const auto allowedOffset = milliseconds(qint64(m_msecsPerPixel * kAutoShiftAreaWidth));
+    const auto targetOffset = milliseconds(qint64(m_msecsPerPixel * kAutoShiftOffsetWidth));
+    const auto leftOffset = position - m_windowStart;
+    const auto rightOffset = m_windowEnd - position;
+
+    if (leftOffset <= allowedOffset)
+    {
+        // Shift window to the left (negative).
+        shiftWindow(leftOffset - targetOffset, animated);
+    }
+    else if (rightOffset <= allowedOffset)
+    {
+        // Shift window to the right (positive).
+        shiftWindow(targetOffset - rightOffset, animated);
+    }
+}
+
 milliseconds QnTimeSlider::sliderTimePosition() const
 {
     return milliseconds(base_type::sliderPosition());
@@ -1176,6 +1195,12 @@ void QnTimeSlider::setValue(milliseconds value, bool keepInWindow)
 
     /* Update tooltip visibility after both setValue and setWindow: */
     updateToolTipVisibilityInternal(true);
+}
+
+void QnTimeSlider::navigateTo(milliseconds value)
+{
+    setValue(value, false);
+    scrollIntoWindow(this->value(), true);
 }
 
 milliseconds QnTimeSlider::selectionStart() const
@@ -3367,25 +3392,7 @@ void QnTimeSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
     dragProcessor()->mouseReleaseEvent(this, event);
 
     if (m_dragIsClick && event->button() == Qt::LeftButton)
-    {
-        const auto pos = timeFromPosition(event->pos());
-
-        const auto allowedOffset = milliseconds(qint64(m_msecsPerPixel * kAutoShiftAreaWidth));
-        const auto targetOffset = milliseconds(qint64(m_msecsPerPixel * kAutoShiftOffsetWidth));
-        const auto leftOffset = pos - m_windowStart;
-        const auto rightOffset = m_windowEnd - pos;
-
-        if (leftOffset <= allowedOffset)
-        {
-            // Shift window to the left (negative).
-            shiftWindow(leftOffset - targetOffset, true);
-        }
-        else if (rightOffset <= allowedOffset)
-        {
-            // Shift window to the right (positive).
-            shiftWindow(targetOffset - rightOffset, true);
-        }
-    }
+        scrollIntoWindow(timeFromPosition(event->pos()), true);
 
     if (m_options.testFlag(LeftButtonSelection) && m_options.testFlag(ClearSelectionOnClick)
         && m_dragMarker == CreateSelectionMarker && !m_selectionInitiated)
@@ -3461,8 +3468,8 @@ void QnTimeSlider::startDrag(DragInfo* info)
             break;
 
         case CreateSelectionMarker:
-            setSelectionValid(true);
             setSelection(pos, pos);
+            setSelectionValid(true);
             m_dragMarker = SelectionStartMarker;
             /* FALL THROUGH */
         case SelectionStartMarker:

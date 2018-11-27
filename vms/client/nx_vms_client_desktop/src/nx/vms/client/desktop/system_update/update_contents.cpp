@@ -90,7 +90,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     {
         QString uploadDestination = QString("updates/%1/").arg(contents.info.version);
         QList<nx::update::Package> checked;
-        for(auto& pkg: contents.info.packages)
+        for (auto& pkg: contents.info.packages)
         {
             if (contents.sourceType == nx::update::UpdateSourceType::file)
             {
@@ -148,7 +148,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     // We will convert it to a list of values later.
     QSet<nx::update::Package*> manualPackages;
     // Checking if all servers have update packages.
-    for(auto record: activeServers)
+    for (auto record: activeServers)
     {
         auto server = record.second;
         bool isOurServer = !server->hasFlags(Qn::fake_server)
@@ -196,7 +196,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
         allServers << record.first;
     }
 
-    for(auto package: manualPackages)
+    for (auto package: manualPackages)
         contents.manualPackages.push_back(*package);
 
     contents.alreadyInstalled = alreadyInstalled;
