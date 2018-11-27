@@ -190,7 +190,7 @@ def generate_languages_json(customization, preview):
     save_content(target_file_name, json.dumps(languages_json, ensure_ascii=False))
 
 
-def init_skin(customization_name, product='cloud_portal'):
+def init_skin(customization_name, product='cloud_portal', preview=False):
     # 1. read skin for this customization
     customization = Customization.objects.get(name=customization_name)
     skin = customization.read_global_value('%SKIN%')
@@ -199,15 +199,16 @@ def init_skin(customization_name, product='cloud_portal'):
     # 2. copy directory
     from_dir = SOURCE_DIR.replace("{{skin}}", skin)
     target_dir = TARGET_DIR.replace("{{customization}}", customization_name)
-    distutils.dir_util.copy_tree(from_dir, target_dir)
-    distutils.dir_util.copy_tree(from_dir, os.path.join(target_dir, 'preview'))
 
-    logger.info("Fill content for " + customization_name)
     # 3. run fill_content
-    fill_content(customization_name, product, preview=False, incremental=False)
-
-    logger.info("Fill preview for " + customization_name)
-    fill_content(customization_name, product, preview=True, incremental=False)
+    if preview:
+        distutils.dir_util.copy_tree(from_dir, target_dir)
+        logger.info("Fill content for " + customization_name)
+        fill_content(customization_name, product, preview=False, incremental=False)
+    else:
+        distutils.dir_util.copy_tree(from_dir, os.path.join(target_dir, 'preview'))
+        logger.info("Fill preview for " + customization_name)
+        fill_content(customization_name, product, preview=True, incremental=False)
 
 
 def fill_content(customization_name='default', product_name='cloud_portal',

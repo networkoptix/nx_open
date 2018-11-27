@@ -202,7 +202,8 @@ def version_action(request, version_id=None):
     elif "Force Update" in request.POST:
         if not request.user.has_perm('cms.force_update'):
             raise PermissionDenied
-        filldata.init_skin(settings.CUSTOMIZATION)
+        filldata.init_skin(settings.CUSTOMIZATION, preview=False)
+        filldata.init_skin(settings.CUSTOMIZATION, preview=True)
         messages.success(request, "Version {} was force updated ".format(version_id))
 
     else:
