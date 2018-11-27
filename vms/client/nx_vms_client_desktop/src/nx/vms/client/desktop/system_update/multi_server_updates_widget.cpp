@@ -425,6 +425,90 @@ void MultiServerUpdatesWidget::initDownloadActions()
         });
 }
 
+MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdateVersionReport(
+    const nx::update::UpdateContents& contents)
+{
+    VersionReport report;
+
+    using Error = nx::update::InformationError;
+    using SourceType = nx::update::UpdateSourceType;
+    if (contents.error == Error::noError)
+        return report;
+
+    bool validUpdate = contents.isValid();
+    auto source = contents.sourceType;
+    QString internalError = nx::update::toString(contents.error);
+    // We have different error messages for each update source. So we should check
+    // every combination of update source and nx::update::InformationError values.
+    if (contents.alreadyInstalled && source != SourceType::internet)
+    {
+        report.status = tr("You already have this version installed");
+    }
+    else if (!validUpdate)
+    {
+        report.versionError = true;
+        report.statusError = true;
+        switch(contents.error)
+        {
+            case Error::noError:
+                // We should not be here.
+                break;
+            case Error::networkError:
+                // Unable to check update from the internet.
+                report.status = tr("Unable to check updates on the internet");
+                report.versionError = false;
+                break;
+            case Error::httpError:
+                NX_ASSERT(source == SourceType::internet || source == SourceType::internetSpecific);
+                if (source == SourceType::internetSpecific)
+                    report.status = tr("Build not found");
+                else
+                    report.status = tr("Unable to check updates on the internet");
+                break;
+            case Error::jsonError:
+                if (source == SourceType::file)
+                    report.status = tr("Cannot update from the selected file");
+                else
+                    report.status = tr("Invalid update information");
+                break;
+            case Error::incompatibleVersion:
+                report.status = tr("Downgrade to earlier versions is not possible");
+                break;
+            case Error::incompatibleCloudHostError:
+                report.status = tr("Incompatible %1 instance. To update disconnect System from %1 first.",
+                    "%1 here will be substituted with cloud name e.g. 'Nx Cloud'.")
+                    .arg(nx::network::AppInfo::cloudName());
+                break;
+            case Error::notFoundError:
+                // No update
+                report.status = tr("Update file is not found");
+                break;
+            case Error::noNewVersion:
+                // We have most recent version for this build.
+                report.hasLatestVersion = true;
+                break;
+            case Error::brokenPackageError:
+                break;
+            case Error::missingPackageError:
+                break;
+        }
+    }
+
+    auto info = QnAppInfo::currentSystemInformation();
+    auto currentVersion = nx::utils::SoftwareVersion(info.version);
+
+    if (validUpdate && contents.getVersion() < currentVersion)
+    {
+        report.status = tr("Downgrade to earlier versions is not possible");
+    }
+    else if (!contents.missingUpdate.empty())
+    {
+        report.status = tr("This version does not include some necessary Server package");
+    }
+
+    return report;
+}
+
 void MultiServerUpdatesWidget::atUpdateCurrentState()
 {
     NX_ASSERT(m_serverUpdateTool);
@@ -448,62 +532,12 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
         m_targetVersion = nx::utils::SoftwareVersion(checkResponse.info.version);
         m_targetChangeset = m_targetVersion.build();
 
-        using Error = nx::update::InformationError;
         if (checkResponse.isValid())
-        {
             m_haveValidUpdate = true;
-        }
-        else
-        {
-            QString internalError = nx::update::toString(checkResponse.error);
-            NX_WARNING(this) << "atUpdateCurrentState(" << m_updateInfo.info.version << ") detected a problem" << internalError;
-            switch(checkResponse.error)
-            {
-                case Error::noError:
-                    // Everything is good. Not should be here.
-                    NX_ASSERT(false);
-                    break;
-                case Error::networkError:
-                    // Unable to check update from the internet.
-                    m_updateCheckError = tr("Unable to check updates on the internet");
-                    break;
-                case Error::httpError:
-                    m_updateCheckError = tr("Unable to check updates on the internet");
-                    break;
-                case Error::jsonError:
-                    m_updateCheckError = tr("Invalid update information");
-                    break;
-                case Error::incompatibleVersion:
-                    m_updateCheckError = tr("Incompatible update version");
-                    break;
-                case Error::incompatibleCloudHostError:
-                    m_updateCheckError = tr("Incompatible %1 instance. To update disconnect System from %1 first.",
-                        "%1 here will be substituted with cloud name e.g. 'Nx Cloud'.")
-                        .arg(nx::network::AppInfo::cloudName());
-                    break;
-                case Error::notFoundError:
-                    // No update
-                    break;
-                case Error::noNewVersion:
-                    // We have most recent version for this build.
-                    break;
-                default:
-                    m_updateCheckError = nx::update::toString(checkResponse.error);
-                    break;
-            }
 
-            auto info = QnAppInfo::currentSystemInformation();
-            auto currentVersion = nx::utils::SoftwareVersion(info.version);
-
-            if (m_haveValidUpdate && m_updateInfo.getVersion() < currentVersion)
-            {
-                m_updateCheckError = tr("Downgrade to earlier versions is not possible");
-            }
-            else if (!m_updateInfo.invalidVersion.empty())
-            {
-                m_updateCheckError = tr("This version does not include some necessary Server package");
-            }
-        }
+        auto report = calculateUpdateVersionReport(m_updateInfo);
+        if (!report.status.isEmpty())
+            m_updateCheckError = report.status;
 
         m_updateLocalStateChanged = true;
     }
@@ -822,12 +856,12 @@ ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress
             if (item->state == nx::update::Status::Code::downloading)
             {
                 result.current += item->progress;
-                result.active++;
+                ++result.active;
             }
             else
             {
                 result.current += 100;
-                result.done++;
+                ++result.done;
             }
         }
 
@@ -843,12 +877,12 @@ ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress
             result.max += 100;
             if (m_clientUpdateTool->isDownloadComplete())
             {
-                result.done++;
+                ++result.done;
                 result.downloadingClient = false;
             }
             else
             {
-                result.active++;
+                ++result.active;
                 result.downloadingClient = true;
             }
         }
@@ -1795,7 +1829,7 @@ void MultiServerUpdatesWidget::checkForInternetUpdates()
 void MultiServerUpdatesWidget::atModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& /*unused*/)
 {
     // This forces custom editor to appear for every item in the table.
-    for (int row = topLeft.row(); row <= bottomRight.row(); row++)
+    for (int row = topLeft.row(); row <= bottomRight.row(); ++row)
     {
         QModelIndex index = m_sortedModel->index(row, ServerUpdatesModel::ProgressColumn);
         ui->tableView->openPersistentEditor(index);
