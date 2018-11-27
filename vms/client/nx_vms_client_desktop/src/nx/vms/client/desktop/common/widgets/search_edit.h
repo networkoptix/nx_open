@@ -36,7 +36,7 @@ public:
 
     bool menuEnabled() const;
     void setMenuEnabled(bool enabled);
- 
+
     void setFilterOptionsSource(std::function<QMenu*()> filterMenuCreator,
         std::function<QString(ResourceTreeNodeType)> filterNameProvider);
     std::optional<ResourceTreeNodeType> currentFilter() const;

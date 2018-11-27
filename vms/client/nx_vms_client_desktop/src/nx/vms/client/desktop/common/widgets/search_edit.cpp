@@ -345,7 +345,7 @@ void SearchEdit::setPlaceholderText(const QString& value)
     d->lineEdit->setPlaceholderText(value);
 }
 
-void SearchEdit::showFilterMenu() 
+void SearchEdit::showFilterMenu()
 {
     if (!menuEnabled() || !d->filterMenuCreator)
         return;
@@ -416,7 +416,7 @@ void SearchEdit::updateTagButton()
     if (d->currentFilter)
     {
         if (d->filterNameProvider)
-            d->tagButton->setText(d->filterNameProvider(d->currentFilter.value()));
+            d->tagButton->setText(d->filterNameProvider(*d->currentFilter));
         d->tagButton->setState(SelectableTextButton::State::unselected);
     }
 
@@ -540,12 +540,12 @@ std::optional<ResourceTreeNodeType> SearchEdit::currentFilter() const
     return d->currentFilter;
 }
 
-bool SearchEdit::menuEnabled() const 
+bool SearchEdit::menuEnabled() const
 {
     return d->menuEnabled;
 }
 
-void SearchEdit::setMenuEnabled(bool enabled) 
+void SearchEdit::setMenuEnabled(bool enabled)
 {
     if (d->menuEnabled == enabled)
         return;

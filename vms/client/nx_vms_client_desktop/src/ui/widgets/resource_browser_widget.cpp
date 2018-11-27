@@ -536,7 +536,7 @@ void QnResourceBrowserWidget::updateInstantFilter()
         [this, localResourcesMode, filterEdit]()
         {
             if (filterEdit->currentFilter())
-                return filterEdit->currentFilter().value();
+                return *filterEdit->currentFilter();
 
             return localResourcesMode
                 ? QnResourceSearchQuery::NodeType::localResources
