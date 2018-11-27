@@ -155,13 +155,10 @@ boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
     nx::utils::Url url(deviceInfo.url);
     url.setPath("/ISAPI/Event/triggersCap");
 
-    nx_http::HttpClient httpClient;
-    httpClient.setResponseReadTimeoutMs(
-        (unsigned int) duration_cast<milliseconds>(kRequestTimeout).count());
-    httpClient.setSendTimeoutMs(
-        (unsigned int) duration_cast<milliseconds>(kRequestTimeout).count());
-    httpClient.setMessageBodyReadTimeoutMs(
-        (unsigned int) duration_cast<milliseconds>(kRequestTimeout).count());
+    nx::network::http::HttpClient httpClient;
+    httpClient.setResponseReadTimeout(kRequestTimeout);
+    httpClient.setSendTimeout(kRequestTimeout);
+    httpClient.setMessageBodyReadTimeout(kRequestTimeout);
     httpClient.setUserName(deviceInfo.login);
     httpClient.setUserPassword(deviceInfo.password);
 
@@ -172,9 +169,9 @@ boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
     {
         NX_WARNING(
             this,
-            lm("No response for supported events request %1.").args(cameraInfo.url));
+            lm("No response for supported events request %1.").args(deviceInfo.url));
         data.timeout.invalidate();
-        return boost::optional<QList<QnUuid>>();
+        return boost::optional<QList<QString>>();
     }
 
     const auto statusCode = response->statusLine.statusCode;
@@ -186,7 +183,7 @@ boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
             lm("Unable to fetch supported events for device %1. HTTP status code: %2")
                 .args(deviceInfo.url, statusCode));
         data.timeout.invalidate();
-        return boost::optional<QList<QnUuid>>();
+        return boost::optional<QList<QString>>();
     }
 
     NX_DEBUG(this, lm("Device url %1. RAW list of supported analytics events: %2").
