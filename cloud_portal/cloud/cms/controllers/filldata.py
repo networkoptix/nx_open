@@ -201,7 +201,7 @@ def init_skin(customization_name, product='cloud_portal', preview=False):
     target_dir = TARGET_DIR.replace("{{customization}}", customization_name)
 
     # 3. run fill_content
-    if preview:
+    if not preview:
         distutils.dir_util.copy_tree(from_dir, target_dir)
         logger.info("Fill content for " + customization_name)
         fill_content(customization_name, product, preview=False, incremental=False)
