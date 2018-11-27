@@ -12,6 +12,8 @@ ${password}     ${BASE PASSWORD}
 ${email}    ${EMAIL OWNER}
 
 *** Test Cases ***      EMAIL
+Empty Email                               ${EMPTY}
+    [tags]    C41888
 Invalid Email 1 noptixqagmail.com         noptixqagmail.com
     [tags]    C41902
 Invalid Email 2 @gmail.com                @gmail.com
@@ -41,8 +43,12 @@ Invalid Email 13 myemail@ gmail.com       myemail@ gmail.com
 Invalid Email 14 myemail@gmail.com;       myemail@gmail.com;
     [tags]    C41902
 Space Email                               ${SPACE}
-Empty Email                               ${EMPTY}
-    [tags]    C41888
+Leading Space Email                       ${SPACE}myemail@gmail.com
+    [tags]    C47296
+Trailing Space Email                      myemail@gmail.com${SPACE}
+    [tags]    C47296
+Valid Email                               myemail@gmail.com
+    [tags]    C47296
 
 *** Keywords ***
 Restart
@@ -60,14 +66,11 @@ Open Share Dialog
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Element Is Visible    ${SHARE BUTTON MODAL}
 
-
 Test Email Invalid
     [Arguments]   ${email}
     Wait Until Element Is Visible    ${SHARE EMAIL}
     Input Text    ${SHARE EMAIL}    ${email}
-    Click Button    ${SHARE BUTTON MODAL}
-    Check Email Outline    ${email}
-
-Check Email Outline
-    [Arguments]    ${email}
-    Wait Until Element Is Visible    //form[@name='shareForm']//input[@id='email' and contains(@class,"ng-invalid")]
+    Click Element    ${SHARE MODAL}
+    Run Keyword If    '${email}' == '${EMPTY}'    Click Button    ${SHARE BUTTON MODAL}
+    Run Keyword Unless    '${email}' == '${SPACE}myemail@gmail.com' or '${email}' == 'myemail@gmail.com${SPACE}' or '${email}' == 'myemail@gmail.com'     Wait Until Element Is Visible    //form[@name='shareForm']//input[@id='email' and contains(@class,"ng-invalid")]
+    Run Keyword If    '${email}' == '${SPACE}myemail@gmail.com' or '${email}' == 'myemail@gmail.com${SPACE}' or '${email}' == 'myemail@gmail.com'     Wait Until Element Is Visible    //form[@name='shareForm']//input[@id='email' and contains(@class,"ng-valid")]
