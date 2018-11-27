@@ -70,6 +70,7 @@ Reset DB and Open New Browser On Failure
 
 *** Test Cases ***
 Share button - opens dialog
+    [tags]    C41888
     Log in to Auto Tests System    ${email}
     Wait Until Elements Are Visible    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}
     Click Button    ${SHARE BUTTON SYSTEMS}
@@ -242,7 +243,7 @@ Delete user works
     Wait Until Element Is Visible    ${YOU HAVE NO SYSTEMS}
 
 Share with registered user - sends him notification
-    [tags]    email
+    [tags]    email    C41888
     #log in as noperm to check language and change its language to the current testing language
     #otherwise it may receive the notification in another language and fail the email subject comparison
     Log In    ${EMAIL NOPERM}    ${password}
