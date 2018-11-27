@@ -61,7 +61,7 @@ private:
 
     bool waitForTimeSpan(
     const std::chrono::milliseconds& timeSpan,
-    const std::chrono::milliseconds& timeOut);
+    const std::chrono::milliseconds& timeout);
     std::shared_ptr<ffmpeg::Packet> nextPacket(int * outNxError);
 
     bool ensureInitialized();

@@ -20,7 +20,7 @@ namespace usb_cam {
 
 namespace {
 
-static constexpr const char * const kPluginName = "usb_cam";
+static constexpr const char kPluginName[] = "usb_cam";
 
 }
 

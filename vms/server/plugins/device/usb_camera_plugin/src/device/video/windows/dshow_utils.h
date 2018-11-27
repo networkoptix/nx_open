@@ -3,6 +3,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 #include <dshow.h>
 #include <windows.h>
@@ -52,22 +53,22 @@ struct DShowInitializer
 //-------------------------------------------------------------------------------------------------
 // public api
 
-std::string getDeviceName(const char * devicePath);
+std::string getDeviceName(const std::string& devicePath);
 
-std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const char * devicePath);
+std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const std::string& devicePath);
 
 std::vector<DeviceData> getDeviceList();
 
 std::vector<ResolutionData> getResolutionList(
-    const char * devicePath,
+    const std::string& devicePath,
     const device::CompressionTypeDescriptorPtr& targetCodecID);
 
 void setBitrate(
-    const char * devicePath,
+    const std::string& devicePath,
     int bitrate,
     const CompressionTypeDescriptorPtr& targetCodecID);
 
-int getMaxBitrate(const char * devicePath, const CompressionTypeDescriptorPtr& targetCodecID);
+int getMaxBitrate(const std::string& devicePath, const CompressionTypeDescriptorPtr& targetCodecID);
 
 //-------------------------------------------------------------------------------------------------
 // api helper functions
@@ -85,7 +86,7 @@ HRESULT enumerateMediaTypes(
     IEnumMediaTypes ** outEnumMediaTypes,
     IPin** outPin = NULL);
 
-HRESULT findDevice(REFGUID category, const char * devicePath, IMoniker ** outMoniker);
+HRESULT findDevice(REFGUID category, const std::string& devicePath, IMoniker ** outMoniker);
 
 HRESULT getSupportedCodecs(
     IMoniker *pMoniker,

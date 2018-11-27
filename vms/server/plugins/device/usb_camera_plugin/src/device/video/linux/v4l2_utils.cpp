@@ -19,7 +19,7 @@
 #include "udev_utils.h"
 
 #define NX_V4L2_LOG(...) \
-NX_DEBUG(nx::utils::log::Tag(std::string("v4l2_utils::")+__FUNCTION__), __VA_ARGS__)
+NX_DEBUG(nx::utils::log::Tag(std::string("nx::usb_cam::v4l2_utils::")+__FUNCTION__), __VA_ARGS__)
 
 namespace nx {
 namespace usb_cam {
@@ -34,8 +34,8 @@ static const std::string kV4l2DevicePath = "/dev";
 // Convenience class for opening and closing devices represented by devicePath
 struct DeviceInitializer
 {
-    DeviceInitializer(const char * devicePath, int oFlag = O_RDWR):
-        fileDescriptor(open(devicePath, oFlag))
+    DeviceInitializer(const std::string& devicePath, int oFlag = O_RDWR):
+        fileDescriptor(open(devicePath.c_str(), oFlag))
     {
     }
 
@@ -66,18 +66,20 @@ std::string getDeviceName(int fileDescriptor)
     struct v4l2_capability deviceCapability;
     if (ioctl(fileDescriptor, VIDIOC_QUERYCAP, &deviceCapability) == -1)
         return std::string();
+    
+    //force a null terminator on the end of the string with c_str()
     return std::string(
         deviceCapability.card,
-        deviceCapability.card + sizeof(deviceCapability.card));
+        deviceCapability.card + sizeof(deviceCapability.card)).c_str();
 };
 
 std::vector<std::string> getDevicePaths()
 {
     const auto isDeviceFile =
-        [](const char *path)
+        [](const std::string& devicePath)
         {
             struct stat buffer;
-            stat(path, &buffer);
+            stat(devicePath.c_str(), &buffer);
             return S_ISCHR(buffer.st_mode);
         };
 
@@ -97,7 +99,7 @@ std::vector<std::string> getDevicePaths()
             continue;
 
         std::string devVideo = kV4l2DevicePath + "/" + directoryEntry->d_name;
-        if (isDeviceFile(devVideo.c_str()))
+        if (isDeviceFile(devVideo))
             devicePaths.push_back(devVideo);
     }
 
@@ -159,7 +161,7 @@ nxcip::CompressionType V4L2CompressionTypeDescriptor::toNxCompressionType() cons
 //--------------------------------------------------------------------------------------------------
 // public api
 
-std::string getDeviceName(const char * devicePath)
+std::string getDeviceName(const std::string& devicePath)
 {
     DeviceInitializer initializer(devicePath);
     if (initializer.fileDescriptor == -1)
@@ -183,7 +185,7 @@ std::vector<DeviceData> getDeviceList()
 
     for (const auto& devicePath : devicePaths)
     {
-        DeviceInitializer initializer(devicePath.c_str());
+        DeviceInitializer initializer(devicePath);
         int fileDescriptor = initializer.fileDescriptor;
         if (fileDescriptor == -1)
         {
@@ -195,13 +197,14 @@ std::vector<DeviceData> getDeviceList()
         deviceList.push_back(device::DeviceData(
             getDeviceName(fileDescriptor),
             devicePath,
-            getDeviceUniqueId(devicePath.c_str())));
+            getDeviceUniqueId(devicePath)));
     }
+
     return deviceList;
 }
 
 std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> getSupportedCodecs(
-    const char * devicePath)
+    const std::string& devicePath)
 {
     DeviceInitializer initializer(devicePath);
 
@@ -220,7 +223,7 @@ std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> getSupportedCode
 }
 
 std::vector<ResolutionData> getResolutionList(
-    const char * devicePath,
+    const std::string& devicePath,
     const device::CompressionTypeDescriptorPtr& targetCodecID)
 {
     if (rpi::isMmalCamera(getDeviceName(devicePath)))
@@ -296,7 +299,7 @@ std::vector<ResolutionData> getResolutionList(
 }
 
 void setBitrate(
-    const char * devicePath,
+    const std::string& devicePath,
     int bitrate,
     const device::CompressionTypeDescriptorPtr& /*targetCodecID*/)
 {
@@ -327,7 +330,7 @@ void setBitrate(
     }
 }
 
-int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescriptorPtr& /*tagetCodecID*/)
+int getMaxBitrate(const std::string& devicePath, const device::CompressionTypeDescriptorPtr& /*tagetCodecID*/)
 {
     if (rpi::isMmalCamera(getDeviceName(devicePath)))
         return rpi::getMmalMaxBitrate();

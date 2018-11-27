@@ -180,7 +180,7 @@ int TranscodeStreamReader::encode(const ffmpeg::Frame* frame, ffmpeg::Packet * o
 
 bool TranscodeStreamReader::waitForTimeSpan(
     const std::chrono::milliseconds& timeSpan,
-    const std::chrono::milliseconds& timeOut)
+    const std::chrono::milliseconds& timeout)
 {
     uint64_t waitStart = m_camera->millisSinceEpoch();
     for (;;)
@@ -201,8 +201,9 @@ bool TranscodeStreamReader::waitForTimeSpan(
         if (allTimestamps.empty() 
             || *allTimestamps.rbegin() - *allTimestamps.begin() < timeSpan.count())
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            if (m_camera->millisSinceEpoch() - waitStart >= timeOut.count())
+            static constexpr std::chrono::milliseconds kSleep(1);
+            std::this_thread::sleep_for(kSleep);
+            if (m_camera->millisSinceEpoch() - waitStart >= timeout.count())
                 return false;
         }
         else
@@ -244,7 +245,7 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxErr
     {
         for (;;)
         {
-            auto videoFrame = m_videoFrameConsumer->popOldest(kWaitTimeOut);
+            auto videoFrame = m_videoFrameConsumer->popOldest(kWaitTimeout);
             if (interrupted() || ioError())
                 return nullptr;
             if (!shouldDrop(videoFrame.get()))
@@ -255,29 +256,29 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxErr
     // Audio enabled
     for(;;)
     {
-        if (waitForTimeSpan(m_camera->videoStream()->actualTimePerFrame(), kWaitTimeOut))
+        if (waitForTimeSpan(m_camera->videoStream()->actualTimePerFrame(), kWaitTimeout))
             break;
         else if (interrupted() || ioError())
             return nullptr;
     }
 
-    static const std::chrono::milliseconds timeOut = std::chrono::milliseconds(1);
+    static constexpr std::chrono::milliseconds kTimeout(1);
 
     for (;;)
     {
-        auto videoFrame = m_videoFrameConsumer->popOldest(timeOut);
-        if (interrupted() || ioError())
-            return nullptr;
-        if (!shouldDrop(videoFrame.get()))
         {
-            if (auto videoPacket = transcodeVideo(videoFrame.get(), outNxError))
-                m_avConsumer->givePacket(videoPacket);
+            // videoFrame needs to be released after this scope to prevent deadlock
+            auto videoFrame = m_videoFrameConsumer->popOldest(kTimeout);
+            if (interrupted() || ioError())
+                return nullptr;
+            if (!shouldDrop(videoFrame.get()))
+            {
+                if (auto videoPacket = transcodeVideo(videoFrame.get(), outNxError))
+                    m_avConsumer->givePacket(videoPacket);
+            }
         }
 
-        // Release the reference so that internally VideoStream::m_frameCount will be decremented.
-        videoFrame = nullptr;
-
-        auto peeked = m_avConsumer->peekOldest(timeOut);
+        auto peeked = m_avConsumer->peekOldest(kTimeout);
         if (!peeked)
         {
             if (interrupted() || ioError())
@@ -285,7 +286,7 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxErr
             continue;
         }
 
-        auto popped =  m_avConsumer->popOldest(kWaitTimeOut);
+        auto popped =  m_avConsumer->popOldest(kTimeout);
         if(!popped)
         {
             if (interrupted() || ioError())

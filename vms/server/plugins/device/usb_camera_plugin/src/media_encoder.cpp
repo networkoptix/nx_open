@@ -78,7 +78,7 @@ int MediaEncoder::getMaxBitrate(int* maxBitrate) const
         return nxcip::NX_IO_ERROR;
 
     *maxBitrate = device::video::getMaxBitrate(
-        m_camera->url().c_str(), 
+        m_camera->url(), 
         m_camera->compressionTypeDescriptor()) / kBytesInOneKilobyte;
     return nxcip::NX_NO_ERROR;
 }
