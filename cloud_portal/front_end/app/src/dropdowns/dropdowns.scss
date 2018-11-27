@@ -143,8 +143,9 @@ header {
             list-style-type : none;
         }
         
-        &--footer {
+        &--footer, &--header {
             padding         : 0;
+            margin          : 0;
             list-style-type : none;
         }
         
@@ -154,41 +155,56 @@ header {
             padding    : 0;
         }
         
-        .dropdown-item {
-            display     : flex;
-            align-items : center;
-            padding     : 0.25rem rem(12px) 0.25rem;
-            height      : 26px;
-            line-height : 26px;
-            font-family : $font-family-medium;
+        .dropdown-item-container {
+            position : relative;
             
-            @media (max-width : $collapse-second-width) {
-                height : 32px;
-            }
-            
-            &:hover {
-                background-color : $light5;
-                color            : $dark9 !important;
-            }
-            
-            &:active {
-                background-color : $light6 !important;
-                //color            : $light1 !important;
-            }
-            
-            &.selected {
-                background-color : $light16 !important;
-                color            : $light1 !important;
+            .dropdown-item {
+                display     : flex;
+                align-items : center;
+                padding     : 0.25rem rem(12px) 0.25rem;
+                height      : 26px;
+                line-height : 26px;
+                font-family : $font-family-medium;
+                
+                @media (max-width : $collapse-second-width) {
+                    height : 32px;
+                }
                 
                 &:hover {
-                    color : $light1 !important;
+                    background-color : $light5;
+                    color            : $dark9 !important;
+                }
+                
+                &:active {
+                    background-color : $light6 !important;
+                    //color            : $light1 !important;
+                }
+                
+                &.selected {
+                    background-color : $light16 !important;
+                    color            : $light1 !important;
+                    
+                    &:hover {
+                        color : $light1 !important;
+                    }
+                }
+                
+                &:focus {
+                    background-color : $light4;
+                }
+                
+            }
+            
+            nx-checkbox {
+                position : absolute;
+                left     : 10px;
+                top      : 4px;
+                
+                & + label {
+                    padding-left : 34px !important;
+                    margin       : 0;
                 }
             }
-            
-            &:focus {
-                background-color : $light4;
-            }
-            
         }
     }
     
