@@ -125,6 +125,20 @@ protected:
         addRelayInstance();
     }
 
+    virtual nx::utils::Url proxyUrlForHost(
+        const Relay& relayInstance,
+        const std::string& hostName)
+    {
+        auto url = relayInstance.basicUrl();
+
+        auto host = lm("%1.%2").args(hostName, url.host()).toStdString();
+        addLocalHostAlias(host);
+        url.setHost(host.c_str());
+        url.setPath(kTestPath);
+
+        return url;
+    }
+
     void givenListeningPeer(
         network::ssl::EncryptionUse encryptionUse = network::ssl::EncryptionUse::never)
     {
@@ -197,6 +211,7 @@ protected:
 
         m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
         m_httpClient->setAdditionalHeaders(std::move(headers));
+        m_httpClient->setSendTimeout(network::kNoTimeout);
         m_httpClient->setResponseReadTimeout(network::kNoTimeout);
         m_httpClient->setMessageBodyReadTimeout(network::kNoTimeout);
         m_httpClient->doRequest(
@@ -305,20 +320,6 @@ protected:
     nx::network::http::Response& lastResponse()
     {
         return *m_lastResponse;
-    }
-
-    nx::utils::Url proxyUrlForHost(
-        const Relay& relayInstance,
-        const std::string& hostName)
-    {
-        auto url = relayInstance.basicUrl();
-
-        auto host = lm("%1.%2").args(hostName, url.host()).toStdString();
-        addLocalHostAlias(host);
-        url.setHost(host.c_str());
-        url.setPath(kTestPath);
-
-        return url;
     }
 
     void addLocalHostAlias(const std::string& alias)
@@ -670,9 +671,22 @@ TEST_F(HttpProxyNonClusterMode, no_cluster_proxy_to_unknown_host_produces_bad_ga
 class HttpProxyWithSsl:
     public HttpProxy
 {
+    using base_type = HttpProxy;
+
 protected:
     virtual void SetUp() override
     {
+        // Intentionally doing nothing.
+    }
+
+    virtual nx::utils::Url proxyUrlForHost(
+        const Relay& relayInstance,
+        const std::string& hostName) override
+    {
+        auto url = base_type::proxyUrlForHost(relayInstance, hostName);
+        url.setScheme(network::http::kSecureUrlSchemeName);
+        url.setPort(relay().moduleInstance()->httpsEndpoints().front().port);
+        return url;
     }
 
     void givenListeningPeerWithSsl()
@@ -736,6 +750,16 @@ TEST_F(HttpProxyWithSsl, proxying_over_ssl_to_server_without_ssl_support_produce
     givenListeningPeer();
 
     whenSendHttpsRequestToPeer();
+
+    thenResponseIsReceived();
+    andResponseStatusCodeIs(nx::network::http::StatusCode::badGateway);
+}
+
+TEST_F(HttpProxyWithSsl, proxy_to_unknown_host_produces_bad_gateway_error)
+{
+    givenRegularRelay();
+
+    whenSendHttpRequestToUnknownPeer();
 
     thenResponseIsReceived();
     andResponseStatusCodeIs(nx::network::http::StatusCode::badGateway);
