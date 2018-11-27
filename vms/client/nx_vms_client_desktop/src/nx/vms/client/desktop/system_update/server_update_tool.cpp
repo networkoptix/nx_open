@@ -341,7 +341,7 @@ void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
     // TODO: Stop previous manual downloads
     m_manualPackages = contents.manualPackages;
 
-    for (auto package: contents.manualPackages)
+    for (const auto& package: contents.manualPackages)
     {
         FileInformation info;
         info.md5 = QByteArray::fromHex(package.md5.toLatin1());
@@ -407,7 +407,7 @@ void ServerUpdateTool::uploadPackage(const nx::update::Package& package, QDir st
     // Updates should land to updates/publication_key/file_name.
     config.ttl = -1; //< This should mean 'infinite time'
 
-    for (auto serverId: package.targets)
+    for (const auto& serverId: package.targets)
     {
         auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
         if (!server)
@@ -491,7 +491,7 @@ void ServerUpdateTool::startUpload(const QnMediaServerResourcePtr& server, const
 {
     NX_ASSERT(server);
     auto serverId = server->getId();
-    for (auto path: filesToUpload)
+    for (const auto& path: filesToUpload)
     {
         auto callback = [tool=QPointer<ServerUpdateTool>(this), serverId](const UploadState& state)
         {
@@ -533,7 +533,7 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents)
         return false;
     }
 
-    for (auto id: m_activeUploads)
+    for (const auto& id: m_activeUploads)
         m_uploadManager->cancelUpload(id);
 
     m_activeUploads.clear();
@@ -553,7 +553,7 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents)
 void ServerUpdateTool::stopUpload()
 {
     NX_ASSERT(m_offlineUpdaterState == OfflineUpdateState::push);
-    for (auto record: m_uploadStateById)
+    for (const auto& record: m_uploadStateById)
     {
         m_uploadManager->cancelUpload(record.first);
     }
@@ -579,20 +579,20 @@ bool ServerUpdateTool::verifyUpdateManifest(UpdateContents& contents) const
 void ServerUpdateTool::calculateUploadProgress(ProgressInfo& result)
 {
     int uploading = 0;
-    for(const auto record: m_uploadStateById)
+    for(const auto& record: m_uploadStateById)
     {
         result.max += 100;
         qint64 progress = 0;
         switch (record.second.status)
         {
             case UploadState::Uploading:
-                progress = 100*record.second.uploaded / record.second.size;
-                uploading++;
-                result.active++;
+                progress = 100 * record.second.uploaded / record.second.size;
+                ++uploading;
+                ++result.active;
                 break;
             case UploadState::Done:
                 progress = 100;
-                result.done++;
+                ++result.done;
                 break;
             default:
                 progress = 0;
@@ -611,15 +611,15 @@ void ServerUpdateTool::calculateManualDownloadProgress(ProgressInfo& progress)
 
     progress.downloadingForServers = !m_activeDownloads.empty();
 
-    for (const auto record: m_activeDownloads)
+    for (const auto& record: m_activeDownloads)
     {
         progress.current += record.second;
-        progress.active++;
+        ++progress.active;
     }
 
-    progress.current += 100*m_completeDownloads.size();
+    progress.current += 100 * m_completeDownloads.size();
     progress.done += m_completeDownloads.size();
-    progress.max += 100*m_issuedDownloads.size();
+    progress.max += 100 * m_issuedDownloads.size();
 }
 
 void ServerUpdateTool::atResourceAdded(const QnResourcePtr& resource)
@@ -695,12 +695,11 @@ nx::update::UpdateContents ServerUpdateTool::getRemoteUpdateContents() const
     return contents;
 }
 
-void ServerUpdateTool::setServerUrl(nx::utils::Url serverUrl, QnUuid serverId)
+void ServerUpdateTool::setServerUrl(const nx::utils::Url& serverUrl, const QnUuid& serverId)
 {
     m_serverConnection.reset(new rest::ServerConnection(commonModule(), serverId, serverUrl));
     m_peerManager->setServerUrl(serverUrl, serverId);
 }
-
 
 void ServerUpdateTool::requestStopAction()
 {
@@ -714,7 +713,7 @@ void ServerUpdateTool::requestStopAction()
         NX_VERBOSE(this) << "requestStopAction() will skip requests" << m_skippedRequests;
     }
 
-    for (auto file: m_activeDownloads)
+    for (const auto& file: m_activeDownloads)
         m_downloader->deleteFile(file.first);
     m_activeDownloads.clear();
 
