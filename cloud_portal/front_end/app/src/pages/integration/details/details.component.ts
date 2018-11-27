@@ -46,7 +46,7 @@ export class NxIntegrationDetailsComponent implements OnInit, OnDestroy {
                                             'This page is a preview of the latest changes, and it doesn\'t match publicly available version.',
                                             'Back to the editing interfaces'
                                         ])
-                                        .subscribe((res: string) => {
+                                        .subscribe(res => {
                                             this.ribbonService.show(
                                                     res['This page is a preview of the latest changes, and it doesn\'t match publicly available version.'],
                                                     res['Back to the editing interfaces'],
