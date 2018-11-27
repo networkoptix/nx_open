@@ -43,6 +43,11 @@ const QLatin1String kPasswordResetCodeExpirationTimeout(
 const std::chrono::seconds kDefaultPasswordResetCodeExpirationTimeout =
     std::chrono::hours(24);
 
+const QLatin1String kRemoveExpiredTemporaryCredentialsPeriod(
+    "accountManager/removeExpiredTemporaryCredentialsPeriod");
+const auto kDefaultRemoveExpiredTemporaryCredentialsPeriod =
+    std::chrono::minutes(10);
+
 //-------------------------------------------------------------------------------------------------
 // System manager settings
 const QLatin1String kReportRemovedSystemPeriodSec("systemManager/reportRemovedSystemPeriod");
@@ -153,7 +158,8 @@ Notification::Notification():
 
 AccountManager::AccountManager():
     accountActivationCodeExpirationTimeout(kDefaultAccountActivationCodeExpirationTimeout),
-    passwordResetCodeExpirationTimeout(kDefaultPasswordResetCodeExpirationTimeout)
+    passwordResetCodeExpirationTimeout(kDefaultPasswordResetCodeExpirationTimeout),
+    removeExpiredTemporaryCredentialsPeriod(kDefaultRemoveExpiredTemporaryCredentialsPeriod)
 {
 }
 
@@ -346,6 +352,11 @@ void Settings::loadSettings()
         nx::utils::parseTimerDuration(
             settings().value(kPasswordResetCodeExpirationTimeout).toString(),
             kDefaultPasswordResetCodeExpirationTimeout));
+
+    m_accountManager.removeExpiredTemporaryCredentialsPeriod = duration_cast<milliseconds>(
+        nx::utils::parseTimerDuration(
+            settings().value(kRemoveExpiredTemporaryCredentialsPeriod).toString(),
+            kDefaultRemoveExpiredTemporaryCredentialsPeriod));
 
     //system manager
     m_systemManager.reportRemovedSystemPeriod = duration_cast<seconds>(

@@ -5,6 +5,8 @@
 namespace nx::clusterdb::engine::test {
 
 static constexpr char kApplicationId[] = "customer_db";
+// TODO: #ak Remove following constant
+static constexpr char kSystemId[] = "review_and_replace_this_value";
 
 CustomerDbNode::CustomerDbNode(int argc, char **argv):
     base_type(kApplicationId, argc, argv)
@@ -29,7 +31,8 @@ void CustomerDbNode::setup()
 
     m_customerManager = std::make_unique<CustomerManager>(
         &syncronizationEngine(),
-        m_customerDao.get());
+        m_customerDao.get(),
+        kSystemId);
 }
 
 void CustomerDbNode::teardown()

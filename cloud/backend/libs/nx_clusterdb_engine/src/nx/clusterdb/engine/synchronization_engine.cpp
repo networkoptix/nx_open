@@ -3,6 +3,7 @@
 #include <nx/network/url/url_parse_helper.h>
 
 #include "statistics/provider.h"
+#include "transport/http_transport_paths.h"
 
 namespace nx::clusterdb::engine {
 
@@ -29,6 +30,11 @@ SyncronizationEngine::SyncronizationEngine(
         m_supportedProtocolRange,
         &m_incomingTransactionDispatcher,
         &m_outgoingTransactionDispatcher),
+    m_transportManager(
+        m_supportedProtocolRange,
+        &m_transactionLog,
+        m_outgoingCommandFilter,
+        peerId.toSimpleByteArray().toStdString()),
     m_connector(
         &m_transportManager,
         &m_connectionManager),
@@ -133,10 +139,6 @@ void SyncronizationEngine::unsubscribeFromSystemDeletedNotification(
     subscription.removeSubscription(m_systemDeletedSubscriptionId);
 }
 
-static constexpr char kEstablishEc2TransactionConnectionPath[] = "/events/ConnectingStage1";
-static constexpr char kEstablishEc2P2pTransactionConnectionPath[] = "/transactionBus";
-static constexpr char kPushEc2TransactionPath[] = "/forward_events/{sequence}";
-
 QnUuid SyncronizationEngine::peerId() const
 {
     return m_peerId;
@@ -147,20 +149,20 @@ void SyncronizationEngine::registerHttpApi(
     nx::network::http::server::rest::MessageDispatcher* dispatcher)
 {
     registerHttpHandler(
-        nx::network::url::joinPath(pathPrefix, kEstablishEc2TransactionConnectionPath),
+        nx::network::url::joinPath(pathPrefix, transport::kEstablishEc2TransactionConnectionPath),
         &transport::CommonHttpAcceptor::createConnection,
         &m_httpTransportAcceptor,
         dispatcher);
 
     registerHttpHandler(
-        nx::network::url::joinPath(pathPrefix, kPushEc2TransactionPath),
+        nx::network::url::joinPath(pathPrefix, transport::kPushEc2TransactionPath),
         &transport::CommonHttpAcceptor::pushTransaction,
         &m_httpTransportAcceptor,
         dispatcher);
 
     registerHttpHandler(
         nx::network::http::Method::get,
-        nx::network::url::joinPath(pathPrefix, kEstablishEc2P2pTransactionConnectionPath),
+        nx::network::url::joinPath(pathPrefix, transport::kEstablishEc2P2pTransactionConnectionPath),
         &transport::WebSocketTransportAcceptor::createConnection,
         &m_webSocketAcceptor,
         dispatcher);

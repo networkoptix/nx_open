@@ -41,6 +41,7 @@ class Manager final:
     public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
+
 public:
     Manager(QnMediaServerModule* serverModule);
     ~Manager();
@@ -49,11 +50,9 @@ public:
     void stop();
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_resourceRemoved(const QnResourcePtr& resource);
-    void at_rulesUpdated(const QSet<QnUuid>& affectedResources);
 
     void at_resourceParentIdChanged(const QnResourcePtr& resource);
     void at_resourcePropertyChanged(const QnResourcePtr& resource, const QString& propertyName);
-
 
     void registerMetadataSink(
         const QnResourcePtr& device,
@@ -96,8 +95,6 @@ private:
         const resource::AnalyticsEngineResourcePtr& engine,
         const QString& propertyName);
 
-    void updateEngineSettings(const resource::AnalyticsEngineResourcePtr& engine);
-
     QWeakPointer<QnAbstractDataReceptor> metadataSink(
         const QnVirtualCameraResourcePtr& device) const;
     QWeakPointer<QnAbstractDataReceptor> metadataSink(const QnUuid& device) const;
@@ -112,7 +109,7 @@ private:
 
     std::map<QnUuid, QSharedPointer<DeviceAnalyticsContext>> m_deviceAnalyticsContexts;
 
-    // TODO: switch to std pointers.
+    // TODO: Switch to std pointers.
     std::map<QnUuid, QWeakPointer<QnAbstractDataReceptor>> m_metadataSinks;
     std::map<QnUuid, QSharedPointer<ProxyVideoDataReceptor>> m_mediaSources;
 };

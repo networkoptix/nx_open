@@ -69,7 +69,7 @@ void Engine::setSettings(const nx::sdk::Settings* settings)
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::Settings* Engine::settings() const
+nx::sdk::Settings* Engine::pluginSideSettings() const
 {
     return nullptr;
 }
@@ -102,6 +102,12 @@ const EventType* Engine::eventTypeById(const QString& id) const noexcept
 
 void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
 {
+}
+
+nx::sdk::Error Engine::setHandler(nx::sdk::analytics::Engine::IHandler* /*handler*/)
+{
+    // TODO: Use the handler for error reporting.
+    return nx::sdk::Error::noError;
 }
 
 } // namespace vca

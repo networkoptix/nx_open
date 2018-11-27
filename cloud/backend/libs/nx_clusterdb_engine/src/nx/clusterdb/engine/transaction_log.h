@@ -39,8 +39,6 @@ struct NX_DATA_SYNC_ENGINE_API ReadCommandsFilter
     static const ReadCommandsFilter kEmptyFilter;
 };
 
-QString toString(const CommandHeader& tran);
-
 /**
  * Supports multiple transactions related to a single system at the same time.
  * In this case transactions will reported to AbstractOutgoingTransactionDispatcher

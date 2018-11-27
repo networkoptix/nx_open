@@ -34,7 +34,7 @@ public:
     RefCountable* release() noexcept { return m_ptr.release(); }
     RefCountable* get() const noexcept { return m_ptr.get();  }
     RefCountable* operator->() const noexcept { return m_ptr.get(); }
-    operator bool() const noexcept { return !!m_ptr; }
+    operator bool() const noexcept { return (bool) m_ptr; }
 
     UniquePtr& operator=(const UniquePtr& other) = delete;
     UniquePtr& operator=(UniquePtr&& other) noexcept
@@ -76,7 +76,7 @@ public:
     RefCountable* release() noexcept { return m_ptr.release(); }
     RefCountable* get() const noexcept { return m_ptr.get(); }
     RefCountable* operator->() const noexcept { return m_ptr.get(); }
-    operator bool() const noexcept { return !!m_ptr; }
+    operator bool() const noexcept { return (bool) m_ptr; }
 
     SharedPtr& operator=(const SharedPtr& other) noexcept
     {

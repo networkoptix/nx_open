@@ -1090,7 +1090,6 @@ void fromApiToResourceList(
     fromApiToResourceList(src, dst, overload_tag());
 }
 
-
 void fromApiToResource(
     const AnalyticsEngineData& src,
     nx::vms::common::AnalyticsEngineResourcePtr& dst)

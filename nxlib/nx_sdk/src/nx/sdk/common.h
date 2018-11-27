@@ -48,25 +48,24 @@ enum class AttributeType
     undefined,
     number,
     boolean,
-    string
-
-    // Other more specific types as DateTime, Coordinates, Temperature ???
+    string,
+    // TODO: Consider adding other specific types like DateTime, Coordinates, Temperature.
 };
 
-class Attribute //< TODO: #dmishin rename to AbstractAttribute
+class IAttribute
 {
 public:
-    virtual ~Attribute() {};
+    virtual ~IAttribute() = default;
 
-    virtual const nx::sdk::AttributeType type() const = 0;
+    virtual AttributeType type() const = 0;
     virtual const char* name() const = 0;
-    virtual const char* value()const = 0;
+    virtual const char* value() const = 0;
 };
 
 enum class Error
 {
     noError,
-    unknownError, //< TODO: Consider renaming to "otherError".
+    unknownError, //< TODO: Consider renaming to "genericError".
     needMoreBufferSpace,
     typeIsNotSupported,
     networkError,

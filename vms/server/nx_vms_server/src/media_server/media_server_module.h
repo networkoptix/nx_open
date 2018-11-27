@@ -52,57 +52,30 @@ class QnResourceStatusWatcher;
 
 namespace nx::vms::common::p2p::downloader { class Downloader; }
 namespace nx::mediaserver::hls { class SessionPool; }
+namespace nx::mediaserver { class CmdLineArguments; }
+namespace nx::mediaserver::analytics { class SdkObjectFactory; }
 
-namespace nx {
-namespace mediaserver {
-class CmdLineArguments;
-namespace analytics {
-class SdkObjectFactory;
-} // namespace analytics
-} // namespace mediaserver
+namespace nx::mediaserver::event {
+    class ExtendedRuleProcessor;
+    class EventConnector;
+    class EventMessageBus;
+}
 
-namespace mediaserver::event {
-class ExtendedRuleProcessor;
-class EventConnector;
-class EventMessageBus;
-} // namespace mediaserver::event
+namespace nx::analytics::storage { class AbstractEventsStorage; }
+namespace nx::mediaserver::time_sync { class TimeSyncManager; }
 
-namespace analytics {
-namespace storage {
-class AbstractEventsStorage;
-} // namespace storage
-} // namespace analytics
+namespace nx::mediaserver {
+    class UnusedWallpapersWatcher;
+    class LicenseWatcher;
+    class RootFileSystem;
+    class Settings;
+    class ServerTimeSyncManager;
+    class ServerUpdateManager;
+}
 
-namespace time_sync {
-class TimeSyncManager;
-} // namespace time_sync
-
-namespace mediaserver {
-
-class UnusedWallpapersWatcher;
-class LicenseWatcher;
-class RootFileSystem;
-class Settings;
-class ServerTimeSyncManager;
-class ServerUpdateManager;
-
-namespace resource {
-
-class SharedContextPool;
-
-} // namespace resource
-
-namespace camera {
-
-class ErrorProcessor;
-
-} // namespace camera
-
-} // namespace mediaserver
-
-class CommonUpdateManager;
-
-} // namespace nx
+namespace nx::mediaserver::resource { class SharedContextPool; }
+namespace nx::mediaserver::camera { class ErrorProcessor; }
+namespace nx { class CommonUpdateManager; }
 
 class QnMediaServerModule : public QObject, public QnInstanceStorage
 {

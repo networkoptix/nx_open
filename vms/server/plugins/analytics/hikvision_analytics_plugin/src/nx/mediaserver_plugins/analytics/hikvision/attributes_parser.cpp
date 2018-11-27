@@ -92,7 +92,7 @@ boost::optional<HikvisionEvent> AttributesParser::parseEventXml(
         {
             const auto internalName = normalizeInternalName(reader.readElementText());
             result.typeId = manifest.eventTypeByInternalName(internalName);
-            if (result.typeId.isNull())
+            if (result.typeId.isEmpty())
                 NX_WARNING(typeid(AttributesParser), lm("Unknown analytics event name %1").arg(internalName));
         }
         else if (name == "eventdescription")
@@ -141,7 +141,7 @@ std::vector<HikvisionEvent> AttributesParser::parseLprXml(
         if (reader.name().toString().toLower() == "plate")
         {
             auto hikvisionEvent = parsePlateData(reader, manifest);
-            if (hikvisionEvent.typeId.isNull())
+            if (hikvisionEvent.typeId.isEmpty())
                 continue;
 
             addEvent(hikvisionEvent);
@@ -195,7 +195,7 @@ HikvisionEvent AttributesParser::parsePlateData(
         {
             const auto internalName = normalizeInternalName(reader.readElementText());
             eventTypeId = manifest.eventTypeByInternalName(internalName);
-            if (eventTypeId.isNull())
+            if (eventTypeId.isEmpty())
                 NX_WARNING(typeid(AttributesParser), lm("Unknown analytics event name %1").arg(internalName));
         }
         else
@@ -206,7 +206,7 @@ HikvisionEvent AttributesParser::parsePlateData(
 
     using namespace nx::sdk::analytics;
     HikvisionEvent hikvisionEvent;
-    if (!eventTypeId.isNull())
+    if (!eventTypeId.isEmpty())
     {
         hikvisionEvent.caption = lm("Plate No. %1 (%2)").args(plateNumber, country);
         hikvisionEvent.description = lm("%1, Lane No. %2, Direction: %3")

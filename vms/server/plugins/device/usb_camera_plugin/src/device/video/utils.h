@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+#include <string>
 
 #include <camera/camera_plugin.h>
 #include <camera/camera_plugin_types.h>
@@ -18,7 +19,7 @@ namespace video {
 /**
  * Get the gui friendly name of the device.
  */
-std::string getDeviceName(const char * devicePath);
+std::string getDeviceName(const std::string& devicePath);
 
 /**
 * Get the list of devices on the system, with fields filled out.
@@ -30,7 +31,7 @@ std::vector<DeviceData> getDeviceList();
 /**
 * Get a list of codecs supported by this device
 */
-std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const char * devicePath);
+std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const std::string& devicePath);
 
 /**
 * Get the list of supported resolutions for the device with the given path.
@@ -40,7 +41,7 @@ std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const char 
 * @param[in] targetCodecID - the codec whose resolution list is desired
 */
 std::vector<ResolutionData> getResolutionList(
-    const char * devicePath,
+    const std::string& devicePath,
     const device::CompressionTypeDescriptorPtr& targetCodecID);
 
 /**
@@ -51,7 +52,7 @@ std::vector<ResolutionData> getResolutionList(
 * @param[in] targetCodecID - the target codec to set bitrate for
 */
 void setBitrate(
-    const char * devicePath,
+    const std::string& devicePath,
     int bitrate,
     const device::CompressionTypeDescriptorPtr& targetCodecID);
 
@@ -61,7 +62,7 @@ void setBitrate(
 * * @param[in] targetCodecID - the target codec to get bitrate for
 */ 
 int getMaxBitrate(
-    const char * devicePath,
+    const std::string& devicePath,
     const device::CompressionTypeDescriptorPtr& targetCodecID);
 
 } // namespace video

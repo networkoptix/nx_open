@@ -71,7 +71,7 @@ void Engine::setSettings(const nx::sdk::Settings* settings)
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::Settings* Engine::settings() const
+nx::sdk::Settings* Engine::pluginSideSettings() const
 {
     return nullptr;
 }
@@ -134,6 +134,12 @@ EngineManifest Engine::fetchSupportedEvents(const DeviceInfo& deviceInfo)
 void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
 {
     // Do nothing.
+}
+
+nx::sdk::Error Engine::setHandler(nx::sdk::analytics::Engine::IHandler* /*handler*/)
+{
+    // TODO: Use the handler for error reporting.
+    return nx::sdk::Error::noError;
 }
 
 } // namespace axis

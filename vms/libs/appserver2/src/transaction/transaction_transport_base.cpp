@@ -411,6 +411,12 @@ void QnTransactionTransportBase::addDataToTheSendQueue(QByteArray data)
         serializeAndSendNextDataBuffer();
 }
 
+void QnTransactionTransportBase::setPostTranUrl(const nx::utils::Url& url)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_mockedUpPostTranUrl = url;
+}
+
 void QnTransactionTransportBase::setState(State state)
 {
     NX_VERBOSE(this, lm("State changed to %1 from outside").args(toString(state)));
@@ -1141,17 +1147,24 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
                 m_outgoingTranClient->setUserPassword(m_remotePeerCredentials.password());
             }
 
-            m_postTranBaseUrl = m_remoteAddr;
-            if (m_remotePeer.peerType == api::PeerType::cloudServer)
-                m_postTranBaseUrl.setPath(nx::cloud::db::api::kPushEc2TransactionPath);
+            if (m_mockedUpPostTranUrl)
+            {
+                m_postTranBaseUrl = *m_mockedUpPostTranUrl;
+            }
             else
-                m_postTranBaseUrl.setPath(lit("/ec2/forward_events"));
-            m_postTranBaseUrl.setQuery(QString());
+            {
+                m_postTranBaseUrl = m_remoteAddr;
+                if (m_remotePeer.peerType == api::PeerType::cloudServer)
+                    m_postTranBaseUrl.setPath(nx::cloud::db::api::kPushEc2TransactionPath);
+                else
+                    m_postTranBaseUrl.setPath(lit("/ec2/forward_events"));
+                m_postTranBaseUrl.setQuery(QString());
+            }
         }
 
         nx::network::http::HttpHeaders additionalHeaders;
         addHttpChunkExtensions(&additionalHeaders);
-        for (const auto& header : additionalHeaders)
+        for (const auto& header: additionalHeaders)
         {
             //removing prev header value (if any)
             m_outgoingTranClient->removeAdditionalHeader(header.first);

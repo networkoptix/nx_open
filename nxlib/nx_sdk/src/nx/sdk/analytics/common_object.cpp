@@ -48,7 +48,7 @@ const char* CommonObject::objectSubType() const
     return m_objectSubType.data();
 }
 
-const Attribute* CommonObject::attribute(int index) const
+const IAttribute* CommonObject::attribute(int index) const
 {
     return (index < (int) m_attributes.size()) ? &m_attributes[index] : nullptr;
 }

@@ -158,7 +158,7 @@ void Engine::setSettings(const nx::sdk::Settings* settings)
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::Settings* Engine::settings() const
+nx::sdk::Settings* Engine::pluginSideSettings() const
 {
     return nullptr;
 }
@@ -212,7 +212,7 @@ boost::optional<QList<QString>> Engine::eventTypeIdsFromParameters(
     for (const auto& eventName: supportedEvents)
     {
         auto eventTypeId = m_engineManifest.eventTypeIdByName(eventName);
-        if (!eventTypeId.isNull())
+        if (!eventTypeId.isEmpty())
             result.insert(eventTypeId);
 
         const auto altEventName = specialEventName(eventName);
@@ -324,6 +324,12 @@ std::shared_ptr<Engine::SharedResources> Engine::sharedResources(
     }
 
     return sharedResourcesItr.value();
+}
+
+nx::sdk::Error Engine::setHandler(nx::sdk::analytics::Engine::IHandler* /*handler*/)
+{
+    // TODO: Use the handler for error reporting.
+    return nx::sdk::Error::noError;
 }
 
 } // namespace hanwha

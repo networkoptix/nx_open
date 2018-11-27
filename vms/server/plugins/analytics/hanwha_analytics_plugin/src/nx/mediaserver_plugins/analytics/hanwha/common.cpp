@@ -45,7 +45,7 @@ bool doesMatch(const QString& realEventName, const QString& internalEventName)
 QString Hanwha::EngineManifest::eventTypeIdByName(const QString& eventName) const
 {
     QString result = m_eventTypeIdByInternalName.value(eventName);
-    if (!result.isNull())
+    if (!result.isEmpty())
         return result;
 
     for (const auto& eventTypeDescriptor: eventTypes)

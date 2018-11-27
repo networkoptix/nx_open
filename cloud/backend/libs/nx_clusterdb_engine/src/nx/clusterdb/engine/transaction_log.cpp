@@ -16,12 +16,6 @@ const ReadCommandsFilter ReadCommandsFilter::kEmptyFilter = {
     std::numeric_limits<int>::max(),
     {}};
 
-QString toString(const CommandHeader& tran)
-{
-    return lm("seq %1, ts %2")
-        .arg(tran.persistentInfo.sequence).arg(tran.persistentInfo.timestamp);
-}
-
 TransactionLog::TransactionLog(
     const QnUuid& peerId,
     const ProtocolVersionRange& supportedProtocolRange,
@@ -92,8 +86,8 @@ nx::sql::DBResult TransactionLog::saveLocalTransaction(
 
     NX_DEBUG(
         QnLog::EC2_TRAN_LOG.join(this),
-        lm("systemId %1. Generated new transaction %2 (%3, hash %4)")
-            .args(systemId, transactionSerializer->header(), transactionHash));
+        lm("systemId %1. Generated new command %2 (hash %3)")
+            .args(systemId, toString(transactionSerializer->header()), transactionHash));
 
     // Saving transaction to the log.
     const auto result = saveToDb(
@@ -379,17 +373,17 @@ bool TransactionLog::isShouldBeIgnored(
 nx::sql::DBResult TransactionLog::saveToDb(
     nx::sql::QueryContext* queryContext,
     const std::string& systemId,
-    const CommandHeader& transaction,
-    const QByteArray& transactionHash,
+    const CommandHeader& commandHeader,
+    const QByteArray& commandHash,
     const QByteArray& ubjsonData)
 {
     NX_DEBUG(QnLog::EC2_TRAN_LOG,
-        lm("systemId %1. Saving transaction %2 (%3, hash %4) to log")
-            .args(systemId, transaction.command, transaction, transactionHash));
+        lm("systemId %1. Saving command %2 (hash %3) to log")
+            .args(systemId, toString(commandHeader), commandHash));
 
     auto dbResult = m_transactionDataObject->insertOrReplaceTransaction(
         queryContext,
-        {systemId, transaction, transactionHash, ubjsonData});
+        {systemId, commandHeader, commandHash, ubjsonData});
     if (dbResult != nx::sql::DBResult::ok)
         return dbResult;
 
@@ -398,7 +392,7 @@ nx::sql::DBResult TransactionLog::saveToDb(
     DbTransactionContext& dbTranContext = getDbTransactionContext(lock, queryContext, systemId);
 
     getTransactionLogContext(lock, systemId)->cache.insertOrReplaceTransaction(
-        dbTranContext.cacheTranId, transaction, transactionHash);
+        dbTranContext.cacheTranId, commandHeader, commandHash);
 
     return nx::sql::DBResult::ok;
 }

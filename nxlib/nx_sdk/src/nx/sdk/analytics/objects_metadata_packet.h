@@ -9,37 +9,36 @@ namespace sdk {
 namespace analytics {
 
 /**
- * @brief The Rect struct represents bounding box of detected object.
+ * Represents bounding box of an analytics object.
  */
 struct Rect
 {
     Rect() {}
+
     Rect(float x, float y, float width, float height):
         x(x), y(y), width(width), height(height)
     {
     }
 
     /**
-     * @brief x coordinate of top left corner by x axis.
-     * MUST be in the range [0..1].
+     * X-coordinate of the top left corner. Must be in the range [0..1].
      */
     float x = 0;
 
     /**
-     * @brief y coordinate of top left corner by y axis.
-     * MUST be in the range [0..1].
+     * Y-coordinate of the top left corner. Must be in the range [0..1].
      */
     float y = 0;
 
     /**
-     * @brief width of rectangle.
-     * MUST be in the range [0..1] and the rule x + width <= 1 MUST be satisfied.
+     * Width of the rectangle. Must be in the range [0..1], and the rule `x + width <= 1` must be
+     * satisfied.
      */
     float width = 0;
 
     /**
-     * @brief height of rectangle.
-     * MUST be in the range [0..1] and the rule y + height <= 1 MUST be satisfied.
+     * Height of the rectangle. Must be in the range [0..1], and the rule `y + height <= 1` must be
+     * satisfied.
      */
     float height = 0;
 };
@@ -71,7 +70,7 @@ public:
     /**
      * @brief attributes array of object attributes (e.g. age, color).
      */
-    virtual const Attribute* attribute(int index) const = 0;
+    virtual const IAttribute* attribute(int index) const = 0;
 
     /**
      * @brief attributeCount count of attributes

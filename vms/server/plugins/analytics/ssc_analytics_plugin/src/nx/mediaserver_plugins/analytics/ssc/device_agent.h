@@ -35,15 +35,15 @@ public:
 
     virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
 
-    virtual sdk::Error setMetadataHandler(
-        nx::sdk::analytics::MetadataHandler* metadataHandler) override;
+    virtual sdk::Error setHandler(
+        nx::sdk::analytics::DeviceAgent::IHandler* handler) override;
 
     virtual sdk::Error setNeededMetadataTypes(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
 
     virtual void setSettings(const nx::sdk::Settings* settings) override;
 
-    virtual nx::sdk::Settings* settings() const override;
+    virtual nx::sdk::Settings* pluginSideSettings() const override;
 
 private:
     nx::sdk::Error startFetchingMetadata(
@@ -56,7 +56,7 @@ private:
     const QUrl m_url;
     const int m_cameraLogicalId;
     QByteArray m_deviceAgentManifest;
-    nx::sdk::analytics::MetadataHandler* m_metadataHandler = nullptr;
+    nx::sdk::analytics::DeviceAgent::IHandler* m_handler = nullptr;
     mutable uint64_t m_packetId = 0; //< autoincrement packet number for log and debug
 };
 

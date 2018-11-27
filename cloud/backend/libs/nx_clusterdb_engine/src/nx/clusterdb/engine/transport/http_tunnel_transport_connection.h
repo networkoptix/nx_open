@@ -23,6 +23,8 @@ public:
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
+    virtual void start() override;
+
     virtual network::SocketAddress remotePeerEndpoint() const override;
 
     virtual void setOnConnectionClosed(ConnectionClosedEventHandler handler) override;

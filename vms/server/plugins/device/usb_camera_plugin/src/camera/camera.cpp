@@ -93,7 +93,7 @@ std::shared_ptr<VideoStream> Camera::videoStream()
 
 std::vector<device::video::ResolutionData> Camera::resolutionList() const
 {
-    return device::video::getResolutionList(url().c_str(), m_compressionTypeDescriptor);
+    return device::video::getResolutionList(url(), m_compressionTypeDescriptor);
 }
 
 void Camera::setAudioEnabled(bool value)
