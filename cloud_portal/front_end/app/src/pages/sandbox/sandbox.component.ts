@@ -38,6 +38,7 @@ export class NxSandboxComponent {
 
         this.options = [
             { name: 'brand', selected: false, type: 'brand' },
+            { name: 'really long name break', selected: false, type: 'brand' },
             { name: 'success', selected: true, type: 'success' },
             { name: 'danger', selected: true, type: 'danger' },
             { name: 'warning', selected: false, type: 'warning' },
