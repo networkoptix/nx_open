@@ -164,7 +164,9 @@ Ptz::Capabilities QnMediaResource::getPtzCapabilities(core_ptz::Type ptzType) co
     switch (ptzType)
     {
         case core_ptz::Type::operational:
-            return operationalPtzCapabilities();
+            return Ptz::Capabilities(toResource()->getProperty(
+                ResourcePropertyKey::kPtzCapabilities).toInt());
+
         case core_ptz::Type::configurational:
             return Ptz::Capabilities(toResource()->getProperty(
                 ResourcePropertyKey::kConfigurationalPtzCapabilities).toInt());
@@ -189,9 +191,8 @@ void QnMediaResource::setPtzCapabilities(
     {
         case core_ptz::Type::operational:
         {
-            // TODO: #rvasilenko Why do we need this check?
-            if (toResource()->hasDefaultProperty(ResourcePropertyKey::kPtzCapabilities))
-                toResource()->setProperty(ResourcePropertyKey::kPtzCapabilities, (int) capabilities);
+            toResource()->setProperty(
+                ResourcePropertyKey::kPtzCapabilities, (int) capabilities);
             break;
         }
         case core_ptz::Type::configurational:
@@ -213,19 +214,8 @@ void QnMediaResource::setPtzCapability(
 {
     setPtzCapabilities(value
         ? (getPtzCapabilities(ptzType) | capability)
-        : (getPtzCapabilities(ptzType) & ~capability), ptzType);
-}
-
-Ptz::Capabilities QnMediaResource::operationalPtzCapabilities() const
-{
-    return Ptz::Capabilities(toResource()->getProperty(
-        ResourcePropertyKey::kPtzCapabilities).toInt());
-}
-
-void QnMediaResource::setOperationalPtzCapabilities(Ptz::Capabilities capabilities)
-{
-    if (toResource()->hasDefaultProperty(ResourcePropertyKey::kPtzCapabilities))
-        toResource()->setProperty(ResourcePropertyKey::kPtzCapabilities, static_cast<int>(capabilities));
+        : (getPtzCapabilities(ptzType) & ~capability),
+        ptzType);
 }
 
 bool QnMediaResource::canSwitchPtzPresetTypes() const

@@ -3460,7 +3460,7 @@ QnAbstractPtzController* QnPlOnvifResource::createSpecialPtzController() const
     if (getModel() == lit("DCS-5615"))
         return new QnDlinkPtzController(toSharedPointer(this));
 
-    return 0;
+    return nullptr;
 }
 
 QnAbstractPtzController *QnPlOnvifResource::createPtzControllerInternal() const
