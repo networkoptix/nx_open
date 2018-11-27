@@ -119,7 +119,6 @@ void ServerUpdateTool::loadInternalState()
     {
         switch((OfflineUpdateState)stored.state)
         {
-            case OfflineUpdateState::unpack:
             case OfflineUpdateState::ready:
             case OfflineUpdateState::push:
                 // We have no idea whether update files are still good on server.
@@ -127,6 +126,7 @@ void ServerUpdateTool::loadInternalState()
                 // TODO: Check if we really need more robust state restoration.
                 m_updateCheck = checkUpdateFromFile(stored.file);
                 break;
+            //case OfflineUpdateState::unpack:
             //case OfflineUpdateState::done:
             //case OfflineUpdateState::error:
             default:
@@ -277,6 +277,10 @@ void ServerUpdateTool::atExtractFilesFinished(int code)
                 contents.error = nx::update::InformationError::missingPackageError;
         }
     }
+    else
+    {
+        changeUploadState(OfflineUpdateState::initial);
+    }
 
     m_offlineUpdateCheckResult.set_value(contents);
 }
@@ -310,7 +314,7 @@ QnMediaServerResourceList ServerUpdateTool::getServersForUpload()
 {
     QnMediaServerResourceList result;
     auto items = m_updatesModel->getServerData();
-    for(auto record: items)
+    for (auto record: items)
     {
         auto server = record->server;
         bool isOurServer = !server->hasFlags(Qn::fake_server)
@@ -540,7 +544,7 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents)
     m_completedUploads.clear();
     m_uploadStateById.clear();
 
-    for(auto server: recipients)
+    for (auto server: recipients)
         startUpload(server, contents.filesToUpload, contents.storageDir);
 
     if (m_activeUploads.empty() && !m_completedUploads.empty())
@@ -579,7 +583,7 @@ bool ServerUpdateTool::verifyUpdateManifest(UpdateContents& contents) const
 void ServerUpdateTool::calculateUploadProgress(ProgressInfo& result)
 {
     int uploading = 0;
-    for(const auto& record: m_uploadStateById)
+    for (const auto& record: m_uploadStateById)
     {
         result.max += 100;
         qint64 progress = 0;
@@ -1053,7 +1057,7 @@ nx::utils::SoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
 {
     nx::utils::SoftwareVersion minimalVersion = qnStaticCommon->engineVersion();
     const auto allServers = resourcePool->getAllServers(Qn::AnyStatus);
-    for(const QnMediaServerResourcePtr &server: allServers)
+    for (const QnMediaServerResourcePtr &server: allServers)
     {
         if (server->getVersion() < minimalVersion)
             minimalVersion = server->getVersion();
@@ -1110,7 +1114,7 @@ QUrl generateUpdatePackageUrl(const nx::update::UpdateContents& contents, const 
     QString clientRuntime = QString("%1_%2_%3").arg(clientPlatform, clientArch, clientPlatformModification);
 
     query.addQueryItem("client", clientRuntime);
-    for(const auto &systemInformation: systemInformationList)
+    for (const auto &systemInformation: systemInformationList)
         query.addQueryItem("server", systemInformation.toString().replace(L' ', L'_'));
 
     query.addQueryItem("customization", QnAppInfo::customizationName());
