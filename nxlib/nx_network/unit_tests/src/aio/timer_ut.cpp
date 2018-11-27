@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
-#include <nx/utils/std/future.h>
 #include <nx/network/aio/timer.h>
-
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/std/future.h>
+#include <nx/utils/thread/sync_queue.h>
 
 namespace nx {
 namespace network {
@@ -41,7 +41,7 @@ protected:
             {
                 if (customHandler)
                     customHandler();
-                m_timedoutPromise.set_value(true);
+                m_timerEvents.push(/*dummy*/ 0);
             });
     }
 
@@ -52,18 +52,16 @@ protected:
 
     void assertTimerEventRaised()
     {
-        ASSERT_TRUE(m_timedoutPromise.get_future().get());
+        m_timerEvents.pop();
     }
 
     void assertTimerEventNotRaised(std::chrono::milliseconds timeToWait)
     {
-        ASSERT_EQ(
-            std::future_status::timeout,
-            m_timedoutPromise.get_future().wait_for(timeToWait));
+        ASSERT_FALSE(m_timerEvents.pop(timeToWait));
     }
 
 private:
-    nx::utils::promise<bool> m_timedoutPromise;
+    nx::utils::SyncQueue<int /*dummy*/> m_timerEvents;
 };
 
 TEST_F(AioTimer, handler_gets_called)
@@ -106,6 +104,22 @@ TEST_F(AioTimer, modify_timeout)
     startTimerFor(std::chrono::milliseconds(1));
 
     assertTimerEventRaised();
+}
+
+TEST_F(AioTimer, modified_timer_is_invoked_only_once)
+{
+    const auto timeout = std::chrono::milliseconds(1);
+
+    m_timer->executeInAioThreadSync(
+        [this, timeout]()
+        {
+            startTimerFor(timeout);
+            startTimerFor(timeout*2);
+        });
+
+    assertTimerEventRaised();
+
+    assertTimerEventNotRaised(timeout*10);
 }
 
 TEST_F(AioTimer, cancelled_timer_is_not_raised)
