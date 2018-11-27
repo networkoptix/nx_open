@@ -264,7 +264,7 @@ Share with registered user - sends him notification
     Remove User Permissions    ${EMAIL NOPERM}
 
 Share with unregistered user - brings them to registration page with code with correct email locked
-    [tags]    email
+    [tags]    email    C41889
     ${random email}    Get Random Email    ${BASE EMAIL}
     Log in to Auto Tests System    ${email}
     Verify In System    Auto Tests
