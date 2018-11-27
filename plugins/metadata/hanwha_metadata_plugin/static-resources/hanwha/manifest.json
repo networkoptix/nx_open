@@ -94,16 +94,6 @@
             "positiveState": "has been detected"
         },
         {
-            "eventTypeId": "{E068D6FF-A3AC-43AA-B2D6-1804440AF506}",
-            "eventName": {
-                "value": "Shock detection",
-                "localization": {}
-            },
-            "internalName": "ShockDetection",
-            "description": "ShockDetection %1",
-            "positiveState": "has been detected"
-        },
-        {
             "eventTypeId": "{CABB4644-F6C2-4F09-8EDF-E0FAFCC4F833}",
             "eventName": {
                 "value": "Audio detection",
@@ -114,6 +104,32 @@
             "description": "The audio volume level is %1 the threshold",
             "positiveState": "above",
             "negativeState": "below",
+            "flags": "stateDependent"
+        },
+        {
+            "eventTypeId": "{E527A572-1F2E-4269-91F6-35161F18185D}",
+            "eventName": {
+                "value": "Shock detection",
+                "localization": {
+                }
+            },
+            "internalName": "ShockDetection",
+            "description": "Shock detection %1",
+            "positiveState": "has been detected",
+            "negativeState": "is not detected",
+            "flags": "stateDependent"
+        },
+        {
+            "eventTypeId": "{59C69BF0-6B63-48AE-B64B-A650EA916B18}",
+            "eventName": {
+                "value": "Temperature Change Detection",
+                "localization": {
+                }
+            },
+            "internalName": "TemperatureChangeDetection",
+            "description": "Temperature Change %1",
+            "positiveState": "has been detected",
+            "negativeState": "is not detected",
             "flags": "stateDependent"
         },
         {
