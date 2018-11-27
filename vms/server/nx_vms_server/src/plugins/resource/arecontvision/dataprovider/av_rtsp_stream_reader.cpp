@@ -39,6 +39,9 @@ CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
     const Qn::ConnectionRole role = getRole();
     m_rtpStreamParser.setRole(role);
 
+    // Override ssn param since some cameras does not support ssn > 8
+    m_streamParam.insert("streamID", getRole() == Qn::CR_LiveVideo ? 1 : 2);
+
     QString requestStr;
     {
         QnMutexLocker lk(&m_mutex);
