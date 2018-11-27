@@ -5,6 +5,7 @@
 #include <list>
 #include <memory>
 #include <stack>
+#include <set>
 
 #include <QString>
 #include <QtCore/QDateTime>
@@ -454,6 +455,10 @@ private:
     bool checkResultAndSetStatus(const CameraDiagnostics::Result& result);
 
     void setAudioOutputConfigurationToken(const QString& value);
+
+    std::set<QString> notificationTopicsForMonitoring() const;
+    std::set<QString> allowedInputSourceNames() const;
+
 protected:
     std::unique_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
     VideoOptionsLocal m_primaryStreamCapabilities;
