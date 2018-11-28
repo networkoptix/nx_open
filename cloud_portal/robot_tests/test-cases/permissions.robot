@@ -290,3 +290,30 @@ Sharing system with a user who is already in the list updates their permissions
     Check For Alert    ${NEW PERMISSIONS SAVED}
     Check User Permissions    ${random email}    ${VIEWER TEXT}
     Remove User Permissions    ${random email}
+
+Check share email for registered user
+    [tags]    C47297
+    #log in as noperm to check language and change its language to the current testing language
+    #otherwise it may receive the notification in another language and fail the email subject comparison
+    Log In    ${EMAIL NOPERM}    ${password}
+    Validate Log In
+    Sleep    1
+    Log Out
+    Validate Log Out
+    Log in to Auto Tests System    ${email}
+    Verify In System    Auto Tests
+    Share To    ${EMAIL NO PERM}    ${ADMIN TEXT}
+    Check For Alert    ${NEW PERMISSIONS SAVED}
+    Check User Permissions    ${EMAIL NOPERM}    ${ADMIN TEXT}
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
+    ${INVITED TO SYSTEM EMAIL SUBJECT}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT}    {{message.system_name}}    ${AUTO TESTS}
+    ${email}    Wait For Email    recipient=${EMAIL NOPERM}    timeout=120
+    ${email text}    Get Email Body    ${email}
+    Check Email Subject    ${email}    ${INVITED TO SYSTEM EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
+    Check Email Button    ${email text}    ${ENV}    ${THEME COLOR}
+    ${links}    Get Links From Email    ${email}
+    @{expected links}    Set Variable    ${SUPPORT URL}    ${WEBSITE URL}    ${ENV}    ${ENV}/systems/${AUTO_TESTS SYSTEM ID}    mailto:${OWNER EMAIL}
+    : FOR    ${link}  IN  @{links}
+    \    check in list    ${expected links}    ${link}
+    Delete Email    ${email}
+    Close Mailbox
