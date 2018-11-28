@@ -3,11 +3,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
 
-namespace {
-
-constexpr int kMaxHostsCheckedSimultaneously = 256;
-
-} // namespace
+static constexpr int kMaxHostsCheckedSimultaneously = 256;
 
 namespace nx::network {
 

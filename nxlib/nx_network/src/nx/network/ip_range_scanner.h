@@ -36,10 +36,16 @@ public:
     static int maxHostsCheckedSimultaneously();
     size_t hostsChecked() const;
 
+
 private:
     enum class State {readyToScan, scanning, terminated};
     using IpCheckers = std::unordered_set<std::unique_ptr<nx::network::http::AsyncClient>>;
 
+    bool startHostCheck();
+    void onDone(IpCheckers::iterator clientIter);
+    virtual void stopWhileInAioThread() override;
+
+private:
     CompletionHandler m_completionHandler;
     std::vector<nx::network::HostAddress> m_onlineHosts;
     IpCheckers m_ipCheckers;
@@ -51,10 +57,6 @@ private:
     uint32_t m_endIpv4 = 0;
     uint32_t m_nextIPToCheck = 0;
     std::atomic<size_t> m_hostsChecked = 0;
-
-    bool startHostCheck();
-    void onDone(IpCheckers::iterator clientIter);
-    virtual void stopWhileInAioThread() override;
 };
 
 } // namespace nx::network

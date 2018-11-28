@@ -182,8 +182,8 @@ void QnManualSearchTaskManager::searchTaskDoneHandler(
 
 void QnManualSearchTaskManager::runSomePendingTasks()
 {
-    NX_ASSERT(m_pollable.isInSelfAioThread());
-    NX_ASSERT(m_state == State::running);
+    NX_CRITICAL(m_pollable.isInSelfAioThread());
+    NX_CRITICAL(m_state == State::running);
 
     QThreadPool* threadPool = commonModule()->resourceDiscoveryManager()->threadPool();
 
@@ -229,7 +229,7 @@ void QnManualSearchTaskManager::runSomePendingTasks()
 
 bool QnManualSearchTaskManager::canRunTask(QThreadPool *threadPool)
 {
-    NX_ASSERT(m_pollable.isInSelfAioThread());
+    NX_CRITICAL(m_pollable.isInSelfAioThread());
     bool allQueuesAreBlocked = true;
     for (const auto& [queueName, queue]: m_searchTasksQueues)
     {
