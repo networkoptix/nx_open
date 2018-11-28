@@ -1,0 +1,47 @@
+{
+  "cameraLinks": {
+    "highStream": "High stream",
+    "lowStream": "Low stream",
+    "transcoding": "Transcoding",
+    "unknown": "Desconhecido",
+    "copyToClipboard": "copy to clipboard",
+    "copyDefaultText": "copiar",
+    "copyActiveText": "copied to clipboard"
+  },
+  "systemOffline": "System Offline",
+  "cameraStates": {
+    "offline": "Offline",
+    "error": "Erro",
+    "unauthorized": "Authentication required",
+    "noData": "No data",
+    "iosVideoTooLarge": "iOS does not support video larger than fullHD (2MP: 1920x1080).",
+    "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
+    "flashOrWebmRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for playing video in Internet Explorer.",
+    "noArmSupport": "This browser or device does not support video playback from ARM-based servers.",
+    "noFormat": "This browser does not support video playback from this camera.",
+    "ieNoWebm": "Please, install <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for Internet Explorer.",
+    "ieWin10": "Please, use Microsoft Edge or Google Chrome browsers.",
+    "ubuntuNX": "Este browser não suporta vídeo a partir de servidores baseados em ARM. Por favor, use o browser Chromium."
+  },
+  "searchCamPlaceholder": "Pesquisar",
+  "resolution": {
+    "auto": "Auto",
+    "high": "Alta",
+    "low": "Baixa"
+  },
+  "chromeCastWarning": "O Chromecast consome muitos recursos e pode causar problemas no seu servidor.",
+  "voiceCommands": {
+    "play": "reproduzir",
+    "pause": "pausa",
+    "live": "go to live | show me live",
+    "view": "view + [camera name]",
+    "search": "find + [text for searchbar]",
+    "clear search": "limpar pesquisa",
+    "expand server": "expand server + [server name]",
+    "collapse server": "collapse server + [server name]",
+    "expand all servers": "expandir todos os servidores",
+    "collapse all servers": "recolher todos os servidores",
+    "stop listening": "parar de ouvir",
+    "help": "help | show commands"
+  }
+}
