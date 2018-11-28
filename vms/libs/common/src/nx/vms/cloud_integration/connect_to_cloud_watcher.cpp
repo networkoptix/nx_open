@@ -53,7 +53,7 @@ void QnConnectToCloudWatcher::setCloudDbUrl(const nx::utils::Url& cloudDbUrl)
     m_cloudDbUrl = cloudDbUrl;
 }
 
-boost::optional<nx::utils::Url> QnConnectToCloudWatcher::cloudDbUrl() const
+std::optional<nx::utils::Url> QnConnectToCloudWatcher::cloudDbUrl() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_cloudDbUrl;
