@@ -422,7 +422,7 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
 
     const QnSecurityCamResource* cameraResource =
         dynamic_cast<QnSecurityCamResource*>(m_resource.data());
-    bool canUseProvider = QnServer::HiQualityCatalog
+    bool canUseProvider = m_catalog == QnServer::HiQualityCatalog
         || !cameraResource || cameraResource->hasDualStreaming();
 
     if (!m_resource->hasFlags(Qn::foreigner) && m_resource->isInitialized() && canUseProvider &&
