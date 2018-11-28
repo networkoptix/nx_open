@@ -114,7 +114,7 @@
                 }
             },
             "internalName": "ShockDetection",
-            "description": "Shock event %1",
+            "description": "Shock detection %1",
             "positiveState": "has been detected",
             "negativeState": "is not detected",
             "flags": "stateDependent"
@@ -127,7 +127,7 @@
                 }
             },
             "internalName": "TemperatureChangeDetection",
-            "description": "Temperature change %1",
+            "description": "Temperature Change %1",
             "positiveState": "has been detected",
             "negativeState": "is not detected",
             "flags": "stateDependent"
