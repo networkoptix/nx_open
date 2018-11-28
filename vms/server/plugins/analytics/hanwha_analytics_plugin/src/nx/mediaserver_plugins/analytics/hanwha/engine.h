@@ -61,7 +61,7 @@ private:
     struct SharedResources
     {
         std::unique_ptr<MetadataMonitor> monitor;
-        std::shared_ptr<nx::mediaserver_core::plugins::HanwhaSharedResourceContext> sharedContext;
+        std::shared_ptr<nx::vms::server::plugins::HanwhaSharedResourceContext> sharedContext;
         std::atomic<int> monitorUsageCount{0};
         std::atomic<int> deviceAgentCount{0};
 
@@ -80,8 +80,8 @@ private:
 
     boost::optional<QList<QString>> eventTypeIdsFromParameters(
         const nx::utils::Url& url,
-        const nx::mediaserver_core::plugins::HanwhaCgiParameters& parameters,
-        const nx::mediaserver_core::plugins::HanwhaResponse& eventStatuses,
+        const nx::vms::server::plugins::HanwhaCgiParameters& parameters,
+        const nx::vms::server::plugins::HanwhaResponse& eventStatuses,
         int channel) const;
 
     std::shared_ptr<SharedResources> sharedResources(

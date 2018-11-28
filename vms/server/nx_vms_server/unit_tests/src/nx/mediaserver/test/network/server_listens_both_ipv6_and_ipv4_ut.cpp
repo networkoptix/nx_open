@@ -4,7 +4,7 @@
 #include <nx/network/http/http_client.h>
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 namespace test {
 namespace network {
 
@@ -59,5 +59,5 @@ TEST(ServerListensBothIpv6AndIpv4, main)
 
 } // namespace network
 } // namespace test
-} // namespace mediaserver
+} // namespace vms::server
 } // namespace nx

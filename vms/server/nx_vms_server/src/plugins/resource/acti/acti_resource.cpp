@@ -57,7 +57,7 @@ const char* kApiRequestPath = "/cgi-bin/cmd/";
 } // namespace
 
 QnActiResource::QnActiResource(QnMediaServerModule* serverModule):
-    nx::mediaserver::resource::Camera(serverModule),
+    nx::vms::server::resource::Camera(serverModule),
     m_desiredTransport(RtpTransport::_auto),
     m_rtspPort(DEFAULT_RTSP_PORT),
     m_hasAudio(false),
@@ -429,9 +429,9 @@ CameraDiagnostics::Result QnActiResource::maxFpsForSecondaryResolution(
     return CameraDiagnostics::NoErrorResult();
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnActiResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex)
+nx::vms::server::resource::StreamCapabilityMap QnActiResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex)
 {
-    using namespace nx::mediaserver::resource;
+    using namespace nx::vms::server::resource;
 
     const auto& resolutionList = m_resolutionList[(int)streamIndex];
 
@@ -1512,7 +1512,7 @@ void QnActiResource::initialize2WayAudio(const ActiSystemInfo& systemInfo)
         setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
 }
 
-std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
+std::vector<nx::vms::server::resource::Camera::AdvancedParametersProvider*>
     QnActiResource::advancedParametersProviders()
 {
     return {&m_advancedParametersProvider};

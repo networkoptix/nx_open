@@ -9,7 +9,7 @@
 #include "api/model/recording_stats_reply.h"
 
 QnRecordingStatsRestHandler::QnRecordingStatsRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

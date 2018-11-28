@@ -3,12 +3,12 @@
 #include <QtCore/QSize>
 #include <QtCore/QList>
 
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera.h>
 
 namespace nx {
 namespace test {
 
-using namespace nx::mediaserver;
+using namespace nx::vms::server;
 using R = QSize;
 using Resolution = R;
 using ResolutionList = QList<Resolution>;

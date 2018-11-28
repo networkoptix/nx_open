@@ -47,7 +47,7 @@ public:
 
     bool execute() override
     {
-        const auto camera = m_resource.dynamicCast<nx::mediaserver::resource::Camera>();
+        const auto camera = m_resource.dynamicCast<nx::vms::server::resource::Camera>();
         NX_CRITICAL(camera);
 
         QnCameraAdvancedParamValueMap values;
@@ -83,7 +83,7 @@ public:
 
     bool execute() override
     {
-        const auto camera = m_resource.dynamicCast<nx::mediaserver::resource::Camera>();
+        const auto camera = m_resource.dynamicCast<nx::vms::server::resource::Camera>();
         NX_CRITICAL(camera);
 
         QSet<QString> ids;
@@ -127,7 +127,7 @@ int QnCameraSettingsRestHandler::executeGet(
         &notFoundCameraId,
         params,
         {kCameraIdParam, kDeprecatedResIdParam})
-            .dynamicCast<nx::mediaserver::resource::Camera>();
+            .dynamicCast<nx::vms::server::resource::Camera>();
     if (!camera)
     {
         NX_WARNING(this, lm("Camera not found"));

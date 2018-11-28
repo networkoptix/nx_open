@@ -5,7 +5,7 @@
 #include <recorder/abstract_remote_archive_synchronization_task.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace recorder {
 
 using RemoteArchiveTaskDoneHandler = std::function<void(const QnUuid&)>;
@@ -31,5 +31,5 @@ private:
 
 
 } // namespace recorder
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

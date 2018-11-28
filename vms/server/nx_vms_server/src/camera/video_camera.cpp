@@ -471,7 +471,7 @@ void QnVideoCameraGopKeeper::clearVideoData()
 //  QnVideoCamera 
 
 QnVideoCamera::QnVideoCamera(
-    const nx::mediaserver::Settings& settings,
+    const nx::vms::server::Settings& settings,
     QnDataProviderFactory* dataProviderFactory,
     const QnResourcePtr& resource)
     :
@@ -842,11 +842,11 @@ MediaStreamCache* QnVideoCamera::liveCache( MediaQuality streamQuality )
         : nullptr;
 }
 
-nx::mediaserver::hls::LivePlaylistManagerPtr QnVideoCamera::hlsLivePlaylistManager( MediaQuality streamQuality ) const
+nx::vms::server::hls::LivePlaylistManagerPtr QnVideoCamera::hlsLivePlaylistManager( MediaQuality streamQuality ) const
 {
     return streamQuality < m_hlsLivePlaylistManager.size()
         ? m_hlsLivePlaylistManager[streamQuality]
-        : nx::mediaserver::hls::LivePlaylistManagerPtr();
+        : nx::vms::server::hls::LivePlaylistManagerPtr();
 }
 
 QnResourcePtr QnVideoCamera::resource() const
@@ -937,7 +937,7 @@ bool QnVideoCamera::ensureLiveCacheStarted(
 
         int removedChunksToKeepCount = m_settings.hlsRemovedChunksToKeep();
         m_hlsLivePlaylistManager[streamQuality] =
-            std::make_shared<nx::mediaserver::hls::LivePlaylistManager>(
+            std::make_shared<nx::vms::server::hls::LivePlaylistManager>(
                 m_liveCache[streamQuality].get(),
                 targetDurationUSec,
                 removedChunksToKeepCount);

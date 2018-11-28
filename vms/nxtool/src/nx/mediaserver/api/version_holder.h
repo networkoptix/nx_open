@@ -6,7 +6,7 @@
 #include <QString>
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 namespace api {
 
 class VersionHolder

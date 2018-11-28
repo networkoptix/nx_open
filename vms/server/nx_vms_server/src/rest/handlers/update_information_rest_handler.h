@@ -2,13 +2,13 @@
 
 #include <rest/server/fusion_rest_handler.h>
 
-namespace nx::mediaserver { class Settings; }
+namespace nx::vms::server { class Settings; }
 struct UpdateInformationRequestData;
 
 class QnUpdateInformationRestHandler: public QnFusionRestHandler
 {
 public:
-    QnUpdateInformationRestHandler(const nx::mediaserver::Settings* settings);
+    QnUpdateInformationRestHandler(const nx::vms::server::Settings* settings);
 
     virtual int executeGet(
         const QString& path,
@@ -25,5 +25,5 @@ private:
         const UpdateInformationRequestData& request) const;
 
 private:
-    const nx::mediaserver::Settings* m_settings = nullptr;
+    const nx::vms::server::Settings* m_settings = nullptr;
 };

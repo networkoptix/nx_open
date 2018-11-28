@@ -1,7 +1,7 @@
 #include "archive_delegate_wrapper.h"
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 ArchiveDelegateWrapper::ArchiveDelegateWrapper(std::unique_ptr<QnAbstractArchiveDelegate> delegate):
@@ -157,5 +157,5 @@ QnAbstractArchiveDelegate* ArchiveDelegateWrapper::delegate() const
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

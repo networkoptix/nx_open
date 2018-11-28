@@ -5,9 +5,9 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QFile>
 
-#include <nx/mediaserver/interactive_settings/qml_engine.h>
-#include <nx/mediaserver/interactive_settings/json_engine.h>
-#include <nx/mediaserver/interactive_settings/components/items.h>
+#include <nx/vms/server/interactive_settings/qml_engine.h>
+#include <nx/vms/server/interactive_settings/json_engine.h>
+#include <nx/vms/server/interactive_settings/components/items.h>
 
 static void PrintTo(const QJsonObject& object, ::std::ostream* os)
 {
@@ -19,7 +19,7 @@ static void PrintTo(const QVariantMap& map, ::std::ostream* os)
     *os << QJsonDocument(QJsonObject::fromVariantMap(map)).toJson().toStdString();
 }
 
-namespace nx::mediaserver::interactive_settings::test {
+namespace nx::vms::server::interactive_settings::test {
 
 namespace {
 
@@ -158,4 +158,4 @@ TEST(InteractiveSettings, rangeCheck)
     ASSERT_EQ(actualValues, expectedValues);
 }
 
-} // namespace nx::mediaserver::interactive_settings::test
+} // namespace nx::vms::server::interactive_settings::test

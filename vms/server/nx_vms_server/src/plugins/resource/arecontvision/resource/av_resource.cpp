@@ -32,7 +32,7 @@ const QString QnPlAreconVisionResource::MANUFACTURE(lit("ArecontVision"));
 #define MAX_RESPONSE_LEN (4*1024)
 
 QnPlAreconVisionResource::QnPlAreconVisionResource(QnMediaServerModule* serverModule):
-    nx::mediaserver::resource::Camera(serverModule),
+    nx::vms::server::resource::Camera(serverModule),
     m_totalMdZones(64),
     m_zoneSite(8),
     m_dualsensor(false),
@@ -159,10 +159,10 @@ void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> com
     httpClientCaptured->doGet( url );
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnPlAreconVisionResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex)
+nx::vms::server::resource::StreamCapabilityMap QnPlAreconVisionResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex)
 {
     // TODO: implement me
-    return nx::mediaserver::resource::StreamCapabilityMap();
+    return nx::vms::server::resource::StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result QnPlAreconVisionResource::initializeCameraDriver()

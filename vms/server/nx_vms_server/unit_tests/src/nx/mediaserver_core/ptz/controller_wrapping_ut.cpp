@@ -7,9 +7,9 @@
 
 #include <utils/math/space_mapper.h>
 
-#include <nx/mediaserver/camera_mock.h>
-#include <nx/mediaserver_core/ptz/server_ptz_helpers.h>
-#include <nx/mediaserver_core/ptz/server_ptz_controller_pool.h>
+#include <nx/vms/server/camera_mock.h>
+#include <nx/vms/server/ptz/server_ptz_helpers.h>
+#include <nx/vms/server/ptz/server_ptz_controller_pool.h>
 
 #include <core/ptz/ptz_mapper.h>
 #include <nx/core/ptz/test_support/test_ptz_controller.h>
@@ -17,9 +17,9 @@
 #include <nx/core/access/access_types.h>
 
 namespace core_ptz = nx::core::ptz;
-namespace mediaserver_ptz = nx::mediaserver_core::ptz;
+namespace mediaserver_ptz = nx::vms::server::ptz;
 
-using namespace nx::mediaserver::resource;
+using namespace nx::vms::server::resource;
 
 namespace nx {
 namespace mediaserver_core{
@@ -227,5 +227,5 @@ TEST_F(ControllerWrappingTest, wrapToRelativeMoveController)
 }
 
 } // namespace ptz
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

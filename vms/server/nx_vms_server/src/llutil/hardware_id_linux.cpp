@@ -24,7 +24,7 @@
 #include "licensing/hardware_info.h"
 #include "hardware_id.h"
 #include "hardware_id_p.h"
-#include <nx/mediaserver/root_fs.h>
+#include <nx/vms/server/root_fs.h>
 #include <media_server/media_server_module.h>
 #include <nx/utils/uuid.h>
 #include <media_server/media_server_module.h>
@@ -47,7 +47,7 @@ std::string trim(const std::string& str) {
     return result;
 }
 
-QString readFile(nx::mediaserver::RootFileSystem* rootTool, const char* path)
+QString readFile(nx::vms::server::RootFileSystem* rootTool, const char* path)
 {
     int fd = rootTool->open(path, QIODevice::ReadOnly);
     QFile file(path);
@@ -62,7 +62,7 @@ QString readFile(nx::mediaserver::RootFileSystem* rootTool, const char* path)
 }
 
 void getMemoryInfo(
-    nx::mediaserver::RootFileSystem* rootTool,
+    nx::vms::server::RootFileSystem* rootTool,
     QString &partNumber, QString &serialNumber)
 {
     bool result = rootTool->dmiInfo(&partNumber, &serialNumber);

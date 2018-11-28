@@ -7,7 +7,7 @@
 
 #include <base/types.h>
 
-namespace nx { namespace mediaserver { namespace api {
+namespace nx { namespace vms::server { namespace api {
     struct BaseServerInfo;
 }}}
 

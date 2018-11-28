@@ -2,7 +2,7 @@
 
 #include <plugins/resource/hanwha/hanwha_utils.h>
 
-using namespace nx::mediaserver_core::plugins;
+using namespace nx::vms::server::plugins;
 
 namespace {
 

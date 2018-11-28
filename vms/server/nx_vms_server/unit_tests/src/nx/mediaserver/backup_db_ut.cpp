@@ -275,4 +275,4 @@ TEST_F(BackupDbIt, FilesRotated)
     thenSeveralRotationsShouldBeObserved();
 }
 
-} // namespace nx::mediaserver::test
+} // namespace nx::vms::server::test

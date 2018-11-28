@@ -6,7 +6,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
 #include <recorder/wearable_archive_synchronization_state.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 #include <utils/common/connective.h>
 
 struct QnWearableStorageStats
@@ -19,7 +19,7 @@ struct QnWearableStorageStats
 
 class QnWearableUploadManager: 
     public Connective<QObject>, 
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 public:
@@ -31,7 +31,7 @@ public:
     bool consume(const QnUuid& cameraId, const QnUuid& token, const QString& uploadId, qint64 startTimeMs);
 
     bool isConsuming(const QnUuid& cameraId) const;
-    nx::mediaserver_core::recorder::WearableArchiveSynchronizationState state(const QnUuid& cameraId) const;
+    nx::vms::server::recorder::WearableArchiveSynchronizationState state(const QnUuid& cameraId) const;
 
 private:
     struct Private;

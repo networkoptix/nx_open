@@ -4,10 +4,10 @@
 #include <media_server/media_server_module.h>
 #include <motion/motion_helper.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
-#include <nx/mediaserver/camera_mock.h>
+#include <nx/vms/server/camera_mock.h>
 #include <nx/fusion/model_functions.h>
 
-namespace nx::mediaserver::test
+namespace nx::vms::server::test
 {
 
 static const int kSteps = 1200;
@@ -111,4 +111,4 @@ TEST_F(MotionArchive, findMotionDesc)
     ASSERT_EQ(deltaMs,result[0].durationMs);
 }
 
-} // nx::mediaserver::test
+} // nx::vms::server::test

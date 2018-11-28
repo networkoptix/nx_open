@@ -6,7 +6,7 @@
 #include <nx/utils/system_error.h>
 #include <core/resource_management/resource_pool.h>
 #include <media_server/media_server_module.h>
-#include <nx/mediaserver/root_fs.h>
+#include <nx/vms/server/root_fs.h>
 
 #include "file_deletor.h"
 
@@ -14,7 +14,7 @@ static const int POSTPONE_FILES_INTERVAL = 1000*60;
 static const int SPACE_CLEARANCE_INTERVAL = 10;
 
 QnFileDeletor::QnFileDeletor(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

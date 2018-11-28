@@ -73,7 +73,7 @@
 #include <media_server/media_server_module.h>
 
 #include <nx/vms/auth/time_based_nonce_provider.h>
-#include <nx/mediaserver/authenticator.h>
+#include <nx/vms/server/authenticator.h>
 #include <network/connection_validator.h>
 #include <network/default_tcp_connection_processor.h>
 #include <network/system_helpers.h>
@@ -190,8 +190,8 @@
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
-#include <nx/mediaserver/rest/device_analytics_settings_handler.h>
-#include <nx/mediaserver/rest/analytics_engine_settings_handler.h>
+#include <nx/vms/server/rest/device_analytics_settings_handler.h>
+#include <nx/vms/server/rest/analytics_engine_settings_handler.h>
 
 #include <rtsp/rtsp_connection.h>
 
@@ -224,7 +224,7 @@
 
 #include "platform/hardware_information.h"
 #include "platform/platform_abstraction.h"
-#include <nx/mediaserver_core/ptz/server_ptz_controller_pool.h>
+#include <nx/vms/server/ptz/server_ptz_controller_pool.h>
 #include "plugins/resource/acti/acti_resource.h"
 #include "common/common_module.h"
 #include <nx/vms/network/reverse_connection_listener.h>
@@ -252,8 +252,8 @@
 #include "cloud/cloud_integration_manager.h"
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <server/server_globals.h>
-#include <nx/mediaserver/unused_wallpapers_watcher.h>
-#include <nx/mediaserver/license_watcher.h>
+#include <nx/vms/server/unused_wallpapers_watcher.h>
+#include <nx/vms/server/license_watcher.h>
 #include <rest/helpers/permissions_helper.h>
 #include "misc/migrate_oldwin_dir.h"
 #include <common/static_common_module.h>
@@ -262,22 +262,22 @@
 #include <rest/helper/p2p_statistics.h>
 #include <recorder/archive_integrity_watcher.h>
 #include <nx/utils/std/cpp14.h>
-#include <nx/mediaserver/analytics/manager.h>
-#include <nx/mediaserver/analytics/sdk_object_factory.h>
+#include <nx/vms/server/analytics/manager.h>
+#include <nx/vms/server/analytics/sdk_object_factory.h>
 #include <nx/utils/platform/current_process.h>
 #include <rest/handlers/change_camera_password_rest_handler.h>
-#include <nx/mediaserver/fs/media_paths/media_paths.h>
-#include <nx/mediaserver/fs/media_paths/media_paths_filter_config.h>
+#include <nx/vms/server/fs/media_paths/media_paths.h>
+#include <nx/vms/server/fs/media_paths/media_paths_filter_config.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
-#include <nx/mediaserver/root_fs.h>
-#include <nx/mediaserver/server_update_manager.h>
+#include <nx/vms/server/root_fs.h>
+#include <nx/vms/server/server_update_manager.h>
 #include <mediaserver_ini.h>
 #include <proxy/2wayaudio/proxy_audio_receiver.h>
 #include <local_connection_factory.h>
 #include <core/resource/resource_command_processor.h>
 #include <rest/handlers/sync_time_rest_handler.h>
 #include <rest/handlers/metrics_rest_handler.h>
-#include <nx/mediaserver/event/event_connector.h>
+#include <nx/vms/server/event/event_connector.h>
 #include <nx/network/http/http_client.h>
 #include <core/resource_management/resource_data_pool.h>
 
@@ -290,7 +290,7 @@
     #include "nx1/info.h"
 #endif
 
-using namespace nx::mediaserver;
+using namespace nx::vms::server;
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -540,7 +540,7 @@ QnStorageResourcePtr MediaServerProcess::createStorage(const QnUuid& serverId, c
 
 QStringList MediaServerProcess::listRecordFolders(bool includeNonHdd) const
 {
-    using namespace nx::mediaserver::fs::media_paths;
+    using namespace nx::vms::server::fs::media_paths;
 
     auto mediaPathList = get(FilterConfig::createDefault(
         m_platform.get(), includeNonHdd, &serverModule()->settings()));
@@ -2674,7 +2674,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param settings JSON object consisting of name-value settings pairs.
      */
     reg("ec2/analyticsEngineSettings",
-        new nx::mediaserver::rest::AnalyticsEngineSettingsHandler(serverModule()));
+        new nx::vms::server::rest::AnalyticsEngineSettingsHandler(serverModule()));
 
     /**%apidoc GET /ec2/deviceAnalyticsSettings
      * Return settings values of the specified device-engine pair.
@@ -2689,7 +2689,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param settings JSON object consisting of name-value settings pairs.
      */
     reg("ec2/deviceAnalyticsSettings",
-        new nx::mediaserver::rest::DeviceAnalyticsSettingsHandler(serverModule()));
+        new nx::vms::server::rest::DeviceAnalyticsSettingsHandler(serverModule()));
 
     reg(
         nx::network::http::Method::options,
@@ -2744,7 +2744,7 @@ bool MediaServerProcess::initTcpListener(
 
     configureApiRestrictions(m_universalTcpListener->authenticator()->restrictionList());
     connect(
-        m_universalTcpListener->authenticator(), &nx::mediaserver::Authenticator::emptyDigestDetected,
+        m_universalTcpListener->authenticator(), &nx::vms::server::Authenticator::emptyDigestDetected,
         this, &MediaServerProcess::at_emptyDigestDetected);
 
     m_universalTcpListener->httpModManager()->addCustomRequestMod(std::bind(
@@ -2791,9 +2791,9 @@ bool MediaServerProcess::initTcpListener(
     regTcp<QnProgressiveDownloadingConsumer>("HTTP", "media", serverModule());
     regTcp<QnIOMonitorConnectionProcessor>("HTTP", "api/iomonitor");
 
-    nx::mediaserver::hls::HttpLiveStreamingProcessor::setMinPlayListSizeToStartStreaming(
+    nx::vms::server::hls::HttpLiveStreamingProcessor::setMinPlayListSizeToStartStreaming(
         serverModule()->settings().hlsPlaylistPreFillChunks());
-    regTcp<nx::mediaserver::hls::HttpLiveStreamingProcessor>("HTTP", "hls", serverModule());
+    regTcp<nx::vms::server::hls::HttpLiveStreamingProcessor>("HTTP", "hls", serverModule());
 
     // Our HLS uses implementation uses authKey (generated by target server) to skip authorization,
     // to keep this warning we should not ask for authorization along the way.
@@ -3163,7 +3163,7 @@ void MediaServerProcess::updateGuidIfNeeded()
 }
 
 nx::utils::log::Settings MediaServerProcess::makeLogSettings(
-    const nx::mediaserver::Settings& settings)
+    const nx::vms::server::Settings& settings)
 {
     nx::utils::log::Settings s;
     s.loggers.resize(1);
@@ -3225,7 +3225,7 @@ void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
             binaryPath,
             {
                 QnLog::HWID_LOG,
-                nx::utils::log::Tag(typeid(nx::mediaserver::LicenseWatcher))
+                nx::utils::log::Tag(typeid(nx::vms::server::LicenseWatcher))
             }),
         /*writeLogHeader*/ false);
 
@@ -3268,7 +3268,7 @@ void MediaServerProcess::initializeHardwareId()
             binaryPath,
             {
                 QnLog::HWID_LOG,
-                nx::utils::log::Tag(toString(typeid(nx::mediaserver::LicenseWatcher)))
+                nx::utils::log::Tag(toString(typeid(nx::vms::server::LicenseWatcher)))
             }));
 
     LLUtil::initHardwareId(serverModule());
@@ -3287,7 +3287,7 @@ void MediaServerProcess::initializeHardwareId()
 
 void MediaServerProcess::connectArchiveIntegrityWatcher()
 {
-    using namespace nx::mediaserver;
+    using namespace nx::vms::server;
     auto serverArchiveIntegrityWatcher = static_cast<ServerArchiveIntegrityWatcher*>(
         serverModule()->archiveIntegrityWatcher());
 
@@ -3861,7 +3861,7 @@ void MediaServerProcess::connectSignals()
     connect(m_createDbBackupTimer.get(), &QTimer::timeout,
         [this]()
         {
-            auto utils = nx::mediaserver::Utils(serverModule());
+            auto utils = nx::vms::server::Utils(serverModule());
             utils.backupDatabase();
         });
 
@@ -4265,7 +4265,7 @@ void MediaServerProcess::run()
         commonModule()->createMessageProcessor<QnServerMessageProcessor>(this->serverModule());
 
     m_remoteArchiveSynchronizer = std::make_unique<
-        nx::mediaserver_core::recorder::RemoteArchiveSynchronizer>(serverModule.get());
+        nx::vms::server::recorder::RemoteArchiveSynchronizer>(serverModule.get());
 
     setUpDataFromSettings();
     initializeCloudConnect();
@@ -4297,7 +4297,7 @@ void MediaServerProcess::run()
     if (!serverModule->serverDb()->open())
         return;
 
-    auto utils = nx::mediaserver::Utils(serverModule.get());
+    auto utils = nx::vms::server::Utils(serverModule.get());
     if (utils.timeToMakeDbBackup())
     {
         utils.backupDatabase(ec2::detail::QnDbManager::ecsDbFileName(
@@ -4308,7 +4308,7 @@ void MediaServerProcess::run()
     if (!connectToDatabase())
         return;
 
-    m_discoveryMonitor = std::make_unique<nx::mediaserver::discovery::DiscoveryMonitor>(
+    m_discoveryMonitor = std::make_unique<nx::vms::server::discovery::DiscoveryMonitor>(
         m_ec2ConnectionFactory->messageBus());
 
     initializeAnalyticsEvents();
@@ -4658,7 +4658,7 @@ int MediaServerProcess::main(int argc, char* argv[])
     return (gRestartFlag && res == 0) ? 1 : 0;
 }
 
-const nx::mediaserver::CmdLineArguments MediaServerProcess::cmdLineArguments() const
+const nx::vms::server::CmdLineArguments MediaServerProcess::cmdLineArguments() const
 {
     return m_cmdLineArguments;
 }

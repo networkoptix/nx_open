@@ -16,7 +16,7 @@
 #include <utils/common/util.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 namespace {
@@ -448,5 +448,5 @@ QnAbstractMediaDataPtr HanwhaStreamReader::getNextData()
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

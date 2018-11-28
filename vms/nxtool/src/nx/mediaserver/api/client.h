@@ -14,7 +14,7 @@ class QTimeZone;
 class QString;
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 namespace api {
 
 /** singleton

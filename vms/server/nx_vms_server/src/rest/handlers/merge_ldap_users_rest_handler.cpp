@@ -23,7 +23,7 @@ int QnMergeLdapUsersRestHandler::executePost(
     QnLdapUsers ldapUsers;
     const auto ldapResult = QnUniversalTcpListener::authenticator(owner->owner())->ldapManager()
         ->fetchUsers(ldapUsers);
-    if (ldapResult != nx::mediaserver::LdapResult::NoError)
+    if (ldapResult != nx::vms::server::LdapResult::NoError)
 	{
         result.setError(QnRestResult::CantProcessRequest, toString(ldapResult));
         return nx::network::http::StatusCode::ok;

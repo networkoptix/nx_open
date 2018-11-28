@@ -458,10 +458,10 @@ bool QnDigitalWatchdogResource::setAdvancedParametersUnderLock(
     return success && m_cameraProxy->setParams(moreParamsToProcess, &result);
 }
 
-nx::mediaserver::resource::StreamCapabilityMap
+nx::vms::server::resource::StreamCapabilityMap
     QnDigitalWatchdogResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex)
 {
-    using namespace nx::mediaserver::resource;
+    using namespace nx::vms::server::resource;
     auto onvifResult = base_type::getStreamCapabilityMapFromDrives(streamIndex);
 #if 0
     // Switch here to test onvif-only videoencoders detection/setting.
@@ -470,7 +470,7 @@ nx::mediaserver::resource::StreamCapabilityMap
     const auto codecs = m_cproApiClient->getSupportedVideoCodecs(streamIndex);
     if (!codecs)
         return onvifResult;
-    nx::mediaserver::resource::StreamCapabilityMap result;
+    nx::vms::server::resource::StreamCapabilityMap result;
     for (const auto& codec: *codecs)
     {
         for (const auto& onvifKeys: onvifResult.keys())

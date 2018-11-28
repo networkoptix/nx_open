@@ -28,7 +28,7 @@
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/vms/event/events/events.h>
 #include <nx/sdk/analytics/engine.h>
-#include <nx/mediaserver/resource/shared_context_pool.h>
+#include <nx/vms/server/resource/shared_context_pool.h>
 #include <nx/streaming/abstract_archive_delegate.h>
 
 #include <core/resource_management/resource_discovery_manager.h>
@@ -41,7 +41,7 @@
 #include <core/resource_management/resource_data_pool.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 using namespace nx::core;
@@ -787,11 +787,11 @@ int HanwhaResource::maxProfileCount() const
     return m_maxProfileCount;
 }
 
-nx::mediaserver::resource::StreamCapabilityMap HanwhaResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap HanwhaResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex streamIndex)
 {
     // TODO: implement me
-    return nx::mediaserver::resource::StreamCapabilityMap();
+    return nx::vms::server::resource::StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result HanwhaResource::initializeCameraDriver()
@@ -2475,7 +2475,7 @@ int HanwhaResource::streamBitrate(
         if (isNvr() && !isBypassSupported())
             streamParams.quality = Qn::StreamQuality::normal;
 
-        bitrateKbps = nx::mediaserver::resource::Camera::suggestBitrateKbps(streamParams, role);
+        bitrateKbps = nx::vms::server::resource::Camera::suggestBitrateKbps(streamParams, role);
     }
 
     auto streamCapability = cameraMediaCapability()
@@ -3734,7 +3734,7 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(
 QnConstResourceAudioLayoutPtr HanwhaResource::getAudioLayout(
     const QnAbstractStreamDataProvider* dataProvider) const
 {
-    auto defaultLayout = nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
+    auto defaultLayout = nx::vms::server::resource::Camera::getAudioLayout(dataProvider);
     if (!isAudioEnabled())
         return defaultLayout;
 
@@ -3906,5 +3906,5 @@ Ptz::Capabilities HanwhaResource::ptzCapabilities(nx::core::ptz::Type ptzType) c
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

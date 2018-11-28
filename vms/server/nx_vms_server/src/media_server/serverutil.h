@@ -11,7 +11,7 @@
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/api/data/timestamp.h>
 #include <api/model/configure_system_data.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class QnCommonModule;
 
@@ -21,7 +21,7 @@ namespace ec2 {
 }
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 
 // Config based system name
 class SystemName: public ServerModuleAware
@@ -102,5 +102,5 @@ public:
     bool timeToMakeDbBackup() const;
 };
 
-} // namespace mediaserver
+} // namespace vms::server
 } // namespace nx

@@ -9,7 +9,7 @@
 #include <common/common_module_aware.h>
 
 #include <nx/utils/thread/mutex.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class QFile;
 class QIODevice;
@@ -17,7 +17,7 @@ class QnZipExtractor;
 
 class QnServerUpdateTool:
     public QObject,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 

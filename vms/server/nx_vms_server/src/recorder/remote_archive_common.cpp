@@ -3,7 +3,7 @@
 #include <chrono>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace recorder {
 
 using namespace nx::core::resource;
@@ -81,5 +81,5 @@ QnTimePeriodList mergeOverlappedChunks(const nx::core::resource::OverlappedRemot
 }
 
 } // namespace nx
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace recorder

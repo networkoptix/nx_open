@@ -15,7 +15,7 @@
 #include <nx/mediaserver/api/version_holder.h>
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 namespace api {
 
 struct InterfaceInfo;

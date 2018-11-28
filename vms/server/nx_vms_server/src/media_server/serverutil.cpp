@@ -71,7 +71,7 @@ namespace
 static QnMediaServerResourcePtr m_server;
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 
 bool Utils::isLocalAppServer(const QString &host)
 {
@@ -351,5 +351,5 @@ QByteArray Utils::autoDetectHttpContentType(const QByteArray& msgBody)
     return kDefaultContentType;
 }
 
-} // namespace mediaserver
+} // namespace vms::server
 } // namespace nx

@@ -5,13 +5,13 @@
 #include "core/resource/network_resource.h"
 #include "core/resource_management/resource_searcher.h"
 #include "onvif_resource_searcher_wsdd.h"
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
-namespace nx::mediaserver { class Settings; }
+namespace nx::vms::server { class Settings; }
 
 class OnvifResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
 public:
     OnvifResourceSearcher(QnMediaServerModule* serverModule);

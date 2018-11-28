@@ -30,7 +30,7 @@
 #include <set>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <rest/server/json_rest_handler.h>

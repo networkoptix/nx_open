@@ -187,7 +187,7 @@ QnMultiserverBookmarksRestHandler::QnMultiserverBookmarksRestHandler(
     QnMediaServerModule* serverModule,const QString& path)
     :
     QnFusionRestHandler(),
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
     QnMultiserverBookmarksRestHandlerPrivate::urlPath = path;
 }

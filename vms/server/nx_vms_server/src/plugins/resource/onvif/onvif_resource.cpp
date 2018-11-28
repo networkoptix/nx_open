@@ -500,7 +500,7 @@ const QString QnPlOnvifResource::fetchMacAddress(
 
 void QnPlOnvifResource::setHostAddress(const QString &ip)
 {
-    //nx::mediaserver::resource::Camera::se
+    //nx::vms::server::resource::Camera::se
     {
         QnMutexLocker lock(&m_mutex);
 
@@ -521,7 +521,7 @@ void QnPlOnvifResource::setHostAddress(const QString &ip)
         }
     }
 
-    nx::mediaserver::resource::Camera::setHostAddress(ip);
+    nx::vms::server::resource::Camera::setHostAddress(ip);
 }
 
 const QString QnPlOnvifResource::createOnvifEndpointUrl(const QString& ipAddress)
@@ -620,12 +620,12 @@ QnAbstractStreamDataProvider* QnPlOnvifResource::createLiveDataProvider()
     return new QnOnvifStreamReader(toSharedPointer(this));
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex streamIndex)
 {
 #if 1
     //old version
-    using namespace nx::mediaserver::resource;
+    using namespace nx::vms::server::resource;
 
     QnMutexLocker lock(&m_mutex);
 
@@ -658,7 +658,7 @@ nx::mediaserver::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapab
     return result;
 #else
     // new version
-    using namespace nx::mediaserver::resource;
+    using namespace nx::vms::server::resource;
 
     QnMutexLocker lock(&m_mutex);
 
@@ -929,7 +929,7 @@ int QnPlOnvifResource::suggestBitrateKbps(
     const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const
 {
     return strictBitrate(
-        nx::mediaserver::resource::Camera::suggestBitrateKbps(streamParams, role), role);
+        nx::vms::server::resource::Camera::suggestBitrateKbps(streamParams, role), role);
 }
 
 int QnPlOnvifResource::strictBitrate(int bitrate, Qn::ConnectionRole role) const
@@ -1696,7 +1696,7 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
     if (!onvifR)
         return false;
 
-    bool result = nx::mediaserver::resource::Camera::mergeResourcesIfNeeded(source);
+    bool result = nx::vms::server::resource::Camera::mergeResourcesIfNeeded(source);
 
     QString onvifUrlSource = onvifR->getDeviceOnvifUrl();
     if (!onvifUrlSource.isEmpty() && getDeviceOnvifUrl() != onvifUrlSource)
@@ -3035,7 +3035,7 @@ bool QnPlOnvifResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMa
     return m_prevOnvifResultCode.errorCode == CameraDiagnostics::ErrorCode::noError;
 }
 
-std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
+std::vector<nx::vms::server::resource::Camera::AdvancedParametersProvider*>
     QnPlOnvifResource::advancedParametersProviders()
 {
     return {&m_advancedParametersProvider};
@@ -4422,7 +4422,7 @@ QnAudioTransmitterPtr QnPlOnvifResource::initializeTwoWayAudio()
         NX_VERBOSE(this, lm("Detected audio output %1 on %2").args(
             audioOutputConfigurationToken(), soapWrapper.endpoint()));
 
-        return std::make_shared<nx::mediaserver_core::plugins::OnvifAudioTransmitter>(this);
+        return std::make_shared<nx::vms::server::plugins::OnvifAudioTransmitter>(this);
     }
 
     NX_VERBOSE(this, lm("No sutable audio outputs are detected on %1").arg(soapWrapper.endpoint()));
@@ -4447,7 +4447,7 @@ QnAudioTransmitterPtr QnPlOnvifResource::initializeTwoWayAudioByResourceData()
     const auto params = resourceData().value<TwoWayAudioParams>(ResourceDataKey::kTwoWayAudio);
     if (params.engine.toLower() == QString("onvif"))
     {
-        result.reset(new nx::mediaserver_core::plugins::OnvifAudioTransmitter(this));
+        result.reset(new nx::vms::server::plugins::OnvifAudioTransmitter(this));
     }
     else if (params.engine.toLower() == QString("basic") || params.engine.isEmpty())
     {

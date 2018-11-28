@@ -14,10 +14,10 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/dataprovider/live_stream_params.h>
-#include <nx/mediaserver/analytics/abstract_video_data_receptor.h>
+#include <nx/vms/server/analytics/abstract_video_data_receptor.h>
 #include <core/dataconsumer/data_copier.h>
-#include <nx/mediaserver/server_module_aware.h>
-#include <nx/mediaserver/resource/resource_fwd.h>
+#include <nx/vms/server/server_module_aware.h>
+#include <nx/vms/server/resource/resource_fwd.h>
 
 static const int META_FRAME_INTERVAL = 10;
 static const int META_DATA_DURATION_MS = 300;
@@ -25,12 +25,12 @@ static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 1024 * 768;
 
 class QnLiveStreamProvider:
     public QnAbstractMediaStreamDataProvider,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
 public:
     class MetadataDataReceptor;
 
-    QnLiveStreamProvider(const nx::mediaserver::resource::CameraPtr& res);
+    QnLiveStreamProvider(const nx::vms::server::resource::CameraPtr& res);
     virtual ~QnLiveStreamProvider();
 
     virtual void setRole(Qn::ConnectionRole role) override;
@@ -98,7 +98,7 @@ private:
     void emitAnalyticsEventIfNeeded(const QnAbstractCompressedMetadataPtr& metadata);
     QnLiveStreamParams mergeWithAdvancedParams(const QnLiveStreamParams& params);
 
-    nx::mediaserver::analytics::AbstractVideoDataReceptorPtr
+    nx::vms::server::analytics::AbstractVideoDataReceptorPtr
         getVideoDataReceptorForMetadataPluginsIfNeeded(
             const QnCompressedVideoDataPtr& compressedFrame,
             bool* outNeedUncompressedFrame);
@@ -130,7 +130,7 @@ private:
     int m_framesSincePrevMediaStreamCheck;
     QWeakPointer<QnAbstractVideoCamera> m_owner;
 
-    QWeakPointer<nx::mediaserver::analytics::AbstractVideoDataReceptor> m_videoDataReceptor;
+    QWeakPointer<nx::vms::server::analytics::AbstractVideoDataReceptor> m_videoDataReceptor;
     QSharedPointer<MetadataDataReceptor> m_metadataReceptor;
     QnAbstractDataReceptorPtr m_analyticsEventsSaver;
     QSharedPointer<DataCopier> m_dataReceptorMultiplexer;

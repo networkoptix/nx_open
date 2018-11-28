@@ -44,7 +44,7 @@ QnConfigureRestHandler::QnConfigureRestHandler(
     QnMediaServerModule* serverModule)
     :
     QnJsonRestHandler(),
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 
@@ -77,7 +77,7 @@ int QnConfigureRestHandler::execute(
     QnJsonRestResult &result,
     const QnRestConnectionProcessor* owner)
 {
-    nx::mediaserver::Utils utils(serverModule());
+    nx::vms::server::Utils utils(serverModule());
 
     nx::vms::utils::SystemMergeProcessor systemMergeProcessor(owner->commonModule());
     using MergeStatus = ::utils::MergeSystemsStatus::Value;

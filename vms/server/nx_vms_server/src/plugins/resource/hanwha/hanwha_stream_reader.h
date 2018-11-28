@@ -10,7 +10,7 @@
 #include <plugins/resource/hanwha/hanwha_shared_resource_context.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 class HanwhaStreamReader: public QnRtpStreamReader
@@ -65,5 +65,5 @@ private:
 };
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

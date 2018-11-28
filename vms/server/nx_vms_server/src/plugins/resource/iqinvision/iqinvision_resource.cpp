@@ -5,7 +5,7 @@
 const QString QnPlIqResource::MANUFACTURE(lit("IqEye"));
 
 QnPlIqResource::QnPlIqResource(QnMediaServerModule* serverModule):
-    nx::mediaserver::resource::Camera(serverModule)
+    nx::vms::server::resource::Camera(serverModule)
 {
     setVendor(MANUFACTURE);
 }
@@ -34,11 +34,11 @@ void QnPlIqResource::setCroppingPhysical(QRect /*cropping*/)
     // Do nothing.
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnPlIqResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnPlIqResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me
-    return nx::mediaserver::resource::StreamCapabilityMap();
+    return nx::vms::server::resource::StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result QnPlIqResource::initializeCameraDriver()

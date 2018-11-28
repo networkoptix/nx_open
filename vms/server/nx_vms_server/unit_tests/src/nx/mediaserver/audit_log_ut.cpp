@@ -9,7 +9,7 @@
 
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 namespace test {
 
 class AuditManagerTest: public ::testing::Test
@@ -58,5 +58,5 @@ TEST_F(AuditManagerTest, testMergeRecords)
 }
 
 } // namespace test
-} // namespace mediaserver
+} // namespace vms::server
 } // namespace nx
