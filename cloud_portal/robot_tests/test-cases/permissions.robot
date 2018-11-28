@@ -277,3 +277,16 @@ Share with unregistered user - brings them to registration page with code with c
     Go To    ${link}
     Register    ${TEST FIRST NAME}    ${TEST LAST NAME}    ${random email}    ${password}
     Validate Log In
+
+Sharing system with a user who is already in the list updates their permissions
+    [tags]    C41892
+    ${random email}    Get Random Email    ${BASE EMAIL}
+    Log in to Auto Tests System    ${email}
+    Verify In System    Auto Tests
+    Share To    ${random email}    ${ADMIN TEXT}
+    Check For Alert    ${NEW PERMISSIONS SAVED}
+    Check User Permissions    ${random email}    ${ADMIN TEXT}
+    Share To    ${random email}    ${VIEWER TEXT}
+    Check For Alert    ${NEW PERMISSIONS SAVED}
+    Check User Permissions    ${random email}    ${VIEWER TEXT}
+    Remove User Permissions    ${random email}
