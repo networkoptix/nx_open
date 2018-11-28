@@ -100,7 +100,7 @@ buildDistribution()
         "$CURRENT_BUILD_DIR" "$APP_DIR" "$BUILD_DIR/bin" "$BUILD_DIR/lib" "$CLIENT_HELP_PATH" "$QT_DIR" \
         "$QT_VERSION"
 
-    if [[ $MAC_SKIP_SIGN = false ]]
+    if [[ $CODE_SIGNING = true ]]
     then
         local -r KEYCHAIN_ARGS=""
 

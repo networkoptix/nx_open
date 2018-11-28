@@ -186,7 +186,7 @@ if(IOS)
         "-framework AVFoundation"
     )
 
-    if(NOT ios.skip.sign)
+    if(codeSigning)
         prepare_mac_keychain(mobile_client)
     endif()
 
