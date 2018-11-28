@@ -33,7 +33,7 @@ def log_error(error, user_email, type, message, lang, customization, queue, atte
                 customization,
                 queue,
                 attempt,
-                traceback.format_exc())
+                traceback.format_exc().replace("Traceback", ""))
 
     if isinstance(error, SMTPException) or isinstance(error, SMTPServerDisconnected):
         logger.warning(error_formatted)
