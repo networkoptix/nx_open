@@ -100,11 +100,11 @@ void QnConnectToCloudWatcher::at_updateConnection()
                     NX_WARNING(this, lm("Error fetching cloud_db endpoint. HTTP result: %1")
                         .arg(statusCode));
                     // try once more later
-                    metaObject()->invokeMethod(this, "restartTimer", Qt::QueuedConnection);
+                    metaObject()->invokeMethod(this, &QnConnectToCloudWatcher::restartTimer, Qt::QueuedConnection);
                     return;
                 }
                 setCloudDbUrl(url);
-                metaObject()->invokeMethod(this, "at_updateConnection", Qt::QueuedConnection);
+                metaObject()->invokeMethod(this, &QnConnectToCloudWatcher::at_updateConnection, Qt::QueuedConnection);
             });
     }
 }
