@@ -1,7 +1,7 @@
 UPDATE_ZIP="@client_update_distribution_name@.zip"
 DISTRIBUTION_DMG="@client_distribution_name@.dmg"
 MAC_SIGN_IDENTITY="@mac.sign.identity@"
-MAC_SKIP_SIGN="@mac.skip.sign@"
+CODE_SIGNING="@codeSigning@"
 PACKAGES_DIR="@PACKAGES_DIR@"
 QT_DIR="@QT_DIR@"
 QT_VERSION="@qt_version@"

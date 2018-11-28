@@ -9,7 +9,7 @@ if(useLoginKeychain)
     set(codeSigningKeychainName)
 endif()
 
-if(NOT useLoginKeychain AND NOT (mac.skip.sign AND ios.skip.sign))
+if(NOT useLoginKeychain AND codeSigning)
     nx_find_first_matching_file(certificate "${certificates_path}/macosx/*.p12")
     if(NOT certificate)
         message(FATAL_ERROR "Cannot find any certificates in ${certificates_path}/macosx")
