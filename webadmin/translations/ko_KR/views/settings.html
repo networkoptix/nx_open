@@ -9,8 +9,7 @@
                전원을 끄고 하드디스크를 설치 하세요
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
-                This device needs network connection to work.<br>
-                Please connect it to the local network or Internet
+                이 장치에 네트워크 연결이 필요 합니다. <br>로컬 네트워크 or 인터넷에 연결하세요
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 이 장치는 네트워크 구성이 잘못 되었습니다.. <br>네트워크에 연결하거나 올바른 IP 주소를 설정 합니다.

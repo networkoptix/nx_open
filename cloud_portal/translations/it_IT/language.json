@@ -10,7 +10,7 @@
     "loginButton": "Accesso",
     "logoutAuthorisedTitle": "Ha già effettuato l'accesso",
     "logoutAuthorisedContinueButton": "Continua",
-    "logoutAuthorisedLogoutButton": "Scollegati"
+    "logoutAuthorisedLogoutButton": "Disconnetti"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
