@@ -4,7 +4,7 @@
 
     <button class="btn btn-dropdown-toggle dropdown-toggle"
             (click)="show = !show"
-            type="button" id="genericSelect" data-toggle="dropdown">
+            type="button" data-toggle="dropdown">
 
         <span [innerHtml]="numSelected"></span>
         <div class="nav-arrow">
@@ -12,28 +12,30 @@
             <span></span>
         </div>
     </button>
-    <ul class="dropdown-menu" [nxArrowNav]="show"
+    <div class="dropdown-menu" [nxArrowNav]="show"
          [style.display]="show ? 'inline-block' : 'none'"
          aria-labelledby="multiSelect">
 
-        <li class="dropdown-item-container" *ngIf="canSelectAll">
-            <a class="dropdown-item inset" (click)="show = false; selectAll()"
-               href translate>All</a>
-        </li>
+        <ul class="dropdown-menu--header" *ngIf="canSelectAll">
+            <li class="dropdown-item-container" >
+                <a class="dropdown-item inset" (click)="selectAll();"
+                   href translate>All</a>
+            </li>
+            <li role="separator" class="dropdown-divider"></li>
+        </ul>
 
-        <li class="dropdown-divider" role="separator" *ngIf="canSelectAll"></li>
+        <ul class="dropdown-menu--list">
+            <li class="dropdown-item-container" *ngFor="let item of items">
+                <nx-checkbox
+                        [compId]="item.id"
+                        [checked]="item.selected"
+                        (click)="change($event, item)">
+                </nx-checkbox>
 
-        <li class="dropdown-item-container" *ngFor="let item of items">
-            <nx-checkbox
-                    [compId]="item.label"
-                    [checked]="item.selected"
-                    (click)="change(item)">
-            </nx-checkbox>
-
-            <label for="{{item.label}}">{{item.label}}</label>
-            <!--<a class="dropdown-item inset" (click)="change(item)">-->
-                <!--<span>{{item.label}}</span>-->
-            <!--</a>-->
-        </li>
-    </ul>
+                <label for="{{item.id}}"
+                       class="dropdown-item inset">{{item.label}}
+                </label>
+            </li>
+        </ul>
+    </div>
 </div>

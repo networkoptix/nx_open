@@ -1,6 +1,6 @@
 import {
     Component, OnInit, ViewEncapsulation,
-    Input, forwardRef, OnChanges, SimpleChanges, ViewChild, ElementRef
+    Input, forwardRef, OnChanges, SimpleChanges, ViewChild, ElementRef, Output, EventEmitter
 } from '@angular/core';
 import { TranslateService }                        from '@ngx-translate/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -13,8 +13,8 @@ const noop = () => {
      canSelectAll?
      description="Roles"
      [items]="[{label: 'a', id: 1}, {label: 'b', id:3}]"
-     [(ngModel)]="[1, 3]"       <- selected items id's
-     required>
+     [ngModel]="[1, 3]"       <- selected items id's
+     (ngModelChanged)="onChange(result)">
  </nx-select>
  */
 
@@ -35,10 +35,8 @@ const noop = () => {
 export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnChanges {
     @Input('items') itemsOrig: any;
     @Input() canSelectAll: any;
-    // @Output() onSelected = new EventEmitter<string>();
 
     private items: any;
-    private message: string;
     private show: boolean;
     private numSelected: string;
     private innerValue: any;
@@ -50,11 +48,6 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
 
     constructor(private translate: TranslateService) {
         this.show = false;
-
-        translate.get('Please select...')
-                 .subscribe((res: string) => {
-                     this.message = res;
-                 });
     }
 
     // TODO: Bind ngModel to the component and eliminate EventEmitter
@@ -72,14 +65,16 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
             }
         });
 
+        // ensure 'change' will be triggered as checkboxes didn't fire click event
+        this.items = this.items.map(obj => ({ ...obj }));
         this.updateModel();
 
         // break anchor nav event
         return false;
     }
 
-    change(item) {
-        if (!item.selected) {
+    change(evt, item) {
+        if (!evt.target.checked) {
             const index = this.innerValue.indexOf(item.id);
             if (index > -1) {
                 this.innerValue.splice(index, 1);
@@ -89,20 +84,41 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
         }
 
         this.updateModel();
+
+        // break anchor nav event
+        return false;
     }
 
     updateItems() {
         this.items.forEach((item) => {
             item.selected = (this.innerValue !== undefined) ? (this.innerValue.indexOf(item.id) > -1) : false;
         });
+
+        // ensure 'change' will be triggered
+        this.items = this.items.map(obj => ({ ...obj }));
+    }
+
+    updateLabel() {
+        switch (this.innerValue.length) {
+            case 0: {
+                this.numSelected = 'None selected';
+                break;
+            }
+            case this.items.length: {
+                this.numSelected = 'All selected';
+                break;
+            }
+            default: {
+                this.numSelected = this.innerValue.length + ' Selected';
+                break;
+            }
+        }
     }
 
     updateModel() {
         // update the form
-        this.numSelected = this.innerValue.length || 'None';
-        this.onTouchedCallback();
+        this.updateLabel();
         this.onChangeCallback(this.innerValue);
-        // this.onSelected.emit(this.innerValue);
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -118,7 +134,7 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
     writeValue(value: any) {
         if (value !== null) {
             this.innerValue = value;
-            this.numSelected = this.innerValue.length || 'None';
+            this.updateLabel();
             this.updateItems();
         }
     }

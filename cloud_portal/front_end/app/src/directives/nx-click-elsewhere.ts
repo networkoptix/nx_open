@@ -10,8 +10,13 @@ export class NxClickElsewhereDirective {
 
     @HostListener('document:click', ['$event.target'])
     onMouseClick(targetElement) {
-        const clickedInside = this._elementRef.nativeElement.contains(targetElement);
+        if (targetElement.type === 'checkbox') {
+            // special case for nx-checkbox component not being recognized as internal
+            // for nx-multi-select
+            return;
+        }
 
+        const clickedInside = this._elementRef.nativeElement.contains(targetElement);
         if (!clickedInside) {
             this.nxClickElsewhere.emit(null);
         }
