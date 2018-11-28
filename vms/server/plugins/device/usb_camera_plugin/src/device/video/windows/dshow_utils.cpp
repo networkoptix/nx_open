@@ -61,8 +61,24 @@ BITMAPINFOHEADER *  DShowCompressionTypeDescriptor::videoInfoBitMapHeader() cons
 
 } // namespace
 
-//-------------------------------------------------------------------------------------------------
-// public api
+std::string getDeviceUniqueId(const std::string& devicePath)
+{
+    // devicePath expexted to be of form:
+    //
+    // \\?\usb#vid_0c45&pid_6340&mi_00#6&37859d1e&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+    //
+    // where uniqueId is contained between { and }. Example above has unique id of:
+    //
+    // 65e8773d-8f56-11d0-a3b9-00a0c9223196
+
+    int start = devicePath.find("{");
+    int end = devicePath.find("}");
+
+    if (start == std::string::npos || end == std::string::npos)
+        return std::string();
+
+    return devicePath.substr(start + 1, end - start - 1);
+}
 
 std::string getDeviceName(const std::string& devicePath)
 {
@@ -88,8 +104,10 @@ std::vector<DeviceData> getDeviceList()
     IMoniker *pMoniker = NULL;
     while (S_OK == pEnum->Next(1, &pMoniker, NULL))
     {
-        std::string devicePath = getDevicePath(pMoniker);
-        devices.push_back(DeviceData(getDeviceName(pMoniker), devicePath, devicePath));
+        std::string name = getDeviceName(pMoniker);
+        std::string path = getDevicePath(pMoniker);
+        std::string uniqueId = getDeviceUniqueId(path);
+        devices.push_back(DeviceData(name, path, uniqueId));
         pMoniker->Release();
     }
     pEnum->Release();
