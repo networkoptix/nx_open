@@ -2,14 +2,17 @@
 
 #include <nx/network/p2p_transport/i_p2p_transport.h>
 #include <nx/network/websocket/websocket_common_types.h>
+#include <nx/network/http/http_parser.h>
 
 namespace nx::network {
 
 class NX_NETWORK_API P2PHttpServerTransport: public IP2PTransport
 {
 public:
-      P2PHttpServerTransport(std::unique_ptr<AbstractStreamSocket> socket,
-          websocket::FrameType messageType = websocket::FrameType::binary);
+    P2PHttpServerTransport(std::unique_ptr<AbstractStreamSocket> socket,
+        websocket::FrameType messageType = websocket::FrameType::binary);
+
+    virtual ~P2PHttpServerTransport() override;
 
     void gotPostConnection(std::unique_ptr<AbstractStreamSocket> socket);
 
@@ -22,7 +25,25 @@ public:
     virtual SocketAddress getForeignAddress() const override;
 
 private:
+    struct ReadContext
+    {
+        http::Message message;
+        http::MessageParser parser;
+        size_t bytesParsed = 0;
+        nx::Buffer buffer;
+    };
+
     websocket::FrameType m_messageType;
+    std::unique_ptr<AbstractStreamSocket> m_sendSocket;
+    std::unique_ptr<AbstractStreamSocket> m_readSocket;
+    bool m_firstSend = true;
+    ReadContext m_readContext;
+
+    void onBytesRead(
+        SystemError::ErrorCode error,
+        size_t transferred,
+        nx::Buffer* const buffer,
+        IoCompletionHandler handler);
 };
 
 } // namespace nx::network

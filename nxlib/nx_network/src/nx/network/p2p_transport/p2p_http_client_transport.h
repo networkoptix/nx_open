@@ -14,11 +14,10 @@ private:
     using HttpClientPtr = std::unique_ptr<nx::network::http::AsyncClient>;
 
 public:
-    P2PHttpClientTransport(
-        HttpClientPtr readHttpClient,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onPostConnectionEstablished,
+    P2PHttpClientTransport(HttpClientPtr readHttpClient,
         websocket::FrameType frameType = websocket::FrameType::binary);
-    ~P2PHttpClientTransport();
+
+    virtual ~P2PHttpClientTransport() override;
 
     virtual void readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler) override;
     virtual void sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler) override;
@@ -29,14 +28,6 @@ public:
     virtual SocketAddress getForeignAddress() const override;
 
 private:
-    enum class State
-    {
-        gotGetConnectionOnly,
-        gotBothConnections,
-        postConnectionFailed,
-        failed
-    };
-
     class PostBodySource: public http::AbstractMsgBodySource
     {
     public:
@@ -49,24 +40,21 @@ private:
 
     private:
         websocket::FrameType m_messageType;
-        nx::Buffer m_data;
+        const nx::Buffer& m_data;
     };
+
+    using UserReadHandlePair = std::unique_ptr<std::pair<nx::Buffer* const, IoCompletionHandler>>;
 
     HttpClientPtr m_writeHttpClient;
     HttpClientPtr m_readHttpClient;
     http::MultipartContentParser m_multipartContentParser;
     std::queue<nx::Buffer> m_incomingMessageQueue;
-    std::queue<std::pair<nx::Buffer* const, IoCompletionHandler>> m_userReadQueue;
-    std::queue<std::pair<nx::Buffer, IoCompletionHandler>> m_userWriteQueue;
+    UserReadHandlePair m_userReadHandlerPair;
+    bool m_postInProgress = false;
     websocket::FrameType m_messageType;
-    State m_state = State::gotGetConnectionOnly;
+    bool m_failed;
 
-    void startEstablishingPostConnection(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onPostConnectionEstablished);
     void startReading();
-    void handoutIncomingMessage(nx::Buffer* const buffer, IoCompletionHandler handler);
-    void doPost(const nx::utils::Url& url, utils::MoveOnlyFunc<void(bool)> doneHandler,
-        const nx::Buffer& data = nx::Buffer());
 };
 
 } // namespace nx::network

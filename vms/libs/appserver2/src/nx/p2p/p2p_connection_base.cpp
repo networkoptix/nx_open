@@ -307,7 +307,7 @@ void ConnectionBase::onHttpClientDone()
     }
     else
     {
-        m_p2pTransport.reset(new P2PHttpClientTransport(std::move(m_httpClient), nullptr));
+        m_p2pTransport.reset(new P2PHttpClientTransport(std::move(m_httpClient)));
     }
 
     m_httpClient.reset();

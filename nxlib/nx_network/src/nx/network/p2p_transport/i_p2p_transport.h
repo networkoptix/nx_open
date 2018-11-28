@@ -8,6 +8,7 @@ namespace nx::network {
 class NX_NETWORK_API IP2PTransport: public aio::AbstractAsyncChannel
 {
 public:
+    virtual ~IP2PTransport() = default;
     virtual SocketAddress getForeignAddress() const = 0;
 };
 
