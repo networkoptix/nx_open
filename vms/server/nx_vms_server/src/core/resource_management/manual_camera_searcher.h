@@ -44,7 +44,7 @@ private:
         QAuthenticator auth);
     void onManualSearchDone(QnManualResourceSearchList results);
 
-    void changeState(QnManualResourceSearchStatus::State newState);
+    QnManualResourceSearchStatus::State changeState(QnManualResourceSearchStatus::State newState);
     void runTasks();
     QList<QnAbstractNetworkResourceSearcher*> getAllNetworkSearchers() const;
 

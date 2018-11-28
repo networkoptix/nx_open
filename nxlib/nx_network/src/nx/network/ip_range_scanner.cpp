@@ -25,7 +25,7 @@ void IpRangeScanner::bindToAioThread(nx::network::aio::AbstractAioThread* aioThr
 
 void IpRangeScanner::stopWhileInAioThread()
 {
-    NX_VERBOSE(this, "Terminate requested, range [%1, %2]",
+    NX_VERBOSE(this, "Stop requested, range [%1, %2]",
         HostAddress(nx::network::HostAddress::ipV4from(m_startIpv4)),
         HostAddress(nx::network::HostAddress::ipV4from(m_endIpv4)));
     m_ipCheckers.clear();

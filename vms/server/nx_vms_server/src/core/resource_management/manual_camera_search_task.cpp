@@ -49,8 +49,8 @@ bool restrictNewManualCameraByIp(const QnSecurityCamResourcePtr& netRes)
         if (existRes->getTypeId() != netRes->getTypeId())
         {
             // Allow several manual cameras with the same IP if cameras have different ports.
-            QUrl url1(existRes->getUrl());
-            QUrl url2(netRes->getUrl());
+            nx::utils::Url url1(existRes->getUrl());
+            nx::utils::Url url2(netRes->getUrl());
             if (url1.port() == url2.port())
                 return true; //< Camera found by different drivers with the same port.
         }

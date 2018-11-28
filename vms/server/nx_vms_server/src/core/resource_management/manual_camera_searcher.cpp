@@ -39,7 +39,7 @@ QnManualCameraSearcher::~QnManualCameraSearcher()
 
 void QnManualCameraSearcher::pleaseStop(nx::utils::MoveOnlyFunc<void ()> completionHandler)
 {
-    // Stopping: task manager -> ip checker -> m_pollable -> completionHandler called.
+    // Stopping: ip scanner -> task manager -> m_pollable -> completionHandler called.
 
     auto onTaskManagerStop =
         [this, handler = std::move(completionHandler)]() mutable
@@ -56,11 +56,7 @@ void QnManualCameraSearcher::pleaseStop(nx::utils::MoveOnlyFunc<void ()> complet
         };
 
     NX_VERBOSE(this, "Canceling search");
-    m_pollable.dispatch(
-        [this, handler = std::move(onIpCheckerStop)]() mutable
-        {
-            m_ipScanner.pleaseStop(std::move(handler));
-        });
+    m_ipScanner.pleaseStop(std::move(onIpCheckerStop));
 }
 
 QList<QnAbstractNetworkResourceSearcher*> QnManualCameraSearcher::getAllNetworkSearchers() const
@@ -162,17 +158,12 @@ void QnManualCameraSearcher::startOnlineHostsScan(
     QAuthenticator auth,
     int port)
 {
-    NX_ASSERT(m_pollable.isInSelfAioThread());
-    NX_ASSERT(m_state == QnManualResourceSearchStatus::Init);
     NX_VERBOSE(this, "Getting online hosts in range [%1, %2]", startAddr, endAddr);
+    auto oldState = changeState(QnManualResourceSearchStatus::CheckingOnline);
+    NX_ASSERT(oldState == QnManualResourceSearchStatus::Init);
 
-    const auto startIPv4Addr = ntohl(startAddr.ipV4().get().s_addr);
-    const auto endIPv4Addr = ntohl(endAddr.ipV4().get().s_addr);
-
-    NX_ASSERT(endIPv4Addr >= startIPv4Addr);
-
-    m_hostRangeSize = endIPv4Addr - startIPv4Addr + 1;
-    changeState(QnManualResourceSearchStatus::CheckingOnline);
+    m_hostRangeSize = ntohl(endAddr.ipV4().get().s_addr) - ntohl(startAddr.ipV4().get().s_addr) + 1;
+    NX_ASSERT(m_hostRangeSize > 0);
 
     m_ipScanner.scanOnlineHosts(
         [this, port, auth = std::move(auth)](auto results)
@@ -231,8 +222,10 @@ void QnManualCameraSearcher::onManualSearchDone(
     m_searchDoneCallback(this);
 }
 
-void QnManualCameraSearcher::changeState(QnManualResourceSearchStatus::State newState)
+QnManualResourceSearchStatus::State QnManualCameraSearcher::changeState(
+    QnManualResourceSearchStatus::State newState)
 {
-    NX_VERBOSE(this, "State change: %1 -> %2", m_state.load(), newState);
-    m_state = newState;
+    auto oldState = m_state.exchange(newState);
+    NX_VERBOSE(this, "State change: %1 -> %2", oldState, newState);
+    return oldState;
 }
