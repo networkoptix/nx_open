@@ -327,7 +327,7 @@ void BookmarkSearchListModel::Private::removeBookmark(const QnUuid& id)
 void BookmarkSearchListModel::Private::updatePeriod(
     const QnTimePeriod& period, const QnCameraBookmarkList& bookmarks)
 {
-    // This function exists until we implement notifying all clients about every created bookmark.
+    // This function exists until we implement notifying all clients about every bookmark change.
     // It's suboptimal in certain cases.
 
     const auto effectivePeriod = period.intersected(q->fetchedTimeWindow());
@@ -390,7 +390,7 @@ void BookmarkSearchListModel::Private::updatePeriod(
 
 void BookmarkSearchListModel::Private::dynamicUpdate(const QnTimePeriod& period)
 {
-    // This function exists until we implement notifying all clients about every created bookmark.
+    // This function exists until we implement notifying all clients about every bookmark change.
 
     const auto effectivePeriod = period.intersected(q->fetchedTimeWindow());
     if (effectivePeriod.isEmpty())

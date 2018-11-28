@@ -48,7 +48,6 @@ protected:
 
 private:
     int indexOf(const QnUuid& guid) const; //< Logarithmic complexity.
-    void updatePeriod(const QnTimePeriod& period, const QnCameraBookmarkList& bookmarks);
 
     QnVirtualCameraResourcePtr camera(const QnCameraBookmark& bookmark) const;
 
@@ -56,6 +55,7 @@ private:
     void addBookmark(const QnCameraBookmark& bookmark);
     void updateBookmark(const QnCameraBookmark& bookmark);
     void removeBookmark(const QnUuid& id);
+    void updatePeriod(const QnTimePeriod& period, const QnCameraBookmarkList& bookmarks);
 
     template<typename Iter>
     bool commitPrefetch(const QnTimePeriod& periodToCommit,
