@@ -844,7 +844,7 @@ bool QnPlAxisResource::setRelayOutputState(
     // Examples:
     // activate Port1: action=Port1:/
     // deactivate Port2: action=Port2:\
-    // activate Port3 for 5 seconds: action=Port3:/500\
+    // activate Port3 for 5 seconds: action=Port3:/5000\
     //
     // All characters not allowed in a URI must be properly percent-encoded.
 
