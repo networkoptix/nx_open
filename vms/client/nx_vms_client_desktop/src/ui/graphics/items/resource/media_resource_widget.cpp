@@ -1891,9 +1891,13 @@ void QnMediaResourceWidget::paintMotionSensitivity(QPainter* painter, int channe
 
         paintMotionSensitivityIndicators(painter, channel, rect);
     }
-    else
+    else if (m_motionSensitivity.size() > channel)
     {
-        paintFilledRegionPath(painter, rect, m_motionSensitivity[channel].getMotionMaskPath(), qnGlobals->motionMaskColor(), qnGlobals->motionMaskColor());
+        paintFilledRegionPath(painter,
+            rect,
+            m_motionSensitivity[channel].getMotionMaskPath(),
+            qnGlobals->motionMaskColor(),
+            qnGlobals->motionMaskColor());
     }
 }
 

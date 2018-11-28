@@ -1,5 +1,6 @@
 #include "motion_search_synchronizer.h"
 
+#include <core/resource/media_resource.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
 #include <nx/utils/log/assert.h>
@@ -31,8 +32,11 @@ MotionSearchSynchronizer::MotionSearchSynchronizer(
         [this](QnMediaResourceWidget* mediaWidget)
         {
             updateAreaSelection();
-            if (!mediaWidget)
+            if (!mediaWidget || !mediaWidget->resource()->toResource()->hasFlags(Qn::motion))
+            {
+                setActive(false);
                 return;
+            }
 
             mediaWidget->setMotionSearchModeEnabled(active());
 
