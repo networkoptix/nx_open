@@ -1641,6 +1641,19 @@ TYPED_TEST_P(
     this->thenSocketCanBeUsedForAsyncIo();
 }
 
+TYPED_TEST_P(
+    StreamSocketAcceptance,
+    change_aio_thread_of_accepted_connection)
+{
+    this->givenPingPongServer();
+
+    this->givenConnectedSocket();
+    this->startReadingConnectionAsync();
+    this->whenClientSentPingAsync();
+
+    this->thenServerMessageIsReceived();
+}
+
 TYPED_TEST_P(StreamSocketAcceptance, DISABLED_socket_is_usable_after_send_cancellation)
 {
     // SSL socket cannot recover from incomplete send.
@@ -1823,6 +1836,7 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     socket_is_ready_for_io_after_read_cancellation,
     socket_aio_thread_can_be_changed_after_io_cancellation_during_connect_completion,
     socket_aio_thread_can_be_changed_after_io_cancellation_during_send_completion,
+    change_aio_thread_of_accepted_connection,
     DISABLED_socket_is_usable_after_send_cancellation,
     /**
      * These tests are disabled because currently it is not supported on mswin.
