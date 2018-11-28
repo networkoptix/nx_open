@@ -75,7 +75,7 @@ protected:
         {
             const auto [resultCode, listeningPeers] = getListeningPeers();
             ASSERT_EQ(api::ResultCode::ok, resultCode);
-            if (listeningPeers.systems.size() >= count)
+            if ((int) listeningPeers.systems.size() >= count)
                 break;
 
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
