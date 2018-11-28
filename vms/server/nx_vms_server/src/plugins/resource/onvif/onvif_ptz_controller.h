@@ -17,7 +17,6 @@ class QnOnvifPtzController: public QnBasicPtzController {
 
 public:
     QnOnvifPtzController(const QnPlOnvifResourcePtr &resource);
-    virtual ~QnOnvifPtzController() override = default;
 
     virtual Ptz::Capabilities getCapabilities(const nx::core::ptz::Options& options) const override;
 
