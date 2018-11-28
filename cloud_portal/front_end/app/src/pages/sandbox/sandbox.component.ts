@@ -53,14 +53,14 @@ export class NxSandboxComponent {
             { label: 'Advanced Viewer', id: 'qwerty2'},
             { label: 'Viewer', id: 'qwerty3'},
             { label: 'Live Viewer', id: 'qwerty4' },
-            { label: 'Administrator', id: 'qwerty11' },
-            { label: 'Advanced Viewer', id: 'qwerty12' },
-            { label: 'Viewer', id: 'qwerty13' },
-            { label: 'Live Viewer', id: 'qwerty14' },
-            { label: 'Administrator', id: 'qwerty21' },
-            { label: 'Advanced Viewer', id: 'qwerty22' },
-            { label: 'Viewer', id: 'qwerty23' },
-            { label: 'Live Viewer', id: 'qwerty24' },
+            // { label: 'Administrator', id: 'qwerty11' },
+            // { label: 'Advanced Viewer', id: 'qwerty12' },
+            // { label: 'Viewer', id: 'qwerty13' },
+            // { label: 'Live Viewer', id: 'qwerty14' },
+            // { label: 'Administrator', id: 'qwerty21' },
+            // { label: 'Advanced Viewer', id: 'qwerty22' },
+            // { label: 'Viewer', id: 'qwerty23' },
+            // { label: 'Live Viewer', id: 'qwerty24' },
         ];
 
         this.itemsSelected = ['qwerty2', 'qwerty3'];
