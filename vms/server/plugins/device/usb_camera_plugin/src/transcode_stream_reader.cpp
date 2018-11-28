@@ -33,7 +33,7 @@ TranscodeStreamReader::~TranscodeStreamReader()
     // Avoid virtual removeVideoConsumer()
     m_camera->videoStream()->removeFrameConsumer(m_videoFrameConsumer);
     uninitialize();
-}   
+}
 
 int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {

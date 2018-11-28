@@ -536,7 +536,7 @@ void QnFlirEIPResource::initializeIO()
 {
     QnMutexLocker lock(&m_ioMutex);
     auto resData = resourceData();
-    auto portList = resData.value<QnIOPortDataList>(Qn::IO_SETTINGS_PARAM_NAME);
+    auto portList = resData.value<QnIOPortDataList>(ResourceDataKey::kIoSettings);
     auto alarmsCount = resData.value<int>(kAlarmsCountParamName);
 
     m_inputPorts.clear();

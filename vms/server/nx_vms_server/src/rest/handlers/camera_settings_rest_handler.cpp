@@ -29,7 +29,6 @@ static const std::chrono::seconds kMaxWaitTimeout(20);
 
 using StatusCode = nx::network::http::StatusCode::Value;
 
-
 namespace {
 
 class GetAdvancedParametersCommand: public QnResourceCommand
@@ -105,7 +104,6 @@ private:
 };
 
 } // namespace
-
 
 QnCameraSettingsRestHandler::QnCameraSettingsRestHandler(QnResourceCommandProcessor* commandProcessor):
     base_type(),
@@ -296,7 +294,7 @@ nx::network::http::StatusCode::Value QnCameraSettingsRestHandler::handleSetParam
     }
 
     const bool needToReloadAllParameters = camera->resourceData()
-        .value<bool>(Qn::kReloadAllAdvancedParameters, false);
+        .value<bool>(ResourceDataKey::kNeedToReloadAllAdvancedParametersAfterApply, false);
 
     if (needToReloadAllParameters)
     {
@@ -309,5 +307,3 @@ nx::network::http::StatusCode::Value QnCameraSettingsRestHandler::handleSetParam
 
     return StatusCode::ok;
 }
-
-

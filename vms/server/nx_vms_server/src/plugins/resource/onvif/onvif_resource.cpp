@@ -3780,8 +3780,8 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     _onvifEvents__PullMessagesResponse response;
 
     auto resData = resourceData();
-    const bool useHttpReader = resData.value<bool>(
-        Qn::PARSE_ONVIF_NOTIFICATIONS_WITH_HTTP_READER,
+    const auto useHttpReader = resData.value<bool>(
+        ResourceDataKey::kParseOnvifNotificationsWithHttpReader,
         false);
 
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> asyncPullMessagesCallWrapper(
@@ -4354,20 +4354,20 @@ bool QnPlOnvifResource::isCameraForcedToOnvif(
     const QString& manufacturer, const QString& model)
 {
     QnResourceData resourceData = dataPool->data(manufacturer, model);
-    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+    if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return true;
 
     QString shortModel = model;
     shortModel.replace(QString(lit(" ")), QString());
     shortModel.replace(QString(lit("-")), QString());
     resourceData = dataPool->data(manufacturer, shortModel);
-    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+    if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return true;
 
     if (shortModel.startsWith(manufacturer))
         shortModel = shortModel.mid(manufacturer.length()).trimmed();
     resourceData = dataPool->data(manufacturer, shortModel);
-    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+    if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return true;
 
     return false;

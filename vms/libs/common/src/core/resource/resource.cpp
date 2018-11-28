@@ -279,7 +279,7 @@ QnResourcePtr QnResource::getParentResource() const
     return QnResourcePtr();
 }
 
-bool QnResource::hasParam(const QString &name) const
+bool QnResource::hasDefaultProperty(const QString &name) const
 {
     QnResourceTypePtr resType = qnResTypePool->getResourceType(m_typeId);
     if (!resType)

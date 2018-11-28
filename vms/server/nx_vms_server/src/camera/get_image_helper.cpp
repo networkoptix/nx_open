@@ -165,7 +165,6 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
 
     auto camera = serverModule()->videoCameraPool()->getVideoCamera(resource);
 
-    CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     QnConstCompressedVideoDataPtr video;
     bool isArchiveVideoPacket = false;
     if (request.usecSinceEpoch == DATETIME_NOW)
@@ -249,9 +248,10 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
     if (!video)
         return nullptr;
 
+    CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
+    bool gotFrame = false;
     QnFfmpegVideoDecoder decoder(
         DecoderConfig::fromResource(resource), video->compressionType, video, false);
-    bool gotFrame = false;
 
     if (!isArchiveVideoPacket)
     {
@@ -279,7 +279,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
     if (video)
         outFrame->channel = video->channelNumber;
 
-    return outFrame;
+    return gotFrame ? outFrame : nullptr;
 }
 
 CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromCaches(

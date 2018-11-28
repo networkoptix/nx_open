@@ -42,7 +42,7 @@ void QnResourceTreeModelRecorderNode::addChildInternal(const QnResourceTreeModel
             {
                 const bool hasDeviceTypeBeenChanged = name == ResourcePropertyKey::kDts
                     || name == ResourcePropertyKey::kAnalog
-                    || name == Qn::kDeviceType;
+                    || name == ResourcePropertyKey::kDeviceType;
 
                 if (hasDeviceTypeBeenChanged)
                     updateIcon();

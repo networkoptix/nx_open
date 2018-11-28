@@ -71,9 +71,7 @@ void HanwhaSharedResourceContext::setResourceAccess(
         if (m_resourceUrl == sharedUrl && m_resourceAuthenticator == authenticator)
             return;
 
-        NX_DEBUG(this, lm("Update resource access (%1:%2) %3").args(
-            authenticator.user(), authenticator.password(), sharedUrl));
-
+        NX_DEBUG(this, "Update resource access: %1 @ %2", authenticator.user(), sharedUrl);
         m_resourceUrl = sharedUrl;
         m_resourceAuthenticator = authenticator;
         m_lastSuccessfulUrlTimer.invalidate();

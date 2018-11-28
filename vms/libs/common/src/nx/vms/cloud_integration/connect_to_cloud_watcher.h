@@ -42,7 +42,7 @@ public:
     virtual ~QnConnectToCloudWatcher();
 
     void setCloudDbUrl(const nx::utils::Url &cloudDbUrl);
-
+    boost::optional<nx::utils::Url> cloudDbUrl() const;
 private slots:
     void at_updateConnection();
     void restartTimer();
@@ -55,7 +55,7 @@ private:
     QTimer m_timer;
     std::unique_ptr<nx::network::cloud::CloudDbUrlFetcher> m_cdbEndPointFetcher;
     boost::optional<nx::utils::Url> m_cloudDbUrl;
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
 };
 
 } // namespace cloud_integration
