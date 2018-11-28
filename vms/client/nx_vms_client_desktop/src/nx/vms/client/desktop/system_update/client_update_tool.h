@@ -61,6 +61,13 @@ public:
     };
 
     /**
+     * Simple check whether client should install anything from these contents.
+     * @param contents
+     * @return true if client's update package should o be installed.
+     */
+    bool shouldInstallThis(const UpdateContents& contents) const;
+
+    /**
      * Asks downloader to get update for client.
      * @param info - update manifest
      */

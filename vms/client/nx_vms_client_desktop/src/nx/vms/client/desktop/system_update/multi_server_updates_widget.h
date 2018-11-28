@@ -141,8 +141,8 @@ private:
 
     // UI synhronization. This functions are ment to be called from loadDataToUi.
     // Do not call them from anywhere else.
-    void syncUpdateCheck();
-    void syncRemoteUpdateState();
+    void syncUpdateCheckToUi();
+    void syncRemoteUpdateStateToUi();
     void syncProgress();
 
     ServerUpdateTool::ProgressInfo calculateActionProgress() const;

@@ -577,7 +577,8 @@ bool ServerUpdateTool::verifyUpdateManifest(UpdateContents& contents) const
         activeServers = m_activeServers;
     }
 
-    return verifyUpdateContents(commonModule(), contents, activeServers);
+    auto cm = commonModule();
+    return verifyUpdateContents(cm, contents, activeServers);
 }
 
 void ServerUpdateTool::calculateUploadProgress(ProgressInfo& result)
@@ -686,13 +687,13 @@ nx::update::UpdateContents ServerUpdateTool::getRemoteUpdateContents() const
     contents.sourceType = nx::update::UpdateSourceType::mediaservers;
     contents.source = "mediaservers";
     contents.info = m_updateManifest;
-    auto clientInfo = QnAppInfo::currentSystemInformation();
+    auto systemInfo = QnAppInfo::currentSystemInformation();
     QString errorMessage;
     QString cloudUrl = nx::network::SocketGlobals::cloud().cloudHost();
     bool boundToCloud = !commonModule()->globalSettings()->cloudSystemId().isEmpty();
 
     nx::update::findPackage(
-        clientInfo,
+        systemInfo,
         m_updateManifest,
         true, cloudUrl, boundToCloud, &contents.clientPackage, &errorMessage);
     verifyUpdateManifest(contents);
