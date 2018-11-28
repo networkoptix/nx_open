@@ -1,6 +1,6 @@
 #pragma once
 
-#include <set>
+#include <unordered_set>
 
 #include <nx/network/async_stoppable.h>
 #include <nx/network/aio/basic_pollable.h>
@@ -12,15 +12,16 @@ namespace nx::network {
  * Asynchronously scans specified ip address range for specified port to be opened and listening.
  */
 class NX_NETWORK_API IpRangeScanner:
-    public nx::network::QnStoppableAsync
+    public aio::BasicPollable
 {
+    using base_type = aio::BasicPollable;
+
 public:
     using CompletionHandler = nx::utils::MoveOnlyFunc<void(std::vector<nx::network::HostAddress>)>;
 
-    IpRangeScanner(nx::network::aio::AbstractAioThread* aioThread);
-    virtual ~IpRangeScanner() override;
+    IpRangeScanner(aio::AbstractAioThread* aioThread);
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     /**
      * Asynchronously scans specified ip address range for portToScan to be opened and listening.
@@ -36,15 +37,14 @@ public:
     size_t hostsChecked() const;
 
 private:
-    using Requests = std::set<std::unique_ptr<nx::network::http::AsyncClient>>;
-
-    nx::network::aio::BasicPollable m_pollable;
+    enum class State {readyToScan, scanning, terminated};
+    using IpCheckers = std::unordered_set<std::unique_ptr<nx::network::http::AsyncClient>>;
 
     CompletionHandler m_completionHandler;
     std::vector<nx::network::HostAddress> m_onlineHosts;
-    Requests m_socketsBeingScanned;
+    IpCheckers m_ipCheckers;
 
-    bool m_terminated = false;
+    std::atomic<State> m_state = State::readyToScan;
 
     int m_portToScan = 0;
     uint32_t m_startIpv4 = 0;
@@ -52,8 +52,9 @@ private:
     uint32_t m_nextIPToCheck = 0;
     std::atomic<size_t> m_hostsChecked = 0;
 
-    bool startHostScan();
-    void onDone(Requests::iterator requestIter);
+    bool startHostCheck();
+    void onDone(IpCheckers::iterator clientIter);
+    virtual void stopWhileInAioThread() override;
 };
 
 } // namespace nx::network

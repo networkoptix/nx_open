@@ -11,34 +11,26 @@ constexpr int kMaxHostsCheckedSimultaneously = 256;
 
 namespace nx::network {
 
-IpRangeScanner::IpRangeScanner(nx::network::aio::AbstractAioThread *aioThread):
-    m_pollable(aioThread)
+IpRangeScanner::IpRangeScanner(aio::AbstractAioThread* aioThread)
 {
     NX_VERBOSE(this, "Created");
+    bindToAioThread(aioThread ? aioThread : getAioThread());
 }
 
-IpRangeScanner::~IpRangeScanner()
+void IpRangeScanner::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
 {
-    pleaseStopSync();
+    NX_ASSERT(m_state == State::readyToScan);
+    base_type::bindToAioThread(aioThread);
 }
 
-void IpRangeScanner::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
+void IpRangeScanner::stopWhileInAioThread()
 {
-    m_pollable.dispatch(
-        [this, completionHandler = std::move(completionHandler)]() mutable
-        {
-            NX_VERBOSE(this, "Terminate requested, range [%1, %2]",
-                nx::network::HostAddress(nx::network::HostAddress::ipV4from(m_startIpv4)),
-                nx::network::HostAddress(nx::network::HostAddress::ipV4from(m_endIpv4)));
-
-            for (auto& httpClientPtr: m_socketsBeingScanned)
-                httpClientPtr->pleaseStopSync();
-
-            m_terminated = true;
-            completionHandler();
-        });
+    NX_VERBOSE(this, "Terminate requested, range [%1, %2]",
+        HostAddress(nx::network::HostAddress::ipV4from(m_startIpv4)),
+        HostAddress(nx::network::HostAddress::ipV4from(m_endIpv4)));
+    m_ipCheckers.clear();
+    m_state = State::terminated;
 }
-
 
 void IpRangeScanner::scanOnlineHosts(
     CompletionHandler callback,
@@ -49,9 +41,10 @@ void IpRangeScanner::scanOnlineHosts(
     NX_ASSERT(startAddr.isIpAddress());
     NX_ASSERT(endAddr.isIpAddress());
 
-    m_pollable.dispatch(
+    dispatch(
         [this, startAddr, endAddr, portToScan, callback = std::move(callback)]() mutable
         {
+            NX_ASSERT(m_state == State::readyToScan);
             NX_VERBOSE(this, "Starting search in range [%1, %2]", startAddr, endAddr);
             m_onlineHosts.clear();
 
@@ -61,9 +54,10 @@ void IpRangeScanner::scanOnlineHosts(
             m_endIpv4 = ntohl(endAddr.ipV4().get().s_addr);
             NX_ASSERT(m_endIpv4 >= m_startIpv4);
 
+            m_state = State::scanning;
             m_nextIPToCheck = m_startIpv4;
             for (int i = 0; i < kMaxHostsCheckedSimultaneously; ++i)
-                startHostScan();
+                startHostCheck();
         });
 }
 
@@ -77,46 +71,41 @@ int IpRangeScanner::maxHostsCheckedSimultaneously()
     return kMaxHostsCheckedSimultaneously;
 }
 
-bool IpRangeScanner::startHostScan()
+bool IpRangeScanner::startHostCheck()
 {
-    NX_ASSERT(m_pollable.isInSelfAioThread());
-    NX_ASSERT(!m_terminated);
+    NX_ASSERT(isInSelfAioThread());
+    NX_ASSERT(m_state == State::scanning);
 
     if (m_nextIPToCheck > m_endIpv4)
         return false;  // All ip addresses are being scanned at the moment.
     uint32_t ipToCheck = m_nextIPToCheck++;
-    NX_VERBOSE(this, "Checking IP: %1",
-        nx::network::HostAddress(nx::network::HostAddress::ipV4from(ipToCheck)));
+    NX_VERBOSE(this, "Checking IP: %1", HostAddress(HostAddress::ipV4from(ipToCheck)));
 
-    auto httpClientIter = m_socketsBeingScanned.insert(
-        std::make_unique<nx::network::http::AsyncClient>()).first;
-    (*httpClientIter)->bindToAioThread(m_pollable.getAioThread());
-    (*httpClientIter)->setOnResponseReceived(
-        std::bind(&IpRangeScanner::onDone, this, httpClientIter));
-    (*httpClientIter)->setOnDone(
-        std::bind(&IpRangeScanner::onDone, this, httpClientIter));
+    auto clientIter = m_ipCheckers.insert(std::make_unique<http::AsyncClient>()).first;
+    (*clientIter)->bindToAioThread(getAioThread());
+    (*clientIter)->setOnResponseReceived(std::bind(&IpRangeScanner::onDone, this, clientIter));
+    (*clientIter)->setOnDone(std::bind(&IpRangeScanner::onDone, this, clientIter));
 
-    (*httpClientIter)->setMaxNumberOfRedirects(0);
-    (*httpClientIter)->doGet(nx::network::url::Builder()
+    (*clientIter)->setMaxNumberOfRedirects(0);
+    (*clientIter)->doGet(nx::network::url::Builder()
         .setScheme(nx::network::http::kUrlSchemeName)
-        .setEndpoint({nx::network::HostAddress(nx::network::HostAddress::ipV4from(ipToCheck)),
-            uint16_t(m_portToScan)})
+        .setEndpoint({HostAddress(HostAddress::ipV4from(ipToCheck)), uint16_t(m_portToScan)})
         .toUrl());
     return true;
 }
 
-void IpRangeScanner::onDone(Requests::iterator httpClientIter)
+void IpRangeScanner::onDone(IpCheckers::iterator clientIter)
 {
-    NX_ASSERT(m_pollable.isInSelfAioThread());
-    NX_ASSERT(!m_terminated);
-    NX_ASSERT(httpClientIter != m_socketsBeingScanned.end());
+    NX_ASSERT(isInSelfAioThread());
+    NX_ASSERT(m_state == State::scanning);
+    NX_ASSERT(clientIter != m_ipCheckers.end());
 
     m_hostsChecked++;
 
-    const auto host = (*httpClientIter)->url().host();
-    if ((*httpClientIter)->bytesRead() > 0)
+    const auto host = (*clientIter)->url().host();
+    if ((*clientIter)->bytesRead() > 0)
     {
-        m_onlineHosts.push_back((*httpClientIter)->socket()->getForeignAddress().address);
+        m_onlineHosts.push_back((*clientIter)->socket()->getForeignAddress().address);
         NX_VERBOSE(this, "Checked IP: %1 (online)", host);
     }
     else
@@ -124,17 +113,18 @@ void IpRangeScanner::onDone(Requests::iterator httpClientIter)
         NX_VERBOSE(this, "Checked IP: %1 (offline)", host);
     }
 
-    m_socketsBeingScanned.erase(httpClientIter);
+    m_ipCheckers.erase(clientIter);
 
-    startHostScan();
-    if (!m_socketsBeingScanned.empty()) // Check if it was the last host check.
+    startHostCheck();
+    if (!m_ipCheckers.empty()) // Check if it was the last host check.
         return;
 
-    NX_VERBOSE(this, "Search in range [%1, %2] has finished, %3 hosts are online (terminated: %4)",
-        nx::network::HostAddress(nx::network::HostAddress::ipV4from(m_startIpv4)),
-        nx::network::HostAddress(nx::network::HostAddress::ipV4from(m_endIpv4)),
-        m_onlineHosts.size(), m_terminated);
+    NX_VERBOSE(this, "Search in range [%1, %2] has finished, %3 hosts are online",
+        HostAddress(HostAddress::ipV4from(m_startIpv4)),
+        HostAddress(HostAddress::ipV4from(m_endIpv4)),
+        m_onlineHosts.size());
 
+    m_state = State::readyToScan;
     nx::utils::moveAndCall(m_completionHandler, std::move(m_onlineHosts));
 }
 
