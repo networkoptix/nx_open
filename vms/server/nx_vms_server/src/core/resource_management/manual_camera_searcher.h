@@ -7,7 +7,7 @@
 
 #include <api/model/manual_camera_seach_reply.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/network/ip_range_checker_async.h>
+#include <nx/network/ip_range_scanner.h>
 #include <common/common_module_aware.h>
 
 #include "manual_camera_search_task_manager.h"
@@ -54,7 +54,7 @@ private:
 
     mutable nx::network::aio::BasicPollable m_pollable;
     int m_hostRangeSize;
-    QnIpRangeScannerAsync m_ipChecker;
+    nx::network::IpRangeScanner m_ipScanner;
     QnManualSearchTaskManager m_taskManager;
 
     SearchDoneCallback m_searchDoneCallback;

@@ -25,7 +25,7 @@ QnManualCameraSearcher::QnManualCameraSearcher(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule),
     m_state(QnManualResourceSearchStatus::Init),
     m_hostRangeSize(0),
-    m_ipChecker(m_pollable.getAioThread()),
+    m_ipScanner(m_pollable.getAioThread()),
     m_taskManager(commonModule, m_pollable.getAioThread())
 {
     NX_VERBOSE(this, "Created");
@@ -59,7 +59,7 @@ void QnManualCameraSearcher::pleaseStop(nx::utils::MoveOnlyFunc<void ()> complet
     m_pollable.dispatch(
         [this, handler = std::move(onIpCheckerStop)]() mutable
         {
-            m_ipChecker.pleaseStop(std::move(handler));
+            m_ipScanner.pleaseStop(std::move(handler));
         });
 }
 
@@ -125,7 +125,7 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
                 {
                     NX_ASSERT(m_hostRangeSize);
                     int currentProgress = m_hostRangeSize
-                        ? (int) m_ipChecker.hostsChecked() * PORT_SCAN_MAX_PROGRESS_PERCENT
+                        ? (int) m_ipScanner.hostsChecked() * PORT_SCAN_MAX_PROGRESS_PERCENT
                             / m_hostRangeSize
                         : 0;
 
@@ -174,7 +174,7 @@ void QnManualCameraSearcher::startOnlineHostsScan(
     m_hostRangeSize = endIPv4Addr - startIPv4Addr + 1;
     changeState(QnManualResourceSearchStatus::CheckingOnline);
 
-    m_ipChecker.scanOnlineHosts(
+    m_ipScanner.scanOnlineHosts(
         [this, port, auth = std::move(auth)](auto results)
         {
             onOnlineHostsScanDone(std::move(results), port, auth);

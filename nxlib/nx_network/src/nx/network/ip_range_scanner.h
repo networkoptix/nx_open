@@ -6,17 +6,19 @@
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/http/http_async_client.h>
 
+namespace nx::network {
+
 /**
  * Asynchronously scans specified ip address range for specified port to be opened and listening.
  */
-class NX_NETWORK_API QnIpRangeScannerAsync:
+class NX_NETWORK_API IpRangeScanner:
     public nx::network::QnStoppableAsync
 {
 public:
     using CompletionHandler = nx::utils::MoveOnlyFunc<void(std::vector<nx::network::HostAddress>)>;
 
-    QnIpRangeScannerAsync(nx::network::aio::AbstractAioThread* aioThread);
-    virtual ~QnIpRangeScannerAsync() override;
+    IpRangeScanner(nx::network::aio::AbstractAioThread* aioThread);
+    virtual ~IpRangeScanner() override;
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
@@ -53,3 +55,5 @@ private:
     bool startHostScan();
     void onDone(Requests::iterator requestIter);
 };
+
+} // namespace nx::network

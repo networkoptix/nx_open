@@ -1,22 +1,28 @@
-#include "ip_range_checker_async.h"
+#include "ip_range_scanner.h"
 
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
 
-static const int kMaxHostsCheckedSimultaneously = 256;
+namespace {
 
-QnIpRangeScannerAsync::QnIpRangeScannerAsync(nx::network::aio::AbstractAioThread *aioThread):
+constexpr int kMaxHostsCheckedSimultaneously = 256;
+
+} // namespace
+
+namespace nx::network {
+
+IpRangeScanner::IpRangeScanner(nx::network::aio::AbstractAioThread *aioThread):
     m_pollable(aioThread)
 {
     NX_VERBOSE(this, "Created");
 }
 
-QnIpRangeScannerAsync::~QnIpRangeScannerAsync()
+IpRangeScanner::~IpRangeScanner()
 {
     pleaseStopSync();
 }
 
-void QnIpRangeScannerAsync::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
+void IpRangeScanner::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_pollable.dispatch(
         [this, completionHandler = std::move(completionHandler)]() mutable
@@ -34,7 +40,7 @@ void QnIpRangeScannerAsync::pleaseStop(nx::utils::MoveOnlyFunc<void()> completio
 }
 
 
-void QnIpRangeScannerAsync::scanOnlineHosts(
+void IpRangeScanner::scanOnlineHosts(
     CompletionHandler callback,
     nx::network::HostAddress startAddr,
     nx::network::HostAddress endAddr,
@@ -61,17 +67,17 @@ void QnIpRangeScannerAsync::scanOnlineHosts(
         });
 }
 
-size_t QnIpRangeScannerAsync::hostsChecked() const
+size_t IpRangeScanner::hostsChecked() const
 {
     return m_hostsChecked;
 }
 
-int QnIpRangeScannerAsync::maxHostsCheckedSimultaneously()
+int IpRangeScanner::maxHostsCheckedSimultaneously()
 {
     return kMaxHostsCheckedSimultaneously;
 }
 
-bool QnIpRangeScannerAsync::startHostScan()
+bool IpRangeScanner::startHostScan()
 {
     NX_ASSERT(m_pollable.isInSelfAioThread());
     NX_ASSERT(!m_terminated);
@@ -86,9 +92,9 @@ bool QnIpRangeScannerAsync::startHostScan()
         std::make_unique<nx::network::http::AsyncClient>()).first;
     (*httpClientIter)->bindToAioThread(m_pollable.getAioThread());
     (*httpClientIter)->setOnResponseReceived(
-        std::bind(&QnIpRangeScannerAsync::onDone, this, httpClientIter));
+        std::bind(&IpRangeScanner::onDone, this, httpClientIter));
     (*httpClientIter)->setOnDone(
-        std::bind(&QnIpRangeScannerAsync::onDone, this, httpClientIter));
+        std::bind(&IpRangeScanner::onDone, this, httpClientIter));
 
     (*httpClientIter)->setMaxNumberOfRedirects(0);
     (*httpClientIter)->doGet(nx::network::url::Builder()
@@ -99,7 +105,7 @@ bool QnIpRangeScannerAsync::startHostScan()
     return true;
 }
 
-void QnIpRangeScannerAsync::onDone(Requests::iterator httpClientIter)
+void IpRangeScanner::onDone(Requests::iterator httpClientIter)
 {
     NX_ASSERT(m_pollable.isInSelfAioThread());
     NX_ASSERT(!m_terminated);
@@ -131,3 +137,5 @@ void QnIpRangeScannerAsync::onDone(Requests::iterator httpClientIter)
 
     nx::utils::moveAndCall(m_completionHandler, std::move(m_onlineHosts));
 }
+
+} // namespace nx::network
