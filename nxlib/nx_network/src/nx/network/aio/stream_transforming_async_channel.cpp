@@ -246,8 +246,6 @@ int StreamTransformingAsyncChannel::readRawDataFromCache(
 
 void StreamTransformingAsyncChannel::readRawChannelAsync()
 {
-    using namespace std::placeholders;
-
     constexpr static std::size_t kRawReadBufferSize = 16 * 1024;
 
     NX_VERBOSE(this, lm("Scheduling socket read operation"));
@@ -256,7 +254,7 @@ void StreamTransformingAsyncChannel::readRawChannelAsync()
     m_rawDataReadBuffer.reserve(kRawReadBufferSize);
     m_rawDataChannel->readSomeAsync(
         &m_rawDataReadBuffer,
-        std::bind(&StreamTransformingAsyncChannel::onSomeRawDataRead, this, _1, _2));
+        [this](auto&&... args) { onSomeRawDataRead(std::move(args)...); });
     m_asyncReadInProgress = true;
 }
 
@@ -293,14 +291,9 @@ int StreamTransformingAsyncChannel::writeRawBytes(const void* data, size_t count
     if (m_rawWriteQueue.size() == 1)
     {
         if (m_sendShutdown)
-        {
-            post(std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this,
-                SystemError::connectionReset, (size_t) -1));
-        }
+            post([this]() { onRawDataWritten(SystemError::connectionReset, (size_t) -1); });
         else
-        {
             scheduleNextRawSendTaskIfAny();
-        }
     }
 
     return (int)count;
