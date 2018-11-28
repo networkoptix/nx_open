@@ -123,7 +123,7 @@ void StreamTransformingAsyncChannel::processReadTask(ReadTask* task)
         return;
     }
 
-    NX_VERBOSE(this, lm("Read task completed. Result %1, bytesWritten %2")
+    NX_VERBOSE(this, lm("Read task completed. Result %1, bytesRead %2")
         .args(sysErrorCode, bytesRead));
 
     task->buffer->resize(task->buffer->size() + bytesRead);

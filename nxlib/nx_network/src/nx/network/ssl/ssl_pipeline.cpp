@@ -179,24 +179,27 @@ int Pipeline::handleSslIoResult(int resultCode)
             return 0;
 
         case SSL_ERROR_WANT_READ:
-        case SSL_ERROR_WANT_WRITE:
-        {
-            // TODO
+            NX_VERBOSE(this, "SSL_ERROR_WANT_READ");
             break;
-        }
+        
+        case SSL_ERROR_WANT_WRITE:
+            NX_VERBOSE(this, "SSL_ERROR_WANT_WRITE");
+            break;
 
         case SSL_ERROR_SSL:
-            NX_VERBOSE(this, "SSL error");
+            NX_VERBOSE(this, "SSL_ERROR_SSL");
             m_eof = true;
             m_failed = true;
             return utils::bstream::StreamIoError::nonRecoverableError;
 
         case SSL_ERROR_SYSCALL:
+            NX_VERBOSE(this, "SSL_ERROR_SYSCALL");
             if (m_readThirsty || m_writeThirsty)
                 return utils::bstream::StreamIoError::wouldBlock;
             return utils::bstream::StreamIoError::osError;
 
         default:
+            NX_VERBOSE(this, lm("SSL_ERROR %1").args(sslErrorCode));
             break;
     }
 
