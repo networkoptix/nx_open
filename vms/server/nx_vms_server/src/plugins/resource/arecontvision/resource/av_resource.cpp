@@ -539,7 +539,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnMed
 
 bool QnPlAreconVisionResource::isPanoramic(QnResourceTypePtr resType)
 {
-    QString layoutStr = resType->defaultValue(Qn::VIDEO_LAYOUT_PARAM_NAME);
+    QString layoutStr = resType->defaultValue(ResourcePropertyKey::kVideoLayout);
     return !layoutStr.isEmpty() && QnCustomResourceVideoLayout::fromString(layoutStr)->channelCount() > 1;
 };
 

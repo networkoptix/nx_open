@@ -52,7 +52,7 @@ QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractS
     if (m_videoLayout)
         return m_videoLayout;
 
-    auto layoutStr = resourceData().value<QString>(Qn::VIDEO_LAYOUT_PARAM_NAME2);
+    auto layoutStr = resourceData().value<QString>(ResourceDataKey::kVideoLayout);
 
     if (!layoutStr.isEmpty())
     {
@@ -68,7 +68,8 @@ QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractS
 
     auto resourceId = getId();
 
-    commonModule()->propertyDictionary()->setValue(resourceId, Qn::VIDEO_LAYOUT_PARAM_NAME, m_videoLayout->toString());
+    commonModule()->propertyDictionary()->setValue(resourceId, ResourcePropertyKey::kVideoLayout,
+        m_videoLayout->toString());
     commonModule()->propertyDictionary()->saveParams(resourceId);
 
     return m_videoLayout;

@@ -25,15 +25,15 @@ static bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnResourceD
     return true;
 }
 
-QString QnResourceDataPool::getVersion(const QByteArray& data)
+nx::utils::SoftwareVersion QnResourceDataPool::getVersion(const QByteArray& data)
 {
     QJsonObject map;
     if (!QJson::deserialize(data, &map))
-        return QString();
+        return nx::utils::SoftwareVersion();
     QString version;
     if (!QJson::deserialize(map, lit("version"), &version))
-        return QString();
-    return version;
+        return nx::utils::SoftwareVersion();
+    return nx::utils::SoftwareVersion(version);
 }
 
 static bool validateDataInternal(

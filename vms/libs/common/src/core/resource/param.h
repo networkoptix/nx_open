@@ -80,11 +80,19 @@ static const QString kIoDisplayName("ioDisplayName");
 
 static const QString kIoOverlayStyle("ioOverlayStyle");
 
-// The next three keys are used both as property keys and as data keys, so they are defined both
+// The next two keys are used both as property keys and as data keys, so they are defined both
 // in ResourcePropertyKey and ResourceDataKey namespaces.
-static const QString kNoVideoSupport("noVideoSupport");
 static const QString kBitratePerGOP("bitratePerGOP");
 static const QString kIoSettings("ioSettings");
+
+static const QString kVideoLayout("VideoLayout");
+
+namespace Onvif
+{
+static const QString kMediaUrl("MediaUrl");
+static const QString kDeviceUrl("DeviceUrl");
+static const QString kDeviceID("DeviceID");
+} // namespace Onvif
 
 namespace MediaServer
 {
@@ -182,11 +190,14 @@ static const QString kNeedToReloadAllAdvancedParametersAfterApply("needToReloadA
 // Rename?
 static const QString kSpace("space");
 
-// The next three keys are used both as property keys and as data keys, so they are defined both
-// in ResourcePropertyKey and ResourceDataKey namespaces.
 static const QString kNoVideoSupport("noVideoSupport");
+
+// The next two keys are used both as property keys and as data keys, so they are defined both
+// in ResourcePropertyKey and ResourceDataKey namespaces.
 static const QString kBitratePerGOP("bitratePerGOP");
 static const QString kIoSettings("ioSettings");
+
+static const QString kVideoLayout("videoLayout");
 
 } // namespace ResourceDataKey
 
@@ -194,14 +205,6 @@ static const QString kIoSettings("ioSettings");
 
 namespace Qn
 {
-// VIDEO_LAYOUT_PARAM_NAME and VIDEO_LAYOUT_PARAM_NAME2 should be renamed and moved to
-// another namespaces.
-static const QString VIDEO_LAYOUT_PARAM_NAME("VideoLayout");
-static const QString VIDEO_LAYOUT_PARAM_NAME2("videoLayout"); //used in resource_data.json
-
-// User
 static const QString USER_FULL_NAME("fullUserName");
-
 static const QString kResourceDataParamName("resource_data.json");
-
 } // namespace Qn

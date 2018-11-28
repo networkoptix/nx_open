@@ -15,7 +15,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1",
+    "version": "1.0.1.1",
     "data": [
         {
             "keys": ["Hanwha|*"],
@@ -503,7 +503,9 @@
                     "password": "12345"
                 }
             ],
-            "unauthorizedTimeoutSec": 185
+            "unauthorizedTimeoutSec": 185,
+            "additionalInputSourceNames": [ "alarmintoken" ],
+            "additionalNotificationTopics":[ "Trigger/AlarmIn" ]
         },
         {
             "keys": [
@@ -787,7 +789,8 @@
         {
             "keys": [
                 "AXIS|AXISP8221",
-                "AXIS|AXISC3003E"
+                "AXIS|AXISC3003E",
+                "AXIS|AXISA9161"
             ],
             "noVideoSupport": true
         },
@@ -995,12 +998,13 @@
                 "HIKVISION|DS-2CD4032FWD*",
                 "HIKVISION|DS-2CD2142FWD*",
                 "hikvision|DS-2CD2142FWD*",
-                "Hikvision|DS-6716*", "HIKVISION|DS-6716*",
-                "Hikvision|DS-6708*", "HIKVISION|DS-6708*",
-                "HIKVISION|DS-2CD4A26FWD-*", "hikvision|DS-2CD4A26FWD-*",
-                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*",
+                "Hikvision|DS-6716*",
+                "Hikvision|DS-6708*",
+                "HIKVISION|DS-2CD4A26FWD-*",
+                "HIKVISION|iDS-2CD8426*",
                 "ONVIF|NC328-VBZ",
-                "Hikvision|DS-2DF8223*"
+                "Hikvision|DS-2DF8223*",
+                "hikvision|DS-2CD2155FWD-IS"
             ],
             "parseOnvifNotificationsWithHttpReader": true
         },
@@ -1025,10 +1029,10 @@
                 "*|NC304-WDA",
                 "HIKVISION|DS-2CD2142FWD*",
                 "hikvision|DS-2CD2142FWD*",
-                "HIKVISION|DS-2CD4A26FWD-*", "hikvision|DS-2CD4A26FWD-*",
-                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*",
-                "Hikvision|DS-2CD2625FWD*", "hikvision|DS-2CD2625FWD*", "HIKVISION|DS-2CD2625FWD*",
-                "Hikvision|DS-2TD2166*", "hikvision|DS-2TD2166", "HIKVISION|DS-2TD2166"
+                "HIKVISION|DS-2CD4A26FWD-*",
+                "HIKVISION|iDS-2CD8426*",
+                "Hikvision|DS-2CD2625FWD*",
+                "Hikvision|DS-2TD2166*"
             ],
             "relayOutputInversed": true,
             "portNamePrefixToIgnore": "AlarmOut"
@@ -2917,6 +2921,47 @@
         {
             "keys": ["UNIVIEW|*"],
             "needToReloadAllAdvancedParametersAfterApply": true
+        },	
+        {
+            "keys": [
+                "*|DS-7332HUHI-K4"
+            ],
+            "forcedOnvifParams": {
+                "ptzProfiles":[
+                    "ProfileToken001",
+                    "ProfileToken002",
+                    "ProfileToken003",
+                    "ProfileToken004",
+                    "ProfileToken005",
+                    "ProfileToken006",
+                    "ProfileToken007",
+                    "ProfileToken008",
+                    "ProfileToken009",
+                    "ProfileToken010",
+                    "ProfileToken011",
+                    "ProfileToken012",
+                    "ProfileToken013",
+                    "ProfileToken014",
+                    "ProfileToken015",
+                    "ProfileToken016",
+                    "ProfileToken017",
+                    "ProfileToken018",
+                    "ProfileToken019",
+                    "ProfileToken020",
+                    "ProfileToken021",
+                    "ProfileToken022",
+                    "ProfileToken023",
+                    "ProfileToken024",
+                    "ProfileToken025",
+                    "ProfileToken026",
+                    "ProfileToken027",
+                    "ProfileToken028",
+                    "ProfileToken029",
+                    "ProfileToken030",
+                    "ProfileToken031",
+                    "ProfileToken032"
+                ]
+            }
         }
     ]
 }

@@ -84,7 +84,6 @@ CameraDiagnostics::Result QnAdamResource::initializeCameraDriver()
     setIoPortDescriptions(std::move(ports), /*needMerge*/ true);
 
     setFlags(flags() | Qn::io_module);
-    setProperty(ResourcePropertyKey::kNoVideoSupport, 1);
     setProperty(ResourcePropertyKey::kIoConfigCapability, 1);
 
     saveProperties();

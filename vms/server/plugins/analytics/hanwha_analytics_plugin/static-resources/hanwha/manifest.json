@@ -87,8 +87,20 @@
                 "localization": {}
             },
             "internalName": "ShockDetection",
-            "description": "ShockDetection %1",
+            "description": "Shock %1",
             "positiveState": "has been detected"
+        },
+        {
+            "id": "nx.hanwha.TemperatureChangeDetection",
+            "name": {
+                "value": "Temperature change detection",
+                "localization": {}
+            },
+            "internalName": "TemperatureChangeDetection",
+            "description": "Temperature change %1",
+            "positiveState": "has been detected",
+            "negativeState": "is not detected",
+            "flags": "stateDependent"
         },
         {
             "id": "nx.hanwha.AudioDetection", 

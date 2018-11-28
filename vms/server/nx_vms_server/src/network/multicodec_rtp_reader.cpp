@@ -56,13 +56,14 @@ QString getConfiguredVideoLayout(const QnResourcePtr& resource)
     auto secResource = resource.dynamicCast<QnSecurityCamResource>();
     if (secResource)
     {
-        configuredLayout = secResource->resourceData().value<QString>(Qn::VIDEO_LAYOUT_PARAM_NAME2);
+        configuredLayout = secResource->resourceData().value<QString>(
+            ResourceDataKey::kVideoLayout);
     }
     if (configuredLayout.isEmpty())
     {
         QnResourceTypePtr resType = qnResTypePool->getResourceType(resource->getTypeId());
         if (resType)
-            configuredLayout = resType->defaultValue(Qn::VIDEO_LAYOUT_PARAM_NAME);
+            configuredLayout = resType->defaultValue(ResourcePropertyKey::kVideoLayout);
     }
     return configuredLayout;
 }
@@ -615,7 +616,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
             newVideoLayout = m_customVideoLayout->toString();
             QnVirtualCameraResourcePtr camRes = m_resource.dynamicCast<QnVirtualCameraResource>();
             if (camRes && m_role == Qn::CR_LiveVideo &&
-                camRes->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout))
+                camRes->setProperty(ResourcePropertyKey::kVideoLayout, newVideoLayout))
             {
                 camRes->saveProperties();
             }

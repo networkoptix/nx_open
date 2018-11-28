@@ -4075,7 +4075,7 @@ void MediaServerProcess::loadResourceParamsData()
     ResourceParamWithRefData param;
     param.name = Qn::kResourceDataParamName;
 
-    QString dataVersion;
+    nx::utils::SoftwareVersion dataVersion;
     QString oldValue;
     nx::vms::api::ResourceParamWithRefDataList data;
     manager->getKvPairsSync(QnUuid(), &data);
