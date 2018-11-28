@@ -69,10 +69,6 @@ public:
         bool value,
         nx::core::ptz::Type ptzType = nx::core::ptz::Type::operational);
 
-    Ptz::Capabilities operationalPtzCapabilities() const;
-    void setOperationalPtzCapabilities(Ptz::Capabilities capabilites);
-
-
     bool canSwitchPtzPresetTypes() const;
 
     /** Name of the resource property key intended for the CustomAspectRatio value storage. */
