@@ -107,7 +107,7 @@
             "flags": "stateDependent"
         },
         {
-            "eventTypeId": "{E068D6FF-A3AC-43AA-B2D6-1804440AF506}",
+            "eventTypeId": "{E527A572-1F2E-4269-91F6-35161F18185D}",
             "eventName": {
                 "value": "Shock detection",
                 "localization": {
