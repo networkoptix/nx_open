@@ -15,6 +15,7 @@ class QToolButton;
 namespace nx::vms::client::desktop {
 
 class EventTile;
+class EventRibbon;
 class SelectableTextButton;
 class AbstractSearchListModel;
 
@@ -125,6 +126,9 @@ protected:
      */
     void addDeviceDependentAction(
         QAction* action, const QString& mixedString, const QString& cameraString);
+
+    /** Internal access to tiles view. */
+    EventRibbon* view() const;
 
 private:
     /**

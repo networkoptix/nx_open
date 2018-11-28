@@ -506,6 +506,11 @@ AbstractSearchListModel* AbstractSearchWidget::Private::model() const
     return m_mainModel.data();
 }
 
+EventRibbon* AbstractSearchWidget::Private::view() const
+{
+    return ui->ribbon;
+}
+
 void AbstractSearchWidget::Private::goToLive()
 {
     if (m_mainModel->liveSupported())

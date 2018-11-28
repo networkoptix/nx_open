@@ -113,4 +113,9 @@ AbstractSearchWidget::Cameras AbstractSearchWidget::previousCameras() const
     return d->previousCameras();
 }
 
+EventRibbon* AbstractSearchWidget::view() const
+{
+    return d->view();
+}
+
 } // namespace nx::vms::client::desktop

@@ -69,6 +69,8 @@ public:
     int unreadCount() const;
     QnNotificationLevel::Value highestUnreadImportance() const;
 
+    nx::utils::Interval<int> visibleRange() const;
+
     void updateHover();
 
 protected:

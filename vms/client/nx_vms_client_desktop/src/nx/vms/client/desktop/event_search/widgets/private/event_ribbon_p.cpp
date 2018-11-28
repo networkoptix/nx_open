@@ -185,7 +185,7 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
             insertNewTiles(index, movedCount, UpdateMode::instant);
 
             updateGuard.rollback();
-            doUpdateView();
+            updateView();
 
             NX_ASSERT(m_model->rowCount() == count());
         });
@@ -604,8 +604,11 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
 
     NX_VERBOSE(q, "%1 tiles inserted at position %2, new count is %3", count, index, m_tiles.size());
 
-    if (!m_updating)
-        emit q->countChanged(this->count());
+    if (m_updating)
+        return;
+
+    emit q->countChanged(this->count());
+    emit q->visibleRangeChanged(m_visible, {});
 }
 
 void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMode)
@@ -688,8 +691,11 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMo
 
     NX_VERBOSE(q, "%1 tiles removed at position %2, new count is %3", count, first, m_tiles.size());
 
-    if (!m_updating)
-        emit q->countChanged(this->count());
+    if (m_updating)
+        return;
+
+    emit q->countChanged(this->count());
+    emit q->visibleRangeChanged(m_visible, {});
 }
 
 void EventRibbon::Private::clear()
@@ -715,8 +721,11 @@ void EventRibbon::Private::clear()
 
     q->updateGeometry();
 
-    if (oldCount > 0)
-        emit q->countChanged(0);
+    if (oldCount <= 0)
+        return;
+
+    emit q->countChanged(0);
+    emit q->visibleRangeChanged({}, {});
 }
 
 void EventRibbon::Private::clearShiftAnimations()
@@ -934,6 +943,14 @@ void EventRibbon::Private::setViewportMargins(int top, int bottom)
 void EventRibbon::Private::updateView()
 {
     const auto unreadCountGuard = makeUnreadCountGuard();
+
+    const auto visibleRangeGuard = nx::utils::Guard(
+        [this, oldVisibleRange = m_visible]()
+        {
+            if (m_visible != oldVisibleRange)
+                emit q->visibleRangeChanged(m_visible, {});
+        });
+
     doUpdateView();
 }
 
@@ -1126,6 +1143,11 @@ int EventRibbon::Private::count() const
 int EventRibbon::Private::unreadCount() const
 {
     return m_totalUnreadCount;
+}
+
+nx::utils::Interval<int> EventRibbon::Private::visibleRange() const
+{
+    return m_visible;
 }
 
 QnNotificationLevel::Value EventRibbon::Private::highestUnreadImportance() const
