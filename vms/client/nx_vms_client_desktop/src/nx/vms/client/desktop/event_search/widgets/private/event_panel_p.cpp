@@ -81,6 +81,8 @@ EventPanel::Private::Private(EventPanel* q):
     q->setAutoFillBackground(false);
     q->setAttribute(Qt::WA_TranslucentBackground);
 
+    m_counterLabel->hide();
+
     connect(m_notificationsTab, &NotificationListWidget::unreadCountChanged,
         this, &Private::updateUnreadCounter);
 

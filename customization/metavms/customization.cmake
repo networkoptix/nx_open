@@ -38,7 +38,6 @@ set(customization.fullBundleUpgradeCode "{b98a8e7a-2e21-472c-b951-e16f82a43798}"
 
 set(deb.customization.company.name "networkoptix-metavms")
 
-set(mac.skip.sign false)
 set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
 set(mac.app.sign.identity "3rd Party Mac Developer Application: Network Optix, Inc. (L6FE34GJWM)")
 set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Network Optix, Inc. (L6FE34GJWM)")

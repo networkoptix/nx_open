@@ -2075,7 +2075,6 @@ void ActionHandler::at_renameAction_triggered()
     // TODO: #vkutin #gdm Is the following block of code still in use?
     if (name.isEmpty())
     {
-        bool ok = false;
         do
         {
             name = QnInputDialog::getText(mainWindowWidget(),
