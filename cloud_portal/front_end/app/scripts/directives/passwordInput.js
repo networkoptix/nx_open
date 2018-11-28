@@ -55,11 +55,15 @@ angular
                 scope.config = configService.config;
 
                 loadCommonPasswords(); // Load most common passwords
-
+                
+                scope.untouch = function () {
+                    var name = elm[0].id.replace(/'/g, '');
+                    scope.form[name].$setUntouched();
+                };
+                
                 scope.$watch('ngModel', function(value){
                     scope.fairPassword = checkComplexity(value) < configService.config.passwordRequirements.strongClassesCount;
                 });
-
             }
         };
     }]);
