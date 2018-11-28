@@ -109,7 +109,8 @@ void StreamTransformingAsyncChannel::processTask(UserTask* task)
 
 void StreamTransformingAsyncChannel::processReadTask(ReadTask* task)
 {
-    NX_VERBOSE(this, "Processing read task");
+    NX_VERBOSE(this, lm("Processing read task. Read buffer size %1")
+        .args(task->buffer->capacity() - task->buffer->size()));
 
     SystemError::ErrorCode sysErrorCode = SystemError::noError;
     int bytesRead = 0;
@@ -126,7 +127,8 @@ void StreamTransformingAsyncChannel::processReadTask(ReadTask* task)
     NX_VERBOSE(this, lm("Read task completed. Result %1, bytesRead %2")
         .args(sysErrorCode, bytesRead));
 
-    task->buffer->resize(task->buffer->size() + bytesRead);
+    if (sysErrorCode == SystemError::noError && bytesRead > 0)
+        task->buffer->resize(task->buffer->size() + bytesRead);
 
     task->status = UserTaskStatus::done;
     auto userHandler = std::move(task->handler);
@@ -215,23 +217,29 @@ int StreamTransformingAsyncChannel::readRawBytes(void* data, size_t count)
     return utils::bstream::StreamIoError::wouldBlock;
 }
 
-int StreamTransformingAsyncChannel::readRawDataFromCache(void* data, size_t count)
+int StreamTransformingAsyncChannel::readRawDataFromCache(
+    void* data,
+    const size_t count)
 {
     uint8_t* dataBytes = static_cast<uint8_t*>(data);
     std::size_t bytesRead = 0;
 
-    while (!m_readRawData.empty() && count > 0)
+    auto bytesToReadCount = count;
+    while (!m_readRawData.empty() && bytesToReadCount > 0)
     {
         nx::Buffer& rawData = m_readRawData.front();
-        auto bytesToCopy = std::min<std::size_t>(rawData.size(), count);
+        auto bytesToCopy = std::min<std::size_t>(rawData.size(), bytesToReadCount);
         memcpy(dataBytes, rawData.constData(), bytesToCopy);
         dataBytes += bytesToCopy;
-        count -= bytesToCopy;
+        bytesToReadCount -= bytesToCopy;
         rawData.remove(0, (int)bytesToCopy);
         if (m_readRawData.front().isEmpty())
             m_readRawData.pop_front();
         bytesRead += bytesToCopy;
     }
+
+    NX_VERBOSE(this, lm("%1 bytes read from cache. %2 bytes were requested")
+        .args(bytesRead, count));
 
     return (int)bytesRead;
 }
@@ -241,6 +249,8 @@ void StreamTransformingAsyncChannel::readRawChannelAsync()
     using namespace std::placeholders;
 
     constexpr static std::size_t kRawReadBufferSize = 16 * 1024;
+
+    NX_VERBOSE(this, lm("Scheduling socket read operation"));
 
     m_rawDataReadBuffer.clear();
     m_rawDataReadBuffer.reserve(kRawReadBufferSize);
@@ -372,6 +382,8 @@ void StreamTransformingAsyncChannel::scheduleNextRawSendTaskIfAny()
 {
     if (!m_rawWriteQueue.empty())
     {
+        NX_VERBOSE(this, lm("Scheduling socket write operation"));
+
         m_rawDataChannel->sendAsync(
             m_rawWriteQueue.front().data,
             [this](auto&&... args) { onRawDataWritten(std::move(args)...); });
