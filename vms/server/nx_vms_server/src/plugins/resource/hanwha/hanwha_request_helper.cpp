@@ -148,7 +148,7 @@ utils::Url HanwhaRequestHelper::buildRequestUrl(
     const QString& submenu,
     const QString& action,
     const HanwhaRequestHelper::Parameters& parameters,
-    const boost::optional<int>& bypassChannel)
+    const boost::optional<int>& /*bypassChannel*/)
 {
     QUrlQuery query;
 
