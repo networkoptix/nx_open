@@ -789,7 +789,8 @@
         {
             "keys": [
                 "AXIS|AXISP8221",
-                "AXIS|AXISC3003E"
+                "AXIS|AXISC3003E",
+                "AXIS|AXISA9161"
             ],
             "noVideoSupport": true
         },
