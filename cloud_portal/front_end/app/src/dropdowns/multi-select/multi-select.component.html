@@ -17,7 +17,7 @@
          aria-labelledby="multiSelect">
 
         <ul class="dropdown-menu--header" *ngIf="canSelectAll">
-            <li class="dropdown-item-container" >
+            <li class="dropdown-item-container">
                 <a class="dropdown-item inset" (click)="selectAll();"
                    href translate>All</a>
             </li>
@@ -26,15 +26,15 @@
 
         <ul class="dropdown-menu--list">
             <li class="dropdown-item-container" *ngFor="let item of items">
-                <nx-checkbox
-                        [compId]="item.id"
-                        [checked]="item.selected"
-                        (click)="change($event, item)">
-                </nx-checkbox>
+                <div class="dropdown-item inset">
+                    <nx-checkbox
+                            [compId]="item.id"
+                            [checked]="item.selected"
+                            (click)="change($event, item)">
+                    </nx-checkbox>
 
-                <label for="{{item.id}}"
-                       class="dropdown-item inset">{{item.label}}
-                </label>
+                    <label for="{{item.id}}">{{item.label}}</label>
+                </div>
             </li>
         </ul>
     </div>

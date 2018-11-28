@@ -161,7 +161,7 @@ header {
             .dropdown-item {
                 display     : flex;
                 align-items : center;
-                padding     : 0.25rem rem(12px) 0.25rem;
+                padding     : 0.25rem rem(10px);
                 height      : 26px;
                 line-height : 26px;
                 font-family : $font-family-medium;
@@ -201,8 +201,11 @@ header {
                 top      : 4px;
                 
                 & + label {
-                    padding-left : 34px !important;
+                    position     : absolute;
+                    padding-left : 24px !important;
                     margin       : 0;
+                    cursor       : pointer;
+                    width        : calc(100% - 10px);
                 }
             }
         }
