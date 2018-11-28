@@ -16,6 +16,8 @@
 #include <nx/network/simple_http_client.h>
 #include <nx/streaming/media_data_packet.h>
 
+#include <nx/network/http/http_client.h>
+
 class QnAxisPtzController;
 
 class QnPlAxisResource:
@@ -109,6 +111,8 @@ private:
     virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
     void setSupportedCodecs(const QSet<AVCodecID>& value);
     QSet<AVCodecID> filterSupportedCodecs(const QList<QByteArray>& values) const;
+
+    std::unique_ptr<nx_http::HttpClient> makeHttpClient() const;
 private:
     QList<AxisResolution> m_resolutionList;
     QSet<AVCodecID> m_supportedCodecs;

@@ -37,50 +37,54 @@ using namespace std;
 const QString QnPlAxisResource::MANUFACTURE(lit("Axis"));
 
 namespace {
-    const static std::chrono::milliseconds kReconnectTimeout(1000);
-    const float MAX_AR_EPS = 0.04f;
-    const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
-    const quint16 DEFAULT_AXIS_API_PORT = 80;
-    const int AXIS_IO_KEEP_ALIVE_TIME = 1000 * 15;
-    const QString AXIS_SUPPORTED_AUDIO_CODECS_PARAM_NAME("Properties.Audio.Decoder.Format");
-    const QString AXIS_TWO_WAY_AUDIO_MODES("Properties.Audio.DuplexMode");
-    const QString AXIS_FIRMWARE_VERSION_PARAM_NAME("Properties.Firmware.Version");
 
-    QnAudioFormat toAudioFormat(const QString& codecName)
+const static std::chrono::milliseconds kReconnectTimeout(1000);
+const static std::chrono::seconds kSendTimeout{5};
+const static std::chrono::seconds kReceiveTimeout{5};
+
+const float MAX_AR_EPS = 0.04f;
+const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
+const quint16 DEFAULT_AXIS_API_PORT = 80;
+const int AXIS_IO_KEEP_ALIVE_TIME = 1000 * 15;
+const QString AXIS_SUPPORTED_AUDIO_CODECS_PARAM_NAME("Properties.Audio.Decoder.Format");
+const QString AXIS_TWO_WAY_AUDIO_MODES("Properties.Audio.DuplexMode");
+const QString AXIS_FIRMWARE_VERSION_PARAM_NAME("Properties.Firmware.Version");
+
+QnAudioFormat toAudioFormat(const QString& codecName)
+{
+    QnAudioFormat result;
+    if (codecName == lit("g711"))
     {
-        QnAudioFormat result;
-        if (codecName == lit("g711"))
-        {
-            result.setSampleRate(8000);
-            result.setCodec("MULAW");
-        }
-        else if (codecName == lit("g726"))
-        {
-            result.setSampleRate(8000);
-            result.setCodec("G726");
-        }
-        else if (codecName == lit("axis-mulaw-128"))
-        {
-            result.setSampleRate(16000);
-            result.setCodec("MULAW");
-        }
-
-        return result;
+        result.setSampleRate(8000);
+        result.setCodec("MULAW");
+    }
+    else if (codecName == lit("g726"))
+    {
+        result.setSampleRate(8000);
+        result.setCodec("G726");
+    }
+    else if (codecName == lit("axis-mulaw-128"))
+    {
+        result.setSampleRate(16000);
+        result.setCodec("MULAW");
     }
 
-    class AxisParamsHelper
-    {
-    public:
-        static QString toDriverBoolValue(const QString& value)
-        {
-            return value == "true" ? "yes" : "no";
-        }
+    return result;
+}
 
-        static QString fromDriverBoolValue(const QString& value)
-        {
-            return value == "yes" ? "true" : "false";
-        }
-    };
+class AxisParamsHelper
+{
+public:
+    static QString toDriverBoolValue(const QString& value)
+    {
+        return value == "true" ? "yes" : "no";
+    }
+
+    static QString fromDriverBoolValue(const QString& value)
+    {
+        return value == "yes" ? "true" : "false";
+    }
+};
 
 } // namespace
 
@@ -429,12 +433,14 @@ bool QnPlAxisResource::readMotionInfo()
     return true;
 }
 
-bool resolutionGreatThan(const QnPlAxisResource::AxisResolution& res1, const QnPlAxisResource::AxisResolution& res2)
+bool resolutionGreaterThan(
+    const QnPlAxisResource::AxisResolution& res1,
+    const QnPlAxisResource::AxisResolution& res2)
 {
     int square1 = res1.size.width() * res1.size.height();
     int square2 = res2.size.width() * res2.size.height();
 
-    return !(square1 < square2);
+    return square1 > square2;
 }
 
 nx::mediaserver::resource::StreamCapabilityMap QnPlAxisResource::getStreamCapabilityMapFromDrives(
@@ -508,6 +514,21 @@ QSet<AVCodecID> QnPlAxisResource::filterSupportedCodecs(const QList<QByteArray>&
             result.insert(AV_CODEC_ID_HEVC);
     }
     return result;
+}
+
+std::unique_ptr<nx_http::HttpClient> QnPlAxisResource::makeHttpClient() const
+{
+    using namespace std::chrono;
+
+    const auto auth = getAuth();
+    auto httpClient = std::make_unique<nx_http::HttpClient>();
+    httpClient->setSendTimeoutMs(duration_cast<milliseconds>(kSendTimeout).count());
+    httpClient->setMessageBodyReadTimeoutMs(duration_cast<milliseconds>(kReceiveTimeout).count());
+    httpClient->setResponseReadTimeoutMs(duration_cast<milliseconds>(kReceiveTimeout).count());
+    httpClient->setUserName(auth.user());
+    httpClient->setUserPassword(auth.password());
+    httpClient->setIgnoreMutexAnalyzer(true);
+    return httpClient;
 }
 
 CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
@@ -615,7 +636,7 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
     if (hasVideo(0))
     {
         QnMutexLocker lock(&m_mutex);
-        std::sort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreatThan);
+        std::sort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreaterThan);
     }
 
 
@@ -795,42 +816,78 @@ int QnPlAxisResource::getChannelNumAxis() const
 
 //!Implementation of QnSecurityCamResource::setRelayOutputState
 bool QnPlAxisResource::setRelayOutputState(
-    const QString& outputID,
+    const QString& outputId,
     bool activate,
-    unsigned int autoResetTimeoutMS )
+    unsigned int autoResetTimeoutMs )
 {
     int portNum = 0;
-    if (outputID.isEmpty()) {
+    if (outputId.isEmpty())
+    {
         QnMutexLocker lock(&m_mutex);
-        for (const auto& value: m_ioPorts) {
+        for (const auto& value: m_ioPorts)
+        {
             if (value.portType == Qn::PT_Output)
                 portNum = portIdToIndex(value.id);
         }
     }
-    else {
-        portNum = portIdToIndex(outputID);
-    }
-    QString cmd = lit("axis-cgi/io/port.cgi?action=%1:%2").arg(portIndexToReqParam(portNum)).arg(QLatin1String(activate ? "/" : "\\"));
-    if (autoResetTimeoutMS > 0)
+    else
     {
-        //adding auto-reset
-        cmd += QString::number(autoResetTimeoutMS)+QLatin1String(activate ? "\\" : "");
+        portNum = portIdToIndex(outputId);
     }
 
-    CLSimpleHTTPClient httpClient( getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
+    // Syntax of an action parameter is the following:
+    // [PortId]:<ActionCharacter>[<Wait><ActionCharacter>...], where:
+    // PortId is port name (default is name from Output.Name output),
+    // ActionCharacter is either `\` (inactive state) or `/` (active state),
+    // Wait - delay before the next action in milliseconds.
+    //
+    // Examples:
+    // activate Port1: action=Port1:/
+    // deactivate Port2: action=Port2:\
+    // activate Port3 for 5 seconds: action=Port3:/500\
+    //
+    // All characters not allowed in a URI must be properly percent-encoded.
 
-    //cmd = QLatin1String("/axis-cgi/param.cgi?action=list&group=IOPort.I0.Configurable");
-    //cmd = QLatin1String("/axis-cgi/param.cgi?action=list&group=IOPort.I1.Output.Name");
-    //cmd = QLatin1String("/axis-cgi/io/port.cgi?check=1,2");
-    //cmd = QLatin1String("/axis-cgi/io/port.cgi?checkactive=1,2");
-    //cmd = QLatin1String("/axis-cgi/io/port.cgi?action=2:/300\\500/300\\");
-    //cmd = QLatin1String("/axis-cgi/param.cgi?action=list&group=IOPort.I1");
+    QString actionString = QString("%1:%2")
+        .arg(portIndexToReqParam(portNum), activate ? "/" : "\\");
 
-    CLHttpStatus status = httpClient.doGET( cmd );
-    if (status / 100 != 2)
+    if (autoResetTimeoutMs > 0)
+        actionString += QString::number(autoResetTimeoutMs) + (activate ? "\\" : "");
+
+    auto httpClient = makeHttpClient();
+    QUrl url(getUrl());
+    url.setPath("/axis-cgi/io/port.cgi");
+
+    QUrlQuery query;
+    query.addQueryItem("action", actionString);
+    url.setQuery(query);
+
+    if (!httpClient->doGet(url))
     {
-        NX_LOG( lit("Failed to set camera %1 port %2 output state to %3. Result: %4").
-            arg(getHostAddress()).arg(outputID).arg(activate).arg(::toString(status)), cl_logWARNING );
+        NX_DEBUG(this, lm("Failed to set camera %1 port %2 output state to %3.")
+            .args(getHostAddress(), outputId, activate));
+
+        return false;
+    }
+
+    const auto response = httpClient->response();
+    if (!response)
+    {
+        NX_DEBUG(
+            this,
+            lm("Failed to fetch HTTP response while settings output port state. "
+                "camera %1 port %2 output state to %3.")
+                .args(getHostAddress(), outputId, activate));
+
+        return false;
+    }
+
+    const auto statusCode = response->statusLine.statusCode;
+    if (!nx_http::StatusCode::isSuccessCode(statusCode))
+    {
+        NX_DEBUG(this, lm("Failed to set camera %1 port %2 output state to %3. Status code: %4")
+            .args(getHostAddress(), outputId, activate, ::toString(statusCode)));
+
         return false;
     }
 
