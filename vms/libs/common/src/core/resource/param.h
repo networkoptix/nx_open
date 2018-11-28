@@ -80,9 +80,8 @@ static const QString kIoDisplayName("ioDisplayName");
 
 static const QString kIoOverlayStyle("ioOverlayStyle");
 
-// The next three keys are used both as property keys and as data keys, so they are defined both
+// The next two keys are used both as property keys and as data keys, so they are defined both
 // in ResourcePropertyKey and ResourceDataKey namespaces.
-static const QString kNoVideoSupport("noVideoSupport");
 static const QString kBitratePerGOP("bitratePerGOP");
 static const QString kIoSettings("ioSettings");
 
@@ -191,9 +190,10 @@ static const QString kNeedToReloadAllAdvancedParametersAfterApply("needToReloadA
 // Rename?
 static const QString kSpace("space");
 
-// The next three keys are used both as property keys and as data keys, so they are defined both
-// in ResourcePropertyKey and ResourceDataKey namespaces.
 static const QString kNoVideoSupport("noVideoSupport");
+
+// The next two keys are used both as property keys and as data keys, so they are defined both
+// in ResourcePropertyKey and ResourceDataKey namespaces.
 static const QString kBitratePerGOP("bitratePerGOP");
 static const QString kIoSettings("ioSettings");
 
