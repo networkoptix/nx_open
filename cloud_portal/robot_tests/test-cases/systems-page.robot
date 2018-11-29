@@ -159,3 +159,4 @@ should update owner name in systems list, if it's changed
     Wait Until Elements Are Visible    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Element Text Should Be    ${AUTO TESTS USER}    newFirstName newLastName
     Reset user owner first/last name
+

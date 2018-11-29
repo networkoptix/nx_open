@@ -154,6 +154,7 @@ ${USERS LIST}                         //div[@process-loading='gettingSystemUsers
 
 ${SYSTEM NO ACCESS}                   //div[@ng-if='systemNoAccess']/h1[contains(text(), "${SYSTEM NO ACCESS TEXT}")]
 ${AVAILABLE SYSTEMS LIST}             //a[@href='/systems']
+${SYSTEMS SEARCH INPUT}               //input[@ng-model='search.value']
 
 #Disconnect from cloud portal
 ${DISCONNECT FORM}                    //form[@name='disconnectForm']
@@ -216,6 +217,9 @@ ${PATCHES TAB}                        //span[@class='tab-heading' and text()='${
 ${BETAS TAB}                          //span[@class='tab-heading' and text()='${BETAS TEXT}']/..
 ${RELEASE NUMBER}                     //div[contains(@class,"active")]//h1
 
+#Known Limitations
+${REMOTE CONNECTIVITY TILE LINK}      //h2[contains(text(),"${REMOTE CONNECTIVITY}")]/..//a[@href="${SUPPORT URL}"]
+${SUPPORT TILE LINK}                  //h2[contains(text(),"${SUPPORT}")]/..//a[@href="${SUPPORT URL}"]
 #About
 ${ABOUT CLOUD NAME}                        //span[contains(@class,'product-name') and text()='${PRODUCT_NAME}']
 

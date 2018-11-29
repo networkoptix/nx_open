@@ -41,7 +41,6 @@ ${AUTO TESTS TITLE}                   //div[@ng-repeat='system in systems | filt
 ${AUTO TESTS USER}                    //div[@ng-repeat='system in systems | filter:searchSystems as filtered track by system.id']//h2[text()='Auto Tests']/following-sibling::span[contains(@class,'user-name')]
 ${AUTO TESTS OPEN NX}                 //div[@ng-repeat='system in systems | filter:searchSystems as filtered track by system.id']//h2[text()='Auto Tests']/..//button[@ng-click='checkForm()']
 ${SYSTEM NAME AUTO TESTS HEADER}      //header//li/a/span[text()="Auto Tests"]
-${SYSTEMS SEARCH INPUT}               //input[@ng-model='search.value']
 ${SYSTEMS TILE}                       //div[@ng-repeat="system in systems | filter:searchSystems as filtered track by system.id"]
 ${NOT OWNER IN SYSTEM}                //div[@process-loading='gettingSystemUsers']//tbody//tr//td[contains(text(), '${EMAIL NOT OWNER}')]
 
