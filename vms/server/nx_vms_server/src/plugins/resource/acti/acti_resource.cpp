@@ -580,14 +580,14 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
 
     // Resolution list depends on streaming mode, so we should make this request
     // after setting proper streaming mode.
-    QByteArray resolutions= makeActiRequest(
+    QByteArray resolutions = makeActiRequest(
         lit("system"),
         lit("VIDEO_RESOLUTION_CAP"),
         status);
 
     // Save this check for backward compatibility
     // since SYSTEM_INFO request potentially can work without auth
-    if (!nx::network::http::StatusCode::unauthorized == status)
+    if (nx::network::http::StatusCode::unauthorized != status)
         setStatus(Qn::Unauthorized);
 
     if (!nx::network::http::StatusCode::isSuccessCode(status))
