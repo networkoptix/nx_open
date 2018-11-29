@@ -50,7 +50,6 @@ Invalid Email 14 myemail@gmail.com;       mark        hamill      myemail@gmail.
 Empty Email                               mark        hamill      ${EMPTY}                  ${BASE PASSWORD}            True
     [tags]    C41556
 Registered Email                          mark        hamill      ${existing email}         ${BASE PASSWORD}            True
-    [tags]    C41860
 Short Password asdfghj                    mark        hamill      ${valid email}            ${7char password}           True
     [tags]    C41860
 No Uppercase Password adrhartjad          mark        hamill      ${valid email}            ${no upper password}        True
