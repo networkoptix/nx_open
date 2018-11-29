@@ -1,7 +1,6 @@
 #!/bin/bash -e
 
-. ../environment
-. ../common.sh
+. common.sh
 
 MODULE=mediaserver
 VERSION=4.0.0.28077
