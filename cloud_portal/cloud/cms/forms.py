@@ -21,7 +21,7 @@ def convert_meta_to_description(meta):
                      }
     converted_msg = ""
     if 'size' in meta:
-        meta['size'] = meta['size']/BYTES_TO_MEGABYTES
+        meta['size'] = meta['size'] / BYTES_TO_MEGABYTES
     for k in meta:
         if k in meta_to_plain:
             value = meta[k]
@@ -38,7 +38,8 @@ def get_languages_list():
         is_default = ""
         if language[0] == default_language_code:
             is_default = " - default"
-        return language[0], "{} - {}{}".format(language[0],language[1], is_default)
+        return language[0], "{} - {}{}".format(language[0], language[1], is_default)
+
     customization = Customization.objects.get(name=settings.CUSTOMIZATION)
     default_language_code = customization.default_language.code
     return map(modify_default_language, customization.languages.values_list('code', 'name'))
@@ -52,7 +53,7 @@ class CustomContextForm(forms.Form):
         super(CustomContextForm, self).__init__(*args, **kwargs)  # 'send_cloud_notification'
         self.fields['language'].choices = get_languages_list()
 
-    def remove_langauge(self):
+    def remove_language(self):
         super(CustomContextForm, self)
         self.fields.pop('language')
 
@@ -63,7 +64,7 @@ class CustomContextForm(forms.Form):
             return
 
         if not context.translatable:
-            self.remove_langauge()
+            self.remove_language()
 
         for data_structure in data_structures:
             ds_label = data_structure.label if data_structure.label else data_structure.name
@@ -74,7 +75,7 @@ class CustomContextForm(forms.Form):
                 ds_description += convert_meta_to_description(data_structure.meta_settings)
 
             if data_structure.type == DataStructure.DATA_TYPES.guid:
-                ds_description += "<br>GUID format is '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX}' using hexdecimal characters (0-9, a-f, A-F)"
+                ds_description += "<br>GUID format is '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX}' using hexadecimal characters (0-9, a-f, A-F)"
 
             ds_language = language
             if not data_structure.translatable:
@@ -165,7 +166,7 @@ class CustomContextForm(forms.Form):
 class ProductSettingsForm(forms.Form):
     file = forms.FileField(
         label="File",
-        help_text="Archive with static files and images for content or stucture.json file. "
+        help_text="Archive with static files and images for content or structure.json file. "
                   "Archive must have top-level directories named as customizations",
         required=True
     )
@@ -188,12 +189,12 @@ class ProductForm(forms.ModelForm):
         exclude = []
         widgets = {
             'created_by': autocomplete.ModelSelect2(url='account-autocomplete',
-                                                            attrs={
-                                                                # Set some placeholder
-                                                                'data-placeholder': 'Email ...',
-                                                                #  Only trigger autocompletion after 2 characters have been typed
-                                                                'data-minimum-input-length': 2
-                                                            }),
+                                                    attrs={
+                                                        # Set some placeholder
+                                                        'data-placeholder': 'Email ...',
+                                                        # Only trigger autocomplete after 2 characters have been typed
+                                                        'data-minimum-input-length': 2
+                                                    }),
             'customizations': FilteredSelectMultiple('customizations', False)
         }
 
@@ -227,12 +228,12 @@ class CustomizationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(CustomizationForm, self).__init__(*args, **kwargs)
 
-        self.fields['parent'].queryset = Customization.objects.exclude(id=self.instance.id)\
+        self.fields['parent'].queryset = Customization.objects.exclude(id=self.instance.id) \
             .exclude(id__in=self.instance.get_children_ids(self.instance))
 
     def clean_parent(self):
         data = self.cleaned_data['parent']
-        if not Customization.objects.exclude(id__in=self.instance.get_children_ids(self.instance)).\
+        if not Customization.objects.exclude(id__in=self.instance.get_children_ids(self.instance)). \
                 exclude(id=self.instance.id).filter(id=data.id).exists():
             raise ValueError('Invalid customization was selected')
         return data

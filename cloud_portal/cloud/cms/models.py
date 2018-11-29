@@ -116,7 +116,8 @@ class Customization(models.Model):
                                <br><br>
                                If there is a parent:<br>
                                - A review will be locked until the parent accepts that review.<br>
-                               - If the parent rejects a review it will automatically be rejected for this customization.<br><br>
+                               - If the parent rejects a review it will automatically be rejected for this
+                               customization.<br><br>
                                If there is no parent selected or the parent is not in the review an integration
                                can be reviewed whenever.""")
     trust_parent = models.BooleanField(default=False, help_text="""Automatically accepts integrations the parent
@@ -281,7 +282,8 @@ class Context(models.Model):
         contexts = (self.contexttemplate_set.filter(language=item[0], skin=item[1]) for item in priorities)
 
         # retrieve first available template from the list or return None
-        return next((context_template.first().template for context_template in contexts if context_template.exists()), None)
+        return next((context_template.first().template for context_template in contexts if context_template.exists()),
+                    None)
 
 
 # TODO: CLOUD-2388 Remove proxy model
@@ -340,7 +342,9 @@ class DataStructure(models.Model):
     type = models.IntegerField(choices=DATA_TYPES, default=DATA_TYPES.text)
     default = models.TextField(default='', blank=True)
     translatable = models.BooleanField(default=True)
-    meta_settings = JSONField(default=dict(), blank=True, help_text="For the regex field \\ needs to be escaped with another '\\'")
+    meta_settings = JSONField(default=dict(),
+                              blank=True,
+                              help_text="For the regex field \\ needs to be escaped with another '\\'")
     advanced = models.BooleanField(default=False)
     order = models.IntegerField(default=100000)
     optional = models.BooleanField(default=False)
@@ -384,15 +388,17 @@ class DataStructure(models.Model):
                 content_record = content_record.filter(version_id__lte=version_id)
                 if not draft:
                     content_record = content_record.\
-                        filter(version__productcustomizationreview__state=ProductCustomizationReview.REVIEW_STATES.accepted)
+                        filter(version__productcustomizationreview__state=ProductCustomizationReview.
+                               REVIEW_STATES.accepted)
                 if content_record.exists():
                     content_value = content_record.latest('version_id').value
 
         # if no value or optional and type file - use default value from structure
-        if not content_value and (not self.optional or self.optional and self.type in [DataStructure.DATA_TYPES.file,
-                                                                                       DataStructure.DATA_TYPES.image,
-                                                                                       DataStructure.DATA_TYPES.external_file,
-                                                                                       DataStructure.DATA_TYPES.external_image]):
+        if not content_value and (not self.optional or
+                                  self.optional and self.type in [DataStructure.DATA_TYPES.file,
+                                                                  DataStructure.DATA_TYPES.image,
+                                                                  DataStructure.DATA_TYPES.external_file,
+                                                                  DataStructure.DATA_TYPES.external_image]):
             content_value = self.default
 
         return content_value
@@ -451,7 +457,6 @@ class ContentVersion(models.Model):
             else:
                 ProductCustomizationReview(customization=customization, version=self, state=pending).save()
 
-
     @property
     def state(self):
         if not self.accepted_by:
@@ -474,7 +479,10 @@ class ProductCustomizationReview(models.Model):
             ("force_update", "Can forcibly update content"),
         )
 
-    REVIEW_STATES = Choices((0, "pending", "Pending"), (1, "accepted", "Accepted"), (2, "rejected", "Rejected"), (3, "blocked", "Blocked"))
+    REVIEW_STATES = Choices((0, "pending", "Pending"),
+                            (1, "accepted", "Accepted"),
+                            (2, "rejected", "Rejected"),
+                            (3, "blocked", "Blocked"))
     customization = models.ForeignKey(Customization)
     version = models.ForeignKey(ContentVersion)
     state = models.IntegerField(choices=REVIEW_STATES, default=REVIEW_STATES.pending)

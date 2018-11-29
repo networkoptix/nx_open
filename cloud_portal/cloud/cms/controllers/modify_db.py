@@ -5,7 +5,11 @@ from django.contrib.auth.models import Permission
 from django.db.models import Q
 
 from PIL import Image
-import base64, json, re, uuid, hashlib
+import base64
+import json
+import re
+import uuid
+import hashlib
 
 from .filldata import fill_content
 from api.models import Account
@@ -375,7 +379,7 @@ def check_meta_settings(data_structure, new_file):
 def upload_file(data_structure, new_file):
     encoded_file = base64.b64encode(new_file.read())
     if new_file.size >= settings.CMS_MAX_FILE_SIZE:
-        return None, [(data_structure.name, 'Its size was {0:.2f}MB but must be less than {1:.2f} MB'. \
+        return None, [(data_structure.name, 'Its size was {0:.2f}MB but must be less than {1:.2f} MB'.
                        format(new_file.size/BYTES_TO_MEGABYTES, settings.CMS_MAX_FILE_SIZE/BYTES_TO_MEGABYTES))]
 
     file_errors = check_meta_settings(data_structure, new_file)
