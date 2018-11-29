@@ -7,7 +7,7 @@
 
 #include <utils/math/space_mapper.h>
 
-#include <nx/vms/server/camera_mock.h>
+#include <nx/mediaserver/camera_mock.h>
 #include <nx/vms/server/ptz/server_ptz_helpers.h>
 #include <nx/vms/server/ptz/server_ptz_controller_pool.h>
 
@@ -34,7 +34,7 @@ public:
         m_staticCommonModule = std::make_unique<QnStaticCommonModule>();
         m_serverModule = std::make_unique<QnMediaServerModule>();
 
-        m_pool = new ptz::ServerPtzControllerPool(m_serverModule->commonModule());
+        m_pool = new vms::server::ptz::ServerPtzControllerPool(m_serverModule->commonModule());
         m_camera.reset(new test::CameraMock(m_serverModule.get()));
         m_camera->setCommonModule(m_serverModule->commonModule());
         m_camera->initInternal();
