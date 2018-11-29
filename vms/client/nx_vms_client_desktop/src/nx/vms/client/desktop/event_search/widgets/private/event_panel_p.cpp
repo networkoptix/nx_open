@@ -58,6 +58,13 @@ EventPanel::Private::Private(EventPanel* q):
     layout->setContentsMargins(QMargins());
     layout->addWidget(m_tabs);
 
+    // Initially all tab widgets must be hidden.
+    m_notificationsTab->hide();
+    m_motionTab->hide();
+    m_bookmarksTab->hide();
+    m_eventsTab->hide();
+    m_analyticsTab->hide();
+
     static constexpr int kTabBarShift = 10;
     m_tabs->setProperty(style::Properties::kTabBarIndent, kTabBarShift);
     setTabShape(m_tabs->tabBar(), style::TabShape::Compact);
