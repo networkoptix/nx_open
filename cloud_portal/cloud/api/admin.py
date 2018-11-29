@@ -15,11 +15,12 @@ from django_csv_exports.admin import CSVExportAdmin
 class CustomizationFilter(SimpleListFilter):
     title = 'Customization'
     parameter_name = 'customization'
-    default_customization = Customization.objects.get(name=settings.CUSTOMIZATION)
+    default_customization = None
 
     def lookups(self, request, model_admin):
         # Temporary customization 0 is need for 'All' since we need to keep it,
         # but choose the customization for the current cloud portal as the default value
+        self.default_customization = Customization.objects.get(name=settings.CUSTOMIZATION)
         customizations = [Customization(id=0, name="All")]
         customizations.extend(list(Customization.objects.filter(name__in=request.user.customizations)))
         return [(c.id, c.name) for c in customizations]
