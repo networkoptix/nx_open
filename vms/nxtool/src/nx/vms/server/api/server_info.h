@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <memory>
@@ -12,11 +11,9 @@
 #include <QMetaType>
 #include <QScopedPointer>
 
-#include <nx/mediaserver/api/version_holder.h>
+#include <nx/vms/server/api/version_holder.h>
 
-namespace nx {
-namespace vms::server {
-namespace api {
+namespace nx::vms::server::api {
 
 struct InterfaceInfo;
 struct BaseServerInfo;
@@ -194,9 +191,7 @@ private:
     ExtraServerInfoPtr m_extra;
 };
 
-} // namespace api
-} // namespace mediaserver
-} // namespace nx
+} // namespace nx::vms::server::api
 
-Q_DECLARE_METATYPE(nx::mediaserver::api::InterfaceInfo)
-Q_DECLARE_METATYPE(nx::mediaserver::api::HttpAccessMethod)
+Q_DECLARE_METATYPE(nx::vms::server::api::InterfaceInfo)
+Q_DECLARE_METATYPE(nx::vms::server::api::HttpAccessMethod)

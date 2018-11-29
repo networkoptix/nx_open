@@ -1,10 +1,7 @@
-
 #include "server_info.h"
 
-namespace nx {
-namespace mediaserver {
-namespace api {
-
+namespace nx::vms::server::api {
+    
 InterfaceInfo::InterfaceInfo()
     : name()
     , ip()
@@ -210,6 +207,4 @@ void ServerInfo::resetExtraInfo()
     m_extra.reset();
 }
 
-} // namespace api
-} // namespace mediaserver
-} // namespace nx
+} // namespace nx::vms::server::api

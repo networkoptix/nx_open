@@ -27,7 +27,7 @@ namespace rtu
     public:
         void waitForServer(const QUuid &id);
 
-        typedef nx::mediaserver::api::BaseServerInfo BaseServerInfo;
+        typedef nx::vms::server::api::BaseServerInfo BaseServerInfo;
 
     signals:
         void serverAdded(const BaseServerInfo &baseInfo);

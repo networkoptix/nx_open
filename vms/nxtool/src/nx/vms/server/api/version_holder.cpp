@@ -3,9 +3,7 @@
 
 #include <QStringList>
 
-namespace nx {
-namespace mediaserver {
-namespace api {
+namespace nx::vms::server::api {
 
 namespace {
 
@@ -103,6 +101,4 @@ bool VersionHolder::operator != (const VersionHolder &other) const
     return (m_data != other.m_data);
 }
 
-} // namespace api
-} // namespace mediaserver
-} // namespace nx
+} // namespace nx::vms::server::api

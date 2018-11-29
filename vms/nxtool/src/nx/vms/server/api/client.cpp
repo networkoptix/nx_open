@@ -1,4 +1,3 @@
-
 #include "client.h"
 
 #include <cassert>
@@ -10,12 +9,10 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 
-#include <nx/mediaserver/api/version_holder.h>
+#include <nx/vms/server/api/version_holder.h>
 #include <base/nxtool_app_info.h>
 
-namespace nx {
-namespace mediaserver {
-namespace api {
+namespace nx::vms::server::api {
 
 using rest::RestClient;
 
@@ -1136,6 +1133,4 @@ Client& Client::instance()
     return client;
 }
 
-} // namespace api
-} // namespace mediaserver
-} // namespace nx
+} // namespace nx::vms::server::api

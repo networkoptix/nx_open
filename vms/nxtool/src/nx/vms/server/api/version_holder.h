@@ -5,10 +5,8 @@
 
 #include <QString>
 
-namespace nx {
-namespace vms::server {
-namespace api {
-
+namespace nx::vms::server::api {
+    
 class VersionHolder
 {
 public:
@@ -41,6 +39,4 @@ private:
     Data m_data;
 };
 
-} // namespace api
-} // namespace mediaserver
-} // namespace nx
+} // namespace nx::vms::server::api

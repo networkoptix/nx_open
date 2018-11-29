@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <memory>
@@ -7,15 +6,13 @@
 #include <QUuid>
 
 #include <nx/rest/rest_client.h>
-#include <nx/mediaserver/api/server_info.h>
+#include <nx/vms/server/api/server_info.h>
 
 class QDateTime;
 class QTimeZone;
 class QString;
 
-namespace nx {
-namespace vms::server {
-namespace api {
+namespace nx::vms::server::api {
 
 /** singleton
  * Executes requests to Mediaserver via Rest API.
@@ -242,6 +239,4 @@ private:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Client::AffectedEntities)
 
-} // namespace api
-} // namespace mediaserver
-} // namespace nx
+} // namespace nx::vms::server::api
