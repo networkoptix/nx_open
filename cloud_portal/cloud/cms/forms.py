@@ -138,6 +138,14 @@ class CustomContextForm(forms.Form):
                                                                          disabled=disabled)
                 continue
 
+            elif data_structure.type == DataStructure.DATA_TYPES.check_box:
+                self.fields[data_structure.name] = forms.BooleanField(label=ds_label,
+                                                                      help_text=ds_description,
+                                                                      initial=record_value,
+                                                                      required=False,
+                                                                      disabled=disabled)
+                continue
+
             validator = RegexValidator('')
             if data_structure.type == DataStructure.DATA_TYPES.text and 'regex' in data_structure.meta_settings:
                 validator = RegexValidator(data_structure.meta_settings['regex'])

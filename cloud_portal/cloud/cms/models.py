@@ -334,7 +334,8 @@ class DataStructure(models.Model):
                          (5, 'guid', 'GUID'),
                          (6, 'select', 'Select'),
                          (7, 'external_file', 'External File'),
-                         (8, 'external_image', 'External Image'))
+                         (8, 'external_image', 'External Image'),
+                         (9, 'check_box', 'Check Box'))
 
     type = models.IntegerField(choices=DATA_TYPES, default=DATA_TYPES.text)
     default = models.TextField(default='', blank=True)

@@ -150,6 +150,9 @@ def save_unrevisioned_records(product, context, language, data_structures,
             elif 'delete_' + data_structure_name in request_data and request_data['delete_' + data_structure_name]:
                 delete_file = True
 
+        elif data_structure.type == DataStructure.DATA_TYPES.check_box:
+            new_record_value = 'on' if data_structure_name in request_data else ''
+
         elif data_structure_name in request_data:
             new_record_value = request_data[data_structure_name]
             if data_structure.type == DataStructure.DATA_TYPES.text and 'regex' in data_structure.meta_settings:
