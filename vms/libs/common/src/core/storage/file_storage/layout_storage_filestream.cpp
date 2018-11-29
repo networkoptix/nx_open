@@ -21,6 +21,8 @@ QnLayoutPlainStream::~QnLayoutPlainStream()
 bool QnLayoutPlainStream::seek(qint64 offset)
 {
     QnMutexLocker lock(&m_mutex);
+    // Qt docs say: "When subclassing QIODevice, you must call QIODevice::seek() at the start
+    // of your function to ensure integrity with QIODevice's built-in buffer."
     QIODevice::seek(offset);
     return m_file.seek(offset + m_fileOffset);;
 }
