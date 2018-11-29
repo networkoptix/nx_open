@@ -162,12 +162,11 @@ void HanwhaResourceSearcher::updateSocketList()
     if (!m_sunapiReceiveSocket)
     {
         auto socket = nx::network::SocketFactory::createDatagramSocket();
-        if (!socket->setReuseAddrFlag(true) ||
-            !socket->bind(network::BROADCAST_ADDRESS, kSunApiProbeSrcPort))
+        if (socket->setReuseAddrFlag(true) &&
+            socket->bind(network::BROADCAST_ADDRESS, kSunApiProbeSrcPort))
         {
-            return;
+            m_sunapiReceiveSocket = std::move(socket);
         }
-        m_sunapiReceiveSocket = std::move(socket);
     }
 
     const auto interfaceList = nx::network::getAllIPv4Interfaces();
@@ -221,6 +220,9 @@ bool HanwhaResourceSearcher::parseSunApiData(const QByteArray& data, SunApiData*
     static const int kUrlOffset = 133;
     const auto urlStr = QLatin1String(data.data() + kUrlOffset);
     QUrl url(urlStr);
+
+    qDebug() << "URL: " << url;
+
     if (!url.isValid() || !isHostBelongsToValidSubnet(QHostAddress(url.host())))
         return false;
     outData->presentationUrl = url.toString(QUrl::RemovePath);
