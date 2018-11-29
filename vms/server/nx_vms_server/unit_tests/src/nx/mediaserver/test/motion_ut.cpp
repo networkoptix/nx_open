@@ -4,7 +4,7 @@
 #include <media_server/media_server_module.h>
 #include <motion/motion_helper.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
-#include <nx/vms/server/camera_mock.h>
+#include "../camera_mock.h"
 #include <nx/fusion/model_functions.h>
 
 namespace nx::vms::server::test
