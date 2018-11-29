@@ -12,6 +12,35 @@ from cms.controllers.modify_db import get_records_for_version
 from cms.views.product import page_editor, review
 
 
+class CustomizationFilter(SimpleListFilter):
+    title = 'Customization'
+    parameter_name = 'customization'
+    default_customization = Customization.objects.get(name=settings.CUSTOMIZATION).id
+
+    def lookups(self, request, model_admin):
+        # Temporary customization 0 is need for 'All' since we need to keep it,
+        # but choose the customization for the current cloud portal as the default value
+        customizations = [Customization(id=0, name='All')]
+        customizations.extend(list(Customization.objects.filter(name__in=request.user.customizations)))
+        return [(c.id, c.name) for c in customizations]
+
+    def choices(self, cl):
+        for lookup, title in self.lookup_choices:
+            yield {
+                'selected': self.value() == lookup if self.value() else lookup == self.default_customization,
+                'query_string': cl.get_query_string({self.parameter_name: lookup}, []),
+                'display': title,
+            }
+
+    def queryset(self, request, queryset):
+        if self.value() and self.value() != '0':
+            return queryset.filter(customization__id=self.value())
+
+        if self.value() is None:
+            return queryset.filter(customization__id=self.default_customization)
+        return queryset
+
+
 class ProductFilter(SimpleListFilter):
     title = 'Product'
     parameter_name = 'product'
@@ -252,7 +281,7 @@ class ContentVersionAdmin(CMSAdmin):
     list_display = ('id', 'product', 'created_date', 'created_by', 'state')
 
     list_display_links = ('id', )
-    list_filter = (ProductFilter,)
+    list_filter = (ProductFilter, CustomizationFilter,)
     search_fields = ('created_by__email',)
     readonly_fields = ('created_by',)
     exclude = ('accepted_by', 'accepted_date')
@@ -276,7 +305,7 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
     list_display = ('product', 'version', 'customization', 'reviewed_by', 'reviewed_date', 'state')
     readonly_fields = ('customization', 'version', 'reviewed_date', 'reviewed_by', 'notes',)
 
-    list_filter = ('version__product__product_type', ProductFilter)
+    list_filter = ('version__product__product_type', ProductFilter, CustomizationFilter)
 
     change_form_template = 'cms/product_customization_review_change_form.html'
     fieldsets = (
@@ -349,13 +378,14 @@ admin.site.register(ProductCustomizationReview, ProductCustomizationReviewAdmin)
 
 class UserGroupsToCustomizationPermissionsAdmin(CMSAdmin):
     list_display = ('id', 'group', 'customization',)
+    list_filter = (CustomizationFilter, )
 
 
 admin.site.register(UserGroupsToCustomizationPermissions, UserGroupsToCustomizationPermissionsAdmin)
 
 
 class ExternalFileAdmin(CMSAdmin):
-    list_filter = ('id', 'file', 'size',)
+    list_display = ('id', 'file', 'size',)
 
 
 admin.site.register(ExternalFile, ExternalFileAdmin)

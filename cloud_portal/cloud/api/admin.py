@@ -12,6 +12,37 @@ from api.models import *
 from django_csv_exports.admin import CSVExportAdmin
 
 
+class CustomizationFilter(SimpleListFilter):
+    title = 'Customization'
+    parameter_name = 'customization'
+    default_customization = Customization.objects.get(name=settings.CUSTOMIZATION)
+
+    def lookups(self, request, model_admin):
+        # Temporary customization 0 is need for 'All' since we need to keep it,
+        # but choose the customization for the current cloud portal as the default value
+        customizations = [Customization(id=0, name="All")]
+        customizations.extend(list(Customization.objects.filter(name__in=request.user.customizations)))
+        return [(c.id, c.name) for c in customizations]
+
+    def choices(self, cl):
+        for lookup, title in self.lookup_choices:
+            yield {
+                'selected': self.value() == lookup if self.value() else lookup == self.default_customization.id,
+                'query_string': cl.get_query_string({self.parameter_name: lookup}, []),
+                'display': title,
+            }
+
+    def queryset(self, request, queryset):
+        customization_name = Customization.objects.filter(id=self.value())
+        if self.value() and customization_name.exists():
+            return queryset.filter(customization=customization_name[0].name)
+
+        if self.value() is None:
+            print self.default_customization.name
+            return queryset.filter(customization=self.default_customization.name)
+        return queryset
+
+
 class GroupFilter(SimpleListFilter):
     title = 'Group'
     parameter_name = 'group'
@@ -38,7 +69,7 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
 
     exclude = ("user_permissions",)
 
-    list_filter = ('subscribe', 'is_staff', 'created_date', 'last_login', 'customization', GroupFilter, )
+    list_filter = ('subscribe', 'is_staff', 'created_date', 'last_login', CustomizationFilter, GroupFilter, )
     search_fields = ('email', 'first_name', 'last_name', 'customization', 'language', 'groups__name')
 
     csv_fields = ('email', 'first_name', 'last_name', 'created_date', 'last_login',
