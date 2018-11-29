@@ -27,13 +27,27 @@ private:
         {
         }
 
-        std::string toString() const
+        bool operator==(const DeviceDataWithNxId& rhs) const
         {
             return 
+                nxId == rhs.nxId 
+                && device.name == rhs.device.name 
+                && device.path == rhs.device.path 
+                && device.uniqueId == rhs.device.uniqueId;
+        }
+
+        bool operator!=(const DeviceDataWithNxId& rhs) const
+        {
+            return !operator==(rhs);
+        }
+
+        std::string toString() const
+        {
+            return
                 std::string("nxId: ") + nxId +
-                ", device: { " + device.name + 
-                ", " + device.path +
-                ", " + device.uniqueId + " }";
+                ", device: { name: " + device.name +
+                ", path: " + device.path +
+                ", uid: " + device.uniqueId + " }";
         }
     };
 
