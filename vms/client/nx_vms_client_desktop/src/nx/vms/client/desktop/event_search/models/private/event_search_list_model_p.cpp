@@ -322,7 +322,7 @@ void EventSearchListModel::Private::fetchLive()
 }
 
 rest::Handle EventSearchListModel::Private::getEvents(
-    const QnTimePeriod& period, GetCallback callback, Qt::SortOrder order, int limit)
+    const QnTimePeriod& period, GetCallback callback, Qt::SortOrder order, int limit) const
 {
     const auto server = q->commonModule()->currentServer();
     NX_ASSERT(callback && server && server->restConnection());
@@ -350,7 +350,7 @@ rest::Handle EventSearchListModel::Private::getEvents(
         request.limit);
 
     const auto internalCallback =
-        [callback, guard = QPointer<Private>(this)](
+        [callback, guard = QPointer<const Private>(this)](
             bool success, rest::Handle handle, rest::EventLogData data)
         {
             if (guard)

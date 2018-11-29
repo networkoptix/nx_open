@@ -1,6 +1,7 @@
 #include "bookmark_search_list_model_p.h"
 
 #include <chrono>
+#include <vector>
 
 #include <QtGui/QPalette>
 #include <QtGui/QPixmap>
@@ -16,6 +17,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
+#include <nx/utils/range_adapters.h>
 #include <nx/utils/scope_guard.h>
 
 namespace nx::vms::client::desktop {
@@ -29,6 +31,16 @@ static const auto lowerBoundPredicate =
 
 static const auto upperBoundPredicate =
     [](milliseconds left, const QnCameraBookmark& right) { return left > right.startTimeMs; };
+
+bool operator==(const QnCameraBookmark& left, const QnCameraBookmark& right)
+{
+    return left.guid == right.guid
+        && left.startTimeMs == right.startTimeMs
+        && left.durationMs == right.durationMs
+        && left.name == right.name
+        && left.description == right.description
+        && left.tags == right.tags;
+}
 
 } // namespace
 
@@ -113,6 +125,7 @@ void BookmarkSearchListModel::Private::clearData()
     m_data.clear();
     m_guidToTimestamp.clear();
     m_prefetch.clear();
+    m_updateRequests.clear();
 }
 
 void BookmarkSearchListModel::Private::truncateToMaximumCount()
@@ -134,18 +147,16 @@ void BookmarkSearchListModel::Private::truncateToRelevantTimePeriod()
         m_data, upperBoundPredicate, q->relevantTimePeriod(), itemCleanup);
 }
 
-rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePeriod& period)
+rest::Handle BookmarkSearchListModel::Private::getBookmarks(
+    const QnTimePeriod& period, GetCallback callback, Qt::SortOrder order, int limit) const
 {
     QnCameraBookmarkSearchFilter filter;
     filter.startTimeMs = period.startTime();
     filter.endTimeMs = period.endTime();
     filter.text = m_filterText;
     filter.orderBy.column = Qn::BookmarkStartTime;
-    filter.orderBy.order = currentRequest().direction == FetchDirection::earlier
-        ? Qt::DescendingOrder
-        : Qt::AscendingOrder;
-
-    filter.limit = currentRequest().batchSize;
+    filter.orderBy.order = order;
+    filter.limit = limit;
 
     NX_VERBOSE(q, "Requesting bookmarks:\n"
         "    from: %1\n    to: %2\n    text filter: %3\n    sort: %4\n    limit: %5",
@@ -155,8 +166,14 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePerio
         QVariant::fromValue(filter.orderBy.order).toString(),
         filter.limit);
 
+    return qnCameraBookmarksManager->getBookmarksAsync(q->cameras(), filter,
+        BookmarksInternalCallbackType(nx::utils::guarded(this, callback)));
+}
+
+rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePeriod& period)
+{
     const auto callback =
-        [this](bool success, const QnCameraBookmarkList& bookmarks, int requestId)
+        [this](bool success, const QnCameraBookmarkList& bookmarks, rest::Handle requestId)
         {
             if (!requestId || requestId != currentRequest().id)
                 return;
@@ -166,7 +183,7 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePerio
 
             if (success)
             {
-                m_prefetch = std::move(bookmarks);
+                m_prefetch = bookmarks;
                 if (!m_prefetch.empty())
                 {
                     actuallyFetched = QnTimePeriod::fromInterval(
@@ -177,8 +194,11 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePerio
             completePrefetch(actuallyFetched, success, m_prefetch.size());
         };
 
-    return qnCameraBookmarksManager->getBookmarksAsync(q->cameras(), filter,
-        BookmarksInternalCallbackType(nx::utils::guarded(this, callback)));
+    const auto sortOrder = currentRequest().direction == FetchDirection::earlier
+        ? Qt::DescendingOrder
+        : Qt::AscendingOrder;
+
+    return getBookmarks(period, callback, sortOrder, currentRequest().batchSize);
 }
 
 template<typename Iter>
@@ -249,9 +269,8 @@ void BookmarkSearchListModel::Private::addBookmark(const QnCameraBookmark& bookm
     if (!q->fetchedTimeWindow().contains(bookmark.startTimeMs.count()))
         return;
 
-    if (m_guidToTimestamp.contains(bookmark.guid))
+    if (!NX_ASSERT(!m_guidToTimestamp.contains(bookmark.guid), "Bookmark already exists"))
     {
-        NX_ASSERT(false, Q_FUNC_INFO, "Bookmark already exists");
         updateBookmark(bookmark);
         return;
     }
@@ -261,9 +280,16 @@ void BookmarkSearchListModel::Private::addBookmark(const QnCameraBookmark& bookm
 
     const auto index = std::distance(m_data.cbegin(), insertionPos);
 
-    ScopedInsertRows insertRows(q,  index, index);
+    ScopedInsertRows insertRows(q, index, index);
     m_data.insert(m_data.begin() + index, bookmark);
     m_guidToTimestamp[bookmark.guid] = bookmark.startTimeMs;
+    insertRows.fire();
+
+    if (count() > q->maximumCount())
+    {
+        NX_VERBOSE(q, "Truncating to maximum count");
+        truncateToMaximumCount();
+    }
 }
 
 void BookmarkSearchListModel::Private::updateBookmark(const QnCameraBookmark& bookmark)
@@ -287,15 +313,105 @@ void BookmarkSearchListModel::Private::updateBookmark(const QnCameraBookmark& bo
     }
 }
 
-void BookmarkSearchListModel::Private::removeBookmark(const QnUuid& guid)
+void BookmarkSearchListModel::Private::removeBookmark(const QnUuid& id)
 {
-    const auto index = indexOf(guid);
+    const auto index = indexOf(id);
     if (index < 0)
         return;
 
     ScopedRemoveRows removeRows(q,  index, index);
     m_data.erase(m_data.begin() + index);
-    m_guidToTimestamp.remove(guid);
+    m_guidToTimestamp.remove(id);
+}
+
+void BookmarkSearchListModel::Private::updatePeriod(
+    const QnTimePeriod& period, const QnCameraBookmarkList& bookmarks)
+{
+    // This function exists until we implement notifying all clients about every bookmark change.
+    // It's suboptimal in certain cases.
+
+    const auto effectivePeriod = period.intersected(q->fetchedTimeWindow());
+    if (effectivePeriod.isEmpty())
+        return;
+
+    const auto oldRange = nx::utils::rangeAdapter(
+        std::lower_bound(m_data.begin(), m_data.end(), effectivePeriod.endTime(),
+            lowerBoundPredicate),
+        std::upper_bound(m_data.begin(), m_data.end(), effectivePeriod.startTime(),
+            upperBoundPredicate));
+
+    std::vector<QnUuid> old;
+    old.resize(oldRange.end() - oldRange.begin());
+    std::transform(oldRange.begin(), oldRange.end(), old.begin(),
+        [](const QnCameraBookmark& bookmark) { return bookmark.guid; });
+
+    const auto newRange = nx::utils::rangeAdapter(
+        std::lower_bound(bookmarks.begin(), bookmarks.end(), effectivePeriod.endTime(),
+            lowerBoundPredicate),
+        std::upper_bound(bookmarks.begin(), bookmarks.end(), effectivePeriod.startTime(),
+            upperBoundPredicate));
+
+    int numAdded = 0;
+    int numUpdated = 0;
+    int numRemoved = 0;
+
+    // Update existing and add new bookmarks.
+    QSet<QnUuid> toKeep;
+    for (const auto& bookmark: newRange)
+    {
+        const int index = indexOf(bookmark.guid);
+        toKeep.insert(bookmark.guid);
+
+        if (index < 0)
+        {
+            addBookmark(bookmark);
+            ++numAdded;
+        }
+        else if (bookmark != m_data[index])
+        {
+            updateBookmark(bookmark);
+            ++numUpdated;
+        }
+    }
+
+    // Remove deleted bookmarks.
+    for (const auto& id: old)
+    {
+        if (toKeep.contains(id))
+            continue;
+
+        removeBookmark(id);
+        ++numRemoved;
+    }
+
+    NX_VERBOSE(q, "Dynamic update: %1 added, %2 removed, %3 updated",
+        numAdded, numRemoved, numUpdated);
+}
+
+void BookmarkSearchListModel::Private::dynamicUpdate(const QnTimePeriod& period)
+{
+    // This function exists until we implement notifying all clients about every bookmark change.
+
+    const auto effectivePeriod = period.intersected(q->fetchedTimeWindow());
+    if (effectivePeriod.isEmpty())
+        return;
+
+    const auto callback =
+        [this](bool success, const QnCameraBookmarkList& bookmarks, rest::Handle requestId)
+        {
+            // It doesn't matter if we receive results limited by maximum count.
+
+            if (requestId && m_updateRequests.contains(requestId) && success)
+                updatePeriod(m_updateRequests.take(requestId), bookmarks);
+        };
+
+    NX_VERBOSE(q, "Dynamic update request");
+
+    const auto requestId =
+        getBookmarks(effectivePeriod, callback, Qt::DescendingOrder, q->fetchBatchSize());
+
+    if (requestId)
+        m_updateRequests[requestId] = effectivePeriod;
 }
 
 int BookmarkSearchListModel::Private::indexOf(const QnUuid& guid) const

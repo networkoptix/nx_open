@@ -143,4 +143,9 @@ int EventRibbon::unreadCount() const
     return d->unreadCount();
 }
 
+nx::utils::Interval<int> EventRibbon::visibleRange() const
+{
+    return d->visibleRange();
+}
+
 } // namespace nx::vms::client::desktop

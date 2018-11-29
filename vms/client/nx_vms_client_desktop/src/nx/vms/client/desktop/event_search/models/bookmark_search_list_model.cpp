@@ -25,4 +25,9 @@ bool BookmarkSearchListModel::isConstrained() const
     return !filterText().isEmpty() || base_type::isConstrained();
 }
 
+void BookmarkSearchListModel::dynamicUpdate(const QnTimePeriod& period)
+{
+    d->dynamicUpdate(period);
+}
+
 } // namespace nx::vms::client::desktop
