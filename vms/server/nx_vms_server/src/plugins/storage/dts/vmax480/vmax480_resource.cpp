@@ -148,6 +148,7 @@ CameraDiagnostics::Result QnPlVmax480Resource::initializeCameraDriver()
     Qn::CameraCapabilities addFlags = Qn::PrimaryStreamSoftMotionCapability;
     setCameraCapabilities(getCameraCapabilities() | addFlags);
 
+    setProperty(ResourcePropertyKey::kForcedAudioStream, 1);
     saveProperties();
 
     QnMutexLocker lock( &m_chunkReaderMutex );

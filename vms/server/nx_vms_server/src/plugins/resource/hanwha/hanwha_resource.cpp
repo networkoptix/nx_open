@@ -1089,6 +1089,10 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
     if (isNvr() && !isVideoSourceActive())
         return CameraDiagnostics::CameraInvalidParams("Video source is not active");
 
+    // We always try to pull an audio stream if possible for NVRs
+    if (isNvr())
+        setProperty(ResourcePropertyKey::kForcedAudioStream, 1);
+
     const auto videoProfiles = sharedContext()->videoProfiles();
     if (!videoProfiles)
         return videoProfiles.diagnostics;

@@ -44,18 +44,6 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     bool isCameraControlRequired,
     const QnLiveStreamParams& params)
 {
-    if (m_hanwhaResource->isNvr() && m_hanwhaResource->isAudioEnabled())
-    {
-        const auto result = m_hanwhaResource->enableAudioInput();
-        if (!result)
-        {
-            // Just log error and continue;
-            NX_DEBUG(this, "Can't enable audio input for device %1 (%2), error %3",
-                m_hanwhaResource->getUserDefinedName(), m_hanwhaResource->getId(),
-                result.toString(m_hanwhaResource->commonModule()->resourcePool()));
-        }
-    }
-
     if (isCameraControlRequired && !m_hanwhaResource->isNvr())
     {
         auto result = updateProfile(params);
