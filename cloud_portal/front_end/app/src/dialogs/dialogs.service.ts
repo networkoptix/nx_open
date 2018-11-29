@@ -1,14 +1,11 @@
-import { Inject, Injectable } from '@angular/core';
-
-import './../dialogs/dialogs.scss';
-
-import { NxModalLoginComponent }      from './../dialogs/login/login.component';
-import { NxModalGenericComponent }    from './../dialogs/generic/generic.component';
-import { NxModalShareComponent }      from './../dialogs/share/share.component';
-import { NxModalDisconnectComponent } from './../dialogs/disconnect/disconnect.component';
-import { NxModalRenameComponent }     from './../dialogs/rename/rename.component';
-import { NxModalMergeComponent }      from './../dialogs/merge/merge.component';
-import { NxModalEmbedComponent }      from './../dialogs/embed/embed.component';
+import { Inject, Injectable }         from '@angular/core';
+import { NxModalLoginComponent }      from './login/login.component';
+import { NxModalGenericComponent }    from './generic/generic.component';
+import { NxModalShareComponent }      from './share/share.component';
+import { NxModalDisconnectComponent } from './disconnect/disconnect.component';
+import { NxModalRenameComponent }     from './rename/rename.component';
+import { NxModalMergeComponent }      from './merge/merge.component';
+import { NxModalEmbedComponent }      from './embed/embed.component';
 
 @Injectable()
 export class NxDialogsService {
@@ -33,11 +30,11 @@ export class NxDialogsService {
         hold = hold || false;
 
         return this.toast.create({
-            className: type,
-            content: message,
+            className       : type,
+            content         : message,
             dismissOnTimeout: !hold,
-            dismissOnClick: !hold,
-            dismissButton: hold
+            dismissOnClick  : !hold,
+            dismissButton   : hold
         });
     }
 

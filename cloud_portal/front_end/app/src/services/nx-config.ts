@@ -286,8 +286,3 @@ export class NxConfigService {
         return this.config;
     }
 }
-
-declare var angular: angular.IAngularStatic;
-angular
-    .module('cloudApp.services')
-    .service('nxConfigService', downgradeInjectable(NxConfigService));
