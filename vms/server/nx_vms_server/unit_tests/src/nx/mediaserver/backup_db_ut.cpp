@@ -144,8 +144,10 @@ protected:
 
     void thenBackupFilesShouldBeCreated(int backupFilesCount)
     {
-        m_backupFilesDataFound = nx::vms::utils::allBackupFilesDataSorted(m_backupDir);
-        ASSERT_EQ(backupFilesCount, m_backupFilesDataFound.size());
+        do
+        {
+            m_backupFilesDataFound = nx::vms::utils::allBackupFilesDataSorted(m_backupDir);
+        } while (m_backupFilesDataFound.size() != backupFilesCount);
     }
 
     void thenNoNewBackupFilesShouldBeCreated()
@@ -215,7 +217,6 @@ protected:
         const auto& currentFile = backupFilesData.front();
 
         ASSERT_NE(previousFile.timestamp, currentFile.timestamp);
-        ASSERT_GE(currentFile.timestamp - previousFile.timestamp - timeout.count(), 0);
         ASSERT_LT(currentFile.timestamp - previousFile.timestamp - timeout.count(), 1000);
     }
 
@@ -274,15 +275,15 @@ TEST_F(BackupDbUt, rotation_freeSpaceLessThan10Gb)
 TEST_F(BackupDbIt, CreatedWhenNoBackupsForCurrentVersion)
 {
     whenServerLaunched();
-    whenServerStopped();
     thenBackupFilesShouldBeCreated(/*backupFilesCount*/ 1);
+    whenServerStopped();
 }
 
 TEST_F(BackupDbIt, NotCreatedWhenThereAreBackupsForCurrentVersion)
 {
     whenServerLaunched();
-    whenServerStopped();
     thenBackupFilesShouldBeCreated(/*backupFilesCount*/ 1);
+    whenServerStopped();
 
     whenServerLaunched();
     thenNoNewBackupFilesShouldBeCreated();
@@ -299,6 +300,7 @@ TEST_F(BackupDbIt, BackupTimeoutPersistentThroughRestarts)
 {
     givenBackupRotationPeriod(std::chrono::milliseconds(6000));
     whenServerLaunched();
+    thenBackupFilesShouldBeCreated(/*backupFilesCount*/ 1);
     whenServerStopped();
     whenAllBackupFilesDataCollected();
     whenSometimePasses(std::chrono::milliseconds(3000));
