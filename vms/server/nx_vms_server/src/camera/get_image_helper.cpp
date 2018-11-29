@@ -276,6 +276,9 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
         }
     }
 
+    if (!gotFrame)
+        return nullptr;
+
     if (video)
         outFrame->channel = video->channelNumber;
 
