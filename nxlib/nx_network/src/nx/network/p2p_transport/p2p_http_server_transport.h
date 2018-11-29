@@ -31,6 +31,8 @@ private:
         http::MessageParser parser;
         size_t bytesParsed = 0;
         nx::Buffer buffer;
+
+        void reset();
     };
 
     std::unique_ptr<AbstractStreamSocket> m_sendSocket;
@@ -44,6 +46,8 @@ private:
         size_t transferred,
         nx::Buffer* const buffer,
         IoCompletionHandler handler);
+
+    void readFromSocket(nx::Buffer* const buffer, IoCompletionHandler handler);
 };
 
 } // namespace nx::network

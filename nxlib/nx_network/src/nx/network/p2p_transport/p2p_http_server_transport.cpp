@@ -29,21 +29,26 @@ void P2PHttpServerTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletio
     m_sendSocket->post(
         [this, buffer, handler = std::move(handler)]() mutable
         {
-            m_readSocket->readSomeAsync(
-                &m_readContext.buffer,
-                [this, handler = std::move(handler), buffer](
-                    SystemError::ErrorCode error,
-                    size_t transferred) mutable
-                {
-                    onBytesRead(error, transferred, buffer, std::move(handler));
-                });
+            readFromSocket(buffer, std::move(handler));
+        });
+}
+
+void P2PHttpServerTransport::readFromSocket(nx::Buffer* const buffer, IoCompletionHandler handler)
+{
+    m_readSocket->readSomeAsync(
+        &m_readContext.buffer,
+        [this, handler = std::move(handler), buffer](
+            SystemError::ErrorCode error,
+            size_t transferred) mutable
+        {
+            onBytesRead(error, transferred, buffer, std::move(handler));
         });
 }
 
 void P2PHttpServerTransport::onBytesRead(
     SystemError::ErrorCode error,
     size_t transferred,
-    nx::Buffer* const ,
+    nx::Buffer* const buffer,
     IoCompletionHandler handler)
 {
     if (error != SystemError::noError || transferred == 0)
@@ -52,14 +57,31 @@ void P2PHttpServerTransport::onBytesRead(
         return;
     }
 
-    //size_t bytesProcessed;
-    //switch( m_parser.parse(*buffer, &bytesProcessed))
-    //{
-    //case server::ParserState::done:
-    //    *buffer = m_message.response->messageBody;
-    //    m_message = http::Message();
+    size_t bytesProcessed;
+    const auto parserState = m_readContext.parser.parse(m_readContext.buffer, &bytesProcessed);
+    m_readContext.bytesParsed += bytesProcessed;
 
-    //}
+    switch(parserState)
+    {
+    case server::ParserState::done:
+        *buffer = m_readContext.message.response->messageBody;
+        handler(SystemError::noError, m_readContext.bytesParsed);
+        m_readContext.reset();
+        break;
+    case server::ParserState::failed:
+        handler(SystemError::invalidData, 0);
+        m_readContext.reset();
+        break;
+    case server::ParserState::readingBody:
+    case server::ParserState::readingMessage:
+        readFromSocket(buffer, std::move(handler));
+        break;
+    case server::ParserState::init:
+        NX_ASSERT(false, "Should never get here");
+        handler(SystemError::invalidData, 0);
+        m_readContext.reset();
+        break;
+    }
 }
 
 void P2PHttpServerTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
@@ -141,6 +163,14 @@ void P2PHttpServerTransport::pleaseStopSync()
 SocketAddress P2PHttpServerTransport::getForeignAddress() const
 {
     return m_sendSocket->getForeignAddress();
+}
+
+void P2PHttpServerTransport::ReadContext::reset()
+{
+    message = http::Message();
+    parser.reset();
+    buffer.remove(0, bytesParsed);
+    bytesParsed = 0;
 }
 
 } // namespace nx::network
