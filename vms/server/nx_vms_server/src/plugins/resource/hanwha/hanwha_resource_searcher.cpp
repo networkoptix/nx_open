@@ -221,8 +221,6 @@ bool HanwhaResourceSearcher::parseSunApiData(const QByteArray& data, SunApiData*
     const auto urlStr = QLatin1String(data.data() + kUrlOffset);
     QUrl url(urlStr);
 
-    qDebug() << "URL: " << url;
-
     if (!url.isValid() || !isHostBelongsToValidSubnet(QHostAddress(url.host())))
         return false;
     outData->presentationUrl = url.toString(QUrl::RemovePath);
