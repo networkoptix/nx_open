@@ -30,7 +30,6 @@ Known limitations". Support link is clickable and lead to the proper site
     Location Should Be    ${ENV}${KNOWN LIMITATIONS URL}
     Wait Until Elements Are Visible    ${REMOTE CONNECTIVITY TILE LINK}    ${SUPPORT TILE LINK}
     Click Link    ${REMOTE CONNECTIVITY TILE LINK}
-    sleep    1
    ${tabs}    Get Window Handles
     Select Window    @{tabs}[1]
     Location Should Contain    ${SUPPORT URL}
