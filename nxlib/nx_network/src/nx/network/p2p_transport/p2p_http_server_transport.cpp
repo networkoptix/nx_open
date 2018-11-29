@@ -43,7 +43,7 @@ void P2PHttpServerTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletio
 void P2PHttpServerTransport::onBytesRead(
     SystemError::ErrorCode error,
     size_t transferred,
-    nx::Buffer* const buffer,
+    nx::Buffer* const ,
     IoCompletionHandler handler)
 {
     if (error != SystemError::noError || transferred == 0)

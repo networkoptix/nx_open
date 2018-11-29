@@ -116,11 +116,11 @@ void P2PHttpClientTransport::bindToAioThread(aio::AbstractAioThread* aioThread)
         });
 }
 
-void P2PHttpClientTransport::cancelIoInAioThread(nx::network::aio::EventType eventType)
+void P2PHttpClientTransport::cancelIoInAioThread(nx::network::aio::EventType /*eventType*/)
 {
-    m_readHttpClient->cancelIoInAioThread(eventType);
+    m_readHttpClient->cancelPostedCallsSync();
     if (m_writeHttpClient)
-        m_writeHttpClient->cancelIoInAioThread(eventType);
+        m_writeHttpClient->cancelPostedCallsSync();
 }
 
 aio::AbstractAioThread* P2PHttpClientTransport::getAioThread() const
