@@ -1,5 +1,7 @@
 #pragma once
 
+#include <type_traits>
+
 #include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/std/future.h>
 
@@ -142,22 +144,26 @@ public:
      * Otherwise, posts func using BasicPollable::post and waits for completion.
      */
     template<typename Func>
-    void executeInAioThreadSync(Func func)
+    std::invoke_result_t<Func> executeInAioThreadSync(Func func)
     {
+        using Result = std::invoke_result_t<Func>;
+
         if (isInSelfAioThread())
         {
-            func();
+            return func();
         }
         else
         {
-            nx::utils::promise<void> done;
+            nx::utils::promise<Result> done;
             post(
-                [&done, &func]()
+                [this, &func, &done]()
                 {
-                    func();
-                    done.set_value();
+                    // TODO: #ak This function call is a work-around for msvc2017 bug
+                    // that causes it to compile else statement in if constexpr(...) {} else {}
+                    // when inside a lambda inside a template function.
+                    this->executeAndSetResultToPromise(func, done);
                 });
-            done.get_future().wait();
+            return done.get_future().get();
         }
     }
 
@@ -181,6 +187,22 @@ private:
     mutable Pollable m_pollable;
     AIOService* m_aioService = nullptr;
     nx::utils::ObjectDestructionFlag m_destructionFlag;
+
+    template<typename Func, typename Promise>
+    void executeAndSetResultToPromise(Func& func, Promise& promise)
+    {
+        using Result = std::invoke_result_t<Func>;
+
+        if constexpr (std::is_void<Result>::value)
+        {
+            func();
+            promise.set_value();
+        }
+        else
+        {
+            promise.set_value(func());
+        }
+    }
 };
 
 } // namespace aio
