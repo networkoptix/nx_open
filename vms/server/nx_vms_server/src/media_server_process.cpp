@@ -3858,11 +3858,18 @@ void MediaServerProcess::connectSignals()
         });
 
     m_createDbBackupTimer = std::make_unique<QTimer>();
-    connect(m_createDbBackupTimer.get(), &QTimer::timeout,
-        [this]()
+    connect(
+        m_createDbBackupTimer.get(),
+        &QTimer::timeout,
+        [firstRun = true, this]() mutable
         {
             auto utils = nx::vms::server::Utils(serverModule());
             utils.backupDatabase();
+            if (firstRun)
+            {
+                m_createDbBackupTimer->start(serverModule()->settings().dbBackupPeriodMS().count());
+                firstRun = false;
+            }
         });
 
     connect(
@@ -4010,7 +4017,23 @@ void MediaServerProcess::startObjects()
     at_timer();
     m_generalTaskTimer->start(QnVirtualCameraResource::issuesTimeoutMs());
     m_udtInternetTrafficTimer->start(UDT_INTERNET_TRAFIC_TIMER);
-    m_createDbBackupTimer->start(serverModule()->settings().dbBackupPeriodMS().count());
+
+    int64_t initialBackupDbPeriodMs;
+    const auto lastDbBackupTimestamp =
+        nx::vms::server::Utils(serverModule()).lastDbBackupTimestamp();
+
+    if (!lastDbBackupTimestamp)
+    {
+        initialBackupDbPeriodMs = 0; //< If no backup files so far, let's create one now.
+    }
+    else
+    {
+        const int64_t dbBackupPeriodMS = serverModule()->settings().dbBackupPeriodMS().count();
+        initialBackupDbPeriodMs = std::max<int64_t>(
+            *lastDbBackupTimestamp + dbBackupPeriodMS - qnSyncTime->currentMSecsSinceEpoch(),
+            0LL);
+    }
+    m_createDbBackupTimer->start(initialBackupDbPeriodMs);
 
     const bool isDiscoveryDisabled = serverModule()->settings().noResourceDiscovery();
 

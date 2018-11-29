@@ -97,10 +97,17 @@ public:
     static void resumeConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus);
 
     void syncStoragesToSettings(const QnMediaServerResourcePtr& server);
-    bool backupDatabase(const boost::optional<QString>& dbFilePath = boost::none,
+
+    bool backupDatabase(
+        const boost::optional<QString>& dbFilePath = boost::none,
         const boost::optional<int>& buildNumber = boost::none);
+    /**
+     * Returns none if no backup file has been found.
+     */
+    boost::optional<int64_t> lastDbBackupTimestamp() const;
     bool timeToMakeDbBackup() const;
 };
 
 } // namespace vms::server
 } // namespace nx
+
