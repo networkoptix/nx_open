@@ -81,8 +81,25 @@ bool AbstractSearchListModel::canFetchMore(const QModelIndex& parent) const
 
 void AbstractSearchListModel::fetchMore(const QModelIndex& parent)
 {
-    if (!parent.isValid())
+    if (parent.isValid())
+        return;
+
+    if (isFilterDegenerate())
+    {
+        NX_ASSERT(rowCount() == 0);
+        setFetchedTimeWindow(relevantTimePeriod());
+        finishFetch(FetchResult::complete);
+    }
+    else
+    {
         requestFetch();
+    }
+}
+
+bool AbstractSearchListModel::isFilterDegenerate() const
+{
+    return relevantTimePeriod().isEmpty()
+        || (cameraSet()->type() != ManagedCameraSet::Type::all && cameras().empty());
 }
 
 ManagedCameraSet* AbstractSearchListModel::cameraSet() const

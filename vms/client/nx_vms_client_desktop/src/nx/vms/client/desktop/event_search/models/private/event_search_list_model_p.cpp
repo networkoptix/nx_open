@@ -275,7 +275,7 @@ bool EventSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodToC
 
 void EventSearchListModel::Private::fetchLive()
 {
-    if (m_liveFetch.id || !q->isLive() || !q->isOnline() || q->livePaused())
+    if (m_liveFetch.id || !q->isLive() || !q->isOnline() || q->livePaused() || q->isFilterDegenerate())
         return;
 
     if (m_data.empty() && fetchInProgress())
@@ -325,8 +325,7 @@ rest::Handle EventSearchListModel::Private::getEvents(
     const QnTimePeriod& period, GetCallback callback, Qt::SortOrder order, int limit) const
 {
     const auto server = q->commonModule()->currentServer();
-    NX_ASSERT(callback && server && server->restConnection());
-    if (!callback || !server || !server->restConnection())
+    if (!NX_ASSERT(callback && server && server->restConnection() && !q->isFilterDegenerate()))
         return {};
 
     QnEventLogMultiserverRequestData request;
