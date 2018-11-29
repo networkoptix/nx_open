@@ -209,7 +209,7 @@ rest::Handle ResourcePoolPeerManager::requestFileInfo(
             d->removeCanceller(localRequestId);
 
             if (!success)
-                return callback(success, handle, FileInformation());
+                return callback(success, localRequestId, FileInformation());
 
             const auto& fileInfo = result.deserialized<FileInformation>();
             callback(success, localRequestId, fileInfo);
@@ -244,7 +244,7 @@ rest::Handle ResourcePoolPeerManager::requestChecksums(
             d->removeCanceller(localRequestId);
 
             if (!success)
-                return callback(success, handle, QVector<QByteArray>());
+                return callback(success, localRequestId, QVector<QByteArray>());
 
             const auto& checksums = result.deserialized<QVector<QByteArray>>();
             callback(success, localRequestId, checksums);
