@@ -4,7 +4,6 @@
 
 #include <core/ptz/ptz_constants.h>
 
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzCommand)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzCoordinateSpace)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzObjectType)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StatisticsDeviceType)
@@ -20,6 +19,38 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StreamIndex)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, ResourceStatus)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StatusChangeReason)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StorageStatuses)
+
+// ATTENTION: Assigning backwards-compatible misspelled values with `Auxilary` in them.
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzCommand,
+    (Qn::ContinuousMovePtzCommand, "ContinuousMovePtzCommand")
+    (Qn::ContinuousFocusPtzCommand, "ContinuousFocusPtzCommand")
+    (Qn::AbsoluteDeviceMovePtzCommand, "AbsoluteDeviceMovePtzCommand")
+    (Qn::AbsoluteLogicalMovePtzCommand, "AbsoluteLogicalMovePtzCommand")
+    (Qn::ViewportMovePtzCommand, "ViewportMovePtzCommand")
+    (Qn::GetDevicePositionPtzCommand, "GetDevicePositionPtzCommand")
+    (Qn::GetLogicalPositionPtzCommand, "GetLogicalPositionPtzCommand")
+    (Qn::GetDeviceLimitsPtzCommand, "GetDeviceLimitsPtzCommand")
+    (Qn::GetLogicalLimitsPtzCommand, "GetLogicalLimitsPtzCommand")
+    (Qn::GetFlipPtzCommand, "GetFlipPtzCommand")
+    (Qn::CreatePresetPtzCommand, "CreatePresetPtzCommand")
+    (Qn::UpdatePresetPtzCommand, "UpdatePresetPtzCommand")
+    (Qn::RemovePresetPtzCommand, "RemovePresetPtzCommand")
+    (Qn::ActivatePresetPtzCommand, "ActivatePresetPtzCommand")
+    (Qn::GetPresetsPtzCommand, "GetPresetsPtzCommand")
+    (Qn::CreateTourPtzCommand, "CreateTourPtzCommand")
+    (Qn::RemoveTourPtzCommand, "RemoveTourPtzCommand")
+    (Qn::ActivateTourPtzCommand, "ActivateTourPtzCommand")
+    (Qn::GetToursPtzCommand, "GetToursPtzCommand")
+    (Qn::GetActiveObjectPtzCommand, "GetActiveObjectPtzCommand")
+    (Qn::UpdateHomeObjectPtzCommand, "UpdateHomeObjectPtzCommand")
+    (Qn::GetHomeObjectPtzCommand, "GetHomeObjectPtzCommand")
+    (Qn::GetAuxiliaryTraitsPtzCommand, "GetAuxilaryTraitsPtzCommand") //< Intentional typo.
+    (Qn::RunAuxiliaryCommandPtzCommand, "RunAuxilaryCommandPtzCommand") //< Intentional typo.
+    (Qn::GetDataPtzCommand, "GetDataPtzCommand")
+    (Qn::RelativeMovePtzCommand, "RelativeMovePtzCommand")
+    (Qn::RelativeFocusPtzCommand, "RelativeFocusPtzCommand")
+    (Qn::InvalidPtzCommand, "InvalidPtzCommand")
+)
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, IOPortType,
     (Qn::PT_Unknown, "Unknown")
