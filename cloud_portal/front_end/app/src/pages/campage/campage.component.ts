@@ -1,49 +1,53 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DoCheck, KeyValueDiffers, ViewEncapsulation } from '@angular/core';
 import { CamerasService } from '../../services/cameras.service';
 import { CampageSearchService } from '../../services/campage-search.service';
 
 @Component({
-  selector: 'campage-component',
+  selector: 'campage',
   templateUrl: 'campage.component.html',
-  styleUrls: ['campage.component.scss']
+    styleUrls: ['campage.component.scss'],
+    encapsulation: ViewEncapsulation.None
 })
 
-export class NxCampageComponent implements OnInit {
+export class NxCampageComponent implements OnInit, DoCheck {
 
     data: any;
-    test_data: any;
-    camerasPromise: any;
     company: any;
     vendorGroups: number;
     vendors: string[];
-    showAdvancedOptions: boolean;
     resolution: string;
     itemsPerPage: number;
     query: string;
-    allCameras = [];
+    allCameras: any;
     cameras: any;
     totalCameras: number;
     totalVendors: number;
     activeCamera: any;
-    hardwareTypes: string[];
+    showAll: boolean;
+    hardwareTypes: any[];
     resolutions: any;
     filter: any;
     emptyFilter: any;
     boolKeys: string[];
     cameraHeaders: string[];
-    testArrayE: string[];
+    camerasTable: any;
+    allowedParameters: string[];
+    filterModel: any;
+    differ: any;
+    vendorDiffer: any;
+    hardwareDiffer: any;
+    toggleCamview: any;
+    multiselectOptions: any;
 
   private setupDefaults() {
       this.cameraHeaders = ['Manufacturer', 'Model', 'Type', 'Max Resolution', 'Max FPS', 'Codec', 'Audio', 'PTZ', 'Fisheye', 'Motion', 'I/O'];
-      this.testArrayE = ['e1', 'e2', 'e3'];
+      this.camerasTable = [];
+      this.allowedParameters = ['vendor', 'model', 'hardwareType', 'maxResolution', 'maxFps', 'primaryCodec', 'isTwAudioSupported', 'isAptzSupported', 'isFisheye', 'isMdSupported', 'isIoSupported'];
 
       this.data = null;
-      this.test_data = null;
-      this.camerasPromise = null;
       this.company = null;
 
       this.vendorGroups = 4;
-      this.showAdvancedOptions = false;
       this.resolution = '0';
 
       this.itemsPerPage = 15;
@@ -51,40 +55,49 @@ export class NxCampageComponent implements OnInit {
 
       this.allCameras = [];
       this.cameras = [];
+      this.camerasTable = [];
       this.vendors = [];
 
       this.totalCameras = 0;
       this.totalVendors = 0;
 
-      this.activeCamera = null;
+      this.activeCamera = undefined;
+      this.showAll = false;
+      this.toggleCamview = 'off';
 
+      // format to fit the multiselect component
       this.hardwareTypes = [
-            'Camera',
-            'Multi-Sensor Camera',
-            'Encoder',
-            'DVR',
-            'Other'
+          {id: 'Camera', label: 'Camera'},
+          {id: 'Multi-Sensor Camera', label: 'Multi-Sensor Camera'},
+          {id: 'Encoder', label: 'Encoder'},
+          {id: 'DVR', label: 'DVR'},
+          {id: 'Other', label: 'Other'}
       ];
 
       this.resolutions = [
-            {value: '0', title: 'All'},
-            {value: '84480', title: '1CIF'},
-            {value: '168960', title: '2CIF'},
-            {value: '337920', title: 'D1'},
-            {value: '307200', title: 'VGA'},
-            {value: '786432', title: 'SVGA'},
-            {value: '921600', title: '720p'},
-            {value: '1310720', title: '1mp'},
-            {value: '2073600', title: '1080p'},
-            {value: '1920000', title: '2mp'},
-            {value: '3145728', title: '3mp'},
-            {value: '4915200', title: '5mp'},
-            {value: '8000000', title: '8mp'},
-            {value: '10039296', title: '10mp'},
-            {value: '15824256', title: '16mp'}
+            {value: '0', name: 'All'},
+            {value: '84480', name: '1CIF'},
+            {value: '168960', name: '2CIF'},
+            {value: '337920', name: 'D1'},
+            {value: '307200', name: 'VGA'},
+            {value: '786432', name: 'SVGA'},
+            {value: '921600', name: '720p'},
+            {value: '1310720', name: '1mp'},
+            {value: '2073600', name: '1080p'},
+            {value: '1920000', name: '2mp'},
+            {value: '3145728', name: '3mp'},
+            {value: '4915200', name: '5mp'},
+            {value: '8000000', name: '8mp'},
+            {value: '10039296', name: '10mp'},
+            {value: '15824256', name: '16mp'}
         ];
       this.filter = {};
+      this.multiselectOptions = {
+          resolutions: this.resolutions,
+          hardwareTypes: this.hardwareTypes
+      }
       this.emptyFilter = {
+            query: '',
             minResolution: this.resolutions[0],
             hardwareTypes: [],
             vendors: [],
@@ -98,30 +111,41 @@ export class NxCampageComponent implements OnInit {
             isH265: false,
             isMultiSensor: false
         };
+      this.filterModel = this.emptyFilter;
       this.boolKeys = Object.keys(this.emptyFilter).filter(key => {
           return key.startsWith('is');
       });
   }
 
   constructor(private cameraService: CamerasService,
-              private camSearch: CampageSearchService) {
+              private camSearch: CampageSearchService,
+              private differs: KeyValueDiffers) {
       this.setupDefaults();
+      this.differ = this.differs.find({}).create();
+      this.vendorDiffer = this.differs.find([]).create();
+      this.hardwareDiffer = this.differs.find([]).create();
+
   }
 
   ngOnInit() {
       this.activate();
   }
 
+  ngDoCheck() {
+        const filterChanges = this.differ.diff(this.filterModel);
+        const vendorChanges = this.vendorDiffer.diff(this.filterModel.vendors);
+        const hardwareChanges = this.hardwareDiffer.diff(this.filterModel.hardwareTypes);
+          if (filterChanges || vendorChanges || hardwareChanges) {
+              this.searchVendor(this.filterModel);
+          }
+  }
+
   activate() {
       this.resetFilters();
-
-      // this.camerasPromise = this.cameraService.getAllCameras(this.company);
       this.cameraService.getAllCameras(this.company).subscribe(data => {
           this.data = data;
           this.camerasSuccessFn();
       });
-
-      // this.camerasPromise.then(this.camerasSuccessFn, this.camerasErrorFn);
   }
 
   resetFilters() {
@@ -136,7 +160,6 @@ export class NxCampageComponent implements OnInit {
        const camerasWithAliases = [];
 
        response.forEach(c => {
-           this.test_data = c;
            c.isH265 = c.primaryCodec === 'H.265';
 
            if (c.hardwareType === 'Camera' && c.isMultiSensor) {
@@ -190,20 +213,47 @@ export class NxCampageComponent implements OnInit {
            return a.toLowerCase().localeCompare(b.toLowerCase());
        });
 
+       // reformat to fit the multiselect component
+       this.multiselectOptions.vendors = this.vendors.map(v => (
+           {id: v, label: v}
+       ));
+
        this.totalVendors = this.vendors.length;
   }
 
-  camerasErrorFn(data, status, headers, config) {
-
+  // restrict the parameters to be passed and viewed for to cam-table (based on allowedParameters)
+  preFilterCameratable (camerasArr) {
+    const values = Object.keys(camerasArr).map(key => camerasArr[key]);
+    const filteredCameras = [];
+    values.forEach(c => {
+        const filteredCamera = Object.keys(c)
+          .filter(key => this.allowedParameters.indexOf(key) > -1)
+          .reduce((obj, key) => {
+            obj[key] = c[key];
+            return obj;
+          }, {});
+        filteredCameras.push(filteredCamera);
+    });
+    return filteredCameras;
   }
 
-  setVendor (vendor) {
-        this.query = vendor;
-        this.camSearch.campageSearch(this.data, this.query, this.filter, this.boolKeys).subscribe(cameras => {
-            this.cameras = cameras;
-            this.testArrayE = cameras;
-        });
+  searchVendor (filter) {
+      this.resetActiveCamera();
+      this.filter = filter;
+      if (this.data) {
+          this.camSearch.campageSearch(this.data, this.filter, this.boolKeys).subscribe(cameras => {
+              this.activeCamera = undefined;
+              this.cameras = cameras;
+              this.camerasTable = this.preFilterCameratable(cameras);
+          });
+      }
   }
+
+  setVendor(vendor) {
+      this.filterModel.query = vendor;
+      this.searchVendor(this.filterModel);
+  }
+
 
   vendorGroup (n) {
       function nstart(m) {
@@ -225,6 +275,52 @@ export class NxCampageComponent implements OnInit {
           n2 = ncol(n);
 
       return {start: n1, end: n1 + n2};
+  }
+
+  activateCamera(elementSelected: any): void {
+      if (this.activeCamera == this.cameras[elementSelected.key]) {
+          return;
+      }
+      this.activeCamera = this.cameras[elementSelected.key];
+      this.showAll = false;
+
+      if (typeof this.activeCamera.firmwares === 'string') {
+          let firmwares = JSON.parse(this.activeCamera.firmwares),
+              firmwaresArray = [];
+
+          let maxFirmwareCount = 0,
+              totalCameraCount = 0;
+
+          Object.keys(firmwares).forEach(key => {
+              const count = firmwares[key];
+              firmwaresArray.push({name: key, count});
+
+              totalCameraCount += count;
+              if (count > maxFirmwareCount) {
+                  maxFirmwareCount = count;
+              }
+          });
+
+          firmwaresArray = firmwaresArray.sort((a, b) => {
+                return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+            });
+
+          firmwaresArray.reverse();
+
+          this.activeCamera.maxFirmwareCount = maxFirmwareCount;
+          this.activeCamera.totalCameraCount = totalCameraCount;
+          this.activeCamera.firmwares = firmwaresArray;
+      }
+      this.toggleCamview = 'on';
+  }
+
+  open(activecamera) {
+      //TO DO : open modal: feedback with the name of the active camera
+  }
+
+  resetActiveCamera() {
+      this.activeCamera = undefined;
+      this.toggleCamview = 'off';
   }
 
 }

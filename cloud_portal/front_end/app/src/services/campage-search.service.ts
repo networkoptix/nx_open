@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, of} from 'rxjs';
+import { Observable, of } from 'rxjs';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
@@ -12,11 +12,11 @@ export class CampageSearchService {
 
   constructor() { }
 
-  campageSearch (allCameras, query, filter, boolKeys): Observable<any> {
-      //$scope.activeCamera = null;
+
+    campageSearch (allCameras, filter, boolKeys): Observable<any> {
+      var query = filter.query;
 
       var queryTerms = query.trim().split(' ');
-      console.log(queryTerms);
       //var window.preferred_vendors = '';
       const preferred_vendors = '';
 
@@ -41,7 +41,6 @@ export class CampageSearchService {
               return false;
           }
 
-          // 10% magic is here
           if (filter.minResolution.value != 0 && c.resolutionArea <= filter.minResolution.value * 0.9) {
               return false;
           }
@@ -70,7 +69,6 @@ export class CampageSearchService {
           return key;
       });
 
-      // $scope.totalItems = $scope.cameras.length;
       return of(cameras);
   }
 }
