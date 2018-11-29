@@ -154,7 +154,7 @@
                             <div class="form-group">
                                 <nx-checkbox
                                         name="show"
-                                        compId="show1"
+                                        componentId="show1"
                                         [(ngModel)]="show5"
                                         checked>Remember me
                                 </nx-checkbox>
@@ -165,7 +165,7 @@
                             <div class="form-group">
                                 <nx-checkbox
                                         name="show"
-                                        compId="show"
+                                        componentId="show"
                                         [(ngModel)]="show"
                                         [checked]="true"
                                         disabled>
@@ -177,7 +177,7 @@
                             <div class="form-group">
                                 <nx-checkbox
                                         name="fldAgree"
-                                        compId="fldAgree" #spyAgree
+                                        componentId="fldAgree" #spyAgree
                                         [(ngModel)]="agree"
                                         required>
                                 </nx-checkbox>
@@ -191,21 +191,21 @@
 
                             <div class="form-group">
                                 <nx-radio
-                                        name="blah" compId="blah1"
+                                        name="blah" componentId="blah1"
                                         value="blah1"
                                         [(ngModel)]="blah">
                                 </nx-radio>
                                 <label for="blah1">blah1</label>
                                 <br/>
                                 <nx-radio
-                                        name="blah" compId="blah2"
+                                        name="blah" componentId="blah2"
                                         value="blah2"
                                         [(ngModel)]="blah">blah2
                                 </nx-radio>
                                 <label for="blah2">blah2</label>
                                 <br/>
                                 <nx-radio
-                                        name="blah" compId="blah3"
+                                        name="blah" componentId="blah3"
                                         value="blah3"
                                         [(ngModel)]="blah">blah3
                                 </nx-radio>
@@ -214,14 +214,14 @@
 
                             <div class="form-group">
                                 <nx-radio
-                                        name="group2" compId="group1"
+                                        name="group2" componentId="group1"
                                         value="Tsanko"
                                         [(ngModel)]="group">Tsanko
                                 </nx-radio>
                                 <label for="group1">Tsanko</label>
                                 <br/>
                                 <nx-radio
-                                        name="group2" compId="group2"
+                                        name="group2" componentId="group2"
                                         value="Evgeny"
                                         [(ngModel)]="group">Evgeny
                                 </nx-radio>
@@ -230,7 +230,7 @@
 
                             <div class="form-group">
                                 <nx-radio
-                                        name="group2" compId="group3"
+                                        name="group2" componentId="group3"
                                         value="Tsanko"
                                         [(ngModel)]="group"
                                         disabled>Tsanko
@@ -238,7 +238,7 @@
                                 <label for="group3" disabled>Tsanko</label>
                                 <br/>
                                 <nx-radio
-                                        name="group2" compId="group4"
+                                        name="group2" componentId="group4"
                                         value="Evgeny"
                                         [(ngModel)]="group"
                                         disabled>Evgeny
@@ -260,10 +260,10 @@
                         <br/>
                         <!--value (required): {{agree}}-->
                         <!--<br/>-->
-                        <!--value (blah): {{blah}}-->
-                        <!--<br/>-->
-                        <!--value (group): {{group}}-->
-                        <!--<br/>-->
+                        value (blah): {{blah}}
+                        <br/>
+                        value (group): {{group}}
+                        <br/>
                         <!--submited: {{submitted}}-->
                         <!--<br/>-->
                         form is valid: {{ testForm.valid ? 'true' : 'false' }}
@@ -282,7 +282,7 @@
                                 <div>
                                     <nx-checkbox
                                             name="show2"
-                                            compId="show2"
+                                            componentId="show2"
                                             [(ngModel)]="show"
                                             [checked]="true">
                                     </nx-checkbox>
@@ -298,7 +298,7 @@
                                 <div>
                                     <nx-checkbox
                                             name="fldEdit"
-                                            compId="fldEdit"
+                                            componentId="fldEdit"
                                             [(ngModel)]="edit">
                                     </nx-checkbox>
                                 </div>
@@ -324,7 +324,7 @@
                                     <td>
                                         <nx-checkbox
                                                 name="show3"
-                                                compId="show3"
+                                                componentId="show3"
                                                 [(ngModel)]="show"
                                                 [checked]="true">
                                         </nx-checkbox>
@@ -334,7 +334,7 @@
                                     <td colspan="2">
                                         <nx-checkbox
                                                 name="fldEdit"
-                                                compId="fldEdit3"
+                                                componentId="fldEdit3"
                                                 [(ngModel)]="edit">
                                         </nx-checkbox>
 
@@ -349,7 +349,7 @@
                                     </td>
                                     <td>
                                         <nx-radio
-                                                name="blah" compId="blah11"
+                                                name="blah" componentId="blah11"
                                                 value="blah1"
                                                 [(ngModel)]="blah">
                                         </nx-radio>
@@ -361,7 +361,7 @@
                                     </td>
                                     <td>
                                         <nx-radio
-                                                name="blah" compId="blah21"
+                                                name="blah" componentId="blah21"
                                                 value="blah2"
                                                 [(ngModel)]="blah">blah2
                                         </nx-radio>
@@ -372,7 +372,7 @@
                                     </td>
                                     <td>
                                         <nx-radio
-                                                name="blah" compId="blah31"
+                                                name="blah" componentId="blah31"
                                                 value="blah3"
                                                 [(ngModel)]="blah">blah3
                                         </nx-radio>

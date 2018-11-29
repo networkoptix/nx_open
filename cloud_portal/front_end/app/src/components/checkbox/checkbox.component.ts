@@ -39,7 +39,7 @@ import {
     encapsulation: ViewEncapsulation.None
 })
 export class NxCheckboxComponent implements OnInit, ControlValueAccessor, Validator {
-    @Input() compId: string;
+    @Input() componentId: string;
     @Input() required: any;
     @Input() checked: any;
     @Input() disabled: any;

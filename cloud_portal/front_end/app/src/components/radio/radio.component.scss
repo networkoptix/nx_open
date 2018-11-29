@@ -17,6 +17,10 @@ nx-radio {
             }
         }
     }
+    
+    & + label {
+        cursor : pointer;
+    }
 
     .nx-radio {
         display : flex;
@@ -26,7 +30,6 @@ nx-radio {
         input[type="radio"] {
             position : absolute;
             opacity  : 0;
-            cursor   : pointer;
         }
 
         input:hover ~ .check {
