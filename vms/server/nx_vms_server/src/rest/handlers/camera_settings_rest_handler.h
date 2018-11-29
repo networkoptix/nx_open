@@ -67,7 +67,7 @@ private:
         const QnRestConnectionProcessor* owner,
         nx::vms::server::resource::CameraPtr* outCamera) const;
 
-    nx::network::http::StatusCode::Value QnCameraSettingsRestHandler::obtainCameraParamValues(
+    nx::network::http::StatusCode::Value obtainCameraParamValues(
         const nx::vms::server::resource::CameraPtr& camera,
         const QnRequestParams& params,
         QnJsonRestResult& result,
