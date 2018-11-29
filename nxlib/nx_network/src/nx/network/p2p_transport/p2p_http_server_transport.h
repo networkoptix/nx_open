@@ -38,6 +38,7 @@ private:
     std::unique_ptr<AbstractStreamSocket> m_sendSocket;
     std::unique_ptr<AbstractStreamSocket> m_readSocket;
     websocket::FrameType m_messageType;
+    nx::Buffer m_sendBuffer;
     bool m_firstSend = true;
     ReadContext m_readContext;
 

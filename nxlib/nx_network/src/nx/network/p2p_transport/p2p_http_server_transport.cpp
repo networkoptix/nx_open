@@ -89,7 +89,6 @@ void P2PHttpServerTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
     m_sendSocket->post(
         [this, &buffer, handler = std::move(handler)]() mutable
         {
-            nx::Buffer messageBuffer;
             if (m_firstSend)
             {
                 http::Response initialResponse;
@@ -102,7 +101,7 @@ void P2PHttpServerTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
                 headers.emplace("Access-Control-Allow-Origin", "*");
                 headers.emplace("Connection", "Keep-Alive");
 
-                initialResponse.serialize(&messageBuffer);
+                initialResponse.serialize(&m_sendBuffer);
                 m_firstSend = false;
             }
 
@@ -118,13 +117,15 @@ void P2PHttpServerTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
             contentResponse.serializeMultipartResponse(&contentBuffer, boundary);
 
             // #TODO: #akulikov Optimize this.
-            messageBuffer += contentBuffer;
+            m_sendBuffer += contentBuffer;
             m_sendSocket->sendAsync(
-                messageBuffer,
+                m_sendBuffer,
                 [this, handler = std::move(handler)](
                     SystemError::ErrorCode error,
                     size_t transferred)
                 {
+                    qDebug() << "SENT" << error << transferred;
+                    m_sendBuffer.clear();
                     handler(error, transferred);
                 });
         });
