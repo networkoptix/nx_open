@@ -139,6 +139,9 @@ class CustomContextForm(forms.Form):
                 continue
 
             elif data_structure.type == DataStructure.DATA_TYPES.check_box:
+                # Off value for check box is empty string
+                if record_value == 'off':
+                    record_value = ''
                 self.fields[data_structure.name] = forms.BooleanField(label=ds_label,
                                                                       help_text=ds_description,
                                                                       initial=record_value,

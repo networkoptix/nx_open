@@ -49,8 +49,8 @@
       },
       {
         "name":"branding",
-        "is_global":true,
-        "description":"Common branding information",
+        "is_global": true,
+        "description": "Common branding information",
         "translatable": false,
         "values":[
           {
@@ -365,6 +365,31 @@
             "value": true,
             "description": "Tls for smtp server",
             "advanced": true
+          }
+        ]
+      },
+      {
+        "name": "Settings",
+        "is_global": false,
+        "description": "Settings for product",
+        "hidden": true,
+        "translatable": false,
+        "values": [
+          {
+            "label": "Public Downloads",
+            "name": "%PUBLIC_DOWNLOADS%",
+            "value": "on",
+            "description": "Allows all users to view the downloads page. If unchecked users must have a special permission to view the downloads page.",
+            "advanced": true,
+            "type": "check_box"
+          },
+          {
+            "label": "Public Release History",
+            "name": "%PUBLIC_RELEASE_HISTORY%",
+            "value": "",
+            "description": "Allows all users to view the release history page. If unchecked users must have a special permission to view the release history page.",
+            "advanced": true,
+            "type": "check_box"
           }
         ]
       }
