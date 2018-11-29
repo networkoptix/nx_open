@@ -118,9 +118,9 @@ void P2PHttpClientTransport::bindToAioThread(aio::AbstractAioThread* aioThread)
 
 void P2PHttpClientTransport::cancelIoInAioThread(nx::network::aio::EventType eventType)
 {
-    m_readHttpClient->cancelPostedCallsSync();
+    m_readHttpClient->cancelIoInAioThread(eventType);
     if (m_writeHttpClient)
-        m_writeHttpClient->cancelPostedCallsSync();
+        m_writeHttpClient->cancelIoInAioThread(eventType);
 }
 
 aio::AbstractAioThread* P2PHttpClientTransport::getAioThread() const
