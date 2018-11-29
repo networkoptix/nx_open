@@ -90,7 +90,7 @@ buildDistribution()
 
     if [[ $MAC_SKIP_SIGN = false ]]
     then
-        local -r KEYCHAIN_ARGS=""
+        local KEYCHAIN_ARGS=""
 
         if [ ! -z "$KEYCHAIN" ]
         then
