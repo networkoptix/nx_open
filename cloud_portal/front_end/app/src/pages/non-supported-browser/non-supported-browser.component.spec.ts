@@ -10,8 +10,8 @@ describe('App', () => {
     });
   });
 
-  // it ('should work', () => {
-  //   let fixture = TestBed.createComponent(NonSupportedBrowserComponent);
-  //   expect(fixture.componentInstance instanceof NonSupportedBrowserComponent).toBe(true, 'should create NonSupportedBrowserComponent');
-  // });
+  it ('should create NonSupportedBrowserComponent', () => {
+    const fixture = TestBed.createComponent(NonSupportedBrowserComponent);
+    expect(fixture.componentInstance instanceof NonSupportedBrowserComponent).toBe(true);
+  });
 });
