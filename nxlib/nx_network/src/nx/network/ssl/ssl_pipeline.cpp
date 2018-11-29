@@ -1,5 +1,7 @@
 #include "ssl_pipeline.h"
 
+#include <openssl/err.h>
+
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 
@@ -187,7 +189,11 @@ int Pipeline::handleSslIoResult(int resultCode)
             break;
 
         case SSL_ERROR_SSL:
-            NX_VERBOSE(this, "SSL_ERROR_SSL");
+            // TODO: #ak use ERR_get_error and ERR_FATAL_ERROR.
+            NX_DEBUG(this, "SSL_ERROR_SSL");
+
+            dumpSslErrorQueue();
+
             m_eof = true;
             m_failed = true;
             return utils::bstream::StreamIoError::nonRecoverableError;
@@ -204,6 +210,18 @@ int Pipeline::handleSslIoResult(int resultCode)
     }
 
     return resultCode;
+}
+
+void Pipeline::dumpSslErrorQueue()
+{
+    char errText[1024];
+
+    while (int errCode = ERR_get_error())
+    {
+        ERR_error_string_n(errCode, errText, sizeof(errText));
+        NX_DEBUG(this, lm("SSL error %1 (%2). Text %3")
+            .args(errCode, ERR_FATAL_ERROR(errCode) ? "fatal" : "not fatal", errText));
+    }
 }
 
 //-------------------------------------------------------------------------------------------------

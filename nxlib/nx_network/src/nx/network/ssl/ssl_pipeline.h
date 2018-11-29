@@ -66,6 +66,8 @@ private:
 
     int handleSslIoResult(int result);
 
+    void dumpSslErrorQueue();
+
     static int bioRead(BIO* b, char* out, int outl);
     static int bioWrite(BIO* b, const char* in, int inl);
     static int bioPuts(BIO* bio, const char* str);
