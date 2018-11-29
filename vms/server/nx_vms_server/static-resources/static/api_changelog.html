@@ -81,6 +81,16 @@ Added required param <strong><code><b>currentPassword</b></code></strong> in met
 <strong><code>/api/restoreState</code></strong>.
 </p>
 <!--............................................................................................-->
+<h3>Retaining compatibility until expired</h3>
+<p>
+Made <strong><i>GET</i></strong> deprecated in favor of the newly implemented
+<strong><b>POST</b></strong> in method <strong><code>/api/setCameraParam</code></strong>
+(deprecated method support expires after 4.0).
+<br/>
+<em>NOTE: In API documentation, this method was previously incorrectly stated as POST, but now
+this statement becomes true.</em>
+</p>
+<!--............................................................................................-->
 <h3>Retaining compatibility</h3>
 <p>
 Removed param <strong><code>scheduleTask.<i>recordAudio</i></code></strong>

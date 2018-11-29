@@ -488,6 +488,7 @@ int QnMediaServerConnection::setParamsAsync(
     for(const QnCameraAdvancedParamValue value: values)
         params << QnRequestParam(value.id, value.value);
 
+    // TODO: Change GET to POST when compatibility with old servers is not needed anymore.
     return sendAsyncGetRequestLogged(SetParamsObject,
         params, QN_STRINGIZE_TYPE(QnCameraAdvancedParamValueList), target, slot);
 }
