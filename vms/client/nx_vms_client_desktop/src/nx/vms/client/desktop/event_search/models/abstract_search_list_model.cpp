@@ -6,6 +6,7 @@
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <utils/common/delayed.h>
 
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <nx/utils/datetime.h>
@@ -323,8 +324,15 @@ void AbstractSearchListModel::clear()
     clearData();
 
     setLive(effectiveLiveSupported());
-    if (canFetchMore())
-        emit dataNeeded();
+
+    const auto emitDataNeeded =
+        [this]()
+        {
+            if (canFetchMore())
+                emit dataNeeded();
+        };
+
+    executeLater(emitDataNeeded, this);
 }
 
 } // namespace nx::vms::client::desktop
