@@ -249,6 +249,7 @@ void EventRibbon::Private::updateTile(int index)
     widget->setAction(modelIndex.data(Qn::CommandActionRole).value<CommandActionPtr>());
     widget->setTitleColor(modelIndex.data(Qt::ForegroundRole).value<QColor>());
     widget->setFooterEnabled(m_footersEnabled);
+    widget->setHeaderEnabled(m_headersEnabled);
 
     setHelpTopic(widget, modelIndex.data(Qn::HelpTopicIdRole).toInt());
 
@@ -806,9 +807,28 @@ void EventRibbon::Private::setFootersEnabled(bool value)
     for (int i = m_visible.lower(); i < m_visible.upper(); ++i)
     {
         const auto& widget = m_tiles[i]->widget;
-        NX_ASSERT(widget);
-        if (widget)
+        if (NX_ASSERT(widget))
             widget->setFooterEnabled(m_footersEnabled);
+    }
+}
+
+bool EventRibbon::Private::headersEnabled() const
+{
+    return m_headersEnabled;
+}
+
+void EventRibbon::Private::setHeadersEnabled(bool value)
+{
+    if (m_headersEnabled == value)
+        return;
+
+    m_headersEnabled = value;
+
+    for (int i = m_visible.lower(); i < m_visible.upper(); ++i)
+    {
+        const auto& widget = m_tiles[i]->widget;
+        if (NX_ASSERT(widget))
+            widget->setHeaderEnabled(m_headersEnabled);
     }
 }
 
