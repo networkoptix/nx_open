@@ -157,7 +157,7 @@ bool BaseRemoteArchiveSynchronizationTask::synchronizeOverlappedTimeline(
 
     auto deviceTimePeriods = toTimePeriodList(m_chunks[overlappedId])
         .intersected(
-            QnTimePeriod(QnTimePeriod::minTimeValue(), qnSyncTime->currentMSecsSinceEpoch()));
+            QnTimePeriod(QnTimePeriod::kMinTimeValue, qnSyncTime->currentMSecsSinceEpoch()));
 
     NX_DEBUG(this, lm("Synchronizing overlapped ID %1. Device time periods: %2. Device: %3.")
         .args(overlappedId, deviceTimePeriods, m_resource->getUserDefinedName()));

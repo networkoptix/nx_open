@@ -41,7 +41,7 @@ QnLayoutFileCameraDataLoader::~QnLayoutFileCameraDataLoader()
 
 int QnLayoutFileCameraDataLoader::sendDataDelayed(const QnAbstractCameraDataPtr& data) {
     int handle = qn_fakeHandle.fetchAndAddAcquire(1);
-    emit delayedReady(data, QnTimePeriod(0, QnTimePeriod::infiniteDuration()), handle);
+    emit delayedReady(data, QnTimePeriod::anytime(), handle);
     return handle;
 }
 
@@ -84,6 +84,8 @@ int QnLayoutFileCameraDataLoader::loadMotion(const QList<QRegion> &motionRegions
 
 int QnLayoutFileCameraDataLoader::load(const QString& filter, const qint64 /*resolutionMs*/)
 {
+    using namespace nx::vms::client::core;
+
     switch (m_dataType)
     {
         case Qn::RecordingContent:
@@ -92,8 +94,12 @@ int QnLayoutFileCameraDataLoader::load(const QString& filter, const qint64 /*res
         }
         case Qn::MotionContent:
         {
+            // Empty motion filter is treated as a full area selection.
+            if (filter.isEmpty())
+                return loadMotion({{QRect(0, 0, MotionGrid::kWidth, MotionGrid::kHeight)}});
+
             const auto motionRegions = QJson::deserialized<QList<QRegion>>(filter.toUtf8());
-            for (const QRegion& region: motionRegions)
+            for (const auto& region: motionRegions)
             {
                 if (!region.isEmpty())
                     return loadMotion(motionRegions);

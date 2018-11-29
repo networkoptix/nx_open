@@ -38,10 +38,10 @@ supported for a while, when noted below.
 <!--============================================================================================-->
 <h3>Breaking compatibility</h3>
 
-In the case of <strong><code>InvalidParameter</code></strong> or <strong><code>MissingParameter</code></strong> error
-return status code has been changed from <strong><code><i>200 OK</i></code></strong>
+In the case of <strong><code>InvalidParameter</code></strong> or <strong><code>MissingParameter</code></strong>
+error, the return status code has been changed from <strong><code><i>200 OK</i></code></strong>
 to <strong><code><b>422 Unprocessable Entity</b></code></strong>;
-in the case of timeout return status code has been changed from <strong><code><i>200 OK</i></code></strong>
+in the case of timeout, the return status code has been changed from <strong><code><i>200 OK</i></code></strong>
 to <strong><code><b>408 Request Timeout</b></code></strong> in methods:
 <pre>
     /api/getCameraParam
@@ -49,8 +49,8 @@ to <strong><code><b>408 Request Timeout</b></code></strong> in methods:
 </pre>
 <p/>
 
-Output parameter value list can contain not only parameters specified by the user 
-but also additional parameter values affected by the set operation in method:
+Output parameter value list can contain not only parameters specified by the user,
+but also additional parameter values affected by the set operation in the method:
 <pre>
     /api/setCameraParam
 </pre>

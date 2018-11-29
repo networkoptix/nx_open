@@ -13,15 +13,53 @@ namespace aio {
 class AIOService;
 
 /**
- * This class implements AbstractPollable and simplifies async operation cancellation
- * by introducing BasicPollable::stopWhileInAioThread method.
+ * This class should be inherited by any class that tends to provide asynchronous operation 
+ * through nx::network::aio.
  *
- * TODO #ak conflicts with Pollable. Introduce proper names for Pollable, AbstractPollable, BasicPollable.
- * Successor to this class MUST support safe object deletion while in object's aio thread.
+ * It implements AbstractPollable and simplifies asynchronous operation cancellation by introducing 
+ * BasicPollable::stopWhileInAioThread method.
+ * It is recommended that BasicPollable::stopWhileInAioThread implementation can be safely 
+ * called multiple times.
+ * 
+ * Sample implementation:
+ * <pre><code>
+ * class Sample:
+ *     public nx::network::aio::BasicPollable
+ * {
+ *     using base_type = nx::network::aio::BasicPollable;
+ * 
+ * public:
+ *     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
+ *     {
+ *         base_type::bindToAioThread(aioThread);
+ *        
+ *         if (m_connection)
+ *             m_connection->bindToAioThread(aioThread);
+ *     }
+ *
+ *     void doSomethingAsync(CompletionHandler handler)
+ *     {
+ *         m_connection = ...; //< Creating connection.
+ *         m_connection->any_async_call(... handler);
+ *     }
+ *
+ * protected:
+ *     virtual void stopWhileInAioThread() override
+ *     {
+ *         base_type::stopWhileInAioThread();
+ *         m_connection->pleaseStopSync(); // or m_connection.reset();
+ *     }
+ * 
+ * private:
+ *     std::unique_ptr<AbstractStreamSocket> m_connection;
+ * };
+ * </code></pre>
+ *
+ * Successor to this class MUST support safe object deletion while in object's aio thread 
+ * (usually, it is acheived automatically).
  * QnStoppableAsync::pleaseStop and BasicPollable::stopWhileInAioThread are not called in this case.
- * So, it is recommended that:
- * - BasicPollable::stopWhileInAioThread implementation can be safely called multiple times
- * - BasicPollable::stopWhileInAioThread call is added to the destructor
+ *
+ * TODO #ak conflicts with Pollable. Consider renaming Pollable, AbstractPollable, BasicPollable.
  */
 class NX_NETWORK_API BasicPollable:
     public AbstractPollable
@@ -34,6 +72,9 @@ public:
     virtual ~BasicPollable() override;
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+    /**
+     * NOTE: Non blocking when called within object's aio thread.
+     */
     virtual void pleaseStopSync() override;
 
     virtual aio::AbstractAioThread* getAioThread() const override;
@@ -56,6 +97,9 @@ public:
      */
     void cancelPostedCallsSync();
 
+    /**
+     * NOTE: Non blocking when called within object's aio thread.
+     */
     template<typename Func>
     void executeInAioThreadSync(Func func)
     {
@@ -80,12 +124,12 @@ public:
     const Pollable& pollable() const;
 
 protected:
-    /** Cancel your asynchronous operations here. */
+    /** Reimplement and cancel your asynchronous operations here. */
     virtual void stopWhileInAioThread();
 
 private:
     mutable Pollable m_pollable;
-    AIOService* m_aioService;
+    AIOService* m_aioService = nullptr;
     nx::utils::ObjectDestructionFlag m_destructionFlag;
 };
 

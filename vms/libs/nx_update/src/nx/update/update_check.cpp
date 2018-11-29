@@ -445,7 +445,7 @@ FindPackageResult findPackage(
         return FindPackageResult::otherError;
     }
 
-    if (nx::utils::SoftwareVersion(updateInformation.version) == qnStaticCommon->engineVersion())
+    if (nx::utils::SoftwareVersion(updateInformation.version) == qnStaticCommon->engineVersion() && !isClient)
     {
         setErrorMessage(QString::fromLatin1(
             "Latest update (%1) installed")

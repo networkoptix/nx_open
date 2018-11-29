@@ -79,8 +79,6 @@ public:
     void connectToResources(const ResourceSignalClass& signal,
         std::function<void(const QnSharedResourcePointer<ResourceClass>& resource)> handler)
     {
-        using ResourceClassPtr = QnSharedResourcePointer<ResourceClass>;
-
         // Call handler if resource was added or removed.
         const auto updateIfNeeded =
             [handler](const QnResourcePtr& resource)

@@ -116,10 +116,33 @@ private:
     void autoCheckForUpdates();
     void checkForInternetUpdates();
 
+    /**
+     * Describes all possible display modes for update version.
+     * Variations for build number:
+     *  - Full build number, "4.0.0.20000".
+     *  - Specific build number "10821". Appears when we waiting for response for specific build.
+     *  - No version avalilable, "-----". Often happens if we have Error::networkError
+     *      or Error::httpError report. Can happen when source=internet
+     */
+    struct VersionReport
+    {
+        bool hasLatestVersion = false;
+        bool checking = false;
+        QString version;
+        /** Status message. It is displayed under version when something went wrong. */
+        QString status;
+        /** Should we display status with error style. */
+        bool statusError = false;
+        /** Should we display version with error style. */
+        bool versionError = false;
+    };
+
+    VersionReport calculateUpdateVersionReport(const nx::update::UpdateContents& contents);
+
     // UI synhronization. This functions are ment to be called from loadDataToUi.
     // Do not call them from anywhere else.
-    void syncUpdateCheck();
-    void syncRemoteUpdateState();
+    void syncUpdateCheckToUi();
+    void syncRemoteUpdateStateToUi();
     void syncProgress();
 
     ServerUpdateTool::ProgressInfo calculateActionProgress() const;

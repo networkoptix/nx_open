@@ -165,7 +165,7 @@ void QnFlatCameraDataLoader::handleDataLoaded(int status, const QnAbstractCamera
         return;
     }
 
-    QnTimePeriod loadedPeriod(m_loading.startTimeMs, QnTimePeriod::infiniteDuration());
+    QnTimePeriod loadedPeriod(m_loading.startTimeMs, QnTimePeriod::kInfiniteDuration);
 
     if (data)
     {

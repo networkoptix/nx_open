@@ -135,7 +135,7 @@ qint64 QnTimePeriodList::duration() const
         return 0;
 
     if (back().isInfinite())
-        return QnTimePeriod::infiniteDuration();
+        return QnTimePeriod::kInfiniteDuration;
 
     qint64 result = 0;
     for (const QnTimePeriod &period : *this)
@@ -143,7 +143,7 @@ qint64 QnTimePeriodList::duration() const
     return result;
 }
 
-QnTimePeriod QnTimePeriodList::boundingPeriod(qint64 truncateInfinite /* = QnTimePeriod::infiniteDuration()*/) const
+QnTimePeriod QnTimePeriodList::boundingPeriod(qint64 truncateInfinite /* = QnTimePeriod::kInfiniteDuration*/) const
 {
     if (isEmpty())
         return QnTimePeriod();
@@ -151,8 +151,8 @@ QnTimePeriod QnTimePeriodList::boundingPeriod(qint64 truncateInfinite /* = QnTim
     QnTimePeriod result(first());
     if (last().isInfinite())
     {
-        if (truncateInfinite == QnTimePeriod::infiniteDuration())
-            result.durationMs = QnTimePeriod::infiniteDuration();
+        if (truncateInfinite == QnTimePeriod::kInfiniteDuration)
+            result.durationMs = QnTimePeriod::kInfiniteDuration;
         else
         {
             result.durationMs = std::max(0ll, truncateInfinite - result.startTimeMs);
@@ -307,7 +307,7 @@ QnTimePeriodList QnTimePeriodList::aggregateTimePeriodsUnconstrained(
         {
             if (p.isInfinite())
             {
-                last.durationMs = QnTimePeriod::infiniteDuration();
+                last.durationMs = QnTimePeriod::kInfiniteDuration;
             }
             else
             {
@@ -680,7 +680,7 @@ QnTimePeriodList mergeTimePeriodsInternal(
                         result.push_back(startPeriod);
                     }
                     else
-                        last.durationMs = QnTimePeriod::infiniteDuration();
+                        last.durationMs = QnTimePeriod::kInfiniteDuration;
                     /* Last element is live and starts before all of rest - no need to process other elements. */
                     return result;
                 }

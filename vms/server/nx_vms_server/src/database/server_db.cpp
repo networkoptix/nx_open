@@ -871,7 +871,7 @@ QString QnServerDb::getRequestStr(const QnEventLogFilterData& request,
 
     if (!request.eventSubtype.isEmpty())
     {
-        requestStr += lit(" AND event_subtype = %1 ").arg(request.eventSubtype);
+        requestStr += lit(" AND event_subtype = '%1' ").arg(request.eventSubtype);
     }
 
     if (request.actionType != vms::api::ActionType::undefinedAction)

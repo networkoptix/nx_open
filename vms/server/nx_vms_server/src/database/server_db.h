@@ -11,7 +11,7 @@
 #include <common/common_module_aware.h>
 #include <nx/mediaserver/server_module_aware.h>
 
-class QnTimePeriod;
+struct QnTimePeriod;
 struct QnEventLogFilterData;
 struct QnEventLogRequestData;
 

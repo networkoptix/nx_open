@@ -159,7 +159,7 @@ struct UpdateContents
     nx::update::Information info;
     nx::update::InformationError error = nx::update::InformationError::noError;
     /**
-     * Packages for manual download. This packages should be downloaded by the client and
+     * Packages for manual download. These packages should be downloaded by the client and
      * pushed to mediaservers without internet.
      */
     QList<Package> manualPackages;

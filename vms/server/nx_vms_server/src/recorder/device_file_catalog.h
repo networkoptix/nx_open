@@ -27,7 +27,7 @@ extern "C" {
 } // extern "C"
 
 class QnTimePeriodList;
-class QnTimePeriod;
+struct QnTimePeriod;
 class QnStorageManager;
 
 class DeviceFileCatalog: public QObject, public nx::mediaserver::ServerModuleAware

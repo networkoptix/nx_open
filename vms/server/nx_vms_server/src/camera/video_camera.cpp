@@ -419,7 +419,13 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
         if (m_lastKeyFrame[0])
             lastKeyTime = m_lastKeyFrame[0]->timestamp;
     }
-    if (!m_resource->hasFlags(Qn::foreigner) && m_resource->isInitialized() &&
+
+    const QnSecurityCamResource* cameraResource =
+        dynamic_cast<QnSecurityCamResource*>(m_resource.data());
+    bool canUseProvider = QnServer::HiQualityCatalog
+        || !cameraResource || cameraResource->hasDualStreaming();
+
+    if (!m_resource->hasFlags(Qn::foreigner) && m_resource->isInitialized() && canUseProvider &&
        (lastKeyTime == (qint64)AV_NOPTS_VALUE || qnSyncTime->currentUSecsSinceEpoch() - lastKeyTime > CAMERA_UPDATE_INTERNVAL) &&
         m_resource->commonModule()->globalSettings()->isAutoUpdateThumbnailsEnabled())
     {

@@ -130,7 +130,7 @@ bool OnvifResourceInformationFetcher::ignoreCamera(
 {
     QnResourceData resourceData = dataPool->data(manufacturer, name);
 
-    if (resourceData.value<bool>(Qn::IGNORE_ONVIF_PARAM_NAME))
+    if (resourceData.value<bool>(ResourceDataKey::kIgnoreONVIF))
         return true;
 
     for (uint i = 0; i < sizeof(IGNORE_VENDORS)/sizeof(IGNORE_VENDORS[0]); ++i)
@@ -367,11 +367,11 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(
         return QnPlOnvifResourcePtr();
 
     auto resData = serverModule()->commonModule()->dataPool()->data(manufacturer, model);
-    auto manufacturerAlias = resData.value<QString>(Qn::ONVIF_VENDOR_SUBTYPE);
+    auto manufacturerAlias = resData.value<QString>(ResourceDataKey::kOnvifVendorSubtype);
 
     manufacturerAlias = manufacturerAlias.isEmpty() ? manufacturer : manufacturerAlias;
 
-    bool doNotAddVendorToDeviceName = resData.value<bool>(Qn::DO_NOT_ADD_VENDOR_TO_DEVICE_NAME);
+    bool doNotAddVendorToDeviceName = resData.value<bool>(ResourceDataKey::kDoNotAddVendorToDeviceName);
 
     QnPlOnvifResourcePtr resource = createOnvifResourceByManufacture(serverModule(), manufacturerAlias);
     if (!resource)

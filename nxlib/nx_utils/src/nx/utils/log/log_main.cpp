@@ -13,8 +13,9 @@ class LoggerCollection
 public:
     LoggerCollection()
     {
-        setMainLogger(std::make_unique<Logger>(
-            std::set<Tag>(), kDefaultLevel, /*writer*/ nullptr));
+        m_mainLogger = std::make_unique<Logger>(std::set<Tag>(), kDefaultLevel);
+        m_mainLogger->setOnLevelChanged([this]() { onLevelChanged(); });
+        updateMaxLevel();
     }
 
     std::shared_ptr<AbstractLogger> main()

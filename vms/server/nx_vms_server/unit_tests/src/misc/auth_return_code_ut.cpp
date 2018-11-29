@@ -286,7 +286,7 @@ public:
             {
                 httpClient.reset(); //< Ensure connection is closed.
 
-                QnTimePeriod period(0, QnTimePeriod::infiniteDuration());
+                const auto period = QnTimePeriod::anytime();
                 QnAuditRecordList outputData;
                 static const std::chrono::seconds kMaxWaitTime(10);
                 nx::utils::ElapsedTimer timer;

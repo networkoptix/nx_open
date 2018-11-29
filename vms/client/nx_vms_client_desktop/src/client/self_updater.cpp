@@ -72,7 +72,7 @@ bool canBeRunFromTheCurrentDirectory()
     if (!nx::utils::AppInfo::isWindows())
         return true;
 
-    const QString binaryPath = qApp->applicationFilePath();
+    const QString binaryPath = qApp->applicationDirPath();
     const QString qt5LibFile =
         #if defined(_DEBUG)
             "Qt5Cored.dll";

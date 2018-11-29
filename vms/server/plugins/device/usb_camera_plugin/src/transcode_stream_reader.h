@@ -39,7 +39,7 @@ private:
         csModified
     };
     StreamState m_cameraState = csOff;
-    
+
     int m_retries = 0;
     int m_initCode = 0;
 

@@ -1289,6 +1289,9 @@ CameraDiagnostics::Result HanwhaResource::initIo()
 
             m_ioPortTypeById[outputPortData.id] = outputPortData;
             ioPorts.push_back(outputPortData);
+
+            if (m_defaultOutputPortId.isEmpty())
+                m_defaultOutputPortId = outputPortData.id;
         }
     }
 
@@ -3517,7 +3520,7 @@ boost::optional<HanwhaResource::HanwhaPortInfo> HanwhaResource::portInfoFromId(
 
 bool HanwhaResource::setOutputPortStateInternal(const QString& outputId, bool activate)
 {
-    const auto info = portInfoFromId(outputId);
+    const auto info = portInfoFromId(outputId.isEmpty() ? m_defaultOutputPortId : outputId);
     if (info == boost::none)
         return false;
 

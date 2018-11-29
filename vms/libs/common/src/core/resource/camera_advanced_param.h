@@ -134,7 +134,7 @@ struct QnCameraAdvancedParameter
     bool compact = false;
     QString unit;
     QString notes;
-    // If parameter with resync flag is changed then all parameters in a set should be reloaded.
+    // If a parameter with resync flag is changed then all parameters in a set should be reloaded.
     bool resync = false;
     bool keepInitialValue = false;
     bool bindDefaultToMinimum = false;
@@ -215,8 +215,8 @@ struct QnCameraAdvancedParams
     QString name;
     QString version;
     QString unique_id;
-    // If packet_mode is set to true then value of all parameters should be reloaded
-    // on every parameter change. May be considered as group 'QnCameraAdvancedParam::resync'
+    // If packet_mode is set to true then the value of all parameters should be reloaded
+    // on every parameter change. May be considered as a group `QnCameraAdvancedParam::resync`
     bool packet_mode = false;
     std::vector<QnCameraAdvancedParamGroup> groups;
 

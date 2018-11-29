@@ -53,6 +53,12 @@ void QnConnectToCloudWatcher::setCloudDbUrl(const nx::utils::Url& cloudDbUrl)
     m_cloudDbUrl = cloudDbUrl;
 }
 
+std::optional<nx::utils::Url> QnConnectToCloudWatcher::cloudDbUrl() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_cloudDbUrl;
+}
+
 void QnConnectToCloudWatcher::restartTimer()
 {
     m_timer.start();
@@ -78,9 +84,10 @@ void QnConnectToCloudWatcher::at_updateConnection()
         return;
     }
 
-    if (m_cloudDbUrl)
+    auto cloudDbUrl = this->cloudDbUrl();
+    if (cloudDbUrl)
     {
-        addCloudPeer(*m_cloudDbUrl);
+        addCloudPeer(*cloudDbUrl);
     }
     else
     {
@@ -93,11 +100,11 @@ void QnConnectToCloudWatcher::at_updateConnection()
                     NX_WARNING(this, lm("Error fetching cloud_db endpoint. HTTP result: %1")
                         .arg(statusCode));
                     // try once more later
-                    metaObject()->invokeMethod(this, "restartTimer", Qt::QueuedConnection);
+                    metaObject()->invokeMethod(this, &QnConnectToCloudWatcher::restartTimer, Qt::QueuedConnection);
                     return;
                 }
                 setCloudDbUrl(url);
-                metaObject()->invokeMethod(this, "at_updateConnection", Qt::QueuedConnection);
+                metaObject()->invokeMethod(this, &QnConnectToCloudWatcher::at_updateConnection, Qt::QueuedConnection);
             });
     }
 }

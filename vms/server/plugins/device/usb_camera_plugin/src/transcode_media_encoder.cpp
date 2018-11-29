@@ -54,7 +54,6 @@ int TranscodeMediaEncoder::getResolutionList(
     infoList[index].maxFps = secondary.fps;
 
     *infoListCount = index + 1;
-    
     return nxcip::NX_NO_ERROR;
 }
 

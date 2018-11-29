@@ -85,9 +85,6 @@ const QString QnPlOnvifResource::MANUFACTURE(lit("OnvifDevice"));
 const char* QnPlOnvifResource::ONVIF_PROTOCOL_PREFIX = "http://";
 const char* QnPlOnvifResource::ONVIF_URL_SUFFIX = ":80/onvif/device_service";
 const int QnPlOnvifResource::DEFAULT_IFRAME_DISTANCE = 20;
-QString QnPlOnvifResource::MEDIA_URL_PARAM_NAME = QLatin1String("MediaUrl");
-QString QnPlOnvifResource::ONVIF_URL_PARAM_NAME = QLatin1String("DeviceUrl");
-QString QnPlOnvifResource::ONVIF_ID_PARAM_NAME = QLatin1String("DeviceID");
 const float QnPlOnvifResource::QUALITY_COEF = 0.2f;
 const int QnPlOnvifResource::MAX_AUDIO_BITRATE = 64; //kbps
 const int QnPlOnvifResource::MAX_AUDIO_SAMPLERATE = 32; //khz
@@ -1051,7 +1048,7 @@ QString QnPlOnvifResource::getDeviceOnvifUrl() const
 {
     QnMutexLocker lock(&m_mutex);
     if (m_serviceUrls.deviceServiceUrl.isEmpty())
-        m_serviceUrls.deviceServiceUrl = getProperty(ONVIF_URL_PARAM_NAME);
+        m_serviceUrls.deviceServiceUrl = getProperty(ResourcePropertyKey::Onvif::kDeviceUrl);
 
     return m_serviceUrls.deviceServiceUrl;
 }
@@ -1063,7 +1060,7 @@ void QnPlOnvifResource::setDeviceOnvifUrl(const QString& src)
         m_serviceUrls.deviceServiceUrl = src;
     }
 
-    setProperty(ONVIF_URL_PARAM_NAME, src);
+    setProperty(ResourcePropertyKey::Onvif::kDeviceUrl, src);
 }
 
 QString QnPlOnvifResource::fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort)
@@ -1296,10 +1293,13 @@ void QnPlOnvifResource::handleOneNotification(
     }
     eventTopic = eventTopicTokens.join(QLatin1Char('/'));
 
-    if (eventTopic.indexOf(lit("Trigger/Relay")) == -1 &&
-        eventTopic.indexOf(lit("IO/Port")) == -1 &&
-        eventTopic.indexOf(lit("Trigger/DigitalInput")) == -1 &&
-        eventTopic.indexOf(lit("Device/IO/VirtualPort")) == -1)
+    const auto topicsToCheck = notificationTopicsForMonitoring();
+    const bool topicIsFound = std::any_of(
+        topicsToCheck.cbegin(),
+        topicsToCheck.cend(),
+        [&eventTopic](const QString& topic) { return eventTopic.indexOf(topic) != -1; });
+
+    if (!topicIsFound)
     {
         NX_VERBOSE(this, lit("Received notification with unknown topic: %1. Ignoring...").
             arg(QLatin1String(notification.Topic->__any.text)));
@@ -1335,11 +1335,11 @@ void QnPlOnvifResource::handleOneNotification(
 
     //checking that there is single source and this source is a relay port
     auto portSourceIter = source.cend();
+    const auto inputSourceNames = allowedInputSourceNames();
     for (auto it = source.cbegin(); it != source.cend(); ++it)
     {
-        if (it->name == "port" ||
-            it->name == "RelayToken" ||
-            it->name == "Index")
+        const auto name = QString::fromStdString(it->name);
+        if (inputSourceNames.find(name.toLower()) != inputSourceNames.cend())
         {
             portSourceIter = it;
             break;
@@ -1352,11 +1352,14 @@ void QnPlOnvifResource::handleOneNotification(
         }
     }
 
-    if (portSourceIter == /*handler.*/source.end()  //< source is not port
-        || data.name != "LogicalState" &&
-           data.name != "state" &&
-           data.name != "Level" &&
-           data.name != "RelayLogicalState")
+    static const std::set<QString> kStateStrings{
+        "logicalstate",
+        "state",
+        "level",
+        "relaylogicalstate"};
+
+    if (portSourceIter == source.end()  //< source is not port
+        || kStateStrings.find(QString::fromStdString(data.name).toLower()) == kStateStrings.cend())
     {
         return;
     }
@@ -2996,6 +2999,28 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetAudioSource()
         QLatin1String("missing channel configuration (2)"));
 }
 
+std::set<QString> QnPlOnvifResource::notificationTopicsForMonitoring() const
+{
+    std::set<QString> result{
+        "Trigger/Relay", "IO/Port", "Trigger/DigitalInput", "Device/IO/VirtualPort"
+    };
+    const auto additionalNotificationTopics = resourceData().value<std::vector<QString>>(
+        "additionalNotificationTopics");
+
+    result.insert(additionalNotificationTopics.cbegin(), additionalNotificationTopics.cend());
+    return result;
+}
+
+std::set<QString> QnPlOnvifResource::allowedInputSourceNames() const
+{
+    std::set<QString> result{"port", "relaytoken", "index"};
+    const auto additionalInputSourceNames = resourceData().value<std::vector<QString>>(
+        "additionalInputSourceNames");
+
+    result.insert(additionalInputSourceNames.cbegin(), additionalInputSourceNames.cend());
+    return result;
+}
+
 bool QnPlOnvifResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values)
 {
     m_prevOnvifResultCode = CameraDiagnostics::NoErrorResult();
@@ -3432,7 +3457,7 @@ QnAbstractPtzController* QnPlOnvifResource::createSpecialPtzController() const
     if (getModel() == lit("DCS-5615"))
         return new QnDlinkPtzController(toSharedPointer(this));
 
-    return 0;
+    return nullptr;
 }
 
 QnAbstractPtzController *QnPlOnvifResource::createPtzControllerInternal() const
@@ -3780,8 +3805,8 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     _onvifEvents__PullMessagesResponse response;
 
     auto resData = resourceData();
-    const bool useHttpReader = resData.value<bool>(
-        Qn::PARSE_ONVIF_NOTIFICATIONS_WITH_HTTP_READER,
+    const auto useHttpReader = resData.value<bool>(
+        ResourceDataKey::kParseOnvifNotificationsWithHttpReader,
         false);
 
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> asyncPullMessagesCallWrapper(
@@ -4028,7 +4053,7 @@ QnConstResourceVideoLayoutPtr QnPlOnvifResource::getVideoLayout(
     }
 
     auto resData = resourceData();
-    auto layoutStr = resData.value<QString>(Qn::VIDEO_LAYOUT_PARAM_NAME2);
+    auto layoutStr = resData.value<QString>(ResourceDataKey::kVideoLayout);
     auto videoLayout = layoutStr.isEmpty()
         ? QnMediaResource::getVideoLayout(dataProvider)
         : QnConstResourceVideoLayoutPtr(QnCustomResourceVideoLayout::fromString(layoutStr));
@@ -4037,7 +4062,7 @@ QnConstResourceVideoLayoutPtr QnPlOnvifResource::getVideoLayout(
     {
         QnMutexLocker lock(&m_layoutMutex);
         m_videoLayout = videoLayout;
-        nonConstThis->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, videoLayout->toString());
+        nonConstThis->setProperty(ResourcePropertyKey::kVideoLayout, videoLayout->toString());
         nonConstThis->saveProperties();
     }
 
@@ -4354,20 +4379,20 @@ bool QnPlOnvifResource::isCameraForcedToOnvif(
     const QString& manufacturer, const QString& model)
 {
     QnResourceData resourceData = dataPool->data(manufacturer, model);
-    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+    if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return true;
 
     QString shortModel = model;
     shortModel.replace(QString(lit(" ")), QString());
     shortModel.replace(QString(lit("-")), QString());
     resourceData = dataPool->data(manufacturer, shortModel);
-    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+    if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return true;
 
     if (shortModel.startsWith(manufacturer))
         shortModel = shortModel.mid(manufacturer.length()).trimmed();
     resourceData = dataPool->data(manufacturer, shortModel);
-    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+    if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return true;
 
     return false;
