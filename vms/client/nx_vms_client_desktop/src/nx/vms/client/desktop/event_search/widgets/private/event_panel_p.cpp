@@ -230,11 +230,20 @@ void EventPanel::Private::updateUnreadCounter(int count, QnNotificationLevel::Va
 void EventPanel::Private::showContextMenu(const QPoint& pos)
 {
     QMenu contextMenu;
-    contextMenu.addAction(action(ui::action::OpenBusinessLogAction));
-    contextMenu.addAction(action(ui::action::BusinessEventsAction));
-    contextMenu.addAction(action(ui::action::PreferencesNotificationTabAction));
+    const auto actions = {
+        ui::action::OpenBusinessLogAction,
+        ui::action::BusinessEventsAction,
+        ui::action::PreferencesNotificationTabAction};
+
+    for (const auto actionId: actions)
+    {
+        if (menu()->canTrigger(actionId))
+            contextMenu.addAction(action(actionId));
+    }
+
     contextMenu.addSeparator();
     contextMenu.addAction(action(ui::action::PinNotificationsAction));
+
     contextMenu.exec(QnHiDpiWorkarounds::safeMapToGlobal(q, pos));
 }
 
