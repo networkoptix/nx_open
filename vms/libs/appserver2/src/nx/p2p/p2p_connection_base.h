@@ -67,8 +67,7 @@ public:
 
     virtual ~ConnectionBase();
 
-    void ConnectionBase::gotPostConnection(
-        std::unique_ptr<nx::network::AbstractStreamSocket> socket);
+    void gotPostConnection(std::unique_ptr<nx::network::AbstractStreamSocket> socket);
 
     static const SendCounters& sendCounters() { return m_sendCounters;  }
 
