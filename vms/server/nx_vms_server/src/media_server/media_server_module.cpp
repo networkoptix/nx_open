@@ -53,7 +53,7 @@
 #include <nx/mediaserver/resource/camera.h>
 #include <nx/mediaserver/root_fs.h>
 #include <nx/mediaserver/server_update_manager.h>
-#include <nx/mediaserver/meta_types.h>
+#include <nx/vms/server/meta_types.h>
 
 #include <nx/mediaserver/analytics/sdk_object_factory.h>
 
@@ -166,7 +166,7 @@ QnMediaServerModule::QnMediaServerModule(
             arguments->rwConfigFilePath));
     }
 
-    nx::mediaserver::registerSerializers();
+    nx::vms::server::registerSerializers();
 
 #ifdef ENABLE_VMAX
     // It depend on Vmax480Resources in the pool. Pool should be cleared before QnVMax480Server destructor.

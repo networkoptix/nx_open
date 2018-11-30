@@ -30,6 +30,7 @@
 #include <nx/sdk/analytics/engine.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
 #include <nx/streaming/abstract_archive_delegate.h>
+#include <nx/vms/server/plugins/resource_data_support/hanwha.h>
 
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource/media_stream_capability.h>
@@ -1045,16 +1046,16 @@ CameraDiagnostics::Result HanwhaResource::initBypass()
     }
 
     const auto resData = resourceData();
-    const auto bypassOverride = resData.value<HanwhaBypassSupportType>(
+    const auto bypassOverride = resData.value<resource_data_support::HanwhaBypassSupportType>(
         kHanwhaBypassOverrideParameterName,
-        HanwhaBypassSupportType::normal);
+        resource_data_support::HanwhaBypassSupportType::normal);
 
-    if (bypassOverride == HanwhaBypassSupportType::forced)
+    if (bypassOverride == resource_data_support::HanwhaBypassSupportType::forced)
     {
         m_isBypassSupported = true;
         return CameraDiagnostics::NoErrorResult();
     }
-    else if (bypassOverride == HanwhaBypassSupportType::disabled)
+    else if (bypassOverride == resource_data_support::HanwhaBypassSupportType::disabled)
     {
         m_isBypassSupported = false;
         return CameraDiagnostics::NoErrorResult();
