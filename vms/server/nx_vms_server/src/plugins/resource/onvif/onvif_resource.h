@@ -151,6 +151,11 @@ public:
             const onvifXsd__VideoEncoder2ConfigurationOptions& resp,
             QnBounds frameRateBounds = QnBounds());
 
+        static std::vector<QnPlOnvifResource::VideoOptionsLocal> createVideoOptionsLocalList(
+            const QString& id,
+            const onvifXsd__VideoEncoderConfigurationOptions& options,
+            QnBounds frameRateBounds);
+
         UnderstandableVideoCodec encoding = UnderstandableVideoCodec::NONE;
 
         // Profiles for h264 codec. May be read by Media1 (from onvifXsd__H264Profile)
@@ -460,6 +465,9 @@ protected:
     std::unique_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
     VideoOptionsLocal m_primaryStreamCapabilities;
     VideoOptionsLocal m_secondaryStreamCapabilities;
+
+    std::vector<VideoOptionsLocal> m_primaryStreamCapabilitiesExtension;
+    std::vector<VideoOptionsLocal> m_secondaryStreamCapabilitiesExtension;
 
     virtual void startInputPortStatesMonitoring() override;
     virtual void stopInputPortStatesMonitoring() override;
