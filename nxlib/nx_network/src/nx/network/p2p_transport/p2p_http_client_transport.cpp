@@ -54,7 +54,7 @@ void P2PHttpClientTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletio
 
             if (m_failed)
             {
-                NX_VERBOSE(this, lm("Connection failed. Reporting with a read handler"));
+                NX_VERBOSE(this, lm("The connection failed. Reporting with a read handler"));
                 handler(SystemError::connectionAbort, 0);
                 return;
             }
@@ -185,7 +185,7 @@ void P2PHttpClientTransport::startReading()
             NX_ASSERT(isResponseMultiPart);
             if (!isResponseMultiPart)
             {
-                NX_WARNING(this, "Expected multipart response. It is not.");
+                NX_WARNING(this, "Expected a multipart response. It is not.");
                 m_failed = true;
                 return;
             }
@@ -201,7 +201,9 @@ void P2PHttpClientTransport::startReading()
      m_readHttpClient->setOnDone(
          [this]()
          {
-             NX_VERBOSE(this, "Read (GET) http client emitted 'onDone'. Moving to failed state.");
+             NX_VERBOSE(
+                 this,
+                 "The read (GET) http client emitted 'onDone'. Moving to a failed state.");
              m_failed = true;
          });
 
