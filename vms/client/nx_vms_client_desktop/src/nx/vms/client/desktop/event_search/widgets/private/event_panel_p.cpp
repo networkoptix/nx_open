@@ -58,6 +58,13 @@ EventPanel::Private::Private(EventPanel* q):
     layout->setContentsMargins(QMargins());
     layout->addWidget(m_tabs);
 
+    // Initially all tab widgets must be hidden.
+    m_notificationsTab->hide();
+    m_motionTab->hide();
+    m_bookmarksTab->hide();
+    m_eventsTab->hide();
+    m_analyticsTab->hide();
+
     static constexpr int kTabBarShift = 10;
     m_tabs->setProperty(style::Properties::kTabBarIndent, kTabBarShift);
     setTabShape(m_tabs->tabBar(), style::TabShape::Compact);
@@ -230,11 +237,20 @@ void EventPanel::Private::updateUnreadCounter(int count, QnNotificationLevel::Va
 void EventPanel::Private::showContextMenu(const QPoint& pos)
 {
     QMenu contextMenu;
-    contextMenu.addAction(action(ui::action::OpenBusinessLogAction));
-    contextMenu.addAction(action(ui::action::BusinessEventsAction));
-    contextMenu.addAction(action(ui::action::PreferencesNotificationTabAction));
+    const auto actions = {
+        ui::action::OpenBusinessLogAction,
+        ui::action::BusinessEventsAction,
+        ui::action::PreferencesNotificationTabAction};
+
+    for (const auto actionId: actions)
+    {
+        if (menu()->canTrigger(actionId))
+            contextMenu.addAction(action(actionId));
+    }
+
     contextMenu.addSeparator();
     contextMenu.addAction(action(ui::action::PinNotificationsAction));
+
     contextMenu.exec(QnHiDpiWorkarounds::safeMapToGlobal(q, pos));
 }
 

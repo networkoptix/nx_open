@@ -10,6 +10,7 @@
 
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/motion_search_list_model.h>
+#include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/utils/log/assert.h>
 
 namespace nx::vms::client::desktop {
@@ -25,6 +26,7 @@ public:
         m_areaSelectionButton(q->createCustomFilterButton())
     {
         NX_CRITICAL(m_model);
+        q->view()->setHeadersEnabled(false);
 
         setReadOnly(m_areaSelectionButton, true); //< Does not affect close button.
         m_areaSelectionButton->setSelectable(false);

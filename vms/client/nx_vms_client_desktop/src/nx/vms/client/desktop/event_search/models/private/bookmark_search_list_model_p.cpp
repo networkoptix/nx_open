@@ -150,6 +150,9 @@ void BookmarkSearchListModel::Private::truncateToRelevantTimePeriod()
 rest::Handle BookmarkSearchListModel::Private::getBookmarks(
     const QnTimePeriod& period, GetCallback callback, Qt::SortOrder order, int limit) const
 {
+    if (!NX_ASSERT(!q->isFilterDegenerate()))
+        return {};
+
     QnCameraBookmarkSearchFilter filter;
     filter.startTimeMs = period.startTime();
     filter.endTimeMs = period.endTime();
@@ -393,7 +396,7 @@ void BookmarkSearchListModel::Private::dynamicUpdate(const QnTimePeriod& period)
     // This function exists until we implement notifying all clients about every bookmark change.
 
     const auto effectivePeriod = period.intersected(q->fetchedTimeWindow());
-    if (effectivePeriod.isEmpty())
+    if (effectivePeriod.isEmpty() || q->isFilterDegenerate())
         return;
 
     const auto callback =

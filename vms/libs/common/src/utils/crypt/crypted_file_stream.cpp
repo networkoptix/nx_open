@@ -181,6 +181,8 @@ qint64 CryptedFileStream::writeData(const char* data, qint64 maxSize)
 bool CryptedFileStream::seek(qint64 offset)
 {
     QnMutexLocker lock(&m_mutex);
+    // Qt docs say: "When subclassing QIODevice, you must call QIODevice::seek() at the start
+    // of your function to ensure integrity with QIODevice's built-in buffer."
     QIODevice::seek(offset);
 
     if (!isWriting() && (offset > m_header.dataSize))

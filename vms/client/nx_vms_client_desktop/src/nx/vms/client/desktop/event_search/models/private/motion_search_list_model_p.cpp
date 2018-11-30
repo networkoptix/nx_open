@@ -252,7 +252,7 @@ bool MotionSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodTo
 
 void MotionSearchListModel::Private::fetchLive()
 {
-    if (m_liveFetch.id || !q->isLive() || !q->isOnline() || q->livePaused())
+    if (m_liveFetch.id || !q->isLive() || !q->isOnline() || q->livePaused() || q->isFilterDegenerate())
         return;
 
     if (m_data.empty() && fetchInProgress())
@@ -271,8 +271,7 @@ rest::Handle MotionSearchListModel::Private::getMotion(
     const QnTimePeriod& period, Qt::SortOrder order, int limit)
 {
     const auto server = q->commonModule()->currentServer();
-    NX_ASSERT(server && server->apiConnection());
-    if (!server || !server->apiConnection())
+    if (!NX_ASSERT(server && server->apiConnection() && !q->isFilterDegenerate()))
         return {};
 
     QnChunksRequestData request;

@@ -59,6 +59,16 @@ void EventRibbon::setFootersEnabled(bool value)
     d->setFootersEnabled(value);
 }
 
+bool EventRibbon::headersEnabled() const
+{
+    return d->headersEnabled();
+}
+
+void EventRibbon::setHeadersEnabled(bool value)
+{
+    d->setHeadersEnabled(value);
+}
+
 Qt::ScrollBarPolicy EventRibbon::scrollBarPolicy() const
 {
     return d->scrollBarPolicy();

@@ -37,6 +37,9 @@ public:
     bool footersEnabled() const;
     void setFootersEnabled(bool value);
 
+    bool headersEnabled() const;
+    void setHeadersEnabled(bool value);
+
     Qt::ScrollBarPolicy scrollBarPolicy() const;
     void setScrollBarPolicy(Qt::ScrollBarPolicy value);
 
