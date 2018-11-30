@@ -814,7 +814,7 @@ private:
 
 TEST_F(HttpProxyWithSslStress, DISABLED_stress_test)
 {
-    constexpr int kRequestCount = 10001;
+    constexpr int kRequestCount = 101;
 
     givenRegularRelay();
     startSendingConcurrentRequestsToUnknownPeer(kRequestCount);
