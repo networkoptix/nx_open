@@ -111,21 +111,8 @@ double QnManualSearchTaskManager::doneToTotalTasksRatio() const
 
 QnManualResourceSearchList QnManualSearchTaskManager::foundResources() const
 {
-    if (m_pollable.isInSelfAioThread())
-        return m_foundResources;
-
-    QnManualResourceSearchList result;
-    std::promise<void> resultPromise;
-    auto resultReady = resultPromise.get_future();
-    m_pollable.post(
-        [this, &result, &resultPromise]()
-        {
-            result = m_foundResources;
-            resultPromise.set_value();
-        });
-
-    resultReady.wait();
-    return result;
+    return m_pollable.executeInAioThreadSync(
+        [this]() -> QnManualResourceSearchList { return m_foundResources; });
 }
 
 void QnManualSearchTaskManager::searchTaskDoneHandler(

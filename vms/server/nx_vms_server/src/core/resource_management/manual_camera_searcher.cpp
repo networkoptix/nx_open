@@ -101,13 +101,10 @@ void QnManualCameraSearcher::run(
 
 QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
 {
-    QnManualCameraSearchProcessStatus result;
-    std::promise<void> resultPromise;
-    auto resultReady = resultPromise.get_future();
-
-    m_pollable.dispatch(
-        [this, &result, &resultPromise]()
+    return m_pollable.executeInAioThreadSync(
+        [this]() -> QnManualCameraSearchProcessStatus
         {
+            QnManualCameraSearchProcessStatus result;
             switch (m_state)
             {
                 case QnManualResourceSearchStatus::Finished:
@@ -145,11 +142,8 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
             }
 
             NX_DEBUG(this, "Status: %1 (%2 max)", result.status.current, result.status.total);
-            resultPromise.set_value();
+            return result;
         });
-
-    resultReady.wait();
-    return result;
 }
 
 void QnManualCameraSearcher::startOnlineHostsScan(
