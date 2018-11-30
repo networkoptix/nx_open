@@ -6,6 +6,7 @@
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <utils/common/delayed.h>
 
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <nx/utils/datetime.h>
@@ -81,8 +82,25 @@ bool AbstractSearchListModel::canFetchMore(const QModelIndex& parent) const
 
 void AbstractSearchListModel::fetchMore(const QModelIndex& parent)
 {
-    if (!parent.isValid())
+    if (parent.isValid())
+        return;
+
+    if (isFilterDegenerate())
+    {
+        NX_ASSERT(rowCount() == 0);
+        setFetchedTimeWindow(relevantTimePeriod());
+        finishFetch(FetchResult::complete);
+    }
+    else
+    {
         requestFetch();
+    }
+}
+
+bool AbstractSearchListModel::isFilterDegenerate() const
+{
+    return relevantTimePeriod().isEmpty()
+        || (cameraSet()->type() != ManagedCameraSet::Type::all && cameras().empty());
 }
 
 ManagedCameraSet* AbstractSearchListModel::cameraSet() const
@@ -306,8 +324,15 @@ void AbstractSearchListModel::clear()
     clearData();
 
     setLive(effectiveLiveSupported());
-    if (canFetchMore())
-        emit dataNeeded();
+
+    const auto emitDataNeeded =
+        [this]()
+        {
+            if (canFetchMore())
+                emit dataNeeded();
+        };
+
+    executeLater(emitDataNeeded, this);
 }
 
 } // namespace nx::vms::client::desktop

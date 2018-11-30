@@ -5,6 +5,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
+#include <nx/utils/interval.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
 
 class QAbstractListModel;
@@ -36,6 +37,9 @@ public:
     bool footersEnabled() const;
     void setFootersEnabled(bool value);
 
+    bool headersEnabled() const;
+    void setHeadersEnabled(bool value);
+
     Qt::ScrollBarPolicy scrollBarPolicy() const;
     void setScrollBarPolicy(Qt::ScrollBarPolicy value);
 
@@ -54,9 +58,12 @@ public:
     int count() const;
     int unreadCount() const;
 
+    nx::utils::Interval<int> visibleRange() const;
+
 signals:
     void countChanged(int count);
     void unreadCountChanged(int unreadCount, QnNotificationLevel::Value importance, QPrivateSignal);
+    void visibleRangeChanged(const nx::utils::Interval<int>& value, QPrivateSignal);
 
     // Tile interaction.
     void hovered(const QModelIndex& index, EventTile* tile);

@@ -152,7 +152,7 @@ void QnWorkbenchWearableHandler::at_newWearableCameraAction_triggered()
             {
                 QnMessageBox::critical(
                     mainWindowWidget(),
-                    tr("Failed to add wearable camera")
+                    tr("Failed to add virtual camera")
                 );
                 return;
             }
@@ -177,7 +177,7 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
 
     QStringList paths = QFileDialog::getOpenFileNames(
         mainWindowWidget(),
-        tr("Open Wearable Camera Recordings..."),
+        tr("Open Virtual Camera Recordings..."),
         QString(),
         filters.join(lit(";;")),
         /*selectedFilter*/ nullptr,
@@ -207,7 +207,7 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFolderAction_triggered()
         return;
 
     QString path = QFileDialog::getExistingDirectory(mainWindowWidget(),
-        tr("Open Wearable Camera Recordings..."),
+        tr("Open Virtual Camera Recordings..."),
         QString(),
         QnCustomFileDialog::directoryDialogOptions()
     );
@@ -319,7 +319,7 @@ bool QnWorkbenchWearableHandler::fixFileUpload(
     {
         QnMessageBox::warning(mainWindowWidget(),
             tr("Selected files cover periods for which videos are already being uploaded", "", count),
-            tr("You can upload these files to a different instance of a Wearable Camera.", "", count));
+            tr("You can upload these files to a different instance of a Virtual Camera.", "", count));
         return false;
     }
 
@@ -327,7 +327,7 @@ bool QnWorkbenchWearableHandler::fixFileUpload(
     {
         QnMessageBox::warning(mainWindowWidget(),
             tr("Selected files cover periods for which videos have already been uploaded", "", count),
-            tr("You can upload these files to a different instance of a Wearable Camera.", "", count));
+            tr("You can upload these files to a different instance of a Virtual Camera.", "", count));
         return false;
     }
 

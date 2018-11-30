@@ -209,10 +209,10 @@ rest::Handle ResourcePoolPeerManager::requestFileInfo(
             d->removeCanceller(localRequestId);
 
             if (!success)
-                return callback(success, handle, FileInformation());
+                return callback(success, localRequestId, FileInformation());
 
             const auto& fileInfo = result.deserialized<FileInformation>();
-            callback(success, handle, fileInfo);
+            callback(success, localRequestId, fileInfo);
         };
 
     const auto handle = connection->fileDownloadStatus(fileName, handleReply, thread());
@@ -244,10 +244,10 @@ rest::Handle ResourcePoolPeerManager::requestChecksums(
             d->removeCanceller(localRequestId);
 
             if (!success)
-                return callback(success, handle, QVector<QByteArray>());
+                return callback(success, localRequestId, QVector<QByteArray>());
 
             const auto& checksums = result.deserialized<QVector<QByteArray>>();
-            callback(success, handle, checksums);
+            callback(success, localRequestId, checksums);
         };
 
     const auto handle = connection->fileChunkChecksums(fileName, handleReply, thread());
@@ -281,7 +281,7 @@ rest::Handle ResourcePoolPeerManager::downloadChunk(
             const nx::network::http::HttpHeaders& /*headers*/)
         {
             d->removeCanceller(localRequestId);
-            return callback(success, requestId, result);
+            return callback(success, localRequestId, result);
         };
 
 
@@ -318,7 +318,7 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
                 const QByteArray& data)
             {
                 d->removeCanceller(localRequestId);
-                callback(result, handle, data);
+                callback(result, localRequestId, data);
             };
 
         handle = d->internetPeerManger->downloadChunkFromInternet(
@@ -341,7 +341,7 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
                 const nx::network::http::HttpHeaders& /*headers*/)
             {
                 d->removeCanceller(localRequestId);
-                callback(success, requestId, success ? result : QByteArray());
+                callback(success, localRequestId, success ? result : QByteArray());
             };
 
         handle = connection->downloadFileChunkFromInternet(

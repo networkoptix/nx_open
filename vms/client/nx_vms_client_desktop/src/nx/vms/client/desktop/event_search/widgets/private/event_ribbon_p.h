@@ -53,6 +53,9 @@ public:
     bool footersEnabled() const;
     void setFootersEnabled(bool value);
 
+    bool headersEnabled() const;
+    void setHeadersEnabled(bool value);
+
     Qt::ScrollBarPolicy scrollBarPolicy() const;
     void setScrollBarPolicy(Qt::ScrollBarPolicy value);
 
@@ -68,6 +71,8 @@ public:
 
     int unreadCount() const;
     QnNotificationLevel::Value highestUnreadImportance() const;
+
+    nx::utils::Interval<int> visibleRange() const;
 
     void updateHover();
 
@@ -171,6 +176,7 @@ private:
     bool m_showDefaultToolTips = false;
     bool m_previewsEnabled = true;
     bool m_footersEnabled = true;
+    bool m_headersEnabled = true;
     bool m_scrollBarRelevant = true;
     bool m_live = true;
     bool m_updating = false;
