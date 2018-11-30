@@ -14,7 +14,8 @@ P2PHttpServerTransport::P2PHttpServerTransport(
 {
     m_readContext.parser.setMessage(&m_readContext.message);
     m_timer.bindToAioThread(m_sendSocket->getAioThread());
-
+    m_sendBuffer.reserve(4096);
+    m_readContext.buffer.reserve(4096);
 }
 
 void P2PHttpServerTransport::start(
@@ -216,6 +217,7 @@ void P2PHttpServerTransport::pleaseStopSync()
     m_sendSocket->pleaseStopSync();
     if (m_readSocket)
         m_readSocket->pleaseStopSync();
+    m_timer.pleaseStopSync();
 }
 
 SocketAddress P2PHttpServerTransport::getForeignAddress() const

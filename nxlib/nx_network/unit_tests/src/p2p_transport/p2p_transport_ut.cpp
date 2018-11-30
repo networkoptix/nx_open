@@ -209,51 +209,32 @@ TEST_F(P2PHttpTransport, ClientReads)
     nx::Buffer serverReadBuf;
     serverReadBuf.reserve(100);
     auto serverSocket = m_connectedSocketsSupplier.serverSocket();
-    //serverSocket->readSomeAsync(
-    //    &serverReadBuf,
-    //    [&](SystemError::ErrorCode , size_t )
-    //    {
-    //        NX_VERBOSE(this, lm("Server socket read: %1").args(serverReadBuf));
-    //        m_server.reset(new P2PHttpServerTransport(std::move(serverSocket)));
-
-    //        utils::MoveOnlyFunc<void(SystemError::ErrorCode, size_t)> onSend =
-    //            [&](SystemError::ErrorCode, size_t)
-    //            {
-    //                m_server->sendAsync(buf, std::move(onSend));
-    //            };
-
-    //        m_server->sendAsync(
-    //            buf,
-    //            [&](SystemError::ErrorCode, size_t)
-    //            {
-    //                m_server->sendAsync(
-    //                    buf,
-    //                    [&](SystemError::ErrorCode, size_t)
-    //                    {
-    //                        qDebug() << "Sent two times";
-    //                    });
-    //            });
-    //    });
 
     m_server.reset(new P2PHttpServerTransport(std::move(serverSocket)));
+    m_server->start(
+        [](SystemError::ErrorCode error)
+        {
+            ASSERT_EQ(SystemError::noError, error);
+        });
 
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     utils::MoveOnlyFunc<void(SystemError::ErrorCode, size_t)> onSend =
         [&](SystemError::ErrorCode, size_t)
-    {
-        m_server->sendAsync(buf, std::move(onSend));
-    };
+        {
+            m_server->sendAsync(buf, std::move(onSend));
+        };
 
     m_server->sendAsync(
         buf,
         [&](SystemError::ErrorCode, size_t)
-    {
-        m_server->sendAsync(
-            buf,
-            [&](SystemError::ErrorCode, size_t)
         {
-            qDebug() << "Sent two times";
+            m_server->sendAsync(
+                buf,
+                [&](SystemError::ErrorCode, size_t)
+            {
+                qDebug() << "Sent two times";
+            });
         });
-    });
 
     utils::promise<void> p;
     auto f = p.get_future();
