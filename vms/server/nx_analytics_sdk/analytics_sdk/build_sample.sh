@@ -27,7 +27,7 @@ case "$(uname -s)" in #< Check OS.
             GEN_OPTIONS=() #< Generate for GNU make and gcc.
         else
             # Using Windows native cmake.
-            GEN_OPTIONS=( -Ax64 -Thost=x64 -G "Visual Studio 14 2015" )
+            GEN_OPTIONS=( -Ax64 -Tv140,host=x64 )
             SOURCE_DIR=$(cygpath -w "$SOURCE_DIR") #< Windows cmake requires Windows path.
         fi
         ;;

@@ -23,8 +23,8 @@ namespace ec2 {
 bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
     nx::vms::api::ResourceParamData* paramData)
 {
-    if (paramData->name == Qn::CAMERA_CREDENTIALS_PARAM_NAME ||
-        paramData->name == Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME)
+    if (paramData->name == ResourcePropertyKey::kCredentials ||
+        paramData->name == ResourcePropertyKey::kDefaultCredentials)
     {
         auto decryptedValue = nx::utils::decodeStringFromHexStringAES128CBC(paramData->value);
         if (accessData == Qn::kSystemAccess ||

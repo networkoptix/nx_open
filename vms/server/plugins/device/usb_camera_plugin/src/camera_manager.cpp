@@ -83,7 +83,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
 
     if (!m_camera)
     {
-        m_camera = std::make_shared<Camera>(this, m_timeProvider);   
+        m_camera = std::make_shared<Camera>(this, m_timeProvider);
         m_camera->initialize();
     }
 

@@ -32,7 +32,6 @@ void P2pMessageBusTestBase::createData(
     if (disableTimeManager)
     {
         settings->setTimeSynchronizationEnabled(false);
-        settings->setSynchronizingTimeWithInternet(false);
     }
 
     settings->synchronizeNow();

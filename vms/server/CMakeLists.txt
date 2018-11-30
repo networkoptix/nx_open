@@ -8,7 +8,7 @@ if(withMediaServer)
     add_subdirectory(plugins)
     add_subdirectory(storage_plugins)
 
-    if(withDistributions)
+    if(withAnalyticsSdk)
         # TODO: Combine all SDKs (nx_storage_sdk, nx_sdk, nx_analytics_sdk) into one like this.
         add_subdirectory(nx_analytics_sdk)
     endif()

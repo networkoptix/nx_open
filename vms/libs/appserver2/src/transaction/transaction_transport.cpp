@@ -16,7 +16,7 @@ namespace ec2 {
 
 QnTransactionTransport::QnTransactionTransport(
     TransactionMessageBusBase* bus,
-    const QnUuid& connectionGuid,
+    const std::string& connectionGuid,
     ConnectionLockGuard connectionLockGuard,
     const api::PeerData& localPeer,
     const api::PeerData& remotePeer,

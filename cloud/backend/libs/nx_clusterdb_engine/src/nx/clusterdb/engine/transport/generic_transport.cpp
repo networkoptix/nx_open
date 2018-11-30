@@ -85,7 +85,7 @@ void GenericTransport::setOnGotTransaction(
     m_gotCommandHandler = std::move(handler);
 }
 
-QnUuid GenericTransport::connectionGuid() const
+std::string GenericTransport::connectionGuid() const
 {
     return m_commandPipeline->connectionGuid();
 }
@@ -107,7 +107,7 @@ void GenericTransport::sendTransaction(
     post(
         [this, transportHeader = std::move(transportHeader), transactionSerializer]()
         {
-            if (::ec2::ApiCommand::isSystem(transactionSerializer->header().command)
+            if (isHandshakeCommand(transactionSerializer->header().command)
                 || m_canSendCommands)
             {
                 m_commandPipeline->sendTransaction(
@@ -135,6 +135,8 @@ void GenericTransport::start()
     NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
         lm("Starting outgoing transaction channel to %1")
             .arg(m_commonTransportHeaderOfRemoteTransaction));
+
+    m_commandPipeline->start();
 
     // Sending tranSyncRequest.
     auto requestTran = command::make<command::TranSyncRequest>(

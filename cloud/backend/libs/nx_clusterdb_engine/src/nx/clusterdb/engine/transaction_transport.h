@@ -57,10 +57,11 @@ public:
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
     virtual void stopWhileInAioThread() override;
 
+    virtual void start() override;
     virtual network::SocketAddress remotePeerEndpoint() const override;
     virtual void setOnConnectionClosed(ConnectionClosedEventHandler handler) override;
     virtual void setOnGotTransaction(CommandDataHandler handler) override;
-    virtual QnUuid connectionGuid() const override;
+    virtual std::string connectionGuid() const override;
     virtual void sendTransaction(
         TransactionTransportHeader transportHeader,
         const std::shared_ptr<const TransactionSerializer>& transactionSerializer) override;
@@ -87,16 +88,6 @@ private:
     const network::SocketAddress m_connectionOriginatorEndpoint;
     bool m_closed = false;
     std::unique_ptr<network::aio::Timer> m_inactivityTimer;
-
-    // TODO: #ak Remove this constructor.
-    CommonHttpConnection(
-        const ProtocolVersionRange& protocolVersionRange,
-        std::unique_ptr<::ec2::QnTransactionTransportBase> connection,
-        const std::string& connectionId,
-        nx::network::aio::AbstractAioThread* aioThread,
-        std::shared_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState,
-        const std::string& systemId,
-        const network::SocketAddress& remotePeerEndpoint);
 
     int highestProtocolVersionCompatibleWithRemotePeer() const;
 

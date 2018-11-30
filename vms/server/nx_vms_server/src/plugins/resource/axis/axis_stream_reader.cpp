@@ -17,12 +17,10 @@
 #include <utils/common/app_info.h>
 #include <utils/media/av_codec_helper.h>
 
-
 static const char AXIS_SEI_UUID[] = "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa";
 static const int AXIS_SEI_PRODUCT_INFO = 0x0a00;
 static const int AXIS_SEI_TIMESTAMP = 0x0a01;
 static const int AXIS_SEI_TRIGGER_DATA = 0x0a03;
-
 
 QnAxisStreamReader::QnAxisStreamReader(
     const QnPlAxisResourcePtr& res)
@@ -71,9 +69,8 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
     m_rtpStreamParser.setRole(role);
 
     int channels = 1;
-    if (m_axisRes->hasParam(QLatin1String("channelsAmount")))
+    if (m_axisRes->hasDefaultProperty(QLatin1String("channelsAmount")))
         channels = m_axisRes->getProperty(lit("channelsAmount")).toUInt();
-
 
     QByteArray profileNumber("S");
     QByteArray profileName;
@@ -106,7 +103,6 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
             profileDescription = QString(lit("%1 Secondary Stream")).arg(QnAppInfo::productNameShort()).toUtf8();
             oldProfileName = OLD_SECONDARY_STREAM_PROFILE_NAME;
         }
-
 
         // ================ profile setup ========================
 
@@ -366,7 +362,6 @@ void QnAxisStreamReader::parseMotionInfo(QnCompressedVideoData* videoData)
         }
     }
 }
-
 
 bool QnAxisStreamReader::isGotFrame(QnCompressedVideoDataPtr videoData)
 {

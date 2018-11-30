@@ -1,13 +1,13 @@
 #pragma once
 
 #include "core/resource_management/resource_searcher.h"
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class QnMediaServerModule;
 
 class QnWearableCameraResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
     using base_type = QnAbstractNetworkResourceSearcher;
 public:

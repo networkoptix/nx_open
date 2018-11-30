@@ -143,7 +143,7 @@ QSize QnDlink_cam_info::secondaryStreamResolution() const
 // =======================================================================================
 
 QnPlDlinkResource::QnPlDlinkResource(QnMediaServerModule* serverModule):
-    nx::mediaserver::resource::Camera(serverModule)
+    nx::vms::server::resource::Camera(serverModule)
 {
     setVendor(lit("Dlink"));
 }
@@ -228,11 +228,11 @@ QnDlink_cam_info QnPlDlinkResource::getCamInfo() const
     return m_camInfo;
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnPlDlinkResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnPlDlinkResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me
-    return nx::mediaserver::resource::StreamCapabilityMap();
+    return nx::vms::server::resource::StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result QnPlDlinkResource::initializeCameraDriver()
@@ -361,7 +361,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initializeCameraDriver()
             ++it;
     }
 
-    saveParams();
+    saveProperties();
 
     return CameraDiagnostics::NoErrorResult();
 

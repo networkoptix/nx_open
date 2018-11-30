@@ -6,7 +6,7 @@ add_subdirectory(mjpeg_link_plugin)
 
 add_subdirectory(generic_multicast_plugin)
 
-if (NOT box OR box STREQUAL "none" OR box STREQUAL "rpi")
+if(NOT box MATCHES "bpi|bananapi|edge1")
     add_subdirectory(usb_camera_plugin)
 endif()
 

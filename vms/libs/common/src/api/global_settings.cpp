@@ -68,9 +68,8 @@ const int kMaxRecorderQueueSizeBytesDefault = 1024 * 1024 * 24;
 const QString kMaxRecorderQueueSizePacketsName("maxRecordQueueSizeElements");
 const int kMaxRecorderQueueSizePacketsDefault = 1000;
 
-const QString kMaxProgressiveDownloadersName("maxProgressiveDowloaders");
-const int kMaxProgressiveDownloadersDefault = 2;
-
+const QString kMaxWebMTranscodersName("maxWebMTranscoders");
+const int kMaxWebMTranscodersDefault = 2;
 
 const QString kTakeCameraOwnershipWithoutLock("takeCameraOwnershipWithoutLock");
 const int kTakeCameraOwnershipWithoutLockDefault = true;
@@ -396,12 +395,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initTimeSynchronizationAdaptors(
         this);
     timeSynchronizationAdaptors << m_timeSynchronizationEnabledAdaptor;
 
-    m_synchronizeTimeWithInternetAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        kNameSynchronizeTimeWithInternet,
-        true,
-        this);
-    timeSynchronizationAdaptors << m_synchronizeTimeWithInternetAdaptor;
-
     m_primaryTimeServerAdaptor = new QnLexicalResourcePropertyAdaptor<QnUuid>(
         kNamePrimaryTimeServer,
         QnUuid(),
@@ -625,8 +618,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kMaxRecorderQueueSizePacketsDefault,
         this);
 
-    m_maxProgressiveDownloaders = new QnLexicalResourcePropertyAdaptor<int>(
-        kMaxProgressiveDownloadersName, kMaxProgressiveDownloadersDefault, this);
+    m_maxWebMTranscoders = new QnLexicalResourcePropertyAdaptor<int>(
+        kMaxWebMTranscodersName, kMaxWebMTranscodersDefault, this);
 
     m_maxRtpRetryCount = new QnLexicalResourcePropertyAdaptor<int>(
         kMaxRtpRetryCount,
@@ -935,7 +928,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_defaultExportVideoCodecAdaptor
         << m_downloaderPeersAdaptor
         << m_lowQualityScreenVideoCodecAdaptor
-        << m_maxProgressiveDownloaders;
+        << m_maxWebMTranscoders;
 
     if (isHanwhaEnabledCustomization())
     {
@@ -1244,7 +1237,7 @@ bool QnGlobalSettings::takeFromSettings(QSettings* settings, const QnResourcePtr
                 m_statisticsAllowedAdaptor->setValue(QnOptionalBool(value));
             }
             mediaServer->setProperty(kStatisticsReportAllowed, QString());
-            mediaServer->saveParams();
+            mediaServer->saveProperties();
         }
     }
 
@@ -1444,16 +1437,6 @@ void QnGlobalSettings::setTimeSynchronizationEnabled(bool value)
     m_timeSynchronizationEnabledAdaptor->setValue(value);
 }
 
-bool QnGlobalSettings::isSynchronizingTimeWithInternet() const
-{
-    return m_synchronizeTimeWithInternetAdaptor->value();
-}
-
-void QnGlobalSettings::setSynchronizingTimeWithInternet(bool value)
-{
-    m_synchronizeTimeWithInternetAdaptor->setValue(value);
-}
-
 QnUuid QnGlobalSettings::primaryTimeServer() const
 {
     return m_primaryTimeServerAdaptor->value();
@@ -1608,9 +1591,9 @@ int QnGlobalSettings::maxRecorderQueueSizeBytes() const
     return m_maxRecorderQueueSizeBytes->value();
 }
 
-int QnGlobalSettings::maxProgressiveDownloaders() const
+int QnGlobalSettings::maxWebMTranscoders() const
 {
-    return m_maxProgressiveDownloaders->value();
+    return m_maxWebMTranscoders->value();
 }
 
 int QnGlobalSettings::maxRecorderQueueSizePackets() const

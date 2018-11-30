@@ -11,8 +11,9 @@ Data modifications made in offline node are distributed when connection to other
 
 ## Uses SQL DB as a persistent storage.
 
-Currently MySQL and SQLite are supported. Different nodes can have a different RDBMS type.
-But, due to "simple" SQL syntax requirements, other RDBMS types can be added easily.
+Currently MySQL and SQLite are supported. But, due to "simple" SQL syntax requirements, 
+other RDBMS types can be added easily.
+Different nodes can have a different RDBMS type.
 
 
 ## Supports many DB instances in a single node.
@@ -20,7 +21,7 @@ But, due to "simple" SQL syntax requirements, other RDBMS types can be added eas
 E.g., let us have multiple user DBs out there. Each DB has the same schema but different data.
 Each user's DB is served by a node (or interconnected group of nodes). At the same time, there can 
 be a "cloud node" that is connected to every user node. Cloud node contains data of all user DBs. 
-But, at the same time, restricts access only to appropriate data.
+But, at the same time, restricts user's access only to appropriate data.
 
 
 ## Current usages

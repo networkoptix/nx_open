@@ -12,7 +12,7 @@
 #include <rest/server/rest_connection_processor.h>
 #include <common/common_module.h>
 
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera.h>
 
 namespace {
 
@@ -24,7 +24,7 @@ static const QString kTypeParam = lit("type");
 } // namespace
 
 QnCameraDiagnosticsRestHandler::QnCameraDiagnosticsRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 
@@ -53,7 +53,7 @@ int QnCameraDiagnosticsRestHandler::executeGet(
     QString notFoundCameraId = QString::null;
     const auto camera = nx::camera_id_helper::findCameraByFlexibleIds(
         owner->commonModule()->resourcePool(), &notFoundCameraId, params, kCameraIdParams)
-        .dynamicCast<nx::mediaserver::resource::Camera>();
+        .dynamicCast<nx::vms::server::resource::Camera>();
 
     if (!camera)
     {
@@ -112,7 +112,7 @@ int QnCameraDiagnosticsRestHandler::executeGet(
 }
 
 CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::checkCameraAvailability(
-    const nx::mediaserver::resource::CameraPtr& cameraRes)
+    const nx::vms::server::resource::CameraPtr& cameraRes)
 {
     if (!cameraRes->ping())
         return CameraDiagnostics::CannotEstablishConnectionResult(cameraRes->httpPort());
@@ -141,7 +141,7 @@ CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::tryAcquireCameraMediaS
 }
 
 CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::checkCameraMediaStreamForErrors(
-    const nx::mediaserver::resource::CameraPtr& camera)
+    const nx::vms::server::resource::CameraPtr& camera)
 {
     return camera->getLastMediaIssue();
 }

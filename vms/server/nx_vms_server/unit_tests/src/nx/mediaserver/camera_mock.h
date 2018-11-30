@@ -1,7 +1,7 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera.h>
 #include <nx/utils/std/cpp14.h>
 #include <core/dataprovider/data_provider_factory.h>
 #include <media_server/media_server_module.h>
@@ -9,7 +9,7 @@
 class QnDataProviderFactory;
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 namespace resource {
 namespace test {
 
@@ -48,7 +48,7 @@ public:
         const QString& value,
         PropertyOptions options) override;
 
-    virtual bool saveParams() override;
+    virtual bool saveProperties() override;
 
 protected:
     virtual QString getDriverName() const override;
@@ -103,5 +103,5 @@ void CameraMock::makeApiAdvancedParametersProvider(
 
 } // namespace test
 } // namespace resource
-} // namespace mediaserver
+} // namespace vms::server
 } // namespace nx

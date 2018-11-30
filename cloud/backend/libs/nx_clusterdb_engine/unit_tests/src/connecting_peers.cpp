@@ -45,7 +45,7 @@ protected:
     }
 };
 
-TEST_F(ConnectingPeers, DISABLED_peer_can_be_explicitly_connected_to_another_one)
+TEST_F(ConnectingPeers, peer_can_be_explicitly_connected_to_another_one)
 {
     givenTwoPeersOfSameApplication();
 

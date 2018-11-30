@@ -850,8 +850,8 @@ void RadassController::registerConsumer(QnCamDisplay* display)
                 [this, updateHasDualStreaming]
                 (const QnResourcePtr& /*resource*/, const QString& propertyName)
                 {
-                    if (propertyName == nx::media::kCameraMediaCapabilityParamName
-                        || propertyName == Qn::HAS_DUAL_STREAMING_PARAM_NAME)
+                    if (propertyName == ResourcePropertyKey::kMediaCapabilities
+                        || propertyName == ResourcePropertyKey::kHasDualStreaming)
                     {
                         updateHasDualStreaming();
                     }
@@ -931,6 +931,5 @@ void RadassController::setMode(QnCamDisplay* display, RadassMode mode)
     }
     d->lastModeChangeTimer.restart();
 }
-
 
 } // namespace nx::vms::client::desktop

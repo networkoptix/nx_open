@@ -21,7 +21,7 @@
 
 
 QnManualCameraAdditionRestHandler::QnManualCameraAdditionRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 
@@ -222,7 +222,7 @@ int QnManualCameraAdditionRestHandler::addCameras(
         if (auto camera = resPool->getResourceByUniqueId<QnSecurityCamResource>(id))
         {
             camera->setAuth(auth);
-            camera->saveParams();
+            camera->saveProperties();
         }
 
     }

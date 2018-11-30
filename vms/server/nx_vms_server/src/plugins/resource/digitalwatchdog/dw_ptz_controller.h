@@ -4,7 +4,7 @@
 #ifdef ENABLE_ONVIF
 
 #include <plugins/resource/onvif/onvif_ptz_controller.h>
-#include <nx/mediaserver/resource/resource_fwd.h>
+#include <nx/vms/server/resource/resource_fwd.h>
 
 class QnDwPtzController: public QnOnvifPtzController {
     Q_OBJECT

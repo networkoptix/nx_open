@@ -51,12 +51,7 @@ static QString fromLatinStdString(const std::string& value)
 // QnOnvifPtzController
 // -------------------------------------------------------------------------- //
 QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource):
-    base_type(resource),
-    m_resource(resource),
-    m_capabilities(Ptz::NoPtzCapabilities),
-    m_stopBroken(false),
-    m_speedBroken(false),
-    m_ptzPresetsReaded(false)
+    base_type(resource), m_resource(resource)
 {
     m_limits.minPan = -1.0;
     m_limits.maxPan = 1.0;
@@ -79,13 +74,11 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     sprintf( m_floatFormat, "%%.%df", digitsAfterDecimalPoint );
     sprintf( m_doubleFormat, "%%.%dlf", digitsAfterDecimalPoint );
 
-    QString ptzUrl = m_resource->getPtzUrl();
+    const QString ptzUrl = m_resource->getPtzUrl();
     if(ptzUrl.isEmpty())
         return;
 
-    Ptz::Capabilities overridedCaps;
-    if(data.value(Qn::PTZ_CAPABILITIES_PARAM_NAME, &overridedCaps))
-        m_capabilities = overridedCaps;
+    m_capabilities = data.value<Ptz::Capabilities>(ResourceDataKey::kOperationalPtzCapabilities);
 
     m_capabilities |= initMove();
     if(absoluteMoveBroken)
@@ -99,10 +92,6 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
         nativePresetsAreEnabled ? ptz::PresetType::native : ptz::PresetType::system);
 
     // TODO: #PTZ #Elric actually implement flip!
-}
-
-QnOnvifPtzController::~QnOnvifPtzController() {
-    return;
 }
 
 Ptz::Capabilities QnOnvifPtzController::initMove()
@@ -214,7 +203,7 @@ Ptz::Capabilities QnOnvifPtzController::initMove()
 
 bool QnOnvifPtzController::readBuiltinPresets()
 {
-    if (m_ptzPresetsReaded)
+    if (m_ptzPresetsIsRead)
         return true;
 
     PtzSoapWrapper ptz(m_resource);
@@ -251,7 +240,7 @@ bool QnOnvifPtzController::readBuiltinPresets()
         m_presetNameByToken.insert(id, name);
     }
 
-    m_ptzPresetsReaded = true;
+    m_ptzPresetsIsRead = true;
     return true;
 }
 

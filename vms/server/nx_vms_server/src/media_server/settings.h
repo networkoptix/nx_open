@@ -6,7 +6,7 @@
 #include <QtCore/QSettings>
 
 #include <analytics/detected_objects_storage/analytics_events_storage_settings.h>
-#include <nx/mediaserver/settings.h>
+#include <nx/vms/server/settings.h>
 
 /**
  * QSettings instance is initialized in \a initializeROSettingsFromConfFile or
@@ -20,8 +20,8 @@ public:
         const QString& roSettingsPath = QString(),
         const QString& rwSettingsPath = QString());
 
-    const nx::mediaserver::Settings& settings() const;
-    nx::mediaserver::Settings* mutableSettings();
+    const nx::vms::server::Settings& settings() const;
+    nx::vms::server::Settings* mutableSettings();
     QSettings* roSettings();
     const QSettings* roSettings() const;
     QSettings* runTimeSettings();
@@ -45,7 +45,7 @@ private:
     void loadAnalyticEventsStorageSettings();
 
 private:
-    nx::mediaserver::Settings m_settings;
+    nx::vms::server::Settings m_settings;
     std::unique_ptr<QSettings> m_rwSettings;
     std::shared_ptr<QSettings> m_roSettings;
     nx::analytics::storage::Settings m_analyticEventsStorage;

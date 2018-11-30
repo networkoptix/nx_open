@@ -27,9 +27,9 @@ extern "C" {
 
 namespace nx {
 
-namespace mediaserver { namespace resource { class SharedContextPool; } }
+namespace vms::server { namespace resource { class SharedContextPool; } }
 
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 enum class HanwhaProfileParameterFlag
@@ -157,7 +157,7 @@ public:
     CameraDiagnostics::Result enableAudioInput();
 
 protected:
-    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
@@ -389,6 +389,7 @@ private:
     nx::media::CameraMediaCapability m_capabilities;
     QMap<QString, QnIOPortData> m_ioPortTypeById;
     std::atomic<bool> m_areInputPortsMonitored{false};
+    QString m_defaultOutputPortId;
 
     nx::utils::TimerHolder m_timerHolder;
     std::shared_ptr<HanwhaSharedResourceContext> m_sharedContext;
@@ -397,5 +398,5 @@ private:
 };
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

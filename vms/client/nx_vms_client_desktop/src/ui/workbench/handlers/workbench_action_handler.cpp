@@ -212,7 +212,6 @@ static constexpr int kSectionHeight = 20;
 //!time that is given to process to exit. After that, applauncher (if present) will try to terminate it
 static const quint32 PROCESS_TERMINATE_TIMEOUT = 15000;
 
-
 namespace nx::vms::client::desktop {
 namespace ui {
 namespace workbench {
@@ -926,6 +925,19 @@ void ActionHandler::at_openInCurrentLayoutAction_triggered()
             return;
     }
 
+    nx::utils::ScopedConnection connection;
+    if (parameters.argument<bool>(Qn::SelectOnOpeningRole))
+    {
+        connection.reset(connect(workbench()->currentLayout(), &QnWorkbenchLayout::itemAdded, this,
+            [this, &connection](const QnWorkbenchItem* item)
+            {
+                menu()->trigger(action::GoToLayoutItemAction, action::Parameters()
+                    .withArgument(Qn::ItemUuidRole, item->uuid()));
+
+                connection.reset();
+            }));
+    }
+
     parameters.setArgument(Qn::LayoutResourceRole, currentLayout->resource());
     menu()->trigger(action::OpenInLayoutAction, parameters);
 }
@@ -1141,7 +1153,7 @@ void ActionHandler::at_convertCameraToEntropix_triggered()
                         QRectF(0.5, 0, 0.5, 1.0))
                 });
         }
-        camera->saveParamsAsync();
+        camera->savePropertiesAsync();
     }
 }
 
@@ -1304,7 +1316,7 @@ void ActionHandler::at_systemAdministrationAction_triggered()
 void ActionHandler::at_jumpToTimeAction_triggered()
 {
     auto slider = navigator()->timeSlider();
-    if (!slider)
+    if (!slider || !navigator()->isTimelineRelevant())
         return;
 
     const auto parameters = menu()->currentParameters(sender());
@@ -1339,7 +1351,7 @@ void ActionHandler::at_jumpToTimeAction_triggered()
         &QnTimeSlider::isSliderDown,
         true);
 
-    slider->setValue(duration_cast<milliseconds>(timestamp), true);
+    slider->navigateTo(duration_cast<milliseconds>(timestamp));
 }
 
 void ActionHandler::at_goToLayoutItemAction_triggered()
@@ -1351,7 +1363,7 @@ void ActionHandler::at_goToLayoutItemAction_triggered()
     const auto parameters = menu()->currentParameters(sender());
     const auto uuid = parameters.argument(Qn::ItemUuidRole).value<QnUuid>();
 
-    const auto shouldRaise = parameters.argument<bool>(Qn::ForceRole);
+    const auto shouldRaise = parameters.argument<bool>(Qn::RaiseSelectionRole);
     const auto centralItem = workbench()->item(Qn::CentralRole);
 
     QnWorkbenchItem* targetItem = nullptr;
@@ -1691,7 +1703,6 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
             }
         }
     }
-
 
     /* List of possible time steps, in milliseconds. */
     const qint64 steps[] = {
@@ -2064,7 +2075,6 @@ void ActionHandler::at_renameAction_triggered()
     // TODO: #vkutin #gdm Is the following block of code still in use?
     if (name.isEmpty())
     {
-        bool ok = false;
         do
         {
             name = QnInputDialog::getText(mainWindowWidget(),
@@ -2173,7 +2183,6 @@ void ActionHandler::closeApplication(bool force) {
 void ActionHandler::at_beforeExitAction_triggered() {
     deleteDialogs();
 }
-
 
 QnAdjustVideoDialog* ActionHandler::adjustVideoDialog() {
     return m_adjustVideoDialog.data();

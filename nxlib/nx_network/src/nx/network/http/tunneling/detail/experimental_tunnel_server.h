@@ -140,8 +140,10 @@ void SeparateUpDownConnectionsTunnelServer<ApplicationData...>::closeAllTunnels(
 
     for (auto& tunnelContext: tunnelsInProgress)
     {
-        tunnelContext.second.upChannel->pleaseStopSync();
-        tunnelContext.second.downChannel->pleaseStopSync();
+        if (tunnelContext.second.upChannel)
+            tunnelContext.second.upChannel->pleaseStopSync();
+        if (tunnelContext.second.downChannel)
+            tunnelContext.second.downChannel->pleaseStopSync();
     }
 }
 

@@ -171,8 +171,8 @@ inline void fixRequestDataIfNeeded(nx::vms::api::UserDataEx* const userDataEx)
 
 inline void fixRequestDataIfNeeded(nx::vms::api::ResourceParamData* const paramData)
 {
-    if (paramData->name == Qn::CAMERA_CREDENTIALS_PARAM_NAME
-    || paramData->name == Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME)
+    if (paramData->name == ResourcePropertyKey::kCredentials
+    || paramData->name == ResourcePropertyKey::kDefaultCredentials)
     {
         paramData->value = nx::utils::encodeHexStringFromStringAES128CBC(paramData->value);
     }

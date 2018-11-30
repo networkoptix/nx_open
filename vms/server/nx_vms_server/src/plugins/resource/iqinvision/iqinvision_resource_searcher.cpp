@@ -86,7 +86,7 @@ QList<QnResourcePtr> QnPlIqResourceSearcher::checkHostAddr(
     if (!url.scheme().isEmpty() && isSearchAction)
         return QList<QnResourcePtr>(); //< Search if only host is present, not specific protocol.
 
-    using namespace nx::mediaserver_core;
+    using namespace nx::vms::server;
 
     nx::utils::Url iqEyeUrl(url);
     iqEyeUrl.setScheme(QString::fromLatin1(nx::network::http::kUrlSchemeName));
@@ -123,7 +123,7 @@ QList<QnResourcePtr> QnPlIqResourceSearcher::checkHostAddr(
 
     const auto model = modelResponse.toString().trimmed();
     QnResourceData resourceData = dataPool()->data(manufacture(), model);
-    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+    if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return QList<QnResourcePtr>();
 
     const auto resourceTypeId = resourceType(model);
@@ -201,7 +201,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
     }
 
     QnResourceData resourceData = dataPool()->data(manufacture(), name);
-    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+    if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return localResults; //< Model forced by ONVIF.
 
     QnPlIqResourcePtr resource (new QnPlIqResource(m_serverModule));

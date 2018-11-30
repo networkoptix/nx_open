@@ -161,7 +161,7 @@ QnStorageResource* QnThirdPartyStorageResource::instance(
     QnCommonModule* commonModule,
     const QString& url,
     const StorageFactoryPtrType& sf,
-    const nx::mediaserver::Settings* settings
+    const nx::vms::server::Settings* settings
 )
 {
     try
@@ -178,7 +178,7 @@ QnThirdPartyStorageResource::QnThirdPartyStorageResource(
     QnCommonModule* commonModule,
     const StorageFactoryPtrType &sf,
     const QString               &storageUrl,
-    const nx::mediaserver::Settings* settings)
+    const nx::vms::server::Settings* settings)
     :
     base_type(commonModule),
     m_valid(true),

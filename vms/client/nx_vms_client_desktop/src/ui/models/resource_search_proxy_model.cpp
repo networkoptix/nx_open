@@ -9,7 +9,6 @@
 #include <utils/common/delayed.h>
 
 #include <ui/models/resource/resource_tree_model.h>
-#include <ui/workbench/workbench_context.h>
 
 #include <nx/vms/client/desktop/resource_views/data/node_type.h>
 #include <nx/vms/client/desktop/resources/search_helper.h>
@@ -30,34 +29,31 @@ QnResourceSearchQuery QnResourceSearchProxyModel::query() const
 
 QModelIndex QnResourceSearchProxyModel::setQuery(const QnResourceSearchQuery& query)
 {
+    // There is no query equality check since current root node may be different for the same
+    // query. E.g. for local resources in connected and disconnected states.
     m_query = query;
-
     setFilterWildcard(L'*' + query.text + L'*');
     invalidateFilterLater();
 
-    QnResourceTreeModel* resourceTreeModel = qobject_cast<QnResourceTreeModel*>(sourceModel());
-    if (!resourceTreeModel)
-        return QModelIndex();
-
-    bool isLoggedIn = !resourceTreeModel->context()->user().isNull();
-
     m_currentRootNode =
-        [this, isLoggedIn]()
+        [this]()
         {
             if (m_query.allowedNode == QnResourceSearchQuery::kAllowAllNodeTypes)
                 return QModelIndex();
 
-            if (!isLoggedIn && m_query.allowedNode == ResourceTreeNodeType::localResources)
-                return QModelIndex();
-
             const int count = rowCount();
-            if (!count)
-                return QModelIndex();
+
+            if (count == 1 && m_query.allowedNode == ResourceTreeNodeType::localResources)
+            {
+                const auto nodeType =
+                    data(index(0, 0), Qn::NodeTypeRole).value<ResourceTreeNodeType>();
+                if (nodeType != ResourceTreeNodeType::localResources)
+                    return QModelIndex();
+            }
 
             if (count == 1)
                 return index(0, 0);
 
-            NX_ASSERT(false, "There should not be more than one root node.");
             return QModelIndex();
         }();
 

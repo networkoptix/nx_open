@@ -18,7 +18,7 @@ const QString QnPlVmax480Resource::MANUFACTURE(lit("VMAX"));
 
 QnPlVmax480Resource::QnPlVmax480Resource(QnMediaServerModule* serverModule)
     :
-    nx::mediaserver::resource::Camera(serverModule),
+    nx::vms::server::resource::Camera(serverModule),
     m_startTime(AV_NOPTS_VALUE),
     m_endTime(AV_NOPTS_VALUE),
     m_chunkReader(0),
@@ -126,11 +126,11 @@ QnAbstractArchiveDelegate* QnPlVmax480Resource::createArchiveDelegate()
     return new QnVMax480ArchiveDelegate(toSharedPointer());
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnPlVmax480Resource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnPlVmax480Resource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me
-    return nx::mediaserver::resource::StreamCapabilityMap();
+    return nx::vms::server::resource::StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result QnPlVmax480Resource::initializeCameraDriver()
@@ -148,7 +148,8 @@ CameraDiagnostics::Result QnPlVmax480Resource::initializeCameraDriver()
     Qn::CameraCapabilities addFlags = Qn::PrimaryStreamSoftMotionCapability;
     setCameraCapabilities(getCameraCapabilities() | addFlags);
 
-    saveParams();
+    setProperty(ResourcePropertyKey::kForcedAudioStream, 1);
+    saveProperties();
 
     QnMutexLocker lock( &m_chunkReaderMutex );
     QnVMax480ChunkReader* chunkReader = m_chunkReaderMap.value(getHostAddress());
@@ -219,7 +220,7 @@ QnSecurityCamResourcePtr QnPlVmax480Resource::getOtherResource(int channel)
     url.setQuery(urlQuery);
     QString urlStr = url.toString();
     return serverModule()->commonModule()->resourcePool()->getResourceByUrl(urlStr)
-        .dynamicCast<nx::mediaserver::resource::Camera>();
+        .dynamicCast<nx::vms::server::resource::Camera>();
 }
 
 void QnPlVmax480Resource::at_gotChunks(int channel, QnTimePeriodList chunks)

@@ -4,7 +4,7 @@
 #include <nx/vms/event/events/reasoned_event.h>
 #include <nx/vms/event/events/network_issue_event.h>
 #include <nx/vms/event/events/camera_disconnected_event.h>
-#include <nx/mediaserver/event/rule_processor.h>
+#include <nx/vms/server/event/rule_processor.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -13,12 +13,12 @@
 #include <utils/common/synctime.h>
 #include <rest/server/rest_connection_processor.h>
 #include <media_server/media_server_module.h>
-#include <nx/mediaserver/event/extended_rule_processor.h>
+#include <nx/vms/server/event/extended_rule_processor.h>
 
 using namespace nx;
 
 QnDebugEventsRestHandler::QnDebugEventsRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

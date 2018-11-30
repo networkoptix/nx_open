@@ -6,9 +6,6 @@
 
 namespace Ui { class ExportLayoutSettingsWidget; }
 
-class QnMediaResourceWidget;
-class QnTimePeriod;
-
 namespace nx::vms::client::desktop {
 
 class ExportLayoutSettingsWidget: public QWidget

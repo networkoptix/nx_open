@@ -64,11 +64,6 @@ QnVirtualCameraResourceSet AbstractSearchWidget::cameras() const
     return d->cameras();
 }
 
-void AbstractSearchWidget::setSingleCameraMode(bool value)
-{
-    d->setSingleCameraMode(value);
-}
-
 QString AbstractSearchWidget::textFilter() const
 {
     return d->textFilter();
@@ -97,20 +92,25 @@ QMenu* AbstractSearchWidget::createDropdownMenu()
     return result;
 }
 
+void AbstractSearchWidget::setCamerasReadOnly(bool value)
+{
+    d->setCamerasReadOnly(value);
+}
+
 void AbstractSearchWidget::addDeviceDependentAction(
     QAction* action, const QString& mixedString, const QString& cameraString)
 {
     d->addDeviceDependentAction(action, mixedString, cameraString);
 }
 
-bool AbstractSearchWidget::wholeArea() const
+void AbstractSearchWidget::selectCameras(Cameras value)
 {
-    return d->wholeArea();
+    d->selectCameras(value);
 }
 
-void AbstractSearchWidget::setWholeArea(bool value)
+AbstractSearchWidget::Cameras AbstractSearchWidget::previousCameras() const
 {
-    d->setWholeArea(value);
+    return d->previousCameras();
 }
 
 } // namespace nx::vms::client::desktop

@@ -350,7 +350,7 @@ std::chrono::milliseconds DeviceAgent::timeTillCheck() const
 void DeviceAgent::sendEventStartedPacket(const EventType& event) const
 {
     auto packet = createCommonEventsMetadataPacket(event, /*active*/ true);
-    m_metadataHandler->handleMetadata(nx::sdk::Error::noError, packet);
+    m_handler->handleMetadata(packet);
     NX_PRINT
         << (event.isStateful() ? "Event [start] " : "Event [pulse] ")
         << event.internalName.toUtf8().constData()
@@ -360,7 +360,7 @@ void DeviceAgent::sendEventStartedPacket(const EventType& event) const
 void DeviceAgent::sendEventStoppedPacket(const EventType& event) const
 {
     auto packet = createCommonEventsMetadataPacket(event, /*active*/ false);
-    m_metadataHandler->handleMetadata(nx::sdk::Error::noError, packet);
+    m_handler->handleMetadata(packet);
     NX_PRINT << "Event [stop] " << event.internalName.toUtf8().constData()
         << " sent to server.";
 }
@@ -437,10 +437,10 @@ void DeviceAgent::reconnectSocket()
     });
 }
 
-nx::sdk::Error DeviceAgent::setMetadataHandler(
-    nx::sdk::analytics::MetadataHandler* metadataHandler)
+nx::sdk::Error DeviceAgent::setHandler(
+    nx::sdk::analytics::DeviceAgent::IHandler* handler)
 {
-    m_metadataHandler = metadataHandler;
+    m_handler = handler;
     return nx::sdk::Error::noError;
 }
 
@@ -448,7 +448,7 @@ nx::sdk::Error DeviceAgent::setMetadataHandler(
 nx::sdk::Error DeviceAgent::setNeededMetadataTypes(
     const nx::sdk::analytics::IMetadataTypes* metadataTypes)
 {
-    if (metadataTypes->isNull())
+    if (metadataTypes->isEmpty())
     {
         stopFetchingMetadata();
         return nx::sdk::Error::noError;
@@ -542,7 +542,7 @@ void DeviceAgent::setSettings(const nx::sdk::Settings* settings)
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::Settings* DeviceAgent::settings() const
+nx::sdk::Settings* DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }

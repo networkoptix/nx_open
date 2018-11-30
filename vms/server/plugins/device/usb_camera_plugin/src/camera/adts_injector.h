@@ -21,8 +21,6 @@ public:
     void uninitialize();
     int inject(ffmpeg::Packet * aacPacket);
 
-    ffmpeg::Packet * currentPacket();
-
 private:
     AVFormatContext * m_formatContext = nullptr;
     AVStream * m_outputStream = nullptr;
@@ -36,6 +34,7 @@ private:
     int initializeIoContext(int bufferSize);
     void uninitializeIoContext();
     int reinitializeIoContext(int bufferSize);
+    static int writePacket(void * opaque, uint8_t *buffer, int bufferSize);
 };
 
 }

@@ -4,7 +4,7 @@
 #include "network/tcp_connection_processor.h"
 #include "network/tcp_listener.h"
 #include <nx/utils/timer_manager.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class QnFfmpegTranscoder;
 

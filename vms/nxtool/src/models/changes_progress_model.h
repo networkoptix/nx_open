@@ -5,7 +5,7 @@
 
 #include <base/types.h>
 
-namespace nx { namespace mediaserver { namespace api {
+namespace nx { namespace vms::server { namespace api {
     struct BaseServerInfo;
 }}}
 
@@ -28,7 +28,7 @@ namespace rtu
         int completedCount() const;
 
     public:
-        typedef nx::mediaserver::api::BaseServerInfo BaseServerInfo;
+        typedef nx::vms::server::api::BaseServerInfo BaseServerInfo;
 
         bool addChangeProgress(const ApplyChangesTaskPtr &task);
 

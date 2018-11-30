@@ -67,7 +67,7 @@ public:
         DeviceAgent* deviceAgent,
         const QUrl& resourceUrl,
         const QAuthenticator& auth,
-        nx::sdk::analytics::MetadataHandler* metadataHandler);
+        nx::sdk::analytics::DeviceAgent::IHandler* handler);
     virtual ~Monitor();
 
     void addRules(
@@ -98,7 +98,7 @@ public:
     const QUrl m_url;
     const QUrl m_endpoint;
     const QAuthenticator m_auth;
-    nx::sdk::analytics::MetadataHandler* m_metadataHandler = nullptr;
+    nx::sdk::analytics::DeviceAgent::IHandler* m_handler = nullptr;
     ElapsedEvents m_eventsToCatch; //< The monitor treats events from this list.
     nx::network::http::TestHttpServer* m_httpServer;
     nx::network::aio::Timer m_aioTimer;

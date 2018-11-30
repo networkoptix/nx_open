@@ -32,8 +32,10 @@ class ServerStatusItemDelegate;
 
 struct UpdateItem;
 
-// Widget deals with update for multiple servers.
-// Widget is spawned as a tab for System Administraton menu.
+/**
+ * Deals with update for multiple servers.
+ * It is spawned as a tab for System Administraton menu.
+ */
 class MultiServerUpdatesWidget:
     public QnAbstractPreferencesWidget,
     public QnSessionAwareDelegate
@@ -41,6 +43,7 @@ class MultiServerUpdatesWidget:
     Q_OBJECT
     using base_type = QnAbstractPreferencesWidget;
     using LocalStatusCode = nx::update::Status::Code;
+    using UpdateSourceType = nx::update::UpdateSourceType;
 
 public:
     MultiServerUpdatesWidget(QWidget* parent = nullptr);
@@ -65,10 +68,11 @@ public:
 protected:
     // This one is called by timer periodically.
     void atUpdateCurrentState();
-    void atClientDownloadFinished();
     void atModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
     void atStartUpdateAction();
     bool atCancelCurrentAction();
+    void atServerPackageDownloaded(const nx::update::Package& package);
+    void atServerPackageDownloadFailed(const nx::update::Package& package, const QString& error);
 
     void hideStatusColumns(bool value);
     void clearUpdateInfo();
@@ -98,12 +102,12 @@ private:
         complete,
     };
 
-    static QString toString(UpdateSourceType mode);
+    static QString toString(nx::update::UpdateSourceType mode);
     static QString toString(WidgetUpdateState state);
     static QString toString(LocalStatusCode stage);
     static QString toString(ServerUpdateTool::OfflineUpdateState state);
 
-    void setUpdateSourceMode(UpdateSourceType mode);
+    void setUpdateSourceMode(nx::update::UpdateSourceType mode);
 
     void initDropdownActions();
     void initDownloadActions();
@@ -112,10 +116,34 @@ private:
     void autoCheckForUpdates();
     void checkForInternetUpdates();
 
+    /**
+     * Describes all possible display modes for update version.
+     * Variations for build number:
+     *  - Full build number, "4.0.0.20000".
+     *  - Specific build number "10821". Appears when we waiting for response for specific build.
+     *  - No version avalilable, "-----". Often happens if we have Error::networkError
+     *      or Error::httpError report. Can happen when source=internet
+     */
+    struct VersionReport
+    {
+        bool hasLatestVersion = false;
+        bool checking = false;
+        QString version;
+        /** Status message. It is displayed under version when something went wrong. */
+        QString status;
+        /** Should we display status with error style. */
+        bool statusError = false;
+        /** Should we display version with error style. */
+        bool versionError = false;
+    };
+
+    VersionReport calculateUpdateVersionReport(const nx::update::UpdateContents& contents);
+
     // UI synhronization. This functions are ment to be called from loadDataToUi.
     // Do not call them from anywhere else.
     void syncUpdateCheck();
     void syncRemoteUpdateState();
+    void syncProgress();
 
     ServerUpdateTool::ProgressInfo calculateActionProgress() const;
 
@@ -133,6 +161,7 @@ private:
     // Advances UI FSM towards selected state.
     void setTargetState(WidgetUpdateState state, QSet<QnUuid> targets = {});
     void completeInstallation(bool clientUpdated);
+    static bool stateHasProgress(WidgetUpdateState state);
 
 private:
     QScopedPointer<Ui::MultiServerUpdatesWidget> ui;
@@ -152,7 +181,7 @@ private:
     // and a label with internal widget states
     bool m_showDebugData = false;
 
-    UpdateSourceType m_updateSourceMode = UpdateSourceType::internet;
+    nx::update::UpdateSourceType m_updateSourceMode = nx::update::UpdateSourceType::internet;
 
     std::unique_ptr<ServerUpdateTool> m_serverUpdateTool;
     std::unique_ptr<ClientUpdateTool> m_clientUpdateTool;
@@ -161,9 +190,9 @@ private:
     std::unique_ptr<ServerStatusItemDelegate> m_statusItemDelegate;
 
     // ServerUpdateTool promises this.
-    std::future<UpdateContents> m_updateCheck;
+    std::future<nx::update::UpdateContents> m_updateCheck;
 
-    UpdateContents m_updateInfo;
+    nx::update::UpdateContents m_updateInfo;
     QString m_updateCheckError;
     nx::utils::SoftwareVersion m_targetVersion;
 

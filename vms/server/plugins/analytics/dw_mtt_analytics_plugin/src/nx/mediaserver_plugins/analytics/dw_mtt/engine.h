@@ -26,7 +26,7 @@ public:
 
     virtual void setSettings(const nx::sdk::Settings* settings) override;
 
-    virtual nx::sdk::Settings* settings() const override;
+    virtual nx::sdk::Settings* pluginSideSettings() const override;
 
     virtual nx::sdk::analytics::DeviceAgent* obtainDeviceAgent(
         const nx::sdk::DeviceInfo* deviceInfo,
@@ -38,6 +38,8 @@ public:
 
     virtual void executeAction(
         nx::sdk::analytics::Action* action, nx::sdk::Error* outError) override;
+
+    virtual nx::sdk::Error setHandler(nx::sdk::analytics::Engine::IHandler* handler) override;
 
 private:
     nx::sdk::analytics::CommonPlugin* const m_plugin;

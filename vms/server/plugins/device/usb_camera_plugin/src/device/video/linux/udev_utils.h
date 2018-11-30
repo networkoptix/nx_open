@@ -10,7 +10,7 @@ namespace device {
 namespace video {
 namespace detail {
 
-std::string getDeviceUniqueId(const char * devicePath);
+std::string getDeviceUniqueId(const std::string& devicePath);
 
 } // namespace detail
 } // namespace video

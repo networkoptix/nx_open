@@ -395,7 +395,7 @@ void ServerTransactionMessageBus::logTransactionState()
 }
 
 void ServerTransactionMessageBus::gotConnectionFromRemotePeer(
-    const QnUuid& connectionGuid,
+    const std::string& connectionGuid,
     ConnectionLockGuard connectionLockGuard,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     ConnectionType::Type connectionType,
@@ -443,7 +443,7 @@ void ServerTransactionMessageBus::gotConnectionFromRemotePeer(
 }
 
 void ServerTransactionMessageBus::gotIncomingTransactionsConnectionFromRemotePeer(
-    const QnUuid& connectionGuid,
+    const std::string& connectionGuid,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     const vms::api::PeerData &/*remotePeer*/,
     qint64 /*remoteSystemIdentityTime*/,
@@ -468,7 +468,7 @@ void ServerTransactionMessageBus::gotIncomingTransactionsConnectionFromRemotePee
 }
 
 bool ServerTransactionMessageBus::gotTransactionFromRemotePeer(
-    const QnUuid& connectionGuid,
+    const std::string& connectionGuid,
     const nx::network::http::Request& request,
     const QByteArray& requestMsgBody)
 {

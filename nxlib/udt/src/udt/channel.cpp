@@ -141,7 +141,7 @@ void UdpChannel::open(UDPSOCKET udpsock)
 
 void UdpChannel::setUDPSockOpt()
 {
-#if defined(BSD) || defined(OSX)
+#if defined(BSD) || defined(__APPLE__)
     // BSD system will fail setsockopt if the requested buffer size exceeds system maximum value
     int maxsize = 64000;
     if (0 != ::setsockopt(m_iSocket, SOL_SOCKET, SO_RCVBUF, (char*)&m_iRcvBufSize, sizeof(int)))
@@ -157,7 +157,7 @@ void UdpChannel::setUDPSockOpt()
 
     timeval tv;
     tv.tv_sec = 0;
-#if defined (BSD) || defined (OSX)
+#if defined (BSD) || defined (__APPLE__)
     // Known BSD bug as the day I wrote this code.
     // A small time out value will cause the socket to block forever.
     tv.tv_usec = 10000;

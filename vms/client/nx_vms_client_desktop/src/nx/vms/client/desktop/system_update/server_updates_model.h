@@ -34,6 +34,8 @@ struct UpdateItem
     // Flag for servers, that can be updated using legacy 3.2 system
     bool onlyLegacyUpdate = false;
     bool legacyUpdateUsed = false;
+    /** Client is uploading files to this server. */
+    bool uploading = false;
     bool offline = false;
     bool skipped = false;
     bool installed = false;
@@ -46,7 +48,9 @@ struct UpdateItem
 
 using UpdateItemPtr = std::shared_ptr<UpdateItem>;
 
-// Model class to represent update states of the server
+/**
+ * Represents current update status of the servers. Used to display servers table widget.
+ */
 class ServerUpdatesModel : public Customized<QAbstractTableModel>, public QnWorkbenchContextAware
 {
     Q_OBJECT

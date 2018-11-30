@@ -457,7 +457,7 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTime(const QnSecur
         foundPeriod->startTimeMs = detailItr->timestampMs;
         ++detailItr;
         foundPeriod->durationMs = (detailItr == detailData.end()
-            ? QnTimePeriod::infiniteDuration()
+            ? QnTimePeriod::kInfiniteDuration
             : detailItr->timestampMs - foundPeriod->startTimeMs);
     }
     return result;
@@ -502,7 +502,7 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getNextMediaServerAndPeriodOnTime(
         foundPeriod->startTimeMs = detailItr->timestampMs;
         auto nextServerItr = detailItr;
         if (++nextServerItr == detailData.end())
-            foundPeriod->durationMs = QnTimePeriod::infiniteDuration();
+            foundPeriod->durationMs = QnTimePeriod::kInfiniteDuration;
         else
             foundPeriod->durationMs = nextServerItr->timestampMs - foundPeriod->startTimeMs;
     }

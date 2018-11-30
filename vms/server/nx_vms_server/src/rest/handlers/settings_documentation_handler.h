@@ -5,14 +5,14 @@
 
 class QnGlobalMonitor;
 
-namespace nx { namespace mediaserver { class Settings; }}
+namespace nx { namespace vms::server { class Settings; }}
 
 class QnSettingsDocumentationHandler: public QnJsonRestHandler
 {
     Q_OBJECT
 
 public:
-    QnSettingsDocumentationHandler(const nx::mediaserver::Settings* settings);
+    QnSettingsDocumentationHandler(const nx::vms::server::Settings* settings);
 
     virtual int executeGet(
         const QString &path,
@@ -20,5 +20,5 @@ public:
         QnJsonRestResult &result,
         const QnRestConnectionProcessor*) override;
 private:
-    const nx::mediaserver::Settings* m_settings = nullptr;
+    const nx::vms::server::Settings* m_settings = nullptr;
 };

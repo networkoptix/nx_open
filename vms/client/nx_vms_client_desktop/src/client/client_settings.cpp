@@ -5,26 +5,28 @@
 #include <QtCore/QSettings>
 #include <QtCore/QCoreApplication>
 
-#include <utils/common/util.h>
-#include <nx/fusion/serialization/json_functions.h>
-#include <utils/common/variant.h>
-#include <nx/utils/string.h>
-
-#include <ui/style/globals.h>
+#include <client_core/client_core_settings.h>
 
 #include <client/client_meta_types.h>
 #include <client/client_runtime_settings.h>
 
 #include <translation/translation_manager.h>
+#include <ui/style/globals.h>
 
+#include <utils/common/util.h>
+#include <utils/common/variant.h>
 #include <utils/common/app_info.h>
 #include <utils/common/warnings.h>
+#include <utils/mac_utils.h>
 
-#include <nx/utils/file_system.h>
-#include <nx/utils/url.h>
-
-#include <client_core/client_core_settings.h>
 #include <nx/network/http/http_types.h>
+
+#include <nx/fusion/model_functions.h>
+
+#include <nx/utils/app_info.h>
+#include <nx/utils/file_system.h>
+#include <nx/utils/string.h>
+#include <nx/utils/url.h>
 
 namespace {
 
@@ -68,6 +70,43 @@ void writeConnectionData(QSettings *settings, const QnConnectionData &connection
     settings->setValue(kNameTag, connection.name);
     settings->setValue(kUrlTag, url.toString());
     settings->setValue(kLocalId, connection.localId.toQUuid());
+}
+
+QString getMoviesDirectory()
+{
+    QString result;
+#ifdef Q_OS_MACX
+    result = mac_getMoviesDir();
+#else
+    const auto moviesDirs = QStandardPaths::standardLocations(QStandardPaths::MoviesLocation);
+    result = moviesDirs[0];
+#endif
+
+    return result.isEmpty()
+        ? QString()
+        : result + "/" + QnAppInfo::mediaFolderName();
+}
+
+QString getBackgroundsDirectory()
+{
+    if (!nx::utils::AppInfo::isWindows())
+    {
+        return QString("/opt/%1/client/share/pictures/sample-backgrounds")
+            .arg(QnAppInfo::linuxOrganizationName());
+    }
+
+    const auto picturesLocations = QStandardPaths::standardLocations(
+        QStandardPaths::PicturesLocation);
+    const auto documentsLocations = QStandardPaths::standardLocations(
+        QStandardPaths::DocumentsLocation);
+
+    QDir baseDir;
+    if (!picturesLocations.isEmpty())
+        baseDir = picturesLocations.first();
+    else if (!documentsLocations.isEmpty())
+        baseDir = documentsLocations.first();
+    baseDir.cd(QString("%1 Backgrounds").arg(QnAppInfo::productNameLong()));
+    return baseDir.absolutePath();
 }
 
 } // namespace

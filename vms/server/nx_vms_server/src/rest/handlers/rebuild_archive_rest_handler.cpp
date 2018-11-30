@@ -10,7 +10,7 @@
 #include "core/resource/storage_resource.h"
 
 QnRebuildArchiveRestHandler::QnRebuildArchiveRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

@@ -39,7 +39,7 @@ private:
         csModified
     };
     StreamState m_cameraState = csOff;
-    
+
     int m_retries = 0;
     int m_initCode = 0;
 
@@ -61,7 +61,7 @@ private:
 
     bool waitForTimeSpan(
     const std::chrono::milliseconds& timeSpan,
-    const std::chrono::milliseconds& timeOut);
+    const std::chrono::milliseconds& timeout);
     std::shared_ptr<ffmpeg::Packet> nextPacket(int * outNxError);
 
     bool ensureInitialized();

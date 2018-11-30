@@ -30,7 +30,7 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
 // ==================================================================
 
 QnPlIsdResource::QnPlIsdResource(QnMediaServerModule* serverModule):
-    nx::mediaserver::resource::Camera(serverModule)
+    nx::vms::server::resource::Camera(serverModule)
 {
     setVendor(lit("ISD"));
 }
@@ -82,11 +82,11 @@ void QnPlIsdResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnPlIsdResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnPlIsdResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me
-    return nx::mediaserver::resource::StreamCapabilityMap();
+    return nx::vms::server::resource::StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result QnPlIsdResource::initializeCameraDriver()
@@ -203,8 +203,8 @@ CameraDiagnostics::Result QnPlIsdResource::initializeCameraDriver()
     setMaxFps(fpsList.at(0));
 
     setProperty(
-        Qn::SUPPORTED_MOTION_PARAM_NAME,
-        qnResTypePool->getResourceType( getTypeId() )->defaultValue( Qn::SUPPORTED_MOTION_PARAM_NAME ) );
+        ResourcePropertyKey::kSupportedMotion,
+        qnResTypePool->getResourceType( getTypeId() )->defaultValue(ResourcePropertyKey::kSupportedMotion) );
 
     //reading firmware version
 
@@ -218,9 +218,9 @@ CameraDiagnostics::Result QnPlIsdResource::initializeCameraDriver()
     const int sepPos = cameraFirmwareVersion.indexOf('=');
     setFirmware( QLatin1String( sepPos != -1 ? cameraFirmwareVersion.mid( sepPos+1 ) : cameraFirmwareVersion ) );
 
-    setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, 1);
+    setProperty(ResourcePropertyKey::kIsAudioSupported, 1);
     //setMotionType( Qn::MotionType::MT_SoftwareGrid );
-    saveParams();
+    saveProperties();
 
     return CameraDiagnostics::NoErrorResult();
 }

@@ -52,10 +52,10 @@ public:
     /**
      * Peek at the oldest item in the buffer
      */
-    V peekOldest(const std::chrono::milliseconds& timeOut)
+    V peekOldest(const std::chrono::milliseconds& timeout)
     {
         std::unique_lock<std::mutex> lock(m_mutex);
-        if (!wait(lock, 0 /*minimumBufferSize*/, timeOut))
+        if (!wait(lock, 0 /*minimumBufferSize*/, timeout))
             return V();
         return m_buffer.begin()->second;
     }
@@ -63,10 +63,10 @@ public:
     /**
      * Pop the oldest item off the buffer
      */
-    virtual V popOldest(const std::chrono::milliseconds& timeOut)
+    virtual V popOldest(const std::chrono::milliseconds& timeout)
     {
         std::unique_lock<std::mutex> lock(m_mutex);
-        if (!wait(lock, 0 /*minimumBufferSize*/, timeOut))
+        if (!wait(lock, 0 /*minimumBufferSize*/, timeout))
             return V();
         auto it = m_buffer.begin();
         auto v = it->second;
@@ -100,19 +100,19 @@ public:
      * 
      * @param[in] timeSpan - The amount of items in terms of their timestamps that the buffer 
      *    should contain.
-     * @param[in] timeOut - The maximum amount of time to wait for the time span condition before
+     * @param[in] timeout - The maximum amount of time to wait for the time span condition before
      *    terminating early
      * @return - true if the wait terminated due to satisfying the timespan condition, false if
      *    the wait terminated due to calling interrupt().
      */
     bool waitForTimeSpan(
         const std::chrono::milliseconds& timeSpan,
-        const std::chrono::milliseconds& timeOut)
+        const std::chrono::milliseconds& timeout)
     {
         std::unique_lock<std::mutex> lock(m_mutex);
         m_wait.wait_for(
             lock,
-            timeOut,
+            timeout,
             [&]() { return m_interrupted || timeSpanInternal() >= timeSpan; });
         if (interrupted() || timeSpanInternal() < timeSpan)
             return false;
@@ -141,14 +141,14 @@ protected:
     }
 
     /**
-     * Wait for at most timeOut for the number of items in the buffer to be > minimumBufferSize.
+     * Wait for at most timeout for the number of items in the buffer to be > minimumBufferSize.
      *    Terminates early if interrupt() is called, returning false. Also returns false if the
      *    wait times out and the buffer size is not strictly larger than minimumBufferSize.
      * 
      * @params[in] lock - an std::unique lock that the condition_variable should wait on.
      * @param[in] minimumBufferSize - the minimum number of items that the buffer should contain 
      *    for the wait condition to return true. Uses a strictly greater than comparison.
-     * @params[in] timeOut - the maximum amount of time to wait (in milliseconds)
+     * @params[in] timeout - the maximum amount of time to wait (in milliseconds)
      *     before terminating early. If 0 is passed, waits indefinitely or until interrupt()
      *     is called.
      * @return - true if the buffer size grows larger than minimum buffer size, false if 
@@ -157,13 +157,13 @@ protected:
     bool wait(
         std::unique_lock<std::mutex>& lock,
         size_t minimumBufferSize,
-        const std::chrono::milliseconds& timeOut)
+        const std::chrono::milliseconds& timeout)
     {
-        if (timeOut.count() > 0)
+        if (timeout.count() > 0)
         {
             m_wait.wait_for(
                 lock,
-                timeOut,
+                timeout,
                 [&](){ return m_interrupted || m_buffer.size() > minimumBufferSize; });
         }
         else
@@ -204,16 +204,16 @@ public:
     void flush();
     
     std::shared_ptr<ffmpeg::Packet> popOldest(
-        const std::chrono::milliseconds& timeOut = std::chrono::milliseconds(0));
+        const std::chrono::milliseconds& timeout = std::chrono::milliseconds(0));
 
     std::shared_ptr<ffmpeg::Packet> peekOldest(
-        const std::chrono::milliseconds& timeOut = std::chrono::milliseconds(0));
+        const std::chrono::milliseconds& timeout = std::chrono::milliseconds(0));
 
     void interrupt();
 
     bool waitForTimeSpan(
         const std::chrono::milliseconds& timeSpan,
-        const std::chrono::milliseconds& timeOut);
+        const std::chrono::milliseconds& timeout);
     std::chrono::milliseconds timeSpan() const;
 
     size_t size() const;
@@ -242,10 +242,10 @@ public:
     virtual void giveFrame(const std::shared_ptr<ffmpeg::Frame>& frame) override;
 
     std::shared_ptr<ffmpeg::Frame> popOldest(
-        const std::chrono::milliseconds& timeOut = std::chrono::milliseconds(0));
+        const std::chrono::milliseconds& timeout = std::chrono::milliseconds(0));
 
     std::shared_ptr<ffmpeg::Frame> peekOldest(
-        const std::chrono::milliseconds& timeOut = std::chrono::milliseconds(0));
+        const std::chrono::milliseconds& timeout = std::chrono::milliseconds(0));
 
     void interrupt();
 

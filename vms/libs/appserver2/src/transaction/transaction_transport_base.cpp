@@ -97,7 +97,8 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     const api::PeerData& localPeer,
     PeerRole peerRole,
     std::chrono::milliseconds tcpKeepAliveTimeout,
-    int keepAliveProbeCount)
+    int keepAliveProbeCount,
+    nx::network::aio::AbstractAioThread* aioThread)
 :
     m_localSystemId(localSystemId),
     m_localPeer(localPeer),
@@ -110,7 +111,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_remotePeerEcProtoVersion(nx_ec::INITIAL_EC2_PROTO_VERSION),
     m_localPeerProtocolVersion(nx_ec::EC2_PROTO_VERSION)
 {
-    m_timer->bindToAioThread(getAioThread());
+    bindToAioThread(aioThread ? aioThread : getAioThread());
 
     m_lastConnectTime = 0;
     m_readSync = false;
@@ -137,7 +138,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
 
 QnTransactionTransportBase::QnTransactionTransportBase(
     const QnUuid& localSystemId,
-    const QnUuid& connectionGuid,
+    const std::string& connectionGuid,
     ConnectionLockGuard connectionLockGuard,
     const api::PeerData& localPeer,
     const api::PeerData& remotePeer,
@@ -145,7 +146,8 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     const nx::network::http::Request& request,
     const QByteArray& contentEncoding,
     std::chrono::milliseconds tcpKeepAliveTimeout,
-    int keepAliveProbeCount)
+    int keepAliveProbeCount,
+    nx::network::aio::AbstractAioThread* aioThread)
 :
     QnTransactionTransportBase(
         localSystemId,
@@ -153,7 +155,8 @@ QnTransactionTransportBase::QnTransactionTransportBase(
         localPeer,
         prAccepting,
         tcpKeepAliveTimeout,
-        keepAliveProbeCount)
+        keepAliveProbeCount,
+        aioThread)
 {
     m_remotePeer = remotePeer;
     m_connectionType = connectionType;
@@ -228,7 +231,8 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     ConnectionGuardSharedState* const connectionGuardSharedState,
     const api::PeerData& localPeer,
     std::chrono::milliseconds tcpKeepAliveTimeout,
-    int keepAliveProbeCount)
+    int keepAliveProbeCount,
+    nx::network::aio::AbstractAioThread* aioThread)
 :
     QnTransactionTransportBase(
         localSystemId,
@@ -236,17 +240,18 @@ QnTransactionTransportBase::QnTransactionTransportBase(
         localPeer,
         prOriginating,
         tcpKeepAliveTimeout,
-        keepAliveProbeCount)
+        keepAliveProbeCount,
+        aioThread)
 {
     m_connectionType =
 #ifdef USE_SINGLE_TWO_WAY_CONNECTION
-#error "Bidirection moed is not supported any more due to unique_ptr for socket. Need refactor to support it."
+#error "Bidirection mode is not supported any more due to unique_ptr for socket. Need refactor to support it."
         ConnectionType::bidirectional
 #else
         ConnectionType::incoming
 #endif
         ;
-    m_connectionGuid = QnUuid::createUuid();
+    m_connectionGuid = QnUuid::createUuid().toSimpleString().toStdString();
 #ifdef ENCODE_TO_BASE64
     m_base64EncodeOutgoingTransactions = true;
 #endif
@@ -336,7 +341,7 @@ void QnTransactionTransportBase::setOutgoingConnection(
         const auto osErrorCode = SystemError::getLastOSErrorCode();
         NX_WARNING(QnLog::EC2_TRAN_LOG,
             lm("Error setting socket write timeout for transaction connection %1 received from %2")
-                .args(m_connectionGuid.toString(),
+                .args(m_connectionGuid,
                     m_outgoingDataSocket->getForeignAddress().toString(),
                     SystemError::toString(osErrorCode)));
     }
@@ -404,6 +409,12 @@ void QnTransactionTransportBase::addDataToTheSendQueue(QByteArray data)
 
     if (m_dataToSend.size() == 1)
         serializeAndSendNextDataBuffer();
+}
+
+void QnTransactionTransportBase::setPostTranUrl(const nx::utils::Url& url)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_mockedUpPostTranUrl = url;
 }
 
 void QnTransactionTransportBase::setState(State state)
@@ -607,7 +618,7 @@ void QnTransactionTransportBase::doOutgoingConnect(
 #endif
     m_httpClient->addAdditionalHeader(
         Qn::EC2_CONNECTION_GUID_HEADER_NAME,
-        m_connectionGuid.toByteArray());
+        m_connectionGuid.c_str());
     m_httpClient->addAdditionalHeader(
         Qn::EC2_CONNECTION_DIRECTION_HEADER_NAME,
         ConnectionType::toString(m_connectionType));   //incoming means this peer wants to receive data via this connection
@@ -858,7 +869,7 @@ void QnTransactionTransportBase::transactionProcessed()
         });
 }
 
-QnUuid QnTransactionTransportBase::connectionGuid() const
+std::string QnTransactionTransportBase::connectionGuid() const
 {
     return m_connectionGuid;
 }
@@ -971,10 +982,10 @@ void QnTransactionTransportBase::onMonitorConnectionForClosure(
 
     if (errorCode != SystemError::noError && errorCode != SystemError::timedOut)
     {
-        NX_WARNING(QnLog::EC2_TRAN_LOG, lit("transaction connection %1 received from %2 failed: %3")
-            .arg(m_connectionGuid.toString())
-            .arg(m_outgoingDataSocket->getForeignAddress().toString())
-            .arg(SystemError::toString(errorCode)));
+        NX_WARNING(QnLog::EC2_TRAN_LOG,
+            lm("transaction connection %1 received from %2 failed: %3")
+            .args(m_connectionGuid, m_outgoingDataSocket->getForeignAddress().toString(),
+                SystemError::toString(errorCode)));
         return setStateNoLock(State::Error);
     }
 
@@ -982,8 +993,7 @@ void QnTransactionTransportBase::onMonitorConnectionForClosure(
     {
         NX_WARNING(QnLog::EC2_TRAN_LOG,
             lm("transaction connection %1 received from %2 has been closed by remote peer")
-            .args(m_connectionGuid.toString(),
-                m_outgoingDataSocket->getForeignAddress().toString()));
+            .args(m_connectionGuid, m_outgoingDataSocket->getForeignAddress().toString()));
         return setStateNoLock(State::Error);
     }
 
@@ -1114,7 +1124,7 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
             m_outgoingTranClient->setResponseReadTimeoutMs(m_idleConnectionTimeout.count());
             m_outgoingTranClient->addAdditionalHeader(
                 Qn::EC2_CONNECTION_GUID_HEADER_NAME,
-                m_connectionGuid.toByteArray());
+                m_connectionGuid.c_str());
             m_outgoingTranClient->addAdditionalHeader(
                 Qn::EC2_CONNECTION_DIRECTION_HEADER_NAME,
                 ConnectionType::toString(ConnectionType::outgoing));
@@ -1137,17 +1147,24 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
                 m_outgoingTranClient->setUserPassword(m_remotePeerCredentials.password());
             }
 
-            m_postTranBaseUrl = m_remoteAddr;
-            if (m_remotePeer.peerType == api::PeerType::cloudServer)
-                m_postTranBaseUrl.setPath(nx::cloud::db::api::kPushEc2TransactionPath);
+            if (m_mockedUpPostTranUrl)
+            {
+                m_postTranBaseUrl = *m_mockedUpPostTranUrl;
+            }
             else
-                m_postTranBaseUrl.setPath(lit("/ec2/forward_events"));
-            m_postTranBaseUrl.setQuery(QString());
+            {
+                m_postTranBaseUrl = m_remoteAddr;
+                if (m_remotePeer.peerType == api::PeerType::cloudServer)
+                    m_postTranBaseUrl.setPath(nx::cloud::db::api::kPushEc2TransactionPath);
+                else
+                    m_postTranBaseUrl.setPath(lit("/ec2/forward_events"));
+                m_postTranBaseUrl.setQuery(QString());
+            }
         }
 
         nx::network::http::HttpHeaders additionalHeaders;
         addHttpChunkExtensions(&additionalHeaders);
-        for (const auto& header : additionalHeaders)
+        for (const auto& header: additionalHeaders)
         {
             //removing prev header value (if any)
             m_outgoingTranClient->removeAdditionalHeader(header.first);

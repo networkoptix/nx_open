@@ -55,9 +55,9 @@ void ResourceHelper::setResourceId(const QString& id)
         connect(camera, &QnSecurityCamResource::parameterValueChanged, this,
             [this](const QnResourcePtr& /*resource*/, const QString& param)
             {
-                if (param == nx::media::kCameraMediaCapabilityParamName)
+                if (param == ResourcePropertyKey::kMediaCapabilities)
                     emit audioSupportedChanged();
-                else if (param == Qn::IO_CONFIG_PARAM_NAME)
+                else if (param == ResourcePropertyKey::kIoConfigCapability)
                     emit isIoModuleChanged();
             });
     }

@@ -7,6 +7,8 @@ extern "C"
     #include <libavutil/avutil.h>
 }
 
+#include <QtCore/QFile>
+
 #include "utils/common/util.h"
 #include <nx/utils/log/log.h>
 #include <nx/utils/unused.h>

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/fusion/serialization/json.h>
-#include <nx/mediaserver/resource/camera_advanced_parameters_providers.h>
+#include <nx/vms/server/resource/camera_advanced_parameters_providers.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 #include <providers/live_stream_provider.h>
 #include <camera/video_camera_mock.h>
@@ -10,7 +10,7 @@
 #include <core/dataprovider/data_provider_factory.h>
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 namespace resource {
 namespace test {
 
@@ -46,8 +46,8 @@ public:
         return m_secondaryProvider;
     }
 
-    virtual void inUse(void* user) override {}
-    virtual void notInUse(void* user) override {}
+    virtual void inUse(void* /*user*/) override {}
+    virtual void notInUse(void* /*user*/) override {}
 private:
     QSharedPointer<QnLiveStreamProvider> m_primaryProvider;
     QSharedPointer<QnLiveStreamProvider> m_secondaryProvider;
@@ -60,7 +60,7 @@ public:
     virtual void SetUp() override
     {
         CameraTest::SetUp();
-        m_camera = newCamera([](CameraMock* camera) {});
+        m_camera = newCamera([](CameraMock* /*camera*/) {});
         NX_ASSERT(m_camera);
         m_camera->setId(QnUuid::createUuid());
 
@@ -127,7 +127,7 @@ public:
     virtual void SetUp() override
     {
         CameraTest::SetUp();
-        m_camera = newCamera([](CameraMock* camera) { });
+        m_camera = newCamera([](CameraMock* /*camera*/) { });
         NX_ASSERT(m_camera);
         m_camera->setId(QnUuid::createUuid());
 
@@ -244,5 +244,5 @@ TEST_F(LiveStreamParametersWithoutAdvancedParams, secondaryFps)
 
 } // namespace test
 } // namespace resource
-} // namespace mediaserver
+} // namespace vms::server
 } // namespace nx

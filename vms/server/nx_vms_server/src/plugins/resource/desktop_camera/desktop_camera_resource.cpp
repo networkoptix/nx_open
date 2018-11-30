@@ -17,13 +17,13 @@ QString QnDesktopCameraResource::getDriverName() const
 }
 
 QnDesktopCameraResource::QnDesktopCameraResource(QnMediaServerModule* serverModule):
-    nx::mediaserver::resource::Camera(serverModule)
+    nx::vms::server::resource::Camera(serverModule)
 {
     setFlags(flags() | Qn::no_last_gop | Qn::desktop_camera);
 }
 
 QnDesktopCameraResource::QnDesktopCameraResource(QnMediaServerModule* serverModule, const QString& userName):
-    nx::mediaserver::resource::Camera(serverModule)
+    nx::vms::server::resource::Camera(serverModule)
 {
     setFlags(flags() | Qn::no_last_gop | Qn::desktop_camera);
     setName(userName);
@@ -69,10 +69,10 @@ bool QnDesktopCameraResource::isReadyToDetach() const
     return !desktopCameraSearcher->isCameraConnected(camera);  // check if we have already lost connection
 }
 
-nx::mediaserver::resource::StreamCapabilityMap
+nx::vms::server::resource::StreamCapabilityMap
     QnDesktopCameraResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex)
 {
-    return nx::mediaserver::resource::StreamCapabilityMap(); //< Not used.
+    return nx::vms::server::resource::StreamCapabilityMap(); //< Not used.
 }
 
 CameraDiagnostics::Result QnDesktopCameraResource::initializeCameraDriver()

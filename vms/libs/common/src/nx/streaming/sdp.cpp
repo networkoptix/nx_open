@@ -76,7 +76,7 @@ Sdp::Media parseMedia(QStringList& lines)
     {
         line = lines.front().trimmed();
         if (line.startsWith("a=", Qt::CaseInsensitive))
-            media.sdpAttributes << line.toLower(); // save sdp for codec parser
+            media.sdpAttributes << line; // save sdp for codec parser
 
         if (line.startsWith("a=rtpmap", Qt::CaseInsensitive))
         {

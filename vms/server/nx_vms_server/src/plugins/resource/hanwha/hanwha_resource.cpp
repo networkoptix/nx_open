@@ -28,7 +28,7 @@
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/vms/event/events/events.h>
 #include <nx/sdk/analytics/engine.h>
-#include <nx/mediaserver/resource/shared_context_pool.h>
+#include <nx/vms/server/resource/shared_context_pool.h>
 #include <nx/streaming/abstract_archive_delegate.h>
 
 #include <core/resource_management/resource_discovery_manager.h>
@@ -41,7 +41,7 @@
 #include <core/resource_management/resource_data_pool.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 using namespace nx::core;
@@ -638,7 +638,7 @@ QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueM
             *info,
             value.value);
     }
-    saveParams();
+    saveProperties();
 
     bool success = true;
     for (const auto& request: requests)
@@ -676,7 +676,7 @@ QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueM
     if (reopenPrimaryStream || reopenSecondaryStream)
     {
         initMediaStreamCapabilities();
-        saveParams();
+        saveProperties();
         reopenStreams(reopenPrimaryStream, reopenSecondaryStream);
     }
 
@@ -787,11 +787,11 @@ int HanwhaResource::maxProfileCount() const
     return m_maxProfileCount;
 }
 
-nx::mediaserver::resource::StreamCapabilityMap HanwhaResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap HanwhaResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex streamIndex)
 {
     // TODO: implement me
-    return nx::mediaserver::resource::StreamCapabilityMap();
+    return nx::vms::server::resource::StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result HanwhaResource::initializeCameraDriver()
@@ -820,7 +820,7 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
         {
             setCameraCapability(Qn::IsDefaultPasswordCapability, isDefaultPassword);
             setCameraCapability(Qn::IsOldFirmwareCapability, isOldFirmware);
-            saveParams();
+            saveProperties();
         });
 
     const auto sharedContext = serverModule()->sharedContextPool()
@@ -897,7 +897,7 @@ void HanwhaResource::initMediaStreamCapabilities()
     m_capabilities.streamCapabilities[Qn::StreamIndex::secondary] =
         mediaCapabilityForRole(Qn::ConnectionRole::CR_SecondaryLiveVideo);
     setProperty(
-        nx::media::kCameraMediaCapabilityParamName,
+        ResourcePropertyKey::kMediaCapabilities,
         QString::fromLatin1(QJson::serialized(m_capabilities)));
 }
 
@@ -1088,6 +1088,10 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
 
     if (isNvr() && !isVideoSourceActive())
         return CameraDiagnostics::CameraInvalidParams("Video source is not active");
+
+    // We always try to pull an audio stream if possible for NVRs
+    if (isNvr())
+        setProperty(ResourcePropertyKey::kForcedAudioStream, 1);
 
     const auto videoProfiles = sharedContext()->videoProfiles();
     if (!videoProfiles)
@@ -1289,6 +1293,9 @@ CameraDiagnostics::Result HanwhaResource::initIo()
 
             m_ioPortTypeById[outputPortData.id] = outputPortData;
             ioPorts.push_back(outputPortData);
+
+            if (m_defaultOutputPortId.isEmpty())
+                m_defaultOutputPortId = outputPortData.id;
         }
     }
 
@@ -2472,7 +2479,7 @@ int HanwhaResource::streamBitrate(
         if (isNvr() && !isBypassSupported())
             streamParams.quality = Qn::StreamQuality::normal;
 
-        bitrateKbps = nx::mediaserver::resource::Camera::suggestBitrateKbps(streamParams, role);
+        bitrateKbps = nx::vms::server::resource::Camera::suggestBitrateKbps(streamParams, role);
     }
 
     auto streamCapability = cameraMediaCapability()
@@ -3480,7 +3487,7 @@ bool HanwhaResource::resetProfileToDefault(Qn::ConnectionRole role)
         setProperty(kSecondaryStreamBitrateParamName, defaultBitrateForStream(role));
     }
 
-    saveParams();
+    saveProperties();
     return true;
 }
 
@@ -3517,7 +3524,7 @@ boost::optional<HanwhaResource::HanwhaPortInfo> HanwhaResource::portInfoFromId(
 
 bool HanwhaResource::setOutputPortStateInternal(const QString& outputId, bool activate)
 {
-    const auto info = portInfoFromId(outputId);
+    const auto info = portInfoFromId(outputId.isEmpty() ? m_defaultOutputPortId : outputId);
     if (info == boost::none)
         return false;
 
@@ -3714,7 +3721,6 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(
     if (numberOfOverlappedIds != 1)
         return QnTimePeriodList();
 
-
     const auto& periods = timeline.cbegin()->second;
     auto itr = std::lower_bound(periods.begin(), periods.end(), startTimeMs);
     if (itr != periods.begin())
@@ -3732,7 +3738,7 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(
 QnConstResourceAudioLayoutPtr HanwhaResource::getAudioLayout(
     const QnAbstractStreamDataProvider* dataProvider) const
 {
-    auto defaultLayout = nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
+    auto defaultLayout = nx::vms::server::resource::Camera::getAudioLayout(dataProvider);
     if (!isAudioEnabled())
         return defaultLayout;
 
@@ -3904,5 +3910,5 @@ Ptz::Capabilities HanwhaResource::ptzCapabilities(nx::core::ptz::Type ptzType) c
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

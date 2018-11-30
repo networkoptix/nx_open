@@ -15,6 +15,28 @@ namespace usb_cam {
 
 class DiscoveryManager: public nxcip::CameraDiscoveryManager
 {
+private:
+    struct DeviceDataWithNxId
+    {
+        device::DeviceData device;
+        std::string nxId;
+
+        DeviceDataWithNxId(const device::DeviceData& device, const std::string& nxId):
+        device(device),
+        nxId(nxId)
+        {
+        }
+
+        std::string toString() const
+        {
+            return 
+                std::string("nxId: ") + nxId +
+                ", device: { " + device.name + 
+                ", " + device.path +
+                ", " + device.uniqueId + " }";
+        }
+    };
+
 public:
     DiscoveryManager(nxpt::CommonRefManager* const refManager,
                      nxpl::TimeProvider *const timeProvider);
@@ -43,15 +65,17 @@ public:
         nxcip::CameraInfo* cameraInfo) override;
     virtual nxcip::BaseCameraManager* createCameraManager( const nxcip::CameraInfo& info ) override;
     virtual int getReservedModelList( char** modelList, int* count ) override;
-    void addFfmpegUrl(const device::DeviceData& device);
-    std::string getFfmpegUrl(const std::string& uniqueId) const;
-    std::vector<device::DeviceData> findCamerasInternal();
+    void addOrUpdateCamera(const DeviceDataWithNxId& nxDevice);
+    std::string getFfmpegUrl(const std::string& nxId) const;
 
 private:
     nxpt::CommonRefManager m_refManager;
     nxpl::TimeProvider *const m_timeProvider;
     mutable std::mutex m_mutex;
-    std::map<std::string/* unique id*/, std::string /*ffmpeg url*/> m_ffmpegUrlMap;
+    std::map<std::string/*nxId*/, DeviceDataWithNxId> m_cameras;
+
+private:
+    std::vector<DeviceDataWithNxId> findCamerasInternal();
 };
 
 } // namespace nx 

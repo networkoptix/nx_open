@@ -143,15 +143,16 @@ protected:
         qint64 /*fileSize*/,
         qint64 startTimeMs = AV_NOPTS_VALUE)
     {
+        Q_UNUSED(startTimeMs)
     }
     virtual void fileStarted(
-        qint64 startTimeMs,
-        int timeZone,
-        const QString& fileName,
-        QnAbstractMediaStreamDataProvider *provider,
+        qint64 /*startTimeMs*/,
+        int /*timeZone*/,
+        const QString& /*fileName*/,
+        QnAbstractMediaStreamDataProvider* /*provider*/,
         bool sideRecorder = false)
     {
-        Q_UNUSED(startTimeMs) Q_UNUSED(timeZone) Q_UNUSED(fileName) Q_UNUSED(provider)
+        Q_UNUSED(sideRecorder)
     }
     virtual void getStoragesAndFileNames(QnAbstractMediaStreamDataProvider*);
 
@@ -165,7 +166,7 @@ protected:
         AVIOContext** context);
     virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md);
     virtual bool isUtcOffsetAllowed() const { return true; }
-    virtual void updateContainerMetadata(QnAviArchiveMetadata* metadata) const {}
+    virtual void updateContainerMetadata(QnAviArchiveMetadata* /*metadata*/) const {}
     virtual bool forceDefaultContext(const QnConstAbstractMediaDataPtr& mediaData) const;
 private:
     struct StreamRecorderContext

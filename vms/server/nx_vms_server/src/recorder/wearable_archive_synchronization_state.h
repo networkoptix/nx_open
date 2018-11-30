@@ -3,7 +3,7 @@
 #include <QtCore/QString>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace recorder {
 
 struct WearableArchiveSynchronizationState {
@@ -38,7 +38,7 @@ struct WearableArchiveSynchronizationState {
 };
 
 } // namespace recorder
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::mediaserver_core::recorder::WearableArchiveSynchronizationState);
+Q_DECLARE_METATYPE(nx::vms::server::recorder::WearableArchiveSynchronizationState);

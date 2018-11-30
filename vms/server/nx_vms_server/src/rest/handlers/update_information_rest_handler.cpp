@@ -19,7 +19,9 @@
 #include <nx/update/update_information.h>
 #include <nx/update/update_check.h>
 #include <media_server/media_server_module.h>
-#include <nx/mediaserver/settings.h>
+
+#include <nx/vms/server/settings.h>
+#include <nx/system_commands.h>
 
 namespace {
 
@@ -56,7 +58,7 @@ qint64 QnUpdateInformationRestHandler::freeSpaceForUpdate() const
     if (updatesDir.isEmpty())
         updatesDir = QDir::tempPath();
 
-    return getDiskFreeSpace(updatesDir);
+    return nx::SystemCommands().freeSpace(updatesDir.toStdString());
 }
 
 void loadFreeSpaceRemotely(
@@ -183,7 +185,7 @@ static int getUpdateInformationFromGlobalSettings(
     return nx::network::http::StatusCode::ok;
 }
 
-QnUpdateInformationRestHandler::QnUpdateInformationRestHandler(const nx::mediaserver::Settings* settings):
+QnUpdateInformationRestHandler::QnUpdateInformationRestHandler(const nx::vms::server::Settings* settings):
     m_settings(settings)
 {
 }

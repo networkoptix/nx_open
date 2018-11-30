@@ -394,7 +394,7 @@ void EventsStorage::addTimePeriodToFilter(
             timePeriod.startTime()).count()));
     sqlFilter->addCondition(std::move(startTimeFilterField));
 
-    if (timePeriod.durationMs != QnTimePeriod::infiniteDuration() &&
+    if (timePeriod.durationMs != QnTimePeriod::kInfiniteDuration &&
         timePeriod.startTimeMs + timePeriod.durationMs <
             duration_cast<milliseconds>(m_maxRecordedTimestamp).count())
     {

@@ -25,7 +25,7 @@ QnSetupCloudSystemRestHandler::QnSetupCloudSystemRestHandler(
     QnMediaServerModule* serverModule,
     nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup)
     :
-    nx::mediaserver::ServerModuleAware(serverModule),
+    nx::vms::server::ServerModuleAware(serverModule),
     m_cloudManagerGroup(cloudManagerGroup)
 {
 }

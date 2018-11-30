@@ -124,6 +124,8 @@ public:
     qint64 positionUsec() const;
     void setPosition(qint64 positionUsec);
 
+    QnTimePeriod timelineRange() const;
+
     QnResourceWidget* currentWidget() const;
     WidgetFlags currentWidgetFlags() const;
 
@@ -220,6 +222,8 @@ protected slots:
     void updatePlayingSupported();
     void updateSpeed();
     void updateSpeedRange();
+
+    bool calculateTimelineRelevancy() const;
     void updateTimelineRelevancy();
     void updateSyncIsForced();
 

@@ -229,19 +229,38 @@ static void testExecuteActionAddPerson(nx::sdk::analytics::Engine* plugin)
     action.assertExpectedState();
 }
 
-class MetadataHandler: public nx::sdk::analytics::MetadataHandler
+class DeviceAgentHandler: public nx::sdk::analytics::DeviceAgent::IHandler
 {
 public:
-    void handleMetadata(nx::sdk::Error error, nx::sdk::analytics::MetadataPacket* metadata) override
+    virtual void handleMetadata(nx::sdk::analytics::MetadataPacket* metadata) override
     {
-        ASSERT_EQ(noError, (int) error);
         ASSERT_TRUE(metadata != nullptr);
 
-        NX_PRINT << "MetadataHandler: Received metadata packet with timestamp "
+        NX_PRINT << "DeviceAgentHandler: Received metadata packet with timestamp "
             << metadata->timestampUsec() << " us, duration " << metadata->durationUsec() << " us";
 
         ASSERT_TRUE(metadata->durationUsec() >= 0);
         ASSERT_TRUE(metadata->timestampUsec() >= 0);
+    }
+
+    virtual void handlePluginEvent(nx::sdk::IPluginEvent* event) override
+    {
+        NX_PRINT << "DeviceAgentHandler: Received plugin event: "
+            << "level " << (int) event->level() << ", "
+            << "caption " << nx::kit::debug::toString(event->caption()) << ", "
+            << "description " << nx::kit::debug::toString(event->description());
+    }
+};
+
+class EngineHandler: public nx::sdk::analytics::Engine::IHandler
+{
+public:
+    virtual void handlePluginEvent(nx::sdk::IPluginEvent* event) override
+    {
+        NX_PRINT << "EngineHandler: Received plugin event: "
+            << "level " << (int) event->level() << ", "
+            << "caption " << nx::kit::debug::toString(event->caption()) << ", "
+            << "description " << nx::kit::debug::toString(event->description());
     }
 };
 
@@ -289,6 +308,9 @@ TEST(stub_analytics_plugin, test)
 
     ASSERT_EQ(plugin, engine->plugin());
 
+    EngineHandler engineHandler;
+    ASSERT_EQ(noError, (int) engine->setHandler(&engineHandler));
+
     const std::string pluginName = engine->plugin()->name();
     ASSERT_TRUE(!pluginName.empty());
     NX_PRINT << "Plugin name: [" << pluginName << "]";
@@ -314,8 +336,8 @@ TEST(stub_analytics_plugin, test)
     testDeviceAgentManifest(deviceAgent);
     testDeviceAgentSettings(deviceAgent);
 
-    MetadataHandler metadataHandler;
-    ASSERT_EQ(noError, (int) deviceAgent->setMetadataHandler(&metadataHandler));
+    DeviceAgentHandler deviceAgentHandler;
+    ASSERT_EQ(noError, (int) deviceAgent->setHandler(&deviceAgentHandler));
 
     nxpt::ScopedRef<nx::sdk::analytics::CommonMetadataTypes> metadataTypes(
         new nx::sdk::analytics::CommonMetadataTypes());

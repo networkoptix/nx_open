@@ -14,8 +14,7 @@ namespace nx::streaming::rtp {
 class H264Parser: public VideoStreamParser
 {
 public:
-    H264Parser(const QString& resourceId);
-    virtual ~H264Parser();
+    H264Parser();
     virtual void setSdpInfo(const Sdp::Media& sdp) override;
 
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, bool& gotData) override;

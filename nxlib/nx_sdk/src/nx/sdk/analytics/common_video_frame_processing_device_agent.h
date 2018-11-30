@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <mutex>
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/utils.h>
@@ -89,30 +90,27 @@ protected:
     void pushMetadataPacket(MetadataPacket* metadataPacket);
 
     /**
-     * Called when any of the settings (param values) change.
+     * Sends a PluginEvent to the Server. Can be called from any thread, but if called before
+     * settingsReceived() was called, will be ignored in case setHandler() was not called yet.
      */
-    virtual void settingsChanged() {}
+    void pushPluginEvent(IPluginEvent::Level level, std::string caption, std::string description);
+
+    /**
+     * Called when the settings are received from the server (even if the values are not changed).
+     * Should perform any required (re)initialization. Called even if the settings model is empty.
+     */
+    virtual void settingsReceived() {}
 
     /**
      * Provides access to the Manager settings stored by the server for a particular Resource.
-     * ATTENTION: If settingsChanged() has not been called yet, it means that the DeviceAgent has
+     * ATTENTION: If settingsReceived() has not been called yet, it means that the DeviceAgent has
      * not received its settings from the server yet, and thus this method will yield empty values.
      * @return Param value, or an empty string if such param does not exist, having logged the
      *     error.
      */
     std::string getParamValue(const char* paramName);
 
-    /**
-     * Starts fetching metadata. This method is called from setNeededMetadataTypes. This method
-     * is called from setNeededMetatadatTypes if metadata types list passed to it is empty.
-     */
-    virtual nx::sdk::Error startFetchingMetadata(const IMetadataTypes* metadataTypes);
-
-    /**
-     * Stops fetching metadata. This method is called from setNeededMetatadatTypes if metadata
-     * types list passed to it is empty.
-     */
-    virtual void stopFetchingMetadata();
+    virtual Error setNeededMetadataTypes(const IMetadataTypes* metadataTypes) override = 0;
 
 public:
     virtual ~CommonVideoFrameProcessingDeviceAgent() override;
@@ -136,19 +134,19 @@ public:
 
 public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
-    virtual Error setMetadataHandler(MetadataHandler* handler) override;
+    virtual Error setHandler(DeviceAgent::IHandler* handler) override;
     virtual Error pushDataPacket(DataPacket* dataPacket) override;
-    virtual Error setNeededMetadataTypes(const IMetadataTypes* metadataTypes) override;
     virtual const IString* manifest(Error* error) const override;
     virtual void setSettings(const nx::sdk::Settings* settings) override;
-    virtual nx::sdk::Settings* settings() const override;
+    virtual nx::sdk::Settings* pluginSideSettings() const override;
 
 private:
     void assertEngineCasted(void* engine) const;
 
 private:
+    mutable std::mutex m_mutex;
     Engine* const m_engine;
-    MetadataHandler* m_handler = nullptr;
+    DeviceAgent::IHandler* m_handler = nullptr;
     std::map<std::string, std::string> m_settings;
 };
 

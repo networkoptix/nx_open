@@ -12,23 +12,8 @@ namespace usb_cam {
 
 namespace {
 
-static constexpr const char * kOutputFormat = "adts";
+static constexpr const char kOutputFormat[] = "adts";
 static constexpr int kDefaultBufferSize = 512;
-
-static int writePacket(void *opaque, uint8_t *buffer, int bufferSize)
-{
-    AdtsInjector * injector = static_cast<AdtsInjector*>(opaque);
-    ffmpeg::Packet * packet = injector->currentPacket();
-
-    if (!packet)
-        return 0;
-
-    packet->unreference();
-    packet->newPacket(bufferSize);
-    memcpy(packet->data(), buffer, bufferSize);
-
-    return bufferSize;
-}
 
 } // namespace
 
@@ -65,18 +50,21 @@ int AdtsInjector::initialize(ffmpeg::Codec * codec)
 
 void AdtsInjector::uninitialize()
 {
+    // Write trailer before doing actual uninitialization.
     if (m_formatContext)
-    {
         av_write_trailer(m_formatContext);
-        avformat_free_context(m_formatContext);
-    }
-    m_formatContext = nullptr;
 
     uninitializeIoContext();
 
     if(m_outputStream)
         avcodec_free_context(&m_outputStream->codec);
     m_outputStream = nullptr;
+
+    if (m_formatContext)
+        avformat_free_context(m_formatContext);
+    m_formatContext = nullptr;
+
+    m_currentPacket = nullptr;
 }
 
 int AdtsInjector::inject(ffmpeg::Packet * packet)
@@ -97,11 +85,6 @@ int AdtsInjector::inject(ffmpeg::Packet * packet)
     return result;
 }
 
-ffmpeg::Packet * AdtsInjector::currentPacket()
-{
-    return m_currentPacket;
-}
-
 int AdtsInjector::initializeIoContext(int bufferSize)
 {
     m_ioBufferSize = bufferSize;
@@ -115,7 +98,7 @@ int AdtsInjector::initializeIoContext(int bufferSize)
         AVIO_FLAG_WRITE,
         this,
         nullptr,
-        writePacket,
+        AdtsInjector::writePacket,
         nullptr);
     if (!m_ioContext)
         return AVERROR(ENOMEM);
@@ -149,6 +132,21 @@ int AdtsInjector::reinitializeIoContext(int bufferSize)
     m_formatContext->pb = m_ioContext;
 
     return result;
+}
+
+int AdtsInjector::writePacket(void *opaque, uint8_t *buffer, int bufferSize)
+{
+    AdtsInjector * injector = static_cast<AdtsInjector*>(opaque);
+    ffmpeg::Packet * packet = injector->m_currentPacket;
+
+    if (!packet)
+        return 0;
+
+    packet->unreference();
+    packet->newPacket(bufferSize);
+    memcpy(packet->data(), buffer, bufferSize);
+
+    return bufferSize;
 }
 
 } // namespace usb_cam

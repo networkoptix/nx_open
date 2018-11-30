@@ -246,7 +246,7 @@ bool HikvisionMetadataMonitor::processEvent(const HikvisionEvent& hikvisionEvent
     using namespace nx::vms::api::analytics;
 
     std::vector<HikvisionEvent> result;
-    if (!hikvisionEvent.typeId.isNull())
+    if (!hikvisionEvent.typeId.isEmpty())
         result.push_back(hikvisionEvent);
 
     auto getEventKey =

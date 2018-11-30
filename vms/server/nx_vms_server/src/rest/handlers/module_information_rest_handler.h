@@ -26,6 +26,17 @@ private slots:
     void changeModuleInformation();
 
 private:
+    struct Connection
+    {
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket;
+        std::chrono::milliseconds updateInterval;
+        nx::Buffer dataToSend;
+        bool isSendInProgress = false;
+    };
+    using Connections = std::list<Connection>;
+
+    static void clear(Connections* connections);
+
     virtual int executeGet(
         const QString& /*path*/,
         const QnRequestParams& /*params*/,
@@ -33,22 +44,18 @@ private:
         const QnRestConnectionProcessor* /*owner*/);
 
     void updateModuleImformation();
-    void sendModuleImformation(nx::network::AbstractStreamSocket* socket);
-    void sendKeepAliveByTimer(nx::network::AbstractStreamSocket* socket,
-        std::chrono::milliseconds interval, bool firstUpdate = true);
+    void send(Connections::iterator socket, nx::Buffer buffer = {});
+    void sendModuleImformation(Connections::iterator socket);
+    void sendKeepAliveByTimer(Connections::iterator socket, bool firstUpdate = true);
 
 private:
-    using Socket = nx::network::AbstractStreamSocket;
-    using SocketList = std::map<Socket*, std::unique_ptr<Socket>>;
-
     nx::network::aio::BasicPollable m_pollable;
-    SocketList m_socketsToKeepOpen;
-
     QByteArray m_moduleInformatiom;
-    SocketList m_socketsToUpdate;
+    Connections m_connectionsToKeepOpen;
+    Connections m_connectionsToUpdate;
 
     QnMutex m_mutex;
     bool m_aboutToStop = false;
+
 private:
-    static void clearSockets(SocketList* sockets);
 };

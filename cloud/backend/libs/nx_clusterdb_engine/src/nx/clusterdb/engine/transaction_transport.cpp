@@ -26,7 +26,7 @@ CommonHttpConnection::CommonHttpConnection(
         protocolVersionRange,
         std::make_unique<::ec2::QnTransactionTransportBase>(
             QnUuid(), //< localSystemId. Not used here
-            QnUuid::fromStringSafe(connectionRequestAttributes.connectionId),
+            connectionRequestAttributes.connectionId,
             ::ec2::ConnectionLockGuard(
                 localPeer.id,
                 connectionGuardSharedState.get(),
@@ -38,9 +38,8 @@ CommonHttpConnection::CommonHttpConnection(
             request,
             connectionRequestAttributes.contentEncoding.c_str(),
             kTcpKeepAliveTimeout,
-            kKeepAliveProbeCount),
-        connectionRequestAttributes.connectionId,
-        aioThread,
+            kKeepAliveProbeCount,
+            aioThread),
         connectionGuardSharedState,
         systemId,
         remotePeerEndpoint)
@@ -50,26 +49,6 @@ CommonHttpConnection::CommonHttpConnection(
 CommonHttpConnection::CommonHttpConnection(
     const ProtocolVersionRange& protocolVersionRange,
     std::unique_ptr<::ec2::QnTransactionTransportBase> connection,
-    std::shared_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState,
-    const std::string& systemId,
-    const network::SocketAddress& remotePeerEndpoint)
-    :
-    CommonHttpConnection(
-        protocolVersionRange,
-        std::move(connection),
-        connection->connectionGuid().toSimpleByteArray().toStdString(),
-        connection->getAioThread(),
-        connectionGuardSharedState,
-        systemId,
-        remotePeerEndpoint)
-{
-}
-
-CommonHttpConnection::CommonHttpConnection(
-    const ProtocolVersionRange& protocolVersionRange,
-    std::unique_ptr<::ec2::QnTransactionTransportBase> connection,
-    const std::string& connectionId,
-    nx::network::aio::AbstractAioThread* aioThread,
     std::shared_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState,
     const std::string& systemId,
     const network::SocketAddress& remotePeerEndpoint)
@@ -78,12 +57,13 @@ CommonHttpConnection::CommonHttpConnection(
     m_connectionGuardSharedState(connectionGuardSharedState),
     m_baseTransactionTransport(std::move(connection)),
     m_systemId(systemId),
-    m_connectionId(connectionId),
+    m_connectionId(m_baseTransactionTransport->connectionGuid()),
     m_connectionOriginatorEndpoint(remotePeerEndpoint),
     m_inactivityTimer(std::make_unique<network::aio::Timer>())
 {
-    bindToAioThread(aioThread);
-    m_baseTransactionTransport->setState(::ec2::QnTransactionTransportBase::ReadyForStreaming);
+    bindToAioThread(m_baseTransactionTransport->getAioThread());
+    m_baseTransactionTransport->setState(
+        ::ec2::QnTransactionTransportBase::ReadyForStreaming);
     // Ignoring "state changed to Connected" signal.
 
     QObject::connect(
@@ -132,6 +112,11 @@ void CommonHttpConnection::stopWhileInAioThread()
     m_inactivityTimer.reset();
 }
 
+void CommonHttpConnection::start()
+{
+    m_baseTransactionTransport->startListening();
+}
+
 network::SocketAddress CommonHttpConnection::remotePeerEndpoint() const
 {
     return m_connectionOriginatorEndpoint;
@@ -147,7 +132,7 @@ void CommonHttpConnection::setOnGotTransaction(CommandDataHandler handler)
     m_gotTransactionEventHandler = std::move(handler);
 }
 
-QnUuid CommonHttpConnection::connectionGuid() const
+std::string CommonHttpConnection::connectionGuid() const
 {
     return m_baseTransactionTransport->connectionGuid();
 }

@@ -35,13 +35,18 @@ class AbstractCommandPipeline:
     public nx::network::aio::BasicPollable
 {
 public:
+    /**
+     * MUST be called to start receiving/sending data.
+     */
+    virtual void start() = 0;
+
     virtual network::SocketAddress remotePeerEndpoint() const = 0;
 
     virtual void setOnConnectionClosed(ConnectionClosedEventHandler handler) = 0;
 
     virtual void setOnGotTransaction(CommandDataHandler handler) = 0;
 
-    virtual QnUuid connectionGuid() const = 0;
+    virtual std::string connectionGuid() const = 0;
 
     virtual void sendTransaction(
         TransactionTransportHeader transportHeader,
@@ -62,7 +67,7 @@ public:
 
     virtual void setOnGotTransaction(CommandHandler handler) = 0;
 
-    virtual QnUuid connectionGuid() const = 0;
+    virtual std::string connectionGuid() const = 0;
 
     virtual const TransactionTransportHeader& commonTransportHeaderOfRemoteTransaction() const = 0;
 

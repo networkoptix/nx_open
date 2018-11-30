@@ -1,9 +1,9 @@
 #include "settings_documentation_handler.h"
 
-#include <nx/mediaserver/settings.h>
+#include <nx/vms/server/settings.h>
 
 QnSettingsDocumentationHandler::QnSettingsDocumentationHandler(
-    const nx::mediaserver::Settings* settings):
+    const nx::vms::server::Settings* settings):
     m_settings(settings)
 {
 }

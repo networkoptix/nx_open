@@ -37,7 +37,8 @@ protected:
 
 private:
     const ProtocolVersionRange m_protocolVersionRange;
-    const nx::utils::Url m_nodeUrl;
+    const nx::utils::Url m_getCommandsNodeUrl;
+    const nx::utils::Url m_postCommandsNodeUrl;
     const std::string m_systemId;
     nx::vms::api::PeerData m_peerData;
 

@@ -5,7 +5,7 @@
 #include <core/ptz/abstract_ptz_controller.h>
 
 #include <nx/utils/std/optional.h>
-#include <nx/utils/meta/signature_extractor.h>
+#include <nx/utils/signature_extractor.h>
 
 namespace nx {
 namespace core {

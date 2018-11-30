@@ -458,31 +458,33 @@ bool QnDigitalWatchdogResource::setAdvancedParametersUnderLock(
     return success && m_cameraProxy->setParams(moreParamsToProcess, &result);
 }
 
-nx::mediaserver::resource::StreamCapabilityMap
+nx::vms::server::resource::StreamCapabilityMap
     QnDigitalWatchdogResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex)
 {
-    using namespace nx::mediaserver::resource;
     auto onvifResult = base_type::getStreamCapabilityMapFromDrives(streamIndex);
-#if 0
-    // Switch here to test onvif-only videoencoders detection/setting.
-    return onvifResult;
-#else
+
+    if (!this->m_serviceUrls.media2ServiceUrl.isEmpty())
+    {
+        // Media2 webService allows to detect H265 encoders, so we don't need to use
+        // additional dw-specific detection.
+        return onvifResult;
+    }
+
     const auto codecs = m_cproApiClient->getSupportedVideoCodecs(streamIndex);
     if (!codecs)
         return onvifResult;
-    nx::mediaserver::resource::StreamCapabilityMap result;
+    nx::vms::server::resource::StreamCapabilityMap result;
     for (const auto& codec: *codecs)
     {
         for (const auto& onvifKeys: onvifResult.keys())
         {
-            StreamCapabilityKey key;
+            nx::vms::server::resource::StreamCapabilityKey key;
             key.codec = codec.toUpper();
             key.resolution = onvifKeys.resolution;
             result.insert(key, nx::media::CameraStreamCapability());
         }
     }
     return result;
-#endif
 }
 
 CameraDiagnostics::Result QnDigitalWatchdogResource::sendVideoEncoderToCameraEx(

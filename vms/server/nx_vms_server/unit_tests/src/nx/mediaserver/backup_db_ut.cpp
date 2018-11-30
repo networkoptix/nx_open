@@ -3,6 +3,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/vms/utils/vms_utils.h>
+#include <nx/vms/utils/system_helpers.h>
 #include <api/model/merge_system_data.h>
 #include <api/model/configure_system_data.h>
 #include <api/model/getnonce_reply.h>
@@ -35,7 +36,7 @@ protected:
         for (int i = 0; i < count; ++i)
         {
             const QString fileName = fileType == FileType::backup
-                ? QString::fromLatin1("ec_%1_%3.backup")
+                ? QString::fromLatin1("ec_%1_%3.db")
                     .arg(i * 1000)
                     .arg(i + 1000LL * 3600LL * 24LL * 365LL * 2010LL)
                 : notQuiteBackupFileName();
@@ -54,7 +55,7 @@ protected:
         }
     }
 
-    void whenAllBackupFilesDataCalled()
+    void whenAllBackupFilesDataCollected()
     {
         m_backupFilesDataFound = nx::vms::utils::allBackupFilesDataSorted(m_testDir);
     }
@@ -107,10 +108,10 @@ private:
     static QString notQuiteBackupFileName()
     {
         const QList<QString> fileNames = {
-            "ec_ab_100.backup",
-            "ec_ab_cd.backup",
+            "ec_ab_100.db",
+            "ec_ab_cd.db",
             "hello.txt",
-            "looks_like_.backup"
+            "looks_like_.db"
         };
 
         return nx::utils::random::choice(fileNames);
@@ -143,8 +144,10 @@ protected:
 
     void thenBackupFilesShouldBeCreated(int backupFilesCount)
     {
-        m_backupFilesDataFound = nx::vms::utils::allBackupFilesDataSorted(m_backupDir);
-        ASSERT_EQ(backupFilesCount, m_backupFilesDataFound.size());
+        do
+        {
+            m_backupFilesDataFound = nx::vms::utils::allBackupFilesDataSorted(m_backupDir);
+        } while (m_backupFilesDataFound.size() != backupFilesCount);
     }
 
     void thenNoNewBackupFilesShouldBeCreated()
@@ -194,6 +197,34 @@ protected:
         }
     }
 
+    void whenSometimePasses(std::chrono::milliseconds timeout)
+    {
+        std::this_thread::sleep_for(timeout);
+    }
+
+    void thenNextDbFileShouldBeCreatedWithTheGivenTimeout(std::chrono::milliseconds timeout)
+    {
+        QList<nx::vms::utils::DbBackupFileData> backupFilesData;
+        while (true)
+        {
+            backupFilesData = nx::vms::utils::allBackupFilesDataSorted(m_backupDir);
+            if (backupFilesData.front().timestamp != m_backupFilesDataFound.front().timestamp)
+                break;
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        }
+
+        const auto& previousFile = m_backupFilesDataFound.front();
+        const auto& currentFile = backupFilesData.front();
+
+        ASSERT_NE(previousFile.timestamp, currentFile.timestamp);
+        ASSERT_LT(currentFile.timestamp - previousFile.timestamp - timeout.count(), 1000);
+    }
+
+    void whenAllBackupFilesDataCollected()
+    {
+        m_backupFilesDataFound = nx::vms::utils::allBackupFilesDataSorted(m_backupDir);
+    }
+
 private:
     LauncherPtr m_server;
     QList<nx::vms::utils::DbBackupFileData> m_backupFilesDataFound;
@@ -219,7 +250,7 @@ TEST_F(BackupDbUt, allBackupFilesData_correctnessCheck)
 {
     whenSomeFilesCreated(/*count*/ 10, FileType::backup);
     whenSomeFilesCreated(/*count*/ 15, FileType::nonBackup);
-    whenAllBackupFilesDataCalled();
+    whenAllBackupFilesDataCollected();
     thenAllBackupFilesShouldBeFound();
 }
 
@@ -227,7 +258,7 @@ TEST_F(BackupDbUt, rotation_freeSpaceMoreThan10Gb)
 {
     givenDiskFreeSpace(11 * 1024 * 1024LL * 1024LL);
     whenSomeFilesCreated(/*count*/ 10, FileType::backup);
-    whenAllBackupFilesDataCalled();
+    whenAllBackupFilesDataCollected();
     whenDeleteOldFilesFunctionCalled();
     thenOldestFilesShouldBeDeleted(/*filesLeft*/ 6);
 }
@@ -236,33 +267,24 @@ TEST_F(BackupDbUt, rotation_freeSpaceLessThan10Gb)
 {
     givenDiskFreeSpace(9 * 1024 * 1024LL * 1024LL);
     whenSomeFilesCreated(/*count*/ 10, FileType::backup);
-    whenAllBackupFilesDataCalled();
+    whenAllBackupFilesDataCollected();
     whenDeleteOldFilesFunctionCalled();
     thenOldestFilesShouldBeDeleted(/*filesLeft*/ 1);
-}
-
-TEST_F(BackupDbIt, NoBackupCreatedOnFirstTimeLaunch)
-{
-    whenServerLaunched();
-    thenNoBackupFilesShouldBeCreated();
 }
 
 TEST_F(BackupDbIt, CreatedWhenNoBackupsForCurrentVersion)
 {
     whenServerLaunched();
-    whenServerStopped();
-    whenServerLaunched();
     thenBackupFilesShouldBeCreated(/*backupFilesCount*/ 1);
+    whenServerStopped();
 }
 
 TEST_F(BackupDbIt, NotCreatedWhenThereAreBackupsForCurrentVersion)
 {
     whenServerLaunched();
-    whenServerStopped();
-    whenServerLaunched();
     thenBackupFilesShouldBeCreated(/*backupFilesCount*/ 1);
-
     whenServerStopped();
+
     whenServerLaunched();
     thenNoNewBackupFilesShouldBeCreated();
 }
@@ -274,4 +296,16 @@ TEST_F(BackupDbIt, FilesRotated)
     thenSeveralRotationsShouldBeObserved();
 }
 
-} // namespace nx::mediaserver::test
+TEST_F(BackupDbIt, BackupTimeoutPersistentThroughRestarts)
+{
+    givenBackupRotationPeriod(std::chrono::milliseconds(6000));
+    whenServerLaunched();
+    thenBackupFilesShouldBeCreated(/*backupFilesCount*/ 1);
+    whenServerStopped();
+    whenAllBackupFilesDataCollected();
+    whenSometimePasses(std::chrono::milliseconds(3000));
+    whenServerLaunched();
+    thenNextDbFileShouldBeCreatedWithTheGivenTimeout(std::chrono::milliseconds(6000));
+}
+
+} // namespace nx::vms::server::test

@@ -29,8 +29,8 @@ public:
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
-    virtual nx::sdk::Error setMetadataHandler(
-        nx::sdk::analytics::MetadataHandler* metadataHandler) override;
+    virtual nx::sdk::Error setHandler(
+        nx::sdk::analytics::DeviceAgent::IHandler* IHandler) override;
 
     virtual nx::sdk::Error setNeededMetadataTypes(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
@@ -45,7 +45,7 @@ public:
 
     virtual void setSettings(const nx::sdk::Settings* settings) override;
 
-    virtual nx::sdk::Settings* settings() const override;
+    virtual nx::sdk::Settings* pluginSideSettings() const override;
 
 private:
     nx::sdk::Error startFetchingMetadata(
@@ -68,7 +68,7 @@ private:
     int m_channel = 0;
 
     MetadataMonitor* m_monitor = nullptr;
-    nx::sdk::analytics::MetadataHandler* m_metadataHandler = nullptr;
+    nx::sdk::analytics::DeviceAgent::IHandler* m_handler = nullptr;
 };
 
 } // namespace hanwha

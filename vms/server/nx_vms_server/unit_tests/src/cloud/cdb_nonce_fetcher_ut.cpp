@@ -12,7 +12,7 @@
 
 namespace nx {
 namespace vms {
-namespace mediaserver {
+namespace vms::server {
 namespace test {
 
 namespace {
@@ -424,6 +424,6 @@ TEST_F(CdbNonceFetcher, requests_cloud_nonce_periodically)
 }
 
 } // namespace test
-} // namespace mediaserver
+} // namespace vms::server
 } // namespace vms
 } // namespace nx

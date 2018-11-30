@@ -1,26 +1,26 @@
 #include <gtest/gtest.h>
-#include <server/server_globals.h>
-#include <test_support/utils.h>
-#include <test_support/mediaserver_launcher.h>
+
 #include <api/app_server_connection.h>
-#include <nx/network/http/http_client.h>
-
-#include <nx/fusion/model_functions.h>
-#include "common/common_module.h"
 #include <api/global_settings.h>
-#include <rest/handlers/detach_from_cloud_rest_handler.h>
 #include <api/model/detach_from_cloud_data.h>
-
-#include <test_support/appserver2_process.h>
-#include <nx/utils/test_support/module_instance_launcher.h>
-#include <media_server/server_connector.h>
 #include <api/test_api_requests.h>
+#include <common/common_module.h>
+#include <media_server/server_connector.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/network/app_info.h>
+#include <nx/network/http/http_client.h>
 #include <nx/utils/elapsed_timer.h>
+#include <nx/utils/test_support/module_instance_launcher.h>
 #include <nx/utils/test_support/test_options.h>
+#include <rest/handlers/detach_from_cloud_rest_handler.h>
+#include <rest/server/json_rest_result.h>
+#include <server/server_globals.h>
+#include <test_support/appserver2_process.h>
+#include <test_support/mediaserver_launcher.h>
+#include <test_support/utils.h>
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 namespace test {
 
 using Appserver2 = nx::utils::test::ModuleLauncher<::ec2::Appserver2Process>;
@@ -113,23 +113,40 @@ public:
         auto client = std::make_unique<nx::network::http::HttpClient>();
         client->setUserName("admin");
         client->setUserPassword("admin");
-        DetachFromCloudData data;
-        data.password = "My1nsAnelYSaf3P4ssW0rd";
+
+        CurrentPasswordData data;
+        data.currentPassword = "admin";
 
         nx::utils::Url url = mediaServerLauncher->apiUrl();
         url.setPath("/api/detachFromSystem");
-        client->doPost(url, "application/json", QJson::serialized(data));
+        ASSERT_TRUE(client->doPost(url, "application/json", QJson::serialized(data)));
+
+        const auto buffer = client->fetchEntireMessageBody();
+        ASSERT_TRUE(buffer);
+
+        const auto result = QJson::deserialized<QnJsonRestResult>(*buffer);
+        ASSERT_EQ(QnRestResult::NoError, result.error) << result.errorString.toStdString();
     }
 
-    void thenUserRemovedFromFirstServerOnly()
+    void thenUserRemovedFromFirstServer()
     {
         auto ec2Connection = mediaServerLauncher->commonModule()->ec2Connection();
         vms::api::UserDataList users;
-        ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
-        ASSERT_EQ(1, users.size());
+        for (int i = 0; i < 10; ++i) //< Detach may take some time in rear cases.
+        {
+            users.clear();
+            ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
+            if (users.size() == 1)
+                return;
 
-        // Make sure server2 is not synchronized with server1 any more
-        for (int i = 0; i < 10; ++i)
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+        ASSERT_EQ(1, users.size());
+    }
+
+    void butSecondServerRemainUnchanged()
+    {
+        for (int i = 0; i < 10; ++i) //< Make sure server2 is not synchronized with server1.
         {
             vms::api::UserDataList users2;
             NX_TEST_API_GET(makeUrl(server2, "/ec2/getUsers"), &users2);
@@ -150,9 +167,10 @@ TEST_F(DetachSingleServerTest, main)
     givenTwoSynchronizedServers();
 
     whenDetachFirstServerFromSystem();
-    thenUserRemovedFromFirstServerOnly();
+    thenUserRemovedFromFirstServer();
+    butSecondServerRemainUnchanged();
 }
 
 } // namespace test
-} // namespace mediaserver
+} // namespace vms::server
 } // namespace nx

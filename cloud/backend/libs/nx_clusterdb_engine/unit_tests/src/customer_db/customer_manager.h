@@ -21,7 +21,8 @@ class CustomerManager
 public:
     CustomerManager(
         SyncronizationEngine* syncronizationEngine,
-        dao::CustomerDao* customerDao);
+        dao::CustomerDao* customerDao,
+        const std::string& systemId);
     ~CustomerManager();
 
     void saveCustomer(
@@ -38,6 +39,7 @@ public:
 private:
     SyncronizationEngine* m_syncronizationEngine = nullptr;
     dao::CustomerDao* m_customerDao = nullptr;
+    const std::string m_systemId;
 
     nx::sql::DBResult saveCustomerToDb(
         nx::sql::QueryContext* queryContext,

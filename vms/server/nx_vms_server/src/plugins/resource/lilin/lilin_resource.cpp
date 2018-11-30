@@ -7,7 +7,7 @@
 #include <nx/utils/std/cpp14.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 LilinResource::LilinResource(QnMediaServerModule* serverModule):
@@ -23,7 +23,7 @@ CameraDiagnostics::Result LilinResource::initializeCameraDriver()
         return result;
 
     setCameraCapability(Qn::RemoteArchiveCapability, true);
-    saveParams();
+    saveProperties();
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -37,7 +37,7 @@ nx::core::resource::AbstractRemoteArchiveManager* LilinResource::remoteArchiveMa
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx
 
 #endif // ENABLE_ONVIF

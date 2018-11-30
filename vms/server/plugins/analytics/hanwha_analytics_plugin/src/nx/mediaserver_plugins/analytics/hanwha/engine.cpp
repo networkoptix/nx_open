@@ -65,7 +65,7 @@ Engine::SharedResources::SharedResources(
     const QAuthenticator& auth)
     :
     monitor(std::make_unique<MetadataMonitor>(engineManifest, url, auth)),
-    sharedContext(std::make_shared<mediaserver_core::plugins::HanwhaSharedResourceContext>(
+    sharedContext(std::make_shared<vms::server::plugins::HanwhaSharedResourceContext>(
         sharedId))
 {
     sharedContext->setResourceAccess(url, auth);
@@ -158,7 +158,7 @@ void Engine::setSettings(const nx::sdk::Settings* settings)
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::Settings* Engine::settings() const
+nx::sdk::Settings* Engine::pluginSideSettings() const
 {
     return nullptr;
 }
@@ -170,7 +170,7 @@ void Engine::executeAction(Action* action, Error* outError)
 boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
     const DeviceInfo& deviceInfo)
 {
-    using namespace nx::mediaserver_core::plugins;
+    using namespace nx::vms::server::plugins;
 
     auto sharedRes = sharedResources(deviceInfo);
 
@@ -192,8 +192,8 @@ boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
 
 boost::optional<QList<QString>> Engine::eventTypeIdsFromParameters(
     const nx::utils::Url& url,
-    const nx::mediaserver_core::plugins::HanwhaCgiParameters& parameters,
-    const nx::mediaserver_core::plugins::HanwhaResponse& eventStatuses,
+    const nx::vms::server::plugins::HanwhaCgiParameters& parameters,
+    const nx::vms::server::plugins::HanwhaResponse& eventStatuses,
     int channel) const
 {
     if (!parameters.isValid())
@@ -212,7 +212,7 @@ boost::optional<QList<QString>> Engine::eventTypeIdsFromParameters(
     for (const auto& eventName: supportedEvents)
     {
         auto eventTypeId = m_engineManifest.eventTypeIdByName(eventName);
-        if (!eventTypeId.isNull())
+        if (!eventTypeId.isEmpty())
             result.insert(eventTypeId);
 
         const auto altEventName = specialEventName(eventName);
@@ -324,6 +324,12 @@ std::shared_ptr<Engine::SharedResources> Engine::sharedResources(
     }
 
     return sharedResourcesItr.value();
+}
+
+nx::sdk::Error Engine::setHandler(nx::sdk::analytics::Engine::IHandler* /*handler*/)
+{
+    // TODO: Use the handler for error reporting.
+    return nx::sdk::Error::noError;
 }
 
 } // namespace hanwha

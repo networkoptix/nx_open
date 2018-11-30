@@ -49,6 +49,7 @@ class AccountManager
 public:
     std::chrono::seconds accountActivationCodeExpirationTimeout;
     std::chrono::seconds passwordResetCodeExpirationTimeout;
+    std::chrono::milliseconds removeExpiredTemporaryCredentialsPeriod;
 
     AccountManager();
 };

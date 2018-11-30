@@ -15,7 +15,7 @@ namespace audio {
 namespace detail {
 
 void fillCameraAuxiliaryData(nxcip::CameraInfo* cameras, int cameraCount);
-bool pluggedIn(const char * devicePath);
+bool pluggedIn(const std::string& devicePath);
 
 } // namespace detail
 } // namespace audio

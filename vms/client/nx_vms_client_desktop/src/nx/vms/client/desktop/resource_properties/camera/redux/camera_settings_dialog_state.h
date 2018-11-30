@@ -13,6 +13,7 @@
 #include <utils/common/aspect_ratio.h>
 
 #include <nx/vms/client/desktop/common/data/rotation.h>
+#include <nx/vms/client/desktop/common/redux/abstract_redux_state.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/schedule_cell_params.h>
 #include <nx/vms/client/desktop/utils/wearable_state.h>
 #include <nx/utils/std/optional.h>
@@ -23,7 +24,7 @@
 
 namespace nx::vms::client::desktop {
 
-struct NX_VMS_DESKTOP_CLIENT_API CameraSettingsDialogState
+struct NX_VMS_DESKTOP_CLIENT_API CameraSettingsDialogState: AbstractReduxState
 {
     template<class T>
     struct UserEditable
@@ -98,13 +99,6 @@ struct NX_VMS_DESKTOP_CLIENT_API CameraSettingsDialogState
         motionDetectionTooManySensitivityRectangles
     };
 
-    CameraSettingsDialogState() = default;
-    CameraSettingsDialogState(const CameraSettingsDialogState& other) = delete;
-    CameraSettingsDialogState(CameraSettingsDialogState&& other) = default;
-    CameraSettingsDialogState& operator=(const CameraSettingsDialogState&) = delete;
-    CameraSettingsDialogState& operator=(CameraSettingsDialogState&&) = default;
-    ~CameraSettingsDialogState() = default;
-
     bool hasChanges = false;
     bool readOnly = true;
     bool settingsOptimizationEnabled = false;
@@ -171,6 +165,9 @@ struct NX_VMS_DESKTOP_CLIENT_API CameraSettingsDialogState
         CombinedValue isWearable;
         CombinedValue isIoModule;
         CombinedValue isArecontCamera;
+        CombinedValue supportsAudio;
+        CombinedValue supportsVideo;
+        CombinedValue isAudioForced;
         CombinedValue hasMotion;
         CombinedValue hasDualStreamingCapability;
         CombinedValue hasRemoteArchiveCapability;
@@ -178,6 +175,7 @@ struct NX_VMS_DESKTOP_CLIENT_API CameraSettingsDialogState
         CombinedValue canForcePtzCapabilities;
         CombinedValue supportsMotionStreamOverride;
         CombinedValue hasCustomMediaPortCapability;
+        CombinedValue supportsRecording;
 
         int maxFps = 0;
         int maxDualStreamingFps = 0;
@@ -293,6 +291,7 @@ struct NX_VMS_DESKTOP_CLIENT_API CameraSettingsDialogState
         UserEditable<QSet<QnUuid>> enabledEngines;
         QHash<QnUuid, UserEditable<QVariantMap>> settingsValuesByEngineId;
         bool loading = false;
+        QnUuid currentEngineId;
     };
     AnalyticsSettings analytics;
 
@@ -333,7 +332,15 @@ struct NX_VMS_DESKTOP_CLIENT_API CameraSettingsDialogState
     bool supportsSchedule() const
     {
         return devicesDescription.isDtsBased == CombinedValue::None
-            && devicesDescription.isWearable == CombinedValue::None;
+            && devicesDescription.isWearable == CombinedValue::None
+            && devicesDescription.supportsRecording == CombinedValue::All;
+    }
+
+    bool supportsVideoStreamControl() const
+    {
+        return devicesDescription.isWearable == CombinedValue::None
+            && devicesDescription.isDtsBased == CombinedValue::None
+            && devicesDescription.supportsVideo == CombinedValue::All;
     }
 
     bool canSwitchPtzPresetTypes() const

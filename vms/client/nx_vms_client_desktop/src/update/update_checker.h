@@ -2,6 +2,7 @@
 #define UPDATE_CHECKER_H_
 
 #include <QtCore/QObject>
+#include <QtCore/QUrl>
 
 class QNetworkAccessManager;
 
