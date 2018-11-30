@@ -747,7 +747,7 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send(
 
         // NOTE: Sometimes, wouldBlock is reported instead of timedOut.
         bool nonBlockingModeEnabled = false;
-        if (!getNonBlockingMode(&nonBlockingModeEnabled))
+        if (!this->getNonBlockingMode(&nonBlockingModeEnabled))
             return -1;
         if (!nonBlockingModeEnabled && errCode == SystemError::wouldBlock)
             SystemError::setLastErrorCode(SystemError::timedOut);
