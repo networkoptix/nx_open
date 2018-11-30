@@ -90,6 +90,7 @@ signals:
     void videowallControlMessageReceived(const nx::vms::api::VideowallControlMessageData& message);
 
     void runtimeInfoChanged(const nx::vms::api::RuntimeData& runtimeInfo);
+    void runtimeInfoRemoved(const nx::vms::api::IdData& data);
     void remotePeerFound(QnUuid data, nx::vms::api::PeerType peerType);
     void remotePeerLost(QnUuid data, nx::vms::api::PeerType peerType);
 

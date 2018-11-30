@@ -11,7 +11,7 @@
 #include <models/servers_selection_model.h>
 
 #include <helpers/time_helper.h>
-#include <nx/mediaserver/api/client.h>
+#include <nx/vms/server/api/client.h>
 #include <helpers/itf_helpers.h>
 
 class rtu::RtuContext::Impl : public QObject
@@ -107,7 +107,7 @@ rtu::RtuContext::Impl::Impl(RtuContext *parent)
     QObject::connect(m_serversFinder.data(), &ServersFinder::serverDiscovered
         , m_selectionModel, &ServersSelectionModel::serverDiscovered);
 
-    typedef nx::mediaserver::api::Client Client;
+    typedef nx::vms::server::api::Client Client;
     QObject::connect(&Client::instance(), &Client::accessMethodChanged,
         m_selectionModel, &ServersSelectionModel::changeAccessMethod);
 }

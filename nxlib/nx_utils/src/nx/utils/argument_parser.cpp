@@ -64,8 +64,6 @@ void ArgumentParser::parse(int argc, const char* argv[])
                 curParamIter->second = QString::fromUtf8(arg);
         }
     }
-
-    NX_VERBOSE(this, lm("Parsed: %1").container(m_args));
 }
 
 bool ArgumentParser::read(const QString& name, QString* const value) const

@@ -488,6 +488,7 @@ int QnMediaServerConnection::setParamsAsync(
     for(const QnCameraAdvancedParamValue value: values)
         params << QnRequestParam(value.id, value.value);
 
+    // TODO: Change GET to POST when compatibility with old servers is not needed anymore.
     return sendAsyncGetRequestLogged(SetParamsObject,
         params, QN_STRINGIZE_TYPE(QnCameraAdvancedParamValueList), target, slot);
 }
@@ -1257,10 +1258,10 @@ int QnMediaServerConnection::getNonceAsync(const nx::utils::Url& url, QObject* t
 }
 
 int QnMediaServerConnection::getRecordingStatisticsAsync(
-    qint64 bitrateAnalizePeriodMs, QObject* target, const char* slot)
+    qint64 bitrateAnalyzePeriodMs, QObject* target, const char* slot)
 {
     QnRequestParamList params;
-    params << QnRequestParam("bitrateAnalizePeriodMs", bitrateAnalizePeriodMs);
+    params << QnRequestParam("bitrateAnalyzePeriodMs", bitrateAnalyzePeriodMs);
     return sendAsyncGetRequestLogged(RecordingStatsObject,
         params, QN_STRINGIZE_TYPE(QnRecordingStatsReply), target, slot);
 }

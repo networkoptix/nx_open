@@ -12,7 +12,7 @@
 #include "nx/utils/thread/long_runnable.h"
 #include <nx/network/socket.h>
 #include "common/common_module_aware.h"
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 namespace nx {
 namespace network {
@@ -21,7 +21,7 @@ class UDPSocket;
 }   //nx
 struct QnCameraConflictList;
 
-class QnMServerResourceSearcher: public QnLongRunnable, public nx::mediaserver::ServerModuleAware
+class QnMServerResourceSearcher: public QnLongRunnable, public nx::vms::server::ServerModuleAware
 {
 public:
     QnMServerResourceSearcher(QnMediaServerModule* serverModule);

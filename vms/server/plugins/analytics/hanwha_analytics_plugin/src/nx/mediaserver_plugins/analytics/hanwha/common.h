@@ -52,7 +52,9 @@ public:
     {
         QList<EventType> eventTypes;
 
+        /** @return Null if not found. */
         QString eventTypeIdByName(const QString& eventName) const;
+        
         const Hanwha::EventType& eventTypeDescriptorById(const QString& id) const;
 
     private:

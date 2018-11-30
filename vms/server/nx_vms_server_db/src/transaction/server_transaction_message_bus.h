@@ -19,7 +19,8 @@ public:
 
     void setDatabase(detail::QnDbManager* db);
 
-    void gotConnectionFromRemotePeer(const QnUuid& connectionGuid,
+    void gotConnectionFromRemotePeer(
+        const std::string& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         ConnectionType::Type connectionType,
@@ -35,7 +36,7 @@ public:
     \param requestBuf Contains serialized \a request and (possibly) partial (or full) message body
     */
     void gotIncomingTransactionsConnectionFromRemotePeer(
-        const QnUuid& connectionGuid,
+        const std::string& connectionGuid,
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         const nx::vms::api::PeerData &remotePeer,
         qint64 remoteSystemIdentityTime,
@@ -43,7 +44,7 @@ public:
         const QByteArray& requestBuf);
 
     bool gotTransactionFromRemotePeer(
-        const QnUuid& connectionGuid,
+        const std::string& connectionGuid,
         const nx::network::http::Request& request,
         const QByteArray& requestMsgBody);
 protected:

@@ -65,6 +65,22 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(const vms::event::Abstra
             return success ? Value::SuccessNotification : Value::CommonNotification;
         }
 
+        case EventType::pluginEvent:
+        {
+            using namespace nx::vms::api;
+            switch (params.metadata.level)
+            {
+                case EventLevel::ErrorEventLevel:
+                    return Value::CriticalNotification;
+
+                case EventLevel::WarningEventLevel:
+                    return Value::ImportantNotification;
+
+                default:
+                    return Value::CommonNotification;
+            }
+        }
+
         default:
             NX_ASSERT(false, Q_FUNC_INFO, "All enum values must be handled");
             return Value::NoNotification;

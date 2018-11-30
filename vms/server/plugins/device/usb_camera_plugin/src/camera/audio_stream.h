@@ -15,6 +15,7 @@
 #include "ffmpeg/codec.h"
 #include "ffmpeg/packet.h"
 #include "ffmpeg/frame.h"
+#include "adts_injector.h"
 
 struct SwrContext;
 namespace nxpl { class TimeProvider; }
@@ -42,9 +43,7 @@ private:
         void addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
         void removePacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
 
-        int sampleRate() const;
-
-    private:    
+    private:
         std::string m_url;
         std::weak_ptr<Camera> m_camera;
         nxpl::TimeProvider * const m_timeProvider;
@@ -56,9 +55,12 @@ private:
 
         bool m_initialized = false;
         int m_initCode = 0;
-        bool m_ioError = false;
+        std::atomic_bool m_ioError = false;
 
-        bool m_terminated = true;
+        int64_t m_offsetTicks = 0;
+        int64_t m_baseTimestamp = 0;
+
+        std::atomic_bool m_terminated = true;
         mutable std::mutex m_mutex;
         std::condition_variable m_wait;
         std::thread m_runThread;
@@ -68,11 +70,11 @@ private:
         struct SwrContext * m_resampleContext = nullptr;
 
         std::shared_ptr<std::atomic_int> m_packetCount;
-        
-        std::vector<std::shared_ptr<ffmpeg::Packet>> m_packetMergeBuffer;
+
+        AdtsInjector m_adtsInjector;
 
     private:
-        std::string ffmpegUrl() const;
+        std::string ffmpegUrlPlatformDependent() const;
         bool waitForConsumers();
         int initialize();
         void uninitialize();
@@ -87,24 +89,13 @@ private:
         std::chrono::milliseconds resampleDelay() const;
         int encode(const ffmpeg::Frame *frame, ffmpeg::Packet * outPacket);
         std::shared_ptr<ffmpeg::Packet> nextPacket(int * outError);
+        uint64_t calculateTimestamp(int64_t duration);
 
-        /**
-         * Buffers the given packet to be merged later with packets given previously.
-         * If enough packets have been given, then it merges all packets, returning the merged 
-         * packet.
-         * 
-         * @param[in] - the packet to buffer
-         * @params[out] - outFfmpegError an error < 0 if one occured, 0 otherwise
-         * @return - all previously given packets, merged into one
-         */
-        std::shared_ptr<ffmpeg::Packet> mergePackets(
-            const std::shared_ptr<ffmpeg::Packet>& packet,
-            int * outFfmpegError);
-        
         std::chrono::milliseconds timePerVideoFrame() const;
 
         bool checkIoError(int ffmpegError);
         void setLastError(int ffmpegError);
+        void terminate();
         void tryStart();
         void start();
         void stop();
@@ -114,7 +105,7 @@ private:
 public:
     AudioStream(const std::string url, const std::weak_ptr<Camera>& camera, bool enabled);
     ~AudioStream() = default;
-    
+
     std::string url() const;
     void setEnabled(bool enabled);
     bool enabled() const;
@@ -123,8 +114,6 @@ public:
 
     void addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
     void removePacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
-
-    int sampleRate() const;
 
 private:
     std::string m_url;

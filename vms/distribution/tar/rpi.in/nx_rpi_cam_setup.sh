@@ -1,8 +1,8 @@
 #!/bin/bash
-set -u #< Prohibit undefined variables.
 
 NX_RPI_CONFIG_FILE="/boot/config.txt"
 NX_RPI_REBOOT=0
+NX_RPI_V4L2_DRIVER_LOADED=0
 NX_RPI_CAM_PRESENT=0
 
 checkRunningUnderRoot()
@@ -59,15 +59,6 @@ setGPUMemory()
     fi
 }
 
-detectRpiCameraPresence()
-{
-    local mmal=`v4l2-ctl --list-devices | grep mmal`
-    if [ ! -z "$mmal" ]
-    then
-        NX_RPI_CAM_PRESENT=1
-    fi
-}
-
 installV4L2()
 {
     local modulePath="/etc/modules-load.d/bcm2835-v4l2.conf"
@@ -84,6 +75,33 @@ installV4L2()
     if ! lsmod | grep -q bcm2835_v4l2 # lsmod reports driver with an underscore
     then
         modprobe bcm2835_v4l2 || true # manually load the driver this time, ignore failure
+    fi
+
+    if lsmod | grep -q bcm2835_v4l2 # check again to see if it loaded successfully
+    then
+        NX_RPI_V4L2_DRIVER_LOADED=1
+	    echo "v4l2 driver is loaded"
+    else
+        echo "v4l2_driver is not loaded"
+    fi 
+}
+
+detectRpiCameraPresence()
+{
+    # test for /dev/video0 presence before checking if it is rpi cam 
+    if [ ! -f "/dev/video0" ]
+    then
+	    echo "/dev/video0 is not present, mmal camera is not installed"
+	    return
+    fi
+
+    local mmal=`v4l2-ctl --list-devices | grep mmal`
+    if [ ! -z "$mmal" ]
+    then
+        NX_RPI_CAM_PRESENT=1
+	    echo "mmal camera present: $mmal"
+    else
+	    echo "mmal camera is not present"
     fi
 }
 
@@ -111,8 +129,9 @@ configureV4L2()
 
     sed -i "s/\"e0\"/\"exit 0\"/g" $file # replace "e0" with "exit 0" from earlier
     
-    if [ "$NX_RPI_CAM_PRESENT" = "1" ]
+    if [ "$NX_RPI_CAM_PRESENT" = "1" -a "$NX_RPI_V4L2_DRIVER_LOADED" = "1" ]
     then
+	    echo "running rpi setup commands"
         eval $repeat_command || true
         eval $i_frame_command || true
     fi
@@ -126,14 +145,12 @@ main()
     setGPUMemory
     installV4L2
     detectRpiCameraPresence
-    configureV4L2
+    configureV4L2 
     
     if [ "$NX_RPI_REBOOT" = "1" ]
     then
         echo "*** Reboot for changes to take effect ***"
     fi
-
-    exit 0
 }
 
 main

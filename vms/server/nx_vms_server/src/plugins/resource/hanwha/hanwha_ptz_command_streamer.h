@@ -7,7 +7,7 @@
 #include <plugins/resource/hanwha/hanwha_ptz_executor.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 class HanwhaPtzCommandStreamer
@@ -54,5 +54,5 @@ private:
 };
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

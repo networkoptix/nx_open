@@ -52,52 +52,6 @@ int Codec::receiveFrame(AVFrame * outFrame) const
     return avcodec_receive_frame(m_codecContext, outFrame);
 }
 
-int Codec::decode(AVFrame * outFrame, const AVPacket * packet, int * outGotFrame)
-{
-    switch (m_codec->type)
-    {
-        case AVMEDIA_TYPE_VIDEO: 
-            return decodeVideo(outFrame, packet, outGotFrame);
-        case AVMEDIA_TYPE_AUDIO: 
-            return decodeAudio(outFrame, packet, outGotFrame);
-        default: 
-            return AVERROR_DECODER_NOT_FOUND;
-    }
-}
-
-int Codec::encode(const AVFrame * frame, AVPacket * outPacket, int * outGotPacket)
-{
-    switch (m_codec->type)
-    {
-        case AVMEDIA_TYPE_VIDEO: 
-            return encodeVideo(frame, outPacket, outGotPacket);
-        case AVMEDIA_TYPE_AUDIO:
-             return encodeAudio(frame, outPacket, outGotPacket);
-        default: 
-            return AVERROR_ENCODER_NOT_FOUND;
-    }
-}
-
-int Codec::decodeVideo(AVFrame * outFrame, const AVPacket * packet, int * outGotFrame)
-{
-    return avcodec_decode_video2(m_codecContext, outFrame, outGotFrame, packet);
-}
-
-int Codec::encodeVideo(const AVFrame * frame, AVPacket * outPacket, int * outGotPacket)
-{
-    return avcodec_encode_video2(m_codecContext, outPacket, frame, outGotPacket);
-}
-
-int Codec::decodeAudio(AVFrame * outFrame, const AVPacket * packet, int * outGotFrame)
-{
-    return avcodec_decode_audio4(m_codecContext, outFrame, outGotFrame, packet);
-}
-
-int Codec::encodeAudio(const AVFrame * frame, AVPacket * outPacket, int * outGotPacket)
-{
-    return avcodec_encode_audio2(m_codecContext, outPacket, frame, outGotPacket);
-}
-
 int Codec::initializeEncoder(AVCodecID codecId)
 {
     close();
@@ -169,12 +123,9 @@ int Codec::initializeDecoder(const char * codecName)
 
 void Codec::setFps(float fps)
 {
-    int numerator = 0;
-    int denominator = 0;
-    utils::toFraction(fps, &numerator, &denominator);
-
-    m_codecContext->framerate = {numerator, denominator};
-    m_codecContext->time_base = {denominator, numerator};
+    AVRational fraction = utils::toFraction(fps);
+    m_codecContext->framerate = fraction;
+    m_codecContext->time_base = {fraction.den, fraction.num};
 }
 
 void Codec::setResolution(int width, int height)

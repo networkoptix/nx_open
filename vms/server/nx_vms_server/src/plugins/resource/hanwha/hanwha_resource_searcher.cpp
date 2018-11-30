@@ -14,7 +14,7 @@
 #include "hanwha_ini_config.h"
 
 #include <media_server/media_server_module.h>
-#include <nx/mediaserver/resource/shared_context_pool.h>
+#include <nx/vms/server/resource/shared_context_pool.h>
 
 namespace {
 
@@ -33,14 +33,14 @@ static const int64_t kSunApiDiscoveryTimeoutMs = 10 * 60 * 1000; //< 10 minutes.
 } // namespace
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 HanwhaResourceSearcher::HanwhaResourceSearcher(QnMediaServerModule* serverModule):
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
     nx::network::upnp::SearchAutoHandler(serverModule->upnpDeviceSearcher(), kUpnpBasicDeviceType),
-    mediaserver::ServerModuleAware(serverModule),
+    vms::server::ServerModuleAware(serverModule),
     m_sunapiProbePackets(createProbePackets())
 {
     ini().reload();
@@ -162,12 +162,11 @@ void HanwhaResourceSearcher::updateSocketList()
     if (!m_sunapiReceiveSocket)
     {
         auto socket = nx::network::SocketFactory::createDatagramSocket();
-        if (!socket->setReuseAddrFlag(true) ||
-            !socket->bind(network::BROADCAST_ADDRESS, kSunApiProbeSrcPort))
+        if (socket->setReuseAddrFlag(true) &&
+            socket->bind(network::BROADCAST_ADDRESS, kSunApiProbeSrcPort))
         {
-            return;
+            m_sunapiReceiveSocket = std::move(socket);
         }
-        m_sunapiReceiveSocket = std::move(socket);
     }
 
     const auto interfaceList = nx::network::getAllIPv4Interfaces();
@@ -386,7 +385,7 @@ void HanwhaResourceSearcher::createResource(
     QnResourceData resourceData = commonModule()->dataPool()
         ->data(devInfo.manufacturer, devInfo.modelName);
 
-    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+    if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return;
 
     HanwhaResourcePtr resource(new HanwhaResource(serverModule()));
@@ -470,5 +469,5 @@ QAuthenticator HanwhaResourceSearcher::getDefaultAuth()
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

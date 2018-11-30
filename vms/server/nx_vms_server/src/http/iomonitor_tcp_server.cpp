@@ -14,7 +14,7 @@
 #include <nx/utils/thread/wait_condition.h>
 #include <network/tcp_listener.h>
 #include <api/helpers/camera_id_helper.h>
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera.h>
 
 class QnIOMonitorConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
@@ -60,7 +60,7 @@ void QnIOMonitorConnectionProcessor::run()
             .queryItemValue(Qn::PHYSICAL_ID_URL_QUERY_ITEM);
 
         const auto camera = nx::camera_id_helper::findCameraByFlexibleId(
-            resourcePool(), cameraId).dynamicCast<nx::mediaserver::resource::Camera>();
+            resourcePool(), cameraId).dynamicCast<nx::vms::server::resource::Camera>();
         if (!camera)
         {
             sendResponse(nx::network::http::StatusCode::notFound,
@@ -68,11 +68,11 @@ void QnIOMonitorConnectionProcessor::run()
             return;
         }
 
-        Qn::directConnect(camera.data(), &nx::mediaserver::resource::Camera::initializedChanged,
+        Qn::directConnect(camera.data(), &nx::vms::server::resource::Camera::initializedChanged,
             this, &QnIOMonitorConnectionProcessor::at_cameraInitDone);
-        Qn::directConnect(camera.data(), &nx::mediaserver::resource::Camera::inputPortStateChanged,
+        Qn::directConnect(camera.data(), &nx::vms::server::resource::Camera::inputPortStateChanged,
             this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged);
-        Qn::directConnect(camera.data(), &nx::mediaserver::resource::Camera::outputPortStateChanged,
+        Qn::directConnect(camera.data(), &nx::vms::server::resource::Camera::outputPortStateChanged,
             this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged);
 
         if (camera->getParentId() != commonModule()->moduleGUID())
@@ -123,7 +123,7 @@ void QnIOMonitorConnectionProcessor::at_cameraInitDone(const QnResourcePtr& reso
 {
     Q_D(QnIOMonitorConnectionProcessor);
     QnMutexLocker lock(&d->waitMutex);
-    const auto camera = resource.dynamicCast<nx::mediaserver::resource::Camera>();
+    const auto camera = resource.dynamicCast<nx::vms::server::resource::Camera>();
     if (camera && camera->isInitialized())
     {
         addData(camera->ioPortStates());

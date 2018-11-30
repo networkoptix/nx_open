@@ -61,10 +61,26 @@ BITMAPINFOHEADER *  DShowCompressionTypeDescriptor::videoInfoBitMapHeader() cons
 
 } // namespace
 
-//-------------------------------------------------------------------------------------------------
-// public api
+std::string getDeviceUniqueId(const std::string& devicePath)
+{
+    // devicePath expexted to be of form:
+    //
+    // \\?\usb#vid_0c45&pid_6340&mi_00#6&37859d1e&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+    //
+    // where uniqueId is contained between { and }. Example above has unique id of:
+    //
+    // 65e8773d-8f56-11d0-a3b9-00a0c9223196
 
-std::string getDeviceName(const char * devicePath)
+    int start = devicePath.find("{");
+    int end = devicePath.find("}");
+
+    if (start == std::string::npos || end == std::string::npos)
+        return std::string();
+
+    return devicePath.substr(start + 1, end - start - 1);
+}
+
+std::string getDeviceName(const std::string& devicePath)
 {
     DShowInitializer init;
     IMoniker * pMoniker = NULL;
@@ -88,15 +104,17 @@ std::vector<DeviceData> getDeviceList()
     IMoniker *pMoniker = NULL;
     while (S_OK == pEnum->Next(1, &pMoniker, NULL))
     {
-        std::string devicePath = getDevicePath(pMoniker);
-        devices.push_back(DeviceData(getDeviceName(pMoniker), devicePath, devicePath));
+        std::string name = getDeviceName(pMoniker);
+        std::string path = getDevicePath(pMoniker);
+        std::string uniqueId = getDeviceUniqueId(path);
+        devices.push_back(DeviceData(name, path, uniqueId));
         pMoniker->Release();
     }
     pEnum->Release();
     return devices;
 }
 
-std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const char * devicePath)
+std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const std::string& devicePath)
 {
     //todo figure out how to avoid this init everytime
     DShowInitializer init;
@@ -115,7 +133,7 @@ std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const char 
 }
 
 std::vector<ResolutionData> getResolutionList(
-    const char * devicePath,
+    const std::string& devicePath,
     const device::CompressionTypeDescriptorPtr& targetCodec)
 {
     //todo figure out how to avoid this init everytime
@@ -138,7 +156,7 @@ std::vector<ResolutionData> getResolutionList(
 }
 
 void setBitrate(
-    const char * devicePath,
+    const std::string& devicePath,
     int bitrate,
     const device::CompressionTypeDescriptorPtr& targetCodec)
 {
@@ -197,7 +215,7 @@ void setBitrate(
     delete[] array;
 }
 
-int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescriptorPtr& targetCodec)
+int getMaxBitrate(const std::string& devicePath, const device::CompressionTypeDescriptorPtr& targetCodec)
 {
 #if 0
     DShowInitializer init;
@@ -393,14 +411,14 @@ HRESULT enumerateDevices(REFGUID category, IEnumMoniker ** ppEnum)
     return result;
 }
 
-HRESULT findDevice(REFGUID category, const char * devicePath, IMoniker ** outMoniker)
+HRESULT findDevice(REFGUID category, const std::string& devicePath, IMoniker ** outMoniker)
 {
     IEnumMoniker * pEnum;
     HRESULT result = enumerateDevices(category, &pEnum);
     if (FAILED(result))
         return result;
 
-    CComBSTR devicePathBstr(devicePath);
+    CComBSTR devicePathBstr(devicePath.c_str());
 
     IMoniker *pMoniker = NULL;
     while (S_OK == (result = pEnum->Next(1, &pMoniker, NULL)))
@@ -603,6 +621,7 @@ std::vector<AudioDeviceDescriptor> getAudioDeviceList()
     IMoniker *pMoniker = NULL;
     while (S_OK == pEnum->Next(1, &pMoniker, NULL))
     {
+        // Intentionally using getDisplayName, it returns the device's instance id
         std::string devicePath = getDisplayName(pMoniker);
         DeviceData data(getDeviceName(pMoniker), devicePath, devicePath);
         devices.push_back(AudioDeviceDescriptor(data, getWaveInID(pMoniker)));

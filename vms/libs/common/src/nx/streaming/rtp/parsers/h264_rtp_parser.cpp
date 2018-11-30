@@ -11,7 +11,7 @@ static const char H264_NAL_PREFIX[4] = {0x00, 0x00, 0x00, 0x01};
 static const char H264_NAL_SHORT_PREFIX[3] = {0x00, 0x00, 0x01};
 static const int kMinIdrCountToDetectIFrameByIdr = 2;
 
-H264Parser::H264Parser(const QString& resourceId):
+H264Parser::H264Parser():
         VideoStreamParser(),
         m_spsInitialized(false),
         m_rtpChannel(98),
@@ -27,10 +27,6 @@ H264Parser::H264Parser(const QString& resourceId):
         m_lastRtpTime(0)
 {
     StreamParser::setFrequency(90000);
-}
-
-H264Parser::~H264Parser()
-{
 }
 
 void H264Parser::setSdpInfo(const Sdp::Media& sdp)
@@ -368,6 +364,7 @@ bool H264Parser::processData(
             if (bufferEnd-curPtr < 2)
                 return clearInternalBuffer();
             curPtr += 2;
+            // TODO: #lbusygin fallthrough here, is it deliberately?
         }
         case STAP_A_PACKET:
         {

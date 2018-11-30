@@ -72,7 +72,7 @@ boost::optional<Event> BytestreamFilter::createEvent(
     using namespace nx::vms::api::analytics;
 
     auto eventTypeId = m_manifest.eventTypeIdByName(eventSource);
-    if (eventTypeId.isNull())
+    if (eventTypeId.isEmpty())
         return boost::none;
     const auto eventTypeDescriptor = m_manifest.eventTypeDescriptorById(eventTypeId);
 
@@ -80,7 +80,7 @@ boost::optional<Event> BytestreamFilter::createEvent(
     event.typeId = eventTypeId;
     event.channel = eventChannel(eventSource);
     event.region = eventRegion(eventSource);
-    event.isActive = isEventActive(eventState);  //< Event start/stop.
+    event.isActive = isEventActive(eventState); //< Event start/stop.
     if (!event.isActive
         && !eventTypeDescriptor.flags.testFlag(EventTypeFlag::stateDependent))
     {

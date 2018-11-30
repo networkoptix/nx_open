@@ -5,8 +5,8 @@
 #include <nx/network/http/auth_restriction_list.h>
 #include <nx/utils/timer_manager.h>
 
-#include <nx/data_sync_engine/serialization/serializable_transaction.h>
-#include <nx/data_sync_engine/synchronization_engine.h>
+#include <nx/clusterdb/engine/serialization/serializable_transaction.h>
+#include <nx/clusterdb/engine/synchronization_engine.h>
 
 #include "access_control/authentication_manager.h"
 #include "access_control/authorization_manager.h"
@@ -49,7 +49,7 @@ public:
 
     EventManager& eventManager();
 
-    data_sync_engine::SyncronizationEngine& ec2SyncronizationEngine();
+    clusterdb::engine::SyncronizationEngine& ec2SyncronizationEngine();
 
     AbstractSystemHealthInfoProvider& systemHealthInfoProvider();
 
@@ -75,7 +75,7 @@ private:
     TemporaryAccountPasswordManager m_tempPasswordManager;
     AccountManager m_accountManager;
     EventManager m_eventManager;
-    data_sync_engine::SyncronizationEngine m_ec2SyncronizationEngine;
+    clusterdb::engine::SyncronizationEngine m_ec2SyncronizationEngine;
     ec2::VmsP2pCommandBus m_vmsP2pCommandBus;
     std::unique_ptr<AbstractSystemHealthInfoProvider> m_systemHealthInfoProvider;
     nx::utils::StandaloneTimerManager m_timerManager;
@@ -102,7 +102,7 @@ private:
     nx::sql::DBResult copyExternalTransaction(
         nx::sql::QueryContext* queryContext,
         const std::string& systemId,
-        const nx::data_sync_engine::EditableSerializableTransaction& transaction);
+        const nx::clusterdb::engine::EditableSerializableTransaction& transaction);
 
     void initializeSecurity();
 };

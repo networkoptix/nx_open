@@ -9,7 +9,7 @@
 #include <ui/style/skin.h>
 
 #include <nx/vms/client/desktop/common/utils/aligner.h>
-#include <nx/utils/disconnect_helper.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/utils/log/assert.h>
 
 namespace nx::vms::client::desktop {
@@ -69,15 +69,15 @@ CameraInfoWidget::~CameraInfoWidget()
 
 void CameraInfoWidget::setStore(CameraSettingsDialogStore* store)
 {
-    m_storeConnections.reset(new QnDisconnectHelper());
+    m_storeConnections = {};
     NX_ASSERT(store);
     if (!store)
         return;
 
-    *m_storeConnections << connect(store, &CameraSettingsDialogStore::stateChanged,
+    m_storeConnections << connect(store, &CameraSettingsDialogStore::stateChanged,
         this, &CameraInfoWidget::loadState);
 
-    *m_storeConnections << connect(ui->nameLabel, &EditableLabel::textChanged,
+    m_storeConnections << connect(ui->nameLabel, &EditableLabel::textChanged,
         store, &CameraSettingsDialogStore::setSingleCameraUserName);
 }
 

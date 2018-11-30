@@ -35,10 +35,21 @@ class NX_UTILS_API Tag
 {
 public:
     Tag() = default;
-    Tag(const char* s) = delete;
+
     Tag(const std::type_info& info);
+
+    /** NOTE: Use a tag made from a string only when absolutely necessary. */
     explicit Tag(QString s);
+
+    /** NOTE: Use a tag made from a string only when absolutely necessary. */
     explicit Tag(const std::string& s);
+
+    /**
+     * Disabled to prohibit compiling NX_DEBUG("message", ...) - incorrect because the message is
+     * passed instead of the tag. Using `explicit` does not help because Tag(const T*) will be
+     * called then, and the wrong call would compile.
+     */
+    Tag(const char* s) = delete;
 
     template<typename T>
     Tag(const T* pointer): m_value(::toString(pointer)) {}

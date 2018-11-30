@@ -57,6 +57,8 @@
 #include <api/model/password_data.h>
 #include <database/db_manager.h>
 
+#include <nx/vms/utils/system_helpers.h>
+
 namespace
 {
     static const QByteArray SYSTEM_NAME_KEY("systemName");
@@ -69,7 +71,7 @@ namespace
 static QnMediaServerResourcePtr m_server;
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 
 bool Utils::isLocalAppServer(const QString &host)
 {
@@ -106,11 +108,12 @@ bool Utils::updateUserCredentials(
     return true;
 }
 
-bool Utils::backupDatabase(const boost::optional<QString>& dbFilePath)
+bool Utils::backupDatabase(const boost::optional<QString>& dbFilePath,
+    const boost::optional<int>& buildNumber)
 {
     auto connection = ec2Connection();
     return nx::vms::utils::backupDatabase(serverModule()->settings().backupDir(),
-        std::move(connection), dbFilePath);
+        std::move(connection), dbFilePath, buildNumber);
 }
 
 bool Utils::timeToMakeDbBackup() const
@@ -123,7 +126,7 @@ bool Utils::timeToMakeDbBackup() const
     const auto currentVersion =
         nx::utils::SoftwareVersion(nx::utils::AppInfo::applicationVersion());
 
-    auto allBackupFilesData = vms::utils::allBackupFilesDataSorted(backupDir);
+    const auto allBackupFilesData = vms::utils::allBackupFilesDataSorted(backupDir);
     QList<nx::vms::utils::DbBackupFileData> thisVersionBackupFilesData;
 
     std::copy_if(allBackupFilesData.cbegin(), allBackupFilesData.cend(),
@@ -144,6 +147,17 @@ bool Utils::timeToMakeDbBackup() const
     }
 
     return false;
+}
+
+boost::optional<int64_t> Utils::lastDbBackupTimestamp() const
+{
+    const auto backupDir = serverModule()->settings().backupDir();
+    const auto allBackupFilesData = vms::utils::allBackupFilesDataSorted(backupDir);
+
+    if (allBackupFilesData.isEmpty())
+        return boost::none;
+
+    return allBackupFilesData.front().timestamp;
 }
 
 void Utils::dropConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus)
@@ -348,5 +362,5 @@ QByteArray Utils::autoDetectHttpContentType(const QByteArray& msgBody)
     return kDefaultContentType;
 }
 
-} // namespace mediaserver
+} // namespace vms::server
 } // namespace nx

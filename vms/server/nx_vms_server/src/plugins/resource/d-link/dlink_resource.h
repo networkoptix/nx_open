@@ -4,7 +4,7 @@
 
 #include <nx/network/deprecated/simple_http_client.h>
 #include <nx/streaming/media_data_packet.h>
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera.h>
 
 struct QnDlink_ProfileInfo
 {
@@ -43,7 +43,7 @@ struct QnDlink_cam_info
     QVector<QnDlink_ProfileInfo> profiles;
 };
 
-class QnPlDlinkResource: public nx::mediaserver::resource::Camera
+class QnPlDlinkResource: public nx::vms::server::resource::Camera
 {
     Q_OBJECT
 
@@ -65,7 +65,7 @@ public:
     virtual void setMotionMaskPhysical(int channel) override;
 
 protected:
-    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override; // does a lot of physical work
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;

@@ -85,7 +85,7 @@ void DeviceAgent::sendEventPacket(const EventType& event) const
 {
     ++m_packetId;
     auto packet = createCommonEventMetadataPacket(event, m_cameraLogicalId);
-    m_metadataHandler->handleMetadata(nx::sdk::Error::noError, packet);
+    m_handler->handleMetadata(packet);
     NX_URL_PRINT << "Event [pulse] packetId = " << m_packetId << " "
         << event.internalName.toUtf8().constData() << " sent to server";
 }
@@ -109,9 +109,9 @@ const nx::sdk::IString* DeviceAgent::manifest(nx::sdk::Error* error) const
     return new nx::sdk::common::String(m_deviceAgentManifest);
 }
 
-sdk::Error DeviceAgent::setMetadataHandler(nx::sdk::analytics::MetadataHandler* metadataHandler)
+sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::DeviceAgent::IHandler* handler)
 {
-    m_metadataHandler = metadataHandler;
+    m_handler = handler;
     return sdk::Error::noError;
 }
 
@@ -132,7 +132,7 @@ void DeviceAgent::setSettings(const nx::sdk::Settings* /*settings*/)
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::Settings* DeviceAgent::settings() const
+nx::sdk::Settings* DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }

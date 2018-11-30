@@ -177,7 +177,7 @@ copyBuildLibs()
     for LIB in "${LIBS_TO_COPY[@]}"
     do
         local FILE
-        for FILE in "$BUILD_DIR/lib/$LIB"*.so*
+        for FILE in "$BUILD_DIR/lib/$LIB".so*
         do
             if [[ $FILE != *.debug ]]
             then
@@ -189,7 +189,7 @@ copyBuildLibs()
     for LIB in "${OPTIONAL_LIBS_TO_COPY[@]}"
     do
         local FILE
-        for FILE in "$BUILD_DIR/lib/$LIB"*.so*
+        for FILE in "$BUILD_DIR/lib/$LIB".so*
         do
             if [ -f "$FILE" ]
             then

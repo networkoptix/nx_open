@@ -15,7 +15,7 @@ namespace detail {
 
 namespace {
 
-std::vector<std::string> kMotherBoardAudioList = 
+static const std::vector<std::string> kMotherBoardAudioList = 
 {
     "HDA Intel PCH"
     // AMD? builtin audio card goes here
@@ -79,7 +79,7 @@ struct DeviceDescriptor
     }
 };
 
-std::vector<DeviceDescriptor> getDevices()
+static std::vector<DeviceDescriptor> getDevices()
 {
     std::vector<DeviceDescriptor> motherBoardDevices;
     std::vector<DeviceDescriptor> devices;
@@ -205,12 +205,12 @@ void fillCameraAuxiliaryData(nxcip::CameraInfo* cameras, int cameraCount)
     }
 }
 
-bool pluggedIn(const char* devicePath)
+bool pluggedIn(const std::string& devicePath)
 {
     auto devices = getDevices();
     for (const auto & device : devices)
     {
-        if (strcmp(device.path.c_str(), devicePath) == 0)
+        if (device.path == devicePath)
             return true;
     }
     return false;

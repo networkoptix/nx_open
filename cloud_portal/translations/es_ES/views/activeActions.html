@@ -1,13 +1,13 @@
 <div class="container">
     <div ng-if="data.activateCode" process-loading="activate">
-        <h1 class="process-success" ng-if="activate.success">
+        <h1 class="process-success" ng-if="activate.success && !loading">
             Su cuenta se ha guardado
         </h1>
-        <h1 class="process-success" ng-if="activate.success">
+        <h1 class="process-success" ng-if="activate.success && !loading">
             <a class="btn btn-default" href="/login">Iniciar sesión</a>
         </h1>
 
-        <h1 class="process-success" ng-if="!activate.success">
+        <h1 class="process-success" ng-if="!activate.success && !loading">
             Ya está activada la cuenta o el código de confirmación es incorrecto
         </h1>
     </div>
@@ -24,8 +24,8 @@
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
             <h1>Te has registrado en %PRODUCT_NAME%</h1>
-            <p>We've sent you a letter with activation link to {{data.email}}.<br>
-                Please activate your account by visiting this link.</p>
+            <p>Le hemos enviado una carta con el enlace de activación a {{data.email}}<br>
+                Active su cuenta visitando este enlace.</p>
         </div>
         <h1 ng-if="!data.email">Activar tu cuenta</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
@@ -43,9 +43,9 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block input-error"
-                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email is required</span>
+                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required"> Se requiere correo electrónico </span>
                     <span class="help-block input-error"
-                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Please enter a valid Email</span>
+                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email"> Por favor ingrese un correo electrónico válido </span>
                 </div>
             </div>
             <div class="form-group">
@@ -80,9 +80,9 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block input-error"
-                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email is required</span>
+                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.required"> Se requiere correo electrónico </span>
                     <span class="help-block input-error"
-                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Please enter a valid Email</span>
+                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.email"> Por favor ingrese un correo electrónico válido </span>
                 </div>
             </div>
             <div class="form-group">

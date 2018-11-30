@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <string>
+
 #include <camera/camera_plugin.h>
 
 namespace nx {
@@ -11,7 +13,7 @@ namespace audio {
 namespace detail {
 
 void fillCameraAuxiliaryData(nxcip::CameraInfo * cameras, int cameraCount);
-bool pluggedIn(const char * devicePath);
+bool pluggedIn(const std::string& devicePath);
 
 } // namespace detail
 } // namespace audio

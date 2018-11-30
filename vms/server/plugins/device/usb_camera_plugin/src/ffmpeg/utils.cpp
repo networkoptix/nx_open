@@ -11,7 +11,7 @@ namespace utils{
 
 namespace {
 
-int greatestCommonDenominator(int n1, int n2)
+static int greatestCommonDenominator(int n1, int n2)
 {
     int gcd = 1;
     for (int i = 1; i <= n1 && i <= n2; ++i)
@@ -79,7 +79,7 @@ nxcip::DataPacketType toNxDataPacketType(AVMediaType mediaType)
             return nxcip::dptVideo;
         case AVMEDIA_TYPE_AUDIO:
             return nxcip::dptAudio;
-        default: 
+        default:
             return nxcip::dptEmpty;
     }
 }
@@ -183,52 +183,24 @@ AVCodecID toAVCodecId(nxcip::CompressionType codecId)
     }
 }
 
-nxcip::AudioFormat::SampleType toNxSampleType(
-    AVSampleFormat format,
-    bool * planar,
-    bool * ok)
+std::optional<nxcip::AudioFormat::SampleType> toNxSampleType(AVSampleFormat format)
 {
-    const auto setOk = [&ok] (bool value) { if (ok) *ok = value; };
-    const auto setPlanar = [&planar] (bool value) { if (planar) *planar = value; };
-
     switch (format)
     {
         case AV_SAMPLE_FMT_U8:
-            setOk(true);
-            setPlanar(false);
-            return nxcip::AudioFormat::stU8;
         case AV_SAMPLE_FMT_U8P:
-            setOk(true);
-            setPlanar(true);
             return nxcip::AudioFormat::stU8;
         case AV_SAMPLE_FMT_S16:
-            setOk(true);
-            setPlanar(false);
-            return nxcip::AudioFormat::stS16;
         case AV_SAMPLE_FMT_S16P:
-            setOk(true);
-            setPlanar(true);
             return nxcip::AudioFormat::stS16;
         case AV_SAMPLE_FMT_S32:
-            setOk(true);
-            setPlanar(false);
-            return nxcip::AudioFormat::stS32;
         case AV_SAMPLE_FMT_S32P:
-            setOk(true);
-            setPlanar(true);
             return nxcip::AudioFormat::stS32;
         case AV_SAMPLE_FMT_FLT:
-            setOk(true);
-            setPlanar(true);
-            return nxcip::AudioFormat::stFLT;
         case AV_SAMPLE_FMT_FLTP:
-            setOk(true);
-            setPlanar(true);
             return nxcip::AudioFormat::stFLT;
         default:
-            setOk(false);
-            setPlanar(false);
-            return nxcip::AudioFormat::stU8;
+            return std::optional<nxcip::AudioFormat::SampleType>();
     }
 }
 
@@ -279,8 +251,10 @@ AVSampleFormat suggestSampleFormat(const AVCodec * codec)
 
 int suggestSampleRate(const AVCodec * codec)
 {
+    static constexpr int kDefaultSampleRate = 44100;
+
     if (!codec->supported_samplerates)
-        return 44100;
+        return kDefaultSampleRate;
 
     int largest = 0;
     for(const int * sampleRate = codec->supported_samplerates; *sampleRate; ++sampleRate)
@@ -288,35 +262,29 @@ int suggestSampleRate(const AVCodec * codec)
     return largest;
 }
 
-void toFraction(float number, int * outNumerator, int * outDenominator)
+AVRational toFraction(float number, int precision)
 {
     int wholeNumber = (int) number;
     float decimal = number - wholeNumber;
 
     if (!decimal)
-    {
-        *outNumerator = number;
-        *outDenominator = 1;
-        return;
-    }
+        return {(int) number, 1};
 
-    //throwing away higher precision because it's not needed for this use case.
-    int num = decimal * 100;
-    int den = 100;
+    int numerator = decimal * precision;
+    int denominator = precision;
 
     int gcd;
     do
     {
-        gcd = greatestCommonDenominator(num, den);
-        num /= gcd;
-        den /= gcd;
-    }while(gcd != 1);
+        gcd = greatestCommonDenominator(numerator, denominator);
+        numerator /= gcd;
+        denominator /= gcd;
+    }while (gcd != 1);
     
-    if(wholeNumber > 0)
-        num = den * wholeNumber + num;
+    if (wholeNumber > 0)
+        numerator = denominator * wholeNumber + numerator;
     
-    *outNumerator = num;
-    *outDenominator = den;
+    return {numerator, denominator};
 }
 
 } // namespace utils

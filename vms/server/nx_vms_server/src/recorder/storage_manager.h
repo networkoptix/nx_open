@@ -39,7 +39,7 @@
 #include <functional>
 #include "storage_db_pool.h"
 #include "health/system_health.h"
-#include "nx/mediaserver/server_module_aware.h"
+#include "nx/vms/server/server_module_aware.h"
 #include <media_server/media_server_module.h>
 #include <api/helpers/chunks_request_data.h>
 
@@ -59,7 +59,7 @@ class QnScheduleSync;
 
 namespace nx { namespace analytics { namespace storage { class AbstractEventsStorage; }}}
 
-class QnStorageManager: public QObject, public nx::mediaserver::ServerModuleAware
+class QnStorageManager: public QObject, public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
     friend class TestHelper;
@@ -129,7 +129,7 @@ public:
         QnMediaServerModule* serverModule,
         const QnChunksRequestData& request,
         const QList<QnServer::ChunksCatalog> &catalogs);
-    QnRecordingStatsReply getChunkStatistics(qint64 bitrateAnalizePeriodMs);
+    QnRecordingStatsReply getChunkStatistics(qint64 bitrateAnalyzePeriodMs);
 
     void doMigrateCSVCatalog(QnStorageResourcePtr extraAllowedStorage = QnStorageResourcePtr());
     void partialMediaScan(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const DeviceFileCatalog::ScanFilter& filter);
@@ -263,10 +263,10 @@ private:
     void getCamerasWithArchiveInternal(std::set<QString>& result,  const FileCatalogMap& catalog) const;
     void testStoragesDone();
     //QMap<QnUuid, QnRecordingStatsData> getChunkStatisticsInternal(qint64 startTime, qint64 endTime, QnServer::ChunksCatalog catalog);
-    QnRecordingStatsData getChunkStatisticsByCamera(qint64 bitrateAnalizePeriodMs, const QString& uniqueId);
+    QnRecordingStatsData getChunkStatisticsByCamera(qint64 bitrateAnalyzePeriodMs, const QString& uniqueId);
 
-    // get statistics for the whole archive except of bitrate. It's analyzed for the last records of archive only in range <= bitrateAnalizePeriodMs
-    QnRecordingStatsData mergeStatsFromCatalogs(qint64 bitrateAnalizePeriodMs, const DeviceFileCatalogPtr& catalogHi, const DeviceFileCatalogPtr& catalogLow);
+    // get statistics for the whole archive except of bitrate. It's analyzed for the last records of archive only in range <= bitrateAnalyzePeriodMs
+    QnRecordingStatsData mergeStatsFromCatalogs(qint64 bitrateAnalyzePeriodMs, const DeviceFileCatalogPtr& catalogHi, const DeviceFileCatalogPtr& catalogLow);
     void clearAnalyticsEvents(const QMap<QnUuid, qint64>& dataToDelete);
     QMap<QnUuid, qint64> calculateOldestDataTimestampByCamera();
     bool getMinTimes(QMap<QString, qint64>& lastTime);

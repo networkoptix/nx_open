@@ -26,39 +26,39 @@ Packet::~Packet()
     av_packet_free(&m_packet);
 }
 
-int Packet::size() const 
+int Packet::size() const
 {
-    return m_packet->size; 
+    return m_packet->size;
 }
 
-uint8_t* Packet::data() 
+uint8_t* Packet::data()
 {
-    return m_packet->data; 
+    return m_packet->data;
 }
 
 const uint8_t* Packet::data() const
 {
-    return m_packet->data; 
+    return m_packet->data;
 }
 
-int Packet::flags() const 
+int Packet::flags() const
 {
-    return m_packet->flags; 
+    return m_packet->flags;
 }
 
-int64_t Packet::pts() const 
+int64_t Packet::pts() const
 {
-    return m_packet->pts; 
+    return m_packet->pts;
 }
 
-int64_t Packet::dts() const 
+int64_t Packet::dts() const
 {
-    return m_packet->dts; 
+    return m_packet->dts;
 }
 
-AVPacket* Packet::packet() const 
+AVPacket* Packet::packet() const
 {
-    return m_packet; 
+    return m_packet;
 }
 
 void Packet::initialize()
@@ -68,9 +68,9 @@ void Packet::initialize()
     m_packet->size = 0;
 }
 
-void Packet::unreference() 
-{ 
-    av_packet_unref(m_packet); 
+void Packet::unreference()
+{
+    av_packet_unref(m_packet);
 }
 
 int Packet::newPacket(int size)
@@ -78,9 +78,9 @@ int Packet::newPacket(int size)
     return av_new_packet(m_packet, size);
 }
 
-AVCodecID Packet::codecId() const 
+AVCodecID Packet::codecId() const
 {
-    return m_codecId; 
+    return m_codecId;
 }
 
 AVMediaType Packet::mediaType() const
@@ -88,14 +88,14 @@ AVMediaType Packet::mediaType() const
     return m_mediaType;
 }
 
-uint64_t Packet::timestamp() const 
+uint64_t Packet::timestamp() const
 {
-    return m_timestamp; 
+    return m_timestamp;
 }
 
-void Packet::setTimestamp(uint64_t millis) 
+void Packet::setTimestamp(uint64_t millis)
 {
-    m_timestamp = millis; 
+    m_timestamp = millis;
 }
 
 bool Packet::keyPacket() const

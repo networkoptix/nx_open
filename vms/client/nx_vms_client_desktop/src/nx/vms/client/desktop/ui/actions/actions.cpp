@@ -324,8 +324,8 @@ void initialize(Manager* manager, Action* root)
         factory(NewWearableCameraAction)
             .flags(Main | NoTarget)
             .requiredGlobalPermission(GlobalPermission::admin)
-            .text(ContextMenu::tr("Wearable Camera..."))
-            .pulledText(ContextMenu::tr("New Wearable Camera..."))
+            .text(ContextMenu::tr("Virtual Camera..."))
+            .pulledText(ContextMenu::tr("New Virtual Camera..."))
             .condition(condition::isLoggedIn()
                 && !condition::isSafeMode())
             .autoRepeat(false);
@@ -1813,8 +1813,8 @@ void initialize(Manager* manager, Action* root)
     factory(GoToPreviousItemAction)
         .flags(NoTarget);
 
-    factory(GoToResourceAction)
-        .flags(ResourceTarget | SingleTarget)
+    factory(GoToLayoutItemAction)
+        .flags(SingleTarget | ResourceTarget | NoTarget)
         .condition(!condition::isLayoutTourReviewMode() && !condition::tourIsRunning());
 
     factory(ToggleCurrentItemMaximizationStateAction)

@@ -12,7 +12,7 @@
 #include <nx/utils/log/log.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 namespace {
@@ -148,7 +148,7 @@ utils::Url HanwhaRequestHelper::buildRequestUrl(
     const QString& submenu,
     const QString& action,
     const HanwhaRequestHelper::Parameters& parameters,
-    const boost::optional<int>& bypassChannel)
+    const boost::optional<int>& /*bypassChannel*/)
 {
     QUrlQuery query;
 
@@ -305,5 +305,5 @@ nx::utils::Url HanwhaRequestHelper::makeBypassUrl(const nx::utils::Url& url, int
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

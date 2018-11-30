@@ -8,23 +8,26 @@
 //!mediaserver's response to \a recording stats request
 struct QnRecordingStatsData
 {
-public:
-    QnRecordingStatsData(): recordedBytes(0), recordedSecs(0), averageBitrate(0), archiveDurationSecs(0) {}
+    // Totals:
+    qint64 recordedBytes = 0;    // recorded archive in bytes
+    qint64 recordedSecs = 0;     // recorded archive in seconds (total)
+    qint64 archiveDurationSecs = 0; // archive calendar duration in seconds
 
-    qint64 recordedBytes;    // recorded archive in bytes
-    qint64 recordedSecs;     // recorded archive in seconds
-    qint64 averageBitrate;   // average bitrate in bytes/sec
-    qint64 archiveDurationSecs; // archive calendar duration in seconds
+    // For requested time period:
+    qint64 averageBitrate = 0;   // average bitrate (= bytes / sum of chunk duration in seconds)
+    qint64 averageDensity = 0;   // average density (= bytes / requested period in seconds)
+
     QMap<QnUuid, qint64> recordedBytesPerStorage; // more detail data about recorded bytes
-    
-    void operator +=(const QnRecordingStatsData& right) {
+
+    void operator +=(const QnRecordingStatsData& right)
+    {
         recordedBytes += right.recordedBytes;
         recordedSecs += right.recordedSecs;
         archiveDurationSecs += right.archiveDurationSecs;
     }
 
 };
-#define QnRecordingStatsData_Fields (recordedBytes)(recordedSecs)(averageBitrate)(archiveDurationSecs)(recordedBytesPerStorage)
+#define QnRecordingStatsData_Fields (recordedBytes)(recordedSecs)(archiveDurationSecs)(averageBitrate)(averageDensity)(recordedBytesPerStorage)
 
 struct QnCamRecordingStatsData: public QnRecordingStatsData
 {

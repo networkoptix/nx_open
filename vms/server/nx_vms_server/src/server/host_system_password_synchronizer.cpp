@@ -22,7 +22,7 @@
 #include "platform/monitoring/platform_monitor.h"
 
 HostSystemPasswordSynchronizer::HostSystemPasswordSynchronizer(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
     Qn::directConnect(
         resourcePool(), &QnResourcePool::resourceAdded,

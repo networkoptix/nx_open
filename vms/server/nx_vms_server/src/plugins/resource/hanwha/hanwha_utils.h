@@ -37,7 +37,7 @@ inline bool operator<(const QSize& lhs, const QSize& rhs)
 }
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 using HanwhaProfileNumber = int;
@@ -199,5 +199,5 @@ qint64 hanwhaDateTimeToMsec(const QByteArray& value, std::chrono::seconds timeZo
 QDateTime toHanwhaDateTime(qint64 valueMs, std::chrono::seconds timeZoneShift);
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

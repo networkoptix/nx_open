@@ -12,6 +12,10 @@ namespace nx::vms::client::desktop {
 
 class EventTile;
 
+/**
+ * Contains tabs and unread counter. Handles tabs visibility depending on the access rights and the
+ * current context. Also manages global panel context menu (not per-tile).
+ */
 class EventPanel:
     public QWidget,
     public QnWorkbenchContextAware
@@ -27,7 +31,7 @@ public:
 
 signals:
     void unreadCountChanged(int count, QnNotificationLevel::Value importance);
-    void tileHovered(const QModelIndex& index, const EventTile* tile);
+    void tileHovered(const QModelIndex& index, EventTile* tile);
 
 private:
     // We capture mouse press to cancel global context menu.

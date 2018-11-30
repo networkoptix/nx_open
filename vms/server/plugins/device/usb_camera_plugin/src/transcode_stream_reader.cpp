@@ -33,7 +33,7 @@ TranscodeStreamReader::~TranscodeStreamReader()
     // Avoid virtual removeVideoConsumer()
     m_camera->videoStream()->removeFrameConsumer(m_videoFrameConsumer);
     uninitialize();
-}   
+}
 
 int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
@@ -108,7 +108,7 @@ bool TranscodeStreamReader::shouldDrop(const ffmpeg::Frame * frame)
 {
     if (!frame)
         return true;
-    
+
     // If this stream's requested framerate is equal to the cameras' requested framerate,
     // never drop.
     if(m_codecParams.fps >= m_camera->videoStream()->fps())
@@ -125,7 +125,7 @@ bool TranscodeStreamReader::shouldDrop(const ffmpeg::Frame * frame)
     // If the time stamp of this frame minus the amount of time per video frame is lower
     // than the timestamp of the last transcoded frame, we should drop.
     bool drop = now - m_timePerFrame < m_lastTimestamp;
-    
+
     if (!drop)
         m_lastTimestamp = now;
 
@@ -180,7 +180,7 @@ int TranscodeStreamReader::encode(const ffmpeg::Frame* frame, ffmpeg::Packet * o
 
 bool TranscodeStreamReader::waitForTimeSpan(
     const std::chrono::milliseconds& timeSpan,
-    const std::chrono::milliseconds& timeOut)
+    const std::chrono::milliseconds& timeout)
 {
     uint64_t waitStart = m_camera->millisSinceEpoch();
     for (;;)
@@ -188,21 +188,22 @@ bool TranscodeStreamReader::waitForTimeSpan(
         if (m_interrupted)
             return false;
 
-        std::set<uint64_t> allTimeStamps;
-        
+        std::set<uint64_t> allTimestamps;
+
         auto videoTimeStamps = m_videoFrameConsumer->timestamps();
         for (const auto & k : videoTimeStamps)
-            allTimeStamps.insert(k);
-        
+            allTimestamps.insert(k);
+
         auto audioTimeStamps = m_avConsumer->timestamps();
         for (const auto & k : audioTimeStamps)
-            allTimeStamps.insert(k);
+            allTimestamps.insert(k);
 
-        if (allTimeStamps.empty() 
-            || *allTimeStamps.rbegin() - *allTimeStamps.begin() < timeSpan.count())
+        if (allTimestamps.empty() 
+            || *allTimestamps.rbegin() - *allTimestamps.begin() < timeSpan.count())
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            if (m_camera->millisSinceEpoch() - waitStart >= timeOut.count())
+            static constexpr std::chrono::milliseconds kSleep(1);
+            std::this_thread::sleep_for(kSleep);
+            if (m_camera->millisSinceEpoch() - waitStart >= timeout.count())
                 return false;
         }
         else
@@ -244,40 +245,40 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxErr
     {
         for (;;)
         {
-            auto videoFrame = m_videoFrameConsumer->popOldest(kWaitTimeOut);
+            auto videoFrame = m_videoFrameConsumer->popOldest(kWaitTimeout);
             if (interrupted() || ioError())
                 return nullptr;
             if (!shouldDrop(videoFrame.get()))
                 return transcodeVideo(videoFrame.get(), outNxError);
         }
     }
-    
+
     // Audio enabled
     for(;;)
     {
-        if (waitForTimeSpan(m_camera->videoStream()->actualTimePerFrame(), kWaitTimeOut))
+        if (waitForTimeSpan(m_camera->videoStream()->actualTimePerFrame(), kWaitTimeout))
             break;
         else if (interrupted() || ioError())
             return nullptr;
     }
 
-    static const std::chrono::milliseconds timeOut = std::chrono::milliseconds(1);
+    static constexpr std::chrono::milliseconds kTimeout(1);
 
     for (;;)
     {
-        auto videoFrame = m_videoFrameConsumer->popOldest(timeOut);
-        if (interrupted() || ioError())
-            return nullptr;
-        if (!shouldDrop(videoFrame.get()))
         {
-            if (auto videoPacket = transcodeVideo(videoFrame.get(), outNxError))
-                m_avConsumer->givePacket(videoPacket);
+            // videoFrame needs to be released after this scope to prevent deadlock
+            auto videoFrame = m_videoFrameConsumer->popOldest(kTimeout);
+            if (interrupted() || ioError())
+                return nullptr;
+            if (!shouldDrop(videoFrame.get()))
+            {
+                if (auto videoPacket = transcodeVideo(videoFrame.get(), outNxError))
+                    m_avConsumer->givePacket(videoPacket);
+            }
         }
 
-        // Release the reference so that internally VideoStream::m_frameCount will be decremented.
-        videoFrame = nullptr;
-
-        auto peeked = m_avConsumer->peekOldest(timeOut);
+        auto peeked = m_avConsumer->peekOldest(kTimeout);
         if (!peeked)
         {
             if (interrupted() || ioError())
@@ -285,19 +286,19 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxErr
             continue;
         }
 
-        auto popped =  m_avConsumer->popOldest(kWaitTimeOut);
+        auto popped =  m_avConsumer->popOldest(kTimeout);
         if(!popped)
         {
             if (interrupted() || ioError())
                 return nullptr;
         }
-        
+
         return popped;
     }
 }
 
 bool TranscodeStreamReader::ensureInitialized()
-{   
+{
     if (m_initCode < 0)
         return false;
 
@@ -380,7 +381,7 @@ int TranscodeStreamReader::initializeScaledFrame(const ffmpeg::Codec* encoder)
     auto scaledFrame = std::make_unique<ffmpeg::Frame>();
     if (!scaledFrame || !scaledFrame->frame())
         return AVERROR(ENOMEM);
-    
+
     AVPixelFormat encoderFormat = ffmpeg::utils::unDeprecatePixelFormat(
         encoder->codec()->pix_fmts[0]);
 
@@ -388,7 +389,7 @@ int TranscodeStreamReader::initializeScaledFrame(const ffmpeg::Codec* encoder)
         encoderFormat,
         m_codecParams.resolution.width,
         m_codecParams.resolution.height, 32);
-    
+
     if (result < 0)
         return result;
 
@@ -402,7 +403,7 @@ void TranscodeStreamReader::setEncoderOptions(ffmpeg::Codec* encoder)
     encoder->setResolution(m_codecParams.resolution.width, m_codecParams.resolution.height);
     encoder->setBitrate(m_codecParams.bitrate);
     encoder->setPixelFormat(ffmpeg::utils::suggestPixelFormat(encoder->codec()));
-    
+
     AVCodecContext* context = encoder->codecContext();
 
     context->mb_decision = FF_MB_DECISION_BITS;
@@ -417,7 +418,7 @@ int TranscodeStreamReader::scale(const AVFrame * frame, AVFrame* outFrame)
     AVPixelFormat pixelFormat = frame->format != -1 
         ? (AVPixelFormat)frame->format 
         : m_camera->videoStream()->decoderPixelFormat();
-        
+
     struct SwsContext * scaleContext = sws_getCachedContext(
         nullptr,
         frame->width,

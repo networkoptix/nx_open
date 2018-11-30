@@ -63,7 +63,7 @@ bool QnCachingCameraDataLoader::supportedResource(const QnMediaResourcePtr &reso
 
 void QnCachingCameraDataLoader::init() {
     // TODO: #GDM 2.4 move to camera history
-    if(m_resource.dynamicCast<QnNetworkResource>()) 
+    if(m_resource.dynamicCast<QnNetworkResource>())
     {
         connect(qnSyncTime, &QnSyncTime::timeChanged,
                 this, &QnCachingCameraDataLoader::discardCachedData);
@@ -229,17 +229,11 @@ bool QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType)
 
         case Qn::MotionContent:
         {
-            if (!isMotionRegionsEmpty())
-            {
-                const auto filter = QString::fromUtf8(QJson::serialized(m_motionRegions));
-                handle = loader->load(filter);
-            }
-            else if (!m_cameraChunks[Qn::MotionContent].isEmpty())
-            {
-                m_cameraChunks[Qn::MotionContent].clear();
-                emit periodsChanged(Qn::MotionContent);
-                return true;
-            }
+            const auto filter = isMotionRegionsEmpty()
+                ? QString() //< Treat empty selection as whole area selection.
+                : QJson::serialized(m_motionRegions);
+
+            handle = loader->load(filter);
             break;
         }
 

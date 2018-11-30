@@ -12,7 +12,7 @@
 #include <network/universal_tcp_listener.h>
 
 QnRestoreStateRestHandler::QnRestoreStateRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

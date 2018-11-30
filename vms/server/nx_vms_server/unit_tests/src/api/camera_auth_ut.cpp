@@ -62,13 +62,13 @@ protected:
     void checkAmendTransaction()
     {
         auto originalTran = createTran<Data>(
-            Qn::CAMERA_CREDENTIALS_PARAM_NAME,
+            ResourcePropertyKey::kCredentials,
             "testValue");
         auto amendedTran = whenTransactionProcessed(originalTran);
         thenItShouldBeAmended(originalTran, amendedTran);
 
         originalTran = createTran<Data>(
-            Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME,
+            ResourcePropertyKey::kDefaultCredentials,
             "testValue");
         amendedTran = whenTransactionProcessed(originalTran);
         thenItShouldBeAmended(originalTran, amendedTran);
@@ -84,23 +84,33 @@ protected:
     void checkOutputDataAmending()
     {
         assertParamsRestored<Data>(
-            /* param name */ Qn::CAMERA_CREDENTIALS_PARAM_NAME,
+            /* param name */ ResourcePropertyKey::kCredentials,
             /* access */ Qn::kSystemAccess,
             /* should be equal */ true);
 
         assertParamsRestored<Data>(
-            /* param name */ Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME,
+            /* param name */ ResourcePropertyKey::kDefaultCredentials,
             /* access */ Qn::kSystemAccess,
             /* should be equal */ true);
 
         assertParamsRestored<Data>(
-            /* param name */ Qn::CAMERA_CREDENTIALS_PARAM_NAME,
+            /* param name */ ResourcePropertyKey::kCredentials,
             /* access */ Qn::kVideowallUserAccess,
+            /* should be equal */ true);
+
+        assertParamsRestored<Data>(
+            /* param name */ ResourcePropertyKey::kDefaultCredentials,
+            /* access */ Qn::kVideowallUserAccess,
+            /* should be equal */ true);
+
+        assertParamsRestored<Data>(
+            /* param name */ ResourcePropertyKey::kCredentials,
+            Qn::UserAccessData(QnUuid::createUuid(), Qn::UserAccessData::Access::Default),
             /* should be equal */ false);
 
         assertParamsRestored<Data>(
-            /* param name */ Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME,
-            /* access */ Qn::kVideowallUserAccess,
+            /* param name */ ResourcePropertyKey::kDefaultCredentials,
+            Qn::UserAccessData(QnUuid::createUuid(), Qn::UserAccessData::Access::Default),
             /* should be equal */ false);
     }
 
@@ -112,7 +122,7 @@ protected:
     {
         auto originalTran = createTran<Data>(paramName, "user:password");
         auto amendedTran = whenTransactionProcessed(originalTran);
-        ec2::detail::amendOutputDataIfNeeded(accessData, &amendedTran.params);
+        ec2::amendOutputDataIfNeeded(accessData, &amendedTran.params);
 
         if (shouldBeEqual)
         {
@@ -160,7 +170,7 @@ protected:
 
         ASSERT_TRUE(camera);
         camera->setAuth("user", "password");
-        camera->saveParams();
+        camera->saveProperties();
     }
 
     void whenRequestedViaApi()
@@ -173,7 +183,7 @@ protected:
 
     void thenItShouldBeObfuscated()
     {
-        assertDataListEntry(Qn::CAMERA_CREDENTIALS_PARAM_NAME, "user:******", true);
+        assertDataListEntry(ResourcePropertyKey::kCredentials, "user:******", true);
     }
 
     void whenRequestedViaResource()
@@ -182,19 +192,19 @@ protected:
         const auto auth = m_server->serverModule()->commonModule()->resourcePool()
             ->getResourceById<QnNetworkResource>(m_cameraData.id)->getAuth();
         m_dataList.push_back(vms::api::ResourceParamWithRefData(m_cameraData.id,
-            Qn::CAMERA_CREDENTIALS_PARAM_NAME, auth.user() + ":" + auth.password()));
+            ResourcePropertyKey::kCredentials, auth.user() + ":" + auth.password()));
     }
 
     void thenItShouldBeUncrypted()
     {
-        assertDataListEntry(Qn::CAMERA_CREDENTIALS_PARAM_NAME, "user:password", true);
+        assertDataListEntry(ResourcePropertyKey::kCredentials, "user:password", true);
     }
 
     void whenAuthSetViaApi()
     {
         vms::api::ResourceParamWithRefDataList dataList;
         dataList.push_back(vms::api::ResourceParamWithRefData(m_cameraData.id,
-            Qn::CAMERA_CREDENTIALS_PARAM_NAME, "user:password"));
+            ResourcePropertyKey::kCredentials, "user:password"));
         NX_TEST_API_POST(m_server.get(), "/ec2/setResourceParams", dataList);
     }
 

@@ -6,9 +6,7 @@
 #include "isd_stream_reader.h"
 #include "isd_resource.h"
 
-
 const QString QnPlIsdResource::MANUFACTURE(lit("ISD"));
-QString QnPlIsdResource::MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
 
 static QStringList getValues(const QString& line)
 {
@@ -31,9 +29,8 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
 
 // ==================================================================
 
-
 QnPlIsdResource::QnPlIsdResource(QnMediaServerModule* serverModule):
-    nx::mediaserver::resource::Camera(serverModule)
+    nx::vms::server::resource::Camera(serverModule)
 {
     setVendor(lit("ISD"));
 }
@@ -85,11 +82,11 @@ void QnPlIsdResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnPlIsdResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnPlIsdResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me
-    return nx::mediaserver::resource::StreamCapabilityMap();
+    return nx::vms::server::resource::StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result QnPlIsdResource::initializeCameraDriver()
@@ -107,7 +104,6 @@ CameraDiagnostics::Result QnPlIsdResource::initializeCameraDriver()
     apiRequestUrl.setHost( getHostAddress() );
     apiRequestUrl.setPort( QUrl(getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT) );
 
-
     //reading resolution list
     CameraDiagnostics::Result result;
 
@@ -119,7 +115,6 @@ CameraDiagnostics::Result QnPlIsdResource::initializeCameraDriver()
         return result;
 
     QStringList vals = getValues(QLatin1String(reslst));
-
 
     QList<QSize> resolutions;
 
@@ -135,8 +130,6 @@ CameraDiagnostics::Result QnPlIsdResource::initializeCameraDriver()
     if (resolutions.size() < 1 )
         return CameraDiagnostics::CameraInvalidParams(lit("resolution"));
 
-
-
     std::sort(resolutions.begin(), resolutions.end(), sizeCompare);
 
     {
@@ -144,11 +137,8 @@ CameraDiagnostics::Result QnPlIsdResource::initializeCameraDriver()
         m_resolution1 = resolutions[0];
         m_resolution2 = QSize(0,0);
 
-
         double maxResolutionSquare = m_resolution1.width() * m_resolution1.height();
         double requestSquare = 480 * 316;
-
-
 
         int bestIndex = 0;
         double bestMatchCoeff = maxResolutionSquare / requestSquare;
@@ -174,7 +164,6 @@ CameraDiagnostics::Result QnPlIsdResource::initializeCameraDriver()
 
             double square = resolutions[i].width() * resolutions[i].height();
 
-
             double matchCoeff = qMax(requestSquare, square) / qMin(requestSquare, square);
 
             if (matchCoeff <= bestMatchCoeff + 0.002)
@@ -188,7 +177,6 @@ CameraDiagnostics::Result QnPlIsdResource::initializeCameraDriver()
             m_resolution2 = resolutions[bestIndex];
 
     }
-
 
     //reading fps list
 
@@ -215,9 +203,8 @@ CameraDiagnostics::Result QnPlIsdResource::initializeCameraDriver()
     setMaxFps(fpsList.at(0));
 
     setProperty(
-        Qn::SUPPORTED_MOTION_PARAM_NAME,
-        qnResTypePool->getResourceType( getTypeId() )->defaultValue( Qn::SUPPORTED_MOTION_PARAM_NAME ) );
-
+        ResourcePropertyKey::kSupportedMotion,
+        qnResTypePool->getResourceType( getTypeId() )->defaultValue(ResourcePropertyKey::kSupportedMotion) );
 
     //reading firmware version
 
@@ -231,9 +218,9 @@ CameraDiagnostics::Result QnPlIsdResource::initializeCameraDriver()
     const int sepPos = cameraFirmwareVersion.indexOf('=');
     setFirmware( QLatin1String( sepPos != -1 ? cameraFirmwareVersion.mid( sepPos+1 ) : cameraFirmwareVersion ) );
 
-    setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, 1);
+    setProperty(ResourcePropertyKey::kIsAudioSupported, 1);
     //setMotionType( Qn::MotionType::MT_SoftwareGrid );
-    saveParams();
+    saveProperties();
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -250,7 +237,6 @@ QSize QnPlIsdResource::getSecondaryResolution() const
     return m_resolution2;
 }
 
-
 QnAbstractStreamDataProvider* QnPlIsdResource::createLiveDataProvider()
 {
     return new QnISDStreamReader(toSharedPointer(this));
@@ -258,11 +244,6 @@ QnAbstractStreamDataProvider* QnPlIsdResource::createLiveDataProvider()
 
 void QnPlIsdResource::setCroppingPhysical(QRect /*cropping*/)
 {
-}
-
-void QnPlIsdResource::setMaxFps(int f)
-{
-    setProperty(MAX_FPS_PARAM_NAME, f);
 }
 
 CameraDiagnostics::Result QnPlIsdResource::doISDApiRequest( const nx::utils::Url& apiRequestUrl, QByteArray* const msgBody )

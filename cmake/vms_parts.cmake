@@ -83,6 +83,11 @@ cmake_dependent_option(withDistributions "Enable distributions build"
     ON
 )
 
+cmake_dependent_option(withAnalyticsSdk "Enable nx_analytics_sdk build"
+    OFF "NOT withDistributions"
+    ON
+)
+
 option(enableHanwha OFF "Enable hanwha camera vendor even if it is disabled by default")
 mark_as_advanced(enableHanwha)
 

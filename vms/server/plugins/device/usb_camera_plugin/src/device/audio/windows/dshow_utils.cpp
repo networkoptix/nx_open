@@ -38,20 +38,16 @@ void fillCameraAuxiliaryData(nxcip::CameraInfo* cameras, int cameraCount)
             if (audioTaken[device])
                 continue;
 
-            if(device->data.deviceName.find(camera->modelName) != std::string::npos)
+            if(device->data.name.find(camera->modelName) != std::string::npos)
             {
                 mute = false;
                 audioTaken[device] = true;
-                
-                // Duplicate audio devices in windows are prepended with an index, making them
-                // unique. Therefore, it is safe to use the device name instead of its path. In
-                // fact, the path requires further parsing before use by ffmpeg, as ffmpeg
-                // replaces all ':' chars wtih '_' in audio alternative names. Oddly, it does not
-                // do this for video.
+
                 strncpy(
                     camera->auxiliaryData,
-                    device->data.deviceName.c_str(),
+                    device->data.path.c_str(),
                     sizeof(camera->auxiliaryData) - 1);
+
                 break;
             }
         }
@@ -65,18 +61,18 @@ void fillCameraAuxiliaryData(nxcip::CameraInfo* cameras, int cameraCount)
         {
             strncpy(
                 muteCamera->auxiliaryData,
-                defaults[0]->data.deviceName.c_str(),
+                defaults[0]->data.name.c_str(),
                 sizeof(muteCamera->auxiliaryData) - 1);
         }
     }
 }
 
-bool pluggedIn(const char * devicePath)
+bool pluggedIn(const std::string& devicePath)
 {
     auto devices = video::detail::getAudioDeviceList();
     for (const auto & device : devices)
     {
-        if (strcmp(device.data.deviceName.c_str(), devicePath) == 0)
+        if (device.data.path == devicePath)
             return true;
     }
     return false;

@@ -3,10 +3,10 @@
 
     <div class="col-12 p-0" style="min-height: 80px;">
         <nx-pre-loader type="page" *ngIf="!activeBuilds"></nx-pre-loader>
-        <ngb-tabset *ngIf="downloadTypes"
+        <ngb-tabset *ngIf="noteTypes"
                     (tabChange)="beforeChange($event)" #tabs>
 
-            <ngb-tab *ngFor="let type of downloadTypes"
+            <ngb-tab *ngFor="let type of noteTypes"
                      [id]="type">
                 <ng-template ngbTabTitle *ngIf="!hideTabs">
                     <span class="tab-heading">{{language.lang.downloads.releasesTypes[type] || type.name}}</span>
@@ -15,7 +15,7 @@
                     <div class="card card-default">
                         <div class="card-body" *ngIf="activeBuilds">
                             <div *ngFor="let release of activeBuilds">
-                                <nx-release [release]="release"></nx-release>
+                                <nx-release [release]="release" [linkbase]="linkbase"></nx-release>
                             </div>
                         </div>
                     </div>

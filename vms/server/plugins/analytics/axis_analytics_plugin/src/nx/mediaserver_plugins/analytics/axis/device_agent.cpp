@@ -59,10 +59,9 @@ void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-nx::sdk::Error DeviceAgent::setMetadataHandler(
-    nx::sdk::analytics::MetadataHandler* metadataHandler)
+nx::sdk::Error DeviceAgent::setHandler(nx::sdk::analytics::DeviceAgent::IHandler* handler)
 {
-    m_metadataHandler = metadataHandler;
+    m_handler = handler;
     return nx::sdk::Error::noError;
 }
 
@@ -83,7 +82,7 @@ void DeviceAgent::setSettings(const nx::sdk::Settings* settings)
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::Settings* DeviceAgent::settings() const
+nx::sdk::Settings* DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }
@@ -91,7 +90,7 @@ nx::sdk::Settings* DeviceAgent::settings() const
 nx::sdk::Error DeviceAgent::startFetchingMetadata(
     const nx::sdk::analytics::IMetadataTypes* metadataTypes)
 {
-    m_monitor = new Monitor(this, m_url, m_auth, m_metadataHandler);
+    m_monitor = new Monitor(this, m_url, m_auth, m_handler);
     return m_monitor->startMonitoring(metadataTypes);
 }
 

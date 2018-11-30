@@ -13,7 +13,7 @@
 #include <nx/utils/basic_service_settings.h>
 #include <nx/utils/std/optional.h>
 
-#include <nx/data_sync_engine/p2p_sync_settings.h>
+#include <nx/clusterdb/engine/p2p_sync_settings.h>
 
 #include "access_control/login_enumeration_protector.h"
 
@@ -49,6 +49,7 @@ class AccountManager
 public:
     std::chrono::seconds accountActivationCodeExpirationTimeout;
     std::chrono::seconds passwordResetCodeExpirationTimeout;
+    std::chrono::milliseconds removeExpiredTemporaryCredentialsPeriod;
 
     AccountManager();
 };
@@ -141,7 +142,7 @@ public:
     const AccountManager& accountManager() const;
     const SystemManager& systemManager() const;
     const EventManager& eventManager() const;
-    const data_sync_engine::SynchronizationSettings& p2pDb() const;
+    const clusterdb::engine::SynchronizationSettings& p2pDb() const;
     const QString& changeUser() const;
     const ModuleFinder& moduleFinder() const;
     const Http& http() const;
@@ -160,7 +161,7 @@ private:
     AccountManager m_accountManager;
     SystemManager m_systemManager;
     EventManager m_eventManager;
-    data_sync_engine::SynchronizationSettings m_p2pDb;
+    clusterdb::engine::SynchronizationSettings m_p2pDb;
     QString m_changeUser;
     ModuleFinder m_moduleFinder;
     Http m_http;

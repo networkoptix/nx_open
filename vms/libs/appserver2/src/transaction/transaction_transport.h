@@ -11,15 +11,14 @@
 
 namespace ec2 {
 
-class QnTransactionTransport
-:
+class QnTransactionTransport:
     public QnTransactionTransportBase
 {
 public:
     /** Initializer for incoming connection */
     QnTransactionTransport(
         TransactionMessageBusBase* bus,
-        const QnUuid& connectionGuid,
+        const std::string& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
         const nx::vms::api::PeerData& localPeer,
         const nx::vms::api::PeerData& remotePeer,

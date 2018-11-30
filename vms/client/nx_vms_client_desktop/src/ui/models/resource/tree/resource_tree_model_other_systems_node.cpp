@@ -74,7 +74,11 @@ void QnResourceTreeModelOtherSystemsNode::handleSystemDiscovered(const QnSystemD
     /* Only cloud systems are handled here. */
     const QString id = system->id();
 
-    m_disconnectHelpers[id] << connect(system, &QnBaseSystemDescription::isCloudSystemChanged, this,
+    auto& connections = m_connections[id];
+    if (!connections)
+        connections.reset(new nx::utils::ScopedConnections());
+
+    *connections << connect(system, &QnBaseSystemDescription::isCloudSystemChanged, this,
         [this, system, id]
         {
             if (canSeeCloudSystem(system))
@@ -90,7 +94,7 @@ void QnResourceTreeModelOtherSystemsNode::handleSystemDiscovered(const QnSystemD
 void QnResourceTreeModelOtherSystemsNode::handleSystemLost(const QString& id)
 {
     /* Only cloud systems are handled here. */
-    m_disconnectHelpers.remove(id);
+    m_connections.remove(id);
     removeNode(m_cloudNodes.value(id));
 }
 

@@ -45,15 +45,15 @@ void BufferedPacketConsumer::flush()
 }
 
 std::shared_ptr<ffmpeg::Packet> BufferedPacketConsumer::popOldest(
-    const std::chrono::milliseconds& timeOut)
+    const std::chrono::milliseconds& timeout)
 {
-    return m_buffer.popOldest(timeOut);
+    return m_buffer.popOldest(timeout);
 }
 
 std::shared_ptr<ffmpeg::Packet> BufferedPacketConsumer::peekOldest(
-    const std::chrono::milliseconds& timeOut)
+    const std::chrono::milliseconds& timeout)
 {
-    return m_buffer.peekOldest(timeOut);
+    return m_buffer.peekOldest(timeout);
 }
 
 void BufferedPacketConsumer::interrupt()
@@ -63,9 +63,9 @@ void BufferedPacketConsumer::interrupt()
 
 bool BufferedPacketConsumer::waitForTimeSpan(
     const std::chrono::milliseconds& timeSpan,
-    const std::chrono::milliseconds& timeOut)
+    const std::chrono::milliseconds& timeout)
 {
-    return m_buffer.waitForTimeSpan(timeSpan, timeOut);
+    return m_buffer.waitForTimeSpan(timeSpan, timeout);
 }
 
 std::chrono::milliseconds BufferedPacketConsumer::timeSpan() const
@@ -113,9 +113,9 @@ void BufferedVideoFrameConsumer::giveFrame(const std::shared_ptr<ffmpeg::Frame>&
 }
 
 std::shared_ptr<ffmpeg::Frame> BufferedVideoFrameConsumer::popOldest(
-    const std::chrono::milliseconds& timeOut)
+    const std::chrono::milliseconds& timeout)
 {
-    return m_buffer.popOldest(timeOut);
+    return m_buffer.popOldest(timeout);
 }
 
 void BufferedVideoFrameConsumer::interrupt()

@@ -1,6 +1,9 @@
 #include "db_helper.h"
 
 #include <QtCore/QCoreApplication>
+#include <QtCore/QFileInfo>
+#include <QtCore/QDir>
+#include <QtCore/QDateTime>
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlRecord>
 #include <QtSql/QSqlError>

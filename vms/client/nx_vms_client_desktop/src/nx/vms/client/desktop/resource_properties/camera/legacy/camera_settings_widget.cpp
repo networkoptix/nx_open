@@ -302,9 +302,9 @@ void CameraSettingsWidget::updateInvalidText()
     }
 
     if (hasWearable && hasNonWearable)
-        m_invalidWidget->setText(tr("Cannot edit properties for several wearable and non-wearable cameras."));
+        m_invalidWidget->setText(tr("Cannot edit properties for several virtual and non-virtual cameras."));
     else if (hasWearable)
-        m_invalidWidget->setText(tr("Cannot edit properties for several wearable cameras."));
+        m_invalidWidget->setText(tr("Cannot edit properties for several virtual cameras."));
     else
         m_invalidWidget->setText(QString());
 }

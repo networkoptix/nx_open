@@ -3,7 +3,7 @@
 #include <network/tcp_connection_priv.h>
 #include <network/universal_tcp_listener.h>
 #include <nx_ec/data/api_conversion_functions.h>
-#include <nx/mediaserver/ldap_manager.h>
+#include <nx/vms/server/ldap_manager.h>
 #include <utils/common/ldap.h>
 
 int QnTestLdapSettingsHandler::executePost(
@@ -19,7 +19,7 @@ int QnTestLdapSettingsHandler::executePost(
     QnLdapUsers ldapUsers;
     const auto ldapResult = QnUniversalTcpListener::authenticator(owner->owner())->ldapManager()
         ->fetchUsers(ldapUsers, settings);
-    if (ldapResult != nx::mediaserver::LdapResult::NoError)
+    if (ldapResult != nx::vms::server::LdapResult::NoError)
     {
         result.setError(QnRestResult::CantProcessRequest, toString(ldapResult));
         return nx::network::http::StatusCode::ok;

@@ -21,8 +21,8 @@
 #include <nx/utils/log/log.h>
 #include "utils/common/synctime.h"
 #include <nx/vms/event/rule.h>
-#include <nx/mediaserver/event/rule_processor.h>
-#include <nx/mediaserver/event/event_connector.h>
+#include <nx/vms/server/event/rule_processor.h>
+#include <nx/vms/server/event/event_connector.h>
 #include <media_server/serverutil.h>
 #include "licensing/license.h"
 #include "mutex/camera_data_handler.h"
@@ -45,7 +45,7 @@ QnRecordingManager::QnRecordingManager(
     QnMediaServerModule* serverModule,
     ec2::QnDistributedMutexManager* mutexManager)
 :
-    nx::mediaserver::ServerModuleAware(serverModule),
+    nx::vms::server::ServerModuleAware(serverModule),
     m_mutex(QnMutex::Recursive),
     m_mutexManager(mutexManager)
 {
@@ -53,7 +53,7 @@ QnRecordingManager::QnRecordingManager(
     m_licenseMutex = nullptr;
     connect(
         this, &QnRecordingManager::recordingDisabled,
-        serverModule->eventConnector(), &nx::mediaserver::event::EventConnector::at_licenseIssueEvent);
+        serverModule->eventConnector(), &nx::vms::server::event::EventConnector::at_licenseIssueEvent);
     m_recordingStopTime = serverModule->settings().forceStopRecordingTime();
     m_recordingStopTime *= 1000 * 60;
 
@@ -653,7 +653,7 @@ void QnRecordingManager::disableLicensesIfNeed()
                 camera->setLicenseUsed(true); // rollback
                 continue;
             }
-            camera->saveParams();
+            camera->saveProperties();
             NX_INFO(this, "Turn off recording for camera %1 because there is not enough licenses",
                 camera->getUniqueId());
             disabledCameras << camera->getId().toString();

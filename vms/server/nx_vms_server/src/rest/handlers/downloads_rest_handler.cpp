@@ -8,7 +8,6 @@
 #include <nx/utils/file_system.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <recorder/storage_manager.h>
-#include <nx/vms/common/p2p/downloader/validate_result.h>
 #include "downloads_rest_handler.h"
 
 using nx::vms::common::p2p::downloader::Downloader;
@@ -31,7 +30,6 @@ struct Request
         chunk,
         status,
         checksums,
-        validate,
     };
 
     QString fileName;
@@ -76,12 +74,6 @@ struct Request
             subject = Subject::chunk;
             sections.remove(sections.size() - 2, 2);
         }
-        else if (sections.last().contains("validate"))
-        {
-            subject = Subject::validate;
-            url = QString::fromLocal8Bit(QByteArray::fromBase64(sections[0].toString().toLatin1()));
-            return;
-        }
 
         if (!sections.isEmpty())
         {
@@ -123,7 +115,6 @@ public:
         const QByteArray& body,
         const QByteArray& contentType);
     int handleStatus(const QString& fileName);
-    int handleValidate(const QString& url);
 
     int makeError(
         int httpStatusCode,
@@ -461,40 +452,6 @@ int Helper::handleStatus(const QString& fileName)
     return nx::network::http::StatusCode::ok;
 }
 
-int Helper::handleValidate(const QString& url)
-{
-    if (url.isEmpty())
-    {
-        NX_ERROR(this, lm("[Downloader, validate] Url is empty"));
-        return makeError(
-            nx::network::http::StatusCode::unprocessableEntity,
-            QnRestResult::Error::InvalidParameter, "Url is empty");
-    }
-
-    static const QString expectedKey = "expected";
-    if (params.find(expectedKey) == params.cend())
-    {
-        NX_ERROR(this, lm("[Downloader, validate] No 'expected' parameter"));
-        return makeError(
-            nx::network::http::StatusCode::unprocessableEntity,
-            QnRestResult::Error::InvalidParameter, "No 'expected' parameter");
-    }
-
-    using namespace nx::vms::common::p2p::downloader;
-
-    auto validateResult = ValidateResult(Downloader::validate(url, /* onlyConnectionCheck */ false,
-        params.value(expectedKey).toInt()));
-
-    NX_VERBOSE(
-        this,
-        lm("[Downloader, validate] validating %1, result: %2").args(url, validateResult.success));
-
-    QnFusionRestHandlerDetail::serializeJsonRestReply(
-        validateResult, params, result, resultContentType, QnRestResult());
-
-    return nx::network::http::StatusCode::ok;
-}
-
 int Helper::makeError(
     int httpStatusCode,
     const QnRestResult::Error& error,
@@ -584,7 +541,7 @@ boost::optional<int> hasError(const Request& request, Helper& helper)
 } // namespace
 
 QnDownloadsRestHandler::QnDownloadsRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 
@@ -608,8 +565,6 @@ int QnDownloadsRestHandler::executeGet(
             return helper.handleGetChunkChecksums(request.fileName);
         case Request::Subject::status:
             return helper.handleStatus(request.fileName);
-        case Request::Subject::validate:
-            return helper.handleValidate(request.url);
         default:
             return nx::network::http::StatusCode::badRequest;
     }

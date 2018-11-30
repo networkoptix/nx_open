@@ -10,8 +10,8 @@
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
 #include <nx/utils/log/log.h>
-#include <nx/mediaserver/fs/media_paths/media_paths.h>
-#include <nx/mediaserver/fs/media_paths/media_paths_filter_config.h>
+#include <nx/vms/server/fs/media_paths/media_paths.h>
+#include <nx/vms/server/fs/media_paths/media_paths_filter_config.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/app_info.h>
 
@@ -69,7 +69,7 @@ QnStorageResourceList UnmountedLocalStoragesFilter::getUnmountedStorages(
 bool isStorageUnmounted(
     QnPlatformAbstraction* platform,
     const QnStorageResourcePtr& storage,
-    const nx::mediaserver::Settings* settings)
+    const nx::vms::server::Settings* settings)
 {
     return getUnmountedStorages(
         platform,
@@ -79,15 +79,15 @@ bool isStorageUnmounted(
 QnStorageResourceList getUnmountedStorages(
     QnPlatformAbstraction* platform,
     const QnStorageResourceList& allServerStorages,
-    const nx::mediaserver::Settings* settings)
+    const nx::vms::server::Settings* settings)
 {
     nx::mserver_aux::UnmountedLocalStoragesFilter unmountedLocalStoragesFilter(QnAppInfo::mediaFolderName());
 
-    using namespace nx::mediaserver::fs::media_paths;
+    using namespace nx::vms::server::fs::media_paths;
 
     auto mediaPathList = get(FilterConfig::createDefault(platform, /*includeNonHdd*/ true, settings));
     NX_VERBOSE(
-        nx::utils::log::Tag(typeid(UnmountedLocalStoragesFilter)),
+        typeid(UnmountedLocalStoragesFilter),
         lm("Record folders: %1").container(mediaPathList));
 
     QnStorageResourceList filteredStorages;
@@ -160,12 +160,12 @@ QnUuid LocalSystemIndentityHelper::generateLocalSystemId() const
     return guidFromArbitraryData(m_systemNameString + m_settings->getMaxServerKey());
 }
 
-class ServerSystemNameProxy: public SystemNameProxy, nx::mediaserver::ServerModuleAware
+class ServerSystemNameProxy: public SystemNameProxy, nx::vms::server::ServerModuleAware
 {
 public:
     ServerSystemNameProxy(QnMediaServerModule* serverModule)
         :
-        nx::mediaserver::ServerModuleAware(serverModule),
+        nx::vms::server::ServerModuleAware(serverModule),
         m_systemName(serverModule)
     {
     }
@@ -177,7 +177,7 @@ public:
 
     virtual void clearFromConfig() override
     {
-        nx::mediaserver::SystemName(serverModule()).saveToConfig();
+        nx::vms::server::SystemName(serverModule()).saveToConfig();
     }
 
     virtual void resetToDefault() override
@@ -197,7 +197,7 @@ public:
     }
 
 private:
-    nx::mediaserver::SystemName m_systemName;
+    nx::vms::server::SystemName m_systemName;
 };
 
 SystemNameProxyPtr createServerSystemNameProxy(QnMediaServerModule* serverModule)
@@ -205,12 +205,12 @@ SystemNameProxyPtr createServerSystemNameProxy(QnMediaServerModule* serverModule
     return std::unique_ptr<SystemNameProxy>(new ServerSystemNameProxy(serverModule));
 }
 
-class ServerSettingsProxy: public SettingsProxy, public nx::mediaserver::ServerModuleAware
+class ServerSettingsProxy: public SettingsProxy, public nx::vms::server::ServerModuleAware
 {
 public:
     ServerSettingsProxy(QnMediaServerModule* serverModule):
         SettingsProxy(),
-        nx::mediaserver::ServerModuleAware(serverModule)
+        nx::vms::server::ServerModuleAware(serverModule)
     {
     }
 

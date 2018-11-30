@@ -50,8 +50,8 @@ QnNewWearableCameraDialog::QnNewWearableCameraDialog(QWidget* parent):
 
     QString name = nx::utils::generateUniqueString(
         usedNames,
-        tr("Wearable Camera"),
-        tr("Wearable Camera %1"));
+        tr("Virtual Camera"),
+        tr("Virtual Camera %1"));
 
     ui->nameField->setTitle(tr("Name"));
     ui->nameField->setText(name);

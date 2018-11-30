@@ -101,7 +101,7 @@ DeviceFileCatalog::DeviceFileCatalog(
     QnServer::ChunksCatalog catalog,
     QnServer::StoragePool   storagePool)
     :
-    nx::mediaserver::ServerModuleAware(serverModule),
+    nx::vms::server::ServerModuleAware(serverModule),
     m_mutex(QnMutex::Recursive),
     m_cameraUniqueId(cameraUniqueId),
     m_catalog(catalog),
@@ -1059,42 +1059,58 @@ bool DeviceFileCatalog::fromCSVFile(const QString& fileName)
     return true;
 }
 
-QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalizePeriodMs) const
+QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalyzePeriodMs) const
 {
     QnRecordingStatsData result;
-    QnRecordingStatsData bitrateStats;
     QnMutexLocker lock(&m_mutex);
 
     if (m_chunks.empty())
         return QnRecordingStatsData();
 
-    result.archiveDurationSecs = qMax(0ll, (qnSyncTime->currentMSecsSinceEpoch() -  m_chunks[0].startTimeMs) / 1000);
+    qint64 averagingPeriodMs = bitrateAnalyzePeriodMs != 0 // bitrateAnalyzePeriodMs or all archive
+        ? bitrateAnalyzePeriodMs
+        : qMax(1ll, qnSyncTime->currentMSecsSinceEpoch() - m_chunks.front().startTimeMs);
+
+    result.archiveDurationSecs = qMax(0ll, (qnSyncTime->currentMSecsSinceEpoch()
+        -  m_chunks.front().startTimeMs) / 1000);
 
     auto itrLeft = m_chunks.cbegin();
     auto itrRight = m_chunks.cend();
 
-    qint64 bitrateThreshold = bitrateAnalizePeriodMs ? m_chunks[m_chunks.size()-1].startTimeMs - bitrateAnalizePeriodMs : 0;
+    qint64 averagingStartTime = bitrateAnalyzePeriodMs != 0 ? m_chunks.back().startTimeMs - bitrateAnalyzePeriodMs : 0;
 
+    qint64 recordedMsForPeriod = 0;
+    qint64 recordedBytesForPeriod = 0;
+    qint64 totalRecordedMs = 0;
+    qint64 totalRecordedBytes = 0;
     for (auto itr = itrLeft; itr != itrRight; ++itr)
     {
         const Chunk& chunk = *itr;
         auto storage = getMyStorageMan()->storageRoot(chunk.storageIndex);
-        if (chunk.durationMs != Chunk::UnknownDuration) {
-            result.recordedBytes += chunk.getFileSize();
+        if (chunk.durationMs != Chunk::UnknownDuration)
+        {
+            totalRecordedBytes += chunk.getFileSize();
             if (storage)
                 result.recordedBytesPerStorage[storage->getId()] += chunk.getFileSize();
-            result.recordedSecs += chunk.durationMs;
+            totalRecordedMs += chunk.durationMs;
 
-            if (chunk.startTimeMs >= bitrateThreshold) {
-                bitrateStats.recordedBytes += chunk.getFileSize();
-                bitrateStats.recordedSecs += chunk.durationMs;
+            if (chunk.startTimeMs >= averagingStartTime)
+            {
+                recordedBytesForPeriod += chunk.getFileSize();
+                recordedMsForPeriod += chunk.durationMs;
             }
         }
     }
-    result.recordedSecs /= 1000;       // msec to sec
-    bitrateStats.recordedSecs /= 1000; // msec to sec
-    if (bitrateStats.recordedBytes > 0 && bitrateStats.recordedSecs > 0)
-        result.averageBitrate = bitrateStats.recordedBytes / (qreal) bitrateStats.recordedSecs;
+    result.recordedBytes = totalRecordedBytes;
+    result.recordedSecs = totalRecordedMs / 1000; // msec to sec
+
+    if (recordedBytesForPeriod > 0)
+    {
+        result.averageDensity = recordedBytesForPeriod / (qreal) averagingPeriodMs * 1000; // msec to sec
+        if (recordedMsForPeriod > 0)
+            result.averageBitrate = recordedBytesForPeriod / (qreal) recordedMsForPeriod * 1000; // msec to sec
+    }
+
     NX_ASSERT(result.averageBitrate >= 0);
     return result;
 }

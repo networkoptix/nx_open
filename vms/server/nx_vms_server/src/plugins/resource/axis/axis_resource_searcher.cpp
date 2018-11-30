@@ -118,7 +118,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const nx::utils::Ur
         return QList<QnResourcePtr>();
 
     QnResourceData resourceData = dataPool()->data(manufacture(), name);
-    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+    if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return QList<QnResourcePtr>(); // model forced by ONVIF
 
     QnPlAxisResourcePtr resource(new QnPlAxisResource(m_serverModule));
@@ -260,7 +260,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     }
 
     QnResourceData resourceData = dataPool()->data(manufacture(), name);
-    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+    if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return local_results; // model forced by ONVIF
 
     QnPlAxisResourcePtr resource (new QnPlAxisResource(m_serverModule));
@@ -344,7 +344,7 @@ QAuthenticator QnPlAxisResourceSearcher::determineResourceCredentials(
 
     auto resData = dataPool()->data(resource->getVendor(), resource->getModel());
     auto possibleCredentials = resData.value<QList<nx::common::utils::Credentials>>(
-        Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
+        ResourceDataKey::kPossibleDefaultCredentials);
 
     for (const auto& credentials: possibleCredentials)
     {
@@ -381,7 +381,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
     QnPlAxisResourcePtr firstResource = result.first().template dynamicCast<QnPlAxisResource>();
 
     uint channels = 1;
-    if (firstResource->hasParam(QLatin1String("channelsAmount")))
+    if (firstResource->hasDefaultProperty(QLatin1String("channelsAmount")))
     {
         QString val = firstResource->getProperty(QLatin1String("channelsAmount"));
         channels = val.toUInt();

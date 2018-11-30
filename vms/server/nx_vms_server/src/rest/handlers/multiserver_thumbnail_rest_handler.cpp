@@ -33,7 +33,7 @@ static QString urlPath;
 
 QnMultiserverThumbnailRestHandler::QnMultiserverThumbnailRestHandler(
     QnMediaServerModule* serverModule, const QString& path):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
     if (!path.isEmpty())
         urlPath = path;

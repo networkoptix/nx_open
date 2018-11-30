@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace test {
 
 TEST(MediaServerProcess, ApiRestrictions)
@@ -51,5 +51,5 @@ TEST(MediaServerProcess, ApiRestrictions)
 }
 
 } // namespace test
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

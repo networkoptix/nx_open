@@ -102,10 +102,10 @@ inline QString toString(ImageRequest::RoundMethod value)
 {
     switch (value)
     {
-        case ImageRequest::RoundMethod::iFrameBefore: return lit("iFrameBefore");
-        case ImageRequest::RoundMethod::precise: return lit("precise");
-        case ImageRequest::RoundMethod::iFrameAfter: return lit("iFrameAfter");
-        default: return lit("RoundMethod::UNKNOWN");
+        case ImageRequest::RoundMethod::iFrameBefore: return "iFrameBefore";
+        case ImageRequest::RoundMethod::precise: return "precise";
+        case ImageRequest::RoundMethod::iFrameAfter: return "iFrameAfter";
+        default: return "RoundMethod::UNKNOWN";
     }
 }
 

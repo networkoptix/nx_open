@@ -28,7 +28,9 @@
             <label for="permissionsSelect" translate>Permissions</label>
 
             <nx-permissions-select
-                    [roles]="accessRoles"
+                    [user]="user"
+                    [system]="system"
+                    [roles]="system.accessRoles"
                     [selected]="user.role"
                     (onSelected)="setPermission($event)">
             </nx-permissions-select>

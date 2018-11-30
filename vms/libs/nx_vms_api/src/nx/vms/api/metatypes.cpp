@@ -1,5 +1,7 @@
 #include "metatypes.h"
 
+#include <atomic>
+
 #include <QtCore/QList>
 #include <QtCore/QMetaType>
 
@@ -46,23 +48,18 @@
 
 #include "types/access_rights_types.h"
 
-namespace {
-
-static bool nx_vms_api_metatypes_initialized = false;
-
-} // namespace
-
 namespace nx {
 namespace vms {
 namespace api {
 
 void Metatypes::initialize()
 {
-    // Note that running the code twice is perfectly OK.
-    if (nx_vms_api_metatypes_initialized)
+    static std::atomic_bool initialized = false;
+
+    if (initialized.load())
         return;
 
-    nx_vms_api_metatypes_initialized = true;
+    initialized = true;
 
     // Fully qualified namespaces are not needed here but are mandatory in all signal declarations.
 

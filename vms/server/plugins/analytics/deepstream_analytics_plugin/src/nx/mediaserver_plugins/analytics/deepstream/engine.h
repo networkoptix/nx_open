@@ -31,7 +31,7 @@ public:
 
     virtual void setSettings(const nx::sdk::Settings* settings) override;
 
-    virtual nx::sdk::Settings* settings() const override;
+    virtual nx::sdk::Settings* pluginSideSettings() const override;
 
     virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
 
@@ -43,6 +43,8 @@ public:
     std::vector<ObjectClassDescription> objectClassDescritions() const;
 
     std::chrono::microseconds currentTimeUs() const;
+    
+    nx::sdk::Error setHandler(nx::sdk::analytics::Engine::IHandler* handler);
 
 private:
     std::vector<ObjectClassDescription> loadObjectClasses() const;

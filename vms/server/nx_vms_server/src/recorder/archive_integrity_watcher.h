@@ -2,11 +2,11 @@
 
 #include <atomic>
 #include <nx/streaming/abstract_archive_delegate.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 
 class IntegrityHashHelper
 {
@@ -46,5 +46,5 @@ private:
     void emitSignal(const QString& fileName);
 };
 
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

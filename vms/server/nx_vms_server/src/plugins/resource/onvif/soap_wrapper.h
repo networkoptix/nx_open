@@ -153,7 +153,7 @@ public:
     template<typename Request>
     void beforeMethodInvocation()
     {
-        //using namespace nx::mediaserver_core::plugins;
+        //using namespace nx::vms::server::plugins;
         if (m_invoked)
         {
             soap_destroy(m_bindingProxy.soap);
@@ -164,14 +164,14 @@ public:
             m_invoked = true;
         }
 
-        const auto namespaces = nx::mediaserver_core::plugins::onvif::requestNamespaces<Request>();
+        const auto namespaces = nx::vms::server::plugins::onvif::requestNamespaces<Request>();
         //########################################################
         if (namespaces != nullptr)
             soap_set_namespaces(m_bindingProxy.soap, namespaces);
 
         if (!m_login.isEmpty())
         {
-            nx::mediaserver_core::plugins::onvif::soapWsseAddUsernameTokenDigest(
+            nx::vms::server::plugins::onvif::soapWsseAddUsernameTokenDigest(
                 m_bindingProxy.soap,
                 NULL,
                 m_login.toUtf8().constData(),

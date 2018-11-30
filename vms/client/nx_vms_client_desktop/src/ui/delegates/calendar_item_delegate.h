@@ -8,7 +8,7 @@
 
 #include <ui/customization/customized.h>
 
-class QnTimePeriod;
+struct QnTimePeriod;
 class QnTimePeriodStorage;
 
 

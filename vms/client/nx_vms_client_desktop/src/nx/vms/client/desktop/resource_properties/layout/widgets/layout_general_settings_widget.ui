@@ -39,7 +39,7 @@
    <item>
     <widget class="QGroupBox" name="fixedSizeGroupBox">
      <property name="title">
-      <string>Minimal Size</string>
+      <string>Minimum Grid Size</string>
      </property>
      <property name="flat">
       <bool>true</bool>

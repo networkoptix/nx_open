@@ -51,7 +51,7 @@ protected:
 private:
     using GetCallback = std::function<void(bool, rest::Handle, vms::event::ActionDataList&&)>;
     rest::Handle getEvents(
-        const QnTimePeriod& period, GetCallback callback, Qt::SortOrder order, int limit);
+        const QnTimePeriod& period, GetCallback callback, Qt::SortOrder order, int limit) const;
 
     void fetchLive();
 

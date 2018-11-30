@@ -78,7 +78,7 @@ int MediaEncoder::getMaxBitrate(int* maxBitrate) const
         return nxcip::NX_IO_ERROR;
 
     *maxBitrate = device::video::getMaxBitrate(
-        m_camera->url().c_str(), 
+        m_camera->url(), 
         m_camera->compressionTypeDescriptor()) / kBytesInOneKilobyte;
     return nxcip::NX_NO_ERROR;
 }
@@ -155,10 +155,9 @@ int MediaEncoder::getAudioFormat(nxcip::AudioFormat* audioFormat) const
 
     AVCodecContext* context = encoder->codecContext();
 
-    bool ok;
-    nxcip::AudioFormat::SampleType nxSampleType =
-        ffmpeg::utils::toNxSampleType(context->sample_fmt, nullptr, &ok);
-    if (!ok)
+    auto nxSampleType =
+        ffmpeg::utils::toNxSampleType(context->sample_fmt);
+    if (!nxSampleType.has_value())
         return nxcip::NX_UNSUPPORTED_CODEC;
 
     audioFormat->compressionType = ffmpeg::utils::toNxCompressionType(context->codec_id);
@@ -172,7 +171,7 @@ int MediaEncoder::getAudioFormat(nxcip::AudioFormat* audioFormat) const
         : nxcip::AudioFormat::boLittleEndian;
 #endif
     audioFormat->channels = context->channels;
-    audioFormat->sampleFmt = nxSampleType;
+    audioFormat->sampleFmt = nxSampleType.value();
     audioFormat->channelLayout = context->channel_layout;
     audioFormat->blockAlign = context->block_align;
     audioFormat->bitsPerCodedSample = context->bits_per_coded_sample;

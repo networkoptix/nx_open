@@ -350,6 +350,9 @@ QString QnIOPortsViewModel::actionToString(Action action)
 
         case Impulse:
            return tr("Impulse", "IO Output Port Action");
+
+        default:
+            break;
     }
 
     return QString();

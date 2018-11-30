@@ -31,7 +31,6 @@ SubsetListModel::SubsetListModel(
 
 SubsetListModel::~SubsetListModel()
 {
-    m_modelConnections.reset();
 }
 
 QAbstractItemModel* SubsetListModel::sourceModel() const
@@ -66,7 +65,7 @@ void SubsetListModel::setSource(
     if (m_sourceModel == sourceModel)
         return;
 
-    m_modelConnections.reset();
+    m_modelConnections = {};
     m_sourceModel = sourceModel;
 
     if (m_sourceModel)
@@ -96,9 +95,9 @@ void SubsetListModel::connectToModel(QAbstractItemModel* model)
 {
     NX_ASSERT(model);
 
-    m_modelConnections.reset(new QnDisconnectHelper());
+    m_modelConnections = {};
 
-    *m_modelConnections << connect(model, &QObject::destroyed, this,
+    m_modelConnections << connect(model, &QObject::destroyed, this,
         [this]()
         {
             m_sourceModel = nullptr;
@@ -107,40 +106,40 @@ void SubsetListModel::connectToModel(QAbstractItemModel* model)
             ScopedReset reset(this);
         });
 
-    *m_modelConnections << connect(model, &QAbstractItemModel::modelAboutToBeReset,
+    m_modelConnections << connect(model, &QAbstractItemModel::modelAboutToBeReset,
         this, &SubsetListModel::beginResetModel);
-    *m_modelConnections << connect(model, &QAbstractItemModel::modelReset,
+    m_modelConnections << connect(model, &QAbstractItemModel::modelReset,
         this, &SubsetListModel::endResetModel);
 
-    *m_modelConnections << connect(model, &QAbstractItemModel::headerDataChanged,
+    m_modelConnections << connect(model, &QAbstractItemModel::headerDataChanged,
         this, &SubsetListModel::headerDataChanged);
 
-    *m_modelConnections << connect(model, &QAbstractItemModel::rowsAboutToBeInserted,
+    m_modelConnections << connect(model, &QAbstractItemModel::rowsAboutToBeInserted,
         this, &SubsetListModel::sourceRowsAboutToBeInserted);
-    *m_modelConnections << connect(model, &QAbstractItemModel::rowsInserted,
+    m_modelConnections << connect(model, &QAbstractItemModel::rowsInserted,
         this, &SubsetListModel::sourceRowsInserted);
-    *m_modelConnections << connect(model, &QAbstractItemModel::rowsAboutToBeRemoved,
+    m_modelConnections << connect(model, &QAbstractItemModel::rowsAboutToBeRemoved,
         this, &SubsetListModel::sourceRowsAboutToBeRemoved);
-    *m_modelConnections << connect(model, &QAbstractItemModel::rowsRemoved,
+    m_modelConnections << connect(model, &QAbstractItemModel::rowsRemoved,
         this, &SubsetListModel::sourceRowsRemoved);
-    *m_modelConnections << connect(model, &QAbstractItemModel::rowsAboutToBeMoved,
+    m_modelConnections << connect(model, &QAbstractItemModel::rowsAboutToBeMoved,
         this, &SubsetListModel::sourceRowsAboutToBeMoved);
-    *m_modelConnections << connect(model, &QAbstractItemModel::rowsMoved,
+    m_modelConnections << connect(model, &QAbstractItemModel::rowsMoved,
         this, &SubsetListModel::sourceRowsMoved);
 
-    *m_modelConnections << connect(model, &QAbstractItemModel::columnsInserted,
+    m_modelConnections << connect(model, &QAbstractItemModel::columnsInserted,
         this, &SubsetListModel::sourceColumnsInserted);
-    *m_modelConnections << connect(model, &QAbstractItemModel::columnsRemoved,
+    m_modelConnections << connect(model, &QAbstractItemModel::columnsRemoved,
         this, &SubsetListModel::sourceColumnsRemoved);
-    *m_modelConnections << connect(model, &QAbstractItemModel::columnsMoved,
+    m_modelConnections << connect(model, &QAbstractItemModel::columnsMoved,
         this, &SubsetListModel::sourceColumnsMoved);
 
-    *m_modelConnections << connect(model, &QAbstractItemModel::layoutAboutToBeChanged,
+    m_modelConnections << connect(model, &QAbstractItemModel::layoutAboutToBeChanged,
         this, &SubsetListModel::sourceLayoutAboutToBeChanged);
-    *m_modelConnections << connect(model, &QAbstractItemModel::layoutChanged,
+    m_modelConnections << connect(model, &QAbstractItemModel::layoutChanged,
         this, &SubsetListModel::sourceLayoutChanged);
 
-    *m_modelConnections << connect(model, &QAbstractItemModel::dataChanged, this,
+    m_modelConnections << connect(model, &QAbstractItemModel::dataChanged, this,
         [this](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
         {
             if (topLeft.column() <= m_sourceColumn && bottomRight.column() >= m_sourceColumn
@@ -150,7 +149,7 @@ void SubsetListModel::connectToModel(QAbstractItemModel* model)
             }
         });
 
-    *m_modelConnections << connect(model, &QAbstractItemModel::headerDataChanged, this,
+    m_modelConnections << connect(model, &QAbstractItemModel::headerDataChanged, this,
         [this](Qt::Orientation orientation, int first, int last)
         {
             if (orientation == Qt::Vertical || (m_sourceColumn >= first && m_sourceColumn <= last))

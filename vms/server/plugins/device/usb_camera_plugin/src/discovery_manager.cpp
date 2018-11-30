@@ -4,6 +4,7 @@
 #include <QNetworkInterface>
 
 #include <nx/utils/app_info.h>
+#include <nx/utils/log/log.h>
 
 #include "plugin.h"
 #include "camera_manager.h"
@@ -16,11 +17,11 @@ namespace usb_cam {
 
 namespace {
 
-static constexpr const char * const kVendorName = "usb_cam";
-static constexpr const char * const kQtMacAddressDelimiter = ":";
-static constexpr const char * const kNxMacAddressDelimiter = "-";
+static constexpr const char kVendorName[] = "usb_cam";
+static constexpr const char kQtMacAddressDelimiter[] = ":";
+static constexpr const char kNxMacAddressDelimiter[] = "-";
 
-std::string getEthernetMacAddress()
+static std::string getEthernetMacAddress()
 {
     for (const auto & iFace : QNetworkInterface::allInterfaces())
     {
@@ -36,7 +37,7 @@ std::string getEthernetMacAddress()
     return {};
 }
 
-bool isRpiMmal(const std::string deviceName)
+bool isRpiMmal(const std::string& deviceName)
 {
    return device::video::rpi::isRpi() && device::video::rpi::isMmalCamera(deviceName);
 }
@@ -88,17 +89,17 @@ void DiscoveryManager::getVendorName(char* buf) const
 
 int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr)
 {
-    std::vector<device::DeviceData> devices = findCamerasInternal();
+    std::vector<DeviceDataWithNxId> devices = findCamerasInternal();
 
     int i;
     for (i = 0; i < devices.size() && i < nxcip::CAMERA_INFO_ARRAY_SIZE; ++i)
     {
         strncpy(
             cameras[i].modelName,
-            devices[i].deviceName.c_str(),
+            devices[i].device.name.c_str(),
             sizeof(cameras[i].modelName) - 1);
         strncpy(cameras[i].url, localInterfaceIPAddr, sizeof(cameras[i].url) - 1);
-        strncpy(cameras[i].uid, devices[i].uniqueId.c_str(), sizeof(cameras[i].uid) - 1);
+        strncpy(cameras[i].uid, devices[i].nxId.c_str(), sizeof(cameras[i].uid) - 1);
     }
 
     device::audio::fillCameraAuxiliaryData(cameras, i);
@@ -144,47 +145,75 @@ int DiscoveryManager::getReservedModelList(char** /*modelList*/, int* count)
     return nxcip::NX_NO_ERROR;
 }
 
-void DiscoveryManager::addFfmpegUrl(const std::string& uniqueId, const std::string& ffmpegUrl)
+void DiscoveryManager::addOrUpdateCamera(const DeviceDataWithNxId& device)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    auto it = m_ffmpegUrlMap.find(uniqueId);
-    if(it == m_ffmpegUrlMap.end())
-        m_ffmpegUrlMap.emplace(uniqueId, ffmpegUrl);
-    else
-        it->second = ffmpegUrl;
-}
-
-std::string DiscoveryManager::getFfmpegUrl(const std::string& uniqueId) const
-{
-    std::lock_guard<std::mutex> lock(m_mutex);
-    auto it = m_ffmpegUrlMap.find(uniqueId);
-    return it != m_ffmpegUrlMap.end() ? it->second : std::string();
-}
-
-std::vector<device::DeviceData> DiscoveryManager::findCamerasInternal()
-{
-    std::vector<device::DeviceData> devices = device::video::getDeviceList();
-
-    for (int i = 0; i < devices.size(); ++i)
+    auto it = m_cameras.find(device.nxId);
+    NX_DEBUG(this, "addOrUpdateCamera");
+    if(it == m_cameras.end())
     {
-        // Convert camera uniqueId to one guaranteed to work with the media server.
-        // On Raspberry Pi for the integrated camera, use the ethernet mac address per VMS-12076.
-        if (isRpiMmal(devices[i].deviceName))
+        NX_DEBUG(this, "Found new device: %1", device.toString());
+        m_cameras.emplace(device.nxId, device);
+    }
+    else
+    {
+        if (it->second != device)
         {
-            devices[i].uniqueId = getEthernetMacAddress();
+            DeviceDataWithNxId old = it->second;
+            NX_DEBUG(
+                this,
+                "Device with nxId already found but device changed: old: %1, new: %2",
+                old.toString(),
+                device.toString());
+
+            it->second = device;
         }
         else
         {
-            const QByteArray& uidHash = QCryptographicHash::hash(
-                devices[i].uniqueId.c_str(),
-                QCryptographicHash::Md5).toHex();
-            devices[i].uniqueId = uidHash.constData();
+            NX_DEBUG(
+                this,
+                "Device already found: %1",
+                device.toString());
+        }
+    }
+}
+
+std::string DiscoveryManager::getFfmpegUrl(const std::string& nxId) const
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    auto it = m_cameras.find(nxId);
+    return it != m_cameras.end() ? it->second.device.path : std::string();
+}
+
+std::vector<DiscoveryManager::DeviceDataWithNxId> DiscoveryManager::findCamerasInternal()
+{
+    std::vector<device::DeviceData> devices = device::video::getDeviceList();
+    std::vector<DeviceDataWithNxId> nxDevices;
+
+    for (auto & device: devices)
+    {
+        std::string nxId;
+
+        // Convert camera uniqueId to one guaranteed to work with the media server.
+        // On Raspberry Pi for the integrated camera, use the ethernet mac address per VMS-12076.
+        if (isRpiMmal(device.name))
+        {
+            nxId = getEthernetMacAddress();
+        }
+        else
+        {
+            nxId = QCryptographicHash::hash(
+                device.uniqueId.c_str(),
+                QCryptographicHash::Md5).toHex().constData();
         }
 
-        addFfmpegUrl(devices[i].uniqueId, devices[i].devicePath);
+        DeviceDataWithNxId nxDevice(device, nxId);
+        
+        nxDevices.push_back(nxDevice);
+        addOrUpdateCamera(nxDevice);
     }
-   
-    return devices;
+
+    return nxDevices;
 }
 
 } // namespace nx 

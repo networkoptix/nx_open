@@ -96,7 +96,7 @@ void TimeSyncManager::loadTimeFromLocalClock()
 
     if (setSyncTime(newValue, kMaxJitterForLocalClock))
     {
-        NX_DEBUG(this, lm("Set time %1 from the local clock")
+        NX_INFO(this, lm("Set time %1 from the local clock")
             .arg(QDateTime::fromMSecsSinceEpoch(newValue.count()).toString(Qt::ISODate)));
     }
     m_isTimeTakenFromInternet = false;
@@ -160,7 +160,7 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
 
     const std::chrono::milliseconds rtt = rttTimer.elapsed();
     auto newTime = std::chrono::milliseconds(timeData.utcTimeMs - rtt.count() / 2);
-    bool syncWithInternel = commonModule()->globalSettings()->isSynchronizingTimeWithInternet();
+    bool syncWithInternel = commonModule()->globalSettings()->primaryTimeServer().isNull();
     if (syncWithInternel && !timeData.isTakenFromInternet)
         return false; //< Target server is not ready yet. Time is not taken from internet yet. Repeat later.
     m_isTimeTakenFromInternet = timeData.isTakenFromInternet;
@@ -214,9 +214,7 @@ std::chrono::milliseconds TimeSyncManager::getSyncTime(bool* outIsTimeTakenFromI
 
 void TimeSyncManager::doPeriodicTasks()
 {
-    auto globalSettings = this->commonModule()->globalSettings();
-    if (globalSettings->isTimeSynchronizationEnabled())
-        updateTime();
+    updateTime();
 }
 
 QString TimeSyncManager::idForToStringFromPtr() const

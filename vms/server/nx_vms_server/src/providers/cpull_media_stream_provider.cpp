@@ -16,7 +16,7 @@ namespace {
 
 } // namespace
 
-QnClientPullMediaStreamProvider::QnClientPullMediaStreamProvider(const nx::mediaserver::resource::CameraPtr& dev)
+QnClientPullMediaStreamProvider::QnClientPullMediaStreamProvider(const nx::vms::server::resource::CameraPtr& dev)
     :
     QnLiveStreamProvider(dev),
     m_fpsSleep(100*1000)

@@ -212,7 +212,6 @@ static constexpr int kSectionHeight = 20;
 //!time that is given to process to exit. After that, applauncher (if present) will try to terminate it
 static const quint32 PROCESS_TERMINATE_TIMEOUT = 15000;
 
-
 namespace nx::vms::client::desktop {
 namespace ui {
 namespace workbench {
@@ -382,8 +381,8 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::JumpToTimeAction), &QAction::triggered,
         this, &ActionHandler::at_jumpToTimeAction_triggered);
 
-    connect(action(action::GoToResourceAction), &QAction::triggered,
-        this, &ActionHandler::at_goToResourceAction_triggered);
+    connect(action(action::GoToLayoutItemAction), &QAction::triggered,
+        this, &ActionHandler::at_goToLayoutItemAction_triggered);
 
     /* Connect through lambda to handle forced parameter. */
     connect(action(action::DelayedForcedExitAction), &QAction::triggered, this, [this] {  closeApplication(true);    }, Qt::QueuedConnection);
@@ -926,6 +925,19 @@ void ActionHandler::at_openInCurrentLayoutAction_triggered()
             return;
     }
 
+    nx::utils::ScopedConnection connection;
+    if (parameters.argument<bool>(Qn::SelectOnOpeningRole))
+    {
+        connection.reset(connect(workbench()->currentLayout(), &QnWorkbenchLayout::itemAdded, this,
+            [this, &connection](const QnWorkbenchItem* item)
+            {
+                menu()->trigger(action::GoToLayoutItemAction, action::Parameters()
+                    .withArgument(Qn::ItemUuidRole, item->uuid()));
+
+                connection.reset();
+            }));
+    }
+
     parameters.setArgument(Qn::LayoutResourceRole, currentLayout->resource());
     menu()->trigger(action::OpenInLayoutAction, parameters);
 }
@@ -1141,7 +1153,7 @@ void ActionHandler::at_convertCameraToEntropix_triggered()
                         QRectF(0.5, 0, 0.5, 1.0))
                 });
         }
-        camera->saveParamsAsync();
+        camera->savePropertiesAsync();
     }
 }
 
@@ -1179,7 +1191,7 @@ void ActionHandler::at_moveCameraAction_triggered() {
         if (camera->hasFlags(Qn::wearable_camera))
         {
             QnMessageBox::critical(mainWindowWidget(),
-                tr("Wearable Cameras cannot be moved between servers"));
+                tr("Virtual Cameras cannot be moved between servers"));
             return;
         }
 
@@ -1304,7 +1316,7 @@ void ActionHandler::at_systemAdministrationAction_triggered()
 void ActionHandler::at_jumpToTimeAction_triggered()
 {
     auto slider = navigator()->timeSlider();
-    if (!slider)
+    if (!slider || !navigator()->isTimelineRelevant())
         return;
 
     const auto parameters = menu()->currentParameters(sender());
@@ -1339,48 +1351,61 @@ void ActionHandler::at_jumpToTimeAction_triggered()
         &QnTimeSlider::isSliderDown,
         true);
 
-    slider->setValue(duration_cast<milliseconds>(timestamp), true);
+    slider->navigateTo(duration_cast<milliseconds>(timestamp));
 }
 
-void ActionHandler::at_goToResourceAction_triggered()
+void ActionHandler::at_goToLayoutItemAction_triggered()
 {
-    const auto parameters = menu()->currentParameters(sender());
-    const auto resource = parameters.resource();
-    if (!resource)
-    {
-        NX_ASSERT(false, "Resource must be specified");
+    const auto currentLayout = workbench()->currentLayout();
+    if (!currentLayout)
         return;
-    }
 
-    const auto shouldRaise = parameters.argument<bool>(Qn::ForceRole);
+    const auto parameters = menu()->currentParameters(sender());
+    const auto uuid = parameters.argument(Qn::ItemUuidRole).value<QnUuid>();
 
+    const auto shouldRaise = parameters.argument<bool>(Qn::RaiseSelectionRole);
     const auto centralItem = workbench()->item(Qn::CentralRole);
-    if (centralItem && centralItem->resource() == resource)
-    {
-        if (shouldRaise)
-            workbench()->setItem(Qn::RaisedRole, centralItem);
 
-        return; //< Nothing more to do.
+    QnWorkbenchItem* targetItem = nullptr;
+
+    if (uuid.isNull())
+    {
+        const auto resource = parameters.resource();
+        if (!resource)
+        {
+            NX_ASSERT(false, "Either item id or resource must be specified");
+            return;
+        }
+
+        if (centralItem && centralItem->resource() == resource)
+        {
+            targetItem = centralItem;
+        }
+        else
+        {
+            const auto items = currentLayout->items(resource);
+            for (const auto& item: items)
+            {
+                if (item->zoomRect().isValid())
+                    continue; //< Skip zoom windows.
+
+                targetItem = item;
+                break;
+            }
+        }
+    }
+    else
+    {
+        targetItem = currentLayout->item(uuid);
     }
 
-    const auto items = workbench()->currentLayout()->items(resource);
-    for (const auto& item: items)
-    {
-        if (item->zoomRect().isValid())
-            continue; //< Skip zoom windows.
+    if (!targetItem)
+        return;
 
-        auto widget = display()->widget(item);
-        if (!widget)
-            break;
+    workbench()->setItem(Qn::SingleSelectedRole, targetItem);
 
-        widget->scene()->clearSelection();
-        widget->setSelected(true);
-
-        if (shouldRaise)
-            workbench()->setItem(Qn::RaisedRole, item);
-
-        break;
-    }
+    if (shouldRaise)
+        workbench()->setItem(Qn::RaisedRole, targetItem);
 }
 
 void ActionHandler::openSystemAdministrationDialog(int page, const QUrl& url)
@@ -1678,7 +1703,6 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
             }
         }
     }
-
 
     /* List of possible time steps, in milliseconds. */
     const qint64 steps[] = {
@@ -2051,7 +2075,6 @@ void ActionHandler::at_renameAction_triggered()
     // TODO: #vkutin #gdm Is the following block of code still in use?
     if (name.isEmpty())
     {
-        bool ok = false;
         do
         {
             name = QnInputDialog::getText(mainWindowWidget(),
@@ -2160,7 +2183,6 @@ void ActionHandler::closeApplication(bool force) {
 void ActionHandler::at_beforeExitAction_triggered() {
     deleteDialogs();
 }
-
 
 QnAdjustVideoDialog* ActionHandler::adjustVideoDialog() {
     return m_adjustVideoDialog.data();

@@ -18,7 +18,7 @@
 #include <core/resource/resource_fwd.h>
 #include "recording/time_period.h"
 #include "api/model/recording_stats_reply.h"
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 extern "C" {
 
@@ -27,10 +27,10 @@ extern "C" {
 } // extern "C"
 
 class QnTimePeriodList;
-class QnTimePeriod;
+struct QnTimePeriod;
 class QnStorageManager;
 
-class DeviceFileCatalog: public QObject, public nx::mediaserver::ServerModuleAware
+class DeviceFileCatalog: public QObject, public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 public:
@@ -336,7 +336,7 @@ public:
 
     bool fromCSVFile(const QString& fileName);
     QnServer::ChunksCatalog getRole() const;
-    QnRecordingStatsData getStatistics(qint64 bitrateAnalizePeriodMs) const;
+    QnRecordingStatsData getStatistics(qint64 bitrateAnalyzePeriodMs) const;
 
     QnServer::StoragePool getStoragePool() const;
     qint64 getSpaceByStorageIndex(int storageIndex) const;

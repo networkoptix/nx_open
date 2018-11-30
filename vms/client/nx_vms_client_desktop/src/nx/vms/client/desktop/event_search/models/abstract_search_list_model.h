@@ -128,6 +128,9 @@ protected:
     /** Sets whether underlying data store can be populated with new items in live mode. */
     void setLiveSupported(bool value);
 
+    /** Checks whether filter is degenerate and fetch will never return any results. */
+    virtual bool isFilterDegenerate() const;
+
 private:
     QnTimePeriod m_relevantTimePeriod = QnTimePeriod::anytime(); //< Time period of interest.
     int m_maximumCount = 500; //< Maximum item count.

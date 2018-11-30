@@ -553,7 +553,7 @@ void QnRtspClient::registerRTPChannel(int rtpNum, int rtcpNum, int trackIndex)
 bool QnRtspClient::sendSetup()
 {
     int audioNum = 0;
-    for (int i = 0; i < m_sdpTracks.size(); ++i)
+    for (uint32_t i = 0; i < m_sdpTracks.size(); ++i)
     {
         auto& track = m_sdpTracks[i];
         if (track.sdpMedia.mediaType == nx::streaming::Sdp::MediaType::Audio)
@@ -789,15 +789,6 @@ nx::network::http::Request QnRtspClient::createPlayRequest( qint64 startPos, qin
     return request;
 }
 
-bool QnRtspClient::sendPlayInternal(qint64 startPos, qint64 endPos)
-{
-    auto request = createPlayRequest( startPos, endPos );
-    NX_ASSERT(request.requestLine.url.isValid());
-    if (!request.requestLine.url.isValid())
-        return false;
-    return sendRequestInternal(std::move(request));
-}
-
 bool QnRtspClient::sendPlay(qint64 startPos, qint64 endPos, double scale)
 {
     QByteArray response;
@@ -1028,7 +1019,7 @@ bool QnRtspClient::processTcpRtcpData(const quint8* data, int size)
         return false;
     int rtpChannelNum = data[1];
     int trackNum = getTrackNum(rtpChannelNum);
-    if (trackNum >= m_sdpTracks.size())
+    if (trackNum >= (int)m_sdpTracks.size())
         return false;
     QnRtspIoDevice* ioDevice = m_sdpTracks[trackNum].ioDevice.get();
     if (!ioDevice)
@@ -1171,7 +1162,7 @@ void QnRtspClient::setTransport(const QString& transport)
 
 QString QnRtspClient::getTrackCodec(int rtpChannelNum)
 {
-    if (rtpChannelNum < m_rtpToTrack.size())
+    if (rtpChannelNum < (int)m_rtpToTrack.size())
         return m_sdpTracks[m_rtpToTrack[rtpChannelNum].trackIndex].sdpMedia.rtpmap.codecName;
 
     return QString();
@@ -1179,14 +1170,14 @@ QString QnRtspClient::getTrackCodec(int rtpChannelNum)
 
 bool QnRtspClient::isRtcp(int rtpChannelNum)
 {
-    if (rtpChannelNum < m_rtpToTrack.size())
+    if (rtpChannelNum < (int)m_rtpToTrack.size())
         return m_rtpToTrack[rtpChannelNum].isRtcp;
     return false;
 }
 
 int QnRtspClient::getTrackNum(int rtpChannelNum)
 {
-    if (rtpChannelNum < m_rtpToTrack.size())
+    if (rtpChannelNum < (int)m_rtpToTrack.size())
         return m_rtpToTrack[rtpChannelNum].trackIndex;
     return 0;
 }

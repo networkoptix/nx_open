@@ -9,7 +9,7 @@
 #include <nx/network/ping.h>
 
 #include <api/app_server_connection.h>
-#include <nx/mediaserver/event/event_connector.h>
+#include <nx/vms/server/event/event_connector.h>
 #include <providers/live_stream_provider.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/network_resource.h>
@@ -29,8 +29,8 @@
 #include <core/resource/general_attribute_pool.h>
 #include <core/resource/camera_user_attribute_pool.h>
 
-#include <nx/mediaserver/resource/analytics_plugin_resource.h>
-#include <nx/mediaserver/resource/analytics_engine_resource.h>
+#include <nx/vms/server/resource/analytics_plugin_resource.h>
+#include <nx/vms/server/resource/analytics_engine_resource.h>
 
 namespace {
 
@@ -46,7 +46,7 @@ QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(QnMediaServ
 {
     connect(
         this, &QnMServerResourceDiscoveryManager::cameraDisconnected,
-        serverModule->eventConnector(), &nx::mediaserver::event::EventConnector::at_cameraDisconnected);
+        serverModule->eventConnector(), &nx::vms::server::event::EventConnector::at_cameraDisconnected);
     m_serverOfflineTimeout = serverModule->settings().redundancyTimeout() * 1000;
     m_serverOfflineTimeout = qMax(1000, m_serverOfflineTimeout);
     m_startupTimer.restart();
@@ -279,7 +279,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     const ec2::ErrorCode errorCode = connect->getCameraManager(Qn::kSystemAccess)->addCameraSync(apiCamera);
                     if( errorCode != ec2::ErrorCode::ok )
                         NX_WARNING(this, QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)));
-                    existCamRes->saveParams();
+                    existCamRes->saveProperties();
                 }
             }
         }
@@ -348,18 +348,16 @@ nx::vms::common::AnalyticsPluginResourcePtr
     QnMServerResourceDiscoveryManager::createAnalyticsPluginResource(
         const QnResourceParams& /*parameters*/)
 {
-    namespace mserver = nx::mediaserver::resource;
-    return mserver::AnalyticsPluginResourcePtr(
-        new mserver::AnalyticsPluginResource(m_serverModule));
+    return nx::vms::server::resource::AnalyticsPluginResourcePtr(
+        new nx::vms::server::resource::AnalyticsPluginResource(m_serverModule));
 }
 
 nx::vms::common::AnalyticsEngineResourcePtr
     QnMServerResourceDiscoveryManager::createAnalyticsEngineResource(
         const QnResourceParams& /*parameters*/)
 {
-    namespace mserver = nx::mediaserver::resource;
-    return mserver::AnalyticsEngineResourcePtr(
-        new mserver::AnalyticsEngineResource(m_serverModule));
+    return nx::vms::server::resource::AnalyticsEngineResourcePtr(
+        new nx::vms::server::resource::AnalyticsEngineResource(m_serverModule));
 }
 
 bool QnMServerResourceDiscoveryManager::hasIpConflict(const QSet<QnNetworkResourcePtr>& cameras)

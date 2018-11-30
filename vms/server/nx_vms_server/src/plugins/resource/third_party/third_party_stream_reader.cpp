@@ -27,6 +27,7 @@
 #include <motion/motion_detection.h>
 #include <utils/common/synctime.h>
 #include <core/resource/param.h>
+#include <decoders/audio/aac.h>
 
 namespace
 {
@@ -64,7 +65,6 @@ namespace
     }
 }
 
-
 ThirdPartyStreamReader::ThirdPartyStreamReader(
     QnThirdPartyResourcePtr res,
     nxcip::BaseCameraManager* camManager )
@@ -84,7 +84,7 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
         this,
         [this](const QnResourcePtr& resource, const QString& propertyName)
         {
-            if (propertyName == Qn::CAMERA_STREAM_URLS)
+            if (propertyName == ResourcePropertyKey::kStreamUrls)
             {
                 // Reinitialize camera driver. hasDualStreaming may be changed.
                 m_resource->setStatus(Qn::Offline);
@@ -322,7 +322,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         if( nx::network::rtsp::isUrlSheme(mediaUrl.scheme().toLower()) )
         {
             nx::streaming::rtp::TimeOffsetPtr timeOffset;
-            if (auto camera = m_resource.dynamicCast<nx::mediaserver::resource::Camera>())
+            if (auto camera = m_resource.dynamicCast<nx::vms::server::resource::Camera>())
                 timeOffset = camera->getTimeOffset();
 
             QnMulticodecRtpReader* rtspStreamReader =
@@ -649,6 +649,12 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader(
         outExtras->extradataBlob.resize(extradataSize);
         memcpy(outExtras->extradataBlob.data(), mediaDataPacket2->extradata(), mediaDataPacket2->extradataSize());
         mediaDataPacket2->releaseRef();
+    }
+    else if (packet->codecType() == nxcip::AV_CODEC_ID_AAC)
+    {
+        AdtsHeader header;
+        if (header.decodeFromFrame((const uint8_t*)packet->data(), packet->dataSize()))
+            header.encodeToFfmpegExtradata(&outExtras->extradataBlob);
     }
 
     switch( packet->type() )

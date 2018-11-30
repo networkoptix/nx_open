@@ -5,6 +5,7 @@
 
 #include <nx/fusion/model_functions.h>
 
+#include <common/common_globals.h>
 #include <utils/math/math.h>
 
 namespace nx {
@@ -107,7 +108,7 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
     filter->timePeriod.setStartTime(
         std::chrono::milliseconds(params.value("startTime").toLongLong()));
     filter->timePeriod.setDuration(
-        std::chrono::milliseconds(QnTimePeriod::infiniteDuration()));
+        std::chrono::milliseconds(QnTimePeriod::kInfiniteDuration));
     if (params.contains("endTime"))
     {
         filter->timePeriod.setEndTime(

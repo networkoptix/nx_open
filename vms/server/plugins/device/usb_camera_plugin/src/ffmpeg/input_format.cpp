@@ -122,13 +122,6 @@ int InputFormat::setResolution(int width, int height)
     return setEntry("video_size", (std::to_string(width) + "x" + std::to_string(height)).c_str());
 }
 
-void InputFormat::resolution(int * width, int * height) const
-{
-    AVStream * stream = findStream(AVMEDIA_TYPE_VIDEO);
-    *width =  stream ? stream->codecpar->width : 0;
-    *height = stream ? stream->codecpar->height : 0;
-}
-
 } // namespace ffmpeg
 } // namespace usb_cam
 } // namespace nx

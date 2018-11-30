@@ -67,10 +67,11 @@ private:
 
     void createEventPanel(QGraphicsWidget* parentWidget);
 
-    void at_eventTileHovered(const QModelIndex& index, const nx::vms::client::desktop::EventTile* tile);
+    void at_eventTileHovered(const QModelIndex& index, nx::vms::client::desktop::EventTile* tile);
 
 private:
     bool m_visible = false;
+    bool m_blockAction = false;
 
     QnBlinkingImageButtonWidget* m_showButton;
 
@@ -90,6 +91,8 @@ private:
     QGraphicsProxyWidget* m_eventPanelContainer = nullptr;
     QScopedPointer<nx::vms::client::desktop::EventPanel> m_eventPanel;
     QPointer<HoverFocusProcessor> m_eventPanelHoverProcessor;
+
+    // Required to correctly display tooltip.
     const nx::vms::client::desktop::EventTile* m_lastHoveredTile = nullptr;
 };
 

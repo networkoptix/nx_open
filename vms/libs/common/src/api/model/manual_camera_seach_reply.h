@@ -21,21 +21,23 @@ struct QnManualResourceSearchStatus {
         Count
     };
 
-    QnManualResourceSearchStatus(): state(Aborted) {}
+    QnManualResourceSearchStatus() {}
     QnManualResourceSearchStatus(State state, quint64 current, quint64 total):
         state(state), current(current), total(total){}
 
     /** Current state of the process. */
-    int state;
+    int state = Aborted;
 
     /** Index of currently processed element. */
-    qint64 current;
+    qint64 current = 0;
 
     /** Number of elements on the current stage. */
-    qint64 total;
+    qint64 total = 0;
 };
 
 #define QnManualResourceSearchStatus_Fields (state)(current)(total)
+
+QString toString(QnManualResourceSearchStatus::State state);
 
 // TODO: #wearable better split this struct in two. name, vendor & existsInPool unused in add requests.
 struct QnManualResourceSearchEntry {

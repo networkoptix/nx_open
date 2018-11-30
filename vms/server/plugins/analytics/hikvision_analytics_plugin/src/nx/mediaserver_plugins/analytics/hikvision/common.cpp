@@ -15,7 +15,7 @@ QString Hikvision::EngineManifest::eventTypeByInternalName(const QString& value)
     const auto internalEventName = value.toLower();
     QnMutexLocker lock(&m_cachedIdMutex);
     const QString result = m_eventTypeIdByInternalName.value(internalEventName);
-    if (!result.isNull())
+    if (!result.isEmpty())
         return result;
 
     for (const auto& eventTypeDescriptor: eventTypes)

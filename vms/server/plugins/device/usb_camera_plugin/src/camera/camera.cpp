@@ -10,7 +10,7 @@ namespace usb_cam {
 
 namespace {
 
-size_t getPriorityCodecIndex(
+static size_t getPriorityCodecIndex(
     const std::vector<nxcip::CompressionType>& videoCodecPriorityList,
     const std::vector<device::CompressionTypeDescriptorPtr>& codecDescriptorList)
 {
@@ -27,7 +27,7 @@ size_t getPriorityCodecIndex(
     return codecDescriptorList.size();
 }
 
-device::CompressionTypeDescriptorPtr getPriorityDescriptor(
+static device::CompressionTypeDescriptorPtr getPriorityDescriptor(
     const std::vector<nxcip::CompressionType>& videoCodecPriorityList,
     const std::vector<device::CompressionTypeDescriptorPtr>& codecDescriptorList)
 {
@@ -61,7 +61,7 @@ Camera::Camera(
 {
     auto codecList = device::video::getSupportedCodecs(url().c_str());
     m_compressionTypeDescriptor = getPriorityDescriptor(kVideoCodecPriorityList, codecList);
-    
+
     // If m_compressionTypeDescriptor is null, there probably is no camera plugged in.
     if(m_compressionTypeDescriptor)
         m_defaultVideoParams = getDefaultVideoParameters();
@@ -85,7 +85,7 @@ std::shared_ptr<AudioStream> Camera::audioStream()
 {
     return m_audioStream;
 }
-    
+
 std::shared_ptr<VideoStream> Camera::videoStream()
 {
     return m_videoStream;
@@ -93,7 +93,7 @@ std::shared_ptr<VideoStream> Camera::videoStream()
 
 std::vector<device::video::ResolutionData> Camera::resolutionList() const
 {
-    return device::video::getResolutionList(url().c_str(), m_compressionTypeDescriptor);
+    return device::video::getResolutionList(url(), m_compressionTypeDescriptor);
 }
 
 void Camera::setAudioEnabled(bool value)
@@ -183,7 +183,7 @@ CodecParameters Camera::getDefaultVideoParameters()
             maxBitrate,
             nxcip::Resolution(it->width, it->height));
     }
-    
+
     // Should never reach here if m_compressionTypeDescriptor is valid
     return CodecParameters();
 }

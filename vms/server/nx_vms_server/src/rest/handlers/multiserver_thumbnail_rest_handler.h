@@ -5,13 +5,13 @@
 #include <rest/server/fusion_rest_handler.h>
 
 #include <api/helpers/request_helpers_fwd.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class QnCommonModule;
 
 class QnMultiserverThumbnailRestHandler: 
     public QnFusionRestHandler,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
 public:
     QnMultiserverThumbnailRestHandler(

@@ -71,7 +71,8 @@ QnVirtualCameraResourcePtr CameraAdvancedParamsWidget::camera() const {
     return m_camera;
 }
 
-void CameraAdvancedParamsWidget::setCamera(const QnVirtualCameraResourcePtr &camera) {
+void CameraAdvancedParamsWidget::setCamera(const QnVirtualCameraResourcePtr &camera)
+{
     if (m_camera == camera)
         return;
 
@@ -80,17 +81,19 @@ void CameraAdvancedParamsWidget::setCamera(const QnVirtualCameraResourcePtr &cam
 
     m_camera = camera;
 
-    if (m_camera) {
-        connect(m_camera, &QnResource::statusChanged,   this, &CameraAdvancedParamsWidget::updateCameraAvailability);
+    if (m_camera)
+    {
+        connect(m_camera, &QnResource::statusChanged, this,
+            &CameraAdvancedParamsWidget::updateCameraAvailability);
 
-        connect(m_camera, &QnResource::propertyChanged, this, [this](const QnResourcePtr &resource, const QString &key) {
-            if (resource != m_camera)
-                return;
-            if (key == Qn::CAMERA_ADVANCED_PARAMETERS) {
-                /* Re-init state if key parameter changed. */
-                initialize();
-            }
-        });
+        connect(m_camera, &QnResource::propertyChanged, this,
+            [this](const QnResourcePtr &resource, const QString &key)
+            {
+                if (resource != m_camera)
+                    return;
+                if (key == ResourcePropertyKey::kCameraAdvancedParams)
+                    initialize(); //< Re-init state if key parameter changed.
+            });
     }
 
     /* Initialize state */
@@ -264,7 +267,6 @@ void CameraAdvancedParamsWidget::at_ptzCommandProcessed(int status, const QVaria
     // Just an empty handler for REST response.
 }
 
-
 void CameraAdvancedParamsWidget::saveValues() {
     /* Check that we are in the correct state. */
     if (state() != State::Init || !m_cameraAvailable)
@@ -327,7 +329,6 @@ void CameraAdvancedParamsWidget::updateButtonsState() {
     ui->loadButton->setEnabled(m_cameraAvailable && m_state == State::Init);
 }
 
-
 bool CameraAdvancedParamsWidget::isCameraAvailable() const {
     if (!m_camera)
         return false;
@@ -335,7 +336,6 @@ bool CameraAdvancedParamsWidget::isCameraAvailable() const {
     // TODO: #GDM check special capability flag
     return m_camera->getStatus() == Qn::Online || m_camera->getStatus() == Qn::Recording;
 }
-
 
 QnMediaServerConnectionPtr CameraAdvancedParamsWidget::getServerConnection() const {
     if (!m_cameraAvailable)
@@ -346,7 +346,6 @@ QnMediaServerConnectionPtr CameraAdvancedParamsWidget::getServerConnection() con
 
     return QnMediaServerConnectionPtr();
 }
-
 
 QnCameraAdvancedParamValueMap CameraAdvancedParamsWidget::groupParameters(
     const QSet<QString>& groups) const
@@ -368,7 +367,6 @@ QnCameraAdvancedParamValueMap CameraAdvancedParamsWidget::groupParameters(
 
     return result;
 }
-
 
 void CameraAdvancedParamsWidget::at_advancedParamChanged(const QString& id, const QString& value)
 {
@@ -468,7 +466,7 @@ void CameraAdvancedParamsWidget::at_advancedParam_saved(int status, const QnCame
     setState(State::Init);
     emit hasChangesChanged();
 
-    // Reload all values if one of parameters requires resync.
+    // Reload all values if one of the parameters requires resync.
     if (needResync && !parameters.packet_mode)
         loadValues();
 }
