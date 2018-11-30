@@ -43,6 +43,12 @@ private:
         const nx::Buffer& m_data;
     };
 
+    enum class FrameContentType
+    {
+        payload,
+        dummy
+    };
+
     using UserReadHandlePair = std::unique_ptr<std::pair<nx::Buffer* const, IoCompletionHandler>>;
 
     HttpClientPtr m_writeHttpClient;
@@ -53,6 +59,7 @@ private:
     bool m_postInProgress = false;
     websocket::FrameType m_messageType;
     bool m_failed = false;
+    FrameContentType m_frameContentType = FrameContentType::payload;
 
     void startReading();
 };

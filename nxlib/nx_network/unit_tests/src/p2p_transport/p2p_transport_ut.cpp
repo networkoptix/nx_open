@@ -214,13 +214,39 @@ TEST_F(P2PHttpTransport, ClientReads)
         {
             NX_VERBOSE(this, lm("Server socket read: %1").args(serverReadBuf));
             m_server.reset(new P2PHttpServerTransport(std::move(serverSocket)));
-            m_server->sendAsync(buf, [](SystemError::ErrorCode, size_t){});
+
+            utils::MoveOnlyFunc<void(SystemError::ErrorCode, size_t)> onSend =
+                [&](SystemError::ErrorCode, size_t)
+                {
+                    m_server->sendAsync(buf, std::move(onSend));
+                };
+
+            m_server->sendAsync(
+                buf,
+                [&](SystemError::ErrorCode, size_t)
+                {
+                    m_server->sendAsync(
+                        buf,
+                        [&](SystemError::ErrorCode, size_t)
+                        {
+                            qDebug() << "Sent two times";
+                        });
+                });
         });
 
     nx::Buffer readBuf;
     m_client->readSomeAsync(
         &readBuf,
-        [](SystemError::ErrorCode error, size_t transferred) { qDebug() << "RECEIVED" << error << transferred;});
+        [&](SystemError::ErrorCode error, size_t transferred)
+        {
+            qDebug() << "RECEIVED" << error << transferred;
+            m_client->readSomeAsync(
+                &readBuf,
+                [&](SystemError::ErrorCode , size_t )
+                {
+                    qDebug() << "RECEIVED 2:" << readBuf;
+                });
+        });
 
     std::this_thread::sleep_for(std::chrono::minutes(5));
 }

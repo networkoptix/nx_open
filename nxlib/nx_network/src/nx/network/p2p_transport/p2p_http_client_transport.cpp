@@ -155,10 +155,14 @@ void P2PHttpClientTransport::startReading()
             auto nextFilter = nx::utils::bstream::makeCustomOutputStream(
                 [this](const QnByteArrayConstRef& data)
                 {
-                    NX_VERBOSE(this, "OnResponceReceived");
+                    if (m_frameContentType == FrameContentType::dummy)
+                    {
+                        m_frameContentType = FrameContentType::payload;
+                        return;
+                    }
+
                     if (m_incomingMessageQueue.size() < kMaxMessageQueueSize)
                     {
-                        NX_VERBOSE(this, lm("Got incoming message %1").arg(data));
                         if (!m_userReadHandlerPair)
                         {
                             m_incomingMessageQueue.push(data);
@@ -174,8 +178,11 @@ void P2PHttpClientTransport::startReading()
                     {
                         NX_WARNING(this, lm("Incoming message queue overflow"));
                     }
+
+                    m_frameContentType = FrameContentType::dummy;
                 });
 
+            m_multipartContentParser.setBoundary("ec2boundary");
             m_multipartContentParser.setNextFilter(nextFilter);
 
             const auto& headers = m_readHttpClient->response()->headers;
@@ -195,16 +202,16 @@ void P2PHttpClientTransport::startReading()
     m_readHttpClient->setOnSomeMessageBodyAvailable(
         [this]()
         {
-            NX_VERBOSE(this, "setOnSomeMessageBodyAvailable");
-            m_multipartContentParser.processData(m_readHttpClient->fetchMessageBodyBuffer());
+            if (!m_multipartContentParser.processData(m_readHttpClient->fetchMessageBodyBuffer()))
+                m_failed = true;
         });
 
-    // m_readHttpClient->setOnDone(
-    //     [this]()
-    //     {
-    //         NX_VERBOSE(this, "Read (GET) http client emitted 'onDone'. Moving to failed state.");
-    //         m_failed = true;
-    //     });
+     m_readHttpClient->setOnDone(
+         [this]()
+         {
+             NX_VERBOSE(this, "Read (GET) http client emitted 'onDone'. Moving to failed state.");
+             m_failed = true;
+         });
 
     m_readHttpClient->doGet(m_readHttpClient->url());
 }

@@ -92,34 +92,16 @@ void P2PHttpServerTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
         {
             if (m_firstSend)
             {
-                NX_VERBOSE(this, "First send");
-                http::Response initialResponse;
-                auto& headers = initialResponse.headers;
-
-                // #TODO: #akulikov Make some constants.
-                headers.emplace("Host", m_sendSocket->getForeignHostName().toUtf8());
-                headers.emplace("Content-Type", "multipart/mixed; boundary=ec2boundary");
-                headers.emplace("Content-Length", "0");
-                headers.emplace("Access-Control-Allow-Origin", "*");
-                headers.emplace("Connection", "Keep-Alive");
-
-                initialResponse.serialize(&m_sendBuffer);
+                m_sendBuffer = makeInitialResponse();
                 m_firstSend = false;
             }
 
-            http::Response contentResponse;
-            contentResponse.headers.emplace(
-                "Content-Type",
-                m_messageType == websocket::FrameType::text
-                    ? "application/json" : "application/ubjson");
-            contentResponse.messageBody = buffer;
-
-            nx::Buffer contentBuffer;
-            static const nx::Buffer boundary = "ec2boundary";
-            contentResponse.serializeMultipartResponse(&contentBuffer, boundary);
-
             // #TODO: #akulikov Optimize this.
-            m_sendBuffer += contentBuffer;
+            const auto contentFrame = makeResponseFrame(buffer);
+            // To make a peer actually receive and process payload frame
+            const auto dummyFrame = makeResponseFrame("NX");
+            m_sendBuffer += contentFrame + dummyFrame;
+
             NX_VERBOSE(this, lm("Sending %1 bytes: %2").args(m_sendBuffer.size(), m_sendBuffer));
 
             m_sendSocket->sendAsync(
@@ -135,6 +117,42 @@ void P2PHttpServerTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
                     handler(error, transferred);
                 });
         });
+}
+
+QByteArray P2PHttpServerTransport::makeInitialResponse() const
+{
+    http::Response initialResponse;
+    initialResponse.statusLine.statusCode = http::StatusCode::ok;
+    initialResponse.statusLine.reasonPhrase = "Ok";
+    initialResponse.statusLine.version = http::http_1_1;
+
+    auto& headers = initialResponse.headers;
+    // #TODO: #akulikov Make some constants.
+    headers.emplace("Host", m_sendSocket->getForeignHostName().toUtf8());
+    headers.emplace("Content-Type", "multipart/mixed; boundary=ec2boundary");
+    headers.emplace("Access-Control-Allow-Origin", "*");
+    headers.emplace("Connection", "Keep-Alive");
+
+    nx::Buffer result;
+    initialResponse.serialize(&result);
+
+    return result;
+}
+
+QByteArray P2PHttpServerTransport::makeResponseFrame(const nx::Buffer& payload) const
+{
+    http::Response contentResponse;
+    contentResponse.headers.emplace(
+        "Content-Type",
+        m_messageType == websocket::FrameType::text
+        ? "application/json" : "application/ubjson");
+    contentResponse.messageBody = payload;
+
+    nx::Buffer contentBuffer;
+    static const nx::Buffer boundary = "--ec2boundary";
+    contentResponse.serializeMultipartResponse(&contentBuffer, boundary);
+
+    return contentBuffer;
 }
 
 void P2PHttpServerTransport::bindToAioThread(aio::AbstractAioThread* aioThread)
