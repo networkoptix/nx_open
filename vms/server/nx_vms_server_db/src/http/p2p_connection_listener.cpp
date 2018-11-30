@@ -326,18 +326,52 @@ void ConnectionProcessor::run()
     P2pTransportPtr p2pTransport;
     const auto dataFormat = remotePeer.dataFormat == Qn::JsonFormat
         ? websocket::FrameType::text : websocket::FrameType::binary;
-    if (useWebSocket)
-        p2pTransport = std::make_unique<P2PWebsocketTransport>(std::move(d->socket), dataFormat);
-    else
-        p2pTransport = std::make_unique<P2PHttpServerTransport>(std::move(d->socket), dataFormat);
 
-    messageBus->gotConnectionFromRemotePeer(
-        remotePeer,
-        std::move(connectionLockGuard),
-        std::move(p2pTransport),
-        QUrlQuery(d->request.requestLine.url.query()),
-        userAccessData(remotePeer),
-        onConnectionClosedCallback);
+    if (useWebSocket)
+    {
+        p2pTransport = std::make_unique<P2PWebsocketTransport>(std::move(d->socket), dataFormat);
+        messageBus->gotConnectionFromRemotePeer(
+            remotePeer,
+            std::move(connectionLockGuard),
+            std::move(p2pTransport),
+            QUrlQuery(d->request.requestLine.url.query()),
+            userAccessData(remotePeer),
+            onConnectionClosedCallback);
+    }
+    else
+    {
+        std::shared_ptr<P2PHttpServerTransport> p2pHttpServerTransport(new P2PHttpServerTransport(
+            std::move(d->socket),
+            dataFormat));
+
+        auto onGetReceivedCallback =
+            [messageBus,
+            remotePeer,
+            connectionLockGuard = std::move(connectionLockGuard),
+            p2pHttpServerTransport,
+            query = QUrlQuery(d->request.requestLine.url.query()),
+            accessData = userAccessData(remotePeer),
+            onConnectionClosedCallback](
+                SystemError::ErrorCode error) mutable
+            {
+                if (error == SystemError::noError)
+                {
+                    messageBus->gotConnectionFromRemotePeer(
+                        remotePeer,
+                        std::move(connectionLockGuard),
+                        P2pTransportPtr(p2pHttpServerTransport.get()),
+                        query,
+                        accessData,
+                        onConnectionClosedCallback);
+                }
+                else
+                {
+                    // #TODO: #rvasilenko Implement this.
+                }
+            };
+
+        p2pHttpServerTransport->start(std::move(onGetReceivedCallback));
+    }
 }
 
 } // namespace p2p

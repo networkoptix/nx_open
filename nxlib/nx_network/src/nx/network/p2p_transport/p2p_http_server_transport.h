@@ -3,18 +3,24 @@
 #include <nx/network/p2p_transport/i_p2p_transport.h>
 #include <nx/network/websocket/websocket_common_types.h>
 #include <nx/network/http/http_parser.h>
+#include <nx/network/aio/timer.h>
 
 namespace nx::network {
 
 class NX_NETWORK_API P2PHttpServerTransport: public IP2PTransport
 {
 public:
-    P2PHttpServerTransport(std::unique_ptr<AbstractStreamSocket> socket,
+    P2PHttpServerTransport(
+        std::unique_ptr<AbstractStreamSocket> socket,
         websocket::FrameType messageType = websocket::FrameType::binary);
 
     virtual ~P2PHttpServerTransport() override;
 
     void gotPostConnection(std::unique_ptr<AbstractStreamSocket> socket);
+    /**
+     * This should be called before all other operations
+     */
+    void start(utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onGetRequestReceived);
 
     virtual void readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler) override;
     virtual void sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler) override;
@@ -41,6 +47,9 @@ private:
     nx::Buffer m_sendBuffer;
     bool m_firstSend = true;
     ReadContext m_readContext;
+    aio::Timer m_timer;
+    utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onGetRequestReceived =
+        [](SystemError::ErrorCode) {};
 
     void onBytesRead(
         SystemError::ErrorCode error,

@@ -5,13 +5,42 @@
 
 namespace nx::network {
 
-P2PHttpServerTransport::P2PHttpServerTransport(std::unique_ptr<AbstractStreamSocket> socket,
+P2PHttpServerTransport::P2PHttpServerTransport(
+    std::unique_ptr<AbstractStreamSocket> socket,
     websocket::FrameType messageType)
     :
     m_sendSocket(std::move(socket)),
     m_messageType(messageType)
 {
     m_readContext.parser.setMessage(&m_readContext.message);
+    m_timer.bindToAioThread(m_sendSocket->getAioThread());
+
+}
+
+void P2PHttpServerTransport::start(
+    utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onGetRequestReceived)
+{
+    m_onGetRequestReceived = std::move(onGetRequestReceived);
+
+    m_timer.start(
+        std::chrono::seconds(10),
+        [this]()
+        {
+            if (m_onGetRequestReceived)
+                m_onGetRequestReceived(SystemError::connectionAbort);
+        });
+
+    m_sendSocket->readSomeAsync(
+        &m_sendBuffer,
+        [this](SystemError::ErrorCode error, size_t transferred)
+        {
+            if (error != SystemError::noError || transferred == 0)
+                return m_onGetRequestReceived(SystemError::connectionAbort);
+
+            auto onGetRequestReceived = std::move(m_onGetRequestReceived);
+            m_onGetRequestReceived = nullptr;
+            onGetRequestReceived(SystemError::noError);
+        });
 }
 
 P2PHttpServerTransport::~P2PHttpServerTransport()
@@ -30,6 +59,9 @@ void P2PHttpServerTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletio
     m_sendSocket->post(
         [this, buffer, handler = std::move(handler)]() mutable
         {
+            if (m_onGetRequestReceived)
+                return handler(SystemError::connectionAbort, 0);
+
             readFromSocket(buffer, std::move(handler));
         });
 }
@@ -90,13 +122,15 @@ void P2PHttpServerTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
     m_sendSocket->post(
         [this, &buffer, handler = std::move(handler)]() mutable
         {
+            if (m_onGetRequestReceived)
+                return handler(SystemError::connectionAbort, 0);
+
             if (m_firstSend)
             {
                 m_sendBuffer = makeInitialResponse();
                 m_firstSend = false;
             }
 
-            // #TODO: #akulikov Optimize this.
             const auto contentFrame = makeResponseFrame(buffer);
             // To make a peer actually receive and process payload frame
             const auto dummyFrame = makeResponseFrame("NX");
@@ -127,7 +161,6 @@ QByteArray P2PHttpServerTransport::makeInitialResponse() const
     initialResponse.statusLine.version = http::http_1_1;
 
     auto& headers = initialResponse.headers;
-    // #TODO: #akulikov Make some constants.
     headers.emplace("Host", m_sendSocket->getForeignHostName().toUtf8());
     headers.emplace("Content-Type", "multipart/mixed; boundary=ec2boundary");
     headers.emplace("Access-Control-Allow-Origin", "*");
@@ -144,8 +177,7 @@ QByteArray P2PHttpServerTransport::makeResponseFrame(const nx::Buffer& payload) 
     http::Response contentResponse;
     contentResponse.headers.emplace(
         "Content-Type",
-        m_messageType == websocket::FrameType::text
-        ? "application/json" : "application/ubjson");
+        m_messageType == websocket::FrameType::text ? "application/json" : "application/ubjson");
     contentResponse.messageBody = payload;
 
     nx::Buffer contentBuffer;
@@ -163,6 +195,7 @@ void P2PHttpServerTransport::bindToAioThread(aio::AbstractAioThread* aioThread)
             m_sendSocket->bindToAioThread(aioThread);
             if (m_readSocket)
                 m_readSocket->bindToAioThread(aioThread);
+            m_timer.bindToAioThread(aioThread);
         });
 }
 
