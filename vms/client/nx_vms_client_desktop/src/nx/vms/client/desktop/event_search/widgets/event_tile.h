@@ -89,6 +89,9 @@ public:
     bool footerEnabled() const;
     void setFooterEnabled(bool value);
 
+    bool headerEnabled() const;
+    void setHeaderEnabled(bool value);
+
     void setResourceList(const QnResourceList& list); //< Doesn't store it, only generates text.
     void setResourceList(const QStringList& list);
 

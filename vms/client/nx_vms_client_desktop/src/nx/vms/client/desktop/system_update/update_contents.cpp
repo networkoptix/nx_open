@@ -9,6 +9,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/update/update_check.h>
 #include <nx/vms/discovery/manager.h>
+#include <nx/utils/app_info.h>
 #include <utils/common/app_info.h>
 
 #include "update_contents.h"
@@ -123,7 +124,6 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
         contents.eulaPath = contents.info.eulaLink;
     }
 
-    auto clientInfo = QnAppInfo::currentSystemInformation();
     QString errorMessage;
     // Update is allowed if either target version has the same cloud host or
     // there are no servers linked to the cloud in the system.
@@ -131,16 +131,22 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     bool boundToCloud = !commonModule->globalSettings()->cloudSystemId().isEmpty();
     bool alreadyInstalled = true;
 
-    if (!clientInfo.version.isEmpty()
-        && (nx::utils::SoftwareVersion(clientInfo.version) != contents.getVersion()))
+    QString clientVersionRaw = nx::utils::AppInfo::applicationVersion();
+    if (!clientVersionRaw.isEmpty()
+        && (nx::utils::SoftwareVersion(clientVersionRaw) != contents.getVersion()))
     {
         alreadyInstalled = false;
     }
 
-    nx::update::findPackage(
-        clientInfo,
-        contents.info,
-        true, cloudUrl, boundToCloud, &contents.clientPackage, &errorMessage);
+    auto systemInfo = QnAppInfo::currentSystemInformation();
+    if (nx::update::findPackage(
+            systemInfo,
+            contents.info,
+            true, cloudUrl, boundToCloud, &contents.clientPackage, &errorMessage)
+        != nx::update::FindPackageResult::ok)
+    {
+        NX_ERROR(NX_SCOPE_TAG, "(%1)Error while trying to find client package: %2", contents.info.version, errorMessage);
+    }
 
     QSet<QnUuid> allServers;
 
@@ -203,35 +209,41 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
 
     contents.cloudIsCompatible = checkCloudHost(commonModule, targetVersion, contents.info.cloudHost, allServers);
 
-    if (!contents.missingUpdate.empty() || !contents.clientPackage.isValid())
+    if (!contents.missingUpdate.empty())
     {
-        NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest(" << contents.info.version <<") - detected missing packages";
+        NX_WARNING(NX_SCOPE_TAG, "(%1) - detected missing server packages.", contents.info.version);
+        contents.error = nx::update::InformationError::missingPackageError;
+    }
+
+    if (!contents.clientPackage.isValid())
+    {
+        NX_WARNING(NX_SCOPE_TAG, "(%1) - detected missing client package.", contents.info.version);
         contents.error = nx::update::InformationError::missingPackageError;
     }
 
     if (!contents.invalidVersion.empty())
     {
-        NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest(" << contents.info.version <<") - detected incompatible version error";
+        NX_WARNING(NX_SCOPE_TAG, "(%1) Detected incompatible version error.", contents.info.version);
         contents.error = nx::update::InformationError::incompatibleVersion;
     }
 
     // Update package has no packages at all.
     if (contents.info.packages.empty() && !activeServers.empty())
     {
-        NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest(" << contents.info.version <<") - this update is completely empty";
+        NX_WARNING(NX_SCOPE_TAG, "(%1) This update is completely empty.", contents.info.version);
         contents.error = nx::update::InformationError::missingPackageError;
     }
 
     if (!contents.cloudIsCompatible)
     {
-        NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest(" << contents.info.version <<") - detected incompatible cloud";
+        NX_WARNING(NX_SCOPE_TAG, "(%1) Detected detected incompatible cloud.", contents.info.version);
         contents.error = nx::update::InformationError::incompatibleCloudHostError;
     }
 
     if (!contents.manualPackages.empty())
     {
         QStringList files;
-        NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest(" << contents.info.version << ") - detected some servers can not download update packages.";
+        NX_WARNING(NX_SCOPE_TAG, "(%1) Detected some servers can not download update packages.", contents.info.version);
     }
 
     contents.verified = true;

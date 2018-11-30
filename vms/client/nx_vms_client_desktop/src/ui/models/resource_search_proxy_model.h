@@ -53,6 +53,7 @@ class QnResourceSearchProxyModel: public QSortFilterProxyModel, protected QnReso
 {
     Q_OBJECT
     using base_type = QSortFilterProxyModel;
+    using NodeType = nx::vms::client::desktop::ResourceTreeNodeType;
 
 public:
     explicit QnResourceSearchProxyModel(QObject* parent = nullptr);
@@ -106,6 +107,12 @@ public slots:
 
 protected:
     virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+
+private:
+    bool isVisibleNodeType(NodeType nodeType, bool isSearchMode) const;
+    bool isResourceMatchesQuery(QnResourcePtr resource, const QnResourceSearchQuery& query) const;
+    bool isRepresentationMatchesQuery(const QModelIndex& index,
+        const QnResourceSearchQuery& query) const;
 
 private:
     bool m_invalidating = false;

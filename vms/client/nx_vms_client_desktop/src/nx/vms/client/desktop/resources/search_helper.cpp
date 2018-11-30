@@ -15,49 +15,39 @@ bool isSearchStringValid(const QString& searchString)
 
 bool matches(const QString& searchString, const QnResourcePtr& resource)
 {
-    const auto mv = matchValues(searchString, resource);
-#ifdef RESOURCE_SEARCH_DEBUG
-    qDebug() << "search " << searchString << " in " << resource->getName();
-    for (auto [k, v]: mv)
-    {
-        qDebug() << "key" << (int)k << " value " << v;
-    }
-    if (!mv.empty())
-        qDebug() << "----MATCH!----------";
-    else
-        qDebug() << "----FAIL!----------";
-#endif
-    return !mv.empty();
+    if (!isSearchStringValid(searchString))
+        return false;
+
+    auto searchWords = uniqueSearchWords(searchString);
+    const auto matches = matchSearchWords(searchWords, resource);
+
+    // Deduce result by loose AND logic: each search word should match at least one resource parameter.
+    return matches.keys().size() == searchWords.size();
 }
 
-Matches matchValues(const QString& searchString, const QnResourcePtr& resource)
+Matches matchSearchWords(const QStringList& searchWords, const QnResourcePtr& resource)
 {
     static constexpr int kIdMatchLength = 4;
 
     Matches result;
 
-    if (!isSearchStringValid(searchString))
-        return result;
-
-    // Combining search values with AND logic.
-    QStringList searchWords = searchString.split(" ", QString::SkipEmptyParts);
     for (const auto& searchWord: searchWords)
     {
         auto checkParameter =
             [&result, &searchWord](Parameter parameter, QString value, int matchLength = 1)
             {
                 if (value.compare(searchWord, Qt::CaseInsensitive) == 0)
-                    result.emplace(parameter, value);
+                    result[searchWord].append(parameter);
 
                 if (searchWord.size() >= matchLength && value.contains(searchWord, Qt::CaseInsensitive))
-                    result.emplace(parameter, value);
+                    result[searchWord].append(parameter);
             };
 
         auto checkParameterFullMatch =
             [&result, &searchWord](Parameter parameter, QString value)
             {
                 if (value.compare(searchWord, Qt::CaseInsensitive) == 0)
-                    result.emplace(parameter, value);
+                    result[searchWord].append(parameter);
             };
 
         if (resource->logicalId() > 0)
@@ -87,6 +77,14 @@ Matches matchValues(const QString& searchString, const QnResourcePtr& resource)
         }
     }
 
+    return result;
+}
+
+QStringList uniqueSearchWords(const QString& searchString)
+{
+    QStringList result = searchString.split(" ", QString::SkipEmptyParts);
+    std::for_each(result.begin(), result.end(), [](QString& str) { str.toLower(); });
+    result.removeDuplicates();
     return result;
 }
 

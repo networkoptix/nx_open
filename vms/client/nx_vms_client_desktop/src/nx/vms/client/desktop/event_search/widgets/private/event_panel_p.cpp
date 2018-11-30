@@ -6,11 +6,13 @@
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QVBoxLayout>
 
+#include <core/resource/resource.h>
 #include <ui/common/notification_levels.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_navigator.h>
 
 #include <nx/vms/client/desktop/common/widgets/animated_tab_widget.h>
 #include <nx/vms/client/desktop/common/widgets/compact_tab_bar.h>
@@ -56,6 +58,13 @@ EventPanel::Private::Private(EventPanel* q):
     layout->setContentsMargins(QMargins());
     layout->addWidget(m_tabs);
 
+    // Initially all tab widgets must be hidden.
+    m_notificationsTab->hide();
+    m_motionTab->hide();
+    m_bookmarksTab->hide();
+    m_eventsTab->hide();
+    m_analyticsTab->hide();
+
     static constexpr int kTabBarShift = 10;
     m_tabs->setProperty(style::Properties::kTabBarIndent, kTabBarShift);
     setTabShape(m_tabs->tabBar(), style::TabShape::Compact);
@@ -99,6 +108,9 @@ EventPanel::Private::Private(EventPanel* q):
     connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged,
         this, &Private::rebuildTabs);
 
+    connect(navigator(), &QnWorkbenchNavigator::currentResourceChanged,
+        this, &Private::rebuildTabs);
+
     rebuildTabs();
 
     using Tabs = std::initializer_list<AbstractSearchWidget*>;
@@ -137,24 +149,38 @@ void EventPanel::Private::setTabCurrent(QWidget* tab, bool current)
 
 void EventPanel::Private::rebuildTabs()
 {
-    m_tabs->clear();
-    m_previousTab = nullptr;
-    m_lastTab = nullptr;
+    int currentIndex = 0;
 
     const auto updateTab =
-        [this](QWidget* tab, bool condition, const QIcon& icon, const QString& text)
+        [this, &currentIndex](QWidget* tab, bool condition, const QIcon& icon, const QString& text)
         {
+            const int oldIndex = m_tabs->indexOf(tab);
+            NX_ASSERT(oldIndex < 0 || oldIndex == currentIndex);
+
+            const bool tabVisible = oldIndex >= 0;
             if (condition)
             {
-                const int index = m_tabs->count();
-                m_tabs->insertTab(index, tab, icon, text);
-                m_tabs->setTabToolTip(index, text);
+                if (!tabVisible)
+                {
+                    // Add tab.
+                    m_tabs->insertTab(currentIndex, tab, icon, text);
+                    m_tabs->setTabToolTip(currentIndex, text);
+                }
+
+                ++currentIndex;
             }
-            else
+            else if (tabVisible)
             {
+                // Remove tab.
+                if (m_previousTab == tab || m_tabs->indexOf(m_previousTab) < 0)
+                    m_previousTab = m_notificationsTab;
+                setTabCurrent(tab, false);
+                m_tabs->removeTab(currentIndex);
                 tab->hide();
             }
         };
+
+    const auto resource = navigator()->currentResource();
 
     updateTab(m_notificationsTab,
         true,
@@ -162,7 +188,7 @@ void EventPanel::Private::rebuildTabs()
         tr("Notifications", "Notifications tab title"));
 
     updateTab(m_motionTab,
-        true,
+        resource && resource->hasFlags(Qn::motion),
         qnSkin->icon(lit("events/tabs/motion.png")),
         tr("Motion", "Motion tab title"));
 
@@ -211,11 +237,20 @@ void EventPanel::Private::updateUnreadCounter(int count, QnNotificationLevel::Va
 void EventPanel::Private::showContextMenu(const QPoint& pos)
 {
     QMenu contextMenu;
-    contextMenu.addAction(action(ui::action::OpenBusinessLogAction));
-    contextMenu.addAction(action(ui::action::BusinessEventsAction));
-    contextMenu.addAction(action(ui::action::PreferencesNotificationTabAction));
+    const auto actions = {
+        ui::action::OpenBusinessLogAction,
+        ui::action::BusinessEventsAction,
+        ui::action::PreferencesNotificationTabAction};
+
+    for (const auto actionId: actions)
+    {
+        if (menu()->canTrigger(actionId))
+            contextMenu.addAction(action(actionId));
+    }
+
     contextMenu.addSeparator();
     contextMenu.addAction(action(ui::action::PinNotificationsAction));
+
     contextMenu.exec(QnHiDpiWorkarounds::safeMapToGlobal(q, pos));
 }
 

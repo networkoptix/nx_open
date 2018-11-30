@@ -432,8 +432,6 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
 
     using Error = nx::update::InformationError;
     using SourceType = nx::update::UpdateSourceType;
-    if (contents.error == Error::noError)
-        return report;
 
     bool validUpdate = contents.isValid();
     auto source = contents.sourceType;
@@ -443,6 +441,10 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
     if (contents.alreadyInstalled && source != SourceType::internet)
     {
         report.status = tr("You already have this version installed");
+    }
+    else if (contents.error == Error::noError)
+    {
+        return report;
     }
     else if (!validUpdate)
     {
@@ -494,8 +496,8 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
         }
     }
 
-    auto info = QnAppInfo::currentSystemInformation();
-    auto currentVersion = nx::utils::SoftwareVersion(info.version);
+    QString versionRaw = nx::utils::AppInfo::applicationVersion();
+    auto currentVersion = nx::utils::SoftwareVersion(versionRaw);
 
     if (validUpdate && contents.getVersion() < currentVersion)
     {
@@ -523,6 +525,10 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
         NX_VERBOSE(this) << "atUpdateCurrentState got update info:"
             << checkResponse.info.version
             << "from" << checkResponse.source;
+        if (checkResponse.sourceType == nx::update::UpdateSourceType::mediaservers)
+        {
+            NX_INFO(this) << "atUpdateCurrentState this is the data from /ec2/updateInformation";
+        }
 
         m_serverUpdateTool->verifyUpdateManifest(checkResponse);
         m_updateLocalStateChanged = true;
@@ -532,7 +538,7 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
         m_targetVersion = nx::utils::SoftwareVersion(checkResponse.info.version);
         m_targetChangeset = m_targetVersion.build();
 
-        if (checkResponse.isValid())
+        if (checkResponse.isValid() && !checkResponse.alreadyInstalled)
             m_haveValidUpdate = true;
 
         auto report = calculateUpdateVersionReport(m_updateInfo);
@@ -694,7 +700,7 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
                 return;
             }*/
             auto targets = m_serverUpdateTool->getAllServers();
-            NX_VERBOSE(this) << "atStartUpdateAction() - sending 'download' command";
+            NX_VERBOSE(this) << "atStartUpdateAction() - sending 'download' command to peers" << targets;
             auto offlineServers = m_serverUpdateTool->getOfflineServers();
             if (!offlineServers.empty())
             {
@@ -847,21 +853,35 @@ ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress
     }
     else if (m_updateStateCurrent == WidgetUpdateState::downloading)
     {
+        // Note: we can get here right after we clicked 'download' but before
+        // we got an update from /ec2/updateStatus. Most servers will be in 'idle' state.
+        // We even can get a stale callback from /ec2/updateStatus, with data actual to
+        // the moment right before we pressed 'Download'.
+        // It will be very troublesome to properly wait for updated /ec2/updateStatus.
         for (auto id : m_serversIssued)
         {
             auto item = m_updatesModel->findItemById(id);
             if (!item)
                 continue;
-
-            if (item->state == nx::update::Status::Code::downloading)
+            switch(item->state)
             {
-                result.current += item->progress;
-                ++result.active;
-            }
-            else
-            {
-                result.current += 100;
-                ++result.done;
+                case nx::update::Status::Code::idle:
+                    // This stage has zero progress.
+                    ++result.active;
+                    break;
+                case nx::update::Status::Code::downloading:
+                    result.current += item->progress;
+                    ++result.active;
+                    break;
+                case nx::update::Status::Code::error:
+                case nx::update::Status::Code::preparing:
+                case nx::update::Status::Code::readyToInstall:
+                    result.current += 100;
+                    ++result.done;
+                    break;
+                case nx::update::Status::Code::latestUpdateInstalled:
+                case nx::update::Status::Code::offline:
+                    break;
             }
         }
 
@@ -889,9 +909,12 @@ ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress
     }
     else if (m_updateStateCurrent == WidgetUpdateState::installing)
     {
+        // Note: we can get here right after we clicked 'Install' but before
+        // we get recent update from /ec2/updateStatus. Most servers will be in 'readyToInstall' state.
+        // We even can get a stale callback from /ec2/updateStatus, with data actual to
+        // the moment right before we pressed 'Install'.
         auto installing = m_serverUpdateTool->getServersInstalling();
         auto installed = m_serverUpdateTool->getServersCompleteInstall();
-        // TODO: Deal with it.
         result.installingServers = !m_serversActive.empty();
 
         int total = m_serversIssued.size();
@@ -924,10 +947,6 @@ void MultiServerUpdatesWidget::processRemoteInitialState()
     if (m_serverUpdateTool->haveActiveUpdate())
     {
         auto updateInfo = m_serverUpdateTool->getRemoteUpdateContents();
-        NX_VERBOSE(this)
-            << "processRemoteInitialState() - we have an active update process to version"
-            << updateInfo.info.version;
-
         /*
          * TODO: We should deal with starting client update.
          * There are two distinct situations:
@@ -937,16 +956,30 @@ void MultiServerUpdatesWidget::processRemoteInitialState()
          */
         if (updateInfo.isValid())
         {
-            m_updateCheck = std::future<nx::update::UpdateContents>();
+            bool hasClientUpdate = m_clientUpdateTool->shouldInstallThis(updateInfo);
+            if (updateInfo.alreadyInstalled && !hasClientUpdate)
+            {
+                // It seems like we should not change the state.
+                NX_VERBOSE(this)
+                    << "processRemoteInitialState() - looks like we have installed this update already";
+                setTargetState(WidgetUpdateState::ready, {});
+                return;
+            }
             m_updateInfo = updateInfo;
+            m_updateCheck = std::future<nx::update::UpdateContents>();
+            if (hasClientUpdate)
+                m_clientUpdateTool->downloadUpdate(updateInfo);
             m_haveValidUpdate = true;
-            m_clientUpdateTool->downloadUpdate(updateInfo);
         }
         else
         {
             m_updateCheck = m_serverUpdateTool->checkRemoteUpdateInfo();
             m_haveValidUpdate = false;
         }
+
+        NX_VERBOSE(this)
+            << "processRemoteInitialState() - we have an active update process to version"
+            << updateInfo.info.version;
 
         m_updateLocalStateChanged = true;
 
@@ -970,10 +1003,6 @@ void MultiServerUpdatesWidget::processRemoteInitialState()
         }
         else if (!installed.empty())
         {
-            // We can be here when we have all servers installed all updates.
-            // There will be some information in /ec2/updateInformation,
-            // but all the servers from /ec2/updateStatus will tell 'No update information'.
-            // Their version will be equal to the version in /ec2/updateInformation
             NX_VERBOSE(this)
                 << "processRemoteInitialState() - servers" << installed
                 << "have already downloaded an update";
@@ -1248,11 +1277,13 @@ void MultiServerUpdatesWidget::processRemoteInstalling()
                 else
                 {
                     NX_WARNING(this) << "processRemoteInstalling() ClientUpdateTool has no package to install";
+                    completeInstallation(false);
                 }
             }
             else
             {
                 NX_WARNING(this) << "processRemoteInstalling() client was not going to install its own update package";
+                completeInstallation(false);
             }
         }
         // No servers have installed updates
@@ -1308,6 +1339,8 @@ void MultiServerUpdatesWidget::completeInstallation(bool clientUpdated)
         NX_VERBOSE(this) << "completeInstallation() - servers" << updatedProtocol << "have new protocol. Forcing reconnect";
         menu()->trigger(action::DisconnectAction, {Qn::ForceRole, true});
     }
+
+    setTargetState(WidgetUpdateState::initial);
 }
 
 bool MultiServerUpdatesWidget::processRemoteChanges(bool force)
@@ -1442,7 +1475,7 @@ void MultiServerUpdatesWidget::closePanelNotifications()
     m_rightPanelDownloadProgress = QnUuid();
 }
 
-void MultiServerUpdatesWidget::syncUpdateCheck()
+void MultiServerUpdatesWidget::syncUpdateCheckToUi()
 {
     bool isChecking = m_updateCheck.valid();
     bool hasEqualUpdateInfo = m_updatesModel->lowestInstalledVersion() >= m_updateInfo.getVersion();
@@ -1615,7 +1648,7 @@ void MultiServerUpdatesWidget::syncProgress()
     }
 }
 
-void MultiServerUpdatesWidget::syncRemoteUpdateState()
+void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
 {
     // This function gathers state status of update from remote servers and changes
     // UI state accordingly.
@@ -1714,11 +1747,11 @@ void MultiServerUpdatesWidget::loadDataToUi()
     if (m_updateLocalStateChanged || m_updateRemoteStateChanged)
     {
         // This one depends both on local and remote information.
-        syncUpdateCheck();
+        syncUpdateCheckToUi();
     }
 
     if (m_updateRemoteStateChanged)
-        syncRemoteUpdateState();
+        syncRemoteUpdateStateToUi();
 
     bool endOfTheWeek = QDateTime::currentDateTime().date().dayOfWeek() >= kTooLateDayOfWeek;
     ui->dayWarningBanner->setVisible(endOfTheWeek);
@@ -1848,7 +1881,8 @@ void MultiServerUpdatesWidget::checkForInternetUpdates()
         clearUpdateInfo();
         QString updateUrl = qnSettings->updateFeedUrl();
         m_updateCheck = nx::update::checkLatestUpdate(updateUrl);
-        syncUpdateCheck();
+        // Maybe we should call loadDataToUi instead.
+        syncUpdateCheckToUi();
     }
 }
 
