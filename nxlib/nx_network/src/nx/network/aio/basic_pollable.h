@@ -84,6 +84,10 @@ public:
     /**
      * @param completionHandler Called in object's AIO thread (returned by getAioThread()) after 
      * completion or cancellation of all scheduled asynchronous operations.
+     * Object can be safely deleted after completion of this call.
+     * WARNING: All usage of this object from non-AIO thread should be halted before invoking 
+     * this method. Otherwise, undefined behavior will happen. All usage in AIO thread is safe 
+     * (it will be cancelled or waited for completion).
      * NOTE: In most cases, you don't need to override this.
      * Override BasicPollable::stopWhileInAioThread instead.
      */
