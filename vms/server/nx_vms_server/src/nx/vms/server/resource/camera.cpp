@@ -503,7 +503,7 @@ StreamCapabilityMap Camera::getStreamCapabilityMap(Qn::StreamIndex streamIndex)
             continue;
         }
 
-        NX_DEBUG(this, lm("Remove unsuported stream capability %1").args(itr.key()));
+        NX_DEBUG(this, lm("Remove unsupported stream capability %1").args(itr.key()));
         itr = result.erase(itr);
     }
 

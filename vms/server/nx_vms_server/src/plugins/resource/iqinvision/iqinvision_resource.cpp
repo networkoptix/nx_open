@@ -109,7 +109,7 @@ bool QnPlIqResource::isRtp() const
     // TODO: #dmihsin determine a camera type via API.
     QString name = getModel().toUpper();
     return
-		name == QLatin1String("IQA35") ||
+        name == QLatin1String("IQA35") ||
         name == QLatin1String("IQA33N") ||
         //name == QLatin1String("IQA32N") ||
         name == QLatin1String("IQA31") ||
