@@ -744,6 +744,13 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send(
         const SystemError::ErrorCode errCode = SystemError::getLastOSErrorCode();
         if (socketCannotRecoverFromError(errCode))
             m_connected = false;
+
+        // NOTE: Sometimes, wouldBlock is reported instead of timedOut.
+        bool nonBlockingModeEnabled = false;
+        if (!getNonBlockingMode(&nonBlockingModeEnabled))
+            return -1;
+        if (!nonBlockingModeEnabled && errCode == SystemError::wouldBlock)
+            SystemError::setLastErrorCode(SystemError::timedOut);
     }
     else if (sended == 0)
     {
