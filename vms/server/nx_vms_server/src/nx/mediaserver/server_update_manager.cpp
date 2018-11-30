@@ -11,7 +11,7 @@ ServerUpdateManager::ServerUpdateManager(QnMediaServerModule* serverModule):
 {
 }
 
-vms::common::p2p::downloader::AbstractDownloader* ServerUpdateManager::downloader()
+vms::common::p2p::downloader::Downloader* ServerUpdateManager::downloader()
 {
     return serverModule()->findInstance<vms::common::p2p::downloader::Downloader>();
 }
