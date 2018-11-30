@@ -30,7 +30,6 @@ SearchLineEdit::SearchLineEdit(QWidget* parent):
     setPalette(p);
 
     // line edit
-    m_lineEdit->setFrame(false);
     m_lineEdit->setFocusProxy(this);
     m_lineEdit->setAttribute(Qt::WA_MacShowFocusRect, false);
     QPalette clearPalette = m_lineEdit->palette();
@@ -51,6 +50,10 @@ SearchLineEdit::SearchLineEdit(QWidget* parent):
 
     QSizePolicy policy = sizePolicy();
     setSizePolicy(QSizePolicy::Preferred, policy.verticalPolicy());
+
+    // Sets empty frame and invalidates geometry of control. Should be called outside constructor
+    // to prevent wrong layout size recalculations.
+    executeLater([this](){ m_lineEdit->setFrame(false); }, this);
 }
 
 SearchLineEdit::~SearchLineEdit()
@@ -75,10 +78,7 @@ void SearchLineEdit::initStyleOption(QStyleOptionFrame* option) const
 
 QSize SearchLineEdit::sizeHint() const
 {
-    m_lineEdit->setFrame(true);
-    QSize size = m_lineEdit->sizeHint();
-    m_lineEdit->setFrame(false);
-    return size;
+    return m_lineEdit->sizeHint();
 }
 
 QString SearchLineEdit::text() const

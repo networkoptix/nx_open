@@ -22,6 +22,7 @@
 #include <nx/utils/app_info.h>
 #include <utils/math/color_transformations.h>
 #include <utils/common/event_processors.h>
+#include <utils/common/delayed.h>
 
 namespace {
 
@@ -139,7 +140,6 @@ void HoverablePushButton::leaveEvent(QEvent* /*event*/)
 
 } //namespace
 
-#include <utils/common/delayed.h>
 namespace nx::vms::client::desktop {
 
 struct SearchEdit::Private
@@ -172,7 +172,6 @@ SearchEdit::SearchEdit(QWidget* parent):
     setAcceptDrops(true);
     setAttribute(Qt::WA_InputMethodEnabled);
 
-    d->lineEdit->setFrame(false);
     d->lineEdit->setFixedHeight(kLineEditHeight);
     d->lineEdit->setFocusProxy(this);
     d->lineEdit->setAttribute(Qt::WA_MacShowFocusRect, false);
@@ -249,6 +248,9 @@ SearchEdit::SearchEdit(QWidget* parent):
             }
         });
 
+    // Sets empty frame and invalidates geometry of control. Should be called outside constructor
+    // to prevent wrong layout size recalculations.
+    executeLater([this](){ d->lineEdit->setFrame(false); }, this);
 }
 
 SearchEdit::~SearchEdit()
@@ -427,9 +429,6 @@ void SearchEdit::updateTagButton()
 
 QSize SearchEdit::sizeHint() const
 {
-    const QnScopedTypedPropertyRollback<bool, QLineEdit>
-        frameRollback(d->lineEdit, &QLineEdit::setFrame, &QLineEdit::hasFrame, true);
-
     const auto tagVerticalSize = d->tagButton->isVisible()
         ? QSize(0, d->tagButton->parentWidget()->sizeHint().height())
         : QSize();
