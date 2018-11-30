@@ -83,7 +83,7 @@ public:
 
     /**
      * @param completionHandler Called in object's AIO thread (returned by getAioThread()) after 
-     * completion or cancellation of all scheduled operations.
+     * completion or cancellation of all scheduled asynchronous operations.
      * NOTE: In most cases, you don't need to override this.
      * Override BasicPollable::stopWhileInAioThread instead.
      */
@@ -91,7 +91,7 @@ public:
 
     /**
      * If called within object's AIO thread (returned by getAioThread()) then cancells all 
-     * scheduled non-blocking operations and returns immediately.
+     * scheduled operations without blocking and returns immediately.
      * Otherwise, invokes BasicPollable::pleaseStop and waits for completion.
      * NOTE: In most cases, you don't need to override this.
      * Override BasicPollable::stopWhileInAioThread instead.
@@ -129,7 +129,7 @@ public:
 
     /**
      * @param completionHandler Will be called in object's AIO thread (returned by getAioThread())
-     * after completion or cancellation of all posted calls.
+     * after completion or cancellation of every call posted with BasicPollable::post.
      */
     void cancelPostedCalls(nx::utils::MoveOnlyFunc<void()> completionHandler);
 
