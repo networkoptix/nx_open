@@ -1,6 +1,7 @@
 #include "p2p_http_server_transport.h"
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/http_types.h>
+#include <nx/utils/log/log.h>
 
 namespace nx::network {
 
@@ -91,6 +92,7 @@ void P2PHttpServerTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
         {
             if (m_firstSend)
             {
+                NX_VERBOSE(this, "First send");
                 http::Response initialResponse;
                 auto& headers = initialResponse.headers;
 
@@ -118,13 +120,17 @@ void P2PHttpServerTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
 
             // #TODO: #akulikov Optimize this.
             m_sendBuffer += contentBuffer;
+            NX_VERBOSE(this, lm("Sending %1 bytes: %2").args(m_sendBuffer.size(), m_sendBuffer));
+
             m_sendSocket->sendAsync(
                 m_sendBuffer,
                 [this, handler = std::move(handler)](
                     SystemError::ErrorCode error,
                     size_t transferred)
                 {
-                    qDebug() << "SENT" << error << transferred;
+                    NX_VERBOSE(
+                        this,
+                        lm("Send completed. error: %1, transferred: %2").args(error, transferred));
                     m_sendBuffer.clear();
                     handler(error, transferred);
                 });

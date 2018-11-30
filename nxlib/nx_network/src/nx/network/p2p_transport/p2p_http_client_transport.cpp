@@ -155,6 +155,7 @@ void P2PHttpClientTransport::startReading()
             auto nextFilter = nx::utils::bstream::makeCustomOutputStream(
                 [this](const QnByteArrayConstRef& data)
                 {
+                    NX_VERBOSE(this, "OnResponceReceived");
                     if (m_incomingMessageQueue.size() < kMaxMessageQueueSize)
                     {
                         NX_VERBOSE(this, lm("Got incoming message %1").arg(data));
@@ -194,15 +195,18 @@ void P2PHttpClientTransport::startReading()
     m_readHttpClient->setOnSomeMessageBodyAvailable(
         [this]()
         {
+            NX_VERBOSE(this, "setOnSomeMessageBodyAvailable");
             m_multipartContentParser.processData(m_readHttpClient->fetchMessageBodyBuffer());
         });
 
-    m_readHttpClient->setOnDone(
-        [this]()
-        {
-            NX_VERBOSE(this, "Read (GET) http client emitted 'onDone'. Moving to failed state.");
-            m_failed = true;
-        });
+    // m_readHttpClient->setOnDone(
+    //     [this]()
+    //     {
+    //         NX_VERBOSE(this, "Read (GET) http client emitted 'onDone'. Moving to failed state.");
+    //         m_failed = true;
+    //     });
+
+    m_readHttpClient->doGet(m_readHttpClient->url());
 }
 
 P2PHttpClientTransport::PostBodySource::PostBodySource(

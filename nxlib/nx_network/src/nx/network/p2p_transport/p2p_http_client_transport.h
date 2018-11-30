@@ -52,7 +52,7 @@ private:
     UserReadHandlePair m_userReadHandlerPair;
     bool m_postInProgress = false;
     websocket::FrameType m_messageType;
-    bool m_failed;
+    bool m_failed = false;
 
     void startReading();
 };
