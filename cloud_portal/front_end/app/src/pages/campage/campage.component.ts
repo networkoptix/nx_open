@@ -252,6 +252,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
   setVendor(vendor) {
       this.filterModel.query = vendor;
       this.searchVendor(this.filterModel);
+      return false;
   }
 
 
