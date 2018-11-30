@@ -66,14 +66,6 @@ enum class HanwhaDeviceType
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(HanwhaDeviceType);
 
-enum class HanwhaBypassSupportType
-{
-    normal,
-    forced,
-    disabled
-};
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(HanwhaBypassSupportType);
-
 static const int kHanwhaBlockedHttpCode = 490;
 static const int kHanwhaInvalidParameterHttpCode = 602;
 
@@ -261,6 +253,3 @@ static const QString kSecondaryStreamFpsParamName = lit("secondaryStreamFps");
 } // namespace nx
 
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::server::plugins::HanwhaDeviceType, (lexical));
-QN_FUSION_DECLARE_FUNCTIONS(
-    nx::vms::server::plugins::HanwhaBypassSupportType,
-    (metatype)(numeric)(lexical));
