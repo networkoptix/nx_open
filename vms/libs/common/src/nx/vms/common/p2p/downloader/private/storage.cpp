@@ -3,25 +3,24 @@
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QCryptographicHash>
+#include <QtConcurrent/QtConcurrent>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/scope_guard.h>
 #include <utils/common/synctime.h>
 
+using namespace std::chrono;
+
 namespace {
 
 static constexpr qint64 kDefaultChunkSize = 1024 * 1024;
-static const QString kMetadataSuffix = lit(".vmsdownload");
-static const int kCleanupPeriodMSecs = 1000 * 60 * 5;
+static const QString kMetadataSuffix = ".vmsdownload";
+static const milliseconds kCleanupPeriod = 5min;
 
 } // namespace
 
-namespace nx {
-namespace vms {
-namespace common {
-namespace p2p {
-namespace downloader {
+namespace nx::vms::common::p2p::downloader {
 
 QN_FUSION_DECLARE_FUNCTIONS(FileMetadata, (json))
 
@@ -29,13 +28,17 @@ Storage::Storage(const QDir& downloadsDirectory, QObject* parent):
     QObject(parent),
     m_downloadsDirectory(downloadsDirectory)
 {
-    findDownloads();
-    cleanupExpiredFiles();
-
     /* Cleanup expired files every 5 mins. */
-    QTimer* timer = new QTimer(this);
+    const auto timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Storage::cleanupExpiredFiles);
-    timer->start(kCleanupPeriodMSecs);
+    timer->start(kCleanupPeriod);
+
+    findDownloads();
+}
+
+Storage::~Storage()
+{
+    waitForDownloadsToBeFound();
 }
 
 QDir Storage::downloadsDirectory() const
@@ -539,17 +542,32 @@ void Storage::findDownloads()
     if (!m_downloadsDirectory.exists())
         return;
 
-    findDownloadsImpl(m_downloadsDirectory);
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    if (m_findDownloadsWatcher.isRunning())
+        return;
+
+    m_findDownloadsWatcher.setFuture(QtConcurrent::run(
+        [this]()
+        {
+            findDownloadsRecursively(m_downloadsDirectory);
+            cleanupExpiredFiles();
+    }));
 }
 
-void Storage::findDownloadsImpl(const QDir& dir)
+void Storage::waitForDownloadsToBeFound()
+{
+    m_findDownloadsWatcher.waitForFinished();
+}
+
+void Storage::findDownloadsRecursively(const QDir& dir)
 {
     for (const auto& entry: dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot))
     {
         auto fileName = entry.absoluteFilePath();
         if (entry.isDir())
         {
-            findDownloadsImpl(QDir(fileName));
+            findDownloadsRecursively(QDir(fileName));
         }
         else if (fileName.endsWith(kMetadataSuffix))
         {
@@ -671,8 +689,7 @@ FileMetadata Storage::fileMetadata(const QString& fileName) const
     return m_fileInformationByName.value(fileName);
 }
 
-ResultCode Storage::loadDownload(
-    const QString& fileName)
+ResultCode Storage::loadDownload(const QString& fileName)
 {
     auto fileInfo = loadMetadata(fileName);
 
@@ -754,8 +771,4 @@ qint64 Storage::calculateChunkSize(qint64 fileSize, int chunkIndex, qint64 chunk
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(FileMetadata, (json), FileInformation_Fields (chunkChecksums))
 
-} // namespace downloader
-} // namespace p2p
-} // namespace common
-} // namespace vms
-} // namespace nx
+} // nx::vms::common::p2p::downloader
