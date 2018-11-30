@@ -616,6 +616,11 @@ protected:
         ASSERT_EQ(SystemError::noError, m_sendResultQueue.pop());
     }
 
+    void thenClientSendTimesOutEventually()
+    {
+        thenSendFailedWith(SystemError::timedOut);
+    }
+
     void thenSendFailedWith(SystemError::ErrorCode systemErrorCode)
     {
         ASSERT_EQ(systemErrorCode, m_sendResultQueue.pop());
@@ -626,6 +631,19 @@ protected:
         const auto errorCode = m_sendResultQueue.pop();
         ASSERT_NE(SystemError::noError, errorCode);
         ASSERT_TRUE(socketCannotRecoverFromError(errorCode));
+    }
+
+    void whenClientSendsRandomDataSynchronouslyUntilFailure()
+    {
+        ASSERT_TRUE(m_connection->setNonBlockingMode(false));
+        if (m_randomDataBuffer.isEmpty())
+            m_randomDataBuffer = nx::utils::generateRandomName(64 * 1024);
+
+        while (m_connection->send(m_randomDataBuffer.data(), m_randomDataBuffer.size()) > 0)
+        {
+        }
+
+        m_sendResultQueue.push(SystemError::getLastOSErrorCode());
     }
 
     void whenClientSendsRandomDataAsyncNonStop()
@@ -911,11 +929,6 @@ protected:
     void thenClientSocketReportedTimedout()
     {
         thenClientSocketReported(SystemError::timedOut);
-    }
-
-    void thenClientSendTimesOutEventually()
-    {
-        ASSERT_EQ(SystemError::timedOut, m_sendResultQueue.pop());
     }
 
     void thenClientSocketReportedFailure()
@@ -1484,7 +1497,18 @@ TYPED_TEST_P(StreamSocketAcceptance, socket_is_reusable_after_recv_timeout)
     this->thenServerMessageIsReceived();
 }
 
-TYPED_TEST_P(StreamSocketAcceptance, socket_reports_send_timeout)
+TYPED_TEST_P(StreamSocketAcceptance, sync_send_reports_timedOut)
+{
+    this->givenAcceptingServerSocket();
+    this->givenConnectedSocket();
+    this->setClientSocketSendTimeout(std::chrono::milliseconds(1));
+
+    this->whenClientSendsRandomDataSynchronouslyUntilFailure();
+
+    this->thenClientSendTimesOutEventually();
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, async_send_reports_timedOut)
 {
     this->givenAcceptingServerSocket();
     this->givenConnectedSocket();
@@ -1830,7 +1854,8 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     msg_dont_wait_flag_makes_recv_call_nonblocking,
     concurrent_recv_send_in_blocking_mode,
     socket_is_reusable_after_recv_timeout,
-    socket_reports_send_timeout,
+    sync_send_reports_timedOut,
+    async_send_reports_timedOut,
     all_data_sent_is_received_after_remote_end_closed_connection,
 
     //---------------------------------------------------------------------------------------------
