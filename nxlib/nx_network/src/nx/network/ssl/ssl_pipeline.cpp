@@ -4,35 +4,39 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/system_error.h>
 
 #include "ssl_static_data.h"
 
-namespace nx {
-namespace network {
-
-//-------------------------------------------------------------------------------------------------
-// ssl::Pipeline
-
-namespace ssl {
+namespace nx::network::ssl {
 
 Pipeline::Pipeline(SSL_CTX* sslContext):
-    m_state(State::init),
-    m_ssl(nullptr, &SSL_free),
-    m_readThirsty(false),
-    m_writeThirsty(false),
-    m_eof(false),
-    m_failed(false)
+    m_ssl(nullptr, &SSL_free)
 {
     initSslBio(sslContext);
 }
 
 int Pipeline::write(const void* data, size_t size)
 {
-    return performSslIoOperation(&SSL_write, data, size);
+    if (m_failed)
+    {
+        SystemError::setLastErrorCode(SystemError::invalidData);
+        return utils::bstream::StreamIoError::nonRecoverableError;
+    }
+
+    const auto resultCode = performSslIoOperation(&SSL_write, data, size);
+    if (m_state >= State::handshakeDone && resultCode < 0)
+        m_failed = true;
+    return resultCode;
 }
 
 int Pipeline::read(void* data, size_t size)
 {
+    // NOTE: Not checking m_failed similar to Pipeline::write because openssl supports
+    // recovering from read errors. It may be useful to read already-received bytes even
+    // when write has failed.
+    // So, input and write channels of the pipeline are independent here.
+
     const auto resultCode = performSslIoOperation(&SSL_read, data, size);
     if (resultCode == 0)
         m_eof = true;
@@ -136,12 +140,16 @@ int Pipeline::performSslIoOperation(Func sslFunc, Data* data, size_t size)
     if (m_state < State::handshakeDone)
         return utils::bstream::StreamIoError::wouldBlock;
 
+    ERR_clear_error();
+
     const int resultCode = sslFunc(m_ssl.get(), data, static_cast<int>(size));
     return handleSslIoResult(resultCode);
 }
 
 int Pipeline::performHandshakeInternal()
 {
+    ERR_clear_error();
+
     const int resultCode = SSL_do_handshake(m_ssl.get());
     if (resultCode == 1)
         m_state = State::handshakeDone;
@@ -170,57 +178,92 @@ int Pipeline::handleSslIoResult(int resultCode)
         return resultCode;
 
     const auto sslErrorCode = SSL_get_error(m_ssl.get(), resultCode);
+    NX_VERBOSE(this, lm("SSL error %1").args(sslErrorCodeToString(sslErrorCode)));
+
     switch (sslErrorCode)
     {
         case SSL_ERROR_NONE:
             return resultCode;
 
         case SSL_ERROR_ZERO_RETURN:
-            NX_VERBOSE(this, "SSL EOF");
             m_eof = true;
             return 0;
 
         case SSL_ERROR_WANT_READ:
-            NX_VERBOSE(this, "SSL_ERROR_WANT_READ");
-            break;
-        
         case SSL_ERROR_WANT_WRITE:
-            NX_VERBOSE(this, "SSL_ERROR_WANT_WRITE");
-            break;
+            return utils::bstream::StreamIoError::wouldBlock;
 
         case SSL_ERROR_SSL:
-            // TODO: #ak use ERR_get_error and ERR_FATAL_ERROR.
-            NX_DEBUG(this, "SSL_ERROR_SSL");
+        {
+            bool fatalErrorFound = false;
+            analyzeSslErrorQueue(&fatalErrorFound);
+            if (fatalErrorFound)
+            {
+                m_eof = true;
+                m_failed = true;
+                SystemError::setLastErrorCode(SystemError::connectionReset);
+                return utils::bstream::StreamIoError::nonRecoverableError;
+            }
 
-            dumpSslErrorQueue();
-
-            m_eof = true;
-            m_failed = true;
-            return utils::bstream::StreamIoError::nonRecoverableError;
+            // NOTE: Socket API does not provide a way to report logical error.
+            // So, have to emulate some recoverable OS error here.
+            SystemError::setLastErrorCode(SystemError::interrupted);
+            return utils::bstream::StreamIoError::osError;
+        }
 
         case SSL_ERROR_SYSCALL:
-            NX_VERBOSE(this, "SSL_ERROR_SYSCALL");
             if (m_readThirsty || m_writeThirsty)
                 return utils::bstream::StreamIoError::wouldBlock;
             return utils::bstream::StreamIoError::osError;
-
-        default:
-            NX_VERBOSE(this, lm("SSL_ERROR %1").args(sslErrorCode));
-            break;
     }
 
     return resultCode;
 }
 
-void Pipeline::dumpSslErrorQueue()
+std::string Pipeline::sslErrorCodeToString(int errorCode)
+{
+    switch (errorCode)
+    {
+        case SSL_ERROR_NONE:
+            return "SSL_ERROR_NONE";
+        case SSL_ERROR_ZERO_RETURN:
+            return "SSL_ERROR_ZERO_RETURN";
+        case SSL_ERROR_WANT_READ:
+            return "SSL_ERROR_WANT_READ";
+        case SSL_ERROR_WANT_WRITE:
+            return "SSL_ERROR_WANT_WRITE";
+        case SSL_ERROR_WANT_CONNECT:
+            return "SSL_ERROR_WANT_CONNECT";
+        case SSL_ERROR_WANT_ACCEPT:
+            return "SSL_ERROR_WANT_ACCEPT";
+        case SSL_ERROR_WANT_X509_LOOKUP:
+            return "SSL_ERROR_WANT_X509_LOOKUP";
+        case SSL_ERROR_SYSCALL:
+            return "SSL_ERROR_SYSCALL";
+        case SSL_ERROR_SSL:
+            return "SSL_ERROR_SSL";
+        default:
+            return lm("Unknown error code %1").args(errorCode).toStdString();
+    }
+}
+
+void Pipeline::analyzeSslErrorQueue(bool* fatalErrorFound)
 {
     char errText[1024];
+    *fatalErrorFound = false;
 
     while (int errCode = ERR_get_error())
     {
         ERR_error_string_n(errCode, errText, sizeof(errText));
-        NX_DEBUG(this, lm("SSL error %1 (%2). Text %3")
-            .args(errCode, ERR_FATAL_ERROR(errCode) ? "fatal" : "not fatal", errText));
+        if (ERR_FATAL_ERROR(errCode))
+        {
+            NX_DEBUG(this, lm("SSL fatal error %1. %2").args(errCode, errText));
+            *fatalErrorFound = true;
+        }
+        else
+        {
+            NX_VERBOSE(this, lm("SSL non fatal error %1. %2").args(errCode, errText));
+        }
     }
 }
 
@@ -231,26 +274,32 @@ int Pipeline::bioRead(BIO* b, char* out, int outl)
 {
     Pipeline* sslSock = static_cast<Pipeline*>(BIO_get_app_data(b));
     int resultCode = sslSock->bioRead(out, outl);
-    if (resultCode == utils::bstream::StreamIoError::osError)
+    if (resultCode >= 0)
+        return resultCode;
+
+    if (resultCode == utils::bstream::StreamIoError::osError ||
+        resultCode == utils::bstream::StreamIoError::wouldBlock)
     {
-        BIO_clear_retry_flags(b);
         BIO_set_retry_read(b);
     }
 
-    return resultCode;
+    return -1;
 }
 
 int Pipeline::bioWrite(BIO* b, const char* in, int inl)
 {
     Pipeline* sslSock = static_cast<Pipeline*>(BIO_get_app_data(b));
     int resultCode = sslSock->bioWrite(in, inl);
-    if (resultCode == utils::bstream::StreamIoError::osError)
+    if (resultCode >= 0)
+        return resultCode;
+
+    if (resultCode == utils::bstream::StreamIoError::osError ||
+        resultCode == utils::bstream::StreamIoError::wouldBlock)
     {
-        BIO_clear_retry_flags(b);
         BIO_set_retry_write(b);
     }
 
-    return resultCode;
+    return -1;
 }
 
 int Pipeline::bioPuts(BIO* bio, const char* str)
@@ -326,6 +375,4 @@ AcceptingPipeline::AcceptingPipeline():
     SSL_set_accept_state(ssl());
 }
 
-} // namespace ssl
-} // namespace network
-} // namespace nx
+} // namespace nx::network::ssl

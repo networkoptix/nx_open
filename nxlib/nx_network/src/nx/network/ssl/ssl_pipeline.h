@@ -4,13 +4,9 @@
 
 #include <openssl/ssl.h>
 
-#include <QByteArray>
-
 #include <nx/utils/byte_stream/pipeline.h>
 
-namespace nx {
-namespace network {
-namespace ssl {
+namespace nx::network::ssl {
 
 /**
  * NOTE: Not thread-safe.
@@ -25,6 +21,13 @@ public:
     Pipeline(SSL_CTX* sslContext);
     ~Pipeline() = default;
 
+    /**
+     * NOTE: SSL pipeline does not recover from any I/O error because openssl supports
+     * retrying write only with the same data. That does not conform to 
+     * utils::bstream::AbstractOutput.
+     * So, even after wouldBlock write error, next write will always produce non-recoverable 
+     * failure. Though, it conforms to utils::bstream::AbstractOutput.
+     */
     virtual int write(const void* data, size_t size) override;
     virtual int read(void* data, size_t size) override;
 
@@ -49,12 +52,12 @@ private:
         handshakeDone,
     };
 
-    State m_state;
+    State m_state = State::init;
     std::unique_ptr<SSL, decltype(&SSL_free)> m_ssl;
-    bool m_readThirsty;
-    bool m_writeThirsty;
-    bool m_eof;
-    bool m_failed;
+    bool m_readThirsty = false;
+    bool m_writeThirsty = false;
+    bool m_eof = false;
+    bool m_failed = false;
 
     void initSslBio(SSL_CTX* sslContext);
 
@@ -65,8 +68,8 @@ private:
     int bioWrite(const void* buffer, unsigned int bufferLen);
 
     int handleSslIoResult(int result);
-
-    void dumpSslErrorQueue();
+    std::string sslErrorCodeToString(int errorCode);
+    void analyzeSslErrorQueue(bool* fatalErrorFound);
 
     static int bioRead(BIO* b, char* out, int outl);
     static int bioWrite(BIO* b, const char* in, int inl);
@@ -90,6 +93,4 @@ public:
     AcceptingPipeline();
 };
 
-} // namespace ssl
-} // namespace network
-} // namespace nx
+} // namespace nx::network::ssl

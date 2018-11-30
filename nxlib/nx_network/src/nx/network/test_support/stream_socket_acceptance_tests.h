@@ -621,7 +621,7 @@ protected:
         ASSERT_EQ(systemErrorCode, m_sendResultQueue.pop());
     }
 
-    void thenSendFailedUnrecoverableError()
+    void thenSendFailedWithUnrecoverableError()
     {
         const auto errorCode = m_sendResultQueue.pop();
         ASSERT_NE(SystemError::noError, errorCode);
@@ -1210,6 +1210,11 @@ protected:
     void freeServerSocket()
     {
         m_serverSocket.reset();
+    }
+
+    const nx::Buffer& clientMessage() const
+    {
+        return m_clientMessage;
     }
 
 private:
