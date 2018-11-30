@@ -3,7 +3,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 
 namespace nx {
-namespace vms::server {
+namespace mediaserver_core {
 namespace plugins {
 
 enum class HanwhaMediaType
@@ -249,7 +249,7 @@ static const QString kSecondaryStreamEntropyCodingParamName = lit("secondaryStre
 static const QString kSecondaryStreamFpsParamName = lit("secondaryStreamFps");
 
 } // namespace plugins
-} // namespace vms::server
+} // namespace mediaserver_core
 } // namespace nx
 
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::server::plugins::HanwhaDeviceType, (lexical));
+QN_FUSION_DECLARE_FUNCTIONS(nx::mediaserver_core::plugins::HanwhaDeviceType, (lexical));

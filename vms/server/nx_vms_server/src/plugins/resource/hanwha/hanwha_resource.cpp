@@ -30,7 +30,7 @@
 #include <nx/sdk/analytics/engine.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
 #include <nx/streaming/abstract_archive_delegate.h>
-#include <nx/vms/server/plugins/resource_data_support/hanwha.h>
+#include <nx/mediaserver_core/plugins/resource_data_support/hanwha.h>
 
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource/media_stream_capability.h>
