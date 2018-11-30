@@ -26,7 +26,7 @@ ${EMAIL CUSTOM}                       noptixautoqa+custom@gmail.com
 @{EMAILS LIST}                        ${EMAIL VIEWER}    ${EMAIL ADV VIEWER}    ${EMAIL LIVE VIEWER}    ${EMAIL OWNER}    ${EMAIL ADMIN}    ${EMAIL CUSTOM}
 ${ADMIN FIRST NAME}                   mark
 ${ADMIN LAST NAME}                    hamil
-${EMAIL UNREGISTERED}                 noptixautoqa+unregistered@gmail.com
+${EMAIL UNREGISTERED}                 noptixautoqa+unregistered1@gmail.com
 ${EMAIL NOPERM}                       noptixautoqa+noperm@gmail.com
 ${BASE PASSWORD}                      qweasd 123
 ${ALT PASSWORD}                       qweasd1234
