@@ -17,6 +17,8 @@
 #include <common/common_module.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/thread/barrier_handler.h>
+
 
 QnManualCameraAdditionRestHandler::QnManualCameraAdditionRestHandler(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule)
@@ -25,10 +27,13 @@ QnManualCameraAdditionRestHandler::QnManualCameraAdditionRestHandler(QnMediaServ
 
 QnManualCameraAdditionRestHandler::~QnManualCameraAdditionRestHandler()
 {
-    for (QnManualCameraSearcher* process: m_searchProcesses)
+    NX_MUTEX_LOCKER lock(&m_searchProcessMutex);
     {
-        process->cancel();
-        delete process;
+        nx::utils::BarrierWaiter barrier;
+        for (auto& [uuid, searcher]: m_searchProcesses)
+        {
+            searcher->pleaseStop(barrier.fork());
+        }
     }
 }
 
@@ -37,50 +42,67 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    QElapsedTimer timer;
-    timer.restart();
     NX_DEBUG(this, lm("Start searching new cameras"));
 
     QAuthenticator auth;
     auth.setUser(params.value("user", "admin"));
     auth.setPassword(params.value("password", "admin"));
 
-    QString addr1 = params.value("start_ip");
-    QString addr2 = params.value("end_ip");
-
-    int port = params.value("port").toInt();
-
-    if (addr1.isNull())
+    auto startIpValue = nx::network::HostAddress::ipV4from(params.value("start_ip"));
+    auto endIpValue = nx::network::HostAddress::ipV4from(params.value("end_ip"));
+    if (!startIpValue)
     {
-        NX_WARNING(this, lm("Invalid parameter 'start_ip'."));
+        NX_WARNING(this, lm("Invalid value for parameter 'start_ip'"));
         return nx::network::http::StatusCode::unprocessableEntity;
     }
 
-    if (addr2 == addr1)
-        addr2.clear();
+    nx::network::HostAddress startIp(startIpValue.get());
+    std::optional<nx::network::HostAddress> endIp;
+    if (endIpValue && endIpValue != startIpValue)
+    {
+        if (endIpValue->s_addr < startIpValue->s_addr)
+        {
+            NX_WARNING(this, lm("Invalid ip range, 'end_ip' must be greater than 'start_ip'"));
+            return nx::network::http::StatusCode::unprocessableEntity;
+        }
+        endIp = nx::network::HostAddress(*endIpValue);
+    }
+
+    int port = 0;
+    const auto portStr = params.value("port");
+    if (!portStr.isEmpty())
+    {
+        bool ok;
+        port = portStr.toUShort(&ok);
+        if (!ok)
+        {
+            NX_WARNING(this, lm("Invalid value for parameter 'port'"));
+            return nx::network::http::StatusCode::unprocessableEntity;
+        }
+    }
 
     QnUuid processUuid = QnUuid::createUuid();
-
-    QnManualCameraSearcher* searcher = new QnManualCameraSearcher(owner->commonModule());
-
     {
-        QnMutexLocker lock( &m_searchProcessMutex );
-        m_searchProcesses.insert(processUuid, searcher);
+        NX_MUTEX_LOCKER lock(&m_searchProcessMutex);
+        auto [searcher, inserted] = m_searchProcesses.try_emplace(processUuid,
+                std::make_unique<QnManualCameraSearcher>(owner->commonModule()));
+        if (!inserted)
+            return nx::network::http::StatusCode::internalServerError;
+        NX_VERBOSE(this, "Created search process with UUID=%1", processUuid);
 
-        // TODO: #ak: better not to use concurrent here, since calling QtConcurrent::run from
-        // running task looks unreliable in some extreme case.
-        // Consider using async fsm here (this one should be quite simple).
-        // NOTE: boost::bind is here temporarily, until nx::utils::concurrent::run supports arbitrary
-        // number of arguments.
-        const auto threadPool = owner->commonModule()->resourceDiscoveryManager()->threadPool();
-        m_searchProcessRuns.insert(processUuid,
-            nx::utils::concurrent::run(threadPool, std::bind(
-                &QnManualCameraSearcher::run, searcher, threadPool, addr1, addr2, auth, port)));
+        searcher->second->run(
+            [this](QnManualCameraSearcher* searcher)
+            {
+                NX_VERBOSE(this, "Search (%1) was finished, found %2 resources",
+                     searcher, searcher->status().cameras.size());
+            },
+            startIp, endIp, auth, port);
     }
+    // NOTE: Finished searchers are removed only in in stop request and destructor!
 
     QnManualCameraSearchReply reply(processUuid, getSearchStatus(processUuid));
     result.setReply(reply);
-    NX_DEBUG(this, lm("Finish searching new cameras. Working time=%1ms").arg(timer.elapsed()));
+    NX_DEBUG(this, "New cameras search was initiated");
     return nx::network::http::StatusCode::ok;
 }
 
@@ -88,6 +110,7 @@ int QnManualCameraAdditionRestHandler::searchStatusAction(
     const QnRequestParams& params, QnJsonRestResult& result)
 {
     QnUuid processUuid = QnUuid(params.value("uuid"));
+    NX_VERBOSE(this, "Status of the search %1 was requested", processUuid);
 
     if (processUuid.isNull())
         return nx::network::http::StatusCode::unprocessableEntity;
@@ -105,35 +128,28 @@ int QnManualCameraAdditionRestHandler::searchStopAction(
     const QnRequestParams& params, QnJsonRestResult& result)
 {
     QnUuid processUuid = QnUuid(params.value("uuid"));
-
     if (processUuid.isNull())
         return nx::network::http::StatusCode::unprocessableEntity;
 
-    QnManualCameraSearcher* process(NULL);
+    NX_VERBOSE(this, "Stopping search process with UUID=%1", processUuid);
+    QnManualCameraSearcherPtr searcher;
     {
-        QnMutexLocker lock( &m_searchProcessMutex );
-        if (m_searchProcesses.contains(processUuid))
+        NX_MUTEX_LOCKER lock(&m_searchProcessMutex);
+        if (m_searchProcesses.count(processUuid))
         {
-            process = m_searchProcesses[processUuid];
-            process->cancel();
-            m_searchProcesses.remove(processUuid);
-        }
-        if (m_searchProcessRuns.contains(processUuid))
-        {
-            m_searchProcessRuns[processUuid].waitForFinished();
-            m_searchProcessRuns.remove(processUuid);
+            searcher = std::move(m_searchProcesses[processUuid]);
+            searcher->pleaseStopSync(); // TODO: #dliman Use async?
+            m_searchProcesses.erase(processUuid);
         }
     }
 
     QnManualCameraSearchReply reply;
     reply.processUuid = processUuid;
-    if (process)
+    if (searcher)
     {
-        QnManualCameraSearchProcessStatus processStatus = process->status();
+        QnManualCameraSearchProcessStatus processStatus = searcher->status();
         reply.status = processStatus.status;
         reply.cameras = processStatus.cameras;
-
-        delete process;
     }
     result.setReply(reply);
 
@@ -222,7 +238,10 @@ int QnManualCameraAdditionRestHandler::addCameras(
         owner->commonModule()->auditManager()->addAuditRecord(auditRecord);
     }
 
-    return registered.size() > 0 ? nx::network::http::StatusCode::ok : nx::network::http::StatusCode::internalServerError;
+    if (registered.size() > 0)
+        return nx::network::http::StatusCode::ok;
+    else
+        return nx::network::http::StatusCode::internalServerError;
 }
 
 int QnManualCameraAdditionRestHandler::executeGet(
@@ -261,9 +280,9 @@ int QnManualCameraAdditionRestHandler::executePost(
 QnManualCameraSearchProcessStatus QnManualCameraAdditionRestHandler::getSearchStatus(
     const QnUuid& searchProcessUuid)
 {
-    QnMutexLocker lock(&m_searchProcessMutex);
+    NX_MUTEX_LOCKER lock(&m_searchProcessMutex);
 
-    if (!m_searchProcesses.contains(searchProcessUuid))
+    if (!m_searchProcesses.count(searchProcessUuid))
         return QnManualCameraSearchProcessStatus();
 
     return m_searchProcesses[searchProcessUuid]->status();
@@ -272,6 +291,6 @@ QnManualCameraSearchProcessStatus QnManualCameraAdditionRestHandler::getSearchSt
 bool QnManualCameraAdditionRestHandler::isSearchActive(
     const QnUuid &searchProcessUuid)
 {
-    QnMutexLocker lock(&m_searchProcessMutex);
-    return m_searchProcesses.contains(searchProcessUuid);
+    NX_MUTEX_LOCKER lock(&m_searchProcessMutex);
+    return m_searchProcesses.count(searchProcessUuid);
 }
