@@ -20,7 +20,9 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, ResourceStatus)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StatusChangeReason)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StorageStatuses)
 
-// ATTENTION: Assigning backwards-compatible misspelled values with `Auxilary` in them.
+// ATTENTION: Assigning backwards-compatible misspelled values with `Auxilary` in them. Such values
+// should go before the correct ones, so both versions are supported on input, and only deprecated
+// version is supported on output.
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzCommand,
     (Qn::ContinuousMovePtzCommand, "ContinuousMovePtzCommand")
     (Qn::ContinuousFocusPtzCommand, "ContinuousFocusPtzCommand")
@@ -45,7 +47,9 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzCommand,
     (Qn::UpdateHomeObjectPtzCommand, "UpdateHomeObjectPtzCommand")
     (Qn::GetHomeObjectPtzCommand, "GetHomeObjectPtzCommand")
     (Qn::GetAuxiliaryTraitsPtzCommand, "GetAuxilaryTraitsPtzCommand") //< Intentional typo.
+    (Qn::GetAuxiliaryTraitsPtzCommand, "GetAuxiliaryTraitsPtzCommand") //< For deserialization.
     (Qn::RunAuxiliaryCommandPtzCommand, "RunAuxilaryCommandPtzCommand") //< Intentional typo.
+    (Qn::RunAuxiliaryCommandPtzCommand, "RunAuxiliaryCommandPtzCommand") //< For deserialization.
     (Qn::GetDataPtzCommand, "GetDataPtzCommand")
     (Qn::RelativeMovePtzCommand, "RelativeMovePtzCommand")
     (Qn::RelativeFocusPtzCommand, "RelativeFocusPtzCommand")

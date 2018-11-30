@@ -111,7 +111,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         ActiveObjectPtzField = 1 << 8,
         HomeObjectPtzField = 1 << 9,
         AuxiliaryTraitsPtzField = 1 << 10,
-        AllPtzFields = (1 << 11) - 1
+        AllPtzFields = -1; //< All ones.
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PtzDataField)
 
