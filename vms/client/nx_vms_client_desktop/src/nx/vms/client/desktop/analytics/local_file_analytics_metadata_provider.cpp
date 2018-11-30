@@ -54,8 +54,7 @@ QList<DetectionMetadataPacketPtr> LocalFileAnalyticsMetadataProvider::metadataRa
 
     QList<DetectionMetadataPacketPtr> result;
 
-    auto it = std::lower_bound(m_metadata.cbegin(), m_metadata.cend(),
-        std::chrono::microseconds(startTimestamp));
+    auto it = std::lower_bound(m_metadata.cbegin(), m_metadata.cend(), startTimestamp);
 
     if (it->timestampUsec > startTimestamp.count() && it != m_metadata.cbegin())
     {
