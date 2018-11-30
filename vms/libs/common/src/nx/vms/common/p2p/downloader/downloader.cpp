@@ -22,7 +22,7 @@ class Downloader::Private: public QObject
 public:
     Private(Downloader* q);
 
-    void createWorker(const QString& fileName);
+    void startDownload(const QString& fileName);
 
 private:
     void atWorkerFinished(const QString& fileName);
@@ -33,6 +33,7 @@ public:
     QHash<QString, std::shared_ptr<Worker>> workers;
     AbstractPeerManagerFactory* peerManagerFactory = nullptr;
     std::unique_ptr<AbstractPeerManagerFactory> peerManagerFactoryOwner;
+    bool downloadsStarted = false;
 };
 
 Downloader::Private::Private(Downloader* q):
@@ -40,9 +41,12 @@ Downloader::Private::Private(Downloader* q):
 {
 }
 
-void Downloader::Private::createWorker(const QString& fileName)
+void Downloader::Private::startDownload(const QString& fileName)
 {
     NX_MUTEX_LOCKER lock(&mutex);
+
+    if (!downloadsStarted)
+        return;
 
     if (workers.contains(fileName))
         return;
@@ -93,7 +97,6 @@ Downloader::Downloader(
     const QDir& downloadsDirectory,
     QnCommonModule* commonModule,
     AbstractPeerManagerFactory* peerManagerFactory,
-    StartupPolicy startupPolicy,
     QObject* parent)
     :
     QObject(parent),
@@ -109,7 +112,8 @@ Downloader::Downloader(
     connect(d->storage.data(), &Storage::fileStatusChanged, this, &Downloader::fileStatusChanged);
 
     d->peerManagerFactory = peerManagerFactory;
-    // Creating default factory
+
+    // Creating the default factory.
     if (!d->peerManagerFactory)
     {
         auto factory = std::make_unique<ResourcePoolPeerManagerFactory>(commonModule);
@@ -117,8 +121,7 @@ Downloader::Downloader(
         d->peerManagerFactoryOwner = std::move(factory);
     }
 
-    if (startupPolicy == StartupPolicy::startFoundDownloads)
-        startFoundDownloads();
+    QMetaObject::invokeMethod(d->storage.data(), &Storage::findDownloads, Qt::QueuedConnection);
 }
 
 Downloader::~Downloader()
@@ -151,7 +154,7 @@ ResultCode Downloader::addFile(const FileInformation& fileInformation)
     executeInThread(thread(),
         [this, fileName = fileInformation.name]
         {
-            d->createWorker(fileName);
+            d->startDownload(fileName);
         });
 
     return errorCode;
@@ -198,10 +201,31 @@ QVector<QByteArray> Downloader::getChunkChecksums(const QString& fileName)
     return d->storage->getChunkChecksums(fileName);
 }
 
-void Downloader::startFoundDownloads()
+void Downloader::startDownloads()
 {
+    {
+        NX_MUTEX_LOCKER lock(&d->mutex);
+        d->downloadsStarted = true;
+    }
+
     for (const auto& fileName: d->storage->files())
-        d->createWorker(fileName);
+        d->startDownload(fileName);
+}
+
+void Downloader::stopDownloads()
+{
+    decltype(d->workers) workers;
+
+    {
+        NX_MUTEX_LOCKER lock(&d->mutex);
+        d->downloadsStarted = false;
+
+        workers = d->workers;
+        d->workers.clear();
+    }
+
+    for (const auto& worker: workers)
+        worker->stop();
 }
 
 void Downloader::validateAsync(const QString& url, bool onlyConnectionCheck, int expectedSize,

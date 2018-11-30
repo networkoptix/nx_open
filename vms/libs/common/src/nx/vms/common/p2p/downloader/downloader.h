@@ -18,17 +18,10 @@ class Downloader: public QObject, public QnCommonModuleAware
     Q_OBJECT
 
 public:
-    enum class StartupPolicy
-    {
-        idle,
-        startFoundDownloads
-    };
-
     Downloader(
         const QDir& downloadsDirectory,
         QnCommonModule* commonModule,
         AbstractPeerManagerFactory* peerManagerFactory = nullptr,
-        StartupPolicy startupPolicy = StartupPolicy::startFoundDownloads,
         QObject* parent = nullptr);
 
     virtual ~Downloader() override;
@@ -60,7 +53,8 @@ public:
 
     QVector<QByteArray> getChunkChecksums(const QString& fileName);
 
-    void startFoundDownloads();
+    void startDownloads();
+    void stopDownloads();
 
     static void validateAsync(const QString& url, bool onlyConnectionCheck, int expectedSize,
         std::function<void(bool)> callback);

@@ -36,7 +36,7 @@ class ClientUpdateTool:
 
 public:
     ClientUpdateTool(QObject* parent = nullptr);
-    ~ClientUpdateTool();
+    virtual ~ClientUpdateTool() override;
 
     enum State
     {
