@@ -1191,7 +1191,7 @@ void ActionHandler::at_moveCameraAction_triggered() {
         if (camera->hasFlags(Qn::wearable_camera))
         {
             QnMessageBox::critical(mainWindowWidget(),
-                tr("Wearable Cameras cannot be moved between servers"));
+                tr("Virtual Cameras cannot be moved between servers"));
             return;
         }
 

@@ -751,7 +751,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
         fetchFromCameras<int>(state.wearableMotion.sensitivity, cameras,
             [](const Camera& camera)
             {
-                NX_ASSERT(camera->getVideoLayout()->channelCount() == 0);
+                NX_ASSERT(camera->getVideoLayout()->channelCount() == 1);
                 QnMotionRegion region = camera->getMotionRegion(0);
                 const auto rects = region.getAllMotionRects();
                 return rects.empty()
