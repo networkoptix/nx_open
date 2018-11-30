@@ -316,6 +316,7 @@ export class NxCampageComponent implements OnInit, DoCheck {
 
   open(activecamera) {
       //TO DO : open modal: feedback with the name of the active camera
+      return false;
   }
 
   resetActiveCamera() {

@@ -26,9 +26,6 @@ export class SearchComponent implements OnInit, AfterViewInit, ControlValueAcces
     constructor(private _elementRef: ElementRef, private _renderer: Renderer2) {
         this.emptyfilters = {
             query: '',
-            minResolution: {value: '0', name: 'All'},
-            hardwareTypes: [],
-            vendors: [],
             isPtzSupported: false,
             isAptzSupported: false,
             isAudioSupported: false,
@@ -39,7 +36,6 @@ export class SearchComponent implements OnInit, AfterViewInit, ControlValueAcces
             isH265: false,
             isMultiSensor: false
         };
-        this.filter = {...this.emptyfilters};
     }
 
     ngOnInit() {
@@ -68,11 +64,6 @@ export class SearchComponent implements OnInit, AfterViewInit, ControlValueAcces
     private onTouchedCallback = () => {};
     private onChangeCallback = (_: any) => {};
 
-    // get accessor
-    get value(): any {
-        return this.filter;
-    }
-
     // Set touched on blur
     onBlur() {
         this.onTouchedCallback();
@@ -100,9 +91,15 @@ export class SearchComponent implements OnInit, AfterViewInit, ControlValueAcces
         this.onTouchedCallback = fn;
     }
 
+    toggleOptions() {
+        this.showAdvancedOptions = !this.showAdvancedOptions;
+        return false;
+    }
     resetFilters() {
-        this.filter = {...this.emptyfilters};
+        // deep copy
+        this.filter = {...this.emptyfilters, minResolution: {value: '0', name: 'All'}, hardwareTypes: [], vendors: []};
         this.onChangeCallback(this.filter);
+        return false;
     }
 
     resetQuery() {

@@ -11,7 +11,7 @@
         margin: 10px 0px 0px 10px;
     }
 
-    #searchinput {
+    .searchinput {
         width: 200px;
         height: 40px;
         padding-left: 40px;
@@ -42,7 +42,7 @@
         }
     }
 
-    #searchclear {
+    .searchclear {
         position: absolute;
         right: 10px;
         top: 0;
@@ -50,6 +50,14 @@
         line-height: 40px;
         margin: auto;
         cursor: pointer
+    }
+
+    .pagination {
+        flex-wrap: wrap;
+
+        li {
+            margin: 0px 5px 4px 0px;
+        }
     }
 
 }

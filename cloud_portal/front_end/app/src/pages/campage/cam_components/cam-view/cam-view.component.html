@@ -4,7 +4,7 @@
         <header>
             <span>{{ activeCamera.vendor }}</span>
             <span> {{ activeCamera.model }}</span>
-            <span id="detailsClose" class="glyphicon close-icon"
+            <span class="glyphicon close-icon detailsClose"
                   (click)="activeCamera = undefined; onCloseView.emit(activeCamera)">
             </span>
         </header>
@@ -37,121 +37,73 @@
 
                 <tr>
                     <td>Audio</td>
-                    <td [ngSwitch]="activeCamera.isAudioSupported">
-                        <span class="icon-positive" *ngSwitchCase="true">
-                            &#9679;
-                        </span>
-                        <span class="icon-negative" *ngSwitchCase="false">
-                            &#9675;
-                        </span>
-                        <span class="icon-unknown" *ngSwitchDefault>
-                            &#63;
-                        </span>
+                    <td>
+                        <nx-bool-icon
+                                [value]="activeCamera.isAudioSupported">
+                        </nx-bool-icon>
                     </td>
                 </tr>
 
                 <tr>
                     <td>2-Way Audio</td>
-                    <td [ngSwitch]="activeCamera.isTwAudioSupported">
-                        <span class="icon-positive" *ngSwitchCase="true">
-                            &#9679;
-                        </span>
-                        <span class="icon-negative" *ngSwitchCase="false">
-                            &#9675;
-                        </span>
-                        <span class="icon-unknown" *ngSwitchDefault>
-                            &#63;
-                        </span>
+                    <td>
+                        <nx-bool-icon
+                                [value]="activeCamera.isTwAudioSupported">
+                        </nx-bool-icon>
                     </td>
                 </tr>
 
                 <tr>
                     <td>PTZ</td>
-                    <td [ngSwitch]="activeCamera.isPtzSupported">
-                        <span class="icon-positive" *ngSwitchCase="true">
-                            &#9679;
-                        </span>
-                        <span class="icon-negative" *ngSwitchCase="false">
-                            &#9675;
-                        </span>
-                        <span class="icon-unknown" *ngSwitchDefault>
-                            &#63;
-                        </span>
+                    <td>
+                        <nx-bool-icon
+                                [value]="activeCamera.isPtzSupported">
+                        </nx-bool-icon>
                     </td>
                 </tr>
 
                 <tr>
                     <td>Advanced PTZ</td>
-                    <td [ngSwitch]="activeCamera.isAptzSupported">
-                        <span class="icon-positive" *ngSwitchCase="true">
-                            &#9679;
-                        </span>
-                        <span class="icon-negative" *ngSwitchCase="false">
-                            &#9675;
-                        </span>
-                        <span class="icon-unknown" *ngSwitchDefault>
-                            &#63;
-                        </span>
+                    <td>
+                        <nx-bool-icon
+                                [value]="activeCamera.isAptzSupported">
+                        </nx-bool-icon>
                     </td>
                 </tr>
 
                 <tr>
                     <td>Motion Detection</td>
-                    <td [ngSwitch]="activeCamera.isMdSupported">
-                        <span class="icon-positive" *ngSwitchCase="true">
-                            &#9679;
-                        </span>
-                        <span class="icon-negative" *ngSwitchCase="false">
-                            &#9675;
-                        </span>
-                        <span class="icon-unknown" *ngSwitchDefault>
-                            &#63;
-                        </span>
+                    <td>
+                        <nx-bool-icon
+                                [value]="activeCamera.isMdSupported">
+                        </nx-bool-icon>
                     </td>
                 </tr>
 
                 <tr>
                     <td>Fisheye</td>
-                    <td [ngSwitch]="activeCamera.isFisheye">
-                        <span class="icon-positive" *ngSwitchCase="true">
-                            &#9679;
-                        </span>
-                        <span class="icon-negative" *ngSwitchCase="false">
-                            &#9675;
-                        </span>
-                        <span class="icon-unknown" *ngSwitchDefault>
-                            &#63;
-                        </span>
+                    <td>
+                        <nx-bool-icon
+                                [value]="activeCamera.isFisheye">
+                        </nx-bool-icon>
                     </td>
                 </tr>
 
                 <tr>
                     <td>I/O</td>
-                    <td [ngSwitch]="activeCamera.isIoSupported">
-                        <span class="icon-positive" *ngSwitchCase="true">
-                            &#9679;
-                        </span>
-                        <span class="icon-negative" *ngSwitchCase="false">
-                            &#9675;
-                        </span>
-                        <span class="icon-unknown" *ngSwitchDefault>
-                            &#63;
-                        </span>
+                    <td>
+                        <nx-bool-icon
+                                [value]="activeCamera.isIoSupported">
+                        </nx-bool-icon>
                     </td>
                 </tr>
 
                 <tr>
                     <td>Dual Streaming</td>
-                    <td [ngSwitch]="activeCamera.isDualStreamingSupported">
-                        <span class="icon-positive" *ngSwitchCase="true">
-                            &#9679;
-                        </span>
-                        <span class="icon-negative" *ngSwitchCase="false">
-                            &#9675;
-                        </span>
-                        <span class="icon-unknown" *ngSwitchDefault>
-                            &#63;
-                        </span>
+                    <td>
+                        <nx-bool-icon
+                                [value]="activeCamera.isDualStreamingSupported">
+                        </nx-bool-icon>
                     </td>
                 </tr>
 
@@ -162,16 +114,10 @@
 
                 <tr>
                     <td>Multi Sensor</td>
-                    <td [ngSwitch]="activeCamera.isMultiSensor">
-                        <span class="icon-positive" *ngSwitchCase="true">
-                            &#9679;
-                        </span>
-                        <span class="icon-negative" *ngSwitchCase="false">
-                            &#9675;
-                        </span>
-                        <span class="icon-unknown" *ngSwitchDefault>
-                            &#63;
-                        </span>
+                    <td>
+                        <nx-bool-icon
+                                [value]="activeCamera.isMultiSensor">
+                        </nx-bool-icon>
                     </td>
                 </tr>
             </table>

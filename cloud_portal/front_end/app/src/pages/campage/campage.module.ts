@@ -10,11 +10,12 @@ import { Angular2CsvModule }    from "angular2-csv";
 
 import { NxCampageComponent } from './campage.component';
 import { ComponentsModule }   from '../../components/components.module';
-import { CamTableComponent } from './temp_components/cam-table/cam-table.component';
-import { CamViewComponent } from './temp_components/cam-view/cam-view.component';
-import { SearchComponent } from './temp_components/search/search.component';
+import { CamTableComponent } from './cam_components/cam-table/cam-table.component';
+import { CamViewComponent } from './cam_components/cam-view/cam-view.component';
+import { SearchComponent } from './cam_components/search/search.component';
 import { DropdownsModule } from '../../dropdowns/dropdowns.module';
-import { CsvButtonComponent } from './temp_components/csv-button/csv-button.component';
+import { CsvButtonComponent } from './cam_components/csv-button/csv-button.component';
+import { BoolIconComponent } from './cam_components/bool-icon/bool-icon.component';
 
 const appRoutes: Routes = [
     { path: 'campage', component: NxCampageComponent }
@@ -42,6 +43,7 @@ const appRoutes: Routes = [
         CamViewComponent,
         SearchComponent,
         CsvButtonComponent,
+        BoolIconComponent,
     ],
     bootstrap      : [],
     entryComponents: [

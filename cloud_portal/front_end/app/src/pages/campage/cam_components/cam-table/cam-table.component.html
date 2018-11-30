@@ -10,9 +10,12 @@
                             </span>
                         </div>
                         <ng-template #camview>
-                            <div class="row vertical-align">
-                                <div class="col-md-10">
-                                    {{results}} results
+                            <div class="col-md-10 vertical-align d-inline-flex justify-content-center" [ngSwitch]="results">
+                                <div class="flex-grow-1" *ngSwitchCase="1">
+                                    <h4>1 result</h4>
+                                </div>
+                                <div class="flex-grow-1" *ngSwitchDefault>
+                                    <h4>{{results}} results</h4>
                                 </div>
                                 <div class="col-md-2">
                                     <nx-csv-button [data]="csvCameraData" filename="camera_list_{{ csvFilename | date:'yyyy-MM-dd' }}" [options]="csvOptions">Export all to CSV</nx-csv-button>

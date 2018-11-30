@@ -8,7 +8,7 @@
     border-top: 1px solid $light5;
   }
   h2 {
-    font-size: 15px;
+    font-size: 0.9375rem;
     color: $dark9;
   }
   a {
@@ -20,26 +20,13 @@
     height: 24px;
     width: 50%;
   }
-  #detailsClose {
+  .detailsClose {
     position: absolute;
     right: 16px;
     cursor: pointer;
   }
-  .icon-positive {
-    font-size: 18px;
-    color: $dark9;
-  }
-  .icon-negative {
-    font-size: 18px;
-    color: $light10;
-  }
   .blue {
     color: $blue1;
-  }
-  .icon-unknown {
-    font-size: 15px;
-    font-family: $font-family-medium;
-    color: $dark9;
   }
   .firmware-line {
     stroke: $brand-primary;

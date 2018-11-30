@@ -36,7 +36,7 @@
     <div class="row p-3" *ngIf="!filterModel.query">
         <ul class="list-unstyled col-md-3" *ngFor="let n of [0, 1, 2, 3]">
             <li class="no-left-padding" *ngFor="let vendor of vendors.slice(vendorGroup(n).start, vendorGroup(n).end)">
-                <a href="javascript:void(0);" (click)="setVendor(vendor)">
+                <a href (click)="!!setVendor(vendor)">
                     <span>
                         {{ vendor }}
                     </span>
@@ -45,7 +45,7 @@
         </ul>
     </div>
     <p>This list is limited to actual devices auto-reporting data to {{company}}, as approved by anonymous system users.
-        The complete list of supported manufacturers and models is greater in scope. Please <a href="javascript:void(0);" (click)="open()">submit a request</a> for additional
+        The complete list of supported manufacturers and models is greater in scope. Please <a href (click)="open()">submit a request</a> for additional
         questions/concerns regarding supported devices.
     </p>
 </div>

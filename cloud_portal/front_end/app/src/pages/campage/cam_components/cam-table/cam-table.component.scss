@@ -39,21 +39,24 @@
       margin-bottom: 0px;
 
       th {
-        padding: 8px 16px 8px 16px;
+        padding: 0.5rem 1rem;
         background-color: $additional_light1;
         border-bottom: 1px solid $light3;
         color: $dark9;
-        font-family: $font-family-medium;
-        font-weight: 500;
-        font-size: 13px;
+        font-family: $font-family-regular;
+        font-size: 0.8125rem;
         line-height: 16px;
         text-transform: none;
         overflow-wrap: break-word;
 
         &.table-title {
           font-family: $font-family-regular;
-          font-size: 15px;
           line-height: 24px;
+
+          .text-placeholder {
+            font-size: 1.25rem;
+            color: $light16;
+          }
         }
       }
       tbody {
