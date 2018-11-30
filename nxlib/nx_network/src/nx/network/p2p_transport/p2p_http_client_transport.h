@@ -59,7 +59,6 @@ private:
     bool m_postInProgress = false;
     websocket::FrameType m_messageType;
     bool m_failed = false;
-    FrameContentType m_frameContentType = FrameContentType::payload;
 
     void startReading();
 };

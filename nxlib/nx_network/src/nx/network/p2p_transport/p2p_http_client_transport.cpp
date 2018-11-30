@@ -155,12 +155,6 @@ void P2PHttpClientTransport::startReading()
             auto nextFilter = nx::utils::bstream::makeCustomOutputStream(
                 [this](const QnByteArrayConstRef& data)
                 {
-                    if (m_frameContentType == FrameContentType::dummy)
-                    {
-                        m_frameContentType = FrameContentType::payload;
-                        return;
-                    }
-
                     if (m_incomingMessageQueue.size() < kMaxMessageQueueSize)
                     {
                         if (!m_userReadHandlerPair)
@@ -178,8 +172,6 @@ void P2PHttpClientTransport::startReading()
                     {
                         NX_WARNING(this, lm("Incoming message queue overflow"));
                     }
-
-                    m_frameContentType = FrameContentType::dummy;
                 });
 
             m_multipartContentParser.setBoundary("ec2boundary");

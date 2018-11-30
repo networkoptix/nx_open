@@ -132,13 +132,7 @@ void P2PHttpServerTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
                 m_firstSend = false;
             }
 
-            const auto contentFrame = makeResponseFrame(buffer);
-            // To make a peer actually receive and process payload frame
-            const auto dummyFrame = makeResponseFrame("NX");
-            m_sendBuffer += contentFrame + dummyFrame;
-
-            NX_VERBOSE(this, lm("Sending %1 bytes: %2").args(m_sendBuffer.size(), m_sendBuffer));
-
+            m_sendBuffer += buffer + "\r\n" + makeFrameHeader();
             m_sendSocket->sendAsync(
                 m_sendBuffer,
                 [this, handler = std::move(handler)](
@@ -169,23 +163,23 @@ QByteArray P2PHttpServerTransport::makeInitialResponse() const
 
     nx::Buffer result;
     initialResponse.serialize(&result);
+    result += makeFrameHeader();
 
     return result;
 }
 
-QByteArray P2PHttpServerTransport::makeResponseFrame(const nx::Buffer& payload) const
+QByteArray P2PHttpServerTransport::makeFrameHeader() const
 {
-    http::Response contentResponse;
-    contentResponse.headers.emplace(
-        "Content-Type",
-        m_messageType == websocket::FrameType::text ? "application/json" : "application/ubjson");
-    contentResponse.messageBody = payload;
+    nx::Buffer headerBuffer;
 
-    nx::Buffer contentBuffer;
-    static const nx::Buffer boundary = "--ec2boundary";
-    contentResponse.serializeMultipartResponse(&contentBuffer, boundary);
+    http::serializeHeaders(
+        {http::HttpHeader(
+            "Content-Type",
+            m_messageType == websocket::FrameType::text
+                ? "application/json" : "application/ubjson")},
+        &headerBuffer);
 
-    return contentBuffer;
+    return "--ec2boundary\r\n" + headerBuffer + "\r\n";
 }
 
 void P2PHttpServerTransport::bindToAioThread(aio::AbstractAioThread* aioThread)

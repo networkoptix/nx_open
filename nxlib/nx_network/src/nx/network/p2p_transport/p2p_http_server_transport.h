@@ -59,7 +59,7 @@ private:
 
     void readFromSocket(nx::Buffer* const buffer, IoCompletionHandler handler);
     QByteArray makeInitialResponse() const;
-    QByteArray makeResponseFrame(const nx::Buffer& payload) const;
+    QByteArray makeFrameHeader() const;
 };
 
 } // namespace nx::network
