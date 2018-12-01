@@ -32,7 +32,8 @@ QnConnectToCloudWatcher::QnConnectToCloudWatcher(
         m_commonModule->globalSettings(), &QnGlobalSettings::cloudSettingsChanged,
         this, [this]()
         {
-            m_ec2CloudConnector->stopDataSynchronization(); //< Sop connection with old parameters if exists.
+            if (!m_cloudUrl.isEmpty())
+                m_ec2CloudConnector->stopDataSynchronization(); //< Sop connection with old parameters if exists.
             at_updateConnection();
         });
     connect(
