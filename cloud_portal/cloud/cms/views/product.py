@@ -7,7 +7,7 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib import admin
-from django.http.response import HttpResponse, HttpResponseBadRequest, Http404
+from django.http.response import HttpResponse, HttpResponseBadRequest
 
 import os
 import json
@@ -157,9 +157,8 @@ def review(request):
     product_review = ProductCustomizationReview.objects.get(id=review_id)
     product = product_review.version.product
 
-    if 'force_update' in request.POST and UserGroupsToCustomizationPermissions.check_permission(request.user,
-                                                                                                settings.CUSTOMIZATION,
-                                                                                                'cms.force_update'):
+    if 'force_update' in request.POST and UserGroupsToProductPermissions.\
+            check_permission(request.user, get_cloud_portal_product(settings.CUSTOMIZATION), 'cms.force_update'):
         if product.product_type.can_preview:
             filldata.init_skin(product, preview=False)
             filldata.init_skin(product, preview=True)
@@ -167,9 +166,8 @@ def review(request):
         else:
             messages.error(request, "You cannot force update this product")
 
-    elif 'publish' in request.POST and UserGroupsToCustomizationPermissions.check_permission(request.user,
-                                                                                             settings.CUSTOMIZATION,
-                                                                                             'cms.publish_version'):
+    elif 'publish' in request.POST and UserGroupsToProductPermissions.\
+            check_permission(request.user, get_cloud_portal_product(settings.CUSTOMIZATION), 'cms.publish_version'):
         if product.product_type.can_preview:
             publishing_errors = modify_db.publish_latest_version(product, review_id, request.user)
             if publishing_errors:

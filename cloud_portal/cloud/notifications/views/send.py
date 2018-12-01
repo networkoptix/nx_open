@@ -9,20 +9,22 @@ from django.utils import timezone
 from django.contrib import messages
 from django.shortcuts import redirect
 
-from api.helpers.exceptions import handle_exceptions, APIRequestException, api_success, ErrorCodes, APINotAuthorisedException
+from api.helpers.exceptions import handle_exceptions, APIRequestException, api_success, ErrorCodes
 from api.models import Account
-from cms.models import Customization, UserGroupsToCustomizationPermissions
+from cms.models import Customization, UserGroupsToProductPermissions, get_cloud_portal_product
 from notifications import api
 from notifications.models import *
 from notifications.tasks import send_to_all_users
 
 import re
 
+
 # Replaces </p> and <br> with \n and then remove all html tags
 def html_to_text(html):
     new_line = re.compile(r'<(\/p|br)>')
     tags = re.compile(r'<[\w\=\'\"\:\;\_\-\,\!\/\ ]+>')
     return tags.sub('', new_line.sub('\n', html))
+
 
 def add_brs(html):
     br = re.compile(r'\n')
@@ -117,8 +119,9 @@ def cloud_notification_action(request):
         customizations = request.data.getlist('customizations')
 
     for customization in customizations:
-        if not UserGroupsToCustomizationPermissions.check_permission(request.user, customization,
-                                                                     'send_cloud_notification'):
+        if not UserGroupsToProductPermissions.check_permission(request.user,
+                                                               get_cloud_portal_product(customization),
+                                                               'send_cloud_notification'):
             raise PermissionDenied
 
     notification_id = str(update_or_create_notification(request.data, customizations))
@@ -161,5 +164,5 @@ def test(request):
     from .. import tasks
     from random import seed, randint
     seed()
-    tasks.test_task.delay(randint(1,100),randint(1,5))
+    tasks.test_task.delay(randint(1, 100), randint(1, 5))
     return Response('ok')

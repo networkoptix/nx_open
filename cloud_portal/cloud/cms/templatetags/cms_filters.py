@@ -64,4 +64,6 @@ def get_review_state(state):
 
 @register.simple_tag
 def has_permission(user, permission):
-    return UserGroupsToCustomizationPermissions.check_permission(user, settings.CUSTOMIZATION, permission)
+    return UserGroupsToProductPermissions.check_permission(user,
+                                                           get_cloud_portal_product(settings.CUSTOMIZATION),
+                                                           permission)

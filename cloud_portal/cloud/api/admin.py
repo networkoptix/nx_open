@@ -39,7 +39,6 @@ class CustomizationFilter(SimpleListFilter):
             return queryset.filter(customization=customization_name[0].name)
 
         if self.value() is None:
-            print self.default_customization.name
             return queryset.filter(customization=self.default_customization.name)
         return queryset
 
@@ -51,7 +50,9 @@ class GroupFilter(SimpleListFilter):
     def lookups(self, request, model_admin):
         groups = Group.objects.all()
         if not request.user.is_superuser:
-            groups = groups.filter(usergroupstocustomizationpermissions__customization__name=settings.CUSTOMIZATION)
+            groups = groups.\
+                filter(usergroupstoproductpermissions__product=get_cloud_portal_product(settings.CUSTOMIZATION)). \
+                exclude(name__contains="Can See")
         return [(g.id, g.name) for g in groups]
 
     def queryset(self, request, queryset):
@@ -170,3 +171,10 @@ class GroupAdmin(admin.ModelAdmin):
     form = GroupAdminForm
     # Filter permissions horizontal as well.
     filter_horizontal = ['permissions']
+    list_display = ('name', 'list_permissions', )
+
+    def list_permissions(self, obj):
+        return [permission.name for permission in obj.permissions.all()]
+
+    list_permissions.short_description = 'Group of permissions'
+    list_permissions.allow_tags = True
