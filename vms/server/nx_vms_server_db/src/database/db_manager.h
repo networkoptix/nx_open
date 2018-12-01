@@ -106,6 +106,7 @@ namespace detail
         bool init(const nx::utils::Url& dbUrl);
         bool isInitialized() const;
         static QString ecsDbFileName(const QString& basePath);
+        static int currentBuildNumber(const QString& basePath);
 
         template <class T>
         ErrorCode executeTransactionNoLock(const QnTransaction<T>& tran, const QByteArray& serializedTran)

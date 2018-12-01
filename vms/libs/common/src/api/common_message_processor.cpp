@@ -128,6 +128,12 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         this,
         &QnCommonMessageProcessor::runtimeInfoChanged,
         connectionType);
+    connect(
+        connection,
+        &ec2::AbstractECConnection::runtimeInfoRemoved,
+        this,
+        &QnCommonMessageProcessor::runtimeInfoRemoved,
+        connectionType);
 
     const auto resourceManager = connection->getResourceNotificationManager();
     connect(
@@ -426,14 +432,12 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         this,
         on_resourceUpdated,
         connectionType);
-
     connect(
         analyticsManager,
         &ec2::AbstractAnalyticsNotificationManager::analyticsPluginRemoved,
         this,
         &QnCommonMessageProcessor::on_resourceRemoved,
         connectionType);
-
     connect(
         analyticsManager,
         &ec2::AbstractAnalyticsNotificationManager::analyticsEngineAddedOrUpdated,
@@ -1007,19 +1011,16 @@ void QnCommonMessageProcessor::updateResource(
 {
     const QnResourceParams parameters(
         analyticsPluginData.id,
-        /* url */ QString(),
-        /* vendor */ QString());
+        /*url*/ QString(),
+        /*vendor*/ QString());
 
-    nx::vms::common::AnalyticsPluginResourcePtr pluginResource = getResourceFactory()
-        ->createResource(
+    nx::vms::common::AnalyticsPluginResourcePtr pluginResource =
+        getResourceFactory()->createResource(
             nx::vms::api::AnalyticsPluginData::kResourceTypeId,
             parameters).dynamicCast<nx::vms::common::AnalyticsPluginResource>();
 
-    if (!pluginResource)
-    {
-        NX_ASSERT(false, "Unable to create plugin resource.");
+    if (!NX_ASSERT(pluginResource, "Unable to create plugin resource."))
         return;
-    }
 
     ec2::fromApiToResource(analyticsPluginData, pluginResource);
     updateResource(pluginResource, source);
@@ -1031,19 +1032,16 @@ void QnCommonMessageProcessor::updateResource(
 {
     const QnResourceParams parameters(
         analyticsEngineData.id,
-        /* url */ QString(),
-        /* vendor */ QString());
+        /*url*/ QString(),
+        /*vendor*/ QString());
 
     nx::vms::common::AnalyticsEngineResourcePtr engineResource = getResourceFactory()
         ->createResource(
             nx::vms::api::AnalyticsEngineData::kResourceTypeId,
             parameters).dynamicCast<nx::vms::common::AnalyticsEngineResource>();
 
-    if (!engineResource)
-    {
-        NX_ASSERT(false, "Unable to create engine resource.");
+    if (!NX_ASSERT(engineResource, "Unable to create engine resource."))
         return;
-    }
 
     ec2::fromApiToResource(analyticsEngineData, engineResource);
     updateResource(engineResource, source);

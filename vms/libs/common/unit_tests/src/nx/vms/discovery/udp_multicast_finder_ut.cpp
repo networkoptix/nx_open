@@ -29,12 +29,12 @@ public:
         nx::vms::api::ModuleInformationWithAddresses module;
         module.id = QnUuid::createUuid();
         module.localSystemId = systemId;
-        module.type = lit("test");
-        module.customization = lit("test");
-        module.brand = lit("test");
+        module.type = "test";
+        module.customization = "test";
+        module.brand = "test";
         module.version = nx::utils::SoftwareVersion(1, 2, 3, 123);
-        module.type = lit("test");
-        module.name = lit("test");
+        module.type = "test";
+        module.name = "test";
         module.port = 7001;
         module.remoteAddresses.insert("127.0.0.1");
         module.realm = nx::network::AppInfo::realm();

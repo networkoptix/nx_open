@@ -2,6 +2,8 @@
 
 #include <array>
 
+class QString;
+
 // This module is currently used for CryptedFileStream and Encrypted Layouts.
 // Some arbitrary constants are used to generate keys and hashes from passwords.
 

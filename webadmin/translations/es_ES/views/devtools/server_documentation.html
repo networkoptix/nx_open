@@ -1,0 +1,43 @@
+<div class="container-fluid">
+    <h1>
+        Documentación del servidor
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">Estas configuraciones son accesibles en:</h2>
+        </div>
+        <div class="panel-body">
+            <p>
+                Para Windows en la clave del registro:
+                Computer\HKEY_LOCAL_MACHINE\SOFTWARE\"{{Config.productName}}"\"{{Config.productName}} Media Server"
+            </p>
+            <p>
+                For all other platforms it is placed in a config file:
+                /opt/{{Config.productName}}/mediaserver/etc/mediaserver.conf
+            </p>
+        </div>
+    </div>
+    <div class="panel panel-default table-responsive">
+        <div class="panel-heading">
+            <h2 class="panel-title">Configuración del Servidor</h2>
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped table-condensed">
+                <thead>
+                    <rt>
+                        <th>Nombre</th>
+                        <th>&Descripción</th>
+                        <th>Valor predefinido</th>
+                    </rt>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="setting in settings">
+                        <td>{{setting.name}}</td>
+                        <td>{{setting.description}}</td>
+                        <td>{{setting.defaultValue}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

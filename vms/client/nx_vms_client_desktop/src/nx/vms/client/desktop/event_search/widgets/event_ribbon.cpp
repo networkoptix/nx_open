@@ -5,6 +5,7 @@
 #include <QtGui/QHoverEvent>
 
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
+#include <nx/vms/client/desktop/utils/widget_utils.h>
 
 namespace nx::vms::client::desktop {
 
@@ -56,6 +57,16 @@ bool EventRibbon::footersEnabled() const
 void EventRibbon::setFootersEnabled(bool value)
 {
     d->setFootersEnabled(value);
+}
+
+bool EventRibbon::headersEnabled() const
+{
+    return d->headersEnabled();
+}
+
+void EventRibbon::setHeadersEnabled(bool value)
+{
+    d->setHeadersEnabled(value);
 }
 
 Qt::ScrollBarPolicy EventRibbon::scrollBarPolicy() const
@@ -118,17 +129,11 @@ bool EventRibbon::event(QEvent* event)
         }
 
         case QEvent::Enter:
-            d->updateHover(true, static_cast<QEnterEvent*>(event)->pos());
-            break;
-
-        case QEvent::HoverEnter:
-        case QEvent::HoverMove:
-            d->updateHover(true, static_cast<QHoverEvent*>(event)->pos());
-            break;
-
         case QEvent::Leave:
+        case QEvent::HoverEnter:
         case QEvent::HoverLeave:
-            d->updateHover(false, QPoint());
+        case QEvent::HoverMove:
+            d->updateHover();
             break;
 
         default:
@@ -146,6 +151,11 @@ int EventRibbon::count() const
 int EventRibbon::unreadCount() const
 {
     return d->unreadCount();
+}
+
+nx::utils::Interval<int> EventRibbon::visibleRange() const
+{
+    return d->visibleRange();
 }
 
 } // namespace nx::vms::client::desktop

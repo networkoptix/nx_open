@@ -15,21 +15,29 @@ module.exports = merge(common, {
         proxy: [
             {
                 context: ['/web/', '/api/', '/ec2/', '/hls/', '/media/', '/proxy/'],
-                target: 'http://10.1.5.130:7001'
+                target: 'https://10.1.5.111:7001',
+                changeOrigin: true,
+                secure      : false
             },
             {
                 context: '/static/',
-                target: "http://0.0.0.0:9000",
-                pathRewrite: {"^/static" : ""},
+                target: 'https://0.0.0.0:9000',
+                pathRewrite: { '^/static' : '' },
                 changeOrigin: true,
                 secure: false
             }
         ],
-        historyApiFallback: {
-            index: '/',
+        https: {
+            spdy: {
+                protocols: ['http/1.1']
+            },
+            key : fs.readFileSync('ssl_keys/server.key').toString(),
+            cert: fs.readFileSync('ssl_keys/server.crt').toString()
         },
-    }
-    ,
+        historyApiFallback: {
+            index: '/'
+        }
+    },
     plugins:[
         new webpack.HotModuleReplacementPlugin(),
         new BundleAnalyzerPlugin({analyzerHost:'0.0.0.0', analyzerPort:9001})

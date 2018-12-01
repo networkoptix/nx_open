@@ -62,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "Geavanceerde Viewer",
-      "description": "Can view live video, browse the archive, control PTZ etc"
+      "description": "Kan live video bekijken, bladeren in het archief, camera's configureren, PTZ, enz. bedienen"
     },
     "Administrator": {
       "label": "Administrator",
@@ -167,7 +167,7 @@
     "confirmRenameTitle": "Systeemnaam",
     "confirmRenameAction": "Opslaan",
     "successRename": "Systeemnaam opgeslagen",
-    "confirmDisconnectTitle": "Verbinding verbreken met systeem %PRODUCT_NAME%?",
+    "confirmDisconnectTitle": "Ontkoppel het systeem van %PRODUCT_NAME%?",
     "confirmDisconnectAction": "Verbinding verbreken",
     "confirmUnshareFromMe": "U staat op het punt om dit systeem uit uw account te verbreken. U kunt dit systeem niet meer gebruiken. Weet u het zeker?",
     "confirmUnshareFromMeTitle": "Systeem loskoppelen?",
@@ -177,14 +177,14 @@
     "confirmUnshareAction": "Verwijder",
     "successDisconnected": "Systeem is succesvol afgesloten van %PRODUCT_NAME%",
     "successDeleted": "Systeem {{systemName}} is succesvol verwijderd van uw account",
-    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
+    "successMerge": "Systeem {{systemName}} is samengevoegd met {{systemName}}",
     "permissionsRemoved": "Machtigingen zijn verwijderd uit {{email}}"
   },
   "account": {
     "accountSavedSuccess": "Uw account is succesvol opgeslagen",
     "activationLinkSent": "Activatielink verzonden",
     "passwordChangedSuccess": "Uw account is succesvol opgeslagen",
-    "changePassword": "Wijzig wachtwoord",
+    "changePassword": "Wachtwoord wijzigen",
     "newPasswordLabel": "Nieuw wachtwoord",
     "saveChanges": "Opslaan"
   },
@@ -279,11 +279,11 @@
       "copyActiveText": "gekopieerd naar het klembord"
     },
     "systemOffline": "Systeem Offline",
-    "systemHasNoCameras": "NO CAMERAS",
+    "systemHasNoCameras": "GEEN CAMERA'S",
     "cameraStates": {
       "offline": "Offline",
       "error": "Fout",
-      "unauthorized": "Authentication required",
+      "unauthorized": "Authenticatie vereist",
       "noData": "Geen data",
       "iosVideoTooLarge": "iOS ondersteunt geen video die groter is dan FullHD (2MP: 1920x1080).",
       "flashRequired": "Gelieve <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> te installeren voor het afspelen van video's.",

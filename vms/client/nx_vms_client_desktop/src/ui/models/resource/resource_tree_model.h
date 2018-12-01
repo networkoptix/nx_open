@@ -62,6 +62,7 @@ public:
 
     virtual QStringList mimeTypes() const override;
     virtual QMimeData* mimeData(const QModelIndexList& indexes) const override;
+    virtual bool canDropMimeData(const QMimeData* mimeData, Qt::DropAction action, int row, int column, const QModelIndex& parent) const override;
     virtual bool dropMimeData(const QMimeData* mimeData, Qt::DropAction action, int row, int column, const QModelIndex& parent) override;
     virtual Qt::DropActions supportedDropActions() const override;
 
@@ -116,6 +117,9 @@ private:
      */
     void handleDrop(const QnResourceList& sourceResources, const QnResourcePtr& targetResource,
         const QMimeData* mimeData);
+
+    QnResourceTreeModelNodePtr dropNode(const QMimeData* mimeData, int row, int column,
+        const QModelIndex& parent, bool checkOnly) const;
 
     void handlePermissionsChanged(const QnResourcePtr& resource);
 

@@ -3,6 +3,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/vms/utils/vms_utils.h>
+#include <nx/vms/utils/system_helpers.h>
 #include <api/model/merge_system_data.h>
 #include <api/model/configure_system_data.h>
 #include <api/model/getnonce_reply.h>
@@ -35,7 +36,7 @@ protected:
         for (int i = 0; i < count; ++i)
         {
             const QString fileName = fileType == FileType::backup
-                ? QString::fromLatin1("ec_%1_%3.backup")
+                ? QString::fromLatin1("ec_%1_%3.db")
                     .arg(i * 1000)
                     .arg(i + 1000LL * 3600LL * 24LL * 365LL * 2010LL)
                 : notQuiteBackupFileName();
@@ -107,10 +108,10 @@ private:
     static QString notQuiteBackupFileName()
     {
         const QList<QString> fileNames = {
-            "ec_ab_100.backup",
-            "ec_ab_cd.backup",
+            "ec_ab_100.db",
+            "ec_ab_cd.db",
             "hello.txt",
-            "looks_like_.backup"
+            "looks_like_.db"
         };
 
         return nx::utils::random::choice(fileNames);

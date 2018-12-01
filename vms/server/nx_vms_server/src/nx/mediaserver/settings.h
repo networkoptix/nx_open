@@ -299,7 +299,7 @@ public:
         kDbBackupPeriodHrs,
         "Backup EC database period. If server version is updated, this setting is neglected and "
         "backup is created after the updated server starts.",
-        [this](const std::chrono::milliseconds& value)
+        [](const std::chrono::milliseconds& value)
         {
             if (value.count() == 0)
                 return std::chrono::milliseconds(kDbBackupPeriodHrs);

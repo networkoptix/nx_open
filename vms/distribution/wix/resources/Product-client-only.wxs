@@ -4,22 +4,31 @@
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
 
     <?include BuildVars.wxi ?>
-    <Product Id="*" Name="$(var.productName) Client" Language="1033" Version="$(var.releaseVersionFull)" Manufacturer="$(var.companyName)" UpgradeCode="$(var.clientUpgradeCode)">
-        <Package Id="*" InstallerVersion="405" Compressed="yes" Keywords="Installer" Comments="$(var.ProductTitle)" Manufacturer="$(var.companyName)" InstallPrivileges="elevated" InstallScope="perMachine"/>
+
+    <Product
+        Id="*"
+        Name="$(var.productName) Client"
+        Language="1033"
+        Version="$(var.releaseVersionFull)"
+        Manufacturer="$(var.companyName)"
+        UpgradeCode="$(var.clientUpgradeCode)">
+
+        <Package
+            Id="*"
+            InstallerVersion="405"
+            Compressed="yes"
+            Keywords="Installer"
+            Comments="$(var.ProductTitle)"
+            Manufacturer="$(var.companyName)"
+            InstallPrivileges="elevated"
+            InstallScope="perMachine"/>
 
         <?include ControlPanel.wxi ?>
+        <?include installer_states.wxi ?>
 
         <Property Id="CLIENT_NAME" Value="$(var.clientInternalName)"/>
         <Property Id="REINSTALLMODE" Value="dmus"/>
         <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Secure="yes" Value="1"/>
-
-        <?define VmsInstalling=" (NOT Installed AND NOT PREVIOUSVERSIONSINSTALLED) "?>
-        <?define VmsUpgrading=" (NOT Installed AND PREVIOUSVERSIONSINSTALLED)" ?>
-        <?define VmsChanging=" (Installed AND REMOVE <> "ALL") "?>
-        <?define VmsRemoving=" (Installed AND REMOVE = "ALL") "?>
-        <?define VmsInstallingOrChanging="($(var.VmsInstalling) OR $(var.VmsChanging))" ?>
-
-        <?define LaunchClientChecBoxText="Launch [ProductName] when setup exits." ?>
 
         <?if $(var.arch) = x86 ?>
         <Condition Message="This package is designed for 32-bit OS. Setup will now exit.">
@@ -27,12 +36,12 @@
         </Condition>
         <?endif?>
 
-        <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
+        <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">$(var.msiUpgrade)</SetProperty>
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
 
         <Property Id="INSTALL_CLIENT" Secure="yes"/>
         <SetProperty Id="INSTALL_CLIENT" Value="1" After="ResetPreselected" Sequence="ui">
-            <![CDATA[ $(var.VmsInstalling) OR &ClientFeature = 3 OR !ClientFeature = 3 ]]>
+            <![CDATA[ $(var.msiFirstTimeInstall) OR &ClientFeature = 3 OR !ClientFeature = 3 ]]>
         </SetProperty>
 
         <SetProperty Id="CLIENT_DIRECTORY_REG" Value="[CLIENT_DIRECTORY_REG32]" After="AppSearch">
@@ -49,8 +58,6 @@
 
         <!-- Add property to access from custom actions -->
         <Property Id="ARCHITECTURE" Value="$(var.arch)" />
-        <!-- <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" Secure="yes"/> -->
-
         <Property Id="LAUNCHAPPONEXIT" Secure="yes" />
 
         <!-- Properties -->
@@ -62,28 +69,47 @@
         <Property Id="CLIENT_APPSERVER_LOGIN" Secure="yes" Value="admin"/>
         <Property Id="CLIENT_VMS_MODE" Value="1"/>
         <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">
-            <RegistrySearch Id="ClientDirectoryReg"
-                            Root="HKCU"
-                            Key="Software\[Manufacturer]\$(var.clientInternalName)"
-                            Name="mediaRoot"
-                            Type="raw"
-                            Win64="yes"/>
+            <RegistrySearch
+                Id="ClientDirectoryReg"
+                Root="HKCU"
+                Key="Software\[Manufacturer]\$(var.clientInternalName)"
+                Name="mediaRoot"
+                Type="raw"
+                Win64="yes"/>
         </Property>
 
         <Property Id="CLIENT_DIRECTORY_REG32" Secure="yes">
-            <RegistrySearch Id="ClientDirectoryReg32"
-                            Root="HKCU"
-                            Key="Software\[Manufacturer]\$(var.clientInternalName)"
-                            Name="mediaRoot"
-                            Type="raw"
-                            Win64="no"/>
+            <RegistrySearch
+                Id="ClientDirectoryReg32"
+                Root="HKCU"
+                Key="Software\[Manufacturer]\$(var.clientInternalName)"
+                Name="mediaRoot"
+                Type="raw"
+                Win64="no"/>
         </Property>
 
         <Binary Id="CustomActions.dll" SourceFile="$(var.SourceDir)\wix_custom_actions.dll" />
 
-        <CustomAction Id="CleanAutorunRegistryKeys" BinaryKey="CustomActions.dll" DllEntry="CleanAutorunRegistryKeys" Execute="immediate" Impersonate="yes"/>
-        <CustomAction Id="CleanClientRegistryKeys_Cmd" Property="CleanClientRegistryKeys" Value="$(var.clientRegPath)" Execute="immediate" Impersonate="yes"/>
-        <CustomAction Id="CleanClientRegistryKeys" BinaryKey="CustomActions.dll" DllEntry="CleanClientRegistryKeys" Execute="deferred" Impersonate="yes"/>
+        <CustomAction
+            Id="CleanAutorunRegistryKeys"
+            BinaryKey="CustomActions.dll"
+            DllEntry="CleanAutorunRegistryKeys"
+            Execute="immediate"
+            Impersonate="yes"/>
+
+        <CustomAction
+            Id="CleanClientRegistryKeys_Cmd"
+            Property="CleanClientRegistryKeys"
+            Value="$(var.clientRegPath)"
+            Execute="immediate"
+            Impersonate="yes"/>
+
+        <CustomAction
+            Id="CleanClientRegistryKeys"
+            BinaryKey="CustomActions.dll"
+            DllEntry="CleanClientRegistryKeys"
+            Execute="deferred"
+            Impersonate="yes"/>
 
         <!-- Custom actions -->
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
@@ -91,11 +117,34 @@
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" />
 
 
-        <!-- Trying to kill old applauncher forcibly. -->
-        <CustomAction Id="CloseAppLauncherAction_Cmd" Property="CloseAppLauncherAction"
+        <!-- Trying to kill old applauncher forcibly. It was named as minilaucher is named currently. Actual always. -->
+        <CustomAction Id="CloseOldApplauncherAction_Cmd" Property="CloseOldApplauncherAction"
                       Value='"[WindowsFolder]\System32\taskkill.exe" /F /IM "$(var.minilauncherBinaryName)"' Execute="immediate" />
-        <CustomAction Id="CloseAppLauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
+        <CustomAction Id="CloseOldApplauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
+
+        <!-- Trying to kill new Applauncher forcibly. It is actual when fully uninstalling the client. -->
+        <CustomAction Id="CloseApplauncherAction_Cmd" Property="CloseApplauncherAction"
+                      Value='"[WindowsFolder]\System32\taskkill.exe" /F /IM "$(var.applauncherBinaryName)"' Execute="immediate" />
+        <CustomAction Id="CloseApplauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
+                      Execute="deferred" Return="ignore" Impersonate="no" />
+
+        <?if $(var.developerBuild) = true ?>
+            <CustomAction Id="developerDebugInfo" Script="vbscript">
+                <![CDATA[
+                    Function testProperty(x)
+                        If Len(session.Property(x)) > 0 Then
+                            MsgBox(x & " : " & session.Property(x))
+                        End If
+                    End Function
+
+                    testProperty("Installed")
+                    testProperty("REMOVE")
+                    testProperty("PREVIOUSVERSIONSINSTALLED")
+                    testProperty("UPGRADINGPRODUCTCODE")
+                ]]>
+            </CustomAction>
+        <?endif?>
 
         <MajorUpgrade
             AllowDowngrades="yes"
@@ -112,12 +161,19 @@
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
 
-            <Custom Action="CleanAutorunRegistryKeys" Before="InstallFinalize">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
-            <Custom Action="CleanClientRegistryKeys_Cmd" After="CleanAutorunRegistryKeys">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
-            <Custom Action="CleanClientRegistryKeys" After="CleanClientRegistryKeys_Cmd">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+            <?if $(var.developerBuild) = true ?>
+                <Custom Action="developerDebugInfo" After="InstallInitialize" />
+            <?endif?>
 
-            <Custom Action="CloseAppLauncherAction_Cmd" Before="CloseAppLauncherAction">NOT $(var.VmsInstalling)</Custom>
-            <Custom Action="CloseAppLauncherAction" Before="StopServices">NOT $(var.VmsInstalling)</Custom>
+            <Custom Action="CleanAutorunRegistryKeys" Before="InstallFinalize">$(var.msiFullUninstall)</Custom>
+            <Custom Action="CleanClientRegistryKeys_Cmd" After="CleanAutorunRegistryKeys">$(var.msiFullUninstall)</Custom>
+            <Custom Action="CleanClientRegistryKeys" After="CleanClientRegistryKeys_Cmd">$(var.msiFullUninstall)</Custom>
+            <Custom Action="CloseApplauncherAction_Cmd" After="CleanClientRegistryKeys">$(var.msiFullUninstall)</Custom>
+            <Custom Action="CloseApplauncherAction" After="CloseApplauncherAction_Cmd">$(var.msiFullUninstall)</Custom>
+
+            <!-- Old applauncher must be killed in any scenario except clean install. -->
+            <Custom Action="CloseOldApplauncherAction_Cmd" Before="CloseApplauncherAction">Installed</Custom>
+            <Custom Action="CloseOldApplauncherAction" Before="StopServices">Installed</Custom>
         </InstallExecuteSequence>
 
         <Media Id="1" Cabinet="client.cab" EmbedCab="yes" />
@@ -159,66 +215,7 @@
         <Property Id="WIXUI_CLIENT_DIRECTORY" Value="CLIENT_DIRECTORY"/>
         <Property Id="WIXUI_SERVER_ALLOWCHANGEIP" Value="SERVER_ALLOWCHANGEIP"/>
 
+        <UIRef Id="ClientMsiUi"/>
 
-        <UIRef Id="WixUI_Common" />
-        <UIRef Id="WixUI_ErrorProgressText" />
-
-        <UI>
-            <!-- These dialog references are needed for CloseApplication above to work correctly -->
-            <DialogRef Id="FilesInUse" />
-            <DialogRef Id="MsiRMFilesInUse" />
-
-            <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
-            <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
-            <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
-            <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
-
-            <DialogRef Id="SelectionWarningDlg" />
-            <DialogRef Id="BrowseDlg" />
-            <DialogRef Id="DiskCostDlg" />
-            <DialogRef Id="ErrorDlg" />
-            <DialogRef Id="FatalError" />
-            <DialogRef Id="FilesInUse" />
-            <DialogRef Id="MsiRMFilesInUse" />
-            <DialogRef Id="PrepareDlg" />
-            <DialogRef Id="ProgressDlg" />
-            <DialogRef Id="ResumeDlg" />
-            <DialogRef Id="UserExit" />
-            <!--Width="260" Height="85"-->
-
-            <Binary Id="Warning" SourceFile="Binary\Exclam.ico" />
-            <Publish Dialog="MyExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
-            <Publish Dialog="MyExitDialog" Control="Finish" Order="1" Event="DoAction" Value="LaunchClient">WIXUI_EXITDIALOGOPTIONALCHECKBOX</Publish>
-
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">NOT PREVIOUSVERSIONSINSTALLED AND NOT LICENSE_ALREADY_ACCEPTED</Publish>
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="ClientDlg">NOT PREVIOUSVERSIONSINSTALLED AND LICENSE_ALREADY_ACCEPTED</Publish>
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="UpgradeDlg">PREVIOUSVERSIONSINSTALLED</Publish>
-
-            <Publish Dialog="UpgradeDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
-            <Publish Dialog="UpgradeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
-
-            <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
-            <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="ClientDlg">LicenseAccepted = "1"</Publish>
-
-            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg" Order="2">NOT LICENSE_ALREADY_ACCEPTED</Publish>
-            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2">LICENSE_ALREADY_ACCEPTED</Publish>
-            <Publish Dialog="ClientDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2">1</Publish>
-
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="ClientDlg">1</Publish>
-
-            <Publish Dialog="VerifyReadyDlg" Control="Install" Event="AddLocal" Value="ClientFeature">INSTALL_CLIENT</Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Install" Event="Remove" Value="ClientFeature">NOT INSTALL_CLIENT</Publish>
-
-            <Publish Dialog="VerifyReadyDlg" Control="InstallNoShield" Event="AddLocal" Value="ClientFeature">INSTALL_CLIENT</Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="InstallNoShield" Event="Remove" Value="ClientFeature">NOT INSTALL_CLIENT</Publish>
-
-            <Publish Dialog="VerifyReadyDlg" Control="Change" Event="AddLocal" Value="ClientFeature">INSTALL_CLIENT</Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Change" Event="Remove" Value="ClientFeature">NOT INSTALL_CLIENT</Publish>
-
-            <Publish Dialog="VerifyReadyDlg" Control="ChangeNoShield" Event="AddLocal" Value="ClientFeature">INSTALL_CLIENT</Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="ChangeNoShield" Event="Remove" Value="ClientFeature">NOT INSTALL_CLIENT</Publish>
-
-            <Publish Dialog="VerifyReadyDlg" Control="Install" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)">1</Publish>
-        </UI>
     </Product>
 </Wix>

@@ -114,7 +114,7 @@ QnAbstractPtzController* HikvisionResource::createPtzControllerInternal() const
 CameraDiagnostics::Result HikvisionResource::initializeMedia(
     const CapabilitiesResp& onvifCapabilities)
 {
-    bool hevcIsDisabled = resourceData().value<bool>(Qn::DISABLE_HEVC_PARAMETER_NAME, false);
+    bool hevcIsDisabled = resourceData().value<bool>(ResourceDataKey::kDisableHevc, false);
 
     if (!hevcIsDisabled && m_integrationProtocols[Protocol::isapi].enabled)
     {
@@ -137,7 +137,7 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
             {
                 if (role == Qn::ConnectionRole::CR_LiveVideo)
                 {
-                    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, 1);
+                    setProperty(ResourcePropertyKey::kHasDualStreaming, 1);
                     if (!channelCapabilities.fpsInDeviceUnits.empty())
                         setMaxFps(channelCapabilities.realMaxFps());
                 }

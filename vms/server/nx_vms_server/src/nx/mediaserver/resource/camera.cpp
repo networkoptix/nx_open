@@ -355,7 +355,7 @@ QSize Camera::closestResolution(
 CameraDiagnostics::Result Camera::initInternal()
 {
     auto resData = resourceData();
-    int timeoutSec = resData.value<int>(Qn::kUnauthrizedTimeoutParamName);
+    auto timeoutSec = resData.value<int>(ResourceDataKey::kUnauthorizedTimeoutSec);
     auto credentials = getAuth();
     auto status = getStatus();
     if (timeoutSec > 0 &&
@@ -371,7 +371,7 @@ CameraDiagnostics::Result Camera::initInternal()
     m_lastCredentials = credentials;
 
     m_mediaTraits = resData.value<nx::media::CameraTraits>(
-        Qn::kMediaTraits,
+        ResourceDataKey::kMediaTraits,
         nx::media::CameraTraits());
 
     m_streamCapabilityAdvancedProviders.clear();
@@ -470,7 +470,7 @@ CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
         containerString(m_advancedParametersProvidersByParameterId)));
 
     advancedParameters.packet_mode = resourceData()
-        .value<bool>(Qn::kReloadAllAdvancedParameters, false);
+        .value<bool>(ResourceDataKey::kNeedToReloadAllAdvancedParametersAfterApply, false);
 
     QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), advancedParameters);
     return CameraDiagnostics::NoErrorResult();

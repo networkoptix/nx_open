@@ -53,6 +53,7 @@
 #include <nx/mediaserver/resource/camera.h>
 #include <nx/mediaserver/root_fs.h>
 #include <nx/mediaserver/server_update_manager.h>
+#include <nx/mediaserver/meta_types.h>
 
 #include <nx/mediaserver/analytics/sdk_object_factory.h>
 
@@ -62,7 +63,6 @@
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <plugins/plugin_manager.h>
-#include <nx/mediaserver/server_meta_types.h>
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
 
 #include "wearable_lock_manager.h"
@@ -154,7 +154,6 @@ QnMediaServerModule::QnMediaServerModule(
 
     Q_INIT_RESOURCE(nx_vms_server);
     Q_INIT_RESOURCE(nx_vms_server_db);
-    nx::mediaserver::MetaTypes::initialize();
 
     if (serverSettings.get())
     {
@@ -167,6 +166,7 @@ QnMediaServerModule::QnMediaServerModule(
             arguments->rwConfigFilePath));
     }
 
+    nx::mediaserver::registerSerializers();
 
 #ifdef ENABLE_VMAX
     // It depend on Vmax480Resources in the pool. Pool should be cleared before QnVMax480Server destructor.
@@ -249,7 +249,11 @@ QnMediaServerModule::QnMediaServerModule(
     m_fileDeletor = store(new QnFileDeletor(this));
 
     m_p2pDownloader = store(new nx::vms::common::p2p::downloader::Downloader(
-        downloadsDirectory(), commonModule(), nullptr, this));
+        downloadsDirectory(),
+        commonModule(),
+        nullptr,
+        nx::vms::common::p2p::downloader::Downloader::StartupPolicy::idle,
+        this));
 
     m_pluginManager = store(new PluginManager(this, &m_pluginContainer));
     m_pluginManager->loadPlugins(roSettings());

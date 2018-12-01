@@ -240,7 +240,7 @@
         </resource>
         <resource name = "40185" public = "20185"> 
             <params>
-                <param name = "VideoLayout" default_value = "width=4;height=1;sensors=2,3,1,0"/>     
+                <param name = "VideoLayout" default_value = "width=4;height=1;sensors=2,1,3,0"/>
                 <param name = "MaxFPS" default_value = "2"/>
             </params>
         </resource>

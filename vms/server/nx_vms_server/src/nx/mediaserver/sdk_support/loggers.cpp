@@ -4,6 +4,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <nx/mediaserver/resource/analytics_engine_resource.h>
+#include <nx/mediaserver/analytics/debug_helpers.h>
 #include <nx/mediaserver/sdk_support/utils.h>
 #include <nx/mediaserver/sdk_support/placeholder_binder.h>
 
@@ -11,6 +12,7 @@ namespace nx::mediaserver::sdk_support {
 
 namespace {
 
+static const QString kManifestFilenamePostfix("_manifest.json");
 static const QString kPluginPlaceholder("{:plugin}");
 static const QString kDevicePlaceholder("{:device}");
 static const QString kEnginePlaceholder("{:engine}");
@@ -43,42 +45,7 @@ QString buildPluginStr(const resource::AnalyticsPluginResourcePtr& plugin)
     return lm("%1 (%2)").args(plugin->getName(), plugin->getId());
 }
 
-QString buildManifestFileName(
-    const QnVirtualCameraResourcePtr& device,
-    const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-    const nx::vms::common::AnalyticsPluginResourcePtr& plugin)
-{
-    auto normalize =
-        [](const QString& s)
-        {
-            QString result = s.toLower().replace(' ', '_');
-            return result;
-        };
-
-    QStringList resultParts;
-    if (device)
-        resultParts << "device_" + normalize(device->getUserDefinedName());
-
-    auto pluginResource = plugin;
-    if (engine)
-    {
-        resultParts << "engine_" + engine->getId().toString();
-        pluginResource = engine->plugin();
-    }
-
-    if (pluginResource)
-        resultParts << "plugin_" + normalize(pluginResource->getName());
-
-    auto result = resultParts.join('_');
-    if (result.isEmpty())
-        result = "unknown_manifest";
-
-    return result;
-}
-
 } // namespace
-
-//-----------------------------------------------------------------------------------------------
 
 ManifestLogger::ManifestLogger(
     nx::utils::log::Tag logTag,
@@ -124,10 +91,15 @@ void ManifestLogger::log(
 {
     if (pluginsIni().analyticsManifestOutputPath[0])
     {
-        sdk_support::saveManifestToFile(
+        analytics::debug_helpers::dumpStringToFile(
             m_logTag,
             manifestStr,
-            buildManifestFileName(m_device, m_engineResource, m_pluginResource));
+            QString(pluginsIni().analyticsManifestOutputPath),
+            analytics::debug_helpers::filename(
+                m_device,
+                m_engineResource,
+                m_pluginResource,
+                kManifestFilenamePostfix));
     }
 
     if (error != nx::sdk::Error::noError)
@@ -148,6 +120,47 @@ QString ManifestLogger::buildLogString(const QString& error) const
     });
 
     return binder.str();
+}
+
+//--------------------------------------------------------------------------------------------------
+
+StartupPluginManifestLogger::StartupPluginManifestLogger(
+    nx::utils::log::Tag logTag,
+    const nx::sdk::analytics::Plugin* plugin)
+    :
+    m_logTag(std::move(logTag)),
+    m_plugin(plugin)
+{
+    NX_ASSERT(plugin);
+}
+
+void StartupPluginManifestLogger::log(
+    const QString& manifestStr,
+    nx::sdk::Error error,
+    const QString& customError)
+{
+    if (pluginsIni().analyticsManifestOutputPath[0])
+    {
+        analytics::debug_helpers::dumpStringToFile(
+            m_logTag,
+            manifestStr,
+            QString(pluginsIni().analyticsManifestOutputPath),
+            analytics::debug_helpers::filename(
+                m_plugin,
+                kManifestFilenamePostfix));
+    }
+
+    if (error != nx::sdk::Error::noError)
+    {
+        NX_WARNING(
+            m_logTag,
+            buildLogString(customError.isEmpty() ? nx::sdk::toString(error) : customError));
+    }
+}
+
+QString StartupPluginManifestLogger::buildLogString(const QString& error) const
+{
+    return lm("Error while plugin manifest from Plugin %1: %2").args(m_plugin->name(), error);
 }
 
 } // namespace nx::mediaserver::sdk_support

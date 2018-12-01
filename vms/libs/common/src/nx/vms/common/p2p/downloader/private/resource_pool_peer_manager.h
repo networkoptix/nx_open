@@ -7,15 +7,10 @@
 #include <common/common_module_aware.h>
 #include <nx/vms/common/p2p/downloader/private/abstract_peer_manager.h>
 #include <nx/vms/common/p2p/downloader/private/peer_selection/abstract_peer_selector.h>
-#include <nx/network/deprecated/asynchttpclient.h>
 
-class QnResourcePool;
+namespace nx::vms::common::p2p::downloader {
 
-namespace nx {
-namespace vms {
-namespace common {
-namespace p2p {
-namespace downloader {
+class InternetOnlyPeerManager;
 
 class ResourcePoolPeerManager: public AbstractPeerManager, public QnCommonModuleAware
 {
@@ -23,6 +18,8 @@ public:
     ResourcePoolPeerManager(
         QnCommonModule* commonModule,
         AbstractPeerSelectorPtr peerSelector, bool isClient = false);
+
+    virtual ~ResourcePoolPeerManager() override;
 
     virtual QnUuid selfId() const override;
     virtual QString peerString(const QnUuid& peerId) const override;
@@ -54,23 +51,18 @@ public:
         int chunkSize,
         ChunkCallback callback) override;
 
-    virtual rest::Handle validateFileInformation(
-        const QnUuid& peerId,
-        const FileInformation& fileInformation,
-        ValidateCallback callback) override;
-
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
     virtual bool hasAccessToTheUrl(const QString& url) const override;
+
+    void setServerDirectConnection(const QnUuid& id, const rest::QnConnectionPtr& connection);
 
 protected:
     virtual QnMediaServerResourcePtr getServer(const QnUuid& peerId) const;
     virtual rest::QnConnectionPtr getConnection(const QnUuid& peerId) const;
 
-    rest::Handle m_currentSelfRequestHandle = 0;
-    QHash<rest::Handle, nx::network::http::AsyncHttpClientPtr> m_httpClientByHandle;
-    AbstractPeerSelectorPtr m_peerSelector;
-
-    bool m_isClient = false;
+private:
+    class Private;
+    QScopedPointer<Private> d;
 };
 
 class ResourcePoolPeerManagerFactory:
@@ -86,8 +78,4 @@ public:
 
 nx::network::http::AsyncHttpClientPtr createHttpClient();
 
-} // namespace downloader
-} // namespace p2p
-} // namespace common
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::common::p2p::downloader

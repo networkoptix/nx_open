@@ -58,7 +58,7 @@ CameraDiagnostics::Result QnPlIqResource::initializeCameraDriver()
             return CameraDiagnostics::UnknownErrorResult();
     }
 
-    saveParams();
+    saveProperties();
 
     return CameraDiagnostics::NoErrorResult();
 }

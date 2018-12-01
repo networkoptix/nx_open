@@ -9,6 +9,7 @@
     #include <signal.h>
     #include <sys/types.h>
     #include <sys/stat.h>
+    #include <sys/prctl.h>
     #include <unistd.h>
 #endif
 
@@ -17,6 +18,7 @@
 #include <qtsinglecoreapplication.h>
 #include <qtservice.h>
 
+#include <QtCore/QStringLiteral>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
@@ -174,6 +176,7 @@
 #include <rest/handlers/execute_analytics_action_rest_handler.h>
 #include <rest/handlers/get_analytics_actions_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
+#include <rest/server/options_request_handler.h>
 #include <rest/handlers/get_hardware_info_rest_handler.h>
 #include <rest/handlers/system_settings_handler.h>
 #include <rest/handlers/audio_transmission_rest_handler.h>
@@ -278,7 +281,7 @@
 #include <nx/network/http/http_client.h>
 #include <core/resource_management/resource_data_pool.h>
 
-#if !defined(EDGE_SERVER) && !defined(__aarch64__)
+#if !defined(EDGE_SERVER)
     #include <nx_speech_synthesizer/text_to_wav.h>
     #include <nx/utils/file_system.h>
 #endif
@@ -306,9 +309,9 @@ static bool gRestartFlag = false;
 namespace {
 
 static const std::chrono::seconds kResourceDataReadingTimeout(5);
-const QString YES = lit("yes");
-const QString NO = lit("no");
-const QString MEDIATOR_ADDRESS_UPDATE = lit("mediatorAddressUpdate");
+const QString YES = "yes";
+const QString NO = "no";
+const QString MEDIATOR_ADDRESS_UPDATE = "mediatorAddressUpdate";
 
 static const int kPublicIpUpdateTimeoutMs = 60 * 2 * 1000;
 static nx::utils::log::Tag kLogTag(typeid(MediaServerProcess));
@@ -323,7 +326,7 @@ void addFakeVideowallUser(QnCommonModule* commonModule)
 
     auto fakeUser = ec2::fromApiToResource(fakeUserData);
     fakeUser->setId(Qn::kVideowallUserAccess.userId);
-    fakeUser->setName(lit("Video wall"));
+    fakeUser->setName("Video wall");
 
     commonModule->resourcePool()->addResource(fakeUser);
 }
@@ -357,7 +360,7 @@ void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args
         szMsg[strlen(szMsg)-1] = 0;
     }
 
-    NX_ERROR(kLogTag, lit("FFMPEG %1").arg(QString::fromLocal8Bit(szMsg)));
+    NX_ERROR(kLogTag, "FFMPEG %1", QString::fromLocal8Bit(szMsg));
 }
 
 QHostAddress resolveHost(const QString& hostString)
@@ -371,7 +374,7 @@ QHostAddress resolveHost(const QString& hostString)
     // Can't resolve
     if (info.error() != QHostInfo::NoError)
     {
-        NX_ERROR(kLogTag, lit("Couldn't resolve host %1").arg(hostString));
+        NX_ERROR(kLogTag, "Couldn't resolve host %1", hostString);
         return QHostAddress();
     }
 
@@ -387,7 +390,7 @@ QHostAddress resolveHost(const QString& hostString)
     }
 
     if (host.toIPv4Address() == 0)
-        NX_ERROR(kLogTag, lit("No ipv4 address associated with host %1").arg(hostString));
+        NX_ERROR(kLogTag, "No ipv4 address associated with host %1", hostString);
 
     return host;
 }
@@ -448,7 +451,6 @@ void calculateSpaceLimitOrLoadFromConfig(
 
     fileStorage->setSpaceLimit(fileStorage->calcInitialSpaceLimit());
 }
-
 
 #ifdef Q_OS_WIN
 static int freeGB(QString drive)
@@ -584,14 +586,12 @@ QnStorageResourceList MediaServerProcess::createStorages(const QnMediaServerReso
             storage->setUsedForWriting(false);
     }
 
-    QString logMessage = lit("Storage new candidates:\n");
+    QString logMessage = "Storage new candidates:\n";
     for (const auto& storage : storages)
     {
         logMessage.append(
-            lit("\t\turl: %1, totalSpace: %2, spaceLimit: %3")
-                .arg(storage->getUrl())
-                .arg(storage->getTotalSpace())
-                .arg(storage->getSpaceLimit()));
+            lm("\t\turl: %1, totalSpace: %2, spaceLimit: %3")
+                .args(storage->getUrl(), storage->getTotalSpace(), storage->getSpaceLimit()));
     }
 
     NX_DEBUG(kLogTag, logMessage);
@@ -623,7 +623,7 @@ QnStorageResourceList MediaServerProcess::updateStorages(QnMediaServerResourcePt
         QString storageType = storage->getStorageType();
         if (storageType.isEmpty())
         {
-            if (storage->getUrl().contains(lit("://")))
+            if (storage->getUrl().contains("://"))
                 storageType = QUrl(storage->getUrl()).scheme();
             if (storageType.isEmpty())
             {
@@ -645,14 +645,12 @@ QnStorageResourceList MediaServerProcess::updateStorages(QnMediaServerResourcePt
             result.insert(storage->getId(), storage);
     }
 
-    QString logMesssage = lit("%1 Modified storages:\n").arg(Q_FUNC_INFO);
+    QString logMesssage = lm("%1 Modified storages:\n").arg(Q_FUNC_INFO);
     for (const auto& storage : result.values())
     {
         logMesssage.append(
-            lit("\t\turl: %1, totalSpace: %2, spaceLimit: %3\n")
-                .arg(storage->getUrl())
-                .arg(storage->getTotalSpace())
-                .arg(storage->getSpaceLimit()));
+            lm("\t\turl: %1, totalSpace: %2, spaceLimit: %3\n")
+                .args(storage->getUrl(), storage->getTotalSpace(), storage->getSpaceLimit()));
     }
 
     NX_DEBUG(kLogTag, logMesssage);
@@ -775,7 +773,7 @@ QString getDefaultServerName()
     QString id = getComputerName();
     if (id.isEmpty())
         id = nx::network::getMacFromPrimaryIF();
-    return lit("Server %1").arg(id);
+    return lm("Server %1").arg(id);
 }
 
 QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectionPtr ec2Connection)
@@ -827,7 +825,7 @@ QnMediaServerResourcePtr MediaServerProcess::registerServer(
     // insert server user attributes if defined
     QString dir = serverModule()->settings().staticDataDir();
 
-    QFile f(closeDirPath(dir) + lit("server_settings.json"));
+    QFile f(closeDirPath(dir) + "server_settings.json");
     if (!f.open(QFile::ReadOnly))
         return server;
     QByteArray data = f.readAll();
@@ -875,18 +873,24 @@ void MediaServerProcess::dumpSystemUsageStats()
     m_platform->monitor()->totalRamUsage();
     m_platform->monitor()->totalHddLoad();
 
-    // TODO: #mu
-    //  - Add some more fields that might be interesting
-    //  - Make and use JSON serializable struct rather than just a string
+    // TODO: #muskov
+    //  - Add some more fields that might be interesting.
+    //  - Make and use JSON serializable struct rather than just a string.
     QStringList networkIfList;
-    for (const auto& iface : m_platform->monitor()->totalNetworkLoad())
+    for (const auto& iface: m_platform->monitor()->totalNetworkLoad())
+    {
         if (iface.type != QnPlatformMonitor::LoopbackInterface)
-            networkIfList.push_back(lit("%1: %2 bps").arg(iface.interfaceName)
-                                                     .arg(iface.bytesPerSecMax));
-
-    const auto networkIfInfo = networkIfList.join(lit(", "));
-    if (m_mediaServer->setProperty(Qn::NETWORK_INTERFACES, networkIfInfo))
-        m_mediaServer->saveParams();
+        {
+            networkIfList.push_back(
+                lm("%1: %2 bps").args(iface.interfaceName, iface.bytesPerSecMax));
+        }
+    }
+    const auto networkIfInfo = networkIfList.join(", ");
+    if (m_mediaServer->setProperty(
+        ResourcePropertyKey::MediaServer::Statistics::kNetworkInterfaces, networkIfInfo))
+    {
+        m_mediaServer->saveProperties();
+    }
 
     QnMutexLocker lk( &m_mutex );
     if(m_dumpSystemResourceUsageTaskId == 0)  //monitoring cancelled
@@ -960,7 +964,7 @@ nx::utils::Url MediaServerProcess::appServerConnectionUrl() const
     appServerUrl.setPassword(password);
     appServerUrl.setQuery(params);
 
-    NX_INFO(this, lit("Connect to server %1").arg(appServerUrl.toString(QUrl::RemovePassword)));
+    NX_INFO(this, "Connect to server %1", appServerUrl.toString(QUrl::RemovePassword));
     return appServerUrl;
 }
 
@@ -1118,19 +1122,22 @@ void MediaServerProcess::updateAllowCameraChangesIfNeeded()
     QString allowCameraChanges = serverModule()->roSettings()->value(DV_PROPERTY).toString();
     if (!allowCameraChanges.isEmpty())
     {
-        qnGlobalSettings->setCameraSettingsOptimizationEnabled(allowCameraChanges.toLower() == lit("yes") || allowCameraChanges.toLower() == lit("true") || allowCameraChanges == lit("1"));
+        qnGlobalSettings->setCameraSettingsOptimizationEnabled(
+            allowCameraChanges.toLower() == "yes"
+            || allowCameraChanges.toLower() == "true"
+            || allowCameraChanges == "1");
         serverModule()->roSettings()->setValue(DV_PROPERTY, "");
     }
 }
 
-template< typename Container>
-QString containerToQString( const Container& container )
+template<typename Container>
+QString containerToQString(const Container& container)
 {
     QStringList list;
     for (const auto& it : container)
         list << it.toString();
 
-    return list.join( lit(", ") );
+    return list.join(", ");
 }
 
 void MediaServerProcess::updateAddressesList()
@@ -1160,8 +1167,7 @@ void MediaServerProcess::updateAddressesList()
         serverAddresses << nx::network::SocketAddress(m_ipDiscovery->publicIP().toString(), port);
 
     m_mediaServer->setNetAddrList(serverAddresses);
-    NX_DEBUG(this, lit("Update mediaserver addresses: %1")
-            .arg(containerToQString(serverAddresses)));
+    NX_DEBUG(this, "Update mediaserver addresses: %1", containerToQString(serverAddresses));
 
     const nx::utils::Url defaultUrl(m_mediaServer->getApiUrl());
     const nx::network::SocketAddress defaultAddress(defaultUrl.host(), defaultUrl.port());
@@ -1192,42 +1198,45 @@ void MediaServerProcess::updateAddressesList()
 
 void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
 {
+    namespace Statistics = ResourcePropertyKey::MediaServer::Statistics;
     const auto hwInfo = HardwareInformation::instance();
-    server->setProperty(Qn::CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
-    server->setProperty(Qn::CPU_MODEL_NAME, hwInfo.cpuModelName);
-    server->setProperty(Qn::PHYSICAL_MEMORY, QString::number(hwInfo.physicalMemory));
-
-    server->setProperty(Qn::PRODUCT_NAME_SHORT, QnAppInfo::productNameShort());
-    server->setProperty(Qn::FULL_VERSION, nx::utils::AppInfo::applicationFullVersion());
-    server->setProperty(Qn::BETA, QString::number(QnAppInfo::beta() ? 1 : 0));
-    server->setProperty(Qn::PUBLIC_IP, m_ipDiscovery->publicIP().toString());
-    server->setProperty(Qn::SYSTEM_RUNTIME, nx::vms::api::SystemInformation::currentSystemRuntime());
+    server->setProperty(Statistics::kCpuArchitecture, hwInfo.cpuArchitecture);
+    server->setProperty(Statistics::kCpuModelName, hwInfo.cpuModelName);
+    server->setProperty(Statistics::kPhysicalMemory, QString::number(hwInfo.physicalMemory));
+    server->setProperty(Statistics::kProductNameShort, QnAppInfo::productNameShort());
+    server->setProperty(Statistics::kFullVersion, nx::utils::AppInfo::applicationFullVersion());
+    server->setProperty(Statistics::kBeta, QString::number(QnAppInfo::beta() ? 1 : 0));
+    server->setProperty(Statistics::kPublicIp, m_ipDiscovery->publicIP().toString());
+    server->setProperty(Statistics::kSystemRuntime, nx::vms::api::SystemInformation::currentSystemRuntime());
 
     if (m_mediaServer->getPanicMode() == Qn::PM_BusinessEvents)
         server->setPanicMode(Qn::PM_None);
 
-    QFile hddList(Qn::HDD_LIST_FILE);
+    static const QString kHddListFilename("/tmp/hddlist");
+
+    QFile hddList(kHddListFilename);
     if (hddList.open(QFile::ReadOnly))
     {
         const auto content = QString::fromUtf8(hddList.readAll());
         if (content.size())
         {
-            auto hhds = content.split(lit("\n"), QString::SkipEmptyParts);
-            for (auto& hdd : hhds) hdd = hdd.trimmed();
-            server->setProperty(Qn::HDD_LIST, hhds.join(", "),
+            auto hhds = content.split("\n", QString::SkipEmptyParts);
+            for (auto& hdd : hhds)
+                hdd = hdd.trimmed();
+            server->setProperty(Statistics::kHddList, hhds.join(", "),
                                 QnResource::NO_ALLOW_EMPTY);
         }
     }
 
-    server->saveParams();
+    server->saveProperties();
     m_mediaServer->setStatus(Qn::Online);
 
     #ifdef ENABLE_EXTENDED_STATISTICS
         qnServerDb->setBookmarkCountController(
             [server](size_t count)
             {
-                server->setProperty(Qn::BOOKMARK_COUNT, QString::number(count));
-                server->saveParams();
+                server->setProperty(Statistics::kBookmarkCount, QString::number(count));
+                server->saveProperties();
             });
     #endif
 }
@@ -1263,8 +1272,9 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIp)
             ec2Connection->getMediaServerManager(Qn::kSystemAccess)->save(apiServer, this, [] {});
         }
 
-        if (server->setProperty(Qn::PUBLIC_IP, publicIp.toString(), QnResource::NO_ALLOW_EMPTY))
-            server->saveParams();
+        if (server->setProperty(ResourcePropertyKey::MediaServer::Statistics::kPublicIp,
+            publicIp.toString(), QnResource::NO_ALLOW_EMPTY))
+            server->saveProperties();
 
         updateAddressesList(); //< update interface list to add/remove publicIP
     }
@@ -1281,8 +1291,7 @@ void MediaServerProcess::at_portMappingChanged(QString address)
         auto it = m_forwardedAddresses.emplace(mappedAddress.address, 0).first;
         if (it->second != mappedAddress.port)
         {
-            NX_ALWAYS(this, lit("New external address %1 has been mapped")
-                    .arg(address));
+            NX_ALWAYS(this, "New external address %1 has been mapped", address);
 
             it->second = mappedAddress.port;
             updateAddressesList();
@@ -1293,8 +1302,8 @@ void MediaServerProcess::at_portMappingChanged(QString address)
         const auto oldIp = m_forwardedAddresses.find(mappedAddress.address);
         if (oldIp != m_forwardedAddresses.end())
         {
-            NX_ALWAYS(this, lit("External address %1:%2 has been unmapped")
-                   .arg(oldIp->first.toString()).arg(oldIp->second));
+            NX_ALWAYS(this, "External address %1:%2 has been unmapped",
+                oldIp->first.toString(), oldIp->second);
 
             m_forwardedAddresses.erase(oldIp);
             updateAddressesList();
@@ -1340,7 +1349,7 @@ void MediaServerProcess::at_serverModuleConflict(nx::vms::discovery::ModuleEndpo
         resPool->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID()),
         qnSyncTime->currentUSecsSinceEpoch(),
         module,
-        QUrl(lit("http://%1").arg(module.endpoint.toString())));
+        QUrl(lm("http://%1").arg(module.endpoint.toString())));
 }
 
 void MediaServerProcess::at_timer()
@@ -1431,24 +1440,11 @@ void MediaServerProcess::registerRestHandlers(
     ec2::TransactionMessageBusAdapter* messageBus)
 {
     auto processorPool = tcpListener->processorPool();
-    const auto welcomePage = lit("/static/index.html");
-    processorPool->registerRedirectRule(lit(""), welcomePage);
-    processorPool->registerRedirectRule(lit("/"), welcomePage);
-    processorPool->registerRedirectRule(lit("/static"), welcomePage);
-    processorPool->registerRedirectRule(lit("/static/"), welcomePage);
-
-    auto reg =
-        [this, processorPool](
-            const QString& path,
-            QnRestRequestHandler* handler,
-            GlobalPermission permission = GlobalPermission::none)
-        {
-            processorPool->registerHandler(path, handler, permission);
-
-            const auto& cameraIdUrlParams = handler->cameraIdUrlParams();
-            if (!cameraIdUrlParams.isEmpty())
-                m_autoRequestForwarder->addCameraIdUrlParams(path, cameraIdUrlParams);
-        };
+    const auto welcomePage = "/static/index.html";
+    processorPool->registerRedirectRule("", welcomePage);
+    processorPool->registerRedirectRule("/", welcomePage);
+    processorPool->registerRedirectRule("/static", welcomePage);
+    processorPool->registerRedirectRule("/static/", welcomePage);
 
     // TODO: When supported by apidoctool, the comment to these constants should be parsed.
     const auto kAdmin = GlobalPermission::admin;
@@ -1651,10 +1647,13 @@ void MediaServerProcess::registerRestHandlers(
      *     rules to assign actions depending on this text.
      * %param[opt]:objectJson metadata Additional information associated with the event, in the
      *     form of a JSON object. Currently this object can specify the only field "cameraRefs",
-     *     but other fields could be added in the future. <ul> <li>"cameraRefs" specifies the list
-     *     of cameras which are linked to the event (e.g. the event will appear on their
-     *     timelines), in the form of a list of camera ids (can be obtained from "id" field via
-     *     /ec2/getCamerasEx or /ec2/getCameras?extraFormatting). </li> </ul>
+     *     but other fields could be added in the future.
+     *     <ul>
+     *         <li>"cameraRefs" specifies the list of cameras which are linked to the event (e.g.
+     *         the event will appear on their timelines), in the form of a list of camera ids (can
+     *         be obtained from "id" field via /ec2/getCamerasEx or
+     *         /ec2/getCameras?extraFormatting).</li>
+     *     </ul>
      * %param[opt]:enum state Generic events can be used either with "long" actions like
      *     "do recording", or instant actions like "send email". This parameter should be specified
      *     in case "long" actions are going to be used with generic events.
@@ -1705,7 +1704,7 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/getNonce", new QnGetNonceRestHandler());
 
-    reg("api/getRemoteNonce", new QnGetNonceRestHandler(lit("/api/getNonce")));
+    reg("api/getRemoteNonce", new QnGetNonceRestHandler("/api/getNonce"));
     reg("api/cookieLogin", new QnCookieLoginRestHandler());
     reg("api/cookieLogout", new QnCookieLogoutRestHandler());
     reg("api/getCurrentUser", new QnCurrentUserRestHandler());
@@ -1765,7 +1764,7 @@ void MediaServerProcess::registerRestHandlers(
     /**%apidoc GET /api/pingSystem
      * Ping the system.
      * %param:string url System URL to ping.
-     * %param:string password System administrator password.
+     * %param:string getKey Authorization key ("auth" param) for the system to ping.
      * %return:object JSON with error code, error string and module information in case of
      *     successful ping. Error string could be empty in case of successful ping, "FAIL" if the
      *     specified system is unreachable or there is no any system, "UNAUTHORIZED" if the
@@ -1961,8 +1960,8 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/getEvents", new QnEventLog2RestHandler(serverModule()), kViewLogs); //< new version
 
-    // TODO: add API doc tool comments here
-    reg("ec2/getEvents", new QnMultiserverEventsRestHandler(serverModule(), lit("ec2/getEvents")), kViewLogs);
+    // TODO: Add apidoc comment.
+    reg("ec2/getEvents", new QnMultiserverEventsRestHandler(serverModule(), "ec2/getEvents"), kViewLogs);
 
     /**%apidoc GET /api/showLog
      * Return tail of the server log file
@@ -2136,19 +2135,24 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/configure", new QnConfigureRestHandler(serverModule()), kAdmin);
 
     /**%apidoc POST /api/detachFromCloud
-     * Detach media server from cloud. Local admin user is enabled, admin password is changed to
+     * Detaches the Server from the Cloud. Local admin user is enabled, admin password is changed to
      * new value (if specified), all cloud users are disabled. Cloud link is removed. Function can
      * be called either via GET or POST method. POST data should be a json object.
      * %permissions Administrator.
      * %param[opt]:string password Set new admin password after detach.
-     * %param[opt]:string currentPassword Required if new admin password is provided.
-     * %return JSON result with error code
+     * %param:string currentPassword Current user password.
+     * %return JSON result with error code.
      */
     reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(serverModule(), cloudManagerGroup), kAdmin);
 
+    /**%apidoc POST /api/detachFromSystem
+     * Detaches the Server from the System and resets its state to the initial one.
+     * %permissions Administrator.
+     * %param:string currentPassword Current user password.
+     * %return JSON result with error code.
+     */
     reg("api/detachFromSystem", new QnDetachFromSystemRestHandler(
-        serverModule(),
-        &cloudManagerGroup->connectionManager, messageBus), kAdmin);
+        serverModule(), &cloudManagerGroup->connectionManager, messageBus), kAdmin);
 
     /**%apidoc[proprietary] POST /api/restoreState
      * Restore initial server state, i.e. <b>delete server's database</b>.
@@ -2591,44 +2595,68 @@ void MediaServerProcess::registerRestHandlers(
     reg("ec2/getHardwareIdsOfServers", new QnMultiserverGetHardwareIdsRestHandler(QLatin1String("/") + kGetHardwareIdsPath));
 
     /**%apidoc GET /api/settingsDocumentation
-     * Return settings documentation
+     * Return settings documentation.
      * %return:array List of setting descriptions.
-     *     %param:string name Setting name
-     *     %param:string defaultValue Setting default value
-     *     %param:string description Setiing description
+     *     %param:string name Setting name.
+     *     %param:string defaultValue Setting default value.
+     *     %param:string description Setiing description.
      */
     reg("api/settingsDocumentation", new QnSettingsDocumentationHandler(&serverModule()->settings()));
 
-
     /**%apidoc GET /ec2/analyticsEngineSettings
-     * Return settings values of the specified engine
-     * %return:object JSON object consisting of name-value settings pairs
-     *      %param:string engineId Id of analytics engine
+     * Return settings values of the specified engine.
+     * %return:object JSON object consisting of name-value settings pairs.
+     *      %param:string engineId Id of analytics engine.
      *
      * %apidoc POST /ec2/analyticsEngineSettings
-     * Applies passed settings values to correspondent analytics engine
-     * %param:string engineId Id of analytics engine
-     * %param settings JSON object consisting of name-value settings pairs
+     * Applies passed settings values to correspondent analytics engine.
+     * %param:string engineId Unique Id of analytics engine.
+     * %param settings JSON object consisting of name-value settings pairs.
      */
-    reg(
-        "ec2/analyticsEngineSettings",
+    reg("ec2/analyticsEngineSettings",
         new nx::mediaserver::rest::AnalyticsEngineSettingsHandler(serverModule()));
 
     /**%apidoc GET /ec2/deviceAnalyticsSettings
-     * Return settings values of the specified device-engine pair
-     * %return:object JSON object consisting of name-value settings pairs
-     *      %param:string engineId Id of an analytics engine
-     *      %param:string deviceId Id of a device
+     * Return settings values of the specified device-engine pair.
+     * %return:object JSON object consisting of name-value settings pairs.
+     *      %param:string engineId Unique Id of an analytics engine.
+     *      %param:string deviceId Id of a device.
      *
      * %apidoc POST /ec2/deviceAnalyticsSettings
-     * Applies passed settings values to the correspondent device-engine pair
-     * %param:string engineId Id of an analytics engine
-     * %param:string deviceId Id of a device
-     * %param settings JSON object consisting of name-value settings pairs
+     * Applies passed settings values to the correspondent device-engine pair.
+     * %param:string engineId Unique Id of an analytics engine.
+     * %param:string deviceId Id of a device.
+     * %param settings JSON object consisting of name-value settings pairs.
      */
-    reg(
-        "ec2/deviceAnalyticsSettings",
+    reg("ec2/deviceAnalyticsSettings",
         new nx::mediaserver::rest::DeviceAnalyticsSettingsHandler(serverModule()));
+
+    reg(
+        nx::network::http::Method::options,
+        QnRestProcessorPool::kAnyPath,
+        new OptionsRequestHandler());
+}
+
+void MediaServerProcess::reg(
+    const QString& path,
+    QnRestRequestHandler* handler,
+    GlobalPermission permission)
+{
+    reg(QnRestProcessorPool::kAnyHttpMethod, path, handler, permission);
+}
+
+void MediaServerProcess::reg(
+    const nx::network::http::Method::ValueType& method,
+    const QString& path,
+    QnRestRequestHandler* handler,
+    GlobalPermission permission)
+{
+    m_universalTcpListener->processorPool()->registerHandler(
+        method, path, handler, permission);
+
+    const auto& cameraIdUrlParams = handler->cameraIdUrlParams();
+    if (!cameraIdUrlParams.isEmpty())
+        m_autoRequestForwarder->addCameraIdUrlParams(path, cameraIdUrlParams);
 }
 
 template<class TcpConnectionProcessor, typename... ExtraParam>
@@ -2652,7 +2680,7 @@ bool MediaServerProcess::initTcpListener(
     m_universalTcpListener->setCloudConnectionManager(cloudManagerGroup->connectionManager);
 
     m_autoRequestForwarder = std::make_unique<QnAutoRequestForwarder>(commonModule());
-    m_autoRequestForwarder->addPathToIgnore(lit("/ec2/*"));
+    m_autoRequestForwarder->addPathToIgnore("/ec2/*");
 
     configureApiRestrictions(m_universalTcpListener->authenticator()->restrictionList());
     connect(
@@ -2686,7 +2714,7 @@ bool MediaServerProcess::initTcpListener(
     // starting with "web" path.
     m_universalTcpListener->setPathIgnorePrefix("web/");
     m_universalTcpListener->authenticator()->restrictionList()->deny(
-        lit("/web/.+"), nx::network::http::AuthMethod::http);
+        "/web/.+", nx::network::http::AuthMethod::http);
 
     nx::network::http::AuthMethod::Values methods = (nx::network::http::AuthMethod::Values) (
         nx::network::http::AuthMethod::cookie |
@@ -2952,17 +2980,18 @@ void MediaServerProcess::performActionsOnExit()
     QString fileName = serverModule()->settings().dataDir() + "/scripts/" + kOnExitScriptName;
     if (!QFile::exists(fileName))
     {
-        NX_VERBOSE(this, lit("Script '%1' is missing at the server").arg(fileName));
+        NX_VERBOSE(this, "Script '%1' is missing at the server", fileName);
         return;
     }
 
     // Currently, no args are needed, hence the empty list.
     QStringList args{};
 
-    NX_VERBOSE(this, lit("Calling the script: %1 %2").arg(fileName).arg(args.join(" ")));
+    NX_VERBOSE(this, "Calling the script: %1 %2", fileName, args.join(" "));
     if (!QProcess::startDetached(fileName, args))
     {
-        NX_VERBOSE(this, lit("Unable to start script '%1' because of a system error").arg(kOnExitScriptName));
+        NX_VERBOSE(this,
+            "Unable to start script \"%1\" because of a system error", kOnExitScriptName);
     }
 }
 
@@ -3114,7 +3143,7 @@ void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
             binaryPath));
 
     if (auto path = nx::utils::log::mainLogger()->filePath())
-        roSettings->setValue("logFile", path->replace(lit(".log"), QString()));
+        roSettings->setValue("logFile", path->replace(".log", ""));
     else
         roSettings->remove("logFile");
 
@@ -3136,7 +3165,7 @@ void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
             binaryPath,
             {
                 QnLog::HWID_LOG,
-                nx::utils::log::Tag(toString(typeid(nx::mediaserver::LicenseWatcher)))
+                nx::utils::log::Tag(typeid(nx::mediaserver::LicenseWatcher))
             }),
         /*writeLogHeader*/ false);
 
@@ -3219,7 +3248,7 @@ public:
         :
         QnTCPConnectionProcessor(std::move(socket), owner),
         m_socket(std::move(socket)),
-        m_file(closeDirPath(dataDir) + lit("log/external_device.log"))
+        m_file(closeDirPath(dataDir) + "log/external_device.log")
     {
         m_file.open(QFile::WriteOnly);
         socket->setRecvTimeout(1000 * 3);
@@ -3423,7 +3452,6 @@ void MediaServerProcess::stopObjects()
     WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(QThread::currentThread(), 3);
     waitingForObjectsToBeFreed.join();
 
-
     m_discoveryMonitor.reset();
     m_crashReporter.reset();
 
@@ -3528,7 +3556,7 @@ ec2::AbstractECConnectionPtr MediaServerProcess::createEc2Connection() const
                 case Qn::IncompatibleCloudHostConnectionResult:
                 case Qn::IncompatibleVersionConnectionResult:
                 case Qn::IncompatibleProtocolConnectionResult:
-                    NX_ERROR(this, lit("Incompatible Server version detected! Giving up."));
+                    NX_ERROR(this, "Incompatible Server version detected! Giving up.");
                     return ec2::AbstractECConnectionPtr();
                 default:
                     break;
@@ -3563,16 +3591,17 @@ void MediaServerProcess::migrateDataFromOldDir()
     switch (nx::misc::migrateFilesFromWindowsOldDir(&migrateHandler))
     {
     case nx::misc::MigrateDataResult::WinDirNotFound:
-        NX_WARNING(this, lit("Moving data from the old windows dir. Windows dir not found."));
+        NX_WARNING(this, "Moving data from the old windows dir. Windows dir not found.");
         break;
     case nx::misc::MigrateDataResult::NoNeedToMigrate:
-        NX_VERBOSE(this, lit("Moving data from the old windows dir. Nothing to move"));
+        NX_VERBOSE(this, "Moving data from the old windows dir. Nothing to move");
         break;
     case nx::misc::MigrateDataResult::MoveDataFailed:
-        NX_WARNING(this, lit("Moving data from the old windows dir. Old data found but move failed."));
+        NX_WARNING(this, "Moving data from the old windows dir. Old data found but move failed.");
         break;
     case nx::misc::MigrateDataResult::Ok:
-        NX_INFO(this, lit("Moving data from the old windows dir. Old data found and successfully moved."));
+        NX_INFO(this,
+            "Moving data from the old windows dir. Old data found and successfully moved.");
         break;
     }
 #endif
@@ -3586,6 +3615,10 @@ void MediaServerProcess::initCrashDump()
 
 #ifdef __linux__
     linux_exception::setSignalHandlingDisabled(serverModule()->settings().createFullCrashDump());
+    // This is needed because setting capability (CAP_NET_BIND_SERVICE in our case) on the
+    // executable automatically sets PR_SET_DUMPABLE to false which in turn stops core dumps from
+    // being created.
+    prctl(PR_SET_DUMPABLE, 1, 0, 0, 0, 0);
 #endif
     m_crashReporter = std::make_unique<ec2::CrashReporter>(commonModule());
 }
@@ -3717,7 +3750,7 @@ void MediaServerProcess::connectSignals()
     using namespace nx::vms::common::p2p::downloader;
     connect(
         this, &MediaServerProcess::started,
-        [this]() {this->serverModule()->findInstance<Downloader>()->atServerStart(); });
+        [this]() {this->serverModule()->findInstance<Downloader>()->startFoundDownloads(); });
 
     connect(commonModule()->resourceDiscoveryManager(),
         &QnResourceDiscoveryManager::CameraIPConflict, this,
@@ -3750,14 +3783,16 @@ void MediaServerProcess::connectSignals()
     connect(m_udtInternetTrafficTimer.get(), &QTimer::timeout,
         [common = commonModule()]()
         {
+            namespace Statistics = ResourcePropertyKey::MediaServer::Statistics;
             QnResourcePtr server = common->resourcePool()->getResourceById(common->moduleGUID());
-            const auto old = server->getProperty(Qn::UDT_INTERNET_TRFFIC).toULongLong();
+            const auto old = server->getProperty(Statistics::kUdtInternetTraffic_bytes).toULongLong();
             const auto current = nx::network::UdtStatistics::global.internetBytesTransfered.load();
             const auto update = old + (qulonglong)current;
-            if (server->setProperty(Qn::UDT_INTERNET_TRFFIC, QString::number(update))
-                && server->saveParams())
+            if (server->setProperty(Statistics::kUdtInternetTraffic_bytes, QString::number(update))
+                && server->saveProperties())
             {
-                NX_DEBUG(kLogTag, lm("%1 is updated to %2").args(Qn::UDT_INTERNET_TRFFIC, update));
+                NX_DEBUG(kLogTag, lm("%1 is updated to %2").args(
+                    Statistics::kUdtInternetTraffic_bytes, update));
                 nx::network::UdtStatistics::global.internetBytesTransfered -= current;
             }
         });
@@ -3767,8 +3802,7 @@ void MediaServerProcess::connectSignals()
         [this]()
         {
             auto utils = nx::mediaserver::Utils(serverModule());
-            if (utils.timeToMakeDbBackup())
-                utils.backupDatabase();
+            utils.backupDatabase();
         });
 
     connect(
@@ -3944,7 +3978,7 @@ std::map<QString, QVariant> MediaServerProcess::confParamsFromSettings() const
     std::map<QString, QVariant> confParams;
     for (const auto& paramName: serverModule()->roSettings()->allKeys())
     {
-        if (paramName.startsWith(lit("ec")))
+        if (paramName.startsWith("ec"))
             confParams.emplace(paramName, serverModule()->roSettings()->value(paramName));
     }
     return confParams;
@@ -3975,7 +4009,7 @@ void MediaServerProcess::writeMutableSettingsData()
 void MediaServerProcess::createTcpListener()
 {
     const int maxConnections = serverModule()->settings().maxConnections();
-    NX_INFO(this, lit("Max TCP connections fomr server= %1").arg(maxConnections));
+    NX_INFO(this, lm("Max TCP connections fomr server= %1").arg(maxConnections));
 
     // Accept SSL connections in all cases as it is always in use by cloud modules and old clients,
     // config value only affects server preference listed in moduleInformation.
@@ -4041,6 +4075,7 @@ void MediaServerProcess::loadResourceParamsData()
     ResourceParamWithRefData param;
     param.name = Qn::kResourceDataParamName;
 
+    nx::utils::SoftwareVersion dataVersion;
     QString oldValue;
     nx::vms::api::ResourceParamWithRefDataList data;
     manager->getKvPairsSync(QnUuid(), &data);
@@ -4049,29 +4084,43 @@ void MediaServerProcess::loadResourceParamsData()
         if (param.name == Qn::kResourceDataParamName)
         {
             oldValue = param.value;
+            dataVersion = QnResourceDataPool::getVersion(param.value.toUtf8());
             break;
         }
     }
-    if (oldValue.isEmpty())
+
+    static const QString kBuiltinFileName(":/resource_data.json");
+    const auto builtinVersion = QnResourceDataPool::getVersion(loadDataFromFile(kBuiltinFileName));
+    if (builtinVersion > dataVersion)
     {
-        source = ":/resource_data.json";
+        source = kBuiltinFileName;
         param.value = loadDataFromFile(source); //< Default value.
     }
 
     for (const auto& url: kUrlsToLoadResourceData)
     {
         const auto internetValue = loadDataFromUrl(url);
+        QString internetVersion;
         if (!internetValue.isEmpty())
         {
-            if (serverModule()->commonModule()->dataPool()->validateData(internetValue))
+            const auto internetVersion = QnResourceDataPool::getVersion(internetValue);
+            if (internetVersion > dataVersion)
             {
-                param.value = internetValue;
-                source = url;
-                break;
+                if (serverModule()->commonModule()->dataPool()->validateData(internetValue))
+                {
+                    param.value = internetValue;
+                    source = url;
+                    dataVersion = internetVersion;
+                    break;
+                }
+                else
+                {
+                    NX_WARNING(this, "Skip invalid resource_data.json from %1", internetValue);
+                }
             }
             else
             {
-                NX_WARNING(this, "Skip invalid resource_data.json from %1", internetValue);
+                NX_DEBUG(this, "Skip internet resource_data.json. Current version %1, internet %2", dataVersion, internetVersion);
             }
         }
     }
@@ -4087,7 +4136,7 @@ void MediaServerProcess::loadResourceParamsData()
     }
 
     const auto externalResourceFileName =
-        QCoreApplication::applicationDirPath() + lit("/resource_data.json");
+        QCoreApplication::applicationDirPath() + "/resource_data.json";
     auto externalFile = loadDataFromFile(externalResourceFileName);
     if (!externalFile.isEmpty())
     {
@@ -4192,7 +4241,8 @@ void MediaServerProcess::run()
     if (utils.timeToMakeDbBackup())
     {
         utils.backupDatabase(ec2::detail::QnDbManager::ecsDbFileName(
-            serverModule->settings().dataDir()));
+            serverModule->settings().dataDir()),
+            ec2::detail::QnDbManager::currentBuildNumber(appServerConnectionUrl().toLocalFile()));
     }
 
     if (!connectToDatabase())
@@ -4533,7 +4583,7 @@ int MediaServerProcess::main(int argc, char* argv[])
         signal( SIGUSR1, SIGUSR1_handler );
     #endif
 
-    #if !defined(EDGE_SERVER) && !defined(__aarch64__)
+    #if !defined(EDGE_SERVER)
         // Festival should be initialized before QnVideoService has started because of a bug in
         // festival.
         std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
@@ -4556,36 +4606,44 @@ const nx::mediaserver::CmdLineArguments MediaServerProcess::cmdLineArguments() c
 void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodRestrictionList* restrictions)
 {
     // For "OPTIONS * RTSP/1.0"
-    restrictions->allow(lit("\\*"), nx::network::http::AuthMethod::noAuth);
+    restrictions->allow("\\*", nx::network::http::AuthMethod::noAuth);
 
-    const auto webPrefix = lit("(/web)?(/proxy/[^/]*(/[^/]*)?)?");
-    restrictions->allow(webPrefix + lit("/api/ping"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/camera_event.*"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/moduleInformation"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/gettime"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + nx::vms::time_sync::TimeSyncManager::kTimeSyncUrlPath,
+    const auto webPrefix = std::string("(/web)?(/proxy/[^/]*(/[^/]*)?)?");
+    restrictions->allow(webPrefix + "/api/ping", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + "/api/camera_event.*", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + "/api/moduleInformation", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + "/api/gettime", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(
+        webPrefix + nx::vms::time_sync::TimeSyncManager::kTimeSyncUrlPath.toStdString(),
         nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/getTimeZones"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/getNonce"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/cookieLogin"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/cookieLogout"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/getCurrentUser"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/static/.*"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(lit("/crossdomain.xml"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(lit("/favicon.ico"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/startLiteClient"), nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + "/api/getTimeZones", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + "/api/getNonce", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + "/api/cookieLogin", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + "/api/cookieLogout", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + "/api/getCurrentUser", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + "/static/.*", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow("/crossdomain.xml", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow("/favicon.ico", nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + "/api/startLiteClient", nx::network::http::AuthMethod::noAuth);
 
     // For open in new browser window.
-    restrictions->allow(webPrefix + lit("/api/showLog.*"),
+    restrictions->allow(webPrefix + "/api/showLog.*",
         nx::network::http::AuthMethod::urlQueryDigest | nx::network::http::AuthMethod::allowWithourCsrf);
 
     // For inserting in HTML <img src="...">.
-    restrictions->allow(webPrefix + lit("/ec2/cameraThumbnail"),
+    restrictions->allow(webPrefix + "/ec2/cameraThumbnail",
         nx::network::http::AuthMethod::allowWithourCsrf);
 
     // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud
     // authentication is implemented.
     // WARNING: This is severe vulnerability introduced in 3.0.
-    restrictions->allow(webPrefix + lit("/api/installUpdateUnauthenticated"),
+    restrictions->allow(webPrefix + "/api/installUpdateUnauthenticated",
+        nx::network::http::AuthMethod::noAuth);
+
+    nx::network::http::AuthMethodRestrictionList::Filter filter;
+    filter.protocol = nx::network::http::http_1_0.protocol.toStdString();
+    filter.method = nx::network::http::Method::options.toStdString();
+    restrictions->allow(
+        filter,
         nx::network::http::AuthMethod::noAuth);
 }

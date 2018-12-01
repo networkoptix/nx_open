@@ -263,6 +263,7 @@ VideoEncoderConfigOptions::VideoEncoderConfigOptions(
             if (ok)
                 frameRates.push_back(frameRateInt);
         }
+        std::sort(frameRates.begin(), frameRates.end());
     }
 
     if (options.ProfilesSupported)

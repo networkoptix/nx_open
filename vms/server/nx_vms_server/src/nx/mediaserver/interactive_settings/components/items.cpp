@@ -75,7 +75,6 @@ QJsonObject ValueItem::serialize() const
 {
     auto result = base_type::serialize();
     result[QLatin1String("defaultValue")] = QJsonValue::fromVariant(m_defaultValue);
-    result[QLatin1String("value")] = QJsonValue::fromVariant(value());
     return result;
 }
 

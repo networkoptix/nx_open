@@ -38,6 +38,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/network/app_info.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/camera_data_ex.h>
@@ -129,27 +130,6 @@ static const char LICENSE_EXPIRED_TIME_KEY[] = "{4208502A-BD7F-47C2-B290-83017D8
 static const char DB_INSTANCE_KEY[] = "DB_INSTANCE_ID";
 
 using std::nullptr_t;
-
-static bool removeDirRecursive(const QString & dirName)
-{
-    bool result = true;
-    QDir dir(dirName);
-
-    if (dir.exists(dirName)) {
-        for(const QFileInfo& info: dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst))
-        {
-            if (info.isDir())
-                result = removeDir(info.absoluteFilePath());
-            else
-                result = QFile::remove(info.absoluteFilePath());
-
-            if (!result)
-                return result;
-        }
-        result = dir.rmdir(dirName);
-    }
-    return result;
-}
 
 template <class T>
 void assertSorted(std::vector<T> &data) {
@@ -395,6 +375,47 @@ QString QnDbManager::ecsDbFileName(const QString& basePath)
     return closeDirPath(basePath) + QString::fromLatin1("ecs.sqlite");
 }
 
+int QnDbManager::currentBuildNumber(const QString& basePath)
+{
+    const QString dbFileName = ecsDbFileName(basePath);
+    if (!QFile(dbFileName).exists())
+    {
+        NX_WARNING(typeid(QnDbManager),
+            lm("currentBuildNumber: File %1 does not exist").arg(dbFileName));
+        return 0;
+    }
+
+    const static QString buildNumberConnectionName = "GetBuildNumberDB";
+    auto sdb = QSqlDatabase::addDatabase(lit("QSQLITE"), "GetBuildNumberDB");
+    sdb.setDatabaseName(dbFileName);
+    if (!sdb.open())
+    {
+        NX_WARNING(typeid(QnDbManager),
+            lm("currentBuildNumber: Failed to open db %1").arg(dbFileName));
+        return 0;
+    }
+
+    auto dbCloseGuard = nx::utils::makeScopeGuard(
+        [&]()
+        {
+            sdb.close();
+            sdb = QSqlDatabase();
+            QSqlDatabase::removeDatabase(buildNumberConnectionName);
+        });
+
+    QSqlQuery getVersionQuery(sdb);
+    const QString queryString = "SELECT data FROM misc_data WHERE key = 'VERSION'";
+    if (!getVersionQuery.prepare(queryString) || !getVersionQuery.exec()
+        || !getVersionQuery.next())
+    {
+        NX_WARNING(typeid(QnDbManager),
+            lm("currentBuildNumber: Failed to prepare or execute query %1").arg(queryString));
+        return 0;
+    }
+
+    return nx::utils::SoftwareVersion(getVersionQuery.value(0).toString()).build();
+}
+
 bool QnDbManager::init(const nx::utils::Url& dbUrl)
 {
     NX_ASSERT(m_tranLog != nullptr);
@@ -513,7 +534,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
         if (addedStoredFilesCnt > 0)
             m_resyncFlags |= ResyncFiles;
 
-        removeDirRecursive(storedFilesDir);
+        QDir(storedFilesDir).removeRecursively();
 
         // updateDBVersion();
         QSqlQuery insVersionQuery(m_sdb);
@@ -1142,18 +1163,18 @@ bool QnDbManager::resyncTransactionLog()
         return false;
     }
 
-    if (!fillTransactionLogInternal <
+    if (!fillTransactionLogInternal<
         QnUuid,
         AnalyticsPluginData,
-        AnalyticsPluginDataList > (ApiCommand::saveAnalyticsPlugin))
+        AnalyticsPluginDataList>(ApiCommand::saveAnalyticsPlugin))
     {
         return false;
     }
 
-    if (!fillTransactionLogInternal <
+    if (!fillTransactionLogInternal<
         QnUuid,
         AnalyticsEngineData,
-        AnalyticsEngineDataList > (ApiCommand::saveAnalyticsEngine))
+        AnalyticsEngineDataList>(ApiCommand::saveAnalyticsEngine))
     {
         return false;
     }
@@ -1955,6 +1976,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     }
 
     if (updateName.endsWith("/99_20181031_rename_smptPassword_parameter.sql"))
+        return resyncIfNeeded(ResyncGlobalSettings);
+
+    if (updateName.endsWith("/99_20181102_remove_sync_with_internet_option.sql"))
         return resyncIfNeeded(ResyncGlobalSettings);
 
     NX_DEBUG(this, lit("SQL update %1 does not require post-actions.").arg(updateName));

@@ -334,18 +334,18 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     if( strlen(cameraInfo.auxiliaryData) > 0 )
         resource->setProperty( QnThirdPartyResource::AUX_DATA_PARAM_NAME, QString::fromLatin1(cameraInfo.auxiliaryData) );
     if( strlen(cameraInfo.firmware) > 0 )
-        resource->setProperty( Qn::FIRMWARE_PARAM_NAME, QString::fromLatin1(cameraInfo.firmware) );
+        resource->setProperty(ResourcePropertyKey::kFirmware, QString::fromLatin1(cameraInfo.firmware));
 
     if( !resourcePool()->getNetResourceByPhysicalId( resource->getPhysicalId() ) )
     {
         // new resource
         // TODO #ak reading MaxFPS here is a workaround of camera integration API defect:
-        // it does not not allow plugin to return hard-coded max fps, it can only be read in during
+        // it does not allow plugin to return hard-coded max fps, it can only be read in during
         // init.
         const QnResourceData& resourceData = resource->resourceData();
-        const float maxFps = resourceData.value<float>( Qn::MAX_FPS_PARAM_NAME, 0.0 );
+        const auto maxFps = resourceData.value<float>(ResourceDataKey::kMaxFps, 0.0);
         if( maxFps > 0.0 )
-            resource->setProperty( Qn::MAX_FPS_PARAM_NAME, maxFps);
+            resource->setMaxFps(maxFps);
     }
 
     unsigned int caps;

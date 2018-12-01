@@ -20,8 +20,8 @@
 #include "nx_ec/data/api_conversion_functions.h"
 
 #include "utils/common/threadqueue.h"
-#include <utils/crypt/symmetrical.h>
 #include <transaction/message_bus_adapter.h>
+#include <transaction/amend_transaction_data.h>
 
 namespace ec2 {
 
@@ -171,8 +171,8 @@ inline void fixRequestDataIfNeeded(nx::vms::api::UserDataEx* const userDataEx)
 
 inline void fixRequestDataIfNeeded(nx::vms::api::ResourceParamData* const paramData)
 {
-    if (paramData->name == Qn::CAMERA_CREDENTIALS_PARAM_NAME
-    || paramData->name == Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME)
+    if (paramData->name == ResourcePropertyKey::kCredentials
+    || paramData->name == ResourcePropertyKey::kDefaultCredentials)
     {
         paramData->value = nx::utils::encodeHexStringFromStringAES128CBC(paramData->value);
     }
@@ -212,55 +212,6 @@ inline QnTransaction<nx::vms::api::ResourceParamWithRefData> amendTranIfNeeded(
     fixRequestDataIfNeeded(static_cast<nx::vms::api::ResourceParamData* const>(&resultTran.params));
 
     return resultTran;
-}
-
-template<typename T>
-void amendOutputDataIfNeeded(const Qn::UserAccessData&, T*)
-{
-}
-
-inline void amendOutputDataIfNeeded(
-    const Qn::UserAccessData& accessData,
-    nx::vms::api::ResourceParamData* paramData)
-{
-    if (paramData->name == Qn::CAMERA_CREDENTIALS_PARAM_NAME
-        || paramData->name == Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME)
-    {
-        auto decryptedValue = nx::utils::decodeStringFromHexStringAES128CBC(paramData->value);
-        if (accessData == Qn::kSystemAccess)
-            paramData->value = decryptedValue;
-        else
-            paramData->value = decryptedValue.left(decryptedValue.indexOf(':')) + ":******";
-    }
-}
-
-inline void amendOutputDataIfNeeded(
-    const Qn::UserAccessData& accessData,
-    nx::vms::api::ResourceParamWithRefData* paramData)
-{
-    return amendOutputDataIfNeeded(
-        accessData,
-        static_cast<nx::vms::api::ResourceParamData*>(paramData));
-}
-
-inline void amendOutputDataIfNeeded(
-    const Qn::UserAccessData& accessData,
-    std::vector<nx::vms::api::ResourceParamData>* paramDataList)
-{
-    for (auto& paramData: *paramDataList)
-        amendOutputDataIfNeeded(accessData, &paramData);
-}
-
-inline void amendOutputDataIfNeeded(
-    const Qn::UserAccessData& accessData,
-    std::vector<nx::vms::api::ResourceParamWithRefData>* paramWithRefDataList)
-{
-    for (auto& paramData: *paramWithRefDataList)
-    {
-        amendOutputDataIfNeeded(
-            accessData,
-            static_cast<nx::vms::api::ResourceParamData*>(&paramData));
-    }
 }
 
 class ServerQueryProcessor
@@ -566,19 +517,6 @@ private:
             postProcessAction();
 
         // Handler is invoked asynchronously.
-    }
-
-    template<class HandlerType>
-    void removeResourceAsync(
-        QnTransaction<nx::vms::api::IdData>& tran,
-        ApiObjectType resourceType,
-        HandlerType handler)
-    {
-        using namespace std::placeholders;
-        executeTranCall(
-            tran,
-            handler,
-            std::bind(&ServerQueryProcessor::removeResourceSync, this, _1, resourceType, _2));
     }
 
     ErrorCode removeHelper(

@@ -46,8 +46,8 @@ public:
         return m_secondaryProvider;
     }
 
-    virtual void inUse(void* user) override {}
-    virtual void notInUse(void* user) override {}
+    virtual void inUse(void* /*user*/) override {}
+    virtual void notInUse(void* /*user*/) override {}
 private:
     QSharedPointer<QnLiveStreamProvider> m_primaryProvider;
     QSharedPointer<QnLiveStreamProvider> m_secondaryProvider;
@@ -60,7 +60,7 @@ public:
     virtual void SetUp() override
     {
         CameraTest::SetUp();
-        m_camera = newCamera([](CameraMock* camera) {});
+        m_camera = newCamera([](CameraMock* /*camera*/) {});
         NX_ASSERT(m_camera);
         m_camera->setId(QnUuid::createUuid());
 
@@ -127,7 +127,7 @@ public:
     virtual void SetUp() override
     {
         CameraTest::SetUp();
-        m_camera = newCamera([](CameraMock* camera) { });
+        m_camera = newCamera([](CameraMock* /*camera*/) { });
         NX_ASSERT(m_camera);
         m_camera->setId(QnUuid::createUuid());
 

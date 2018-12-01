@@ -222,13 +222,13 @@ bool MotionSearchListModel::Private::commitInternal(const QnTimePeriod& periodTo
     const auto count = std::distance(begin, end);
     if (count <= 0)
     {
-        NX_VERBOSE(q) << "Committing no motion periods";
+        NX_VERBOSE(q, "Committing no motion periods");
         return false;
     }
 
-    NX_VERBOSE(q) << "Committing" << count << "motion periods from"
-        << utils::timestampToDebugString((end - 1)->period.startTimeMs) << "to"
-        << utils::timestampToDebugString(begin->period.startTimeMs);
+    NX_VERBOSE(q, "Committing %1 motion periods:\n    from: %2\n    to: %3", count,
+        utils::timestampToDebugString((end - 1)->period.startTimeMs),
+        utils::timestampToDebugString(begin->period.startTimeMs));
 
     ScopedInsertRows insertRows(q, position, position + count - 1);
 
@@ -252,18 +252,18 @@ bool MotionSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodTo
 
 void MotionSearchListModel::Private::fetchLive()
 {
-    if (m_liveFetch.id || !q->isLive() || !q->isOnline() || q->livePaused())
+    if (m_liveFetch.id || !q->isLive() || !q->isOnline() || q->livePaused() || q->isFilterDegenerate())
         return;
 
     if (m_data.empty() && fetchInProgress())
         return; //< Don't fetch live if first fetch from archive is in progress.
 
     const milliseconds from = (m_data.empty() ? 0ms : m_data.front().period.startTime());
-    m_liveFetch.period = QnTimePeriod(from.count(), QnTimePeriod::infiniteDuration());
+    m_liveFetch.period = QnTimePeriod(from.count(), QnTimePeriod::kInfiniteDuration);
     m_liveFetch.direction = FetchDirection::later;
     m_liveFetch.batchSize = q->fetchBatchSize();
 
-    NX_VERBOSE(q) << "Live update request";
+    NX_VERBOSE(q, "Live update request");
     m_liveFetch.id = getMotion(m_liveFetch.period, Qt::DescendingOrder, m_liveFetch.batchSize);
 }
 
@@ -271,8 +271,7 @@ rest::Handle MotionSearchListModel::Private::getMotion(
     const QnTimePeriod& period, Qt::SortOrder order, int limit)
 {
     const auto server = q->commonModule()->currentServer();
-    NX_ASSERT(server && server->apiConnection());
-    if (!server || !server->apiConnection())
+    if (!NX_ASSERT(server && server->apiConnection() && !q->isFilterDegenerate()))
         return {};
 
     QnChunksRequestData request;
@@ -288,11 +287,13 @@ rest::Handle MotionSearchListModel::Private::getMotion(
         ? QString()
         : QJson::serialized(m_filterRegions);
 
-    NX_VERBOSE(q) << "Requesting motion periods from"
-        << utils::timestampToDebugString(period.startTimeMs) << "to"
-        << utils::timestampToDebugString(period.endTimeMs()) << "in"
-        << QVariant::fromValue(request.sortOrder).toString()
-        << "maximum chunks" << request.limit;
+    NX_VERBOSE(q, "Requesting motion periods:\n"
+        "    from: %1\n    to: %2\n    filter: %3\n    sort: %4\n    limit: %5",
+        utils::timestampToDebugString(period.startTimeMs),
+        utils::timestampToDebugString(period.endTimeMs()),
+        request.filter,
+        QVariant::fromValue(request.sortOrder).toString(),
+        request.limit);
 
     return server->apiConnection()->recordedTimePeriods(request, this,
         SLOT(processReceivedTimePeriods(int, const MultiServerPeriodDataList &, int)));
@@ -373,12 +374,12 @@ void MotionSearchListModel::Private::processReceivedTimePeriods(
 
         q->addToFetchedTimeWindow(periodToCommit);
 
-        NX_VERBOSE(q) << "Live update commit";
+        NX_VERBOSE(q, "Live update commit");
         commitInternal(periodToCommit, data.begin(), data.end(), 0, true);
 
         if (count() > q->maximumCount())
         {
-            NX_VERBOSE(q) << "Truncating to maximum count";
+            NX_VERBOSE(q, "Truncating to maximum count");
             truncateToMaximumCount();
         }
     }

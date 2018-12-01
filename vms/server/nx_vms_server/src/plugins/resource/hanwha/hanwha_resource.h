@@ -154,6 +154,8 @@ public:
     bool isBypassSupported() const;
     boost::optional<int> bypassChannel() const;
 
+    CameraDiagnostics::Result enableAudioInput();
+
 protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
@@ -387,6 +389,7 @@ private:
     nx::media::CameraMediaCapability m_capabilities;
     QMap<QString, QnIOPortData> m_ioPortTypeById;
     std::atomic<bool> m_areInputPortsMonitored{false};
+    QString m_defaultOutputPortId;
 
     nx::utils::TimerHolder m_timerHolder;
     std::shared_ptr<HanwhaSharedResourceContext> m_sharedContext;

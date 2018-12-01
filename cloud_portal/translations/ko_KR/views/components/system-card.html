@@ -3,14 +3,13 @@
     <div class="card-body">
         <h2 class="mb-3">귀하의 시스템</h2>
         <p>
-            <button class="btn btn-default" ng-click="rename()">시스템 이름 바꾸기</button>
+            <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">시스템 이름 바꾸기</button>
         </p>
         <p>
-            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">다른 시스템과 병합</button>
+            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">다른 시스템과 병합</button>
         </p>
         <hr />
-        <button class="btn btn-default" ng-click="disconnect()">Disconnect from
-            <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">{{PRODUCT_NAME}} 에서 연결 해제</button>
     </div>
 </div>
 <div class="card card-condensed" ng-if="!system.isMine">
@@ -30,14 +29,22 @@
         <button class="btn btn-default" ng-click="delete()">내 계정에서 분리</button>
     </div>
 </div>
-<div class="card card-default" ng-if="currentlyMerging">
+<div class="mt-3 card card-default" ng-if="currentlyMerging">
     <div class="card-body" ng-if="isMaster && system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
         <div><strong>{{mergeTargetSystem.name}}</strong>
             이 현재 시스템에 병합됩니다</div>
         <hr />
         <div class="merge-info-text">데이터베이스 크기에 따라 최대 몇 시간이 소요될 수 있습니다.</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
         <div>이 시스템은             <strong>{{mergeTargetSystem.name}}에 병합됩니다</strong></div>
         <hr />
         <div class="merge-info-text">

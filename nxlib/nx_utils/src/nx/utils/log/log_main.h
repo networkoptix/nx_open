@@ -133,11 +133,12 @@ inline Stream makeStream(Level level, const Tag& tag)
         stream /* <<... */
 
 /**
- * Can be used to redirect NX_PRINT to log as following:
+ * Can be used to redirect nx_kit's NX_PRINT to log as following:
  * <pre><code>
  *     #define NX_PRINT NX_UTILS_LOG_STREAM_NO_SPACE( \
- *     nx::utils::log::Level::debug, nx::utils::log::Tag(QStringLiteral("vca_analytics_plugin"))) \
- *     << NX_PRINT_PREFIX
+ *         nx::utils::log::Level::debug, \
+ *         nx::utils::log::Tag(QStringLiteral("my_plugin")) \
+ *     ) << NX_PRINT_PREFIX
  * </code></pre>
  */
 #define NX_UTILS_LOG_STREAM_NO_SPACE(LEVEL, TAG) \

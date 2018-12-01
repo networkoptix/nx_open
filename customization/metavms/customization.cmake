@@ -11,7 +11,7 @@ set(cloudName "Nx Meta Cloud")
 set(uri.protocol "nx-metavms")
 set(mediaserver_application_name "Network Optix MetaVMS Media Server")
 set(mediaserver_service_name "Network Optix MetaVMS Media Server")
-set(metaVersion "R3.1")
+set(metaVersion "R4")
 
 # Default settings
 set(backgroundImage
@@ -38,7 +38,6 @@ set(customization.fullBundleUpgradeCode "{b98a8e7a-2e21-472c-b951-e16f82a43798}"
 
 set(deb.customization.company.name "networkoptix-metavms")
 
-set(mac.skip.sign false)
 set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
 set(mac.app.sign.identity "3rd Party Mac Developer Application: Network Optix, Inc. (L6FE34GJWM)")
 set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Network Optix, Inc. (L6FE34GJWM)")

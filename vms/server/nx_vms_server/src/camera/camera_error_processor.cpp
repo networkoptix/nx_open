@@ -57,7 +57,6 @@ void ErrorProcessor::processStreamError(
     QnAbstractMediaStreamDataProvider* streamReader,
     CameraDiagnostics::Result error)
 {
-    return;
     auto ownerResource = streamReader->getResource().dynamicCast<resource::Camera>();
     NX_ASSERT(ownerResource);
     if (!ownerResource || !ownerResource->isInitialized())

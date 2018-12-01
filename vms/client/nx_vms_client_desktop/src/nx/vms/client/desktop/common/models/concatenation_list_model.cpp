@@ -20,7 +20,6 @@ ConcatenationListModel::ConcatenationListModel(
 
 ConcatenationListModel::~ConcatenationListModel()
 {
-    m_modelConnections.reset();
 }
 
 QList<QAbstractListModel*> ConcatenationListModel::models() const
@@ -30,7 +29,7 @@ QList<QAbstractListModel*> ConcatenationListModel::models() const
 
 void ConcatenationListModel::setModels(const QList<QAbstractListModel*>& models)
 {
-    m_modelConnections.reset(new QnDisconnectHelper());
+    m_modelConnections = {};
     m_models = models;
 
     for (const auto model: m_models)
@@ -144,40 +143,40 @@ void ConcatenationListModel::connectToModel(QAbstractListModel* model)
 {
     NX_ASSERT(model);
 
-    *m_modelConnections << connect(model, &QObject::destroyed, this,
+    m_modelConnections << connect(model, &QObject::destroyed, this,
         [this, model]() { m_models.removeAll(model); }); //< Should happen only during destruction.
 
-    *m_modelConnections << connect(model, &QAbstractItemModel::modelAboutToBeReset,
+    m_modelConnections << connect(model, &QAbstractItemModel::modelAboutToBeReset,
         this, &ConcatenationListModel::sourceModelAboutToBeReset);
 
-    *m_modelConnections << connect(model, &QAbstractItemModel::modelReset,
+    m_modelConnections << connect(model, &QAbstractItemModel::modelReset,
         this, &ConcatenationListModel::sourceModelReset);
 
-    *m_modelConnections << connect(model, &QAbstractItemModel::rowsAboutToBeInserted,
+    m_modelConnections << connect(model, &QAbstractItemModel::rowsAboutToBeInserted,
         this, &ConcatenationListModel::sourceRowsAboutToBeInserted);
 
-    *m_modelConnections << connect(model, &QAbstractItemModel::rowsInserted,
+    m_modelConnections << connect(model, &QAbstractItemModel::rowsInserted,
         this, &ConcatenationListModel::sourceRowsInserted);
 
-    *m_modelConnections << connect(model, &QAbstractItemModel::rowsAboutToBeRemoved,
+    m_modelConnections << connect(model, &QAbstractItemModel::rowsAboutToBeRemoved,
         this, &ConcatenationListModel::sourceRowsAboutToBeRemoved);
 
-    *m_modelConnections << connect(model, &QAbstractItemModel::rowsRemoved,
+    m_modelConnections << connect(model, &QAbstractItemModel::rowsRemoved,
         this, &ConcatenationListModel::sourceRowsRemoved);
 
-    *m_modelConnections << connect(model, &QAbstractItemModel::rowsAboutToBeMoved,
+    m_modelConnections << connect(model, &QAbstractItemModel::rowsAboutToBeMoved,
         this, &ConcatenationListModel::sourceRowsAboutToBeMoved);
 
-    *m_modelConnections << connect(model, &QAbstractItemModel::rowsMoved,
+    m_modelConnections << connect(model, &QAbstractItemModel::rowsMoved,
         this, &ConcatenationListModel::sourceRowsMoved);
 
-    *m_modelConnections << connect(model, &QAbstractItemModel::layoutAboutToBeChanged,
+    m_modelConnections << connect(model, &QAbstractItemModel::layoutAboutToBeChanged,
         this, &ConcatenationListModel::sourceLayoutAboutToBeChanged);
 
-    *m_modelConnections << connect(model, &QAbstractItemModel::layoutChanged,
+    m_modelConnections << connect(model, &QAbstractItemModel::layoutChanged,
         this, &ConcatenationListModel::sourceLayoutChanged);
 
-    *m_modelConnections << connect(model, &QAbstractItemModel::dataChanged, this,
+    m_modelConnections << connect(model, &QAbstractItemModel::dataChanged, this,
         [this](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
         {
             emit dataChanged(mapFromSource(topLeft), mapFromSource(bottomRight), roles);

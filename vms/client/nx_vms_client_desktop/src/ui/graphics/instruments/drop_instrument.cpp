@@ -211,16 +211,18 @@ bool DropInstrument::dropEvent(QGraphicsItem* /*item*/, QGraphicsSceneDragDropEv
 
     resourcePool()->addNewResources(localMimeData->resources());
 
+    action::Parameters parameters(localMimeData->resources(), localMimeData->arguments());
+
     if (!m_intoNewLayout)
     {
         delayedTriggerIfPossible(
             action::DropResourcesAction,
-            action::Parameters(localMimeData->resources()).withArgument(Qn::ItemPositionRole,
+            parameters.withArgument(Qn::ItemPositionRole,
                 context->workbench()->mapper()->mapToGridF(event->scenePos())));
     }
     else
     {
-        delayedTriggerIfPossible(action::OpenInNewTabAction, localMimeData->resources());
+        delayedTriggerIfPossible(action::OpenInNewTabAction, parameters);
     }
 
     return true;

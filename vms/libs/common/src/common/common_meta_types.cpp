@@ -1,5 +1,7 @@
 #include "common_meta_types.h"
 
+#include <atomic>
+
 #include <QtCore/QMetaType>
 
 #include <nx/network/socket_common.h>
@@ -81,6 +83,7 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/events/analytics_sdk_event.h>
+#include <nx/vms/event/events/plugin_event.h>
 #include <nx/vms/event/rule.h>
 
 #include <licensing/license.h>
@@ -108,21 +111,19 @@
 
 #include <nx/utils/metatypes.h>
 
-namespace {
-bool qn_commonMetaTypes_initialized = false;
-}
-
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ResourceInfoLevel);
 
 void QnCommonMetaTypes::initialize()
 {
+    static std::atomic_bool initialized = false;
+
+    if (initialized.load())
+        return;
+
+    initialized = true;
+
     nx::utils::Metatypes::initialize();
     nx::vms::api::Metatypes::initialize();
-
-    /* Note that running the code twice is perfectly OK,
-     * so we don't need heavyweight synchronization here. */
-    if (qn_commonMetaTypes_initialized)
-        return;
 
     qRegisterMetaType<uintptr_t>("uintptr_t");
 
@@ -145,6 +146,7 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<Qn::ResourceStatus>();
     qRegisterMetaType<nx::vms::api::EventReason>();
     qRegisterMetaType<nx::vms::event::AnalyticsSdkEventPtr>();
+    qRegisterMetaType<nx::vms::event::PluginEventPtr>();
 
     qRegisterMetaType<QnUserResourcePtr>();
     qRegisterMetaType<QnLayoutResourcePtr>();
@@ -362,6 +364,4 @@ void QnCommonMetaTypes::initialize()
     QMetaType::registerConverter<std::chrono::seconds, std::chrono::milliseconds>();
     QMetaType::registerConverter<std::chrono::seconds, std::chrono::microseconds>();
     QMetaType::registerConverter<std::chrono::milliseconds, std::chrono::microseconds>();
-
-    qn_commonMetaTypes_initialized = true;
 }

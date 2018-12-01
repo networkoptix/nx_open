@@ -5,6 +5,17 @@ nx-checkbox {
     &[disabled] {
         .nx-checkbox {
             opacity : .3;
+
+            .tick {
+                cursor : default;
+            }
+
+            input:hover ~ .tick {
+                svg polygon.box,
+                svg polyline.box {
+                    stroke : $dark9 !important;
+                }
+            }
         }
     }
 
@@ -21,22 +32,21 @@ nx-checkbox {
     .nx-checkbox {
         display : flex;
         float   : left;
-        margin   : 0;
+        margin  : 0;
 
         input[type="checkbox"] {
             position : absolute;
             opacity  : 0;
-            cursor   : pointer;
         }
 
-        input:hover ~ .check {
+        input:hover ~ .tick {
             svg polygon.box,
             svg polyline.box {
                 stroke : $dark1;
             }
         }
 
-        input:active ~ .check {
+        input:active ~ .tick {
             svg polygon.box,
             svg polyline.box {
                 stroke : $dark9 !important;

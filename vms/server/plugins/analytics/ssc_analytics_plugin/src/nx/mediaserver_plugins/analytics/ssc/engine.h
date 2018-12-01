@@ -34,7 +34,7 @@ public:
 
     virtual void setSettings(const nx::sdk::Settings* settings) override;
 
-    virtual nx::sdk::Settings* settings() const override;
+    virtual nx::sdk::Settings* pluginSideSettings() const override;
 
     virtual nx::sdk::analytics::DeviceAgent* obtainDeviceAgent(
         const nx::sdk::DeviceInfo* deviceInfo, nx::sdk::Error* outError) override;
@@ -45,9 +45,9 @@ public:
     void unregisterCamera(int cameraLogicalId);
 
     virtual void executeAction(
-        nx::sdk::analytics::Action* /*action*/, sdk::Error* /*outError*/) override
-    {
-    }
+        nx::sdk::analytics::Action* /*action*/, sdk::Error* /*outError*/) override;
+
+    virtual nx::sdk::Error setHandler(nx::sdk::analytics::Engine::IHandler* handler) override;
 
 private:
     void readAllowedPortNames();

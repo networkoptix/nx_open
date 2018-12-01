@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QSize>
+
 #include <nx/fusion/model_functions_fwd.h>
 #include <common/common_globals.h>
 

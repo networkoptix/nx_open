@@ -51,22 +51,21 @@ QnSystemsFinder::~QnSystemsFinder()
 void QnSystemsFinder::addSystemsFinder(QnAbstractSystemsFinder *finder,
     int priority)
 {
-    const auto discovered = connect(finder, &QnAbstractSystemsFinder::systemDiscovered, this,
+    nx::utils::ScopedConnectionsPtr connections(new nx::utils::ScopedConnections());
+
+    *connections << connect(finder, &QnAbstractSystemsFinder::systemDiscovered, this,
         [this, priority](const QnSystemDescriptionPtr& system)
         {
             onBaseSystemDiscovered(system, priority);
         });
 
-    const auto lostConnection = connect(finder, &QnAbstractSystemsFinder::systemLost, this,
+    *connections << connect(finder, &QnAbstractSystemsFinder::systemLost, this,
         [this, priority](const QString& id) { onSystemLost(id, priority); });
 
-    const auto destroyedConnection = connect(finder, &QObject::destroyed, this,
+    *connections << connect(finder, &QObject::destroyed, this,
         [this, finder]() { m_finders.remove(finder); });
 
-    const auto connectionHolder = QnDisconnectHelper::create();
-    *connectionHolder << discovered << lostConnection << destroyedConnection;
-
-    m_finders.insert(finder, connectionHolder);
+    m_finders.insert(finder, connections);
     for (const auto& system: finder->systems())
         onBaseSystemDiscovered(system, priority);
 }

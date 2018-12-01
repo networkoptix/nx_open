@@ -201,7 +201,7 @@ void QnTimeServerSelectionWidget::loadDataToUi()
 {
     PRINT_DEBUG("provide selected server to model:");
     m_model->setSelectedServer(globalSettings()->primaryTimeServer());
-    ui->syncWithInternetCheckBox->setChecked(globalSettings()->isSynchronizingTimeWithInternet());
+    ui->syncWithInternetCheckBox->setChecked(globalSettings()->primaryTimeServer().isNull());
     updateTime();
 }
 
@@ -212,10 +212,10 @@ void QnTimeServerSelectionWidget::applyChanges()
         return;
 
     auto globalSettings = commonModule()->globalSettings();
-    globalSettings->setSynchronizingTimeWithInternet(ui->syncWithInternetCheckBox->isChecked());
 
     if (ui->syncWithInternetCheckBox->isChecked())
     {
+        globalSettings->setPrimaryTimeServer(QnUuid());
         globalSettings->synchronizeNow();
         return;
     }
@@ -229,7 +229,8 @@ void QnTimeServerSelectionWidget::applyChanges()
 bool QnTimeServerSelectionWidget::hasChanges() const
 {
     const bool syncWithInternet = ui->syncWithInternetCheckBox->isChecked();
-    if (globalSettings()->isSynchronizingTimeWithInternet() != syncWithInternet)
+    const bool syncWithInternetInSettings = globalSettings()->primaryTimeServer().isNull();
+    if (syncWithInternetInSettings != syncWithInternet)
         return true;
 
     return syncWithInternet
@@ -263,8 +264,8 @@ void QnTimeServerSelectionWidget::updateTime()
 void QnTimeServerSelectionWidget::updateDescription()
 {
     ui->descriptionLabel->setText(ui->syncWithInternetCheckBox->isChecked()
-        ? tr("System time is synchronized with the Internet and does not depend on local time on servers.")
-        : tr("System time is synchronized with local time on the selected server and does not depend on local time on other servers."));
+        ? tr("VMS time is synchronized with the Internet and does not depend on local time on servers.")
+        : tr("VMS time is synchronized with local time on the selected server and does not depend on local time on other servers."));
 }
 
 void QnTimeServerSelectionWidget::updateAlert()

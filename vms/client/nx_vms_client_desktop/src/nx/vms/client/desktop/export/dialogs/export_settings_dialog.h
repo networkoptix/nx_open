@@ -13,7 +13,7 @@
 namespace Ui { class ExportSettingsDialog; }
 
 class QnMediaResourceWidget;
-class QnTimePeriod;
+struct QnTimePeriod;
 class QnWorkbenchContext;
 struct QnCameraBookmark;
 struct QnLayoutItemData;

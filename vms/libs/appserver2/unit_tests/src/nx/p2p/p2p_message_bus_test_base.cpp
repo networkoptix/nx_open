@@ -32,7 +32,6 @@ void P2pMessageBusTestBase::createData(
     if (disableTimeManager)
     {
         settings->setTimeSynchronizationEnabled(false);
-        settings->setSynchronizingTimeWithInternet(false);
     }
 
     settings->synchronizeNow();
@@ -160,6 +159,11 @@ void P2pMessageBusTestBase::fullConnect(std::vector<Appserver2Ptr>& servers)
             connectServers(servers[j], servers[i]);
         }
     }
+}
+
+// connect all servers to each others
+void P2pMessageBusTestBase::emptyConnect(std::vector<Appserver2Ptr>& servers)
+{
 }
 
 bool P2pMessageBusTestBase::waitForCondition(

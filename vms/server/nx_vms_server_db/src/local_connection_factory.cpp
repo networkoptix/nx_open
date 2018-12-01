@@ -281,8 +281,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %value Sunday
      * %param backupStart Time of day when the backup starts (in seconds passed from 00:00:00).
      * %param backupDuration Duration of the synchronization period (in seconds). -1 if not set.
-     * %param backupBitrate Maximum backup bitrate (in bytes per second). Negative
-     *     value if not limited.
+     * %param backupBitrate Maximum backup bitrate (in bytes per second). Negative value if not
+     *     limited.
      * %// AbstractCameraManager::saveUserAttributes
      */
     regUpdate<MediaServerUserAttributesData>(p, ApiCommand::saveMediaServerUserAttributes);
@@ -297,16 +297,15 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param serverId Server unique id. If such object exists, omitted fields will not be changed.
      * %param serverName Server name.
      * %param maxCameras Maximum number of cameras on the server.
-     * %param allowAutoRedundancy Whether the server can take cameras from
-     *     an offline server automatically.
+     * %param allowAutoRedundancy Whether the server can take cameras from an offline server
+     *     automatically.
      *     %value false
      *     %value true
      * %param backupType Settings for storage redundancy.
      *     %value Backup_Manual Backup is performed only at a user's request.
      *     %value Backup_RealTime Backup is performed during recording.
      *     %value Backup_Schedule Backup is performed on schedule.
-     * %param backupDaysOfTheWeek Combination (via "|") of weekdays
-     *     the backup is active on.
+     * %param backupDaysOfTheWeek Combination (via "|") of weekdays the backup is active on.
      *     %value Monday
      *     %value Tuesday
      *     %value Wednesday
@@ -1349,7 +1348,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     // can't be created or removed via REST API for now.
 
     /**%apidoc GET /ec2/getAnalyticsPlugins
-     * Return list of analytics plugins
      * %param[default] format
      * %return List of analytics plugins in the requested format.
      * %// AbstractAnalyticsManager::getAnalyticsPlugins
@@ -1357,7 +1355,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regGet<QnUuid, AnalyticsPluginDataList>(p, ApiCommand::getAnalyticsPlugins);
 
     /**%apidoc GET /ec2/getAnalyticsEngines
-     * Return list of analytics engines
      * %param[default] format
      * %return List of analytics engines in the requested format.
      * %// AbstractAnalyticsManager::getAnalyticsEngines

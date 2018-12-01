@@ -144,7 +144,8 @@ void manufacturerReplacementByModel(QnResourceDataPool* dataPool, EndpointAdditi
     const auto& model = outInfo->name;
 
     auto resourceData = dataPool->data(currentManufacturer, model);
-    auto manufacturerReplacement = resourceData.value(Qn::ONVIF_MANUFACTURER_REPLACEMENT, QString());
+    auto manufacturerReplacement =
+        resourceData.value(ResourceDataKey::kOnvifManufacturerReplacement, QString());
 
     if (manufacturerReplacement.isEmpty())
         return;

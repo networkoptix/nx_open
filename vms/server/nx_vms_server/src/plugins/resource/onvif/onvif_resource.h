@@ -5,6 +5,7 @@
 #include <list>
 #include <memory>
 #include <stack>
+#include <set>
 
 #include <QString>
 #include <QtCore/QDateTime>
@@ -178,9 +179,6 @@ public:
     };
 
     static const QString MANUFACTURE;
-    static QString MEDIA_URL_PARAM_NAME;
-    static QString ONVIF_URL_PARAM_NAME;
-    static QString ONVIF_ID_PARAM_NAME;
     static const float QUALITY_COEF;
     static const int MAX_AUDIO_BITRATE;
     static const int MAX_AUDIO_SAMPLERATE;
@@ -400,8 +398,6 @@ protected:
         return CameraDiagnostics::NoErrorResult();
     }
 
-    void setMaxFps(int f);
-
     void setPrimaryVideoCapabilities(const VideoOptionsLocal& capabilities)
     {
         m_primaryStreamCapabilities = capabilities;
@@ -456,6 +452,10 @@ private:
     bool checkResultAndSetStatus(const CameraDiagnostics::Result& result);
 
     void setAudioOutputConfigurationToken(const QString& value);
+
+    std::set<QString> notificationTopicsForMonitoring() const;
+    std::set<QString> allowedInputSourceNames() const;
+
 protected:
     std::unique_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
     VideoOptionsLocal m_primaryStreamCapabilities;

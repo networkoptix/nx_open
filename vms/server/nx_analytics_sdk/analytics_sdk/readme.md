@@ -75,10 +75,10 @@ Nvidia Tegra cross-compiling: aarch-64 g++ >= 5.4.0 (e.g. Linaro), make or Ninja
 To compile the sample, and (if not cross-compiling) run unit tests, execute the commands collected
 into the provided scripts (use their source code as a reference):
 ```
-# Windows:
+# Windows, x64:
 ...\analytics_sdk\build_sample.bat
 
-# Linux or Windows with Cygwin:
+# Linux or Windows with Cygwin, x64:
 .../analytics_sdk/build_sample.sh
 
 # Nvidia Tegra cross-compiling (64-bit ARM):
@@ -87,7 +87,8 @@ into the provided scripts (use their source code as a reference):
 ```
 
 On Windows, after CMake generation phase, Visual Studio GUI can be used to compile the sample:
-open `.../build/stub_analytics_plugin.sln` and build `ALL_BUILD` project.
+open `.../build/stub_analytics_plugin.sln` and build `ALL_BUILD` project. Make sure that the 
+platform combo-box is set to "x64".
 
 After successful building, locate the main built artifact:
 ```

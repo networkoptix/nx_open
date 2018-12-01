@@ -27,7 +27,7 @@ extern "C" {
 } // extern "C"
 
 class QnTimePeriodList;
-class QnTimePeriod;
+struct QnTimePeriod;
 class QnStorageManager;
 
 class DeviceFileCatalog: public QObject, public nx::mediaserver::ServerModuleAware
@@ -336,7 +336,7 @@ public:
 
     bool fromCSVFile(const QString& fileName);
     QnServer::ChunksCatalog getRole() const;
-    QnRecordingStatsData getStatistics(qint64 bitrateAnalizePeriodMs) const;
+    QnRecordingStatsData getStatistics(qint64 bitrateAnalyzePeriodMs) const;
 
     QnServer::StoragePool getStoragePool() const;
     qint64 getSpaceByStorageIndex(int storageIndex) const;

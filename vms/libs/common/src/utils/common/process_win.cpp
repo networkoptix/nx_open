@@ -29,7 +29,11 @@ SystemError::ErrorCode startProcessDetached(
     p.setWorkingDirectory(workingDirectory);
     p.setArguments(arguments);
     p.setCreateProcessArgumentsModifier(
-        [](QProcess::CreateProcessArguments *args) { args->flags |= CREATE_NEW_CONSOLE; });
+        [](QProcess::CreateProcessArguments* args)
+        {
+            args->startupInfo->dwFlags &= ~DWORD(STARTF_USESTDHANDLES);
+            args->flags |= CREATE_NEW_CONSOLE;
+        });
 
     return p.startDetached(pid)? SystemError::noError : SystemError::fileNotFound;
 }

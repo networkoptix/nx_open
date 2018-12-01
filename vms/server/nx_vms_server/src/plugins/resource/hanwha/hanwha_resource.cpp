@@ -638,7 +638,7 @@ QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueM
             *info,
             value.value);
     }
-    saveParams();
+    saveProperties();
 
     bool success = true;
     for (const auto& request: requests)
@@ -676,7 +676,7 @@ QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueM
     if (reopenPrimaryStream || reopenSecondaryStream)
     {
         initMediaStreamCapabilities();
-        saveParams();
+        saveProperties();
         reopenStreams(reopenPrimaryStream, reopenSecondaryStream);
     }
 
@@ -820,7 +820,7 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
         {
             setCameraCapability(Qn::IsDefaultPasswordCapability, isDefaultPassword);
             setCameraCapability(Qn::IsOldFirmwareCapability, isOldFirmware);
-            saveParams();
+            saveProperties();
         });
 
     const auto sharedContext = serverModule()->sharedContextPool()
@@ -897,7 +897,7 @@ void HanwhaResource::initMediaStreamCapabilities()
     m_capabilities.streamCapabilities[Qn::StreamIndex::secondary] =
         mediaCapabilityForRole(Qn::ConnectionRole::CR_SecondaryLiveVideo);
     setProperty(
-        nx::media::kCameraMediaCapabilityParamName,
+        ResourcePropertyKey::kMediaCapabilities,
         QString::fromLatin1(QJson::serialized(m_capabilities)));
 }
 
@@ -1087,15 +1087,15 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
         return CameraDiagnostics::ServerTerminatedResult();
 
     if (isNvr() && !isVideoSourceActive())
-        return CameraDiagnostics::CameraInvalidParams(lit("Video source is not active"));
+        return CameraDiagnostics::CameraInvalidParams("Video source is not active");
 
     const auto videoProfiles = sharedContext()->videoProfiles();
     if (!videoProfiles)
         return videoProfiles.diagnostics;
 
     const auto channel = getChannel();
-    m_capabilities.hasAudio = m_attributes.attribute<int>(
-        lit("Media/MaxAudioInput/%1").arg(channel)) > 0;
+    m_capabilities.hasAudio = isNvr() //< We assume NVR channels are always capable of audio stream.
+        || m_attributes.attribute<int>(lm("Media/MaxAudioInput/%1").arg(channel)) > 0;
 
     if (isConnectedViaSunapi())
     {
@@ -1289,6 +1289,9 @@ CameraDiagnostics::Result HanwhaResource::initIo()
 
             m_ioPortTypeById[outputPortData.id] = outputPortData;
             ioPorts.push_back(outputPortData);
+
+            if (m_defaultOutputPortId.isEmpty())
+                m_defaultOutputPortId = outputPortData.id;
         }
     }
 
@@ -3480,7 +3483,7 @@ bool HanwhaResource::resetProfileToDefault(Qn::ConnectionRole role)
         setProperty(kSecondaryStreamBitrateParamName, defaultBitrateForStream(role));
     }
 
-    saveParams();
+    saveProperties();
     return true;
 }
 
@@ -3517,7 +3520,7 @@ boost::optional<HanwhaResource::HanwhaPortInfo> HanwhaResource::portInfoFromId(
 
 bool HanwhaResource::setOutputPortStateInternal(const QString& outputId, bool activate)
 {
-    const auto info = portInfoFromId(outputId);
+    const auto info = portInfoFromId(outputId.isEmpty() ? m_defaultOutputPortId : outputId);
     if (info == boost::none)
         return false;
 
@@ -3565,6 +3568,36 @@ boost::optional<int> HanwhaResource::bypassChannel() const
         return getChannel();
 
     return boost::none;
+}
+
+CameraDiagnostics::Result HanwhaResource::enableAudioInput()
+{
+    const auto audioInputEnabledParameter =
+        m_cgiParameters.parameter("media/audioinput/set/Enable");
+
+    if (!audioInputEnabledParameter)
+    {
+        NX_DEBUG(
+            this,
+            "media/audioinput/set/Enable parameter is not supported by device: %1 (%2)",
+            getUserDefinedName(), getId());
+
+        return CameraDiagnostics::NoErrorResult();
+    }
+
+    HanwhaRequestHelper helper(sharedContext());
+    const auto response = helper.set("media/audioinput", {
+        {"Enable", kHanwhaTrue},
+        {"Channel", QString::number(getChannel())}
+    });
+
+    if (!response.isSuccessful())
+    {
+        return CameraDiagnostics::RequestFailedResult(
+            response.requestUrl(), response.errorString());
+    }
+
+    return CameraDiagnostics::NoErrorResult();
 }
 
 bool HanwhaResource::isNvr() const
@@ -3684,7 +3717,6 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(
     if (numberOfOverlappedIds != 1)
         return QnTimePeriodList();
 
-
     const auto& periods = timeline.cbegin()->second;
     auto itr = std::lower_bound(periods.begin(), periods.end(), startTimeMs);
     if (itr != periods.begin())
@@ -3803,7 +3835,7 @@ HanwhaProfileParameters HanwhaResource::makeProfileParameters(
     else
         result.emplace(kHanwhaProfileNumberProperty, QString::number(profileByRole(role)));
 
-    auto audioInputEnableParameter = cgiParameters().parameter(
+    const auto audioInputEnableParameter = cgiParameters().parameter(
         QString("media/videoprofile/add_update/") + kHanwhaAudioInputEnableProperty);
 
     if (flags.testFlag(HanwhaProfileParameterFlag::audioSupported) && audioInputEnableParameter)

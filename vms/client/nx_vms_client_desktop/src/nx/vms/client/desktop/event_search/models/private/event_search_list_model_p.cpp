@@ -29,7 +29,6 @@ using nx::vms::event::ActionData;
 using nx::vms::event::ActionDataList;
 
 using namespace std::chrono;
-using namespace std::literals::chrono_literals;
 
 namespace {
 
@@ -126,7 +125,7 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
                 return QVariant();
             [[fallthrough]];
         case Qn::TimestampRole:
-            return QVariant::fromValue(std::chrono::microseconds(eventParams.eventTimestampUsec));
+            return QVariant::fromValue(microseconds(eventParams.eventTimestampUsec));
 
         case Qn::ResourceListRole:
         {
@@ -247,13 +246,13 @@ bool EventSearchListModel::Private::commitInternal(const QnTimePeriod& periodToC
     const auto count = std::distance(begin, end);
     if (count <= 0)
     {
-        NX_VERBOSE(q) << "Committing no events";
+        NX_VERBOSE(q, "Committing no events");
         return false;
     }
 
-    NX_VERBOSE(q) << "Committing" << count << "events from"
-        << utils::timestampToDebugString(startTime(*(end - 1)).count()) << "to"
-        << utils::timestampToDebugString(startTime(*begin).count());
+    NX_VERBOSE(q, "Committing %1 events:\n    from: %2\n    to: %3", count,
+        utils::timestampToDebugString(startTime(*(end - 1)).count()),
+        utils::timestampToDebugString(startTime(*begin).count()));
 
     ScopedInsertRows insertRows(q, position, position + count - 1);
     m_data.insert(m_data.begin() + position,
@@ -276,14 +275,14 @@ bool EventSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodToC
 
 void EventSearchListModel::Private::fetchLive()
 {
-    if (m_liveFetch.id || !q->isLive() || !q->isOnline() || q->livePaused())
+    if (m_liveFetch.id || !q->isLive() || !q->isOnline() || q->livePaused() || q->isFilterDegenerate())
         return;
 
     if (m_data.empty() && fetchInProgress())
         return; //< Don't fetch live if first fetch from archive is in progress.
 
     const milliseconds from = (m_data.empty() ? 0ms : startTime(m_data.front()));
-    m_liveFetch.period = QnTimePeriod(from.count(), QnTimePeriod::infiniteDuration());
+    m_liveFetch.period = QnTimePeriod(from.count(), QnTimePeriod::kInfiniteDuration);
     m_liveFetch.direction = FetchDirection::later;
     m_liveFetch.batchSize = q->fetchBatchSize();
 
@@ -306,28 +305,27 @@ void EventSearchListModel::Private::fetchLive()
 
             q->addToFetchedTimeWindow(periodToCommit);
 
-            NX_VERBOSE(q) << "Live update commit";
+            NX_VERBOSE(q, "Live update commit");
             commitInternal(periodToCommit, data.begin(), data.end(), 0, true);
 
             if (count() > q->maximumCount())
             {
-                NX_VERBOSE(q) << "Truncating to maximum count";
+                NX_VERBOSE(q, "Truncating to maximum count");
                 truncateToMaximumCount();
             }
         };
 
-    NX_VERBOSE(q) << "Live update request";
+    NX_VERBOSE(q, "Live update request");
 
     m_liveFetch.id = getEvents(m_liveFetch.period, liveEventsReceived, Qt::DescendingOrder,
         m_liveFetch.batchSize);
 }
 
 rest::Handle EventSearchListModel::Private::getEvents(
-    const QnTimePeriod& period, GetCallback callback, Qt::SortOrder order, int limit)
+    const QnTimePeriod& period, GetCallback callback, Qt::SortOrder order, int limit) const
 {
     const auto server = q->commonModule()->currentServer();
-    NX_ASSERT(callback && server && server->restConnection());
-    if (!callback || !server || !server->restConnection())
+    if (!NX_ASSERT(callback && server && server->restConnection() && !q->isFilterDegenerate()))
         return {};
 
     QnEventLogMultiserverRequestData request;
@@ -341,14 +339,17 @@ rest::Handle EventSearchListModel::Private::getEvents(
     request.limit = limit;
     request.order = order;
 
-    NX_VERBOSE(q) << "Requesting events from"
-        << utils::timestampToDebugString(period.startTimeMs) << "to"
-        << utils::timestampToDebugString(period.endTimeMs()) << "in"
-        << QVariant::fromValue(request.order).toString()
-        << "maximum count" << request.limit;
+    NX_VERBOSE(q, "Requesting events:\n"
+        "    from: %1\n    to: %2\n    type: %3\n    subtype: %4\n    sort: %5\n    limit: %6",
+        utils::timestampToDebugString(period.startTimeMs),
+        utils::timestampToDebugString(period.endTimeMs()),
+        request.filter.eventType,
+        request.filter.eventSubtype,
+        QVariant::fromValue(request.order).toString(),
+        request.limit);
 
     const auto internalCallback =
-        [callback, guard = QPointer<Private>(this)](
+        [callback, guard = QPointer<const Private>(this)](
             bool success, rest::Handle handle, rest::EventLogData data)
         {
             if (guard)

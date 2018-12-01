@@ -1,4 +1,5 @@
 #include "abstract_search_widget_p.h"
+#include "tile_interaction_handler_p.h"
 #include "ui_abstract_search_widget.h"
 
 #include <chrono>
@@ -37,10 +38,9 @@
 
 namespace nx::vms::client::desktop {
 
-namespace {
-
-using namespace std::literals::chrono_literals;
 using namespace std::chrono;
+
+namespace {
 
 static constexpr int kPlaceholderFontPixelSize = 15;
 static constexpr milliseconds kQueuedFetchMoreDelay = 50ms;
@@ -111,7 +111,6 @@ AbstractSearchWidget::Private::Private(
     setupPlaceholder();
     setupTimeSelection();
     setupCameraSelection();
-    setupAreaSelection();
 
     installEventHandler(q, QEvent::Show, this, &Private::requestFetchIfNeeded);
 
@@ -198,14 +197,16 @@ void AbstractSearchWidget::Private::setupRibbon()
     connect(ui->ribbon->scrollBar(), &QScrollBar::valueChanged,
         this, &Private::requestFetchIfNeeded, Qt::QueuedConnection);
 
-    connect(ui->ribbon, &EventRibbon::tileHovered, q, &AbstractSearchWidget::tileHovered);
+    connect(ui->ribbon, &EventRibbon::hovered, q, &AbstractSearchWidget::tileHovered);
 
     connect(navigator(), &QnWorkbenchNavigator::timelinePositionChanged, this,
         [this]()
         {
             ui->ribbon->setHighlightedTimestamp(
-                std::chrono::microseconds(navigator()->positionUsec()));
+                microseconds(navigator()->positionUsec()));
         });
+
+    TileInteractionHandler::install(ui->ribbon);
 }
 
 void AbstractSearchWidget::Private::setupToolbar()
@@ -326,7 +327,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
         {
             if (ini().automaticFilterByTimelineSelection)
             {
-                const bool selectionExists = !m_timelineSelection.isEmpty();
+                const bool selectionExists = !m_timelineSelection.isNull();
                 const bool selectionFilter = m_period == Period::selection;
 
                 if (selectionExists != selectionFilter)
@@ -353,7 +354,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
                 return;
 
             // If selection was cleared, update immediately, otherwise update after small delay.
-            if (m_timelineSelection.isEmpty())
+            if (m_timelineSelection.isNull())
                 applyTimePeriod->fire();
             else
                 applyTimePeriod->requestOperation();
@@ -361,8 +362,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
 
     // Setup day change watcher.
 
-    using namespace std::chrono;
-    m_dayChangeTimer->setInterval(milliseconds(seconds(1)).count());
+    m_dayChangeTimer->setInterval(1s);
 
     connect(m_dayChangeTimer.data(), &QTimer::timeout,
         this, &Private::updateCurrentTimePeriod);
@@ -495,50 +495,20 @@ void AbstractSearchWidget::Private::setupCameraSelection()
         });
 }
 
-void AbstractSearchWidget::Private::setupAreaSelection()
+void AbstractSearchWidget::Private::setCamerasReadOnly(bool value)
 {
-    ui->areaSelectionButton->setSelectable(false);
-    ui->areaSelectionButton->setDeactivatable(true);
-    ui->areaSelectionButton->setAccented(true);
-    ui->areaSelectionButton->setText(tr("In selected area"));
-    ui->areaSelectionButton->setDeactivatedText(tr("Anywhere on the video"));
-    ui->areaSelectionButton->setIcon(qnSkin->icon("text_buttons/area.png"));
-    setReadOnly(ui->areaSelectionButton, true);
-
-    connect(q, &AbstractSearchWidget::cameraSetChanged, this,
-        [this]()
-        {
-            const auto cameras = q->cameras();
-            ui->areaSelectionButton->setEnabled(
-                cameras.size() == 1 && (*cameras.cbegin())->hasVideo());
-
-            ui->areaSelectionButton->deactivate();
-        });
-
-    const auto handleStateChanged =
-        [this](SelectableTextButton::State state)
-        {
-            setWholeArea(state == SelectableTextButton::State::deactivated);
-            ui->areaSelectionButton->setToolTip(m_wholeArea
-                ? tr("Select some area on video to use it as a filter")
-                : QString());
-        };
-
-    connect(ui->areaSelectionButton, &SelectableTextButton::stateChanged, this, handleStateChanged);
-    handleStateChanged(ui->areaSelectionButton->state());
-
-    connect(q, &AbstractSearchWidget::selectedAreaChanged, this,
-        [this](bool wholeArea)
-        {
-            ui->areaSelectionButton->setState(wholeArea
-                ? SelectableTextButton::State::deactivated
-                : SelectableTextButton::State::unselected);
-        });
+    ui->cameraSelectionButton->setDeactivatable(!value);
+    setReadOnly(ui->cameraSelectionButton, value);
 }
 
 AbstractSearchListModel* AbstractSearchWidget::Private::model() const
 {
     return m_mainModel.data();
+}
+
+EventRibbon* AbstractSearchWidget::Private::view() const
+{
+    return ui->ribbon;
 }
 
 void AbstractSearchWidget::Private::goToLive()
@@ -554,7 +524,6 @@ AbstractSearchWidget::Controls AbstractSearchWidget::Private::relevantControls()
     Controls result;
     result.setFlag(Control::cameraSelector, !ui->cameraSelectionButton->isHidden());
     result.setFlag(Control::timeSelector, !ui->timeSelectionButton->isHidden());
-    result.setFlag(Control::areaSelector, !ui->areaSelectionHolder->isHidden());
     result.setFlag(Control::freeTextFilter, !m_textFilterEdit->isHidden());
     result.setFlag(Control::footersToggler, !ui->toggleFootersButton->isHidden());
     result.setFlag(Control::previewsToggler, !ui->togglePreviewsButton->isHidden());
@@ -565,7 +534,6 @@ void AbstractSearchWidget::Private::setRelevantControls(Controls value)
 {
     ui->cameraSelectionButton->setVisible(value.testFlag(Control::cameraSelector));
     ui->timeSelectionButton->setVisible(value.testFlag(Control::timeSelector));
-    ui->areaSelectionHolder->setVisible(value.testFlag(Control::areaSelector));
     m_textFilterEdit->setVisible(value.testFlag(Control::freeTextFilter));
     ui->toggleFootersButton->setVisible(value.testFlag(Control::footersToggler));
     ui->togglePreviewsButton->setVisible(value.testFlag(Control::previewsToggler));
@@ -639,7 +607,7 @@ QnTimePeriod AbstractSearchWidget::Private::effectiveTimePeriod() const
     auto current = qnSyncTime->currentDateTime();
     current.setTime(QTime(0, 0, 0, 0));
     return QnTimePeriod(current.addDays(1 - days).toMSecsSinceEpoch(),
-        QnTimePeriod::infiniteDuration());
+        QnTimePeriod::kInfiniteDuration);
 }
 
 AbstractSearchWidget::Cameras AbstractSearchWidget::Private::selectedCameras() const
@@ -647,16 +615,20 @@ AbstractSearchWidget::Cameras AbstractSearchWidget::Private::selectedCameras() c
     return m_cameras;
 }
 
-void AbstractSearchWidget::Private::setSingleCameraMode(bool value)
+void AbstractSearchWidget::Private::selectCameras(Cameras value)
 {
-    const bool currentlyEnabled = m_cameras == Cameras::current;
-    if (currentlyEnabled == value)
+    if (m_cameras == value)
         return;
 
-    const auto action = m_cameraSelectionActions.value(value ? Cameras::current : m_previousCameras);
+    const auto action = m_cameraSelectionActions.value(value);
     NX_ASSERT(action);
     if (action)
         action->trigger();
+}
+
+AbstractSearchWidget::Cameras AbstractSearchWidget::Private::previousCameras() const
+{
+    return m_previousCameras;
 }
 
 void AbstractSearchWidget::Private::setSelectedCameras(Cameras value)
@@ -667,20 +639,6 @@ void AbstractSearchWidget::Private::setSelectedCameras(Cameras value)
     m_previousCameras = m_cameras;
     m_cameras = value;
     updateCurrentCameras();
-}
-
-bool AbstractSearchWidget::Private::wholeArea() const
-{
-    return ui->areaSelectionButton->state() == SelectableTextButton::State::deactivated;
-}
-
-void AbstractSearchWidget::Private::setWholeArea(bool value)
-{
-    if (m_wholeArea == value)
-        return;
-
-    m_wholeArea = value;
-    emit q->selectedAreaChanged(m_wholeArea);
 }
 
 QnVirtualCameraResourceSet AbstractSearchWidget::Private::cameras() const
@@ -712,8 +670,6 @@ void AbstractSearchWidget::Private::updateCurrentCameras()
 {
     if (!m_mainModel->isOnline())
         return;
-
-    ui->areaSelectionButton->setVisible(m_cameras == Cameras::current);
 
     switch (m_cameras)
     {
@@ -766,9 +722,8 @@ void AbstractSearchWidget::Private::requestFetchIfNeeded()
 
 void AbstractSearchWidget::Private::resetFilters()
 {
-    ui->cameraSelectionButton->deactivate();
+    ui->cameraSelectionButton->deactivate(); //< Will do nothing if selector is set to read-only.
     ui->timeSelectionButton->deactivate();
-    ui->areaSelectionButton->deactivate();
     m_textFilterEdit->clear();
 }
 

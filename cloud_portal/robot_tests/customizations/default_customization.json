@@ -1,14 +1,14 @@
 {
     "PRODUCT_NAME"             :    "Nx Cloud",
     "VMS_NAME"                 :    "Nx Witness",
-    "PRIVACY POLICY URL"       :    "http://www.networkoptix.com/privacy-policy/",
+    "PRIVACY POLICY URL"       :    "https://www.networkoptix.com/privacy-policy/",
     "SUPPORT URL"              :    "https://support.networkoptix.com",
-    "WEBSITE URL"              :    "http://networkoptix.com",
-    "ABOUT URL"                :    "https://cloud-test.hdw.mx/content/about",
-    "KNOWN LIMITATIONS URL"    :    "https://cloud-test.hdw.mx/content/faq",
-    "TERMS URL"                :    "https://cloud-test.hdw.mx/content/eula",
-    "COPYWRIGHT URL"           :    "http://www.networkoptix.com/",
-    "COPYWRIGHT TEXT"          :    "© 2018 Network Optix",
+    "WEBSITE URL"              :    "https://networkoptix.com",
+    "ABOUT URL"                :    "/content/about",
+    "KNOWN LIMITATIONS URL"    :    "/content/faq",
+    "TERMS URL"                :    "/content/eula",
+    "COPYRIGHT URL"            :    "https://www.networkoptix.com/",
+    "COPYRIGHT TEXT"           :    "© 2018 Network Optix",
     "THEME COLOR"              :    "#2FA2DB",
     "THEME COLOR RGB"          :    "rgba(47, 162, 219, 1)"
-}   
+}

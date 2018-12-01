@@ -105,7 +105,9 @@
 #include <nx/client/ptz/ptz_hotkey_resource_property_adaptor.h>
 #include <nx/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
+#include <nx/vms/client/desktop/ini.h>
 
+using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 using nx::vms::client::core::Geometry;
 
@@ -1068,6 +1070,9 @@ void QnWorkbenchController::at_motionRegionSelected(QGraphicsView *, QnMediaReso
         return;
 
     widget->addToMotionSelection(region);
+
+    if (!ini().exclusiveMotionSelection)
+        return;
 
     for (auto otherWidget: display()->widgets())
     {

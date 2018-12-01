@@ -22,7 +22,7 @@ public:
     virtual float confidence() const override;
     virtual nxpl::NX_GUID id() const override;
     virtual const char* objectSubType() const override;
-    virtual const Attribute* attribute(int index) const override;
+    virtual const IAttribute* attribute(int index) const override;
     virtual int attributeCount() const override;
     virtual const char* auxilaryData() const override;
     virtual Rect boundingBox() const override;

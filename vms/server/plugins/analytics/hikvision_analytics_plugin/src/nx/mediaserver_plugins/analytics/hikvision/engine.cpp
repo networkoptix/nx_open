@@ -1,9 +1,11 @@
-#include "engine.h"
+﻿#include "engine.h"
 
 #include "device_agent.h"
 #include "common.h"
 #include "string_helper.h"
 #include "attributes_parser.h"
+
+#include <chrono>
 
 #include <QtCore/QString>
 #include <QtCore/QUrlQuery>
@@ -26,6 +28,7 @@ namespace {
 
 const QString kHikvisionTechwinVendor = lit("hikvision");
 static const std::chrono::seconds kCacheTimeout{60};
+static const std::chrono::seconds kRequestTimeout{10};
 
 } // namespace
 
@@ -79,7 +82,7 @@ void Engine::setSettings(const nx::sdk::Settings* settings)
     // There are no DeviceAgent settings for this plugin.
 }
 
-nx::sdk::Settings* Engine::settings() const
+nx::sdk::Settings* Engine::pluginSideSettings() const
 {
     return nullptr;
 }
@@ -125,14 +128,14 @@ QList<QString> Engine::parseSupportedEvents(const QByteArray& data)
     for (const auto& internalName: *supportedEvents)
     {
         const QString eventTypeId = m_engineManifest.eventTypeByInternalName(internalName);
-        if (!eventTypeId.isNull())
+        if (!eventTypeId.isEmpty())
         {
             result << eventTypeId;
             const auto descriptor = m_engineManifest.eventTypeDescriptorById(eventTypeId);
             for (const auto& dependedName: descriptor.dependedEvent.split(','))
             {
                 auto descriptor = m_engineManifest.eventTypeDescriptorByInternalName(dependedName);
-                if (!descriptor.id.isNull())
+                if (!descriptor.id.isEmpty())
                     result << descriptor.id;
             }
         }
@@ -147,23 +150,47 @@ boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
     if (!data.hasExpired())
         return data.supportedEventTypeIds;
 
+    using namespace std::chrono;
+
     nx::utils::Url url(deviceInfo.url);
     url.setPath("/ISAPI/Event/triggersCap");
-    url.setUserInfo(deviceInfo.login);
-    url.setPassword(deviceInfo.password);
-    int statusCode = 0;
-    QByteArray buffer;
-    if (nx::network::http::downloadFileSync(url, &statusCode, &buffer) != SystemError::noError ||
-        statusCode != nx::network::http::StatusCode::ok)
+
+    nx::network::http::HttpClient httpClient;
+    httpClient.setResponseReadTimeout(kRequestTimeout);
+    httpClient.setSendTimeout(kRequestTimeout);
+    httpClient.setMessageBodyReadTimeout(kRequestTimeout);
+    httpClient.setUserName(deviceInfo.login);
+    httpClient.setUserPassword(deviceInfo.password);
+
+    const auto result = httpClient.doGet(url);
+    const auto response = httpClient.response();
+
+    if (!result || !response)
     {
-        NX_WARNING(this,lm("Can't fetch supported events for device %1. HTTP status code: %2").
-            arg(deviceInfo.url).arg(statusCode));
+        NX_WARNING(
+            this,
+            lm("No response for supported events request %1.").args(deviceInfo.url));
+        data.timeout.invalidate();
         return boost::optional<QList<QString>>();
     }
+
+    const auto statusCode = response->statusLine.statusCode;
+    const auto buffer = httpClient.fetchEntireMessageBody();
+    if (!nx::network::http::StatusCode::isSuccessCode(statusCode) || !buffer)
+    {
+        NX_WARNING(
+            this,
+            lm("Unable to fetch supported events for device %1. HTTP status code: %2")
+                .args(deviceInfo.url, statusCode));
+        data.timeout.invalidate();
+        return boost::optional<QList<QString>>();
+    }
+
     NX_DEBUG(this, lm("Device url %1. RAW list of supported analytics events: %2").
         arg(deviceInfo.url).arg(buffer));
 
-    data.supportedEventTypeIds = parseSupportedEvents(buffer);
+    data.supportedEventTypeIds = parseSupportedEvents(*buffer);
+    data.timeout.restart();
     return data.supportedEventTypeIds;
 }
 
@@ -174,6 +201,12 @@ const Hikvision::EngineManifest& Engine::engineManifest() const
 
 void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
 {
+}
+
+nx::sdk::Error Engine::setHandler(nx::sdk::analytics::Engine::IHandler* /*handler*/)
+{
+    // TODO: Use the handler for error reporting.
+    return nx::sdk::Error::noError;
 }
 
 } // namespace hikvision

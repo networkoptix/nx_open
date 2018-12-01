@@ -23,17 +23,16 @@ namespace nx::mediaserver::analytics {
 
 class MetadataHandler:
     public QObject,
-    public nx::sdk::analytics::MetadataHandler,
     public ServerModuleAware
 {
-    Q_OBJECT;
-    using DescriptorMap = std::map<QString, nx::vms::api::analytics::EventTypeDescriptor>;
+    Q_OBJECT
+
 public:
+    using DescriptorMap = std::map<QString, nx::vms::api::analytics::EventTypeDescriptor>;
+
     MetadataHandler(QnMediaServerModule* serverModule);
 
-    virtual void handleMetadata(
-        nx::sdk::Error error,
-        nx::sdk::analytics::MetadataPacket* metadata) override;
+    void handleMetadata(nx::sdk::analytics::MetadataPacket* metadata);
 
     void setResource(QnVirtualCameraResourcePtr resource);
     void setPluginId(QString pluginId);

@@ -8,14 +8,12 @@ namespace nx::mediaserver::interactive_settings {
 
 class QmlEngine: public AbstractEngine
 {
-    using base_type = AbstractEngine;
-
 public:
-    QmlEngine(QObject* parent = nullptr);
+    QmlEngine();
     virtual ~QmlEngine() override;
 
-    virtual void load(const QByteArray& data) override;
-    virtual void load(const QString& fileName) override;
+    virtual Error loadModelFromData(const QByteArray& data) override;
+    virtual Error loadModelFromFile(const QString& fileName) override;
 
 private:
     class Private;

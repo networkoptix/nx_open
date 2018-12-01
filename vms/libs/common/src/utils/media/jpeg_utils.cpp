@@ -12,20 +12,20 @@ namespace nx_jpg
     static const int MARKER_HEADER_SIZE = 2;
     static const int MARKER_LENGTH_SIZE = 2;
 
-    QString toString( ResultCode resCode )
+    QString toString(ResultCode resCode)
     {
-        switch( resCode )
+        switch (resCode)
         {
             case succeeded:
-                return lit("succeeded");
+                return "succeeded";
             case interrupted:
-                return lit("interrupted");
+                return "interrupted";
             case badData:
-                return lit("badData");
+                return "badData";
             case failed:
-                return lit("failed");
+                return "failed";
             default:
-                return lit("unknownError");
+                return "unknownError";
         }
     }
 

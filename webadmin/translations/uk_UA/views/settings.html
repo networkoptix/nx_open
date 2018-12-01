@@ -4,20 +4,20 @@
             <system-info></system-info>
         </div>
         <div class="col-md-8 col-md-pull-4">
-            <alert type="danger" ng-if="settings.flags.noHDD">
+            <uib-alert type="danger" ng-if="settings.flags.noHDD">
                 Цей пристрій призначений для роботи з жорстким диском. <br> Будь ласка, вимкніть пристрій та встановіть жорсткий диск.
-            </alert>
-            <alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
+            </uib-alert>
+            <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
                 Для роботи цього пристрою необхідно встановити з'єднання з мережею. <br> Будь ласка, підключіть його до вашої локальної мережі або мережі Інтернет
-            </alert>
-            <alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
+            </uib-alert>
+            <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 У цього пристрою некоректна мережева конфігурація. <br> Потрібно підключити його до мережі або налаштувати правильну IP-адресу.
-            </alert>
+            </uib-alert>
 
 
             <uib-tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
                 <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
-                    <div>
+                    <div ng-if="user.isOwner">
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
                             <h3>Порт</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
@@ -47,7 +47,7 @@
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Від'єднати від системи</button></p>
                     </div>
                     <div>
-                        <h3>Перезапуск</h3>
+                        <h3>Перезавантажити</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">Перезапустіть сервер</button>                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Перезавантажити</button></p>
                     </div>
                     <div ng-if="user.isOwner">
@@ -99,11 +99,11 @@
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <alert type="warning">Ця система не пов’язана з {{Config.cloud.productName}} <a ng-if="!mode.liteClient"
+                            <uib-alert type="warning">Ця система не пов’язана з {{Config.cloud.productName}} <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
-                                   target="_blank">Докладніше</a></alert>
-                            <alert type="error" ng-if="!hasInternetOnServer">Для виконання установки {{Config.cloud.productName}} необхідно підключити сервера до мережі Інтернет</alert>
-                            <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Для підключення системи до {{Config.cloud.productName}} необхідне підключення до мережі Інтернет</alert>
+                                   target="_blank">Докладніше</a></uib-alert>
+                            <uib-alert type="error" ng-if="!hasInternetOnServer">Для виконання установки {{Config.cloud.productName}} необхідно підключити сервера до мережі Інтернет</uib-alert>
+                            <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Для підключення системи до {{Config.cloud.productName}} необхідне підключення до мережі Інтернет</uib-alert>
                             <p ng-if="canConnectToCloud"  ><button
                                     class="btn btn-default"
                                     ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Підключитися до {{Config.cloud.productName}}</button>                                 <a ng-if="!mode.liteClient"  class="btn btn-default"
@@ -114,18 +114,20 @@
 
 
                     <div>
-                        <h3>Шифрування передачі</h3>
+                        <h3>Шифрування трафіку</h3>
                         <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> Забезпечити шифрування передачі
+                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> Включити шифрування трафіку
                                 </label>
                             </div>
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox"
                                            ng-disabled="!trafficSettings.trafficEncryptionForced"
-                                           ng-model="trafficSettings.videoTrafficEncryptionForced"> Забезпечити шифрування передачі відеосигналу
+                                           ng-model="trafficSettings.videoTrafficEncryptionForced"
+                                           ng-checked="checkTrafficEncryption()">
+                                    Включити шифрування відео трафіку
                                 </label>
                             </div>
                             <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Зберегти</button>

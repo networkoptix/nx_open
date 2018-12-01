@@ -74,7 +74,7 @@ private:
         analytics::storage::ObjectPosition&& position, bool emitDataChanged = true);
 
     using GetCallback = std::function<void(bool, rest::Handle, analytics::storage::LookupResult&&)>;
-    rest::Handle getObjects(const QnTimePeriod& period, GetCallback callback, int limit);
+    rest::Handle getObjects(const QnTimePeriod& period, GetCallback callback, int limit) const;
 
     QString description(const analytics::storage::DetectedObject& object) const;
     QString attributes(const analytics::storage::DetectedObject& object) const;

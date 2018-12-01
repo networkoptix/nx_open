@@ -3,6 +3,7 @@
 #include <QtCore/QTimer>
 
 #include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
 
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/ui/workbench/workbench_animations.h>
@@ -176,7 +177,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     m_showButton->setFocusProxy(item);
     m_showButton->setZValue(BackgroundItemZOrder); /*< To make it paint under the tooltip. */
     connect(action(action::ToggleNotificationsAction), &QAction::toggled,
-        this, [this](bool opened) { setOpened(opened); });
+        this, [this](bool opened) { if (!m_blockAction) setOpened(opened); });
 
     m_opacityProcessor->addTargetItem(item);
     m_opacityProcessor->addTargetItem(m_showButton);
@@ -243,9 +244,9 @@ void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
     m_showingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
     auto toggleAction = action(action::ToggleNotificationsAction);
-    toggleAction->blockSignals(true);
+    m_blockAction = true;
     toggleAction->setChecked(opened);
-    toggleAction->blockSignals(false);
+    m_blockAction = false;
 
     xAnimator->stop();
     qnWorkbenchAnimations->setupAnimator(xAnimator, opened
@@ -415,7 +416,7 @@ void NotificationsWorkbenchPanel::createEventPanel(QGraphicsWidget* parentWidget
 
 void NotificationsWorkbenchPanel::at_eventTileHovered(
     const QModelIndex& index,
-    const nx::vms::client::desktop::EventTile* tile)
+    nx::vms::client::desktop::EventTile* tile)
 {
     if (m_eventPanelHoverProcessor)
     {
@@ -456,8 +457,16 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
     toolTip->updateTailPos();
     toolTip->pointTo(tooltipPos);
 
-    connect(toolTip.data(), &QnNotificationToolTipWidget::thumbnailClicked,
-        tile, &nx::vms::client::desktop::EventTile::clicked);
+    // TODO: #vkutin Refactor tooltip clicks, now it looks hackish.
+    connect(toolTip.data(), &QnNotificationToolTipWidget::thumbnailClicked, tile,
+        [tile]() { emit tile->clicked(Qt::LeftButton, QApplication::keyboardModifiers()); });
+
+    connect(tile, &EventTile::clicked, this,
+        [this]()
+        {
+            if (m_eventPanelHoverProcessor)
+                m_eventPanelHoverProcessor->forceHoverLeave();
+        });
 
     m_eventPanelHoverProcessor = new HoverFocusProcessor(parentWidget);
     m_eventPanelHoverProcessor->addTargetItem(toolTip);

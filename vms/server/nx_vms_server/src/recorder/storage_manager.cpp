@@ -438,7 +438,7 @@ public:
             if (status == Qn::Online)
             {
                 const auto space = QString::number(storage->getTotalSpace());
-                if (storage->setProperty(Qn::SPACE, space))
+                if (storage->setProperty(ResourceDataKey::kSpace, space))
                     m_owner->propertyDictionary()->saveParams(storage->getId());
             }
         }
@@ -1424,7 +1424,7 @@ void QnStorageManager::getRecordedPeriodsInternal(
     }
 }
 
-QnRecordingStatsReply QnStorageManager::getChunkStatistics(qint64 bitrateAnalizePeriodMs)
+QnRecordingStatsReply QnStorageManager::getChunkStatistics(qint64 bitrateAnalyzePeriodMs)
 {
     QnRecordingStatsReply result;
     QSet<QString> cameras;
@@ -1437,7 +1437,7 @@ QnRecordingStatsReply QnStorageManager::getChunkStatistics(qint64 bitrateAnalize
     }
 
     for (const auto& uniqueId: cameras) {
-        QnRecordingStatsData stats = getChunkStatisticsByCamera(bitrateAnalizePeriodMs, uniqueId);
+        QnRecordingStatsData stats = getChunkStatisticsByCamera(bitrateAnalyzePeriodMs, uniqueId);
         QnCamRecordingStatsData data(stats);
         data.uniqueId = uniqueId;
         if (data.recordedBytes > 0)
@@ -1446,47 +1446,47 @@ QnRecordingStatsReply QnStorageManager::getChunkStatistics(qint64 bitrateAnalize
     return result;
 }
 
-QnRecordingStatsData QnStorageManager::getChunkStatisticsByCamera(qint64 bitrateAnalizePeriodMs, const QString& uniqueId)
+QnRecordingStatsData QnStorageManager::getChunkStatisticsByCamera(qint64 bitrateAnalyzePeriodMs, const QString& uniqueId)
 {
     QnMutexLocker lock(&m_mutexCatalog);
     auto catalogHi = m_devFileCatalog[QnServer::HiQualityCatalog].value(uniqueId);
     auto catalogLow = m_devFileCatalog[QnServer::LowQualityCatalog].value(uniqueId);
 
     if (catalogHi && !catalogHi->isEmpty() && catalogLow && !catalogLow->isEmpty())
-        return mergeStatsFromCatalogs(bitrateAnalizePeriodMs, catalogHi, catalogLow);
+        return mergeStatsFromCatalogs(bitrateAnalyzePeriodMs, catalogHi, catalogLow);
     else if (catalogHi && !catalogHi->isEmpty())
-        return catalogHi->getStatistics(bitrateAnalizePeriodMs);
+        return catalogHi->getStatistics(bitrateAnalyzePeriodMs);
     else if (catalogLow && !catalogLow->isEmpty())
-        return catalogLow->getStatistics(bitrateAnalizePeriodMs);
+        return catalogLow->getStatistics(bitrateAnalyzePeriodMs);
     else
         return QnRecordingStatsData();
 }
 
-QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnalizePeriodMs, const DeviceFileCatalogPtr& catalogHi, const DeviceFileCatalogPtr& catalogLow)
+// Do not use this function with hi or low catalog empty.
+QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnalyzePeriodMs,
+    const DeviceFileCatalogPtr& catalogHi, const DeviceFileCatalogPtr& catalogLow)
 {
-    QnRecordingStatsData result;
-    QnRecordingStatsData bitrateStats; // temp stats for virtual bitrate calculation
-    qint64 archiveStartTimeMs = -1;
-    qint64 bitrateThreshold = DATETIME_NOW;
+    NX_ASSERT(catalogHi && !catalogHi->isEmpty() && catalogLow && !catalogLow->isEmpty());
+
     QnMutexLocker lock1(&catalogHi->m_mutex);
     QnMutexLocker lock2(&catalogLow->m_mutex);
 
-    if (catalogHi && !catalogHi->m_chunks.empty()) {
-        archiveStartTimeMs = catalogHi->m_chunks[0].startTimeMs;
-        bitrateThreshold = catalogHi->m_chunks[catalogHi->m_chunks.size()-1].startTimeMs;
-    }
-    if (catalogLow && !catalogLow->m_chunks.empty()) {
-        if (archiveStartTimeMs == -1) {
-            archiveStartTimeMs = catalogLow->m_chunks[0].startTimeMs;
-            bitrateThreshold = catalogLow->m_chunks[catalogLow->m_chunks.size()-1].startTimeMs;
-        }
-        else {
-            archiveStartTimeMs = qMin(archiveStartTimeMs, catalogLow->m_chunks[0].startTimeMs);
-            // not need to merge bitrateThreshold. getting from Hi archive is OK
-        }
-    }
-    bitrateThreshold = bitrateAnalizePeriodMs ? bitrateThreshold - bitrateAnalizePeriodMs : 0;
-    result.archiveDurationSecs = qMax(0ll, (qnSyncTime->currentMSecsSinceEpoch() - archiveStartTimeMs) / 1000);
+    qint64 archiveStartTimeMs = qMin(catalogHi->m_chunks.front().startTimeMs,
+        catalogLow->m_chunks.front().startTimeMs);
+
+    qint64 averagingPeriodMs = bitrateAnalyzePeriodMs != 0
+        ? bitrateAnalyzePeriodMs
+        : qMax(1ll, qnSyncTime->currentMSecsSinceEpoch() - archiveStartTimeMs);
+
+    qint64 averagingStartTime = bitrateAnalyzePeriodMs != 0
+        ? qMax(catalogHi->m_chunks.back().startTimeMs, catalogHi->m_chunks.back().startTimeMs)
+        : 0;
+
+    qint64 recordedMsForPeriod = 0;
+    qint64 recordedBytesForPeriod = 0;
+    qint64 totalRecordedMs = 0;
+    qint64 totalRecordedBytes = 0;
+    QnRecordingStatsData result;
 
     //auto itrHiLeft = std::lower_bound(catalogHi->m_chunks.cbegin(), catalogHi->m_chunks.cend(), startTime);
     //auto itrHiRight = std::upper_bound(itrHiLeft, catalogHi->m_chunks.cend(), endTime);
@@ -1508,11 +1508,13 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
         qint64 nextLowTime = DATETIME_NOW;
         bool hasHi = false;
         bool hasLow = false;
-        if (itrHiLeft != itrHiRight) {
+        if (itrHiLeft != itrHiRight)
+        {
             nextHiTime = itrHiLeft->containsTime(currentTime) ? itrHiLeft->endTimeMs() : itrHiLeft->startTimeMs;
             hasHi = itrHiLeft->durationMs > 0 && itrHiLeft->containsTime(currentTime);
         }
-        if (itrLowLeft != itrLowRight) {
+        if (itrLowLeft != itrLowRight)
+        {
             nextLowTime = itrLowLeft->containsTime(currentTime) ? itrLowLeft->endTimeMs() : itrLowLeft->startTimeMs;
             hasLow = itrLowLeft->durationMs > 0 && itrLowLeft->containsTime(currentTime);
         }
@@ -1523,37 +1525,39 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
 
         if (hasHi)
         {
-            qreal persentUsage = blockDuration / (qreal) itrHiLeft->durationMs;
-            NX_ASSERT(qBetween(0.0, persentUsage, 1.000001));
+            qreal percentUsage = blockDuration / (qreal) itrHiLeft->durationMs;
+            NX_ASSERT(qBetween(0.0, percentUsage, 1.000001));
             auto storage = storageRoot(itrHiLeft->storageIndex);
-            result.recordedBytes += itrHiLeft->getFileSize() * persentUsage;
+            totalRecordedBytes += itrHiLeft->getFileSize() * percentUsage;
             if (storage)
-                result.recordedBytesPerStorage[storage->getId()] += itrHiLeft->getFileSize() * persentUsage;
+                result.recordedBytesPerStorage[storage->getId()] += itrHiLeft->getFileSize() * percentUsage;
 
-            result.recordedSecs += itrHiLeft->durationMs * persentUsage;
-            if (itrHiLeft->startTimeMs >= bitrateThreshold) {
-                bitrateStats.recordedBytes += itrHiLeft->getFileSize() * persentUsage;
-                bitrateStats.recordedSecs += itrHiLeft->durationMs * persentUsage;
+            totalRecordedMs += itrHiLeft->durationMs * percentUsage;
+            if (itrHiLeft->startTimeMs >= averagingStartTime)
+            {
+                recordedBytesForPeriod += itrHiLeft->getFileSize() * percentUsage;
+                recordedMsForPeriod += itrHiLeft->durationMs * percentUsage;
             }
         }
 
         if (hasLow)
         {
-            qreal persentUsage = blockDuration / (qreal) itrLowLeft->durationMs;
-            NX_ASSERT(qBetween(0.0, persentUsage, 1.000001));
+            qreal percentUsage = blockDuration / (qreal) itrLowLeft->durationMs;
+            NX_ASSERT(qBetween(0.0, percentUsage, 1.000001));
             auto storage = storageRoot(itrLowLeft->storageIndex);
-            result.recordedBytes += itrLowLeft->getFileSize() * persentUsage;
+            totalRecordedBytes += itrLowLeft->getFileSize() * percentUsage;
             if (storage)
-                result.recordedBytesPerStorage[storage->getId()] += itrLowLeft->getFileSize() * persentUsage;
+                result.recordedBytesPerStorage[storage->getId()] += itrLowLeft->getFileSize() * percentUsage;
             if (hasHi)
             {
                 // do not include bitrate calculation if only LQ quality
-                if (itrLowLeft->startTimeMs >= bitrateThreshold)
-                    bitrateStats.recordedBytes += itrLowLeft->getFileSize() * persentUsage;
+                if (itrLowLeft->startTimeMs >= averagingStartTime)
+                    recordedBytesForPeriod += itrLowLeft->getFileSize() * percentUsage;
             }
-            else {
+            else
+            {
                 // inc time if no HQ
-                result.recordedSecs += itrLowLeft->durationMs * persentUsage;
+                totalRecordedMs += itrLowLeft->durationMs * percentUsage;
             }
         }
 
@@ -1564,10 +1568,16 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
         currentTime = nextTime;
     }
 
-    result.recordedSecs /= 1000;   // msec to sec
-    bitrateStats.recordedSecs /= 1000; // msec to sec
-    if (bitrateStats.recordedBytes > 0 && bitrateStats.recordedSecs > 0)
-        result.averageBitrate = bitrateStats.recordedBytes / (qreal) bitrateStats.recordedSecs;
+    result.archiveDurationSecs = qMax(0ll, (qnSyncTime->currentMSecsSinceEpoch() - archiveStartTimeMs) / 1000);
+    result.recordedBytes = totalRecordedBytes;
+    result.recordedSecs = totalRecordedMs / 1000;   // msec to sec
+
+    if (recordedBytesForPeriod > 0)
+    {
+        result.averageDensity = (qint64) (recordedBytesForPeriod / (qreal) averagingPeriodMs * 1000);
+        if (recordedMsForPeriod > 0)
+            result.averageBitrate = (qint64) (recordedBytesForPeriod / (qreal) recordedMsForPeriod * 1000);
+    }
     NX_ASSERT(result.averageBitrate >= 0);
     return result;
 }
@@ -2502,7 +2512,6 @@ void QnStorageManager::startAuxTimerTasks()
         },
         kRemoveEmptyDirsInterval,
         kRemoveEmptyDirsInterval);
-
 
     static const std::chrono::seconds kTestStorageInterval(40);
     m_auxTasksTimerManager.addNonStopTimer(
