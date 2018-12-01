@@ -2,6 +2,8 @@
 
 #include "log_logger.h"
 
+#include <nx/utils/system_error.h>
+
 namespace nx {
 namespace utils {
 namespace log {
@@ -111,13 +113,18 @@ inline Stream makeStream(Level level, const Tag& tag)
 
 } // namespace detail
 
+/**
+ * NOTE: Preserves current system error code (SystemError::getLastOSErrorCode()).
+ */
 #define NX_UTILS_LOG_MESSAGE(LEVEL, TAG, ...) do \
 { \
     struct ScopeTag{}; /*< Used by NX_SCOPE_TAG to get scope from demangled type_info::name(). */ \
     if (static_cast<nx::utils::log::Level>(LEVEL) <= nx::utils::log::maxLevel()) \
     { \
+        const auto systemErrorBak = SystemError::getLastOSErrorCode(); \
         if (auto helper = nx::utils::log::detail::Helper((LEVEL), (TAG))) \
             helper.log(nx::utils::log::makeMessage(__VA_ARGS__)); \
+        SystemError::setLastErrorCode(systemErrorBak); \
     } \
 } while (0)
 
