@@ -83,6 +83,10 @@ http {
             try_files ${DOLLAR}uri ${DOLLAR}uri/ @proxy_to_app;
         }
 
+        location ~* .php$ {
+            return 404;
+        }
+
         location /api/cloud_modules {
             index static/index.html;
 
