@@ -50,6 +50,7 @@ inline int runTest(
     if (gtestRunFlags & GtestRunFlag::gtestThrowOnFailure)
         extendedArgs.push_back("--gtest_throw_on_failure");
     argc = (int)extendedArgs.size();
+    extendedArgs.push_back(nullptr);
 
     // NOTE: On osx InitGoogleTest(...) should be called independent of InitGoogleMock(...).
     ::testing::InitGoogleTest(&argc, (char**) extendedArgs.data());

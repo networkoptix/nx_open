@@ -430,8 +430,9 @@ protected:
         ASSERT_TRUE(one->isWriteThirsty());
 
         ASSERT_GT(another->read(buf.data(), buf.size()), 0);
-        ASSERT_GT(one->write(buf.data(), buf.size()), 0);
-        ASSERT_FALSE(one->isWriteThirsty());
+        
+        // NOTE: SSL pipeline cannot recover from write errors.
+        ASSERT_LT(one->write(buf.data(), buf.size()), 0);
     }
 };
 
