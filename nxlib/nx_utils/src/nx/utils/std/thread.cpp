@@ -53,8 +53,14 @@ thread::thread(nx::utils::MoveOnlyFunc<void()> threadFunc) noexcept(false):
     m_threadFunc(std::move(threadFunc))
 {
     start();
+
+    // NOTE: m_threadCanBeStarted is used to make sure that thread does not exit before we check 
+    // isRunning(). Without it we would not be unable to distinguish thread start error from a 
+    // very fast thread. 
     if (!isRunning())
         throw std::system_error(std::make_error_code(std::errc::resource_unavailable_try_again));
+
+    m_threadCanBeStarted.set_value();
 
     m_idFilledPromise.get_future().wait();
 }
@@ -81,6 +87,8 @@ uintptr_t thread::native_handle() const
 
 void thread::run()
 {
+    m_threadCanBeStarted.get_future().wait();
+
     m_id = std::this_thread::get_id();
     m_nativeHandle = currentThreadSystemId();
     m_idFilledPromise.set_value();
