@@ -123,20 +123,11 @@ api::ResultCode Ec2MserverCloudSynchronization::unbindSystem()
     if (!findAdminUserId(&adminUserId))
         return api::ResultCode::unknownError;
 
-    nx::vms::api::ResourceParamWithRefDataList params;
-    params.emplace_back(nx::vms::api::ResourceParamWithRefData(
-        adminUserId,
-        "cloudSystemID",
-        QString()));
-    params.emplace_back(nx::vms::api::ResourceParamWithRefData(
-        adminUserId,
-        "cloudAuthKey",
-        QString()));
-    if (m_appserver2.moduleInstance()->ecConnection()->getResourceManager(Qn::kSystemAccess)
-            ->saveSync(params) != ::ec2::ErrorCode::ok)
-    {
-        return api::ResultCode::unknownError;
-    }
+    auto settings =
+        m_appserver2.moduleInstance()->ecConnection()->commonModule()->globalSettings();
+    settings->setCloudSystemId(QString());
+    settings->setCloudAuthKey(QString());
+    settings->synchronizeNow();
 
     return api::ResultCode::ok;
 }
@@ -171,20 +162,10 @@ api::ResultCode Ec2MserverCloudSynchronization::saveCloudSystemCredentials(
     if (!findAdminUserId(&adminUserId))
         return api::ResultCode::unknownError;
 
-    nx::vms::api::ResourceParamWithRefDataList params;
-    params.emplace_back(nx::vms::api::ResourceParamWithRefData(
-        adminUserId,
-        "cloudSystemID",
-        QString::fromStdString(m_system.id)));
-    params.emplace_back(nx::vms::api::ResourceParamWithRefData(
-        adminUserId,
-        "cloudAuthKey",
-        QString::fromStdString(m_system.authKey)));
-    if (m_appserver2.moduleInstance()->ecConnection()->getResourceManager(Qn::kSystemAccess)
-            ->saveSync(params) != ::ec2::ErrorCode::ok)
-    {
-        return api::ResultCode::unknownError;
-    }
+    auto settings = m_appserver2.moduleInstance()->ecConnection()->commonModule()->globalSettings();
+    settings->setCloudSystemId(QString::fromStdString(m_system.id));
+    settings->setCloudAuthKey(QString::fromStdString(m_system.authKey));
+    settings->synchronizeNow();
 
     return api::ResultCode::ok;
 }
