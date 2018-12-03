@@ -9,7 +9,6 @@
 
 #include <nx/cloud/db/client/cdb_request_path.h>
 #include <nx/cloud/db/client/data/types.h>
-#include <nx/email/mustache/mustache_helper.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/fusion/serialization/sql.h>
 #include <nx/fusion/serialization/sql_functions.h>
