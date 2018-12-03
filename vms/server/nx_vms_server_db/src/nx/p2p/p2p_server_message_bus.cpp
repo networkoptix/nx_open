@@ -733,8 +733,20 @@ void ServerMessageBus::gotTransaction(
             dbTran->commit();
             m_peers->updateLocalDistance(peerId, tran.persistentInfo.sequence);
             proxyFillerTransaction(tran, transportHeader);
+
+            NX_VERBOSE(this,
+                lit("Skip transaction because of timestamp: %1, seq: %2, timestamp: %3")
+                    .arg(ApiCommand::toString(tran.command))
+                    .arg(tran.persistentInfo.sequence)
+                    .arg(tran.persistentInfo.timestamp.toString()));
             return;
         case ErrorCode::containsBecauseSequence:
+
+            NX_VERBOSE(this,
+                lit("Skip transaction because of sequence: %1, seq: %2, timestamp: %3")
+                    .arg(ApiCommand::toString(tran.command))
+                    .arg(tran.persistentInfo.sequence)
+                    .arg(tran.persistentInfo.timestamp.toString()));
             dbTran->commit();
             return; // do not proxy if transaction already exists
         default:
