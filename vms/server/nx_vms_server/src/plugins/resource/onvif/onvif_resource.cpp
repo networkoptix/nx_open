@@ -60,36 +60,7 @@
 
 namespace
 {
-    const std::string kOnvifMedia2Namespace("http://www.onvif.org/ver20/media/wsdl");
 
-    const QString kBaselineH264Profile("Baseline");
-    const QString kMainH264Profile("Main");
-    const QString kExtendedH264Profile("Extended");
-    const QString kHighH264Profile("High");
-
-    onvifXsd__H264Profile fromStringToH264Profile(const QString& str)
-    {
-        if (str == kMainH264Profile)
-            return onvifXsd__H264Profile::Main;
-        else if (str == kExtendedH264Profile)
-            return onvifXsd__H264Profile::Extended;
-        else if (str == kHighH264Profile)
-            return onvifXsd__H264Profile::High;
-        else
-            return onvifXsd__H264Profile::Baseline;
-    };
-}
-
-const QString QnPlOnvifResource::MANUFACTURE(lit("OnvifDevice"));
-//static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
-const char* QnPlOnvifResource::ONVIF_PROTOCOL_PREFIX = "http://";
-const char* QnPlOnvifResource::ONVIF_URL_SUFFIX = ":80/onvif/device_service";
-const int QnPlOnvifResource::DEFAULT_IFRAME_DISTANCE = 20;
-const float QnPlOnvifResource::QUALITY_COEF = 0.2f;
-const int QnPlOnvifResource::MAX_AUDIO_BITRATE = 64; //kbps
-const int QnPlOnvifResource::MAX_AUDIO_SAMPLERATE = 32; //khz
-const int QnPlOnvifResource::ADVANCED_SETTINGS_VALID_TIME = 60; //60s
-static const unsigned int DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT = 30;
 // !If renew subscription exactly at termination time, camera can already terminate subscription,
 // so have to do that a little bit earlier..
 static const unsigned int RENEW_NOTIFICATION_FORWARDING_SECS = 5;
@@ -99,29 +70,66 @@ static const int MAX_IO_PORTS_PER_DEVICE = 200;
 static const int DEFAULT_SOAP_TIMEOUT = 10;
 static const quint32 MAX_TIME_DRIFT_UPDATE_PERIOD_MS = 15 * 60 * 1000; // 15 minutes
 
-//Forth times greater than default = 320 x 240
+static const std::string kOnvifMedia2Namespace("http://www.onvif.org/ver20/media/wsdl");
+
+static const QString kBaselineH264Profile("Baseline");
+static const QString kMainH264Profile("Main");
+static const QString kExtendedH264Profile("Extended");
+static const QString kHighH264Profile("High");
+
+onvifXsd__H264Profile fromStringToH264Profile(const QString& str)
+{
+    if (str == kMainH264Profile)
+        return onvifXsd__H264Profile::Main;
+    else if (str == kExtendedH264Profile)
+        return onvifXsd__H264Profile::Extended;
+    else if (str == kHighH264Profile)
+        return onvifXsd__H264Profile::High;
+    else
+        return onvifXsd__H264Profile::Baseline;
+};
+
+void updateTimer(nx::utils::TimerId* timerId, std::chrono::milliseconds timeout,
+    nx::utils::MoveOnlyFunc<void(nx::utils::TimerId)> function)
+{
+    if (*timerId != 0)
+    {
+        nx::utils::TimerManager::instance()->deleteTimer(*timerId);
+        *timerId = 0;
+    }
+
+    *timerId = nx::utils::TimerManager::instance()->addTimer(
+        std::move(function), timeout);
+}
 
 /* Some cameras declare invalid max resolution */
-struct StrictResolution {
+struct StrictResolution
+{
     const char* model;
     QSize maxRes;
 };
 
 // strict maximum resolution for this models
-
 // TODO: #Elric #VASILENKO move out to JSON
 StrictResolution strictResolutionList[] =
 {
     { "Brickcom-30xN", QSize(1920, 1080) }
 };
 
-//width > height is preferred
-static bool resolutionGreaterThan(const QSize &s1, const QSize &s2)
-{
-    long long res1 = s1.width() * s1.height();
-    long long res2 = s2.width() * s2.height();
-    return res1 > res2? true: (res1 == res2 && s1.width() > s2.width()? true: false);
-}
+} // namespace
+
+const QString QnPlOnvifResource::MANUFACTURE(lit("OnvifDevice"));
+const char* QnPlOnvifResource::ONVIF_PROTOCOL_PREFIX = "http://";
+const char* QnPlOnvifResource::ONVIF_URL_SUFFIX = ":80/onvif/device_service";
+const int QnPlOnvifResource::DEFAULT_IFRAME_DISTANCE = 20;
+const float QnPlOnvifResource::QUALITY_COEF = 0.2f;
+const int QnPlOnvifResource::MAX_AUDIO_BITRATE = 64; //kbps
+const int QnPlOnvifResource::MAX_AUDIO_SAMPLERATE = 32; //khz
+const int QnPlOnvifResource::ADVANCED_SETTINGS_VALID_TIME = 60; //60s
+static const unsigned int DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT = 30;
+
+//-------------------------------------------------------------------------------------------------
+// QnOnvifServiceUrls
 
 QString QnOnvifServiceUrls::getUrl(OnvifWebService onvifWebService) const
 {
@@ -138,6 +146,9 @@ QString QnOnvifServiceUrls::getUrl(OnvifWebService onvifWebService) const
         .arg(static_cast<int>(onvifWebService)));
     return QString();
 }
+
+//-------------------------------------------------------------------------------------------------
+// QnPlOnvifResource::VideoOptionsLocal
 
 QnPlOnvifResource::VideoOptionsLocal::VideoOptionsLocal(
     const QString& id,
@@ -203,7 +214,8 @@ QnPlOnvifResource::VideoOptionsLocal::VideoOptionsLocal(
     }
 }
 
-QnPlOnvifResource::VideoOptionsLocal::VideoOptionsLocal(const QString& id,
+QnPlOnvifResource::VideoOptionsLocal::VideoOptionsLocal(
+    const QString& id,
     const onvifXsd__VideoEncoder2ConfigurationOptions& resp,
     QnBounds frameRateBounds)
     :
@@ -267,10 +279,11 @@ QnPlOnvifResource::VideoOptionsLocal::VideoOptionsLocal(const QString& id,
     maxQ = round(options.qualityRange.high);
 }
 
-std::vector<QnPlOnvifResource::VideoOptionsLocal> QnPlOnvifResource::VideoOptionsLocal::
-createVideoOptionsLocalList(const QString& id,
-    const onvifXsd__VideoEncoderConfigurationOptions& options,
-    QnBounds frameRateBounds)
+std::vector<QnPlOnvifResource::VideoOptionsLocal>
+    QnPlOnvifResource::VideoOptionsLocal::createVideoOptionsLocalList(
+        const QString& id,
+        const onvifXsd__VideoEncoderConfigurationOptions& options,
+        QnBounds frameRateBounds)
 {
     std::vector<QnPlOnvifResource::VideoOptionsLocal> result;
     constexpr int maxCount = 2; // H264 + JPEG
@@ -294,8 +307,13 @@ int QnPlOnvifResource::VideoOptionsLocal::restrictFrameRate(
     if (frameRateBounds.isNull())
         return frameRate;
 
-    return qBound((int)frameRateBounds.min, frameRate, (int)frameRateBounds.max);
+    return qBound((int) frameRateBounds.min, frameRate, (int) frameRateBounds.max);
 }
+
+//-------------------------------------------------------------------------------------------------
+
+namespace
+{
 
 using VideoOptionsComparator = std::function<bool(
     const QnPlOnvifResource::VideoOptionsLocal&,
@@ -332,7 +350,7 @@ bool videoOptsGreaterThan(
     if (square1Max != square2Max)
         return square1Max > square2Max;
 
-    //for equal resolutions the rule is: H265 > H264 > JPEG
+    // For equal resolutions the rule is: H265 > H264 > JPEG.
     if (s1.encoding != s2.encoding)
         return s1.encoding > s2.encoding;
 
@@ -343,6 +361,8 @@ bool videoOptsGreaterThan(
 
     return s1.id > s2.id; // sort by name
 }
+
+} // namespace
 
 bool compareByProfiles(
     const QnPlOnvifResource::VideoOptionsLocal &s1,
@@ -384,22 +404,8 @@ VideoOptionsComparator createComparator(const QString& profiles)
     return videoOptsGreaterThan;
 }
 
-static void updateTimer(nx::utils::TimerId* timerId, std::chrono::milliseconds timeout,
-    nx::utils::MoveOnlyFunc<void(nx::utils::TimerId)> function)
-{
-    if (*timerId != 0)
-    {
-        nx::utils::TimerManager::instance()->deleteTimer(*timerId);
-        *timerId = 0;
-    }
-
-    *timerId = nx::utils::TimerManager::instance()->addTimer(
-        std::move(function), timeout);
-}
-
-//
+//-------------------------------------------------------------------------------------------------
 // QnPlOnvifResource
-//
 
 QnPlOnvifResource::QnPlOnvifResource(QnMediaServerModule* serverModule):
     base_type(serverModule),
@@ -441,7 +447,7 @@ QnPlOnvifResource::~QnPlOnvifResource()
 
             lk.unlock();
 
-            // Garantees that no onTimer(timerID) is running on return.
+            // Guarantees that no onTimer(timerID) is running on return.
             nx::utils::TimerManager::instance()->joinAndDeleteTimer(timerID);
             if (!outputTask.active)
             {
@@ -485,7 +491,6 @@ const QString QnPlOnvifResource::fetchMacAddress(
 
             if (conf->DHCP && conf->FromDHCP)
             {
-                // TODO: #vasilenko UTF unuse std::string
                 if (senderIpAddress == QString::fromStdString(conf->FromDHCP->Address))
                 {
                     return QString::fromStdString(ifacePtr->Info->HwAddress).toUpper()
@@ -499,7 +504,7 @@ const QString QnPlOnvifResource::fetchMacAddress(
 
             std::vector<class onvifXsd__PrefixedIPv4Address*> addresses = conf->Manual;
             std::vector<class onvifXsd__PrefixedIPv4Address*>::const_iterator addrPtrIter =
-                addresses.begin();
+                addresses.cbegin();
 
             for (; addrPtrIter != addresses.end(); ++addrPtrIter)
             {
@@ -507,7 +512,6 @@ const QString QnPlOnvifResource::fetchMacAddress(
                 if (!addrPtr)
                     continue;
 
-                // TODO: #vasilenko UTF unuse std::string
                 if (senderIpAddress == QString::fromStdString(addrPtr->Address))
                 {
                     return QString::fromStdString(ifacePtr->Info->HwAddress).toUpper()
@@ -526,7 +530,6 @@ const QString QnPlOnvifResource::fetchMacAddress(
 
 void QnPlOnvifResource::setHostAddress(const QString &ip)
 {
-    //nx::vms::server::resource::Camera::se
     {
         QnMutexLocker lock(&m_mutex);
 
@@ -555,12 +558,6 @@ const QString QnPlOnvifResource::createOnvifEndpointUrl(const QString& ipAddress
     return QLatin1String(ONVIF_PROTOCOL_PREFIX) + ipAddress + QLatin1String(ONVIF_URL_SUFFIX);
 }
 
-typedef GSoapAsyncCallWrapper <
-    DeviceSoapWrapper,
-    NetIfacesReq,
-    NetIfacesResp
-> GSoapDeviceGetNetworkIntfAsyncWrapper;
-
 void QnPlOnvifResource::checkIfOnlineAsync(std::function<void(bool)> completionHandler)
 {
     QAuthenticator auth = getAuth();
@@ -579,6 +576,11 @@ void QnPlOnvifResource::checkIfOnlineAsync(std::function<void(bool)> completionH
         auth.user(),
         auth.password(),
         m_timeDrift));
+
+    using GSoapDeviceGetNetworkIntfAsyncWrapper = GSoapAsyncCallWrapper<
+        DeviceSoapWrapper,
+        NetIfacesReq,
+        NetIfacesResp>;
 
     // Trying to get HardwareId.
     auto asyncWrapper = std::make_shared<GSoapDeviceGetNetworkIntfAsyncWrapper>(
@@ -762,7 +764,6 @@ CameraDiagnostics::Result QnPlOnvifResource::initOnvifCapabilitiesAndUrls(
     DeviceSoapWrapper& deviceSoapWrapper,
     CapabilitiesResp* outCapabilitiesResponse)
 {
-
     if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
@@ -780,7 +781,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initOnvifCapabilitiesAndUrls(
 
     QString media2ServiceUrl;
     fetchOnvifMedia2Url(&media2ServiceUrl); //< We ignore the result,
-    // because old devices may not support Device::getServices request
+    // because old devices may not support Device::getServices request.
 
     setMedia2Url(media2ServiceUrl);
 
@@ -824,8 +825,8 @@ CameraDiagnostics::Result QnPlOnvifResource::initializePtz(
     if (!result)
     {
         return CameraDiagnostics::RequestFailedResult(
-            lit("Fetch Onvif PTZ configurations."),
-            lit("Can not fetch Onvif PTZ configurations."));
+            "Fetch ONVIF PTZ configurations.",
+            "Can not fetch ONVIF PTZ configurations.");
     }
 
     return CameraDiagnostics::NoErrorResult();
@@ -840,7 +841,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(
     m_fixWrongInputPortNumber = resourceData.value(QString("fixWrongInputPortNumber"), false);
     m_fixWrongOutputPortToken = resourceData.value(QString("fixWrongOutputPortToken"), false);
 
-    //registering onvif event handler
+    // Registering ONVIF event handler.
     std::vector<QnPlOnvifResource::RelayOutputInfo> RelayOutputInfoList;
     fetchRelayOutputs(&RelayOutputInfoList);
     if (!RelayOutputInfoList.empty())
@@ -880,11 +881,8 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(
             QnIOPortDataList result;
             if (portCount > MAX_IO_PORTS_PER_DEVICE)
             {
-                NX_WARNING(
-                    this,
-                    lm("Device %1 (%2) reports too many input ports (%3).")
-                        .args(getName(), getId(), portCount));
-
+                NX_WARNING(this, "1%(): Device %2 (%3) reports too many input ports (%4).",
+                    __func__, getName(), getId(), portCount);
                 return result;
             }
 
@@ -4313,7 +4311,6 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchOnvifCapabilities(
     DeviceSoapWrapper& soapWrapper,
     CapabilitiesResp* response)
 {
-    //Trying to get onvif URLs
     CapabilitiesReq request;
     int soapRes = soapWrapper.getCapabilities(request, *response);
     if (soapRes != SOAP_OK)
