@@ -12,7 +12,9 @@ ${url}             ${ENV}
 
 *** Keywords ***
 Restart
-    Go To    ${url}
+    Close Browser
+    Open Browser and go to URL    ${url}
+
 *** Test Cases ***
 About page is correctly displayed
     [tags]    C41541
@@ -65,7 +67,7 @@ Copyright leads to the proper site
     Wait Until Element Is Visible    ${FOOTER COPYRIGHT LINK}
     Click Link    ${FOOTER COPYRIGHT LINK}
     ${tabs}    Get Window Handles
-    Select Window    @{tabs}[4]
+    Select Window    @{tabs}[1]
     Location Should Be    ${COPYRIGHT URL}
 
 Change interface language

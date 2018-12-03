@@ -23,7 +23,7 @@
     "CONFIRMATION MESSAGE IS SENT TO": "Messaggio di conferma viene inviato a %email%",
     "CANNOT SAVE PASSWORD": "Impossibile salvare la password:",
     "PASSWORD INCORRECT": "Password corrente non è corretta.",
-    "TOO MANY ATTEMPTS TEXT": "Troppi tentativi. Riprovare tra un minuto.",
+    "TOO MANY ATTEMPTS TEXT": "Troppi tentativi. Riprova tra un minuto.",
     "WRONG PASSWORD": "Password errata",
     "ACCOUNT NOT FOUND TEXT": "Account non trovato",
     "CANNOT SEND CONFIRMATION EMAIL": "Non è possibile inviare e-mail di conferma:",
