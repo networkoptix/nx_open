@@ -150,7 +150,7 @@ struct EventTile::Private
     {
         if (list.empty())
         {
-            q->ui->resourceListLabel->hide();
+            q->ui->resourceListHolder->hide();
             q->ui->resourceListLabel->setText({});
         }
         else
@@ -170,7 +170,7 @@ struct EventTile::Private
             }
 
             q->ui->resourceListLabel->setText(text);
-            q->ui->resourceListLabel->show();
+            q->ui->resourceListHolder->show();
         }
     }
 
@@ -232,7 +232,7 @@ EventTile::EventTile(QWidget* parent):
     ui->timestampLabel->hide();
     ui->actionHolder->hide();
     ui->footerLabel->hide();
-    ui->resourceListLabel->hide();
+    ui->resourceListHolder->hide();
     ui->progressDescriptionLabel->hide();
     ui->narrowHolder->hide();
     ui->wideHolder->hide();
