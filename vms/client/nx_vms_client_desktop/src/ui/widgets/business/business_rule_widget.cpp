@@ -584,7 +584,9 @@ void QnBusinessRuleWidget::updateWarningLabel()
         && m_model->actionType() == ActionType::showPopupAction
         && m_model->actionParams().needConfirmation)
         {
-            static const QString warning = tr("Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL");
+            static const QString warning = tr(
+                "Force Acknowledgement will only work for Generic Events"
+                " if camera modifiers are used in the Generic Event URL");
             ui->actionWarningLabel->setText(warning);
             ui->actionWarningLabel->show();
             return;
