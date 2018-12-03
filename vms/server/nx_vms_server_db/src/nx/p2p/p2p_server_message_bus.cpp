@@ -374,6 +374,7 @@ void ServerMessageBus::commitLazyData()
         dbTran.commit();
         m_dbCommitTimer.restart();
     }
+    emit lazyDataCommtDone();
 }
 
 void ServerMessageBus::stop()
