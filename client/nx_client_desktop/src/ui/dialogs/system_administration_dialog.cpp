@@ -47,7 +47,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent)
     addPage(CloudManagement,        new QnCloudManagementWidget(this),      nx::network::AppInfo::cloudName());
 
     loadDataToUi();
-    autoResizePagesToContents(ui->tabWidget,  { QSizePolicy::Preferred, QSizePolicy::Preferred }, false);
+    autoResizePagesToContents(ui->tabWidget, {QSizePolicy::Preferred, QSizePolicy::Preferred}, true);
 
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
