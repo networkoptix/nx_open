@@ -184,9 +184,6 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     connect(m_serverUpdateTool.get(), &ServerUpdateTool::packageDownloadFailed,
         this, &MultiServerUpdatesWidget::atServerPackageDownloadFailed);
 
-    void packageDownloaded(const nx::update::Package& package);
-    void packageDownloadFailed(const nx::update::Package& package);
-
     connect(ui->cancelProgressAction, &QPushButton::clicked, this,
         &MultiServerUpdatesWidget::atCancelCurrentAction);
 

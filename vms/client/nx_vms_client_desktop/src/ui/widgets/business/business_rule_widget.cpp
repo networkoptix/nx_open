@@ -268,6 +268,8 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
         if (ui->commentsLineEdit->text() != text)
             ui->commentsLineEdit->setText(text);
     }
+
+    updateWarningLabel();
 }
 
 void QnBusinessRuleWidget::initEventParameters()
@@ -574,4 +576,21 @@ void QnBusinessRuleWidget::at_scheduleButton_clicked()
     if (!dialog->exec())
         return;
     m_model->setSchedule(dialog->scheduleTasks());
+}
+
+void QnBusinessRuleWidget::updateWarningLabel()
+{
+    if (m_model->eventType() == EventType::userDefinedEvent
+        && m_model->actionType() == ActionType::showPopupAction
+        && m_model->actionParams().needConfirmation)
+        {
+            static const QString warning = tr(
+                "Force Acknowledgement will only work for Generic Events"
+                " if camera modifiers are used in the Generic Event URL");
+            ui->actionWarningLabel->setText(warning);
+            ui->actionWarningLabel->show();
+            return;
+        }
+
+    ui->actionWarningLabel->hide();
 }
