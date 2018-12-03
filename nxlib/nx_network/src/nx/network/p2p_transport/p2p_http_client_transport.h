@@ -14,8 +14,13 @@ private:
     using HttpClientPtr = std::unique_ptr<nx::network::http::AsyncClient>;
 
 public:
-    P2PHttpClientTransport(HttpClientPtr readHttpClient,
-        websocket::FrameType frameType = websocket::FrameType::binary);
+    /**
+     * @param url If set used instead of readHttpClient->url().
+     */
+    P2PHttpClientTransport(
+        HttpClientPtr readHttpClient,
+        websocket::FrameType frameType = websocket::FrameType::binary,
+        const boost::optional<utils::Url>& url = boost::none);
 
     virtual ~P2PHttpClientTransport() override;
 
@@ -59,6 +64,7 @@ private:
     bool m_postInProgress = false;
     websocket::FrameType m_messageType;
     bool m_failed = false;
+    boost::optional<utils::Url> m_url;
 
     void startReading();
 };

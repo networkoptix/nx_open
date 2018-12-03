@@ -51,8 +51,13 @@ P2PHttpServerTransport::~P2PHttpServerTransport()
 
 void P2PHttpServerTransport::gotPostConnection(std::unique_ptr<AbstractStreamSocket> socket)
 {
-    m_readSocket = std::move(socket);
-    m_readSocket->bindToAioThread(m_sendSocket->getAioThread());
+    m_sendSocket->post(
+        [this, socket = std::move(socket)]() mutable
+        {
+            m_readSocket = std::move(socket);
+            m_readSocket->setNonBlockingMode(true);
+            m_readSocket->bindToAioThread(m_sendSocket->getAioThread());
+        });
 }
 
 void P2PHttpServerTransport::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler)
@@ -91,31 +96,94 @@ void P2PHttpServerTransport::onBytesRead(
         return;
     }
 
-    size_t bytesProcessed;
-    const auto parserState = m_readContext.parser.parse(m_readContext.buffer, &bytesProcessed);
-    m_readContext.bytesParsed += bytesProcessed;
+    size_t totalBytesProcessed = 0;
 
-    switch(parserState)
+    while (totalBytesProcessed != transferred)
     {
-    case server::ParserState::done:
-        *buffer = m_readContext.message.response->messageBody;
-        handler(SystemError::noError, m_readContext.bytesParsed);
-        m_readContext.reset();
-        break;
-    case server::ParserState::failed:
-        handler(SystemError::invalidData, 0);
-        m_readContext.reset();
-        break;
-    case server::ParserState::readingBody:
-    case server::ParserState::readingMessage:
-        readFromSocket(buffer, std::move(handler));
-        break;
-    case server::ParserState::init:
-        NX_ASSERT(false, "Should never get here");
-        handler(SystemError::invalidData, 0);
-        m_readContext.reset();
-        break;
+        size_t bytesProcessed = 0;
+        const auto parserState = m_readContext.parser.parse(m_readContext.buffer, &bytesProcessed);
+        m_readContext.bytesParsed += bytesProcessed;
+        totalBytesProcessed += bytesProcessed;
+
+        switch(parserState)
+        {
+        case server::ParserState::done:
+            buffer->append(m_readContext.parser.fetchMessageBody());
+            sendResponse(
+                SystemError::noError,
+                [this, handler = std::move(handler)](SystemError::ErrorCode error)
+                {
+                    handler(error, m_readContext.bytesParsed);
+                    m_readContext.reset();
+                });
+            return;
+        case server::ParserState::failed:
+            sendResponse(
+                SystemError::invalidData,
+                [this, handler = std::move(handler)](SystemError::ErrorCode error)
+                {
+                    handler(error, 0);
+                    m_readContext.reset();
+                });
+            return;
+        case server::ParserState::readingBody:
+        case server::ParserState::readingMessage:
+            buffer->append(m_readContext.parser.fetchMessageBody());
+            m_readContext.buffer.remove(0, totalBytesProcessed);
+            break;
+        case server::ParserState::init:
+            NX_ASSERT(false, "Should never get here");
+            sendResponse(
+                SystemError::invalidData,
+                [this, handler = std::move(handler)](SystemError::ErrorCode error)
+                {
+                    handler(error, 0);
+                    m_readContext.reset();
+                });
+            return;
+        }
     }
+
+    m_readContext.buffer.remove(0, totalBytesProcessed);
+    readFromSocket(buffer, std::move(handler));
+}
+
+void P2PHttpServerTransport::addDateHeader(http::HttpHeaders* headers)
+{
+    using namespace std::chrono;
+    const auto dateTime = QDateTime::fromMSecsSinceEpoch(
+        duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count());
+    headers->emplace("Date", http::formatDateTime(dateTime));
+}
+
+void P2PHttpServerTransport::sendResponse(
+    SystemError::ErrorCode error,
+    utils::MoveOnlyFunc<void(SystemError::ErrorCode)> completionHandler)
+{
+    http::Response response;
+    response.statusLine.statusCode = error == SystemError::noError
+        ? http::StatusCode::ok
+        : http::StatusCode::internalServerError;
+    response.statusLine.version = http::http_1_1;
+    addDateHeader(&response.headers);
+
+    response.serialize(&m_responseBuffer);
+
+    m_readSocket->sendAsync(
+        m_responseBuffer,
+        [this, readError = error, completionHandler = std::move(completionHandler)](
+            SystemError::ErrorCode error,
+            size_t transferred)
+        {
+            m_responseBuffer.clear();
+            if (readError != SystemError::noError)
+                return completionHandler(readError);
+
+            if (error != SystemError::noError)
+                return completionHandler(error);
+
+            completionHandler(SystemError::noError);
+        });
 }
 
 void P2PHttpServerTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
@@ -143,6 +211,7 @@ void P2PHttpServerTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
                         this,
                         lm("Send completed. error: %1, transferred: %2").args(error, transferred));
                     m_sendBuffer.clear();
+                    m_sendBuffer.reserve(4096);
                     handler(error, transferred);
                 });
         });
@@ -160,6 +229,7 @@ QByteArray P2PHttpServerTransport::makeInitialResponse() const
     headers.emplace("Content-Type", "multipart/mixed; boundary=ec2boundary");
     headers.emplace("Access-Control-Allow-Origin", "*");
     headers.emplace("Connection", "Keep-Alive");
+    addDateHeader(&headers);
 
     nx::Buffer result;
     initialResponse.serialize(&result);
@@ -223,7 +293,8 @@ void P2PHttpServerTransport::ReadContext::reset()
 {
     message = http::Message();
     parser.reset();
-    buffer.remove(0, bytesParsed);
+    buffer.clear();
+    buffer.reserve(4096);
     bytesParsed = 0;
 }
 

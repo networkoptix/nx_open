@@ -18,7 +18,8 @@ public:
 
     void gotPostConnection(std::unique_ptr<AbstractStreamSocket> socket);
     /**
-     * This should be called before all other operations
+     * This should be called before all other operations. Transport becomes operational only after
+     * onGetRequestReceived() callback is fired.
      */
     void start(utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onGetRequestReceived);
 
@@ -45,6 +46,7 @@ private:
     std::unique_ptr<AbstractStreamSocket> m_readSocket;
     websocket::FrameType m_messageType;
     nx::Buffer m_sendBuffer;
+    nx::Buffer m_responseBuffer;
     bool m_firstSend = true;
     ReadContext m_readContext;
     aio::Timer m_timer;
@@ -60,6 +62,10 @@ private:
     void readFromSocket(nx::Buffer* const buffer, IoCompletionHandler handler);
     QByteArray makeInitialResponse() const;
     QByteArray makeFrameHeader() const;
+    void sendResponse(
+        SystemError::ErrorCode error,
+        utils::MoveOnlyFunc<void(SystemError::ErrorCode)> completionHandler);
+    static void addDateHeader(http::HttpHeaders* headers);
 };
 
 } // namespace nx::network

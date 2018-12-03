@@ -14,11 +14,20 @@ static const int kMaxMessageQueueSize = 100;
 
 P2PHttpClientTransport::P2PHttpClientTransport(
     HttpClientPtr readHttpClient,
-    websocket::FrameType messageType)
+    websocket::FrameType messageType,
+    const boost::optional<utils::Url>& url)
     :
+    m_writeHttpClient(new http::AsyncClient),
     m_readHttpClient(std::move(readHttpClient)),
-    m_messageType(messageType)
+    m_messageType(messageType),
+    m_url(url)
 {
+    using namespace std::chrono_literals;
+    m_readHttpClient->setResponseReadTimeout(0ms);
+    m_readHttpClient->setMessageBodyReadTimeout(0ms);
+    //m_writeHttpClient->setSendTimeout(60s);
+    //m_writeHttpClient->setResponseReadTimeout(60s);
+
     m_readHttpClient->post([this]() { startReading(); });
 }
 
@@ -86,7 +95,7 @@ void P2PHttpClientTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
                 buffer));
 
             m_writeHttpClient->doPost(
-                m_readHttpClient->url(),
+                m_url ? *m_url : m_readHttpClient->url(),
                 [this, handler = std::move(handler), bufferSize = buffer.size()]
                 {
                     const bool isResponseValid = m_writeHttpClient->response()
@@ -207,7 +216,7 @@ void P2PHttpClientTransport::startReading()
              m_failed = true;
          });
 
-    m_readHttpClient->doGet(m_readHttpClient->url());
+    m_readHttpClient->doGet(m_url ? *m_url : m_readHttpClient->url());
 }
 
 P2PHttpClientTransport::PostBodySource::PostBodySource(

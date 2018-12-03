@@ -2,259 +2,248 @@
 #include <nx/network/p2p_transport/p2p_http_server_transport.h>
 #include <nx/network/p2p_transport/p2p_http_client_transport.h>
 #include <nx/network/socket_factory.h>
+#include <nx/network/http/server/http_server_connection.h>
 #include <nx/utils/std/future.h>
 
 namespace nx::network::test {
 
-class ConnectedSocketsSupplier
-{
-public:
-    ConnectedSocketsSupplier();
-    ~ConnectedSocketsSupplier();
-
-    bool connectSockets();
-    std::unique_ptr<AbstractStreamSocket> clientSocket();
-    std::unique_ptr<AbstractStreamSocket> serverSocket();
-    std::string lastError();
-
-private:
-    std::unique_ptr<AbstractStreamServerSocket> m_acceptor;
-    std::unique_ptr<AbstractStreamSocket> m_clientSocket;
-    std::unique_ptr<AbstractStreamSocket> m_acceptedClientSocket;
-    std::string m_lastError;
-    nx::utils::promise<std::string> m_connectedPromise;
-    nx::utils::future<std::string> m_connectedFuture;
-
-    template<typename F>
-    bool checkedCall(F f, const std::string& errorString);
-    bool initAcceptor();
-    bool initClientSocket();
-    bool ok() const;
-    void onAccept(
-        SystemError::ErrorCode ecode,
-        std::unique_ptr<AbstractStreamSocket> acceptedSocket);
-    bool connect();
-};
-
-ConnectedSocketsSupplier::ConnectedSocketsSupplier():
-    m_connectedFuture(m_connectedPromise.get_future())
-{
-    if(!initAcceptor())
-        return;
-
-    initClientSocket();
-}
-
-ConnectedSocketsSupplier::~ConnectedSocketsSupplier()
-{
-    if (m_acceptor)
-        m_acceptor->pleaseStopSync();
-
-    if (m_clientSocket)
-        m_clientSocket->pleaseStopSync();
-
-    if (m_acceptedClientSocket)
-        m_acceptedClientSocket->pleaseStopSync();
-}
-
-bool ConnectedSocketsSupplier::initAcceptor()
-{
-    if (!checkedCall(
-            [this]()
-            {
-                return (bool) (m_acceptor = std::unique_ptr<AbstractStreamServerSocket>(
-                    SocketFactory::createStreamServerSocket()));
-            },
-            "SocketFactory::createStreamServerSocket"))
-    {
-        return false;
-    }
-
-    if (!checkedCall(
-            [this]() { return m_acceptor->setNonBlockingMode(true); },
-            "acceptor::setNonBlockingMode"))
-    {
-        return false;
-    }
-
-    if (!checkedCall(
-            [this]() { return m_acceptor->bind(SocketAddress::anyPrivateAddress); },
-            "acceptor::bind"))
-    {
-        return false;
-    }
-
-    return checkedCall(
-            [this]() { return m_acceptor->listen(); },
-            "acceptor::listen");
-}
-
-bool ConnectedSocketsSupplier::initClientSocket()
-{
-    if (!checkedCall(
-            [this]()
-            {
-                return (bool) (m_clientSocket = SocketFactory::createStreamSocket());
-            },
-            "SocketFactory::createStreamSocket"))
-    {
-        return false;
-    }
-
-    return checkedCall(
-            [this]() { return m_clientSocket->setNonBlockingMode(true); },
-            "clientSocket::setNonBlockingMode");
-}
-
-template<typename F>
-bool ConnectedSocketsSupplier::checkedCall(F f, const std::string& errorString)
-{
-    if (f())
-        return true;
-
-    m_lastError = errorString + " failed";
-    return false;
-}
-
-
-bool ConnectedSocketsSupplier::connectSockets()
-{
-    if (!ok())
-        return false;
-
-    using namespace std::placeholders;
-    m_acceptor->acceptAsync(std::bind(&ConnectedSocketsSupplier::onAccept, this, _1, _2));
-
-    return connect();
-}
-
-bool ConnectedSocketsSupplier::connect()
-{
-    while (!m_clientSocket->connect(
-                m_acceptor->getLocalAddress(),
-                nx::network::deprecated::kDefaultConnectTimeout))
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
-    }
-
-    m_lastError = m_connectedFuture.get();
-    m_acceptor->pleaseStopSync();
-
-    if (!ok())
-        return false;
-
-    return true;
-}
-
-void ConnectedSocketsSupplier::onAccept(
-    SystemError::ErrorCode ecode,
-    std::unique_ptr<AbstractStreamSocket> acceptedSocket)
-{
-    if (SystemError::noError != ecode)
-    {
-        m_connectedPromise.set_value("OnAccept error: " + std::to_string((int) ecode));
-        return;
-    }
-
-    if (!acceptedSocket->setNonBlockingMode(true))
-    {
-        m_connectedPromise.set_value("OnAccept: acceptedSocket::setNonBlockingMode failed");
-        return;
-    }
-
-    m_acceptedClientSocket = std::move(acceptedSocket);
-    m_connectedPromise.set_value(std::string());
-}
-
-bool ConnectedSocketsSupplier::ok() const
-{
-    return m_lastError.empty();
-}
-
-std::unique_ptr<AbstractStreamSocket> ConnectedSocketsSupplier::clientSocket()
-{
-    return std::move(m_clientSocket);
-}
-
-std::unique_ptr<AbstractStreamSocket> ConnectedSocketsSupplier::serverSocket()
-{
-    return std::move(m_acceptedClientSocket);
-}
-
-std::string ConnectedSocketsSupplier::lastError()
-{
-    return m_lastError;
-}
-
 class P2PHttpTransport: public ::testing::Test
 {
 protected:
-    virtual void SetUp() override
+    P2PHttpTransport()
     {
-        ASSERT_TRUE(m_connectedSocketsSupplier.connectSockets());
+        if (!m_serverSendBuffer.isEmpty())
+            return;
+
+        for (int i = 0; i < 10000; ++i)
+        {
+            m_serverSendBuffer.push_back("hello");
+            m_clientSendBuffer.push_back("hello");
+        }
+
+        m_acceptor = SocketFactory::createStreamServerSocket();
+        m_acceptor->setNonBlockingMode(true);
+        m_acceptor->bind(SocketAddress::anyPrivateAddress);
+        m_acceptor->listen();
     }
 
-// private:
+    void givenConnectedP2PTransports()
+    {
+        std::unique_ptr<AbstractStreamSocket> clientSocket;
+        std::unique_ptr<AbstractStreamSocket> serverSocket;
+        createConnectedSockets(&clientSocket, &serverSocket);
+
+        m_acceptor->acceptAsync(
+            [this](
+                SystemError::ErrorCode error,
+                std::unique_ptr<AbstractStreamSocket> acceptedSocket)
+            {
+                ASSERT_EQ(SystemError::noError, error);
+                m_server->gotPostConnection(std::move(acceptedSocket));
+                m_serverPostConnectionPromise.set_value();
+            });
+
+        ASSERT_TRUE((bool) clientSocket);
+        ASSERT_TRUE((bool) serverSocket);
+
+        std::unique_ptr<nx::network::http::AsyncClient> clientHttpClient(
+            new http::AsyncClient(std::move(clientSocket)));
+
+        m_server.reset(new P2PHttpServerTransport(std::move(serverSocket)));
+        m_client.reset(new P2PHttpClientTransport(
+            std::move(clientHttpClient),
+            websocket::binary,
+            utils::Url("http://" + m_acceptor->getLocalAddress().toString() + kPath)));
+
+        utils::promise<void> startedPromise;
+        auto startedFuture = startedPromise.get_future();
+
+        m_server->start(
+            [&](SystemError::ErrorCode error)
+            {
+                ASSERT_EQ(SystemError::noError, error);
+                startedPromise.set_value();
+            });
+
+        startedFuture.wait();
+    }
+
+    void assertDataIsSentFromServerToClientViaGETChannel()
+    {
+        auto connectionContext = std::make_shared<ConnectionContext>();
+        auto readyFuture = connectionContext->promise.get_future();
+
+        m_server->sendAsync(
+            m_serverSendBuffer,
+            [this, connectionContext](
+                SystemError::ErrorCode error,
+                size_t transferred)
+            {
+                onServerSend(connectionContext, error, transferred);
+            });
+
+        m_client->readSomeAsync(
+            &m_clientReadBuffer,
+            [this](SystemError::ErrorCode error, size_t transferred)
+            {
+                onClientRead(error, transferred);
+            });
+
+        readyFuture.wait();
+    }
+
+    void assertDataIsSentFromClientToServerViaPOSTChannel()
+    {
+        auto connectionContext = std::make_shared<ConnectionContext>();
+        auto readyFuture = connectionContext->promise.get_future();
+
+        m_client->sendAsync(
+            m_clientSendBuffer,
+            [this, connectionContext](SystemError::ErrorCode error, size_t transferred)
+            {
+                onClientSend(connectionContext, error, transferred);
+            });
+
+        m_serverPostConnectionFuture.wait();
+        m_server->readSomeAsync(
+            &m_serverReadBuffer,
+            [this](SystemError::ErrorCode error, size_t transferred)
+            {
+                onServerRead(error, transferred);
+            });
+
+        readyFuture.wait();
+    }
+
+private:
+    struct ConnectionContext
+    {
+        int count = 0;
+        nx::utils::promise<void> promise;
+    };
+
+    static const QString kPath;
     std::unique_ptr<P2PHttpServerTransport> m_server;
     std::unique_ptr<P2PHttpClientTransport> m_client;
-    ConnectedSocketsSupplier m_connectedSocketsSupplier;
+    static nx::Buffer m_serverSendBuffer;
+    nx::Buffer m_clientReadBuffer;
+    static nx::Buffer m_clientSendBuffer;
+    nx::Buffer m_serverReadBuffer;
+    std::unique_ptr<AbstractStreamServerSocket> m_acceptor;
+    utils::promise<void> m_serverPostConnectionPromise;
+    utils::future<void> m_serverPostConnectionFuture = m_serverPostConnectionPromise.get_future();
+
+    void createConnectedSockets(
+        std::unique_ptr<AbstractStreamSocket>* clientSocket,
+        std::unique_ptr<AbstractStreamSocket>* serverSocket)
+    {
+        *clientSocket = SocketFactory::createStreamSocket();
+        (*clientSocket)->setNonBlockingMode(true);
+
+
+        nx::utils::promise<void> connectPromise;
+        auto connectFuture = connectPromise.get_future();
+        m_acceptor->acceptAsync(
+            [&](SystemError::ErrorCode ecode, std::unique_ptr<AbstractStreamSocket> acceptedSocket)
+            {
+                *serverSocket = std::move(acceptedSocket);
+                (*serverSocket)->setNonBlockingMode(true);
+                connectPromise.set_value();
+            });
+
+        (*clientSocket)->connect(m_acceptor->getLocalAddress(), std::chrono::milliseconds(0));
+        connectFuture.wait();
+    }
+
+    void onServerSend(
+        std::shared_ptr<ConnectionContext> connectionContext,
+        SystemError::ErrorCode error,
+        size_t transferred)
+    {
+        ASSERT_EQ(SystemError::noError, error);
+        ASSERT_LE(m_serverSendBuffer.size(), transferred);
+
+        if (connectionContext->count++ > 1000)
+        {
+            connectionContext->promise.set_value();
+            return;
+        }
+
+        m_server->sendAsync(
+            m_serverSendBuffer,
+            [this, connectionContext](SystemError::ErrorCode error, size_t transferred)
+            {
+                onServerSend(connectionContext, error, transferred);
+            });
+    }
+
+    void onClientRead(SystemError::ErrorCode error, size_t transferred)
+    {
+        ASSERT_EQ(error, SystemError::noError);
+        ASSERT_EQ(m_serverSendBuffer.size(), transferred);
+        ASSERT_EQ(m_clientReadBuffer, m_serverSendBuffer);
+
+        m_clientReadBuffer.clear();
+        m_client->readSomeAsync(
+            &m_clientReadBuffer,
+            [this](SystemError::ErrorCode error, size_t transferred)
+            {
+                onClientRead(error, transferred);
+            });
+    }
+
+    void onClientSend(
+        std::shared_ptr<ConnectionContext> connectionContext,
+        SystemError::ErrorCode error,
+        size_t transferred)
+    {
+        ASSERT_EQ(SystemError::noError, error);
+        ASSERT_LE(m_clientSendBuffer.size(), transferred);
+
+        if (connectionContext->count++ > 1000)
+        {
+            connectionContext->promise.set_value();
+            return;
+        }
+
+        m_client->sendAsync(
+            m_clientSendBuffer,
+            [this, connectionContext](SystemError::ErrorCode error, size_t transferred)
+            {
+                onClientSend(connectionContext, error, transferred);
+            });
+    }
+
+    void onServerRead(SystemError::ErrorCode error, size_t transferred)
+    {
+        ASSERT_EQ(error, SystemError::noError);
+        ASSERT_LE(m_clientSendBuffer.size(), transferred);
+        ASSERT_EQ(m_serverReadBuffer, m_clientSendBuffer);
+
+        m_serverReadBuffer.clear();
+        m_server->readSomeAsync(
+            &m_serverReadBuffer,
+            [this](SystemError::ErrorCode error, size_t transferred)
+            {
+                onServerRead(error, transferred);
+            });
+    }
 };
+
+nx::Buffer P2PHttpTransport::m_serverSendBuffer;
+nx::Buffer P2PHttpTransport::m_clientSendBuffer;
+const QString P2PHttpTransport::kPath = "/p2pTest";
 
 TEST_F(P2PHttpTransport, ClientReads)
 {
-    std::unique_ptr<nx::network::http::AsyncClient> clientHttpClient(new http::AsyncClient(m_connectedSocketsSupplier.clientSocket()));
-    m_client.reset(new P2PHttpClientTransport(std::move(clientHttpClient)));
+    givenConnectedP2PTransports();
+    assertDataIsSentFromServerToClientViaGETChannel();
+}
 
-    nx::Buffer buf("hello");
-    nx::Buffer serverReadBuf;
-    serverReadBuf.reserve(100);
-    auto serverSocket = m_connectedSocketsSupplier.serverSocket();
-
-    m_server.reset(new P2PHttpServerTransport(std::move(serverSocket)));
-    m_server->start(
-        [](SystemError::ErrorCode error)
-        {
-            ASSERT_EQ(SystemError::noError, error);
-        });
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    utils::MoveOnlyFunc<void(SystemError::ErrorCode, size_t)> onSend =
-        [&](SystemError::ErrorCode, size_t)
-        {
-            m_server->sendAsync(buf, std::move(onSend));
-        };
-
-    m_server->sendAsync(
-        buf,
-        [&](SystemError::ErrorCode, size_t)
-        {
-            m_server->sendAsync(
-                buf,
-                [&](SystemError::ErrorCode, size_t)
-            {
-                qDebug() << "Sent two times";
-            });
-        });
-
-    utils::promise<void> p;
-    auto f = p.get_future();
-
-    nx::Buffer readBuf;
-    m_client->readSomeAsync(
-        &readBuf,
-        [&](SystemError::ErrorCode error, size_t transferred)
-        {
-            qDebug() << "RECEIVED" << error << transferred;
-            m_client->readSomeAsync(
-                &readBuf,
-                [&](SystemError::ErrorCode , size_t )
-                {
-                    qDebug() << "RECEIVED 2:" << readBuf;
-                    p.set_value();
-                });
-        });
-
-    f.wait();
+TEST_F(P2PHttpTransport, ClientSends)
+{
+    givenConnectedP2PTransports();
+    assertDataIsSentFromClientToServerViaPOSTChannel();
 }
 
 } // namespace nx::network::test
