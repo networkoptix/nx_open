@@ -378,7 +378,7 @@ void QnResourceBrowserWidget::initInstantSearch()
     connect(searchModel, &QAbstractItemModel::modelReset,
         this, &QnResourceBrowserWidget::handleInstantFilterUpdated);
 
-    auto filterMenuCreator = [this]() { return createFilterMenu(); };
+    auto filterMenuCreator = [this](QWidget* parent) { return createFilterMenu(parent); };
     auto filterNameProvider = [this](const QVariant& data)
         { return getFilterName(data.value<ResourceTreeNodeType>()); };
     filterEdit->setTagOptionsSource(filterMenuCreator, filterNameProvider);
@@ -733,9 +733,9 @@ void QnResourceBrowserWidget::updateHintVisibilityByBasicState()
         && ui->instantFilterLineEdit->focused());
 }
 
-QMenu* QnResourceBrowserWidget::createFilterMenu() const
+QMenu* QnResourceBrowserWidget::createFilterMenu(QWidget* parent) const
 {
-    QMenu* result = new QMenu();
+    QMenu* result = new QMenu(parent);
 
     auto escapeActionText =
         [](const QString& text)

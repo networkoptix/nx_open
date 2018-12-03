@@ -154,7 +154,7 @@ struct SearchEdit::Private
 
     bool isMenuEnabled = false;
     QVariant currentTagData;
-    std::function<QMenu*()> tagMenuCreator;
+    MenuCreator tagMenuCreator;
     std::function<QString(const QVariant&)> tagNameProvider;
 };
 
@@ -350,9 +350,7 @@ void SearchEdit::showFilterMenu()
     if (!isMenuEnabled() || !d->tagMenuCreator)
         return;
 
-    auto menu = d->tagMenuCreator();
-    menu->setParent(this, menu->windowFlags());
-
+    const auto menu = d->tagMenuCreator(this);
     connect(menu, &QMenu::aboutToHide, this, [this]() { d->lineEdit->setFocus(); });
     connect(menu, &QMenu::aboutToHide, menu, &QMenu::deleteLater);
 
@@ -369,7 +367,7 @@ void SearchEdit::showFilterMenu()
     QnHiDpiWorkarounds::showMenu(menu, globalPoint);
 }
 
-void SearchEdit::setTagOptionsSource(std::function<QMenu*()> tagMenuCreator,
+void SearchEdit::setTagOptionsSource(MenuCreator tagMenuCreator,
     std::function<QString(const QVariant&)> tagNameProvider)
 {
     d->tagMenuCreator = tagMenuCreator;
