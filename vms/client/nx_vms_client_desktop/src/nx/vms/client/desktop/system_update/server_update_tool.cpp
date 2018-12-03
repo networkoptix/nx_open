@@ -422,7 +422,7 @@ void ServerUpdateTool::uploadPackage(const nx::update::Package& package, QDir st
             continue;
         }
 
-        auto callback = [tool=QPointer<ServerUpdateTool>(this), serverId](const UploadState& state)
+        auto callback = [tool = QPointer<ServerUpdateTool>(this), serverId](const UploadState& state)
         {
             if (tool)
                 tool->atUploadWorkerState(serverId, state);

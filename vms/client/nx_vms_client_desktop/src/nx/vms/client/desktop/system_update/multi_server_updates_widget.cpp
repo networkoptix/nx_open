@@ -855,7 +855,7 @@ ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress
         // We even can get a stale callback from /ec2/updateStatus, with data actual to
         // the moment right before we pressed 'Download'.
         // It will be very troublesome to properly wait for updated /ec2/updateStatus.
-        for (auto id : m_serversIssued)
+        for (auto id: m_serversIssued)
         {
             auto item = m_updatesModel->findItemById(id);
             if (!item)
@@ -882,6 +882,8 @@ ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress
             }
         }
 
+        // We sum up individual progress from every server and adjust maximum progress as well.
+        // We could get 147 of 200 percents done. ProgressBar works fine with it.
         result.max += 100 * m_serversIssued.size();
         result.downloadingServers = !m_serversActive.empty();
 
