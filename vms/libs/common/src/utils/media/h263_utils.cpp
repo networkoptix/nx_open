@@ -7,27 +7,28 @@ namespace nx::media_utils::h263 {
 // based on ff_h263_decode_picture_header
 bool PictureHeader::decode(const uint8_t* data, uint32_t size)
 {
-    try {
+    try
+    {
         BitStreamReader reader(data, data + size);
         uint32_t startcode = reader.getBits(22);
         if (startcode != 0x20)
             return false;
 
         timestamp = reader.getBits(8);
-        if (!reader.getBit()) // Marker bit, should be 1
+        if (reader.getBit() != 1) // Marker bit, should be 1
             return false;
 
-        if (reader.getBit()) // H263 id, should be 0
+        if (reader.getBit() != 0) // H263 id, should be 0
             return false;
 
         reader.skipBit(); /* split screen off */
         reader.skipBit(); /* camera  off */
         reader.skipBit(); /* freeze picture release off */
-        format = reader.getBits(3);
-        if (format != 7 && format != 6)
+        format = (Format)reader.getBits(3);
+        if (format != Format::ExtendedPType && format != Format::Reserved)
         {
             /* H.263v1 */
-            pictureType = reader.getBit() ? PictureType::I : PictureType::P;
+            pictureType = reader.getBit() == 1 ? PictureType::IPicture : PictureType::PPicture;
         }
         else
         {
@@ -35,9 +36,10 @@ bool PictureHeader::decode(const uint8_t* data, uint32_t size)
             uint32_t ufep = reader.getBits(3); /* Update Full Extended PTYPE */
 
             /* ufep other than 0 and 1 are reserved */
-            if (ufep == 1) {
+            if (ufep == 1)
+            {
                 /* OPPTYPE */
-                format = reader.getBits(3);
+                format = (Format)reader.getBits(3);
                 reader.skipBits(15); // TODO process skipped bits
             }
             else if (ufep != 0)
@@ -45,22 +47,7 @@ bool PictureHeader::decode(const uint8_t* data, uint32_t size)
                 return false;
             }
             /* MPPTYPE */
-            uint32_t pt = reader.getBits(3);
-            switch(pt)
-            {
-                case 0:
-                case 7: //ZYGO
-                    pictureType = PictureType::I;
-                    break;
-                case 1:
-                case 2:
-                    pictureType = PictureType::P;
-                    break;
-                case 3:
-                    pictureType = PictureType::B;
-                default:
-                    return false;
-            }
+            pictureType = (PictureType)reader.getBits(3);
         }
     }
     catch(const BitStreamException&)

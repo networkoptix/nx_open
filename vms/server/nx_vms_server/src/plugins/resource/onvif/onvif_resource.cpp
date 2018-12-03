@@ -690,6 +690,9 @@ nx::vms::server::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapab
 
 CameraDiagnostics::Result QnPlOnvifResource::initializeCameraDriver()
 {
+    if (commonModule()->isNeedToStop())
+        return CameraDiagnostics::ServerTerminatedResult();
+
     if (getDeviceOnvifUrl().isEmpty())
     {
         return m_prevOnvifResultCode.errorCode != CameraDiagnostics::ErrorCode::noError
@@ -700,7 +703,12 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeCameraDriver()
     setCameraCapability(Qn::customMediaPortCapability, true);
 
     calcTimeDrift();
+    if (commonModule()->isNeedToStop())
+        return CameraDiagnostics::ServerTerminatedResult();
+
     updateFirmware();
+    if (commonModule()->isNeedToStop())
+        return CameraDiagnostics::ServerTerminatedResult();
 
     const QAuthenticator auth = getAuth();
     DeviceSoapWrapper deviceSoapWrapper(
@@ -715,6 +723,9 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeCameraDriver()
     auto result = initOnvifCapabilitiesAndUrls(deviceSoapWrapper, &capabilitiesResponse); //< step 1
     if (!checkResultAndSetStatus(result))
         return result;
+
+    if (commonModule()->isNeedToStop())
+        return CameraDiagnostics::ServerTerminatedResult();
 
     result = initializeMedia(/*parameter is not used*/capabilitiesResponse); //< step 2
     if (!checkResultAndSetStatus(result))
