@@ -119,7 +119,7 @@ QnCameraStatsData QnRecordingStats::forecastFromStatsToModel(const QnRecordingSt
 {
     using namespace nx::core::storage_forecast;
     QnRecordingStatsReply filteredStats;
-    AllCameraData cameras;
+    CameraRecordingSettingsSet cameras;
 
     // Filter "hidden" cameras.
     for (const auto& cameraStats : stats)
@@ -129,7 +129,7 @@ QnCameraStatsData QnRecordingStats::forecastFromStatsToModel(const QnRecordingSt
 
         if (isActive(cameraResource, cameraStats))
         {
-            CameraData camera;
+            CameraRecordingSettings camera;
             camera.uniqueId = cameraStats.uniqueId;
             camera.minDays = qMax(0, cameraResource->minDays());
             camera.maxDays = qMax(0, cameraResource->maxDays());
