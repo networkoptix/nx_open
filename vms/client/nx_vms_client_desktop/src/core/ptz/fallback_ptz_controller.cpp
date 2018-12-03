@@ -205,19 +205,19 @@ bool QnFallbackPtzController::getHomeObject(QnPtzObject* homeObject) const
     return baseController({nx::core::ptz::Type::operational})->getHomeObject(homeObject);
 }
 
-bool QnFallbackPtzController::getAuxilaryTraits(
-    QnPtzAuxilaryTraitList* auxilaryTraits,
+bool QnFallbackPtzController::getAuxiliaryTraits(
+    QnPtzAuxiliaryTraitList* auxiliaryTraits,
     const nx::core::ptz::Options& options) const
 {
-    return baseController(options)->getAuxilaryTraits(auxilaryTraits, options);
+    return baseController(options)->getAuxiliaryTraits(auxiliaryTraits, options);
 }
 
-bool QnFallbackPtzController::runAuxilaryCommand(
-    const QnPtzAuxilaryTrait& trait,
+bool QnFallbackPtzController::runAuxiliaryCommand(
+    const QnPtzAuxiliaryTrait& trait,
     const QString& data,
     const nx::core::ptz::Options& options)
 {
-    return baseController(options)->runAuxilaryCommand(trait, data, options);
+    return baseController(options)->runAuxiliaryCommand(trait, data, options);
 }
 
 bool QnFallbackPtzController::getData(

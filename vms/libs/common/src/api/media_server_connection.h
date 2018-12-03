@@ -228,15 +228,15 @@ public:
         QObject* target,
         const char* slot);
 
-    int ptzGetAuxilaryTraitsAsync(
+    int ptzGetAuxiliaryTraitsAsync(
         const QnNetworkResourcePtr& camera,
         const nx::core::ptz::Options& options,
         QObject* target,
         const char* slot);
 
-    int ptzRunAuxilaryCommandAsync(
+    int ptzRunAuxiliaryCommandAsync(
         const QnNetworkResourcePtr& camera,
-        const QnPtzAuxilaryTrait& trait,
+        const QnPtzAuxiliaryTrait& trait,
         const QString& data,
         const nx::core::ptz::Options& options,
         QObject* target,

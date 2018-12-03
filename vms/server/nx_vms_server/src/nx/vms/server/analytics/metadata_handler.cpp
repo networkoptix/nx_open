@@ -186,7 +186,7 @@ void MetadataHandler::handleMetadataEvent(
         eventState,
         eventData->caption(),
         eventData->description(),
-        eventData->auxilaryData(),
+        eventData->auxiliaryData(),
         timestampUsec);
 
     if (m_resource->captureEvent(sdkEvent))

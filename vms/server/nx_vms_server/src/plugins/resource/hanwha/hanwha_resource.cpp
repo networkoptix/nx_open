@@ -1373,7 +1373,7 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
     m_ptzTraits.append(calculatePtzTraits());
 
     if (m_ptzTraits.contains(Ptz::ManualAutoFocusPtzTrait))
-        capabilities |= Ptz::AuxilaryPtzCapability;
+        capabilities |= Ptz::AuxiliaryPtzCapability;
 
     NX_DEBUG(this, lm("%1: Supported PTZ capabilities: %2")
         .args(getPhysicalId(), ptzCapabilityBits(capabilities)));
@@ -1498,9 +1498,9 @@ HanwhaPtzRangeMap HanwhaResource::fetchPtzRanges()
     return result;
 }
 
-QnPtzAuxilaryTraitList HanwhaResource::calculatePtzTraits() const
+QnPtzAuxiliaryTraitList HanwhaResource::calculatePtzTraits() const
 {
-    QnPtzAuxilaryTraitList ptzTraits;
+    QnPtzAuxiliaryTraitList ptzTraits;
     if (deviceType() == HanwhaDeviceType::nwc) //< Camera device type.
         ptzTraits = calculateCameraOnlyTraits();
 
@@ -1508,12 +1508,12 @@ QnPtzAuxilaryTraitList HanwhaResource::calculatePtzTraits() const
     return ptzTraits;
 }
 
-QnPtzAuxilaryTraitList HanwhaResource::calculateCameraOnlyTraits() const
+QnPtzAuxiliaryTraitList HanwhaResource::calculateCameraOnlyTraits() const
 {
-    QnPtzAuxilaryTraitList ptzTraits;
+    QnPtzAuxiliaryTraitList ptzTraits;
     for (const auto& item: kHanwhaPtzTraitDescriptors)
     {
-        const auto trait = QnPtzAuxilaryTrait(item.first);
+        const auto trait = QnPtzAuxiliaryTrait(item.first);
         const auto& descriptor = item.second;
         const auto& parameter = m_cgiParameters.parameter(descriptor.parameterName);
 
@@ -1533,7 +1533,7 @@ QnPtzAuxilaryTraitList HanwhaResource::calculateCameraOnlyTraits() const
     return ptzTraits;
 }
 
-void HanwhaResource::calculateAutoFocusSupport(QnPtzAuxilaryTraitList* outTraitList) const
+void HanwhaResource::calculateAutoFocusSupport(QnPtzAuxiliaryTraitList* outTraitList) const
 {
     const auto parameter = cgiParameters().parameter(lit("image/focus/control/Mode"));
     if (!parameter)
@@ -1556,7 +1556,7 @@ void HanwhaResource::calculateAutoFocusSupport(QnPtzAuxilaryTraitList* outTraitL
 
             if (possibleValues.contains(mode))
             {
-                outTraitList->push_back(QnPtzAuxilaryTrait(traitName));
+                outTraitList->push_back(QnPtzAuxiliaryTrait(traitName));
                 gotAutoFocus = true;
             }
         }
@@ -1569,13 +1569,13 @@ void HanwhaResource::calculateAutoFocusSupport(QnPtzAuxilaryTraitList* outTraitL
 
         if (attribute != boost::none && attribute.get())
         {
-            outTraitList->push_back(QnPtzAuxilaryTrait(kHanwhaSimpleFocusTrait));
+            outTraitList->push_back(QnPtzAuxiliaryTrait(kHanwhaSimpleFocusTrait));
             gotAutoFocus = true;
         }
     }
 
     if (gotAutoFocus)
-        outTraitList->push_back(QnPtzAuxilaryTrait(Ptz::ManualAutoFocusPtzTrait));
+        outTraitList->push_back(QnPtzAuxiliaryTrait(Ptz::ManualAutoFocusPtzTrait));
 }
 
 CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()

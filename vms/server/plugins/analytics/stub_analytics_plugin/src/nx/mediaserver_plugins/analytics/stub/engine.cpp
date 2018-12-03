@@ -111,13 +111,13 @@ std::string Engine::manifest() const
     ],
     "objectTypes": [
         {
-            "id": ")json" + kCarObjectType+ R"json(",
+            "id": ")json" + kCarObjectType + R"json(",
             "name": {
                 "value": "Car"
             }
         },
         {
-            "id": ")json" + kHumanFaceObjectType+ R"json(",
+            "id": ")json" + kHumanFaceObjectType + R"json(",
             "name": {
                 "value": "Human face"
             }
@@ -131,7 +131,7 @@ std::string Engine::manifest() const
                 "value": "Add to list"
             },
             "supportedObjectTypeIds": [
-                ")json" + kCarObjectType+ R"json("
+                ")json" + kCarObjectType + R"json("
             ],
             "settings": {
                 "params": [
@@ -157,7 +157,7 @@ std::string Engine::manifest() const
                 "value": "Add person (URL-based)"
             },
             "supportedObjectTypeIds": [
-                ")json" + kCarObjectType+ R"json("
+                ")json" + kCarObjectType + R"json("
             ]
         }
     ],

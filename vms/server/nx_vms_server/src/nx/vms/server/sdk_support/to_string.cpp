@@ -1,4 +1,4 @@
-#include "traits.h"
+#include "to_string.h"
 
 namespace nx::sdk {
 
@@ -13,7 +13,8 @@ QString toString(const nx::sdk::DeviceInfo& deviceInfo)
             deviceInfo.uid,
             deviceInfo.sharedId,
             deviceInfo.url,
-            deviceInfo.channel).toQString();
+            deviceInfo.channel
+        ).toQString();
 }
 
 } // namespace nx::sdk
