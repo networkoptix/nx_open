@@ -39,6 +39,8 @@ struct SoapTimeouts
     static constexpr int kDefaultConnectTimeoutSeconds = 10;
     static constexpr int kDefaultAcceptTimeoutSeconds = 10;
 
+    static SoapTimeouts minivalValue();
+
     SoapTimeouts() = default;
     SoapTimeouts(const QString& serialized);
     QString serialize() const;

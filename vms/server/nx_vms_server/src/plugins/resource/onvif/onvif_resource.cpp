@@ -4773,7 +4773,10 @@ QnPlOnvifResource::VideoOptionsLocal QnPlOnvifResource::secondaryVideoCapabiliti
 
 SoapTimeouts QnPlOnvifResource::onvifTimeouts() const
 {
-    return SoapTimeouts(serverModule()->settings().onvifTimeouts());
+    if (commonModule()->isNeedToStop())
+        return SoapTimeouts::minivalValue();
+    else
+        return SoapTimeouts(serverModule()->settings().onvifTimeouts());
 }
 
 #endif //ENABLE_ONVIF

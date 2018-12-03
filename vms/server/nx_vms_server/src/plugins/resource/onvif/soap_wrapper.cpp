@@ -31,6 +31,18 @@ static PasswordHelper passwordHelper;
 // ------------------------------------------------------------------------------------------------
 // SoapTimeouts
 // ------------------------------------------------------------------------------------------------
+
+SoapTimeouts SoapTimeouts::minivalValue()
+{
+    using namespace std::chrono;
+    SoapTimeouts result;
+    result.sendTimeout = 1s;
+    result.recvTimeout = 1s;
+    result.connectTimeout = 1s;
+    result.acceptTimeout = 1s;
+    return result;
+}
+
 SoapTimeouts::SoapTimeouts(const QString& serialized)
 {
     if (serialized.isEmpty())
