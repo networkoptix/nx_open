@@ -124,7 +124,7 @@ private:
         bool hasCapabilities(Ptz::Capabilities value) const;
 
         Ptz::Capabilities capabilities = 0;
-        QnPtzAuxilaryTraitList traits;
+        QnPtzAuxiliaryTraitList traits;
         nx::core::ptz::Vector currentSpeed;
         nx::core::ptz::Vector requestedSpeed;
         PtzOverlayWidget* overlayWidget = nullptr;

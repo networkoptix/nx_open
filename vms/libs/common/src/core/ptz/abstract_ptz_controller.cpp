@@ -102,10 +102,10 @@ bool QnAbstractPtzController::getData(
         data->fields |= Qn::HomeObjectPtzField;
     }
 
-    if (query.testFlag(Qn::AuxilaryTraitsPtzField)
-        && getAuxilaryTraits(&data->auxilaryTraits, options))
+    if (query.testFlag(Qn::AuxiliaryTraitsPtzField)
+        && getAuxiliaryTraits(&data->auxiliaryTraits, options))
     {
-        data->fields |= Qn::AuxilaryTraitsPtzField;
+        data->fields |= Qn::AuxiliaryTraitsPtzField;
     }
 
     return true;
@@ -169,9 +169,9 @@ bool QnAbstractPtzController::supports(
         case Qn::GetHomeObjectPtzCommand:
             return capabilities.testFlag(Ptz::HomePtzCapability);
 
-        case Qn::GetAuxilaryTraitsPtzCommand:
-        case Qn::RunAuxilaryCommandPtzCommand:
-            return capabilities.testFlag(Ptz::AuxilaryPtzCapability);
+        case Qn::GetAuxiliaryTraitsPtzCommand:
+        case Qn::RunAuxiliaryCommandPtzCommand:
+            return capabilities.testFlag(Ptz::AuxiliaryPtzCapability);
 
         case Qn::GetDataPtzCommand:
             return true;

@@ -106,7 +106,7 @@ nx::sdk::Error DeviceAgent::startFetchingMetadata(
                 event->setDescription(hanwhaEvent.caption.toStdString());
                 event->setIsActive(hanwhaEvent.isActive);
                 event->setConfidence(1.0);
-                event->setAuxilaryData(hanwhaEvent.fullEventName.toStdString());
+                event->setAuxiliaryData(hanwhaEvent.fullEventName.toStdString());
 
                 packet->setTimestampUsec(
                     duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());

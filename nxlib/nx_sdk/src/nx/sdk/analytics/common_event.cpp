@@ -39,9 +39,9 @@ const char* CommonEvent::description() const
     return m_description.c_str();
 }
 
-const char* CommonEvent::auxilaryData() const
+const char* CommonEvent::auxiliaryData() const
 {
-    return m_auxilaryData.c_str();
+    return m_auxiliaryData.c_str();
 }
 
 bool CommonEvent::isActive() const
@@ -69,9 +69,9 @@ void CommonEvent::setDescription(const std::string& description)
     m_description = description;
 }
 
-void CommonEvent::setAuxilaryData(const std::string& auxilaryData)
+void CommonEvent::setAuxiliaryData(const std::string& auxiliaryData)
 {
-    m_auxilaryData = auxilaryData;
+    m_auxiliaryData = auxiliaryData;
 }
 
 void CommonEvent::setIsActive(bool isActive)

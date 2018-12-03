@@ -97,7 +97,7 @@ nx::sdk::Error DeviceAgent::startFetchingMetadata(
                 event->setDescription(hikvisionEvent.description.toStdString());
                 event->setIsActive(hikvisionEvent.isActive);
                 event->setConfidence(1.0);
-                //event->setAuxilaryData(hikvisionEvent.fullEventName.toStdString());
+                //event->setAuxiliaryData(hikvisionEvent.fullEventName.toStdString());
 
                 packet->setTimestampUsec(
                     duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());

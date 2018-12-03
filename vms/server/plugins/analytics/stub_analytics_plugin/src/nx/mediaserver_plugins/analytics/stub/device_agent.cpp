@@ -266,7 +266,7 @@ MetadataPacket* DeviceAgent::cookSomeEvents()
     auto commonEvent = new CommonEvent();
     commonEvent->setCaption("Line crossing (caption)");
     commonEvent->setDescription("Line crossing (description)");
-    commonEvent->setAuxilaryData(R"json({ "auxilaryData": "someJson" })json");
+    commonEvent->setAuxiliaryData(R"json({ "auxiliaryData": "someJson" })json");
     commonEvent->setIsActive(m_counter == 1);
     commonEvent->setTypeId(m_eventTypeId);
 
@@ -291,7 +291,7 @@ MetadataPacket* DeviceAgent::cookSomeObjects()
 
     auto commonObject = new CommonObject();
 
-    commonObject->setAuxilaryData(R"json({ "auxilaryData": "someJson2" })json");
+    commonObject->setAuxiliaryData(R"json({ "auxiliaryData": "someJson2" })json");
     commonObject->setTypeId(kCarObjectType);
 
     double dt = m_objectCounter / 32.0;

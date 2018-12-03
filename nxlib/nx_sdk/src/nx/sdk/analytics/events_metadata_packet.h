@@ -25,9 +25,9 @@ public:
     virtual const char* description() const = 0;
 
     /**
-     * @brief auxilaryData user side data in json format. Null terminated UTF-8 string.
+     * @brief auxiliaryData user side data in json format. Null terminated UTF-8 string.
      */
-    virtual const char* auxilaryData() const = 0;
+    virtual const char* auxiliaryData() const = 0;
 
     /**
      * @brief Is an event in active state.

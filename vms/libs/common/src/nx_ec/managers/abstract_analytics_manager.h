@@ -30,7 +30,7 @@ using AbstractAnalyticsNotificationManagerPtr =
     std::shared_ptr<AbstractAnalyticsNotificationManager>;
 
 /**
- * @note All methods are asynchronous if other not specified
+ * NOTE: All methods are asynchronous, unless specified otherwise.
  */
 class AbstractAnalyticsManager
 {
