@@ -45,7 +45,7 @@ QnPlISDResourceSearcher::QnPlISDResourceSearcher(QnMediaServerModule* serverModu
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
     SearchAutoHandler(serverModule->upnpDeviceSearcher(), kUpnpBasicDeviceType),
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
     NX_DEBUG(this, "Constructed");
     serverModule->mdnsListener()->registerConsumer((std::uintptr_t) this);

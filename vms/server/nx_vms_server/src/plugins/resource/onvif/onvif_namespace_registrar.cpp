@@ -5,7 +5,7 @@
 #include "soap_wrapper.h"
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 namespace onvif {
 
@@ -83,5 +83,5 @@ const Namespace* requestNamespaces(RequestTypeId typeId)
 
 } // namespaec onvif
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

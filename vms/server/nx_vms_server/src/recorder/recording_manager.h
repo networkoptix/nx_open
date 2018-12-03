@@ -14,7 +14,7 @@
 
 #include "camera/video_camera.h"
 #include <common/common_module_aware.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class QnServerStreamRecorder;
 class QnVideoCamera;
@@ -77,7 +77,7 @@ protected: // 'protected' -> enable access for ut
 
 class QnRecordingManager:
     public QThread,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 public:

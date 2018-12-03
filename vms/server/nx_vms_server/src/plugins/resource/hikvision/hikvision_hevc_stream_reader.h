@@ -10,7 +10,7 @@
 #include <plugins/resource/hikvision/hikvision_utils.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 class HikvisionHevcStreamReader: public QnRtpStreamReader
@@ -81,7 +81,7 @@ private:
 };
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx
 
 #endif // ENABLE_ONVIF

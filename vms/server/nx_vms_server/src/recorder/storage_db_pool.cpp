@@ -7,7 +7,7 @@
 #include <nx/utils/log/log.h>
 
 QnStorageDbPool::QnStorageDbPool(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

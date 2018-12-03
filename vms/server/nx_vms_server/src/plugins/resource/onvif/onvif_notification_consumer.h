@@ -13,7 +13,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <onvif/soapNotificationConsumerBindingService.h>
-#include <nx/mediaserver/resource/resource_fwd.h>
+#include <nx/vms/server/resource/resource_fwd.h>
 
 
 //!Processes notifications from onvif resources

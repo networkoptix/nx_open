@@ -76,12 +76,12 @@ void MSSettings::initializeROSettings()
     ));
 }
 
-nx::mediaserver::Settings* MSSettings::mutableSettings()
+nx::vms::server::Settings* MSSettings::mutableSettings()
 {
     return &m_settings;
 }
 
-const nx::mediaserver::Settings& MSSettings::settings() const
+const nx::vms::server::Settings& MSSettings::settings() const
 {
     return m_settings;
 }

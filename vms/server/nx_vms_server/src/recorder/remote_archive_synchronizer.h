@@ -9,7 +9,7 @@
 #include <vector>
 #include <atomic>
 
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 #include <core/resource/resource_fwd.h>
 #include <recorder/abstract_remote_archive_synchronization_task.h>
 #include <recorder/remote_archive_worker_pool.h>
@@ -20,12 +20,12 @@
 #include <nx/utils/lockable.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace recorder {
 
 class RemoteArchiveSynchronizer:
     public QObject,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
     using TaskMap = nx::utils::Lockable<std::map<QnUuid, RemoteArchiveTaskPtr>>;
@@ -57,5 +57,5 @@ private:
 
 
 } // namespace recorder
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

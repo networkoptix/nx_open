@@ -4,7 +4,7 @@
 #include <motion/motion_estimation.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 class MotionDelegateWrapper: public ArchiveDelegateWrapper
@@ -27,5 +27,5 @@ private:
 };
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

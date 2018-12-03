@@ -50,7 +50,7 @@ QnAdamResourceSearcher::QnAdamAsciiCommand::QnAdamAsciiCommand(const QString& co
 QnAdamResourceSearcher::QnAdamResourceSearcher(QnMediaServerModule* serverModule):
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

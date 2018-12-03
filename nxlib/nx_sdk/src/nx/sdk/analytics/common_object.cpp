@@ -63,9 +63,9 @@ Rect CommonObject::boundingBox() const
     return m_rect;
 }
 
-const char* CommonObject::auxilaryData() const
+const char* CommonObject::auxiliaryData() const
 {
-    return m_auxilaryData.c_str();
+    return m_auxiliaryData.c_str();
 }
 
 void CommonObject::setTypeId(std::string typeId)
@@ -93,9 +93,9 @@ void CommonObject::setAttributes(const std::vector<CommonAttribute>& value)
     m_attributes = value;
 }
 
-void CommonObject::setAuxilaryData(std::string auxilaryData)
+void CommonObject::setAuxiliaryData(std::string auxiliaryData)
 {
-    m_auxilaryData = std::move(auxilaryData);
+    m_auxiliaryData = std::move(auxiliaryData);
 }
 
 void CommonObject::setBoundingBox(const Rect& rect)

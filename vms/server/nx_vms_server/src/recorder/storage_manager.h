@@ -39,7 +39,7 @@
 #include <functional>
 #include "storage_db_pool.h"
 #include "health/system_health.h"
-#include "nx/mediaserver/server_module_aware.h"
+#include "nx/vms/server/server_module_aware.h"
 #include <media_server/media_server_module.h>
 #include <api/helpers/chunks_request_data.h>
 
@@ -59,7 +59,7 @@ class QnScheduleSync;
 
 namespace nx { namespace analytics { namespace storage { class AbstractEventsStorage; }}}
 
-class QnStorageManager: public QObject, public nx::mediaserver::ServerModuleAware
+class QnStorageManager: public QObject, public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
     friend class TestHelper;

@@ -4,7 +4,7 @@
 #include <nx/utils/log/log.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 namespace test {
 
@@ -128,6 +128,6 @@ TEST_F(HanwhaCgiParser, ShortCompact)  { parse(removeWhiteSpace(QByteArray(kShor
 
 } // namespace test
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx
 

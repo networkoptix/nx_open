@@ -17,7 +17,7 @@
 #include <QJsonDocument>
 #include <QRegularExpression>
 
-#include <nx/mediaserver/api/client.h>
+#include <nx/vms/server/api/client.h>
 
 #include <helpers/itf_helpers.h>
 
@@ -33,7 +33,7 @@
     #error Not supported target os
 #endif
 
-namespace api = nx::mediaserver::api;
+namespace api = nx::vms::server::api;
 
 namespace
 {

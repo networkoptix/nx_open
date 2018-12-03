@@ -11,7 +11,7 @@
 #include <nx/network/http/http_client.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 class VivotekResource: public QnPlOnvifResource
@@ -40,7 +40,7 @@ public:
     virtual CameraDiagnostics::Result customStreamConfiguration(
         Qn::ConnectionRole role) override;
 protected:
-    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
 private:
     bool fetchHevcSupport();
@@ -72,7 +72,7 @@ private:
 Q_DECLARE_OPERATORS_FOR_FLAGS(VivotekResource::StreamCodecCapabilities);
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx
 
 #endif // ENABLE_ONVIF

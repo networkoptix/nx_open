@@ -97,7 +97,7 @@ MediaStreamCache* MediaServerVideoCameraMock::liveCache(MediaQuality /*streamQua
     return nullptr;
 }
 
-nx::mediaserver::hls::LivePlaylistManagerPtr MediaServerVideoCameraMock::hlsLivePlaylistManager(
+nx::vms::server::hls::LivePlaylistManagerPtr MediaServerVideoCameraMock::hlsLivePlaylistManager(
     MediaQuality /*streamQuality*/) const
 {
     NX_GTEST_ASSERT_GT(m_usageCounter, 0);

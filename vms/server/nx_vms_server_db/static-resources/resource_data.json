@@ -808,7 +808,7 @@
                 "VISTA|VK2-3MPBIR28V12re",
                 "VISTA|VK2-3MPVRDIR28V12re"
             ],
-            "operationalPtzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability"
+            "operationalPtzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability|AuxiliaryPtzCapability"
         },
         {
             "keys": [
@@ -872,7 +872,7 @@
                 "Pelco|D5220",
                 "Pelco|PelcoD5220"
             ],
-            "operationalPtzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability|PresetsPtzCapability"
+            "operationalPtzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxiliaryPtzCapability|PresetsPtzCapability"
         },
         {
             "keys": [

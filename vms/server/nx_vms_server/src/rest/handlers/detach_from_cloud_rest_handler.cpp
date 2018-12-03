@@ -20,7 +20,7 @@ QnDetachFromCloudRestHandler::QnDetachFromCloudRestHandler(
     nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup)
     :
     QnJsonRestHandler(),
-    nx::mediaserver::ServerModuleAware(serverModule),
+    nx::vms::server::ServerModuleAware(serverModule),
     m_cloudManagerGroup(cloudManagerGroup)
 {
 }

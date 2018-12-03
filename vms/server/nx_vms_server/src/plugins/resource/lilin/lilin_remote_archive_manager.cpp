@@ -12,7 +12,7 @@
 
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 namespace {

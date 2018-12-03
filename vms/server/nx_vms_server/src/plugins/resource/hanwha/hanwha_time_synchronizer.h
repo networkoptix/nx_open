@@ -5,7 +5,7 @@
 #include <nx/network/http/http_async_client.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 class HanwhaResource;
@@ -52,5 +52,5 @@ private:
 };
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

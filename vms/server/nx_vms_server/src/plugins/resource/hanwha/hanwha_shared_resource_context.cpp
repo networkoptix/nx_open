@@ -11,7 +11,7 @@
 #include <nx/fusion/serialization/lexical.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 namespace {
@@ -34,7 +34,7 @@ static const nx::utils::Url cleanUrl(nx::utils::Url url)
 } // namespace
 
 using namespace nx::core::resource;
-using namespace nx::mediaserver::resource;
+using namespace nx::vms::server::resource;
 
 SeekPosition::SeekPosition(qint64 value) : position(value)
 {
@@ -482,5 +482,5 @@ void SessionContext::updateCurrentPositionUsec(
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

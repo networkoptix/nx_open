@@ -2,9 +2,9 @@
 
 #include <vector>
 
-#include <nx/mediaserver/sdk_support/placeholder_binder.h>
+#include <nx/vms/server/sdk_support/placeholder_binder.h>
 
-using namespace nx::mediaserver;
+using namespace nx::vms::server;
 
 struct TestCase
 {

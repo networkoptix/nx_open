@@ -3,13 +3,13 @@
 #include <api/model/setup_cloud_system_data.h>
 #include <core/resource_access/user_access_data.h>
 #include <rest/server/json_rest_handler.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 namespace nx { namespace vms { namespace cloud_integration { class CloudManagerGroup; } } }
 
 class QnSetupCloudSystemRestHandler:
     public QnJsonRestHandler,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 

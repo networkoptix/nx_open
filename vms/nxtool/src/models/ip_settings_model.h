@@ -5,7 +5,7 @@
 #include <QAbstractListModel>
 
 #include <base/types.h>
-#include <nx/mediaserver/api/server_info.h>
+#include <nx/vms/server/api/server_info.h>
 
 namespace rtu
 {
@@ -19,7 +19,7 @@ namespace rtu
         Q_PROPERTY(bool isSingleSelection READ isSingleSelection NOTIFY isSingleSelectionChanged)
         
     public:
-        typedef nx::mediaserver::api::InterfaceInfoList InterfaceInfoList;
+        typedef nx::vms::server::api::InterfaceInfoList InterfaceInfoList;
 
         IpSettingsModel(int count
             , const InterfaceInfoList &interfaces

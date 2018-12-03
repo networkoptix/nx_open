@@ -250,7 +250,6 @@ private:
     static QByteArray getGuid();
     void registerRTPChannel(int rtpNum, int rtcpNum, int trackIndex);
     nx::network::http::Request createPlayRequest( qint64 startPos, qint64 endPos );
-    bool sendPlayInternal(qint64 startPos, qint64 endPos);
     bool sendRequestInternal(nx::network::http::Request&& request);
     void addCommonHeaders(nx::network::http::HttpHeaders& headers);
     void addAdditionalHeaders(const QString& requestName, nx::network::http::HttpHeaders* outHeaders);

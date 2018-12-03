@@ -10,7 +10,7 @@
 #include <helpers/server_info_manager.h>
 #include <helpers/model_change_helper.h>
 
-namespace api = nx::mediaserver::api;
+namespace api = nx::vms::server::api;
 
 namespace
 {

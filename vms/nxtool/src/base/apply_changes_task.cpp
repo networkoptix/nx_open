@@ -7,7 +7,7 @@
 #include <QElapsedTimer>
 #include <QHostAddress>
 
-#include <nx/mediaserver/api/client.h>
+#include <nx/vms/server/api/client.h>
 #include <base/changeset.h>
 #include <base/selection.h>
 
@@ -17,7 +17,7 @@
 
 #include <models/changes_summary_model.h>
 
-namespace api = nx::mediaserver::api;
+namespace api = nx::vms::server::api;
 
 namespace
 {

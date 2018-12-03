@@ -82,7 +82,7 @@ void sendInstallRequest(
 } // namespace
 
 QnInstallUpdateRestHandler::QnInstallUpdateRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

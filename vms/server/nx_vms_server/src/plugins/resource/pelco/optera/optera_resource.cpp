@@ -75,7 +75,7 @@ QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractS
     return m_videoLayout;
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnOpteraResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnOpteraResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex streamIndex)
 {
     return base_type::getStreamCapabilityMapFromDrives(streamIndex);

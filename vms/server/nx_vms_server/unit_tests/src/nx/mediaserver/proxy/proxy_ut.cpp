@@ -14,7 +14,7 @@
 using namespace nx::utils::test;
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 namespace proxy {
 namespace test {
 
@@ -104,5 +104,5 @@ TEST_F(ProxyTest, proxyToAnotherThenToThemself)
 }
 } // namespace test
 } // namespace proxy
-} // namespace mediaserver
+} // namespace vms::server
 } // namespace nx

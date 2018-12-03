@@ -11,7 +11,7 @@
 #include <media_server/media_server_module.h>
 
 QnEventLog2RestHandler::QnEventLog2RestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

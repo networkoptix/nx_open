@@ -12,7 +12,7 @@
 #include <api/global_settings.h>
 #include <nx/vms/api/types/resource_types.h>
 #include <media_server/media_server_module.h>
-#include <nx/mediaserver/settings.h>
+#include <nx/vms/server/settings.h>
 #include <nx/update/common_update_manager.h>
 #include <api/helpers/empty_request_data.h>
 #include <nx/update/common_update_manager.h>

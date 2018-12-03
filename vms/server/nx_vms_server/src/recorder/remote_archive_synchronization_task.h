@@ -6,7 +6,7 @@
 #include <nx/network/buffer.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace recorder {
 
 /*
@@ -39,5 +39,5 @@ private:
 };
 
 } // namespace recorder
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

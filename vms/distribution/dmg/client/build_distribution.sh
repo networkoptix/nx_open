@@ -102,7 +102,7 @@ buildDistribution()
 
     if [[ $CODE_SIGNING = true ]]
     then
-        local -r KEYCHAIN_ARGS=""
+        local KEYCHAIN_ARGS=""
 
         if [ ! -z "$KEYCHAIN" ]
         then

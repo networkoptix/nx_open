@@ -5,7 +5,7 @@
 
 #include <QObject>
 
-#include <nx/mediaserver/api/client.h>
+#include <nx/vms/server/api/client.h>
 
 namespace rtu
 {
@@ -14,10 +14,10 @@ namespace rtu
         Q_OBJECT
 
     public:
-        typedef nx::mediaserver::api::Client Client;
-        typedef nx::mediaserver::api::BaseServerInfo BaseServerInfo;
-        typedef nx::mediaserver::api::ExtraServerInfo ExtraServerInfo;
-        typedef nx::mediaserver::api::ServerInfoContainer ServerInfoContainer;
+        typedef nx::vms::server::api::Client Client;
+        typedef nx::vms::server::api::BaseServerInfo BaseServerInfo;
+        typedef nx::vms::server::api::ExtraServerInfo ExtraServerInfo;
+        typedef nx::vms::server::api::ServerInfoContainer ServerInfoContainer;
 
         typedef std::function<void (const QUuid &id, const ExtraServerInfo &extraInfo
             , const QString &host)> SuccessfulCallback;
