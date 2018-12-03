@@ -165,6 +165,8 @@ void P2PHttpServerTransport::sendResponse(
         ? http::StatusCode::ok
         : http::StatusCode::internalServerError;
     response.statusLine.version = http::http_1_1;
+
+    response.headers.emplace("Content-Length", "0");
     addDateHeader(&response.headers);
 
     response.serialize(&m_responseBuffer);

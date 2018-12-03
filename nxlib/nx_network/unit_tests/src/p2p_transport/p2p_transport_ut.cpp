@@ -12,19 +12,26 @@ class P2PHttpTransport: public ::testing::Test
 protected:
     P2PHttpTransport()
     {
-        if (!m_serverSendBuffer.isEmpty())
-            return;
-
-        for (int i = 0; i < 10000; ++i)
+        if (m_serverSendBuffer.isEmpty())
         {
-            m_serverSendBuffer.push_back("hello");
-            m_clientSendBuffer.push_back("hello");
+            for (int i = 0; i < 10000; ++i)
+            {
+                m_serverSendBuffer.push_back("hello");
+                m_clientSendBuffer.push_back("hello");
+            }
         }
 
         m_acceptor = SocketFactory::createStreamServerSocket();
         m_acceptor->setNonBlockingMode(true);
+        m_acceptor->setReuseAddrFlag(true);
+        m_acceptor->setReusePortFlag(true);
         m_acceptor->bind(SocketAddress::anyPrivateAddress);
         m_acceptor->listen();
+    }
+
+    virtual void TearDown() override
+    {
+        m_acceptor->pleaseStopSync();
     }
 
     void givenConnectedP2PTransports()
@@ -84,9 +91,9 @@ protected:
 
         m_client->readSomeAsync(
             &m_clientReadBuffer,
-            [this](SystemError::ErrorCode error, size_t transferred)
+            [this, connectionContext](SystemError::ErrorCode error, size_t transferred)
             {
-                onClientRead(error, transferred);
+                onClientRead(connectionContext, error, transferred);
             });
 
         readyFuture.wait();
@@ -105,11 +112,12 @@ protected:
             });
 
         m_serverPostConnectionFuture.wait();
+        m_acceptor->pleaseStopSync();
         m_server->readSomeAsync(
             &m_serverReadBuffer,
-            [this](SystemError::ErrorCode error, size_t transferred)
+            [this, connectionContext](SystemError::ErrorCode error, size_t transferred)
             {
-                onServerRead(error, transferred);
+                onServerRead(connectionContext, error, transferred);
             });
 
         readyFuture.wait();
@@ -163,12 +171,10 @@ private:
         ASSERT_EQ(SystemError::noError, error);
         ASSERT_LE(m_serverSendBuffer.size(), transferred);
 
-        if (connectionContext->count++ > 1000)
-        {
-            connectionContext->promise.set_value();
+        if (connectionContext->count == 1000)
             return;
-        }
 
+        connectionContext->count++;
         m_server->sendAsync(
             m_serverSendBuffer,
             [this, connectionContext](SystemError::ErrorCode error, size_t transferred)
@@ -177,18 +183,27 @@ private:
             });
     }
 
-    void onClientRead(SystemError::ErrorCode error, size_t transferred)
+    void onClientRead(
+        std::shared_ptr<ConnectionContext> connectionContext,
+        SystemError::ErrorCode error,
+        size_t transferred)
     {
         ASSERT_EQ(error, SystemError::noError);
         ASSERT_EQ(m_serverSendBuffer.size(), transferred);
         ASSERT_EQ(m_clientReadBuffer, m_serverSendBuffer);
 
+        if (connectionContext->count == 1000)
+        {
+            connectionContext->promise.set_value();
+            return;
+        }
+
         m_clientReadBuffer.clear();
         m_client->readSomeAsync(
             &m_clientReadBuffer,
-            [this](SystemError::ErrorCode error, size_t transferred)
+            [this, connectionContext](SystemError::ErrorCode error, size_t transferred)
             {
-                onClientRead(error, transferred);
+                onClientRead(connectionContext, error, transferred);
             });
     }
 
@@ -200,11 +215,10 @@ private:
         ASSERT_EQ(SystemError::noError, error);
         ASSERT_LE(m_clientSendBuffer.size(), transferred);
 
-        if (connectionContext->count++ > 1000)
-        {
-            connectionContext->promise.set_value();
+        if (connectionContext->count == 1000)
             return;
-        }
+
+        connectionContext->count++;
 
         m_client->sendAsync(
             m_clientSendBuffer,
@@ -214,18 +228,27 @@ private:
             });
     }
 
-    void onServerRead(SystemError::ErrorCode error, size_t transferred)
+    void onServerRead(
+        std::shared_ptr<ConnectionContext> connectionContext,
+        SystemError::ErrorCode error,
+        size_t transferred)
     {
         ASSERT_EQ(error, SystemError::noError);
         ASSERT_LE(m_clientSendBuffer.size(), transferred);
         ASSERT_EQ(m_serverReadBuffer, m_clientSendBuffer);
 
+        if (connectionContext->count == 1000)
+        {
+            connectionContext->promise.set_value();
+            return;
+        }
+
         m_serverReadBuffer.clear();
         m_server->readSomeAsync(
             &m_serverReadBuffer,
-            [this](SystemError::ErrorCode error, size_t transferred)
+            [this, connectionContext](SystemError::ErrorCode error, size_t transferred)
             {
-                onServerRead(error, transferred);
+                onServerRead(connectionContext, error, transferred);
             });
     }
 };

@@ -103,7 +103,7 @@ void P2PHttpClientTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
                             == http::StatusCode::ok;
 
                     const auto resultCode = !m_writeHttpClient->failed() && isResponseValid
-                        ? SystemError::connectionAbort : SystemError::noError;
+                        ? SystemError::noError : SystemError::connectionAbort;
                     const std::size_t transferred = resultCode == SystemError::noError
                         ? bufferSize : 0;
 
