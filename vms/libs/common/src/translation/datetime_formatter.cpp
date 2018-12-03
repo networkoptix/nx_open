@@ -67,7 +67,6 @@ void DateTimeFormats::setFormats()
     formatStrings[Format::dd_MM] = tr("MM/dd"); //< Localizable
     formatStrings[Format::MMMM_yyyy] = tr("MMMM yyyy"); //< Localizable
     formatStrings[Format::dd_MM_yyyy] = locale.dateFormat(QLocale::ShortFormat);
-    formatStrings[Format::yyyy_MM_dd_hh_mm_ss] = locale.dateTimeFormat(QLocale::ShortFormat);
 
     auto shortFormat = locale.dateTimeFormat(QLocale::ShortFormat);
     // QLocale::ShortFormat probably does not include seconds - add them!
