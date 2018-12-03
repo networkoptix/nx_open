@@ -178,16 +178,16 @@ int runUi(QtSingleGuiApplication* application)
             
             const auto iosDeviceInfo = iosDeviceInformation();
             const bool isXsPhone =
-            iosDeviceInfo.type == IosDeviceInformation::Type::iPhone
-            && iosDeviceInfo.majorVersion == IosDeviceInformation::iPhoneXs;
+                iosDeviceInfo.type == IosDeviceInformation::Type::iPhone
+                && iosDeviceInfo.majorVersion == IosDeviceInformation::iPhoneXs;
             if (isXsPhone)
                 return true;
             
             const bool isIPadPro3Gen =
-            iosDeviceInfo.type == IosDeviceInformation::Type::iPad
-            && iosDeviceInfo.majorVersion == IosDeviceInformation::iPadPro3Gen
-            && iosDeviceInfo.minorVersion >= IosDeviceInformation::iPadPro3GenStartMinorVersion
-            && iosDeviceInfo.minorVersion <= IosDeviceInformation::iPadPro3GenFinishMinorVersion;
+                iosDeviceInfo.type == IosDeviceInformation::Type::iPad
+                && iosDeviceInfo.majorVersion == IosDeviceInformation::iPadPro3Gen
+                && iosDeviceInfo.minorVersion >= IosDeviceInformation::iPadPro3GenStartMinorVersion
+                && iosDeviceInfo.minorVersion <= IosDeviceInformation::iPadPro3GenFinishMinorVersion;
             
             return isIPadPro3Gen;
 #else
