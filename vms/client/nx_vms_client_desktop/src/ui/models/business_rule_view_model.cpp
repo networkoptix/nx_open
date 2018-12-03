@@ -42,8 +42,6 @@
 #include <utils/media/audio_player.h>
 #include <nx/network/http/http_types.h>
 
-#include <nx/vms/client/desktop/ini.h>
-
 #include <nx/fusion/model_functions.h>
 
 using namespace nx;
@@ -214,9 +212,6 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
     {
         if (eventType == EventType::pluginEvent)
         {
-            if (!ini().enablePluginEvents)
-                continue;
-
             /** Show it only for users who have at least one plugin installed. */
             const auto pirs =
                 resourcePool()->getResources<nx::vms::common::AnalyticsEngineResource>();
