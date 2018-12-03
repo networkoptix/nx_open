@@ -164,7 +164,7 @@ QList<QnResourceChannelMapping> MultisensorDataProvider::getVideoChannelMapping(
         secRes->getModel());
 
     return resData.value<QList<QnResourceChannelMapping>>(
-        Qn::VIDEO_MULTIRESOURCE_CHANNEL_MAPPING_PARAM_NAME);
+        ResourceDataKey::kMultiresourceVideoChannelMapping);
 }
 
 } // namespace utils

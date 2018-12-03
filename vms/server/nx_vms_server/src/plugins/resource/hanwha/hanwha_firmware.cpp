@@ -1,7 +1,7 @@
 #include "hanwha_firmware.h"
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 HanwhaFirmware::HanwhaFirmware(const QString& firmwareString)
@@ -90,5 +90,5 @@ int HanwhaFirmware::parseMajorVersion(const QString& majorVersionString) const
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

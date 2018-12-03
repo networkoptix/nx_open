@@ -4,6 +4,7 @@
 #include <nx/utils/uuid.h>
 
 #include "connection_manager.h"
+#include "transport/command_transport_delegate.h"
 #include "transport/transport_manager.h"
 
 namespace nx::clusterdb::engine {
@@ -92,6 +93,8 @@ void Connector::registerConnection(
     const NodeContext& nodeContext,
     std::unique_ptr<transport::AbstractConnection> connection)
 {
+    using ConnectionWithSequence = transport::CommandTransportDelegateWithData<int>;
+
     NX_DEBUG(this, lm("Connection %1 to %2 established successfully")
         .args(nodeContext.connectionId, url));
 
@@ -106,9 +109,26 @@ void Connector::registerConnection(
     connectionContext.fullPeerName.peerId = 
         connection->commonTransportHeaderOfRemoteTransaction().peerId;
     //connectionContext.userAgent = ;
-    connectionContext.connection = std::move(connection);
+    const auto connectionSequence = ++m_connectionSequence;
+    connectionContext.connection =
+        std::make_unique<ConnectionWithSequence>(
+            std::move(connection),
+            connectionSequence);
 
     m_connectionManager->addNewConnection(std::move(connectionContext));
+
+    // NOTE: Not relying on connectionId.
+    m_connectionManager->modifyConnectionByIdSafe(
+        nodeContext.connectionId,
+        [connectionSequence](auto abstractConnection)
+        {
+            const auto connection = 
+                dynamic_cast<ConnectionWithSequence*>(abstractConnection);
+            if (!connection || connection->data() != connectionSequence)
+                return;
+
+            connection->start();
+        });
 }
 
 void Connector::onConnectionClosed(

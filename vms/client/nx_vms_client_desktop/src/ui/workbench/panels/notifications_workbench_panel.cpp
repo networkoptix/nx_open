@@ -461,6 +461,13 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
     connect(toolTip.data(), &QnNotificationToolTipWidget::thumbnailClicked, tile,
         [tile]() { emit tile->clicked(Qt::LeftButton, QApplication::keyboardModifiers()); });
 
+    connect(tile, &EventTile::clicked, this,
+        [this]()
+        {
+            if (m_eventPanelHoverProcessor)
+                m_eventPanelHoverProcessor->forceHoverLeave();
+        });
+
     m_eventPanelHoverProcessor = new HoverFocusProcessor(parentWidget);
     m_eventPanelHoverProcessor->addTargetItem(toolTip);
     m_eventPanelHoverProcessor->setHoverEnterDelay(kToolTipShowDelayMs);

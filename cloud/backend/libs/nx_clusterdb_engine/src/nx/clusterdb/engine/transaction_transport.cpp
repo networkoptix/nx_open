@@ -112,6 +112,11 @@ void CommonHttpConnection::stopWhileInAioThread()
     m_inactivityTimer.reset();
 }
 
+void CommonHttpConnection::start()
+{
+    m_baseTransactionTransport->startListening();
+}
+
 network::SocketAddress CommonHttpConnection::remotePeerEndpoint() const
 {
     return m_connectionOriginatorEndpoint;

@@ -59,6 +59,16 @@ void EventRibbon::setFootersEnabled(bool value)
     d->setFootersEnabled(value);
 }
 
+bool EventRibbon::headersEnabled() const
+{
+    return d->headersEnabled();
+}
+
+void EventRibbon::setHeadersEnabled(bool value)
+{
+    d->setHeadersEnabled(value);
+}
+
 Qt::ScrollBarPolicy EventRibbon::scrollBarPolicy() const
 {
     return d->scrollBarPolicy();
@@ -141,6 +151,11 @@ int EventRibbon::count() const
 int EventRibbon::unreadCount() const
 {
     return d->unreadCount();
+}
+
+nx::utils::Interval<int> EventRibbon::visibleRange() const
+{
+    return d->visibleRange();
 }
 
 } // namespace nx::vms::client::desktop

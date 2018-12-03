@@ -5,7 +5,7 @@
 #include <nx/utils/log/assert.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 HanwhaAttributes::HanwhaAttributes(nx::network::http::StatusCode::Value statusCode):
@@ -117,5 +117,5 @@ boost::optional<double> HanwhaAttributes::attribute<double>(
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

@@ -106,8 +106,6 @@ public:
 
     // ==================================================
 
-    bool hasParam(const QString &name) const;
-
     virtual QString getUrl() const;
     virtual void setUrl(const QString &url);
 
@@ -117,6 +115,8 @@ public:
     bool hasConsumer(QnResourceConsumer *consumer) const;
 
     virtual bool isInitialized() const;
+
+    bool hasDefaultProperty(const QString &name) const;
 
     /* Note that these functions hide property API inherited from QObject.
      * This is intended as this API cannot be used with QnResource anyway

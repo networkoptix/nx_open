@@ -384,11 +384,10 @@ bool AnalyticsSearchListModel::Private::commitPrefetch(const QnTimePeriod& perio
 }
 
 rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& period,
-    GetCallback callback, int limit)
+    GetCallback callback, int limit) const
 {
     const auto server = q->commonModule()->currentServer();
-    NX_ASSERT(callback && server && server->restConnection());
-    if (!callback || !server || !server->restConnection())
+    if (!NX_ASSERT(callback && server && server->restConnection() && !q->isFilterDegenerate()))
         return {};
 
     Filter request;
@@ -489,7 +488,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
     if (q->livePaused())
         q->setLive(false);
 
-    setLiveReceptionActive(q->isLive() && q->isOnline());
+    setLiveReceptionActive(q->isLive() && q->isOnline() && !q->isFilterDegenerate());
 
     if (!m_liveReceptionActive)
         return;

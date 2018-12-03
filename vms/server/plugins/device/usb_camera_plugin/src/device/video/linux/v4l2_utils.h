@@ -34,7 +34,7 @@ private:
 * Get the name of the device reported by the underlying hardware.
 * @params[in] devicePath - the path to the device, like, /dev/video* on Linux.
 */
-std::string getDeviceName(const char * devicePath);
+std::string getDeviceName(const std::string& devicePath);
 
 /**
 * Get the list of devices on the system, with fields filled out.
@@ -44,7 +44,7 @@ std::vector<DeviceData> getDeviceList();
 /**
 * Get a list of codecs supported by this device
 */
-std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const char * devicePath);
+std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const std::string& devicePath);
 
 /**
 * Get the list of supported resolutions for the device with the given path.
@@ -54,7 +54,7 @@ std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const char 
 * @param[in] codecId - the codec whose resolution list is desired
 */
 std::vector<ResolutionData> getResolutionList(
-    const char * devicePath,
+    const std::string& devicePath,
     const device::CompressionTypeDescriptorPtr& targetCodecID);
 
 /**
@@ -64,7 +64,7 @@ std::vector<ResolutionData> getResolutionList(
 * @param[in] bitrate - the bitrate to set in bits per second.
 */ 
 void setBitrate(
-    const char * devicePath,
+    const std::string& devicePath,
     int bitrate,
     const device::CompressionTypeDescriptorPtr& targetCodecID);
 
@@ -74,7 +74,7 @@ void setBitrate(
 * @param[int] devicePath - the path to the device.
 */ 
 int getMaxBitrate(
-    const char * devicePath,
+    const std::string& devicePath,
     const device::CompressionTypeDescriptorPtr& tagetCodecID);
 
 } // namespace detail

@@ -42,6 +42,7 @@ public:
     virtual ~Private() override;
 
     AbstractSearchListModel* model() const;
+    EventRibbon* view() const;
 
     void goToLive();
 

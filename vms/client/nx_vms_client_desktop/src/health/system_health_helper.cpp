@@ -25,7 +25,7 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
         case QnSystemHealth::UsersEmailIsEmpty:
             return tr("Some users have not set their email addresses");
         case QnSystemHealth::SystemIsReadOnly:
-            return tr("System is in safe mode");
+            return tr("The System is in safe mode");
         case QnSystemHealth::EmailSendError:
             return tr("Error while sending email");
         case QnSystemHealth::StoragesNotConfigured:
@@ -39,7 +39,7 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
         case QnSystemHealth::ArchiveIntegrityFailed:
             return tr("Archive integrity problem detected");
         case QnSystemHealth::NoInternetForTimeSync:
-            return tr("No internet access for time synchronization");
+            return tr("The System has no internet access for time synchronization");
         default:
             break;
     }
@@ -125,7 +125,7 @@ QString QnSystemHealthStringsHelper::messageTooltip(QnSystemHealth::MessageType 
             return QString(); //< TODO: #vkutin #gdm Some tooltip would be nice.
 
         case QnSystemHealth::NoInternetForTimeSync:
-            return tr("No online server in the system has internet access for time synchronization.");
+            return tr("No online server in the System has internet access for time synchronization.");
 
         case QnSystemHealth::EmailIsEmpty:
             messageParts << tr("Email address is not set.") << tr("You cannot receive System notifications by email.");
@@ -137,7 +137,7 @@ QString QnSystemHealthStringsHelper::messageTooltip(QnSystemHealth::MessageType 
             messageParts << tr("Some users have not set their email addresses.") << tr("They cannot receive System notifications by email.");
             break;
         case QnSystemHealth::SystemIsReadOnly:
-            messageParts << tr("System is running in safe mode.") << tr("Any configuration changes except license activation are impossible.");
+            messageParts << tr("The System is running in safe mode.") << tr("Any configuration changes except license activation are impossible.");
             break;
         case QnSystemHealth::StoragesNotConfigured:
             messageParts << tr("Storage is not configured on the following Server:") << resourceName;

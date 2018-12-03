@@ -116,7 +116,7 @@ bool calculateRecordingParametersAvailable(const Cameras& cameras)
         [](const Camera& camera)
         {
             return camera->hasVideo()
-                && !camera->hasParam(Qn::NO_RECORDING_PARAMS_PARAM_NAME);
+                && !camera->hasDefaultProperty(ResourcePropertyKey::kNoRecordingParams);
         });
 }
 
@@ -595,7 +595,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
         {
             state.singleIoModuleSettings.visualStyle.setBase(
                 QnLexical::deserialized<vms::api::IoModuleVisualStyle>(
-                    firstCamera->getProperty(Qn::IO_OVERLAY_STYLE_PARAM_NAME), {}));
+                    firstCamera->getProperty(ResourcePropertyKey::kIoOverlayStyle), {}));
 
             state.singleIoModuleSettings.ioPortsData.setBase(firstCamera->ioPortDescriptions());
         }
@@ -751,7 +751,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
         fetchFromCameras<int>(state.wearableMotion.sensitivity, cameras,
             [](const Camera& camera)
             {
-                NX_ASSERT(camera->getVideoLayout()->channelCount() == 0);
+                NX_ASSERT(camera->getVideoLayout()->channelCount() == 1);
                 QnMotionRegion region = camera->getMotionRegion(0);
                 const auto rects = region.getAllMotionRects();
                 return rects.empty()

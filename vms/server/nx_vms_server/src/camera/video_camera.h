@@ -16,20 +16,20 @@
 #include <core/resource/resource_consumer.h>
 #include <providers/live_stream_provider.h>
 #include <server/server_globals.h>
-#include <nx/mediaserver/settings.h>
-#include <nx/mediaserver/hls/hls_live_playlist_manager.h>
+#include <nx/vms/server/settings.h>
+#include <nx/vms/server/hls/hls_live_playlist_manager.h>
 #include <api/helpers/thumbnail_request_data.h>
 
 class QnVideoCameraGopKeeper;
 class QnDataProviderFactory;
 class MediaStreamCache;
 
-namespace nx { namespace mediaserver { class Settings; } }
+namespace nx { namespace vms::server { class Settings; } }
 
 /**
  * TODO: #ak Have to introduce this class since QnAbstractVideoCamera
  * is in common and thus cannot dependend on mediaserver's types.
- * TODO: #ak QnAbstractMediaServerVideoCamera is better be nx::vms::mediaserver::AbstractVideoCamera.
+ * TODO: #ak QnAbstractMediaServerVideoCamera is better be nx::vms::vms::server::AbstractVideoCamera.
  */
 class QnAbstractMediaServerVideoCamera: public QnAbstractVideoCamera
 {
@@ -82,7 +82,7 @@ public:
     /**
      * TODO: #ak Should remove it from here.
      */
-    virtual nx::mediaserver::hls::LivePlaylistManagerPtr hlsLivePlaylistManager(
+    virtual nx::vms::server::hls::LivePlaylistManagerPtr hlsLivePlaylistManager(
         MediaQuality streamQuality) const = 0;
 
     /**
@@ -101,7 +101,7 @@ class QnVideoCamera: public QObject, public QnAbstractMediaServerVideoCamera
 
 public:
     QnVideoCamera(
-        const nx::mediaserver::Settings& settings,
+        const nx::vms::server::Settings& settings,
         QnDataProviderFactory* dataProviderFactory,
         const QnResourcePtr& resource);
     virtual ~QnVideoCamera() override;
@@ -141,7 +141,7 @@ public:
     virtual const MediaStreamCache* liveCache( MediaQuality streamQuality ) const override;
     virtual MediaStreamCache* liveCache( MediaQuality streamQuality ) override;
     virtual bool ensureLiveCacheStarted( MediaQuality streamQuality, qint64 targetDurationUSec ) override;
-    virtual nx::mediaserver::hls::LivePlaylistManagerPtr hlsLivePlaylistManager(MediaQuality streamQuality) const override;
+    virtual nx::vms::server::hls::LivePlaylistManagerPtr hlsLivePlaylistManager(MediaQuality streamQuality) const override;
 
     virtual QnResourcePtr resource() const override;
 
@@ -152,7 +152,7 @@ private:
 private:
     QnMutex m_readersMutex;
     QnMutex m_getReaderMutex;
-    const nx::mediaserver::Settings& m_settings;
+    const nx::vms::server::Settings& m_settings;
     QnDataProviderFactory* m_dataProviderFactory = nullptr;
     QnResourcePtr m_resource;
     QnLiveStreamProviderPtr m_primaryReader;
@@ -165,7 +165,7 @@ private:
     //!index - is a \a MediaQuality element
     std::vector<std::unique_ptr<MediaStreamCache> > m_liveCache;
     //!index - is a \a MediaQuality element
-    std::vector<nx::mediaserver::hls::LivePlaylistManagerPtr> m_hlsLivePlaylistManager;
+    std::vector<nx::vms::server::hls::LivePlaylistManagerPtr> m_hlsLivePlaylistManager;
 
     const qint64 m_loStreamHlsInactivityPeriodMS;
     const qint64 m_hiStreamHlsInactivityPeriodMS;

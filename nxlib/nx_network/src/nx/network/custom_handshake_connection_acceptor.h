@@ -315,15 +315,16 @@ private:
         openConnections(lock);
         if (acceptResult)
         {
-            // TODO: #ak Uncomment, fix & remove extra post from onHandshakeDone.
-            //connection->cancelIOSync(aio::etNone);
             if (acceptResult->connection)
             {
                 acceptResult->connection->bindToAioThread(
                     SocketGlobals::aioService().getRandomAioThread());
             }
+
             nx::utils::swapAndCall(
-                m_acceptHandler, acceptResult->resultCode, std::move(acceptResult->connection));
+                m_acceptHandler,
+                acceptResult->resultCode,
+                std::move(acceptResult->connection));
         }
     }
 

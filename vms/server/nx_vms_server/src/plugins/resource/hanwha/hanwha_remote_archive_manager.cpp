@@ -7,7 +7,7 @@
 #include <utils/common/synctime.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 namespace {
@@ -117,5 +117,5 @@ RemoteArchiveSynchronizationSettings HanwhaRemoteArchiveManager::settings() cons
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

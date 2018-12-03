@@ -334,7 +334,7 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     if( strlen(cameraInfo.auxiliaryData) > 0 )
         resource->setProperty( QnThirdPartyResource::AUX_DATA_PARAM_NAME, QString::fromLatin1(cameraInfo.auxiliaryData) );
     if( strlen(cameraInfo.firmware) > 0 )
-        resource->setProperty( Qn::FIRMWARE_PARAM_NAME, QString::fromLatin1(cameraInfo.firmware) );
+        resource->setProperty(ResourcePropertyKey::kFirmware, QString::fromLatin1(cameraInfo.firmware));
 
     if( !resourcePool()->getNetResourceByPhysicalId( resource->getPhysicalId() ) )
     {

@@ -22,7 +22,7 @@ extern QString getValueFromString(const QString& line);
 QnPlDlinkResourceSearcher::QnPlDlinkResourceSearcher(QnMediaServerModule* serverModule):
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 
@@ -143,7 +143,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
                 continue;
 
             QnResourceData resourceData = dataPool()->data(manufacture(), name);
-            if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+            if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
                 continue; // model forced by ONVIF
 
             resource->setTypeId(rt);
@@ -214,7 +214,7 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const nx::utils::U
         return QList<QnResourcePtr>();
 
     QnResourceData resourceData = dataPool()->data(manufacture(), name);
-    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+    if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return QList<QnResourcePtr>(); // model forced by ONVIF
 
     QnNetworkResourcePtr resource ( new QnPlDlinkResource(serverModule()) );

@@ -19,6 +19,7 @@
 #include <ui/style/nx_style_p.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <utils/common/event_processors.h>
+#include <utils/common/scoped_value_rollback.h>
 
 #include <nx/api/mediaserver/image_request.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
@@ -66,6 +67,11 @@ QSize minimumWidgetSize(QWidget* widget)
     return widget->minimumSizeHint()
         .expandedTo(widget->minimumSize())
         .expandedTo(QApplication::globalStrut());
+}
+
+bool shouldAnimateTile(const QModelIndex& index)
+{
+    return !index.data(Qt::DisplayRole).toString().isEmpty();
 }
 
 } // namespace
@@ -146,12 +152,14 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
         [this](const QModelIndex& /*parent*/, int first, int last)
         {
             insertNewTiles(first, last - first + 1, UpdateMode::animated);
+            NX_ASSERT(m_model->rowCount() == count());
         });
 
-    m_modelConnections << connect(m_model, &QAbstractListModel::rowsAboutToBeRemoved, this,
+    m_modelConnections << connect(m_model, &QAbstractListModel::rowsRemoved, this,
         [this](const QModelIndex& /*parent*/, int first, int last)
         {
             removeTiles(first, last - first + 1, UpdateMode::animated);
+            NX_ASSERT(m_model->rowCount() == count());
         });
 
     m_modelConnections << connect(m_model, &QAbstractListModel::dataChanged, this,
@@ -162,23 +170,24 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
                 updateTile(i);
         });
 
-    m_modelConnections << connect(m_model, &QAbstractListModel::rowsAboutToBeMoved, this,
-        [this](const QModelIndex& /*sourceParent*/, int sourceFirst, int sourceLast)
-        {
-            removeTiles(sourceFirst, sourceLast - sourceFirst + 1, UpdateMode::instant);
-        });
-
     m_modelConnections << connect(m_model, &QAbstractListModel::rowsMoved, this,
         [this](const QModelIndex& /*parent*/, int sourceFirst, int sourceLast,
             const QModelIndex& /*destinationParent*/, int destinationIndex)
         {
             NX_ASSERT(destinationIndex < sourceFirst || destinationIndex > sourceLast + 1);
-            const auto count = sourceLast - sourceFirst + 1;
+            const auto movedCount = sourceLast - sourceFirst + 1;
             const auto index = destinationIndex < sourceFirst
                 ? destinationIndex
-                : destinationIndex - count;
+                : destinationIndex - movedCount;
 
-            insertNewTiles(index, count, UpdateMode::instant);
+            QnScopedValueRollback<bool> updateGuard(&m_updating, true);
+            removeTiles(sourceFirst, movedCount, UpdateMode::instant);
+            insertNewTiles(index, movedCount, UpdateMode::instant);
+
+            updateGuard.rollback();
+            updateView();
+
+            NX_ASSERT(m_model->rowCount() == count());
         });
 }
 
@@ -240,6 +249,7 @@ void EventRibbon::Private::updateTile(int index)
     widget->setAction(modelIndex.data(Qn::CommandActionRole).value<CommandActionPtr>());
     widget->setTitleColor(modelIndex.data(Qt::ForegroundRole).value<QColor>());
     widget->setFooterEnabled(m_footersEnabled);
+    widget->setHeaderEnabled(m_headersEnabled);
 
     setHelpTopic(widget, modelIndex.data(Qn::HelpTopicIdRole).toInt());
 
@@ -469,7 +479,7 @@ void EventRibbon::Private::closeExpiredTiles()
     for (const auto tile: expired)
         m_model->removeRows(m_deadlines[tile].index.row(), 1);
 
-    NX_VERBOSE(q) << "Expired" << expired.size() << "tiles";
+    NX_VERBOSE(q, "Expired %1 tiles", expired.size());
     NX_ASSERT(expired.size() == (oldDeadlineCount - m_deadlines.size()));
 };
 
@@ -494,6 +504,8 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
         return;
     }
 
+    QnScopedValueRollback<bool> updateGuard(&m_updating, true);
+
     const auto position = (index > 0)
         ? m_tiles[index - 1]->position + m_tiles[index - 1]->height + kDefaultTileSpacing
         : 0;
@@ -510,11 +522,15 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
     for (int i = index; i < endIndex; ++i)
     {
         const auto modelIndex = m_model->index(i);
-        const auto importance = modelIndex.data(Qn::NotificationLevelRole).value<Importance>();
         const auto closeable = modelIndex.data(Qn::RemovableRole).toBool();
         const auto timeout = modelIndex.data(Qn::TimeoutRole).value<milliseconds>();
+        const auto importance = modelIndex.data(Qn::NotificationLevelRole).value<Importance>();
 
-        TilePtr tile(new Tile(currentPosition, importance));
+        TilePtr tile(new Tile());
+        tile->position = currentPosition;
+        tile->importance = importance;
+        tile->animated = shouldAnimateTile(modelIndex);
+
         if (closeable && timeout > 0ms)
             m_deadlines[tile.get()] = Deadline{kInvisibleAutoCloseDelay, modelIndex};
 
@@ -569,9 +585,11 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
     // Animated shift of subsequent tiles.
     if (updateMode == UpdateMode::animated && endIndex < this->count())
     {
-        if (m_model->data(m_model->index(endIndex - 1), Qn::AnimatedRole).toBool())
+        if (m_tiles[endIndex - 1]->animated)
             addAnimatedShift(endIndex, -m_tiles[endIndex - 1]->height);
     }
+
+    updateGuard.rollback();
 
     doUpdateView();
 
@@ -580,12 +598,18 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
         const auto highlightRange = m_visible.intersected({index, index + count});
         for (int i = highlightRange.lower(); i < highlightRange.upper(); ++i)
         {
-            if (m_model->data(m_model->index(i), Qn::AnimatedRole).toBool())
+            if (m_tiles[i]->animated)
                highlightAppearance(m_tiles[i]->widget.get());
         }
     }
 
+    NX_VERBOSE(q, "%1 tiles inserted at position %2, new count is %3", count, index, m_tiles.size());
+
+    if (m_updating)
+        return;
+
     emit q->countChanged(this->count());
+    emit q->visibleRangeChanged(m_visible, {});
 }
 
 void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMode)
@@ -600,11 +624,16 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMo
         return;
     }
 
+    QnScopedValueRollback<bool> updateGuard(&m_updating, true);
+
     const auto unreadCountGuard = makeUnreadCountGuard();
 
     const int end = first + count;
     const int last = end - 1;
     const int nextPosition = m_tiles[last]->position + m_tiles[last]->height + kDefaultTileSpacing;
+
+    if (end == this->count())
+        updateMode = UpdateMode::instant;
 
     int delta = 0;
     const bool topmostTileWasVisible = m_visible.contains(first);
@@ -647,19 +676,27 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMo
             animatedIndex = qMax(first, animatedIndex - count);
     }
 
-    if (first != this->count() && m_model->data(m_model->index(first), Qn::AnimatedRole).toBool())
+    if (first != this->count())
     {
         if (first == 0)
             m_tiles[0]->position = 0; //< Keep integrity: positions must start from 0.
 
         // In case of several tiles removing, animate only the topmost tile collapsing.
-        if (topmostTileWasVisible && updateMode == UpdateMode::animated)
+        if (topmostTileWasVisible && updateMode == UpdateMode::animated && m_tiles[first]->animated)
             addAnimatedShift(first, delta);
     }
 
+    updateGuard.rollback();
+
     doUpdateView();
 
+    NX_VERBOSE(q, "%1 tiles removed at position %2, new count is %3", count, first, m_tiles.size());
+
+    if (m_updating)
+        return;
+
     emit q->countChanged(this->count());
+    emit q->visibleRangeChanged(m_visible, {});
 }
 
 void EventRibbon::Private::clear()
@@ -668,6 +705,11 @@ void EventRibbon::Private::clear()
     m_unreadCounts = {};
     m_totalUnreadCount = 0;
     m_deadlines = {};
+
+    const auto oldCount = count();
+
+    for (int index = m_visible.lower(); index != m_visible.upper(); ++index)
+        reserveWidget(index);
 
     m_tiles.clear();
     m_visible = {};
@@ -680,7 +722,11 @@ void EventRibbon::Private::clear()
 
     q->updateGeometry();
 
-    emit q->countChanged(count());
+    if (oldCount <= 0)
+        return;
+
+    emit q->countChanged(0);
+    emit q->visibleRangeChanged({}, {});
 }
 
 void EventRibbon::Private::clearShiftAnimations()
@@ -761,9 +807,28 @@ void EventRibbon::Private::setFootersEnabled(bool value)
     for (int i = m_visible.lower(); i < m_visible.upper(); ++i)
     {
         const auto& widget = m_tiles[i]->widget;
-        NX_ASSERT(widget);
-        if (widget)
+        if (NX_ASSERT(widget))
             widget->setFooterEnabled(m_footersEnabled);
+    }
+}
+
+bool EventRibbon::Private::headersEnabled() const
+{
+    return m_headersEnabled;
+}
+
+void EventRibbon::Private::setHeadersEnabled(bool value)
+{
+    if (m_headersEnabled == value)
+        return;
+
+    m_headersEnabled = value;
+
+    for (int i = m_visible.lower(); i < m_visible.upper(); ++i)
+    {
+        const auto& widget = m_tiles[i]->widget;
+        if (NX_ASSERT(widget))
+            widget->setHeaderEnabled(m_headersEnabled);
     }
 }
 
@@ -825,7 +890,7 @@ void EventRibbon::Private::updateHighlightedTiles()
                 return false;
 
             return m_highlightedTimestamp >= timestamp
-                && (duration.count() == QnTimePeriod::infiniteDuration()
+                && (duration.count() == QnTimePeriod::kInfiniteDuration
                     || m_highlightedTimestamp <= (timestamp + duration));
         };
 
@@ -898,11 +963,22 @@ void EventRibbon::Private::setViewportMargins(int top, int bottom)
 void EventRibbon::Private::updateView()
 {
     const auto unreadCountGuard = makeUnreadCountGuard();
+
+    const auto visibleRangeGuard = nx::utils::Guard(
+        [this, oldVisibleRange = m_visible]()
+        {
+            if (m_visible != oldVisibleRange)
+                emit q->visibleRangeChanged(m_visible, {});
+        });
+
     doUpdateView();
 }
 
 void EventRibbon::Private::doUpdateView()
 {
+    if (m_updating)
+        return;
+
     if (m_tiles.empty())
     {
         clear();
@@ -1087,6 +1163,11 @@ int EventRibbon::Private::count() const
 int EventRibbon::Private::unreadCount() const
 {
     return m_totalUnreadCount;
+}
+
+nx::utils::Interval<int> EventRibbon::Private::visibleRange() const
+{
+    return m_visible;
 }
 
 QnNotificationLevel::Value EventRibbon::Private::highestUnreadImportance() const

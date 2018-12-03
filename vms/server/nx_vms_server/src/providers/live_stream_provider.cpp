@@ -27,12 +27,12 @@
 #include <mediaserver_ini.h>
 #include <analytics/detected_objects_storage/analytics_events_receptor.h>
 #include <media_server/media_server_module.h>
-#include <nx/mediaserver/analytics/manager.h>
+#include <nx/vms/server/analytics/manager.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera.h>
 #include <utils/media/utils.h>
 
-using nx::mediaserver::analytics::AbstractVideoDataReceptorPtr;
+using nx::vms::server::analytics::AbstractVideoDataReceptorPtr;
 
 static const int CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES = 1000;
 static const int PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS = 10 * 1000;
@@ -61,10 +61,10 @@ public:
     QnSafeQueue<QnAbstractCompressedMetadataPtr> metadataQueue;
 };
 
-QnLiveStreamProvider::QnLiveStreamProvider(const nx::mediaserver::resource::CameraPtr& res)
+QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::CameraPtr& res)
     :
     QnAbstractMediaStreamDataProvider(res),
-    nx::mediaserver::ServerModuleAware(res->serverModule()),
+    nx::vms::server::ServerModuleAware(res->serverModule()),
     m_liveMutex(QnMutex::Recursive),
     m_framesSinceLastMetaData(0),
     m_totalVideoFrames(0),

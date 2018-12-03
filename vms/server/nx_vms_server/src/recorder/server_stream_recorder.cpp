@@ -19,7 +19,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "providers/spush_media_stream_provider.h"
-#include <nx/mediaserver/event/event_connector.h>
+#include <nx/vms/server/event/event_connector.h>
 #include <nx/vms/event/events/reasoned_event.h>
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include "nx/streaming/media_data_packet.h"
@@ -32,7 +32,7 @@
 #include <media_server/media_server_module.h>
 #include <nx/utils/cryptographic_hash.h>
 #include "archive_integrity_watcher.h"
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera.h>
 #include <utils/media/h264_utils.h>
 #include <utils/media/nalUnits.h>
 #include <utils/media/hevc_common.h>
@@ -102,13 +102,13 @@ QnServerStreamRecorder::QnServerStreamRecorder(
     connect(this, &QnStreamRecorder::recordingFinished, this, &QnServerStreamRecorder::at_recordingFinished);
 
     connect(this, &QnServerStreamRecorder::motionDetected, m_serverModule->eventConnector(),
-        &nx::mediaserver::event::EventConnector::at_motionDetected);
+        &nx::vms::server::event::EventConnector::at_motionDetected);
 
-    using storageFailureWithResource = void (nx::mediaserver::event::EventConnector::*)
+    using storageFailureWithResource = void (nx::vms::server::event::EventConnector::*)
         (const QnResourcePtr&, qint64, nx::vms::api::EventReason, const QnResourcePtr&);
 
     connect(this, &QnServerStreamRecorder::storageFailure, m_serverModule->eventConnector(),
-        storageFailureWithResource(&nx::mediaserver::event::EventConnector::at_storageFailure));
+        storageFailureWithResource(&nx::vms::server::event::EventConnector::at_storageFailure));
 
     connect(dev.data(), &QnResource::propertyChanged, this,
         &QnServerStreamRecorder::at_camera_propertyChanged);
@@ -125,7 +125,7 @@ QnServerStreamRecorder::~QnServerStreamRecorder()
 
 void QnServerStreamRecorder::at_camera_propertyChanged(const QnResourcePtr &, const QString & key)
 {
-    const auto camera = dynamic_cast<nx::mediaserver::resource::Camera*>(m_resource.data());
+    const auto camera = dynamic_cast<nx::vms::server::resource::Camera*>(m_resource.data());
     m_usePrimaryRecorder = (camera->getProperty(QnMediaResource::dontRecordPrimaryStreamKey()).toInt() == 0);
     m_useSecondaryRecorder = (camera->getProperty(QnMediaResource::dontRecordSecondaryStreamKey()).toInt() == 0);
 
@@ -133,7 +133,7 @@ void QnServerStreamRecorder::at_camera_propertyChanged(const QnResourcePtr &, co
     if (liveProvider) {
         if (key == QnMediaResource::motionStreamKey())
             liveProvider->updateSoftwareMotionStreamNum();
-        else if (key == Qn::FORCE_BITRATE_PER_GOP)
+        else if (key == ResourcePropertyKey::kBitratePerGOP)
             liveProvider->pleaseReopenStream();
     }
 }
@@ -359,7 +359,7 @@ int QnServerStreamRecorder::getBufferSize() const
 
 void QnServerStreamRecorder::updateStreamParams()
 {
-    const nx::mediaserver::resource::Camera* camera = dynamic_cast<const nx::mediaserver::resource::Camera*>(m_resource.data());
+    const nx::vms::server::resource::Camera* camera = dynamic_cast<const nx::vms::server::resource::Camera*>(m_resource.data());
     if (m_mediaProvider)
     {
         QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
@@ -387,7 +387,7 @@ void QnServerStreamRecorder::updateStreamParams()
 
 bool QnServerStreamRecorder::isMotionRec(Qn::RecordingType recType) const
 {
-    const QnSecurityCamResource* camera = static_cast<const nx::mediaserver::resource::Camera*>(m_resource.data());
+    const QnSecurityCamResource* camera = static_cast<const nx::vms::server::resource::Camera*>(m_resource.data());
     return recType == Qn::RecordingType::motionOnly ||
            (m_catalog == QnServer::HiQualityCatalog && recType == Qn::RecordingType::motionAndLow && camera->hasDualStreaming());
 }
@@ -413,7 +413,7 @@ void QnServerStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr
         QnMutexLocker lock( &m_scheduleMutex );
         task = m_currentScheduleTask;
     }
-    bool isRecording = task.recordingType != Qn::RecordingType::never 
+    bool isRecording = task.recordingType != Qn::RecordingType::never
         && m_serverModule->normalStorageManager()->isWritableStoragesAvailable();
     if (!m_resource->hasFlags(Qn::foreigner)) {
         if (isRecording) {
@@ -454,7 +454,7 @@ void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timest
 
 void QnServerStreamRecorder::updateContainerMetadata(QnAviArchiveMetadata* metadata) const
 {
-    using namespace nx::mediaserver;
+    using namespace nx::vms::server;
     metadata->version = QnAviArchiveMetadata::kIntegrityCheckVersion;
     metadata->integrityHash =
         IntegrityHashHelper::generateIntegrityHash(QByteArray::number(m_startDateTimeUs / 1000));
@@ -476,7 +476,7 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
     }
     QnScheduleTask task = currentScheduleTask();
 
-    const auto camera = static_cast<const nx::mediaserver::resource::Camera*>(m_resource.data());
+    const auto camera = static_cast<const nx::vms::server::resource::Camera*>(m_resource.data());
     const QnMetaDataV1* metaData = dynamic_cast<const QnMetaDataV1*>(media.get());
 
     if (m_catalog == QnServer::LowQualityCatalog && !metaData && !m_useSecondaryRecorder)
@@ -528,7 +528,7 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
 
 int QnServerStreamRecorder::getFpsForValue(int fps)
 {
-    const nx::mediaserver::resource::Camera* camera = dynamic_cast<const nx::mediaserver::resource::Camera*>(m_resource.data());
+    const nx::vms::server::resource::Camera* camera = dynamic_cast<const nx::vms::server::resource::Camera*>(m_resource.data());
     if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing)
     {
         if (m_catalog == QnServer::HiQualityCatalog)
@@ -664,7 +664,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
             if (scheduleTaskContainsWeekTimeMs(*itr, scheduleTimeMs))
             {
                 const auto camera =
-                    static_cast<const nx::mediaserver::resource::Camera*>(m_resource.data());
+                    static_cast<const nx::vms::server::resource::Camera*>(m_resource.data());
 
                 ScheduleTaskWithThresholds task(*itr);
                 task.recordBeforeSec = camera->recordBeforeMotionSec();
@@ -912,7 +912,7 @@ void QnServerStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, in
 
 bool QnServerStreamRecorder::needConfigureProvider() const
 {
-    const nx::mediaserver::resource::Camera* camera = dynamic_cast<nx::mediaserver::resource::Camera*>(m_resource.data());
+    const nx::vms::server::resource::Camera* camera = dynamic_cast<nx::vms::server::resource::Camera*>(m_resource.data());
     return camera->isLicenseUsed();
 }
 

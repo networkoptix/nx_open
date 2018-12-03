@@ -235,6 +235,7 @@ public:
     QnMediaResourcePtr mediaRes;
     ServerTrackInfoMap trackInfo;
     bool useProprietaryFormat;
+    bool multiChannelVideo = true;
 
     struct TranscodeParams
     {
@@ -346,7 +347,10 @@ void QnRtspConnectionProcessor::parseRequest()
     QString codec = urlQuery.queryItemValue("codec");
     if (!codec.isEmpty())
     {
-        AVCodec* avCodec = avcodec_find_encoder_by_name(codec.toLatin1().data());
+        QString codecLower = codec.toLower();
+        if (codecLower == "h264")
+            codecLower = "libopenh264";
+        AVCodec* avCodec = avcodec_find_encoder_by_name(codecLower.toLatin1().data());
         if (avCodec)
             d->transcodeParams.codecId = avCodec->id;
 
@@ -748,6 +752,10 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeDescribe()
     if (!d->mediaRes)
         return nx::network::http::StatusCode::notFound;
 
+    // if transcoding used -> multiple channels will be sticked to single stream video
+    if (d->transcodeParams.codecId != AV_CODEC_ID_NONE)
+        d->multiChannelVideo = false;
+
     d->playbackMode = getStreamingMode();
 
     createDataProvider();
@@ -758,9 +766,7 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeDescribe()
 
     QTextStream sdp(&d->response.messageBody);
 
-
     QnConstResourceVideoLayoutPtr videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
-
 
     int numAudio = 0;
     QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
@@ -776,7 +782,9 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeDescribe()
             numAudio = audioLayout->channelCount();
     }
 
-    int numVideo = videoLayout && d->useProprietaryFormat ? videoLayout->channelCount() : 1;
+    int numVideo = 1;
+    if (videoLayout && (d->useProprietaryFormat || d->multiChannelVideo))
+        numVideo = videoLayout->channelCount();
 
     addResponseRangeHeader();
 
@@ -1028,7 +1036,7 @@ void QnRtspConnectionProcessor::createDataProvider()
                 speed = tmpSpeed;
         }
         d->dataProcessor->setStreamingSpeed(speed);
-        d->dataProcessor->setMultiChannelVideo(d->useProprietaryFormat);
+        d->dataProcessor->setMultiChannelVideo(d->useProprietaryFormat || d->multiChannelVideo);
     }
     else
         d->dataProcessor->clearUnprocessedData();

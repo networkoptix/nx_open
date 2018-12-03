@@ -26,7 +26,7 @@ public:
             ResourceDataKey::kPossibleDefaultCredentials);
         registerKey<nx::common::utils::Credentials>(ResourceDataKey::kForcedDefaultCredentials);
         registerKey<QList<QnResourceChannelMapping>>(
-            Qn::VIDEO_MULTIRESOURCE_CHANNEL_MAPPING_PARAM_NAME);
+            ResourceDataKey::kMultiresourceVideoChannelMapping);
         registerKey<QnHttpConfigureRequestList>(ResourceDataKey::kPreStreamConfigureRequests);
         registerKey<QnBitrateList>(ResourceDataKey::kHighStreamAvailableBitrates);
         registerKey<QnBitrateList>(ResourceDataKey::kLowStreamAvailableBitrates);

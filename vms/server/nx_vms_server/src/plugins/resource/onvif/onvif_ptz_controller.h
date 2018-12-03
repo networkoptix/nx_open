@@ -7,7 +7,7 @@
 #include <QtCore/QPair>
 
 #include <core/ptz/basic_ptz_controller.h>
-#include <nx/mediaserver/resource/resource_fwd.h>
+#include <nx/vms/server/resource/resource_fwd.h>
 
 class QnPtzSpaceMapper;
 
@@ -17,7 +17,6 @@ class QnOnvifPtzController: public QnBasicPtzController {
 
 public:
     QnOnvifPtzController(const QnPlOnvifResourcePtr &resource);
-    virtual ~QnOnvifPtzController();
 
     virtual Ptz::Capabilities getCapabilities(const nx::core::ptz::Options& options) const override;
 
@@ -81,15 +80,15 @@ private:
 
 private:
     QnPlOnvifResourcePtr m_resource;
-    Ptz::Capabilities m_capabilities;
-    bool m_stopBroken;
-    bool m_speedBroken;
+    Ptz::Capabilities m_capabilities = Ptz::NoPtzCapabilities;
+    bool m_stopBroken = false;
+    bool m_speedBroken = false;
 
     SpeedLimits m_panSpeedLimits, m_tiltSpeedLimits, m_zoomSpeedLimits, m_focusSpeedLimits;
     QnPtzLimits m_limits;
     QMap<QString, QString> m_presetTokenById;
     QMap<QString, QString> m_presetNameByToken;
-    bool m_ptzPresetsReaded;
+    bool m_ptzPresetsIsRead = false;
     char m_floatFormat[16];
     char m_doubleFormat[16];
 

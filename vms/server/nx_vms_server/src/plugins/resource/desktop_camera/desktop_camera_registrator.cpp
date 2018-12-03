@@ -16,7 +16,7 @@ QnDesktopCameraRegistrator::QnDesktopCameraRegistrator(
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
     :
-    nx::mediaserver::ServerModuleAware(serverModule),
+    nx::vms::server::ServerModuleAware(serverModule),
     QnTCPConnectionProcessor(std::move(socket), owner)
 {
     Q_D(QnTCPConnectionProcessor);

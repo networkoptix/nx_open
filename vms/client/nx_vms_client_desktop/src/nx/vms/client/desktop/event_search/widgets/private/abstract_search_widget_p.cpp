@@ -327,7 +327,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
         {
             if (ini().automaticFilterByTimelineSelection)
             {
-                const bool selectionExists = !m_timelineSelection.isEmpty();
+                const bool selectionExists = !m_timelineSelection.isNull();
                 const bool selectionFilter = m_period == Period::selection;
 
                 if (selectionExists != selectionFilter)
@@ -354,7 +354,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
                 return;
 
             // If selection was cleared, update immediately, otherwise update after small delay.
-            if (m_timelineSelection.isEmpty())
+            if (m_timelineSelection.isNull())
                 applyTimePeriod->fire();
             else
                 applyTimePeriod->requestOperation();
@@ -506,6 +506,11 @@ AbstractSearchListModel* AbstractSearchWidget::Private::model() const
     return m_mainModel.data();
 }
 
+EventRibbon* AbstractSearchWidget::Private::view() const
+{
+    return ui->ribbon;
+}
+
 void AbstractSearchWidget::Private::goToLive()
 {
     if (m_mainModel->liveSupported())
@@ -602,7 +607,7 @@ QnTimePeriod AbstractSearchWidget::Private::effectiveTimePeriod() const
     auto current = qnSyncTime->currentDateTime();
     current.setTime(QTime(0, 0, 0, 0));
     return QnTimePeriod(current.addDays(1 - days).toMSecsSinceEpoch(),
-        QnTimePeriod::infiniteDuration());
+        QnTimePeriod::kInfiniteDuration);
 }
 
 AbstractSearchWidget::Cameras AbstractSearchWidget::Private::selectedCameras() const

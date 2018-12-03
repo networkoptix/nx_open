@@ -41,7 +41,7 @@ void QnVideoCameraPool::stop()
 }
 
 QnVideoCameraPool::QnVideoCameraPool(
-    const nx::mediaserver::Settings& settings,
+    const nx::vms::server::Settings& settings,
     QnDataProviderFactory* dataProviderFactory,
     QnResourcePool* resourcePool)
     :

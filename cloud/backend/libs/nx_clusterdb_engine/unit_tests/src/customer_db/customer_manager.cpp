@@ -6,10 +6,12 @@ namespace nx::clusterdb::engine::test {
 
 CustomerManager::CustomerManager(
     SyncronizationEngine* syncronizationEngine,
-    dao::CustomerDao* customerDao)
+    dao::CustomerDao* customerDao,
+    const std::string& systemId)
     :
     m_syncronizationEngine(syncronizationEngine),
-    m_customerDao(customerDao)
+    m_customerDao(customerDao),
+    m_systemId(systemId)
 {
     using namespace std::placeholders;
 
@@ -38,7 +40,7 @@ void CustomerManager::saveCustomer(
     using namespace std::placeholders;
 
     m_syncronizationEngine->transactionLog().startDbTransaction(
-        "",
+        m_systemId,
         [this, customer](auto&&... args)
         {
             return saveCustomerToDb(std::move(args)..., customer);
@@ -58,7 +60,7 @@ void CustomerManager::removeCustomer(
     using namespace std::placeholders;
 
     m_syncronizationEngine->transactionLog().startDbTransaction(
-        "",
+        m_systemId,
         [this, id](auto&&... args) { return removeCustomerFromDb(std::move(args)..., id); },
         [handler = std::move(handler)](nx::sql::DBResult dbResult)
         {
@@ -99,7 +101,7 @@ nx::sql::DBResult CustomerManager::saveCustomerToDb(
 
     return m_syncronizationEngine->transactionLog()
         .generateTransactionAndSaveToLog<command::SaveCustomer>(
-            queryContext, "", customer);
+            queryContext, m_systemId, customer);
 }
 
 nx::sql::DBResult CustomerManager::removeCustomerFromDb(
@@ -110,7 +112,7 @@ nx::sql::DBResult CustomerManager::removeCustomerFromDb(
 
     return m_syncronizationEngine->transactionLog()
         .generateTransactionAndSaveToLog<command::RemoveCustomer>(
-            queryContext, "", Id{customerId});
+            queryContext, m_systemId, Id{customerId});
 }
 
 nx::sql::DBResult CustomerManager::processSaveCustomer(

@@ -39,6 +39,8 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
 
     connect(m_downloader.get(), &Downloader::downloadFailed,
         this, &ClientUpdateTool::atDownloadFailed);
+
+    m_downloader->startDownloads();
 }
 
 ClientUpdateTool::~ClientUpdateTool()
@@ -105,7 +107,7 @@ void ClientUpdateTool::setServerUrl(nx::utils::Url serverUrl, QnUuid serverId)
 
 void ClientUpdateTool::atRemoteUpdateInformation(const nx::update::Information& updateInformation)
 {
-    auto clientInfo = QnAppInfo::currentSystemInformation();
+    auto systemInfo = QnAppInfo::currentSystemInformation();
     QString errorMessage;
     // Update is allowed if either target version has the same cloud host or
     // there are no servers linked to the cloud in the system.
@@ -114,7 +116,7 @@ void ClientUpdateTool::atRemoteUpdateInformation(const nx::update::Information& 
 
     nx::update::Package clientPackage;
     nx::update::findPackage(
-        clientInfo,
+        systemInfo,
         updateInformation,
         true, cloudUrl, boundToCloud, &clientPackage, &errorMessage);
 
@@ -143,6 +145,17 @@ void ClientUpdateTool::atRemoteUpdateInformation(const nx::update::Information& 
 nx::update::UpdateContents ClientUpdateTool::getRemoteUpdateInfo() const
 {
     return m_remoteUpdateContents;
+}
+
+bool ClientUpdateTool::shouldInstallThis(const UpdateContents& contents) const
+{
+    QString clientVersion = nx::utils::AppInfo::applicationVersion();
+
+    if (!contents.clientPackage.isValid())
+        return false;
+
+    return clientVersion.isEmpty()
+        || contents.getVersion() > nx::utils::SoftwareVersion(clientVersion);
 }
 
 void ClientUpdateTool::downloadUpdate(const UpdateContents& contents)
@@ -316,7 +329,7 @@ bool ClientUpdateTool::installUpdate()
     static const int kMaxTries = 5;
     QString absolutePath = QFileInfo(m_updateFile).absoluteFilePath();
 
-    for (int retries = 0; retries < kMaxTries; retries++)
+    for (int retries = 0; retries < kMaxTries; ++retries)
     {
         using Result = applauncher::api::ResultType::Value;
         Result result = applauncher::api::installZip(m_updateVersion, absolutePath);

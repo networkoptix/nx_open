@@ -6,12 +6,12 @@
 
 #include "camera/video_camera.h"
 
-#include <nx/mediaserver/resource/resource_fwd.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/resource/resource_fwd.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class QnCameraDiagnosticsRestHandler:
     public QnJsonRestHandler,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 
@@ -27,11 +27,11 @@ public:
 
 private:
     static CameraDiagnostics::Result checkCameraAvailability(
-        const nx::mediaserver::resource::CameraPtr& cameraRes);
+        const nx::vms::server::resource::CameraPtr& cameraRes);
 
     static CameraDiagnostics::Result tryAcquireCameraMediaStream(
         const QnVideoCameraPtr& videoCamera);
 
     static CameraDiagnostics::Result checkCameraMediaStreamForErrors(
-        const nx::mediaserver::resource::CameraPtr& camera);
+        const nx::vms::server::resource::CameraPtr& camera);
 };

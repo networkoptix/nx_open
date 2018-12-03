@@ -36,7 +36,7 @@ class ClientUpdateTool:
 
 public:
     ClientUpdateTool(QObject* parent = nullptr);
-    ~ClientUpdateTool();
+    virtual ~ClientUpdateTool() override;
 
     enum State
     {
@@ -59,6 +59,13 @@ public:
         /** Got an error during installation. */
         applauncherError,
     };
+
+    /**
+     * Simple check whether client should install anything from these contents.
+     * @param contents
+     * @return true if client's update package should o be installed.
+     */
+    bool shouldInstallThis(const UpdateContents& contents) const;
 
     /**
      * Asks downloader to get update for client.

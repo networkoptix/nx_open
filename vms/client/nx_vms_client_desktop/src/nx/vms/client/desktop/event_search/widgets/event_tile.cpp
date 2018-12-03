@@ -58,6 +58,29 @@ static constexpr int kSeparatorHeight = 6;
 
 static constexpr int kMaximumResourceListSize = 3; //< Before "...and n more"
 
+static constexpr int kMaximumPreviewHeightWithHeader = 120;
+static constexpr int kMaximumPreviewHeightWithoutHeader = 136;
+
+static constexpr QMargins kMarginsWithHeader(8, 8, 8, 8);
+static constexpr QMargins kMarginsWithoutHeader(8, 4, 8, 8);
+
+static constexpr QMargins kWidePreviewMarginsWithHeader(0, 0, 0, 0);
+static constexpr QMargins kWidePreviewMarginsWithoutHeader(0, 4, 0, 0);
+
+// Close button margins are fine-tuned in correspondence with tile layout.
+static constexpr QMargins kCloseButtonMarginsWithHeader(0, 6, 2, 0);
+static constexpr QMargins kCloseButtonMarginsWithoutHeader(0, 2, 2, 0);
+
+void setWidgetHolder(QWidget* widget, QWidget* newHolder)
+{
+    auto oldHolder = widget->parentWidget();
+    const bool wasHidden = widget->isHidden();
+    oldHolder->layout()->removeWidget(widget);
+    widget->setParent(newHolder);
+    newHolder->layout()->addWidget(widget);
+    widget->setHidden(wasHidden);
+};
+
 } // namespace
 
 // ------------------------------------------------------------------------------------------------
@@ -67,6 +90,7 @@ struct EventTile::Private
 {
     EventTile* const q;
     CloseButton* const closeButton;
+    WidgetAnchor* const closeButtonAnchor;
     bool closeable = false;
     CommandActionPtr action; //< Button action.
     QnElidedLabel* const progressLabel;
@@ -84,6 +108,7 @@ struct EventTile::Private
     Private(EventTile* q):
         q(q),
         closeButton(new CloseButton(q)),
+        closeButtonAnchor(anchorWidgetToParent(closeButton, Qt::RightEdge | Qt::TopEdge)),
         progressLabel(new QnElidedLabel(q)),
         loadPreviewTimer(new QTimer(q))
     {
@@ -191,11 +216,12 @@ EventTile::EventTile(QWidget* parent):
     ui->setupUi(this);
     setAttribute(Qt::WA_Hover);
 
-    // Close button margins are fine-tuned in correspondence with UI-file.
-    static constexpr QMargins kCloseButtonMargins(0, 6, 2, 0);
-
     d->closeButton->setHidden(true);
-    anchorWidgetToParent(d->closeButton, Qt::RightEdge | Qt::TopEdge, kCloseButtonMargins);
+    d->closeButtonAnchor->setMargins(kCloseButtonMarginsWithHeader);
+
+    ui->mainWidget->layout()->setContentsMargins(kMarginsWithHeader);
+    ui->wideHolder->layout()->setContentsMargins(kWidePreviewMarginsWithHeader);
+    ui->previewWidget->setMaximumHeight(kMaximumPreviewHeightWithHeader);
 
     auto sizePolicy = ui->timestampLabel->sizePolicy();
     sizePolicy.setRetainSizeWhenHidden(true);
@@ -263,9 +289,11 @@ EventTile::EventTile(QWidget* parent):
         style::Metrics::kStandardPadding,
         style::Metrics::kStandardPadding);
 
-    ui->busyIndicator->setHidden(true);
-    ui->progressHolder->setHidden(true);
-    ui->mainWidget->setHidden(true);
+    ui->busyIndicator->hide();
+    ui->progressHolder->hide();
+    ui->mainWidget->hide();
+
+    ui->secondaryTimestampHolder->hide();
 
     QFont progressLabelFont;
     progressLabelFont.setWeight(QFont::DemiBold);
@@ -680,6 +708,41 @@ void EventTile::setFooterEnabled(bool value)
     ui->footerLabel->setHidden(!d->footerEnabled || ui->footerLabel->text().isEmpty());
 }
 
+bool EventTile::headerEnabled() const
+{
+    return !ui->iconLabel->isHidden();
+}
+
+void EventTile::setHeaderEnabled(bool value)
+{
+    if (headerEnabled() == value)
+        return;
+
+    ui->iconLabel->setHidden(!value);
+    ui->nameLabel->setHidden(!value);
+
+    if (value)
+    {
+        setWidgetHolder(ui->timestampLabel, ui->primaryTimestampHolder);
+        ui->secondaryTimestampHolder->hide();
+        ui->primaryTimestampHolder->show();
+        ui->previewWidget->setMaximumHeight(kMaximumPreviewHeightWithHeader);
+        ui->mainWidget->layout()->setContentsMargins(kMarginsWithHeader);
+        ui->wideHolder->layout()->setContentsMargins(kWidePreviewMarginsWithHeader);
+        d->closeButtonAnchor->setMargins(kCloseButtonMarginsWithHeader);
+    }
+    else
+    {
+        setWidgetHolder(ui->timestampLabel, ui->secondaryTimestampHolder);
+        ui->secondaryTimestampHolder->show();
+        ui->primaryTimestampHolder->hide();
+        ui->previewWidget->setMaximumHeight(kMaximumPreviewHeightWithoutHeader);
+        ui->mainWidget->layout()->setContentsMargins(kMarginsWithoutHeader);
+        ui->wideHolder->layout()->setContentsMargins(kWidePreviewMarginsWithoutHeader);
+        d->closeButtonAnchor->setMargins(kCloseButtonMarginsWithoutHeader);
+    }
+}
+
 EventTile::Mode EventTile::mode() const
 {
     if (ui->previewWidget->parentWidget() == ui->narrowHolder)
@@ -694,28 +757,17 @@ void EventTile::setMode(Mode value)
     if (mode() == value)
         return;
 
-    const auto reparentPreview =
-        [this](QWidget* newParent)
-        {
-            auto oldParent = ui->previewWidget->parentWidget();
-            const bool wasHidden = ui->previewWidget->isHidden();
-            oldParent->layout()->removeWidget(ui->previewWidget);
-            ui->previewWidget->setParent(newParent);
-            newParent->layout()->addWidget(ui->previewWidget);
-            ui->previewWidget->setHidden(wasHidden);
-        };
-
     const bool noPreview = ui->previewWidget->isHidden() || !ui->previewWidget->imageProvider();
     switch (value)
     {
         case Mode::standard:
-            reparentPreview(ui->narrowHolder);
+            setWidgetHolder(ui->previewWidget, ui->narrowHolder);
             ui->narrowHolder->setHidden(noPreview);
             ui->wideHolder->setHidden(true);
             break;
 
         case Mode::wide:
-            reparentPreview(ui->wideHolder);
+            setWidgetHolder(ui->previewWidget, ui->wideHolder);
             ui->wideHolder->setHidden(noPreview);
             ui->narrowHolder->setHidden(false); //< There is a spacer child item.
             break;

@@ -100,15 +100,13 @@ void QnNetworkResource::setPhysicalId(const QString &physicalId)
 
 void QnNetworkResource::setAuth(const QAuthenticator &auth)
 {
-    setProperty(
-        ResourcePropertyKey::kCredentials,
+    setProperty(ResourcePropertyKey::kCredentials,
         lit("%1:%2").arg(auth.user()) .arg(auth.password()));
 }
 
 void QnNetworkResource::setDefaultAuth(const QAuthenticator &auth)
 {
-    setProperty(
-        ResourcePropertyKey::kDefaultCredentials,
+    setProperty(ResourcePropertyKey::kDefaultCredentials,
         lit("%1:%2").arg(auth.user()).arg(auth.password()));
 }
 

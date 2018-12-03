@@ -4,7 +4,7 @@
 #include "server_stream_recorder.h"
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 
 // IntegrityHashHelper -----------------------------------------------------------------------------
 const QByteArray IntegrityHashHelper::kIntegrityHashSalt = "408422e1-1b4c-498c-b45a-43ef7723c6e5";
@@ -104,5 +104,5 @@ void ServerArchiveIntegrityWatcher::emitSignal(const QString& fileName)
 }
 //-------------------------------------------------------------------------------------------------
 
-} // namespace mediaserver
+} // namespace vms::server
 } // namespace nx

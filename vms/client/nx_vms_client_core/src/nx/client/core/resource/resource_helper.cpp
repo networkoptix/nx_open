@@ -57,7 +57,7 @@ void ResourceHelper::setResourceId(const QString& id)
             {
                 if (param == ResourcePropertyKey::kMediaCapabilities)
                     emit audioSupportedChanged();
-                else if (param == Qn::IO_CONFIG_PARAM_NAME)
+                else if (param == ResourcePropertyKey::kIoConfigCapability)
                     emit isIoModuleChanged();
             });
     }

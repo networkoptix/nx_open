@@ -1039,7 +1039,7 @@ void LegacyCameraScheduleWidget::updateRecordingParamsAvailable()
         {
             return camera->hasVideo(0)
                 && camera->getVendor() != lit("GENERIC_RTSP")
-                && !camera->hasParam(Qn::NO_RECORDING_PARAMS_PARAM_NAME);
+                && !camera->hasDefaultProperty(ResourcePropertyKey::kNoRecordingParams);
         });
 
     if (m_recordingParamsAvailable == available)

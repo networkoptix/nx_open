@@ -98,10 +98,10 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
         std::bind( &QnSecurityCamResource::calculateMotionType, this ),
         &m_mutex ),
     m_cachedIsIOModule(
-        [this]()->bool{ return getProperty(Qn::IO_CONFIG_PARAM_NAME).toInt() > 0; },
+        [this]()->bool{ return getProperty(ResourcePropertyKey::kIoConfigCapability).toInt() > 0; },
         &m_mutex),
     m_cachedCanConfigureRemoteRecording(
-        [this]() { return getProperty(Qn::kCanConfigureRemoteRecording).toInt() > 0; },
+        [this]() { return getProperty(ResourcePropertyKey::kCanConfigureRemoteRecording).toInt() > 0; },
         &m_mutex),
     m_cachedCameraMediaCapabilities(
         [this]()
@@ -114,14 +114,14 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
         [this]()
         {
             return QnLexical::deserialized<nx::core::resource::DeviceType>(
-                getProperty(Qn::kDeviceType),
+                getProperty(ResourcePropertyKey::kDeviceType),
                 nx::core::resource::DeviceType::unknown);
         },
         &m_mutex),
     m_cachedHasVideo(
         [this]()
         {
-            return !resourceData().value(Qn::VIDEO_DISABLED_PARAM_NAME, false);
+            return !resourceData().value(ResourceDataKey::kNoVideoSupport, false);
         },
         &m_mutex)
 {
@@ -157,7 +157,7 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
             if (key == ResourcePropertyKey::kDts)
                 emit licenseTypeChanged(toSharedPointer(this));
 
-            if (key == Qn::kDeviceType)
+            if (key == ResourcePropertyKey::kDeviceType)
                 emit licenseTypeChanged(toSharedPointer(this));
         });
 
@@ -185,7 +185,7 @@ bool QnSecurityCamResource::setProperty(
 }
 
 bool QnSecurityCamResource::isGroupPlayOnly() const {
-    return hasParam(Qn::kGroupPlayParamName);
+    return hasDefaultProperty(ResourcePropertyKey::kGroupPlayParamName);
 }
 
 bool QnSecurityCamResource::needsToChangeDefaultPassword() const
@@ -511,7 +511,7 @@ bool QnSecurityCamResource::isSharingLicenseInGroup() const
     if (!QnLicense::licenseTypeInfo(licenseType()).allowedToShareChannel)
         return false; //< Don't allow sharing for encoders e.t.c
 
-    return resourceData().value<bool>(Qn::kCanShareLicenseGroup, false);
+    return resourceData().value<bool>(ResourceDataKey::kCanShareLicenseGroup, false);
 }
 
 bool QnSecurityCamResource::isNvr() const
@@ -537,7 +537,7 @@ void QnSecurityCamResource::setDeviceType(nx::core::resource::DeviceType deviceT
 {
     m_cachedDeviceType.reset();
     m_cachedLicenseType.reset();
-    setProperty(Qn::kDeviceType, QnLexical::serialized(deviceType));
+    setProperty(ResourcePropertyKey::kDeviceType, QnLexical::serialized(deviceType));
 }
 
 Qn::LicenseType QnSecurityCamResource::licenseType() const
@@ -606,7 +606,7 @@ bool QnSecurityCamResource::setIoPortDescriptions(QnIOPortDataList newPorts, boo
         hasOutputs |= supportedTypes & Qn::PT_Output;
     }
 
-    setProperty(Qn::IO_SETTINGS_PARAM_NAME, QString::fromUtf8(QJson::serialized(newPorts)));
+    setProperty(ResourcePropertyKey::kIoSettings, QString::fromUtf8(QJson::serialized(newPorts)));
     setCameraCapability(Qn::InputPortCapability, hasInputs);
     setCameraCapability(Qn::OutputPortCapability, hasOutputs);
     return wasDataMerged;
@@ -615,7 +615,7 @@ bool QnSecurityCamResource::setIoPortDescriptions(QnIOPortDataList newPorts, boo
 QnIOPortDataList QnSecurityCamResource::ioPortDescriptions(Qn::IOPortType type) const
 {
     auto ports = QJson::deserialized<QnIOPortDataList>(
-        getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
+        getProperty(ResourcePropertyKey::kIoSettings).toUtf8());
 
     if (type != Qn::PT_Unknown)
         nx::utils::remove_if(ports, [&](auto p) { return p.portType != type; });
@@ -868,12 +868,12 @@ void QnSecurityCamResource::setModel(const QString &model)
 
 QString QnSecurityCamResource::getFirmware() const
 {
-    return getProperty(Qn::FIRMWARE_PARAM_NAME);
+    return getProperty(ResourcePropertyKey::kFirmware);
 }
 
 void QnSecurityCamResource::setFirmware(const QString &firmware)
 {
-    setProperty(Qn::FIRMWARE_PARAM_NAME, firmware);
+    setProperty(ResourcePropertyKey::kFirmware, firmware);
 }
 
 bool QnSecurityCamResource::trustCameraTime() const
@@ -1318,11 +1318,11 @@ void QnSecurityCamResource::resetCachedValues()
 
 bool QnSecurityCamResource::useBitratePerGop() const
 {
-    auto result = getProperty(Qn::FORCE_BITRATE_PER_GOP);
+    auto result = getProperty(ResourcePropertyKey::kBitratePerGOP);
     if (!result.isEmpty())
         return result.toInt() > 0;
 
-    return resourceData().value<bool>(Qn::FORCE_BITRATE_PER_GOP);
+    return resourceData().value<bool>(ResourceDataKey::kBitratePerGOP);
 }
 
 bool QnSecurityCamResource::isIOModule() const

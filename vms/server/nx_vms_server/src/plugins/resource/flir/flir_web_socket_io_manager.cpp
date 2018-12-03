@@ -560,7 +560,6 @@ void WebSocketIoManager::sendKeepAliveUnsafe()
         kKeepAliveTimeout);
 }
 
-
 void WebSocketIoManager::handleServerWhoAmIResponseUnsafe(const CommandResponse& response)
 {
     const auto sessionId = response.value<int>(kSessionIdParamName);
@@ -632,9 +631,8 @@ void WebSocketIoManager::checkAndNotifyIfNeeded(const Notification& notification
 
 void WebSocketIoManager::initIoPortStatesUnsafe()
 {
-    auto resData = m_resource->resourceData();
-
-    auto allPorts = resData.value<QnIOPortDataList>(Qn::IO_SETTINGS_PARAM_NAME);
+    const auto resData = m_resource->resourceData();
+    const auto allPorts = resData.value<QnIOPortDataList>(ResourceDataKey::kIoSettings);
 
     for (const auto& port : allPorts)
     {

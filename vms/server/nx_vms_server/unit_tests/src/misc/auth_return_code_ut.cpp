@@ -13,7 +13,7 @@
 #include <database/server_db.h>
 #include <network/authutil.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/mediaserver/authenticator.h>
+#include <nx/vms/server/authenticator.h>
 #include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/custom_headers.h>
@@ -32,7 +32,7 @@
 // - Replace hardcoded credentials with constants.
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 namespace test {
 
 class LdapManagerMock: public AbstractLdapManager
@@ -286,7 +286,7 @@ public:
             {
                 httpClient.reset(); //< Ensure connection is closed.
 
-                QnTimePeriod period(0, QnTimePeriod::infiniteDuration());
+                const auto period = QnTimePeriod::anytime();
                 QnAuditRecordList outputData;
                 static const std::chrono::seconds kMaxWaitTime(10);
                 nx::utils::ElapsedTimer timer;
@@ -610,5 +610,5 @@ TEST_F(AuthenticationTest, serverKey)
 }
 
 } // namespace test
-} // namespace mediaserver
+} // namespace vms::server
 } // namespace nx

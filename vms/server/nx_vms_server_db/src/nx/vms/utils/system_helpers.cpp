@@ -35,9 +35,8 @@ bool backupDatabase(const QString& backupDir,
         ? *buildNumber
         : nx::utils::SoftwareVersion(nx::utils::AppInfo::applicationVersion()).build();
 
-    const QString fileName = lm("%1_%2_%3.backup")
-                                 .args(closeDirPath(backupDir) + "ecs", buildNumberArg,
-                                     qnSyncTime->currentMSecsSinceEpoch());
+    const QString fileName = lm("%1_%2_%3.db").args(closeDirPath(backupDir) + "ecs",
+        buildNumberArg, qnSyncTime->currentMSecsSinceEpoch());
 
     QDir dir(backupDir);
     if (!dir.exists() && !dir.mkdir(backupDir))
@@ -84,7 +83,7 @@ QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir)
 
     for (const auto& fileInfo: dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files))
     {
-        if (fileInfo.completeSuffix() != "backup")
+        if (fileInfo.completeSuffix() != "db")
             continue;
 
         auto nameSplits = fileInfo.baseName().split('_');

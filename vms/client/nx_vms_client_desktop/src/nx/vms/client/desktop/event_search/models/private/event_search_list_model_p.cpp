@@ -275,14 +275,14 @@ bool EventSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodToC
 
 void EventSearchListModel::Private::fetchLive()
 {
-    if (m_liveFetch.id || !q->isLive() || !q->isOnline() || q->livePaused())
+    if (m_liveFetch.id || !q->isLive() || !q->isOnline() || q->livePaused() || q->isFilterDegenerate())
         return;
 
     if (m_data.empty() && fetchInProgress())
         return; //< Don't fetch live if first fetch from archive is in progress.
 
     const milliseconds from = (m_data.empty() ? 0ms : startTime(m_data.front()));
-    m_liveFetch.period = QnTimePeriod(from.count(), QnTimePeriod::infiniteDuration());
+    m_liveFetch.period = QnTimePeriod(from.count(), QnTimePeriod::kInfiniteDuration);
     m_liveFetch.direction = FetchDirection::later;
     m_liveFetch.batchSize = q->fetchBatchSize();
 
@@ -322,11 +322,10 @@ void EventSearchListModel::Private::fetchLive()
 }
 
 rest::Handle EventSearchListModel::Private::getEvents(
-    const QnTimePeriod& period, GetCallback callback, Qt::SortOrder order, int limit)
+    const QnTimePeriod& period, GetCallback callback, Qt::SortOrder order, int limit) const
 {
     const auto server = q->commonModule()->currentServer();
-    NX_ASSERT(callback && server && server->restConnection());
-    if (!callback || !server || !server->restConnection())
+    if (!NX_ASSERT(callback && server && server->restConnection() && !q->isFilterDegenerate()))
         return {};
 
     QnEventLogMultiserverRequestData request;
@@ -350,7 +349,7 @@ rest::Handle EventSearchListModel::Private::getEvents(
         request.limit);
 
     const auto internalCallback =
-        [callback, guard = QPointer<Private>(this)](
+        [callback, guard = QPointer<const Private>(this)](
             bool success, rest::Handle handle, rest::EventLogData data)
         {
             if (guard)

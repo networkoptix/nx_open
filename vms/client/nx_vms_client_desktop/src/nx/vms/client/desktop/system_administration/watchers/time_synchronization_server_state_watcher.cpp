@@ -41,11 +41,11 @@ public:
 private:
     void onServerAdded(const QnResourcePtr& resource)
     {
-        onServerAddedInternal(resource);
-
         const auto& server = resource.dynamicCast<QnMediaServerResource>();
         if (server && !server->hasFlags(Qn::fake))
         {
+            onServerAddedInternal(server);
+
             TimeSynchronizationWidgetState::ServerInfo serverInfo;
             serverInfo.id = server->getId();
             serverInfo.name = server->getName();
@@ -58,14 +58,12 @@ private:
         }
     }
 
-    void onServerAddedInternal(const QnResourcePtr& resource)
+    void onServerAddedInternal(const QnMediaServerResourcePtr& server)
     {
-        const auto& server = resource.dynamicCast<QnMediaServerResource>();
-        if (server && !server->hasFlags(Qn::fake))
-        {
-            connect(server.get(), &QnMediaServerResource::statusChanged,
-                this, &TimeSynchronizationServerStateWatcher::Private::onStatusChanged);
-        }
+        NX_ASSERT(server && !server->hasFlags(Qn::fake));
+
+        connect(server.get(), &QnMediaServerResource::statusChanged,
+            this, &TimeSynchronizationServerStateWatcher::Private::onStatusChanged);
     }
 
     void onServerRemoved(const QnResourcePtr& resource)
@@ -81,11 +79,10 @@ private:
     void onStatusChanged(const QnResourcePtr& resource)
     {
         const auto& server = resource.dynamicCast<QnMediaServerResource>();
-        if (server && !server->hasFlags(Qn::fake)) //< BTW, fakes shouldn't be connected here
-        {
-            m_store->setServerOnline(server->getId(), server->getStatus() == Qn::Online);
-            // TODO: has internet?
-        }
+        NX_ASSERT(server && !server->hasFlags(Qn::fake));
+
+        m_store->setServerOnline(server->getId(), server->getStatus() == Qn::Online);
+        // TODO: has internet?
     }
 
 private:

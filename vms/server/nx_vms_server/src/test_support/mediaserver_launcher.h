@@ -38,7 +38,7 @@ public:
     int port() const;
     QnCommonModule* commonModule() const;
     QnMediaServerModule* serverModule() const;
-    nx::mediaserver::Authenticator* authenticator() const;
+    nx::vms::server::Authenticator* authenticator() const;
 
     void addSetting(const std::string& name, const QVariant& value);
 

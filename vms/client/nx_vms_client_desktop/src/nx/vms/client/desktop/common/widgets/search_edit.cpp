@@ -30,17 +30,6 @@ static const int kTagHolderHeight = 40;
 static const int kLineHeight = 1;
 static const int kControlMaxHeight = kLineEditHeight + kTagHolderHeight + kLineHeight;
 
-/**
- * We have to use double empersand to preserve it in the menu item.
- * Since we use same string as the button and menu item text simultaneously we need to fix
- * it for the button (for example) to get rid of double ampersand.
- */
-QString fixAmpersand(QString value)
-{
-    value.replace(lit("&&"), lit("&"));
-    return value;
-}
-
 QPalette modifiedPalette(QPalette palette, const QColor& backgroundColor = Qt::transparent)
 {
     palette.setBrush(QPalette::Base, QBrush(backgroundColor));
@@ -158,22 +147,22 @@ struct SearchEdit::Private
     QWidget* const lineEditHolder;
     ColoredLineEdit* const lineEdit = nullptr;
     HoverablePushButton* const menuButton = nullptr;
-    QMenu* const menu = nullptr;
     SelectableTextButton* const tagButton = nullptr;
-
-    QStringList tags;
 
     bool focused = false;
     bool hovered = false;
-    int selectedTagIndex = -1;
-    int clearingTagIndex = -1;
+
+    bool isMenuEnabled = false;
+    QVariant currentTagData;
+    std::function<QMenu*()> tagMenuCreator;
+    std::function<QString(const QVariant&)> tagNameProvider;
 };
 
 SearchEdit::SearchEdit(QWidget* parent):
     base_type(parent),
     d(new Private({new QWidget(this), new ColoredLineEdit(this),
         new HoverablePushButton(this, [this](bool hovered){ setButtonHovered(hovered); }),
-        new QMenu(this), new SelectableTextButton(this)}))
+        new SelectableTextButton(this)}))
 {
     setFocusPolicy(d->lineEdit->focusPolicy());
     setSizePolicy(d->lineEdit->sizePolicy());
@@ -215,7 +204,6 @@ SearchEdit::SearchEdit(QWidget* parent):
     d->tagButton->setState(SelectableTextButton::State::unselected);
     connect(d->tagButton, &SelectableTextButton::stateChanged,
         this, &SearchEdit::handleTagButtonStateChanged);
-    connect(this, &SearchEdit::selectedTagIndexChanged, this, &SearchEdit::updateTagButton);
 
     const auto searchLineLayout = new QHBoxLayout(this);
     searchLineLayout->setSpacing(0);
@@ -283,11 +271,15 @@ void SearchEdit::setFocused(bool value)
 
 void SearchEdit::updateFocused()
 {
-    setFocused(
-        hasFocus()
-        || d->menu->hasFocus()
+    auto menuHasFocus = [this]() -> bool
+        {
+            auto menus = findChildren<QMenu*>();
+            return std::any_of(menus.begin(), menus.end(), [](auto menu) { return menu->hasFocus(); });
+        };
+
+    setFocused(hasFocus()
         || d->menuButton->hasFocus()
-        || d->menu->isVisible());
+        || menuHasFocus());
 }
 
 void SearchEdit::setupMenuButton()
@@ -295,41 +287,30 @@ void SearchEdit::setupMenuButton()
     d->menuButton->setFlat(true);
     d->menuButton->setFocusPolicy(Qt::NoFocus);
     d->menuButton->setAutoFillBackground(true);
-
     updateMenuButtonIcon();
 
-    connect(d->menu, &QMenu::aboutToHide, this, [this]() { d->lineEdit->setFocus(); });
     connect(d->menuButton, &QPushButton::clicked, this,
         [this]()
         {
-            if (d->menu->actions().size())
-            {
-                const auto buttonGeometry = d->menuButton->geometry();
-                const auto bottomPoint = QPoint(0, buttonGeometry.height());
-                const auto globalPoint = d->menuButton->mapToGlobal(bottomPoint);
-                QnHiDpiWorkarounds::showMenu(d->menu, globalPoint);
-            }
+            if (isMenuEnabled())
+                showFilterMenu();
             else
-            {
                 d->lineEdit->setFocus();
-                emit selectedTagIndexChanged();
-            }
         });
-
 
     connect(d->lineEdit, &QLineEdit::textChanged, this, &SearchEdit::updateMenuButtonIcon);
 }
 
 void SearchEdit::updateMenuButtonIcon()
 {
-    const auto kIcon = d->tags.isEmpty()
-        ? qnSkin->icon("tree/search.png")
-        : qnSkin->icon("tree/search_drop.png");
-    const auto kSelectedIcon = d->tags.isEmpty()
-        ? qnSkin->icon("tree/search_selected.png")
-        : qnSkin->icon("tree/search_drop_selected.png");
+    const auto kIcon = isMenuEnabled()
+        ? qnSkin->icon("tree/search_drop.png")
+        : qnSkin->icon("tree/search.png");
+    const auto kSelectedIcon = isMenuEnabled()
+        ? qnSkin->icon("tree/search_drop_selected.png")
+        : qnSkin->icon("tree/search_selected.png");
 
-    d->menuButton->setFixedSize(d->tags.isEmpty() ? QSize(32, 32) : QSize(40, 32));
+    d->menuButton->setFixedSize(isMenuEnabled() ? QSize(40, 32) : QSize(32, 32));
     d->menuButton->setIcon(d->lineEdit->text().isEmpty() ? kIcon : kSelectedIcon);
 }
 
@@ -362,45 +343,41 @@ void SearchEdit::setPlaceholderText(const QString& value)
     d->lineEdit->setPlaceholderText(value);
 }
 
-QStringList SearchEdit::tagsList() const
+void SearchEdit::showFilterMenu()
 {
-    return d->tags;
-}
-
-void SearchEdit::setTags(const QStringList& value)
-{
-
-    if (d->tags == value)
+    if (!isMenuEnabled() || !d->tagMenuCreator)
         return;
 
-    d->tags = value;
-    setSelectedTagIndex(-1);
+    auto menu = d->tagMenuCreator();
+    menu->setParent(this, menu->windowFlags());
 
-    d->menu->clear();
-    d->lineEdit->setIndentOn(!d->tags.isEmpty());
-    updateMenuButtonIcon();
+    connect(menu, &QMenu::aboutToHide, this, [this]() { d->lineEdit->setFocus(); });
+    connect(menu, &QMenu::aboutToHide, menu, &QMenu::deleteLater);
 
-    for (int index = 0; index != d->tags.size(); ++ index)
-    {
-        const auto tag = d->tags.at(index);
-        const auto action = tag.isEmpty()
-            ? d->menu->addSeparator()
-            : d->menu->addAction(tag);
-
+    for (auto action: menu->actions())
         connect(action, &QAction::triggered, this,
-            [this, index]() { setSelectedTagIndex(index); });
-    }
+            [this, action]()
+            {
+                setCurrentTagData(action->data());
+            });
+
+    const auto buttonGeometry = d->menuButton->geometry();
+    const auto bottomPoint = QPoint(0, buttonGeometry.height());
+    const auto globalPoint = d->menuButton->mapToGlobal(bottomPoint);
+    QnHiDpiWorkarounds::showMenu(menu, globalPoint);
+}
+
+void SearchEdit::setTagOptionsSource(std::function<QMenu*()> tagMenuCreator,
+    std::function<QString(const QVariant&)> tagNameProvider)
+{
+    d->tagMenuCreator = tagMenuCreator;
+    d->tagNameProvider= tagNameProvider;
 }
 
 void SearchEdit::handleTagButtonStateChanged()
 {
     if (d->tagButton->state() == SelectableTextButton::State::deactivated)
-        setSelectedTagIndex(-1);
-}
-
-int SearchEdit::selectedTagIndex() const
-{
-    return d->selectedTagIndex;
+        setCurrentTagData(QVariant());
 }
 
 void SearchEdit::updatePalette()
@@ -422,38 +399,30 @@ void SearchEdit::updatePalette()
     d->menuButton->setPalette(controlPalette);
 }
 
-void SearchEdit::setSelectedTagIndex(int value)
+void SearchEdit::setCurrentTagData(const QVariant& tagData)
 {
-    if (value == d->selectedTagIndex)
+    if (tagData == d->currentTagData)
         return;
 
-    d->selectedTagIndex = value;
-    emit selectedTagIndexChanged();
+    d->currentTagData = tagData;
+    updateTagButton();
+    emit currentTagDataChanged();
 }
 
 void SearchEdit::updateTagButton()
 {
-    if (d->selectedTagIndex != -1)
+    if (!d->currentTagData.isNull())
     {
-        d->tagButton->setText(fixAmpersand(d->tags.at(d->selectedTagIndex)));
+        if (d->tagNameProvider)
+            d->tagButton->setText(d->tagNameProvider(d->currentTagData));
         d->tagButton->setState(SelectableTextButton::State::unselected);
     }
 
-    const bool tagVisible = d->selectedTagIndex != -1;
+    const bool tagVisible = !d->currentTagData.isNull();
     setFixedHeight(tagVisible
         ? kLineEditHeight + kTagHolderHeight + kLineHeight
         : kLineEditHeight);
     d->tagButton->parentWidget()->setVisible(tagVisible);
-}
-
-void SearchEdit::setClearingTagIndex(int index)
-{
-    d->clearingTagIndex = index;
-}
-
-int SearchEdit::clearingTagIndex() const
-{
-    return d->clearingTagIndex;
 }
 
 QSize SearchEdit::sizeHint() const
@@ -461,9 +430,9 @@ QSize SearchEdit::sizeHint() const
     const QnScopedTypedPropertyRollback<bool, QLineEdit>
         frameRollback(d->lineEdit, &QLineEdit::setFrame, &QLineEdit::hasFrame, true);
 
-    const auto tagVerticalSize = d->selectedTagIndex == -1
-        ? QSize()
-        : QSize(0, d->tagButton->parentWidget()->sizeHint().height());
+    const auto tagVerticalSize = d->tagButton->isVisible()
+        ? QSize(0, d->tagButton->parentWidget()->sizeHint().height())
+        : QSize();
 
     const auto menuButtonHorizontalSize = QSize(d->menuButton->sizeHint().width(), 0);
     const auto result = d->lineEdit->sizeHint() + menuButtonHorizontalSize + tagVerticalSize;
@@ -562,6 +531,27 @@ bool SearchEdit::event(QEvent* event)
         keyEvent->accept();
 
     return result;
+}
+
+QVariant SearchEdit::currentTagData() const
+{
+    return d->currentTagData;
+}
+
+bool SearchEdit::isMenuEnabled() const
+{
+    return d->isMenuEnabled;
+}
+
+void SearchEdit::setMenuEnabled(bool enabled)
+{
+    if (d->isMenuEnabled == enabled)
+        return;
+
+    d->isMenuEnabled = enabled;
+
+    d->lineEdit->setIndentOn(!d->isMenuEnabled);
+    updateMenuButtonIcon();
 }
 
 } // namespace nx::vms::client::desktop

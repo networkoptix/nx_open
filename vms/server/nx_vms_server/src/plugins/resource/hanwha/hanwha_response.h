@@ -16,7 +16,7 @@ extern "C" {
 } // extern "C"
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 namespace HanwhaError
@@ -106,5 +106,5 @@ template<>
 boost::optional<QString> HanwhaResponse::parameter<QString>(const QString& parameterName, int channel) const;
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

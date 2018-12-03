@@ -541,7 +541,7 @@ boost::optional<int> hasError(const Request& request, Helper& helper)
 } // namespace
 
 QnDownloadsRestHandler::QnDownloadsRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

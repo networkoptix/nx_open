@@ -8,23 +8,25 @@
 
 #include <api/model/api_ioport_data.h>
 #include <core/resource/camera_advanced_param.h>
-#include <nx/mediaserver/resource/camera_advanced_parameters_providers.h>
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera_advanced_parameters_providers.h>
+#include <nx/vms/server/resource/camera.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/deprecated/simple_http_client.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/streaming/media_data_packet.h>
 
+#include <nx/network/http/http_client.h>
+
 class QnAxisPtzController;
 
 class QnPlAxisResource:
-    public nx::mediaserver::resource::Camera
+    public nx::vms::server::resource::Camera
 {
     Q_OBJECT
 
 public:
-    typedef nx::mediaserver::resource::Camera base_type;
+    typedef nx::vms::server::resource::Camera base_type;
 
     struct AxisResolution
     {
@@ -83,7 +85,7 @@ public slots:
 
 protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;
-    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
@@ -108,6 +110,8 @@ private:
     virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
     void setSupportedCodecs(const QSet<AVCodecID>& value);
     QSet<AVCodecID> filterSupportedCodecs(const QList<QByteArray>& values) const;
+
+    std::unique_ptr<nx::network::http::HttpClient> makeHttpClient() const;
 private:
     QList<AxisResolution> m_resolutionList;
     QSet<AVCodecID> m_supportedCodecs;
@@ -142,7 +146,7 @@ private:
 
     QnWaitCondition m_stopInputMonitoringWaitCondition;
 
-    nx::mediaserver::resource::ApiMultiAdvancedParametersProvider<QnPlAxisResource> m_advancedParametersProvider;
+    nx::vms::server::resource::ApiMultiAdvancedParametersProvider<QnPlAxisResource> m_advancedParametersProvider;
 
     //!reads axis parameter, triggering url like http://ip/axis-cgi/param.cgi?action=list&group=Input.NbrOfInputs
     CLHttpStatus readAxisParameter(

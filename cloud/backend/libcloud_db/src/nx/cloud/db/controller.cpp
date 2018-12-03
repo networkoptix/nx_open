@@ -24,6 +24,7 @@ Controller::Controller(const conf::Settings& settings):
     m_emailManager(EMailManagerFactory::create(settings)),
     m_streeManager(settings.auth().rulesXmlPath),
     m_tempPasswordManager(
+        settings.accountManager(),
         m_streeManager.resourceNameSet(),
         &m_dbInstanceController.queryExecutor()),
     m_accountManager(

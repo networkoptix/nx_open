@@ -1,14 +1,14 @@
 
 #include "selection.h"
 
-#include <nx/mediaserver/api/server_info.h>
+#include <nx/vms/server/api/server_info.h>
 #include <helpers/time_helper.h>
 #include <helpers/qml_helpers.h>
 #include <models/time_zones_model.h>
 #include <models/ip_settings_model.h>
 #include <models/servers_selection_model.h>
 
-namespace api = nx::mediaserver::api;
+namespace api = nx::vms::server::api;
 
 namespace 
 {

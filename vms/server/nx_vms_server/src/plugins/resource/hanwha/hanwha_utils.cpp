@@ -4,7 +4,7 @@
 #include <utils/common/app_info.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 QStringList fromHanwhaInternalRange(const QStringList& internalRange)
@@ -621,5 +621,5 @@ QDateTime toHanwhaDateTime(qint64 valueMs, std::chrono::seconds timeZoneShift)
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

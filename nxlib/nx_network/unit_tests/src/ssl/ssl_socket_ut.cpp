@@ -480,7 +480,10 @@ protected:
             int bytesSent =
                 connection()->send(randomData.constData(), randomData.size());
             if (bytesSent >= 0)
+            {
+                m_dataSent += randomData;
                 continue;
+            }
 
             ASSERT_EQ(SystemError::timedOut, SystemError::getLastOSErrorCode());
             break;
@@ -490,12 +493,39 @@ protected:
     void givenNotEncryptedConnection()
     {
         m_notEncryptedConnection = std::make_unique<TCPSocket>(AF_INET);
-        ASSERT_TRUE(m_notEncryptedConnection->connect(serverEndpoint(), kNoTimeout));
+        ASSERT_TRUE(m_notEncryptedConnection->connect(serverEndpoint(), kNoTimeout))
+            << SystemError::getLastOSErrorText().toStdString();
 
         nx::Buffer testData("Hello, world");
         ASSERT_EQ(
             testData.size(),
             m_notEncryptedConnection->send(testData.constData(), testData.size()));
+    }
+
+    void assertServerReceivedAllDataSent()
+    {
+        assertServerReceivedData(m_dataSent);
+    }
+
+    void assertServerReceivedData(const QByteArray& expected)
+    {
+        QByteArray dataReceived;
+        dataReceived.reserve(expected.size());
+        while (dataReceived.size() < expected.size())
+        {
+            const int bytesRead = lastAcceptedSocket()->recv(
+                dataReceived.data() + dataReceived.size(),
+                dataReceived.capacity() - dataReceived.size());
+            ASSERT_GT(bytesRead, 0);
+            dataReceived.resize(dataReceived.size() + bytesRead);
+        }
+
+        ASSERT_EQ(expected, dataReceived);
+    }
+
+    void assertServerReceivedPing()
+    {
+        assertServerReceivedData(clientMessage());
     }
 
     void assertClientConnectionReportsEncryptionEnabled()
@@ -523,20 +553,36 @@ protected:
 
 private:
     std::unique_ptr<TCPSocket> m_notEncryptedConnection;
+    QByteArray m_dataSent;
 };
 
 TEST_F(SslSocketSpecific, socket_becomes_unusable_after_async_send_timeout)
 {
     givenSocketTimedOutOnSendAsync();
     whenClientSendsPingAsync();
-    thenSendFailedUnrecoverableError();
+    thenSendFailedWithUnrecoverableError();
+}
+
+// TODO: #ak Probably, it is still possible to create a work-around for openssl limitation
+// of retrying write only with the same arguments (NXLIB-1).
+TEST_F(SslSocketSpecific, DISABLED_socket_is_still_usable_after_sync_send_timeout_error)
+{
+    givenSocketTimedOutOnSend();
+
+    thenConnectionHasBeenAccepted();
+    assertServerReceivedAllDataSent();
+
+    setClientSocketSendTimeout(kNoTimeout);
+    whenClientSendsPing();
+
+    assertServerReceivedPing();
 }
 
 TEST_F(SslSocketSpecific, socket_becomes_unusable_after_sync_send_timeout)
 {
     givenSocketTimedOutOnSend();
     whenClientSendsPing();
-    thenSendFailedUnrecoverableError();
+    thenSendFailedWithUnrecoverableError();
 }
 
 TEST_F(SslSocketSpecific, enabled_encryption_is_reported)

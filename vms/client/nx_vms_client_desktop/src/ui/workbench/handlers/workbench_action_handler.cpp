@@ -1191,7 +1191,7 @@ void ActionHandler::at_moveCameraAction_triggered() {
         if (camera->hasFlags(Qn::wearable_camera))
         {
             QnMessageBox::critical(mainWindowWidget(),
-                tr("Wearable Cameras cannot be moved between servers"));
+                tr("Virtual Cameras cannot be moved between servers"));
             return;
         }
 
@@ -1351,7 +1351,7 @@ void ActionHandler::at_jumpToTimeAction_triggered()
         &QnTimeSlider::isSliderDown,
         true);
 
-    slider->setValue(duration_cast<milliseconds>(timestamp), true);
+    slider->navigateTo(duration_cast<milliseconds>(timestamp));
 }
 
 void ActionHandler::at_goToLayoutItemAction_triggered()
@@ -2075,7 +2075,6 @@ void ActionHandler::at_renameAction_triggered()
     // TODO: #vkutin #gdm Is the following block of code still in use?
     if (name.isEmpty())
     {
-        bool ok = false;
         do
         {
             name = QnInputDialog::getText(mainWindowWidget(),

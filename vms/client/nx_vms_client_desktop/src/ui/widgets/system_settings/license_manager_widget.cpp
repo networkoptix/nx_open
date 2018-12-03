@@ -424,7 +424,7 @@ void QnLicenseManagerWidget::showMessage(
         const auto button = messageBox->addButton(
             tr("Copy To Clipboard"), QDialogButtonBox::HelpRole);
         connect(button, &QPushButton::clicked, this,
-            [this, extras] { qApp->clipboard()->setText(extras); });
+            [extras] { qApp->clipboard()->setText(extras); });
     }
 
     messageBox->setStandardButtons(QDialogButtonBox::Ok);

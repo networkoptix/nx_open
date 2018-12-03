@@ -101,7 +101,7 @@ DeviceFileCatalog::DeviceFileCatalog(
     QnServer::ChunksCatalog catalog,
     QnServer::StoragePool   storagePool)
     :
-    nx::mediaserver::ServerModuleAware(serverModule),
+    nx::vms::server::ServerModuleAware(serverModule),
     m_mutex(QnMutex::Recursive),
     m_cameraUniqueId(cameraUniqueId),
     m_catalog(catalog),

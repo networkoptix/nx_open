@@ -5,7 +5,7 @@
 
 #include <camera/data/camera_data_fwd.h>
 
-class QnTimePeriod;
+struct QnTimePeriod;
 class QnTimePeriodList;
 
 /**
@@ -26,7 +26,7 @@ public:
      * @return                                      True if there is at least one piece of data.
      */
     virtual bool isEmpty() const = 0;
-    
+
     /**
      * @brief update                                Append other piece of data.
      * @param other                                 Other data struct.

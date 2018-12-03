@@ -133,7 +133,7 @@ QnMultiserverChunksRestHandler::QnMultiserverChunksRestHandler(
     QnMediaServerModule* serverModule)
     :
     QnFusionRestHandler(),
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

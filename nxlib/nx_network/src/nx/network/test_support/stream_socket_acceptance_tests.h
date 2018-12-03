@@ -616,16 +616,34 @@ protected:
         ASSERT_EQ(SystemError::noError, m_sendResultQueue.pop());
     }
 
+    void thenClientSendTimesOutEventually()
+    {
+        thenSendFailedWith(SystemError::timedOut);
+    }
+
     void thenSendFailedWith(SystemError::ErrorCode systemErrorCode)
     {
         ASSERT_EQ(systemErrorCode, m_sendResultQueue.pop());
     }
 
-    void thenSendFailedUnrecoverableError()
+    void thenSendFailedWithUnrecoverableError()
     {
         const auto errorCode = m_sendResultQueue.pop();
         ASSERT_NE(SystemError::noError, errorCode);
         ASSERT_TRUE(socketCannotRecoverFromError(errorCode));
+    }
+
+    void whenClientSendsRandomDataSynchronouslyUntilFailure()
+    {
+        ASSERT_TRUE(m_connection->setNonBlockingMode(false));
+        if (m_randomDataBuffer.isEmpty())
+            m_randomDataBuffer = nx::utils::generateRandomName(64 * 1024);
+
+        while (m_connection->send(m_randomDataBuffer.data(), m_randomDataBuffer.size()) > 0)
+        {
+        }
+
+        m_sendResultQueue.push(SystemError::getLastOSErrorCode());
     }
 
     void whenClientSendsRandomDataAsyncNonStop()
@@ -911,11 +929,6 @@ protected:
     void thenClientSocketReportedTimedout()
     {
         thenClientSocketReported(SystemError::timedOut);
-    }
-
-    void thenClientSendTimesOutEventually()
-    {
-        ASSERT_EQ(SystemError::timedOut, m_sendResultQueue.pop());
     }
 
     void thenClientSocketReportedFailure()
@@ -1212,6 +1225,11 @@ protected:
         m_serverSocket.reset();
     }
 
+    const nx::Buffer& clientMessage() const
+    {
+        return m_clientMessage;
+    }
+
 private:
     using RecvResult = std::tuple<SystemError::ErrorCode, nx::Buffer>;
     using AcceptResult =
@@ -1479,7 +1497,18 @@ TYPED_TEST_P(StreamSocketAcceptance, socket_is_reusable_after_recv_timeout)
     this->thenServerMessageIsReceived();
 }
 
-TYPED_TEST_P(StreamSocketAcceptance, socket_reports_send_timeout)
+TYPED_TEST_P(StreamSocketAcceptance, sync_send_reports_timedOut)
+{
+    this->givenAcceptingServerSocket();
+    this->givenConnectedSocket();
+    this->setClientSocketSendTimeout(std::chrono::milliseconds(1));
+
+    this->whenClientSendsRandomDataSynchronouslyUntilFailure();
+
+    this->thenClientSendTimesOutEventually();
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, async_send_reports_timedOut)
 {
     this->givenAcceptingServerSocket();
     this->givenConnectedSocket();
@@ -1639,6 +1668,19 @@ TYPED_TEST_P(
 
     this->thenServerMessageIsReceived();
     this->thenSocketCanBeUsedForAsyncIo();
+}
+
+TYPED_TEST_P(
+    StreamSocketAcceptance,
+    change_aio_thread_of_accepted_connection)
+{
+    this->givenPingPongServer();
+
+    this->givenConnectedSocket();
+    this->startReadingConnectionAsync();
+    this->whenClientSentPingAsync();
+
+    this->thenServerMessageIsReceived();
 }
 
 TYPED_TEST_P(StreamSocketAcceptance, DISABLED_socket_is_usable_after_send_cancellation)
@@ -1812,7 +1854,8 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     msg_dont_wait_flag_makes_recv_call_nonblocking,
     concurrent_recv_send_in_blocking_mode,
     socket_is_reusable_after_recv_timeout,
-    socket_reports_send_timeout,
+    sync_send_reports_timedOut,
+    async_send_reports_timedOut,
     all_data_sent_is_received_after_remote_end_closed_connection,
 
     //---------------------------------------------------------------------------------------------
@@ -1823,6 +1866,7 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     socket_is_ready_for_io_after_read_cancellation,
     socket_aio_thread_can_be_changed_after_io_cancellation_during_connect_completion,
     socket_aio_thread_can_be_changed_after_io_cancellation_during_send_completion,
+    change_aio_thread_of_accepted_connection,
     DISABLED_socket_is_usable_after_send_cancellation,
     /**
      * These tests are disabled because currently it is not supported on mswin.

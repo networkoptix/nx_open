@@ -180,7 +180,13 @@ public:
     void setSliderPosition(milliseconds position, bool keepInWindow);
 
     milliseconds value() const;
+
+    // Methods setValue(value, true) and navigateTo(value) do similar things but with different
+    // visual behavior: setValue scrolls the timeline to move its cursor to the position it was at
+    // before value change, navigateTo scrolls the timeline to move its cursor into view with side
+    // paddings subtracted, i.e. acts as if user clicked timeline at specified position.
     void setValue(milliseconds value, bool keepInWindow);
+    void navigateTo(milliseconds value);
 
     milliseconds selectionStart() const;
     void setSelectionStart(milliseconds selectionStart);
@@ -437,6 +443,9 @@ private:
     void setTargetEnd(milliseconds end);
     milliseconds targetStart();
     milliseconds targetEnd();
+
+    // Similar to ensureWindowContains, but honors side paddings.
+    void scrollIntoWindow(milliseconds position, bool animated);
 
     void generateProgressPatterns();
 
