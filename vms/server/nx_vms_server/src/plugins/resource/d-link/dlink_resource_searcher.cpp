@@ -178,7 +178,7 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(
     // #dliman This logic should be removed, url must contain host field here.
     NX_ASSERT(!host.isEmpty());
     if (host.isEmpty())
-        host = url.toString(); // In case if url just host address without protocol and port.
+        host = url.toString(); //< If url is just a host address without a protocol and a port.
 
     int port = url.port();
     if (port <= 0)
@@ -195,16 +195,17 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(
 
     nx::network::http::StatusCode::Value status = nx::network::http::StatusCode::undefined;
     nx::network::http::BufferType responseBuffer;
-    const auto rc = nx::network::http::downloadFileSync(requestUrl, (int*)&status, &responseBuffer);
-    if (rc != SystemError::noError || !nx::network::http::StatusCode::isSuccessCode(status))
+    const auto returnCode =
+        nx::network::http::downloadFileSync(requestUrl, (int*) &status, &responseBuffer);
+    if (returnCode != SystemError::noError || !nx::network::http::StatusCode::isSuccessCode(status))
     {
         NX_DEBUG(this, "Request error, system error: %1, status code: %2",
-            rc, nx::network::http::StatusCode::toString(status));
+            returnCode, nx::network::http::StatusCode::toString(status));
         return QList<QnResourcePtr>();
     }
 
-    QString response = responseBuffer;
-    if (response.length() == 0)
+    const QString response = responseBuffer;
+    if (response.isEmpty())
         return QList<QnResourcePtr>();
 
     QStringList lines = response.split(QLatin1String("\r\n"), QString::SkipEmptyParts);

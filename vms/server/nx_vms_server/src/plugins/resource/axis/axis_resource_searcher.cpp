@@ -92,14 +92,14 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const nx::utils::Ur
     nx::network::http::downloadFileSync(nx::network::url::Builder(baseRequestUrl)
         .setQuery("action=list&group=root.Network.Bonjour.FriendlyName").toUrl(),
         (int*) &status, &response1);
-    if (response1.length() == 0 || !nx::network::http::StatusCode::isSuccessCode(status))
+    if (response1.isEmpty() || !nx::network::http::StatusCode::isSuccessCode(status))
         return QList<QnResourcePtr>();
 
     QByteArray response2;
     nx::network::http::downloadFileSync(nx::network::url::Builder(baseRequestUrl)
         .setQuery("action=list&group=root.Network.eth0.MACAddress").toUrl(),
         (int*) &status, &response2);
-    if (response2.length() == 0 || !nx::network::http::StatusCode::isSuccessCode(status))
+    if (response2.isEmpty() || !nx::network::http::StatusCode::isSuccessCode(status))
         return QList<QnResourcePtr>();
 
     QString response = QString(QLatin1String(response1.append(response2)));
@@ -108,7 +108,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const nx::utils::Ur
     QString name;
     QString mac;
 
-    for (QString line: lines)
+    for (const QString& line: lines)
     {
         if (line.contains(QLatin1String("root.Network.Bonjour.FriendlyName")))
         {

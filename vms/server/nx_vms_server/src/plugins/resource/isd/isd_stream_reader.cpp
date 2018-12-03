@@ -53,6 +53,8 @@ QString QnISDStreamReader::serializeStreamParams(
 
 CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& liveStreamParams)
 {
+    namespace StatusCode = nx::network::http::StatusCode;
+
     QnLiveStreamParams params = liveStreamParams;
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
@@ -90,11 +92,14 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
     {
         QString streamProfileStr = serializeStreamParams(params, profileIndex);
 
-        httpClient.doPost(
-            nx::network::url::Builder(baseRequestUrl).setPath("/api/param.cgi").toUrl(),
-            "Content-Type: application/x-www-form-urlencoded",
-            streamProfileStr.toUtf8());
-        // TODO: Log should be here if error occured.
+        const auto url = nx::network::url::Builder(baseRequestUrl).setPath("/api/param.cgi").toUrl();
+        bool ok = httpClient.doPost(
+            url, "Content-Type: application/x-www-form-urlencoded", streamProfileStr.toUtf8());
+        if (!ok)
+            NX_DEBUG(this, "Request %1 system error: %2", url, httpClient.lastSysErrorCode());
+        else if (!StatusCode::isSuccessCode(httpClient.response()->statusLine.statusCode))
+            NX_DEBUG(this, "Request %1 error: %2", url,
+                StatusCode::toString(httpClient.response()->statusLine.statusCode));
         QnSleep::msleep(100);
     }
 
@@ -103,11 +108,12 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
             .setQuery(lm("req=VideoInput.1.h264.%1.Rtsp.AbsolutePath").arg(profileIndex))
             .toUrl();
 
-    auto statusCode = nx::network::http::StatusCode::Value(httpClient.response()->statusLine.statusCode);
-    httpClient.doGet(requestUrl);
-    if (!nx::network::http::StatusCode::isSuccessCode(statusCode))
-        NX_DEBUG(this, "Request %1 failed with %2", requestUrl,
-            nx::network::http::StatusCode::toString(statusCode));
+    if (!httpClient.doGet(requestUrl))
+        return CameraDiagnostics::IOErrorResult(requestUrl.toString());
+
+    const auto statusCode = StatusCode::Value(httpClient.response()->statusLine.statusCode);
+    if (!StatusCode::isSuccessCode(statusCode))
+        NX_DEBUG(this, "Request %1 failed with %2", requestUrl, StatusCode::toString(statusCode));
 
     if (statusCode == nx::network::http::StatusCode::unauthorized)
         return CameraDiagnostics::NotAuthorisedResult(requestUrl.toString());
