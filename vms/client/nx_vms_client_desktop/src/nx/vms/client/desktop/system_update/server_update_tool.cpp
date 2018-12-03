@@ -579,8 +579,7 @@ bool ServerUpdateTool::verifyUpdateManifest(UpdateContents& contents) const
         activeServers = m_activeServers;
     }
 
-    auto cm = commonModule();
-    return verifyUpdateContents(cm, contents, activeServers);
+    return verifyUpdateContents(commonModule(), contents, activeServers);
 }
 
 void ServerUpdateTool::calculateUploadProgress(ProgressInfo& result)
