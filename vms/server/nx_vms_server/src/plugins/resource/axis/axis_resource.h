@@ -8,8 +8,8 @@
 
 #include <api/model/api_ioport_data.h>
 #include <core/resource/camera_advanced_param.h>
-#include <nx/mediaserver/resource/camera_advanced_parameters_providers.h>
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera_advanced_parameters_providers.h>
+#include <nx/vms/server/resource/camera.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/deprecated/simple_http_client.h>
@@ -21,12 +21,12 @@
 class QnAxisPtzController;
 
 class QnPlAxisResource:
-    public nx::mediaserver::resource::Camera
+    public nx::vms::server::resource::Camera
 {
     Q_OBJECT
 
 public:
-    typedef nx::mediaserver::resource::Camera base_type;
+    typedef nx::vms::server::resource::Camera base_type;
 
     struct AxisResolution
     {
@@ -85,7 +85,7 @@ public slots:
 
 protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;
-    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
@@ -146,7 +146,7 @@ private:
 
     QnWaitCondition m_stopInputMonitoringWaitCondition;
 
-    nx::mediaserver::resource::ApiMultiAdvancedParametersProvider<QnPlAxisResource> m_advancedParametersProvider;
+    nx::vms::server::resource::ApiMultiAdvancedParametersProvider<QnPlAxisResource> m_advancedParametersProvider;
 
     //!reads axis parameter, triggering url like http://ip/axis-cgi/param.cgi?action=list&group=Input.NbrOfInputs
     CLHttpStatus readAxisParameter(

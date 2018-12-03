@@ -5,7 +5,7 @@
 
 TEST(AutodetectHttpContentType, main)
 {
-    using namespace nx::mediaserver;
+    using namespace nx::vms::server;
 
     QByteArray kJsonText =
         "{ \"data\": [{ \"keys\": [\"Sony|SNC-VM772R\"] }] }";

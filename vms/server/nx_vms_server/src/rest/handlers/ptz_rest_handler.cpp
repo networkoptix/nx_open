@@ -97,7 +97,7 @@ bool checkUserAccess(
 } // namespace
 
 QnPtzRestHandler::QnPtzRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

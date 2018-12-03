@@ -4,12 +4,12 @@
 #include "nx/sdk/analytics/device_agent.h"
 #include "nx/vms/api/analytics/engine_manifest.h"
 #include "api/model/analytics_actions.h"
-#include <nx/mediaserver/server_module_aware.h>
-#include <nx/mediaserver/sdk_support/loggers.h>
+#include <nx/vms/server/server_module_aware.h>
+#include <nx/vms/server/sdk_support/loggers.h>
 
 class QnExecuteAnalyticsActionRestHandler:
     public QnJsonRestHandler,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
 public:
     QnExecuteAnalyticsActionRestHandler(QnMediaServerModule* serverModule);
@@ -27,6 +27,6 @@ private:
         nx::sdk::analytics::Engine* plugin,
         const AnalyticsAction& actionData);
 
-    std::unique_ptr<nx::mediaserver::sdk_support::AbstractManifestLogger> makeLogger(
-        nx::mediaserver::resource::AnalyticsEngineResourcePtr engineResource) const;
+    std::unique_ptr<nx::vms::server::sdk_support::AbstractManifestLogger> makeLogger(
+        nx::vms::server::resource::AnalyticsEngineResourcePtr engineResource) const;
 };

@@ -9,7 +9,7 @@
 #include <core/ptz/ptz_constants.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 class HanwhaAdavancedParameterInfo

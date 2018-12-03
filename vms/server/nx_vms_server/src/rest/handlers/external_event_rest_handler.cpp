@@ -11,7 +11,7 @@
 #include <utils/common/util.h>
 #include <utils/common/synctime.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/mediaserver/event/event_connector.h>
+#include <nx/vms/server/event/event_connector.h>
 #include <nx/utils/string.h>
 #include <nx/vms/event/event_parameters.h>
 #include <media_server/media_server_module.h>
@@ -20,7 +20,7 @@
 using namespace nx;
 
 QnExternalEventRestHandler::QnExternalEventRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

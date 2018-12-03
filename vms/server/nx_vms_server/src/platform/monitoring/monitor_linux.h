@@ -8,7 +8,7 @@
 #include <nx/utils/thread/mutex.h>
 
 class QnLinuxMonitorPrivate;
-namespace nx::mediaserver { class RootFileSystem; }
+namespace nx::vms::server { class RootFileSystem; }
 
 class QnLinuxMonitor: public QnSigarMonitor
 {

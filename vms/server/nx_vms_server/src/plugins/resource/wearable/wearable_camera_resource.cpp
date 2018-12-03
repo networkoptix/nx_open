@@ -5,10 +5,10 @@
 #include <nx/streaming/abstract_archive_delegate.h>
 
 const QString QnWearableCameraResource::kManufacture = lit("WEARABLE_CAMERA");
-using namespace nx::mediaserver::resource;
+using namespace nx::vms::server::resource;
 
 QnWearableCameraResource::QnWearableCameraResource(QnMediaServerModule* serverModule):
-    nx::mediaserver::resource::Camera(serverModule)
+    nx::vms::server::resource::Camera(serverModule)
 {
     removeFlags(Qn::live | Qn::network | Qn::streamprovider | Qn::motion);
     addFlags(Qn::wearable_camera);

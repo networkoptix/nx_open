@@ -8,7 +8,7 @@
 #include <proxy/2wayaudio/proxy_audio_transmitter.h>
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera.h>
 #include <media_server/media_server_module.h>
 #include <core/dataprovider/data_provider_factory.h>
 
@@ -28,7 +28,7 @@ namespace
 }
 
 QnAudioStreamerPool::QnAudioStreamerPool(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 
@@ -43,13 +43,13 @@ QnVideoCameraPtr QnAudioStreamerPool::getTransmitSource(const QString& sourceId)
     return QnVideoCameraPtr();
 }
 
-nx::mediaserver::resource::CameraPtr QnAudioStreamerPool::getTransmitDestination(const QnUuid& resourceId) const
+nx::vms::server::resource::CameraPtr QnAudioStreamerPool::getTransmitDestination(const QnUuid& resourceId) const
 {
-    auto resource = resourcePool()->getResourceById<nx::mediaserver::resource::Camera>(resourceId);
+    auto resource = resourcePool()->getResourceById<nx::vms::server::resource::Camera>(resourceId);
     if (!resource)
-        return nx::mediaserver::resource::CameraPtr();
+        return nx::vms::server::resource::CameraPtr();
     if (!resource->hasCameraCapabilities(Qn::AudioTransmitCapability))
-        return nx::mediaserver::resource::CameraPtr();
+        return nx::vms::server::resource::CameraPtr();
     return resource;
 }
 

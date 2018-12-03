@@ -64,7 +64,7 @@ QnThirdPartyResource::QnThirdPartyResource(
     nxcip::BaseCameraManager* camManager,
     const nxcip_qt::CameraDiscoveryManager& discoveryManager )
     :
-    nx::mediaserver::resource::Camera(serverModule),
+    nx::vms::server::resource::Camera(serverModule),
     m_camInfo( camInfo ),
     m_camManager( camManager ? new nxcip_qt::BaseCameraManager(camManager) : nullptr ),
     m_discoveryManager( discoveryManager ),
@@ -100,7 +100,7 @@ QnAbstractPtzController* QnThirdPartyResource::createPtzControllerInternal() con
     return new QnThirdPartyPtzController( toSharedPointer().staticCast<QnThirdPartyResource>(), ptzManager );
 }
 
-std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
+std::vector<nx::vms::server::resource::Camera::AdvancedParametersProvider*>
     QnThirdPartyResource::advancedParametersProviders()
 {
     return {&m_advancedParametersProvider};
@@ -247,7 +247,7 @@ QnAbstractStreamDataProvider* QnThirdPartyResource::createArchiveDataProvider()
 {
     QnAbstractArchiveDelegate* archiveDelegate = createArchiveDelegate();
     if( !archiveDelegate )
-        return nx::mediaserver::resource::Camera::createArchiveDataProvider();
+        return nx::vms::server::resource::Camera::createArchiveDataProvider();
     QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(toSharedPointer());
     archiveReader->setArchiveDelegate(archiveDelegate);
     return archiveReader;
@@ -400,7 +400,7 @@ void QnThirdPartyResource::inputPortStateChanged(
     int newState,
     unsigned long int /*timestamp*/ )
 {
-    emit nx::mediaserver::resource::Camera::inputPortStateChanged(
+    emit nx::vms::server::resource::Camera::inputPortStateChanged(
         toSharedPointer(),
         QString::fromUtf8(inputPortID),
         newState != 0,
@@ -421,11 +421,11 @@ nxcip::Resolution QnThirdPartyResource::getSelectedResolutionForEncoder(Qn::Stre
     return nxcip::Resolution();
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnThirdPartyResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnThirdPartyResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex /*streamIndex*/)
 {
     // TODO: implement me
-    return nx::mediaserver::resource::StreamCapabilityMap();
+    return nx::vms::server::resource::StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
@@ -775,7 +775,7 @@ nxcip::Resolution QnThirdPartyResource::getNearestResolution(Qn::StreamIndex enc
 nxcip::Resolution QnThirdPartyResource::getSecondStreamResolution() const
 {
     const nxcip::Resolution& primaryStreamResolution = getMaxResolution(Qn::StreamIndex::primary);
-    const float currentAspect = nx::mediaserver::resource::Camera::getResolutionAspectRatio( QSize(primaryStreamResolution.width, primaryStreamResolution.height) );
+    const float currentAspect = nx::vms::server::resource::Camera::getResolutionAspectRatio( QSize(primaryStreamResolution.width, primaryStreamResolution.height) );
 
     const QList<nxcip::Resolution>& resolutionList = getEncoderResolutionList(Qn::StreamIndex::secondary);
     if (resolutionList.isEmpty())
@@ -791,7 +791,7 @@ nxcip::Resolution QnThirdPartyResource::getSecondStreamResolution() const
         resolutionList.begin(), resolutionList.end(), std::back_inserter(resList),
         []( const nxcip::Resolution& resolution ){ return QSize(resolution.width, resolution.height); } );
 
-    QSize secondaryResolution = nx::mediaserver::resource::Camera::closestResolution(
+    QSize secondaryResolution = nx::vms::server::resource::Camera::closestResolution(
         SECONDARY_STREAM_DEFAULT_RESOLUTION,
         currentAspect,
         SECONDARY_STREAM_MAX_RESOLUTION,

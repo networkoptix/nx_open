@@ -9,7 +9,7 @@
 #include "media_server_module_fixture.h"
 #include <media_server/media_server_module.h>
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 namespace test {
 
 void addChunk(
@@ -59,5 +59,5 @@ TEST_F(StorageManager, deleteRecordsToTime)
 }
 
 } // namespace test
-} // namespace mediaserver
+} // namespace vms::server
 } // namespace nx

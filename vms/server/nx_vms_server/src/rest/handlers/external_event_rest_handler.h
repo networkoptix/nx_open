@@ -2,10 +2,10 @@
 
 #include <core/resource/resource_fwd.h>
 #include <rest/server/json_rest_handler.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class QnExternalEventRestHandler:
-    public QnJsonRestHandler, public nx::mediaserver::ServerModuleAware
+    public QnJsonRestHandler, public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 

@@ -4,7 +4,7 @@
 #include <plugins/resource/axis/axis_onvif_resource.h>
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 namespace test {
 
 struct TestData
@@ -97,5 +97,5 @@ TEST(CameraIpConflict, main)
 }
 
 } // namespace test
-} // namespace mediaserver
+} // namespace vms::server
 } // namespace nx

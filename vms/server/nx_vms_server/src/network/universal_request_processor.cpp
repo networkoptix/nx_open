@@ -92,7 +92,7 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
         t.restart();
         QnAuthSession lastUnauthorizedData;
         const auto clientIp = d->socket->getForeignAddress().address;
-        nx::mediaserver::Authenticator::Result result;
+        nx::vms::server::Authenticator::Result result;
         while ((result = d->listener->authenticator()->tryAllMethods(
             clientIp, d->request, &d->response, isProxy)).code != Qn::Auth_OK)
         {

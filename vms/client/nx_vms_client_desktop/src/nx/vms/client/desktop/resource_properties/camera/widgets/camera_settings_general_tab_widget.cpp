@@ -83,6 +83,11 @@ void CameraSettingsGeneralTabWidget::loadState(const CameraSettingsDialogState& 
         state.devicesDescription.supportsAudio != CombinedValue::None
         && state.devicesDescription.isAudioForced == CombinedValue::None);
 
+    // Hide audio checkbox for NVRs and IO modules (devices with forced audio).
+    const bool hasAudioSettings = state.devicesDescription.isAudioForced != CombinedValue::All;
+    ui->enableAudioCheckBox->setVisible(hasAudioSettings);
+    ui->audioGroupBox->setVisible(hasAudioSettings);
+
     ::setReadOnly(ui->enableAudioCheckBox, state.readOnly);
     ::setReadOnly(ui->editCredentialsButton, state.readOnly);
 

@@ -5,7 +5,7 @@
 struct soap;
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 namespace onvif {
 
@@ -17,6 +17,6 @@ int soapWsseAddUsernameTokenDigest(
     time_t now);
 
 } // namespace onvif
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace plugins
 } // namespace nx

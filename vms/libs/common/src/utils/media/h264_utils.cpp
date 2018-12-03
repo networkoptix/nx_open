@@ -6,8 +6,6 @@
 namespace nx {
 namespace media_utils {
 
-
-
 //dishonorably stolen from libavcodec source
 #ifndef AV_RB16
 #   define AV_RB16(x)                           \

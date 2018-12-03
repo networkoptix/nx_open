@@ -1,14 +1,14 @@
 #include "rtp_stream_reader.h"
 #if defined(ENABLE_DATA_PROVIDERS)
 
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera.h>
 
 #include <nx/utils/log/log.h>
 
 static const size_t kPacketCountToOmitLog = 50;
 
 QnRtpStreamReader::QnRtpStreamReader(
-    const nx::mediaserver::resource::CameraPtr& res,
+    const nx::vms::server::resource::CameraPtr& res,
     const QString& request)
     :
     CLServerPushStreamReader(res),

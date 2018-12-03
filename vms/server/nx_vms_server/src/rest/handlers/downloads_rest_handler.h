@@ -1,13 +1,13 @@
 #pragma once
 
 #include <rest/server/fusion_rest_handler.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 namespace nx::vms::common::p2p::downloader { class Downloader; }
 
 class QnDownloadsRestHandler:
     public QnFusionRestHandler,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
 public:
     QnDownloadsRestHandler(QnMediaServerModule* serverModule);

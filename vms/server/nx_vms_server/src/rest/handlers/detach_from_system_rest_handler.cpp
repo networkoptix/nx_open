@@ -22,7 +22,7 @@ QnDetachFromSystemRestHandler::QnDetachFromSystemRestHandler(
     ec2::AbstractTransactionMessageBus* messageBus)
     :
     QnJsonRestHandler(),
-    nx::mediaserver::ServerModuleAware(serverModule),
+    nx::vms::server::ServerModuleAware(serverModule),
     m_cloudConnectionManager(cloudConnectionManager),
     m_messageBus(messageBus)
 {
@@ -72,12 +72,12 @@ int QnDetachFromSystemRestHandler::execute(
         return QnPermissionsHelper::notOwnerError(result);
     }
 
-    nx::mediaserver::Utils::dropConnectionsToRemotePeers(m_messageBus);
+    nx::vms::server::Utils::dropConnectionsToRemotePeers(m_messageBus);
     nx::vms::utils::DetachServerProcessor detachServerProcessor(
         owner->commonModule(),
         m_cloudConnectionManager);
 
     const auto resultCode = detachServerProcessor.detachServer(&result);
-    nx::mediaserver::Utils::resumeConnectionsToRemotePeers(m_messageBus);
+    nx::vms::server::Utils::resumeConnectionsToRemotePeers(m_messageBus);
     return resultCode;
 }

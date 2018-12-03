@@ -18,7 +18,7 @@
 #include <core/resource/resource_fwd.h>
 #include "recording/time_period.h"
 #include "api/model/recording_stats_reply.h"
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 extern "C" {
 
@@ -30,7 +30,7 @@ class QnTimePeriodList;
 struct QnTimePeriod;
 class QnStorageManager;
 
-class DeviceFileCatalog: public QObject, public nx::mediaserver::ServerModuleAware
+class DeviceFileCatalog: public QObject, public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 public:

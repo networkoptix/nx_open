@@ -956,7 +956,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %param eventCondition.description Substring to be found in the long event
      *             description. Empty string matches any value.
      *         %//param eventCondition.metadata (object) Imposes filtering based on the event
-     *             metadata fields. The object contains the following fields:
+     *             metadata fields.
      *             %//param eventCondition.metadata.cameraRefs cameraRefs (list of strings) Camera
      *                 id list. Empty means any. Camera id can be obtained from "id", "physicalId"
      *                 or "logicalId" field via request '/ec2/getCamerasEx'.
@@ -1010,7 +1010,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *             - text - HTTP message body for POST method.
      *         %value acknowledgeAction
      *     %param actionResourceIds List of action resource ids.
-     *     %param actionParams String containing a JSON object which fields depend on actionType
+     *     %param:objectJson actionParams String containing a JSON object which fields depend on actionType
      *         and thus are described next to the respective actionType values.
      *     %param aggregationPeriod Period (in seconds) during which the consecutive similar events
      *         are aggregated into a single event.
@@ -1036,9 +1036,12 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regGet<ApiTranLogFilter, ApiTransactionDataList>(p, ApiCommand::getTransactionLog);
 
     /**%apidoc POST /ec2/saveEventRule
-     * Create or update event rule in event/actions rule list. Parameters should be passed
-	 * as a JSON object in POST message body with content type "application/json".
-	 * Example of such object can be seen in the result of the corresponding GET function.
+     * Create or update event rule in event/actions rule list.
+     * <p>
+     * Parameters should be passed as a JSON object in POST message body with
+     * content type "application/json". Example of such object can be seen in
+     * the result of the corresponding GET function.
+     * </p>
      * %param eventType Event type to match the rule. Example of possible values can be seen in
 	 *     the result of the corresponding GET function.
      * %param[opt] eventResourceIds List of resources to match. Any resource if the list is empty.
@@ -1134,7 +1137,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     a previously received object, use false when creating a new one.
      *     %value false
      *     %value true
-     * %param permissions Combination (via "|") of the following flags:
+     * %param permissions Combination (via "|") of the flags defining permissions.
      *     %value GlobalAdminPermission Admin, can edit other non-admins.
      *     %value GlobalEditCamerasPermission Can edit camera settings.
      *     %value GlobalControlVideoWallPermission Can control video walls.
@@ -1194,7 +1197,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     *     a previously received object, use false when creating a new one.
     *     %value false
     *     %value true
-    * %param permissions Combination (via "|") of the following flags:
+    * %param permissions Combination (via "|") of the flags defining permissions.
     *     %value GlobalAdminPermission Admin, can edit other non-admins.
     *     %value GlobalEditCamerasPermission Can edit camera settings.
     *     %value GlobalControlVideoWallPermission Can control video walls.
@@ -1257,7 +1260,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param[opt] id User role unique id. Can be omitted when creating a new object. If such
      *     object exists, omitted fields will not be changed.
      * %param name User role name.
-     * %param permissions Combination (via "|") of the following flags:
+     * %param permissions Combination (via "|") of the flags defining permissions.
      *     %value GlobalEditCamerasPermission Can edit camera settings.
      *     %value GlobalControlVideoWallPermission Can control video walls.
      *     %value GlobalViewArchivePermission Can view archives of available cameras.

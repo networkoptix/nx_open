@@ -2,10 +2,10 @@
 #include <media_server/media_server_module.h>
 #include <nx/update/common_update_manager.h>
 #include <api/global_settings.h>
-#include <nx/mediaserver/settings.h>
+#include <nx/vms/server/settings.h>
 
 QnStartUpdateRestHandler::QnStartUpdateRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

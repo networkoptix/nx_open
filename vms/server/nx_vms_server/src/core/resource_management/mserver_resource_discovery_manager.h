@@ -4,7 +4,7 @@
 #include <QtCore/QElapsedTimer>
 
 #include "core/resource_management/resource_discovery_manager.h"
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class QnMServerResourceDiscoveryManager:
     public QnResourceDiscoveryManager

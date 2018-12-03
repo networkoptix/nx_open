@@ -3,10 +3,10 @@
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/http_types.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/mediaserver/resource/resource_fwd.h>
+#include <nx/vms/server/resource/resource_fwd.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 struct IqInvisionResponse
@@ -44,5 +44,5 @@ private:
 };
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

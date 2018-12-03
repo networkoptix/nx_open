@@ -20,11 +20,11 @@
 #include <QElapsedTimer>
 #include <QtCore/QTimeZone>
 
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera.h>
 #include <core/resource/camera_advanced_param.h>
 
 #include <core/resource/resource_data_structures.h>
-#include <nx/mediaserver/resource/camera_advanced_parameters_providers.h>
+#include <nx/vms/server/resource/camera_advanced_parameters_providers.h>
 #include <nx/network/deprecated/simple_http_client.h>
 #include <nx/streaming/media_data_packet.h>
 #include <onvif/soapStub.h>
@@ -91,10 +91,10 @@ struct QnOnvifServiceUrls
 };
 
 class QnPlOnvifResource:
-    public nx::mediaserver::resource::Camera
+    public nx::vms::server::resource::Camera
 {
     Q_OBJECT
-    using base_type = nx::mediaserver::resource::Camera;
+    using base_type = nx::vms::server::resource::Camera;
 
 public:
     using GSoapAsyncPullMessagesCallWrapper = GSoapAsyncCallWrapper<
@@ -150,6 +150,11 @@ public:
         VideoOptionsLocal(const QString& id,
             const onvifXsd__VideoEncoder2ConfigurationOptions& resp,
             QnBounds frameRateBounds = QnBounds());
+
+        static std::vector<QnPlOnvifResource::VideoOptionsLocal> createVideoOptionsLocalList(
+            const QString& id,
+            const onvifXsd__VideoEncoderConfigurationOptions& options,
+            QnBounds frameRateBounds);
 
         UnderstandableVideoCodec encoding = UnderstandableVideoCodec::NONE;
 
@@ -365,7 +370,7 @@ protected:
     int strictBitrate(int bitrate, Qn::ConnectionRole role) const;
     void setAudioCodec(AUDIO_CODEC c);
 
-    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual CameraDiagnostics::Result initOnvifCapabilitiesAndUrls(
@@ -460,6 +465,9 @@ protected:
     std::unique_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
     VideoOptionsLocal m_primaryStreamCapabilities;
     VideoOptionsLocal m_secondaryStreamCapabilities;
+
+    std::vector<VideoOptionsLocal> m_primaryStreamCapabilitiesExtension;
+    std::vector<VideoOptionsLocal> m_secondaryStreamCapabilitiesExtension;
 
     virtual void startInputPortStatesMonitoring() override;
     virtual void stopInputPortStatesMonitoring() override;
@@ -648,7 +656,7 @@ public:
     mutable QnOnvifServiceUrls m_serviceUrls;
 
 protected:
-    nx::mediaserver::resource::ApiMultiAdvancedParametersProvider<QnPlOnvifResource> m_advancedParametersProvider;
+    nx::vms::server::resource::ApiMultiAdvancedParametersProvider<QnPlOnvifResource> m_advancedParametersProvider;
     int m_onvifRecieveTimeout;
     int m_onvifSendTimeout;
     QString m_audioOutputConfigurationToken;
