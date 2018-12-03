@@ -14,7 +14,7 @@ public:
 
 private:
     ServerUpdateInstaller m_installer;
-    virtual vms::common::p2p::downloader::AbstractDownloader* downloader() override;
+    virtual vms::common::p2p::downloader::Downloader* downloader() override;
     virtual CommonUpdateInstaller* installer() override;
 };
 

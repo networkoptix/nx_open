@@ -5,7 +5,7 @@ __author__ = 'Danil Lavrentyuk'
 """
 import json, random, string
 from hashlib import md5
-import threading, urllib2
+import threading
 from functest_util import ClusterWorker, sendRequest, TestRequestError
 from testbase import getTestMaster
 from pycommons.GenData import BasicGenerator

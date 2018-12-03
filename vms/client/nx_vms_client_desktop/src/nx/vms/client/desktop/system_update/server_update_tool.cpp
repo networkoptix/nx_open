@@ -88,6 +88,8 @@ ServerUpdateTool::ServerUpdateTool(QObject* parent):
     connect(m_downloader.get(), &Downloader::downloadFailed,
         this, &ServerUpdateTool::atDownloadFailed);
 
+    m_downloader->startDownloads();
+
     loadInternalState();
 }
 

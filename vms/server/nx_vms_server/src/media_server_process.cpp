@@ -3810,7 +3810,7 @@ void MediaServerProcess::connectSignals()
     using namespace nx::vms::common::p2p::downloader;
     connect(
         this, &MediaServerProcess::started,
-        [this]() {this->serverModule()->findInstance<Downloader>()->startFoundDownloads(); });
+        [this]() {this->serverModule()->findInstance<Downloader>()->startDownloads(); });
 
     connect(commonModule()->resourceDiscoveryManager(),
         &QnResourceDiscoveryManager::CameraIPConflict, this,
