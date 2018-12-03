@@ -116,7 +116,8 @@ bool calculateRecordingParametersAvailable(const Cameras& cameras)
         [](const Camera& camera)
         {
             return camera->hasVideo()
-                && !camera->hasDefaultProperty(ResourcePropertyKey::kNoRecordingParams);
+                && !camera->hasDefaultProperty(ResourcePropertyKey::kNoRecordingParams)
+                && !camera->hasCameraCapabilities(Qn::FixedQualityCapability);
         });
 }
 
