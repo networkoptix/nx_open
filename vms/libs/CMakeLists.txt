@@ -11,6 +11,19 @@ if (withDesktopClient OR withMobileClient)
     add_subdirectory(nx_vms_utils)
 endif()
 
+if(withDesktopClient OR withMobileClient)
+    add_subdirectory(nx_audio)
+    add_subdirectory(nx_media)
+endif()
+
+if((withMediaServer OR withDesktopClient) AND NOT targetDevice STREQUAL edge1)
+    add_subdirectory(nx_speech_synthesizer)
+endif()
+
+if(withMediaServer)
+    add_subdirectory(nx_email)
+endif()
+
 if(withMediaServer)
     add_subdirectory(nx_plugin_utils)
 endif()
