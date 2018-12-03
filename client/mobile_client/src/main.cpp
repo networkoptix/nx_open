@@ -170,13 +170,31 @@ int runUi(QtSingleGuiApplication* application)
     QSize maxFfmpegHevcResolution = maxFfmpegResolution;
 
     const bool forceSoftwareOnlyDecoderForIPhone =
-        #if defined(Q_OS_IOS)
-            ini().forceSoftwareDecoderForIPhoneXs
-            && iosDeviceInformation().majorVersion == IosDeviceInformation::iPhoneXs
-            && iosDeviceInformation().type == IosDeviceInformation::Type::iPhone;
-        #else
-            false;
-        #endif
+        []()
+        {
+#if defined(Q_OS_IOS)
+            if (!ini().forceSoftwareDecoderForIPhoneXs)
+                return false;
+            
+            const auto iosDeviceInfo = iosDeviceInformation();
+            const bool isXsPhone =
+            iosDeviceInfo.type == IosDeviceInformation::Type::iPhone
+            && iosDeviceInfo.majorVersion == IosDeviceInformation::iPhoneXs;
+            if (isXsPhone)
+                return true;
+            
+            const bool isIPadPro3Gen =
+            iosDeviceInfo.type == IosDeviceInformation::Type::iPad
+            && iosDeviceInfo.majorVersion == IosDeviceInformation::iPadPro3Gen
+            && iosDeviceInfo.minorVersion >= IosDeviceInformation::iPadPro3GenStartMinorVersion
+            && iosDeviceInfo.minorVersion <= IosDeviceInformation::iPadPro3GenFinishMinorVersion;
+            
+            return isIPadPro3Gen;
+#else
+            return false;
+#endif
+        }();
+    
     
     if (maxFfmpegResolution.isEmpty())
     {

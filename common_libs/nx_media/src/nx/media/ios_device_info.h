@@ -18,9 +18,16 @@ struct IosDeviceInformation
 
     enum Version
     {
+        iPadPro3Gen = 7,
         iPhoneXs = 11,
         iPhone6 = 7,
         iPadAir2 = 5,
+    };
+
+    enum minorVersion
+    {
+        iPadPro3GenStartMinorVersion = 1,
+        iPadPro3GenFinishMinorVersion = 4,
     };
 
     Type type = Type::unknown;
