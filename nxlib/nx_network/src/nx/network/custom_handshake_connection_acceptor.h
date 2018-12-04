@@ -292,12 +292,17 @@ private:
             return;
         }
 
+        const auto aioThread = SocketGlobals::aioService().getCurrentAioThread();
+        NX_ASSERT(aioThread == connection->getAioThread());
+
         m_acceptedConnections.emplace_back(
             SystemError::noError, std::move(connection));
 
         post(
-            [this]()
+            [this, aioThread]()
             {
+                NX_ASSERT(aioThread == SocketGlobals::aioService().getCurrentAioThread());
+
                 QnMutexLocker lock(&m_mutex);
                 provideConnectionToTheCallerIfAppropriate(lock);
             });
