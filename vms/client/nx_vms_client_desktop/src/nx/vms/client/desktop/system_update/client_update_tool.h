@@ -61,9 +61,9 @@ public:
     };
 
     /**
-     * Simple check whether client should install anything from these contents.
+     * Simple check whether client should install anything from the contents.
      * @param contents
-     * @return true if client's update package should o be installed.
+     * @return true if client's update package should be installed.
      */
     bool shouldInstallThis(const UpdateContents& contents) const;
 
