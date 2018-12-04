@@ -24,7 +24,8 @@ public:
 
 private:
     friend class WaitConditionDebugDelegate;
-    void afterMutexLocked(const char* sourceFile, int sourceLine, int lockId);
+    void afterLock(const char* sourceFile, int sourceLine, int lockId);
+    void beforeUnlock();
 
 private:
     QMutex m_mutex;
