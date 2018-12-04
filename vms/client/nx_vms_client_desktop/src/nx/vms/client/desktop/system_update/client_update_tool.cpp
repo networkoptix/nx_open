@@ -39,6 +39,8 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
 
     connect(m_downloader.get(), &Downloader::downloadFailed,
         this, &ClientUpdateTool::atDownloadFailed);
+
+    m_downloader->startDownloads();
 }
 
 ClientUpdateTool::~ClientUpdateTool()

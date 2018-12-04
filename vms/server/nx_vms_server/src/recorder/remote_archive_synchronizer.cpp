@@ -2,7 +2,7 @@
 
 #include <recorder/remote_archive_synchronization_task.h>
 #include <recorder/remote_archive_stream_synchronization_task.h>
-#include <nx/mediaserver/event/event_connector.h>
+#include <nx/vms/server/event/event_connector.h>
 #include <utils/common/util.h>
 
 #include <common/common_module.h>
@@ -19,13 +19,13 @@
 #include <media_server/media_server_module.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace recorder {
 
 using namespace nx::core::resource;
 
 RemoteArchiveSynchronizer::RemoteArchiveSynchronizer(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule),
+    nx::vms::server::ServerModuleAware(serverModule),
     m_tasks(std::make_unique<RemoteArchiveSynchronizer::TaskMap>()),
     m_workerPool(std::make_unique<RemoteArchiveWorkerPool>())
 {
@@ -231,5 +231,5 @@ std::shared_ptr<AbstractRemoteArchiveSynchronizationTask> RemoteArchiveSynchroni
 }
 
 } // namespace recorder
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

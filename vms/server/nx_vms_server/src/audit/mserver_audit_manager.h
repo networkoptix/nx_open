@@ -5,12 +5,12 @@
 #include <nx/utils/thread/mutex.h>
 
 #include "audit/audit_manager.h"
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class QnMServerAuditManager:
     public QObject,
     public QnAuditManager,
-    public nx::mediaserver::ServerModuleAware
+    public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 public:
@@ -42,7 +42,7 @@ private:
 private slots:
     void at_timer();
 private:
-    friend nx::mediaserver::test::AuditManagerTest;
+    friend nx::vms::server::test::AuditManagerTest;
 
     void processRecords();
     bool enabled() const;

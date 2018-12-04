@@ -292,12 +292,17 @@ private:
             return;
         }
 
+        const auto aioThread = SocketGlobals::aioService().getCurrentAioThread();
+        NX_ASSERT(aioThread == connection->getAioThread());
+
         m_acceptedConnections.emplace_back(
             SystemError::noError, std::move(connection));
 
         post(
-            [this]()
+            [this, aioThread]()
             {
+                NX_ASSERT(aioThread == SocketGlobals::aioService().getCurrentAioThread());
+
                 QnMutexLocker lock(&m_mutex);
                 provideConnectionToTheCallerIfAppropriate(lock);
             });
@@ -315,15 +320,16 @@ private:
         openConnections(lock);
         if (acceptResult)
         {
-            // TODO: #ak Uncomment, fix & remove extra post from onHandshakeDone.
-            //connection->cancelIOSync(aio::etNone);
             if (acceptResult->connection)
             {
                 acceptResult->connection->bindToAioThread(
                     SocketGlobals::aioService().getRandomAioThread());
             }
+
             nx::utils::swapAndCall(
-                m_acceptHandler, acceptResult->resultCode, std::move(acceptResult->connection));
+                m_acceptHandler,
+                acceptResult->resultCode,
+                std::move(acceptResult->connection));
         }
     }
 

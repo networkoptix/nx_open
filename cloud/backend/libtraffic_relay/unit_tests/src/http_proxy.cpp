@@ -109,10 +109,16 @@ public:
     {
         m_peerServer.reset();
 
-        if (m_httpClient)
+        decltype(m_httpClients) httpClients;
         {
-            m_httpClient->pleaseStopSync();
-            m_httpClient.reset();
+            QnMutexLocker lock(&m_mutex);
+            httpClients = std::exchange(m_httpClients, {});
+        }
+
+        for (auto& httpClient: httpClients)
+        {
+            httpClient->pleaseStopSync();
+            httpClient.reset();
         }
 
         for (const auto& hostName: m_registeredHostNames)
@@ -123,6 +129,20 @@ protected:
     virtual void SetUp() override
     {
         addRelayInstance();
+    }
+
+    virtual nx::utils::Url proxyUrlForHost(
+        const Relay& relayInstance,
+        const std::string& hostName)
+    {
+        auto url = relayInstance.basicUrl();
+
+        auto host = lm("%1.%2").args(hostName, url.host()).toStdString();
+        addLocalHostAlias(host);
+        url.setHost(host.c_str());
+        url.setPath(kTestPath);
+
+        return url;
     }
 
     void givenListeningPeer(
@@ -192,19 +212,25 @@ protected:
         network::http::Method::ValueType method = network::http::Method::get,
         network::http::HttpHeaders headers = {})
     {
-        if (m_httpClient)
-            m_httpClient->pleaseStopSync();
+        auto httpClient = std::make_unique<nx::network::http::AsyncClient>();
+        httpClient->setAdditionalHeaders(std::move(headers));
+        httpClient->setSendTimeout(network::kNoTimeout);
+        httpClient->setResponseReadTimeout(network::kNoTimeout);
+        httpClient->setMessageBodyReadTimeout(network::kNoTimeout);
+        
+        httpClient->executeInAioThreadSync(
+            [this, &httpClient, method, url]()
+            {
+                httpClient->doRequest(
+                    method,
+                    url,
+                    std::bind(&HttpProxy::saveResponse, this, httpClient.get()));
 
-        m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
-        m_httpClient->setAdditionalHeaders(std::move(headers));
-        m_httpClient->setResponseReadTimeout(network::kNoTimeout);
-        m_httpClient->setMessageBodyReadTimeout(network::kNoTimeout);
-        m_httpClient->doRequest(
-            method,
-            url,
-            std::bind(&HttpProxy::saveResponse, this));
+                m_lastRequest = httpClient->request();
+            });
 
-        m_lastRequest = m_httpClient->request();
+        QnMutexLocker lock(&m_mutex);
+        m_httpClients.push_back(std::move(httpClient));
     }
 
     void thenResponseIsReceived()
@@ -307,20 +333,6 @@ protected:
         return *m_lastResponse;
     }
 
-    nx::utils::Url proxyUrlForHost(
-        const Relay& relayInstance,
-        const std::string& hostName)
-    {
-        auto url = relayInstance.basicUrl();
-
-        auto host = lm("%1.%2").args(hostName, url.host()).toStdString();
-        addLocalHostAlias(host);
-        url.setHost(host.c_str());
-        url.setPath(kTestPath);
-
-        return url;
-    }
-
     void addLocalHostAlias(const std::string& alias)
     {
         nx::network::SocketGlobals::addressResolver().addFixedAddress(
@@ -336,7 +348,8 @@ protected:
 private:
     std::string m_listeningPeerHostName;
     std::unique_ptr<nx::network::http::TestHttpServer> m_peerServer;
-    std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
+    mutable nx::utils::Mutex m_mutex;
+    std::vector<std::unique_ptr<nx::network::http::AsyncClient>> m_httpClients;
     nx::utils::SyncQueue<std::unique_ptr<nx::network::http::Response>>
         m_httpResponseQueue;
     std::vector<std::string> m_registeredHostNames;
@@ -346,19 +359,26 @@ private:
     std::optional<network::http::Request> m_lastRequestOnTargetServer;
     nx::utils::SyncQueue<network::http::Request> m_requestOnTargetServerQueue;
 
-    void saveResponse()
+    void saveResponse(nx::network::http::AsyncClient* httpClient)
     {
-        if (m_httpClient->response())
+        if (httpClient->response())
         {
             auto response = std::make_unique<nx::network::http::Response>(
-                *m_httpClient->response());
-            response->messageBody = m_httpClient->fetchMessageBodyBuffer();
+                *httpClient->response());
+            response->messageBody = httpClient->fetchMessageBodyBuffer();
             m_httpResponseQueue.push(std::move(response));
         }
         else
         {
             m_httpResponseQueue.push(nullptr);
         }
+
+        QnMutexLocker lock(&m_mutex);
+
+        m_httpClients.erase(
+            std::remove_if(m_httpClients.begin(), m_httpClients.end(),
+                [httpClient](const auto& val) { return httpClient == val.get(); }),
+            m_httpClients.end());
     }
 
     void processHttpRequest(
@@ -670,9 +690,22 @@ TEST_F(HttpProxyNonClusterMode, no_cluster_proxy_to_unknown_host_produces_bad_ga
 class HttpProxyWithSsl:
     public HttpProxy
 {
+    using base_type = HttpProxy;
+
 protected:
     virtual void SetUp() override
     {
+        // Intentionally doing nothing.
+    }
+
+    virtual nx::utils::Url proxyUrlForHost(
+        const Relay& relayInstance,
+        const std::string& hostName) override
+    {
+        auto url = base_type::proxyUrlForHost(relayInstance, hostName);
+        url.setScheme(network::http::kSecureUrlSchemeName);
+        url.setPort(relay().moduleInstance()->httpsEndpoints().front().port);
+        return url;
     }
 
     void givenListeningPeerWithSsl()
@@ -739,6 +772,53 @@ TEST_F(HttpProxyWithSsl, proxying_over_ssl_to_server_without_ssl_support_produce
 
     thenResponseIsReceived();
     andResponseStatusCodeIs(nx::network::http::StatusCode::badGateway);
+}
+
+TEST_F(HttpProxyWithSsl, proxy_to_unknown_host_produces_bad_gateway_error)
+{
+    givenRegularRelay();
+
+    whenSendHttpRequestToUnknownPeer();
+
+    thenResponseIsReceived();
+    andResponseStatusCodeIs(nx::network::http::StatusCode::badGateway);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class HttpProxyWithSslStress:
+    public HttpProxyWithSsl
+{
+protected:
+    void startSendingConcurrentRequestsToUnknownPeer(int count)
+    {
+        m_totalRequestCount = count;
+
+        for (int i = 0; i < m_totalRequestCount; ++i)
+            whenSendHttpRequestToUnknownPeer();
+    }
+
+    void waitForEveryRequestToCompleteWith(
+        nx::network::http::StatusCode::Value statusCode)
+    {
+        for (int i = 0; i < m_totalRequestCount; ++i)
+        {
+            thenResponseIsReceived();
+            andResponseStatusCodeIs(statusCode);
+        }
+    }
+
+private:
+    int m_totalRequestCount = 0;
+};
+
+TEST_F(HttpProxyWithSslStress, DISABLED_stress_test)
+{
+    constexpr int kRequestCount = 101;
+
+    givenRegularRelay();
+    startSendingConcurrentRequestsToUnknownPeer(kRequestCount);
+    waitForEveryRequestToCompleteWith(nx::network::http::StatusCode::badGateway);
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -24,7 +24,7 @@ public:
     virtual const char* objectSubType() const override;
     virtual const IAttribute* attribute(int index) const override;
     virtual int attributeCount() const override;
-    virtual const char* auxilaryData() const override;
+    virtual const char* auxiliaryData() const override;
     virtual Rect boundingBox() const override;
 
     void setTypeId(std::string typeId);
@@ -32,7 +32,7 @@ public:
     void setId(const nxpl::NX_GUID& value);
     void setObjectSubType(const std::string& value);
     void setAttributes(const std::vector<CommonAttribute>& value);
-    void setAuxilaryData(std::string value);
+    void setAuxiliaryData(std::string value);
     void setBoundingBox(const Rect& rect);
 
 private:
@@ -43,7 +43,7 @@ private:
     nxpl::NX_GUID m_id{{0}};
     std::string m_objectSubType;
     std::vector<CommonAttribute> m_attributes;
-    std::string m_auxilaryData;
+    std::string m_auxiliaryData;
     Rect m_rect;
 };
 

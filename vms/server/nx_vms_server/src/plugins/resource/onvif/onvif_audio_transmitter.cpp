@@ -2,7 +2,7 @@
 #include <nx/streaming/rtp/rtp.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 OnvifAudioTransmitter::OnvifAudioTransmitter(QnVirtualCameraResource* res):
@@ -169,5 +169,5 @@ bool OnvifAudioTransmitter::isCompatible(const QnAudioFormat& format) const
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

@@ -139,7 +139,7 @@ private:
 };
 
 QnPlAxisResource::QnPlAxisResource(QnMediaServerModule* serverModule):
-    nx::mediaserver::resource::Camera(serverModule),
+    nx::vms::server::resource::Camera(serverModule),
     m_lastMotionReadTime(0),
     m_inputIoMonitor(Qn::PT_Input),
     m_outputIoMonitor(Qn::PT_Output),
@@ -430,10 +430,10 @@ bool resolutionGreaterThan(
     return square1 > square2;
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnPlAxisResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnPlAxisResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex streamIndex)
 {
-    using namespace nx::mediaserver::resource;
+    using namespace nx::vms::server::resource;
 
     QnMutexLocker lock(&m_mutex);
     StreamCapabilityKey key;
@@ -1780,7 +1780,7 @@ QString QnPlAxisResource::buildMaintenanceQuery(const QnCameraAdvancedParamValue
     return QString();
 }
 
-std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
+std::vector<nx::vms::server::resource::Camera::AdvancedParametersProvider*>
     QnPlAxisResource::advancedParametersProviders()
 {
     return {&m_advancedParametersProvider};

@@ -1,5 +1,6 @@
 #include "stream_transforming_async_channel.h"
 
+#include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
 
 namespace nx {
@@ -108,6 +109,9 @@ void StreamTransformingAsyncChannel::processTask(UserTask* task)
 
 void StreamTransformingAsyncChannel::processReadTask(ReadTask* task)
 {
+    NX_VERBOSE(this, lm("Processing read task. Read buffer size %1")
+        .args(task->buffer->capacity() - task->buffer->size()));
+
     SystemError::ErrorCode sysErrorCode = SystemError::noError;
     int bytesRead = 0;
     std::tie(sysErrorCode, bytesRead) = invokeConverter(
@@ -115,9 +119,16 @@ void StreamTransformingAsyncChannel::processReadTask(ReadTask* task)
             task->buffer->data() + task->buffer->size(),
             task->buffer->capacity() - task->buffer->size()));
     if (sysErrorCode == SystemError::wouldBlock)
+    {
+        NX_VERBOSE(this, "Failed to process read task. wouldBlock");
         return;
+    }
 
-    task->buffer->resize(task->buffer->size() + bytesRead);
+    NX_VERBOSE(this, lm("Read task completed. Result %1, bytesRead %2")
+        .args(sysErrorCode, bytesRead));
+
+    if (sysErrorCode == SystemError::noError && bytesRead > 0)
+        task->buffer->resize(task->buffer->size() + bytesRead);
 
     task->status = UserTaskStatus::done;
     auto userHandler = std::move(task->handler);
@@ -126,6 +137,8 @@ void StreamTransformingAsyncChannel::processReadTask(ReadTask* task)
 
 void StreamTransformingAsyncChannel::processWriteTask(WriteTask* task)
 {
+    NX_VERBOSE(this, lm("Processing write task (%1 bytes)").args(task->buffer.size()));
+
     SystemError::ErrorCode sysErrorCode = SystemError::noError;
     int bytesWritten = 0;
 
@@ -136,9 +149,15 @@ void StreamTransformingAsyncChannel::processWriteTask(WriteTask* task)
             task->buffer.data(),
             task->buffer.size()));
     if (sysErrorCode == SystemError::wouldBlock)
+    {
+        NX_VERBOSE(this, "Failed to process write task. wouldBlock");
         return; //< Could not schedule user data send.
+    }
 
     task->status = UserTaskStatus::done;
+
+    NX_VERBOSE(this, lm("Write task completed. Result %1, bytesWritten %2")
+        .args(sysErrorCode, bytesWritten));
 
     if (m_rawWriteQueue.size() > rawWriteQueueSizeBak)
     {
@@ -166,6 +185,7 @@ std::tuple<SystemError::ErrorCode, int /*bytesTransferred*/>
 
     if (m_converter->failed())
     {
+        NX_VERBOSE(this, "Converter reported failure");
         // This is actually converter error. E.g., ssl stream corruption. Not a system error!
         // TODO: #ak Set converter-specific error code.
         return std::make_tuple(SystemError::connectionReset, -1);
@@ -173,11 +193,17 @@ std::tuple<SystemError::ErrorCode, int /*bytesTransferred*/>
 
     if (m_converter->eof())
     {
+        NX_VERBOSE(this, "Converter reported EOF");
         // Correct stream shutdown.
         return std::make_tuple(SystemError::noError, 0);
     }
 
-    NX_ASSERT(result == utils::bstream::StreamIoError::wouldBlock);
+    // Converter has not moved to "failed" state, so we have a recoverable error here.
+
+    NX_ASSERT(
+        result == utils::bstream::StreamIoError::wouldBlock ||
+            result == utils::bstream::StreamIoError::osError,
+        lm("result = %1").args(result));
     return std::make_tuple(SystemError::wouldBlock, -1);
 }
 
@@ -194,38 +220,44 @@ int StreamTransformingAsyncChannel::readRawBytes(void* data, size_t count)
     return utils::bstream::StreamIoError::wouldBlock;
 }
 
-int StreamTransformingAsyncChannel::readRawDataFromCache(void* data, size_t count)
+int StreamTransformingAsyncChannel::readRawDataFromCache(
+    void* data,
+    const size_t count)
 {
     uint8_t* dataBytes = static_cast<uint8_t*>(data);
     std::size_t bytesRead = 0;
 
-    while (!m_readRawData.empty() && count > 0)
+    auto bytesToReadCount = count;
+    while (!m_readRawData.empty() && bytesToReadCount > 0)
     {
         nx::Buffer& rawData = m_readRawData.front();
-        auto bytesToCopy = std::min<std::size_t>(rawData.size(), count);
+        auto bytesToCopy = std::min<std::size_t>(rawData.size(), bytesToReadCount);
         memcpy(dataBytes, rawData.constData(), bytesToCopy);
         dataBytes += bytesToCopy;
-        count -= bytesToCopy;
+        bytesToReadCount -= bytesToCopy;
         rawData.remove(0, (int)bytesToCopy);
         if (m_readRawData.front().isEmpty())
             m_readRawData.pop_front();
         bytesRead += bytesToCopy;
     }
 
+    NX_VERBOSE(this, lm("%1 bytes read from cache. %2 bytes were requested")
+        .args(bytesRead, count));
+
     return (int)bytesRead;
 }
 
 void StreamTransformingAsyncChannel::readRawChannelAsync()
 {
-    using namespace std::placeholders;
-
     constexpr static std::size_t kRawReadBufferSize = 16 * 1024;
+
+    NX_VERBOSE(this, lm("Scheduling socket read operation"));
 
     m_rawDataReadBuffer.clear();
     m_rawDataReadBuffer.reserve(kRawReadBufferSize);
     m_rawDataChannel->readSomeAsync(
         &m_rawDataReadBuffer,
-        std::bind(&StreamTransformingAsyncChannel::onSomeRawDataRead, this, _1, _2));
+        [this](auto&&... args) { onSomeRawDataRead(std::move(args)...); });
     m_asyncReadInProgress = true;
 }
 
@@ -262,14 +294,9 @@ int StreamTransformingAsyncChannel::writeRawBytes(const void* data, size_t count
     if (m_rawWriteQueue.size() == 1)
     {
         if (m_sendShutdown)
-        {
-            post(std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this,
-                SystemError::connectionReset, (size_t) -1));
-        }
+            post([this]() { onRawDataWritten(SystemError::connectionReset, (size_t) -1); });
         else
-        {
             scheduleNextRawSendTaskIfAny();
-        }
     }
 
     return (int)count;
@@ -351,6 +378,8 @@ void StreamTransformingAsyncChannel::scheduleNextRawSendTaskIfAny()
 {
     if (!m_rawWriteQueue.empty())
     {
+        NX_VERBOSE(this, lm("Scheduling socket write operation"));
+
         m_rawDataChannel->sendAsync(
             m_rawWriteQueue.front().data,
             [this](auto&&... args) { onRawDataWritten(std::move(args)...); });

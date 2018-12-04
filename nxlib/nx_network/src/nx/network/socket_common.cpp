@@ -309,6 +309,13 @@ boost::optional<QString> HostAddress::ipToString(
     return result;
 }
 
+in_addr HostAddress::ipV4from(const uint32_t& ip)
+{
+    in_addr v4;
+    v4.s_addr = htonl(ip);
+    return v4;
+}
+
 boost::optional<in_addr> HostAddress::ipV4from(const QString& ip)
 {
     in_addr v4;

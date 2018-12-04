@@ -1,7 +1,7 @@
 #include "motion_delegate_wrapper.h"
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 MotionDelegateWrapper::MotionDelegateWrapper(std::unique_ptr<QnAbstractArchiveDelegate> delegate):
@@ -61,5 +61,5 @@ QnMetaDataV1Ptr MotionDelegateWrapper::analyzeMotion(const QnAbstractMediaDataPt
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

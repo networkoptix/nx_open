@@ -7,7 +7,7 @@
 #include <nx/streaming/abstract_archive_delegate.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace recorder {
 
 /*
@@ -32,5 +32,5 @@ public:
 };
 
 } // namespace recorder
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

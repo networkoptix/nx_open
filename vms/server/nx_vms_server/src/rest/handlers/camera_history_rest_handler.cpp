@@ -73,7 +73,7 @@ LoadDataContext* getContext(const QnUuid& id)
 } // namespace
 
 QnCameraHistoryRestHandler::QnCameraHistoryRestHandler(QnMediaServerModule * serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

@@ -18,7 +18,7 @@ extern "C" {
 } // extern "C"
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 // TODO: #dmishin class?
@@ -56,5 +56,5 @@ struct HanwhaVideoProfile
 };
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

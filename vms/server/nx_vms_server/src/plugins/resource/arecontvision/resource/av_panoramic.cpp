@@ -120,11 +120,11 @@ bool QnArecontPanoramicResource::setSpecialParam(const QString& id, const QStrin
     return false;
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnArecontPanoramicResource::getStreamCapabilityMapFromDrives(
+nx::vms::server::resource::StreamCapabilityMap QnArecontPanoramicResource::getStreamCapabilityMapFromDrives(
     Qn::StreamIndex streamIndex)
 {
     // TODO: implement me
-    return nx::mediaserver::resource::StreamCapabilityMap();
+    return nx::vms::server::resource::StreamCapabilityMap();
 }
 
 CameraDiagnostics::Result QnArecontPanoramicResource::initializeCameraDriver()

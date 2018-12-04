@@ -21,7 +21,7 @@
 using namespace nx;
 
 QnScheduleSync::QnScheduleSync(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule),
+    nx::vms::server::ServerModuleAware(serverModule),
     m_syncing(false),
     m_forced(false),
     m_interrupted(false),

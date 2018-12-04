@@ -4,7 +4,7 @@
 #ifdef ENABLE_ONVIF
 
 #include <core/ptz/basic_ptz_controller.h>
-#include <nx/mediaserver/resource/resource_fwd.h>
+#include <nx/vms/server/resource/resource_fwd.h>
 
 class QnDwZoomPtzController: public QnBasicPtzController {
     Q_OBJECT

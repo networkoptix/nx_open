@@ -15,7 +15,7 @@
 #include <core/resource_management/resource_data_pool.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 namespace {
@@ -55,7 +55,7 @@ void HanwhaPtzController::setPtzLimits(const QnPtzLimits& limits)
     m_presetManager->setMaxPresetNumber(limits.maxPresetNumber);
 }
 
-void HanwhaPtzController::setPtzTraits(const QnPtzAuxilaryTraitList& traits)
+void HanwhaPtzController::setPtzTraits(const QnPtzAuxiliaryTraitList& traits)
 {
     m_ptzTraits = traits;
 }
@@ -375,25 +375,25 @@ bool HanwhaPtzController::getPresets(QnPtzPresetList* presets) const
     return m_presetManager->presets(presets);
 }
 
-bool HanwhaPtzController::getAuxilaryTraits(
-    QnPtzAuxilaryTraitList* auxilaryTraits,
+bool HanwhaPtzController::getAuxiliaryTraits(
+    QnPtzAuxiliaryTraitList* auxiliaryTraits,
     const nx::core::ptz::Options& options) const
 {
     if (options.type != nx::core::ptz::Type::operational)
     {
         NX_WARNING(
             this,
-            lm("Getting auxilary traits - wrong PTZ type. "
+            lm("Getting auxiliary traits - wrong PTZ type. "
                 "Only operational PTZ is supported. Resource %1 (%2)")
                 .args(resource()->getName(), resource()->getId()));
     }
 
-    *auxilaryTraits = m_ptzTraits;
+    *auxiliaryTraits = m_ptzTraits;
     return true;
 }
 
-bool HanwhaPtzController::runAuxilaryCommand(
-    const QnPtzAuxilaryTrait& trait,
+bool HanwhaPtzController::runAuxiliaryCommand(
+    const QnPtzAuxiliaryTrait& trait,
     const QString& data,
     const nx::core::ptz::Options& options)
 {
@@ -406,13 +406,13 @@ bool HanwhaPtzController::runAuxilaryCommand(
                 .args(resource()->getName(), resource()->getId()));
     }
 
-    if (!hasAnyCapability(Ptz::AuxilaryPtzCapability, core::ptz::Type::operational))
+    if (!hasAnyCapability(Ptz::AuxiliaryPtzCapability, core::ptz::Type::operational))
         return false;
 
     if (trait.standardTrait() != Ptz::ManualAutoFocusPtzTrait)
         return false;
 
-    const auto focusMode = m_ptzTraits.contains(QnPtzAuxilaryTrait(kHanwhaSimpleFocusTrait))
+    const auto focusMode = m_ptzTraits.contains(QnPtzAuxiliaryTrait(kHanwhaSimpleFocusTrait))
         ? lit("SimpleFocus")
         : lit("AutoFocus");
 
@@ -646,11 +646,11 @@ bool HanwhaPtzController::useNormalizedSpeed() const
     auto resData = m_hanwhaResource->resourceData();
     bool normilizedSpeedDisabled = resData.value<bool>(lit("disableNormalizedSpeed"), false);
 
-    return m_ptzTraits.contains(QnPtzAuxilaryTrait(kHanwhaNormalizedSpeedPtzTrait))
+    return m_ptzTraits.contains(QnPtzAuxiliaryTrait(kHanwhaNormalizedSpeedPtzTrait))
         && ini().allowNormalizedPtzSpeed
         && !normilizedSpeedDisabled;
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

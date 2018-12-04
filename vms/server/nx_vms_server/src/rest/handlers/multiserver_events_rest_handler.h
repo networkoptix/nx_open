@@ -3,7 +3,7 @@
 #include <QtCore/QScopedPointer>
 
 #include <rest/server/fusion_rest_handler.h>
-#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/server/server_module_aware.h>
 
 class QnMultiserverEventsRestHandler: public QnFusionRestHandler
 {

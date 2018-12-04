@@ -31,7 +31,7 @@ namespace
 }
 
 QnStorageSpaceRestHandler::QnStorageSpaceRestHandler(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {}
 
 int QnStorageSpaceRestHandler::executeGet(

@@ -352,22 +352,25 @@ void PeerRegistrator::reportClientBind(
         peerConnection = peerLocker->value().peerConnection;
     }
 
-    NX_ASSERT(peerConnection->isInSelfAioThread());
-    sendClientBindIndications(peerConnection);
+    auto clientBindIndications = prepareClientBindIndications();
+    peerConnection->dispatch(
+        [this, clientBindIndications = std::move(clientBindIndications),
+            peerConnectionPtr = peerConnection.get()]() mutable
+        {
+            for (auto& indication: clientBindIndications)
+                peerConnectionPtr->sendMessage(std::move(indication), [](auto...) {});
+        });
 }
 
-void PeerRegistrator::sendClientBindIndications(
-    const ConnectionStrongRef& connection)
+std::vector<network::stun::Message> PeerRegistrator::prepareClientBindIndications()
 {
+    QnMutexLocker lk(&m_mutex);
+ 
     std::vector<network::stun::Message> clientBindIndications;
-    {
-        QnMutexLocker lk(&m_mutex);
-        for (const auto& client: m_boundClients)
-            clientBindIndications.push_back(makeIndication(client.first, client.second));
-    }
+    for (const auto& client: m_boundClients)
+        clientBindIndications.push_back(makeIndication(client.first, client.second));
 
-    for (auto& indication: clientBindIndications)
-        connection->sendMessage(std::move(indication));
+    return clientBindIndications;
 }
 
 network::stun::Message PeerRegistrator::makeIndication(

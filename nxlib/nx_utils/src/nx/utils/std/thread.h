@@ -34,6 +34,7 @@ public:
 
 private:
     promise<void> m_idFilledPromise;
+    promise<void> m_threadCanBeStarted;
     std::thread::id m_id;
     uintptr_t m_nativeHandle;
     nx::utils::MoveOnlyFunc<void()> m_threadFunc;

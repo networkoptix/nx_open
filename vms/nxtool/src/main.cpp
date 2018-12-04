@@ -7,7 +7,7 @@
 #include <models/buttons.h>
 #include <base/constants.h>
 #include <base/rtu_context.h>
-#include <nx/mediaserver/api/server_info.h>
+#include <nx/vms/server/api/server_info.h>
 
 void registerTypes()
 {
@@ -24,7 +24,7 @@ void registerTypes()
         , kMajorVersion, kMinorVersion, kConstantsQmlTypeName, kConstantsQmlTypeName);
 
     const char kRestApiConstantsQmlTypeName[] = "RestApiConstants";
-    qmlRegisterUncreatableType<nx::mediaserver::api::Constants>(kRtuDomainName
+    qmlRegisterUncreatableType<nx::vms::server::api::Constants>(kRtuDomainName
         , kMajorVersion, kMinorVersion, kRestApiConstantsQmlTypeName, kRestApiConstantsQmlTypeName);
 
     const char kButtonsModelQmlTypeName[] = "Buttons";

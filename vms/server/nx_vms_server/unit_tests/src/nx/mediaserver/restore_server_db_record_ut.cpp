@@ -5,7 +5,7 @@
 #include "ec2_thread_pool.h"
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 namespace test {
 
 TEST(RestoreServerDbRecord, restoreOwnServerInDatabase)
@@ -25,5 +25,5 @@ TEST(RestoreServerDbRecord, restoreOwnServerInDatabase)
 }
 
 } // namespace test
-} // namespace mediaserver
+} // namespace vms::server
 } // namespace nx

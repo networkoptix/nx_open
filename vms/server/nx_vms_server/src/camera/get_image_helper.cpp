@@ -66,7 +66,7 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(
 } // namespace
 
 QnGetImageHelper::QnGetImageHelper(QnMediaServerModule* serverModule):
-    nx::mediaserver::ServerModuleAware(serverModule)
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 

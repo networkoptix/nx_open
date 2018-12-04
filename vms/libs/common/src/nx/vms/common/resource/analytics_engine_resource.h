@@ -7,6 +7,10 @@
 
 namespace nx::vms::common {
 
+/**
+ * VMS Resource corresponding to all instances (System-wide) of a particular Engine of an
+ * Analytics Plugin.
+ */
 class AnalyticsEngineResource: public QnResource
 {
     using base_type = QnResource;

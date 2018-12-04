@@ -1,9 +1,9 @@
 #include "camera_mock.h"
 #include "live_stream_provider_mock.h"
-#include <nx/mediaserver/resource/camera.h>
+#include <nx/vms/server/resource/camera.h>
 
 namespace nx {
-namespace mediaserver {
+namespace vms::server {
 namespace resource {
 namespace test {
 
@@ -223,5 +223,5 @@ QnMediaServerModule* CameraTest::serverModule() const
 }
 } // namespace test
 } // namespace resource
-} // namespace mediaserver
+} // namespace vms::server
 } // namespace nx

@@ -167,7 +167,7 @@ TEST(IoServerMonitorTest, main)
         });
 
     auto camera = launcher.commonModule()->resourcePool()
-        ->getResourceByUniqueId<nx::mediaserver::resource::Camera>(kTestCamPhysicalId);
+        ->getResourceByUniqueId<nx::vms::server::resource::Camera>(kTestCamPhysicalId);
 
     ASSERT_TRUE(camera);
     launcher.commonModule()->statusDictionary()->setValue(camera->getId(), Qn::Online);

@@ -10,7 +10,7 @@
 #include <nx/utils/move_only_func.h>
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace recorder {
 
 using TaskMap = std::map<QnUuid, RemoteArchiveTaskPtr>;
@@ -49,5 +49,5 @@ private:
 };
 
 } // namespace recorder
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

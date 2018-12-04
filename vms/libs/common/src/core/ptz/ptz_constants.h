@@ -52,7 +52,7 @@ public:
         SynchronizedPtzCapability = 0x00200000,
         VirtualPtzCapability = 0x00400000,
 
-        AuxilaryPtzCapability = 0x01000000,
+        AuxiliaryPtzCapability = 0x01000000,
 
         NativePresetsPtzCapability = 0x08000000,
         NoNxPresetsPtzCapability = 0x10000000, //<< TODO: remove it. Introduce NativePresets and NxPresets capabilities instead

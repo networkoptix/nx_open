@@ -15,7 +15,7 @@
 #include <plugins/resource/hanwha/hanwha_ptz_common.h>
 #include <plugins/resource/onvif/onvif_resource.h>
 
-#include <core/ptz/ptz_auxilary_trait.h>
+#include <core/ptz/ptz_auxiliary_trait.h>
 #include <nx/core/ptz/type.h>
 #include <nx/utils/timer_holder.h>
 
@@ -27,9 +27,9 @@ extern "C" {
 
 namespace nx {
 
-namespace mediaserver { namespace resource { class SharedContextPool; } }
+namespace vms::server { namespace resource { class SharedContextPool; } }
 
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 enum class HanwhaProfileParameterFlag
@@ -157,7 +157,7 @@ public:
     CameraDiagnostics::Result enableAudioInput();
 
 protected:
-    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+    virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
@@ -207,9 +207,9 @@ private:
     void cleanUpOnProxiedDeviceChange();
 
     HanwhaPtzRangeMap fetchPtzRanges();
-    QnPtzAuxilaryTraitList calculatePtzTraits() const;
-    QnPtzAuxilaryTraitList calculateCameraOnlyTraits() const;
-    void calculateAutoFocusSupport(QnPtzAuxilaryTraitList* outTraitList) const;
+    QnPtzAuxiliaryTraitList calculatePtzTraits() const;
+    QnPtzAuxiliaryTraitList calculateCameraOnlyTraits() const;
+    void calculateAutoFocusSupport(QnPtzAuxiliaryTraitList* outTraitList) const;
 
     AVCodecID defaultCodecForStream(Qn::ConnectionRole role) const;
     QSize defaultResolutionForStream(Qn::ConnectionRole role) const;
@@ -363,7 +363,7 @@ private:
     std::map<Qn::ConnectionRole, ProfileNumbers> m_profileByRole;
 
     QnPtzLimits m_ptzLimits;
-    QnPtzAuxilaryTraitList m_ptzTraits;
+    QnPtzAuxiliaryTraitList m_ptzTraits;
     HanwhaPtzRangeMap m_ptzRanges;
     HanwhaPtzCapabilitiesMap m_ptzCapabilities = {
         {nx::core::ptz::Type::operational, Ptz::NoPtzCapabilities},
@@ -398,5 +398,5 @@ private:
 };
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx

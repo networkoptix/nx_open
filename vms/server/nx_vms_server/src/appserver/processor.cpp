@@ -35,7 +35,7 @@ QnAppserverResourceProcessor::QnAppserverResourceProcessor(
     ec2::QnDistributedMutexManager* distributedMutexManager,
     QnUuid serverId)
 :
-    nx::mediaserver::ServerModuleAware(serverModule),
+    nx::vms::server::ServerModuleAware(serverModule),
     m_serverId(serverId),
     m_distributedMutexManager(distributedMutexManager)
 {

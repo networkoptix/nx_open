@@ -35,7 +35,7 @@ static QString getPosixTimeZone(const QTimeZone& timeZone)
 }
 
 namespace nx {
-namespace mediaserver_core {
+namespace vms::server {
 namespace plugins {
 
 HanwhaTimeSyncronizer::HanwhaTimeSyncronizer()
@@ -240,5 +240,5 @@ void HanwhaTimeSyncronizer::doRequest(
 }
 
 } // namespace plugins
-} // namespace mediaserver_core
+} // namespace vms::server
 } // namespace nx
