@@ -315,12 +315,9 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="actionWarningLabel">
+         <widget class="QnWordWrappedLabel" name="actionWarningLabel">
           <property name="text">
            <string/>
-          </property>
-          <property name="wordWrap">
-           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -369,6 +366,12 @@
    <class>nx::vms::client::desktop::AggregationWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/business/aggregation_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
