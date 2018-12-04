@@ -79,6 +79,8 @@ protected:
     {
         auto connectionContext = std::make_shared<ConnectionContext>();
         auto readyFuture = connectionContext->promise.get_future();
+        connectionContext->server = m_server;
+        connectionContext->client = m_client;
 
         m_server->sendAsync(
             m_serverSendBuffer,
@@ -128,12 +130,14 @@ private:
     {
         int sendCount = 0;
         int readCount  = 0;
+        std::shared_ptr<P2PHttpServerTransport> server;
+        std::shared_ptr<P2PHttpClientTransport> client;
         nx::utils::promise<void> promise;
     };
 
     static const QString kPath;
-    std::unique_ptr<P2PHttpServerTransport> m_server;
-    std::unique_ptr<P2PHttpClientTransport> m_client;
+    std::shared_ptr<P2PHttpServerTransport> m_server;
+    std::shared_ptr<P2PHttpClientTransport> m_client;
     static nx::Buffer m_serverSendBuffer;
     nx::Buffer m_clientReadBuffer;
     static nx::Buffer m_clientSendBuffer;
