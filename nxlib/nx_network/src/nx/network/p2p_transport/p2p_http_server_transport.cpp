@@ -172,7 +172,7 @@ void P2PHttpServerTransport::sendResponse(
         userHandler = std::move(userHandler),
         completionHandler = std::move(completionHandler)](
             SystemError::ErrorCode error,
-            size_t transferred) mutable
+            size_t /*transferred*/) mutable
         {
             m_responseBuffer.clear();
             if (readError != SystemError::noError)

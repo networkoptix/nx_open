@@ -158,7 +158,7 @@ private:
         nx::utils::promise<void> connectPromise;
         auto connectFuture = connectPromise.get_future();
         m_acceptor->acceptAsync(
-            [&](SystemError::ErrorCode ecode, std::unique_ptr<AbstractStreamSocket> acceptedSocket)
+            [&](SystemError::ErrorCode /*ecode*/, std::unique_ptr<AbstractStreamSocket> acceptedSocket)
             {
                 *serverSocket = std::move(acceptedSocket);
                 (*serverSocket)->setNonBlockingMode(true);
