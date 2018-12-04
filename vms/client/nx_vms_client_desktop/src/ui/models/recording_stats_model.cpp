@@ -171,28 +171,7 @@ qreal QnRecordingStatsModel::chartData(const QModelIndex& index) const
 
 QString QnRecordingStatsModel::tooltipText(Columns column) const
 {
-    switch (column)
-    {
-        case CameraNameColumn:
-            return QnDeviceDependentStrings::getDefaultNameFromSet(
-                resourcePool(),
-                tr("Devices with non-empty archive"),
-                tr("Cameras with non-empty archive")
-                );
-        case BytesColumn:
-            return QnDeviceDependentStrings::getDefaultNameFromSet(
-                resourcePool(),
-                tr("Storage space occupied by devices"),
-                tr("Storage space occupied by cameras")
-                );
-        case DurationColumn:
-            return tr("Archived duration in calendar days since the first recording");
-        case BitrateColumn:
-            return tr("Average bitrate for the recorded period");
-        default:
-            break;
-    }
-    return QString();
+    return QString(); //< We currently decided to skip tooltips.
 }
 
 QVariant QnRecordingStatsModel::data(const QModelIndex &index, int role) const
@@ -224,7 +203,7 @@ QVariant QnRecordingStatsModel::data(const QModelIndex &index, int role) const
 
             break;
         }
-        case Qn::ResourceRole: //< This is used by QnResourceItemDelegate to draw contents. 
+        case Qn::ResourceRole: //< This is used by QnResourceItemDelegate to draw contents.
         {
             if (rowType == Normal)
                 return QVariant::fromValue<QnResourcePtr>(

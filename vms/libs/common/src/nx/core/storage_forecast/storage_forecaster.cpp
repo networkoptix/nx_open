@@ -66,7 +66,7 @@ void nx::core::storage_forecast::doForecast(const CameraRecordingSettingsSet& ca
     for (auto& cameraStat: forecast)
     {
         auto camera = std::find_if(cameras.begin(), cameras.end(),
-            [cameraStat](const CameraRecordingSettings &camera) -> bool { return camera.uniqueId == cameraStat.uniqueId; });
+            [cameraStat](const CameraRecordingSettings& cam) { return cam.uniqueId == cameraStat.uniqueId; });
         if (camera == cameras.end())
         {
             NX_ASSERT(false, "Strange - this cameraStat should be filtered in forecastFromStatsToModel()");
@@ -74,7 +74,7 @@ void nx::core::storage_forecast::doForecast(const CameraRecordingSettingsSet& ca
         }
         else
         {
-            if (cameraStat.averageDensity == 0) // We have no data to make forecast on this camera.
+            if (cameraStat.averageDensity == 0) //< We have no data to make forecast on this camera.
                 cameraStat.archiveDurationSecs = 0;
             else if (days < maxMinDays)
                 cameraStat.archiveDurationSecs = (qint64) (kSecsInDay * qMin((qreal)camera->minDays, days));
