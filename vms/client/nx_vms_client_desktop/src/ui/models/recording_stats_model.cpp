@@ -317,7 +317,7 @@ QString QnRecordingStatsModel::formatBytesString(qint64 bytes) const
 QString QnRecordingStatsModel::formatDurationString(const QnCamRecordingStatsData& data) const
 {
     if (data.archiveDurationSecs == 0)
-        return tr("empty");
+        return m_isForecastRole ? tr("no data for forecast") : tr("empty");
 
     if (data.archiveDurationSecs < kSecondsPerHour)
         return tr("less than an hour");
