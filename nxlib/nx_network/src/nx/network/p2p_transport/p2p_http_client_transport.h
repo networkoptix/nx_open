@@ -5,6 +5,7 @@
 #include <nx/network/websocket/websocket_common_types.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/multipart_content_parser.h>
+#include <nx/utils/object_destruction_flag.h>
 
 namespace nx::network {
 
@@ -65,6 +66,7 @@ private:
     websocket::FrameType m_messageType;
     bool m_failed = false;
     boost::optional<utils::Url> m_url;
+    utils::ObjectDestructionFlag m_destructionFlag;
 
     void startReading();
 };

@@ -105,6 +105,8 @@ protected:
     {
         auto connectionContext = std::make_shared<ConnectionContext>();
         auto readyFuture = connectionContext->promise.get_future();
+        connectionContext->server = m_server;
+        connectionContext->client = m_client;
 
         m_client->sendAsync(
             m_clientSendBuffer,
@@ -153,7 +155,6 @@ private:
         *clientSocket = SocketFactory::createStreamSocket();
         (*clientSocket)->setNonBlockingMode(true);
 
-
         nx::utils::promise<void> connectPromise;
         auto connectFuture = connectPromise.get_future();
         m_acceptor->acceptAsync(
@@ -173,13 +174,13 @@ private:
         SystemError::ErrorCode error,
         size_t transferred)
     {
-        if (connectionContext->sendCount++ == 1000)
+        if (++connectionContext->sendCount == 1000)
             return;
 
         ASSERT_EQ(SystemError::noError, error);
         ASSERT_LE(m_serverSendBuffer.size(), transferred);
 
-        m_server->sendAsync(
+        connectionContext->server->sendAsync(
             m_serverSendBuffer,
             [this, connectionContext](SystemError::ErrorCode error, size_t transferred)
             {
@@ -216,7 +217,7 @@ private:
         SystemError::ErrorCode error,
         size_t transferred)
     {
-        if (connectionContext->sendCount++ == 1000)
+        if (++connectionContext->sendCount == 1000)
             return;
 
         ASSERT_EQ(SystemError::noError, error);

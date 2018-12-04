@@ -4,6 +4,7 @@
 #include <nx/network/websocket/websocket_common_types.h>
 #include <nx/network/http/http_parser.h>
 #include <nx/network/aio/timer.h>
+#include <nx/utils/object_destruction_flag.h>
 
 namespace nx::network {
 
@@ -52,6 +53,7 @@ private:
     aio::Timer m_timer;
     utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onGetRequestReceived =
         [](SystemError::ErrorCode) {};
+    utils::ObjectDestructionFlag m_destructionFlag;
 
     void onBytesRead(
         SystemError::ErrorCode error,
@@ -64,7 +66,8 @@ private:
     QByteArray makeFrameHeader() const;
     void sendResponse(
         SystemError::ErrorCode error,
-        utils::MoveOnlyFunc<void(SystemError::ErrorCode)> completionHandler);
+        IoCompletionHandler userHandler,
+        utils::MoveOnlyFunc<void(SystemError::ErrorCode, IoCompletionHandler)> completionHandler);
     static void addDateHeader(http::HttpHeaders* headers);
 };
 

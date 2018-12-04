@@ -107,7 +107,11 @@ void P2PHttpClientTransport::sendAsync(const nx::Buffer& buffer, IoCompletionHan
                     const std::size_t transferred = resultCode == SystemError::noError
                         ? bufferSize : 0;
 
+                    utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
                     handler(resultCode, transferred);
+                    if (watcher.objectDestroyed())
+                        return;
+
                     m_postInProgress = 0;
                 });
 
@@ -125,11 +129,11 @@ void P2PHttpClientTransport::bindToAioThread(aio::AbstractAioThread* aioThread)
         });
 }
 
-void P2PHttpClientTransport::cancelIoInAioThread(nx::network::aio::EventType /*eventType*/)
+void P2PHttpClientTransport::cancelIoInAioThread(nx::network::aio::EventType eventType)
 {
-    m_readHttpClient->cancelPostedCallsSync();
+    m_readHttpClient->socket()->cancelIOSync(eventType);
     if (m_writeHttpClient)
-        m_writeHttpClient->cancelPostedCallsSync();
+        m_writeHttpClient->socket()->cancelIOSync(eventType);
 }
 
 aio::AbstractAioThread* P2PHttpClientTransport::getAioThread() const
@@ -139,13 +143,9 @@ aio::AbstractAioThread* P2PHttpClientTransport::getAioThread() const
 
 void P2PHttpClientTransport::pleaseStopSync()
 {
-    m_readHttpClient->cancelPostedCallsSync();
     m_readHttpClient->pleaseStopSync();
     if (m_writeHttpClient)
-    {
-        m_writeHttpClient->cancelPostedCallsSync();
         m_writeHttpClient->pleaseStopSync();
-    }
 }
 
 SocketAddress P2PHttpClientTransport::getForeignAddress() const

@@ -98,6 +98,17 @@ void P2PHttpServerTransport::onBytesRead(
 
     size_t totalBytesProcessed = 0;
 
+    auto completionHandler =
+        [this](SystemError::ErrorCode error, IoCompletionHandler handler)
+        {
+            utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+            handler(error, m_readContext.bytesParsed);
+            if (watcher.objectDestroyed())
+                return;
+
+            m_readContext.reset();
+        };
+
     while (totalBytesProcessed != transferred)
     {
         size_t bytesProcessed = 0;
@@ -109,22 +120,10 @@ void P2PHttpServerTransport::onBytesRead(
         {
         case server::ParserState::done:
             buffer->append(m_readContext.parser.fetchMessageBody());
-            sendResponse(
-                SystemError::noError,
-                [this, handler = std::move(handler)](SystemError::ErrorCode error)
-                {
-                    handler(error, m_readContext.bytesParsed);
-                    m_readContext.reset();
-                });
+            sendResponse(SystemError::noError, std::move(handler), std::move(completionHandler));
             return;
         case server::ParserState::failed:
-            sendResponse(
-                SystemError::invalidData,
-                [this, handler = std::move(handler)](SystemError::ErrorCode error)
-                {
-                    handler(error, 0);
-                    m_readContext.reset();
-                });
+            sendResponse(SystemError::invalidData, std::move(handler), std::move(completionHandler));
             return;
         case server::ParserState::readingBody:
         case server::ParserState::readingMessage:
@@ -133,13 +132,7 @@ void P2PHttpServerTransport::onBytesRead(
             break;
         case server::ParserState::init:
             NX_ASSERT(false, "Should never get here");
-            sendResponse(
-                SystemError::invalidData,
-                [this, handler = std::move(handler)](SystemError::ErrorCode error)
-                {
-                    handler(error, 0);
-                    m_readContext.reset();
-                });
+            sendResponse(SystemError::invalidData, std::move(handler), std::move(completionHandler));
             return;
         }
     }
@@ -158,7 +151,8 @@ void P2PHttpServerTransport::addDateHeader(http::HttpHeaders* headers)
 
 void P2PHttpServerTransport::sendResponse(
     SystemError::ErrorCode error,
-    utils::MoveOnlyFunc<void(SystemError::ErrorCode)> completionHandler)
+    IoCompletionHandler userHandler,
+    utils::MoveOnlyFunc<void(SystemError::ErrorCode, IoCompletionHandler)> completionHandler)
 {
     http::Response response;
     response.statusLine.statusCode = error == SystemError::noError
@@ -173,18 +167,21 @@ void P2PHttpServerTransport::sendResponse(
 
     m_readSocket->sendAsync(
         m_responseBuffer,
-        [this, readError = error, completionHandler = std::move(completionHandler)](
+        [this,
+        readError = error,
+        userHandler = std::move(userHandler),
+        completionHandler = std::move(completionHandler)](
             SystemError::ErrorCode error,
-            size_t transferred)
+            size_t transferred) mutable
         {
             m_responseBuffer.clear();
             if (readError != SystemError::noError)
-                return completionHandler(readError);
+                return completionHandler(readError, std::move(userHandler));
 
             if (error != SystemError::noError)
-                return completionHandler(error);
+                return completionHandler(error, std::move(userHandler));
 
-            completionHandler(SystemError::noError);
+            completionHandler(SystemError::noError, std::move(userHandler));
         });
 }
 
