@@ -5,6 +5,7 @@
 #include <nx/utils/type_utils.h>
 
 #include "controller.h"
+#include "model.h"
 #include "http_view.h"
 #include "libcloud_db_app_info.h"
 #include "statistics/provider.h"
@@ -57,7 +58,9 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
 
     m_settings = &settings;
 
-    Controller controller(settings);
+    auto model = ModelFactory::instance().create();
+
+    Controller controller(settings, &model);
     m_controller = &controller;
 
     HttpView view(settings, &controller);

@@ -47,9 +47,19 @@ std::optional<data::Credentials> TemporaryCredentialsDao::find(
 void TemporaryCredentialsDao::update(
     nx::sql::QueryContext* /*queryContext*/,
     const nx::utils::stree::ResourceNameSet& /*attributeNameset*/,
-    const data::Credentials& /*credentials*/,
-    const data::TemporaryAccountCredentials& /*tempPasswordData*/)
+    const data::Credentials& credentials,
+    const data::TemporaryAccountCredentials& tempPasswordData)
 {
+    for (auto& idAndCredentials: m_credentialsById)
+    {
+        if (idAndCredentials.second.login == credentials.login)
+        {
+            idAndCredentials.second.expirationTimestampUtc =
+                tempPasswordData.expirationTimestampUtc;
+            idAndCredentials.second.useCount = tempPasswordData.useCount;
+            idAndCredentials.second.maxUseCount = tempPasswordData.maxUseCount;
+        }
+    }
 }
 
 void TemporaryCredentialsDao::deleteById(
@@ -80,7 +90,13 @@ std::vector<data::TemporaryAccountCredentialsEx> TemporaryCredentialsDao::fetchA
     nx::sql::QueryContext* /*queryContext*/,
     const nx::utils::stree::ResourceNameSet& /*attributeNameset*/)
 {
-    return {};
+    std::vector<data::TemporaryAccountCredentialsEx> result;
+    std::transform(
+        m_credentialsById.begin(), m_credentialsById.end(),
+        std::back_inserter(result),
+        [](const auto& idAndCredentials) { return idAndCredentials.second; });
+
+    return result;
 }
 
 void TemporaryCredentialsDao::parsePasswordString(
