@@ -52,7 +52,7 @@ void TemporaryCredentialsDao::update(
 {
     for (auto& idAndCredentials: m_credentialsById)
     {
-        if (idAndCredentials.second.login == tempPasswordData.login)
+        if (idAndCredentials.second.login == credentials.login)
         {
             idAndCredentials.second.expirationTimestampUtc =
                 tempPasswordData.expirationTimestampUtc;
