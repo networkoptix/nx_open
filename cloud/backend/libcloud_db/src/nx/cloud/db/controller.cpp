@@ -18,7 +18,10 @@ const int kMaxSupportedProtocolVersion = nx_ec::EC2_PROTO_VERSION;
 
 static const QnUuid kCdbGuid("{674bafd7-4eec-4bba-84aa-a1baea7fc6db}");
 
-Controller::Controller(const conf::Settings& settings):
+Controller::Controller(
+    const conf::Settings& settings,
+    Model* model)
+    :
     m_settings(settings),
     m_dbInstanceController(settings.dbConnectionOptions()),
     m_emailManager(EMailManagerFactory::create(settings)),
@@ -26,7 +29,8 @@ Controller::Controller(const conf::Settings& settings):
     m_tempPasswordManager(
         settings.accountManager(),
         m_streeManager.resourceNameSet(),
-        &m_dbInstanceController.queryExecutor()),
+        &m_dbInstanceController.queryExecutor(),
+        model->temporaryCredentialsDao.get()),
     m_accountManager(
         settings,
         m_streeManager,
