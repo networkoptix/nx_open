@@ -67,11 +67,11 @@ QnModuleInformationRestHandler::~QnModuleInformationRestHandler()
     stopPollable.post(
         [this, &stopPromise]()
         {
-            NX_DEBUG(this, "Close all %1 kept and %2 updated connections on destruction",
-                m_connectionsToKeepOpen.size(), m_connectionsToUpdate.size());
+            NX_DEBUG(this, "Closing all %1 kept and %2 updated connections on destruction",
+                m_connectionsToKeepOpened.size(), m_connectionsToUpdate.size());
 
             m_pollable.pleaseStopSync();
-            clear(&m_connectionsToKeepOpen);
+            clear(&m_connectionsToKeepOpened);
             clear(&m_connectionsToUpdate);
             stopPromise.set_value();
         });
@@ -156,7 +156,7 @@ void QnModuleInformationRestHandler::afterExecute(
         || !socket->setKeepAlive(kKeepAliveOptions))
     {
         const auto error = SystemError::getLastOSErrorCode();
-        NX_DEBUG(this, lm("Failed to configure connection from %1: %2")
+        NX_DEBUG(this, lm("Failed to configure a connection from %1: %2")
             .args(socket->getForeignAddress(), SystemError::toString(error)));
         return;
     }
@@ -170,31 +170,33 @@ void QnModuleInformationRestHandler::afterExecute(
                 const auto connection = m_connectionsToUpdate.insert(
                     m_connectionsToUpdate.end(), {std::move(socket), *updateStreamTime});
 
-                NX_VERBOSE(this, "Connection from %1 asks for update stream (interval %2), %3 total",
+                NX_VERBOSE(this,
+                    "A connection from %1 asks for updating a stream (interval %2), %3 total",
                     connection->socket->getForeignAddress(), *updateStreamTime,
-                    m_connectionsToKeepOpen.size());
+                    m_connectionsToKeepOpened.size());
 
                 sendKeepAliveByTimer(connection);
             }
             else
             {
-                const auto connection = m_connectionsToKeepOpen.insert(
-                    m_connectionsToKeepOpen.end(), {std::move(socket)});
+                const auto connection = m_connectionsToKeepOpened.insert(
+                    m_connectionsToKeepOpened.end(), {std::move(socket)});
 
-                NX_VERBOSE(this, "Connection from %1 asks to keep connection open, %2 total",
-                    connection->socket->getForeignAddress(), m_connectionsToKeepOpen.size());
+                NX_VERBOSE(this, "A connection from %1 asks to keep connection opened, %2 total",
+                    connection->socket->getForeignAddress(), m_connectionsToKeepOpened.size());
 
                 auto buffer = std::make_shared<QByteArray>();
                 buffer->reserve(100);
                 connection->socket->readSomeAsync(buffer.get(),
                     [this, buffer, connection](SystemError::ErrorCode code, size_t size)
                     {
-                        NX_VERBOSE(this, "Unexpected event on connection from %1 (size=%2): %3",
+                        NX_VERBOSE(this,
+                            "Unexpected event on the connection from %1 (size=%2): %3",
                             connection->socket->getForeignAddress(), size,
                             SystemError::toString(code));
 
                         connection->socket->cancelIOSync(nx::network::aio::etNone);
-                        m_connectionsToKeepOpen.erase(connection);
+                        m_connectionsToKeepOpened.erase(connection);
                     });
             }
         });
@@ -210,8 +212,8 @@ void QnModuleInformationRestHandler::changeModuleInformation()
         [this]()
         {
             NX_DEBUG(this, "Close %1 connections on moduleInformation change",
-                m_connectionsToKeepOpen.size());
-            clear(&m_connectionsToKeepOpen);
+                m_connectionsToKeepOpened.size());
+            clear(&m_connectionsToKeepOpened);
 
             updateModuleImformation();
             NX_DEBUG(this, lm("Update %1 connections on moduleInformation change")
@@ -275,7 +277,7 @@ void QnModuleInformationRestHandler::sendModuleImformation(Connections::iterator
     if (m_moduleInformatiom.isEmpty())
         updateModuleImformation();
 
-    NX_VERBOSE(this, "Send module information to %1", connection->socket->getForeignAddress());
+    NX_VERBOSE(this, "Sending module information to %1", connection->socket->getForeignAddress());
     send(connection, m_moduleInformatiom);
 }
 
@@ -292,8 +294,7 @@ void QnModuleInformationRestHandler::sendKeepAliveByTimer(
         [this, connection, interval]()
         {
             NX_VERBOSE(this, "Send keep alive to %1", connection->socket->getForeignAddress());
-            static const auto kEmptyObject = QJson::serialize(QJsonObject());
-            send(connection, kEmptyObject);
+            send(connection, "{}");
         });
 }
 
