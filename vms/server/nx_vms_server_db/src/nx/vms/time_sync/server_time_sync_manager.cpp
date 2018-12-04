@@ -232,6 +232,10 @@ void ServerTimeSyncManager::updateTime()
 
     if (primaryTimeServerId == ownId || !isTimeSyncEnabled)
     {
+        // Reset network time sync period. If user will change settings, next network request
+        // should be applied immediately without regular delay.
+        m_lastNetworkSyncTime.invalidate();
+
         loadTimeFromLocalClock();
     }
     else if (syncWithInternel)
