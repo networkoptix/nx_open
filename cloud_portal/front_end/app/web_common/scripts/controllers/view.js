@@ -624,7 +624,9 @@
                 var killSubscription = $rootScope.$on('$routeChangeStart', function (event, next) {
                     timeFromUrl = $location.search().time;
                     
-                    $scope.activeCamera = $scope.camerasProvider.getCamera(next.params.cameraId);
+                    if (next.params.cameraId) {
+                        $scope.activeCamera = $scope.camerasProvider.getCamera(next.params.cameraId);
+                    }
                 });
                 
                 $('html').addClass('webclient-page');
