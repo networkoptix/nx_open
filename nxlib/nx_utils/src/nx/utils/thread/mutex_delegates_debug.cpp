@@ -22,19 +22,12 @@ MutexDebugDelegate::~MutexDebugDelegate()
 void MutexDebugDelegate::lock(const char* sourceFile, int sourceLine, int lockId)
 {
     m_mutex.lock();
-    afterMutexLocked(sourceFile, sourceLine, lockId);
+    afterLock(sourceFile, sourceLine, lockId);
 }
 
 void MutexDebugDelegate::unlock()
 {
-    if (m_isAnalyzerInUse)
-        MutexLockAnalyzer::instance()->beforeMutexUnlocked(currentLockStack.top());
-
-    currentLockStack.pop();
-
-    if (--recursiveLockCount == 0)
-        threadHoldingMutex = 0;
-
+    beforeUnlock();
     m_mutex.unlock();
 }
 
@@ -42,7 +35,7 @@ bool MutexDebugDelegate::tryLock(const char* sourceFile, int sourceLine, int loc
 {
     const auto result = m_mutex.tryLock();
     if (result)
-        afterMutexLocked(sourceFile, sourceLine, lockId);
+        afterLock(sourceFile, sourceLine, lockId);
 
     return result;
 }
@@ -53,7 +46,7 @@ bool MutexDebugDelegate::isRecursive() const
 }
 
 
-void MutexDebugDelegate::afterMutexLocked(const char* sourceFile, int sourceLine, int lockId)
+void MutexDebugDelegate::afterLock(const char* sourceFile, int sourceLine, int lockId)
 {
     threadHoldingMutex = ::currentThreadSystemId();
     ++recursiveLockCount;
@@ -70,6 +63,17 @@ void MutexDebugDelegate::afterMutexLocked(const char* sourceFile, int sourceLine
         MutexLockAnalyzer::instance()->afterMutexLocked(lockKey);
 
     currentLockStack.push(std::move(lockKey));
+}
+
+void MutexDebugDelegate::beforeUnlock()
+{
+    if (m_isAnalyzerInUse)
+        MutexLockAnalyzer::instance()->beforeMutexUnlocked(currentLockStack.top());
+
+    currentLockStack.pop();
+
+    if (--recursiveLockCount == 0)
+        threadHoldingMutex = 0;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -114,17 +118,24 @@ void ReadWriteLockDebugDelegate::unlock()
 
 bool WaitConditionDebugDelegate::wait(MutexDelegate* mutex, std::chrono::milliseconds timeout)
 {
-    return m_delegate.wait(
-        &static_cast<MutexDebugDelegate*>(mutex)->m_mutex,
-        timeout == std::chrono::milliseconds::max() ? ULONG_MAX : (unsigned long) timeout.count());
+    auto mutexDelegate = static_cast<MutexDebugDelegate*>(mutex);
+    mutexDelegate->beforeUnlock();
+
+    const auto result = m_delegate.wait(
+        &mutexDelegate->m_mutex,
+        (timeout == std::chrono::milliseconds::max())
+            ? ULONG_MAX
+            : (unsigned long) timeout.count());
+
+    //< Better to save current position than nothing.
+    mutexDelegate->afterLock(__FILE__, __LINE__, 0);
+    return result;
 }
 
 bool WaitConditionDebugDelegate::wait(
     ReadWriteLockDelegate* mutex, std::chrono::milliseconds timeout)
 {
-    return m_delegate.wait(
-        &static_cast<ReadWriteLockDebugDelegate*>(mutex)->m_delegate.m_mutex,
-        timeout == std::chrono::milliseconds::max() ? ULONG_MAX : (unsigned long) timeout.count());
+    return wait(&static_cast<ReadWriteLockDebugDelegate*>(mutex)->m_delegate, timeout);
 }
 
 void WaitConditionDebugDelegate::wakeAll()
