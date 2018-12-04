@@ -14,11 +14,11 @@ ${common password}             qweasd123
 ${weak password}               asqwerdf
 ${fair password}               qweasd1234
 
-${PASSWORD IS REQUIRED}            //span[@ng-if='form.passwordNew.$error.required' and contains(text(),'${PASSWORD IS REQUIRED TEXT}')]
-${PASSWORD SPECIAL CHARS}          //span[contains(@ng-if, 'form.passwordNew.$error.pattern &&') and contains(@ng-if,'!form.passwordNew.$error.minlength') and contains(text(),'${PASSWORD SPECIAL CHARS TEXT}')]
-${PASSWORD TOO SHORT}              //span[contains(@ng-if,'form.passwordNew.$error.minlength') and contains(text(),'${PASSWORD TOO SHORT TEXT}')]
-${PASSWORD TOO COMMON}             //span[contains(@ng-if,'form.passwordNew.$error.common &&') and contains(@ng-if,'!form.passwordNew.$error.required') and contains(text(),'${PASSWORD TOO COMMON TEXT}')]
-${PASSWORD IS WEAK}                //span[contains(@ng-if,'form.passwordNew.$error.weak &&') and contains(@ng-if,'!form.passwordNew.$error.common &&') and contains(@ng-if,'!form.passwordNew.$error.pattern &&') and contains(@ng-if,'!form.passwordNew.$error.minlength') and contains(@ng-if,'!form.passwordNew.$error.required &&') and contains(text(),'${PASSWORD IS WEAK TEXT}')]
+${PASSWORD IS REQUIRED}            //span[@ng-if='form[id].$error.required' and contains(text(),'${PASSWORD IS REQUIRED TEXT}')]
+${PASSWORD SPECIAL CHARS}          //span[contains(@ng-if,'form[id].$error.pattern &&') and contains(@ng-if,'!form[id].$error.minlength') and contains(text(),'${PASSWORD SPECIAL CHARS TEXT}')]
+${PASSWORD TOO SHORT}              //span[contains(@ng-if,'form[id].$error.minlength') and contains(text(),'${PASSWORD TOO SHORT TEXT}')]
+${PASSWORD TOO COMMON}             //span[contains(@ng-if,'form[id].$error.common &&') and contains(@ng-if,'!form[id].$error.required') and contains(text(),'${PASSWORD TOO COMMON TEXT}')]
+${PASSWORD IS WEAK}                //span[contains(@ng-if,'form[id].$error.weak &&') and contains(@ng-if,'!form[id].$error.common &&') and contains(@ng-if,'!form[id].$error.pattern &&') and contains(@ng-if,'!form[id].$error.minlength') and contains(@ng-if,'!form[id].$error.required &&') and contains(text(),'${PASSWORD IS WEAK TEXT}')]
 ${CURRENT PASSWORD IS REQUIRED}    //span[contains(@ng-if,'passwordForm.password.$touched &&') and contains(@ng-if,'passwordForm.password.$error.required') and contains(text(),"${CURRENT PASSWORD IS REQUIRED TEXT}")]
 
 *** Test Cases ***              OLD PW                    NEW PW
