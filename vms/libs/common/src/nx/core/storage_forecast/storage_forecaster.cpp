@@ -74,7 +74,7 @@ void nx::core::storage_forecast::doForecast(const CameraRecordingSettingsSet& ca
         }
         else
         {
-            if (cameraStat.averageDensity == 0) //< We have no data to make forecast on this camera.
+            if (camera->averageDensity == 0) //< We have no data to make forecast on this camera.
                 cameraStat.archiveDurationSecs = 0;
             else if (days < maxMinDays)
                 cameraStat.archiveDurationSecs = (qint64) (kSecsInDay * qMin((qreal)camera->minDays, days));
