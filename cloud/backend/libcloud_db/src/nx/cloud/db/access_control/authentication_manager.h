@@ -26,9 +26,6 @@ class AuthMethodRestrictionList;
 
 namespace nx::cloud::db {
 
-class AccountManager;
-class SystemManager;
-class TemporaryAccountPasswordManager;
 class StreeManager;
 class AbstractAuthenticationDataProvider;
 
