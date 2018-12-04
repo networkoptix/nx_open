@@ -23,11 +23,12 @@ struct QnLowFreeSpaceWarning;
 
 namespace Ui { class MultiServerUpdatesWidget; }
 
-class QnSortedServerUpdatesModel;
+
 
 namespace nx::vms::client::desktop {
 
 class ServerUpdatesModel;
+class SortedPeerUpdatesModel;
 class ServerStatusItemDelegate;
 
 struct UpdateItem;
@@ -186,7 +187,8 @@ private:
     std::unique_ptr<ServerUpdateTool> m_serverUpdateTool;
     std::unique_ptr<ClientUpdateTool> m_clientUpdateTool;
     std::shared_ptr<ServerUpdatesModel> m_updatesModel;
-    std::unique_ptr<QnSortedServerUpdatesModel> m_sortedModel;
+    std::shared_ptr<PeerStateTracker> m_stateTracker;
+    std::unique_ptr<SortedPeerUpdatesModel> m_sortedModel;
     std::unique_ptr<ServerStatusItemDelegate> m_statusItemDelegate;
 
     // ServerUpdateTool promises this.
