@@ -126,7 +126,8 @@ protected:
 private:
     struct ConnectionContext
     {
-        int count = 0;
+        int sendCount = 0;
+        int readCount  = 0;
         nx::utils::promise<void> promise;
     };
 
@@ -168,13 +169,12 @@ private:
         SystemError::ErrorCode error,
         size_t transferred)
     {
+        if (connectionContext->sendCount++ == 1000)
+            return;
+
         ASSERT_EQ(SystemError::noError, error);
         ASSERT_LE(m_serverSendBuffer.size(), transferred);
 
-        if (connectionContext->count == 1000)
-            return;
-
-        connectionContext->count++;
         m_server->sendAsync(
             m_serverSendBuffer,
             [this, connectionContext](SystemError::ErrorCode error, size_t transferred)
@@ -192,7 +192,7 @@ private:
         ASSERT_EQ(m_serverSendBuffer.size(), transferred);
         ASSERT_EQ(m_clientReadBuffer, m_serverSendBuffer);
 
-        if (connectionContext->count == 1000)
+        if (++connectionContext->readCount == 1000)
         {
             connectionContext->promise.set_value();
             return;
@@ -212,13 +212,11 @@ private:
         SystemError::ErrorCode error,
         size_t transferred)
     {
-        ASSERT_EQ(SystemError::noError, error);
-        ASSERT_LE(m_clientSendBuffer.size(), transferred);
-
-        if (connectionContext->count == 1000)
+        if (connectionContext->sendCount++ == 1000)
             return;
 
-        connectionContext->count++;
+        ASSERT_EQ(SystemError::noError, error);
+        ASSERT_LE(m_clientSendBuffer.size(), transferred);
 
         m_client->sendAsync(
             m_clientSendBuffer,
@@ -237,7 +235,7 @@ private:
         ASSERT_LE(m_clientSendBuffer.size(), transferred);
         ASSERT_EQ(m_serverReadBuffer, m_clientSendBuffer);
 
-        if (connectionContext->count == 1000)
+        if (++connectionContext->readCount == 1000)
         {
             connectionContext->promise.set_value();
             return;

@@ -139,9 +139,13 @@ aio::AbstractAioThread* P2PHttpClientTransport::getAioThread() const
 
 void P2PHttpClientTransport::pleaseStopSync()
 {
+    m_readHttpClient->cancelPostedCallsSync();
     m_readHttpClient->pleaseStopSync();
     if (m_writeHttpClient)
+    {
+        m_writeHttpClient->cancelPostedCallsSync();
         m_writeHttpClient->pleaseStopSync();
+    }
 }
 
 SocketAddress P2PHttpClientTransport::getForeignAddress() const

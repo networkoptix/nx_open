@@ -280,9 +280,15 @@ aio::AbstractAioThread* P2PHttpServerTransport::getAioThread() const
 
 void P2PHttpServerTransport::pleaseStopSync()
 {
+    m_sendSocket->cancelIOSync(aio::etWrite);
+    m_sendSocket->cancelIOSync(aio::etRead);
     m_sendSocket->pleaseStopSync();
     if (m_readSocket)
+    {
+        m_readSocket->cancelIOSync(aio::etWrite);
+        m_readSocket->cancelIOSync(aio::etRead);
         m_readSocket->pleaseStopSync();
+    }
     m_timer.pleaseStopSync();
 }
 
