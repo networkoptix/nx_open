@@ -17,7 +17,6 @@ extern QString getValueFromString(const QString& line);
 
 namespace
 {
-    // TODO: #Elric we should probably increase this one. In some cases 4 secs is not enough.
     const int kDefaultAxisTimeout = 4000;
     const QString kTestCredentialsUrl = lit("axis-cgi/param.cgi?action=list&group=root.Network.Bonjour.FriendlyName");
     static const QString kChannelNumberSuffix(lit("_channel_")); //< For physicalId.

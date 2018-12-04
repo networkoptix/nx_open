@@ -96,10 +96,14 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
         bool ok = httpClient.doPost(
             url, "Content-Type: application/x-www-form-urlencoded", streamProfileStr.toUtf8());
         if (!ok)
+        {
             NX_DEBUG(this, "Request %1 system error: %2", url, httpClient.lastSysErrorCode());
+        }
         else if (!StatusCode::isSuccessCode(httpClient.response()->statusLine.statusCode))
+        {
             NX_DEBUG(this, "Request %1 error: %2", url,
                 StatusCode::toString(httpClient.response()->statusLine.statusCode));
+        }
         QnSleep::msleep(100);
     }
 
