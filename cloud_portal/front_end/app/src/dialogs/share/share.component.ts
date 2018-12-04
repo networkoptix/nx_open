@@ -47,6 +47,7 @@ export class ShareModalContent {
         this.accessRoles = [];
     }
 
+
     private getRoleDescription() {
         if (this.user.role.description) {
             return this.user.role.description;
@@ -62,7 +63,9 @@ export class ShareModalContent {
 
     setPermission(role: any) {
         this.selectedPermission = role;
-        this.accessDescription = this.language.accessRoles[ this.selectedPermission.name ].description;
+        this.accessDescription = this.language.accessRoles[this.selectedPermission.name] ?
+                this.language.accessRoles[this.selectedPermission.name].description :
+                this.language.accessRoles.customRole.description;
     }
 
     formatUserName() {
